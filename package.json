@@ -45,7 +45,12 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@metamask/jazzicon": "^2.0.0",
 		"daisyui": "^2.15.2",
-		"tailwindcss-font-inter": "^3.0.1"
+		"svelte-icons": "^2.1.0",
+		"svelte-image": "^0.2.9",
+		"svelte-web3": "^3.4.2",
+		"tailwindcss-font-inter": "^3.0.1",
+		"vite-plugin-windicss": "^1.8.4"
 	}
 }

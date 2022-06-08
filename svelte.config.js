@@ -1,15 +1,43 @@
-import adapter from "@sveltejs/adapter-auto";
-import preprocess from "svelte-preprocess";
-import { windi } from "svelte-windicss-preprocess";
-/** @type {import('@sveltejs/kit').Config} */
+import adapter from '@sveltejs/adapter-auto';
+import path from 'path';
+import preprocess from 'svelte-preprocess';
+import WindiCSS from 'vite-plugin-windicss';
+import image from 'svelte-image';
+
 const config = {
 	// Consult https://github.com/sveltejs/svelte-preprocess
 	// for more information about preprocessors
-	preprocess: preprocess([windi({})]),
+	preprocess: preprocess(
+		image({
+			placeholder: "blur"
+		})
+	),
 
 	kit: {
 		adapter: adapter(),
-	},
+		// adapter: adapter({
+		// 	fallback: '200.html'
+		// }),
+		// prerender: {
+		// 	enabled: false
+		// },
+		vite: {
+			server: { hmr: { overlay: true } },
+			resolve: {
+				alias: {
+					// these are the aliases and paths to them
+					types: path.resolve('./src/types'),
+					components: path.resolve('./src/components'),
+					stores: path.resolve('./src/stores'),
+					lib: path.resolve('./src/lib'),
+					models: path.resolve('./src/models')
+				}
+			},
+			mode: 'development',
+
+			plugins: [WindiCSS()]
+		}
+	}
 };
 
 export default config;

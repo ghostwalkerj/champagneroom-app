@@ -1,11 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		%sveltekit.head%
-	</head>
+	<meta charset="utf-8" />
+	<title>Champagne App</title>
+	<meta name="description" content="Champagne App" />
+	<link rel="icon" href="/favicon.ico" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js" />
+
+	<script type="application/javascript">
+		var global = window;
+	</script>
+	<script> window.process = window.process || { env: { NODE_DEBUG: undefined, DEBUG: undefined } }; window.global = window; </script>
+	%sveltekit.head%
 	<body>
 		<div>%sveltekit.body%</div>
 	</body>
