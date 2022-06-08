@@ -5,7 +5,6 @@
 	import GiTheaterCurtains from 'svelte-icons/gi/GiTheaterCurtains.svelte';
 	import MdDashboard from 'svelte-icons/md/MdDashboard.svelte';
 	import { selectedAccount } from 'svelte-web3';
-	export let url;
 
 	selectedAccount.subscribe(async (account) => {
 		if (account) {
