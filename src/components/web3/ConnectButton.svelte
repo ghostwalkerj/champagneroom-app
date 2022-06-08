@@ -5,15 +5,39 @@
 	import FaWindowClose from 'svelte-icons/fa/FaWindowClose.svelte';
 	import { connected, defaultEvmStores, selectedAccount, web3 } from 'svelte-web3';
 	import JazzIcon from './JazzIcon.svelte';
+	import Web3Modal from 'web3modal';
 
 	let pending = 'pending';
-	const enable = () => defaultEvmStores.setProvider();
 	const disable = () => defaultEvmStores.disconnect();
+	let WalletConnectProvider;
 
 	onMount(async () => {
 		// add a test to return in SSR context
-		await defaultEvmStores.setProvider();
+		WalletConnectProvider = await import('@walletconnect/web3-provider');
 	});
+
+	async function connect() {
+		try {
+			const web3Modal = await getWeb3Modal();
+		} catch (err) {
+			console.log('error:', err);
+		}
+	}
+
+	async function getWeb3Modal() {
+		const web3Modal = new Web3Modal({
+			cacheProvider: false,
+			providerOptions: {
+				walletconnect: {
+					package: WalletConnectProvider,
+					options: {
+						infuraId: '69863419b8cb4448a5fbad58c6186181'
+					}
+				}
+			}
+		});
+		return web3Modal;
+	}
 
 	function copyAddress() {
 		navigator.clipboard.writeText($selectedAccount);
@@ -29,7 +53,7 @@
 {#if !$connected || !$selectedAccount}
 	<button
 		class="bg-gradient-to-r rounded-xl font-medium from-pink-800 via-purple-900 to-blue-900  border-2 border-purple-700  shadow-sm text-sm text-white py-2 px-4 inline-flex  items-center whitespace-nowrap hover:border-pink-800"
-		on:click={enable}
+		on:click={connect}
 	>
 		Connect to Wallet
 	</button>
