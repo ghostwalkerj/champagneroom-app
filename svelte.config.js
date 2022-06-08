@@ -36,6 +36,16 @@ const config = {
 			mode: 'development',
 
 			plugins: [WindiCSS()]
+			,
+			optimizeDeps: {
+				esbuildOptions: {
+					// Node.js global to browser globalThis
+					define: {
+						global: "globalThis",
+					},
+
+				}
+			}
 		}
 	}
 };

@@ -14,6 +14,7 @@
 		"format": "prettier --write --plugin-search-dir=. ."
 	},
 	"devDependencies": {
+		"@esbuild-plugins/node-globals-polyfill": "^0.1.1",
 		"@playwright/test": "^1.22.2",
 		"@sveltejs/adapter-auto": "next",
 		"@sveltejs/kit": "next",
@@ -35,6 +36,7 @@
 		"prettier": "^2.3.2",
 		"prettier-plugin-solidity": "^1.0.0-beta.13",
 		"prettier-plugin-svelte": "^2.7.0",
+		"rollup-plugin-polyfill-node": "^0.9.0",
 		"svelte": "^3.44.0",
 		"svelte-check": "^2.7.1",
 		"svelte-preprocess": "^4.10.6",
@@ -46,11 +48,13 @@
 	"type": "module",
 	"dependencies": {
 		"@metamask/jazzicon": "^2.0.0",
+		"@walletconnect/web3-provider": "^1.7.8",
 		"daisyui": "^2.15.2",
 		"svelte-icons": "^2.1.0",
 		"svelte-image": "^0.2.9",
 		"svelte-web3": "^3.4.2",
 		"tailwindcss-font-inter": "^3.0.1",
-		"vite-plugin-windicss": "^1.8.4"
+		"vite-plugin-windicss": "^1.8.4",
+		"web3modal": "^1.9.7"
 	}
 }

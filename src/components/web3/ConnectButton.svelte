@@ -6,19 +6,20 @@
 	import { connected, defaultEvmStores, selectedAccount, web3 } from 'svelte-web3';
 	import JazzIcon from './JazzIcon.svelte';
 	import Web3Modal from 'web3modal';
-
+	import WalletConnectProvider from '@walletconnect/web3-provider/dist/umd/index.min.js';
 	let pending = 'pending';
 	const disable = () => defaultEvmStores.disconnect();
-	let WalletConnectProvider;
 
 	onMount(async () => {
 		// add a test to return in SSR context
-		WalletConnectProvider = await import('@walletconnect/web3-provider');
+		//WalletConnectProvider = await import('@walletconnect/web3-provider');
 	});
 
 	async function connect() {
 		try {
+			console.log('In connect');
 			const web3Modal = await getWeb3Modal();
+			const connection = await web3Modal.connect();
 		} catch (err) {
 			console.log('error:', err);
 		}

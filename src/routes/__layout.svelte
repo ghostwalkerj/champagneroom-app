@@ -7,7 +7,6 @@
 		(window as any).process = {
 			env: { DEBUG: undefined }
 		};
-		global = window;
 		import('virtual:windi-devtools');
 	}
 </script>
