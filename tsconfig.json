@@ -1,0 +1,11 @@
+{
+  "include": [
+    "./scripts",
+    "./test",
+    "./typechain"
+  ],
+  "files": [
+    "./hardhat.config.ts"
+  ],
+  "extends": "./.svelte-kit/tsconfig.json"
+}

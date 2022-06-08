@@ -1,0 +1,60 @@
+Arguments: 
+  /usr/local/Cellar/node/18.3.0/bin/node /usr/local/Cellar/yarn/1.22.19/libexec/bin/yarn.js
+
+PATH: 
+  /Users/joseph/Library/pnpm:/opt/local/bin:/opt/local/sbin:/Users/joseph/.fig/bin:/Users/joseph/.local/bin:/opt/local/bin:/opt/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/Library/Apple/usr/bin:/Applications/Little Snitch.app/Contents/Components:/Applications/VMware Fusion.app/Contents/Public:/usr/local/share/dotnet:~/.dotnet/tools:/usr/local/go/bin:/usr/local/MacGPG2/bin:/Library/Frameworks/Mono.framework/Versions/Current/Commands
+
+Yarn version: 
+  1.22.19
+
+Node version: 
+  18.3.0
+
+Platform: 
+  darwin x64
+
+Trace: 
+  Error: ENOENT: no such file or directory, copyfile '/Users/joseph/Library/Caches/Yarn/v6/npm-estraverse-4.3.0-398ad3f3c5a24948be7725e83d11a7de28cdbd1d-integrity/node_modules/estraverse/.jshintrc' -> '/Users/joseph/Dev/pcall/node_modules/@typescript-eslint/utils/node_modules/estraverse/.jshintrc'
+
+npm manifest: 
+  {
+  	"name": "pcall",
+  	"version": "0.0.1",
+  	"scripts": {
+  		"dev": "svelte-kit dev",
+  		"build": "svelte-kit build",
+  		"package": "svelte-kit package",
+  		"preview": "svelte-kit preview",
+  		"prepare": "svelte-kit sync",
+  		"test": "playwright test",
+  		"check": "svelte-check --tsconfig ./tsconfig.json",
+  		"check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
+  		"lint": "prettier --check --plugin-search-dir=. . && eslint .",
+  		"format": "prettier --write --plugin-search-dir=. ."
+  	},
+  	"devDependencies": {
+  		"@playwright/test": "^1.22.2",
+  		"@sveltejs/adapter-auto": "next",
+  		"@sveltejs/kit": "next",
+  		"@typescript-eslint/eslint-plugin": "^5.27.0",
+  		"@typescript-eslint/parser": "^5.27.0",
+  		"eslint": "^8.16.0",
+  		"eslint-config-prettier": "^8.3.0",
+  		"eslint-plugin-svelte3": "^4.0.0",
+  		"prettier": "^2.6.2",
+  		"prettier-plugin-svelte": "^2.7.0",
+  		"svelte": "^3.44.0",
+  		"svelte-check": "^2.7.1",
+  		"svelte-preprocess": "^4.10.6",
+  		"tslib": "^2.3.1",
+  		"typescript": "^4.7.2"
+  	},
+  	"type": "module",
+  	"dependencies": {}
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
