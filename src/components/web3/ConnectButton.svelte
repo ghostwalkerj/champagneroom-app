@@ -21,7 +21,7 @@
 
 	async function getWeb3Modal() {
 		const web3Modal = new Web3Modal({
-			cacheProvider: false,
+			cacheProvider: true,
 			theme: 'dark',
 
 			providerOptions: {

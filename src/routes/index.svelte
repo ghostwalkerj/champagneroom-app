@@ -11,10 +11,11 @@
 		amount: yup.number().integer().min(0).max(10000).required()
 	});
 
-	const { form } = createForm<yup.InferType<typeof schema>>({
+	const { form, reset } = createForm<yup.InferType<typeof schema>>({
 		extend: [reporter, validator({ schema })],
 		onSubmit(values) {
 			console.log(values);
+			reset();
 		}
 	});
 </script>
@@ -24,16 +25,16 @@
 		<div class="max-w-md">
 			<h1 class="text-5xl font-bold">Request a pCall</h1>
 			<p class="py-6">
-				Provident cupiditate voluptatem et in. Quaerat fugiat ut assumenda excepturi exercitationem
-				quasi. In deleniti eaque aut repudiandae et a id nisi.
+				Pretioso flos est, nihil ad vos nunc. Posset faciens pecuniam. Posuit eam ad opus nunc et
+				adepto a pCall!
 			</p>
 
 			{#if $selectedAccount}
 				<form use:form>
-					<div class="p-2 flex flex-col text-left">
+					<div class="p-2 flex flex-col justify-center items-center">
 						<div class="form-control w-full max-w-xs">
 							<label class="label">
-								<span class="label-text">What is your name?</span>
+								<span class="label-text">Name to Show Caller</span>
 							</label>
 							<input
 								type="text"
