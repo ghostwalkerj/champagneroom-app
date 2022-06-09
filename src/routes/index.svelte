@@ -1,34 +1,22 @@
-<script lang="ts">
-	import HeaderItem from 'components/HeaderItem.svelte';
+<script type="ts">
 	import ConnectButton from 'components/web3/ConnectButton.svelte';
-	import FaRegUserCircle from 'svelte-icons/fa/FaRegUserCircle.svelte';
-	import GiTheaterCurtains from 'svelte-icons/gi/GiTheaterCurtains.svelte';
-	import MdDashboard from 'svelte-icons/md/MdDashboard.svelte';
 	import { selectedAccount } from 'svelte-web3';
-
-	selectedAccount.subscribe(async (account) => {
-		if (account) {
-		}
-	});
 </script>
 
-<nav class=" flex flex-col h-auto mx-5 mt-4 justify-between items-center md:flex-row">
-	<div class="flex flex-grow max-w-lg mt-2 justify-items-start">
-		<HeaderItem title="HOME" path="/talent">
-			<MdDashboard />
-		</HeaderItem>
-		<HeaderItem title="PROFILE" path="/talent/profile">
-			<FaRegUserCircle />
-		</HeaderItem>
-		<HeaderItem title="ON STAGE" path="/talent/show">
-			<GiTheaterCurtains />
-		</HeaderItem>
-	</div>
-	<div class="pb-5">
-		<ConnectButton />
-	</div>
-</nav>
+<div class="hero min-h-screen bg-base-200">
+	<div class="hero-content text-center">
+		<div class="max-w-md">
+			<h1 class="text-5xl font-bold">Request a pCall</h1>
+			<p class="py-6">
+				Provident cupiditate voluptatem et in. Quaerat fugiat ut assumenda excepturi exercitationem
+				quasi. In deleniti eaque aut repudiandae et a id nisi.
+			</p>
 
-<div class="h-full">
-	<slot />
+			{#if $selectedAccount}
+				<button class="btn btn-primary">Get Started</button>
+			{:else}
+				<ConnectButton />
+			{/if}
+		</div>
+	</div>
 </div>

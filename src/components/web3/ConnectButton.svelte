@@ -1,5 +1,4 @@
 <script type="ts">
-	import { onMount } from 'svelte';
 	import FaExternalLinkAlt from 'svelte-icons/fa/FaExternalLinkAlt.svelte';
 	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';
 	import FaWindowClose from 'svelte-icons/fa/FaWindowClose.svelte';
@@ -10,16 +9,11 @@
 	let pending = 'pending';
 	const disable = () => defaultEvmStores.disconnect();
 
-	onMount(async () => {
-		// add a test to return in SSR context
-		//WalletConnectProvider = await import('@walletconnect/web3-provider');
-	});
-
 	async function connect() {
 		try {
-			console.log('In connect');
 			const web3Modal = await getWeb3Modal();
-			const connection = await web3Modal.connect();
+			const provider = await web3Modal.connect();
+			defaultEvmStores.setProvider(provider);
 		} catch (err) {
 			console.log('error:', err);
 		}
@@ -28,6 +22,8 @@
 	async function getWeb3Modal() {
 		const web3Modal = new Web3Modal({
 			cacheProvider: false,
+			theme: 'dark',
+
 			providerOptions: {
 				walletconnect: {
 					package: WalletConnectProvider,
@@ -56,7 +52,7 @@
 		class="bg-gradient-to-r rounded-xl font-medium from-pink-800 via-purple-900 to-blue-900  border-2 border-purple-700  shadow-sm text-sm text-white py-2 px-4 inline-flex  items-center whitespace-nowrap hover:border-pink-800"
 		on:click={connect}
 	>
-		Connect to Wallet
+		Connect to a wallet
 	</button>
 {:else}
 	<div>
@@ -82,7 +78,7 @@
 		<input type="checkbox" id="my-modal" class="modal-toggle" />
 		<div class="modal">
 			<div class="bg-base-300 top-1/4 modal-box fixed">
-				<div class="font-light text-lg pl-1 text-gray-300 ">Account</div>
+				<div class="font-bold text-lg pl-1 text-gray-300 ">Account</div>
 				<div class="pr-6 top-0 right-0 hidden absolute  sm:block">
 					<div class="modal-action">
 						<label for="my-modal" class="btn btn-square btn-xs">
@@ -104,8 +100,8 @@
 						<JazzIcon address={$selectedAccount} />
 
 						<div class="font-semibold  text-xl ml-2 text-gray-200">
-							{$selectedAccount.slice(0, 6)}...{$selectedAccount.slice(
-								$selectedAccount.length - 4,
+							{$selectedAccount.slice(0, 14)}...{$selectedAccount.slice(
+								$selectedAccount.length - 14,
 								$selectedAccount.length
 							)}
 						</div>
@@ -142,3 +138,17 @@
 		</div>
 	</div>
 {/if}
+
+<style>
+	:global .walletconnect-modal__base {
+		background: rgb(39, 49, 56) !important;
+		color: black;
+	}
+	:global .walletconnect-qrcode__text {
+		color: white !important;
+	}
+
+	:global .walletconnect-connect__button__text {
+		color: white !important;
+	}
+</style>
