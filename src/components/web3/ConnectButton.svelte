@@ -1,7 +1,7 @@
 <script type="ts">
 	import FaExternalLinkAlt from 'svelte-icons/fa/FaExternalLinkAlt.svelte';
 	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';
-	import FaWindowClose from 'svelte-icons/fa/FaWindowClose.svelte';
+	import IoIosClose from 'svelte-icons/io/IoIosClose.svelte';
 	import { connected, defaultEvmStores, selectedAccount, web3 } from 'svelte-web3';
 	import JazzIcon from './JazzIcon.svelte';
 	import Web3Modal from 'web3modal';
@@ -77,16 +77,16 @@
 		</div>
 		<input type="checkbox" id="my-modal" class="modal-toggle" />
 		<div class="modal">
-			<div class="bg-base-300 top-1/4 modal-box fixed">
-				<div class="font-bold text-lg pl-1 text-gray-300 ">Account</div>
-				<div class="pr-6 top-0 right-0 hidden absolute  sm:block">
-					<div class="modal-action">
-						<label for="my-modal" class="btn btn-square btn-xs">
-							<FaWindowClose />
+			<div class="bg-base-300  p-0.5 top-1/4 modal-box fixed">
+				<div class="flex px-4 pt-2 justify-between">
+					<div class="">Wallet Connection</div>
+					<div class="place-content-end">
+						<label for="my-modal" class="btn btn-circle btn-outline btn-xs ">
+							<IoIosClose />
 						</label>
 					</div>
 				</div>
-				<div class="bg-base-100 border-2 border-gray-600 m-1 mt-4 p-4   card">
+				<div class="bg-base-100 border-2 border-gray-600 m-4 mt-2 p-4 card">
 					<div class="flex mb-2 justify-between items-center">
 						<p class="text-sm text-gray-400">Connected with MetaMask</p>
 						<button
@@ -125,13 +125,15 @@
 									<div class="h-5 mr-1 mb-1 group-hover:text-white">
 										<FaExternalLinkAlt />
 									</div>
-									<div class="text-sm text-gray-400 group-hover:text-white">View on Explorer</div>
+									<div class="text-sm pt-.5 text-gray-400 group-hover:text-white">
+										View on Explorer
+									</div>
 								</div>
 							</a>
 						</div>
 					</div>
 				</div>
-				<div class="flex flex-row-reverse bg-[#3F0071] mt-5 pt-4 pr-4 pb-4 card">
+				<div class="flex flex-row bg-[#3F0071] m-4 mt-2 p-4   card">
 					Your transactions will appear here...
 				</div>
 			</div>
