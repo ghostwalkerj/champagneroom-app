@@ -9,7 +9,6 @@ export const get: RequestHandler<GetParams, ResponseBody> = async (
 		const id = event.params.id;
 		const db = getDb();
 		const doc: pCallLink = await db.get(id);
-		console.log(doc);
 		return {
 			status: 200,
 			body: {
