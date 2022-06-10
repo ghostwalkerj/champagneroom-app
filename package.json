@@ -25,6 +25,8 @@
 		"@types/chai": "^4.2.21",
 		"@types/mocha": "^9.0.0",
 		"@types/node": "^12.0.0",
+		"@types/pouchdb-core": "^7.0.10",
+		"@types/pouchdb-find": "^6.3.7",
 		"@types/pouchdb-node": "^6.1.4",
 		"@typescript-eslint/eslint-plugin": "^4.29.1",
 		"@typescript-eslint/parser": "^4.29.1",
@@ -56,12 +58,13 @@
 		"@metamask/jazzicon": "^2.0.0",
 		"@walletconnect/web3-provider": "^1.7.8",
 		"daisyui": "^2.15.2",
+		"nanoid": "^4.0.0",
+		"pouchdb-find": "^7.3.0",
 		"pouchdb-node": "^7.3.0",
 		"svelte-icons": "^2.1.0",
 		"svelte-image": "^0.2.9",
 		"svelte-web3": "^3.4.2",
 		"tailwindcss-font-inter": "^3.0.1",
-		"uuid": "^8.3.2",
 		"vite-plugin-windicss": "^1.8.4",
 		"web3modal": "^1.9.7"
 	}

@@ -11,6 +11,14 @@
 		amount: yup.number().integer().min(0).max(10000).required()
 	});
 
+	let pCallLink = '';
+	let hasLink = false;
+
+	const clearLink = () => {
+		pCallLink = '';
+		hasLink = false;
+	};
+
 	const { form, reset } = createForm<yup.InferType<typeof schema>>({
 		extend: [
 			reporter,
@@ -21,9 +29,11 @@
 		async onSuccess(response: any) {
 			const body: {
 				success: boolean;
-				id: string;
+				link: string;
 			} = await response.json();
-			console.log(body);
+
+			pCallLink = body.link;
+			hasLink = true;
 			reset();
 		},
 		onerror(err: any) {
@@ -40,10 +50,19 @@
 				Pretioso flos est, nihil ad vos nunc. Posset faciens pecuniam. Posuit eam ad opus nunc et
 				adepto a pCall!
 			</p>
-
-			{#if $selectedAccount}
-				<form use:form method="post">
-					<div class="flex flex-col p-2 justify-center items-center">
+			{#if hasLink}
+				<div class="flex flex-col p-2 justify-center items-center">
+					<div>Here is your unique pCall link:</div>
+					<div>
+						{pCallLink}
+					</div>
+					<div>You can request a new link by clicking the button below. This link will expire.</div>
+					<button class="btn btn-primary" on:click={clearLink}>Generate New Link</button>
+				</div>
+			{:else if $selectedAccount}
+				<div class="flex flex-col p-2 justify-center items-center">
+					<form use:form method="post">
+						<input type="hidden" name="address" id="address" value={$selectedAccount} />
 						<div class="max-w-xs w-full form-control">
 							<!-- svelte-ignore a11y-label-has-associated-control -->
 							<label class="label">
@@ -81,8 +100,9 @@
 						<div class="py-4">
 							<button class="btn btn-primary" type="submit">Generate Link</button>
 						</div>
-					</div>
-				</form>
+					</form>
+					{pCallLink}
+				</div>
 			{:else}
 				<ConnectButton />
 			{/if}
