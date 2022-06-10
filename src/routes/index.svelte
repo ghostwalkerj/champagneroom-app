@@ -12,10 +12,22 @@
 	});
 
 	const { form, reset } = createForm<yup.InferType<typeof schema>>({
-		extend: [reporter, validator({ schema })],
-		onSubmit(values) {
-			console.log(values);
+		extend: [
+			reporter,
+			validator({
+				schema
+			})
+		],
+		async onSuccess(response: any) {
+			const body: {
+				success: boolean;
+				id: string;
+			} = await response.json();
+			console.log(body);
 			reset();
+		},
+		onerror(err: any) {
+			console.log(err);
 		}
 	});
 </script>
@@ -30,7 +42,7 @@
 			</p>
 
 			{#if $selectedAccount}
-				<form use:form>
+				<form use:form method="post">
 					<div class="flex flex-col p-2 justify-center items-center">
 						<div class="max-w-xs w-full form-control">
 							<!-- svelte-ignore a11y-label-has-associated-control -->

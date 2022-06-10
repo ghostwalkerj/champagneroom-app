@@ -16,3 +16,6 @@ typechain
 #Hardhat files
 cache
 artifacts
+
+db
+yarn-error.log
