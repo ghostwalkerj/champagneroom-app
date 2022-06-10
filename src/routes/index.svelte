@@ -74,6 +74,10 @@
 						</div>
 					</div>
 
+					<div class="py-4">Wait for your pCall</div>
+					<button class="btn btn-primary" on:click={clearLink}>Wait for pCall</button>
+
+					<div class="divider">OR</div>
 					<div class="py-4">
 						You can only have 1 pCall link active at a time. If you want to create a new one, click
 						the button below.

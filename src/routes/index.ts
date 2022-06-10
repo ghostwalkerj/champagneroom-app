@@ -2,6 +2,9 @@ import PouchDB from 'pouchdb-node';
 import type { RequestHandler } from '@sveltejs/kit';
 import { nanoid } from 'nanoid';
 import PouchFind from 'pouchdb-find';
+import path from 'path';
+
+
 PouchDB.plugin(PouchFind);
 type pCallLink = {
   _id: string;
@@ -16,8 +19,8 @@ const REMOTE_DB_URL = import.meta.env.VITE_REMOTE_COUCHDB_URL;
 const LOCAL_DB_URL = import.meta.env.VITE_LOCAL_COUCHDB_URL;
 
 const generateLink = (doc: pCallLink): string => {
-  const link = import.meta.env.VITE_CALL_URL + '/' + doc._id;
-  return link;
+  const link = new URL(path.join(import.meta.env.VITE_CALL_URL, doc._id));
+  return link.toString();
 };
 
 export const post: RequestHandler = async ({ request }) => {
