@@ -20,10 +20,10 @@
 	});
 </script>
 
-<div class="hero min-h-screen bg-base-200">
-	<div class="hero-content text-center">
+<div class="min-h-screen bg-base-200 hero">
+	<div class="text-center hero-content">
 		<div class="max-w-md">
-			<h1 class="text-5xl font-bold">Request a pCall</h1>
+			<h1 class="font-bold text-5xl">Request a pCall</h1>
 			<p class="py-6">
 				Pretioso flos est, nihil ad vos nunc. Posset faciens pecuniam. Posuit eam ad opus nunc et
 				adepto a pCall!
@@ -31,8 +31,9 @@
 
 			{#if $selectedAccount}
 				<form use:form>
-					<div class="p-2 flex flex-col justify-center items-center">
-						<div class="form-control w-full max-w-xs">
+					<div class="flex flex-col p-2 justify-center items-center">
+						<div class="max-w-xs w-full form-control">
+							<!-- svelte-ignore a11y-label-has-associated-control -->
 							<label class="label">
 								<span class="label-text">Name to Show Caller</span>
 							</label>
@@ -41,14 +42,15 @@
 								id="name"
 								name="name"
 								placeholder="Enter a name"
-								class="input input-bordered input-primary w-full max-w-xs"
+								class="max-w-xs w-full input input-bordered input-primary"
 							/>
 							<ValidationMessage for="name" let:messages={message}>
 								<span>{message}</span>
 								<span slot="placeholder" />
 							</ValidationMessage>
 						</div>
-						<div class="form-control w-full max-w-xs">
+						<div class="max-w-xs w-full form-control">
+							<!-- svelte-ignore a11y-label-has-associated-control -->
 							<label class="label">
 								<span class="label-text">Requested Amount in USD</span>
 							</label>
@@ -57,7 +59,7 @@
 								id="amount"
 								name="amount"
 								placeholder="Enter an amount"
-								class="input input-bordered input-primary w-full max-w-xs"
+								class="max-w-xs w-full input input-bordered input-primary"
 							/>
 							<ValidationMessage for="amount" let:messages={message}>
 								<span>{message}</span>
