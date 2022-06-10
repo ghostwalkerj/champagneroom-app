@@ -1,11 +1,11 @@
 <script type="ts">
-	import ConnectButton from 'components/web3/ConnectButton.svelte';
-	import { selectedAccount } from 'svelte-web3';
-	import { createForm } from 'felte';
 	import { reporter, ValidationMessage } from '@felte/reporter-svelte';
 	import { validator } from '@felte/validator-yup';
-	import * as yup from 'yup';
+	import ConnectButton from 'components/web3/ConnectButton.svelte';
+	import { createForm } from 'felte';
 	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';
+	import { selectedAccount } from 'svelte-web3';
+	import * as yup from 'yup';
 
 	const schema = yup.object({
 		name: yup.string().min(3).max(20).required(),

@@ -1,11 +1,11 @@
 <script type="ts">
+	import WalletConnectProvider from '@walletconnect/web3-provider/dist/umd/index.min.js';
 	import FaExternalLinkAlt from 'svelte-icons/fa/FaExternalLinkAlt.svelte';
 	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';
 	import IoIosClose from 'svelte-icons/io/IoIosClose.svelte';
 	import { connected, defaultEvmStores, selectedAccount, web3 } from 'svelte-web3';
-	import JazzIcon from './JazzIcon.svelte';
 	import Web3Modal from 'web3modal';
-	import WalletConnectProvider from '@walletconnect/web3-provider/dist/umd/index.min.js';
+	import JazzIcon from './JazzIcon.svelte';
 	let pending = 'pending';
 	const disable = () => defaultEvmStores.disconnect();
 
