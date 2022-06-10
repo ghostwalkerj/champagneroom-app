@@ -5,6 +5,7 @@
 	import { reporter, ValidationMessage } from '@felte/reporter-svelte';
 	import { validator } from '@felte/validator-yup';
 	import * as yup from 'yup';
+	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';
 
 	const schema = yup.object({
 		name: yup.string().min(3).max(20).required(),
@@ -17,6 +18,10 @@
 	const clearLink = () => {
 		pCallLink = '';
 		hasLink = false;
+	};
+
+	const copyLink = () => {
+		navigator.clipboard.writeText(pCallLink);
 	};
 
 	const { form, reset } = createForm<yup.InferType<typeof schema>>({
@@ -44,7 +49,7 @@
 
 <div class="min-h-screen bg-base-200 hero">
 	<div class="text-center hero-content">
-		<div class="max-w-md">
+		<div class="max-w-lg">
 			<h1 class="font-bold text-5xl">Request a pCall</h1>
 			<p class="py-6">
 				Pretioso flos est, nihil ad vos nunc. Posset faciens pecuniam. Posuit eam ad opus nunc et
@@ -52,18 +57,34 @@
 			</p>
 			{#if hasLink}
 				<div class="flex flex-col p-2 justify-center items-center">
-					<div>Here is your unique pCall link:</div>
-					<div>
-						{pCallLink}
+					<div class="bg-primary text-primary-content card">
+						<div class="card-body">
+							<h2 class="card-title">Here is your unique pCall link</h2>
+							<div class="text-left">{pCallLink}</div>
+							<div class="pt-4 card-actions justify-end">
+								<button on:click={copyLink}>
+									<div class="cursor-pointer flex group">
+										<div class="h-5 mr-1 mb-1 pl-2 group-hover:text-white">
+											<FaRegCopy />
+										</div>
+										<div class="text-sm text-gray-200 group-hover:text-white">Copy link</div>
+									</div>
+								</button>
+							</div>
+						</div>
 					</div>
-					<div>You can request a new link by clicking the button below. This link will expire.</div>
+
+					<div class="py-4">
+						You can only have 1 pCall link active at a time. If you want to create a new one, click
+						the button below.
+					</div>
 					<button class="btn btn-primary" on:click={clearLink}>Generate New Link</button>
 				</div>
 			{:else if $selectedAccount}
 				<div class="flex flex-col p-2 justify-center items-center">
 					<form use:form method="post">
 						<input type="hidden" name="address" id="address" value={$selectedAccount} />
-						<div class="max-w-xs w-full form-control">
+						<div class="max-w-xs w-full py-2 form-control">
 							<!-- svelte-ignore a11y-label-has-associated-control -->
 							<label class="label">
 								<span class="label-text">Name to Show Caller</span>
@@ -73,7 +94,7 @@
 								id="name"
 								name="name"
 								placeholder="Enter a name"
-								class="max-w-xs w-full input input-bordered input-primary"
+								class="max-w-xs w-full py-2 input input-bordered input-primary"
 							/>
 							<ValidationMessage for="name" let:messages={message}>
 								<span>{message}</span>
