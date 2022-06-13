@@ -39,6 +39,7 @@
 		"eslint-plugin-promise": "^5.1.0",
 		"eslint-plugin-svelte3": "^4.0.0",
 		"felte": "^1.2.2",
+		"install-peers": "^1.0.4",
 		"prettier": "^2.3.2",
 		"prettier-plugin-solidity": "^1.0.0-beta.13",
 		"prettier-plugin-svelte": "^2.7.0",

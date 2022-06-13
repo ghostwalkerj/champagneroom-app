@@ -26,7 +26,7 @@ export const getDb = (): PouchDB.Database => {
 	return db;
 };
 
-export type pCallLink = {
+export type PCallDocument = {
 	_id: string;
 	name: string;
 	amount: string;

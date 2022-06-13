@@ -47,7 +47,7 @@
 	});
 </script>
 
-<div class="min-h-screen bg-base-200 hero">
+<div class="min-h-screen-md bg-base-100 hero">
 	<div class="text-center hero-content">
 		<div class="max-w-lg">
 			<h1 class="font-bold text-5xl">Request a pCall</h1>

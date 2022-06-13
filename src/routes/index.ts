@@ -1,9 +1,9 @@
 import type { RequestHandler } from '@sveltejs/kit';
-import { getDb, type pCallLink } from 'lib/db';
+import { getDb, type PCallDocument } from 'lib/db';
 import { nanoid } from 'nanoid';
 import path from 'path';
 
-const generateLink = (doc: pCallLink): string => {
+const generateLink = (doc: PCallDocument): string => {
 	const link = new URL(path.join(import.meta.env.VITE_CALL_URL, doc._id));
 	return link.toString();
 };
@@ -26,7 +26,7 @@ export const post: RequestHandler = async ({ request }) => {
 			};
 		}
 
-		const doc: pCallLink = {
+		const doc: PCallDocument = {
 			_id: 'id' + nanoid(),
 			name,
 			amount,
@@ -37,7 +37,7 @@ export const post: RequestHandler = async ({ request }) => {
 
 		const expireDocs = (await db.find({
 			selector: { address, expired: false }
-		})) as PouchDB.Find.FindResponse<pCallLink>;
+		})) as PouchDB.Find.FindResponse<PCallDocument>;
 
 		// expire any existing documents
 		db.bulkDocs(expireDocs.docs.map(doc => ({ ...doc, expired: true })));
