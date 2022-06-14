@@ -2,9 +2,9 @@
 pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
-import "@openzeppelin/contracts/finance/PaymentSplitter.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract Greeter {
+contract pCall {
     string private greeting;
 
     constructor(string memory _greeting) {
