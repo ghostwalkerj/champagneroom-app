@@ -1,26 +1,40 @@
-## Making a Call
+## pCall Transaction
 ```plantuml
 @startuml
-Talent -> App : Creates Link : (name, amount, time, note)
+autonumber
+skinparam participant {
+  backgroundColor<<app>> Fuchsia
+  backgroundColor<<contract>> DeepSkyBlue
+}
 
-Talent <- App : Return Link : Encoded 1 Time Use
+actor User #Orchid
+actor Caller #Cyan
+participant pCall <<app>> 
+box "Ethereum" #LightCyan
+participant "pCall Escrow" as Escrow<<contract>>
+participant "ERC20\n(USDC)" as ERC20<<contract>>
+end box
+actor "pCall Wallet" as Margin #Purple
 
-Talent -> Subscriber : Share Link : Via Facebook, Telegram, Whatsapp etc
 
-Subscriber -> App : Clicks Link
-
-Subscriber <- App : Requests Payment 
-
-Subscriber -> App : Completes Payment
-
-Subscriber <- App : Initiates Call with Talent
-
-Subscriber <-> Talent : Connects for Call
-
-Talent -> App : Ends Call
-
-Subscriber <- App : Requests Feedback
-
-Talent <- App : Sends Payment
+User -> pCall : Create Link \n(name, amount, note)
+User <- pCall : Return Link \n(encoded 1 time use)
+User -> Caller : Share Link \n(via Facebook, WhatspApp etc)
+Caller -> pCall : Click Link
+Caller <- pCall : Request Transfer 
+Caller -> ERC20 : Approve Spend
+Escrow -> ERC20 : Transfer Payment
+Escrow <- ERC20 : Payment Released
+Escrow -> pCall : Confirms Payment
+Caller <- pCall : Initiate Call 
+Caller <-> User : Connect Call
+Caller -> pCall : End Call
+Caller <- pCall : Request Feedback
+Caller --> pCall : Provide Feedback(?)
+pCall -> User : Alert Transaction Status
+pCall -> Escrow : Release Payment
+Escrow -> ERC20 : Approve Spend
+User <- ERC20 : Transfer Payment
+ERC20 -> Margin: Transfer Payment
 @enduml
 
