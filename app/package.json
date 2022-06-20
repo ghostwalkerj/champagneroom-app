@@ -62,7 +62,7 @@
 		"nanoid": "^4.0.0",
 		"pouchdb-find": "^7.3.0",
 		"pouchdb-node": "^7.3.0",
-		"relational-pouch": "^4.0.0",
+		"pouchorm": "^2.1.1",
 		"svelte-icons": "^2.1.0",
 		"svelte-image": "^0.2.9",
 		"svelte-web3": "^3.4.2",

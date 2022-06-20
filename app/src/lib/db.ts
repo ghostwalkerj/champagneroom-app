@@ -1,5 +1,4 @@
 import find from 'pouchdb-find';
-import rel from 'relational-pouch';
 import PouchDB from 'pouchdb-node';
 
 const REMOTE_DB_URL = import.meta.env.VITE_REMOTE_COUCHDB_URL;
@@ -10,7 +9,7 @@ let db: PouchDB.Database = undefined;
 export const getDb = (): PouchDB.Database => {
 	if (db === undefined) {
 		try {
-			PouchDB.plugin(find).plugin(rel);
+			PouchDB.plugin(find);
 
 			const localDB = new PouchDB(LOCAL_DB_URL);
 			const remoteDB = new PouchDB(REMOTE_DB_URL);
