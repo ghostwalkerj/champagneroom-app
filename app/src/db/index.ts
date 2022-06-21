@@ -1,5 +1,9 @@
 import find from 'pouchdb-find';
 import PouchDB from 'pouchdb-node';
+import { ClassValidate, PouchORM } from 'pouchorm';
+
+PouchORM.LOGGING = true; // enable diagnostic logging if desired
+PouchORM.VALIDATE = ClassValidate.ON; // validate on save
 
 const REMOTE_DB_URL = import.meta.env.VITE_REMOTE_COUCHDB_URL;
 const LOCAL_DB_URL = import.meta.env.VITE_LOCAL_COUCHDB_URL;

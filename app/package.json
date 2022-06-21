@@ -58,6 +58,7 @@
 		"@felte/reporter-svelte": "^1.1.2",
 		"@metamask/jazzicon": "^2.0.0",
 		"@walletconnect/web3-provider": "^1.7.8",
+		"class-validator": "^0.13.2",
 		"daisyui": "2.15.4",
 		"nanoid": "^4.0.0",
 		"pouchdb-find": "^7.3.0",

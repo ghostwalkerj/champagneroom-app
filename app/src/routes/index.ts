@@ -1,5 +1,5 @@
 import type { RequestHandler } from '@sveltejs/kit';
-import { getDb, type PCallDocument } from 'lib/db';
+import { getDb, type PCallDocument } from 'db';
 import { nanoid } from 'nanoid';
 import path from 'path';
 

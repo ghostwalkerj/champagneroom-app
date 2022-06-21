@@ -1,5 +1,5 @@
 import type { RequestEvent, RequestHandler, ResponseBody } from '@sveltejs/kit';
-import { getDb, type PCallDocument } from 'lib/db';
+import { getDb, type PCallDocument } from 'db';
 type GetParams = Record<string, string>;
 
 export const get: RequestHandler<GetParams, ResponseBody> = async (

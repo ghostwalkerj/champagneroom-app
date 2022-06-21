@@ -17,5 +17,5 @@ typechain
 cache
 artifacts
 
-db
+pouchdb
 yarn-error.log

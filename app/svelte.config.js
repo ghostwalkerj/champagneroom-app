@@ -30,7 +30,8 @@ const config = {
 					components: path.resolve('./src/components'),
 					stores: path.resolve('./src/stores'),
 					lib: path.resolve('./src/lib'),
-					models: path.resolve('./src/models')
+					models: path.resolve('./src/models'),
+					db: path.resolve('./src/db')
 				}
 			},
 			mode: 'development',
