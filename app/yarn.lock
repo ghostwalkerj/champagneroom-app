@@ -249,6 +249,13 @@
   dependencies:
     "@felte/common" "1.1.1"
 
+"@felte/validator-zod@^1.0.10":
+  version "1.0.10"
+  resolved "https://registry.yarnpkg.com/@felte/validator-zod/-/validator-zod-1.0.10.tgz#482229ac8add9877ad793f4c69507111a36259b2"
+  integrity sha512-Il4/Lq5XrMeDxqXZjRvleXTTxlhpJJpKJIHBe3acvT5WmfWyeV1Iygb+zI5zDOQ5NHGk4kGkLNfzW5+rY1sRnw==
+  dependencies:
+    "@felte/common" "1.1.1"
+
 "@humanwhocodes/config-array@^0.9.2":
   version "0.9.5"
   resolved "https://registry.yarnpkg.com/@humanwhocodes/config-array/-/config-array-0.9.5.tgz#2cbaf9a89460da24b5ca6531b8bbfc23e1df50c7"
@@ -940,6 +947,11 @@
   version "10.11.3"
   resolved "https://registry.yarnpkg.com/@types/validator/-/validator-10.11.3.tgz#945799bef24a953c5bc02011ca8ad79331a3ef25"
   integrity sha512-GKF2VnEkMmEeEGvoo03ocrP9ySMuX1ypKazIYMlsjfslfBMhOAtC5dmEWKdJioW4lJN7MZRS88kalTsVClyQ9w==
+
+"@types/validator@^13.7.3":
+  version "13.7.3"
+  resolved "https://registry.yarnpkg.com/@types/validator/-/validator-13.7.3.tgz#3193c0a3c03a7d1189016c62b4fba4b149ef5e33"
+  integrity sha512-DNviAE5OUcZ5s+XEQHRhERLg8fOp8gSgvyJ4aaFASx5wwaObm+PBwTIMXiOFm1QrSee5oYwEAYb7LMzX2O88gA==
 
 "@typescript-eslint/eslint-plugin@^5.28.0":
   version "5.28.0"
@@ -1888,14 +1900,6 @@ class-validator@^0.11.0:
     "@types/validator" "10.11.3"
     google-libphonenumber "^3.1.6"
     validator "12.0.0"
-
-class-validator@^0.13.2:
-  version "0.13.2"
-  resolved "https://registry.yarnpkg.com/class-validator/-/class-validator-0.13.2.tgz#64b031e9f3f81a1e1dcd04a5d604734608b24143"
-  integrity sha512-yBUcQy07FPlGzUjoLuUfIOXzgynnQPPruyK1Ge2B74k9ROwnle1E+NxLWnUv5OLU8hA/qL5leAE9XnXq3byaBw==
-  dependencies:
-    libphonenumber-js "^1.9.43"
-    validator "^13.7.0"
 
 cliui@^5.0.0:
   version "5.0.0"
@@ -4205,11 +4209,6 @@ levn@^0.4.1:
   dependencies:
     prelude-ls "^1.2.1"
     type-check "~0.4.0"
-
-libphonenumber-js@^1.9.43:
-  version "1.10.7"
-  resolved "https://registry.yarnpkg.com/libphonenumber-js/-/libphonenumber-js-1.10.7.tgz#4c010b7b57e824c571ea4cdbf7aea6f3c408878c"
-  integrity sha512-jZXLCCWMe1b/HXkjiLeYt2JsytZMcqH26jLFIdzFDFF0xvSUWrYKyvPlyPG+XJzEyKUFbcZxLdWGMwQsWaHDxQ==
 
 lilconfig@^2.0.5:
   version "2.0.5"
@@ -6693,3 +6692,8 @@ yn@3.1.1:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/yn/-/yn-3.1.1.tgz#1e87401a09d767c1d5eab26a6e4c185182d2eb50"
   integrity sha512-Ux4ygGWsu2c7isFWe8Yu1YluJmqVhxqK2cLXNQA5AcC3QfbGNpM7fu0Y8b/z16pXLnFxZYvWhd3fhBY9DLmC6Q==
+
+zod@^3.17.3:
+  version "3.17.3"
+  resolved "https://registry.yarnpkg.com/zod/-/zod-3.17.3.tgz#86abbc670ff0063a4588d85a4dcc917d6e4af2ba"
+  integrity sha512-4oKP5zvG6GGbMlqBkI5FESOAweldEhSOZ6LI6cG+JzUT7ofj1ZOC0PJudpQOpT1iqOFpYYtX5Pw0+o403y4bcg==

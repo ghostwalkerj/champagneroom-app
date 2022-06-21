@@ -1,11 +1,11 @@
 <script type="ts">
 	import { reporter, ValidationMessage } from '@felte/reporter-svelte';
-	import { validate as class_validate } from 'class-validator';
+	import { validator } from '@felte/validator-zod';
 	import ConnectButton from 'components/web3/ConnectButton.svelte';
-	import { Link } from 'db/models/Link';
 	import { createForm } from 'felte';
 	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';
 	import { selectedAccount } from 'svelte-web3';
+	import { linkSchema } from 'db/models/Link';
 
 	let pCallLink = '';
 	let hasLink = false;
@@ -20,20 +20,12 @@
 	};
 
 	const { form, reset } = createForm({
-		debounced: {
-			timeout: 3000,
-			async validate(values) {
-				const errors = {};
-				console.log(values);
-				const _link = {
-					...values,
-					expired: false
-				};
-
-				const _errors = await class_validate(_link);
-				return errors;
-			}
-		},
+		extend: [
+			reporter,
+			validator({
+				schema: linkSchema
+			})
+		],
 		async onSuccess(response: any) {
 			const body: {
 				success: boolean;

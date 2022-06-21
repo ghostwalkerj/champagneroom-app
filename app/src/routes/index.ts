@@ -1,11 +1,10 @@
 import type { RequestHandler } from '@sveltejs/kit';
-import { getDb, type PCallDocument } from 'db';
-import { nanoid } from 'nanoid';
+import { getDb, LinkDocument, linkSchema } from 'db';
 import path from 'path';
 
-const generateLink = (doc: PCallDocument): string => {
-	const link = new URL(path.join(import.meta.env.VITE_CALL_URL, doc._id));
-	return link.toString();
+const generateLink = (link: LinkDocument): string => {
+	const url = new URL(path.join(import.meta.env.VITE_CALL_URL, link._id));
+	return url.toString();
 };
 
 export const post: RequestHandler = async ({ request }) => {
@@ -26,18 +25,22 @@ export const post: RequestHandler = async ({ request }) => {
 			};
 		}
 
-		const doc: PCallDocument = {
-			_id: 'id' + nanoid(),
-			name,
-			amount,
-			address,
-			expired: false,
-			created_at: new Date().toISOString()
-		};
+		const doc = new LinkDocument();
+		doc.name = name;
+		doc.amount = parseInt(amount);
+		doc.address = address;
+
+		linkSchema.parse(doc);
+
+		await db.createIndex({
+			index: {
+				fields: ['address', 'expired']
+			}
+		});
 
 		const expireDocs = (await db.find({
 			selector: { address, expired: false }
-		})) as PouchDB.Find.FindResponse<PCallDocument>;
+		})) as PouchDB.Find.FindResponse<LinkDocument>;
 
 		// expire any existing documents
 		db.bulkDocs(expireDocs.docs.map(doc => ({ ...doc, expired: true })));

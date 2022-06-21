@@ -4,6 +4,7 @@
     "experimentalDecorators": true,
     "baseUrl": "./src",
     "allowSyntheticDefaultImports": true
+    // "strict": true
   },
   "include": [
     "src/**/*.d.ts",

@@ -1,5 +1,5 @@
 import type { RequestEvent, RequestHandler, ResponseBody } from '@sveltejs/kit';
-import { getDb, type PCallDocument } from 'db';
+import { getDb, type LinkType } from 'db';
 type GetParams = Record<string, string>;
 
 export const get: RequestHandler<GetParams, ResponseBody> = async (
@@ -8,12 +8,12 @@ export const get: RequestHandler<GetParams, ResponseBody> = async (
 	try {
 		const id = event.params.id;
 		const db = getDb();
-		const pCallDocument: PCallDocument = await db.get(id);
+		const linkDocument = (await db.get(id)) as LinkType;
 		return {
 			status: 200,
 			body: {
 				success: true,
-				pCallDocument
+				linkDocument: linkDocument
 			}
 		};
 	} catch (error) {
@@ -22,7 +22,7 @@ export const get: RequestHandler<GetParams, ResponseBody> = async (
 			body: {
 				success: false,
 				error: error.message,
-				pCallDocument: null
+				linkDocument: null
 			}
 		};
 	}
