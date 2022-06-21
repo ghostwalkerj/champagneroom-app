@@ -10,6 +10,7 @@ import {
 } from 'class-validator';
 import { nanoid } from 'nanoid';
 import { PouchCollection, PouchModel } from 'pouchorm';
+
 export class Link extends PouchModel<Link> {
 	@MinLength(3)
 	@MaxLength(30)

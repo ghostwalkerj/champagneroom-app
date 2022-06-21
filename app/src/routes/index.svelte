@@ -1,16 +1,11 @@
 <script type="ts">
 	import { reporter, ValidationMessage } from '@felte/reporter-svelte';
-	import { validator } from '@felte/validator-yup';
+	import { validate as class_validate } from 'class-validator';
 	import ConnectButton from 'components/web3/ConnectButton.svelte';
+	import { Link } from 'db/models/Link';
 	import { createForm } from 'felte';
 	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';
 	import { selectedAccount } from 'svelte-web3';
-	import * as yup from 'yup';
-
-	const schema = yup.object({
-		name: yup.string().min(3).max(20).required(),
-		amount: yup.number().integer().min(0).max(10000).required()
-	});
 
 	let pCallLink = '';
 	let hasLink = false;
@@ -24,13 +19,21 @@
 		navigator.clipboard.writeText(pCallLink);
 	};
 
-	const { form, reset } = createForm<yup.InferType<typeof schema>>({
-		extend: [
-			reporter,
-			validator({
-				schema
-			})
-		],
+	const { form, reset } = createForm({
+		debounced: {
+			timeout: 3000,
+			async validate(values) {
+				const errors = {};
+				console.log(values);
+				const _link = {
+					...values,
+					expired: false
+				};
+
+				const _errors = await class_validate(_link);
+				return errors;
+			}
+		},
 		async onSuccess(response: any) {
 			const body: {
 				success: boolean;
