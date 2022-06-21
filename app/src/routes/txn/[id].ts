@@ -13,7 +13,7 @@ export const get: RequestHandler<GetParams, ResponseBody> = async (
 			status: 200,
 			body: {
 				success: true,
-				linkDocument: linkDocument
+				linkDocument
 			}
 		};
 	} catch (error) {

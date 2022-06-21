@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import IsEthereumAddress from 'validator/lib/isEthereumAddress';
-import { Entity } from '.';
+import { DocumentBase } from '.';
 
 export const linkSchema = z.object({
 	name: z
@@ -15,13 +15,11 @@ export const linkSchema = z.object({
 
 export type LinkType = z.infer<typeof linkSchema>;
 
-export class LinkDocument extends Entity implements LinkType {
-	public name: string;
-	public amount: number;
-	public address: string;
-	public expired: boolean;
+export class LinkDocument extends DocumentBase implements LinkType {
 	constructor() {
 		super('link');
-		this.expired = false;
+		(this as LinkType).expired = false;
 	}
 }
+
+export type LinkDocumentType = LinkDocument & LinkType;

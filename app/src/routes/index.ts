@@ -1,5 +1,5 @@
 import type { RequestHandler } from '@sveltejs/kit';
-import { getDb, LinkDocument, linkSchema } from 'db';
+import { getDb, LinkDocument, linkSchema, type LinkDocumentType } from 'db';
 import path from 'path';
 
 const generateLink = (link: LinkDocument): string => {
@@ -25,12 +25,12 @@ export const post: RequestHandler = async ({ request }) => {
 			};
 		}
 
-		const doc = new LinkDocument();
-		doc.name = name;
-		doc.amount = parseInt(amount);
-		doc.address = address;
+		const linkDocument = new LinkDocument() as LinkDocumentType;
+		linkDocument.name = name;
+		linkDocument.amount = parseInt(amount);
+		linkDocument.address = address;
 
-		linkSchema.parse(doc);
+		linkSchema.parse(linkDocument);
 
 		await db.createIndex({
 			index: {
@@ -45,9 +45,9 @@ export const post: RequestHandler = async ({ request }) => {
 		// expire any existing documents
 		db.bulkDocs(expireDocs.docs.map(doc => ({ ...doc, expired: true })));
 
-		db.put(doc);
+		db.put(linkDocument);
 
-		const link = generateLink(doc);
+		const link = generateLink(linkDocument);
 		return {
 			status: 200,
 			body: {
