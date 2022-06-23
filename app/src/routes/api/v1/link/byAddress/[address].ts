@@ -1,14 +1,15 @@
 import type { RequestEvent, RequestHandler, ResponseBody } from '@sveltejs/kit';
-import { getDb, LinkDocument, type LinkType } from 'db';
+import { getDb } from 'db';
+import type { LinkDocument, LinkType } from "db/models/Link";
 type GetParams = Record<string, string>;
 
 export const get: RequestHandler<GetParams, ResponseBody> = async (
   event: RequestEvent<GetParams>
 ) => {
   try {
-    const address = event.params.id;
+    const address = event.params.address;
     const db = getDb();
-    let linkDocument: LinkType = {};
+    let linkDocument: LinkType = undefined;
 
     await db.createIndex({
       index: {

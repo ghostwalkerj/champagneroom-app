@@ -19,9 +19,9 @@
 	};
 </script>
 
-{#if linkURL.length > 0}
-	<div class="bg-primary text-primary-content card">
-		<div class="card-body">
+<div class="bg-primary text-primary-content card">
+	<div class="card-body">
+		{#if linkURL.length > 0}
 			<h2 class="card-title">Here is your unique pCall link</h2>
 			<div class="text-left">{linkURL}</div>
 			<div class="pt-4 card-actions justify-end">
@@ -34,6 +34,8 @@
 					</div>
 				</button>
 			</div>
-		</div>
+		{:else}
+			You do not have any pCall links active
+		{/if}
 	</div>
-{/if}
+</div>
