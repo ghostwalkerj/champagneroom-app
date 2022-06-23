@@ -67,6 +67,7 @@
 		"svelte-image": "^0.2.9",
 		"svelte-web3": "^3.4.2",
 		"tailwindcss-font-inter": "^3.0.1",
+		"url-join": "^5.0.0",
 		"validator": "^13.7.0",
 		"vite-plugin-windicss": "^1.8.4",
 		"web3modal": "^1.9.7",

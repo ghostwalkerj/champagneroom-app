@@ -6,6 +6,7 @@
 	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';
 	import { selectedAccount } from 'svelte-web3';
 	import { linkSchema } from 'db/models/Link';
+	import { currentLink } from 'db/stores/LinkStore';
 
 	let pCallLink = '';
 	let hasLink = false;
@@ -29,16 +30,20 @@
 		async onSuccess(response: any) {
 			const body: {
 				success: boolean;
-				link: string;
+				linkURL: string;
 			} = await response.json();
 
-			pCallLink = body.link;
+			pCallLink = body.linkURL;
 			hasLink = true;
 			reset();
 		},
 		onerror(err: any) {
 			console.log(err);
 		}
+	});
+
+	currentLink.subscribe((link) => {
+		console.log(link);
 	});
 </script>
 

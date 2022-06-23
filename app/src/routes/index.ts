@@ -2,8 +2,8 @@ import type { RequestHandler } from '@sveltejs/kit';
 import { getDb, LinkDocument, linkSchema, type LinkDocumentType } from 'db';
 import path from 'path';
 
-const generateLink = (link: LinkDocument): string => {
-	const url = new URL(path.join(import.meta.env.VITE_CALL_URL, link._id));
+const generateLinkURL = (link: LinkDocument): string => {
+	const url = new URL(path.join(import.meta.env.VITE_TXN_URL, link._id));
 	return url.toString();
 };
 
@@ -47,12 +47,12 @@ export const post: RequestHandler = async ({ request }) => {
 
 		db.put(linkDocument);
 
-		const link = generateLink(linkDocument);
+		const linkURL = generateLinkURL(linkDocument);
 		return {
 			status: 200,
 			body: {
 				success: true,
-				link
+				linkURL
 			}
 		};
 	} catch (error) {
