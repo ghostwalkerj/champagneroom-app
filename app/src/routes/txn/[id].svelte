@@ -8,10 +8,10 @@
 <div class="min-h-screen-md bg-base-100 hero">
 	<div class="text-center hero-content">
 		<div class="max-w-lg">
-			<h1 class="font-bold text-5xl">Make your pCall</h1>
-			<p class="py-6">Scis vis facere illud pCall. Carpe florem et fac quod nunc vocant.</p>
 			{#if linkDocument != null}
-				<div class="flex flex-col p-2 justify-center items-center">
+				<h1 class="font-bold text-5xl">Make your pCall</h1>
+				<p class="py-6">Scis vis facere illud pCall. Carpe florem et fac quod nunc vocant.</p>
+				<div class="flex flex-col p-2  items-center">
 					<div class="bg-primary text-primary-content stats">
 						<div class="stat">
 							<div class="stat-title">You are Calling</div>
@@ -31,7 +31,7 @@
 					</div>
 				</div>
 			{:else}
-				<ConnectButton />
+				<h1 class="font-bold text-5xl">Invalid link</h1>
 			{/if}
 		</div>
 	</div>

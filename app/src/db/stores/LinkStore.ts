@@ -14,7 +14,8 @@ const getLinkByAddress = async (address: string) => {
 		return body.linkDocument as LinkType;
 	} else return {};
 };
-export const currentLink = derived(
+
+const { subscribe } = derived(
 	selectedAccount,
 	($selectedAccount, set) => {
 		if ($selectedAccount) {
@@ -27,3 +28,6 @@ export const currentLink = derived(
 	},
 	null
 );
+export const linkStore = {
+	subscribe
+};
