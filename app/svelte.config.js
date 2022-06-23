@@ -1,8 +1,8 @@
 import adapter from '@sveltejs/adapter-auto';
 import path from 'path';
+import image from 'svelte-image';
 import preprocess from 'svelte-preprocess';
 import WindiCSS from 'vite-plugin-windicss';
-import image from 'svelte-image';
 
 const config = {
 	// Consult https://github.com/sveltejs/svelte-preprocess

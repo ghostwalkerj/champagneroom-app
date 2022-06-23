@@ -1,7 +1,7 @@
-import { z } from 'zod';
-import IsEthereumAddress from 'validator/lib/isEthereumAddress';
-import { DocumentBase } from '.';
 import urlJoin from 'url-join';
+import IsEthereumAddress from 'validator/lib/isEthereumAddress';
+import { z } from 'zod';
+import { DocumentBase } from '.';
 
 export const linkSchema = z.object({
 	name: z
@@ -17,7 +17,7 @@ export const linkSchema = z.object({
 export type LinkType = z.infer<typeof linkSchema>;
 
 export class LinkDocument extends DocumentBase implements LinkType {
-	constructor () {
+	constructor() {
 		super('link');
 		(this as LinkType).expired = false;
 	}
@@ -25,7 +25,7 @@ export class LinkDocument extends DocumentBase implements LinkType {
 	static generateLinkURL(linkDocument: LinkDocument): string {
 		const url = new URL(urlJoin(import.meta.env.VITE_TXN_URL, linkDocument._id));
 		return url.toString();
-	};
+	}
 }
 
 export type LinkDocumentType = LinkDocument & LinkType;

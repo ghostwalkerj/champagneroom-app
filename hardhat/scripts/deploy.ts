@@ -1,5 +1,5 @@
-import { ethers } from "hardhat";
 import { writeFileSync } from "fs";
+import { ethers } from "hardhat";
 
 async function main() {
   const PCallEscrow = await ethers.getContractFactory("pCallEscrow");
