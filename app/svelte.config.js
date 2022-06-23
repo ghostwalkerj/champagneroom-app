@@ -15,6 +15,10 @@ const config = {
 
 	kit: {
 		adapter: adapter(),
+		endpointExtensions: ['.ts'],
+		paths: {
+			base: ''
+		},
 		// adapter: adapter({
 		// 	fallback: '200.html'
 		// }),
@@ -26,11 +30,8 @@ const config = {
 			resolve: {
 				alias: {
 					// these are the aliases and paths to them
-					types: path.resolve('./src/types'),
 					components: path.resolve('./src/components'),
-					stores: path.resolve('./src/stores'),
 					lib: path.resolve('./src/lib'),
-					models: path.resolve('./src/models'),
 					db: path.resolve('./src/db')
 				}
 			},

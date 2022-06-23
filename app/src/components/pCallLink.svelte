@@ -1,5 +1,16 @@
 <script type="ts">
+	import type { LinkType } from 'db';
+	import { currentLink } from 'db';
 	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';
+
+	let pCallLink: LinkType = {};
+	currentLink.subscribe((link) => {
+		pCallLink = link;
+	});
+
+	const copyLink = () => {
+		navigator.clipboard.writeText(pCallLink);
+	};
 </script>
 
 <div class="bg-primary text-primary-content card">

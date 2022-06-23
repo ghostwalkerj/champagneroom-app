@@ -2,11 +2,10 @@
 	import { reporter, ValidationMessage } from '@felte/reporter-svelte';
 	import { validator } from '@felte/validator-zod';
 	import ConnectButton from 'components/web3/ConnectButton.svelte';
+	import { LinkDocument, linkSchema, type LinkDocumentType } from 'db/models/Link';
 	import { createForm } from 'felte';
 	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';
 	import { selectedAccount } from 'svelte-web3';
-	import { linkSchema } from 'db/models/Link';
-	import { currentLink } from 'db/stores/LinkStore';
 
 	let pCallLink = '';
 	let hasLink = false;
@@ -30,20 +29,16 @@
 		async onSuccess(response: any) {
 			const body: {
 				success: boolean;
-				linkURL: string;
+				linkDocument: LinkDocumentType;
 			} = await response.json();
 
-			pCallLink = body.linkURL;
+			pCallLink = LinkDocument.generateLinkURL(body.linkDocument);
 			hasLink = true;
 			reset();
 		},
 		onerror(err: any) {
 			console.log(err);
 		}
-	});
-
-	currentLink.subscribe((link) => {
-		console.log(link);
 	});
 </script>
 
