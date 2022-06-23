@@ -5,7 +5,7 @@
 
 	let linkURL = '';
 
-	if (linkDocument) {
+	$: if (linkDocument) {
 		linkURL = LinkDocument.generateLinkURL(linkDocument);
 	}
 

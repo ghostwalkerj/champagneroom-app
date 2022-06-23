@@ -20,6 +20,13 @@ export const getDb = (): PouchDB.Database => {
 					retry: true
 				})
 				.then((result) => console.log('sync result: ', result));
+
+			db.changes({
+				since: 'now',
+				live: true
+			}).on('change', function (change) {
+				console.log(change);
+			});
 		} catch (err) {
 			console.log(err);
 		}

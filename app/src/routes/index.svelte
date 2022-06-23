@@ -7,10 +7,10 @@
 	import { createForm } from 'felte';
 	import { selectedAccount } from 'svelte-web3';
 
-	let linkDocument;
+	let linkDocument: LinkDocument;
 
 	linkStore.subscribe((_linkDocument) => {
-		$: linkDocument = _linkDocument;
+		linkDocument = _linkDocument;
 	});
 
 	const { form, reset } = createForm({

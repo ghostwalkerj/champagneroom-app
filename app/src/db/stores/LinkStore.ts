@@ -9,6 +9,7 @@ const getLinkByAddress = async (address: string): Promise<LinkDocument> => {
 	if (address) {
 		const url = new URL(urlJoin(API_PATH, 'link/byAddress', address));
 
+		console.log('getLinkByAddress: ', url.toString());
 		const response = await fetch(url);
 		const body = await response.json();
 
