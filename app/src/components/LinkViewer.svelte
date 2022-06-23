@@ -1,18 +1,13 @@
 <script type="ts">
 	import { LinkDocument, type LinkDocumentType } from 'db/models/Link';
-	import { linkStore } from 'db/stores/LinkStore';
 	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';
+	export let linkDocument: LinkDocumentType;
 
-	let link: LinkDocumentType = null;
 	let linkURL = '';
-	linkStore.subscribe((_link) => {
-		link = _link;
-		if (link) {
-			linkURL = LinkDocument.generateLinkURL(link);
-		} else {
-			linkURL = '';
-		}
-	});
+
+	if (linkDocument) {
+		linkURL = LinkDocument.generateLinkURL(linkDocument);
+	}
 
 	const copyLink = () => {
 		navigator.clipboard.writeText(linkURL);
@@ -24,14 +19,14 @@
 		{#if linkURL.length > 0}
 			<h2 class="card-title text-2xl">Outstanding pCall Link</h2>
 
-			<div class="container mx-auto p-6 grid grid-cols-2 gap-4">
+			<div class="container mx-auto p-6 grid grid-row-2 gap-4">
 				<div class="bg-info text-accent-content rounded-box items-center p-4 shadow-xl ">
 					<div class="stat-title">Your Name Shown</div>
-					<div class="stat-value">{link.name}</div>
+					<div class="stat-value">{linkDocument.name}</div>
 				</div>
 				<div class="bg-info text-accent-content rounded-box items-center p-4 shadow-xl">
 					<div class="stat-title">Amount</div>
-					<div class="stat-value">${link.amount} USD</div>
+					<div class="stat-value">${linkDocument.amount} USD</div>
 				</div>
 			</div>
 

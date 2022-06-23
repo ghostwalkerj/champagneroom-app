@@ -1,11 +1,17 @@
 <script type="ts">
 	import { reporter, ValidationMessage } from '@felte/reporter-svelte';
 	import { validator } from '@felte/validator-zod';
-	import LinkURL from 'components/LinkURL.svelte';
-	import { linkSchema, type LinkDocumentType } from 'db/models/Link';
+	import LinkViewer from 'components/LinkViewer.svelte';
+	import { LinkDocument, linkSchema, type LinkDocumentType } from 'db/models/Link';
 	import { linkStore } from 'db/stores';
 	import { createForm } from 'felte';
 	import { selectedAccount } from 'svelte-web3';
+
+	let linkDocument;
+
+	linkStore.subscribe((_linkDocument) => {
+		$: linkDocument = _linkDocument;
+	});
 
 	const { form, reset } = createForm({
 		extend: [
@@ -38,7 +44,7 @@
 				Pretioso flos est, nihil ad vos nunc. Posset faciens pecuniam. Posuit eam ad opus nunc et
 				adepto a pCall!
 			</p>
-			<div><LinkURL /></div>
+			<div><LinkViewer {linkDocument} /></div>
 
 			<div class="flex flex-col p-2 justify-center items-center">
 				<div class="py-4">Wait for your pCall</div>
