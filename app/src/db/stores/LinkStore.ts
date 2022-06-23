@@ -1,33 +1,45 @@
 import type { LinkType } from 'db/models/Link';
 import { selectedAccount } from 'svelte-web3';
-import { derived } from 'svelte/store';
+import { writable, type Subscriber } from 'svelte/store';
 import urlJoin from 'url-join';
 const API_PATH = import.meta.env.VITE_API_URL;
 
-const getLinkByAddress = async (address: string) => {
-	const url = new URL(urlJoin(API_PATH, 'link/byAddress', address));
+const getLinkByAddress = async (address: string): Promise<LinkType> => {
+	let link = {} as LinkType;
+	if (address) {
+		const url = new URL(urlJoin(API_PATH, 'link/byAddress', address));
 
-	const response = await fetch(url);
-	const body = await response.json();
+		const response = await fetch(url);
+		const body = await response.json();
 
-	if (body.success) {
-		return body.linkDocument as LinkType;
-	} else return {};
-};
-
-const { subscribe } = derived(
-	selectedAccount,
-	($selectedAccount, set) => {
-		if ($selectedAccount) {
-			getLinkByAddress($selectedAccount).then((link) => {
-				set(link);
-			});
-		} else {
-			set(null);
+		if (body.success) {
+			link = body.linkDocument;
 		}
-	},
-	null
-);
-export const linkStore = {
-	subscribe
+	}
+	return link;
 };
+
+async function storeFunc() {
+	const { subscribe: _subscribe, set: _set } = writable<LinkType>();
+	const _unsubscribe = selectedAccount.subscribe((account) => {
+		if (account) {
+			getLinkByAddress(account).then((linkDocument) => {
+				_set(linkDocument);
+			});
+		}
+	});
+	const subscribe = (subscriber: Subscriber<LinkType>) => {
+		const unsubscribe = _subscribe(subscriber);
+		return () => {
+			unsubscribe();
+			_unsubscribe();
+		};
+	};
+	const set = (linkDocument: LinkType) => {
+		_set(linkDocument);
+	};
+
+	return { subscribe, set };
+}
+
+export const linkStore = await storeFunc();
