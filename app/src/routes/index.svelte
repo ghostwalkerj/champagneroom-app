@@ -6,6 +6,7 @@
 	import { createForm } from 'felte';
 	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';
 	import { selectedAccount } from 'svelte-web3';
+	import LinkURL from 'components/LinkURL.svelte';
 
 	let pCallLink = '';
 	let hasLink = false;
@@ -42,6 +43,7 @@
 	});
 </script>
 
+<LinkURL />
 <div class="min-h-screen-md bg-base-100 hero">
 	<div class="text-center hero-content">
 		<div class="max-w-lg">

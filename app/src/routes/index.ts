@@ -1,4 +1,5 @@
-import { getDb, LinkDocument, linkSchema, type LinkDocumentType } from "db";
+import { getDb } from "db";
+import { LinkDocument, linkSchema, type LinkDocumentType } from "db/models/Link";
 
 export const post = async ({ request }) => {
 	try {

@@ -22,6 +22,6 @@ export const currentLink = derived(selectedAccount, ($selectedAccount, set) => {
     });
   }
   else {
-    set({});
+    set(null);
   }
-}, {});
+}, null);
