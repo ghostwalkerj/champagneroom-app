@@ -1,4 +1,4 @@
-import type { LinkType } from "db/models/Link";
+import type { LinkType } from 'db/models/Link';
 import { derived } from 'svelte/store';
 import { selectedAccount } from 'svelte-web3';
 import urlJoin from 'url-join';
@@ -12,16 +12,18 @@ const getLinkByAddress = async (address: string) => {
 
   if (body.success) {
     return body.linkDocument as LinkType;
-  }
-  else return {};
+  } else return {};
 };
-export const currentLink = derived(selectedAccount, ($selectedAccount, set) => {
-  if ($selectedAccount) {
-    getLinkByAddress($selectedAccount).then(link => {
-      set(link);
-    });
-  }
-  else {
-    set(null);
-  }
-}, null);
+export const currentLink = derived(
+  selectedAccount,
+  ($selectedAccount, set) => {
+    if ($selectedAccount) {
+      getLinkByAddress($selectedAccount).then((link) => {
+        set(link);
+      });
+    } else {
+      set(null);
+    }
+  },
+  null
+);

@@ -1,5 +1,5 @@
-import { getDb } from "db";
-import { LinkDocument, linkSchema, type LinkDocumentType } from "db/models/Link";
+import { getDb } from 'db';
+import { LinkDocument, linkSchema, type LinkDocumentType } from 'db/models/Link';
 
 export const post = async ({ request }) => {
 	try {
@@ -37,7 +37,7 @@ export const post = async ({ request }) => {
 		})) as PouchDB.Find.FindResponse<LinkDocument>;
 
 		// expire any existing documents
-		db.bulkDocs(expireDocs.docs.map(doc => ({ ...doc, expired: true })));
+		db.bulkDocs(expireDocs.docs.map((doc) => ({ ...doc, expired: true })));
 
 		db.put(linkDocument);
 

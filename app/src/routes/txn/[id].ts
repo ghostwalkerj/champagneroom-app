@@ -1,6 +1,6 @@
 import type { RequestEvent, RequestHandler, ResponseBody } from '@sveltejs/kit';
 import { getDb } from 'db';
-import type { LinkType } from "db/models/Link";
+import type { LinkType } from 'db/models/Link';
 type GetParams = Record<string, string>;
 
 export const get: RequestHandler<GetParams, ResponseBody> = async (

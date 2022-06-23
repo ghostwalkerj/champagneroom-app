@@ -1,12 +1,12 @@
 <script type="ts">
 	import { reporter, ValidationMessage } from '@felte/reporter-svelte';
 	import { validator } from '@felte/validator-zod';
+	import LinkURL from 'components/LinkURL.svelte';
 	import ConnectButton from 'components/web3/ConnectButton.svelte';
 	import { LinkDocument, linkSchema, type LinkDocumentType } from 'db/models/Link';
 	import { createForm } from 'felte';
 	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';
 	import { selectedAccount } from 'svelte-web3';
-	import LinkURL from 'components/LinkURL.svelte';
 
 	let pCallLink = '';
 	let hasLink = false;
