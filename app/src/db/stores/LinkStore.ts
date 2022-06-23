@@ -1,11 +1,11 @@
-import type { LinkType } from 'db/models/Link';
+import type { LinkDocument } from 'db/models/Link';
 import { selectedAccount } from 'svelte-web3';
 import { writable, type Subscriber } from 'svelte/store';
 import urlJoin from 'url-join';
 const API_PATH = import.meta.env.VITE_API_URL;
 
-const getLinkByAddress = async (address: string): Promise<LinkType> => {
-	let link = {} as LinkType;
+const getLinkByAddress = async (address: string): Promise<LinkDocument> => {
+	let link = {} as LinkDocument;
 	if (address) {
 		const url = new URL(urlJoin(API_PATH, 'link/byAddress', address));
 
@@ -20,7 +20,7 @@ const getLinkByAddress = async (address: string): Promise<LinkType> => {
 };
 
 async function storeFunc() {
-	const { subscribe: _subscribe, set: _set } = writable<LinkType>();
+	const { subscribe: _subscribe, set: _set } = writable<LinkDocument>();
 	const _unsubscribe = selectedAccount.subscribe((account) => {
 		if (account) {
 			getLinkByAddress(account).then((linkDocument) => {
@@ -28,14 +28,14 @@ async function storeFunc() {
 			});
 		}
 	});
-	const subscribe = (subscriber: Subscriber<LinkType>) => {
+	const subscribe = (subscriber: Subscriber<LinkDocument>) => {
 		const unsubscribe = _subscribe(subscriber);
 		return () => {
 			unsubscribe();
 			_unsubscribe();
 		};
 	};
-	const set = (linkDocument: LinkType) => {
+	const set = (linkDocument: LinkDocument) => {
 		_set(linkDocument);
 	};
 

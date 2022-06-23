@@ -2,10 +2,9 @@
 	import { reporter, ValidationMessage } from '@felte/reporter-svelte';
 	import { validator } from '@felte/validator-zod';
 	import LinkURL from 'components/LinkURL.svelte';
-	import ConnectButton from 'components/web3/ConnectButton.svelte';
-	import { LinkDocument, linkSchema, type LinkDocumentType } from 'db/models/Link';
+	import { linkSchema, type LinkDocumentType } from 'db/models/Link';
+	import { linkStore } from 'db/stores';
 	import { createForm } from 'felte';
-	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';
 	import { selectedAccount } from 'svelte-web3';
 
 	const { form, reset } = createForm({
@@ -20,6 +19,9 @@
 				success: boolean;
 				linkDocument: LinkDocumentType;
 			} = await response.json();
+			if (body.success) {
+				linkStore.set(body.linkDocument);
+			}
 			reset();
 		},
 		onerror(err: any) {

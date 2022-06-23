@@ -1,5 +1,4 @@
 <script type="ts">
-	import ConnectButton from 'components/web3/ConnectButton.svelte';
 	import type { LinkType } from 'db/models/Link';
 
 	export let linkDocument: LinkType;
