@@ -1,0 +1,23 @@
+{
+  "files.exclude": {
+    "app/.env.example": true,
+    "app/.eslintignore": true,
+    "app/.eslintrc.cjs": true,
+    "app/.gitignore": true,
+    "app/.npmignore": true,
+    "app/.prettierignore": true,
+    "app/.prettierrc": true,
+    "app/package.json": true,
+    "app/playwright.config.ts": true,
+    "app/README.md": true,
+    "app/svelte.config.js": true,
+    "app/tsconfig.json": true,
+    "app/windi.config.cjs": true,
+    "node_modules": true,
+    "yarn.lock": true,
+    "app/.svelte-kit": true,
+    ".vscode": true,
+    "app/node_modules": true
+  },
+  "workspace.isHidden": true
+}
