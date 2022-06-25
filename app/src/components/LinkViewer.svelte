@@ -1,12 +1,12 @@
 <script type="ts">
-	import { LinkDocument, type LinkDocumentType } from 'db/models/Link';
+	import { generateLinkURL, type LinkDocumentType } from 'db/models/Link';
 	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';
 	export let linkDocument: LinkDocumentType;
 
 	let linkURL = '';
 
 	$: if (linkDocument) {
-		linkURL = LinkDocument.generateLinkURL(linkDocument);
+		linkURL = generateLinkURL(linkDocument);
 	}
 
 	const copyLink = () => {

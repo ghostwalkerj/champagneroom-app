@@ -1,17 +1,33 @@
 <script type="ts">
 	import { reporter, ValidationMessage } from '@felte/reporter-svelte';
 	import { validator } from '@felte/validator-zod';
+	import type { QueryKey, UseQueryStoreResult } from '@sveltestack/svelte-query';
+	import type { AxiosError } from 'axios';
 	import LinkViewer from 'components/LinkViewer.svelte';
-	import { LinkDocument, linkSchema, type LinkDocumentType } from 'db/models/Link';
-	import { linkStore } from 'db/stores';
+	import {
+		getLinkQueryByAddress,
+		LinkDocument,
+		linkSchema,
+		type LinkDocumentType
+	} from 'db/models/Link';
 	import { createForm } from 'felte';
 	import { selectedAccount } from 'svelte-web3';
 
-	let linkDocument: LinkDocument;
+	let linkQuery: UseQueryStoreResult<
+		LinkDocument,
+		AxiosError<unknown, any>,
+		LinkDocument,
+		QueryKey
+	>;
 
-	linkStore.subscribe((_linkDocument) => {
-		linkDocument = _linkDocument;
+	let address = '';
+	selectedAccount.subscribe((account) => {
+		if (account) {
+			address = account;
+		}
 	});
+
+	$: linkQuery = getLinkQueryByAddress(address);
 
 	const { form, reset } = createForm({
 		extend: [
@@ -23,10 +39,10 @@
 		async onSuccess(response: any) {
 			const body: {
 				success: boolean;
-				linkDocument: LinkDocumentType;
+				data: LinkDocumentType;
 			} = await response.json();
 			if (body.success) {
-				linkStore.set(body.linkDocument);
+				//linkStore.set(body.linkDocument);
 			}
 			reset();
 		},
@@ -44,8 +60,9 @@
 				Pretioso flos est, nihil ad vos nunc. Posset faciens pecuniam. Posuit eam ad opus nunc et
 				adepto a pCall!
 			</p>
-			<div><LinkViewer {linkDocument} /></div>
-
+			{#if $linkQuery && $linkQuery.isSuccess}
+				<div><LinkViewer linkDocument={$linkQuery.data.linkDocument} /></div>
+			{/if}
 			<div class="flex flex-col p-2 justify-center items-center">
 				<div class="py-4">Wait for your pCall</div>
 				<button class="btn btn-primary">Wait for pCall</button>

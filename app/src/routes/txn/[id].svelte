@@ -1,7 +1,7 @@
 <script type="ts">
-	import type { LinkType } from 'db/models/Link';
+	import type { LinkDocumentType } from 'db/models/Link';
 
-	export let linkDocument: LinkType;
+	export let linkDocument: LinkDocumentType;
 </script>
 
 <div class="min-h-screen-md bg-base-100 hero">
