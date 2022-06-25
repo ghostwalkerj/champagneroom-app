@@ -24,6 +24,8 @@ export class LinkDocument extends DocumentBase implements LinkType {
 export type LinkDocumentType = LinkDocument & LinkType;
 
 export const generateLinkURL = (linkDocument: LinkDocument): string => {
-	const url = new URL(urlJoin(import.meta.env.VITE_TXN_URL, linkDocument._id));
+	const TXN_URL = import.meta.env.VITE_TXN_URL || 'http://localhost:3000/txn';
+
+	const url = new URL(urlJoin(TXN_URL, linkDocument._id));
 	return url.toString();
 };
