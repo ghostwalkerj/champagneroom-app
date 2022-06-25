@@ -1,24 +1,44 @@
 <script type="ts">
 	import { reporter, ValidationMessage } from '@felte/reporter-svelte';
 	import { validator } from '@felte/validator-zod';
-	import type { QueryKey, UseQueryStoreResult } from '@sveltestack/svelte-query';
-	import type { AxiosError } from 'axios';
-	import LinkViewer from 'components/LinkViewer.svelte';
 	import {
-		getLinkQueryByAddress,
-		LinkDocument,
-		linkSchema,
-		type LinkDocumentType
-	} from 'db/models/Link';
+		useQuery,
+		useQueryClient,
+		type QueryKey,
+		type UseQueryStoreResult
+	} from '@sveltestack/svelte-query';
+	import type { AxiosError } from 'axios';
+	import axios from 'axios';
+	import LinkViewer from 'components/LinkViewer.svelte';
+	import { linkSchema, type LinkDocumentType } from 'db/models/Link';
 	import { createForm } from 'felte';
 	import { selectedAccount } from 'svelte-web3';
+	import urlJoin from 'url-join';
+	const API_PATH = import.meta.env.VITE_API_URL;
+	const queryClient = useQueryClient();
 
-	let linkQuery: UseQueryStoreResult<
-		LinkDocument,
+	type getLinkQueryByAddressResponse = {
+		linkDocument: LinkDocumentType;
+	};
+
+	let linkQueryResult: UseQueryStoreResult<
+		getLinkQueryByAddressResponse,
 		AxiosError<unknown, any>,
-		LinkDocument,
+		getLinkQueryByAddressResponse,
 		QueryKey
 	>;
+
+	const getLinkQueryByAddress = (address: string) => {
+		const linkQuery = useQuery<getLinkQueryByAddressResponse, AxiosError>(
+			['linkDocument', address],
+			async () => {
+				const url = new URL(urlJoin(API_PATH, 'link/byAddress', address));
+				const { data } = await axios.get<getLinkQueryByAddressResponse>(url.toString());
+				return data;
+			}
+		);
+		return linkQuery;
+	};
 
 	let address = '';
 	selectedAccount.subscribe((account) => {
@@ -27,7 +47,10 @@
 		}
 	});
 
-	$: linkQuery = getLinkQueryByAddress(address);
+	$: linkQueryResult = getLinkQueryByAddress(address);
+	// linkQuery.subscribe((data) => {
+	// 	linkDocument = data.linkDocument;
+	// });
 
 	const { form, reset } = createForm({
 		extend: [
@@ -39,10 +62,10 @@
 		async onSuccess(response: any) {
 			const body: {
 				success: boolean;
-				data: LinkDocumentType;
+				linkDocument: LinkDocumentType;
 			} = await response.json();
 			if (body.success) {
-				//linkStore.set(body.linkDocument);
+				queryClient.setQueryData(['linkDocument', address], body);
 			}
 			reset();
 		},
@@ -60,8 +83,8 @@
 				Pretioso flos est, nihil ad vos nunc. Posset faciens pecuniam. Posuit eam ad opus nunc et
 				adepto a pCall!
 			</p>
-			{#if $linkQuery && $linkQuery.isSuccess}
-				<div><LinkViewer linkDocument={$linkQuery.data.linkDocument} /></div>
+			{#if $linkQueryResult && $linkQueryResult.isSuccess}
+				<div><LinkViewer linkDocument={$linkQueryResult.data.linkDocument} /></div>
 			{/if}
 			<div class="flex flex-col p-2 justify-center items-center">
 				<div class="py-4">Wait for your pCall</div>
@@ -75,7 +98,7 @@
 			</div>
 			<div class="flex flex-col p-2 justify-center items-center">
 				<form use:form method="post">
-					<input type="hidden" name="address" id="address" value={$selectedAccount} />
+					<input type="hidden" name="address" id="address" value={address} />
 					<div class="max-w-xs w-full py-2 form-control">
 						<!-- svelte-ignore a11y-label-has-associated-control -->
 						<label class="label">
