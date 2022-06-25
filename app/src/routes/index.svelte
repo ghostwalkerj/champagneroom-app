@@ -14,7 +14,7 @@
 	import { createForm } from 'felte';
 	import { selectedAccount } from 'svelte-web3';
 	import urlJoin from 'url-join';
-	const API_PATH = import.meta.env.VITE_API_URL;
+	const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
 	const queryClient = useQueryClient();
 
 	type getLinkQueryByAddressResponse = {
@@ -34,7 +34,7 @@
 		const linkQuery = useQuery<getLinkQueryByAddressResponse, AxiosError>(
 			['linkDocument', address],
 			async () => {
-				const url = new URL(urlJoin(API_PATH, 'link/byAddress', address));
+				const url = new URL(urlJoin(API_URL, 'link/byAddress', address));
 				const { data } = await axios.get<getLinkQueryByAddressResponse>(url.toString());
 				return data;
 			}
