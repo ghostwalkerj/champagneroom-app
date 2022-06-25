@@ -21,11 +21,11 @@
 
 			<div class="container mx-auto p-6 grid grid-row-2 gap-4">
 				<div class="bg-info text-accent-content rounded-box items-center p-4 shadow-xl ">
-					<div class="stat-title">Your Name Shown</div>
+					<div class="stat-title">Name Shown</div>
 					<div class="stat-value">{linkDocument.name}</div>
 				</div>
 				<div class="bg-info text-accent-content rounded-box items-center p-4 shadow-xl">
-					<div class="stat-title">Amount</div>
+					<div class="stat-title">Amount Requested</div>
 					<div class="stat-value">${linkDocument.amount} USD</div>
 				</div>
 			</div>

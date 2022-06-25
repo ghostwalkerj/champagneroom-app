@@ -20,7 +20,7 @@ module.exports = {
 
 		}
 	},
-	plugins: [require("daisyui"), require("tailwindcss-font-inter")],
+	plugins: [require('windicss/plugin/typography'), require("daisyui"), require("tailwindcss-font-inter")],
 	daisyui: {
 		styled: true,
 		base: true,

@@ -28,6 +28,8 @@
 		QueryKey
 	>;
 
+	let address = '';
+
 	const getLinkQueryByAddress = (address: string) => {
 		const linkQuery = useQuery<getLinkQueryByAddressResponse, AxiosError>(
 			['linkDocument', address],
@@ -40,17 +42,7 @@
 		return linkQuery;
 	};
 
-	let address = '';
-	selectedAccount.subscribe((account) => {
-		if (account) {
-			address = account;
-		}
-	});
-
 	$: linkQueryResult = getLinkQueryByAddress(address);
-	// linkQuery.subscribe((data) => {
-	// 	linkDocument = data.linkDocument;
-	// });
 
 	const { form, reset } = createForm({
 		extend: [
@@ -71,6 +63,12 @@
 		},
 		onerror(err: any) {
 			console.log(err);
+		}
+	});
+
+	selectedAccount.subscribe((account) => {
+		if (account) {
+			address = account;
 		}
 	});
 </script>
