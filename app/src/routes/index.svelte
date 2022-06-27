@@ -10,6 +10,7 @@
 	import type { AxiosError } from 'axios';
 	import axios from 'axios';
 	import LinkViewer from 'components/LinkViewer.svelte';
+	import VideoCall from 'components/VideoCall.svelte';
 	import { linkSchema, type LinkDocumentType } from 'db/models/Link';
 	import { createForm } from 'felte';
 	import { selectedAccount } from 'svelte-web3';
@@ -82,7 +83,6 @@
 <div class="min-h-full">
 	<main class="py-10">
 		<!-- Page header -->
-
 		<div
 			class="max-w-3xl mx-auto px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8"
 		>
@@ -170,6 +170,18 @@
 										<button class="btn btn-secondary" type="submit">Generate Link</button>
 									</div>
 								</form>
+							</div>
+						</div>
+					</div>
+				</section>
+
+				<!-- Camera  Preview -->
+				<section aria-labelledby="new-link-tile">
+					<div class="bg-primary text-primary-content card">
+						<div class="card-body items-center text-center">
+							<h2 class="card-title text-2xl">Your Video Preview</h2>
+							<div class="rounded-2xl">
+								<VideoCall address={$selectedAccount} userName={'Chyna'} />
 							</div>
 						</div>
 					</div>
