@@ -29,7 +29,8 @@ module.exports = {
 		rtl: false,
 		themes: [
 			{
-				cyptoJesus: {
+				cryptoJesus: {
+					...require("daisyui/src/colors/themes")["[data-theme=synthwave]"],
 					fontFamily: "Inter",
 					primary: "#e779c1",
 					"primary-focus": "#e04dac",

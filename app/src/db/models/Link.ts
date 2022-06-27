@@ -1,5 +1,5 @@
 import urlJoin from 'url-join';
-import IsEthereumAddress from 'validator/lib/isEthereumAddress';
+import validator from 'validator';
 import { z } from 'zod';
 import { DocumentBase } from '.';
 export const linkSchema = z.object({
@@ -8,7 +8,7 @@ export const linkSchema = z.object({
 		.min(3, { message: 'Must be 3 or more characters long' })
 		.max(20, { message: 'Must be 20 characters or less' }),
 	amount: z.number().min(1).max(10000).int(),
-	address: z.string().refine(IsEthereumAddress),
+	address: z.string().refine(validator.isEthereumAddress),
 	expired: z.boolean().optional().default(false),
 	created_at: z.string().optional().default(new Date().toISOString())
 });

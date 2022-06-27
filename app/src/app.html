@@ -1,19 +1,25 @@
 <!DOCTYPE html>
-<html>	<meta charset="utf-8" />
-	<title>pCall</title>
-	<meta name="description" content="pCall" />
-	<link rel="icon" href="/favicon.ico" />
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<svelte:head>
-  <link href="https://fonts.googleapis.com/css?family=Inter" rel="stylesheet">
-</svelte:head>
-<script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
-	<script type="application/javascript">
-		var global = window;
-	</script>
-	<script> window.process = window.process || { env: { NODE_DEBUG: undefined, DEBUG: undefined } }; window.global = window; </script>
-	%sveltekit.head%
+<html>
+
+	<head>
+		<meta charset="utf-8" />
+		<title>pCall</title>
+		<meta name="description" content="pCall" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<svelte:head>
+			<link href="https://fonts.googleapis.com/css?family=Inter" rel="stylesheet">
+		</svelte:head>
+		<script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+		<script type="application/javascript">
+			var global = window;
+		</script>
+		<script> window.process = window.process || { env: { NODE_DEBUG: undefined, DEBUG: undefined } }; window.global = window; </script>
+		%sveltekit.head%
+	</head>
+
 	<body>
 		<div>%sveltekit.body%</div>
 	</body>
+
 </html>
