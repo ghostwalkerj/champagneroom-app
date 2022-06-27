@@ -110,9 +110,9 @@ export default class VideoStream {
 	private userId: string;
 
 	private userName: string;
-	constructor(address: string, name: string) {
+	constructor(userId: string, name: string) {
 		this.callState.subscribe((s) => (this.currentState = s));
-		this.userId = address;
+		this.userId = userId;
 		this.userName = name;
 		this.socket = io(SIGNAL_SERVER, {
 			query: {

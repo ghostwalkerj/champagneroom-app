@@ -19,9 +19,8 @@
 	// TODO: simple-peer error on destroy
 
 	// Props
-	export let callerType: 'CALLER' | 'CALLEE';
 	export let address: string;
-	export let callerName: string;
+	export let userName: string;
 
 	// UI Controls
 	let canvas: HTMLCanvasElement;
@@ -137,12 +136,12 @@
 		localVideo.play();
 	};
 
-	const handleError = (error) => {
+	const handleError = (error: any) => {
 		console.log('navigator.getUserMedia error: ', error);
 	};
 
 	const initalise = () => {
-		vc = new VideoStream(address, callerName);
+		vc = new VideoStream(address, userName);
 		cs = vc.callState;
 
 		vc.callState.subscribe((s) => {
