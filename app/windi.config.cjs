@@ -1,5 +1,9 @@
-module.exports = {
+const daisyui = require('daisyui');
+const inter = require('tailwindcss-font-inter');
+const typography = require('windicss/plugin/typography');
+const forms = require('windicss/plugin/forms');
 
+module.exports = {
 	content: ["./src/**/*.{html,js,svelte,ts}"],
 	theme: {
 		extend: {},
@@ -20,7 +24,7 @@ module.exports = {
 
 		}
 	},
-	plugins: [require("daisyui"), require("tailwindcss-font-inter")],
+	plugins: [daisyui, inter, typography, forms],
 	daisyui: {
 		styled: true,
 		base: true,
@@ -32,7 +36,6 @@ module.exports = {
 				cryptoJesus: {
 					...require("daisyui/src/colors/themes")["[data-theme=synthwave]"],
 					fontFamily: "Inter",
-
 					"base-100": "#150050",
 					"base-200": "#20134e",
 					"base-300": "#140a2e",

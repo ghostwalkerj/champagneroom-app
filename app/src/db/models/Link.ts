@@ -7,7 +7,12 @@ export const linkSchema = z.object({
 		.string()
 		.min(3, { message: 'Must be 3 or more characters long' })
 		.max(20, { message: 'Must be 20 characters or less' }),
-	amount: z.number().min(1).max(10000).int(),
+	amount: z.string().refine(
+		(x) => {
+			return validator.isInt(x, { gt: 0, lt: 10000 });
+		},
+		{ message: 'Must be between  $1 and $9999' }
+	),
 	address: z.string().refine(validator.isEthereumAddress),
 	expired: z.boolean().optional().default(false),
 	created_at: z.string().optional().default(new Date().toISOString())

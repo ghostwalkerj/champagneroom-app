@@ -21,7 +21,7 @@ export const post = async ({ request }) => {
 
 		const linkDocument = new LinkDocument() as LinkDocumentType;
 		linkDocument.name = name;
-		linkDocument.amount = parseInt(amount);
+		linkDocument.amount = amount;
 		linkDocument.address = address;
 
 		linkSchema.parse(linkDocument);
