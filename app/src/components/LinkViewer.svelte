@@ -1,5 +1,5 @@
 <script type="ts">
-	import { generateLinkURL, type LinkDocumentType } from 'db/models/Link';
+	import { generateLinkURL, type LinkDocumentType } from 'db/models/link';
 	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';
 	export let linkDocument: LinkDocumentType;
 

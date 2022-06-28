@@ -10,7 +10,7 @@
 	import type { AxiosError } from 'axios';
 	import axios from 'axios';
 	import LinkViewer from 'components/LinkViewer.svelte';
-	import { linkSchema, type LinkDocumentType } from 'db/models/Link';
+	import { linkSchema, type LinkDocumentType } from 'db/models/link';
 	import { createForm } from 'felte';
 	import { selectedAccount } from 'svelte-web3';
 	import urlJoin from 'url-join';

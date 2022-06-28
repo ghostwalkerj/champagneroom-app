@@ -1,6 +1,6 @@
 import type { RequestEvent } from '@sveltejs/kit';
 import { getDb } from 'db';
-import type { LinkDocumentType } from 'db/models/Link';
+import type { LinkDocumentType } from 'db/models/link';
 type GetParams = Record<string, string>;
 
 export const get = async (event: RequestEvent<GetParams>) => {

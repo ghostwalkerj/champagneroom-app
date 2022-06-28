@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid';
-export * from './Link';
+export * from './link';
 
 export abstract class DocumentBase {
 	public created_at: string;

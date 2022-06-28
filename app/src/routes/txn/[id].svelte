@@ -1,5 +1,5 @@
 <script type="ts">
-	import type { LinkDocumentType } from 'db/models/Link';
+	import type { LinkDocumentType } from 'db/models/link';
 
 	export let linkDocument: LinkDocumentType;
 </script>
