@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { MicIcon, MicOffIcon, VideoIcon, VideoOffIcon } from 'svelte-feather-icons';
 	import { userStream, type UserStreamType } from 'lib/userStream';
+	import { videoCall, type VideoCallType } from 'lib/videoCall';
 
 	// TODO: simple-peer error on destroy
 
@@ -25,8 +26,8 @@
 		us = await userStream();
 		localVideo.srcObject = us.mediaStream;
 		localVideo.play();
-		$: camState = us.camState;
-		$: micState = us.micState;
+		camState = us.camState;
+		micState = us.micState;
 		initialized = true;
 	};
 </script>
@@ -41,7 +42,7 @@
 		class="flex bg-base-100 flex-shrink-0 p-4 gap-4 items-center justify-center text-white md:rounded-2xl md:gap-8 "
 	>
 		<div class="flex flex-col gap-2 items-center">
-			<button class="h-14 w-14 btn btn-circle " on:click={us.camState.toggleCam}>
+			<button class="h-14 w-14 btn btn-circle " on:click={camState.toggleCam}>
 				{#if $camState === 'CamOn'}
 					<VideoIcon size="34" />
 				{:else}
@@ -51,7 +52,7 @@
 			Cam
 		</div>
 		<div class="flex flex-col gap-2 items-center">
-			<button class="h-14 w-14 btn btn-circle" on:click={us.micState.toggleMic}>
+			<button class="h-14 w-14 btn btn-circle" on:click={micState.toggleMic}>
 				{#if $micState === 'MicOn'}
 					<MicIcon size="34" />
 				{:else}

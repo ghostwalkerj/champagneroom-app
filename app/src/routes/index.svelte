@@ -7,6 +7,7 @@
 	import { linkSchema, type LinkDocumentType } from 'db/models/link';
 	import { getLinkQueryByAddress } from 'db/queries/linkQueries';
 	import { createForm } from 'felte';
+	import { videoCall, type VideoCallType } from 'lib/videoCall';
 	import { selectedAccount } from 'svelte-web3';
 
 	const queryClient = useQueryClient();
@@ -43,9 +44,13 @@
 		}
 	});
 
+	let vc: VideoCallType;
+	let callState: typeof vc.callState;
 	selectedAccount.subscribe((account) => {
 		if (account) {
 			address = account;
+			vc = videoCall(address, address);
+			callState = vc.callState;
 		}
 	});
 </script>
@@ -163,8 +168,8 @@
 					<section aria-labelledby="status-title" class="lg:col-start-3 lg:col-span-1">
 						<div class="bg-primary text-primary-content card">
 							<div class="card-body items-center text-center">
-								<h2 class="card-title text-2xl">Status</h2>
-								<p>Waiting for incoming pCall</p>
+								<h2 class="card-title text-2xl">pCall Status</h2>
+								<p>{$callState}</p>
 							</div>
 						</div>
 					</section>

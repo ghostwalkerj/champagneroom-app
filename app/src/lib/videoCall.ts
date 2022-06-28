@@ -287,9 +287,11 @@ export const videoCall = (_userId: string, _name: string) => {
 		acceptCall,
 		hangUp,
 		rejectCall,
-		currentState: currentCallState,
+		callState,
 		callerId,
 		callerName,
 		remoteStream
 	};
 };
+
+export type VideoCallType = ReturnType<typeof videoCall>;
