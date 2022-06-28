@@ -502,7 +502,9 @@
 				</div>
 			</div>
 		{:else}
-			<VideoCall {vc} {us} />
+			<div>
+				<VideoCall {vc} {us} />
+			</div>
 		{/if}
 	</main>
 </div>
