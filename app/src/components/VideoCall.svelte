@@ -20,6 +20,29 @@
 	// TODO: simple-peer error on destroy
 	export let vc: Awaited<VideoCallType>;
 	export let us: Awaited<UserStreamType>;
+	export let options: Partial<{
+		makeCall: boolean;
+		rejectCall: boolean;
+		answerCall: boolean;
+		hangup: boolean;
+		cam: boolean;
+		mic: boolean;
+		cancel: boolean;
+	}> = {};
+
+	const buttonOptions = Object.assign(
+		{
+			makeCall: true,
+			rejectCall: true,
+			answerCall: true,
+			hangup: true,
+			cam: true,
+			mic: true,
+			cancel: true
+		},
+		options
+	);
+
 	const callState = vc.callState;
 	const micState = us.micState;
 	const camState = us.camState;
@@ -131,6 +154,7 @@
 		<div class="flex flex-col gap-2 items-center">
 			{#if $callState == 'ready'}
 				<button
+					disabled={!buttonOptions.makeCall}
 					class="h-14 w-14 btn btn-circle"
 					on:click={() =>
 						vc.makeCall('talent:0x5e90c65c58a4ad95eea3b04615a4270d1d2ec1b1', us.mediaStream)}
@@ -139,7 +163,10 @@
 				</button>
 				Call
 			{:else if $callState == 'makingCall'}
-				<button class="h-14 animate-flash animate-loop w-14 animated  btn btn-circle">
+				<button
+					class="h-14 animate-flash animate-loop w-14 animated  btn btn-circle"
+					disabled={!buttonOptions.makeCall}
+				>
 					<PhoneOutgoingIcon size="34" />
 				</button>
 				Waiting
@@ -147,6 +174,7 @@
 				<button
 					class="h-14 animate-shock animate-loop w-14 animated  btn btn-circle"
 					on:click={() => vc.acceptCall(us.mediaStream)}
+					disabled={!buttonOptions.answerCall}
 				>
 					<PhoneIncomingIcon size="34" />
 				</button>
@@ -160,7 +188,11 @@
 		</div>
 
 		<div class="flex flex-col gap-2 items-center">
-			<button class="h-14 w-14 btn btn-circle " on:click={camState.toggleCam}>
+			<button
+				class="h-14 w-14 btn btn-circle "
+				on:click={camState.toggleCam}
+				disabled={!buttonOptions.cam}
+			>
 				{#if $camState === 'CamOn'}
 					<VideoIcon size="34" />
 				{:else}
@@ -171,7 +203,11 @@
 		</div>
 
 		<div class="flex flex-col gap-2 items-center">
-			<button class="h-14 w-14 btn btn-circle" on:click={micState.toggleMic}>
+			<button
+				class="h-14 w-14 btn btn-circle"
+				on:click={micState.toggleMic}
+				disabled={!buttonOptions.mic}
+			>
 				{#if $micState === 'MicOn'}
 					<MicIcon size="34" />
 				{:else}
@@ -183,22 +219,38 @@
 
 		<div class="flex flex-col gap-2 items-center">
 			{#if $callState == 'receivingCall'}
-				<button class="h-14 w-14 btn-primary btn btn-circle" on:click={() => vc.rejectCall()}>
+				<button
+					class="h-14 w-14 btn-primary btn btn-circle"
+					on:click={() => vc.rejectCall()}
+					disabled={!buttonOptions.rejectCall}
+				>
 					<PhoneMissedIcon size="34" />
 				</button>
 				Reject
 			{:else if $callState == 'makingCall'}
-				<button class="h-14 w-14 btn btn-circle btn-primary" on:click={() => vc.cancelCall()}>
+				<button
+					class="h-14 w-14 btn btn-circle btn-primary"
+					on:click={() => vc.cancelCall()}
+					disabled={!buttonOptions.rejectCall}
+				>
 					<PhoneMissedIcon size="34" />
 				</button>
 				Cancel
 			{:else if $callState == 'connectedAsCaller' || $callState == 'connectedAsReceiver'}
-				<button class="h-14 w-14 btn btn-circle btn-primary" on:click={() => vc.hangUp()}>
+				<button
+					class="h-14 w-14 btn btn-circle btn-primary"
+					on:click={() => vc.hangUp()}
+					disabled={!buttonOptions.hangup}
+				>
 					<PhoneMissedIcon size="34" />
 				</button>
 				Hangup
 			{:else}
-				<button class="h-14 w-14 btn btn-primary btn-circle" on:click={() => vc.cancelCall()}>
+				<button
+					class="h-14 w-14 btn btn-primary btn-circle"
+					on:click={() => vc.cancelCall()}
+					disabled={!buttonOptions.hangup}
+				>
 					<div class="h-8 w-8"><MdClose /></div></button
 				>
 				Leave

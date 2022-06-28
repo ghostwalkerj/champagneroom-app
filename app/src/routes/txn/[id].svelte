@@ -27,7 +27,6 @@
 
 	const call = async () => {
 		if (vc) {
-			let us = await userStream();
 			vc.makeCall(linkDocument.address, us.mediaStream);
 		}
 	};

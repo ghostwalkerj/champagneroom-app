@@ -503,7 +503,7 @@
 			</div>
 		{:else}
 			<div>
-				<VideoCall {vc} {us} />
+				<VideoCall {vc} {us} options={{ hangup: false, cam: false, mic: false }} />
 			</div>
 		{/if}
 	</main>

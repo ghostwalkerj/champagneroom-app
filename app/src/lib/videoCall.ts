@@ -263,7 +263,6 @@ export const videoCall = (_userId: string, _name: string) => {
 
 		peer.on('stream', (stream: MediaStream) => {
 			_remoteStream.set(stream);
-			console.log('Got stream');
 			callState.callConnected();
 		});
 
@@ -275,7 +274,6 @@ export const videoCall = (_userId: string, _name: string) => {
 	};
 
 	const hangUp = () => {
-		console.log('Current state:', currentCallState);
 		if (currentCallState === 'connectedAsReceiver') {
 			console.log('Hangup on ', callerId);
 			if (socket) {
