@@ -66,6 +66,7 @@ io.on('connection', socket => {
   });
 
   socket.on("disconnectCall", (data) => {
+    console.log("disconnetCall", data);
     try {
 
       const { userName, socketId } = directory[data.userId];

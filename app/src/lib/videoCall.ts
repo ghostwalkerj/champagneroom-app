@@ -184,7 +184,8 @@ export const videoCall = (_userId: string, _name: string) => {
 		resetCallState();
 	};
 
-	const makeCall = (receiverId: string, localStream: MediaStream) => {
+	const makeCall = (_receiverId: string, localStream: MediaStream) => {
+		receiverId = _receiverId;
 		callState.makingCall();
 		cancelCallTimer = setTimeout(() => {
 			cancelCall();
