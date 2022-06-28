@@ -12,7 +12,7 @@
 	let callState: typeof vc.callState;
 	selectedAccount.subscribe((account) => {
 		if (account) {
-			vc = videoCall(account, account);
+			vc = videoCall(account, 'Dr. Huge Mongus');
 			callState = vc.callState;
 		}
 	});
@@ -20,7 +20,6 @@
 	const call = async () => {
 		if (vc) {
 			let us = await userStream();
-
 			vc.makeCall(linkDocument.address, us.mediaStream);
 		}
 	};

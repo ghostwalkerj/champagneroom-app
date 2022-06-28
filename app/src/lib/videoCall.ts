@@ -10,7 +10,6 @@ export const videoCall = (_userId: string, _name: string) => {
 	let receiverId: string;
 	let callerId: string;
 	let socketId: string;
-	let remoteStream: MediaStream;
 	let callerSignal: Peer.SignalData | null;
 	let peer: Peer.Instance | null;
 	let cancelCallTimer: NodeJS.Timeout;
@@ -26,6 +25,12 @@ export const videoCall = (_userId: string, _name: string) => {
 	});
 
 	const _callerName = writable<string | null>(null);
+	const _remoteStream = writable<MediaStream | null>(null);
+	const remoteStream = readable<MediaStream | null>(null, (set) => {
+		_remoteStream.subscribe((stream) => {
+			set(stream);
+		});
+	});
 
 	const callerName = readable<string | null>(null, (set) => {
 		_callerName.subscribe((name) => {
@@ -127,6 +132,7 @@ export const videoCall = (_userId: string, _name: string) => {
 		callerSignal = null;
 		callerId = '';
 		receiverId = '';
+		_remoteStream.set(null);
 	};
 
 	// Receiving calls
@@ -178,9 +184,7 @@ export const videoCall = (_userId: string, _name: string) => {
 		resetCallState();
 	};
 
-	const makeCall = (_receiverId: string, _localStream: MediaStream) => {
-		receiverId = _receiverId;
-		const localStream = _localStream;
+	const makeCall = (receiverId: string, localStream: MediaStream) => {
 		callState.makingCall();
 		cancelCallTimer = setTimeout(() => {
 			cancelCall();
@@ -196,7 +200,7 @@ export const videoCall = (_userId: string, _name: string) => {
 
 			peer.on('signal', (data) => {
 				socket.emit('makeCall', {
-					receiverId: receiverId,
+					receiverId,
 					callerName: userName,
 					callerId: userId,
 					signalData: data
@@ -205,7 +209,7 @@ export const videoCall = (_userId: string, _name: string) => {
 
 			peer.on('stream', (stream: MediaStream) => {
 				console.log('Got stream');
-				remoteStream = stream;
+				_remoteStream.set(stream);
 				callState.callConnected();
 			});
 
@@ -257,7 +261,8 @@ export const videoCall = (_userId: string, _name: string) => {
 		}
 
 		peer.on('stream', (stream: MediaStream) => {
-			remoteStream = stream;
+			_remoteStream.set(stream);
+			console.log('Got stream');
 			callState.callConnected();
 		});
 

@@ -44,14 +44,23 @@
 	});
 
 	const initalise = () => {
+		if (localVideo) {
+			localVideo.srcObject = us.mediaStream;
+			localVideo.play();
+		}
 		vc.callState.subscribe((s) => {
 			switch (s) {
 				case 'ready':
 
 				case 'connectedAsCaller':
 				case 'connectedAsReceiver':
-					remoteVideo.srcObject = vc.remoteStream;
-					remoteVideo.play();
+					vc.remoteStream.subscribe((stream) => {
+						if (stream && remoteVideo) {
+							remoteVideo.srcObject = stream;
+							remoteVideo.play();
+						}
+					});
+
 					break;
 			}
 		});

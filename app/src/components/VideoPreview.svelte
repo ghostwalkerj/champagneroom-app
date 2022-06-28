@@ -2,7 +2,6 @@
 	import { onMount } from 'svelte';
 	import { MicIcon, MicOffIcon, VideoIcon, VideoOffIcon } from 'svelte-feather-icons';
 	import { userStream, type UserStreamType } from 'lib/userStream';
-	import { local } from 'web3modal';
 
 	// UI Controls
 	let localVideo: HTMLVideoElement;
