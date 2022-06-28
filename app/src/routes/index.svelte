@@ -3,7 +3,7 @@
 	import { validator } from '@felte/validator-zod';
 	import { useQueryClient } from '@sveltestack/svelte-query';
 	import LinkViewer from 'components/LinkViewer.svelte';
-	import VideoCall from 'components/VideoCall.svelte';
+	import VideoPreview from 'components/VideoPreview.svelte';
 	import { linkSchema, type LinkDocumentType } from 'db/models/link';
 	import { getLinkQueryByAddress } from 'db/queries/linkQueries';
 	import { createForm } from 'felte';
@@ -151,7 +151,7 @@
 						<div class="card-body items-center text-center">
 							<h2 class="card-title text-2xl">Your Video Preview</h2>
 							<div class="rounded-2xl">
-								<VideoCall address={$selectedAccount} userName={'Chyna'} />
+								<VideoPreview address={$selectedAccount} userName={'Chyna'} />
 							</div>
 						</div>
 					</div>
