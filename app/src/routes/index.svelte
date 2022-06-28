@@ -21,6 +21,7 @@
 	let address = '';
 
 	$: linkQueryResult = getLinkQueryByAddress(address);
+	$: userName = $linkQueryResult.data?.linkDocument.name || '';
 
 	const { form, reset } = createForm({
 		extend: [
@@ -49,10 +50,13 @@
 	selectedAccount.subscribe((account) => {
 		if (account) {
 			address = account;
-			vc = videoCall(address, address);
-			callState = vc.callState;
 		}
 	});
+
+	$: if ($selectedAccount && userName) {
+		vc = videoCall(address, userName);
+		callState = vc.callState;
+	}
 </script>
 
 <div class="min-h-full">
@@ -156,12 +160,13 @@
 						<div class="card-body items-center text-center">
 							<h2 class="card-title text-2xl">Your Video Preview</h2>
 							<div class="rounded-2xl">
-								<VideoPreview address={$selectedAccount} userName={'Chyna'} />
+								<VideoPreview />
 							</div>
 						</div>
 					</div>
 				</section>
 			</div>
+			<!--Next Column-->
 			<div class="space-y-6 lg:col-start-3 lg:col-span-1">
 				<div>
 					<!-- Status -->
@@ -169,7 +174,8 @@
 						<div class="bg-primary text-primary-content card">
 							<div class="card-body items-center text-center">
 								<h2 class="card-title text-2xl">pCall Status</h2>
-								<p>{$callState}</p>
+								<p>Signed in as {userName}</p>
+								<p>Call Status: {$callState}</p>
 							</div>
 						</div>
 					</section>

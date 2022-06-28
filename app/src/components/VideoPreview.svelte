@@ -2,17 +2,9 @@
 	import { onMount } from 'svelte';
 	import { MicIcon, MicOffIcon, VideoIcon, VideoOffIcon } from 'svelte-feather-icons';
 	import { userStream, type UserStreamType } from 'lib/userStream';
-	import { videoCall, type VideoCallType } from 'lib/videoCall';
-
-	// TODO: simple-peer error on destroy
-
-	// Props
-	export let address: string;
-	export let userName: string;
 
 	// UI Controls
 	let localVideo: HTMLVideoElement;
-
 	let us: Awaited<UserStreamType> = null;
 	let initialized = false;
 	let camState: typeof us.camState;
