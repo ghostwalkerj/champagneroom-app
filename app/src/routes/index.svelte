@@ -7,7 +7,9 @@
 	import { linkSchema, type LinkDocumentType } from 'db/models/link';
 	import { getLinkQueryByAddress } from 'db/queries/linkQueries';
 	import { createForm } from 'felte';
+	import { userStream, type UserStreamType } from 'lib/userStream';
 	import { videoCall, type VideoCallType } from 'lib/videoCall';
+	import { onMount } from 'svelte';
 	import { selectedAccount } from 'svelte-web3';
 
 	const queryClient = useQueryClient();
@@ -43,6 +45,11 @@
 	});
 
 	let vc: VideoCallType;
+	let us: Awaited<UserStreamType> = null;
+
+	onMount(async () => {
+		us = await userStream();
+	});
 	let callState: typeof vc.callState;
 
 	selectedAccount.subscribe((account) => {
@@ -61,8 +68,12 @@
 			callerName = name;
 		});
 	}
-
 	$: showAlert = $callState == 'receivingCall';
+
+	const answerCall = () => {
+		showAlert = false;
+		vc.acceptCall(us.mediaStream);
+	};
 </script>
 
 <!-- Put this part before </body> tag -->
@@ -74,7 +85,7 @@
 			You have an incoming pCall from <span class="font-bold">{callerName}</span>
 		</p>
 		<div class="modal-action">
-			<label for="call-modal" class="btn">Yay!</label>
+			<label for="call-modal" class="btn" on:click={answerCall}>Answer</label>
 		</div>
 	</div>
 </div>

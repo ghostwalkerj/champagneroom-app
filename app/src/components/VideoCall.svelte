@@ -1,6 +1,8 @@
 <script lang="ts">
-	import VideoStream from 'lib/VideoStream';
+	import type { UserStreamType } from 'lib/userStream';
+	import type { VideoCallType } from 'lib/videoCall';
 	import { onMount } from 'svelte';
+
 	import {
 		MicIcon,
 		MicOffIcon,
@@ -12,15 +14,15 @@
 		VideoIcon,
 		VideoOffIcon
 	} from 'svelte-feather-icons';
-	import fsm from 'svelte-fsm';
 	import MdClose from 'svelte-icons/md/MdClose.svelte';
 	import Moveable from 'svelte-moveable';
 
 	// TODO: simple-peer error on destroy
-
-	// Props
-	export let address: string;
-	export let userName: string;
+	export let vc: Awaited<VideoCallType>;
+	export let us: Awaited<UserStreamType>;
+	const callState = vc.callState;
+	const micState = us.micState;
+	const camState = us.camState;
 
 	// UI Controls
 	let canvas: HTMLCanvasElement;
@@ -29,75 +31,10 @@
 
 	// Video Control
 	let filters;
-	let videoTrack: MediaStreamTrack = null;
-	let audioTrack: MediaStreamTrack = null;
-	let userStream: MediaStream | undefined;
 	const frame = {
 		translate: [2, 2]
 	};
 	let target: HTMLDivElement;
-
-	// Cam and mic
-	const camState = fsm('unitialised', {
-		unitialised: {
-			initialised() {
-				videoTrack.enabled = true;
-				return 'CamOn';
-			}
-		},
-		CamOn: {
-			toggleCam() {
-				videoTrack.enabled = !videoTrack.enabled;
-				return 'CamOff';
-			},
-			turnCamOff() {
-				videoTrack.enabled = false;
-				return 'CamOff';
-			}
-		},
-		CamOff: {
-			toggleCam() {
-				videoTrack.enabled = !videoTrack.enabled;
-				return 'CamOn';
-			},
-			turnCamOn() {
-				videoTrack.enabled = true;
-				return 'CamOn';
-			}
-		}
-	});
-	const micState = fsm('unitialised', {
-		unitialised: {
-			initialised() {
-				audioTrack.enabled = true;
-				return 'MicOn';
-			}
-		},
-		MicOn: {
-			toggleMic() {
-				audioTrack.enabled = !audioTrack.enabled;
-				return 'MicOff';
-			},
-			turnMicOff() {
-				audioTrack.enabled = false;
-				return 'MicOff';
-			}
-		},
-		MicOff: {
-			toggleMic() {
-				audioTrack.enabled = !audioTrack.enabled;
-				return 'MicOn';
-			},
-			turnMicOn() {
-				audioTrack.enabled = true;
-				return 'MicOn';
-			}
-		}
-	});
-
-	// Videocall
-	let vc: VideoStream;
-	let cs: VideoStream['callState'];
 
 	onMount(() => {
 		canvas.width = localVideo.width;
@@ -106,50 +43,11 @@
 		initalise();
 	});
 
-	const enableCameraAndAudio = async () => {
-		try {
-			userStream = await navigator.mediaDevices.getUserMedia({
-				video: {
-					width: 1280,
-					height: 720,
-					frameRate: {
-						ideal: 60,
-						min: 15
-					}
-				},
-				audio: true
-			});
-			const videoStreams = userStream.getVideoTracks();
-			const audioStreams = userStream.getAudioTracks();
-			videoTrack = videoStreams[0];
-			audioTrack = audioStreams[0];
-			handleSuccess(userStream);
-			camState.initialised();
-			micState.initialised();
-		} catch (err) {
-			handleError(err);
-		}
-	};
-
-	const handleSuccess = (stream: MediaProvider) => {
-		localVideo.srcObject = stream;
-		localVideo.play();
-	};
-
-	const handleError = (error: any) => {
-		console.log('navigator.getUserMedia error: ', error);
-	};
-
 	const initalise = () => {
-		vc = new VideoStream(address, userName);
-		cs = vc.callState;
-
 		vc.callState.subscribe((s) => {
 			switch (s) {
 				case 'ready':
-					if (remoteVideo) {
-						remoteVideo.srcObject = null;
-					}
+
 				case 'connectedAsCaller':
 				case 'connectedAsReceiver':
 					remoteVideo.srcObject = vc.remoteStream;
@@ -157,7 +55,6 @@
 					break;
 			}
 		});
-		enableCameraAndAudio();
 	};
 </script>
 
@@ -199,139 +96,106 @@
 	on:resizeEnd={({ detail: { target, isDrag, clientX, clientY } }) => {}}
 />
 
-{#if $cs == 'ready'}
-	<div class="rounded-xl border-2 h-full p-2 w-full">
-		<video bind:this={localVideo} playsinline autoplay>
-			<track kind="captions" />
-		</video>
+<section
+	class="h-full bg-base-100  grid grid-cols-1 grid-rows-1 grow overflow-hidden md:border-2  md:rounded-2xl"
+>
+	<div class="flex flex-col m-2 relative">
+		<div class="rounded-xl border-2 h-68 p-2 w-120 z-10 absolute" bind:this={target}>
+			<video bind:this={localVideo} playsinline autoplay>
+				<track kind="captions" />
+			</video>
+		</div>
+
+		<div class="h-full w-full align-top">
+			<video bind:this={remoteVideo} playsinline autoplay class="h-full object-cover w-full">
+				<track kind="captions" />
+			</video>
+		</div>
+		<canvas bind:this={canvas} />
+	</div>
+</section>
+
+<section
+	class="flex bg-base-100 flex-shrink-0 p-4 gap-4 items-center justify-center md:rounded-2xl md:gap-8 dark:bg-dark-eval-1"
+>
+	<div class="flex flex-col gap-2 items-center">
+		{#if $callState == 'ready'}
+			<button
+				class="h-14 w-14 btn btn-circle"
+				on:click={() =>
+					vc.makeCall('talent:0x5e90c65c58a4ad95eea3b04615a4270d1d2ec1b1', us.mediaStream)}
+			>
+				<PhoneIcon size="34" />
+			</button>
+			Call
+		{:else if $callState == 'makingCall'}
+			<button class="h-14 animate-flash animate-loop w-14 animated  btn btn-circle">
+				<PhoneOutgoingIcon size="34" />
+			</button>
+			Waiting
+		{:else if $callState == 'receivingCall'}
+			<button
+				class="h-14 animate-shock animate-loop w-14 animated  btn btn-circle"
+				on:click={() => vc.acceptCall(us.mediaStream)}
+			>
+				<PhoneIncomingIcon size="34" />
+			</button>
+			Answer
+		{:else}
+			<button class="h-14 w-14 btn btn-circle" disabled={true}>
+				<PhoneCallIcon size="34" />
+			</button>
+			In Call
+		{/if}
 	</div>
 
-	<section
-		class="flex bg-base-100 flex-shrink-0 p-4 gap-4 items-center justify-center text-white md:rounded-2xl md:gap-8 "
-	>
-		<div class="flex flex-col gap-2 items-center">
-			<button class="h-14 w-14 btn btn-circle " on:click={camState.toggleCam}>
-				{#if $camState === 'CamOn'}
-					<VideoIcon size="34" />
-				{:else}
-					<VideoOffIcon size="34" />
-				{/if}
-			</button>
-			Cam
-		</div>
-		<div class="flex flex-col gap-2 items-center">
-			<button class="h-14 w-14 btn btn-circle" on:click={micState.toggleMic}>
-				{#if $micState === 'MicOn'}
-					<MicIcon size="34" />
-				{:else}
-					<MicOffIcon size="34" />
-				{/if}
-			</button>
-			Mic
-		</div>
-	</section>
-{:else}
-	<section
-		class="h-full bg-base-100  grid grid-cols-1 grid-rows-1 grow overflow-hidden md:border-2  md:rounded-2xl"
-	>
-		<div class="flex flex-col m-2 relative">
-			<div class="rounded-xl border-2 h-68 p-2 w-120 z-10 absolute" bind:this={target}>
-				<video bind:this={localVideo} playsinline autoplay>
-					<track kind="captions" />
-				</video>
-			</div>
-
-			<div class="h-full w-full align-top">
-				<video bind:this={remoteVideo} playsinline autoplay class="h-full object-cover w-full">
-					<track kind="captions" />
-				</video>
-			</div>
-			<canvas bind:this={canvas} />
-		</div>
-	</section>
-
-	<section
-		class="flex bg-base-100 flex-shrink-0 p-4 gap-4 items-center justify-center md:rounded-2xl md:gap-8 dark:bg-dark-eval-1"
-	>
-		<div class="flex flex-col gap-2 items-center">
-			{#if $cs == 'ready'}
-				<button
-					class="h-14 w-14 btn btn-circle"
-					on:click={() =>
-						vc.makeCall('talent:0x5e90c65c58a4ad95eea3b04615a4270d1d2ec1b1', userStream)}
-				>
-					<PhoneIcon size="34" />
-				</button>
-				Call
-			{:else if $cs == 'makingCall'}
-				<button class="h-14 animate-flash animate-loop w-14 animated  btn btn-circle">
-					<PhoneOutgoingIcon size="34" />
-				</button>
-				Waiting
-			{:else if $cs == 'receivingCall'}
-				<button
-					class="h-14 animate-shock animate-loop w-14 animated  btn btn-circle"
-					on:click={() => vc.acceptCall(userStream)}
-				>
-					<PhoneIncomingIcon size="34" />
-				</button>
-				Answer
+	<div class="flex flex-col gap-2 items-center">
+		<button class="h-14 w-14 btn btn-circle " on:click={camState.toggleCam}>
+			{#if $camState === 'CamOn'}
+				<VideoIcon size="34" />
 			{:else}
-				<button class="h-14 w-14 btn btn-circle" disabled={true}>
-					<PhoneCallIcon size="34" />
-				</button>
-				In Call
+				<VideoOffIcon size="34" />
 			{/if}
-		</div>
+		</button>
+		Cam
+	</div>
 
-		<div class="flex flex-col gap-2 items-center">
-			<button class="h-14 w-14 btn btn-circle " on:click={camState.toggleCam}>
-				{#if $camState === 'CamOn'}
-					<VideoIcon size="34" />
-				{:else}
-					<VideoOffIcon size="34" />
-				{/if}
-			</button>
-			Cam
-		</div>
-
-		<div class="flex flex-col gap-2 items-center">
-			<button class="h-14 w-14 btn btn-circle" on:click={micState.toggleMic}>
-				{#if $micState === 'MicOn'}
-					<MicIcon size="34" />
-				{:else}
-					<MicOffIcon size="34" />
-				{/if}
-			</button>
-			Mic
-		</div>
-
-		<div class="flex flex-col gap-2 items-center">
-			{#if $cs == 'receivingCall'}
-				<button class="h-14 w-14 btn-primary btn btn-circle" on:click={() => vc.rejectCall()}>
-					<PhoneMissedIcon size="34" />
-				</button>
-				Reject
-			{:else if $cs == 'makingCall'}
-				<button class="h-14 w-14 btn btn-circle btn-primary" on:click={() => vc.cancelCall()}>
-					<PhoneMissedIcon size="34" />
-				</button>
-				Cancel
-			{:else if $cs == 'connectedAsCaller' || $cs == 'connectedAsReceiver'}
-				<button class="h-14 w-14 btn btn-circle btn-primary" on:click={() => vc.hangUp()}>
-					<PhoneMissedIcon size="34" />
-				</button>
-				Hangup
+	<div class="flex flex-col gap-2 items-center">
+		<button class="h-14 w-14 btn btn-circle" on:click={micState.toggleMic}>
+			{#if $micState === 'MicOn'}
+				<MicIcon size="34" />
 			{:else}
-				<button class="h-14 w-14 btn btn-primary btn-circle" on:click={() => vc.cancelCall()}>
-					<div class="h-8 w-8"><MdClose /></div></button
-				>
-				Leave
+				<MicOffIcon size="34" />
 			{/if}
-		</div>
-	</section>
-{/if}
-Call State: {$cs} <br />
+		</button>
+		Mic
+	</div>
+
+	<div class="flex flex-col gap-2 items-center">
+		{#if $callState == 'receivingCall'}
+			<button class="h-14 w-14 btn-primary btn btn-circle" on:click={() => vc.rejectCall()}>
+				<PhoneMissedIcon size="34" />
+			</button>
+			Reject
+		{:else if $callState == 'makingCall'}
+			<button class="h-14 w-14 btn btn-circle btn-primary" on:click={() => vc.cancelCall()}>
+				<PhoneMissedIcon size="34" />
+			</button>
+			Cancel
+		{:else if $callState == 'connectedAsCaller' || $callState == 'connectedAsReceiver'}
+			<button class="h-14 w-14 btn btn-circle btn-primary" on:click={() => vc.hangUp()}>
+				<PhoneMissedIcon size="34" />
+			</button>
+			Hangup
+		{:else}
+			<button class="h-14 w-14 btn btn-primary btn-circle" on:click={() => vc.cancelCall()}>
+				<div class="h-8 w-8"><MdClose /></div></button
+			>
+			Leave
+		{/if}
+	</div>
+</section>
+Call State: {$callState} <br />
 
 <style>
 	:global .moveable-control.moveable-origin {

@@ -1,9 +1,9 @@
 <script type="ts">
 	import VideoPreview from 'components/VideoPreview.svelte';
 	import type { LinkDocumentType } from 'db/models/link';
+	import { userStream } from 'lib/userStream';
 	import { videoCall, type VideoCallType } from 'lib/videoCall';
 	import { selectedAccount } from 'svelte-web3';
-	import { userStream } from 'lib/userStream';
 
 	export let linkDocument: LinkDocumentType;
 	export let success: boolean = false;

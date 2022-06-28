@@ -295,6 +295,7 @@ export const videoCall = (_userId: string, _name: string) => {
 		acceptCall,
 		hangUp,
 		rejectCall,
+		cancelCall,
 		callState,
 		remoteStream,
 		callerName
