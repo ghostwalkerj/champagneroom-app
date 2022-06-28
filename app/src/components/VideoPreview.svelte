@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { MicIcon, MicOffIcon, VideoIcon, VideoOffIcon } from 'svelte-feather-icons';
 	import { userStream, type UserStreamType } from 'lib/userStream';
+	import { local } from 'web3modal';
 
 	// UI Controls
 	let localVideo: HTMLVideoElement;
@@ -16,8 +17,10 @@
 
 	const initialize = async () => {
 		us = await userStream();
-		localVideo.srcObject = us.mediaStream;
-		localVideo.play();
+		if (localVideo) {
+			localVideo.srcObject = us.mediaStream;
+			localVideo.play();
+		}
 		camState = us.camState;
 		micState = us.micState;
 		initialized = true;

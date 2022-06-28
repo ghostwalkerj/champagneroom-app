@@ -20,9 +20,6 @@
 
 	let address = '';
 
-	$: linkQueryResult = getLinkQueryByAddress(address);
-	$: userName = $linkQueryResult.data?.linkDocument.name || '';
-
 	const { form, reset } = createForm({
 		extend: [
 			reporter,
@@ -47,17 +44,40 @@
 
 	let vc: VideoCallType;
 	let callState: typeof vc.callState;
+
 	selectedAccount.subscribe((account) => {
 		if (account) {
 			address = account;
 		}
 	});
+	$: linkQueryResult = getLinkQueryByAddress(address);
+	$: userName = $linkQueryResult.data?.linkDocument.name || '';
+	$: callerName = '';
 
 	$: if ($selectedAccount && userName) {
 		vc = videoCall(address, userName);
 		callState = vc.callState;
+		vc.callerName.subscribe((name) => {
+			callerName = name;
+		});
 	}
+
+	$: showAlert = $callState == 'receivingCall';
 </script>
+
+<!-- Put this part before </body> tag -->
+<input type="checkbox" id="call-modal" class="modal-toggle" bind:checked={showAlert} />
+<div class="modal">
+	<div class="modal-box">
+		<h3 class="font-bold text-lg">Incoming pCall</h3>
+		<p class="py-4">
+			You have an incoming pCall from <span class="font-bold">{callerName}</span>
+		</p>
+		<div class="modal-action">
+			<label for="call-modal" class="btn">Yay!</label>
+		</div>
+	</div>
+</div>
 
 <div class="min-h-full">
 	<main class="py-10">

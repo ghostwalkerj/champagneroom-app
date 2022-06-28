@@ -1,6 +1,7 @@
 import Peer from 'simple-peer';
 import { io } from 'socket.io-client';
 import fsm from 'svelte-fsm';
+import { readable, writable } from 'svelte/store';
 
 const SIGNAL_SERVER = process.env.VITE_SIGNAL_SERVER || 'http://localhost:8000';
 const CALL_TIMEOUT = Number.parseInt(process.env.VITE_CALL_TIMEOUT || '30000');
@@ -10,7 +11,6 @@ export const videoCall = (_userId: string, _name: string) => {
 	let callerId: string;
 	let socketId: string;
 	let remoteStream: MediaStream;
-	let callerName: string;
 	let callerSignal: Peer.SignalData | null;
 	let peer: Peer.Instance | null;
 	let cancelCallTimer: NodeJS.Timeout;
@@ -23,6 +23,14 @@ export const videoCall = (_userId: string, _name: string) => {
 			userId,
 			userName
 		}
+	});
+
+	const _callerName = writable<string | null>(null);
+
+	const callerName = readable<string | null>(null, (set) => {
+		_callerName.subscribe((name) => {
+			set(name);
+		});
 	});
 
 	const callState = fsm('uninitialized', {
@@ -115,7 +123,7 @@ export const videoCall = (_userId: string, _name: string) => {
 	const resetCallState = () => {
 		peer ? peer.destroy() : null;
 		peer = null;
-		callerName = '';
+		_callerName.set(null);
 		callerSignal = null;
 		callerId = '';
 		receiverId = '';
@@ -129,7 +137,7 @@ export const videoCall = (_userId: string, _name: string) => {
 		});
 
 		socket.on('incomingCall', (data) => {
-			callerName = data.callerName;
+			_callerName.set(data.callerName);
 			callerSignal = data.signal;
 			callerId = data.callerId;
 			callState.receivingCall();
@@ -288,9 +296,8 @@ export const videoCall = (_userId: string, _name: string) => {
 		hangUp,
 		rejectCall,
 		callState,
-		callerId,
-		callerName,
-		remoteStream
+		remoteStream,
+		callerName
 	};
 };
 
