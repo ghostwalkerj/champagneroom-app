@@ -28,7 +28,12 @@ const config = {
 		// 	enabled: false
 		// },
 		vite: {
-			server: { hmr: { overlay: true }, cors: false },
+			server: {
+				hmr: { overlay: true }, cors: {
+					origin: "*",
+					methods: "GET,HEAD,PUT,PATCH,POST,DELETE"
+				}
+			},
 			resolve: {
 				alias: {
 					// these are the aliases and paths to them

@@ -7,7 +7,7 @@ export const get = async (event: RequestEvent<GetParams>) => {
 	try {
 		const address = event.params.address;
 		const db = getDb();
-		let linkDocument: LinkDocumentType = undefined;
+		let linkDocument = null;
 
 		await db.createIndex({
 			index: {

@@ -60,7 +60,7 @@
 		}
 	});
 	$: linkQueryResult = getLinkQueryByAddress(address);
-	$: userName = $linkQueryResult.data?.linkDocument.name || '';
+	$: userName = $linkQueryResult.data?.linkDocument?.name || '';
 	$: callerName = '';
 
 	$: if ($selectedAccount && userName) {
