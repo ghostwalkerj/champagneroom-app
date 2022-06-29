@@ -4,6 +4,8 @@ import image from 'svelte-image';
 import preprocess from 'svelte-preprocess';
 import WindiCSS from 'vite-plugin-windicss';
 
+
+
 const config = {
 	// Consult https://github.com/sveltejs/svelte-preprocess
 	// for more information about preprocessors
@@ -26,7 +28,7 @@ const config = {
 		// 	enabled: false
 		// },
 		vite: {
-			server: { hmr: { overlay: true } },
+			server: { hmr: { overlay: true }, cors: false },
 			resolve: {
 				alias: {
 					// these are the aliases and paths to them

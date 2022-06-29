@@ -19,6 +19,9 @@
 		}
 	});
 
+	// vc = videoCall('111', 'Dr. Huge Mongus');
+	// callState = vc.callState;
+
 	let us: Awaited<UserStreamType> = null;
 
 	onMount(async () => {
