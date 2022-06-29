@@ -15,7 +15,6 @@
 		VideoOffIcon
 	} from 'svelte-feather-icons';
 	import MdClose from 'svelte-icons/md/MdClose.svelte';
-	import Moveable from 'svelte-moveable';
 
 	// TODO: simple-peer error on destroy
 	export let vc: Awaited<VideoCallType>;
@@ -58,8 +57,11 @@
 		translate: [2, 2]
 	};
 	let target: HTMLDivElement;
+	let Moveable;
 
-	onMount(() => {
+	onMount(async () => {
+		Moveable = (await import('svelte-moveable')).default;
+
 		canvas.width = localVideo.width;
 		canvas.height = localVideo.height;
 		filters = document.querySelector('.filters');
@@ -90,7 +92,8 @@
 	};
 </script>
 
-<Moveable
+<svelte:component
+	this={Moveable}
 	draggable={true}
 	resizable={true}
 	keepRatio={true}
