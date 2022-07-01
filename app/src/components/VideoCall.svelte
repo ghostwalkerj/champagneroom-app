@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { UserStreamType } from 'lib/userStream';
 	import type { VideoCallType } from 'lib/videoCall';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 
 	import {
 		MicIcon,
@@ -27,6 +27,7 @@
 		mic: boolean;
 		cancel: boolean;
 	}> = {};
+	let mediaStream: MediaStream;
 
 	const buttonOptions = Object.assign(
 		{
@@ -64,12 +65,26 @@
 		canvas.width = localVideo.width;
 		canvas.height = localVideo.height;
 		filters = document.querySelector('.filters');
-		initalise();
+		initalize();
 	});
 
-	const initalise = () => {
+	onDestroy(() => {
+		if (remoteVideo) {
+			remoteVideo.pause();
+		}
+		vc.destroy();
+	});
+
+	if (us) {
+		us.mediaStream.subscribe((stream) => {
+			if (stream) mediaStream = stream;
+		});
+	}
+
+	const initalize = () => {
 		if (localVideo) {
-			localVideo.srcObject = us.mediaStream;
+			localVideo.srcObject = mediaStream;
+			remoteVideo.load();
 			localVideo.play();
 		}
 		vc.callState.subscribe((s) => {
@@ -81,6 +96,7 @@
 					vc.remoteStream.subscribe((stream) => {
 						if (stream && remoteVideo) {
 							remoteVideo.srcObject = stream;
+							remoteVideo.load();
 							remoteVideo.play();
 						}
 					});
@@ -159,7 +175,7 @@
 					disabled={!buttonOptions.makeCall}
 					class="h-14 w-14 btn btn-circle"
 					on:click={() =>
-						vc.makeCall('talent:0x5e90c65c58a4ad95eea3b04615a4270d1d2ec1b1', us.mediaStream)}
+						vc.makeCall('talent:0x5e90c65c58a4ad95eea3b04615a4270d1d2ec1b1', mediaStream)}
 				>
 					<PhoneIcon size="34" />
 				</button>
@@ -175,7 +191,7 @@
 			{:else if $callState == 'receivingCall'}
 				<button
 					class="h-14 animate-shock animate-loop w-14 animated  btn btn-circle"
-					on:click={() => vc.acceptCall(us.mediaStream)}
+					on:click={() => vc.acceptCall(mediaStream)}
 					disabled={!buttonOptions.answerCall}
 				>
 					<PhoneIncomingIcon size="34" />
@@ -259,7 +275,7 @@
 			{/if}
 		</div>
 	</section>
-	Call State: {$callState} <br />
+	Call State: {$callState || ''} <br />
 </div>
 
 <style>

@@ -1,28 +1,37 @@
 <script lang="ts">
+	import type { UserStreamType } from 'lib/userStream';
 	import { onMount } from 'svelte';
 	import { MicIcon, MicOffIcon, VideoIcon, VideoOffIcon } from 'svelte-feather-icons';
-	import { userStream, type UserStreamType } from 'lib/userStream';
 
 	// UI Controls
 	let localVideo: HTMLVideoElement;
-	let us: Awaited<UserStreamType> = null;
+	export let us: Awaited<UserStreamType>;
 	let initialized = false;
 	let camState: typeof us.camState;
 	let micState: typeof us.micState;
+	let mediaStream: MediaStream;
+
+	$: if (us) {
+		camState = us.camState;
+		micState = us.micState;
+		us.mediaStream.subscribe((stream) => {
+			if (stream) mediaStream = stream;
+			console.log('initialize');
+			initialize();
+		});
+	}
 
 	onMount(async () => {
 		initialize();
 	});
 
-	const initialize = async () => {
-		us = await userStream();
+	const initialize = () => {
 		if (localVideo) {
-			localVideo.srcObject = us.mediaStream;
+			localVideo.srcObject = mediaStream;
+			localVideo.load();
 			localVideo.play();
+			initialized = true;
 		}
-		camState = us.camState;
-		micState = us.micState;
-		initialized = true;
 	};
 </script>
 

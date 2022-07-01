@@ -1,4 +1,5 @@
 import fsm from 'svelte-fsm';
+import { readable, writable } from 'svelte/store';
 
 export type VideoStreamOptions = {
 	video: {
@@ -15,7 +16,12 @@ export type VideoStreamOptions = {
 export const userStream = async (options: Partial<VideoStreamOptions> = {}) => {
 	let videoTrack: MediaStreamTrack;
 	let audioTrack: MediaStreamTrack;
-	let mediaStream: MediaStream;
+	const _mediaStream = writable<MediaStream | null>(null);
+	const mediaStream = readable<MediaStream | null>(null, (set) => {
+		_mediaStream.subscribe((stream) => {
+			set(stream);
+		});
+	});
 
 	const ops = Object.assign(
 		{
@@ -91,9 +97,10 @@ export const userStream = async (options: Partial<VideoStreamOptions> = {}) => {
 	});
 
 	try {
-		mediaStream = await navigator.mediaDevices.getUserMedia(ops);
-		const videoStreams = mediaStream.getVideoTracks();
-		const audioStreams = mediaStream.getAudioTracks();
+		const stream = await navigator.mediaDevices.getUserMedia(ops);
+		_mediaStream.set(stream);
+		const videoStreams = stream.getVideoTracks();
+		const audioStreams = stream.getAudioTracks();
 		videoTrack = videoStreams[0];
 		audioTrack = audioStreams[0];
 		camState.initialized();

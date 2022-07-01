@@ -3,16 +3,16 @@
 	import { validator } from '@felte/validator-zod';
 	import { useQueryClient } from '@sveltestack/svelte-query';
 	import LinkViewer from 'components/LinkViewer.svelte';
+	import VideoCall from 'components/VideoCall.svelte';
 	import VideoPreview from 'components/VideoPreview.svelte';
 	import { linkSchema, type LinkDocumentType } from 'db/models/link';
 	import { getLinkQueryByAddress } from 'db/queries/linkQueries';
 	import { createForm } from 'felte';
 	import { userStream, type UserStreamType } from 'lib/userStream';
 	import type { VideoCallType } from 'lib/videoCall';
-	import { onDestroy, onMount } from 'svelte';
-	import { selectedAccount } from 'svelte-web3';
-	import VideoCall from 'components/VideoCall.svelte';
+	import { onMount } from 'svelte';
 	import { PhoneIncomingIcon } from 'svelte-feather-icons';
+	import { selectedAccount } from 'svelte-web3';
 
 	const queryClient = useQueryClient();
 
@@ -50,22 +50,19 @@
 	let us: Awaited<UserStreamType>;
 	let callState: typeof vc.callState;
 	let videoCall;
+	let mediaStream: MediaStream;
 
 	onMount(async () => {
 		us = await userStream();
 		videoCall = (await import('lib/videoCall')).videoCall;
+		us.mediaStream.subscribe((stream) => {
+			if (stream) mediaStream = stream;
+		});
 	});
 
 	selectedAccount.subscribe((account) => {
 		if (account) {
 			address = account;
-		}
-	});
-
-	onDestroy(() => {
-		if (vc) {
-			vc.hangUp();
-			vc.destroy();
 		}
 	});
 
@@ -85,7 +82,7 @@
 
 	const answerCall = () => {
 		showAlert = false;
-		vc.acceptCall(us!.mediaStream);
+		vc.acceptCall(mediaStream);
 	};
 </script>
 
@@ -209,7 +206,7 @@
 							<div class="text-center card-body items-center">
 								<h2 class="text-2xl card-title">Your Video Preview</h2>
 								<div class="rounded-2xl">
-									<VideoPreview />
+									<VideoPreview {us} />
 								</div>
 							</div>
 						</div>

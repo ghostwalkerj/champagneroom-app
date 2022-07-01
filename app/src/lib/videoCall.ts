@@ -1,7 +1,8 @@
 import { Peer } from 'peerjs';
 import fsm from 'svelte-fsm';
 import { readable, writable } from 'svelte/store';
-const SIGNAL_SERVER = process.env.VITE_SIGNAL_SERVER || 'http://localhost:8000';
+const SIGNAL_SERVER_HOST = process.env.VITE_SIGNAL_SERVER_HOST || 'localhost';
+const SIGNAL_SERVER_PORT = Number.parseInt(process.env.VITE_SIGNAL_SERVER_PORT || '8000');
 const CALL_TIMEOUT = Number.parseInt(process.env.VITE_CALL_TIMEOUT || '30000');
 
 export const videoCall = (_userId: string, _name: string) => {
@@ -27,9 +28,9 @@ export const videoCall = (_userId: string, _name: string) => {
 		});
 	});
 
-	const callState = fsm('uninitialized', {
-		uninitialized: {
-			initialized() {
+	const callState = fsm('disconnected', {
+		disconnected: {
+			connected() {
 				return 'ready';
 			}
 		},
@@ -39,6 +40,9 @@ export const videoCall = (_userId: string, _name: string) => {
 			},
 			makingCall() {
 				return 'makingCall';
+			},
+			disconnected() {
+				return 'disconnected';
 			}
 		},
 		makingCall: {
@@ -96,18 +100,21 @@ export const videoCall = (_userId: string, _name: string) => {
 
 	// Start new Peerjs workflow
 	const peer = new Peer(userId, {
-		host: 'localhost',
-		port: 8000,
-		path: '/'
+		host: SIGNAL_SERVER_HOST,
+		port: SIGNAL_SERVER_PORT,
+		path: '/',
+		config: { iceServers: [] }
 	});
-	let call;
-
-	callState.initialized();
+	let mediaConnection;
+	let dataConnection;
 
 	const resetCallState = () => {
 		console.log('reset call state');
-		if (call) {
-			call.close();
+		if (dataConnection) {
+			dataConnection.close();
+		}
+		if (mediaConnection) {
+			mediaConnection.close();
 		}
 		_callerName.set(null);
 		callerId = '';
@@ -116,6 +123,46 @@ export const videoCall = (_userId: string, _name: string) => {
 		clearTimeout(rejectCallTimer);
 		clearTimeout(cancelCallTimer);
 	};
+
+	// Events
+	peer.on('open', () => {
+		console.log('Connected to peer server');
+		callState.connected();
+	});
+
+	peer.on('call', (_call) => {
+		console.log('Received call');
+		callState.receivingCall();
+		mediaConnection = _call;
+		_callerName.set(mediaConnection.metadata.name);
+
+		rejectCallTimer = setTimeout(() => {
+			rejectCall();
+		}, CALL_TIMEOUT);
+	});
+
+	peer.on('connection', (conn) => {
+		dataConnection = conn;
+		console.log('Data connection opened');
+
+		dataConnection.on('data', (data) => {
+			console.log('Got data', data);
+		});
+
+		dataConnection.on('close', () => {
+			console.log('Data connection closed');
+			callState.callEnded();
+			resetCallState();
+		});
+	});
+
+	peer.on('disconnected', () => {
+		console.log('Disconnected from server');
+		callState.disconnected();
+		peer.reconnect();
+		console.log('Attempting to reconnect');
+		callState.connected();
+	});
 
 	const cancelCall = () => {
 		console.log('cancelCall');
@@ -130,37 +177,49 @@ export const videoCall = (_userId: string, _name: string) => {
 			cancelCall();
 		}, CALL_TIMEOUT);
 
-		call = peer.call(receiverId, localStream, { metadata: { name: userName } });
-		call.on('stream', (remoteStream) => {
-			console.log('Got stream');
-			_remoteStream.set(remoteStream);
-			callState.callConnected();
-		});
+		mediaConnection = peer.call(receiverId, localStream, { metadata: { name: userName } });
+
+		if (mediaConnection) {
+			mediaConnection.on('stream', (remoteStream) => {
+				_remoteStream.set(remoteStream);
+				callState.callConnected();
+			});
+			mediaConnection.on('close', () => {
+				console.log('Call closed');
+				callState.callEnded();
+				resetCallState();
+			});
+
+			dataConnection = peer.connect(receiverId, { metadata: { name: userName } });
+			dataConnection.on('open', () => {
+				console.log('Data connection opened');
+			});
+			dataConnection.on('close', () => {
+				console.log('Data connection closed');
+				callState.callEnded();
+			});
+		} else {
+			console.log('Error making call');
+			resetCallState();
+		}
 	};
-
-	// Receiving calls
-	peer.on('call', (_call) => {
-		console.log('Received call');
-		callState.receivingCall();
-		call = _call;
-		_callerName.set(call.metadata.name);
-
-		rejectCallTimer = setTimeout(() => {
-			rejectCall();
-		}, CALL_TIMEOUT);
-	});
 
 	const rejectCall = () => {
 		clearTimeout(rejectCallTimer);
 		callState.rejectCall();
+		resetCallState();
 	};
 
 	const acceptCall = (localStream: MediaStream) => {
 		callState.acceptCall();
-		call.answer(localStream);
-		call.on('stream', (remoteStream) => {
+		mediaConnection.answer(localStream);
+		mediaConnection.on('stream', (remoteStream) => {
 			callState.callConnected();
 			_remoteStream.set(remoteStream);
+		});
+		mediaConnection.on('close', () => {
+			console.log('Call closed');
+			callState.callEnded();
 		});
 	};
 
@@ -169,9 +228,9 @@ export const videoCall = (_userId: string, _name: string) => {
 			console.log('Hangup on ', callerId);
 		} else if (currentCallState === 'connectedAsCaller') {
 			console.log('Hangup on ', receiverId);
+			callState.hangUp();
 
 			resetCallState();
-			callState.hangUp();
 		}
 	};
 

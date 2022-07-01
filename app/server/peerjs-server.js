@@ -8,6 +8,10 @@ const peerServer = PeerServer({ port: 8000, path: '/' }, (server) => {
 });
 
 
-peerServer.on('connection', (id) => {
-  console.log('connection: ', id);
+peerServer.on('connection', (client) => {
+  console.log('connection: ', client.getId());
+});
+
+peerServer.on('disconnect', (client) => {
+  console.log('disconnect: ', client.getId());
 });
