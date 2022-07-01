@@ -17,7 +17,7 @@ const config = {
 
 	kit: {
 		adapter: adapter(),
-		endpointExtensions: ['.ts'],
+		moduleExtensions: ['.ts'],
 		paths: {
 			base: ''
 		},

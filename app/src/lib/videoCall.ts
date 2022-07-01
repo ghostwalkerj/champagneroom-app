@@ -125,6 +125,7 @@ export const videoCall = (_userId: string, _name: string) => {
 	};
 
 	const resetCallState = () => {
+		console.log('reset call state');
 		peer ? peer.destroy() : null;
 		peer = null;
 		_callerName.set(null);
