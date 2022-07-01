@@ -106,10 +106,10 @@ export const videoCall = (_userId: string, _name: string) => {
 
 	// Start new Peerjs workflow
 	const peer = new Peer(userId, {
-		host: SIGNAL_SERVER_HOST,
-		port: SIGNAL_SERVER_PORT,
-		path: '/',
-		config: { iceServers: [] }
+		// host: SIGNAL_SERVER_HOST,
+		// port: SIGNAL_SERVER_PORT,
+		// path: '/',
+		// config: { iceServers: [] }
 	});
 	let mediaConnection;
 	let dataConnection;

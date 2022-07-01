@@ -22,6 +22,9 @@ export type LinkType = z.infer<typeof linkSchema>;
 
 export class LinkDocument extends DocumentBase {
 	public expired = false;
+	constructor() {
+		super('link');
+	}
 }
 export type LinkDocumentType = LinkDocument & LinkType;
 
