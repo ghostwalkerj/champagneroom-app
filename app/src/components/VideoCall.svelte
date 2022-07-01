@@ -16,7 +16,6 @@
 	} from 'svelte-feather-icons';
 	import MdClose from 'svelte-icons/md/MdClose.svelte';
 
-	// TODO: simple-peer error on destroy
 	export let vc: Awaited<VideoCallType>;
 	export let us: Awaited<UserStreamType>;
 	export let options: Partial<{
@@ -57,7 +56,7 @@
 		translate: [2, 2]
 	};
 	let target: HTMLDivElement;
-	let Moveable;
+	let Moveable: any;
 
 	onMount(async () => {
 		Moveable = (await import('svelte-moveable')).default;

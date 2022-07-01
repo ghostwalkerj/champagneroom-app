@@ -20,11 +20,8 @@ export const linkSchema = z.object({
 
 export type LinkType = z.infer<typeof linkSchema>;
 
-export class LinkDocument extends DocumentBase implements LinkType {
-	constructor() {
-		super('link');
-		(this as LinkType).expired = false;
-	}
+export class LinkDocument extends DocumentBase {
+	public expired = false;
 }
 export type LinkDocumentType = LinkDocument & LinkType;
 

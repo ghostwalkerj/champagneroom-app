@@ -13,9 +13,9 @@ export type VideoStreamOptions = {
 };
 
 export const userStream = async (options: Partial<VideoStreamOptions> = {}) => {
-	let videoTrack: MediaStreamTrack = null;
-	let audioTrack: MediaStreamTrack = null;
-	let mediaStream: MediaStream = null;
+	let videoTrack: MediaStreamTrack;
+	let audioTrack: MediaStreamTrack;
+	let mediaStream: MediaStream;
 
 	const ops = Object.assign(
 		{

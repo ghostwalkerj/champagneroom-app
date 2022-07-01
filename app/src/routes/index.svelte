@@ -9,7 +9,7 @@
 	import { createForm } from 'felte';
 	import { userStream, type UserStreamType } from 'lib/userStream';
 	import { videoCall, type VideoCallType } from 'lib/videoCall';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { selectedAccount } from 'svelte-web3';
 	import VideoCall from 'components/VideoCall.svelte';
 	import { PhoneIncomingIcon } from 'svelte-feather-icons';
@@ -47,12 +47,19 @@
 	});
 
 	let vc: VideoCallType;
-	let us: Awaited<UserStreamType> = null;
+	let us: Awaited<UserStreamType>;
+	let callState: typeof vc.callState;
 
 	onMount(async () => {
 		us = await userStream();
 	});
-	let callState: typeof vc.callState;
+
+	onDestroy(() => {
+		if (vc) {
+			vc.hangUp();
+			vc.destroy();
+		}
+	});
 
 	selectedAccount.subscribe((account) => {
 		if (account) {
@@ -67,7 +74,7 @@
 		vc = videoCall(address, userName);
 		callState = vc.callState;
 		vc.callerName.subscribe((name) => {
-			callerName = name;
+			if (name) callerName = name;
 		});
 	}
 	$: showAlert = $callState == 'receivingCall';
@@ -75,7 +82,7 @@
 
 	const answerCall = () => {
 		showAlert = false;
-		vc.acceptCall(us.mediaStream);
+		vc.acceptCall(us!.mediaStream);
 	};
 </script>
 

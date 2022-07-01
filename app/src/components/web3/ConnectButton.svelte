@@ -8,6 +8,7 @@
 	import JazzIcon from './JazzIcon.svelte';
 	let pending = 'pending';
 	const disable = () => defaultEvmStores.disconnect();
+	const IFURA_ID = process.env.VITE_INFURA_ID || '';
 
 	async function connect() {
 		try {
@@ -28,7 +29,7 @@
 				walletconnect: {
 					package: WalletConnectProvider,
 					options: {
-						infuraId: '69863419b8cb4448a5fbad58c6186181'
+						infuraId: IFURA_ID
 					}
 				}
 			}
@@ -37,7 +38,7 @@
 	}
 
 	function copyAddress() {
-		navigator.clipboard.writeText($selectedAccount);
+		navigator.clipboard.writeText($selectedAccount!);
 	}
 
 	function formatEth(balance: any) {
@@ -47,7 +48,7 @@
 	$: balance = $connected && $selectedAccount ? $web3.eth.getBalance($selectedAccount) : '';
 </script>
 
-{#if !$connected || !$selectedAccount}
+{#if !$selectedAccount}
 	<button
 		class="bg-gradient-to-r rounded-xl font-medium from-pink-800 via-purple-900 to-blue-900  border-2 border-purple-700  shadow-sm text-sm text-white py-2 px-4 inline-flex  items-center whitespace-nowrap hover:border-pink-800"
 		on:click={connect}

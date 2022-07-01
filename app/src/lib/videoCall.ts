@@ -2,7 +2,6 @@ import Peer from 'simple-peer';
 import { io } from 'socket.io-client';
 import fsm from 'svelte-fsm';
 import { readable, writable } from 'svelte/store';
-
 const SIGNAL_SERVER = process.env.VITE_SIGNAL_SERVER || 'http://localhost:8000';
 const CALL_TIMEOUT = Number.parseInt(process.env.VITE_CALL_TIMEOUT || '30000');
 
@@ -133,6 +132,8 @@ export const videoCall = (_userId: string, _name: string) => {
 		callerId = '';
 		receiverId = '';
 		_remoteStream.set(null);
+		clearTimeout(rejectCallTimer);
+		clearTimeout(cancelCallTimer);
 	};
 
 	// Receiving calls
@@ -140,6 +141,7 @@ export const videoCall = (_userId: string, _name: string) => {
 		socket.on('socketId', (id) => {
 			socketId = id;
 			callState.receivedSocketId();
+			console.log('socketId:', socketId);
 		});
 
 		socket.on('incomingCall', (data) => {
@@ -156,7 +158,6 @@ export const videoCall = (_userId: string, _name: string) => {
 			console.log('Call canceled');
 			resetCallState();
 			callState.callCanceled();
-			clearTimeout(rejectCallTimer);
 		});
 
 		socket.on('callDisconnected', () => {
@@ -174,8 +175,6 @@ export const videoCall = (_userId: string, _name: string) => {
 	callState.initialized();
 
 	const cancelCall = () => {
-		clearTimeout(cancelCallTimer);
-
 		console.log('cancelCall');
 		socket.emit('cancelCall', {
 			receiverId: receiverId
@@ -225,7 +224,6 @@ export const videoCall = (_userId: string, _name: string) => {
 			socket.on('callRejected', () => {
 				resetCallState();
 				callState.callRejected();
-				clearTimeout(cancelCallTimer);
 			});
 
 			peer.on('close', () => {
@@ -245,6 +243,10 @@ export const videoCall = (_userId: string, _name: string) => {
 			trickle: false,
 			stream: localStream
 		});
+
+		// peer.on('iceStateChange', (connectionState, gatheringState) => {
+		// 	console.log('got iceStateChange:', connectionState, gatheringState);
+		// });
 
 		if (callerSignal) {
 			peer.signal(callerSignal);
@@ -267,9 +269,14 @@ export const videoCall = (_userId: string, _name: string) => {
 		});
 
 		peer.on('close', () => {
+			console.log('peer close');
 			socket.off('callAccepted');
 			resetCallState();
 			callState.callEnded();
+		});
+
+		peer.on('error', () => {
+			console.log('peer: error');
 		});
 	};
 
@@ -294,6 +301,11 @@ export const videoCall = (_userId: string, _name: string) => {
 		callState.hangUp();
 	};
 
+	const destroy = () => {
+		resetCallState();
+		socket.close();
+	};
+
 	return {
 		makeCall,
 		acceptCall,
@@ -302,7 +314,8 @@ export const videoCall = (_userId: string, _name: string) => {
 		cancelCall,
 		callState,
 		remoteStream,
-		callerName
+		callerName,
+		destroy
 	};
 };
 

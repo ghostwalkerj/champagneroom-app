@@ -5,7 +5,7 @@
 	import { videoCall, type VideoCallType } from 'lib/videoCall';
 	import { selectedAccount } from 'svelte-web3';
 	import VideoCall from 'components/VideoCall.svelte';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 
 	export let linkDocument: LinkDocumentType;
 	export let success: boolean = false;
@@ -19,10 +19,17 @@
 		}
 	});
 
+	onDestroy(() => {
+		if (vc) {
+			vc.hangUp();
+			vc.destroy();
+		}
+	});
+
 	// vc = videoCall('111', 'Dr. Huge Mongus');
 	// callState = vc.callState;
 
-	let us: Awaited<UserStreamType> = null;
+	let us: Awaited<UserStreamType>;
 
 	onMount(async () => {
 		us = await userStream();
