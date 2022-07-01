@@ -16,7 +16,6 @@
 		micState = us.micState;
 		us.mediaStream.subscribe((stream) => {
 			if (stream) mediaStream = stream;
-			console.log('initialize');
 			initialize();
 		});
 	}

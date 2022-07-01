@@ -57,6 +57,9 @@ export const videoCall = (_userId: string, _name: string) => {
 			},
 			cancelCall() {
 				return 'ready';
+			},
+			callEnded() {
+				return 'ready';
 			}
 		},
 		receivingCall: {
@@ -67,6 +70,9 @@ export const videoCall = (_userId: string, _name: string) => {
 				return 'ready';
 			},
 			callCanceled() {
+				return 'ready';
+			},
+			callEnded() {
 				return 'ready';
 			}
 		},
