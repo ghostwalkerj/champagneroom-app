@@ -8,7 +8,7 @@
 	import { getLinkQueryByAddress } from 'db/queries/linkQueries';
 	import { createForm } from 'felte';
 	import { userStream, type UserStreamType } from 'lib/userStream';
-	import { videoCall, type VideoCallType } from 'lib/videoCall';
+	import type { VideoCallType } from 'lib/videoCall';
 	import { onDestroy, onMount } from 'svelte';
 	import { selectedAccount } from 'svelte-web3';
 	import VideoCall from 'components/VideoCall.svelte';
@@ -49,9 +49,17 @@
 	let vc: VideoCallType;
 	let us: Awaited<UserStreamType>;
 	let callState: typeof vc.callState;
+	let videoCall;
 
 	onMount(async () => {
 		us = await userStream();
+		videoCall = (await import('lib/videoCall')).videoCall;
+	});
+
+	selectedAccount.subscribe((account) => {
+		if (account) {
+			address = account;
+		}
 	});
 
 	onDestroy(() => {
@@ -61,16 +69,11 @@
 		}
 	});
 
-	selectedAccount.subscribe((account) => {
-		if (account) {
-			address = account;
-		}
-	});
 	$: linkQueryResult = getLinkQueryByAddress(address);
 	$: userName = $linkQueryResult.data?.linkDocument?.name || '';
 	$: callerName = '';
 
-	$: if ($selectedAccount && userName) {
+	$: if (address && userName && videoCall) {
 		vc = videoCall(address, userName);
 		callState = vc.callState;
 		vc.callerName.subscribe((name) => {

@@ -2,7 +2,7 @@
 	import VideoPreview from 'components/VideoPreview.svelte';
 	import type { LinkDocumentType } from 'db/models/link';
 	import { userStream, type UserStreamType } from 'lib/userStream';
-	import { videoCall, type VideoCallType } from 'lib/videoCall';
+	import type { VideoCallType } from 'lib/videoCall';
 	import { selectedAccount } from 'svelte-web3';
 	import VideoCall from 'components/VideoCall.svelte';
 	import { onDestroy, onMount } from 'svelte';
@@ -12,12 +12,7 @@
 
 	let vc: VideoCallType;
 	let callState: typeof vc.callState;
-	selectedAccount.subscribe((account) => {
-		if (account) {
-			vc = videoCall(account, 'Dr. Huge Mongus');
-			callState = vc.callState;
-		}
-	});
+	let videoCall;
 
 	onDestroy(() => {
 		if (vc) {
@@ -33,6 +28,13 @@
 
 	onMount(async () => {
 		us = await userStream();
+		videoCall = (await import('lib/videoCall')).videoCall;
+		selectedAccount.subscribe((account) => {
+			if (account) {
+				vc = videoCall(account, 'Dr. Huge Mongus');
+				callState = vc.callState;
+			}
+		});
 	});
 
 	const call = async () => {
