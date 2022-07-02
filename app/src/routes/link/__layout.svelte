@@ -1,6 +1,9 @@
 <script lang="ts">
+	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
 	import ConnectButton from 'components/web3/ConnectButton.svelte';
+	import { selectedAccount } from 'svelte-web3';
 	import 'virtual:windi.css';
+	const queryClient = new QueryClient();
 </script>
 
 <div class="bg-base-100 navbar">
@@ -13,4 +16,8 @@
 	</div>
 </div>
 
-<slot />
+<QueryClientProvider client={queryClient}>
+	<div class="h-full">
+		<slot />
+	</div>
+</QueryClientProvider>

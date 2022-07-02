@@ -1,0 +1,25 @@
+{
+  "files.exclude": {
+    ".svelte-kit": true,
+    "node_modules": true,
+    "pouchdb": true,
+    ".vscode": true,
+    ".env.example": true,
+    ".env.local": true,
+    ".eslintignore": true,
+    ".eslintrc.cjs": true,
+    ".gitignore": true,
+    ".npmignore": true,
+    ".prettierignore": true,
+    ".prettierrc": true,
+    "package.json": true,
+    "yarn.lock": true,
+    "playwright.config.ts": true,
+    "README.md": true,
+    "svelte.config.js": true,
+    "tsconfig.json": true,
+    "windi.config.cjs": true,
+    "yarn-error.log": true,
+    "static": true
+  }
+}
