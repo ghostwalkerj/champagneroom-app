@@ -15,7 +15,8 @@ export const linkSchema = z.object({
 	),
 	address: z.string().refine(validator.isEthereumAddress),
 	expired: z.boolean().optional().default(false),
-	created_at: z.string().optional().default(new Date().toISOString())
+	created_at: z.string().optional().default(new Date().toISOString()),
+	creatorId: z.string().min(21)
 });
 
 export type LinkType = z.infer<typeof linkSchema>;

@@ -5,14 +5,12 @@ const SIGNAL_SERVER_HOST = process.env.VITE_SIGNAL_SERVER_HOST || 'localhost';
 const SIGNAL_SERVER_PORT = Number.parseInt(process.env.VITE_SIGNAL_SERVER_PORT || '8000');
 const CALL_TIMEOUT = Number.parseInt(process.env.VITE_CALL_TIMEOUT || '30000');
 
-export const videoCall = (_userId: string, _name: string) => {
+export const videoCall = (name: string, userId?: string) => {
 	let receiverId: string;
 	let callerId: string;
 	let cancelCallTimer: NodeJS.Timeout;
 	let rejectCallTimer: NodeJS.Timeout;
 	let currentCallState = 'uninitialized';
-	const userId = _userId;
-	const userName = _name;
 
 	const _callerName = writable<string | null>(null);
 	const _remoteStream = writable<MediaStream | null>(null);
@@ -183,7 +181,7 @@ export const videoCall = (_userId: string, _name: string) => {
 			cancelCall();
 		}, CALL_TIMEOUT);
 
-		mediaConnection = peer.call(receiverId, localStream, { metadata: { name: userName } });
+		mediaConnection = peer.call(receiverId, localStream, { metadata: { name } });
 
 		if (mediaConnection) {
 			mediaConnection.on('stream', (remoteStream) => {
@@ -196,7 +194,7 @@ export const videoCall = (_userId: string, _name: string) => {
 				resetCallState();
 			});
 
-			dataConnection = peer.connect(receiverId, { metadata: { name: userName } });
+			dataConnection = peer.connect(receiverId, { metadata: { name } });
 			dataConnection.on('open', () => {
 				console.log('Data connection opened');
 			});
