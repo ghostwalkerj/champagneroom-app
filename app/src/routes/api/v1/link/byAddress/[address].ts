@@ -7,7 +7,7 @@ export const get = async (event: RequestEvent<GetParams>) => {
 	try {
 		const address = event.params.address;
 		const db = getDb();
-		let linkDocument = null;
+		let linkDocument;
 
 		await db.createIndex({
 			index: {
@@ -36,7 +36,7 @@ export const get = async (event: RequestEvent<GetParams>) => {
 			status: 200,
 			body: {
 				success: false,
-				error: error.message,
+				error: error,
 				linkDocument: null
 			}
 		};

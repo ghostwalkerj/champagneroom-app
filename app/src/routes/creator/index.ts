@@ -48,12 +48,12 @@ export const post = async ({ request }) => {
 				linkDocument
 			}
 		};
-	} catch (error: any | { message: string }) {
+	} catch (error) {
 		return {
 			status: 400,
 			body: {
 				success: false,
-				error: error.message
+				error: error
 			}
 		};
 	}
