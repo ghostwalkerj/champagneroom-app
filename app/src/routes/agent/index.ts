@@ -1,5 +1,5 @@
 import { getDb } from 'db';
-import { LinkDocument, linkSchema, type LinkDocumentType } from 'db/models/link';
+import { LinkDocument, LinkSchema, type LinkDocumentType } from 'db/models/link';
 
 export const post = async ({ request }) => {
 	try {
@@ -24,7 +24,7 @@ export const post = async ({ request }) => {
 		linkDocument.amount = amount;
 		linkDocument.address = address;
 
-		linkSchema.parse(linkDocument);
+		LinkSchema.parse(linkDocument);
 
 		await db.createIndex({
 			index: {

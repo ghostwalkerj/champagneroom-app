@@ -1,12 +1,12 @@
 <script type="ts">
 	import VideoCall from 'components/VideoCall.svelte';
 	import VideoPreview from 'components/VideoPreview.svelte';
-	import type { LinkDocumentType } from 'db/models/link';
+	import type { LinkDocument } from 'db/models/link';
 	import { userStream, type UserStreamType } from 'lib/userStream';
 	import type { VideoCallType } from 'lib/videoCall';
 	import { onMount } from 'svelte';
 
-	export let linkDocument: LinkDocumentType;
+	export let linkDocument: LinkDocument;
 	export let success: boolean = false;
 
 	let vc: VideoCallType;
@@ -29,7 +29,7 @@
 
 	const call = async () => {
 		if (vc) {
-			vc.makeCall(linkDocument.address, mediaStream);
+			vc.makeCall(linkDocument.callId, mediaStream);
 		}
 	};
 	$: inCall = callState == 'connectedAsCaller';

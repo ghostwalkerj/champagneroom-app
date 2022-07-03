@@ -5,8 +5,8 @@
 	import LinkViewer from 'components/LinkViewer.svelte';
 	import VideoCall from 'components/VideoCall.svelte';
 	import VideoPreview from 'components/VideoPreview.svelte';
-	import { linkSchema, type LinkDocumentType } from 'db/models/link';
-	import { getLinkQueryByAddress } from 'db/queries/linkQueries';
+	import { LinkSchema, type LinkDocumentType } from 'db/models/link';
+	import { getLinkQueryByCreatorId } from 'db/queries/linkQueries';
 	import { createForm } from 'felte';
 	import { userStream, type UserStreamType } from 'lib/userStream';
 	import type { VideoCallType } from 'lib/videoCall';
@@ -28,7 +28,7 @@
 		extend: [
 			reporter,
 			validator({
-				schema: linkSchema
+				schema: LinkSchema
 			})
 		],
 		async onSuccess(response: any) {
@@ -66,7 +66,7 @@
 		}
 	});
 
-	$: linkQueryResult = getLinkQueryByAddress(address);
+	$: linkQueryResult = getLinkQueryByCreatorId(address);
 	$: userName = $linkQueryResult.data?.linkDocument?.name || '';
 	$: callerName = '';
 

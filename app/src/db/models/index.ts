@@ -1,14 +1,30 @@
 import { nanoid } from 'nanoid';
+import validator from 'validator';
+import { z } from 'zod';
 export * from './link';
 
-export abstract class DocumentBase {
-	public created_at: string;
-	public _id: string;
-	public document_type: string;
+export const DocumentBaseSchema = z.object({
+	_id: z.string().min(21),
+	createdAt: z
+		.string()
+		.optional()
+		.default(new Date().toISOString())
+		.refine((x) => {
+			return validator.isDate(x);
+		}),
+	documentType: z.string().min(1)
+});
 
-	constructor(type: string) {
-		this.created_at = new Date().toISOString();
-		this.document_type = type;
-		this._id = type + ':' + nanoid();
+export type DocumentBaseType = z.infer<typeof DocumentBaseSchema>;
+
+export abstract class DocumentBase implements DocumentBaseType {
+	public createdAt: string;
+	public _id: string;
+	public documentType: string;
+
+	constructor(documentType: string) {
+		this.createdAt = new Date().toISOString();
+		this.documentType = documentType;
+		this._id = documentType + ':' + nanoid();
 	}
 }

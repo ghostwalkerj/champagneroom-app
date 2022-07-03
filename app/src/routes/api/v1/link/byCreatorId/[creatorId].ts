@@ -1,24 +1,24 @@
 import type { RequestEvent } from '@sveltejs/kit';
 import { getDb } from 'db';
-import type { LinkDocumentType } from 'db/models/link';
+import { LinkDocument, LinkStatus } from 'db/models/link';
 type GetParams = Record<string, string>;
 
 export const get = async (event: RequestEvent<GetParams>) => {
 	try {
-		const address = event.params.address;
+		const creatorId = event.params.creatorId;
 		const db = getDb();
-		let linkDocument;
+		let linkDocument: LinkDocument | null = null;
 
 		await db.createIndex({
 			index: {
-				fields: ['address', 'expired']
+				fields: ['creatorId', 'status']
 			}
 		});
 
 		const currentLink = (await db.find({
-			selector: { address, expired: false },
+			selector: { creatorId, status: LinkStatus.ACTIVE },
 			limit: 1
-		})) as PouchDB.Find.FindResponse<LinkDocumentType>;
+		})) as PouchDB.Find.FindResponse<LinkDocument>;
 
 		if (currentLink.docs.length === 1) {
 			linkDocument = currentLink.docs[0];
@@ -36,7 +36,6 @@ export const get = async (event: RequestEvent<GetParams>) => {
 			status: 200,
 			body: {
 				success: false,
-				error: error,
 				linkDocument: null
 			}
 		};

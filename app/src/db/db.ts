@@ -4,7 +4,7 @@ import PouchDB from 'pouchdb-node';
 const REMOTE_DB_URL = import.meta.env.VITE_REMOTE_COUCHDB_URL || '';
 const LOCAL_DB_URL = import.meta.env.VITE_LOCAL_COUCHDB_URL || 'pouchdb/pcall';
 
-let db: PouchDB.Database = undefined;
+let db: PouchDB.Database;
 
 export const getDb = (): PouchDB.Database => {
 	if (db === undefined) {

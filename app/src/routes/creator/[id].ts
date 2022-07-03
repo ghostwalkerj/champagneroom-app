@@ -1,18 +1,20 @@
 import type { RequestEvent } from '@sveltejs/kit';
 import { getDb } from 'db';
-import type { LinkDocument } from 'db/models/link';
+import { CreatorDocument } from 'db/models/creator';
 type GetParams = Record<string, string>;
 
 export const get = async (event: RequestEvent<GetParams>) => {
 	try {
-		const id = event.params.id;
+		const id = CreatorDocument.type + ':' + event.params.id;
 		const db = getDb();
-		const linkDocument = (await db.get(id)) as LinkDocument;
+
+		const creatorDocument = (await db.get(id)) as PouchDB.Find.FindResponse<CreatorDocument>;
+
 		return {
 			status: 200,
 			body: {
 				success: true,
-				linkDocument
+				creatorDocument
 			}
 		};
 	} catch (error) {
@@ -20,8 +22,7 @@ export const get = async (event: RequestEvent<GetParams>) => {
 			status: 200,
 			body: {
 				success: false,
-				error: error,
-				linkDocument: null
+				creatorDocument: null
 			}
 		};
 	}

@@ -1,3 +1,4 @@
+import { nanoid } from 'nanoid';
 import urlJoin from 'url-join';
 import validator from 'validator';
 import { z } from 'zod';
@@ -9,7 +10,7 @@ export enum LinkStatus {
 	IN_PROGRESS = 'IN_PROGRESS',
 	COMPLETED = 'COMPLETED'
 }
-export const linkSchema = z.object({
+export const LinkSchema = z.object({
 	creatorId: z.string().min(21),
 	walletAddress: z.string().refine((x) => {
 		return validator.isEthereumAddress(x);
@@ -23,13 +24,6 @@ export const linkSchema = z.object({
 	fundedAmount: z.string().refine((x) => {
 		return validator.isInt(x, { min: 0 });
 	}),
-	createdAt: z
-		.string()
-		.optional()
-		.default(new Date().toISOString())
-		.refine((x) => {
-			return validator.isDate(x);
-		}),
 	callStart: z
 		.string()
 		.optional()
@@ -43,22 +37,44 @@ export const linkSchema = z.object({
 			return !x || validator.isDate(x);
 		}),
 	callId: z.string().min(21),
-	status: z.nativeEnum(LinkStatus).default(LinkStatus.ACTIVE)
+	status: z.nativeEnum(LinkStatus).default(LinkStatus.ACTIVE),
+	feedBack: z
+		.string()
+		.optional()
+		.refine((x) => {
+			return !x || validator.isInt(x, { min: 0, max: 5 });
+		})
 });
 
-export type LinkType = z.infer<typeof linkSchema>;
+export type LinkType = z.infer<typeof LinkSchema>;
 
-export class LinkDocument extends DocumentBase {
-	public expired = false;
-	constructor() {
-		super('link');
+export class LinkDocument extends DocumentBase implements LinkType {
+	public status = LinkStatus.ACTIVE;
+	public callId: string;
+	public creatorId: string;
+
+	public walletAddress: string;
+	public amount: string;
+
+	public fundedAmount: string;
+
+	public callStart?: string;
+	public callEnd?: string;
+
+	public static type = 'link';
+
+	constructor(creatorId: string, walletAddress: string, amount: string) {
+		super(LinkDocument.type);
+		this.creatorId = creatorId;
+		this.walletAddress = walletAddress;
+		this.amount = amount;
+		this.fundedAmount = '0';
+		this.callId = 'callId:' + nanoid();
 	}
 }
-export type LinkDocumentType = LinkDocument & LinkType;
-
 export const generateLinkURL = (linkDocument: LinkDocument): string => {
-	const TXN_URL = import.meta.env.VITE_TXN_URL || 'http://localhost:3000/txn';
+	const ROOM_URL = import.meta.env.VITE_ROOM_URL || 'http://localhost:3000/room';
 
-	const url = new URL(urlJoin(TXN_URL, linkDocument._id));
+	const url = new URL(urlJoin(ROOM_URL, linkDocument._id));
 	return url.toString();
 };
