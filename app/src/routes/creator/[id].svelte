@@ -55,7 +55,6 @@
 		}
 	});
 
-	let linkQueryResult: any;
 	let linkDocument: LinkDocument;
 	let us: Awaited<UserStreamType>;
 	$: callState = 'disconnected';
@@ -69,7 +68,7 @@
 	};
 
 	$: callerName = '';
-	linkQueryResult = getLinkQueryByCreatorId(creatorDocument._id);
+	const linkQueryResult = getLinkQueryByCreatorId(creatorDocument._id);
 
 	$: if ($linkQueryResult.isSuccess) {
 		linkDocument = $linkQueryResult.data.linkDocument;

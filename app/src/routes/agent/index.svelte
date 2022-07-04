@@ -2,17 +2,36 @@
 	import { CreatorDocument, CreatorSchema } from 'db/models/creator';
 	import { reporter, ValidationMessage } from '@felte/reporter-svelte';
 	import { validator } from '@felte/validator-zod';
-	import { useQueryClient } from '@sveltestack/svelte-query';
+	import {
+		useQueryClient,
+		type QueryKey,
+		type UseQueryStoreResult
+	} from '@sveltestack/svelte-query';
 	import { createForm } from 'felte';
 	import { selectedAccount } from 'svelte-web3';
+	import {
+		getCreatorsByAgentAddress,
+		type getCreatorsByAgentAddressResponse
+	} from 'db/queries/creatorQueries';
 
 	const queryClient = useQueryClient();
-	export let success: boolean;
-	export let creators: [CreatorDocument];
-	console.log(success);
-	console.log(creators);
 
 	let address = '';
+	let creators: CreatorDocument[] = [];
+	selectedAccount.subscribe((account) => {
+		if (account) {
+			address = account;
+		}
+	});
+
+	let creatorsQueryResult;
+	$: if (address) {
+		creatorsQueryResult = getCreatorsByAgentAddress(address);
+	}
+	$: if (creatorsQueryResult && $creatorsQueryResult.isSuccess) {
+		creators = $creatorsQueryResult.data.creators;
+		console.log(creators);
+	}
 
 	const { form, reset } = createForm({
 		extend: [
@@ -33,12 +52,6 @@
 		},
 		onerror(err: any) {
 			console.log(err);
-		}
-	});
-
-	selectedAccount.subscribe((account) => {
-		if (account) {
-			address = account;
 		}
 	});
 </script>
