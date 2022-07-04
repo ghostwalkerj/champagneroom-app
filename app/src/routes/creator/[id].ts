@@ -8,7 +8,6 @@ export const get = async (event: RequestEvent<GetParams>) => {
 	try {
 		const id = CreatorDocument.type + ':' + event.params.id;
 		const db = getDb();
-
 		const creatorDocument = (await db.get(id)) as PouchDB.Find.FindResponse<CreatorDocument>;
 
 		return {
@@ -46,7 +45,7 @@ export const post = async ({ request }) => {
 		}
 		const linkDocument = new LinkDocument(
 			creatorId,
-			'0x251281e1516e6E0A145d28a41EE63BfcDd9E18Bf',
+			'0x251281e1516e6E0A145d28a41EE63BfcDd9E18Bf', // TODO: Generate
 			amount
 		);
 

@@ -4,6 +4,7 @@ import urlJoin from 'url-join';
 import validator from 'validator';
 import { z } from 'zod';
 import { DocumentBase } from '.';
+import type { CreatorDocument } from './creator';
 
 export enum LinkStatus {
 	ACTIVE = 'ACTIVE',
@@ -67,6 +68,8 @@ export class LinkDocument extends DocumentBase implements LinkType {
 
 	public callStart?: string;
 	public callEnd?: string;
+
+	public creator?: Partial<CreatorDocument>;
 
 	public static type = 'link';
 

@@ -29,6 +29,10 @@ export class CreatorDocument extends DocumentBase implements CreatorType {
 	public name: string;
 	public walletAddress: string;
 
+	public profileImageUrl?: string;
+
+	public feedBackAvg?: string;
+
 	public static type = 'creator';
 
 	constructor(agentId: string, name: string, walletAddress: string) {

@@ -5,7 +5,7 @@ const SIGNAL_SERVER_HOST = process.env.VITE_SIGNAL_SERVER_HOST || 'localhost';
 const SIGNAL_SERVER_PORT = Number.parseInt(process.env.VITE_SIGNAL_SERVER_PORT || '8000');
 const CALL_TIMEOUT = Number.parseInt(process.env.VITE_CALL_TIMEOUT || '30000');
 
-export const videoCall = (userId: string) => {
+export const videoCall = (userId?: string) => {
 	let receiverId: string;
 	let callerId: string;
 	let cancelCallTimer: NodeJS.Timeout;
@@ -109,12 +109,12 @@ export const videoCall = (userId: string) => {
 	// 	path: '/'
 	// 	// config: { iceServers: [] }
 	// });
-	let peer = new Peer(userId);
+	const peer = userId ? new Peer(userId) : new Peer();
 	let mediaConnection;
 	let dataConnection;
 
 	const resetCallState = () => {
-		console.log('reset call state');
+		console.log('Reset call state');
 		if (dataConnection) {
 			dataConnection.close();
 		}
@@ -161,13 +161,13 @@ export const videoCall = (userId: string) => {
 		});
 	});
 
-	// peer.on('disconnected', () => {
-	// 	console.log('Disconnected from server');
-	// 	callState.disconnected();
-	// 	peer.reconnect();
-	// 	console.log('Attempting to reconnect');
-	// 	callState.connected();
-	// });
+	peer.on('disconnected', () => {
+		console.log('Disconnected from server');
+		callState.disconnected();
+		peer.reconnect();
+		console.log('Attempting to reconnect');
+		callState.connected();
+	});
 
 	const cancelCall = () => {
 		console.log('cancelCall');
@@ -175,14 +175,14 @@ export const videoCall = (userId: string) => {
 		resetCallState();
 	};
 
-	const makeCall = (_receiverId: string, localStream: MediaStream) => {
+	const makeCall = (_receiverId: string, callerName: string, localStream: MediaStream) => {
 		receiverId = _receiverId;
 		callState.makingCall();
 		cancelCallTimer = setTimeout(() => {
 			cancelCall();
 		}, CALL_TIMEOUT);
 
-		mediaConnection = peer.call(receiverId, localStream, { metadata: { name } });
+		mediaConnection = peer.call(receiverId, localStream, { metadata: { callerName } });
 
 		if (mediaConnection) {
 			mediaConnection.on('stream', (remoteStream) => {
@@ -242,14 +242,7 @@ export const videoCall = (userId: string) => {
 	const destroy = () => {
 		console.log('destroy called');
 		peer.destroy();
-
 		resetCallState();
-	};
-
-	const reconnect = (userId: string) => {
-		resetCallState();
-		peer.destroy();
-		peer = new Peer(userId);
 	};
 
 	return {
@@ -261,8 +254,7 @@ export const videoCall = (userId: string) => {
 		callState,
 		remoteStream,
 		callerName,
-		destroy,
-		reconnect
+		destroy
 	};
 };
 

@@ -14,7 +14,6 @@
 	import type { VideoCallType } from 'lib/videoCall';
 	import { onMount } from 'svelte';
 	import { PhoneIncomingIcon } from 'svelte-feather-icons';
-	import { init } from 'svelte/internal';
 
 	export let creatorDocument: CreatorDocument;
 	export let success: boolean;
@@ -76,18 +75,17 @@
 	}
 
 	const initVC = () => {
-		if (creatorDocument && linkDocument) {
-			if (vc) {
-				vc.destroy();
-			}
-			vc = videoCall(creatorDocument.name, linkDocument.callId);
-			vc.callState.subscribe((cs) => {
-				if (cs) callState = cs;
-			});
-			vc.callerName.subscribe((name) => {
-				if (name) callerName = name;
-			});
+		if (vc) {
+			vc.destroy();
 		}
+		const callId = linkDocument ? linkDocument.callId : null;
+		vc = videoCall(callId);
+		vc.callState.subscribe((cs) => {
+			if (cs) callState = cs;
+		});
+		vc.callerName.subscribe((name) => {
+			if (name) callerName = name;
+		});
 	};
 
 	onMount(async () => {
@@ -146,6 +144,12 @@
 							<div>
 								{#if linkDocument}
 									<LinkViewer {linkDocument} {creatorDocument} />
+								{:else}
+									<div class="bg-primary text-primary-content card">
+										<div class="card-body items-center text-center">
+											<h2 class="card-title text-2xl">You Have No Outstanding pCall Links</h2>
+										</div>
+									</div>
 								{/if}
 							</div>
 						</section>
@@ -164,6 +168,7 @@
 												id="creatorId"
 												value={creatorDocument._id}
 											/>
+
 											<div class="max-w-xs w-full py-2 form-control ">
 												<!-- svelte-ignore a11y-label-has-associated-control -->
 												<label for="price" class="label">
