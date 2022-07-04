@@ -46,7 +46,7 @@
 				creatorDocument: CreatorDocument;
 			} = await response.json();
 			if (body.success) {
-				queryClient.setQueryData(['creator', address], body);
+				queryClient.setQueryData(['creators', address], body);
 			}
 			reset();
 		},
@@ -70,7 +70,7 @@
 				<section aria-labelledby="new-link-tile">
 					<div class="bg-primary text-primary-content card">
 						<div class="text-center card-body items-center">
-							<h2 class="text-2xl card-title">Request a New pCall</h2>
+							<h2 class="text-2xl card-title">New Creator</h2>
 
 							<div class="flex flex-col text-white p-2 justify-center items-center">
 								<form use:form method="post">
@@ -94,7 +94,7 @@
 									</div>
 
 									<div class="py-4">
-										<button class="btn btn-secondary" type="submit">Generate Link</button>
+										<button class="btn btn-secondary" type="submit">Save Creator</button>
 									</div>
 								</form>
 							</div>

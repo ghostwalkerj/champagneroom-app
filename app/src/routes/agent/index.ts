@@ -38,7 +38,7 @@ export const post = async ({ request }) => {
 	try {
 		const db = getDb();
 		const form = await request.formData();
-		const creatorId = form.get('creatorId');
+		const address = form.get('address');
 		const amount = form.get('amount');
 		if (typeof creatorId !== 'string' || typeof amount !== 'string') {
 			return {
