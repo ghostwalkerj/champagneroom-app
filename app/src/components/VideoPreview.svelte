@@ -34,7 +34,7 @@
 	};
 </script>
 
-<div class="rounded-xl h-full  w-full p-2">
+<div class="rounded-xl  w-full p-2">
 	<video bind:this={localVideo} playsinline autoplay>
 		<track kind="captions" />
 	</video>

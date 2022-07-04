@@ -22,6 +22,7 @@
 	if (browser) {
 		import('lib/videoCall').then((_vc) => {
 			videoCall = _vc.videoCall;
+			initVC();
 		});
 	}
 	const queryClient = useQueryClient();
@@ -60,8 +61,8 @@
 	$: callState = 'disconnected';
 	let videoCall;
 	let mediaStream: MediaStream;
-	let showAlert = callState == 'receivingCall';
-	let inCall = callState == 'connectedAsReceiver';
+	$: showAlert = callState == 'receivingCall';
+	$: inCall = callState == 'connectedAsReceiver';
 	const answerCall = () => {
 		showAlert = false;
 		vc.acceptCall(mediaStream);
@@ -75,9 +76,6 @@
 	}
 
 	const initVC = () => {
-		if (vc) {
-			vc.destroy();
-		}
 		const callId = linkDocument ? linkDocument.callId : null;
 		vc = videoCall(callId);
 		vc.callState.subscribe((cs) => {
@@ -93,7 +91,6 @@
 		us.mediaStream.subscribe((stream) => {
 			if (stream) mediaStream = stream;
 		});
-		initVC();
 	});
 </script>
 

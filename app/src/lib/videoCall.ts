@@ -139,7 +139,7 @@ export const videoCall = (userId?: string) => {
 		console.log('Received call');
 		callState.receivingCall();
 		mediaConnection = _call;
-		_callerName.set(mediaConnection.metadata.name);
+		_callerName.set(mediaConnection.metadata.callerName);
 
 		rejectCallTimer = setTimeout(() => {
 			rejectCall();
@@ -195,7 +195,7 @@ export const videoCall = (userId?: string) => {
 				resetCallState();
 			});
 
-			dataConnection = peer.connect(receiverId, { metadata: { name } });
+			dataConnection = peer.connect(receiverId, { metadata: { callerName } });
 			dataConnection.on('open', () => {
 				console.log('Data connection opened');
 			});

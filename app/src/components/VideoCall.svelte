@@ -72,7 +72,6 @@
 		if (remoteVideo) {
 			remoteVideo.pause();
 		}
-		vc.destroy();
 	});
 
 	if (us) {
@@ -171,12 +170,7 @@
 	>
 		<div class="flex flex-col gap-2 items-center">
 			{#if $callState == 'ready'}
-				<button
-					disabled={!buttonOptions.makeCall}
-					class="h-14 w-14 btn btn-circle"
-					on:click={() =>
-						vc.makeCall('talent:0x5e90c65c58a4ad95eea3b04615a4270d1d2ec1b1', mediaStream)}
-				>
+				<button disabled={!buttonOptions.makeCall} class="h-14 w-14 btn btn-circle">
 					<PhoneIcon size="34" />
 				</button>
 				Call
