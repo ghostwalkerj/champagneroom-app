@@ -1,4 +1,5 @@
 <script type="ts">
+	import { browser } from '$app/env';
 	import { reporter, ValidationMessage } from '@felte/reporter-svelte';
 	import { validator } from '@felte/validator-zod';
 	import { useQueryClient } from '@sveltestack/svelte-query';
@@ -13,10 +14,17 @@
 	import type { VideoCallType } from 'lib/videoCall';
 	import { onMount } from 'svelte';
 	import { PhoneIncomingIcon } from 'svelte-feather-icons';
+	import { init } from 'svelte/internal';
 
 	export let creatorDocument: CreatorDocument;
 	export let success: boolean;
+	let vc: VideoCallType;
 
+	if (browser) {
+		import('lib/videoCall').then((_vc) => {
+			videoCall = _vc.videoCall;
+		});
+	}
 	const queryClient = useQueryClient();
 	const formatter = new Intl.NumberFormat('en-US', {
 		style: 'currency',
@@ -37,7 +45,8 @@
 				linkDocument: LinkDocument;
 			} = await response.json();
 			if (body.success) {
-				queryClient.setQueryData(['linkDocument', creatorDocument._id], body.linkDocument);
+				queryClient.setQueryData(['linkDocument', creatorDocument._id], body);
+				initVC();
 			}
 			reset();
 		},
@@ -47,39 +56,47 @@
 	});
 
 	let linkQueryResult: any;
-	let vc: VideoCallType;
+	let linkDocument: LinkDocument;
 	let us: Awaited<UserStreamType>;
-	let callState: typeof vc.callState;
+	$: callState = 'disconnected';
 	let videoCall;
 	let mediaStream: MediaStream;
-	let showAlert = $callState == 'receivingCall';
-	let inCall = $callState == 'connectedAsReceiver';
+	let showAlert = callState == 'receivingCall';
+	let inCall = callState == 'connectedAsReceiver';
 	const answerCall = () => {
 		showAlert = false;
 		vc.acceptCall(mediaStream);
 	};
 
 	$: callerName = '';
+	linkQueryResult = getLinkQueryByCreatorId(creatorDocument._id);
 
-	if (success) {
-		linkQueryResult = getLinkQueryByCreatorId(creatorDocument._id);
+	$: if ($linkQueryResult.isSuccess) {
+		linkDocument = $linkQueryResult.data.linkDocument;
+	}
 
-		onMount(async () => {
-			us = await userStream();
-			videoCall = (await import('lib/videoCall')).videoCall;
-			us.mediaStream.subscribe((stream) => {
-				if (stream) mediaStream = stream;
+	const initVC = () => {
+		if (creatorDocument && linkDocument) {
+			if (vc) {
+				vc.destroy();
+			}
+			vc = videoCall(creatorDocument.name, linkDocument.callId);
+			vc.callState.subscribe((cs) => {
+				if (cs) callState = cs;
 			});
-		});
-
-		if (linkQueryResult && $linkQueryResult.linkDocument) {
-			vc = videoCall(creatorDocument.name, $linkQueryResult.linkDocument.callerId);
-			callState = vc.callState;
 			vc.callerName.subscribe((name) => {
 				if (name) callerName = name;
 			});
 		}
-	}
+	};
+
+	onMount(async () => {
+		us = await userStream();
+		us.mediaStream.subscribe((stream) => {
+			if (stream) mediaStream = stream;
+		});
+		initVC();
+	});
 </script>
 
 {#if success}
@@ -127,8 +144,8 @@
 
 						<section aria-labelledby="link-information-tile">
 							<div>
-								{#if $linkQueryResult && $linkQueryResult.isSuccess}
-									<LinkViewer linkDocument={$linkQueryResult.data.linkDocument} />
+								{#if linkDocument}
+									<LinkViewer {linkDocument} {creatorDocument} />
 								{/if}
 							</div>
 						</section>
@@ -208,7 +225,10 @@
 									<div class="text-center card-body items-center">
 										<h2 class="text-2xl card-title">pCall Status</h2>
 										<p>Signed in as {creatorDocument.name}</p>
-										<p>Call Status: {$callState || 'Not Connected'}</p>
+										{#if linkDocument}
+											<p>CallId: {linkDocument.callId}</p>
+										{/if}
+										<p>Call Status: {callState}</p>
 									</div>
 								</div>
 							</section>

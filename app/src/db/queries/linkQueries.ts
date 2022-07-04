@@ -22,8 +22,8 @@ export const getLinkQueryByCreatorId = (creatorId: string) => {
 	const linkQuery = useQuery<getLinkQueryByCreatorIdResponse, AxiosError>(
 		['linkDocument', creatorId],
 		async () => {
-			const url = new URL(urlJoin(PCALL_API_URL, 'link/byCreatorId', creatorId));
-			const { data } = await axios.get<getLinkQueryByCreatorIdResponse>(url.toString());
+			const url = urlJoin(PCALL_API_URL, 'link/byCreatorId', creatorId);
+			const { data } = await axios.get<getLinkQueryByCreatorIdResponse>(url);
 			return data;
 		}
 	);

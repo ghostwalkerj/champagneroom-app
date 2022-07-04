@@ -1,5 +1,5 @@
-import { BASE_PCALL_URL, PCALL_ROOM_URL } from 'lib/constants';
-import { nanoid } from 'nanoid';
+import { PCALL_ROOM_URL } from 'lib/constants';
+import { v4 as uuidv4 } from 'uuid';
 import urlJoin from 'url-join';
 import validator from 'validator';
 import { z } from 'zod';
@@ -76,10 +76,10 @@ export class LinkDocument extends DocumentBase implements LinkType {
 		this.walletAddress = walletAddress;
 		this.amount = amount;
 		this.fundedAmount = '0';
-		this.callId = 'callId:' + nanoid();
+		this.callId = uuidv4();
 	}
 }
 export const generateLinkURL = (linkDocument: LinkDocument): string => {
-	const url = new URL(PCALL_ROOM_URL, linkDocument._id);
-	return url.toString();
+	const url = urlJoin(PCALL_ROOM_URL, linkDocument._id);
+	return url;
 };

@@ -5,7 +5,7 @@ const SIGNAL_SERVER_HOST = process.env.VITE_SIGNAL_SERVER_HOST || 'localhost';
 const SIGNAL_SERVER_PORT = Number.parseInt(process.env.VITE_SIGNAL_SERVER_PORT || '8000');
 const CALL_TIMEOUT = Number.parseInt(process.env.VITE_CALL_TIMEOUT || '30000');
 
-export const videoCall = (name: string, userId?: string) => {
+export const videoCall = (userId: string) => {
 	let receiverId: string;
 	let callerId: string;
 	let cancelCallTimer: NodeJS.Timeout;
@@ -103,12 +103,13 @@ export const videoCall = (name: string, userId?: string) => {
 	callState.subscribe((s) => (currentCallState = s));
 
 	// Start new Peerjs workflow
-	const peer = new Peer(userId, {
-		// host: SIGNAL_SERVER_HOST,
-		// port: SIGNAL_SERVER_PORT,
-		// path: '/',
-		// config: { iceServers: [] }
-	});
+	// const peer = new Peer(userId, {
+	// 	host: SIGNAL_SERVER_HOST,
+	// 	port: SIGNAL_SERVER_PORT,
+	// 	path: '/'
+	// 	// config: { iceServers: [] }
+	// });
+	let peer = new Peer(userId);
 	let mediaConnection;
 	let dataConnection;
 
@@ -160,13 +161,13 @@ export const videoCall = (name: string, userId?: string) => {
 		});
 	});
 
-	peer.on('disconnected', () => {
-		console.log('Disconnected from server');
-		callState.disconnected();
-		peer.reconnect();
-		console.log('Attempting to reconnect');
-		callState.connected();
-	});
+	// peer.on('disconnected', () => {
+	// 	console.log('Disconnected from server');
+	// 	callState.disconnected();
+	// 	peer.reconnect();
+	// 	console.log('Attempting to reconnect');
+	// 	callState.connected();
+	// });
 
 	const cancelCall = () => {
 		console.log('cancelCall');
@@ -239,7 +240,16 @@ export const videoCall = (name: string, userId?: string) => {
 	};
 
 	const destroy = () => {
+		console.log('destroy called');
+		peer.destroy();
+
 		resetCallState();
+	};
+
+	const reconnect = (userId: string) => {
+		resetCallState();
+		peer.destroy();
+		peer = new Peer(userId);
 	};
 
 	return {
@@ -251,7 +261,8 @@ export const videoCall = (name: string, userId?: string) => {
 		callState,
 		remoteStream,
 		callerName,
-		destroy
+		destroy,
+		reconnect
 	};
 };
 
