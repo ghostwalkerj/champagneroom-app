@@ -3,9 +3,9 @@ import type { AxiosError } from 'axios';
 import axios from 'axios';
 
 import type { LinkDocument } from 'db/models/link';
+import { BASE_PCALL_URL, PCALL_API_URL } from 'lib/constants';
 
 import urlJoin from 'url-join';
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
 
 export type getLinkQueryByCreatorIdResponse = {
 	linkDocument: LinkDocument;
@@ -22,7 +22,7 @@ export const getLinkQueryByCreatorId = (creatorId: string) => {
 	const linkQuery = useQuery<getLinkQueryByCreatorIdResponse, AxiosError>(
 		['linkDocument', creatorId],
 		async () => {
-			const url = new URL(urlJoin(API_URL, 'link/byCreatorId', creatorId));
+			const url = new URL(urlJoin(PCALL_API_URL, 'link/byCreatorId', creatorId));
 			const { data } = await axios.get<getLinkQueryByCreatorIdResponse>(url.toString());
 			return data;
 		}

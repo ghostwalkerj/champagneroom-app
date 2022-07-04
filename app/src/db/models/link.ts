@@ -1,3 +1,4 @@
+import { BASE_PCALL_URL, PCALL_ROOM_URL } from 'lib/constants';
 import { nanoid } from 'nanoid';
 import urlJoin from 'url-join';
 import validator from 'validator';
@@ -12,38 +13,44 @@ export enum LinkStatus {
 }
 export const LinkSchema = z.object({
 	creatorId: z.string().min(21),
-	walletAddress: z.string().refine((x) => {
-		return validator.isEthereumAddress(x);
-	}),
+	walletAddress: z
+		.string()
+		.refine((x) => {
+			return validator.isEthereumAddress(x);
+		})
+		.optional(),
 	amount: z.string().refine(
 		(x) => {
 			return validator.isInt(x, { gt: 0, lt: 10000 });
 		},
 		{ message: 'Must be between  $1 and $9999' }
 	),
-	fundedAmount: z.string().refine((x) => {
-		return validator.isInt(x, { min: 0 });
-	}),
+	fundedAmount: z
+		.string()
+		.refine((x) => {
+			return validator.isInt(x, { min: 0 });
+		})
+		.optional(),
 	callStart: z
 		.string()
-		.optional()
 		.refine((x) => {
-			return !x || validator.isDate(x);
-		}),
+			return validator.isDate(x);
+		})
+		.optional(),
 	callEnd: z
 		.string()
-		.optional()
 		.refine((x) => {
-			return !x || validator.isDate(x);
-		}),
-	callId: z.string().min(21),
-	status: z.nativeEnum(LinkStatus).default(LinkStatus.ACTIVE),
+			return validator.isDate(x);
+		})
+		.optional(),
+	callId: z.string().optional(),
+	status: z.nativeEnum(LinkStatus).default(LinkStatus.ACTIVE).optional(),
 	feedBack: z
 		.string()
-		.optional()
 		.refine((x) => {
-			return !x || validator.isInt(x, { min: 0, max: 5 });
+			return validator.isInt(x, { min: 0, max: 5 });
 		})
+		.optional()
 });
 
 export type LinkType = z.infer<typeof LinkSchema>;
@@ -73,8 +80,6 @@ export class LinkDocument extends DocumentBase implements LinkType {
 	}
 }
 export const generateLinkURL = (linkDocument: LinkDocument): string => {
-	const ROOM_URL = import.meta.env.VITE_ROOM_URL || 'http://localhost:3000/room';
-
-	const url = new URL(urlJoin(ROOM_URL, linkDocument._id));
+	const url = new URL(PCALL_ROOM_URL, linkDocument._id);
 	return url.toString();
 };

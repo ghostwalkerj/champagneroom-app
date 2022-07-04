@@ -1,21 +1,13 @@
 <script type="ts">
 	import { reporter, ValidationMessage } from '@felte/reporter-svelte';
 	import { validator } from '@felte/validator-zod';
-	import {
-		useQueryClient,
-		type QueryKey,
-		type UseQueryStoreResult
-	} from '@sveltestack/svelte-query';
-	import type { AxiosError } from 'axios';
+	import { useQueryClient } from '@sveltestack/svelte-query';
 	import LinkViewer from 'components/LinkViewer.svelte';
 	import VideoCall from 'components/VideoCall.svelte';
 	import VideoPreview from 'components/VideoPreview.svelte';
 	import type { CreatorDocument } from 'db/models/creator';
 	import { LinkDocument, LinkSchema } from 'db/models/link';
-	import {
-		getLinkQueryByCreatorId,
-		type getLinkQueryByCreatorIdResponse
-	} from 'db/queries/linkQueries';
+	import { getLinkQueryByCreatorId } from 'db/queries/linkQueries';
 	import { createForm } from 'felte';
 	import { userStream, type UserStreamType } from 'lib/userStream';
 	import type { VideoCallType } from 'lib/videoCall';
@@ -31,6 +23,7 @@
 		currency: 'USD',
 		maximumFractionDigits: 0
 	});
+
 	const { form, reset } = createForm({
 		extend: [
 			reporter,
@@ -48,8 +41,8 @@
 			}
 			reset();
 		},
-		onerror(err: any) {
-			//	console.log(err);
+		onError(err: any) {
+			console.log(err);
 		}
 	});
 
@@ -68,7 +61,7 @@
 
 	$: callerName = '';
 
-	$: if (success) {
+	if (success) {
 		linkQueryResult = getLinkQueryByCreatorId(creatorDocument._id);
 
 		onMount(async () => {
@@ -132,11 +125,13 @@
 					<div class="space-y-6 lg:col-start-1 lg:col-span-2">
 						<!-- Current Link -->
 
-						{#if $linkQueryResult && $linkQueryResult.isSuccess}
-							<section aria-labelledby="link-information-tile">
-								<div><LinkViewer linkDocument={$linkQueryResult.data.linkDocument} /></div>
-							</section>
-						{/if}
+						<section aria-labelledby="link-information-tile">
+							<div>
+								{#if $linkQueryResult && $linkQueryResult.isSuccess}
+									<LinkViewer linkDocument={$linkQueryResult.data.linkDocument} />
+								{/if}
+							</div>
+						</section>
 
 						<!-- Link Form-->
 						<section aria-labelledby="new-link-tile">
@@ -151,12 +146,6 @@
 												name="creatorId"
 												id="creatorId"
 												value={creatorDocument._id}
-											/>
-											<input
-												type="hidden"
-												name="walletAddress"
-												id="walletAddress"
-												value={creatorDocument.walletAddress}
 											/>
 											<div class="max-w-xs w-full py-2 form-control ">
 												<!-- svelte-ignore a11y-label-has-associated-control -->

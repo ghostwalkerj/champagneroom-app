@@ -10,16 +10,16 @@ export const CreatorSchema = z.object({
 	name: z.string().min(3).max(20),
 	profileImageUrl: z
 		.string()
-		.optional()
 		.refine((x) => {
-			return !x || validator.isURL(x);
-		}),
+			return validator.isURL(x);
+		})
+		.optional(),
 	feedBackAvg: z
 		.string()
-		.optional()
 		.refine((x) => {
-			return !x || validator.isInt(x, { min: 0, max: 5 });
+			return validator.isInt(x, { min: 0, max: 5 });
 		})
+		.optional()
 });
 
 export type CreatorType = z.infer<typeof CreatorSchema>;
