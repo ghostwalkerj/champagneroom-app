@@ -1,6 +1,6 @@
 import validator from 'validator';
 import { z } from 'zod';
-import { DocumentBase } from '.';
+import { DocumentBase } from './documentBase';
 
 export const CreatorSchema = z.object({
 	agentId: z.string().min(21),

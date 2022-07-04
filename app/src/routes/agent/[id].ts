@@ -8,13 +8,19 @@ export const get = async (event: RequestEvent<GetParams>) => {
 	try {
 		const id = CreatorDocument.type + ':' + event.params.id;
 		const db = getDb();
-		const creatorDocument = (await db.get(id)) as PouchDB.Find.FindResponse<CreatorDocument>;
-
+		await db.createIndex({
+			index: {
+				fields: ['agentId', 'documentType']
+			}
+		});
+		const creatorDocs = (await db.find({
+			selector: { agentId: id, documentType: CreatorDocument.type }
+		})) as PouchDB.Find.FindResponse<CreatorDocument>;
 		return {
 			status: 200,
 			body: {
 				success: true,
-				creatorDocument
+				creators: creatorDocs.docs
 			}
 		};
 	} catch (error) {
@@ -52,11 +58,11 @@ export const post = async ({ request }) => {
 		LinkSchema.parse(linkDocument);
 		await db.createIndex({
 			index: {
-				fields: ['creatorId', 'status', 'documentType']
+				fields: ['creatorId', 'status']
 			}
 		});
 		const expireDocs = (await db.find({
-			selector: { creatorId, status: LinkStatus.ACTIVE, documentType: LinkDocument.type }
+			selector: { creatorId, status: LinkStatus.ACTIVE }
 		})) as PouchDB.Find.FindResponse<LinkDocument>;
 		// expire any existing documents
 		db.bulkDocs(expireDocs.docs.map((doc) => ({ ...doc, status: LinkStatus.EXPIRED })));

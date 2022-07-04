@@ -19,3 +19,4 @@ artifacts
 
 pouchdb
 yarn-error.log
+.vercel

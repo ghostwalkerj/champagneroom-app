@@ -11,12 +11,12 @@ export const get = async (event: RequestEvent<GetParams>) => {
 
 		await db.createIndex({
 			index: {
-				fields: ['creatorId', 'status']
+				fields: ['creatorId', 'status', 'documentType']
 			}
 		});
 
 		const currentLink = (await db.find({
-			selector: { creatorId, status: LinkStatus.ACTIVE },
+			selector: { creatorId, status: LinkStatus.ACTIVE, documentType: LinkDocument.type },
 			limit: 1
 		})) as PouchDB.Find.FindResponse<LinkDocument>;
 

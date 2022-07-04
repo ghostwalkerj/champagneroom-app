@@ -3,8 +3,8 @@ import { v4 as uuidv4 } from 'uuid';
 import urlJoin from 'url-join';
 import validator from 'validator';
 import { z } from 'zod';
-import { DocumentBase } from '.';
 import type { CreatorDocument } from './creator';
+import { DocumentBase } from './documentBase';
 
 export enum LinkStatus {
 	ACTIVE = 'ACTIVE',

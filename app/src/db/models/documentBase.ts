@@ -1,7 +1,6 @@
 import { nanoid } from 'nanoid';
 import validator from 'validator';
 import { z } from 'zod';
-export * from './link';
 
 export const DocumentBaseSchema = z.object({
 	_id: z.string().min(21),
