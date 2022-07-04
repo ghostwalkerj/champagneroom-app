@@ -92,7 +92,7 @@
 										<input type="radio" name="rating-3" class="mask mask-heart bg-green-400" />
 									</div>
 
-									<div class="stats stats-vertical stats-shadow md:stats-horizontal">
+									<div class="stats stats-vertical stats-shadow lg:stats-horizontal">
 										<div class="stat">
 											<div class="stat-figure text-primary w-10">
 												<FaMoneyBillWave />
