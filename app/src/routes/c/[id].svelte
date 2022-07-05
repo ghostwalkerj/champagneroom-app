@@ -18,7 +18,7 @@
 	export let creatorDocument: CreatorDocument;
 	export let success: boolean;
 	let vc: VideoCallType;
-
+	console.log(creatorDocument);
 	if (browser) {
 		import('lib/videoCall').then((_vc) => {
 			videoCall = _vc.videoCall;

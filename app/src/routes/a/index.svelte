@@ -48,8 +48,6 @@
 	}
 	$: if (agentQueryResult && $agentQueryResult.isSuccess) {
 		agent = $agentQueryResult.data.agent;
-		console.log(agent);
-
 		if (agent) {
 			setFields('agentId', agent._id);
 		}

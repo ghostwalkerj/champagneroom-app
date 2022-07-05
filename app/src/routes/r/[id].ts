@@ -8,8 +8,8 @@ export const get = async (event: RequestEvent<GetParams>) => {
 	try {
 		const id = event.params.id;
 		const db = getDb();
-		const linkDocument = (await db.get(id)) as LinkDocument;
-		const creatorDocument = (await db.get(linkDocument.creatorId)) as CreatorDocument;
+		const linkDocument = await db.get<LinkDocument>(id);
+		const creatorDocument = await db.get<CreatorDocument>(linkDocument.creatorId);
 		linkDocument.creator = creatorDocument;
 		return {
 			status: 200,

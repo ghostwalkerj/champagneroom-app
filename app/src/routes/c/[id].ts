@@ -1,38 +1,34 @@
 import type { RequestEvent } from '@sveltejs/kit';
 import { getDb } from 'db';
-import { CreatorDocument } from 'db/models/creator';
+import type { CreatorDocument } from 'db/models/creator';
 import { LinkDocument, LinkSchema, LinkStatus } from 'db/models/link';
 type GetParams = Record<string, string>;
 
 export const get = async (event: RequestEvent<GetParams>) => {
 	try {
-		const id = CreatorDocument.type + ':' + event.params.id;
+		const id = event.params.id;
 		const db = getDb();
-		const creatorDocument = (await db.get(id)) as PouchDB.Find.FindResponse<CreatorDocument>;
+		const creatorDocument = await db.get<CreatorDocument>(id);
+		const linkDocument = (await db.find({
+			selector: {
+				creatorId: creatorDocument._id,
+				status: LinkStatus.ACTIVE,
+				documentType: LinkDocument.type
+			},
+			limit: 1
+		})) as PouchDB.Find.FindResponse<LinkDocument>;
 
-		if (creatorDocument.docs.length === 1) {
-			const creator = creatorDocument.docs[0];
-			const linkDocument = (await db.find({
-				selector: {
-					creatorId: creator._id,
-					status: LinkStatus.ACTIVE,
-					documentType: LinkDocument.type
-				},
-				limit: 1
-			})) as PouchDB.Find.FindResponse<LinkDocument>;
-
-			if (linkDocument.docs.length != 0) {
-				creator.currentLink = linkDocument.docs[0];
-			}
-
-			return {
-				status: 200,
-				body: {
-					success: true,
-					creatorDocument
-				}
-			};
+		if (linkDocument.docs.length != 0) {
+			creatorDocument.currentLink = linkDocument.docs[0];
 		}
+
+		return {
+			status: 200,
+			body: {
+				success: true,
+				creatorDocument
+			}
+		};
 	} catch (error) {
 		return {
 			status: 200,
