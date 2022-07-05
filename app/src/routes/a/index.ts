@@ -18,7 +18,6 @@ export const post = async ({ request }) => {
 			};
 		} //TODO: Change these all to zod parse
 		const talentDocument = new TalentDocument(agentId, name, talentKey);
-		console.log(talentDocument);
 		TalentSchema.parse(talentDocument);
 		db.put(talentDocument);
 		return {
