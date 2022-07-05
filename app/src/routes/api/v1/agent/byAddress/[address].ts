@@ -2,6 +2,7 @@ import type { RequestEvent } from '@sveltejs/kit';
 import { getDb } from 'db';
 import { AgentDocument } from 'db/models/agent';
 import { CreatorDocument } from 'db/models/creator';
+import e from 'express';
 type GetParams = Record<string, string>;
 
 export const get = async (event: RequestEvent<GetParams>) => {
@@ -22,10 +23,10 @@ export const get = async (event: RequestEvent<GetParams>) => {
 
 		const agentDocs = (await db.find({
 			selector: { address, documentType: AgentDocument.type }
-		})) as PouchDB.Find.FindResponse<CreatorDocument>;
+		})) as PouchDB.Find.FindResponse<AgentDocument>;
 
 		if (agentDocs.docs.length > 0) {
-			const agent = agentDocs[0];
+			const agent = agentDocs.docs[0];
 			const creatorDocs = (await db.find({
 				selector: { agentId: agent._id, documentType: CreatorDocument.type }
 			})) as PouchDB.Find.FindResponse<CreatorDocument>;
@@ -51,6 +52,7 @@ export const get = async (event: RequestEvent<GetParams>) => {
 			};
 		} //
 	} catch (error) {
+		console.log(error);
 		return {
 			status: 200,
 			body: {

@@ -1,8 +1,8 @@
 import validator from 'validator';
 import { z } from 'zod';
-import { AgentDocument, AgentSchema } from './agent';
+import type { AgentDocument } from './agent';
 import { DocumentBase } from './documentBase';
-import { LinkDocument, LinkSchema } from './link';
+import type { LinkDocument } from './link';
 
 export const CreatorSchema = z.object({
 	agentId: z.string().min(21),
@@ -24,9 +24,7 @@ export const CreatorSchema = z.object({
 		.refine((x) => {
 			return validator.isInt(x, { min: 0, max: 5 });
 		})
-		.optional(),
-	currentLink: LinkSchema.optional(),
-	agent: AgentSchema.optional()
+		.optional()
 });
 
 export type CreatorType = z.infer<typeof CreatorSchema>;
@@ -35,17 +33,11 @@ export class CreatorDocument extends DocumentBase implements CreatorType {
 	public agentId: string;
 	public name: string;
 	public walletAddress?: string;
-
 	public profileImageUrl?: string;
-
 	public feedBackAvg?: string;
-
 	public currentLink?: LinkDocument;
-
 	public agent?: AgentDocument;
-
 	public static type = 'creator';
-
 	constructor(agentId: string, name: string) {
 		super(CreatorDocument.type);
 		this.agentId = agentId;

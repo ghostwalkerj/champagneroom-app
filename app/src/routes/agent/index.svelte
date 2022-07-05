@@ -9,6 +9,30 @@
 	import { selectedAccount } from 'svelte-web3';
 
 	const queryClient = useQueryClient();
+	const { form, setFields, data, reset } = createForm({
+		extend: [
+			reporter,
+			validator({
+				schema: CreatorSchema
+			})
+		],
+		async onSuccess(response: any) {
+			const body: {
+				success: boolean;
+				creatorDocument: CreatorDocument;
+			} = await response.json();
+			if (body.success) {
+				if (agent) {
+					agent.creators!.push(body.creatorDocument);
+				}
+				queryClient.invalidateQueries(['agent', address]);
+			}
+			reset();
+		},
+		onerror(err: any) {
+			console.log(err);
+		}
+	});
 
 	let address = '';
 	selectedAccount.subscribe((account) => {
@@ -23,31 +47,13 @@
 		agentQueryResult = getOrCreateAgentByAddress(address);
 	}
 	$: if (agentQueryResult && $agentQueryResult.isSuccess) {
-		agent = $agentQueryResult.data.creators;
+		agent = $agentQueryResult.data.agent;
 		console.log(agent);
-	}
 
-	const { form, reset } = createForm({
-		extend: [
-			reporter,
-			validator({
-				schema: CreatorSchema
-			})
-		],
-		async onSuccess(response: any) {
-			const body: {
-				success: boolean;
-				creatorDocument: CreatorDocument;
-			} = await response.json();
-			if (body.success) {
-				queryClient.setQueryData(['agent', address], body);
-			}
-			reset();
-		},
-		onerror(err: any) {
-			console.log(err);
+		if (agent) {
+			setFields('agentId', agent._id);
 		}
-	});
+	}
 </script>
 
 <div class="min-h-full">
@@ -68,7 +74,7 @@
 
 							<div class="flex flex-col text-white p-2 justify-center items-center">
 								<form use:form method="post">
-									<input type="hidden" name="address" id="address" value={address} />
+									<input type="hidden" name="agentId" />
 									<div class="max-w-xs w-full py-2 form-control">
 										<!-- svelte-ignore a11y-label-has-associated-control -->
 										<label class="label">
