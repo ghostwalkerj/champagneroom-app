@@ -11,7 +11,7 @@
 	export let linkDocument: LinkDocument;
 	export let success: boolean = false;
 
-	let creator = linkDocument.creator || { name: '', profileImageUrl: '', feedBackAvg: '0' };
+	let talent = linkDocument.talent || { name: '', profileImageUrl: '', feedBackAvg: '0' };
 
 	const formatter = new Intl.NumberFormat('en-US', {
 		style: 'currency',
@@ -68,12 +68,12 @@
 								>
 									<div class="text-center">
 										<div class="text-lg font-extrabold">This pCall is For</div>
-										<div class="text-3xl font-extrabold">{creator.name}</div>
+										<div class="text-3xl font-extrabold">{talent.name}</div>
 									</div>
 									<div class="rounded-full flex-none h-48 w-48 mask-circle">
 										<Image
-											src={creator.profileImageUrl}
-											alt={creator.name}
+											src={talent.profileImageUrl}
+											alt={talent.name}
 											height="48"
 											width="48"
 											class="rounded-full flex-none object-cover mask-circle"
@@ -124,7 +124,7 @@
 										<button
 											class="btn btn-secondary"
 											on:click={call}
-											disabled={callState != 'ready'}>Call {creator.name} Now</button
+											disabled={callState != 'ready'}>Call {talent.name} Now</button
 										>
 									</div>
 								</div>

@@ -7,23 +7,23 @@ import { PCALL_API_URL } from 'lib/constants';
 
 import urlJoin from 'url-join';
 
-export type getLinkQueryByCreatorIdResponse = {
+export type getLinkQueryByTalentIdResponse = {
 	linkDocument: LinkDocument;
 };
 
 export type linkQueryResult = UseQueryStoreResult<
-	getLinkQueryByCreatorIdResponse,
+	getLinkQueryByTalentIdResponse,
 	AxiosError<unknown, unknown>,
-	getLinkQueryByCreatorIdResponse,
+	getLinkQueryByTalentIdResponse,
 	QueryKey
 >;
 
-export const getLinkQueryByCreatorId = (creatorId: string) => {
-	const linkQuery = useQuery<getLinkQueryByCreatorIdResponse, AxiosError>(
-		['linkDocument', creatorId],
+export const getLinkQueryByTalentId = (talentId: string) => {
+	const linkQuery = useQuery<getLinkQueryByTalentIdResponse, AxiosError>(
+		['linkDocument', talentId],
 		async () => {
-			const url = urlJoin(PCALL_API_URL, 'link/byCreatorId', creatorId);
-			const { data } = await axios.get<getLinkQueryByCreatorIdResponse>(url);
+			const url = urlJoin(PCALL_API_URL, 'link/byTalentId', talentId);
+			const { data } = await axios.get<getLinkQueryByTalentIdResponse>(url);
 			return data;
 		}
 	);

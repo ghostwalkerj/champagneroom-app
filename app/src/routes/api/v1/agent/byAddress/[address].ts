@@ -1,14 +1,14 @@
 import type { RequestEvent } from '@sveltejs/kit';
 import { getDb } from 'db';
 import { AgentDocument } from 'db/models/agent';
-import { CreatorDocument } from 'db/models/creator';
+import { TalentDocument } from 'db/models/talent';
 type GetParams = Record<string, string>;
 
 export const get = async (event: RequestEvent<GetParams>) => {
 	try {
 		const address = event.params.address;
 		const db = getDb();
-		let creators: CreatorDocument[] = [];
+		let talents: TalentDocument[] = [];
 		await db.createIndex({
 			index: {
 				fields: ['address', 'documentType']
@@ -26,11 +26,11 @@ export const get = async (event: RequestEvent<GetParams>) => {
 
 		if (agentDocs.docs.length > 0) {
 			const agent = agentDocs.docs[0];
-			const creatorDocs = (await db.find({
-				selector: { agentId: agent._id, documentType: CreatorDocument.type }
-			})) as PouchDB.Find.FindResponse<CreatorDocument>;
-			creators = creatorDocs.docs;
-			agent.creators = creators;
+			const talentDocs = (await db.find({
+				selector: { agentId: agent._id, documentType: TalentDocument.type }
+			})) as PouchDB.Find.FindResponse<TalentDocument>;
+			talents = talentDocs.docs;
+			agent.talents = talents;
 			return {
 				status: 200,
 				body: {

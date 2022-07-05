@@ -3,27 +3,29 @@
 	import { validator } from '@felte/validator-zod';
 	import { useQueryClient } from '@sveltestack/svelte-query';
 	import type { AgentDocument } from 'db/models/agent';
-	import { CreatorDocument, CreatorSchema } from 'db/models/creator';
+	import { TalentDocument, TalentSchema } from 'db/models/talent';
 	import { getOrCreateAgentByAddress } from 'db/queries/agentQueries';
 	import { createForm } from 'felte';
+	import { nanoid } from 'nanoid';
 	import { selectedAccount } from 'svelte-web3';
+	import { nan, set } from 'zod';
 
 	const queryClient = useQueryClient();
 	const { form, setFields, data, reset } = createForm({
 		extend: [
 			reporter,
 			validator({
-				schema: CreatorSchema
+				schema: TalentSchema
 			})
 		],
 		async onSuccess(response: any) {
 			const body: {
 				success: boolean;
-				creatorDocument: CreatorDocument;
+				talentDocument: TalentDocument;
 			} = await response.json();
 			if (body.success) {
 				if (agent) {
-					agent.creators!.push(body.creatorDocument);
+					agent.talents!.push(body.talentDocument);
 				}
 				queryClient.invalidateQueries(['agent', address]);
 			}
@@ -46,12 +48,12 @@
 	$: if (address) {
 		agentQueryResult = getOrCreateAgentByAddress(address);
 	}
-	let creators: CreatorDocument[] = [];
+	let talents: TalentDocument[] = [];
 	$: if (agentQueryResult && $agentQueryResult.isSuccess) {
 		agent = $agentQueryResult.data.agent;
 		if (agent) {
 			setFields('agentId', agent._id);
-			creators = agent.creators || [];
+			talents = agent.talents || [];
 		}
 	}
 </script>
@@ -66,10 +68,10 @@
 			class="mx-auto mt-8 max-w-3xl grid gap-6 grid-cols-1 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3"
 		>
 			<div class="space-y-6 lg:col-start-1 lg:col-span-2">
-				<!-- Creator Form-->
+				<!-- talent Form-->
 				<div class="bg-primary text-primary-content card">
 					<div class="text-center card-body items-center">
-						<h2 class="text-2xl card-title">New Creator</h2>
+						<h2 class="text-2xl card-title">New Talent</h2>
 
 						<div class="flex flex-col text-white p-2 justify-center items-center">
 							<form use:form method="post">
@@ -77,7 +79,7 @@
 								<div class="max-w-xs w-full py-2 form-control">
 									<!-- svelte-ignore a11y-label-has-associated-control -->
 									<label class="label">
-										<span class="label-text">Creator Name</span>
+										<span class="label-text">Talent Name</span>
 									</label>
 									<input
 										type="text"
@@ -91,9 +93,23 @@
 										<span slot="placeholder" />
 									</ValidationMessage>
 								</div>
-
+								<div class="max-w-xs w-full py-2 form-control">
+									<!-- svelte-ignore a11y-label-has-associated-control -->
+									<label class="label">
+										<span class="label-text">Talent Key</span>
+									</label>
+									<input
+										type="text"
+										id="talentKey"
+										name="talentKey"
+										value={nanoid()}
+										placeholder="Talent Key"
+										readonly
+										class="max-w-xs w-full py-2 input input-bordered input-primary"
+									/>
+								</div>
 								<div class="py-4">
-									<button class="btn btn-secondary" type="submit">Save Creator</button>
+									<button class="btn btn-secondary" type="submit">Save talent</button>
 								</div>
 							</form>
 						</div>
@@ -101,9 +117,9 @@
 				</div>
 
 				<div>
-					{#each creators as creator, i}
+					{#each talents as talent, i}
 						<li>
-							{i + 1}: <a href="/c/{creator._id}">{creator.name}</a>
+							{i + 1}: <a href="/t/{talent._id}">{talent.name}</a>
 						</li>
 					{/each}
 				</div>

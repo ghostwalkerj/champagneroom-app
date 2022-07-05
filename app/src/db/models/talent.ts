@@ -4,8 +4,9 @@ import type { AgentDocument } from './agent';
 import { DocumentBase } from './documentBase';
 import type { LinkDocument } from './link';
 
-export const CreatorSchema = z.object({
+export const TalentSchema = z.object({
 	agentId: z.string().min(21),
+	talentKey: z.string().min(21),
 	walletAddress: z
 		.string()
 		.refine((x) => {
@@ -33,10 +34,11 @@ export const CreatorSchema = z.object({
 		.optional()
 });
 
-export type CreatorType = z.infer<typeof CreatorSchema>;
+export type TalentType = z.infer<typeof TalentSchema>;
 
-export class CreatorDocument extends DocumentBase implements CreatorType {
+export class TalentDocument extends DocumentBase implements TalentType {
 	public agentId: string;
+	public talentKey: string;
 	public name: string;
 	public walletAddress?: string;
 	public profileImageUrl?: string;
@@ -45,10 +47,11 @@ export class CreatorDocument extends DocumentBase implements CreatorType {
 	public agentCommission?: string;
 	public currentLink?: LinkDocument;
 	public agent?: AgentDocument;
-	public static type = 'creator';
-	constructor(agentId: string, name: string) {
-		super(CreatorDocument.type);
+	public static type = 'talent';
+	constructor(agentId: string, name: string, talentKey: string) {
+		super(TalentDocument.type);
 		this.agentId = agentId;
 		this.name = name;
+		this.talentKey = talentKey;
 	}
 }

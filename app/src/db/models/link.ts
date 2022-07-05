@@ -3,7 +3,7 @@ import urlJoin from 'url-join';
 import { v4 as uuidv4 } from 'uuid';
 import validator from 'validator';
 import { z } from 'zod';
-import type { CreatorDocument } from './creator';
+import type { TalentDocument } from './talent';
 import { DocumentBase } from './documentBase';
 
 export enum LinkStatus {
@@ -13,7 +13,7 @@ export enum LinkStatus {
 	COMPLETED = 'COMPLETED'
 }
 export const LinkSchema = z.object({
-	creatorId: z.string().min(21),
+	talentId: z.string().min(21),
 	walletAddress: z
 		.string()
 		.refine((x) => {
@@ -59,17 +59,17 @@ export type LinkType = z.infer<typeof LinkSchema>;
 export class LinkDocument extends DocumentBase implements LinkType {
 	public status = LinkStatus.ACTIVE;
 	public callId: string;
-	public creatorId: string;
+	public talentId: string;
 	public walletAddress?: string;
 	public amount: string;
 	public fundedAmount: string;
 	public callStart?: string;
 	public callEnd?: string;
-	public creator?: CreatorDocument;
+	public talent?: TalentDocument;
 	public static type = 'link';
-	constructor(creatorId: string, walletAddress: string, amount: string) {
+	constructor(talentId: string, walletAddress: string, amount: string) {
 		super(LinkDocument.type);
-		this.creatorId = creatorId;
+		this.talentId = talentId;
 		this.walletAddress = walletAddress;
 		this.amount = amount;
 		this.fundedAmount = '0';

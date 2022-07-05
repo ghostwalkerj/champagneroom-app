@@ -6,19 +6,19 @@
 	import LinkViewer from 'components/LinkViewer.svelte';
 	import VideoCall from 'components/VideoCall.svelte';
 	import VideoPreview from 'components/VideoPreview.svelte';
-	import type { CreatorDocument } from 'db/models/creator';
+	import type { TalentDocument } from 'db/models/talent';
 	import { LinkDocument, LinkSchema } from 'db/models/link';
-	import { getLinkQueryByCreatorId } from 'db/queries/linkQueries';
+	import { getLinkQueryByTalentId } from 'db/queries/linkQueries';
 	import { createForm } from 'felte';
 	import { userStream, type UserStreamType } from 'lib/userStream';
 	import type { VideoCallType } from 'lib/videoCall';
 	import { onMount } from 'svelte';
 	import { PhoneIncomingIcon } from 'svelte-feather-icons';
 
-	export let creatorDocument: CreatorDocument;
+	export let talentDocument: TalentDocument;
 	export let success: boolean;
 	let vc: VideoCallType;
-	console.log(creatorDocument);
+	console.log(talentDocument);
 	if (browser) {
 		import('lib/videoCall').then((_vc) => {
 			videoCall = _vc.videoCall;
@@ -45,7 +45,7 @@
 				linkDocument: LinkDocument;
 			} = await response.json();
 			if (body.success) {
-				queryClient.setQueryData(['linkDocument', creatorDocument._id], body);
+				queryClient.setQueryData(['linkDocument', talentDocument._id], body);
 				initVC();
 			}
 			reset();
@@ -68,7 +68,7 @@
 	};
 
 	$: callerName = '';
-	const linkQueryResult = getLinkQueryByCreatorId(creatorDocument._id);
+	const linkQueryResult = getLinkQueryByTalentId(talentDocument._id);
 
 	$: if ($linkQueryResult.isSuccess) {
 		linkDocument = $linkQueryResult.data.linkDocument;
@@ -139,7 +139,7 @@
 						<section aria-labelledby="link-information-tile">
 							<div>
 								{#if linkDocument}
-									<LinkViewer {linkDocument} {creatorDocument} />
+									<LinkViewer {linkDocument} {talentDocument} />
 								{:else}
 									<div class="bg-primary text-primary-content card">
 										<div class="card-body items-center text-center">
@@ -161,9 +161,9 @@
 											<!-- TODO: Change this to programatic  -->
 											<input
 												type="hidden"
-												name="creatorId"
-												id="creatorId"
-												value={creatorDocument._id}
+												name="talentId"
+												id="talentId"
+												value={talentDocument._id}
 											/>
 
 											<div class="max-w-xs w-full py-2 form-control ">
@@ -226,7 +226,7 @@
 								<div class="bg-primary text-primary-content card">
 									<div class="text-center card-body items-center">
 										<h2 class="text-2xl card-title">pCall Status</h2>
-										<p>Signed in as {creatorDocument.name}</p>
+										<p>Signed in as {talentDocument.name}</p>
 										{#if linkDocument}
 											<p>CallId: {linkDocument.callId}</p>
 										{/if}

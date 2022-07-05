@@ -5,18 +5,18 @@ type GetParams = Record<string, string>;
 
 export const get = async (event: RequestEvent<GetParams>) => {
 	try {
-		const creatorId = event.params.creatorId;
+		const talentId = event.params.talentId;
 		const db = getDb();
 		let linkDocument: LinkDocument | null = null;
 
 		await db.createIndex({
 			index: {
-				fields: ['creatorId', 'status', 'documentType']
+				fields: ['talentId', 'status', 'documentType']
 			}
 		});
 
 		const currentLink = (await db.find({
-			selector: { creatorId, status: LinkStatus.ACTIVE, documentType: LinkDocument.type },
+			selector: { talentId, status: LinkStatus.ACTIVE, documentType: LinkDocument.type },
 			limit: 1
 		})) as PouchDB.Find.FindResponse<LinkDocument>;
 

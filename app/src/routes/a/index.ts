@@ -1,5 +1,5 @@
 import { getDb } from 'db';
-import { CreatorDocument, CreatorSchema } from 'db/models/creator';
+import { TalentDocument, TalentSchema } from 'db/models/talent';
 
 export const post = async ({ request }) => {
 	try {
@@ -7,7 +7,8 @@ export const post = async ({ request }) => {
 		const form = await request.formData();
 		const agentId = form.get('agentId');
 		const name = form.get('name');
-		if (typeof agentId !== 'string' || typeof name !== 'string') {
+		const talentKey = form.get('talentKey');
+		if (typeof agentId !== 'string' || typeof name !== 'string' || typeof talentKey !== 'string') {
 			return {
 				status: 400,
 				body: {
@@ -16,15 +17,15 @@ export const post = async ({ request }) => {
 				}
 			};
 		}
-		const creatorDocument = new CreatorDocument(agentId, name);
+		const talentDocument = new TalentDocument(agentId, name, talentKey);
 
-		CreatorSchema.parse(creatorDocument);
-		db.put(creatorDocument);
+		TalentSchema.parse(TalentDocument);
+		db.put(talentDocument);
 		return {
 			status: 200,
 			body: {
 				success: true,
-				creatorDocument
+				talentDocument
 			}
 		};
 	} catch (error) {
