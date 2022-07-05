@@ -2,7 +2,6 @@ import type { RequestEvent } from '@sveltejs/kit';
 import { getDb } from 'db';
 import { AgentDocument } from 'db/models/agent';
 import { CreatorDocument } from 'db/models/creator';
-import { LinkDocument, LinkSchema, LinkStatus } from 'db/models/link';
 type GetParams = Record<string, string>;
 
 export const get = async (event: RequestEvent<GetParams>) => {
@@ -31,20 +30,21 @@ export const get = async (event: RequestEvent<GetParams>) => {
 				selector: { agentId: agent._id, documentType: CreatorDocument.type }
 			})) as PouchDB.Find.FindResponse<CreatorDocument>;
 			creators = creatorDocs.docs;
-		}
-		return {
-			status: 200,
-			body: {
-				success: true,
-				creators
-			}
-		};
+			agent.creators = creators;
+			return {
+				status: 200,
+				body: {
+					success: true,
+					agent
+				}
+			};
+		} // TODO: Create an agent if it doesn't exist
 	} catch (error) {
 		return {
 			status: 200,
 			body: {
 				success: false,
-				creators: null
+				agent: null
 			}
 		};
 	}

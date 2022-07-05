@@ -10,13 +10,29 @@ export const get = async (event: RequestEvent<GetParams>) => {
 		const db = getDb();
 		const creatorDocument = (await db.get(id)) as PouchDB.Find.FindResponse<CreatorDocument>;
 
-		return {
-			status: 200,
-			body: {
-				success: true,
-				creatorDocument
+		if (creatorDocument.docs.length === 1) {
+			const creator = creatorDocument.docs[0];
+			const linkDocument = (await db.find({
+				selector: {
+					creatorId: creator._id,
+					status: LinkStatus.ACTIVE,
+					documentType: LinkDocument.type
+				},
+				limit: 1
+			})) as PouchDB.Find.FindResponse<LinkDocument>;
+
+			if (linkDocument.docs.length != 0) {
+				creator.currentLink = linkDocument.docs[0];
 			}
-		};
+
+			return {
+				status: 200,
+				body: {
+					success: true,
+					creatorDocument
+				}
+			};
+		}
 	} catch (error) {
 		return {
 			status: 200,

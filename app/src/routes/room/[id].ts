@@ -10,12 +10,7 @@ export const get = async (event: RequestEvent<GetParams>) => {
 		const db = getDb();
 		const linkDocument = (await db.get(id)) as LinkDocument;
 		const creatorDocument = (await db.get(linkDocument.creatorId)) as CreatorDocument;
-		linkDocument.creator = {
-			_id: creatorDocument._id,
-			name: creatorDocument.name,
-			profileImageUrl: creatorDocument.profileImageUrl,
-			feedBackAvg: creatorDocument.feedBackAvg
-		};
+		linkDocument.creator = creatorDocument;
 		return {
 			status: 200,
 			body: {

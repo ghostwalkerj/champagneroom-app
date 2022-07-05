@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import urlJoin from 'url-join';
 import validator from 'validator';
 import { z } from 'zod';
-import type { CreatorDocument } from './creator';
+import { CreatorSchema, type CreatorDocument } from './creator';
 import { DocumentBase } from './documentBase';
 
 export enum LinkStatus {
@@ -51,7 +51,8 @@ export const LinkSchema = z.object({
 		.refine((x) => {
 			return validator.isInt(x, { min: 0, max: 5 });
 		})
-		.optional()
+		.optional(),
+	creator: CreatorSchema.optional()
 });
 
 export type LinkType = z.infer<typeof LinkSchema>;
@@ -61,7 +62,7 @@ export class LinkDocument extends DocumentBase implements LinkType {
 	public callId: string;
 	public creatorId: string;
 
-	public walletAddress: string;
+	public walletAddress?: string;
 	public amount: string;
 
 	public fundedAmount: string;
@@ -69,7 +70,7 @@ export class LinkDocument extends DocumentBase implements LinkType {
 	public callStart?: string;
 	public callEnd?: string;
 
-	public creator?: Partial<CreatorDocument>;
+	public creator?: CreatorDocument;
 
 	public static type = 'link';
 
