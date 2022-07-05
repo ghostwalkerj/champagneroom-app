@@ -24,6 +24,12 @@ export const CreatorSchema = z.object({
 		.refine((x) => {
 			return validator.isInt(x, { min: 0, max: 5 });
 		})
+		.optional(),
+	agentCommission: z
+		.string()
+		.refine((x) => {
+			return validator.isInt(x, { min: 0, max: 100 });
+		})
 		.optional()
 });
 
@@ -34,7 +40,9 @@ export class CreatorDocument extends DocumentBase implements CreatorType {
 	public name: string;
 	public walletAddress?: string;
 	public profileImageUrl?: string;
+	I;
 	public feedBackAvg?: string;
+	public agentCommission?: string;
 	public currentLink?: LinkDocument;
 	public agent?: AgentDocument;
 	public static type = 'creator';
