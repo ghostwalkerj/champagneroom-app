@@ -46,10 +46,12 @@
 	$: if (address) {
 		agentQueryResult = getOrCreateAgentByAddress(address);
 	}
+	let creators: CreatorDocument[] = [];
 	$: if (agentQueryResult && $agentQueryResult.isSuccess) {
 		agent = $agentQueryResult.data.agent;
 		if (agent) {
 			setFields('agentId', agent._id);
+			creators = agent.creators || [];
 		}
 	}
 </script>
@@ -65,40 +67,46 @@
 		>
 			<div class="space-y-6 lg:col-start-1 lg:col-span-2">
 				<!-- Creator Form-->
-				<section aria-labelledby="new-link-tile">
-					<div class="bg-primary text-primary-content card">
-						<div class="text-center card-body items-center">
-							<h2 class="text-2xl card-title">New Creator</h2>
+				<div class="bg-primary text-primary-content card">
+					<div class="text-center card-body items-center">
+						<h2 class="text-2xl card-title">New Creator</h2>
 
-							<div class="flex flex-col text-white p-2 justify-center items-center">
-								<form use:form method="post">
-									<input type="hidden" name="agentId" />
-									<div class="max-w-xs w-full py-2 form-control">
-										<!-- svelte-ignore a11y-label-has-associated-control -->
-										<label class="label">
-											<span class="label-text">Creator Name</span>
-										</label>
-										<input
-											type="text"
-											id="name"
-											name="name"
-											placeholder="Enter a name"
-											class="max-w-xs w-full py-2 input input-bordered input-primary"
-										/>
-										<ValidationMessage for="name" let:messages={message}>
-											<span>{message}</span>
-											<span slot="placeholder" />
-										</ValidationMessage>
-									</div>
+						<div class="flex flex-col text-white p-2 justify-center items-center">
+							<form use:form method="post">
+								<input type="hidden" name="agentId" />
+								<div class="max-w-xs w-full py-2 form-control">
+									<!-- svelte-ignore a11y-label-has-associated-control -->
+									<label class="label">
+										<span class="label-text">Creator Name</span>
+									</label>
+									<input
+										type="text"
+										id="name"
+										name="name"
+										placeholder="Enter a name"
+										class="max-w-xs w-full py-2 input input-bordered input-primary"
+									/>
+									<ValidationMessage for="name" let:messages={message}>
+										<span>{message}</span>
+										<span slot="placeholder" />
+									</ValidationMessage>
+								</div>
 
-									<div class="py-4">
-										<button class="btn btn-secondary" type="submit">Save Creator</button>
-									</div>
-								</form>
-							</div>
+								<div class="py-4">
+									<button class="btn btn-secondary" type="submit">Save Creator</button>
+								</div>
+							</form>
 						</div>
 					</div>
-				</section>
+				</div>
+
+				<div>
+					{#each creators as creator, i}
+						<li>
+							{i + 1}: <a href="/c/{creator._id}">{creator.name}</a>
+						</li>
+					{/each}
+				</div>
 			</div>
 		</div>
 	</main>
