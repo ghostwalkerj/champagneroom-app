@@ -40,7 +40,7 @@ export class CreatorDocument extends DocumentBase implements CreatorType {
 	public name: string;
 	public walletAddress?: string;
 	public profileImageUrl?: string;
-	I;
+
 	public feedBackAvg?: string;
 	public agentCommission?: string;
 	public currentLink?: LinkDocument;
