@@ -1,6 +1,6 @@
 import { PCALL_ROOM_URL } from 'lib/constants';
-import { v4 as uuidv4 } from 'uuid';
 import urlJoin from 'url-join';
+import { v4 as uuidv4 } from 'uuid';
 import validator from 'validator';
 import { z } from 'zod';
 import { CreatorSchema, type CreatorDocument } from './creator';

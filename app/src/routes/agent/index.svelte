@@ -1,18 +1,11 @@
 <script type="ts">
-	import { CreatorDocument, CreatorSchema } from 'db/models/creator';
 	import { reporter, ValidationMessage } from '@felte/reporter-svelte';
 	import { validator } from '@felte/validator-zod';
-	import {
-		useQueryClient,
-		type QueryKey,
-		type UseQueryStoreResult
-	} from '@sveltestack/svelte-query';
+	import { useQueryClient } from '@sveltestack/svelte-query';
+	import { CreatorDocument, CreatorSchema } from 'db/models/creator';
+	import { getCreatorsByAgentAddress } from 'db/queries/creatorQueries';
 	import { createForm } from 'felte';
 	import { selectedAccount } from 'svelte-web3';
-	import {
-		getCreatorsByAgentAddress,
-		type getCreatorsByAgentAddressResponse
-	} from 'db/queries/creatorQueries';
 
 	const queryClient = useQueryClient();
 

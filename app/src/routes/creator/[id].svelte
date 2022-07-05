@@ -1,16 +1,16 @@
 <script type="ts">
 	import { browser } from '$app/env';
-	import { reporter, ValidationMessage } from '@felte/reporter-svelte';
+	import { reporter,ValidationMessage } from '@felte/reporter-svelte';
 	import { validator } from '@felte/validator-zod';
 	import { useQueryClient } from '@sveltestack/svelte-query';
 	import LinkViewer from 'components/LinkViewer.svelte';
 	import VideoCall from 'components/VideoCall.svelte';
 	import VideoPreview from 'components/VideoPreview.svelte';
 	import type { CreatorDocument } from 'db/models/creator';
-	import { LinkDocument, LinkSchema } from 'db/models/link';
+	import { LinkDocument,LinkSchema } from 'db/models/link';
 	import { getLinkQueryByCreatorId } from 'db/queries/linkQueries';
 	import { createForm } from 'felte';
-	import { userStream, type UserStreamType } from 'lib/userStream';
+	import { userStream,type UserStreamType } from 'lib/userStream';
 	import type { VideoCallType } from 'lib/videoCall';
 	import { onMount } from 'svelte';
 	import { PhoneIncomingIcon } from 'svelte-feather-icons';

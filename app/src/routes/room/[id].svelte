@@ -3,11 +3,11 @@
 	import VideoCall from 'components/VideoCall.svelte';
 	import VideoPreview from 'components/VideoPreview.svelte';
 	import type { LinkDocument } from 'db/models/link';
-	import { userStream, type UserStreamType } from 'lib/userStream';
+	import { userStream,type UserStreamType } from 'lib/userStream';
 	import type { VideoCallType } from 'lib/videoCall';
 	import { onMount } from 'svelte';
-	import Image from 'svelte-image';
 	import FaMoneyBillWave from 'svelte-icons/fa/FaMoneyBillWave.svelte';
+	import Image from 'svelte-image';
 	export let linkDocument: LinkDocument;
 	export let success: boolean = false;
 

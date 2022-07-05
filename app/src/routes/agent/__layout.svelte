@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
+	import { QueryClient,QueryClientProvider } from '@sveltestack/svelte-query';
 	import ConnectButton from 'components/web3/ConnectButton.svelte';
 	import { selectedAccount } from 'svelte-web3';
 	const queryClient = new QueryClient();

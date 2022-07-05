@@ -3,7 +3,7 @@ import type { AxiosError } from 'axios';
 import axios from 'axios';
 
 import type { LinkDocument } from 'db/models/link';
-import { BASE_PCALL_URL, PCALL_API_URL } from 'lib/constants';
+import { PCALL_API_URL } from 'lib/constants';
 
 import urlJoin from 'url-join';
 
