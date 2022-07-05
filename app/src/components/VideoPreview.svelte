@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { UserStreamType } from 'lib/userStream';
 	import { onMount } from 'svelte';
-	import { MicIcon,MicOffIcon,VideoIcon,VideoOffIcon } from 'svelte-feather-icons';
+	import { MicIcon, MicOffIcon, VideoIcon, VideoOffIcon } from 'svelte-feather-icons';
 
 	// UI Controls
 	let localVideo: HTMLVideoElement;

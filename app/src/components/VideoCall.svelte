@@ -1,18 +1,18 @@
 <script lang="ts">
 	import type { UserStreamType } from 'lib/userStream';
 	import type { VideoCallType } from 'lib/videoCall';
-	import { onDestroy,onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 
 	import {
-	MicIcon,
-	MicOffIcon,
-	PhoneCallIcon,
-	PhoneIcon,
-	PhoneIncomingIcon,
-	PhoneMissedIcon,
-	PhoneOutgoingIcon,
-	VideoIcon,
-	VideoOffIcon
+		MicIcon,
+		MicOffIcon,
+		PhoneCallIcon,
+		PhoneIcon,
+		PhoneIncomingIcon,
+		PhoneMissedIcon,
+		PhoneOutgoingIcon,
+		VideoIcon,
+		VideoOffIcon
 	} from 'svelte-feather-icons';
 	import MdClose from 'svelte-icons/md/MdClose.svelte';
 

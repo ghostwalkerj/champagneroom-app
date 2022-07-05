@@ -38,7 +38,18 @@ export const get = async (event: RequestEvent<GetParams>) => {
 					agent
 				}
 			};
-		} // TODO: Create an agent if it doesn't exist
+		} // Create Agent
+		else {
+			const agent = new AgentDocument(address);
+			db.put(new AgentDocument(address));
+			return {
+				status: 200,
+				body: {
+					success: true,
+					agent
+				}
+			};
+		} //
 	} catch (error) {
 		return {
 			status: 200,

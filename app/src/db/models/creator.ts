@@ -46,10 +46,9 @@ export class CreatorDocument extends DocumentBase implements CreatorType {
 
 	public static type = 'creator';
 
-	constructor(agentId: string, name: string, walletAddress: string) {
+	constructor(agentId: string, name: string) {
 		super(CreatorDocument.type);
 		this.agentId = agentId;
-		this.walletAddress = walletAddress;
 		this.name = name;
 	}
 }

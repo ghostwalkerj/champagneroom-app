@@ -3,7 +3,7 @@
 	import FaExternalLinkAlt from 'svelte-icons/fa/FaExternalLinkAlt.svelte';
 	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';
 	import IoIosClose from 'svelte-icons/io/IoIosClose.svelte';
-	import { connected,defaultEvmStores,selectedAccount,web3 } from 'svelte-web3';
+	import { connected, defaultEvmStores, selectedAccount, web3 } from 'svelte-web3';
 	import Web3Modal from 'web3modal';
 	import JazzIcon from './JazzIcon.svelte';
 	let pending = 'pending';

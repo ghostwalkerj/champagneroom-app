@@ -2,28 +2,29 @@
 	import { reporter, ValidationMessage } from '@felte/reporter-svelte';
 	import { validator } from '@felte/validator-zod';
 	import { useQueryClient } from '@sveltestack/svelte-query';
+	import type { AgentDocument } from 'db/models/agent';
 	import { CreatorDocument, CreatorSchema } from 'db/models/creator';
-	import { getCreatorsByAgentAddress } from 'db/queries/creatorQueries';
+	import { getOrCreateAgentByAddress } from 'db/queries/agentQueries';
 	import { createForm } from 'felte';
 	import { selectedAccount } from 'svelte-web3';
 
 	const queryClient = useQueryClient();
 
 	let address = '';
-	let creators: CreatorDocument[] = [];
 	selectedAccount.subscribe((account) => {
 		if (account) {
 			address = account;
 		}
 	});
 
-	let creatorsQueryResult;
+	let agentQueryResult;
+	let agent: AgentDocument;
 	$: if (address) {
-		creatorsQueryResult = getCreatorsByAgentAddress(address);
+		agentQueryResult = getOrCreateAgentByAddress(address);
 	}
-	$: if (creatorsQueryResult && $creatorsQueryResult.isSuccess) {
-		creators = $creatorsQueryResult.data.creators;
-		console.log(creators);
+	$: if (agentQueryResult && $agentQueryResult.isSuccess) {
+		agent = $agentQueryResult.data.creators;
+		console.log(agent);
 	}
 
 	const { form, reset } = createForm({
@@ -39,7 +40,7 @@
 				creatorDocument: CreatorDocument;
 			} = await response.json();
 			if (body.success) {
-				queryClient.setQueryData(['creators', address], body);
+				queryClient.setQueryData(['agent', address], body);
 			}
 			reset();
 		},
