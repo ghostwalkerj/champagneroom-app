@@ -16,41 +16,28 @@ export const LinkSchema = z.object({
 	talentId: z.string().min(21),
 	walletAddress: z
 		.string()
-		.refine((x) => {
-			return validator.isEthereumAddress(x);
-		})
+		.refine((x) => validator.isEthereumAddress(x), { message: 'Invalid Wallet Address' })
 		.optional(),
-	amount: z.string().refine(
-		(x) => {
-			return validator.isInt(x, { gt: 0, lt: 10000 });
-		},
-		{ message: 'Must be between  $1 and $9999' }
-	),
+	amount: z.string().refine((x) => validator.isInt(x, { gt: 0, lt: 10000 }), {
+		message: 'Must be between  $1 and $9999'
+	}),
 	fundedAmount: z
 		.string()
-		.refine((x) => {
-			return validator.isInt(x, { min: 0 });
-		})
+		.refine((x) => validator.isInt(x, { min: 0 }))
 		.optional(),
 	callStart: z
 		.string()
-		.refine((x) => {
-			return validator.isDate(x);
-		})
+		.refine((x) => validator.isDate(x))
 		.optional(),
 	callEnd: z
 		.string()
-		.refine((x) => {
-			return validator.isDate(x);
-		})
+		.refine((x) => validator.isDate(x))
 		.optional(),
 	callId: z.string().optional(),
 	status: z.nativeEnum(LinkStatus).default(LinkStatus.ACTIVE).optional(),
 	feedBack: z
 		.string()
-		.refine((x) => {
-			return validator.isInt(x, { min: 0, max: 5 });
-		})
+		.refine((x) => validator.isInt(x, { min: 0, max: 5 }))
 		.optional()
 });
 

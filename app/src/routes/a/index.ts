@@ -16,10 +16,10 @@ export const post = async ({ request }) => {
 					error: 'Bad parameters.'
 				}
 			};
-		}
+		} //TODO: Change these all to zod parse
 		const talentDocument = new TalentDocument(agentId, name, talentKey);
-
-		TalentSchema.parse(TalentDocument);
+		console.log(talentDocument);
+		TalentSchema.parse(talentDocument);
 		db.put(talentDocument);
 		return {
 			status: 200,

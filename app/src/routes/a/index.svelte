@@ -119,7 +119,7 @@
 				<div>
 					{#each talents as talent, i}
 						<li>
-							{i + 1}: <a href="/t/{talent._id}">{talent.name}</a>
+							{i + 1}: <a href="/t/{talent.talentKey}">{talent.name}</a>
 						</li>
 					{/each}
 				</div>

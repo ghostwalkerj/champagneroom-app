@@ -9,9 +9,7 @@ export const AgentSchema = z.object({
 	}),
 	walletAddress: z
 		.string()
-		.refine((x) => {
-			return validator.isEthereumAddress(x);
-		})
+		.refine((x) => validator.isEthereumAddress(x), { message: 'Invalid Wallet Address' })
 		.optional()
 });
 
