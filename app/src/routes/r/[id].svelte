@@ -58,17 +58,17 @@
 				<div
 					class="mx-auto max-w-3xl  sm:px-6 md:flex md:space-x-5 md:items-center md:justify-between lg:max-w-7xl lg:px-8"
 				>
-					<div class="flex flex-col space-x-5 w-full items-center p-2">
-						<h1 class="font-bold text-5xl text-center">Make your pCall</h1>
+					<div class="flex flex-col space-x-5 w-full p-2 items-center">
+						<h1 class="font-bold text-center text-5xl">Make your pCall</h1>
 						<p class="py-6">Scis vis facere illud pCall. Carpe florem et fac quod nunc vocant.</p>
 						<div class="flex flex-col w-full gap-6 md:flex-row">
 							<div class="flex flex-col w-full ">
 								<div
-									class="h-full bg-base-200 rounded-box col-span-3 row-span-3 mx-2 grid  flex-shrink-0 place-items-center gap-4 p-4 py-8 shadow-xl xl:mx-0 xl:w-full"
+									class="rounded-box h-full bg-base-200 flex-shrink-0 shadow-xl mx-2 grid  p-4 py-8 gap-4 col-span-3 row-span-3 place-items-center xl:mx-0 xl:w-full"
 								>
 									<div class="text-center">
-										<div class="text-lg font-extrabold">This pCall is For</div>
-										<div class="text-3xl font-extrabold">{talent.name}</div>
+										<div class="font-extrabold text-lg">This pCall is For</div>
+										<div class="font-extrabold text-3xl">{talent.name}</div>
 									</div>
 									<div class="rounded-full flex-none h-48 w-48 mask-circle">
 										<Image
@@ -79,42 +79,42 @@
 											class="rounded-full flex-none object-cover mask-circle"
 										/>
 									</div>
-									<div class="rating gap-1">
-										<input type="radio" name="rating-3" class="mask mask-heart bg-red-400" />
-										<input type="radio" name="rating-3" class="mask mask-heart bg-orange-400" />
-										<input type="radio" name="rating-3" class="mask mask-heart bg-yellow-400" />
+									<div class="gap-1 rating">
+										<input type="radio" name="rating-3" class="bg-red-400 mask mask-heart" />
+										<input type="radio" name="rating-3" class="bg-orange-400 mask mask-heart" />
+										<input type="radio" name="rating-3" class="bg-yellow-400 mask mask-heart" />
 										<input
 											type="radio"
 											name="rating-3"
-											class="mask mask-heart bg-lime-400"
+											class="bg-lime-400 mask mask-heart"
 											checked
 										/>
-										<input type="radio" name="rating-3" class="mask mask-heart bg-green-400" />
+										<input type="radio" name="rating-3" class="bg-green-400 mask mask-heart" />
 									</div>
 
 									<div class="stats stats-vertical stats-shadow lg:stats-horizontal">
 										<div class="stat">
-											<div class="stat-figure text-primary w-10">
+											<div class="text-primary w-10 stat-figure">
 												<FaMoneyBillWave />
 											</div>
 											<div class="stat-title">Requested</div>
-											<div class="stat-value text-primary">
+											<div class="text-primary stat-value">
 												{formatter.format(Number.parseInt(linkDocument.amount))}
 											</div>
 										</div>
 
 										<div class="stat">
-											<div class="stat-figure text-secondary w-10">
+											<div class="text-secondary w-10 stat-figure">
 												<FaMoneyBillWave />
 											</div>
 											<div class="stat-title">Funded</div>
-											<div class="stat-value text-secondary">
+											<div class="text-secondary stat-value">
 												{formatter.format(Number.parseInt(linkDocument.fundedAmount))}
 											</div>
 										</div>
 									</div>
 									<section
-										class="flex flex-col bg-base-100 flex-shrink-0 text-white p-4 gap-4 text-center items-center justify-center rounded-2xl  md:gap-8 "
+										class="flex flex-col bg-base-100 rounded-2xl flex-shrink-0 text-white text-center p-4 gap-4 items-center justify-center  md:gap-8 "
 									>
 										<div>Funding Address</div>
 										<div class="break-all">{linkDocument.walletAddress}</div>

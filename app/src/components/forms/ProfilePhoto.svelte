@@ -87,15 +87,11 @@
 
 <div class="p-4">
 	<div
-		class="container mx-auto relative rounded-full h-50 w-50 items-center text-center  mask-circle"
+		class="container rounded-full flex-none h-50 text-center w-50 relative  items-center mask-circle"
 		in:scale
 	>
 		<div>
-			<Image
-				src={imageUrl || ' '}
-				alt=""
-				class=" rounded-full h-50 w-50 object-cover border-4 border-secondary "
-			/>
+			<Image src={imageUrl || ' '} alt="" class="rounded-full flex-none object-cover mask-circle" />
 		</div>
 		<div
 			use:filedrop={options}
@@ -146,9 +142,7 @@
 				Choose Image
 			</label>
 		{:else}
-			<button class="btn btn-xs btn-outline btn-primary md:btn-sm" on:click={(e) => upload()}>
-				Upload</button
-			>
+			<button class="btn btn-xs btn-secondary md:btn-sm" on:click={(e) => upload()}> Upload</button>
 		{/if}
 		<button class="btn btn-xs btn-outline btn-secondary md:btn-sm" on:click={resetForm}>
 			Cancel</button

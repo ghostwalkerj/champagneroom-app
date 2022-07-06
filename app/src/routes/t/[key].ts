@@ -4,6 +4,7 @@ import { TalentDocument } from 'db/models/talent';
 import { LinkDocument, LinkSchema, LinkStatus } from 'db/models/link';
 type GetParams = Record<string, string>;
 
+// Talent Get
 export const get = async (event: RequestEvent<GetParams>) => {
 	try {
 		const key = event.params.key;
@@ -61,6 +62,7 @@ export const get = async (event: RequestEvent<GetParams>) => {
 	}
 };
 
+// LinkDocument
 export const post = async ({ request }) => {
 	try {
 		const db = getDb();

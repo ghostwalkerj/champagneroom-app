@@ -165,7 +165,7 @@ export const videoCall = (userId?: string) => {
 		console.log('Disconnected from server');
 		callState.disconnected();
 		peer.reconnect();
-		console.log('Attempting to reconnect');
+		console.log('Attempting to reconnect'); //TODO: Need to reconnect
 		callState.connected();
 	});
 

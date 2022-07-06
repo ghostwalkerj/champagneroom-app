@@ -14,9 +14,9 @@
 	import type { VideoCallType } from 'lib/videoCall';
 	import { onMount } from 'svelte';
 	import { PhoneIncomingIcon } from 'svelte-feather-icons';
-	import Image from 'svelte-image';
 	import { DEFAULT_PROFILE_IMAGE } from 'lib/constants';
 	import ProfilePhoto from 'components/forms/ProfilePhoto.svelte';
+	import { updateTalent } from 'db/queries/talentQueries';
 
 	export let talentDocument: TalentDocument;
 	export let success: boolean;
@@ -34,7 +34,11 @@
 		maximumFractionDigits: 0
 	});
 
-	const { form, reset } = createForm({
+	const update = async (talent: TalentDocument) => {
+		updateTalent(talent);
+	};
+
+	const { form: linkForm, reset: linkFormReset } = createForm({
 		extend: [
 			reporter,
 			validator({
@@ -50,7 +54,7 @@
 				queryClient.setQueryData(['linkDocument', talentDocument._id], body);
 				initVC();
 			}
-			reset();
+			linkFormReset();
 		},
 		onError(err: any) {
 			console.log(err);
@@ -158,7 +162,7 @@
 									<h2 class="text-2xl card-title">Request a New pCall</h2>
 
 									<div class="flex flex-col text-white p-2 justify-center items-center">
-										<form use:form method="post">
+										<form use:linkForm method="post">
 											<!-- TODO: Change this to programatic  -->
 											<input
 												type="hidden"
@@ -246,6 +250,7 @@
 												profileImage={talentDocument.profileImageUrl || DEFAULT_PROFILE_IMAGE}
 												callBack={(value) => {
 													talentDocument.profileImageUrl = value;
+													update(talentDocument);
 												}}
 											/>
 										</div>
