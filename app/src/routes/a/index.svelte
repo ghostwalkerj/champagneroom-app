@@ -3,14 +3,15 @@
 	import { validator } from '@felte/validator-zod';
 	import { useQueryClient } from '@sveltestack/svelte-query';
 	import type { AgentDocument } from 'db/models/agent';
-	import { TalentDocument, TalentSchema } from 'db/models/talent';
+	import { TalentSchema, type TalentDocument } from 'db/models/talent';
 	import { getOrCreateAgentByAddress } from 'db/queries/agentQueries';
 	import { createForm } from 'felte';
 	import { PCALL_TALENT_URL } from 'lib/constants';
 	import { nanoid } from 'nanoid';
 	import { selectedAccount } from 'svelte-web3';
 	import urlJoin from 'url-join';
-	import { nan, number, set } from 'zod';
+
+	export const prerender = false; // because depends if we have a valid agent
 
 	const queryClient = useQueryClient();
 	const { form, setFields, reset } = createForm({
@@ -60,9 +61,9 @@
 		agent = $agentQueryResult.data.agent;
 		if (agent) {
 			setFields('agentId', agent._id);
+			setFields('talentKey', talentkey);
 			talents = agent.talents || [];
 		}
-		setFields('talentKey', talentkey);
 	}
 
 	$: talentUrl = urlJoin(PCALL_TALENT_URL, talentkey);

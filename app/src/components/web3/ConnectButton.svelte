@@ -49,12 +49,7 @@
 </script>
 
 {#if !$selectedAccount}
-	<button
-		class="bg-gradient-to-r rounded-xl font-medium from-pink-800 via-purple-900 to-blue-900  border-2 border-purple-700  shadow-sm text-sm text-white py-2 px-4 inline-flex  items-center whitespace-nowrap hover:border-pink-800"
-		on:click={connect}
-	>
-		Connect to a wallet
-	</button>
+	<button class="btn" on:click={connect}> Connect to a wallet </button>
 {:else}
 	<div>
 		<div class="card card-side bordered  ">

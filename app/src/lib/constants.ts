@@ -1,8 +1,12 @@
 import urlJoin from 'url-join';
 
-export const BASE_PCALL_URL = `${import.meta.env.VITE_PCALL_PROTOCOL}:${
-	import.meta.env.VITE_PCALL_HOST
-}:${import.meta.env.VITE_PCALL_PORT}`;
+const PORT = import.meta.env.VITE_PCALL_PORT;
+
+export const BASE_PCALL_URL = PORT
+	? `${import.meta.env.VITE_PCALL_PROTOCOL}:${import.meta.env.VITE_PCALL_HOST}:${
+			import.meta.env.VITE_PCALL_PORT
+	  }`
+	: `${import.meta.env.VITE_PCALL_PROTOCOL}:${import.meta.env.VITE_PCALL_HOST}`;
 
 export const PCALL_API_URL = urlJoin(BASE_PCALL_URL, import.meta.env.VITE_API_PATH);
 

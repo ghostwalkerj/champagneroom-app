@@ -265,7 +265,7 @@
 								<div class="bg-primary text-primary-content card">
 									<div class="text-center card-body items-center">
 										<h2 class="text-2xl card-title">Your Feedback Rating</h2>
-										<StarRating rating={talentDocument.feedBackAvg} />
+										<StarRating rating={talentDocument.feedBackAvg || 0} />
 									</div>
 								</div>
 							</div>

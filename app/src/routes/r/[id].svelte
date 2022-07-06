@@ -10,6 +10,7 @@
 	import Image from 'svelte-image';
 	export let linkDocument: LinkDocument;
 	export let success: boolean = false;
+	import StarRating from 'svelte-star-rating';
 
 	let talent = linkDocument.talent || { name: '', profileImageUrl: '', feedBackAvg: '0' };
 
@@ -79,18 +80,7 @@
 											class="rounded-full flex-none object-cover mask-circle"
 										/>
 									</div>
-									<div class="gap-1 rating">
-										<input type="radio" name="rating-3" class="bg-red-400 mask mask-heart" />
-										<input type="radio" name="rating-3" class="bg-orange-400 mask mask-heart" />
-										<input type="radio" name="rating-3" class="bg-yellow-400 mask mask-heart" />
-										<input
-											type="radio"
-											name="rating-3"
-											class="bg-lime-400 mask mask-heart"
-											checked
-										/>
-										<input type="radio" name="rating-3" class="bg-green-400 mask mask-heart" />
-									</div>
+									<StarRating rating={talent.feedBackAvg || 0} />
 
 									<div class="stats stats-vertical stats-shadow lg:stats-horizontal">
 										<div class="stat">

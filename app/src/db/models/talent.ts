@@ -16,7 +16,7 @@ export const TalentSchema = z.object({
 		.string()
 		.refine((x) => validator.isURL(x))
 		.optional(),
-	feedBackAvg: z.number().min(1).max(5).optional(),
+	feedBackAvg: z.number().min(0).max(5).optional(),
 	agentCommission: z.number().min(0).max(100).int().optional()
 });
 

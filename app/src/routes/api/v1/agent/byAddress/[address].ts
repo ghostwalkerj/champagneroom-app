@@ -3,7 +3,7 @@ import { getDb } from 'db';
 import { AgentDocument } from 'db/models/agent';
 import { TalentDocument } from 'db/models/talent';
 type GetParams = Record<string, string>;
-
+export const prerender = false; // because depends if we have a valid agent
 export const get = async (event: RequestEvent<GetParams>) => {
 	try {
 		const address = event.params.address;
@@ -29,8 +29,10 @@ export const get = async (event: RequestEvent<GetParams>) => {
 			const talentDocs = (await db.find({
 				selector: { agentId: agent._id, documentType: TalentDocument.type }
 			})) as PouchDB.Find.FindResponse<TalentDocument>;
-			talents = talentDocs.docs;
-			agent.talents = talents;
+			if (talentDocs.docs.length > 0) {
+				talents = talentDocs.docs;
+				agent.talents = talents;
+			}
 			return {
 				status: 200,
 				body: {
