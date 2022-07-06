@@ -16,14 +16,8 @@ export const TalentSchema = z.object({
 		.string()
 		.refine((x) => validator.isURL(x))
 		.optional(),
-	feedBackAvg: z
-		.string()
-		.refine((x) => validator.isInt(x, { min: 0, max: 5 }))
-		.optional(),
-	agentCommission: z
-		.string()
-		.refine((x) => validator.isInt(x, { min: 0, max: 100 }))
-		.optional()
+	feedBackAvg: z.number().min(1).max(5).optional(),
+	agentCommission: z.number().min(0).max(100).int().optional()
 });
 
 export type TalentType = z.infer<typeof TalentSchema>;
@@ -35,8 +29,8 @@ export class TalentDocument extends DocumentBase implements TalentType {
 	public walletAddress?: string;
 	public profileImageUrl?: string;
 
-	public feedBackAvg?: string;
-	public agentCommission?: string;
+	public feedBackAvg?: number;
+	public agentCommission?: number;
 	public currentLink?: LinkDocument;
 	public agent?: AgentDocument;
 	public static type = 'talent';

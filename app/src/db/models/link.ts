@@ -35,10 +35,7 @@ export const LinkSchema = z.object({
 		.optional(),
 	callId: z.string().optional(),
 	status: z.nativeEnum(LinkStatus).default(LinkStatus.ACTIVE).optional(),
-	feedBack: z
-		.string()
-		.refine((x) => validator.isInt(x, { min: 0, max: 5 }))
-		.optional()
+	feedBackAvg: z.number().min(1).max(5).optional()
 });
 
 export type LinkType = z.infer<typeof LinkSchema>;
@@ -52,6 +49,7 @@ export class LinkDocument extends DocumentBase implements LinkType {
 	public fundedAmount: string;
 	public callStart?: string;
 	public callEnd?: string;
+	public feedBackAvg?: number;
 	public talent?: TalentDocument;
 	public static type = 'link';
 	constructor(talentId: string, walletAddress: string, amount: string) {

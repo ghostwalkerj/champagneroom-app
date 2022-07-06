@@ -52,7 +52,6 @@
 		"prettier": "^2.7.1",
 		"prettier-plugin-solidity": "^1.0.0-beta.19",
 		"prettier-plugin-svelte": "^2.7.0",
-		"rollup-plugin-polyfill-node": "^0.10.0",
 		"svelte": "^3.48.0",
 		"svelte-check": "^2.8.0",
 		"svelte-feather-icons": "^4.0.0",

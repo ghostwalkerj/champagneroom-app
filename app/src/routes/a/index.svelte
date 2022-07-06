@@ -10,16 +10,20 @@
 	import { nanoid } from 'nanoid';
 	import { selectedAccount } from 'svelte-web3';
 	import urlJoin from 'url-join';
-	import { nan, set } from 'zod';
+	import { nan, number, set } from 'zod';
 
 	const queryClient = useQueryClient();
-	const { form, setFields, data, reset } = createForm({
+	const { form, setFields, reset } = createForm({
 		extend: [
 			reporter,
 			validator({
 				schema: TalentSchema
 			})
 		],
+		transform: (values: any) => ({
+			...values,
+			agentCommission: parseInt(values.agentCommission, 10)
+		}),
 		async onSuccess(response: any) {
 			const body: {
 				success: boolean;
@@ -77,7 +81,7 @@
 					<div class="text-center card-body items-center">
 						<h2 class="text-2xl card-title">New Talent</h2>
 
-						<div class="text-white whitespace-nowrap">
+						<div class="text-white text-left whitespace-nowrap">
 							<form use:form method="post">
 								<input type="hidden" name="agentId" />
 								<input type="hidden" name="talentKey" />
@@ -95,6 +99,30 @@
 										class="max-w-xs w-full py-2 input input-bordered input-primary"
 									/>
 									<ValidationMessage for="name" let:messages={message}>
+										<span>{message}</span>
+										<span slot="placeholder" />
+									</ValidationMessage>
+								</div>
+								<label for="price" class="label">
+									<span class="label-text">Commission Percentage</span></label
+								>
+								<div class="form-control">
+									<!-- svelte-ignore a11y-label-has-associated-control -->
+
+									<div class="rounded-md shadow-sm mt-1 w-20 relative">
+										<input
+											type="text"
+											name="agentCommission"
+											id="agentCommission"
+											class="py-2 w-20 input input-bordered input-primary "
+											value="10"
+										/>
+										<div class="flex  inset-y-4 right-4 absolute pointer-events-none">
+											<span class="text-gray-500 sm:text-sm"> % </span>
+										</div>
+									</div>
+
+									<ValidationMessage for="agentCommission" let:messages={message}>
 										<span>{message}</span>
 										<span slot="placeholder" />
 									</ValidationMessage>

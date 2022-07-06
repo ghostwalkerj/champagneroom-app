@@ -8,6 +8,7 @@ export const post = async ({ request }) => {
 		const agentId = form.get('agentId');
 		const name = form.get('name');
 		const talentKey = form.get('talentKey');
+		const agentCommission = form.get('agentCommission');
 		if (typeof agentId !== 'string' || typeof name !== 'string' || typeof talentKey !== 'string') {
 			return {
 				status: 400,
@@ -18,6 +19,7 @@ export const post = async ({ request }) => {
 			};
 		} //TODO: Change these all to zod parse
 		const talentDocument = new TalentDocument(agentId, name, talentKey);
+		talentDocument.agentCommission = Number.parseInt(agentCommission);
 		TalentSchema.parse(talentDocument);
 		db.put(talentDocument);
 		return {

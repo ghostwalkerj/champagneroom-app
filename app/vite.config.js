@@ -20,19 +20,15 @@ const config = {
 		}
 	},
 	mode: 'development',
-
-	plugins: [sveltekit(), WindiCSS()]
-	,
+	plugins: [sveltekit(), WindiCSS()],
 	optimizeDeps: {
 		esbuildOptions: {
 			// Node.js global to browser globalThis
 			define: {
 				global: "globalThis",
 			},
-
 		}
 	}
 };
-
 
 export default config;

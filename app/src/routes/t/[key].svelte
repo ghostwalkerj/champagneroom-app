@@ -17,6 +17,7 @@
 	import { DEFAULT_PROFILE_IMAGE } from 'lib/constants';
 	import ProfilePhoto from 'components/forms/ProfilePhoto.svelte';
 	import { updateTalent } from 'db/queries/talentQueries';
+	import StarRating from 'svelte-star-rating';
 
 	export let talentDocument: TalentDocument;
 	export let success: boolean;
@@ -264,6 +265,7 @@
 								<div class="bg-primary text-primary-content card">
 									<div class="text-center card-body items-center">
 										<h2 class="text-2xl card-title">Your Feedback Rating</h2>
+										<StarRating rating={talentDocument.feedBackAvg} />
 									</div>
 								</div>
 							</div>
