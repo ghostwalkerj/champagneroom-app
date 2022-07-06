@@ -1,8 +1,7 @@
 import adapter from '@sveltejs/adapter-auto';
-import path from 'path';
 import image from 'svelte-image';
 import preprocess from 'svelte-preprocess';
-import WindiCSS from 'vite-plugin-windicss';
+
 
 
 
@@ -27,35 +26,7 @@ const config = {
 		// prerender: {
 		// 	enabled: false
 		// },
-		vite: {
-			server: {
-				hmr: { overlay: true }, cors: {
-					origin: "*",
-					methods: "GET,HEAD,PUT,PATCH,POST,DELETE"
-				}
-			},
-			resolve: {
-				alias: {
-					// these are the aliases and paths to them
-					components: path.resolve('./src/components'),
-					lib: path.resolve('./src/lib'),
-					db: path.resolve('./src/db')
-				}
-			},
-			mode: 'development',
 
-			plugins: [WindiCSS()]
-			,
-			optimizeDeps: {
-				esbuildOptions: {
-					// Node.js global to browser globalThis
-					define: {
-						global: "globalThis",
-					},
-
-				}
-			}
-		}
 	}
 };
 

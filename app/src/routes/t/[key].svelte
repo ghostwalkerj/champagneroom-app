@@ -264,61 +264,6 @@
 								<div class="bg-primary text-primary-content card">
 									<div class="text-center card-body items-center">
 										<h2 class="text-2xl card-title">Your Feedback Rating</h2>
-										<div class="bg-gradient-3 content">
-											<div class=" rating rating-lg rating-half">
-												<input
-													type="radio"
-													name="rating-10"
-													class="bg-blue-500 mask mask-star-2 mask-half-1"
-												/>
-												<input
-													type="radio"
-													name="rating-10"
-													class="bg-blue-500 mask mask-star-2 mask-half-2"
-												/>
-												<input
-													type="radio"
-													name="rating-10"
-													class="bg-blue-500 mask mask-star-2 mask-half-1"
-													checked
-												/>
-												<input
-													type="radio"
-													name="rating-10"
-													class="bg-blue-500 mask mask-star-2 mask-half-2"
-												/>
-												<input
-													type="radio"
-													name="rating-10"
-													class="bg-blue-500 mask mask-star-2 mask-half-1"
-												/>
-												<input
-													type="radio"
-													name="rating-10"
-													class="bg-blue-500 mask mask-star-2 mask-half-2"
-												/>
-												<input
-													type="radio"
-													name="rating-10"
-													class="bg-blue-500 mask mask-star-2 mask-half-1"
-												/>
-												<input
-													type="radio"
-													name="rating-10"
-													class="bg-blue-500 mask mask-star-2 mask-half-2"
-												/>
-												<input
-													type="radio"
-													name="rating-10"
-													class="bg-blue-500 mask mask-star-2 mask-half-1"
-												/>
-												<input
-													type="radio"
-													name="rating-10"
-													class="bg-blue-500 mask mask-star-2 mask-half-2"
-												/>
-											</div>
-										</div>
 									</div>
 								</div>
 							</div>
