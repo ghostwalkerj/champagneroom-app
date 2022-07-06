@@ -147,8 +147,8 @@
 									<LinkViewer {linkDocument} {talentDocument} />
 								{:else}
 									<div class="bg-primary text-primary-content card">
-										<div class="card-body items-center text-center">
-											<h2 class="card-title text-2xl">You Have No Outstanding pCall Links</h2>
+										<div class="text-center card-body items-center">
+											<h2 class="text-2xl card-title">You Have No Outstanding pCall Links</h2>
 										</div>
 									</div>
 								{/if}
@@ -259,6 +259,71 @@
 							</div>
 						</div>
 						<div>
+							<!-- Feedback -->
+							<div class="lg:col-start-3 lg:col-span-1">
+								<div class="bg-primary text-primary-content card">
+									<div class="text-center card-body items-center">
+										<h2 class="text-2xl card-title">Your Feedback Rating</h2>
+										<div class="bg-gradient-3 content">
+											<div class=" rating rating-lg rating-half">
+												<input
+													type="radio"
+													name="rating-10"
+													class="bg-blue-500 mask mask-star-2 mask-half-1"
+												/>
+												<input
+													type="radio"
+													name="rating-10"
+													class="bg-blue-500 mask mask-star-2 mask-half-2"
+												/>
+												<input
+													type="radio"
+													name="rating-10"
+													class="bg-blue-500 mask mask-star-2 mask-half-1"
+													checked
+												/>
+												<input
+													type="radio"
+													name="rating-10"
+													class="bg-blue-500 mask mask-star-2 mask-half-2"
+												/>
+												<input
+													type="radio"
+													name="rating-10"
+													class="bg-blue-500 mask mask-star-2 mask-half-1"
+												/>
+												<input
+													type="radio"
+													name="rating-10"
+													class="bg-blue-500 mask mask-star-2 mask-half-2"
+												/>
+												<input
+													type="radio"
+													name="rating-10"
+													class="bg-blue-500 mask mask-star-2 mask-half-1"
+												/>
+												<input
+													type="radio"
+													name="rating-10"
+													class="bg-blue-500 mask mask-star-2 mask-half-2"
+												/>
+												<input
+													type="radio"
+													name="rating-10"
+													class="bg-blue-500 mask mask-star-2 mask-half-1"
+												/>
+												<input
+													type="radio"
+													name="rating-10"
+													class="bg-blue-500 mask mask-star-2 mask-half-2"
+												/>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div>
 							<!-- Account -->
 							<div class="lg:col-start-3 lg:col-span-1">
 								<div class="bg-primary text-primary-content card">
@@ -296,7 +361,7 @@
 														<div class="flex space-x-5 relative">
 															<div>
 																<span
-																	class="rounded-full flex bg-green-500 h-8 ring-white ring-8 w-8 items-center justify-center"
+																	class="rounded-full flex bg-blue-500 h-8 ring-white ring-8 w-8 items-center justify-center"
 																>
 																	<!-- Heroicon name: solid/check -->
 																	<svg
@@ -378,7 +443,7 @@
 														<div class="flex space-x-5 relative">
 															<div>
 																<span
-																	class="rounded-full flex bg-green-500 h-8 ring-white ring-8 w-8 items-center justify-center"
+																	class="rounded-full flex bg-blue-500 h-8 ring-white ring-8 w-8 items-center justify-center"
 																>
 																	<!-- Heroicon name: solid/check -->
 																	<svg
@@ -418,7 +483,7 @@
 														<div class="flex space-x-5 relative">
 															<div>
 																<span
-																	class="rounded-full flex bg-green-500 h-8 ring-white ring-8 w-8 items-center justify-center"
+																	class="rounded-full flex bg-blue-500 h-8 ring-white ring-8 w-8 items-center justify-center"
 																>
 																	<!-- Heroicon name: solid/check -->
 																	<svg
@@ -458,7 +523,7 @@
 														<div class="flex space-x-5 relative">
 															<div>
 																<span
-																	class="rounded-full flex bg-green-500 h-8 ring-white ring-8 w-8 items-center justify-center"
+																	class="rounded-full flex bg-blue-500 h-8 ring-white ring-8 w-8 items-center justify-center"
 																>
 																	<!-- Heroicon name: solid/check -->
 																	<svg
@@ -498,7 +563,7 @@
 														<div class="flex space-x-5 relative">
 															<div>
 																<span
-																	class="rounded-full flex bg-green-500 h-8 ring-white ring-8 w-8 items-center justify-center"
+																	class="rounded-full flex bg-blue-500 h-8 ring-white ring-8 w-8 items-center justify-center"
 																>
 																	<!-- Heroicon name: solid/check -->
 																	<svg

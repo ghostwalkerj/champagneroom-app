@@ -2448,10 +2448,10 @@ custom-error-instance@2.1.1:
   resolved "https://registry.yarnpkg.com/custom-error-instance/-/custom-error-instance-2.1.1.tgz#3cf6391487a6629a6247eb0ca0ce00081b7e361a"
   integrity sha512-p6JFxJc3M4OTD2li2qaHkDCw9SfMw82Ldr6OC9Je1aXiGfhx2W8p3GaoeaGrPJTUN9NirTM/KTxHWMUdR1rsUg==
 
-daisyui@^2.17.0:
-  version "2.17.0"
-  resolved "https://registry.yarnpkg.com/daisyui/-/daisyui-2.17.0.tgz#4a1016cf5e0d32ee4dec1139f600b06bfd185ceb"
-  integrity sha512-U8eA8IvwH0JSi72WbRZdmJcYZek3ERMPFPAVFhnYc6dGnobeIHLGBz8J4q012I9YVDUqXFrWz13rpn+SBdn7qQ==
+daisyui@^2.18.0:
+  version "2.18.0"
+  resolved "https://registry.yarnpkg.com/daisyui/-/daisyui-2.18.0.tgz#02f5721520e1bee3071af05c9aad473f614a0047"
+  integrity sha512-PIS+byC2r90VZV/9RUD2E3BsyzE0cj4PmFTDQqGd+4+hnVP5OB3DnjPBhjhfJwySErzpz0ZVOGRi/X9rWRhP5A==
   dependencies:
     color "^4.2"
     css-selector-tokenizer "^0.8.0"
