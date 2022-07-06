@@ -14,6 +14,9 @@
 	import type { VideoCallType } from 'lib/videoCall';
 	import { onMount } from 'svelte';
 	import { PhoneIncomingIcon } from 'svelte-feather-icons';
+	import Image from 'svelte-image';
+	import { DEFAULT_PROFILE_IMAGE } from 'lib/constants';
+	import ProfilePhoto from 'components/forms/ProfilePhoto.svelte';
 
 	export let talentDocument: TalentDocument;
 	export let success: boolean;
@@ -134,8 +137,7 @@
 				>
 					<div class="space-y-6 lg:col-start-1 lg:col-span-2">
 						<!-- Current Link -->
-
-						<section aria-labelledby="link-information-tile">
+						<div>
 							<div>
 								{#if linkDocument}
 									<LinkViewer {linkDocument} {talentDocument} />
@@ -147,10 +149,10 @@
 									</div>
 								{/if}
 							</div>
-						</section>
+						</div>
 
 						<!-- Link Form-->
-						<section aria-labelledby="new-link-tile">
+						<div>
 							<div class="bg-primary text-primary-content card">
 								<div class="text-center card-body items-center">
 									<h2 class="text-2xl card-title">Request a New pCall</h2>
@@ -203,25 +205,24 @@
 									</div>
 								</div>
 							</div>
-						</section>
+						</div>
 
 						<!-- Camera  Preview -->
-						<section aria-labelledby="new-link-tile">
-							<div class="bg-primary text-primary-content card">
-								<div class="text-center card-body items-center">
-									<h2 class="text-2xl card-title">Your Video Preview</h2>
-									<div class="rounded-2xl">
-										<VideoPreview {us} />
-									</div>
+						<div class="bg-primary text-primary-content card">
+							<div class="text-center card-body items-center">
+								<h2 class="text-2xl card-title">Your Video Preview</h2>
+								<div class="rounded-2xl">
+									<VideoPreview {us} />
 								</div>
 							</div>
-						</section>
+						</div>
 					</div>
+
 					<!--Next Column-->
 					<div class="space-y-6 lg:col-start-3 lg:col-span-1">
 						<div>
 							<!-- Status -->
-							<section aria-labelledby="status-title" class="lg:col-start-3 lg:col-span-1">
+							<div class="lg:col-start-3 lg:col-span-1">
 								<div class="bg-primary text-primary-content card">
 									<div class="text-center card-body items-center">
 										<h2 class="text-2xl card-title">pCall Status</h2>
@@ -232,11 +233,29 @@
 										<p>Call Status: {callState}</p>
 									</div>
 								</div>
-							</section>
+							</div>
+						</div>
+						<div>
+							<!-- Photo -->
+							<div class="lg:col-start-3 lg:col-span-1">
+								<div class="bg-primary text-primary-content card">
+									<div class="text-center card-body items-center">
+										<h2 class="text-2xl card-title">Profile Photo</h2>
+										<div>
+											<ProfilePhoto
+												profileImage={talentDocument.profileImageUrl || DEFAULT_PROFILE_IMAGE}
+												callBack={(value) => {
+													talentDocument.profileImageUrl = value;
+												}}
+											/>
+										</div>
+									</div>
+								</div>
+							</div>
 						</div>
 						<div>
 							<!-- Account -->
-							<section aria-labelledby="account-title" class="lg:col-start-3 lg:col-span-1">
+							<div class="lg:col-start-3 lg:col-span-1">
 								<div class="bg-primary text-primary-content card">
 									<div class="text-center card-body items-center">
 										<h2 class="text-2xl card-title">Account</h2>
@@ -252,11 +271,11 @@
 										</div>
 									</div>
 								</div>
-							</section>
+							</div>
 						</div>
 						<div>
 							<!-- Activity Feed -->
-							<section aria-labelledby="activity-title" class="lg:col-start-3 lg:col-span-1">
+							<div class="lg:col-start-3 lg:col-span-1">
 								<div class="bg-primary text-primary-content card">
 									<div class="text-left card-body items-center">
 										<h2 class="text-2xl card-title">Activity</h2>
@@ -513,7 +532,7 @@
 										</div>
 									</div>
 								</div>
-							</section>
+							</div>
 						</div>
 					</div>
 				</div>
