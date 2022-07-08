@@ -1,6 +1,6 @@
 import validator from 'validator';
 import { z } from 'zod';
-import { createModelBase, type ModelBase as ModelBase } from './modelBase';
+import { createModelBase, type ModelBase } from './modelBase';
 
 export const AgentSchema = z.object({
 	address: z.string().refine((x) => {

@@ -8,6 +8,5 @@ declare namespace App {
 	//interface Session {
 	//}
 	interface Stuff {
-		dehydratedState: import('@sveltestack/svelte-query').DehydratedState;
 	}
 }

@@ -1,9 +1,9 @@
 import { PCALL_ROOM_URL } from 'lib/constants';
 import urlJoin from 'url-join';
+import { v4 as uuidv4 } from 'uuid';
 import validator from 'validator';
 import { z } from 'zod';
 import { createModelBase, type ModelBase } from './modelBase';
-import { v4 as uuidv4 } from 'uuid';
 export enum LinkStatus {
 	ACTIVE = 'ACTIVE',
 	EXPIRED = 'EXPIRED',

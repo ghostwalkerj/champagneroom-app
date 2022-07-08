@@ -10,6 +10,8 @@
 	import VideoCall from 'components/VideoCall.svelte';
 	import VideoPreview from 'components/VideoPreview.svelte';
 
+	import { createLink, LinkById, LinkSchema, LinkStatus, type Link } from 'db/models/link';
+	import { TalentByKey, type Talent } from 'db/models/talent';
 	import { createForm } from 'felte';
 	import { DEFAULT_PROFILE_IMAGE } from 'lib/constants';
 	import { userStream, type UserStreamType } from 'lib/userStream';
@@ -17,8 +19,6 @@
 	import { onMount } from 'svelte';
 	import { PhoneIncomingIcon } from 'svelte-feather-icons';
 	import StarRating from 'svelte-star-rating';
-	import { TalentByKey, type Talent } from 'db/models/talent';
-	import { createLink, LinkById, LinkSchema, LinkStatus, type Link } from 'db/models/link';
 
 	let key = $page.params.key;
 	let talentByKey = gun.get(TalentByKey);

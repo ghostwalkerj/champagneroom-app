@@ -1,18 +1,18 @@
 <script type="ts">
 	import { browser } from '$app/env';
+	import { page } from '$app/stores';
 	import VideoCall from 'components/VideoCall.svelte';
 	import VideoPreview from 'components/VideoPreview.svelte';
+	import { gun } from 'db';
 	import { LinkById, type Link } from 'db/models/link';
+	import { TalentById } from 'db/models/talent';
+	import { DEFAULT_PROFILE_IMAGE } from 'lib/constants';
 	import { userStream, type UserStreamType } from 'lib/userStream';
 	import type { VideoCallType } from 'lib/videoCall';
 	import { onMount } from 'svelte';
 	import FaMoneyBillWave from 'svelte-icons/fa/FaMoneyBillWave.svelte';
 	import Image from 'svelte-image';
 	import StarRating from 'svelte-star-rating';
-	import { page } from '$app/stores';
-	import { gun } from 'db';
-	import { TalentById } from 'db/models/talent';
-	import { DEFAULT_PROFILE_IMAGE } from 'lib/constants';
 
 	let talent = { name: '', profileImageUrl: '', feedBackAvg: '0' };
 	let link: Link;
@@ -26,7 +26,6 @@
 			talentById.get(link.talentId).on((_talent) => {
 				if (_talent) {
 					talent = _talent;
-					console.log(talent);
 				}
 			});
 		}
