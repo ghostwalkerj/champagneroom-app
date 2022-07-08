@@ -2,7 +2,7 @@ import { PCALL_ROOM_URL } from 'lib/constants';
 import urlJoin from 'url-join';
 import validator from 'validator';
 import { z } from 'zod';
-import { createDocumentBase, type DocumentBase } from './documentBase';
+import { createModelBase, type ModelBase } from './modelBase';
 
 export enum LinkStatus {
 	ACTIVE = 'ACTIVE',
@@ -36,15 +36,17 @@ export const LinkSchema = z.object({
 	feedBackAvg: z.number().min(1).max(5).optional()
 });
 
-export type Link = z.infer<typeof LinkSchema> & DocumentBase;
+export type LinkBase = z.infer<typeof LinkSchema>;
+export type Link = LinkBase & ModelBase;
 
 export const LinkType = 'link';
-export const createLink = (talentId: string, amount: string) => {
-	const base = createDocumentBase(LinkType);
+export const LinkById = LinkType;
+
+export const createLink = (_link: LinkBase) => {
+	const base = createModelBase(LinkType);
 	const link = {
 		...base,
-		talentId,
-		amount,
+		..._link,
 		status: LinkStatus.ACTIVE,
 		fundedAmount: '0'
 	};

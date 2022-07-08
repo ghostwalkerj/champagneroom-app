@@ -1,6 +1,6 @@
 import validator from 'validator';
 import { z } from 'zod';
-import { createDocumentBase, type DocumentBase as DocumentBase } from './documentBase';
+import { createModelBase, type ModelBase as ModelBase } from './modelBase';
 
 export const AgentSchema = z.object({
 	address: z.string().refine((x) => {
@@ -10,19 +10,21 @@ export const AgentSchema = z.object({
 		.string()
 		.refine((x) => validator.isEthereumAddress(x), { message: 'Invalid Wallet Address' })
 		.optional(),
-	talents: z.set(z.string(), z.any()).optional()
+	talents: z.set(z.any()).optional()
 });
 
-export type Agent = z.infer<typeof AgentSchema> & DocumentBase;
+export type AgentBase = z.infer<typeof AgentSchema>;
+export type Agent = AgentBase & ModelBase;
 export const AgentType = 'agent';
 
-export const createAgent = (address: string) => {
-	const base = createDocumentBase(AgentType);
+export const AgentById = AgentType;
+export const AgentByAddress = AgentType + 'byAddress';
+
+export const createAgent = (_agent: AgentBase) => {
+	const base = createModelBase(AgentType);
 	const agent = {
 		...base,
-		address,
-		walletAddress: address,
-		talents: {}
+		..._agent
 	};
 	return agent;
 };

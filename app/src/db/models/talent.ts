@@ -1,6 +1,6 @@
 import validator from 'validator';
 import { z } from 'zod';
-import { createDocumentBase, type DocumentBase } from './documentBase';
+import { createModelBase, type ModelBase } from './modelBase';
 
 export const TalentSchema = z.object({
 	agentId: z.string().min(21),
@@ -19,16 +19,17 @@ export const TalentSchema = z.object({
 	currentLink: z.any().optional()
 });
 
-export type Talent = z.infer<typeof TalentSchema> & DocumentBase;
+export type TalentBase = z.infer<typeof TalentSchema>;
+export type Talent = TalentBase & ModelBase;
 export const TalentType = 'talent';
+export const TalentById = TalentType;
+export const TalentByKey = TalentType + 'ByKey';
 
-export const createTalent = (agentId: string, name: string, key: string): Talent => {
-	const base = createDocumentBase(TalentType);
+export const createTalent = (_talent: TalentBase): Talent => {
+	const base = createModelBase(TalentType);
 	const talent = {
 		...base,
-		agentId,
-		name,
-		key
+		..._talent
 	};
 	return talent;
 };

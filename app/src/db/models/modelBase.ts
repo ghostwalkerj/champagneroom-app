@@ -2,7 +2,7 @@ import { nanoid } from 'nanoid';
 import validator from 'validator';
 import { z } from 'zod';
 
-export const DocumentBaseSchema = z.object({
+export const ModelBase = z.object({
 	_id: z.string().min(21),
 	createdAt: z
 		.string()
@@ -13,10 +13,10 @@ export const DocumentBaseSchema = z.object({
 	documentType: z.string().min(1)
 });
 
-export type DocumentBase = z.infer<typeof DocumentBaseSchema>;
+export type ModelBase = z.infer<typeof ModelBase>;
 
-export const createDocumentBase = (type: string): DocumentBase => {
-	const base: DocumentBase = {
+export const createModelBase = (type: string): ModelBase => {
+	const base: ModelBase = {
 		createdAt: new Date().toISOString(),
 		documentType: type,
 		_id: type + ':' + nanoid()

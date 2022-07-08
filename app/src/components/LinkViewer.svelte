@@ -1,19 +1,19 @@
 <script type="ts">
-	import { generateLinkURL, LinkDocument } from 'db/models/link';
-	import type { TalentDocument } from 'db/models/talent';
+	import { generateLinkURL, type Link } from 'db/models/link';
+	import type { Talent } from 'db/models/talent';
 	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';
-	export let linkDocument: LinkDocument;
-	export let talentDocument: TalentDocument;
+	export let link: Link;
+	export let talent: Talent;
 	let linkURL = '';
 
-	linkURL = generateLinkURL(linkDocument);
+	linkURL = generateLinkURL(link);
 
 	const copyLink = () => {
 		navigator.clipboard.writeText(linkURL);
 	};
 </script>
 
-{#if talentDocument && linkDocument}
+{#if talent && link}
 	<div class="bg-primary text-primary-content card">
 		<div class="card-body items-center text-center">
 			{#if linkURL.length > 0}
@@ -22,11 +22,11 @@
 				<div class="container mx-auto p-6 grid grid-row-2 gap-4">
 					<div class="bg-info text-accent-content rounded-box items-center p-4 shadow-xl ">
 						<div class="stat-title">Name Shown</div>
-						<div class="stat-value">{talentDocument.name}</div>
+						<div class="stat-value">{talent.name}</div>
 					</div>
 					<div class="bg-info text-accent-content rounded-box items-center p-4 shadow-xl">
 						<div class="stat-title">Amount Requested</div>
-						<div class="stat-value">${linkDocument.amount} USD</div>
+						<div class="stat-value">${link.amount} USD</div>
 					</div>
 				</div>
 

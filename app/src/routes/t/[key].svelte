@@ -1,16 +1,15 @@
 <script type="ts">
 	import { browser } from '$app/env';
+	import { page } from '$app/stores';
+	import { gun } from 'db';
+
 	import { reporter, ValidationMessage } from '@felte/reporter-svelte';
 	import { validator } from '@felte/validator-zod';
-	import { useQueryClient } from '@sveltestack/svelte-query';
 	import ProfilePhoto from 'components/forms/ProfilePhoto.svelte';
 	import LinkViewer from 'components/LinkViewer.svelte';
 	import VideoCall from 'components/VideoCall.svelte';
 	import VideoPreview from 'components/VideoPreview.svelte';
-	import { LinkDocument, LinkSchema } from 'db/models/link';
-	import type { TalentDocument } from 'db/models/talent';
-	import { getLinkQueryByTalentId } from 'db/queries/linkQueries';
-	import { updateTalent } from 'db/queries/talentQueries';
+
 	import { createForm } from 'felte';
 	import { DEFAULT_PROFILE_IMAGE } from 'lib/constants';
 	import { userStream, type UserStreamType } from 'lib/userStream';
@@ -18,9 +17,23 @@
 	import { onMount } from 'svelte';
 	import { PhoneIncomingIcon } from 'svelte-feather-icons';
 	import StarRating from 'svelte-star-rating';
+	import { TalentByKey, type Talent } from 'db/models/talent';
+	import { createLink, LinkById, LinkSchema, LinkStatus, type Link } from 'db/models/link';
 
-	export let talentDocument: TalentDocument;
-	export let success: boolean;
+	let key = $page.params.key;
+	let talentByKey = gun.get(TalentByKey);
+	let linkById = gun.get(LinkById);
+	let talent: Talent;
+	let currentLink: Link;
+	talentByKey.get(key).on((_talent) => {
+		if (_talent) {
+			talent = _talent;
+			if (talent.currentLink) {
+				currentLink = talent.currentLink;
+			}
+		}
+	});
+
 	let vc: VideoCallType;
 	if (browser) {
 		import('lib/videoCall').then((_vc) => {
@@ -28,18 +41,17 @@
 			initVC();
 		});
 	}
-	const queryClient = useQueryClient();
 	const formatter = new Intl.NumberFormat('en-US', {
 		style: 'currency',
 		currency: 'USD',
 		maximumFractionDigits: 0
 	});
 
-	const update = async (talent: TalentDocument) => {
-		updateTalent(talent);
+	const updateProfileImage = async (_talent: Talent) => {
+		talentByKey.get(key).get('profileImageUrl').put(_talent.profileImageUrl);
 	};
 
-	const { form: linkForm, reset: linkFormReset } = createForm({
+	const { form: form, reset: reset } = createForm({
 		extend: [
 			reporter,
 			validator({
@@ -49,20 +61,27 @@
 		async onSuccess(response: any) {
 			const body: {
 				success: boolean;
-				linkDocument: LinkDocument;
 			} = await response.json();
 			if (body.success) {
-				queryClient.setQueryData(['linkDocument', talentDocument._id], body);
 				initVC();
 			}
-			linkFormReset();
+			reset();
 		},
 		onError(err: any) {
 			console.log(err);
+		},
+		onSubmit(values) {
+			const link = createLink(values as Link);
+			linkById.get(link._id).put(link);
+			if (currentLink) {
+				currentLink.status = LinkStatus.EXPIRED;
+				linkById.get(currentLink._id).put(currentLink);
+			}
+			talentByKey.get(key).get('currentLink').put(link);
+			reset();
 		}
 	});
 
-	let linkDocument: LinkDocument;
 	let us: Awaited<UserStreamType>;
 	$: callState = 'disconnected';
 	let videoCall;
@@ -75,14 +94,9 @@
 	};
 
 	$: callerName = '';
-	const linkQueryResult = getLinkQueryByTalentId(talentDocument._id);
-
-	$: if ($linkQueryResult.isSuccess) {
-		linkDocument = $linkQueryResult.data.linkDocument;
-	}
 
 	const initVC = () => {
-		const callId = linkDocument ? linkDocument.callId : null;
+		const callId = currentLink ? currentLink.callId : null;
 		vc = videoCall(callId);
 		vc.callState.subscribe((cs) => {
 			if (cs) callState = cs;
@@ -100,7 +114,7 @@
 	});
 </script>
 
-{#if success}
+{#if talent}
 	<!-- Put this part before </body> tag -->
 	<input type="checkbox" id="call-modal" class="modal-toggle" bind:checked={showAlert} />
 	<div class="modal">
@@ -144,8 +158,8 @@
 						<!-- Current Link -->
 						<div>
 							<div>
-								{#if linkDocument}
-									<LinkViewer {linkDocument} {talentDocument} />
+								{#if currentLink}
+									<LinkViewer link={currentLink} {talent} />
 								{:else}
 									<div class="bg-primary text-primary-content card">
 										<div class="text-center card-body items-center">
@@ -163,14 +177,8 @@
 									<h2 class="text-2xl card-title">Request a New pCall</h2>
 
 									<div class="flex flex-col text-white p-2 justify-center items-center">
-										<form use:linkForm method="post">
-											<!-- TODO: Change this to programatic  -->
-											<input
-												type="hidden"
-												name="talentId"
-												id="talentId"
-												value={talentDocument._id}
-											/>
+										<form use:form method="post">
+											<input type="hidden" name="talentId" id="talentId" value={talent._id} />
 
 											<div class="max-w-xs w-full py-2 form-control ">
 												<!-- svelte-ignore a11y-label-has-associated-control -->
@@ -231,9 +239,9 @@
 								<div class="bg-primary text-primary-content card">
 									<div class="text-center card-body items-center">
 										<h2 class="text-2xl card-title">pCall Status</h2>
-										<p>Signed in as {talentDocument.name}</p>
-										{#if linkDocument}
-											<p>CallId: {linkDocument.callId}</p>
+										<p>Signed in as {talent.name}</p>
+										{#if currentLink}
+											<p>CallId: {currentLink.callId}</p>
 										{/if}
 										<p>Call Status: {callState}</p>
 									</div>
@@ -248,10 +256,10 @@
 										<h2 class="text-2xl card-title">Profile Photo</h2>
 										<div>
 											<ProfilePhoto
-												profileImage={talentDocument.profileImageUrl || DEFAULT_PROFILE_IMAGE}
+												profileImage={talent.profileImageUrl || DEFAULT_PROFILE_IMAGE}
 												callBack={(value) => {
-													talentDocument.profileImageUrl = value;
-													update(talentDocument);
+													talent.profileImageUrl = value;
+													updateProfileImage(talent);
 												}}
 											/>
 										</div>
@@ -265,7 +273,7 @@
 								<div class="bg-primary text-primary-content card">
 									<div class="text-center card-body items-center">
 										<h2 class="text-2xl card-title">Your Feedback Rating</h2>
-										<StarRating rating={talentDocument.feedBackAvg || 0} />
+										<StarRating rating={talent.feedBackAvg || 0} />
 									</div>
 								</div>
 							</div>
