@@ -1,5 +1,4 @@
 import Gun from 'gun';
+import { GUNDB_PEER } from 'lib/constants';
 
-export const gun = Gun({
-	peers: ['http://localhost:8080/gun'] // Put the relay node that you want here
-});
+export const gun = Gun({ radisk: false, localStorage: true });

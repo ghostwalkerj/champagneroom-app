@@ -11,7 +11,6 @@
 		type Talent
 	} from 'db/models/talent';
 	import { createForm } from 'felte';
-	import 'gun/lib/not.js';
 	import { PCALL_TALENT_URL } from 'lib/constants';
 	import { nanoid } from 'nanoid';
 	import { selectedAccount } from 'svelte-web3';
@@ -55,9 +54,9 @@
 			agentByAddress
 				.get(account, (ack) => {
 					if (!ack.put) {
-						const _agent = createAgent({ address: account });
-						agentByAddress.get(account).put(_agent);
-						agentById.get(agent._id).put(_agent);
+						agent = createAgent({ address: account });
+						agentByAddress.get(account).put(agent);
+						agentById.get(agent._id).put(agent);
 						console.log('Created New Agent');
 					}
 				})
@@ -69,7 +68,6 @@
 						.get(account)
 						.get('talents')
 						.map((talent) => {
-							console.log('added talent', talent);
 							talents.push(talent);
 						});
 				});
@@ -167,4 +165,6 @@
 			</div>
 		</main>
 	</div>
+{:else}
+	Can't create agent
 {/if}

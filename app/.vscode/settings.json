@@ -21,5 +21,6 @@
     "windi.config.cjs": true,
     "yarn-error.log": true,
     "static": true
-  }
+  },
+  "workspace.isHidden": true
 }
