@@ -26,6 +26,14 @@ const config = {
 	optimizeDeps: {
 		include: ['gun',
 			'gun/gun',
+			'gun/sea',
+			'gun/sea.js',
+			'gun/lib/then',
+			'gun/lib/webrtc',
+			'gun/lib/radix',
+			'gun/lib/radisk',
+			'gun/lib/store',
+			'gun/lib/rindexed',
 			'gun/lib/unset.js',
 			'gun/lib/not.js'
 		]

@@ -8,7 +8,6 @@
 		TalentById,
 		TalentByKey,
 		TalentSchema,
-		TalentType,
 		type Talent
 	} from 'db/models/talent';
 	import { createForm } from 'felte';

@@ -28,8 +28,12 @@
 	talentByKey.get(key).on((_talent) => {
 		if (_talent) {
 			talent = _talent;
-			if (talent.currentLink) {
-				currentLink = talent.currentLink;
+			if (talent.currentLinkId) {
+				linkById.get(talent.currentLinkId).on((_link) => {
+					if (_link) {
+						currentLink = _link;
+					}
+				});
 			}
 		}
 	});
@@ -59,12 +63,7 @@
 			})
 		],
 		async onSuccess(response: any) {
-			const body: {
-				success: boolean;
-			} = await response.json();
-			if (body.success) {
-				initVC();
-			}
+			initVC();
 			reset();
 		},
 		onError(err: any) {
@@ -72,13 +71,11 @@
 		},
 		onSubmit(values) {
 			const link = createLink(values as Link);
-			linkById.get(link._id).put(link);
 			if (currentLink) {
-				currentLink.status = LinkStatus.EXPIRED;
-				linkById.get(currentLink._id).put(currentLink);
+				linkById.get(currentLink._id).get('status').put(LinkStatus.EXPIRED);
 			}
-			talentByKey.get(key).get('currentLink').put(link);
-			reset();
+			linkById.get(link._id).put(link);
+			talentByKey.get(key).get('currentLinkId').put(link._id);
 		}
 	});
 

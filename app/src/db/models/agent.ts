@@ -17,8 +17,8 @@ export type AgentBase = z.infer<typeof AgentSchema>;
 export type Agent = AgentBase & ModelBase;
 export const AgentType = 'agent';
 
-export const AgentById = AgentType;
-export const AgentByAddress = AgentType + 'byAddress';
+export const AgentById = AgentType + 'ById';
+export const AgentByAddress = AgentType + 'ByAddress';
 
 export const createAgent = (_agent: AgentBase) => {
 	const base = createModelBase(AgentType);

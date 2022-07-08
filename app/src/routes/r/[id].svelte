@@ -2,14 +2,35 @@
 	import { browser } from '$app/env';
 	import VideoCall from 'components/VideoCall.svelte';
 	import VideoPreview from 'components/VideoPreview.svelte';
+	import { LinkById, type Link } from 'db/models/link';
 	import { userStream, type UserStreamType } from 'lib/userStream';
 	import type { VideoCallType } from 'lib/videoCall';
 	import { onMount } from 'svelte';
 	import FaMoneyBillWave from 'svelte-icons/fa/FaMoneyBillWave.svelte';
 	import Image from 'svelte-image';
 	import StarRating from 'svelte-star-rating';
+	import { page } from '$app/stores';
+	import { gun } from 'db';
+	import { TalentById } from 'db/models/talent';
+	import { DEFAULT_PROFILE_IMAGE } from 'lib/constants';
 
-	let talent = linkDocument.talent || { name: '', profileImageUrl: '', feedBackAvg: '0' };
+	let talent = { name: '', profileImageUrl: '', feedBackAvg: '0' };
+	let link: Link;
+	let id = $page.params.id;
+	let linkById = gun.get(LinkById);
+	let talentById = gun.get(TalentById);
+
+	linkById.get(id).on((_link) => {
+		if (_link) {
+			link = _link;
+			talentById.get(link.talentId).on((_talent) => {
+				if (_talent) {
+					talent = _talent;
+					console.log(talent);
+				}
+			});
+		}
+	});
 
 	const formatter = new Intl.NumberFormat('en-US', {
 		style: 'currency',
@@ -42,7 +63,7 @@
 
 	const call = async () => {
 		if (vc) {
-			vc.makeCall(linkDocument.callId, 'Dr. Huge Mongus', mediaStream);
+			//vc.makeCall(linkDocument.callId, 'Dr. Huge Mongus', mediaStream);
 		}
 	};
 	$: inCall = callState == 'connectedAsCaller';
@@ -50,7 +71,7 @@
 
 <div class="min-h-full">
 	<main class="py-6">
-		{#if success}
+		{#if talent}
 			{#if !inCall}
 				<!-- Page header -->
 				<div
@@ -70,7 +91,7 @@
 									</div>
 									<div class="rounded-full flex-none h-48 w-48 mask-circle">
 										<Image
-											src={talent.profileImageUrl}
+											src={talent.profileImageUrl || DEFAULT_PROFILE_IMAGE}
 											alt={talent.name}
 											height="48"
 											width="48"
@@ -86,7 +107,7 @@
 											</div>
 											<div class="stat-title">Requested</div>
 											<div class="text-primary stat-value">
-												{formatter.format(Number.parseInt(linkDocument.amount))}
+												{formatter.format(Number.parseInt(link.amount))}
 											</div>
 										</div>
 
@@ -96,7 +117,7 @@
 											</div>
 											<div class="stat-title">Funded</div>
 											<div class="text-secondary stat-value">
-												{formatter.format(Number.parseInt(linkDocument.fundedAmount))}
+												{formatter.format(Number.parseInt(link.fundedAmount || '0'))}
 											</div>
 										</div>
 									</div>
@@ -104,7 +125,7 @@
 										class="flex flex-col bg-base-100 rounded-2xl flex-shrink-0 text-white text-center p-4 gap-4 items-center justify-center  md:gap-8 "
 									>
 										<div>Funding Address</div>
-										<div class="break-all">{linkDocument.walletAddress}</div>
+										<div class="break-all">{link.walletAddress}</div>
 									</section>
 
 									<div class="btn-group">

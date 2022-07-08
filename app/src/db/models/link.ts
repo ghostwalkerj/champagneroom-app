@@ -3,7 +3,7 @@ import urlJoin from 'url-join';
 import validator from 'validator';
 import { z } from 'zod';
 import { createModelBase, type ModelBase } from './modelBase';
-
+import { v4 as uuidv4 } from 'uuid';
 export enum LinkStatus {
 	ACTIVE = 'ACTIVE',
 	EXPIRED = 'EXPIRED',
@@ -40,7 +40,7 @@ export type LinkBase = z.infer<typeof LinkSchema>;
 export type Link = LinkBase & ModelBase;
 
 export const LinkType = 'link';
-export const LinkById = LinkType;
+export const LinkById = LinkType + 'ById';
 
 export const createLink = (_link: LinkBase) => {
 	const base = createModelBase(LinkType);
@@ -48,12 +48,19 @@ export const createLink = (_link: LinkBase) => {
 		...base,
 		..._link,
 		status: LinkStatus.ACTIVE,
-		fundedAmount: '0'
+		fundedAmount: '0',
+		walletAddress: '0x251281e1516e6E0A145d28a41EE63BfcDd9E18Bf', //TODO: make real wallet
+		callId: uuidv4()
 	};
 	return link;
 };
 
-export const generateLinkURL = (linkDocument: Link): string => {
-	const url = urlJoin(PCALL_ROOM_URL, linkDocument._id);
-	return url;
+export const generateLinkURL = (link: Link): string => {
+	if (link && link._id) {
+		const url = urlJoin(PCALL_ROOM_URL, link._id);
+		return url;
+	} else {
+		console.log("Can't generate link url, link is missing id", link);
+		return '';
+	}
 };

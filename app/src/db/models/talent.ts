@@ -16,20 +16,21 @@ export const TalentSchema = z.object({
 		.optional(),
 	feedBackAvg: z.number().min(0).max(5).optional(),
 	agentCommission: z.number().min(0).max(100).int().optional(),
-	currentLink: z.any().optional()
+	currentLinkId: z.string().optional()
 });
 
 export type TalentBase = z.infer<typeof TalentSchema>;
 export type Talent = TalentBase & ModelBase;
 export const TalentType = 'talent';
-export const TalentById = TalentType;
+export const TalentById = TalentType + 'ById';
 export const TalentByKey = TalentType + 'ByKey';
 
 export const createTalent = (_talent: TalentBase): Talent => {
 	const base = createModelBase(TalentType);
 	const talent = {
 		...base,
-		..._talent
+		..._talent,
+		feedBackAvg: 0
 	};
 	return talent;
 };
