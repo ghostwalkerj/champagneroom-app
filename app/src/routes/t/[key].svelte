@@ -3,20 +3,20 @@
 	import { reporter, ValidationMessage } from '@felte/reporter-svelte';
 	import { validator } from '@felte/validator-zod';
 	import { useQueryClient } from '@sveltestack/svelte-query';
+	import ProfilePhoto from 'components/forms/ProfilePhoto.svelte';
 	import LinkViewer from 'components/LinkViewer.svelte';
 	import VideoCall from 'components/VideoCall.svelte';
 	import VideoPreview from 'components/VideoPreview.svelte';
-	import type { TalentDocument } from 'db/models/talent';
 	import { LinkDocument, LinkSchema } from 'db/models/link';
+	import type { TalentDocument } from 'db/models/talent';
 	import { getLinkQueryByTalentId } from 'db/queries/linkQueries';
+	import { updateTalent } from 'db/queries/talentQueries';
 	import { createForm } from 'felte';
+	import { DEFAULT_PROFILE_IMAGE } from 'lib/constants';
 	import { userStream, type UserStreamType } from 'lib/userStream';
 	import type { VideoCallType } from 'lib/videoCall';
 	import { onMount } from 'svelte';
 	import { PhoneIncomingIcon } from 'svelte-feather-icons';
-	import { DEFAULT_PROFILE_IMAGE } from 'lib/constants';
-	import ProfilePhoto from 'components/forms/ProfilePhoto.svelte';
-	import { updateTalent } from 'db/queries/talentQueries';
 	import StarRating from 'svelte-star-rating';
 
 	export let talentDocument: TalentDocument;

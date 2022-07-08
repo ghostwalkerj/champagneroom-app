@@ -1,16 +1,12 @@
 <script lang="ts">
-	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
 	import ConnectButton from 'components/web3/ConnectButton.svelte';
 	import { selectedAccount } from 'svelte-web3';
-	const queryClient = new QueryClient();
 </script>
 
 {#if $selectedAccount}
-	<QueryClientProvider client={queryClient}>
-		<div class="h-full">
-			<slot />
-		</div>
-	</QueryClientProvider>
+	<div class="h-full">
+		<slot />
+	</div>
 {:else}
 	<div class="min-h-screen-md bg-base-100 hero">
 		<div class="text-center hero-content">

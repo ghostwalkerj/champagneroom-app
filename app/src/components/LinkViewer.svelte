@@ -1,6 +1,6 @@
 <script type="ts">
-	import type { TalentDocument } from 'db/models/talent';
 	import { generateLinkURL, LinkDocument } from 'db/models/link';
+	import type { TalentDocument } from 'db/models/talent';
 	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';
 	export let linkDocument: LinkDocument;
 	export let talentDocument: TalentDocument;

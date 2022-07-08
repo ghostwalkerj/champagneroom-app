@@ -23,14 +23,13 @@ const config = {
 	},
 	mode: 'development',
 	plugins: [sveltekit(), WindiCSS()],
-	// optimizeDeps: {
-	// 	esbuildOptions: {
-	// 		// Node.js global to browser globalThis
-	// 		define: {
-	// 			global: "globalThis",
-	// 		},
-	// 	}
-	// }
+	optimizeDeps: {
+		include: ['gun',
+			'gun/gun',
+			'gun/lib/unset.js',
+			'gun/lib/not.js'
+		]
+	}
 };
 
 export default config;

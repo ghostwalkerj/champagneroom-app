@@ -1,20 +1,17 @@
 <script type="ts">
 	import { reporter, ValidationMessage } from '@felte/reporter-svelte';
 	import { validator } from '@felte/validator-zod';
-	import { useQueryClient } from '@sveltestack/svelte-query';
-	import type { AgentDocument } from 'db/models/agent';
-	import { TalentSchema, type TalentDocument } from 'db/models/talent';
-	import { getOrCreateAgentByAddress } from 'db/queries/agentQueries';
+	import { gun } from 'db';
+	import { AgentType, createAgent, type Agent } from 'db/models/agent';
+	import { TalentSchema, type Talent } from 'db/models/talent';
 	import { createForm } from 'felte';
+	import 'gun/lib/not.js';
 	import { PCALL_TALENT_URL } from 'lib/constants';
 	import { nanoid } from 'nanoid';
 	import { selectedAccount } from 'svelte-web3';
 	import urlJoin from 'url-join';
 
-	export const prerender = false; // because depends if we have a valid agent
-
-	const queryClient = useQueryClient();
-	const { form, setFields, reset } = createForm({
+	const { form, reset } = createForm({
 		extend: [
 			reporter,
 			validator({
@@ -25,46 +22,34 @@
 			...values,
 			agentCommission: parseInt(values.agentCommission, 10)
 		}),
-		async onSuccess(response: any) {
-			const body: {
-				success: boolean;
-				talentDocument: TalentDocument;
-			} = await response.json();
-			if (body.success) {
-				if (agent) {
-					agent.talents!.push(body.talentDocument);
-				}
-				queryClient.invalidateQueries(['agent', address]);
-			}
-			reset();
-		},
 		onerror(err: any) {
 			console.log(err);
+		},
+		onSubmit(values, context) {
+			reset();
 		}
 	});
 
-	let address = '';
+	let agentRef = gun.get(AgentType);
+	let agent;
+	let talents: Record<string, Talent> = {};
+
 	selectedAccount.subscribe((account) => {
 		if (account) {
-			address = account;
+			agentRef
+				.get(account, (ack) => {
+					if (!ack.put) {
+						agentRef.get(account).put(createAgent(account));
+						console.log('Created New Agent');
+					}
+				})
+				.on((_agent: Agent) => {
+					agent = _agent;
+				});
 		}
 	});
 
-	let agentQueryResult;
-	let agent: AgentDocument;
 	$: talentkey = nanoid();
-	$: if (address) {
-		agentQueryResult = getOrCreateAgentByAddress(address);
-	}
-	let talents: TalentDocument[] = [];
-	$: if (agentQueryResult && $agentQueryResult.isSuccess) {
-		agent = $agentQueryResult.data.agent;
-		if (agent) {
-			setFields('agentId', agent._id);
-			setFields('talentKey', talentkey);
-			talents = agent.talents || [];
-		}
-	}
 
 	$: talentUrl = urlJoin(PCALL_TALENT_URL, talentkey);
 </script>
@@ -144,11 +129,11 @@
 				</div>
 
 				<div>
-					{#each talents as talent, i}
+					<!-- {#each talents as talent, i}
 						<li>
 							{i + 1}: <a href="/t/{talent.talentKey}">{talent.name}</a>
 						</li>
-					{/each}
+					{/each} -->
 				</div>
 			</div>
 		</div>

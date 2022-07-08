@@ -6,7 +6,6 @@ export const DocumentBaseSchema = z.object({
 	_id: z.string().min(21),
 	createdAt: z
 		.string()
-		.optional()
 		.default(new Date().toISOString())
 		.refine((x) => {
 			return validator.isDate(x);
@@ -14,16 +13,13 @@ export const DocumentBaseSchema = z.object({
 	documentType: z.string().min(1)
 });
 
-export type DocumentBaseType = z.infer<typeof DocumentBaseSchema>;
+export type DocumentBase = z.infer<typeof DocumentBaseSchema>;
 
-export abstract class DocumentBase implements DocumentBaseType {
-	public createdAt: string;
-	public _id: string;
-	public documentType: string;
-
-	constructor(documentType: string) {
-		this.createdAt = new Date().toISOString();
-		this.documentType = documentType;
-		this._id = documentType + ':' + nanoid();
-	}
-}
+export const createDocumentBase = (type: string): DocumentBase => {
+	const base: DocumentBase = {
+		createdAt: new Date().toISOString(),
+		documentType: type,
+		_id: type + ':' + nanoid()
+	};
+	return base;
+};

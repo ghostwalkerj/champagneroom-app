@@ -1,10 +1,8 @@
 import { PCALL_ROOM_URL } from 'lib/constants';
 import urlJoin from 'url-join';
-import { v4 as uuidv4 } from 'uuid';
 import validator from 'validator';
 import { z } from 'zod';
-import type { TalentDocument } from './talent';
-import { DocumentBase } from './documentBase';
+import { createDocumentBase, type DocumentBase } from './documentBase';
 
 export enum LinkStatus {
 	ACTIVE = 'ACTIVE',
@@ -38,30 +36,22 @@ export const LinkSchema = z.object({
 	feedBackAvg: z.number().min(1).max(5).optional()
 });
 
-export type LinkType = z.infer<typeof LinkSchema>;
+export type Link = z.infer<typeof LinkSchema> & DocumentBase;
 
-export class LinkDocument extends DocumentBase implements LinkType {
-	public status = LinkStatus.ACTIVE;
-	public callId: string;
-	public talentId: string;
-	public walletAddress?: string;
-	public amount: string;
-	public fundedAmount: string;
-	public callStart?: string;
-	public callEnd?: string;
-	public feedBackAvg?: number;
-	public talent?: TalentDocument;
-	public static type = 'link';
-	constructor(talentId: string, walletAddress: string, amount: string) {
-		super(LinkDocument.type);
-		this.talentId = talentId;
-		this.walletAddress = walletAddress;
-		this.amount = amount;
-		this.fundedAmount = '0';
-		this.callId = uuidv4();
-	}
-}
-export const generateLinkURL = (linkDocument: LinkDocument): string => {
+export const LinkType = 'link';
+export const createLink = (talentId: string, amount: string) => {
+	const base = createDocumentBase(LinkType);
+	const link = {
+		...base,
+		talentId,
+		amount,
+		status: LinkStatus.ACTIVE,
+		fundedAmount: '0'
+	};
+	return link;
+};
+
+export const generateLinkURL = (linkDocument: Link): string => {
 	const url = urlJoin(PCALL_ROOM_URL, linkDocument._id);
 	return url;
 };
