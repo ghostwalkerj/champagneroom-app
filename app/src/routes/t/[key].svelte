@@ -21,11 +21,12 @@
 	import StarRating from 'svelte-star-rating';
 
 	let key = $page.params.key;
-	let talentByKey = gun.get(TalentByKey);
 	let linkById = gun.get(LinkById);
 	let talent: Talent;
 	let currentLink: Link;
-	talentByKey.get(key).on((_talent) => {
+	let telentRef = gun.get(TalentByKey).get(key);
+
+	telentRef.on((_talent) => {
 		if (_talent) {
 			talent = _talent;
 			if (talent.currentLinkId) {
@@ -52,7 +53,7 @@
 	});
 
 	const updateProfileImage = async (_talent: Talent) => {
-		talentByKey.get(key).get('profileImageUrl').put(_talent.profileImageUrl);
+		telentRef.get('profileImageUrl').put(_talent.profileImageUrl);
 	};
 
 	const { form: form, reset: reset } = createForm({
@@ -74,8 +75,9 @@
 			if (currentLink) {
 				linkById.get(currentLink._id).get('status').put(LinkStatus.EXPIRED);
 			}
-			linkById.get(link._id).put(link);
-			talentByKey.get(key).get('currentLinkId').put(link._id);
+			const linkref = linkById.get(link._id).put(link);
+
+			telentRef.get('currentLinkId').put(link._id);
 		}
 	});
 

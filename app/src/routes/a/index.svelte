@@ -11,6 +11,7 @@
 		type Talent
 	} from 'db/models/talent';
 	import { createForm } from 'felte';
+	import type { IGunChain, IGunInstance } from 'gun';
 	import { PCALL_TALENT_URL } from 'lib/constants';
 	import { nanoid } from 'nanoid';
 	import { selectedAccount } from 'svelte-web3';
@@ -32,9 +33,9 @@
 		},
 		onSubmit(values) {
 			const talent = createTalent(values as Talent);
-			agentByAddress.get(agent.address).get('talents').set(talent); // save talent to agent
-			talentById.get(talent._id).put(talent).get('agent').put(agent); // save talent by Id
-			talentByKey.get(talent.key).put(talent); // save talent by key
+			const talentRef = talentById.get(talent._id).put(talent);
+			talentByKey.get(talent.key).put(talentRef); // save talent by key
+			agentRef.get('talents').set(talent); // save talent to agent
 			reset();
 		}
 	});
@@ -43,6 +44,12 @@
 	let agentById = gun.get(AgentById);
 	let talentById = gun.get(TalentById);
 	let talentByKey = gun.get(TalentByKey);
+	let agentRef: IGunChain<
+		any,
+		IGunChain<any, IGunInstance<any>, IGunInstance<any>, string>,
+		IGunInstance<any>,
+		string
+	>;
 
 	let agent: Agent;
 	let talents: Talent[] = [];
@@ -51,25 +58,25 @@
 
 	selectedAccount.subscribe((account) => {
 		if (account) {
-			agentByAddress
-				.get(account, (ack) => {
-					if (!ack.put) {
-						agent = createAgent({ address: account });
-						agentByAddress.get(account).put(agent);
-						agentById.get(agent._id).put(agent);
-						console.log('Created New Agent');
-					}
-				})
-				.on((_agent: Agent) => {
-					agent = _agent;
-					talents = [];
-					console.log('Got Agent', agent);
-					agentByAddress
-						.get(account)
-						.get('talents')
-						.map((talent) => {
-							talents.push(talent);
-						});
+			agentRef = agentByAddress.get(account, (ack) => {
+				if (!ack.put) {
+					agent = createAgent({ address: account });
+					const agentRef = agentByAddress.get(account).put(agent);
+					agentById.get(agent._id).put(agentRef);
+					console.log('Created New Agent');
+				}
+			});
+
+			agentRef.on((_agent: Agent) => {
+				agent = _agent;
+			});
+
+			talents = [];
+			agentRef
+				.get('talents')
+				.map()
+				.on((_talent: any) => {
+					talents.push(_talent);
 				});
 		}
 	});

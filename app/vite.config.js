@@ -11,7 +11,6 @@ const config = {
 			origin: "*",
 			methods: "GET,HEAD,PUT,PATCH,POST,DELETE"
 		},
-		https: true
 	},
 	resolve: {
 		alias: {

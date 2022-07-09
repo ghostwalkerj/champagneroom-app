@@ -1,6 +1,7 @@
 import validator from 'validator';
 import { z } from 'zod';
 import { createModelBase, type ModelBase } from './modelBase';
+import { DEFAULT_PROFILE_IMAGE } from '../../lib/constants';
 
 export const TalentSchema = z.object({
 	agentId: z.string().min(21),
@@ -30,7 +31,9 @@ export const createTalent = (_talent: TalentBase): Talent => {
 	const talent = {
 		...base,
 		..._talent,
-		feedBackAvg: 0
+		feedBackAvg: 0,
+		agentCommission: 0,
+		profileImageUrl: DEFAULT_PROFILE_IMAGE
 	};
 	return talent;
 };

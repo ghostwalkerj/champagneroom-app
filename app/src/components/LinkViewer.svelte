@@ -6,7 +6,7 @@
 	export let talent: Talent;
 	let linkURL = '';
 
-	linkURL = generateLinkURL(link);
+	$: linkURL = generateLinkURL(link);
 
 	const copyLink = () => {
 		navigator.clipboard.writeText(linkURL);
@@ -15,24 +15,24 @@
 
 {#if talent && link}
 	<div class="bg-primary text-primary-content card">
-		<div class="card-body items-center text-center">
+		<div class="text-center card-body items-center">
 			{#if linkURL.length > 0}
-				<h2 class="card-title text-2xl">Your Outstanding pCall Link</h2>
+				<h2 class="text-2xl card-title">Your Outstanding pCall Link</h2>
 
-				<div class="container mx-auto p-6 grid grid-row-2 gap-4">
-					<div class="bg-info text-accent-content rounded-box items-center p-4 shadow-xl ">
+				<div class="container mx-auto grid p-6 gap-4 grid-row-2">
+					<div class="bg-info rounded-box shadow-xl text-accent-content p-4 items-center ">
 						<div class="stat-title">Name Shown</div>
 						<div class="stat-value">{talent.name}</div>
 					</div>
-					<div class="bg-info text-accent-content rounded-box items-center p-4 shadow-xl">
+					<div class="bg-info rounded-box shadow-xl text-accent-content p-4 items-center">
 						<div class="stat-title">Amount Requested</div>
 						<div class="stat-value">${link.amount} USD</div>
 					</div>
 				</div>
 
-				<div class="card-title text-md">URL</div>
+				<div class="text-md card-title">URL</div>
 
-				<div class="bg-info text-accent-content rounded-box items-center p-4 shadow-xl ">
+				<div class="bg-info rounded-box shadow-xl text-accent-content p-4 items-center ">
 					{linkURL}
 				</div>
 				<div class="pt-4 card-actions justify-end">

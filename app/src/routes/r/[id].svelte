@@ -5,7 +5,7 @@
 	import VideoPreview from 'components/VideoPreview.svelte';
 	import { gun } from 'db';
 	import { LinkById, type Link } from 'db/models/link';
-	import { TalentById } from 'db/models/talent';
+	import { TalentById, type Talent } from 'db/models/talent';
 	import { DEFAULT_PROFILE_IMAGE } from 'lib/constants';
 	import { userStream, type UserStreamType } from 'lib/userStream';
 	import type { VideoCallType } from 'lib/videoCall';
@@ -14,22 +14,13 @@
 	import Image from 'svelte-image';
 	import StarRating from 'svelte-star-rating';
 
-	let talent = { name: '', profileImageUrl: '', feedBackAvg: '0' };
+	let talent: Talent;
 	let link: Link;
 	let id = $page.params.id;
 	let linkById = gun.get(LinkById);
 	let talentById = gun.get(TalentById);
-
-	linkById.get(id).on((_link) => {
-		if (_link) {
-			link = _link;
-			talentById.get(link.talentId).on((_talent) => {
-				if (_talent) {
-					talent = _talent;
-				}
-			});
-		}
-	});
+	$: rating = 0;
+	$: profileImageUrl = DEFAULT_PROFILE_IMAGE;
 
 	const formatter = new Intl.NumberFormat('en-US', {
 		style: 'currency',
@@ -46,15 +37,30 @@
 	if (browser) {
 		import('lib/videoCall').then((_vc) => {
 			videoCall = _vc.videoCall;
+			vc = videoCall();
+			vc.callState.subscribe((state) => {
+				callState = state;
+			});
 		});
 	}
 
+	linkById.get(id).on((_link) => {
+		if (_link) {
+			link = _link;
+			talentById.get(link.talentId).on((_talent) => {
+				if (_talent) {
+					talent = _talent;
+					profileImageUrl = _talent.profileImageUrl;
+					if (_talent.feedBackAvg > 0) {
+						rating = _talent.feedBackAvg;
+					}
+				}
+			});
+		}
+	});
+
 	onMount(async () => {
 		us = await userStream();
-		vc = videoCall();
-		vc.callState.subscribe((state) => {
-			callState = state;
-		});
 		us.mediaStream.subscribe((stream) => {
 			if (stream) mediaStream = stream;
 		});
@@ -62,7 +68,7 @@
 
 	const call = async () => {
 		if (vc) {
-			//vc.makeCall(linkDocument.callId, 'Dr. Huge Mongus', mediaStream);
+			vc.makeCall(link.callId!, 'Dr. Huge Mongus', mediaStream);
 		}
 	};
 	$: inCall = callState == 'connectedAsCaller';
@@ -70,7 +76,7 @@
 
 <div class="min-h-full">
 	<main class="py-6">
-		{#if talent}
+		{#if link && talent}
 			{#if !inCall}
 				<!-- Page header -->
 				<div
@@ -90,14 +96,14 @@
 									</div>
 									<div class="rounded-full flex-none h-48 w-48 mask-circle">
 										<Image
-											src={talent.profileImageUrl || DEFAULT_PROFILE_IMAGE}
+											src={profileImageUrl}
 											alt={talent.name}
 											height="48"
 											width="48"
 											class="rounded-full flex-none object-cover mask-circle"
 										/>
 									</div>
-									<StarRating rating={talent.feedBackAvg || 0} />
+									<StarRating {rating} />
 
 									<div class="stats stats-vertical stats-shadow lg:stats-horizontal">
 										<div class="stat">
@@ -152,8 +158,6 @@
 			{:else}
 				<VideoCall {vc} {us} />
 			{/if}
-		{:else}
-			<h1 class="font-bold text-5xl">Invalid link</h1>
-		{/if}
+		{:else}{/if}
 	</main>
 </div>
