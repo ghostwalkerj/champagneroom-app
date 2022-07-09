@@ -33,7 +33,12 @@ export const LinkSchema = z.object({
 		.optional(),
 	callId: z.string().optional(),
 	status: z.nativeEnum(LinkStatus).default(LinkStatus.ACTIVE).optional(),
-	feedBackAvg: z.number().min(1).max(5).optional()
+	feedBackAvg: z.number().min(1).max(5).optional(),
+	name: z.string().min(3).max(20),
+	profileImageUrl: z
+		.string()
+		.refine((x) => validator.isURL(x))
+		.optional()
 });
 
 export type LinkBase = z.infer<typeof LinkSchema>;

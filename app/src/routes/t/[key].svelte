@@ -1,3 +1,5 @@
+
+
 <script type="ts">
 	import { browser } from '$app/env';
 	import { page } from '$app/stores';
@@ -24,13 +26,13 @@
 	let linkById = gun.get(LinkById);
 	let talent: Talent;
 	let currentLink: Link;
-	let telentRef = gun.get(TalentByKey).get(key);
+	let talentRef = gun.get(TalentByKey).get(key);
 
-	telentRef.on((_talent) => {
+	talentRef.once((_talent) => {
 		if (_talent) {
 			talent = _talent;
 			if (talent.currentLinkId) {
-				linkById.get(talent.currentLinkId).on((_link) => {
+				linkById.get(talent.currentLinkId).once((_link) => {
 					if (_link) {
 						currentLink = _link;
 					}
@@ -52,8 +54,13 @@
 		maximumFractionDigits: 0
 	});
 
-	const updateProfileImage = async (_talent: Talent) => {
-		telentRef.get('profileImageUrl').put(_talent.profileImageUrl);
+	const updateProfileImage = async (image: string) => {
+		if (image) {
+			talentRef.get('profileImageUrl').put(image);
+
+			talent.profileImageUrl = image;
+			talentRef.put(talent);
+		}
 	};
 
 	const { form: form, reset: reset } = createForm({
@@ -75,9 +82,9 @@
 			if (currentLink) {
 				linkById.get(currentLink._id).get('status').put(LinkStatus.EXPIRED);
 			}
-			const linkref = linkById.get(link._id).put(link);
-
-			telentRef.get('currentLinkId').put(link._id);
+			linkById.get(link._id).put(link);
+			talentRef.get('currentLinkId').put(link._id);
+			currentLink = link;
 		}
 	});
 
@@ -178,6 +185,13 @@
 									<div class="flex flex-col text-white p-2 justify-center items-center">
 										<form use:form method="post">
 											<input type="hidden" name="talentId" id="talentId" value={talent._id} />
+											<input type="hidden" name="name" id="name" value={talent.name} />
+											<input
+												type="hidden"
+												name="profileImageUrl"
+												id="profileImageUrl"
+												value={talent.profileImageUrl}
+											/>
 
 											<div class="max-w-xs w-full py-2 form-control ">
 												<!-- svelte-ignore a11y-label-has-associated-control -->
@@ -257,8 +271,7 @@
 											<ProfilePhoto
 												profileImage={talent.profileImageUrl || DEFAULT_PROFILE_IMAGE}
 												callBack={(value) => {
-													talent.profileImageUrl = value;
-													updateProfileImage(talent);
+													updateProfileImage(value);
 												}}
 											/>
 										</div>

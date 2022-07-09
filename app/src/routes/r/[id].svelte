@@ -5,22 +5,16 @@
 	import VideoPreview from 'components/VideoPreview.svelte';
 	import { gun } from 'db';
 	import { LinkById, type Link } from 'db/models/link';
-	import { TalentById, type Talent } from 'db/models/talent';
-	import { DEFAULT_PROFILE_IMAGE } from 'lib/constants';
 	import { userStream, type UserStreamType } from 'lib/userStream';
 	import type { VideoCallType } from 'lib/videoCall';
 	import { onMount } from 'svelte';
 	import FaMoneyBillWave from 'svelte-icons/fa/FaMoneyBillWave.svelte';
 	import Image from 'svelte-image';
 	import StarRating from 'svelte-star-rating';
-
-	let talent: Talent;
 	let link: Link;
 	let id = $page.params.id;
 	let linkById = gun.get(LinkById);
-	let talentById = gun.get(TalentById);
 	$: rating = 0;
-	$: profileImageUrl = DEFAULT_PROFILE_IMAGE;
 
 	const formatter = new Intl.NumberFormat('en-US', {
 		style: 'currency',
@@ -44,18 +38,9 @@
 		});
 	}
 
-	linkById.get(id).on((_link) => {
+	linkById.get(id).once((_link) => {
 		if (_link) {
 			link = _link;
-			talentById.get(link.talentId).on((_talent) => {
-				if (_talent) {
-					talent = _talent;
-					profileImageUrl = _talent.profileImageUrl;
-					if (_talent.feedBackAvg > 0) {
-						rating = _talent.feedBackAvg;
-					}
-				}
-			});
 		}
 	});
 
@@ -76,7 +61,7 @@
 
 <div class="min-h-full">
 	<main class="py-6">
-		{#if link && talent}
+		{#if link}
 			{#if !inCall}
 				<!-- Page header -->
 				<div
@@ -92,12 +77,12 @@
 								>
 									<div class="text-center">
 										<div class="font-extrabold text-lg">This pCall is For</div>
-										<div class="font-extrabold text-3xl">{talent.name}</div>
+										<div class="font-extrabold text-3xl">{link.name}</div>
 									</div>
 									<div class="rounded-full flex-none h-48 w-48 mask-circle">
 										<Image
-											src={profileImageUrl}
-											alt={talent.name}
+											src={link.profileImageUrl}
+											alt={link.name}
 											height="48"
 											width="48"
 											class="rounded-full flex-none object-cover mask-circle"
@@ -137,7 +122,7 @@
 										<button
 											class="btn btn-secondary"
 											on:click={call}
-											disabled={callState != 'ready'}>Call {talent.name} Now</button
+											disabled={callState != 'ready'}>Call {link.name} Now</button
 										>
 									</div>
 								</div>
