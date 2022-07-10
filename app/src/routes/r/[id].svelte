@@ -24,7 +24,8 @@
 	$: callState = 'disconnected';
 	$: previousState = 'none';
 
-	$: linkById.get(id).on((_link) => {
+	let feedback: Feedback;
+	$: linkById.get(id).once((_link) => {
 		if (_link) {
 			link = _link;
 			feedbackRef = feedbackByLinkId.get(_link._id, (ack) => {
@@ -42,7 +43,7 @@
 					console.log('Created New Feedback');
 				}
 			});
-			feedbackRef.on((_feedback) => {
+			feedbackRef.once((_feedback) => {
 				feedback = _feedback;
 			});
 		}
@@ -142,32 +143,6 @@
 		IGunInstance<any>,
 		string
 	>;
-	let feedback: Feedback;
-
-	$: linkById.get(id).on((_link) => {
-		if (_link) {
-			link = _link;
-			feedbackRef = feedbackByLinkId.get(_link._id, (ack) => {
-				if (!ack.put) {
-					feedback = createFeedback({
-						linkId: link._id,
-						talentId: link.talentId,
-						rejectedCount: 0,
-						disconnectCount: 0,
-						notAnsweredCount: 0,
-						rating: 0
-					});
-					feedbackRef = feedbackByLinkId.get(_link._id).put(feedback);
-					gun.get(FeedbackByLinkId).get(feedback._id).put(feedback);
-					console.log('Created New Feedback');
-				}
-			});
-
-			feedbackRef.on((_feedback) => {
-				feedback = _feedback;
-			});
-		}
-	});
 
 	onMount(async () => {
 		us = await userStream();
@@ -195,7 +170,7 @@
 					<p class="py-6">Scis vis facere illud pCall. Carpe florem et fac quod nunc vocant.</p>
 				</div>
 				<div
-					class="container mx-auto max-w-3xl  sm:px-6 md:flex md:space-x-5 md:items-stretch md:items-center md:justify-between lg:px-8"
+					class="max-w-max	 container mx-auto  items-center sm:px-6 md:flex md:space-x-5 md:items-stretch  lg:px-8"
 				>
 					<div class="rounded-box h-full bg-base-200">
 						<div>
@@ -208,7 +183,7 @@
 						</div>
 					</div>
 
-					<div class="bg-base-200  text-white card lg:min-w-100">
+					<div class="bg-base-200  text-white card lg:min-w-200">
 						<div class="text-center card-body items-center ">
 							<div class="text-2xl card-title">Your Video Preview</div>
 							<div class="container rounded-2xl max-w-2xl h-full">
