@@ -2,18 +2,15 @@
 	import { browser } from '$app/env';
 	import { page } from '$app/stores';
 	import { gun } from 'db';
+	import { createForm } from 'svelte-forms-lib';
 
-	import { reporter, ValidationMessage } from '@felte/reporter-svelte';
-	import { validator } from '@felte/validator-zod';
 	import ProfilePhoto from 'components/forms/ProfilePhoto.svelte';
 	import LinkViewer from 'components/LinkViewer.svelte';
 	import VideoCall from 'components/VideoCall.svelte';
 	import VideoPreview from 'components/VideoPreview.svelte';
 
-	import { createLink, LinkById, LinkSchema, LinkStatus, type Link } from 'db/models/link';
+	import { createLink, LinkById, LinkStatus, type Link } from 'db/models/link';
 	import { TalentByKey, type Talent } from 'db/models/talent';
-	import { createForm } from 'felte';
-	import { DEFAULT_PROFILE_IMAGE } from 'lib/constants';
 	import { userStream, type UserStreamType } from 'lib/userStream';
 	import type { VideoCallType } from 'lib/videoCall';
 	import { onMount } from 'svelte';
@@ -53,39 +50,13 @@
 		maximumFractionDigits: 0
 	});
 
-	const updateProfileImage = async (image: string) => {
-		if (image) {
-			talentRef.get('profileImageUrl').put(image);
-
-			talent.profileImageUrl = image;
+	const updateProfileImage = async (url: string) => {
+		if (url) {
+			talentRef.get('profileImageUrl').put(url);
+			talent.profileImageUrl = url;
 			talentRef.put(talent);
 		}
 	};
-
-	const { form: form, reset: reset } = createForm({
-		extend: [
-			reporter,
-			validator({
-				schema: LinkSchema
-			})
-		],
-		async onSuccess(response: any) {
-			initVC();
-			reset();
-		},
-		onError(err: any) {
-			console.log(err);
-		},
-		onSubmit(values) {
-			const link = createLink(values as Link);
-			if (currentLink) {
-				linkById.get(currentLink._id).get('status').put(LinkStatus.EXPIRED);
-			}
-			linkById.get(link._id).put(link);
-			talentRef.get('currentLinkId').put(link._id);
-			currentLink = link;
-		}
-	});
 
 	let us: Awaited<UserStreamType>;
 	$: callState = 'disconnected';
@@ -116,6 +87,20 @@
 		us.mediaStream.subscribe((stream) => {
 			if (stream) mediaStream = stream;
 		});
+	});
+
+	const { form, handleChange, handleSubmit } = createForm({
+		initialValues: {},
+		onSubmit: (values) => {
+			console.log(values);
+			// const link = createLink(values as Link);
+			// if (currentLink) {
+			// 	linkById.get(currentLink._id).get('status').put(LinkStatus.EXPIRED);
+			// }
+			// linkById.get(link._id).put(link);
+			// talentRef.get('currentLinkId').put(link._id);
+			// currentLink = link;
+		}
 	});
 </script>
 
@@ -182,20 +167,11 @@
 									<h2 class="text-2xl card-title">Request a New pCall</h2>
 
 									<div class="flex flex-col text-white p-2 justify-center items-center">
-										<form use:form method="post">
-											<input type="hidden" name="talentId" id="talentId" value={talent._id} />
-											<input type="hidden" name="name" id="name" value={talent.name} />
-											<input
-												type="hidden"
-												name="profileImageUrl"
-												id="profileImageUrl"
-												value={talent.profileImageUrl}
-											/>
-
+										<form on:submit|preventDefault={handleSubmit}>
 											<div class="max-w-xs w-full py-2 form-control ">
 												<!-- svelte-ignore a11y-label-has-associated-control -->
 												<label for="price" class="label">
-													<span class="label-text"> Requested Amount in USD</span></label
+													<span class="label-text">Requested Amount in USD</span></label
 												>
 												<div class="rounded-md shadow-sm mt-1 relative">
 													<div
@@ -210,6 +186,8 @@
 														class=" max-w-xs w-full py-2 pl-6 input input-bordered input-primary "
 														placeholder="0.00"
 														aria-describedby="price-currency"
+														on:change={handleChange}
+														bind:value={$form.amount}
 													/>
 													<div
 														class="flex pr-3 inset-y-0 right-0 absolute items-center pointer-events-none"
@@ -217,11 +195,6 @@
 														<span class="text-gray-500 sm:text-sm" id="price-currency"> USDC </span>
 													</div>
 												</div>
-
-												<ValidationMessage for="amount" let:messages={message}>
-													<span>{message}</span>
-													<span slot="placeholder" />
-												</ValidationMessage>
 											</div>
 											<div class="py-4">
 												<button class="btn btn-secondary" type="submit">Generate Link</button>
@@ -268,7 +241,7 @@
 										<h2 class="text-2xl card-title">Profile Photo</h2>
 										<div>
 											<ProfilePhoto
-												profileImage={talent.profileImageUrl || DEFAULT_PROFILE_IMAGE}
+												profileImage={talent.profileImageUrl}
 												callBack={(value) => {
 													updateProfileImage(value);
 												}}

@@ -1,47 +1,33 @@
 import { PCALL_ROOM_URL } from 'lib/constants';
 import urlJoin from 'url-join';
 import { v4 as uuidv4 } from 'uuid';
-import validator from 'validator';
-import { z } from 'zod';
 import { createModelBase, type ModelBase } from './modelBase';
+import * as yup from 'yup';
+
 export enum LinkStatus {
 	ACTIVE = 'ACTIVE',
 	EXPIRED = 'EXPIRED',
 	IN_PROGRESS = 'IN_PROGRESS',
 	COMPLETED = 'COMPLETED'
 }
-export const LinkSchema = z.object({
-	talentId: z.string().min(21),
-	walletAddress: z
+export const LinkSchema = yup.object({
+	talentId: yup.string().min(21).required(),
+	walletAddress: yup.string(),
+	amount: yup
 		.string()
-		.refine((x) => validator.isEthereumAddress(x), { message: 'Invalid Wallet Address' })
-		.optional(),
-	amount: z.string().refine((x) => validator.isInt(x, { gt: 0, lt: 10000 }), {
-		message: 'Must be between  $1 and $9999'
-	}),
-	fundedAmount: z
-		.string()
-		.refine((x) => validator.isInt(x, { min: 0 }))
-		.optional(),
-	callStart: z
-		.string()
-		.refine((x) => validator.isDate(x))
-		.optional(),
-	callEnd: z
-		.string()
-		.refine((x) => validator.isDate(x))
-		.optional(),
-	callId: z.string().optional(),
-	status: z.nativeEnum(LinkStatus).default(LinkStatus.ACTIVE).optional(),
-	feedBackAvg: z.number().min(1).max(5).optional(),
-	name: z.string().min(3).max(20),
-	profileImageUrl: z
-		.string()
-		//.refine((x) => validator.isURL(x))
-		.optional()
+		.matches(/\d{0,4}/)
+		.required('Must be between  $1 and $9999'),
+	fundedAmount: yup.string().matches(/^[0-9]\d*$/),
+	callStart: yup.string(),
+	callEnd: yup.string(),
+	callId: yup.string(),
+	status: yup.string().default(LinkStatus.ACTIVE),
+	feedBackAvg: yup.number().min(1).max(5),
+	name: yup.string().min(3).max(20).required(),
+	profileImageUrl: yup.string()
 });
 
-export type LinkBase = z.infer<typeof LinkSchema>;
+export type LinkBase = yup.InferType<typeof LinkSchema>;
 export type Link = LinkBase & ModelBase;
 
 export const LinkType = 'link';

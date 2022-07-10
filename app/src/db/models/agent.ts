@@ -1,19 +1,13 @@
-import validator from 'validator';
-import { z } from 'zod';
+import * as yup from 'yup';
 import { createModelBase, type ModelBase } from './modelBase';
 
-export const AgentSchema = z.object({
-	address: z.string().refine((x) => {
-		return validator.isEthereumAddress(x);
-	}),
-	walletAddress: z
-		.string()
-		.refine((x) => validator.isEthereumAddress(x), { message: 'Invalid Wallet Address' })
-		.optional(),
-	talents: z.set(z.any()).optional()
+export const AgentSchema = yup.object({
+	address: yup.string().required().min(40),
+	walletAddress: yup.string().optional(),
+	talents: yup.array().optional()
 });
 
-export type AgentBase = z.infer<typeof AgentSchema>;
+export type AgentBase = yup.InferType<typeof AgentSchema>;
 export type Agent = AgentBase & ModelBase;
 export const AgentType = 'agent';
 

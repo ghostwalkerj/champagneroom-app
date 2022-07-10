@@ -1,6 +1,4 @@
 <script type="ts">
-	import { reporter, ValidationMessage } from '@felte/reporter-svelte';
-	import { validator } from '@felte/validator-zod';
 	import { gun } from 'db';
 	import { AgentByAddress, AgentById, createAgent, type Agent } from 'db/models/agent';
 	import {
@@ -10,34 +8,40 @@
 		TalentSchema,
 		type Talent
 	} from 'db/models/talent';
-	import { createForm } from 'felte';
 	import type { IGunChain, IGunInstance } from 'gun';
-	import { PCALL_TALENT_URL } from 'lib/constants';
+	import { DEFAULT_PROFILE_IMAGE, PCALL_TALENT_URL } from 'lib/constants';
 	import { nanoid } from 'nanoid';
 	import { selectedAccount } from 'svelte-web3';
 	import urlJoin from 'url-join';
+	import { createForm } from 'svelte-forms-lib';
+	import * as yup from 'yup';
+	import ConnectButton from 'components/web3/ConnectButton.svelte';
 
-	const { form, reset } = createForm({
-		extend: [
-			reporter,
-			validator({
-				schema: TalentSchema
-			})
-		],
-		transform: (values: any) => ({
-			...values,
-			agentCommission: parseInt(values.agentCommission, 10)
+	const { form, errors, handleChange, handleSubmit } = createForm({
+		initialValues: { name: '', agentCommission: '10' },
+		validationSchema: yup.object({
+			name: yup.string().required('Talent name is required'),
+			agentCommission: yup
+				.number()
+				.min(0)
+				.max(100)
+				.integer()
+				.required('Agent commission between 0 and 100 required')
 		}),
-		onerror(err: any) {
-			console.log(err);
-		},
-		onSubmit(values) {
-			const talent = createTalent(values as Talent);
+		onSubmit: (values) => {
+			console.log(values);
+			const talentParams = TalentSchema.cast({
+				agentId: agent._id,
+				name: values.name,
+				agentCommission: Number.parseInt(values.agentCommission),
+				key: talentkey
+			});
+			const talent = createTalent(talentParams);
+
 			const talentRef = talentById.get(talent._id).put(talent);
 			talentByKey.get(talent.key).put(talentRef); // save talent by key
 			agentRef.get('talents').set(talent); // save talent to agent
 			talents = talents.concat(talent);
-			reset();
 		}
 	});
 
@@ -61,7 +65,9 @@
 		if (account) {
 			agentRef = agentByAddress.get(account, (ack) => {
 				if (!ack.put) {
-					agent = createAgent({ address: account });
+					agent = createAgent({
+						address: account
+					});
 					const agentRef = agentByAddress.get(account).put(agent);
 					agentById.get(agent._id).put(agentRef);
 					console.log('Created New Agent');
@@ -78,8 +84,10 @@
 				.get('talents')
 				.map()
 				.once((_talent: any) => {
-					console.log('add', _talent.name);
-					talents.push(_talent);
+					if (_talent) {
+						console.log('add', _talent.name);
+						talents.push(_talent);
+					}
 				});
 		}
 	});
@@ -102,10 +110,7 @@
 							<h2 class="text-2xl card-title">New Talent</h2>
 
 							<div class="text-white text-left whitespace-nowrap">
-								<form use:form method="post">
-									<input type="hidden" name="agentId" value={agent._id} />
-									<input type="hidden" name="key" value={talentkey} />
-
+								<form on:submit|preventDefault={handleSubmit}>
 									<div class="max-w-xs w-full py-2 form-control">
 										<!-- svelte-ignore a11y-label-has-associated-control -->
 										<label class="label">
@@ -113,16 +118,17 @@
 										</label>
 										<input
 											type="text"
-											id="name"
 											name="name"
 											placeholder="Enter a name"
 											class="max-w-xs w-full py-2 input input-bordered input-primary"
+											on:change={handleChange}
+											bind:value={$form.name}
 										/>
-										<ValidationMessage for="name" let:messages={message}>
-											<span>{message}</span>
-											<span slot="placeholder" />
-										</ValidationMessage>
 									</div>
+									{#if $errors.name}
+										<div class="alert alert-error shadow-lg">{$errors.name}</div>
+									{/if}
+
 									<label for="price" class="label">
 										<span class="label-text">Commission Percentage</span></label
 									>
@@ -133,20 +139,18 @@
 											<input
 												type="text"
 												name="agentCommission"
-												id="agentCommission"
-												class="py-2 w-20 input input-bordered input-primary "
-												value="10"
+												class="py-2 w-20 input input-bordered input-primary"
+												bind:value={$form.agentCommission}
+												on:change={handleChange}
 											/>
 											<div class="flex  inset-y-4 right-4 absolute pointer-events-none">
 												<span class="text-gray-500 sm:text-sm"> % </span>
 											</div>
 										</div>
-
-										<ValidationMessage for="agentCommission" let:messages={message}>
-											<span>{message}</span>
-											<span slot="placeholder" />
-										</ValidationMessage>
 									</div>
+									{#if $errors.agentCommission}
+										<div class="alert alert-error shadow-lg">{$errors.agentCommission}</div>
+									{/if}
 									<div class="max-w-xs w-full py-2 form-control">
 										<!-- svelte-ignore a11y-label-has-associated-control -->
 										<label class="label">

@@ -1,26 +1,18 @@
-import validator from 'validator';
-import { z } from 'zod';
-import { DEFAULT_PROFILE_IMAGE } from '../../lib/constants';
 import { createModelBase, type ModelBase } from './modelBase';
-
-export const TalentSchema = z.object({
-	agentId: z.string().min(21),
-	name: z.string().min(3).max(20),
-	key: z.string().min(21),
-	walletAddress: z
-		.string()
-		.refine((x) => validator.isEthereumAddress(x), { message: 'Invalid Wallet Address' })
-		.optional(),
-	profileImageUrl: z
-		.string()
-		.refine((x) => validator.isURL(x))
-		.optional(),
-	feedBackAvg: z.number().min(0).max(5).optional(),
-	agentCommission: z.number().min(0).max(100).int().optional(),
-	currentLinkId: z.string().optional()
+import * as yup from 'yup';
+import { DEFAULT_PROFILE_IMAGE } from 'lib/constants';
+export const TalentSchema = yup.object({
+	agentId: yup.string().min(21).required(),
+	name: yup.string().min(3).max(20).required(),
+	key: yup.string().min(21).required(),
+	walletAddress: yup.string().nullable(),
+	profileImageUrl: yup.string().default(DEFAULT_PROFILE_IMAGE).required(),
+	feedBackAvg: yup.number().integer().min(0).max(5).default(0).required(),
+	agentCommission: yup.number().integer().min(0).max(100).default(0).required(),
+	currentLinkId: yup.string().nullable()
 });
 
-export type TalentBase = z.infer<typeof TalentSchema>;
+export type TalentBase = yup.InferType<typeof TalentSchema>;
 export type Talent = TalentBase & ModelBase;
 export const TalentType = 'talent';
 export const TalentById = TalentType + 'ById';
@@ -30,10 +22,7 @@ export const createTalent = (_talent: TalentBase): Talent => {
 	const base = createModelBase(TalentType);
 	const talent = {
 		...base,
-		..._talent,
-		feedBackAvg: 0,
-		agentCommission: 0,
-		profileImageUrl: DEFAULT_PROFILE_IMAGE
+		..._talent
 	};
 	return talent;
 };
