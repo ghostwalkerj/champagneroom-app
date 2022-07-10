@@ -1,5 +1,3 @@
-
-
 <script type="ts">
 	import { browser } from '$app/env';
 	import { page } from '$app/stores';
@@ -28,11 +26,12 @@
 	let currentLink: Link;
 	let talentRef = gun.get(TalentByKey).get(key);
 
-	talentRef.once((_talent) => {
+	talentRef.on((_talent) => {
 		if (_talent) {
 			talent = _talent;
+			console.log('talent', talent);
 			if (talent.currentLinkId) {
-				linkById.get(talent.currentLinkId).once((_link) => {
+				linkById.get(talent.currentLinkId).on((_link) => {
 					if (_link) {
 						currentLink = _link;
 					}

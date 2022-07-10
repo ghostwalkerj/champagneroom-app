@@ -36,6 +36,7 @@
 			const talentRef = talentById.get(talent._id).put(talent);
 			talentByKey.get(talent.key).put(talentRef); // save talent by key
 			agentRef.get('talents').set(talent); // save talent to agent
+			talents = talents.concat(talent);
 			reset();
 		}
 	});
@@ -72,10 +73,12 @@
 			});
 
 			talents = [];
+			console.log('clear talents');
 			agentRef
 				.get('talents')
 				.map()
-				.on((_talent: any) => {
+				.once((_talent: any) => {
+					console.log('add', _talent.name);
 					talents.push(_talent);
 				});
 		}

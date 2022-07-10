@@ -37,7 +37,7 @@ export const LinkSchema = z.object({
 	name: z.string().min(3).max(20),
 	profileImageUrl: z
 		.string()
-		.refine((x) => validator.isURL(x))
+		//.refine((x) => validator.isURL(x))
 		.optional()
 });
 

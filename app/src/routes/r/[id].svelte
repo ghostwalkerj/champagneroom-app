@@ -38,7 +38,7 @@
 		});
 	}
 
-	linkById.get(id).once((_link) => {
+	$: linkById.get(id).on((_link) => {
 		if (_link) {
 			link = _link;
 		}
@@ -143,6 +143,6 @@
 			{:else}
 				<VideoCall {vc} {us} />
 			{/if}
-		{:else}{/if}
+		{:else}Searching for your pCall{/if}
 	</main>
 </div>
