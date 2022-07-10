@@ -9,13 +9,12 @@
 		type Talent
 	} from 'db/models/talent';
 	import type { IGunChain, IGunInstance } from 'gun';
-	import { DEFAULT_PROFILE_IMAGE, PCALL_TALENT_URL } from 'lib/constants';
+	import { PCALL_TALENT_URL } from 'lib/constants';
 	import { nanoid } from 'nanoid';
+	import { createForm } from 'svelte-forms-lib';
 	import { selectedAccount } from 'svelte-web3';
 	import urlJoin from 'url-join';
-	import { createForm } from 'svelte-forms-lib';
 	import * as yup from 'yup';
-	import ConnectButton from 'components/web3/ConnectButton.svelte';
 
 	const { form, errors, handleChange, handleSubmit } = createForm({
 		initialValues: { name: '', agentCommission: '10' },

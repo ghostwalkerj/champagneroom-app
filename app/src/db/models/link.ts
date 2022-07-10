@@ -1,8 +1,8 @@
 import { PCALL_ROOM_URL } from 'lib/constants';
 import urlJoin from 'url-join';
 import { v4 as uuidv4 } from 'uuid';
-import { createModelBase, type ModelBase } from './modelBase';
 import * as yup from 'yup';
+import { createModelBase, type ModelBase } from './modelBase';
 
 export enum LinkStatus {
 	ACTIVE = 'ACTIVE',
@@ -15,14 +15,17 @@ export const LinkSchema = yup.object({
 	walletAddress: yup.string(),
 	amount: yup
 		.string()
-		.matches(/\d{0,4}/)
-		.required('Must be between  $1 and $9999'),
-	fundedAmount: yup.string().matches(/^[0-9]\d*$/),
+		.matches(/^[1-9]\d{0,3}$/, 'Must be between $1 and $9999')
+		.required(),
+	fundedAmount: yup
+		.string()
+		.matches(/^[0-9]\d*$/)
+		.default('0'),
 	callStart: yup.string(),
 	callEnd: yup.string(),
 	callId: yup.string(),
 	status: yup.string().default(LinkStatus.ACTIVE),
-	feedBackAvg: yup.number().min(1).max(5),
+	feedBackAvg: yup.number().min(0).max(5).default(0),
 	name: yup.string().min(3).max(20).required(),
 	profileImageUrl: yup.string()
 });

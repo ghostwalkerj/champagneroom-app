@@ -1,6 +1,6 @@
-import { createModelBase, type ModelBase } from './modelBase';
-import * as yup from 'yup';
 import { DEFAULT_PROFILE_IMAGE } from 'lib/constants';
+import * as yup from 'yup';
+import { createModelBase, type ModelBase } from './modelBase';
 export const TalentSchema = yup.object({
 	agentId: yup.string().min(21).required(),
 	name: yup.string().min(3).max(20).required(),

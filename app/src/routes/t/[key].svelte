@@ -3,13 +3,14 @@
 	import { page } from '$app/stores';
 	import { gun } from 'db';
 	import { createForm } from 'svelte-forms-lib';
+	import * as yup from 'yup';
 
 	import ProfilePhoto from 'components/forms/ProfilePhoto.svelte';
 	import LinkViewer from 'components/LinkViewer.svelte';
 	import VideoCall from 'components/VideoCall.svelte';
 	import VideoPreview from 'components/VideoPreview.svelte';
 
-	import { createLink, LinkById, LinkStatus, type Link } from 'db/models/link';
+	import { LinkById, createLink, LinkSchema, type Link, LinkStatus } from 'db/models/link';
 	import { TalentByKey, type Talent } from 'db/models/talent';
 	import { userStream, type UserStreamType } from 'lib/userStream';
 	import type { VideoCallType } from 'lib/videoCall';
@@ -89,17 +90,29 @@
 		});
 	});
 
-	const { form, handleChange, handleSubmit } = createForm({
-		initialValues: {},
+	const { form, errors, handleChange, handleSubmit } = createForm({
+		initialValues: { amount: '0' },
+		validationSchema: yup.object({
+			amount: yup
+				.string()
+				.matches(/^[1-9]\d{0,3}$/, 'Must be between $1 and $9999')
+				.required()
+		}),
 		onSubmit: (values) => {
 			console.log(values);
-			// const link = createLink(values as Link);
-			// if (currentLink) {
-			// 	linkById.get(currentLink._id).get('status').put(LinkStatus.EXPIRED);
-			// }
-			// linkById.get(link._id).put(link);
-			// talentRef.get('currentLinkId').put(link._id);
-			// currentLink = link;
+			const linkParams = LinkSchema.cast({
+				amount: values.amount,
+				talentId: talent._id,
+				name: talent.name,
+				profileImageUrl: talent.profileImageUrl
+			});
+			const link = createLink(linkParams);
+			if (currentLink) {
+				linkById.get(currentLink._id).get('status').put(LinkStatus.EXPIRED);
+			}
+			linkById.get(link._id).put(link);
+			talentRef.get('currentLinkId').put(link._id);
+			currentLink = link;
 		}
 	});
 </script>
@@ -196,6 +209,9 @@
 													</div>
 												</div>
 											</div>
+											{#if $errors.amount}
+												<div class="alert alert-error shadow-lg">{$errors.amount}</div>
+											{/if}
 											<div class="py-4">
 												<button class="btn btn-secondary" type="submit">Generate Link</button>
 											</div>
