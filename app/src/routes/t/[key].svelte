@@ -14,7 +14,7 @@
 	import { TalentByKey, type Talent } from 'db/models/talent';
 	import { userStream, type UserStreamType } from 'lib/userStream';
 	import type { VideoCallType } from 'lib/videoCall';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { PhoneIncomingIcon } from 'svelte-feather-icons';
 	import StarRating from 'svelte-star-rating';
 
@@ -72,6 +72,7 @@
 	$: callerName = '';
 
 	const initVC = () => {
+		if (vc) vc.destroy();
 		const callId = currentLink ? currentLink.callId : null;
 		vc = videoCall(callId);
 		vc.callState.subscribe((cs) => {
@@ -87,6 +88,10 @@
 		us.mediaStream.subscribe((stream) => {
 			if (stream) mediaStream = stream;
 		});
+	});
+
+	onDestroy(async () => {
+		if (vc) vc.destroy();
 	});
 
 	const { form, errors, handleChange, handleSubmit } = createForm({
@@ -242,7 +247,7 @@
 										{#if currentLink}
 											<p>CallId: {currentLink.callId}</p>
 										{/if}
-										<p>Call Status: {callState}</p>
+										<p>Call State: {callState}</p>
 									</div>
 								</div>
 							</div>

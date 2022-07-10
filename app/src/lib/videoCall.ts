@@ -96,10 +96,25 @@ export const videoCall = (userId?: string) => {
 			hangUp() {
 				return 'ready';
 			}
+		},
+		'*': {
+			connectionError: () => {
+				return 'error';
+			}
+		},
+		error: {
+			connected() {
+				return 'ready';
+			}
 		}
 	});
 
 	callState.subscribe((s) => (currentCallState = s));
+
+	const connect2PeerServer = (userId?: string) => {
+		console.log('connect2PeerServer: ', userId);
+		return userId ? new Peer(userId, { debug: 3 }) : new Peer({ debug: 3 });
+	};
 
 	// Start new Peerjs workflow
 	// const peer = new Peer(userId, {
@@ -108,7 +123,7 @@ export const videoCall = (userId?: string) => {
 	// 	path: '/'
 	// 	// config: { iceServers: [] }
 	// });
-	const peer = userId ? new Peer(userId) : new Peer();
+	let peer = connect2PeerServer(userId);
 	let mediaConnection;
 	let dataConnection;
 
@@ -126,6 +141,9 @@ export const videoCall = (userId?: string) => {
 		_remoteStream.set(null);
 		clearTimeout(rejectCallTimer);
 		clearTimeout(cancelCallTimer);
+		if (!peer.disconnected) {
+			callState.connected();
+		}
 	};
 
 	// Events
@@ -143,6 +161,19 @@ export const videoCall = (userId?: string) => {
 		rejectCallTimer = setTimeout(() => {
 			rejectCall();
 		}, CALL_TIMEOUT);
+	});
+
+	peer.on('error', (err: Error) => {
+		console.log('error', err);
+		callState.connectionError();
+
+		setTimeout(() => {
+			console.log('Attempting to reconnect');
+			if (!peer.destroyed) {
+				peer.destroy();
+			}
+			peer = connect2PeerServer(userId);
+		}, 5000);
 	});
 
 	peer.on('connection', (conn) => {
@@ -163,9 +194,13 @@ export const videoCall = (userId?: string) => {
 	peer.on('disconnected', () => {
 		console.log('Disconnected from server');
 		callState.disconnected();
-		peer.reconnect();
-		console.log('Attempting to reconnect'); //TODO: Need to reconnect
-		callState.connected();
+		setTimeout(() => {
+			console.log('Attempting to reconnect');
+			if (!peer.destroyed) {
+				peer.destroy();
+			}
+			peer = connect2PeerServer(userId);
+		}, 5000);
 	});
 
 	const cancelCall = () => {
@@ -187,6 +222,7 @@ export const videoCall = (userId?: string) => {
 			mediaConnection.on('stream', (remoteStream) => {
 				_remoteStream.set(remoteStream);
 				callState.callConnected();
+				clearTimeout(cancelCallTimer);
 			});
 			mediaConnection.on('close', () => {
 				console.log('Call closed');
@@ -219,6 +255,8 @@ export const videoCall = (userId?: string) => {
 		mediaConnection.answer(localStream);
 		mediaConnection.on('stream', (remoteStream) => {
 			callState.callConnected();
+			clearTimeout(rejectCallTimer);
+
 			_remoteStream.set(remoteStream);
 		});
 		mediaConnection.on('close', () => {
@@ -233,7 +271,6 @@ export const videoCall = (userId?: string) => {
 		} else if (currentCallState === 'connectedAsCaller') {
 			console.log('Hangup on ', receiverId);
 			callState.hangUp();
-
 			resetCallState();
 		}
 	};
