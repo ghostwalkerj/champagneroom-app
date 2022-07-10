@@ -25,7 +25,7 @@
 	$: previousState = 'none';
 
 	let feedback: Feedback;
-	$: linkById.get(id).once((_link) => {
+	$: linkById.get(id).on((_link) => {
 		if (_link) {
 			link = _link;
 			feedbackRef = feedbackByLinkId.get(_link._id, (ack) => {
@@ -43,7 +43,7 @@
 					console.log('Created New Feedback');
 				}
 			});
-			feedbackRef.once((_feedback) => {
+			feedbackRef.on((_feedback) => {
 				feedback = _feedback;
 			});
 		}
