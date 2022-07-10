@@ -35,34 +35,36 @@
 	};
 </script>
 
-<div class="rounded-xl  w-full p-2">
-	<video bind:this={localVideo} playsinline autoplay>
-		<track kind="captions" />
-	</video>
+<div class="container h-full">
+	<div class="rounded-xl  w-full p-2">
+		<video bind:this={localVideo} playsinline autoplay>
+			<track kind="captions" />
+		</video>
+	</div>
+	{#if initialized}
+		<section
+			class="flex bg-base-100 flex-shrink-0 text-white p-4 gap-4 items-center justify-center md:rounded-2xl md:gap-8 "
+		>
+			<div class="flex flex-col gap-2 items-center">
+				<button class="h-14 w-14 btn btn-circle " on:click={camState.toggleCam}>
+					{#if $camState === 'CamOn'}
+						<VideoIcon size="34" />
+					{:else}
+						<VideoOffIcon size="34" />
+					{/if}
+				</button>
+				Cam
+			</div>
+			<div class="flex flex-col gap-2 items-center">
+				<button class="h-14 w-14 btn btn-circle" on:click={micState.toggleMic}>
+					{#if $micState === 'MicOn'}
+						<MicIcon size="34" />
+					{:else}
+						<MicOffIcon size="34" />
+					{/if}
+				</button>
+				Mic
+			</div>
+		</section>
+	{/if}
 </div>
-{#if initialized}
-	<section
-		class="flex bg-base-100 flex-shrink-0 text-white p-4 gap-4 items-center justify-center md:rounded-2xl md:gap-8 "
-	>
-		<div class="flex flex-col gap-2 items-center">
-			<button class="h-14 w-14 btn btn-circle " on:click={camState.toggleCam}>
-				{#if $camState === 'CamOn'}
-					<VideoIcon size="34" />
-				{:else}
-					<VideoOffIcon size="34" />
-				{/if}
-			</button>
-			Cam
-		</div>
-		<div class="flex flex-col gap-2 items-center">
-			<button class="h-14 w-14 btn btn-circle" on:click={micState.toggleMic}>
-				{#if $micState === 'MicOn'}
-					<MicIcon size="34" />
-				{:else}
-					<MicOffIcon size="34" />
-				{/if}
-			</button>
-			Mic
-		</div>
-	</section>
-{/if}

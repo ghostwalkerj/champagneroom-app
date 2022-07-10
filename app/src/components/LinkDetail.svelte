@@ -15,7 +15,7 @@
 
 {#if link}
 	<div
-		class=" flex-shrink-0  mx-2 grid  p-4 py-8 gap-4 col-span-3 row-span-3 place-items-center xl:mx-0 xl:w-full"
+		class=" flex-shrink-0  mx-2 grid  p-4 py-8 gap-4 col-span-3 row-span-3 place-items-center xl:mx-0 lg:w-100"
 	>
 		<div class="text-center">
 			<div class="font-extrabold text-lg">This pCall is For</div>

@@ -3,31 +3,93 @@
 	import { page } from '$app/stores';
 	import VideoCall from 'components/VideoCall.svelte';
 	import VideoPreview from 'components/VideoPreview.svelte';
-	import LinkDetail from 'components/web3/LinkDetail.svelte';
+	import LinkDetail from 'components/LinkDetail.svelte';
+	import LinkFeedback from 'components/Feedback.svelte';
 	import { gun } from 'db';
 	import { LinkById, type Link } from 'db/models/link';
 	import { userStream, type UserStreamType } from 'lib/userStream';
 	import type { VideoCallType } from 'lib/videoCall';
 	import { onMount } from 'svelte';
-	import FaMoneyBillWave from 'svelte-icons/fa/FaMoneyBillWave.svelte';
-	import Image from 'svelte-image';
-	import StarRating from 'svelte-star-rating';
+	import fsm from 'svelte-fsm';
+
+	import { createFeedback, FeedbackByLinkId, type Feedback } from 'db/models/feedback';
+	import type { IGunChain, IGunInstance } from 'gun/types';
 	let link: Link;
 	let id = $page.params.id;
 	let linkById = gun.get(LinkById);
-	$: rating = 0;
-
-	const formatter = new Intl.NumberFormat('en-US', {
-		style: 'currency',
-		currency: 'USD',
-		maximumFractionDigits: 0
-	});
-
 	let vc: VideoCallType;
 	let videoCall;
 	let mediaStream: MediaStream;
 	let us: Awaited<UserStreamType>;
 	$: callState = 'disconnected';
+	$: previousState = 'none';
+
+	$: linkById.get(id).on((_link) => {
+		if (_link) {
+			link = _link;
+			feedbackRef = feedbackByLinkId.get(_link._id, (ack) => {
+				if (!ack.put) {
+					feedback = createFeedback({
+						linkId: link._id,
+						talentId: link.talentId,
+						rejectedCount: 0,
+						disconnectCount: 0,
+						notAnsweredCount: 0,
+						rating: 0
+					});
+					feedbackRef = feedbackByLinkId.get(_link._id).put(feedback);
+					gun.get(FeedbackByLinkId).get(feedback._id).put(feedback);
+					console.log('Created New Feedback');
+				}
+			});
+			feedbackRef.on((_feedback) => {
+				feedback = _feedback;
+			});
+		}
+	});
+
+	const linkState = fsm('neverConnected', {
+		neverConnected: {
+			call: 'calling'
+		},
+		rejected: {
+			_enter() {
+				feedback.rejectedCount++;
+			},
+			call: 'calling'
+		},
+		notAnswered: {
+			_enter() {
+				feedback.notAnsweredCount++;
+			},
+			call: 'calling'
+		},
+		calling: {
+			callAccepted: 'inCall',
+			callRejected: 'rejected',
+			recieverHangup: 'rejected',
+			noAnswer: 'notAnswered'
+		},
+		inCall: {
+			callEnded: 'callEnded',
+			callDisconnected: 'disconnected',
+			recieverHangup: 'disconnected'
+		},
+		disconnected: {
+			_enter() {
+				feedback.disconnectCount++;
+			},
+			call: 'calling'
+		},
+		callEnded: {
+			waitingForFeedback: 'waitForFeedback'
+		},
+		waitForFeedback: {
+			feedbackGiven: 'complete'
+		},
+		complete: {}
+	});
+	const feedbackByLinkId = gun.get(FeedbackByLinkId);
 
 	if (browser) {
 		import('lib/videoCall').then((_vc) => {
@@ -35,13 +97,75 @@
 			vc = videoCall();
 			vc.callState.subscribe((state) => {
 				callState = state;
+				switch (state) {
+					case 'makingCall': {
+						linkState.call();
+						break;
+					}
+					case 'connectedAsCaller': {
+						linkState.callAccepted();
+						break;
+					}
+				}
+			});
+			vc.previousState.subscribe((_previousState) => {
+				if (_previousState) {
+					previousState = _previousState;
+					switch (_previousState) {
+						case 'callerEnded':
+						case 'callerHangup': {
+							linkState.callEnded();
+							break;
+						}
+						case 'timeout': {
+							linkState.noAnswer();
+							break;
+						}
+						case 'receiverRejected': {
+							linkState.callRejected();
+							break;
+						}
+						case 'receiverHangup':
+						case 'receiverEnded': {
+							linkState.recieverHangup();
+							break;
+						}
+					}
+				}
 			});
 		});
 	}
 
+	let feedbackRef: IGunChain<
+		any,
+		IGunChain<any, IGunInstance<any>, IGunInstance<any>, string>,
+		IGunInstance<any>,
+		string
+	>;
+	let feedback: Feedback;
+
 	$: linkById.get(id).on((_link) => {
 		if (_link) {
 			link = _link;
+			feedbackRef = feedbackByLinkId.get(_link._id, (ack) => {
+				if (!ack.put) {
+					feedback = createFeedback({
+						linkId: link._id,
+						talentId: link.talentId,
+						rejectedCount: 0,
+						disconnectCount: 0,
+						notAnsweredCount: 0,
+						rating: 0
+					});
+					feedbackRef = feedbackByLinkId.get(_link._id).put(feedback);
+					gun.get(FeedbackByLinkId).get(feedback._id).put(feedback);
+					console.log('Created New Feedback');
+				}
+			});
+
+			feedbackRef.on((_feedback) => {
+				feedback = _feedback;
+			});
 		}
 	});
 
@@ -57,20 +181,21 @@
 			vc.makeCall(link.callId!, 'Dr. Huge Mongus', mediaStream);
 		}
 	};
-	$: inCall = callState == 'connectedAsCaller';
+	$: showFeedback = false;
 </script>
 
+<LinkFeedback {showFeedback} />
 <div class="min-h-full">
 	<main class="py-6">
 		{#if link}
-			{#if !inCall}
+			{#if $linkState != 'inCall'}
 				<!-- Page header -->
 				<div class="text-center">
 					<h1 class="font-bold text-center text-5xl">Make your pCall</h1>
 					<p class="py-6">Scis vis facere illud pCall. Carpe florem et fac quod nunc vocant.</p>
 				</div>
 				<div
-					class="mx-auto max-w-3xl  sm:px-6 md:flex md:space-x-5 md:items-center md:justify-between lg:max-w-7xl lg:px-8"
+					class="container mx-auto max-w-3xl  sm:px-6 md:flex md:space-x-5 md:items-stretch md:items-center md:justify-between lg:px-8"
 				>
 					<div class="rounded-box h-full bg-base-200">
 						<div>
@@ -83,10 +208,10 @@
 						</div>
 					</div>
 
-					<div class="bg-base-200 text-white card">
-						<div class="text-center card-body items-center">
+					<div class="bg-base-200  text-white card lg:min-w-100">
+						<div class="text-center card-body items-center ">
 							<div class="text-2xl card-title">Your Video Preview</div>
-							<div class="container rounded-2xl max-w-2xl">
+							<div class="container rounded-2xl max-w-2xl h-full">
 								<VideoPreview {us} />
 							</div>
 							Call State: {callState}
@@ -101,3 +226,17 @@
 		{/if}
 	</main>
 </div>
+Link: {$linkState}
+<br />
+Call: {previousState}
+<br />
+
+{#if feedback}
+	RejectedCount: {feedback.rejectedCount}
+	<br />
+
+	DisconnectCount: {feedback.disconnectCount}
+	<br />
+
+	NotAnsweredCount: {feedback.notAnsweredCount}
+{/if}

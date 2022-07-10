@@ -67,7 +67,7 @@
 					agent = createAgent({
 						address: account
 					});
-					const agentRef = agentByAddress.get(account).put(agent);
+					agentRef = agentByAddress.get(account).put(agent);
 					agentById.get(agent._id).put(agentRef);
 					console.log('Created New Agent');
 				}

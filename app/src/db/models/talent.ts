@@ -7,7 +7,7 @@ export const TalentSchema = yup.object({
 	key: yup.string().min(21).required(),
 	walletAddress: yup.string().nullable(),
 	profileImageUrl: yup.string().default(DEFAULT_PROFILE_IMAGE).required(),
-	feedBackAvg: yup.number().integer().min(0).max(5).default(0).required(),
+	ratingAvg: yup.number().integer().min(0).max(5).default(0).required(),
 	agentCommission: yup.number().integer().min(0).max(100).default(0).required(),
 	currentLinkId: yup.string().nullable()
 });

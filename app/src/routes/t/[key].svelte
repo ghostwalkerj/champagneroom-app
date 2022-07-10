@@ -275,8 +275,8 @@
 							<div class="lg:col-start-3 lg:col-span-1">
 								<div class="bg-primary text-primary-content card">
 									<div class="text-center card-body items-center">
-										<h2 class="text-2xl card-title">Your Feedback Rating</h2>
-										<StarRating rating={talent.feedBackAvg || 0} />
+										<h2 class="text-2xl card-title">Your Average Rating</h2>
+										<StarRating rating={talent.ratingAvg || 0} />
 									</div>
 								</div>
 							</div>
