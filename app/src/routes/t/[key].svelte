@@ -10,7 +10,7 @@
 	import VideoCall from 'components/VideoCall.svelte';
 	import VideoPreview from 'components/VideoPreview.svelte';
 
-	import { LinkById, createLink, LinkSchema, type Link, LinkStatus } from 'db/models/link';
+	import { createLink, LinkById, LinkSchema, LinkStatus, type Link } from 'db/models/link';
 	import { TalentByKey, type Talent } from 'db/models/talent';
 	import { userStream, type UserStreamType } from 'lib/userStream';
 	import type { VideoCallType } from 'lib/videoCall';
@@ -27,7 +27,6 @@
 	talentRef.on((_talent) => {
 		if (_talent) {
 			talent = _talent;
-			console.log('talent', talent);
 			if (talent.currentLinkId) {
 				linkById.get(talent.currentLinkId).on((_link) => {
 					if (_link) {
@@ -99,7 +98,6 @@
 				.required()
 		}),
 		onSubmit: (values) => {
-			console.log(values);
 			const linkParams = LinkSchema.cast({
 				amount: values.amount,
 				talentId: talent._id,

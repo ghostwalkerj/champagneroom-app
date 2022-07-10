@@ -27,6 +27,7 @@
 	const initialize = () => {
 		if (localVideo && mediaStream) {
 			localVideo.srcObject = mediaStream;
+			localVideo.muted = true;
 			localVideo.load();
 			localVideo.play();
 			initialized = true;

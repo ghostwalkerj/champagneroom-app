@@ -3,12 +3,30 @@ import { readable, writable } from 'svelte/store';
 
 export type VideoStreamOptions = {
 	video: {
-		width: number;
-		height: number;
-		frameRate: {
-			min: number;
-			ideal: number;
-		};
+		width:
+			| number
+			| {
+					min?: number;
+					ideal?: number;
+					exact?: number;
+					max?: number;
+			  };
+		height:
+			| number
+			| {
+					min?: number;
+					ideal?: number;
+					exact?: number;
+					max?: number;
+			  };
+		frameRate:
+			| number
+			| {
+					min?: number;
+					ideal?: number;
+					exact?: number;
+					max?: number;
+			  };
 	};
 	audio: boolean;
 };

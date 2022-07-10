@@ -1,8 +1,7 @@
 import { Peer } from 'peerjs';
 import fsm from 'svelte-fsm';
 import { readable, writable } from 'svelte/store';
-const SIGNAL_SERVER_HOST = process.env.VITE_SIGNAL_SERVER_HOST || 'localhost';
-const SIGNAL_SERVER_PORT = Number.parseInt(process.env.VITE_SIGNAL_SERVER_PORT || '8000');
+
 const CALL_TIMEOUT = Number.parseInt(process.env.VITE_CALL_TIMEOUT || '30000');
 
 export const videoCall = (userId?: string) => {
