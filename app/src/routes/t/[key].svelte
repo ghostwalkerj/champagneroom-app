@@ -94,7 +94,7 @@
 		if (vc) vc.destroy();
 	});
 
-	const { form, errors, handleChange, handleSubmit } = createForm({
+	const { form, errors, handleChange, handleSubmit, handleReset } = createForm({
 		initialValues: { amount: '0' },
 		validationSchema: yup.object({
 			amount: yup
@@ -116,6 +116,7 @@
 			linkById.get(link._id).put(link);
 			talentRef.get('currentLinkId').put(link._id);
 			currentLink = link;
+			handleReset();
 		}
 	});
 </script>

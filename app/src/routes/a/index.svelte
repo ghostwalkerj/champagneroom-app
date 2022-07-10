@@ -16,7 +16,7 @@
 	import urlJoin from 'url-join';
 	import * as yup from 'yup';
 
-	const { form, errors, handleChange, handleSubmit } = createForm({
+	const { form, errors, handleReset, handleChange, handleSubmit } = createForm({
 		initialValues: { name: '', agentCommission: '10' },
 		validationSchema: yup.object({
 			name: yup.string().required('Talent name is required'),
@@ -36,11 +36,10 @@
 				key: talentkey
 			});
 			const talent = createTalent(talentParams);
-
 			const talentRef = talentById.get(talent._id).put(talent);
 			talentByKey.get(talent.key).put(talentRef); // save talent by key
 			agentRef.get('talents').set(talent); // save talent to agent
-			talents = talents.concat(talent);
+			handleReset();
 		}
 	});
 
@@ -77,15 +76,14 @@
 				agent = _agent;
 			});
 
-			talents = [];
-			console.log('clear talents');
 			agentRef
 				.get('talents')
+				.once(() => {})
 				.map()
 				.once((_talent: any) => {
 					if (_talent) {
 						console.log('add', _talent.name);
-						talents.push(_talent);
+						talents = talents.concat(_talent);
 					}
 				});
 		}
