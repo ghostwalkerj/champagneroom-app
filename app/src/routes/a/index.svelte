@@ -22,7 +22,6 @@
 				.required('Agent commission between 0 and 100 required')
 		}),
 		onSubmit: (values) => {
-			console.log(values);
 			const talentParams = TalentSchema.cast({
 				agentId: agent._id,
 				name: values.name,
@@ -58,7 +57,6 @@
 					});
 					const _agent = gun.get(AgentType).get(account).put(agent);
 					gun.get(AgentType).get(agent._id).put(_agent);
-					console.log('Created New Agent');
 				}
 			});
 
@@ -72,7 +70,6 @@
 				.map()
 				.once((_talent: any) => {
 					if (_talent) {
-						console.log('add', _talent.name);
 						talents = talents.concat(_talent);
 					}
 				});

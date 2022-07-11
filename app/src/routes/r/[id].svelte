@@ -25,7 +25,7 @@
 	let feedback: Feedback | null = null;
 
 	// get link
-	$: gun
+	gun
 		.get(LinkType)
 		.get(linkId)
 		.on((_link) => {
@@ -42,16 +42,15 @@
 						rejectedCount: 0,
 						disconnectCount: 0,
 						notAnsweredCount: 0,
-						rating: 0
+						rating: 0,
+						viewedCount: 0
 					});
-					console.log('Created New Feedback');
 					gun.get(FeedbackType).get(linkId).put(feedback);
 				}
 			})
 			.on((_feedback) => {
 				if (_feedback && !feedback) {
 					feedback = _feedback;
-					console.log('Got Feedback');
 				}
 			});
 	}
@@ -206,6 +205,9 @@ Call: {previousState}
 <br />
 
 {#if feedback}
+	Views : {feedback.viewedCount}
+	<br />
+
 	RejectedCount: {feedback.rejectedCount}
 	<br />
 

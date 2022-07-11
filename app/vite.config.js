@@ -1,6 +1,6 @@
 import { sveltekit } from '@sveltejs/kit/vite';
-import WindiCSS from 'vite-plugin-windicss';
 import path from 'path';
+import WindiCSS from 'vite-plugin-windicss';
 
 const config = {
 	// Consult https://github.com/sveltejs/svelte-preprocess

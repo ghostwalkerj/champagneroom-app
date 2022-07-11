@@ -20,7 +20,7 @@ database couchDB
  [pCall BackEnd] <.[norank].>  couchDB
 }
 
-node "Ethereum" {   
+node "Ethereum" {
   [pCall Payment] <<contract>>
 	[pCall Escrow] <<contract>>
   [ERC20 Token] <<contract>>
