@@ -1,7 +1,6 @@
 <script type="ts">
 	import { browser } from '$app/env';
 	import { page } from '$app/stores';
-	import { gun } from 'db';
 	import { createForm } from 'svelte-forms-lib';
 	import * as yup from 'yup';
 
@@ -21,25 +20,9 @@
 	let key = $page.params.key;
 	let talent: Talent;
 	let currentLink: Link;
+	let gun;
 
-	const talentRef = gun
-		.get(TalentType)
-		.get(key)
-		.on((_talent) => {
-			if (_talent) {
-				talent = _talent;
-				if (talent.currentLinkId) {
-					gun
-						.get(LinkType)
-						.get(talent.currentLinkId)
-						.on((_link: Link) => {
-							if (_link) {
-								currentLink = _link;
-							}
-						});
-				}
-			}
-		});
+	let talentRef;
 
 	let vc: VideoCallType;
 	if (browser) {
@@ -91,6 +74,25 @@
 	};
 
 	onMount(async () => {
+		gun = (await import('db/gun')).gun;
+		talentRef = gun
+			.get(TalentType)
+			.get(key)
+			.on((_talent) => {
+				if (_talent) {
+					talent = _talent;
+					if (talent.currentLinkId) {
+						gun
+							.get(LinkType)
+							.get(talent.currentLinkId)
+							.on((_link: Link) => {
+								if (_link) {
+									currentLink = _link;
+								}
+							});
+					}
+				}
+			});
 		us = await userStream();
 		us.mediaStream.subscribe((stream) => {
 			if (stream) mediaStream = stream;
