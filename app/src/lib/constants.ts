@@ -13,3 +13,4 @@ export const PCALL_AGENT_URL = urlJoin(BASE_PCALL_URL, import.meta.env.VITE_AGEN
 export const DEFAULT_PROFILE_IMAGE = import.meta.env.VITE_DEFAULT_PROFILE_IMAGE;
 
 export const GUNDB_PEER = import.meta.env.VITE_GUNDB_PEER;
+export const PCALL_MOBILE_URL = urlJoin(BASE_PCALL_URL, import.meta.env.VITE_MOBILE_PATH);
