@@ -32,7 +32,7 @@
 			const talent = createTalent(talentParams);
 			const talentRef = gun.get(TalentType).get(talent._id).put(talent);
 			gun.get(TalentType).get(talent.key).put(talentRef);
-			agentRef.get(TalentType).set(talentRef); // save talent to agent
+			agentRef.get('talents').set(talentRef); // save talent to agent
 			handleReset();
 		}
 	});
