@@ -1,13 +1,7 @@
 <script type="ts">
 	import { gun } from 'db';
-	import { AgentByAddress, AgentById, createAgent, type Agent } from 'db/models/agent';
-	import {
-		createTalent,
-		TalentById,
-		TalentByKey,
-		TalentSchema,
-		type Talent
-	} from 'db/models/talent';
+	import { AgentType, createAgent, type Agent } from 'db/models/agent';
+	import { createTalent, TalentSchema, TalentType, type Talent } from 'db/models/talent';
 	import type { IGunChain, IGunInstance } from 'gun';
 	import { PCALL_TALENT_URL } from 'lib/constants';
 	import { nanoid } from 'nanoid';
@@ -36,17 +30,13 @@
 				key: talentkey
 			});
 			const talent = createTalent(talentParams);
-			const talentRef = talentById.get(talent._id).put(talent);
-			talentByKey.get(talent.key).put(talentRef); // save talent by key
-			agentRef.get('talents').set(talent); // save talent to agent
+			const talentRef = gun.get(TalentType).get(talent._id).put(talent);
+			gun.get(TalentType).get(talent.key).put(talentRef);
+			agentRef.get(TalentType).set(talentRef); // save talent to agent
 			handleReset();
 		}
 	});
 
-	let agentByAddress = gun.get(AgentByAddress);
-	let agentById = gun.get(AgentById);
-	let talentById = gun.get(TalentById);
-	let talentByKey = gun.get(TalentByKey);
 	let agentRef: IGunChain<
 		any,
 		IGunChain<any, IGunInstance<any>, IGunInstance<any>, string>,
@@ -61,13 +51,13 @@
 
 	selectedAccount.subscribe((account) => {
 		if (account) {
-			agentRef = agentByAddress.get(account, (ack) => {
+			agentRef = gun.get(account, (ack) => {
 				if (!ack.put) {
 					agent = createAgent({
 						address: account
 					});
-					agentRef = agentByAddress.get(account).put(agent);
-					agentById.get(agent._id).put(agentRef);
+					const _agent = gun.get(AgentType).get(account).put(agent);
+					gun.get(AgentType).get(agent._id).put(_agent);
 					console.log('Created New Agent');
 				}
 			});

@@ -25,6 +25,7 @@ export const LinkSchema = yup.object({
 	callEnd: yup.string(),
 	callId: yup.string(),
 	status: yup.string().default(LinkStatus.ACTIVE),
+	rating: yup.number().min(0).max(5).default(0),
 	name: yup.string().min(3).max(20).required(),
 	profileImageUrl: yup.string()
 });

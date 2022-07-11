@@ -1,21 +1,20 @@
 <script type="ts">
 	import { browser } from '$app/env';
 	import { page } from '$app/stores';
+	import LinkFeedback from 'components/Feedback.svelte';
+	import LinkDetail from 'components/LinkDetail.svelte';
 	import VideoCall from 'components/VideoCall.svelte';
 	import VideoPreview from 'components/VideoPreview.svelte';
-	import LinkDetail from 'components/LinkDetail.svelte';
-	import LinkFeedback from 'components/Feedback.svelte';
 	import { gun } from 'db';
-	import { LinkById, type Link } from 'db/models/link';
+	import { createFeedback, FeedbackType, type Feedback } from 'db/models/feedback';
+	import { LinkType, type Link } from 'db/models/link';
 	import { userStream, type UserStreamType } from 'lib/userStream';
 	import type { VideoCallType } from 'lib/videoCall';
 	import { onMount } from 'svelte';
 	import fsm from 'svelte-fsm';
 
-	import { createFeedback, FeedbackByLinkId, type Feedback } from 'db/models/feedback';
 	let link: Link;
 	let linkId = $page.params.id;
-	let linkById = gun.get(LinkById);
 	let vc: VideoCallType;
 	let videoCall;
 	let mediaStream: MediaStream;
@@ -24,26 +23,18 @@
 	$: previousState = 'none';
 
 	let feedback: Feedback | null = null;
-	let linkRef = linkById.get(linkId);
-	const feedbackByLinkId = gun.get(FeedbackByLinkId);
 
 	// get link
-	linkRef.on((_link) => {
-		console.log('listen link: ' + _link.profileImageUrl);
-		if (_link && !link) {
+	$: gun
+		.get(LinkType)
+		.get(linkId)
+		.on((_link) => {
 			link = _link;
-		}
-	});
-
-	// linkRef.get('profileImageUrl').on((profileImageUrl) => {
-	// 	if (profileImageUrl && link) {
-	// 		link.profileImageUrl = profileImageUrl;
-	// 		console.log('new profileImageUrl: ' + profileImageUrl);
-	// 	}
-	// });
+		});
 
 	if (feedback == null) {
-		feedbackByLinkId
+		gun
+			.get(FeedbackType)
 			.get(linkId, (ack) => {
 				if (!ack.put) {
 					feedback = createFeedback({
@@ -54,7 +45,7 @@
 						rating: 0
 					});
 					console.log('Created New Feedback');
-					feedbackByLinkId.get(linkId).put(feedback);
+					gun.get(FeedbackType).get(linkId).put(feedback);
 				}
 			})
 			.on((_feedback) => {
@@ -71,13 +62,13 @@
 		},
 		rejected: {
 			_enter() {
-				feedback.rejectedCount++;
+				feedback!.rejectedCount++;
 			},
 			call: 'calling'
 		},
 		notAnswered: {
 			_enter() {
-				feedback.notAnsweredCount++;
+				feedback!.notAnsweredCount++;
 			},
 			call: 'calling'
 		},
@@ -94,7 +85,7 @@
 		},
 		disconnected: {
 			_enter() {
-				feedback.disconnectCount++;
+				feedback!.disconnectCount++;
 			},
 			call: 'calling'
 		},

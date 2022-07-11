@@ -1,5 +1,5 @@
-import { createModelBase, type ModelBase } from './modelBase';
 import * as yup from 'yup';
+import { createModelBase, type ModelBase } from './modelBase';
 
 export const FeedbackSchema = yup.object({
 	linkId: yup.string().min(21).required(),

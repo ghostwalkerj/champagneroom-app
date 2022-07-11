@@ -10,8 +10,8 @@
 	import VideoCall from 'components/VideoCall.svelte';
 	import VideoPreview from 'components/VideoPreview.svelte';
 
-	import { createLink, LinkById, LinkSchema, LinkStatus, type Link } from 'db/models/link';
-	import { TalentByKey, type Talent } from 'db/models/talent';
+	import { createLink, LinkSchema, LinkStatus, LinkType, type Link } from 'db/models/link';
+	import { TalentType, type Talent } from 'db/models/talent';
 	import { userStream, type UserStreamType } from 'lib/userStream';
 	import type { VideoCallType } from 'lib/videoCall';
 	import { onDestroy, onMount } from 'svelte';
@@ -19,23 +19,27 @@
 	import StarRating from 'svelte-star-rating';
 
 	let key = $page.params.key;
-	let linkById = gun.get(LinkById);
 	let talent: Talent;
 	let currentLink: Link;
-	let talentRef = gun.get(TalentByKey).get(key);
 
-	talentRef.on((_talent) => {
-		if (_talent) {
-			talent = _talent;
-			if (talent.currentLinkId) {
-				linkById.get(talent.currentLinkId).on((_link: Link) => {
-					if (_link) {
-						currentLink = _link;
-					}
-				});
+	const talentRef = gun
+		.get(TalentType)
+		.get(key)
+		.on((_talent) => {
+			if (_talent) {
+				talent = _talent;
+				if (talent.currentLinkId) {
+					gun
+						.get(LinkType)
+						.get(talent.currentLinkId)
+						.on((_link: Link) => {
+							if (_link) {
+								currentLink = _link;
+							}
+						});
+				}
 			}
-		}
-	});
+		});
 
 	let vc: VideoCallType;
 	if (browser) {
@@ -56,6 +60,7 @@
 			talent.profileImageUrl = url;
 			if (currentLink) {
 				currentLink.profileImageUrl = url;
+				gun.get(LinkType).get(currentLink._id).get('profileImageUrl').put(url);
 			}
 		}
 	};
@@ -113,9 +118,9 @@
 			});
 			const link = createLink(linkParams);
 			if (currentLink) {
-				linkById.get(currentLink._id).get('status').put(LinkStatus.EXPIRED);
+				gun.get(LinkType).get(currentLink._id).get('status').put(LinkStatus.EXPIRED);
 			}
-			linkById.get(link._id).put(link);
+			gun.get(LinkType).get(link._id).put(link);
 			talentRef.get('currentLinkId').put(link._id);
 			currentLink = link;
 			handleReset();
