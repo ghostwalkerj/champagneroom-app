@@ -3,7 +3,7 @@ import * as yup from 'yup';
 
 export const FeedbackSchema = yup.object({
 	linkId: yup.string().min(21).required(),
-	talentId: yup.string().min(21).required(),
+	//	talentId: yup.string().min(21).required(),
 	rejectedCount: yup.number().integer().required().positive().default(0),
 	disconnectCount: yup.number().integer().required().positive().default(0),
 	notAnsweredCount: yup.number().integer().required().positive().default(0),

@@ -13,9 +13,8 @@
 	import fsm from 'svelte-fsm';
 
 	import { createFeedback, FeedbackByLinkId, type Feedback } from 'db/models/feedback';
-	import type { IGunChain, IGunInstance } from 'gun/types';
 	let link: Link;
-	let id = $page.params.id;
+	let linkId = $page.params.id;
 	let linkById = gun.get(LinkById);
 	let vc: VideoCallType;
 	let videoCall;
@@ -24,30 +23,47 @@
 	$: callState = 'disconnected';
 	$: previousState = 'none';
 
-	let feedback: Feedback;
-	$: linkById.get(id).on((_link) => {
-		if (_link) {
+	let feedback: Feedback | null = null;
+	let linkRef = linkById.get(linkId);
+	const feedbackByLinkId = gun.get(FeedbackByLinkId);
+
+	// get link
+	linkRef.on((_link) => {
+		console.log('listen link: ' + _link.profileImageUrl);
+		if (_link && !link) {
 			link = _link;
-			feedbackRef = feedbackByLinkId.get(_link._id, (ack) => {
+		}
+	});
+
+	// linkRef.get('profileImageUrl').on((profileImageUrl) => {
+	// 	if (profileImageUrl && link) {
+	// 		link.profileImageUrl = profileImageUrl;
+	// 		console.log('new profileImageUrl: ' + profileImageUrl);
+	// 	}
+	// });
+
+	if (feedback == null) {
+		feedbackByLinkId
+			.get(linkId, (ack) => {
 				if (!ack.put) {
 					feedback = createFeedback({
-						linkId: link._id,
-						talentId: link.talentId,
+						linkId,
 						rejectedCount: 0,
 						disconnectCount: 0,
 						notAnsweredCount: 0,
 						rating: 0
 					});
-					feedbackRef = feedbackByLinkId.get(_link._id).put(feedback);
-					gun.get(FeedbackByLinkId).get(feedback._id).put(feedback);
 					console.log('Created New Feedback');
+					feedbackByLinkId.get(linkId).put(feedback);
+				}
+			})
+			.on((_feedback) => {
+				if (_feedback && !feedback) {
+					feedback = _feedback;
+					console.log('Got Feedback');
 				}
 			});
-			feedbackRef.on((_feedback) => {
-				feedback = _feedback;
-			});
-		}
-	});
+	}
 
 	const linkState = fsm('neverConnected', {
 		neverConnected: {
@@ -90,7 +106,6 @@
 		},
 		complete: {}
 	});
-	const feedbackByLinkId = gun.get(FeedbackByLinkId);
 
 	if (browser) {
 		import('lib/videoCall').then((_vc) => {
@@ -136,13 +151,6 @@
 			});
 		});
 	}
-
-	let feedbackRef: IGunChain<
-		any,
-		IGunChain<any, IGunInstance<any>, IGunInstance<any>, string>,
-		IGunInstance<any>,
-		string
-	>;
 
 	onMount(async () => {
 		us = await userStream();

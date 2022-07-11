@@ -28,7 +28,7 @@
 		if (_talent) {
 			talent = _talent;
 			if (talent.currentLinkId) {
-				linkById.get(talent.currentLinkId).on((_link) => {
+				linkById.get(talent.currentLinkId).on((_link: Link) => {
 					if (_link) {
 						currentLink = _link;
 					}
@@ -54,7 +54,9 @@
 		if (url) {
 			talentRef.get('profileImageUrl').put(url);
 			talent.profileImageUrl = url;
-			talentRef.put(talent);
+			if (currentLink) {
+				currentLink.profileImageUrl = url;
+			}
 		}
 	};
 
