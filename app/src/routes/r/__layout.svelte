@@ -8,7 +8,6 @@
 	if (browser) {
 		const parser = new UAParser();
 		const result = parser.getDevice();
-		console.log($page);
 
 		if (result && result.type == 'mobile') {
 			import.meta.env.VITE_MOBILE_PATH;
