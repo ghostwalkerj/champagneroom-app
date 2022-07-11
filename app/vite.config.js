@@ -3,15 +3,7 @@ import path from 'path';
 import WindiCSS from 'vite-plugin-windicss';
 
 const config = {
-	// Consult https://github.com/sveltejs/svelte-preprocess
-	// for more information about preprocessors
-	server: {
-		hmr: { overlay: true },
-		cors: {
-			origin: "*",
-			methods: "GET,HEAD,PUT,PATCH,POST,DELETE"
-		},
-	},
+
 	resolve: {
 		alias: {
 			// these are the aliases and paths to them
@@ -35,7 +27,8 @@ const config = {
 			'gun/lib/rindexed',
 			'gun/lib/unset.js',
 			'gun/lib/not.js'
-		]
+		],
+		exclude: ['web3']
 	}
 };
 
