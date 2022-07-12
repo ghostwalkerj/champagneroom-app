@@ -169,5 +169,5 @@
 		</main>
 	</div>
 {:else}
-	Creating New Agent
+	Loading Agent....
 {/if}
