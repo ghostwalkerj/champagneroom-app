@@ -206,14 +206,14 @@ Call: {previousState}
 <br />
 
 {#if feedback}
-	Views : {feedback.viewedCount}
+	Views : {feedback.viewedCount | 0}
 	<br />
 
-	RejectedCount: {feedback.rejectedCount}
+	RejectedCount: {feedback.rejectedCount | 0}
 	<br />
 
-	DisconnectCount: {feedback.disconnectCount}
+	DisconnectCount: {feedback.disconnectCount | 0}
 	<br />
 
-	NotAnsweredCount: {feedback.notAnsweredCount}
+	NotAnsweredCount: {feedback.notAnsweredCount | 0}
 {/if}

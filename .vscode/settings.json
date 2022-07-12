@@ -29,7 +29,9 @@
     "app/vite.config.js": false,
     "app/src/app.d.ts": false,
     "app/src/app.html": false,
-    "app/src/end.d.ts": false
+    "app/src/end.d.ts": false,
+    ".gitignore": false,
+    "app/.gitignore": false
   },
   "workspace.isHidden": false,
   "cSpell.words": [
