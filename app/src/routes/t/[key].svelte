@@ -16,11 +16,11 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { PhoneIncomingIcon } from 'svelte-feather-icons';
 	import StarRating from 'svelte-star-rating';
+	import { gun } from 'db/gun';
 
 	let key = $page.params.key;
 	let talent: Talent;
 	let currentLink: Link;
-	let gun;
 
 	let talentRef;
 
@@ -73,26 +73,26 @@
 		});
 	};
 
-	onMount(async () => {
-		gun = (await import('db/gun')).gun;
-		talentRef = gun
-			.get(TalentType)
-			.get(key)
-			.on((_talent) => {
-				if (_talent) {
-					talent = _talent;
-					if (talent.currentLinkId) {
-						gun
-							.get(LinkType)
-							.get(talent.currentLinkId)
-							.on((_link: Link) => {
-								if (_link) {
-									currentLink = _link;
-								}
-							});
-					}
+	talentRef = gun
+		.get(TalentType)
+		.get(key)
+		.on((_talent) => {
+			if (_talent) {
+				talent = _talent;
+				if (talent.currentLinkId) {
+					gun
+						.get(LinkType)
+						.get(talent.currentLinkId)
+						.on((_link: Link) => {
+							if (_link) {
+								currentLink = _link;
+							}
+						});
 				}
-			});
+			}
+		});
+
+	onMount(async () => {
 		us = await userStream();
 		us.mediaStream.subscribe((stream) => {
 			if (stream) mediaStream = stream;
