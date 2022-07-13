@@ -18,4 +18,4 @@ export const PCALL_MOBILE_URL = urlJoin(BASE_PCALL_URL, import.meta.env.VITE_MOB
 export const PCALL_MOBILE_ROOM_URL = urlJoin(PCALL_MOBILE_URL, import.meta.env.VITE_ROOM_PATH);
 
 export const PCALL_MOBILE_TALENT_URL = urlJoin(PCALL_MOBILE_URL, import.meta.env.VITE_AGENT_PATH);
-export const LOCAL_GUNDB_PEER = import.meta.env.VITE_LOCAL_GUNDB_PEER || false;
+export const LOCAL_GUNDB_PEER = (import.meta.env.VITE_LOCAL_GUNDB_PEER || false) as boolean;
