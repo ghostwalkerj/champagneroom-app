@@ -7,7 +7,5 @@ declare namespace App {
 	// interface Platform {}
 	//interface Session {
 	//}
-	interface Stuff {
-		dehydratedState: import('@sveltestack/svelte-query').DehydratedState;
-	}
+	interface Stuff {}
 }

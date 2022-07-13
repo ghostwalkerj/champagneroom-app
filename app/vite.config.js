@@ -1,18 +1,9 @@
 import { sveltekit } from '@sveltejs/kit/vite';
-import WindiCSS from 'vite-plugin-windicss';
 import path from 'path';
+import WindiCSS from 'vite-plugin-windicss';
 
 const config = {
-	// Consult https://github.com/sveltejs/svelte-preprocess
-	// for more information about preprocessors
-	server: {
-		hmr: { overlay: true },
-		cors: {
-			origin: "*",
-			methods: "GET,HEAD,PUT,PATCH,POST,DELETE"
-		},
-		https: true
-	},
+
 	resolve: {
 		alias: {
 			// these are the aliases and paths to them
@@ -23,14 +14,22 @@ const config = {
 	},
 	mode: 'development',
 	plugins: [sveltekit(), WindiCSS()],
-	// optimizeDeps: {
-	// 	esbuildOptions: {
-	// 		// Node.js global to browser globalThis
-	// 		define: {
-	// 			global: "globalThis",
-	// 		},
-	// 	}
-	// }
+	optimizeDeps: {
+		include: ['gun',
+			'gun/gun',
+			'gun/sea',
+			'gun/sea.js',
+			'gun/lib/then',
+			'gun/lib/webrtc',
+			'gun/lib/radix',
+			'gun/lib/radisk',
+			'gun/lib/store',
+			'gun/lib/rindexed',
+			'gun/lib/unset.js',
+			'gun/lib/not.js'
+		],
+		exclude: ['path', 'fs', 'os', 'perf_hooks', 'util'],
+	}
 };
 
 export default config;

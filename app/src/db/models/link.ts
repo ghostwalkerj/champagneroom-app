@@ -1,10 +1,8 @@
 import { PCALL_ROOM_URL } from 'lib/constants';
 import urlJoin from 'url-join';
 import { v4 as uuidv4 } from 'uuid';
-import validator from 'validator';
-import { z } from 'zod';
-import type { TalentDocument } from './talent';
-import { DocumentBase } from './documentBase';
+import * as yup from 'yup';
+import { createModelBase, type ModelBase } from './modelBase';
 
 export enum LinkStatus {
 	ACTIVE = 'ACTIVE',
@@ -12,56 +10,51 @@ export enum LinkStatus {
 	IN_PROGRESS = 'IN_PROGRESS',
 	COMPLETED = 'COMPLETED'
 }
-export const LinkSchema = z.object({
-	talentId: z.string().min(21),
-	walletAddress: z
+export const LinkSchema = yup.object({
+	talentId: yup.string().min(21).required(),
+	walletAddress: yup.string(),
+	amount: yup
 		.string()
-		.refine((x) => validator.isEthereumAddress(x), { message: 'Invalid Wallet Address' })
-		.optional(),
-	amount: z.string().refine((x) => validator.isInt(x, { gt: 0, lt: 10000 }), {
-		message: 'Must be between  $1 and $9999'
-	}),
-	fundedAmount: z
+		.matches(/^[1-9]\d{0,3}$/, 'Must be between $1 and $9999')
+		.required(),
+	fundedAmount: yup
 		.string()
-		.refine((x) => validator.isInt(x, { min: 0 }))
-		.optional(),
-	callStart: z
-		.string()
-		.refine((x) => validator.isDate(x))
-		.optional(),
-	callEnd: z
-		.string()
-		.refine((x) => validator.isDate(x))
-		.optional(),
-	callId: z.string().optional(),
-	status: z.nativeEnum(LinkStatus).default(LinkStatus.ACTIVE).optional(),
-	feedBackAvg: z.number().min(1).max(5).optional()
+		.matches(/^[0-9]\d*$/)
+		.default('0'),
+	callStart: yup.string(),
+	callEnd: yup.string(),
+	callId: yup.string(),
+	status: yup.string().default(LinkStatus.ACTIVE),
+	rating: yup.number().min(0).max(5).default(0),
+	name: yup.string().min(3).max(20).required(),
+	profileImageUrl: yup.string()
 });
 
-export type LinkType = z.infer<typeof LinkSchema>;
+export type LinkBase = yup.InferType<typeof LinkSchema>;
+export type Link = LinkBase & ModelBase;
 
-export class LinkDocument extends DocumentBase implements LinkType {
-	public status = LinkStatus.ACTIVE;
-	public callId: string;
-	public talentId: string;
-	public walletAddress?: string;
-	public amount: string;
-	public fundedAmount: string;
-	public callStart?: string;
-	public callEnd?: string;
-	public feedBackAvg?: number;
-	public talent?: TalentDocument;
-	public static type = 'link';
-	constructor(talentId: string, walletAddress: string, amount: string) {
-		super(LinkDocument.type);
-		this.talentId = talentId;
-		this.walletAddress = walletAddress;
-		this.amount = amount;
-		this.fundedAmount = '0';
-		this.callId = uuidv4();
+export const LinkType = 'link';
+export const LinkById = LinkType + 'ById';
+
+export const createLink = (_link: LinkBase) => {
+	const base = createModelBase(LinkType);
+	const link = {
+		...base,
+		..._link,
+		status: LinkStatus.ACTIVE,
+		fundedAmount: '0',
+		walletAddress: '0x251281e1516e6E0A145d28a41EE63BfcDd9E18Bf', //TODO: make real wallet
+		callId: uuidv4()
+	};
+	return link;
+};
+
+export const generateLinkURL = (link: Link): string => {
+	if (link && link._id) {
+		const url = urlJoin(PCALL_ROOM_URL, link._id);
+		return url;
+	} else {
+		console.log("Can't generate link url, link is missing id", link);
+		return '';
 	}
-}
-export const generateLinkURL = (linkDocument: LinkDocument): string => {
-	const url = urlJoin(PCALL_ROOM_URL, linkDocument._id);
-	return url;
 };

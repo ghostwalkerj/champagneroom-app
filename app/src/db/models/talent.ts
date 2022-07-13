@@ -1,43 +1,28 @@
-import validator from 'validator';
-import { z } from 'zod';
-import type { AgentDocument } from './agent';
-import { DocumentBase } from './documentBase';
-import type { LinkDocument } from './link';
-
-export const TalentSchema = z.object({
-	agentId: z.string().min(21),
-	name: z.string().min(3).max(20),
-	talentKey: z.string().min(21),
-	walletAddress: z
-		.string()
-		.refine((x) => validator.isEthereumAddress(x), { message: 'Invalid Wallet Address' })
-		.optional(),
-	profileImageUrl: z
-		.string()
-		.refine((x) => validator.isURL(x))
-		.optional(),
-	feedBackAvg: z.number().min(0).max(5).optional(),
-	agentCommission: z.number().min(0).max(100).int().optional()
+import { DEFAULT_PROFILE_IMAGE } from 'lib/constants';
+import * as yup from 'yup';
+import { createModelBase, type ModelBase } from './modelBase';
+export const TalentSchema = yup.object({
+	agentId: yup.string().min(21).required(),
+	name: yup.string().min(3).max(20).required(),
+	key: yup.string().min(21).required(),
+	walletAddress: yup.string().nullable(),
+	profileImageUrl: yup.string().default(DEFAULT_PROFILE_IMAGE).required(),
+	ratingAvg: yup.number().integer().min(0).max(5).default(0).required(),
+	agentCommission: yup.number().integer().min(0).max(100).default(0).required(),
+	currentLinkId: yup.string().nullable()
 });
 
-export type TalentType = z.infer<typeof TalentSchema>;
+export type TalentBase = yup.InferType<typeof TalentSchema>;
+export type Talent = TalentBase & ModelBase;
+export const TalentType = 'talent';
+export const TalentById = TalentType + 'ById';
+export const TalentByKey = TalentType + 'ByKey';
 
-export class TalentDocument extends DocumentBase implements TalentType {
-	public agentId: string;
-	public talentKey: string;
-	public name: string;
-	public walletAddress?: string;
-	public profileImageUrl?: string;
-
-	public feedBackAvg?: number;
-	public agentCommission?: number;
-	public currentLink?: LinkDocument;
-	public agent?: AgentDocument;
-	public static type = 'talent';
-	constructor(agentId: string, name: string, talentKey: string) {
-		super(TalentDocument.type);
-		this.agentId = agentId;
-		this.name = name;
-		this.talentKey = talentKey;
-	}
-}
+export const createTalent = (_talent: TalentBase): Talent => {
+	const base = createModelBase(TalentType);
+	const talent = {
+		...base,
+		..._talent
+	};
+	return talent;
+};

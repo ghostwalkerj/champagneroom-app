@@ -1,43 +1,150 @@
 <script type="ts">
 	import { browser } from '$app/env';
+	import { page } from '$app/stores';
+	import LinkFeedback from 'components/Feedback.svelte';
+	import LinkDetail from 'components/LinkDetail.svelte';
 	import VideoCall from 'components/VideoCall.svelte';
 	import VideoPreview from 'components/VideoPreview.svelte';
-	import type { LinkDocument } from 'db/models/link';
+	import { createFeedback, FeedbackType, type Feedback } from 'db/models/feedback';
+	import { LinkType, type Link } from 'db/models/link';
 	import { userStream, type UserStreamType } from 'lib/userStream';
 	import type { VideoCallType } from 'lib/videoCall';
 	import { onMount } from 'svelte';
-	import FaMoneyBillWave from 'svelte-icons/fa/FaMoneyBillWave.svelte';
-	import Image from 'svelte-image';
-	export let linkDocument: LinkDocument;
-	export let success: boolean = false;
-	import StarRating from 'svelte-star-rating';
+	import fsm from 'svelte-fsm';
 
-	let talent = linkDocument.talent || { name: '', profileImageUrl: '', feedBackAvg: '0' };
-
-	const formatter = new Intl.NumberFormat('en-US', {
-		style: 'currency',
-		currency: 'USD',
-		maximumFractionDigits: 0
-	});
-
+	let link: Link;
+	let linkId = $page.params.id;
 	let vc: VideoCallType;
 	let videoCall;
 	let mediaStream: MediaStream;
 	let us: Awaited<UserStreamType>;
 	$: callState = 'disconnected';
+	$: previousState = 'none';
+
+	let feedback: Feedback | null = null;
+	let gun;
+
+	const linkState = fsm('neverConnected', {
+		neverConnected: {
+			call: 'calling'
+		},
+		rejected: {
+			_enter() {
+				feedback!.rejectedCount++;
+			},
+			call: 'calling'
+		},
+		notAnswered: {
+			_enter() {
+				feedback!.notAnsweredCount++;
+			},
+			call: 'calling'
+		},
+		calling: {
+			callAccepted: 'inCall',
+			callRejected: 'rejected',
+			recieverHangup: 'rejected',
+			noAnswer: 'notAnswered'
+		},
+		inCall: {
+			callEnded: 'callEnded',
+			callDisconnected: 'disconnected',
+			recieverHangup: 'disconnected'
+		},
+		disconnected: {
+			_enter() {
+				feedback!.disconnectCount++;
+			},
+			call: 'calling'
+		},
+		callEnded: {
+			waitingForFeedback: 'waitForFeedback'
+		},
+		waitForFeedback: {
+			feedbackGiven: 'complete'
+		},
+		complete: {}
+	});
 
 	if (browser) {
 		import('lib/videoCall').then((_vc) => {
 			videoCall = _vc.videoCall;
+			vc = videoCall();
+			vc.callState.subscribe((state) => {
+				callState = state;
+				switch (state) {
+					case 'makingCall': {
+						linkState.call();
+						break;
+					}
+					case 'connectedAsCaller': {
+						linkState.callAccepted();
+						break;
+					}
+				}
+			});
+			vc.previousState.subscribe((_previousState) => {
+				if (_previousState) {
+					previousState = _previousState;
+					switch (_previousState) {
+						case 'callerEnded':
+						case 'callerHangup': {
+							linkState.callEnded();
+							break;
+						}
+						case 'timeout': {
+							linkState.noAnswer();
+							break;
+						}
+						case 'receiverRejected': {
+							linkState.callRejected();
+							break;
+						}
+						case 'receiverHangup':
+						case 'receiverEnded': {
+							linkState.recieverHangup();
+							break;
+						}
+					}
+				}
+			});
 		});
 	}
 
 	onMount(async () => {
+		gun = (await import('db/gun')).gun;
+		// get link
+		gun
+			.get(LinkType)
+			.get(linkId)
+			.on((_link) => {
+				link = _link;
+			});
+
+		if (feedback == null) {
+			gun
+				.get(FeedbackType)
+				.get(linkId, (ack) => {
+					if (!ack.put) {
+						feedback = createFeedback({
+							linkId,
+							rejectedCount: 0,
+							disconnectCount: 0,
+							notAnsweredCount: 0,
+							rating: 0,
+							viewedCount: 0
+						});
+						gun.get(FeedbackType).get(linkId).put(feedback);
+					}
+				})
+				.on((_feedback) => {
+					if (_feedback && !feedback) {
+						feedback = _feedback;
+					}
+				});
+		}
+
 		us = await userStream();
-		vc = videoCall();
-		vc.callState.subscribe((state) => {
-			callState = state;
-		});
 		us.mediaStream.subscribe((stream) => {
 			if (stream) mediaStream = stream;
 		});
@@ -45,90 +152,43 @@
 
 	const call = async () => {
 		if (vc) {
-			vc.makeCall(linkDocument.callId, 'Dr. Huge Mongus', mediaStream);
+			vc.makeCall(link.callId!, 'Dr. Huge Mongus', mediaStream);
 		}
 	};
-	$: inCall = callState == 'connectedAsCaller';
+	$: showFeedback = false;
 </script>
 
+<LinkFeedback {showFeedback} />
 <div class="min-h-full">
 	<main class="py-6">
-		{#if success}
-			{#if !inCall}
+		{#if link}
+			{#if $linkState != 'inCall'}
 				<!-- Page header -->
+				<div class="text-center">
+					<h1 class="font-bold text-center text-5xl">Make your pCall</h1>
+					<p class="py-6">Scis vis facere illud pCall. Carpe florem et fac quod nunc vocant.</p>
+				</div>
 				<div
-					class="mx-auto max-w-3xl  sm:px-6 md:flex md:space-x-5 md:items-center md:justify-between lg:max-w-7xl lg:px-8"
+					class="max-w-max	 container mx-auto  items-center sm:px-6 md:flex md:space-x-5 md:items-stretch  lg:px-8"
 				>
-					<div class="flex flex-col space-x-5 w-full p-2 items-center">
-						<h1 class="font-bold text-center text-5xl">Make your pCall</h1>
-						<p class="py-6">Scis vis facere illud pCall. Carpe florem et fac quod nunc vocant.</p>
-						<div class="flex flex-col w-full gap-6 md:flex-row">
-							<div class="flex flex-col w-full ">
-								<div
-									class="rounded-box h-full bg-base-200 flex-shrink-0 shadow-xl mx-2 grid  p-4 py-8 gap-4 col-span-3 row-span-3 place-items-center xl:mx-0 xl:w-full"
-								>
-									<div class="text-center">
-										<div class="font-extrabold text-lg">This pCall is For</div>
-										<div class="font-extrabold text-3xl">{talent.name}</div>
-									</div>
-									<div class="rounded-full flex-none h-48 w-48 mask-circle">
-										<Image
-											src={talent.profileImageUrl}
-											alt={talent.name}
-											height="48"
-											width="48"
-											class="rounded-full flex-none object-cover mask-circle"
-										/>
-									</div>
-									<StarRating rating={talent.feedBackAvg || 0} />
+					<div class="rounded-box h-full bg-base-200">
+						<div>
+							<LinkDetail {link} />
+						</div>
+						<div class="btn-group justify-center pb-6">
+							<button class="btn btn-secondary" on:click={call} disabled={callState != 'ready'}
+								>Call {link.name} Now</button
+							>
+						</div>
+					</div>
 
-									<div class="stats stats-vertical stats-shadow lg:stats-horizontal">
-										<div class="stat">
-											<div class="text-primary w-10 stat-figure">
-												<FaMoneyBillWave />
-											</div>
-											<div class="stat-title">Requested</div>
-											<div class="text-primary stat-value">
-												{formatter.format(Number.parseInt(linkDocument.amount))}
-											</div>
-										</div>
-
-										<div class="stat">
-											<div class="text-secondary w-10 stat-figure">
-												<FaMoneyBillWave />
-											</div>
-											<div class="stat-title">Funded</div>
-											<div class="text-secondary stat-value">
-												{formatter.format(Number.parseInt(linkDocument.fundedAmount))}
-											</div>
-										</div>
-									</div>
-									<section
-										class="flex flex-col bg-base-100 rounded-2xl flex-shrink-0 text-white text-center p-4 gap-4 items-center justify-center  md:gap-8 "
-									>
-										<div>Funding Address</div>
-										<div class="break-all">{linkDocument.walletAddress}</div>
-									</section>
-
-									<div class="btn-group">
-										<button
-											class="btn btn-secondary"
-											on:click={call}
-											disabled={callState != 'ready'}>Call {talent.name} Now</button
-										>
-									</div>
-								</div>
+					<div class="bg-base-200  text-white card lg:min-w-200">
+						<div class="text-center card-body items-center ">
+							<div class="text-2xl card-title">Your Video Preview</div>
+							<div class="container rounded-2xl max-w-2xl h-full">
+								<VideoPreview {us} />
 							</div>
-
-							<div class="bg-base-200 text-white card">
-								<div class="text-center card-body items-center">
-									<div class="text-2xl card-title">Your Video Preview</div>
-									<div class="container rounded-2xl max-w-2xl">
-										<VideoPreview {us} />
-									</div>
-									Call State: {callState}
-								</div>
-							</div>
+							Call State: {callState}
 						</div>
 					</div>
 				</div>
@@ -136,7 +196,24 @@
 				<VideoCall {vc} {us} />
 			{/if}
 		{:else}
-			<h1 class="font-bold text-5xl">Invalid link</h1>
+			<h1>Searching for your pCall</h1>
 		{/if}
 	</main>
 </div>
+Link: {$linkState}
+<br />
+Call: {previousState}
+<br />
+
+{#if feedback}
+	Views : {feedback.viewedCount | 0}
+	<br />
+
+	RejectedCount: {feedback.rejectedCount | 0}
+	<br />
+
+	DisconnectCount: {feedback.disconnectCount | 0}
+	<br />
+
+	NotAnsweredCount: {feedback.notAnsweredCount | 0}
+{/if}

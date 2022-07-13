@@ -83,13 +83,14 @@
 	const initalize = () => {
 		if (localVideo) {
 			localVideo.srcObject = mediaStream;
+			localVideo.muted = true;
+
 			remoteVideo.load();
 			localVideo.play();
 		}
 		vc.callState.subscribe((s) => {
 			switch (s) {
 				case 'ready':
-
 				case 'connectedAsCaller':
 				case 'connectedAsReceiver':
 					vc.remoteStream.subscribe((stream) => {

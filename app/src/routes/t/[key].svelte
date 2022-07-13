@@ -1,26 +1,29 @@
 <script type="ts">
 	import { browser } from '$app/env';
-	import { reporter, ValidationMessage } from '@felte/reporter-svelte';
-	import { validator } from '@felte/validator-zod';
-	import { useQueryClient } from '@sveltestack/svelte-query';
+	import { page } from '$app/stores';
+	import { createForm } from 'svelte-forms-lib';
+	import * as yup from 'yup';
+
+	import ProfilePhoto from 'components/forms/ProfilePhoto.svelte';
 	import LinkViewer from 'components/LinkViewer.svelte';
 	import VideoCall from 'components/VideoCall.svelte';
 	import VideoPreview from 'components/VideoPreview.svelte';
-	import type { TalentDocument } from 'db/models/talent';
-	import { LinkDocument, LinkSchema } from 'db/models/link';
-	import { getLinkQueryByTalentId } from 'db/queries/linkQueries';
-	import { createForm } from 'felte';
+
+	import { createLink, LinkSchema, LinkStatus, LinkType, type Link } from 'db/models/link';
+	import { TalentType, type Talent } from 'db/models/talent';
 	import { userStream, type UserStreamType } from 'lib/userStream';
 	import type { VideoCallType } from 'lib/videoCall';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { PhoneIncomingIcon } from 'svelte-feather-icons';
-	import { DEFAULT_PROFILE_IMAGE } from 'lib/constants';
-	import ProfilePhoto from 'components/forms/ProfilePhoto.svelte';
-	import { updateTalent } from 'db/queries/talentQueries';
 	import StarRating from 'svelte-star-rating';
 
-	export let talentDocument: TalentDocument;
-	export let success: boolean;
+	let key = $page.params.key;
+	let talent: Talent;
+	let currentLink: Link;
+	let gun;
+
+	let talentRef;
+
 	let vc: VideoCallType;
 	if (browser) {
 		import('lib/videoCall').then((_vc) => {
@@ -28,41 +31,23 @@
 			initVC();
 		});
 	}
-	const queryClient = useQueryClient();
 	const formatter = new Intl.NumberFormat('en-US', {
 		style: 'currency',
 		currency: 'USD',
 		maximumFractionDigits: 0
 	});
 
-	const update = async (talent: TalentDocument) => {
-		updateTalent(talent);
+	const updateProfileImage = async (url: string) => {
+		if (url) {
+			talentRef.get('profileImageUrl').put(url);
+			talent.profileImageUrl = url;
+			if (currentLink) {
+				currentLink.profileImageUrl = url;
+				gun.get(LinkType).get(currentLink._id).get('profileImageUrl').put(url);
+			}
+		}
 	};
 
-	const { form: linkForm, reset: linkFormReset } = createForm({
-		extend: [
-			reporter,
-			validator({
-				schema: LinkSchema
-			})
-		],
-		async onSuccess(response: any) {
-			const body: {
-				success: boolean;
-				linkDocument: LinkDocument;
-			} = await response.json();
-			if (body.success) {
-				queryClient.setQueryData(['linkDocument', talentDocument._id], body);
-				initVC();
-			}
-			linkFormReset();
-		},
-		onError(err: any) {
-			console.log(err);
-		}
-	});
-
-	let linkDocument: LinkDocument;
 	let us: Awaited<UserStreamType>;
 	$: callState = 'disconnected';
 	let videoCall;
@@ -75,14 +60,10 @@
 	};
 
 	$: callerName = '';
-	const linkQueryResult = getLinkQueryByTalentId(talentDocument._id);
-
-	$: if ($linkQueryResult.isSuccess) {
-		linkDocument = $linkQueryResult.data.linkDocument;
-	}
 
 	const initVC = () => {
-		const callId = linkDocument ? linkDocument.callId : null;
+		if (vc) vc.destroy();
+		const callId = currentLink ? currentLink.callId : null;
 		vc = videoCall(callId);
 		vc.callState.subscribe((cs) => {
 			if (cs) callState = cs;
@@ -93,14 +74,63 @@
 	};
 
 	onMount(async () => {
+		gun = (await import('db/gun')).gun;
+		talentRef = gun
+			.get(TalentType)
+			.get(key)
+			.on((_talent) => {
+				if (_talent) {
+					talent = _talent;
+					if (talent.currentLinkId) {
+						gun
+							.get(LinkType)
+							.get(talent.currentLinkId)
+							.on((_link: Link) => {
+								if (_link) {
+									currentLink = _link;
+								}
+							});
+					}
+				}
+			});
 		us = await userStream();
 		us.mediaStream.subscribe((stream) => {
 			if (stream) mediaStream = stream;
 		});
 	});
+
+	onDestroy(async () => {
+		if (vc) vc.destroy();
+	});
+
+	const { form, errors, handleChange, handleSubmit, handleReset } = createForm({
+		initialValues: { amount: '0' },
+		validationSchema: yup.object({
+			amount: yup
+				.string()
+				.matches(/^[1-9]\d{0,3}$/, 'Must be between $1 and $9999')
+				.required()
+		}),
+		onSubmit: (values) => {
+			const linkParams = LinkSchema.cast({
+				amount: values.amount,
+				talentId: talent._id,
+				name: talent.name,
+				profileImageUrl: talent.profileImageUrl
+			});
+			const link = createLink(linkParams);
+			if (currentLink) {
+				gun.get(LinkType).get(currentLink._id).get('status').put(LinkStatus.EXPIRED);
+			}
+			gun.get(LinkType).get(link._id).put(link);
+			talentRef.get('currentLinkId').put(link._id);
+			currentLink = link;
+			handleReset();
+		}
+	});
 </script>
 
-{#if success}
+{#if talent}
 	<!-- Put this part before </body> tag -->
 	<input type="checkbox" id="call-modal" class="modal-toggle" bind:checked={showAlert} />
 	<div class="modal">
@@ -144,8 +174,8 @@
 						<!-- Current Link -->
 						<div>
 							<div>
-								{#if linkDocument}
-									<LinkViewer {linkDocument} {talentDocument} />
+								{#if currentLink}
+									<LinkViewer link={currentLink} {talent} />
 								{:else}
 									<div class="bg-primary text-primary-content card">
 										<div class="text-center card-body items-center">
@@ -163,19 +193,11 @@
 									<h2 class="text-2xl card-title">Request a New pCall</h2>
 
 									<div class="flex flex-col text-white p-2 justify-center items-center">
-										<form use:linkForm method="post">
-											<!-- TODO: Change this to programatic  -->
-											<input
-												type="hidden"
-												name="talentId"
-												id="talentId"
-												value={talentDocument._id}
-											/>
-
+										<form on:submit|preventDefault={handleSubmit}>
 											<div class="max-w-xs w-full py-2 form-control ">
 												<!-- svelte-ignore a11y-label-has-associated-control -->
 												<label for="price" class="label">
-													<span class="label-text"> Requested Amount in USD</span></label
+													<span class="label-text">Requested Amount in USD</span></label
 												>
 												<div class="rounded-md shadow-sm mt-1 relative">
 													<div
@@ -190,6 +212,8 @@
 														class=" max-w-xs w-full py-2 pl-6 input input-bordered input-primary "
 														placeholder="0.00"
 														aria-describedby="price-currency"
+														on:change={handleChange}
+														bind:value={$form.amount}
 													/>
 													<div
 														class="flex pr-3 inset-y-0 right-0 absolute items-center pointer-events-none"
@@ -197,12 +221,10 @@
 														<span class="text-gray-500 sm:text-sm" id="price-currency"> USDC </span>
 													</div>
 												</div>
-
-												<ValidationMessage for="amount" let:messages={message}>
-													<span>{message}</span>
-													<span slot="placeholder" />
-												</ValidationMessage>
 											</div>
+											{#if $errors.amount}
+												<div class="alert alert-error shadow-lg">{$errors.amount}</div>
+											{/if}
 											<div class="py-4">
 												<button class="btn btn-secondary" type="submit">Generate Link</button>
 											</div>
@@ -231,11 +253,11 @@
 								<div class="bg-primary text-primary-content card">
 									<div class="text-center card-body items-center">
 										<h2 class="text-2xl card-title">pCall Status</h2>
-										<p>Signed in as {talentDocument.name}</p>
-										{#if linkDocument}
-											<p>CallId: {linkDocument.callId}</p>
+										<p>Signed in as {talent.name}</p>
+										{#if currentLink}
+											<p>CallId: {currentLink.callId}</p>
 										{/if}
-										<p>Call Status: {callState}</p>
+										<p>Call State: {callState}</p>
 									</div>
 								</div>
 							</div>
@@ -248,10 +270,9 @@
 										<h2 class="text-2xl card-title">Profile Photo</h2>
 										<div>
 											<ProfilePhoto
-												profileImage={talentDocument.profileImageUrl || DEFAULT_PROFILE_IMAGE}
+												profileImage={talent.profileImageUrl}
 												callBack={(value) => {
-													talentDocument.profileImageUrl = value;
-													update(talentDocument);
+													updateProfileImage(value);
 												}}
 											/>
 										</div>
@@ -264,8 +285,8 @@
 							<div class="lg:col-start-3 lg:col-span-1">
 								<div class="bg-primary text-primary-content card">
 									<div class="text-center card-body items-center">
-										<h2 class="text-2xl card-title">Your Feedback Rating</h2>
-										<StarRating rating={talentDocument.feedBackAvg || 0} />
+										<h2 class="text-2xl card-title">Your Average Rating</h2>
+										<StarRating rating={talent.ratingAvg || 0} />
 									</div>
 								</div>
 							</div>

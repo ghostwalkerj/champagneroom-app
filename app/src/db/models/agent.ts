@@ -1,28 +1,24 @@
-import validator from 'validator';
-import { z } from 'zod';
-import type { TalentDocument } from './talent';
-import { DocumentBase } from './documentBase';
+import * as yup from 'yup';
+import { createModelBase, type ModelBase } from './modelBase';
 
-export const AgentSchema = z.object({
-	address: z.string().refine((x) => {
-		return validator.isEthereumAddress(x);
-	}),
-	walletAddress: z
-		.string()
-		.refine((x) => validator.isEthereumAddress(x), { message: 'Invalid Wallet Address' })
-		.optional()
+export const AgentSchema = yup.object({
+	address: yup.string().required().min(40),
+	walletAddress: yup.string().optional(),
+	talents: yup.array().optional()
 });
 
-export type AgentType = z.infer<typeof AgentSchema>;
+export type AgentBase = yup.InferType<typeof AgentSchema>;
+export type Agent = AgentBase & ModelBase;
+export const AgentType = 'agent';
 
-export class AgentDocument extends DocumentBase implements AgentType {
-	public address: string;
-	public walletAddress?: string;
-	public talents: TalentDocument[];
-	public static type = 'agent';
-	constructor(address: string) {
-		super(AgentDocument.type);
-		this.address = address;
-		this.talents = [];
-	}
-}
+export const AgentById = AgentType + 'ById';
+export const AgentByAddress = AgentType + 'ByAddress';
+
+export const createAgent = (_agent: AgentBase) => {
+	const base = createModelBase(AgentType);
+	const agent = {
+		...base,
+		..._agent
+	};
+	return agent;
+};
