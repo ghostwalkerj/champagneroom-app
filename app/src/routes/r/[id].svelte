@@ -5,6 +5,7 @@
 	import LinkDetail from 'components/LinkDetail.svelte';
 	import VideoCall from 'components/VideoCall.svelte';
 	import VideoPreview from 'components/VideoPreview.svelte';
+	import { gun } from 'db/gun';
 	import { createFeedback, FeedbackType, type Feedback } from 'db/models/feedback';
 	import { LinkType, type Link } from 'db/models/link';
 	import { userStream, type UserStreamType } from 'lib/userStream';
@@ -22,7 +23,37 @@
 	$: previousState = 'none';
 
 	let feedback: Feedback | null = null;
-	let gun;
+
+	// get link
+	gun
+		.get(LinkType)
+		.get(linkId)
+		.on((_link) => {
+			link = _link;
+		});
+
+	if (feedback == null) {
+		gun
+			.get(FeedbackType)
+			.get(linkId, (ack) => {
+				if (!ack.put) {
+					feedback = createFeedback({
+						linkId,
+						rejectedCount: 0,
+						disconnectCount: 0,
+						notAnsweredCount: 0,
+						rating: 0,
+						viewedCount: 0
+					});
+					gun.get(FeedbackType).get(linkId).put(feedback);
+				}
+			})
+			.on((_feedback) => {
+				if (_feedback && !feedback) {
+					feedback = _feedback;
+				}
+			});
+	}
 
 	const linkState = fsm('neverConnected', {
 		neverConnected: {
@@ -112,38 +143,6 @@
 	}
 
 	onMount(async () => {
-		gun = (await import('db/gun')).gun;
-		// get link
-		gun
-			.get(LinkType)
-			.get(linkId)
-			.on((_link) => {
-				link = _link;
-			});
-
-		if (feedback == null) {
-			gun
-				.get(FeedbackType)
-				.get(linkId, (ack) => {
-					if (!ack.put) {
-						feedback = createFeedback({
-							linkId,
-							rejectedCount: 0,
-							disconnectCount: 0,
-							notAnsweredCount: 0,
-							rating: 0,
-							viewedCount: 0
-						});
-						gun.get(FeedbackType).get(linkId).put(feedback);
-					}
-				})
-				.on((_feedback) => {
-					if (_feedback && !feedback) {
-						feedback = _feedback;
-					}
-				});
-		}
-
 		us = await userStream();
 		us.mediaStream.subscribe((stream) => {
 			if (stream) mediaStream = stream;
