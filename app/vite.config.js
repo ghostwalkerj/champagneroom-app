@@ -28,7 +28,7 @@ const config = {
 			'gun/lib/unset.js',
 			'gun/lib/not.js'
 		],
-		exclude: ['web3']
+		exclude: ['path', 'fs', 'os', 'perf_hooks', 'util'],
 	}
 };
 
