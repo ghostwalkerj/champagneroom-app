@@ -23,7 +23,8 @@
     ".svelte-kit": true,
     "app/.svelte-kit": true,
     "app/.vercel": true,
-    "app/.env": true
+    "app/.env": true,
+    "app/build": true
   },
   "workspace.isHidden": true,
   "cSpell.words": [
