@@ -1,3 +1,10 @@
+import {
+	toTypedRxJsonSchema,
+	type ExtractDocumentTypeFromTypedRxJsonSchema,
+	type RxCollection,
+	type RxDocument,
+	type RxJsonSchema
+} from 'rxdb';
 import * as yup from 'yup';
 import { createModelBase, type ModelBase } from './modelBase';
 
@@ -22,3 +29,55 @@ export const createAgent = (_agent: AgentBase) => {
 	};
 	return agent;
 };
+
+const agentSchemaLiteral = {
+	title: 'agent',
+	description: 'manages talent',
+	version: 0,
+	type: 'object',
+	primaryKey: {
+		key: '_id',
+		fields: ['entityType', 'address'],
+		separator: ':'
+	},
+	properties: {
+		_id: {
+			type: 'string',
+			maxLength: 100
+		},
+		entityType: {
+			type: 'string',
+			default: 'agent',
+			maxLength: 50
+		},
+		address: {
+			type: 'string',
+			maxLength: 50
+		},
+		updatedAt: {
+			type: 'number'
+		},
+		talents: {
+			type: 'array',
+			ref: 'talent',
+			items: {
+				type: 'string',
+				maxLength: 100
+			}
+		}
+	},
+	required: ['_id', 'address', 'entityType'],
+	indexes: ['_id', 'address', 'entityType']
+} as const;
+
+type agentRef = {
+	talents_?: Promise<AgentDocument[]>;
+};
+
+const schemaTyped = toTypedRxJsonSchema(agentSchemaLiteral);
+export type AgentDocType = ExtractDocumentTypeFromTypedRxJsonSchema<typeof schemaTyped>;
+export const agentSchema: RxJsonSchema<AgentDocType> = agentSchemaLiteral;
+
+export type AgentDocument = RxDocument<AgentDocType> & agentRef;
+
+export type AgentCollection = RxCollection<AgentDocType>;

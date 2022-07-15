@@ -1,6 +1,7 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import path from 'path';
 import WindiCSS from 'vite-plugin-windicss';
+import basicSsl from '@vitejs/plugin-basic-ssl';
 
 const config = {
 
@@ -13,7 +14,7 @@ const config = {
 		}
 	},
 	mode: 'development',
-	plugins: [sveltekit(), WindiCSS()],
+	plugins: [sveltekit(), basicSsl(), WindiCSS()],
 	optimizeDeps: {
 		include: ['gun',
 			'gun/gun',
@@ -26,9 +27,8 @@ const config = {
 			'gun/lib/store',
 			'gun/lib/rindexed',
 			'gun/lib/unset.js',
-			'gun/lib/not.js'
-		],
-		exclude: ['path', 'fs', 'os', 'perf_hooks', 'util'],
+			'gun/lib/not.js'],
+		exclude: ['path', 'fs', 'os', 'perf_hooks'],
 	}
 };
 

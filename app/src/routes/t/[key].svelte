@@ -9,6 +9,7 @@
 	import VideoCall from 'components/VideoCall.svelte';
 	import VideoPreview from 'components/VideoPreview.svelte';
 
+	import { gun } from 'db/gun';
 	import { createLink, LinkSchema, LinkStatus, LinkType, type Link } from 'db/models/link';
 	import { TalentType, type Talent } from 'db/models/talent';
 	import { userStream, type UserStreamType } from 'lib/userStream';
@@ -16,7 +17,6 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { PhoneIncomingIcon } from 'svelte-feather-icons';
 	import StarRating from 'svelte-star-rating';
-	import { gun } from 'db/gun';
 
 	let key = $page.params.key;
 	let talent: Talent;

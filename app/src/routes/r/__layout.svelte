@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { browser } from '$app/env';
 	import { goto } from '$app/navigation';
-	import { UAParser } from 'ua-parser-js';
 	import { page } from '$app/stores';
+	import { UAParser } from 'ua-parser-js';
 	import urlJoin from 'url-join';
 
 	if (browser) {

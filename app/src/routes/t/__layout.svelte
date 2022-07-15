@@ -1,6 +1,5 @@
 <script lang="ts">
 	import ConnectButton from 'components/web3/ConnectButton.svelte';
-	import { selectedAccount } from 'svelte-web3';
 </script>
 
 <div class="bg-base-100 navbar">

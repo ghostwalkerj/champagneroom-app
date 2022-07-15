@@ -1,6 +1,24 @@
 <script lang="ts">
 	import ConnectButton from 'components/web3/ConnectButton.svelte';
+	import { createAgent } from 'db/models/agent';
+	import { agentDB, currentAgent } from 'db/pcallDB';
 	import { selectedAccount } from 'svelte-web3';
+
+	//TODO: This will be authentication later
+	selectedAccount.subscribe(async (account) => {
+		if (account) {
+			const db$ = await agentDB(account);
+			let agent = await db$.agent.findOne('agent:' + account).exec();
+			if (!agent) {
+				const _agent = createAgent({
+					address: account
+				});
+				agent = await db$.agent.insert(_agent);
+
+				currentAgent.set(agent);
+			}
+		}
+	});
 </script>
 
 <div class="bg-base-100 navbar">
