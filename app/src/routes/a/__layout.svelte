@@ -8,14 +8,21 @@
 	selectedAccount.subscribe(async (account) => {
 		if (account) {
 			const db$ = await agentDB(account);
-			let agent = await db$.agent.findOne('agent:' + account).exec();
+			let agent = await db$.agent
+				.findOne({
+					selector: {
+						address: account
+					}
+				})
+				.exec();
 			if (!agent) {
 				const _agent = createAgent({
 					address: account
 				});
-				agent = await db$.agent.insert(_agent);
 
+				agent = await db$.agent.insert(_agent);
 				currentAgent.set(agent);
+				console.log(agent);
 			}
 		}
 	});

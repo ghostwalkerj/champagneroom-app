@@ -35,11 +35,7 @@ const agentSchemaLiteral = {
 	description: 'manages talent',
 	version: 0,
 	type: 'object',
-	primaryKey: {
-		key: '_id',
-		fields: ['entityType', 'address'],
-		separator: ':'
-	},
+	primaryKey: '_id',
 	properties: {
 		_id: {
 			type: 'string',
@@ -54,9 +50,7 @@ const agentSchemaLiteral = {
 			type: 'string',
 			maxLength: 50
 		},
-		updatedAt: {
-			type: 'number'
-		},
+		createdAt: { type: 'string' },
 		talents: {
 			type: 'array',
 			ref: 'talent',
@@ -67,7 +61,7 @@ const agentSchemaLiteral = {
 		}
 	},
 	required: ['_id', 'address', 'entityType'],
-	indexes: ['_id', 'address', 'entityType']
+	indexes: ['address', 'entityType']
 } as const;
 
 type agentRef = {

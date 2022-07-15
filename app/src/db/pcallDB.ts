@@ -11,6 +11,8 @@ import { addRxPlugin, createRxDatabase } from 'rxdb';
 import { RxDBLeaderElectionPlugin } from 'rxdb/plugins/leader-election';
 import { addPouchPlugin, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
 import { RxDBUpdatePlugin } from 'rxdb/plugins/update';
+import { RxDBDevModePlugin } from 'rxdb/plugins/dev-mode';
+import { RxDBMigrationPlugin } from 'rxdb/plugins/migration';
 
 const SYNCCOUCHDB_URL = import.meta.env.VITE_SYNCCOUCHDB_URL as string;
 
@@ -31,6 +33,8 @@ const _create = async (address: string) => {
 	addRxPlugin(RxDBValidatePlugin);
 	addPouchPlugin(PouchHttpPlugin);
 	addRxPlugin(RxDBUpdatePlugin);
+	addRxPlugin(RxDBDevModePlugin);
+	//addRxPlugin(RxDBMigrationPlugin);
 
 	const _db: pcallDB = await createRxDatabase({
 		name: 'pcall',
@@ -49,8 +53,8 @@ const _create = async (address: string) => {
 		options: {
 			retry: true,
 			live: true
-		},
-		query: _db.agent.find().where('address').eq(address)
+		}
+		//query: _db.agent.find().where('address').eq(address)
 	});
 	return _db;
 };
