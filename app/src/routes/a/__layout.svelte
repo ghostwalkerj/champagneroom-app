@@ -16,14 +16,12 @@
 				// .eq('agent')
 				.exec();
 			if (!agent) {
-				const _agent = createAgent({
-					address: account
-				});
+				const _agent = createAgent(account);
 				console.log('insert agent: ' + _agent);
 				agent = await db$.agent.insert(_agent);
 			}
 			currentAgent.set(agent);
-			console.log(agent);
+			console.log(JSON.stringify(agent));
 		}
 	});
 </script>

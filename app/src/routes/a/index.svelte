@@ -1,14 +1,12 @@
 <script type="ts">
-	import { gun } from '$lib/db/gun';
-	import { AgentType, createAgent, type Agent } from '$lib/db/models/agent';
 	import { createTalent, TalentSchema, TalentType, type Talent } from '$lib/db/models/talent';
-	import type { IGunChain, IGunInstance } from 'gun';
 	import { PCALL_TALENT_URL } from '$lib/constants';
 	import { nanoid } from 'nanoid';
 	import { createForm } from 'svelte-forms-lib';
-	import { selectedAccount } from 'svelte-web3';
 	import urlJoin from 'url-join';
 	import * as yup from 'yup';
+	import type { AgentDocument } from '$lib/db/models/agent';
+	import { currentAgent } from '$lib/db/pcallDB';
 
 	const { form, errors, handleReset, handleChange, handleSubmit } = createForm({
 		initialValues: { name: '', agentCommission: '10' },
@@ -36,45 +34,13 @@
 		}
 	});
 
-	let agentRef: IGunChain<
-		any,
-		IGunChain<any, IGunInstance<any>, IGunInstance<any>, string>,
-		IGunInstance<any>,
-		string
-	>;
-
-	let agent: Agent;
+	let agent: AgentDocument;
+	$: currentAgent.subscribe((_agent) => {
+		agent = _agent;
+	});
 	let talents: Talent[] = [];
 	$: talentkey = nanoid();
 	$: talentUrl = urlJoin(PCALL_TALENT_URL, talentkey);
-
-	selectedAccount.subscribe((account) => {
-		if (account) {
-			agentRef = gun.get(account, (ack) => {
-				if (!ack.put) {
-					agent = createAgent({
-						address: account
-					});
-					const _agent = gun.get(AgentType).get(account).put(agent);
-					gun.get(AgentType).get(agent._id).put(_agent);
-				}
-			});
-
-			agentRef.on((_agent: Agent) => {
-				agent = _agent;
-			});
-
-			agentRef
-				.get('talents')
-				.once(() => {})
-				.map()
-				.once((_talent: any) => {
-					if (_talent) {
-						talents = talents.concat(_talent);
-					}
-				});
-		}
-	});
 </script>
 
 {#if agent}

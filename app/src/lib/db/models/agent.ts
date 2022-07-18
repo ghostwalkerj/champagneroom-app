@@ -8,29 +8,6 @@ import {
 import * as yup from 'yup';
 import { createModelBase, type ModelBase } from './modelBase';
 
-export const AgentSchema = yup.object({
-	address: yup.string().required().min(40),
-	walletAddress: yup.string().optional(),
-	talents: yup.array().optional()
-});
-
-export type AgentBase = yup.InferType<typeof AgentSchema>;
-export type Agent = AgentBase & ModelBase;
-export const AgentType = 'agent';
-
-export const AgentById = AgentType + 'ById';
-export const AgentByAddress = AgentType + 'ByAddress';
-
-export const createAgent = (_agent: AgentBase) => {
-	const base = createModelBase(AgentType);
-	const agent = {
-		...base,
-		..._agent,
-		_id: AgentType + ':' + _agent.address
-	};
-	return agent;
-};
-
 const agentSchemaLiteral = {
 	title: 'agent',
 	description: 'manages talent',
@@ -71,7 +48,7 @@ const agentSchemaLiteral = {
 	encrypted: ['talents']
 } as const;
 
-type agentRef = {
+type talentRef = {
 	talents_?: Promise<AgentDocument[]>;
 };
 
@@ -79,6 +56,18 @@ const schemaTyped = toTypedRxJsonSchema(agentSchemaLiteral);
 export type AgentDocType = ExtractDocumentTypeFromTypedRxJsonSchema<typeof schemaTyped>;
 export const agentSchema: RxJsonSchema<AgentDocType> = agentSchemaLiteral;
 
-export type AgentDocument = RxDocument<AgentDocType> & agentRef;
+export type AgentDocument = RxDocument<AgentDocType> & talentRef;
 
 export type AgentCollection = RxCollection<AgentDocType>;
+
+export const AgentType = 'agent';
+
+export const createAgent = (address: string) => {
+	const base = createModelBase(AgentType);
+	const agent = {
+		...base,
+		_id: AgentType + ':' + address,
+		address: address
+	};
+	return agent;
+};
