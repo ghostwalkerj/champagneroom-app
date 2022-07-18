@@ -25,7 +25,8 @@ export const createAgent = (_agent: AgentBase) => {
 	const base = createModelBase(AgentType);
 	const agent = {
 		...base,
-		..._agent
+		..._agent,
+		_id: AgentType + ':' + _agent.address
 	};
 	return agent;
 };
@@ -35,7 +36,11 @@ const agentSchemaLiteral = {
 	description: 'manages talent',
 	version: 0,
 	type: 'object',
-	primaryKey: '_id',
+	primaryKey: {
+		key: '_id',
+		fields: ['entityType', 'address'],
+		separator: ':'
+	},
 	properties: {
 		_id: {
 			type: 'string',
@@ -48,7 +53,8 @@ const agentSchemaLiteral = {
 		},
 		address: {
 			type: 'string',
-			maxLength: 50
+			maxLength: 50,
+			unique: true
 		},
 		createdAt: { type: 'string' },
 		talents: {
@@ -61,7 +67,8 @@ const agentSchemaLiteral = {
 		}
 	},
 	required: ['_id', 'address', 'entityType'],
-	indexes: ['address', 'entityType']
+	indexes: [['address', 'entityType']],
+	encrypted: ['talents']
 } as const;
 
 type agentRef = {

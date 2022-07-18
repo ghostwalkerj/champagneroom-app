@@ -19,6 +19,7 @@
 				const _agent = createAgent({
 					address: account
 				});
+				console.log('insert agent: ' + _agent);
 				agent = await db$.agent.insert(_agent);
 			}
 			currentAgent.set(agent);
