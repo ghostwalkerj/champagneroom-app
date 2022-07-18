@@ -1,5 +1,4 @@
 import { sveltekit } from '@sveltejs/kit/vite';
-import path from 'path';
 import WindiCSS from 'vite-plugin-windicss';
 import basicSsl from '@vitejs/plugin-basic-ssl';
 
@@ -8,9 +7,7 @@ const config = {
 	resolve: {
 		alias: {
 			// these are the aliases and paths to them
-			components: path.resolve('./src/components'),
-			lib: path.resolve('./src/lib'),
-			db: path.resolve('./src/db')
+			//$lib: path.resolve('./src/lib'),
 		}
 	},
 	mode: 'development',

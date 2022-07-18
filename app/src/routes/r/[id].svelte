@@ -1,10 +1,10 @@
 <script type="ts">
 	import { browser } from '$app/env';
 	import { page } from '$app/stores';
-	import LinkFeedback from 'components/Feedback.svelte';
-	import LinkDetail from 'components/LinkDetail.svelte';
-	import VideoCall from 'components/VideoCall.svelte';
-	import VideoPreview from 'components/VideoPreview.svelte';
+	import LinkFeedback from 'lib/components/Feedback.svelte';
+	import LinkDetail from 'lib/components/LinkDetail.svelte';
+	import VideoCall from 'lib/components/VideoCall.svelte';
+	import VideoPreview from 'lib/components/VideoPreview.svelte';
 	import { gun } from 'db/gun';
 	import { createFeedback, FeedbackType, type Feedback } from 'db/models/feedback';
 	import { LinkType, type Link } from 'db/models/link';

@@ -5,7 +5,7 @@ import { RxDBReplicationCouchDBPlugin } from 'rxdb/plugins/replication-couchdb';
 import { RxDBValidatePlugin } from 'rxdb/plugins/validate';
 import { writable } from 'svelte/store';
 
-import { agentSchema, type AgentCollection, type AgentDocument } from 'db/models/agent';
+import { agentSchema, type AgentCollection, type AgentDocument } from '$lib/db/models/agent';
 import * as PouchHttpPlugin from 'pouchdb-adapter-http';
 import { addRxPlugin, createRxDatabase } from 'rxdb';
 import { RxDBLeaderElectionPlugin } from 'rxdb/plugins/leader-election';
@@ -54,7 +54,7 @@ const _create = async (address: string) => {
 			retry: true,
 			live: true
 		}
-		//query: _db.agent.find().where('address').eq(address)
+		// query: _db.agent.find().where('address').eq(address).where('entityType').eq('agent')
 	});
 	return _db;
 };

@@ -1,4 +1,4 @@
-import { DEFAULT_PROFILE_IMAGE } from 'lib/constants';
+import { DEFAULT_PROFILE_IMAGE } from '$lib/constants';
 import * as yup from 'yup';
 import { createModelBase, type ModelBase } from './modelBase';
 export const TalentSchema = yup.object({

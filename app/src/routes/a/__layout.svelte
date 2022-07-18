@@ -1,7 +1,7 @@
 <script lang="ts">
-	import ConnectButton from 'components/web3/ConnectButton.svelte';
-	import { createAgent } from 'db/models/agent';
-	import { agentDB, currentAgent } from 'db/pcallDB';
+	import ConnectButton from '$lib/components/web3/ConnectButton.svelte';
+	import { createAgent } from '$lib/db/models/agent';
+	import { agentDB, currentAgent } from '$lib/db/pcallDB';
 	import { selectedAccount } from 'svelte-web3';
 
 	//TODO: This will be authentication later
@@ -9,21 +9,20 @@
 		if (account) {
 			const db$ = await agentDB(account);
 			let agent = await db$.agent
-				.findOne({
-					selector: {
-						address: account
-					}
-				})
+				.findOne()
+				.where('address')
+				.eq(account)
+				// .where('entityType')
+				// .eq('agent')
 				.exec();
 			if (!agent) {
 				const _agent = createAgent({
 					address: account
 				});
-
 				agent = await db$.agent.insert(_agent);
-				currentAgent.set(agent);
-				console.log(agent);
 			}
+			currentAgent.set(agent);
+			console.log(agent);
 		}
 	});
 </script>

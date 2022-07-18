@@ -1,7 +1,7 @@
 <script type="ts">
 	import { page } from '$app/stores';
-	import LinkFeedback from 'components/Feedback.svelte';
-	import LinkDetail from 'components/LinkDetail.svelte';
+	import LinkFeedback from 'lib/components/Feedback.svelte';
+	import LinkDetail from 'lib/components/LinkDetail.svelte';
 	import { createFeedback, FeedbackType, type Feedback } from 'db/models/feedback';
 	import { LinkType, type Link } from 'db/models/link';
 	import { onMount } from 'svelte';

@@ -1,9 +1,9 @@
 <script type="ts">
-	import { gun } from 'db/gun';
-	import { AgentType, createAgent, type Agent } from 'db/models/agent';
-	import { createTalent, TalentSchema, TalentType, type Talent } from 'db/models/talent';
+	import { gun } from '$lib/db/gun';
+	import { AgentType, createAgent, type Agent } from '$lib/db/models/agent';
+	import { createTalent, TalentSchema, TalentType, type Talent } from '$lib/db/models/talent';
 	import type { IGunChain, IGunInstance } from 'gun';
-	import { PCALL_TALENT_URL } from 'lib/constants';
+	import { PCALL_TALENT_URL } from '$lib/constants';
 	import { nanoid } from 'nanoid';
 	import { createForm } from 'svelte-forms-lib';
 	import { selectedAccount } from 'svelte-web3';
@@ -110,7 +110,7 @@
 										/>
 									</div>
 									{#if $errors.name}
-										<div class="alert alert-error shadow-lg">{$errors.name}</div>
+										<div class="shadow-lg alert alert-error">{$errors.name}</div>
 									{/if}
 
 									<label for="price" class="label">
@@ -133,7 +133,7 @@
 										</div>
 									</div>
 									{#if $errors.agentCommission}
-										<div class="alert alert-error shadow-lg">{$errors.agentCommission}</div>
+										<div class="shadow-lg alert alert-error">{$errors.agentCommission}</div>
 									{/if}
 									<div class="max-w-xs w-full py-2 form-control">
 										<!-- svelte-ignore a11y-label-has-associated-control -->

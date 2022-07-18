@@ -3,7 +3,6 @@
   "compilerOptions": {
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "baseUrl": "./src",
     "strict": true,
     "noImplicitAny": false,
     "esModuleInterop": true,

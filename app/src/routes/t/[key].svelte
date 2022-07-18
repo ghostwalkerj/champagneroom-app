@@ -4,10 +4,10 @@
 	import { createForm } from 'svelte-forms-lib';
 	import * as yup from 'yup';
 
-	import ProfilePhoto from 'components/forms/ProfilePhoto.svelte';
-	import LinkViewer from 'components/LinkViewer.svelte';
-	import VideoCall from 'components/VideoCall.svelte';
-	import VideoPreview from 'components/VideoPreview.svelte';
+	import ProfilePhoto from 'lib/components/forms/ProfilePhoto.svelte';
+	import LinkViewer from 'lib/components/LinkViewer.svelte';
+	import VideoCall from 'lib/components/VideoCall.svelte';
+	import VideoPreview from 'lib/components/VideoPreview.svelte';
 
 	import { gun } from 'db/gun';
 	import { createLink, LinkSchema, LinkStatus, LinkType, type Link } from 'db/models/link';
