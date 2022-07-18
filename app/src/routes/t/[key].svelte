@@ -4,16 +4,16 @@
 	import { createForm } from 'svelte-forms-lib';
 	import * as yup from 'yup';
 
-	import ProfilePhoto from 'lib/components/forms/ProfilePhoto.svelte';
-	import LinkViewer from 'lib/components/LinkViewer.svelte';
-	import VideoCall from 'lib/components/VideoCall.svelte';
-	import VideoPreview from 'lib/components/VideoPreview.svelte';
+	import ProfilePhoto from '$lib/components/forms/ProfilePhoto.svelte';
+	import LinkViewer from '$lib/components/LinkViewer.svelte';
+	import VideoCall from '$lib/components/VideoCall.svelte';
+	import VideoPreview from '$lib/components/VideoPreview.svelte';
 
-	import { gun } from 'db/gun';
-	import { createLink, LinkSchema, LinkStatus, LinkType, type Link } from 'db/models/link';
-	import { TalentType, type Talent } from 'db/models/talent';
-	import { userStream, type UserStreamType } from 'lib/userStream';
-	import type { VideoCallType } from 'lib/videoCall';
+	import { gun } from '$lib/db/gun';
+	import { createLink, LinkSchema, LinkStatus, LinkType, type Link } from '$lib/db/models/link';
+	import { TalentType, type Talent } from '$lib/db/models/talent';
+	import { userStream, type UserStreamType } from '$lib/userStream';
+	import type { VideoCallType } from '$lib/videoCall';
 	import { onDestroy, onMount } from 'svelte';
 	import { PhoneIncomingIcon } from 'svelte-feather-icons';
 	import StarRating from 'svelte-star-rating';
@@ -26,7 +26,7 @@
 
 	let vc: VideoCallType;
 	if (browser) {
-		import('lib/videoCall').then((_vc) => {
+		import('$lib/videoCall').then((_vc) => {
 			videoCall = _vc.videoCall;
 			initVC();
 		});
@@ -223,7 +223,7 @@
 												</div>
 											</div>
 											{#if $errors.amount}
-												<div class="alert alert-error shadow-lg">{$errors.amount}</div>
+												<div class="shadow-lg alert alert-error">{$errors.amount}</div>
 											{/if}
 											<div class="py-4">
 												<button class="btn btn-secondary" type="submit">Generate Link</button>

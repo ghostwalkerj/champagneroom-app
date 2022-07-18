@@ -1,4 +1,4 @@
-import { PCALL_ROOM_URL } from 'lib/constants';
+import { PCALL_ROOM_URL } from '$lib/constants';
 import urlJoin from 'url-join';
 import { v4 as uuidv4 } from 'uuid';
 import * as yup from 'yup';

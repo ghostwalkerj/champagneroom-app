@@ -1,9 +1,9 @@
 <script type="ts">
 	import { page } from '$app/stores';
-	import LinkFeedback from 'lib/components/Feedback.svelte';
-	import LinkDetail from 'lib/components/LinkDetail.svelte';
-	import { createFeedback, FeedbackType, type Feedback } from 'db/models/feedback';
-	import { LinkType, type Link } from 'db/models/link';
+	import LinkFeedback from '$lib/components/Feedback.svelte';
+	import LinkDetail from '$lib/components/LinkDetail.svelte';
+	import { createFeedback, FeedbackType, type Feedback } from '$lib/db/models/feedback';
+	import { LinkType, type Link } from '$lib/db/models/link';
 	import { onMount } from 'svelte';
 
 	let link: Link;
@@ -15,7 +15,7 @@
 	let gun;
 
 	onMount(async () => {
-		gun = (await import('db/gun')).gun;
+		gun = (await import('$lib/db/gun')).gun;
 		// get link
 		gun
 			.get(LinkType)
@@ -54,11 +54,11 @@
 <LinkFeedback {showFeedback} />
 <div class="h-full w-full">
 	{#if link}
-		<div class="max-w-max	bg-base-200 container mx-auto  items-center ">
+		<div class="container	mx-auto max-w-max bg-base-200  items-center ">
 			<div>
 				<LinkDetail {link} />
 			</div>
-			<div class="btn-group justify-center pb-6">
+			<div class="pb-6 btn-group justify-center">
 				<button class="btn btn-secondary" disabled={callState != 'ready'}
 					>Call {link.name} Now</button
 				>

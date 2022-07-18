@@ -1,15 +1,15 @@
 <script type="ts">
 	import { browser } from '$app/env';
 	import { page } from '$app/stores';
-	import LinkFeedback from 'lib/components/Feedback.svelte';
-	import LinkDetail from 'lib/components/LinkDetail.svelte';
-	import VideoCall from 'lib/components/VideoCall.svelte';
-	import VideoPreview from 'lib/components/VideoPreview.svelte';
-	import { gun } from 'db/gun';
-	import { createFeedback, FeedbackType, type Feedback } from 'db/models/feedback';
-	import { LinkType, type Link } from 'db/models/link';
-	import { userStream, type UserStreamType } from 'lib/userStream';
-	import type { VideoCallType } from 'lib/videoCall';
+	import LinkFeedback from '$lib/components/Feedback.svelte';
+	import LinkDetail from '$lib/components/LinkDetail.svelte';
+	import VideoCall from '$lib/components/VideoCall.svelte';
+	import VideoPreview from '$lib/components/VideoPreview.svelte';
+	import { gun } from '$lib/db/gun';
+	import { createFeedback, FeedbackType, type Feedback } from '$lib/db/models/feedback';
+	import { LinkType, type Link } from '$lib/db/models/link';
+	import { userStream, type UserStreamType } from '$lib/userStream';
+	import type { VideoCallType } from '$lib/videoCall';
 	import { onMount } from 'svelte';
 	import fsm from 'svelte-fsm';
 
@@ -74,13 +74,13 @@
 		calling: {
 			callAccepted: 'inCall',
 			callRejected: 'rejected',
-			recieverHangup: 'rejected',
+			receiverHangup: 'rejected',
 			noAnswer: 'notAnswered'
 		},
 		inCall: {
 			callEnded: 'callEnded',
 			callDisconnected: 'disconnected',
-			recieverHangup: 'disconnected'
+			receiverHangup: 'disconnected'
 		},
 		disconnected: {
 			_enter() {
@@ -98,7 +98,7 @@
 	});
 
 	if (browser) {
-		import('lib/videoCall').then((_vc) => {
+		import('$lib/videoCall').then((_vc) => {
 			videoCall = _vc.videoCall;
 			vc = videoCall();
 			vc.callState.subscribe((state) => {
@@ -133,7 +133,7 @@
 						}
 						case 'receiverHangup':
 						case 'receiverEnded': {
-							linkState.recieverHangup();
+							linkState.receiverHangup();
 							break;
 						}
 					}
@@ -168,13 +168,13 @@
 					<p class="py-6">Scis vis facere illud pCall. Carpe florem et fac quod nunc vocant.</p>
 				</div>
 				<div
-					class="max-w-max	 container mx-auto  items-center sm:px-6 md:flex md:space-x-5 md:items-stretch  lg:px-8"
+					class="container	 mx-auto max-w-max  items-center sm:px-6 md:flex md:space-x-5 md:items-stretch  lg:px-8"
 				>
 					<div class="rounded-box h-full bg-base-200">
 						<div>
 							<LinkDetail {link} />
 						</div>
-						<div class="btn-group justify-center pb-6">
+						<div class="pb-6 btn-group justify-center">
 							<button class="btn btn-secondary" on:click={call} disabled={callState != 'ready'}
 								>Call {link.name} Now</button
 							>
@@ -184,7 +184,7 @@
 					<div class="bg-base-200  text-white card lg:min-w-200">
 						<div class="text-center card-body items-center ">
 							<div class="text-2xl card-title">Your Video Preview</div>
-							<div class="container rounded-2xl max-w-2xl h-full">
+							<div class="container h-full rounded-2xl max-w-2xl">
 								<VideoPreview {us} />
 							</div>
 							Call State: {callState}
