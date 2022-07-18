@@ -12,8 +12,7 @@ export type ModelBase = yup.InferType<typeof ModelBase>;
 export const createModelBase = (type: string): ModelBase => {
 	const base: ModelBase = {
 		createdAt: new Date().toISOString(),
-		entityType: type,
-		_id: type + ':' + nanoid()
+		entityType: type
 	};
 	return base;
 };

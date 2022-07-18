@@ -66,7 +66,7 @@ export const createAgent = (address: string) => {
 	const base = createModelBase(AgentType);
 	const agent = {
 		...base,
-		_id: AgentType + ':' + address,
+		//_id: AgentType + ':' + address,
 		address: address
 	};
 	return agent;

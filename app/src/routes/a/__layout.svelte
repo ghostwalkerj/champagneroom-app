@@ -17,7 +17,7 @@
 				.exec();
 			if (!agent) {
 				const _agent = createAgent(account);
-				console.log('insert agent: ' + _agent);
+				console.log('insert agent: ' + JSON.stringify(_agent));
 				agent = await db$.agent.insert(_agent);
 			}
 			currentAgent.set(agent);

@@ -1,5 +1,5 @@
 import * as idb from 'pouchdb-adapter-idb';
-import type { RxDatabase } from 'rxdb';
+import { removeRxDatabase, type RxDatabase } from 'rxdb';
 import { RxDBQueryBuilderPlugin } from 'rxdb/plugins/query-builder';
 import { RxDBReplicationCouchDBPlugin } from 'rxdb/plugins/replication-couchdb';
 import { RxDBValidatePlugin } from 'rxdb/plugins/validate';
@@ -35,6 +35,8 @@ const _create = async (address: string) => {
 	addRxPlugin(RxDBUpdatePlugin);
 	addRxPlugin(RxDBDevModePlugin);
 	addRxPlugin(RxDBEncryptionPlugin);
+
+	await removeRxDatabase('pcall', getRxStoragePouch('idb'));
 
 	const _db: pcallDB = await createRxDatabase({
 		name: 'pcall',
