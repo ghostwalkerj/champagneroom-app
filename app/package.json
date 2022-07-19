@@ -39,7 +39,6 @@
 		"@typescript-eslint/eslint-plugin": "^5.30.5",
 		"@typescript-eslint/parser": "^5.30.5",
 		"@vitejs/plugin-basic-ssl": "^0.1.1",
-		"@walletconnect/web3-provider": "^1.7.8",
 		"daisyui": "^2.18.1",
 		"eslint": "^8.19.0",
 		"eslint-config-prettier": "^8.5.0",
@@ -94,6 +93,7 @@
 		"ua-parser-js": "^1.0.2",
 		"url-join": "^5.0.0",
 		"uuid": "^8.3.2",
-		"web3": "^1.7.4"
+		"web3": "^1.7.4",
+		"@walletconnect/web3-provider": "^1.7.8"
 	}
 }
