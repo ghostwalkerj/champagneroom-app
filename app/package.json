@@ -76,6 +76,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@walletconnect/web3-provider": "^1.7.8",
 		"broadcast-channel": "^4.13.0",
 		"express": "^4.18.1",
 		"gun": "^0.2020.1237",
@@ -90,10 +91,10 @@
 		"skynet-js": "^4.3.0",
 		"socket.io": "^4.5.1",
 		"socket.io-client": "^4.5.1",
+		"svelte-proxied-store": "^1.1.4",
 		"ua-parser-js": "^1.0.2",
 		"url-join": "^5.0.0",
 		"uuid": "^8.3.2",
-		"web3": "^1.7.4",
-		"@walletconnect/web3-provider": "^1.7.8"
+		"web3": "^1.7.4"
 	}
 }
