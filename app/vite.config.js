@@ -3,13 +3,6 @@ import WindiCSS from 'vite-plugin-windicss';
 import basicSsl from '@vitejs/plugin-basic-ssl';
 
 const config = {
-
-	resolve: {
-		alias: {
-			// these are the aliases and paths to them
-			//$lib: path.resolve('./src/lib'),
-		}
-	},
 	mode: 'development',
 	plugins: [sveltekit(), basicSsl(), WindiCSS()],
 	optimizeDeps: {
