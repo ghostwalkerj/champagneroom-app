@@ -1,4 +1,3 @@
-import { nanoid } from 'nanoid';
 import * as yup from 'yup';
 
 export const ModelBase = yup.object({

@@ -1,12 +1,12 @@
 <script type="ts">
-	import { createTalent, TalentSchema, TalentType, type Talent } from '$lib/db/models/talent';
-	import { API_PATH, PCALL_TALENT_URL } from '$lib/constants';
+	import { PCALL_TALENT_URL } from '$lib/constants';
+	import type { AgentDocument } from '$lib/db/models/agent';
+	import { createTalent, TalentSchema, type Talent } from '$lib/db/models/talent';
+	import { currentAgent } from '$lib/db/pcallDB';
 	import { nanoid } from 'nanoid';
 	import { createForm } from 'svelte-forms-lib';
 	import urlJoin from 'url-join';
 	import * as yup from 'yup';
-	import type { AgentDocument } from '$lib/db/models/agent';
-	import { currentAgent } from '$lib/db/pcallDB';
 
 	const { form, errors, handleReset, handleChange, handleSubmit } = createForm({
 		initialValues: { name: '', agentCommission: '10' },

@@ -1,6 +1,6 @@
+import { GUNDB_PEER } from '$lib/constants';
 import Gun from 'gun';
 import 'gun/nts.js';
-import { GUNDB_PEER } from '$lib/constants';
 
 console.log('peers', GUNDB_PEER);
 

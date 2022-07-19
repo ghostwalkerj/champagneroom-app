@@ -1,6 +1,6 @@
+import { JWT_SECRET } from '$lib/constants';
 import type { RequestHandler } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
-import { JWT_SECRET } from '$lib/constants';
 
 export const POST: RequestHandler = async ({ request }) => {
 	const body = await request.json();

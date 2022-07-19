@@ -1,19 +1,17 @@
-import * as idb from 'pouchdb-adapter-idb';
-import { removeRxDatabase, type RxDatabase } from 'rxdb';
-import { PouchDB } from 'rxdb/plugins/pouchdb';
-import { writable } from 'svelte/store';
 import { agentSchema, type AgentCollection, type AgentDocument } from '$lib/db/models/agent';
 import * as PouchHttpPlugin from 'pouchdb-adapter-http';
-import { addRxPlugin, createRxDatabase } from 'rxdb';
-import { RXDB_PASSWORD } from '../constants';
-import { RxDBLeaderElectionPlugin } from 'rxdb/plugins/leader-election';
-import { RxDBReplicationCouchDBPlugin } from 'rxdb/plugins/replication-couchdb';
-import { RxDBQueryBuilderPlugin } from 'rxdb/plugins/query-builder';
-import { RxDBValidatePlugin } from 'rxdb/plugins/validate';
-import { RxDBUpdatePlugin } from 'rxdb/plugins/update';
+import * as idb from 'pouchdb-adapter-idb';
+import { addRxPlugin, createRxDatabase, removeRxDatabase, type RxDatabase } from 'rxdb';
 import { RxDBDevModePlugin } from 'rxdb/plugins/dev-mode';
 import { RxDBEncryptionPlugin } from 'rxdb/plugins/encryption';
-import { addPouchPlugin, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
+import { RxDBLeaderElectionPlugin } from 'rxdb/plugins/leader-election';
+import { addPouchPlugin, getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
+import { RxDBQueryBuilderPlugin } from 'rxdb/plugins/query-builder';
+import { RxDBReplicationCouchDBPlugin } from 'rxdb/plugins/replication-couchdb';
+import { RxDBUpdatePlugin } from 'rxdb/plugins/update';
+import { RxDBValidatePlugin } from 'rxdb/plugins/validate';
+import { writable } from 'svelte/store';
+import { RXDB_PASSWORD } from '../constants';
 
 const SYNCCOUCHDB_URL = import.meta.env.VITE_SYNCCOUCHDB_URL;
 
