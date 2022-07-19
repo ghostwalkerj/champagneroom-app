@@ -10,12 +10,12 @@ export const PCALL_ROOM_URL = urlJoin(BASE_PCALL_URL, import.meta.env.VITE_ROOM_
 export const PCALL_TALENT_URL = urlJoin(BASE_PCALL_URL, import.meta.env.VITE_TALENT_PATH);
 export const PCALL_AGENT_URL = urlJoin(BASE_PCALL_URL, import.meta.env.VITE_AGENT_PATH);
 export const DEFAULT_PROFILE_IMAGE = import.meta.env.VITE_DEFAULT_PROFILE_IMAGE;
-
 export const GUNDB_PEER = import.meta.env.VITE_GUNDB_PEER;
 export const PCALL_MOBILE_URL = urlJoin(BASE_PCALL_URL, import.meta.env.VITE_MOBILE_PATH);
-
 export const PCALL_MOBILE_ROOM_URL = urlJoin(PCALL_MOBILE_URL, import.meta.env.VITE_ROOM_PATH);
-
 export const PCALL_MOBILE_TALENT_URL = urlJoin(PCALL_MOBILE_URL, import.meta.env.VITE_AGENT_PATH);
-
 export const RXDB_PASSWORD = import.meta.env.VITE_RXDB_PASSWORD;
+export const API_PATH = import.meta.env.VITE_API_PATH;
+
+export const AUTH_PATH = import.meta.env.VITE_AUTH_PATH;
+export const JWT_SECRET = import.meta.env.VITE_JWT_SECRET;

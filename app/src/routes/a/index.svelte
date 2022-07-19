@@ -1,6 +1,6 @@
 <script type="ts">
 	import { createTalent, TalentSchema, TalentType, type Talent } from '$lib/db/models/talent';
-	import { PCALL_TALENT_URL } from '$lib/constants';
+	import { API_PATH, PCALL_TALENT_URL } from '$lib/constants';
 	import { nanoid } from 'nanoid';
 	import { createForm } from 'svelte-forms-lib';
 	import urlJoin from 'url-join';
@@ -32,7 +32,9 @@
 
 	let agent: AgentDocument;
 	$: currentAgent.subscribe((_agent) => {
-		agent = _agent;
+		if (_agent) {
+			agent = _agent;
+		}
 	});
 	let talents: Talent[] = [];
 	$: talentkey = nanoid();

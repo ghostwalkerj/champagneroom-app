@@ -1,13 +1,27 @@
 <script lang="ts">
 	import ConnectButton from '$lib/components/web3/ConnectButton.svelte';
+	import { AUTH_PATH } from '$lib/constants';
 	import { createAgent } from '$lib/db/models/agent';
 	import { agentDB, currentAgent } from '$lib/db/pcallDB';
 	import { selectedAccount } from 'svelte-web3';
 
+	async function doAuth(address: string) {
+		const res = await fetch(AUTH_PATH, {
+			method: 'POST',
+			body: JSON.stringify({
+				address,
+				type: 'agent'
+			})
+		});
+		const body = await res.json();
+		return body.token;
+	}
+
 	//TODO: This will be authentication later
 	selectedAccount.subscribe(async (account) => {
 		if (account) {
-			const db$ = await agentDB(account);
+			const token = await doAuth(account);
+			const db$ = await agentDB(token, account);
 			let agent = await db$.agent
 				.findOne()
 				.where('address')

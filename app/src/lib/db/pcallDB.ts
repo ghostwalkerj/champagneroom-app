@@ -1,10 +1,10 @@
 import * as idb from 'pouchdb-adapter-idb';
 import { removeRxDatabase, type RxDatabase } from 'rxdb';
+import { PouchDB } from 'rxdb/plugins/pouchdb';
 import { writable } from 'svelte/store';
 import { agentSchema, type AgentCollection, type AgentDocument } from '$lib/db/models/agent';
 import * as PouchHttpPlugin from 'pouchdb-adapter-http';
 import { addRxPlugin, createRxDatabase } from 'rxdb';
-
 import { RXDB_PASSWORD } from '../constants';
 import { RxDBLeaderElectionPlugin } from 'rxdb/plugins/leader-election';
 import { RxDBReplicationCouchDBPlugin } from 'rxdb/plugins/replication-couchdb';
@@ -24,9 +24,10 @@ type MyDatabaseCollections = {
 export type pcallDB = RxDatabase<MyDatabaseCollections>;
 let dbPromise: Promise<pcallDB> | null;
 
-export const agentDB = (address: string) => (dbPromise ? dbPromise : _create(address));
+export const agentDB = (token: string, address: string) =>
+	dbPromise ? dbPromise : _create(token, address);
 
-const _create = async (address: string) => {
+const _create = async (token: string, address: string) => {
 	addRxPlugin(RxDBLeaderElectionPlugin);
 	addRxPlugin(RxDBReplicationCouchDBPlugin);
 	addPouchPlugin(idb);
@@ -52,8 +53,15 @@ const _create = async (address: string) => {
 		}
 	});
 
+	const remoteDB = new PouchDB(SYNCCOUCHDB_URL, {
+		fetch: function (url, opts) {
+			opts.headers.set('Authorization', `Bearer ${token}`);
+			return PouchDB.fetch(url, opts);
+		}
+	});
+
 	const repState = _db.agent.syncCouchDB({
-		remote: SYNCCOUCHDB_URL,
+		remote: remoteDB,
 		waitForLeadership: false,
 		options: {
 			retry: true
@@ -67,7 +75,7 @@ const _create = async (address: string) => {
 	await repState.awaitInitialReplication();
 
 	_db.agent.syncCouchDB({
-		remote: SYNCCOUCHDB_URL,
+		remote: remoteDB,
 		waitForLeadership: false,
 		options: {
 			retry: true,
