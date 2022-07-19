@@ -73,10 +73,9 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"yup": "v1.0.0-beta.3",
-		"svelte-web3": "^3.5.0",
 		"@walletconnect/web3-provider": "^1.7.8",
 		"broadcast-channel": "^4.13.0",
+		"dequal": "^2.0.3",
 		"express": "^4.18.1",
 		"gun": "^0.2020.1237",
 		"nanoid": "^4.0.0",
@@ -91,10 +90,12 @@
 		"socket.io": "^4.5.1",
 		"socket.io-client": "^4.5.1",
 		"svelte-proxied-store": "^1.1.4",
+		"svelte-web3": "^3.5.0",
 		"ua-parser-js": "^1.0.2",
 		"url-join": "^5.0.0",
 		"uuid": "^8.3.2",
 		"web3": "^1.7.4",
-		"web3modal": "^1.9.8"
+		"web3modal": "^1.9.8",
+		"yup": "v1.0.0-beta.3"
 	}
 }
