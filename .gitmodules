@@ -1,0 +1,3 @@
+[submodule "haproxy/haproxy-lua-oauth"]
+	path = haproxy/haproxy-lua-oauth
+	url = https://github.com/haproxytech/haproxy-lua-oauth.git
