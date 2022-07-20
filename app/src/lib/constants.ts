@@ -19,3 +19,10 @@ export const API_PATH = import.meta.env.VITE_API_PATH;
 
 export const AUTH_PATH = import.meta.env.VITE_AUTH_PATH;
 export const JWT_SECRET = import.meta.env.VITE_JWT_SECRET;
+
+export const JWT_AUDIENCE = import.meta.env.VITE_JWT_AUDIENCE;
+
+export const COUCHDB_USER = import.meta.env.VITE_COUCHDB_USER;
+export const COUCH_ENDPOINT = import.meta.env.VITE_COUCH_ENDPOINT;
+export const COUCHDB_PASSWORD = import.meta.env.VITE_COUCHDB_PASSWORD;
+export const COUCHDB_AUTH = import.meta.env.VITE_COUCHDB_AUTH;

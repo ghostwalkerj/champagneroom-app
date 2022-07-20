@@ -11,9 +11,13 @@ import { RxDBReplicationCouchDBPlugin } from 'rxdb/plugins/replication-couchdb';
 import { RxDBUpdatePlugin } from 'rxdb/plugins/update';
 import { RxDBValidatePlugin } from 'rxdb/plugins/validate';
 import { writable } from 'svelte/store';
-import { RXDB_PASSWORD } from '../constants';
-
-const SYNCCOUCHDB_URL = import.meta.env.VITE_SYNCCOUCHDB_URL;
+import {
+	COUCHDB_PASSWORD,
+	COUCHDB_USER,
+	RXDB_PASSWORD,
+	COUCH_ENDPOINT,
+	COUCHDB_AUTH
+} from '../constants';
 
 type MyDatabaseCollections = {
 	agent: AgentCollection;
@@ -51,9 +55,10 @@ const _create = async (token: string, address: string) => {
 		}
 	});
 
-	const remoteDB = new PouchDB(SYNCCOUCHDB_URL, {
+	const remoteDB = new PouchDB(COUCH_ENDPOINT, {
+		skip_setup: true,
 		fetch: function (url, opts) {
-			opts.headers.set('Authorization', `Bearer ${token}`);
+			opts.headers.set('x-auth-token', 'Bearer ' + token);
 			return PouchDB.fetch(url, opts);
 		}
 	});

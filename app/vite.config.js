@@ -5,6 +5,7 @@ import basicSsl from '@vitejs/plugin-basic-ssl';
 const config = {
 	mode: 'development',
 	plugins: [sveltekit(), basicSsl(), WindiCSS()],
+	//plugins: [sveltekit(), WindiCSS()],
 	optimizeDeps: {
 		include: ['gun',
 			'gun/gun',
