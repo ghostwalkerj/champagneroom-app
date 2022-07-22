@@ -38,7 +38,7 @@ export const agentDocMethods: AgentDocMethods = {
 		const db = get(currentAgentDB);
 		const talent = await db.talents.insert(_talent);
 
-		const talents = this.talents ? this.talents.push(talent._id) : [talent._id];
+		const talents = this.talents ? this.talents.concat([talent._id]) : [talent._id];
 		this.update({ $set: { talents } });
 		return talent;
 	}
@@ -84,7 +84,7 @@ const agentSchemaLiteral = {
 		},
 		talents: {
 			type: 'array',
-			ref: 'talent',
+			ref: 'talents',
 			items: {
 				type: 'string',
 				maxLength: 50

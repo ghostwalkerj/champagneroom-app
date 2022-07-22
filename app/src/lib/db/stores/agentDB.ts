@@ -102,7 +102,7 @@ const _create = async (token: string, agentId: string) => {
 			retry: true,
 			live: true
 		},
-		query: _db.talents.findOne().where('agent').eq(agentId)
+		query: _db.talents.find().where('agent').eq(agentId)
 	});
 
 	_agentDB = _db;

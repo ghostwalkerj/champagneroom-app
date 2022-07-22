@@ -1,7 +1,6 @@
 <script type="ts">
 	import { PCALL_TALENT_URL } from '$lib/constants';
 	import type { AgentDocument } from '$lib/db/models/agent';
-	import type { TalentDocument } from '$lib/db/models/talent';
 	import { currentAgent } from '$lib/db/stores/agentDB';
 	import { nanoid } from 'nanoid';
 	import { createForm } from 'svelte-forms-lib';
@@ -21,18 +20,14 @@
 		}),
 		onSubmit: (values) => {
 			agent.createTalent(values.name, talentkey, Number.parseInt(values.agentCommission));
+			handleReset();
 		}
 	});
 
 	let agent: AgentDocument;
-	let talents: TalentDocument[] = [];
-
-	$: currentAgent.subscribe(async (_agent) => {
+	currentAgent.subscribe(async (_agent) => {
 		if (_agent) {
 			agent = _agent;
-			if (agent.talents) {
-				talents = await agent.talents_!;
-			}
 		}
 	});
 
@@ -112,15 +107,16 @@
 							</div>
 						</div>
 					</div>
-
 					<div>
-						{#if talents.length > 0}
-							{#each talents as talent, id}
-								<li>
-									<a href="/t/{talent.key}">{talent.name}</a>
-								</li>
-							{/each}
-						{/if}
+						{#await agent.talents_ then talents}
+							{#if talents}
+								{#each talents as talent, id}
+									<li>
+										<a href="/t/{talent.key}">{talent.name}</a>
+									</li>
+								{/each}
+							{/if}
+						{/await}
 					</div>
 				</div>
 			</div>
