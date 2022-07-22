@@ -1,10 +1,10 @@
 import { PCALL_ROOM_URL } from '$lib/constants';
 import { nanoid } from 'nanoid';
 import {
-	ExtractDocumentTypeFromTypedRxJsonSchema,
-	RxCollection,
-	RxDocument,
-	RxJsonSchema,
+	type ExtractDocumentTypeFromTypedRxJsonSchema,
+	type RxCollection,
+	type RxDocument,
+	type RxJsonSchema,
 	toTypedRxJsonSchema
 } from 'rxdb';
 import urlJoin from 'url-join';
@@ -95,7 +95,8 @@ type linkRef = {
 
 const schemaTyped = toTypedRxJsonSchema(linkSchemaLiteral);
 export type LinkDocType = ExtractDocumentTypeFromTypedRxJsonSchema<typeof schemaTyped>;
-
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 export const linkSchema: RxJsonSchema<LinkDocType> = linkSchemaLiteral;
 export type LinkDocument = RxDocument<LinkDocType> & linkRef;
 export type LinkCollection = RxCollection<LinkDocType>;

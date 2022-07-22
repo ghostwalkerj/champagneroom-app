@@ -2,7 +2,7 @@
 	import ConnectButton from '$lib/components/web3/ConnectButton.svelte';
 	import { AUTH_PATH } from '$lib/constants';
 	import { AgentType } from '$lib/db/models/agent';
-	import { agentDB, currentAgent } from '$lib/db/stores/agentDB';
+	import { agentDB, currentAgent, currentAgentDB } from '$lib/db/stores/agentDB';
 	import { selectedAccount } from 'svelte-web3';
 
 	async function doAuth(address: string) {
@@ -25,15 +25,12 @@
 			const db = await agentDB(token, agentId);
 			let agent = await db.agents.findOne().where('_id').eq(agentId).exec();
 			if (!agent) {
-				const _agent = await db.agents.insert({
-					_id: agentId,
-					address: account
-				});
+				const _agent = await db.agents.createAgent(account);
 				console.log('insert agent: ' + JSON.stringify(_agent));
 				agent = _agent;
 			}
 			currentAgent.set(agent);
-			console.log(JSON.stringify(agent));
+			currentAgentDB.set(db);
 		}
 	});
 </script>

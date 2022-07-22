@@ -1,9 +1,9 @@
 import { nanoid } from 'nanoid';
 import {
-	ExtractDocumentTypeFromTypedRxJsonSchema,
-	RxCollection,
-	RxDocument,
-	RxJsonSchema,
+	type ExtractDocumentTypeFromTypedRxJsonSchema,
+	type RxCollection,
+	type RxDocument,
+	type RxJsonSchema,
 	toTypedRxJsonSchema
 } from 'rxdb';
 import type { LinkDocument } from './link';
@@ -81,7 +81,8 @@ export const FeedbackType = 'feedback';
 
 const schemaTyped = toTypedRxJsonSchema(feedbackSchemaLiteral);
 export type FeedbackDocType = ExtractDocumentTypeFromTypedRxJsonSchema<typeof schemaTyped>;
-
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 export const feedbackSchema: RxJsonSchema<FeedbackDocType> = feedbackSchemaLiteral;
 export type FeedbackDocument = RxDocument<FeedbackDocType> & feedbackRef;
 export type FeedbackCollection = RxCollection<FeedbackDocument>;

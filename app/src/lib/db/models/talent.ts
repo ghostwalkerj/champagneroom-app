@@ -5,8 +5,8 @@ import {
 	type RxDocument,
 	type RxJsonSchema
 } from 'rxdb';
-import type { AgentDocument } from './agent';
-import type { LinkDocument } from './link';
+import type { AgentDocument } from '$lib/db/models/agent';
+import type { LinkDocument } from '$lib/db/models/link';
 
 export const TalentType = 'talent';
 
@@ -68,7 +68,8 @@ const talentSchemaLiteral = {
 		},
 		agent: { type: 'string', ref: 'agent', maxLength: 50 }
 	},
-	required: ['_id', 'key', 'name', 'profileImageUrl', 'agent']
+	required: ['_id', 'key', 'name', 'profileImageUrl', 'agent'],
+	encrypted: ['key']
 } as const;
 
 type talentRef = {
@@ -77,6 +78,8 @@ type talentRef = {
 };
 const schemaTyped = toTypedRxJsonSchema(talentSchemaLiteral);
 export type TalentDocType = ExtractDocumentTypeFromTypedRxJsonSchema<typeof schemaTyped>;
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 export const talentSchema: RxJsonSchema<TalentDocType> = talentSchemaLiteral;
 export type TalentDocument = RxDocument<TalentDocType> & talentRef;
 export type TalentCollection = RxCollection<TalentDocType>;

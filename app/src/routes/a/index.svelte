@@ -20,14 +20,7 @@
 				.required('Agent commission between 0 and 100 required')
 		}),
 		onSubmit: (values) => {
-			// const talentParams = TalentSchema.cast({
-			// 	agentId: agent._id,
-			// 	name: values.name,
-			// 	agentCommission: Number.parseInt(values.agentCommission),
-			// 	key: talentkey
-			// });
-			// const talent = createTalent(talentParams);
-			// handleReset();
+			agent.createTalent(values.name, talentkey, Number.parseInt(values.agentCommission));
 		}
 	});
 
@@ -42,6 +35,7 @@
 			}
 		}
 	});
+
 	$: talentkey = nanoid();
 	$: talentUrl = urlJoin(PCALL_TALENT_URL, talentkey);
 </script>

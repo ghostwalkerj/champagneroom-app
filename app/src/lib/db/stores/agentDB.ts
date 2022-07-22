@@ -1,5 +1,10 @@
 import { CREATORS_ENDPOINT, RXDB_PASSWORD } from '$lib/constants';
-import { agentSchema, type AgentCollection, type AgentDocument } from '$lib/db/models/agent';
+import {
+	agentSchema,
+	agentStaticMethods,
+	type AgentCollection,
+	type AgentDocument
+} from '$lib/db/models/agent';
 import * as PouchHttpPlugin from 'pouchdb-adapter-http';
 import * as idb from 'pouchdb-adapter-idb';
 import { addRxPlugin, createRxDatabase, removeRxDatabase, type RxDatabase } from 'rxdb';
@@ -12,7 +17,8 @@ import { RxDBReplicationCouchDBPlugin } from 'rxdb/plugins/replication-couchdb';
 import { RxDBUpdatePlugin } from 'rxdb/plugins/update';
 import { RxDBValidatePlugin } from 'rxdb/plugins/validate';
 import { writable } from 'svelte/store';
-import { type TalentCollection, talentSchema } from '../models/talent';
+import { agentDocMethods } from '$lib/db/models/agent';
+import { talentSchema, type TalentCollection } from '$lib/db/models/talent';
 
 type CreatorsCollections = {
 	agents: AgentCollection;
@@ -46,7 +52,9 @@ const _create = async (token: string, agentId: string) => {
 
 	await _db.addCollections({
 		agents: {
-			schema: agentSchema
+			schema: agentSchema,
+			methods: agentDocMethods,
+			statics: agentStaticMethods
 		},
 		talents: {
 			schema: talentSchema
@@ -102,3 +110,4 @@ const _create = async (token: string, agentId: string) => {
 };
 
 export const currentAgent = writable<AgentDocument>();
+export const currentAgentDB = writable<RxDatabase<CreatorsCollections>>();
