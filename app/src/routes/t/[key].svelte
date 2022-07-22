@@ -9,9 +9,8 @@
 	import VideoCall from '$lib/components/VideoCall.svelte';
 	import VideoPreview from '$lib/components/VideoPreview.svelte';
 
-	import { gun } from '$lib/db/gun';
-	import { createLink, LinkSchema, LinkStatus, LinkType, type Link } from '$lib/db/models/link';
-	import { TalentType, type Talent } from '$lib/db/models/talent';
+	import type { LinkDocument } from '$lib/db/models/link';
+	import type { TalentDocument } from '$lib/db/models/talent';
 	import { userStream, type UserStreamType } from '$lib/userStream';
 	import type { VideoCallType } from '$lib/videoCall';
 	import { onDestroy, onMount } from 'svelte';
@@ -19,8 +18,8 @@
 	import StarRating from 'svelte-star-rating';
 
 	let key = $page.params.key;
-	let talent: Talent;
-	let currentLink: Link;
+	let talent: TalentDocument;
+	let currentLink: LinkDocument;
 
 	let talentRef;
 
@@ -39,11 +38,10 @@
 
 	const updateProfileImage = async (url: string) => {
 		if (url) {
-			talentRef.get('profileImageUrl').put(url);
+			//			talentRef.get('profileImageUrl').put(url);
 			talent.profileImageUrl = url;
 			if (currentLink) {
 				currentLink.profileImageUrl = url;
-				gun.get(LinkType).get(currentLink._id).get('profileImageUrl').put(url);
 			}
 		}
 	};
@@ -73,24 +71,24 @@
 		});
 	};
 
-	talentRef = gun
-		.get(TalentType)
-		.get(key)
-		.on((_talent) => {
-			if (_talent) {
-				talent = _talent;
-				if (talent.currentLinkId) {
-					gun
-						.get(LinkType)
-						.get(talent.currentLinkId)
-						.on((_link: Link) => {
-							if (_link) {
-								currentLink = _link;
-							}
-						});
-				}
-			}
-		});
+	//talentRef = gun
+	// .get(TalentType)
+	// .get(key)
+	// .on((_talent) => {
+	// 	if (_talent) {
+	// 		talent = _talent;
+	// 		if (talent.currentLinkId) {
+	// 			gun
+	// 				.get(LinkType)
+	// 				.get(talent.currentLinkId)
+	// 				.on((_link: Link) => {
+	// 					if (_link) {
+	// 						currentLink = _link;
+	// 					}
+	// 				});
+	// 		}
+	// 	}
+	// });
 
 	onMount(async () => {
 		us = await userStream();
@@ -112,20 +110,20 @@
 				.required()
 		}),
 		onSubmit: (values) => {
-			const linkParams = LinkSchema.cast({
-				amount: values.amount,
-				talentId: talent._id,
-				name: talent.name,
-				profileImageUrl: talent.profileImageUrl
-			});
-			const link = createLink(linkParams);
-			if (currentLink) {
-				gun.get(LinkType).get(currentLink._id).get('status').put(LinkStatus.EXPIRED);
-			}
-			gun.get(LinkType).get(link._id).put(link);
-			talentRef.get('currentLinkId').put(link._id);
-			currentLink = link;
-			handleReset();
+			// const linkParams = LinkSchema.cast({
+			// 	amount: values.amount,
+			// 	talentId: talent._id,
+			// 	name: talent.name,
+			// 	profileImageUrl: talent.profileImageUrl
+			// });
+			// const link = createLink(linkParams);
+			// if (currentLink) {
+			// 	gun.get(LinkType).get(currentLink._id).get('status').put(LinkStatus.EXPIRED);
+			// }
+			// gun.get(LinkType).get(link._id).put(link);
+			// talentRef.get('currentLinkId').put(link._id);
+			// currentLink = link;
+			// handleReset();
 		}
 	});
 </script>

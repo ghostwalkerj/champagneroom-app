@@ -1,28 +1,82 @@
-import { DEFAULT_PROFILE_IMAGE } from '$lib/constants';
-import * as yup from 'yup';
-import { createModelBase, type ModelBase } from './modelBase';
-export const TalentSchema = yup.object({
-	agentId: yup.string().min(21).required(),
-	name: yup.string().min(3).max(20).required(),
-	key: yup.string().min(21).required(),
-	walletAddress: yup.string().nullable(),
-	profileImageUrl: yup.string().default(DEFAULT_PROFILE_IMAGE).required(),
-	ratingAvg: yup.number().integer().min(0).max(5).default(0).required(),
-	agentCommission: yup.number().integer().min(0).max(100).default(0).required(),
-	currentLinkId: yup.string().nullable()
-});
+import {
+	toTypedRxJsonSchema,
+	type ExtractDocumentTypeFromTypedRxJsonSchema,
+	type RxCollection,
+	type RxDocument,
+	type RxJsonSchema
+} from 'rxdb';
+import type { AgentDocument } from './agent';
+import type { LinkDocument } from './link';
 
-export type TalentBase = yup.InferType<typeof TalentSchema>;
-export type Talent = TalentBase & ModelBase;
 export const TalentType = 'talent';
-export const TalentById = TalentType + 'ById';
-export const TalentByKey = TalentType + 'ByKey';
 
-export const createTalent = (_talent: TalentBase): Talent => {
-	const base = createModelBase(TalentType);
-	const talent = {
-		...base,
-		..._talent
-	};
-	return talent;
+const talentSchemaLiteral = {
+	title: 'talent',
+	description: 'creator of content',
+	version: 0,
+	type: 'object',
+	primaryKey: '_id',
+	properties: {
+		_id: {
+			type: 'string',
+			maxLength: 50,
+			final: true
+		},
+		key: {
+			type: 'string',
+			maxLength: 30
+		},
+		entityType: {
+			type: 'string',
+			default: 'talent',
+			maxLength: 20,
+			final: true
+		},
+		walletAddress: {
+			type: 'string',
+			maxLength: 50
+		},
+		name: {
+			type: 'string',
+			maxLength: 50
+		},
+		profileImageUrl: {
+			type: 'string'
+		},
+		ratingAvg: {
+			type: 'number',
+			minimum: 0,
+			maximum: 5,
+			default: 0
+		},
+		agentCommission: {
+			type: 'integer',
+			default: 0,
+			minimum: 0,
+			maximum: 100
+		},
+		currentLink: {
+			type: 'string',
+			maxLength: 50,
+			ref: 'link'
+		},
+		createdAt: {
+			type: 'string'
+		},
+		updatedAt: {
+			type: 'string'
+		},
+		agent: { type: 'string', ref: 'agent', maxLength: 50 }
+	},
+	required: ['_id', 'key', 'name', 'profileImageUrl', 'agent']
+} as const;
+
+type talentRef = {
+	currentLink_?: Promise<LinkDocument>;
+	agent_?: Promise<AgentDocument>;
 };
+const schemaTyped = toTypedRxJsonSchema(talentSchemaLiteral);
+export type TalentDocType = ExtractDocumentTypeFromTypedRxJsonSchema<typeof schemaTyped>;
+export const talentSchema: RxJsonSchema<TalentDocType> = talentSchemaLiteral;
+export type TalentDocument = RxDocument<TalentDocType> & talentRef;
+export type TalentCollection = RxCollection<TalentDocType>;

@@ -1,7 +1,6 @@
-import { JWT_AUDIENCE, JWT_SECRET } from '$lib/constants';
+import { JWT_AUDIENCE, JWT_EXPIRY, JWT_SECRET } from '$lib/constants';
 import type { RequestHandler } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
-
 export const POST: RequestHandler = async ({ request }) => {
 	const body = await request.json();
 	let token = {};
@@ -10,7 +9,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			{
 				aud: JWT_AUDIENCE,
 				//scope: 'agent',
-				exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7
+				exp: Math.floor(Date.now() / 1000) + JWT_EXPIRY
 			},
 			JWT_SECRET
 		);

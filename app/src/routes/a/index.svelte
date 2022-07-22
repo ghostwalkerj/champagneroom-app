@@ -1,8 +1,8 @@
 <script type="ts">
 	import { PCALL_TALENT_URL } from '$lib/constants';
 	import type { AgentDocument } from '$lib/db/models/agent';
-	import { createTalent, TalentSchema, type Talent } from '$lib/db/models/talent';
-	import { currentAgent } from '$lib/db/pcallDB';
+	import type { TalentDocument } from '$lib/db/models/talent';
+	import { currentAgent } from '$lib/db/stores/agentDB';
 	import { nanoid } from 'nanoid';
 	import { createForm } from 'svelte-forms-lib';
 	import urlJoin from 'url-join';
@@ -20,23 +20,28 @@
 				.required('Agent commission between 0 and 100 required')
 		}),
 		onSubmit: (values) => {
-			const talentParams = TalentSchema.cast({
-				agentId: agent._id,
-				name: values.name,
-				agentCommission: Number.parseInt(values.agentCommission),
-				key: talentkey
-			});
-			const talent = createTalent(talentParams);
+			// const talentParams = TalentSchema.cast({
+			// 	agentId: agent._id,
+			// 	name: values.name,
+			// 	agentCommission: Number.parseInt(values.agentCommission),
+			// 	key: talentkey
+			// });
+			// const talent = createTalent(talentParams);
+			// handleReset();
 		}
 	});
 
 	let agent: AgentDocument;
-	$: currentAgent.subscribe((_agent) => {
+	let talents: TalentDocument[] = [];
+
+	$: currentAgent.subscribe(async (_agent) => {
 		if (_agent) {
 			agent = _agent;
+			if (agent.talents) {
+				talents = await agent.talents_!;
+			}
 		}
 	});
-	let talents: Talent[] = [];
 	$: talentkey = nanoid();
 	$: talentUrl = urlJoin(PCALL_TALENT_URL, talentkey);
 </script>

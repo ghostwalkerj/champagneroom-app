@@ -1,28 +1,95 @@
-import * as yup from 'yup';
-import { createModelBase, type ModelBase } from './modelBase';
+import { nanoid } from 'nanoid';
+import {
+	ExtractDocumentTypeFromTypedRxJsonSchema,
+	RxCollection,
+	RxDocument,
+	RxJsonSchema,
+	toTypedRxJsonSchema
+} from 'rxdb';
+import type { LinkDocument } from './link';
 
-export const FeedbackSchema = yup.object({
-	linkId: yup.string().min(21).required(),
-	rejectedCount: yup.number().integer().required().positive().default(0),
-	disconnectCount: yup.number().integer().required().positive().default(0),
-	notAnsweredCount: yup.number().integer().required().positive().default(0),
-	viewedCount: yup.number().integer().required().positive().default(0),
-	rating: yup.number().min(0).max(5).default(0)
-});
+const feedbackSchemaLiteral = {
+	title: 'feedback',
+	description: 'customer feedback for a link',
+	version: 0,
+	type: 'object',
+	primaryKey: {
+		key: '_id',
+		fields: ['entityType', 'internalId'],
+		separator: ':'
+	},
+	properties: {
+		_id: {
+			type: 'string',
+			maxLength: 70
+		},
+		entityType: {
+			type: 'string',
+			default: 'feedback',
+			maxLength: 20,
+			final: true
+		},
+		createdAt: { type: 'string' },
+		updatedAt: {
+			type: 'string'
+		},
+		link: {
+			type: 'string',
+			ref: 'link'
+		},
+		internalId: {
+			type: 'string',
+			maxLength: 21,
+			default: nanoid(),
+			final: true
+		},
+		rejectedCount: {
+			type: 'integer',
+			default: 0,
+			minimum: 0
+		},
+		disconnectCount: {
+			type: 'integer',
+			default: 0,
+			minimum: 0
+		},
+		notAnsweredCount: {
+			type: 'integer',
+			default: 0,
+			minimum: 0
+		},
+		viewedCount: {
+			type: 'integer',
+			default: 0,
+			minimum: 0
+		},
+		rating: {
+			type: 'integer',
+			default: 0,
+			minimum: 0,
+			maximum: 5
+		}
+	},
+	required: ['_id', 'entityType', 'link', 'internalId']
+} as const;
 
-export type FeedbackBase = yup.InferType<typeof FeedbackSchema>;
-export type Feedback = FeedbackBase & ModelBase;
+type feedbackRef = {
+	link_?: Promise<LinkDocument>;
+};
 
 export const FeedbackType = 'feedback';
 
-export const FeedbackById = FeedbackType + 'ById';
-export const FeedbackByLinkId = FeedbackType + 'ByLinkId';
+const schemaTyped = toTypedRxJsonSchema(feedbackSchemaLiteral);
+export type FeedbackDocType = ExtractDocumentTypeFromTypedRxJsonSchema<typeof schemaTyped>;
 
-export const createFeedback = (_feedback: FeedbackBase) => {
-	const base = createModelBase(FeedbackType);
+export const feedbackSchema: RxJsonSchema<FeedbackDocType> = feedbackSchemaLiteral;
+export type FeedbackDocument = RxDocument<FeedbackDocType> & feedbackRef;
+export type FeedbackCollection = RxCollection<FeedbackDocument>;
+
+export const createFeedback = (linkId: string) => {
 	const feedback = {
-		...base,
-		..._feedback
+		link: linkId,
+		internalId: nanoid()
 	};
 	return feedback;
 };

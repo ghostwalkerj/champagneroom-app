@@ -1,3 +1,4 @@
+import { CREATORS_ENDPOINT, RXDB_PASSWORD } from '$lib/constants';
 import { agentSchema, type AgentCollection, type AgentDocument } from '$lib/db/models/agent';
 import * as PouchHttpPlugin from 'pouchdb-adapter-http';
 import * as idb from 'pouchdb-adapter-idb';
@@ -11,25 +12,20 @@ import { RxDBReplicationCouchDBPlugin } from 'rxdb/plugins/replication-couchdb';
 import { RxDBUpdatePlugin } from 'rxdb/plugins/update';
 import { RxDBValidatePlugin } from 'rxdb/plugins/validate';
 import { writable } from 'svelte/store';
-import {
-	COUCHDB_PASSWORD,
-	COUCHDB_USER,
-	RXDB_PASSWORD,
-	COUCH_ENDPOINT,
-	COUCHDB_AUTH
-} from '../constants';
+import { type TalentCollection, talentSchema } from '../models/talent';
 
-type MyDatabaseCollections = {
-	agent: AgentCollection;
+type CreatorsCollections = {
+	agents: AgentCollection;
+	talents: TalentCollection;
 };
 
-export type pcallDB = RxDatabase<MyDatabaseCollections>;
-let dbPromise: Promise<pcallDB> | null;
+export type AgentDB = RxDatabase<CreatorsCollections>;
+let _agentDB: AgentDB;
 
-export const agentDB = (token: string, address: string) =>
-	dbPromise ? dbPromise : _create(token, address);
+export const agentDB = async (token: string, agentId: string) =>
+	_agentDB ? _agentDB : await _create(token, agentId);
 
-const _create = async (token: string, address: string) => {
+const _create = async (token: string, agentId: string) => {
 	addRxPlugin(RxDBLeaderElectionPlugin);
 	addRxPlugin(RxDBReplicationCouchDBPlugin);
 	addPouchPlugin(idb);
@@ -39,58 +35,70 @@ const _create = async (token: string, address: string) => {
 	addRxPlugin(RxDBUpdatePlugin);
 	addRxPlugin(RxDBDevModePlugin);
 	addRxPlugin(RxDBEncryptionPlugin);
+	await removeRxDatabase('agentdb', getRxStoragePouch('idb'));
 
-	await removeRxDatabase('pcall', getRxStoragePouch('idb'));
-
-	const _db: pcallDB = await createRxDatabase({
-		name: 'pcall',
+	const _db: AgentDB = await createRxDatabase({
+		name: 'agentdb',
 		storage: getRxStoragePouch('idb'),
 		ignoreDuplicate: true,
 		password: RXDB_PASSWORD
 	});
 
 	await _db.addCollections({
-		agent: {
+		agents: {
 			schema: agentSchema
+		},
+		talents: {
+			schema: talentSchema
 		}
 	});
 
-	const remoteDB = new PouchDB(COUCH_ENDPOINT, {
+	const remoteDB = new PouchDB(CREATORS_ENDPOINT, {
 		skip_setup: true,
-		fetch: function (url, opts) {
+		fetch: function (
+			url: string,
+			opts: { headers: { set: (arg0: string, arg1: string) => void } }
+		) {
 			opts.headers.set('x-auth-token', 'Bearer ' + token);
 			return PouchDB.fetch(url, opts);
 		}
 	});
 
-	const repState = _db.agent.syncCouchDB({
+	const query = _db.agents.findOne().where('_id').eq(agentId);
+
+	const repState = _db.agents.syncCouchDB({
 		remote: remoteDB,
 		waitForLeadership: false,
 		options: {
 			retry: true
 		},
-		query: _db.agent
-			.findOne()
-			.where('_id')
-			.eq('agent:' + address)
+		query
 	});
 
 	await repState.awaitInitialReplication();
 
-	_db.agent.syncCouchDB({
+	_db.agents.syncCouchDB({
 		remote: remoteDB,
 		waitForLeadership: false,
 		options: {
 			retry: true,
 			live: true
 		},
-		query: _db.agent
-			.findOne()
-			.where('_id')
-			.eq('agent:' + address)
+		query
 	});
 
-	return _db;
+	_db.talents.syncCouchDB({
+		remote: remoteDB,
+		waitForLeadership: false,
+		options: {
+			retry: true,
+			live: true
+		},
+		query: _db.talents.findOne().where('agent').eq(agentId)
+	});
+
+	_agentDB = _db;
+	return _agentDB;
 };
 
 export const currentAgent = writable<AgentDocument>();

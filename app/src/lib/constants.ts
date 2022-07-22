@@ -16,13 +16,8 @@ export const PCALL_MOBILE_ROOM_URL = urlJoin(PCALL_MOBILE_URL, import.meta.env.V
 export const PCALL_MOBILE_TALENT_URL = urlJoin(PCALL_MOBILE_URL, import.meta.env.VITE_AGENT_PATH);
 export const RXDB_PASSWORD = import.meta.env.VITE_RXDB_PASSWORD;
 export const API_PATH = import.meta.env.VITE_API_PATH;
-
 export const AUTH_PATH = import.meta.env.VITE_AUTH_PATH;
 export const JWT_SECRET = import.meta.env.VITE_JWT_SECRET;
-
 export const JWT_AUDIENCE = import.meta.env.VITE_JWT_AUDIENCE;
-
-export const COUCHDB_USER = import.meta.env.VITE_COUCHDB_USER;
-export const COUCH_ENDPOINT = import.meta.env.VITE_COUCH_ENDPOINT;
-export const COUCHDB_PASSWORD = import.meta.env.VITE_COUCHDB_PASSWORD;
-export const COUCHDB_AUTH = import.meta.env.VITE_COUCHDB_AUTH;
+export const CREATORS_ENDPOINT = import.meta.env.VITE_CREATORS_ENDPOINT;
+export const JWT_EXPIRY = Number.parseInt(import.meta.env.VITE_JWT_EXPIRY || '600', 10);

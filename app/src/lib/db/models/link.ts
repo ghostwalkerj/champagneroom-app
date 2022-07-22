@@ -1,55 +1,106 @@
 import { PCALL_ROOM_URL } from '$lib/constants';
+import { nanoid } from 'nanoid';
+import {
+	ExtractDocumentTypeFromTypedRxJsonSchema,
+	RxCollection,
+	RxDocument,
+	RxJsonSchema,
+	toTypedRxJsonSchema
+} from 'rxdb';
 import urlJoin from 'url-join';
 import { v4 as uuidv4 } from 'uuid';
-import * as yup from 'yup';
-import { createModelBase, type ModelBase } from './modelBase';
-
+import type { TalentDocument } from './talent';
 export enum LinkStatus {
 	ACTIVE = 'ACTIVE',
 	EXPIRED = 'EXPIRED',
 	IN_PROGRESS = 'IN_PROGRESS',
 	COMPLETED = 'COMPLETED'
 }
-export const LinkSchema = yup.object({
-	talentId: yup.string().min(21).required(),
-	walletAddress: yup.string(),
-	amount: yup
-		.string()
-		.matches(/^[1-9]\d{0,3}$/, 'Must be between $1 and $9999')
-		.required(),
-	fundedAmount: yup
-		.string()
-		.matches(/^[0-9]\d*$/)
-		.default('0'),
-	callStart: yup.string(),
-	callEnd: yup.string(),
-	callId: yup.string(),
-	status: yup.string().default(LinkStatus.ACTIVE),
-	rating: yup.number().min(0).max(5).default(0),
-	name: yup.string().min(3).max(20).required(),
-	profileImageUrl: yup.string()
-});
 
-export type LinkBase = yup.InferType<typeof LinkSchema>;
-export type Link = LinkBase & ModelBase;
+export const LinkTypes = 'link';
+const linkSchemaLiteral = {
+	title: 'link',
+	description: 'onetime link to call',
+	version: 0,
+	type: 'object',
+	primaryKey: {
+		key: '_id',
+		fields: ['entityType', 'internalId'],
+		separator: ':'
+	},
+	properties: {
+		_id: {
+			type: 'string',
+			maxLength: 50
+		},
+		entityType: {
+			type: 'string',
+			default: 'link',
+			maxLength: 20,
+			final: true
+		},
+		walletAddress: {
+			type: 'string',
+			maxLength: 50
+		},
+		amount: {
+			type: 'integer',
+			default: 0,
+			minimum: 0,
+			maximum: 99999
+		},
+		fundedAmount: {
+			type: 'integer',
+			default: 0,
+			minimum: 0,
+			maximum: 99999
+		},
+		callStart: { type: 'string' },
+		callEnd: { type: 'string' },
+		callId: { type: 'string' },
+		status: { type: 'string', enum: Object.keys(LinkStatus) },
+		rating: {
+			type: 'integer',
+			minimum: 0,
+			maximum: 5
+		},
+		profileImageUrl: {
+			type: 'string'
+		},
+		talentName: {
+			type: 'string',
+			maxLength: 50
+		},
+		talent: { type: 'string', ref: 'agent', maxLength: 50 },
+		createdAt: {
+			type: 'number'
+		},
+		updatedAt: {
+			type: 'number'
+		},
+		internalId: {
+			type: 'string',
+			maxLength: 21,
+			default: nanoid(),
+			final: true
+		}
+	},
+	required: ['_id', 'entityType', 'internalId', 'talent', 'name', 'profileImageUrl', 'callId'],
+	encrypted: ['callId']
+} as const;
 
-export const LinkType = 'link';
-export const LinkById = LinkType + 'ById';
-
-export const createLink = (_link: LinkBase) => {
-	const base = createModelBase(LinkType);
-	const link = {
-		...base,
-		..._link,
-		status: LinkStatus.ACTIVE,
-		fundedAmount: '0',
-		walletAddress: '0x251281e1516e6E0A145d28a41EE63BfcDd9E18Bf', //TODO: make real wallet
-		callId: uuidv4()
-	};
-	return link;
+type linkRef = {
+	talent_?: Promise<TalentDocument>;
 };
 
-export const generateLinkURL = (link: Link): string => {
+const schemaTyped = toTypedRxJsonSchema(linkSchemaLiteral);
+export type LinkDocType = ExtractDocumentTypeFromTypedRxJsonSchema<typeof schemaTyped>;
+
+export const linkSchema: RxJsonSchema<LinkDocType> = linkSchemaLiteral;
+export type LinkDocument = RxDocument<LinkDocType> & linkRef;
+export type LinkCollection = RxCollection<LinkDocType>;
+
+export const generateLinkURL = (link: LinkDocType): string => {
 	if (link && link._id) {
 		const url = urlJoin(PCALL_ROOM_URL, link._id);
 		return url;
@@ -57,4 +108,18 @@ export const generateLinkURL = (link: Link): string => {
 		console.log("Can't generate link url, link is missing id", link);
 		return '';
 	}
+};
+
+export const createLink = (name: string, talentId: string, profileImageUrl: string) => {
+	const link = {
+		status: LinkStatus.ACTIVE,
+		fundedAmount: '0',
+		walletAddress: '0x251281e1516e6E0A145d28a41EE63BfcDd9E18Bf', //TODO: make real wallet
+		callId: uuidv4(),
+		name,
+		talent: talentId,
+		profileImageUrl,
+		internalId: nanoid()
+	};
+	return link;
 };
