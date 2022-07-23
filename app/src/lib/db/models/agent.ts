@@ -88,7 +88,8 @@ const agentSchemaLiteral = {
 			items: {
 				type: 'string',
 				maxLength: 50
-			}
+			},
+			default: []
 		}
 	},
 	required: ['_id', 'address']

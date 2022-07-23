@@ -1,9 +1,12 @@
 <script type="ts">
 	import { PCALL_TALENT_URL } from '$lib/constants';
 	import type { AgentDocument } from '$lib/db/models/agent';
-	import { currentAgent } from '$lib/db/stores/agentDB';
+	import type { TalentDocument } from '$lib/db/models/talent';
+	import { agentDB, currentAgent, currentAgentDB } from '$lib/db/stores/agentDB';
 	import { nanoid } from 'nanoid';
 	import { createForm } from 'svelte-forms-lib';
+	import { each } from 'svelte/internal';
+	import { get } from 'svelte/store';
 	import urlJoin from 'url-join';
 	import * as yup from 'yup';
 
@@ -25,9 +28,17 @@
 	});
 
 	let agent: AgentDocument;
+	let talents: TalentDocument[];
+	const getTalents = async () => {
+		if (agent.talents) {
+			talents = await agent.populate('talents');
+			console.log(talents);
+		}
+	};
 	currentAgent.subscribe(async (_agent) => {
 		if (_agent) {
 			agent = _agent;
+			getTalents();
 		}
 	});
 
@@ -108,15 +119,14 @@
 						</div>
 					</div>
 					<div>
-						{#await agent.talents_ then talents}
-							{#if talents}
-								{#each talents as talent, id}
-									<li>
-										<a href="/t/{talent.key}">{talent.name}</a>
-									</li>
-								{/each}
-							{/if}
-						{/await}
+						{#if talents && talents.length > 0}
+							{talents.length}
+							{#each talents as talent, id}
+								<li>
+									<a href="/t/{talent.key}">{talent.name}</a>
+								</li>
+							{/each}
+						{/if}
 					</div>
 				</div>
 			</div>

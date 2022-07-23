@@ -23,7 +23,7 @@
 			const agentId = AgentType + ':' + account;
 			const token = await doAuth(account);
 			const db = await agentDB(token, agentId);
-			let agent = await db.agents.findOne().where('_id').eq(agentId).exec();
+			let agent = await db.agents.findOne(agentId).exec();
 			if (!agent) {
 				const _agent = await db.agents.createAgent(account);
 				console.log('insert agent: ' + JSON.stringify(_agent));
