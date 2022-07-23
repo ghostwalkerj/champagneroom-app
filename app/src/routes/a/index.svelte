@@ -21,9 +21,14 @@
 				.integer()
 				.required('Agent commission between 0 and 100 required')
 		}),
-		onSubmit: (values) => {
-			agent.createTalent(values.name, talentkey, Number.parseInt(values.agentCommission));
+		onSubmit: async (values) => {
+			const talent = await agent.createTalent(
+				values.name,
+				talentkey,
+				Number.parseInt(values.agentCommission)
+			);
 			handleReset();
+			talents = talents.concat([talent]);
 		}
 	});
 
@@ -32,6 +37,7 @@
 	const getTalents = async () => {
 		if (agent.talents) {
 			talents = await agent.populate('talents');
+			console.log(talents);
 		}
 	};
 	currentAgent.subscribe(async (_agent) => {
