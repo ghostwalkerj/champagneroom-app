@@ -1,10 +1,10 @@
 import { nanoid } from 'nanoid';
 import {
+	toTypedRxJsonSchema,
 	type ExtractDocumentTypeFromTypedRxJsonSchema,
 	type RxCollection,
 	type RxDocument,
-	type RxJsonSchema,
-	toTypedRxJsonSchema
+	type RxJsonSchema
 } from 'rxdb';
 import type { LinkDocument } from './link';
 

@@ -2,11 +2,9 @@
 	import { PCALL_TALENT_URL } from '$lib/constants';
 	import type { AgentDocument } from '$lib/db/models/agent';
 	import type { TalentDocument } from '$lib/db/models/talent';
-	import { agentDB, currentAgent, currentAgentDB } from '$lib/db/stores/agentDB';
+	import { currentAgent } from '$lib/db/stores/agentDB';
 	import { nanoid } from 'nanoid';
 	import { createForm } from 'svelte-forms-lib';
-	import { each } from 'svelte/internal';
-	import { get } from 'svelte/store';
 	import urlJoin from 'url-join';
 	import * as yup from 'yup';
 
@@ -37,7 +35,6 @@
 	const getTalents = async () => {
 		if (agent.talents) {
 			talents = await agent.populate('talents');
-			console.log(talents);
 		}
 	};
 	currentAgent.subscribe(async (_agent) => {

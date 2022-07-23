@@ -1,11 +1,11 @@
 import { PCALL_ROOM_URL } from '$lib/constants';
 import { nanoid } from 'nanoid';
 import {
+	toTypedRxJsonSchema,
 	type ExtractDocumentTypeFromTypedRxJsonSchema,
 	type RxCollection,
 	type RxDocument,
-	type RxJsonSchema,
-	toTypedRxJsonSchema
+	type RxJsonSchema
 } from 'rxdb';
 import urlJoin from 'url-join';
 import { v4 as uuidv4 } from 'uuid';

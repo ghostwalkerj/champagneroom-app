@@ -1,3 +1,5 @@
+import type { AgentDocument } from '$lib/db/models/agent';
+import type { LinkDocument } from '$lib/db/models/link';
 import {
 	toTypedRxJsonSchema,
 	type ExtractDocumentTypeFromTypedRxJsonSchema,
@@ -5,8 +7,6 @@ import {
 	type RxDocument,
 	type RxJsonSchema
 } from 'rxdb';
-import type { AgentDocument } from '$lib/db/models/agent';
-import type { LinkDocument } from '$lib/db/models/link';
 
 export const TalentType = 'talent';
 

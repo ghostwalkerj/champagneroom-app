@@ -1,10 +1,12 @@
 import { CREATORS_ENDPOINT, RXDB_PASSWORD } from '$lib/constants';
 import {
+	agentDocMethods,
 	agentSchema,
 	agentStaticMethods,
 	type AgentCollection,
 	type AgentDocument
 } from '$lib/db/models/agent';
+import { talentSchema, type TalentCollection } from '$lib/db/models/talent';
 import * as PouchHttpPlugin from 'pouchdb-adapter-http';
 import * as idb from 'pouchdb-adapter-idb';
 import { addRxPlugin, createRxDatabase, removeRxDatabase, type RxDatabase } from 'rxdb';
@@ -17,8 +19,6 @@ import { RxDBReplicationCouchDBPlugin } from 'rxdb/plugins/replication-couchdb';
 import { RxDBUpdatePlugin } from 'rxdb/plugins/update';
 import { RxDBValidatePlugin } from 'rxdb/plugins/validate';
 import { writable } from 'svelte/store';
-import { agentDocMethods } from '$lib/db/models/agent';
-import { talentSchema, type TalentCollection } from '$lib/db/models/talent';
 
 type CreatorsCollections = {
 	agents: AgentCollection;
