@@ -73,16 +73,16 @@ const _create = async (token: string, agentId: string) => {
 	});
 	const query = _db.agents.findOne(agentId);
 
-	// const repState = _db.agents.syncCouchDB({
-	// 	remote: remoteDB,
-	// 	waitForLeadership: false,
-	// 	options: {
-	// 		retry: true
-	// 	},
-	// 	query
-	// });
+	const repState = _db.agents.syncCouchDB({
+		remote: remoteDB,
+		waitForLeadership: false,
+		options: {
+			retry: true
+		},
+		query
+	});
 
-	//	await repState.awaitInitialReplication();
+	await repState.awaitInitialReplication();
 
 	_db.agents.syncCouchDB({
 		remote: remoteDB,
@@ -90,8 +90,8 @@ const _create = async (token: string, agentId: string) => {
 		options: {
 			retry: true,
 			live: true
-		}
-		//	query
+		},
+		query
 	});
 	_db.talents.syncCouchDB({
 		remote: remoteDB,
@@ -99,10 +99,10 @@ const _create = async (token: string, agentId: string) => {
 		options: {
 			retry: true,
 			live: true
-		}
-		//	query: _db.talents.find().where('agent').eq(agentId)
+		},
+		query: _db.talents.find().where('agent').eq(agentId)
 	});
-	//await repState.awaitInitialReplication();
+	await repState.awaitInitialReplication();
 	_agentDB = _db;
 	return _agentDB;
 };

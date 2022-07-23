@@ -27,7 +27,7 @@ export const agentDocMethods: AgentDocMethods = {
 		agentCommission: number
 	) {
 		const _talent: TalentDocType = {
-			_id: TalentType + ':' + nanoid(),
+			_id: TalentType + ':' + 't' + nanoid(),
 			name,
 			agentCommission,
 			key,
