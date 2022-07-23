@@ -73,13 +73,23 @@ const _create = async (token: string, agentId: string) => {
 	});
 	const query = _db.agents.findOne(agentId);
 
-	const repState = _db.agents.syncCouchDB({
+	let repState = _db.agents.syncCouchDB({
 		remote: remoteDB,
 		waitForLeadership: false,
 		options: {
 			retry: true
 		},
 		query
+	});
+	await repState.awaitInitialReplication();
+
+	repState = _db.talents.syncCouchDB({
+		remote: remoteDB,
+		waitForLeadership: false,
+		options: {
+			retry: true
+		},
+		query: _db.talents.find().where('agent').eq(agentId)
 	});
 
 	await repState.awaitInitialReplication();
@@ -102,7 +112,6 @@ const _create = async (token: string, agentId: string) => {
 		},
 		query: _db.talents.find().where('agent').eq(agentId)
 	});
-	await repState.awaitInitialReplication();
 	_agentDB = _db;
 	return _agentDB;
 };

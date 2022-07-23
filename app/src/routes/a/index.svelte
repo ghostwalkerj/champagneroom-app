@@ -32,7 +32,6 @@
 	const getTalents = async () => {
 		if (agent.talents) {
 			talents = await agent.populate('talents');
-			console.log(talents);
 		}
 	};
 	currentAgent.subscribe(async (_agent) => {
@@ -120,7 +119,6 @@
 					</div>
 					<div>
 						{#if talents && talents.length > 0}
-							{talents.length}
 							{#each talents as talent, id}
 								<li>
 									<a href="/t/{talent.key}">{talent.name}</a>
