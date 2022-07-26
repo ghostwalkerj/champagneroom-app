@@ -62,17 +62,14 @@ const _create = async (token: string, agentId: string) => {
 	});
 
 	const remoteDB = new PouchDB(CREATORS_ENDPOINT, {
-		skip_setup: true,
-		auth: { username: 'pcallcreator', password: 'slapyobitchon' }
-
-		// fetch: function (
-		// 	url: string,
-		// 	opts: { headers: { set: (arg0: string, arg1: string) => void } }
-		// ) {
-		// 	opts.headers.set('Authentication', 'Bearer ' + token);
-		// 	opts.headers.set('Content-Type', 'application/json');
-		// 	return PouchDB.fetch(url, opts);
-		// }
+		//auth: { username: 'pcallcreator', password: 'slapyobitchon' },
+		fetch: function (
+			url: string,
+			opts: { headers: { set: (arg0: string, arg1: string) => void } }
+		) {
+			opts.headers.set('Authorization', 'Bearer ' + token);
+			return PouchDB.fetch(url, opts);
+		}
 	});
 	const query = _db.agents.findOne(agentId);
 

@@ -1,4 +1,4 @@
-import { JWT_AUDIENCE, JWT_EXPIRY, JWT_SECRET } from '$lib/constants';
+import { JWT_EXPIRY, JWT_SECRET, JWT_USER } from '$lib/constants';
 import type { RequestHandler } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 export const POST: RequestHandler = async ({ request }) => {
@@ -7,13 +7,10 @@ export const POST: RequestHandler = async ({ request }) => {
 	if (body.type && body.type === 'agent') {
 		token = jwt.sign(
 			{
-				aud: JWT_AUDIENCE,
-				//scope: 'agent',
 				exp: Math.floor(Date.now() / 1000) + JWT_EXPIRY,
-				sub: 'pcallcreator'
+				sub: JWT_USER
 			},
-			JWT_SECRET,
-			{ algorithm: 'HS256' }
+			JWT_SECRET
 		);
 	}
 	return {

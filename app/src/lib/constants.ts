@@ -21,3 +21,5 @@ export const JWT_SECRET = import.meta.env.VITE_JWT_SECRET;
 export const JWT_AUDIENCE = import.meta.env.VITE_JWT_AUDIENCE;
 export const CREATORS_ENDPOINT = import.meta.env.VITE_CREATORS_ENDPOINT;
 export const JWT_EXPIRY = Number.parseInt(import.meta.env.VITE_JWT_EXPIRY || '600', 10);
+
+export const JWT_USER = import.meta.env.VITE_JWT_USER;
