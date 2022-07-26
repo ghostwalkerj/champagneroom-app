@@ -9,9 +9,11 @@ export const POST: RequestHandler = async ({ request }) => {
 			{
 				aud: JWT_AUDIENCE,
 				//scope: 'agent',
-				exp: Math.floor(Date.now() / 1000) + JWT_EXPIRY
+				exp: Math.floor(Date.now() / 1000) + JWT_EXPIRY,
+				sub: 'pcallcreator'
 			},
-			JWT_SECRET
+			JWT_SECRET,
+			{ algorithm: 'HS256' }
 		);
 	}
 	return {
