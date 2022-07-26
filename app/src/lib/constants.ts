@@ -17,6 +17,8 @@ export const PCALL_MOBILE_TALENT_URL = urlJoin(PCALL_MOBILE_URL, import.meta.env
 export const RXDB_PASSWORD = import.meta.env.VITE_RXDB_PASSWORD;
 export const API_PATH = import.meta.env.VITE_API_PATH;
 export const AUTH_PATH = import.meta.env.VITE_AUTH_PATH;
+
+export const AUTH_URL = urlJoin(BASE_PCALL_URL, AUTH_PATH);
 export const JWT_SECRET = import.meta.env.VITE_JWT_SECRET;
 export const JWT_AUDIENCE = import.meta.env.VITE_JWT_AUDIENCE;
 export const CREATORS_ENDPOINT = import.meta.env.VITE_CREATORS_ENDPOINT;

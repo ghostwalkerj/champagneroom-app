@@ -1,34 +1,36 @@
-<script lang="ts">
-	import ConnectButton from '$lib/components/web3/ConnectButton.svelte';
-	import { AUTH_PATH } from '$lib/constants';
-	import { AgentType } from '$lib/db/models/agent';
-	import { agentDB, currentAgent, currentAgentDB } from '$lib/db/stores/agentDB';
-	import { selectedAccount } from 'svelte-web3';
-
-	async function doAuth(address: string) {
-		const res = await fetch(AUTH_PATH, {
+<script context="module">
+	import { AUTH_URL } from '$lib/constants';
+	export async function load() {
+		const res = await fetch(AUTH_URL, {
 			method: 'POST',
 			body: JSON.stringify({
-				address,
 				type: 'agent'
 			})
 		});
 		const body = await res.json();
-		return body.token;
+		const token = body.token;
+		return { props: { token } };
 	}
+</script>
+
+<script lang="ts">
+	import ConnectButton from '$lib/components/web3/ConnectButton.svelte';
+	import { AgentType } from '$lib/db/models/agent';
+	import { agentDB, currentAgent } from '$lib/db/stores/agentDB';
+	import { selectedAccount } from 'svelte-web3';
+	export let token: string;
 
 	//TODO: This will be authentication later
 	selectedAccount.subscribe(async (account) => {
 		if (account) {
 			const agentId = AgentType + ':' + account;
-			const token = await doAuth(account);
 			const db = await agentDB(token, agentId);
 			currentAgent.subscribe(async (_agent) => {
-				if (!_agent) {
-					const _agent = await db.agents.createAgent(account);
-					console.log('insert agent: ' + JSON.stringify(_agent));
-					currentAgent.set(_agent);
-				}
+				// if (!_agent) {
+				// 	const _agent = await db.agents.createAgent(account);
+				// 	console.log('insert agent: ' + JSON.stringify(_agent));
+				// 	currentAgent.set(_agent);
+				// }
 			});
 		}
 	});

@@ -62,7 +62,6 @@ const _create = async (token: string, agentId: string) => {
 			schema: talentSchema
 		}
 	});
-
 	const remoteDB = new PouchDB(CREATORS_ENDPOINT, {
 		fetch: function (
 			url: string,
@@ -73,51 +72,49 @@ const _create = async (token: string, agentId: string) => {
 		}
 	});
 	const query = _db.agents.findOne(agentId);
+
+	let repState = _db.agents.syncCouchDB({
+		remote: remoteDB,
+		waitForLeadership: false,
+		options: {
+			retry: true
+		},
+		query
+	});
+	await repState.awaitInitialReplication();
+
+	repState = _db.talents.syncCouchDB({
+		remote: remoteDB,
+		waitForLeadership: false,
+		options: {
+			retry: true
+		},
+		query: _db.talents.find().where('agent').eq(agentId)
+	});
+	await repState.awaitInitialReplication();
+
 	_currentAgent = await query.exec();
+	if (_currentAgent) currentAgent.set(_currentAgent);
 
-	if (_currentAgent) {
-		currentAgent.set(_currentAgent);
+	_db.agents.syncCouchDB({
+		remote: remoteDB,
+		waitForLeadership: true,
+		options: {
+			retry: true,
+			live: true
+		},
+		query
+	});
+	_db.talents.syncCouchDB({
+		remote: remoteDB,
+		waitForLeadership: true,
+		options: {
+			retry: true,
+			live: true
+		},
+		query: _db.talents.find().where('agent').eq(agentId)
+	});
 
-		let repState = _db.agents.syncCouchDB({
-			remote: remoteDB,
-			waitForLeadership: false,
-			options: {
-				retry: true
-			},
-			query
-		});
-		await repState.awaitInitialReplication();
-
-		repState = _db.talents.syncCouchDB({
-			remote: remoteDB,
-			waitForLeadership: false,
-			options: {
-				retry: true
-			},
-			query: _db.talents.find().where('agent').eq(agentId)
-		});
-
-		await repState.awaitInitialReplication();
-
-		_db.agents.syncCouchDB({
-			remote: remoteDB,
-			waitForLeadership: true,
-			options: {
-				retry: true,
-				live: true
-			},
-			query
-		});
-		_db.talents.syncCouchDB({
-			remote: remoteDB,
-			waitForLeadership: true,
-			options: {
-				retry: true,
-				live: true
-			},
-			query: _db.talents.find().where('agent').eq(agentId)
-		});
-	}
 	_agentDB = _db;
 	currentAgentDB.set(_db);
 	return _agentDB;

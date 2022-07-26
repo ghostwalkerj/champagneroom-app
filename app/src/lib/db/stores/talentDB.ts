@@ -1,7 +1,7 @@
 import { CREATORS_ENDPOINT, RXDB_PASSWORD } from '$lib/constants';
 import {
 	talentDocMethods,
-	TalentDocument,
+	type TalentDocument,
 	talentSchema,
 	type TalentCollection
 } from '$lib/db/models/talent';
@@ -17,7 +17,7 @@ import { RxDBReplicationCouchDBPlugin } from 'rxdb/plugins/replication-couchdb';
 import { RxDBUpdatePlugin } from 'rxdb/plugins/update';
 import { RxDBValidatePlugin } from 'rxdb/plugins/validate';
 import { writable } from 'svelte/store';
-import { LinkCollection, linkDocMethods, linkSchema } from '$lib/db/models/link';
+import { type LinkCollection, linkDocMethods, linkSchema } from '$lib/db/models/link';
 
 type CreatorsCollections = {
 	talents: TalentCollection;

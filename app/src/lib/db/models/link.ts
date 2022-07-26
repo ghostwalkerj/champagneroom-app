@@ -1,5 +1,4 @@
 import { PCALL_ROOM_URL } from '$lib/constants';
-import { nanoid } from 'nanoid';
 import {
 	toTypedRxJsonSchema,
 	type ExtractDocumentTypeFromTypedRxJsonSchema,
@@ -8,8 +7,7 @@ import {
 	type RxJsonSchema
 } from 'rxdb';
 import urlJoin from 'url-join';
-import { v4 as uuidv4 } from 'uuid';
-import type { TalentDocument } from './talent';
+import type { TalentDocument } from '$lib/db/models/talent';
 export enum LinkStatus {
 	ACTIVE = 'ACTIVE',
 	EXPIRED = 'EXPIRED',
