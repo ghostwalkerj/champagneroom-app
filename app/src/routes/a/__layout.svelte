@@ -23,14 +23,13 @@
 			const agentId = AgentType + ':' + account;
 			const token = await doAuth(account);
 			const db = await agentDB(token, agentId);
-			let agent = await db.agents.findOne(agentId).exec();
-			if (!agent) {
-				const _agent = await db.agents.createAgent(account);
-				console.log('insert agent: ' + JSON.stringify(_agent));
-				agent = _agent;
-			}
-			currentAgent.set(agent);
-			currentAgentDB.set(db);
+			currentAgent.subscribe(async (_agent) => {
+				if (!_agent) {
+					const _agent = await db.agents.createAgent(account);
+					console.log('insert agent: ' + JSON.stringify(_agent));
+					currentAgent.set(_agent);
+				}
+			});
 		}
 	});
 </script>

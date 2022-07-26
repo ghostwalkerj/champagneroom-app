@@ -32,7 +32,8 @@ export const agentDocMethods: AgentDocMethods = {
 			agentCommission,
 			key,
 			agent: this._id,
-			profileImageUrl: DEFAULT_PROFILE_IMAGE
+			profileImageUrl: DEFAULT_PROFILE_IMAGE,
+			createdAt: new Date().toISOString()
 		};
 
 		const db = get(currentAgentDB);
@@ -48,7 +49,8 @@ export const agentStaticMethods: AgentStaticMethods = {
 		const agentId = AgentType + ':' + address;
 		const _agent = await this.insert({
 			_id: agentId,
-			address
+			address,
+			createdAt: new Date().toISOString()
 		});
 		return _agent;
 	}

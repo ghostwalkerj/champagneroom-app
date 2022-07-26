@@ -1,5 +1,6 @@
 import type { AgentDocument } from '$lib/db/models/agent';
-import type { LinkDocument } from '$lib/db/models/link';
+import { LinkDocument, LinkStatus, LinkType } from '$lib/db/models/link';
+import { nanoid } from 'nanoid';
 import {
 	toTypedRxJsonSchema,
 	type ExtractDocumentTypeFromTypedRxJsonSchema,
@@ -7,6 +8,9 @@ import {
 	type RxDocument,
 	type RxJsonSchema
 } from 'rxdb';
+import { get } from 'svelte/store';
+import { currentTalentDB } from '../stores/talentDB';
+import { v4 as uuidv4 } from 'uuid';
 
 export const TalentType = 'talent';
 
@@ -69,17 +73,49 @@ const talentSchemaLiteral = {
 		agent: { type: 'string', ref: 'agent', maxLength: 50 }
 	},
 	required: ['_id', 'key', 'name', 'profileImageUrl', 'agent'],
-	encrypted: ['key']
+	indexed: ['key']
 } as const;
 
 type talentRef = {
 	currentLink_?: Promise<LinkDocument>;
 	agent_?: Promise<AgentDocument>;
 };
+
+type TalentDocMethods = {
+	createLink: (amount: number) => Promise<LinkDocument>;
+};
+
+export const talentDocMethods: TalentDocMethods = {
+	createLink: async function (this: TalentDocument, amount: number): Promise<LinkDocument> {
+		const _link = {
+			status: LinkStatus.ACTIVE,
+			fundedAmount: 0,
+			amount,
+			walletAddress: '0x251281e1516e6E0A145d28a41EE63BfcDd9E18Bf', //TODO: make real wallet
+			callId: uuidv4(),
+			talentName: this.name,
+			talent: this._id,
+			profileImageUrl: this.profileImageUrl,
+			_id: LinkType + ':' + nanoid(),
+			createdAt: new Date().toISOString()
+		};
+
+		if (this.currentLink) {
+			const currentLink = await this.populate('currentLink');
+			currentLink.update({ $set: { status: LinkStatus.EXPIRED } });
+		}
+
+		const db = get(currentTalentDB);
+		const link = await db.links.insert(_link);
+		this.update({ $set: { currentLink: link._id } });
+		return link;
+	}
+};
+
 const schemaTyped = toTypedRxJsonSchema(talentSchemaLiteral);
 export type TalentDocType = ExtractDocumentTypeFromTypedRxJsonSchema<typeof schemaTyped>;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 export const talentSchema: RxJsonSchema<TalentDocType> = talentSchemaLiteral;
-export type TalentDocument = RxDocument<TalentDocType> & talentRef;
-export type TalentCollection = RxCollection<TalentDocType>;
+export type TalentDocument = RxDocument<TalentDocType, TalentDocMethods> & talentRef;
+export type TalentCollection = RxCollection<TalentDocType, TalentDocMethods>;

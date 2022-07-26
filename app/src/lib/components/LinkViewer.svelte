@@ -1,12 +1,12 @@
 <script type="ts">
-	import { generateLinkURL, type Link } from '$lib/db/models/link';
-	import type { Talent } from '$lib/db/models/talent';
+	import type { LinkDocument } from '$lib/db/models/link';
+	import type { TalentDocument } from '$lib/db/models/talent';
 	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';
-	export let link: Link;
-	export let talent: Talent;
+	export let link: LinkDocument;
+	export let talent: TalentDocument;
 	let linkURL = '';
 
-	$: linkURL = generateLinkURL(link);
+	$: linkURL = link.generateLinkURL();
 
 	const copyLink = () => {
 		navigator.clipboard.writeText(linkURL);

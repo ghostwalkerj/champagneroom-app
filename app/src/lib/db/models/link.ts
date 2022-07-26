@@ -17,17 +17,13 @@ export enum LinkStatus {
 	COMPLETED = 'COMPLETED'
 }
 
-export const LinkTypes = 'link';
+export const LinkType = 'link';
 const linkSchemaLiteral = {
 	title: 'link',
 	description: 'onetime link to call',
 	version: 0,
 	type: 'object',
-	primaryKey: {
-		key: '_id',
-		fields: ['entityType', 'internalId'],
-		separator: ':'
-	},
+	primaryKey: '_id',
 	properties: {
 		_id: {
 			type: 'string',
@@ -73,19 +69,13 @@ const linkSchemaLiteral = {
 		},
 		talent: { type: 'string', ref: 'agent', maxLength: 50 },
 		createdAt: {
-			type: 'number'
+			type: 'string'
 		},
 		updatedAt: {
-			type: 'number'
-		},
-		internalId: {
-			type: 'string',
-			maxLength: 21,
-			default: nanoid(),
-			final: true
+			type: 'string'
 		}
 	},
-	required: ['_id', 'entityType', 'internalId', 'talent', 'name', 'profileImageUrl', 'callId'],
+	required: ['entityType', 'talent', 'name', 'profileImageUrl', 'callId', 'amount'],
 	encrypted: ['callId']
 } as const;
 
@@ -98,29 +88,21 @@ export type LinkDocType = ExtractDocumentTypeFromTypedRxJsonSchema<typeof schema
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 export const linkSchema: RxJsonSchema<LinkDocType> = linkSchemaLiteral;
-export type LinkDocument = RxDocument<LinkDocType> & linkRef;
-export type LinkCollection = RxCollection<LinkDocType>;
+export type LinkDocument = RxDocument<LinkDocType, LinkDocMethods> & linkRef;
+export type LinkCollection = RxCollection<LinkDocType, LinkDocMethods>;
 
-export const generateLinkURL = (link: LinkDocType): string => {
-	if (link && link._id) {
-		const url = urlJoin(PCALL_ROOM_URL, link._id);
-		return url;
-	} else {
-		console.log("Can't generate link url, link is missing id", link);
-		return '';
-	}
+type LinkDocMethods = {
+	generateLinkURL: () => string;
 };
 
-export const createLink = (name: string, talentId: string, profileImageUrl: string) => {
-	const link = {
-		status: LinkStatus.ACTIVE,
-		fundedAmount: '0',
-		walletAddress: '0x251281e1516e6E0A145d28a41EE63BfcDd9E18Bf', //TODO: make real wallet
-		callId: uuidv4(),
-		name,
-		talent: talentId,
-		profileImageUrl,
-		internalId: nanoid()
-	};
-	return link;
+export const linkDocMethods: LinkDocMethods = {
+	generateLinkURL: function (this: LinkDocument): string {
+		if (this._id) {
+			const url = urlJoin(PCALL_ROOM_URL, this._id);
+			return url;
+		} else {
+			console.log("Can't generate link url, link is missing id", this);
+			return '';
+		}
+	}
 };

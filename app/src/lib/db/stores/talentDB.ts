@@ -1,12 +1,10 @@
 import { CREATORS_ENDPOINT, RXDB_PASSWORD } from '$lib/constants';
 import {
-	agentDocMethods,
-	agentSchema,
-	agentStaticMethods,
-	type AgentCollection,
-	type AgentDocument
-} from '$lib/db/models/agent';
-import { talentSchema, type TalentCollection } from '$lib/db/models/talent';
+	talentDocMethods,
+	TalentDocument,
+	talentSchema,
+	type TalentCollection
+} from '$lib/db/models/talent';
 import * as PouchHttpPlugin from 'pouchdb-adapter-http';
 import * as idb from 'pouchdb-adapter-idb';
 import { addRxPlugin, createRxDatabase, removeRxDatabase, type RxDatabase } from 'rxdb';
@@ -19,21 +17,22 @@ import { RxDBReplicationCouchDBPlugin } from 'rxdb/plugins/replication-couchdb';
 import { RxDBUpdatePlugin } from 'rxdb/plugins/update';
 import { RxDBValidatePlugin } from 'rxdb/plugins/validate';
 import { writable } from 'svelte/store';
+import { LinkCollection, linkDocMethods, linkSchema } from '$lib/db/models/link';
 
 type CreatorsCollections = {
-	agents: AgentCollection;
 	talents: TalentCollection;
+	links: LinkCollection;
 };
 
-export type AgentDB = RxDatabase<CreatorsCollections>;
-let _agentDB: AgentDB;
+export type TalentDB = RxDatabase<CreatorsCollections>;
+let _talentDB: TalentDB;
 
-export const agentDB = async (token: string, agentId: string) =>
-	_agentDB ? _agentDB : await _create(token, agentId);
+export const talentDB = async (token: string, key: string) =>
+	_talentDB ? _talentDB : await _create(token, key);
 
-let _currentAgent: AgentDocument | null;
+let _currentTalent: TalentDocument | null;
 
-const _create = async (token: string, agentId: string) => {
+const _create = async (token: string, key: string) => {
 	addRxPlugin(RxDBLeaderElectionPlugin);
 	addRxPlugin(RxDBReplicationCouchDBPlugin);
 	addPouchPlugin(idb);
@@ -43,23 +42,23 @@ const _create = async (token: string, agentId: string) => {
 	addRxPlugin(RxDBUpdatePlugin);
 	addRxPlugin(RxDBDevModePlugin);
 	addRxPlugin(RxDBEncryptionPlugin);
-	await removeRxDatabase('agentdb', getRxStoragePouch('idb'));
+	await removeRxDatabase('talentdb', getRxStoragePouch('idb'));
 
-	const _db: AgentDB = await createRxDatabase({
-		name: 'agentdb',
+	const _db: TalentDB = await createRxDatabase({
+		name: 'talentdb',
 		storage: getRxStoragePouch('idb'),
 		ignoreDuplicate: true,
 		password: RXDB_PASSWORD
 	});
 
 	await _db.addCollections({
-		agents: {
-			schema: agentSchema,
-			methods: agentDocMethods,
-			statics: agentStaticMethods
-		},
 		talents: {
-			schema: talentSchema
+			schema: talentSchema,
+			methods: talentDocMethods
+		},
+		links: {
+			schema: linkSchema,
+			methods: linkDocMethods
 		}
 	});
 
@@ -72,13 +71,13 @@ const _create = async (token: string, agentId: string) => {
 			return PouchDB.fetch(url, opts);
 		}
 	});
-	const query = _db.agents.findOne(agentId);
-	_currentAgent = await query.exec();
+	const query = _db.talents.findOne().where('key').eq(key);
+	_currentTalent = await query.exec();
 
-	if (_currentAgent) {
-		currentAgent.set(_currentAgent);
+	if (_currentTalent) {
+		currentTalent.set(_currentTalent);
 
-		let repState = _db.agents.syncCouchDB({
+		let repState = _db.talents.syncCouchDB({
 			remote: remoteDB,
 			waitForLeadership: false,
 			options: {
@@ -88,26 +87,17 @@ const _create = async (token: string, agentId: string) => {
 		});
 		await repState.awaitInitialReplication();
 
-		repState = _db.talents.syncCouchDB({
+		repState = _db.links.syncCouchDB({
 			remote: remoteDB,
 			waitForLeadership: false,
 			options: {
 				retry: true
 			},
-			query: _db.talents.find().where('agent').eq(agentId)
+			query: _db.links.find().where('talent').eq(_currentTalent._id)
 		});
 
 		await repState.awaitInitialReplication();
 
-		_db.agents.syncCouchDB({
-			remote: remoteDB,
-			waitForLeadership: true,
-			options: {
-				retry: true,
-				live: true
-			},
-			query
-		});
 		_db.talents.syncCouchDB({
 			remote: remoteDB,
 			waitForLeadership: true,
@@ -115,13 +105,22 @@ const _create = async (token: string, agentId: string) => {
 				retry: true,
 				live: true
 			},
-			query: _db.talents.find().where('agent').eq(agentId)
+			query
+		});
+		_db.links.syncCouchDB({
+			remote: remoteDB,
+			waitForLeadership: true,
+			options: {
+				retry: true,
+				live: true
+			},
+			query: _db.talents.find().where('talent').eq(_currentTalent._id)
 		});
 	}
-	_agentDB = _db;
-	currentAgentDB.set(_db);
-	return _agentDB;
+	_talentDB = _db;
+	currentTalentDB.set(_db);
+	return _talentDB;
 };
 
-export const currentAgent = writable<AgentDocument>();
-export const currentAgentDB = writable<RxDatabase<CreatorsCollections>>();
+export const currentTalent = writable<TalentDocument>();
+export const currentTalentDB = writable<RxDatabase<CreatorsCollections>>();
