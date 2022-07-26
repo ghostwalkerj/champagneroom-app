@@ -26,11 +26,11 @@
 			const agentId = AgentType + ':' + account;
 			const db = await agentDB(token, agentId);
 			currentAgent.subscribe(async (_agent) => {
-				// if (!_agent) {
-				// 	const _agent = await db.agents.createAgent(account);
-				// 	console.log('insert agent: ' + JSON.stringify(_agent));
-				// 	currentAgent.set(_agent);
-				// }
+				if (!_agent) {
+					const _agent = await db.agents.createAgent(account);
+					console.log('insert agent: ' + JSON.stringify(_agent));
+					currentAgent.set(_agent);
+				}
 			});
 		}
 	});

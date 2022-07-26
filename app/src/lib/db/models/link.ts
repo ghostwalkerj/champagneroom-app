@@ -65,7 +65,7 @@ const linkSchemaLiteral = {
 			type: 'string',
 			maxLength: 50
 		},
-		talent: { type: 'string', ref: 'agent', maxLength: 50 },
+		talent: { type: 'string', ref: 'talent', maxLength: 50 },
 		createdAt: {
 			type: 'string'
 		},

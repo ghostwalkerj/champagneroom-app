@@ -42,6 +42,7 @@ const _create = async (token: string, key: string) => {
 	addRxPlugin(RxDBUpdatePlugin);
 	addRxPlugin(RxDBDevModePlugin);
 	addRxPlugin(RxDBEncryptionPlugin);
+
 	await removeRxDatabase('talentdb', getRxStoragePouch('idb'));
 
 	const _db: TalentDB = await createRxDatabase({
@@ -72,21 +73,20 @@ const _create = async (token: string, key: string) => {
 		}
 	});
 	const query = _db.talents.findOne().where('key').eq(key);
+
+	let repState = _db.talents.syncCouchDB({
+		remote: remoteDB,
+		waitForLeadership: false,
+		options: {
+			retry: true
+		},
+		query
+	});
+	await repState.awaitInitialReplication();
+
 	_currentTalent = await query.exec();
 
 	if (_currentTalent) {
-		currentTalent.set(_currentTalent);
-
-		let repState = _db.talents.syncCouchDB({
-			remote: remoteDB,
-			waitForLeadership: false,
-			options: {
-				retry: true
-			},
-			query
-		});
-		await repState.awaitInitialReplication();
-
 		repState = _db.links.syncCouchDB({
 			remote: remoteDB,
 			waitForLeadership: false,
@@ -95,7 +95,6 @@ const _create = async (token: string, key: string) => {
 			},
 			query: _db.links.find().where('talent').eq(_currentTalent._id)
 		});
-
 		await repState.awaitInitialReplication();
 
 		_db.talents.syncCouchDB({
@@ -107,6 +106,7 @@ const _create = async (token: string, key: string) => {
 			},
 			query
 		});
+
 		_db.links.syncCouchDB({
 			remote: remoteDB,
 			waitForLeadership: true,
@@ -114,9 +114,13 @@ const _create = async (token: string, key: string) => {
 				retry: true,
 				live: true
 			},
-			query: _db.talents.find().where('talent').eq(_currentTalent._id)
+			query: _db.links.find().where('talent').eq(_currentTalent._id)
 		});
 	}
+
+	_currentTalent = await query.exec();
+	if (_currentTalent) currentTalent.set(_currentTalent);
+
 	_talentDB = _db;
 	currentTalentDB.set(_db);
 	return _talentDB;

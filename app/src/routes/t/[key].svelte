@@ -1,3 +1,18 @@
+<script context="module">
+	import { AUTH_URL } from '$lib/constants';
+	export async function load() {
+		const res = await fetch(AUTH_URL, {
+			method: 'POST',
+			body: JSON.stringify({
+				type: 'talent'
+			})
+		});
+		const body = await res.json();
+		const token = body.token;
+		return { props: { token } };
+	}
+</script>
+
 <script type="ts">
 	import { browser } from '$app/env';
 	import { page } from '$app/stores';
@@ -16,12 +31,23 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { PhoneIncomingIcon } from 'svelte-feather-icons';
 	import StarRating from 'svelte-star-rating';
+	import { currentTalent, talentDB } from '$lib/db/stores/talentDB';
 
+	// async function doAuth() {
+	// 	const res = await fetch(AUTH_URL, {
+	// 		method: 'POST',
+	// 		body: JSON.stringify({
+	// 			type: 'talent'
+	// 		})
+	// 	});
+	// 	const body = await res.json();
+	// 	return body.token;
+	// }
+
+	export let token: string;
 	let key = $page.params.key;
 	let talent: TalentDocument;
 	let currentLink: LinkDocument;
-
-	let talentRef;
 
 	let vc: VideoCallType;
 	if (browser) {
@@ -71,26 +97,17 @@
 		});
 	};
 
-	//talentRef = gun
-	// .get(TalentType)
-	// .get(key)
-	// .on((_talent) => {
-	// 	if (_talent) {
-	// 		talent = _talent;
-	// 		if (talent.currentLinkId) {
-	// 			gun
-	// 				.get(LinkType)
-	// 				.get(talent.currentLinkId)
-	// 				.on((_link: Link) => {
-	// 					if (_link) {
-	// 						currentLink = _link;
-	// 					}
-	// 				});
-	// 		}
-	// 	}
-	// });
-
 	onMount(async () => {
+		// doAuth().then(async (token) => {
+		// 	console.log(token);
+		const db = await talentDB(token, key);
+		currentTalent.subscribe(async (_talent) => {
+			if (_talent) {
+				talent = _talent;
+				currentLink = await talent.populate('currentLink');
+			}
+		});
+
 		us = await userStream();
 		us.mediaStream.subscribe((stream) => {
 			if (stream) mediaStream = stream;
