@@ -106,7 +106,6 @@ export const talentDocMethods: TalentDocMethods = {
 			currentLink.update({ $set: { status: LinkStatus.EXPIRED } });
 		}
 
-		console.log(_link);
 		const db = get(currentTalentDB);
 		const link = await db.links.insert(_link);
 		this.update({ $set: { currentLink: link._id } });
