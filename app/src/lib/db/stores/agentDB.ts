@@ -7,17 +7,9 @@ import {
 	type AgentDocument
 } from '$lib/db/models/agent';
 import { talentSchema, type TalentCollection } from '$lib/db/models/talent';
-import * as PouchHttpPlugin from 'pouchdb-adapter-http';
-import * as idb from 'pouchdb-adapter-idb';
-import { addRxPlugin, createRxDatabase, removeRxDatabase, type RxDatabase } from 'rxdb';
-import { RxDBDevModePlugin } from 'rxdb/plugins/dev-mode';
-import { RxDBEncryptionPlugin } from 'rxdb/plugins/encryption';
-import { RxDBLeaderElectionPlugin } from 'rxdb/plugins/leader-election';
-import { addPouchPlugin, getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
-import { RxDBQueryBuilderPlugin } from 'rxdb/plugins/query-builder';
-import { RxDBReplicationCouchDBPlugin } from 'rxdb/plugins/replication-couchdb';
-import { RxDBUpdatePlugin } from 'rxdb/plugins/update';
-import { RxDBValidatePlugin } from 'rxdb/plugins/validate';
+import { initRXDB } from '$lib/db/rxdb';
+import { createRxDatabase, removeRxDatabase, type RxDatabase } from 'rxdb';
+import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
 import { writable } from 'svelte/store';
 
 type CreatorsCollections = {
@@ -34,15 +26,7 @@ export const agentDB = async (token: string, agentId: string) =>
 let _currentAgent: AgentDocument | null;
 
 const _create = async (token: string, agentId: string) => {
-	addRxPlugin(RxDBLeaderElectionPlugin);
-	addRxPlugin(RxDBReplicationCouchDBPlugin);
-	addPouchPlugin(idb);
-	addRxPlugin(RxDBQueryBuilderPlugin);
-	addRxPlugin(RxDBValidatePlugin);
-	addPouchPlugin(PouchHttpPlugin);
-	addRxPlugin(RxDBUpdatePlugin);
-	addRxPlugin(RxDBDevModePlugin);
-	addRxPlugin(RxDBEncryptionPlugin);
+	initRXDB();
 	await removeRxDatabase('agentdb', getRxStoragePouch('idb'));
 
 	const _db: AgentDB = await createRxDatabase({

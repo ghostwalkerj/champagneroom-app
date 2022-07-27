@@ -1,4 +1,5 @@
 import { PCALL_ROOM_URL } from '$lib/constants';
+import type { TalentDocument } from '$lib/db/models/talent';
 import {
 	toTypedRxJsonSchema,
 	type ExtractDocumentTypeFromTypedRxJsonSchema,
@@ -7,7 +8,6 @@ import {
 	type RxJsonSchema
 } from 'rxdb';
 import urlJoin from 'url-join';
-import type { TalentDocument } from '$lib/db/models/talent';
 export enum LinkStatus {
 	ACTIVE = 'ACTIVE',
 	EXPIRED = 'EXPIRED',

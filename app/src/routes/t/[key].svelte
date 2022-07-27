@@ -26,12 +26,12 @@
 
 	import type { LinkDocument } from '$lib/db/models/link';
 	import type { TalentDocument } from '$lib/db/models/talent';
+	import { currentTalent, talentDB } from '$lib/db/stores/talentDB';
 	import { userStream, type UserStreamType } from '$lib/userStream';
 	import type { VideoCallType } from '$lib/videoCall';
 	import { onDestroy, onMount } from 'svelte';
 	import { PhoneIncomingIcon } from 'svelte-feather-icons';
 	import StarRating from 'svelte-star-rating';
-	import { currentTalent, talentDB } from '$lib/db/stores/talentDB';
 
 	// async function doAuth() {
 	// 	const res = await fetch(AUTH_URL, {

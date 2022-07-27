@@ -1,23 +1,15 @@
 import { CREATORS_ENDPOINT, RXDB_PASSWORD } from '$lib/constants';
+import { linkDocMethods, linkSchema, type LinkCollection } from '$lib/db/models/link';
 import {
 	talentDocMethods,
-	type TalentDocument,
 	talentSchema,
-	type TalentCollection
+	type TalentCollection,
+	type TalentDocument
 } from '$lib/db/models/talent';
-import * as PouchHttpPlugin from 'pouchdb-adapter-http';
-import * as idb from 'pouchdb-adapter-idb';
-import { addRxPlugin, createRxDatabase, removeRxDatabase, type RxDatabase } from 'rxdb';
-import { RxDBDevModePlugin } from 'rxdb/plugins/dev-mode';
-import { RxDBEncryptionPlugin } from 'rxdb/plugins/encryption';
-import { RxDBLeaderElectionPlugin } from 'rxdb/plugins/leader-election';
-import { addPouchPlugin, getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
-import { RxDBQueryBuilderPlugin } from 'rxdb/plugins/query-builder';
-import { RxDBReplicationCouchDBPlugin } from 'rxdb/plugins/replication-couchdb';
-import { RxDBUpdatePlugin } from 'rxdb/plugins/update';
-import { RxDBValidatePlugin } from 'rxdb/plugins/validate';
+import { createRxDatabase, removeRxDatabase, type RxDatabase } from 'rxdb';
+import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
 import { writable } from 'svelte/store';
-import { type LinkCollection, linkDocMethods, linkSchema } from '$lib/db/models/link';
+import { initRXDB } from '$lib/db/rxdb';
 
 type CreatorsCollections = {
 	talents: TalentCollection;
@@ -33,16 +25,7 @@ export const talentDB = async (token: string, key: string) =>
 let _currentTalent: TalentDocument | null;
 
 const _create = async (token: string, key: string) => {
-	addRxPlugin(RxDBLeaderElectionPlugin);
-	addRxPlugin(RxDBReplicationCouchDBPlugin);
-	addPouchPlugin(idb);
-	addRxPlugin(RxDBQueryBuilderPlugin);
-	addRxPlugin(RxDBValidatePlugin);
-	addPouchPlugin(PouchHttpPlugin);
-	addRxPlugin(RxDBUpdatePlugin);
-	addRxPlugin(RxDBDevModePlugin);
-	addRxPlugin(RxDBEncryptionPlugin);
-
+	initRXDB();
 	await removeRxDatabase('talentdb', getRxStoragePouch('idb'));
 
 	const _db: TalentDB = await createRxDatabase({

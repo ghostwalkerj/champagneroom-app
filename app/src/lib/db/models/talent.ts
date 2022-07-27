@@ -1,5 +1,6 @@
 import type { AgentDocument } from '$lib/db/models/agent';
-import { type LinkDocument, LinkStatus, LinkType } from '$lib/db/models/link';
+import { LinkStatus, LinkType, type LinkDocument } from '$lib/db/models/link';
+import { currentTalentDB } from '$lib/db/stores/talentDB';
 import { nanoid } from 'nanoid';
 import {
 	toTypedRxJsonSchema,
@@ -9,7 +10,6 @@ import {
 	type RxJsonSchema
 } from 'rxdb';
 import { get } from 'svelte/store';
-import { currentTalentDB } from '$lib/db/stores/talentDB';
 import { v4 as uuidv4 } from 'uuid';
 
 export const TalentType = 'talent';
