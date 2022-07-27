@@ -4,9 +4,10 @@
 	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';
 	export let link: LinkDocument;
 	export let talent: TalentDocument;
-	let linkURL = '';
 
-	$: linkURL = link.generateLinkURL();
+	$: linkURL = '';
+
+	$: if (link) linkURL = link.generateLinkURL();
 
 	const copyLink = () => {
 		navigator.clipboard.writeText(linkURL);

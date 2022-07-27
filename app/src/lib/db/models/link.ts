@@ -65,7 +65,7 @@ const linkSchemaLiteral = {
 			type: 'string',
 			maxLength: 50
 		},
-		talent: { type: 'string', ref: 'talent', maxLength: 50 },
+		talent: { type: 'string', ref: 'talents', maxLength: 50 },
 		createdAt: {
 			type: 'string'
 		},
@@ -73,7 +73,7 @@ const linkSchemaLiteral = {
 			type: 'string'
 		}
 	},
-	required: ['entityType', 'talent', 'name', 'profileImageUrl', 'callId', 'amount'],
+	required: ['entityType', 'talent', 'talentName', 'profileImageUrl', 'callId', 'amount'],
 	encrypted: ['callId']
 } as const;
 

@@ -101,7 +101,6 @@ const _create = async (token: string, key: string) => {
 		});
 	}
 
-	_currentTalent = await query.exec();
 	if (_currentTalent) currentTalent.set(_currentTalent);
 
 	_talentDB = _db;

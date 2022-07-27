@@ -33,17 +33,6 @@
 	import { PhoneIncomingIcon } from 'svelte-feather-icons';
 	import StarRating from 'svelte-star-rating';
 
-	// async function doAuth() {
-	// 	const res = await fetch(AUTH_URL, {
-	// 		method: 'POST',
-	// 		body: JSON.stringify({
-	// 			type: 'talent'
-	// 		})
-	// 	});
-	// 	const body = await res.json();
-	// 	return body.token;
-	// }
-
 	export let token: string;
 	let key = $page.params.key;
 	let talent: TalentDocument;
@@ -55,7 +44,20 @@
 			videoCall = _vc.videoCall;
 			initVC();
 		});
+		talentDB(token, key).then((db) => {
+			currentTalent.subscribe((_talent) => {
+				if (_talent) {
+					talent = _talent;
+					talent.populate('currentLink').then((cl) => {
+						if (cl) {
+							currentLink = cl;
+						}
+					});
+				}
+			});
+		});
 	}
+
 	const formatter = new Intl.NumberFormat('en-US', {
 		style: 'currency',
 		currency: 'USD',
@@ -64,10 +66,19 @@
 
 	const updateProfileImage = async (url: string) => {
 		if (url) {
-			//			talentRef.get('profileImageUrl').put(url);
-			talent.profileImageUrl = url;
+			talent.update({
+				$set: {
+					profileImageUrl: url,
+					updatedAt: new Date().toISOString()
+				}
+			});
 			if (currentLink) {
-				currentLink.profileImageUrl = url;
+				currentLink.update({
+					$set: {
+						profileImageUrl: url,
+						updatedAt: new Date().toISOString()
+					}
+				});
 			}
 		}
 	};
@@ -98,16 +109,6 @@
 	};
 
 	onMount(async () => {
-		// doAuth().then(async (token) => {
-		// 	console.log(token);
-		const db = await talentDB(token, key);
-		currentTalent.subscribe(async (_talent) => {
-			if (_talent) {
-				talent = _talent;
-				currentLink = await talent.populate('currentLink');
-			}
-		});
-
 		us = await userStream();
 		us.mediaStream.subscribe((stream) => {
 			if (stream) mediaStream = stream;
@@ -127,20 +128,10 @@
 				.required()
 		}),
 		onSubmit: (values) => {
-			// const linkParams = LinkSchema.cast({
-			// 	amount: values.amount,
-			// 	talentId: talent._id,
-			// 	name: talent.name,
-			// 	profileImageUrl: talent.profileImageUrl
-			// });
-			// const link = createLink(linkParams);
-			// if (currentLink) {
-			// 	gun.get(LinkType).get(currentLink._id).get('status').put(LinkStatus.EXPIRED);
-			// }
-			// gun.get(LinkType).get(link._id).put(link);
-			// talentRef.get('currentLinkId').put(link._id);
-			// currentLink = link;
-			// handleReset();
+			talent.createLink(Number.parseInt(values.amount)).then((cl) => {
+				currentLink = cl;
+			});
+			handleReset();
 		}
 	});
 </script>
@@ -189,15 +180,7 @@
 						<!-- Current Link -->
 						<div>
 							<div>
-								{#if currentLink}
-									<LinkViewer link={currentLink} {talent} />
-								{:else}
-									<div class="bg-primary text-primary-content card">
-										<div class="text-center card-body items-center">
-											<h2 class="text-2xl card-title">You Have No Outstanding pCall Links</h2>
-										</div>
-									</div>
-								{/if}
+								<LinkViewer link={currentLink} {talent} />
 							</div>
 						</div>
 

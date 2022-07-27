@@ -62,7 +62,7 @@ const talentSchemaLiteral = {
 		currentLink: {
 			type: 'string',
 			maxLength: 50,
-			ref: 'link'
+			ref: 'links'
 		},
 		createdAt: {
 			type: 'string'
@@ -70,7 +70,7 @@ const talentSchemaLiteral = {
 		updatedAt: {
 			type: 'string'
 		},
-		agent: { type: 'string', ref: 'agent', maxLength: 50 }
+		agent: { type: 'string', ref: 'agents', maxLength: 50 }
 	},
 	required: ['_id', 'key', 'name', 'profileImageUrl', 'agent'],
 	indexed: ['key']
@@ -97,7 +97,8 @@ export const talentDocMethods: TalentDocMethods = {
 			talent: this._id,
 			profileImageUrl: this.profileImageUrl,
 			_id: LinkType + ':' + nanoid(),
-			createdAt: new Date().toISOString()
+			createdAt: new Date().toISOString(),
+			entityType: LinkType
 		};
 
 		if (this.currentLink) {
@@ -105,6 +106,7 @@ export const talentDocMethods: TalentDocMethods = {
 			currentLink.update({ $set: { status: LinkStatus.EXPIRED } });
 		}
 
+		console.log(_link);
 		const db = get(currentTalentDB);
 		const link = await db.links.insert(_link);
 		this.update({ $set: { currentLink: link._id } });
