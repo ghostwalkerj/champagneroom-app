@@ -1,5 +1,6 @@
 import { DEFAULT_PROFILE_IMAGE } from '$lib/constants';
-import { TalentType, type TalentDocType, type TalentDocument } from '$lib/db/models/talent';
+import { thisAgentDB } from '$lib/ORM/client/dbs/agentDB';
+import { TalentString, type TalentDocType, type TalentDocument } from '$lib/ORM/models/talent';
 import { nanoid } from 'nanoid';
 import {
 	toTypedRxJsonSchema,
@@ -9,12 +10,11 @@ import {
 	type RxJsonSchema
 } from 'rxdb';
 import { get } from 'svelte/store';
-import { currentAgentDB } from '../stores/agentDB';
 type AgentDocMethods = {
 	createTalent: (name: string, key: string, agentCommission: number) => Promise<TalentDocument>;
 };
 
-export const AgentType = 'agent';
+export const AgentString = 'agent';
 
 type AgentStaticMethods = {
 	createAgent: (address: string) => Promise<AgentDocument>;
@@ -27,7 +27,7 @@ export const agentDocMethods: AgentDocMethods = {
 		agentCommission: number
 	) {
 		const _talent: TalentDocType = {
-			_id: TalentType + ':' + 't' + nanoid(),
+			_id: `${TalentString}:t${nanoid()}`,
 			name,
 			agentCommission,
 			key,
@@ -36,7 +36,7 @@ export const agentDocMethods: AgentDocMethods = {
 			createdAt: new Date().toISOString()
 		};
 
-		const db = get(currentAgentDB);
+		const db = get(thisAgentDB);
 		const talent = await db.talents.insert(_talent);
 
 		const talents = this.talents ? this.talents.concat([talent._id]) : [talent._id];
@@ -46,9 +46,8 @@ export const agentDocMethods: AgentDocMethods = {
 };
 export const agentStaticMethods: AgentStaticMethods = {
 	createAgent: async function (this: AgentCollection, address: string) {
-		const agentId = AgentType + ':' + address;
 		const _agent = await this.insert({
-			_id: agentId,
+			_id: `${AgentString}:${address}`,
 			address,
 			createdAt: new Date().toISOString()
 		});

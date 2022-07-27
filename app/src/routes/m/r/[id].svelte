@@ -1,7 +1,7 @@
 <script type="ts">
 	import LinkFeedback from '$lib/components/Feedback.svelte';
 	import LinkDetail from '$lib/components/LinkDetail.svelte';
-	import type { LinkDocument } from '$lib/db/models/link';
+	import type { LinkDocument } from '$lib/ORM/models/link';
 
 	let link: LinkDocument;
 	// let linkId = $page.params.id;

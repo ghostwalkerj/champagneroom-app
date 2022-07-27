@@ -1,6 +1,6 @@
-import type { AgentDocument } from '$lib/db/models/agent';
-import { LinkStatus, LinkType, type LinkDocument } from '$lib/db/models/link';
-import { currentTalentDB } from '$lib/db/stores/talentDB';
+import { thisTalentDB } from '$lib/ORM/client/dbs/talentDB';
+import type { AgentDocument } from '$lib/ORM/models/agent';
+import { LinkStatus, LinkString, type LinkDocument } from '$lib/ORM/models/link';
 import { nanoid } from 'nanoid';
 import {
 	toTypedRxJsonSchema,
@@ -12,7 +12,7 @@ import {
 import { get } from 'svelte/store';
 import { v4 as uuidv4 } from 'uuid';
 
-export const TalentType = 'talent';
+export const TalentString = 'talent';
 
 const talentSchemaLiteral = {
 	title: 'talent',
@@ -96,9 +96,9 @@ export const talentDocMethods: TalentDocMethods = {
 			talentName: this.name,
 			talent: this._id,
 			profileImageUrl: this.profileImageUrl,
-			_id: LinkType + ':' + nanoid(),
+			_id: `${LinkString}:l${nanoid()}`,
 			createdAt: new Date().toISOString(),
-			entityType: LinkType
+			entityType: LinkString
 		};
 
 		if (this.currentLink) {
@@ -106,7 +106,7 @@ export const talentDocMethods: TalentDocMethods = {
 			currentLink.update({ $set: { status: LinkStatus.EXPIRED } });
 		}
 
-		const db = get(currentTalentDB);
+		const db = get(thisTalentDB);
 		const link = await db.links.insert(_link);
 		this.update({ $set: { currentLink: link._id } });
 		return link;

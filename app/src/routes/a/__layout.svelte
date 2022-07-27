@@ -15,21 +15,21 @@
 
 <script lang="ts">
 	import ConnectButton from '$lib/components/web3/ConnectButton.svelte';
-	import { AgentType } from '$lib/db/models/agent';
-	import { agentDB, currentAgent } from '$lib/db/stores/agentDB';
+	import { agentDB, thisAgent } from '$lib/ORM/client/dbs/agentDB';
+	import { type AgentDocument, AgentString } from '$lib/ORM/models/agent';
 	import { selectedAccount } from 'svelte-web3';
 	export let token: string;
 
 	//TODO: This will be authentication later
 	selectedAccount.subscribe(async (account) => {
 		if (account) {
-			const agentId = AgentType + ':' + account;
+			const agentId = AgentString + ':' + account;
 			const db = await agentDB(token, agentId);
-			currentAgent.subscribe(async (_agent) => {
+			thisAgent.subscribe(async (_agent: AgentDocument) => {
 				if (!_agent) {
 					const _agent = await db.agents.createAgent(account);
 					console.log('insert agent: ' + JSON.stringify(_agent));
-					currentAgent.set(_agent);
+					thisAgent.set(_agent);
 				}
 			});
 		}

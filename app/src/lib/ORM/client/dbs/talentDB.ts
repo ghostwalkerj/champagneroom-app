@@ -1,23 +1,23 @@
 import { CREATORS_ENDPOINT, RXDB_PASSWORD } from '$lib/constants';
-import { linkDocMethods, linkSchema, type LinkCollection } from '$lib/db/models/link';
+import { linkDocMethods, linkSchema, type LinkCollection } from '$lib/ORM/models/link';
 import {
 	talentDocMethods,
 	talentSchema,
 	type TalentCollection,
 	type TalentDocument
-} from '$lib/db/models/talent';
+} from '$lib/ORM/models/talent';
+import { initRXDB } from '$lib/ORM/client/rxdb';
 import { createRxDatabase, removeRxDatabase, type RxDatabase } from 'rxdb';
 import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
 import { writable } from 'svelte/store';
-import { initRXDB } from '$lib/db/rxdb';
 
 type CreatorsCollections = {
 	talents: TalentCollection;
 	links: LinkCollection;
 };
 
-export type TalentDB = RxDatabase<CreatorsCollections>;
-let _talentDB: TalentDB;
+export type TalentDBType = RxDatabase<CreatorsCollections>;
+let _talentDB: TalentDBType;
 
 export const talentDB = async (token: string, key: string) =>
 	_talentDB ? _talentDB : await _create(token, key);
@@ -28,7 +28,7 @@ const _create = async (token: string, key: string) => {
 	initRXDB();
 	await removeRxDatabase('talentdb', getRxStoragePouch('idb'));
 
-	const _db: TalentDB = await createRxDatabase({
+	const _db: TalentDBType = await createRxDatabase({
 		name: 'talentdb',
 		storage: getRxStoragePouch('idb'),
 		ignoreDuplicate: true,
@@ -101,12 +101,12 @@ const _create = async (token: string, key: string) => {
 		});
 	}
 
-	if (_currentTalent) currentTalent.set(_currentTalent);
+	if (_currentTalent) thisTalent.set(_currentTalent);
 
 	_talentDB = _db;
-	currentTalentDB.set(_db);
+	thisTalentDB.set(_db);
 	return _talentDB;
 };
 
-export const currentTalent = writable<TalentDocument>();
-export const currentTalentDB = writable<RxDatabase<CreatorsCollections>>();
+export const thisTalent = writable<TalentDocument>();
+export const thisTalentDB = writable<RxDatabase<CreatorsCollections>>();

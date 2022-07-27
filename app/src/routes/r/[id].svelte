@@ -5,8 +5,7 @@
 	import LinkDetail from '$lib/components/LinkDetail.svelte';
 	import VideoCall from '$lib/components/VideoCall.svelte';
 	import VideoPreview from '$lib/components/VideoPreview.svelte';
-	import { type Feedback } from '$lib/db/models/feedback';
-	import type { LinkDocument } from '$lib/db/models/link';
+	import type { LinkDocument } from '$lib/ORM/models/link';
 	import { userStream, type UserStreamType } from '$lib/userStream';
 	import type { VideoCallType } from '$lib/videoCall';
 	import { onMount } from 'svelte';

@@ -1,8 +1,8 @@
 <script type="ts">
 	import { PCALL_TALENT_URL } from '$lib/constants';
-	import type { AgentDocument } from '$lib/db/models/agent';
-	import type { TalentDocument } from '$lib/db/models/talent';
-	import { currentAgent } from '$lib/db/stores/agentDB';
+	import { thisAgent } from '$lib/ORM/client/dbs/agentDB';
+	import type { AgentDocument } from '$lib/ORM/models/agent';
+	import type { TalentDocument } from '$lib/ORM/models/talent';
 	import { nanoid } from 'nanoid';
 	import { createForm } from 'svelte-forms-lib';
 	import urlJoin from 'url-join';
@@ -37,7 +37,7 @@
 			talents = await agent.populate('talents');
 		}
 	};
-	currentAgent.subscribe(async (_agent) => {
+	thisAgent.subscribe(async (_agent) => {
 		if (_agent) {
 			agent = _agent;
 			getTalents();

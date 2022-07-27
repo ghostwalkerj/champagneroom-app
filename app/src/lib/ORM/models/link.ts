@@ -1,5 +1,7 @@
 import { PCALL_ROOM_URL } from '$lib/constants';
-import type { TalentDocument } from '$lib/db/models/talent';
+import { thisPublicDB } from '$lib/ORM/client/dbs/publicDB';
+import { type FeedbackDocument, FeedbackString } from '$lib/ORM/models/feedback';
+import type { TalentDocument } from '$lib/ORM/models/talent';
 import {
 	toTypedRxJsonSchema,
 	type ExtractDocumentTypeFromTypedRxJsonSchema,
@@ -7,6 +9,7 @@ import {
 	type RxDocument,
 	type RxJsonSchema
 } from 'rxdb';
+import { get } from 'svelte/store';
 import urlJoin from 'url-join';
 export enum LinkStatus {
 	ACTIVE = 'ACTIVE',
@@ -15,7 +18,7 @@ export enum LinkStatus {
 	COMPLETED = 'COMPLETED'
 }
 
-export const LinkType = 'link';
+export const LinkString = 'link';
 const linkSchemaLiteral = {
 	title: 'link',
 	description: 'onetime link to call',
@@ -53,11 +56,6 @@ const linkSchemaLiteral = {
 		callEnd: { type: 'string' },
 		callId: { type: 'string' },
 		status: { type: 'string', enum: Object.keys(LinkStatus) },
-		rating: {
-			type: 'integer',
-			minimum: 0,
-			maximum: 5
-		},
 		profileImageUrl: {
 			type: 'string'
 		},
@@ -66,6 +64,7 @@ const linkSchemaLiteral = {
 			maxLength: 50
 		},
 		talent: { type: 'string', ref: 'talents', maxLength: 50 },
+		feedback: { type: 'string', ref: 'feedbacks', maxLength: 50 },
 		createdAt: {
 			type: 'string'
 		},
@@ -91,6 +90,7 @@ export type LinkCollection = RxCollection<LinkDocType, LinkDocMethods>;
 
 type LinkDocMethods = {
 	generateLinkURL: () => string;
+	createFeedback: () => Promise<FeedbackDocument>;
 };
 
 export const linkDocMethods: LinkDocMethods = {
@@ -102,5 +102,23 @@ export const linkDocMethods: LinkDocMethods = {
 			console.log("Can't generate link url, link is missing id", this);
 			return '';
 		}
+	},
+	createFeedback: async function (this: LinkDocument): Promise<FeedbackDocument> {
+		const _feedback = {
+			entityType: FeedbackString,
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			link: this._id!,
+			_id: `${FeedbackString}:${this._id}`,
+			createdAt: new Date().toISOString(),
+			rejectedCount: 0,
+			disconnectCount: 0,
+			notAnsweredCount: 0,
+			viewedCount: 0,
+			rating: 0
+		};
+		const db = get(thisPublicDB);
+		const feedback = await db.feedbacks.insert(_feedback);
+		this.update({ $set: { feedback: _feedback._id } });
+		return feedback;
 	}
 };

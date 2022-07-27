@@ -24,9 +24,9 @@
 	import VideoCall from '$lib/components/VideoCall.svelte';
 	import VideoPreview from '$lib/components/VideoPreview.svelte';
 
-	import type { LinkDocument } from '$lib/db/models/link';
-	import type { TalentDocument } from '$lib/db/models/talent';
-	import { currentTalent, talentDB } from '$lib/db/stores/talentDB';
+	import { thisTalent, type TalentDBType, talentDB } from '$lib/ORM/client/dbs/talentDB';
+	import type { LinkDocument } from '$lib/ORM/models/link';
+	import type { TalentDocument } from '$lib/ORM/models/talent';
 	import { userStream, type UserStreamType } from '$lib/userStream';
 	import type { VideoCallType } from '$lib/videoCall';
 	import { onDestroy, onMount } from 'svelte';
@@ -44,8 +44,8 @@
 			videoCall = _vc.videoCall;
 			initVC();
 		});
-		talentDB(token, key).then((db) => {
-			currentTalent.subscribe((_talent) => {
+		talentDB(token, key).then((db: TalentDBType) => {
+			thisTalent.subscribe((_talent) => {
 				if (_talent) {
 					talent = _talent;
 					talent.populate('currentLink').then((cl) => {
@@ -85,7 +85,7 @@
 
 	let us: Awaited<UserStreamType>;
 	$: callState = 'disconnected';
-	let videoCall;
+	let videoCall: any;
 	let mediaStream: MediaStream;
 	$: showAlert = callState == 'receivingCall';
 	$: inCall = callState == 'connectedAsReceiver';
@@ -301,7 +301,7 @@
 												<div class="stat-value">{formatter.format(1400)}</div>
 											</div>
 											<div class="stat">
-												<div class="stat-title">Amount Availabe</div>
+												<div class="stat-title">Amount Available</div>
 												<div class="stat-value">{formatter.format(400)}</div>
 											</div>
 										</div>
@@ -390,7 +390,7 @@
 															<div class="flex space-x-4 flex-1 min-w-0 pt-1.5 justify-between">
 																<div>
 																	<p class="text-sm text-gray-100">
-																		You recieved feedback from <span
+																		You received feedback from <span
 																			class="font-medium text-gray-900"
 																			>Ted Cruiz (not related to Ted Cruz)</span
 																		>

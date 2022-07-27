@@ -1,4 +1,4 @@
-import { JWT_EXPIRY, JWT_SECRET, JWT_USER } from '$lib/constants';
+import { JWT_CREATOR_USER, JWT_EXPIRY, JWT_SECRET } from '$lib/constants';
 import type { RequestHandler } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 export const POST: RequestHandler = async ({ request }) => {
@@ -8,7 +8,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		token = jwt.sign(
 			{
 				exp: Math.floor(Date.now() / 1000) + JWT_EXPIRY,
-				sub: JWT_USER
+				sub: JWT_CREATOR_USER
 			},
 			JWT_SECRET
 		);

@@ -1,4 +1,3 @@
-import { nanoid } from 'nanoid';
 import {
 	toTypedRxJsonSchema,
 	type ExtractDocumentTypeFromTypedRxJsonSchema,
@@ -10,14 +9,10 @@ import type { LinkDocument } from './link';
 
 const feedbackSchemaLiteral = {
 	title: 'feedback',
-	description: 'customer feedback for a link',
+	description: ' feedback for a link',
 	version: 0,
 	type: 'object',
-	primaryKey: {
-		key: '_id',
-		fields: ['entityType', 'internalId'],
-		separator: ':'
-	},
+	primaryKey: '_id',
 	properties: {
 		_id: {
 			type: 'string',
@@ -35,13 +30,7 @@ const feedbackSchemaLiteral = {
 		},
 		link: {
 			type: 'string',
-			ref: 'link'
-		},
-		internalId: {
-			type: 'string',
-			maxLength: 21,
-			default: nanoid(),
-			final: true
+			ref: 'links'
 		},
 		rejectedCount: {
 			type: 'integer',
@@ -70,14 +59,14 @@ const feedbackSchemaLiteral = {
 			maximum: 5
 		}
 	},
-	required: ['_id', 'entityType', 'link', 'internalId']
+	required: ['_id', 'entityType', 'link']
 } as const;
 
 type feedbackRef = {
 	link_?: Promise<LinkDocument>;
 };
 
-export const FeedbackType = 'feedback';
+export const FeedbackString = 'feedback';
 
 const schemaTyped = toTypedRxJsonSchema(feedbackSchemaLiteral);
 export type FeedbackDocType = ExtractDocumentTypeFromTypedRxJsonSchema<typeof schemaTyped>;
@@ -85,12 +74,11 @@ export type FeedbackDocType = ExtractDocumentTypeFromTypedRxJsonSchema<typeof sc
 // @ts-ignore
 export const feedbackSchema: RxJsonSchema<FeedbackDocType> = feedbackSchemaLiteral;
 export type FeedbackDocument = RxDocument<FeedbackDocType> & feedbackRef;
-export type FeedbackCollection = RxCollection<FeedbackDocument>;
+export type FeedbackCollection = RxCollection<FeedbackDocType>;
 
 export const createFeedback = (linkId: string) => {
 	const feedback = {
-		link: linkId,
-		internalId: nanoid()
+		link: linkId
 	};
 	return feedback;
 };

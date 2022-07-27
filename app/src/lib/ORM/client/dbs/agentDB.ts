@@ -5,9 +5,9 @@ import {
 	agentStaticMethods,
 	type AgentCollection,
 	type AgentDocument
-} from '$lib/db/models/agent';
-import { talentSchema, type TalentCollection } from '$lib/db/models/talent';
-import { initRXDB } from '$lib/db/rxdb';
+} from '$lib/ORM/models/agent';
+import { talentSchema, type TalentCollection } from '$lib/ORM/models/talent';
+import { initRXDB } from '$lib/ORM/client/rxdb';
 import { createRxDatabase, removeRxDatabase, type RxDatabase } from 'rxdb';
 import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
 import { writable } from 'svelte/store';
@@ -17,8 +17,8 @@ type CreatorsCollections = {
 	talents: TalentCollection;
 };
 
-export type AgentDB = RxDatabase<CreatorsCollections>;
-let _agentDB: AgentDB;
+export type AgentDBType = RxDatabase<CreatorsCollections>;
+let _agentDB: AgentDBType;
 
 export const agentDB = async (token: string, agentId: string) =>
 	_agentDB ? _agentDB : await _create(token, agentId);
@@ -29,7 +29,7 @@ const _create = async (token: string, agentId: string) => {
 	initRXDB();
 	await removeRxDatabase('agentdb', getRxStoragePouch('idb'));
 
-	const _db: AgentDB = await createRxDatabase({
+	const _db: AgentDBType = await createRxDatabase({
 		name: 'agentdb',
 		storage: getRxStoragePouch('idb'),
 		ignoreDuplicate: true,
@@ -78,7 +78,7 @@ const _create = async (token: string, agentId: string) => {
 	await repState.awaitInitialReplication();
 
 	_currentAgent = await query.exec();
-	if (_currentAgent) currentAgent.set(_currentAgent);
+	if (_currentAgent) thisAgent.set(_currentAgent);
 
 	_db.agents.syncCouchDB({
 		remote: remoteDB,
@@ -100,9 +100,9 @@ const _create = async (token: string, agentId: string) => {
 	});
 
 	_agentDB = _db;
-	currentAgentDB.set(_db);
+	thisAgentDB.set(_db);
 	return _agentDB;
 };
 
-export const currentAgent = writable<AgentDocument>();
-export const currentAgentDB = writable<RxDatabase<CreatorsCollections>>();
+export const thisAgent = writable<AgentDocument>();
+export const thisAgentDB = writable<RxDatabase<CreatorsCollections>>();
