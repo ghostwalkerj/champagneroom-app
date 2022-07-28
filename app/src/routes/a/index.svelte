@@ -1,5 +1,6 @@
 <script type="ts">
-	import { PCALL_TALENT_URL } from '$lib/constants';
+	import { page } from '$app/stores';
+	import { TALENT_PATH } from '$lib/constants';
 	import { thisAgent } from '$lib/ORM/client/dbs/agentDB';
 	import type { AgentDocument } from '$lib/ORM/models/agent';
 	import type { TalentDocument } from '$lib/ORM/models/talent';
@@ -45,7 +46,7 @@
 	});
 
 	$: talentkey = nanoid();
-	$: talentUrl = urlJoin(PCALL_TALENT_URL, talentkey);
+	$: talentUrl = urlJoin($page.url.origin, TALENT_PATH, talentkey);
 </script>
 
 {#if agent}

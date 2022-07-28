@@ -6,5 +6,6 @@
     "isolatedModules": false,
     "esModuleInterop": true,
     "strict": true,
+    "noImplicitAny": false
   }
 }

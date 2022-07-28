@@ -5,6 +5,7 @@
 	import LinkDetail from '$lib/components/LinkDetail.svelte';
 	import VideoCall from '$lib/components/VideoCall.svelte';
 	import VideoPreview from '$lib/components/VideoPreview.svelte';
+	import type { FeedbackDocument } from '$lib/ORM/models/feedback';
 	import type { LinkDocument } from '$lib/ORM/models/link';
 	import { userStream, type UserStreamType } from '$lib/userStream';
 	import type { VideoCallType } from '$lib/videoCall';
@@ -20,7 +21,7 @@
 	$: callState = 'disconnected';
 	$: previousState = 'none';
 
-	let feedback: Feedback | null = null;
+	let feedback: FeedbackDocument | null = null;
 
 	// get link
 

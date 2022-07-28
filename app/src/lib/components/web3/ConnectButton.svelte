@@ -8,7 +8,7 @@
 	import JazzIcon from './JazzIcon.svelte';
 	let pending = 'pending';
 	const disable = () => defaultEvmStores.disconnect();
-	const IFURA_ID = process.env.VITE_INFURA_ID || '';
+	const INFURA_ID = process.env.VITE_INFURA_ID || '';
 
 	async function connect() {
 		try {
@@ -29,7 +29,7 @@
 				walletconnect: {
 					package: WalletConnectProvider,
 					options: {
-						infuraId: IFURA_ID
+						infuraId: INFURA_ID
 					}
 				}
 			}

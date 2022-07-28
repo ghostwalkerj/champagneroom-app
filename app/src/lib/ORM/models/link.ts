@@ -1,6 +1,6 @@
-import { PCALL_ROOM_URL } from '$lib/constants';
+import { ROOM_PATH } from '$lib/constants';
 import { thisPublicDB } from '$lib/ORM/client/dbs/publicDB';
-import { type FeedbackDocument, FeedbackString } from '$lib/ORM/models/feedback';
+import { FeedbackString, type FeedbackDocument } from '$lib/ORM/models/feedback';
 import type { TalentDocument } from '$lib/ORM/models/talent';
 import {
 	toTypedRxJsonSchema,
@@ -89,14 +89,14 @@ export type LinkDocument = RxDocument<LinkDocType, LinkDocMethods> & linkRef;
 export type LinkCollection = RxCollection<LinkDocType, LinkDocMethods>;
 
 type LinkDocMethods = {
-	generateLinkURL: () => string;
+	generateLinkURL: (path: string) => string;
 	createFeedback: () => Promise<FeedbackDocument>;
 };
 
 export const linkDocMethods: LinkDocMethods = {
-	generateLinkURL: function (this: LinkDocument): string {
+	generateLinkURL: function (this: LinkDocument, path: string): string {
 		if (this._id) {
-			const url = urlJoin(PCALL_ROOM_URL, this._id);
+			const url = urlJoin(path, ROOM_PATH, this._id);
 			return url;
 		} else {
 			console.log("Can't generate link url, link is missing id", this);

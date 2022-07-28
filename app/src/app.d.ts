@@ -7,5 +7,6 @@ declare namespace App {
 	// interface Platform {}
 	//interface Session {
 	//}
+	// eslint-disable-next-line @typescript-eslint/no-empty-interface
 	interface Stuff {}
 }

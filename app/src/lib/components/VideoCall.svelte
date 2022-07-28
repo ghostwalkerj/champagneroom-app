@@ -65,7 +65,7 @@
 		canvas.width = localVideo.width;
 		canvas.height = localVideo.height;
 		filters = document.querySelector('.filters');
-		initalize();
+		initialize();
 	});
 
 	onDestroy(() => {
@@ -80,7 +80,7 @@
 		});
 	}
 
-	const initalize = () => {
+	const initialize = () => {
 		if (localVideo) {
 			localVideo.srcObject = mediaStream;
 			localVideo.muted = true;

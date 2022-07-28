@@ -141,7 +141,7 @@
     babel-plugin-polyfill-regenerator "^0.3.1"
     semver "^6.3.0"
 
-"@babel/runtime@7.18.6", "@babel/runtime@^7.5.5", "@babel/runtime@^7.7.2":
+"@babel/runtime@7.18.6", "@babel/runtime@^7.5.5":
   version "7.18.6"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.18.6.tgz#6a1ef59f838debd670421f8c7f2cbb8da9751580"
   integrity sha512-t9wi7/AW6XtKahAe20Yw0/mMljKq0B1r2fPdvaAdV/KPDZewFXdaaa6K7lxmZBZ8FBNpCiAT6iHPmd6QO9bKfQ==
@@ -155,7 +155,7 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
-"@babel/runtime@^7.16.0", "@babel/runtime@^7.6.2":
+"@babel/runtime@^7.16.0", "@babel/runtime@^7.6.2", "@babel/runtime@^7.7.2":
   version "7.18.9"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.18.9.tgz#b4fcfce55db3d2e5e080d2490f608a3b9f407f4a"
   integrity sha512-lkqXDcvlFT5rvEjiu6+QYO+1GXrEHRo2LOtS7E4GtX5ESIZOgepqsZBVIj6Pv+a6zqsya9VCgiK1KAK4BvJDAw==
@@ -8465,10 +8465,10 @@ svelte-proxied-store@^1.1.4:
   resolved "https://registry.yarnpkg.com/svelte-proxied-store/-/svelte-proxied-store-1.1.4.tgz#220b2a2f56574b65fff48e526fcea83208934122"
   integrity sha512-Vz8egScKBx3Ve1+MlaX0D6hEgYgtIQzpZx4HtzI6+J0mJiVgfaxnEdvSVGDWNb5E+zGzGGXdmzxqjfOIyNEswQ==
 
-svelte-star-rating@^1.3.2:
-  version "1.3.2"
-  resolved "https://registry.yarnpkg.com/svelte-star-rating/-/svelte-star-rating-1.3.2.tgz#5d64ff447860a6806a016beebd109c800e80bf38"
-  integrity sha512-sHcy6AjNpTyZlprhBsrXDYIckgBMVjAplA1Af1IlU2u9i5v3JM+4VBqYxDGZCuY06fKVucmdykbZC+mTgmF7Ow==
+svelte-star-rating@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/svelte-star-rating/-/svelte-star-rating-2.0.0.tgz#0055add20d2de85fc81be61e7aae27a5c34d19ab"
+  integrity sha512-1krisQtIQIOWrm1Hb+P9aYwcTleX2iJvzExz9rvWNAHUEeIlsL2O8JCNZgScS9f3FUri09Dcg56meX40Jb8pZA==
 
 svelte-waypoint@latest:
   version "0.1.4"
@@ -8476,9 +8476,9 @@ svelte-waypoint@latest:
   integrity sha512-UEqoXZjJeKj2sWlAIsBOFjxjMn+KP8aFCc/zjdmZi1cCOE59z6T2C+I6ZaAf8EmNQqNzfZVB/Lci4Ci9spzXAw==
 
 svelte-web3@^3.5.0:
-  version "3.5.0"
-  resolved "https://registry.yarnpkg.com/svelte-web3/-/svelte-web3-3.5.0.tgz#b5d2e5216bec34f957700c0041f1bcab7298bb04"
-  integrity sha512-QlYkvCPBnhCOUHd0mVCvq1KXJmDie8JxNUdE8HpJ92UbXbFe55KyZQzNWDuSUzGgcuME/Xp35ygiSWVO4d5aNA==
+  version "3.5.1"
+  resolved "https://registry.yarnpkg.com/svelte-web3/-/svelte-web3-3.5.1.tgz#7f37b15b5d8fa2f0c40944a682c62d24a38bfc2b"
+  integrity sha512-ZC8qAMPk6r5I6MXN21XeaqV05MIeqAZxBHHnTYZV6UyPabW923CnsvluDYjNdxvnCmRqmOl48aF70uVo1+6rtA==
   dependencies:
     svelte "^3.0.0"
     svelte-proxied-store "^1.1.4"

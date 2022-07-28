@@ -68,7 +68,7 @@
 			try {
 				const client = new SkynetClient(SKYNET_URL);
 				const { skylink } = await client.uploadFile(file, { onUploadProgress });
-				const skylinkUrl = await client.getSkylinkUrl(skylink); // TODO:Abstract the domain to allow muttiple domains
+				const skylinkUrl = await client.getSkylinkUrl(skylink); // TODO:Abstract the domain to allow multiple domains
 				profileImage = skylinkUrl;
 				callBack(skylinkUrl);
 				progressVisibility = 'invisible';
@@ -93,6 +93,7 @@
 		<div>
 			<Image src={imageUrl || ' '} alt="" class="rounded-full flex-none object-cover mask-circle" />
 		</div>
+
 		<div
 			use:filedrop={options}
 			on:filedrop={onChange}

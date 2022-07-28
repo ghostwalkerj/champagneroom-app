@@ -1,23 +1,30 @@
 <script context="module">
-	import { AUTH_URL } from '$lib/constants';
-	export async function load() {
-		const res = await fetch(AUTH_URL, {
-			method: 'POST',
-			body: JSON.stringify({
-				type: 'agent'
-			})
-		});
-		const body = await res.json();
-		const token = body.token;
-		return { props: { token } };
+	import { AUTH_PATH, TokenRole } from '$lib/constants';
+
+	export async function load({ url, fetch }) {
+		const auth_url = urlJoin(url.origin, AUTH_PATH);
+		try {
+			const res = await fetch(auth_url, {
+				method: 'POST',
+				body: JSON.stringify({
+					tokenRole: TokenRole.AGENT
+				})
+			});
+			const body = await res.json();
+			const token = body.token;
+			return { props: { token } };
+		} catch (e) {
+			console.log(e);
+		}
 	}
 </script>
 
 <script lang="ts">
 	import ConnectButton from '$lib/components/web3/ConnectButton.svelte';
 	import { agentDB, thisAgent } from '$lib/ORM/client/dbs/agentDB';
-	import { type AgentDocument, AgentString } from '$lib/ORM/models/agent';
+	import { AgentString, type AgentDocument } from '$lib/ORM/models/agent';
 	import { selectedAccount } from 'svelte-web3';
+	import urlJoin from 'url-join';
 	export let token: string;
 
 	//TODO: This will be authentication later

@@ -1,10 +1,11 @@
 <script context="module">
-	import { AUTH_URL } from '$lib/constants';
-	export async function load() {
-		const res = await fetch(AUTH_URL, {
+	import { AUTH_PATH, TokenRole } from '$lib/constants';
+	export async function load({ url, fetch }) {
+		const auth_url = urlJoin(url.origin, AUTH_PATH);
+		const res = await fetch(auth_url, {
 			method: 'POST',
 			body: JSON.stringify({
-				type: 'talent'
+				tokenRole: TokenRole.TALENT
 			})
 		});
 		const body = await res.json();
@@ -24,7 +25,7 @@
 	import VideoCall from '$lib/components/VideoCall.svelte';
 	import VideoPreview from '$lib/components/VideoPreview.svelte';
 
-	import { thisTalent, type TalentDBType, talentDB } from '$lib/ORM/client/dbs/talentDB';
+	import { talentDB, thisTalent, type TalentDBType } from '$lib/ORM/client/dbs/talentDB';
 	import type { LinkDocument } from '$lib/ORM/models/link';
 	import type { TalentDocument } from '$lib/ORM/models/talent';
 	import { userStream, type UserStreamType } from '$lib/userStream';
@@ -32,6 +33,7 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { PhoneIncomingIcon } from 'svelte-feather-icons';
 	import StarRating from 'svelte-star-rating';
+	import urlJoin from 'url-join';
 
 	export let token: string;
 	let key = $page.params.key;

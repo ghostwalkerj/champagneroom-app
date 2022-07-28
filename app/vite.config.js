@@ -4,8 +4,8 @@ import basicSsl from '@vitejs/plugin-basic-ssl';
 
 const config = {
 	mode: 'development',
-	plugins: [sveltekit(), basicSsl(), WindiCSS()],
-	//plugins: [sveltekit(), WindiCSS()],
+	//plugins: [sveltekit(), basicSsl(), WindiCSS()],
+	plugins: [sveltekit(), WindiCSS()],
 	optimizeDeps: {
 		exclude: ['path', 'fs', 'os', 'perf_hooks'],
 	}

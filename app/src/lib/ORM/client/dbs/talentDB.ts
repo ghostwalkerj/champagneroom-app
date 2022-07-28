@@ -1,4 +1,5 @@
 import { CREATORS_ENDPOINT, RXDB_PASSWORD } from '$lib/constants';
+import { initRXDB } from '$lib/ORM/client/rxdb';
 import { linkDocMethods, linkSchema, type LinkCollection } from '$lib/ORM/models/link';
 import {
 	talentDocMethods,
@@ -6,7 +7,6 @@ import {
 	type TalentCollection,
 	type TalentDocument
 } from '$lib/ORM/models/talent';
-import { initRXDB } from '$lib/ORM/client/rxdb';
 import { createRxDatabase, removeRxDatabase, type RxDatabase } from 'rxdb';
 import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
 import { writable } from 'svelte/store';
