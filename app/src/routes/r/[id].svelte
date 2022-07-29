@@ -1,9 +1,13 @@
-<script context="module">
+<script context="module" type="ts">
 	import { AUTH_PATH, TokenRoles } from '$lib/constants';
+	import { publicDB, thisLink } from '$lib/ORM/dbs/publicDB';
 
 	//TODO: Only return token if link URL is good.
-	export async function load({ url, fetch }) {
+	/** @type {import('./__types/[id]').Load} */
+	export async function load({ params, url, fetch }) {
 		const auth_url = urlJoin(url.origin, AUTH_PATH);
+		let token = '';
+		let linkId = params.id;
 		try {
 			const res = await fetch(auth_url, {
 				method: 'POST',
@@ -12,10 +16,19 @@
 				})
 			});
 			const body = await res.json();
-			const token = body.token;
-			return { props: { token } };
+			token = body.token;
 		} catch (e) {
 			console.log('Error in link load', e);
+		}
+
+		//Try to preload link
+		if (token != '') {
+			const _publicDB = await publicDB(token, linkId, StorageTypes.NODE_WEBSQL);
+			const link = await _publicDB.links.findOne(linkId).exec();
+
+			if (link) {
+				return { props: { token, link: link.toJSON() } };
+			}
 		}
 	}
 </script>
@@ -34,7 +47,6 @@
 	import { onMount } from 'svelte';
 	import fsm from 'svelte-fsm';
 	import urlJoin from 'url-join';
-	import { publicDB, thisLink } from '$lib/ORM/dbs/publicDB';
 	import { StorageTypes } from '$lib/ORM/rxdb';
 
 	export let token: string;
