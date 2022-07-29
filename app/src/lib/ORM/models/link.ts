@@ -1,5 +1,5 @@
 import { ROOM_PATH } from '$lib/constants';
-import { thisPublicDB } from '$lib/ORM/client/dbs/publicDB';
+import { thisPublicDB } from '$lib/ORM/dbs/publicDB';
 import { FeedbackString, type FeedbackDocument } from '$lib/ORM/models/feedback';
 import type { TalentDocument } from '$lib/ORM/models/talent';
 import {
@@ -11,7 +11,7 @@ import {
 } from 'rxdb';
 import { get } from 'svelte/store';
 import urlJoin from 'url-join';
-export enum LinkStatus {
+export enum LinkStatuses {
 	ACTIVE = 'ACTIVE',
 	EXPIRED = 'EXPIRED',
 	IN_PROGRESS = 'IN_PROGRESS',
@@ -52,10 +52,9 @@ const linkSchemaLiteral = {
 			minimum: 0,
 			maximum: 99999
 		},
-		callStart: { type: 'string' },
-		callEnd: { type: 'string' },
+
 		callId: { type: 'string' },
-		status: { type: 'string', enum: Object.keys(LinkStatus) },
+		status: { type: 'string', enum: Object.keys(LinkStatuses) },
 		profileImageUrl: {
 			type: 'string'
 		},
@@ -72,7 +71,15 @@ const linkSchemaLiteral = {
 			type: 'string'
 		}
 	},
-	required: ['entityType', 'talent', 'talentName', 'profileImageUrl', 'callId', 'amount'],
+	required: [
+		'entityType',
+		'talent',
+		'talentName',
+		'profileImageUrl',
+		'callId',
+		'amount',
+		'fundedAmount'
+	],
 	encrypted: ['callId']
 } as const;
 
@@ -110,10 +117,10 @@ export const linkDocMethods: LinkDocMethods = {
 			link: this._id!,
 			_id: `${FeedbackString}:${this._id}`,
 			createdAt: new Date().toISOString(),
-			rejectedCount: 0,
-			disconnectCount: 0,
-			notAnsweredCount: 0,
-			viewedCount: 0,
+			rejected: 0,
+			disconnected: 0,
+			unanswered: 0,
+			viewed: 0,
 			rating: 0
 		};
 		const db = get(thisPublicDB);

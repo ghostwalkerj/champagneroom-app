@@ -1,9 +1,9 @@
 <script lang="ts">
-	import type { Link } from '$lib/ORM/models/link';
+	import type { LinkDocument } from '$lib/ORM/models/link';
 	import FaMoneyBillWave from 'svelte-icons/fa/FaMoneyBillWave.svelte';
 	import Image from 'svelte-image';
 	import StarRating from 'svelte-star-rating';
-	export let link: Link;
+	export let link: LinkDocument;
 	$: rating = 0;
 
 	const formatter = new Intl.NumberFormat('en-US', {
@@ -19,12 +19,12 @@
 	>
 		<div class="text-center">
 			<div class="font-extrabold text-lg">This pCall is For</div>
-			<div class="font-extrabold text-3xl">{link.name}</div>
+			<div class="font-extrabold text-3xl">{link.talentName}</div>
 		</div>
 		<div class="rounded-full flex-none h-48 w-48 mask-circle">
 			<Image
 				src={link.profileImageUrl}
-				alt={link.name}
+				alt={link.talentName}
 				height="48"
 				width="48"
 				class="rounded-full flex-none object-cover mask-circle"
@@ -39,7 +39,7 @@
 				</div>
 				<div class="stat-title">Requested</div>
 				<div class="text-primary stat-value">
-					{formatter.format(Number.parseInt(link.amount))}
+					{formatter.format(link.amount)}
 				</div>
 			</div>
 
@@ -49,12 +49,12 @@
 				</div>
 				<div class="stat-title">Funded</div>
 				<div class="text-secondary stat-value">
-					{formatter.format(Number.parseInt(link.fundedAmount || '0'))}
+					{formatter.format(link.fundedAmount)}
 				</div>
 			</div>
 		</div>
 		<section
-			class="flex flex-col bg-base-100 rounded-2xl flex-shrink-0 text-white text-center p-4 gap-4 items-center justify-center  md:gap-8 "
+			class="flex flex-col bg-base-100 rounded-2xl flex-shrink-0 text-white text-center p-4  items-center justify-center "
 		>
 			<div>Funding Address</div>
 			<div class="break-all">{link.walletAddress}</div>

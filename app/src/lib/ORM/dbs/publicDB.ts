@@ -1,5 +1,5 @@
 import { PUBLIC_ENDPOINT, RXDB_PASSWORD } from '$lib/constants';
-import { initRXDB } from '$lib/ORM/client/rxdb';
+import { initRXDB, StorageTypes } from '$lib/ORM/rxdb';
 import { feedbackSchema, type FeedbackCollection } from '$lib/ORM/models/feedback';
 import {
 	linkDocMethods,
@@ -19,18 +19,18 @@ type PublicCollections = {
 export type PublicDBType = RxDatabase<PublicCollections>;
 let _publicDB: PublicDBType;
 
-export const publicDB = async (token: string, linkId: string) =>
-	_publicDB ? _publicDB : await _create(token, linkId);
+export const publicDB = async (token: string, linkId: string, storage: StorageTypes) =>
+	_publicDB ? _publicDB : await _create(token, linkId, storage);
 
 let _thisLink: LinkDocument | null;
 
-const _create = async (token: string, linkId: string) => {
-	initRXDB();
-	await removeRxDatabase('publicDB', getRxStoragePouch('idb'));
+const _create = async (token: string, linkId: string, storage: StorageTypes) => {
+	initRXDB(storage);
+	await removeRxDatabase('public_db', getRxStoragePouch(storage));
 
 	const _db: PublicDBType = await createRxDatabase({
-		name: 'publicDB',
-		storage: getRxStoragePouch('idb'),
+		name: 'public_db',
+		storage: getRxStoragePouch(storage),
 		ignoreDuplicate: true,
 		password: RXDB_PASSWORD
 	});

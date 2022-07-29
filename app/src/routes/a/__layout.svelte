@@ -1,13 +1,14 @@
 <script context="module">
-	import { AUTH_PATH, TokenRole } from '$lib/constants';
+	import { AUTH_PATH, TokenRoles } from '$lib/constants';
 
+	//TODO: Only return token if agent address is good.
 	export async function load({ url, fetch }) {
 		const auth_url = urlJoin(url.origin, AUTH_PATH);
 		try {
 			const res = await fetch(auth_url, {
 				method: 'POST',
 				body: JSON.stringify({
-					tokenRole: TokenRole.AGENT
+					tokenRole: TokenRoles.AGENT
 				})
 			});
 			const body = await res.json();
@@ -21,17 +22,18 @@
 
 <script lang="ts">
 	import ConnectButton from '$lib/components/web3/ConnectButton.svelte';
-	import { agentDB, thisAgent } from '$lib/ORM/client/dbs/agentDB';
+	import { agentDB, thisAgent } from '$lib/ORM/dbs/agentDB';
 	import { AgentString, type AgentDocument } from '$lib/ORM/models/agent';
 	import { selectedAccount } from 'svelte-web3';
 	import urlJoin from 'url-join';
+	import { StorageTypes } from '$lib/ORM/rxdb';
 	export let token: string;
 
 	//TODO: This will be authentication later
 	selectedAccount.subscribe(async (account) => {
 		if (account) {
 			const agentId = AgentString + ':' + account;
-			const db = await agentDB(token, agentId);
+			const db = await agentDB(token, agentId, StorageTypes.IDB);
 			thisAgent.subscribe(async (_agent: AgentDocument) => {
 				if (!_agent) {
 					const _agent = await db.agents.createAgent(account);

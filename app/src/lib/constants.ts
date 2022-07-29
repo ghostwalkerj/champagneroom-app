@@ -14,7 +14,7 @@ export const ROOM_PATH = import.meta.env.VITE_ROOM_PATH;
 export const AGENT_PATH = import.meta.env.VITE_AGENT_PATH;
 export const MOBILE_PATH = import.meta.env.VITE_MOBILE_PATH;
 
-export enum TokenRole {
+export enum TokenRoles {
 	ADMIN,
 	PUBLIC,
 	AGENT,

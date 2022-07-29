@@ -1,5 +1,5 @@
 import { CREATORS_ENDPOINT, RXDB_PASSWORD } from '$lib/constants';
-import { initRXDB } from '$lib/ORM/client/rxdb';
+import { initRXDB } from '$lib/ORM/rxdb';
 import { linkDocMethods, linkSchema, type LinkCollection } from '$lib/ORM/models/link';
 import {
 	talentDocMethods,
@@ -10,6 +10,7 @@ import {
 import { createRxDatabase, removeRxDatabase, type RxDatabase } from 'rxdb';
 import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
 import { writable } from 'svelte/store';
+import type { StorageTypes } from '$lib/ORM/rxdb';
 
 type CreatorsCollections = {
 	talents: TalentCollection;
@@ -19,18 +20,18 @@ type CreatorsCollections = {
 export type TalentDBType = RxDatabase<CreatorsCollections>;
 let _talentDB: TalentDBType;
 
-export const talentDB = async (token: string, key: string) =>
-	_talentDB ? _talentDB : await _create(token, key);
+export const talentDB = async (token: string, key: string, storage: StorageTypes) =>
+	_talentDB ? _talentDB : await _create(token, key, storage);
 
 let _currentTalent: TalentDocument | null;
 
-const _create = async (token: string, key: string) => {
-	initRXDB();
-	await removeRxDatabase('talentdb', getRxStoragePouch('idb'));
+const _create = async (token: string, key: string, storage: StorageTypes) => {
+	initRXDB(storage);
+	await removeRxDatabase('talent_db', getRxStoragePouch(storage));
 
 	const _db: TalentDBType = await createRxDatabase({
-		name: 'talentdb',
-		storage: getRxStoragePouch('idb'),
+		name: 'talent_db',
+		storage: getRxStoragePouch(storage),
 		ignoreDuplicate: true,
 		password: RXDB_PASSWORD
 	});

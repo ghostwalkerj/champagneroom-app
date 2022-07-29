@@ -3,12 +3,12 @@ import {
 	JWT_EXPIRY,
 	JWT_PUBLIC_USER,
 	JWT_SECRET,
-	TokenRole
+	TokenRoles
 } from '$lib/constants';
 import jwt from 'jsonwebtoken';
 
-export const doAuth = async (tokenRole: TokenRole) => {
-	if (tokenRole === TokenRole.AGENT || tokenRole === TokenRole.TALENT) {
+export const doAuth = async (tokenRole: TokenRoles) => {
+	if (tokenRole === TokenRoles.AGENT || tokenRole === TokenRoles.TALENT) {
 		return jwt.sign(
 			{
 				exp: Math.floor(Date.now() / 1000) + JWT_EXPIRY,
@@ -16,7 +16,7 @@ export const doAuth = async (tokenRole: TokenRole) => {
 			},
 			JWT_SECRET
 		);
-	} else if (tokenRole === TokenRole.PUBLIC) {
+	} else if (tokenRole === TokenRoles.PUBLIC) {
 		return jwt.sign(
 			{
 				exp: Math.floor(Date.now() / 1000) + JWT_EXPIRY,

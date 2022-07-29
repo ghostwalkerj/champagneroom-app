@@ -32,22 +32,22 @@ const feedbackSchemaLiteral = {
 			type: 'string',
 			ref: 'links'
 		},
-		rejectedCount: {
+		rejected: {
 			type: 'integer',
 			default: 0,
 			minimum: 0
 		},
-		disconnectCount: {
+		disconnected: {
 			type: 'integer',
 			default: 0,
 			minimum: 0
 		},
-		notAnsweredCount: {
+		unanswered: {
 			type: 'integer',
 			default: 0,
 			minimum: 0
 		},
-		viewedCount: {
+		viewed: {
 			type: 'integer',
 			default: 0,
 			minimum: 0
@@ -57,9 +57,11 @@ const feedbackSchemaLiteral = {
 			default: 0,
 			minimum: 0,
 			maximum: 5
-		}
+		},
+		callStart: { type: 'string' },
+		callEnd: { type: 'string' }
 	},
-	required: ['_id', 'entityType', 'link']
+	required: ['_id', 'entityType', 'link', 'viewed', 'rejected', 'disconnected', 'unanswered']
 } as const;
 
 type feedbackRef = {

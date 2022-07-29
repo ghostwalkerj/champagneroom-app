@@ -1,11 +1,12 @@
 <script context="module">
-	import { AUTH_PATH, TokenRole } from '$lib/constants';
+	//TODO: Only return token if talent key is good.
+	import { AUTH_PATH, TokenRoles } from '$lib/constants';
 	export async function load({ url, fetch }) {
 		const auth_url = urlJoin(url.origin, AUTH_PATH);
 		const res = await fetch(auth_url, {
 			method: 'POST',
 			body: JSON.stringify({
-				tokenRole: TokenRole.TALENT
+				tokenRole: TokenRoles.TALENT
 			})
 		});
 		const body = await res.json();
@@ -25,7 +26,7 @@
 	import VideoCall from '$lib/components/VideoCall.svelte';
 	import VideoPreview from '$lib/components/VideoPreview.svelte';
 
-	import { talentDB, thisTalent, type TalentDBType } from '$lib/ORM/client/dbs/talentDB';
+	import { talentDB, thisTalent, type TalentDBType } from '$lib/ORM/dbs/talentDB';
 	import type { LinkDocument } from '$lib/ORM/models/link';
 	import type { TalentDocument } from '$lib/ORM/models/talent';
 	import { userStream, type UserStreamType } from '$lib/userStream';
@@ -34,6 +35,7 @@
 	import { PhoneIncomingIcon } from 'svelte-feather-icons';
 	import StarRating from 'svelte-star-rating';
 	import urlJoin from 'url-join';
+	import { StorageTypes } from '$lib/ORM/rxdb';
 
 	export let token: string;
 	let key = $page.params.key;
@@ -46,7 +48,7 @@
 			videoCall = _vc.videoCall;
 			initVC();
 		});
-		talentDB(token, key).then((db: TalentDBType) => {
+		talentDB(token, key, StorageTypes.IDB).then((db: TalentDBType) => {
 			thisTalent.subscribe((_talent) => {
 				if (_talent) {
 					talent = _talent;

@@ -1,7 +1,7 @@
 <script type="ts">
 	import { page } from '$app/stores';
 	import { TALENT_PATH } from '$lib/constants';
-	import { thisAgent } from '$lib/ORM/client/dbs/agentDB';
+	import { thisAgent } from '$lib/ORM/dbs/agentDB';
 	import type { AgentDocument } from '$lib/ORM/models/agent';
 	import type { TalentDocument } from '$lib/ORM/models/talent';
 	import { nanoid } from 'nanoid';

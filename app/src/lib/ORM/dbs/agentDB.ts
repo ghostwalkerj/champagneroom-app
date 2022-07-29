@@ -1,5 +1,5 @@
 import { CREATORS_ENDPOINT, RXDB_PASSWORD } from '$lib/constants';
-import { initRXDB } from '$lib/ORM/client/rxdb';
+import { initRXDB, StorageTypes } from '$lib/ORM/rxdb';
 import {
 	agentDocMethods,
 	agentSchema,
@@ -20,18 +20,18 @@ type CreatorsCollections = {
 export type AgentDBType = RxDatabase<CreatorsCollections>;
 let _agentDB: AgentDBType;
 
-export const agentDB = async (token: string, agentId: string) =>
-	_agentDB ? _agentDB : await _create(token, agentId);
+export const agentDB = async (token: string, agentId: string, storage: StorageTypes) =>
+	_agentDB ? _agentDB : await _create(token, agentId, storage);
 
 let _currentAgent: AgentDocument | null;
 
-const _create = async (token: string, agentId: string) => {
-	initRXDB();
-	await removeRxDatabase('agentdb', getRxStoragePouch('idb'));
+const _create = async (token: string, agentId: string, storage: StorageTypes) => {
+	initRXDB(storage);
+	await removeRxDatabase('agent_db', getRxStoragePouch(storage));
 
 	const _db: AgentDBType = await createRxDatabase({
-		name: 'agentdb',
-		storage: getRxStoragePouch('idb'),
+		name: 'agent_db',
+		storage: getRxStoragePouch(storage),
 		ignoreDuplicate: true,
 		password: RXDB_PASSWORD
 	});

@@ -1,6 +1,6 @@
-import { thisTalentDB } from '$lib/ORM/client/dbs/talentDB';
+import { thisTalentDB } from '$lib/ORM/dbs/talentDB';
 import type { AgentDocument } from '$lib/ORM/models/agent';
-import { LinkStatus, LinkString, type LinkDocument } from '$lib/ORM/models/link';
+import { LinkStatuses, LinkString, type LinkDocument } from '$lib/ORM/models/link';
 import { nanoid } from 'nanoid';
 import {
 	toTypedRxJsonSchema,
@@ -88,7 +88,7 @@ type TalentDocMethods = {
 export const talentDocMethods: TalentDocMethods = {
 	createLink: async function (this: TalentDocument, amount: number): Promise<LinkDocument> {
 		const _link = {
-			status: LinkStatus.ACTIVE,
+			status: LinkStatuses.ACTIVE,
 			fundedAmount: 0,
 			amount,
 			walletAddress: '0x251281e1516e6E0A145d28a41EE63BfcDd9E18Bf', //TODO: make real wallet
@@ -103,7 +103,7 @@ export const talentDocMethods: TalentDocMethods = {
 
 		if (this.currentLink) {
 			const currentLink = await this.populate('currentLink');
-			currentLink.update({ $set: { status: LinkStatus.EXPIRED } });
+			currentLink.update({ $set: { status: LinkStatuses.EXPIRED } });
 		}
 
 		const db = get(thisTalentDB);

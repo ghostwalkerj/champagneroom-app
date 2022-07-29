@@ -1,5 +1,5 @@
 import { DEFAULT_PROFILE_IMAGE } from '$lib/constants';
-import { thisAgentDB } from '$lib/ORM/client/dbs/agentDB';
+import { thisAgentDB } from '$lib/ORM/dbs/agentDB';
 import { TalentString, type TalentDocType, type TalentDocument } from '$lib/ORM/models/talent';
 import { nanoid } from 'nanoid';
 import {

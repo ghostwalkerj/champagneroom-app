@@ -1,3 +1,25 @@
+<script context="module">
+	import { AUTH_PATH, TokenRoles } from '$lib/constants';
+
+	//TODO: Only return token if link URL is good.
+	export async function load({ url, fetch }) {
+		const auth_url = urlJoin(url.origin, AUTH_PATH);
+		try {
+			const res = await fetch(auth_url, {
+				method: 'POST',
+				body: JSON.stringify({
+					tokenRole: TokenRoles.PUBLIC
+				})
+			});
+			const body = await res.json();
+			const token = body.token;
+			return { props: { token } };
+		} catch (e) {
+			console.log('Error in link load', e);
+		}
+	}
+</script>
+
 <script type="ts">
 	import { browser } from '$app/env';
 	import { page } from '$app/stores';
@@ -11,11 +33,15 @@
 	import type { VideoCallType } from '$lib/videoCall';
 	import { onMount } from 'svelte';
 	import fsm from 'svelte-fsm';
+	import urlJoin from 'url-join';
+	import { publicDB, thisLink } from '$lib/ORM/dbs/publicDB';
+	import { StorageTypes } from '$lib/ORM/rxdb';
 
+	export let token: string;
 	let link: LinkDocument;
 	let linkId = $page.params.id;
 	let vc: VideoCallType;
-	let videoCall;
+	let videoCall: any;
 	let mediaStream: MediaStream;
 	let us: Awaited<UserStreamType>;
 	$: callState = 'disconnected';
@@ -23,44 +49,19 @@
 
 	let feedback: FeedbackDocument | null = null;
 
-	// get link
-
-	// if (feedback == null) {
-	// 	gun
-	// 		.get(FeedbackType)
-	// 		.get(linkId, (ack) => {
-	// 			if (!ack.put) {
-	// 				feedback = createFeedback({
-	// 					linkId,
-	// 					rejectedCount: 0,
-	// 					disconnectCount: 0,
-	// 					notAnsweredCount: 0,
-	// 					rating: 0,
-	// 					viewedCount: 0
-	// 				});
-	// 				gun.get(FeedbackType).get(linkId).put(feedback);
-	// 			}
-	// 		})
-	// 		.on((_feedback) => {
-	// 			if (_feedback && !feedback) {
-	// 				feedback = _feedback;
-	// 			}
-	// 		});
-	// }
-
 	const linkState = fsm('neverConnected', {
 		neverConnected: {
 			call: 'calling'
 		},
 		rejected: {
 			_enter() {
-				feedback!.rejectedCount++;
+				feedback!.update({ $inc: { rejected: 1 } });
 			},
 			call: 'calling'
 		},
 		notAnswered: {
 			_enter() {
-				feedback!.notAnsweredCount++;
+				feedback!.update({ $inc: { unanswered: 1 } });
 			},
 			call: 'calling'
 		},
@@ -77,7 +78,7 @@
 		},
 		disconnected: {
 			_enter() {
-				feedback!.disconnectCount++;
+				feedback!.update({ $inc: { disconnected: 1 } });
 			},
 			call: 'calling'
 		},
@@ -91,6 +92,31 @@
 	});
 
 	if (browser) {
+		// get link
+		publicDB(token, linkId, StorageTypes.IDB).then(() => {
+			thisLink.subscribe((_link) => {
+				if (_link) {
+					link = _link;
+					if (link.feedback) {
+						link.populate('feedback').then((_feedback: FeedbackDocument) => {
+							if (_feedback) {
+								_feedback.update({ $inc: { viewed: 1 } });
+								_feedback.$.subscribe((_feedback: FeedbackDocument) => {
+									feedback = _feedback;
+								});
+							}
+						});
+					} else {
+						link.createFeedback().then((_feedback) => {
+							_feedback.update({ $inc: { viewed: 1 } });
+							_feedback.$.subscribe((_feedback: FeedbackDocument) => {
+								feedback = _feedback;
+							});
+						});
+					}
+				}
+			});
+		});
 		import('$lib/videoCall').then((_vc) => {
 			videoCall = _vc.videoCall;
 			vc = videoCall();
@@ -198,14 +224,11 @@ Call: {previousState}
 <br />
 
 {#if feedback}
-	Views : {feedback.viewedCount | 0}
+	Views : {feedback.viewed | 0}
 	<br />
-
-	RejectedCount: {feedback.rejectedCount | 0}
+	RejectedCount: {feedback.rejected | 0}
 	<br />
-
-	DisconnectCount: {feedback.disconnectCount | 0}
+	DisconnectCount: {feedback.disconnected | 0}
 	<br />
-
-	NotAnsweredCount: {feedback.notAnsweredCount | 0}
+	NotAnsweredCount: {feedback.unanswered | 0}
 {/if}
