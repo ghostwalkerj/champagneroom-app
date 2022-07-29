@@ -218,17 +218,33 @@
 		{/if}
 	</main>
 </div>
-Link: {$linkState}
-<br />
-Call: {previousState}
-<br />
-
-{#if feedback}
-	Views : {feedback.viewed | 0}
-	<br />
-	RejectedCount: {feedback.rejected | 0}
-	<br />
-	DisconnectCount: {feedback.disconnected | 0}
-	<br />
-	NotAnsweredCount: {feedback.unanswered | 0}
-{/if}
+<div class="flex w-full place-content-center">
+	<div class="bg-primary shadow text-primary-content  stats stats-vertical lg:stats-horizontal">
+		{#if feedback}
+			<div class="stat">
+				<div class="stat-title">Views</div>
+				<div class="stat-value">{feedback.viewed}</div>
+			</div>
+			<div class="stat">
+				<div class="stat-title">Rejected</div>
+				<div class="stat-value">{feedback.rejected}</div>
+			</div>
+			<div class="stat">
+				<div class="stat-title">Disconnected</div>
+				<div class="stat-value">{feedback.disconnected}</div>
+			</div>
+			<div class="stat">
+				<div class="stat-title">UnAnswered</div>
+				<div class="stat-value">{feedback.unanswered}</div>
+			</div>
+		{/if}
+		<div class="stat">
+			<div class="stat-title">Link State</div>
+			<div class="stat-value">{$linkState}</div>
+		</div>
+		<div class="stat">
+			<div class="stat-title">Call State</div>
+			<div class="stat-value">{previousState}</div>
+		</div>
+	</div>
+</div>
