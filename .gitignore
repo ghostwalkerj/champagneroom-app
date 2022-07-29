@@ -1,6 +1,4 @@
 app/server/data
 radata*
 app/.yarnclean
-app/public_db-rxdb-0-_rxdb_internal
-app/public_db-rxdb-0-feedbacks
-app/public_db-rxdb-0-links
+app/pouchdb/*

@@ -27,10 +27,10 @@ let _currentTalent: TalentDocument | null;
 
 const create = async (token: string, key: string, storage: StorageTypes) => {
 	initRXDB(storage);
-	await removeRxDatabase('talent_db', getRxStoragePouch(storage));
+	//await removeRxDatabase('pouchdb/talent_db', getRxStoragePouch(storage));
 
 	const _db: TalentDBType = await createRxDatabase({
-		name: 'talent_db',
+		name: 'pouchdb/talent_db',
 		storage: getRxStoragePouch(storage),
 		ignoreDuplicate: true,
 		password: RXDB_PASSWORD

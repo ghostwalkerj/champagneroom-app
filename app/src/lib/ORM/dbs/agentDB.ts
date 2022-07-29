@@ -30,7 +30,7 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 	await removeRxDatabase('agent_db', getRxStoragePouch(storage));
 
 	const _db: AgentDBType = await createRxDatabase({
-		name: 'agent_db',
+		name: 'pouchdb/agent_db',
 		storage: getRxStoragePouch(storage),
 		ignoreDuplicate: true,
 		password: RXDB_PASSWORD
