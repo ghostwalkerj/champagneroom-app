@@ -1,38 +1,3 @@
-<script context="module" type="ts">
-	import { AUTH_PATH, TokenRoles } from '$lib/constants';
-	import { publicDB, thisLink } from '$lib/ORM/dbs/publicDB';
-
-	//TODO: Only return token if link URL is good.
-	/** @type {import('./__types/[id]').Load} */
-	export async function load({ params, url, fetch }) {
-		const auth_url = urlJoin(url.origin, AUTH_PATH);
-		let token = '';
-		let linkId = params.id;
-		try {
-			const res = await fetch(auth_url, {
-				method: 'POST',
-				body: JSON.stringify({
-					tokenRole: TokenRoles.PUBLIC
-				})
-			});
-			const body = await res.json();
-			token = body.token;
-		} catch (e) {
-			console.log('Error in link load', e);
-		}
-
-		//Try to preload link
-		if (token != '') {
-			const _publicDB = await publicDB(token, linkId, StorageTypes.NODE_WEBSQL);
-			const link = await _publicDB.links.findOne(linkId).exec();
-
-			if (link) {
-				return { props: { token, link: link.toJSON() } };
-			}
-		}
-	}
-</script>
-
 <script type="ts">
 	import { browser } from '$app/env';
 	import { page } from '$app/stores';
@@ -48,9 +13,10 @@
 	import fsm from 'svelte-fsm';
 	import urlJoin from 'url-join';
 	import { StorageTypes } from '$lib/ORM/rxdb';
+	import { publicDB, thisLink } from '$lib/ORM/dbs/publicDB';
 
 	export let token: string;
-	let link: LinkDocument;
+	export let link: LinkDocument;
 	let linkId = $page.params.id;
 	let vc: VideoCallType;
 	let videoCall: any;

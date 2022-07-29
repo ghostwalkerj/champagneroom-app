@@ -28,14 +28,12 @@ const create = async (token: string, linkId: string, storage: StorageTypes) => {
 	initRXDB(storage);
 	//await removeRxDatabase('public_db', getRxStoragePouch(storage));
 
-	console.log('before create database', storage.toString());
 	const _db: PublicDBType = await createRxDatabase({
 		name: 'public_db',
 		storage: getRxStoragePouch(storage.toString()),
 		ignoreDuplicate: true,
 		password: RXDB_PASSWORD
 	});
-	console.log('after create database');
 
 	await _db.addCollections({
 		links: {

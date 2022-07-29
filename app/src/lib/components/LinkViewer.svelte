@@ -9,7 +9,6 @@
 	import urlJoin from 'url-join';
 
 	$: linkURL = '';
-
 	$: if (link) linkURL = urlJoin($page.url.origin, ROOM_PATH, link._id);
 
 	const copyLink = () => {
