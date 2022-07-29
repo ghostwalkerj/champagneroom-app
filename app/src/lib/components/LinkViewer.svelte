@@ -5,10 +5,12 @@
 	export let link: LinkDocument;
 	export let talent: TalentDocument;
 	import { page } from '$app/stores';
+	import { ROOM_PATH } from '$lib/constants';
+	import urlJoin from 'url-join';
 
 	$: linkURL = '';
 
-	$: if (link) linkURL = link.generateLinkURL($page.url.origin);
+	$: if (link) linkURL = urlJoin($page.url.origin, ROOM_PATH, link._id);
 
 	const copyLink = () => {
 		navigator.clipboard.writeText(linkURL);

@@ -20,20 +20,22 @@ export type PublicDBType = RxDatabase<PublicCollections>;
 let _publicDB: PublicDBType;
 
 export const publicDB = async (token: string, linkId: string, storage: StorageTypes) =>
-	_publicDB ? _publicDB : await _create(token, linkId, storage);
+	_publicDB ? _publicDB : await create(token, linkId, storage);
 
 let _thisLink: LinkDocument | null;
 
-const _create = async (token: string, linkId: string, storage: StorageTypes) => {
+const create = async (token: string, linkId: string, storage: StorageTypes) => {
 	initRXDB(storage);
 	//await removeRxDatabase('public_db', getRxStoragePouch(storage));
 
+	console.log('before create database', storage.toString());
 	const _db: PublicDBType = await createRxDatabase({
 		name: 'public_db',
-		storage: getRxStoragePouch(storage),
+		storage: getRxStoragePouch(storage.toString()),
 		ignoreDuplicate: true,
 		password: RXDB_PASSWORD
 	});
+	console.log('after create database');
 
 	await _db.addCollections({
 		links: {

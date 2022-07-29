@@ -1,6 +1,6 @@
 import * as PouchHttpPlugin from 'pouchdb-adapter-http';
 import * as idb from 'pouchdb-adapter-idb';
-import * as nodewebsql from 'pouchdb-adapter-node-websql';
+import nodewebsql from 'pouchdb-adapter-node-websql';
 import { addRxPlugin } from 'rxdb';
 import { RxDBDevModePlugin } from 'rxdb/plugins/dev-mode';
 import { RxDBEncryptionPlugin } from 'rxdb/plugins/encryption';
@@ -23,19 +23,20 @@ export enum StorageTypes {
 }
 
 export const initRXDB = (storage: StorageTypes) => {
+	if (initialized[storage]) return;
+	if (storage === StorageTypes.IDB) addPouchPlugin(idb);
+	else addPouchPlugin(nodewebsql);
+	initialized[storage] = true;
+
 	if (!initialized.init) {
+		addPouchPlugin(PouchHttpPlugin);
 		addRxPlugin(RxDBLeaderElectionPlugin);
 		addRxPlugin(RxDBReplicationCouchDBPlugin);
 		addRxPlugin(RxDBQueryBuilderPlugin);
 		addRxPlugin(RxDBValidatePlugin);
-		addPouchPlugin(PouchHttpPlugin);
 		addRxPlugin(RxDBUpdatePlugin);
 		addRxPlugin(RxDBDevModePlugin);
 		addRxPlugin(RxDBEncryptionPlugin);
 		initialized.init = true;
 	}
-	if (initialized[storage]) return;
-	if (storage === StorageTypes.IDB) addPouchPlugin(idb);
-	else addPouchPlugin(nodewebsql);
-	initialized[storage] = true;
 };

@@ -21,11 +21,11 @@ export type AgentDBType = RxDatabase<CreatorsCollections>;
 let _agentDB: AgentDBType;
 
 export const agentDB = async (token: string, agentId: string, storage: StorageTypes) =>
-	_agentDB ? _agentDB : await _create(token, agentId, storage);
+	_agentDB ? _agentDB : await create(token, agentId, storage);
 
 let _currentAgent: AgentDocument | null;
 
-const _create = async (token: string, agentId: string, storage: StorageTypes) => {
+const create = async (token: string, agentId: string, storage: StorageTypes) => {
 	initRXDB(storage);
 	await removeRxDatabase('agent_db', getRxStoragePouch(storage));
 

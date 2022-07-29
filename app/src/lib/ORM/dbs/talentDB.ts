@@ -21,11 +21,11 @@ export type TalentDBType = RxDatabase<CreatorsCollections>;
 let _talentDB: TalentDBType;
 
 export const talentDB = async (token: string, key: string, storage: StorageTypes) =>
-	_talentDB ? _talentDB : await _create(token, key, storage);
+	_talentDB ? _talentDB : await create(token, key, storage);
 
 let _currentTalent: TalentDocument | null;
 
-const _create = async (token: string, key: string, storage: StorageTypes) => {
+const create = async (token: string, key: string, storage: StorageTypes) => {
 	initRXDB(storage);
 	await removeRxDatabase('talent_db', getRxStoragePouch(storage));
 

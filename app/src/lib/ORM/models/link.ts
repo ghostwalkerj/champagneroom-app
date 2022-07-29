@@ -72,6 +72,7 @@ const linkSchemaLiteral = {
 		}
 	},
 	required: [
+		'_id',
 		'entityType',
 		'talent',
 		'talentName',
@@ -96,20 +97,10 @@ export type LinkDocument = RxDocument<LinkDocType, LinkDocMethods> & linkRef;
 export type LinkCollection = RxCollection<LinkDocType, LinkDocMethods>;
 
 type LinkDocMethods = {
-	generateLinkURL: (path: string) => string;
 	createFeedback: () => Promise<FeedbackDocument>;
 };
 
 export const linkDocMethods: LinkDocMethods = {
-	generateLinkURL: function (this: LinkDocument, path: string): string {
-		if (this._id) {
-			const url = urlJoin(path, ROOM_PATH, this._id);
-			return url;
-		} else {
-			console.log("Can't generate link url, link is missing id", this);
-			return '';
-		}
-	},
 	createFeedback: async function (this: LinkDocument): Promise<FeedbackDocument> {
 		const _feedback = {
 			entityType: FeedbackString,

@@ -1,20 +1,3 @@
-<script context="module">
-	//TODO: Only return token if talent key is good.
-	import { AUTH_PATH, TokenRoles } from '$lib/constants';
-	export async function load({ url, fetch }) {
-		const auth_url = urlJoin(url.origin, AUTH_PATH);
-		const res = await fetch(auth_url, {
-			method: 'POST',
-			body: JSON.stringify({
-				tokenRole: TokenRoles.TALENT
-			})
-		});
-		const body = await res.json();
-		const token = body.token;
-		return { props: { token } };
-	}
-</script>
-
 <script type="ts">
 	import { browser } from '$app/env';
 	import { page } from '$app/stores';
@@ -34,13 +17,13 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { PhoneIncomingIcon } from 'svelte-feather-icons';
 	import StarRating from 'svelte-star-rating';
-	import urlJoin from 'url-join';
 	import { StorageTypes } from '$lib/ORM/rxdb';
 
 	export let token: string;
+	export let talent: TalentDocument;
+	export let currentLink: LinkDocument;
+
 	let key = $page.params.key;
-	let talent: TalentDocument;
-	let currentLink: LinkDocument;
 
 	let vc: VideoCallType;
 	if (browser) {
