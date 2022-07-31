@@ -5,17 +5,17 @@
 	import LinkDetail from '$lib/components/LinkDetail.svelte';
 	import VideoCall from '$lib/components/VideoCall.svelte';
 	import VideoPreview from '$lib/components/VideoPreview.svelte';
-	import { publicDB, thisLink } from '$lib/ORM/dbs/publicDB';
+	import { publicDB, PublicDBType } from '$lib/ORM/dbs/publicDB';
 	import type { FeedbackDocument } from '$lib/ORM/models/feedback';
 	import type { LinkDocument } from '$lib/ORM/models/link';
 	import { StorageTypes } from '$lib/ORM/rxdb';
 	import { userStream, type UserStreamType } from '$lib/userStream';
 	import type { VideoCallType } from '$lib/videoCall';
-	import { onMount } from 'svelte';
 	import fsm from 'svelte-fsm';
 
 	export let token: string;
 	export let link: LinkDocument;
+	let feedback: FeedbackDocument | null = null;
 	let linkId = $page.params.id;
 	let vc: VideoCallType;
 	let videoCall: any;
@@ -23,9 +23,6 @@
 	let us: Awaited<UserStreamType>;
 	$: callState = 'disconnected';
 	$: previousState = 'none';
-
-	let feedback: FeedbackDocument | null = null;
-
 	const linkState = fsm('neverConnected', {
 		neverConnected: {
 			call: 'calling'
@@ -68,32 +65,28 @@
 		complete: {}
 	});
 
-	if (browser) {
-		// get link
-		publicDB(token, linkId, StorageTypes.IDB).then(() => {
-			thisLink.subscribe((_link) => {
-				if (_link) {
-					_link.$.subscribe((__link) => (link = _link));
-				}
-				if (link.feedback) {
-					link.populate('feedback').then((_feedback: FeedbackDocument) => {
-						if (_feedback) {
-							_feedback.update({ $inc: { viewed: 1 } });
-							_feedback.$.subscribe((_feedback: FeedbackDocument) => {
-								feedback = _feedback;
-							});
-						}
-					});
-				} else {
-					link.createFeedback().then((_feedback) => {
-						_feedback.update({ $inc: { viewed: 1 } });
-						_feedback.$.subscribe((_feedback: FeedbackDocument) => {
-							feedback = _feedback;
-						});
-					});
-				}
-			});
+	if (link && browser) {
+		let db: PublicDBType;
+		userStream().then((_us) => {
+			if (_us) {
+				_us.mediaStream.subscribe((stream) => {
+					if (stream) mediaStream = stream;
+				});
+			}
 		});
+		publicDB(token, linkId, StorageTypes.IDB).then((_db: PublicDBType) => {
+			if (_db) {
+				db = _db;
+				if (link.feedback)
+					db.feedbacks.findOne(link.feedback).$.subscribe((_feedback) => {
+						feedback = _feedback;
+					});
+
+				if (!feedback) {
+				}
+			}
+		});
+
 		import('$lib/videoCall').then((_vc) => {
 			videoCall = _vc.videoCall;
 			vc = videoCall();
@@ -137,14 +130,6 @@
 			});
 		});
 	}
-
-	onMount(async () => {
-		us = await userStream();
-		us.mediaStream.subscribe((stream) => {
-			if (stream) mediaStream = stream;
-		});
-	});
-
 	const call = async () => {
 		if (vc) {
 			vc.makeCall(link.callId!, 'Dr. Huge Mongus', mediaStream);
@@ -153,74 +138,76 @@
 	$: showFeedback = false;
 </script>
 
-<LinkFeedback {showFeedback} />
-<div class="min-h-full">
-	<main class="py-6">
-		{#if link}
-			{#if $linkState != 'inCall'}
-				<!-- Page header -->
-				<div class="text-center">
-					<h1 class="font-bold text-center text-5xl">Make your pCall</h1>
-					<p class="py-6">Scis vis facere illud pCall. Carpe florem et fac quod nunc vocant.</p>
-				</div>
-				<div
-					class="container	 mx-auto max-w-max  items-center sm:px-6 md:flex md:space-x-5 md:items-stretch  lg:px-8"
-				>
-					<div class="rounded-box h-full bg-base-200">
-						<div>
-							<LinkDetail {link} />
-						</div>
-						<div class="pb-6 btn-group justify-center">
-							<button class="btn btn-secondary" on:click={call} disabled={callState != 'ready'}
-								>Call {link.talentName} Now</button
-							>
-						</div>
+{#if link}
+	<LinkFeedback {showFeedback} />
+	<div class="min-h-full">
+		<main class="py-6">
+			{#if link}
+				{#if $linkState != 'inCall'}
+					<!-- Page header -->
+					<div class="text-center">
+						<h1 class="font-bold text-center text-5xl">Make your pCall</h1>
+						<p class="py-6">Scis vis facere illud pCall. Carpe florem et fac quod nunc vocant.</p>
 					</div>
-					<div class="bg-base-200  text-white card lg:min-w-200">
-						<div class="text-center card-body items-center ">
-							<div class="text-2xl card-title">Your Video Preview</div>
-							<div class="container h-full rounded-2xl max-w-2xl">
-								<VideoPreview {us} />
+					<div
+						class="container	 mx-auto max-w-max  items-center sm:px-6 md:flex md:space-x-5 md:items-stretch  lg:px-8"
+					>
+						<div class="rounded-box h-full bg-base-200">
+							<div>
+								<LinkDetail {link} />
 							</div>
-							Call State: {callState}
+							<div class="pb-6 btn-group justify-center">
+								<button class="btn btn-secondary" on:click={call} disabled={callState != 'ready'}
+									>Call {link.talentName} Now</button
+								>
+							</div>
+						</div>
+						<div class="bg-base-200  text-white card lg:min-w-200">
+							<div class="text-center card-body items-center ">
+								<div class="text-2xl card-title">Your Video Preview</div>
+								<div class="container h-full rounded-2xl max-w-2xl">
+									<VideoPreview {us} />
+								</div>
+								Call State: {callState}
+							</div>
 						</div>
 					</div>
-				</div>
+				{:else}
+					<VideoCall {vc} {us} />
+				{/if}
 			{:else}
-				<VideoCall {vc} {us} />
+				<h1>Searching for your pCall</h1>
 			{/if}
-		{:else}
-			<h1>Searching for your pCall</h1>
-		{/if}
-	</main>
-</div>
-{#if feedback}
-	<div class="flex w-full place-content-center">
-		<div class="bg-primary shadow text-primary-content  stats stats-vertical lg:stats-horizontal">
-			<div class="stat">
-				<div class="stat-title">Views</div>
-				<div class="stat-value">{feedback.viewed}</div>
-			</div>
-			<div class="stat">
-				<div class="stat-title">Rejected</div>
-				<div class="stat-value">{feedback.rejected}</div>
-			</div>
-			<div class="stat">
-				<div class="stat-title">Disconnected</div>
-				<div class="stat-value">{feedback.disconnected}</div>
-			</div>
-			<div class="stat">
-				<div class="stat-title">UnAnswered</div>
-				<div class="stat-value">{feedback.unanswered}</div>
-			</div>
-			<div class="stat">
-				<div class="stat-title">Link State</div>
-				<div class="stat-value">{$linkState}</div>
-			</div>
-			<div class="stat">
-				<div class="stat-title">Call State</div>
-				<div class="stat-value">{previousState}</div>
+		</main>
+	</div>
+	{#if feedback}
+		<div class="flex w-full place-content-center">
+			<div class="bg-primary shadow text-primary-content  stats stats-vertical lg:stats-horizontal">
+				<div class="stat">
+					<div class="stat-title">Views</div>
+					<div class="stat-value">{feedback.viewed}</div>
+				</div>
+				<div class="stat">
+					<div class="stat-title">Rejected</div>
+					<div class="stat-value">{feedback.rejected}</div>
+				</div>
+				<div class="stat">
+					<div class="stat-title">Disconnected</div>
+					<div class="stat-value">{feedback.disconnected}</div>
+				</div>
+				<div class="stat">
+					<div class="stat-title">UnAnswered</div>
+					<div class="stat-value">{feedback.unanswered}</div>
+				</div>
+				<div class="stat">
+					<div class="stat-title">Link State</div>
+					<div class="stat-value">{$linkState}</div>
+				</div>
+				<div class="stat">
+					<div class="stat-title">Call State</div>
+					<div class="stat-value">{previousState}</div>
+				</div>
 			</div>
 		</div>
-	</div>
+	{/if}
 {/if}

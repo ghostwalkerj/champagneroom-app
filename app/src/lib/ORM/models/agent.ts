@@ -65,6 +65,10 @@ const agentSchemaLiteral = {
 			type: 'string',
 			maxLength: 70
 		},
+		contextId: {
+			type: 'string',
+			maxLength: 30
+		},
 		entityType: {
 			type: 'string',
 			default: 'agent',

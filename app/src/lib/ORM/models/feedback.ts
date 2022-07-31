@@ -32,6 +32,10 @@ const feedbackSchemaLiteral = {
 			type: 'string',
 			ref: 'links'
 		},
+		talent: {
+			type: 'string',
+			ref: 'talents'
+		},
 		rejected: {
 			type: 'integer',
 			default: 0,
@@ -61,7 +65,18 @@ const feedbackSchemaLiteral = {
 		callStart: { type: 'string' },
 		callEnd: { type: 'string' }
 	},
-	required: ['_id', 'entityType', 'link', 'viewed', 'rejected', 'disconnected', 'unanswered']
+	indexed: ['talent', 'link'],
+	required: [
+		'_id',
+		'entityType',
+		'viewed',
+		'rejected',
+		'disconnected',
+		'unanswered',
+		'rating',
+		'link',
+		'talent'
+	]
 } as const;
 
 type feedbackRef = {
@@ -77,10 +92,3 @@ export type FeedbackDocType = ExtractDocumentTypeFromTypedRxJsonSchema<typeof sc
 export const feedbackSchema: RxJsonSchema<FeedbackDocType> = feedbackSchemaLiteral;
 export type FeedbackDocument = RxDocument<FeedbackDocType> & feedbackRef;
 export type FeedbackCollection = RxCollection<FeedbackDocType>;
-
-export const createFeedback = (linkId: string) => {
-	const feedback = {
-		link: linkId
-	};
-	return feedback;
-};

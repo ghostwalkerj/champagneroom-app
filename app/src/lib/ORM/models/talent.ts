@@ -11,6 +11,7 @@ import {
 } from 'rxdb';
 import { get } from 'svelte/store';
 import { v4 as uuidv4 } from 'uuid';
+import { FeedbackString } from './feedback';
 
 export const TalentString = 'talent';
 
@@ -73,7 +74,7 @@ const talentSchemaLiteral = {
 		agent: { type: 'string', ref: 'agents', maxLength: 50 }
 	},
 	required: ['_id', 'key', 'name', 'profileImageUrl', 'agent'],
-	indexed: ['key']
+	indexed: ['key', 'agent']
 } as const;
 
 type talentRef = {
@@ -87,6 +88,22 @@ type TalentDocMethods = {
 
 export const talentDocMethods: TalentDocMethods = {
 	createLink: async function (this: TalentDocument, amount: number): Promise<LinkDocument> {
+		const db = get(thisTalentDB);
+		const key = nanoid();
+
+		const _feedback = {
+			_id: `${FeedbackString}:l${key}`,
+			entityType: FeedbackString,
+			createdAt: new Date().toISOString(),
+			rejected: 0,
+			accepted: 0,
+			disconnected: 0,
+			unanswered: 0,
+			viewed: 0,
+			rating: 0,
+			link: `${LinkString}:${key}`,
+			talent: this._id
+		};
 		const _link = {
 			status: LinkStatuses.ACTIVE,
 			fundedAmount: 0,
@@ -96,9 +113,10 @@ export const talentDocMethods: TalentDocMethods = {
 			talentName: this.name,
 			talent: this._id,
 			profileImageUrl: this.profileImageUrl,
-			_id: `${LinkString}:l${nanoid()}`,
+			_id: `${LinkString}:l${key}`,
 			createdAt: new Date().toISOString(),
-			entityType: LinkString
+			entityType: LinkString,
+			feedback: `${FeedbackString}:f${key}`
 		};
 
 		if (this.currentLink) {
@@ -106,8 +124,8 @@ export const talentDocMethods: TalentDocMethods = {
 			currentLink.update({ $set: { status: LinkStatuses.EXPIRED } });
 		}
 
-		const db = get(thisTalentDB);
 		const link = await db.links.insert(_link);
+		db.feedbacks.insert(_feedback);
 		this.update({ $set: { currentLink: link._id } });
 		return link;
 	}

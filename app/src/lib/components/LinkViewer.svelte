@@ -1,9 +1,9 @@
 <script type="ts">
+	import { page } from '$app/stores';
+	import { ROOM_PATH } from '$lib/constants';
 	import type { LinkDocument } from '$lib/ORM/models/link';
 	import type { TalentDocument } from '$lib/ORM/models/talent';
 	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';
-	import { page } from '$app/stores';
-	import { ROOM_PATH } from '$lib/constants';
 	import urlJoin from 'url-join';
 	export let link: LinkDocument;
 	export let talent: TalentDocument;

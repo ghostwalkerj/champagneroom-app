@@ -7,9 +7,9 @@ const config = {
 	mode: 'development',
 	//plugins: [sveltekit(), basicSsl(), WindiCSS()],
 	plugins: [sveltekit(), WindiCSS()],
-	optimizeDeps: {
-		exclude: ['path', 'fs', 'os', 'perf_hooks'],
-	}
+	// optimizeDeps: {
+	// 	exclude: ['path', 'fs', 'os', 'perf_hooks'],
+	// }
 };
 
 export default config;

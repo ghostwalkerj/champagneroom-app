@@ -1,5 +1,3 @@
-import { thisPublicDB } from '$lib/ORM/dbs/publicDB';
-import { FeedbackString, type FeedbackDocument } from '$lib/ORM/models/feedback';
 import type { TalentDocument } from '$lib/ORM/models/talent';
 import {
 	toTypedRxJsonSchema,
@@ -8,7 +6,7 @@ import {
 	type RxDocument,
 	type RxJsonSchema
 } from 'rxdb';
-import { get } from 'svelte/store';
+
 export enum LinkStatuses {
 	ACTIVE = 'ACTIVE',
 	EXPIRED = 'EXPIRED',
@@ -50,7 +48,6 @@ const linkSchemaLiteral = {
 			minimum: 0,
 			maximum: 99999
 		},
-
 		callId: { type: 'string' },
 		status: { type: 'string', enum: Object.keys(LinkStatuses) },
 		profileImageUrl: {
@@ -77,8 +74,10 @@ const linkSchemaLiteral = {
 		'profileImageUrl',
 		'callId',
 		'amount',
-		'fundedAmount'
+		'fundedAmount',
+		'feedback'
 	],
+	indexed: ['talent', 'feedback'],
 	encrypted: ['callId']
 } as const;
 
@@ -91,30 +90,5 @@ export type LinkDocType = ExtractDocumentTypeFromTypedRxJsonSchema<typeof schema
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 export const linkSchema: RxJsonSchema<LinkDocType> = linkSchemaLiteral;
-export type LinkDocument = RxDocument<LinkDocType, LinkDocMethods> & linkRef;
-export type LinkCollection = RxCollection<LinkDocType, LinkDocMethods>;
-
-type LinkDocMethods = {
-	createFeedback: () => Promise<FeedbackDocument>;
-};
-
-export const linkDocMethods: LinkDocMethods = {
-	createFeedback: async function (this: LinkDocument): Promise<FeedbackDocument> {
-		const _feedback = {
-			entityType: FeedbackString,
-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-			link: this._id!,
-			_id: `${FeedbackString}:${this._id}`,
-			createdAt: new Date().toISOString(),
-			rejected: 0,
-			disconnected: 0,
-			unanswered: 0,
-			viewed: 0,
-			rating: 0
-		};
-		const db = get(thisPublicDB);
-		const feedback = await db.feedbacks.insert(_feedback);
-		this.update({ $set: { feedback: _feedback._id } });
-		return feedback;
-	}
-};
+export type LinkDocument = RxDocument<LinkDocType> & linkRef;
+export type LinkCollection = RxCollection<LinkDocType>;

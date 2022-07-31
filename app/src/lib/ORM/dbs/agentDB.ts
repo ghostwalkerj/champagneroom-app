@@ -55,7 +55,7 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 			return PouchDB.fetch(url, opts);
 		}
 	});
-	const query = _db.agents.findOne(agentId);
+	const agentQuery = _db.agents.findOne(agentId);
 
 	let repState = _db.agents.syncCouchDB({
 		remote: remoteDB,
@@ -63,7 +63,7 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 		options: {
 			retry: true
 		},
-		query
+		query: agentQuery
 	});
 	await repState.awaitInitialReplication();
 
@@ -77,7 +77,7 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 	});
 	await repState.awaitInitialReplication();
 
-	_currentAgent = await query.exec();
+	_currentAgent = await agentQuery.exec();
 	if (_currentAgent) thisAgent.set(_currentAgent);
 
 	_db.agents.syncCouchDB({
@@ -87,7 +87,7 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 			retry: true,
 			live: true
 		},
-		query
+		query: agentQuery
 	});
 	_db.talents.syncCouchDB({
 		remote: remoteDB,
@@ -98,7 +98,6 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 		},
 		query: _db.talents.find().where('agent').eq(agentId)
 	});
-
 	_agentDB = _db;
 	thisAgentDB.set(_db);
 	return _agentDB;
