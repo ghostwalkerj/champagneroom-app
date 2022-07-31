@@ -1,4 +1,3 @@
-import { ROOM_PATH } from '$lib/constants';
 import { thisPublicDB } from '$lib/ORM/dbs/publicDB';
 import { FeedbackString, type FeedbackDocument } from '$lib/ORM/models/feedback';
 import type { TalentDocument } from '$lib/ORM/models/talent';
@@ -10,7 +9,6 @@ import {
 	type RxJsonSchema
 } from 'rxdb';
 import { get } from 'svelte/store';
-import urlJoin from 'url-join';
 export enum LinkStatuses {
 	ACTIVE = 'ACTIVE',
 	EXPIRED = 'EXPIRED',

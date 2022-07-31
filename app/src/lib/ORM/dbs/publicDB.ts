@@ -1,5 +1,4 @@
 import { PUBLIC_ENDPOINT, RXDB_PASSWORD } from '$lib/constants';
-import { initRXDB, StorageTypes } from '$lib/ORM/rxdb';
 import { feedbackSchema, type FeedbackCollection } from '$lib/ORM/models/feedback';
 import {
 	linkDocMethods,
@@ -7,7 +6,8 @@ import {
 	type LinkCollection,
 	type LinkDocument
 } from '$lib/ORM/models/link';
-import { createRxDatabase, removeRxDatabase, type RxDatabase } from 'rxdb';
+import { initRXDB, StorageTypes } from '$lib/ORM/rxdb';
+import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
 import { writable } from 'svelte/store';
 

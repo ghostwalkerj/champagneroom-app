@@ -12,12 +12,12 @@
 	import { talentDB, thisTalent, type TalentDBType } from '$lib/ORM/dbs/talentDB';
 	import type { LinkDocument } from '$lib/ORM/models/link';
 	import type { TalentDocument } from '$lib/ORM/models/talent';
+	import { StorageTypes } from '$lib/ORM/rxdb';
 	import { userStream, type UserStreamType } from '$lib/userStream';
 	import type { VideoCallType } from '$lib/videoCall';
 	import { onDestroy, onMount } from 'svelte';
 	import { PhoneIncomingIcon } from 'svelte-feather-icons';
 	import StarRating from 'svelte-star-rating';
-	import { StorageTypes } from '$lib/ORM/rxdb';
 
 	export let token: string;
 	export let talent: TalentDocument;

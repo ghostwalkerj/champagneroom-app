@@ -24,9 +24,9 @@
 	import ConnectButton from '$lib/components/web3/ConnectButton.svelte';
 	import { agentDB, thisAgent } from '$lib/ORM/dbs/agentDB';
 	import { AgentString, type AgentDocument } from '$lib/ORM/models/agent';
+	import { StorageTypes } from '$lib/ORM/rxdb';
 	import { selectedAccount } from 'svelte-web3';
 	import urlJoin from 'url-join';
-	import { StorageTypes } from '$lib/ORM/rxdb';
 	export let token: string;
 
 	//TODO: This will be authentication later

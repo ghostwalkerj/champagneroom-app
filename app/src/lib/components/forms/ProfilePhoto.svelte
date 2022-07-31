@@ -3,7 +3,6 @@
 
 	import { browser } from '$app/env';
 	import { filedrop } from 'filedrop-svelte';
-	import Image from 'svelte-image';
 	import { scale } from 'svelte/transition';
 
 	export let profileImage: string;

@@ -1,7 +1,12 @@
-import { JWT_CREATOR_USER, JWT_EXPIRY, JWT_PUBLIC_USER, JWT_SECRET } from '$lib/constants';
+import {
+	JWT_CREATOR_USER,
+	JWT_EXPIRY,
+	JWT_PUBLIC_USER,
+	JWT_SECRET,
+	TokenRoles
+} from '$lib/constants';
 import type { RequestHandler } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
-import { TokenRoles } from '$lib/constants';
 export const POST: RequestHandler = async ({ request }) => {
 	const body = await request.json();
 	const tokenRole = body.tokenRole;
