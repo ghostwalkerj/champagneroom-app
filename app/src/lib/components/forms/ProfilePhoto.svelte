@@ -90,14 +90,14 @@
 		class="container rounded-full flex-none h-50 text-center w-50 relative  items-center mask-circle"
 		in:scale
 	>
-		<div>
-			<Image src={imageUrl || ' '} alt="" class="rounded-full flex-none object-cover mask-circle" />
-		</div>
-
+		<div
+			class="bg-cover w-48 h-48 bg-no-repeat bg-center rounded-full"
+			style="background-image: url('{imageUrl}')"
+		/>
 		<div
 			use:filedrop={options}
 			on:filedrop={onChange}
-			class="absolute inset-0 flex flex-col justify-center z-10 bg-gray-500 opacity-75 rounded-full h-50 items-center w-50 {uploadVisibility}"
+			class="absolute inset-0 flex flex-col justify-center z-10 bg-gray-500 opacity-75 rounded-full h-48 items-center w-48 {uploadVisibility}"
 		>
 			<div class="self-center">
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="50" height="50"

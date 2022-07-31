@@ -1,5 +1,4 @@
 import { JWT_EXPIRY, JWT_SECRET } from '$lib/constants';
-import { publicDB } from '$lib/ORM/dbs/publicDB';
 import { StorageTypes } from '$lib/ORM/rxdb';
 import jwt from 'jsonwebtoken';
 import { JWT_CREATOR_USER } from '../../lib/constants';

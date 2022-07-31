@@ -74,24 +74,24 @@
 		publicDB(token, linkId, StorageTypes.IDB).then(() => {
 			thisLink.subscribe((_link) => {
 				if (_link) {
-					link = _link;
-					if (link.feedback) {
-						link.populate('feedback').then((_feedback: FeedbackDocument) => {
-							if (_feedback) {
-								_feedback.update({ $inc: { viewed: 1 } });
-								_feedback.$.subscribe((_feedback: FeedbackDocument) => {
-									feedback = _feedback;
-								});
-							}
-						});
-					} else {
-						link.createFeedback().then((_feedback) => {
+					_link.$.subscribe((__link) => (link = _link));
+				}
+				if (link.feedback) {
+					link.populate('feedback').then((_feedback: FeedbackDocument) => {
+						if (_feedback) {
 							_feedback.update({ $inc: { viewed: 1 } });
 							_feedback.$.subscribe((_feedback: FeedbackDocument) => {
 								feedback = _feedback;
 							});
+						}
+					});
+				} else {
+					link.createFeedback().then((_feedback) => {
+						_feedback.update({ $inc: { viewed: 1 } });
+						_feedback.$.subscribe((_feedback: FeedbackDocument) => {
+							feedback = _feedback;
 						});
-					}
+					});
 				}
 			});
 		});
@@ -177,7 +177,6 @@
 							>
 						</div>
 					</div>
-
 					<div class="bg-base-200  text-white card lg:min-w-200">
 						<div class="text-center card-body items-center ">
 							<div class="text-2xl card-title">Your Video Preview</div>
@@ -196,9 +195,9 @@
 		{/if}
 	</main>
 </div>
-<div class="flex w-full place-content-center">
-	<div class="bg-primary shadow text-primary-content  stats stats-vertical lg:stats-horizontal">
-		{#if feedback}
+{#if feedback}
+	<div class="flex w-full place-content-center">
+		<div class="bg-primary shadow text-primary-content  stats stats-vertical lg:stats-horizontal">
 			<div class="stat">
 				<div class="stat-title">Views</div>
 				<div class="stat-value">{feedback.viewed}</div>
@@ -215,14 +214,14 @@
 				<div class="stat-title">UnAnswered</div>
 				<div class="stat-value">{feedback.unanswered}</div>
 			</div>
-		{/if}
-		<div class="stat">
-			<div class="stat-title">Link State</div>
-			<div class="stat-value">{$linkState}</div>
-		</div>
-		<div class="stat">
-			<div class="stat-title">Call State</div>
-			<div class="stat-value">{previousState}</div>
+			<div class="stat">
+				<div class="stat-title">Link State</div>
+				<div class="stat-value">{$linkState}</div>
+			</div>
+			<div class="stat">
+				<div class="stat-title">Call State</div>
+				<div class="stat-value">{previousState}</div>
+			</div>
 		</div>
 	</div>
-</div>
+{/if}

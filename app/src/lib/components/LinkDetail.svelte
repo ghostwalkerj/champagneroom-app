@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { LinkDocument } from '$lib/ORM/models/link';
 	import FaMoneyBillWave from 'svelte-icons/fa/FaMoneyBillWave.svelte';
-	import Image from 'svelte-image';
 	import StarRating from 'svelte-star-rating';
 	export let link: LinkDocument;
 	$: rating = 0;
@@ -21,15 +20,11 @@
 			<div class="font-extrabold text-lg">This pCall is For</div>
 			<div class="font-extrabold text-3xl">{link.talentName}</div>
 		</div>
-		<div class="rounded-full flex-none h-48 w-48 mask-circle">
-			<Image
-				src={link.profileImageUrl}
-				alt={link.talentName}
-				height="48"
-				width="48"
-				class="rounded-full flex-none object-cover mask-circle"
-			/>
-		</div>
+		<div
+			class="bg-cover w-48 h-48 bg-no-repeat bg-center rounded-full"
+			style="background-image: url('{link.profileImageUrl}')"
+		/>
+
 		<StarRating {rating} />
 
 		<div class="stats stats-vertical stats-shadow lg:stats-horizontal">
