@@ -1,8 +1,8 @@
 import { JWT_EXPIRY, JWT_SECRET } from '$lib/constants';
 import { StorageTypes } from '$lib/ORM/rxdb';
 import jwt from 'jsonwebtoken';
-import { JWT_CREATOR_USER } from '../../lib/constants';
-import { talentDB } from '../../lib/ORM/dbs/talentDB';
+import { JWT_CREATOR_USER } from '$lib/constants';
+import { talentDB } from '$lib/ORM/dbs/talentDB';
 export async function GET({ params }) {
 	const key = params.key;
 	const token = jwt.sign(
@@ -16,12 +16,14 @@ export async function GET({ params }) {
 	//Try to preload link
 	if (token != '') {
 		const db = await talentDB(token, key, StorageTypes.NODE_WEBSQL);
-		const talent = await db.talents.findOne().where('key').eq(key).exec();
+		const _talent = await db.talents.findOne().where('key').eq(key).exec();
 
-		if (talent) {
-			const currentLink = await talent.populate('currentLink');
+		if (_talent) {
+			const _currentLink = await _talent.populate('currentLink');
+			const currentLink = _currentLink ? _currentLink.toJSON() : null;
+			const talent = _talent.toJSON();
 			return {
-				body: { token, talent: talent.toJSON(), currentLink: currentLink.toJSON() },
+				body: { token, talent, currentLink },
 				status: 200
 			};
 		}

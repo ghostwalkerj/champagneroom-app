@@ -96,7 +96,6 @@ export const talentDocMethods: TalentDocMethods = {
 			entityType: FeedbackString,
 			createdAt: new Date().toISOString(),
 			rejected: 0,
-			accepted: 0,
 			disconnected: 0,
 			unanswered: 0,
 			viewed: 0,
