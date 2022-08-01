@@ -8,7 +8,7 @@ const config = {
 	plugins: [sveltekit(), basicSsl(), WindiCSS()],
 	build: {
 		target: 'esnext',
-		minify: false
+		minify: true
 	}
 };
 

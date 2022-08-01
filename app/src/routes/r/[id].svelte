@@ -5,7 +5,7 @@
 	import LinkDetail from '$lib/components/LinkDetail.svelte';
 	import VideoCall from '$lib/components/VideoCall.svelte';
 	import VideoPreview from '$lib/components/VideoPreview.svelte';
-	import { publicDB, type PublicDBType } from '$lib/ORM/dbs/publicDB';
+	import { publicDB, thisFeedback, type PublicDBType } from '$lib/ORM/dbs/publicDB';
 	import type { FeedbackDocument } from '$lib/ORM/models/feedback';
 	import type { LinkDocument } from '$lib/ORM/models/link';
 	import { StorageTypes } from '$lib/ORM/rxdb';
@@ -15,7 +15,7 @@
 
 	export let token: string;
 	export let link: LinkDocument;
-	let feedback: FeedbackDocument | null = null;
+	export let feedback: FeedbackDocument | null = null;
 	let linkId = $page.params.id;
 	let vc: VideoCallType;
 	let videoCall: any;
@@ -66,7 +66,6 @@
 	});
 
 	if (link && browser) {
-		let db: PublicDBType;
 		userStream().then((_us) => {
 			if (_us) {
 				_us.mediaStream.subscribe((stream) => {
@@ -75,16 +74,15 @@
 			}
 		});
 		publicDB(token, linkId, StorageTypes.IDB).then((_db: PublicDBType) => {
-			if (_db) {
-				db = _db;
-				if (link.feedback)
-					db.feedbacks.findOne(link.feedback).$.subscribe((_feedback) => {
-						feedback = _feedback;
-					});
+			thisFeedback.subscribe((_feedback: FeedbackDocument) => {
+				if (_feedback) _feedback!.update({ $inc: { viewed: 1 } });
 
-				if (!feedback) {
-				}
-			}
+				_feedback.$.subscribe((_feedback: FeedbackDocument) => {
+					if (_feedback) {
+						feedback = _feedback;
+					}
+				});
+			});
 		});
 
 		import('$lib/videoCall').then((_vc) => {
@@ -135,6 +133,7 @@
 			vc.makeCall(link.callId!, 'Dr. Huge Mongus', mediaStream);
 		}
 	};
+
 	$: showFeedback = false;
 </script>
 

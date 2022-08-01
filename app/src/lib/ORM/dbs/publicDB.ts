@@ -5,6 +5,7 @@ import { initRXDB, StorageTypes } from '$lib/ORM/rxdb';
 import { createRxDatabase, removeRxDatabase, type RxDatabase } from 'rxdb';
 import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
 import { writable } from 'svelte/store';
+import type { FeedbackDocument } from '$lib/ORM/models/feedback';
 
 type PublicCollections = {
 	links: LinkCollection;
@@ -21,7 +22,7 @@ let _thisLink: LinkDocument | null;
 
 const create = async (token: string, linkId: string, storage: StorageTypes) => {
 	initRXDB(storage);
-	await removeRxDatabase('pouchdb/public_db', getRxStoragePouch(storage));
+	//	await removeRxDatabase('pouchdb/public_db', getRxStoragePouch(storage));
 
 	const _db: PublicDBType = await createRxDatabase({
 		name: 'pouchdb/public_db',
@@ -47,7 +48,7 @@ const create = async (token: string, linkId: string, storage: StorageTypes) => {
 			return PouchDB.fetch(url, opts);
 		}
 	});
-	const query = _db.links.findOne(linkId);
+	const linkQuery = _db.links.findOne(linkId);
 
 	let repState = _db.links.syncCouchDB({
 		remote: remoteDB,
@@ -55,47 +56,55 @@ const create = async (token: string, linkId: string, storage: StorageTypes) => {
 		options: {
 			retry: true
 		},
-		query
+		query: linkQuery
 	});
 	await repState.awaitInitialReplication();
 
-	const feedbackQuery = _db.feedbacks.findOne().where('link').eq(linkId);
-	repState = _db.feedbacks.syncCouchDB({
-		remote: remoteDB,
-		waitForLeadership: false,
-		options: {
-			retry: true
-		},
-		query: feedbackQuery
-	});
-	await repState.awaitInitialReplication();
+	_thisLink = await linkQuery.exec();
+	if (_thisLink) {
+		const feedbackQuery = _db.feedbacks.findOne(_thisLink.feedback);
 
-	_thisLink = await query.exec();
-	if (_thisLink) thisLink.set(_thisLink);
+		repState = _db.feedbacks.syncCouchDB({
+			remote: remoteDB,
+			waitForLeadership: false,
+			options: {
+				retry: true
+			},
+			query: feedbackQuery
+		});
+		await repState.awaitInitialReplication();
 
-	_db.links.syncCouchDB({
-		remote: remoteDB,
-		waitForLeadership: true,
-		options: {
-			retry: true,
-			live: true
-		},
-		query
-	});
-	_db.feedbacks.syncCouchDB({
-		remote: remoteDB,
-		waitForLeadership: true,
-		options: {
-			retry: true,
-			live: true
-		},
-		query: feedbackQuery
-	});
+		const _thisFeedback = await feedbackQuery.exec();
+		if (_thisFeedback) {
+			thisFeedback.set(_thisFeedback);
+		}
 
+		thisLink.set(_thisLink);
+
+		_db.links.syncCouchDB({
+			remote: remoteDB,
+			waitForLeadership: true,
+			options: {
+				retry: true,
+				live: true
+			},
+			query: linkQuery
+		});
+		_db.feedbacks.syncCouchDB({
+			remote: remoteDB,
+			waitForLeadership: true,
+			options: {
+				retry: true,
+				live: true
+			},
+			query: feedbackQuery
+		});
+	}
 	_publicDB = _db;
 	thisPublicDB.set(_db);
 	return _publicDB;
 };
 
 export const thisLink = writable<LinkDocument>();
+export const thisFeedback = writable<FeedbackDocument>();
 export const thisPublicDB = writable<RxDatabase<PublicCollections>>();

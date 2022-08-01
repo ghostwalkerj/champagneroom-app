@@ -1,5 +1,5 @@
 import { CREATORS_ENDPOINT, RXDB_PASSWORD } from '$lib/constants';
-import { linkSchema, type LinkCollection } from '$lib/ORM/models/link';
+import { type LinkDocument, linkSchema, type LinkCollection } from '$lib/ORM/models/link';
 import {
 	talentDocMethods,
 	talentSchema,
@@ -26,6 +26,7 @@ export const talentDB = async (token: string, key: string, storage: StorageTypes
 	_talentDB ? _talentDB : await create(token, key, storage);
 
 let _currentTalent: TalentDocument | null;
+let _currentLink: LinkDocument | null;
 
 const create = async (token: string, key: string, storage: StorageTypes) => {
 	initRXDB(storage);
@@ -76,15 +77,21 @@ const create = async (token: string, key: string, storage: StorageTypes) => {
 	if (_currentTalent) {
 		// Wait for currentLink
 		if (_currentTalent.currentLink) {
+			const currentLinkQuery = _db.links.findOne(_currentTalent.currentLink);
 			repState = _db.links.syncCouchDB({
 				remote: remoteDB,
 				waitForLeadership: false,
 				options: {
 					retry: true
 				},
-				query: _db.links.findOne(_currentTalent.currentLink)
+				query: currentLinkQuery
 			});
 			await repState.awaitInitialReplication();
+
+			_currentLink = await currentLinkQuery.exec();
+			if (_currentLink) {
+				thisCurrentLink.set(_currentLink);
+			}
 
 			// Wait for currentLink Feedback
 			repState = _db.feedbacks.syncCouchDB({
@@ -139,4 +146,5 @@ const create = async (token: string, key: string, storage: StorageTypes) => {
 };
 
 export const thisTalent = writable<TalentDocument>();
+export const thisCurrentLink = writable<LinkDocument>();
 export const thisTalentDB = writable<RxDatabase<CreatorsCollections>>();

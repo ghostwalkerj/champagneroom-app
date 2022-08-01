@@ -92,7 +92,7 @@ export const talentDocMethods: TalentDocMethods = {
 		const key = nanoid();
 
 		const _feedback = {
-			_id: `${FeedbackString}:l${key}`,
+			_id: `${FeedbackString}:f${key}`,
 			entityType: FeedbackString,
 			createdAt: new Date().toISOString(),
 			rejected: 0,
@@ -100,7 +100,7 @@ export const talentDocMethods: TalentDocMethods = {
 			unanswered: 0,
 			viewed: 0,
 			rating: 0,
-			link: `${LinkString}:${key}`,
+			link: `${LinkString}:l${key}`,
 			talent: this._id
 		};
 		const _link = {
