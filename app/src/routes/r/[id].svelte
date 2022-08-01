@@ -5,7 +5,7 @@
 	import LinkDetail from '$lib/components/LinkDetail.svelte';
 	import VideoCall from '$lib/components/VideoCall.svelte';
 	import VideoPreview from '$lib/components/VideoPreview.svelte';
-	import { publicDB, PublicDBType } from '$lib/ORM/dbs/publicDB';
+	import { publicDB, type PublicDBType } from '$lib/ORM/dbs/publicDB';
 	import type { FeedbackDocument } from '$lib/ORM/models/feedback';
 	import type { LinkDocument } from '$lib/ORM/models/link';
 	import { StorageTypes } from '$lib/ORM/rxdb';
