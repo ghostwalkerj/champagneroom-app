@@ -6,6 +6,10 @@ import basicSsl from '@vitejs/plugin-basic-ssl';
 const config = {
 	mode: 'development',
 	plugins: [sveltekit(), basicSsl(), WindiCSS()],
+	build: {
+		target: 'esnext',
+		minify: false
+	}
 };
 
 export default config;
