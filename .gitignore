@@ -2,3 +2,4 @@ app/server/data
 radata*
 app/.yarnclean
 app/pouchdb/*
+app/build.out.txt
