@@ -1,7 +1,6 @@
 import daisyui from 'daisyui';
 import inter from 'tailwindcss-font-inter';
 import typography from 'windicss/plugin/typography';
-import forms from 'windicss/plugin/forms';
 import { defineConfig } from 'windicss/helpers';
 
 export default defineConfig({
@@ -24,7 +23,7 @@ export default defineConfig({
 			'8xl': '4500px'
 		}
 	},
-	plugins: [daisyui, inter, typography, forms],
+	plugins: [daisyui, inter, typography],
 	daisyui: {
 		styled: true,
 		base: true,
