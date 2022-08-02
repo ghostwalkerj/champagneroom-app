@@ -1,7 +1,12 @@
 import { handler } from './build/handler.js';
 import express from 'express';
+import fs from 'fs';
 
 const app = express();
+
+// need pouchdb directory for SSR DB
+const dir = './pouchdb';
+!fs.existsSync(dir) && fs.mkdirSync(dir);
 
 // add a route that lives separately from the SvelteKit app
 app.get('/healthcheck', (req, res) => {
