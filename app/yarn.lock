@@ -991,10 +991,10 @@
     "@vercel/nft" "^0.21.0"
     esbuild "^0.14.48"
 
-"@sveltejs/kit@1.0.0-next.375":
-  version "1.0.0-next.375"
-  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-1.0.0-next.375.tgz#a5febbd5b124fcf740122eeed125492666416022"
-  integrity sha512-9+gKm97TW/xIz6DfWOqdsIwGY4yckUkmMFlsJmEGkjcTy60Q6ZCfrQhMULzL/fILLydF0wZcD/fWE/urAbp2nw==
+"@sveltejs/kit@1.0.0-next.397":
+  version "1.0.0-next.397"
+  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-1.0.0-next.397.tgz#2f78a1efb295d4212e09004e528c3f0095054a7a"
+  integrity sha512-fJZzr9WWbDfW8tHLCavo4s6lYTu1TS40x8fmRO9mxvlUjWgBSzu+CBtXW65BZ/uFd6MuDtUyQJHsBtl9b0bWxw==
   dependencies:
     "@sveltejs/vite-plugin-svelte" "^1.0.1"
     chokidar "^3.5.3"
@@ -10492,10 +10492,10 @@ vite-plugin-windicss@^1.8.7:
     kolorist "^1.5.1"
     windicss "^3.5.6"
 
-vite@3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/vite/-/vite-3.0.0.tgz#b4675cb9ab83ec0803b9c952ffa6519bcce033a7"
-  integrity sha512-M7phQhY3+fRZa0H+1WzI6N+/onruwPTBTMvaj7TzgZ0v2TE+N2sdLKxJOfOv9CckDWt5C4HmyQP81xB4dwRKzA==
+vite@3.0.4:
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/vite/-/vite-3.0.4.tgz#c61688d6b97573e96cf5ac25f2d68597b5ce68e8"
+  integrity sha512-NU304nqnBeOx2MkQnskBQxVsa0pRAH5FphokTGmyy8M3oxbvw7qAXts2GORxs+h/2vKsD+osMhZ7An6yK6F1dA==
   dependencies:
     esbuild "^0.14.47"
     postcss "^8.4.14"
