@@ -11,7 +11,7 @@ import { initRXDB } from '$lib/ORM/rxdb';
 import { createRxDatabase, removeRxDatabase, type RxDatabase } from 'rxdb';
 import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
 import { writable } from 'svelte/store';
-import { type FeedbackCollection, feedbackSchema } from '../models/feedback';
+import { type FeedbackCollection, feedbackSchema } from '$lib/ORM/models/feedback';
 
 type CreatorsCollections = {
 	talents: TalentCollection;

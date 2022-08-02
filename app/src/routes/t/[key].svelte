@@ -24,9 +24,10 @@
 	export let currentLink: LinkDocument;
 
 	let key = $page.params.key;
-	const global = window;
 	let vc: VideoCallType;
+	let global = globalThis;
 	if (browser) {
+		global = window;
 		import('$lib/videoCall').then((_vc) => {
 			videoCall = _vc.videoCall;
 			initVC();
