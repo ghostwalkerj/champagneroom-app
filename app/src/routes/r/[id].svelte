@@ -77,7 +77,6 @@
 			_db.links.findOne(link._id).$.subscribe((_link) => {
 				if (_link) {
 					link = _link;
-					console.log('new link', _link);
 				}
 			});
 			thisFeedback.subscribe((_feedback: FeedbackDocument) => {
