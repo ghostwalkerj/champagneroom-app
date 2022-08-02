@@ -5,7 +5,7 @@
 	import LinkDetail from '$lib/components/LinkDetail.svelte';
 	import VideoCall from '$lib/components/VideoCall.svelte';
 	import VideoPreview from '$lib/components/VideoPreview.svelte';
-	import { publicDB, thisFeedback, type PublicDBType } from '$lib/ORM/dbs/publicDB';
+	import { publicDB, thisFeedback, thisLink, type PublicDBType } from '$lib/ORM/dbs/publicDB';
 	import type { FeedbackDocument } from '$lib/ORM/models/feedback';
 	import type { LinkDocument } from '$lib/ORM/models/link';
 	import { StorageTypes } from '$lib/ORM/rxdb';
@@ -74,6 +74,12 @@
 			}
 		});
 		publicDB(token, linkId, StorageTypes.IDB).then((_db: PublicDBType) => {
+			_db.links.findOne(link._id).$.subscribe((_link) => {
+				if (_link) {
+					link = _link;
+					console.log('new link', _link);
+				}
+			});
 			thisFeedback.subscribe((_feedback: FeedbackDocument) => {
 				if (_feedback) _feedback!.update({ $inc: { viewed: 1 } });
 

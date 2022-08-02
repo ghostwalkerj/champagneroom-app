@@ -20,7 +20,16 @@
     "tsconfig.json": false,
     "windi.config.cjs": false,
     "yarn-error.log": false,
-    "static": false
+    "static": false,
+    "build": false,
+    "src/app.d.ts": false,
+    "src/app.html": false,
+    "src/end.d.ts": false,
+    "haproxy.cfg": false,
+    "Procfile": false,
+    "server.js": false,
+    "vite.config.js": false,
+    "windi.config.ts": false
   },
   "workspace.isHidden": false
 }
