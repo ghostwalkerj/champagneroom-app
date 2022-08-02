@@ -55,7 +55,6 @@
 		"svelte-check": "^2.8.0",
 		"svelte-feather-icons": "^4.0.0",
 		"svelte-forms-lib": "^2.0.1",
-		"svelte-fsm": "^1.1.2",
 		"svelte-icons": "^2.1.0",
 		"svelte-moveable": "^0.22.0",
 		"svelte-preprocess": "^4.10.7",
@@ -68,6 +67,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"svelte-fsm": "^1.1.2",
 		"@walletconnect/web3-provider": "^1.7.8",
 		"broadcast-channel": "^4.13.0",
 		"dequal": "^2.0.3",
