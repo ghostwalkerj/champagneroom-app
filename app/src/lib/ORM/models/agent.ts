@@ -81,6 +81,7 @@ const agentSchemaLiteral = {
 			unique: true,
 			final: true
 		},
+		walletAddress: { type: 'string', maxLength: 50 },
 		createdAt: {
 			type: 'string'
 		},
