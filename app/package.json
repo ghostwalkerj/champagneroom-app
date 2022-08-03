@@ -20,7 +20,7 @@
 		"@playwright/test": "^1.23.2",
 		"@sveltejs/adapter-auto": "next",
 		"@sveltejs/adapter-node": "next",
-		"@sveltejs/kit": "1.0.0-next.397",
+		"@sveltejs/kit": "1.0.0-next.402",
 		"@typechain/ethers-v5": "^10.1.0",
 		"@typechain/hardhat": "^6.1.2",
 		"@types/chai": "^4.3.1",

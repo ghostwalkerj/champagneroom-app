@@ -33,16 +33,19 @@
 			initVC();
 		});
 		talentDB(token, key, StorageTypes.IDB).then((db: TalentDBType) => {
-			thisTalent.subscribe((_talent) => {
-				if (_talent) {
-					talent = _talent;
-					talent.populate('currentLink').then((cl) => {
-						if (cl) {
-							currentLink = cl;
-						}
-					});
-				}
-			});
+			db.talents
+				.findOne(talent._id)
+				.exec()
+				.then((_talent) => {
+					if (_talent) {
+						talent = _talent;
+						talent.populate('currentLink').then((cl) => {
+							if (cl) {
+								currentLink = cl;
+							}
+						});
+					}
+				});
 		});
 	}
 

@@ -1,9 +1,14 @@
 {
   "files.exclude": {
+    "**/.git": false,
+    "**/.svn": false,
+    "**/.hg": false,
+    "**/CVS": false,
+    "**/.DS_Store": false,
+    "**/Thumbs.db": false,
     ".svelte-kit": false,
     "node_modules": false,
     "pouchdb": false,
-    ".vscode": false,
     ".env.example": false,
     ".env.local": false,
     ".eslintignore": false,
@@ -29,7 +34,10 @@
     "Procfile": false,
     "server.js": false,
     "vite.config.js": false,
-    "windi.config.ts": false
+    "windi.config.ts": false,
+    "env.example": false,
+    ".vscode": false
   },
-  "workspace.isHidden": false
+  "workspace.isHidden": false,
+  "explorerExclude.backup": {}
 }

@@ -73,6 +73,8 @@
 				});
 			}
 		});
+
+		// Make link and feedback reactive
 		publicDB(token, linkId, StorageTypes.IDB).then((_db: PublicDBType) => {
 			_db.links.findOne(link._id).$.subscribe((_link) => {
 				if (_link) {
@@ -81,7 +83,6 @@
 			});
 			thisFeedback.subscribe((_feedback: FeedbackDocument) => {
 				if (_feedback) _feedback!.update({ $inc: { viewed: 1 } });
-
 				_feedback.$.subscribe((_feedback: FeedbackDocument) => {
 					if (_feedback) {
 						feedback = _feedback;

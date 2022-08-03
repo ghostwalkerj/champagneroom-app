@@ -991,10 +991,10 @@
     "@vercel/nft" "^0.21.0"
     esbuild "^0.14.48"
 
-"@sveltejs/kit@1.0.0-next.397":
-  version "1.0.0-next.397"
-  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-1.0.0-next.397.tgz#2f78a1efb295d4212e09004e528c3f0095054a7a"
-  integrity sha512-fJZzr9WWbDfW8tHLCavo4s6lYTu1TS40x8fmRO9mxvlUjWgBSzu+CBtXW65BZ/uFd6MuDtUyQJHsBtl9b0bWxw==
+"@sveltejs/kit@1.0.0-next.402":
+  version "1.0.0-next.402"
+  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-1.0.0-next.402.tgz#664edfc345c2b78cbd451bf43fd4448be2acb207"
+  integrity sha512-F0Mm+bTGOnl+vWKab5uwXsY+5YypC/uveGE0wKyYSE9a/pFQD20WwrvRKePGhUCepiHc7S82jxVZRwjCsToaNQ==
   dependencies:
     "@sveltejs/vite-plugin-svelte" "^1.0.1"
     chokidar "^3.5.3"
