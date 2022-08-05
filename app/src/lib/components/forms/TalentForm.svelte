@@ -28,7 +28,7 @@
 
 <div class="bg-primary text-primary-content w-full card">
 	<div class="text-center card-body items-center">
-		<h2 class="text-2xl card-title">New Talent</h2>
+		<h2 class="text-2xl card-title">Add New Talent</h2>
 
 		<div class="text-white text-left whitespace-nowrap">
 			<form on:submit|preventDefault={handleSubmit}>

@@ -60,13 +60,13 @@
 				<div class="font-semibold text-primary text-md leading-6">Agent Dashboard</div>
 				<div class="divider" />
 
-				<div class="mx-auto w-full px-4 md:flex  md:items-center md:justify-between " />
-				<div class="mx-auto mt-8 w-full grid grid-cols-1 lg:grid-flow-col-dense lg:grid-cols-3">
+				<div class="mx-auto  w-full px-4 md:flex  md:items-center md:justify-between " />
+				<div class="mx-auto  grid grid-cols-1 lg:grid-cols-3">
 					<!-- Talent viewing and adding -->
-					<div class="space-y-6  lg:col-start-1 lg:col-span-2">
+					<div class="p-2  lg:col-span-3">
 						<TalentTable {talents} />
 					</div>
-					<div>
+					<div class="p-2">
 						<TalentForm {agent} {talents} />
 					</div>
 				</div>
