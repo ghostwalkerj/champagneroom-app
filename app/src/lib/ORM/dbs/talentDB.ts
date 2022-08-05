@@ -1,18 +1,12 @@
 import { CREATORS_ENDPOINT, RXDB_PASSWORD } from '$lib/constants';
 import { feedbackSchema, type FeedbackCollection } from '$lib/ORM/models/feedback';
-import { linkSchema, type LinkCollection, type LinkDocument } from '$lib/ORM/models/link';
-import {
-	talentDocMethods,
-	talentSchema,
-	type TalentCollection,
-	type TalentDocument
-} from '$lib/ORM/models/talent';
+import { linkSchema, type LinkCollection } from '$lib/ORM/models/link';
+import { talentDocMethods, talentSchema, type TalentCollection } from '$lib/ORM/models/talent';
 import type { StorageTypes } from '$lib/ORM/rxdb';
 import { initRXDB } from '$lib/ORM/rxdb';
+import { EventEmitter } from 'events';
 import { createRxDatabase, removeRxDatabase, type RxDatabase } from 'rxdb';
 import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
-import { writable } from 'svelte/store';
-import { EventEmitter } from 'events';
 
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 25;
@@ -27,9 +21,6 @@ let _talentDB: TalentDBType;
 
 export const talentDB = async (token: string, key: string, storage: StorageTypes) =>
 	_talentDB ? _talentDB : await create(token, key, storage);
-
-let _currentTalent: TalentDocument | null;
-let _currentLink: LinkDocument | null;
 
 const create = async (token: string, key: string, storage: StorageTypes) => {
 	initRXDB(storage);
@@ -76,7 +67,7 @@ const create = async (token: string, key: string, storage: StorageTypes) => {
 	});
 	await repState.awaitInitialReplication();
 
-	_currentTalent = await talentQuery.exec();
+	const _currentTalent = await talentQuery.exec();
 	if (_currentTalent) {
 		// Wait for currentLink
 		if (_currentTalent.currentLink) {
@@ -90,11 +81,6 @@ const create = async (token: string, key: string, storage: StorageTypes) => {
 				query: currentLinkQuery
 			});
 			await repState.awaitInitialReplication();
-
-			_currentLink = await currentLinkQuery.exec();
-			if (_currentLink) {
-				thisCurrentLink.set(_currentLink);
-			}
 
 			// Wait for currentLink Feedback
 			repState = _db.feedbacks.syncCouchDB({
@@ -140,12 +126,7 @@ const create = async (token: string, key: string, storage: StorageTypes) => {
 			},
 			query: talentQuery
 		});
-
-		thisTalent.set(_currentTalent);
 	}
 	_talentDB = _db;
 	return _talentDB;
 };
-
-export const thisTalent = writable<TalentDocument>();
-export const thisCurrentLink = writable<LinkDocument>();

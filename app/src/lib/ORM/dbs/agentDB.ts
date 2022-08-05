@@ -10,10 +10,9 @@ import { feedbackSchema, type FeedbackCollection } from '$lib/ORM/models/feedbac
 import { linkSchema, type LinkCollection } from '$lib/ORM/models/link';
 import { talentSchema, type TalentCollection } from '$lib/ORM/models/talent';
 import { initRXDB, StorageTypes } from '$lib/ORM/rxdb';
+import { EventEmitter } from 'events';
 import { createRxDatabase, removeRxDatabase, type RxDatabase } from 'rxdb';
 import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
-import { writable } from 'svelte/store';
-import { EventEmitter } from 'events';
 
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 25;
@@ -92,7 +91,6 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 	await repState.awaitInitialReplication();
 
 	_currentAgent = await agentQuery.exec();
-	if (_currentAgent) thisAgent.set(_currentAgent);
 
 	_db.agents.syncCouchDB({
 		remote: remoteDB,
@@ -134,5 +132,3 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 	_agentDB = _db;
 	return _agentDB;
 };
-
-export const thisAgent = writable<AgentDocument>();

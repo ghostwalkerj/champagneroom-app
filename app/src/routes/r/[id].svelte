@@ -5,7 +5,7 @@
 	import LinkDetail from '$lib/components/LinkDetail.svelte';
 	import VideoCall from '$lib/components/VideoCall.svelte';
 	import VideoPreview from '$lib/components/VideoPreview.svelte';
-	import { publicDB, thisFeedback, type PublicDBType } from '$lib/ORM/dbs/publicDB';
+	import { publicDB, type PublicDBType } from '$lib/ORM/dbs/publicDB';
 	import type { FeedbackDocument } from '$lib/ORM/models/feedback';
 	import type { LinkDocument } from '$lib/ORM/models/link';
 	import { StorageTypes } from '$lib/ORM/rxdb';
@@ -15,7 +15,7 @@
 
 	export let token: string;
 	export let link: LinkDocument;
-	export let feedback: FeedbackDocument | null = null;
+	export let feedback: FeedbackDocument;
 	let linkId = $page.params.id;
 	let vc: VideoCallType;
 	let videoCall: any;
@@ -81,13 +81,10 @@
 					link = _link;
 				}
 			});
-			thisFeedback.subscribe((_feedback: FeedbackDocument) => {
-				if (_feedback) _feedback!.update({ $inc: { viewed: 1 } });
-				_feedback.$.subscribe((_feedback: FeedbackDocument) => {
-					if (_feedback) {
-						feedback = _feedback;
-					}
-				});
+			_db.feedbacks.findOne(feedback._id).$.subscribe((_feedback) => {
+				if (_feedback) {
+					feedback = _feedback;
+				}
 			});
 		});
 

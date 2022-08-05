@@ -9,7 +9,6 @@ import {
 	type RxDocument,
 	type RxJsonSchema
 } from 'rxdb';
-import { get } from 'svelte/store';
 import { v4 as uuidv4 } from 'uuid';
 
 export const TalentString = 'talent';

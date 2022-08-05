@@ -1,13 +1,33 @@
 <script type="ts">
 	import { page } from '$app/stores';
 	import { TALENT_PATH } from '$lib/constants';
-	import { thisAgent } from '$lib/ORM/dbs/agentDB';
-	import type { AgentDocument } from '$lib/ORM/models/agent';
+	import { agentDB } from '$lib/ORM/dbs/agentDB';
+	import { AgentDocument, AgentString } from '$lib/ORM/models/agent';
 	import type { TalentDocument } from '$lib/ORM/models/talent';
+	import { StorageTypes } from '$lib/ORM/rxdb';
 	import { nanoid } from 'nanoid';
 	import { createForm } from 'svelte-forms-lib';
+	import { selectedAccount } from 'svelte-web3';
 	import urlJoin from 'url-join';
 	import * as yup from 'yup';
+
+	export let token: string;
+
+	//TODO: This will be authentication later
+	$: selectedAccount.subscribe(async (account) => {
+		if (account) {
+			const agentId = AgentString + ':' + account;
+			const db = await agentDB(token, agentId, StorageTypes.IDB);
+			db.agents.findOne(agentId).$.subscribe((_agent) => {
+				if (_agent) {
+					agent = _agent;
+					agent.populate('talents').then((_talents) => {
+						talents = _talents;
+					});
+				}
+			});
+		}
+	});
 
 	const { form, errors, handleReset, handleChange, handleSubmit } = createForm({
 		initialValues: { name: '', agentCommission: '10' },
@@ -38,12 +58,6 @@
 			talents = await agent.populate('talents');
 		}
 	};
-	thisAgent.subscribe(async (_agent) => {
-		if (_agent) {
-			agent = _agent;
-			getTalents();
-		}
-	});
 
 	$: talentkey = nanoid();
 	$: talentUrl = urlJoin($page.url.origin, TALENT_PATH, talentkey);

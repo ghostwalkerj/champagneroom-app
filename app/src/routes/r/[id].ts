@@ -1,8 +1,7 @@
 import { JWT_EXPIRY, JWT_PUBLIC_USER, JWT_SECRET } from '$lib/constants';
-import { publicDB, thisFeedback, thisLink } from '$lib/ORM/dbs/publicDB';
+import { publicDB } from '$lib/ORM/dbs/publicDB';
 import { StorageTypes } from '$lib/ORM/rxdb';
 import jwt from 'jsonwebtoken';
-import { get } from 'svelte/store';
 export async function GET({ params }) {
 	const linkId = params.id;
 	const token = jwt.sign(
@@ -13,15 +12,15 @@ export async function GET({ params }) {
 		JWT_SECRET
 	);
 
-	//Try to preload link
 	if (token != '') {
-		await publicDB(token, linkId, StorageTypes.NODE_WEBSQL);
-		const _link = get(thisLink);
+		const db = await publicDB(token, linkId, StorageTypes.NODE_WEBSQL);
+		const _link = await db.links.findOne(linkId).exec();
 
 		if (_link) {
 			const link = _link.toJSON();
-			const _feedback = get(thisFeedback);
+			const _feedback = await _link.populate('feedback');
 			if (_feedback) {
+				_feedback.update({ $inc: { viewed: 1 } });
 				const feedback = _feedback.toJSON();
 				return {
 					body: { token, link, feedback },

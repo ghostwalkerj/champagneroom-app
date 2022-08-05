@@ -1,10 +1,10 @@
 <script type="ts">
 	// TODO:Add validation
+	import { page } from '$app/stores';
+	import { IMAGE_UPLOAD_PATH } from '$lib/constants';
 	import { filedrop } from 'filedrop-svelte';
 	import { scale } from 'svelte/transition';
 	import urlJoin from 'url-join';
-	import { page } from '$app/stores';
-	import { IMAGE_UPLOAD_PATH } from '$lib/constants';
 
 	export let profileImage: string;
 	export let callBack: (arg0: string) => void;
@@ -69,7 +69,6 @@
 		});
 		const data = await res.json();
 		profileImage = data.url;
-		console.log(profileImage);
 		callBack(profileImage);
 		progressVisibility = 'invisible';
 		resetForm();

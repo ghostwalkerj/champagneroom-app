@@ -1,5 +1,5 @@
 import { JWT_CREATOR_USER, JWT_EXPIRY, JWT_SECRET } from '$lib/constants';
-import { talentDB, thisCurrentLink, thisTalent } from '$lib/ORM/dbs/talentDB';
+import { talentDB } from '$lib/ORM/dbs/talentDB';
 import { StorageTypes } from '$lib/ORM/rxdb';
 import jwt from 'jsonwebtoken';
 import { get } from 'svelte/store';
@@ -15,11 +15,11 @@ export async function GET({ params }) {
 
 	//Try to preload link
 	if (token != '') {
-		await talentDB(token, key, StorageTypes.NODE_WEBSQL);
-		const _talent = get(thisTalent);
+		const db = await talentDB(token, key, StorageTypes.NODE_WEBSQL);
+		const _talent = await db.talents.findOne().where('key').equals(key).exec();
 
 		if (_talent) {
-			const _currentLink = get(thisCurrentLink);
+			const _currentLink = await _talent.populate('currentLink');
 			const currentLink = _currentLink ? _currentLink.toJSON() : null;
 			const talent = _talent.toJSON();
 			return {

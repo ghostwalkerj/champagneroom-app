@@ -22,27 +22,8 @@
 
 <script lang="ts">
 	import ConnectButton from '$lib/components/web3/ConnectButton.svelte';
-	import { agentDB, thisAgent } from '$lib/ORM/dbs/agentDB';
-	import { AgentString, type AgentDocument } from '$lib/ORM/models/agent';
-	import { StorageTypes } from '$lib/ORM/rxdb';
 	import { selectedAccount } from 'svelte-web3';
 	import urlJoin from 'url-join';
-	export let token: string;
-
-	//TODO: This will be authentication later
-	selectedAccount.subscribe(async (account) => {
-		if (account) {
-			const agentId = AgentString + ':' + account;
-			const db = await agentDB(token, agentId, StorageTypes.IDB);
-			thisAgent.subscribe(async (_agent: AgentDocument) => {
-				if (!_agent) {
-					const _agent = await db.agents.createAgent(account);
-					console.log('insert agent: ' + JSON.stringify(_agent));
-					thisAgent.set(_agent);
-				}
-			});
-		}
-	});
 </script>
 
 <div class="bg-base-100 navbar">

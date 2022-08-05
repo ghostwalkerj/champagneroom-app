@@ -1,12 +1,10 @@
 import { PUBLIC_ENDPOINT, RXDB_PASSWORD } from '$lib/constants';
-import type { FeedbackDocument } from '$lib/ORM/models/feedback';
 import { feedbackSchema, type FeedbackCollection } from '$lib/ORM/models/feedback';
 import { linkSchema, type LinkCollection, type LinkDocument } from '$lib/ORM/models/link';
 import { initRXDB, StorageTypes } from '$lib/ORM/rxdb';
-import { createRxDatabase, type RxDatabase } from 'rxdb';
-import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
-import { writable } from 'svelte/store';
 import { EventEmitter } from 'events';
+import { createRxDatabase, removeRxDatabase, type RxDatabase } from 'rxdb';
+import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
 
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 25;
@@ -25,7 +23,7 @@ let _thisLink: LinkDocument | null;
 
 const create = async (token: string, linkId: string, storage: StorageTypes) => {
 	initRXDB(storage);
-	//	await removeRxDatabase('pouchdb/public_db', getRxStoragePouch(storage));
+	await removeRxDatabase('pouchdb/public_db', getRxStoragePouch(storage));
 
 	const _db: PublicDBType = await createRxDatabase({
 		name: 'pouchdb/public_db',
@@ -77,13 +75,6 @@ const create = async (token: string, linkId: string, storage: StorageTypes) => {
 		});
 		await repState.awaitInitialReplication();
 
-		const _thisFeedback = await feedbackQuery.exec();
-		if (_thisFeedback) {
-			thisFeedback.set(_thisFeedback);
-		}
-
-		thisLink.set(_thisLink);
-
 		_db.links.syncCouchDB({
 			remote: remoteDB,
 			waitForLeadership: true,
@@ -106,6 +97,3 @@ const create = async (token: string, linkId: string, storage: StorageTypes) => {
 	_publicDB = _db;
 	return _publicDB;
 };
-
-export const thisLink = writable<LinkDocument>();
-export const thisFeedback = writable<FeedbackDocument>();
