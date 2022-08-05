@@ -21,18 +21,14 @@
 </script>
 
 <script type="ts">
-	import { page } from '$app/stores';
-	import { TALENT_PATH } from '$lib/constants';
 	import { agentDB } from '$lib/ORM/dbs/agentDB';
 	import { type AgentDocument, AgentString } from '$lib/ORM/models/agent';
 	import type { TalentDocument } from '$lib/ORM/models/talent';
 	import { StorageTypes } from '$lib/ORM/rxdb';
-	import { nanoid } from 'nanoid';
-	import { createForm } from 'svelte-forms-lib';
 	import { selectedAccount } from 'svelte-web3';
 	import urlJoin from 'url-join';
-	import * as yup from 'yup';
 	import TalentForm from '$lib/components/forms/TalentForm.svelte';
+	import TalentTable from '$lib/components/forms/TalentTable.svelte';
 
 	export let token: string;
 
@@ -52,33 +48,8 @@
 		}
 	});
 
-	const { form, errors, handleReset, handleChange, handleSubmit } = createForm({
-		initialValues: { name: '', agentCommission: '10' },
-		validationSchema: yup.object({
-			name: yup.string().required('Talent name is required'),
-			agentCommission: yup
-				.number()
-				.min(0)
-				.max(100)
-				.integer()
-				.required('Agent commission between 0 and 100 required')
-		}),
-		onSubmit: async (values) => {
-			const talent = await agent.createTalent(
-				values.name,
-				talentkey,
-				Number.parseInt(values.agentCommission)
-			);
-			handleReset();
-			talents = talents.concat([talent]);
-		}
-	});
-
 	let agent: AgentDocument;
 	let talents: TalentDocument[];
-
-	$: talentkey = nanoid();
-	$: talentUrl = urlJoin($page.url.origin, TALENT_PATH, talentkey);
 </script>
 
 {#if agent}
@@ -95,18 +66,10 @@
 				<div
 					class="mx-auto mt-8 max-w-3xl grid grid-cols-1 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3"
 				>
-					<!-- talent Form-->
+					<!-- Talent viewing and adding -->
 					<div class="space-y-6 lg:col-start-1 lg:col-span-2">
 						<TalentForm {agent} {talents} />
-						<div>
-							{#if talents && talents.length > 0}
-								{#each talents as talent, id}
-									<li>
-										<a href="/t/{talent.key}">{talent.name}</a>
-									</li>
-								{/each}
-							{/if}
-						</div>
+						<TalentTable {talents} />
 					</div>
 				</div>
 			</div>

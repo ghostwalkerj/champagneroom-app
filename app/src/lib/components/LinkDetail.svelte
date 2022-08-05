@@ -16,7 +16,7 @@
 			<div class="font-extrabold text-3xl">{link.talentName}</div>
 		</div>
 		<div
-			class="bg-cover w-48 h-48 bg-no-repeat bg-center rounded-full"
+			class="bg-cover bg-no-repeat bg-center rounded-full h-48 w-48"
 			style="background-image: url('{link.profileImageUrl}')"
 		/>
 

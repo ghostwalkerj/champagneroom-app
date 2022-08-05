@@ -3,12 +3,11 @@ import {
 	agentDocMethods,
 	agentSchema,
 	agentStaticMethods,
-	type AgentCollection,
-	type AgentDocument
+	type AgentCollection
 } from '$lib/ORM/models/agent';
 import { feedbackSchema, type FeedbackCollection } from '$lib/ORM/models/feedback';
 import { linkSchema, type LinkCollection } from '$lib/ORM/models/link';
-import { talentSchema, type TalentCollection } from '$lib/ORM/models/talent';
+import { talentDocMethods, talentSchema, type TalentCollection } from '$lib/ORM/models/talent';
 import { initRXDB, StorageTypes } from '$lib/ORM/rxdb';
 import { EventEmitter } from 'events';
 import { createRxDatabase, removeRxDatabase, type RxDatabase } from 'rxdb';
@@ -30,8 +29,6 @@ let _agentDB: AgentDBType;
 export const agentDB = async (token: string, agentId: string, storage: StorageTypes) =>
 	_agentDB ? _agentDB : await create(token, agentId, storage);
 
-let _currentAgent: AgentDocument | null;
-
 const create = async (token: string, agentId: string, storage: StorageTypes) => {
 	initRXDB(storage);
 	await removeRxDatabase('pouchdb/agent_db', getRxStoragePouch(storage));
@@ -50,7 +47,8 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 			statics: agentStaticMethods
 		},
 		talents: {
-			schema: talentSchema
+			schema: talentSchema,
+			methods: talentDocMethods
 		},
 		links: {
 			schema: linkSchema
@@ -89,8 +87,6 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 		query: _db.talents.find().where('agent').eq(agentId)
 	});
 	await repState.awaitInitialReplication();
-
-	_currentAgent = await agentQuery.exec();
 
 	_db.agents.syncCouchDB({
 		remote: remoteDB,
