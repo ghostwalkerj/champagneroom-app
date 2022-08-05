@@ -1,9 +1,10 @@
 <script type="ts">
 	// TODO:Add validation
-
-	import { browser } from '$app/env';
 	import { filedrop } from 'filedrop-svelte';
 	import { scale } from 'svelte/transition';
+	import urlJoin from 'url-join';
+	import { page } from '$app/stores';
+	import { IMAGE_UPLOAD_PATH } from '$lib/constants';
 
 	export let profileImage: string;
 	export let callBack: (arg0: string) => void;
@@ -11,7 +12,6 @@
 	let uploadVisibility = 'invisible';
 	let progressVisibility = 'invisible';
 	let file: File;
-	const SKYNET_URL = (import.meta.env.VITE_SKYNET_URL as string) || 'https://siasky.net';
 
 	let options = {
 		fileLimit: 1,
@@ -23,7 +23,6 @@
 	$: update = false;
 	$: imageUrl = profileImage;
 	$: uploadReady = false;
-	$: uploadProgress = 0;
 
 	function onChange(e: CustomEvent) {
 		const files = e.detail.files.accepted;
@@ -58,30 +57,23 @@
 	}
 
 	// TODO: Have to make this secure before going live, convert to endpoint and proxy via the server
-
 	async function upload() {
-		if (browser) {
-			uploadVisibility = 'invisible';
-			progressVisibility = 'visible';
-			const { SkynetClient } = await import('skynet-js');
-			try {
-				const client = new SkynetClient(SKYNET_URL);
-				const { skylink } = await client.uploadFile(file, { onUploadProgress });
-				const skylinkUrl = await client.getSkylinkUrl(skylink); // TODO:Abstract the domain to allow multiple domains
-				profileImage = skylinkUrl;
-				callBack(skylinkUrl);
-				progressVisibility = 'invisible';
-				uploadProgress = 0;
-			} catch (error) {
-				console.log(error);
-			}
-		}
+		uploadVisibility = 'invisible';
+		progressVisibility = 'visible';
+		let formData = new FormData();
+		formData.append('file', file);
+		const upload_url = urlJoin($page.url.origin, IMAGE_UPLOAD_PATH);
+		const res = await fetch(upload_url, {
+			method: 'POST',
+			body: formData
+		});
+		const data = await res.json();
+		profileImage = data.url;
+		console.log(profileImage);
+		callBack(profileImage);
+		progressVisibility = 'invisible';
 		resetForm();
 	}
-
-	const onUploadProgress = (progress: number) => {
-		uploadProgress = Math.round(progress * 100);
-	};
 </script>
 
 <div class="p-4">
@@ -112,11 +104,7 @@
 	</div>
 	<div
 		class="absolute m-4 inset-0 flex flex-col justify-center items-center z-10 bg-gray-500 opacity-75 rounded-xl {progressVisibility}"
-	>
-		<div class="text-primary radial-progress" style="--value:{uploadProgress}">
-			{uploadProgress}%
-		</div>
-	</div>
+	/>
 </div>
 
 {#if !update}

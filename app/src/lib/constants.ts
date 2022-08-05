@@ -14,9 +14,20 @@ export const ROOM_PATH = import.meta.env.VITE_ROOM_PATH;
 export const AGENT_PATH = import.meta.env.VITE_AGENT_PATH;
 export const MOBILE_PATH = import.meta.env.VITE_MOBILE_PATH;
 
+export const IMAGE_UPLOAD_PATH = import.meta.env.VITE_IMAGE_UPLOAD_PATH;
+
 export enum TokenRoles {
 	ADMIN,
 	PUBLIC,
 	AGENT,
 	TALENT
 }
+
+export const INFURA_IPFS_PROJECT_ID = import.meta.env.VITE_INFURA_IPFS_PROJECT_ID;
+
+export const INFURA_IPFS_PROJECT_SECRET = import.meta.env.VITE_INFURA_IPFS_PROJECT_SECRET;
+
+export const INFURA_IPFS_API_URL = import.meta.env.VITE_INFURA_IPFS_API_URL;
+export const INFURA_IPFS_API_PORT = import.meta.env.VITE_INFURA_IPFS_API_PORT;
+
+export const INFURA_IPFS_DEDICATED_GATEWAY = import.meta.env.VITE_INFURA_IPFS_DEDICATED_GATEWAY;
