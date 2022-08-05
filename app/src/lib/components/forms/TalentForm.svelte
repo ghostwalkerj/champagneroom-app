@@ -26,13 +26,13 @@
 	});
 </script>
 
-<div class="bg-primary text-primary-content card">
+<div class="bg-primary text-primary-content w-full card">
 	<div class="text-center card-body items-center">
 		<h2 class="text-2xl card-title">New Talent</h2>
 
 		<div class="text-white text-left whitespace-nowrap">
 			<form on:submit|preventDefault={handleSubmit}>
-				<div class="max-w-xs w-full py-2 form-control">
+				<div class="max-w-xs  py-2 form-control">
 					<!-- svelte-ignore a11y-label-has-associated-control -->
 					<label class="label">
 						<span class="label-text">Talent Name</span>
@@ -41,7 +41,7 @@
 						type="text"
 						name="name"
 						placeholder="Enter a name"
-						class="max-w-xs w-full py-2 input input-bordered input-primary"
+						class="max-w-xs  py-2 input input-bordered input-primary"
 						on:change={handleChange}
 						bind:value={$form.name}
 					/>

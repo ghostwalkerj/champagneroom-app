@@ -56,20 +56,18 @@
 	<div class="min-h-full">
 		<main class="p-10">
 			<!-- Page header -->
-			<div class="bg-black rounded-lg mx-auto max-w-7xl py-4 px-4 sm:px-6 lg:px-8">
+			<div class="bg-black rounded-lg mx-auto py-4 px-4 sm:px-6 lg:px-8">
 				<div class="font-semibold text-primary text-md leading-6">Agent Dashboard</div>
 				<div class="divider" />
 
-				<div
-					class="mx-auto max-w-3xl px-4 md:flex  md:items-center md:justify-between lg:max-w-7xl "
-				/>
-				<div
-					class="mx-auto mt-8 max-w-3xl grid grid-cols-1 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3"
-				>
+				<div class="mx-auto w-full px-4 md:flex  md:items-center md:justify-between " />
+				<div class="mx-auto mt-8 w-full grid grid-cols-1 lg:grid-flow-col-dense lg:grid-cols-3">
 					<!-- Talent viewing and adding -->
-					<div class="space-y-6 lg:col-start-1 lg:col-span-2">
-						<TalentForm {agent} {talents} />
+					<div class="space-y-6  lg:col-start-1 lg:col-span-2">
 						<TalentTable {talents} />
+					</div>
+					<div>
+						<TalentForm {agent} {talents} />
 					</div>
 				</div>
 			</div>
