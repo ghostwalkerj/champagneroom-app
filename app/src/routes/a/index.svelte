@@ -43,7 +43,6 @@
 			db.agents.findOne(agentId).$.subscribe((_agent) => {
 				if (_agent) {
 					agent = _agent;
-					console.log(agent);
 					agent.populate('talents').then((_talents) => {
 						talents = _talents;
 					});
