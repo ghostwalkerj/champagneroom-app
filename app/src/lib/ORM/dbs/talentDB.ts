@@ -141,10 +141,8 @@ const create = async (token: string, key: string, storage: StorageTypes) => {
 		thisTalent.set(_currentTalent);
 	}
 	_talentDB = _db;
-	thisTalentDB.set(_db);
 	return _talentDB;
 };
 
 export const thisTalent = writable<TalentDocument>();
 export const thisCurrentLink = writable<LinkDocument>();
-export const thisTalentDB = writable<RxDatabase<CreatorsCollections>>();

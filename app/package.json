@@ -67,7 +67,6 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"svelte-fsm": "^1.1.2",
 		"@walletconnect/web3-provider": "^1.7.8",
 		"broadcast-channel": "^4.13.0",
 		"dequal": "^2.0.3",
@@ -87,6 +86,7 @@
 		"skynet-js": "^4.3.0",
 		"socket.io": "^4.5.1",
 		"socket.io-client": "^4.5.1",
+		"svelte-fsm": "^1.1.2",
 		"svelte-image": "^0.2.9",
 		"svelte-proxied-store": "^1.1.4",
 		"svelte-star-rating": "^2.0.0",

@@ -30,7 +30,13 @@
     "app/.env.local": true,
     "app/package.json": true,
     "**/node_modules": true,
-    "app/pouchdb": true
+    "app/pouchdb": true,
+    "app/src/app.d.ts": true,
+    "app/src/app.html": true,
+    "app/src/end.d.ts": true,
+    "app/.svelte-kit": true,
+    "app/build": true,
+    "app/static": true
   },
   "workspace.isHidden": true,
   "explorerExclude.backup": {}

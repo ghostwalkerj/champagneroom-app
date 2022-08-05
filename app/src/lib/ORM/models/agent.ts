@@ -36,7 +36,7 @@ export const agentDocMethods: AgentDocMethods = {
 			createdAt: new Date().toISOString()
 		};
 
-		const db = get(thisAgentDB);
+		const db = this.collection.database;
 		const talent = await db.talents.insert(_talent);
 
 		const talents = this.talents ? this.talents.concat([talent._id]) : [talent._id];

@@ -101,10 +101,8 @@ const create = async (token: string, linkId: string, storage: StorageTypes) => {
 		});
 	}
 	_publicDB = _db;
-	thisPublicDB.set(_db);
 	return _publicDB;
 };
 
 export const thisLink = writable<LinkDocument>();
 export const thisFeedback = writable<FeedbackDocument>();
-export const thisPublicDB = writable<RxDatabase<PublicCollections>>();

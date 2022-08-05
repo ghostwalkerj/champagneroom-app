@@ -11,10 +11,14 @@ import { initRXDB, StorageTypes } from '$lib/ORM/rxdb';
 import { createRxDatabase, removeRxDatabase, type RxDatabase } from 'rxdb';
 import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
 import { writable } from 'svelte/store';
+import { FeedbackCollection, feedbackSchema } from '$lib/ORM/models/feedback';
+import { LinkCollection, linkSchema } from '$lib/ORM/models/link';
 
 type CreatorsCollections = {
 	agents: AgentCollection;
 	talents: TalentCollection;
+	links: LinkCollection;
+	feedbacks: FeedbackCollection;
 };
 
 export type AgentDBType = RxDatabase<CreatorsCollections>;
@@ -44,6 +48,12 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 		},
 		talents: {
 			schema: talentSchema
+		},
+		links: {
+			schema: linkSchema
+		},
+		feedbacks: {
+			schema: feedbackSchema
 		}
 	});
 	const remoteDB = new PouchDB(CREATORS_ENDPOINT, {
@@ -98,10 +108,27 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 		},
 		query: _db.talents.find().where('agent').eq(agentId)
 	});
+	_db.links.syncCouchDB({
+		remote: remoteDB,
+		waitForLeadership: true,
+		options: {
+			retry: true,
+			live: true
+		},
+		query: _db.links.find().where('agent').eq(agentId)
+	});
+	_db.feedbacks.syncCouchDB({
+		remote: remoteDB,
+		waitForLeadership: true,
+		options: {
+			retry: true,
+			live: true
+		},
+		query: _db.feedbacks.find().where('agent').eq(agentId)
+	});
+
 	_agentDB = _db;
-	thisAgentDB.set(_db);
 	return _agentDB;
 };
 
 export const thisAgent = writable<AgentDocument>();
-export const thisAgentDB = writable<RxDatabase<CreatorsCollections>>();

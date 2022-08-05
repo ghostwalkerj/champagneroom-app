@@ -1,4 +1,3 @@
-import { thisTalentDB } from '$lib/ORM/dbs/talentDB';
 import type { AgentDocument } from '$lib/ORM/models/agent';
 import { LinkStatuses, LinkString, type LinkDocument } from '$lib/ORM/models/link';
 import { nanoid } from 'nanoid';
@@ -11,7 +10,7 @@ import {
 } from 'rxdb';
 import { get } from 'svelte/store';
 import { v4 as uuidv4 } from 'uuid';
-import { FeedbackString } from './feedback';
+import { FeedbackString } from '$lib/ORM/models/feedback';
 
 export const TalentString = 'talent';
 
@@ -77,6 +76,12 @@ const talentSchemaLiteral = {
 	indexed: ['key', 'agent']
 } as const;
 
+export type TalentStats = {
+	ratingAvg: number;
+	totalEarnings: number;
+	completedCalls: LinkDocument[];
+};
+
 type talentRef = {
 	currentLink_?: Promise<LinkDocument>;
 	agent_?: Promise<AgentDocument>;
@@ -84,6 +89,7 @@ type talentRef = {
 
 type TalentDocMethods = {
 	createLink: (amount: number) => Promise<LinkDocument>;
+	getStats: () => Promise<TalentStats>;
 };
 
 export const talentDocMethods: TalentDocMethods = {
@@ -127,6 +133,24 @@ export const talentDocMethods: TalentDocMethods = {
 		db.feedbacks.insert(_feedback);
 		this.update({ $set: { currentLink: link._id } });
 		return link;
+	},
+	getStats: async function (this: TalentDocument): Promise<TalentStats> {
+		const completedCalls = (await this.collection.database.links
+			.find()
+			.where('talentId')
+			.equals(this._id)
+			.and('status')
+			.equals(LinkStatuses.COMPLETED)
+			.exec()) as LinkDocument[];
+
+		const ratingAvg = 0;
+		const totalEarnings = 0;
+
+		return {
+			ratingAvg,
+			totalEarnings,
+			completedCalls
+		};
 	}
 };
 
