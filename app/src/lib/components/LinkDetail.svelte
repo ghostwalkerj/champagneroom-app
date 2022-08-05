@@ -1,15 +1,10 @@
 <script lang="ts">
+	import { currencyFormatter } from '$lib/constants';
 	import type { LinkDocument } from '$lib/ORM/models/link';
 	import FaMoneyBillWave from 'svelte-icons/fa/FaMoneyBillWave.svelte';
 	import StarRating from 'svelte-star-rating';
 	export let link: LinkDocument;
 	$: rating = 0;
-
-	const formatter = new Intl.NumberFormat('en-US', {
-		style: 'currency',
-		currency: 'USD',
-		maximumFractionDigits: 0
-	});
 </script>
 
 {#if link}
@@ -34,7 +29,7 @@
 				</div>
 				<div class="stat-title">Requested</div>
 				<div class="text-primary stat-value">
-					{formatter.format(link.amount)}
+					{currencyFormatter.format(link.amount)}
 				</div>
 			</div>
 
@@ -44,7 +39,7 @@
 				</div>
 				<div class="stat-title">Funded</div>
 				<div class="text-secondary stat-value">
-					{formatter.format(link.fundedAmount)}
+					{currencyFormatter.format(link.fundedAmount)}
 				</div>
 			</div>
 		</div>

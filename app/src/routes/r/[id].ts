@@ -20,7 +20,7 @@ export async function GET({ params }) {
 			const link = _link.toJSON();
 			const _feedback = await _link.populate('feedback');
 			if (_feedback) {
-				_feedback.update({ $inc: { viewed: 1 } });
+				_feedback.update({ $inc: { viewed: 1 } }); // Increment view count
 				const feedback = _feedback.toJSON();
 				return {
 					body: { token, link, feedback },

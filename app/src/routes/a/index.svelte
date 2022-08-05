@@ -53,11 +53,6 @@
 
 	let agent: AgentDocument;
 	let talents: TalentDocument[];
-	const getTalents = async () => {
-		if (agent.talents) {
-			talents = await agent.populate('talents');
-		}
-	};
 
 	$: talentkey = nanoid();
 	$: talentUrl = urlJoin($page.url.origin, TALENT_PATH, talentkey);

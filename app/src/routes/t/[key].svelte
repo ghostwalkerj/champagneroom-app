@@ -1,4 +1,5 @@
 <script type="ts">
+	import { currencyFormatter } from '$lib/constants';
 	import { browser } from '$app/env';
 	import { page } from '$app/stores';
 	import { createForm } from 'svelte-forms-lib';
@@ -31,6 +32,7 @@
 		totalEarnings: 0,
 		completedCalls: []
 	};
+
 	if (browser) {
 		global = window;
 		import('$lib/videoCall').then((_vc) => {
@@ -56,13 +58,6 @@
 				});
 		});
 	}
-
-	const formatter = new Intl.NumberFormat('en-US', {
-		style: 'currency',
-		currency: 'USD',
-		maximumFractionDigits: 0
-	});
-
 	const updateProfileImage = async (url: string) => {
 		if (url) {
 			talent.update({
@@ -297,11 +292,11 @@
 										<div class="flex">
 											<div class="stat">
 												<div class="stat-title">Amount in Escrow</div>
-												<div class="stat-value">{formatter.format(1400)}</div>
+												<div class="stat-value">{currencyFormatter.format(1400)}</div>
 											</div>
 											<div class="stat">
 												<div class="stat-title">Amount Available</div>
-												<div class="stat-value">{formatter.format(400)}</div>
+												<div class="stat-value">{currencyFormatter.format(400)}</div>
 											</div>
 										</div>
 									</div>
@@ -350,7 +345,7 @@
 																		Completed pCall with <span class="font-medium text-gray-900"
 																			>Ted Cruz</span
 																		>
-																		for {formatter.format(300)}
+																		for {currencyFormatter.format(300)}
 																	</p>
 																</div>
 																<div class="text-right text-sm text-gray-200 whitespace-nowrap">
@@ -433,7 +428,7 @@
 																			href="#"
 																			class="font-medium text-gray-900">Tedward Cruz</span
 																		>
-																		for {formatter.format(500)}
+																		for {currencyFormatter.format(500)}
 																	</p>
 																</div>
 																<div class="text-right text-sm text-gray-200 whitespace-nowrap">
@@ -473,7 +468,7 @@
 																			href="#"
 																			class="font-medium text-gray-900">Zed Cruz</span
 																		>
-																		for {formatter.format(500)}
+																		for {currencyFormatter.format(500)}
 																	</p>
 																</div>
 																<div class="text-right text-sm text-gray-200 whitespace-nowrap">
@@ -513,7 +508,7 @@
 																			href="#"
 																			class="font-medium text-gray-900">Ed Cruz</span
 																		>
-																		for {formatter.format(500)}
+																		for {currencyFormatter.format(500)}
 																	</p>
 																</div>
 																<div class="text-right text-sm text-gray-200 whitespace-nowrap">
@@ -553,7 +548,7 @@
 																			href="#"
 																			class="font-medium text-gray-900">Fred Cruz</span
 																		>
-																		for {formatter.format(500)}
+																		for {currencyFormatter.format(500)}
 																	</p>
 																</div>
 																<div class="text-right text-sm text-gray-200 whitespace-nowrap">

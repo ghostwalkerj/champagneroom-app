@@ -31,3 +31,9 @@ export const INFURA_IPFS_API_URL = import.meta.env.VITE_INFURA_IPFS_API_URL;
 export const INFURA_IPFS_API_PORT = import.meta.env.VITE_INFURA_IPFS_API_PORT;
 
 export const INFURA_IPFS_DEDICATED_GATEWAY = import.meta.env.VITE_INFURA_IPFS_DEDICATED_GATEWAY;
+
+export const currencyFormatter = new Intl.NumberFormat('en-US', {
+	style: 'currency',
+	currency: 'USD',
+	maximumFractionDigits: 0
+});
