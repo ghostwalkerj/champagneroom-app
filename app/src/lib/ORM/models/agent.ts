@@ -1,5 +1,4 @@
 import { DEFAULT_PROFILE_IMAGE } from '$lib/constants';
-import { thisAgentDB } from '$lib/ORM/dbs/agentDB';
 import { TalentString, type TalentDocType, type TalentDocument } from '$lib/ORM/models/talent';
 import { nanoid } from 'nanoid';
 import {
@@ -9,7 +8,6 @@ import {
 	type RxDocument,
 	type RxJsonSchema
 } from 'rxdb';
-import { get } from 'svelte/store';
 type AgentDocMethods = {
 	createTalent: (name: string, key: string, agentCommission: number) => Promise<TalentDocument>;
 };

@@ -1,4 +1,5 @@
 import type { AgentDocument } from '$lib/ORM/models/agent';
+import { FeedbackString } from '$lib/ORM/models/feedback';
 import { LinkStatuses, LinkString, type LinkDocument } from '$lib/ORM/models/link';
 import { nanoid } from 'nanoid';
 import {
@@ -10,7 +11,6 @@ import {
 } from 'rxdb';
 import { get } from 'svelte/store';
 import { v4 as uuidv4 } from 'uuid';
-import { FeedbackString } from '$lib/ORM/models/feedback';
 
 export const TalentString = 'talent';
 
@@ -46,12 +46,6 @@ const talentSchemaLiteral = {
 		},
 		profileImageUrl: {
 			type: 'string'
-		},
-		ratingAvg: {
-			type: 'number',
-			minimum: 0,
-			maximum: 5,
-			default: 0
 		},
 		agentCommission: {
 			type: 'integer',
@@ -94,7 +88,7 @@ type TalentDocMethods = {
 
 export const talentDocMethods: TalentDocMethods = {
 	createLink: async function (this: TalentDocument, amount: number): Promise<LinkDocument> {
-		const db = get(thisTalentDB);
+		const db = this.collection.database;
 		const key = nanoid();
 
 		const _feedback = {
@@ -107,7 +101,8 @@ export const talentDocMethods: TalentDocMethods = {
 			viewed: 0,
 			rating: 0,
 			link: `${LinkString}:l${key}`,
-			talent: this._id
+			talent: this._id,
+			agent: this.agent
 		};
 		const _link = {
 			status: LinkStatuses.ACTIVE,
@@ -121,7 +116,8 @@ export const talentDocMethods: TalentDocMethods = {
 			_id: `${LinkString}:l${key}`,
 			createdAt: new Date().toISOString(),
 			entityType: LinkString,
-			feedback: `${FeedbackString}:f${key}`
+			feedback: `${FeedbackString}:f${key}`,
+			agent: this.agent
 		};
 
 		if (this.currentLink) {
@@ -135,17 +131,25 @@ export const talentDocMethods: TalentDocMethods = {
 		return link;
 	},
 	getStats: async function (this: TalentDocument): Promise<TalentStats> {
+		let ratingAvg = 0;
+		let totalRating = 0;
+		let totalEarnings = 0;
 		const completedCalls = (await this.collection.database.links
-			.find()
-			.where('talentId')
-			.equals(this._id)
-			.and('status')
-			.equals(LinkStatuses.COMPLETED)
+			.find({ selector: { talent: this._id, status: LinkStatuses.COMPLETED } })
 			.exec()) as LinkDocument[];
 
-		const ratingAvg = 0;
-		const totalEarnings = 0;
+		const ids = completedCalls.map((link) => {
+			totalEarnings += link.amount;
+			return link._id;
+		});
 
+		const completedFeedback = await this.collection.database.feedbacks.findByIds(ids);
+		for (const feedback of completedFeedback.values()) {
+			totalRating += feedback.rating;
+		}
+		if (completedFeedback.size > 0) {
+			ratingAvg = totalRating / completedFeedback.size;
+		}
 		return {
 			ratingAvg,
 			totalEarnings,

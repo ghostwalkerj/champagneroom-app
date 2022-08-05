@@ -991,10 +991,10 @@
     "@vercel/nft" "^0.21.0"
     esbuild "^0.14.48"
 
-"@sveltejs/kit@1.0.0-next.402":
-  version "1.0.0-next.402"
-  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-1.0.0-next.402.tgz#664edfc345c2b78cbd451bf43fd4448be2acb207"
-  integrity sha512-F0Mm+bTGOnl+vWKab5uwXsY+5YypC/uveGE0wKyYSE9a/pFQD20WwrvRKePGhUCepiHc7S82jxVZRwjCsToaNQ==
+"@sveltejs/kit@1.0.0-next.403":
+  version "1.0.0-next.403"
+  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-1.0.0-next.403.tgz#bef4f9c56d280de230cdce68b6f817e7b3426fcb"
+  integrity sha512-pKlmthl1SZkbx671Jp+LBoRne0vNzsjSgta9iRhqW/bt/0mx/IjlMd/NOeLuJGo30dAJdefrySoSamiaq47M/g==
   dependencies:
     "@sveltejs/vite-plugin-svelte" "^1.0.1"
     chokidar "^3.5.3"
@@ -4598,7 +4598,7 @@ eventemitter3@4.0.7, eventemitter3@^4.0.4, eventemitter3@^4.0.7:
   resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-4.0.7.tgz#2de9b68f6528d5644ef5c59526a1b4a07306169f"
   integrity sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==
 
-events@^3.0.0:
+events@^3.0.0, events@^3.3.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/events/-/events-3.3.0.tgz#31a95ad0a924e2d2c419a813aeb2c4e878ea7400"
   integrity sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==

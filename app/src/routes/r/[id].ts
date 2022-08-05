@@ -1,9 +1,8 @@
 import { JWT_EXPIRY, JWT_PUBLIC_USER, JWT_SECRET } from '$lib/constants';
-import { publicDB, thisLink } from '$lib/ORM/dbs/publicDB';
+import { publicDB, thisFeedback, thisLink } from '$lib/ORM/dbs/publicDB';
 import { StorageTypes } from '$lib/ORM/rxdb';
 import jwt from 'jsonwebtoken';
 import { get } from 'svelte/store';
-import { thisFeedback } from '$lib/ORM/dbs/publicDB';
 export async function GET({ params }) {
 	const linkId = params.id;
 	const token = jwt.sign(

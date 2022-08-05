@@ -9,9 +9,9 @@
 	import VideoCall from '$lib/components/VideoCall.svelte';
 	import VideoPreview from '$lib/components/VideoPreview.svelte';
 
-	import { talentDB, thisTalent, type TalentDBType } from '$lib/ORM/dbs/talentDB';
+	import { talentDB, type TalentDBType } from '$lib/ORM/dbs/talentDB';
 	import type { LinkDocument } from '$lib/ORM/models/link';
-	import type { TalentDocument } from '$lib/ORM/models/talent';
+	import type { TalentDocument, TalentStats } from '$lib/ORM/models/talent';
 	import { StorageTypes } from '$lib/ORM/rxdb';
 	import { userStream, type UserStreamType } from '$lib/userStream';
 	import type { VideoCallType } from '$lib/videoCall';
@@ -26,6 +26,11 @@
 	let key = $page.params.key;
 	let vc: VideoCallType;
 	let global = globalThis;
+	let talentStats: TalentStats = {
+		ratingAvg: 0,
+		totalEarnings: 0,
+		completedCalls: []
+	};
 	if (browser) {
 		global = window;
 		import('$lib/videoCall').then((_vc) => {
@@ -39,6 +44,9 @@
 				.then((_talent) => {
 					if (_talent) {
 						talent = _talent;
+						talent.getStats().then((_stats) => {
+							talentStats = _stats;
+						});
 						talent.populate('currentLink').then((cl) => {
 							if (cl) {
 								currentLink = cl;
@@ -275,7 +283,7 @@
 								<div class="bg-primary text-primary-content card">
 									<div class="text-center card-body items-center">
 										<h2 class="text-2xl card-title">Your Average Rating</h2>
-										<StarRating rating={talent.ratingAvg || 0} />
+										<StarRating rating={talentStats.ratingAvg || 0} />
 									</div>
 								</div>
 							</div>

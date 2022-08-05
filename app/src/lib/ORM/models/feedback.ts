@@ -36,6 +36,7 @@ const feedbackSchemaLiteral = {
 			type: 'string',
 			ref: 'talents'
 		},
+		agent: { type: 'string', ref: 'agents', maxLength: 70 },
 		rejected: {
 			type: 'integer',
 			default: 0,
@@ -65,7 +66,7 @@ const feedbackSchemaLiteral = {
 		callStart: { type: 'string' },
 		callEnd: { type: 'string' }
 	},
-	indexed: ['talent', 'link'],
+	indexed: ['talent', 'link', 'agent'],
 	required: [
 		'_id',
 		'entityType',

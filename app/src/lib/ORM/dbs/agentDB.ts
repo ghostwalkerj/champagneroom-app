@@ -6,22 +6,26 @@ import {
 	type AgentCollection,
 	type AgentDocument
 } from '$lib/ORM/models/agent';
+import { feedbackSchema, type FeedbackCollection } from '$lib/ORM/models/feedback';
+import { linkSchema, type LinkCollection } from '$lib/ORM/models/link';
 import { talentSchema, type TalentCollection } from '$lib/ORM/models/talent';
 import { initRXDB, StorageTypes } from '$lib/ORM/rxdb';
 import { createRxDatabase, removeRxDatabase, type RxDatabase } from 'rxdb';
 import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
 import { writable } from 'svelte/store';
-import { FeedbackCollection, feedbackSchema } from '$lib/ORM/models/feedback';
-import { LinkCollection, linkSchema } from '$lib/ORM/models/link';
+import { EventEmitter } from 'events';
 
-type CreatorsCollections = {
+// Sync requires more listeners but ok with http2
+EventEmitter.defaultMaxListeners = 25;
+
+type AllCollections = {
 	agents: AgentCollection;
 	talents: TalentCollection;
 	links: LinkCollection;
 	feedbacks: FeedbackCollection;
 };
 
-export type AgentDBType = RxDatabase<CreatorsCollections>;
+export type AgentDBType = RxDatabase<AllCollections>;
 let _agentDB: AgentDBType;
 
 export const agentDB = async (token: string, agentId: string, storage: StorageTypes) =>
@@ -31,7 +35,7 @@ let _currentAgent: AgentDocument | null;
 
 const create = async (token: string, agentId: string, storage: StorageTypes) => {
 	initRXDB(storage);
-	await removeRxDatabase('agent_db', getRxStoragePouch(storage));
+	await removeRxDatabase('pouchdb/agent_db', getRxStoragePouch(storage));
 
 	const _db: AgentDBType = await createRxDatabase({
 		name: 'pouchdb/agent_db',

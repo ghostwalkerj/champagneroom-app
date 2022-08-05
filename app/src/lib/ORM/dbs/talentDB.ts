@@ -1,5 +1,6 @@
 import { CREATORS_ENDPOINT, RXDB_PASSWORD } from '$lib/constants';
-import { type LinkDocument, linkSchema, type LinkCollection } from '$lib/ORM/models/link';
+import { feedbackSchema, type FeedbackCollection } from '$lib/ORM/models/feedback';
+import { linkSchema, type LinkCollection, type LinkDocument } from '$lib/ORM/models/link';
 import {
 	talentDocMethods,
 	talentSchema,
@@ -11,8 +12,10 @@ import { initRXDB } from '$lib/ORM/rxdb';
 import { createRxDatabase, removeRxDatabase, type RxDatabase } from 'rxdb';
 import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
 import { writable } from 'svelte/store';
-import { type FeedbackCollection, feedbackSchema } from '$lib/ORM/models/feedback';
+import { EventEmitter } from 'events';
 
+// Sync requires more listeners but ok with http2
+EventEmitter.defaultMaxListeners = 25;
 type CreatorsCollections = {
 	talents: TalentCollection;
 	links: LinkCollection;
