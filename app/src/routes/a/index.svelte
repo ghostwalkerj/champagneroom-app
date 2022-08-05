@@ -1,8 +1,30 @@
+<script context="module">
+	import { AUTH_PATH, TokenRoles } from '$lib/constants';
+
+	//TODO: Only return token if agent address is good.
+	export async function load({ url, fetch }) {
+		const auth_url = urlJoin(url.origin, AUTH_PATH);
+		try {
+			const res = await fetch(auth_url, {
+				method: 'POST',
+				body: JSON.stringify({
+					tokenRole: TokenRoles.AGENT
+				})
+			});
+			const body = await res.json();
+			const token = body.token;
+			return { props: { token } };
+		} catch (e) {
+			console.log(e);
+		}
+	}
+</script>
+
 <script type="ts">
 	import { page } from '$app/stores';
 	import { TALENT_PATH } from '$lib/constants';
 	import { agentDB } from '$lib/ORM/dbs/agentDB';
-	import { AgentDocument, AgentString } from '$lib/ORM/models/agent';
+	import { type AgentDocument, AgentString } from '$lib/ORM/models/agent';
 	import type { TalentDocument } from '$lib/ORM/models/talent';
 	import { StorageTypes } from '$lib/ORM/rxdb';
 	import { nanoid } from 'nanoid';
@@ -14,13 +36,14 @@
 	export let token: string;
 
 	//TODO: This will be authentication later
-	$: selectedAccount.subscribe(async (account) => {
+	selectedAccount.subscribe(async (account) => {
 		if (account) {
 			const agentId = AgentString + ':' + account;
 			const db = await agentDB(token, agentId, StorageTypes.IDB);
 			db.agents.findOne(agentId).$.subscribe((_agent) => {
 				if (_agent) {
 					agent = _agent;
+					console.log(agent);
 					agent.populate('talents').then((_talents) => {
 						talents = _talents;
 					});
