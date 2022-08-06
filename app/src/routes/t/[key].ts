@@ -2,7 +2,6 @@ import { JWT_CREATOR_USER, JWT_EXPIRY, JWT_SECRET } from '$lib/constants';
 import { talentDB } from '$lib/ORM/dbs/talentDB';
 import { StorageTypes } from '$lib/ORM/rxdb';
 import jwt from 'jsonwebtoken';
-import { get } from 'svelte/store';
 export async function GET({ params }) {
 	const key = params.key;
 	const token = jwt.sign(

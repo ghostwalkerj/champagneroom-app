@@ -1,4 +1,4 @@
-<script type="ts">
+<script lang="ts">
 	import { currencyFormatter } from '$lib/constants';
 	import type { TalentDocument } from '$lib/ORM/models/talent';
 	export let talents: TalentDocument[];

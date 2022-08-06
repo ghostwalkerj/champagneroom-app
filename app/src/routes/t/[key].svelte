@@ -1,7 +1,7 @@
-<script type="ts">
-	import { currencyFormatter } from '$lib/constants';
+<script lang="ts">
 	import { browser } from '$app/env';
 	import { page } from '$app/stores';
+	import { currencyFormatter } from '$lib/constants';
 	import { createForm } from 'svelte-forms-lib';
 	import * as yup from 'yup';
 

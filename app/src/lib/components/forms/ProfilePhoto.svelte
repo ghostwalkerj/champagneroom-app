@@ -1,4 +1,4 @@
-<script type="ts">
+<script lang="ts">
 	// TODO:Add validation
 	import { page } from '$app/stores';
 	import { IMAGE_UPLOAD_PATH } from '$lib/constants';
@@ -81,7 +81,7 @@
 		in:scale
 	>
 		<div
-			class="bg-cover w-48 h-48 bg-no-repeat bg-center rounded-full"
+			class="bg-cover bg-no-repeat bg-center rounded-full h-48 w-48"
 			style="background-image: url('{imageUrl}')"
 		/>
 		<div

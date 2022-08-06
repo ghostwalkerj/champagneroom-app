@@ -1,4 +1,4 @@
-<script type="ts">
+<script lang="ts">
 	import { browser } from '$app/env';
 	import { page } from '$app/stores';
 	import LinkFeedback from '$lib/components/Feedback.svelte';

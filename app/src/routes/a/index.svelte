@@ -1,4 +1,4 @@
-<script context="module">
+<script context="module" lang="ts">
 	import { AUTH_PATH, TokenRoles } from '$lib/constants';
 
 	//TODO: Only return token if agent address is good.
@@ -20,15 +20,15 @@
 	}
 </script>
 
-<script type="ts">
+<script lang="ts">
+	import TalentForm from '$lib/components/forms/TalentForm.svelte';
+	import TalentTable from '$lib/components/forms/TalentTable.svelte';
 	import { agentDB } from '$lib/ORM/dbs/agentDB';
-	import { type AgentDocument, AgentString } from '$lib/ORM/models/agent';
+	import { AgentString, type AgentDocument } from '$lib/ORM/models/agent';
 	import type { TalentDocument } from '$lib/ORM/models/talent';
 	import { StorageTypes } from '$lib/ORM/rxdb';
 	import { selectedAccount } from 'svelte-web3';
 	import urlJoin from 'url-join';
-	import TalentForm from '$lib/components/forms/TalentForm.svelte';
-	import TalentTable from '$lib/components/forms/TalentTable.svelte';
 
 	export let token: string;
 

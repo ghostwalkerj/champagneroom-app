@@ -1,4 +1,4 @@
-<script type="ts">
+<script lang="ts">
 	import type { AgentDocument } from '$lib/ORM/models/agent';
 	import type { TalentDocument } from '$lib/ORM/models/talent';
 	import { createForm } from 'svelte-forms-lib';

@@ -1,4 +1,4 @@
-<script type="ts">
+<script lang="ts">
 	import WalletConnectProvider from '@walletconnect/web3-provider/dist/umd/index.min.js';
 	import FaExternalLinkAlt from 'svelte-icons/fa/FaExternalLinkAlt.svelte';
 	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';
