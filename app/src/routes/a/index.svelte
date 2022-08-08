@@ -68,8 +68,8 @@
 						<AgentWallet {agent} />
 					</div>
 					{#key talents}
-						<div class="p-1  lg:col-span-2">
-							<TopTalent {agent} />
+						<div class="p-1  lg:col-span-1">
+							<TopTalent {agent} {talents} />
 						</div>
 						<!-- Talent viewing and adding -->
 						<div class="p-1">

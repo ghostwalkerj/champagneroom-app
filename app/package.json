@@ -69,6 +69,7 @@
 	"dependencies": {
 		"@walletconnect/web3-provider": "^1.7.8",
 		"broadcast-channel": "^4.13.0",
+		"chart.js": "^3.9.1",
 		"dequal": "^2.0.3",
 		"events": "^3.3.0",
 		"express": "^4.18.1",
@@ -87,6 +88,7 @@
 		"simple-peer": "^9.11.1",
 		"socket.io": "^4.5.1",
 		"socket.io-client": "^4.5.1",
+		"svelte-chartjs": "^2.0.1",
 		"svelte-fsm": "^1.1.2",
 		"svelte-image": "^0.2.9",
 		"svelte-proxied-store": "^1.1.4",
