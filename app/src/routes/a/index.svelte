@@ -64,7 +64,7 @@
 				<div class="mx-auto  grid grid-cols-1 lg:grid-cols-3">
 					<!-- Talent viewing and adding -->
 					{#key talents}
-						<div class="p-2  lg:col-span-3">
+						<div class="p-2  lg:col-span-2">
 							<TalentTable {talents} />
 						</div>
 						<div class="p-2">

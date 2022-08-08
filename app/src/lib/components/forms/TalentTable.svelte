@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { writable } from 'svelte/store';
+	import TalentLink from '$lib/components/forms/TalentLink.svelte';
+	import TableRating from '$lib/components/forms/TableRating.svelte';
 	import { currencyFormatter } from '$lib/constants';
 	import type { TalentDocument } from '$lib/ORM/models/talent';
 	import SvelteTable from 'svelte-table';
@@ -12,6 +13,8 @@
 		rating: number;
 		calls: number;
 		earnings: number;
+		commisson: number;
+		myEarnings: number;
 		url: string;
 	};
 
@@ -39,7 +42,10 @@
 			title: 'Average Rating',
 			value: (v: TalentRow) => v.rating,
 			sortable: true,
-			headerClass: 'font-semibold text-left text-sm py-3.5 px-3 text-gray-900'
+			headerClass: 'font-semibold text-left text-sm py-3.5 px-3 text-gray-900',
+			renderComponent: {
+				component: TableRating
+			}
 		},
 		{
 			key: 'calls',
@@ -57,12 +63,30 @@
 			renderValue: (v: TalentRow) => currencyFormatter.format(v.earnings)
 		},
 		{
+			key: 'commission',
+			title: 'Commission (%)',
+			value: (v: TalentRow) => v.commisson,
+			sortable: true,
+			headerClass: 'font-semibold text-left text-sm py-3.5 px-3 text-gray-900',
+			renderValue: (v: TalentRow) => `${v.commisson}%`
+		},
+		{
+			key: 'myearnings',
+			title: 'Commision ($)',
+			value: (v: TalentRow) => v.myEarnings,
+			sortable: true,
+			headerClass: 'font-semibold text-left text-sm py-3.5 px-3 text-gray-900',
+			renderValue: (v: TalentRow) => currencyFormatter.format(v.myEarnings)
+		},
+		{
 			key: 'url',
-			title: 'Private Link',
+			title: "Talent's Link",
 			value: (v: TalentRow) => v.url,
 			sortable: false,
 			headerClass: 'font-semibold text-left text-sm py-3.5 px-3 text-gray-900',
-			renderValue: (v: TalentRow) => `<a href="/t/${v.url}">${v.name}</a>`
+			renderComponent: {
+				component: TalentLink
+			}
 		}
 	];
 
@@ -75,7 +99,9 @@
 				rating: stats.ratingAvg,
 				calls: stats.completedCalls.length,
 				earnings: stats.totalEarnings,
-				url: talent.key
+				url: talent.key,
+				commisson: talent.agentCommission,
+				myEarnings: stats.totalEarnings * talent.agentCommission
 			});
 		});
 	}
@@ -88,64 +114,9 @@
 	<SvelteTable
 		{columns}
 		rows={talentRows}
-		classNameTable="divide-y min-w-full divide-gray-300"
+		classNameTable="divide-y divide-gray-300"
 		classNameThead="bg-gray-50"
 		classNameTbody="divide-y bg-white divide-gray-200"
 		classNameCell="text-sm py-4 px-3 text-gray-500 whitespace-nowrap"
 	/>
-
-	<!-- <table class="divide-y min-w-full divide-gray-300">
-		<thead class="bg-gray-50">
-			<tr>
-				<th
-					scope="col"
-					class="font-semibold text-left text-sm py-3.5 pr-3 pl-4 text-gray-900 sm:pl-6">Name</th
-				>
-				<th scope="col" class="font-semibold text-left text-sm py-3.5 px-3 text-gray-900"
-					>Avg Rating</th
-				>
-				<th scope="col" class="font-semibold text-left text-sm py-3.5 px-3 text-gray-900"
-					>Completed Calls</th
-				>
-				<th scope="col" class="font-semibold text-left text-sm py-3.5 px-3 text-gray-900"
-					>Total Earnings</th
-				>
-				<th scope="col" class="font-semibold text-left text-sm py-3.5 px-3 text-gray-900"
-					>Private Link</th
-				>
-			</tr>
-		</thead>
-		<tbody class="divide-y bg-white divide-gray-200">
-			{#if talents && talents.length > 0}
-				{#each talentRows as talent}
-					<tr>
-						<td class="text-sm py-4 pr-3 pl-4 whitespace-nowrap sm:pl-6">
-							<div class="flex items-center">
-								<div
-									class="bg-cover bg-no-repeat bg-center rounded-full h-10 w-10"
-									style="background-image: url('{talent.photo}')"
-								/>
-								<div class="ml-4">
-									<div class="font-medium text-gray-900">{talent.name}</div>
-								</div>
-							</div>
-						</td>
-
-						<td class="text-sm text-center py-4 px-3 text-gray-500 whitespace-nowrap">
-							{talent.rating}
-						</td>
-						<td class="text-sm text-center py-4 px-3 text-gray-500 whitespace-nowrap">
-							{talent.calls}
-						</td>
-						<td class="text-sm text-center py-4 px-3 text-gray-500 whitespace-nowrap">
-							{currencyFormatter.format(talent.earnings)}
-						</td>
-						<td class="text-sm py-4 px-3 text-gray-500 whitespace-nowrap">
-							<a href="/t/{talent.url}">{talent.name}</a>
-						</td>
-					</tr>
-				{/each}
-			{/if}
-		</tbody>
-	</table> -->
 </div>

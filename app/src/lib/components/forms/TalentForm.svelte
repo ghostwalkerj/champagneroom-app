@@ -50,9 +50,7 @@
 					<div class="shadow-lg alert alert-error">{$errors.name}</div>
 				{/if}
 
-				<label for="price" class="label">
-					<span class="label-text">Commission Percentage</span></label
-				>
+				<label for="price" class="label"> <span class="label-text">Commission (%)</span></label>
 				<div class="form-control">
 					<!-- svelte-ignore a11y-label-has-associated-control -->
 

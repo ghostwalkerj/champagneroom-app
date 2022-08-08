@@ -65,7 +65,7 @@ const talentSchemaLiteral = {
 		},
 		agent: { type: 'string', ref: 'agents', maxLength: 50 }
 	},
-	required: ['_id', 'key', 'name', 'profileImageUrl', 'agent'],
+	required: ['_id', 'key', 'name', 'profileImageUrl', 'agent', 'agentCommission'],
 	indexed: ['key', 'agent']
 } as const;
 
