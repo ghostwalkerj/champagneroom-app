@@ -1,7 +1,6 @@
 <script lang="ts">
-	import TalentLink from '$lib/components/forms/TalentLink.svelte';
 	import TableRating from '$lib/components/forms/TableRating.svelte';
-	import { currencyFormatter } from '$lib/constants';
+	import { currencyFormatter, TALENT_PATH } from '$lib/constants';
 	import type { TalentDocument } from '$lib/ORM/models/talent';
 	import SvelteTable from 'svelte-table';
 
@@ -84,9 +83,14 @@
 			value: (v: TalentRow) => v.url,
 			sortable: false,
 			headerClass: 'font-semibold text-left text-sm py-3.5 px-3 text-gray-900',
-			renderComponent: {
-				component: TalentLink
-			}
+			renderValue: (v: TalentRow) => `<a href="/${TALENT_PATH}/${v.url}">${v.name}</a>`
+		},
+		{
+			key: 'action',
+			title: '',
+			sortable: false,
+			headerClass: 'font-semibold text-left text-sm py-3.5 px-3 text-gray-900',
+			renderValue: () => '<button class="btn btn-secondary btn-xs">Edit</button>'
 		}
 	];
 
@@ -109,12 +113,12 @@
 
 <div class="bg-primary text-primary-content card">
 	<div class="text-center card-body items-center">
-		<h2 class="card-title">Manage Talent</h2>
+		<h2 class="text-2xl card-title">Manage Talent</h2>
 	</div>
 	<SvelteTable
 		{columns}
 		rows={talentRows}
-		classNameTable="divide-y divide-gray-300"
+		classNameTable="divide-y divide-gray-300 "
 		classNameThead="bg-gray-50"
 		classNameTbody="divide-y bg-white divide-gray-200"
 		classNameCell="text-sm py-4 px-3 text-gray-500 whitespace-nowrap"
