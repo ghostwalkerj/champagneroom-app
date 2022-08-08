@@ -19,7 +19,7 @@
 		"@metamask/jazzicon": "^2.0.0",
 		"@playwright/test": "^1.23.2",
 		"@sveltejs/adapter-auto": "next",
-		"@sveltejs/adapter-node": "next",
+		"@sveltejs/adapter-node": "^1.0.0-next.86",
 		"@sveltejs/kit": "1.0.0-next.403",
 		"@typechain/ethers-v5": "^10.1.0",
 		"@typechain/hardhat": "^6.1.2",

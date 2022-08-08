@@ -1110,12 +1110,10 @@
     set-cookie-parser "^2.4.8"
     tiny-glob "^0.2.9"
 
-"@sveltejs/adapter-node@next":
-  version "1.0.0-next.85"
-  resolved "https://registry.yarnpkg.com/@sveltejs/adapter-node/-/adapter-node-1.0.0-next.85.tgz#a28071947bccc14f60227754da5bdc2e059c9cc7"
-  integrity sha512-rSiUAbFZbxP0QdcBmtIudR1F1jHUfjUNk7cguUfOnJ9HyuKmXxFctY6lz68pO1bX2kTHf9ixu9DKC7VfDmt2mg==
-  dependencies:
-    tiny-glob "^0.2.9"
+"@sveltejs/adapter-node@^1.0.0-next.86":
+  version "1.0.0-next.86"
+  resolved "https://registry.yarnpkg.com/@sveltejs/adapter-node/-/adapter-node-1.0.0-next.86.tgz#0d0e6a432de786c8153f7c4e1cb925e6ba162a4b"
+  integrity sha512-VfKcFukVEPoAdm8tVGkFLyDDMZe+9HLFW7X/9Ch/UrSCHo3/HyOfYt/slmh+sjGXYjIBAtTjacrIfcMdYh744g==
 
 "@sveltejs/adapter-vercel@1.0.0-next.66":
   version "1.0.0-next.66"
@@ -1236,9 +1234,9 @@
     "@types/responselike" "*"
 
 "@types/chai@^4.3.1":
-  version "4.3.1"
-  resolved "https://registry.yarnpkg.com/@types/chai/-/chai-4.3.1.tgz#e2c6e73e0bdeb2521d00756d099218e9f5d90a04"
-  integrity sha512-/zPMqDkzSZ8t3VtxOa4KPq7uzzW978M9Tvh+j7GHKuo6k6GTLxPJ4J5gE5cjfJ26pnXst0N5Hax8Sr0T2Mi9zQ==
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@types/chai/-/chai-4.3.2.tgz#29b4afe85a0bb85f3d39a586f25038a8d78229b2"
+  integrity sha512-TNeRJV5O1L0s7NM4Xg9q8HPbLnyAMQ9twPMul53hWRld//NnjV/VSw7InBCNrPJyWBPhyoSLlzR2mR9Fq5nJTg==
 
 "@types/clone@2.1.1":
   version "2.1.1"
