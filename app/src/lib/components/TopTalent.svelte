@@ -15,7 +15,14 @@
 
 	const options = {
 		responsive: true,
-		scales: {}
+		circumference: 180,
+		rotation: -90,
+		animation: {
+			animateScal: true
+		},
+		plugins: {
+			legend: { display: true, position: 'bottom' }
+		}
 	};
 
 	const data = {
@@ -24,19 +31,16 @@
 			{
 				data: [300, 50, 100],
 				backgroundColor: ['#2D1B69', '#58C7F3', '#F3CC30'],
-				// hoverOffset: 4,
 				borderWidth: 0
 			}
 		]
 	};
-	ChartJS.overrides.doughnut.plugins.legend.position = 'bottom';
 	ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale);
 </script>
 
-<div class="bg-primary text-primary-content w-full card">
+<div class="bg-primary text-primary-content  card">
 	<div class="text-center card-body items-center">
 		<h2 class="text-2xl card-title">Top Talent - {month}</h2>
-
 		<Doughnut {data} {options} />
 	</div>
 </div>
