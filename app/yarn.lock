@@ -1165,18 +1165,6 @@
   dependencies:
     defer-to-connect "^2.0.1"
 
-"@tanstack/svelte-table@^8.5.11":
-  version "8.5.11"
-  resolved "https://registry.yarnpkg.com/@tanstack/svelte-table/-/svelte-table-8.5.11.tgz#d12c53bd238759aa72927324f2a2ea60ef0a7dc3"
-  integrity sha512-HGWx44Rq9AZ+e/zmnHUqZonDQJh+HUHMV9YR6xAr+7qlXVdc7n/lQleHmlS3LkLLfKkrEUrGPtdXum155phNtg==
-  dependencies:
-    "@tanstack/table-core" "8.5.11"
-
-"@tanstack/table-core@8.5.11":
-  version "8.5.11"
-  resolved "https://registry.yarnpkg.com/@tanstack/table-core/-/table-core-8.5.11.tgz#a23178a097df4b0b64bdfa6f79e6d8933e97c7f7"
-  integrity sha512-ZN61ockLaIAiiPbZfMKT2S03nbWx28OHg/nAiDnNfmN4QmAMcdwVajPn2QQwnNVGAr4jS4nbhbYzCcjq8livXQ==
-
 "@tsconfig/node10@^1.0.7":
   version "1.0.9"
   resolved "https://registry.yarnpkg.com/@tsconfig/node10/-/node10-1.0.9.tgz#df4907fc07a886922637b15e02d4cebc4c0021b2"
@@ -10120,6 +10108,11 @@ svelte-star-rating@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/svelte-star-rating/-/svelte-star-rating-2.0.0.tgz#0055add20d2de85fc81be61e7aae27a5c34d19ab"
   integrity sha512-1krisQtIQIOWrm1Hb+P9aYwcTleX2iJvzExz9rvWNAHUEeIlsL2O8JCNZgScS9f3FUri09Dcg56meX40Jb8pZA==
+
+svelte-table@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/svelte-table/-/svelte-table-0.5.0.tgz#e6728021b5b1cfd2edaa5870e8b9e8d31bd0e7b6"
+  integrity sha512-wh4PzJq4R6iA0YCv0tgyc4oR8xVAC2ZwzkzT+tqZTHscH+Vu8srzP4eeIRklKPggSO2yN4sDABVHriVbM5PDQQ==
 
 svelte-waypoint@latest:
   version "0.1.4"

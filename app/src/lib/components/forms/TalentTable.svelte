@@ -2,14 +2,7 @@
 	import { writable } from 'svelte/store';
 	import { currencyFormatter } from '$lib/constants';
 	import type { TalentDocument } from '$lib/ORM/models/talent';
-	import {
-		type ColumnDef,
-		createSvelteTable,
-		flexRender,
-		getCoreRowModel,
-		type TableOptions,
-		getSortedRowModel
-	} from '@tanstack/svelte-table';
+	import SvelteTable from 'svelte-table';
 
 	export let talents: TalentDocument[];
 
@@ -24,68 +17,54 @@
 
 	let talentRows: TalentRow[] = [];
 
-	const defaultColumns: ColumnDef<TalentRow>[] = [
+	const columns = [
 		{
-			accessorKey: 'name',
-			header: () => 'Name',
-			footer: (info) => info.column.id
+			key: 'name',
+			title: 'Name',
+			value: (v: TalentRow) => v.name,
+			sortable: true,
+			headerClass: 'font-semibold text-left text-sm py-3.5 pr-3 pl-4 text-gray-900 sm:pl-6',
+			class: 'text-sm py-4 pr-3 pl-4 whitespace-nowrap sm:pl-6',
+			renderValue: (v: TalentRow) =>
+				`<div class="flex items-center">
+						<div class="bg-cover bg-no-repeat bg-center rounded-full h-10 w-10"
+								style="background-image: url('${v.photo}')"></div>
+						<div class="ml-4">
+								<div class="font-medium text-gray-900">${v.name}</div>
+						</div>
+				</div>`
 		},
 		{
-			accessorKey: 'photo',
-			header: () => 'Photo',
-			footer: (info) => info.column.id
+			key: 'rating',
+			title: 'Average Rating',
+			value: (v: TalentRow) => v.rating,
+			sortable: true,
+			headerClass: 'font-semibold text-left text-sm py-3.5 px-3 text-gray-900'
 		},
 		{
-			accessorKey: 'rating',
-			header: () => 'Rating',
-			footer: (info) => info.column.id
+			key: 'calls',
+			title: 'Calls',
+			value: (v: TalentRow) => v.calls,
+			sortable: true,
+			headerClass: 'font-semibold text-left text-sm py-3.5 px-3 text-gray-900'
 		},
 		{
-			accessorKey: 'calls',
-			header: () => 'Calls',
-			footer: (info) => info.column.id
+			key: 'earnings',
+			title: 'Earnings',
+			value: (v: TalentRow) => v.earnings,
+			sortable: true,
+			headerClass: 'font-semibold text-left text-sm py-3.5 px-3 text-gray-900',
+			renderValue: (v: TalentRow) => currencyFormatter.format(v.earnings)
 		},
 		{
-			accessorKey: 'earnings',
-			header: () => 'Earnings',
-			footer: (info) => info.column.id
-		},
-		{
-			accessorKey: 'url',
-			header: () => 'URL',
-			footer: (info) => info.column.id
+			key: 'url',
+			title: 'Private Link',
+			value: (v: TalentRow) => v.url,
+			sortable: false,
+			headerClass: 'font-semibold text-left text-sm py-3.5 px-3 text-gray-900',
+			renderValue: (v: TalentRow) => `<a href="/t/${v.url}">${v.name}</a>`
 		}
 	];
-
-	let sorting = [];
-
-	const setSorting = (updater) => {
-		if (updater instanceof Function) {
-			sorting = updater(sorting);
-		} else {
-			sorting = updater;
-		}
-		options.update((old) => ({
-			...old,
-			state: {
-				...old.state,
-				sorting
-			}
-		}));
-	};
-
-	const options = writable<TableOptions<TalentRow>>({
-		data: talentRows,
-		columns: defaultColumns,
-		state: {
-			sorting
-		},
-		onSortingChange: setSorting,
-		getCoreRowModel: getCoreRowModel(),
-		getSortedRowModel: getSortedRowModel()
-	});
-
-	const table = createSvelteTable(options);
 
 	if (talents) {
 		talents.forEach(async (talent: TalentDocument) => {
@@ -98,10 +77,6 @@
 				earnings: stats.totalEarnings,
 				url: talent.key
 			});
-			options.update((options) => ({
-				...options,
-				data: talentRows
-			}));
 		});
 	}
 </script>
@@ -110,45 +85,67 @@
 	<div class="text-center card-body items-center">
 		<h2 class="card-title">Manage Talent</h2>
 	</div>
-	<table class="divide-y min-w-full divide-gray-300">
+	<SvelteTable
+		{columns}
+		rows={talentRows}
+		classNameTable="divide-y min-w-full divide-gray-300"
+		classNameThead="bg-gray-50"
+		classNameTbody="divide-y bg-white divide-gray-200"
+		classNameCell="text-sm py-4 px-3 text-gray-500 whitespace-nowrap"
+	/>
+
+	<!-- <table class="divide-y min-w-full divide-gray-300">
 		<thead class="bg-gray-50">
-			{#each $table.getHeaderGroups() as headerGroup}
-				<tr>
-					{#each headerGroup.headers as header}
-						<th
-							scope="col"
-							class="font-semibold text-left text-sm py-3.5 pr-3 pl-4 text-gray-900 sm:pl-6"
-						>
-							{#if !header.isPlaceholder}
-								<div
-									class:cursor-pointer={header.column.getCanSort()}
-									class:select-none={header.column.getCanSort()}
-									on:click={header.column.getToggleSortingHandler()}
-								>
-									<svelte:component
-										this={flexRender(header.column.columnDef.header, header.getContext())}
-									/>
-									{{
-										asc: ' 🔼',
-										desc: ' 🔽'
-									}[header.column.getIsSorted().toString()] ?? ''}
-								</div>
-							{/if}
-						</th>
-					{/each}
-				</tr>
-			{/each}
+			<tr>
+				<th
+					scope="col"
+					class="font-semibold text-left text-sm py-3.5 pr-3 pl-4 text-gray-900 sm:pl-6">Name</th
+				>
+				<th scope="col" class="font-semibold text-left text-sm py-3.5 px-3 text-gray-900"
+					>Avg Rating</th
+				>
+				<th scope="col" class="font-semibold text-left text-sm py-3.5 px-3 text-gray-900"
+					>Completed Calls</th
+				>
+				<th scope="col" class="font-semibold text-left text-sm py-3.5 px-3 text-gray-900"
+					>Total Earnings</th
+				>
+				<th scope="col" class="font-semibold text-left text-sm py-3.5 px-3 text-gray-900"
+					>Private Link</th
+				>
+			</tr>
 		</thead>
 		<tbody class="divide-y bg-white divide-gray-200">
-			{#each $table.getRowModel().rows as row}
-				<tr>
-					{#each row.getVisibleCells() as cell}
+			{#if talents && talents.length > 0}
+				{#each talentRows as talent}
+					<tr>
 						<td class="text-sm py-4 pr-3 pl-4 whitespace-nowrap sm:pl-6">
-							<svelte:component this={flexRender(cell.column.columnDef.cell, cell.getContext())} />
+							<div class="flex items-center">
+								<div
+									class="bg-cover bg-no-repeat bg-center rounded-full h-10 w-10"
+									style="background-image: url('{talent.photo}')"
+								/>
+								<div class="ml-4">
+									<div class="font-medium text-gray-900">{talent.name}</div>
+								</div>
+							</div>
 						</td>
-					{/each}
-				</tr>
-			{/each}
+
+						<td class="text-sm text-center py-4 px-3 text-gray-500 whitespace-nowrap">
+							{talent.rating}
+						</td>
+						<td class="text-sm text-center py-4 px-3 text-gray-500 whitespace-nowrap">
+							{talent.calls}
+						</td>
+						<td class="text-sm text-center py-4 px-3 text-gray-500 whitespace-nowrap">
+							{currencyFormatter.format(talent.earnings)}
+						</td>
+						<td class="text-sm py-4 px-3 text-gray-500 whitespace-nowrap">
+							<a href="/t/{talent.url}">{talent.name}</a>
+						</td>
+					</tr>
+				{/each}
+			{/if}
 		</tbody>
-	</table>
+	</table> -->
 </div>

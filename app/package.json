@@ -67,7 +67,6 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@tanstack/svelte-table": "^8.5.11",
 		"@walletconnect/web3-provider": "^1.7.8",
 		"broadcast-channel": "^4.13.0",
 		"dequal": "^2.0.3",
@@ -92,6 +91,7 @@
 		"svelte-image": "^0.2.9",
 		"svelte-proxied-store": "^1.1.4",
 		"svelte-star-rating": "^2.0.0",
+		"svelte-table": "^0.5.0",
 		"svelte-web3": "^3.5.0",
 		"ua-parser-js": "^1.0.2",
 		"url-join": "^5.0.0",
