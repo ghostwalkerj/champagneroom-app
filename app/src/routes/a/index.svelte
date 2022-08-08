@@ -63,12 +63,14 @@
 				<div class="mx-auto  w-full px-4 md:flex  md:items-center md:justify-between " />
 				<div class="mx-auto  grid grid-cols-1 lg:grid-cols-3">
 					<!-- Talent viewing and adding -->
-					<div class="p-2  lg:col-span-3">
-						<TalentTable {talents} />
-					</div>
-					<div class="p-2">
-						<TalentForm {agent} {talents} />
-					</div>
+					{#key talents}
+						<div class="p-2  lg:col-span-3">
+							<TalentTable {talents} />
+						</div>
+						<div class="p-2">
+							<TalentForm {agent} {talents} />
+						</div>
+					{/key}
 				</div>
 			</div>
 		</main>

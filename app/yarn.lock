@@ -1165,6 +1165,18 @@
   dependencies:
     defer-to-connect "^2.0.1"
 
+"@tanstack/svelte-table@^8.5.11":
+  version "8.5.11"
+  resolved "https://registry.yarnpkg.com/@tanstack/svelte-table/-/svelte-table-8.5.11.tgz#d12c53bd238759aa72927324f2a2ea60ef0a7dc3"
+  integrity sha512-HGWx44Rq9AZ+e/zmnHUqZonDQJh+HUHMV9YR6xAr+7qlXVdc7n/lQleHmlS3LkLLfKkrEUrGPtdXum155phNtg==
+  dependencies:
+    "@tanstack/table-core" "8.5.11"
+
+"@tanstack/table-core@8.5.11":
+  version "8.5.11"
+  resolved "https://registry.yarnpkg.com/@tanstack/table-core/-/table-core-8.5.11.tgz#a23178a097df4b0b64bdfa6f79e6d8933e97c7f7"
+  integrity sha512-ZN61ockLaIAiiPbZfMKT2S03nbWx28OHg/nAiDnNfmN4QmAMcdwVajPn2QQwnNVGAr4jS4nbhbYzCcjq8livXQ==
+
 "@tsconfig/node10@^1.0.7":
   version "1.0.9"
   resolved "https://registry.yarnpkg.com/@tsconfig/node10/-/node10-1.0.9.tgz#df4907fc07a886922637b15e02d4cebc4c0021b2"
