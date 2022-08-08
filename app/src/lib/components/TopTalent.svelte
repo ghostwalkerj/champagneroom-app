@@ -1,14 +1,15 @@
 <script lang="ts">
 	import type { AgentDocument } from '$lib/ORM/models/agent';
 	import { Doughnut } from 'svelte-chartjs';
-	import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement, CategoryScale } from 'chart.js';
+	import { Chart, Title, Tooltip, Legend, ArcElement, CategoryScale } from 'chart.js';
 	import type { TalentDocument } from '$lib/ORM/models/talent';
 	export let agent: AgentDocument;
 	export let talents: TalentDocument[];
+	import ChartDataLabels from 'chartjs-plugin-datalabels';
+	import { currencyFormatter } from '$lib/constants';
 
 	const month = new Date().toLocaleString('default', { month: 'long' });
 	let labels = [] as string[];
-
 	if (talents) {
 		labels = talents.map((talent) => talent.name);
 	}
@@ -21,7 +22,13 @@
 			animateScal: true
 		},
 		plugins: {
-			legend: { display: true, position: 'bottom' }
+			legend: { display: true, position: 'bottom' },
+			datalabels: {
+				formatter: function (value, context) {
+					return currencyFormatter.format(value);
+				}
+				//anchor: 'end'
+			}
 		}
 	};
 
@@ -35,7 +42,8 @@
 			}
 		]
 	};
-	ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale);
+	Chart.register(Title, Tooltip, Legend, ArcElement, CategoryScale);
+	Chart.register(ChartDataLabels);
 </script>
 
 <div class="bg-primary text-primary-content  card">
