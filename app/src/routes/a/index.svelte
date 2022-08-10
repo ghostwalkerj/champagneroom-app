@@ -1,5 +1,6 @@
 <script context="module" lang="ts">
 	import { AUTH_PATH, TokenRoles } from '$lib/constants';
+	import urlJoin from 'url-join';
 
 	//TODO: Only return token if agent address is good.
 	export async function load({ url, fetch }) {
@@ -28,7 +29,6 @@
 	import type { TalentDocument } from '$lib/ORM/models/talent';
 	import { StorageTypes } from '$lib/ORM/rxdb';
 	import { selectedAccount } from 'svelte-web3';
-	import urlJoin from 'url-join';
 	import AgentWallet from '$lib/components/AgentWallet.svelte';
 	import TopTalent from '$lib/components/TopTalent.svelte';
 
@@ -63,17 +63,17 @@
 				<div class="divider" />
 
 				<div class="mx-auto  w-full px-4 md:flex  md:items-center md:justify-between " />
-				<div class="mx-auto  grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+				<div class="mx-auto grid gap-2 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
 					<div class="p-1">
 						<AgentWallet {agent} />
 					</div>
 					{#key talents}
-						<div class="p-1  lg:col-span-1">
-							<TopTalent {agent} {talents} />
-						</div>
 						<!-- Talent viewing and adding -->
 						<div class="p-1">
 							<TalentForm {agent} {talents} />
+						</div>
+						<div class="p-1 row-span-2 ">
+							<TopTalent {agent} {talents} />
 						</div>
 						<div class="p-1  lg:col-span-2">
 							<TalentTable {talents} />

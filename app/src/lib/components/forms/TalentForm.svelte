@@ -26,7 +26,7 @@
 	});
 </script>
 
-<div class="bg-primary text-primary-content w-full card">
+<div class="bg-primary h-full text-primary-content w-full card">
 	<div class="text-center card-body items-center">
 		<h2 class="text-2xl card-title">Add New Talent</h2>
 
