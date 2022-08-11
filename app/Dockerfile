@@ -1,9 +1,7 @@
-# couchDB install
-FROM couchdb:alpine
-
 # pCall install
 FROM node:alpine
 ENV NODE_ENV=production
+ENV DOCKERIZED=true
 WORKDIR /app
 COPY package*.json ./
 RUN apk add --no-cache \

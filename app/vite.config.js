@@ -8,6 +8,9 @@ const config = {
 	plugins: [sveltekit(), WindiCSS()],
 	optimizeDeps: {
 	},
+	ssr: {
+		noExternal: ['chart.js/**']
+	}
 };
 
 export default config;
