@@ -23,7 +23,7 @@ let _thisLink: LinkDocument | null;
 
 const create = async (token: string, linkId: string, storage: StorageTypes) => {
 	initRXDB(storage);
-	await removeRxDatabase('pouchdb/public_db', getRxStoragePouch(storage));
+	//await removeRxDatabase('pouchdb/public_db', getRxStoragePouch(storage));
 
 	const _db: PublicDBType = await createRxDatabase({
 		name: 'pouchdb/public_db',
@@ -40,59 +40,64 @@ const create = async (token: string, linkId: string, storage: StorageTypes) => {
 			schema: feedbackSchema
 		}
 	});
-	const remoteDB = new PouchDB(PUBLIC_ENDPOINT, {
-		fetch: function (
-			url: string,
-			opts: { headers: { set: (arg0: string, arg1: string) => void } }
-		) {
-			opts.headers.set('Authorization', 'Bearer ' + token);
-			return PouchDB.fetch(url, opts);
-		}
-	});
-	const linkQuery = _db.links.findOne(linkId);
 
-	let repState = _db.links.syncCouchDB({
-		remote: remoteDB,
-		waitForLeadership: false,
-		options: {
-			retry: true
-		},
-		query: linkQuery
-	});
-	await repState.awaitInitialReplication();
+	if (PUBLIC_ENDPOINT) {
+		// Sync if there is a remote endpoint
 
-	_thisLink = await linkQuery.exec();
-	if (_thisLink) {
-		const feedbackQuery = _db.feedbacks.findOne(_thisLink.feedback);
+		const remoteDB = new PouchDB(PUBLIC_ENDPOINT, {
+			fetch: function (
+				url: string,
+				opts: { headers: { set: (arg0: string, arg1: string) => void } }
+			) {
+				opts.headers.set('Authorization', 'Bearer ' + token);
+				return PouchDB.fetch(url, opts);
+			}
+		});
+		const linkQuery = _db.links.findOne(linkId);
 
-		repState = _db.feedbacks.syncCouchDB({
+		let repState = _db.links.syncCouchDB({
 			remote: remoteDB,
 			waitForLeadership: false,
 			options: {
 				retry: true
 			},
-			query: feedbackQuery
+			query: linkQuery
 		});
 		await repState.awaitInitialReplication();
 
-		_db.links.syncCouchDB({
-			remote: remoteDB,
-			waitForLeadership: true,
-			options: {
-				retry: true,
-				live: true
-			},
-			query: linkQuery
-		});
-		_db.feedbacks.syncCouchDB({
-			remote: remoteDB,
-			waitForLeadership: true,
-			options: {
-				retry: true,
-				live: true
-			},
-			query: feedbackQuery
-		});
+		_thisLink = await linkQuery.exec();
+		if (_thisLink) {
+			const feedbackQuery = _db.feedbacks.findOne(_thisLink.feedback);
+
+			repState = _db.feedbacks.syncCouchDB({
+				remote: remoteDB,
+				waitForLeadership: false,
+				options: {
+					retry: true
+				},
+				query: feedbackQuery
+			});
+			await repState.awaitInitialReplication();
+
+			_db.links.syncCouchDB({
+				remote: remoteDB,
+				waitForLeadership: true,
+				options: {
+					retry: true,
+					live: true
+				},
+				query: linkQuery
+			});
+			_db.feedbacks.syncCouchDB({
+				remote: remoteDB,
+				waitForLeadership: true,
+				options: {
+					retry: true,
+					live: true
+				},
+				query: feedbackQuery
+			});
+		}
 	}
 	_publicDB = _db;
 	return _publicDB;

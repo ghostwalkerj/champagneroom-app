@@ -45,6 +45,9 @@
 					agent.populate('talents').then((_talents) => {
 						talents = _talents;
 					});
+				} else {
+					console.log('Create new agent');
+					db.agents.createAgent(account);
 				}
 			});
 		}

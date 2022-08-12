@@ -31,7 +31,7 @@ export const agentDB = async (token: string, agentId: string, storage: StorageTy
 
 const create = async (token: string, agentId: string, storage: StorageTypes) => {
 	initRXDB(storage);
-	await removeRxDatabase('pouchdb/agent_db', getRxStoragePouch(storage));
+	//await removeRxDatabase('pouchdb/agent_db', getRxStoragePouch(storage));
 
 	const _db: AgentDBType = await createRxDatabase({
 		name: 'pouchdb/agent_db',
@@ -57,73 +57,77 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 			schema: feedbackSchema
 		}
 	});
-	const remoteDB = new PouchDB(CREATORS_ENDPOINT, {
-		fetch: function (
-			url: string,
-			opts: { headers: { set: (arg0: string, arg1: string) => void } }
-		) {
-			opts.headers.set('Authorization', 'Bearer ' + token);
-			return PouchDB.fetch(url, opts);
-		}
-	});
-	const agentQuery = _db.agents.findOne(agentId);
 
-	let repState = _db.agents.syncCouchDB({
-		remote: remoteDB,
-		waitForLeadership: false,
-		options: {
-			retry: true
-		},
-		query: agentQuery
-	});
-	await repState.awaitInitialReplication();
+	if (CREATORS_ENDPOINT) {
+		// Sync if there is a remote endpoint
+		const remoteDB = new PouchDB(CREATORS_ENDPOINT, {
+			fetch: function (
+				url: string,
+				opts: { headers: { set: (arg0: string, arg1: string) => void } }
+			) {
+				opts.headers.set('Authorization', 'Bearer ' + token);
+				return PouchDB.fetch(url, opts);
+			}
+		});
+		const agentQuery = _db.agents.findOne(agentId);
 
-	repState = _db.talents.syncCouchDB({
-		remote: remoteDB,
-		waitForLeadership: false,
-		options: {
-			retry: true
-		},
-		query: _db.talents.find().where('agent').eq(agentId)
-	});
-	await repState.awaitInitialReplication();
+		let repState = _db.agents.syncCouchDB({
+			remote: remoteDB,
+			waitForLeadership: false,
+			options: {
+				retry: true
+			},
+			query: agentQuery
+		});
+		await repState.awaitInitialReplication();
 
-	_db.agents.syncCouchDB({
-		remote: remoteDB,
-		waitForLeadership: true,
-		options: {
-			retry: true,
-			live: true
-		},
-		query: agentQuery
-	});
-	_db.talents.syncCouchDB({
-		remote: remoteDB,
-		waitForLeadership: true,
-		options: {
-			retry: true,
-			live: true
-		},
-		query: _db.talents.find().where('agent').eq(agentId)
-	});
-	_db.links.syncCouchDB({
-		remote: remoteDB,
-		waitForLeadership: true,
-		options: {
-			retry: true,
-			live: true
-		},
-		query: _db.links.find().where('agent').eq(agentId)
-	});
-	_db.feedbacks.syncCouchDB({
-		remote: remoteDB,
-		waitForLeadership: true,
-		options: {
-			retry: true,
-			live: true
-		},
-		query: _db.feedbacks.find().where('agent').eq(agentId)
-	});
+		repState = _db.talents.syncCouchDB({
+			remote: remoteDB,
+			waitForLeadership: false,
+			options: {
+				retry: true
+			},
+			query: _db.talents.find().where('agent').eq(agentId)
+		});
+		await repState.awaitInitialReplication();
+
+		_db.agents.syncCouchDB({
+			remote: remoteDB,
+			waitForLeadership: true,
+			options: {
+				retry: true,
+				live: true
+			},
+			query: agentQuery
+		});
+		_db.talents.syncCouchDB({
+			remote: remoteDB,
+			waitForLeadership: true,
+			options: {
+				retry: true,
+				live: true
+			},
+			query: _db.talents.find().where('agent').eq(agentId)
+		});
+		_db.links.syncCouchDB({
+			remote: remoteDB,
+			waitForLeadership: true,
+			options: {
+				retry: true,
+				live: true
+			},
+			query: _db.links.find().where('agent').eq(agentId)
+		});
+		_db.feedbacks.syncCouchDB({
+			remote: remoteDB,
+			waitForLeadership: true,
+			options: {
+				retry: true,
+				live: true
+			},
+			query: _db.feedbacks.find().where('agent').eq(agentId)
+		});
+	}
 
 	_agentDB = _db;
 	return _agentDB;
