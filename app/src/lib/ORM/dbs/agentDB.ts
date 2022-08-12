@@ -69,6 +69,7 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 				return PouchDB.fetch(url, opts);
 			}
 		});
+
 		const agentQuery = _db.agents.findOne(agentId);
 
 		let repState = _db.agents.syncCouchDB({
