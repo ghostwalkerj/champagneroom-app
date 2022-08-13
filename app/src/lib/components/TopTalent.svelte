@@ -11,8 +11,12 @@
 
 	const month = new Date().toLocaleString('default', { month: 'long' });
 	let labels = [] as string[];
+	let _data = [] as number[];
 	if (talents) {
 		labels = talents.map((talent: TalentDocument) => talent.name);
+		talents.forEach(async (talent: TalentDocument) => {
+			const stats = await talent.getStats();
+		});
 	}
 
 	const options = {
@@ -49,6 +53,10 @@
 <div class="bg-primary text-primary-content  card">
 	<div class="text-center card-body items-center">
 		<h2 class="text-2xl card-title">Top Talent - {month}</h2>
-		<Doughnut {data} {options} />
+		{#if talents && talents.length != 0}
+			<Doughnut {data} {options} />
+		{:else}
+			<h3 class="text-xl">No talents found</h3>
+		{/if}
 	</div>
 </div>

@@ -26,7 +26,7 @@ export const agentDocMethods: AgentDocMethods = {
 			key: nanoid(),
 			agent: this._id,
 			profileImageUrl: DEFAULT_PROFILE_IMAGE,
-			createdAt: new Date().toISOString()
+			createdAt: new Date().getTime()
 		};
 
 		const db = this.collection.database;
@@ -42,7 +42,7 @@ export const agentStaticMethods: AgentStaticMethods = {
 		const _agent = await this.insert({
 			_id: `${AgentString}:${address}`,
 			address,
-			createdAt: new Date().toISOString()
+			createdAt: new Date().getTime()
 		});
 		return _agent;
 	}
@@ -76,10 +76,10 @@ const agentSchemaLiteral = {
 		},
 		walletAddress: { type: 'string', maxLength: 50 },
 		createdAt: {
-			type: 'string'
+			type: 'integer'
 		},
 		updatedAt: {
-			type: 'string'
+			type: 'integer'
 		},
 		talents: {
 			type: 'array',

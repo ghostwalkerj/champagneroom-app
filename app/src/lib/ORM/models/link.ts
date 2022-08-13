@@ -60,11 +60,13 @@ const linkSchemaLiteral = {
 		talent: { type: 'string', ref: 'talents', maxLength: 50 },
 		agent: { type: 'string', ref: 'agents', maxLength: 70 },
 		feedback: { type: 'string', ref: 'feedbacks', maxLength: 50 },
+		callStart: { type: 'integer' },
+		callEnd: { type: 'integer' },
 		createdAt: {
-			type: 'string'
+			type: 'integer'
 		},
 		updatedAt: {
-			type: 'string'
+			type: 'integer'
 		}
 	},
 	required: [
@@ -78,7 +80,7 @@ const linkSchemaLiteral = {
 		'fundedAmount',
 		'feedback'
 	],
-	indexed: ['talent', 'feedback', 'agent', ['talent', 'status']],
+	indexed: ['talent', 'feedback', 'agent', ['talent', 'status', 'callStart', 'callEnd']],
 	encrypted: ['callId']
 } as const;
 

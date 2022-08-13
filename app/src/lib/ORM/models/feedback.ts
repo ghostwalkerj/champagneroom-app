@@ -24,9 +24,9 @@ const feedbackSchemaLiteral = {
 			maxLength: 20,
 			final: true
 		},
-		createdAt: { type: 'string' },
+		createdAt: { type: 'integer' },
 		updatedAt: {
-			type: 'string'
+			type: 'integer'
 		},
 		link: {
 			type: 'string',
@@ -62,9 +62,7 @@ const feedbackSchemaLiteral = {
 			default: 0,
 			minimum: 0,
 			maximum: 5
-		},
-		callStart: { type: 'string' },
-		callEnd: { type: 'string' }
+		}
 	},
 	indexed: ['talent', 'link', 'agent'],
 	required: [

@@ -58,10 +58,10 @@ const talentSchemaLiteral = {
 			ref: 'links'
 		},
 		createdAt: {
-			type: 'string'
+			type: 'integer'
 		},
 		updatedAt: {
-			type: 'string'
+			type: 'integer'
 		},
 		agent: { type: 'string', ref: 'agents', maxLength: 50 }
 	},
@@ -82,7 +82,7 @@ type talentRef = {
 
 type TalentDocMethods = {
 	createLink: (amount: number) => Promise<LinkDocument>;
-	getStats: () => Promise<TalentStats>;
+	getStats: (range?: { start: number; end: number }) => Promise<TalentStats>;
 };
 
 export const talentDocMethods: TalentDocMethods = {
@@ -93,7 +93,7 @@ export const talentDocMethods: TalentDocMethods = {
 		const _feedback = {
 			_id: `${FeedbackString}:f${key}`,
 			entityType: FeedbackString,
-			createdAt: new Date().toISOString(),
+			createdAt: new Date().getTime(),
 			rejected: 0,
 			disconnected: 0,
 			unanswered: 0,
@@ -113,7 +113,7 @@ export const talentDocMethods: TalentDocMethods = {
 			talent: this._id,
 			profileImageUrl: this.profileImageUrl,
 			_id: `${LinkString}:l${key}`,
-			createdAt: new Date().toISOString(),
+			createdAt: new Date().getTime(),
 			entityType: LinkString,
 			feedback: `${FeedbackString}:f${key}`,
 			agent: this.agent
@@ -129,12 +129,22 @@ export const talentDocMethods: TalentDocMethods = {
 		this.update({ $set: { currentLink: link._id } });
 		return link;
 	},
-	getStats: async function (this: TalentDocument): Promise<TalentStats> {
+	getStats: async function (
+		this: TalentDocument,
+		range = { start: 0, end: new Date().getTime() }
+	): Promise<TalentStats> {
 		let ratingAvg = 0;
 		let totalRating = 0;
 		let totalEarnings = 0;
 		const completedCalls = (await this.collection.database.links
-			.find({ selector: { talent: this._id, status: LinkStatuses.COMPLETED } })
+			.find({
+				selector: {
+					talent: this._id,
+					status: LinkStatuses.COMPLETED,
+					callStart: { $gte: range.start },
+					callEnd: { $lte: range.end }
+				}
+			})
 			.exec()) as LinkDocument[];
 
 		const ids = completedCalls.map((link) => {

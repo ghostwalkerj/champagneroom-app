@@ -63,14 +63,14 @@
 			talent.update({
 				$set: {
 					profileImageUrl: url,
-					updatedAt: new Date().toISOString()
+					updatedAt: new Date().getTime()
 				}
 			});
 			if (currentLink) {
 				currentLink.update({
 					$set: {
 						profileImageUrl: url,
-						updatedAt: new Date().toISOString()
+						updatedAt: new Date().getTime()
 					}
 				});
 			}
