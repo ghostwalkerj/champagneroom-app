@@ -31,7 +31,7 @@ export const agentDB = async (token: string, agentId: string, storage: StorageTy
 
 const create = async (token: string, agentId: string, storage: StorageTypes) => {
 	initRXDB(storage);
-	await removeRxDatabase('pouchdb/agent_db', getRxStoragePouch(storage));
+	//await removeRxDatabase('pouchdb/agent_db', getRxStoragePouch(storage));
 
 	const _db: AgentDBType = await createRxDatabase({
 		name: 'pouchdb/agent_db',

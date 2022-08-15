@@ -1,9 +1,12 @@
-import { womensNames } from '$lib/womensNames';
-import { uniqueNamesGenerator } from 'unique-names-generator';
 import type { AgentDocument } from '$lib/ORM/models/agent';
+import { type LinkDocType, LinkStatuses, LinkString } from '$lib/ORM/models/link';
 import type { TalentDocument } from '$lib/ORM/models/talent';
-import { LinkStatuses } from '$lib/ORM/models/link';
+import { womensNames } from '$lib/womensNames';
+import { nanoid } from 'nanoid';
 import spacetime from 'spacetime';
+import { uniqueNamesGenerator } from 'unique-names-generator';
+import { type FeedbackDocType, FeedbackString } from '$lib/ORM/models/feedback';
+import { v4 as uuidv4 } from 'uuid';
 
 const names = womensNames;
 
@@ -52,35 +55,60 @@ export const generateTalent = async (agent: AgentDocument) => {
 		dictionaries: [names]
 	});
 	const profileImageUrl = profileImageUrls[Math.floor(Math.random() * profileImageUrls.length)];
-
 	const talent = await agent.createTalent(name, 10, profileImageUrl);
-
-	const count = Math.floor(Math.random() * 100) + 1;
-	generateLinks(talent, count);
-
+	const count = Math.floor(Math.random() * 25) + 1;
+	await generateLinks(talent, count);
 	return talent;
 };
 
 const generateLinks = async (talent: TalentDocument, count: number) => {
-	for (let i = 0; i < count; i++) {
-		const amount = Math.floor(Math.random() * 1000) + 1;
-		const link = await talent.createLink(amount);
-		const callStart = spacetime.now().subtract(Math.floor(Math.random() * 100) + 1, 'day');
-		const callEnd = callStart.add(1, 'hour');
+	const links: LinkDocType[] = [];
+	const feedbacks: FeedbackDocType[] = [];
 
-		link.update({
-			$set: {
-				fundedAmount: link.amount,
-				status: LinkStatuses.COMPLETED,
-				callStart: callStart.epoch,
-				callEnd: callEnd.epoch
-			}
-		});
-		const feedback = await link.feedback_;
-		feedback.update({
-			$set: {
-				rating: Math.floor(Math.random() * 5) + 1
-			}
-		});
+	console.log(count);
+	// Create completedCalls
+	for (let i = 0; i < count; i++) {
+		const key = nanoid();
+		const amount = Math.floor(Math.random() * 1000) + 1;
+		const callStart = spacetime.now().subtract(Math.floor(Math.random() * 45) + 1, 'day');
+		const callEnd = callStart.add(1, 'hour');
+		const _feedback = {
+			_id: `${FeedbackString}:f${key}`,
+			entityType: FeedbackString,
+			createdAt: new Date().getTime(),
+			rejected: 0,
+			disconnected: 0,
+			unanswered: 0,
+			viewed: 0,
+			rating: Math.floor(Math.random() * 5) + 1,
+			link: `${LinkString}:l${key}`,
+			talent: talent._id,
+			agent: talent.agent
+		};
+		const _link = {
+			status: LinkStatuses.COMPLETED,
+			amount,
+			fundedAmount: amount,
+			walletAddress: '0x251281e1516e6E0A145d28a41EE63BfcDd9E18Bf',
+			callId: uuidv4(),
+			talentName: talent.name,
+			talent: talent._id,
+			profileImageUrl: talent.profileImageUrl,
+			_id: `${LinkString}:l${key}`,
+			createdAt: new Date().getTime(),
+			entityType: LinkString,
+			feedback: `${FeedbackString}:f${key}`,
+			agent: talent.agent,
+			callStart: callStart.epoch,
+			callEnd: callEnd.epoch
+		};
+		links.push(_link);
+		feedbacks.push(_feedback);
 	}
+
+	const db = talent.collection.database;
+	let result = await db.links.bulkInsert(links);
+	console.log(result);
+	result = await db.feedbacks.bulkInsert(feedbacks);
+	console.log(result);
 };

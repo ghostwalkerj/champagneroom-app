@@ -1,11 +1,10 @@
 <script lang="ts">
-	import type { AgentDocument } from '$lib/ORM/models/agent';
-	import { Doughnut } from 'svelte-chartjs';
-	import Chart from 'chart.js/auto';
-	import type { TalentDocument } from '$lib/ORM/models/talent';
-	import ChartDataLabels from 'chartjs-plugin-datalabels';
 	import { currencyFormatter } from '$lib/constants';
+	import type { TalentDocument } from '$lib/ORM/models/talent';
+	import Chart from 'chart.js/auto';
+	import ChartDataLabels from 'chartjs-plugin-datalabels';
 	import spacetime from 'spacetime';
+	import { Doughnut } from 'svelte-chartjs';
 
 	export let talents: TalentDocument[];
 
@@ -14,13 +13,13 @@
 	let talentData = [] as number[];
 
 	if (talents) {
-		labels = talents.map((talent: TalentDocument) => talent.name);
 		talents.forEach(async (talent: TalentDocument) => {
-			const stats = await talent.getStats({
-				start: now.startOf('month').epoch,
-				end: now.endOf('month').epoch
-			});
-			talentData.push(stats.totalEarnings);
+			const range = { start: now.startOf('month').epoch, end: now.endOf('month').epoch };
+			const stats = await talent.getStats(range);
+			if (stats.totalEarnings > 0) {
+				talentData = talentData.concat(stats.totalEarnings);
+				labels = labels.concat(talent.name);
+			}
 		});
 	}
 
@@ -42,7 +41,7 @@
 		}
 	};
 
-	const data = {
+	$: data = {
 		labels,
 		datasets: [
 			{
