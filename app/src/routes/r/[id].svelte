@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { browser } from '$app/env';
 	import { page } from '$app/stores';
-	import LinkFeedback from '$lib/components/Feedback.svelte';
-	import LinkDetail from '$lib/components/LinkDetail.svelte';
+	import LinkFeedback from '$lib/components/link/Feedback.svelte';
+	import LinkDetail from '$lib/components/link/LinkDetail.svelte';
 	import VideoCall from '$lib/components/VideoCall.svelte';
 	import VideoPreview from '$lib/components/VideoPreview.svelte';
 	import { publicDB, type PublicDBType } from '$lib/ORM/dbs/publicDB';

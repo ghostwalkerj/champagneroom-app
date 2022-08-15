@@ -1,5 +1,5 @@
 <script lang="ts">
-	import TableRating from '$lib/components/forms/TableRating.svelte';
+	import TableRating from '$lib/components/talent/TableRating.svelte';
 	import { currencyFormatter, TALENT_PATH } from '$lib/constants';
 	import type { TalentDocument } from '$lib/ORM/models/talent';
 	import SvelteTable from 'svelte-table';

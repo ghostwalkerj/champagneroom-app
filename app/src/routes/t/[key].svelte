@@ -6,7 +6,7 @@
 	import * as yup from 'yup';
 
 	import ProfilePhoto from '$lib/components/forms/ProfilePhoto.svelte';
-	import LinkViewer from '$lib/components/LinkViewer.svelte';
+	import LinkViewer from '$lib/components/link/LinkViewer.svelte';
 	import VideoCall from '$lib/components/VideoCall.svelte';
 	import VideoPreview from '$lib/components/VideoPreview.svelte';
 

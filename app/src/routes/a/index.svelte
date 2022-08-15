@@ -22,15 +22,15 @@
 </script>
 
 <script lang="ts">
-	import TalentForm from '$lib/components/forms/TalentForm.svelte';
-	import TalentTable from '$lib/components/forms/TalentTable.svelte';
+	import TalentForm from '$lib/components/talent/TalentForm.svelte';
+	import TalentTable from '$lib/components/talent/TalentTable.svelte';
 	import { agentDB } from '$lib/ORM/dbs/agentDB';
 	import { AgentString, type AgentDocument } from '$lib/ORM/models/agent';
 	import type { TalentDocument } from '$lib/ORM/models/talent';
 	import { StorageTypes } from '$lib/ORM/rxdb';
 	import { selectedAccount } from 'svelte-web3';
-	import AgentWallet from '$lib/components/AgentWallet.svelte';
-	import TopTalent from '$lib/components/TopTalent.svelte';
+	import AgentWallet from '$lib/components/agent/AgentWallet.svelte';
+	import TopTalent from '$lib/components/talent/TopTalent.svelte';
 
 	export let token: string;
 
