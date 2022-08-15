@@ -124,8 +124,8 @@ export const talentDocMethods: TalentDocMethods = {
 			currentLink.update({ $set: { status: LinkStatuses.EXPIRED } });
 		}
 
-		const link = await db.links.insert(_link);
 		db.feedbacks.insert(_feedback);
+		const link = await db.links.insert(_link);
 		this.update({ $set: { currentLink: link._id } });
 		return link;
 	},
@@ -136,23 +136,22 @@ export const talentDocMethods: TalentDocMethods = {
 		let ratingAvg = 0;
 		let totalRating = 0;
 		let totalEarnings = 0;
-		const completedCalls = (await this.collection.database.links
+		const db = this.collection.database;
+		const completedCalls = (await db.links
 			.find({
 				selector: {
 					talent: this._id,
 					status: LinkStatuses.COMPLETED,
-					callStart: { $gte: range.start },
-					callEnd: { $lte: range.end }
+					callStart: { $gte: range.start, $lte: range.end }
 				}
 			})
 			.exec()) as LinkDocument[];
 
-		const ids = completedCalls.map((link) => {
+		const feedbackIds = completedCalls.map((link) => {
 			totalEarnings += link.amount;
-			return link._id;
+			return link.feedback;
 		});
-
-		const completedFeedback = await this.collection.database.feedbacks.findByIds(ids);
+		const completedFeedback = await db.feedbacks.findByIds(feedbackIds);
 		for (const feedback of completedFeedback.values()) {
 			totalRating += feedback.rating;
 		}

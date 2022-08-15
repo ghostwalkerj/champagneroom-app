@@ -2,12 +2,11 @@
 	import type { AgentDocument } from '$lib/ORM/models/agent';
 	import { Doughnut } from 'svelte-chartjs';
 	import Chart from 'chart.js/auto';
-	import type { TalentDocument, TalentStats } from '$lib/ORM/models/talent';
+	import type { TalentDocument } from '$lib/ORM/models/talent';
 	import ChartDataLabels from 'chartjs-plugin-datalabels';
 	import { currencyFormatter } from '$lib/constants';
 	import spacetime from 'spacetime';
 
-	export let agent: AgentDocument;
 	export let talents: TalentDocument[];
 
 	const now = spacetime.now();
@@ -64,7 +63,7 @@
 				<Doughnut {data} {options} />
 			{:else}
 				<div class="text-center">
-					<h3 class="text-lg">No data available</h3>
+					<h3 class="text-lg">No earnings available</h3>
 				</div>
 			{/if}
 		{:else}

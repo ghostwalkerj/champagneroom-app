@@ -7,7 +7,9 @@
 
 <div class="flex">
 	<div class="pr-5 ">
-		{rating}
+		{rating.toFixed(1)}
 	</div>
-	<StarRating {rating} />
+	{#if rating > 0 && rating <= 5}
+		<StarRating {rating} />
+	{/if}
 </div>

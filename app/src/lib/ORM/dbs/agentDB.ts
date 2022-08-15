@@ -92,6 +92,26 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 		});
 		await repState.awaitInitialReplication();
 
+		repState = _db.links.syncCouchDB({
+			remote: remoteDB,
+			waitForLeadership: false,
+			options: {
+				retry: true
+			},
+			query: _db.links.find().where('agent').eq(agentId)
+		});
+		await repState.awaitInitialReplication();
+
+		repState = _db.feedbacks.syncCouchDB({
+			remote: remoteDB,
+			waitForLeadership: false,
+			options: {
+				retry: true
+			},
+			query: _db.feedbacks.find().where('agent').eq(agentId)
+		});
+		await repState.awaitInitialReplication();
+
 		_db.agents.syncCouchDB({
 			remote: remoteDB,
 			waitForLeadership: true,

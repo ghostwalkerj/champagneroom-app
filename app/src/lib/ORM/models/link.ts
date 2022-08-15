@@ -6,6 +6,8 @@ import {
 	type RxDocument,
 	type RxJsonSchema
 } from 'rxdb';
+import type { AgentDocument } from '$lib/ORM/models/agent';
+import type { FeedbackDocument } from '$lib/ORM/models/feedback';
 
 export enum LinkStatuses {
 	ACTIVE = 'ACTIVE',
@@ -73,6 +75,7 @@ const linkSchemaLiteral = {
 		'_id',
 		'entityType',
 		'talent',
+		'agent',
 		'talentName',
 		'profileImageUrl',
 		'callId',
@@ -85,7 +88,9 @@ const linkSchemaLiteral = {
 } as const;
 
 type linkRef = {
-	talent_?: Promise<TalentDocument>;
+	talent_: Promise<TalentDocument>;
+	agent_: Promise<AgentDocument>;
+	feedback_: Promise<FeedbackDocument>;
 };
 
 const schemaTyped = toTypedRxJsonSchema(linkSchemaLiteral);

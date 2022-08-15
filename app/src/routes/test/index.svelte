@@ -31,6 +31,7 @@
 	import { selectedAccount } from 'svelte-web3';
 	import AgentWallet from '$lib/components/agent/AgentWallet.svelte';
 	import TopTalent from '$lib/components/talent/TopTalent.svelte';
+	import { generateTalent } from '$lib/dataHelper';
 
 	export let token: string;
 
@@ -61,8 +62,17 @@
 	<div class="min-h-full">
 		<main class="p-10">
 			<!-- Page header -->
-			<div class="bg-black rounded-lg mx-auto py-4 px-4 sm:px-6 lg:px-8">
-				<div class="font-semibold text-primary text-md leading-6">Agent Dashboard</div>
+			<div class="bg-black  rounded-lg mx-auto py-4 px-4 sm:px-6 lg:px-8">
+				<div class="font-semibold text-primary text-md leading-6">
+					Agent Dashboard
+
+					<button
+						class="btn btn-sm"
+						on:click={() => {
+							generateTalent(agent);
+						}}>Create Data</button
+					>
+				</div>
 				<div class="divider" />
 
 				<div class="mx-auto  w-full px-4 md:flex  md:items-center md:justify-between " />

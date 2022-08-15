@@ -105,7 +105,7 @@
 				earnings: stats.totalEarnings,
 				url: talent.key,
 				commisson: talent.agentCommission,
-				myEarnings: stats.totalEarnings * talent.agentCommission
+				myEarnings: stats.totalEarnings * (1 / talent.agentCommission)
 			});
 		});
 	}
