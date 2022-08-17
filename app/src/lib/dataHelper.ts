@@ -56,7 +56,7 @@ export const generateTalent = async (agent: AgentDocument) => {
 	});
 	const profileImageUrl = profileImageUrls[Math.floor(Math.random() * profileImageUrls.length)];
 	const talent = await agent.createTalent(name, 10, profileImageUrl);
-	const count = Math.floor(Math.random() * 25) + 1;
+	const count = Math.floor(Math.random() * 100) + 1;
 	await generateLinks(talent, count);
 	return talent;
 };
@@ -65,7 +65,6 @@ const generateLinks = async (talent: TalentDocument, count: number) => {
 	const links: LinkDocType[] = [];
 	const feedbacks: FeedbackDocType[] = [];
 
-	console.log(count);
 	// Create completedCalls
 	for (let i = 0; i < count; i++) {
 		const key = nanoid();
@@ -108,7 +107,5 @@ const generateLinks = async (talent: TalentDocument, count: number) => {
 
 	const db = talent.collection.database;
 	let result = await db.links.bulkInsert(links);
-	console.log(result);
 	result = await db.feedbacks.bulkInsert(feedbacks);
-	console.log(result);
 };

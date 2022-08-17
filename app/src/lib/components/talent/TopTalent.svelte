@@ -46,7 +46,7 @@
 		datasets: [
 			{
 				data: talentData,
-				backgroundColor: ['#2D1B69', '#58C7F3', '#F3CC30'],
+				backgroundColor: ['#2D1B69', '#58C7F3', '#F3CC30', '#20134E'],
 				borderWidth: 0
 			}
 		]
