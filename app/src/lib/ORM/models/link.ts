@@ -69,6 +69,10 @@ const linkSchemaLiteral = {
 		},
 		updatedAt: {
 			type: 'integer'
+		},
+		_deleted: {
+			type: 'boolean',
+			default: false
 		}
 	},
 	required: [

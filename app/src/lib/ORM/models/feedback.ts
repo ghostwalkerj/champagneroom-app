@@ -28,6 +28,10 @@ const feedbackSchemaLiteral = {
 		updatedAt: {
 			type: 'integer'
 		},
+		_deleted: {
+			type: 'boolean',
+			default: false
+		},
 		link: {
 			type: 'string',
 			ref: 'links'

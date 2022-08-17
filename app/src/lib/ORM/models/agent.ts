@@ -8,6 +8,7 @@ import {
 	type RxDocument,
 	type RxJsonSchema
 } from 'rxdb';
+import { bool } from 'yup';
 type AgentDocMethods = {
 	createTalent: (
 		name: string,
@@ -35,7 +36,8 @@ export const agentDocMethods: AgentDocMethods = {
 			key: nanoid(),
 			agent: this._id,
 			profileImageUrl,
-			createdAt: new Date().getTime()
+			createdAt: new Date().getTime(),
+			updatedAt: new Date().getTime()
 		};
 
 		const db = this.collection.database;
@@ -51,7 +53,8 @@ export const agentStaticMethods: AgentStaticMethods = {
 		const _agent = await this.insert({
 			_id: `${AgentString}:${address}`,
 			address,
-			createdAt: new Date().getTime()
+			createdAt: new Date().getTime(),
+			updatedAt: new Date().getTime()
 		});
 		return _agent;
 	}
@@ -89,6 +92,10 @@ const agentSchemaLiteral = {
 		},
 		updatedAt: {
 			type: 'integer'
+		},
+		_deleted: {
+			type: 'boolean',
+			default: false
 		},
 		talents: {
 			type: 'array',

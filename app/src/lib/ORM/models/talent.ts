@@ -63,6 +63,10 @@ const talentSchemaLiteral = {
 		updatedAt: {
 			type: 'integer'
 		},
+		_deleted: {
+			type: 'boolean',
+			default: false
+		},
 		agent: { type: 'string', ref: 'agents', maxLength: 50 }
 	},
 	required: ['_id', 'key', 'name', 'profileImageUrl', 'agent', 'agentCommission'],
@@ -94,6 +98,8 @@ export const talentDocMethods: TalentDocMethods = {
 			_id: `${FeedbackString}:f${key}`,
 			entityType: FeedbackString,
 			createdAt: new Date().getTime(),
+			updatedAt: new Date().getTime(),
+
 			rejected: 0,
 			disconnected: 0,
 			unanswered: 0,
@@ -114,6 +120,7 @@ export const talentDocMethods: TalentDocMethods = {
 			profileImageUrl: this.profileImageUrl,
 			_id: `${LinkString}:l${key}`,
 			createdAt: new Date().getTime(),
+			updatedAt: new Date().getTime(),
 			entityType: LinkString,
 			feedback: `${FeedbackString}:f${key}`,
 			agent: this.agent

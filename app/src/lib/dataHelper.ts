@@ -75,6 +75,7 @@ const generateLinks = (talent: TalentDocument, count: number) => {
 			_id: `${FeedbackString}:f${key}`,
 			entityType: FeedbackString,
 			createdAt: new Date().getTime(),
+			updatedAt: new Date().getTime(),
 			rejected: 0,
 			disconnected: 0,
 			unanswered: 0,
@@ -95,6 +96,8 @@ const generateLinks = (talent: TalentDocument, count: number) => {
 			profileImageUrl: talent.profileImageUrl,
 			_id: `${LinkString}:l${key}`,
 			createdAt: new Date().getTime(),
+			updatedAt: new Date().getTime(),
+
 			entityType: LinkString,
 			feedback: `${FeedbackString}:f${key}`,
 			agent: talent.agent,
