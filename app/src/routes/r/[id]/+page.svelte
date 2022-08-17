@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Feedback from './../../../lib/components/link/Feedback.svelte';
 	import { browser } from '$app/env';
 	import { page } from '$app/stores';
 	import LinkFeedback from '$lib/components/link/Feedback.svelte';
@@ -19,8 +20,8 @@
 
 	if (errors) console.log(errors);
 	const token = data!.token;
-	export let link: LinkDocument;
-	export let feedback: FeedbackDocument;
+	export let link = data!.link;
+	export let feedback = data!.feedback;
 	let linkId = $page.params.id;
 	let vc: VideoCallType;
 	let videoCall: any;

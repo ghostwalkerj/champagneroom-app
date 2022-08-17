@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { currencyFormatter } from '$lib/constants';
-	import type { LinkDocument } from '$lib/ORM/models/link';
+	import type { LinkDocType, LinkDocument } from '$lib/ORM/models/link';
 	import FaMoneyBillWave from 'svelte-icons/fa/FaMoneyBillWave.svelte';
 	import StarRating from 'svelte-star-rating';
-	export let link: LinkDocument;
+	export let link: LinkDocType;
 	$: rating = 0;
 </script>
 

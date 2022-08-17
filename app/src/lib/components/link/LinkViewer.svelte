@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { ROOM_PATH } from '$lib/constants';
-	import type { LinkDocument } from '$lib/ORM/models/link';
-	import type { TalentDocument } from '$lib/ORM/models/talent';
+	import type { LinkDocType } from '$lib/ORM/models/link';
+	import type { TalentDocType } from '$lib/ORM/models/talent';
 	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';
 	import urlJoin from 'url-join';
-	export let link: LinkDocument;
-	export let talent: TalentDocument;
+	export let link: LinkDocType;
+	export let talent: TalentDocType;
 
 	$: linkURL = '';
 	$: if (link) linkURL = urlJoin($page.url.origin, ROOM_PATH, link._id);

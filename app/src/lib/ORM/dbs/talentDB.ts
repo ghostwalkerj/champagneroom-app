@@ -17,14 +17,14 @@ type CreatorsCollections = {
 };
 
 export type TalentDBType = RxDatabase<CreatorsCollections>;
-let _talentDB: TalentDBType;
+const _talentDB = new Map<string, TalentDBType>();
 
 export const talentDB = async (token: string, key: string, storage: StorageTypes) =>
-	_talentDB ? _talentDB : await create(token, key, storage);
+	_talentDB.has(key) ? _talentDB.get(key) : await create(token, key, storage);
 
 const create = async (token: string, key: string, storage: StorageTypes) => {
 	initRXDB(storage);
-	await removeRxDatabase('pouchdb/talent_db', getRxStoragePouch(storage));
+	//await removeRxDatabase('pouchdb/talent_db', getRxStoragePouch(storage));
 
 	const _db: TalentDBType = await createRxDatabase({
 		name: 'pouchdb/talent_db',
@@ -130,6 +130,6 @@ const create = async (token: string, key: string, storage: StorageTypes) => {
 			});
 		}
 	}
-	_talentDB = _db;
-	return _talentDB;
+	_talentDB.set(key, _db);
+	return _db;
 };

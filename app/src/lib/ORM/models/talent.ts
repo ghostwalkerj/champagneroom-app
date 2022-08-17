@@ -121,7 +121,9 @@ export const talentDocMethods: TalentDocMethods = {
 
 		if (this.currentLink) {
 			const currentLink = await this.populate('currentLink');
-			currentLink.update({ $set: { status: LinkStatuses.EXPIRED } });
+			if (currentLink && currentLink.status === LinkStatuses.ACTIVE) {
+				currentLink.update({ $set: { status: LinkStatuses.EXPIRED } });
+			}
 		}
 
 		db.feedbacks.insert(_feedback);

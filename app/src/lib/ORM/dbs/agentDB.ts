@@ -24,10 +24,10 @@ type AllCollections = {
 };
 
 export type AgentDBType = RxDatabase<AllCollections>;
-let _agentDB: AgentDBType;
+const _agentDB = new Map<string, AgentDBType>();
 
 export const agentDB = async (token: string, agentId: string, storage: StorageTypes) =>
-	_agentDB ? _agentDB : await create(token, agentId, storage);
+	_agentDB.has(agentId) ? _agentDB.get(agentId) : await create(token, agentId, storage);
 
 const create = async (token: string, agentId: string, storage: StorageTypes) => {
 	initRXDB(storage);
@@ -114,7 +114,7 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 
 		_db.agents.syncCouchDB({
 			remote: remoteDB,
-			waitForLeadership: true,
+			waitForLeadership: false,
 			options: {
 				retry: true,
 				live: true
@@ -123,7 +123,7 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 		});
 		_db.talents.syncCouchDB({
 			remote: remoteDB,
-			waitForLeadership: true,
+			waitForLeadership: false,
 			options: {
 				retry: true,
 				live: true
@@ -132,7 +132,7 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 		});
 		_db.links.syncCouchDB({
 			remote: remoteDB,
-			waitForLeadership: true,
+			waitForLeadership: false,
 			options: {
 				retry: true,
 				live: true
@@ -141,7 +141,7 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 		});
 		_db.feedbacks.syncCouchDB({
 			remote: remoteDB,
-			waitForLeadership: true,
+			waitForLeadership: false,
 			options: {
 				retry: true,
 				live: true
@@ -150,6 +150,6 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 		});
 	}
 
-	_agentDB = _db;
-	return _agentDB;
+	_agentDB.set(agentId, _db);
+	return _db;
 };

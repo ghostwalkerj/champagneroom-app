@@ -14,12 +14,11 @@ type PublicCollections = {
 };
 
 export type PublicDBType = RxDatabase<PublicCollections>;
-let _publicDB: PublicDBType;
-
+const _publicDB = new Map<string, PublicDBType>();
 export const publicDB = async (token: string, linkId: string, storage: StorageTypes) =>
-	_publicDB ? _publicDB : await create(token, linkId, storage);
+	_publicDB.has(linkId) ? _publicDB.get(linkId) : await create(token, linkId, storage);
 
-let _thisLink: LinkDocument | null;
+let _thisLink: LinkDocument;
 
 const create = async (token: string, linkId: string, storage: StorageTypes) => {
 	initRXDB(storage);
@@ -65,7 +64,7 @@ const create = async (token: string, linkId: string, storage: StorageTypes) => {
 		});
 		await repState.awaitInitialReplication();
 
-		_thisLink = await linkQuery.exec();
+		_thisLink = (await linkQuery.exec()) as LinkDocument;
 		if (_thisLink) {
 			const feedbackQuery = _db.feedbacks.findOne(_thisLink.feedback);
 
@@ -99,6 +98,6 @@ const create = async (token: string, linkId: string, storage: StorageTypes) => {
 			});
 		}
 	}
-	_publicDB = _db;
-	return _publicDB;
+	_publicDB.set(linkId, _db);
+	return _db;
 };

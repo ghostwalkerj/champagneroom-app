@@ -1,11 +1,11 @@
 import type { AgentDocument } from '$lib/ORM/models/agent';
-import { type LinkDocType, LinkStatuses, LinkString } from '$lib/ORM/models/link';
+import { FeedbackString, type FeedbackDocType } from '$lib/ORM/models/feedback';
+import { LinkStatuses, LinkString, type LinkDocType } from '$lib/ORM/models/link';
 import type { TalentDocument } from '$lib/ORM/models/talent';
 import { womensNames } from '$lib/womensNames';
 import { nanoid } from 'nanoid';
 import spacetime from 'spacetime';
 import { uniqueNamesGenerator } from 'unique-names-generator';
-import { type FeedbackDocType, FeedbackString } from '$lib/ORM/models/feedback';
 import { v4 as uuidv4 } from 'uuid';
 
 const names = womensNames;
@@ -61,7 +61,7 @@ export const generateTalent = async (agent: AgentDocument) => {
 	return talent;
 };
 
-const generateLinks = async (talent: TalentDocument, count: number) => {
+const generateLinks = (talent: TalentDocument, count: number) => {
 	const links: LinkDocType[] = [];
 	const feedbacks: FeedbackDocType[] = [];
 
@@ -106,6 +106,6 @@ const generateLinks = async (talent: TalentDocument, count: number) => {
 	}
 
 	const db = talent.collection.database;
-	let result = await db.links.bulkInsert(links);
-	result = await db.feedbacks.bulkInsert(feedbacks);
+	db.links.bulkInsert(links);
+	db.feedbacks.bulkInsert(feedbacks);
 };
