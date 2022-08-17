@@ -1,31 +1,4 @@
-<script context="module" lang="ts">
-	throw new Error("@migration task: Check code was safely removed (https://github.com/sveltejs/kit/discussions/5774#discussioncomment-3292722)");
-
-	// import { AUTH_PATH, TokenRoles } from '$lib/constants';
-	// import urlJoin from 'url-join';
-
-	// //TODO: Only return token if agent address is good.
-	// export async function load({ url, fetch }) {
-	// 	const auth_url = urlJoin(url.origin, AUTH_PATH);
-	// 	try {
-	// 		const res = await fetch(auth_url, {
-	// 			method: 'POST',
-	// 			body: JSON.stringify({
-	// 				tokenRole: TokenRoles.AGENT
-	// 			})
-	// 		});
-	// 		const body = await res.json();
-	// 		const token = body.token;
-	// 		return { props: { token } };
-	// 	} catch (e) {
-	// 		console.log(e);
-	// 	}
-	// }
-</script>
-
 <script lang="ts">
-	throw new Error("@migration task: Add data prop (https://github.com/sveltejs/kit/discussions/5774#discussioncomment-3292707)");
-
 	import TalentForm from '$lib/components/talent/TalentForm.svelte';
 	import TalentTable from '$lib/components/talent/TalentTable.svelte';
 	import { agentDB } from '$lib/ORM/dbs/agentDB';
@@ -35,9 +8,14 @@
 	import { selectedAccount } from 'svelte-web3';
 	import AgentWallet from '$lib/components/agent/AgentWallet.svelte';
 	import TopTalent from '$lib/components/talent/TopTalent.svelte';
+	import { generateTalent } from '$lib/dataHelper';
+	import type { PageData, Errors } from './$types';
 
-	export let token: string;
+	export let data: PageData;
+	export let errors: Errors;
 
+	if (errors) console.log(errors);
+	const token = data!.token;
 	//TODO: This will be authentication later
 	selectedAccount.subscribe(async (account) => {
 		if (account) {
@@ -65,8 +43,17 @@
 	<div class="min-h-full">
 		<main class="p-10">
 			<!-- Page header -->
-			<div class="bg-black rounded-lg mx-auto py-4 px-4 sm:px-6 lg:px-8">
-				<div class="font-semibold text-primary text-md leading-6">Agent Dashboard</div>
+			<div class="bg-black  rounded-lg mx-auto py-4 px-4 sm:px-6 lg:px-8">
+				<div class="font-semibold text-primary text-md leading-6">
+					Agent Dashboard
+
+					<button
+						class="btn btn-sm"
+						on:click={() => {
+							generateTalent(agent);
+						}}>Create Data</button
+					>
+				</div>
 				<div class="divider" />
 
 				<div class="mx-auto  w-full px-4 md:flex  md:items-center md:justify-between " />

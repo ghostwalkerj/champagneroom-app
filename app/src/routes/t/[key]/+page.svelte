@@ -1,6 +1,4 @@
 <script lang="ts">
-	throw new Error("@migration task: Add data prop (https://github.com/sveltejs/kit/discussions/5774#discussioncomment-3292707)");
-
 	import { browser } from '$app/env';
 	import { page } from '$app/stores';
 	import { currencyFormatter } from '$lib/constants';
@@ -12,6 +10,8 @@
 	import VideoCall from '$lib/components/VideoCall.svelte';
 	import VideoPreview from '$lib/components/VideoPreview.svelte';
 
+	import StarRating from 'svelte-star-rating';
+
 	import { talentDB, type TalentDBType } from '$lib/ORM/dbs/talentDB';
 	import type { LinkDocument } from '$lib/ORM/models/link';
 	import type { TalentDocument, TalentStats } from '$lib/ORM/models/talent';
@@ -20,9 +20,13 @@
 	import type { VideoCallType } from '$lib/videoCall';
 	import { onDestroy, onMount } from 'svelte';
 	import { PhoneIncomingIcon } from 'svelte-feather-icons';
-	import StarRating from 'svelte-star-rating';
+	import type { PageData, Errors } from './$types';
 
-	export let token: string;
+	export let data: PageData;
+	export let _errors: Errors;
+
+	if (_errors) console.log(_errors);
+	const token = data!.token;
 	export let talent: TalentDocument;
 	export let currentLink: LinkDocument;
 

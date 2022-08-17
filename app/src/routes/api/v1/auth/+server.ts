@@ -6,7 +6,7 @@ import {
 	JWT_SECRET,
 	TokenRoles
 } from '$lib/constants';
-import type { RequestHandler } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 import jwt from 'jsonwebtoken';
 export const POST: RequestHandler = async ({ request }) => {
 	const body = await request.json();
@@ -31,7 +31,10 @@ export const POST: RequestHandler = async ({ request }) => {
 		);
 	}
 
-	return json$1({ token }, {
-		status: 201
-	});
+	return json$1(
+		{ token },
+		{
+			status: 201
+		}
+	);
 };

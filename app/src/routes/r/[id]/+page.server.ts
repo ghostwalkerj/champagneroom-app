@@ -2,7 +2,8 @@ import { JWT_EXPIRY, JWT_PUBLIC_USER, JWT_SECRET } from '$lib/constants';
 import { publicDB } from '$lib/ORM/dbs/publicDB';
 import { StorageTypes } from '$lib/ORM/rxdb';
 import jwt from 'jsonwebtoken';
-export async function load({ params }) {
+import type { PageServerLoad } from './$types';
+export const load: PageServerLoad = async ({ params }) => {
 	const linkId = params.id;
 	const token = jwt.sign(
 		{
@@ -28,4 +29,4 @@ export async function load({ params }) {
 			}
 		}
 	}
-}
+};

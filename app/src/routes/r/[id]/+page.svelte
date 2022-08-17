@@ -1,6 +1,4 @@
 <script lang="ts">
-	throw new Error("@migration task: Add data prop (https://github.com/sveltejs/kit/discussions/5774#discussioncomment-3292707)");
-
 	import { browser } from '$app/env';
 	import { page } from '$app/stores';
 	import LinkFeedback from '$lib/components/link/Feedback.svelte';
@@ -14,8 +12,13 @@
 	import { userStream, type UserStreamType } from '$lib/userStream';
 	import type { VideoCallType } from '$lib/videoCall';
 	import fsm from 'svelte-fsm';
+	import type { PageData, Errors } from './$types';
 
-	export let token: string;
+	export let data: PageData;
+	export let errors: Errors;
+
+	if (errors) console.log(errors);
+	const token = data!.token;
 	export let link: LinkDocument;
 	export let feedback: FeedbackDocument;
 	let linkId = $page.params.id;
@@ -80,12 +83,12 @@
 		publicDB(token, linkId, StorageTypes.IDB).then((_db: PublicDBType) => {
 			_db.links.findOne(link._id).$.subscribe((_link) => {
 				if (_link) {
-					link = _link;
+					link = _link as LinkDocument;
 				}
 			});
 			_db.feedbacks.findOne(feedback._id).$.subscribe((_feedback) => {
 				if (_feedback) {
-					feedback = _feedback;
+					feedback = _feedback as FeedbackDocument;
 				}
 			});
 		});

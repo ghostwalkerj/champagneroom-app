@@ -1,8 +1,9 @@
 import { AUTH_PATH, TokenRoles } from '$lib/constants';
 import urlJoin from 'url-join';
+import type { PageLoad } from './$types';
 
 //TODO: Only return token if agent address is good.
-export async function load({ url, fetch }) {
+export const load: PageLoad = async ({ url, fetch }) => {
 	const auth_url = urlJoin(url.origin, AUTH_PATH);
 	try {
 		const res = await fetch(auth_url, {
@@ -17,4 +18,4 @@ export async function load({ url, fetch }) {
 	} catch (e) {
 		console.log(e);
 	}
-}
+};

@@ -1,8 +1,10 @@
 import { JWT_CREATOR_USER, JWT_EXPIRY, JWT_SECRET } from '$lib/constants';
 import { talentDB } from '$lib/ORM/dbs/talentDB';
 import { StorageTypes } from '$lib/ORM/rxdb';
+import type { PageServerLoad } from './$types';
 import jwt from 'jsonwebtoken';
-export async function load({ params }) {
+
+export const load: PageServerLoad = async ({ params }) => {
 	const key = params.key;
 	const token = jwt.sign(
 		{
@@ -13,7 +15,7 @@ export async function load({ params }) {
 	);
 
 	//Try to preload link
-	if (token != '') {
+	if (token != '' && key != null) {
 		const db = await talentDB(token, key, StorageTypes.NODE_WEBSQL);
 		const _talent = await db.talents.findOne().where('key').equals(key).exec();
 
@@ -24,4 +26,4 @@ export async function load({ params }) {
 			return { token, talent, currentLink };
 		}
 	}
-}
+};

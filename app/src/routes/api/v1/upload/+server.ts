@@ -6,7 +6,7 @@ import {
 	INFURA_IPFS_PROJECT_ID,
 	INFURA_IPFS_PROJECT_SECRET
 } from '$lib/constants';
-import type { RequestHandler } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 import ipfsClient from 'ipfs-http-client';
 
 const auth =
