@@ -27,13 +27,16 @@ export type AgentDBType = RxDatabase<AllCollections>;
 const _agentDB = new Map<string, AgentDBType>();
 
 export const agentDB = async (token: string, agentId: string, storage: StorageTypes) =>
-	_agentDB.has(agentId) ? _agentDB.get(agentId) : await create(token, agentId, storage);
+	await create(token, agentId, storage);
 
 const create = async (token: string, agentId: string, storage: StorageTypes) => {
+	let _db = _agentDB.get(agentId);
+	if (_db) return _db;
+
 	initRXDB(storage);
 	//await removeRxDatabase('pouchdb/agent_db', getRxStoragePouch(storage));
 
-	const _db: AgentDBType = await createRxDatabase({
+	_db = await createRxDatabase({
 		name: 'pouchdb/agent_db',
 		storage: getRxStoragePouch(storage),
 		ignoreDuplicate: true,

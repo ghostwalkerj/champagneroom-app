@@ -6,7 +6,7 @@
 	import { createForm } from 'svelte-forms-lib';
 	import * as yup from 'yup';
 	import ProfilePhoto from '$lib/components/forms/ProfilePhoto.svelte';
-	import LinkViewer from '$lib/components/link/LinkViewer.svelte';
+	import LinkViewer from '$lib/components/link/LinkView.svelte';
 	import VideoCall from '$lib/components/VideoCall.svelte';
 	import VideoPreview from '$lib/components/VideoPreview.svelte';
 	import StarRating from 'svelte-star-rating';
@@ -25,8 +25,8 @@
 
 	if (_errors) console.log(_errors);
 	const token = data!.token;
-	let talentDoc: TalentDocType = data!.talent!;
-	let currentLinkDoc: LinkDocType = data!.currentLink!;
+	let talentObj: TalentDocType = data!.talent!;
+	let currentLinkObj: LinkDocType = data!.currentLink!;
 
 	let key = $page.params.key;
 	let vc: VideoCallType;
@@ -45,26 +45,25 @@
 			videoCall = _vc.videoCall;
 			initVC();
 		});
-		talentDB(token, key, StorageTypes.IDB).then((db: TalentDBType | undefined) => {
-			if (db)
-				db.talents
-					.findOne(talentDoc._id)
-					.exec()
-					.then((_talent) => {
-						if (_talent) {
-							talentDoc = _talent;
-							talent = _talent;
-							talent.getStats().then((_stats) => {
-								talentStats = _stats;
-							});
-							talent.populate('currentLink').then((cl) => {
-								if (cl) {
-									currentLinkDoc = cl;
-									currentLink = cl;
-								}
-							});
-						}
-					});
+		talentDB(token, key, StorageTypes.IDB).then((db: TalentDBType) => {
+			db.talents
+				.findOne(talentObj._id)
+				.exec()
+				.then((_talent) => {
+					if (_talent) {
+						talentObj = _talent;
+						talent = _talent;
+						talent.getStats().then((_stats) => {
+							talentStats = _stats;
+						});
+						talent.populate('currentLink').then((cl) => {
+							if (cl) {
+								currentLinkObj = cl;
+								currentLink = cl;
+							}
+						});
+					}
+				});
 		});
 	}
 	const updateProfileImage = async (url: string) => {
@@ -101,7 +100,7 @@
 
 	const initVC = () => {
 		if (vc) vc.destroy();
-		const callId = currentLinkDoc ? currentLinkDoc.callId : null;
+		const callId = currentLinkObj ? currentLinkObj.callId : null;
 		vc = videoCall(callId);
 		vc.callState.subscribe((cs) => {
 			if (cs) callState = cs;
@@ -133,14 +132,14 @@
 		onSubmit: (values) => {
 			if (talent)
 				talent.createLink!(Number.parseInt(values.amount)).then((cl) => {
-					currentLinkDoc = cl;
+					currentLinkObj = cl;
 				});
 			handleReset();
 		}
 	});
 </script>
 
-{#if talentDoc}
+{#if talentObj}
 	<!-- Put this part before </body> tag -->
 	<input type="checkbox" id="call-modal" class="modal-toggle" bind:checked={showAlert} />
 	<div class="modal">
@@ -184,7 +183,7 @@
 						<!-- Current Link -->
 						<div>
 							<div>
-								<LinkViewer link={currentLinkDoc} talent={talentDoc} />
+								<LinkViewer link={currentLinkObj} talent={talentObj} />
 							</div>
 						</div>
 
@@ -255,9 +254,9 @@
 								<div class="bg-primary text-primary-content card">
 									<div class="text-center card-body items-center">
 										<h2 class="text-2xl card-title">pCall Status</h2>
-										<p>Signed in as {talentDoc.name}</p>
-										{#if currentLinkDoc}
-											<p>CallId: {currentLinkDoc.callId}</p>
+										<p>Signed in as {talentObj.name}</p>
+										{#if currentLinkObj}
+											<p>CallId: {currentLinkObj.callId}</p>
 										{/if}
 										<p>Call State: {callState}</p>
 									</div>
@@ -272,7 +271,7 @@
 										<h2 class="text-2xl card-title">Profile Photo</h2>
 										<div>
 											<ProfilePhoto
-												profileImage={talentDoc.profileImageUrl || DEFAULT_PROFILE_IMAGE}
+												profileImage={talentObj.profileImageUrl || DEFAULT_PROFILE_IMAGE}
 												callBack={(value) => {
 													updateProfileImage(value);
 												}}

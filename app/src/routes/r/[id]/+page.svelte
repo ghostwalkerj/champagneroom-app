@@ -1,14 +1,13 @@
 <script lang="ts">
-	import Feedback from './../../../lib/components/link/Feedback.svelte';
 	import { browser } from '$app/env';
 	import { page } from '$app/stores';
-	import LinkFeedback from '$lib/components/link/Feedback.svelte';
+	import FeedbackForm from '$lib/components/link/FeedbackForm.svelte';
 	import LinkDetail from '$lib/components/link/LinkDetail.svelte';
 	import VideoCall from '$lib/components/VideoCall.svelte';
 	import VideoPreview from '$lib/components/VideoPreview.svelte';
 	import { publicDB, type PublicDBType } from '$lib/ORM/dbs/publicDB';
-	import type { FeedbackDocument } from '$lib/ORM/models/feedback';
-	import type { LinkDocument } from '$lib/ORM/models/link';
+	import type { FeedbackDocType, FeedbackDocument } from '$lib/ORM/models/feedback';
+	import type { LinkDocType, LinkDocument } from '$lib/ORM/models/link';
 	import { StorageTypes } from '$lib/ORM/rxdb';
 	import { userStream, type UserStreamType } from '$lib/userStream';
 	import type { VideoCallType } from '$lib/videoCall';
@@ -16,19 +15,22 @@
 	import type { PageData, Errors } from './$types';
 
 	export let data: PageData;
-	export let errors: Errors;
+	export let _errors: Errors;
 
-	if (errors) console.log(errors);
+	if (_errors) console.log(_errors);
 	const token = data!.token;
-	export let link = data!.link;
-	export let feedback = data!.feedback;
+	export let linkObj = data!.link as LinkDocType;
+	export let feedbackObj = data!.feedback as FeedbackDocType;
 	let linkId = $page.params.id;
 	let vc: VideoCallType;
 	let videoCall: any;
 	let mediaStream: MediaStream;
 	let us: Awaited<UserStreamType>;
+	let link: LinkDocument;
+	let feedback: FeedbackDocument;
 	$: callState = 'disconnected';
 	$: previousState = 'none';
+
 	const linkState = fsm('neverConnected', {
 		neverConnected: {
 			call: 'calling'
@@ -71,7 +73,7 @@
 		complete: {}
 	});
 
-	if (link && browser) {
+	if (linkObj && browser) {
 		userStream().then((_us) => {
 			if (_us) {
 				_us.mediaStream.subscribe((stream) => {
@@ -82,14 +84,14 @@
 
 		// Make link and feedback reactive
 		publicDB(token, linkId, StorageTypes.IDB).then((_db: PublicDBType) => {
-			_db.links.findOne(link._id).$.subscribe((_link) => {
+			_db.links.findOne(linkObj._id).$.subscribe((_link) => {
 				if (_link) {
-					link = _link as LinkDocument;
+					linkObj = _link as LinkDocument;
 				}
 			});
-			_db.feedbacks.findOne(feedback._id).$.subscribe((_feedback) => {
+			_db.feedbacks.findOne(feedbackObj._id).$.subscribe((_feedback) => {
 				if (_feedback) {
-					feedback = _feedback as FeedbackDocument;
+					feedbackObj = _feedback as FeedbackDocument;
 				}
 			});
 		});
@@ -139,18 +141,18 @@
 	}
 	const call = async () => {
 		if (vc) {
-			vc.makeCall(link.callId!, 'Dr. Huge Mongus', mediaStream);
+			vc.makeCall(linkObj.callId!, 'Dr. Huge Mongus', mediaStream);
 		}
 	};
 
 	$: showFeedback = false;
 </script>
 
-{#if link}
-	<LinkFeedback {showFeedback} />
+{#if linkObj}
+	<FeedbackForm {showFeedback} />
 	<div class="min-h-full">
 		<main class="py-6">
-			{#if link}
+			{#if linkObj}
 				{#if $linkState != 'inCall'}
 					<!-- Page header -->
 					<div class="text-center">
@@ -162,11 +164,11 @@
 					>
 						<div class="rounded-box h-full bg-base-200">
 							<div>
-								<LinkDetail {link} />
+								<LinkDetail link={linkObj} />
 							</div>
 							<div class="pb-6 btn-group justify-center">
 								<button class="btn btn-secondary" on:click={call} disabled={callState != 'ready'}
-									>Call {link.talentName} Now</button
+									>Call {linkObj.talentName} Now</button
 								>
 							</div>
 						</div>
@@ -188,24 +190,24 @@
 			{/if}
 		</main>
 	</div>
-	{#if feedback}
+	{#if feedbackObj}
 		<div class="flex w-full place-content-center">
 			<div class="bg-primary shadow text-primary-content  stats stats-vertical lg:stats-horizontal">
 				<div class="stat">
 					<div class="stat-title">Views</div>
-					<div class="stat-value">{feedback.viewed}</div>
+					<div class="stat-value">{feedbackObj.viewed}</div>
 				</div>
 				<div class="stat">
 					<div class="stat-title">Rejected</div>
-					<div class="stat-value">{feedback.rejected}</div>
+					<div class="stat-value">{feedbackObj.rejected}</div>
 				</div>
 				<div class="stat">
 					<div class="stat-title">Disconnected</div>
-					<div class="stat-value">{feedback.disconnected}</div>
+					<div class="stat-value">{feedbackObj.disconnected}</div>
 				</div>
 				<div class="stat">
 					<div class="stat-title">UnAnswered</div>
-					<div class="stat-value">{feedback.unanswered}</div>
+					<div class="stat-value">{feedbackObj.unanswered}</div>
 				</div>
 				<div class="stat">
 					<div class="stat-title">Link State</div>

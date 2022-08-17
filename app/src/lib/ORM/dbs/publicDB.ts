@@ -15,16 +15,22 @@ type PublicCollections = {
 
 export type PublicDBType = RxDatabase<PublicCollections>;
 const _publicDB = new Map<string, PublicDBType>();
-export const publicDB = async (token: string, linkId: string, storage: StorageTypes) =>
-	_publicDB.has(linkId) ? _publicDB.get(linkId) : await create(token, linkId, storage);
+export const publicDB = async (
+	token: string,
+	linkId: string,
+	storage: StorageTypes
+): Promise<PublicDBType> => await create(token, linkId, storage);
 
 let _thisLink: LinkDocument;
 
 const create = async (token: string, linkId: string, storage: StorageTypes) => {
+	let _db = _publicDB.get(linkId);
+	if (_db) return _db;
+
 	initRXDB(storage);
 	await removeRxDatabase('pouchdb/public_db', getRxStoragePouch(storage));
 
-	const _db: PublicDBType = await createRxDatabase({
+	_db = await createRxDatabase({
 		name: 'pouchdb/public_db',
 		storage: getRxStoragePouch(storage.toString()),
 		ignoreDuplicate: true,

@@ -1,3 +1,5 @@
+import type { AgentDocument } from '$lib/ORM/models/agent';
+import type { FeedbackDocument } from '$lib/ORM/models/feedback';
 import type { TalentDocument } from '$lib/ORM/models/talent';
 import {
 	toTypedRxJsonSchema,
@@ -6,8 +8,6 @@ import {
 	type RxDocument,
 	type RxJsonSchema
 } from 'rxdb';
-import type { AgentDocument } from '$lib/ORM/models/agent';
-import type { FeedbackDocument } from '$lib/ORM/models/feedback';
 
 export enum LinkStatuses {
 	ACTIVE = 'ACTIVE',
