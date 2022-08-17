@@ -2,7 +2,7 @@ import { JWT_CREATOR_USER, JWT_EXPIRY, JWT_SECRET } from '$lib/constants';
 import { talentDB } from '$lib/ORM/dbs/talentDB';
 import { StorageTypes } from '$lib/ORM/rxdb';
 import jwt from 'jsonwebtoken';
-export async function GET({ params }) {
+export async function load({ params }) {
 	const key = params.key;
 	const token = jwt.sign(
 		{
@@ -21,10 +21,7 @@ export async function GET({ params }) {
 			const _currentLink = await _talent.populate('currentLink');
 			const currentLink = _currentLink ? _currentLink.toJSON() : null;
 			const talent = _talent.toJSON();
-			return {
-				body: { token, talent, currentLink },
-				status: 200
-			};
+			return { token, talent, currentLink };
 		}
 	}
 }

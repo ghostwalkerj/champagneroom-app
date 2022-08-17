@@ -1,3 +1,4 @@
+import { json } from '@sveltejs/kit';
 import {
 	INFURA_IPFS_API_PORT,
 	INFURA_IPFS_API_URL,
@@ -36,13 +37,8 @@ export const POST: RequestHandler = async ({ request }) => {
 		} catch (error) {
 			console.log('error', error);
 		}
-		return {
-			status: 200,
-			body: { url }
-		};
+		return json({ url });
 	} else {
-		return {
-			status: 400
-		};
+		return new Response(undefined, { status: 400 });
 	}
 };

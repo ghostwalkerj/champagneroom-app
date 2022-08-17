@@ -2,7 +2,7 @@ import { JWT_EXPIRY, JWT_PUBLIC_USER, JWT_SECRET } from '$lib/constants';
 import { publicDB } from '$lib/ORM/dbs/publicDB';
 import { StorageTypes } from '$lib/ORM/rxdb';
 import jwt from 'jsonwebtoken';
-export async function GET({ params }) {
+export async function load({ params }) {
 	const linkId = params.id;
 	const token = jwt.sign(
 		{
@@ -22,15 +22,9 @@ export async function GET({ params }) {
 			if (_feedback) {
 				_feedback.update({ $inc: { viewed: 1 } }); // Increment view count
 				const feedback = _feedback.toJSON();
-				return {
-					body: { token, link, feedback },
-					status: 200
-				};
+				return { token, link, feedback };
 			} else {
-				return {
-					body: { token, link },
-					status: 200
-				};
+				return { token, link };
 			}
 		}
 	}

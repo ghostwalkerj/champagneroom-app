@@ -1,27 +1,31 @@
 <script context="module" lang="ts">
-	import { AUTH_PATH, TokenRoles } from '$lib/constants';
-	import urlJoin from 'url-join';
+	throw new Error("@migration task: Check code was safely removed (https://github.com/sveltejs/kit/discussions/5774#discussioncomment-3292722)");
 
-	//TODO: Only return token if agent address is good.
-	export async function load({ url, fetch }) {
-		const auth_url = urlJoin(url.origin, AUTH_PATH);
-		try {
-			const res = await fetch(auth_url, {
-				method: 'POST',
-				body: JSON.stringify({
-					tokenRole: TokenRoles.AGENT
-				})
-			});
-			const body = await res.json();
-			const token = body.token;
-			return { props: { token } };
-		} catch (e) {
-			console.log(e);
-		}
-	}
+	// import { AUTH_PATH, TokenRoles } from '$lib/constants';
+	// import urlJoin from 'url-join';
+
+	// //TODO: Only return token if agent address is good.
+	// export async function load({ url, fetch }) {
+	// 	const auth_url = urlJoin(url.origin, AUTH_PATH);
+	// 	try {
+	// 		const res = await fetch(auth_url, {
+	// 			method: 'POST',
+	// 			body: JSON.stringify({
+	// 				tokenRole: TokenRoles.AGENT
+	// 			})
+	// 		});
+	// 		const body = await res.json();
+	// 		const token = body.token;
+	// 		return { props: { token } };
+	// 	} catch (e) {
+	// 		console.log(e);
+	// 	}
+	// }
 </script>
 
 <script lang="ts">
+	throw new Error("@migration task: Add data prop (https://github.com/sveltejs/kit/discussions/5774#discussioncomment-3292707)");
+
 	import TalentForm from '$lib/components/talent/TalentForm.svelte';
 	import TalentTable from '$lib/components/talent/TalentTable.svelte';
 	import { agentDB } from '$lib/ORM/dbs/agentDB';

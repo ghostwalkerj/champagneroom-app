@@ -1,3 +1,4 @@
+import { json as json$1 } from '@sveltejs/kit';
 import {
 	JWT_CREATOR_USER,
 	JWT_EXPIRY,
@@ -30,8 +31,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		);
 	}
 
-	return {
-		body: { token },
+	return json$1({ token }, {
 		status: 201
-	};
+	});
 };
