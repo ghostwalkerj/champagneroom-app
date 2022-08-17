@@ -1,5 +1,5 @@
 <script lang="ts">
-	import LinkFeedback from '$lib/components/link/FeedbackForm.svelte';
+	import LinkFeedback from '$lib/components/feedback/FeedbackForm.svelte';
 	import LinkDetail from '$lib/components/link/LinkDetail.svelte';
 	import type { LinkDocument } from '$lib/ORM/models/link';
 

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { browser } from '$app/env';
 	import { page } from '$app/stores';
-	import FeedbackForm from '$lib/components/link/FeedbackForm.svelte';
+	import FeedbackForm from '$lib/components/feedback/FeedbackForm.svelte';
 	import LinkDetail from '$lib/components/link/LinkDetail.svelte';
 	import VideoCall from '$lib/components/VideoCall.svelte';
 	import VideoPreview from '$lib/components/VideoPreview.svelte';
