@@ -70,7 +70,7 @@ const talentSchemaLiteral = {
 		agent: { type: 'string', ref: 'agents', maxLength: 50 }
 	},
 	required: ['_id', 'key', 'name', 'profileImageUrl', 'agent', 'agentCommission'],
-	indexed: ['key', 'agent']
+	indexes: ['key', 'agent']
 } as const;
 
 export type TalentStats = {
@@ -152,7 +152,9 @@ export const talentDocMethods: TalentDocMethods = {
 					talent: this._id,
 					status: LinkStatuses.COMPLETED,
 					callStart: { $gte: range.start, $lte: range.end }
-				}
+				},
+				sort: [{ callStart: 'desc' }],
+				index: ['callStart']
 			})
 			.exec()) as LinkDocument[];
 

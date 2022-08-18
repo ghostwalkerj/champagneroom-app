@@ -27,15 +27,12 @@
 	const token = data!.token;
 	let talentObj: TalentDocType = data!.talent!;
 	let currentLinkObj: LinkDocType = data!.currentLink!;
+	let talentStats: TalentStats = data!.talentStats!;
 
 	let key = $page.params.key;
 	let vc: VideoCallType;
 	let global = globalThis;
-	let talentStats: TalentStats = {
-		ratingAvg: 0,
-		totalEarnings: 0,
-		completedCalls: []
-	};
+
 	let talent: TalentDocument;
 	let currentLink: LinkDocument;
 
@@ -53,9 +50,6 @@
 					if (_talent) {
 						talentObj = _talent;
 						talent = _talent;
-						talent.getStats().then((_stats) => {
-							talentStats = _stats;
-						});
 						talent.populate('currentLink').then((cl) => {
 							if (cl) {
 								currentLinkObj = cl;
@@ -91,6 +85,7 @@
 	let mediaStream: MediaStream;
 	$: showAlert = callState == 'receivingCall';
 	$: inCall = callState == 'connectedAsReceiver';
+
 	const answerCall = () => {
 		showAlert = false;
 		vc.acceptCall(mediaStream);
@@ -100,14 +95,15 @@
 
 	const initVC = () => {
 		if (vc) vc.destroy();
-		const callId = currentLinkObj ? currentLinkObj.callId : null;
-		vc = videoCall(callId);
-		vc.callState.subscribe((cs) => {
-			if (cs) callState = cs;
-		});
-		vc.callerName.subscribe((name) => {
-			if (name) callerName = name;
-		});
+		if (currentLinkObj) {
+			vc = videoCall(currentLinkObj.callId);
+			vc.callState.subscribe((cs) => {
+				if (cs) callState = cs;
+			});
+			vc.callerName.subscribe((name) => {
+				if (name) callerName = name;
+			});
+		}
 	};
 
 	onMount(async () => {
@@ -131,8 +127,9 @@
 		}),
 		onSubmit: (values) => {
 			if (talent)
-				talent.createLink!(Number.parseInt(values.amount)).then((cl) => {
+				talent.createLink(Number.parseInt(values.amount)).then((cl) => {
 					currentLinkObj = cl;
+					initVC();
 				});
 			handleReset();
 		}

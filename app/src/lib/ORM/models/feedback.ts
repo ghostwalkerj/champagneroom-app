@@ -34,11 +34,13 @@ const feedbackSchemaLiteral = {
 		},
 		link: {
 			type: 'string',
-			ref: 'links'
+			ref: 'links',
+			maxLength: 50
 		},
 		talent: {
 			type: 'string',
-			ref: 'talents'
+			ref: 'talents',
+			maxLength: 50
 		},
 		agent: { type: 'string', ref: 'agents', maxLength: 70 },
 		rejected: {
@@ -68,7 +70,7 @@ const feedbackSchemaLiteral = {
 			maximum: 5
 		}
 	},
-	indexed: ['talent', 'link', 'agent'],
+	indexes: ['talent', 'link', 'agent'],
 	required: [
 		'_id',
 		'entityType',

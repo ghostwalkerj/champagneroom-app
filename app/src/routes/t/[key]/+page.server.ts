@@ -17,17 +17,15 @@ export const load: PageServerLoad = async ({ params }) => {
 		);
 	}
 
-	//Try to preload link
+	//Try to preload
 	if (key != null) {
 		const db = await talentDB(token, key, StorageTypes.NODE_WEBSQL);
 		if (db) {
-			const _talent = await db.talents.findOne().where('key').equals(key).exec();
-
-			if (_talent) {
-				const _currentLink = await _talent.populate('currentLink');
-				const currentLink = _currentLink ? _currentLink.toJSON() : null;
-				const talent = _talent.toJSON();
-				return { token, talent, currentLink };
+			const talent = await db.talents.findOne().where('key').equals(key).exec();
+			if (talent) {
+				const currentLink = await talent.populate('currentLink');
+				const talentStats = await talent.getStats();
+				return { token, talent, currentLink, talentStats };
 			} else {
 				return { token };
 			}

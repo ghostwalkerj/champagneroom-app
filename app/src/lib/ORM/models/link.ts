@@ -51,7 +51,7 @@ const linkSchemaLiteral = {
 			maximum: 99999
 		},
 		callId: { type: 'string' },
-		status: { type: 'string', enum: Object.keys(LinkStatuses) },
+		status: { type: 'string', enum: Object.keys(LinkStatuses), maxLength: 20 },
 		profileImageUrl: {
 			type: 'string'
 		},
@@ -62,8 +62,8 @@ const linkSchemaLiteral = {
 		talent: { type: 'string', ref: 'talents', maxLength: 50 },
 		agent: { type: 'string', ref: 'agents', maxLength: 70 },
 		feedback: { type: 'string', ref: 'feedbacks', maxLength: 50 },
-		callStart: { type: 'integer' },
-		callEnd: { type: 'integer' },
+		callStart: { type: 'integer', multipleOf: 1, minimum: 0, maximum: 3000000000 },
+		callEnd: { type: 'integer', multipleOf: 1, minimum: 0, maximum: 3000000000 },
 		createdAt: {
 			type: 'integer'
 		},
@@ -87,7 +87,7 @@ const linkSchemaLiteral = {
 		'fundedAmount',
 		'feedback'
 	],
-	indexed: ['talent', 'feedback', 'agent', ['talent', 'status', 'callStart', 'callEnd']],
+	indexes: ['talent', 'feedback', 'agent', 'status', 'callStart'],
 	encrypted: ['callId']
 } as const;
 

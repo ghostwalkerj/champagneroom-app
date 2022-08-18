@@ -5,7 +5,7 @@ import { talentDocMethods, talentSchema, type TalentCollection } from '$lib/ORM/
 import type { StorageTypes } from '$lib/ORM/rxdb';
 import { initRXDB } from '$lib/ORM/rxdb';
 import { EventEmitter } from 'events';
-import { createRxDatabase, type RxDatabase } from 'rxdb';
+import { createRxDatabase, removeRxDatabase, type RxDatabase } from 'rxdb';
 import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
 
 // Sync requires more listeners but ok with http2
@@ -26,7 +26,7 @@ const create = async (token: string, key: string, storage: StorageTypes) => {
 	let _db = _talentDB.get(key);
 	if (_db) return _db;
 	initRXDB(storage);
-	//await removeRxDatabase('pouchdb/talent_db', getRxStoragePouch(storage));
+	await removeRxDatabase('pouchdb/talent_db', getRxStoragePouch(storage));
 
 	_db = await createRxDatabase({
 		name: 'pouchdb/talent_db',
