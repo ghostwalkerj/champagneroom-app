@@ -59,7 +59,9 @@
 		<h2 class="text-2xl card-title capitalize">Top Talent - {now.monthName()}</h2>
 		{#if talents && talents.length != 0}
 			{#if talentData.length > 0}
-				<Doughnut {data} {options} />
+				{#key talentData}
+					<Doughnut {data} {options} />
+				{/key}
 			{:else}
 				<div class="text-center">
 					<h3 class="text-lg">No earnings available</h3>
