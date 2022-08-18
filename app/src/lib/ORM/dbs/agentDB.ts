@@ -10,7 +10,7 @@ import { linkSchema, type LinkCollection } from '$lib/ORM/models/link';
 import { talentDocMethods, talentSchema, type TalentCollection } from '$lib/ORM/models/talent';
 import { initRXDB, StorageTypes } from '$lib/ORM/rxdb';
 import { EventEmitter } from 'events';
-import { createRxDatabase, type RxDatabase } from 'rxdb';
+import { createRxDatabase, removeRxDatabase, type RxDatabase } from 'rxdb';
 import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
 
 // Sync requires more listeners but ok with http2
@@ -34,7 +34,7 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 	if (_db) return _db;
 
 	initRXDB(storage);
-	//await removeRxDatabase('pouchdb/agent_db', getRxStoragePouch(storage));
+	await removeRxDatabase('pouchdb/agent_db', getRxStoragePouch(storage));
 
 	_db = await createRxDatabase({
 		name: 'pouchdb/agent_db',

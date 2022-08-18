@@ -19,6 +19,7 @@
 	import StarRating from 'svelte-star-rating';
 	import * as yup from 'yup';
 	import type { Errors, PageData } from './$types';
+	import TalentWallet from './TalentWallet.svelte';
 
 	export let data: PageData;
 	export let _errors: Errors;
@@ -179,55 +180,50 @@
 					<div class="space-y-6 lg:col-start-1 lg:col-span-2">
 						<!-- Current Link -->
 						<div>
-							<div>
-								<LinkViewer link={currentLinkObj} talent={talentObj} />
-							</div>
+							<LinkViewer link={currentLinkObj} talent={talentObj} />
 						</div>
 
 						<!-- Link Form-->
-						<div>
-							<div class="bg-primary text-primary-content card">
-								<div class="text-center card-body items-center">
-									<h2 class="text-2xl card-title">Request a New pCall</h2>
-
-									<div class="flex flex-col text-white p-2 justify-center items-center">
-										<form on:submit|preventDefault={handleSubmit}>
-											<div class="max-w-xs w-full py-2 form-control ">
-												<!-- svelte-ignore a11y-label-has-associated-control -->
-												<label for="price" class="label">
-													<span class="label-text">Requested Amount in USD</span></label
+						<div class="bg-primary text-primary-content card">
+							<div class="text-center card-body items-center">
+								<h2 class="text-2xl card-title">Create a New pCall Link</h2>
+								<div class="flex flex-col text-white p-2 justify-center items-center">
+									<form on:submit|preventDefault={handleSubmit}>
+										<div class="max-w-xs w-full py-2 form-control ">
+											<!-- svelte-ignore a11y-label-has-associated-control -->
+											<label for="price" class="label">
+												<span class="label-text">Requested Amount in USD</span></label
+											>
+											<div class="rounded-md shadow-sm mt-1 relative">
+												<div
+													class="flex pl-3 inset-y-0 left-0 absolute items-center pointer-events-none"
 												>
-												<div class="rounded-md shadow-sm mt-1 relative">
-													<div
-														class="flex pl-3 inset-y-0 left-0 absolute items-center pointer-events-none"
-													>
-														<span class="text-gray-500 sm:text-sm"> $ </span>
-													</div>
-													<input
-														type="text"
-														name="amount"
-														id="amount"
-														class=" max-w-xs w-full py-2 pl-6 input input-bordered input-primary "
-														placeholder="0.00"
-														aria-describedby="price-currency"
-														on:change={handleChange}
-														bind:value={$form.amount}
-													/>
-													<div
-														class="flex pr-3 inset-y-0 right-0 absolute items-center pointer-events-none"
-													>
-														<span class="text-gray-500 sm:text-sm" id="price-currency"> USDC </span>
-													</div>
+													<span class="text-gray-500 sm:text-sm"> $ </span>
+												</div>
+												<input
+													type="text"
+													name="amount"
+													id="amount"
+													class=" max-w-xs w-full py-2 pl-6 input input-bordered input-primary "
+													placeholder="0.00"
+													aria-describedby="price-currency"
+													on:change={handleChange}
+													bind:value={$form.amount}
+												/>
+												<div
+													class="flex pr-3 inset-y-0 right-0 absolute items-center pointer-events-none"
+												>
+													<span class="text-gray-500 sm:text-sm" id="price-currency"> USDC </span>
 												</div>
 											</div>
-											{#if $errors.amount}
-												<div class="shadow-lg alert alert-error">{$errors.amount}</div>
-											{/if}
-											<div class="py-4">
-												<button class="btn btn-secondary" type="submit">Generate Link</button>
-											</div>
-										</form>
-									</div>
+										</div>
+										{#if $errors.amount}
+											<div class="shadow-lg alert alert-error">{$errors.amount}</div>
+										{/if}
+										<div class="py-4">
+											<button class="btn btn-secondary" type="submit">Generate Link</button>
+										</div>
+									</form>
 								</div>
 							</div>
 						</div>
@@ -245,18 +241,14 @@
 
 					<!--Next Column-->
 					<div class="space-y-6 lg:col-start-3 lg:col-span-1">
-						<div>
-							<!-- Status -->
-							<div class="lg:col-start-3 lg:col-span-1">
-								<div class="bg-primary text-primary-content card">
-									<div class="text-center card-body items-center">
-										<h2 class="text-2xl card-title">pCall Status</h2>
-										<p>Signed in as {talentObj.name}</p>
-										{#if currentLinkObj}
-											<p>CallId: {currentLinkObj.callId}</p>
-										{/if}
-										<p>Call State: {callState}</p>
-									</div>
+						<!-- Status -->
+						<div class="lg:col-start-3 lg:col-span-1">
+							<div class="bg-primary text-primary-content card">
+								<div class="text-center card-body items-center">
+									<h2 class="text-2xl card-title">pCall Status</h2>
+									<p>Signed in as {talentObj.name}</p>
+
+									<p>Call State: {callState}</p>
 								</div>
 							</div>
 						</div>
@@ -278,8 +270,14 @@
 								</div>
 							</div>
 						</div>
+
+						<!-- Wallet -->
 						<div>
-							<!-- Feedback -->
+							<TalentWallet {talent} />
+						</div>
+
+						<!-- Feedback -->
+						<div>
 							<div class="lg:col-start-3 lg:col-span-1">
 								<div class="bg-primary text-primary-content card">
 									<div class="text-center card-body items-center">
@@ -289,28 +287,9 @@
 								</div>
 							</div>
 						</div>
+
+						<!-- Activity Feed -->
 						<div>
-							<!-- Account -->
-							<div class="lg:col-start-3 lg:col-span-1">
-								<div class="bg-primary text-primary-content card">
-									<div class="text-center card-body items-center">
-										<h2 class="text-2xl card-title">Account</h2>
-										<div class="flex">
-											<div class="stat">
-												<div class="stat-title">Amount in Escrow</div>
-												<div class="stat-value">{currencyFormatter.format(1400)}</div>
-											</div>
-											<div class="stat">
-												<div class="stat-title">Amount Available</div>
-												<div class="stat-value">{currencyFormatter.format(400)}</div>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-						<div>
-							<!-- Activity Feed -->
 							<div class="lg:col-start-3 lg:col-span-1">
 								<TalentActivity {talentStats} />
 							</div>
