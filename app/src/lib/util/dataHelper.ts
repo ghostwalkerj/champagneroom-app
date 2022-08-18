@@ -2,7 +2,7 @@ import type { AgentDocument } from '$lib/ORM/models/agent';
 import { FeedbackString, type FeedbackDocType } from '$lib/ORM/models/feedback';
 import { LinkStatuses, LinkString, type LinkDocType } from '$lib/ORM/models/link';
 import type { TalentDocument } from '$lib/ORM/models/talent';
-import { womensNames } from '$lib/womensNames';
+import { womensNames } from '$lib/util/womensNames';
 import { nanoid } from 'nanoid';
 import spacetime from 'spacetime';
 import { uniqueNamesGenerator } from 'unique-names-generator';

@@ -1,4 +1,4 @@
-import { AUTH_PATH, TokenRoles } from '$lib/constants';
+import { AUTH_PATH, TokenRoles } from '$lib/util/constants';
 import urlJoin from 'url-join';
 import type { PageLoad } from './$types';
 

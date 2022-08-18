@@ -1129,12 +1129,11 @@
     esbuild "^0.14.48"
 
 "@sveltejs/kit@^1.0.0-next.415":
-  version "1.0.0-next.418"
-  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-1.0.0-next.418.tgz#3097db39da946c3741e9ddf30326d96ac7f3e4ea"
-  integrity sha512-lR1iNXOln3e6gl4KxiylIF3fQNrLmD0KhWUD09IKRIkkL3DJ5e7kwaX/CEsYJqVt0tg7jwMxQVlpcvFNFnRRLQ==
+  version "1.0.0-next.420"
+  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-1.0.0-next.420.tgz#314d097c1aa5816c3602656ae06d80cc15059476"
+  integrity sha512-9m/uWbd7Osj474TrkjRZ2x784PZzO6akxDFGfaEoFS5AsRUnDFRJ0HWHHdymy170aJsvlu20ZpLTNbbS5a95+g==
   dependencies:
     "@sveltejs/vite-plugin-svelte" "^1.0.1"
-    chokidar "^3.5.3"
     cookie "^0.5.0"
     devalue "^2.0.1"
     kleur "^4.1.4"

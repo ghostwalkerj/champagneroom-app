@@ -1,5 +1,5 @@
 <script lang="ts">
-	import ConnectButton from '$lib/components/web3/ConnectButton.svelte';
+	import ConnectButton from '$lib/components/header/ConnectButton.svelte';
 </script>
 
 <div class="bg-base-100 navbar">

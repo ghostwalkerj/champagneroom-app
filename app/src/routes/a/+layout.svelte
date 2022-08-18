@@ -1,5 +1,5 @@
 <script lang="ts">
-	import ConnectButton from '$lib/components/web3/ConnectButton.svelte';
+	import ConnectButton from '$lib/components/header/ConnectButton.svelte';
 	import { BellIcon, MailIcon, MenuIcon } from 'svelte-feather-icons';
 	import { selectedAccount } from 'svelte-web3';
 </script>

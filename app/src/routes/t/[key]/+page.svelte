@@ -1,25 +1,24 @@
 <script lang="ts">
-	import { DEFAULT_PROFILE_IMAGE } from '$lib/constants';
 	import { browser } from '$app/env';
 	import { page } from '$app/stores';
-	import { currencyFormatter } from '$lib/constants';
-	import { createForm } from 'svelte-forms-lib';
-	import * as yup from 'yup';
 	import ProfilePhoto from '$lib/components/forms/ProfilePhoto.svelte';
-	import LinkViewer from '$lib/components/link/LinkView.svelte';
-	import VideoCall from '$lib/components/VideoCall.svelte';
-	import VideoPreview from '$lib/components/VideoPreview.svelte';
-	import StarRating from 'svelte-star-rating';
+	import LinkViewer from './LinkView.svelte';
+	import TalentActivity from './TalentActivity.svelte';
+	import VideoCall from '$lib/components/calls/VideoCall.svelte';
+	import VideoPreview from '$lib/components/calls/VideoPreview.svelte';
+	import { currencyFormatter, DEFAULT_PROFILE_IMAGE } from '$lib/util/constants';
 	import { talentDB, type TalentDBType } from '$lib/ORM/dbs/talentDB';
+	import type { LinkDocType, LinkDocument } from '$lib/ORM/models/link';
+	import type { TalentDocType, TalentDocument, TalentStats } from '$lib/ORM/models/talent';
 	import { StorageTypes } from '$lib/ORM/rxdb';
-	import { userStream, type UserStreamType } from '$lib/userStream';
-	import type { VideoCallType } from '$lib/videoCall';
+	import { userStream, type UserStreamType } from '$lib/util/userStream';
+	import type { VideoCallType } from '$lib/util/videoCall';
 	import { onDestroy, onMount } from 'svelte';
 	import { PhoneIncomingIcon } from 'svelte-feather-icons';
-	import type { PageData, Errors } from './$types';
-	import type { TalentDocType, TalentDocument, TalentStats } from '$lib/ORM/models/talent';
-	import type { LinkDocType, LinkDocument } from '$lib/ORM/models/link';
-	import TalentActivity from '$lib/components/talent/TalentActivity.svelte';
+	import { createForm } from 'svelte-forms-lib';
+	import StarRating from 'svelte-star-rating';
+	import * as yup from 'yup';
+	import type { Errors, PageData } from './$types';
 
 	export let data: PageData;
 	export let _errors: Errors;
@@ -42,7 +41,7 @@
 
 	if (browser) {
 		global = window;
-		import('$lib/videoCall').then((_vc) => {
+		import('$lib/util/videoCall').then((_vc) => {
 			videoCall = _vc.videoCall;
 			initVC();
 		});

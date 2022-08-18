@@ -1,4 +1,4 @@
-import { DEFAULT_PROFILE_IMAGE } from '$lib/constants';
+import { DEFAULT_PROFILE_IMAGE } from '$lib/util/constants';
 import { TalentString, type TalentDocType, type TalentDocument } from '$lib/ORM/models/talent';
 import { nanoid } from 'nanoid';
 import {
@@ -8,7 +8,6 @@ import {
 	type RxDocument,
 	type RxJsonSchema
 } from 'rxdb';
-import { bool } from 'yup';
 type AgentDocMethods = {
 	createTalent: (
 		name: string,

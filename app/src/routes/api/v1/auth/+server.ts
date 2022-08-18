@@ -4,7 +4,7 @@ import {
 	JWT_PUBLIC_USER,
 	JWT_SECRET,
 	TokenRoles
-} from '$lib/constants';
+} from '$lib/util/constants';
 import { json as json$1 } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import type { RequestHandler } from './$types';

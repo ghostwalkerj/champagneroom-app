@@ -1,18 +1,18 @@
 <script lang="ts">
 	import { browser } from '$app/env';
 	import { page } from '$app/stores';
-	import FeedbackForm from '$lib/components/feedback/FeedbackForm.svelte';
-	import LinkDetail from '$lib/components/link/LinkDetail.svelte';
-	import VideoCall from '$lib/components/VideoCall.svelte';
-	import VideoPreview from '$lib/components/VideoPreview.svelte';
+	import FeedbackForm from './FeedbackForm.svelte';
+	import LinkDetail from './LinkDetail.svelte';
+	import VideoCall from '$lib/components/calls/VideoCall.svelte';
+	import VideoPreview from '$lib/components/calls/VideoPreview.svelte';
 	import { publicDB, type PublicDBType } from '$lib/ORM/dbs/publicDB';
 	import type { FeedbackDocType, FeedbackDocument } from '$lib/ORM/models/feedback';
 	import type { LinkDocType, LinkDocument } from '$lib/ORM/models/link';
 	import { StorageTypes } from '$lib/ORM/rxdb';
-	import { userStream, type UserStreamType } from '$lib/userStream';
-	import type { VideoCallType } from '$lib/videoCall';
+	import { userStream, type UserStreamType } from '$lib/util/userStream';
+	import type { VideoCallType } from '$lib/util/videoCall';
 	import fsm from 'svelte-fsm';
-	import type { PageData, Errors } from './$types';
+	import type { Errors, PageData } from './$types';
 
 	export let data: PageData;
 	export let _errors: Errors;
@@ -96,7 +96,7 @@
 			});
 		});
 
-		import('$lib/videoCall').then((_vc) => {
+		import('$lib/util/videoCall').then((_vc) => {
 			videoCall = _vc.videoCall;
 			vc = videoCall();
 			vc.callState.subscribe((state) => {

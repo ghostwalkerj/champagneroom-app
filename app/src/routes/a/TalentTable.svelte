@@ -1,6 +1,6 @@
 <script lang="ts">
-	import TableRating from '$lib/components/TableRating.svelte';
-	import { currencyFormatter, TALENT_PATH } from '$lib/constants';
+	import TableRating from './TableRating.svelte';
+	import { currencyFormatter, TALENT_PATH } from '$lib/util/constants';
 	import type { TalentDocument } from '$lib/ORM/models/talent';
 	import SvelteTable from 'svelte-table';
 

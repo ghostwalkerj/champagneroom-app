@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { currencyFormatter } from '$lib/constants';
+	import { currencyFormatter } from '$lib/util/constants';
 	import type { TalentStats } from '$lib/ORM/models/talent';
 	export let talentStats: TalentStats;
 </script>

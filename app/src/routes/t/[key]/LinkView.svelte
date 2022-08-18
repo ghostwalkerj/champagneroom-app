@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { ROOM_PATH } from '$lib/constants';
+	import { ROOM_PATH } from '$lib/util/constants';
 	import type { LinkDocType } from '$lib/ORM/models/link';
 	import type { TalentDocType } from '$lib/ORM/models/talent';
 	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';

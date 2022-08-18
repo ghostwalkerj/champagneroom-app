@@ -1,4 +1,4 @@
-import { PUBLIC_ENDPOINT, RXDB_PASSWORD } from '$lib/constants';
+import { PUBLIC_ENDPOINT, RXDB_PASSWORD } from '$lib/util/constants';
 import { feedbackSchema, type FeedbackCollection } from '$lib/ORM/models/feedback';
 import { linkSchema, type LinkCollection, type LinkDocument } from '$lib/ORM/models/link';
 import { initRXDB, StorageTypes } from '$lib/ORM/rxdb';

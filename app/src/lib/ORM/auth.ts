@@ -4,7 +4,7 @@ import {
 	JWT_PUBLIC_USER,
 	JWT_SECRET,
 	TokenRoles
-} from '$lib/constants';
+} from '$lib/util/constants';
 import jwt from 'jsonwebtoken';
 
 export const doAuth = async (tokenRole: TokenRoles) => {

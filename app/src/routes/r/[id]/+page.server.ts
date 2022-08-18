@@ -1,4 +1,4 @@
-import { JWT_EXPIRY, JWT_PUBLIC_USER, JWT_SECRET } from '$lib/constants';
+import { JWT_EXPIRY, JWT_PUBLIC_USER, JWT_SECRET } from '$lib/util/constants';
 import { publicDB } from '$lib/ORM/dbs/publicDB';
 import type { FeedbackDocument } from '$lib/ORM/models/feedback';
 import { StorageTypes } from '$lib/ORM/rxdb';

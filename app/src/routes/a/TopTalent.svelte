@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { currencyFormatter } from '$lib/constants';
+	import { currencyFormatter } from '$lib/util/constants';
 	import type { TalentDocument } from '$lib/ORM/models/talent';
 	import Chart from 'chart.js/auto';
 	import ChartDataLabels from 'chartjs-plugin-datalabels';

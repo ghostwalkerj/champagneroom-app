@@ -1,7 +1,7 @@
 <script lang="ts">
 	// TODO:Add validation
 	import { page } from '$app/stores';
-	import { IMAGE_UPLOAD_PATH } from '$lib/constants';
+	import { IMAGE_UPLOAD_PATH } from '$lib/util/constants';
 	import { filedrop } from 'filedrop-svelte';
 	import { scale } from 'svelte/transition';
 	import urlJoin from 'url-join';

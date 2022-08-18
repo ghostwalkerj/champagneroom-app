@@ -1,4 +1,4 @@
-import { CREATORS_ENDPOINT, RXDB_PASSWORD } from '$lib/constants';
+import { CREATORS_ENDPOINT, RXDB_PASSWORD } from '$lib/util/constants';
 import { feedbackSchema, type FeedbackCollection } from '$lib/ORM/models/feedback';
 import { linkSchema, type LinkCollection } from '$lib/ORM/models/link';
 import { talentDocMethods, talentSchema, type TalentCollection } from '$lib/ORM/models/talent';

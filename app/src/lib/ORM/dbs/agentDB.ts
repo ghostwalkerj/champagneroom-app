@@ -1,4 +1,4 @@
-import { CREATORS_ENDPOINT, RXDB_PASSWORD } from '$lib/constants';
+import { CREATORS_ENDPOINT, RXDB_PASSWORD } from '$lib/util/constants';
 import {
 	agentDocMethods,
 	agentSchema,
@@ -10,7 +10,7 @@ import { linkSchema, type LinkCollection } from '$lib/ORM/models/link';
 import { talentDocMethods, talentSchema, type TalentCollection } from '$lib/ORM/models/talent';
 import { initRXDB, StorageTypes } from '$lib/ORM/rxdb';
 import { EventEmitter } from 'events';
-import { createRxDatabase, removeRxDatabase, type RxDatabase } from 'rxdb';
+import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
 
 // Sync requires more listeners but ok with http2

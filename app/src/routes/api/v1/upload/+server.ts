@@ -5,7 +5,7 @@ import {
 	INFURA_IPFS_DEDICATED_GATEWAY,
 	INFURA_IPFS_PROJECT_ID,
 	INFURA_IPFS_PROJECT_SECRET
-} from '$lib/constants';
+} from '$lib/util/constants';
 import type { RequestHandler } from './$types';
 import ipfsClient from 'ipfs-http-client';
 
