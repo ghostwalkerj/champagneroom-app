@@ -69,7 +69,7 @@ const talentSchemaLiteral = {
 		},
 		agent: { type: 'string', ref: 'agents', maxLength: 50 }
 	},
-	required: ['_id', 'key', 'name', 'profileImageUrl', 'agent', 'agentCommission'],
+	required: ['_id', 'key', 'name', 'profileImageUrl', 'agent', 'agentCommission', 'createdAt'],
 	indexes: ['key', 'agent']
 } as const;
 
@@ -138,6 +138,7 @@ export const talentDocMethods: TalentDocMethods = {
 		this.update({ $set: { currentLink: link._id } });
 		return link;
 	},
+
 	getStats: async function (
 		this: TalentDocument,
 		range = { start: 0, end: new Date().getTime() }

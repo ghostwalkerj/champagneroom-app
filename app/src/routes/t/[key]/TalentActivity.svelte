@@ -1,16 +1,18 @@
 <script lang="ts">
 	import { currencyFormatter } from '$lib/util/constants';
 	import type { TalentStats } from '$lib/ORM/models/talent';
+	import spacetime from 'spacetime';
 	export let talentStats: TalentStats;
 </script>
 
 <div class="bg-primary text-primary-content card">
 	<div class="text-left card-body items-center">
 		<h2 class="text-2xl card-title">Activity</h2>
+		<h2 class="text-lg card-title">{talentStats.completedCalls.length} Completed Calls</h2>
 
 		<div class="mt-6 flow-root">
 			<ul class="-mb-8">
-				{#each talentStats.completedCalls as calls}
+				{#each talentStats.completedCalls.slice(0, 9) as call}
 					<li>
 						<div class="pb-8 relative">
 							<div class="flex space-x-5 relative">
@@ -37,14 +39,11 @@
 								<div class="flex space-x-4 flex-1 min-w-0 pt-1.5 justify-between">
 									<div>
 										<p class="text-sm text-gray-200">
-											Completed pCall with <span href="#" class="font-medium text-gray-900"
-												>Tedward Cruz</span
-											>
-											for {currencyFormatter.format(500)}
+											Completed pCall for {currencyFormatter.format(call.amount)}
 										</p>
 									</div>
 									<div class="text-right text-sm text-gray-200 whitespace-nowrap">
-										<time datetime="2020-10-04">Oct 4</time>
+										{spacetime(call.callStart).format('{month-short} {date-pad}')}
 									</div>
 								</div>
 							</div>

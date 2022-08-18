@@ -85,7 +85,8 @@ const linkSchemaLiteral = {
 		'callId',
 		'amount',
 		'fundedAmount',
-		'feedback'
+		'feedback',
+		'createdAt'
 	],
 	indexes: ['talent', 'feedback', 'agent', 'status', 'callStart'],
 	encrypted: ['callId']

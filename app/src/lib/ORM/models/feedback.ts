@@ -80,7 +80,8 @@ const feedbackSchemaLiteral = {
 		'unanswered',
 		'rating',
 		'link',
-		'talent'
+		'talent',
+		'createdAt'
 	]
 } as const;
 
