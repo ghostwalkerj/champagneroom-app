@@ -115,12 +115,13 @@
 	<div class="text-center card-body items-center">
 		<h2 class="text-2xl card-title">Manage Talent</h2>
 	</div>
-	<SvelteTable
-		{columns}
-		rows={talentRows}
-		classNameTable="divide-y divide-gray-300 "
-		classNameThead="bg-gray-50"
-		classNameTbody="divide-y bg-white divide-gray-200"
-		classNameCell="text-sm py-4 px-3 text-gray-500 whitespace-nowrap"
-	/>
+	<div class="p-2">
+		<SvelteTable
+			{columns}
+			rows={talentRows}
+			classNameTable="w-full bg-white  rounded-xl"
+			classNameTbody="divide-y border-3 rounded-xl"
+			classNameCell="text-sm py-4 px-3 m-10 text-gray-500 whitespace-nowrap "
+		/>
+	</div>
 </div>

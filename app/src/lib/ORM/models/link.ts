@@ -62,8 +62,8 @@ const linkSchemaLiteral = {
 		talent: { type: 'string', ref: 'talents', maxLength: 50 },
 		agent: { type: 'string', ref: 'agents', maxLength: 70 },
 		feedback: { type: 'string', ref: 'feedbacks', maxLength: 50 },
-		callStart: { type: 'integer', multipleOf: 1, minimum: 0, maximum: 3000000000 },
-		callEnd: { type: 'integer', multipleOf: 1, minimum: 0, maximum: 3000000000 },
+		callStart: { type: 'integer', multipleOf: 1, minimum: 0, maximum: 3000000000000 },
+		callEnd: { type: 'integer', multipleOf: 1, minimum: 0, maximum: 3000000000000 },
 		createdAt: {
 			type: 'integer'
 		},

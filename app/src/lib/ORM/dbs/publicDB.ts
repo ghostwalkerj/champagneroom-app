@@ -7,7 +7,7 @@ import { createRxDatabase, removeRxDatabase, type RxDatabase } from 'rxdb';
 import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
 
 // Sync requires more listeners but ok with http2
-EventEmitter.defaultMaxListeners = 25;
+EventEmitter.defaultMaxListeners = 100;
 type PublicCollections = {
 	links: LinkCollection;
 	feedbacks: FeedbackCollection;
