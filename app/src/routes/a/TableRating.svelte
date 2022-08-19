@@ -1,15 +1,18 @@
 <script lang="ts">
 	import StarRating from 'svelte-star-rating';
 	export let row;
+	export let col;
 
-	const rating = row.rating;
+	$: rating = row.rating;
 </script>
 
-<div class="flex">
-	<div class="pr-5 ">
-		{rating.toFixed(1)}
+{#key row.id}
+	<div class="flex">
+		<div class="pr-5 ">
+			{rating.toFixed(1)}
+		</div>
+		{#if rating > 0 && rating <= 5}
+			<StarRating {rating} />
+		{/if}
 	</div>
-	{#if rating > 0 && rating <= 5}
-		<StarRating {rating} />
-	{/if}
-</div>
+{/key}

@@ -43,7 +43,10 @@
 			sortable: true,
 			headerClass: 'font-semibold text-left text-sm py-3.5 px-3 text-gray-900',
 			renderComponent: {
-				component: TableRating
+				component: TableRating,
+				props: {
+					//onChange: updateRow
+				}
 			}
 		},
 		{
