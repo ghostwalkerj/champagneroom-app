@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { UserStreamType } from '$lib/userStream';
+	import type { UserStreamType } from '$lib/util/userStream';
 	import { onMount } from 'svelte';
 	import { MicIcon, MicOffIcon, VideoIcon, VideoOffIcon } from 'svelte-feather-icons';
 
