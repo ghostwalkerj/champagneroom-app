@@ -31,13 +31,13 @@
 	let rating = data!.rating!;
 	let earnings = data!.earnings!;
 	let completedCalls = data!.completedCalls! as LinkDocType[];
+	let currentLink: LinkDocument;
 
 	let key = $page.params.key;
 	let vc: VideoCallType;
 	let global = globalThis;
 
 	let talent: TalentDocument;
-	let currentLink: LinkDocument;
 
 	if (browser) {
 		global = window;

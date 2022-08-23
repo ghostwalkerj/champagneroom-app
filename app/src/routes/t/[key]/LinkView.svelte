@@ -7,20 +7,22 @@
 	import urlJoin from 'url-join';
 	export let link: LinkDocType;
 	export let talent: TalentDocType;
+	let tooltipOpen = '';
 
 	$: linkURL = '';
 	$: if (link) linkURL = urlJoin($page.url.origin, ROOM_PATH, link._id);
 
 	const copyLink = () => {
 		navigator.clipboard.writeText(linkURL);
+		tooltipOpen = 'tooltip-open';
+		setTimeout(() => (tooltipOpen = ''), 2000);
 	};
 </script>
 
 <div class="bg-primary text-primary-content card">
 	<div class="text-center card-body items-center">
+		<h2 class="text-2xl card-title">Your Outstanding pCall Link</h2>
 		{#if talent && link}
-			<h2 class="text-2xl card-title">Your Outstanding pCall Link</h2>
-
 			<div class="container mx-auto grid p-6 gap-4 grid-row-2">
 				<div class="bg-info rounded-box shadow-xl text-accent-content p-4 items-center ">
 					<div class="stat-title">Name Shown</div>
@@ -43,10 +45,14 @@
 						<div class="h-5 mr-1 mb-1 pl-2 group-hover:text-white">
 							<FaRegCopy />
 						</div>
-						<div class="text-sm text-gray-200 group-hover:text-white">Copy link</div>
+						<div class="text-sm text-gray-200 group-hover:text-white">
+							<div class="tooltip tooltip-success {tooltipOpen}" data-tip="Copied!">Copy link</div>
+						</div>
 					</div>
 				</button>
 			</div>
+		{:else if talent.currentLink}
+			Loading....
 		{:else}
 			You do not have any pCall links active
 		{/if}

@@ -1,4 +1,5 @@
 import { talentDB } from '$lib/ORM/dbs/talentDB';
+import type { LinkDocument } from '$lib/ORM/models/link';
 import { StorageTypes } from '$lib/ORM/rxdb';
 import { JWT_CREATOR_USER, JWT_EXPIRY, JWT_SECRET } from '$lib/util/constants';
 import { error } from '@sveltejs/kit';
@@ -23,6 +24,8 @@ export const load: PageServerLoad = async ({ params }) => {
 		if (db) {
 			const talent = await db.talents.findOne().where('key').equals(key).exec();
 			if (talent) {
+				const _currentLink = (await talent.populate('currentLink')) as LinkDocument;
+				const currentLink = _currentLink ? _currentLink.toJSON() : null;
 				const stats = await talent.getStats();
 				const rating = stats.ratingAvg;
 				const earnings = stats.totalEarnings;
@@ -30,6 +33,7 @@ export const load: PageServerLoad = async ({ params }) => {
 				return {
 					token,
 					talent: talent.toJSON(),
+					currentLink,
 					rating,
 					earnings,
 					completedCalls
