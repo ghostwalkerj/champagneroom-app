@@ -28,7 +28,6 @@
 	if (_errors) console.log(_errors);
 	const token = data!.token;
 	let talentObj: TalentDocType = data!.talent!;
-	let currentLinkObj: LinkDocType = data!.currentLink!;
 	let rating = data!.rating!;
 	let earnings = data!.earnings!;
 	let completedCalls = data!.completedCalls! as LinkDocType[];
@@ -40,29 +39,27 @@
 	let talent: TalentDocument;
 	let currentLink: LinkDocument;
 
-	talentDB(token, key, StorageTypes.IDB).then((db: TalentDBType) => {
-		db.talents
-			.findOne(talentObj._id)
-			.exec()
-			.then((_talent) => {
-				if (_talent) {
-					talentObj = _talent;
-					talent = _talent;
-					talent.populate('currentLink').then((cl) => {
-						if (cl) {
-							currentLinkObj = cl;
-							currentLink = cl;
-						}
-					});
-				}
-			});
-	});
-
 	if (browser) {
 		global = window;
 		import('$lib/util/videoCall').then((_vc) => {
 			videoCall = _vc.videoCall;
-			initVC();
+		});
+		talentDB(token, key, StorageTypes.IDB).then((db: TalentDBType) => {
+			db.talents
+				.findOne(talentObj._id)
+				.exec()
+				.then((_talent) => {
+					if (_talent) {
+						talentObj = _talent;
+						talent = _talent;
+						talent.populate('currentLink').then((cl) => {
+							if (cl) {
+								currentLink = cl;
+								initVC();
+							}
+						});
+					}
+				});
 		});
 	}
 	const updateProfileImage = async (url: string) => {
@@ -100,8 +97,8 @@
 
 	const initVC = () => {
 		if (vc) vc.destroy();
-		if (currentLinkObj) {
-			vc = videoCall(currentLinkObj.callId);
+		if (currentLink) {
+			vc = videoCall(currentLink.callId);
 			vc.callState.subscribe((cs) => {
 				if (cs) callState = cs;
 			});
@@ -133,7 +130,7 @@
 		onSubmit: (values) => {
 			if (talent)
 				talent.createLink(Number.parseInt(values.amount)).then((cl) => {
-					currentLinkObj = cl;
+					currentLink = cl;
 					initVC();
 				});
 			handleReset();
@@ -184,7 +181,7 @@
 					<div class="space-y-6 lg:col-start-1 lg:col-span-2">
 						<!-- Current Link -->
 						<div>
-							<LinkViewer link={currentLinkObj} talent={talentObj} />
+							<LinkViewer link={currentLink} talent={talentObj} />
 						</div>
 
 						<!-- Link Form-->
@@ -254,8 +251,8 @@
 										<div class="text-2xl">Waiting for Incoming Call</div>
 									{:else}
 										<p>Signed in as {talentObj.name}</p>
-										<p>Call State: {callState}</p>
 									{/if}
+									<p>Call State: {callState}</p>
 								</div>
 							</div>
 						</div>

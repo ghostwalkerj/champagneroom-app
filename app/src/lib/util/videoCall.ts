@@ -10,6 +10,7 @@ export const videoCall = (userId?: string) => {
 	let noAnswerTimer: NodeJS.Timeout;
 	let rejectCallTimer: NodeJS.Timeout;
 	let currentCallState = 'uninitialized';
+	let destroyed = false;
 
 	const _callerName = writable<string | null>(null);
 	const _remoteStream = writable<MediaStream | null>(null);
@@ -177,16 +178,18 @@ export const videoCall = (userId?: string) => {
 	});
 
 	peer.on('error', (err: Error) => {
-		console.log('error', err);
-		callState.connectionError();
+		if (!destroyed) {
+			console.log('error', err);
+			callState.connectionError();
 
-		setTimeout(() => {
-			console.log('Attempting to reconnect');
-			if (!peer.destroyed) {
-				peer.destroy();
-			}
-			peer = connect2PeerServer(userId);
-		}, 5000);
+			setTimeout(() => {
+				console.log('Attempting to reconnect');
+				if (!peer.destroyed) {
+					peer.destroy();
+				}
+				peer = connect2PeerServer(userId);
+			}, 5000);
+		}
 	});
 
 	peer.on('connection', (conn) => {
@@ -205,15 +208,17 @@ export const videoCall = (userId?: string) => {
 	});
 
 	peer.on('disconnected', () => {
-		console.log('Disconnected from server');
-		callState.disconnected();
-		setTimeout(() => {
-			console.log('Attempting to reconnect');
-			if (!peer.destroyed) {
-				peer.destroy();
-			}
-			peer = connect2PeerServer(userId);
-		}, 5000);
+		if (!destroyed) {
+			console.log('Disconnected from server');
+			callState.disconnected();
+			setTimeout(() => {
+				console.log('Attempting to reconnect');
+				if (!peer.destroyed) {
+					peer.destroy();
+				}
+				peer = connect2PeerServer(userId);
+			}, 5000);
+		}
 	});
 
 	const cancelCall = () => {
@@ -290,6 +295,7 @@ export const videoCall = (userId?: string) => {
 	};
 
 	const destroy = () => {
+		destroyed = true;
 		console.log('destroy called');
 		peer.destroy();
 		resetCallState();

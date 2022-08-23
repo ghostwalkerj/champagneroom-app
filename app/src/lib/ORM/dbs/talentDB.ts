@@ -98,7 +98,7 @@ const create = async (token: string, key: string, storage: StorageTypes) => {
 			// Live sync this Talent's links
 			_db.links.syncCouchDB({
 				remote: remoteDB,
-				waitForLeadership: true,
+				waitForLeadership: false,
 				options: {
 					retry: true,
 					live: true
@@ -109,7 +109,7 @@ const create = async (token: string, key: string, storage: StorageTypes) => {
 			// Live sync this Talent's feedbacks
 			_db.feedbacks.syncCouchDB({
 				remote: remoteDB,
-				waitForLeadership: true,
+				waitForLeadership: false,
 				options: {
 					retry: true,
 					live: true
@@ -120,7 +120,7 @@ const create = async (token: string, key: string, storage: StorageTypes) => {
 			// Live sync this Talent
 			_db.talents.syncCouchDB({
 				remote: remoteDB,
-				waitForLeadership: true,
+				waitForLeadership: false,
 				options: {
 					retry: true,
 					live: true

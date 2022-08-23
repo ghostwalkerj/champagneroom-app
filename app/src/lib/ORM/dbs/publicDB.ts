@@ -86,7 +86,7 @@ const create = async (token: string, linkId: string, storage: StorageTypes) => {
 
 			_db.links.syncCouchDB({
 				remote: remoteDB,
-				waitForLeadership: true,
+				waitForLeadership: false,
 				options: {
 					retry: true,
 					live: true
@@ -95,7 +95,7 @@ const create = async (token: string, linkId: string, storage: StorageTypes) => {
 			});
 			_db.feedbacks.syncCouchDB({
 				remote: remoteDB,
-				waitForLeadership: true,
+				waitForLeadership: false,
 				options: {
 					retry: true,
 					live: true
