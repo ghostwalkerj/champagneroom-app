@@ -24,6 +24,7 @@
 			db.agents.findOne(agentId).$.subscribe((_agent) => {
 				if (_agent) {
 					agent = _agent;
+					talents = [];
 					agent.populate('talents').then((_talents) => {
 						talents = _talents;
 					});
@@ -34,47 +35,47 @@
 			});
 		}
 	});
-
 	let agent: AgentDocument;
-	let talents: TalentDocument[];
+	let talents: TalentDocument[] = [];
 </script>
 
 {#if agent}
 	<div class="min-h-full">
 		<main class="p-10">
 			<!-- Page header -->
-			<div class="bg-black  rounded-lg mx-auto py-4 px-4 sm:px-6 lg:px-8">
-				<div class="font-semibold text-primary text-md leading-6">
-					Agent Dashboard
+			{#key agent._id}
+				<div class="bg-black  rounded-lg mx-auto py-4 px-4 sm:px-6 lg:px-8">
+					<div class="font-semibold text-primary text-md leading-6">
+						Agent Dashboard
 
-					<button
-						class="btn btn-sm"
-						on:click={() => {
-							generateTalent(agent);
-						}}>Create Data</button
-					>
-				</div>
-				<div class="divider" />
-
-				<div class="mx-auto  w-full px-4 md:flex  md:items-center md:justify-between " />
-				<div class="mx-auto grid gap-2 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-					<div class="p-1">
-						<AgentWallet {agent} />
+						<button
+							class="btn btn-sm"
+							on:click={() => {
+								generateTalent(agent);
+							}}>Create Data</button
+						>
 					</div>
-					{#key talents}
-						<!-- Talent viewing and adding -->
+					<div class="divider" />
+
+					<div class="mx-auto grid gap-2 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
 						<div class="p-1">
-							<TalentForm {agent} {talents} />
+							<AgentWallet {agent} />
 						</div>
-						<div class="p-1 row-span-2 ">
-							<TopTalent {talents} />
-						</div>
-						<div class="p-1  lg:col-span-2">
-							<TalentTable {talents} />
-						</div>
-					{/key}
+						{#key talents}
+							<!-- Talent viewing and adding -->
+							<div class="p-1">
+								<TalentForm {agent} {talents} />
+							</div>
+							<div class="p-1 row-span-2 ">
+								<TopTalent {talents} />
+							</div>
+							<div class="p-1  lg:col-span-2">
+								<TalentTable {talents} />
+							</div>
+						{/key}
+					</div>
 				</div>
-			</div>
+			{/key}
 		</main>
 	</div>
 {:else}

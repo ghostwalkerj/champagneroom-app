@@ -1,3 +1,4 @@
+import { LinkDocument } from './../../../lib/ORM/models/link';
 import { JWT_CREATOR_USER, JWT_EXPIRY, JWT_SECRET } from '$lib/util/constants';
 import { talentDB } from '$lib/ORM/dbs/talentDB';
 import { StorageTypes } from '$lib/ORM/rxdb';
@@ -23,13 +24,14 @@ export const load: PageServerLoad = async ({ params }) => {
 		if (db) {
 			const talent = await db.talents.findOne().where('key').equals(key).exec();
 			if (talent) {
-				const currentLink = await talent.populate('currentLink');
+				const _currentLink = (await talent.populate('currentLink')) as LinkDocument;
+				const currentLink = _currentLink ? _currentLink.toJSON() : null;
 				const talentStats = await talent.getStats();
 				return {
 					token,
 					talent: talent.toJSON(),
-					currentLink: currentLink.toJSON(),
-					talentStats: talentStats
+					currentLink,
+					talentStats
 				};
 			} else {
 				return { token };

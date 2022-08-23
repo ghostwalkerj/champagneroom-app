@@ -91,14 +91,14 @@
 			renderComponent: {
 				component: TableCopyLink
 			}
-		},
-		{
-			key: 'action',
-			title: '',
-			sortable: false,
-			headerClass: 'font-semibold text-left text-sm py-3.5 px-3 text-gray-900',
-			renderValue: () => '<button class="btn btn-secondary btn-xs">Edit</button>'
 		}
+		// {
+		// 	key: 'action',
+		// 	title: '',
+		// 	sortable: false,
+		// 	headerClass: 'font-semibold text-left text-sm py-3.5 px-3 text-gray-900',
+		// 	renderValue: () => '<button class="btn btn-secondary btn-xs">Edit</button>'
+		// }
 	];
 
 	if (talents) {
