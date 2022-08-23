@@ -25,7 +25,12 @@ export const load: PageServerLoad = async ({ params }) => {
 			if (talent) {
 				const currentLink = await talent.populate('currentLink');
 				const talentStats = await talent.getStats();
-				return { token, talent, currentLink, talentStats };
+				return {
+					token,
+					talent: talent.toJSON(),
+					currentLink: currentLink.toJSON(),
+					talentStats: talentStats
+				};
 			} else {
 				return { token };
 			}

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import TableRating from './TableRating.svelte';
-	import { currencyFormatter, TALENT_PATH } from '$lib/util/constants';
+	import TableCopyLink from './TableCopyLink.svelte';
+	import { currencyFormatter } from '$lib/util/constants';
 	import type { TalentDocument } from '$lib/ORM/models/talent';
 	import SvelteTable from 'svelte-table';
 
@@ -12,7 +13,7 @@
 		rating: number;
 		calls: number;
 		earnings: number;
-		commisson: number;
+		commission: number;
 		myEarnings: number;
 		url: string;
 	};
@@ -67,10 +68,10 @@
 		{
 			key: 'commission',
 			title: 'Commission (%)',
-			value: (v: TalentRow) => v.commisson,
+			value: (v: TalentRow) => v.commission,
 			sortable: true,
 			headerClass: 'font-semibold text-left text-sm py-3.5 px-3 text-gray-900',
-			renderValue: (v: TalentRow) => `${v.commisson}%`
+			renderValue: (v: TalentRow) => `${v.commission}%`
 		},
 		{
 			key: 'myearnings',
@@ -82,11 +83,14 @@
 		},
 		{
 			key: 'url',
-			title: "Talent's Link",
+			title: 'Talent Link',
 			value: (v: TalentRow) => v.url,
 			sortable: false,
 			headerClass: 'font-semibold text-left text-sm py-3.5 px-3 text-gray-900',
-			renderValue: (v: TalentRow) => `<a href="/${TALENT_PATH}/${v.url}">${v.name}</a>`
+			// renderValue: (v: TalentRow) => `<a href="/${TALENT_PATH}/${v.url}">${v.name}</a>`
+			renderComponent: {
+				component: TableCopyLink
+			}
 		},
 		{
 			key: 'action',
@@ -107,7 +111,7 @@
 				calls: stats.completedCalls.length,
 				earnings: stats.totalEarnings,
 				url: talent.key,
-				commisson: talent.agentCommission,
+				commission: talent.agentCommission,
 				myEarnings: stats.totalEarnings * (1 / talent.agentCommission)
 			});
 		});
