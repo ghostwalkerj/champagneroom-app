@@ -7,6 +7,8 @@
 	import Web3Modal from 'web3modal';
 	import JazzIcon from './JazzIcon.svelte';
 	let pending = 'pending';
+	let tooltipOpen = '';
+
 	const disable = () => defaultEvmStores.disconnect();
 	const INFURA_ID = process.env.VITE_INFURA_ID || '';
 
@@ -39,6 +41,8 @@
 
 	function copyAddress() {
 		navigator.clipboard.writeText($selectedAccount!);
+		tooltipOpen = 'tooltip-open';
+		setTimeout(() => (tooltipOpen = ''), 2000);
 	}
 
 	function formatEth(balance: any) {
@@ -92,7 +96,7 @@
 							Change
 						</button>
 					</div>
-					<div class="flex mt-2 mb-4 leading-4 items-center align-middle">
+					<div class="flex  mt-2 mb-4 leading-4 items-center align-middle">
 						<JazzIcon address={$selectedAccount} />
 
 						<div class="font-semibold  text-xl ml-2 text-gray-200">
@@ -108,9 +112,14 @@
 								<div class="h-5 mr-1 mb-1 pl-2 group-hover:text-white">
 									<FaRegCopy />
 								</div>
-								<div class="text-sm text-gray-400 group-hover:text-white">Copy address</div>
+								<div class="text-sm text-gray-400 group-hover:text-white">
+									<div class="tooltip tooltip-success {tooltipOpen}" data-tip="Copied!">
+										Copy Address
+									</div>
+								</div>
 							</div>
 						</button>
+
 						<div class="pl-6 group">
 							<a
 								href={`https://etherscan.io/address/${$selectedAccount}`}
