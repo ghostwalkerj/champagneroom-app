@@ -9,3 +9,6 @@ app/.svelte-kit/
 app/build/
 node_modules/.yarn-integrity
 app/log.txt
+app/yarn-error.log
+app/.vscode/**
+.vscode/**
