@@ -1,4 +1,3 @@
-import { json } from '@sveltejs/kit';
 import {
 	INFURA_IPFS_API_PORT,
 	INFURA_IPFS_API_URL,
@@ -6,8 +5,9 @@ import {
 	INFURA_IPFS_PROJECT_ID,
 	INFURA_IPFS_PROJECT_SECRET
 } from '$lib/util/constants';
-import type { RequestHandler } from './$types';
+import { json } from '@sveltejs/kit';
 import ipfsClient from 'ipfs-http-client';
+import type { RequestHandler } from './$types';
 
 const auth =
 	'Basic ' +

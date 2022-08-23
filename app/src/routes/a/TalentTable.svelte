@@ -1,9 +1,9 @@
 <script lang="ts">
-	import TableRating from './TableRating.svelte';
-	import TableCopyLink from './TableCopyLink.svelte';
-	import { currencyFormatter } from '$lib/util/constants';
 	import type { TalentDocument } from '$lib/ORM/models/talent';
+	import { currencyFormatter } from '$lib/util/constants';
 	import SvelteTable from 'svelte-table';
+	import TableCopyLink from './TableCopyLink.svelte';
+	import TableRating from './TableRating.svelte';
 
 	export let talents: TalentDocument[];
 

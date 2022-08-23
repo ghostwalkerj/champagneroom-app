@@ -1,5 +1,5 @@
-import { DEFAULT_PROFILE_IMAGE } from '$lib/util/constants';
 import { TalentString, type TalentDocType, type TalentDocument } from '$lib/ORM/models/talent';
+import { DEFAULT_PROFILE_IMAGE } from '$lib/util/constants';
 import { nanoid } from 'nanoid';
 import {
 	toTypedRxJsonSchema,

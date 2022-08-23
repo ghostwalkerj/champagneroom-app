@@ -1,15 +1,15 @@
 <script lang="ts">
-	import AgentWallet from './AgentWallet.svelte';
-	import TalentForm from './TalentForm.svelte';
-	import TalentTable from './TalentTable.svelte';
-	import TopTalent from './TopTalent.svelte';
-	import { generateTalent } from '$lib/util/dataHelper';
 	import { agentDB } from '$lib/ORM/dbs/agentDB';
 	import { AgentString, type AgentDocument } from '$lib/ORM/models/agent';
 	import type { TalentDocument } from '$lib/ORM/models/talent';
 	import { StorageTypes } from '$lib/ORM/rxdb';
+	import { generateTalent } from '$lib/util/dataHelper';
 	import { selectedAccount } from 'svelte-web3';
 	import type { Errors, PageData } from './$types';
+	import AgentWallet from './AgentWallet.svelte';
+	import TalentForm from './TalentForm.svelte';
+	import TalentTable from './TalentTable.svelte';
+	import TopTalent from './TopTalent.svelte';
 
 	export let data: PageData;
 	export let errors: Errors;

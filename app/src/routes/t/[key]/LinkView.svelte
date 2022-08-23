@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { ROOM_PATH } from '$lib/util/constants';
 	import type { LinkDocType } from '$lib/ORM/models/link';
 	import type { TalentDocType } from '$lib/ORM/models/talent';
+	import { ROOM_PATH } from '$lib/util/constants';
 	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';
 	import urlJoin from 'url-join';
 	export let link: LinkDocType;

@@ -1,8 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/env';
 	import { page } from '$app/stores';
-	import FeedbackForm from './FeedbackForm.svelte';
-	import LinkDetail from './LinkDetail.svelte';
 	import VideoCall from '$lib/components/calls/VideoCall.svelte';
 	import VideoPreview from '$lib/components/calls/VideoPreview.svelte';
 	import { publicDB, type PublicDBType } from '$lib/ORM/dbs/publicDB';
@@ -13,6 +11,8 @@
 	import type { VideoCallType } from '$lib/util/videoCall';
 	import fsm from 'svelte-fsm';
 	import type { Errors, PageData } from './$types';
+	import FeedbackForm from './FeedbackForm.svelte';
+	import LinkDetail from './LinkDetail.svelte';
 
 	export let data: PageData;
 	export let _errors: Errors;

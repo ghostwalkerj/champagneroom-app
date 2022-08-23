@@ -1,6 +1,6 @@
 <script lang="ts">
-	import 'virtual:windi.css';
 	import { browser } from '$app/env';
+	import 'virtual:windi.css';
 	if (browser) import('virtual:windi-devtools');
 </script>
 

@@ -1,8 +1,8 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import { TALENT_PATH } from '$lib/util/constants';
 	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';
 	import urlJoin from 'url-join';
-	import { page } from '$app/stores';
 
 	export let row;
 	export let col;

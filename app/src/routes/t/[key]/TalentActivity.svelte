@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { currencyFormatter } from '$lib/util/constants';
 	import type { TalentStats } from '$lib/ORM/models/talent';
+	import { currencyFormatter } from '$lib/util/constants';
 	import spacetime from 'spacetime';
 	export let talentStats: TalentStats;
 </script>

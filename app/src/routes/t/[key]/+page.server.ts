@@ -1,10 +1,10 @@
-import { LinkDocument } from './../../../lib/ORM/models/link';
-import { JWT_CREATOR_USER, JWT_EXPIRY, JWT_SECRET } from '$lib/util/constants';
 import { talentDB } from '$lib/ORM/dbs/talentDB';
 import { StorageTypes } from '$lib/ORM/rxdb';
+import { JWT_CREATOR_USER, JWT_EXPIRY, JWT_SECRET } from '$lib/util/constants';
 import { error } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import type { PageServerLoad } from './$types';
+import { LinkDocument } from './../../../lib/ORM/models/link';
 export const load: PageServerLoad = async ({ params }) => {
 	const key = params.key;
 	let token = '';

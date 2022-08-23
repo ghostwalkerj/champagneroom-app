@@ -1,9 +1,9 @@
-import { CREATORS_ENDPOINT, RXDB_PASSWORD } from '$lib/util/constants';
 import { feedbackSchema, type FeedbackCollection } from '$lib/ORM/models/feedback';
 import { linkSchema, type LinkCollection } from '$lib/ORM/models/link';
 import { talentDocMethods, talentSchema, type TalentCollection } from '$lib/ORM/models/talent';
 import type { StorageTypes } from '$lib/ORM/rxdb';
 import { initRXDB } from '$lib/ORM/rxdb';
+import { CREATORS_ENDPOINT, RXDB_PASSWORD } from '$lib/util/constants';
 import { EventEmitter } from 'events';
 import { createRxDatabase, removeRxDatabase, type RxDatabase } from 'rxdb';
 import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';

@@ -1,16 +1,14 @@
 <script lang="ts">
 	import { browser } from '$app/env';
 	import { page } from '$app/stores';
-	import ProfilePhoto from '$lib/components/forms/ProfilePhoto.svelte';
-	import LinkViewer from './LinkView.svelte';
-	import TalentActivity from './TalentActivity.svelte';
 	import VideoCall from '$lib/components/calls/VideoCall.svelte';
 	import VideoPreview from '$lib/components/calls/VideoPreview.svelte';
-	import { currencyFormatter, DEFAULT_PROFILE_IMAGE } from '$lib/util/constants';
+	import ProfilePhoto from '$lib/components/forms/ProfilePhoto.svelte';
 	import { talentDB, type TalentDBType } from '$lib/ORM/dbs/talentDB';
 	import type { LinkDocType, LinkDocument } from '$lib/ORM/models/link';
 	import type { TalentDocType, TalentDocument, TalentStats } from '$lib/ORM/models/talent';
 	import { StorageTypes } from '$lib/ORM/rxdb';
+	import { DEFAULT_PROFILE_IMAGE } from '$lib/util/constants';
 	import { userStream, type UserStreamType } from '$lib/util/userStream';
 	import type { VideoCallType } from '$lib/util/videoCall';
 	import { onDestroy, onMount } from 'svelte';
@@ -19,6 +17,8 @@
 	import StarRating from 'svelte-star-rating';
 	import * as yup from 'yup';
 	import type { Errors, PageData } from './$types';
+	import LinkViewer from './LinkView.svelte';
+	import TalentActivity from './TalentActivity.svelte';
 	import TalentWallet from './TalentWallet.svelte';
 
 	export let data: PageData;
