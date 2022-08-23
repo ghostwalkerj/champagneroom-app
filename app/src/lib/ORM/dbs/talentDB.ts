@@ -73,30 +73,27 @@ const create = async (token: string, key: string, storage: StorageTypes) => {
 
 		const _currentTalent = await talentQuery.exec();
 		if (_currentTalent) {
-			// Wait for currentLink
-			if (_currentTalent.currentLink) {
-				const currentLinkQuery = _db.links.findOne(_currentTalent.currentLink);
-				repState = _db.links.syncCouchDB({
-					remote: remoteDB,
-					waitForLeadership: false,
-					options: {
-						retry: true
-					},
-					query: currentLinkQuery
-				});
-				await repState.awaitInitialReplication();
+			// Wait for links
+			repState = _db.links.syncCouchDB({
+				remote: remoteDB,
+				waitForLeadership: false,
+				options: {
+					retry: true
+				},
+				query: _db.links.find().where('talent').eq(_currentTalent._id)
+			});
+			await repState.awaitInitialReplication();
 
-				// Wait for currentLink Feedback
-				repState = _db.feedbacks.syncCouchDB({
-					remote: remoteDB,
-					waitForLeadership: false,
-					options: {
-						retry: true
-					},
-					query: _db.feedbacks.findOne().where('link').eq(_currentTalent.currentLink)
-				});
-				await repState.awaitInitialReplication();
-			}
+			// Wait for feedbacks
+			repState = _db.feedbacks.syncCouchDB({
+				remote: remoteDB,
+				waitForLeadership: false,
+				options: {
+					retry: true
+				},
+				query: _db.feedbacks.findOne().where('link').eq(_currentTalent.currentLink)
+			});
+			await repState.awaitInitialReplication();
 
 			// Live sync this Talent's links
 			_db.links.syncCouchDB({

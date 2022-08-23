@@ -6,7 +6,7 @@
 	import ProfilePhoto from '$lib/components/forms/ProfilePhoto.svelte';
 	import { talentDB, type TalentDBType } from '$lib/ORM/dbs/talentDB';
 	import type { LinkDocType, LinkDocument } from '$lib/ORM/models/link';
-	import type { TalentDocType, TalentDocument, TalentStats } from '$lib/ORM/models/talent';
+	import type { TalentDocType, TalentDocument } from '$lib/ORM/models/talent';
 	import { StorageTypes } from '$lib/ORM/rxdb';
 	import { DEFAULT_PROFILE_IMAGE } from '$lib/util/constants';
 	import { userStream, type UserStreamType } from '$lib/util/userStream';
@@ -23,12 +23,15 @@
 
 	export let data: PageData;
 	export let _errors: Errors;
+	export { _errors as errors };
 
 	if (_errors) console.log(_errors);
 	const token = data!.token;
 	let talentObj: TalentDocType = data!.talent!;
 	let currentLinkObj: LinkDocType = data!.currentLink!;
-	let talentStats: TalentStats = data!.talentStats!;
+	let rating = data!.rating!;
+	let earnings = data!.earnings!;
+	let completedCalls = data!.completedCalls! as LinkDocType[];
 
 	let key = $page.params.key;
 	let vc: VideoCallType;
@@ -37,28 +40,29 @@
 	let talent: TalentDocument;
 	let currentLink: LinkDocument;
 
+	talentDB(token, key, StorageTypes.IDB).then((db: TalentDBType) => {
+		db.talents
+			.findOne(talentObj._id)
+			.exec()
+			.then((_talent) => {
+				if (_talent) {
+					talentObj = _talent;
+					talent = _talent;
+					talent.populate('currentLink').then((cl) => {
+						if (cl) {
+							currentLinkObj = cl;
+							currentLink = cl;
+						}
+					});
+				}
+			});
+	});
+
 	if (browser) {
 		global = window;
 		import('$lib/util/videoCall').then((_vc) => {
 			videoCall = _vc.videoCall;
 			initVC();
-		});
-		talentDB(token, key, StorageTypes.IDB).then((db: TalentDBType) => {
-			db.talents
-				.findOne(talentObj._id)
-				.exec()
-				.then((_talent) => {
-					if (_talent) {
-						talentObj = _talent;
-						talent = _talent;
-						talent.populate('currentLink').then((cl) => {
-							if (cl) {
-								currentLinkObj = cl;
-								currentLink = cl;
-							}
-						});
-					}
-				});
 		});
 	}
 	const updateProfileImage = async (url: string) => {
@@ -246,9 +250,12 @@
 							<div class="bg-primary text-primary-content card">
 								<div class="text-center card-body items-center">
 									<h2 class="text-2xl card-title">pCall Status</h2>
-									<p>Signed in as {talentObj.name}</p>
-
-									<p>Call State: {callState}</p>
+									{#if callState == 'ready'}
+										<div class="text-2xl">Waiting for Incoming Call</div>
+									{:else}
+										<p>Signed in as {talentObj.name}</p>
+										<p>Call State: {callState}</p>
+									{/if}
 								</div>
 							</div>
 						</div>
@@ -282,7 +289,8 @@
 								<div class="bg-primary text-primary-content card">
 									<div class="text-center card-body items-center">
 										<h2 class="text-2xl card-title">Your Average Rating</h2>
-										<StarRating rating={talentStats.ratingAvg || 0} />
+										{rating.toFixed(2)}
+										<StarRating rating={rating || 0} />
 									</div>
 								</div>
 							</div>
@@ -291,7 +299,7 @@
 						<!-- Activity Feed -->
 						<div>
 							<div class="lg:col-start-3 lg:col-span-1">
-								<TalentActivity {talentStats} />
+								<TalentActivity {completedCalls} />
 							</div>
 						</div>
 					</div>

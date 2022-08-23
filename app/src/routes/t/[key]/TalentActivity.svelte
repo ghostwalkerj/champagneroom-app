@@ -1,18 +1,18 @@
 <script lang="ts">
-	import type { TalentStats } from '$lib/ORM/models/talent';
+	import type { LinkDocType } from '$lib/ORM/models/link';
 	import { currencyFormatter } from '$lib/util/constants';
 	import spacetime from 'spacetime';
-	export let talentStats: TalentStats;
+	export let completedCalls: LinkDocType[];
 </script>
 
 <div class="bg-primary text-primary-content card">
 	<div class="text-left card-body items-center">
 		<h2 class="text-2xl card-title">Activity</h2>
-		<h2 class="text-lg card-title">{talentStats.completedCalls.length} Completed Calls</h2>
+		<h2 class="text-lg card-title">{completedCalls.length} Completed Calls</h2>
 
 		<div class="mt-6 flow-root">
 			<ul class="-mb-8">
-				{#each talentStats.completedCalls.slice(0, 9) as call}
+				{#each completedCalls.slice(0, 9) as call}
 					<li>
 						<div class="pb-8 relative">
 							<div class="flex space-x-5 relative">
@@ -43,7 +43,9 @@
 										</p>
 									</div>
 									<div class="text-right text-sm text-gray-200 whitespace-nowrap">
-										{spacetime(call.callStart).format('{month-short} {date-pad}')}
+										{#if call.callStart}
+											{spacetime(call.callStart).format('{month-short} {date-pad}')}
+										{/if}
 									</div>
 								</div>
 							</div>
