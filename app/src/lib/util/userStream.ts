@@ -44,11 +44,11 @@ export const userStream = async (options: Partial<VideoStreamOptions> = {}) => {
 	const ops = Object.assign(
 		{
 			video: {
-				width: 1280,
-				height: 720,
+				width: { ideal: 4096 },
+				height: { ideal: 2160 },
 				frameRate: {
 					ideal: 60,
-					min: 15
+					min: 30
 				}
 			},
 			audio: true
