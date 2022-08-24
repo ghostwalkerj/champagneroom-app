@@ -34,7 +34,7 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 	if (_db) return _db;
 
 	initRXDB(storage);
-	//await removeRxDatabase('pouchdb/agent_db', getRxStoragePouch(storage));
+	await removeRxDatabase('pouchdb/agent_db', getRxStoragePouch(storage));
 
 	_db = await createRxDatabase({
 		name: 'pouchdb/agent_db',

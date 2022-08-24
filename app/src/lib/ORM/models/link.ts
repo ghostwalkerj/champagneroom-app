@@ -52,12 +52,33 @@ const linkSchemaLiteral = {
 		},
 		callId: { type: 'string' },
 		status: { type: 'string', enum: Object.keys(LinkStatuses), maxLength: 20 },
-		profileImageUrl: {
-			type: 'string'
-		},
-		talentName: {
-			type: 'string',
-			maxLength: 50
+		talentInfo: {
+			type: 'object',
+			properties: {
+				profileImageUrl: {
+					type: 'string'
+				},
+				name: {
+					type: 'string',
+					maxLength: 50
+				},
+				stats: {
+					type: 'object',
+					properties: {
+						numCompletedCalls: {
+							type: 'integer',
+							minimum: 0
+						},
+						ratingAvg: {
+							type: 'number',
+							minimum: 0,
+							maximum: 5
+						}
+					},
+					required: ['numCompletedCalls', 'ratingAvg']
+				}
+			},
+			required: ['profileImageUrl', 'name', 'stats']
 		},
 		talent: { type: 'string', ref: 'talents', maxLength: 50 },
 		agent: { type: 'string', ref: 'agents', maxLength: 70 },
@@ -80,8 +101,7 @@ const linkSchemaLiteral = {
 		'entityType',
 		'talent',
 		'agent',
-		'talentName',
-		'profileImageUrl',
+		'talentInfo',
 		'callId',
 		'amount',
 		'fundedAmount',

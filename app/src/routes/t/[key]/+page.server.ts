@@ -28,9 +28,9 @@ export const load: PageServerLoad = async ({ params }) => {
 				const completedCalls = (await talent.populate('stats.completedCalls')) as LinkDocument[];
 				return {
 					token,
-					talent,
-					currentLink,
-					completedCalls
+					talent: talent.toJSON(),
+					currentLink: currentLink ? currentLink.toJSON() : null,
+					completedCalls: completedCalls.map((link) => link.toJSON())
 				};
 			} else {
 				return { token };

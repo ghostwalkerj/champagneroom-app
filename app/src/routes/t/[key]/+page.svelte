@@ -71,7 +71,10 @@
 			if (currentLink) {
 				currentLink.update({
 					$set: {
-						profileImageUrl: url,
+						talentInfo: {
+							...currentLink.talentInfo,
+							profileImageUrl: url
+						},
 						updatedAt: new Date().getTime()
 					}
 				});
@@ -284,8 +287,8 @@
 								<div class="bg-primary text-primary-content card">
 									<div class="text-center card-body items-center">
 										<h2 class="text-2xl card-title">Your Average Rating</h2>
-										{talent.stats.ratingAvg.toFixed(2)}
-										<StarRating rating={talent.stats.ratingAvg || 0} />
+										{talentObj.stats.ratingAvg.toFixed(2)}
+										<StarRating rating={talentObj.stats.ratingAvg || 0} />
 									</div>
 								</div>
 							</div>

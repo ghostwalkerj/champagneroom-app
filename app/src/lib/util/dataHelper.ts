@@ -92,9 +92,15 @@ const generateLinks = (talent: TalentDocument, count: number) => {
 			fundedAmount: amount,
 			walletAddress: '0x251281e1516e6E0A145d28a41EE63BfcDd9E18Bf',
 			callId: uuidv4(),
-			talentName: talent.name,
 			talent: talent._id,
-			profileImageUrl: talent.profileImageUrl,
+			talentInfo: {
+				name: talent.name,
+				profileImageUrl: talent.profileImageUrl,
+				stats: {
+					ratingAvg: Math.floor(Math.random() * 5) + 1,
+					numCompletedCalls: i
+				}
+			},
 			_id: `${LinkString}:l${key}`,
 			createdAt: new Date().getTime(),
 			updatedAt: new Date().getTime(),

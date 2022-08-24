@@ -79,18 +79,18 @@ const talentSchemaLiteral = {
 				},
 				completedCalls: {
 					type: 'array',
+					ref: 'links',
 					items: {
 						type: 'string',
-						maxLength: 50,
-						ref: 'links'
+						maxLength: 50
 					}
 				},
 				completedFeedbacks: {
 					type: 'array',
+					ref: 'feedbacks',
 					items: {
 						type: 'string',
-						maxLength: 50,
-						ref: 'feedbacks'
+						maxLength: 50
 					}
 				}
 			},
@@ -144,6 +144,8 @@ export const talentDocMethods: TalentDocMethods = {
 		const db = this.collection.database;
 		const key = nanoid();
 
+		const stats = await this.updateStats();
+
 		const _feedback = {
 			_id: `${FeedbackString}:f${key}`,
 			entityType: FeedbackString,
@@ -164,9 +166,15 @@ export const talentDocMethods: TalentDocMethods = {
 			amount,
 			walletAddress: '0x251281e1516e6E0A145d28a41EE63BfcDd9E18Bf', //TODO: make real wallet
 			callId: uuidv4(),
-			talentName: this.name,
 			talent: this._id,
-			profileImageUrl: this.profileImageUrl,
+			talentInfo: {
+				name: this.name,
+				profileImageUrl: this.profileImageUrl,
+				stats: {
+					ratingAvg: stats.ratingAvg,
+					numCompletedCalls: stats.numCompletedCalls
+				}
+			},
 			_id: `${LinkString}:l${key}`,
 			createdAt: new Date().getTime(),
 			updatedAt: new Date().getTime(),
