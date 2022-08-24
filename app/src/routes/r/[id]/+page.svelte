@@ -31,6 +31,8 @@
 	$: callState = 'disconnected';
 	$: previousState = 'none';
 
+	let funded = false;
+
 	const linkState = fsm('neverConnected', {
 		neverConnected: {
 			call: 'calling'
@@ -144,6 +146,10 @@
 		}
 	};
 
+	const pay = () => {
+		funded = true;
+	};
+
 	$: showFeedback = false;
 </script>
 
@@ -166,9 +172,13 @@
 								<LinkDetail link={linkObj} />
 							</div>
 							<div class="pb-6 btn-group justify-center">
-								<button class="btn btn-secondary" on:click={call} disabled={callState != 'ready'}
-									>Call {linkObj.talentInfo.name} Now</button
-								>
+								{#if funded}
+									<button class="btn btn-secondary" on:click={call} disabled={callState != 'ready'}
+										>Call {linkObj.talentInfo.name} Now</button
+									>
+								{:else}
+									<button class="btn btn-secondary" on:click={pay}>Pay for Call</button>
+								{/if}
 							</div>
 						</div>
 						<div class="bg-base-200  text-white card lg:min-w-200">
