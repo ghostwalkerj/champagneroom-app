@@ -4,7 +4,6 @@
 	import FaMoneyBillWave from 'svelte-icons/fa/FaMoneyBillWave.svelte';
 	import StarRating from 'svelte-star-rating';
 	export let link: LinkDocType;
-	$: rating = 0;
 </script>
 
 {#if link}
@@ -13,14 +12,14 @@
 	>
 		<div class="text-center">
 			<div class="font-extrabold text-lg">This pCall is For</div>
-			<div class="font-extrabold text-3xl">{link.talentName}</div>
+			<div class="font-extrabold text-3xl">{link.talentInfo.name}</div>
 		</div>
 		<div
 			class="bg-cover bg-no-repeat bg-center rounded-full h-48 w-48"
-			style="background-image: url('{link.profileImageUrl}')"
+			style="background-image: url('{link.talentInfo.profileImageUrl}')"
 		/>
 
-		<StarRating {rating} />
+		<StarRating rating={link.talentInfo.stats.ratingAvg} />
 
 		<div class="stats stats-vertical stats-shadow lg:stats-horizontal">
 			<div class="stat">

@@ -168,7 +168,7 @@
 							</div>
 							<div class="pb-6 btn-group justify-center">
 								<button class="btn btn-secondary" on:click={call} disabled={callState != 'ready'}
-									>Call {linkObj.talentName} Now</button
+									>Call {linkObj.talentInfo.name} Now</button
 								>
 							</div>
 						</div>
