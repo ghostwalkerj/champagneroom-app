@@ -9,6 +9,7 @@
 	import { StorageTypes } from '$lib/ORM/rxdb';
 	import { userStream, type UserStreamType } from '$lib/util/userStream';
 	import type { VideoCallType } from '$lib/util/videoCall';
+	import { onMount } from 'svelte';
 	import fsm from 'svelte-fsm';
 	import type { Errors, PageData } from './$types';
 	import FeedbackForm from './FeedbackForm.svelte';
@@ -26,7 +27,6 @@
 	let videoCall: any;
 	let mediaStream: MediaStream;
 	let us: Awaited<UserStreamType>;
-	let link: LinkDocument;
 	let feedback: FeedbackDocument;
 	$: callState = 'disconnected';
 	$: previousState = 'none';
@@ -73,15 +73,14 @@
 		complete: {}
 	});
 
-	if (linkObj && browser) {
-		userStream().then((_us) => {
-			if (_us) {
-				_us.mediaStream.subscribe((stream) => {
-					if (stream) mediaStream = stream;
-				});
-			}
+	onMount(async () => {
+		us = await userStream();
+		us.mediaStream.subscribe((stream) => {
+			if (stream) mediaStream = stream;
 		});
+	});
 
+	if (linkObj && browser) {
 		// Make link and feedback reactive
 		publicDB(token, linkId, StorageTypes.IDB).then((_db: PublicDBType) => {
 			_db.links.findOne(linkObj._id).$.subscribe((_link) => {
