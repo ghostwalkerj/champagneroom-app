@@ -161,7 +161,7 @@ export const talentDocMethods: TalentDocMethods = {
 			status: LinkStatuses.ACTIVE,
 			fundedAmount: 0,
 			amount,
-			walletAddress: '0x251281e1516e6E0A145d28a41EE63BfcDd9E18Bf', //TODO: make real wallet
+			fundingAddress: '0x251281e1516e6E0A145d28a41EE63BfcDd9E18Bf', //TODO: make real wallet
 			callId: uuidv4(),
 			talent: this._id,
 			talentInfo: {

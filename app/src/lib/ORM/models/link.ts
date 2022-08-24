@@ -34,7 +34,7 @@ const linkSchemaLiteral = {
 			maxLength: 20,
 			final: true
 		},
-		walletAddress: {
+		fundingAddress: {
 			type: 'string',
 			maxLength: 50
 		},
@@ -104,6 +104,7 @@ const linkSchemaLiteral = {
 		'talentInfo',
 		'callId',
 		'amount',
+		'fundingAddress',
 		'fundedAmount',
 		'feedback',
 		'createdAt'

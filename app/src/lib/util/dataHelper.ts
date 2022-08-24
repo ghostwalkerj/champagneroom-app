@@ -90,7 +90,7 @@ const generateLinks = (talent: TalentDocument, count: number) => {
 			status: LinkStatuses.COMPLETED,
 			amount,
 			fundedAmount: amount,
-			walletAddress: '0x251281e1516e6E0A145d28a41EE63BfcDd9E18Bf',
+			fundingAddress: '0x251281e1516e6E0A145d28a41EE63BfcDd9E18Bf',
 			callId: uuidv4(),
 			talent: talent._id,
 			talentInfo: {

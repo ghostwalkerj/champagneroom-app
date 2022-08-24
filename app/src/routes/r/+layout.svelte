@@ -5,6 +5,7 @@
 	import { browserType } from '$lib/stores';
 	import { UAParser } from 'ua-parser-js';
 	import urlJoin from 'url-join';
+	import ConnectButton from '$lib/components/header/ConnectButton.svelte';
 
 	if (browser) {
 		if ($browserType == null) {
@@ -24,6 +25,16 @@
 		}
 	}
 </script>
+
+<div class="bg-base-100 navbar">
+	<div class="flex-1">
+		<!-- svelte-ignore a11y-missing-attribute -->
+		<a class="text-xl btn btn-ghost normal-case"> <img src="/logo.png" alt="Logo" width="48" /></a>
+	</div>
+	<div class="flex-none">
+		<ConnectButton />
+	</div>
+</div>
 
 {#if $browserType != 'mobile'}
 	<div class="h-full">

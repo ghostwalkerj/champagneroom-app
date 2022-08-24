@@ -53,6 +53,12 @@
 					</div>
 				</div>
 			</div>
+			<section
+				class="flex flex-col bg-base-100 rounded-2xl flex-shrink-0 text-white text-center p-4  items-center justify-center "
+			>
+				<div>Funding Address</div>
+				<div class="break-all">{link.fundingAddress}</div>
+			</section>
 
 			<div class="text-md card-title">URL</div>
 

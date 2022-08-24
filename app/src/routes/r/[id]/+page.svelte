@@ -11,6 +11,7 @@
 	import type { VideoCallType } from '$lib/util/videoCall';
 	import { onMount } from 'svelte';
 	import fsm from 'svelte-fsm';
+	import { web3, selectedAccount } from 'svelte-web3';
 	import type { Errors, PageData } from './$types';
 	import FeedbackForm from './FeedbackForm.svelte';
 	import LinkDetail from './LinkDetail.svelte';
@@ -146,8 +147,19 @@
 		}
 	};
 
+	const sendTransaction = async (amount: number, fundingAddress: string) => {
+		if ($selectedAccount) {
+			const result = await $web3.eth.sendTransaction({
+				from: $selectedAccount,
+				to: fundingAddress,
+				value: $web3.utils.toWei(amount.toString(), 'ether')
+			});
+			return result;
+		}
+	};
+
 	const pay = () => {
-		funded = true;
+		sendTransaction(linkObj.amount, linkObj.fundingAddress);
 	};
 
 	$: showFeedback = false;
