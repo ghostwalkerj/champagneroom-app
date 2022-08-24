@@ -45,9 +45,7 @@
 			headerClass: 'font-semibold text-left text-sm py-3.5 px-3 text-gray-900',
 			renderComponent: {
 				component: TableRating,
-				props: {
-					//onChange: updateRow
-				}
+				props: {}
 			}
 		},
 		{
@@ -87,7 +85,6 @@
 			value: (v: TalentRow) => v.url,
 			sortable: false,
 			headerClass: 'font-semibold text-left text-sm py-3.5 px-3 text-gray-900',
-			// renderValue: (v: TalentRow) => `<a href="/${TALENT_PATH}/${v.url}">${v.name}</a>`
 			renderComponent: {
 				component: TableCopyLink
 			}
@@ -103,16 +100,18 @@
 
 	if (talents) {
 		talents.forEach(async (talent: TalentDocument) => {
-			const stats = await talent.getStats();
+			if (talent.stats.numCompletedCalls == 0) {
+				await talent.updateStats();
+			}
 			talentRows = talentRows.concat({
 				name: talent.name,
 				photo: talent.profileImageUrl,
-				rating: stats.ratingAvg,
-				calls: stats.completedCalls.length,
-				earnings: stats.totalEarnings,
+				rating: talent.stats.ratingAvg,
+				calls: talent.stats.completedCalls.length,
+				earnings: talent.stats.totalEarnings,
 				url: talent.key,
 				commission: talent.agentCommission,
-				myEarnings: stats.totalEarnings * (1 / talent.agentCommission)
+				myEarnings: talent.stats.totalEarnings * (1 / talent.agentCommission)
 			});
 		});
 	}
@@ -123,12 +122,14 @@
 		<h2 class="text-2xl card-title">Manage Talent</h2>
 	</div>
 	<div class="p-2">
-		<SvelteTable
-			{columns}
-			rows={talentRows}
-			classNameTable="w-full bg-white  rounded-xl"
-			classNameTbody="divide-y border-3 rounded-xl"
-			classNameCell="text-sm py-4 px-3 m-10 text-gray-500 whitespace-nowrap "
-		/>
+		{#key talentRows}
+			<SvelteTable
+				{columns}
+				rows={talentRows}
+				classNameTable="w-full bg-white  rounded-xl"
+				classNameTbody="divide-y border-3 rounded-xl"
+				classNameCell="text-sm py-4 px-3 m-10 text-gray-500 whitespace-nowrap "
+			/>
+		{/key}
 	</div>
 </div>

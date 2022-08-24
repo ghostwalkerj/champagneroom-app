@@ -24,18 +24,12 @@ export const load: PageServerLoad = async ({ params }) => {
 		if (db) {
 			const talent = await db.talents.findOne().where('key').equals(key).exec();
 			if (talent) {
-				const _currentLink = (await talent.populate('currentLink')) as LinkDocument;
-				const currentLink = _currentLink ? _currentLink.toJSON() : null;
-				const stats = await talent.getStats();
-				const rating = stats.ratingAvg;
-				const earnings = stats.totalEarnings;
-				const completedCalls = stats.completedCalls.map((link) => link.toJSON());
+				const currentLink = (await talent.populate('currentLink')) as LinkDocument;
+				const completedCalls = (await talent.populate('stats.completedCalls')) as LinkDocument[];
 				return {
 					token,
-					talent: talent.toJSON(),
+					talent,
 					currentLink,
-					rating,
-					earnings,
 					completedCalls
 				};
 			} else {

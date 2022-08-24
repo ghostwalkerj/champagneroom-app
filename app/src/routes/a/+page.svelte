@@ -21,18 +21,21 @@
 		if (account) {
 			const agentId = AgentString + ':' + account;
 			const db = await agentDB(token, agentId, StorageTypes.IDB);
-			db.agents.findOne(agentId).$.subscribe((_agent) => {
-				if (_agent) {
-					agent = _agent;
-					talents = [];
-					agent.populate('talents').then((_talents) => {
-						talents = _talents;
-					});
-				} else {
-					console.log('Create new agent');
-					db.agents.createAgent(account);
-				}
-			});
+			db.agents
+				.findOne(agentId)
+				.exec()
+				.then((_agent) => {
+					if (_agent) {
+						agent = _agent;
+						talents = [];
+						agent.populate('talents').then((_talents) => {
+							talents = _talents;
+						});
+					} else {
+						console.log('Create new agent');
+						db.agents.createAgent(account);
+					}
+				});
 		}
 	});
 	let agent: AgentDocument;
@@ -50,8 +53,9 @@
 
 						<button
 							class="btn btn-sm"
-							on:click={() => {
-								generateTalent(agent);
+							on:click={async () => {
+								const talent = await generateTalent(agent);
+								talents = [...talents, talent];
 							}}>Create Data</button
 						>
 					</div>

@@ -58,6 +58,7 @@ export const generateTalent = async (agent: AgentDocument) => {
 	const talent = await agent.createTalent(name, 10, profileImageUrl);
 	const count = Math.floor(Math.random() * 100) + 1;
 	await generateLinks(talent, count);
+	await talent.updateStats();
 	return talent;
 };
 

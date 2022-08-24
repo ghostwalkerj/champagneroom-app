@@ -27,10 +27,8 @@
 
 	if (_errors) console.log(_errors);
 	const token = data!.token;
-	let talentObj: TalentDocType = data!.talent!;
-	let rating = data!.rating!;
-	let earnings = data!.earnings!;
-	let completedCalls = data!.completedCalls! as LinkDocType[];
+	let talentObj = data!.talent! as TalentDocType;
+	let completedCalls = data!.completedCalls as LinkDocType[];
 	let currentLink: LinkDocument;
 
 	let key = $page.params.key;
@@ -286,8 +284,8 @@
 								<div class="bg-primary text-primary-content card">
 									<div class="text-center card-body items-center">
 										<h2 class="text-2xl card-title">Your Average Rating</h2>
-										{rating.toFixed(2)}
-										<StarRating rating={rating || 0} />
+										{talent.stats.ratingAvg.toFixed(2)}
+										<StarRating rating={talent.stats.ratingAvg || 0} />
 									</div>
 								</div>
 							</div>

@@ -15,7 +15,7 @@
 	if (talents) {
 		talents.forEach(async (talent: TalentDocument) => {
 			const range = { start: now.startOf('month').epoch, end: now.endOf('month').epoch };
-			const stats = await talent.getStats(range);
+			const stats = await talent.getStatsByRange(range);
 			if (stats.totalEarnings > 0) {
 				talentData = talentData.concat(stats.totalEarnings);
 				labels = labels.concat(talent.name);

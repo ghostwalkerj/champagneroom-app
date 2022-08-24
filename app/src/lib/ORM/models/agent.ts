@@ -35,6 +35,14 @@ export const agentDocMethods: AgentDocMethods = {
 			key: nanoid(),
 			agent: this._id,
 			profileImageUrl,
+			stats: {
+				ratingAvg: 0,
+				totalEarnings: 0,
+				totalRating: 0,
+				completedCalls: [],
+				completedFeedbacks: [],
+				numCompletedCalls: 0
+			},
 			createdAt: new Date().getTime(),
 			updatedAt: new Date().getTime()
 		};

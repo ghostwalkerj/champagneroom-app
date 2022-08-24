@@ -57,6 +57,52 @@ const talentSchemaLiteral = {
 			maxLength: 50,
 			ref: 'links'
 		},
+		stats: {
+			type: 'object',
+			properties: {
+				ratingAvg: {
+					type: 'number',
+					minimum: 0,
+					maximum: 5
+				},
+				totalRating: {
+					type: 'integer',
+					minimum: 0
+				},
+				numCompletedCalls: {
+					type: 'integer',
+					minimum: 0
+				},
+				totalEarnings: {
+					type: 'number',
+					minimum: 0
+				},
+				completedCalls: {
+					type: 'array',
+					items: {
+						type: 'string',
+						maxLength: 50,
+						ref: 'links'
+					}
+				},
+				completedFeedbacks: {
+					type: 'array',
+					items: {
+						type: 'string',
+						maxLength: 50,
+						ref: 'feedbacks'
+					}
+				}
+			},
+			required: [
+				'ratingAvg',
+				'totalRating',
+				'numCompletedCalls',
+				'totalEarnings',
+				'completedCalls',
+				'completedFeedbacks'
+			]
+		},
 		createdAt: {
 			type: 'integer'
 		},
@@ -69,15 +115,18 @@ const talentSchemaLiteral = {
 		},
 		agent: { type: 'string', ref: 'agents', maxLength: 50 }
 	},
-	required: ['_id', 'key', 'name', 'profileImageUrl', 'agent', 'agentCommission', 'createdAt'],
+	required: [
+		'_id',
+		'key',
+		'name',
+		'stats',
+		'profileImageUrl',
+		'agent',
+		'agentCommission',
+		'createdAt'
+	],
 	indexes: ['key', 'agent']
 } as const;
-
-export type TalentStats = {
-	ratingAvg: number;
-	totalEarnings: number;
-	completedCalls: LinkDocument[];
-};
 
 type talentRef = {
 	currentLink_?: Promise<LinkDocument>;
@@ -86,7 +135,8 @@ type talentRef = {
 
 type TalentDocMethods = {
 	createLink: (amount: number) => Promise<LinkDocument>;
-	getStats: (range?: { start: number; end: number }) => Promise<TalentStats>;
+	updateStats: () => Promise<TalentDocument['stats']>;
+	getStatsByRange: (range?: { start: number; end: number }) => Promise<TalentDocument['stats']>;
 };
 
 export const talentDocMethods: TalentDocMethods = {
@@ -99,7 +149,6 @@ export const talentDocMethods: TalentDocMethods = {
 			entityType: FeedbackString,
 			createdAt: new Date().getTime(),
 			updatedAt: new Date().getTime(),
-
 			rejected: 0,
 			disconnected: 0,
 			unanswered: 0,
@@ -139,10 +188,21 @@ export const talentDocMethods: TalentDocMethods = {
 		return link;
 	},
 
-	getStats: async function (
+	updateStats: async function (this: TalentDocument): Promise<TalentDocument['stats']> {
+		const stats = await this.getStatsByRange({ start: 0, end: new Date().getTime() });
+		this.update({
+			$set: {
+				stats,
+				updatedAt: new Date().getTime()
+			}
+		});
+		return stats;
+	},
+
+	getStatsByRange: async function (
 		this: TalentDocument,
 		range = { start: 0, end: new Date().getTime() }
-	): Promise<TalentStats> {
+	): Promise<TalentDocument['stats']> {
 		let ratingAvg = 0;
 		let totalRating = 0;
 		let totalEarnings = 0;
@@ -159,8 +219,10 @@ export const talentDocMethods: TalentDocMethods = {
 			})
 			.exec()) as LinkDocument[];
 
+		const completedLinksIds: string[] = [];
 		const feedbackIds = completedCalls.map((link) => {
 			totalEarnings += link.amount;
+			completedLinksIds.push(link._id);
 			return link.feedback;
 		});
 		const completedFeedback = await db.feedbacks.findByIds(feedbackIds);
@@ -170,11 +232,15 @@ export const talentDocMethods: TalentDocMethods = {
 		if (completedFeedback.size > 0) {
 			ratingAvg = totalRating / completedFeedback.size;
 		}
-		return {
+		const stats = {
 			ratingAvg,
 			totalEarnings,
-			completedCalls
+			totalRating,
+			completedCalls: completedLinksIds,
+			numCompletedCalls: completedLinksIds.length,
+			completedFeedbacks: feedbackIds
 		};
+		return stats;
 	}
 };
 
