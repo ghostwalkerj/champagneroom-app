@@ -143,9 +143,6 @@ export const talentDocMethods: TalentDocMethods = {
 	createLink: async function (this: TalentDocument, amount: number): Promise<LinkDocument> {
 		const db = this.collection.database;
 		const key = nanoid();
-
-		const stats = await this.updateStats();
-
 		const _feedback = {
 			_id: `${FeedbackString}:f${key}`,
 			entityType: FeedbackString,
@@ -171,8 +168,8 @@ export const talentDocMethods: TalentDocMethods = {
 				name: this.name,
 				profileImageUrl: this.profileImageUrl,
 				stats: {
-					ratingAvg: stats.ratingAvg,
-					numCompletedCalls: stats.numCompletedCalls
+					ratingAvg: this.stats.ratingAvg,
+					numCompletedCalls: this.stats.numCompletedCalls
 				}
 			},
 			_id: `${LinkString}:l${key}`,
@@ -198,11 +195,10 @@ export const talentDocMethods: TalentDocMethods = {
 
 	updateStats: async function (this: TalentDocument): Promise<TalentDocument['stats']> {
 		const stats = await this.getStatsByRange({ start: 0, end: new Date().getTime() });
-		this.update({
-			$set: {
-				stats,
-				updatedAt: new Date().getTime()
-			}
+
+		this.atomicPatch({
+			stats,
+			updatedAt: new Date().getTime()
 		});
 		return stats;
 	},

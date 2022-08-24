@@ -43,21 +43,18 @@
 			videoCall = _vc.videoCall;
 		});
 		talentDB(token, key, StorageTypes.IDB).then((db: TalentDBType) => {
-			db.talents
-				.findOne(talentObj._id)
-				.exec()
-				.then((_talent) => {
-					if (_talent) {
-						talentObj = _talent;
-						talent = _talent;
-						talent.populate('currentLink').then((cl) => {
-							if (cl) {
-								currentLink = cl;
-								initVC();
-							}
-						});
-					}
-				});
+			db.talents.findOne(talentObj._id).$.subscribe((_talent) => {
+				if (_talent) {
+					talentObj = _talent;
+					talent = _talent;
+					talent.populate('currentLink').then((cl) => {
+						if (cl) {
+							currentLink = cl;
+							initVC();
+						}
+					});
+				}
+			});
 		});
 	}
 	const updateProfileImage = async (url: string) => {

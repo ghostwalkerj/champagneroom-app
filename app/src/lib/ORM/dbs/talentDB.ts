@@ -26,7 +26,7 @@ const create = async (token: string, key: string, storage: StorageTypes) => {
 	let _db = _talentDB.get(key);
 	if (_db) return _db;
 	initRXDB(storage);
-	await removeRxDatabase('pouchdb/talent_db', getRxStoragePouch(storage));
+	//await removeRxDatabase('pouchdb/talent_db', getRxStoragePouch(storage));
 
 	_db = await createRxDatabase({
 		name: 'pouchdb/talent_db',
