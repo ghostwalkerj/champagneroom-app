@@ -4,7 +4,7 @@
 	export let agent: AgentDocument;
 </script>
 
-<div class="bg-primary h-full text-primary-content w-full card">
+<div class="bg-primary h-full text-primary-content w-full card p-2">
 	<div class="text-center card-body items-center">
 		<h2 class="text-2xl card-title">My Wallet</h2>
 

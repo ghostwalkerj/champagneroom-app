@@ -2,7 +2,8 @@
 	import { page } from '$app/stores';
 	import type { LinkDocType } from '$lib/ORM/models/link';
 	import type { TalentDocType } from '$lib/ORM/models/talent';
-	import { ROOM_PATH } from '$lib/util/constants';
+	import { currencyFormatter, ROOM_PATH } from '$lib/util/constants';
+	import FaMoneyBillWave from 'svelte-icons/fa/FaMoneyBillWave.svelte';
 	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';
 	import urlJoin from 'url-join';
 	export let link: LinkDocType;
@@ -28,9 +29,28 @@
 					<div class="stat-title">Name Shown</div>
 					<div class="stat-value">{talent.name}</div>
 				</div>
-				<div class="bg-info rounded-box shadow-xl text-accent-content p-4 items-center">
-					<div class="stat-title">Amount Requested</div>
-					<div class="stat-value">${link.amount} USD</div>
+				<div>
+					<div class="max-w-min stats stats-vertical stats-shadow lg:stats-horizontal">
+						<div class="stat">
+							<div class="text-primary w-10 stat-figure">
+								<FaMoneyBillWave />
+							</div>
+							<div class="stat-title">Amount Requested</div>
+							<div class="text-primary stat-value">
+								{currencyFormatter.format(link.amount)}
+							</div>
+						</div>
+
+						<div class="stat">
+							<div class="text-secondary w-10 stat-figure">
+								<FaMoneyBillWave />
+							</div>
+							<div class="stat-title">Amount Funded</div>
+							<div class="text-secondary stat-value">
+								{currencyFormatter.format(link.fundedAmount)}
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 
