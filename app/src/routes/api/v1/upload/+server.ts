@@ -6,7 +6,7 @@ import {
 	INFURA_IPFS_PROJECT_SECRET
 } from '$lib/util/constants';
 import { json } from '@sveltejs/kit';
-import ipfsClient from 'ipfs-http-client';
+import { create } from 'ipfs-http-client';
 import type { RequestHandler } from './$types';
 
 const auth =
@@ -17,7 +17,7 @@ const addOptions = {
 	pin: true
 };
 
-const client = ipfsClient.create({
+const client = create({
 	host: INFURA_IPFS_API_URL,
 	port: INFURA_IPFS_API_PORT,
 	protocol: 'https',
