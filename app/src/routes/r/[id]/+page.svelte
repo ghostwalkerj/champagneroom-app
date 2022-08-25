@@ -154,6 +154,7 @@
 				to: fundingAddress,
 				value: $web3.utils.toWei(amount.toString(), 'ether')
 			});
+			funded = true;
 			return result;
 		}
 	};
