@@ -65,11 +65,11 @@
 						<div class="p-1">
 							<AgentWallet {agent} />
 						</div>
+						<!-- Talent viewing and adding -->
+						<div class="p-1">
+							<TalentForm {agent} bind:talents />
+						</div>
 						{#key talents}
-							<!-- Talent viewing and adding -->
-							<div class="p-1">
-								<TalentForm {agent} {talents} />
-							</div>
 							<div class="p-1 row-span-2 ">
 								<TopTalent {talents} />
 							</div>
