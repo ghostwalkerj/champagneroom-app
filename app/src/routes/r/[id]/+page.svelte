@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { browser } from '$app/env';
+	import { browser } from '$app/environment';
 	import { page } from '$app/stores';
 	import VideoCall from '$lib/components/calls/VideoCall.svelte';
 	import VideoPreview from '$lib/components/calls/VideoPreview.svelte';
@@ -17,9 +17,9 @@
 	import LinkDetail from './LinkDetail.svelte';
 
 	export let data: PageData;
-	export let _errors: Errors;
+	export let errors: Errors;
 
-	if (_errors) console.log(_errors);
+	if (errors) console.log(errors);
 	const token = data!.token;
 	export let linkObj = data!.link as LinkDocType;
 	export let feedbackObj = data!.feedback as FeedbackDocType;
@@ -33,7 +33,23 @@
 	$: previousState = 'none';
 
 	let funded = false;
+	$: userstream = false;
 
+	const requestStream = async () => {
+		try {
+			us = await userStream();
+			us.mediaStream.subscribe((stream) => {
+				if (stream) {
+					mediaStream = stream;
+					userstream = true;
+				} else {
+					userstream = false;
+				}
+			});
+		} catch (e) {
+			userstream = false;
+		}
+	};
 	const linkState = fsm('neverConnected', {
 		neverConnected: {
 			call: 'calling'
@@ -77,10 +93,7 @@
 	});
 
 	onMount(async () => {
-		us = await userStream();
-		us.mediaStream.subscribe((stream) => {
-			if (stream) mediaStream = stream;
-		});
+		requestStream();
 	});
 
 	if (linkObj && browser) {
@@ -185,8 +198,12 @@
 							</div>
 							<div class="pb-6 btn-group justify-center">
 								{#if funded}
-									<button class="btn btn-secondary" on:click={call} disabled={callState != 'ready'}
-										>Call {linkObj.talentInfo.name} Now</button
+									<button
+										class="btn btn-secondary"
+										on:click={call}
+										disabled={callState != 'ready' || !userstream}
+									>
+										Call {linkObj.talentInfo.name} Now</button
 									>
 								{:else}
 									<button class="btn btn-secondary" on:click={pay}>Pay for Call</button>
@@ -197,7 +214,24 @@
 							<div class="text-center card-body items-center ">
 								<div class="text-2xl card-title">Your Video Preview</div>
 								<div class="container h-full rounded-2xl max-w-2xl">
-									<VideoPreview {us} />
+									{#if userstream}
+										<VideoPreview {us} />
+									{:else}
+										<div class="text-center">
+											<p class="text-center">
+												<span class="text-lg">
+													You need to allow access to your camera and microphone to use this
+													feature.
+												</span>
+												<br />
+												<span class="text-lg">
+													If you want to be able to send your video, you will need to reload this
+													page and give permission to use your microphone and camera. You will not
+													be able to make a call until you do this.
+												</span>
+											</p>
+										</div>
+									{/if}
 								</div>
 								Call State: {callState}
 							</div>
