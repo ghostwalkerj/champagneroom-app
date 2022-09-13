@@ -12,14 +12,12 @@
 	import { onMount } from 'svelte';
 	import fsm from 'svelte-fsm';
 	import { web3, selectedAccount } from 'svelte-web3';
-	import type { Errors, PageData } from './$types';
+	import type { PageData } from './$types';
 	import FeedbackForm from './FeedbackForm.svelte';
 	import LinkDetail from './LinkDetail.svelte';
 
 	export let data: PageData;
-	export let errors: Errors;
 
-	if (errors) console.log(errors);
 	const token = data!.token;
 	export let linkObj = data!.link as LinkDocType;
 	export let feedbackObj = data!.feedback as FeedbackDocType;
@@ -196,7 +194,7 @@
 							<div>
 								<LinkDetail link={linkObj} />
 							</div>
-							<div class="pb-6 btn-group justify-center">
+							<div class="pb-6 w-full flex justify-center">
 								{#if funded}
 									<button
 										class="btn btn-secondary"

@@ -16,16 +16,13 @@
 	import { createForm } from 'svelte-forms-lib';
 	import StarRating from 'svelte-star-rating';
 	import * as yup from 'yup';
-	import type { Errors, PageData } from './$types';
+	import type { PageData } from './$types';
 	import LinkViewer from './LinkView.svelte';
 	import TalentActivity from './TalentActivity.svelte';
 	import TalentWallet from './TalentWallet.svelte';
 
 	export let data: PageData;
-	export let _errors: Errors;
-	export { _errors as errors };
 
-	if (_errors) console.log(_errors);
 	const token = data!.token;
 	let talentObj = data!.talent! as TalentDocType;
 	let completedCalls = data!.completedCalls as LinkDocType[];
