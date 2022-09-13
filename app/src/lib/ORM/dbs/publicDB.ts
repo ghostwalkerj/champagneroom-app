@@ -3,7 +3,9 @@ import { linkSchema, type LinkCollection, type LinkDocument } from '$lib/ORM/mod
 import { initRXDB, StorageTypes } from '$lib/ORM/rxdb';
 import { PUBLIC_ENDPOINT, RXDB_PASSWORD } from '$lib/util/constants';
 import { EventEmitter } from 'events';
-import { createRxDatabase, removeRxDatabase, type RxDatabase } from 'rxdb';
+import { createRxDatabase, type RxDatabase } from 'rxdb';
+import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
+
 import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
 
 // Sync requires more listeners but ok with http2
@@ -28,11 +30,14 @@ const create = async (token: string, linkId: string, storage: StorageTypes) => {
 	if (_db) return _db;
 
 	initRXDB(storage);
-	//await removeRxDatabase('pouchdb/public_db', getRxStoragePouch(storage));
+
+	const wrappedStorage = wrappedKeyEncryptionStorage({
+		storage: getRxStoragePouch(storage)
+	});
 
 	_db = await createRxDatabase({
 		name: 'pouchdb/public_db',
-		storage: getRxStoragePouch(storage.toString()),
+		storage: wrappedStorage,
 		ignoreDuplicate: true,
 		password: RXDB_PASSWORD
 	});

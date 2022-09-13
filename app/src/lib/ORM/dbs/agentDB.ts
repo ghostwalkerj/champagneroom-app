@@ -12,6 +12,7 @@ import { CREATORS_ENDPOINT, RXDB_PASSWORD } from '$lib/util/constants';
 import { EventEmitter } from 'events';
 import { createRxDatabase, removeRxDatabase, type RxDatabase } from 'rxdb';
 import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
+import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
 
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 100;
@@ -34,11 +35,14 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 	if (_db) return _db;
 
 	initRXDB(storage);
-	//await removeRxDatabase('pouchdb/agent_db', getRxStoragePouch(storage));
+
+	const wrappedStorage = wrappedKeyEncryptionStorage({
+		storage: getRxStoragePouch(storage)
+	});
 
 	_db = await createRxDatabase({
 		name: 'pouchdb/agent_db',
-		storage: getRxStoragePouch(storage),
+		storage: wrappedStorage,
 		ignoreDuplicate: true,
 		password: RXDB_PASSWORD
 	});
