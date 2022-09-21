@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
+	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import VideoCall from '$lib/components/calls/VideoCall.svelte';
 	import VideoPreview from '$lib/components/calls/VideoPreview.svelte';
@@ -18,20 +19,25 @@
 
 	export let data: PageData;
 
-	const token = data!.token;
-	export let linkObj = data!.link as LinkDocType;
-	export let feedbackObj = data!.feedback as FeedbackDocType;
+	if (browser && (!data.token || !data.link || !data.feedback)) {
+		goto('/');
+	}
+
+	$: callState = 'disconnected';
+	$: previousState = 'none';
+	$: userstream = false;
+
+	const token = data.token;
+	let linkObj = data.link as LinkDocType;
+	let feedbackObj = data.feedback as FeedbackDocType;
 	let linkId = $page.params.id;
 	let vc: VideoCallType;
 	let videoCall: any;
 	let mediaStream: MediaStream;
 	let us: Awaited<UserStreamType>;
 	let feedback: FeedbackDocument;
-	$: callState = 'disconnected';
-	$: previousState = 'none';
 
 	let funded = false;
-	$: userstream = false;
 
 	const requestStream = async () => {
 		try {
@@ -267,4 +273,6 @@
 			</div>
 		</div>
 	{/if}
+{:else if linkObj && linkObj.status != LinkStatuses.ACTIVE}
+	<h1 class="font-bold text-center text-5xl">No pCall Here</h1>
 {/if}

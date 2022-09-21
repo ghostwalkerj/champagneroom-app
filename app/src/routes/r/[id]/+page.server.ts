@@ -30,6 +30,9 @@ export const load: PageServerLoad = async ({ params }) => {
 				return { token, link, feedback };
 			}
 		}
+		else {
+			return error(404, 'Link not found');
+		}
 	} else {
 		throw error(400, 'no db');
 	}
