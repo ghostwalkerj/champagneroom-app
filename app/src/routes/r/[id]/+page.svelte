@@ -5,7 +5,7 @@
 	import VideoPreview from '$lib/components/calls/VideoPreview.svelte';
 	import { publicDB, type PublicDBType } from '$lib/ORM/dbs/publicDB';
 	import type { FeedbackDocType, FeedbackDocument } from '$lib/ORM/models/feedback';
-	import type { LinkDocType, LinkDocument } from '$lib/ORM/models/link';
+	import { type LinkDocType, type LinkDocument, LinkStatuses } from '$lib/ORM/models/link';
 	import { StorageTypes } from '$lib/ORM/rxdb';
 	import { userStream, type UserStreamType } from '$lib/util/userStream';
 	import type { VideoCallType } from '$lib/util/videoCall';
@@ -90,11 +90,10 @@
 		complete: {}
 	});
 
-	onMount(async () => {
-		requestStream();
-	});
-
-	if (linkObj && browser) {
+	if (linkObj && linkObj.status == LinkStatuses.ACTIVE && browser) {
+		onMount(async () => {
+			requestStream();
+		});
 		// Make link and feedback reactive
 		publicDB(token, linkId, StorageTypes.IDB).then((_db: PublicDBType) => {
 			_db.links.findOne(linkObj._id).$.subscribe((_link) => {
@@ -176,70 +175,65 @@
 	$: showFeedback = false;
 </script>
 
-{#if linkObj}
+{#if linkObj && linkObj.status == LinkStatuses.ACTIVE}
 	<FeedbackForm {showFeedback} />
 	<div class="min-h-full">
 		<main class="py-6">
-			{#if linkObj}
-				{#if $linkState != 'inCall'}
-					<!-- Page header -->
-					<div class="text-center">
-						<h1 class="font-bold text-center text-5xl">Make your pCall</h1>
-						<p class="py-6">Scis vis facere illud pCall. Carpe florem et fac quod nunc vocant.</p>
+			{#if $linkState != 'inCall'}
+				<!-- Page header -->
+				<div class="text-center">
+					<h1 class="font-bold text-center text-5xl">Make your pCall</h1>
+					<p class="py-6">Scis vis facere illud pCall. Carpe florem et fac quod nunc vocant.</p>
+				</div>
+				<div
+					class="container	 mx-auto max-w-max  items-center sm:px-6 md:flex md:space-x-5 md:items-stretch  lg:px-8"
+				>
+					<div class="rounded-box h-full bg-base-200">
+						<div>
+							<LinkDetail link={linkObj} />
+						</div>
+						<div class="pb-6 w-full flex justify-center">
+							{#if funded}
+								<button
+									class="btn btn-secondary"
+									on:click={call}
+									disabled={callState != 'ready' || !userstream}
+								>
+									Call {linkObj.talentInfo.name} Now</button
+								>
+							{:else}
+								<button class="btn btn-secondary" on:click={pay}>Pay for Call</button>
+							{/if}
+						</div>
 					</div>
-					<div
-						class="container	 mx-auto max-w-max  items-center sm:px-6 md:flex md:space-x-5 md:items-stretch  lg:px-8"
-					>
-						<div class="rounded-box h-full bg-base-200">
-							<div>
-								<LinkDetail link={linkObj} />
-							</div>
-							<div class="pb-6 w-full flex justify-center">
-								{#if funded}
-									<button
-										class="btn btn-secondary"
-										on:click={call}
-										disabled={callState != 'ready' || !userstream}
-									>
-										Call {linkObj.talentInfo.name} Now</button
-									>
+					<div class="bg-base-200  text-white card lg:min-w-200">
+						<div class="text-center card-body items-center ">
+							<div class="text-2xl card-title">Your Video Preview</div>
+							<div class="container h-full rounded-2xl max-w-2xl">
+								{#if userstream}
+									<VideoPreview {us} />
 								{:else}
-									<button class="btn btn-secondary" on:click={pay}>Pay for Call</button>
+									<div class="text-center">
+										<p class="text-center">
+											<span class="text-lg">
+												You need to allow access to your camera and microphone to use this feature.
+											</span>
+											<br />
+											<span class="text-lg">
+												If you want to be able to send your video, you will need to reload this page
+												and give permission to use your microphone and camera. You will not be able
+												to make a call until you do this.
+											</span>
+										</p>
+									</div>
 								{/if}
 							</div>
-						</div>
-						<div class="bg-base-200  text-white card lg:min-w-200">
-							<div class="text-center card-body items-center ">
-								<div class="text-2xl card-title">Your Video Preview</div>
-								<div class="container h-full rounded-2xl max-w-2xl">
-									{#if userstream}
-										<VideoPreview {us} />
-									{:else}
-										<div class="text-center">
-											<p class="text-center">
-												<span class="text-lg">
-													You need to allow access to your camera and microphone to use this
-													feature.
-												</span>
-												<br />
-												<span class="text-lg">
-													If you want to be able to send your video, you will need to reload this
-													page and give permission to use your microphone and camera. You will not
-													be able to make a call until you do this.
-												</span>
-											</p>
-										</div>
-									{/if}
-								</div>
-								Call State: {callState}
-							</div>
+							Call State: {callState}
 						</div>
 					</div>
-				{:else}
-					<VideoCall {vc} {us} />
-				{/if}
+				</div>
 			{:else}
-				<h1>Searching for your pCall</h1>
+				<VideoCall {vc} {us} />
 			{/if}
 		</main>
 	</div>
