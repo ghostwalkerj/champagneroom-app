@@ -270,6 +270,10 @@
 					<div class="stat-title">Call State</div>
 					<div class="stat-value">{previousState}</div>
 				</div>
+				<div class="stat">
+					<div class="stat-title">pCall Status</div>
+					<div class="stat-value">{linkObj.status}</div>
+				</div>
 			</div>
 		</div>
 	{/if}
