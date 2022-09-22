@@ -1,5 +1,5 @@
 import { TalentString, type TalentDocType, type TalentDocument } from '$lib/ORM/models/talent';
-import { DEFAULT_PROFILE_IMAGE } from '$lib/util/constants';
+import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
 import { nanoid } from 'nanoid';
 import {
 	toTypedRxJsonSchema,
@@ -7,6 +7,7 @@ import {
 	type RxCollection,
 	type RxDocument,
 	type RxJsonSchema
+
 } from 'rxdb';
 type AgentDocMethods = {
 	createTalent: (
@@ -26,7 +27,7 @@ export const agentDocMethods: AgentDocMethods = {
 		this: AgentDocument,
 		name: string,
 		agentCommission: number,
-		profileImageUrl: string = DEFAULT_PROFILE_IMAGE
+		profileImageUrl: string = PUBLIC_DEFAULT_PROFILE_IMAGE
 	) {
 		const _talent: TalentDocType = {
 			_id: `${TalentString}:t${nanoid()}`,

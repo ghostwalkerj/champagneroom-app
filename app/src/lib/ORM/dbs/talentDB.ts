@@ -3,7 +3,8 @@ import { linkSchema, type LinkCollection } from '$lib/ORM/models/link';
 import { talentDocMethods, talentSchema, type TalentCollection } from '$lib/ORM/models/talent';
 import type { StorageTypes } from '$lib/ORM/rxdb';
 import { initRXDB } from '$lib/ORM/rxdb';
-import { CREATORS_ENDPOINT, RXDB_PASSWORD } from '$lib/util/constants';
+import { PUBLIC_CREATORS_ENDPOINT } from '$env/static/public';
+import { PUBLIC_RXDB_PASSWORD } from '$env/static/public';
 import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
@@ -36,7 +37,7 @@ const create = async (token: string, key: string, storage: StorageTypes) => {
 		name: 'pouchdb/talent_db',
 		storage: wrappedStorage,
 		ignoreDuplicate: true,
-		password: RXDB_PASSWORD
+		password: PUBLIC_RXDB_PASSWORD
 	});
 
 	await _db.addCollections({
@@ -52,12 +53,12 @@ const create = async (token: string, key: string, storage: StorageTypes) => {
 		}
 	});
 
-	if (CREATORS_ENDPOINT) {
+	if (PUBLIC_CREATORS_ENDPOINT) {
 		// Sync if there is a remote endpoint
-		const remoteDB = new PouchDB(CREATORS_ENDPOINT, {
+		const remoteDB = new PouchDB(PUBLIC_CREATORS_ENDPOINT, {
 			fetch: function (
 				url: string,
-				opts: { headers: { set: (arg0: string, arg1: string) => void } }
+				opts: { headers: { set: (arg0: string, arg1: string) => void; }; }
 			) {
 				opts.headers.set('Authorization', 'Bearer ' + token);
 				return PouchDB.fetch(url, opts);

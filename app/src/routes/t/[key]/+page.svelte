@@ -9,7 +9,7 @@
 	import type { LinkDocType, LinkDocument } from '$lib/ORM/models/link';
 	import type { TalentDocType, TalentDocument } from '$lib/ORM/models/talent';
 	import { StorageTypes } from '$lib/ORM/rxdb';
-	import { DEFAULT_PROFILE_IMAGE } from '$lib/util/constants';
+	import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
 	import { userStream, type UserStreamType } from '$lib/util/userStream';
 	import type { VideoCallType } from '$lib/util/videoCall';
 	import { onDestroy, onMount } from 'svelte';
@@ -260,7 +260,7 @@
 										<h2 class="text-2xl card-title">Profile Photo</h2>
 										<div>
 											<ProfilePhoto
-												profileImage={talentObj.profileImageUrl || DEFAULT_PROFILE_IMAGE}
+												profileImage={talentObj.profileImageUrl || PUBLIC_DEFAULT_PROFILE_IMAGE}
 												callBack={(value) => {
 													updateProfileImage(value);
 												}}

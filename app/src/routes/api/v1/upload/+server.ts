@@ -3,15 +3,15 @@ import {
 	INFURA_IPFS_API_URL,
 	INFURA_IPFS_DEDICATED_GATEWAY,
 	INFURA_IPFS_PROJECT_ID,
-	INFURA_IPFS_PROJECT_SECRET
-} from '$lib/util/constants';
+	INFURA_IPFS_API_SECRET
+} from '$env/static/private';
 import { json } from '@sveltejs/kit';
 import { create } from 'ipfs-http-client';
 import type { RequestHandler } from './$types';
 
 const auth =
 	'Basic ' +
-	Buffer.from(INFURA_IPFS_PROJECT_ID + ':' + INFURA_IPFS_PROJECT_SECRET).toString('base64');
+	Buffer.from(INFURA_IPFS_PROJECT_ID + ':' + INFURA_IPFS_API_SECRET).toString('base64');
 
 const addOptions = {
 	pin: true
@@ -19,7 +19,7 @@ const addOptions = {
 
 const client = create({
 	host: INFURA_IPFS_API_URL,
-	port: INFURA_IPFS_API_PORT,
+	port: Number.parseInt(INFURA_IPFS_API_PORT),
 	protocol: 'https',
 	headers: {
 		authorization: auth

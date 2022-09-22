@@ -1,10 +1,12 @@
-import { AUTH_PATH, TokenRoles } from '$lib/util/constants';
+import { TokenRoles } from '$lib/util/constants';
+import { PUBLIC_AUTH_PATH } from '$env/static/public';
+
 import urlJoin from 'url-join';
 import type { PageLoad } from './$types';
 
 //TODO: Only return token if agent address is good.  How?
 export const load: PageLoad = async ({ url, fetch }) => {
-	const auth_url = urlJoin(url.origin, AUTH_PATH);
+	const auth_url = urlJoin(url.origin, PUBLIC_AUTH_PATH);
 	try {
 		const res = await fetch(auth_url, {
 			method: 'POST',

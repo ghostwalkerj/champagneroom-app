@@ -1,7 +1,7 @@
 <script lang="ts">
 	// TODO:Add validation
 	import { page } from '$app/stores';
-	import { IMAGE_UPLOAD_PATH } from '$lib/util/constants';
+	import { PUBLIC_IMAGE_UPDATE_PATH } from '$env/static/public';
 	import { filedrop } from 'filedrop-svelte';
 	import { scale } from 'svelte/transition';
 	import urlJoin from 'url-join';
@@ -61,7 +61,7 @@
 		progressVisibility = 'visible';
 		let formData = new FormData();
 		formData.append('file', file);
-		const upload_url = urlJoin($page.url.origin, IMAGE_UPLOAD_PATH);
+		const upload_url = urlJoin($page.url.origin, PUBLIC_IMAGE_UPDATE_PATH);
 		const res = await fetch(upload_url, {
 			method: 'POST',
 			body: formData

@@ -2,7 +2,8 @@
 	import { page } from '$app/stores';
 	import type { LinkDocType } from '$lib/ORM/models/link';
 	import type { TalentDocType } from '$lib/ORM/models/talent';
-	import { currencyFormatter, ROOM_PATH } from '$lib/util/constants';
+	import { currencyFormatter } from '$lib/util/constants';
+	import { PUBLIC_ROOM_PATH } from '$env/static/public';
 	import FaMoneyBillWave from 'svelte-icons/fa/FaMoneyBillWave.svelte';
 	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';
 	import urlJoin from 'url-join';
@@ -11,7 +12,7 @@
 	let tooltipOpen = '';
 
 	$: linkURL = '';
-	$: if (link) linkURL = urlJoin($page.url.origin, ROOM_PATH, link._id);
+	$: if (link) linkURL = urlJoin($page.url.origin, PUBLIC_ROOM_PATH, link._id);
 
 	const copyLink = () => {
 		navigator.clipboard.writeText(linkURL);

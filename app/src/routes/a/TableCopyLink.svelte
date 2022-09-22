@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { TALENT_PATH } from '$lib/util/constants';
+	import { PUBLIC_TALENT_PATH } from '$env/static/public';
 	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';
 	import urlJoin from 'url-join';
 
 	export let row;
 	export let col;
 
-	$: url = urlJoin($page.url.origin, TALENT_PATH, row.url);
+	$: url = urlJoin($page.url.origin, PUBLIC_TALENT_PATH, row.url);
 	let tooltipOpen = '';
 
 	const copyUrl = () => {

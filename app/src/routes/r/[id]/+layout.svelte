@@ -6,6 +6,7 @@
 	import { UAParser } from 'ua-parser-js';
 	import urlJoin from 'url-join';
 	import ConnectButton from '$lib/components/header/ConnectButton.svelte';
+	import { PUBLIC_MOBILE_PATH } from '$env/static/public';
 
 	if (browser) {
 		if ($browserType == null) {
@@ -15,12 +16,7 @@
 		}
 
 		if ($browserType == 'mobile') {
-			import.meta.env.VITE_MOBILE_PATH;
-			const mobileUrl = urlJoin(
-				$page.url.origin,
-				import.meta.env.VITE_MOBILE_PATH,
-				$page.url.pathname
-			);
+			const mobileUrl = urlJoin($page.url.origin, PUBLIC_MOBILE_PATH, $page.url.pathname);
 			goto(mobileUrl);
 		}
 	}
