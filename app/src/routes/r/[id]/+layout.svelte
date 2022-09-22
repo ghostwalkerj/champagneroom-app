@@ -2,11 +2,11 @@
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
+	import { PUBLIC_MOBILE_PATH } from '$env/static/public';
+	import ConnectButton from '$lib/components/header/ConnectButton.svelte';
 	import { browserType } from '$lib/stores';
 	import { UAParser } from 'ua-parser-js';
 	import urlJoin from 'url-join';
-	import ConnectButton from '$lib/components/header/ConnectButton.svelte';
-	import { PUBLIC_MOBILE_PATH } from '$env/static/public';
 
 	if (browser) {
 		if ($browserType == null) {

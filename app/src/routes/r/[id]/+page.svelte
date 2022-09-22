@@ -5,14 +5,13 @@
 	import VideoPreview from '$lib/components/calls/VideoPreview.svelte';
 	import { publicDB, type PublicDBType } from '$lib/ORM/dbs/publicDB';
 	import type { FeedbackDocType, FeedbackDocument } from '$lib/ORM/models/feedback';
-	import { type LinkDocType, type LinkDocument, LinkStatuses } from '$lib/ORM/models/link';
+	import { LinkStatuses, type LinkDocument } from '$lib/ORM/models/link';
 	import { StorageTypes } from '$lib/ORM/rxdb';
 	import { userStream, type UserStreamType } from '$lib/util/userStream';
 	import type { VideoCallType } from '$lib/util/videoCall';
+	import type { PageData } from './$types';
 	import { onMount } from 'svelte';
 	import fsm from 'svelte-fsm';
-	import { web3, selectedAccount } from 'svelte-web3';
-	import type { PageData } from './$types';
 	import FeedbackForm from './FeedbackForm.svelte';
 	import LinkDetail from './LinkDetail.svelte';
 
@@ -23,15 +22,15 @@
 	$: userstream = false;
 
 	const token = data.token;
-	let linkObj = data.link! as LinkDocType;
-	let feedbackObj = data.feedback! as FeedbackDocType;
+	let linkObj = data.link;
+	let feedbackObj = data.feedback;
 	let linkId = $page.params.id;
 	let vc: VideoCallType;
 	let videoCall: any;
 	let mediaStream: MediaStream;
 	let us: Awaited<UserStreamType>;
 	let feedback: FeedbackDocument;
-	$: ready = linkObj.status == LinkStatuses.READY;
+	$: linkStatus = data.link.status;
 
 	const requestStream = async () => {
 		try {
@@ -54,13 +53,13 @@
 		},
 		rejected: {
 			_enter() {
-				feedback!.update({ $inc: { rejected: 1 } });
+				feedback.update({ $inc: { rejected: 1 } });
 			},
 			call: 'calling'
 		},
 		notAnswered: {
 			_enter() {
-				feedback!.update({ $inc: { unanswered: 1 } });
+				feedback.update({ $inc: { unanswered: 1 } });
 			},
 			call: 'calling'
 		},
@@ -77,7 +76,7 @@
 		},
 		disconnected: {
 			_enter() {
-				feedback!.update({ $inc: { disconnected: 1 } });
+				feedback.update({ $inc: { disconnected: 1 } });
 			},
 			call: 'calling'
 		},
@@ -90,7 +89,7 @@
 		complete: {}
 	});
 
-	if (linkObj && browser) {
+	if (browser) {
 		onMount(async () => {
 			requestStream();
 		});
@@ -99,13 +98,22 @@
 			_db.links.findOne(linkObj._id).$.subscribe((_link) => {
 				if (_link) {
 					linkObj = _link as LinkDocument;
+					linkStatus = linkObj.status;
 				}
 			});
-			_db.feedbacks.findOne(feedbackObj._id).$.subscribe((_feedback) => {
-				if (_feedback) {
-					feedbackObj = _feedback as FeedbackDocument;
-				}
-			});
+			_db.feedbacks
+				.findOne(feedbackObj._id)
+				.exec()
+				.then((_feedback) => {
+					if (_feedback) {
+						feedback = _feedback as FeedbackDocument;
+						feedback.$.subscribe((_feedback) => {
+							if (_feedback) {
+								feedbackObj = _feedback as FeedbackDocType;
+							}
+						});
+					}
+				});
 		});
 
 		import('$lib/util/videoCall').then((_vc) => {
@@ -157,7 +165,7 @@
 		}
 	};
 
-	const sendTransaction = async (amount: number, fundingAddress: string) => {
+	$: sendTransaction = async (amount: number, fundingAddress: string) => {
 		// if ($selectedAccount) {
 		// 	const result = await $web3.eth.sendTransaction({
 		// 		from: $selectedAccount,
@@ -165,7 +173,7 @@
 		// 		value: $web3.utils.toWei(amount.toString(), 'ether')
 		// 	});
 		// }
-		$: linkObj.status = LinkStatuses.READY; //TODO: This is temp, need backend service to indicate when link is ready
+		linkStatus = LinkStatuses.READY; //TODO: This is temp, need backend service to indicate when link is ready
 	};
 
 	const pay = () => {
@@ -175,102 +183,96 @@
 	$: showFeedback = false;
 </script>
 
-{#if linkObj}
-	<FeedbackForm {showFeedback} />
-	<div class="min-h-full">
-		<main class="py-6">
-			{#if $linkState != 'inCall'}
-				<!-- Page header -->
-				<div class="text-center">
-					<h1 class="font-bold text-center text-5xl">Make your pCall</h1>
-					<p class="py-6">Scis vis facere illud pCall. Carpe florem et fac quod nunc vocant.</p>
+<FeedbackForm {showFeedback} />
+<div class="min-h-full">
+	<main class="py-6">
+		{#if $linkState != 'inCall'}
+			<!-- Page header -->
+			<div class="text-center">
+				<h1 class="font-bold text-center text-5xl">Make your pCall</h1>
+				<p class="py-6">Scis vis facere illud pCall. Carpe florem et fac quod nunc vocant.</p>
+			</div>
+			<div
+				class="container	 mx-auto max-w-max  items-center sm:px-6 md:flex md:space-x-5 md:items-stretch  lg:px-8"
+			>
+				<div class="rounded-box h-full bg-base-200">
+					<div>
+						<LinkDetail link={linkObj} />
+					</div>
+					<div class="pb-6 w-full flex justify-center">
+						{#if linkStatus === LinkStatuses.READY}
+							<button
+								class="btn btn-secondary"
+								on:click={call}
+								disabled={callState != 'ready' || !userstream}
+							>
+								Call {linkObj.talentInfo.name} Now</button
+							>
+						{:else}
+							<button class="btn btn-secondary" on:click={pay}>Pay for Call</button>
+						{/if}
+					</div>
 				</div>
-				<div
-					class="container	 mx-auto max-w-max  items-center sm:px-6 md:flex md:space-x-5 md:items-stretch  lg:px-8"
-				>
-					<div class="rounded-box h-full bg-base-200">
-						<div>
-							<LinkDetail link={linkObj} />
-						</div>
-						<div class="pb-6 w-full flex justify-center">
-							{#if ready}
-								<button
-									class="btn btn-secondary"
-									on:click={call}
-									disabled={callState != 'ready' || !userstream}
-								>
-									Call {linkObj.talentInfo.name} Now</button
-								>
+				<div class="bg-base-200  text-white card lg:min-w-200">
+					<div class="text-center card-body items-center ">
+						<div class="text-2xl card-title">Your Video Preview</div>
+						<div class="container h-full rounded-2xl max-w-2xl">
+							{#if userstream}
+								<VideoPreview {us} />
 							{:else}
-								<button class="btn btn-secondary" on:click={pay}>Pay for Call</button>
+								<div class="text-center">
+									<p class="text-center">
+										<span class="text-lg">
+											You need to allow access to your camera and microphone to use this feature.
+										</span>
+										<br />
+										<span class="text-lg">
+											If you want to be able to send your video, you will need to reload this page
+											and give permission to use your microphone and camera. You will not be able to
+											make a call until you do this.
+										</span>
+									</p>
+								</div>
 							{/if}
 						</div>
+						Call State: {callState}
 					</div>
-					<div class="bg-base-200  text-white card lg:min-w-200">
-						<div class="text-center card-body items-center ">
-							<div class="text-2xl card-title">Your Video Preview</div>
-							<div class="container h-full rounded-2xl max-w-2xl">
-								{#if userstream}
-									<VideoPreview {us} />
-								{:else}
-									<div class="text-center">
-										<p class="text-center">
-											<span class="text-lg">
-												You need to allow access to your camera and microphone to use this feature.
-											</span>
-											<br />
-											<span class="text-lg">
-												If you want to be able to send your video, you will need to reload this page
-												and give permission to use your microphone and camera. You will not be able
-												to make a call until you do this.
-											</span>
-										</p>
-									</div>
-								{/if}
-							</div>
-							Call State: {callState}
-						</div>
-					</div>
-				</div>
-			{:else}
-				<VideoCall {vc} {us} />
-			{/if}
-		</main>
-	</div>
-	{#if feedbackObj}
-		<div class="flex w-full place-content-center">
-			<div class="bg-primary shadow text-primary-content  stats stats-vertical lg:stats-horizontal">
-				<div class="stat">
-					<div class="stat-title">Views</div>
-					<div class="stat-value">{feedbackObj.viewed}</div>
-				</div>
-				<div class="stat">
-					<div class="stat-title">Rejected</div>
-					<div class="stat-value">{feedbackObj.rejected}</div>
-				</div>
-				<div class="stat">
-					<div class="stat-title">Disconnected</div>
-					<div class="stat-value">{feedbackObj.disconnected}</div>
-				</div>
-				<div class="stat">
-					<div class="stat-title">UnAnswered</div>
-					<div class="stat-value">{feedbackObj.unanswered}</div>
-				</div>
-				<div class="stat">
-					<div class="stat-title">Link State</div>
-					<div class="stat-value">{$linkState}</div>
-				</div>
-				<div class="stat">
-					<div class="stat-title">Call State</div>
-					<div class="stat-value">{previousState}</div>
-				</div>
-				<div class="stat">
-					<div class="stat-title">pCall Status</div>
-					<div class="stat-value">{linkObj.status}</div>
 				</div>
 			</div>
+		{:else}
+			<VideoCall {vc} {us} />
+		{/if}
+	</main>
+</div>
+<div class="flex w-full place-content-center">
+	<div class="bg-primary shadow text-primary-content  stats stats-vertical lg:stats-horizontal">
+		<div class="stat">
+			<div class="stat-title">Views</div>
+			<div class="stat-value">{feedbackObj.viewed}</div>
 		</div>
-	{/if}
-{:else if linkObj && linkObj.status != LinkStatuses.ACTIVE}
-	<h1 class="font-bold text-center text-5xl">No pCall Here</h1>
-{/if}
+		<div class="stat">
+			<div class="stat-title">Rejected</div>
+			<div class="stat-value">{feedbackObj.rejected}</div>
+		</div>
+		<div class="stat">
+			<div class="stat-title">Disconnected</div>
+			<div class="stat-value">{feedbackObj.disconnected}</div>
+		</div>
+		<div class="stat">
+			<div class="stat-title">UnAnswered</div>
+			<div class="stat-value">{feedbackObj.unanswered}</div>
+		</div>
+		<div class="stat">
+			<div class="stat-title">Link State</div>
+			<div class="stat-value">{$linkState}</div>
+		</div>
+		<div class="stat">
+			<div class="stat-title">Call State</div>
+			<div class="stat-value">{previousState}</div>
+		</div>
+		<div class="stat">
+			<div class="stat-title">pCall Status</div>
+			<div class="stat-value">{linkObj.status}</div>
+		</div>
+	</div>
+</div>

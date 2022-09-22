@@ -56,7 +56,7 @@
 	}
 	const updateProfileImage = async (url: string) => {
 		if (url && talent) {
-			talent.update!({
+			talent.update({
 				$set: {
 					profileImageUrl: url,
 					updatedAt: new Date().getTime()
@@ -133,174 +133,171 @@
 	});
 </script>
 
-{#if talentObj}
-	<!-- Put this part before </body> tag -->
-	<input type="checkbox" id="call-modal" class="modal-toggle" bind:checked={showAlert} />
-	<div class="modal">
-		<div class="modal-box">
-			<div class="flex flex-row pt-4 gap-2 place-items-center justify-between">
-				<div class="font-bold text-lg  ">Incoming pCall</div>
-				<div class="h-14 animate-shock animate-loop w-14 animated  btn btn-circle ">
-					<PhoneIncomingIcon size="34" />
-				</div>
-			</div>
-			<p class="py-4">
-				You have an incoming pCall from <span class="font-bold">{callerName}</span>
-			</p>
-			<div class="modal-action">
-				<label for="call-modal" class="btn" on:click={answerCall}>Answer</label>
+<input type="checkbox" id="call-modal" class="modal-toggle" bind:checked={showAlert} />
+<div class="modal">
+	<div class="modal-box">
+		<div class="flex flex-row pt-4 gap-2 place-items-center justify-between">
+			<div class="font-bold text-lg  ">Incoming pCall</div>
+			<div class="h-14 animate-shock animate-loop w-14 animated  btn btn-circle ">
+				<PhoneIncomingIcon size="34" />
 			</div>
 		</div>
+		<p class="py-4">
+			You have an incoming pCall from <span class="font-bold">{callerName}</span>
+		</p>
+		<div class="modal-action">
+			<label for="call-modal" class="btn" on:click={answerCall}>Answer</label>
+		</div>
 	</div>
+</div>
 
-	<div class="min-h-full">
-		<main class="py-10">
-			<!-- Page header -->
-			<div
-				class="mx-auto max-w-3xl px-4 sm:px-6 md:flex md:space-x-5 md:items-center md:justify-between lg:max-w-7xl lg:px-8"
-			>
-				<div class="flex space-x-5 items-center">
-					<div>
-						<h1 class="font-bold text-5xl">Request a pCall</h1>
-						<p class="pt-6">
-							Pretioso flos est, nihil ad vos nunc. Posset faciens pecuniam. Posuit eam ad opus nunc
-							et adepto a pCall!
-						</p>
-					</div>
+<div class="min-h-full">
+	<main class="py-10">
+		<!-- Page header -->
+		<div
+			class="mx-auto max-w-3xl px-4 sm:px-6 md:flex md:space-x-5 md:items-center md:justify-between lg:max-w-7xl lg:px-8"
+		>
+			<div class="flex space-x-5 items-center">
+				<div>
+					<h1 class="font-bold text-5xl">Request a pCall</h1>
+					<p class="pt-6">
+						Pretioso flos est, nihil ad vos nunc. Posset faciens pecuniam. Posuit eam ad opus nunc
+						et adepto a pCall!
+					</p>
 				</div>
 			</div>
-			{#if !inCall}
-				<div
-					class="mx-auto mt-8 max-w-3xl grid gap-6 grid-cols-1 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3"
-				>
-					<div class="space-y-6 lg:col-start-1 lg:col-span-2">
-						<!-- Current Link -->
-						<div>
-							<LinkViewer link={currentLink} talent={talentObj} />
-						</div>
+		</div>
+		{#if !inCall}
+			<div
+				class="mx-auto mt-8 max-w-3xl grid gap-6 grid-cols-1 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3"
+			>
+				<div class="space-y-6 lg:col-start-1 lg:col-span-2">
+					<!-- Current Link -->
+					<div>
+						<LinkViewer link={currentLink} talent={talentObj} />
+					</div>
 
-						<!-- Link Form-->
-						<div class="bg-primary text-primary-content card">
-							<div class="text-center card-body items-center">
-								<h2 class="text-2xl card-title">Create a New pCall Link</h2>
-								<div class="flex flex-col text-white p-2 justify-center items-center">
-									<form on:submit|preventDefault={handleSubmit}>
-										<div class="max-w-xs w-full py-2 form-control ">
-											<!-- svelte-ignore a11y-label-has-associated-control -->
-											<label for="price" class="label">
-												<span class="label-text">Requested Amount in USD</span></label
+					<!-- Link Form-->
+					<div class="bg-primary text-primary-content card">
+						<div class="text-center card-body items-center">
+							<h2 class="text-2xl card-title">Create a New pCall Link</h2>
+							<div class="flex flex-col text-white p-2 justify-center items-center">
+								<form on:submit|preventDefault={handleSubmit}>
+									<div class="max-w-xs w-full py-2 form-control ">
+										<!-- svelte-ignore a11y-label-has-associated-control -->
+										<label for="price" class="label">
+											<span class="label-text">Requested Amount in USD</span></label
+										>
+										<div class="rounded-md shadow-sm mt-1 relative">
+											<div
+												class="flex pl-3 inset-y-0 left-0 absolute items-center pointer-events-none"
 											>
-											<div class="rounded-md shadow-sm mt-1 relative">
-												<div
-													class="flex pl-3 inset-y-0 left-0 absolute items-center pointer-events-none"
-												>
-													<span class="text-gray-500 sm:text-sm"> $ </span>
-												</div>
-												<input
-													type="text"
-													name="amount"
-													id="amount"
-													class=" max-w-xs w-full py-2 pl-6 input input-bordered input-primary "
-													placeholder="0.00"
-													aria-describedby="price-currency"
-													on:change={handleChange}
-													bind:value={$form.amount}
-												/>
-												<div
-													class="flex pr-3 inset-y-0 right-0 absolute items-center pointer-events-none"
-												>
-													<span class="text-gray-500 sm:text-sm" id="price-currency"> USDC </span>
-												</div>
+												<span class="text-gray-500 sm:text-sm"> $ </span>
+											</div>
+											<input
+												type="text"
+												name="amount"
+												id="amount"
+												class=" max-w-xs w-full py-2 pl-6 input input-bordered input-primary "
+												placeholder="0.00"
+												aria-describedby="price-currency"
+												on:change={handleChange}
+												bind:value={$form.amount}
+											/>
+											<div
+												class="flex pr-3 inset-y-0 right-0 absolute items-center pointer-events-none"
+											>
+												<span class="text-gray-500 sm:text-sm" id="price-currency"> USDC </span>
 											</div>
 										</div>
-										{#if $errors.amount}
-											<div class="shadow-lg alert alert-error">{$errors.amount}</div>
-										{/if}
-										<div class="py-4">
-											<button class="btn btn-secondary" type="submit">Generate Link</button>
-										</div>
-									</form>
-								</div>
-							</div>
-						</div>
-
-						<!-- Camera  Preview -->
-						<div class="bg-primary text-primary-content card">
-							<div class="text-center card-body items-center">
-								<h2 class="text-2xl card-title">Your Video Preview</h2>
-								<div class="rounded-2xl">
-									<VideoPreview {us} />
-								</div>
+									</div>
+									{#if $errors.amount}
+										<div class="shadow-lg alert alert-error">{$errors.amount}</div>
+									{/if}
+									<div class="py-4">
+										<button class="btn btn-secondary" type="submit">Generate Link</button>
+									</div>
+								</form>
 							</div>
 						</div>
 					</div>
 
-					<!--Next Column-->
-					<div class="space-y-6 lg:col-start-3 lg:col-span-1">
-						<!-- Status -->
+					<!-- Camera  Preview -->
+					<div class="bg-primary text-primary-content card">
+						<div class="text-center card-body items-center">
+							<h2 class="text-2xl card-title">Your Video Preview</h2>
+							<div class="rounded-2xl">
+								<VideoPreview {us} />
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!--Next Column-->
+				<div class="space-y-6 lg:col-start-3 lg:col-span-1">
+					<!-- Status -->
+					<div class="lg:col-start-3 lg:col-span-1">
+						<div class="bg-primary text-primary-content card">
+							<div class="text-center card-body items-center">
+								<h2 class="text-2xl card-title">pCall Status</h2>
+								{#if callState == 'ready'}
+									<div class="text-2xl">Waiting for Incoming Call</div>
+								{:else}
+									<p>Signed in as {talentObj.name}</p>
+								{/if}
+								<p>Call State: {callState}</p>
+							</div>
+						</div>
+					</div>
+					<div>
+						<!-- Photo -->
 						<div class="lg:col-start-3 lg:col-span-1">
 							<div class="bg-primary text-primary-content card">
 								<div class="text-center card-body items-center">
-									<h2 class="text-2xl card-title">pCall Status</h2>
-									{#if callState == 'ready'}
-										<div class="text-2xl">Waiting for Incoming Call</div>
-									{:else}
-										<p>Signed in as {talentObj.name}</p>
-									{/if}
-									<p>Call State: {callState}</p>
-								</div>
-							</div>
-						</div>
-						<div>
-							<!-- Photo -->
-							<div class="lg:col-start-3 lg:col-span-1">
-								<div class="bg-primary text-primary-content card">
-									<div class="text-center card-body items-center">
-										<h2 class="text-2xl card-title">Profile Photo</h2>
-										<div>
-											<ProfilePhoto
-												profileImage={talentObj.profileImageUrl || PUBLIC_DEFAULT_PROFILE_IMAGE}
-												callBack={(value) => {
-													updateProfileImage(value);
-												}}
-											/>
-										</div>
+									<h2 class="text-2xl card-title">Profile Photo</h2>
+									<div>
+										<ProfilePhoto
+											profileImage={talentObj.profileImageUrl || PUBLIC_DEFAULT_PROFILE_IMAGE}
+											callBack={(value) => {
+												updateProfileImage(value);
+											}}
+										/>
 									</div>
 								</div>
-							</div>
-						</div>
-
-						<!-- Wallet -->
-						<div>
-							<TalentWallet {talent} />
-						</div>
-
-						<!-- Feedback -->
-						<div>
-							<div class="lg:col-start-3 lg:col-span-1">
-								<div class="bg-primary text-primary-content card">
-									<div class="text-center card-body items-center">
-										<h2 class="text-2xl card-title">Your Average Rating</h2>
-										{talentObj.stats.ratingAvg.toFixed(2)}
-										<StarRating rating={talentObj.stats.ratingAvg || 0} />
-									</div>
-								</div>
-							</div>
-						</div>
-
-						<!-- Activity Feed -->
-						<div>
-							<div class="lg:col-start-3 lg:col-span-1">
-								<TalentActivity {completedCalls} />
 							</div>
 						</div>
 					</div>
+
+					<!-- Wallet -->
+					<div>
+						<TalentWallet {talent} />
+					</div>
+
+					<!-- Feedback -->
+					<div>
+						<div class="lg:col-start-3 lg:col-span-1">
+							<div class="bg-primary text-primary-content card">
+								<div class="text-center card-body items-center">
+									<h2 class="text-2xl card-title">Your Average Rating</h2>
+									{talentObj.stats.ratingAvg.toFixed(2)}
+									<StarRating rating={talentObj.stats.ratingAvg || 0} />
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Activity Feed -->
+					<div>
+						<div class="lg:col-start-3 lg:col-span-1">
+							<TalentActivity {completedCalls} />
+						</div>
+					</div>
 				</div>
-			{:else}
-				<div>
-					<VideoCall {vc} {us} options={{ hangup: false, cam: false, mic: false }} />
-				</div>
-			{/if}
-		</main>
-	</div>
-{/if}
+			</div>
+		{:else}
+			<div>
+				<VideoCall {vc} {us} options={{ hangup: false, cam: false, mic: false }} />
+			</div>
+		{/if}
+	</main>
+</div>

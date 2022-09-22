@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { page } from '$app/stores';
+	import { PUBLIC_ROOM_PATH } from '$env/static/public';
 	import type { LinkDocType } from '$lib/ORM/models/link';
 	import type { TalentDocType } from '$lib/ORM/models/talent';
 	import { currencyFormatter } from '$lib/util/constants';
-	import { PUBLIC_ROOM_PATH } from '$env/static/public';
 	import FaMoneyBillWave from 'svelte-icons/fa/FaMoneyBillWave.svelte';
 	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';
 	import urlJoin from 'url-join';
