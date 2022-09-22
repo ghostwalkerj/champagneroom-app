@@ -9,9 +9,9 @@
 	import { StorageTypes } from '$lib/ORM/rxdb';
 	import { userStream, type UserStreamType } from '$lib/util/userStream';
 	import type { VideoCallType } from '$lib/util/videoCall';
-	import type { PageData } from './$types';
 	import { onMount } from 'svelte';
 	import fsm from 'svelte-fsm';
+	import type { PageData } from './$types';
 	import FeedbackForm from './FeedbackForm.svelte';
 	import LinkDetail from './LinkDetail.svelte';
 
@@ -272,7 +272,7 @@
 		</div>
 		<div class="stat">
 			<div class="stat-title">pCall Status</div>
-			<div class="stat-value">{linkObj.status}</div>
+			<div class="stat-value">{linkStatus}</div>
 		</div>
 	</div>
 </div>
