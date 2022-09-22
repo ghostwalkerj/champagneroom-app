@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
+	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import VideoCall from '$lib/components/calls/VideoCall.svelte';
 	import VideoPreview from '$lib/components/calls/VideoPreview.svelte';
@@ -23,9 +24,12 @@
 
 	export let data: PageData;
 
-	const token = data!.token;
-	let talentObj = data!.talent! as TalentDocType;
-	let completedCalls = data!.completedCalls as LinkDocType[];
+	if (browser && !data.token) {
+		goto('/');
+	}
+	const token = data.token;
+	let talentObj = data.talent as TalentDocType;
+	let completedCalls = data.completedCalls as LinkDocType[];
 	let currentLink: LinkDocument;
 
 	let key = $page.params.key;

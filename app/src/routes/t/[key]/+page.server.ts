@@ -33,7 +33,7 @@ export const load: PageServerLoad = async ({ params }) => {
 					completedCalls: completedCalls.map((link) => link.toJSON())
 				};
 			} else {
-				return { token };
+				return {};
 			}
 		} else {
 			throw error(400, 'no db');
