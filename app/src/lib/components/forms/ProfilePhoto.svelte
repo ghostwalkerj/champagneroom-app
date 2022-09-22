@@ -56,7 +56,6 @@
 		progressVisibility = 'invisible';
 	}
 
-	// TODO: Have to make this secure before going live, convert to endpoint and proxy via the server
 	async function upload() {
 		uploadVisibility = 'invisible';
 		progressVisibility = 'visible';
