@@ -1,5 +1,5 @@
-import { TalentString, type TalentDocType, type TalentDocument } from '$lib/ORM/models/talent';
 import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
+import { TalentString, type TalentDocType, type TalentDocument } from '$lib/ORM/models/talent';
 import { nanoid } from 'nanoid';
 import {
 	toTypedRxJsonSchema,
@@ -7,7 +7,6 @@ import {
 	type RxCollection,
 	type RxDocument,
 	type RxJsonSchema
-
 } from 'rxdb';
 type AgentDocMethods = {
 	createTalent: (

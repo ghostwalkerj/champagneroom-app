@@ -1,9 +1,7 @@
 import {
-	INFURA_IPFS_API_PORT,
-	INFURA_IPFS_API_URL,
+	INFURA_IPFS_API_PORT, INFURA_IPFS_API_SECRET, INFURA_IPFS_API_URL,
 	INFURA_IPFS_DEDICATED_GATEWAY,
-	INFURA_IPFS_PROJECT_ID,
-	INFURA_IPFS_API_SECRET
+	INFURA_IPFS_PROJECT_ID
 } from '$env/static/private';
 import { json } from '@sveltejs/kit';
 import { create } from 'ipfs-http-client';

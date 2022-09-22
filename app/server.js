@@ -1,6 +1,6 @@
-import { handler } from './build/handler.js';
 import express from 'express';
 import fs from 'fs';
+import { handler } from './build/handler.js';
 
 const app = express();
 

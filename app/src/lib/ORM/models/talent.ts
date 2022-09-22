@@ -136,7 +136,7 @@ type talentRef = {
 type TalentDocMethods = {
 	createLink: (amount: number) => Promise<LinkDocument>;
 	updateStats: () => Promise<TalentDocument['stats']>;
-	getStatsByRange: (range?: { start: number; end: number }) => Promise<TalentDocument['stats']>;
+	getStatsByRange: (range?: { start: number; end: number; }) => Promise<TalentDocument['stats']>;
 };
 
 export const talentDocMethods: TalentDocMethods = {

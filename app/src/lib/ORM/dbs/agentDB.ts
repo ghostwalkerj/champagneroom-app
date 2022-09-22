@@ -1,3 +1,4 @@
+import { PUBLIC_CREATORS_ENDPOINT, PUBLIC_RXDB_PASSWORD } from '$env/static/public';
 import {
 	agentDocMethods,
 	agentSchema,
@@ -8,12 +9,10 @@ import { feedbackSchema, type FeedbackCollection } from '$lib/ORM/models/feedbac
 import { linkSchema, type LinkCollection } from '$lib/ORM/models/link';
 import { talentDocMethods, talentSchema, type TalentCollection } from '$lib/ORM/models/talent';
 import { initRXDB, StorageTypes } from '$lib/ORM/rxdb';
-import { PUBLIC_CREATORS_ENDPOINT } from '$env/static/public';
-import { PUBLIC_RXDB_PASSWORD } from '$env/static/public';
 import { EventEmitter } from 'events';
-import { createRxDatabase, removeRxDatabase, type RxDatabase } from 'rxdb';
-import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
+import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
+import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
 
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 100;

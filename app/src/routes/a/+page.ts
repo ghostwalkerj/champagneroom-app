@@ -1,5 +1,5 @@
-import { TokenRoles } from '$lib/util/constants';
 import { PUBLIC_AUTH_PATH } from '$env/static/public';
+import { TokenRoles } from '$lib/util/constants';
 
 import urlJoin from 'url-join';
 import type { PageLoad } from './$types';

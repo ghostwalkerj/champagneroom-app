@@ -1,7 +1,7 @@
+import { JWT_CREATOR_USER, JWT_EXPIRY, JWT_SECRET } from '$env/static/private';
 import { talentDB } from '$lib/ORM/dbs/talentDB';
 import type { LinkDocument } from '$lib/ORM/models/link';
 import { StorageTypes } from '$lib/ORM/rxdb';
-import { JWT_CREATOR_USER, JWT_EXPIRY, JWT_SECRET } from '$env/static/private';
 import { error } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import type { PageServerLoad } from './$types';
@@ -14,7 +14,7 @@ export const load: PageServerLoad = async ({ params }) => {
 	if (JWT_SECRET) {
 		token = jwt.sign(
 			{
-				exp: Math.floor(Date.now() / 1000) + JWT_EXPIRY,
+				exp: Math.floor(Date.now() / 1000) + Number.parseInt(JWT_EXPIRY),
 				sub: JWT_CREATOR_USER
 			},
 			JWT_SECRET
