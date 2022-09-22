@@ -89,10 +89,8 @@
 		complete: {}
 	});
 
-	if (browser) {
-		onMount(async () => {
-			requestStream();
-		});
+	const mightCall = () => {
+		requestStream();
 		// Make link and feedback reactive
 		publicDB(token, linkId, StorageTypes.IDB).then((_db: PublicDBType) => {
 			_db.links.findOne(linkObj._id).$.subscribe((_link) => {
@@ -158,14 +156,15 @@
 				}
 			});
 		});
-	}
+	};
+
 	const call = async () => {
 		if (vc) {
 			vc.makeCall(linkObj.callId!, 'Dr. Huge Mongus', mediaStream);
 		}
 	};
 
-	$: sendTransaction = async (amount: number, fundingAddress: string) => {
+	const sendTransaction = async (amount: number, fundingAddress: string) => {
 		// if ($selectedAccount) {
 		// 	const result = await $web3.eth.sendTransaction({
 		// 		from: $selectedAccount,
@@ -181,9 +180,22 @@
 	};
 
 	$: showFeedback = false;
+
+	// All depends on the link status
+	// Wait for onMount to grab user Stream only if we plan to call
+	onMount(async () => {
+		switch (linkStatus) {
+			case LinkStatuses.READY:
+			case LinkStatuses.ACTIVE: {
+				mightCall();
+				break;
+			}
+		}
+	});
 </script>
 
 <FeedbackForm {showFeedback} />
+
 <div class="min-h-full">
 	<main class="py-6">
 		{#if $linkState != 'inCall'}
@@ -244,6 +256,7 @@
 		{/if}
 	</main>
 </div>
+
 <div class="flex w-full place-content-center">
 	<div class="bg-primary shadow text-primary-content  stats stats-vertical lg:stats-horizontal">
 		<div class="stat">
