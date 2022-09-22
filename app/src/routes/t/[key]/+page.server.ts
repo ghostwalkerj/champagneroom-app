@@ -8,6 +8,9 @@ import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ params }) => {
 	const key = params.key;
 	let token = '';
+	let talent = {};
+	let currentLink = {};
+	let completedCalls = {};
 	if (JWT_SECRET) {
 		token = jwt.sign(
 			{
@@ -19,24 +22,29 @@ export const load: PageServerLoad = async ({ params }) => {
 	}
 
 	//Try to preload
-	if (key != null) {
-		const db = await talentDB(token, key, StorageTypes.NODE_WEBSQL);
-		if (db) {
-			const talent = await db.talents.findOne().where('key').equals(key).exec();
-			if (talent) {
-				const currentLink = (await talent.populate('currentLink')) as LinkDocument;
-				const completedCalls = (await talent.populate('stats.completedCalls')) as LinkDocument[];
-				return {
-					token,
-					talent: talent.toJSON(),
-					currentLink: currentLink ? currentLink.toJSON() : null,
-					completedCalls: completedCalls.map((link) => link.toJSON())
-				};
-			} else {
-				return {};
-			}
-		} else {
-			throw error(400, 'no db');
-		}
+	if (key === null) {
+		throw error(404, 'Key not found');
 	}
+	const db = await talentDB(token, key, StorageTypes.NODE_WEBSQL);
+	if (db) {
+		const _talent = await db.talents.findOne().where('key').equals(key).exec();
+		if (_talent) {
+			const _currentLink = (await _talent.populate('currentLink')) as LinkDocument;
+			const _completedCalls = (await _talent.populate('stats.completedCalls')) as LinkDocument[];
+			talent = _talent.toJSON();
+			currentLink = _currentLink ? _currentLink.toJSON() : {};
+			completedCalls = _completedCalls.map((link) => link.toJSON());
+		}
+		else {
+			throw error(404, 'Talent not found');
+		}
+	} else {
+		throw error(400, 'no db');
+	}
+	return {
+		token,
+		talent,
+		currentLink,
+		completedCalls
+	};
 };

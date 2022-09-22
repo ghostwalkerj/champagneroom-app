@@ -12,6 +12,7 @@ import {
 export enum LinkStatuses {
 	ACTIVE = 'ACTIVE',
 	EXPIRED = 'EXPIRED',
+	READY = 'READY',
 	IN_PROGRESS = 'IN_PROGRESS',
 	COMPLETED = 'COMPLETED'
 }
@@ -107,7 +108,8 @@ const linkSchemaLiteral = {
 		'fundingAddress',
 		'fundedAmount',
 		'feedback',
-		'createdAt'
+		'createdAt',
+		'status'
 	],
 	indexes: ['talent', 'feedback', 'agent', 'status', 'callStart'],
 	encrypted: ['callId']

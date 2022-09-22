@@ -24,9 +24,6 @@
 
 	export let data: PageData;
 
-	if (browser && !data.token) {
-		goto('/');
-	}
 	const token = data.token;
 	let talentObj = data.talent as TalentDocType;
 	let completedCalls = data.completedCalls as LinkDocType[];
@@ -34,7 +31,7 @@
 
 	let key = $page.params.key;
 	let vc: VideoCallType;
-	let global = globalThis;
+	//let global = globalThis;
 
 	let talent: TalentDocument;
 

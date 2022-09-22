@@ -19,25 +19,20 @@
 
 	export let data: PageData;
 
-	if (browser && (!data.token || !data.link || !data.feedback)) {
-		goto('/');
-	}
-
 	$: callState = 'disconnected';
 	$: previousState = 'none';
 	$: userstream = false;
 
 	const token = data.token;
-	let linkObj = data.link as LinkDocType;
-	let feedbackObj = data.feedback as FeedbackDocType;
+	let linkObj = data.link! as LinkDocType;
+	let feedbackObj = data.feedback! as FeedbackDocType;
 	let linkId = $page.params.id;
 	let vc: VideoCallType;
 	let videoCall: any;
 	let mediaStream: MediaStream;
 	let us: Awaited<UserStreamType>;
 	let feedback: FeedbackDocument;
-
-	let funded = false;
+	$: ready = linkObj.status == LinkStatuses.READY;
 
 	const requestStream = async () => {
 		try {
@@ -96,7 +91,7 @@
 		complete: {}
 	});
 
-	if (linkObj && linkObj.status == LinkStatuses.ACTIVE && browser) {
+	if (linkObj && browser) {
 		onMount(async () => {
 			requestStream();
 		});
@@ -164,14 +159,14 @@
 	};
 
 	const sendTransaction = async (amount: number, fundingAddress: string) => {
-		if ($selectedAccount) {
-			const result = await $web3.eth.sendTransaction({
-				from: $selectedAccount,
-				to: fundingAddress,
-				value: $web3.utils.toWei(amount.toString(), 'ether')
-			});
-		}
-		funded = true;
+		// if ($selectedAccount) {
+		// 	const result = await $web3.eth.sendTransaction({
+		// 		from: $selectedAccount,
+		// 		to: fundingAddress,
+		// 		value: $web3.utils.toWei(amount.toString(), 'ether')
+		// 	});
+		// }
+		$: linkObj.status = LinkStatuses.READY; //TODO: This is temp, need backend service to indicate when link is ready
 	};
 
 	const pay = () => {
@@ -181,7 +176,7 @@
 	$: showFeedback = false;
 </script>
 
-{#if linkObj && linkObj.status == LinkStatuses.ACTIVE}
+{#if linkObj}
 	<FeedbackForm {showFeedback} />
 	<div class="min-h-full">
 		<main class="py-6">
@@ -199,7 +194,7 @@
 							<LinkDetail link={linkObj} />
 						</div>
 						<div class="pb-6 w-full flex justify-center">
-							{#if funded}
+							{#if ready}
 								<button
 									class="btn btn-secondary"
 									on:click={call}
