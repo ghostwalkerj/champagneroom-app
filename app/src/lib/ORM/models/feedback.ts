@@ -9,7 +9,7 @@ import type { LinkDocument } from './link';
 
 const feedbackSchemaLiteral = {
 	title: 'feedback',
-	description: ' feedback for a link',
+	description: 'feedback for a link',
 	version: 0,
 	type: 'object',
 	primaryKey: '_id',

@@ -172,7 +172,7 @@
 		// 		value: $web3.utils.toWei(amount.toString(), 'ether')
 		// 	});
 		// }
-		linkStatus = LinkStatuses.READY; //TODO: This is temp, need backend service to indicate when link is ready
+		linkStatus = LinkStatuses.CLAIMED; //TODO: This is temp, need backend service to indicate when link is ready
 	};
 
 	const pay = () => {
@@ -185,8 +185,8 @@
 	// Wait for onMount to grab user Stream only if we plan to call
 	onMount(async () => {
 		switch (linkStatus) {
-			case LinkStatuses.READY:
-			case LinkStatuses.ACTIVE: {
+			case LinkStatuses.CLAIMED:
+			case LinkStatuses.UNCLAIMED: {
 				mightCall();
 				break;
 			}
@@ -212,7 +212,7 @@
 						<LinkDetail link={linkObj} />
 					</div>
 					<div class="pb-6 w-full flex justify-center">
-						{#if linkStatus === LinkStatuses.READY}
+						{#if linkStatus === LinkStatuses.CLAIMED}
 							<button
 								class="btn btn-secondary"
 								on:click={call}

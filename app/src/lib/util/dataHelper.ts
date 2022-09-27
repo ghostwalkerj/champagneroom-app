@@ -87,7 +87,7 @@ const generateLinks = (talent: TalentDocument, count: number) => {
 			agent: talent.agent
 		};
 		const _link = {
-			status: LinkStatuses.COMPLETED,
+			status: LinkStatuses.FINALIZED,
 			amount,
 			fundedAmount: amount,
 			fundingAddress: '0x251281e1516e6E0A145d28a41EE63BfcDd9E18Bf',

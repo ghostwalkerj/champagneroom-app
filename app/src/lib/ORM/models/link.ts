@@ -10,11 +10,10 @@ import {
 } from 'rxdb';
 
 export enum LinkStatuses {
-	ACTIVE = 'ACTIVE',
-	EXPIRED = 'EXPIRED',
-	READY = 'READY',
-	IN_PROGRESS = 'IN_PROGRESS',
-	COMPLETED = 'COMPLETED'
+	UNCLAIMED = 'UNCLAIMED',
+	CANCELLED = 'CANCELLED',
+	CLAIMED = 'CLAIMED',
+	FINALIZED = 'FINALIZED'
 }
 
 export const LinkString = 'link';

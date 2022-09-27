@@ -158,7 +158,7 @@ export const talentDocMethods: TalentDocMethods = {
 			agent: this.agent
 		};
 		const _link = {
-			status: LinkStatuses.ACTIVE,
+			status: LinkStatuses.UNCLAIMED,
 			fundedAmount: 0,
 			amount,
 			fundingAddress: '0x251281e1516e6E0A145d28a41EE63BfcDd9E18Bf', //TODO: make real wallet
@@ -182,8 +182,8 @@ export const talentDocMethods: TalentDocMethods = {
 
 		if (this.currentLink) {
 			const currentLink = await this.populate('currentLink');
-			if (currentLink && currentLink.status === LinkStatuses.ACTIVE) {
-				currentLink.update({ $set: { status: LinkStatuses.EXPIRED } });
+			if (currentLink && currentLink.status === LinkStatuses.UNCLAIMED) {
+				currentLink.update({ $set: { status: LinkStatuses.CANCELLED } });
 			}
 		}
 
@@ -215,7 +215,7 @@ export const talentDocMethods: TalentDocMethods = {
 			.find({
 				selector: {
 					talent: this._id,
-					status: LinkStatuses.COMPLETED,
+					status: LinkStatuses.FINALIZED,
 					callStart: { $gte: range.start, $lte: range.end }
 				},
 				sort: [{ callStart: 'desc' }],
