@@ -19,7 +19,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		if (tokenRole && (tokenRole === TokenRoles.AGENT || tokenRole === TokenRoles.TALENT)) {
 			token = jwt.sign(
 				{
-					exp: Math.floor(Date.now() / 1000) + JWT_EXPIRY,
+					exp: Math.floor(Date.now() / 1000) + Number.parseInt(JWT_EXPIRY),
 					sub: JWT_CREATOR_USER
 				},
 				JWT_SECRET
@@ -28,7 +28,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		if (tokenRole === TokenRoles.PUBLIC) {
 			token = jwt.sign(
 				{
-					exp: Math.floor(Date.now() / 1000) + JWT_EXPIRY,
+					exp: Math.floor(Date.now() / 1000) + Number.parseInt(JWT_EXPIRY),
 					sub: JWT_PUBLIC_USER
 				},
 				JWT_SECRET
