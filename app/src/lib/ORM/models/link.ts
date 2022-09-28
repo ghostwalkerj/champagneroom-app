@@ -8,6 +8,7 @@ import {
 	type RxDocument,
 	type RxJsonSchema
 } from 'rxdb';
+import fsm from 'svelte-fsm';
 
 export enum LinkStatuses {
 	UNCLAIMED = 'UNCLAIMED',
@@ -15,6 +16,27 @@ export enum LinkStatuses {
 	CLAIMED = 'CLAIMED',
 	FINALIZED = 'FINALIZED'
 }
+
+const getState = (_this: LinkDocument) => {
+	const linkState = fsm('unclaimed', {
+		unclaimed: {
+			claim: 'claimed',
+			cancel: 'cancelled'
+		},
+		claimed: {
+			completeCall: 'waiting4Finalization',
+			requestCancellation: 'cancelRequested',
+		},
+		waiting4Finalization: {
+		},
+		cancelRequested: {},
+		cancelled: {},
+		finalized: {}
+	});
+
+	return linkState;
+
+};
 
 export const LinkString = 'link';
 const linkSchemaLiteral = {
