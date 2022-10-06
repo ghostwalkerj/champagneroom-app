@@ -65,6 +65,7 @@
 	"type": "module",
 	"dependencies": {
 		"@walletconnect/web3-provider": "^1.7.8",
+		"@xstate/svelte": "^2.0.0",
 		"broadcast-channel": "^4.17.0",
 		"chart.js": "^3.9.1",
 		"chartjs-plugin-datalabels": "^2.1.0",
@@ -98,6 +99,7 @@
 		"uuidv4": "^6.2.13",
 		"web3": "^1.7.4",
 		"web3modal": "^1.9.8",
+		"xstate": "^4.33.6",
 		"yup": "v1.0.0-beta.3"
 	}
 }
