@@ -1,6 +1,6 @@
+import { callMachine } from '$lib/machines/callMachine';
 import { Peer } from 'peerjs';
 import { readable, writable } from 'svelte/store';
-import { callMachine } from '$lib/machines/callMachine';
 import { interpret } from 'xstate';
 
 const CALL_TIMEOUT = Number.parseInt(process.env.VITE_CALL_TIMEOUT || '30000');

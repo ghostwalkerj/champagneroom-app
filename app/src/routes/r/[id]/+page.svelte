@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
 	import { page } from '$app/stores';
 	import VideoCall from '$lib/components/calls/VideoCall.svelte';
 	import VideoPreview from '$lib/components/calls/VideoPreview.svelte';
+	import { callMachine } from '$lib/machines/callMachine';
 	import { publicDB, type PublicDBType } from '$lib/ORM/dbs/publicDB';
 	import type { FeedbackDocType, FeedbackDocument } from '$lib/ORM/models/feedback';
 	import { LinkStatuses, type LinkDocument } from '$lib/ORM/models/link';
@@ -17,8 +17,7 @@
 
 	export let data: PageData;
 
-	$: callState = 'disconnected';
-	$: previousState = 'none';
+	$: callState = callMachine.initialState;
 	$: userstream = false;
 
 	const token = data.token;
@@ -47,6 +46,7 @@
 			userstream = false;
 		}
 	};
+
 	const linkState = fsm('neverConnected', {
 		neverConnected: {
 			call: 'calling'
@@ -119,41 +119,6 @@
 			vc = videoCall();
 			vc.callState.subscribe((state) => {
 				callState = state;
-				switch (state) {
-					case 'makingCall': {
-						linkState.call();
-						break;
-					}
-					case 'connectedAsCaller': {
-						linkState.callAccepted();
-						break;
-					}
-				}
-			});
-			vc.previousState.subscribe((_previousState) => {
-				if (_previousState) {
-					previousState = _previousState;
-					switch (_previousState) {
-						case 'callerEnded':
-						case 'callerHangup': {
-							linkState.callEnded();
-							break;
-						}
-						case 'timeout': {
-							linkState.noAnswer();
-							break;
-						}
-						case 'receiverRejected': {
-							linkState.callRejected();
-							break;
-						}
-						case 'receiverHangup':
-						case 'receiverEnded': {
-							linkState.receiverHangup();
-							break;
-						}
-					}
-				}
 			});
 		});
 	};
@@ -216,7 +181,7 @@
 							<button
 								class="btn btn-secondary"
 								on:click={call}
-								disabled={callState != 'ready' || !userstream}
+								disabled={!callState.matches('ready4Call') || !userstream}
 							>
 								Call {linkObj.talentInfo.name} Now</button
 							>
@@ -281,7 +246,7 @@
 		</div>
 		<div class="stat">
 			<div class="stat-title">Call State</div>
-			<div class="stat-value">{previousState}</div>
+			<div class="stat-value">{callState.value}</div>
 		</div>
 		<div class="stat">
 			<div class="stat-title">pCall Status</div>

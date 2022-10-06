@@ -1,4 +1,4 @@
-import fsm from 'svelte-fsm';
+import createMediaToggleMachine, { type ToggleMachineType } from '$lib/machines/mediaToggleMachine';
 import { readable, writable } from 'svelte/store';
 
 export type VideoStreamOptions = {
@@ -56,63 +56,8 @@ export const userStream = async (options: Partial<VideoStreamOptions> = {}) => {
 		options
 	);
 
-	const camState = fsm('uninitialized', {
-		uninitialized: {
-			initialized() {
-				videoTrack.enabled = true;
-				return 'CamOn';
-			}
-		},
-		CamOn: {
-			toggleCam() {
-				videoTrack.enabled = !videoTrack.enabled;
-				return 'CamOff';
-			},
-			turnCamOff() {
-				videoTrack.enabled = false;
-				return 'CamOff';
-			}
-		},
-		CamOff: {
-			toggleCam() {
-				videoTrack.enabled = !videoTrack.enabled;
-				return 'CamOn';
-			},
-			turnCamOn() {
-				videoTrack.enabled = true;
-				return 'CamOn';
-			}
-		}
-	});
-
-	const micState = fsm('uninitialized', {
-		uninitialized: {
-			initialized() {
-				audioTrack.enabled = true;
-				return 'MicOn';
-			}
-		},
-		MicOn: {
-			toggleMic() {
-				audioTrack.enabled = !audioTrack.enabled;
-				return 'MicOff';
-			},
-			turnMicOff() {
-				audioTrack.enabled = false;
-				return 'MicOff';
-			}
-		},
-		MicOff: {
-			toggleMic() {
-				audioTrack.enabled = !audioTrack.enabled;
-				return 'MicOn';
-			},
-			turnMicOn() {
-				audioTrack.enabled = true;
-				return 'MicOn';
-			}
-		}
-	});
+	let camMachine: ToggleMachineType;
+	let micMachine: ToggleMachineType;
 
 	try {
 		const stream = await navigator.mediaDevices.getUserMedia(ops);
@@ -121,8 +66,8 @@ export const userStream = async (options: Partial<VideoStreamOptions> = {}) => {
 		const audioStreams = stream.getAudioTracks();
 		videoTrack = videoStreams[0];
 		audioTrack = audioStreams[0];
-		camState.initialized();
-		micState.initialized();
+		camMachine = createMediaToggleMachine(videoTrack);
+		micMachine = createMediaToggleMachine(audioTrack);
 	} catch (error) {
 		console.log('get UserStream error: ', error);
 		throw error;
@@ -130,8 +75,8 @@ export const userStream = async (options: Partial<VideoStreamOptions> = {}) => {
 
 	return {
 		mediaStream,
-		camState,
-		micState
+		camMachine,
+		micMachine
 	};
 };
 
