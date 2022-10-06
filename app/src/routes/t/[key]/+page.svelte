@@ -5,6 +5,7 @@
 	import VideoCall from '$lib/components/calls/VideoCall.svelte';
 	import VideoPreview from '$lib/components/calls/VideoPreview.svelte';
 	import ProfilePhoto from '$lib/components/forms/ProfilePhoto.svelte';
+	import { callMachine } from '$lib/machines/callMachine';
 	import { talentDB, type TalentDBType } from '$lib/ORM/dbs/talentDB';
 	import type { LinkDocType, LinkDocument } from '$lib/ORM/models/link';
 	import type { TalentDocType, TalentDocument } from '$lib/ORM/models/talent';
@@ -77,11 +78,11 @@
 	};
 
 	let us: Awaited<UserStreamType>;
-	$: callState = 'disconnected';
+	$: callState = callMachine.initialState;
 	let videoCall: any;
 	let mediaStream: MediaStream;
-	$: showAlert = callState == 'receivingCall';
-	$: inCall = callState == 'connectedAsReceiver';
+	$: showAlert = callState.matches('receivingCall');
+	$: inCall = callState.matches('inCall');
 
 	const answerCall = () => {
 		showAlert = false;
@@ -240,12 +241,12 @@
 						<div class="bg-primary text-primary-content card">
 							<div class="text-center card-body items-center">
 								<h2 class="text-2xl card-title">pCall Status</h2>
-								{#if callState == 'ready'}
+								{#if callState.matches('ready4Call')}
 									<div class="text-2xl">Waiting for Incoming Call</div>
 								{:else}
 									<p>Signed in as {talentObj.name}</p>
 								{/if}
-								<p>Call State: {callState}</p>
+								<p>Call State: {callState.value}</p>
 							</div>
 						</div>
 					</div>

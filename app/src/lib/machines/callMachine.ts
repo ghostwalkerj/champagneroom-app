@@ -1,4 +1,3 @@
-import type { ConnectionType } from 'peerjs';
 import { createMachine } from 'xstate';
 
 export const callMachine =
@@ -14,18 +13,15 @@ export const callMachine =
         | { type: 'CONNECT PEER SUCCESS'; }
         | { type: 'DISCONNECTED PEER SERVER'; }
         | { type: 'CALL HANGUP'; }
-        | { type: 'CALL PEER'; }
+        | { type: 'CALL OUTGOING'; }
         | { type: 'CALL CONNECTED'; }
-        | { type: 'CALL CANCELED'; }
-        | { type: 'CALL REFUSED'; }
+        | { type: 'CALL CANCELLED'; }
+        | { type: 'CALL REJECTED'; }
         | { type: 'CALL INCOMING'; }
         | { type: 'CALL UNANSWERED'; }
         | { type: 'CALL CANT CONNECT'; }
         | { type: 'CALL DISCONNECTED'; }
-        | {
-          type: 'CALL ACCEPTED';
-          connection: { caller: string; date: number; type: ConnectionType; };
-        }
+        | { type: 'CALL ACCEPTED'; }
     },
     predictableActionArguments: true,
     id: 'callMachine',
@@ -53,7 +49,7 @@ export const callMachine =
           'CONNECT PEER LOST': {
             target: 'inError'
           },
-          'CALL PEER': {
+          'CALL OUTGOING': {
             target: 'calling'
           },
           'CALL INCOMING': {
@@ -66,13 +62,13 @@ export const callMachine =
           'CALL ACCEPTED': {
             target: 'acceptingCall'
           },
-          'CALL REFUSED': {
+          'CALL REJECTED': {
             target: 'ready4Call'
           },
           'CALL UNANSWERED': {
             target: 'ready4Call'
           },
-          'CALL CANCELED': {
+          'CALL CANCELLED': {
             target: 'ready4Call'
           }
         }
@@ -112,10 +108,10 @@ export const callMachine =
           'CALL UNANSWERED': {
             target: 'ready4Call'
           },
-          'CALL REFUSED': {
+          'CALL REJECTED': {
             target: 'ready4Call'
           },
-          'CALL CANCELED': {
+          'CALL CANCELLED': {
             target: 'ready4Call'
           }
         }
