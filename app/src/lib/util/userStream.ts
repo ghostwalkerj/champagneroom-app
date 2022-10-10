@@ -1,4 +1,4 @@
-import createMediaToggleMachine, { type ToggleMachineType } from '$lib/machines/mediaToggleMachine';
+import createMediaToggleMachine, { type MediaToggleMachineType } from '$lib/machines/mediaToggleMachine';
 import { readable, writable } from 'svelte/store';
 
 export type VideoStreamOptions = {
@@ -56,8 +56,8 @@ export const userStream = async (options: Partial<VideoStreamOptions> = {}) => {
 		options
 	);
 
-	let camMachine: ToggleMachineType;
-	let micMachine: ToggleMachineType;
+	let camMachine: MediaToggleMachineType;
+	let micMachine: MediaToggleMachineType;
 
 	try {
 		const stream = await navigator.mediaDevices.getUserMedia(ops);
