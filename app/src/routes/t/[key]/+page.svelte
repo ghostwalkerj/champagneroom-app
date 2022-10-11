@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { page } from '$app/stores';
-	import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
 	import VideoCall from '$lib/components/calls/VideoCall.svelte';
 	import VideoPreview from '$lib/components/calls/VideoPreview.svelte';
 	import ProfilePhoto from '$lib/components/forms/ProfilePhoto.svelte';
@@ -21,6 +20,7 @@
 	import LinkViewer from './LinkView.svelte';
 	import TalentActivity from './TalentActivity.svelte';
 	import TalentWallet from './TalentWallet.svelte';
+	import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
 
 	export let data: PageData;
 

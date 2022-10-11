@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { UserStreamType } from '$lib/util/userStream';
 	import type { VideoCallType } from '$lib/util/videoCall';
+	import { useMachine } from '@xstate/svelte';
 	import { onDestroy, onMount } from 'svelte';
 
 	import {
@@ -43,8 +44,10 @@
 	);
 
 	const callState = vc.callState;
-	const micState = us.micState;
-	const camState = us.camState;
+	const micMachine = useMachine(us.micMachine);
+	const micState = micMachine.state;
+	const camMachine = useMachine(us.camMachine);
+	const camState = camMachine.state;
 
 	// UI Controls
 	let canvas: HTMLCanvasElement;
@@ -88,20 +91,11 @@
 			remoteVideo.load();
 			localVideo.play();
 		}
-		vc.callState.subscribe((s) => {
-			switch (s) {
-				case 'ready':
-				case 'connectedAsCaller':
-				case 'connectedAsReceiver':
-					vc.remoteStream.subscribe((stream) => {
-						if (stream && remoteVideo) {
-							remoteVideo.srcObject = stream;
-							remoteVideo.load();
-							remoteVideo.play();
-						}
-					});
-
-					break;
+		vc.remoteStream.subscribe((stream) => {
+			if (stream && remoteVideo) {
+				remoteVideo.srcObject = stream;
+				remoteVideo.load();
+				remoteVideo.play();
 			}
 		});
 	};
@@ -170,12 +164,12 @@
 		class="flex bg-base-100 flex-shrink-0 p-4 gap-4 items-center justify-center md:rounded-2xl md:gap-8 dark:bg-dark-eval-1"
 	>
 		<div class="flex flex-col gap-2 items-center">
-			{#if $callState == 'ready'}
+			{#if $callState.matches('ready4Call')}
 				<button disabled={!buttonOptions.makeCall} class="h-14 w-14 btn btn-circle">
 					<PhoneIcon size="34" />
 				</button>
 				Call
-			{:else if $callState == 'makingCall'}
+			{:else if $callState.matches('makingCall')}
 				<button
 					class="h-14 animate-flash animate-loop w-14 animated  btn btn-circle"
 					disabled={!buttonOptions.makeCall}
@@ -183,7 +177,7 @@
 					<PhoneOutgoingIcon size="34" />
 				</button>
 				Waiting
-			{:else if $callState == 'receivingCall'}
+			{:else if $callState.matches('receivingCall')}
 				<button
 					class="h-14 animate-shock animate-loop w-14 animated  btn btn-circle"
 					on:click={() => vc.acceptCall(mediaStream)}
@@ -201,12 +195,8 @@
 		</div>
 
 		<div class="flex flex-col gap-2 items-center">
-			<button
-				class="h-14 w-14 btn btn-circle "
-				on:click={camState.toggleCam}
-				disabled={!buttonOptions.cam}
-			>
-				{#if $camState === 'CamOn'}
+			<button class="h-14 w-14 btn btn-circle " on:click={() => camMachine.send('TOGGLE')}>
+				{#if $camState.matches('on')}
 					<VideoIcon size="34" />
 				{:else}
 					<VideoOffIcon size="34" />
@@ -216,58 +206,56 @@
 		</div>
 
 		<div class="flex flex-col gap-2 items-center">
-			<button
-				class="h-14 w-14 btn btn-circle"
-				on:click={micState.toggleMic}
-				disabled={!buttonOptions.mic}
-			>
-				{#if $micState === 'MicOn'}
-					<MicIcon size="34" />
-				{:else}
-					<MicOffIcon size="34" />
-				{/if}
-			</button>
-			Mic
-		</div>
+			<div class="flex flex-col gap-2 items-center">
+				<button class="h-14 w-14 btn btn-circle" on:click={() => micMachine.send('TOGGLE')}>
+					{#if $micState.matches('on')}
+						<MicIcon size="34" />
+					{:else}
+						<MicOffIcon size="34" />
+					{/if}
+				</button>
+				Mic
+			</div>
 
-		<div class="flex flex-col gap-2 items-center">
-			{#if $callState == 'receivingCall'}
-				<button
-					class="h-14 w-14 btn-primary btn btn-circle"
-					on:click={() => vc.rejectCall()}
-					disabled={!buttonOptions.rejectCall}
-				>
-					<PhoneMissedIcon size="34" />
-				</button>
-				Reject
-			{:else if $callState == 'makingCall'}
-				<button
-					class="h-14 w-14 btn btn-circle btn-primary"
-					on:click={() => vc.cancelCall()}
-					disabled={!buttonOptions.rejectCall}
-				>
-					<PhoneMissedIcon size="34" />
-				</button>
-				Cancel
-			{:else if $callState == 'connectedAsCaller' || $callState == 'connectedAsReceiver'}
-				<button
-					class="h-14 w-14 btn btn-circle btn-primary"
-					on:click={() => vc.hangUp()}
-					disabled={!buttonOptions.hangup}
-				>
-					<PhoneMissedIcon size="34" />
-				</button>
-				Hangup
-			{:else}
-				<button
-					class="h-14 w-14 btn btn-primary btn-circle"
-					on:click={() => vc.cancelCall()}
-					disabled={!buttonOptions.hangup}
-				>
-					<div class="h-8 w-8"><MdClose /></div></button
-				>
-				Leave
-			{/if}
+			<div class="flex flex-col gap-2 items-center">
+				{#if $callState.matches('receivingCall')}
+					<button
+						class="h-14 w-14 btn-primary btn btn-circle"
+						on:click={() => vc.rejectCall()}
+						disabled={!buttonOptions.rejectCall}
+					>
+						<PhoneMissedIcon size="34" />
+					</button>
+					Reject
+				{:else if $callState.matches('makingCall')}
+					<button
+						class="h-14 w-14 btn btn-circle btn-primary"
+						on:click={() => vc.cancelCall()}
+						disabled={!buttonOptions.rejectCall}
+					>
+						<PhoneMissedIcon size="34" />
+					</button>
+					Cancel
+				{:else if $callState.matches('inCall')}
+					<button
+						class="h-14 w-14 btn btn-circle btn-primary"
+						on:click={() => vc.hangUp()}
+						disabled={!buttonOptions.hangup}
+					>
+						<PhoneMissedIcon size="34" />
+					</button>
+					Hangup
+				{:else}
+					<button
+						class="h-14 w-14 btn btn-primary btn-circle"
+						on:click={() => vc.cancelCall()}
+						disabled={!buttonOptions.hangup}
+					>
+						<div class="h-8 w-8"><MdClose /></div></button
+					>
+					Leave
+				{/if}
+			</div>
 		</div>
 	</section>
 	Call State: {$callState || ''} <br />

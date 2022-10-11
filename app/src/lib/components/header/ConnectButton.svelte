@@ -10,7 +10,6 @@
 	let tooltipOpen = '';
 
 	const disable = () => defaultEvmStores.disconnect();
-	const INFURA_ID = process.env.VITE_INFURA_ID || '';
 
 	async function connect() {
 		try {
@@ -30,9 +29,7 @@
 			providerOptions: {
 				walletconnect: {
 					package: WalletConnectProvider,
-					options: {
-						infuraId: INFURA_ID
-					}
+					options: {}
 				}
 			}
 		});

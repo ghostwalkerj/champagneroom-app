@@ -86,7 +86,6 @@
 		"socket.io-client": "^4.5.1",
 		"spacetime": "^7.1.4",
 		"svelte-chartjs": "^2.0.1",
-		"svelte-fsm": "^1.1.2",
 		"svelte-image": "^0.2.9",
 		"svelte-proxied-store": "^1.1.4",
 		"svelte-star-rating": "^2.0.0",

@@ -140,7 +140,7 @@ type TalentDocMethods = {
 };
 
 export const talentDocMethods: TalentDocMethods = {
-	createLink: async function (this: TalentDocument, amount: number): Promise<LinkDocument> {
+	createLink: async function (this: TalentDocument, requestedAmount: number): Promise<LinkDocument> {
 		const db = this.collection.database;
 		const key = nanoid();
 		const _feedback = {
@@ -158,9 +158,11 @@ export const talentDocMethods: TalentDocMethods = {
 			agent: this.agent
 		};
 		const _link = {
-			status: LinkStatuses.UNCLAIMED,
+			state: {
+				status: LinkStatuses.UNCLAIMED,
+			},
 			fundedAmount: 0,
-			amount,
+			requestedAmount,
 			fundingAddress: '0x251281e1516e6E0A145d28a41EE63BfcDd9E18Bf', //TODO: make real wallet
 			callId: uuidv4(),
 			talent: this._id,
@@ -225,7 +227,7 @@ export const talentDocMethods: TalentDocMethods = {
 
 		const completedLinksIds: string[] = [];
 		const feedbackIds = completedCalls.map((link) => {
-			totalEarnings += link.amount;
+			totalEarnings += link.requestedAmount;
 			completedLinksIds.push(link._id);
 			return link.feedback;
 		});

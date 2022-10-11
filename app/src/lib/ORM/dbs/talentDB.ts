@@ -8,6 +8,7 @@ import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
 import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
+import type { TransactionCollection } from '$lib/ORM/models/transaction';
 
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 100;
@@ -15,6 +16,8 @@ type CreatorsCollections = {
 	talents: TalentCollection;
 	links: LinkCollection;
 	feedbacks: FeedbackCollection;
+	transactions: TransactionCollection;
+
 };
 
 export type TalentDBType = RxDatabase<CreatorsCollections>;

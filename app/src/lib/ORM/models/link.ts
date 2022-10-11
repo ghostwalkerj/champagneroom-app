@@ -8,35 +8,38 @@ import {
 	type RxDocument,
 	type RxJsonSchema
 } from 'rxdb';
-import fsm from 'svelte-fsm';
+import type { TransactionDocument } from './transaction';
 
 export enum LinkStatuses {
-	UNCLAIMED = 'UNCLAIMED',
-	CANCELLED = 'CANCELLED',
-	CLAIMED = 'CLAIMED',
-	FINALIZED = 'FINALIZED'
+	UNCLAIMED,
+	CLAIMED,
+	CANCELED,
+	FINALIZED,
+	IN_ESCROW,
+	IN_DISPUTE,
+	IN_CALL
 }
 
-const getState = (_this: LinkDocument) => {
-	const linkState = fsm('unclaimed', {
-		unclaimed: {
-			claim: 'claimed',
-			cancel: 'cancelled'
-		},
-		claimed: {
-			completeCall: 'waiting4Finalization',
-			requestCancellation: 'cancelRequested',
-		},
-		waiting4Finalization: {
-		},
-		cancelRequested: {},
-		cancelled: {},
-		finalized: {}
-	});
+export enum ConnectionType {
+	ATTEMPT,
+	CONNECT,
+	DISCONNECTED,
+	NO_ANSWER,
+	CALLER_HANGUP,
+	CALLEE_HANGUP
+}
 
-	return linkState;
+export enum ActorType {
+	AGENT,
+	TALENT,
+	CALLER
+}
 
-};
+export enum DisputeDecision {
+	TALENT_WON,
+	CALLER_WON,
+	SPLIT
+}
 
 export const LinkString = 'link';
 const linkSchemaLiteral = {
@@ -60,7 +63,7 @@ const linkSchemaLiteral = {
 			type: 'string',
 			maxLength: 50
 		},
-		amount: {
+		requestedAmount: {
 			type: 'integer',
 			default: 0,
 			minimum: 0,
@@ -73,7 +76,103 @@ const linkSchemaLiteral = {
 			maximum: 99999
 		},
 		callId: { type: 'string' },
-		status: { type: 'string', enum: Object.keys(LinkStatuses), maxLength: 20 },
+		state: {
+			type: 'object',
+			properties: {
+				status: {
+					type: 'string',
+					enum: Object.values(LinkStatuses),
+					default: LinkStatuses.UNCLAIMED
+				},
+				cancel: {
+					type: 'object',
+					properties: {
+						createdAt: { type: 'integer' },
+						canceler: {
+							type: 'string',
+							enum: Object.values(ActorType)
+						},
+						refundedAmount: { type: 'integer' },
+						canceledInState: { type: 'string' },
+						transactions: {
+							type: 'array',
+							ref: 'transactions',
+							items: { type: 'string' }
+						}
+					},
+					required: ['createdAt', 'canceler', 'canceledInState']
+				},
+				claim: {
+					type: 'object',
+					properties: {
+						caller: { type: 'string' },
+						pin: { type: 'string', maxLength: 8 },
+						createdAt: { type: 'integer' }
+					},
+					required: ['caller', 'pin', 'createdAt'],
+					encrypted: ['pin']
+				},
+				escrow: {
+					type: 'object',
+					properties: {
+						startedAt: { type: 'integer' },
+						endedAt: { type: 'integer' }
+					},
+				},
+				dispute: {
+					type: 'object',
+					properties: {
+						startedAt: { type: 'integer' },
+						endedAt: { type: 'integer' },
+						disputer: {
+							type: 'string',
+							enum: Object.values(ActorType)
+						},
+						outcome: {
+							type: 'object',
+							properties: {
+								decision: {
+									type: 'string',
+									enum: Object.values(DisputeDecision)
+								},
+								transactions: {
+									type: 'array',
+									ref: 'transactions',
+									items: { type: 'string' }
+								}
+							},
+						}
+					},
+				},
+				finalized: {
+					type: 'object',
+					properties: {
+						endedAt: { type: 'integer' },
+						transactions: {
+							type: 'array',
+							ref: 'transactions',
+							items: { type: 'string' }
+						}
+					}
+				},
+				connections: {
+					type: 'array',
+					items: {
+						type: 'object',
+						properties: {
+							type: {
+								type: 'string',
+								enum: Object.values(ConnectionType)
+							},
+							createdAt: { type: 'integer' },
+							endedAt: { type: 'integer' },
+							caller: { type: 'string' },
+						},
+					}
+				}
+			},
+			required: ['status']
+		},
 		talentInfo: {
 			type: 'object',
 			properties: {
@@ -105,8 +204,6 @@ const linkSchemaLiteral = {
 		talent: { type: 'string', ref: 'talents', maxLength: 50 },
 		agent: { type: 'string', ref: 'agents', maxLength: 70 },
 		feedback: { type: 'string', ref: 'feedbacks', maxLength: 50 },
-		callStart: { type: 'integer', multipleOf: 1, minimum: 0, maximum: 3000000000000 },
-		callEnd: { type: 'integer', multipleOf: 1, minimum: 0, maximum: 3000000000000 },
 		createdAt: {
 			type: 'integer'
 		},
@@ -120,17 +217,17 @@ const linkSchemaLiteral = {
 	},
 	required: [
 		'_id',
+		'state',
 		'entityType',
 		'talent',
 		'agent',
 		'talentInfo',
 		'callId',
-		'amount',
+		'requestedAmount',
 		'fundingAddress',
 		'fundedAmount',
 		'feedback',
-		'createdAt',
-		'status'
+		'createdAt'
 	],
 	indexes: ['talent', 'feedback', 'agent', 'status', 'callStart'],
 	encrypted: ['callId']
@@ -140,6 +237,7 @@ type linkRef = {
 	talent_: Promise<TalentDocument>;
 	agent_: Promise<AgentDocument>;
 	feedback_: Promise<FeedbackDocument>;
+	transactions_: Promise<TransactionDocument[]>;
 };
 
 const schemaTyped = toTypedRxJsonSchema(linkSchemaLiteral);

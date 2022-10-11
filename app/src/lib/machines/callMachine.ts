@@ -50,7 +50,7 @@ export const callMachine =
             target: 'inError'
           },
           'CALL OUTGOING': {
-            target: 'calling'
+            target: 'makingCall'
           },
           'CALL INCOMING': {
             target: 'receivingCall'
@@ -100,7 +100,7 @@ export const callMachine =
           }
         }
       },
-      calling: {
+      makingCall: {
         on: {
           'CALL ACCEPTED': {
             target: 'acceptingCall'

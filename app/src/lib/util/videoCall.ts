@@ -1,33 +1,19 @@
-import { callMachine } from '$lib/machines/callMachine';
+import callMachine from '$lib/machines/callMachine';
 import { Peer } from 'peerjs';
 import { readable, writable } from 'svelte/store';
 import { interpret } from 'xstate';
+import { PUBLIC_CALL_TIMEOUT } from '$env/static/public';
 
-const CALL_TIMEOUT = Number.parseInt(process.env.VITE_CALL_TIMEOUT || '30000');
+const CALL_TIMEOUT = Number.parseInt(PUBLIC_CALL_TIMEOUT || '30000');
 
 export const videoCall = (userId?: string) => {
 	let receiverId: string;
 	let noAnswerTimer: NodeJS.Timeout;
 	let rejectCallTimer: NodeJS.Timeout;
 	let destroyed = false;
-	const _callState = writable<typeof callMachine.initialState>(callMachine.initialState);
-
-	const callState = readable<typeof callMachine.initialState>(callMachine.initialState, (set) => {
-		_callState.subscribe((state) =>
-			set(state)
-		);
-	});
 
 	const callService = interpret(callMachine).start();
 
-	callService.onTransition((state) => {
-		if (state.changed) {
-			console.log('call state changed', state.value);
-			_callState.set(state);
-		}
-	});
-
-	const _callerName = writable<string | null>(null);
 	const _remoteStream = writable<MediaStream | null>(null);
 	const remoteStream = readable<MediaStream | null>(null, (set) => {
 		_remoteStream.subscribe((stream) => {
@@ -35,10 +21,22 @@ export const videoCall = (userId?: string) => {
 		});
 	});
 
+	const _callerName = writable<string | null>(null);
 	const callerName = readable<string | null>(null, (set) => {
 		_callerName.subscribe((name) => {
 			set(name);
 		});
+	});
+
+	const _callState = writable(callMachine.initialState);
+	const callState = readable(callMachine.initialState, (set) => {
+		_callState.subscribe((state) => {
+			set(state);
+		});
+	});
+
+	callService.onTransition(state => {
+		_callState.set(state);
 	});
 
 	const connect2PeerServer = (userId?: string) => {
@@ -195,10 +193,11 @@ export const videoCall = (userId?: string) => {
 	};
 
 	const destroy = () => {
+		resetCallState();
 		destroyed = true;
 		console.log('destroy called');
 		peer.destroy();
-		resetCallState();
+		callService.stop();
 	};
 
 	return {

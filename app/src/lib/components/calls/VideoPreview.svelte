@@ -4,7 +4,6 @@
 	import { onMount } from 'svelte';
 	import { MicIcon, MicOffIcon, VideoIcon, VideoOffIcon } from 'svelte-feather-icons';
 	import { useMachine } from '@xstate/svelte';
-	import { matchesState } from 'xstate';
 
 	// UI Controls
 	let localVideo: HTMLVideoElement;

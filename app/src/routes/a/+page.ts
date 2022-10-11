@@ -15,7 +15,7 @@ export const load: PageLoad = async ({ url, fetch }) => {
 			})
 		});
 		const body = await res.json();
-		const token = body.token;
+		const token = body.token as string;
 		return { token };
 	} catch (e) {
 		console.log(e);
