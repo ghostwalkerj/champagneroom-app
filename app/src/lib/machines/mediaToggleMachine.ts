@@ -80,6 +80,6 @@ const createMediaToggleMachine = (mediaTrack: MediaStreamTrack) => {
   return toggleMachine;
 };
 
-export type ToggleMachineType = ReturnType<typeof createMediaToggleMachine>;
+export type MediaToggleMachineType = ReturnType<typeof createMediaToggleMachine>;
 
 export default createMediaToggleMachine;

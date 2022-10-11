@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { ToggleMachineType } from '$lib/machines/mediaToggleMachine';
+	import type { MediaToggleMachineType } from '$lib/machines/mediaToggleMachine';
 	import type { UserStreamType } from '$lib/util/userStream';
 	import { onMount } from 'svelte';
 	import { MicIcon, MicOffIcon, VideoIcon, VideoOffIcon } from 'svelte-feather-icons';
@@ -9,17 +9,15 @@
 	let localVideo: HTMLVideoElement;
 	export let us: Awaited<UserStreamType>;
 	let initialized = false;
-	let camMachine: ReturnType<typeof useMachine<ToggleMachineType>>;
-	let micMachine: ReturnType<typeof useMachine<ToggleMachineType>>;
-	let camState: typeof camMachine.state;
-	let micState: typeof micMachine.state;
+	let camState: ReturnType<typeof useMachine<MediaToggleMachineType>>['state'];
+	let micState: ReturnType<typeof useMachine<MediaToggleMachineType>>['state'];
+	let camSend: ReturnType<typeof useMachine<MediaToggleMachineType>>['send'];
+	let micSend: ReturnType<typeof useMachine<MediaToggleMachineType>>['send'];
 	let mediaStream: MediaStream;
 
 	$: if (us) {
-		camMachine = useMachine(us.camMachine);
-		camState = camMachine.state;
-		micMachine = useMachine(us.micMachine);
-		micState = micMachine.state;
+		const { state: camState, send: camSend } = useMachine(us.camMachine);
+		const { state: micState, send: micSend } = useMachine(us.micMachine);
 		us.mediaStream.subscribe((stream) => {
 			if (stream) mediaStream = stream;
 			initialize();
@@ -52,7 +50,7 @@
 			class="flex bg-base-100 flex-shrink-0 text-white p-4 gap-4 items-center justify-center md:rounded-2xl md:gap-8 "
 		>
 			<div class="flex flex-col gap-2 items-center">
-				<button class="h-14 w-14 btn btn-circle " on:click={() => camMachine.send('TOGGLE')}>
+				<button class="h-14 w-14 btn btn-circle " on:click={() => camSend('TOGGLE')}>
 					{#if $camState.matches('on')}
 						<VideoIcon size="34" />
 					{:else}
@@ -62,7 +60,7 @@
 				Cam
 			</div>
 			<div class="flex flex-col gap-2 items-center">
-				<button class="h-14 w-14 btn btn-circle" on:click={() => micMachine.send('TOGGLE')}>
+				<button class="h-14 w-14 btn btn-circle" on:click={() => micSend('TOGGLE')}>
 					{#if $micState.matches('on')}
 						<MicIcon size="34" />
 					{:else}
