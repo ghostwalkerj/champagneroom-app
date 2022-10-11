@@ -4,37 +4,22 @@ export interface Typegen0 {
 	'@@xstate/typegen': true;
 	internalEvents: {
 		'': { type: '' };
-		'done.invoke.callerCallMachine.loading link:invocation[0]': {
-			type: 'done.invoke.callerCallMachine.loading link:invocation[0]';
-			data: unknown;
-			__tip: 'See the XState TS docs to learn how to strongly type this.';
-		};
-		'error.platform.callerCallMachine.loading link:invocation[0]': {
-			type: 'error.platform.callerCallMachine.loading link:invocation[0]';
-			data: unknown;
-		};
 		'xstate.init': { type: 'xstate.init' };
 	};
-	invokeSrcNameMap: {
-		loadLink: 'done.invoke.callerCallMachine.loading link:invocation[0]';
-	};
+	invokeSrcNameMap: {};
 	missingImplementations: {
 		actions: never;
-		services: 'loadLink';
+		services: never;
 		guards: never;
 		delays: never;
 	};
 	eventsCausingActions: {
-		assignErrorToContext: 'error.platform.callerCallMachine.loading link:invocation[0]';
-		assignLinktoContext: 'done.invoke.callerCallMachine.loading link:invocation[0]';
 		cancelCall: 'REQUEST CANCELLATION';
 		claimCall: 'CLAIM';
 		initiateDispute: 'DISPUTE INITIATED';
-		sendTransaction: 'TRANSACTION RECEIVED';
+		sendPayment: 'PAYMENT RECEIVED';
 	};
-	eventsCausingServices: {
-		loadLink: 'xstate.init';
-	};
+	eventsCausingServices: {};
 	eventsCausingGuards: {
 		fullyFunded: '';
 		linkCancelled: '';
@@ -50,8 +35,6 @@ export interface Typegen0 {
 		| 'claimed.waiting4Funding'
 		| 'finalized'
 		| 'link loaded'
-		| 'loading link'
-		| 'loading link error'
 		| 'requestedCancellation'
 		| 'requestedCancellation.waiting4Refund'
 		| 'unclaimed'

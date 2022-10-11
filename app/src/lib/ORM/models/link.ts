@@ -100,16 +100,21 @@ const linkSchemaLiteral = {
 							items: { type: 'string' }
 						}
 					},
-					required: ['createdAt', 'canceler', 'canceledInState']
+					required: ['createdAt', 'canceler', 'canceledInState', 'transactions']
 				},
 				claim: {
 					type: 'object',
 					properties: {
 						caller: { type: 'string' },
 						pin: { type: 'string', maxLength: 8 },
-						createdAt: { type: 'integer' }
+						createdAt: { type: 'integer' },
+						transactions: {
+							type: 'array',
+							ref: 'transactions',
+							items: { type: 'string' }
+						}
 					},
-					required: ['caller', 'pin', 'createdAt'],
+					required: ['caller', 'pin', 'createdAt', 'transactions'],
 					encrypted: ['pin']
 				},
 				escrow: {
@@ -118,6 +123,8 @@ const linkSchemaLiteral = {
 						startedAt: { type: 'integer' },
 						endedAt: { type: 'integer' }
 					},
+					required: ['startedAt'],
+
 				},
 				dispute: {
 					type: 'object',
@@ -141,8 +148,10 @@ const linkSchemaLiteral = {
 									items: { type: 'string' }
 								}
 							},
+							required: ['decision', 'transactions'],
 						}
 					},
+					required: ['startedAt', 'disputer']
 				},
 				finalized: {
 					type: 'object',
@@ -153,7 +162,8 @@ const linkSchemaLiteral = {
 							ref: 'transactions',
 							items: { type: 'string' }
 						}
-					}
+					},
+					required: ['endedAt']
 				},
 				connections: {
 					type: 'array',
@@ -168,10 +178,11 @@ const linkSchemaLiteral = {
 							endedAt: { type: 'integer' },
 							caller: { type: 'string' },
 						},
+						required: ['type', 'createdAt', 'caller']
 					}
 				}
 			},
-			required: ['status']
+			required: ['status', 'connections']
 		},
 		talentInfo: {
 			type: 'object',

@@ -185,7 +185,7 @@ export const talentDocMethods: TalentDocMethods = {
 		if (this.currentLink) {
 			const currentLink = await this.populate('currentLink');
 			if (currentLink && currentLink.status === LinkStatuses.UNCLAIMED) {
-				currentLink.update({ $set: { status: LinkStatuses.CANCELLED } });
+				currentLink.update({ $set: { status: LinkStatuses.CANCELED } });
 			}
 		}
 
