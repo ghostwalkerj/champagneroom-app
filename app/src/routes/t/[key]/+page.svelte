@@ -6,7 +6,7 @@
 	import ProfilePhoto from '$lib/components/forms/ProfilePhoto.svelte';
 	import { callMachine } from '$lib/machines/callMachine';
 	import { talentDB, type TalentDBType } from '$lib/ORM/dbs/talentDB';
-	import type { LinkDocType, LinkDocument } from '$lib/ORM/models/link';
+	import { ActorType, type LinkDocType, type LinkDocument } from '$lib/ORM/models/link';
 	import type { TalentDocType, TalentDocument } from '$lib/ORM/models/talent';
 	import { StorageTypes } from '$lib/ORM/rxdb';
 	import { userStream, type UserStreamType } from '$lib/util/userStream';
@@ -21,19 +21,23 @@
 	import TalentActivity from './TalentActivity.svelte';
 	import TalentWallet from './TalentWallet.svelte';
 	import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
+	import type { LinkMachineType } from '$lib/machines/linkMachine';
+	import createLinkMachine from '$lib/machines/linkMachine';
+	import { useMachine } from '@xstate/svelte';
 
 	export let data: PageData;
-
 	const token = data.token;
+
 	let talentObj = data.talent as TalentDocType;
 	let completedCalls = data.completedCalls as LinkDocType[];
+	type useMachineType = ReturnType<typeof useMachine<LinkMachineType>>;
 	let currentLink: LinkDocument;
-
+	let linkService: useMachineType['service'];
+	let linkState: useMachineType['state'];
 	let key = $page.params.key;
 	let vc: VideoCallType;
-	//let global = globalThis;
-
 	let talent: TalentDocument;
+	let canCreateLink = true;
 
 	if (browser) {
 		global = window;
@@ -48,6 +52,12 @@
 					talent.populate('currentLink').then((cl) => {
 						if (cl) {
 							currentLink = cl;
+							const linkMachine = createLinkMachine(currentLink);
+							({ state: linkState, service: linkService } = useMachine(linkMachine));
+							canCreateLink = $linkState.can({
+								type: 'REQUEST CANCELLATION',
+								cancel: undefined
+							});
 							initVC();
 						}
 					});
@@ -124,12 +134,26 @@
 				.required()
 		}),
 		onSubmit: (values) => {
-			if (talent)
+			if (talent) {
+				// Must expire the current link, then create a new one.
+				if (currentLink)
+					linkService.send({
+						type: 'REQUEST CANCELLATION',
+						cancel: {
+							createdAt: new Date().getTime(),
+							transactions: [],
+							refundedAmount: 0, //TODO: This is only good before funding.
+							canceledInState: $linkState.value.toString(),
+							canceler: ActorType.TALENT
+						}
+					});
+				talent.currentLink = undefined;
 				talent.createLink(Number.parseInt(values.amount)).then((cl) => {
 					currentLink = cl;
 					initVC();
 				});
-			handleReset();
+				handleReset();
+			}
 		}
 	});
 </script>
@@ -147,6 +171,7 @@
 			You have an incoming pCall from <span class="font-bold">{callerName}</span>
 		</p>
 		<div class="modal-action">
+			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<label for="call-modal" class="btn" on:click={answerCall}>Answer</label>
 		</div>
 	</div>
@@ -216,7 +241,9 @@
 										<div class="shadow-lg alert alert-error">{$errors.amount}</div>
 									{/if}
 									<div class="py-4">
-										<button class="btn btn-secondary" type="submit">Generate Link</button>
+										<button class="btn btn-secondary" type="submit" disabled={!canCreateLink}
+											>Generate Link</button
+										>
 									</div>
 								</form>
 							</div>

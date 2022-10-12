@@ -56,7 +56,9 @@
 
 <div class="bg-primary text-primary-content  card">
 	<div class="text-center card-body items-center">
-		<h2 class="text-2xl card-title capitalize">Top Talent - {now.monthName()}</h2>
+		<div class="text-2xl card-title capitalize">
+			Top Talent - {now.monthName()}
+		</div>
 		{#if talents && talents.length != 0}
 			{#if talentData.length > 0}
 				{#key talentData}

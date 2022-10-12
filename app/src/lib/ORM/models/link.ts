@@ -69,12 +69,6 @@ const linkSchemaLiteral = {
 			minimum: 0,
 			maximum: 99999
 		},
-		fundedAmount: {
-			type: 'integer',
-			default: 0,
-			minimum: 0,
-			maximum: 99999
-		},
 		callId: { type: 'string' },
 		state: {
 			type: 'object',
@@ -83,6 +77,12 @@ const linkSchemaLiteral = {
 					type: 'string',
 					enum: Object.values(LinkStatuses),
 					default: LinkStatuses.UNCLAIMED
+				},
+				fundedAmount: {
+					type: 'integer',
+					default: 0,
+					minimum: 0,
+					maximum: 99999
 				},
 				cancel: {
 					type: 'object',
@@ -112,7 +112,7 @@ const linkSchemaLiteral = {
 							type: 'array',
 							ref: 'transactions',
 							items: { type: 'string' }
-						}
+						},
 					},
 					required: ['caller', 'pin', 'createdAt', 'transactions'],
 					encrypted: ['pin']
@@ -124,7 +124,6 @@ const linkSchemaLiteral = {
 						endedAt: { type: 'integer' }
 					},
 					required: ['startedAt'],
-
 				},
 				dispute: {
 					type: 'object',
@@ -182,7 +181,7 @@ const linkSchemaLiteral = {
 					}
 				}
 			},
-			required: ['status', 'connections']
+			required: ['status', 'connections', 'fundedAmount']
 		},
 		talentInfo: {
 			type: 'object',
@@ -236,11 +235,10 @@ const linkSchemaLiteral = {
 		'callId',
 		'requestedAmount',
 		'fundingAddress',
-		'fundedAmount',
 		'feedback',
 		'createdAt'
 	],
-	indexes: ['talent', 'feedback', 'agent', 'status', 'callStart'],
+	indexes: ['talent', 'feedback', 'agent', 'state.status', 'state.finalized.endedAt'],
 	encrypted: ['callId']
 } as const;
 

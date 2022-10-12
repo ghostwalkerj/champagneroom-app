@@ -16,8 +16,8 @@
 	let mediaStream: MediaStream;
 
 	$: if (us) {
-		const { state: camState, send: camSend } = useMachine(us.camMachine);
-		const { state: micState, send: micSend } = useMachine(us.micMachine);
+		({ state: camState, send: camSend } = useMachine(us.camMachine));
+		({ state: micState, send: micSend } = useMachine(us.micMachine));
 		us.mediaStream.subscribe((stream) => {
 			if (stream) mediaStream = stream;
 			initialize();

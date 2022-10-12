@@ -6,6 +6,7 @@ import type { PageLoad } from './$types';
 
 //TODO: Only return token if agent address is good.  How?
 export const load: PageLoad = async ({ url, fetch }) => {
+	let token = '';
 	const auth_url = urlJoin(url.origin, PUBLIC_AUTH_PATH);
 	try {
 		const res = await fetch(auth_url, {
@@ -15,9 +16,9 @@ export const load: PageLoad = async ({ url, fetch }) => {
 			})
 		});
 		const body = await res.json();
-		const token = body.token as string;
-		return { token };
+		token = body.token as string;
 	} catch (e) {
 		console.log(e);
 	}
+	return { token };
 };

@@ -57,7 +57,7 @@ export const generateTalent = async (agent: AgentDocument) => {
 	const profileImageUrl = profileImageUrls[Math.floor(Math.random() * profileImageUrls.length)];
 	const talent = await agent.createTalent(name, 10, profileImageUrl);
 	const count = Math.floor(Math.random() * 100) + 1;
-	await generateLinks(talent, count);
+	generateLinks(talent, count);
 	await talent.updateStats();
 	return talent;
 };
@@ -70,8 +70,7 @@ const generateLinks = (talent: TalentDocument, count: number) => {
 	for (let i = 0; i < count; i++) {
 		const key = nanoid();
 		const amount = Math.floor(Math.random() * 1000) + 1;
-		const callStart = spacetime.now().subtract(Math.floor(Math.random() * 45) + 1, 'day');
-		const callEnd = callStart.add(1, 'hour');
+		const endedAt = spacetime.now().subtract(Math.floor(Math.random() * 45) + 1, 'day');
 		const _feedback = {
 			_id: `${FeedbackString}:f${key}`,
 			entityType: FeedbackString,
@@ -87,9 +86,15 @@ const generateLinks = (talent: TalentDocument, count: number) => {
 			agent: talent.agent
 		};
 		const _link = {
-			status: LinkStatuses.FINALIZED,
-			amount,
-			fundedAmount: amount,
+			state: {
+				status: LinkStatuses.FINALIZED,
+				fundedAmount: amount,
+				connections: [],
+				finalized: {
+					endedAt: endedAt.epoch
+				}
+			},
+			requestedAmount: amount,
 			fundingAddress: '0x251281e1516e6E0A145d28a41EE63BfcDd9E18Bf',
 			callId: uuidv4(),
 			talent: talent._id,
@@ -104,12 +109,10 @@ const generateLinks = (talent: TalentDocument, count: number) => {
 			_id: `${LinkString}:l${key}`,
 			createdAt: new Date().getTime(),
 			updatedAt: new Date().getTime(),
-
 			entityType: LinkString,
 			feedback: `${FeedbackString}:f${key}`,
 			agent: talent.agent,
-			callStart: callStart.epoch,
-			callEnd: callEnd.epoch
+
 		};
 		links.push(_link);
 		feedbacks.push(_feedback);

@@ -141,6 +141,10 @@ type TalentDocMethods = {
 
 export const talentDocMethods: TalentDocMethods = {
 	createLink: async function (this: TalentDocument, requestedAmount: number): Promise<LinkDocument> {
+		if (this.currentLink) {
+			throw new Error('Talent already has a current link');
+		}
+
 		const db = this.collection.database;
 		const key = nanoid();
 		const _feedback = {
@@ -182,13 +186,6 @@ export const talentDocMethods: TalentDocMethods = {
 			agent: this.agent
 		};
 
-		if (this.currentLink) {
-			const currentLink = await this.populate('currentLink');
-			if (currentLink && currentLink.status === LinkStatuses.UNCLAIMED) {
-				currentLink.update({ $set: { status: LinkStatuses.CANCELED } });
-			}
-		}
-
 		db.feedbacks.insert(_feedback);
 		const link = await db.links.insert(_link);
 		this.update({ $set: { currentLink: link._id } });
@@ -217,11 +214,16 @@ export const talentDocMethods: TalentDocMethods = {
 			.find({
 				selector: {
 					talent: this._id,
-					status: LinkStatuses.FINALIZED,
-					callStart: { $gte: range.start, $lte: range.end }
+					state: {
+						status: LinkStatuses.FINALIZED,
+						finalized: {
+							endedAt: { $gte: range.start, $lte: range.end }
+						}
+					}
 				},
-				sort: [{ callStart: 'desc' }],
-				index: ['callStart']
+				sort:
+					[{ 'state.finalized.endedAt': 'asc' }]
+				,
 			})
 			.exec()) as LinkDocument[];
 

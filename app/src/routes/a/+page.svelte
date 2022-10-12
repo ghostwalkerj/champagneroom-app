@@ -12,7 +12,7 @@
 	import TopTalent from './TopTalent.svelte';
 
 	export let data: PageData;
-	const token = data!.token;
+	const token = data.token;
 	//TODO: This will be authentication later
 	selectedAccount.subscribe(async (account) => {
 		if (account) {
