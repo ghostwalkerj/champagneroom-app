@@ -33,6 +33,7 @@
 	let vc: VideoCallType;
 	let talent: TalentDocument;
 	let linkService: LinkMachineService;
+	$: currentLinkState = 'loading';
 	$: canCreateLink = true;
 	$: canCall = false;
 	$: ready4Call = false;
@@ -53,6 +54,7 @@
 						if (cl) {
 							currentLink = cl;
 							linkService = createLinkMachineService(currentLink).onTransition((state) => {
+								currentLinkState = state.value.toString();
 								if (state.changed) {
 									canCreateLink = state.can({
 										type: 'REQUEST CANCELLATION',
@@ -281,6 +283,7 @@
 									<p>Signed in as {talentObj.name}</p>
 								{/if}
 								<p>Call State: {callState.value}</p>
+								<p>Link State: {currentLinkState}</p>
 							</div>
 						</div>
 					</div>
