@@ -164,8 +164,9 @@ export const talentDocMethods: TalentDocMethods = {
 		const _link = {
 			state: {
 				status: LinkStatuses.UNCLAIMED,
+				fundedAmount: 0,
+				connections: [],
 			},
-			fundedAmount: 0,
 			requestedAmount,
 			fundingAddress: '0x251281e1516e6E0A145d28a41EE63BfcDd9E18Bf', //TODO: make real wallet
 			callId: uuidv4(),

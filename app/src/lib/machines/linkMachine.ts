@@ -1,18 +1,18 @@
 import type { LinkDocument } from '$lib/ORM/models/link';
 import type { TransactionDocType } from '$lib/ORM/models/transaction';
-import { createMachine } from 'xstate';
+import { createMachine, interpret } from 'xstate';
 import { LinkStatuses } from '$lib/ORM/models/link';
 
-type stateType = LinkDocument['state'];
+type StateType = LinkDocument['state'];
 
-const createLinkMachine = (link: LinkDocument) => {
+export const createLinkMachine = (link: LinkDocument) => {
   return createMachine({
     context: { link, errorMessage: undefined as string | undefined },
     tsTypes: {} as import("./linkMachine.typegen").Typegen0,
     schema: {
       events: {} as
-        | { type: 'CLAIM'; claim: NonNullable<stateType['claim']>; }
-        | { type: 'REQUEST CANCELLATION'; cancel: stateType['cancel']; }
+        | { type: 'CLAIM'; claim: NonNullable<StateType['claim']>; }
+        | { type: 'REQUEST CANCELLATION'; cancel: StateType['cancel']; }
         | { type: 'REFUND ISSUED'; }
         | {
           type: 'PAYMENT RECEIVED';
@@ -21,12 +21,12 @@ const createLinkMachine = (link: LinkDocument) => {
         | { type: 'CALL CONNECTED'; }
         | { type: 'CALL DISCONNECTED'; }
         | {
-          type: 'CALL ACCEPTED'; connection: NonNullable<stateType['connections']>[0];
+          type: 'CALL ACCEPTED'; connection: NonNullable<StateType['connections']>[0];
         }
         | { type: 'FEEDBACK RECEIVED'; }
         | { type: 'ESCROW FINISHED'; }
         | {
-          type: 'DISPUTE INITIATED'; dispute: NonNullable<stateType['dispute']>;
+          type: 'DISPUTE INITIATED'; dispute: NonNullable<StateType['dispute']>;
         },
     },
     predictableActionArguments: true,
@@ -194,6 +194,10 @@ const createLinkMachine = (link: LinkDocument) => {
     });
 };
 
-export type LinkMachineType = ReturnType<typeof createLinkMachine>;
+export const createLinkMachineService = (link: LinkDocument) => {
+  const linkMachine = createLinkMachine(link);
+  return interpret(linkMachine).start();
+};
 
-export default createLinkMachine;
+export type LinkMachineType = ReturnType<typeof createLinkMachine>;
+export type LinkMachineService = ReturnType<typeof createLinkMachineService>;

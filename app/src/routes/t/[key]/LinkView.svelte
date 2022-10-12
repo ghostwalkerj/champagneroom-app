@@ -38,7 +38,7 @@
 							</div>
 							<div class="stat-title">Amount Requested</div>
 							<div class="text-primary stat-value">
-								{currencyFormatter.format(link.amount)}
+								{currencyFormatter.format(link.requestedAmount)}
 							</div>
 						</div>
 
@@ -48,7 +48,7 @@
 							</div>
 							<div class="stat-title">Amount Funded</div>
 							<div class="text-secondary stat-value">
-								{currencyFormatter.format(link.fundedAmount)}
+								{currencyFormatter.format(link.state.fundedAmount)}
 							</div>
 						</div>
 					</div>

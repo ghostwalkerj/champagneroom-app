@@ -21,23 +21,23 @@
 	import TalentActivity from './TalentActivity.svelte';
 	import TalentWallet from './TalentWallet.svelte';
 	import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
-	import type { LinkMachineType } from '$lib/machines/linkMachine';
-	import createLinkMachine from '$lib/machines/linkMachine';
-	import { useMachine } from '@xstate/svelte';
+	import { createLinkMachineService, type LinkMachineService } from '$lib/machines/linkMachine';
 
 	export let data: PageData;
 	const token = data.token;
 
 	let talentObj = data.talent as TalentDocType;
 	let completedCalls = data.completedCalls as LinkDocType[];
-	type useMachineType = ReturnType<typeof useMachine<LinkMachineType>>;
 	let currentLink: LinkDocument;
-	let linkService: useMachineType['service'];
-	let linkState: useMachineType['state'];
 	let key = $page.params.key;
 	let vc: VideoCallType;
 	let talent: TalentDocument;
-	let canCreateLink = true;
+	let linkService: LinkMachineService;
+	$: canCreateLink = true;
+	$: canCall = false;
+	$: ready4Call = false;
+	$: showAlert = false;
+	$: inCall = false;
 
 	if (browser) {
 		global = window;
@@ -52,19 +52,23 @@
 					talent.populate('currentLink').then((cl) => {
 						if (cl) {
 							currentLink = cl;
-							const linkMachine = createLinkMachine(currentLink);
-							({ state: linkState, service: linkService } = useMachine(linkMachine));
-							canCreateLink = $linkState.can({
-								type: 'REQUEST CANCELLATION',
-								cancel: undefined
+							linkService = createLinkMachineService(currentLink).onTransition((state) => {
+								if (state.changed) {
+									canCreateLink = state.can({
+										type: 'REQUEST CANCELLATION',
+										cancel: undefined
+									});
+									canCall = state.matches('claimed.canCall');
+									if (canCall) initVC();
+								}
 							});
-							initVC();
 						}
 					});
 				}
 			});
 		});
 	}
+
 	const updateProfileImage = async (url: string) => {
 		if (url && talent) {
 			talent.update({
@@ -88,11 +92,9 @@
 	};
 
 	let us: Awaited<UserStreamType>;
-	$: callState = callMachine.initialState;
+	let callState = callMachine.initialState;
 	let videoCall: any;
 	let mediaStream: MediaStream;
-	$: showAlert = callState.matches('receivingCall');
-	$: inCall = callState.matches('inCall');
 
 	const answerCall = () => {
 		showAlert = false;
@@ -106,7 +108,12 @@
 		if (currentLink) {
 			vc = videoCall(currentLink.callId);
 			vc.callState.subscribe((cs) => {
-				if (cs) callState = cs;
+				if (cs) {
+					callState = cs;
+					showAlert = callState.matches('receivingCall');
+					inCall = callState.matches('inCall');
+					ready4Call = callState.matches('ready4Call');
+				}
 			});
 			vc.callerName.subscribe((name) => {
 				if (name) callerName = name;
@@ -136,21 +143,21 @@
 		onSubmit: (values) => {
 			if (talent) {
 				// Must expire the current link, then create a new one.
-				if (currentLink)
+				if (currentLink && linkService) {
 					linkService.send({
 						type: 'REQUEST CANCELLATION',
 						cancel: {
 							createdAt: new Date().getTime(),
 							transactions: [],
 							refundedAmount: 0, //TODO: This is only good before funding.
-							canceledInState: $linkState.value.toString(),
+							canceledInState: linkService.getSnapshot().value.toString(),
 							canceler: ActorType.TALENT
 						}
 					});
-				talent.currentLink = undefined;
+					talent.currentLink = undefined;
+				}
 				talent.createLink(Number.parseInt(values.amount)).then((cl) => {
 					currentLink = cl;
-					initVC();
 				});
 				handleReset();
 			}
@@ -268,7 +275,7 @@
 						<div class="bg-primary text-primary-content card">
 							<div class="text-center card-body items-center">
 								<h2 class="text-2xl card-title">pCall Status</h2>
-								{#if callState.matches('ready4Call')}
+								{#if ready4Call}
 									<div class="text-2xl">Waiting for Incoming Call</div>
 								{:else}
 									<p>Signed in as {talentObj.name}</p>
