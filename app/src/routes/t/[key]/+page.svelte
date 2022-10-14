@@ -41,7 +41,11 @@
 	$: ready4Call = false;
 	$: showAlert = false;
 	$: inCall = false;
-
+	let us: Awaited<UserStreamType>;
+	let callState = callMachine.initialState;
+	let mediaStream: MediaStream;
+	$: callerName = '';
+	let videoCall: any;
 	const updateLink = (linkState: LinkDocument['state']) => {
 		if (currentLink) currentLink.update({ $set: { state: linkState } });
 	};
@@ -116,17 +120,10 @@
 		}
 	};
 
-	let us: Awaited<UserStreamType>;
-	let callState = callMachine.initialState;
-	let videoCall: any;
-	let mediaStream: MediaStream;
-
 	const answerCall = () => {
 		showAlert = false;
 		vc.acceptCall(mediaStream);
 	};
-
-	$: callerName = '';
 
 	const initVC = () => {
 		if (vc) vc.destroy();

@@ -3,9 +3,10 @@
 	import VideoCall from '$lib/components/calls/VideoCall.svelte';
 	import VideoPreview from '$lib/components/calls/VideoPreview.svelte';
 	import { callMachine } from '$lib/machines/callMachine';
+	import { createLinkMachineService, type LinkMachineService } from '$lib/machines/linkMachine';
 	import { publicDB, type PublicDBType } from '$lib/ORM/dbs/publicDB';
 	import type { FeedbackDocType, FeedbackDocument } from '$lib/ORM/models/feedback';
-	import { LinkStatuses, type LinkDocument } from '$lib/ORM/models/link';
+	import type { LinkDocument } from '$lib/ORM/models/link';
 	import { StorageTypes } from '$lib/ORM/rxdb';
 	import { userStream, type UserStreamType } from '$lib/util/userStream';
 	import type { VideoCallType } from '$lib/util/videoCall';
@@ -13,11 +14,9 @@
 	import type { PageData } from './$types';
 	import FeedbackForm from './FeedbackForm.svelte';
 	import LinkDetail from './LinkDetail.svelte';
+	import type { Subscription } from 'xstate';
 
 	export let data: PageData;
-
-	$: callState = callMachine.initialState;
-	$: userstream = false;
 
 	const token = data.token;
 	let linkObj = data.link;
@@ -28,9 +27,47 @@
 	let mediaStream: MediaStream;
 	let us: Awaited<UserStreamType>;
 	let feedback: FeedbackDocument;
-	$: linkStatus = data.link.state.status;
+
+	let linkSub: Subscription;
+
+	const updateLink = (linkState: LinkDocument['state']) => {
+		// Public can't update link.  Need to call a service to do it.
+	};
+
+	$: linkService = createLinkMachineService(linkObj.state, updateLink);
+	$: linkState = linkService.initialState;
+	$: showFeedback = false;
 	$: inCall = false;
-	$: canCall = false;
+	$: callState = callMachine.initialState;
+	$: userstream = false;
+
+	publicDB(token, linkId, StorageTypes.IDB).then((_db: PublicDBType) => {
+		_db.links.findOne(linkObj._id).$.subscribe((_link) => {
+			if (_link) {
+				linkObj = _link as LinkDocument;
+				// Here is where we run the machine and do all the logic based on the state
+				linkService = createLinkMachineService(_link.state, updateLink);
+				linkSub = linkService.subscribe((state) => {
+					linkState = state;
+					if (state.matches('claimed.canCall')) initVC();
+				});
+			}
+		});
+
+		_db.feedbacks
+			.findOne(feedbackObj._id)
+			.exec()
+			.then((_feedback) => {
+				if (_feedback) {
+					feedback = _feedback as FeedbackDocument;
+					feedback.$.subscribe((_feedback) => {
+						if (_feedback) {
+							feedbackObj = _feedback as FeedbackDocType;
+						}
+					});
+				}
+			});
+	});
 
 	const requestStream = async () => {
 		try {
@@ -48,31 +85,7 @@
 		}
 	};
 
-	const mightCall = () => {
-		requestStream();
-		// Make link and feedback reactive
-		publicDB(token, linkId, StorageTypes.IDB).then((_db: PublicDBType) => {
-			_db.links.findOne(linkObj._id).$.subscribe((_link) => {
-				if (_link) {
-					linkObj = _link as LinkDocument;
-					linkStatus = linkObj.state.status;
-				}
-			});
-			_db.feedbacks
-				.findOne(feedbackObj._id)
-				.exec()
-				.then((_feedback) => {
-					if (_feedback) {
-						feedback = _feedback as FeedbackDocument;
-						feedback.$.subscribe((_feedback) => {
-							if (_feedback) {
-								feedbackObj = _feedback as FeedbackDocType;
-							}
-						});
-					}
-				});
-		});
-
+	const initVC = () => {
 		import('$lib/util/videoCall').then((_vc) => {
 			//TODO: Should we wait until call is paid to connect?  Or connect early to check for errors?
 			videoCall = _vc.videoCall;
@@ -97,25 +110,16 @@
 		// 		value: $web3.utils.toWei(amount.toString(), 'ether')
 		// 	});
 		// }
-		linkStatus = LinkStatuses.CLAIMED; //TODO: This is temp, need backend service to indicate when link is ready
 	};
 
 	const pay = () => {
 		sendTransaction(linkObj.requestedAmount, linkObj.fundingAddress);
 	};
 
-	$: showFeedback = false;
-
 	// All depends on the link status
-	// Wait for onMount to grab user Stream only if we plan to call
+	// Wait for onMount to grab user Stream only if we plan to call or do we grab to to make sure it works?
 	onMount(async () => {
-		switch (linkStatus) {
-			case LinkStatuses.CLAIMED:
-			case LinkStatuses.UNCLAIMED: {
-				mightCall();
-				break;
-			}
-		}
+		requestStream();
 	});
 </script>
 
@@ -137,7 +141,15 @@
 						<LinkDetail link={linkObj} />
 					</div>
 					<div class="pb-6 w-full flex justify-center">
-						{#if linkStatus === LinkStatuses.CLAIMED}
+						{#if linkState.matches('claimed')}
+							<button
+								class="btn btn-secondary"
+								on:click={call}
+								disabled={!callState.matches('ready4Call') || !userstream}
+							>
+								Call {linkObj.talentInfo.name} Now</button
+							>
+						{:else if linkState.matches('claimed')}
 							<button
 								class="btn btn-secondary"
 								on:click={call}
@@ -205,8 +217,8 @@
 			<div class="stat-value">{callState.value}</div>
 		</div>
 		<div class="stat">
-			<div class="stat-title">pCall Status</div>
-			<div class="stat-value">{linkStatus}</div>
+			<div class="stat-title">Link State</div>
+			<div class="stat-value">{linkState}</div>
 		</div>
 	</div>
 </div>
