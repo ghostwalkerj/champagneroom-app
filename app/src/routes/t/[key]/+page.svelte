@@ -17,6 +17,7 @@
 	import { PhoneIncomingIcon } from 'svelte-feather-icons';
 	import { createForm } from 'svelte-forms-lib';
 	import StarRating from 'svelte-star-rating';
+	import type { Subscription } from 'xstate';
 	import * as yup from 'yup';
 	import type { PageData } from './$types';
 	import LinkViewer from './LinkView.svelte';
@@ -33,6 +34,7 @@
 	let vc: VideoCallType;
 	let talent: TalentDocument;
 	let linkService: LinkMachineService;
+	let linkSub: Subscription;
 	$: currentLinkState = 'loading';
 	$: canCreateLink = true;
 	$: canCall = false;
@@ -40,8 +42,8 @@
 	$: showAlert = false;
 	$: inCall = false;
 
-	const updateLink = (linkState: LinkDocType['state']) => {
-		if (currentLink) currentLink.update({ state: linkState });
+	const updateLink = (linkState: LinkDocument['state']) => {
+		if (currentLink) currentLink.update({ $set: { state: linkState } });
 	};
 
 	if (browser) {
@@ -54,28 +56,38 @@
 				if (_talent) {
 					talentObj = _talent;
 					talent = _talent;
-					talent.populate('currentLink').then((cl) => {
-						if (cl) {
-							currentLink = cl;
-							linkService = createLinkMachineService(currentLink.state, updateLink).onTransition(
-								(state) => {
-									currentLinkState = state.value.toString();
-									if (state.changed) {
-										canCreateLink = state.can({
-											type: 'REQUEST CANCELLATION',
-											cancel: undefined
-										});
-										canCall = state.matches('claimed.canCall');
-										if (canCall) initVC();
-									}
-								}
-							);
+					talent.get$('currentLink').subscribe((linkId) => {
+						if (linkId) {
+							startLinkMachine(db, linkId);
 						}
 					});
 				}
 			});
 		});
 	}
+
+	const startLinkMachine = (db: TalentDBType, linkId: string) => {
+		db.links
+			.findOne(linkId)
+			.exec()
+			.then((link) => {
+				if (link) {
+					currentLink = link;
+					linkService = createLinkMachineService(currentLink.state, updateLink);
+					linkSub = linkService.subscribe((state) => {
+						currentLinkState = state.value.toString();
+						if (state.changed) {
+							canCreateLink = state.can({
+								type: 'REQUEST CANCELLATION',
+								cancel: undefined
+							});
+							canCall = state.matches('claimed.canCall');
+							if (canCall) initVC();
+						}
+					});
+				}
+			});
+	};
 
 	const updateProfileImage = async (url: string) => {
 		if (url && talent) {
@@ -162,6 +174,8 @@
 							canceler: ActorType.TALENT
 						}
 					});
+					linkService.stop();
+					linkSub.unsubscribe();
 					talent.currentLink = undefined;
 				}
 				talent.createLink(Number.parseInt(values.amount)).then((cl) => {

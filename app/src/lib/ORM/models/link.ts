@@ -249,10 +249,10 @@ const linkSchemaLiteral = {
 } as const;
 
 type linkRef = {
-	talent_: Promise<TalentDocument>;
-	agent_: Promise<AgentDocument>;
-	feedback_: Promise<FeedbackDocument>;
-	transactions_: Promise<TransactionDocument[]>;
+	talent_?: Promise<TalentDocument>;
+	agent_?: Promise<AgentDocument>;
+	feedback_?: Promise<FeedbackDocument>;
+	transactions_?: Promise<TransactionDocument[]>;
 };
 
 const schemaTyped = toTypedRxJsonSchema(linkSchemaLiteral);
