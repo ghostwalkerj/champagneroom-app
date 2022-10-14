@@ -1,10 +1,12 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { page } from '$app/stores';
+	import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
 	import VideoCall from '$lib/components/calls/VideoCall.svelte';
 	import VideoPreview from '$lib/components/calls/VideoPreview.svelte';
 	import ProfilePhoto from '$lib/components/forms/ProfilePhoto.svelte';
 	import { callMachine } from '$lib/machines/callMachine';
+	import { createLinkMachineService, type LinkMachineService } from '$lib/machines/linkMachine';
 	import { talentDB, type TalentDBType } from '$lib/ORM/dbs/talentDB';
 	import { ActorType, type LinkDocType, type LinkDocument } from '$lib/ORM/models/link';
 	import type { TalentDocType, TalentDocument } from '$lib/ORM/models/talent';
@@ -20,8 +22,6 @@
 	import LinkViewer from './LinkView.svelte';
 	import TalentActivity from './TalentActivity.svelte';
 	import TalentWallet from './TalentWallet.svelte';
-	import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
-	import { createLinkMachineService, type LinkMachineService } from '$lib/machines/linkMachine';
 
 	export let data: PageData;
 	const token = data.token;
@@ -40,6 +40,10 @@
 	$: showAlert = false;
 	$: inCall = false;
 
+	const updateLink = (linkState: LinkDocType['state']) => {
+		if (currentLink) currentLink.update({ state: linkState });
+	};
+
 	if (browser) {
 		global = window;
 		import('$lib/util/videoCall').then((_vc) => {
@@ -53,17 +57,19 @@
 					talent.populate('currentLink').then((cl) => {
 						if (cl) {
 							currentLink = cl;
-							linkService = createLinkMachineService(currentLink.state).onTransition((state) => {
-								currentLinkState = state.value.toString();
-								if (state.changed) {
-									canCreateLink = state.can({
-										type: 'REQUEST CANCELLATION',
-										cancel: undefined
-									});
-									canCall = state.matches('claimed.canCall');
-									if (canCall) initVC();
+							linkService = createLinkMachineService(currentLink.state, updateLink).onTransition(
+								(state) => {
+									currentLinkState = state.value.toString();
+									if (state.changed) {
+										canCreateLink = state.can({
+											type: 'REQUEST CANCELLATION',
+											cancel: undefined
+										});
+										canCall = state.matches('claimed.canCall');
+										if (canCall) initVC();
+									}
 								}
-							});
+							);
 						}
 					});
 				}

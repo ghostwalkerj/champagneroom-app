@@ -1,9 +1,9 @@
 <script lang="ts">
 	import type { MediaToggleMachineType } from '$lib/machines/mediaToggleMachine';
 	import type { UserStreamType } from '$lib/util/userStream';
+	import { useMachine } from '@xstate/svelte';
 	import { onMount } from 'svelte';
 	import { MicIcon, MicOffIcon, VideoIcon, VideoOffIcon } from 'svelte-feather-icons';
-	import { useMachine } from '@xstate/svelte';
 
 	// UI Controls
 	let localVideo: HTMLVideoElement;

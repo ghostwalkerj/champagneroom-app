@@ -2,13 +2,13 @@ import { PUBLIC_CREATORS_ENDPOINT, PUBLIC_RXDB_PASSWORD } from '$env/static/publ
 import { feedbackSchema, type FeedbackCollection } from '$lib/ORM/models/feedback';
 import { linkSchema, type LinkCollection } from '$lib/ORM/models/link';
 import { talentDocMethods, talentSchema, type TalentCollection } from '$lib/ORM/models/talent';
+import type { TransactionCollection } from '$lib/ORM/models/transaction';
 import type { StorageTypes } from '$lib/ORM/rxdb';
 import { initRXDB } from '$lib/ORM/rxdb';
 import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
 import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
-import type { TransactionCollection } from '$lib/ORM/models/transaction';
 
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 100;
@@ -17,7 +17,6 @@ type CreatorsCollections = {
 	links: LinkCollection;
 	feedbacks: FeedbackCollection;
 	transactions: TransactionCollection;
-
 };
 
 export type TalentDBType = RxDatabase<CreatorsCollections>;
@@ -60,7 +59,7 @@ const create = async (token: string, key: string, storage: StorageTypes) => {
 		const remoteDB = new PouchDB(PUBLIC_CREATORS_ENDPOINT, {
 			fetch: function (
 				url: string,
-				opts: { headers: { set: (arg0: string, arg1: string) => void; }; }
+				opts: { headers: { set: (arg0: string, arg1: string) => void } }
 			) {
 				opts.headers.set('Authorization', 'Bearer ' + token);
 				return PouchDB.fetch(url, opts);

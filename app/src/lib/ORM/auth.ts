@@ -1,12 +1,6 @@
-import {
-	TokenRoles
-} from '$lib/util/constants';
+import { TokenRoles } from '$lib/util/constants';
 
-import {
-	JWT_CREATOR_USER,
-	JWT_EXPIRY,
-	JWT_PUBLIC_USER, JWT_SECRET
-} from '$env/static/private';
+import { JWT_CREATOR_USER, JWT_EXPIRY, JWT_PUBLIC_USER, JWT_SECRET } from '$env/static/private';
 import jwt from 'jsonwebtoken';
 
 export const doAuth = async (tokenRole: TokenRoles) => {
