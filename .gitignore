@@ -14,3 +14,4 @@ app/.vscode/**
 .vscode/**
 /app/src/lib/machines/callMachine.typegen.ts
 /app/src/lib/util/callMachine.typegen.ts
+app/src/lib/machines/linkMachine.typegen.ts
