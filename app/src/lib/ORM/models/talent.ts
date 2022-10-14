@@ -136,11 +136,14 @@ type talentRef = {
 type TalentDocMethods = {
 	createLink: (amount: number) => Promise<LinkDocument>;
 	updateStats: () => Promise<TalentDocument['stats']>;
-	getStatsByRange: (range?: { start: number; end: number; }) => Promise<TalentDocument['stats']>;
+	getStatsByRange: (range?: { start: number; end: number }) => Promise<TalentDocument['stats']>;
 };
 
 export const talentDocMethods: TalentDocMethods = {
-	createLink: async function (this: TalentDocument, requestedAmount: number): Promise<LinkDocument> {
+	createLink: async function (
+		this: TalentDocument,
+		requestedAmount: number
+	): Promise<LinkDocument> {
 		if (this.currentLink) {
 			throw new Error('Talent already has a current link');
 		}
@@ -164,8 +167,9 @@ export const talentDocMethods: TalentDocMethods = {
 		const _link = {
 			state: {
 				status: LinkStatuses.UNCLAIMED,
-				fundedAmount: 0,
-				connections: [],
+				totalFunding: 0,
+				minFunding: requestedAmount,
+				connections: []
 			},
 			requestedAmount,
 			fundingAddress: '0x251281e1516e6E0A145d28a41EE63BfcDd9E18Bf', //TODO: make real wallet
@@ -222,9 +226,7 @@ export const talentDocMethods: TalentDocMethods = {
 						}
 					}
 				},
-				sort:
-					[{ 'state.finalized.endedAt': 'asc' }]
-				,
+				sort: [{ 'state.finalized.endedAt': 'asc' }]
 			})
 			.exec()) as LinkDocument[];
 

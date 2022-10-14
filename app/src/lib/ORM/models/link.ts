@@ -78,7 +78,13 @@ const linkSchemaLiteral = {
 					enum: Object.values(LinkStatuses),
 					default: LinkStatuses.UNCLAIMED
 				},
-				fundedAmount: {
+				totalFunding: {
+					type: 'integer',
+					default: 0,
+					minimum: 0,
+					maximum: 99999
+				},
+				minFunding: {
 					type: 'integer',
 					default: 0,
 					minimum: 0,
@@ -112,7 +118,7 @@ const linkSchemaLiteral = {
 							type: 'array',
 							ref: 'transactions',
 							items: { type: 'string' }
-						},
+						}
 					},
 					required: ['caller', 'pin', 'createdAt', 'transactions'],
 					encrypted: ['pin']
@@ -123,7 +129,7 @@ const linkSchemaLiteral = {
 						startedAt: { type: 'integer' },
 						endedAt: { type: 'integer' }
 					},
-					required: ['startedAt'],
+					required: ['startedAt']
 				},
 				dispute: {
 					type: 'object',
@@ -147,7 +153,7 @@ const linkSchemaLiteral = {
 									items: { type: 'string' }
 								}
 							},
-							required: ['decision', 'transactions'],
+							required: ['decision', 'transactions']
 						}
 					},
 					required: ['startedAt', 'disputer']
@@ -175,13 +181,13 @@ const linkSchemaLiteral = {
 							},
 							createdAt: { type: 'integer' },
 							endedAt: { type: 'integer' },
-							caller: { type: 'string' },
+							caller: { type: 'string' }
 						},
 						required: ['type', 'createdAt', 'caller']
 					}
 				}
 			},
-			required: ['status', 'connections', 'fundedAmount']
+			required: ['status', 'connections', 'totalFunding', 'minFunding']
 		},
 		talentInfo: {
 			type: 'object',

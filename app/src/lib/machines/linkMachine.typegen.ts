@@ -15,7 +15,6 @@ export interface Typegen0 {
 	};
 	eventsCausingActions: {
 		cancelCall: 'REQUEST CANCELLATION';
-		claimCall: 'CLAIM';
 		initiateDispute: 'DISPUTE INITIATED';
 		sendPayment: 'PAYMENT RECEIVED';
 	};
