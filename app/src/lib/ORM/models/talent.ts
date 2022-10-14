@@ -144,10 +144,6 @@ export const talentDocMethods: TalentDocMethods = {
 		this: TalentDocument,
 		requestedAmount: number
 	): Promise<LinkDocument> {
-		if (this.currentLink) {
-			throw new Error('Talent already has a current link');
-		}
-
 		const db = this.collection.database;
 		const key = nanoid();
 		const _feedback = {

@@ -52,21 +52,26 @@
 			videoCall = _vc.videoCall;
 		});
 		talentDB(token, key, StorageTypes.IDB).then((db: TalentDBType) => {
-			db.talents.findOne(talentObj._id).$.subscribe((_talent) => {
-				if (_talent) {
-					talentObj = _talent;
-					talent = _talent;
-					talent.get$('currentLink').subscribe((linkId) => {
-						if (linkId) {
-							startLinkMachine(db, linkId);
-						}
-					});
-				}
-			});
+			db.talents
+				.findOne(talentObj._id)
+				.exec()
+				.then((_talent) => {
+					if (_talent) {
+						talentObj = _talent;
+						talent = _talent;
+						talent.get$('currentLink').subscribe((linkId) => {
+							if (linkId) {
+								startLinkMachine(db, linkId);
+							}
+						});
+					}
+				});
 		});
 	}
 
 	const startLinkMachine = (db: TalentDBType, linkId: string) => {
+		if (linkService) linkService.stop();
+		if (linkSub) linkSub.unsubscribe();
 		db.links
 			.findOne(linkId)
 			.exec()
@@ -174,13 +179,8 @@
 							canceler: ActorType.TALENT
 						}
 					});
-					linkService.stop();
-					linkSub.unsubscribe();
-					talent.currentLink = undefined;
 				}
-				talent.createLink(Number.parseInt(values.amount)).then((cl) => {
-					currentLink = cl;
-				});
+				talent.createLink(Number.parseInt(values.amount));
 				handleReset();
 			}
 		}
