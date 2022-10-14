@@ -30,6 +30,7 @@
 					<div class="stat-title">Name Shown</div>
 					<div class="stat-value">{talent.name}</div>
 				</div>
+
 				<div>
 					<div class="max-w-min stats stats-vertical stats-shadow lg:stats-horizontal">
 						<div class="stat">

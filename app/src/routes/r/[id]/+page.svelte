@@ -28,7 +28,9 @@
 	let mediaStream: MediaStream;
 	let us: Awaited<UserStreamType>;
 	let feedback: FeedbackDocument;
-	$: linkStatus = data.link.status;
+	$: linkStatus = data.link.state.status;
+	$: inCall = false;
+	$: canCall = false;
 
 	const requestStream = async () => {
 		try {
@@ -46,48 +48,6 @@
 		}
 	};
 
-	const linkState = fsm('neverConnected', {
-		neverConnected: {
-			call: 'calling'
-		},
-		rejected: {
-			_enter() {
-				feedback.update({ $inc: { rejected: 1 } });
-			},
-			call: 'calling'
-		},
-		notAnswered: {
-			_enter() {
-				feedback.update({ $inc: { unanswered: 1 } });
-			},
-			call: 'calling'
-		},
-		calling: {
-			callAccepted: 'inCall',
-			callRejected: 'rejected',
-			receiverHangup: 'rejected',
-			noAnswer: 'notAnswered'
-		},
-		inCall: {
-			callEnded: 'callEnded',
-			callDisconnected: 'disconnected',
-			receiverHangup: 'disconnected'
-		},
-		disconnected: {
-			_enter() {
-				feedback.update({ $inc: { disconnected: 1 } });
-			},
-			call: 'calling'
-		},
-		callEnded: {
-			waitingForFeedback: 'waitForFeedback'
-		},
-		waitForFeedback: {
-			feedbackGiven: 'complete'
-		},
-		complete: {}
-	});
-
 	const mightCall = () => {
 		requestStream();
 		// Make link and feedback reactive
@@ -95,7 +55,7 @@
 			_db.links.findOne(linkObj._id).$.subscribe((_link) => {
 				if (_link) {
 					linkObj = _link as LinkDocument;
-					linkStatus = linkObj.status;
+					linkStatus = linkObj.state.status;
 				}
 			});
 			_db.feedbacks
@@ -114,6 +74,7 @@
 		});
 
 		import('$lib/util/videoCall').then((_vc) => {
+			//TODO: Should we wait until call is paid to connect?  Or connect early to check for errors?
 			videoCall = _vc.videoCall;
 			vc = videoCall();
 			vc.callState.subscribe((state) => {
@@ -140,7 +101,7 @@
 	};
 
 	const pay = () => {
-		sendTransaction(linkObj.amount, linkObj.fundingAddress);
+		sendTransaction(linkObj.requestedAmount, linkObj.fundingAddress);
 	};
 
 	$: showFeedback = false;
@@ -162,7 +123,7 @@
 
 <div class="min-h-full">
 	<main class="py-6">
-		{#if $linkState != 'inCall'}
+		{#if !inCall}
 			<!-- Page header -->
 			<div class="text-center">
 				<h1 class="font-bold text-center text-5xl">Make your pCall</h1>
@@ -211,7 +172,7 @@
 								</div>
 							{/if}
 						</div>
-						Call State: {callState}
+						Call State: {callState.value}
 					</div>
 				</div>
 			</div>
@@ -238,10 +199,6 @@
 		<div class="stat">
 			<div class="stat-title">UnAnswered</div>
 			<div class="stat-value">{feedbackObj.unanswered}</div>
-		</div>
-		<div class="stat">
-			<div class="stat-title">Link State</div>
-			<div class="stat-value">{$linkState}</div>
 		</div>
 		<div class="stat">
 			<div class="stat-title">Call State</div>

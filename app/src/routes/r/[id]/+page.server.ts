@@ -1,6 +1,7 @@
 import { JWT_EXPIRY, JWT_PUBLIC_USER, JWT_SECRET } from '$env/static/private';
 import { publicDB } from '$lib/ORM/dbs/publicDB';
-import type { FeedbackDocument } from '$lib/ORM/models/feedback';
+import type { FeedbackDocType, FeedbackDocument } from '$lib/ORM/models/feedback';
+import type { LinkDocType } from '$lib/ORM/models/link';
 import { StorageTypes } from '$lib/ORM/rxdb';
 import { error } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
@@ -30,13 +31,13 @@ export const load: PageServerLoad = async ({ params }) => {
 		throw error(404, 'pCall not found');
 	}
 
-	const link = _link.toJSON();
+	const link = _link.toJSON() as LinkDocType;
 	const _feedback = await _link.populate('feedback');
 	if (!_feedback) {
 		throw error(500, 'Feedback not found');
 	}
 	_feedback.update({ $inc: { viewed: 1 } }); // Increment view count
-	const feedback = (_feedback as FeedbackDocument).toJSON();
+	const feedback = (_feedback as FeedbackDocument).toJSON() as FeedbackDocType;
 
 	return {
 		token,
