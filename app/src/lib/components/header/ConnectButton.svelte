@@ -50,7 +50,7 @@
 </script>
 
 {#if !$selectedAccount}
-	<button class="btn" on:click={connect}> Connect to a wallet </button>
+	<button class="btn" on:click={connect}>Connect Wallet</button>
 {:else}
 	<div>
 		<div class="card card-side bordered  ">

@@ -1,6 +1,6 @@
 import type { LinkDocType } from '$lib/ORM/models/link';
 import type { TransactionDocType } from '$lib/ORM/models/transaction';
-import { createMachine, interpret, assign } from 'xstate';
+import { createMachine, interpret, assign, actions } from 'xstate';
 import { LinkStatuses } from '$lib/ORM/models/link';
 
 type LinkStateType = LinkDocType['state'];
@@ -13,8 +13,8 @@ export const createLinkMachine = (linkState: LinkStateType) => {
 			tsTypes: {} as import('./linkMachine.typegen').Typegen0,
 			schema: {
 				events: {} as
-					| { type: 'CLAIM'; claim: NonNullable<LinkStateType['claim']> }
-					| { type: 'REQUEST CANCELLATION'; cancel: NonNullable<LinkStateType['cancel']> }
+					| { type: 'CLAIM'; claim: LinkStateType['claim'] }
+					| { type: 'REQUEST CANCELLATION'; cancel: LinkStateType['cancel'] }
 					| { type: 'REFUND ISSUED' }
 					| {
 							type: 'PAYMENT RECEIVED';
@@ -60,10 +60,11 @@ export const createLinkMachine = (linkState: LinkStateType) => {
 				unclaimed: {
 					on: {
 						CLAIM: {
-							target: 'claimed'
+							target: 'claimed',
+							actions: 'claimLink'
 						},
 						'REQUEST CANCELLATION': {
-							actions: 'cancelCall',
+							actions: 'cancelLink',
 							target: 'cancelled'
 						}
 					}
@@ -78,7 +79,7 @@ export const createLinkMachine = (linkState: LinkStateType) => {
 							},
 							on: {
 								'REQUEST CANCELLATION': {
-									actions: 'cancelCall',
+									actions: 'cancelLink',
 									target: '#linkMachine.requestedCancellation'
 								},
 								'PAYMENT RECEIVED': {
@@ -133,12 +134,22 @@ export const createLinkMachine = (linkState: LinkStateType) => {
 		},
 		{
 			actions: {
-				cancelCall: assign((context, event) => {
+				cancelLink: assign((context, event) => {
 					return {
 						linkState: {
 							...context.linkState,
 							status: LinkStatuses.CANCELED,
 							cancel: event.cancel
+						}
+					};
+				}),
+
+				claimLink: assign((context, event) => {
+					return {
+						linkState: {
+							...context.linkState,
+							status: LinkStatuses.CLAIMED,
+							claim: event.claim
 						}
 					};
 				}),

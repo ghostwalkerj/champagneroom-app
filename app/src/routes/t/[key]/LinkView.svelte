@@ -46,9 +46,9 @@
 							<div class="text-secondary w-10 stat-figure">
 								<FaMoneyBillWave />
 							</div>
-							<div class="stat-title">Amount Funded</div>
+							<div class="stat-title">Total Funded</div>
 							<div class="text-secondary stat-value">
-								{currencyFormatter.format(link.state.fundedAmount)}
+								{currencyFormatter.format(link.state.totalFunding)}
 							</div>
 						</div>
 					</div>

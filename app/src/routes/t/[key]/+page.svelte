@@ -53,7 +53,7 @@
 					talent.populate('currentLink').then((cl) => {
 						if (cl) {
 							currentLink = cl;
-							linkService = createLinkMachineService(currentLink).onTransition((state) => {
+							linkService = createLinkMachineService(currentLink.state).onTransition((state) => {
 								currentLinkState = state.value.toString();
 								if (state.changed) {
 									canCreateLink = state.can({

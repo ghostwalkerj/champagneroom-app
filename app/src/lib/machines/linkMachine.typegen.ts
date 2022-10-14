@@ -14,7 +14,8 @@ export interface Typegen0 {
 		delays: never;
 	};
 	eventsCausingActions: {
-		cancelCall: 'REQUEST CANCELLATION';
+		cancelLink: 'REQUEST CANCELLATION';
+		claimLink: 'CLAIM';
 		initiateDispute: 'DISPUTE INITIATED';
 		sendPayment: 'PAYMENT RECEIVED';
 	};
