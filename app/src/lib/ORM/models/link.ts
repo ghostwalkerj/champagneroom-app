@@ -84,7 +84,7 @@ const linkSchemaLiteral = {
 					minimum: 0,
 					maximum: 99999
 				},
-				minFunding: {
+				requestedFunding: {
 					type: 'integer',
 					default: 0,
 					minimum: 0,
@@ -120,7 +120,7 @@ const linkSchemaLiteral = {
 							items: { type: 'string' }
 						}
 					},
-					required: ['caller', 'pin', 'createdAt', 'transactions'],
+					required: ['caller', 'pin', 'createdAt'],
 					encrypted: ['pin']
 				},
 				escrow: {
@@ -153,7 +153,7 @@ const linkSchemaLiteral = {
 									items: { type: 'string' }
 								}
 							},
-							required: ['decision', 'transactions']
+							required: ['decision']
 						}
 					},
 					required: ['startedAt', 'disputer']
@@ -187,7 +187,7 @@ const linkSchemaLiteral = {
 					}
 				}
 			},
-			required: ['status', 'connections', 'totalFunding', 'minFunding']
+			required: ['status', 'totalFunding', 'requestedFunding']
 		},
 		talentInfo: {
 			type: 'object',

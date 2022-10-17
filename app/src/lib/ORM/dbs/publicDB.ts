@@ -53,7 +53,6 @@ const create = async (token: string, linkId: string, storage: StorageTypes) => {
 
 	if (PUBLIC_PUBLIC_ENDPOINT) {
 		// Sync if there is a remote endpoint
-
 		const remoteDB = new PouchDB(PUBLIC_PUBLIC_ENDPOINT, {
 			fetch: function (
 				url: string,

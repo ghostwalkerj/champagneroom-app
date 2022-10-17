@@ -36,7 +36,7 @@
 	let linkService: LinkMachineService;
 	let linkSub: Subscription;
 	$: currentLinkState = 'loading';
-	$: canCreateLink = true;
+	$: canCreateLink = false;
 	$: canCall = false;
 	$: ready4Call = false;
 	$: showAlert = false;
@@ -47,7 +47,13 @@
 	$: callerName = '';
 	let videoCall: any;
 	const updateLink = (linkState: LinkDocument['state']) => {
-		if (currentLink) currentLink.update({ $set: { state: linkState } });
+		if (currentLink)
+			currentLink.update({
+				$set: {
+					updatedAt: new Date().getTime(),
+					state: linkState
+				}
+			});
 	};
 
 	if (browser) {
@@ -84,7 +90,7 @@
 					currentLink = link;
 					linkService = createLinkMachineService(currentLink.state, updateLink);
 					linkSub = linkService.subscribe((state) => {
-						currentLinkState = state.value.toString();
+						currentLinkState = JSON.stringify(state.value);
 						if (state.changed) {
 							canCreateLink = state.can({
 								type: 'REQUEST CANCELLATION',

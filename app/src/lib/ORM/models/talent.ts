@@ -164,7 +164,7 @@ export const talentDocMethods: TalentDocMethods = {
 			state: {
 				status: LinkStatuses.UNCLAIMED,
 				totalFunding: 0,
-				minFunding: requestedAmount,
+				requestedFunding: requestedAmount,
 				connections: []
 			},
 			requestedAmount,

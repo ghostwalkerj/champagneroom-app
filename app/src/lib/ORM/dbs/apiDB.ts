@@ -1,8 +1,7 @@
 import { PUBLIC_CREATORS_ENDPOINT, PUBLIC_RXDB_PASSWORD } from '$env/static/public';
 import { feedbackSchema, type FeedbackCollection } from '$lib/ORM/models/feedback';
-import { linkSchema, type LinkCollection } from '$lib/ORM/models/link';
-import { talentDocMethods, talentSchema, type TalentCollection } from '$lib/ORM/models/talent';
-import { type TransactionCollection, transactionSchema } from '$lib/ORM/models/transaction';
+import { LinkDocument, linkSchema, type LinkCollection } from '$lib/ORM/models/link';
+import { TransactionCollection, transactionSchema } from '$lib/ORM/models/transaction';
 import type { StorageTypes } from '$lib/ORM/rxdb';
 import { initRXDB } from '$lib/ORM/rxdb';
 import { EventEmitter } from 'events';
@@ -12,22 +11,27 @@ import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
 
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 100;
-type CreatorsCollections = {
-	talents: TalentCollection;
+type APICollections = {
 	links: LinkCollection;
 	feedbacks: FeedbackCollection;
 	transactions: TransactionCollection;
 };
 
-export type TalentDBType = RxDatabase<CreatorsCollections>;
-const _talentDB = new Map<string, TalentDBType>();
+export type APIDBType = RxDatabase<APICollections>;
+const _apiDB = new Map<string, APIDBType>();
 
-export const talentDB = async (token: string, key: string, storage: StorageTypes) =>
-	await create(token, key, storage);
+export const apiDB = async (
+	token: string,
+	linkId: string,
+	storage: StorageTypes
+): Promise<APIDBType> => await create(token, linkId, storage);
 
-const create = async (token: string, key: string, storage: StorageTypes) => {
-	let _db = _talentDB.get(key);
+let _thisLink: LinkDocument;
+
+const create = async (token: string, linkId: string, storage: StorageTypes) => {
+	let _db = _apiDB.get(linkId);
 	if (_db) return _db;
+
 	initRXDB(storage);
 
 	const wrappedStorage = wrappedKeyEncryptionStorage({
@@ -35,17 +39,13 @@ const create = async (token: string, key: string, storage: StorageTypes) => {
 	});
 
 	_db = await createRxDatabase({
-		name: 'pouchdb/talent_db',
+		name: 'pouchdb/api_db',
 		storage: wrappedStorage,
 		ignoreDuplicate: true,
 		password: PUBLIC_RXDB_PASSWORD
 	});
 
 	await _db.addCollections({
-		talents: {
-			schema: talentSchema,
-			methods: talentDocMethods
-		},
 		links: {
 			schema: linkSchema
 		},
@@ -68,43 +68,43 @@ const create = async (token: string, key: string, storage: StorageTypes) => {
 				return PouchDB.fetch(url, opts);
 			}
 		});
-		const talentQuery = _db.talents.findOne().where('key').eq(key);
+		const linkQuery = _db.links.findOne(linkId);
 
-		let repState = _db.talents.syncCouchDB({
+		let repState = _db.links.syncCouchDB({
 			remote: remoteDB,
 			waitForLeadership: false,
 			options: {
 				retry: true
 			},
-			query: talentQuery
+			query: linkQuery
 		});
 		await repState.awaitInitialReplication();
 
-		const _currentTalent = await talentQuery.exec();
-		if (_currentTalent) {
-			// Wait for links
-			repState = _db.links.syncCouchDB({
-				remote: remoteDB,
-				waitForLeadership: false,
-				options: {
-					retry: true
-				},
-				query: _db.links.find().where('talent').eq(_currentTalent._id)
-			});
-			await repState.awaitInitialReplication();
+		_thisLink = (await linkQuery.exec()) as LinkDocument;
+		if (_thisLink) {
+			const feedbackQuery = _db.feedbacks.findOne(_thisLink.feedback);
+			const transactionQuery = _db.transactions.findOne().where('linkId').eq(linkId);
 
-			// Wait for feedbacks
 			repState = _db.feedbacks.syncCouchDB({
 				remote: remoteDB,
 				waitForLeadership: false,
 				options: {
 					retry: true
 				},
-				query: _db.feedbacks.findOne().where('link').eq(_currentTalent.currentLink)
+				query: feedbackQuery
 			});
 			await repState.awaitInitialReplication();
 
-			// Live sync this Talent's links
+			repState = _db.transactions.syncCouchDB({
+				remote: remoteDB,
+				waitForLeadership: false,
+				options: {
+					retry: true
+				},
+				query: transactionQuery
+			});
+			await repState.awaitInitialReplication();
+
 			_db.links.syncCouchDB({
 				remote: remoteDB,
 				waitForLeadership: false,
@@ -112,10 +112,9 @@ const create = async (token: string, key: string, storage: StorageTypes) => {
 					retry: true,
 					live: true
 				},
-				query: _db.links.find().where('talent').eq(_currentTalent._id)
+				query: linkQuery
 			});
 
-			// Live sync this Talent's feedbacks
 			_db.feedbacks.syncCouchDB({
 				remote: remoteDB,
 				waitForLeadership: false,
@@ -123,21 +122,20 @@ const create = async (token: string, key: string, storage: StorageTypes) => {
 					retry: true,
 					live: true
 				},
-				query: _db.feedbacks.find().where('talent').eq(_currentTalent._id)
+				query: feedbackQuery
 			});
 
-			// Live sync this Talent
-			_db.talents.syncCouchDB({
+			_db.transactions.syncCouchDB({
 				remote: remoteDB,
 				waitForLeadership: false,
 				options: {
 					retry: true,
 					live: true
 				},
-				query: talentQuery
+				query: transactionQuery
 			});
 		}
 	}
-	_talentDB.set(key, _db);
+	_apiDB.set(linkId, _db);
 	return _db;
 };

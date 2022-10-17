@@ -7,7 +7,7 @@ type LinkStateType = LinkDocType['state'];
 
 type StateCallBackType = (state: LinkStateType) => void;
 
-export const createLinkMachine = (linkState: LinkStateType, saveState: StateCallBackType) => {
+export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCallBackType) => {
 	const stateCallback = saveState;
 
 	/** @xstate-layout N4IgpgJg5mDOIC5QBsCWA7A1gWQIYGMALDMAOjSwAJkB7XCSAYkVAAcbZUAXVG9FkAA9EARgAMIgBykxksQE4AzGIBsAFgBMIgOyTJAGhABPRIpXzSmkSI3aArGM2z1AXxeGKOAsXRkAruj4yLioALZMAMIAMgCCAJLYAuycPHwCwggiamJ2pIpK+fIaaiKKUoYmCBrVpEXWGkqSyjo5bh4YXkQkpAFBIeEQjABKAKIAigCqIwDKACqUETEAchEjUbGzcQDyS0kc3Lz8SEKi2bn5ioXFpeXGiGraYrVa4tUlGooPbSCeeF2+pD6YUgpAA7iEeOgoGoAGIBCAYKDDcZTOYLZardYxTY7PYpQ7pRAqOy5SRqYlqSl2FRifIqCqIeRibTPay0iRqal2DTfX7ebpAgZgiGI2HwxGMAAKMQAmtgRkt5qNVnEAGojAAieIOaWOGREdkULLJxI+aiKcg09LuVUU0jqNm5IhU9lkdl5HT+PjIgpB4IOULF6ARUOYx2SOqOoH12kUuQkZLEOXMkg0jgZmTsalZCk5ajMKiyHqwXu6ACcwABHPxwLiQCK4QJgZDBVLoYUB6FDMAAM3hyJhEyWGsocWm0ymWvD+zbhMyNhUpBUtke8nJ2mX8gMNskG8sL2U8m0adKimLnW9pAr1dr9cb+GbrcOYbYM4JetEC6XK9zLs328qIpsysRxC0kLJFA0SRz1LAFwUhaEYQwXA0AAL1wNtGBhEZNQAIRiCIAGlKGVEY1U1bVZw-TIExkOQlFUKxdAA0wtH3axxDjZlikkFQYP5OCMNFJD0BQ1B0MwmYIiGLYAHVKBhOIljHAAJCjp3xXVo1EWjZAUZR1C0ZiM1sRR2KyEpzFMnl3B+T0BLIeDhOQtChL4RgNTHSUJlmEZR2UzZsXU19NKjE4EBdUlySzKkaTpDNIIsB0pCKbRyRUaDvnQGgGHgY4+X+MhPGoOgGAgSj320iLmTyXjCzKWNnU0DMXWkF0rVjdQMt3bR+MKnpAmCYFyo0yM5xsbQWSAjKxGKEoMweRcHTTfMVHMS41D6y9fQgDsEKDEMoAqrTwoNOwRBkEoyXJWkbDUBLlBzSLHEpLctoFIahXwRsGxbY6wv1NcNFqBRaTtaojw+DMpGAl5qm5RjPnegEdv+8bzrMk1uU+C1ZutSpU1ZUp5BULi7HkA1kbIa8a1gOsIAbJsWzc9t-X27s+2DNHqNS0htHkEmVqZE9tAzNczJAtKDTJLJetsgrLxp28GfvR8We5qqmTM-nBccYWJFFndtAuqxrCArdHSp4V9pEsSJMOUgMA1VBYFYPw6w18LeJZBxbEkJQYrKFiEE+MzkqtFoDWKK2nMDW3XKokKxuo4kLqxylOTikmTM5InSlAppijPeX7P676meQSBPf1MoLuXDd5AcPQ7S3MXDXY2lJG5BpbHdEuSwc0gexc8Sq9GxPTuqaRdGyRqBdTUmEtUcyOTSkoSSp6vEDsJparWm5GsM6GngdMwJCPcC+LcFwgA */
@@ -65,7 +65,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState: StateCall
 					on: {
 						CLAIM: {
 							target: 'claimed',
-							actions: 'claimLink'
+							actions: ['claimLink', 'saveLinkState']
 						},
 						'REQUEST CANCELLATION': {
 							actions: ['cancelLink', 'saveLinkState'],
@@ -157,12 +157,13 @@ export const createLinkMachine = (linkState: LinkStateType, saveState: StateCall
 						}
 					};
 				}),
+
 				saveLinkState: (context) => {
-					stateCallback(context.linkState);
+					if (stateCallback) stateCallback(context.linkState);
 				},
 
 				sendPayment: (context, event) => {
-					context.linkState.claim?.transactions.push(event.transaction._id);
+					//context.linkState.claim?.transactions.push(event.transaction._id);
 					context.linkState.totalFunding += Number.parseInt(event.transaction.value);
 				},
 
@@ -175,7 +176,8 @@ export const createLinkMachine = (linkState: LinkStateType, saveState: StateCall
 				linkCancelled: (context) => context.linkState.status === LinkStatuses.CANCELED,
 				linkFinalized: (context) => context.linkState.status === LinkStatuses.FINALIZED,
 				linkClaimed: (context) => context.linkState.status === LinkStatuses.CLAIMED,
-				fullyFunded: (context) => context.linkState.totalFunding >= context.linkState.minFunding
+				fullyFunded: (context) =>
+					context.linkState.totalFunding >= context.linkState.requestedFunding
 			}
 		}
 	);
@@ -183,7 +185,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState: StateCall
 
 export const createLinkMachineService = (
 	linkState: LinkStateType,
-	saveState: StateCallBackType
+	saveState?: StateCallBackType
 ) => {
 	const linkMachine = createLinkMachine(linkState, saveState);
 	return interpret(linkMachine).start();

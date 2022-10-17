@@ -3,7 +3,7 @@
 	import VideoCall from '$lib/components/calls/VideoCall.svelte';
 	import VideoPreview from '$lib/components/calls/VideoPreview.svelte';
 	import { callMachine } from '$lib/machines/callMachine';
-	import { createLinkMachineService, type LinkMachineService } from '$lib/machines/linkMachine';
+	import { createLinkMachineService } from '$lib/machines/linkMachine';
 	import { publicDB, type PublicDBType } from '$lib/ORM/dbs/publicDB';
 	import type { FeedbackDocType, FeedbackDocument } from '$lib/ORM/models/feedback';
 	import type { LinkDocument } from '$lib/ORM/models/link';
@@ -15,6 +15,8 @@
 	import FeedbackForm from './FeedbackForm.svelte';
 	import LinkDetail from './LinkDetail.svelte';
 	import type { Subscription } from 'xstate';
+	import { enhance } from '$app/forms';
+	export let form: import('./$types').ActionData;
 
 	export let data: PageData;
 
@@ -30,11 +32,7 @@
 
 	let linkSub: Subscription;
 
-	const updateLink = (linkState: LinkDocument['state']) => {
-		// Public can't update link.  Need to call a service to do it.
-	};
-
-	$: linkService = createLinkMachineService(linkObj.state, updateLink);
+	$: linkService = createLinkMachineService(linkObj.state);
 	$: linkState = linkService.initialState;
 	$: showFeedback = false;
 	$: inCall = false;
@@ -46,7 +44,7 @@
 			if (_link) {
 				linkObj = _link as LinkDocument;
 				// Here is where we run the machine and do all the logic based on the state
-				linkService = createLinkMachineService(_link.state, updateLink);
+				linkService = createLinkMachineService(_link.state);
 				linkSub = linkService.subscribe((state) => {
 					linkState = state;
 					if (state.matches('claimed.canCall')) initVC();
@@ -140,6 +138,56 @@
 					<div>
 						<LinkDetail link={linkObj} />
 					</div>
+
+					<!-- Link Claim -->
+					<div class="bg-primary text-primary-content card">
+						<div class="text-center card-body items-center">
+							<h2 class="text-2xl card-title">Claim pCall Link</h2>
+							<div class="flex flex-col text-white p-2 justify-center items-center">
+								<form method="post" action="?/claim" use:enhance>
+									<input type="hidden" name="linkId" value={linkId} />
+									<div class="max-w-xs w-full py-2 form-control ">
+										<!-- svelte-ignore a11y-label-has-associated-control -->
+										<label for="caller" class="label">
+											<span class="label-text">Name you want shown</span></label
+										>
+										<div class="rounded-md shadow-sm mt-1 relative">
+											<input
+												name="caller"
+												type="text"
+												class=" max-w-xs w-full py-2 pl-6 input input-bordered input-primary "
+												value={form?.caller ?? ''}
+											/>
+											{#if form?.missingCaller}<div class="shadow-lg alert alert-error">
+													Name is required
+												</div>{/if}
+										</div>
+									</div>
+									<div class="max-w-xs w-full py-2 form-control ">
+										<!-- svelte-ignore a11y-label-has-associated-control -->
+										<label for="pin" class="label">
+											<span class="label-text">8 Digit Pin</span></label
+										>
+										<div class="rounded-md shadow-sm mt-1 relative">
+											<input
+												name="pin"
+												type="text"
+												class=" max-w-xs w-full py-2 pl-6 input input-bordered input-primary "
+												value={form?.pin ?? ''}
+											/>
+											{#if form?.missingPin}<div class="shadow-lg alert alert-error">
+													Pin is required
+												</div>{/if}
+										</div>
+									</div>
+									<div class="py-4">
+										<button class="btn btn-secondary" type="submit">Claim Link</button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+
 					<div class="pb-6 w-full flex justify-center">
 						{#if linkState.matches('claimed')}
 							<button
@@ -218,7 +266,7 @@
 		</div>
 		<div class="stat">
 			<div class="stat-title">Link State</div>
-			<div class="stat-value">{linkState}</div>
+			<div class="stat-value">{linkState.value}</div>
 		</div>
 	</div>
 </div>
