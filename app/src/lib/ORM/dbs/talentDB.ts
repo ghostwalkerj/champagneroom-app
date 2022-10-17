@@ -1,6 +1,6 @@
 import { PUBLIC_CREATORS_ENDPOINT, PUBLIC_RXDB_PASSWORD } from '$env/static/public';
 import { feedbackSchema, type FeedbackCollection } from '$lib/ORM/models/feedback';
-import { linkSchema, type LinkCollection } from '$lib/ORM/models/link';
+import { linkDocMethods, linkSchema, type LinkCollection } from '$lib/ORM/models/link';
 import { talentDocMethods, talentSchema, type TalentCollection } from '$lib/ORM/models/talent';
 import { type TransactionCollection, transactionSchema } from '$lib/ORM/models/transaction';
 import type { StorageTypes } from '$lib/ORM/rxdb';
@@ -47,7 +47,8 @@ const create = async (token: string, key: string, storage: StorageTypes) => {
 			methods: talentDocMethods
 		},
 		links: {
-			schema: linkSchema
+			schema: linkSchema,
+			methods: linkDocMethods
 		},
 		feedbacks: {
 			schema: feedbackSchema

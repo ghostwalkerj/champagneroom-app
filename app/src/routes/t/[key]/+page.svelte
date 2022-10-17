@@ -41,6 +41,7 @@
 	$: ready4Call = false;
 	$: showAlert = false;
 	$: inCall = false;
+	$: updateCount = 0;
 	let us: Awaited<UserStreamType>;
 	let callState = callMachine.initialState;
 	let mediaStream: MediaStream;
@@ -88,6 +89,9 @@
 			.then((link) => {
 				if (link) {
 					currentLink = link;
+					link.get$('state').subscribe(() => {
+						updateCount++;
+					}); // Hack to update the LinkViewer
 					linkService = createLinkMachineService(currentLink.state, updateLink);
 					linkSub = linkService.subscribe((state) => {
 						currentLinkState = JSON.stringify(state.value);
@@ -232,7 +236,9 @@
 				<div class="space-y-6 lg:col-start-1 lg:col-span-2">
 					<!-- Current Link -->
 					<div>
-						<LinkViewer link={currentLink} talent={talentObj} />
+						{#key updateCount}
+							<LinkViewer link={currentLink} talent={talentObj} />
+						{/key}
 					</div>
 
 					<!-- Link Form-->

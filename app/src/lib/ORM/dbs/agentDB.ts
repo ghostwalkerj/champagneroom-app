@@ -6,7 +6,7 @@ import {
 	type AgentCollection
 } from '$lib/ORM/models/agent';
 import { feedbackSchema, type FeedbackCollection } from '$lib/ORM/models/feedback';
-import { linkSchema, type LinkCollection } from '$lib/ORM/models/link';
+import { linkDocMethods, linkSchema, type LinkCollection } from '$lib/ORM/models/link';
 import { talentDocMethods, talentSchema, type TalentCollection } from '$lib/ORM/models/talent';
 import { initRXDB, StorageTypes } from '$lib/ORM/rxdb';
 import { EventEmitter } from 'events';
@@ -60,7 +60,8 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 			methods: talentDocMethods
 		},
 		links: {
-			schema: linkSchema
+			schema: linkSchema,
+			methods: linkDocMethods
 		},
 		feedbacks: {
 			schema: feedbackSchema

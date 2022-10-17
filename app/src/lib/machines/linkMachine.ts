@@ -87,7 +87,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 									target: '#linkMachine.requestedCancellation'
 								},
 								'PAYMENT RECEIVED': {
-									actions: 'sendPayment',
+									actions: ['sendPayment', 'saveLinkState'],
 									target: 'waiting4Funding'
 								}
 							}
@@ -162,14 +162,38 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 					if (stateCallback) stateCallback(context.linkState);
 				},
 
-				sendPayment: (context, event) => {
-					//context.linkState.claim?.transactions.push(event.transaction._id);
-					context.linkState.totalFunding += Number.parseInt(event.transaction.value);
-				},
-
-				initiateDispute: (context, event) => {
-					context.linkState.dispute = event.dispute;
-				}
+				sendPayment: assign((context, event) => {
+					if (context.linkState.claim) {
+						return {
+							linkState: {
+								...context.linkState,
+								totalFunding: context.linkState.totalFunding + Number(event.transaction.value),
+								claim: {
+									...context.linkState.claim,
+									transactions: context.linkState.claim.transactions
+										? [...context.linkState.claim.transactions, event.transaction._id]
+										: [event.transaction._id]
+								}
+							}
+						};
+					} else {
+						return {
+							linkState: {
+								...context.linkState,
+								totalFunding: context.linkState.totalFunding + Number(event.transaction.value)
+							}
+						};
+					}
+				}),
+				initiateDispute: assign((context, event) => {
+					return {
+						linkState: {
+							...context.linkState,
+							status: LinkStatuses.IN_DISPUTE,
+							dispute: event.dispute
+						}
+					};
+				})
 			},
 			guards: {
 				linkUnclaimed: (context) => context.linkState.status === LinkStatuses.UNCLAIMED,

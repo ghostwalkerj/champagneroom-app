@@ -1,6 +1,7 @@
 import type { AgentDocument } from '$lib/ORM/models/agent';
 import type { FeedbackDocument } from '$lib/ORM/models/feedback';
 import type { TalentDocument } from '$lib/ORM/models/talent';
+import { nanoid } from 'nanoid';
 import {
 	toTypedRxJsonSchema,
 	type ExtractDocumentTypeFromTypedRxJsonSchema,
@@ -8,7 +9,12 @@ import {
 	type RxDocument,
 	type RxJsonSchema
 } from 'rxdb';
-import type { TransactionDocument } from './transaction';
+import {
+	type TransactionDocType,
+	type TransactionDocument,
+	TransactionReasonType,
+	TransactionString
+} from './transaction';
 
 export enum LinkStatuses {
 	UNCLAIMED,
@@ -40,6 +46,41 @@ export enum DisputeDecision {
 	CALLER_WON,
 	SPLIT
 }
+
+type LinkDocMethods = {
+	createTransaction: (transaction: {
+		hash: string;
+		block: number;
+		from: string;
+		to: string;
+		value: string;
+		reason: TransactionReasonType;
+	}) => Promise<TransactionDocument>;
+};
+
+export const linkDocMethods: LinkDocMethods = {
+	createTransaction: async function (
+		this: LinkDocument,
+		transaction: {
+			hash: string;
+			block: number;
+			from: string;
+			to: string;
+			value: string;
+			reason: TransactionReasonType;
+		}
+	) {
+		const db = this.collection.database;
+		const _transaction: TransactionDocType = {
+			_id: `${TransactionString}:t${nanoid()}`,
+			createdAt: new Date().getTime(),
+			updatedAt: new Date().getTime(),
+			link: this._id,
+			...transaction
+		};
+		return db.transactions.insert(_transaction);
+	}
+};
 
 export const LinkString = 'link';
 const linkSchemaLiteral = {
@@ -234,7 +275,6 @@ const linkSchemaLiteral = {
 	required: [
 		'_id',
 		'state',
-		'entityType',
 		'talent',
 		'agent',
 		'talentInfo',
@@ -260,5 +300,5 @@ export type LinkDocType = ExtractDocumentTypeFromTypedRxJsonSchema<typeof schema
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 export const linkSchema: RxJsonSchema<LinkDocType> = linkSchemaLiteral;
-export type LinkDocument = RxDocument<LinkDocType> & linkRef;
-export type LinkCollection = RxCollection<LinkDocType>;
+export type LinkDocument = RxDocument<LinkDocType, LinkDocMethods> & linkRef;
+export type LinkCollection = RxCollection<LinkDocType, LinkDocMethods>;

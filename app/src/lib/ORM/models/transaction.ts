@@ -67,7 +67,7 @@ const transactionSchemaLiteral = {
 		}
 	},
 	indexes: [],
-	required: ['_id', 'entityType', 'createdAt', 'hash', 'block', 'from', 'to', 'reason', 'value']
+	required: ['_id', 'createdAt', 'hash', 'block', 'from', 'to', 'reason', 'value']
 } as const;
 
 export const TransactionString = 'transaction';
