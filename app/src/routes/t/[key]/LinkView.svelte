@@ -62,23 +62,24 @@
 				<div class="break-all">{link.fundingAddress}</div>
 			</section>
 
-			<div class="text-md card-title">URL</div>
-
-			<div class="bg-info rounded-box shadow-xl text-accent-content p-4 items-center ">
-				{linkURL}
-			</div>
-			<div class="pt-4 card-actions justify-end">
-				<button on:click={copyLink}>
-					<div class="cursor-pointer flex group">
-						<div class="h-5 mr-1 mb-1 pl-2 group-hover:text-white">
-							<FaRegCopy />
+			<section
+				class="flex flex-col bg-base-100 rounded-2xl flex-shrink-0 text-center p-4 mt-4 items-center justify-center bg-info text-accent-content "
+			>
+				<div>URL</div>
+				<div class="break-all">
+					{linkURL}
+					<button on:click={copyLink}>
+						<div class="cursor-pointer flex group">
+							<div class="h-5 mr-1 mb-1 pl-2 group-hover:text-white">
+								<FaRegCopy />
+							</div>
+							<div class="text-sm group-hover:text-white">
+								<div class="tooltip tooltip-accent {tooltipOpen}" data-tip="Copied!" />
+							</div>
 						</div>
-						<div class="text-sm text-gray-200 group-hover:text-white">
-							<div class="tooltip tooltip-success {tooltipOpen}" data-tip="Copied!">Copy link</div>
-						</div>
-					</div>
-				</button>
-			</div>
+					</button>
+				</div>
+			</section>
 		{:else if talent.currentLink}
 			Loading....
 		{:else}

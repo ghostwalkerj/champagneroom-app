@@ -73,7 +73,6 @@ const feedbackSchemaLiteral = {
 	indexes: ['talent', 'link', 'agent'],
 	required: [
 		'_id',
-		'entityType',
 		'viewed',
 		'rejected',
 		'disconnected',

@@ -17,7 +17,7 @@ export interface Typegen0 {
 		cancelLink: 'REQUEST CANCELLATION';
 		claimLink: 'CLAIM';
 		initiateDispute: 'DISPUTE INITIATED';
-		saveLinkState: 'CLAIM' | 'REQUEST CANCELLATION';
+		saveLinkState: 'CLAIM' | 'PAYMENT RECEIVED' | 'REQUEST CANCELLATION';
 		sendPayment: 'PAYMENT RECEIVED';
 	};
 	eventsCausingServices: {};

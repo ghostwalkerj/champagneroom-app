@@ -1,6 +1,11 @@
 import { PUBLIC_CREATORS_ENDPOINT, PUBLIC_RXDB_PASSWORD } from '$env/static/public';
 import { feedbackSchema, type FeedbackCollection } from '$lib/ORM/models/feedback';
-import { LinkDocument, linkSchema, type LinkCollection } from '$lib/ORM/models/link';
+import {
+	linkDocMethods,
+	LinkDocument,
+	linkSchema,
+	type LinkCollection
+} from '$lib/ORM/models/link';
 import { TransactionCollection, transactionSchema } from '$lib/ORM/models/transaction';
 import type { StorageTypes } from '$lib/ORM/rxdb';
 import { initRXDB } from '$lib/ORM/rxdb';
@@ -47,7 +52,8 @@ const create = async (token: string, linkId: string, storage: StorageTypes) => {
 
 	await _db.addCollections({
 		links: {
-			schema: linkSchema
+			schema: linkSchema,
+			methods: linkDocMethods
 		},
 		feedbacks: {
 			schema: feedbackSchema
@@ -83,7 +89,7 @@ const create = async (token: string, linkId: string, storage: StorageTypes) => {
 		_thisLink = (await linkQuery.exec()) as LinkDocument;
 		if (_thisLink) {
 			const feedbackQuery = _db.feedbacks.findOne(_thisLink.feedback);
-			const transactionQuery = _db.transactions.findOne().where('linkId').eq(linkId);
+			const transactionQuery = _db.transactions.findOne().where('link').eq(linkId);
 
 			repState = _db.feedbacks.syncCouchDB({
 				remote: remoteDB,

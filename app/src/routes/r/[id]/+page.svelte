@@ -140,56 +140,93 @@
 					</div>
 
 					<!-- Link Claim -->
-					<div class="bg-primary text-primary-content card">
-						<div class="text-center card-body items-center">
-							<h2 class="text-2xl card-title">Claim pCall Link</h2>
-							<div class="flex flex-col text-white p-2 justify-center items-center">
-								<form method="post" action="?/claim" use:enhance>
-									<input type="hidden" name="linkId" value={linkId} />
-									<div class="max-w-xs w-full py-2 form-control ">
-										<!-- svelte-ignore a11y-label-has-associated-control -->
-										<label for="caller" class="label">
-											<span class="label-text">Name you want shown</span></label
-										>
-										<div class="rounded-md shadow-sm mt-1 relative">
-											<input
-												name="caller"
-												type="text"
-												class=" max-w-xs w-full py-2 pl-6 input input-bordered input-primary "
-												value={form?.caller ?? ''}
-											/>
-											{#if form?.missingCaller}<div class="shadow-lg alert alert-error">
-													Name is required
-												</div>{/if}
+					{#if linkState.can({ type: 'CLAIM', claim: undefined })}
+						<div class="bg-primary text-primary-content card">
+							<div class="text-center card-body items-center">
+								<h2 class="text-2xl card-title">Claim pCall Link</h2>
+								<div class="flex flex-col text-white p-2 justify-center items-center">
+									<form method="post" action="?/claim" use:enhance>
+										<div class="max-w-xs w-full py-2 form-control ">
+											<!-- svelte-ignore a11y-label-has-associated-control -->
+											<label for="caller" class="label">
+												<span class="label-text">Name you want shown</span></label
+											>
+											<div class="rounded-md shadow-sm mt-1 relative">
+												<input
+													name="caller"
+													type="text"
+													class=" max-w-xs w-full py-2 pl-6 input input-bordered input-primary "
+													value={form?.caller ?? ''}
+												/>
+												{#if form?.missingCaller}<div class="shadow-lg alert alert-error">
+														Name is required
+													</div>{/if}
+											</div>
 										</div>
-									</div>
-									<div class="max-w-xs w-full py-2 form-control ">
-										<!-- svelte-ignore a11y-label-has-associated-control -->
-										<label for="pin" class="label">
-											<span class="label-text">8 Digit Pin</span></label
-										>
-										<div class="rounded-md shadow-sm mt-1 relative">
-											<input
-												name="pin"
-												type="text"
-												class=" max-w-xs w-full py-2 pl-6 input input-bordered input-primary "
-												value={form?.pin ?? ''}
-											/>
-											{#if form?.missingPin}<div class="shadow-lg alert alert-error">
-													Pin is required
-												</div>{/if}
+										<div class="max-w-xs w-full py-2 form-control ">
+											<!-- svelte-ignore a11y-label-has-associated-control -->
+											<label for="pin" class="label">
+												<span class="label-text">8 Digit Pin</span></label
+											>
+											<div class="rounded-md shadow-sm mt-1 relative">
+												<input
+													name="pin"
+													type="text"
+													class=" max-w-xs w-full py-2 pl-6 input input-bordered input-primary "
+													value={form?.pin ?? ''}
+													minlength="8"
+													maxlength="8"
+												/>
+												{#if form?.missingPin}<div class="shadow-lg alert alert-error">
+														Pin is required
+													</div>{/if}
+											</div>
 										</div>
-									</div>
-									<div class="py-4">
-										<button class="btn btn-secondary" type="submit">Claim Link</button>
-									</div>
-								</form>
+										<div class="py-4">
+											<button class="btn btn-secondary" type="submit">Claim Link</button>
+										</div>
+									</form>
+								</div>
 							</div>
 						</div>
-					</div>
 
-					<div class="pb-6 w-full flex justify-center">
-						{#if linkState.matches('claimed')}
+						<!-- Link Transaction -->
+					{:else if linkState.matches('claimed.waiting4Funding')}
+						<div class="bg-primary text-primary-content card">
+							<div class="text-center card-body items-center">
+								<h2 class="text-2xl card-title">Fund pCall Link</h2>
+								<div class="flex flex-col text-white p-2 justify-center items-center">
+									<form method="post" action="?/payment_sent" use:enhance>
+										<div class="max-w-xs w-full py-2 form-control ">
+											<!-- svelte-ignore a11y-label-has-associated-control -->
+											<label for="amount" class="label">
+												<span class="label-text">Amount</span></label
+											>
+											<div class="rounded-md shadow-sm mt-1 relative">
+												<input
+													name="amount"
+													type="text"
+													class=" max-w-xs w-full py-2 pl-6 input input-bordered input-primary "
+													value={form?.amount ?? ''}
+												/>
+												{#if form?.missingAmount}<div class="shadow-lg alert alert-error">
+														Amount is required
+													</div>{/if}
+												{#if form?.invalidAmount}<div class="shadow-lg alert alert-error">
+														Invalid Amount
+													</div>{/if}
+											</div>
+										</div>
+										<div class="py-4">
+											<button class="btn btn-secondary" type="submit">Send Payment</button>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>
+						<!-- Call -->
+					{:else}
+						<div class="text-center pb-6  w-full">
 							<button
 								class="btn btn-secondary"
 								on:click={call}
@@ -197,18 +234,8 @@
 							>
 								Call {linkObj.talentInfo.name} Now</button
 							>
-						{:else if linkState.matches('claimed')}
-							<button
-								class="btn btn-secondary"
-								on:click={call}
-								disabled={!callState.matches('ready4Call') || !userstream}
-							>
-								Call {linkObj.talentInfo.name} Now</button
-							>
-						{:else}
-							<button class="btn btn-secondary" on:click={pay}>Pay for Call</button>
-						{/if}
-					</div>
+						</div>
+					{/if}
 				</div>
 				<div class="bg-base-200  text-white card lg:min-w-200">
 					<div class="text-center card-body items-center ">
@@ -266,7 +293,7 @@
 		</div>
 		<div class="stat">
 			<div class="stat-title">Link State</div>
-			<div class="stat-value">{linkState.value}</div>
+			<div class="stat-value">{JSON.stringify(linkState.value)}</div>
 		</div>
 	</div>
 </div>
