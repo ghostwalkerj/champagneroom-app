@@ -87,12 +87,13 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 									target: '#linkMachine.requestedCancellation'
 								},
 								'PAYMENT RECEIVED': {
-									actions: ['sendPayment', 'saveLinkState'],
-									target: 'waiting4Funding'
+									actions: ['receivePayment', 'saveLinkState']
 								}
 							}
 						},
-						canCall: {}
+						canCall: {
+							type: 'final'
+						}
 					}
 				},
 				requestedCancellation: {
@@ -162,7 +163,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 					if (stateCallback) stateCallback(context.linkState);
 				},
 
-				sendPayment: assign((context, event) => {
+				receivePayment: assign((context, event) => {
 					if (context.linkState.claim) {
 						return {
 							linkState: {
@@ -185,6 +186,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 						};
 					}
 				}),
+
 				initiateDispute: assign((context, event) => {
 					return {
 						linkState: {
