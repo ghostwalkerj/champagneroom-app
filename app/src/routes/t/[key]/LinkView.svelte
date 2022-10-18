@@ -44,7 +44,7 @@
 				<section
 					class="flex flex-col bg-base-100 rounded-2xl flex-shrink-0 text-white text-center items-center justify-center"
 				>
-					<div class="stats stats-vertical stats-shadow lg:stats-horizontal">
+					<div class="stats stats-vertical stats-shadow md:stats-horizontal">
 						<div class="stat">
 							<div class="text-primary w-10 stat-figure">
 								<FaMoneyBillWave />

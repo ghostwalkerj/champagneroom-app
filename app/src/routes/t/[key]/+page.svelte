@@ -93,23 +93,27 @@
 			.exec()
 			.then((link) => {
 				if (link) {
-					currentLink = link;
-					link.get$('state').subscribe(() => {
-						updateCount++;
-					}); // Hack to update the LinkViewer
-					linkService = createLinkMachineService(currentLink.state, updateLink);
-					linkSub = linkService.subscribe((state) => {
-						currentLinkState = state;
-						if (state.changed) {
-							canCreateLink =
-								state.done ||
-								state.can({
-									type: 'REQUEST CANCELLATION',
-									cancel: undefined
-								});
-							canCall = state.matches('claimed.canCall');
-							if (canCall) initVC();
-						}
+					link.$.subscribe((_link) => {
+						currentLink = _link;
+
+						// link.get$('state').subscribe(() => {
+						// 	updateCount++;
+						// 	console.log('count', updateCount);
+						// }); // Hack to update the LinkViewer
+						linkService = createLinkMachineService(currentLink.state, updateLink);
+						linkSub = linkService.subscribe((state) => {
+							currentLinkState = state;
+							if (state.changed) {
+								canCreateLink =
+									state.done ||
+									state.can({
+										type: 'REQUEST CANCELLATION',
+										cancel: undefined
+									});
+								canCall = state.matches('claimed.canCall');
+								if (canCall) initVC();
+							}
+						});
 					});
 				}
 			});
@@ -245,9 +249,7 @@
 				<div class="space-y-6 lg:col-start-1 lg:col-span-2">
 					<!-- Current Link -->
 					<div>
-						{#key updateCount}
-							<LinkViewer link={currentLink} talent={talentObj} linkState={currentLinkState} />
-						{/key}
+						<LinkViewer link={currentLink} talent={talentObj} linkState={currentLinkState} />
 					</div>
 
 					<!-- Link Form-->
