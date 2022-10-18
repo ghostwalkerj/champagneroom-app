@@ -8,12 +8,12 @@ import {
 import { feedbackSchema, type FeedbackCollection } from '$lib/ORM/models/feedback';
 import { linkDocMethods, linkSchema, type LinkCollection } from '$lib/ORM/models/link';
 import { talentDocMethods, talentSchema, type TalentCollection } from '$lib/ORM/models/talent';
+import type { TransactionCollection } from '$lib/ORM/models/transaction';
 import { initRXDB, StorageTypes } from '$lib/ORM/rxdb';
 import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
 import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
-import type { TransactionCollection } from '$lib/ORM/models/transaction';
 
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 100;

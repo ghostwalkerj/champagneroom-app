@@ -6,23 +6,19 @@
 	import VideoPreview from '$lib/components/calls/VideoPreview.svelte';
 	import ProfilePhoto from '$lib/components/forms/ProfilePhoto.svelte';
 	import { callMachine } from '$lib/machines/callMachine';
-	import {
-		createLinkMachineService,
-		createLinkMachine,
-		type LinkMachineServiceType,
-		type LinkMachineStateType
-	} from '$lib/machines/linkMachine';
+	import { createLinkMachineService, type LinkMachineServiceType } from '$lib/machines/linkMachine';
 	import { talentDB, type TalentDBType } from '$lib/ORM/dbs/talentDB';
 	import { ActorType, type LinkDocType, type LinkDocument } from '$lib/ORM/models/link';
 	import type { TalentDocType, TalentDocument } from '$lib/ORM/models/talent';
 	import { StorageTypes } from '$lib/ORM/rxdb';
+	import { currencyFormatter } from '$lib/util/constants';
 	import { userStream, type UserStreamType } from '$lib/util/userStream';
 	import type { VideoCallType } from '$lib/util/videoCall';
 	import { onDestroy, onMount } from 'svelte';
 	import { PhoneIncomingIcon } from 'svelte-feather-icons';
 	import { createForm } from 'svelte-forms-lib';
 	import StarRating from 'svelte-star-rating';
-	import { State, type Subscription } from 'xstate';
+	import type { Subscription } from 'xstate';
 	import * as yup from 'yup';
 	import type { PageData } from './$types';
 	import LinkViewer from './LinkView.svelte';
@@ -41,6 +37,8 @@
 	let linkService: LinkMachineServiceType;
 	let linkSub: Subscription;
 	$: canCreateLink = talentObj.currentLink === undefined; // If there is no current link, then we can create a new one
+	$: canCancelLink = false;
+
 	$: canCall = false;
 	$: ready4Call = false;
 	$: showAlert = false;
@@ -52,7 +50,7 @@
 	let videoCall: any;
 	let currentLinkState = currentLink
 		? createLinkMachineService(currentLink.state).getSnapshot()
-		: State.from('Loading...');
+		: undefined;
 
 	const updateLink = (linkState: LinkDocument['state']) => {
 		if (currentLink)
@@ -91,21 +89,15 @@
 				if (link) {
 					link.$.subscribe((_link) => {
 						currentLink = _link;
-
-						// link.get$('state').subscribe(() => {
-						// 	updateCount++;
-						// 	console.log('count', updateCount);
-						// }); // Hack to update the LinkViewer
 						linkService = createLinkMachineService(currentLink.state, updateLink);
 						linkSub = linkService.subscribe((state) => {
 							currentLinkState = state;
 							if (state.changed) {
-								canCreateLink =
-									state.done ||
-									state.can({
-										type: 'REQUEST CANCELLATION',
-										cancel: undefined
-									});
+								canCancelLink = state.can({
+									type: 'REQUEST CANCELLATION',
+									cancel: undefined
+								});
+								canCreateLink = state.done ?? true;
 								canCall = state.matches('claimed.canCall');
 								if (canCall) initVC();
 							}
@@ -189,7 +181,7 @@
 		onSubmit: (values) => {
 			if (talent) {
 				// Must expire the current link, then create a new one.
-				if (currentLink && linkService) {
+				if (currentLinkState && linkService) {
 					linkService.send({
 						type: 'REQUEST CANCELLATION',
 						cancel: {
@@ -253,52 +245,72 @@
 						<LinkViewer link={currentLink} talent={talentObj} linkState={currentLinkState} />
 					</div>
 
-					<!-- Link Form-->
-					<div class="bg-primary text-primary-content card">
-						<div class="text-center card-body items-center">
-							<h2 class="text-2xl card-title">Create a New pCall Link</h2>
-							<div class="flex flex-col text-white p-2 justify-center items-center">
-								<form on:submit|preventDefault={handleSubmit}>
-									<div class="max-w-xs w-full py-2 form-control ">
-										<!-- svelte-ignore a11y-label-has-associated-control -->
-										<label for="price" class="label">
-											<span class="label-text">Requested Amount in USD</span></label
-										>
-										<div class="rounded-md shadow-sm mt-1 relative">
-											<div
-												class="flex pl-3 inset-y-0 left-0 absolute items-center pointer-events-none"
-											>
-												<span class="text-gray-500 sm:text-sm"> $ </span>
-											</div>
-											<input
-												type="text"
-												name="amount"
-												id="amount"
-												class=" max-w-xs w-full py-2 pl-6 input input-bordered input-primary "
-												placeholder="0.00"
-												aria-describedby="price-currency"
-												on:change={handleChange}
-												bind:value={$form.amount}
-											/>
-											<div
-												class="flex pr-3 inset-y-0 right-0 absolute items-center pointer-events-none"
-											>
-												<span class="text-gray-500 sm:text-sm" id="price-currency"> USDC </span>
-											</div>
-										</div>
-									</div>
-									{#if $errors.amount}
-										<div class="shadow-lg alert alert-error">{$errors.amount}</div>
-									{/if}
+					{#if canCancelLink}
+						<!-- Link Form-->
+						<div class="bg-primary text-primary-content card">
+							<div class="text-center card-body items-center">
+								<div class="text-2xl card-title">Cancel Your pCall Link</div>
+								<div class="text xl">
+									If you cancel this pCall link, the link will be deactivated ans nobody can use it
+									to call.
+								</div>
+								{#if currentLink.state.claim && currentLink.state.totalFunding > 0}
+									{currencyFormatter.format(currentLink.state.totalFunding)} will be refunded to "{currentLink
+										.state.claim.caller}"
+								{/if}
+
+								<div class="flex flex-col text-white p-2 justify-center items-center">
 									<div class="py-4">
-										<button class="btn btn-secondary" type="submit" disabled={!canCreateLink}
-											>Generate Link</button
-										>
+										<button class="btn btn-secondary">Cancel Link</button>
 									</div>
-								</form>
+								</div>
 							</div>
 						</div>
-					</div>
+					{:else if canCreateLink}
+						<div class="bg-primary text-primary-content card">
+							<div class="text-center card-body items-center">
+								<h2 class="text-2xl card-title">Create a New pCall Link</h2>
+								<div class="flex flex-col text-white p-2 justify-center items-center">
+									<form on:submit|preventDefault={handleSubmit}>
+										<div class="max-w-xs w-full py-2 form-control ">
+											<!-- svelte-ignore a11y-label-has-associated-control -->
+											<label for="price" class="label">
+												<span class="label-text">Requested Amount in USD</span></label
+											>
+											<div class="rounded-md shadow-sm mt-1 relative">
+												<div
+													class="flex pl-3 inset-y-0 left-0 absolute items-center pointer-events-none"
+												>
+													<span class="text-gray-500 sm:text-sm"> $ </span>
+												</div>
+												<input
+													type="text"
+													name="amount"
+													id="amount"
+													class=" max-w-xs w-full py-2 pl-6 input input-bordered input-primary "
+													placeholder="0.00"
+													aria-describedby="price-currency"
+													on:change={handleChange}
+													bind:value={$form.amount}
+												/>
+												<div
+													class="flex pr-3 inset-y-0 right-0 absolute items-center pointer-events-none"
+												>
+													<span class="text-gray-500 sm:text-sm" id="price-currency"> USDC </span>
+												</div>
+											</div>
+										</div>
+										{#if $errors.amount}
+											<div class="shadow-lg alert alert-error">{$errors.amount}</div>
+										{/if}
+										<div class="py-4">
+											<button class="btn btn-secondary" type="submit">Generate Link</button>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>
+					{/if}
 
 					<!-- Camera  Preview -->
 					<div class="bg-primary text-primary-content card">

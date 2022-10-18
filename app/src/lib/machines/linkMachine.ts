@@ -79,8 +79,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 							},
 							on: {
 								'REQUEST CANCELLATION': {
-									target: '#linkMachine.requestedCancellation',
-									actions: 'cancelLink'
+									target: '#linkMachine.requestedCancellation'
 								},
 								'PAYMENT RECEIVED': {
 									actions: ['receivePayment', 'saveLinkState']
@@ -91,6 +90,9 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 							on: {
 								'CALL CONNECTED': {
 									target: 'inCall'
+								},
+								'REQUEST CANCELLATION': {
+									target: '#linkMachine.requestedCancellation'
 								}
 							}
 						},

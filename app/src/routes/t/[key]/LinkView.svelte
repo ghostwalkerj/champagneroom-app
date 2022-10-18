@@ -10,7 +10,7 @@
 	import urlJoin from 'url-join';
 	export let link: LinkDocType;
 	export let talent: TalentDocType;
-	export let linkState: LinkMachineStateType;
+	export let linkState: LinkMachineStateType | undefined;
 	let tooltipOpen = '';
 
 	$: linkURL = '';

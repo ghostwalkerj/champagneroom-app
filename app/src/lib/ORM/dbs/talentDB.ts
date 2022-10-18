@@ -2,7 +2,7 @@ import { PUBLIC_CREATORS_ENDPOINT, PUBLIC_RXDB_PASSWORD } from '$env/static/publ
 import { feedbackSchema, type FeedbackCollection } from '$lib/ORM/models/feedback';
 import { linkDocMethods, linkSchema, type LinkCollection } from '$lib/ORM/models/link';
 import { talentDocMethods, talentSchema, type TalentCollection } from '$lib/ORM/models/talent';
-import { type TransactionCollection, transactionSchema } from '$lib/ORM/models/transaction';
+import { transactionSchema, type TransactionCollection } from '$lib/ORM/models/transaction';
 import type { StorageTypes } from '$lib/ORM/rxdb';
 import { initRXDB } from '$lib/ORM/rxdb';
 import { EventEmitter } from 'events';

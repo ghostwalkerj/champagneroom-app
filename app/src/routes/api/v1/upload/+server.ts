@@ -1,5 +1,7 @@
 import {
-	INFURA_IPFS_API_PORT, INFURA_IPFS_API_SECRET, INFURA_IPFS_API_URL,
+	INFURA_IPFS_API_PORT,
+	INFURA_IPFS_API_SECRET,
+	INFURA_IPFS_API_URL,
 	INFURA_IPFS_DEDICATED_GATEWAY,
 	INFURA_IPFS_PROJECT_ID
 } from '$env/static/private';
@@ -8,8 +10,7 @@ import { create } from 'ipfs-http-client';
 import type { RequestHandler } from './$types';
 
 const auth =
-	'Basic ' +
-	Buffer.from(INFURA_IPFS_PROJECT_ID + ':' + INFURA_IPFS_API_SECRET).toString('base64');
+	'Basic ' + Buffer.from(INFURA_IPFS_PROJECT_ID + ':' + INFURA_IPFS_API_SECRET).toString('base64');
 
 const addOptions = {
 	pin: true
