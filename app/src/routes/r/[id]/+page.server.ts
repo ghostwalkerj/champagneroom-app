@@ -8,7 +8,6 @@ import { TransactionReasonType } from '$lib/ORM/models/transaction';
 import { StorageTypes } from '$lib/ORM/rxdb';
 import { error, invalid } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
-import { from } from 'rxjs';
 
 export const load: import('./$types').PageServerLoad = async ({ params }) => {
 	const linkId = params.id;

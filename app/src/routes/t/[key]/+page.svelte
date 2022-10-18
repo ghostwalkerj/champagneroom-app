@@ -8,6 +8,7 @@
 	import { callMachine } from '$lib/machines/callMachine';
 	import {
 		createLinkMachineService,
+		createLinkMachine,
 		type LinkMachineServiceType,
 		type LinkMachineStateType
 	} from '$lib/machines/linkMachine';
@@ -33,24 +34,25 @@
 
 	let talentObj = data.talent as TalentDocType;
 	let completedCalls = data.completedCalls as LinkDocType[];
-	let currentLink: LinkDocument;
+	let currentLink = data.currentLink as LinkDocument;
 	let key = $page.params.key;
 	let vc: VideoCallType;
 	let talent: TalentDocument;
 	let linkService: LinkMachineServiceType;
 	let linkSub: Subscription;
-	let currentLinkState: LinkMachineStateType = State.from('Loading...');
 	$: canCreateLink = talentObj.currentLink === undefined; // If there is no current link, then we can create a new one
 	$: canCall = false;
 	$: ready4Call = false;
 	$: showAlert = false;
 	$: inCall = false;
-	$: updateCount = 0;
 	let us: Awaited<UserStreamType>;
 	let callState = callMachine.initialState;
 	let mediaStream: MediaStream;
 	$: callerName = '';
 	let videoCall: any;
+	let currentLinkState = currentLink
+		? createLinkMachineService(currentLink.state).getSnapshot()
+		: State.from('Loading...');
 
 	const updateLink = (linkState: LinkDocument['state']) => {
 		if (currentLink)
@@ -62,28 +64,22 @@
 			});
 	};
 
-	if (browser) {
-		global = window;
-		import('$lib/util/videoCall').then((_vc) => {
-			videoCall = _vc.videoCall;
-		});
-		talentDB(token, key, StorageTypes.IDB).then((db: TalentDBType) => {
-			db.talents
-				.findOne(talentObj._id)
-				.exec()
-				.then((_talent) => {
-					if (_talent) {
-						talentObj = _talent;
-						talent = _talent;
-						talent.get$('currentLink').subscribe((linkId) => {
-							if (linkId) {
-								startLinkMachine(db, linkId);
-							}
-						});
-					}
-				});
-		});
-	}
+	talentDB(token, key, StorageTypes.IDB).then((db: TalentDBType) => {
+		db.talents
+			.findOne(talentObj._id)
+			.exec()
+			.then((_talent) => {
+				if (_talent) {
+					talentObj = _talent;
+					talent = _talent;
+					talent.get$('currentLink').subscribe((linkId) => {
+						if (linkId) {
+							startLinkMachine(db, linkId);
+						}
+					});
+				}
+			});
+	});
 
 	const startLinkMachine = (db: TalentDBType, linkId: string) => {
 		if (linkService) linkService.stop();
@@ -147,22 +143,27 @@
 	};
 
 	const initVC = () => {
-		if (videoCall) {
-			if (vc) vc.destroy();
-			if (currentLink) {
-				vc = videoCall(currentLink.callId);
-				vc.callState.subscribe((cs) => {
-					if (cs) {
-						callState = cs;
-						showAlert = callState.matches('receivingCall');
-						inCall = callState.matches('inCall');
-						ready4Call = callState.matches('ready4Call');
-					}
-				});
-				vc.callerName.subscribe((name) => {
-					if (name) callerName = name;
-				});
-			}
+		if (browser) {
+			global = window;
+			import('$lib/util/videoCall').then((_vc) => {
+				videoCall = _vc.videoCall;
+
+				if (vc) vc.destroy();
+				if (currentLink) {
+					vc = videoCall(currentLink.callId);
+					vc.callState.subscribe((cs) => {
+						if (cs) {
+							callState = cs;
+							showAlert = callState.matches('receivingCall');
+							inCall = callState.matches('inCall');
+							ready4Call = callState.matches('ready4Call');
+						}
+					});
+					vc.callerName.subscribe((name) => {
+						if (name) callerName = name;
+					});
+				}
+			});
 		}
 	};
 

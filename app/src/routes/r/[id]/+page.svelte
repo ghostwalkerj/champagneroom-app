@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
 	import VideoCall from '$lib/components/calls/VideoCall.svelte';
@@ -14,7 +15,6 @@
 	import type { VideoCallType } from '$lib/util/videoCall';
 	import { onMount } from 'svelte';
 	import { uniqueNamesGenerator } from 'unique-names-generator';
-	import type { Subscription } from 'xstate';
 	import type { PageData } from './$types';
 	import FeedbackForm from './FeedbackForm.svelte';
 	import LinkDetail from './LinkDetail.svelte';
@@ -36,8 +36,6 @@
 	let us: Awaited<UserStreamType>;
 	let feedback: FeedbackDocument;
 
-	let linkSub: Subscription;
-
 	$: linkService = createLinkMachineService(linkObj.state);
 	$: linkState = linkService.initialState;
 	$: showFeedback = false;
@@ -51,7 +49,7 @@
 				linkObj = _link as LinkDocument;
 				// Here is where we run the machine and do all the logic based on the state
 				linkService = createLinkMachineService(_link.state);
-				linkSub = linkService.subscribe((state) => {
+				linkService.subscribe((state) => {
 					linkState = state;
 					if (state.matches('claimed.canCall')) initVC();
 				});
@@ -90,14 +88,16 @@
 	};
 
 	const initVC = () => {
-		import('$lib/util/videoCall').then((_vc) => {
-			//TODO: Should we wait until call is paid to connect?  Or connect early to check for errors?
-			videoCall = _vc.videoCall;
-			vc = videoCall();
-			vc.callState.subscribe((state) => {
-				callState = state;
+		if (browser) {
+			import('$lib/util/videoCall').then((_vc) => {
+				//TODO: Should we wait until call is paid to connect?  Or connect early to check for errors?
+				videoCall = _vc.videoCall;
+				vc = videoCall();
+				vc.callState.subscribe((state) => {
+					callState = state;
+				});
 			});
-		});
+		}
 	};
 
 	const call = async () => {
@@ -114,10 +114,6 @@
 		// 		value: $web3.utils.toWei(amount.toString(), 'ether')
 		// 	});
 		// }
-	};
-
-	const pay = () => {
-		sendTransaction(linkObj.requestedAmount, linkObj.fundingAddress);
 	};
 
 	// All depends on the link status
