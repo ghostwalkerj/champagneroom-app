@@ -10,6 +10,7 @@
 	import TalentForm from './TalentForm.svelte';
 	import TalentTable from './TalentTable.svelte';
 	import TopTalent from './TopTalent.svelte';
+	import WeeklyBooking from './WeeklyBooking.svelte';
 
 	export let data: PageData;
 	const token = data.token;
@@ -69,6 +70,9 @@
 						{#key talents}
 							<div class="p-1 row-span-2 ">
 								<TopTalent {talents} />
+							</div>
+							<div class="p-1  lg:col-span-2">
+								<WeeklyBooking {talents} />
 							</div>
 							<div class="p-1  lg:col-span-2">
 								<TalentTable {talents} />
