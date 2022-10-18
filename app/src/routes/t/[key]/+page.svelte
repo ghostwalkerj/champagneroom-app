@@ -193,7 +193,7 @@
 						}
 					});
 				}
-				talent.createLink(Number.parseInt(values.amount));
+				talent.createLink(Number(values.amount));
 				handleReset();
 			}
 		}

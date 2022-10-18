@@ -19,7 +19,10 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 				events: {} as
 					| { type: 'CLAIM'; claim: LinkStateType['claim'] }
 					| { type: 'REQUEST CANCELLATION'; cancel: LinkStateType['cancel'] }
-					| { type: 'REFUND ISSUED' }
+					| {
+							type: 'REFUND RECEIVED';
+							transaction: TransactionDocType;
+					  }
 					| {
 							type: 'PAYMENT RECEIVED';
 							transaction: TransactionDocType;
@@ -110,15 +113,15 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 					states: {
 						waiting4Refund: {
 							on: {
-								'REFUND ISSUED': {
-									target: '#linkMachine.cancelled'
+								'REFUND RECEIVED': {
+									actions: ['recieveRefund', 'saveLinkState']
 								}
 							}
 						}
 					},
 					always: {
 						target: 'cancelled',
-						cond: (context) => context.linkState.totalFunding === 0
+						cond: (context) => context.linkState.totalFunding <= 0
 					}
 				},
 				wating4Finalization: {
@@ -190,8 +193,29 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 					} else {
 						return {
 							linkState: {
+								...context.linkState
+							}
+						};
+					}
+				}),
+				recieveRefund: assign((context, event) => {
+					if (context.linkState.cancel) {
+						return {
+							linkState: {
 								...context.linkState,
-								totalFunding: context.linkState.totalFunding + Number(event.transaction.value)
+								totalFunding: context.linkState.totalFunding - Number(event.transaction.value),
+								cancel: {
+									...context.linkState.cancel,
+									transactions: context.linkState.cancel.transactions
+										? [...context.linkState.cancel.transactions, event.transaction._id]
+										: [event.transaction._id]
+								}
+							}
+						};
+					} else {
+						return {
+							linkState: {
+								...context.linkState
 							}
 						};
 					}

@@ -147,7 +147,7 @@ const linkSchemaLiteral = {
 							items: { type: 'string' }
 						}
 					},
-					required: ['createdAt', 'canceler', 'canceledInState', 'transactions']
+					required: ['createdAt', 'canceler', 'canceledInState']
 				},
 				claim: {
 					type: 'object',

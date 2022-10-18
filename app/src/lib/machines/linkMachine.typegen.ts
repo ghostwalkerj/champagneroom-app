@@ -18,7 +18,8 @@ export interface Typegen0 {
 		claimLink: 'CLAIM';
 		initiateDispute: 'DISPUTE INITIATED';
 		receivePayment: 'PAYMENT RECEIVED';
-		saveLinkState: 'CLAIM' | 'PAYMENT RECEIVED' | 'REQUEST CANCELLATION';
+		recieveRefund: 'REFUND RECEIVED';
+		saveLinkState: 'CLAIM' | 'PAYMENT RECEIVED' | 'REFUND RECEIVED' | 'REQUEST CANCELLATION';
 	};
 	eventsCausingServices: {};
 	eventsCausingGuards: {
