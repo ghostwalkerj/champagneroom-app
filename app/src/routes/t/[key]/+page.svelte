@@ -314,7 +314,7 @@
 					<div class="lg:col-start-3 lg:col-span-1">
 						<div class="bg-primary text-primary-content card">
 							<div class="text-center card-body items-center">
-								<h2 class="text-2xl card-title">pCall Status</h2>
+								<h2 class="text-2xl card-title">Call Status</h2>
 								{#if ready4Call}
 									<div class="text-2xl">Waiting for Incoming Call</div>
 								{:else}

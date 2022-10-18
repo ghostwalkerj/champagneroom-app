@@ -8,6 +8,7 @@
 	import FaMoneyBillWave from 'svelte-icons/fa/FaMoneyBillWave.svelte';
 	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';
 	import urlJoin from 'url-join';
+	import { matchesState, t } from 'xstate';
 	export let link: LinkDocType;
 	export let talent: TalentDocType;
 	export let linkState: LinkMachineStateType;
@@ -28,8 +29,17 @@
 		<h2 class="text-2xl card-title">Your Outstanding pCall Link</h2>
 		{#if talent && link && linkState}
 			<div class="container mx-auto grid p-6 gap-4 grid-row-2">
-				<div class="bg-info rounded-box shadow-xl text-accent-content p-4 items-center ">
-					{linkState.value}
+				<div class="text-center card-body items-center bg-secondary rounded-2xl">
+					<div class="text-xl">
+						{#if linkState.matches('unclaimed')}
+							Your pCall link has not Been Claimed
+						{:else if linkState.matches('claimed') && link.state.claim}
+							Your pCall link was claimed by
+							<div>{link.state.claim.caller}</div>
+							<div>on</div>
+							<div>{new Date(link.state.claim.createdAt).toLocaleString()}</div>
+						{/if}
+					</div>
 				</div>
 
 				<section
