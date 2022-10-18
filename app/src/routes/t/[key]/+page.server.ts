@@ -7,6 +7,7 @@ import jwt from 'jsonwebtoken';
 import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ params }) => {
 	const key = params.key;
+
 	if (key === null) {
 		throw error(404, 'Key not found');
 	}
@@ -22,12 +23,10 @@ export const load: PageServerLoad = async ({ params }) => {
 	const db = await talentDB(token, key, StorageTypes.NODE_WEBSQL);
 	if (!db) {
 		throw error(500, 'no db');
-
 	}
 	const _talent = await db.talents.findOne().where('key').equals(key).exec();
 	if (!_talent) {
 		throw error(404, 'Talent not found');
-
 	}
 	const _currentLink = (await _talent.populate('currentLink')) as LinkDocument;
 	const _completedCalls = (await _talent.populate('stats.completedCalls')) as LinkDocument[];

@@ -10,10 +10,10 @@ import {
 	type RxJsonSchema
 } from 'rxdb';
 import {
-	type TransactionDocType,
-	type TransactionDocument,
 	TransactionReasonType,
-	TransactionString
+	TransactionString,
+	type TransactionDocType,
+	type TransactionDocument
 } from './transaction';
 
 export enum LinkStatuses {

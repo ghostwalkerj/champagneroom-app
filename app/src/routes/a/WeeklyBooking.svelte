@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { TalentDocument } from '$lib/ORM/models/talent';
-	import { currencyFormatter } from '$lib/util/constants';
 	import Chart from 'chart.js/auto';
 	import ChartDataLabels from 'chartjs-plugin-datalabels';
 	import spacetime from 'spacetime';
@@ -24,40 +23,40 @@
 	}
 
 	const options = {
-        elements: {
-            line: {
-                borderColor: "#58C7F3",
-                tension: .4
-            }    
-        }, 
-        scales : {
-            x: {
-                grid: {
-                    display: false
-                }
-            }
-        },
-        legend: {
-            labels: {
-                usePointStyle: true, // show legend as point instead of box
-                fontSize: 10 // legend point size is based on fontsize
-            }
-        }
-    };
+		elements: {
+			line: {
+				borderColor: '#58C7F3',
+				tension: 0.4
+			}
+		},
+		scales: {
+			x: {
+				grid: {
+					display: false
+				}
+			}
+		},
+		legend: {
+			labels: {
+				usePointStyle: true, // show legend as point instead of box
+				fontSize: 10 // legend point size is based on fontsize
+			}
+		}
+	};
 
 	$: data = {
-        type: "line",
-		labels: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+		type: 'line',
+		labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
 		datasets: [
 			{
-                label: "Weekly Bookings",
+				label: 'Weekly Bookings',
 				data: [2, 3, 1, 2, 4, 5, 2],
 				borderWidth: 2,
-                pointBorderColor: "#E779C1",
-                pointBorderWidth: 1,
-                pointStyle: 'circle',
-                pointRadius: 10,
-                pointHoverRadius: 15
+				pointBorderColor: '#E779C1',
+				pointBorderWidth: 1,
+				pointStyle: 'circle',
+				pointRadius: 10,
+				pointHoverRadius: 15
 			}
 		]
 	};
@@ -66,9 +65,7 @@
 
 <div class="bg-primary text-primary-content  card">
 	<div class="text-center card-body items-center">
-		<div class="text-2xl card-title capitalize">
-			Weekly Bookings
-		</div>
+		<div class="text-2xl card-title capitalize">Weekly Bookings</div>
 		{#if talents && talents.length != 0}
 			{#if talentData.length > 0}
 				{#key talentData}

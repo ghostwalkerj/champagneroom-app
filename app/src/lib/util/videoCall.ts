@@ -1,8 +1,8 @@
+import { PUBLIC_CALL_TIMEOUT } from '$env/static/public';
 import callMachine from '$lib/machines/callMachine';
 import { Peer } from 'peerjs';
 import { readable, writable } from 'svelte/store';
 import { interpret } from 'xstate';
-import { PUBLIC_CALL_TIMEOUT } from '$env/static/public';
 
 const CALL_TIMEOUT = Number.parseInt(PUBLIC_CALL_TIMEOUT || '30000');
 
@@ -35,7 +35,7 @@ export const videoCall = (userId?: string) => {
 		});
 	});
 
-	callService.onTransition(state => {
+	callService.onTransition((state) => {
 		_callState.set(state);
 	});
 
@@ -158,7 +158,8 @@ export const videoCall = (userId?: string) => {
 			});
 			dataConnection.on('close', () => {
 				console.log('Data connection closed');
-				callService.send; ({ type: 'CALL DISCONNECTED' });
+				callService.send;
+				({ type: 'CALL DISCONNECTED' });
 			});
 		} else {
 			console.log('Error making call');
@@ -168,7 +169,8 @@ export const videoCall = (userId?: string) => {
 
 	const rejectCall = () => {
 		clearTimeout(rejectCallTimer);
-		callService.send; ({ type: 'CALL REJECTED' });
+		callService.send;
+		({ type: 'CALL REJECTED' });
 		resetCallState();
 	};
 
@@ -183,12 +185,14 @@ export const videoCall = (userId?: string) => {
 		});
 		mediaConnection.on('close', () => {
 			console.log('Call closed');
-			callService.send; ({ type: 'CALL DISCONNECTED' });
+			callService.send;
+			({ type: 'CALL DISCONNECTED' });
 		});
 	};
 
 	const hangUp = () => {
-		callService.send; ({ type: 'CALL HANGUP' });
+		callService.send;
+		({ type: 'CALL HANGUP' });
 		resetCallState();
 	};
 
@@ -209,7 +213,7 @@ export const videoCall = (userId?: string) => {
 		callState,
 		remoteStream,
 		callerName,
-		destroy,
+		destroy
 	};
 };
 

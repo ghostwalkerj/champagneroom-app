@@ -21,7 +21,7 @@
 	import { PhoneIncomingIcon } from 'svelte-feather-icons';
 	import { createForm } from 'svelte-forms-lib';
 	import StarRating from 'svelte-star-rating';
-	import { type Subscription, State } from 'xstate';
+	import { State, type Subscription } from 'xstate';
 	import * as yup from 'yup';
 	import type { PageData } from './$types';
 	import LinkViewer from './LinkView.svelte';
@@ -40,7 +40,7 @@
 	let linkService: LinkMachineServiceType;
 	let linkSub: Subscription;
 	let currentLinkState: LinkMachineStateType = State.from('Loading...');
-	$: canCreateLink = talentObj.currentLink === null; // If there is no current link, then we can create a new one
+	$: canCreateLink = talentObj.currentLink === undefined; // If there is no current link, then we can create a new one
 	$: canCall = false;
 	$: ready4Call = false;
 	$: showAlert = false;
@@ -329,7 +329,7 @@
 						<div class="lg:col-start-3 lg:col-span-1">
 							<div class="bg-primary text-primary-content card">
 								<div class="text-center card-body items-center">
-									<h2 class="text-2xl card-title">{talentObj.name}</h2>
+									<h2 class="text-3xl card-title">{talentObj.name}</h2>
 									<div>
 										<ProfilePhoto
 											profileImage={talentObj.profileImageUrl || PUBLIC_DEFAULT_PROFILE_IMAGE}
@@ -355,7 +355,7 @@
 								<div class="text-center card-body items-center">
 									<h2 class="text-2xl card-title">Your Average Rating</h2>
 									{talentObj.stats.ratingAvg.toFixed(2)}
-									<StarRating rating={talentObj.stats.ratingAvg || 0} />
+									<StarRating rating={talentObj.stats.ratingAvg ?? 0} />
 								</div>
 							</div>
 						</div>

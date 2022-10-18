@@ -8,7 +8,6 @@
 	import FaMoneyBillWave from 'svelte-icons/fa/FaMoneyBillWave.svelte';
 	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';
 	import urlJoin from 'url-join';
-	import { matchesState, t } from 'xstate';
 	export let link: LinkDocType;
 	export let talent: TalentDocType;
 	export let linkState: LinkMachineStateType;
@@ -32,7 +31,7 @@
 				<div class="text-center card-body items-center bg-secondary rounded-2xl">
 					<div class="text-xl">
 						{#if linkState.matches('unclaimed')}
-							Your pCall link has not Been Claimed
+							Your pCall link has Not Been Claimed
 						{:else if linkState.matches('claimed') && link.state.claim}
 							Your pCall link was claimed by
 							<div>{link.state.claim.caller}</div>
@@ -70,32 +69,32 @@
 						<div class="text-xl pb-4">Link is Fully Funded!</div>
 					{/if}
 				</section>
-			</div>
-			<section
-				class="flex flex-col bg-base-100 rounded-2xl flex-shrink-0 text-white text-center p-4  items-center justify-center "
-			>
-				<div>Funding Address</div>
-				<div class="break-all">{link.fundingAddress}</div>
-			</section>
+				<section
+					class="flex flex-col bg-base-100 rounded-2xl flex-shrink-0 text-white text-center p-4  items-center justify-center "
+				>
+					<div>Funding Address</div>
+					<div class="break-all">{link.fundingAddress}</div>
+				</section>
 
-			<section
-				class="flex flex-col bg-base-100 rounded-2xl flex-shrink-0 text-center p-4 mt-4 items-center justify-center bg-info text-accent-content "
-			>
-				<div>URL</div>
-				<div class="break-all">
-					{linkURL}
-					<button on:click={copyLink}>
-						<div class="cursor-pointer flex group">
-							<div class="h-5 mr-1 mb-1 pl-2 group-hover:text-white">
-								<FaRegCopy />
+				<section
+					class="flex flex-col bg-base-100 rounded-2xl flex-shrink-0 text-center p-4 items-center justify-center bg-info text-accent-content "
+				>
+					<div>Unique pCall Link</div>
+					<div class="break-all">
+						{linkURL}
+						<button on:click={copyLink}>
+							<div class="cursor-pointer flex group">
+								<div class="h-5 mr-1 mb-1 pl-2 group-hover:text-white">
+									<FaRegCopy />
+								</div>
+								<div class="text-sm group-hover:text-white">
+									<div class="tooltip tooltip-accent {tooltipOpen}" data-tip="Copied!" />
+								</div>
 							</div>
-							<div class="text-sm group-hover:text-white">
-								<div class="tooltip tooltip-accent {tooltipOpen}" data-tip="Copied!" />
-							</div>
-						</div>
-					</button>
-				</div>
-			</section>
+						</button>
+					</div>
+				</section>
+			</div>
 		{:else if talent.currentLink}
 			Loading....
 		{:else}

@@ -228,7 +228,7 @@ export const talentDocMethods: TalentDocMethods = {
 
 		const completedLinksIds: string[] = [];
 		const feedbackIds = completedCalls.map((link) => {
-			totalEarnings += link.requestedAmount;
+			totalEarnings += link.state.totalFunding;
 			completedLinksIds.push(link._id);
 			return link.feedback;
 		});

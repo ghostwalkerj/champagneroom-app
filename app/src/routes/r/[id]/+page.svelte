@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
 	import VideoCall from '$lib/components/calls/VideoCall.svelte';
 	import VideoPreview from '$lib/components/calls/VideoPreview.svelte';
@@ -8,17 +9,22 @@
 	import type { FeedbackDocType, FeedbackDocument } from '$lib/ORM/models/feedback';
 	import type { LinkDocument } from '$lib/ORM/models/link';
 	import { StorageTypes } from '$lib/ORM/rxdb';
+	import { mensNames } from '$lib/util/mensNames';
 	import { userStream, type UserStreamType } from '$lib/util/userStream';
 	import type { VideoCallType } from '$lib/util/videoCall';
 	import { onMount } from 'svelte';
+	import { uniqueNamesGenerator } from 'unique-names-generator';
+	import type { Subscription } from 'xstate';
 	import type { PageData } from './$types';
 	import FeedbackForm from './FeedbackForm.svelte';
 	import LinkDetail from './LinkDetail.svelte';
-	import type { Subscription } from 'xstate';
-	import { enhance } from '$app/forms';
 	export let form: import('./$types').ActionData;
 
 	export let data: PageData;
+
+	const defaultDisplayName: string = uniqueNamesGenerator({
+		dictionaries: [mensNames]
+	});
 
 	const token = data.token;
 	let linkObj = data.link;
@@ -96,7 +102,7 @@
 
 	const call = async () => {
 		if (vc) {
-			vc.makeCall(linkObj.callId!, 'Dr. Huge Mongus', mediaStream);
+			vc.makeCall(linkObj.callId, linkObj.state.claim?.caller ?? 'Anonymous', mediaStream);
 		}
 	};
 
@@ -149,14 +155,14 @@
 										<div class="max-w-xs w-full py-2 form-control ">
 											<!-- svelte-ignore a11y-label-has-associated-control -->
 											<label for="caller" class="label">
-												<span class="label-text">Name you want shown</span></label
+												<span class="label-text">Your Display Name</span></label
 											>
 											<div class="rounded-md shadow-sm mt-1 relative">
 												<input
 													name="caller"
 													type="text"
 													class=" max-w-xs w-full py-2 pl-6 input input-bordered input-primary "
-													value={form?.caller ?? ''}
+													value={form?.caller ?? defaultDisplayName}
 												/>
 												{#if form?.missingCaller}<div class="shadow-lg alert alert-error">
 														Name is required

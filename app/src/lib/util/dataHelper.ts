@@ -8,8 +8,6 @@ import spacetime from 'spacetime';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 import { v4 as uuidv4 } from 'uuid';
 
-const names = womensNames;
-
 const profileImageUrls = [
 	'https://pcall.infura-ipfs.io/ipfs/QmaKAWmpMsXQByYGjEHMkgqJ7yqL83SNaVuVFB7mJQpSes?filename=2021-11-18%2014.00.27.jpg',
 	'https://pcall.infura-ipfs.io/ipfs/QmbV8vmvuH3U1CVyeAGWfxjFQvFNaL2hgCqCXDJDJiN5BL?filename=2021-12-14%2019.52.25.jpg',
@@ -52,7 +50,7 @@ const profileImageUrls = [
 
 export const generateTalent = async (agent: AgentDocument) => {
 	const name: string = uniqueNamesGenerator({
-		dictionaries: [names]
+		dictionaries: [womensNames]
 	});
 	const profileImageUrl = profileImageUrls[Math.floor(Math.random() * profileImageUrls.length)];
 	const talent = await agent.createTalent(name, 10, profileImageUrl);
@@ -88,7 +86,8 @@ const generateLinks = (talent: TalentDocument, count: number) => {
 		const _link = {
 			state: {
 				status: LinkStatuses.FINALIZED,
-				fundedAmount: amount,
+				totalFunding: amount,
+				requestedFunding: amount,
 				connections: [],
 				finalized: {
 					endedAt: endedAt.epoch
@@ -111,9 +110,8 @@ const generateLinks = (talent: TalentDocument, count: number) => {
 			updatedAt: new Date().getTime(),
 			entityType: LinkString,
 			feedback: `${FeedbackString}:f${key}`,
-			agent: talent.agent,
-
-		};
+			agent: talent.agent
+		} as LinkDocType;
 		links.push(_link);
 		feedbacks.push(_feedback);
 	}

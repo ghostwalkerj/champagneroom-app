@@ -39,12 +39,12 @@
 								<div class="flex space-x-4 flex-1 min-w-0 pt-1.5 justify-between">
 									<div>
 										<p class="text-sm text-gray-200">
-											Completed pCall for {currencyFormatter.format(call.amount)}
+											Completed pCall for {currencyFormatter.format(call.state.totalFunding)}
 										</p>
 									</div>
 									<div class="text-right text-sm text-gray-200 whitespace-nowrap">
-										{#if call.callStart}
-											{spacetime(call.callStart).format('{month-short} {date-pad}')}
+										{#if call.state.finalized}
+											{spacetime(call.state.finalized.endedAt).format('{month-short} {date-pad}')}
 										{/if}
 									</div>
 								</div>

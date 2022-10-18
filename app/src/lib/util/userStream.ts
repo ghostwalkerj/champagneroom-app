@@ -1,32 +1,34 @@
-import createMediaToggleMachine, { type MediaToggleMachineType } from '$lib/machines/mediaToggleMachine';
+import createMediaToggleMachine, {
+	type MediaToggleMachineType
+} from '$lib/machines/mediaToggleMachine';
 import { readable, writable } from 'svelte/store';
 
 export type VideoStreamOptions = {
 	video: {
 		width:
-		| number
-		| {
-			min?: number;
-			ideal?: number;
-			exact?: number;
-			max?: number;
-		};
+			| number
+			| {
+					min?: number;
+					ideal?: number;
+					exact?: number;
+					max?: number;
+			  };
 		height:
-		| number
-		| {
-			min?: number;
-			ideal?: number;
-			exact?: number;
-			max?: number;
-		};
+			| number
+			| {
+					min?: number;
+					ideal?: number;
+					exact?: number;
+					max?: number;
+			  };
 		frameRate:
-		| number
-		| {
-			min?: number;
-			ideal?: number;
-			exact?: number;
-			max?: number;
-		};
+			| number
+			| {
+					min?: number;
+					ideal?: number;
+					exact?: number;
+					max?: number;
+			  };
 	};
 	audio: boolean;
 };
