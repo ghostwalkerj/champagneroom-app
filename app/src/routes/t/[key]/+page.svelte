@@ -6,7 +6,11 @@
 	import VideoPreview from '$lib/components/calls/VideoPreview.svelte';
 	import ProfilePhoto from '$lib/components/forms/ProfilePhoto.svelte';
 	import { callMachine } from '$lib/machines/callMachine';
-	import { createLinkMachineService, type LinkMachineService } from '$lib/machines/linkMachine';
+	import {
+		createLinkMachineService,
+		type LinkMachineServiceType,
+		type LinkMachineStateType
+	} from '$lib/machines/linkMachine';
 	import { talentDB, type TalentDBType } from '$lib/ORM/dbs/talentDB';
 	import { ActorType, type LinkDocType, type LinkDocument } from '$lib/ORM/models/link';
 	import type { TalentDocType, TalentDocument } from '$lib/ORM/models/talent';
@@ -17,7 +21,7 @@
 	import { PhoneIncomingIcon } from 'svelte-feather-icons';
 	import { createForm } from 'svelte-forms-lib';
 	import StarRating from 'svelte-star-rating';
-	import type { Subscription } from 'xstate';
+	import { type Subscription, State } from 'xstate';
 	import * as yup from 'yup';
 	import type { PageData } from './$types';
 	import LinkViewer from './LinkView.svelte';
@@ -33,10 +37,10 @@
 	let key = $page.params.key;
 	let vc: VideoCallType;
 	let talent: TalentDocument;
-	let linkService: LinkMachineService;
+	let linkService: LinkMachineServiceType;
 	let linkSub: Subscription;
-	$: currentLinkState = 'loading';
-	$: canCreateLink = false;
+	let currentLinkState: LinkMachineStateType = State.from('Loading...');
+	$: canCreateLink = talentObj.currentLink === null; // If there is no current link, then we can create a new one
 	$: canCall = false;
 	$: ready4Call = false;
 	$: showAlert = false;
@@ -47,6 +51,7 @@
 	let mediaStream: MediaStream;
 	$: callerName = '';
 	let videoCall: any;
+
 	const updateLink = (linkState: LinkDocument['state']) => {
 		if (currentLink)
 			currentLink.update({
@@ -94,12 +99,14 @@
 					}); // Hack to update the LinkViewer
 					linkService = createLinkMachineService(currentLink.state, updateLink);
 					linkSub = linkService.subscribe((state) => {
-						currentLinkState = JSON.stringify(state.value);
+						currentLinkState = state;
 						if (state.changed) {
-							canCreateLink = state.can({
-								type: 'REQUEST CANCELLATION',
-								cancel: undefined
-							});
+							canCreateLink =
+								state.done ||
+								state.can({
+									type: 'REQUEST CANCELLATION',
+									cancel: undefined
+								});
 							canCall = state.matches('claimed.canCall');
 							if (canCall) initVC();
 						}
@@ -136,20 +143,22 @@
 	};
 
 	const initVC = () => {
-		if (vc) vc.destroy();
-		if (currentLink) {
-			vc = videoCall(currentLink.callId);
-			vc.callState.subscribe((cs) => {
-				if (cs) {
-					callState = cs;
-					showAlert = callState.matches('receivingCall');
-					inCall = callState.matches('inCall');
-					ready4Call = callState.matches('ready4Call');
-				}
-			});
-			vc.callerName.subscribe((name) => {
-				if (name) callerName = name;
-			});
+		if (videoCall) {
+			if (vc) vc.destroy();
+			if (currentLink) {
+				vc = videoCall(currentLink.callId);
+				vc.callState.subscribe((cs) => {
+					if (cs) {
+						callState = cs;
+						showAlert = callState.matches('receivingCall');
+						inCall = callState.matches('inCall');
+						ready4Call = callState.matches('ready4Call');
+					}
+				});
+				vc.callerName.subscribe((name) => {
+					if (name) callerName = name;
+				});
+			}
 		}
 	};
 
@@ -182,7 +191,7 @@
 							createdAt: new Date().getTime(),
 							transactions: [],
 							refundedAmount: 0, //TODO: This is only good before funding.
-							canceledInState: linkService.getSnapshot().value.toString(),
+							canceledInState: currentLinkState.value.toString(),
 							canceler: ActorType.TALENT
 						}
 					});
@@ -237,7 +246,7 @@
 					<!-- Current Link -->
 					<div>
 						{#key updateCount}
-							<LinkViewer link={currentLink} talent={talentObj} />
+							<LinkViewer link={currentLink} talent={talentObj} linkState={currentLinkState} />
 						{/key}
 					</div>
 
@@ -312,16 +321,15 @@
 									<p>Signed in as {talentObj.name}</p>
 								{/if}
 								<p>Call State: {callState.value}</p>
-								<p>Link State: {currentLinkState}</p>
 							</div>
 						</div>
 					</div>
+					<!-- Photo -->
 					<div>
-						<!-- Photo -->
 						<div class="lg:col-start-3 lg:col-span-1">
 							<div class="bg-primary text-primary-content card">
 								<div class="text-center card-body items-center">
-									<h2 class="text-2xl card-title">Profile Photo</h2>
+									<h2 class="text-2xl card-title">{talentObj.name}</h2>
 									<div>
 										<ProfilePhoto
 											profileImage={talentObj.profileImageUrl || PUBLIC_DEFAULT_PROFILE_IMAGE}

@@ -33,6 +33,7 @@ export interface Typegen0 {
 		| 'cancelled'
 		| 'claimed'
 		| 'claimed.canCall'
+		| 'claimed.inCall'
 		| 'claimed.waiting4Funding'
 		| 'finalized'
 		| 'link loaded'
@@ -42,7 +43,7 @@ export interface Typegen0 {
 		| 'wating4Finalization'
 		| 'wating4Finalization.inDispute'
 		| {
-				claimed?: 'canCall' | 'waiting4Funding';
+				claimed?: 'canCall' | 'inCall' | 'waiting4Funding';
 				requestedCancellation?: 'waiting4Refund';
 				wating4Finalization?: 'inDispute';
 		  };

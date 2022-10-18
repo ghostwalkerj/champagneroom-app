@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { PUBLIC_ROOM_PATH } from '$env/static/public';
+	import type { LinkMachineStateType } from '$lib/machines/linkMachine';
 	import type { LinkDocType } from '$lib/ORM/models/link';
 	import type { TalentDocType } from '$lib/ORM/models/talent';
 	import { currencyFormatter } from '$lib/util/constants';
@@ -9,6 +10,7 @@
 	import urlJoin from 'url-join';
 	export let link: LinkDocType;
 	export let talent: TalentDocType;
+	export let linkState: LinkMachineStateType;
 	let tooltipOpen = '';
 
 	$: linkURL = '';
@@ -24,15 +26,16 @@
 <div class="bg-primary text-primary-content card">
 	<div class="text-center card-body items-center">
 		<h2 class="text-2xl card-title">Your Outstanding pCall Link</h2>
-		{#if talent && link}
+		{#if talent && link && linkState}
 			<div class="container mx-auto grid p-6 gap-4 grid-row-2">
 				<div class="bg-info rounded-box shadow-xl text-accent-content p-4 items-center ">
-					<div class="stat-title">Name Shown</div>
-					<div class="stat-value">{talent.name}</div>
+					{linkState.value}
 				</div>
 
-				<div>
-					<div class="max-w-min stats stats-vertical stats-shadow lg:stats-horizontal">
+				<section
+					class="flex flex-col bg-base-100 rounded-2xl flex-shrink-0 text-white text-center items-center justify-center"
+				>
+					<div class="stats stats-vertical stats-shadow lg:stats-horizontal">
 						<div class="stat">
 							<div class="text-primary w-10 stat-figure">
 								<FaMoneyBillWave />
@@ -53,7 +56,10 @@
 							</div>
 						</div>
 					</div>
-				</div>
+					{#if link.state.totalFunding >= link.requestedAmount}
+						<div class="text-xl pb-4">Link is Fully Funded!</div>
+					{/if}
+				</section>
 			</div>
 			<section
 				class="flex flex-col bg-base-100 rounded-2xl flex-shrink-0 text-white text-center p-4  items-center justify-center "

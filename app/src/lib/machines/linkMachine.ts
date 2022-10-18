@@ -1,7 +1,7 @@
 import type { LinkDocType } from '$lib/ORM/models/link';
 import { LinkStatuses } from '$lib/ORM/models/link';
 import type { TransactionDocType } from '$lib/ORM/models/transaction';
-import { assign, createMachine, interpret } from 'xstate';
+import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 
 type LinkStateType = LinkDocType['state'];
 
@@ -10,7 +10,7 @@ type StateCallBackType = (state: LinkStateType) => void;
 export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCallBackType) => {
 	const stateCallback = saveState;
 
-	/** @xstate-layout N4IgpgJg5mDOIC5QBsCWA7A1gWQIYGMALDMAOjSwAJkB7XCSAYkVAAcbZUAXVG9FkAA9EARgAMIgBykxksQE4AzGIBsAFgBMIgOyTJAGhABPRIpXzSmkSI3aArGM2z1AXxeGKOAsXRkAruj4yLioALZMAMIAMgCCAJLYAuycPHwCwggiamJ2pIpK+fIaaiKKUoYmCBrVpEXWGkqSyjo5bh4YXkQkpAFBIeEQjABKAKIAigCqIwDKACqUETEAchEjUbGzcQDyS0kc3Lz8SEKi2bn5ioXFpeXGiGraYrVa4tUlGooPbSCeeF2+pD6YUgpAA7iEeOgoGoAGIBCAYKDDcZTOYLZardYxTY7PYpQ7pRAqOy5SRqYlqSl2FRifIqCqIeRibTPay0iRqal2DTfX7ebpAgZgiGI2HwxGMAAKMQAmtgRkt5qNVnEAGojAAieIOaWOGREdkULLJxI+aiKcg09LuVUU0jqNm5IhU9lkdl5HT+PjIgpB4IOULF6ARUOYx2SOqOoH12kUuQkZLEOXMkg0jgZmTsalZCk5ajMKiyHqwXu6ACcwABHPxwLiQCK4QJgZDBVLoYUB6FDMAAM3hyJhEyWGsocWm0ymWvD+zbhMyNhUpBUtke8nJ2mX8gMNskG8sL2U8m0adKimLnW9pAr1dr9cb+GbrcOYbYM4JetEC6XK9zLs328qIpsysRxC0kLJFA0SRz1LAFwUhaEYQwXA0AAL1wNtGBhEZNQAIRiCIAGlKGVEY1U1bVZw-TIExkOQlFUKxdAA0wtH3axxDjZlikkFQYP5OCMNFJD0BQ1B0MwmYIiGLYAHVKBhOIljHAAJCjp3xXVo1EWjZAUZR1C0ZiM1sRR2KyEpzFMnl3B+T0BLIeDhOQtChL4RgNTHSUJlmEZR2UzZsXU19NKjE4EBdUlySzKkaTpDNIIsB0pCKbRyRUaDvnQGgGHgY4+X+MhPGoOgGAgSj320iLmTyXjCzKWNnU0DMXWkF0rVjdQMt3bR+MKnpAmCYFyo0yM5xsbQWSAjKxGKEoMweRcHTTfMVHMS41D6y9fQgDsEKDEMoAqrTwoNOwRBkEoyXJWkbDUBLlBzSLHEpLctoFIahXwRsGxbY6wv1NcNFqBRaTtaojw+DMpGAl5qm5RjPnegEdv+8bzrMk1uU+C1ZutSpU1ZUp5BULi7HkA1kbIa8a1gOsIAbJsWzc9t-X27s+2DNHqNS0htHkEmVqZE9tAzNczJAtKDTJLJetsgrLxp28GfvR8We5qqmTM-nBccYWJFFndtAuqxrCArdHSp4V9pEsSJMOUgMA1VBYFYPw6w18LeJZBxbEkJQYrKFiEE+MzkqtFoDWKK2nMDW3XKokKxuo4kLqxylOTikmTM5InSlAppijPeX7P676meQSBPf1MoLuXDd5AcPQ7S3MXDXY2lJG5BpbHdEuSwc0gexc8Sq9GxPTuqaRdGyRqBdTUmEtUcyOTSkoSSp6vEDsJparWm5GsM6GngdMwJCPcC+LcFwgA */
+	/** @xstate-layout N4IgpgJg5mDOIC5QBsCWA7A1gWQIYGMALDMAOjSwAJkB7XCSAYgG0AGAXUVAAcbZUALqhrouIAB6IALAGYppAEwA2AKxKZARiVKA7FJUAOBQBoQAT2kKFpVRtYqAnBocGDUgw6kBfL6Yo4CYnQyf2o6BggWDU4kEF5+IRExSQQpNMVVdS1dfSNTCwQFFR1SKQdygy0VMrUpJR8-DACiEnImsPomZgUYnj5BYVFYlLT5ZTVNbT1DE3NEI1JypakrWRVWGQaQfzwW4LaqWk7I5hleuP7EodARhTHMyZyZ-OklAxsVOxlWAx0HHRkmi2O0CrQAruh8MhcKgALZMADCABkAIIASWwbHO8QGSWGiD+MlIrB0lQcgJUMgc1VmBRkOhUiyWnl0Gz0DmBTV2QTIEKhMPhkQASgBRACKAFURQBlAAqlARKIAcgiRUjUbK0QB5JVYsQ4q7JRAqWmIDQaBQlDSfLR2aoOO4GTlYbmtflwyCkADuMKE6CgUgAYhCIBgoIxRZKZfLFSq1RrtbqOPrLoMjQglKaENTGR5ARopObWMWVCpnc0eaR3YLvb6w0GQ2HGAAFFEATWwIqV8tFqrRADURQARPWxA1p-HZpylek6a2-JTUvJzQq-UrMuo6Nllcuu-bVz0+gb+hvoUP+ljJsepvE3M3OJQ2VjU5TqbTKF4Ib6PjQySk6KxihkdRPF3UF92hD0ICrXB0ARXBkGQRhFXVBUdSVEUEVlYdRz6BIJzvBACwAxY3CmVgC2tOpP2+Ilf0pdQ1CUQtATAvYyAPaCMHgxDkJRVCES1bBmyREVsJHK88Nxa4JDNYsSmfGRfjcexSRcT9C1YYlvj0VgFHsDZqjYysACcwAARzBOABEgeDITARDcCuWtjwDIUwAAMxDCMRUDCUlSHSg0WlaUpQk7EbxklJqnkDRfjKAwKOKE0s3KR9GLSZ8NmyHRjNaMzLOs2zYPwBzoSuS8Ivw29ZIQGLSDi9lEutBkrE-Ox3BsP93Fka0HFYKRct8bYuXAsgfT9ANAwwBDUAALycwZGEDEVhwAIRRBEAGlKF7EUBxwySLmqqLLHuCYctyLMmI+IsNgUQEfg0PL9gm+tpvQWaFoqmUESFLUAHVKEDNElWCgAJQ6quk9MVnOrIpiuz9PnkWx7EXO1Fw5YaQXY2tJqDGa0G+pah2C5sJWwoKwc1FFxNw46YcnADkb-BrPhJAwlC0clseG9AaAYeBYlxytQiOCIUxO2HUusMolk0KxAIMTYcdGvG+UgwUpaZwjM0ZRwlL-T4jCpFQNP09m7AewEFAdZwhsaF0xqrLXDzrE9gzPMMdcNSc7FYR8PC5upyR+LmZA0uLSjePQdCUDYHG5rQXo4t3oPwWCeOQX2CNq39mKfJPfktBQtBojYuspfq9F-DxmNT12BU9biEJz69pf93QNEWKwLRRwsy8jldaKr4C-20FjVadis3XT3OapSTwiVkHQ50MeOlyzZx3nWYs9IBdQZAexuCqs2AbIgOzSsc5yjwJ9yvLPBfTq-QtFkpAs0uUcPzZXcorTdRfJ-Zw08RrOzxmfIqV8SplUWjVcci9EB2yJNSTQ8tMwJ1cH-Ao-V3j0VLFob49swGi1aG9T2RN5rwPQKQDAQ5UCwG4GCGyL90yWh7pkO2gcBqVDisPAopZ3h5geolBiKsnRqwgZWChU0qEkwQZFdhUgNJ1CthsFWc57AaEduA2e+5YGIUgGw5mbNOZEIGoHZiOh2rFh7g9aoAISRWGwY3Dy8jjEd11rVZi1hi4Mn0CSBOnhkYFluoHfQ+kpBslTiYwiABaO4n54mMmZP8LcScHTH1Vj4IAA */
 	return createMachine(
 		{
 			context: { linkState: linkState, errorMessage: undefined as string | undefined },
@@ -25,11 +25,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 							transaction: TransactionDocType;
 					  }
 					| { type: 'CALL CONNECTED' }
-					| { type: 'CALL DISCONNECTED' }
-					| {
-							type: 'CALL ACCEPTED';
-							connection: NonNullable<LinkStateType['connections']>[0];
-					  }
+					| { type: 'CALL COMPLETED' }
 					| { type: 'FEEDBACK RECEIVED' }
 					| { type: 'ESCROW FINISHED' }
 					| {
@@ -44,20 +40,20 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 				'link loaded': {
 					always: [
 						{
-							cond: 'linkUnclaimed',
-							target: 'unclaimed'
+							target: 'unclaimed',
+							cond: 'linkUnclaimed'
 						},
 						{
-							cond: 'linkClaimed',
-							target: 'claimed'
+							target: 'claimed',
+							cond: 'linkClaimed'
 						},
 						{
-							cond: 'linkCancelled',
-							target: 'cancelled'
+							target: 'cancelled',
+							cond: 'linkCancelled'
 						},
 						{
-							cond: 'linkFinalized',
-							target: 'finalized'
+							target: 'finalized',
+							cond: 'linkFinalized'
 						}
 					]
 				},
@@ -68,8 +64,8 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 							actions: ['claimLink', 'saveLinkState']
 						},
 						'REQUEST CANCELLATION': {
-							actions: ['cancelLink', 'saveLinkState'],
-							target: 'cancelled'
+							target: 'cancelled',
+							actions: ['cancelLink', 'saveLinkState']
 						}
 					}
 				},
@@ -78,13 +74,13 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 					states: {
 						waiting4Funding: {
 							always: {
-								cond: 'fullyFunded',
-								target: 'canCall'
+								target: 'canCall',
+								cond: 'fullyFunded'
 							},
 							on: {
 								'REQUEST CANCELLATION': {
-									actions: 'cancelLink',
-									target: '#linkMachine.requestedCancellation'
+									target: '#linkMachine.requestedCancellation',
+									actions: 'cancelLink'
 								},
 								'PAYMENT RECEIVED': {
 									actions: ['receivePayment', 'saveLinkState']
@@ -92,7 +88,18 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 							}
 						},
 						canCall: {
-							type: 'final'
+							on: {
+								'CALL CONNECTED': {
+									target: 'inCall'
+								}
+							}
+						},
+						inCall: {
+							on: {
+								'CALL COMPLETED': {
+									target: '#linkMachine.wating4Finalization'
+								}
+							}
 						}
 					}
 				},
@@ -108,11 +115,12 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 						}
 					},
 					always: {
-						cond: (context) => context.linkState.totalFunding === 0,
-						target: 'cancelled'
+						target: 'cancelled',
+						cond: (context) => context.linkState.totalFunding === 0
 					}
 				},
 				wating4Finalization: {
+					initial: 'inDispute',
 					states: {
 						inDispute: {}
 					},
@@ -124,8 +132,8 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 							target: 'finalized'
 						},
 						'DISPUTE INITIATED': {
-							actions: 'initiateDispute',
-							target: '.inDispute'
+							target: '.inDispute',
+							actions: 'initiateDispute'
 						}
 					}
 				},
@@ -218,4 +226,5 @@ export const createLinkMachineService = (
 };
 
 export type LinkMachineType = ReturnType<typeof createLinkMachine>;
-export type LinkMachineService = ReturnType<typeof createLinkMachineService>;
+export type LinkMachineStateType = StateFrom<typeof createLinkMachine>;
+export type LinkMachineServiceType = ReturnType<typeof createLinkMachineService>;
