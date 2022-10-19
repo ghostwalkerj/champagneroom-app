@@ -93,7 +93,6 @@
 			.then((link) => {
 				if (link) {
 					link.$.subscribe((_link) => {
-						submitDisabled = false; // link changed, so can submit again
 						currentLink = _link;
 						linkService = createLinkMachineService(currentLink.state, updateLink);
 						linkSub = linkService.subscribe((state) => {
@@ -108,6 +107,7 @@
 								if (canCall) initVC();
 							}
 						});
+						submitDisabled = false; // link changed, so can submit again
 					});
 				}
 			});

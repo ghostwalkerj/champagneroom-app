@@ -47,13 +47,13 @@
 		_db.links.findOne(linkObj._id).$.subscribe((_link) => {
 			if (_link) {
 				linkObj = _link as LinkDocument;
-				submitDisabled = false;
 				// Here is where we run the machine and do all the logic based on the state
 				linkService = createLinkMachineService(_link.state);
 				linkService.subscribe((state) => {
 					linkState = state;
 					if (state.matches('claimed.canCall')) initVC();
 				});
+				submitDisabled = false;
 			}
 		});
 
