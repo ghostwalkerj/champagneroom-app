@@ -2,6 +2,7 @@
 	import { browser } from '$app/environment';
 	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
+	import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
 	import VideoCall from '$lib/components/calls/VideoCall.svelte';
 	import VideoPreview from '$lib/components/calls/VideoPreview.svelte';
 	import { callMachine } from '$lib/machines/callMachine';
@@ -11,12 +12,10 @@
 	import type { LinkDocument } from '$lib/ORM/models/link';
 	import { StorageTypes } from '$lib/ORM/rxdb';
 	import { currencyFormatter } from '$lib/util/constants';
-	import { mensNames } from '$lib/util/mensNames';
 	import getProfileImage from '$lib/util/profilePhoto';
 	import { userStream, type UserStreamType } from '$lib/util/userStream';
 	import type { VideoCallType } from '$lib/util/videoCall';
 	import { onMount } from 'svelte';
-	import { uniqueNamesGenerator } from 'unique-names-generator';
 	import type { PageData } from './$types';
 	import FeedbackForm from './FeedbackForm.svelte';
 	import LinkDetail from './LinkDetail.svelte';
@@ -24,13 +23,10 @@
 
 	export let data: PageData;
 
-	const defaultDisplayName: string = uniqueNamesGenerator({
-		dictionaries: [mensNames]
-	});
-
 	const token = data.token;
 	let linkObj = data.link;
 	let feedbackObj = data.feedback;
+	let displayName = data.displayName;
 	let linkId = $page.params.id;
 	let vc: VideoCallType;
 	let videoCall: any;
@@ -44,9 +40,8 @@
 	$: inCall = false;
 	$: callState = callMachine.initialState;
 	$: userstream = false;
-	$: displayName = form?.caller ?? defaultDisplayName;
-	$: profileImage = getProfileImage(displayName);
 
+	$: profileImage = getProfileImage(displayName);
 	publicDB(token, linkId, StorageTypes.IDB).then((_db: PublicDBType) => {
 		_db.links.findOne(linkObj._id).$.subscribe((_link) => {
 			if (_link) {

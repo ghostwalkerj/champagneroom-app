@@ -84,11 +84,9 @@ export const actions: import('./$types').Actions = {
 		}
 
 		const updateLink = (linkState: LinkDocument['state']) => {
-			cancelLink.update({
-				$set: {
-					updatedAt: new Date().getTime(),
-					state: linkState
-				}
+			cancelLink.atomicPatch({
+				updatedAt: new Date().getTime(),
+				state: linkState
 			});
 		};
 		const linkService = createLinkMachineService(cancelLink.state, updateLink);
@@ -98,7 +96,7 @@ export const actions: import('./$types').Actions = {
 			type: 'REQUEST CANCELLATION',
 			cancel: {
 				createdAt: new Date().getTime(),
-				canceledInState: JSON.stringify(currentLinkState.value.toString()),
+				canceledInState: JSON.stringify(currentLinkState.value),
 				canceler: ActorType.TALENT
 			}
 		});

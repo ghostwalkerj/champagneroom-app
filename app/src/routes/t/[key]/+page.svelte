@@ -36,10 +36,7 @@
 	let talent: TalentDocument;
 	let linkService: LinkMachineServiceType;
 	let linkSub: Subscription;
-	$: canCreateLink = talentObj.currentLink === undefined; // If there is no current link, then we can create a new one
-	$: canCancelLink = false;
 
-	$: canCall = false;
 	$: ready4Call = false;
 	$: showAlert = false;
 	$: inCall = false;
@@ -51,6 +48,15 @@
 	let currentLinkState = currentLink
 		? createLinkMachineService(currentLink.state).getSnapshot()
 		: undefined;
+	$: canCancelLink = currentLinkState
+		? currentLinkState.can({
+				type: 'REQUEST CANCELLATION',
+				cancel: undefined
+		  })
+		: false;
+
+	$: canCreateLink = currentLinkState ? currentLinkState.done : true;
+	$: canCall = currentLinkState ? currentLinkState.matches('claimed.canCall') : false;
 
 	const updateLink = (linkState: LinkDocument['state']) => {
 		if (currentLink && currentLink.update)
