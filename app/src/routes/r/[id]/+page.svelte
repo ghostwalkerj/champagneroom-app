@@ -11,6 +11,7 @@
 	import type { LinkDocument } from '$lib/ORM/models/link';
 	import { StorageTypes } from '$lib/ORM/rxdb';
 	import { mensNames } from '$lib/util/mensNames';
+	import getProfileImage from '$lib/util/profilePhoto';
 	import { userStream, type UserStreamType } from '$lib/util/userStream';
 	import type { VideoCallType } from '$lib/util/videoCall';
 	import { onMount } from 'svelte';
@@ -42,6 +43,8 @@
 	$: inCall = false;
 	$: callState = callMachine.initialState;
 	$: userstream = false;
+	$: displayName = form?.caller ?? defaultDisplayName;
+	$: profileImage = getProfileImage(displayName);
 
 	publicDB(token, linkId, StorageTypes.IDB).then((_db: PublicDBType) => {
 		_db.links.findOne(linkObj._id).$.subscribe((_link) => {
@@ -148,6 +151,10 @@
 								<h2 class="text-2xl card-title">Claim pCall Link</h2>
 								<div class="flex flex-col text-white p-2 justify-center items-center">
 									<form method="post" action="?/claim" use:enhance>
+										<div
+											class="bg-cover bg-no-repeat bg-center rounded-full h-48 w-48"
+											style="background-image: url('{profileImage}')"
+										/>
 										<div class="max-w-xs w-full py-2 form-control ">
 											<!-- svelte-ignore a11y-label-has-associated-control -->
 											<label for="caller" class="label">
@@ -158,7 +165,7 @@
 													name="caller"
 													type="text"
 													class=" max-w-xs w-full py-2 pl-6 input input-bordered input-primary "
-													value={form?.caller ?? defaultDisplayName}
+													bind:value={displayName}
 												/>
 												{#if form?.missingCaller}<div class="shadow-lg alert alert-error">
 														Name is required

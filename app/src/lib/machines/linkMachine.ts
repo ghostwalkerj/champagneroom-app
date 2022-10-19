@@ -121,7 +121,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 					},
 					always: {
 						target: 'cancelled',
-						cond: (context) => context.linkState.totalFunding <= 0
+						cond: (context) => context.linkState.totalFunding <= context.linkState.refundedAmount
 					}
 				},
 				wating4Finalization: {

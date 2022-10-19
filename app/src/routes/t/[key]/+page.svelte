@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
+	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
 	import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
 	import VideoCall from '$lib/components/calls/VideoCall.svelte';
@@ -8,7 +9,8 @@
 	import { callMachine } from '$lib/machines/callMachine';
 	import { createLinkMachineService, type LinkMachineServiceType } from '$lib/machines/linkMachine';
 	import { talentDB, type TalentDBType } from '$lib/ORM/dbs/talentDB';
-	import { ActorType, type LinkDocType, type LinkDocument } from '$lib/ORM/models/link';
+	import type { LinkDocType, LinkDocument } from '$lib/ORM/models/link';
+
 	import type { TalentDocType, TalentDocument } from '$lib/ORM/models/talent';
 	import { StorageTypes } from '$lib/ORM/rxdb';
 	import { currencyFormatter } from '$lib/util/constants';
@@ -16,14 +18,13 @@
 	import type { VideoCallType } from '$lib/util/videoCall';
 	import { onDestroy, onMount } from 'svelte';
 	import { PhoneIncomingIcon } from 'svelte-feather-icons';
-	import { createForm } from 'svelte-forms-lib';
 	import StarRating from 'svelte-star-rating';
 	import type { Subscription } from 'xstate';
-	import * as yup from 'yup';
 	import type { PageData } from './$types';
 	import LinkViewer from './LinkView.svelte';
 	import TalentActivity from './TalentActivity.svelte';
 	import TalentWallet from './TalentWallet.svelte';
+	export let form: import('./$types').ActionData;
 
 	export let data: PageData;
 	const token = data.token;
@@ -169,35 +170,6 @@
 	onDestroy(async () => {
 		if (vc) vc.destroy();
 	});
-
-	const { form, errors, handleChange, handleSubmit, handleReset } = createForm({
-		initialValues: { amount: '0' },
-		validationSchema: yup.object({
-			amount: yup
-				.string()
-				.matches(/^[1-9]\d{0,3}$/, 'Must be between $1 and $9999')
-				.required()
-		}),
-		onSubmit: (values) => {
-			if (talent) {
-				// Must expire the current link, then create a new one.
-				if (currentLinkState && linkService) {
-					linkService.send({
-						type: 'REQUEST CANCELLATION',
-						cancel: {
-							createdAt: new Date().getTime(),
-							transactions: [],
-							refundedAmount: 0, //TODO: This is only good before funding.
-							canceledInState: currentLinkState.value.toString(),
-							canceler: ActorType.TALENT
-						}
-					});
-				}
-				talent.createLink(Number(values.amount));
-				handleReset();
-			}
-		}
-	});
 </script>
 
 <input type="checkbox" id="call-modal" class="modal-toggle" bind:checked={showAlert} />
@@ -247,31 +219,33 @@
 
 					{#if canCancelLink}
 						<!-- Link Form-->
-						<div class="bg-primary text-primary-content card">
-							<div class="text-center card-body items-center">
-								<div class="text-2xl card-title">Cancel Your pCall Link</div>
-								<div class="text xl">
-									If you cancel this pCall link, the link will be deactivated ans nobody can use it
-									to call.
-								</div>
-								{#if currentLink.state.claim && currentLink.state.totalFunding > 0}
-									{currencyFormatter.format(currentLink.state.totalFunding)} will be refunded to "{currentLink
-										.state.claim.caller}"
-								{/if}
+						<form method="post" action="?/cancel_link" use:enhance>
+							<div class="bg-primary text-primary-content card">
+								<div class="text-center card-body items-center">
+									<div class="text-2xl card-title">Cancel Your pCall Link</div>
+									<div class="text xl">
+										If you cancel this pCall link, the link will be deactivated ans nobody can use
+										it to call.
+									</div>
+									{#if currentLink.state.claim && currentLink.state.totalFunding > 0}
+										{currencyFormatter.format(currentLink.state.totalFunding)} will be refunded to "{currentLink
+											.state.claim.caller}"
+									{/if}
 
-								<div class="flex flex-col text-white p-2 justify-center items-center">
-									<div class="py-4">
-										<button class="btn btn-secondary">Cancel Link</button>
+									<div class="flex flex-col text-white p-2 justify-center items-center">
+										<div class="py-4">
+											<button class="btn btn-secondary" type="submit">Cancel Link</button>
+										</div>
 									</div>
 								</div>
 							</div>
-						</div>
+						</form>
 					{:else if canCreateLink}
 						<div class="bg-primary text-primary-content card">
 							<div class="text-center card-body items-center">
 								<h2 class="text-2xl card-title">Create a New pCall Link</h2>
 								<div class="flex flex-col text-white p-2 justify-center items-center">
-									<form on:submit|preventDefault={handleSubmit}>
+									<form method="post" action="?/create_link" use:enhance>
 										<div class="max-w-xs w-full py-2 form-control ">
 											<!-- svelte-ignore a11y-label-has-associated-control -->
 											<label for="price" class="label">
@@ -290,8 +264,6 @@
 													class=" max-w-xs w-full py-2 pl-6 input input-bordered input-primary "
 													placeholder="0.00"
 													aria-describedby="price-currency"
-													on:change={handleChange}
-													bind:value={$form.amount}
 												/>
 												<div
 													class="flex pr-3 inset-y-0 right-0 absolute items-center pointer-events-none"
@@ -300,9 +272,12 @@
 												</div>
 											</div>
 										</div>
-										{#if $errors.amount}
-											<div class="shadow-lg alert alert-error">{$errors.amount}</div>
-										{/if}
+										{#if form?.missingAmount}<div class="shadow-lg alert alert-error">
+												Amount is required
+											</div>{/if}
+										{#if form?.invalidAmount}<div class="shadow-lg alert alert-error">
+												Invalid Amount
+											</div>{/if}
 										<div class="py-4">
 											<button class="btn btn-secondary" type="submit">Generate Link</button>
 										</div>

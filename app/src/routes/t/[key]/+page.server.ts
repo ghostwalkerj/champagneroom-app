@@ -100,8 +100,6 @@ export const actions: import('./$types').Actions = {
 			type: 'REQUEST CANCELLATION',
 			cancel: {
 				createdAt: new Date().getTime(),
-				transactions: [],
-				refundedAmount: 0, //TODO: This is only good before funding.
 				canceledInState: currentLinkState.value.toString(),
 				canceler: ActorType.TALENT
 			}

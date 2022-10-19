@@ -131,6 +131,12 @@ const linkSchemaLiteral = {
 					minimum: 0,
 					maximum: 99999
 				},
+				refundedAmount: {
+					type: 'integer',
+					default: 0,
+					minimum: 0,
+					maximum: 99999
+				},
 				cancel: {
 					type: 'object',
 					properties: {
@@ -139,7 +145,6 @@ const linkSchemaLiteral = {
 							type: 'string',
 							enum: Object.values(ActorType)
 						},
-						refundedAmount: { type: 'integer' },
 						canceledInState: { type: 'string' },
 						transactions: {
 							type: 'array',
@@ -228,7 +233,7 @@ const linkSchemaLiteral = {
 					}
 				}
 			},
-			required: ['status', 'totalFunding', 'requestedFunding']
+			required: ['status', 'totalFunding', 'requestedFunding', 'refundedAmount']
 		},
 		talentInfo: {
 			type: 'object',
