@@ -10,7 +10,6 @@
 	import { createLinkMachineService, type LinkMachineServiceType } from '$lib/machines/linkMachine';
 	import { talentDB, type TalentDBType } from '$lib/ORM/dbs/talentDB';
 	import type { LinkDocType, LinkDocument } from '$lib/ORM/models/link';
-
 	import type { TalentDocType, TalentDocument } from '$lib/ORM/models/talent';
 	import { StorageTypes } from '$lib/ORM/rxdb';
 	import { currencyFormatter } from '$lib/util/constants';
@@ -224,7 +223,7 @@
 								<div class="text-center card-body items-center">
 									<div class="text-2xl card-title">Cancel Your pCall Link</div>
 									<div class="text xl">
-										If you cancel this pCall link, the link will be deactivated ans nobody can use
+										If you cancel this pCall link, the link will be deactivated and nobody can use
 										it to call.
 									</div>
 									{#if currentLink.state.claim && currentLink.state.totalFunding > 0}

@@ -145,7 +145,13 @@
 					</div>
 
 					<!-- Link Claim -->
-					{#if linkState.can({ type: 'CLAIM', claim: undefined })}
+					{#if linkState.done}
+						<div class="bg-primary text-primary-content card">
+							<div class="text-center card-body items-center">
+								<h2 class="text-2xl card-title">This Link is No Longer Active</h2>
+							</div>
+						</div>
+					{:else if linkState.can({ type: 'CLAIM', claim: undefined })}
 						<div class="bg-primary text-primary-content card">
 							<div class="text-center card-body items-center">
 								<h2 class="text-2xl card-title">Claim pCall Link</h2>
