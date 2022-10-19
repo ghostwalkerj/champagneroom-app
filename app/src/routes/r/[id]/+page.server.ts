@@ -97,11 +97,9 @@ export const actions: import('./$types').Actions = {
 		}
 
 		const updateLink = (linkState: LinkDocument['state']) => {
-			link.update({
-				$set: {
-					updatedAt: new Date().getTime(),
-					state: linkState
-				}
+			link.atomicPatch({
+				updatedAt: new Date().getTime(),
+				state: linkState
 			});
 		};
 
@@ -157,11 +155,9 @@ export const actions: import('./$types').Actions = {
 		}
 
 		const updateLink = (linkState: LinkDocument['state']) => {
-			link.update({
-				$set: {
-					updatedAt: new Date().getTime(),
-					state: linkState
-				}
+			link.atomicPatch({
+				updatedAt: new Date().getTime(),
+				state: linkState
 			});
 		};
 

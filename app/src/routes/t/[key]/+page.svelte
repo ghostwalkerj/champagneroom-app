@@ -59,12 +59,10 @@
 	$: canCall = currentLinkState ? currentLinkState.matches('claimed.canCall') : false;
 
 	const updateLink = (linkState: LinkDocument['state']) => {
-		if (currentLink && currentLink.update)
-			currentLink.update({
-				$set: {
-					updatedAt: new Date().getTime(),
-					state: linkState
-				}
+		if (currentLink && currentLink.atomicPatch)
+			currentLink.atomicPatch({
+				updatedAt: new Date().getTime(),
+				state: linkState
 			});
 	};
 

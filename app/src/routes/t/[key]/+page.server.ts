@@ -125,11 +125,9 @@ export const actions: import('./$types').Actions = {
 		}
 
 		const updateLink = (linkState: LinkDocument['state']) => {
-			refundLink.update({
-				$set: {
-					updatedAt: new Date().getTime(),
-					state: linkState
-				}
+			refundLink.atomicPatch({
+				updatedAt: new Date().getTime(),
+				state: linkState
 			});
 		};
 
