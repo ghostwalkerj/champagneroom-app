@@ -53,7 +53,7 @@
 		: undefined;
 
 	const updateLink = (linkState: LinkDocument['state']) => {
-		if (currentLink)
+		if (currentLink && currentLink.update)
 			currentLink.update({
 				$set: {
 					updatedAt: new Date().getTime(),
