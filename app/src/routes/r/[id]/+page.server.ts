@@ -117,7 +117,7 @@ export const actions: import('./$types').Actions = {
 
 		return { success: true };
 	},
-	payment_sent: async ({ params, request }) => {
+	send_payment: async ({ params, request }) => {
 		const linkId = params.id;
 		const data = await request.formData();
 		const amount = data.get('amount') as string;

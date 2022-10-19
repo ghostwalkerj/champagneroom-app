@@ -10,6 +10,7 @@
 	import type { FeedbackDocType, FeedbackDocument } from '$lib/ORM/models/feedback';
 	import type { LinkDocument } from '$lib/ORM/models/link';
 	import { StorageTypes } from '$lib/ORM/rxdb';
+	import { currencyFormatter } from '$lib/util/constants';
 	import { mensNames } from '$lib/util/mensNames';
 	import getProfileImage from '$lib/util/profilePhoto';
 	import { userStream, type UserStreamType } from '$lib/util/userStream';
@@ -151,6 +152,16 @@
 								<h2 class="text-2xl card-title">This Link is No Longer Active</h2>
 							</div>
 						</div>
+					{:else if linkState.matches('claimed.requestedCancellation.waiting4Refund')}
+						<div class="bg-primary text-primary-content card">
+							<div class="text-center card-body items-center">
+								<h2 class="text-2xl card-title">
+									This Link has been Cancelled. Refund is pending.
+								</h2>
+								<div>Refunded Amount</div>
+								<div>{currencyFormatter.format(linkObj.state.refundedAmount)}</div>
+							</div>
+						</div>
 					{:else if linkState.can({ type: 'CLAIM', claim: undefined })}
 						<div class="bg-primary text-primary-content card">
 							<div class="text-center card-body items-center">
@@ -211,7 +222,7 @@
 							<div class="text-center card-body items-center">
 								<h2 class="text-2xl card-title">Fund pCall Link</h2>
 								<div class="flex flex-col text-white p-2 justify-center items-center">
-									<form method="post" action="?/payment_sent" use:enhance>
+									<form method="post" action="?/send_payment" use:enhance>
 										<div class="max-w-xs w-full py-2 form-control ">
 											<!-- svelte-ignore a11y-label-has-associated-control -->
 											<label for="amount" class="label">

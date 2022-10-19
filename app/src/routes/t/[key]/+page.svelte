@@ -259,10 +259,10 @@
 												<input
 													type="text"
 													name="amount"
-													id="amount"
 													class=" max-w-xs w-full py-2 pl-6 input input-bordered input-primary "
 													placeholder="0.00"
 													aria-describedby="price-currency"
+													value={form?.amount ?? ''}
 												/>
 												<div
 													class="flex pr-3 inset-y-0 right-0 absolute items-center pointer-events-none"
@@ -270,15 +270,64 @@
 													<span class="text-gray-500 sm:text-sm" id="price-currency"> USDC </span>
 												</div>
 											</div>
+											{#if form?.missingAmount}<div class="shadow-lg alert alert-error">
+													Amount is required
+												</div>{/if}
+											{#if form?.invalidAmount}<div class="shadow-lg alert alert-error">
+													Invalid Amount
+												</div>{/if}
 										</div>
-										{#if form?.missingAmount}<div class="shadow-lg alert alert-error">
-												Amount is required
-											</div>{/if}
-										{#if form?.invalidAmount}<div class="shadow-lg alert alert-error">
-												Invalid Amount
-											</div>{/if}
+
 										<div class="py-4">
 											<button class="btn btn-secondary" type="submit">Generate Link</button>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>
+					{:else if currentLinkState && currentLinkState.matches('claimed.requestedCancellation.waiting4Refund')}
+						<div class="bg-primary text-primary-content card">
+							<div class="text-center card-body items-center">
+								<h2 class="text-2xl card-title">Issue Refund for Cancelled Link</h2>
+								<div class="flex flex-col text-white p-2 justify-center items-center">
+									<form method="post" action="?/send_refund" use:enhance>
+										<div class="max-w-xs w-full py-2 form-control ">
+											<!-- svelte-ignore a11y-label-has-associated-control -->
+											<label for="price" class="label">
+												<span class="label-text"
+													>Refund {currentLink.state.claim && currentLink.state.claim.caller}</span
+												></label
+											>
+											<div class="rounded-md shadow-sm mt-1 relative">
+												<div
+													class="flex pl-3 inset-y-0 left-0 absolute items-center pointer-events-none"
+												>
+													<span class="text-gray-500 sm:text-sm"> $ </span>
+												</div>
+												<input
+													type="text"
+													name="amount"
+													class=" max-w-xs w-full py-2 pl-6 input input-bordered input-primary "
+													placeholder="0.00"
+													aria-describedby="price-currency"
+													value={form?.amount ?? ''}
+												/>
+												<div
+													class="flex pr-3 inset-y-0 right-0 absolute items-center pointer-events-none"
+												>
+													<span class="text-gray-500 sm:text-sm" id="price-currency"> USDC </span>
+												</div>
+											</div>
+											{#if form?.missingAmount}<div class="shadow-lg alert alert-error">
+													Amount is required
+												</div>{/if}
+											{#if form?.invalidAmount}<div class="shadow-lg alert alert-error">
+													Invalid Amount
+												</div>{/if}
+										</div>
+
+										<div class="py-4">
+											<button class="btn btn-secondary" type="submit">Send Refund</button>
 										</div>
 									</form>
 								</div>

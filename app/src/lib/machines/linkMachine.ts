@@ -230,7 +230,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 						return {
 							linkState: {
 								...context.linkState,
-								totalFunding: context.linkState.totalFunding - Number(event.transaction.value),
+								refundedAmount: context.linkState.refundedAmount + Number(event.transaction.value),
 								cancel: {
 									...context.linkState.cancel,
 									transactions: context.linkState.cancel.transactions
