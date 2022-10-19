@@ -70,7 +70,7 @@ export const actions: import('./$types').Actions = {
 		talent.createLink(Number(amount));
 		return { success: true };
 	},
-	cancel_link: async ({ params, request }) => {
+	cancel_link: async ({ params }) => {
 		const key = params.key;
 		if (key === null) {
 			throw error(404, 'Key not found');
@@ -93,6 +93,8 @@ export const actions: import('./$types').Actions = {
 
 		const linkService = createLinkMachineService(cancelLink.state, updateLink);
 		const currentLinkState = linkService.getSnapshot();
+
+		console.log('currentLinkState', currentLinkState);
 
 		linkService.send({
 			type: 'REQUEST CANCELLATION',

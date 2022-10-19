@@ -10,7 +10,7 @@ type StateCallBackType = (state: LinkStateType) => void;
 export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCallBackType) => {
 	const stateCallback = saveState;
 
-	/** @xstate-layout N4IgpgJg5mDOIC5QBsCWA7A1gWQIYGMALDMAOjSwAJkB7XCSAYgG0AGAXUVAAcbZUALqhrouIAB6IAjAA4ALKQCscgGwyZKgOxSAzAE45c+QBoQAT0QAmA6SmLWezXL2W5OuVKkBfL6Yo4CYnQyf2o6BggWKU4kEF5+IRExSQQpG2U1DW19QxNzaUsZUj0Skt1FPXtLLR8-DACiEnJ6sPomZksYnj5BYVFYlMVLUwtUwxVSFSNlHWqVIblakH88RuDmqlo2yOYdLriexP7QFLSFDPUtXQMjORHEGUti0s1NLUK9LRUllcCmgFd0PhkLhUABbJgAYQAMgBBACS2DY+3ivSSA0QzgUhSklikmh0Gj0OhUenuCFcmlIzhKmhkaSyelY318y3qqyCZEBwNBEMiACUAKIARQAqoKAMoAFUokNhADlIYLoXCpfCAPLy5FiVFHZKYmw4vEEokksn5BA6AnUtSZPE6WTuRas35rMg88GQUgAd1BQnQUDkADFARAMFBGEKxZKZXLFcrVRqtRwdYc+vqEHp8Uo6Q4NIoVGbzaMpA5FKRWKxqo8ZJVZjJND92X91h6+T6-eHg6Hw4wAAqwgCa2EF8plQqV8IAaoKACLa2K69MY1KsTTkgw6SY6ZRyVzE1iqFl1LAcpptr2+3oB7voMMBlgpxdp9EnRAOp742R0qRyTRVtJ1wtT4t1eVh5E0RR-2sGRFCbU8W3dEFPQgUh8FwdBIVwZBkEYOUVVlTV5UFSEpTnBdugSZc3wQRR1CUVR1E0GC-zccl5HLYknDpVwPGJPR4IaTk0OQ9t0Mw7DcKjcVpVlBUlRVWE1U1CiDio18JEQLMqSgmQ83mQtSWLaRDy3StLAqX8ZCtfNBLPVtRK9DAsJwvDYQIyF1WwPtoUFMj5yfSi0WOTTM2zXT9ILIt2LkTirT-R5DDSfQ7MQ0gACcwAAR3+OABEgLCgTAHDcCODtr0DfkwAAM1DSNBSDUV5VnSgJ0FadyMCtTgozTxHCUD9LB0NdWHsHdyVLQxJk0T4VFkIbHF-VK3Qy7LctgfKIEK-BipBI5HxRF8QtOPcFF-Ub3FrStPjuC1SxcWwpkPNRFAdKQ1GW4TfX9QMgwwbDUAAL1KvpGCDQU5wAIVhSEAGlWpI9qZwCw71OO6RnAmelePUR47ELdjKmpeLa0LFwdE+ppvq7P70AB4H9slSF+XVAB1Sgg3heV4QlAAJTrUZ6ldf0+UhsdydQ8SimKtzcbjEr450TyEqmQZvWn6ZBkRGFnHm+1FMjKC5+E1SUgXUzR3rf3ORjXrSAxXtu0ZrPLNIhmsgkhqxHxWXQGgGHgWJXWE0ItgiC2hZovcNyeGk9EeIbtBcRRvBdZsVu5RyIAjvUVxJBQZrUZi93UOjf3JawpEmewShUNc9yGY82QQlaL1Qq8ftve8oBz6jQtxWO6-4nd-yMCb68mQ8133Sa4LTlvhLbtCMJc5Be40lIjFYWxtFJhtHBJRQNzm0hLH-DQG0sADKYc3knIknD1-RhA6SpW4SRmip8x0GKJjlhLeLJQEvPFWt8UJPwzBUckkEJhcXsKNbQ1hmI3zIJlHKeUCoYR2iVMqHcuxVVqneCBws8RPDxPmQoUwz7VAmvicsUwOKyGUPHNIKDVroI2pgoqOC+5Lg3tIEWA0B7DX-GNI+wFFD0MLvIOwpYnBN2DqrTuGs0AMz6KQDAs5UCwG4P8fKxCaK6CmlfQa5RKhDXYnRYo8UeJJQMGw6m6t-qqK1iFPhz97oTAuHbEosV3DQNULYOszJRoO2qGw8S2DkCQAMf3KKkwGz53evNFQE1Ziu1uE4DwO5SSp2VvZMg1VnFAxic+S2wttDlhTruW0nx5Ey2Jk4SopZG4khQbElIABaVJFpuk+y8EAA */
+	/** @xstate-layout N4IgpgJg5mDOIC5QBsCWA7A1gWQIYGMALDMAOjSwAJkB7XCSAYgG0AGAXUVAAcbZUALqhrouIAB6IAjAA4ALKQCscgGwyA7FICcigMzypcgEwAaEAE9ER3a1IqtU1rsUrFLlStkBfL2Yo4CYnQyf2o6BggWKU4kEF5+IRExSQRZBWU1TR19OUNTC0RFVhlSOXV1VX0s1UUfPwwAohJyBrD6JmYjGJ4+QWFRWJSZfMsEB1syiqKZVnVFdQc6kH88JuCWqlp2yOZdbrjexIHQFKkKpVUNbT0DYzNRlVYtUvK5GSkjM89dJZXA5oAruh8MhcKgALZMADCABkAIIASWwbH28T6SUGiDkWgURneRgJ6jUrEURhU90QukcpFYxXUzlmcycJN+DVWQTIQJBYMhkQASgBRACKAFUBQBlAAqlChcIAclCBTD4ZKEQB5OUosRoo7JLE40h4j6E4mk8kFVLyGlyWmsXLGG1aLSsrDs5rciGQUgAdzBQnQUDkADEgRAMFBGILRRLpbKFUqVerNRxtYd+nrUmcKakPCpSOUNKwjBVdHMpCoXY0OaQPbyfX7w8HQ+HGAAFOEATWwArl0sFioRADUBQARLWxHXpzEIYxSfO6ORvHQLZTORTZj6yUpaCqzbTGGTyStu9a1r2+voBpvoMMBlgpidpjEnSlF0hnWSKLQqTTDYtyDdnBKFRdGLGQXFYDwpF0Z1fGWNl-lPUFPQgGtcHQKFcGQZBGFlZUZQ1OUBShSVR3HHoEinF8EAJWxS2xBwKlkb9wI3HFFFIZwcUMVgPgXPFj0Qsgz1Q-B0Mw7DI2FMUpRleVFWVOFVQ1ciDko58JCsIw6IqJ0zlyGQWPXC0zkPQ11BkH8ySkQxvzkQS1mE5C6wwCScLwmECOwVsYQFUixwfCj0WOTSEEUQxSkgoxck+SoPDYuQOK4+1eOsA8HOrETSAAJzAABHAE4AESBMOBMBsNwI560vQM+TAAAzUMpKDEU5RHSh+wFIcyMCtTgozIo6KNDxdB-eYnXUDd7HUOxQPeaC5i0QyZAy91nK9XKCqKkr0PwcrQSOe9USfELTikL9DScbTcl0BdFxGaRDBmyZEumQ8LJ+OC-kcmt1tQ31-UDIMMCw1AAC9Kv6RggwFUcACE4ShABpDriK64cAuO9TTsei7tNAu1oLuu4TKdXRSHAnFrGgu0nVWpCeXPSGr2B9BQYhw6JShPk1QAdUoIMETlBFxQACR6rH+unGy8auwnbsXEnRn3OdKZSvi5E++pXSE37Gf+5mgZBtAOahkcRdbEVSMoIWEVVJSJdTbGMyJOctFLRQZhcd2KgA0mFzsM4CTUUsls9nw4PQGgGHgWJvurUItgiJ2peopWrFA99xgXWySQXenOWBP6U91adRoUBY1B-XjBp0bMCRKbRHFu6x1FblavoQn6sovQHr1vKAS6o0KbKMUpHi0Iwlv05RPkA7Fx8eTJVE0PQC71lC0IwrDkCHjSzoe1J3eebRi0n4pHCp9estcne95xmdtE4j4yhxECnAcBKOLVniNYEzudbdz+jlfKhVYDFQgKVPaFUqq90bHVRqN574DXOjSc6Kh7owW0uFDcwxgI12MFSRwMgtbwUAZlYBm0wEQKgftSGGlJz7yxKSTiw0QJjQWDuKaxRZpgSWhoBwt1r7AIBo2Vm7N6HoFIBgEcqBYDcABMVZB05vxzi-FUYsC1NDmmVjoEoyU3jqCcGNDu2sqxrX1vWPu4iTaSOUdRTQ5MfaexJPYeiftlbyA4p4NuecGJPCMMI-W9jQoYI3B8Z42IphvQ0CQ6+u19qQBCacKeJRdLfm0j4nE2YHAlB3L7OYRJtLfnXvVY24MkmPmdtLKopAtBRULHMRczg2J6E4l+G62gcS8QrAA8xwRkmIAALQ6MQDoGkMEnRTOmXTCOQA */
 	return createMachine(
 		{
 			context: { linkState: linkState, errorMessage: undefined as string | undefined },
@@ -57,6 +57,10 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 						{
 							target: 'finalized',
 							cond: 'linkFinalized'
+						},
+						{
+							target: 'claimed.requestedCancellation',
+							cond: 'linkInCancellationRequested'
 						}
 					]
 				},
@@ -82,7 +86,8 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 							},
 							on: {
 								'REQUEST CANCELLATION': {
-									target: '#linkMachine.requestedCancellation'
+									target: 'requestedCancellation',
+									actions: ['requestCancellation', 'saveLinkState']
 								},
 								'PAYMENT RECEIVED': {
 									actions: ['receivePayment', 'saveLinkState']
@@ -95,50 +100,53 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 									target: 'inCall'
 								},
 								'REQUEST CANCELLATION': {
-									target: '#linkMachine.requestedCancellation'
+									target: 'requestedCancellation',
+									actions: ['requestCancellation', 'saveLinkState']
 								}
 							}
 						},
 						inCall: {
 							on: {
 								'CALL COMPLETED': {
-									target: '#linkMachine.wating4Finalization'
+									target: 'wating4Finalization'
 								}
 							}
-						}
-					}
-				},
-				requestedCancellation: {
-					initial: 'waiting4Refund',
-					states: {
-						waiting4Refund: {
+						},
+						requestedCancellation: {
+							initial: 'waiting4Refund',
+							states: {
+								waiting4Refund: {
+									on: {
+										'REFUND RECEIVED': {
+											actions: ['recieveRefund', 'saveLinkState']
+										}
+									}
+								}
+							},
+							always: {
+								target: '#linkMachine.cancelled',
+								actions: ['cancelApproved', 'saveLinkState'],
+								cond: (context) =>
+									context.linkState.totalFunding <= context.linkState.refundedAmount
+							}
+						},
+						wating4Finalization: {
+							initial: 'inDispute',
+							states: {
+								inDispute: {}
+							},
 							on: {
-								'REFUND RECEIVED': {
-									actions: ['recieveRefund', 'saveLinkState']
+								'FEEDBACK RECEIVED': {
+									target: '#linkMachine.finalized'
+								},
+								'ESCROW FINISHED': {
+									target: '#linkMachine.finalized'
+								},
+								'DISPUTE INITIATED': {
+									target: '.inDispute',
+									actions: 'initiateDispute'
 								}
 							}
-						}
-					},
-					always: {
-						target: 'cancelled',
-						cond: (context) => context.linkState.totalFunding <= context.linkState.refundedAmount
-					}
-				},
-				wating4Finalization: {
-					initial: 'inDispute',
-					states: {
-						inDispute: {}
-					},
-					on: {
-						'FEEDBACK RECEIVED': {
-							target: 'finalized'
-						},
-						'ESCROW FINISHED': {
-							target: 'finalized'
-						},
-						'DISPUTE INITIATED': {
-							target: '.inDispute',
-							actions: 'initiateDispute'
 						}
 					}
 				},
@@ -168,6 +176,25 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 							...context.linkState,
 							status: LinkStatuses.CLAIMED,
 							claim: event.claim
+						}
+					};
+				}),
+
+				requestCancellation: assign((context, event) => {
+					return {
+						linkState: {
+							...context.linkState,
+							status: LinkStatuses.CANCELLATION_REQUESTED,
+							cancel: event.cancel
+						}
+					};
+				}),
+
+				cancelApproved: assign((context) => {
+					return {
+						linkState: {
+							...context.linkState,
+							status: LinkStatuses.CANCELED
 						}
 					};
 				}),
@@ -236,6 +263,8 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 				linkCancelled: (context) => context.linkState.status === LinkStatuses.CANCELED,
 				linkFinalized: (context) => context.linkState.status === LinkStatuses.FINALIZED,
 				linkClaimed: (context) => context.linkState.status === LinkStatuses.CLAIMED,
+				linkInCancellationRequested: (context) =>
+					context.linkState.status === LinkStatuses.CANCELLATION_REQUESTED,
 				fullyFunded: (context) =>
 					context.linkState.totalFunding >= context.linkState.requestedFunding
 			}

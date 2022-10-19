@@ -23,7 +23,8 @@ export enum LinkStatuses {
 	FINALIZED,
 	IN_ESCROW,
 	IN_DISPUTE,
-	IN_CALL
+	IN_CALL,
+	CANCELLATION_REQUESTED
 }
 
 export enum ConnectionType {

@@ -14,12 +14,14 @@ export interface Typegen0 {
 		delays: never;
 	};
 	eventsCausingActions: {
+		cancelApproved: '';
 		cancelLink: 'REQUEST CANCELLATION';
 		claimLink: 'CLAIM';
 		initiateDispute: 'DISPUTE INITIATED';
 		receivePayment: 'PAYMENT RECEIVED';
 		recieveRefund: 'REFUND RECEIVED';
-		saveLinkState: 'CLAIM' | 'PAYMENT RECEIVED' | 'REFUND RECEIVED' | 'REQUEST CANCELLATION';
+		requestCancellation: 'REQUEST CANCELLATION';
+		saveLinkState: '' | 'CLAIM' | 'PAYMENT RECEIVED' | 'REFUND RECEIVED' | 'REQUEST CANCELLATION';
 	};
 	eventsCausingServices: {};
 	eventsCausingGuards: {
@@ -27,6 +29,7 @@ export interface Typegen0 {
 		linkCancelled: '';
 		linkClaimed: '';
 		linkFinalized: '';
+		linkInCancellationRequested: '';
 		linkUnclaimed: '';
 	};
 	eventsCausingDelays: {};
@@ -35,18 +38,22 @@ export interface Typegen0 {
 		| 'claimed'
 		| 'claimed.canCall'
 		| 'claimed.inCall'
+		| 'claimed.requestedCancellation'
+		| 'claimed.requestedCancellation.waiting4Refund'
 		| 'claimed.waiting4Funding'
+		| 'claimed.wating4Finalization'
+		| 'claimed.wating4Finalization.inDispute'
 		| 'finalized'
 		| 'link loaded'
-		| 'requestedCancellation'
-		| 'requestedCancellation.waiting4Refund'
 		| 'unclaimed'
-		| 'wating4Finalization'
-		| 'wating4Finalization.inDispute'
 		| {
-				claimed?: 'canCall' | 'inCall' | 'waiting4Funding';
-				requestedCancellation?: 'waiting4Refund';
-				wating4Finalization?: 'inDispute';
+				claimed?:
+					| 'canCall'
+					| 'inCall'
+					| 'requestedCancellation'
+					| 'waiting4Funding'
+					| 'wating4Finalization'
+					| { requestedCancellation?: 'waiting4Refund'; wating4Finalization?: 'inDispute' };
 		  };
 	tags: never;
 }
