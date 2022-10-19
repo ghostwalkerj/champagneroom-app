@@ -7,6 +7,7 @@ import { StorageTypes } from '$lib/ORM/rxdb';
 import { error, invalid } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import type { PageServerLoad } from './$types';
+import { waitFor } from 'xstate/lib/waitFor';
 
 const token = jwt.sign(
 	{
@@ -100,6 +101,7 @@ export const actions: import('./$types').Actions = {
 				canceler: ActorType.TALENT
 			}
 		});
+
 		return { success: true };
 	},
 	send_refund: async ({ params, request }) => {

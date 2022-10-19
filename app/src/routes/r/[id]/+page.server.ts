@@ -10,7 +10,6 @@ import { error, invalid } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 import { mensNames } from '$lib/util/mensNames';
-
 export const load: import('./$types').PageServerLoad = async ({ params }) => {
 	const linkId = params.id;
 	if (linkId === null) {
@@ -44,7 +43,7 @@ export const load: import('./$types').PageServerLoad = async ({ params }) => {
 		throw error(500, 'Feedback not found');
 	}
 
-	_feedback.update({ $inc: { viewed: 1 } }); // Increment view count
+	//_feedback.update({ $inc: { viewed: 1 } }); // Increment view count
 	const feedback = (_feedback as FeedbackDocument).toJSON() as FeedbackDocType;
 	const displayName = uniqueNamesGenerator({
 		dictionaries: [mensNames]

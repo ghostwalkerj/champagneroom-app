@@ -57,6 +57,7 @@
 
 	$: canCreateLink = currentLinkState ? currentLinkState.done : true;
 	$: canCall = currentLinkState ? currentLinkState.matches('claimed.canCall') : false;
+	$: submitDisabled = false;
 
 	const updateLink = (linkState: LinkDocument['state']) => {
 		if (currentLink && currentLink.atomicPatch)
@@ -92,6 +93,7 @@
 			.then((link) => {
 				if (link) {
 					link.$.subscribe((_link) => {
+						submitDisabled = false; // link changed, so can submit again
 						currentLink = _link;
 						linkService = createLinkMachineService(currentLink.state, updateLink);
 						linkSub = linkService.subscribe((state) => {
@@ -222,7 +224,12 @@
 
 					{#if canCancelLink}
 						<!-- Link Form-->
-						<form method="post" action="?/cancel_link" use:enhance>
+						<form
+							method="post"
+							action="?/cancel_link"
+							on:submit={() => (submitDisabled = true)}
+							use:enhance
+						>
 							<div class="bg-primary text-primary-content card">
 								<div class="text-center card-body items-center">
 									<div class="text-2xl card-title">Cancel Your pCall Link</div>
@@ -237,7 +244,9 @@
 
 									<div class="flex flex-col text-white p-2 justify-center items-center">
 										<div class="py-4">
-											<button class="btn btn-secondary" type="submit">Cancel Link</button>
+											<button class="btn btn-secondary" type="submit" disabled={submitDisabled}
+												>Cancel Link</button
+											>
 										</div>
 									</div>
 								</div>
@@ -248,7 +257,12 @@
 							<div class="text-center card-body items-center">
 								<h2 class="text-2xl card-title">Create a New pCall Link</h2>
 								<div class="flex flex-col text-white p-2 justify-center items-center">
-									<form method="post" action="?/create_link" use:enhance>
+									<form
+										method="post"
+										action="?/create_link"
+										on:submit={() => (submitDisabled = true)}
+										use:enhance
+									>
 										<div class="max-w-xs w-full py-2 form-control ">
 											<!-- svelte-ignore a11y-label-has-associated-control -->
 											<label for="price" class="label">
@@ -283,7 +297,9 @@
 										</div>
 
 										<div class="py-4">
-											<button class="btn btn-secondary" type="submit">Generate Link</button>
+											<button class="btn btn-secondary" type="submit" disabled={submitDisabled}
+												>Generate Link</button
+											>
 										</div>
 									</form>
 								</div>
@@ -294,7 +310,12 @@
 							<div class="text-center card-body items-center">
 								<h2 class="text-2xl card-title">Issue Refund for Cancelled Link</h2>
 								<div class="flex flex-col text-white p-2 justify-center items-center">
-									<form method="post" action="?/send_refund" use:enhance>
+									<form
+										method="post"
+										action="?/send_refund"
+										on:submit={() => (submitDisabled = true)}
+										use:enhance
+									>
 										<div class="max-w-xs w-full py-2 form-control ">
 											<!-- svelte-ignore a11y-label-has-associated-control -->
 											<label for="price" class="label">
@@ -331,7 +352,9 @@
 										</div>
 
 										<div class="py-4">
-											<button class="btn btn-secondary" type="submit">Send Refund</button>
+											<button class="btn btn-secondary" type="submit" disabled={submitDisabled}
+												>Send Refund</button
+											>
 										</div>
 									</form>
 								</div>

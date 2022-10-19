@@ -19,8 +19,8 @@
 	import type { PageData } from './$types';
 	import FeedbackForm from './FeedbackForm.svelte';
 	import LinkDetail from './LinkDetail.svelte';
-	export let form: import('./$types').ActionData;
 
+	export let form: import('./$types').ActionData;
 	export let data: PageData;
 
 	const token = data.token;
@@ -33,6 +33,7 @@
 	let mediaStream: MediaStream;
 	let us: Awaited<UserStreamType>;
 	let feedback: FeedbackDocument;
+	$: submitDisabled = false;
 
 	$: linkService = createLinkMachineService(linkObj.state);
 	$: linkState = linkService.initialState;
@@ -46,6 +47,7 @@
 		_db.links.findOne(linkObj._id).$.subscribe((_link) => {
 			if (_link) {
 				linkObj = _link as LinkDocument;
+				submitDisabled = false;
 				// Here is where we run the machine and do all the logic based on the state
 				linkService = createLinkMachineService(_link.state);
 				linkService.subscribe((state) => {
@@ -105,17 +107,6 @@
 		}
 	};
 
-	const sendTransaction = async (amount: number, fundingAddress: string) => {
-		// if ($selectedAccount) {
-		// 	const result = await $web3.eth.sendTransaction({
-		// 		from: $selectedAccount,
-		// 		to: fundingAddress,
-		// 		value: $web3.utils.toWei(amount.toString(), 'ether')
-		// 	});
-		// }
-	};
-
-	// All depends on the link status
 	// Wait for onMount to grab user Stream only if we plan to call or do we grab to to make sure it works?
 	onMount(async () => {
 		requestStream();
@@ -162,7 +153,12 @@
 							<div class="text-center card-body items-center">
 								<h2 class="text-2xl card-title">Claim pCall Link</h2>
 								<div class="flex flex-col text-white p-2 justify-center items-center">
-									<form method="post" action="?/claim" use:enhance>
+									<form
+										method="post"
+										action="?/claim"
+										on:submit={() => (submitDisabled = true)}
+										use:enhance
+									>
 										<div
 											class="bg-cover bg-no-repeat bg-center rounded-full h-48 w-48"
 											style="background-image: url('{profileImage}')"
@@ -204,7 +200,9 @@
 											</div>
 										</div>
 										<div class="py-4">
-											<button class="btn btn-secondary" type="submit">Claim Link</button>
+											<button class="btn btn-secondary" type="submit" disabled={submitDisabled}
+												>Claim Link</button
+											>
 										</div>
 									</form>
 								</div>
@@ -217,7 +215,12 @@
 							<div class="text-center card-body items-center">
 								<h2 class="text-2xl card-title">Fund pCall Link</h2>
 								<div class="flex flex-col text-white p-2 justify-center items-center">
-									<form method="post" action="?/send_payment" use:enhance>
+									<form
+										method="post"
+										action="?/send_payment"
+										on:submit={() => (submitDisabled = true)}
+										use:enhance
+									>
 										<div class="max-w-xs w-full py-2 form-control ">
 											<!-- svelte-ignore a11y-label-has-associated-control -->
 											<label for="amount" class="label">
@@ -239,7 +242,9 @@
 											</div>
 										</div>
 										<div class="py-4">
-											<button class="btn btn-secondary" type="submit">Send Payment</button>
+											<button class="btn btn-secondary" type="submit" disabled={submitDisabled}
+												>Send Payment</button
+											>
 										</div>
 									</form>
 								</div>
