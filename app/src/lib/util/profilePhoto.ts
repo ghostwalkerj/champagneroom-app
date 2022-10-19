@@ -1,7 +1,7 @@
 import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
 import { PUBLIC_PROFILE_IMAGE_PATH } from '$env/static/public';
 
-const MAX_PROFILE_NUMBER = 32;
+const MAX_PROFILE_NUMBER = 80;
 const PROFILE_PAD = 5;
 const PROFILE_IMAGE_EXTENSION = 'jpg';
 const PROFILE_IMAGE_PREFIX = 'profile';
