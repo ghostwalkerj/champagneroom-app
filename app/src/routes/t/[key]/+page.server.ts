@@ -7,7 +7,6 @@ import { StorageTypes } from '$lib/ORM/rxdb';
 import { error, invalid } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import type { PageServerLoad } from './$types';
-import { waitFor } from 'xstate/lib/waitFor';
 
 const token = jwt.sign(
 	{
@@ -41,7 +40,7 @@ export const load: PageServerLoad = async ({ params }) => {
 	const _currentLink = (await _talent.populate('currentLink')) as LinkDocument;
 	const _completedCalls = (await _talent.populate('stats.completedCalls')) as LinkDocument[];
 	const talent = _talent.toJSON();
-	const currentLink = _currentLink ? _currentLink.toJSON() : {};
+	const currentLink = _currentLink ? _currentLink.toJSON() : undefined;
 	const completedCalls = _completedCalls.map((link) => link.toJSON());
 
 	return {
@@ -64,7 +63,7 @@ export const actions: import('./$types').Actions = {
 		if (!amount) {
 			return invalid(400, { amount, missingAmount: true });
 		}
-		if (isNaN(Number(amount)) || Number(amount) < 0 || Number(amount) > 10000) {
+		if (isNaN(Number(amount)) || Number(amount) < 1 || Number(amount) > 10000) {
 			return invalid(400, { amount, invalidAmount: true });
 		}
 		const talent = await getTalent(key);
@@ -101,7 +100,6 @@ export const actions: import('./$types').Actions = {
 				canceler: ActorType.TALENT
 			}
 		});
-
 		return { success: true };
 	},
 	send_refund: async ({ params, request }) => {

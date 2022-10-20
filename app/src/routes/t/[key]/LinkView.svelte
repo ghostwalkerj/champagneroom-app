@@ -14,9 +14,10 @@
 	export let linkState: LinkMachineStateType | undefined;
 	let tooltipOpen = '';
 
-	$: callerProfileImage = link.state.claim
-		? getProfileImage(link.state.claim.caller)
-		: PUBLIC_DEFAULT_PROFILE_IMAGE;
+	$: callerProfileImage =
+		link && link.state.claim
+			? getProfileImage(link.state.claim.caller)
+			: PUBLIC_DEFAULT_PROFILE_IMAGE;
 
 	$: linkURL = '';
 	$: if (link) linkURL = urlJoin($page.url.origin, PUBLIC_ROOM_PATH, link._id);

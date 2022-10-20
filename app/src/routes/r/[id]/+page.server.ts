@@ -129,7 +129,7 @@ export const actions: import('./$types').Actions = {
 			return invalid(400, { amount, missingAmount: true });
 		}
 
-		if (isNaN(Number(amount))) {
+		if (isNaN(Number(amount)) || Number(amount) < 1 || Number(amount) > 10000) {
 			return invalid(400, { amount, invalidAmount: true });
 		}
 

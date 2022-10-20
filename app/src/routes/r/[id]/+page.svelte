@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import { enhance } from '$app/forms';
+	import { applyAction, enhance } from '$app/forms';
 	import { page } from '$app/stores';
-	import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
 	import VideoCall from '$lib/components/calls/VideoCall.svelte';
 	import VideoPreview from '$lib/components/calls/VideoPreview.svelte';
 	import { callMachine } from '$lib/machines/callMachine';
@@ -33,7 +32,7 @@
 	let mediaStream: MediaStream;
 	let us: Awaited<UserStreamType>;
 	let feedback: FeedbackDocument;
-	$: submitDisabled = false;
+	$: waiting4StateChange = false;
 
 	$: linkService = createLinkMachineService(linkObj.state);
 	$: linkState = linkService.initialState;
@@ -53,7 +52,7 @@
 					linkState = state;
 					if (state.matches('claimed.canCall')) initVC();
 				});
-				submitDisabled = false;
+				waiting4StateChange = false;
 			}
 		});
 
@@ -107,6 +106,16 @@
 		}
 	};
 
+	const onSubmit = () => {
+		waiting4StateChange = true;
+		return async ({ result }) => {
+			if (result.type !== 'success') {
+				waiting4StateChange = false;
+			}
+			await applyAction(result);
+		};
+	};
+
 	// Wait for onMount to grab user Stream only if we plan to call or do we grab to to make sure it works?
 	onMount(async () => {
 		requestStream();
@@ -153,12 +162,7 @@
 							<div class="text-center card-body items-center">
 								<h2 class="text-2xl card-title">Claim pCall Link</h2>
 								<div class="flex flex-col text-white p-2 justify-center items-center">
-									<form
-										method="post"
-										action="?/claim"
-										on:submit={() => (submitDisabled = true)}
-										use:enhance
-									>
+									<form method="post" action="?/claim" use:enhance={onSubmit}>
 										<div
 											class="bg-cover bg-no-repeat bg-center rounded-full h-48 w-48"
 											style="background-image: url('{profileImage}')"
@@ -200,7 +204,7 @@
 											</div>
 										</div>
 										<div class="py-4">
-											<button class="btn btn-secondary" type="submit" disabled={submitDisabled}
+											<button class="btn btn-secondary" type="submit" disabled={waiting4StateChange}
 												>Claim Link</button
 											>
 										</div>
@@ -215,12 +219,7 @@
 							<div class="text-center card-body items-center">
 								<h2 class="text-2xl card-title">Fund pCall Link</h2>
 								<div class="flex flex-col text-white p-2 justify-center items-center">
-									<form
-										method="post"
-										action="?/send_payment"
-										on:submit={() => (submitDisabled = true)}
-										use:enhance
-									>
+									<form method="post" action="?/send_payment" use:enhance={onSubmit}>
 										<div class="max-w-xs w-full py-2 form-control ">
 											<!-- svelte-ignore a11y-label-has-associated-control -->
 											<label for="amount" class="label">
@@ -242,7 +241,7 @@
 											</div>
 										</div>
 										<div class="py-4">
-											<button class="btn btn-secondary" type="submit" disabled={submitDisabled}
+											<button class="btn btn-secondary" type="submit" disabled={waiting4StateChange}
 												>Send Payment</button
 											>
 										</div>

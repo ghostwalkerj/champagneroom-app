@@ -14,7 +14,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 	return createMachine(
 		{
 			context: { linkState: linkState, errorMessage: undefined as string | undefined },
-			tsTypes: {} as import('./linkMachine.typegen').Typegen0,
+			tsTypes: {} as import("./linkMachine.typegen").Typegen0,
 			schema: {
 				events: {} as
 					| { type: 'CLAIM'; claim: LinkStateType['claim'] }

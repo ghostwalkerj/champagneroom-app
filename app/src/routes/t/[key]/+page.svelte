@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import { enhance } from '$app/forms';
+	import { applyAction, enhance } from '$app/forms';
 	import { page } from '$app/stores';
 	import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
 	import VideoCall from '$lib/components/calls/VideoCall.svelte';
@@ -23,6 +23,7 @@
 	import LinkViewer from './LinkView.svelte';
 	import TalentActivity from './TalentActivity.svelte';
 	import TalentWallet from './TalentWallet.svelte';
+
 	export let form: import('./$types').ActionData;
 
 	export let data: PageData;
@@ -45,19 +46,18 @@
 	let mediaStream: MediaStream;
 	$: callerName = '';
 	let videoCall: any;
-	let currentLinkState = currentLink
-		? createLinkMachineService(currentLink.state).getSnapshot()
-		: undefined;
-	$: canCancelLink = currentLinkState
-		? currentLinkState.can({
-				type: 'REQUEST CANCELLATION',
-				cancel: undefined
-		  })
-		: false;
+	let currentLinkState = currentLink && createLinkMachineService(currentLink.state).getSnapshot();
 
-	$: canCreateLink = currentLinkState ? currentLinkState.done : true;
-	$: canCall = currentLinkState ? currentLinkState.matches('claimed.canCall') : false;
-	$: submitDisabled = false;
+	$: canCancelLink =
+		currentLinkState &&
+		currentLinkState.can({
+			type: 'REQUEST CANCELLATION',
+			cancel: undefined
+		});
+
+	$: canCreateLink = !currentLinkState || currentLinkState.done;
+	$: canCall = currentLinkState && currentLinkState.matches('claimed.canCall');
+	$: waiting4StateChange = false;
 
 	const updateLink = (linkState: LinkDocument['state']) => {
 		if (currentLink && currentLink.atomicPatch)
@@ -107,7 +107,7 @@
 								if (canCall) initVC();
 							}
 						});
-						submitDisabled = false; // link changed, so can submit again
+						waiting4StateChange = false; // link changed, so can submit again
 					});
 				}
 			});
@@ -175,6 +175,16 @@
 	onDestroy(async () => {
 		if (vc) vc.destroy();
 	});
+
+	const onSubmit = () => {
+		waiting4StateChange = true;
+		return async ({ result }) => {
+			if (result.type !== 'success') {
+				waiting4StateChange = false;
+			}
+			await applyAction(result);
+		};
+	};
 </script>
 
 <input type="checkbox" id="call-modal" class="modal-toggle" bind:checked={showAlert} />
@@ -224,12 +234,7 @@
 
 					{#if canCancelLink}
 						<!-- Link Form-->
-						<form
-							method="post"
-							action="?/cancel_link"
-							on:submit={() => (submitDisabled = true)}
-							use:enhance
-						>
+						<form method="post" action="?/cancel_link" use:enhance={onSubmit}>
 							<div class="bg-primary text-primary-content card">
 								<div class="text-center card-body items-center">
 									<div class="text-2xl card-title">Cancel Your pCall Link</div>
@@ -244,7 +249,7 @@
 
 									<div class="flex flex-col text-white p-2 justify-center items-center">
 										<div class="py-4">
-											<button class="btn btn-secondary" type="submit" disabled={submitDisabled}
+											<button class="btn btn-secondary" type="submit" disabled={waiting4StateChange}
 												>Cancel Link</button
 											>
 										</div>
@@ -257,12 +262,7 @@
 							<div class="text-center card-body items-center">
 								<h2 class="text-2xl card-title">Create a New pCall Link</h2>
 								<div class="flex flex-col text-white p-2 justify-center items-center">
-									<form
-										method="post"
-										action="?/create_link"
-										on:submit={() => (submitDisabled = true)}
-										use:enhance
-									>
+									<form method="post" action="?/create_link" use:enhance={onSubmit}>
 										<div class="max-w-xs w-full py-2 form-control ">
 											<!-- svelte-ignore a11y-label-has-associated-control -->
 											<label for="price" class="label">
@@ -297,7 +297,7 @@
 										</div>
 
 										<div class="py-4">
-											<button class="btn btn-secondary" type="submit" disabled={submitDisabled}
+											<button class="btn btn-secondary" type="submit" disabled={waiting4StateChange}
 												>Generate Link</button
 											>
 										</div>
@@ -310,12 +310,7 @@
 							<div class="text-center card-body items-center">
 								<h2 class="text-2xl card-title">Issue Refund for Cancelled Link</h2>
 								<div class="flex flex-col text-white p-2 justify-center items-center">
-									<form
-										method="post"
-										action="?/send_refund"
-										on:submit={() => (submitDisabled = true)}
-										use:enhance
-									>
+									<form method="post" action="?/send_refund" use:enhance={onSubmit}>
 										<div class="max-w-xs w-full py-2 form-control ">
 											<!-- svelte-ignore a11y-label-has-associated-control -->
 											<label for="price" class="label">
@@ -352,7 +347,7 @@
 										</div>
 
 										<div class="py-4">
-											<button class="btn btn-secondary" type="submit" disabled={submitDisabled}
+											<button class="btn btn-secondary" type="submit" disabled={waiting4StateChange}
 												>Send Refund</button
 											>
 										</div>
