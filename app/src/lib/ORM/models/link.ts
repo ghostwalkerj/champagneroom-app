@@ -1,5 +1,10 @@
 import type { AgentDocument } from '$lib/ORM/models/agent';
-import type { FeedbackDocument } from '$lib/ORM/models/feedback';
+import {
+	ConnectionDocType,
+	ConnectionDocument,
+	ConnectionStatus,
+	ConnectionString
+} from '$lib/ORM/models/connection';
 import type { TalentDocument } from '$lib/ORM/models/talent';
 import { nanoid } from 'nanoid';
 import {
@@ -16,7 +21,7 @@ import {
 	type TransactionDocument
 } from './transaction';
 
-export enum LinkStatuses {
+export enum LinkStatus {
 	UNCLAIMED,
 	CLAIMED,
 	CANCELED,
@@ -25,15 +30,6 @@ export enum LinkStatuses {
 	IN_DISPUTE,
 	IN_CALL,
 	CANCELLATION_REQUESTED
-}
-
-export enum ConnectionType {
-	ATTEMPT,
-	CONNECT,
-	DISCONNECTED,
-	NO_ANSWER,
-	CALLER_HANGUP,
-	CALLEE_HANGUP
 }
 
 export enum ActorType {
@@ -57,6 +53,7 @@ type LinkDocMethods = {
 		value: string;
 		reason: TransactionReasonType;
 	}) => Promise<TransactionDocument>;
+	createConnection: () => Promise<TransactionDocument>;
 };
 
 export const linkDocMethods: LinkDocMethods = {
@@ -80,6 +77,19 @@ export const linkDocMethods: LinkDocMethods = {
 			...transaction
 		};
 		return db.transactions.insert(_transaction);
+	},
+	createConnection: async function (this: LinkDocument) {
+		const db = this.collection.database;
+		const _connection: ConnectionDocType = {
+			_id: `${ConnectionString}:c${nanoid()}`,
+			createdAt: new Date().getTime(),
+			updatedAt: new Date().getTime(),
+			link: this._id,
+			talent: this.talent,
+			agent: this.agent,
+			status: ConnectionStatus.ATTEMPT
+		};
+		return db.connections.insert(_connection);
 	}
 };
 
@@ -112,13 +122,13 @@ const linkSchemaLiteral = {
 			maximum: 99999
 		},
 		callId: { type: 'string' },
-		state: {
+		linkState: {
 			type: 'object',
 			properties: {
 				status: {
 					type: 'string',
-					enum: Object.values(LinkStatuses),
-					default: LinkStatuses.UNCLAIMED
+					enum: Object.values(LinkStatus),
+					default: LinkStatus.UNCLAIMED
 				},
 				totalFunding: {
 					type: 'integer',
@@ -137,34 +147,6 @@ const linkSchemaLiteral = {
 					default: 0,
 					minimum: 0,
 					maximum: 99999
-				},
-				feedback: {
-					rejected: {
-						type: 'integer',
-						default: 0,
-						minimum: 0
-					},
-					disconnected: {
-						type: 'integer',
-						default: 0,
-						minimum: 0
-					},
-					unanswered: {
-						type: 'integer',
-						default: 0,
-						minimum: 0
-					},
-					viewed: {
-						type: 'integer',
-						default: 0,
-						minimum: 0
-					},
-					callerRating: {
-						type: 'integer',
-						default: 0,
-						minimum: 0,
-						maximum: 5
-					}
 				},
 				cancel: {
 					type: 'object',
@@ -241,28 +223,28 @@ const linkSchemaLiteral = {
 							type: 'array',
 							ref: 'transactions',
 							items: { type: 'string' }
+						},
+						feedback: {
+							type: 'object',
+							properties: {
+								rating: {
+									type: 'integer',
+									default: 0,
+									minimum: 0,
+									maximum: 5
+								},
+								comments: {
+									type: 'string',
+									maxLength: 500
+								}
+							},
+							required: ['rating']
 						}
 					},
 					required: ['endedAt']
-				},
-				connections: {
-					type: 'array',
-					items: {
-						type: 'object',
-						properties: {
-							type: {
-								type: 'string',
-								enum: Object.values(ConnectionType)
-							},
-							createdAt: { type: 'integer' },
-							endedAt: { type: 'integer' },
-							caller: { type: 'string' }
-						},
-						required: ['type', 'createdAt', 'caller']
-					}
 				}
 			},
-			required: ['status', 'totalFunding', 'requestedFunding', 'refundedAmount', 'feedback']
+			required: ['status', 'totalFunding', 'requestedFunding', 'refundedAmount']
 		},
 		talentInfo: {
 			type: 'object',
@@ -294,7 +276,7 @@ const linkSchemaLiteral = {
 		},
 		talent: { type: 'string', ref: 'talents', maxLength: 50 },
 		agent: { type: 'string', ref: 'agents', maxLength: 70 },
-		feedback: { type: 'string', ref: 'feedbacks', maxLength: 50 },
+		connections: { type: 'string', ref: 'connections', maxLength: 50 },
 		createdAt: {
 			type: 'integer'
 		},
@@ -308,24 +290,23 @@ const linkSchemaLiteral = {
 	},
 	required: [
 		'_id',
-		'state',
+		'linkState',
 		'talent',
 		'agent',
 		'talentInfo',
 		'callId',
 		'requestedAmount',
 		'fundingAddress',
-		'feedback',
 		'createdAt'
 	],
-	indexes: ['talent', 'feedback', 'agent', 'state.status', 'state.finalized.endedAt'],
+	indexes: ['talent', 'connections', 'agent', 'state.status', 'state.finalized.endedAt'],
 	encrypted: ['callId']
 } as const;
 
 type linkRef = {
 	talent_?: Promise<TalentDocument>;
 	agent_?: Promise<AgentDocument>;
-	feedback_?: Promise<FeedbackDocument>;
+	connections_?: Promise<ConnectionDocument>;
 	transactions_?: Promise<TransactionDocument[]>;
 };
 

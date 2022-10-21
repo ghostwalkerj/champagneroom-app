@@ -1,5 +1,5 @@
 import { PUBLIC_PUBLIC_ENDPOINT, PUBLIC_RXDB_PASSWORD } from '$env/static/public';
-import { feedbackSchema, type FeedbackCollection } from '$lib/ORM/models/feedback';
+import { connectionSchema, type ConnectionCollection } from '$lib/ORM/models/connection';
 import { linkSchema, type LinkCollection, type LinkDocument } from '$lib/ORM/models/link';
 import { initRXDB, StorageTypes } from '$lib/ORM/rxdb';
 import { EventEmitter } from 'events';
@@ -12,7 +12,7 @@ import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
 EventEmitter.defaultMaxListeners = 100;
 type PublicCollections = {
 	links: LinkCollection;
-	feedbacks: FeedbackCollection;
+	feedbacks: ConnectionCollection;
 };
 
 export type PublicDBType = RxDatabase<PublicCollections>;
@@ -47,7 +47,7 @@ const create = async (token: string, linkId: string, storage: StorageTypes) => {
 			schema: linkSchema
 		},
 		feedbacks: {
-			schema: feedbackSchema
+			schema: connectionSchema
 		}
 	});
 

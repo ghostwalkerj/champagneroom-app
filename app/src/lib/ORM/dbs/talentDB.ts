@@ -1,5 +1,5 @@
 import { PUBLIC_CREATORS_ENDPOINT, PUBLIC_RXDB_PASSWORD } from '$env/static/public';
-import { feedbackSchema, type FeedbackCollection } from '$lib/ORM/models/feedback';
+import { connectionSchema, type ConnectionCollection } from '$lib/ORM/models/connection';
 import { linkDocMethods, linkSchema, type LinkCollection } from '$lib/ORM/models/link';
 import { talentDocMethods, talentSchema, type TalentCollection } from '$lib/ORM/models/talent';
 import { transactionSchema, type TransactionCollection } from '$lib/ORM/models/transaction';
@@ -15,7 +15,7 @@ EventEmitter.defaultMaxListeners = 100;
 type CreatorsCollections = {
 	talents: TalentCollection;
 	links: LinkCollection;
-	feedbacks: FeedbackCollection;
+	feedbacks: ConnectionCollection;
 	transactions: TransactionCollection;
 };
 
@@ -51,7 +51,7 @@ const create = async (token: string, key: string, storage: StorageTypes) => {
 			methods: linkDocMethods
 		},
 		feedbacks: {
-			schema: feedbackSchema
+			schema: connectionSchema
 		},
 		transactions: {
 			schema: transactionSchema

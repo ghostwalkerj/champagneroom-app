@@ -1,6 +1,5 @@
 import type { AgentDocument } from '$lib/ORM/models/agent';
-import { FeedbackString } from '$lib/ORM/models/feedback';
-import { LinkStatuses, LinkString, type LinkDocument } from '$lib/ORM/models/link';
+import { LinkStatus, LinkString, type LinkDocument } from '$lib/ORM/models/link';
 import { nanoid } from 'nanoid';
 import {
 	toTypedRxJsonSchema,
@@ -84,24 +83,9 @@ const talentSchemaLiteral = {
 						type: 'string',
 						maxLength: 50
 					}
-				},
-				completedFeedbacks: {
-					type: 'array',
-					ref: 'feedbacks',
-					items: {
-						type: 'string',
-						maxLength: 50
-					}
 				}
 			},
-			required: [
-				'ratingAvg',
-				'totalRating',
-				'numCompletedCalls',
-				'totalEarnings',
-				'completedCalls',
-				'completedFeedbacks'
-			]
+			required: ['ratingAvg', 'totalRating', 'numCompletedCalls', 'totalEarnings', 'completedCalls']
 		},
 		createdAt: {
 			type: 'integer'
@@ -146,27 +130,12 @@ export const talentDocMethods: TalentDocMethods = {
 	): Promise<LinkDocument> {
 		const db = this.collection.database;
 		const key = nanoid();
-		const _feedback = {
-			_id: `${FeedbackString}:f${key}`,
-			entityType: FeedbackString,
-			createdAt: new Date().getTime(),
-			updatedAt: new Date().getTime(),
-			rejected: 0,
-			disconnected: 0,
-			unanswered: 0,
-			viewed: 0,
-			rating: 0,
-			link: `${LinkString}:l${key}`,
-			talent: this._id,
-			agent: this.agent
-		};
 		const _link = {
-			state: {
-				status: LinkStatuses.UNCLAIMED,
+			linkState: {
+				status: LinkStatus.UNCLAIMED,
 				totalFunding: 0,
 				refundedAmount: 0,
-				requestedFunding: requestedAmount,
-				connections: []
+				requestedFunding: requestedAmount
 			},
 			requestedAmount,
 			fundingAddress: '0x251281e1516e6E0A145d28a41EE63BfcDd9E18Bf', //TODO: make real wallet
@@ -184,11 +153,8 @@ export const talentDocMethods: TalentDocMethods = {
 			createdAt: new Date().getTime(),
 			updatedAt: new Date().getTime(),
 			entityType: LinkString,
-			feedback: `${FeedbackString}:f${key}`,
 			agent: this.agent
 		};
-
-		db.feedbacks.insert(_feedback);
 		const link = await db.links.insert(_link);
 		this.update({ $set: { currentLink: link._id } });
 		return link;
@@ -211,13 +177,15 @@ export const talentDocMethods: TalentDocMethods = {
 		let ratingAvg = 0;
 		let totalRating = 0;
 		let totalEarnings = 0;
+		let numRatings = 0;
 		const db = this.collection.database;
+		const completedCallIds: string[] = [];
 		const completedCalls = (await db.links
 			.find({
 				selector: {
 					talent: this._id,
 					state: {
-						status: LinkStatuses.FINALIZED,
+						status: LinkStatus.FINALIZED,
 						finalized: {
 							endedAt: { $gte: range.start, $lte: range.end }
 						}
@@ -227,26 +195,23 @@ export const talentDocMethods: TalentDocMethods = {
 			})
 			.exec()) as LinkDocument[];
 
-		const completedLinksIds: string[] = [];
-		const feedbackIds = completedCalls.map((link) => {
-			totalEarnings += link.state.totalFunding;
-			completedLinksIds.push(link._id);
-			return link.feedback;
+		completedCalls.map((link) => {
+			totalEarnings += link.linkState.totalFunding;
+			if (link.linkState.finalized?.feedback) {
+				totalRating += link.linkState.finalized.feedback.rating;
+				numRatings++;
+			}
+			completedCallIds.push(link._id);
 		});
-		const completedFeedback = await db.feedbacks.findByIds(feedbackIds);
-		for (const feedback of completedFeedback.values()) {
-			totalRating += feedback.rating;
-		}
-		if (completedFeedback.size > 0) {
-			ratingAvg = totalRating / completedFeedback.size;
+		if (numRatings > 0) {
+			ratingAvg = totalRating / numRatings;
 		}
 		const stats = {
 			ratingAvg,
 			totalEarnings,
 			totalRating,
-			completedCalls: completedLinksIds,
-			numCompletedCalls: completedLinksIds.length,
-			completedFeedbacks: feedbackIds
+			completedCalls: completedCallIds,
+			numCompletedCalls: completedCalls.length
 		};
 		return stats;
 	}

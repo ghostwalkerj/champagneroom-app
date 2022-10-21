@@ -59,14 +59,6 @@
 	$: canCall = currentLinkState && currentLinkState.matches('claimed.canCall');
 	$: waiting4StateChange = false;
 
-	const updateLink = (linkState: LinkDocument['state']) => {
-		if (currentLink && currentLink.atomicPatch)
-			currentLink.atomicPatch({
-				updatedAt: new Date().getTime(),
-				state: linkState
-			});
-	};
-
 	talentDB(token, key, StorageTypes.IDB).then((db: TalentDBType) => {
 		db.talents
 			.findOne(talentObj._id)
@@ -77,40 +69,47 @@
 					talent = _talent;
 					talent.get$('currentLink').subscribe((linkId) => {
 						if (linkId) {
-							startLinkMachine(db, linkId);
+							db.links
+								.findOne(linkId)
+								.exec()
+								.then((link) => {
+									if (link) {
+										currentLink = link;
+										startLinkMachine(link);
+									}
+								});
 						}
 					});
 				}
 			});
 	});
 
-	const startLinkMachine = (db: TalentDBType, linkId: string) => {
+	const startLinkMachine = (link: LinkDocument) => {
 		if (linkService) linkService.stop();
 		if (linkSub) linkSub.unsubscribe();
-		db.links
-			.findOne(linkId)
-			.exec()
-			.then((link) => {
-				if (link) {
-					link.$.subscribe((_link) => {
-						currentLink = _link;
-						linkService = createLinkMachineService(currentLink.state, updateLink);
-						linkSub = linkService.subscribe((state) => {
-							currentLinkState = state;
-							if (state.changed) {
-								canCancelLink = state.can({
-									type: 'REQUEST CANCELLATION',
-									cancel: undefined
-								});
-								canCreateLink = state.done ?? true;
-								canCall = state.matches('claimed.canCall');
-								if (canCall) initVC();
-							}
-						});
-						waiting4StateChange = false; // link changed, so can submit again
+		link.get$('state').subscribe((_state) => {
+			const updateLink = (linkState: LinkDocument['state']) => {
+				if (link && link.atomicPatch)
+					link.atomicPatch({
+						updatedAt: new Date().getTime(),
+						state: linkState
 					});
+			};
+			linkService = createLinkMachineService(_state, updateLink);
+			linkSub = linkService.subscribe((state) => {
+				currentLinkState = state;
+				if (state.changed) {
+					canCancelLink = state.can({
+						type: 'REQUEST CANCELLATION',
+						cancel: undefined
+					});
+					canCreateLink = state.done ?? true;
+					canCall = state.matches('claimed.canCall');
+					if (canCall) initVC();
 				}
 			});
+			waiting4StateChange = false; // link changed, so can submit again
+		});
 	};
 
 	const updateProfileImage = async (url: string) => {

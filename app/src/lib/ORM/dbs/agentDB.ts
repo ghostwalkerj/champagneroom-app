@@ -5,7 +5,7 @@ import {
 	agentStaticMethods,
 	type AgentCollection
 } from '$lib/ORM/models/agent';
-import { feedbackSchema, type FeedbackCollection } from '$lib/ORM/models/feedback';
+import { connectionSchema, type ConnectionCollection } from '$lib/ORM/models/connection';
 import { linkDocMethods, linkSchema, type LinkCollection } from '$lib/ORM/models/link';
 import { talentDocMethods, talentSchema, type TalentCollection } from '$lib/ORM/models/talent';
 import type { TransactionCollection } from '$lib/ORM/models/transaction';
@@ -22,7 +22,7 @@ type AllCollections = {
 	agents: AgentCollection;
 	talents: TalentCollection;
 	links: LinkCollection;
-	feedbacks: FeedbackCollection;
+	connections: ConnectionCollection;
 	transactions: TransactionCollection;
 };
 
@@ -63,8 +63,8 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 			schema: linkSchema,
 			methods: linkDocMethods
 		},
-		feedbacks: {
-			schema: feedbackSchema
+		connections: {
+			schema: connectionSchema
 		}
 	});
 
@@ -81,6 +81,11 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 		});
 
 		const agentQuery = _db.agents.findOne(agentId);
+		const talentQuery = _db.talents.find().where('agent').eq(agentId);
+		const talentIDs = await talentQuery.exec().then((talents) => talents.map((t) => t._id));
+		const linkQuery = _db.links.find().where('talent').in(talentIDs);
+		const connectionQuery = _db.connections.find().where('talent').in(talentIDs);
+		const transactionQuery = _db.transactions.find().where('talent').in(talentIDs);
 
 		let repState = _db.agents.syncCouchDB({
 			remote: remoteDB,
@@ -98,7 +103,7 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 			options: {
 				retry: true
 			},
-			query: _db.talents.find().where('agent').eq(agentId)
+			query: talentQuery
 		});
 		await repState.awaitInitialReplication();
 
@@ -108,17 +113,27 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 			options: {
 				retry: true
 			},
-			query: _db.links.find().where('agent').eq(agentId)
+			query: linkQuery
 		});
 		await repState.awaitInitialReplication();
 
-		repState = _db.feedbacks.syncCouchDB({
+		repState = _db.connections.syncCouchDB({
 			remote: remoteDB,
 			waitForLeadership: false,
 			options: {
 				retry: true
 			},
-			query: _db.feedbacks.find().where('agent').eq(agentId)
+			query: connectionQuery
+		});
+		await repState.awaitInitialReplication();
+
+		repState = _db.transactions.syncCouchDB({
+			remote: remoteDB,
+			waitForLeadership: false,
+			options: {
+				retry: true
+			},
+			query: transactionQuery
 		});
 		await repState.awaitInitialReplication();
 
@@ -138,7 +153,7 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 				retry: true,
 				live: true
 			},
-			query: _db.talents.find().where('agent').eq(agentId)
+			query: talentQuery
 		});
 		_db.links.syncCouchDB({
 			remote: remoteDB,
@@ -147,16 +162,25 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 				retry: true,
 				live: true
 			},
-			query: _db.links.find().where('agent').eq(agentId)
+			query: linkQuery
 		});
-		_db.feedbacks.syncCouchDB({
+		_db.connections.syncCouchDB({
 			remote: remoteDB,
 			waitForLeadership: false,
 			options: {
 				retry: true,
 				live: true
 			},
-			query: _db.feedbacks.find().where('agent').eq(agentId)
+			query: connectionQuery
+		});
+		_db.transactions.syncCouchDB({
+			remote: remoteDB,
+			waitForLeadership: false,
+			options: {
+				retry: true,
+				live: true
+			},
+			query: transactionQuery
 		});
 	}
 

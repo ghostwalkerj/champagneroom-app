@@ -1,5 +1,5 @@
 import { PUBLIC_CREATORS_ENDPOINT, PUBLIC_RXDB_PASSWORD } from '$env/static/public';
-import { feedbackSchema, type FeedbackCollection } from '$lib/ORM/models/feedback';
+import { connectionSchema, type ConnectionCollection } from '$lib/ORM/models/connection';
 import {
 	linkDocMethods,
 	LinkDocument,
@@ -18,7 +18,7 @@ import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
 EventEmitter.defaultMaxListeners = 100;
 type APICollections = {
 	links: LinkCollection;
-	feedbacks: FeedbackCollection;
+	feedbacks: ConnectionCollection;
 	transactions: TransactionCollection;
 };
 
@@ -56,7 +56,7 @@ const create = async (token: string, linkId: string, storage: StorageTypes) => {
 			methods: linkDocMethods
 		},
 		feedbacks: {
-			schema: feedbackSchema
+			schema: connectionSchema
 		},
 		transactions: {
 			schema: transactionSchema

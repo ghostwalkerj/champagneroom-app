@@ -1,5 +1,5 @@
 import type { LinkDocType } from '$lib/ORM/models/link';
-import { LinkStatuses } from '$lib/ORM/models/link';
+import { LinkStatus } from '$lib/ORM/models/link';
 import type { TransactionDocType } from '$lib/ORM/models/transaction';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 
@@ -14,7 +14,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 	return createMachine(
 		{
 			context: { linkState: linkState, errorMessage: undefined as string | undefined },
-			tsTypes: {} as import("./linkMachine.typegen").Typegen0,
+			tsTypes: {} as import('./linkMachine.typegen').Typegen0,
 			schema: {
 				events: {} as
 					| { type: 'CLAIM'; claim: LinkStateType['claim'] }
@@ -164,7 +164,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 					return {
 						linkState: {
 							...context.linkState,
-							status: LinkStatuses.CANCELED,
+							status: LinkStatus.CANCELED,
 							cancel: event.cancel
 						}
 					};
@@ -174,7 +174,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 					return {
 						linkState: {
 							...context.linkState,
-							status: LinkStatuses.CLAIMED,
+							status: LinkStatus.CLAIMED,
 							claim: event.claim
 						}
 					};
@@ -184,7 +184,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 					return {
 						linkState: {
 							...context.linkState,
-							status: LinkStatuses.CANCELLATION_REQUESTED,
+							status: LinkStatus.CANCELLATION_REQUESTED,
 							cancel: event.cancel
 						}
 					};
@@ -194,7 +194,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 					return {
 						linkState: {
 							...context.linkState,
-							status: LinkStatuses.CANCELED
+							status: LinkStatus.CANCELED
 						}
 					};
 				}),
@@ -252,19 +252,19 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 					return {
 						linkState: {
 							...context.linkState,
-							status: LinkStatuses.IN_DISPUTE,
+							status: LinkStatus.IN_DISPUTE,
 							dispute: event.dispute
 						}
 					};
 				})
 			},
 			guards: {
-				linkUnclaimed: (context) => context.linkState.status === LinkStatuses.UNCLAIMED,
-				linkCancelled: (context) => context.linkState.status === LinkStatuses.CANCELED,
-				linkFinalized: (context) => context.linkState.status === LinkStatuses.FINALIZED,
-				linkClaimed: (context) => context.linkState.status === LinkStatuses.CLAIMED,
+				linkUnclaimed: (context) => context.linkState.status === LinkStatus.UNCLAIMED,
+				linkCancelled: (context) => context.linkState.status === LinkStatus.CANCELED,
+				linkFinalized: (context) => context.linkState.status === LinkStatus.FINALIZED,
+				linkClaimed: (context) => context.linkState.status === LinkStatus.CLAIMED,
 				linkInCancellationRequested: (context) =>
-					context.linkState.status === LinkStatuses.CANCELLATION_REQUESTED,
+					context.linkState.status === LinkStatus.CANCELLATION_REQUESTED,
 				fullyFunded: (context) =>
 					context.linkState.totalFunding >= context.linkState.requestedFunding
 			}

@@ -1,6 +1,6 @@
 import type { AgentDocument } from '$lib/ORM/models/agent';
-import { FeedbackString, type FeedbackDocType } from '$lib/ORM/models/feedback';
-import { LinkStatuses, LinkString, type LinkDocType } from '$lib/ORM/models/link';
+import { ConnectionString, type ConnectionDocType } from '$lib/ORM/models/connection';
+import { LinkStatus, LinkString, type LinkDocType } from '$lib/ORM/models/link';
 import type { TalentDocument } from '$lib/ORM/models/talent';
 import { womensNames } from '$lib/util/womensNames';
 import { nanoid } from 'nanoid';
@@ -62,7 +62,7 @@ export const generateTalent = async (agent: AgentDocument) => {
 
 const generateLinks = (talent: TalentDocument, count: number) => {
 	const links: LinkDocType[] = [];
-	const feedbacks: FeedbackDocType[] = [];
+	const feedbacks: ConnectionDocType[] = [];
 
 	// Create completedCalls
 	for (let i = 0; i < count; i++) {
@@ -70,8 +70,8 @@ const generateLinks = (talent: TalentDocument, count: number) => {
 		const amount = Math.floor(Math.random() * 1000) + 1;
 		const endedAt = spacetime.now().subtract(Math.floor(Math.random() * 45) + 1, 'day');
 		const _feedback = {
-			_id: `${FeedbackString}:f${key}`,
-			entityType: FeedbackString,
+			_id: `${ConnectionString}:f${key}`,
+			entityType: ConnectionString,
 			createdAt: new Date().getTime(),
 			updatedAt: new Date().getTime(),
 			rejected: 0,
@@ -84,8 +84,8 @@ const generateLinks = (talent: TalentDocument, count: number) => {
 			agent: talent.agent
 		};
 		const _link = {
-			state: {
-				status: LinkStatuses.FINALIZED,
+			linkState: {
+				status: LinkStatus.FINALIZED,
 				totalFunding: amount,
 				requestedFunding: amount,
 				refundedAmount: 0,
@@ -110,7 +110,7 @@ const generateLinks = (talent: TalentDocument, count: number) => {
 			createdAt: new Date().getTime(),
 			updatedAt: new Date().getTime(),
 			entityType: LinkString,
-			feedback: `${FeedbackString}:f${key}`,
+			feedback: `${ConnectionString}:f${key}`,
 			agent: talent.agent
 		} as LinkDocType;
 		links.push(_link);

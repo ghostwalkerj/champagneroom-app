@@ -5,6 +5,7 @@ import {
 	type RxDocument,
 	type RxJsonSchema
 } from 'rxdb';
+import type { LinkDocument } from './link';
 
 export enum TransactionReasonType {
 	FUNDING,
@@ -67,8 +68,12 @@ const transactionSchemaLiteral = {
 		}
 	},
 	indexes: [],
-	required: ['_id', 'createdAt', 'hash', 'block', 'from', 'to', 'reason', 'value']
+	required: ['_id', 'createdAt', 'hash', 'block', 'from', 'to', 'reason', 'value', 'link']
 } as const;
+
+type transactionRef = {
+	link_?: Promise<LinkDocument>;
+};
 
 export const TransactionString = 'transaction';
 
@@ -77,5 +82,5 @@ export type TransactionDocType = ExtractDocumentTypeFromTypedRxJsonSchema<typeof
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 export const transactionSchema: RxJsonSchema<TransactionDocType> = transactionSchemaLiteral;
-export type TransactionDocument = RxDocument<TransactionDocType>;
+export type TransactionDocument = RxDocument<TransactionDocType> & transactionRef;
 export type TransactionCollection = RxCollection<TransactionDocType>;

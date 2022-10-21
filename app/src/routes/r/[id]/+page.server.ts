@@ -2,7 +2,7 @@ import { JWT_EXPIRY, JWT_CREATOR_USER, JWT_SECRET, JWT_PUBLIC_USER } from '$env/
 import { createLinkMachineService } from '$lib/machines/linkMachine';
 import { apiDB } from '$lib/ORM/dbs/apiDB';
 import { publicDB } from '$lib/ORM/dbs/publicDB';
-import type { FeedbackDocType, FeedbackDocument } from '$lib/ORM/models/feedback';
+import type { ConnectionDocType, ConnectionDocument } from '$lib/ORM/models/connection';
 import type { LinkDocType, LinkDocument } from '$lib/ORM/models/link';
 import { TransactionReasonType } from '$lib/ORM/models/transaction';
 import { StorageTypes } from '$lib/ORM/rxdb';
@@ -44,7 +44,7 @@ export const load: import('./$types').PageServerLoad = async ({ params }) => {
 	}
 
 	//_feedback.update({ $inc: { viewed: 1 } }); // Increment view count
-	const feedback = (_feedback as FeedbackDocument).toJSON() as FeedbackDocType;
+	const feedback = (_feedback as ConnectionDocument).toJSON() as ConnectionDocType;
 	const displayName = uniqueNamesGenerator({
 		dictionaries: [mensNames]
 	});
@@ -95,14 +95,14 @@ export const actions: import('./$types').Actions = {
 			return error(404, 'Link not found');
 		}
 
-		const updateLink = (linkState: LinkDocument['state']) => {
+		const updateLink = (linkState: LinkDocument['linkState']) => {
 			link.atomicPatch({
 				updatedAt: new Date().getTime(),
-				state: linkState
+				linkState
 			});
 		};
 
-		const linkService = createLinkMachineService(link.state, updateLink);
+		const linkService = createLinkMachineService(link.linkState, updateLink);
 		const state = linkService.getSnapshot();
 		if (
 			!state.can({
