@@ -138,6 +138,34 @@ const linkSchemaLiteral = {
 					minimum: 0,
 					maximum: 99999
 				},
+				feedback: {
+					rejected: {
+						type: 'integer',
+						default: 0,
+						minimum: 0
+					},
+					disconnected: {
+						type: 'integer',
+						default: 0,
+						minimum: 0
+					},
+					unanswered: {
+						type: 'integer',
+						default: 0,
+						minimum: 0
+					},
+					viewed: {
+						type: 'integer',
+						default: 0,
+						minimum: 0
+					},
+					callerRating: {
+						type: 'integer',
+						default: 0,
+						minimum: 0,
+						maximum: 5
+					}
+				},
 				cancel: {
 					type: 'object',
 					properties: {
@@ -234,7 +262,7 @@ const linkSchemaLiteral = {
 					}
 				}
 			},
-			required: ['status', 'totalFunding', 'requestedFunding', 'refundedAmount']
+			required: ['status', 'totalFunding', 'requestedFunding', 'refundedAmount', 'feedback']
 		},
 		talentInfo: {
 			type: 'object',
