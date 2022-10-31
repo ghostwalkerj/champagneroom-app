@@ -83,13 +83,13 @@ export const actions: import('./$types').Actions = {
 			throw error(404, 'Link not found');
 		}
 
-		const updateLink = (linkState: LinkDocument['state']) => {
+		const updateLink = (linkState: LinkDocument['linkState']) => {
 			cancelLink.atomicPatch({
 				updatedAt: new Date().getTime(),
-				state: linkState
+				linkState
 			});
 		};
-		const linkService = createLinkMachineService(cancelLink.state, updateLink);
+		const linkService = createLinkMachineService(cancelLink.linkState, updateLink);
 		const currentLinkState = linkService.getSnapshot();
 
 		linkService.send({
@@ -124,14 +124,14 @@ export const actions: import('./$types').Actions = {
 			throw error(404, 'Link not found');
 		}
 
-		const updateLink = (linkState: LinkDocument['state']) => {
+		const updateLink = (linkState: LinkDocument['linkState']) => {
 			refundLink.atomicPatch({
 				updatedAt: new Date().getTime(),
-				state: linkState
+				linkState
 			});
 		};
 
-		const linkService = createLinkMachineService(refundLink.state, updateLink);
+		const linkService = createLinkMachineService(refundLink.linkState, updateLink);
 		const state = linkService.getSnapshot();
 
 		if (!state.matches('claimed.requestedCancellation.waiting4Refund')) {

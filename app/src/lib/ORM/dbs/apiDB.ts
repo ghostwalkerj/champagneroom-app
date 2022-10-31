@@ -18,7 +18,7 @@ import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
 EventEmitter.defaultMaxListeners = 100;
 type APICollections = {
 	links: LinkCollection;
-	feedbacks: ConnectionCollection;
+	connections: ConnectionCollection;
 	transactions: TransactionCollection;
 };
 
@@ -55,7 +55,7 @@ const create = async (token: string, linkId: string, storage: StorageTypes) => {
 			schema: linkSchema,
 			methods: linkDocMethods
 		},
-		feedbacks: {
+		connections: {
 			schema: connectionSchema
 		},
 		transactions: {
@@ -88,18 +88,8 @@ const create = async (token: string, linkId: string, storage: StorageTypes) => {
 
 		_thisLink = (await linkQuery.exec()) as LinkDocument;
 		if (_thisLink) {
-			const feedbackQuery = _db.feedbacks.findOne(_thisLink.feedback);
 			const transactionQuery = _db.transactions.findOne().where('link').eq(linkId);
-
-			repState = _db.feedbacks.syncCouchDB({
-				remote: remoteDB,
-				waitForLeadership: false,
-				options: {
-					retry: true
-				},
-				query: feedbackQuery
-			});
-			await repState.awaitInitialReplication();
+			const connectionQuery = _db.connections.findOne().where('link').eq(linkId);
 
 			repState = _db.transactions.syncCouchDB({
 				remote: remoteDB,
@@ -108,6 +98,16 @@ const create = async (token: string, linkId: string, storage: StorageTypes) => {
 					retry: true
 				},
 				query: transactionQuery
+			});
+			await repState.awaitInitialReplication();
+
+			repState = _db.connections.syncCouchDB({
+				remote: remoteDB,
+				waitForLeadership: false,
+				options: {
+					retry: true
+				},
+				query: connectionQuery
 			});
 			await repState.awaitInitialReplication();
 
@@ -121,16 +121,6 @@ const create = async (token: string, linkId: string, storage: StorageTypes) => {
 				query: linkQuery
 			});
 
-			_db.feedbacks.syncCouchDB({
-				remote: remoteDB,
-				waitForLeadership: false,
-				options: {
-					retry: true,
-					live: true
-				},
-				query: feedbackQuery
-			});
-
 			_db.transactions.syncCouchDB({
 				remote: remoteDB,
 				waitForLeadership: false,
@@ -139,6 +129,16 @@ const create = async (token: string, linkId: string, storage: StorageTypes) => {
 					live: true
 				},
 				query: transactionQuery
+			});
+
+			_db.connections.syncCouchDB({
+				remote: remoteDB,
+				waitForLeadership: false,
+				options: {
+					retry: true,
+					live: true
+				},
+				query: connectionQuery
 			});
 		}
 	}

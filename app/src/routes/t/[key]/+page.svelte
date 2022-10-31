@@ -46,7 +46,8 @@
 	let mediaStream: MediaStream;
 	$: callerName = '';
 	let videoCall: any;
-	let currentLinkState = currentLink && createLinkMachineService(currentLink.state).getSnapshot();
+	let currentLinkState =
+		currentLink && createLinkMachineService(currentLink.linkState).getSnapshot();
 
 	$: canCancelLink =
 		currentLinkState &&
@@ -87,12 +88,12 @@
 	const startLinkMachine = (link: LinkDocument) => {
 		if (linkService) linkService.stop();
 		if (linkSub) linkSub.unsubscribe();
-		link.get$('state').subscribe((_state) => {
-			const updateLink = (linkState: LinkDocument['state']) => {
+		link.get$('linkState').subscribe((_state) => {
+			const updateLink = (linkState: LinkDocument['linkState']) => {
 				if (link && link.atomicPatch)
 					link.atomicPatch({
 						updatedAt: new Date().getTime(),
-						state: linkState
+						linkState
 					});
 			};
 			linkService = createLinkMachineService(_state, updateLink);
@@ -241,9 +242,9 @@
 										If you cancel this pCall link, the link will be deactivated and nobody can use
 										it to call.
 									</div>
-									{#if currentLink.state.claim && currentLink.state.totalFunding > 0}
-										{currencyFormatter.format(currentLink.state.totalFunding)} will be refunded to "{currentLink
-											.state.claim.caller}"
+									{#if currentLink.linkState.claim && currentLink.linkState.totalFunding > 0}
+										{currencyFormatter.format(currentLink.linkState.totalFunding)} will be refunded to
+										"{currentLink.linkState.claim.caller}"
 									{/if}
 
 									<div class="flex flex-col text-white p-2 justify-center items-center">
@@ -314,7 +315,8 @@
 											<!-- svelte-ignore a11y-label-has-associated-control -->
 											<label for="price" class="label">
 												<span class="label-text"
-													>Refund {currentLink.state.claim && currentLink.state.claim.caller}</span
+													>Refund {currentLink.linkState.claim &&
+														currentLink.linkState.claim.caller}</span
 												></label
 											>
 											<div class="rounded-md shadow-sm mt-1 relative">

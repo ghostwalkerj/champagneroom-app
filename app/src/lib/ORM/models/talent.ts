@@ -193,7 +193,7 @@ export const talentDocMethods: TalentDocMethods = {
 				}
 			})
 			.exec()) as LinkDocument[];
-		
+
 		completedCalls.map((link) => {
 			totalEarnings += link.linkState.totalFunding;
 			if (link.linkState.finalized?.feedback) {

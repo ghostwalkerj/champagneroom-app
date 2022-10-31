@@ -1,9 +1,9 @@
 import type { AgentDocument } from '$lib/ORM/models/agent';
 import {
-	type ConnectionDocType,
-	type ConnectionDocument,
 	ConnectionStatus,
-	ConnectionString
+	ConnectionString,
+	type ConnectionDocType,
+	type ConnectionDocument
 } from '$lib/ORM/models/connection';
 import type { TalentDocument } from '$lib/ORM/models/talent';
 import { nanoid } from 'nanoid';

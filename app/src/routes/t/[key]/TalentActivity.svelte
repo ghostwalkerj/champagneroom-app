@@ -39,12 +39,14 @@
 								<div class="flex space-x-4 flex-1 min-w-0 pt-1.5 justify-between">
 									<div>
 										<p class="text-sm text-gray-200">
-											Completed pCall for {currencyFormatter.format(call.state.totalFunding)}
+											Completed pCall for {currencyFormatter.format(call.linkState.totalFunding)}
 										</p>
 									</div>
 									<div class="text-right text-sm text-gray-200 whitespace-nowrap">
-										{#if call.state.finalized}
-											{spacetime(call.state.finalized.endedAt).format('{month-short} {date-pad}')}
+										{#if call.linkState.finalized}
+											{spacetime(call.linkState.finalized.endedAt).format(
+												'{month-short} {date-pad}'
+											)}
 										{/if}
 									</div>
 								</div>
