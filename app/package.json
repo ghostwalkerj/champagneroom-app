@@ -84,7 +84,7 @@
 		"simple-peer": "^9.11.1",
 		"socket.io": "^4.5.1",
 		"socket.io-client": "^4.5.1",
-		"spacetime": "^7.1.4",
+		"spacetime": "^7.2.0",
 		"svelte-chartjs": "^2.0.1",
 		"svelte-image": "^0.2.9",
 		"svelte-proxied-store": "^1.1.4",

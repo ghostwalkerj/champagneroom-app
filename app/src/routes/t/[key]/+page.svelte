@@ -70,15 +70,12 @@
 					talent = _talent;
 					talent.get$('currentLink').subscribe((linkId) => {
 						if (linkId) {
-							db.links
-								.findOne(linkId)
-								.exec()
-								.then((link) => {
-									if (link) {
-										currentLink = link;
-										startLinkMachine(link);
-									}
-								});
+							db.links.findOne(linkId).$.subscribe((link) => {
+								if (link) {
+									currentLink = link;
+									startLinkMachine(link);
+								}
+							});
 						}
 					});
 				}
@@ -88,29 +85,27 @@
 	const startLinkMachine = (link: LinkDocument) => {
 		if (linkService) linkService.stop();
 		if (linkSub) linkSub.unsubscribe();
-		link.get$('linkState').subscribe((_state) => {
-			const updateLink = (linkState: LinkDocument['linkState']) => {
-				if (link && link.atomicPatch)
-					link.atomicPatch({
-						updatedAt: new Date().getTime(),
-						linkState
-					});
-			};
-			linkService = createLinkMachineService(_state, updateLink);
-			linkSub = linkService.subscribe((state) => {
-				currentLinkState = state;
-				if (state.changed) {
-					canCancelLink = state.can({
-						type: 'REQUEST CANCELLATION',
-						cancel: undefined
-					});
-					canCreateLink = state.done ?? true;
-					canCall = state.matches('claimed.canCall');
-					if (canCall) initVC();
-				}
-			});
-			waiting4StateChange = false; // link changed, so can submit again
+		const updateLink = (linkState: LinkDocument['linkState']) => {
+			if (link && link.atomicPatch)
+				link.atomicPatch({
+					updatedAt: new Date().getTime(),
+					linkState
+				});
+		};
+		linkService = createLinkMachineService(link.linkState, updateLink);
+		linkSub = linkService.subscribe((state) => {
+			currentLinkState = state;
+			if (state.changed) {
+				canCancelLink = state.can({
+					type: 'REQUEST CANCELLATION',
+					cancel: undefined
+				});
+				canCreateLink = state.done ?? true;
+				canCall = state.matches('claimed.canCall');
+				if (canCall) initVC();
+			}
 		});
+		waiting4StateChange = false; // link changed, so can submit again
 	};
 
 	const updateProfileImage = async (url: string) => {
@@ -229,7 +224,7 @@
 				<div class="space-y-6 lg:col-start-1 lg:col-span-2">
 					<!-- Current Link -->
 					<div>
-						<LinkViewer link={currentLink} talent={talentObj} linkState={currentLinkState} />
+						<LinkViewer link={currentLink} talent={talentObj} state={currentLinkState} />
 					</div>
 
 					{#if canCancelLink}
