@@ -23,7 +23,6 @@
 
 	const token = data.token;
 	let linkObj = data.link;
-	let feedbackObj = data.feedback;
 	let displayName = data.displayName;
 	let linkId = $page.params.id;
 	let vc: VideoCallType;
@@ -151,11 +150,11 @@
 							<div class="text-center card-body items-center">
 								<h2 class="text-2xl card-title">Claim pCall Link</h2>
 								<div class="flex flex-col text-white p-2 justify-center items-center">
+									<div
+										class="bg-cover items-center bg-no-repeat rounded-full h-48 w-48"
+										style="background-image: url('{profileImage}')"
+									/>
 									<form method="post" action="?/claim" use:enhance={onSubmit}>
-										<div
-											class="bg-cover bg-no-repeat bg-center rounded-full h-48 w-48"
-											style="background-image: url('{profileImage}')"
-										/>
 										<div class="max-w-xs w-full py-2 form-control ">
 											<!-- svelte-ignore a11y-label-has-associated-control -->
 											<label for="caller" class="label">

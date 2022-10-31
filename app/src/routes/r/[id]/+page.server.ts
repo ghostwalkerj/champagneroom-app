@@ -1,15 +1,14 @@
-import { JWT_EXPIRY, JWT_CREATOR_USER, JWT_SECRET, JWT_PUBLIC_USER } from '$env/static/private';
+import { JWT_CREATOR_USER, JWT_EXPIRY, JWT_PUBLIC_USER, JWT_SECRET } from '$env/static/private';
 import { createLinkMachineService } from '$lib/machines/linkMachine';
 import { apiDB } from '$lib/ORM/dbs/apiDB';
 import { publicDB } from '$lib/ORM/dbs/publicDB';
-import type { ConnectionDocType, ConnectionDocument } from '$lib/ORM/models/connection';
 import type { LinkDocType, LinkDocument } from '$lib/ORM/models/link';
 import { TransactionReasonType } from '$lib/ORM/models/transaction';
 import { StorageTypes } from '$lib/ORM/rxdb';
+import { mensNames } from '$lib/util/mensNames';
 import { error, invalid } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import { uniqueNamesGenerator } from 'unique-names-generator';
-import { mensNames } from '$lib/util/mensNames';
 export const load: import('./$types').PageServerLoad = async ({ params }) => {
 	const linkId = params.id;
 	if (linkId === null) {
@@ -38,13 +37,6 @@ export const load: import('./$types').PageServerLoad = async ({ params }) => {
 
 	const link = _link.toJSON() as LinkDocType;
 
-	const _feedback = await _link.populate('feedback');
-	if (!_feedback) {
-		throw error(500, 'Feedback not found');
-	}
-
-	//_feedback.update({ $inc: { viewed: 1 } }); // Increment view count
-	const feedback = (_feedback as ConnectionDocument).toJSON() as ConnectionDocType;
 	const displayName = uniqueNamesGenerator({
 		dictionaries: [mensNames]
 	});
@@ -52,7 +44,6 @@ export const load: import('./$types').PageServerLoad = async ({ params }) => {
 	return {
 		token,
 		link,
-		feedback,
 		displayName
 	};
 };
