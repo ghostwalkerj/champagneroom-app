@@ -15,8 +15,8 @@
 	let tooltipOpen = '';
 
 	$: callerProfileImage =
-		link && link.state.claim
-			? getProfileImage(link.state.claim.caller)
+		link && link.linkState.claim
+			? getProfileImage(link.linkState.claim.caller)
 			: PUBLIC_DEFAULT_PROFILE_IMAGE;
 
 	$: linkURL = '';
@@ -38,14 +38,14 @@
 					<div class="text-xl w-full">
 						{#if linkState.matches('unclaimed')}
 							Your pCall link has Not Been Claimed
-						{:else if linkState.matches('claimed') && link.state.claim}
+						{:else if linkState.matches('claimed') && link.linkState.claim}
 							<div class="w-full ">
 								Your pCall link was claimed by:
 								<div class="p-6 flex flex-row w-full place-content-evenly items-center">
 									<div>
-										<div>{link.state.claim.caller}</div>
+										<div>{link.linkState.claim.caller}</div>
 										<div>on</div>
-										<div>{new Date(link.state.claim.createdAt).toLocaleString()}</div>
+										<div>{new Date(link.linkState.claim.createdAt).toLocaleString()}</div>
 									</div>
 									<div
 										class="bg-cover bg-no-repeat bg-center rounded-full h-32 w-32"
@@ -77,11 +77,11 @@
 							</div>
 							<div class="stat-title">Total Funded</div>
 							<div class="text-secondary stat-value">
-								{currencyFormatter.format(link.state.totalFunding)}
+								{currencyFormatter.format(link.linkState.totalFunding)}
 							</div>
 						</div>
 					</div>
-					{#if link.state.totalFunding >= link.requestedAmount}
+					{#if link.linkState.totalFunding >= link.requestedAmount}
 						<div class="text-xl pb-4">Link is Fully Funded!</div>
 					{/if}
 				</section>

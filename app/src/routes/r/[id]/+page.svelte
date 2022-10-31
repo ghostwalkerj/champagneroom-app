@@ -282,32 +282,3 @@
 		{/if}
 	</main>
 </div>
-
-<div class="flex w-full place-content-center">
-	<div class="bg-primary shadow text-primary-content  stats stats-vertical lg:stats-horizontal">
-		<div class="stat">
-			<div class="stat-title">Views</div>
-			<div class="stat-value">{feedbackObj.viewed}</div>
-		</div>
-		<div class="stat">
-			<div class="stat-title">Rejected</div>
-			<div class="stat-value">{feedbackObj.rejected}</div>
-		</div>
-		<div class="stat">
-			<div class="stat-title">Disconnected</div>
-			<div class="stat-value">{feedbackObj.disconnected}</div>
-		</div>
-		<div class="stat">
-			<div class="stat-title">UnAnswered</div>
-			<div class="stat-value">{feedbackObj.unanswered}</div>
-		</div>
-		<div class="stat">
-			<div class="stat-title">Call State</div>
-			<div class="stat-value">{callState.value}</div>
-		</div>
-		<div class="stat">
-			<div class="stat-title">Link State</div>
-			<div class="stat-value">{JSON.stringify(machineState.value)}</div>
-		</div>
-	</div>
-</div>

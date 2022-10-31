@@ -1,5 +1,4 @@
 import { PUBLIC_PUBLIC_ENDPOINT, PUBLIC_RXDB_PASSWORD } from '$env/static/public';
-import { connectionSchema, type ConnectionCollection } from '$lib/ORM/models/connection';
 import { linkSchema, type LinkCollection, type LinkDocument } from '$lib/ORM/models/link';
 import { initRXDB, StorageTypes } from '$lib/ORM/rxdb';
 import { EventEmitter } from 'events';
@@ -12,7 +11,6 @@ import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
 EventEmitter.defaultMaxListeners = 100;
 type PublicCollections = {
 	links: LinkCollection;
-	feedbacks: ConnectionCollection;
 };
 
 export type PublicDBType = RxDatabase<PublicCollections>;
@@ -45,9 +43,6 @@ const create = async (token: string, linkId: string, storage: StorageTypes) => {
 	await _db.addCollections({
 		links: {
 			schema: linkSchema
-		},
-		feedbacks: {
-			schema: connectionSchema
 		}
 	});
 
@@ -64,7 +59,7 @@ const create = async (token: string, linkId: string, storage: StorageTypes) => {
 		});
 		const linkQuery = _db.links.findOne(linkId);
 
-		let repState = _db.links.syncCouchDB({
+		const repState = _db.links.syncCouchDB({
 			remote: remoteDB,
 			waitForLeadership: false,
 			options: {
@@ -76,18 +71,6 @@ const create = async (token: string, linkId: string, storage: StorageTypes) => {
 
 		_thisLink = (await linkQuery.exec()) as LinkDocument;
 		if (_thisLink) {
-			const feedbackQuery = _db.feedbacks.findOne(_thisLink.feedback);
-
-			repState = _db.feedbacks.syncCouchDB({
-				remote: remoteDB,
-				waitForLeadership: false,
-				options: {
-					retry: true
-				},
-				query: feedbackQuery
-			});
-			await repState.awaitInitialReplication();
-
 			_db.links.syncCouchDB({
 				remote: remoteDB,
 				waitForLeadership: false,
@@ -96,15 +79,6 @@ const create = async (token: string, linkId: string, storage: StorageTypes) => {
 					live: true
 				},
 				query: linkQuery
-			});
-			_db.feedbacks.syncCouchDB({
-				remote: remoteDB,
-				waitForLeadership: false,
-				options: {
-					retry: true,
-					live: true
-				},
-				query: feedbackQuery
 			});
 		}
 	}

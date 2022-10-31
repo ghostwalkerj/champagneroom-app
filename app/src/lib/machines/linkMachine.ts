@@ -3,7 +3,7 @@ import { LinkStatus } from '$lib/ORM/models/link';
 import type { TransactionDocType } from '$lib/ORM/models/transaction';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 
-type LinkStateType = LinkDocType['state'];
+type LinkStateType = LinkDocType['linkState'];
 
 type StateCallBackType = (state: LinkStateType) => void;
 

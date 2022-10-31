@@ -75,7 +75,7 @@ export const actions: import('./$types').Actions = {
 			caller,
 			pin,
 			createdAt: new Date().getTime()
-		} as NonNullable<LinkDocument['state']['claim']>;
+		} as NonNullable<LinkDocument['linkState']['claim']>;
 
 		const token = jwt.sign(
 			{
@@ -153,14 +153,14 @@ export const actions: import('./$types').Actions = {
 			return error(404, 'Link not found');
 		}
 
-		const updateLink = (linkState: LinkDocument['state']) => {
+		const updateLink = (linkState: LinkDocument['linkState']) => {
 			link.atomicPatch({
 				updatedAt: new Date().getTime(),
-				state: linkState
+				linkState
 			});
 		};
 
-		const linkService = createLinkMachineService(link.state, updateLink);
+		const linkService = createLinkMachineService(link.linkState, updateLink);
 		const state = linkService.getSnapshot();
 		if (!state.matches('claimed.waiting4Funding')) {
 			return error(400, 'Link cannot be funded');

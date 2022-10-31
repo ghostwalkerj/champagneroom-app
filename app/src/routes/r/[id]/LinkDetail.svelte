@@ -38,7 +38,7 @@
 				</div>
 				<div class="stat-title">Funded</div>
 				<div class="text-secondary stat-value">
-					{currencyFormatter.format(link.state.totalFunding)}
+					{currencyFormatter.format(link.linkState.totalFunding)}
 				</div>
 			</div>
 		</div>
