@@ -1,5 +1,4 @@
 import type { AgentDocument } from '$lib/ORM/models/agent';
-import { ConnectionString, type ConnectionDocType } from '$lib/ORM/models/connection';
 import { LinkStatus, LinkString, type LinkDocType } from '$lib/ORM/models/link';
 import type { TalentDocument } from '$lib/ORM/models/talent';
 import { womensNames } from '$lib/util/womensNames';
@@ -62,7 +61,6 @@ export const generateTalent = async (agent: AgentDocument) => {
 
 const generateLinks = (talent: TalentDocument, count: number) => {
 	const links: LinkDocType[] = [];
-	const feedbacks: ConnectionDocType[] = [];
 
 	// Create completedCalls
 	for (let i = 0; i < count; i++) {
@@ -70,18 +68,7 @@ const generateLinks = (talent: TalentDocument, count: number) => {
 		const amount = Math.floor(Math.random() * 1000) + 1;
 		const endedAt = spacetime.now().subtract(Math.floor(Math.random() * 45) + 1, 'day');
 		const _feedback = {
-			_id: `${ConnectionString}:f${key}`,
-			entityType: ConnectionString,
-			createdAt: new Date().getTime(),
-			updatedAt: new Date().getTime(),
-			rejected: 0,
-			disconnected: 0,
-			unanswered: 0,
-			viewed: 0,
-			rating: Math.floor(Math.random() * 5) + 1,
-			link: `${LinkString}:l${key}`,
-			talent: talent._id,
-			agent: talent.agent
+			rating: Math.floor(Math.random() * 5) + 1
 		};
 		const _link = {
 			linkState: {
@@ -89,9 +76,9 @@ const generateLinks = (talent: TalentDocument, count: number) => {
 				totalFunding: amount,
 				requestedFunding: amount,
 				refundedAmount: 0,
-				connections: [],
 				finalized: {
-					endedAt: endedAt.epoch
+					endedAt: endedAt.epoch,
+					feedback: _feedback
 				}
 			},
 			requestedAmount: amount,
@@ -110,14 +97,11 @@ const generateLinks = (talent: TalentDocument, count: number) => {
 			createdAt: new Date().getTime(),
 			updatedAt: new Date().getTime(),
 			entityType: LinkString,
-			feedback: `${ConnectionString}:f${key}`,
 			agent: talent.agent
 		} as LinkDocType;
 		links.push(_link);
-		feedbacks.push(_feedback);
 	}
 
 	const db = talent.collection.database;
 	db.links.bulkInsert(links);
-	db.feedbacks.bulkInsert(feedbacks);
 };

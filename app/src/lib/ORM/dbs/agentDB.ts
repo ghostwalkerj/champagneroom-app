@@ -8,7 +8,7 @@ import {
 import { connectionSchema, type ConnectionCollection } from '$lib/ORM/models/connection';
 import { linkDocMethods, linkSchema, type LinkCollection } from '$lib/ORM/models/link';
 import { talentDocMethods, talentSchema, type TalentCollection } from '$lib/ORM/models/talent';
-import type { TransactionCollection } from '$lib/ORM/models/transaction';
+import { transactionSchema, type TransactionCollection } from '$lib/ORM/models/transaction';
 import { initRXDB, StorageTypes } from '$lib/ORM/rxdb';
 import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
@@ -65,6 +65,9 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 		},
 		connections: {
 			schema: connectionSchema
+		},
+		transactions: {
+			schema: transactionSchema
 		}
 	});
 

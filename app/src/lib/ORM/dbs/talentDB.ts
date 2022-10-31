@@ -50,7 +50,7 @@ const create = async (token: string, key: string, storage: StorageTypes) => {
 			schema: linkSchema,
 			methods: linkDocMethods
 		},
-		feedbacks: {
+		connections: {
 			schema: connectionSchema
 		},
 		transactions: {

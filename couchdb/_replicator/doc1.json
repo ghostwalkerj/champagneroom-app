@@ -1,0 +1,35 @@
+{
+  "_id": "858d5b2a73aab4eb8a8039d0ab00f346",
+  "_rev": "12-a35d9d285e4a7e94fb177f45cdd7a0a6",
+  "user_ctx": {
+    "name": "admin",
+    "roles": [
+      "_admin",
+      "_reader",
+      "_writer"
+    ]
+  },
+  "source": {
+    "url": "https://couchdb1.pcall.app/creators",
+    "headers": {
+      "Authorization": "Basic YWRtaW46d29vZ2llYm9vZ2ll"
+    }
+  },
+  "target": {
+    "url": "https://couchdb1.pcall.app/public",
+    "headers": {
+      "Authorization": "Basic YWRtaW46d29vZ2llYm9vZ2ll"
+    }
+  },
+  "create_target": true,
+  "continuous": true,
+  "create_target_params": {
+    "partitioned": true
+  },
+  "owner": "admin",
+  "selector": {
+    "_id": {
+      "$regex": "^link:"
+    }
+  }
+}

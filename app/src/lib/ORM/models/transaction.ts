@@ -65,6 +65,11 @@ const transactionSchemaLiteral = {
 			type: 'string',
 			maxLength: 50,
 			ref: 'links'
+		},
+		talent: {
+			type: 'string',
+			ref: 'talents',
+			maxLength: 50
 		}
 	},
 	indexes: [],

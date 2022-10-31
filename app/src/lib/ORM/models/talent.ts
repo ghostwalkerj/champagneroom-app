@@ -184,17 +184,16 @@ export const talentDocMethods: TalentDocMethods = {
 			.find({
 				selector: {
 					talent: this._id,
-					state: {
+					linkState: {
 						status: LinkStatus.FINALIZED,
 						finalized: {
 							endedAt: { $gte: range.start, $lte: range.end }
 						}
 					}
-				},
-				sort: [{ 'state.finalized.endedAt': 'asc' }]
+				}
 			})
 			.exec()) as LinkDocument[];
-
+		
 		completedCalls.map((link) => {
 			totalEarnings += link.linkState.totalFunding;
 			if (link.linkState.finalized?.feedback) {

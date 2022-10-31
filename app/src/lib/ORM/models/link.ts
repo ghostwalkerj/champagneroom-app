@@ -1,7 +1,7 @@
 import type { AgentDocument } from '$lib/ORM/models/agent';
 import {
-	ConnectionDocType,
-	ConnectionDocument,
+	type ConnectionDocType,
+	type ConnectionDocument,
 	ConnectionStatus,
 	ConnectionString
 } from '$lib/ORM/models/connection';
@@ -74,6 +74,7 @@ export const linkDocMethods: LinkDocMethods = {
 			createdAt: new Date().getTime(),
 			updatedAt: new Date().getTime(),
 			link: this._id,
+			talent: this.talent,
 			...transaction
 		};
 		return db.transactions.insert(_transaction);
@@ -86,7 +87,6 @@ export const linkDocMethods: LinkDocMethods = {
 			updatedAt: new Date().getTime(),
 			link: this._id,
 			talent: this.talent,
-			agent: this.agent,
 			status: ConnectionStatus.ATTEMPT
 		};
 		return db.connections.insert(_connection);

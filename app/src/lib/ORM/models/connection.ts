@@ -49,6 +49,11 @@ const connectionSchemaLiteral = {
 			type: 'string',
 			ref: 'links',
 			maxLength: 50
+		},
+		talent: {
+			type: 'string',
+			ref: 'talents',
+			maxLength: 50
 		}
 	},
 	required: ['_id', 'link', 'createdAt', 'status']
