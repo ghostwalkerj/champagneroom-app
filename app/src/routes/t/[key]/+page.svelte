@@ -74,6 +74,7 @@
 								if (link) {
 									currentLink = link;
 									startLinkMachine(link);
+									waiting4StateChange = false; // link changed, so can submit again
 								}
 							});
 						}
@@ -105,7 +106,6 @@
 				if (canCall) initVC();
 			}
 		});
-		waiting4StateChange = false; // link changed, so can submit again
 	};
 
 	const updateProfileImage = async (url: string) => {

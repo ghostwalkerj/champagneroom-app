@@ -39,24 +39,19 @@
 	$: userstream = false;
 
 	$: profileImage = getProfileImage(displayName);
-	publicDB(token, linkId, StorageTypes.IDB).then((_db: PublicDBType) => {
-		_db.links
-			.findOne(linkObj._id)
-			.exec()
-			.then((_link) => {
-				if (_link) {
-					linkObj = _link as LinkDocument;
-					// Here is where we run the machine and do all the logic based on the state
-					_link.get$('linkState').subscribe((linkState) => {
-						linkService = createLinkMachineService(linkState);
-						linkService.subscribe((state) => {
-							machineState = state;
-							if (state.matches('claimed.canCall')) initVC();
-						});
-						waiting4StateChange = false;
-					});
-				}
-			});
+	publicDB(token, linkId, StorageTypes.IDB).then((db: PublicDBType) => {
+		db.links.findOne(linkId).$.subscribe((link) => {
+			if (link) {
+				linkObj = link as LinkDocument;
+				// Here is where we run the machine and do all the logic based on the state
+				linkService = createLinkMachineService(link.linkState);
+				linkService.subscribe((state) => {
+					machineState = state;
+					if (state.matches('claimed.canCall')) initVC();
+				});
+				waiting4StateChange = false;
+			}
+		});
 	});
 
 	const requestStream = async () => {
