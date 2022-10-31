@@ -171,11 +171,13 @@
 		if (vc) vc.destroy();
 	});
 
-	const onSubmit = () => {
+	const onSubmit = ({ form }) => {
 		waiting4StateChange = true;
 		return async ({ result }) => {
 			if (result.type !== 'success') {
 				waiting4StateChange = false;
+			} else {
+				form.reset();
 			}
 			await applyAction(result);
 		};

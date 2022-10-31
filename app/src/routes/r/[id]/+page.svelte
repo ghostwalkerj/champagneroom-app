@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { applyAction, enhance } from '$app/forms';
+	import { invalidateAll } from '$app/navigation';
 	import { page } from '$app/stores';
 	import VideoCall from '$lib/components/calls/VideoCall.svelte';
 	import VideoPreview from '$lib/components/calls/VideoPreview.svelte';
@@ -89,11 +90,13 @@
 		}
 	};
 
-	const onSubmit = () => {
+	const onSubmit = ({ form }) => {
 		waiting4StateChange = true;
 		return async ({ result }) => {
 			if (result.type !== 'success') {
 				waiting4StateChange = false;
+			} else {
+				form.reset();
 			}
 			await applyAction(result);
 		};
