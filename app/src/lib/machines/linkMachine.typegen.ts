@@ -18,10 +18,17 @@ export interface Typegen0 {
 		cancelLink: 'REQUEST CANCELLATION';
 		claimLink: 'CLAIM';
 		initiateDispute: 'DISPUTE INITIATED';
+		receiveConnectionAttempt: 'CONNECTION ATTEMPT';
 		receivePayment: 'PAYMENT RECEIVED';
-		recieveRefund: 'REFUND RECEIVED';
+		receiveRefund: 'REFUND RECEIVED';
 		requestCancellation: 'REQUEST CANCELLATION';
-		saveLinkState: '' | 'CLAIM' | 'PAYMENT RECEIVED' | 'REFUND RECEIVED' | 'REQUEST CANCELLATION';
+		saveLinkState:
+			| ''
+			| 'CLAIM'
+			| 'CONNECTION ATTEMPT'
+			| 'PAYMENT RECEIVED'
+			| 'REFUND RECEIVED'
+			| 'REQUEST CANCELLATION';
 	};
 	eventsCausingServices: {};
 	eventsCausingGuards: {

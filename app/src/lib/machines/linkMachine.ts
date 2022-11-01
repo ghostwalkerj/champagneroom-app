@@ -1,3 +1,4 @@
+import type { ConnectionDocType } from '$lib/ORM/models/connection';
 import type { LinkDocType } from '$lib/ORM/models/link';
 import { LinkStatus } from '$lib/ORM/models/link';
 import type { TransactionDocType } from '$lib/ORM/models/transaction';
@@ -22,6 +23,10 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 					| {
 							type: 'REFUND RECEIVED';
 							transaction: TransactionDocType;
+					  }
+					| {
+							type: 'CONNECTION ATTEMPT';
+							connection: ConnectionDocType;
 					  }
 					| {
 							type: 'PAYMENT RECEIVED';
@@ -102,6 +107,9 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 								'REQUEST CANCELLATION': {
 									target: 'requestedCancellation',
 									actions: ['requestCancellation', 'saveLinkState']
+								},
+								'CONNECTION ATTEMPT': {
+									actions: ['receiveConnectionAttempt', 'saveLinkState']
 								}
 							}
 						},
@@ -118,7 +126,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 								waiting4Refund: {
 									on: {
 										'REFUND RECEIVED': {
-											actions: ['recieveRefund', 'saveLinkState']
+											actions: ['receiveRefund', 'saveLinkState']
 										}
 									}
 								}
@@ -225,7 +233,18 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 						};
 					}
 				}),
-				recieveRefund: assign((context, event) => {
+				receiveConnectionAttempt: assign((context, event) => {
+					return {
+						linkState: {
+							...context.linkState,
+							connections: context.linkState.connections
+								? [...context.linkState.connections, event.connection._id]
+								: [event.connection._id]
+						}
+					};
+				}),
+
+				receiveRefund: assign((context, event) => {
 					if (context.linkState.cancel) {
 						return {
 							linkState: {

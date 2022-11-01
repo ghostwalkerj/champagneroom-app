@@ -177,7 +177,7 @@
 			if (result.type !== 'success') {
 				waiting4StateChange = false;
 			} else {
-				form.reset();
+				if (form) form.reset();
 			}
 			await applyAction(result);
 		};

@@ -242,7 +242,8 @@ const linkSchemaLiteral = {
 						}
 					},
 					required: ['endedAt']
-				}
+				},
+				connections: { type: 'array', ref: 'connections', items: { type: 'string' } }
 			},
 			required: ['status', 'totalFunding', 'requestedFunding', 'refundedAmount']
 		},
@@ -276,7 +277,6 @@ const linkSchemaLiteral = {
 		},
 		talent: { type: 'string', ref: 'talents', maxLength: 50 },
 		agent: { type: 'string', ref: 'agents', maxLength: 70 },
-		connections: { type: 'string', ref: 'connections', maxLength: 50 },
 		createdAt: {
 			type: 'integer'
 		},
