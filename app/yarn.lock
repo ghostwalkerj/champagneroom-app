@@ -3516,7 +3516,7 @@ dag-jose@^1.0.0:
     "@ipld/dag-cbor" "^6.0.3"
     multiformats "^9.0.2"
 
-daisyui@^2.27.0:
+daisyui@^2.38.0:
   version "2.38.0"
   resolved "https://registry.yarnpkg.com/daisyui/-/daisyui-2.38.0.tgz#4ab5b73dd1fd33a34308fc96f408c644bab14c8c"
   integrity sha512-/AIT/XrNY8QLpXnoEXU7aFv5NRU7R3NSpg13ujs+hkTlDlR8pkjsGMqTRKvMf7orCX9833VLFAFJw+CH4EORvA==
@@ -9326,7 +9326,7 @@ rustbn.js@~0.2.0:
   resolved "https://registry.yarnpkg.com/rustbn.js/-/rustbn.js-0.2.0.tgz#8082cb886e707155fd1cb6f23bd591ab8d55d0ca"
   integrity sha512-4VlvkRUuCJvr2J6Y0ImW7NvTCriMi7ErOAqWk1y69vAdoNIzCF3yPmgeNzx+RQTLEDFq5sHfscn1MwHxP9hNfA==
 
-rxdb@^13.0.3:
+rxdb@^13.8.2:
   version "13.8.2"
   resolved "https://registry.yarnpkg.com/rxdb/-/rxdb-13.8.2.tgz#2e522d1092e94f62ecba06c333fbcb15dbee51f9"
   integrity sha512-LRoDGzUfKcqUWzQlhgNw5m4JC685OfqCyeg7ZkiM4TnUvSpeKa1u7SDJWDOg/vv/IV2PsuSDn2E/+8e3hynJrA==
