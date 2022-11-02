@@ -1,4 +1,4 @@
-import type { ConnectionDocType } from '$lib/ORM/models/connection';
+import type { ConnectionDocType } from '$lib/ORM/models/callEvent';
 import type { LinkDocType } from '$lib/ORM/models/link';
 import { LinkStatus } from '$lib/ORM/models/link';
 import type { TransactionDocType } from '$lib/ORM/models/transaction';

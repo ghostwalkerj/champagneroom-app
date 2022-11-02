@@ -7,7 +7,7 @@ import {
 } from 'rxdb';
 import type { LinkDocument } from './link';
 
-export enum ConnectionType {
+export enum CallEventType {
 	ATTEMPT,
 	CONNECT,
 	DISCONNECTED,
@@ -16,9 +16,9 @@ export enum ConnectionType {
 	CALLEE_HANGUP
 }
 
-const connectionSchemaLiteral = {
-	title: 'connection',
-	description: 'connection for a link',
+const CallEventSchemaLiteral = {
+	title: 'callEvent',
+	description: 'callEvent for a link',
 	version: 0,
 	type: 'object',
 	primaryKey: '_id',
@@ -29,7 +29,7 @@ const connectionSchemaLiteral = {
 		},
 		entityType: {
 			type: 'string',
-			default: 'connection',
+			default: 'callEvent',
 			maxLength: 20,
 			final: true
 		},
@@ -40,10 +40,10 @@ const connectionSchemaLiteral = {
 			type: 'boolean',
 			default: false
 		},
-		status: {
+		type: {
 			type: 'string',
-			enum: Object.values(ConnectionType),
-			default: ConnectionType.ATTEMPT
+			enum: Object.values(CallEventType),
+			default: CallEventType.ATTEMPT
 		},
 		link: {
 			type: 'string',
@@ -56,19 +56,19 @@ const connectionSchemaLiteral = {
 			maxLength: 50
 		}
 	},
-	required: ['_id', 'link', 'createdAt', 'status']
+	required: ['_id', 'link', 'createdAt', 'type', 'talent']
 } as const;
 
-type connectionRef = {
+type CallEventRef = {
 	link_?: Promise<LinkDocument>;
 };
 
-export const ConnectionString = 'connection';
+export const CallEventString = 'callEvent';
 
-const schemaTyped = toTypedRxJsonSchema(connectionSchemaLiteral);
-export type ConnectionDocType = ExtractDocumentTypeFromTypedRxJsonSchema<typeof schemaTyped>;
+const schemaTyped = toTypedRxJsonSchema(CallEventSchemaLiteral);
+export type CallEventDocType = ExtractDocumentTypeFromTypedRxJsonSchema<typeof schemaTyped>;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-export const connectionSchema: RxJsonSchema<ConnectionDocType> = connectionSchemaLiteral;
-export type ConnectionDocument = RxDocument<ConnectionDocType> & connectionRef;
-export type ConnectionCollection = RxCollection<ConnectionDocType>;
+export const callEventSchema: RxJsonSchema<CallEventDocType> = CallEventSchemaLiteral;
+export type CallEventDocument = RxDocument<CallEventDocType> & CallEventRef;
+export type CallEventCollection = RxCollection<CallEventDocType>;

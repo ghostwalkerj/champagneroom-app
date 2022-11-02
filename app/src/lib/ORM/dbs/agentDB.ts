@@ -5,7 +5,7 @@ import {
 	agentStaticMethods,
 	type AgentCollection
 } from '$lib/ORM/models/agent';
-import { connectionSchema, type ConnectionCollection } from '$lib/ORM/models/connection';
+
 import { linkDocMethods, linkSchema, type LinkCollection } from '$lib/ORM/models/link';
 import { talentDocMethods, talentSchema, type TalentCollection } from '$lib/ORM/models/talent';
 import { transactionSchema, type TransactionCollection } from '$lib/ORM/models/transaction';
@@ -14,6 +14,7 @@ import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
 import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
+import { type CallEventCollection, callEventSchema } from '../models/callEvent';
 
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 100;
@@ -22,7 +23,7 @@ type AllCollections = {
 	agents: AgentCollection;
 	talents: TalentCollection;
 	links: LinkCollection;
-	connections: ConnectionCollection;
+	callEvents: CallEventCollection;
 	transactions: TransactionCollection;
 };
 
@@ -63,8 +64,8 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 			schema: linkSchema,
 			methods: linkDocMethods
 		},
-		connections: {
-			schema: connectionSchema
+		callEvents: {
+			schema: callEventSchema
 		},
 		transactions: {
 			schema: transactionSchema
@@ -87,7 +88,7 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 		const talentQuery = _db.talents.find().where('agent').eq(agentId);
 		const talentIDs = await talentQuery.exec().then((talents) => talents.map((t) => t._id));
 		const linkQuery = _db.links.find().where('talent').in(talentIDs);
-		const connectionQuery = _db.connections.find().where('talent').in(talentIDs);
+		const callEventQuery = _db.callEvents.find().where('talent').in(talentIDs);
 		const transactionQuery = _db.transactions.find().where('talent').in(talentIDs);
 
 		let repState = _db.agents.syncCouchDB({
@@ -120,13 +121,13 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 		});
 		await repState.awaitInitialReplication();
 
-		repState = _db.connections.syncCouchDB({
+		repState = _db.callEvents.syncCouchDB({
 			remote: remoteDB,
 			waitForLeadership: false,
 			options: {
 				retry: true
 			},
-			query: connectionQuery
+			query: callEventQuery
 		});
 		await repState.awaitInitialReplication();
 
@@ -167,14 +168,14 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 			},
 			query: linkQuery
 		});
-		_db.connections.syncCouchDB({
+		_db.callEvents.syncCouchDB({
 			remote: remoteDB,
 			waitForLeadership: false,
 			options: {
 				retry: true,
 				live: true
 			},
-			query: connectionQuery
+			query: callEventQuery
 		});
 		_db.transactions.syncCouchDB({
 			remote: remoteDB,

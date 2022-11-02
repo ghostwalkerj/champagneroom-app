@@ -93,7 +93,7 @@ const generateLinks = (talent: TalentDocument, count: number) => {
 					numCompletedCalls: i
 				}
 			},
-			_id: `${LinkString}:l${key}`,
+			_id: `${LinkString}:l-${key}`,
 			createdAt: new Date().getTime(),
 			updatedAt: new Date().getTime(),
 			entityType: LinkString,

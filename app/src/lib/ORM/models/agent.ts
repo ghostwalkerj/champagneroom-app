@@ -29,7 +29,7 @@ export const agentDocMethods: AgentDocMethods = {
 		profileImageUrl: string = PUBLIC_DEFAULT_PROFILE_IMAGE
 	) {
 		const _talent: TalentDocType = {
-			_id: `${TalentString}:t${nanoid()}`,
+			_id: `${TalentString}:t-${nanoid()}`,
 			name,
 			agentCommission,
 			key: nanoid(),
@@ -57,7 +57,7 @@ export const agentDocMethods: AgentDocMethods = {
 export const agentStaticMethods: AgentStaticMethods = {
 	createAgent: async function (this: AgentCollection, address: string) {
 		const _agent = await this.insert({
-			_id: `${AgentString}:${address}`,
+			_id: `${AgentString}:a-${address}`,
 			address,
 			createdAt: new Date().getTime(),
 			updatedAt: new Date().getTime()

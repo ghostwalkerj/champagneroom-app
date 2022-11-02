@@ -73,7 +73,7 @@ const transactionSchemaLiteral = {
 		}
 	},
 	indexes: [],
-	required: ['_id', 'createdAt', 'hash', 'block', 'from', 'to', 'reason', 'value', 'link']
+	required: ['_id', 'createdAt', 'hash', 'block', 'from', 'to', 'reason', 'value', 'link', 'talent']
 } as const;
 
 type transactionRef = {

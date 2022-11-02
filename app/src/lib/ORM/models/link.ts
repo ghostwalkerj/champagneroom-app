@@ -1,10 +1,10 @@
 import type { AgentDocument } from '$lib/ORM/models/agent';
 import {
-	ConnectionType,
-	ConnectionString,
-	type ConnectionDocType,
-	type ConnectionDocument
-} from '$lib/ORM/models/connection';
+	type CallEventDocType,
+	type CallEventDocument,
+	CallEventString,
+	type CallEventType
+} from '$lib/ORM/models/callEvent';
 import type { TalentDocument } from '$lib/ORM/models/talent';
 import { nanoid } from 'nanoid';
 import {
@@ -53,7 +53,7 @@ type LinkDocMethods = {
 		value: string;
 		reason: TransactionReasonType;
 	}) => Promise<TransactionDocument>;
-	createConnection: () => Promise<TransactionDocument>;
+	createCallEvent: (type: CallEventType) => Promise<CallEventDocument>;
 };
 
 export const linkDocMethods: LinkDocMethods = {
@@ -70,7 +70,7 @@ export const linkDocMethods: LinkDocMethods = {
 	) {
 		const db = this.collection.database;
 		const _transaction: TransactionDocType = {
-			_id: `${TransactionString}:t${nanoid()}`,
+			_id: `${TransactionString}:tr-${nanoid()}`,
 			createdAt: new Date().getTime(),
 			updatedAt: new Date().getTime(),
 			link: this._id,
@@ -79,17 +79,17 @@ export const linkDocMethods: LinkDocMethods = {
 		};
 		return db.transactions.insert(_transaction);
 	},
-	createConnection: async function (this: LinkDocument) {
+	createCallEvent: async function (this: LinkDocument, type: CallEventType) {
 		const db = this.collection.database;
-		const _connection: ConnectionDocType = {
-			_id: `${ConnectionString}:c${nanoid()}`,
+		const _callEvent: CallEventDocType = {
+			_id: `${CallEventString}:ce-${nanoid()}`,
 			createdAt: new Date().getTime(),
 			updatedAt: new Date().getTime(),
 			link: this._id,
 			talent: this.talent,
-			status: ConnectionType.ATTEMPT
+			type
 		};
-		return db.connections.insert(_connection);
+		return db.callEvents.insert(_callEvent);
 	}
 };
 
@@ -243,7 +243,7 @@ const linkSchemaLiteral = {
 					},
 					required: ['endedAt']
 				},
-				connections: { type: 'array', ref: 'connections', items: { type: 'string' } }
+				callEvents: { type: 'array', ref: 'callEvents', items: { type: 'string' } }
 			},
 			required: ['status', 'totalFunding', 'requestedFunding', 'refundedAmount']
 		},
@@ -306,7 +306,7 @@ const linkSchemaLiteral = {
 type linkRef = {
 	talent_?: Promise<TalentDocument>;
 	agent_?: Promise<AgentDocument>;
-	connections_?: Promise<ConnectionDocument>;
+	callEvents_?: Promise<CallEventDocument>;
 	transactions_?: Promise<TransactionDocument[]>;
 };
 

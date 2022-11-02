@@ -1,5 +1,4 @@
 import { PUBLIC_CREATORS_ENDPOINT, PUBLIC_RXDB_PASSWORD } from '$env/static/public';
-import { connectionSchema, type ConnectionCollection } from '$lib/ORM/models/connection';
 import {
 	linkDocMethods,
 	LinkDocument,
@@ -13,12 +12,13 @@ import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
 import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
+import { type CallEventCollection, callEventSchema } from '../models/callEvent';
 
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 100;
 type APICollections = {
 	links: LinkCollection;
-	connections: ConnectionCollection;
+	callEvents: CallEventCollection;
 	transactions: TransactionCollection;
 };
 
@@ -55,8 +55,8 @@ const create = async (token: string, linkId: string, storage: StorageTypes) => {
 			schema: linkSchema,
 			methods: linkDocMethods
 		},
-		connections: {
-			schema: connectionSchema
+		callEvents: {
+			schema: callEventSchema
 		},
 		transactions: {
 			schema: transactionSchema
@@ -89,7 +89,7 @@ const create = async (token: string, linkId: string, storage: StorageTypes) => {
 		_thisLink = (await linkQuery.exec()) as LinkDocument;
 		if (_thisLink) {
 			const transactionQuery = _db.transactions.findOne().where('link').eq(linkId);
-			const connectionQuery = _db.connections.findOne().where('link').eq(linkId);
+			const callEventsQuery = _db.callEvents.findOne().where('link').eq(linkId);
 
 			repState = _db.transactions.syncCouchDB({
 				remote: remoteDB,
@@ -101,13 +101,13 @@ const create = async (token: string, linkId: string, storage: StorageTypes) => {
 			});
 			await repState.awaitInitialReplication();
 
-			repState = _db.connections.syncCouchDB({
+			repState = _db.callEvents.syncCouchDB({
 				remote: remoteDB,
 				waitForLeadership: false,
 				options: {
 					retry: true
 				},
-				query: connectionQuery
+				query: callEventsQuery
 			});
 			await repState.awaitInitialReplication();
 
@@ -131,14 +131,14 @@ const create = async (token: string, linkId: string, storage: StorageTypes) => {
 				query: transactionQuery
 			});
 
-			_db.connections.syncCouchDB({
+			_db.callEvents.syncCouchDB({
 				remote: remoteDB,
 				waitForLeadership: false,
 				options: {
 					retry: true,
 					live: true
 				},
-				query: connectionQuery
+				query: callEventsQuery
 			});
 		}
 	}
