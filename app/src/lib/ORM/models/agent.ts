@@ -47,11 +47,10 @@ export const agentDocMethods: AgentDocMethods = {
 		};
 
 		const db = this.collection.database;
-		const talent = await db.talents.insert(_talent);
 
-		const talents = this.talents ? this.talents.concat([talent._id]) : [talent._id];
+		const talents = this.talents ? this.talents.concat([_talent._id]) : [_talent._id];
 		this.update({ $set: { talents } });
-		return talent;
+		return await db.talents.insert(_talent);
 	}
 };
 export const agentStaticMethods: AgentStaticMethods = {

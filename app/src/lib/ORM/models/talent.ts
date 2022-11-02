@@ -155,9 +155,9 @@ export const talentDocMethods: TalentDocMethods = {
 			entityType: LinkString,
 			agent: this.agent
 		};
-		const link = await db.links.insert(_link);
-		this.update({ $set: { currentLink: link._id } });
-		return link;
+		this.update({ $set: { currentLink: _link._id } });
+
+		return await db.links.insert(_link);
 	},
 
 	updateStats: async function (this: TalentDocument): Promise<TalentDocument['stats']> {
