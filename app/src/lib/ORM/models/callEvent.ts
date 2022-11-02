@@ -9,11 +9,12 @@ import type { LinkDocument } from './link';
 
 export enum CallEventType {
 	ATTEMPT,
+	ANSWER,
 	CONNECT,
-	DISCONNECTED,
+	DISCONNECT,
 	NO_ANSWER,
-	CALLER_HANGUP,
-	CALLEE_HANGUP
+	HANGUP,
+	REJECT
 }
 
 const CallEventSchemaLiteral = {

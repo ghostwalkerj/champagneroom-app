@@ -9,6 +9,7 @@
 	import { callMachine } from '$lib/machines/callMachine';
 	import { createLinkMachineService, type LinkMachineServiceType } from '$lib/machines/linkMachine';
 	import { talentDB, type TalentDBType } from '$lib/ORM/dbs/talentDB';
+	import { CallEventType } from '$lib/ORM/models/callEvent';
 	import type { LinkDocType, LinkDocument } from '$lib/ORM/models/link';
 	import type { TalentDocType, TalentDocument } from '$lib/ORM/models/talent';
 	import { StorageTypes } from '$lib/ORM/rxdb';
@@ -146,6 +147,37 @@
 					vc = videoCall(currentLink.callId);
 					vc.callState.subscribe((cs) => {
 						if (cs) {
+							// Save the callEvent
+							switch (cs.event.type) {
+								case 'CALL INCOMING':
+									currentLink.createCallEvent(CallEventType.ATTEMPT);
+									break;
+
+								case 'CALL ACCEPTED':
+									currentLink.createCallEvent(CallEventType.ANSWER);
+									break;
+
+								case 'CALL CONNECTED':
+									currentLink.createCallEvent(CallEventType.CONNECT);
+									break;
+
+								case 'CALL UNANSWERED':
+									currentLink.createCallEvent(CallEventType.NO_ANSWER);
+									break;
+
+								case 'CALL REJECTED':
+									currentLink.createCallEvent(CallEventType.REJECT);
+									break;
+
+								case 'CALL DISCONNECTED':
+									currentLink.createCallEvent(CallEventType.DISCONNECT);
+									break;
+
+								case 'CALL HANGUP':
+									currentLink.createCallEvent(CallEventType.HANGUP);
+									break;
+							}
+
 							callState = cs;
 							showAlert = callState.matches('receivingCall');
 							inCall = callState.matches('inCall');
