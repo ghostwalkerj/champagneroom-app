@@ -7,7 +7,7 @@ import {
 } from 'rxdb';
 import type { LinkDocument } from './link';
 
-export enum ConnectionStatus {
+export enum ConnectionType {
 	ATTEMPT,
 	CONNECT,
 	DISCONNECTED,
@@ -42,8 +42,8 @@ const connectionSchemaLiteral = {
 		},
 		status: {
 			type: 'string',
-			enum: Object.values(ConnectionStatus),
-			default: ConnectionStatus.ATTEMPT
+			enum: Object.values(ConnectionType),
+			default: ConnectionType.ATTEMPT
 		},
 		link: {
 			type: 'string',
