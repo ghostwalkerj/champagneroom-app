@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { applyAction, enhance } from '$app/forms';
-	import { invalidateAll } from '$app/navigation';
 	import { page } from '$app/stores';
 	import VideoCall from '$lib/components/calls/VideoCall.svelte';
 	import VideoPreview from '$lib/components/calls/VideoPreview.svelte';
@@ -79,6 +78,8 @@
 				vc = videoCall();
 				vc.callState.subscribe((state) => {
 					callState = state;
+
+					// Here we send in callEvents to the linkState machine
 				});
 			});
 		}

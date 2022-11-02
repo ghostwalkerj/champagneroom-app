@@ -1,8 +1,8 @@
 import type { AgentDocument } from '$lib/ORM/models/agent';
 import {
+	CallEventString,
 	type CallEventDocType,
 	type CallEventDocument,
-	CallEventString,
 	type CallEventType
 } from '$lib/ORM/models/callEvent';
 import type { TalentDocument } from '$lib/ORM/models/talent';

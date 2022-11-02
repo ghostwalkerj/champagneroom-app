@@ -1,4 +1,4 @@
-import type { ConnectionDocType } from '$lib/ORM/models/callEvent';
+import type { CallEventDocType } from '$lib/ORM/models/callEvent';
 import type { LinkDocType } from '$lib/ORM/models/link';
 import { LinkStatus } from '$lib/ORM/models/link';
 import type { TransactionDocType } from '$lib/ORM/models/transaction';
@@ -25,8 +25,8 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 							transaction: TransactionDocType;
 					  }
 					| {
-							type: 'CONNECTION ATTEMPT';
-							connection: ConnectionDocType;
+							type: 'CALL EVENT';
+							callEvent: CallEventDocType;
 					  }
 					| {
 							type: 'PAYMENT RECEIVED';
@@ -108,8 +108,8 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 									target: 'requestedCancellation',
 									actions: ['requestCancellation', 'saveLinkState']
 								},
-								'CONNECTION ATTEMPT': {
-									actions: ['receiveConnectionAttempt', 'saveLinkState']
+								'CALL EVENT': {
+									actions: ['receiveCallEvent', 'saveLinkState']
 								}
 							}
 						},
@@ -233,13 +233,13 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 						};
 					}
 				}),
-				receiveConnectionAttempt: assign((context, event) => {
+				receiveCallEvent: assign((context, event) => {
 					return {
 						linkState: {
 							...context.linkState,
-							connections: context.linkState.connections
-								? [...context.linkState.connections, event.connection._id]
-								: [event.connection._id]
+							callEvents: context.linkState.callEvents
+								? [...context.linkState.callEvents, event.callEvent._id]
+								: [event.callEvent._id]
 						}
 					};
 				}),

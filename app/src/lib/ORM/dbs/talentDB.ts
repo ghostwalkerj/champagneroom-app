@@ -8,7 +8,7 @@ import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
 import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
-import { type CallEventCollection, callEventSchema } from '../models/callEvent';
+import { callEventSchema, type CallEventCollection } from '../models/callEvent';
 
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 100;

@@ -6,10 +6,10 @@
 	import type { TalentDocType } from '$lib/ORM/models/talent';
 	import { currencyFormatter } from '$lib/util/constants';
 	import getProfileImage from '$lib/util/profilePhoto';
+	import spacetime from 'spacetime';
 	import FaMoneyBillWave from 'svelte-icons/fa/FaMoneyBillWave.svelte';
 	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';
 	import urlJoin from 'url-join';
-	import spacetime from 'spacetime';
 
 	export let link: LinkDocType;
 	export let talent: TalentDocType;
