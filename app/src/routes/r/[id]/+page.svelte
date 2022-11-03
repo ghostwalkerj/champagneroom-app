@@ -47,7 +47,6 @@
 				linkService = createLinkMachineService(link.linkState);
 				linkService.subscribe((state) => {
 					machineState = state;
-					if (state.matches('claimed.canCall')) initVC();
 				});
 				waiting4StateChange = false;
 			}
@@ -78,8 +77,6 @@
 				vc = videoCall();
 				vc.callState.subscribe((state) => {
 					callState = state;
-
-					// Here we send in callEvents to the linkState machine
 				});
 			});
 		}
@@ -106,6 +103,7 @@
 	// Wait for onMount to grab user Stream only if we plan to call or do we grab to to make sure it works?
 	onMount(async () => {
 		requestStream();
+		initVC();
 	});
 </script>
 

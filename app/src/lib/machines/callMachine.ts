@@ -70,6 +70,9 @@ export const callMachine =
 					},
 					'CALL CANCELLED': {
 						target: 'ready4Call'
+					},
+					'CALL DISCONNECTED': {
+						target: 'ready4Call'
 					}
 				}
 			},

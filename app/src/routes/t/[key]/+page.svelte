@@ -58,10 +58,10 @@
 		});
 
 	$: canCreateLink = !currentLinkState || currentLinkState.done;
-	$: canCall = currentLinkState && currentLinkState.matches('claimed.canCall');
 	$: waiting4StateChange = false;
 
 	talentDB(token, key, StorageTypes.IDB).then((db: TalentDBType) => {
+		// Don't judge me
 		db.talents
 			.findOne(talentObj._id)
 			.exec()
@@ -71,43 +71,45 @@
 					talent = _talent;
 					talent.get$('currentLink').subscribe((linkId) => {
 						if (linkId) {
-							db.links.findOne(linkId).$.subscribe((link) => {
-								if (link) {
-									currentLink = link;
-									startLinkMachine(link);
-									waiting4StateChange = false; // link changed, so can submit again
-								}
-							});
+							db.links
+								.findOne(linkId)
+								.exec()
+								.then((link) => {
+									if (link) {
+										initVC(currentLink.callId);
+										currentLink = link;
+										link.get$('linkState').subscribe((linkState) => {
+											if (linkState) {
+												if (linkService) linkService.stop();
+												if (linkSub) linkSub.unsubscribe();
+												const updateLink = (linkState: LinkDocument['linkState']) => {
+													if (link)
+														link.atomicPatch({
+															updatedAt: new Date().getTime(),
+															linkState
+														});
+												};
+												linkService = createLinkMachineService(linkState, updateLink);
+												linkSub = linkService.subscribe((state) => {
+													if (state.changed) {
+														currentLinkState = state;
+														canCancelLink = state.can({
+															type: 'REQUEST CANCELLATION',
+															cancel: undefined
+														});
+														canCreateLink = state.done ?? true;
+													}
+												});
+												waiting4StateChange = false; // link changed, so can submit again
+											}
+										});
+									}
+								});
 						}
 					});
 				}
 			});
 	});
-
-	const startLinkMachine = (link: LinkDocument) => {
-		if (linkService) linkService.stop();
-		if (linkSub) linkSub.unsubscribe();
-		const updateLink = (linkState: LinkDocument['linkState']) => {
-			if (link && link.atomicPatch)
-				link.atomicPatch({
-					updatedAt: new Date().getTime(),
-					linkState
-				});
-		};
-		linkService = createLinkMachineService(link.linkState, updateLink);
-		linkSub = linkService.subscribe((state) => {
-			currentLinkState = state;
-			if (state.changed) {
-				canCancelLink = state.can({
-					type: 'REQUEST CANCELLATION',
-					cancel: undefined
-				});
-				canCreateLink = state.done ?? true;
-				canCall = state.matches('claimed.canCall');
-				if (canCall) initVC();
-			}
-		});
-	};
 
 	const updateProfileImage = async (url: string) => {
 		if (url && talent) {
@@ -136,7 +138,7 @@
 		vc.acceptCall(mediaStream);
 	};
 
-	const initVC = () => {
+	const initVC = (callId: string) => {
 		if (browser) {
 			global = window;
 			import('$lib/util/videoCall').then((_vc) => {
@@ -144,7 +146,7 @@
 
 				if (vc) vc.destroy();
 				if (currentLink) {
-					vc = videoCall(currentLink.callId);
+					vc = videoCall(callId);
 					vc.callState.subscribe((cs) => {
 						if (cs) {
 							// Save the callEvent
