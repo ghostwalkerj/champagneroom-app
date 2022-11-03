@@ -39,6 +39,13 @@ export const videoCall = (userId?: string) => {
 		_callState.set(state);
 	});
 
+	const _callEvent = writable(callMachine.initialState.event);
+	const callEvent = readable(callMachine.initialState.event, (set) => {
+		_callEvent.subscribe((event) => {
+			set(event);
+		});
+	});
+
 	callService.onEvent((event) => {
 		console.log('Call Event: ', JSON.stringify(event));
 	});
@@ -207,6 +214,7 @@ export const videoCall = (userId?: string) => {
 		rejectCall: ignoreCall,
 		cancelCall,
 		callState,
+		callEvent,
 		remoteStream,
 		callerName,
 		destroy

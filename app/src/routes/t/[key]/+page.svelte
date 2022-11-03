@@ -44,6 +44,7 @@
 	$: inCall = false;
 	let us: Awaited<UserStreamType>;
 	let callState = callMachine.initialState;
+	let callEvent = callState.event;
 	let mediaStream: MediaStream;
 	$: callerName = '';
 	let videoCall: any;
@@ -147,10 +148,10 @@
 				if (vc) vc.destroy();
 				if (currentLink) {
 					vc = videoCall(callId);
-					vc.callState.subscribe((cs) => {
-						if (cs) {
-							// Save the callEvent
-							switch (cs.event.type) {
+					vc.callEvent.subscribe((ce) => {
+						if (ce) {
+							callEvent = ce;
+							switch (ce.type) {
 								case 'CALL INCOMING':
 									currentLink.createCallEvent(CallEventType.ATTEMPT);
 									break;
@@ -179,7 +180,11 @@
 									currentLink.createCallEvent(CallEventType.HANGUP);
 									break;
 							}
+						}
+					});
 
+					vc.callState.subscribe((cs) => {
+						if (cs) {
 							callState = cs;
 							showAlert = callState.matches('receivingCall');
 							inCall = callState.matches('inCall');
