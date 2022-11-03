@@ -29,16 +29,16 @@
 	let videoCall: any;
 	let mediaStream: MediaStream;
 	let us: Awaited<UserStreamType>;
-	$: waiting4StateChange = false;
 
+	$: waiting4StateChange = false;
 	$: linkService = createLinkMachineService(linkObj.linkState);
 	$: machineState = linkService.initialState;
 	$: showFeedback = false;
 	$: inCall = false;
 	$: callState = callMachine.initialState;
 	$: userstream = false;
-
 	$: profileImage = getProfileImage(displayName);
+
 	publicDB(token, linkId, StorageTypes.IDB).then((db: PublicDBType) => {
 		db.links.findOne(linkId).$.subscribe((link) => {
 			if (link) {

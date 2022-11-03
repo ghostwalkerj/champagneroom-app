@@ -25,10 +25,6 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 							transaction: TransactionDocType;
 					  }
 					| {
-							type: 'CALL EVENT';
-							callEvent: CallEventDocType;
-					  }
-					| {
 							type: 'PAYMENT RECEIVED';
 							transaction: TransactionDocType;
 					  }
@@ -107,9 +103,6 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 								'REQUEST CANCELLATION': {
 									target: 'requestedCancellation',
 									actions: ['requestCancellation', 'saveLinkState']
-								},
-								'CALL EVENT': {
-									actions: ['receiveCallEvent', 'saveLinkState']
 								}
 							}
 						},
@@ -232,16 +225,6 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 							}
 						};
 					}
-				}),
-				receiveCallEvent: assign((context, event) => {
-					return {
-						linkState: {
-							...context.linkState,
-							callEvents: context.linkState.callEvents
-								? [...context.linkState.callEvents, event.callEvent._id]
-								: [event.callEvent._id]
-						}
-					};
 				}),
 
 				receiveRefund: assign((context, event) => {

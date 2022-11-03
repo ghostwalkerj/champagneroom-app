@@ -178,6 +178,12 @@ export const videoCall = (userId?: string) => {
 		resetCallState();
 	};
 
+	const rejectCall = () => {
+		clearTimeout(unansweredTimer);
+		callService.send({ type: 'CALL REJECTED' });
+		resetCallState();
+	};
+
 	const acceptCall = (localStream: MediaStream) => {
 		callService.send({ type: 'CALL ACCEPTED' });
 		mediaConnection.answer(localStream);
@@ -211,7 +217,7 @@ export const videoCall = (userId?: string) => {
 		makeCall,
 		acceptCall,
 		hangUp,
-		rejectCall: ignoreCall,
+		rejectCall,
 		cancelCall,
 		callState,
 		callEvent,

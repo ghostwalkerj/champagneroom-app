@@ -149,6 +149,7 @@
 				if (currentLink) {
 					vc = videoCall(callId);
 					vc.callEvent.subscribe((ce) => {
+						// Log call events on the Talent side
 						if (ce) {
 							callEvent = ce;
 							switch (ce.type) {
