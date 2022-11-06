@@ -16,12 +16,12 @@
 	export let state: LinkMachineStateType | undefined;
 	let tooltipOpen = '';
 
-	$: callerProfileImage = PUBLIC_DEFAULT_PROFILE_IMAGE;
+	let callerProfileImage = PUBLIC_DEFAULT_PROFILE_IMAGE;
 
-	$: linkURL = '';
-	$: if (link) linkURL = urlJoin($page.url.origin, PUBLIC_ROOM_PATH, link._id);
+	let linkURL = '';
+	if (link) linkURL = urlJoin($page.url.origin, PUBLIC_ROOM_PATH, link._id);
 
-	$: if (state && state.matches('claimed') && link.linkState.claim) {
+	if (state && state.matches('claimed') && link.linkState.claim) {
 		callerProfileImage = getProfileImage(link.linkState.claim.caller);
 	}
 

@@ -32,7 +32,7 @@
 
 	let talentObj = data.talent as TalentDocType;
 	let completedCalls = data.completedCalls as LinkDocType[];
-	let currentLink = data.currentLink as LinkDocument;
+	$: currentLink = data.currentLink as LinkDocument;
 	let key = $page.params.key;
 	let vc: VideoCallType;
 	let talent: TalentDocument;
@@ -72,6 +72,7 @@
 						talentObj = _talent;
 						talent = _talent;
 						talent.get$('currentLink').subscribe((linkId) => {
+							console.log('currentLink', linkId);
 							if (linkId) {
 								db.links
 									.findOne(linkId)
@@ -102,10 +103,9 @@
 
 															if (state.matches('claimed.canCall')) initVC(currentLink.callId);
 															else {
-																if (vc !== undefined) {
+																if (vc && !callState.done) {
 																	console.log('vc destroy');
 																	vc.destroy();
-																	vc == undefined;
 																}
 															}
 														}
