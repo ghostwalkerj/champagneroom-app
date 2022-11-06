@@ -61,56 +61,66 @@
 	$: canCreateLink = !currentLinkState || currentLinkState.done;
 	$: waiting4StateChange = false;
 
-	talentDB(token, key, StorageTypes.IDB).then((db: TalentDBType) => {
-		// Don't judge me
-		db.talents
-			.findOne(talentObj._id)
-			.exec()
-			.then((_talent) => {
-				if (_talent) {
-					talentObj = _talent;
-					talent = _talent;
-					talent.get$('currentLink').subscribe((linkId) => {
-						if (linkId) {
-							db.links
-								.findOne(linkId)
-								.exec()
-								.then((link) => {
-									if (link) {
-										initVC(currentLink.callId);
-										currentLink = link;
-										link.get$('linkState').subscribe((linkState) => {
-											if (linkState) {
-												if (linkService) linkService.stop();
-												if (linkSub) linkSub.unsubscribe();
-												const updateLink = (linkState: LinkDocument['linkState']) => {
-													if (link)
-														link.atomicPatch({
-															updatedAt: new Date().getTime(),
-															linkState
-														});
-												};
-												linkService = createLinkMachineService(linkState, updateLink);
-												linkSub = linkService.subscribe((state) => {
-													if (state.changed) {
-														currentLinkState = state;
-														canCancelLink = state.can({
-															type: 'REQUEST CANCELLATION',
-															cancel: undefined
-														});
-														canCreateLink = state.done ?? true;
-													}
-												});
-												waiting4StateChange = false; // link changed, so can submit again
-											}
-										});
-									}
-								});
-						}
-					});
-				}
-			});
-	});
+	if (browser) {
+		talentDB(token, key, StorageTypes.IDB).then((db: TalentDBType) => {
+			// Don't judge me
+			db.talents
+				.findOne(talentObj._id)
+				.exec()
+				.then((_talent) => {
+					if (_talent) {
+						talentObj = _talent;
+						talent = _talent;
+						talent.get$('currentLink').subscribe((linkId) => {
+							if (linkId) {
+								db.links
+									.findOne(linkId)
+									.exec()
+									.then((link) => {
+										if (link) {
+											currentLink = link;
+											link.get$('linkState').subscribe((linkState) => {
+												if (linkState) {
+													if (linkService) linkService.stop();
+													if (linkSub) linkSub.unsubscribe();
+													const updateLink = (linkState: LinkDocument['linkState']) => {
+														if (link)
+															link.atomicPatch({
+																updatedAt: new Date().getTime(),
+																linkState
+															});
+													};
+													linkService = createLinkMachineService(linkState, updateLink);
+													linkSub = linkService.subscribe((state) => {
+														if (state.changed) {
+															currentLinkState = state;
+															canCancelLink = state.can({
+																type: 'REQUEST CANCELLATION',
+																cancel: undefined
+															});
+															canCreateLink = state.done ?? true;
+
+															if (state.matches('claimed.canCall')) initVC(currentLink.callId);
+															else {
+																if (vc !== undefined) {
+																	console.log('vc destroy');
+																	vc.destroy();
+																	vc == undefined;
+																}
+															}
+														}
+													});
+													waiting4StateChange = false; // link changed, so can submit again
+												}
+											});
+										}
+									});
+							}
+						});
+					}
+				});
+		});
+	}
 
 	const updateProfileImage = async (url: string) => {
 		if (url && talent) {
@@ -189,6 +199,9 @@
 							callState = cs;
 							showAlert = callState.matches('receivingCall');
 							inCall = callState.matches('inCall');
+							if (inCall) {
+								linkService.send('CALL CONNECTED');
+							}
 							ready4Call = callState.matches('ready4Call');
 						}
 					});

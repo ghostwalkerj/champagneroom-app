@@ -16,13 +16,14 @@
 	export let state: LinkMachineStateType | undefined;
 	let tooltipOpen = '';
 
-	$: callerProfileImage =
-		link && link.linkState.claim
-			? getProfileImage(link.linkState.claim.caller)
-			: PUBLIC_DEFAULT_PROFILE_IMAGE;
+	$: callerProfileImage = PUBLIC_DEFAULT_PROFILE_IMAGE;
 
 	$: linkURL = '';
 	$: if (link) linkURL = urlJoin($page.url.origin, PUBLIC_ROOM_PATH, link._id);
+
+	$: if (state && state.matches('claimed') && link.linkState.claim) {
+		callerProfileImage = getProfileImage(link.linkState.claim.caller);
+	}
 
 	const copyLink = () => {
 		navigator.clipboard.writeText(linkURL);

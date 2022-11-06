@@ -149,7 +149,7 @@ export const talentDocMethods: TalentDocMethods = {
 					numCompletedCalls: this.stats.numCompletedCalls
 				}
 			},
-			_id: `${LinkString}:l${key}`,
+			_id: `${LinkString}:l-${key}`,
 			createdAt: new Date().getTime(),
 			updatedAt: new Date().getTime(),
 			entityType: LinkString,

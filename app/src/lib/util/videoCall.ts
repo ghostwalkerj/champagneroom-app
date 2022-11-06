@@ -206,11 +206,12 @@ export const videoCall = (userId?: string) => {
 	};
 
 	const destroy = () => {
-		resetCallState();
 		destroyed = true;
 		console.log('destroy called');
 		peer.destroy();
+		callService.send({ type: 'PEER DESTROYED' });
 		callService.stop();
+		resetCallState();
 	};
 
 	return {

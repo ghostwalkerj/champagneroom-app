@@ -29,6 +29,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 							transaction: TransactionDocType;
 					  }
 					| { type: 'CALL CONNECTED' }
+					| { type: 'CALL INTERRUPTED' }
 					| { type: 'CALL COMPLETED' }
 					| { type: 'FEEDBACK RECEIVED' }
 					| { type: 'ESCROW FINISHED' }
@@ -110,7 +111,8 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 							on: {
 								'CALL COMPLETED': {
 									target: 'wating4Finalization'
-								}
+								},
+								'CALL INTERRUPTED': { target: 'canCall' }
 							}
 						},
 						requestedCancellation: {
