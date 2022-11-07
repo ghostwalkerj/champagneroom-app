@@ -9,7 +9,7 @@
 	import { callMachine } from '$lib/machines/callMachine';
 	import { createLinkMachineService, type LinkMachineServiceType } from '$lib/machines/linkMachine';
 	import { talentDB, type TalentDBType } from '$lib/ORM/dbs/talentDB';
-	import { CallEventType } from '$lib/ORM/models/callEvent';
+	import { CallEventDocument, CallEventType } from '$lib/ORM/models/callEvent';
 	import type { LinkDocType, LinkDocument } from '$lib/ORM/models/link';
 	import type { TalentDocType, TalentDocument } from '$lib/ORM/models/talent';
 	import { StorageTypes } from '$lib/ORM/rxdb';
@@ -157,37 +157,42 @@
 						// Log call events on the Talent side
 						if (ce) {
 							callEvent = ce;
+							let eventType: CallEventType | undefined;
 							switch (ce.type) {
 								case 'CALL INCOMING':
-									currentLink.createCallEvent(CallEventType.ATTEMPT);
-									linkService.send('CALL INCOMING');
+									eventType = CallEventType.ATTEMPT;
 									break;
 
 								case 'CALL ACCEPTED':
-									currentLink.createCallEvent(CallEventType.ANSWER);
+									eventType = CallEventType.ANSWER;
 									break;
 
 								case 'CALL CONNECTED':
-									currentLink.createCallEvent(CallEventType.CONNECT);
+									eventType = CallEventType.CONNECT;
 									linkService.send('CALL CONNECTED');
 									break;
 
 								case 'CALL UNANSWERED':
-									currentLink.createCallEvent(CallEventType.NO_ANSWER);
+									eventType = CallEventType.NO_ANSWER;
 									break;
 
 								case 'CALL REJECTED':
-									currentLink.createCallEvent(CallEventType.REJECT);
+									eventType = CallEventType.REJECT;
 									break;
 
 								case 'CALL DISCONNECTED':
-									currentLink.createCallEvent(CallEventType.DISCONNECT);
+									eventType = CallEventType.DISCONNECT;
 									linkService.send('CALL DISCONNECTED');
 									break;
 
 								case 'CALL HANGUP':
-									currentLink.createCallEvent(CallEventType.HANGUP);
+									eventType = CallEventType.HANGUP;
 									break;
+							}
+							if (eventType) {
+								currentLink.createCallEvent(eventType).then((callEvent) => {
+									linkService.send({ type: 'CALL EVENT RECEIVED', callEvent });
+								});
 							}
 						}
 					});

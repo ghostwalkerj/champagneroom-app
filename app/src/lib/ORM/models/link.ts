@@ -91,18 +91,6 @@ export const linkDocMethods: LinkDocMethods = {
 			talent: this.talent,
 			type
 		};
-		const callEvents = _linkState.claim.call.callEvents
-			? _linkState.claim.call.callEvents.concat([_callEvent._id])
-			: [_callEvent._id];
-
-		const linkState = {
-			...this.linkState,
-			callEvents
-		};
-		this.atomicPatch({
-			linkState: linkState,
-			updatedAt: new Date().getTime()
-		});
 		return db.callEvents.insert(_callEvent);
 	}
 };
