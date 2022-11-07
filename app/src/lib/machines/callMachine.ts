@@ -112,8 +112,8 @@ export const callMachine =
 			},
 			makingCall: {
 				on: {
-					'CALL ACCEPTED': {
-						target: 'acceptingCall'
+					'CALL CONNECTED': {
+						target: 'inCall'
 					},
 					'CALL UNANSWERED': {
 						target: 'ready4Call'

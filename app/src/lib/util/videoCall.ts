@@ -164,8 +164,7 @@ export const videoCall = (userId?: string) => {
 			});
 			dataConnection.on('close', () => {
 				console.log('Data connection closed');
-				callService.send;
-				({ type: 'CALL DISCONNECTED' });
+				callService.send({ type: 'CALL DISCONNECTED' });
 			});
 		} else {
 			console.log('Error making call');

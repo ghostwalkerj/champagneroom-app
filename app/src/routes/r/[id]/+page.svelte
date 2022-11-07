@@ -32,7 +32,7 @@
 
 	$: waiting4StateChange = false;
 	$: linkService = createLinkMachineService(linkObj.linkState);
-	$: machineState = linkService.initialState;
+	$: linkState = linkService.initialState;
 	$: showFeedback = false;
 	$: inCall = false;
 	$: callState = callMachine.initialState;
@@ -46,7 +46,7 @@
 				// Here is where we run the machine and do all the logic based on the state
 				linkService = createLinkMachineService(link.linkState);
 				linkService.subscribe((state) => {
-					machineState = state;
+					linkState = state;
 				});
 				waiting4StateChange = false;
 			}
@@ -77,6 +77,8 @@
 				vc = videoCall();
 				vc.callState.subscribe((state) => {
 					callState = state;
+					console.log('callState', JSON.stringify(callState.value));
+					inCall = callState.matches('inCall');
 				});
 			});
 		}
@@ -126,13 +128,13 @@
 					</div>
 
 					<!-- Link Claim -->
-					{#if machineState.done}
+					{#if linkState.done}
 						<div class="bg-primary text-primary-content card">
 							<div class="text-center card-body items-center">
 								<h2 class="text-2xl card-title">This Link is No Longer Active</h2>
 							</div>
 						</div>
-					{:else if machineState.matches('claimed.requestedCancellation.waiting4Refund')}
+					{:else if linkState.matches('claimed.requestedCancellation.waiting4Refund')}
 						<div class="bg-primary text-primary-content card">
 							<div class="text-center card-body items-center">
 								<h2 class="text-2xl card-title">
@@ -142,7 +144,7 @@
 								<div>{currencyFormatter.format(linkObj.linkState.refundedAmount)}</div>
 							</div>
 						</div>
-					{:else if machineState.can({ type: 'CLAIM', claim: undefined })}
+					{:else if linkState.can({ type: 'CLAIM', claim: undefined })}
 						<div class="bg-primary text-primary-content card">
 							<div class="text-center card-body items-center">
 								<h2 class="text-2xl card-title">Claim pCall Link</h2>
@@ -199,7 +201,7 @@
 						</div>
 
 						<!-- Link Transaction -->
-					{:else if machineState.matches('claimed.waiting4Funding')}
+					{:else if linkState.matches('claimed.waiting4Funding')}
 						<div class="bg-primary text-primary-content card">
 							<div class="text-center card-body items-center">
 								<h2 class="text-2xl card-title">Fund pCall Link</h2>

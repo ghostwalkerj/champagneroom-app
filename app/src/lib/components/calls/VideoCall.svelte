@@ -216,46 +216,46 @@
 				</button>
 				Mic
 			</div>
+		</div>
 
-			<div class="flex flex-col gap-2 items-center">
-				{#if $callState.matches('receivingCall')}
-					<button
-						class="h-14 w-14 btn-primary btn btn-circle"
-						on:click={() => vc.rejectCall()}
-						disabled={!buttonOptions.rejectCall}
-					>
-						<PhoneMissedIcon size="34" />
-					</button>
-					Reject
-				{:else if $callState.matches('makingCall')}
-					<button
-						class="h-14 w-14 btn btn-circle btn-primary"
-						on:click={() => vc.cancelCall()}
-						disabled={!buttonOptions.rejectCall}
-					>
-						<PhoneMissedIcon size="34" />
-					</button>
-					Cancel
-				{:else if $callState.matches('inCall')}
-					<button
-						class="h-14 w-14 btn btn-circle btn-primary"
-						on:click={() => vc.hangUp()}
-						disabled={!buttonOptions.hangup}
-					>
-						<PhoneMissedIcon size="34" />
-					</button>
-					Hangup
-				{:else}
-					<button
-						class="h-14 w-14 btn btn-primary btn-circle"
-						on:click={() => vc.cancelCall()}
-						disabled={!buttonOptions.hangup}
-					>
-						<div class="h-8 w-8"><MdClose /></div></button
-					>
-					Leave
-				{/if}
-			</div>
+		<div class="flex flex-col gap-2 items-center">
+			{#if $callState.matches('receivingCall')}
+				<button
+					class="h-14 w-14 btn-primary btn btn-circle"
+					on:click={() => vc.rejectCall()}
+					disabled={!buttonOptions.rejectCall}
+				>
+					<PhoneMissedIcon size="34" />
+				</button>
+				Reject
+			{:else if $callState.matches('makingCall')}
+				<button
+					class="h-14 w-14 btn btn-circle btn-primary"
+					on:click={() => vc.cancelCall()}
+					disabled={!buttonOptions.rejectCall}
+				>
+					<PhoneMissedIcon size="34" />
+				</button>
+				Cancel
+			{:else if $callState.matches('inCall')}
+				<button
+					class="h-14 w-14 btn btn-circle btn-primary"
+					on:click={() => vc.hangUp()}
+					disabled={!buttonOptions.hangup}
+				>
+					<PhoneMissedIcon size="34" />
+				</button>
+				Hangup
+			{:else}
+				<button
+					class="h-14 w-14 btn btn-primary btn-circle"
+					on:click={() => vc.cancelCall()}
+					disabled={!buttonOptions.hangup}
+				>
+					<div class="h-8 w-8"><MdClose /></div></button
+				>
+				Leave
+			{/if}
 		</div>
 	</section>
 	Call State: {$callState || ''} <br />
