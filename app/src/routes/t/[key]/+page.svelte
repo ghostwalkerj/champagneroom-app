@@ -9,7 +9,7 @@
 	import { callMachine } from '$lib/machines/callMachine';
 	import { createLinkMachineService, type LinkMachineServiceType } from '$lib/machines/linkMachine';
 	import { talentDB, type TalentDBType } from '$lib/ORM/dbs/talentDB';
-	import { CallEventDocument, CallEventType } from '$lib/ORM/models/callEvent';
+	import { CallEventType } from '$lib/ORM/models/callEvent';
 	import type { LinkDocType, LinkDocument } from '$lib/ORM/models/link';
 	import type { TalentDocType, TalentDocument } from '$lib/ORM/models/talent';
 	import { StorageTypes } from '$lib/ORM/rxdb';
