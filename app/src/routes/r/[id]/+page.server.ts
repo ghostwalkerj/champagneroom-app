@@ -65,7 +65,10 @@ export const actions: import('./$types').Actions = {
 		const claim = {
 			caller,
 			pin,
-			createdAt: new Date().getTime()
+			createdAt: new Date().getTime(),
+			call: {
+				started: false
+			}
 		} as NonNullable<LinkDocument['linkState']['claim']>;
 
 		const token = jwt.sign(

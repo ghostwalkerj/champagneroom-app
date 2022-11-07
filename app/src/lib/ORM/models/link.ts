@@ -28,7 +28,6 @@ export enum LinkStatus {
 	FINALIZED,
 	IN_ESCROW,
 	IN_DISPUTE,
-	IN_CALL,
 	CANCELLATION_REQUESTED
 }
 
@@ -80,6 +79,9 @@ export const linkDocMethods: LinkDocMethods = {
 		return db.transactions.insert(_transaction);
 	},
 	createCallEvent: async function (this: LinkDocument, type: CallEventType) {
+		const _linkState = this.linkState;
+		if (!_linkState.claim) throw new Error('Link not claimed');
+
 		const db = this.collection.database;
 		const _callEvent: CallEventDocType = {
 			_id: `${CallEventString}:ce-${nanoid()}`,
@@ -89,8 +91,8 @@ export const linkDocMethods: LinkDocMethods = {
 			talent: this.talent,
 			type
 		};
-		const callEvents = this.linkState.callEvents
-			? this.linkState.callEvents.concat([_callEvent._id])
+		const callEvents = _linkState.claim.call.callEvents
+			? _linkState.claim.call.callEvents.concat([_callEvent._id])
 			: [_callEvent._id];
 
 		const linkState = {
@@ -187,9 +189,17 @@ const linkSchemaLiteral = {
 							type: 'array',
 							ref: 'transactions',
 							items: { type: 'string' }
+						},
+						call: {
+							type: 'object',
+							properties: {
+								startedAt: { type: 'integer' },
+								endedAt: { type: 'integer' },
+								callEvents: { type: 'array', ref: 'callEvents', items: { type: 'string' } }
+							}
 						}
 					},
-					required: ['caller', 'pin', 'createdAt'],
+					required: ['caller', 'pin', 'createdAt', 'call'],
 					encrypted: ['pin']
 				},
 				escrow: {
@@ -254,8 +264,7 @@ const linkSchemaLiteral = {
 						}
 					},
 					required: ['endedAt']
-				},
-				callEvents: { type: 'array', ref: 'callEvents', items: { type: 'string' } }
+				}
 			},
 			required: ['status', 'totalFunding', 'requestedFunding', 'refundedAmount']
 		},

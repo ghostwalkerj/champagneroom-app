@@ -43,7 +43,7 @@ export const callMachine =
 					'CONNECT PEER SUCCESS': {
 						target: 'ready4Call'
 					},
-					'PEER DESTOYED': {
+					'PEER DESTROYED': {
 						target: 'destroyed'
 					}
 				}

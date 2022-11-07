@@ -1,8 +1,10 @@
-import type { CallEventDocType } from '$lib/ORM/models/callEvent';
 import type { LinkDocType } from '$lib/ORM/models/link';
 import { LinkStatus } from '$lib/ORM/models/link';
 import type { TransactionDocType } from '$lib/ORM/models/transaction';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
+import { PUBLIC_MIN_COMPLETED_CALL_DURATION } from '$env/static/public';
+
+const MIN_COMPLETED_CALL = Number(PUBLIC_MIN_COMPLETED_CALL_DURATION || 30000);
 
 type LinkStateType = LinkDocType['linkState'];
 
@@ -28,9 +30,10 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 							type: 'PAYMENT RECEIVED';
 							transaction: TransactionDocType;
 					  }
-					| { type: 'CALL CONNECTED' }
-					| { type: 'CALL INTERRUPTED' }
-					| { type: 'CALL COMPLETED' }
+					| {
+							type: 'CALL CONNECTED';
+					  }
+					| { type: 'CALL DISCONNECTED' }
 					| { type: 'FEEDBACK RECEIVED' }
 					| { type: 'ESCROW FINISHED' }
 					| {
@@ -97,9 +100,11 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 							}
 						},
 						canCall: {
+							always: { target: 'gracePeriod', cond: 'gracePeriodStarted' },
 							on: {
 								'CALL CONNECTED': {
-									target: 'inCall'
+									target: 'callStarted',
+									actions: ['startCall', 'saveLinkState']
 								},
 								'REQUEST CANCELLATION': {
 									target: 'requestedCancellation',
@@ -107,12 +112,32 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 								}
 							}
 						},
-						inCall: {
+						callStarted: {
 							on: {
-								'CALL COMPLETED': {
+								'CALL DISCONNECTED': {
+									target: 'gracePeriod',
+									actions: ['endCall', 'saveLinkState']
+								}
+							}
+						},
+						gracePeriod: {
+							after: [
+								{
+									delay: (context) => {
+										let timer = 0;
+										if (context.linkState.claim && context.linkState.claim.call.startedAt) {
+											timer =
+												context.linkState.claim.call.startedAt + MIN_COMPLETED_CALL - Date.now();
+										}
+										return timer > 0 ? timer : 0;
+									},
 									target: 'wating4Finalization'
-								},
-								'CALL INTERRUPTED': { target: 'canCall' }
+								}
+							],
+							on: {
+								'CALL CONNECTED': {
+									target: 'callStarted'
+								}
 							}
 						},
 						requestedCancellation: {
@@ -183,6 +208,38 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 					};
 				}),
 
+				startCall: assign((context) => {
+					if (context.linkState.claim && !context.linkState.claim.call.startedAt) {
+						return {
+							linkState: {
+								...context.linkState,
+								call: {
+									...context.linkState.claim.call,
+									startedAt: new Date().getTime()
+								}
+							}
+						};
+					} else {
+						return {};
+					}
+				}),
+
+				endCall: assign((context) => {
+					if (context.linkState.claim && context.linkState.claim.call.startedAt) {
+						return {
+							linkState: {
+								...context.linkState,
+								call: {
+									...context.linkState.claim.call,
+									endedAt: new Date().getTime()
+								}
+							}
+						};
+					} else {
+						return {};
+					}
+				}),
+
 				requestCancellation: assign((context, event) => {
 					return {
 						linkState: {
@@ -221,11 +278,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 							}
 						};
 					} else {
-						return {
-							linkState: {
-								...context.linkState
-							}
-						};
+						return {};
 					}
 				}),
 
@@ -244,11 +297,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 							}
 						};
 					} else {
-						return {
-							linkState: {
-								...context.linkState
-							}
-						};
+						return {};
 					}
 				}),
 
@@ -270,7 +319,15 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 				linkInCancellationRequested: (context) =>
 					context.linkState.status === LinkStatus.CANCELLATION_REQUESTED,
 				fullyFunded: (context) =>
-					context.linkState.totalFunding >= context.linkState.requestedFunding
+					context.linkState.totalFunding >= context.linkState.requestedFunding,
+				gracePeriodStarted: (context) => {
+					return (
+						context.linkState.claim !== undefined &&
+						context.linkState.claim.call !== undefined &&
+						context.linkState.claim.call.startedAt !== undefined &&
+						context.linkState.claim.call.endedAt !== undefined
+					);
+				}
 			}
 		}
 	);

@@ -72,7 +72,6 @@
 						talentObj = _talent;
 						talent = _talent;
 						talent.get$('currentLink').subscribe((linkId) => {
-							console.log('currentLink', linkId);
 							if (linkId) {
 								db.links
 									.findOne(linkId)
@@ -173,6 +172,7 @@
 
 								case 'CALL CONNECTED':
 									currentLink.createCallEvent(CallEventType.CONNECT);
+									linkService.send('CALL CONNECTED');
 									break;
 
 								case 'CALL UNANSWERED':
@@ -185,6 +185,7 @@
 
 								case 'CALL DISCONNECTED':
 									currentLink.createCallEvent(CallEventType.DISCONNECT);
+									linkService.send('CALL DISCONNECTED');
 									break;
 
 								case 'CALL HANGUP':
@@ -195,14 +196,14 @@
 					});
 
 					vc.callState.subscribe((cs) => {
+						// Logic for all of the possible call states
 						if (cs) {
 							callState = cs;
-							showAlert = callState.matches('receivingCall');
-							inCall = callState.matches('inCall');
-							if (inCall) {
-								linkService.send('CALL CONNECTED');
+							if (cs.changed) {
+								showAlert = callState.matches('receivingCall');
+								inCall = callState.matches('inCall');
+								ready4Call = callState.matches('ready4Call');
 							}
-							ready4Call = callState.matches('ready4Call');
 						}
 					});
 					vc.callerName.subscribe((name) => {
@@ -487,3 +488,5 @@
 		{/if}
 	</main>
 </div>
+
+{#if currentLinkState}{JSON.stringify(currentLinkState.value)}{/if}
