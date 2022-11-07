@@ -100,12 +100,10 @@
 															});
 															canCreateLink = state.done ?? true;
 
-															if (state.matches('claimed.canCall')) initVC(currentLink.callId);
-															else {
-																if (vc && !callState.done) {
-																	console.log('vc destroy');
-																	vc.destroy();
-																}
+															if (state.hasTag('connect2VC')) initVC(currentLink.callId);
+															else if (vc && !callState.done) {
+																console.log('vc destroy');
+																vc.destroy();
 															}
 														}
 													});
@@ -149,12 +147,10 @@
 	};
 
 	const initVC = (callId: string) => {
-		if (browser) {
+		if (browser && !vc) {
 			global = window;
 			import('$lib/util/videoCall').then((_vc) => {
 				videoCall = _vc.videoCall;
-
-				if (vc) vc.destroy();
 				if (currentLink) {
 					vc = videoCall(callId);
 					vc.callEvent.subscribe((ce) => {
@@ -164,6 +160,7 @@
 							switch (ce.type) {
 								case 'CALL INCOMING':
 									currentLink.createCallEvent(CallEventType.ATTEMPT);
+									linkService.send('CALL INCOMING');
 									break;
 
 								case 'CALL ACCEPTED':
@@ -433,6 +430,9 @@
 									<p>Signed in as {talentObj.name}</p>
 								{/if}
 								<p>Call State: {callState.value}</p>
+								{#if currentLinkState}<p>
+										Link State:{JSON.stringify(currentLinkState.value)}
+									</p>{/if}
 							</div>
 						</div>
 					</div>
@@ -488,5 +488,3 @@
 		{/if}
 	</main>
 </div>
-
-{#if currentLinkState}{JSON.stringify(currentLinkState.value)}{/if}

@@ -18,8 +18,8 @@
 
 	$: callerProfileImage = PUBLIC_DEFAULT_PROFILE_IMAGE;
 
-	let linkURL = '';
-	if (link) linkURL = urlJoin($page.url.origin, PUBLIC_ROOM_PATH, link._id);
+	$: linkURL = '';
+	$: if (link) linkURL = urlJoin($page.url.origin, PUBLIC_ROOM_PATH, link._id);
 
 	$: if (state && state.matches('claimed') && link.linkState.claim) {
 		callerProfileImage = getProfileImage(link.linkState.claim.caller);

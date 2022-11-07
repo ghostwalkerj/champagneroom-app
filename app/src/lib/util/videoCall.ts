@@ -48,6 +48,7 @@ export const videoCall = (userId?: string) => {
 
 	callService.onEvent((event) => {
 		console.log('Call Event: ', JSON.stringify(event));
+		_callEvent.set(event);
 	});
 
 	const connect2PeerServer = (userId?: string) => {
@@ -209,7 +210,7 @@ export const videoCall = (userId?: string) => {
 		destroyed = true;
 		console.log('destroy called');
 		peer.destroy();
-		callService.send({ type: 'PEER DESTROYED' });
+		callService.send('PEER DESTROYED');
 		callService.stop();
 		resetCallState();
 	};

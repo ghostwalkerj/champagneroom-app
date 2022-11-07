@@ -110,7 +110,8 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 									target: 'requestedCancellation',
 									actions: ['requestCancellation', 'saveLinkState']
 								}
-							}
+							},
+							tags: ['connect2VC']
 						},
 						callStarted: {
 							on: {
@@ -118,7 +119,8 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 									target: 'gracePeriod',
 									actions: ['endCall', 'saveLinkState']
 								}
-							}
+							},
+							tags: ['connect2VC']
 						},
 						gracePeriod: {
 							after: [
@@ -138,7 +140,8 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 								'CALL CONNECTED': {
 									target: 'callStarted'
 								}
-							}
+							},
+							tags: ['connect2VC']
 						},
 						requestedCancellation: {
 							initial: 'waiting4Refund',

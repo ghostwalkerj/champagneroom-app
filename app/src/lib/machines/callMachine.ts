@@ -11,6 +11,7 @@ export const callMachine =
 				| { type: 'CONNECT PEER REFUSED' }
 				| { type: 'CONNECT PEER LOST' }
 				| { type: 'CONNECT PEER SUCCESS' }
+				| { type: 'PEER DESTROYED' }
 				| { type: 'DISCONNECTED PEER SERVER' }
 				| { type: 'CALL HANGUP' }
 				| { type: 'CALL OUTGOING' }
@@ -22,7 +23,6 @@ export const callMachine =
 				| { type: 'CALL CANT CONNECT' }
 				| { type: 'CALL DISCONNECTED' }
 				| { type: 'CALL ACCEPTED' }
-				| { type: 'PEER DESTROYED' }
 		},
 		predictableActionArguments: true,
 		id: 'callMachine',
