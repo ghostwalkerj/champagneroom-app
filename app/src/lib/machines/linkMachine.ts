@@ -2,10 +2,11 @@ import type { LinkDocType } from '$lib/ORM/models/link';
 import { LinkStatus } from '$lib/ORM/models/link';
 import type { TransactionDocType } from '$lib/ORM/models/transaction';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
-import { PUBLIC_MIN_COMPLETED_CALL_DURATION } from '$env/static/public';
+import { PUBLIC_ESCROW_PERIOD, PUBLIC_GRACE_PERIOD } from '$env/static/public';
 import type { CallEventDocType } from '$lib/ORM/models/callEvent';
 
-const MIN_COMPLETED_CALL = Number(PUBLIC_MIN_COMPLETED_CALL_DURATION || 90000);
+const GRACE_PERIOD = Number(PUBLIC_GRACE_PERIOD || 90000);
+const ESCROW_PERIOD = Number(PUBLIC_ESCROW_PERIOD || 3600000);
 
 type LinkStateType = LinkDocType['linkState'];
 
@@ -14,7 +15,7 @@ type StateCallBackType = (state: LinkStateType) => void;
 export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCallBackType) => {
 	const stateCallback = saveState;
 
-	/** @xstate-layout N4IgpgJg5mDOIC5QBsCWA7A1gWQIYGMALDMAOjSwAJkB7XCSAYgG0AGAXUVAAcbZUALqhrouIAB6IAjAA4ALKQCsAZgCcrRQCZNUgOy6pagDQgAnomUA2ZaU2tZU1pdbLlMtwF8PJijgLF0Ml9qOgYIFilOJBBefiERMUkEOwUVdS0dfUNVE3MERV1FUik5RRkpRVYDF0UvHww-IhJyBpD6JmZNKJ4+QWFRaKS9VLUNbT0DYzNEGU1SVV1LRTlnRxKquTqQXzwmwJaqWnbw5mVumN74gdAkrVyLDSLVJctNXU01AxldLZ3-ZuCRzCLDk51ifQSg2kqhG6XGWSmeS0qmKlhKchklXGqk0vwauwCZAAruh8MhcKgALZMADCABkAIIASWwbDBl36iUQchhtlYGhKmjk2iWmnuCGUmhRTikUlUiks7lcirxWAJzRJZIp1PCACUAKIARQAqvqAMoAFUoNIZADkafq6YyLUyAPK2tlicFXLkIHkKOwC4XCzSi8V2KSkFbfKVS0oYyw-bzbfH-fZaqmQUgAdwpQnQUDkADESRAMFBGAaTearTb7Y7nW6PRwvRzITdpHJdOKKjJWKR+e4tGNWKpZKrGoTSBmdTm8+Xi6Xy4wAAoMgCa2H1tqtBodTIAavqACKe6LezlQ-Jj0jKFzKAoyRPKd6KHsVFFvezvXQP0dJ+o1TTMgZyzXM+gLRd0DLAsWBbc822uCQHjmEpJTkSVrAWZQKh7O9I1YD5VExDFJUWCd1XTclMwgadcHQGlcGQZBGBtJ1rXdW19RpC0TzPHo4kvDtklYGR5jsMocRhGQcTFaYEDld5SF0J9WAwhZZkTGQKOA6dqNnfB6MY5jKyNU1LWtO0HSdBkXXdfiLkE9tkIlbRbDSNSnDcT45B7YibBhVR8JWCo1B0vYQP0rNDIYpiWLYulKGPJkzRpTjuN4094IEiEkKGZ55iCyo5FEhVVHlZQe3kIo5WUDDXgKCpE3CqdQNomLjPihl2P1I8d0oPd9UPPjssc3LfVq9z+RKJZCikUM5LyPQ9FIZxRM0TErDUhUWuaNq6NikzxFgARcAEMhcAAM3OgAnAAKKAboIMBjzAclTAASkYP4Ir07VoqMuKHIvZykklOZNA8krrHcBZfPknRZSUOQJl0GFliC3aqP+2ibrAABHIk4HOiBGNJN7ySuOcIMLXUwEu0tTKLY1bWPAbuKGo8svZJy8ukd5wxWXQo2IwKXD7KRmuTH7Wqi3GCaJk7IDJ-AKbO-o4J58ar10YUBwMAox1KKpLEsQX9EKmQrYVYVHBWLHIpxud80LIsMCY1AAC91ZEUgMH1WB8Bumhs0YIt9RPAAhBkaQAaXZ-cueBxDfV1uYqgqNGSkqRYzYRoLIy7X85TsUNMel1Nfv23MXeLd20G9qn-cD4PQ-NGldVdAB1SgiyZW0UoACRGrWfR1vWM8N7OTbzvINrRkXFTeK35sUVQHb+mjnYXN30A9xv+j99AA6DkPGGSs0V2NXjKH7pkXVskfW15ia7gR2YCI28oVPUIUvGTdANAGDwGiDLAErQgSQGftrYSwpxSJmFuUHCKgqj8leFIDemo5bQLHsJKwChfwYTXk+Moa1KryS2spFwiwVg4QMDCDe1d5yQRLNBcsOChIuVlHMUoBQ5D8MknKMoPYpSRifJDKoVtEzL0YXLA6nUOGg2kIoIo-CfxqX4d8NE4ZHBFBfJiFIrxtC4grkBKuci8aE2JsreiqtmI+3QNTWudMGbQUUXzBST5Vr6EsOVHEa81C4QRmtAcRtIZaEUhg0xk49oWIVtY0mti1a4LGikoYQpwz6KUNoKwP4xzyFkU7GuO965ewcUfE+rd3ETRkspGS9C9D6JxDIcM-jbzZBcMRIUKgAIpjMbLIp6sWGlIPr7DAx5UCwG4ESc61SryyDEvYIUJRfy+J0FUcMiwCKkVDAqK2XlClb2KcMveDcHFzOEnbcM0j9bDAxKObClhDk6guS5BUPZUG2CCroKoY5iJPk2NEyiIEknMSgQhF+V4cSWFIPIB86h3BokVG+BGD5hY5xwiVFGezAWARifsS6IzwU5TSYgZ4-ZdZ1WhoUJ85C54FyjIsGUJUtAYVxX0-FYBXlJAALSz0QHygc-JCJvAxgqSWyh-4eCAA */
+	/** @xstate-layout N4IgpgJg5mDOIC5QBsCWA7A1gWQIYGMALDMAOjSwAJkB7XCSAYgG0AGAXUVAAcbZUALqhrouIAB6IAjAA4ALKQCsAZgCcrAOwbVqxaznblAGhABPRACY5M0quUA2WRuXWpyxTPsBfLyYo4CYnQyf2o6BggWKU4kEF5+IRExSQRZBRV1LR09AzsTcwRFDUVSKTkPOWUXLSkPHz8MAKISckaw+iZmCxiePkFhUViUqQ10tU1tXX1DfMQZC1sNe0V7Ko0LK0U63xB-PGbg1qpaDsjmZR64vsTB0BTFC1mEZSlWVlsZZU+LLblWH-qu0a+yCITaJwiLDkl3i-SSQ2k8iU4yyU1yxjMiAeqlKjjkqy+nzkUm8Oz2gRaAFd0PhkLhUABbJgAYQAMgBBACS2DYMOuA2SiDkqgUFje+LK+NUFhccieygsONYjjS9k0ZQsUkB5IOZGptPpTMiACUAKIARQAqqaAMoAFUozPZADlmabWRy7ZyAPLO3liWE3QUIYWi8V4qUyuRyzEIMVSUj4mTFWrLEUybXAimHA2MyCkADu9KE6CgcgAYtSIBgoIwzVbbQ6na73Z6fX6OAH+fC7tILBonmUNAn7Dp7DIPPJXopM1gQS1c0bC8WaxWqzXGAAFdkATWwpudDrNbs5ADVTQARf2xQMChEIeYaWxFf5SNzLYcD2OvBylCzj-QMlkKRVFnJpQVIRd8yLfpSzXdBq1LFhOxvbtbgkRBlH+UpKh+L57HsaNHEHCxPlIfQ1VYKRFX7BwZzJLNdUguk8wgSDcHQZlcGQZBGCdD1HV9Z1TWZO1L2vXoEjvXtnlWUh3FWKxWDsMpWGTQdPAUAwNH+DRkzcWRlDA+ccxYpd8A4rieLrC1rXtR0XTdD12S9X0JKuKSeww54NlIPDpQIzRPCkQddAWV43hkTQXBeYpjOzMgoLYizOO43j+NZSgL05G1mSEkSxKvFDJLhdCUncBM5Bo+ZVHWUjVHsQdnHsUgZHkawlmHCi5HipikvY1LrIyyhTXPQ9KGPU0z3E4qPNK4NqlIccikUVQSRkVQJ0UQc1RxGi3AVAylgsXqIP6lKrN48RYAEXABDIXAADN7oAJwACigF6CDAC8wDpUwAEpGB1M6zPzC60vc28vPK3z-P-NU9OI2MxW0JbpSsGVWAqLRToXMG2JesAAEdKTge6IC4mk-rpG5l1gstjTAR6qxs8tLWdC8JpEqbzyKvlPLK6R1ieKx3CW4UfmKFRtC1Bi5wS5jDXzInSfJyAqfwGm7oGZCBfm+9RgWdVVnsKxdDUGRB1eJ8zdkN43GsDwTvl8D8eVtiixLMtywwbjUAALx1kRSAwU1YHwF6aALRhy1NS8ACF2WZABpbmTz5qG0ODI3yOHU3zYyK2UZ0va1MIqrU0IjQ8dMj3l29is-bQIO6bDiOo5j7KbU3S0xMoTlnU5L0XJm-Wg3vUiE30EVCNWECRW2lHPneUc2rcN4xWVIzXZMxKCYb1dffQf3W4GUP0HDyPo8Ya7bvu0gntet64Gvgtfv+oGQfd1jD7g4-T7B3QBfK+ncs6CxzlVPOJIHCF0tqLJYCZZAbRkCMNqLgCI+B2OgGgDB4CxG-ocUIEJIBdggfeKqTwHgtQIi4AyVUsL-lrnqGkBMyEGxkg4BQzhKg6X0K8OwxcChWBapUVBwo1SWwxswpWv8YKN0rAhGs7CJ4yTfAscoRQ1CKA6spa245SDDjWh4HQOkHg7waArPqB8IY8RUdJbytQSjRnWMUJGpE2qhVquRUcXwZSKmQaSSxbs66-1VmTG6GsOJax4kA+mjcmYswQvYmGiIaFaEMJqNqvivzCJWDYKwIxarFD+GbIJQIrGg3ruE9WlNona1UXNRpwwrCiwwUtVxo4QKKhkf1L2R9m6Bzie3N+KShapDNqLCcCgJzTjsLKDavSD79P-oMs+IcMAXlQLAbglJ7pjODNYVeekHC1Q2qGdwUydGtUUG+DIa17BxV3orPpOtVknxbkAg5943wxmEaMBMdUqqjkcIqOwSyPbfJkoRRMWxnC6F0aoJ4Iony1CohOZYOjVq9PqTxUhqFyEyQCq1Xhmo1KeBqsi5MpRGEyiwjpDaoFnlMUems-FJVmmIFqu8UYDhlLjlLnpBBYpDGsEYeUdeGxmFQu8gAWkarGWVJQdAqs+DoMVKKsFeCAA */
 	return createMachine(
 		{
 			context: { linkState: linkState, errorMessage: undefined as string | undefined },
@@ -151,11 +152,15 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 							initial: 'inEscrow',
 							states: {
 								inEscrow: {
+									after: {
+										escrowDelay: {
+											target: '#linkMachine.finalized',
+											actions: [],
+											internal: false
+										}
+									},
 									on: {
 										'FEEDBACK RECEIVED': {
-											target: '#linkMachine.finalized'
-										},
-										'ESCROW FINISHED': {
 											target: '#linkMachine.finalized'
 										},
 										'DISPUTE INITIATED': {
@@ -334,10 +339,20 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 				graceDelay: (context) => {
 					let timer = 0;
 					if (context.linkState.claim && context.linkState.claim.call.startedAt) {
-						timer =
-							context.linkState.claim.call.startedAt + MIN_COMPLETED_CALL - new Date().getTime();
+						timer = context.linkState.claim.call.startedAt + GRACE_PERIOD - new Date().getTime();
 					}
 					console.log('Grace Timer: ', timer);
+					return timer > 0 ? timer : 0;
+				},
+				escrowDelay: (context) => {
+					let timer = 0;
+
+					if (context.linkState.claim && context.linkState.claim.call.startedAt) {
+						const endTime =
+							context.linkState.claim.call.endedAt || context.linkState.claim.call.startedAt;
+						timer = endTime + ESCROW_PERIOD - new Date().getTime();
+					}
+					console.log('Escrow Timer: ', timer);
 					return timer > 0 ? timer : 0;
 				}
 			},
