@@ -1,11 +1,11 @@
 import { PUBLIC_CREATORS_ENDPOINT, PUBLIC_RXDB_PASSWORD } from '$env/static/public';
 import {
 	linkDocMethods,
-	LinkDocument,
+	type LinkDocument,
 	linkSchema,
 	type LinkCollection
 } from '$lib/ORM/models/link';
-import { TransactionCollection, transactionSchema } from '$lib/ORM/models/transaction';
+import { type TransactionCollection, transactionSchema } from '$lib/ORM/models/transaction';
 import type { StorageTypes } from '$lib/ORM/rxdb';
 import { initRXDB } from '$lib/ORM/rxdb';
 import { EventEmitter } from 'events';

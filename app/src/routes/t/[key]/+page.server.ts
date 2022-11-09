@@ -1,7 +1,7 @@
 import { JWT_CREATOR_USER, JWT_EXPIRY, JWT_SECRET } from '$env/static/private';
 import { createLinkMachineService } from '$lib/machines/linkMachine';
 import { talentDB } from '$lib/ORM/dbs/talentDB';
-import { ActorType, LinkDocument } from '$lib/ORM/models/link';
+import { ActorType, type LinkDocument } from '$lib/ORM/models/link';
 import { TransactionReasonType } from '$lib/ORM/models/transaction';
 import { StorageTypes } from '$lib/ORM/rxdb';
 import { error, invalid } from '@sveltejs/kit';

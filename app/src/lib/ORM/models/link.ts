@@ -187,7 +187,6 @@ const linkSchemaLiteral = {
 							}
 						}
 					},
-					encrypted: ['pin'],
 					required: ['caller', 'pin', 'createdAt', 'call']
 				},
 				escrow: {
@@ -308,8 +307,8 @@ const linkSchemaLiteral = {
 		'fundingAddress',
 		'createdAt'
 	],
-	indexes: ['talent', 'connections', 'agent', 'state.status', 'state.finalized.endedAt'],
-	encrypted: ['callId']
+	indexes: ['talent', 'connections', 'agent', 'linkState.status', 'linkState.finalized.endedAt'],
+	encrypted: ['callId', 'linkState.claim.pin']
 } as const;
 
 type linkRef = {
