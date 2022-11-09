@@ -4,6 +4,7 @@ import type { TransactionDocType } from '$lib/ORM/models/transaction';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 import { PUBLIC_ESCROW_PERIOD, PUBLIC_GRACE_PERIOD } from '$env/static/public';
 import type { CallEventDocType } from '$lib/ORM/models/callEvent';
+import type { on } from 'events';
 
 const GRACE_PERIOD = Number(PUBLIC_GRACE_PERIOD || 90000);
 const ESCROW_PERIOD = Number(PUBLIC_ESCROW_PERIOD || 3600000);
@@ -15,7 +16,7 @@ type StateCallBackType = (state: LinkStateType) => void;
 export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCallBackType) => {
 	const stateCallback = saveState;
 
-	/** @xstate-layout N4IgpgJg5mDOIC5QBsCWA7A1gWQIYGMALDMAOjSwAJkB7XCSAYgG0AGAXUVAAcbZUALqhrouIAB6IAjAA4ALKQCsAZgCcrAOwbVqxaznblAGhABPRACY5M0quUA2WRuXWpyxTPsBfLyYo4CYnQyf2o6BggWKU4kEF5+IRExSQRZBRV1LR09AzsTcwRFDUVSKTkPOWUXLSkPHz8MAKISckaw+iZmCxiePkFhUViUqQ10tU1tXX1DfMQZC1sNe0V7Ko0LK0U63xB-PGbg1qpaDsjmZR64vsTB0BTFC1mEZSlWVlsZZU+LLblWH-qu0a+yCITaJwiLDkl3i-SSQ2k8iU4yyU1yxjMiAeqlKjjkqy+nzkUm8Oz2gRaAFd0PhkLhUABbJgAYQAMgBBACS2DYMOuA2SiDkqgUFje+LK+NUFhccieygsONYjjS9k0ZQsUkB5IOZGptPpTMiACUAKIARQAqqaAMoAFUozPZADlmabWRy7ZyAPLO3liWE3QUIYWi8V4qUyuRyzEIMVSUj4mTFWrLEUybXAimHA2MyCkADu9KE6CgcgAYtSIBgoIwzVbbQ6na73Z6fX6OAH+fC7tILBonmUNAn7Dp7DIPPJXopM1gQS1c0bC8WaxWqzXGAAFdkATWwpudDrNbs5ADVTQARf2xQMChEIeYaWxFf5SNzLYcD2OvBylCzj-QMlkKRVFnJpQVIRd8yLfpSzXdBq1LFhOxvbtbgkRBlH+UpKh+L57HsaNHEHCxPlIfQ1VYKRFX7BwZzJLNdUguk8wgSDcHQZlcGQZBGCdD1HV9Z1TWZO1L2vXoEjvXtnlWUh3FWKxWDsMpWGTQdPAUAwNH+DRkzcWRlDA+ccxYpd8A4rieLrC1rXtR0XTdD12S9X0JKuKSeww54NlIPDpQIzRPCkQddAWV43hkTQXBeYpjOzMgoLYizOO43j+NZSgL05G1mSEkSxKvFDJLhdCUncBM5Bo+ZVHWUjVHsQdnHsUgZHkawlmHCi5HipikvY1LrIyyhTXPQ9KGPU0z3E4qPNK4NqlIccikUVQSRkVQJ0UQc1RxGi3AVAylgsXqIP6lKrN48RYAEXABDIXAADN7oAJwACigF6CDAC8wDpUwAEpGB1M6zPzC60vc28vPK3z-P-NU9OI2MxW0JbpSsGVWAqLRToXMG2JesAAEdKTge6IC4mk-rpG5l1gstjTAR6qxs8tLWdC8JpEqbzyKvlPLK6R1ieKx3CW4UfmKFRtC1Bi5wS5jDXzInSfJyAqfwGm7oGZCBfm+9RgWdVVnsKxdDUGRB1eJ8zdkN43GsDwTvl8D8eVtiixLMtywwbjUAALx1kRSAwU1YHwF6aALRhy1NS8ACF2WZABpbmTz5qG0ODI3yOHU3zYyK2UZ0va1MIqrU0IjQ8dMj3l29is-bQIO6bDiOo5j7KbU3S0xMoTlnU5L0XJm-Wg3vUiE30EVCNWECRW2lHPneUc2rcN4xWVIzXZMxKCYb1dffQf3W4GUP0HDyPo8Ya7bvu0gntet64Gvgtfv+oGQfd1jD7g4-T7B3QBfK+ncs6CxzlVPOJIHCF0tqLJYCZZAbRkCMNqLgCI+B2OgGgDB4CxG-ocUIEJIBdggfeKqTwHgtQIi4AyVUsL-lrnqGkBMyEGxkg4BQzhKg6X0K8OwxcChWBapUVBwo1SWwxswpWv8YKN0rAhGs7CJ4yTfAscoRQ1CKA6spa245SDDjWh4HQOkHg7waArPqB8IY8RUdJbytQSjRnWMUJGpE2qhVquRUcXwZSKmQaSSxbs66-1VmTG6GsOJax4kA+mjcmYswQvYmGiIaFaEMJqNqvivzCJWDYKwIxarFD+GbIJQIrGg3ruE9WlNona1UXNRpwwrCiwwUtVxo4QKKhkf1L2R9m6Bzie3N+KShapDNqLCcCgJzTjsLKDavSD79P-oMs+IcMAXlQLAbglJ7pjODNYVeekHC1Q2qGdwUydGtUUG+DIa17BxV3orPpOtVknxbkAg5943wxmEaMBMdUqqjkcIqOwSyPbfJkoRRMWxnC6F0aoJ4Iony1CohOZYOjVq9PqTxUhqFyEyQCq1Xhmo1KeBqsi5MpRGEyiwjpDaoFnlMUems-FJVmmIFqu8UYDhlLjlLnpBBYpDGsEYeUdeGxmFQu8gAWkarGWVJQdAqs+DoMVKKsFeCAA */
+	/** @xstate-layout N4IgpgJg5mDOIC5QBsCWA7A1gWQIYGMALDMAOjSwAJkB7XCSAYgG0AGAXUVAAcbZUALqhrouIAB6IAjAA4ALKQCsAZgCcrGQDYATHMWLWygOxGANCACeiXTNKrlmqatUzWLozJlSAvt-MUcAmJ0MgDqOgYIFilOJBBefiERMUkEWQUVdS1dfUMTcysERSNFUik9GQNtZXLlViNffwxAohJyZvD6JmZtWJ4+QWFRONSpIwy1DR09A2MzS0QZbTsjTX1VTWM5VdZtRpAAvFaQ9qpaLqjmZT74gaTh0FTFbQLEGtZWO3k9ErdFTVUcn2hyCbTC50iLDkNwSg2SI2k8iUk2yMzy80Kz1UZUccmUclkRhcKmBzSOwTIAFd0PhkLhUABbJgAYQAMgBBACS2DYMLuQxSiDkgNI2g+jmUuk2kpkrwQkuxrEc6Uc-yVylJWHJbWptPpTKiACUAKIARQAqsaAMoAFUozPZADlmcbWRybZyAPKO3liWH3QUIYUKMVKqSSuTS7SyhYIMVSUiRmQlZTKLxuD5AvwHMmgk56xmQUgAd3pQnQUDkADFqRAMFBGCaLda7Q7na73V6fRw-fz4Y9pNoMdJtgmAS4lZpxg4ZBrsyDjmQCwaS2X69Xa-XGAAFdkATWwxsddpNLs5ADVjQARX1xf0ChEIJZGOzFNxpuTaZz-OVSQyaMptE0JZFFUKRqmePZ51zRdSGXItS0GCsN3QOsKxYHs7z7B4JDeXYyjxIcTDWbQv2TX9o2UUhWEjKQ1n+HQbE1FoKTgulCwgODcHQZlcGQZBGAdN17W9R1jWZG1r1vfpEgfAd5U2UhlH+YwATo1gpHKX8tAUbYjF0VRxhkdR6mY7V83Yld8G43j+MbM1LVte0nRdN12Q9b1pNuWT+1w+VSNFFRPDkQxFCWTxf1UZ4yg+BwiSHJZVCgpotTzJdLKLayeL4gShNZSgr05K1mVE8TJJvTCZLhHDUmUhNP3sVhQM8Sov1-IwHFIYKOqVYUfGg1LYPgzists3L2WE41L2PShT2NC8pMq7zqsDfEX2A4oiScOjpU0X9NDcUUku0TTFGFL97DMtK2P1TKbJyxhxFgARcAEMhcAAMzegAnAAKKBvoIMArzAOkLAASkYBdWOGrjsv4rz7182qAu0IL5FC8KY0KMUiVIAFo2TXZVjqTQrqGjLOO+sAAEdKTgN6IF4mlQbpe5VyQytDTAD7a3sqtzUdK9ZvE+bLwqvkfJq6R9LlXRlPxgx6g2TRIyHcmYcp0hqbphnIGZ-BWdeoYMMllbH3GZZ6jGXYlnqOpFF-P91pOjrnBVlwsxSli2gwY1YHwb6aGLRgq2Na8ACF2WZABpEWz3FxHsMDS3qKMG3o1xh25aMQ6xTA4VXA0zSvZzQbWL9gOg5DwqrW3c1JMoTlHU5D13MWs2A0faMExowFXAO1xFCcYc41nT5x0lcNSKkZ4Nd99B-cD4PHue173q+sA-rgZfixBsHIehhel+rpOpZTz804zu2esd2Mh0cMpjPO74nDnbN0BoBh4DiI+TnBCIkBezn0fJ+OUzwAKaE2AScMHgDoaXnicXUlNgHm3kg4BQHU5AEklF+JUzg9r30jImNM5RviflWOrAaPsLK3U4ohcslYayoXrKgru8lNLLBmOMeo2DVbqFUE7YCpB072D0BpE6WJEHpToXDMabC5J+VnqUbB+kVDYPAkSYUkVDLUQBKsYKRNyjSJuhxbWtN6bPX1txQ2-FjYiA5owuQ3NeaoQUcjREkCTD6Q+JpEoHUXj33+LYXQ1RVQ9zJtQ8yMizE60sYzA2Rt2HLWSaMXQct8ReMyV+co6dIne2iaYg07jpYIFVomfQPDxiRmFG4OUgIXyz12G4OiugcEmKyrY5AQCsIgPkklAC8g0xDl2MPSM9TkxlDqPnVpGjS5-zIB9DAfFUAAC8elVVSYgQynxpxrCihA0Cgj74+JEZjfQoFKlzgKddSuu8SmBlaXLSoChKhjDGMZYZJiMBXlQLAbglI3oPNAa4fGHg1AUIcJnUe0YzpdWHunDw9gljSOBfJAAtIQwomLqIfDxfi-FDRfDeCAA */
 	return createMachine(
 		{
 			context: { linkState: linkState, errorMessage: undefined as string | undefined },
@@ -34,15 +35,17 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 					  }
 					| { type: 'CALL CONNECTED' }
 					| { type: 'CALL DISCONNECTED' }
-					| { type: 'FEEDBACK RECEIVED' }
-					| { type: 'ESCROW FINISHED' }
-					| {
-							type: 'DISPUTE INITIATED';
-							dispute: NonNullable<LinkStateType['dispute']>;
-					  }
 					| {
 							type: 'CALL EVENT RECEIVED';
 							callEvent: CallEventDocType;
+					  }
+					| {
+							type: 'FEEDBACK RECEIVED';
+							feedback: NonNullable<LinkStateType['finalized']>['feedback'];
+					  }
+					| {
+							type: 'DISPUTE INITIATED';
+							dispute: NonNullable<LinkStateType['dispute']>;
 					  }
 			},
 			predictableActionArguments: true,
@@ -107,9 +110,8 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 							tags: 'connect2VC',
 							after: {
 								graceDelay: {
-									target: '#linkMachine.claimed.wating4Finalization',
+									target: '#linkMachine.inEscrow',
 									cond: 'gracePeriodStarted',
-									actions: [],
 									internal: false
 								}
 							},
@@ -147,30 +149,6 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 									context.linkState.totalFunding <= context.linkState.refundedAmount,
 								actions: ['cancelApproved', 'saveLinkState']
 							}
-						},
-						wating4Finalization: {
-							initial: 'inEscrow',
-							states: {
-								inEscrow: {
-									after: {
-										escrowDelay: {
-											target: '#linkMachine.finalized',
-											actions: [],
-											internal: false
-										}
-									},
-									on: {
-										'FEEDBACK RECEIVED': {
-											target: '#linkMachine.finalized'
-										},
-										'DISPUTE INITIATED': {
-											target: 'inDispute',
-											actions: 'initiateDispute'
-										}
-									}
-								},
-								inDispute: {}
-							}
 						}
 					}
 				},
@@ -178,8 +156,29 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 					type: 'final'
 				},
 				finalized: {
+					entry: ['finalizeLink', 'saveLinkState'],
 					type: 'final'
-				}
+				},
+				inEscrow: {
+					exit: ['exitEscrow', 'saveLinkState'],
+					entry: ['enterEscrow', 'saveLinkState'],
+					after: {
+						escrowDelay: {
+							target: 'finalized',
+							internal: false
+						}
+					},
+					on: {
+						'FEEDBACK RECEIVED': {
+							target: 'finalized'
+						},
+						'DISPUTE INITIATED': {
+							target: 'inDispute',
+							actions: ['initiateDispute', 'saveLinkState']
+						}
+					}
+				},
+				inDispute: {}
 			}
 		},
 		{
@@ -218,9 +217,8 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 								}
 							}
 						};
-					} else {
-						return {};
 					}
+					return {};
 				}),
 
 				endCall: assign((context) => {
@@ -237,9 +235,8 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 								}
 							}
 						};
-					} else {
-						return {};
 					}
+					return {};
 				}),
 
 				receiveCallEvent: assign((context, event) => {
@@ -259,9 +256,8 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 								}
 							}
 						};
-					} else {
-						return {};
 					}
+					return {};
 				}),
 
 				requestCancellation: assign((context, event) => {
@@ -301,9 +297,8 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 								}
 							}
 						};
-					} else {
-						return {};
 					}
+					return {};
 				}),
 
 				receiveRefund: assign((context, event) => {
@@ -320,9 +315,8 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 								}
 							}
 						};
-					} else {
-						return {};
 					}
+					return {};
 				}),
 
 				initiateDispute: assign((context, event) => {
@@ -333,8 +327,62 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 							dispute: event.dispute
 						}
 					};
+				}),
+
+				enterEscrow: assign((context) => {
+					if (context.linkState.status !== LinkStatus.IN_ESCROW) {
+						const escrow = {
+							startedAt: new Date().getTime()
+						} as NonNullable<LinkStateType['escrow']>;
+						return {
+							linkState: {
+								...context.linkState,
+								status: LinkStatus.IN_ESCROW,
+								escrow: escrow
+							}
+						};
+					}
+					return {};
+				}),
+
+				exitEscrow: assign((context) => {
+					if (context.linkState.status === LinkStatus.IN_ESCROW && context.linkState.escrow) {
+						return {
+							linkState: {
+								...context.linkState,
+								escrow: {
+									...context.linkState.escrow,
+									endedAt: new Date().getTime()
+								}
+							}
+						};
+					}
+					return {};
+				}),
+
+				finalizeLink: assign((context, event) => {
+					let finalized = {
+						endedAt: new Date().getTime()
+					} as NonNullable<LinkStateType['finalized']>;
+					if (event.type === 'FEEDBACK RECEIVED') {
+						finalized = {
+							...finalized,
+							feedback: event.feedback
+						};
+					}
+					if (context.linkState.status !== LinkStatus.FINALIZED) {
+						return {
+							linkState: {
+								...context.linkState,
+								finalized: finalized,
+								status: LinkStatus.FINALIZED
+							}
+						};
+					}
+					return {};
 				})
 			},
+
 			delays: {
 				graceDelay: (context) => {
 					let timer = 0;
