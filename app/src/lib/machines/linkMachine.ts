@@ -14,7 +14,7 @@ type StateCallBackType = (state: LinkStateType) => void;
 export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCallBackType) => {
 	const stateCallback = saveState;
 
-	/** @xstate-layout N4IgpgJg5mDOIC5QBsCWA7A1gWQIYGMALDMAOjSwAJkB7XCSAYgG0AGAXUVAAcbZUALqhrouIAB6IAjAA4ALKQCscgGwyA7FICcigMzypcgEwAaEAE9ER3a1IqtU1rsUrFLlStkBfL2Yo4CYnQyf2o6BggWKU4kEF5+IRExSQRZBWU1TR19OUNTC0RFVhlSOXV1VX0s1UUfPwwAohJyBrD6JmYjGJ4+QWFRWJSZfMsEB1syiqKZVnVFdQc6kH88JuCWqlp2yOZdbrjexIHQFKkKpVUNbT0DYzNRlVYtUvK5GSkjM89dJZXA5oAruh8MhcKgALZMADCABkAIIASWwbH28T6SUGiDkWgURneRgJ6jUrEURhU90QukcpFYxXUzlmcycJN+DVWQTIQJBYMhkQASgBRACKAFUBQBlAAqlChcIAclCBTD4ZKEQB5OUosRoo7JLE40h4j6E4mk8kFVLyGlyWmsXLGG1aLSsrDs5rciGQUgAdzBQnQUDkADEgRAMFBGILRRLpbKFUqVerNRxtYd+nrUmcKakPCpSOUNKwjBVdHMpCoXY0OaQPbyfX7w8HQ+HGAAFOEATWwArl0sFioRADUBQARLWxHXpzEIYxSfO6ORvHQLZTORTZj6yUpaCqzbTGGTyStu9a1r2+voBpvoMMBlgpidpjEnSlF0hnWSKLQqTTDYtyDdnBKFRdGLGQXFYDwpF0Z1fGWNl-lPUFPQgGtcHQKFcGQZBGFlZUZQ1OUBShSVR3HHoEinF8EAJWxS2xBwKlkb9wI3HFFFIZwcUMVgPgXPFj0Qsgz1Q-B0Mw7DI2FMUpRleVFWVOFVQ1ciDko58JCsIw6IqJ0zlyGQWPXC0zkPQ11BkH8ySkQxvzkQS1mE5C6wwCScLwmECOwVsYQFUixwfCj0WOTSEEUQxSkgoxck+SoPDYuQOK4+1eOsA8HOrETSAAJzAABHAE4AESBMOBMBsNwI560vQM+TAAAzUMpKDEU5RHSh+wFIcyMCtTgozIo6KNDxdB-eYnXUDd7HUOxQPeaC5i0QyZAy91nK9XKCqKkr0PwcrQSOe9USfELTikL9DScbTcl0BdFxGaRDBmyZEumQ8LJ+OC-kcmt1tQ31-UDIMMCw1AAC9Kv6RggwFUcACE4ShABpDriK64cAuO9TTsei7tNAu1oLuu4TKdXRSHAnFrGgu0nVWpCeXPSGr2B9BQYhw6JShPk1QAdUoIMETlBFxQACR6rH+unGy8auwnbsXEnRn3OdKZSvi5E++pXSE37Gf+5mgZBtAOahkcRdbEVSMoIWEVVJSJdTbGMyJOctFLRQZhcd2KgA0mFzsM4CTUUsls9nw4PQGgGHgWJvurUItgiJ2peopWrFA99xgXWySQXenOWBP6U91adRoUBY1B-XjBp0bMCRKbRHFu6x1FblavoQn6sovQHr1vKAS6o0KbKMUpHi0Iwlv05RPkA7Fx8eTJVE0PQC71lC0IwrDkCHjSzoe1J3eebRi0n4pHCp9estcne95xmdtE4j4yhxECnAcBKOLVniNYEzudbdz+jlfKhVYDFQgKVPaFUqq90bHVRqN574DXOjSc6Kh7owW0uFDcwxgI12MFSRwMgtbwUAZlYBm0wEQKgftSGGlJz7yxKSTiw0QJjQWDuKaxRZpgSWhoBwt1r7AIBo2Vm7N6HoFIBgEcqBYDcABMVZB05vxzi-FUYsC1NDmmVjoEoyU3jqCcGNDu2sqxrX1vWPu4iTaSOUdRTQ5MfaexJPYeiftlbyA4p4NuecGJPCMMI-W9jQoYI3B8Z42IphvQ0CQ6+u19qQBCacKeJRdLfm0j4nE2YHAlB3L7OYRJtLfnXvVY24MkmPmdtLKopAtBRULHMRczg2J6E4l+G62gcS8QrAA8xwRkmIAALQ6MQDoGkMEnRTOmXTCOQA */
+	/** @xstate-layout N4IgpgJg5mDOIC5QBsCWA7A1gWQIYGMALDMAOjSwAJkB7XCSAYgG0AGAXUVAAcbZUALqhrouIAB6IAjAA4ALKQCsAZgCcrRQCZNUgOy6pagDQgAnomUA2ZaU2tZU1pdbLlMtwF8PJijgLF0Ml9qOgYIFilOJBBefiERMUkEOwUVdS0dfUNVE3MERV1FUik5RRkpRVYDF0UvHww-IhJyBpD6JmZNKJ4+QWFRaKS9VLUNbT0DYzNEGU1SVV1LRTlnRxKquTqQXzwmwJaqWnbw5mVumN74gdAkrVyLDSLVJctNXU01AxldLZ3-ZuCRzCLDk51ifQSg2kqhG6XGWSmeS0qmKlhKchklXGqk0vwauwCZAAruh8MhcKgALZMADCABkAIIASWwbDBl36iUQchhtlYGhKmjk2iWmnuCGUmhRTikUlUiks7lcirxWAJzRJZIp1PCACUAKIARQAqvqAMoAFUoNIZADkafq6YyLUyAPK2tlicFXLkIHkKOwC4XCzSi8V2KSkFbfKVS0oYyw-bzbfH-fZaqmQUgAdwpQnQUDkADESRAMFBGAaTearTb7Y7nW6PRwvRzITdpHJdOKKjJWKR+e4tGNWKpZKrGoTSBmdTm8+Xi6Xy4wAAoMgCa2H1tqtBodTIAavqACKe6LezlQ-Jj0jKFzKAoyRPKd6KHsVFFvezvXQP0dJ+o1TTMgZyzXM+gLRd0DLAsWBbc822uCQHjmEpJTkSVrAWZQKh7O9I1YD5VExDFJUWCd1XTclMwgadcHQGlcGQZBGBtJ1rXdW19RpC0TzPHo4kvDtklYGR5jsMocRhGQcTFaYEDld5SF0J9WAwhZZkTGQKOA6dqNnfB6MY5jKyNU1LWtO0HSdBkXXdfiLkE9tkIlbRbDSNSnDcT45B7YibBhVR8JWCo1B0vYQP0rNDIYpiWLYulKGPJkzRpTjuN4094IEiEkKGZ55iCyo5FEhVVHlZQe3kIo5WUDDXgKCpE3CqdQNomLjPihl2P1I8d0oPd9UPPjssc3LfVq9z+RKJZCikUM5LyPQ9FIZxRM0TErDUhUWuaNq6NikzxFgARcAEMhcAAM3OgAnAAKKAboIMBjzAclTAASkYP4Ir07VoqMuKHIvZykklOZNA8krrHcBZfPknRZSUOQJl0GFliC3aqP+2ibrAABHIk4HOiBGNJN7ySuOcIMLXUwEu0tTKLY1bWPAbuKGo8svZJy8ukd5wxWXQo2IwKXD7KRmuTH7Wqi3GCaJk7IDJ-AKbO-o4J58ar10YUBwMAox1KKpLEsQX9EKmQrYVYVHBWLHIpxud80LIsMCY1AAC91ZEUgMH1WB8Bumhs0YIt9RPAAhBkaQAaXZ-cueBxDfV1uYqgqNGSkqRYzYRoLIy7X85TsUNMel1Nfv23MXeLd20G9qn-cD4PQ-NGldVdAB1SgiyZW0UoACRGrWfR1vWM8N7OTbzvINrRkXFTeK35sUVQHb+mjnYXN30A9xv+j99AA6DkPGGSs0V2NXjKH7pkXVskfW15ia7gR2YCI28oVPUIUvGTdANAGDwGiDLAErQgSQGftrYSwpxSJmFuUHCKgqj8leFIDemo5bQLHsJKwChfwYTXk+Moa1KryS2spFwiwVg4QMDCDe1d5yQRLNBcsOChIuVlHMUoBQ5D8MknKMoPYpSRifJDKoVtEzL0YXLA6nUOGg2kIoIo-CfxqX4d8NE4ZHBFBfJiFIrxtC4grkBKuci8aE2JsreiqtmI+3QNTWudMGbQUUXzBST5Vr6EsOVHEa81C4QRmtAcRtIZaEUhg0xk49oWIVtY0mti1a4LGikoYQpwz6KUNoKwP4xzyFkU7GuO965ewcUfE+rd3ETRkspGS9C9D6JxDIcM-jbzZBcMRIUKgAIpjMbLIp6sWGlIPr7DAx5UCwG4ESc61SryyDEvYIUJRfy+J0FUcMiwCKkVDAqK2XlClb2KcMveDcHFzOEnbcM0j9bDAxKObClhDk6guS5BUPZUG2CCroKoY5iJPk2NEyiIEknMSgQhF+V4cSWFIPIB86h3BokVG+BGD5hY5xwiVFGezAWARifsS6IzwU5TSYgZ4-ZdZ1WhoUJ85C54FyjIsGUJUtAYVxX0-FYBXlJAALSz0QHygc-JCJvAxgqSWyh-4eCAA */
 	return createMachine(
 		{
 			context: { linkState: linkState, errorMessage: undefined as string | undefined },
@@ -67,7 +67,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 							cond: 'linkFinalized'
 						},
 						{
-							target: 'claimed.requestedCancellation',
+							target: '#linkMachine.claimed.requestedCancellation',
 							cond: 'linkInCancellationRequested'
 						}
 					]
@@ -103,8 +103,14 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 							}
 						},
 						canCall: {
+							tags: 'connect2VC',
 							after: {
-								graceDelay: { target: 'wating4Finalization', cond: 'gracePeriodStarted' }
+								graceDelay: {
+									target: '#linkMachine.claimed.wating4Finalization',
+									cond: 'gracePeriodStarted',
+									actions: [],
+									internal: false
+								}
 							},
 							on: {
 								'CALL CONNECTED': {
@@ -121,8 +127,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 								'CALL EVENT RECEIVED': {
 									actions: ['receiveCallEvent', 'saveLinkState']
 								}
-							},
-							tags: ['connect2VC']
+							}
 						},
 						requestedCancellation: {
 							initial: 'waiting4Refund',
@@ -137,28 +142,29 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 							},
 							always: {
 								target: '#linkMachine.cancelled',
-								actions: ['cancelApproved', 'saveLinkState'],
 								cond: (context) =>
-									context.linkState.totalFunding <= context.linkState.refundedAmount
+									context.linkState.totalFunding <= context.linkState.refundedAmount,
+								actions: ['cancelApproved', 'saveLinkState']
 							}
 						},
 						wating4Finalization: {
 							initial: 'inEscrow',
 							states: {
-								inEscrow: {},
+								inEscrow: {
+									on: {
+										'FEEDBACK RECEIVED': {
+											target: '#linkMachine.finalized'
+										},
+										'ESCROW FINISHED': {
+											target: '#linkMachine.finalized'
+										},
+										'DISPUTE INITIATED': {
+											target: 'inDispute',
+											actions: 'initiateDispute'
+										}
+									}
+								},
 								inDispute: {}
-							},
-							on: {
-								'FEEDBACK RECEIVED': {
-									target: '#linkMachine.finalized'
-								},
-								'ESCROW FINISHED': {
-									target: '#linkMachine.finalized'
-								},
-								'DISPUTE INITIATED': {
-									target: '.inDispute',
-									actions: 'initiateDispute'
-								}
 							}
 						}
 					}
