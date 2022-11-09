@@ -3,7 +3,6 @@ import { LinkStatus } from '$lib/ORM/models/link';
 import type { TransactionDocType } from '$lib/ORM/models/transaction';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 import { PUBLIC_MIN_COMPLETED_CALL_DURATION } from '$env/static/public';
-import { on } from 'events';
 import type { CallEventDocType } from '$lib/ORM/models/callEvent';
 
 const MIN_COMPLETED_CALL = Number(PUBLIC_MIN_COMPLETED_CALL_DURATION || 30000);
@@ -341,9 +340,9 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 					context.linkState.totalFunding >= context.linkState.requestedFunding,
 				neverCalled: (context) => {
 					return (
-						context.linkState.claim !== undefined &&
-						context.linkState.claim.call !== undefined &&
-						context.linkState.claim.call.startedAt !== undefined
+						context.linkState.claim === undefined ||
+						context.linkState.claim.call === undefined ||
+						context.linkState.claim.call.startedAt === undefined
 					);
 				},
 				gracePeriodStarted: (context) => {

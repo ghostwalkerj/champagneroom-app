@@ -143,7 +143,7 @@ export const videoCall = (userId?: string) => {
 		noAnswerTimer = setTimeout(() => {
 			callService.send({ type: 'CALL UNANSWERED' });
 			resetCallState();
-		}, CALL_TIMEOUT + 1000);
+		}, CALL_TIMEOUT + 10000);
 
 		mediaConnection = peer.call(receiverId, localStream, { metadata: { callerName } });
 

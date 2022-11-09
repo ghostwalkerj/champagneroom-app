@@ -171,7 +171,7 @@ const linkSchemaLiteral = {
 					type: 'object',
 					properties: {
 						caller: { type: 'string' },
-						pin: { type: 'string', maxLength: 8 },
+						pin: { type: 'string' },
 						createdAt: { type: 'integer' },
 						transactions: {
 							type: 'array',
@@ -187,8 +187,8 @@ const linkSchemaLiteral = {
 							}
 						}
 					},
-					required: ['caller', 'pin', 'createdAt', 'call'],
-					encrypted: ['pin']
+					encrypted: ['pin'],
+					required: ['caller', 'pin', 'createdAt', 'call']
 				},
 				escrow: {
 					type: 'object',
