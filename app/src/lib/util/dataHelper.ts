@@ -68,7 +68,9 @@ const generateLinks = (talent: TalentDocument, count: number) => {
 		const amount = Math.floor(Math.random() * 1000) + 1;
 		const endedAt = spacetime.now().subtract(Math.floor(Math.random() * 45) + 1, 'day');
 		const _feedback = {
-			rating: Math.floor(Math.random() * 5) + 1
+			rating: Math.floor(Math.random() * 5) + 1,
+			createdAt: new Date().getTime(),
+			comments: 'This is a comment'
 		};
 		const _link = {
 			linkState: {
@@ -77,9 +79,9 @@ const generateLinks = (talent: TalentDocument, count: number) => {
 				requestedFunding: amount,
 				refundedAmount: 0,
 				finalized: {
-					endedAt: endedAt.epoch,
-					feedback: _feedback
-				}
+					endedAt: endedAt.epoch
+				},
+				feedback: _feedback
 			},
 			requestedAmount: amount,
 			fundingAddress: '0x251281e1516e6E0A145d28a41EE63BfcDd9E18Bf',

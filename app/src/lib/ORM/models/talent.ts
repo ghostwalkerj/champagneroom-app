@@ -196,8 +196,8 @@ export const talentDocMethods: TalentDocMethods = {
 
 		completedCalls.map((link) => {
 			totalEarnings += link.linkState.totalFunding;
-			if (link.linkState.finalized?.feedback) {
-				totalRating += link.linkState.finalized.feedback.rating;
+			if (link.linkState.feedback) {
+				totalRating += link.linkState.feedback.rating;
 				numRatings++;
 			}
 			completedCallIds.push(link._id);

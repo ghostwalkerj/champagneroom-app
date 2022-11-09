@@ -232,25 +232,26 @@ const linkSchemaLiteral = {
 							type: 'array',
 							ref: 'transactions',
 							items: { type: 'string' }
-						},
-						feedback: {
-							type: 'object',
-							properties: {
-								rating: {
-									type: 'integer',
-									default: 0,
-									minimum: 0,
-									maximum: 5
-								},
-								comments: {
-									type: 'string',
-									maxLength: 500
-								}
-							},
-							required: ['rating']
 						}
 					},
 					required: ['endedAt']
+				},
+				feedback: {
+					type: 'object',
+					properties: {
+						rating: {
+							type: 'integer',
+							default: 0,
+							minimum: 0,
+							maximum: 5
+						},
+						comments: {
+							type: 'string',
+							maxLength: 500
+						},
+						createdAt: { type: 'integer' }
+					},
+					required: ['createdAt', 'rating']
 				}
 			},
 			required: ['status', 'totalFunding', 'requestedFunding', 'refundedAmount']

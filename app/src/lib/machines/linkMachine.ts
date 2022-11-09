@@ -41,7 +41,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 					  }
 					| {
 							type: 'FEEDBACK RECEIVED';
-							feedback: NonNullable<LinkStateType['finalized']>['feedback'];
+							feedback: NonNullable<LinkStateType['feedback']>;
 					  }
 					| {
 							type: 'DISPUTE INITIATED';
@@ -129,6 +129,10 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 								},
 								'CALL EVENT RECEIVED': {
 									actions: ['receiveCallEvent', 'saveLinkState']
+								},
+								'FEEDBACK RECEIVED': {
+									target: '#linkMachine.finalized',
+									actions: ['receiveFeedback', 'saveLinkState']
 								}
 							}
 						},
@@ -170,7 +174,8 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 					},
 					on: {
 						'FEEDBACK RECEIVED': {
-							target: 'finalized'
+							target: 'finalized',
+							actions: ['receiveFeedback', 'saveLinkState']
 						},
 						'DISPUTE INITIATED': {
 							target: 'inDispute',
@@ -319,6 +324,15 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 					return {};
 				}),
 
+				receiveFeedback: assign((context, event) => {
+					return {
+						linkState: {
+							...context.linkState,
+							feedback: event.feedback
+						}
+					};
+				}),
+
 				initiateDispute: assign((context, event) => {
 					return {
 						linkState: {
@@ -360,16 +374,10 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 					return {};
 				}),
 
-				finalizeLink: assign((context, event) => {
-					let finalized = {
+				finalizeLink: assign((context) => {
+					const finalized = {
 						endedAt: new Date().getTime()
 					} as NonNullable<LinkStateType['finalized']>;
-					if (event.type === 'FEEDBACK RECEIVED') {
-						finalized = {
-							...finalized,
-							feedback: event.feedback
-						};
-					}
 					if (context.linkState.status !== LinkStatus.FINALIZED) {
 						return {
 							linkState: {
