@@ -258,7 +258,7 @@
 			{/if}
 		</div>
 	</section>
-	Call State: {$callState || ''} <br />
+	Call State: {JSON.stringify($callState['value'] || '')} <br />
 </div>
 
 <style>

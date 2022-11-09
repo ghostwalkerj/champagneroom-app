@@ -5,7 +5,7 @@ import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 import { PUBLIC_MIN_COMPLETED_CALL_DURATION } from '$env/static/public';
 import type { CallEventDocType } from '$lib/ORM/models/callEvent';
 
-const MIN_COMPLETED_CALL = Number(PUBLIC_MIN_COMPLETED_CALL_DURATION || 30000);
+const MIN_COMPLETED_CALL = Number(PUBLIC_MIN_COMPLETED_CALL_DURATION || 90000);
 
 type LinkStateType = LinkDocType['linkState'];
 
@@ -143,8 +143,9 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 							}
 						},
 						wating4Finalization: {
-							initial: 'inDispute',
+							initial: 'inEscrow',
 							states: {
+								inEscrow: {},
 								inDispute: {}
 							},
 							on: {
@@ -216,9 +217,12 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 						return {
 							linkState: {
 								...context.linkState,
-								call: {
-									...context.linkState.claim.call,
-									endedAt: new Date().getTime()
+								claim: {
+									...context.linkState.claim,
+									call: {
+										...context.linkState.claim.call,
+										endedAt: new Date().getTime()
+									}
 								}
 							}
 						};
@@ -324,8 +328,10 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 				graceDelay: (context) => {
 					let timer = 0;
 					if (context.linkState.claim && context.linkState.claim.call.startedAt) {
-						timer = context.linkState.claim.call.startedAt + MIN_COMPLETED_CALL - Date.now();
+						timer =
+							context.linkState.claim.call.startedAt + MIN_COMPLETED_CALL - new Date().getTime();
 					}
+					console.log('Grace Timer: ', timer);
 					return timer > 0 ? timer : 0;
 				}
 			},
@@ -349,8 +355,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 					return (
 						context.linkState.claim !== undefined &&
 						context.linkState.claim.call !== undefined &&
-						context.linkState.claim.call.startedAt !== undefined &&
-						context.linkState.claim.call.endedAt !== undefined
+						context.linkState.claim.call.startedAt !== undefined
 					);
 				}
 			}
