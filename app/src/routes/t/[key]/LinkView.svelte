@@ -46,7 +46,7 @@
 					<div class="text-xl w-full">
 						{#if linkState.status === LinkStatus.UNCLAIMED}
 							Your pCall link has Not Been Claimed
-						{:else if linkState.status === LinkStatus.CLAIMED && link.linkState.claim}
+						{:else if linkState.claim}
 							<div class="w-full ">
 								Your pCall link was claimed by:
 								<div class="p-6 flex flex-row w-full place-content-evenly items-center">
@@ -55,9 +55,9 @@
 										style="background-image: url('{callerProfileImage}')"
 									/>
 									<div>
-										<div>{link.linkState.claim.caller}</div>
+										<div>{linkState.claim.caller}</div>
 										<div>on</div>
-										<div>{spacetime(link.linkState.claim.createdAt).format('nice-short')}</div>
+										<div>{spacetime(linkState.claim.createdAt).format('nice-short')}</div>
 									</div>
 								</div>
 							</div>
