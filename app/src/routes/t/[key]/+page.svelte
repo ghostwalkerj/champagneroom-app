@@ -62,6 +62,8 @@
 
 	$: waiting4StateChange = false;
 
+	let connectedCallId: string;
+
 	const useLinkState = (link: LinkDocument, linkState: LinkDocument['linkState']) => {
 		if (linkService) linkService.stop();
 		if (linkSub) linkSub.unsubscribe();
@@ -77,8 +79,13 @@
 				});
 				canCreateLink = state.done ?? true;
 
-				if (state.hasTag('connect2VC')) initVC(currentLink.callId);
-				else if (vc && !callState.done) {
+				if (state.hasTag('connect2VC')) {
+					if (connectedCallId !== currentLink.callId) {
+						connectedCallId = currentLink.callId;
+						initVC(currentLink.callId);
+					}
+				} else if (vc && !callState.done) {
+					connectedCallId = '';
 					vc.destroy();
 				}
 			}
@@ -122,73 +129,71 @@
 	};
 
 	const initVC = (callId: string) => {
-		if (browser && !vc) {
-			global = window;
-			import('$lib/util/videoCall').then((_vc) => {
-				videoCall = _vc.videoCall;
-				if (currentLink) {
-					vc = videoCall(callId);
-					vc.callEvent.subscribe((ce) => {
-						// Log call events on the Talent side
-						if (ce) {
-							callEvent = ce;
-							let eventType: CallEventType | undefined;
-							switch (ce.type) {
-								case 'CALL INCOMING':
-									eventType = CallEventType.ATTEMPT;
-									break;
+		if (!browser) return;
 
-								case 'CALL ACCEPTED':
-									eventType = CallEventType.ANSWER;
-									break;
+		global = window;
+		import('$lib/util/videoCall').then((_vc) => {
+			videoCall = _vc.videoCall;
+			vc = videoCall(callId);
+			vc.callEvent.subscribe((ce) => {
+				// Log call events on the Talent side
+				if (ce) {
+					callEvent = ce;
+					let eventType: CallEventType | undefined;
+					switch (ce.type) {
+						case 'CALL INCOMING':
+							eventType = CallEventType.ATTEMPT;
+							break;
 
-								case 'CALL CONNECTED':
-									eventType = CallEventType.CONNECT;
-									linkService.send('CALL CONNECTED');
-									break;
+						case 'CALL ACCEPTED':
+							eventType = CallEventType.ANSWER;
+							break;
 
-								case 'CALL UNANSWERED':
-									eventType = CallEventType.NO_ANSWER;
-									break;
+						case 'CALL CONNECTED':
+							eventType = CallEventType.CONNECT;
+							linkService.send('CALL CONNECTED');
+							break;
 
-								case 'CALL REJECTED':
-									eventType = CallEventType.REJECT;
-									break;
+						case 'CALL UNANSWERED':
+							eventType = CallEventType.NO_ANSWER;
+							break;
 
-								case 'CALL DISCONNECTED':
-									eventType = CallEventType.DISCONNECT;
-									linkService.send('CALL DISCONNECTED');
-									break;
+						case 'CALL REJECTED':
+							eventType = CallEventType.REJECT;
+							break;
 
-								case 'CALL HANGUP':
-									eventType = CallEventType.HANGUP;
-									break;
-							}
-							if (eventType !== undefined) {
-								currentLink.createCallEvent(eventType).then((callEvent) => {
-									linkService.send({ type: 'CALL EVENT RECEIVED', callEvent });
-								});
-							}
-						}
-					});
+						case 'CALL DISCONNECTED':
+							eventType = CallEventType.DISCONNECT;
+							linkService.send('CALL DISCONNECTED');
+							break;
 
-					vc.callState.subscribe((cs) => {
-						// Logic for all of the possible call states
-						if (cs) {
-							callState = cs;
-							if (cs.changed) {
-								showAlert = callState.matches('receivingCall');
-								inCall = callState.matches('inCall');
-								ready4Call = callState.matches('ready4Call');
-							}
-						}
-					});
-					vc.callerName.subscribe((name) => {
-						if (name) callerName = name;
-					});
+						case 'CALL HANGUP':
+							eventType = CallEventType.HANGUP;
+							break;
+					}
+					if (eventType !== undefined) {
+						currentLink.createCallEvent(eventType).then((callEvent) => {
+							linkService.send({ type: 'CALL EVENT RECEIVED', callEvent });
+						});
+					}
 				}
 			});
-		}
+
+			vc.callState.subscribe((cs) => {
+				// Logic for all of the possible call states
+				if (cs) {
+					callState = cs;
+					if (cs.changed) {
+						showAlert = callState.matches('receivingCall');
+						inCall = callState.matches('inCall');
+						ready4Call = callState.matches('ready4Call');
+					}
+				}
+			});
+			vc.callerName.subscribe((name) => {
+				if (name) callerName = name;
+			});
+		});
 	};
 
 	onMount(async () => {
