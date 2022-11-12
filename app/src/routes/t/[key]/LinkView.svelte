@@ -85,11 +85,11 @@
 							</div>
 							<div class="stat-title">Total Funded</div>
 							<div class="text-secondary stat-value">
-								{currencyFormatter.format(link.linkState.totalFunding)}
+								{currencyFormatter.format(linkState.totalFunding || 0)}
 							</div>
 						</div>
 					</div>
-					{#if link.linkState.totalFunding >= link.requestedAmount}
+					{#if linkState.totalFunding >= link.requestedAmount}
 						<div class="text-xl pb-4">Link is Fully Funded!</div>
 					{/if}
 				</section>

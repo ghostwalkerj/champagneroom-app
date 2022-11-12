@@ -48,17 +48,18 @@
 	let mediaStream: MediaStream;
 	$: callerName = '';
 	let videoCall: any;
-	let currentLinkState =
+	let linkMachineState =
 		currentLink && createLinkMachineService(currentLink.linkState).getSnapshot();
 
 	$: canCancelLink =
-		currentLinkState &&
-		currentLinkState.can({
+		linkMachineState &&
+		linkMachineState.can({
 			type: 'REQUEST CANCELLATION',
 			cancel: undefined
 		});
 
-	$: canCreateLink = !currentLinkState || currentLinkState.done;
+	$: canCreateLink = !currentLink || (linkMachineState && linkMachineState.done);
+
 	$: waiting4StateChange = false;
 
 	const useLinkState = (link: LinkDocument, linkState: LinkDocument['linkState']) => {
@@ -67,8 +68,9 @@
 
 		linkService = createLinkMachineService(linkState, link.updateLinkStateCallBack());
 		linkSub = linkService.subscribe((state) => {
+			linkMachineState = state;
+
 			if (state.changed) {
-				currentLinkState = state;
 				canCancelLink = state.can({
 					type: 'REQUEST CANCELLATION',
 					cancel: undefined
@@ -88,9 +90,7 @@
 		useLinkState(link, link.linkState);
 		link.get$('linkState').subscribe((_linkState) => {
 			waiting4StateChange = false; // link changed, so can submit again
-			if (_linkState && _linkState.updatedAt > link.linkState.updatedAt) {
-				useLinkState(link, _linkState);
-			}
+			useLinkState(link, _linkState);
 		});
 	};
 
@@ -225,7 +225,7 @@
 						talent = _talent;
 						talent.get$('currentLink').subscribe((linkId) => {
 							if (linkId) {
-								waiting4StateChange = false; // link changed, so can submit again
+								waiting4StateChange = false; // link changed, so can submit
 								db.links
 									.findOne(linkId)
 									.exec()
@@ -358,7 +358,7 @@
 								</div>
 							</div>
 						</div>
-					{:else if currentLinkState && currentLinkState.matches('claimed.requestedCancellation.waiting4Refund')}
+					{:else if linkMachineState && linkMachineState.matches('claimed.requestedCancellation.waiting4Refund')}
 						<div class="bg-primary text-primary-content card">
 							<div class="text-center card-body items-center">
 								<h2 class="text-2xl card-title">Issue Refund for Cancelled Link</h2>
@@ -435,8 +435,8 @@
 									<p>Signed in as {talentObj.name}</p>
 								{/if}
 								<p>Call State: {callState.value}</p>
-								{#if currentLinkState}<p>
-										Link State:{JSON.stringify(currentLinkState.value)}
+								{#if linkMachineState}<p>
+										Link State:{JSON.stringify(linkMachineState.value)}
 									</p>{/if}
 							</div>
 						</div>
