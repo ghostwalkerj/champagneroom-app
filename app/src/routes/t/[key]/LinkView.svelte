@@ -1,29 +1,34 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { PUBLIC_DEFAULT_PROFILE_IMAGE, PUBLIC_ROOM_PATH } from '$env/static/public';
-	import type { LinkMachineStateType } from '$lib/machines/linkMachine';
-	import type { LinkDocType } from '$lib/ORM/models/link';
-	import type { TalentDocType } from '$lib/ORM/models/talent';
+	import { type LinkDocument, LinkStatus } from '$lib/ORM/models/link';
 	import { currencyFormatter } from '$lib/util/constants';
 	import getProfileImage from '$lib/util/profilePhoto';
 	import spacetime from 'spacetime';
 	import FaMoneyBillWave from 'svelte-icons/fa/FaMoneyBillWave.svelte';
 	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';
 	import urlJoin from 'url-join';
+	export let link: LinkDocument;
 
-	export let link: LinkDocType;
-	export let talent: TalentDocType;
-	export let state: LinkMachineStateType | undefined;
 	let tooltipOpen = '';
-
 	$: callerProfileImage = PUBLIC_DEFAULT_PROFILE_IMAGE;
-
 	$: linkURL = '';
-	$: if (link) linkURL = urlJoin($page.url.origin, PUBLIC_ROOM_PATH, link._id);
+	let linkState: LinkDocument['linkState'];
 
-	$: if (state && state.matches('claimed') && link.linkState.claim) {
-		callerProfileImage = getProfileImage(link.linkState.claim.caller);
+	$: if (link) {
+		linkState = link.linkState;
 	}
+
+	$: if (link.get$)
+		link.get$('linkState').subscribe((_linkState) => {
+			linkState = _linkState;
+		});
+
+	$: if (linkState && linkState.claim) {
+		callerProfileImage = getProfileImage(linkState.claim.caller);
+	}
+
+	$: if (link) linkURL = urlJoin($page.url.origin, PUBLIC_ROOM_PATH, link._id);
 
 	const copyLink = () => {
 		navigator.clipboard.writeText(linkURL);
@@ -35,13 +40,13 @@
 <div class="bg-primary text-primary-content card">
 	<div class="text-center card-body items-center">
 		<h2 class="text-2xl card-title">Your Outstanding pCall Link</h2>
-		{#if talent && link && state && !state.done}
+		{#if link && linkState.status !== LinkStatus.CANCELED && linkState.status !== LinkStatus.FINALIZED}
 			<div class="container mx-auto grid p-6 gap-4 grid-row-2">
 				<div class="text-center card-body items-center bg-secondary rounded-2xl">
 					<div class="text-xl w-full">
-						{#if state.matches('unclaimed')}
+						{#if linkState.status === LinkStatus.UNCLAIMED}
 							Your pCall link has Not Been Claimed
-						{:else if state.matches('claimed') && link.linkState.claim}
+						{:else if linkState.status === LinkStatus.CLAIMED && link.linkState.claim}
 							<div class="w-full ">
 								Your pCall link was claimed by:
 								<div class="p-6 flex flex-row w-full place-content-evenly items-center">
@@ -114,7 +119,7 @@
 					</div>
 				</section>
 			</div>
-		{:else if talent.currentLink && state && !state.done}
+		{:else if !link}
 			Loading....
 		{:else}
 			You do not have any pCall links active

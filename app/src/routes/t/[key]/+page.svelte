@@ -87,9 +87,9 @@
 		currentLink = link;
 		useLinkState(link, link.linkState);
 		link.get$('linkState').subscribe((_linkState) => {
+			waiting4StateChange = false; // link changed, so can submit again
 			if (_linkState && _linkState.updatedAt > link.linkState.updatedAt) {
 				useLinkState(link, _linkState);
-				waiting4StateChange = false; // link changed, so can submit again
 			}
 		});
 	};
@@ -225,6 +225,7 @@
 						talent = _talent;
 						talent.get$('currentLink').subscribe((linkId) => {
 							if (linkId) {
+								waiting4StateChange = false; // link changed, so can submit again
 								db.links
 									.findOne(linkId)
 									.exec()
@@ -281,7 +282,7 @@
 				<div class="space-y-6 lg:col-start-1 lg:col-span-2">
 					<!-- Current Link -->
 					<div>
-						<LinkViewer link={currentLink} talent={talentObj} state={currentLinkState} />
+						<LinkViewer link={currentLink} />
 					</div>
 
 					{#if canCancelLink}

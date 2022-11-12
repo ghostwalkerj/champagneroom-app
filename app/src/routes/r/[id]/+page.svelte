@@ -42,12 +42,14 @@
 	publicDB(token, linkId, StorageTypes.IDB).then((db: PublicDBType) => {
 		db.links.findOne(linkId).$.subscribe((link) => {
 			if (link) {
-				linkObj = link as LinkDocument;
 				// Here is where we run the machine and do all the logic based on the state
-				linkService = createLinkMachineService(link.linkState);
-				linkService.subscribe((state) => {
-					linkState = state;
-				});
+				if (link.linkState.updatedAt > linkObj.linkState.updatedAt) {
+					linkService = createLinkMachineService(link.linkState);
+					linkService.subscribe((state) => {
+						linkState = state;
+					});
+				}
+				linkObj = link as LinkDocument;
 				waiting4StateChange = false;
 			}
 		});
