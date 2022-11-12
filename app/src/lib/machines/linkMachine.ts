@@ -191,6 +191,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 					return {
 						linkState: {
 							...context.linkState,
+							updatedAt: new Date().getTime(),
 							status: LinkStatus.CANCELED,
 							cancel: event.cancel
 						}
@@ -201,6 +202,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 					return {
 						linkState: {
 							...context.linkState,
+							updatedAt: new Date().getTime(),
 							status: LinkStatus.CLAIMED,
 							claim: event.claim
 						}
@@ -208,16 +210,18 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 				}),
 
 				startCall: assign((context) => {
-					if (context.linkState.claim && !context.linkState.claim.call.startedAt) {
+					if (context.linkState.claim) {
+						const call = {
+							...context.linkState.claim.call,
+							startTime: Date.now()
+						};
 						return {
 							linkState: {
 								...context.linkState,
+								updatedAt: new Date().getTime(),
 								claim: {
 									...context.linkState.claim,
-									call: {
-										...context.linkState.claim.call,
-										startedAt: new Date().getTime()
-									}
+									call: call
 								}
 							}
 						};
@@ -226,10 +230,15 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 				}),
 
 				endCall: assign((context) => {
-					if (context.linkState.claim && context.linkState.claim.call.startedAt) {
+					if (
+						context.linkState.claim &&
+						context.linkState.claim.call &&
+						context.linkState.claim.call.startedAt
+					) {
 						return {
 							linkState: {
 								...context.linkState,
+								updatedAt: new Date().getTime(),
 								claim: {
 									...context.linkState.claim,
 									call: {
@@ -245,17 +254,17 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 
 				receiveCallEvent: assign((context, event) => {
 					if (context.linkState.claim) {
+						const call = context.linkState.claim.call || {};
+
 						return {
 							linkState: {
 								...context.linkState,
+								updatedAt: new Date().getTime(),
 								claim: {
 									...context.linkState.claim,
 									call: {
-										...context.linkState.claim.call,
-										callEvents: [
-											...(context.linkState.claim.call.callEvents || []),
-											event.callEvent._id
-										]
+										...call,
+										callEvents: [...(call.callEvents || []), event.callEvent._id]
 									}
 								}
 							}
@@ -268,6 +277,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 					return {
 						linkState: {
 							...context.linkState,
+							updatedAt: new Date().getTime(),
 							status: LinkStatus.CANCELLATION_REQUESTED,
 							cancel: event.cancel
 						}
@@ -278,6 +288,8 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 					return {
 						linkState: {
 							...context.linkState,
+							updatedAt: new Date().getTime(),
+
 							status: LinkStatus.CANCELED
 						}
 					};
@@ -292,6 +304,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 						return {
 							linkState: {
 								...context.linkState,
+								updatedAt: new Date().getTime(),
 								totalFunding: context.linkState.totalFunding + Number(event.transaction.value),
 								claim: {
 									...context.linkState.claim,
@@ -310,6 +323,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 						return {
 							linkState: {
 								...context.linkState,
+								updatedAt: new Date().getTime(),
 								refundedAmount: context.linkState.refundedAmount + Number(event.transaction.value),
 								cancel: {
 									...context.linkState.cancel,
@@ -327,6 +341,8 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 					return {
 						linkState: {
 							...context.linkState,
+							updatedAt: new Date().getTime(),
+
 							feedback: event.feedback
 						}
 					};
@@ -350,6 +366,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 						return {
 							linkState: {
 								...context.linkState,
+								updatedAt: new Date().getTime(),
 								status: LinkStatus.IN_ESCROW,
 								escrow: escrow
 							}
@@ -363,6 +380,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 						return {
 							linkState: {
 								...context.linkState,
+								updatedAt: new Date().getTime(),
 								escrow: {
 									...context.linkState.escrow,
 									endedAt: new Date().getTime()
@@ -381,6 +399,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 						return {
 							linkState: {
 								...context.linkState,
+								updatedAt: new Date().getTime(),
 								finalized: finalized,
 								status: LinkStatus.FINALIZED
 							}
@@ -393,16 +412,23 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 			delays: {
 				graceDelay: (context) => {
 					let timer = 0;
-					if (context.linkState.claim && context.linkState.claim.call.startedAt) {
+					if (
+						context.linkState.claim &&
+						context.linkState.claim.call &&
+						context.linkState.claim.call.startedAt
+					) {
 						timer = context.linkState.claim.call.startedAt + GRACE_PERIOD - new Date().getTime();
 					}
-					console.log('Grace Timer: ', timer);
 					return timer > 0 ? timer : 0;
 				},
 				escrowDelay: (context) => {
 					let timer = 0;
 
-					if (context.linkState.claim && context.linkState.claim.call.startedAt) {
+					if (
+						context.linkState.claim &&
+						context.linkState.claim.call &&
+						context.linkState.claim.call.startedAt
+					) {
 						const endTime =
 							context.linkState.claim.call.endedAt || context.linkState.claim.call.startedAt;
 						timer = endTime + ESCROW_PERIOD - new Date().getTime();

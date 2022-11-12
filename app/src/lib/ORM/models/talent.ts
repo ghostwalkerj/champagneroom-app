@@ -135,7 +135,8 @@ export const talentDocMethods: TalentDocMethods = {
 				status: LinkStatus.UNCLAIMED,
 				totalFunding: 0,
 				refundedAmount: 0,
-				requestedFunding: requestedAmount
+				requestedFunding: requestedAmount,
+				updatedAt: new Date().getTime()
 			},
 			requestedAmount,
 			fundingAddress: '0x251281e1516e6E0A145d28a41EE63BfcDd9E18Bf', //TODO: make real wallet

@@ -61,9 +61,41 @@
 	$: canCreateLink = !currentLinkState || currentLinkState.done;
 	$: waiting4StateChange = false;
 
+	const useLinkState = (link: LinkDocument, linkState: LinkDocument['linkState']) => {
+		if (linkService) linkService.stop();
+		if (linkSub) linkSub.unsubscribe();
+
+		linkService = createLinkMachineService(linkState, link.updateLinkStateCallBack);
+		linkSub = linkService.subscribe((state) => {
+			if (state.changed) {
+				currentLinkState = state;
+				canCancelLink = state.can({
+					type: 'REQUEST CANCELLATION',
+					cancel: undefined
+				});
+				canCreateLink = state.done ?? true;
+
+				if (state.hasTag('connect2VC')) initVC(currentLink.callId);
+				else if (vc && !callState.done) {
+					vc.destroy();
+				}
+			}
+		});
+	};
+
+	const useLink = (link: LinkDocument) => {
+		currentLink = link;
+		useLinkState(link, link.linkState);
+		link.get$('linkState').subscribe((linkState) => {
+			if (linkState && linkState.updatedAt > link.linkState.updatedAt) {
+				useLinkState(link, linkState);
+				waiting4StateChange = false; // link changed, so can submit again
+			}
+		});
+	};
+
 	if (browser) {
 		talentDB(token, key, StorageTypes.IDB).then((db: TalentDBType) => {
-			// Don't judge me
 			db.talents
 				.findOne(talentObj._id)
 				.exec()
@@ -77,40 +109,7 @@
 									.findOne(linkId)
 									.exec()
 									.then((link) => {
-										if (link) {
-											currentLink = link;
-											link.get$('linkState').subscribe((linkState) => {
-												if (linkState) {
-													if (linkService) linkService.stop();
-													if (linkSub) linkSub.unsubscribe();
-													const updateLink = (linkState: LinkDocument['linkState']) => {
-														if (link)
-															link.atomicPatch({
-																updatedAt: new Date().getTime(),
-																linkState
-															});
-													};
-													linkService = createLinkMachineService(linkState, updateLink);
-													linkSub = linkService.subscribe((state) => {
-														if (state.changed) {
-															currentLinkState = state;
-															canCancelLink = state.can({
-																type: 'REQUEST CANCELLATION',
-																cancel: undefined
-															});
-															canCreateLink = state.done ?? true;
-
-															if (state.hasTag('connect2VC')) initVC(currentLink.callId);
-															else if (vc && !callState.done) {
-																console.log('vc destroy');
-																vc.destroy();
-															}
-														}
-													});
-													waiting4StateChange = false; // link changed, so can submit again
-												}
-											});
-										}
+										if (link) useLink(link);
 									});
 							}
 						});
@@ -189,7 +188,7 @@
 									eventType = CallEventType.HANGUP;
 									break;
 							}
-							if (eventType) {
+							if (eventType !== undefined) {
 								currentLink.createCallEvent(eventType).then((callEvent) => {
 									linkService.send({ type: 'CALL EVENT RECEIVED', callEvent });
 								});

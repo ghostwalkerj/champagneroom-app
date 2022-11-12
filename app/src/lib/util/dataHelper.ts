@@ -81,7 +81,8 @@ const generateLinks = (talent: TalentDocument, count: number) => {
 				finalized: {
 					endedAt: endedAt.epoch
 				},
-				feedback: _feedback
+				feedback: _feedback,
+				updatedAt: new Date().getTime()
 			},
 			requestedAmount: amount,
 			fundingAddress: '0x251281e1516e6E0A145d28a41EE63BfcDd9E18Bf',

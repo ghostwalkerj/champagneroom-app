@@ -1,10 +1,11 @@
 import { JWT_CREATOR_USER, JWT_EXPIRY, JWT_SECRET } from '$env/static/private';
 import { createLinkMachineService } from '$lib/machines/linkMachine';
 import { talentDB } from '$lib/ORM/dbs/talentDB';
-import { ActorType, type LinkDocument } from '$lib/ORM/models/link';
+import { ActorType, LinkDocType, type LinkDocument } from '$lib/ORM/models/link';
 import { TransactionReasonType } from '$lib/ORM/models/transaction';
 import { StorageTypes } from '$lib/ORM/rxdb';
 import { error, invalid } from '@sveltejs/kit';
+import { link } from 'fs';
 import jwt from 'jsonwebtoken';
 import type { PageServerLoad } from './$types';
 
@@ -83,13 +84,10 @@ export const actions: import('./$types').Actions = {
 			throw error(404, 'Link not found');
 		}
 
-		const updateLink = (linkState: LinkDocument['linkState']) => {
-			cancelLink.atomicPatch({
-				updatedAt: new Date().getTime(),
-				linkState
-			});
-		};
-		const linkService = createLinkMachineService(cancelLink.linkState, updateLink);
+		const linkService = createLinkMachineService(
+			cancelLink.linkState,
+			cancelLink.updateLinkStateCallBack
+		);
 		const currentLinkState = linkService.getSnapshot();
 
 		linkService.send({
@@ -124,14 +122,10 @@ export const actions: import('./$types').Actions = {
 			throw error(404, 'Link not found');
 		}
 
-		const updateLink = (linkState: LinkDocument['linkState']) => {
-			refundLink.atomicPatch({
-				updatedAt: new Date().getTime(),
-				linkState
-			});
-		};
-
-		const linkService = createLinkMachineService(refundLink.linkState, updateLink);
+		const linkService = createLinkMachineService(
+			refundLink.linkState,
+			refundLink.updateLinkStateCallBack
+		);
 		const state = linkService.getSnapshot();
 
 		if (!state.matches('claimed.requestedCancellation.waiting4Refund')) {

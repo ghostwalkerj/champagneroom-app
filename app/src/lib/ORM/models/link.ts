@@ -6,6 +6,7 @@ import {
 	type CallEventType
 } from '$lib/ORM/models/callEvent';
 import type { TalentDocument } from '$lib/ORM/models/talent';
+import { link } from 'fs';
 import { nanoid } from 'nanoid';
 import {
 	toTypedRxJsonSchema,
@@ -53,6 +54,7 @@ type LinkDocMethods = {
 		reason: TransactionReasonType;
 	}) => Promise<TransactionDocument>;
 	createCallEvent: (type: CallEventType) => Promise<CallEventDocument>;
+	updateLinkStateCallBack: () => (_linkState: LinkDocument['linkState']) => void;
 };
 
 export const linkDocMethods: LinkDocMethods = {
@@ -92,6 +94,23 @@ export const linkDocMethods: LinkDocMethods = {
 			type
 		};
 		return db.callEvents.insert(_callEvent);
+	},
+	updateLinkStateCallBack: function (this: LinkDocument) {
+		return (_linkState: LinkDocument['linkState']) => {
+			if (_linkState.updatedAt > this.linkState.updatedAt) {
+				const atomicUpdate = (linkDoc: LinkDocType) => {
+					const newState = {
+						...linkDoc.linkState,
+						..._linkState
+					};
+					return {
+						...linkDoc,
+						linkState: newState
+					};
+				};
+				this.atomicUpdate(atomicUpdate);
+			}
+		};
 	}
 };
 
@@ -187,7 +206,7 @@ const linkSchemaLiteral = {
 							}
 						}
 					},
-					required: ['caller', 'pin', 'createdAt', 'call']
+					required: ['caller', 'pin', 'createdAt']
 				},
 				escrow: {
 					type: 'object',
@@ -252,9 +271,10 @@ const linkSchemaLiteral = {
 						createdAt: { type: 'integer' }
 					},
 					required: ['createdAt', 'rating']
-				}
+				},
+				updatedAt: { type: 'integer' }
 			},
-			required: ['status', 'totalFunding', 'requestedFunding', 'refundedAmount']
+			required: ['status', 'totalFunding', 'requestedFunding', 'refundedAmount', 'updatedAt']
 		},
 		talentInfo: {
 			type: 'object',
