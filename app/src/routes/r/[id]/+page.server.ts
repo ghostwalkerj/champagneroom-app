@@ -87,7 +87,7 @@ export const actions: import('./$types').Actions = {
 			return error(404, 'Link not found');
 		}
 
-		const linkService = createLinkMachineService(link.linkState, link.updateLinkStateCallBack);
+		const linkService = createLinkMachineService(link.linkState, link.updateLinkStateCallBack());
 
 		const state = linkService.getSnapshot();
 		if (
@@ -139,7 +139,7 @@ export const actions: import('./$types').Actions = {
 			return error(404, 'Link not found');
 		}
 
-		const linkService = createLinkMachineService(link.linkState, link.updateLinkStateCallBack);
+		const linkService = createLinkMachineService(link.linkState, link.updateLinkStateCallBack());
 		const state = linkService.getSnapshot();
 		if (!state.matches('claimed.waiting4Funding')) {
 			return error(400, 'Link cannot be funded');

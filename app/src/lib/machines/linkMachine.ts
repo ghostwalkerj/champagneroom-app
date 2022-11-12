@@ -255,7 +255,6 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 				receiveCallEvent: assign((context, event) => {
 					if (context.linkState.claim) {
 						const call = context.linkState.claim.call || {};
-
 						return {
 							linkState: {
 								...context.linkState,

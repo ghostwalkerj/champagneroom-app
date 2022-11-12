@@ -65,7 +65,7 @@
 		if (linkService) linkService.stop();
 		if (linkSub) linkSub.unsubscribe();
 
-		linkService = createLinkMachineService(linkState, link.updateLinkStateCallBack);
+		linkService = createLinkMachineService(linkState, link.updateLinkStateCallBack());
 		linkSub = linkService.subscribe((state) => {
 			if (state.changed) {
 				currentLinkState = state;
@@ -86,37 +86,13 @@
 	const useLink = (link: LinkDocument) => {
 		currentLink = link;
 		useLinkState(link, link.linkState);
-		link.get$('linkState').subscribe((linkState) => {
-			if (linkState && linkState.updatedAt > link.linkState.updatedAt) {
-				useLinkState(link, linkState);
+		link.get$('linkState').subscribe((_linkState) => {
+			if (_linkState && _linkState.updatedAt > link.linkState.updatedAt) {
+				useLinkState(link, _linkState);
 				waiting4StateChange = false; // link changed, so can submit again
 			}
 		});
 	};
-
-	if (browser) {
-		talentDB(token, key, StorageTypes.IDB).then((db: TalentDBType) => {
-			db.talents
-				.findOne(talentObj._id)
-				.exec()
-				.then((_talent) => {
-					if (_talent) {
-						talentObj = _talent;
-						talent = _talent;
-						talent.get$('currentLink').subscribe((linkId) => {
-							if (linkId) {
-								db.links
-									.findOne(linkId)
-									.exec()
-									.then((link) => {
-										if (link) useLink(link);
-									});
-							}
-						});
-					}
-				});
-		});
-	}
 
 	const updateProfileImage = async (url: string) => {
 		if (url && talent) {
@@ -237,6 +213,30 @@
 			await applyAction(result);
 		};
 	};
+
+	if (browser) {
+		talentDB(token, key, StorageTypes.IDB).then((db: TalentDBType) => {
+			db.talents
+				.findOne(talentObj._id)
+				.exec()
+				.then((_talent) => {
+					if (_talent) {
+						talentObj = _talent;
+						talent = _talent;
+						talent.get$('currentLink').subscribe((linkId) => {
+							if (linkId) {
+								db.links
+									.findOne(linkId)
+									.exec()
+									.then((link) => {
+										if (link) useLink(link);
+									});
+							}
+						});
+					}
+				});
+		});
+	}
 </script>
 
 <input type="checkbox" id="call-modal" class="modal-toggle" bind:checked={showAlert} />

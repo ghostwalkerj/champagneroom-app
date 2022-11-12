@@ -6,7 +6,6 @@ import {
 	type CallEventType
 } from '$lib/ORM/models/callEvent';
 import type { TalentDocument } from '$lib/ORM/models/talent';
-import { link } from 'fs';
 import { nanoid } from 'nanoid';
 import {
 	toTypedRxJsonSchema,

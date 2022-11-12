@@ -86,7 +86,7 @@ export const actions: import('./$types').Actions = {
 
 		const linkService = createLinkMachineService(
 			cancelLink.linkState,
-			cancelLink.updateLinkStateCallBack
+			cancelLink.updateLinkStateCallBack()
 		);
 		const currentLinkState = linkService.getSnapshot();
 
@@ -124,7 +124,7 @@ export const actions: import('./$types').Actions = {
 
 		const linkService = createLinkMachineService(
 			refundLink.linkState,
-			refundLink.updateLinkStateCallBack
+			refundLink.updateLinkStateCallBack()
 		);
 		const state = linkService.getSnapshot();
 
