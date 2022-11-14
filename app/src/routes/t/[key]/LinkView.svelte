@@ -12,14 +12,12 @@
 	export let link: LinkDocument;
 	export let linkMachineState: LinkMachineStateType;
 
-	const claim = (linkMachineState && linkMachineState.context.linkState.claim) || {
+	$: claim = (linkMachineState && linkMachineState.context.linkState.claim) || {
 		caller: '',
 		createdAt: ''
 	};
 
-	$: callerProfileImage =
-		(link && link.linkState.claim && getProfileImage(link.linkState.claim.caller)) ||
-		PUBLIC_DEFAULT_PROFILE_IMAGE;
+	$: callerProfileImage = getProfileImage(claim.caller);
 
 	$: linkURL = link && urlJoin($page.url.origin, PUBLIC_ROOM_PATH, link._id);
 

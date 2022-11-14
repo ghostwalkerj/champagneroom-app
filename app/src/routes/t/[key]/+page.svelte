@@ -230,7 +230,6 @@
 						talent = _talent;
 						talent.get$('currentLink').subscribe((linkId) => {
 							if (linkId) {
-								waiting4StateChange = false; // link changed, so can submit
 								db.links
 									.findOne(linkId)
 									.exec()
