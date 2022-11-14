@@ -1,35 +1,29 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { PUBLIC_DEFAULT_PROFILE_IMAGE, PUBLIC_ROOM_PATH } from '$env/static/public';
-	import { type LinkDocument, LinkStatus } from '$lib/ORM/models/link';
 	import { currencyFormatter } from '$lib/util/constants';
 	import getProfileImage from '$lib/util/profilePhoto';
 	import spacetime from 'spacetime';
 	import FaMoneyBillWave from 'svelte-icons/fa/FaMoneyBillWave.svelte';
 	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';
 	import urlJoin from 'url-join';
+	import type { LinkDocument } from '$lib/ORM/models/link';
+	import type { LinkMachineStateType } from '$lib/machines/linkMachine';
 	export let link: LinkDocument;
+	export let linkMachineState: LinkMachineStateType;
+
+	const claim = (linkMachineState && linkMachineState.context.linkState.claim) || {
+		caller: '',
+		createdAt: ''
+	};
+
+	$: callerProfileImage =
+		(link && link.linkState.claim && getProfileImage(link.linkState.claim.caller)) ||
+		PUBLIC_DEFAULT_PROFILE_IMAGE;
+
+	$: linkURL = link && urlJoin($page.url.origin, PUBLIC_ROOM_PATH, link._id);
 
 	let tooltipOpen = '';
-	$: callerProfileImage = PUBLIC_DEFAULT_PROFILE_IMAGE;
-	$: linkURL = '';
-	let linkState: LinkDocument['linkState'];
-
-	$: if (link) {
-		linkState = link.linkState;
-	}
-
-	$: if (link.get$)
-		link.get$('linkState').subscribe((_linkState) => {
-			linkState = _linkState;
-		});
-
-	$: if (linkState && linkState.claim) {
-		callerProfileImage = getProfileImage(linkState.claim.caller);
-	}
-
-	$: if (link) linkURL = urlJoin($page.url.origin, PUBLIC_ROOM_PATH, link._id);
-
 	const copyLink = () => {
 		navigator.clipboard.writeText(linkURL);
 		tooltipOpen = 'tooltip-open';
@@ -40,13 +34,13 @@
 <div class="bg-primary text-primary-content card">
 	<div class="text-center card-body items-center">
 		<h2 class="text-2xl card-title">Your Outstanding pCall Link</h2>
-		{#if link && linkState.status !== LinkStatus.CANCELED && linkState.status !== LinkStatus.FINALIZED}
+		{#if link && linkMachineState && !linkMachineState.done}
 			<div class="container mx-auto grid p-6 gap-4 grid-row-2">
 				<div class="text-center card-body items-center bg-secondary rounded-2xl">
 					<div class="text-xl w-full">
-						{#if linkState.status === LinkStatus.UNCLAIMED}
+						{#if linkMachineState.matches('unclaimed')}
 							Your pCall link has Not Been Claimed
-						{:else if linkState.claim}
+						{:else if linkMachineState.matches('claimed')}
 							<div class="w-full ">
 								Your pCall link was claimed by:
 								<div class="p-6 flex flex-row w-full place-content-evenly items-center">
@@ -55,9 +49,9 @@
 										style="background-image: url('{callerProfileImage}')"
 									/>
 									<div>
-										<div>{linkState.claim.caller}</div>
+										<div>{claim.caller}</div>
 										<div>on</div>
-										<div>{spacetime(linkState.claim.createdAt).format('nice-short')}</div>
+										<div>{spacetime(claim.createdAt).format('nice-short')}</div>
 									</div>
 								</div>
 							</div>
@@ -85,11 +79,11 @@
 							</div>
 							<div class="stat-title">Total Funded</div>
 							<div class="text-secondary stat-value">
-								{currencyFormatter.format(linkState.totalFunding || 0)}
+								{currencyFormatter.format(link.linkState.totalFunding || 0)}
 							</div>
 						</div>
 					</div>
-					{#if linkState.totalFunding >= link.requestedAmount}
+					{#if link.linkState.totalFunding >= link.requestedAmount}
 						<div class="text-xl pb-4">Link is Fully Funded!</div>
 					{/if}
 				</section>

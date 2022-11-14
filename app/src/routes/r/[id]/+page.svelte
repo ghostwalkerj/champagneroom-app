@@ -32,7 +32,7 @@
 
 	$: waiting4StateChange = false;
 	$: linkService = createLinkMachineService(linkObj.linkState);
-	$: linkState = linkService.initialState;
+	$: linkMachineState = linkService.initialState;
 	$: showFeedback = false;
 	$: inCall = false;
 	$: callState = callMachine.initialState;
@@ -46,7 +46,7 @@
 				if (link.linkState.updatedAt > linkObj.linkState.updatedAt) {
 					linkService = createLinkMachineService(link.linkState);
 					linkService.subscribe((state) => {
-						linkState = state;
+						linkMachineState = state;
 					});
 				}
 				linkObj = link as LinkDocument;
@@ -130,13 +130,13 @@
 					</div>
 
 					<!-- Link Claim -->
-					{#if linkState.done}
+					{#if linkMachineState.done}
 						<div class="bg-primary text-primary-content card">
 							<div class="text-center card-body items-center">
 								<h2 class="text-2xl card-title">This Link is No Longer Active</h2>
 							</div>
 						</div>
-					{:else if linkState.matches('claimed.requestedCancellation.waiting4Refund')}
+					{:else if linkMachineState.matches('claimed.requestedCancellation.waiting4Refund')}
 						<div class="bg-primary text-primary-content card">
 							<div class="text-center card-body items-center">
 								<h2 class="text-2xl card-title">
@@ -146,7 +146,7 @@
 								<div>{currencyFormatter.format(linkObj.linkState.refundedAmount)}</div>
 							</div>
 						</div>
-					{:else if linkState.can({ type: 'CLAIM', claim: undefined })}
+					{:else if linkMachineState.can({ type: 'CLAIM', claim: undefined })}
 						<div class="bg-primary text-primary-content card">
 							<div class="text-center card-body items-center">
 								<h2 class="text-2xl card-title">Claim pCall Link</h2>
@@ -203,7 +203,7 @@
 						</div>
 
 						<!-- Link Transaction -->
-					{:else if linkState.matches('claimed.waiting4Funding')}
+					{:else if linkMachineState.matches('claimed.waiting4Funding')}
 						<div class="bg-primary text-primary-content card">
 							<div class="text-center card-body items-center">
 								<h2 class="text-2xl card-title">Fund pCall Link</h2>

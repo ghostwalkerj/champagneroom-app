@@ -287,7 +287,7 @@
 				<div class="space-y-6 lg:col-start-1 lg:col-span-2">
 					<!-- Current Link -->
 					<div>
-						<LinkViewer link={currentLink} />
+						<LinkViewer link={currentLink} {linkMachineState} />
 					</div>
 
 					{#if canCancelLink}
