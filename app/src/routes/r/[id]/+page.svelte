@@ -182,13 +182,16 @@
 												<input
 													name="pin"
 													type="text"
-													class=" max-w-xs w-full py-2 pl-6 input input-bordered input-primary "
+													class="max-w-xs w-full py-2 pl-6 input input-bordered input-primary"
 													value={form?.pin ?? ''}
 													minlength="8"
 													maxlength="8"
 												/>
 												{#if form?.missingPin}<div class="shadow-lg alert alert-error">
 														Pin is required
+													</div>{/if}
+												{#if form?.invalidPin}<div class="shadow-lg alert alert-error">
+														Pin must be 8 digits
 													</div>{/if}
 											</div>
 										</div>

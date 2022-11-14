@@ -61,6 +61,10 @@ export const actions: import('./$types').Actions = {
 		if (!pin) {
 			return invalid(400, { pin, missingPin: true });
 		}
+		const isNum = /^\d+$/.test(pin);
+		if (!isNum) {
+			return invalid(400, { pin, invalidPin: true });
+		}
 
 		const claim = {
 			caller,
