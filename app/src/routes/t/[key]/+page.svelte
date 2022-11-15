@@ -94,6 +94,8 @@
 
 	const useLink = (link: LinkDocument) => {
 		currentLink = link;
+		waiting4StateChange = false; // link changed, so can submit again
+		useLinkState(link, link.linkState);
 		link.get$('linkState').subscribe((_linkState) => {
 			waiting4StateChange = false; // link changed, so can submit again
 			useLinkState(link, _linkState);
@@ -283,11 +285,9 @@
 				class="mx-auto mt-8 max-w-3xl grid gap-6 grid-cols-1 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3"
 			>
 				<div class="space-y-6 lg:col-start-1 lg:col-span-2">
-					<!-- Current Link -->
 					<div>
 						<LinkViewer link={currentLink} {linkMachineState} />
 					</div>
-
 					{#if canCancelLink}
 						<!-- Link Form-->
 						<form method="post" action="?/cancel_link" use:enhance={onSubmit}>

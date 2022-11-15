@@ -457,6 +457,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 					) {
 						timer = context.linkState.claim.call.startedAt + GRACE_PERIOD - new Date().getTime();
 					}
+					console.log('graceDelay', timer);
 					return timer > 0 ? timer : 0;
 				},
 				escrowDelay: (context) => {
