@@ -115,8 +115,13 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 						},
 						canCall: {
 							tags: 'connect2VC',
+							initial: 'neverConnected',
 							states: {
 								neverConnected: {
+									always: {
+										target: 'inGracePeriod',
+										cond: 'gracePeriodStarted'
+									},
 									on: {
 										'REQUEST CANCELLATION': {
 											target: '#linkMachine.claimed.requestedCancellation',
@@ -152,15 +157,6 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 									}
 								}
 							},
-							always: [
-								{
-									target: '.neverConnected',
-									cond: 'neverConnected'
-								},
-								{
-									target: '.inGracePeriod'
-								}
-							],
 							on: {
 								'CALL EVENT RECEIVED': {
 									actions: ['receiveCallEvent', 'saveLinkState']
@@ -479,12 +475,12 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 					context.linkState.status === LinkStatus.CANCELLATION_REQUESTED,
 				fullyFunded: (context) =>
 					context.linkState.totalFunding >= context.linkState.requestedFunding,
-				neverConnected: (context) => {
+				gracePeriodStarted: (context) => {
 					return (
 						context.linkState.status === LinkStatus.CLAIMED &&
 						context.linkState.claim !== undefined &&
-						(context.linkState.claim.call === undefined ||
-							context.linkState.claim.call.startedAt === undefined)
+						context.linkState.claim.call !== undefined &&
+						context.linkState.claim.call.startedAt !== undefined
 					);
 				}
 			}

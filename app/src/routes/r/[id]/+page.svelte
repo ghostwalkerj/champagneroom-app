@@ -16,7 +16,7 @@
 	import { onMount } from 'svelte';
 	import { PhoneOutgoingIcon } from 'svelte-feather-icons';
 	import type { PageData } from './$types';
-	import FeedbackForm from './FeedbackForm.svelte';
+	import CallEnded from './CallEnded.svelte';
 	import LinkDetail from './LinkDetail.svelte';
 
 	export let form: import('./$types').ActionData;
@@ -34,7 +34,7 @@
 	$: waiting4StateChange = false;
 	$: linkService = createLinkMachineService(linkObj.linkState);
 	$: linkMachineState = linkService.initialState;
-	$: showFeedback = false;
+	$: showCallEnded = false;
 	$: inCall = false;
 	$: callState = callMachine.initialState;
 	$: userstream = false;
@@ -139,7 +139,7 @@
 	</div>
 </div>
 
-<FeedbackForm {showFeedback} />
+<CallEnded {showCallEnded} />
 
 <div class="min-h-full">
 	<main class="py-6">

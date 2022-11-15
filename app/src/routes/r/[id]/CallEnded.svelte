@@ -1,8 +1,8 @@
 <script lang="ts">
-	export let showFeedback = false;
+	export let showCallEnded = false;
 </script>
 
-<input type="checkbox" id="feedback-modal" class="modal-toggle" bind:checked={showFeedback} />
+<input type="checkbox" id="callended-modal" class="modal-toggle" bind:checked={showCallEnded} />
 <div class="modal">
 	<div class="modal-box">
 		<div class="flex flex-row pt-4 gap-2 place-items-center justify-between">

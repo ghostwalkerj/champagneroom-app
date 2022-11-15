@@ -299,9 +299,9 @@
 										If you cancel this pCall link, the link will be deactivated and nobody can use
 										it to call.
 									</div>
-									{#if currentLink.linkState.claim && currentLink.linkState.totalFunding > 0}
-										{currencyFormatter.format(currentLink.linkState.totalFunding)} will be refunded to
-										"{currentLink.linkState.claim.caller}"
+									{#if linkMachineState.context.linkState.totalFunding > 0}
+										{currencyFormatter.format(linkMachineState.context.linkState.totalFunding)} will
+										be refunded to "{linkMachineState.context.linkState.claim?.caller}"
 									{/if}
 
 									<div class="flex flex-col text-white p-2 justify-center items-center">
@@ -372,8 +372,8 @@
 											<!-- svelte-ignore a11y-label-has-associated-control -->
 											<label for="price" class="label">
 												<span class="label-text"
-													>Refund {currentLink.linkState.claim &&
-														currentLink.linkState.claim.caller}</span
+													>Refund {linkMachineState.context.linkState.claim &&
+														linkMachineState.context.linkState.claim.caller}</span
 												></label
 											>
 											<div class="rounded-md shadow-sm mt-1 relative">
