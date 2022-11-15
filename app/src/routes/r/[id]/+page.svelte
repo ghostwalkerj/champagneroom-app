@@ -14,6 +14,7 @@
 	import { userStream, type UserStreamType } from '$lib/util/userStream';
 	import type { VideoCallType } from '$lib/util/videoCall';
 	import { onMount } from 'svelte';
+	import { PhoneOutgoingIcon } from 'svelte-feather-icons';
 	import type { PageData } from './$types';
 	import FeedbackForm from './FeedbackForm.svelte';
 	import LinkDetail from './LinkDetail.svelte';
@@ -38,6 +39,7 @@
 	$: callState = callMachine.initialState;
 	$: userstream = false;
 	$: profileImage = getProfileImage(displayName);
+	$: showCallModal = false;
 
 	publicDB(token, linkId, StorageTypes.IDB).then((db: PublicDBType) => {
 		db.links.findOne(linkId).$.subscribe((link) => {
@@ -81,6 +83,8 @@
 					callState = state;
 					console.log('callState', JSON.stringify(callState.value));
 					inCall = callState.matches('inCall');
+					showCallModal = callState.matches('makingCall');
+					console.log('showCallModal', showCallModal);
 				});
 			});
 		}
@@ -104,12 +108,37 @@
 		};
 	};
 
+	const cancelCall = () => {
+		if (vc) {
+			vc.cancelCall();
+		}
+	};
+
 	// Wait for onMount to grab user Stream only if we plan to call or do we grab to to make sure it works?
 	onMount(async () => {
 		requestStream();
 		initVC();
 	});
 </script>
+
+<input type="checkbox" id="outgoingcall-modal" class="modal-toggle" bind:checked={showCallModal} />
+<div class="modal">
+	<div class="modal-box">
+		<div class="flex flex-row pt-4 gap-2 place-items-center justify-between">
+			<div class="font-bold text-lg  ">Making pCall</div>
+			<div class="h-14 animate-shock animate-loop w-14 animated  btn btn-circle ">
+				<PhoneOutgoingIcon size="34" />
+			</div>
+		</div>
+		<p class="py-4">
+			You are calling <span class="font-bold">{linkObj.talentInfo.name}</span>
+		</p>
+		<div class="modal-action">
+			<!-- svelte-ignore a11y-click-events-have-key-events -->
+			<label for="call-modal" class="btn" on:click={cancelCall}>Cancel</label>
+		</div>
+	</div>
+</div>
 
 <FeedbackForm {showFeedback} />
 
@@ -242,7 +271,7 @@
 							</div>
 						</div>
 						<!-- Call -->
-					{:else}
+					{:else if linkMachineState.matches('claimed.canCall')}
 						<div class="text-center pb-6  w-full">
 							<button
 								class="btn btn-secondary"

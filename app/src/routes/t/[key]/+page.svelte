@@ -40,7 +40,7 @@
 	let linkSub: Subscription;
 
 	$: ready4Call = false;
-	$: showAlert = false;
+	$: showCallModal = false;
 	$: inCall = false;
 	let us: Awaited<UserStreamType>;
 	let callState = callMachine.initialState;
@@ -124,7 +124,7 @@
 	};
 
 	const answerCall = () => {
-		showAlert = false;
+		showCallModal = false;
 		vc.acceptCall(mediaStream);
 	};
 
@@ -184,7 +184,7 @@
 				if (cs) {
 					callState = cs;
 					if (cs.changed) {
-						showAlert = callState.matches('receivingCall');
+						showCallModal = callState.matches('receivingCall');
 						inCall = callState.matches('inCall');
 						ready4Call = callState.matches('ready4Call');
 					}
@@ -244,7 +244,7 @@
 	}
 </script>
 
-<input type="checkbox" id="call-modal" class="modal-toggle" bind:checked={showAlert} />
+<input type="checkbox" id="incomingcall-modal" class="modal-toggle" bind:checked={showCallModal} />
 <div class="modal">
 	<div class="modal-box">
 		<div class="flex flex-row pt-4 gap-2 place-items-center justify-between">
