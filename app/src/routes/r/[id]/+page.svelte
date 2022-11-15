@@ -84,7 +84,6 @@
 					console.log('callState', JSON.stringify(callState.value));
 					inCall = callState.matches('inCall');
 					showCallModal = callState.matches('makingCall');
-					console.log('showCallModal', showCallModal);
 				});
 			});
 		}
