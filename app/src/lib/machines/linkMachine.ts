@@ -118,18 +118,32 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 							initial: 'neverConnected',
 							states: {
 								neverConnected: {
-									always: {
-										target: 'inGracePeriod',
-										cond: 'gracePeriodStarted'
-									},
+									always: [
+										{
+											target: 'inGracePeriod',
+											cond: 'inGracePeriod'
+										},
+										{
+											target: 'connected',
+											cond: 'callConnected'
+										}
+									],
 									on: {
 										'REQUEST CANCELLATION': {
 											target: '#linkMachine.claimed.requestedCancellation',
 											actions: ['requestCancellation', 'saveLinkState']
 										},
 										'CALL CONNECTED': {
-											target: 'inGracePeriod',
+											target: 'connected',
 											actions: ['startCall', 'saveLinkState']
+										}
+									}
+								},
+								connected: {
+									on: {
+										'CALL DISCONNECTED': {
+											actions: ['endCall', 'saveLinkState'],
+											target: 'inGracePeriod'
 										}
 									}
 								},
@@ -137,19 +151,18 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 									after: {
 										graceDelay: {
 											target: '#linkMachine.inEscrow',
-											actions: [],
+											actions: ['enterEscrow', 'saveLinkState'],
 											internal: false
 										}
 									},
 									on: {
 										'FEEDBACK RECEIVED': {
 											target: '#linkMachine.finalized',
-											actions: ['receiveFeedback', 'saveLinkState']
+											actions: ['receiveFeedback', 'finalizeLink', 'saveLinkState']
 										},
 										'CALL CONNECTED': {},
-										'CALL DISCONNECTED': {
-											actions: ['endCall', 'saveLinkState']
-										},
+										'CALL DISCONNECTED': { actions: ['endCall', 'saveLinkState'] },
+
 										'DISPUTE INITIATED': {
 											target: '#linkMachine.inDispute',
 											actions: ['initiateDispute', 'saveLinkState']
@@ -187,23 +200,20 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 					type: 'final'
 				},
 				finalized: {
-					entry: ['finalizeLink', 'saveLinkState'],
 					type: 'final'
 				},
 				inEscrow: {
-					entry: ['enterEscrow', 'saveLinkState'],
-					exit: ['exitEscrow', 'saveLinkState'],
 					after: {
 						escrowDelay: {
 							target: '#linkMachine.finalized',
-							actions: [],
+							actions: ['exitEscrow', 'finalizeLink', 'saveLinkState'],
 							internal: false
 						}
 					},
 					on: {
 						'FEEDBACK RECEIVED': {
 							target: 'finalized',
-							actions: ['receiveFeedback', 'saveLinkState']
+							actions: ['receiveFeedback', 'exitEscrow', 'finalizeLink', 'saveLinkState']
 						},
 						'DISPUTE INITIATED': {
 							target: 'inDispute',
@@ -242,7 +252,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 					if (context.linkState.claim) {
 						const call = {
 							...context.linkState.claim.call,
-							startTime: Date.now()
+							startedAt: Date.now()
 						};
 						return {
 							linkState: {
@@ -475,12 +485,21 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 					context.linkState.status === LinkStatus.CANCELLATION_REQUESTED,
 				fullyFunded: (context) =>
 					context.linkState.totalFunding >= context.linkState.requestedFunding,
-				gracePeriodStarted: (context) => {
+				callConnected: (context) => {
 					return (
 						context.linkState.status === LinkStatus.CLAIMED &&
 						context.linkState.claim !== undefined &&
 						context.linkState.claim.call !== undefined &&
 						context.linkState.claim.call.startedAt !== undefined
+					);
+				},
+				inGracePeriod: (context) => {
+					return (
+						context.linkState.status === LinkStatus.CLAIMED &&
+						context.linkState.claim !== undefined &&
+						context.linkState.claim.call !== undefined &&
+						context.linkState.claim.call.startedAt !== undefined &&
+						context.linkState.claim.call.endedAt !== undefined
 					);
 				}
 			}

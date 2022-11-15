@@ -94,7 +94,6 @@
 
 	const useLink = (link: LinkDocument) => {
 		currentLink = link;
-		useLinkState(link, link.linkState);
 		link.get$('linkState').subscribe((_linkState) => {
 			waiting4StateChange = false; // link changed, so can submit again
 			useLinkState(link, _linkState);
