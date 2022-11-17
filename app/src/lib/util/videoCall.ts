@@ -2,7 +2,7 @@ import { PUBLIC_CALL_TIMEOUT } from '$env/static/public';
 import callMachine from '$lib/machines/callMachine';
 import { Peer } from 'peerjs';
 import { readable, writable } from 'svelte/store';
-import { interpret } from 'xstate';
+import { interpret, type EventObject } from 'xstate';
 
 const CALL_TIMEOUT = Number.parseInt(PUBLIC_CALL_TIMEOUT || '30000');
 
@@ -28,19 +28,19 @@ export const videoCall = (userId?: string) => {
 		});
 	});
 
-	const _callState = writable(callMachine.initialState);
-	const callState = readable(callMachine.initialState, (set) => {
-		_callState.subscribe((state) => {
+	const _callMachineState = writable(callMachine.initialState);
+	const callMachineState = readable(callMachine.initialState, (set) => {
+		_callMachineState.subscribe((state) => {
 			set(state);
 		});
 	});
 
 	callService.onTransition((state) => {
-		_callState.set(state);
+		_callMachineState.set(state);
 	});
 
-	const _callEvent = writable(callMachine.initialState.event);
-	const callEvent = readable(callMachine.initialState.event, (set) => {
+	const _callEvent = writable<EventObject>(callMachine.initialState.event);
+	const callEvent = readable<EventObject>(callMachine.initialState.event, (set) => {
 		_callEvent.subscribe((event) => {
 			set(event);
 		});
@@ -52,7 +52,6 @@ export const videoCall = (userId?: string) => {
 	});
 
 	const connect2PeerServer = (userId?: string) => {
-		console.log('connect2PeerServer: ', userId);
 		callService.send({ type: 'CONNECT PEER SERVER' });
 		return userId ? new Peer(userId, { debug: 1 }) : new Peer({ debug: 1 });
 	};
@@ -220,7 +219,7 @@ export const videoCall = (userId?: string) => {
 		hangUp,
 		rejectCall,
 		cancelCall,
-		callState,
+		callMachineState,
 		callEvent,
 		remoteStream,
 		callerName,

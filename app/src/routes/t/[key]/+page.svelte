@@ -43,8 +43,8 @@
 	$: showCallModal = false;
 	$: inCall = false;
 	let us: Awaited<UserStreamType>;
-	let callState = callMachine.initialState;
-	let callEvent = callState.event;
+	let callMachineState = callMachine.initialState;
+	let callEvent = callMachineState.event;
 	let mediaStream: MediaStream;
 	$: callerName = '';
 	let videoCall: any;
@@ -84,7 +84,7 @@
 						connectedCallId = currentLink.callId;
 						initVC(currentLink.callId);
 					}
-				} else if (vc && !callState.done) {
+				} else if (vc && !callMachineState.done) {
 					connectedCallId = '';
 					vc.destroy();
 				}
@@ -180,14 +180,14 @@
 				}
 			});
 
-			vc.callState.subscribe((cs) => {
+			vc.callMachineState.subscribe((cs) => {
 				// Logic for all of the possible call states
 				if (cs) {
-					callState = cs;
+					callMachineState = cs;
 					if (cs.changed) {
-						showCallModal = callState.matches('receivingCall');
-						inCall = callState.matches('inCall');
-						ready4Call = callState.matches('ready4Call');
+						showCallModal = callMachineState.matches('receivingCall');
+						inCall = callMachineState.matches('inCall');
+						ready4Call = callMachineState.matches('ready4Call');
 					}
 				}
 			});
@@ -437,7 +437,7 @@
 								{:else}
 									<p>Signed in as {talentObj.name}</p>
 								{/if}
-								<p>Call State: {callState.value}</p>
+								<p>Call State: {callMachineState.value}</p>
 								{#if linkMachineState}<p>
 										Link State:{JSON.stringify(linkMachineState.value)}
 									</p>{/if}

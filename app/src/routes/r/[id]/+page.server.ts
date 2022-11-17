@@ -165,5 +165,66 @@ export const actions: import('./$types').Actions = {
 		});
 
 		return { success: true };
+	},
+	feedback: async ({ params, request }) => {
+		const linkId = params.id;
+		const data = await request.formData();
+		const caller = data.get('caller') as string;
+		const pin = data.get('pin') as string;
+
+		if (!caller) {
+			return invalid(400, { caller, missingCaller: true });
+		}
+		if (!pin) {
+			return invalid(400, { pin, missingPin: true });
+		}
+		const isNum = /^\d+$/.test(pin);
+		if (!isNum) {
+			return invalid(400, { pin, invalidPin: true });
+		}
+
+		const claim = {
+			caller,
+			pin,
+			createdAt: new Date().getTime(),
+			call: {}
+		} as NonNullable<LinkDocument['linkState']['claim']>;
+
+		const token = jwt.sign(
+			{
+				exp: Math.floor(Date.now() / 1000) + Number.parseInt(JWT_EXPIRY),
+				sub: JWT_CREATOR_USER
+			},
+			JWT_SECRET
+		);
+
+		const db = await apiDB(token, linkId, StorageTypes.NODE_WEBSQL);
+		if (!db) {
+			throw error(500, 'no db');
+		}
+
+		const link = await db.links.findOne(linkId).exec();
+		if (!link) {
+			return error(404, 'Link not found');
+		}
+
+		const linkService = createLinkMachineService(link.linkState, link.updateLinkStateCallBack());
+
+		const state = linkService.getSnapshot();
+		if (
+			!state.can({
+				type: 'CLAIM',
+				claim
+			})
+		) {
+			return error(400, 'Link cannot be claimed');
+		}
+
+		linkService.send({
+			type: 'CLAIM',
+			claim
+		});
+
+		return { success: true };
 	}
 };

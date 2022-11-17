@@ -43,7 +43,7 @@
 		options
 	);
 
-	const callState = vc.callState;
+	const callMachineState = vc.callMachineState;
 	const micMachine = useMachine(us.micMachine);
 	const micState = micMachine.state;
 	const camMachine = useMachine(us.camMachine);
@@ -164,12 +164,12 @@
 		class="flex bg-base-100 flex-shrink-0 p-4 gap-4 items-center justify-center md:rounded-2xl md:gap-8 dark:bg-dark-eval-1"
 	>
 		<div class="flex flex-col gap-2 items-center">
-			{#if $callState.matches('ready4Call')}
+			{#if $callMachineState.matches('ready4Call')}
 				<button disabled={!buttonOptions.makeCall} class="h-14 w-14 btn btn-circle">
 					<PhoneIcon size="34" />
 				</button>
 				Call
-			{:else if $callState.matches('makingCall')}
+			{:else if $callMachineState.matches('makingCall')}
 				<button
 					class="h-14 animate-flash animate-loop w-14 animated  btn btn-circle"
 					disabled={!buttonOptions.makeCall}
@@ -177,7 +177,7 @@
 					<PhoneOutgoingIcon size="34" />
 				</button>
 				Waiting
-			{:else if $callState.matches('receivingCall')}
+			{:else if $callMachineState.matches('receivingCall')}
 				<button
 					class="h-14 animate-shock animate-loop w-14 animated  btn btn-circle"
 					on:click={() => vc.acceptCall(mediaStream)}
@@ -219,7 +219,7 @@
 		</div>
 
 		<div class="flex flex-col gap-2 items-center">
-			{#if $callState.matches('receivingCall')}
+			{#if $callMachineState.matches('receivingCall')}
 				<button
 					class="h-14 w-14 btn-primary btn btn-circle"
 					on:click={() => vc.rejectCall()}
@@ -228,7 +228,7 @@
 					<PhoneMissedIcon size="34" />
 				</button>
 				Reject
-			{:else if $callState.matches('makingCall')}
+			{:else if $callMachineState.matches('makingCall')}
 				<button
 					class="h-14 w-14 btn btn-circle btn-primary"
 					on:click={() => vc.cancelCall()}
@@ -237,7 +237,7 @@
 					<PhoneMissedIcon size="34" />
 				</button>
 				Cancel
-			{:else if $callState.matches('inCall')}
+			{:else if $callMachineState.matches('inCall')}
 				<button
 					class="h-14 w-14 btn btn-circle btn-primary"
 					on:click={() => vc.hangUp()}
@@ -258,7 +258,7 @@
 			{/if}
 		</div>
 	</section>
-	Call State: {JSON.stringify($callState['value'] || '')} <br />
+	Call State: {JSON.stringify($callMachineState['value'] || '')} <br />
 </div>
 
 <style>

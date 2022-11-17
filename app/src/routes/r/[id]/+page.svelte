@@ -35,7 +35,7 @@
 	$: linkService = createLinkMachineService(link.linkState);
 	$: linkMachineState = linkService.initialState;
 	$: inCall = false;
-	$: callState = callMachine.initialState;
+	$: callMachineState = callMachine.initialState;
 	$: userstream = false;
 	$: profileImage = getProfileImage(displayName);
 	$: showCallModal = false;
@@ -76,11 +76,10 @@
 				//TODO: Should we wait until call is paid to connect?  Or connect early to check for errors?
 				videoCall = _vc.videoCall;
 				vc = videoCall();
-				vc.callState.subscribe((state) => {
-					callState = state;
-					console.log('callState', JSON.stringify(callState.value));
-					inCall = callState.matches('inCall');
-					showCallModal = callState.matches('makingCall');
+				vc.callMachineState.subscribe((state) => {
+					callMachineState = state;
+					inCall = callMachineState.matches('inCall');
+					showCallModal = callMachineState.matches('makingCall');
 				});
 			});
 		}
@@ -116,7 +115,14 @@
 		initVC();
 	});
 
-	$: showCallEnded = !inCall && linkMachineState && linkMachineState.hasTag('callerCanInteract');
+	$: showCallEnded =
+		true || (!inCall && linkMachineState && linkMachineState.hasTag('callerCanInteract'));
+	$: canCall =
+		linkMachineState &&
+		callMachineState &&
+		linkMachineState.matches('claimed.canCall') &&
+		callMachineState.matches('ready4Call') &&
+		userstream;
 </script>
 
 <input type="checkbox" id="outgoingcall-modal" class="modal-toggle" bind:checked={showCallModal} />
@@ -138,7 +144,7 @@
 	</div>
 </div>
 
-<CallEnded {showCallEnded} {link} {linkMachineState} />
+<CallEnded {showCallEnded} {link} {canCall} />
 
 <div class="min-h-full">
 	<main class="py-6">
@@ -270,12 +276,12 @@
 						</div>
 
 						<!-- Call -->
-					{:else if linkMachineState.matches('claimed.canCall')}
+					{:else if canCall}
 						<div class="text-center pb-6  w-full">
 							<button
 								class="btn btn-secondary"
 								on:click={call}
-								disabled={!callState.matches('ready4Call') || !userstream}
+								disabled={!callMachineState.matches('ready4Call') || !userstream}
 							>
 								Call {link.talentInfo.name} Now</button
 							>
@@ -304,7 +310,7 @@
 								</div>
 							{/if}
 						</div>
-						Call State: {callState.value}
+						Call State: {callMachineState.value}
 					</div>
 				</div>
 			</div>

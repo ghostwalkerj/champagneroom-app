@@ -1,13 +1,11 @@
 <script lang="ts">
-	import { graceTimer, LinkMachineStateType } from '$lib/machines/linkMachine';
 	import type { LinkDocType } from '$lib/ORM/models/link';
 
 	export let showCallEnded = false;
 	export let link: LinkDocType;
-	export let linkMachineState: LinkMachineStateType;
+	export let canCall = false;
 
-	const canCallTimer = graceTimer(linkMachineState.context.linkState.claim?.call?.startedAt || 0);
-	$: minutesCanCall = Math.floor(canCallTimer / (1000 * 60));
+	let rating = 0;
 
 	const closeModal = () => {
 		showCallEnded = false;
@@ -19,25 +17,74 @@
 	<div class="modal-box card w-96 bg-neutral text-neutral-content">
 		<div class="card-body items-center text-center">
 			<h2 class="card-title">How was your pCall?</h2>
-			<div class="flex flex-col w-full border-opacity-50">
-				<div class="grid h-20 card bg-base-300 rounded-box place-items-center">
-					You can still reconnect with {link.talentInfo.name} for
+			<form method="post" action="?/feedback">
+				<div class="flex flex-col ">
+					<div class="rating">
+						<input
+							type="radio"
+							name="rating-1"
+							class="rating-hidden"
+							checked
+							on:change={() => {
+								rating = 0;
+							}}
+						/>
+
+						<input
+							type="radio"
+							name="rating-1"
+							on:change={() => {
+								rating = 1;
+							}}
+							class="mask mask-star"
+						/>
+						<input
+							type="radio"
+							name="rating-1"
+							class="mask mask-star"
+							on:change={() => {
+								rating = 2;
+							}}
+						/>
+						<input
+							type="radio"
+							name="rating-1"
+							class="mask mask-star"
+							on:change={() => {
+								rating = 3;
+							}}
+						/>
+						<input
+							type="radio"
+							name="rating-1"
+							class="mask mask-star"
+							on:change={() => {
+								rating = 4;
+							}}
+						/>
+						<input
+							type="radio"
+							name="rating-1"
+							class="mask mask-star"
+							on:change={() => {
+								rating = 5;
+							}}
+						/>
+					</div>
 					<div>
-						<span class="countdown font-mono text-4xl">
-							{minutesCanCall}
-						</span>
+						<input type="text" placeholder="Review" class="input w-full max-w-xs" />
+					</div>
+					<div>
+						<button class="btn btn-secondary" type="submit">Leave Feedback</button>
 					</div>
 				</div>
-				<div class="divider">OR</div>
-				<div class="grid h-20 card bg-base-300 rounded-box place-items-center">Leave Feedback</div>
-				<div class="divider">OR</div>
-				<div class="grid h-20 card bg-base-300 rounded-box place-items-center">
-					Intiate a Dispute
-				</div>
-			</div>
-			<div class="card-actions justify-end">
-				<button class="btn btn-secondary" on:click={closeModal}>Close</button>
-			</div>
+			</form>
+			<div class="divider">OR</div>
+			<button class="btn btn-secondary" disabled={true}>Initiate Dispute</button>
+			<div class="divider">OR</div>
+			<button class="btn btn-secondary" disabled={!canCall}>
+				Call {link.talentInfo.name} Again</button
+			>
 		</div>
 	</div>
 </div>
