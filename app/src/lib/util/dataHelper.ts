@@ -76,7 +76,7 @@ const generateLinks = (talent: TalentDocument, count: number) => {
 			linkState: {
 				status: LinkStatus.FINALIZED,
 				totalFunding: amount,
-				requestedFunding: amount,
+				requestedAmount: amount,
 				refundedAmount: 0,
 				finalized: {
 					endedAt: endedAt.epoch

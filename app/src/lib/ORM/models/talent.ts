@@ -135,7 +135,7 @@ export const talentDocMethods: TalentDocMethods = {
 				status: LinkStatus.UNCLAIMED,
 				totalFunding: 0,
 				refundedAmount: 0,
-				requestedFunding: requestedAmount,
+				requestedAmount,
 				updatedAt: new Date().getTime()
 			},
 			requestedAmount,

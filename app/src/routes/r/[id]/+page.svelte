@@ -23,7 +23,7 @@
 	export let data: PageData;
 
 	const token = data.token;
-	let linkObj = data.link;
+	let link = data.link;
 	let displayName = data.displayName;
 	let linkId = $page.params.id;
 	let vc: VideoCallType;
@@ -32,9 +32,8 @@
 	let us: Awaited<UserStreamType>;
 
 	$: waiting4StateChange = false;
-	$: linkService = createLinkMachineService(linkObj.linkState);
+	$: linkService = createLinkMachineService(link.linkState);
 	$: linkMachineState = linkService.initialState;
-	$: showCallEnded = false;
 	$: inCall = false;
 	$: callState = callMachine.initialState;
 	$: userstream = false;
@@ -42,18 +41,16 @@
 	$: showCallModal = false;
 
 	publicDB(token, linkId, StorageTypes.IDB).then((db: PublicDBType) => {
-		db.links.findOne(linkId).$.subscribe((link) => {
-			if (link) {
+		db.links.findOne(linkId).$.subscribe((_link) => {
+			if (_link) {
 				// Here is where we run the machine and do all the logic based on the state
-				if (link.linkState.updatedAt > linkObj.linkState.updatedAt) {
-					linkService = createLinkMachineService(link.linkState);
-					linkService.subscribe((state) => {
-						linkMachineState = state;
-					});
-				}
-				linkObj = link as LinkDocument;
-				waiting4StateChange = false;
+				linkService = createLinkMachineService(_link.linkState);
+				linkService.subscribe((state) => {
+					linkMachineState = state;
+				});
 			}
+			link = _link as LinkDocument;
+			waiting4StateChange = false;
 		});
 	});
 
@@ -91,7 +88,7 @@
 
 	const call = async () => {
 		if (vc) {
-			vc.makeCall(linkObj.callId, linkObj.linkState.claim?.caller ?? 'Anonymous', mediaStream);
+			vc.makeCall(link.callId, link.linkState.claim?.caller ?? 'Anonymous', mediaStream);
 		}
 	};
 
@@ -118,6 +115,8 @@
 		requestStream();
 		initVC();
 	});
+
+	$: showCallEnded = !inCall && linkMachineState && linkMachineState.hasTag('callerCanInteract');
 </script>
 
 <input type="checkbox" id="outgoingcall-modal" class="modal-toggle" bind:checked={showCallModal} />
@@ -130,7 +129,7 @@
 			</div>
 		</div>
 		<p class="py-4">
-			You are calling <span class="font-bold">{linkObj.talentInfo.name}</span>
+			You are calling <span class="font-bold">{link.talentInfo.name}</span>
 		</p>
 		<div class="modal-action">
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -139,7 +138,7 @@
 	</div>
 </div>
 
-<CallEnded {showCallEnded} />
+<CallEnded {showCallEnded} {link} {linkMachineState} />
 
 <div class="min-h-full">
 	<main class="py-6">
@@ -154,7 +153,7 @@
 			>
 				<div class="rounded-box h-full bg-base-200">
 					<div>
-						<LinkDetail link={linkObj} />
+						<LinkDetail {link} />
 					</div>
 
 					<!-- Link Claim -->
@@ -171,7 +170,7 @@
 									This Link has been Cancelled. Refund is pending.
 								</h2>
 								<div>Refunded Amount</div>
-								<div>{currencyFormatter.format(linkObj.linkState.refundedAmount)}</div>
+								<div>{currencyFormatter.format(link.linkState.refundedAmount)}</div>
 							</div>
 						</div>
 					{:else if linkMachineState.can({ type: 'CLAIM', claim: undefined })}
@@ -269,6 +268,7 @@
 								</div>
 							</div>
 						</div>
+
 						<!-- Call -->
 					{:else if linkMachineState.matches('claimed.canCall')}
 						<div class="text-center pb-6  w-full">
@@ -277,7 +277,7 @@
 								on:click={call}
 								disabled={!callState.matches('ready4Call') || !userstream}
 							>
-								Call {linkObj.talentInfo.name} Now</button
+								Call {link.talentInfo.name} Now</button
 							>
 						</div>
 					{/if}

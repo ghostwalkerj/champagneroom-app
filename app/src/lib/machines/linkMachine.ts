@@ -12,6 +12,11 @@ type LinkStateType = LinkDocType['linkState'];
 
 type StateCallBackType = (state: LinkStateType) => void;
 
+export const graceTimer = (timerStart: number) => {
+	const timer = timerStart + GRACE_PERIOD - new Date().getTime();
+	return timer > 0 ? timer : 0;
+};
+
 export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCallBackType) => {
 	const stateCallback = saveState;
 
@@ -148,6 +153,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 									}
 								},
 								inGracePeriod: {
+									tags: 'callerCanInteract',
 									after: {
 										graceDelay: {
 											target: '#linkMachine.inEscrow',
@@ -203,6 +209,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 					type: 'final'
 				},
 				inEscrow: {
+					tags: 'callerCanInteract',
 					after: {
 						escrowDelay: {
 							target: '#linkMachine.finalized',
@@ -327,7 +334,6 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 						linkState: {
 							...context.linkState,
 							updatedAt: new Date().getTime(),
-
 							status: LinkStatus.CANCELED
 						}
 					};
@@ -380,7 +386,6 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 						linkState: {
 							...context.linkState,
 							updatedAt: new Date().getTime(),
-
 							feedback: event.feedback
 						}
 					};
@@ -390,6 +395,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 					return {
 						linkState: {
 							...context.linkState,
+							updatedAt: new Date().getTime(),
 							status: LinkStatus.IN_DISPUTE,
 							dispute: event.dispute
 						}
@@ -455,7 +461,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 						context.linkState.claim.call &&
 						context.linkState.claim.call.startedAt
 					) {
-						timer = context.linkState.claim.call.startedAt + GRACE_PERIOD - new Date().getTime();
+						timer = graceTimer(context.linkState.claim.call.startedAt);
 					}
 					console.log('graceDelay', timer);
 					return timer > 0 ? timer : 0;
@@ -485,7 +491,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 				linkInCancellationRequested: (context) =>
 					context.linkState.status === LinkStatus.CANCELLATION_REQUESTED,
 				fullyFunded: (context) =>
-					context.linkState.totalFunding >= context.linkState.requestedFunding,
+					context.linkState.totalFunding >= context.linkState.requestedAmount,
 				callConnected: (context) => {
 					return (
 						context.linkState.status === LinkStatus.CLAIMED &&

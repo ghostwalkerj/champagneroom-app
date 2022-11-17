@@ -156,7 +156,7 @@ const linkSchemaLiteral = {
 					minimum: 0,
 					maximum: 99999
 				},
-				requestedFunding: {
+				requestedAmount: {
 					type: 'integer',
 					default: 0,
 					minimum: 0,
@@ -273,7 +273,7 @@ const linkSchemaLiteral = {
 				},
 				updatedAt: { type: 'integer' }
 			},
-			required: ['status', 'totalFunding', 'requestedFunding', 'refundedAmount', 'updatedAt']
+			required: ['status', 'totalFunding', 'requestedAmount', 'refundedAmount', 'updatedAt']
 		},
 		talentInfo: {
 			type: 'object',
