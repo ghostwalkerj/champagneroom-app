@@ -1,11 +1,8 @@
-import daisyui from 'daisyui';
-import inter from 'tailwindcss-font-inter';
-import { defineConfig } from 'windicss/helpers';
-import typography from 'windicss/plugin/typography';
 
-export default defineConfig({
-	content: ['./src/**/*.{html,js,svelte,ts}'],
-	theme: {
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: ['./src/**/*.{html,js,svelte,ts}'],
+ 	theme: {
 		extend: {},
 		screens: {
 			'2sx': '300px',
@@ -23,8 +20,8 @@ export default defineConfig({
 			'8xl': '4500px'
 		}
 	},
-	plugins: [daisyui, inter, typography],
-	daisyui: {
+  plugins: [require("daisyui"), require('tailwindcss-font-inter'), require('@tailwindcss/typography')],
+  	daisyui: {
 		styled: true,
 		base: true,
 		utils: true,
@@ -55,4 +52,4 @@ export default defineConfig({
 			}
 		]
 	}
-});
+}

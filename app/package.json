@@ -20,6 +20,7 @@
 		"@sveltejs/adapter-auto": "^1.0.0-next.65",
 		"@sveltejs/adapter-node": "^1.0.0-next.88",
 		"@sveltejs/kit": "^1.0.0-next.529",
+		"@tailwindcss/typography": "^0.5.8",
 		"@typechain/ethers-v5": "^10.1.0",
 		"@types/express": "^4.17.13",
 		"@types/jsonwebtoken": "^8.5.8",
@@ -34,6 +35,7 @@
 		"@typescript-eslint/eslint-plugin": "^5.30.5",
 		"@typescript-eslint/parser": "^5.30.5",
 		"@vitejs/plugin-basic-ssl": "^0.1.1",
+		"autoprefixer": "^10.4.13",
 		"daisyui": "^2.38.0",
 		"eslint": "^8.19.0",
 		"eslint-config-prettier": "^8.5.0",
@@ -45,6 +47,7 @@
 		"eslint-plugin-svelte3": "^4.0.0",
 		"filedrop-svelte": "^0.1.2",
 		"install-peers": "^1.0.4",
+		"postcss": "^8.4.19",
 		"prettier": "^2.7.1",
 		"prettier-plugin-solidity": "^1.0.0-beta.19",
 		"prettier-plugin-svelte": "^2.7.0",
@@ -55,12 +58,12 @@
 		"svelte-icons": "^2.1.0",
 		"svelte-moveable": "^0.22.0",
 		"svelte-preprocess": "^4.10.7",
+		"tailwindcss": "^3.2.4",
 		"tailwindcss-font-inter": "^3.0.1",
 		"ts-node": "^10.8.2",
 		"tslib": "^2.4.0",
 		"typescript": "^4.7.4",
-		"vite": "^3.2.3",
-		"vite-plugin-windicss": "^1.8.7"
+		"vite": "^3.2.3"
 	},
 	"type": "module",
 	"dependencies": {
