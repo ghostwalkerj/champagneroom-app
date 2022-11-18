@@ -9,6 +9,8 @@ import { mensNames } from '$lib/util/mensNames';
 import { error, invalid } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import { uniqueNamesGenerator } from 'unique-names-generator';
+type LinkStateType = LinkDocType['linkState'];
+
 export const load: import('./$types').PageServerLoad = async ({ params }) => {
 	const linkId = params.id;
 	if (linkId === null) {
@@ -71,7 +73,7 @@ export const actions: import('./$types').Actions = {
 			pin,
 			createdAt: new Date().getTime(),
 			call: {}
-		} as NonNullable<LinkDocument['linkState']['claim']>;
+		} as NonNullable<LinkStateType['claim']>;
 
 		const token = jwt.sign(
 			{
@@ -169,26 +171,26 @@ export const actions: import('./$types').Actions = {
 	feedback: async ({ params, request }) => {
 		const linkId = params.id;
 		const data = await request.formData();
-		const caller = data.get('caller') as string;
-		const pin = data.get('pin') as string;
+		const ratingStr = data.get('rating') as string;
+		const comment = data.get('comment') as string;
 
-		if (!caller) {
-			return invalid(400, { caller, missingCaller: true });
+		if (!ratingStr) {
+			return invalid(400, { rating: ratingStr, missingRating: true });
 		}
-		if (!pin) {
-			return invalid(400, { pin, missingPin: true });
-		}
-		const isNum = /^\d+$/.test(pin);
+		const isNum = /^\d+$/.test(ratingStr);
 		if (!isNum) {
-			return invalid(400, { pin, invalidPin: true });
+			return invalid(400, { rating: ratingStr, invalidRating: true });
+		}
+		const rating = Number(ratingStr);
+		if (rating < 1 || rating > 5) {
+			return invalid(400, { rating: ratingStr, invalidRating: true });
 		}
 
-		const claim = {
-			caller,
-			pin,
-			createdAt: new Date().getTime(),
-			call: {}
-		} as NonNullable<LinkDocument['linkState']['claim']>;
+		const feedback = {
+			rating,
+			comment: comment.trim() || '',
+			createdAt: new Date().getTime()
+		} as NonNullable<LinkStateType['feedback']>;
 
 		const token = jwt.sign(
 			{
@@ -213,16 +215,16 @@ export const actions: import('./$types').Actions = {
 		const state = linkService.getSnapshot();
 		if (
 			!state.can({
-				type: 'CLAIM',
-				claim
+				type: 'FEEDBACK RECEIVED',
+				feedback
 			})
 		) {
-			return error(400, 'Link cannot be claimed');
+			return error(500, 'Feedback is not allowed');
 		}
 
 		linkService.send({
-			type: 'CLAIM',
-			claim
+			type: 'FEEDBACK RECEIVED',
+			feedback
 		});
 
 		return { success: true };

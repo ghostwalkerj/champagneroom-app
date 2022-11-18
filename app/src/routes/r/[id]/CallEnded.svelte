@@ -1,9 +1,13 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import type { LinkDocType } from '$lib/ORM/models/link';
+	import type { PageData } from './$types';
 
 	export let showCallEnded = false;
 	export let link: LinkDocType;
 	export let canCall = false;
+
+	export let form: import('./$types').ActionData;
 
 	let rating = 0;
 
@@ -17,8 +21,9 @@
 	<div class="modal-box card w-96 bg-neutral text-neutral-content">
 		<div class="card-body items-center text-center">
 			<h2 class="card-title">How was your pCall?</h2>
-			<form method="post" action="?/feedback">
-				<div class="flex flex-col ">
+			<form method="post" action="?/feedback" use:enhance>
+				<input type="hidden" name="rating" bind:value={rating} />
+				<div class="flex flex-col gap-6 items-center">
 					<div class="rating">
 						<input
 							type="radio"
@@ -71,8 +76,11 @@
 							}}
 						/>
 					</div>
+					{#if form?.missingRating || form?.invalidRating}<div class="shadow-lg alert alert-error">
+							Please rate your call
+						</div>{/if}
 					<div>
-						<input type="text" placeholder="Review" class="input w-full max-w-xs" />
+						<input type="text" placeholder="Comment" class="input w-full max-w-xs" name="comment" />
 					</div>
 					<div>
 						<button class="btn btn-secondary" type="submit">Leave Feedback</button>

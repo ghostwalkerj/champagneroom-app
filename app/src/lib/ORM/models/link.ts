@@ -263,7 +263,7 @@ const linkSchemaLiteral = {
 							minimum: 0,
 							maximum: 5
 						},
-						comments: {
+						comment: {
 							type: 'string',
 							maxLength: 500
 						},
