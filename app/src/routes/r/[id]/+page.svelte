@@ -115,8 +115,7 @@
 		initVC();
 	});
 
-	$: showCallEnded =
-		true || (!inCall && linkMachineState && linkMachineState.hasTag('callerCanInteract'));
+	$: showCallEnded = !inCall && linkMachineState && linkMachineState.hasTag('callerCanInteract');
 	$: canCall =
 		linkMachineState &&
 		callMachineState &&

@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import type { LinkDocType } from '$lib/ORM/models/link';
-	import type { PageData } from './$types';
 
 	export let showCallEnded = false;
 	export let link: LinkDocType;

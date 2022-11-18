@@ -24,6 +24,7 @@
 	import LinkViewer from './LinkView.svelte';
 	import TalentActivity from './TalentActivity.svelte';
 	import TalentWallet from './TalentWallet.svelte';
+	import type { EventObject } from 'xstate';
 
 	export let form: import('./$types').ActionData;
 
@@ -44,7 +45,7 @@
 	$: inCall = false;
 	let us: Awaited<UserStreamType>;
 	let callMachineState = callMachine.initialState;
-	let callEvent = callMachineState.event;
+	let callEvent: EventObject;
 	let mediaStream: MediaStream;
 	$: callerName = '';
 	let videoCall: any;
