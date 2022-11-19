@@ -19,7 +19,7 @@
 		"@metamask/jazzicon": "^2.0.0",
 		"@sveltejs/adapter-auto": "^1.0.0-next.65",
 		"@sveltejs/adapter-node": "^1.0.0-next.88",
-		"@sveltejs/kit": "^1.0.0-next.529",
+		"@sveltejs/kit": "^1.0.0-next.551",
 		"@tailwindcss/typography": "^0.5.8",
 		"@typechain/ethers-v5": "^10.1.0",
 		"@types/express": "^4.17.13",
