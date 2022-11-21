@@ -49,10 +49,6 @@ export const load: PageServerLoad = async ({ params }) => {
 	const currentLink = _currentLink ? _currentLink.toJSON() : undefined;
 	const completedCalls = _completedCalls.map((link) => link.toJSON());
 
-	console.log('talent', talent);
-	console.log('currentLink', currentLink);
-	console.log('Completed calls', completedCalls);
-
 	return {
 		token,
 		talent,
