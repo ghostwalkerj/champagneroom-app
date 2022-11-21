@@ -21,58 +21,48 @@
 		<div class="card-body items-center text-center">
 			<h2 class="card-title">How was your pCall?</h2>
 			<form method="post" action="?/feedback" use:enhance>
-				<input type="hidden" name="rating" bind:value={rating} />
 				<div class="flex flex-col gap-6 items-center">
 					<div class="rating">
+						<input type="radio" name="rating" class="rating-hidden" bind:group={rating} value={0} />
+
 						<input
 							type="radio"
-							name="rating-1"
-							class="rating-hidden"
-							on:change={() => {
-								rating = 0;
-							}}
-							checked
+							name="rating"
+							bind:group={rating}
+							class="mask mask-star"
+							value={1}
 						/>
 
 						<input
 							type="radio"
-							name="rating-1"
-							on:change={() => {
-								rating = 1;
-							}}
+							name="rating"
+							bind:group={rating}
 							class="mask mask-star"
+							value={2}
 						/>
+
 						<input
 							type="radio"
-							name="rating-1"
+							name="rating"
+							bind:group={rating}
 							class="mask mask-star"
-							on:change={() => {
-								rating = 2;
-							}}
+							value={3}
 						/>
+
 						<input
 							type="radio"
-							name="rating-1"
+							name="rating"
+							bind:group={rating}
 							class="mask mask-star"
-							on:change={() => {
-								rating = 3;
-							}}
+							value={4}
 						/>
+
 						<input
 							type="radio"
-							name="rating-1"
+							name="rating"
+							bind:group={rating}
 							class="mask mask-star"
-							on:change={() => {
-								rating = 4;
-							}}
-						/>
-						<input
-							type="radio"
-							name="rating-1"
-							class="mask mask-star"
-							on:change={() => {
-								rating = 5;
-							}}
+							value={5}
 						/>
 					</div>
 					{#if form?.missingRating || form?.invalidRating}<div class="shadow-lg alert alert-error">
