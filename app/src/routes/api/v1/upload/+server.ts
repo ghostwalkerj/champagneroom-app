@@ -1,29 +1,9 @@
-import {
-	INFURA_IPFS_API_PORT,
-	INFURA_IPFS_API_SECRET,
-	INFURA_IPFS_API_URL,
-	INFURA_IPFS_DEDICATED_GATEWAY,
-	INFURA_IPFS_PROJECT_ID
-} from '$env/static/private';
+import { WEB3STORAGE_API_TOKEN, WEB3STORAGE_DOMAIN } from '$env/static/private';
 import { json } from '@sveltejs/kit';
-import { create } from 'ipfs-http-client';
+import { Web3Storage } from 'web3.storage';
 import type { RequestHandler } from './$types';
 
-const auth =
-	'Basic ' + Buffer.from(INFURA_IPFS_PROJECT_ID + ':' + INFURA_IPFS_API_SECRET).toString('base64');
-
-const addOptions = {
-	pin: true
-};
-
-const client = create({
-	host: INFURA_IPFS_API_URL,
-	port: Number.parseInt(INFURA_IPFS_API_PORT),
-	protocol: 'https',
-	headers: {
-		authorization: auth
-	}
-});
+const client = new Web3Storage({ token: WEB3STORAGE_API_TOKEN });
 
 export const POST: RequestHandler = async ({ request }) => {
 	let url = '';
@@ -31,8 +11,16 @@ export const POST: RequestHandler = async ({ request }) => {
 	const file = body.get('file') as File;
 	if (file) {
 		try {
-			const result = await client.add(file, addOptions);
-			url = `${INFURA_IPFS_DEDICATED_GATEWAY}/ipfs/${result.path}`;
+			const rootCid = await client.put([file]);
+			const res = await client.get(rootCid);
+			// Web3Response
+			if (res) {
+				const files = await res.files(); // Web3File[]
+				for (const file of files) {
+					url = `https://${file.cid}.ipfs.${WEB3STORAGE_DOMAIN}`;
+					break;
+				}
+			}
 		} catch (error) {
 			console.log('error', error);
 		}
