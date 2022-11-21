@@ -70,11 +70,6 @@ const create = async (token: string, key: string, storage: StorageTypes) => {
 			}
 		});
 		const talentQuery = _db.talents.findOne().where('key').eq(key);
-		const _currentTalent = await talentQuery.exec();
-
-		const linkQuery = _db.links.find().where('talent').eq(_currentTalent?._id);
-		const callEventQuery = _db.callEvents.find().where('talent').eq(_currentTalent?._id);
-		const transactionQuery = _db.transactions.find().where('talent').eq(_currentTalent?._id);
 
 		let repState = _db.talents.syncCouchDB({
 			remote: remoteDB,
@@ -85,6 +80,12 @@ const create = async (token: string, key: string, storage: StorageTypes) => {
 			query: talentQuery
 		});
 		await repState.awaitInitialReplication();
+
+		const _currentTalent = await talentQuery.exec();
+
+		const linkQuery = _db.links.find().where('talent').eq(_currentTalent?._id);
+		const callEventQuery = _db.callEvents.find().where('talent').eq(_currentTalent?._id);
+		const transactionQuery = _db.transactions.find().where('talent').eq(_currentTalent?._id);
 
 		if (_currentTalent) {
 			// Wait for links
