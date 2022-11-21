@@ -37,13 +37,14 @@ export const load: PageServerLoad = async ({ params }) => {
 	}
 
 	const _talent = await getTalent(key);
-	const res = await _talent.updateStats();
-	console.log(JSON.stringify(res));
+	await _talent.updateStats();
 	const _currentLink = (await _talent.populate('currentLink')) as LinkDocument;
 	const _completedCalls = (await _talent.populate('stats.completedCalls')) as LinkDocument[];
 	const talent = _talent.toJSON();
 	const currentLink = _currentLink ? _currentLink.toJSON() : undefined;
 	const completedCalls = _completedCalls.map((link) => link.toJSON());
+
+	console.log(talent);
 
 	return {
 		token,
