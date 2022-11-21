@@ -41,9 +41,11 @@ export const load: PageServerLoad = async ({ params }) => {
 		throw error(404, 'Key not found');
 	}
 
+	const db = await getDb(key);
+
 	const _talent = await getTalent(key);
 	await _talent.updateStats();
-	const _currentLink = (await _talent.populate('currentLink')) as LinkDocument;
+	const _currentLink = (await db.links.findOne(_talent.currentLink).exec()) as LinkDocument;
 	const _completedCalls = (await _talent.populate('stats.completedCalls')) as LinkDocument[];
 	const talent = _talent.toJSON();
 	const currentLink = _currentLink ? _currentLink.toJSON() : undefined;
