@@ -2,7 +2,9 @@
 	"name": "pcall",
 	"version": "0.0.1",
 	"license": "UNLICENSED",
-	"engines": {},
+	"engines": {
+		"node": ">=18.12.1"
+	},
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
