@@ -37,7 +37,8 @@ export const load: PageServerLoad = async ({ params }) => {
 	}
 
 	const _talent = await getTalent(key);
-	await _talent.updateStats();
+	const res = await _talent.updateStats();
+	console.log(JSON.stringify(res));
 	const _currentLink = (await _talent.populate('currentLink')) as LinkDocument;
 	const _completedCalls = (await _talent.populate('stats.completedCalls')) as LinkDocument[];
 	const talent = _talent.toJSON();
