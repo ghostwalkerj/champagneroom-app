@@ -2,7 +2,7 @@ import { JWT_CREATOR_USER, JWT_EXPIRY, JWT_PUBLIC_USER, JWT_SECRET } from '$env/
 import { createLinkMachineService } from '$lib/machines/linkMachine';
 import { apiDB } from '$lib/ORM/dbs/apiDB';
 import { publicDB } from '$lib/ORM/dbs/publicDB';
-import type { LinkDocType, LinkDocument } from '$lib/ORM/models/link';
+import type { LinkDocType } from '$lib/ORM/models/link';
 import { TransactionReasonType } from '$lib/ORM/models/transaction';
 import { StorageTypes } from '$lib/ORM/rxdb';
 import { mensNames } from '$lib/util/mensNames';
