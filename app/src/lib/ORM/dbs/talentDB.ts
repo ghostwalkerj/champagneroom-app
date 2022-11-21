@@ -83,11 +83,10 @@ const create = async (token: string, key: string, storage: StorageTypes) => {
 
 		const _currentTalent = await talentQuery.exec();
 
-		const linkQuery = _db.links.find().where('talent').eq(_currentTalent?._id);
-		const callEventQuery = _db.callEvents.find().where('talent').eq(_currentTalent?._id);
-		const transactionQuery = _db.transactions.find().where('talent').eq(_currentTalent?._id);
-
 		if (_currentTalent) {
+			const linkQuery = _db.links.find().where('talent').eq(_currentTalent?._id);
+			const callEventQuery = _db.callEvents.find().where('talent').eq(_currentTalent?._id);
+			const transactionQuery = _db.transactions.find().where('talent').eq(_currentTalent?._id);
 			// Wait for links
 			repState = _db.links.syncCouchDB({
 				remote: remoteDB,
