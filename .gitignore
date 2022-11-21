@@ -1,7 +1,6 @@
 app/server/data
-radata*
 app/.yarnclean
-app/pouchdb
+app/pouchdb/*rxdb*
 app/build.out.txt
 app/.env.local
 app/node_modules
