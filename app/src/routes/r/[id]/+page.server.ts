@@ -50,6 +50,28 @@ export const load: import('./$types').PageServerLoad = async ({ params }) => {
 	};
 };
 
+const getLink = async (linkId: string) => {
+	const token = jwt.sign(
+		{
+			exp: Math.floor(Date.now() / 1000) + Number.parseInt(JWT_EXPIRY),
+			sub: JWT_CREATOR_USER
+		},
+		JWT_SECRET
+	);
+
+	const db = await apiDB(token, linkId, StorageTypes.NODE_WEBSQL);
+	if (!db) {
+		throw error(500, 'no db');
+	}
+
+	const link = await db.links.findOne(linkId).exec();
+	if (!link) {
+		throw error(404, 'Link not found');
+	}
+
+	return link;
+};
+
 export const actions: import('./$types').Actions = {
 	claim: async ({ params, request }) => {
 		const linkId = params.id;
@@ -75,25 +97,13 @@ export const actions: import('./$types').Actions = {
 			call: {}
 		} as NonNullable<LinkStateType['claim']>;
 
-		const token = jwt.sign(
-			{
-				exp: Math.floor(Date.now() / 1000) + Number.parseInt(JWT_EXPIRY),
-				sub: JWT_CREATOR_USER
-			},
-			JWT_SECRET
-		);
+		const link = await getLink(linkId);
 
-		const db = await apiDB(token, linkId, StorageTypes.NODE_WEBSQL);
-		if (!db) {
-			throw error(500, 'no db');
-		}
+		let linkService = createLinkMachineService(link.linkState, link.updateLinkStateCallBack());
 
-		const link = await db.links.findOne(linkId).exec();
-		if (!link) {
-			return error(404, 'Link not found');
-		}
-
-		const linkService = createLinkMachineService(link.linkState, link.updateLinkStateCallBack());
+		link.get$('linkState').subscribe((_linkState) => {
+			linkService = createLinkMachineService(_linkState, link.updateLinkStateCallBack());
+		});
 
 		const state = linkService.getSnapshot();
 		if (
@@ -125,27 +135,14 @@ export const actions: import('./$types').Actions = {
 			return invalid(400, { amount, invalidAmount: true });
 		}
 
-		// Imitate a transaction
-		//TODO: This will become a real transaction sent from blockchain event
-		const token = jwt.sign(
-			{
-				exp: Math.floor(Date.now() / 1000) + Number.parseInt(JWT_EXPIRY),
-				sub: JWT_CREATOR_USER
-			},
-			JWT_SECRET
-		);
+		const link = await getLink(linkId);
 
-		const db = await apiDB(token, linkId, StorageTypes.NODE_WEBSQL);
-		if (!db) {
-			throw error(500, 'no db');
-		}
+		let linkService = createLinkMachineService(link.linkState, link.updateLinkStateCallBack());
 
-		const link = await db.links.findOne(linkId).exec();
-		if (!link) {
-			return error(404, 'Link not found');
-		}
+		link.get$('linkState').subscribe((_linkState) => {
+			linkService = createLinkMachineService(_linkState, link.updateLinkStateCallBack());
+		});
 
-		const linkService = createLinkMachineService(link.linkState, link.updateLinkStateCallBack());
 		const state = linkService.getSnapshot();
 		if (!state.matches('claimed.waiting4Funding')) {
 			return error(400, 'Link cannot be funded');
@@ -192,25 +189,13 @@ export const actions: import('./$types').Actions = {
 			createdAt: new Date().getTime()
 		} as NonNullable<LinkStateType['feedback']>;
 
-		const token = jwt.sign(
-			{
-				exp: Math.floor(Date.now() / 1000) + Number.parseInt(JWT_EXPIRY),
-				sub: JWT_CREATOR_USER
-			},
-			JWT_SECRET
-		);
+		const link = await getLink(linkId);
 
-		const db = await apiDB(token, linkId, StorageTypes.NODE_WEBSQL);
-		if (!db) {
-			throw error(500, 'no db');
-		}
+		let linkService = createLinkMachineService(link.linkState, link.updateLinkStateCallBack());
 
-		const link = await db.links.findOne(linkId).exec();
-		if (!link) {
-			return error(404, 'Link not found');
-		}
-
-		const linkService = createLinkMachineService(link.linkState, link.updateLinkStateCallBack());
+		link.get$('linkState').subscribe((_linkState) => {
+			linkService = createLinkMachineService(_linkState, link.updateLinkStateCallBack());
+		});
 
 		const state = linkService.getSnapshot();
 		if (
@@ -227,6 +212,6 @@ export const actions: import('./$types').Actions = {
 			feedback
 		});
 
-		return { success: true };
+		return { success: true, rating };
 	}
 };

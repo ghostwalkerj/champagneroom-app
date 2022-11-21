@@ -28,10 +28,10 @@
 							type="radio"
 							name="rating-1"
 							class="rating-hidden"
-							checked
 							on:change={() => {
 								rating = 0;
 							}}
+							checked
 						/>
 
 						<input
