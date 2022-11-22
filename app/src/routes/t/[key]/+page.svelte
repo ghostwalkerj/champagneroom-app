@@ -59,7 +59,10 @@
 			cancel: undefined
 		});
 
-	$: canCreateLink = !currentLink || (linkMachineState && linkMachineState.done);
+	$: canCreateLink =
+		!currentLink ||
+		(linkMachineState && linkMachineState.done) ||
+		(linkMachineState && linkMachineState.matches('inEscrow'));
 
 	$: waiting4StateChange = false;
 

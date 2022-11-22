@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { PUBLIC_DEFAULT_PROFILE_IMAGE, PUBLIC_ROOM_PATH } from '$env/static/public';
+	import { PUBLIC_ESCROW_PERIOD, PUBLIC_ROOM_PATH } from '$env/static/public';
 	import { currencyFormatter } from '$lib/util/constants';
 	import getProfileImage from '$lib/util/profilePhoto';
 	import spacetime from 'spacetime';
@@ -12,9 +12,15 @@
 	export let link: LinkDocument;
 	export let linkMachineState: LinkMachineStateType;
 
+	const ESCROW_PERIOD = Number(PUBLIC_ESCROW_PERIOD || 3600000);
+
 	$: claim = (linkMachineState && linkMachineState.context.linkState.claim) || {
 		caller: '',
-		createdAt: ''
+		createdAt: '',
+		call: {
+			startedAt: undefined,
+			endedAt: undefined
+		}
 	};
 
 	$: callerProfileImage = getProfileImage(claim.caller);
@@ -37,10 +43,10 @@
 				<div class="text-center card-body items-center bg-secondary rounded-2xl">
 					<div class="text-xl w-full">
 						{#if linkMachineState.matches('unclaimed')}
-							Your pCall link has Not Been Claimed
+							Your pCall Link has Not Been Claimed
 						{:else if linkMachineState.matches('claimed')}
 							<div class="w-full ">
-								Your pCall link was claimed by:
+								Your pCall Link was Claimed by:
 								<div class="p-6 flex flex-row w-full place-content-evenly items-center">
 									<div
 										class="bg-cover bg-no-repeat bg-center rounded-full h-32 w-32"
@@ -50,6 +56,17 @@
 										<div>{claim.caller}</div>
 										<div>on</div>
 										<div>{spacetime(claim.createdAt).format('nice-short')}</div>
+									</div>
+								</div>
+							</div>
+						{:else if linkMachineState.matches('inEscrow')}
+							Your pCall Link is in Escrow until:
+							<div class="p-6 flex flex-row w-full place-content-evenly items-center">
+								<div>
+									<div>
+										{spacetime(
+											(claim.call?.endedAt || claim.call?.startedAt || 0) + ESCROW_PERIOD
+										).format('nice-short')}
 									</div>
 								</div>
 							</div>

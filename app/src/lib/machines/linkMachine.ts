@@ -17,6 +17,11 @@ export const graceTimer = (timerStart: number) => {
 	return timer > 0 ? timer : 0;
 };
 
+export const escrowTimer = (endTime: number) => {
+	const timer = endTime + ESCROW_PERIOD - new Date().getTime();
+	return timer > 0 ? timer : 0;
+};
+
 export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCallBackType) => {
 	const stateCallback = saveState;
 
@@ -476,7 +481,7 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 					) {
 						const endTime =
 							context.linkState.claim.call.endedAt || context.linkState.claim.call.startedAt;
-						timer = endTime + ESCROW_PERIOD - new Date().getTime();
+						timer = escrowTimer(endTime);
 					}
 					return timer > 0 ? timer : 0;
 				}
