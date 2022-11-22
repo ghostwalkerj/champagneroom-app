@@ -39,12 +39,10 @@
 	};
 </script>
 
-<div class=" h-full w-full">
-	<div class=" w-full p-1">
-		<video bind:this={localVideo} playsinline autoplay>
-			<track kind="captions" />
-		</video>
-	</div>
+<div class="flex w-full h-full">
+	<video bind:this={localVideo} playsinline autoplay class="rounded-xl  w-full p-2">
+		<track kind="captions" />
+	</video>
 	{#if initialized}
 		<section
 			class="flex bg-base-100 flex-shrink-0 text-white p-4 gap-4 items-center justify-center md:rounded-2xl md:gap-8 "

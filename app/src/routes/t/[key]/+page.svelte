@@ -83,7 +83,7 @@
 				});
 				canCreateLink = state.done ?? true;
 
-				if (state.hasTag('connect2VC')) {
+				if (state.matches('claimed.canCall')) {
 					if (connectedCallId !== currentLink.callId) {
 						connectedCallId = currentLink.callId;
 						initVC(currentLink.callId);

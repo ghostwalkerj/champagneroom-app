@@ -124,7 +124,6 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 							}
 						},
 						canCall: {
-							tags: 'connect2VC',
 							initial: 'neverConnected',
 							states: {
 								neverConnected: {

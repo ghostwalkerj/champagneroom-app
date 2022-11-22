@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { applyAction, enhance } from '$app/forms';
+	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import {
 		PUBLIC_DEFAULT_PROFILE_IMAGE,
@@ -16,12 +17,12 @@
 	import { currencyFormatter } from '$lib/util/constants';
 	import getProfileImage from '$lib/util/profilePhoto';
 	import spacetime from 'spacetime';
+	import FaMoneyBillWave from 'svelte-icons/fa/FaMoneyBillWave.svelte';
+	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';
 	import StarRating from 'svelte-star-rating';
 	import urlJoin from 'url-join';
 	import type { Subscription } from 'xstate';
 	import type { PageData } from './$types';
-	import FaMoneyBillWave from 'svelte-icons/fa/FaMoneyBillWave.svelte';
-	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';
 
 	export let form: import('./$types').ActionData;
 	export let data: PageData;
@@ -70,7 +71,7 @@
 	const copyLink = () => {
 		navigator.clipboard.writeText(linkURL);
 		tooltipOpen = 'tooltip-open';
-		setTimeout(() => (tooltipOpen = ''), 2000);
+		setTimeout(() => (tooltipOpen = ''), 1000);
 	};
 
 	const useLinkState = (link: LinkDocument, linkState: LinkDocument['linkState']) => {
@@ -82,6 +83,9 @@
 			linkMachineState = state;
 
 			if (state.changed) {
+				if (state.matches('claimed.canCall')) {
+					goto(key + '/call');
+				}
 				canCancelLink = state.can({
 					type: 'REQUEST CANCELLATION',
 					cancel: undefined
@@ -186,8 +190,8 @@
 		<!-- Link Detail -->
 		{#if currentLink && linkMachineState}
 			<div class="bg-primary text-primary-content card">
-				<div class="text-center card-body items-center">
-					<div class="container mx-auto grid p-6 gap-4 grid-row-2">
+				<div class="text-center card-body items-center ">
+					<div class="container mx-auto grid  gap-2 grid-row-2">
 						<div class="text-center card-body items-center bg-secondary rounded-2xl">
 							<div class="text-xl w-full">
 								{#if linkMachineState.matches('unclaimed')}
@@ -195,7 +199,7 @@
 								{:else if linkMachineState.matches('claimed')}
 									<div class="w-full ">
 										Your pCall Link was Claimed by:
-										<div class="p-6 flex flex-row w-full place-content-evenly items-center">
+										<div class="p-2 flex flex-col w-full place-content-evenly items-center">
 											<div
 												class="bg-cover bg-no-repeat bg-center rounded-full h-32 w-32"
 												style="background-image: url('{callerProfileImage}')"
