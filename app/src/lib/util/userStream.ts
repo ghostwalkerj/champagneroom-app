@@ -51,7 +51,8 @@ export const userStream = async (options: Partial<VideoStreamOptions> = {}) => {
 				frameRate: {
 					ideal: 60,
 					min: 30
-				}
+				},
+				facingMode: 'user'
 			},
 			audio: true
 		},

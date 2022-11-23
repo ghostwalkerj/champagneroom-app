@@ -45,7 +45,7 @@
 	};
 </script>
 
-<div class="flex w-full h-full">
+<div class="flex flex-col w-full h-full">
 	<video bind:this={localVideo} on:click={startVideo} class="rounded-xl  w-full p-2">
 		<track kind="captions" />
 	</video>
