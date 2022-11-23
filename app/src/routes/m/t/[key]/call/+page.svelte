@@ -196,6 +196,9 @@
 		</div>
 	{:else}
 		<!-- Video Preview -->
-		<MobileVideoPreview {us} />
+		<div class="flex flex-col text-center">
+			<p class="text-2xl font-bold">Video Preview</p>
+			<MobileVideoPreview {us} />
+		</div>
 	{/if}
 </div>
