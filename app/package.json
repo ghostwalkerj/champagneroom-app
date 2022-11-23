@@ -6,7 +6,7 @@
 		"node": "18.12.1"
 	},
 	"scripts": {
-		"dev": "vite dev",
+		"dev": "vite dev --https",
 		"build": "vite build",
 		"start": "node server.js",
 		"package": "svelte-kit package",

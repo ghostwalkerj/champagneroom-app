@@ -31,16 +31,22 @@
 	const initialize = () => {
 		if (localVideo && mediaStream) {
 			localVideo.srcObject = mediaStream;
-			localVideo.muted = true;
 			localVideo.load();
-			localVideo.play();
 			initialized = true;
+			localVideo.muted = true;
+
+			camSend('TOGGLE OFF');
+			micSend('TOGGLE OFF');
 		}
+	};
+
+	const startVideo = () => {
+		localVideo.play();
 	};
 </script>
 
 <div class="flex w-full h-full">
-	<video bind:this={localVideo} playsinline autoplay class="rounded-xl  w-full p-2">
+	<video bind:this={localVideo} on:click={startVideo} class="rounded-xl  w-full p-2">
 		<track kind="captions" />
 	</video>
 	{#if initialized}
@@ -48,7 +54,13 @@
 			class="flex bg-base-100 flex-shrink-0 text-white p-4 gap-4 items-center justify-center md:rounded-2xl md:gap-8 "
 		>
 			<div class="flex flex-col gap-2 items-center">
-				<button class="h-14 w-14 btn btn-circle " on:click={() => camSend('TOGGLE')}>
+				<button
+					class="h-14 w-14 btn btn-circle "
+					on:click={() => {
+						startVideo();
+						camSend('TOGGLE');
+					}}
+				>
 					{#if $camState.matches('on')}
 						<VideoIcon size="34" />
 					{:else}
