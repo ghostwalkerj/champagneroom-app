@@ -146,9 +146,8 @@
 	>
 		<div class="flex flex-col m-2 relative">
 			<div class="rounded-xl border-2 h-68 p-2 w-120 z-10 absolute" bind:this={target}>
-				<video bind:this={localVideo} playsinline autoplay>
-					<track kind="captions" />
-				</video>
+				<!-- svelte-ignore a11y-media-has-caption -->
+				<video bind:this={localVideo} playsinline autoplay />
 			</div>
 
 			<div class="h-full w-full align-top">

@@ -41,9 +41,8 @@
 
 <div class=" h-full w-full">
 	<div class=" w-full p-1">
-		<video bind:this={localVideo} playsinline autoplay>
-			<track kind="captions" />
-		</video>
+		<!-- svelte-ignore a11y-media-has-caption -->
+		<video bind:this={localVideo} playsinline autoplay />
 	</div>
 	{#if initialized}
 		<section

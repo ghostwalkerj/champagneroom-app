@@ -32,11 +32,12 @@
 		if (localVideo && mediaStream) {
 			localVideo.srcObject = mediaStream;
 			localVideo.load();
-			initialized = true;
 			localVideo.muted = true;
 
 			camSend('TOGGLE OFF');
 			micSend('TOGGLE OFF');
+
+			initialized = true;
 		}
 	};
 
@@ -46,13 +47,20 @@
 		camSend('TOGGLE');
 		localVideo.play();
 		showOverlay = !showOverlay;
+		console.log('localVideo', mediaStream);
 	};
 </script>
 
 <div class="flex flex-col">
-	<video bind:this={localVideo} class="rounded-xl p-2 max-h-screen" on:click={toggleVideo}>
-		<track kind="captions" />
-	</video>
+	<video
+		bind:this={localVideo}
+		muted
+		autoplay
+		playsinline
+		loop
+		class="rounded-xl p-2 max-h-screen"
+		on:click={toggleVideo}
+	/>
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 
 	{#if showOverlay}
