@@ -49,8 +49,8 @@
 	};
 </script>
 
-<div class="flex flex-col w-full h-full">
-	<video bind:this={localVideo} class="rounded-xl w-full p-2" on:click={toggleVideo}>
+<div class="flex flex-col">
+	<video bind:this={localVideo} class="rounded-xl p-2 max-h-screen" on:click={toggleVideo}>
 		<track kind="captions" />
 	</video>
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
