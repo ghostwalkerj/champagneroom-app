@@ -64,9 +64,11 @@ export const load: LayoutServerLoad = async ({ url, params }) => {
 
 		const CALL_PATH = urlJoin(PUBLIC_MOBILE_PATH, PUBLIC_TALENT_PATH, 'call', key);
 
+		const BASE_PATH = urlJoin(PUBLIC_MOBILE_PATH, PUBLIC_TALENT_PATH, key);
+
 		if (linkMachineState?.matches('claimed.canCall') && url.pathname !== CALL_PATH) {
 			throw redirect(307, urlJoin(url.origin, CALL_PATH));
-		}
+		} else if (url.pathname !== BASE_PATH) throw redirect(307, urlJoin(url.origin, BASE_PATH));
 	}
 
 	return {

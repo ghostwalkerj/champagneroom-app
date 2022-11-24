@@ -5,6 +5,7 @@
 	export let showCallEnded = false;
 	export let link: LinkDocType;
 	export let canCall = false;
+	export let call: () => Promise<void>;
 
 	export let form: import('./$types').ActionData;
 
@@ -79,7 +80,7 @@
 			<div class="divider">OR</div>
 			<button class="btn btn-secondary" disabled={true}>Initiate Dispute</button>
 			<div class="divider">OR</div>
-			<button class="btn btn-secondary" disabled={!canCall}>
+			<button class="btn btn-secondary" disabled={!canCall} on:click={call}>
 				Call {link.talentInfo.name} Again</button
 			>
 		</div>

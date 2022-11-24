@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { page } from '$app/stores';
-	import VideoCall from '$lib/components/calls/VideoCall.svelte';
+	import MobileVideoCall from '$lib/components/calls/MobileVideoCall.svelte';
 	import { callMachine } from '$lib/machines/callMachine';
 	import { createLinkMachineService, type LinkMachineServiceType } from '$lib/machines/linkMachine';
 	import { talentDB, type TalentDBType } from '$lib/ORM/dbs/talentDB';
@@ -192,7 +192,7 @@
 <div class="flex">
 	{#if inCall}
 		<div>
-			<VideoCall {vc} {us} options={{ hangup: false, cam: false, mic: false }} />
+			<MobileVideoCall {vc} {us} options={{ hangup: false, cam: false, mic: false }} />
 		</div>
 	{:else}
 		<!-- Video Preview -->

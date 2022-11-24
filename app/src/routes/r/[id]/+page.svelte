@@ -143,7 +143,7 @@
 	</div>
 </div>
 
-<CallEnded {showCallEnded} {link} {canCall} {form} />
+<CallEnded {showCallEnded} {link} {canCall} {form} {call} />
 
 <div class="min-h-full">
 	<main class="py-6">

@@ -193,7 +193,7 @@
 		</div>
 
 		<!-- Link Detail -->
-		{#if currentLink && linkMachineState}
+		{#if currentLink && linkMachineState && !linkMachineState.done}
 			<div class="bg-primary text-primary-content card">
 				<div class="text-center card-body items-center ">
 					<div class="container mx-auto grid  gap-2 grid-row-2">
