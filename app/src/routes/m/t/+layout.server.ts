@@ -1,10 +1,13 @@
 import { JWT_CREATOR_USER, JWT_EXPIRY, JWT_SECRET } from '$env/static/private';
+import { PUBLIC_MOBILE_PATH, PUBLIC_TALENT_PATH } from '$env/static/public';
 import { talentDB } from '$lib/ORM/dbs/talentDB';
 import type { LinkDocument } from '$lib/ORM/models/link';
 import { StorageTypes } from '$lib/ORM/rxdb';
-import { error } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
-import type { PageServerLoad } from './$types';
+import urlJoin from 'url-join';
+import type { LayoutServerLoad } from './$types';
+import { createLinkMachineService } from '$lib/machines/linkMachine';
 
 // /** @type {import('./$types').LayoutServerLoad} */
 // export function load({ locals }) {
@@ -39,10 +42,10 @@ const getTalent = async (key: string) => {
 	return talent;
 };
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: LayoutServerLoad = async ({ url, params }) => {
 	const key = params.key;
 
-	if (key === null) {
+	if (key === undefined) {
 		throw error(404, 'Key not found');
 	}
 
@@ -53,6 +56,18 @@ export const load: PageServerLoad = async ({ params }) => {
 	const talent = _talent.toJSON();
 	const currentLink = _currentLink ? _currentLink.toJSON() : undefined;
 	const completedCalls = _completedCalls.map((link) => link.toJSON());
+
+	// Gate keeping the route for mobile apps.  Redirect to the correct sub page based on the currentLink
+	if (_currentLink) {
+		const linkMachineState =
+			currentLink && createLinkMachineService(_currentLink.linkState).getSnapshot();
+
+		const CALL_PATH = urlJoin(PUBLIC_MOBILE_PATH, PUBLIC_TALENT_PATH, 'call', key);
+
+		if (linkMachineState?.matches('claimed.canCall') && url.pathname !== CALL_PATH) {
+			throw redirect(307, urlJoin(url.origin, CALL_PATH));
+		}
+	}
 
 	return {
 		token,

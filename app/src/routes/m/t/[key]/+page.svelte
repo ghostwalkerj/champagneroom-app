@@ -6,7 +6,9 @@
 	import {
 		PUBLIC_DEFAULT_PROFILE_IMAGE,
 		PUBLIC_ESCROW_PERIOD,
-		PUBLIC_ROOM_PATH
+		PUBLIC_MOBILE_PATH,
+		PUBLIC_ROOM_PATH,
+		PUBLIC_TALENT_PATH
 	} from '$env/static/public';
 	import ProfilePhoto from '$lib/components/forms/ProfilePhoto.svelte';
 	import { createLinkMachineService, type LinkMachineServiceType } from '$lib/machines/linkMachine';
@@ -32,6 +34,7 @@
 	let key = $page.params.key;
 
 	const ESCROW_PERIOD = Number(PUBLIC_ESCROW_PERIOD || 3600000);
+	const CALL_PATH = urlJoin($page.url.origin, PUBLIC_MOBILE_PATH, PUBLIC_TALENT_PATH, 'call', key);
 
 	let talent: TalentDocument;
 	let linkService: LinkMachineServiceType;
@@ -84,7 +87,9 @@
 
 			if (state.changed) {
 				if (state.matches('claimed.canCall')) {
-					goto(key + '/call');
+					if (linkService) linkService.stop();
+					if (linkSub) linkSub.unsubscribe();
+					goto(CALL_PATH);
 				}
 				canCancelLink = state.can({
 					type: 'REQUEST CANCELLATION',

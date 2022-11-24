@@ -145,7 +145,7 @@
 		class="h-full bg-base-100  grid grid-cols-1 grid-rows-1 grow overflow-hidden md:border-2  md:rounded-2xl"
 	>
 		<div class="flex flex-col m-2 relative">
-			<div class="rounded-xl border-2 h-68 p-2 w-120 z-10 absolute" bind:this={target}>
+			<div class="rounded-xl border-2 h-68 p-2 w-120 z-10 absolute -scale-x-100" bind:this={target}>
 				<!-- svelte-ignore a11y-media-has-caption -->
 				<video bind:this={localVideo} playsinline autoplay />
 			</div>
