@@ -84,19 +84,20 @@
 
 		linkService = createLinkMachineService(linkState, link.updateLinkStateCallBack());
 		linkSub = linkService.subscribe(async (state) => {
-			linkMachineState = state;
-
 			if (state.matches('claimed.canCall')) {
-				await goto(CALL_PATH);
 				if (linkService) linkService.stop();
 				if (linkSub) linkSub.unsubscribe();
 				if (linkStateSub) linkStateSub.unsubscribe();
+				console.log('goto', CALL_PATH);
+				await goto(CALL_PATH);
 			}
 			canCancelLink = state.can({
 				type: 'REQUEST CANCELLATION',
 				cancel: undefined
 			});
 			canCreateLink = state.done ?? true;
+
+			linkMachineState = state;
 		});
 	};
 
@@ -255,9 +256,6 @@
 									</div>
 								</div>
 							</div>
-							{#if linkMachineState.context.linkState.totalFunding >= currentLink.requestedAmount}
-								<div class="text-xl pb-4">Link is Fully Funded!</div>
-							{/if}
 						</section>
 						<section
 							class="flex flex-col bg-base-100 rounded-2xl flex-shrink-0 text-white text-center p-4  items-center justify-center "

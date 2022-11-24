@@ -11735,9 +11735,9 @@ web3@^1.7.4:
     web3-utils "1.8.1"
 
 web3modal@^1.9.8:
-  version "1.9.9"
-  resolved "https://registry.yarnpkg.com/web3modal/-/web3modal-1.9.9.tgz#1a09771e1b9264842ab98d42c620568f470ff96b"
-  integrity sha512-ML1C4xH+JTSHHkKbjxuF+f5B3cDUOCnrdQZ8Mlzippq7zRKHf3NBeuIvDdNjtVclJ2S4zYYVmVqRWrgB11ej8A==
+  version "1.9.10"
+  resolved "https://registry.yarnpkg.com/web3modal/-/web3modal-1.9.10.tgz#ab7836ff27c6a16b9ca881ba0e8008bd33cb0dff"
+  integrity sha512-gRByp+toRiADwkJLLGRXsnIVbLS1aJB71sJyryS6C7cF6jJ3cRN1LbPYEMObMyJkyjOZonx0CNZVAYGiD099aA==
   dependencies:
     detect-browser "^5.1.0"
     prop-types "^15.7.2"

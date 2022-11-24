@@ -74,6 +74,7 @@
 				if (linkService) linkService.stop();
 				if (linkSub) linkSub.unsubscribe();
 				if (linkStateSub) linkStateSub.unsubscribe();
+				console.log('goto', BASE_PATH);
 				await goto(BASE_PATH);
 			}
 		});

@@ -50,23 +50,17 @@
 	const camState = camMachine.state;
 
 	// UI Controls
-	let canvas: HTMLCanvasElement;
-	let localVideo: HTMLVideoElement;
+
 	let remoteVideo: HTMLVideoElement;
 
 	// Video Control
 	let filters;
-	const frame = {
-		translate: [2, 2]
-	};
-	let target: HTMLDivElement;
+
 	let Moveable: any;
 
 	onMount(async () => {
 		Moveable = (await import('svelte-moveable')).default;
 
-		canvas.width = localVideo.width;
-		canvas.height = localVideo.height;
 		filters = document.querySelector('.filters');
 		initialize();
 	});

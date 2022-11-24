@@ -57,24 +57,6 @@ export const load: LayoutServerLoad = async ({ url, params }) => {
 	const currentLink = _currentLink ? _currentLink.toJSON() : undefined;
 	const completedCalls = _completedCalls.map((link) => link.toJSON());
 
-	// Gate keeping the route for mobile apps.  Redirect to the correct sub page based on the currentLink
-	if (_currentLink) {
-		const linkMachineState =
-			currentLink && createLinkMachineService(_currentLink.linkState).getSnapshot();
-
-		const CALL_PATH = urlJoin(PUBLIC_MOBILE_PATH, PUBLIC_TALENT_PATH, 'call', key);
-
-		const BASE_PATH = urlJoin(PUBLIC_MOBILE_PATH, PUBLIC_TALENT_PATH, key);
-
-		if (linkMachineState?.matches('claimed.canCall')) {
-			if (url.pathname !== CALL_PATH) {
-				throw redirect(307, urlJoin(url.origin, CALL_PATH));
-			}
-		} else {
-			if (url.pathname !== BASE_PATH) throw redirect(307, urlJoin(url.origin, BASE_PATH));
-		}
-	}
-
 	return {
 		token,
 		talent,
