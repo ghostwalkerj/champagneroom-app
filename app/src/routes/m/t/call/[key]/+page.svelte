@@ -4,11 +4,8 @@
 	import MobileVideoCall from '$lib/components/calls/MobileVideoCall.svelte';
 	import { callMachine } from '$lib/machines/callMachine';
 	import { createLinkMachineService, type LinkMachineServiceType } from '$lib/machines/linkMachine';
-	import { talentDB, type TalentDBType } from '$lib/ORM/dbs/talentDB';
 	import { CallEventType } from '$lib/ORM/models/callEvent';
 	import type { LinkDocument } from '$lib/ORM/models/link';
-	import type { TalentDocType, TalentDocument } from '$lib/ORM/models/talent';
-	import { StorageTypes } from '$lib/ORM/rxdb';
 	import { userStream, type UserStreamType } from '$lib/util/userStream';
 	import type { VideoCallType } from '$lib/util/videoCall';
 	import { onDestroy, onMount } from 'svelte';
@@ -18,17 +15,22 @@
 
 	import MobileVideoPreview from '$lib/components/calls/MobileVideoPreview.svelte';
 	import type { EventObject } from 'xstate';
+	import { goto } from '$app/navigation';
+	import urlJoin from 'url-join';
+	import { PUBLIC_MOBILE_PATH, PUBLIC_TALENT_PATH } from '$env/static/public';
+	import { talentDB, type TalentDBType } from '$lib/ORM/dbs/talentDB';
+	import { StorageTypes } from '$lib/ORM/rxdb';
 
 	export let data: PageData;
+
+	$: currentLink = data.currentLink as LinkDocument;
 	const token = data.token;
 
-	let talentObj = data.talent as TalentDocType;
-	$: currentLink = data.currentLink as LinkDocument;
 	let key = $page.params.key;
 	let vc: VideoCallType;
-	let talent: TalentDocument;
 	let linkService: LinkMachineServiceType;
 	let linkSub: Subscription;
+	let linkStateSub: Subscription;
 
 	$: ready4Call = false;
 	$: showCallModal = false;
@@ -42,21 +44,45 @@
 	let linkMachineState =
 		currentLink && createLinkMachineService(currentLink.linkState).getSnapshot();
 
+	const BASE_PATH = urlJoin($page.url.origin, PUBLIC_MOBILE_PATH, PUBLIC_TALENT_PATH, key);
+
+	if (browser) {
+		talentDB(token, key, StorageTypes.IDB).then((db: TalentDBType) => {
+			db.links
+				.findOne(currentLink._id)
+				.exec()
+				.then((link) => {
+					if (link) {
+						currentLink = link;
+						useLink(link);
+					}
+				})
+				.catch((err) => {
+					console.error(err);
+				});
+		});
+	}
+
 	const useLinkState = (link: LinkDocument, linkState: LinkDocument['linkState']) => {
 		if (linkService) linkService.stop();
 		if (linkSub) linkSub.unsubscribe();
 
 		linkService = createLinkMachineService(linkState, link.updateLinkStateCallBack());
-		linkSub = linkService.subscribe((state) => {
+		linkSub = linkService.subscribe(async (state) => {
 			linkMachineState = state;
+			if (state.changed && !state.matches('claimed.canCall')) {
+				if (linkService) linkService.stop();
+				if (linkSub) linkSub.unsubscribe();
+				if (linkStateSub) linkStateSub.unsubscribe();
+				await goto(BASE_PATH);
+			}
 		});
 	};
 
 	const useLink = (link: LinkDocument) => {
-		currentLink = link;
-		initVC(currentLink.callId);
+		initVC(link.callId);
 		useLinkState(link, link.linkState);
-		link.get$('linkState').subscribe((_linkState) => {
+		linkStateSub = link.get$('linkState').subscribe((_linkState) => {
 			useLinkState(link, _linkState);
 		});
 	};
@@ -144,30 +170,6 @@
 	onDestroy(async () => {
 		if (vc) vc.destroy();
 	});
-
-	if (browser) {
-		talentDB(token, key, StorageTypes.IDB).then((db: TalentDBType) => {
-			db.talents
-				.findOne(talentObj._id)
-				.exec()
-				.then((_talent) => {
-					if (_talent) {
-						talentObj = _talent;
-						talent = _talent;
-						talent.get$('currentLink').subscribe((linkId) => {
-							if (linkId) {
-								db.links
-									.findOne(linkId)
-									.exec()
-									.then((link) => {
-										if (link) useLink(link);
-									});
-							}
-						});
-					}
-				});
-		});
-	}
 </script>
 
 <input type="checkbox" id="incomingcall-modal" class="modal-toggle" bind:checked={showCallModal} />

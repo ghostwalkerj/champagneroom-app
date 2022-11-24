@@ -10,15 +10,11 @@
 	export let form: import('./$types').ActionData;
 
 	let rating = 0;
-
-	const closeModal = () => {
-		showCallEnded = false;
-	};
 </script>
 
 <input type="checkbox" id="callended-modal" class="modal-toggle" bind:checked={showCallEnded} />
-<div class="modal">
-	<div class="modal-box card w-96 bg-neutral text-neutral-content">
+<div class="modal z-10">
+	<div class="modal-box card w-96 bg-neutral text-neutral-content ">
 		<div class="card-body items-center text-center">
 			<h2 class="card-title">How was your pCall?</h2>
 			<form method="post" action="?/feedback" use:enhance>
@@ -80,7 +76,13 @@
 			<div class="divider">OR</div>
 			<button class="btn btn-secondary" disabled={true}>Initiate Dispute</button>
 			<div class="divider">OR</div>
-			<button class="btn btn-secondary" disabled={!canCall} on:click={call}>
+			<button
+				class="btn btn-secondary"
+				disabled={!canCall}
+				on:click={() => {
+					call();
+				}}
+			>
 				Call {link.talentInfo.name} Again</button
 			>
 		</div>

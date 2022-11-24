@@ -126,7 +126,7 @@
 
 <input type="checkbox" id="outgoingcall-modal" class="modal-toggle" bind:checked={showCallModal} />
 <div class="modal">
-	<div class="modal-box">
+	<div class="modal-box z-20">
 		<div class="flex flex-row pt-4 gap-2 place-items-center justify-between">
 			<div class="font-bold text-lg  ">Making pCall</div>
 			<div class="h-14 animate-shock animate-loop w-14 animated  btn btn-circle ">
@@ -144,7 +144,6 @@
 </div>
 
 <CallEnded {showCallEnded} {link} {canCall} {form} {call} />
-
 <div class="min-h-full">
 	<main class="py-6">
 		{#if !inCall}

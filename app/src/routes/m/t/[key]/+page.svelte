@@ -82,21 +82,20 @@
 		if (linkSub) linkSub.unsubscribe();
 
 		linkService = createLinkMachineService(linkState, link.updateLinkStateCallBack());
-		linkSub = linkService.subscribe((state) => {
+		linkSub = linkService.subscribe(async (state) => {
 			linkMachineState = state;
 
-			if (state.changed) {
-				if (state.matches('claimed.canCall')) {
-					if (linkService) linkService.stop();
-					if (linkSub) linkSub.unsubscribe();
-					goto(CALL_PATH);
-				}
-				canCancelLink = state.can({
-					type: 'REQUEST CANCELLATION',
-					cancel: undefined
-				});
-				canCreateLink = state.done ?? true;
+			if (state.matches('claimed.canCall')) {
+				console.log('goto');
+				if (linkService) linkService.stop();
+				if (linkSub) linkSub.unsubscribe();
+				await goto(CALL_PATH);
 			}
+			canCancelLink = state.can({
+				type: 'REQUEST CANCELLATION',
+				cancel: undefined
+			});
+			canCreateLink = state.done ?? true;
 		});
 	};
 
