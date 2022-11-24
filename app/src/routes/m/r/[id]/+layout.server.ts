@@ -2,7 +2,7 @@ import { JWT_EXPIRY, JWT_PUBLIC_USER, JWT_SECRET } from '$env/static/private';
 import { publicDB } from '$lib/ORM/dbs/publicDB';
 import type { LinkDocType } from '$lib/ORM/models/link';
 import { StorageTypes } from '$lib/ORM/rxdb';
-import { error, redirect } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 
 // /** @type {import('./$types').LayoutServerLoad} */

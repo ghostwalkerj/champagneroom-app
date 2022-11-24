@@ -16,8 +16,8 @@
 	import type { Subscription } from 'xstate';
 	import type { PageData } from './$types';
 
-	import type { EventObject } from 'xstate';
 	import MobileVideoPreview from '$lib/components/calls/MobileVideoPreview.svelte';
+	import type { EventObject } from 'xstate';
 
 	export let data: PageData;
 	const token = data.token;
