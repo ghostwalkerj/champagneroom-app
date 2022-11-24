@@ -44,7 +44,7 @@
 	let linkMachineState =
 		currentLink && createLinkMachineService(currentLink.linkState).getSnapshot();
 
-	const BASE_PATH = urlJoin($page.url.origin, PUBLIC_MOBILE_PATH, PUBLIC_TALENT_PATH, key);
+	const BASE_PATH = urlJoin(PUBLIC_MOBILE_PATH, PUBLIC_TALENT_PATH, key);
 
 	if (browser) {
 		talentDB(token, key, StorageTypes.IDB).then((db: TalentDBType) => {

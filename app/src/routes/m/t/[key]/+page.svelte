@@ -34,11 +34,12 @@
 	let key = $page.params.key;
 
 	const ESCROW_PERIOD = Number(PUBLIC_ESCROW_PERIOD || 3600000);
-	const CALL_PATH = urlJoin($page.url.origin, PUBLIC_MOBILE_PATH, PUBLIC_TALENT_PATH, 'call', key);
+	const CALL_PATH = urlJoin(PUBLIC_MOBILE_PATH, PUBLIC_TALENT_PATH, 'call', key);
 
 	let talent: TalentDocument;
 	let linkService: LinkMachineServiceType;
 	let linkSub: Subscription;
+	let linkStateSub: Subscription;
 
 	let linkMachineState =
 		currentLink && createLinkMachineService(currentLink.linkState).getSnapshot();
@@ -86,10 +87,10 @@
 			linkMachineState = state;
 
 			if (state.matches('claimed.canCall')) {
-				console.log('goto');
+				await goto(CALL_PATH);
 				if (linkService) linkService.stop();
 				if (linkSub) linkSub.unsubscribe();
-				await goto(CALL_PATH);
+				if (linkStateSub) linkStateSub.unsubscribe();
 			}
 			canCancelLink = state.can({
 				type: 'REQUEST CANCELLATION',
@@ -103,7 +104,7 @@
 		currentLink = link;
 		waiting4StateChange = false; // link changed, so can submit again
 		useLinkState(link, link.linkState);
-		link.get$('linkState').subscribe((_linkState) => {
+		linkStateSub = link.get$('linkState').subscribe((_linkState) => {
 			waiting4StateChange = false; // link changed, so can submit again
 			useLinkState(link, _linkState);
 		});
