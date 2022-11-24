@@ -1,9 +1,13 @@
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ['./src/**/*.{html,js,svelte,ts}'],
- 	theme: {
-		extend: {},
+	content: ['./src/**/*.{html,js,svelte,ts}'],
+	theme: {
+		extend: {
+			scale: {
+				'-100': '-1',
+			}
+		},
 		screens: {
 			'2sx': '300px',
 			sx: '400px',
@@ -20,8 +24,8 @@ module.exports = {
 			'8xl': '4500px'
 		}
 	},
-  plugins: [require("daisyui"), require('tailwindcss-font-inter'), require('@tailwindcss/typography')],
-  	daisyui: {
+	plugins: [require("daisyui"), require('tailwindcss-font-inter'), require('@tailwindcss/typography')],
+	daisyui: {
 		styled: true,
 		base: true,
 		utils: true,
@@ -52,4 +56,4 @@ module.exports = {
 			}
 		]
 	}
-}
+};

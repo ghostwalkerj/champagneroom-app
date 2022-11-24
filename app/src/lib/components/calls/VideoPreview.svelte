@@ -40,7 +40,7 @@
 </script>
 
 <div class=" h-full w-full">
-	<div class=" w-full p-1">
+	<div class="w-full p-1 transform -scale-x-100">
 		<!-- svelte-ignore a11y-media-has-caption -->
 		<video bind:this={localVideo} playsinline autoplay />
 	</div>

@@ -47,7 +47,6 @@
 		camSend('TOGGLE');
 		localVideo.play();
 		showOverlay = !showOverlay;
-		console.log('localVideo', mediaStream);
 	};
 </script>
 
@@ -57,8 +56,8 @@
 		muted
 		autoplay
 		playsinline
-		loop
-		class="rounded-xl p-2 max-h-screen"
+		preload="none"
+		class="rounded-xl p-2 max-h-screen  -scale-x-100"
 		on:click={toggleVideo}
 	/>
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
