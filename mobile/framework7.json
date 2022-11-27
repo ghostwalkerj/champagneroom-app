@@ -1,0 +1,28 @@
+{
+  "cwd": "/Users/joseph/Dev/pmobile",
+  "type": [
+    "web",
+    "pwa",
+    "capacitor"
+  ],
+  "name": "pMobile",
+  "pkg": "app.pcall.pmobile",
+  "framework": "svelte",
+  "template": "tabs",
+  "cssPreProcessor": true,
+  "bundler": "vite",
+  "capacitor": {
+    "platforms": [
+      "ios",
+      "android"
+    ]
+  },
+  "theming": {
+    "customColor": false,
+    "color": "#007aff",
+    "darkTheme": true,
+    "iconFonts": true,
+    "fillBars": false
+  },
+  "customBuild": false
+}
