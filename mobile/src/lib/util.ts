@@ -1,6 +1,25 @@
 import urlJoin from 'url-join';
+import { TokenRoles } from 'pcall/src/lib/util/constants';
+import { talentDB } from 'pcall/src/lib/ORM/dbs/talentDB';
+import { StorageTypes } from 'pcall/src/lib/ORM/rxdb';
 
 export const getTalentDB = async (key: string) => {
-  const WEB_URL = import.meta.env.VITE_WEB_URL;
-  const AUTH_PATH = import.meta.env.VITE_AUTH_PATH;
+	const WEB_URL = import.meta.env.VITE_WEB_URL;
+	const AUTH_PATH = import.meta.env.VITE_AUTH_PATH;
+	const auth_url = urlJoin(WEB_URL, AUTH_PATH);
+
+	try {
+		const res = await fetch(auth_url, {
+			method: 'POST',
+			body: JSON.stringify({
+				tokenRole: TokenRoles.TALENT
+			})
+		});
+		const body = await res.json();
+		const token = body.token as string;
+		const db = await talentDB(token, key, StorageTypes.NODE_WEBSQL);
+		return db;
+	} catch (e) {
+		console.log(e);
+	}
 };
