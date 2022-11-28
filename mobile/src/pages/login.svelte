@@ -9,15 +9,31 @@
     BlockFooter,
   } from 'framework7-svelte';
   import { setContext } from 'svelte';
-  
+  import { getTalentDB } from '../lib/util';
 
   export let f7router;
 
   let key = '';
 
-  const signIn = () => {
-    
-    });
+  const signIn = async () => {
+    if (key.trim() !== '') {
+      const talentDB = await getTalentDB(key);
+      if (!talentDB) {
+        f7.dialog.alert('Invalid DB');
+        return;
+      }
+      const talent = await talentDB.talents
+        .findOne()
+        .where('key')
+        .equals(key)
+        .exec();
+      if (!talent) {
+        f7.dialog.alert('Invalid Key');
+        return;
+      }
+      setContext('talent', talent);
+      f7router.back();
+    }
   };
 </script>
 

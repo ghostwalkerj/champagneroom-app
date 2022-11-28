@@ -17,7 +17,7 @@ export const getTalentDB = async (key: string) => {
 		});
 		const body = await res.json();
 		const token = body.token as string;
-		const db = await talentDB(token, key, StorageTypes.NODE_WEBSQL);
+		const db = await talentDB(token, key, StorageTypes.IDB);
 		return db;
 	} catch (e) {
 		console.log(e);

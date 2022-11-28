@@ -1,12 +1,12 @@
 {
-  "cwd": "/Users/joseph/Dev/pmobile",
+  "cwd": "/Users/joseph/Dev/mobile",
   "type": [
     "web",
     "pwa",
     "capacitor"
   ],
-  "name": "pMobile",
-  "pkg": "app.pcall.pmobile",
+  "name": "pCall",
+  "pkg": "app.pcall",
   "framework": "svelte",
   "template": "tabs",
   "cssPreProcessor": true,

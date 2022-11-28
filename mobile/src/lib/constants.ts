@@ -1,0 +1,2 @@
+export const PUBLIC_RXDB_PASSWORD = import.meta.env.VITE_RXDB_PASSWORD;
+export const PUBLIC_CREATORS_ENDPOINT = import.meta.env.VITE_PUBLIC_CREATORS_ENDPOINT;

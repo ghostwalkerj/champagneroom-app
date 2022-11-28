@@ -15,7 +15,7 @@ import '../css/app.css';
 import App from '../components/app.svelte';
 
 // Init F7 Svelte Plugin
-Framework7.use(Framework7Svelte)
+Framework7.use(Framework7Svelte);
 
 // Mount Svelte App
 const app = new App({

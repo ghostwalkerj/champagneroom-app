@@ -5,6 +5,7 @@ import FormPage from '../pages/form.svelte';
 import CatalogPage from '../pages/catalog.svelte';
 import ProductPage from '../pages/product.svelte';
 import SettingsPage from '../pages/settings.svelte';
+import LoginPage from '../pages/login.svelte';
 
 import DynamicRoutePage from '../pages/dynamic-route.svelte';
 import RequestAndLoad from '../pages/request-and-load.svelte';
@@ -34,6 +35,10 @@ var routes = [
   {
     path: '/settings/',
     component: SettingsPage,
+  },
+  {
+    path: '/login/',
+    component: LoginPage,
   },
 
   {

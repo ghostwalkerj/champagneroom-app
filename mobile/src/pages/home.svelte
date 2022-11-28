@@ -61,6 +61,7 @@
   <List>
     <ListItem link="/about/" title="About" />
     <ListItem link="/form/" title="Form" />
+    <ListItem link="/login/" title="Login" />
   </List>
 
   <BlockTitle>Modals</BlockTitle>
