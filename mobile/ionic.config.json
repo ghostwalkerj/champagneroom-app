@@ -1,0 +1,7 @@
+{
+  "name": "pmobile",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "custom"
+}
