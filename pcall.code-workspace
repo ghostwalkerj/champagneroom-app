@@ -4,8 +4,83 @@
 			"path": "mobile"
 		},
 		{
-			"path": "app"
+			"path": "web"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"hide-files.files": [
+			"capacitor.config.ts",
+			"framework7.json",
+			"ionic.config.json",
+			"package.json",
+			"yarn.lock",
+			"postcss.config.js",
+			"README.md",
+			"tailwind.config.cjs",
+			"tsconfig.json",
+			"vite.config.js",
+			"workbox-config.js",
+			"node_modules",
+			"build",
+			".vscode",
+			"src/index.html",
+			"src/manifest.json",
+			"/Users/joseph/Dev/pcall/web/vite.config.ts",
+			"/Users/joseph/Dev/pcall/web/.dockerignore",
+			"/Users/joseph/Dev/pcall/web/.env.development",
+			"/Users/joseph/Dev/pcall/web/.env.example",
+			"/Users/joseph/Dev/pcall/web/.eslintignore",
+			"/Users/joseph/Dev/pcall/web/.eslintrc.cjs",
+			"/Users/joseph/Dev/pcall/web/.npmignore",
+			"/Users/joseph/Dev/pcall/web/.prettierignore",
+			"/Users/joseph/Dev/pcall/web/.prettierrc",
+			"/Users/joseph/Dev/pcall/web/Dockerfile",
+			"/Users/joseph/Dev/pcall/web/package.json",
+			"/Users/joseph/Dev/pcall/web/postcss.config.cjs",
+			"/Users/joseph/Dev/pcall/web/Procfile",
+			"/Users/joseph/Dev/pcall/web/server.js",
+			"/Users/joseph/Dev/pcall/web/svelte.config.js",
+			"/Users/joseph/Dev/pcall/web/tailwind.config.cjs",
+			"/Users/joseph/Dev/pcall/web/tsconfig.json",
+			"/Users/joseph/Dev/pcall/web/.svelte-kit"
+		],
+		"hidefiles.configurationType": "local",
+		"hidefiles.globalConfig": {
+			"profiles": [
+				{
+					"name": "Default",
+					"detail": "",
+					"description": "Test",
+					"hidden": [
+						".vscode/"
+					]
+				},
+				{
+					"name": "Strict",
+					"detail": "Hide everything not immediately required",
+					"hidden": [
+						"$Default"
+					]
+				}
+			]
+		},
+		"files.exclude": {
+			"**/.git": true,
+			"**/.svn": true,
+			"**/.hg": true,
+			"**/CVS": true,
+			"**/.DS_Store": true,
+			"**/Thumbs.db": true,
+			"**/*.git": true,
+			"vite.config.ts": true,
+			".dockerignore": true,
+			"../mobile/workbox-config.js": true,
+			".svelte-kit": true,
+			".vscode": true,
+			"tsconfig.json": true,
+			"../mobile/tailwind.config.cjs": true
+		},
+		"explorerExclude.backup": {},
+		"explorerExclude.showPicker": false
+	}
 }
