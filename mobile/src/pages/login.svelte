@@ -31,8 +31,9 @@
         f7.dialog.alert('Invalid Key');
         return;
       }
-      setContext('talent', talent);
-      f7router.back();
+      //setContext('talent', talent);
+      f7.dialog.alert('Welcome ' + talent.name);
+      f7router.navigate('/');
     }
   };
 </script>

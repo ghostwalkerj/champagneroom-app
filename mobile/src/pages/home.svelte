@@ -16,6 +16,7 @@
     Col,
     Button,
   } from 'framework7-svelte';
+  import { getContext } from 'svelte';
 </script>
 
 <Page name="home">
@@ -40,16 +41,12 @@
         panelOpen="right"
       />
     </NavRight>
-    <NavTitleLarge>pCall Mobile</NavTitleLarge>
+    <NavTitleLarge>pCall Talent App</NavTitleLarge>
   </Navbar>
 
   <!-- Page content -->
   <Block strong>
-    <p>
-      This is an example of tabs-layout application. The main point of such
-      tabbed layout is that each tab contains independent view with its own
-      routing and navigation.
-    </p>
+    <p>Welcome!</p>
 
     <p>
       Each tab/view may have different layout, different navbar type (dynamic,
