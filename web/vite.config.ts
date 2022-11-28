@@ -4,7 +4,7 @@ import basicSsl from '@vitejs/plugin-basic-ssl';
 
 const config: UserConfig = {
 	mode: 'development',
-	plugins: [basicSsl(), sveltekit()],
+	plugins: [sveltekit()],
 	optimizeDeps: {},
 	ssr: {
 		noExternal: ['chart.js/**']
