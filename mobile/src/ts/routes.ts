@@ -1,6 +1,6 @@
 
 import AboutPage from '../pages/about.svelte';
-import CatalogPage from '../pages/catalog.svelte';
+import WalletPage from '../pages/wallet.svelte';
 import FormPage from '../pages/form.svelte';
 import HomePage from '../pages/home.svelte';
 import ProductPage from '../pages/product.svelte';
@@ -25,7 +25,7 @@ var routes = [
   },
   {
     path: '/wallet/',
-    component: CatalogPage,
+    component: WalletPage
   },
   {
     path: '/product/:id/',

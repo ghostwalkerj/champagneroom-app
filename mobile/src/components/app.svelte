@@ -31,6 +31,41 @@
   import routes from '../ts/routes';
   import store from '../ts/store';
 
+  import { talent } from '../lib/stores';
+  import { getTalentDB } from '../lib/util';
+
+  let loginScreenOpened = false;
+  let key = '';
+
+  if (!$talent) {
+    loginScreenOpened = true;
+  }
+
+  const login = async () => {
+    if (key.trim() === '') {
+      return;
+    }
+    const preloader = f7.dialog.preloader('Loading...', 'purple');
+    const db = await getTalentDB(key);
+    if (!db) {
+      preloader.close();
+      f7.dialog.alert('Invalid DB');
+      return;
+    }
+    const _talent = await db.talents.findOne().where('key').equals(key).exec();
+    if (!_talent) {
+      preloader.close();
+
+      f7.dialog.alert('Invalid Key');
+      return;
+    }
+    talent.set(_talent);
+    name = _talent.name;
+    preloader.close();
+
+    loginScreenOpened = false;
+  };
+
   const device = getDevice();
   // Framework7 Parameters
   let f7params = {
@@ -94,6 +129,35 @@
       </View>
     </Panel>
 
+    <!-- Login Screen -->
+    <LoginScreen
+      class="login-screen"
+      opened={loginScreenOpened}
+      onLoginScreenClosed={() => (loginScreenOpened = false)}
+    >
+      <Page loginScreen>
+        <LoginScreenTitle>Talent Login</LoginScreenTitle>
+        <List form>
+          <ListInput
+            label="Talent Key"
+            type="text"
+            placeholder="Your Key"
+            value={key}
+            onInput={e => (key = e.target.value)}
+            required
+            validate
+          />
+        </List>
+        <List>
+          <ListButton onClick={login}>Log In</ListButton>
+        </List>
+        <BlockFooter>
+          Pretioso flos est, nihil ad vos nunc. Posset faciens pecuniam. Posuit
+          eam ad opus nunc et adepto a pCall!</BlockFooter
+        >
+      </Page>
+    </LoginScreen>
+
     <!-- Views/Tabs container -->
     <Views tabs class="safe-areas">
       <!-- Tabbar for switching views-tabs -->
@@ -131,21 +195,5 @@
       <!-- profile View -->
       <View id="view-profile" name="profile" tab url="/profile/" />
     </Views>
-
-    <!-- Popup -->
-    <Popup id="my-popup">
-      <View>
-        <Page>
-          <Navbar title="Popup">
-            <NavRight>
-              <Link popupClose>Close</Link>
-            </NavRight>
-          </Navbar>
-          <Block>
-            <p>Popup content goes here.</p>
-          </Block>
-        </Page>
-      </View>
-    </Popup>
   </App>
 </KonstaProvider>

@@ -5848,6 +5848,11 @@ svelte-preprocess@^4.0.0, svelte-preprocess@^4.10.7:
     sorcery "^0.10.0"
     strip-indent "^3.0.0"
 
+svelte-star-rating@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/svelte-star-rating/-/svelte-star-rating-2.0.1.tgz#f1a019eea5179e928550ac49b3c7bfebe149c130"
+  integrity sha512-bURPn91T+uBCi4XXdh2eE0k2sCILcJrfb8NfKOBfpVbOJYjTfWllBtSKQMoXRnXwRmgx/52HC87ziG1KTywkFg==
+
 svelte@^3.53.1:
   version "3.53.1"
   resolved "https://registry.npmjs.org/svelte/-/svelte-3.53.1.tgz"

@@ -22,8 +22,8 @@
   };
 </script>
 
-<Page name="catalog">
-  <Navbar title="Catalog" />
+<Page name="wallet">
+  <Navbar title="Wallet" />
   <List>
     {#each products as product, index (product.id)}
       <ListItem title={product.title} link={`/product/${product.id}/`} />

@@ -40,6 +40,7 @@
     "material-icons": "^1.12.2",
     "skeleton-elements": "^4.0.1",
     "svelte": "^3.53.1",
+    "svelte-star-rating": "^2.0.1",
     "swiper": "^8.4.5",
     "url-join": "^5.0.0"
   },
