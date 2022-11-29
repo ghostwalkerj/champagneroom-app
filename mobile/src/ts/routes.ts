@@ -1,15 +1,14 @@
 
-import HomePage from '../pages/home.svelte';
 import AboutPage from '../pages/about.svelte';
-import FormPage from '../pages/form.svelte';
 import CatalogPage from '../pages/catalog.svelte';
+import FormPage from '../pages/form.svelte';
+import HomePage from '../pages/home.svelte';
 import ProductPage from '../pages/product.svelte';
-import SettingsPage from '../pages/settings.svelte';
-import LoginPage from '../pages/login.svelte';
+import ProfilePage from '../pages/profile.svelte';
 
+import NotFoundPage from '../pages/404.svelte';
 import DynamicRoutePage from '../pages/dynamic-route.svelte';
 import RequestAndLoad from '../pages/request-and-load.svelte';
-import NotFoundPage from '../pages/404.svelte';
 
 var routes = [
   {
@@ -25,7 +24,7 @@ var routes = [
     component: FormPage,
   },
   {
-    path: '/catalog/',
+    path: '/wallet/',
     component: CatalogPage,
   },
   {
@@ -33,12 +32,8 @@ var routes = [
     component: ProductPage,
   },
   {
-    path: '/settings/',
-    component: SettingsPage,
-  },
-  {
-    path: '/login/',
-    component: LoginPage,
+    path: '/profile/',
+    component: ProfilePage
   },
 
   {

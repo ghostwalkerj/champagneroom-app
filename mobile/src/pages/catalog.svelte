@@ -1,11 +1,11 @@
 <script>
   import {
-    Page,
-    Navbar,
-    List,
-    ListItem,
     Block,
     Button,
+    List,
+    ListItem,
+    Navbar,
+    Page,
     useStore,
   } from 'framework7-svelte';
   import store from '../ts/store';

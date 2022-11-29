@@ -34,10 +34,10 @@
   const device = getDevice();
   // Framework7 Parameters
   let f7params = {
-    name: 'pMobile', // App name
+    name: 'pCall', // App name
     theme: 'auto', // Automatic theme detection
 
-    id: 'app.pcall.pmobile', // App bundle ID
+    id: 'app.pcall', // App bundle ID
     // App store
     store: store,
     // App routes
@@ -49,29 +49,18 @@
             path: '/service-worker.js',
           }
         : {},
-    // Input settings
+    // Input profile
     input: {
       scrollIntoViewOnFocus: device.capacitor,
       scrollIntoViewCentered: device.capacitor,
     },
-    // Capacitor Statusbar settings
+    // Capacitor Statusbar profile
     statusbar: {
       iosOverlaysWebView: true,
       androidOverlaysWebView: false,
     },
   };
-  // Login screen demo data
-  let username = '';
-  let password = '';
 
-  function alertLoginData() {
-    f7.dialog.alert(
-      'Username: ' + username + '<br>Password: ' + password,
-      () => {
-        f7.loginScreen.close();
-      }
-    );
-  }
   onMount(() => {
     f7ready(() => {
       // Init capacitor APIs (see capacitor-app.js)
@@ -118,29 +107,29 @@
           text="Home"
         />
         <Link
-          tabLink="#view-catalog"
-          iconIos="f7:square_list_fill"
-          iconAurora="f7:square_list_fill"
-          iconMd="material:view_list"
-          text="Catalog"
+          tabLink="#view-profile"
+          iconIos="f7:person_circle_fill"
+          iconAurora="f7:person_circle_fill"
+          iconMd="material:person_circle_fill"
+          text="Profile"
         />
         <Link
-          tabLink="#view-settings"
-          iconIos="f7:gear"
-          iconAurora="f7:gear"
-          iconMd="material:settings"
-          text="Settings"
+          tabLink="#view-wallet"
+          iconIos="f7:wallet_fill"
+          iconAurora="f7:square_list_fill"
+          iconMd="material:wallet_fill"
+          text="Wallet"
         />
       </Toolbar>
 
       <!-- Your main view/tab, should have "view-main" class. It also has "tabActive" prop -->
       <View id="view-home" main tab tabActive url="/" />
 
-      <!-- Catalog View -->
-      <View id="view-catalog" name="catalog" tab url="/catalog/" />
+      <!-- wallet View -->
+      <View id="view-wallet" name="wallet" tab url="/wallet/" />
 
-      <!-- Settings View -->
-      <View id="view-settings" name="settings" tab url="/settings/" />
+      <!-- profile View -->
+      <View id="view-profile" name="profile" tab url="/profile/" />
     </Views>
 
     <!-- Popup -->
@@ -158,34 +147,5 @@
         </Page>
       </View>
     </Popup>
-
-    <LoginScreen id="my-login-screen">
-      <View>
-        <Page loginScreen>
-          <LoginScreenTitle>Login</LoginScreenTitle>
-          <List form>
-            <ListInput
-              type="text"
-              name="username"
-              placeholder="Your username"
-              bind:value={username}
-            />
-            <ListInput
-              type="password"
-              name="password"
-              placeholder="Your password"
-              bind:value={password}
-            />
-          </List>
-          <List>
-            <ListButton title="Sign In" onClick={() => alertLoginData()} />
-          </List>
-          <BlockFooter>
-            Some text about login information.<br />Click "Sign In" to close
-            Login Screen
-          </BlockFooter>
-        </Page>
-      </View>
-    </LoginScreen>
   </App>
 </KonstaProvider>

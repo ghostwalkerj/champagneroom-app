@@ -1,12 +1,5 @@
-<Page name="product">
-  <Navbar title={currentProduct.title} backLink="Back" />
-  <BlockTitle>About {currentProduct.title}</BlockTitle>
-  <Block strong>
-    {currentProduct.description}
-  </Block>
-</Page>
 <script>
-  import { Page, Navbar, BlockTitle, Block, useStore } from 'framework7-svelte';
+  import { Block, BlockTitle, Navbar, Page, useStore } from 'framework7-svelte';
 
   export let f7route;
 
@@ -19,3 +12,11 @@
     }
   });
 </script>
+
+<Page name="product">
+  <Navbar title={currentProduct.title} backLink="Back" />
+  <BlockTitle>About {currentProduct.title}</BlockTitle>
+  <Block strong>
+    {currentProduct.description}
+  </Block>
+</Page>

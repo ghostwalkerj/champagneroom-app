@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">pmobile</string>
-    <string name="title_activity_main">pmobile</string>
-    <string name="package_name">app.pcall.pmobile</string>
-    <string name="custom_url_scheme">app.pcall.pmobile</string>
+    <string name="app_name">pCall</string>
+    <string name="title_activity_main">pCall</string>
+    <string name="package_name">app.pcall</string>
+    <string name="custom_url_scheme">app.pcall</string>
 </resources>

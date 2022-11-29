@@ -1,54 +1,100 @@
-<script>
+<script type="ts">
   import {
-    Page,
-    Navbar,
-    NavLeft,
-    NavTitle,
-    NavTitleLarge,
-    NavRight,
-    Link,
-    Toolbar,
     Block,
+    BlockFooter,
     BlockTitle,
-    List,
-    ListItem,
-    Row,
-    Col,
     Button,
+    Col,
+    f7,
+    List,
+    ListButton,
+    ListInput,
+    ListItem,
+    LoginScreen,
+    LoginScreenTitle,
+    Navbar,
+    Page,
+    Row,
   } from 'framework7-svelte';
 
   import { talent } from '../lib/stores';
+  import { getTalentDB } from '../lib/util';
+
+  let loginScreenOpened = false;
+  let key = '';
+  $: name = '';
+
+  if (!$talent) {
+    loginScreenOpened = true;
+  }
+
+  const login = async () => {
+    if (key.trim() === '') {
+      return;
+    }
+    const preloader = f7.dialog.preloader('Loading...', 'purple');
+    const db = await getTalentDB(key);
+    if (!db) {
+      preloader.close();
+      f7.dialog.alert('Invalid DB');
+      return;
+    }
+    const _talent = await db.talents.findOne().where('key').equals(key).exec();
+    if (!_talent) {
+      preloader.close();
+
+      f7.dialog.alert('Invalid Key');
+      return;
+    }
+    talent.set(_talent);
+    name = _talent.name;
+    preloader.close();
+
+    loginScreenOpened = false;
+  };
 </script>
 
 <Page name="home">
   <!-- Top Navbar -->
-  <Navbar large sliding={false}>
-    <NavLeft>
-      <!-- svelte-ignore a11y-missing-attribute -->
+  <Navbar title="pCall Creator" subtitle={name} />
 
-      <Link
-        iconIos="f7:menu"
-        iconAurora="f7:menu"
-        iconMd="material:menu"
-        panelOpen="left"
-      />
-    </NavLeft>
-    <NavTitle sliding>pMobile</NavTitle>
-    <NavRight>
-      <Link
-        iconIos="f7:menu"
-        iconAurora="f7:menu"
-        iconMd="material:menu"
-        panelOpen="right"
-      />
-    </NavRight>
-    <NavTitleLarge>pCall Creator</NavTitleLarge>
-  </Navbar>
+  <!-- Login Screen -->
+  <LoginScreen
+    class="login-screen"
+    opened={loginScreenOpened}
+    onLoginScreenClosed={() => (loginScreenOpened = false)}
+  >
+    <Page loginScreen>
+      <LoginScreenTitle>Talent Login</LoginScreenTitle>
+      <List form>
+        <ListInput
+          label="Talent Key"
+          type="text"
+          placeholder="Your Key"
+          value={key}
+          onInput={e => (key = e.target.value)}
+          required
+          validate
+        />
+      </List>
+      <List>
+        <ListButton onClick={login}>Log In</ListButton>
+      </List>
+      <BlockFooter>
+        Pretioso flos est, nihil ad vos nunc. Posset faciens pecuniam. Posuit
+        eam ad opus nunc et adepto a pCall!</BlockFooter
+      >
+    </Page>
+  </LoginScreen>
 
   <!-- Page content -->
   <Block strong>
     {#if $talent}
       <p>Welcome {$talent.name}</p>
+      <div
+        class="bg-cover bg-no-repeat bg-center rounded-full h-48 w-48"
+        style="background-image: url('{$talent.profileImageUrl}')"
+      />
     {:else}
       <p>Welcome</p>
     {/if}
@@ -63,7 +109,6 @@
   <List>
     <ListItem link="/about/" title="About" />
     <ListItem link="/form/" title="Form" />
-    <ListItem link="/login/" title="Login" />
   </List>
 
   <BlockTitle>Modals</BlockTitle>
@@ -91,19 +136,4 @@
       </Col>
     </Row>
   </Block>
-
-  <List>
-    <ListItem
-      title="Dynamic (Component) Route"
-      link="/dynamic-route/blog/45/post/125/?foo=bar#about"
-    />
-    <ListItem
-      title="Default Route (404)"
-      link="/load-something-that-doesnt-exist/"
-    />
-    <ListItem
-      title="Request Data & Load"
-      link="/request-and-load/user/123456/"
-    />
-  </List>
 </Page>
