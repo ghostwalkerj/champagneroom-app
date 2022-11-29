@@ -11,6 +11,7 @@
     Range,
     Row,
     Toggle,
+    Col,
   } from 'framework7-svelte';
   import StarRating from 'svelte-star-rating';
 
@@ -20,19 +21,21 @@
 {#if $talent}
   <Page name="Profile">
     <Navbar title="Profile" />
-    <Block>
-      <div class="flex w-full place-content-center p-2">
-        <div
-          class="bg-cover bg-no-repeat bg-center rounded-full h-48 w-48"
-          style="background-image: url('{$talent.profileImageUrl}')"
-        />
-      </div>
+    <Block strong>
+      <Row>
+        <Col width="100" class="flex place-content-center">
+          <div
+            class=" bg-cover bg-no-repeat bg-center rounded-full h-48 w-48"
+            style="background-image: url('{$talent.profileImageUrl}')"
+          />
+        </Col>
+      </Row>
+      <Row>
+        <Col width="100" class="flex pt-4 place-content-center">
+          <StarRating rating={$talent.stats.ratingAvg ?? 0} />
+        </Col>
+      </Row>
     </Block>
-    <Block>
-      <div class="flex w-full place-content-center p-2">
-        <StarRating rating={$talent.stats.ratingAvg ?? 0} />
-      </div></Block
-    >
     <List noHairlinesMd>
       <ListInput label="Name" type="text" placeholder={$talent.name} />
 
