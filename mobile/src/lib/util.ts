@@ -4,9 +4,9 @@ import { talentDB } from 'pcall/src/lib/ORM/dbs/talentDB';
 import { StorageTypes } from 'pcall/src/lib/ORM/rxdb';
 
 export const getTalentDB = async (key: string) => {
-	const WEB_URL = import.meta.env.VITE_WEB_URL;
+	const PCALL_URL = import.meta.env.VITE_PCALL_URL;
 	const AUTH_PATH = import.meta.env.VITE_AUTH_PATH;
-	const auth_url = urlJoin(WEB_URL, AUTH_PATH);
+	const auth_url = urlJoin(PCALL_URL, AUTH_PATH);
 
 	try {
 		const res = await fetch(auth_url, {

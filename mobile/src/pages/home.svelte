@@ -16,7 +16,8 @@
     Col,
     Button,
   } from 'framework7-svelte';
-  import { getContext } from 'svelte';
+
+  import { talent } from '../lib/stores';
 </script>
 
 <Page name="home">
@@ -41,12 +42,16 @@
         panelOpen="right"
       />
     </NavRight>
-    <NavTitleLarge>pCall Talent App</NavTitleLarge>
+    <NavTitleLarge>pCall Creator</NavTitleLarge>
   </Navbar>
 
   <!-- Page content -->
   <Block strong>
-    <p>Welcome!</p>
+    {#if $talent}
+      <p>Welcome {$talent.name}</p>
+    {:else}
+      <p>Welcome</p>
+    {/if}
 
     <p>
       Each tab/view may have different layout, different navbar type (dynamic,

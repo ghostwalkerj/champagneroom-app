@@ -8,7 +8,7 @@
     ListButton,
     BlockFooter,
   } from 'framework7-svelte';
-  import { setContext } from 'svelte';
+  import { talent } from '../lib/stores';
   import { getTalentDB } from '../lib/util';
 
   export let f7router;
@@ -22,17 +22,18 @@
         f7.dialog.alert('Invalid DB');
         return;
       }
-      const talent = await talentDB.talents
+      const _talent = await talentDB.talents
         .findOne()
         .where('key')
         .equals(key)
         .exec();
-      if (!talent) {
+      if (!_talent) {
         f7.dialog.alert('Invalid Key');
         return;
       }
-      //setContext('talent', talent);
-      f7.dialog.alert('Welcome ' + talent.name);
+      talent.set(_talent);
+
+      f7.dialog.alert('Welcome ' + _talent.name);
       f7router.navigate('/');
     }
   };
