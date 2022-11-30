@@ -19,6 +19,11 @@
     "types": [
       "node",
       "vite/client"
-    ]
+    ],
+    "paths": {
+      "$lib/*": [
+        "./node_modules/pcall/src/lib/*"
+      ],
+    }
   }
 }
