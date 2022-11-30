@@ -45,7 +45,7 @@
     if (key.trim() === '') {
       return;
     }
-    const preloader = f7.dialog.preloader('Loading...', 'purple');
+    const preloader = f7.dialog.preloader('Loading...', 'deeppurple');
     const db = await getTalentDB(key);
     if (!db) {
       preloader.close();
@@ -61,7 +61,6 @@
       return;
     }
     talent.set(_talent);
-    name = _talent.name;
     preloader.close();
 
     loginScreenOpened = false;
@@ -173,15 +172,16 @@
         />
         <Link
           tabLink="#view-profile"
-          iconIos="f7:person_circle_fill"
-          iconAurora="f7:person_circle_fill"
-          iconMd="material:person_circle_fill"
+          iconIos="f7:person_circle"
+          iconAurora="f7:person_circle"
+          iconMd="material:person"
           text="Profile"
         />
+
         <Link
           tabLink="#view-wallet"
           iconIos="f7:wallet_fill"
-          iconAurora="f7:square_list_fill"
+          iconAurora="f7:wallet_fill"
           iconMd="material:wallet_fill"
           text="Wallet"
         />

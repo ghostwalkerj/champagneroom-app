@@ -11,6 +11,8 @@
     Row,
     Card,
     CardContent,
+    CardFooter,
+    Icon,
   } from 'framework7-svelte';
   import { talent, talentDB } from '../lib/stores';
   import type { LinkDocument } from '$lib/ORM/models/link';
@@ -20,16 +22,30 @@
     type LinkMachineServiceType,
   } from '$lib/machines/linkMachine';
   import type { Subscription } from 'xstate';
+  import urlJoin from 'url-join';
+  import getProfileImage from '$lib/util/profilePhoto';
+  import spacetime from 'spacetime';
+
+  const PCALL_URL = import.meta.env.VITE_PCALL_URL;
+  const ROOM_PATH = import.meta.env.VITE_ROOM_PATH;
 
   $: name = '';
   $: currentLink = null as LinkDocument | null;
   $: waiting4StateChange = false;
+  $: linkURL =
+    (currentLink && urlJoin(PCALL_URL, ROOM_PATH, currentLink._id)) || '';
 
   let linkMachineState =
     currentLink &&
     createLinkMachineService(currentLink.linkState).getSnapshot();
   let linkService: LinkMachineServiceType;
   let linkSub: Subscription;
+  let tooltipOpen = '';
+  const copyLink = () => {
+    navigator.clipboard.writeText(linkURL);
+    tooltipOpen = 'tooltip-open';
+    setTimeout(() => (tooltipOpen = ''), 2000);
+  };
 
   $: canCancelLink =
     linkMachineState &&
@@ -58,6 +74,17 @@
       });
     }
   });
+
+  $: claim = (linkMachineState && linkMachineState.context.linkState.claim) || {
+    caller: '',
+    createdAt: '',
+    call: {
+      startedAt: undefined,
+      endedAt: undefined,
+    },
+  };
+
+  $: callerProfileImage = urlJoin(PCALL_URL, getProfileImage(claim.caller));
 
   const useLinkState = (
     link: LinkDocument,
@@ -99,21 +126,60 @@
   <Navbar title="pCall Creator" subtitle={name} />
 
   <!-- Current Link -->
-  {#if currentLink}
-    <Card title="Your Outstanding pCall Link">
+  {#if currentLink && linkMachineState}
+    <Card title="Your Outstanding pCall Link" class="border-2 rounded-lg ">
+      <CardContent class="bg-color-black">
+        {#if linkMachineState.matches('unclaimed')}
+          <Row>Your pCall Link has Not Been Claimed</Row>
+        {:else if linkMachineState.matches('claimed')}
+          <Row>
+            Your pCall Link was Claimed by:
+            <Col
+              class="mt-4 flex flex-row w-full place-content-evenly items-center"
+            >
+              <div
+                class="bg-cover  bg-no-repeat bg-center rounded-full h-32 w-32"
+                style="background-image: url('{callerProfileImage}')"
+              />
+              <div class="text-center">
+                <div>{claim.caller}</div>
+                <div>on</div>
+                <div>{spacetime(claim.createdAt).format('nice-short')}</div>
+              </div>
+            </Col>
+          </Row>
+        {/if}
+      </CardContent>
       <CardContent>
         <Row
           ><Col
-            >Amount Requested: {currencyFormatter.format(
+            >Amount Requested:<br />{currencyFormatter.format(
               currentLink.requestedAmount
             )}</Col
           >
           <Col
-            >Total Funded: {currencyFormatter.format(
-              currentLink.linkState.totalFunding || 0
+            >Total Funded:<br />{currencyFormatter.format(
+              linkMachineState.context.linkState.totalFunding || 0
             )}</Col
           >
         </Row>
+        <Row class="pt-4">
+          <Col>Funding Address:<br /></Col>
+          <div class="break-all">{currentLink.fundingAddress}</div>
+        </Row>
+      </CardContent>
+      <Button on:click={copyLink}>Copy pCall Link</Button>
+
+      <CardFooter>
+        {#if linkMachineState.context.linkState.totalFunding >= currentLink.requestedAmount}
+          Link is Fully Funded!
+        {/if}
+      </CardFooter>
+    </Card>
+  {:else}
+    <Card title="No Outstanding pCall Link">
+      <CardContent>
+        <p>Click the button below to create a new pCall link.</p>
       </CardContent>
     </Card>
   {/if}
