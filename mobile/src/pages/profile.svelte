@@ -3,6 +3,7 @@
     Block,
     BlockTitle,
     Button,
+    Col,
     List,
     ListInput,
     ListItem,
@@ -11,7 +12,6 @@
     Range,
     Row,
     Toggle,
-    Col,
   } from 'framework7-svelte';
   import StarRating from 'svelte-star-rating';
 

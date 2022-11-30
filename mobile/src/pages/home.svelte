@@ -1,28 +1,34 @@
-<script type="ts">
+<script lang="ts">
   import {
     Block,
-    BlockFooter,
     BlockTitle,
     Button,
     Col,
-    f7,
     List,
-    ListButton,
-    ListInput,
     ListItem,
-    LoginScreen,
-    LoginScreenTitle,
     Navbar,
     Page,
     Row,
   } from 'framework7-svelte';
-  import { talent } from '../lib/stores';
+  import { talent, talentDB } from '../lib/stores';
+  import type { LinkDocument } from '$lib/ORM/models/link';
 
   $: name = '';
+  $: currentLink = null as LinkDocument | null;
 
   $: talent.subscribe(talent => {
     if (talent) {
       name = talent.name;
+      talent.get$('currentLink').subscribe(linkId => {
+        if (linkId && $talentDB) {
+          $talentDB.links
+            .findOne(linkId)
+            .exec()
+            .then(link => {
+              currentLink = link;
+            });
+        }
+      });
     }
   });
 </script>

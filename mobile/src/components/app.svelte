@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { KonstaProvider } from 'konsta/svelte';
 
   import { onMount } from 'svelte';
@@ -31,7 +31,7 @@
   import routes from '../ts/routes';
   import store from '../ts/store';
 
-  import { talent } from '../lib/stores';
+  import { talent, talentDB } from '../lib/stores';
   import { getTalentDB } from '../lib/util';
 
   let loginScreenOpened = false;
@@ -52,6 +52,7 @@
       f7.dialog.alert('Invalid DB');
       return;
     }
+    talentDB.set(db);
     const _talent = await db.talents.findOne().where('key').equals(key).exec();
     if (!_talent) {
       preloader.close();
