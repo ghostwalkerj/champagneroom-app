@@ -127,13 +127,13 @@
 
   <!-- Current Link -->
   {#if currentLink && linkMachineState}
-    <Card title="Your Outstanding pCall Link" class="border-2 rounded-lg ">
+    <Card title="Your Outstanding pCall Link" class="rounded-lg" outline>
       <CardContent class="bg-color-black">
         {#if linkMachineState.matches('unclaimed')}
           <Row>Your pCall Link has Not Been Claimed</Row>
         {:else if linkMachineState.matches('claimed')}
           <Row>
-            Your pCall Link was Claimed by:
+            pCall Link was Claimed by:
             <Col
               class="mt-4 flex flex-row w-full place-content-evenly items-center"
             >
@@ -163,19 +163,42 @@
             )}</Col
           >
         </Row>
+        {#if linkMachineState.context.linkState.totalFunding >= currentLink.requestedAmount}
+          <Row>Link is Fully Funded!</Row>
+        {/if}
         <Row class="pt-4">
           <Col>Funding Address:<br /></Col>
           <div class="break-all">{currentLink.fundingAddress}</div>
         </Row>
       </CardContent>
       <Button on:click={copyLink}>Copy pCall Link</Button>
-
-      <CardFooter>
-        {#if linkMachineState.context.linkState.totalFunding >= currentLink.requestedAmount}
-          Link is Fully Funded!
-        {/if}
-      </CardFooter>
     </Card>
+
+    <!-- Cancel Link -->
+    {#if canCancelLink}
+      <Card title="Cancel Your pCall Link" class="rounded-lg" outline>
+        {#if linkMachineState.context.linkState.totalFunding > 0}
+          <Block strong>
+            <Row>
+              <Col>
+                {currencyFormatter.format(
+                  linkMachineState.context.linkState.totalFunding
+                )} will be refunded to "{linkMachineState.context.linkState
+                  .claim?.caller}"
+              </Col>
+            </Row>
+          </Block>
+        {/if}
+
+        <Block strong>
+          <Row>
+            <Col>
+              <Button fill round>Cancel</Button>
+            </Col>
+          </Row>
+        </Block>
+      </Card>
+    {/if}
   {:else}
     <Card title="No Outstanding pCall Link">
       <CardContent>
