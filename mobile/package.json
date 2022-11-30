@@ -43,7 +43,8 @@
     "svelte": "^3.53.1",
     "svelte-star-rating": "^2.0.1",
     "swiper": "^8.4.5",
-    "url-join": "^5.0.0"
+    "url-join": "^5.0.0",
+    "xstate": "^4.34.0"
   },
   "devDependencies": {
     "@capacitor/assets": "^2.0.4",
