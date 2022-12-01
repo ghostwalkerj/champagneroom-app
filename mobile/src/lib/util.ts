@@ -2,6 +2,7 @@ import urlJoin from 'url-join';
 import { TokenRoles } from '$lib/util/constants';
 import { talentDB } from '$lib/ORM/dbs/talentDB';
 import { StorageTypes } from '$lib/ORM/rxdb';
+import type { LinkMachineStateType } from '$lib/machines/linkMachine';
 
 export const getTalentDB = async (key: string) => {
 	const PCALL_URL = import.meta.env.VITE_PCALL_URL;
@@ -22,4 +23,17 @@ export const getTalentDB = async (key: string) => {
 	} catch (e) {
 		console.log(e);
 	}
+};
+
+export const formatLinkState = (linkMachineState: LinkMachineStateType) => {
+	if (linkMachineState.matches('finalized')) return 'finalized';
+	if (linkMachineState.matches('unclaimed')) return 'unclaimed';
+	if (linkMachineState.matches('cancelled')) return 'cancelled';
+	if (linkMachineState.matches('finalized')) return 'finalized';
+	if (linkMachineState.matches('inEscrow')) return 'in escrow';
+	if (linkMachineState.matches('inDispute')) return 'in dispute';
+	if (linkMachineState.matches('claimed.waiting4Funding')) return 'waiting for funding';
+	if (linkMachineState.matches('claimed.canCall')) return 'ready for pCall';
+	if (linkMachineState.matches('claimed.requestedCancellation.waiting4Refund')) return 'waiting for refund';
+
 };

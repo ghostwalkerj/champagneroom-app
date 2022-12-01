@@ -15,7 +15,7 @@
     Icon,
   } from 'framework7-svelte';
   import { talent, talentDB } from '../lib/stores';
-  import type { LinkDocument } from '$lib/ORM/models/link';
+  import { ActorType, type LinkDocument } from '$lib/ORM/models/link';
   import { currencyFormatter } from '$lib/util/constants';
   import {
     createLinkMachineService,
@@ -25,6 +25,8 @@
   import urlJoin from 'url-join';
   import getProfileImage from '$lib/util/profilePhoto';
   import spacetime from 'spacetime';
+  import { formatLinkState } from '../lib/util';
+  import { TransactionReasonType } from '$lib/ORM/models/transaction';
 
   const PCALL_URL = import.meta.env.VITE_PCALL_URL;
   const ROOM_PATH = import.meta.env.VITE_ROOM_PATH;
@@ -41,6 +43,7 @@
   let linkService: LinkMachineServiceType;
   let linkSub: Subscription;
   let tooltipOpen = '';
+
   const copyLink = () => {
     navigator.clipboard.writeText(linkURL);
     tooltipOpen = 'tooltip-open';
@@ -119,6 +122,38 @@
       useLinkState(link, _linkState);
     });
   };
+
+  const cancelLink = () => {
+    if (linkService && linkMachineState) {
+      linkService.send({
+        type: 'REQUEST CANCELLATION',
+        cancel: {
+          createdAt: new Date().getTime(),
+          canceledInState: JSON.stringify(linkMachineState.value),
+          canceler: ActorType.TALENT,
+        },
+      });
+    }
+  };
+
+  const issueRefund = async () => {
+    if (currentLink && linkMachineState) {
+      // Create and save a faux transaction
+      const transaction = await currentLink.createTransaction({
+        hash: '0x1234567890',
+        block: 1234567890,
+        to: '0x1234567890',
+        from: currentLink.fundingAddress,
+        value: linkMachineState.context.linkState.totalFunding.toString(),
+        reason: TransactionReasonType.REFUND,
+      });
+
+      linkService.send({
+        type: 'REFUND RECEIVED',
+        transaction,
+      });
+    }
+  };
 </script>
 
 <Page name="home">
@@ -170,6 +205,13 @@
           <Col>Funding Address:<br /></Col>
           <div class="break-all">{currentLink.fundingAddress}</div>
         </Row>
+        <Row class="pt-4">
+          <Col
+            >Status: <span class="italic">
+              {formatLinkState(linkMachineState)}
+            </span>
+          </Col>
+        </Row>
       </CardContent>
       <Button on:click={copyLink}>Copy pCall Link</Button>
     </Card>
@@ -178,7 +220,7 @@
     {#if canCancelLink}
       <Card title="Cancel Your pCall Link" class="rounded-lg" outline>
         {#if linkMachineState.context.linkState.totalFunding > 0}
-          <Block strong>
+          <CardContent class="bg-color-black">
             <Row>
               <Col>
                 {currencyFormatter.format(
@@ -187,13 +229,33 @@
                   .claim?.caller}"
               </Col>
             </Row>
-          </Block>
+          </CardContent>
         {/if}
 
         <Block strong>
           <Row>
             <Col>
-              <Button fill round>Cancel</Button>
+              <Button fill round on:click={cancelLink}>Cancel</Button>
+            </Col>
+          </Row>
+        </Block>
+      </Card>
+    {/if}
+
+    <!-- Issue Refund -->
+    {#if linkMachineState && linkMachineState.matches('claimed.requestedCancellation.waiting4Refund')}
+      <Card title="Issue Refund" class="rounded-lg" outline>
+        <Block strong>
+          <Row class="pb-4">
+            <Col>
+              Send {currencyFormatter.format(
+                linkMachineState.context.linkState.totalFunding
+              )} to "{linkMachineState.context.linkState.claim?.caller}"
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <Button fill round on:click={issueRefund}>Issue Refund</Button>
             </Col>
           </Row>
         </Block>
