@@ -1,35 +1,27 @@
 <script lang="ts">
   import { KonstaProvider } from 'konsta/svelte';
 
-  import { onMount } from 'svelte';
-  import { getDevice } from 'framework7/lite-bundle';
   import {
+    App,
+    BlockFooter,
     f7,
     f7ready,
-    App,
-    Panel,
-    Views,
-    View,
-    Popup,
-    Page,
-    Navbar,
-    Toolbar,
-    NavRight,
     Link,
-    Block,
-    BlockTitle,
+    List,
+    ListButton,
+    ListInput,
     LoginScreen,
     LoginScreenTitle,
-    List,
-    ListItem,
-    ListInput,
-    ListButton,
-    BlockFooter,
+    Page,
+    Toolbar,
+    View,
+    Views,
   } from 'framework7-svelte';
+  import { getDevice } from 'framework7/lite-bundle';
+  import { onMount } from 'svelte';
 
   import capacitorApp from '../ts/capacitor-app';
   import routes from '../ts/routes';
-  import store from '../ts/store';
 
   import { talent, talentDB } from '../lib/stores';
   import { getTalentDB } from '../lib/util';
@@ -73,8 +65,6 @@
     theme: 'auto', // Automatic theme detection
 
     id: 'app.pcall', // App bundle ID
-    // App store
-    store: store,
     // App routes
     routes: routes,
     // Register service worker (only on production build)
@@ -109,26 +99,6 @@
 
 <KonstaProvider theme="parent">
   <App {...f7params} dark colorTheme="purple">
-    <!-- Left panel with cover effect-->
-    <Panel left cover dark>
-      <View>
-        <Page>
-          <Navbar title="Left Panel" />
-          <Block>Left panel content goes here</Block>
-        </Page>
-      </View>
-    </Panel>
-
-    <!-- Right panel with reveal effect-->
-    <Panel right reveal dark>
-      <View>
-        <Page>
-          <Navbar title="Right Panel" />
-          <Block>Right panel content goes here</Block>
-        </Page>
-      </View>
-    </Panel>
-
     <!-- Login Screen -->
     <LoginScreen
       class="login-screen"

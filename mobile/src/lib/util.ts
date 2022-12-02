@@ -1,8 +1,8 @@
-import urlJoin from 'url-join';
-import { TokenRoles } from '$lib/util/constants';
+import type { LinkMachineStateType } from '$lib/machines/linkMachine';
 import { talentDB } from '$lib/ORM/dbs/talentDB';
 import { StorageTypes } from '$lib/ORM/rxdb';
-import type { LinkMachineStateType } from '$lib/machines/linkMachine';
+import { TokenRoles } from '$lib/util/constants';
+import urlJoin from 'url-join';
 
 export const getTalentDB = async (key: string) => {
 	const PCALL_URL = import.meta.env.VITE_PCALL_URL;

@@ -1,39 +1,39 @@
 <script lang="ts">
   import {
-    Block,
-    BlockTitle,
-    Button,
-    Col,
-    List,
-    ListItem,
-    Navbar,
-    Page,
-    Row,
-    Card,
-    CardContent,
-    CardFooter,
-    Icon,
-  } from 'framework7-svelte';
-  import { talent, talentDB } from '../lib/stores';
-  import { ActorType, type LinkDocument } from '$lib/ORM/models/link';
-  import { currencyFormatter } from '$lib/util/constants';
-  import {
     createLinkMachineService,
     type LinkMachineServiceType,
   } from '$lib/machines/linkMachine';
-  import type { Subscription } from 'xstate';
-  import urlJoin from 'url-join';
-  import getProfileImage from '$lib/util/profilePhoto';
-  import spacetime from 'spacetime';
-  import { formatLinkState } from '../lib/util';
+  import { ActorType, type LinkDocument } from '$lib/ORM/models/link';
   import { TransactionReasonType } from '$lib/ORM/models/transaction';
+  import { currencyFormatter } from '$lib/util/constants';
+  import getProfileImage from '$lib/util/profilePhoto';
+  import {
+    Block,
+    BlockTitle,
+    Button,
+    Card,
+    CardContent,
+    Col,
+    Icon,
+    List,
+    ListItem,
+    ListItemCell,
+    Navbar,
+    Page,
+    Range,
+    Row,
+  } from 'framework7-svelte';
+  import spacetime from 'spacetime';
+  import urlJoin from 'url-join';
+  import type { Subscription } from 'xstate';
+  import { talent, talentDB } from '../lib/stores';
+  import { formatLinkState } from '../lib/util';
 
   const PCALL_URL = import.meta.env.VITE_PCALL_URL;
   const ROOM_PATH = import.meta.env.VITE_ROOM_PATH;
 
   $: name = '';
   $: currentLink = null as LinkDocument | null;
-  $: waiting4StateChange = false;
   $: linkURL =
     (currentLink && urlJoin(PCALL_URL, ROOM_PATH, currentLink._id)) || '';
 
@@ -42,13 +42,8 @@
     createLinkMachineService(currentLink.linkState).getSnapshot();
   let linkService: LinkMachineServiceType;
   let linkSub: Subscription;
-  let tooltipOpen = '';
 
-  const copyLink = () => {
-    navigator.clipboard.writeText(linkURL);
-    tooltipOpen = 'tooltip-open';
-    setTimeout(() => (tooltipOpen = ''), 2000);
-  };
+  let amount = 50;
 
   $: canCancelLink =
     linkMachineState &&
@@ -61,6 +56,8 @@
     !currentLink ||
     (linkMachineState && linkMachineState.done) ||
     (linkMachineState && linkMachineState.matches('inEscrow'));
+
+  $: showCurrentLink = !canCreateLink;
 
   $: talent.subscribe(talent => {
     if (talent) {
@@ -108,17 +105,15 @@
           type: 'REQUEST CANCELLATION',
           cancel: undefined,
         });
-        canCreateLink = state.done ?? true;
+        canCreateLink = !currentLink || state.done || state.matches('inEscrow');
       }
     });
   };
 
   const useLink = (link: LinkDocument) => {
     currentLink = link;
-    waiting4StateChange = false; // link changed, so can submit again
     useLinkState(link, link.linkState);
     link.get$('linkState').subscribe(_linkState => {
-      waiting4StateChange = false; // link changed, so can submit again
       useLinkState(link, _linkState);
     });
   };
@@ -154,6 +149,20 @@
       });
     }
   };
+
+  const copyLink = () => {
+    navigator.clipboard.writeText(linkURL);
+  };
+
+  const onAmountChange = value => {
+    amount = value;
+  };
+
+  const createLink = () => {
+    $talent?.createLink(amount).then(link => {
+      navigator.clipboard.writeText(urlJoin(PCALL_URL, ROOM_PATH, link._id));
+    });
+  };
 </script>
 
 <Page name="home">
@@ -161,7 +170,7 @@
   <Navbar title="pCall Creator" subtitle={name} />
 
   <!-- Current Link -->
-  {#if currentLink && linkMachineState}
+  {#if showCurrentLink && currentLink && linkMachineState}
     <Card title="Your Outstanding pCall Link" class="rounded-lg" outline>
       <CardContent class="bg-color-black">
         {#if linkMachineState.matches('unclaimed')}
@@ -261,43 +270,49 @@
         </Block>
       </Card>
     {/if}
-  {:else}
-    <Card title="No Outstanding pCall Link">
-      <CardContent>
-        <p>Click the button below to create a new pCall link.</p>
-      </CardContent>
-    </Card>
   {/if}
 
-  <BlockTitle>Navigation</BlockTitle>
-  <List>
-    <ListItem link="/about/" title="About" />
-    <ListItem link="/form/" title="Form" />
-  </List>
-
-  <BlockTitle>Modals</BlockTitle>
-  <Block strong>
-    <Row>
-      <Col width="50">
-        <Button fill raised popupOpen="#my-popup">Popup</Button>
-      </Col>
-      <Col width="50">
-        <Button fill raised loginScreenOpen="#my-login-screen"
-          >Login Screen</Button
-        >
-      </Col>
-    </Row>
-  </Block>
-
-  <BlockTitle>Panels</BlockTitle>
-  <Block strong>
-    <Row>
-      <Col width="50">
-        <Button fill raised panelOpen="left">Left Panel</Button>
-      </Col>
-      <Col width="50">
-        <Button fill raised panelOpen="right">Right Panel</Button>
-      </Col>
-    </Row>
-  </Block>
+  <!-- Create Link -->
+  {#if canCreateLink}
+    <Card title="Create new pCall Link" class="rounded-lg" outline>
+      <BlockTitle class="display-flex justify-content-space-between mt-6">
+        <span>Amount</span>
+        <span>${amount}</span>
+      </BlockTitle>
+      <List simpleList>
+        <ListItem>
+          <ListItemCell class="width-auto flex-shrink-0">
+            <Icon
+              ios="f7:money_dollar_circle"
+              aurora="f7:money_dollar_circle"
+              md="material:attach_money"
+            />
+          </ListItemCell>
+          <ListItemCell class="flex-shrink-3">
+            <Range
+              min={1}
+              max={2000}
+              step={10}
+              label={true}
+              value={amount}
+              onRangeChange={onAmountChange}
+            />
+          </ListItemCell>
+          <ListItemCell class="width-auto flex-shrink-0">
+            <Icon
+              ios="f7:money_dollar_circle_fill"
+              aurora="f7:money_dollar_circle_fill"
+              md="material:monetization_on"
+            />
+          </ListItemCell>
+        </ListItem>
+      </List>
+      <Row class="p-4">
+        <Col
+          ><Button fill round on:click={createLink}>Create pCall Link</Button
+          ></Col
+        ></Row
+      >
+    </Card>
+  {/if}
 </Page>
