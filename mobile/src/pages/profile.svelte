@@ -26,6 +26,8 @@
   } from '@capacitor/camera';
 
   const takePicture = async () => {
+    console.log(JSON.stringify(Camera));
+
     const image = await Camera.getPhoto({
       quality: 90,
       direction: CameraDirection.Front,
@@ -33,7 +35,6 @@
       resultType: CameraResultType.Base64,
       source: CameraSource.Prompt,
     });
-    console.log(JSON.stringify(image));
 
     // image.webPath will contain a path that can be set as an image src.
     // You can access the original file using image.path, which can be
@@ -52,9 +53,13 @@
           <!-- svelte-ignore a11y-click-events-have-key-events -->
           <div
             class=" bg-cover bg-no-repeat bg-center rounded-full h-48 w-48"
-            on:click={takePicture}
             style="background-image: url('{$talent.profileImageUrl}')"
           />
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          <Button fill on:click={takePicture}>Update Photo</Button>
         </Col>
       </Row>
       <Row>
