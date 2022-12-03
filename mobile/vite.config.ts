@@ -2,6 +2,7 @@
 import path from 'path';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { defineConfig } from 'vite';
+import basicSsl from '@vitejs/plugin-basic-ssl';
 
 const SRC_DIR = path.resolve(__dirname, './src');
 const PUBLIC_DIR = path.resolve(__dirname, './public');
@@ -12,7 +13,7 @@ const LIB_DIR = path.resolve(__dirname, './node_modules/pcall/src/lib/');
 export default defineConfig({
   plugins: [
     svelte(),
-
+    basicSsl(),
   ],
   root: SRC_DIR,
   base: '',

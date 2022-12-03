@@ -16,6 +16,22 @@
   import StarRating from 'svelte-star-rating';
 
   import { talent } from '../lib/stores';
+
+  import { Camera, CameraResultType } from '@capacitor/camera';
+
+  const takePicture = async () => {
+    const image = await Camera.getPhoto({
+      quality: 90,
+      allowEditing: true,
+      resultType: CameraResultType.Uri,
+    });
+
+    // image.webPath will contain a path that can be set as an image src.
+    // You can access the original file using image.path, which can be
+    // passed to the Filesystem API to read the raw data of the image,
+    // if desired (or pass resultType: CameraResultType.Base64 to getPhoto)
+    var imageUrl = image.webPath;
+  };
 </script>
 
 {#if $talent}
@@ -24,8 +40,10 @@
     <Block strong>
       <Row>
         <Col width="100" class="flex place-content-center">
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
           <div
             class=" bg-cover bg-no-repeat bg-center rounded-full h-48 w-48"
+            on:click={takePicture}
             style="background-image: url('{$talent.profileImageUrl}')"
           />
         </Col>

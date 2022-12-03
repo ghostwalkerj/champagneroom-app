@@ -910,9 +910,9 @@
     to-fast-properties "^2.0.0"
 
 "@capacitor/android@^4.5.0":
-  version "4.5.0"
-  resolved "https://registry.npmjs.org/@capacitor/android/-/android-4.5.0.tgz"
-  integrity sha512-GRoQ0Q1XOupU4pK3aipWfwCGXRuAq32IHpOoNSZm3Enu1/FhoOlIvHMlnnIQTpq6sBye/cqBIuYsOpPBMi3VNg==
+  version "4.6.0"
+  resolved "https://registry.yarnpkg.com/@capacitor/android/-/android-4.6.0.tgz#0731c086638296c02d666a1f902e6ca5e6e064a6"
+  integrity sha512-damKRxtkAs7GHdPwQqKyUZjjsbIyOoJWoshG2I1/Lc8cDkfGKw2WntWx3hyUPho0BmM7wnbsjeZtYbMdGm0zIQ==
 
 "@capacitor/app@^4.1.1":
   version "4.1.1"
@@ -941,6 +941,11 @@
   version "4.1.0"
   resolved "https://registry.npmjs.org/@capacitor/browser/-/browser-4.1.0.tgz"
   integrity sha512-WKAZDc9ECYQesEXlVhJu5/qbqkL5rj15wg9yBqSC0RXYsOU7aDiTMjXIu+Vu68jA8IQqIuNIp8slDvDQa+U/Kw==
+
+"@capacitor/camera@^4.1.4":
+  version "4.1.4"
+  resolved "https://registry.yarnpkg.com/@capacitor/camera/-/camera-4.1.4.tgz#5d019f88d1f3547b537270e35bcb96084eb48df6"
+  integrity sha512-7f4n7PlnstYsdGyxc0Kc4hIyS6csFLOjXvffm7pJsuy9pSo+kfdOPdYgGg360QwbUAmA+Yv+J1ZW1eFIwgvWrQ==
 
 "@capacitor/cli@^3.2.5":
   version "3.9.0"
@@ -1150,6 +1155,11 @@
     "@ionic/utils-terminal" "2.3.3"
     debug "^4.0.0"
     tslib "^2.0.1"
+
+"@ionic/pwa-elements@^3.1.1":
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/@ionic/pwa-elements/-/pwa-elements-3.1.1.tgz#ae1a97260886545b3285364974674576f2b090a7"
+  integrity sha512-BoEX1pSrKn5dP4VQwaf8DweAmT4ynmpW+9f6oj/W1xLe54bmuXcUY07ziuZX1DLu50xHSYcO5qJ/dbYC/w6wgA==
 
 "@ionic/utils-array@2.1.5", "@ionic/utils-array@^2.1.5":
   version "2.1.5"
@@ -1573,6 +1583,11 @@
   version "2.0.2"
   resolved "https://registry.npmjs.org/@types/trusted-types/-/trusted-types-2.0.2.tgz"
   integrity sha512-F5DIZ36YVLE+PN+Zwws4kJogq47hNgX3Nx6WyDJ3kcplxyke3XIzB8uK5n/Lpm1HBsbGzd6nmGehL8cPekP+Tg==
+
+"@vitejs/plugin-basic-ssl@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@vitejs/plugin-basic-ssl/-/plugin-basic-ssl-0.1.2.tgz#7177f9adc5384f1377b9b91b17ce7cdb8f422abd"
+  integrity sha512-EdwCHnbkakR6YPupySZm1WoCDRPaw9c5jObAo2pCRv8Ja2TESFC6Sc8RUOcKuihfjARDfszbBf+YEQwHY9s9wg==
 
 "@xml-tools/parser@^1.0.11":
   version "1.0.11"
