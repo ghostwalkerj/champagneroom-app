@@ -26,15 +26,14 @@
   } from '@capacitor/camera';
 
   const takePicture = async () => {
-    console.log(JSON.stringify(Camera));
-
     const image = await Camera.getPhoto({
       quality: 90,
       direction: CameraDirection.Front,
-      allowEditing: true,
+      allowEditing: false,
       resultType: CameraResultType.Base64,
       source: CameraSource.Prompt,
     });
+    console.log(image);
 
     // image.webPath will contain a path that can be set as an image src.
     // You can access the original file using image.path, which can be
@@ -54,14 +53,11 @@
           <div
             class=" bg-cover bg-no-repeat bg-center rounded-full h-48 w-48"
             style="background-image: url('{$talent.profileImageUrl}')"
+            on:click={takePicture}
           />
         </Col>
       </Row>
-      <Row>
-        <Col>
-          <Button fill on:click={takePicture}>Update Photo</Button>
-        </Col>
-      </Row>
+
       <Row>
         <Col width="100" class="flex pt-4 place-content-center">
           <StarRating rating={$talent.stats.ratingAvg ?? 0} />
