@@ -909,7 +909,7 @@
     "@babel/helper-validator-identifier" "^7.19.1"
     to-fast-properties "^2.0.0"
 
-"@capacitor/android@^4.5.0":
+"@capacitor/android@4.6.0":
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/@capacitor/android/-/android-4.6.0.tgz#0731c086638296c02d666a1f902e6ca5e6e064a6"
   integrity sha512-damKRxtkAs7GHdPwQqKyUZjjsbIyOoJWoshG2I1/Lc8cDkfGKw2WntWx3hyUPho0BmM7wnbsjeZtYbMdGm0zIQ==
@@ -947,29 +947,7 @@
   resolved "https://registry.yarnpkg.com/@capacitor/camera/-/camera-4.1.4.tgz#5d019f88d1f3547b537270e35bcb96084eb48df6"
   integrity sha512-7f4n7PlnstYsdGyxc0Kc4hIyS6csFLOjXvffm7pJsuy9pSo+kfdOPdYgGg360QwbUAmA+Yv+J1ZW1eFIwgvWrQ==
 
-"@capacitor/cli@^3.2.5":
-  version "3.9.0"
-  resolved "https://registry.yarnpkg.com/@capacitor/cli/-/cli-3.9.0.tgz#302c65d89fd5ee23b1b87f9b8462134f48027a71"
-  integrity sha512-NkbVZhYb0oPdh/XArE2ZmOwPFJbla5meShGhv3DxKCXeKn1rt92ile+2xOgtB/j+mL7f9cqQzTQM/11sGQzMAg==
-  dependencies:
-    "@ionic/cli-framework-output" "^2.2.1"
-    "@ionic/utils-fs" "^3.1.5"
-    "@ionic/utils-subprocess" "^2.1.6"
-    "@ionic/utils-terminal" "^2.3.0"
-    commander "^6.0.0"
-    debug "^4.2.0"
-    env-paths "^2.2.0"
-    kleur "^4.1.1"
-    native-run "^1.5.0"
-    open "^7.4.2"
-    plist "^3.0.2"
-    prompts "^2.3.2"
-    semver "^7.3.2"
-    tar "^6.1.11"
-    tslib "^2.1.0"
-    xml2js "^0.4.23"
-
-"@capacitor/cli@^4.5.0":
+"@capacitor/cli@4.6.0":
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/@capacitor/cli/-/cli-4.6.0.tgz#f0cb132c62a22681545ebd5e7554f6eaf8394fad"
   integrity sha512-/u+Hjt2+pnKfjQxNHpBJxbL1SPXOzgy/bYjKuDBErYYDwBtMd4zxmVTch/PeyjefjWRiOjNbbs9YGAqfwhgbJg==
@@ -992,14 +970,36 @@
     tslib "^2.4.0"
     xml2js "^0.4.23"
 
-"@capacitor/core@^4.5.0":
+"@capacitor/cli@^3.2.5":
+  version "3.9.0"
+  resolved "https://registry.yarnpkg.com/@capacitor/cli/-/cli-3.9.0.tgz#302c65d89fd5ee23b1b87f9b8462134f48027a71"
+  integrity sha512-NkbVZhYb0oPdh/XArE2ZmOwPFJbla5meShGhv3DxKCXeKn1rt92ile+2xOgtB/j+mL7f9cqQzTQM/11sGQzMAg==
+  dependencies:
+    "@ionic/cli-framework-output" "^2.2.1"
+    "@ionic/utils-fs" "^3.1.5"
+    "@ionic/utils-subprocess" "^2.1.6"
+    "@ionic/utils-terminal" "^2.3.0"
+    commander "^6.0.0"
+    debug "^4.2.0"
+    env-paths "^2.2.0"
+    kleur "^4.1.1"
+    native-run "^1.5.0"
+    open "^7.4.2"
+    plist "^3.0.2"
+    prompts "^2.3.2"
+    semver "^7.3.2"
+    tar "^6.1.11"
+    tslib "^2.1.0"
+    xml2js "^0.4.23"
+
+"@capacitor/core@4.6.0":
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/@capacitor/core/-/core-4.6.0.tgz#25e816d75160571e24233afe3bda350f33ce9aef"
   integrity sha512-P8PfJB5rFSBU2wDZ5wVHTVFZxKweFrxz554+Fl/ymhhAxlxFJuF5nFIZyQgVq+A1yp/nCLzWOyPMC5OPD/um0g==
   dependencies:
     tslib "^2.1.0"
 
-"@capacitor/ios@^4.5.0":
+"@capacitor/ios@4.6.0":
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/@capacitor/ios/-/ios-4.6.0.tgz#fe4eb729993585e974b1fd40d6ba3de4a97b789d"
   integrity sha512-OrB1pYWDZJ0O0lAlqVM5DgVWxx2/As9vXBY72ndQhI+HYY41fIYFt5YHxp5rubqzV38UKmP2ZgdK7Q33ZmjDyw==
@@ -1014,7 +1014,7 @@
   resolved "https://registry.npmjs.org/@capacitor/splash-screen/-/splash-screen-4.1.2.tgz"
   integrity sha512-uw37mfFtpXH6lBG0Lz6/ZRvbnn1XZ0lVOL7UHylvW4C/BUJRKHqPloCXNMeSBGuBkf5WdW7sdmKdGdp4J5fU9g==
 
-"@capacitor/status-bar@^4.1.0":
+"@capacitor/status-bar@4.1.1":
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/@capacitor/status-bar/-/status-bar-4.1.1.tgz#5b9a1acbe5efb30158e35be7a5ef7ffaaadaf804"
   integrity sha512-3wosxMD1XuIFz88+c2GdVEHSJV6u7suOeKQjyWf3zf9eFr622Sg+udZqDbC0dtTWXw97BWyCjv3r1EYJw7XnIA==
@@ -5837,7 +5837,7 @@ supports-preserve-symlinks-flag@^1.0.0:
   resolved "https://registry.npmjs.org/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz"
   integrity sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==
 
-svelte-check@^2.9.2:
+svelte-check@2.10.0:
   version "2.10.0"
   resolved "https://registry.yarnpkg.com/svelte-check/-/svelte-check-2.10.0.tgz#38a5d888efa3edaca4827aa61db5d4d4eaa90532"
   integrity sha512-5iLCoja/WsithyRkNtIeDQ0euJlgWj3Zzo2IA6iuHMuuX9D9OrRYZj2WlA5ACnAFQnN5L9mxWcwUW9VxDNEoGg==
@@ -6084,7 +6084,7 @@ trim-newlines@^4.0.2:
   resolved "https://registry.npmjs.org/trim-newlines/-/trim-newlines-4.0.2.tgz"
   integrity sha512-GJtWyq9InR/2HRiLZgpIKv+ufIKrVrvjQWEj7PxAXNc5dwbNJkqhAUoAGgzRmULAnoOM5EIpveYd3J2VeSAIew==
 
-ts-loader@^9.4.1:
+ts-loader@9.4.2:
   version "9.4.2"
   resolved "https://registry.yarnpkg.com/ts-loader/-/ts-loader-9.4.2.tgz#80a45eee92dd5170b900b3d00abcfa14949aeb78"
   integrity sha512-OmlC4WVmFv5I0PpaxYb+qGeGOdm5giHU7HwDDUjw59emP2UYMHy9fFSDcYgSNoH8sXcj4hGCSEhlDZ9ULeDraA==
