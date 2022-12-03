@@ -129,7 +129,7 @@
     </LoginScreen>
 
     <!-- Views/Tabs container -->
-    <Views tabs class="safe-areas">
+    <Views tabs class="safe-areas z-50">
       <!-- Tabbar for switching views-tabs -->
       <Toolbar tabbar labels bottom>
         <Link
