@@ -14,7 +14,7 @@ export const getTalentDB = async (key: string) => {
 			method: 'POST',
 			body: JSON.stringify({
 				tokenRole: TokenRoles.TALENT
-			})
+			}),
 		});
 		const body = await res.json();
 		const token = body.token as string;

@@ -21,8 +21,7 @@ app.get('/healthcheck', (req, res) => {
 });
 
 // let SvelteKit handle everything else, including serving prerendered pages and static assets
-app.use(cors(corsOptions));
-app.use(handler);
+app.use(cors(corsOptions), handler);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
