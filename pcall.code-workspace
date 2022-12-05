@@ -48,6 +48,13 @@
 		"hidefiles.globalConfig": {
 			"profiles": [
 				{
+					"hidden": [],
+					"name": "pCall",
+					"description": "",
+					"detail": "",
+					"peek": []
+				},
+				{
 					"name": "Default",
 					"detail": "",
 					"description": "Test",
@@ -58,9 +65,7 @@
 				{
 					"name": "Strict",
 					"detail": "Hide everything not immediately required",
-					"hidden": [
-						"$Default"
-					]
+					"hidden": []
 				}
 			]
 		},
@@ -69,16 +74,7 @@
 			"**/.svn": true,
 			"**/.hg": true,
 			"**/CVS": true,
-			"**/.DS_Store": true,
-			"**/Thumbs.db": true,
-			"**/*.git": true,
-			"vite.config.ts": true,
-			".dockerignore": true,
-			"../mobile/workbox-config.js": true,
-			".svelte-kit": true,
-			".vscode": true,
-			"tsconfig.json": true,
-			"../mobile/tailwind.config.cjs": true
+			"**/.DS_Store": true
 		},
 		"explorerExclude.backup": {},
 		"explorerExclude.showPicker": false

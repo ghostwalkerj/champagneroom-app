@@ -28,6 +28,7 @@
   import type { Subscription } from 'xstate';
   import { talent, talentDB } from '../lib/stores';
   import { formatLinkState } from '../lib/util';
+  import { Clipboard } from '@capacitor/clipboard';
 
   const PCALL_URL = import.meta.env.VITE_PCALL_URL;
   const ROOM_PATH = import.meta.env.VITE_ROOM_PATH;
@@ -151,7 +152,9 @@
   };
 
   const copyLink = () => {
-    navigator.clipboard.writeText(linkURL);
+    Clipboard.write({
+      string: linkURL,
+    });
   };
 
   const onAmountChange = value => {
@@ -160,7 +163,9 @@
 
   const createLink = () => {
     $talent?.createLink(amount).then(link => {
-      navigator.clipboard.writeText(urlJoin(PCALL_URL, ROOM_PATH, link._id));
+      Clipboard.write({
+        string: urlJoin(PCALL_URL, ROOM_PATH, link._id),
+      });
     });
   };
 </script>

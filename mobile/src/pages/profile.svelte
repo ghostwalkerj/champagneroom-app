@@ -25,21 +25,25 @@
     CameraSource,
   } from '@capacitor/camera';
 
-  const takePicture = async () => {
-    const image = await Camera.getPhoto({
+  $: imageUrl = $talent?.profileImageUrl;
+
+  const takePicture = () => {
+    Camera.getPhoto({
       quality: 90,
       direction: CameraDirection.Front,
       allowEditing: false,
-      resultType: CameraResultType.Base64,
+      resultType: CameraResultType.Uri,
       source: CameraSource.Prompt,
+    }).then(image => {
+      if (image) {
+        imageUrl = image.webPath;
+      }
     });
-    console.log(image);
 
     // image.webPath will contain a path that can be set as an image src.
     // You can access the original file using image.path, which can be
     // passed to the Filesystem API to read the raw data of the image,
     // if desired (or pass resultType: CameraResultType.Base64 to getPhoto)
-    var imageUrl = image.webPath;
   };
 </script>
 
@@ -52,7 +56,8 @@
           <!-- svelte-ignore a11y-click-events-have-key-events -->
           <div
             class=" bg-cover bg-no-repeat bg-center rounded-full h-48 w-48"
-            style="background-image: url('{$talent.profileImageUrl}')"
+            style="background-image: url('{imageUrl ||
+              $talent.profileImageUrl}')"
             on:click={takePicture}
           />
         </Col>
