@@ -13,7 +13,6 @@ const LIB_DIR = path.resolve(__dirname, './node_modules/pcall/src/lib/');
 export default defineConfig({
   plugins: [
     svelte(),
-    basicSsl(),
   ],
   root: SRC_DIR,
   base: '',

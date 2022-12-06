@@ -1,29 +1,23 @@
 <script type="ts">
   import {
     Block,
-    BlockTitle,
-    Button,
     Col,
-    f7,
     List,
     ListInput,
-    ListItem,
     Navbar,
     Page,
-    Range,
     Row,
-    Toggle,
   } from 'framework7-svelte';
   import StarRating from 'svelte-star-rating';
-  const IMAGE_UPDATE_PATH = import.meta.env.VITE_IMAGE_UPDATE_PATH;
+  const PHOTO_UPDATE_PATH = import.meta.env.VITE_PHOTO_UPDATE_PATH;
   const PCALL_URL = import.meta.env.VITE_PCALL_URL;
 
   import { talent } from '../lib/stores';
 
   import {
     Camera,
-    CameraResultType,
     CameraDirection,
+    CameraResultType,
     CameraSource,
   } from '@capacitor/camera';
   import urlJoin from 'url-join';
@@ -35,27 +29,25 @@
       quality: 90,
       direction: CameraDirection.Front,
       allowEditing: false,
-      resultType: CameraResultType.Uri,
+      resultType: CameraResultType.DataUrl,
       source: CameraSource.Prompt,
     }).then(async image => {
-      if (image && image.webPath) {
-        imageUrl = image.webPath;
-        console.log(imageUrl);
-        const blob = await (await fetch(imageUrl)).blob();
+      if (image && image.dataUrl) {
+        imageUrl = image.dataUrl;
+        const blob = await (await fetch(image.dataUrl)).blob();
         const file = new File([blob], 'profile.jpg', {
           type: 'image/jpeg',
           lastModified: new Date().getTime(),
         });
         let formData = new FormData();
-        formData.append('file', 'file');
-        const upload_url = urlJoin(PCALL_URL, IMAGE_UPDATE_PATH);
-        console.log(upload_url);
-        const res = await fetch(upload_url, {
+        formData.append('file', file);
+        formData.append('key', $talent!.key);
+
+        const upload_url = urlJoin(PCALL_URL, PHOTO_UPDATE_PATH);
+        fetch(upload_url, {
           method: 'POST',
           body: formData,
         });
-        const data = await res.json();
-        console.log(data);
       }
     });
 
