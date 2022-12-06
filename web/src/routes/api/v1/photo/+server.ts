@@ -55,7 +55,6 @@ export const POST: RequestHandler = async ({ request }) => {
 				}
 			}
 
-			console.log('url', url);
 
 			const talent = await getTalent(key);
 			talent.atomicPatch({

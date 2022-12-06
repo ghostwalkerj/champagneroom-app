@@ -1,6 +1,7 @@
 <script type="ts">
   import {
     Block,
+    Button,
     Col,
     List,
     ListInput,
@@ -56,6 +57,10 @@
     // passed to the Filesystem API to read the raw data of the image,
     // if desired (or pass resultType: CameraResultType.Base64 to getPhoto)
   };
+
+  const logout = () => {
+    talent.set(null);
+  };
 </script>
 
 {#if $talent}
@@ -83,5 +88,7 @@
     <List noHairlinesMd>
       <ListInput label="Name" type="text" placeholder={$talent.name} />
     </List>
+
+    <Button on:click={logout}>Logout</Button>
   </Page>
 {/if}

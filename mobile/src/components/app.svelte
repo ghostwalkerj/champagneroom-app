@@ -26,12 +26,7 @@
   import { talent, talentDB } from '../lib/stores';
   import { getTalentDB } from '../lib/util';
 
-  let loginScreenOpened = false;
   let key = '';
-
-  if (!$talent) {
-    loginScreenOpened = true;
-  }
 
   const login = async () => {
     if (key.trim() === '') {
@@ -53,9 +48,9 @@
       return;
     }
     talent.set(_talent);
-    preloader.close();
 
-    loginScreenOpened = false;
+    preloader.close();
+    key = '';
   };
 
   const device = getDevice();
@@ -97,39 +92,11 @@
   });
 </script>
 
-<KonstaProvider theme="parent">
-  <App {...f7params} dark colorTheme="purple">
-    <!-- Login Screen -->
-    <LoginScreen
-      class="login-screen"
-      opened={loginScreenOpened}
-      onLoginScreenClosed={() => (loginScreenOpened = false)}
-    >
-      <Page loginScreen>
-        <LoginScreenTitle>Talent Login</LoginScreenTitle>
-        <List form>
-          <ListInput
-            label="Talent Key"
-            type="text"
-            placeholder="Your Key"
-            value={key}
-            onInput={e => (key = e.target.value)}
-            required
-            validate
-          />
-        </List>
-        <List>
-          <ListButton onClick={login}>Log In</ListButton>
-        </List>
-        <BlockFooter>
-          Pretioso flos est, nihil ad vos nunc. Posset faciens pecuniam. Posuit
-          eam ad opus nunc et adepto a pCall!</BlockFooter
-        >
-      </Page>
-    </LoginScreen>
+<App {...f7params} dark colorTheme="purple">
+  <!-- Views/Tabs container -->
 
-    <!-- Views/Tabs container -->
-    <Views tabs class="safe-areas z-50">
+  {#if $talent}
+    <Views tabs class="z-40">
       <!-- Tabbar for switching views-tabs -->
       <Toolbar tabbar labels bottom>
         <Link
@@ -166,5 +133,30 @@
       <!-- profile View -->
       <View id="view-profile" name="profile" tab url="/profile/" />
     </Views>
-  </App>
-</KonstaProvider>
+  {:else}
+    <!-- Login Screen -->
+    <LoginScreen opened={true}>
+      <Page loginScreen>
+        <LoginScreenTitle>Talent Login</LoginScreenTitle>
+        <List form>
+          <ListInput
+            label="Talent Key"
+            type="text"
+            placeholder="Your Key"
+            value={key}
+            onInput={e => (key = e.target.value)}
+            required
+            validate
+          />
+        </List>
+        <List>
+          <ListButton onClick={login}>Log In</ListButton>
+        </List>
+        <BlockFooter>
+          Pretioso flos est, nihil ad vos nunc. Posset faciens pecuniam. Posuit
+          eam ad opus nunc et adepto a pCall!</BlockFooter
+        >
+      </Page>
+    </LoginScreen>
+  {/if}
+</App>
