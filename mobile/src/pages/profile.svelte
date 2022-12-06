@@ -25,7 +25,18 @@
   } from '@capacitor/camera';
   import urlJoin from 'url-join';
 
-  let imageUrl = $talent?.profileImageUrl;
+  $: imageUrl = $talent?.profileImageUrl;
+  $: name = $talent?.name;
+
+  if ($talent) {
+    $talent.get$('profileImageUrl').subscribe(url => {
+      imageUrl = url;
+    });
+
+    $talent.get$('name').subscribe(_name => {
+      name = _name;
+    });
+  }
 
   $: takePicture = () => {
     Camera.getPhoto({
@@ -66,6 +77,14 @@
       key: 'key',
     });
   };
+
+  const updateName = () => {
+    name = name?.trim();
+    $talent!.atomicPatch({
+      name,
+      updatedAt: new Date().getTime(),
+    });
+  };
 </script>
 
 {#if $talent}
@@ -77,8 +96,7 @@
           <!-- svelte-ignore a11y-click-events-have-key-events -->
           <div
             class=" bg-cover bg-no-repeat bg-center rounded-full h-48 w-48"
-            style="background-image: url('{imageUrl ||
-              $talent.profileImageUrl}')"
+            style="background-image: url('{imageUrl}')"
             on:click={takePicture}
           />
         </Col>
@@ -91,7 +109,17 @@
       </Row>
     </Block>
     <List noHairlinesMd>
-      <ListInput label="Name" type="text" placeholder={$talent.name} />
+      <ListInput
+        label="Name"
+        type="text"
+        placeholder={name}
+        on:blur={updateName}
+        bind:value={name}
+        minlength="3"
+        maxlength="20"
+        required
+        validate
+      />
     </List>
 
     <Button on:click={logout}>Logout</Button>
