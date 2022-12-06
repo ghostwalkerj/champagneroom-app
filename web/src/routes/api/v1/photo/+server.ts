@@ -55,7 +55,6 @@ export const POST: RequestHandler = async ({ request }) => {
 				}
 			}
 
-
 			const talent = await getTalent(key);
 			talent.atomicPatch({
 				profileImageUrl: url,

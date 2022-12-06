@@ -10,6 +10,8 @@
     Row,
   } from 'framework7-svelte';
   import StarRating from 'svelte-star-rating';
+  import { Preferences } from '@capacitor/preferences';
+
   const PHOTO_UPDATE_PATH = import.meta.env.VITE_PHOTO_UPDATE_PATH;
   const PCALL_URL = import.meta.env.VITE_PCALL_URL;
 
@@ -60,6 +62,9 @@
 
   const logout = () => {
     talent.set(null);
+    Preferences.remove({
+      key: 'key',
+    });
   };
 </script>
 
