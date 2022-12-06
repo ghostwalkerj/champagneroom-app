@@ -81,13 +81,13 @@
 
   const updateName = () => {
     name = name.trim();
-    if (name !== $talent!.name) {
-      $talent!.atomicPatch({
+    if ($talent && name !== $talent!.name) {
+      $talent.atomicPatch({
         name,
         updatedAt: new Date().getTime(),
       });
 
-      $talent!
+      $talent
         .populate('currentLink')
         .then((currentLink: LinkDocument | null) => {
           if (currentLink) {
