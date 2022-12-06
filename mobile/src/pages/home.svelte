@@ -33,7 +33,6 @@
   const PCALL_URL = import.meta.env.VITE_PCALL_URL;
   const ROOM_PATH = import.meta.env.VITE_ROOM_PATH;
 
-  let name = '';
   $: linkURL =
     ($currentLink && urlJoin(PCALL_URL, ROOM_PATH, $currentLink._id)) || '';
 
@@ -42,7 +41,7 @@
     createLinkMachineService($currentLink.linkState).getSnapshot();
   let linkService: LinkMachineServiceType;
   let linkSub: Subscription;
-
+  let name = '';
   let amount = 50;
 
   $: canCancelLink =
