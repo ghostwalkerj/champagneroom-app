@@ -33,7 +33,7 @@
   const PCALL_URL = import.meta.env.VITE_PCALL_URL;
   const ROOM_PATH = import.meta.env.VITE_ROOM_PATH;
 
-  $: name = '';
+  let name = '';
   $: currentLink = null as LinkDocument | null;
   $: linkURL =
     (currentLink && urlJoin(PCALL_URL, ROOM_PATH, currentLink._id)) || '';
@@ -60,10 +60,9 @@
 
   $: showCurrentLink = !canCreateLink;
 
-  $: talent.subscribe(talent => {
-    if (talent) {
-      name = talent.name;
-      talent.get$('currentLink').subscribe(linkId => {
+  $: talent.subscribe(_talent => {
+    if (_talent) {
+      _talent.get$('currentLink').subscribe(linkId => {
         if (linkId && $talentDB) {
           $talentDB.links
             .findOne(linkId)
@@ -72,6 +71,10 @@
               if (link) useLink(link);
             });
         }
+      });
+
+      _talent.get$('name').subscribe((_name: string): void => {
+        name = _name;
       });
     }
   });

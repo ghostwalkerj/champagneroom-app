@@ -8,6 +8,7 @@ import { talentDB } from '$lib/ORM/dbs/talentDB';
 import { StorageTypes } from '$lib/ORM/rxdb';
 import { error } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
+import type { LinkDocument } from '$lib/ORM/models/link';
 
 const client = new Web3Storage({ token: WEB3STORAGE_API_TOKEN });
 
@@ -60,6 +61,17 @@ export const POST: RequestHandler = async ({ request }) => {
 				profileImageUrl: url,
 				updatedAt: new Date().getTime()
 			});
+
+			const currentLink = await talent.populate('currentLink') as LinkDocument;
+			if (currentLink) {
+				currentLink.atomicPatch({
+					talentInfo: {
+						...currentLink.talentInfo,
+						profileImageUrl: url
+					},
+					updatedAt: new Date().getTime()
+				});
+			}
 
 		} catch (error) {
 			console.log('error', error);

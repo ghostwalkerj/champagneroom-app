@@ -11,6 +11,7 @@
   } from 'framework7-svelte';
   import StarRating from 'svelte-star-rating';
   import { Preferences } from '@capacitor/preferences';
+  import type { LinkDocument } from '$lib/ORM/models/link';
 
   const PHOTO_UPDATE_PATH = import.meta.env.VITE_PHOTO_UPDATE_PATH;
   const PCALL_URL = import.meta.env.VITE_PCALL_URL;
@@ -25,15 +26,15 @@
   } from '@capacitor/camera';
   import urlJoin from 'url-join';
 
-  $: imageUrl = $talent?.profileImageUrl;
-  $: name = $talent?.name;
+  let imageUrl = $talent!.profileImageUrl;
+  let name = $talent!.name;
 
   if ($talent) {
-    $talent.get$('profileImageUrl').subscribe(url => {
+    $talent.get$('profileImageUrl').subscribe((url: string): void => {
       imageUrl = url;
     });
 
-    $talent.get$('name').subscribe(_name => {
+    $talent.get$('name').subscribe((_name: string): void => {
       name = _name;
     });
   }
@@ -79,11 +80,27 @@
   };
 
   const updateName = () => {
-    name = name?.trim();
-    $talent!.atomicPatch({
-      name,
-      updatedAt: new Date().getTime(),
-    });
+    name = name.trim();
+    if (name !== $talent!.name) {
+      $talent!.atomicPatch({
+        name,
+        updatedAt: new Date().getTime(),
+      });
+
+      $talent!
+        .populate('currentLink')
+        .then((currentLink: LinkDocument | null) => {
+          if (currentLink) {
+            currentLink.atomicPatch({
+              talentInfo: {
+                ...currentLink.talentInfo,
+                name,
+              },
+              updatedAt: new Date().getTime(),
+            });
+          }
+        });
+    }
   };
 </script>
 
