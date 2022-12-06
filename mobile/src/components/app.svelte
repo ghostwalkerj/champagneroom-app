@@ -27,7 +27,12 @@
   import { talent, talentDB } from '../lib/stores';
   import { getTalentDB } from '../lib/util';
 
+  import { videoCall } from '$lib/util/videoCall';
+  import type { VideoCallType } from '$lib/util/videoCall';
+
+  let vc: VideoCallType;
   let key = '';
+  let callId = '';
 
   const login = async () => {
     if (key.trim() === '') {

@@ -26,7 +26,7 @@
   import spacetime from 'spacetime';
   import urlJoin from 'url-join';
   import type { Subscription } from 'xstate';
-  import { talent, talentDB } from '../lib/stores';
+  import { talent, talentDB, currentLink } from '../lib/stores';
   import { formatLinkState } from '../lib/util';
   import { Clipboard } from '@capacitor/clipboard';
 
@@ -34,13 +34,12 @@
   const ROOM_PATH = import.meta.env.VITE_ROOM_PATH;
 
   let name = '';
-  $: currentLink = null as LinkDocument | null;
   $: linkURL =
-    (currentLink && urlJoin(PCALL_URL, ROOM_PATH, currentLink._id)) || '';
+    ($currentLink && urlJoin(PCALL_URL, ROOM_PATH, $currentLink._id)) || '';
 
   let linkMachineState =
-    currentLink &&
-    createLinkMachineService(currentLink.linkState).getSnapshot();
+    $currentLink &&
+    createLinkMachineService($currentLink.linkState).getSnapshot();
   let linkService: LinkMachineServiceType;
   let linkSub: Subscription;
 
@@ -54,7 +53,7 @@
     });
 
   $: canCreateLink =
-    !currentLink ||
+    !$currentLink ||
     (linkMachineState && linkMachineState.done) ||
     (linkMachineState && linkMachineState.matches('inEscrow'));
 
@@ -68,7 +67,10 @@
             .findOne(linkId)
             .exec()
             .then(link => {
-              if (link) useLink(link);
+              if (link) {
+                currentLink.set(link);
+                useLink(link);
+              }
             });
         }
       });
@@ -109,13 +111,13 @@
           type: 'REQUEST CANCELLATION',
           cancel: undefined,
         });
-        canCreateLink = !currentLink || state.done || state.matches('inEscrow');
+        canCreateLink =
+          !$currentLink || state.done || state.matches('inEscrow');
       }
     });
   };
 
   const useLink = (link: LinkDocument) => {
-    currentLink = link;
     useLinkState(link, link.linkState);
     link.get$('linkState').subscribe(_linkState => {
       useLinkState(link, _linkState);
@@ -136,13 +138,13 @@
   };
 
   const issueRefund = async () => {
-    if (currentLink && linkMachineState) {
+    if ($currentLink && linkMachineState) {
       // Create and save a faux transaction
-      const transaction = await currentLink.createTransaction({
+      const transaction = await $currentLink.createTransaction({
         hash: '0x1234567890',
         block: 1234567890,
         to: '0x1234567890',
-        from: currentLink.fundingAddress,
+        from: $currentLink.fundingAddress,
         value: linkMachineState.context.linkState.totalFunding.toString(),
         reason: TransactionReasonType.REFUND,
       });
@@ -178,7 +180,7 @@
   <Navbar title="pCall Creator" subtitle={name} />
 
   <!-- Current Link -->
-  {#if showCurrentLink && currentLink && linkMachineState}
+  {#if showCurrentLink && $currentLink && linkMachineState}
     <Card title="Your Outstanding pCall Link" class="rounded-lg" outline>
       <CardContent class="bg-color-black">
         {#if linkMachineState.matches('unclaimed')}
@@ -206,7 +208,7 @@
         <Row
           ><Col
             >Amount Requested:<br />{currencyFormatter.format(
-              currentLink.requestedAmount
+              $currentLink.requestedAmount
             )}</Col
           >
           <Col
@@ -215,12 +217,12 @@
             )}</Col
           >
         </Row>
-        {#if linkMachineState.context.linkState.totalFunding >= currentLink.requestedAmount}
+        {#if linkMachineState.context.linkState.totalFunding >= $currentLink.requestedAmount}
           <Row>Link is Fully Funded!</Row>
         {/if}
         <Row class="pt-4">
           <Col>Funding Address:<br /></Col>
-          <div class="break-all">{currentLink.fundingAddress}</div>
+          <div class="break-all">{$currentLink.fundingAddress}</div>
         </Row>
         <Row class="pt-4">
           <Col

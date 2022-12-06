@@ -11,12 +11,11 @@
   } from 'framework7-svelte';
   import StarRating from 'svelte-star-rating';
   import { Preferences } from '@capacitor/preferences';
-  import type { LinkDocument } from '$lib/ORM/models/link';
 
   const PHOTO_UPDATE_PATH = import.meta.env.VITE_PHOTO_UPDATE_PATH;
   const PCALL_URL = import.meta.env.VITE_PCALL_URL;
 
-  import { talent } from '../lib/stores';
+  import { talent, currentLink } from '../lib/stores';
 
   import {
     Camera,
@@ -86,20 +85,15 @@
         name,
         updatedAt: new Date().getTime(),
       });
-
-      $talent
-        .populate('currentLink')
-        .then((currentLink: LinkDocument | null) => {
-          if (currentLink) {
-            currentLink.atomicPatch({
-              talentInfo: {
-                ...currentLink.talentInfo,
-                name,
-              },
-              updatedAt: new Date().getTime(),
-            });
-          }
+      if ($currentLink) {
+        $currentLink.atomicPatch({
+          talentInfo: {
+            ...$currentLink.talentInfo,
+            name,
+          },
+          updatedAt: new Date().getTime(),
         });
+      }
     }
   };
 </script>
