@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Preferences } from '@capacitor/preferences';
-  import { Block, Dialog, KonstaProvider } from 'konsta/svelte';
+  import { Dialog, KonstaProvider } from 'konsta/svelte';
 
   import {
     App,
@@ -13,9 +13,7 @@
     ListInput,
     LoginScreen,
     LoginScreenTitle,
-    Navbar,
     Page,
-    Popup,
     Toolbar,
     View,
     Views,
@@ -28,6 +26,7 @@
   import routes from '../ts/routes';
 
   import { createLinkMachineService } from '$lib/machines/linkMachine';
+  import { CallEventType } from '$lib/ORM/models/callEvent';
   import type { LinkDocument } from '$lib/ORM/models/link';
   import type { VideoCallType } from '$lib/util/videoCall';
   import { videoCall } from '$lib/util/videoCall';
@@ -39,8 +38,6 @@
     talentDB,
   } from '../lib/stores';
   import { getTalentDB } from '../lib/util';
-  import { CallEventType } from '$lib/ORM/models/callEvent';
-  import { get } from 'svelte/store';
 
   let vc: VideoCallType;
   let key = '';
@@ -145,53 +142,58 @@
       return;
     }
     const preloader = f7.dialog.preloader('Loading...', 'deeppurple');
-    const db = await getTalentDB(key);
-    if (!db) {
-      preloader.close();
-      f7.dialog.alert('Invalid DB');
-      return;
-    }
-    talentDB.set(db);
-    const _talent = await db.talents.findOne().where('key').equals(key).exec();
-    if (!_talent) {
-      preloader.close();
-      f7.dialog.alert('Invalid Key');
-      return;
-    }
-
-    Preferences.set({
-      key: 'key',
-      value: key,
-    });
-
-    talent.set(_talent);
-
-    _talent.get$('currentLink').subscribe(linkId => {
-      if (linkId && $talentDB) {
-        $talentDB.links
-          .findOne(linkId)
-          .exec()
-          .then(link => {
-            if (link) {
-              currentLink.set(link);
-
-              linkMachineState.subscribe(state => {
-                if (state?.changed) {
-                  if (state.matches('claimed.canCall')) initVC(link.callId);
-                  else {
-                    vc?.destroy();
-                    callId = '';
-                  }
-                }
-              });
-              useLink(link);
-            }
-          });
+    try {
+      const db = await getTalentDB(key);
+      talentDB.set(db);
+      const _talent = await db.talents
+        .findOne()
+        .where('key')
+        .equals(key)
+        .exec();
+      if (!_talent) {
+        preloader.close();
+        f7.dialog.alert('Invalid Key');
+        return;
       }
-    });
 
-    preloader.close();
-    key = '';
+      Preferences.set({
+        key: 'key',
+        value: key,
+      });
+
+      talent.set(_talent);
+
+      _talent.get$('currentLink').subscribe(linkId => {
+        if (linkId && $talentDB) {
+          $talentDB.links
+            .findOne(linkId)
+            .exec()
+            .then(link => {
+              if (link) {
+                currentLink.set(link);
+
+                linkMachineState.subscribe(state => {
+                  if (state?.changed) {
+                    if (state.matches('claimed.canCall')) initVC(link.callId);
+                    else {
+                      vc?.destroy();
+                      callId = '';
+                    }
+                  }
+                });
+                useLink(link);
+              }
+            });
+        }
+      });
+
+      preloader.close();
+      key = '';
+    } catch (e) {
+      preloader.close();
+      f7.dialog.alert('Errror in Login: ', JSON.stringify(e));
+      return;
+    }
   };
 
   const device = getDevice();

@@ -4,6 +4,8 @@
   import { currencyFormatter } from '$lib/util/constants';
   import getProfileImage from '$lib/util/profilePhoto';
   import { Clipboard } from '@capacitor/clipboard';
+  import { Share } from '@capacitor/share';
+
   import {
     Block,
     BlockTitle,
@@ -24,9 +26,9 @@
   import urlJoin from 'url-join';
   import {
     currentLink,
+    linkMachineService,
     linkMachineState,
     talent,
-    linkMachineService,
   } from '../lib/stores';
   import { formatLinkState } from '../lib/util';
 
@@ -104,10 +106,19 @@
     });
   };
 
-  const copyLink = () => {
-    Clipboard.write({
-      string: linkURL,
-    });
+  const shareLink = async () => {
+    if ((await Share.canShare()).value === true) {
+      Share.share({
+        title: 'pCall Link',
+        text: 'pCall Link',
+        url: linkURL,
+        dialogTitle: 'Share pCall Link',
+      });
+    } else {
+      Clipboard.write({
+        string: linkURL,
+      });
+    }
   };
 
   const onAmountChange = value => {
@@ -180,7 +191,7 @@
           </Col>
         </Row>
       </CardContent>
-      <Button on:click={copyLink}>Copy pCall Link</Button>
+      <Button on:click={shareLink}>Share pCall Link</Button>
     </Card>
 
     <!-- Cancel Link -->
