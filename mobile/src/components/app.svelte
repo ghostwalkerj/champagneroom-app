@@ -40,6 +40,7 @@
   } from '../lib/stores';
   import { getTalentDB } from '../lib/util';
   import { CallEventType } from '$lib/ORM/models/callEvent';
+  import { get } from 'svelte/store';
 
   let vc: VideoCallType;
   let key = '';
@@ -126,8 +127,13 @@
       // Logic for all of the possible call states
       if (cs) {
         if (cs.changed) {
-          if (cs.matches('receivingCall')) callAlert.open();
-          else callAlert.close();
+          if (cs.matches('receivingCall')) {
+            let callerName = $currentLink?.linkState.claim?.caller || 'Unknown';
+
+            const callText = `pCall from ${callerName}`;
+            callAlert.setText(callText);
+            callAlert.open();
+          } else callAlert.close();
           inCall = cs.matches('inCall');
         }
       }
@@ -227,12 +233,6 @@
         title: 'Incoming Call',
         text: 'You have an incoming call',
         buttons: [
-          {
-            text: 'Reject',
-            onClick: () => {
-              vc?.rejectCall();
-            },
-          },
           {
             text: 'Answer',
             onClick: () => {
