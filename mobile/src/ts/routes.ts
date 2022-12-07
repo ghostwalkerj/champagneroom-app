@@ -5,6 +5,7 @@ import ProfilePage from '../pages/profile.svelte';
 import WalletPage from '../pages/wallet.svelte';
 
 import NotFoundPage from '../pages/404.svelte';
+import VideoPreview from '../pages/videoPreview.svelte';
 
 var routes = [
   {
@@ -24,6 +25,10 @@ var routes = [
   {
     path: '/profile/',
     component: ProfilePage
+  },
+  {
+    path: '/preview/',
+    component: VideoPreview
   },
 
   {

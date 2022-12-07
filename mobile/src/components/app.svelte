@@ -30,6 +30,7 @@
   import type { LinkDocument } from '$lib/ORM/models/link';
   import type { VideoCallType } from '$lib/util/videoCall';
   import { videoCall } from '$lib/util/videoCall';
+
   import {
     currentLink,
     linkMachineService,
@@ -264,6 +265,14 @@
             iconMd="material:home"
             text="Home"
           />
+
+          <Link
+            tabLink="#view-preview"
+            iconIos="material:video_call"
+            iconAurora="material:video_call"
+            iconMd="material:video_call"
+            text="Preview"
+          />
           <Link
             tabLink="#view-profile"
             iconIos="f7:person_circle"
@@ -283,6 +292,9 @@
 
         <!-- Your main view/tab, should have "view-main" class. It also has "tabActive" prop -->
         <View id="view-home" main tab tabActive url="/" />
+
+        <!-- Preview View -->
+        <View id="view-preview" name="preview" tab url="/preview/" />
 
         <!-- wallet View -->
         <View id="view-wallet" name="wallet" tab url="/wallet/" />
