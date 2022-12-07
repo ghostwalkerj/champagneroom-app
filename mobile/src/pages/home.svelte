@@ -1,12 +1,9 @@
 <script lang="ts">
-  import {
-    createLinkMachineService,
-    type LinkMachineServiceType,
-  } from '$lib/machines/linkMachine';
-  import { ActorType, type LinkDocument } from '$lib/ORM/models/link';
+  import { ActorType } from '$lib/ORM/models/link';
   import { TransactionReasonType } from '$lib/ORM/models/transaction';
   import { currencyFormatter } from '$lib/util/constants';
   import getProfileImage from '$lib/util/profilePhoto';
+  import { Clipboard } from '@capacitor/clipboard';
   import {
     Block,
     BlockTitle,
@@ -25,15 +22,13 @@
   } from 'framework7-svelte';
   import spacetime from 'spacetime';
   import urlJoin from 'url-join';
-  import type { Subscription } from 'xstate';
   import {
-    talent,
-    talentDB,
     currentLink,
     linkMachineState,
+    talent,
+    linkMachineService,
   } from '../lib/stores';
   import { formatLinkState } from '../lib/util';
-  import { Clipboard } from '@capacitor/clipboard';
 
   const PCALL_URL = import.meta.env.VITE_PCALL_URL;
   const ROOM_PATH = import.meta.env.VITE_ROOM_PATH;
@@ -41,8 +36,6 @@
   $: linkURL =
     ($currentLink && urlJoin(PCALL_URL, ROOM_PATH, $currentLink._id)) || '';
 
-  let linkService: LinkMachineServiceType;
-  let linkSub: Subscription;
   let name = '';
   let amount = 50;
 
@@ -58,26 +51,8 @@
 
   $: showCurrentLink = !canCreateLink;
 
-  $: talent.subscribe(_talent => {
-    if (_talent) {
-      _talent.get$('currentLink').subscribe(linkId => {
-        if (linkId && $talentDB) {
-          $talentDB.links
-            .findOne(linkId)
-            .exec()
-            .then(link => {
-              if (link) {
-                currentLink.set(link);
-                useLink(link);
-              }
-            });
-        }
-      });
-
-      _talent.get$('name').subscribe((_name: string): void => {
-        name = _name;
-      });
-    }
+  $talent?.get$('name').subscribe((_name: string): void => {
+    name = _name;
   });
 
   $: claim = $linkMachineState?.context.linkState.claim || {
@@ -91,68 +66,42 @@
 
   $: callerProfileImage = urlJoin(PCALL_URL, getProfileImage(claim.caller));
 
-  const useLinkState = (
-    link: LinkDocument,
-    linkState: LinkDocument['linkState']
-  ) => {
-    if (linkService) linkService.stop();
-    if (linkSub) linkSub.unsubscribe();
-
-    linkService = createLinkMachineService(
-      linkState,
-      link.updateLinkStateCallBack()
-    );
-    linkSub = linkService.subscribe(state => {
-      linkMachineState.set(state);
-
-      if (state.changed) {
-        canCancelLink = state.can({
-          type: 'REQUEST CANCELLATION',
-          cancel: undefined,
-        });
-        canCreateLink =
-          !$currentLink || state.done || state.matches('inEscrow');
-      }
-    });
-  };
-
-  const useLink = (link: LinkDocument) => {
-    useLinkState(link, link.linkState);
-    link.get$('linkState').subscribe(_linkState => {
-      useLinkState(link, _linkState);
-    });
-  };
+  linkMachineState.subscribe(state => {
+    if (state?.changed) {
+      canCancelLink = state.can({
+        type: 'REQUEST CANCELLATION',
+        cancel: undefined,
+      });
+      canCreateLink = !$currentLink || state.done || state.matches('inEscrow');
+    }
+  });
 
   const cancelLink = () => {
-    if (linkService && linkMachineState) {
-      linkService.send({
-        type: 'REQUEST CANCELLATION',
-        cancel: {
-          createdAt: new Date().getTime(),
-          canceledInState: JSON.stringify($linkMachineState?.value),
-          canceler: ActorType.TALENT,
-        },
-      });
-    }
+    $linkMachineService?.send({
+      type: 'REQUEST CANCELLATION',
+      cancel: {
+        createdAt: new Date().getTime(),
+        canceledInState: JSON.stringify($linkMachineState?.value),
+        canceler: ActorType.TALENT,
+      },
+    });
   };
 
   const issueRefund = async () => {
-    if ($currentLink && linkMachineState) {
-      // Create and save a faux transaction
-      const transaction = await $currentLink.createTransaction({
-        hash: '0x1234567890',
-        block: 1234567890,
-        to: '0x1234567890',
-        from: $currentLink.fundingAddress,
-        value: $linkMachineState!.context.linkState.totalFunding.toString(),
-        reason: TransactionReasonType.REFUND,
-      });
+    // Create and save a faux transaction
+    const transaction = await $currentLink!.createTransaction({
+      hash: '0x1234567890',
+      block: 1234567890,
+      to: '0x1234567890',
+      from: $currentLink!.fundingAddress,
+      value: $linkMachineState!.context.linkState.totalFunding.toString(),
+      reason: TransactionReasonType.REFUND,
+    });
 
-      linkService.send({
-        type: 'REFUND RECEIVED',
-        transaction,
-      });
-    }
+    $linkMachineService?.send({
+      type: 'REFUND RECEIVED',
+      transaction,
+    });
   };
 
   const copyLink = () => {

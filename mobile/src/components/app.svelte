@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { KonstaProvider } from 'konsta/svelte';
   import { Preferences } from '@capacitor/preferences';
+  import { Block, Dialog, KonstaProvider } from 'konsta/svelte';
 
   import {
     App,
@@ -13,31 +13,126 @@
     ListInput,
     LoginScreen,
     LoginScreenTitle,
+    Navbar,
     Page,
+    Popup,
     Toolbar,
     View,
     Views,
   } from 'framework7-svelte';
+  // @ts-ignore
   import { getDevice } from 'framework7/lite-bundle';
   import { onMount } from 'svelte';
 
   import capacitorApp from '../ts/capacitor-app';
   import routes from '../ts/routes';
 
+  import { createLinkMachineService } from '$lib/machines/linkMachine';
+  import type { LinkDocument } from '$lib/ORM/models/link';
+  import type { VideoCallType } from '$lib/util/videoCall';
+  import { videoCall } from '$lib/util/videoCall';
   import {
+    currentLink,
+    linkMachineService,
+    linkMachineState,
     talent,
     talentDB,
-    linkMachineState,
-    currentLink,
   } from '../lib/stores';
   import { getTalentDB } from '../lib/util';
-  import { LinkStatus } from '$lib/ORM/models/link';
-  import { videoCall } from '$lib/util/videoCall';
-  import type { VideoCallType } from '$lib/util/videoCall';
+  import { CallEventType } from '$lib/ORM/models/callEvent';
 
   let vc: VideoCallType;
   let key = '';
   let callId = '';
+  let inCall = false;
+  let callAlert: Dialog['Dialog'];
+
+  const useLink = (link: LinkDocument) => {
+    useLinkState(link, link.linkState);
+    link.get$('linkState').subscribe(_linkState => {
+      useLinkState(link, _linkState);
+    });
+  };
+
+  const useLinkState = (
+    link: LinkDocument,
+    linkState: LinkDocument['linkState']
+  ) => {
+    $linkMachineService?.stop();
+    const _linkService = createLinkMachineService(
+      linkState,
+      link.updateLinkStateCallBack()
+    );
+    linkMachineService.set(_linkService);
+    _linkService.subscribe(state => {
+      linkMachineState.set(state);
+    });
+  };
+
+  const initVC = (_callId: string) => {
+    if (callId === _callId) return;
+
+    callId = _callId;
+    if (vc) vc.destroy();
+
+    vc = videoCall(_callId);
+    vc.callEvent.subscribe(ce => {
+      // Log call events on the Talent side
+      if (ce) {
+        let eventType: CallEventType | undefined;
+        switch (ce.type) {
+          case 'CALL INCOMING':
+            eventType = CallEventType.ATTEMPT;
+            break;
+
+          case 'CALL ACCEPTED':
+            eventType = CallEventType.ANSWER;
+            break;
+
+          case 'CALL CONNECTED':
+            eventType = CallEventType.CONNECT;
+            $linkMachineService?.send('CALL CONNECTED');
+            break;
+
+          case 'CALL UNANSWERED':
+            eventType = CallEventType.NO_ANSWER;
+            break;
+
+          case 'CALL REJECTED':
+            eventType = CallEventType.REJECT;
+            break;
+
+          case 'CALL DISCONNECTED':
+            eventType = CallEventType.DISCONNECT;
+            $linkMachineService?.send('CALL DISCONNECTED');
+            break;
+
+          case 'CALL HANGUP':
+            eventType = CallEventType.HANGUP;
+            break;
+        }
+        if (eventType !== undefined) {
+          $currentLink?.createCallEvent(eventType).then(callEvent => {
+            $linkMachineService?.send({
+              type: 'CALL EVENT RECEIVED',
+              callEvent,
+            });
+          });
+        }
+      }
+    });
+
+    vc.callMachineState.subscribe(cs => {
+      // Logic for all of the possible call states
+      if (cs) {
+        if (cs.changed) {
+          if (cs.matches('receivingCall')) callAlert.open();
+          else callAlert.close();
+          inCall = cs.matches('inCall');
+        }
+      }
+    });
+  };
 
   const login = async () => {
     if (key.trim() === '') {
@@ -64,6 +159,30 @@
     });
 
     talent.set(_talent);
+
+    _talent.get$('currentLink').subscribe(linkId => {
+      if (linkId && $talentDB) {
+        $talentDB.links
+          .findOne(linkId)
+          .exec()
+          .then(link => {
+            if (link) {
+              currentLink.set(link);
+
+              linkMachineState.subscribe(state => {
+                if (state?.changed) {
+                  if (state.matches('claimed.canCall')) initVC(link.callId);
+                  else {
+                    vc?.destroy();
+                    callId = '';
+                  }
+                }
+              });
+              useLink(link);
+            }
+          });
+      }
+    });
 
     preloader.close();
     key = '';
@@ -103,25 +222,26 @@
       if (f7.device.capacitor) {
         capacitorApp.init(f7);
       }
-      // Call F7 APIs here
-    });
 
-    linkMachineState.subscribe(state => {
-      if (state && state.changed) {
-        if (state.matches('claimed.canCall')) {
-          if (callId !== $currentLink?.callId) {
-            callId = $currentLink!.callId;
-            vc?.destroy();
-            vc = videoCall(callId);
-          }
-        } else {
-          vc?.destroy();
-          callId = '';
-        }
-      } else {
-        vc?.destroy();
-        callId = '';
-      }
+      callAlert = f7.dialog.create({
+        title: 'Incoming Call',
+        text: 'You have an incoming call',
+        buttons: [
+          {
+            text: 'Reject',
+            onClick: () => {
+              vc?.rejectCall();
+            },
+          },
+          {
+            text: 'Answer',
+            onClick: () => {
+              vc?.rejectCall();
+            },
+          },
+        ],
+      });
+      // Call F7 APIs here
     });
   });
 </script>

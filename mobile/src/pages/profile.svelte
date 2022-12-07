@@ -1,4 +1,5 @@
 <script type="ts">
+  import { Preferences } from '@capacitor/preferences';
   import {
     Block,
     Button,
@@ -10,12 +11,11 @@
     Row,
   } from 'framework7-svelte';
   import StarRating from 'svelte-star-rating';
-  import { Preferences } from '@capacitor/preferences';
 
   const PHOTO_UPDATE_PATH = import.meta.env.VITE_PHOTO_UPDATE_PATH;
   const PCALL_URL = import.meta.env.VITE_PCALL_URL;
 
-  import { talent, currentLink } from '../lib/stores';
+  import { currentLink, talent } from '../lib/stores';
 
   import {
     Camera,
