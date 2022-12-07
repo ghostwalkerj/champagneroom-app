@@ -24,9 +24,14 @@
   import capacitorApp from '../ts/capacitor-app';
   import routes from '../ts/routes';
 
-  import { talent, talentDB } from '../lib/stores';
+  import {
+    talent,
+    talentDB,
+    linkMachineState,
+    currentLink,
+  } from '../lib/stores';
   import { getTalentDB } from '../lib/util';
-
+  import { LinkStatus } from '$lib/ORM/models/link';
   import { videoCall } from '$lib/util/videoCall';
   import type { VideoCallType } from '$lib/util/videoCall';
 
@@ -99,6 +104,24 @@
         capacitorApp.init(f7);
       }
       // Call F7 APIs here
+    });
+
+    linkMachineState.subscribe(state => {
+      if (state && state.changed) {
+        if (state.matches('claimed.canCall')) {
+          if (callId !== $currentLink?.callId) {
+            callId = $currentLink!.callId;
+            vc?.destroy();
+            vc = videoCall(callId);
+          }
+        } else {
+          vc?.destroy();
+          callId = '';
+        }
+      } else {
+        vc?.destroy();
+        callId = '';
+      }
     });
   });
 </script>

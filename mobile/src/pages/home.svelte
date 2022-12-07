@@ -26,7 +26,12 @@
   import spacetime from 'spacetime';
   import urlJoin from 'url-join';
   import type { Subscription } from 'xstate';
-  import { talent, talentDB, currentLink } from '../lib/stores';
+  import {
+    talent,
+    talentDB,
+    currentLink,
+    linkMachineState,
+  } from '../lib/stores';
   import { formatLinkState } from '../lib/util';
   import { Clipboard } from '@capacitor/clipboard';
 
@@ -36,25 +41,20 @@
   $: linkURL =
     ($currentLink && urlJoin(PCALL_URL, ROOM_PATH, $currentLink._id)) || '';
 
-  let linkMachineState =
-    $currentLink &&
-    createLinkMachineService($currentLink.linkState).getSnapshot();
   let linkService: LinkMachineServiceType;
   let linkSub: Subscription;
   let name = '';
   let amount = 50;
 
-  $: canCancelLink =
-    linkMachineState &&
-    linkMachineState.can({
-      type: 'REQUEST CANCELLATION',
-      cancel: undefined,
-    });
+  $: canCancelLink = $linkMachineState?.can({
+    type: 'REQUEST CANCELLATION',
+    cancel: undefined,
+  });
 
   $: canCreateLink =
     !$currentLink ||
-    (linkMachineState && linkMachineState.done) ||
-    (linkMachineState && linkMachineState.matches('inEscrow'));
+    $linkMachineState?.done ||
+    $linkMachineState?.matches('inEscrow');
 
   $: showCurrentLink = !canCreateLink;
 
@@ -80,7 +80,7 @@
     }
   });
 
-  $: claim = (linkMachineState && linkMachineState.context.linkState.claim) || {
+  $: claim = $linkMachineState?.context.linkState.claim || {
     caller: '',
     createdAt: '',
     call: {
@@ -103,7 +103,7 @@
       link.updateLinkStateCallBack()
     );
     linkSub = linkService.subscribe(state => {
-      linkMachineState = state;
+      linkMachineState.set(state);
 
       if (state.changed) {
         canCancelLink = state.can({
@@ -129,7 +129,7 @@
         type: 'REQUEST CANCELLATION',
         cancel: {
           createdAt: new Date().getTime(),
-          canceledInState: JSON.stringify(linkMachineState.value),
+          canceledInState: JSON.stringify($linkMachineState?.value),
           canceler: ActorType.TALENT,
         },
       });
@@ -144,7 +144,7 @@
         block: 1234567890,
         to: '0x1234567890',
         from: $currentLink.fundingAddress,
-        value: linkMachineState.context.linkState.totalFunding.toString(),
+        value: $linkMachineState!.context.linkState.totalFunding.toString(),
         reason: TransactionReasonType.REFUND,
       });
 
@@ -179,12 +179,12 @@
   <Navbar title="pCall Creator" subtitle={name} />
 
   <!-- Current Link -->
-  {#if showCurrentLink && $currentLink && linkMachineState}
+  {#if showCurrentLink && $currentLink && $linkMachineState}
     <Card title="Your Outstanding pCall Link" class="rounded-lg" outline>
       <CardContent class="bg-color-black">
-        {#if linkMachineState.matches('unclaimed')}
+        {#if $linkMachineState?.matches('unclaimed')}
           <Row>Your pCall Link has Not Been Claimed</Row>
-        {:else if linkMachineState.matches('claimed')}
+        {:else if $linkMachineState?.matches('claimed')}
           <Row>
             pCall Link was Claimed by:
             <Col
@@ -212,11 +212,11 @@
           >
           <Col
             >Total Funded:<br />{currencyFormatter.format(
-              linkMachineState.context.linkState.totalFunding || 0
+              $linkMachineState.context.linkState.totalFunding || 0
             )}</Col
           >
         </Row>
-        {#if linkMachineState.context.linkState.totalFunding >= $currentLink.requestedAmount}
+        {#if $linkMachineState.context.linkState.totalFunding >= $currentLink.requestedAmount}
           <Row>Link is Fully Funded!</Row>
         {/if}
         <Row class="pt-4">
@@ -226,7 +226,7 @@
         <Row class="pt-4">
           <Col
             >Status: <span class="italic">
-              {formatLinkState(linkMachineState)}
+              {formatLinkState($linkMachineState)}
             </span>
           </Col>
         </Row>
@@ -237,13 +237,13 @@
     <!-- Cancel Link -->
     {#if canCancelLink}
       <Card title="Cancel Your pCall Link" class="rounded-lg" outline>
-        {#if linkMachineState.context.linkState.totalFunding > 0}
+        {#if $linkMachineState.context.linkState.totalFunding > 0}
           <CardContent class="bg-color-black">
             <Row>
               <Col>
                 {currencyFormatter.format(
-                  linkMachineState.context.linkState.totalFunding
-                )} will be refunded to "{linkMachineState.context.linkState
+                  $linkMachineState.context.linkState.totalFunding
+                )} will be refunded to "{$linkMachineState.context.linkState
                   .claim?.caller}"
               </Col>
             </Row>
@@ -261,14 +261,14 @@
     {/if}
 
     <!-- Issue Refund -->
-    {#if linkMachineState && linkMachineState.matches('claimed.requestedCancellation.waiting4Refund')}
+    {#if $linkMachineState.matches('claimed.requestedCancellation.waiting4Refund')}
       <Card title="Issue Refund" class="rounded-lg" outline>
         <Block strong>
           <Row class="pb-4">
             <Col>
               Send {currencyFormatter.format(
-                linkMachineState.context.linkState.totalFunding
-              )} to "{linkMachineState.context.linkState.claim?.caller}"
+                $linkMachineState.context.linkState.totalFunding
+              )} to "{$linkMachineState.context.linkState.claim?.caller}"
             </Col>
           </Row>
           <Row>

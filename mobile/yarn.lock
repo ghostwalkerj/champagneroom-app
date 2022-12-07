@@ -5884,9 +5884,9 @@ svelte-star-rating@^2.0.1:
   integrity sha512-bURPn91T+uBCi4XXdh2eE0k2sCILcJrfb8NfKOBfpVbOJYjTfWllBtSKQMoXRnXwRmgx/52HC87ziG1KTywkFg==
 
 svelte@^3.53.1:
-  version "3.53.1"
-  resolved "https://registry.npmjs.org/svelte/-/svelte-3.53.1.tgz"
-  integrity sha512-Q4/hHkktZogGhN5iqxqSi9sjEVoe/NbIxX4hXEHoasTxj+TxEQVAq66LnDMdAZxjmsodkoI5F3slqsS68U7FNw==
+  version "3.54.0"
+  resolved "https://registry.yarnpkg.com/svelte/-/svelte-3.54.0.tgz#b4bcd865bd9e927f9f7b76563288ef5f4d72867a"
+  integrity sha512-tdrgeJU0hob0ZWAMoKXkhcxXA7dpTg6lZGxUeko5YqvPdJBiyRspGsCwV27kIrbrqPP2WUoSV9ca0gnLlw8YzQ==
 
 swiper@^8.1.4, swiper@^8.4.5:
   version "8.4.5"
