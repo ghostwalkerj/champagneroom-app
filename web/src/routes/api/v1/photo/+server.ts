@@ -5,10 +5,10 @@ import { Web3Storage } from 'web3.storage';
 import type { RequestHandler } from './$types';
 
 import { talentDB } from '$lib/ORM/dbs/talentDB';
+import type { LinkDocument } from '$lib/ORM/models/link';
 import { StorageTypes } from '$lib/ORM/rxdb';
 import { error } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
-import type { LinkDocument } from '$lib/ORM/models/link';
 
 const client = new Web3Storage({ token: WEB3STORAGE_API_TOKEN });
 

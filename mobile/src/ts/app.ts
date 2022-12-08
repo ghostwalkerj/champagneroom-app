@@ -14,7 +14,7 @@ import '../css/app.css';
 import '../css/icons.css';
 
 // Import App Component
-import App from '../components/app.svelte';
+import App from '../app.svelte';
 
 // Init F7 Svelte Plugin
 Framework7.use(Framework7Svelte);

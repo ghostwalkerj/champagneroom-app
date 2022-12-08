@@ -2,10 +2,8 @@
   import type {
     MediaToggleMachineServiceType,
     MediaToggleMachineStateType,
-    MediaToggleMachineType,
   } from '$lib/machines/mediaToggleMachine';
   import type { UserStreamType } from '$lib/util/userStream';
-  import { useMachine } from '@xstate/svelte';
   import { onMount } from 'svelte';
   import {
     MicIcon,

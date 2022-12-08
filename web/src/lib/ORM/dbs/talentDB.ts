@@ -63,7 +63,7 @@ const create = async (token: string, key: string, storage: StorageTypes) => {
 		const remoteDB = new PouchDB(PUBLIC_CREATORS_ENDPOINT, {
 			fetch: function (
 				url: string,
-				opts: { headers: { set: (arg0: string, arg1: string) => void } }
+				opts: { headers: { set: (arg0: string, arg1: string) => void; }; }
 			) {
 				opts.headers.set('Authorization', 'Bearer ' + token);
 				return PouchDB.fetch(url, opts);

@@ -13,37 +13,37 @@
 
   // UI Controls
   let localVideo: HTMLVideoElement;
-  let initialized = false;
   let camState: MediaToggleMachineStateType;
   let micState: MediaToggleMachineStateType;
   let camService: MediaToggleMachineServiceType;
   let micService: MediaToggleMachineServiceType;
   let mediaStream: MediaStream | null;
 
-  onMount(async () => {
-    us = await userStream();
-    camService = interpret(us.camMachine).onTransition(state => {
-      camState = state;
-    });
-    camService.start();
+  const getUserStream = async () => {
+    if (!us) {
+      us = await userStream();
+      camService = interpret(us.camMachine).onTransition(state => {
+        camState = state;
+      });
+      camService.start();
 
-    micService = interpret(us.micMachine).onTransition(state => {
-      micState = state;
-    });
-    micService.start();
+      micService = interpret(us.micMachine).onTransition(state => {
+        micState = state;
+      });
+      micService.start();
 
-    us.mediaStream.subscribe(stream => {
-      if (stream) mediaStream = stream;
-      localVideo.srcObject = mediaStream;
-      localVideo.load();
-      localVideo.muted = true;
-      localVideo.play();
-    });
-    initialized = true;
-  });
+      us.mediaStream.subscribe(stream => {
+        if (stream) mediaStream = stream;
+        localVideo.srcObject = mediaStream;
+        localVideo.load();
+        localVideo.muted = true;
+        localVideo.play();
+      });
+    }
+  };
 </script>
 
-<Page name="Video Preview">
+<Page name="Video Preview" on:pageTabShow={getUserStream}>
   <!-- svelte-ignore a11y-media-has-caption -->
   <video
     bind:this={localVideo}
@@ -52,33 +52,27 @@
     class="h-full object-cover w-full -scale-x-100 "
   />
   <!-- svelte-ignore a11y-click-events-have-key-events -->
-
-  {#if initialized}
-    <div class="absolute inset-0 flex flex-col bg-base-100  text-white p-4  ">
-      <div class="flex flex-col  items-center w-min">
-        <button
-          class="h-14 w-14 btn  "
-          on:click={() => camService.send('TOGGLE')}
-        >
-          {#if camState?.matches('on')}
-            <Icon material="videocam" size="34" />
-          {:else}
-            <Icon material="videocam_off" size="34" />
-          {/if}
-        </button>
-      </div>
-      <div class="flex flex-col items-center w-min">
-        <button
-          class="h-14 w-14 btn"
-          on:click={() => micService.send('TOGGLE')}
-        >
-          {#if micState?.matches('on')}
-            <Icon material="mic" size="34" />
-          {:else}
-            <Icon material="mic_off" size="34" />
-          {/if}
-        </button>
-      </div>
+  <div class="absolute inset-0 flex flex-col bg-base-100  text-white p-4  ">
+    <div class="flex flex-col items-center w-min">
+      <button
+        class="h-14 w-14 btn  "
+        on:click={() => camService?.send('TOGGLE')}
+      >
+        {#if camState?.matches('on')}
+          <Icon material="videocam" size="34" />
+        {:else}
+          <Icon material="videocam_off" size="34" />
+        {/if}
+      </button>
     </div>
-  {/if}
+    <div class="flex flex-col items-center w-min">
+      <button class="h-14 w-14 btn" on:click={() => micService?.send('TOGGLE')}>
+        {#if micState?.matches('on')}
+          <Icon material="mic" size="34" />
+        {:else}
+          <Icon material="mic_off" size="34" />
+        {/if}
+      </button>
+    </div>
+  </div>
 </Page>

@@ -22,12 +22,11 @@
   import { onDestroy, onMount } from 'svelte';
   import { PhoneIncomingIcon } from 'svelte-feather-icons';
   import StarRating from 'svelte-star-rating';
-  import type { Subscription } from 'xstate';
+  import type { EventObject, Subscription } from 'xstate';
   import type { PageData } from './$types';
   import LinkViewer from './LinkView.svelte';
   import TalentActivity from './TalentActivity.svelte';
   import TalentWallet from './TalentWallet.svelte';
-  import type { EventObject } from 'xstate';
 
   export let form: import('./$types').ActionData;
 

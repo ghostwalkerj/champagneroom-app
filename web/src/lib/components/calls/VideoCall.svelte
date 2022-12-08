@@ -5,7 +5,6 @@
   } from '$lib/machines/mediaToggleMachine';
   import type { UserStreamType } from '$lib/util/userStream';
   import type { VideoCallType } from '$lib/util/videoCall';
-  import { useMachine } from '@xstate/svelte';
   import { onDestroy, onMount } from 'svelte';
 
   import {

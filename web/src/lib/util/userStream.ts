@@ -42,6 +42,7 @@ export const userStream = async (options: Partial<VideoStreamOptions> = {}) => {
 			set(stream);
 		});
 	});
+	let stream: MediaStream;
 
 	const ops = Object.assign(
 		{
@@ -63,7 +64,7 @@ export const userStream = async (options: Partial<VideoStreamOptions> = {}) => {
 	let micMachine: MediaToggleMachineType;
 
 	try {
-		const stream = await navigator.mediaDevices.getUserMedia(ops);
+		stream = await navigator.mediaDevices.getUserMedia(ops);
 		_mediaStream.set(stream);
 		const videoStreams = stream.getVideoTracks();
 		const audioStreams = stream.getAudioTracks();
@@ -76,10 +77,19 @@ export const userStream = async (options: Partial<VideoStreamOptions> = {}) => {
 		throw error;
 	}
 
+	const stop = () => {
+		if (stream) {
+			for (const track of stream.getTracks()) {
+				track.stop();
+			}
+		}
+	};
+
 	return {
 		mediaStream,
 		camMachine,
-		micMachine
+		micMachine,
+		stop
 	};
 };
 

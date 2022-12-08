@@ -21,8 +21,8 @@
   import { getDevice } from 'framework7/lite-bundle';
   import { onMount } from 'svelte';
 
-  import capacitorApp from '../ts/capacitor-app';
-  import routes from '../ts/routes';
+  import capacitorApp from './ts/capacitor-app';
+  import routes from './ts/routes';
 
   import { createLinkMachineService } from '$lib/machines/linkMachine';
   import { CallEventType } from '$lib/ORM/models/callEvent';
@@ -36,8 +36,8 @@
     linkMachineState,
     talent,
     talentDB,
-  } from '../lib/stores';
-  import { getTalentDB } from '../lib/util';
+  } from './lib/stores';
+  import { getTalentDB } from './lib/util';
 
   let vc: VideoCallType;
   let key = '';
