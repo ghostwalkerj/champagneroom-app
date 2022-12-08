@@ -1,5 +1,4 @@
 <script type="ts">
-  import { Preferences } from '@capacitor/preferences';
   import {
     Block,
     Button,
@@ -73,9 +72,6 @@
 
   const logout = () => {
     talent.set(null);
-    Preferences.remove({
-      key: 'key',
-    });
   };
 
   const updateName = () => {

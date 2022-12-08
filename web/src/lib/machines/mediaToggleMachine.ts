@@ -1,4 +1,4 @@
-import { createMachine } from 'xstate';
+import { createMachine, interpret, StateFrom } from 'xstate';
 
 const createMediaToggleMachine = (mediaTrack: MediaStreamTrack) => {
 	const toggleMachine = createMachine(
@@ -8,7 +8,7 @@ const createMediaToggleMachine = (mediaTrack: MediaStreamTrack) => {
 			tsTypes: {} as import('./mediaToggleMachine.typegen').Typegen0,
 			initial: 'unInitialized',
 			schema: {
-				events: {} as { type: 'TOGGLE' } | { type: 'TOGGLE ON' } | { type: 'TOGGLE OFF' }
+				events: {} as { type: 'TOGGLE'; } | { type: 'TOGGLE ON'; } | { type: 'TOGGLE OFF'; }
 			},
 			states: {
 				unInitialized: {
@@ -79,6 +79,14 @@ const createMediaToggleMachine = (mediaTrack: MediaStreamTrack) => {
 	return toggleMachine;
 };
 
+export const createMediaToggleMachineService = (mediaTrack: MediaStreamTrack) => {
+	return interpret(createMediaToggleMachine(mediaTrack)).start();
+};
+
 export type MediaToggleMachineType = ReturnType<typeof createMediaToggleMachine>;
+
+export type MediaToggleMachineStateType = StateFrom<typeof createMediaToggleMachine>;
+
+export type MediaToggleMachineServiceType = ReturnType<typeof createMediaToggleMachineService>;
 
 export default createMediaToggleMachine;

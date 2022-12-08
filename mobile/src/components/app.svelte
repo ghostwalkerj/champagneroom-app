@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { Preferences } from '@capacitor/preferences';
   import { Dialog, KonstaProvider } from 'konsta/svelte';
 
   import {
@@ -156,12 +155,6 @@
         f7.dialog.alert('Invalid Key');
         return;
       }
-
-      Preferences.set({
-        key: 'key',
-        value: key,
-      });
-
       talent.set(_talent);
 
       _talent.get$('currentLink').subscribe(linkId => {
