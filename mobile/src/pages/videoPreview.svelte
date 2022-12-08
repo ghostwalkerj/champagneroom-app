@@ -44,43 +44,41 @@
 </script>
 
 <Page name="Video Preview">
-  <div class="flex flex-col z-100 ">
-    <!-- svelte-ignore a11y-media-has-caption -->
-    <video
-      bind:this={localVideo}
-      muted
-      playsinline
-      class="rounded-xl p-2 -scale-x-100 max-h-screen"
-    />
-    <!-- svelte-ignore a11y-click-events-have-key-events -->
+  <!-- svelte-ignore a11y-media-has-caption -->
+  <video
+    bind:this={localVideo}
+    muted
+    playsinline
+    class="h-full object-cover w-full -scale-x-100 "
+  />
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
 
-    {#if initialized}
-      <div class="absolute inset-0 flex flex-col bg-base-100  text-white p-4  ">
-        <div class="flex flex-col  items-center w-min">
-          <button
-            class="h-14 w-14 btn  "
-            on:click={() => camService.send('TOGGLE')}
-          >
-            {#if camState?.matches('on')}
-              <Icon material="videocam" size="34" />
-            {:else}
-              <Icon material="videocam_off" size="34" />
-            {/if}
-          </button>
-        </div>
-        <div class="flex flex-col items-center w-min">
-          <button
-            class="h-14 w-14 btn"
-            on:click={() => micService.send('TOGGLE')}
-          >
-            {#if micState?.matches('on')}
-              <Icon material="mic" size="34" />
-            {:else}
-              <Icon material="mic_off" size="34" />
-            {/if}
-          </button>
-        </div>
+  {#if initialized}
+    <div class="absolute inset-0 flex flex-col bg-base-100  text-white p-4  ">
+      <div class="flex flex-col  items-center w-min">
+        <button
+          class="h-14 w-14 btn  "
+          on:click={() => camService.send('TOGGLE')}
+        >
+          {#if camState?.matches('on')}
+            <Icon material="videocam" size="34" />
+          {:else}
+            <Icon material="videocam_off" size="34" />
+          {/if}
+        </button>
       </div>
-    {/if}
-  </div>
+      <div class="flex flex-col items-center w-min">
+        <button
+          class="h-14 w-14 btn"
+          on:click={() => micService.send('TOGGLE')}
+        >
+          {#if micState?.matches('on')}
+            <Icon material="mic" size="34" />
+          {:else}
+            <Icon material="mic_off" size="34" />
+          {/if}
+        </button>
+      </div>
+    </div>
+  {/if}
 </Page>
