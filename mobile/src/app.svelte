@@ -27,9 +27,12 @@
   import { createLinkMachineService } from '$lib/machines/linkMachine';
   import { CallEventType } from '$lib/ORM/models/callEvent';
   import type { LinkDocument } from '$lib/ORM/models/link';
+  import { userStream, type UserStreamType } from '$lib/util/userStream';
   import type { VideoCallType } from '$lib/util/videoCall';
   import { videoCall } from '$lib/util/videoCall';
 
+  import { get } from 'svelte/store';
+  import TalentCall from './lib/components/TalentCall.svelte';
   import {
     currentLink,
     linkMachineService,
@@ -40,6 +43,8 @@
   import { getTalentDB } from './lib/util';
 
   let vc: VideoCallType;
+  let us: Awaited<UserStreamType>;
+
   let key = '';
   let callId = '';
   let inCall = false;
@@ -130,7 +135,9 @@
             const callText = `pCall from ${callerName}`;
             callAlert.setText(callText);
             callAlert.open();
-          } else callAlert.close();
+          } else {
+            callAlert.close();
+          }
           inCall = cs.matches('inCall');
         }
       }
@@ -218,6 +225,17 @@
     },
   };
 
+  const answerCall = async () => {
+    if (!us) {
+      us = await userStream();
+    }
+
+    const mediaStream = get(us.mediaStream);
+    if (mediaStream) {
+      vc?.acceptCall(mediaStream);
+    }
+  };
+
   onMount(() => {
     f7ready(() => {
       // Init capacitor APIs (see capacitor-app.js)
@@ -232,7 +250,7 @@
           {
             text: 'Answer',
             onClick: () => {
-              vc?.rejectCall();
+              answerCall();
             },
           },
         ],
@@ -247,6 +265,9 @@
     <!-- Views/Tabs container -->
 
     {#if $talent}
+      {#if inCall}
+        <TalentCall {us} {vc} />
+      {/if}
       <Views tabs class="z-40">
         <!-- Tabbar for switching views-tabs -->
         <Toolbar tabbar labels bottom>

@@ -78,11 +78,9 @@ export const userStream = async (options: Partial<VideoStreamOptions> = {}) => {
 	}
 
 	const stop = () => {
-		if (stream) {
-			for (const track of stream.getTracks()) {
-				track.stop();
-			}
-		}
+		stream.getTracks().forEach(track => {
+			track.stop();
+		});
 	};
 
 	return {
