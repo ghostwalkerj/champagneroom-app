@@ -32,30 +32,30 @@ export const createLinkMachine = (linkState: LinkStateType, saveState?: StateCal
 			tsTypes: {} as import('./linkMachine.typegen').Typegen0,
 			schema: {
 				events: {} as
-					| { type: 'CLAIM'; claim: LinkStateType['claim'] }
-					| { type: 'REQUEST CANCELLATION'; cancel: LinkStateType['cancel'] }
+					| { type: 'CLAIM'; claim: LinkStateType['claim']; }
+					| { type: 'REQUEST CANCELLATION'; cancel: LinkStateType['cancel']; }
 					| {
-							type: 'REFUND RECEIVED';
-							transaction: TransactionDocType;
-					  }
+						type: 'REFUND RECEIVED';
+						transaction: TransactionDocType;
+					}
 					| {
-							type: 'PAYMENT RECEIVED';
-							transaction: TransactionDocType;
-					  }
-					| { type: 'CALL CONNECTED' }
-					| { type: 'CALL DISCONNECTED' }
+						type: 'PAYMENT RECEIVED';
+						transaction: TransactionDocType;
+					}
+					| { type: 'CALL CONNECTED'; }
+					| { type: 'CALL DISCONNECTED'; }
 					| {
-							type: 'CALL EVENT RECEIVED';
-							callEvent: CallEventDocType;
-					  }
+						type: 'CALL EVENT RECEIVED';
+						callEvent: CallEventDocType;
+					}
 					| {
-							type: 'FEEDBACK RECEIVED';
-							feedback: NonNullable<LinkStateType['feedback']>;
-					  }
+						type: 'FEEDBACK RECEIVED';
+						feedback: NonNullable<LinkStateType['feedback']>;
+					}
 					| {
-							type: 'DISPUTE INITIATED';
-							dispute: NonNullable<LinkStateType['dispute']>;
-					  }
+						type: 'DISPUTE INITIATED';
+						dispute: NonNullable<LinkStateType['dispute']>;
+					}
 			},
 			predictableActionArguments: true,
 			id: 'linkMachine',

@@ -1,8 +1,9 @@
 import { PUBLIC_CALL_TIMEOUT } from '$env/static/public';
-import callMachine from '$lib/machines/callMachine';
+import callMachine, { CallMachineStateType } from '$lib/machines/callMachine';
 import { Peer } from 'peerjs';
 import { readable, writable } from 'svelte/store';
 import { interpret, type EventObject } from 'xstate';
+import type { Subscriber } from 'svelte/store';
 
 const CALL_TIMEOUT = Number.parseInt(PUBLIC_CALL_TIMEOUT || '30000');
 
@@ -11,39 +12,42 @@ export const videoCall = (userId?: string) => {
 	let noAnswerTimer: NodeJS.Timeout;
 	let unansweredTimer: NodeJS.Timeout;
 	let destroyed = false;
+	const subscribers: Subscriber<unknown>[] = [];
 
 	const callService = interpret(callMachine).start();
 
 	const _remoteStream = writable<MediaStream | null>(null);
 	const remoteStream = readable<MediaStream | null>(null, (set) => {
-		_remoteStream.subscribe((stream) => {
+		subscribers.push(_remoteStream.subscribe((stream) => {
 			set(stream);
-		});
+		}));
 	});
 
 	const _callerName = writable<string | null>(null);
 	const callerName = readable<string | null>(null, (set) => {
-		_callerName.subscribe((name) => {
+		subscribers.push(_callerName.subscribe((name) => {
 			set(name);
-		});
+		}));
 	});
 
-	const _callMachineState = writable(callMachine.initialState);
-	const callMachineState = readable(callMachine.initialState, (set) => {
-		_callMachineState.subscribe((state) => {
-			set(state);
-		});
+	const _callMachineState = writable<CallMachineStateType | null>(null);
+	const callMachineState = readable<CallMachineStateType | null>(null, (set) => {
+		subscribers.push(
+			_callMachineState.subscribe((state) => {
+				set(state);
+			}));
 	});
 
 	callService.onTransition((state) => {
 		_callMachineState.set(state);
 	});
 
-	const _callEvent = writable<EventObject>(callMachine.initialState.event);
-	const callEvent = readable<EventObject>(callMachine.initialState.event, (set) => {
-		_callEvent.subscribe((event) => {
-			set(event);
-		});
+	const _callEvent = writable<EventObject | null>(null);
+	const callEvent = readable<EventObject | null>(null, (set) => {
+		subscribers.push(
+			_callEvent.subscribe((event) => {
+				set(event);
+			}));
 	});
 
 	callService.onEvent((event) => {
@@ -189,7 +193,6 @@ export const videoCall = (userId?: string) => {
 		mediaConnection.on('stream', (remoteStream) => {
 			callService.send({ type: 'CALL CONNECTED' });
 			clearTimeout(unansweredTimer);
-
 			_remoteStream.set(remoteStream);
 		});
 		mediaConnection.on('close', () => {
@@ -211,6 +214,12 @@ export const videoCall = (userId?: string) => {
 			peer.destroy();
 			callService.send('PEER DESTROYED');
 			callService.stop();
+
+			_callerName.set(null);
+			_remoteStream.set(null);
+			_callEvent.set(null);
+			_callMachineState.set(null);
+			subscribers.forEach(s => s);
 			resetCallState();
 		}
 	};

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Dialog, KonstaProvider } from 'konsta/svelte';
+  import { KonstaProvider } from 'konsta/svelte';
 
   import {
     App,
@@ -27,12 +27,8 @@
   import { createLinkMachineService } from '$lib/machines/linkMachine';
   import { CallEventType } from '$lib/ORM/models/callEvent';
   import type { LinkDocument } from '$lib/ORM/models/link';
-  import { userStream, type UserStreamType } from '$lib/util/userStream';
-  import type { VideoCallType } from '$lib/util/videoCall';
-  import { videoCall } from '$lib/util/videoCall';
-
-  import { get } from 'svelte/store';
-  import TalentCall from './lib/components/TalentCall.svelte';
+  import CallManager from './lib/components/callManager';
+  import VideoCall from './lib/components/VideoCall.svelte';
   import {
     currentLink,
     linkMachineService,
@@ -42,13 +38,9 @@
   } from './lib/stores';
   import { getTalentDB } from './lib/util';
 
-  let vc: VideoCallType;
-  let us: Awaited<UserStreamType>;
-
+  let callManager: CallManager | undefined;
   let key = '';
   let callId = '';
-  let inCall = false;
-  let callAlert: Dialog['Dialog'];
 
   const useLink = (link: LinkDocument) => {
     useLinkState(link, link.linkState);
@@ -76,10 +68,9 @@
     if (callId === _callId) return;
 
     callId = _callId;
-    if (vc) vc.destroy();
-
-    vc = videoCall(_callId);
-    vc.callEvent.subscribe(ce => {
+    callManager = new CallManager(_callId);
+    callManager.callService.onEvent(ce => {
+      console.log('call event', ce);
       // Log call events on the Talent side
       if (ce) {
         let eventType: CallEventType | undefined;
@@ -124,24 +115,6 @@
         }
       }
     });
-
-    vc.callMachineState.subscribe(cs => {
-      // Logic for all of the possible call states
-      if (cs) {
-        if (cs.changed) {
-          if (cs.matches('receivingCall')) {
-            let callerName = $currentLink?.linkState.claim?.caller || 'Unknown';
-
-            const callText = `pCall from ${callerName}`;
-            callAlert.setText(callText);
-            callAlert.open();
-          } else {
-            callAlert.close();
-          }
-          inCall = cs.matches('inCall');
-        }
-      }
-    });
   };
 
   const login = async () => {
@@ -177,7 +150,8 @@
                   if (state?.changed) {
                     if (state.matches('claimed.canCall')) initVC(link.callId);
                     else {
-                      vc?.destroy();
+                      callManager?.destroy();
+                      callManager = undefined;
                       callId = '';
                     }
                   }
@@ -225,17 +199,6 @@
     },
   };
 
-  const answerCall = async () => {
-    if (!us) {
-      us = await userStream();
-    }
-
-    const mediaStream = get(us.mediaStream);
-    if (mediaStream) {
-      vc?.acceptCall(mediaStream);
-    }
-  };
-
   onMount(() => {
     f7ready(() => {
       // Init capacitor APIs (see capacitor-app.js)
@@ -243,18 +206,6 @@
         capacitorApp.init(f7);
       }
 
-      callAlert = f7.dialog.create({
-        title: 'Incoming Call',
-        text: 'You have an incoming call',
-        buttons: [
-          {
-            text: 'Answer',
-            onClick: () => {
-              answerCall();
-            },
-          },
-        ],
-      });
       // Call F7 APIs here
     });
   });
@@ -265,8 +216,8 @@
     <!-- Views/Tabs container -->
 
     {#if $talent}
-      {#if inCall}
-        <TalentCall {us} {vc} />
+      {#if callManager}
+        <VideoCall {callManager} />
       {/if}
       <Views tabs class="z-40">
         <!-- Tabbar for switching views-tabs -->

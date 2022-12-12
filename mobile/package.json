@@ -45,6 +45,7 @@
     "framework7-svelte": "^7.0.9",
     "konsta": "^1.0.2",
     "material-icons": "^1.12.2",
+    "peerjs": "^1.4.7",
     "skeleton-elements": "^4.0.1",
     "spacetime": "^7.2.0",
     "svelte": "^3.53.1",
