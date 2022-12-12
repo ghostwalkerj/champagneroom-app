@@ -37,14 +37,19 @@
     talentDB,
   } from './lib/stores';
   import { getTalentDB } from './lib/util';
+  import type { Unsubscriber } from 'svelte/store';
 
   let callManager: CallManager | undefined;
   let key = '';
   let callId = '';
+  let unSubLinkMachineState: Unsubscriber;
+  let subLinkState: any;
+  let subLinkService: any;
 
   const useLink = (link: LinkDocument) => {
     useLinkState(link, link.linkState);
-    link.get$('linkState').subscribe(_linkState => {
+    if (subLinkState) subLinkState.unsubscribe();
+    subLinkState = link.get$('linkState').subscribe(_linkState => {
       useLinkState(link, _linkState);
     });
   };
@@ -59,12 +64,13 @@
       link.updateLinkStateCallBack()
     );
     linkMachineService.set(_linkService);
-    _linkService.subscribe(state => {
+    if (subLinkService) subLinkService.unsubscribe();
+    subLinkService = _linkService.subscribe(state => {
       linkMachineState.set(state);
     });
   };
 
-  const initVC = (_callId: string) => {
+  const initCallManager = (_callId: string) => {
     if (callId === _callId) return;
 
     callId = _callId;
@@ -145,10 +151,11 @@
             .then(link => {
               if (link) {
                 currentLink.set(link);
-
-                linkMachineState.subscribe(state => {
+                if (unSubLinkMachineState) unSubLinkMachineState();
+                unSubLinkMachineState = linkMachineState.subscribe(state => {
                   if (state?.changed) {
-                    if (state.matches('claimed.canCall')) initVC(link.callId);
+                    if (state.matches('claimed.canCall'))
+                      initCallManager(link.callId);
                     else {
                       callManager?.destroy();
                       callManager = undefined;

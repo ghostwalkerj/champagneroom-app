@@ -7,7 +7,7 @@
   import type CallManager from './callManager';
 
   import { f7, Icon } from 'framework7-svelte';
-  import { onMount, onDestroy } from 'svelte';
+  import { onDestroy } from 'svelte';
   import { interpret } from 'xstate';
 
   export let callManager: CallManager;
@@ -63,6 +63,12 @@
         callAlert.open();
       } else {
         callAlert.close();
+      }
+      if (state.matches('inCall')) {
+        inCall = true;
+        startVideo();
+      } else {
+        inCall = false;
       }
     }
   });
