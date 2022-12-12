@@ -45,6 +45,7 @@
   let unSubLinkMachineState: Unsubscriber;
   let subLinkState: any;
   let subLinkService: any;
+  let inCall = false;
 
   const useLink = (link: LinkDocument) => {
     useLinkState(link, link.linkState);
@@ -224,56 +225,59 @@
 
     {#if $talent}
       {#if callManager}
-        <VideoCall {callManager} />
+        <VideoCall {callManager} bind:inCall />
       {/if}
-      <Views tabs class="z-40">
-        <!-- Tabbar for switching views-tabs -->
-        <Toolbar tabbar labels bottom>
-          <Link
-            tabLink="#view-home"
-            tabLinkActive
-            iconIos="f7:house_fill"
-            iconAurora="f7:house_fill"
-            iconMd="material:home"
-            text="Home"
-          />
 
-          <Link
-            tabLink="#view-preview"
-            iconIos="material:video_call"
-            iconAurora="material:video_call"
-            iconMd="material:video_call"
-            text="Preview"
-          />
-          <Link
-            tabLink="#view-profile"
-            iconIos="f7:person_circle"
-            iconAurora="f7:person_circle"
-            iconMd="material:person"
-            text="Profile"
-          />
+      {#if !inCall}
+        <Views tabs class="z-40">
+          <!-- Tabbar for switching views-tabs -->
+          <Toolbar tabbar labels bottom>
+            <Link
+              tabLink="#view-home"
+              tabLinkActive
+              iconIos="f7:house_fill"
+              iconAurora="f7:house_fill"
+              iconMd="material:home"
+              text="Home"
+            />
 
-          <Link
-            tabLink="#view-wallet"
-            iconIos="f7:wallet_fill"
-            iconAurora="f7:wallet_fill"
-            iconMd="material:wallet_fill"
-            text="Wallet"
-          />
-        </Toolbar>
+            <Link
+              tabLink="#view-preview"
+              iconIos="material:video_call"
+              iconAurora="material:video_call"
+              iconMd="material:video_call"
+              text="Preview"
+            />
+            <Link
+              tabLink="#view-profile"
+              iconIos="f7:person_circle"
+              iconAurora="f7:person_circle"
+              iconMd="material:person"
+              text="Profile"
+            />
 
-        <!-- Your main view/tab, should have "view-main" class. It also has "tabActive" prop -->
-        <View id="view-home" main tab tabActive url="/" />
+            <Link
+              tabLink="#view-wallet"
+              iconIos="f7:wallet_fill"
+              iconAurora="f7:wallet_fill"
+              iconMd="material:wallet_fill"
+              text="Wallet"
+            />
+          </Toolbar>
 
-        <!-- Preview View -->
-        <View id="view-preview" name="preview" tab url="/preview/" />
+          <!-- Your main view/tab, should have "view-main" class. It also has "tabActive" prop -->
+          <View id="view-home" main tab tabActive url="/" />
 
-        <!-- wallet View -->
-        <View id="view-wallet" name="wallet" tab url="/wallet/" />
+          <!-- Preview View -->
+          <View id="view-preview" name="preview" tab url="/preview/" />
 
-        <!-- profile View -->
-        <View id="view-profile" name="profile" tab url="/profile/" />
-      </Views>
+          <!-- wallet View -->
+          <View id="view-wallet" name="wallet" tab url="/wallet/" />
+
+          <!-- profile View -->
+          <View id="view-profile" name="profile" tab url="/profile/" />
+        </Views>
+      {/if}
     {:else}
       <!-- Login Screen -->
       <LoginScreen opened={true}>

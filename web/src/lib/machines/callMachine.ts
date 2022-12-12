@@ -88,7 +88,7 @@ export const callMachine =
 					'CALL CONNECTED': {
 						target: 'inCall'
 					},
-					'CALL CANT CONNECT': {
+					'CALL DISCONNECTED': {
 						target: 'ready4Call'
 					}
 				}

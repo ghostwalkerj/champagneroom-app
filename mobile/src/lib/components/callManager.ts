@@ -19,13 +19,10 @@ export default class CallManager {
 	private _remoteStream: MediaStream | undefined;
 
 	public callerName = writable('');
+	public remoteStream = writable<MediaStream | undefined>(undefined);
 
 	public get callService() {
 		return this._callService;
-	}
-
-	public get remoteStream() {
-		return this._remoteStream;
 	}
 
 	private _resetCallState = () => {
@@ -36,6 +33,7 @@ export default class CallManager {
 		this._dataConnection = undefined;
 		this._mediaConnection = undefined;
 		this._remoteStream = undefined;
+		this.remoteStream.set(undefined);
 
 		clearTimeout(this._unansweredTimer);
 		clearTimeout(this._noAnswerTimer);
@@ -83,6 +81,7 @@ export default class CallManager {
 
 		this._mediaConnection.on('stream', (remoteStream) => {
 			this._remoteStream = remoteStream;
+			this.remoteStream.set(remoteStream);
 			this._callService.send({ type: 'CALL CONNECTED' });
 			clearTimeout(this._noAnswerTimer);
 		});
@@ -90,15 +89,6 @@ export default class CallManager {
 		this._mediaConnection.on('close', () => {
 			console.log('Media connection closed');
 			this._resetCallState();
-		});
-
-		this._dataConnection.on('open', () => {
-			console.log('Data connection opened');
-		});
-
-		this._dataConnection.on('close', () => {
-			console.log('Data connection closed');
-			this._callService.send({ type: 'CALL DISCONNECTED' });
 		});
 	};
 
@@ -112,10 +102,12 @@ export default class CallManager {
 		this._mediaConnection?.answer(localStream);
 		this._mediaConnection?.on('stream', (remoteStream) => {
 			this._remoteStream = remoteStream;
+			this.remoteStream.set(remoteStream);
 			this._callService.send({ type: 'CALL CONNECTED' });
 			clearTimeout(this._unansweredTimer);
 		});
 		this._mediaConnection?.on('close', () => {
+			console.log('Call can\'t connect');
 			this._callService.send({ type: 'CALL DISCONNECTED' });
 		});
 	};
@@ -146,6 +138,7 @@ export default class CallManager {
 
 		this._peer.on('call', (mediaConnection) => {
 			this._callService.send({ type: 'CALL INCOMING' });
+			this._mediaConnection = mediaConnection;
 			this.callerName.set(mediaConnection.metadata.callerName || 'Anonymous');
 			this._unansweredTimer = setTimeout(() => {
 				this._ignoreCall();
@@ -166,18 +159,6 @@ export default class CallManager {
 			}
 		});
 
-		this._peer.on('disconnected', () => {
-			if (!this._destroyed) {
-				this._callService.send({ type: 'CONNECT PEER LOST' }); //TODO: What happens if in call
-				setTimeout(() => {
-					console.log('Attempting to reconnect');
-					if (!this._peer.destroyed && this._peer.disconnected) {
-						this._peer.reconnect();
-					}
-				}, 5000);
-			}
-		});
-
 		this._peer.on('connection', (dataConnection) => {
 			this._dataConnection = dataConnection;
 			console.log('Data connection opened');
@@ -189,5 +170,17 @@ export default class CallManager {
 				this._resetCallState();
 			});
 		});
-	};
+
+		this._peer.on('disconnected', () => {
+			if (!this._destroyed) {
+				this._callService.send({ type: 'CONNECT PEER LOST' }); //TODO: What happens if in call
+				setTimeout(() => {
+					console.log('Attempting to reconnect');
+					if (!this._peer.destroyed && this._peer.disconnected) {
+						this._peer.reconnect();
+					}
+				}, 5000);
+			}
+		});
+	}
 }

@@ -9,8 +9,11 @@
   import { f7, Icon } from 'framework7-svelte';
   import { onDestroy } from 'svelte';
   import { interpret } from 'xstate';
+  import type { Unsubscriber } from 'svelte/store';
 
   export let callManager: CallManager;
+  export let inCall = false;
+
   export let options: Partial<{
     makeCall: boolean;
     rejectCall: boolean;
@@ -22,7 +25,17 @@
   }> = {};
 
   let us: Awaited<UserStreamType>;
-  let inCall = false;
+
+  // UI Controls
+  const placeholder = import.meta.env.VITE_BLACK_IMAGE;
+  let videoElement: HTMLVideoElement;
+  let camState: MediaToggleMachineStateType;
+  let micState: MediaToggleMachineStateType;
+  let camService: MediaToggleMachineServiceType;
+  let micService: MediaToggleMachineServiceType;
+  let localStream: MediaStream;
+  let remoteStream: MediaStream;
+  let unSubLocalStream: Unsubscriber;
 
   const buttonOptions = Object.assign(
     {
@@ -37,24 +50,40 @@
     options
   );
 
+  const answerCall = async () => {
+    if (!us) {
+      us = await userStream();
+      if (unSubLocalStream) unSubLocalStream();
+      unSubLocalStream = us.mediaStream.subscribe(_localStream => {
+        if (_localStream) {
+          localStream = _localStream;
+        }
+      });
+
+      camService = interpret(us.camMachine).onTransition(state => {
+        camState = state;
+      });
+      camService.start();
+
+      micService = interpret(us.micMachine).onTransition(state => {
+        micState = state;
+      });
+      micService.start();
+    }
+
+    callManager.acceptCall(localStream);
+  };
+
   let callAlert = f7.dialog.create({
     title: 'Incoming pCall',
     text: 'Do you want to answer the call?',
     buttons: [
       {
         text: 'Answer',
-        onClick: () => {},
+        onClick: answerCall,
       },
     ],
   });
-
-  // UI Controls
-  const placeholder = import.meta.env.VITE_BLACK_IMAGE;
-  let videoElement: HTMLVideoElement;
-  let camState: MediaToggleMachineStateType;
-  let micState: MediaToggleMachineStateType;
-  let camService: MediaToggleMachineServiceType;
-  let micService: MediaToggleMachineServiceType;
 
   callManager.callService.onTransition(state => {
     console.log(state.value);
@@ -66,10 +95,15 @@
       }
       if (state.matches('inCall')) {
         inCall = true;
-        startVideo();
       } else {
         inCall = false;
       }
+    }
+  });
+
+  callManager.remoteStream.subscribe(_remoteStream => {
+    if (_remoteStream) {
+      remoteStream = _remoteStream;
     }
   });
 
@@ -77,39 +111,22 @@
     callAlert.setText('pCall from ' + _callerName);
   });
 
-  const startVideo = async () => {
-    if (!us) {
-      us = await userStream();
-    }
-    camService = interpret(us.camMachine).onTransition(state => {
-      camState = state;
-    });
-    camService.start();
-
-    micService = interpret(us.micMachine).onTransition(state => {
-      micState = state;
-    });
-    micService.start();
-
-    if (callManager.remoteStream) {
-      videoElement.srcObject = callManager.remoteStream;
-      videoElement.load();
-      videoElement.muted = true;
-      videoElement.play();
-    }
-
-    videoElement.muted = false;
-    videoElement.play();
-  };
+  function startVideo(video) {
+    video.srcObject = remoteStream;
+    video.muted = true;
+    video.load();
+    video.play();
+  }
 
   const stopVideo = () => {
     camService?.stop();
     micService?.stop();
     us?.stop();
-
-    if (!videoElement) return;
-    videoElement.pause();
-    videoElement.srcObject = null;
+    unSubLocalStream?.();
+    if (videoElement) {
+      videoElement.pause();
+      videoElement.srcObject = null;
+    }
   };
 
   onDestroy(() => {
@@ -126,6 +143,7 @@
       playsinline
       class="h-full object-cover w-full -scale-x-100"
       poster={placeholder}
+      use:startVideo
     />
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div class="absolute inset-0 flex flex-col bg-base-100  text-white p-4  ">
