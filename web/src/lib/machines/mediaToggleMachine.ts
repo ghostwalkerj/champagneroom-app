@@ -1,4 +1,4 @@
-import { createMachine, interpret, StateFrom } from 'xstate';
+import { createMachine, interpret, type StateFrom } from 'xstate';
 
 const createMediaToggleMachine = (mediaTrack: MediaStreamTrack) => {
 	const toggleMachine = createMachine(

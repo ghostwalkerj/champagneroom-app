@@ -37,6 +37,7 @@
 
   $: linkURL =
     ($currentLink && urlJoin(PCALL_URL, ROOM_PATH, $currentLink._id)) || '';
+  $: waiting4StateChange = false;
 
   let name = '';
   let amount = 50;
@@ -110,7 +111,6 @@
     if ((await Share.canShare()).value === true) {
       Share.share({
         title: 'pCall Link',
-        text: 'pCall Link',
         url: linkURL,
         dialogTitle: 'Share pCall Link',
       });
@@ -126,10 +126,12 @@
   };
 
   const createLink = () => {
+    waiting4StateChange = true;
     $talent?.createLink(amount).then(link => {
       Clipboard.write({
         string: urlJoin(PCALL_URL, ROOM_PATH, link._id),
       });
+      waiting4StateChange = false;
     });
   };
 </script>
@@ -278,7 +280,11 @@
       </List>
       <Row class="p-4">
         <Col
-          ><Button fill round on:click={createLink}>Create pCall Link</Button
+          ><Button
+            fill
+            round
+            on:click={createLink}
+            disabled={waiting4StateChange}>Create pCall Link</Button
           ></Col
         ></Row
       >

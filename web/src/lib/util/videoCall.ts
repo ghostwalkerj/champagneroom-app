@@ -1,5 +1,5 @@
 import { PUBLIC_CALL_TIMEOUT } from '$env/static/public';
-import callMachine, { CallMachineStateType } from '$lib/machines/callMachine';
+import callMachine from '$lib/machines/callMachine';
 import { Peer } from 'peerjs';
 import { readable, writable } from 'svelte/store';
 import { interpret, type EventObject } from 'xstate';
