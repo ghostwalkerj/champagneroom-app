@@ -62,7 +62,6 @@
   };
 
   const startLocalStream = async () => {
-    if (us) return;
     us = await userStream();
     camService = interpret(us.camMachine).onTransition(state => {
       camState = state;
@@ -96,7 +95,7 @@
       if (_localStream) {
         localStream = _localStream;
         if (!inCall) {
-          callManager.acceptCall(localStream);
+          callManager.acceptCall(_localStream);
         }
       }
     });
@@ -141,9 +140,11 @@
         if (state.matches('inCall')) {
           inCall = true;
           showVideo();
-        } else {
+        }
+        if (state.matches('ready4Call')) {
           inCall = false;
           hideVideo();
+          stopLocalStream();
         }
       }
     });
