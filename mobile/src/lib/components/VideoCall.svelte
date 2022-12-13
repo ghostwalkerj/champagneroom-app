@@ -7,12 +7,14 @@
   import type CallManager from './callManager';
 
   import { f7, Icon } from 'framework7-svelte';
-  import { onDestroy } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
   import { interpret } from 'xstate';
   import type { Unsubscriber } from 'svelte/store';
 
   export let callManager: CallManager;
   export let inCall = false;
+
+  let videoDisplay = 'h-0';
 
   export let options: Partial<{
     makeCall: boolean;
@@ -50,28 +52,54 @@
     options
   );
 
+  // I hate this but it works
+  const showVideo = () => {
+    videoDisplay = 'h-full';
+  };
+
+  const hideVideo = () => {
+    videoDisplay = 'h-0';
+  };
+
+  const startLocalStream = async () => {
+    if (us) return;
+    us = await userStream();
+    camService = interpret(us.camMachine).onTransition(state => {
+      camState = state;
+    });
+    camService.start();
+    micService = interpret(us.micMachine).onTransition(state => {
+      micState = state;
+    });
+    micService.start();
+  };
+
+  const stopLocalStream = () => {
+    camService?.stop();
+    micService?.stop();
+    us?.stop();
+    if (unSubLocalStream)
+      try {
+        unSubLocalStream();
+      } catch (e) {}
+  };
+
   const answerCall = async () => {
-    if (!us) {
-      us = await userStream();
-      if (unSubLocalStream) unSubLocalStream();
-      unSubLocalStream = us.mediaStream.subscribe(_localStream => {
-        if (_localStream) {
-          localStream = _localStream;
+    showVideo();
+    await startLocalStream();
+    if (unSubLocalStream)
+      try {
+        unSubLocalStream();
+      } catch (e) {}
+
+    unSubLocalStream = us.mediaStream.subscribe(_localStream => {
+      if (_localStream) {
+        localStream = _localStream;
+        if (!inCall) {
+          callManager.acceptCall(localStream);
         }
-      });
-
-      camService = interpret(us.camMachine).onTransition(state => {
-        camState = state;
-      });
-      camService.start();
-
-      micService = interpret(us.micMachine).onTransition(state => {
-        micState = state;
-      });
-      micService.start();
-    }
-
-    callManager.acceptCall(localStream);
+      }
+    });
   };
 
   let callAlert = f7.dialog.create({
@@ -85,56 +113,60 @@
     ],
   });
 
-  callManager.callService.onTransition(state => {
-    console.log(state.value);
-    if (state.changed) {
-      if (state.matches('receivingCall')) {
-        callAlert.open();
-      } else {
-        callAlert.close();
-      }
-      if (state.matches('inCall')) {
-        inCall = true;
-      } else {
-        inCall = false;
-      }
+  function startVideo() {
+    if (videoElement) {
+      videoElement.srcObject = remoteStream;
+      videoElement.muted = true;
+      videoElement.load();
+      videoElement.play();
     }
-  });
-
-  callManager.remoteStream.subscribe(_remoteStream => {
-    if (_remoteStream) {
-      remoteStream = _remoteStream;
-    }
-  });
-
-  callManager.callerName.subscribe(_callerName => {
-    callAlert.setText('pCall from ' + _callerName);
-  });
-
-  function startVideo(video: HTMLVideoElement) {
-    video.srcObject = remoteStream;
-    video.muted = true;
-    video.load();
-    video.play();
   }
 
   const stopVideo = () => {
-    camService?.stop();
-    micService?.stop();
-    us?.stop();
-    unSubLocalStream?.();
     if (videoElement) {
       videoElement.pause();
       videoElement.srcObject = null;
     }
   };
 
+  onMount(() => {
+    callManager.callService.onTransition(state => {
+      console.log(state.value);
+      if (state.changed) {
+        if (state.matches('receivingCall')) {
+          callAlert.open();
+        } else {
+          callAlert.close();
+        }
+        if (state.matches('inCall')) {
+          inCall = true;
+          showVideo();
+        } else {
+          inCall = false;
+          hideVideo();
+        }
+      }
+    });
+
+    callManager.remoteStream.subscribe(_remoteStream => {
+      if (_remoteStream && _remoteStream !== remoteStream) {
+        remoteStream = _remoteStream;
+        startVideo();
+      }
+    });
+
+    callManager.callerName.subscribe(_callerName => {
+      callAlert.setText('pCall from ' + _callerName);
+    });
+  });
+
   onDestroy(() => {
+    stopLocalStream();
     stopVideo();
   });
 </script>
 
-{#if inCall}
+<div class={videoDisplay}>
   <!-- svelte-ignore a11y-media-has-caption -->
   <video
     bind:this={videoElement}
@@ -142,7 +174,6 @@
     playsinline
     class="h-full object-cover w-full -scale-x-100"
     poster={placeholder}
-    use:startVideo
   />
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <div class="absolute inset-0 flex flex-col bg-base-100  text-white p-4  ">
@@ -168,4 +199,4 @@
       </button>
     </div>
   </div>
-{/if}
+</div>

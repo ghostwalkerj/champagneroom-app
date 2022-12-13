@@ -43,9 +43,6 @@
       localVideo.muted = true;
       localVideo.play();
     }
-
-    localVideo.muted = false;
-    localVideo.play();
   };
 
   const stopVideo = () => {
