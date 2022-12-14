@@ -2141,11 +2141,6 @@ caniuse-lite@^1.0.30001400, caniuse-lite@^1.0.30001426:
   resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001434.tgz"
   integrity sha512-aOBHrLmTQw//WFa2rcF1If9fa3ypkC1wzqqiKHgfdrXTWcU8C4gKVZT77eQAPWN1APys3+uQ0Df07rKauXGEYA==
 
-capacitor-jitsi-meet@^3.0.1:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/capacitor-jitsi-meet/-/capacitor-jitsi-meet-3.0.1.tgz#aa762b83f146796de059797258b4440e29976709"
-  integrity sha512-A8u4WZnTFivUfCLRk1+haUeRvftNQBxF/ZyPyu7DZcCds0NPzGi3PCASK+dFi0OXe5qwXPcoQvg/OwXYAK5mng==
-
 chalk@2.4.2, chalk@^2.0.0:
   version "2.4.2"
   resolved "https://registry.npmjs.org/chalk/-/chalk-2.4.2.tgz"

@@ -39,7 +39,6 @@
     "@capacitor/status-bar": "4.1.1",
     "@ionic/pwa-elements": "^3.1.1",
     "@xstate/svelte": "^2.0.1",
-    "capacitor-jitsi-meet": "^3.0.1",
     "dom7": "^4.0.4",
     "framework7": "^7.0.9",
     "framework7-icons": "^5.0.5",
