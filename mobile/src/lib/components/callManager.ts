@@ -1,7 +1,7 @@
 import callMachine from '$lib/machines/callMachine';
-import { DataConnection, MediaConnection, Peer } from 'peerjs';
+import { type DataConnection, type MediaConnection, Peer } from 'peerjs';
 import { writable } from 'svelte/store';
-import { interpret, InterpreterFrom } from 'xstate';
+import { interpret, type InterpreterFrom } from 'xstate';
 
 const VITE_CALL_TIMEOUT = import.meta.env.VITE_CALL_TIMEOUT;
 

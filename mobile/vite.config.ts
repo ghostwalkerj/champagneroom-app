@@ -15,7 +15,6 @@ export default defineConfig({
     svelte(),
   ],
   root: SRC_DIR,
-  base: '',
   publicDir: PUBLIC_DIR,
   build: {
     outDir: BUILD_DIR,
@@ -27,9 +26,13 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': SRC_DIR,
+
+      '@': path.resolve(__dirname, './src'),
       '$env/static/public': CONSTANTS,
       '$lib': LIB_DIR,
+      'lib': path.resolve(__dirname, './src/lib'),
+      'ts': path.resolve(__dirname, './src/ts'),
+      'pages': path.resolve(__dirname, './src/pages'),
     },
   },
   server: {

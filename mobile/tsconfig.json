@@ -5,9 +5,11 @@
   ],
   "exclude": [
     "node_modules/*",
-    "public/*"
+    "public/*",
+    "src/svelte.config.js"
   ],
   "compilerOptions": {
+    "baseUrl": "./src",
     "allowJs": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": false,
@@ -18,11 +20,12 @@
     "moduleResolution": "Node",
     "types": [
       "node",
-      "vite/client"
+      "vite/client",
+      "svelte",
     ],
     "paths": {
       "$lib/*": [
-        "./node_modules/pcall/src/lib/*"
+        "../node_modules/pcall/src/lib/*"
       ],
     }
   }

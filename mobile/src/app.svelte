@@ -17,26 +17,27 @@
     View,
     Views,
   } from 'framework7-svelte';
+
   // @ts-ignore
   import { getDevice } from 'framework7/lite-bundle';
   import { onMount } from 'svelte';
 
-  import capacitorApp from './ts/capacitor-app';
-  import routes from './ts/routes';
+  import capacitorApp from 'ts/capacitor-app';
+  import routes from 'ts/routes';
 
   import { createLinkMachineService } from '$lib/machines/linkMachine';
   import { CallEventType } from '$lib/ORM/models/callEvent';
   import type { LinkDocument } from '$lib/ORM/models/link';
-  import CallManager from './lib/components/callManager';
-  import VideoCall from './lib/components/VideoCall.svelte';
+  import CallManager from 'lib/components/callManager';
+  import VideoCall from 'lib/components/VideoCall.svelte';
   import {
     currentLink,
     linkMachineService,
     linkMachineState,
     talent,
     talentDB,
-  } from './lib/stores';
-  import { getTalentDB } from './lib/util';
+  } from 'lib/stores';
+  import { getTalentDB } from 'lib/util';
   import type { Unsubscriber } from 'svelte/store';
 
   let callManager: CallManager | undefined;

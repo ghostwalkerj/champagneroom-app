@@ -1,4 +1,4 @@
-<script type="ts">
+<script lang="ts">
   import {
     Block,
     Button,
@@ -14,7 +14,7 @@
   const PHOTO_UPDATE_PATH = import.meta.env.VITE_PHOTO_UPDATE_PATH;
   const PCALL_URL = import.meta.env.VITE_PCALL_URL;
 
-  import { currentLink, talent } from '../lib/stores';
+  import { currentLink, talent } from 'lib/stores';
 
   import {
     Camera,

@@ -175,6 +175,7 @@
     playsinline
     class="h-full object-cover w-full -scale-x-100"
     poster={placeholder}
+    disablePictureInPicture={true}
   />
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <div class="absolute inset-0 flex flex-col bg-base-100  text-white p-4  ">

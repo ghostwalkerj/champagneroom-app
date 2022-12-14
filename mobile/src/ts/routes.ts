@@ -5,7 +5,7 @@ import ProfilePage from '../pages/profile.svelte';
 import WalletPage from '../pages/wallet.svelte';
 
 import NotFoundPage from '../pages/404.svelte';
-import VideoPreview from '../pages/videoPreview.svelte';
+import VideoPreview from '../pages/jitsiPreview.svelte';
 
 var routes = [
   {

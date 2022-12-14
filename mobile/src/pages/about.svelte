@@ -1,4 +1,4 @@
-<script>
+<script type="ts">
   import { Block, BlockTitle, Navbar, Page } from 'framework7-svelte';
 </script>
 

@@ -33,3 +33,19 @@ export const formatLinkState = (linkMachineState: LinkMachineStateType) => {
 	if (linkMachineState.matches('claimed.requestedCancellation.waiting4Refund')) return 'waiting for refund';
 
 };
+
+export const loadExternalScript = (src: string) => {
+	let resolveLoadScriptPromise: (arg0: boolean) => any;
+
+	const loadScriptPromise: Promise<boolean> = new Promise((resolve): void => {
+		resolveLoadScriptPromise = resolve;
+	});
+
+	const script = document.createElement('script');
+	script.src = src;
+	script.async = true;
+	script.onload = () => resolveLoadScriptPromise(true);
+	document.body.appendChild(script);
+
+	return loadScriptPromise;
+};

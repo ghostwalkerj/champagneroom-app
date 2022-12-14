@@ -1,0 +1,66 @@
+<script>
+  // @ts-nocheck
+
+  import {
+    createConnectionStore,
+    localTracksStore,
+    DEFAULT_JITSI_CONFIG,
+    Mirror,
+  } from 'lib/jitsi-svelte';
+
+  import Conference from './Conference.svelte';
+  let mirrorPage = true;
+
+  let shareDesktop = false;
+
+  // Note that as soon as you provide a ConfigStore for the connection, it will connect.
+  // If you want to delay connecting until some future point, just use 'null' as the store.
+  const connection = createConnectionStore(DEFAULT_JITSI_CONFIG, 'pcall-test');
+
+  const conferences = connection.conferencesStore;
+
+  // The conference room to join. You can join now or later (e.g. after some action). You
+  // can join multiple conferences simultaneously. Joining a conference is independent of
+  // actually sharing your video/audio--the Mirror page lets the user set up their video/
+  // audio and share it with the conference room.
+  conferences.join('pcall-test');
+
+  // You can also join a conference later, e.g. after some action.
+  // conferences.join('relm-test');
+</script>
+
+{#if mirrorPage}
+  <div class="centered">
+    <p>You're about to join a video meeting</p>
+    <Mirror on:done={() => (mirrorPage = false)} />
+  </div>
+{/if}
+<div>{$connection ? 'Connected' : 'Not Connected'}</div>
+
+{#each Object.entries($conferences) as [conferenceId, conference], key}
+  <Conference {conferenceId} {conference} permitEntry={!mirrorPage} />
+  <button on:click={() => conferences.leave(conferenceId)}
+    >Leave Conference</button
+  >
+{/each}
+
+<button
+  on:click={() => {
+    shareDesktop = !shareDesktop;
+    localTracksStore.shareDesktop(shareDesktop);
+  }}
+>
+  {shareDesktop ? 'Stop Sharing Screen' : 'Share Screen'}
+</button>
+
+<style>
+  p {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+  }
+  .centered {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+  }
+</style>

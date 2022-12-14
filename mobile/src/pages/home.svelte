@@ -29,8 +29,8 @@
     linkMachineService,
     linkMachineState,
     talent,
-  } from '../lib/stores';
-  import { formatLinkState } from '../lib/util';
+  } from 'lib/stores';
+  import { formatLinkState } from 'lib/util';
 
   const PCALL_URL = import.meta.env.VITE_PCALL_URL;
   const ROOM_PATH = import.meta.env.VITE_ROOM_PATH;
