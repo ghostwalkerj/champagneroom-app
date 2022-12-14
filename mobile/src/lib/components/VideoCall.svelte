@@ -14,7 +14,7 @@
   export let callManager: CallManager;
   export let inCall = false;
 
-  let videoDisplay = 'h-0';
+  let videoDisplay = 'h-0 z-0';
 
   export let options: Partial<{
     makeCall: boolean;
@@ -54,11 +54,11 @@
 
   // I hate this but it works
   const showVideo = () => {
-    videoDisplay = 'h-full';
+    videoDisplay = 'h-full z-100';
   };
 
   const hideVideo = () => {
-    videoDisplay = 'h-0';
+    videoDisplay = 'h-0 z-0';
   };
 
   const startLocalStream = async () => {

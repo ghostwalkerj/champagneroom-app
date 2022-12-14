@@ -153,7 +153,7 @@
   >
     <div class="flex flex-col m-2 relative">
       <div
-        class="rounded-xl border-2 h-68 p-2 w-120 z-10 absolute -scale-x-100"
+        class="rounded-xl border-2 h-68 p-2 w-120 z-10 absolute"
         bind:this={target}
       >
         <!-- svelte-ignore a11y-media-has-caption -->

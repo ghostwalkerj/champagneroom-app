@@ -77,7 +77,7 @@
     callId = _callId;
     callManager = new CallManager(_callId);
     callManager.callService.onEvent(ce => {
-      console.log('call event', ce);
+      console.log('call event', JSON.stringify(ce));
       // Log call events on the Talent side
       if (ce) {
         let eventType: CallEventType | undefined;
