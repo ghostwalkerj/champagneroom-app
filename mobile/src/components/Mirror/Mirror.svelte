@@ -106,7 +106,7 @@
   });
 
   onDestroy(() => {
-    localTracksStore.dispose();
+    //  localTracksStore.dispose();
   });
 </script>
 
@@ -211,7 +211,7 @@
   {/if}
 {:else}
   <div
-    class="h-56 bg-gray-500 w-screen rounded-xl flex justify-center overflow-hidden relative p-1"
+    class="h-56 bg-gray-500 w-screen rounded-xl flex justify-center overflow-hidden relative p-1 text-center"
   >
     <div
       class="absolute  inset-0 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 place-content-center flex"
@@ -226,7 +226,7 @@
     </div>
   </div>
 
-  <p class="p-4">
+  <p class="p-4 text-center">
     For others to see and hear you, your browser will request access to your cam
     and mic.
   </p>

@@ -1,5 +1,5 @@
 <script>
-  import { Video } from 'lib/jitsi-svelte';
+  import Video from '../Video';
 
   export let participant;
 </script>
