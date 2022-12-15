@@ -23,7 +23,7 @@
 </script>
 
 <div class="h-full w-full relative">
-  <Mirror showContinueButton={false} />
+  <Mirror showContinueButton={true} />
   <div class="absolute top-2 right-2 animate-pulse ">
     {#if $connection}
       <div class="h-2 w-2 rounded-full border-2 bg-green-600" />

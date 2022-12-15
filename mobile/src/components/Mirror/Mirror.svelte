@@ -118,60 +118,86 @@
       <Audio track={$localTracksStore.audio} />
     {/if}
     <Video track={$localTracksStore.video} mirror={true} autoPlay={false} />
-    <div class="absolute inset-x-0 top-0 text-center rounded-xl ">
-      {#if !$audioRequested && !$videoRequested}
-        <div class="p-4 rounded-xl opacity-80 bg-slate-900">
-          Join with cam and mic off
-        </div>
-      {:else if !$videoRequested}
-        <div class="p-4 rounded-xl opacity-80 bg-slate-900">
-          Join with cam off
-        </div>
-      {:else if !$audioRequested}
-        <div class="p-4 rounded-xl opacity-80 bg-slate-900">
-          Join with mic off
-        </div>
-      {:else}
-        <div />
-      {/if}
-    </div>
-    <div class="absolute inset-x-1 bottom-0.5 flex">
-      {#if advancedSettingsSupported}
-        <button class="corner" on:click={toggleAdvancedSettings}
-          ><img src={settingsIcon} width="32" alt="Settings" /></button
+    <div class="absolute inset-x-1 top-0.5 flex">
+      <div>
+        {#if advancedSettingsSupported}
+          <button class="corner" on:click={toggleAdvancedSettings}
+            ><img
+              src={settingsIcon}
+              width="32"
+              alt="Settings"
+              class="bg-[#9c27b0] rounded-full"
+            /></button
+          >
+        {/if}
+        <button
+          on:click={toggleVideoRequested}
+          class:track-disabled={!$videoRequested}
         >
-      {/if}
-      <button
-        on:click={toggleVideoRequested}
-        class:track-disabled={!$videoRequested}
-      >
-        {#if $videoRequested}
-          <img src={videoEnabledIcon} width="32" alt="Video Enabled" />
+          {#if $videoRequested}
+            <img
+              src={videoEnabledIcon}
+              width="32"
+              alt="Video Enabled"
+              class="bg-[#9c27b0] rounded-full"
+            />
+          {:else}
+            <img
+              src={videoDisabledIcon}
+              width="32"
+              alt="Video Disabled"
+              class="bg-[#9c27b0] rounded-full"
+            />
+          {/if}
+        </button>
+        <button
+          on:click={toggleAudioRequested}
+          class:audio-level={$audioRequested &&
+            $audioLevelSpring > AUDIO_LEVEL_MINIMUM}
+          class:track-disabled={!$audioRequested}
+          style="--audio-level:{($audioLevelSpring * 85 + 15).toFixed(2) + '%'}"
+        >
+          {#if $audioRequested}
+            <img
+              src={audioEnabledIcon}
+              width="32"
+              alt="Audio Enabled"
+              class="bg-[#9c27b0] rounded-full"
+            />
+          {:else}
+            <img
+              src={audioDisabledIcon}
+              width="32"
+              alt="Audio Disabled"
+              class="bg-[#9c27b0] rounded-full"
+            />
+          {/if}
+        </button>
+      </div>
+      <div class="text-center rounded-xl ">
+        {#if !$audioRequested && !$videoRequested}
+          <div class="p-4 rounded-xl opacity-80 bg-slate-900">
+            Join with cam and mic off
+          </div>
+        {:else if !$videoRequested}
+          <div class="p-4 rounded-xl opacity-80 bg-slate-900">
+            Join with cam off
+          </div>
+        {:else if !$audioRequested}
+          <div class="p-4 rounded-xl opacity-80 bg-slate-900">
+            Join with mic off
+          </div>
         {:else}
-          <img src={videoDisabledIcon} width="32" alt="Video Disabled" />
+          <div />
         {/if}
-      </button>
-      <button
-        on:click={toggleAudioRequested}
-        class:audio-level={$audioRequested &&
-          $audioLevelSpring > AUDIO_LEVEL_MINIMUM}
-        class:track-disabled={!$audioRequested}
-        style="--audio-level:{($audioLevelSpring * 85 + 15).toFixed(2) + '%'}"
-      >
-        {#if $audioRequested}
-          <img src={audioEnabledIcon} width="32" alt="Audio Enabled" />
-        {:else}
-          <img src={audioDisabledIcon} width="32" alt="Audio Disabled" />
-        {/if}
-      </button>
+      </div>
     </div>
+    {#if showContinueButton}
+      <div class="p-4 w-screen absolute bottom-0">
+        <ContinueButton on:click={handleDone}>Continue</ContinueButton>
+      </div>
+    {/if}
   </div>
-
-  {#if showContinueButton}
-    <div class="p-4 w-screen">
-      <ContinueButton on:click={handleDone}>Continue</ContinueButton>
-    </div>
-  {/if}
 
   {#if advancedSettings}
     <div>
@@ -225,7 +251,8 @@
     max-height: 100%;
     bottom: 0;
     left: 0;
-    background-color: rgba(143, 70, 180, 0.7);
+    opacity: 0.5;
+    background-color: #9c27b0;
     border-bottom-right-radius: 8px;
     border-bottom-left-radius: 8px;
   }
