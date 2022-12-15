@@ -4,12 +4,12 @@
     MediaToggleMachineStateType,
   } from '$lib/machines/mediaToggleMachine';
   import { userStream, type UserStreamType } from '$lib/util/userStream';
-  import type CallManager from './callManager';
+  import type CallManager from '../lib/callManager';
 
   import { f7, Icon } from 'framework7-svelte';
   import { onDestroy, onMount } from 'svelte';
-  import { interpret } from 'xstate';
   import type { Unsubscriber } from 'svelte/store';
+  import { interpret } from 'xstate';
 
   export let callManager: CallManager;
   export let inCall = false;

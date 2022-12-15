@@ -1,13 +1,13 @@
-import { derived, writable, get } from 'svelte/store'
-import omit from '../utils/omit.js'
-import { selectedDevices as selectedDevicesStore } from './DeviceListStore.js'
+import { derived, get, writable } from 'svelte/store';
+import omit from '../utils/omit.js';
+import { selectedDevices as selectedDevicesStore } from './DeviceListStore.js';
 
-const { TRACK_AUDIO_LEVEL_CHANGED } = JitsiMeetJS.events.track
+const { TRACK_AUDIO_LEVEL_CHANGED } = JitsiMeetJS.events.track;
 
 const requestedTracks = {
   audio: writable(true),
   video: writable(true),
-}
+};
 
 /**
  * Converts requestedTracks to a list of track names, e.g. ['audio', 'video']
@@ -17,10 +17,10 @@ const requestedTrackNames = derived(
   ([$audio, $video]) =>
     [$audio ? 'audio' : null, $video ? 'video' : null].filter((x) => x),
   []
-)
+);
 
 function createAudioLevelStore() {
-  const { subscribe, set } = writable(0)
+  const { subscribe, set } = writable(0);
 
   /**
    * Adds or removes an event listener function if the track is an audio track
@@ -30,44 +30,44 @@ function createAudioLevelStore() {
    */
   const changeAudioTrackEventListener = (track, direction) => {
     if (track.getType() === 'audio') {
-      track[`${direction}EventListener`](TRACK_AUDIO_LEVEL_CHANGED, set)
+      track[`${direction}EventListener`](TRACK_AUDIO_LEVEL_CHANGED, set);
     }
-    return track
-  }
+    return track;
+  };
 
   return {
     subscribe,
     set,
     initTrack: (track) => {
-      return changeAudioTrackEventListener(track, 'add')
+      return changeAudioTrackEventListener(track, 'add');
     },
     deinitTrack: (track) => {
-      return changeAudioTrackEventListener(track, 'remove')
+      return changeAudioTrackEventListener(track, 'remove');
     },
-  }
+  };
 }
 
-const localAudioLevel = createAudioLevelStore()
+const localAudioLevel = createAudioLevelStore();
 
 async function createLocalTracks(requestedTrackNames, selectedDevices = {}) {
-  let tracks = {}
+  let tracks = {};
 
-  const options = { devices: requestedTrackNames }
+  const options = { devices: requestedTrackNames };
 
   // If we have a specific video camera to request, include it in the options
   if (requestedTrackNames.includes('video') && selectedDevices.videoinput) {
-    options.cameraDeviceId = selectedDevices.videoinput
+    options.cameraDeviceId = selectedDevices.videoinput;
   }
 
   // If we have a specific microphone to request, include it in the options
   if (requestedTrackNames.includes('audio') && selectedDevices.audioinput) {
-    options.micDeviceId = selectedDevices.audioinput
+    options.micDeviceId = selectedDevices.audioinput;
   }
 
   try {
     // Get all requested tracks at once
     for (const track of await JitsiMeetJS.createLocalTracks(options)) {
-      tracks[track.getType()] = localAudioLevel.initTrack(track)
+      tracks[track.getType()] = localAudioLevel.initTrack(track);
     }
   } catch (err) {
     if (requestedTrackNames.length > 1) {
@@ -77,35 +77,35 @@ async function createLocalTracks(requestedTrackNames, selectedDevices = {}) {
           Object.assign(
             tracks,
             await createLocalTracks([requestedTrack], selectedDevices)
-          )
+          );
         } catch (err2) {
-          console.error(`Shouldn't happen:`, err2)
+          console.error(`Shouldn't happen:`, err2);
         }
       }
     } else {
       console.warn(
         `Unable to create local track: ${requestedTrackNames.join(', ')}`
-      )
+      );
     }
   }
 
-  return tracks
+  return tracks;
 }
 
 function createLocalTracksStore() {
-  const store = writable({})
-  const { subscribe, update, set } = store
+  const store = writable({});
+  const { subscribe, update, set } = store;
 
   function clear() {
-    const tracks = get(store)
+    const tracks = get(store);
 
     // Clean up from past local track creation
     for (const track of Object.values(tracks)) {
-      localAudioLevel.deinitTrack(track)
+      localAudioLevel.deinitTrack(track);
     }
 
     // Reset localTracks to empty object
-    set({})
+    set({});
   }
 
   return {
@@ -116,7 +116,7 @@ function createLocalTracksStore() {
     set,
 
     count: () => {
-      return Object.values(get()).length
+      return Object.values(get()).length;
     },
 
     /**
@@ -125,20 +125,20 @@ function createLocalTracksStore() {
     shareDesktop: async (desktop = true) => {
       const desktopTracks = await createLocalTracks([
         desktop ? 'desktop' : 'video',
-      ])
+      ]);
 
       update(($tracks) => {
         if ($tracks.video) {
-          $tracks.video.dispose()
+          $tracks.video.dispose();
         }
-        return omit($tracks, ['video'])
-      })
+        return omit($tracks, ['video']);
+      });
 
       setTimeout(() => {
         update(($tracks) => {
-          return { ...$tracks, ...desktopTracks }
-        })
-      }, 1000)
+          return { ...$tracks, ...desktopTracks };
+        });
+      }, 1000);
     },
 
     /**
@@ -152,32 +152,32 @@ function createLocalTracksStore() {
      */
     request: async ({ requestedTracks, selectedDevices } = {}) => {
       if (!requestedTracks) {
-        requestedTracks = get(requestedTrackNames)
+        requestedTracks = get(requestedTrackNames);
       }
 
       if (!selectedDevices) {
-        selectedDevices = get(selectedDevicesStore)
+        selectedDevices = get(selectedDevicesStore);
       }
 
-      const tracks = await createLocalTracks(requestedTracks, selectedDevices)
+      const tracks = await createLocalTracks(requestedTracks, selectedDevices);
 
-      clear()
+      clear();
 
-      set(tracks)
+      set(tracks);
 
-      return Object.values(tracks).length > 0
+      return Object.values(tracks).length > 0;
     },
 
     // De-initialize existing tracks & clear the LocalTracksStore
     clear,
-  }
+  };
 }
 
-const localTracksStore = createLocalTracksStore()
+const localTracksStore = createLocalTracksStore();
 
 export {
   localTracksStore,
   localAudioLevel,
   requestedTracks,
   createAudioLevelStore,
-}
+};

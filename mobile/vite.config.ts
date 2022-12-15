@@ -33,6 +33,7 @@ export default defineConfig({
       'lib': path.resolve(__dirname, './src/lib'),
       'ts': path.resolve(__dirname, './src/ts'),
       'pages': path.resolve(__dirname, './src/pages'),
+      'components': path.resolve(__dirname, './src/components'),
     },
   },
   server: {

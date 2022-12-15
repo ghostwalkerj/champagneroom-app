@@ -22,8 +22,6 @@
     Range,
     Row,
   } from 'framework7-svelte';
-  import spacetime from 'spacetime';
-  import urlJoin from 'url-join';
   import {
     currentLink,
     linkMachineService,
@@ -31,6 +29,8 @@
     talent,
   } from 'lib/stores';
   import { formatLinkState } from 'lib/util';
+  import spacetime from 'spacetime';
+  import urlJoin from 'url-join';
 
   const PCALL_URL = import.meta.env.VITE_PCALL_URL;
   const ROOM_PATH = import.meta.env.VITE_ROOM_PATH;

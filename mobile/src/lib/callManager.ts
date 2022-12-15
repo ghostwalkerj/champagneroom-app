@@ -1,5 +1,5 @@
 import callMachine from '$lib/machines/callMachine';
-import { type DataConnection, type MediaConnection, Peer } from 'peerjs';
+import { Peer, type DataConnection, type MediaConnection } from 'peerjs';
 import { writable } from 'svelte/store';
 import { interpret, type InterpreterFrom } from 'xstate';
 

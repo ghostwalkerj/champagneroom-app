@@ -6,16 +6,17 @@ async function canAutoPermit() {
     // full permission to use audio & video.
     if (JitsiMeetJS.mediaDevices.isDeviceListAvailable()) {
       JitsiMeetJS.mediaDevices.enumerateDevices((deviceList) => {
-        let autoPermit = false
+        let autoPermit = false;
         for (const device of deviceList) {
-          if (device.label) autoPermit = true
+          console.log(JSON.stringify("Device: ", device));
+          if (device.label) autoPermit = true;
         }
-        resolve(autoPermit)
-      })
+        resolve(autoPermit);
+      });
     } else {
-      resolve(false)
+      resolve(false);
     }
-  })
+  });
 }
 
-export default canAutoPermit
+export default canAutoPermit;

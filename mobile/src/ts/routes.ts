@@ -1,22 +1,16 @@
 
-import AboutPage from '../pages/about.svelte';
-import HomePage from '../pages/home.svelte';
-import ProfilePage from '../pages/profile.svelte';
-import WalletPage from '../pages/wallet.svelte';
+import HomePage from 'pages/home.svelte';
+import ProfilePage from 'pages/profile.svelte';
+import WalletPage from 'pages/wallet.svelte';
 
-import NotFoundPage from '../pages/404.svelte';
-import VideoPreview from '../pages/jitsiPreview.svelte';
+import NotFoundPage from 'pages/404.svelte';
+import Jitisi from 'pages/jitisPreview.svelte';
 
 var routes = [
   {
     path: '/',
     component: HomePage,
   },
-  {
-    path: '/about/',
-    component: AboutPage,
-  },
-
   {
     path: '/wallet/',
     component: WalletPage
@@ -28,7 +22,7 @@ var routes = [
   },
   {
     path: '/preview/',
-    component: VideoPreview
+    component: Jitisi
   },
 
   {

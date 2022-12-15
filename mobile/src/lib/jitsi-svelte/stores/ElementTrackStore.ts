@@ -1,57 +1,57 @@
-import { writable, derived, get } from 'svelte/store'
+import { derived, get, writable } from 'svelte/store';
 
 function createElementAndTrackStore() {
-  let attachedTrack
+  let attachedTrack;
 
-  const elementStore = writable(null)
-  const trackStore = writable(null)
+  const elementStore = writable(null);
+  const trackStore = writable(null);
 
   const detach = () => {
-    const element = get(elementStore)
+    const element = get(elementStore);
     if (attachedTrack) {
-      attachedTrack.detach(element)
-      attachedTrack = null
+      attachedTrack.detach(element);
+      attachedTrack = null;
     }
-  }
+  };
 
   const attach = () => {
-    const track = get(trackStore)
-    const element = get(elementStore)
+    const track = get(trackStore);
+    const element = get(elementStore);
     if (track && track !== attachedTrack) {
-      detach()
-      attachedTrack = track
-      track.attach(element)
+      detach();
+      attachedTrack = track;
+      track.attach(element);
     }
-  }
+  };
 
   const store = derived([elementStore, trackStore], ([$element, $track]) => {
-    return { element: $element, track: $track }
-  })
+    return { element: $element, track: $track };
+  });
 
   const unsubscribe = store.subscribe(($props) => {
     if ($props.element && $props.track) {
-      attach()
+      attach();
     }
-  })
+  });
 
   return {
     subscribe: store.subscribe,
 
     destroy: () => {
-      detach()
-      unsubscribe()
+      detach();
+      unsubscribe();
     },
 
     setElement: (element) => {
-      elementStore.set(element)
+      elementStore.set(element);
     },
 
     setTrack: (track) => {
       if (track !== get(trackStore)) {
-        trackStore.set(track)
+        trackStore.set(track);
       }
     },
-  }
+  };
 }
 
-export { createElementAndTrackStore }
+export { createElementAndTrackStore };
