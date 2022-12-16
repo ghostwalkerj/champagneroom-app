@@ -11,6 +11,7 @@
 
   let connection;
   let conferences;
+
   onMount(() => {
     // Note that as soon as you provide a ConfigStore for the connection, it will connect.
     // If you want to delay connecting until some future point, just use 'null' as the store.
@@ -23,7 +24,6 @@
     // actually sharing your video/audio--the Mirror page lets the user set up their video/
     // audio and share it with the conference room.
     conferences.join('pcall-test');
-    console.dir(conferences);
 
     // You can also join a conference later, e.g. after some action.
     // conferences.join('relm-test');
