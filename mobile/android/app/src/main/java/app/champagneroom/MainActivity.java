@@ -1,4 +1,4 @@
-package app.pcall;
+package app.champagneroom;
 
 import com.getcapacitor.BridgeActivity;
 

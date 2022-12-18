@@ -1,8 +1,8 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.pcall',
-  appName: 'pCall',
+  appId: 'app.champagneroom',
+  appName: 'Champagne Room',
   webDir: 'www',
   bundledWebRuntime: false
 };

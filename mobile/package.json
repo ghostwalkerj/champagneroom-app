@@ -1,8 +1,8 @@
 {
-  "name": "pcall",
+  "name": "champagneroom",
   "private": true,
   "version": "1.0.0",
-  "description": "pCall",
+  "description": "Champagne Room",
   "repository": "",
   "license": "UNLICENSED",
   "scripts": {
@@ -43,6 +43,7 @@
     "framework7": "^7.0.9",
     "framework7-icons": "^5.0.5",
     "framework7-svelte": "^7.0.9",
+    "i18n-possessive": "^1.0.0",
     "keycode-js": "^3.1.0",
     "konsta": "^1.0.2",
     "material-icons": "^1.12.2",

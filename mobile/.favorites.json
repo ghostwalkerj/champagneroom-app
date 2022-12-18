@@ -1,0 +1,66 @@
+[
+    {
+        "type": "Group",
+        "name": "Web",
+        "parent_id": null,
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "Q2ZWTgiFwONLBxCo"
+    },
+    {
+        "type": "Group",
+        "name": "Mobile",
+        "parent_id": null,
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "v84drcPCXRTeJElb"
+    },
+    {
+        "type": "Directory",
+        "name": "/Users/joseph/Dev/pcall/web/src/routes",
+        "parent_id": "Q2ZWTgiFwONLBxCo",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/web",
+        "workspacePath": "src/routes",
+        "id": "7tG4ANOLwqKQFcnh"
+    },
+    {
+        "type": "Directory",
+        "name": "/Users/joseph/Dev/pcall/web/src/lib",
+        "parent_id": "Q2ZWTgiFwONLBxCo",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/web",
+        "workspacePath": "src/lib",
+        "id": "0jzSkFt1E6YHy58s"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/mobile/src/app.svelte",
+        "parent_id": "v84drcPCXRTeJElb",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/mobile",
+        "workspacePath": "src/app.svelte",
+        "id": "k9PnS0aC2vxOHfoj"
+    },
+    {
+        "type": "Directory",
+        "name": "/Users/joseph/Dev/pcall/mobile/src/components",
+        "parent_id": "v84drcPCXRTeJElb",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/mobile",
+        "workspacePath": "src/components",
+        "id": "B5fY4ZjAx6z0NFv9"
+    },
+    {
+        "type": "Directory",
+        "name": "/Users/joseph/Dev/pcall/mobile/src/lib",
+        "parent_id": "v84drcPCXRTeJElb",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/mobile",
+        "workspacePath": "src/lib",
+        "id": "EcvwGlL1uUPOYpsJ"
+    },
+    {
+        "type": "Directory",
+        "name": "/Users/joseph/Dev/pcall/mobile/src/pages",
+        "parent_id": "v84drcPCXRTeJElb",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/mobile",
+        "workspacePath": "src/pages",
+        "id": "7xRkFAXJOBoT5yVj"
+    }
+]

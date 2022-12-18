@@ -3764,6 +3764,11 @@ http-cache-semantics@^4.0.0:
   resolved "https://registry.npmjs.org/http-cache-semantics/-/http-cache-semantics-4.1.0.tgz"
   integrity sha512-carPklcUh7ROWRK7Cv27RPtdhYhUsela/ue5/jKzjegVvXDqM2ILE9Q2BGn9JZJh1g87cp56su/FgQSzcWS8cQ==
 
+i18n-possessive@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/i18n-possessive/-/i18n-possessive-1.0.0.tgz#1f7ff22f5689842ca3535eb6c9008953c24972b4"
+  integrity sha512-VbnbubpG6zWrq1VxAw2m2YMgzm+uBhVR01nluByx0yeh60zOWwk02yTIK5bWAlfxa8xH4FLTqO/ZMQ6gBk9cOg==
+
 iconv-lite@^0.4.24:
   version "0.4.24"
   resolved "https://registry.npmjs.org/iconv-lite/-/iconv-lite-0.4.24.tgz"

@@ -77,6 +77,29 @@
 			"**/.DS_Store": true
 		},
 		"explorerExclude.backup": {},
-		"explorerExclude.showPicker": false
+		"explorerExclude.showPicker": false,
+		"favorites.resources": [
+			{
+				"filePath": "/Users/joseph/Dev/pcall/web/src/routes",
+				"group": "Default"
+			},
+			{
+				"filePath": "/Users/joseph/Dev/pcall/web/src/lib",
+				"group": "Default"
+			},
+			{
+				"filePath": "/Users/joseph/Dev/pcall/mobile/src/pages",
+				"group": "Default"
+			},
+			{
+				"filePath": "/Users/joseph/Dev/pcall/mobile/src/components",
+				"group": "Default"
+			},
+			{
+				"filePath": "/Users/joseph/Dev/pcall/mobile/src/lib",
+				"group": "Default"
+			}
+		],
+		"favorites.sortOrder": "ASC"
 	}
 }

@@ -5,6 +5,7 @@
   import getProfileImage from '$lib/util/profilePhoto';
   import { Clipboard } from '@capacitor/clipboard';
   import { Share } from '@capacitor/share';
+  import { possessive } from 'i18n-possessive';
 
   import {
     Block,
@@ -15,6 +16,7 @@
     Col,
     Icon,
     List,
+    ListInput,
     ListItem,
     ListItemCell,
     Navbar,
@@ -41,6 +43,14 @@
 
   let name = '';
   let amount = 50;
+  let showName = '';
+  let showDuration = 15;
+
+  const duration2String = (duration: number): string => {
+    const hours = Math.floor(duration / 60);
+    const minutes = duration % 60;
+    return `${hours}h ${minutes}m`;
+  };
 
   $: canCancelLink = $linkMachineState?.can({
     type: 'REQUEST CANCELLATION',
@@ -56,6 +66,7 @@
 
   $talent?.get$('name').subscribe((_name: string): void => {
     name = _name;
+    showName = possessive(name, 'en') + ' Show';
   });
 
   $: claim = $linkMachineState?.context.linkState.claim || {
@@ -125,6 +136,10 @@
     amount = value;
   };
 
+  const onDurationChange = value => {
+    showDuration = value;
+  };
+
   const createLink = () => {
     waiting4StateChange = true;
     $talent?.createLink(amount).then(link => {
@@ -138,7 +153,7 @@
 
 <Page name="home">
   <!-- Top Navbar -->
-  <Navbar title="pCall Creator" subtitle={name} />
+  <Navbar title="Champagne Room Creator" subtitle={name} />
 
   <!-- Current Link -->
   {#if showCurrentLink && $currentLink && $linkMachineState}
@@ -243,40 +258,93 @@
     {/if}
   {/if}
 
-  <!-- Create Link -->
+  <!-- Create Ticket -->
   {#if canCreateLink}
-    <Card title="Create new pCall Link" class="rounded-lg" outline>
-      <BlockTitle class="display-flex justify-content-space-between mt-6">
-        <span>Amount</span>
-        <span>${amount}</span>
-      </BlockTitle>
-      <List simpleList>
-        <ListItem>
-          <ListItemCell class="width-auto flex-shrink-0">
-            <Icon
-              ios="f7:money_dollar_circle"
-              aurora="f7:money_dollar_circle"
-              md="material:attach_money"
-            />
-          </ListItemCell>
-          <ListItemCell class="flex-shrink-3">
-            <Range
-              min={1}
-              max={2000}
-              step={10}
-              label={true}
-              value={amount}
-              onRangeChange={onAmountChange}
-            />
-          </ListItemCell>
-          <ListItemCell class="width-auto flex-shrink-0">
-            <Icon
-              ios="f7:money_dollar_circle_fill"
-              aurora="f7:money_dollar_circle_fill"
-              md="material:monetization_on"
-            />
-          </ListItemCell>
-        </ListItem>
+    <Card title="Create a New Show" class="rounded-lg" outline>
+      <List noHairlinesMd>
+        <ListInput
+          label="Title"
+          type="text"
+          required
+          clearButton
+          validate
+          minlength="3"
+          maxlength="50"
+          value={showName}
+        />
+
+        <ListInput
+          label="Number of Tickets"
+          type="number"
+          placeholder="1"
+          disabled
+        />
+
+        <div>
+          <BlockTitle class="display-flex justify-content-space-between mt-3">
+            <span>Show Duration</span>
+            <span>{duration2String(showDuration)}</span>
+          </BlockTitle>
+          <ListItem class="-mt-2">
+            <ListItemCell class="width-auto flex-shrink-0">
+              <Icon
+                ios="f7:money_dollar_circle"
+                aurora="f7:money_dollar_circle"
+                md="material:attach_money"
+              />
+            </ListItemCell>
+            <ListItemCell class="flex-shrink-3">
+              <Range
+                min={15}
+                max={120}
+                step={15}
+                label={true}
+                value={showDuration}
+                onRangeChange={onDurationChange}
+              />
+            </ListItemCell>
+            <ListItemCell class="width-auto flex-shrink-0">
+              <Icon
+                ios="f7:money_dollar_circle_fill"
+                aurora="f7:money_dollar_circle_fill"
+                md="material:monetization_on"
+              />
+            </ListItemCell>
+          </ListItem>
+        </div>
+
+        <div>
+          <BlockTitle class="display-flex justify-content-space-between mt-3">
+            <span>Ticket Price</span>
+            <span>${amount}</span>
+          </BlockTitle>
+          <ListItem class="-mt-2">
+            <ListItemCell class="width-auto flex-shrink-0">
+              <Icon
+                ios="f7:money_dollar_circle"
+                aurora="f7:money_dollar_circle"
+                md="material:attach_money"
+              />
+            </ListItemCell>
+            <ListItemCell class="flex-shrink-3">
+              <Range
+                min={1}
+                max={2000}
+                step={10}
+                label={true}
+                value={amount}
+                onRangeChange={onAmountChange}
+              />
+            </ListItemCell>
+            <ListItemCell class="width-auto flex-shrink-0">
+              <Icon
+                ios="f7:money_dollar_circle_fill"
+                aurora="f7:money_dollar_circle_fill"
+                md="material:monetization_on"
+              />
+            </ListItemCell>
+          </ListItem>
+        </div>
       </List>
       <Row class="p-4">
         <Col
@@ -284,7 +352,7 @@
             fill
             round
             on:click={createLink}
-            disabled={waiting4StateChange}>Create pCall Link</Button
+            disabled={waiting4StateChange}>Create Ticket Sales Link</Button
           ></Col
         ></Row
       >

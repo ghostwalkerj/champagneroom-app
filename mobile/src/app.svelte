@@ -179,10 +179,10 @@
   const device = getDevice();
   // Framework7 Parameters
   let f7params = {
-    name: 'pCall', // App name
+    name: 'Champagne Room', // App name
     theme: 'auto', // Automatic theme detection
 
-    id: 'app.pcall', // App bundle ID
+    id: 'app.champagneroom', // App bundle ID
     // App routes
     routes: routes,
     // Register service worker (only on production build)
