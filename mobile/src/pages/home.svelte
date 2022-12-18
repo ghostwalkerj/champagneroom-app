@@ -49,7 +49,9 @@
   const duration2String = (duration: number): string => {
     const hours = Math.floor(duration / 60);
     const minutes = duration % 60;
-    return `${hours}h ${minutes}m`;
+    const hoursString = hours > 0 ? `${hours}h ` : '';
+    const minuteString = minutes > 0 ? `${minutes}m` : '';
+    return `${hoursString} ${minuteString}`;
   };
 
   $: canCancelLink = $linkMachineState?.can({
@@ -121,9 +123,9 @@
   const shareLink = async () => {
     if ((await Share.canShare()).value === true) {
       Share.share({
-        title: 'pCall Link',
+        title: 'Ticket Link',
         url: linkURL,
-        dialogTitle: 'Share pCall Link',
+        dialogTitle: 'Share Ticket Link',
       });
     } else {
       Clipboard.write({
@@ -153,11 +155,114 @@
 
 <Page name="home">
   <!-- Top Navbar -->
-  <Navbar title="Champagne Room Creator" subtitle={name} />
+  <div>
+    <Navbar title="Champagne Room Creator" subtitle={name} class="relative">
+      <!-- svelte-ignore a11y-missing-attribute -->
+      <img src="/assets/logo.png" class="absolute top-0 left-0  h-full p-1" />
+      <!-- svelte-ignore a11y-missing-attribute -->
+      <img src="/assets/logo.png" class="absolute top-0 right-0  h-full p-1" />
+    </Navbar>
+  </div>
+  <!-- Create Show -->
+  {#if canCreateLink}
+    <Card title="Create a New Show" class="rounded-lg" outline>
+      <List noHairlinesMd>
+        <ListInput
+          label="Title"
+          type="text"
+          required
+          clearButton
+          validate
+          minlength="3"
+          maxlength="50"
+          value={showName}
+        />
+
+        <ListInput
+          label="Number of Tickets"
+          type="number"
+          placeholder="1"
+          disabled
+        />
+
+        <div>
+          <BlockTitle class="display-flex justify-content-space-between mt-3">
+            <span>Show Duration</span>
+            <span>{duration2String(showDuration)}</span>
+          </BlockTitle>
+          <ListItem class="-mt-2">
+            <ListItemCell class="width-auto flex-shrink-0">
+              <Icon ios="f7:timer" aurora="f7:timer" md="material:schedule" />
+            </ListItemCell>
+            <ListItemCell class="flex-shrink-3">
+              <Range
+                min={15}
+                max={120}
+                step={15}
+                label={true}
+                value={showDuration}
+                onRangeChange={onDurationChange}
+              />
+            </ListItemCell>
+            <ListItemCell class="width-auto flex-shrink-0">
+              <Icon
+                ios="f7:timer_fill"
+                aurora="f7:timer_fill"
+                md="material:watch_later"
+              />
+            </ListItemCell>
+          </ListItem>
+        </div>
+
+        <div>
+          <BlockTitle class="display-flex justify-content-space-between mt-3">
+            <span>Ticket Price</span>
+            <span>${amount}</span>
+          </BlockTitle>
+          <ListItem class="-mt-2">
+            <ListItemCell class="width-auto flex-shrink-0">
+              <Icon
+                ios="f7:money_dollar_circle"
+                aurora="f7:money_dollar_circle"
+                md="material:attach_money"
+              />
+            </ListItemCell>
+            <ListItemCell class="flex-shrink-3">
+              <Range
+                min={1}
+                max={2000}
+                step={10}
+                label={true}
+                value={amount}
+                onRangeChange={onAmountChange}
+              />
+            </ListItemCell>
+            <ListItemCell class="width-auto flex-shrink-0">
+              <Icon
+                ios="f7:money_dollar_circle_fill"
+                aurora="f7:money_dollar_circle_fill"
+                md="material:monetization_on"
+              />
+            </ListItemCell>
+          </ListItem>
+        </div>
+      </List>
+      <Row class="p-4">
+        <Col
+          ><Button
+            fill
+            round
+            on:click={createLink}
+            disabled={waiting4StateChange}>Create Ticket Link</Button
+          ></Col
+        ></Row
+      >
+    </Card>
+  {/if}
 
   <!-- Current Link -->
   {#if showCurrentLink && $currentLink && $linkMachineState}
-    <Card title="Your Outstanding pCall Link" class="rounded-lg" outline>
+    <Card title="Your Upcoming Show" class="rounded-lg" outline>
       <CardContent class="bg-color-black">
         {#if $linkMachineState?.matches('unclaimed')}
           <Row>Your pCall Link has Not Been Claimed</Row>
@@ -256,106 +361,5 @@
         </Block>
       </Card>
     {/if}
-  {/if}
-
-  <!-- Create Ticket -->
-  {#if canCreateLink}
-    <Card title="Create a New Show" class="rounded-lg" outline>
-      <List noHairlinesMd>
-        <ListInput
-          label="Title"
-          type="text"
-          required
-          clearButton
-          validate
-          minlength="3"
-          maxlength="50"
-          value={showName}
-        />
-
-        <ListInput
-          label="Number of Tickets"
-          type="number"
-          placeholder="1"
-          disabled
-        />
-
-        <div>
-          <BlockTitle class="display-flex justify-content-space-between mt-3">
-            <span>Show Duration</span>
-            <span>{duration2String(showDuration)}</span>
-          </BlockTitle>
-          <ListItem class="-mt-2">
-            <ListItemCell class="width-auto flex-shrink-0">
-              <Icon
-                ios="f7:money_dollar_circle"
-                aurora="f7:money_dollar_circle"
-                md="material:attach_money"
-              />
-            </ListItemCell>
-            <ListItemCell class="flex-shrink-3">
-              <Range
-                min={15}
-                max={120}
-                step={15}
-                label={true}
-                value={showDuration}
-                onRangeChange={onDurationChange}
-              />
-            </ListItemCell>
-            <ListItemCell class="width-auto flex-shrink-0">
-              <Icon
-                ios="f7:money_dollar_circle_fill"
-                aurora="f7:money_dollar_circle_fill"
-                md="material:monetization_on"
-              />
-            </ListItemCell>
-          </ListItem>
-        </div>
-
-        <div>
-          <BlockTitle class="display-flex justify-content-space-between mt-3">
-            <span>Ticket Price</span>
-            <span>${amount}</span>
-          </BlockTitle>
-          <ListItem class="-mt-2">
-            <ListItemCell class="width-auto flex-shrink-0">
-              <Icon
-                ios="f7:money_dollar_circle"
-                aurora="f7:money_dollar_circle"
-                md="material:attach_money"
-              />
-            </ListItemCell>
-            <ListItemCell class="flex-shrink-3">
-              <Range
-                min={1}
-                max={2000}
-                step={10}
-                label={true}
-                value={amount}
-                onRangeChange={onAmountChange}
-              />
-            </ListItemCell>
-            <ListItemCell class="width-auto flex-shrink-0">
-              <Icon
-                ios="f7:money_dollar_circle_fill"
-                aurora="f7:money_dollar_circle_fill"
-                md="material:monetization_on"
-              />
-            </ListItemCell>
-          </ListItem>
-        </div>
-      </List>
-      <Row class="p-4">
-        <Col
-          ><Button
-            fill
-            round
-            on:click={createLink}
-            disabled={waiting4StateChange}>Create Ticket Sales Link</Button
-          ></Col
-        ></Row
-      >
-    </Card>
   {/if}
 </Page>

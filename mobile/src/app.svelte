@@ -230,10 +230,10 @@
         <Link
           tabLink="#view-home"
           tabLinkActive
-          iconIos="f7:house_fill"
-          iconAurora="f7:house_fill"
-          iconMd="material:home"
-          text="Home"
+          iconIos="f7:ticket_fill"
+          iconAurora="f7:ticket_fill"
+          iconMd="material:confirmation_number"
+          text="Tickets"
         />
 
         <Link
@@ -292,8 +292,9 @@
           <ListButton onClick={login}>Log In</ListButton>
         </List>
         <BlockFooter>
-          Pretioso flos est, nihil ad vos nunc. Posset faciens pecuniam. Posuit
-          eam ad opus nunc et adepto a pCall!</BlockFooter
+          Flos tuus pretiosus nunc perditus est, cum posset tibi pecuniam
+          facere. Cur non nunc opus est? Aperi cella Campaniae et pecunia in
+          volumine.</BlockFooter
         >
       </Page>
     </LoginScreen>
