@@ -165,7 +165,7 @@
   </div>
   <!-- Create Show -->
   {#if canCreateLink}
-    <Card title="Create a New Show" class="rounded-lg" outline>
+    <Card class="rounded-lg" outline>
       <List noHairlinesMd>
         <ListInput
           label="Title"
@@ -175,7 +175,7 @@
           validate
           minlength="3"
           maxlength="50"
-          value={showName}
+          bind:value={showName}
         />
 
         <ListInput
@@ -259,6 +259,35 @@
       >
     </Card>
   {/if}
+
+  <!-- Show Preview -->
+  <Card class="rounded-lg" outline>
+    <CardContent class="bg-color-black rounded-lg">
+      <div
+        class="bg-cover bg-no-repeat bg-center rounded-xl h-64  relative"
+        style="background-image: url('{$talent?.profileImageUrl}')"
+      />
+      <div class="absolute top-4 left-6 text-lg">{showName}</div>
+
+      <div class="text-center">
+        <div>{name}</div>
+      </div>
+      <Row class="mt-4">
+        <Col class="flex flex-col items-center">
+          <div class="text-center">
+            <div>Duration</div>
+            <div>{duration2String(showDuration)}</div>
+          </div>
+        </Col>
+        <Col class="flex flex-col items-center">
+          <div class="text-center">
+            <div>Price</div>
+            <div>${amount}</div>
+          </div>
+        </Col>
+      </Row>
+    </CardContent>
+  </Card>
 
   <!-- Current Link -->
   {#if showCurrentLink && $currentLink && $linkMachineState}
