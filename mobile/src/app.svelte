@@ -22,11 +22,12 @@
   import capacitorApp from 'ts/capacitor-app';
   import routes from 'ts/routes';
 
-  import type { ShowDocument } from '$lib/ORM/models/show';
   import { createShowMachineService } from '$lib/machines/showMachine';
+  import type { ShowDocument } from '$lib/ORM/models/show';
   import {
     currentShow,
     showMachineService,
+    showMachineState,
     talent,
     talentDB,
   } from 'lib/stores';
@@ -72,7 +73,11 @@
                     _showState,
                     show.updateShowStateCallBack()
                   );
+                  _showMachineService.start();
                   showMachineService.set(_showMachineService);
+                  _showMachineService.onTransition(state => {
+                    showMachineState.set(state);
+                  });
                 });
               }
             });

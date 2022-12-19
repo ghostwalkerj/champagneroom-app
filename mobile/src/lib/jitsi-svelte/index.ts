@@ -1,8 +1,8 @@
 
 export { default as canAutoPermit } from './jitsi/canAutoPermit.js';
-
-export { localTracksStore } from './stores/LocalTracksStore.js';
 export {
-  createConnectionStore,
-  DEFAULT_JITSI_CONFIG,
+  DEFAULT_JITSI_CONFIG, createConnectionStore
 } from './stores/ConnectionStore.js';
+export { localTracksStore } from './stores/LocalTracksStore.js';
+
+

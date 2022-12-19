@@ -6,7 +6,7 @@ import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
 import { PouchDB, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
-import { type ShowCollection, showSchema } from '$lib/ORM/models/show';
+import { type ShowCollection, showSchema, showDocMethods } from '$lib/ORM/models/show';
 import { type TicketCollection, ticketSchema } from '$lib/ORM/models/ticket';
 
 // Sync requires more listeners but ok with http2
@@ -45,7 +45,8 @@ const create = async (token: string, key: string, storage: StorageTypes) => {
 			methods: talentDocMethods
 		},
 		shows: {
-			schema: showSchema
+			schema: showSchema,
+			methods: showDocMethods
 		},
 		tickets: {
 			schema: ticketSchema

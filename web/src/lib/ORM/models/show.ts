@@ -7,7 +7,7 @@ import {
 } from 'rxdb';
 import type { AgentDocument } from './agent';
 import type { TalentDocument } from './talent';
-import { ActorType, TicketDocument } from './ticket';
+import { ActorType, type TicketDocument } from './ticket';
 
 export enum ShowStatus {
   CREATED,
@@ -35,7 +35,7 @@ export const showDocMethods: ShowDocMethods = {
           };
           return {
             ...showDoc,
-            linkState: newState
+            showState: newState
           };
         };
         this.atomicUpdate(atomicUpdate);

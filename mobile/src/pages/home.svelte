@@ -1,19 +1,17 @@
 <script lang="ts">
-  import { ActorType } from '$lib/ORM/models/link';
-  import { TransactionReasonType } from '$lib/ORM/models/transaction';
   import { currencyFormatter } from '$lib/util/constants';
-  import getProfileImage from '$lib/util/profilePhoto';
   import { Clipboard } from '@capacitor/clipboard';
   import { Share } from '@capacitor/share';
   import { possessive } from 'i18n-possessive';
 
+  import type { ShowDocType } from '$lib/ORM/models/show';
   import {
-    Block,
     BlockTitle,
     Button,
     Card,
     CardContent,
     Col,
+    f7,
     Icon,
     List,
     ListInput,
@@ -24,11 +22,9 @@
     Range,
     Row,
   } from 'framework7-svelte';
-  import { currentShow, talent } from 'lib/stores';
-  import { formatLinkState } from 'lib/util';
+  import { currentShow, showMachineState, talent } from 'lib/stores';
   import spacetime from 'spacetime';
   import urlJoin from 'url-join';
-  import type { ShowDocType } from '$lib/ORM/models/show';
 
   const APP_URL = import.meta.env.VITE_APP_URL;
   const SHOW_PATH = import.meta.env.VITE_SHOW_PATH;
@@ -51,6 +47,7 @@
   };
 
   $: canCreateShow = !$currentShow;
+  $: canCancelShow = false;
 
   $talent?.get$('name').subscribe((_name: string): void => {
     name = _name;
@@ -95,6 +92,30 @@
       waiting4StateChange = false;
     });
   };
+
+  const cancelShow = () => {
+    const confirm = f7.dialog.confirm(
+      'This will Refund all Tickets. Are you sure?',
+      'Cancel Show',
+      () => {
+        confirm.close();
+      },
+
+      () => {
+        confirm.close();
+      }
+    );
+  };
+
+  showMachineState.subscribe(state => {
+    console.log('state', state);
+    if (state) {
+      canCancelShow = state.can({
+        type: 'REQUEST CANCELLATION',
+        cancel: undefined,
+      });
+    }
+  });
 </script>
 
 <Page name="home">
@@ -235,6 +256,11 @@
 
   {#if $currentShow}
     <Card class="rounded-lg" title="Current Show" outline>
+      <span slot="header">
+        <Button iconF7="square_arrow_up" on:click={shareLink}>Share</Button
+        ></span
+      >
+
       <CardContent class="bg-color-black rounded-lg">
         <div
           class="bg-cover bg-no-repeat bg-center rounded-xl h-64  relative"
@@ -280,6 +306,8 @@
       </CardContent>
     </Card>
 
-    <Button on:click={shareLink}>Share Show Link</Button>
+    {#if canCancelShow}
+      <Button on:click={cancelShow}>Cancel Show</Button>
+    {/if}
   {/if}
 </Page>
