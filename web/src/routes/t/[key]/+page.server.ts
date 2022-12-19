@@ -74,7 +74,7 @@ export const actions: import('./$types').Actions = {
 		}
 		const talent = await getTalent(key);
 
-		talent.createLink(Number(amount));
+		talent.createShow(Number(amount));
 		return { success: true };
 	},
 	cancel_link: async ({ params }) => {

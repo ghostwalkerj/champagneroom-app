@@ -11,7 +11,7 @@ import { initRXDB } from '$lib/ORM/rxdb';
 import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
-import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
+import { PouchDB, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
 import { callEventSchema, type CallEventCollection } from '../models/callEvent';
 
 // Sync requires more listeners but ok with http2
@@ -68,7 +68,7 @@ const create = async (token: string, linkId: string, storage: StorageTypes) => {
 		const remoteDB = new PouchDB(PUBLIC_CREATORS_ENDPOINT, {
 			fetch: function (
 				url: string,
-				opts: { headers: { set: (arg0: string, arg1: string) => void } }
+				opts: { headers: { set: (arg0: string, arg1: string) => void; }; }
 			) {
 				opts.headers.set('Authorization', 'Bearer ' + token);
 				return PouchDB.fetch(url, opts);

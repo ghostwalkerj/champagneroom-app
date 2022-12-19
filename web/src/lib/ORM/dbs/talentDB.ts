@@ -1,22 +1,20 @@
 import { PUBLIC_CREATORS_ENDPOINT, PUBLIC_RXDB_PASSWORD } from '$env/static/public';
-import { linkDocMethods, linkSchema, type LinkCollection } from '$lib/ORM/models/link';
 import { talentDocMethods, talentSchema, type TalentCollection } from '$lib/ORM/models/talent';
-import { transactionSchema, type TransactionCollection } from '$lib/ORM/models/transaction';
 import type { StorageTypes } from '$lib/ORM/rxdb';
 import { initRXDB } from '$lib/ORM/rxdb';
 import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
-import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
-import { callEventSchema, type CallEventCollection } from '../models/callEvent';
+import { PouchDB, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
+import { type ShowCollection, showSchema } from '$lib/ORM/models/show';
+import { type TicketCollection, ticketSchema } from '$lib/ORM/models/ticket';
 
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 100;
 type CreatorsCollections = {
 	talents: TalentCollection;
-	links: LinkCollection;
-	callEvents: CallEventCollection;
-	transactions: TransactionCollection;
+	shows: ShowCollection;
+	tickets: TicketCollection;
 };
 
 export type TalentDBType = RxDatabase<CreatorsCollections>;
@@ -46,16 +44,12 @@ const create = async (token: string, key: string, storage: StorageTypes) => {
 			schema: talentSchema,
 			methods: talentDocMethods
 		},
-		links: {
-			schema: linkSchema,
-			methods: linkDocMethods
+		shows: {
+			schema: showSchema
 		},
-		callEvents: {
-			schema: callEventSchema
+		tickets: {
+			schema: ticketSchema
 		},
-		transactions: {
-			schema: transactionSchema
-		}
 	});
 
 	if (PUBLIC_CREATORS_ENDPOINT) {
@@ -84,71 +78,28 @@ const create = async (token: string, key: string, storage: StorageTypes) => {
 		const _currentTalent = await talentQuery.exec();
 
 		if (_currentTalent) {
-			const linkQuery = _db.links.find().where('talent').eq(_currentTalent?._id);
-			const callEventQuery = _db.callEvents.find().where('talent').eq(_currentTalent?._id);
-			const transactionQuery = _db.transactions.find().where('talent').eq(_currentTalent?._id);
-			// Wait for links
-			repState = _db.links.syncCouchDB({
+			const showQuery = _db.shows.find().where('talent').eq(_currentTalent?._id);
+
+			// Wait for shows
+			repState = _db.shows.syncCouchDB({
 				remote: remoteDB,
 				waitForLeadership: false,
 				options: {
 					retry: true
 				},
-				query: linkQuery
+				query: showQuery
 			});
 			await repState.awaitInitialReplication();
 
-			// Wait for connections
-			repState = _db.callEvents.syncCouchDB({
-				remote: remoteDB,
-				waitForLeadership: false,
-				options: {
-					retry: true
-				},
-				query: callEventQuery
-			});
-
-			// Wait for transactions
-			repState = _db.transactions.syncCouchDB({
-				remote: remoteDB,
-				waitForLeadership: false,
-				options: {
-					retry: true
-				},
-				query: transactionQuery
-			});
-
-			// Live sync this Talent's links
-			_db.links.syncCouchDB({
+			// Live sync this Talent's shows
+			_db.shows.syncCouchDB({
 				remote: remoteDB,
 				waitForLeadership: false,
 				options: {
 					retry: true,
 					live: true
 				},
-				query: linkQuery
-			});
-
-			// Live sync this Talent's connections
-			_db.callEvents.syncCouchDB({
-				remote: remoteDB,
-				waitForLeadership: false,
-				options: {
-					retry: true,
-					live: true
-				},
-				query: callEventQuery
-			});
-
-			// Live sync this Talent's transactions
-			_db.transactions.syncCouchDB({
-				remote: remoteDB,
-				waitForLeadership: false,
-				options: {
-					retry: true,
-					live: true
-				},
-				query: transactionQuery
+				query: showQuery
 			});
 
 			// Live sync this Talent

@@ -22,104 +22,11 @@
   import capacitorApp from 'ts/capacitor-app';
   import routes from 'ts/routes';
 
-  import { createLinkMachineService } from '$lib/machines/linkMachine';
-  import { CallEventType } from '$lib/ORM/models/callEvent';
-  import type { LinkDocument } from '$lib/ORM/models/link';
-  import CallManager from 'lib/callManager';
-  import {
-    currentLink,
-    linkMachineService,
-    linkMachineState,
-    talent,
-    talentDB,
-  } from 'lib/stores';
+  import type { ShowDocument } from '$lib/ORM/models/show';
+  import { currentShow, talent, talentDB } from 'lib/stores';
   import { getTalentDB } from 'lib/util';
-  import type { Unsubscriber } from 'svelte/store';
 
-  let callManager: CallManager | undefined;
   let key = '';
-  let callId = '';
-  let unSubLinkMachineState: Unsubscriber;
-  let subLinkState: any;
-  let subLinkService: any;
-  let inCall = false;
-
-  const useLink = (link: LinkDocument) => {
-    useLinkState(link, link.linkState);
-    if (subLinkState) subLinkState.unsubscribe();
-    subLinkState = link.get$('linkState').subscribe(_linkState => {
-      useLinkState(link, _linkState);
-    });
-  };
-
-  const useLinkState = (
-    link: LinkDocument,
-    linkState: LinkDocument['linkState']
-  ) => {
-    $linkMachineService?.stop();
-    const _linkService = createLinkMachineService(
-      linkState,
-      link.updateLinkStateCallBack()
-    );
-    linkMachineService.set(_linkService);
-    if (subLinkService) subLinkService.unsubscribe();
-    subLinkService = _linkService.subscribe(state => {
-      linkMachineState.set(state);
-    });
-  };
-
-  const initCallManager = (_callId: string) => {
-    if (callId === _callId) return;
-
-    callId = _callId;
-    callManager = new CallManager(_callId);
-    callManager.callService.onEvent(ce => {
-      console.log('call event', JSON.stringify(ce));
-      // Log call events on the Talent side
-      if (ce) {
-        let eventType: CallEventType | undefined;
-        switch (ce.type) {
-          case 'CALL INCOMING':
-            eventType = CallEventType.ATTEMPT;
-            break;
-
-          case 'CALL ACCEPTED':
-            eventType = CallEventType.ANSWER;
-            break;
-
-          case 'CALL CONNECTED':
-            eventType = CallEventType.CONNECT;
-            $linkMachineService?.send('CALL CONNECTED');
-            break;
-
-          case 'CALL UNANSWERED':
-            eventType = CallEventType.NO_ANSWER;
-            break;
-
-          case 'CALL REJECTED':
-            eventType = CallEventType.REJECT;
-            break;
-
-          case 'CALL DISCONNECTED':
-            eventType = CallEventType.DISCONNECT;
-            $linkMachineService?.send('CALL DISCONNECTED');
-            break;
-
-          case 'CALL HANGUP':
-            eventType = CallEventType.HANGUP;
-            break;
-        }
-        if (eventType !== undefined) {
-          $currentLink?.createCallEvent(eventType).then(callEvent => {
-            $linkMachineService?.send({
-              type: 'CALL EVENT RECEIVED',
-              callEvent,
-            });
-          });
-        }
-      }
-    });
-  };
 
   const login = async () => {
     if (key.trim() === '') {
@@ -141,27 +48,14 @@
       }
       talent.set(_talent);
 
-      _talent.get$('currentLink').subscribe(linkId => {
-        if (linkId && $talentDB) {
-          $talentDB.links
-            .findOne(linkId)
+      _talent.get$('currentShow').subscribe(showId => {
+        if (showId && $talentDB) {
+          $talentDB.shows
+            .findOne(showId)
             .exec()
-            .then(link => {
-              if (link) {
-                currentLink.set(link);
-                if (unSubLinkMachineState) unSubLinkMachineState();
-                unSubLinkMachineState = linkMachineState.subscribe(state => {
-                  if (state?.changed) {
-                    if (state.matches('claimed.canCall'))
-                      initCallManager(link.callId);
-                    else {
-                      callManager?.destroy();
-                      callManager = undefined;
-                      callId = '';
-                    }
-                  }
-                });
-                useLink(link);
+            .then((show: ShowDocument | null) => {
+              if (show) {
+                currentShow.set(show);
               }
             });
         }
@@ -171,7 +65,7 @@
       key = '';
     } catch (e) {
       preloader.close();
-      f7.dialog.alert('Errror in Login: ', JSON.stringify(e));
+      f7.dialog.alert('Error in Login: ', JSON.stringify(e));
       return;
     }
   };
@@ -237,7 +131,7 @@
         />
 
         <Link
-          tabLink="#view-preview"
+          tabLink="#view-show"
           iconIos="material:video_call"
           iconAurora="material:video_call"
           iconMd="material:video_call"
@@ -263,8 +157,8 @@
       <!-- Your main view/tab, should have "view-main" class. It also has "tabActive" prop -->
       <View id="view-home" main tab tabActive url="/" />
 
-      <!-- Preview View -->
-      <View id="view-preview" name="preview" tab url="/preview/" />
+      <!-- show View -->
+      <View id="view-show" name="show" tab url="/show/" />
 
       <!-- wallet View -->
       <View id="view-wallet" name="wallet" tab url="/wallet/" />

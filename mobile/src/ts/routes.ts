@@ -21,7 +21,7 @@ var routes = [
     component: ProfilePage
   },
   {
-    path: '/preview/',
+    path: '/show/',
     component: Jitisi
   },
 

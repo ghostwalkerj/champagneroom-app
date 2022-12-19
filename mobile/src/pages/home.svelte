@@ -25,7 +25,7 @@
     Row,
   } from 'framework7-svelte';
   import {
-    currentLink,
+    currentShow,
     linkMachineService,
     linkMachineState,
     talent,
@@ -33,16 +33,17 @@
   import { formatLinkState } from 'lib/util';
   import spacetime from 'spacetime';
   import urlJoin from 'url-join';
+  import type { ShowDocType } from '$lib/ORM/models/show';
 
-  const PCALL_URL = import.meta.env.VITE_PCALL_URL;
-  const ROOM_PATH = import.meta.env.VITE_ROOM_PATH;
+  const APP_URL = import.meta.env.VITE_APP_URL;
+  const SHOW_PATH = import.meta.env.VITE_SHOW_PATH;
 
-  $: linkURL =
-    ($currentLink && urlJoin(PCALL_URL, ROOM_PATH, $currentLink._id)) || '';
+  $: showURL =
+    ($currentShow && urlJoin(APP_URL, SHOW_PATH, $currentShow._id)) || '';
   $: waiting4StateChange = false;
 
   let name = '';
-  let amount = 50;
+  let price = 50;
   let showName = '';
   let showDuration = 15;
 
@@ -54,99 +55,47 @@
     return `${hoursString} ${minuteString}`;
   };
 
-  $: canCancelLink = $linkMachineState?.can({
-    type: 'REQUEST CANCELLATION',
-    cancel: undefined,
-  });
-
-  $: canCreateLink =
-    !$currentLink ||
-    $linkMachineState?.done ||
-    $linkMachineState?.matches('inEscrow');
-
-  $: showCurrentLink = !canCreateLink;
+  $: canCreateShow = !$currentShow;
 
   $talent?.get$('name').subscribe((_name: string): void => {
     name = _name;
     showName = possessive(name, 'en') + ' Show';
   });
 
-  $: claim = $linkMachineState?.context.linkState.claim || {
-    caller: '',
-    createdAt: '',
-    call: {
-      startedAt: undefined,
-      endedAt: undefined,
-    },
-  };
-
-  $: callerProfileImage = urlJoin(PCALL_URL, getProfileImage(claim.caller));
-
-  linkMachineState.subscribe(state => {
-    if (state?.changed) {
-      canCancelLink = state.can({
-        type: 'REQUEST CANCELLATION',
-        cancel: undefined,
-      });
-      canCreateLink = !$currentLink || state.done || state.matches('inEscrow');
-    }
-  });
-
-  const cancelLink = () => {
-    $linkMachineService?.send({
-      type: 'REQUEST CANCELLATION',
-      cancel: {
-        createdAt: new Date().getTime(),
-        canceledInState: JSON.stringify($linkMachineState?.value),
-        canceler: ActorType.TALENT,
-      },
-    });
-  };
-
-  const issueRefund = async () => {
-    // Create and save a faux transaction
-    const transaction = await $currentLink!.createTransaction({
-      hash: '0x1234567890',
-      block: 1234567890,
-      to: '0x1234567890',
-      from: $currentLink!.fundingAddress,
-      value: $linkMachineState!.context.linkState.totalFunding.toString(),
-      reason: TransactionReasonType.REFUND,
-    });
-
-    $linkMachineService?.send({
-      type: 'REFUND RECEIVED',
-      transaction,
-    });
-  };
-
   const shareLink = async () => {
     if ((await Share.canShare()).value === true) {
       Share.share({
         title: 'Ticket Link',
-        url: linkURL,
-        dialogTitle: 'Share Ticket Link',
+        url: showURL,
+        dialogTitle: 'Share Show Link',
       });
     } else {
       Clipboard.write({
-        string: linkURL,
+        string: showURL,
       });
     }
   };
 
-  const onAmountChange = value => {
-    amount = value;
+  const onAmountChange = (value: number) => {
+    price = value;
   };
 
-  const onDurationChange = value => {
+  const onDurationChange = (value: number) => {
     showDuration = value;
   };
 
-  const createLink = () => {
+  const createShow = () => {
     waiting4StateChange = true;
-    $talent?.createLink(amount).then(link => {
+    const show = {
+      name: showName,
+      duration: showDuration,
+      price: price,
+      maxNumTickets: 1,
+      coverPhotoUrl: $talent?.profileImageUrl,
+    } as Partial<ShowDocType>;
+    $talent?.createShow(show).then(show => {
       Clipboard.write({
-        string: urlJoin(PCALL_URL, ROOM_PATH, link._id),
+        string: urlJoin(APP_URL, SHOW_PATH, show._id),
       });
       waiting4StateChange = false;
     });
@@ -164,7 +113,7 @@
     </Navbar>
   </div>
   <!-- Create Show -->
-  {#if canCreateLink}
+  {#if canCreateShow}
     <Card class="rounded-lg" outline>
       <List noHairlinesMd>
         <ListInput
@@ -217,7 +166,7 @@
         <div>
           <BlockTitle class="display-flex justify-content-space-between mt-3">
             <span>Ticket Price</span>
-            <span>${amount}</span>
+            <span>${price}</span>
           </BlockTitle>
           <ListItem class="-mt-2">
             <ListItemCell class="width-auto flex-shrink-0">
@@ -233,7 +182,7 @@
                 max={2000}
                 step={10}
                 label={true}
-                value={amount}
+                value={price}
                 onRangeChange={onAmountChange}
               />
             </ListItemCell>
@@ -252,143 +201,90 @@
           ><Button
             fill
             round
-            on:click={createLink}
-            disabled={waiting4StateChange}>Create Ticket Link</Button
+            on:click={createShow}
+            disabled={waiting4StateChange}>Create Show</Button
           ></Col
         ></Row
       >
     </Card>
-  {/if}
 
-  <!-- Show Preview -->
-  <Card class="rounded-lg" outline>
-    <CardContent class="bg-color-black rounded-lg">
-      <div
-        class="bg-cover bg-no-repeat bg-center rounded-xl h-64  relative"
-        style="background-image: url('{$talent?.profileImageUrl}')"
-      />
-      <div class="absolute top-4 left-6 text-lg">{showName}</div>
-
-      <div class="text-center">
-        <div>{name}</div>
-      </div>
-      <Row class="mt-4">
-        <Col class="flex flex-col items-center">
-          <div class="text-center">
-            <div>Duration</div>
-            <div>{duration2String(showDuration)}</div>
-          </div>
-        </Col>
-        <Col class="flex flex-col items-center">
-          <div class="text-center">
-            <div>Price</div>
-            <div>${amount}</div>
-          </div>
-        </Col>
-      </Row>
-    </CardContent>
-  </Card>
-
-  <!-- Current Link -->
-  {#if showCurrentLink && $currentLink && $linkMachineState}
+    <!-- Show Preview -->
     <Card class="rounded-lg" outline>
       <CardContent class="bg-color-black rounded-lg">
-        {#if $linkMachineState?.matches('unclaimed')}
-          <Row>Your pCall Link has Not Been Claimed</Row>
-        {:else if $linkMachineState?.matches('claimed')}
-          <Row>
-            pCall Link was Claimed by:
-            <Col
-              class="mt-4 flex flex-row w-full place-content-evenly items-center"
-            >
-              <div
-                class="bg-cover  bg-no-repeat bg-center rounded-full h-32 w-32"
-                style="background-image: url('{callerProfileImage}')"
-              />
-              <div class="text-center">
-                <div>{claim.caller}</div>
-                <div>on</div>
-                <div>{spacetime(claim.createdAt).format('nice-short')}</div>
-              </div>
-            </Col>
-          </Row>
-        {/if}
-      </CardContent>
-      <CardContent>
-        <Row
-          ><Col
-            >Amount Requested:<br />{currencyFormatter.format(
-              $currentLink.requestedAmount
-            )}</Col
-          >
-          <Col
-            >Total Funded:<br />{currencyFormatter.format(
-              $linkMachineState.context.linkState.totalFunding || 0
-            )}</Col
-          >
-        </Row>
-        {#if $linkMachineState.context.linkState.totalFunding >= $currentLink.requestedAmount}
-          <Row>Link is Fully Funded!</Row>
-        {/if}
-        <Row class="pt-4">
-          <Col>Funding Address:<br /></Col>
-          <div class="break-all">{$currentLink.fundingAddress}</div>
-        </Row>
-        <Row class="pt-4">
-          <Col
-            >Status: <span class="italic">
-              {formatLinkState($linkMachineState)}
-            </span>
+        <div
+          class="bg-cover bg-no-repeat bg-center rounded-xl h-64  relative"
+          style="background-image: url('{$talent?.profileImageUrl}')"
+        />
+        <div class="absolute top-4 left-6 text-lg">{showName}</div>
+
+        <div class="text-center">
+          <div>{name}</div>
+        </div>
+        <Row class="mt-4">
+          <Col class="flex flex-col items-center">
+            <div class="text-center">
+              <div>Duration</div>
+              <div>{duration2String(showDuration)}</div>
+            </div>
+          </Col>
+          <Col class="flex flex-col items-center">
+            <div class="text-center">
+              <div>Price</div>
+              <div>${price}</div>
+            </div>
           </Col>
         </Row>
       </CardContent>
-      <Button on:click={shareLink}>Share pCall Link</Button>
+    </Card>
+  {/if}
+
+  {#if $currentShow}
+    <Card class="rounded-lg" title="Current Show" outline>
+      <CardContent class="bg-color-black rounded-lg">
+        <div
+          class="bg-cover bg-no-repeat bg-center rounded-xl h-64  relative"
+          style="background-image: url('{$currentShow.coverPhotoUrl}')"
+        />
+        <div class="absolute top-4 left-6 text-lg">{$currentShow.name}</div>
+
+        <div class="text-center">
+          <div>{name}</div>
+        </div>
+        <Row class="mt-4">
+          <Col class="flex flex-col items-center">
+            <div class="text-center">
+              <div>Duration</div>
+              <div>{duration2String($currentShow.duration)}</div>
+            </div>
+          </Col>
+          <Col class="flex flex-col items-center">
+            <div class="text-center">
+              <div>Price</div>
+              <div>${$currentShow.price}</div>
+            </div>
+          </Col>
+        </Row>
+      </CardContent>
+    </Card>
+    <Card class="rounded-lg" outline>
+      <CardContent>
+        <List>
+          <ListItem title="Created">
+            {spacetime($currentShow.createdAt).format('nice-short')}
+          </ListItem>
+          <ListItem title="Total Tickets">
+            {$currentShow.maxNumTickets}
+          </ListItem>
+          <ListItem title="Tickets Sold">
+            {$currentShow.salesStats.ticketsSold}
+          </ListItem>
+          <ListItem title="Sales">
+            {currencyFormatter.format($currentShow.salesStats.totalSales)}
+          </ListItem>
+        </List>
+      </CardContent>
     </Card>
 
-    <!-- Cancel Link -->
-    {#if canCancelLink}
-      <Card title="Cancel Your pCall Link" class="rounded-lg" outline>
-        {#if $linkMachineState.context.linkState.totalFunding > 0}
-          <CardContent class="bg-color-black">
-            <Row>
-              <Col>
-                {currencyFormatter.format(
-                  $linkMachineState.context.linkState.totalFunding
-                )} will be refunded to "{$linkMachineState.context.linkState
-                  .claim?.caller}"
-              </Col>
-            </Row>
-          </CardContent>
-        {/if}
-
-        <Block strong>
-          <Row>
-            <Col>
-              <Button fill round on:click={cancelLink}>Cancel</Button>
-            </Col>
-          </Row>
-        </Block>
-      </Card>
-    {/if}
-
-    <!-- Issue Refund -->
-    {#if $linkMachineState.matches('claimed.requestedCancellation.waiting4Refund')}
-      <Card title="Issue Refund" class="rounded-lg" outline>
-        <Block strong>
-          <Row class="pb-4">
-            <Col>
-              Send {currencyFormatter.format(
-                $linkMachineState.context.linkState.totalFunding
-              )} to "{$linkMachineState.context.linkState.claim?.caller}"
-            </Col>
-          </Row>
-          <Row>
-            <Col>
-              <Button fill round on:click={issueRefund}>Issue Refund</Button>
-            </Col>
-          </Row>
-        </Block>
-      </Card>
-    {/if}
+    <Button on:click={shareLink}>Share Show Link</Button>
   {/if}
 </Page>

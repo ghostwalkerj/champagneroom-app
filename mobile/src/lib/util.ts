@@ -5,9 +5,9 @@ import { TokenRoles } from '$lib/util/constants';
 import urlJoin from 'url-join';
 
 export const getTalentDB = async (key: string) => {
-	const PCALL_URL = import.meta.env.VITE_PCALL_URL;
+	const APP_URL = import.meta.env.VITE_APP_URL;
 	const AUTH_PATH = import.meta.env.VITE_AUTH_PATH;
-	const auth_url = urlJoin(PCALL_URL, AUTH_PATH);
+	const auth_url = urlJoin(APP_URL, AUTH_PATH);
 
 	const res = await fetch(auth_url, {
 		method: 'POST',

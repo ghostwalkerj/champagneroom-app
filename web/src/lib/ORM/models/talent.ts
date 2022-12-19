@@ -1,5 +1,4 @@
 import type { AgentDocument } from '$lib/ORM/models/agent';
-import { LinkStatus, LinkString, type LinkDocument } from '$lib/ORM/models/link';
 import { nanoid } from 'nanoid';
 import {
 	toTypedRxJsonSchema,
@@ -8,6 +7,7 @@ import {
 	type RxDocument,
 	type RxJsonSchema
 } from 'rxdb';
+import { type ShowDocType, type ShowDocument, ShowStatus, ShowString } from './show';
 import { v4 as uuidv4 } from 'uuid';
 
 export const TalentString = 'talent';
@@ -51,10 +51,10 @@ const talentSchemaLiteral = {
 			minimum: 0,
 			maximum: 100
 		},
-		currentLink: {
+		currentShow: {
 			type: 'string',
 			maxLength: 50,
-			ref: 'links'
+			ref: 'shows'
 		},
 		stats: {
 			type: 'object',
@@ -68,7 +68,7 @@ const talentSchemaLiteral = {
 					type: 'integer',
 					minimum: 0
 				},
-				numCompletedCalls: {
+				numCompletedShows: {
 					type: 'integer',
 					minimum: 0
 				},
@@ -76,16 +76,16 @@ const talentSchemaLiteral = {
 					type: 'number',
 					minimum: 0
 				},
-				completedCalls: {
+				completedShows: {
 					type: 'array',
-					ref: 'links',
+					ref: 'shows',
 					items: {
 						type: 'string',
 						maxLength: 50
 					}
 				}
 			},
-			required: ['ratingAvg', 'totalRating', 'numCompletedCalls', 'totalEarnings', 'completedCalls']
+			required: ['ratingAvg', 'totalRating', 'numCompletedShows', 'totalEarnings', 'completedShows']
 		},
 		createdAt: {
 			type: 'integer'
@@ -113,58 +113,45 @@ const talentSchemaLiteral = {
 } as const;
 
 type talentRef = {
-	currentLink_?: Promise<LinkDocument>;
+	currentShow_?: Promise<ShowDocument>;
 	agent_?: Promise<AgentDocument>;
 };
 
 type TalentDocMethods = {
-	createLink: (amount: number) => Promise<LinkDocument>;
+	createShow: (ticket: Partial<ShowDocType>) => Promise<ShowDocument>;
 	updateStats: () => Promise<TalentDocument['stats']>;
-	getStatsByRange: (range?: { start: number; end: number }) => Promise<TalentDocument['stats']>;
+	getStatsByRange: (range?: { start: number; end: number; }) => Promise<TalentDocument['stats']>;
 };
 
 export const talentDocMethods: TalentDocMethods = {
-	createLink: async function (
+	createShow: async function (
 		this: TalentDocument,
-		requestedAmount: number
-	): Promise<LinkDocument> {
+		show: Partial<ShowDocType>
+	): Promise<ShowDocument> {
 		const db = this.collection.database;
-		const key = nanoid();
-		const _link = {
-			linkState: {
-				status: LinkStatus.UNCLAIMED,
-				totalFunding: 0,
-				refundedAmount: 0,
-				requestedAmount,
-				updatedAt: new Date().getTime()
-			},
-			requestedAmount,
-			fundingAddress: '0x251281e1516e6E0A145d28a41EE63BfcDd9E18Bf', //TODO: make real wallet
-			callId: uuidv4(),
-			talent: this._id,
-			talentInfo: {
-				name: this.name,
-				profileImageUrl: this.profileImageUrl,
-				stats: {
-					ratingAvg: this.stats.ratingAvg,
-					numCompletedCalls: this.stats.numCompletedCalls
-				}
-			},
-			_id: `${LinkString}:l-${key}`,
-			createdAt: new Date().getTime(),
-			updatedAt: new Date().getTime(),
-			entityType: LinkString,
-			agent: this.agent
+		show.talent = this._id;
+		show.talentInfo = {
+			name: this.name,
+			profileImageUrl: this.profileImageUrl,
+			stats: {
+				ratingAvg: this.stats.ratingAvg,
+				numCompletedShows: this.stats.numCompletedShows,
+			}
 		};
-		const newLink = await db.links.insert(_link);
-		this.update({ $set: { currentLink: _link._id } });
-
-		return newLink;
+		show.showState = { status: ShowStatus.CREATED };
+		show.salesStats = { ticketsSold: 0, totalSales: 0 };
+		show._id = `${ShowString}:sh-${nanoid()}`;
+		show.createdAt = new Date().getTime();
+		show.updatedAt = new Date().getTime();
+		show.agent = this.agent;
+		show.roomId = uuidv4();
+		const newShow = await db.shows.insert(show);
+		this.update({ $set: { currentShow: newShow._id } });
+		return newShow;
 	},
 
 	updateStats: async function (this: TalentDocument): Promise<TalentDocument['stats']> {
 		const stats = await this.getStatsByRange({ start: 0, end: new Date().getTime() });
-
 		this.atomicPatch({
 			stats,
 			updatedAt: new Date().getTime()
@@ -177,32 +164,28 @@ export const talentDocMethods: TalentDocMethods = {
 		range = { start: 0, end: new Date().getTime() }
 	): Promise<TalentDocument['stats']> {
 		let ratingAvg = 0;
-		let totalRating = 0;
+		const totalRating = 0;
 		let totalEarnings = 0;
-		let numRatings = 0;
+		const numRatings = 0;
 		const db = this.collection.database;
-		const completedCallIds: string[] = [];
-		const completedCalls = (await db.links
+		const completedShowIds: string[] = [];
+		const completedShows = (await db.shows
 			.find({
 				selector: {
 					talent: this._id,
-					linkState: {
-						status: LinkStatus.FINALIZED,
+					showState: {
+						status: ShowStatus.FINALIZED,
 						finalized: {
 							endedAt: { $gte: range.start, $lte: range.end }
 						}
 					}
 				}
 			})
-			.exec()) as LinkDocument[];
+			.exec()) as ShowDocument[];
 
-		completedCalls.map((link) => {
-			totalEarnings += link.linkState.totalFunding;
-			if (link.linkState.feedback) {
-				totalRating += link.linkState.feedback.rating;
-				numRatings++;
-			}
-			completedCallIds.push(link._id);
+		completedShows.map((show) => {
+			totalEarnings += show.salesStats?.totalRevenue || 0;
+			completedShowIds.push(show._id);
 		});
 		if (numRatings > 0) {
 			ratingAvg = totalRating / numRatings;
@@ -211,8 +194,8 @@ export const talentDocMethods: TalentDocMethods = {
 			ratingAvg,
 			totalEarnings,
 			totalRating,
-			completedCalls: completedCallIds,
-			numCompletedCalls: completedCalls.length
+			completedShows: completedShowIds,
+			numCompletedShows: completedShows.length
 		};
 		return stats;
 	}

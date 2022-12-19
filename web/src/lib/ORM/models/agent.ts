@@ -39,8 +39,8 @@ export const agentDocMethods: AgentDocMethods = {
 				ratingAvg: 0,
 				totalEarnings: 0,
 				totalRating: 0,
-				completedCalls: [],
-				numCompletedCalls: 0
+				completedShows: [],
+				numCompletedShows: 0
 			},
 			createdAt: new Date().getTime(),
 			updatedAt: new Date().getTime()
