@@ -24,12 +24,7 @@
     Range,
     Row,
   } from 'framework7-svelte';
-  import {
-    currentShow,
-    linkMachineService,
-    linkMachineState,
-    talent,
-  } from 'lib/stores';
+  import { currentShow, talent } from 'lib/stores';
   import { formatLinkState } from 'lib/util';
   import spacetime from 'spacetime';
   import urlJoin from 'url-join';

@@ -14,7 +14,7 @@
   const PHOTO_UPDATE_PATH = import.meta.env.VITE_PHOTO_UPDATE_PATH;
   const PCALL_URL = import.meta.env.VITE_PCALL_URL;
 
-  import { currentLink, talent } from 'lib/stores';
+  import { talent } from 'lib/stores';
 
   import {
     Camera,
@@ -81,15 +81,6 @@
         name,
         updatedAt: new Date().getTime(),
       });
-      if ($currentLink) {
-        $currentLink.atomicPatch({
-          talentInfo: {
-            ...$currentLink.talentInfo,
-            name,
-          },
-          updatedAt: new Date().getTime(),
-        });
-      }
     }
   };
 </script>

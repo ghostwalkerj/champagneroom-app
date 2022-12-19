@@ -138,7 +138,7 @@ export const talentDocMethods: TalentDocMethods = {
 				numCompletedShows: this.stats.numCompletedShows,
 			}
 		};
-		show.showState = { status: ShowStatus.CREATED };
+		show.showState = { status: ShowStatus.BOX_OFFICE_OPEN, updatedAt: new Date().getTime() };
 		show.salesStats = { ticketsSold: 0, totalSales: 0 };
 		show._id = `${ShowString}:sh-${nanoid()}`;
 		show.createdAt = new Date().getTime();
@@ -184,7 +184,7 @@ export const talentDocMethods: TalentDocMethods = {
 			.exec()) as ShowDocument[];
 
 		completedShows.map((show) => {
-			totalEarnings += show.salesStats?.totalRevenue || 0;
+			totalEarnings += show.salesStats.totalSales || 0;
 			completedShowIds.push(show._id);
 		});
 		if (numRatings > 0) {

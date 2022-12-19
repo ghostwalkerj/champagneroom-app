@@ -7,7 +7,7 @@ import {
 } from 'rxdb';
 import type { AgentDocument } from './agent';
 import type { TalentDocument } from './talent';
-import type { TicketDocument } from './ticket';
+import { ActorType, TicketDocument } from './ticket';
 
 export enum ShowStatus {
   CREATED,
@@ -19,6 +19,30 @@ export enum ShowStatus {
   IN_DISPUTE,
   CANCELLATION_REQUESTED
 }
+
+type ShowDocMethods = {
+  updateShowStateCallBack: () => (_showState: ShowDocument['showState']) => void;
+};
+
+export const showDocMethods: ShowDocMethods = {
+  updateShowStateCallBack: function (this: ShowDocument) {
+    return (_showState: ShowDocument['showState']) => {
+      if (_showState.updatedAt > this.showState.updatedAt) {
+        const atomicUpdate = (showDoc: ShowDocType) => {
+          const newState = {
+            ...showDoc.showState,
+            ..._showState
+          };
+          return {
+            ...showDoc,
+            linkState: newState
+          };
+        };
+        this.atomicUpdate(atomicUpdate);
+      }
+    };
+  }
+};
 
 const showSchemaLiteral = {
   title: 'show',
@@ -52,8 +76,27 @@ const showSchemaLiteral = {
           type: 'string',
           enum: Object.values(ShowStatus),
           default: ShowStatus.CREATED
-        }
-      }
+        },
+        updatedAt: { type: 'integer' },
+        cancel: {
+          type: 'object',
+          properties: {
+            createdAt: { type: 'integer' },
+            canceler: {
+              type: 'string',
+              enum: Object.values(ActorType)
+            },
+            canceledInState: { type: 'string' },
+            transactions: {
+              type: 'array',
+              ref: 'transactions',
+              items: { type: 'string' }
+            }
+          },
+          required: ['createdAt', 'canceler', 'canceledInState']
+        },
+      },
+      required: ['status', 'updatedAt']
     },
     tickets: {
       type: 'array',
@@ -113,7 +156,7 @@ const showSchemaLiteral = {
       required: ['ticketsSold', 'totalSales']
     }
   },
-  required: ['_id', 'createdAt', 'agent', 'talent', 'duration', 'price', 'name', 'maxNumTickets', 'roomId', 'salesStats'],
+  required: ['_id', 'createdAt', 'agent', 'talent', 'duration', 'price', 'name', 'maxNumTickets', 'roomId', 'salesStats', 'showState', 'talentInfo'],
   encrypted: ['roomId']
 } as const;
 
@@ -130,5 +173,5 @@ export type ShowDocType = ExtractDocumentTypeFromTypedRxJsonSchema<typeof schema
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 export const showSchema: RxJsonSchema<ShowDocType> = showSchemaLiteral;
-export type ShowDocument = RxDocument<ShowDocType> & showRef;
-export type ShowCollection = RxCollection<ShowDocType>;
+export type ShowDocument = RxDocument<ShowDocType, ShowDocMethods> & showRef;
+export type ShowCollection = RxCollection<ShowDocType, ShowDocMethods>;

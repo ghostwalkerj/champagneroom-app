@@ -23,10 +23,18 @@
   import routes from 'ts/routes';
 
   import type { ShowDocument } from '$lib/ORM/models/show';
-  import { currentShow, talent, talentDB } from 'lib/stores';
+  import { createShowMachineService } from '$lib/machines/showMachine';
+  import {
+    currentShow,
+    showMachineService,
+    talent,
+    talentDB,
+  } from 'lib/stores';
   import { getTalentDB } from 'lib/util';
+  import type { Unsubscriber } from 'svelte/store';
 
   let key = '';
+  let showStateUnSub: Unsubscriber;
 
   const login = async () => {
     if (key.trim() === '') {
@@ -56,6 +64,16 @@
             .then((show: ShowDocument | null) => {
               if (show) {
                 currentShow.set(show);
+
+                // New show, start showMachine
+                show.get$('showState').subscribe(_showState => {
+                  $showMachineService?.stop();
+                  const _showMachineService = createShowMachineService(
+                    _showState,
+                    show.updateShowStateCallBack()
+                  );
+                  showMachineService.set(_showMachineService);
+                });
               }
             });
         }

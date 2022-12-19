@@ -14,3 +14,4 @@ web/.vscode/**
 web/src/lib/machines/callMachine.typegen.ts
 web/src/lib/machines/linkMachine.typegen.ts
 web/src/lib/machines/mediaToggleMachine.typegen.ts
+web/src/lib/machines/showMachine.typegen.ts
