@@ -203,6 +203,7 @@
             onInput={e => (key = e.target.value)}
             required
             validate
+            clearButton
           />
         </List>
         <List>

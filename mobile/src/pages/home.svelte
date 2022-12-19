@@ -19,6 +19,9 @@
     ListInput,
     ListItem,
     ListItemCell,
+    MenuDropdown,
+    MenuDropdownItem,
+    MenuItem,
     Navbar,
     Page,
     Range,
@@ -119,7 +122,7 @@
   };
 
   showMachineState.subscribe((state: ShowMachineStateType | null) => {
-    if (state) {
+    if (state && state.changed) {
       console.log(state.value);
       canCancelShow = state.can('REQUEST CANCELLATION');
       canCreateShow = !state.done || !state.matches('inEscrow');
@@ -130,11 +133,14 @@
 <Page name="home">
   <!-- Top Navbar -->
   <div>
-    <Navbar title="Champagne Room Creator" subtitle={name} class="relative">
-      <!-- svelte-ignore a11y-missing-attribute -->
-      <img src="/assets/logo.png" class="absolute top-0 left-0  h-full p-1" />
-      <!-- svelte-ignore a11y-missing-attribute -->
-      <img src="/assets/logo.png" class="absolute top-0 right-0  h-full p-1" />
+    <Navbar>
+      <div class="flex justify-between w-full place-items-center">
+        <!-- svelte-ignore a11y-missing-attribute -->
+        <img src="/assets/logo.png" class="h-8" />
+        Champagne Room Creator
+        <!-- svelte-ignore a11y-missing-attribute -->
+        <img src="/assets/logo.png" class=" h-8" />
+      </div>
     </Navbar>
   </div>
   <!-- Create Show -->
@@ -237,7 +243,7 @@
     <Card class="rounded-lg" outline>
       <CardContent class="bg-color-black rounded-lg">
         <div
-          class="bg-cover bg-no-repeat bg-center rounded-xl h-64  relative"
+          class="bg-cover bg-no-repeat bg-center rounded-xl h-60  relative"
           style="background-image: url('{$talent?.profileImageUrl}')"
         />
         <div class="absolute top-4 left-6 text-lg">{showName}</div>
@@ -262,15 +268,29 @@
       </CardContent>
     </Card>
   {:else if $currentShow}
-    <Card class="rounded-lg" title="Current Show" outline>
-      <span slot="header">
-        <Button iconF7="square_arrow_up" on:click={shareLink}>Share</Button
-        ></span
-      >
+    <Card class="rounded-lg" outline>
+      <div class="justify-start  w-full place-items-center flex  p-1 ">
+        <MenuItem iconF7="menu" dropdown>
+          <MenuDropdown left>
+            <MenuDropdownItem href="#" class="bg-black">
+              <Button iconF7="square_arrow_up" on:click={shareLink}
+                >Share</Button
+              >
+            </MenuDropdownItem>
+            {#if canCancelShow}
+              <MenuDropdownItem href="#" class="bg-black">
+                <Button iconF7="xmark" on:click={cancelShow}>Cancel Show</Button
+                >
+              </MenuDropdownItem>
+            {/if}
+          </MenuDropdown>
+        </MenuItem>
+        <div class="ml-3">Current Show</div>
+      </div>
 
       <CardContent class="bg-color-black rounded-lg">
         <div
-          class="bg-cover bg-no-repeat bg-center rounded-xl h-64  relative"
+          class="bg-cover bg-no-repeat bg-center rounded-xl h-60  relative"
           style="background-image: url('{$currentShow.coverPhotoUrl}')"
         />
         <div class="absolute top-4 left-6 text-lg">{$currentShow.name}</div>
@@ -312,9 +332,5 @@
         </List>
       </CardContent>
     </Card>
-
-    {#if canCancelShow}
-      <Button on:click={cancelShow}>Cancel Show</Button>
-    {/if}
   {/if}
 </Page>
