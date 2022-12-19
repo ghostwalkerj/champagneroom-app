@@ -73,11 +73,11 @@
                     _showState,
                     show.updateShowStateCallBack()
                   );
-                  _showMachineService.start();
                   showMachineService.set(_showMachineService);
                   _showMachineService.onTransition(state => {
                     showMachineState.set(state);
                   });
+                  _showMachineService.start();
                 });
               }
             });

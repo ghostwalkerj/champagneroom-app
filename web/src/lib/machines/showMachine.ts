@@ -29,7 +29,7 @@ export const createShowMachine = (showState: ShowStateType, saveState?: StateCal
 			tsTypes: {} as import("./showMachine.typegen").Typegen0,
 			schema: {
 				events: {} as
-					| { type: 'REQUEST CANCELLATION'; cancel: ShowStateType['cancel']; }
+					| { type: 'REQUEST CANCELLATION'; }
 			},
 			predictableActionArguments: true,
 			id: 'showMachine',
@@ -97,23 +97,29 @@ export const createShowMachine = (showState: ShowStateType, saveState?: StateCal
 		},
 		{
 			actions: {
-				cancelShow: assign((context, event) => {
+				cancelShow: assign((context, _event, meta) => {
 					return {
 						showState: {
 							...context.showState,
 							updatedAt: new Date().getTime(),
 							status: ShowStatus.CANCELED,
-							cancel: event.cancel
+							cancel: {
+								createdAt: new Date().getTime(),
+								canceledInState: meta.state ? JSON.stringify(meta.state.value) : 'unknown'
+							}
 						}
 					};
 				}),
-				requestCancellation: assign((context, event) => {
+				requestCancellation: assign((context, _event, meta) => {
 					return {
 						showState: {
 							...context.showState,
 							updatedAt: new Date().getTime(),
 							status: ShowStatus.CANCELLATION_REQUESTED,
-							cancel: event.cancel
+							cancel: {
+								createdAt: new Date().getTime(),
+								canceledInState: meta.state ? JSON.stringify(meta.state.value) : 'unknown'
+							}
 						}
 					};
 				}),

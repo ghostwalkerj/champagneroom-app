@@ -5,6 +5,8 @@
   import { possessive } from 'i18n-possessive';
 
   import type { ShowDocType } from '$lib/ORM/models/show';
+  import type { ShowMachineStateType } from '$lib/machines/showMachine';
+
   import {
     BlockTitle,
     Button,
@@ -22,7 +24,12 @@
     Range,
     Row,
   } from 'framework7-svelte';
-  import { currentShow, showMachineState, talent } from 'lib/stores';
+  import {
+    currentShow,
+    showMachineState,
+    showMachineService,
+    talent,
+  } from 'lib/stores';
   import spacetime from 'spacetime';
   import urlJoin from 'url-join';
 
@@ -46,8 +53,11 @@
     return `${hoursString} ${minuteString}`;
   };
 
-  $: canCreateShow = !$currentShow;
-  $: canCancelShow = false;
+  $: canCreateShow =
+    !$currentShow ||
+    $showMachineState?.done ||
+    $showMachineState?.matches('inEscrow');
+  $: canCancelShow = $showMachineState?.can('REQUEST CANCELLATION');
 
   $talent?.get$('name').subscribe((_name: string): void => {
     name = _name;
@@ -98,6 +108,7 @@
       'This will Refund all Tickets. Are you sure?',
       'Cancel Show',
       () => {
+        $showMachineService?.send('REQUEST CANCELLATION');
         confirm.close();
       },
 
@@ -107,13 +118,11 @@
     );
   };
 
-  showMachineState.subscribe(state => {
-    console.log('state', state);
+  showMachineState.subscribe((state: ShowMachineStateType | null) => {
     if (state) {
-      canCancelShow = state.can({
-        type: 'REQUEST CANCELLATION',
-        cancel: undefined,
-      });
+      console.log(state.value);
+      canCancelShow = state.can('REQUEST CANCELLATION');
+      canCreateShow = !state.done || !state.matches('inEscrow');
     }
   });
 </script>
@@ -252,9 +261,7 @@
         </Row>
       </CardContent>
     </Card>
-  {/if}
-
-  {#if $currentShow}
+  {:else if $currentShow}
     <Card class="rounded-lg" title="Current Show" outline>
       <span slot="header">
         <Button iconF7="square_arrow_up" on:click={shareLink}>Share</Button

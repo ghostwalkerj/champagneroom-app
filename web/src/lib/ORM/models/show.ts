@@ -7,7 +7,7 @@ import {
 } from 'rxdb';
 import type { AgentDocument } from './agent';
 import type { TalentDocument } from './talent';
-import { ActorType, type TicketDocument } from './ticket';
+import type { TicketDocument } from './ticket';
 
 export enum ShowStatus {
   CREATED,
@@ -82,10 +82,6 @@ const showSchemaLiteral = {
           type: 'object',
           properties: {
             createdAt: { type: 'integer' },
-            canceler: {
-              type: 'string',
-              enum: Object.values(ActorType)
-            },
             canceledInState: { type: 'string' },
             transactions: {
               type: 'array',
@@ -93,7 +89,7 @@ const showSchemaLiteral = {
               items: { type: 'string' }
             }
           },
-          required: ['createdAt', 'canceler', 'canceledInState']
+          required: ['createdAt', 'canceledInState']
         },
       },
       required: ['status', 'updatedAt']
