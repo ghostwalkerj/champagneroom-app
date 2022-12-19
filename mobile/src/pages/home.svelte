@@ -199,7 +199,7 @@
                 min={15}
                 max={120}
                 step={15}
-                label={true}
+                label={false}
                 value={showDuration}
                 onRangeChange={onDurationChange}
               />
@@ -291,8 +291,8 @@
 
   <!-- Current Link -->
   {#if showCurrentLink && $currentLink && $linkMachineState}
-    <Card title="Your Upcoming Show" class="rounded-lg" outline>
-      <CardContent class="bg-color-black">
+    <Card class="rounded-lg" outline>
+      <CardContent class="bg-color-black rounded-lg">
         {#if $linkMachineState?.matches('unclaimed')}
           <Row>Your pCall Link has Not Been Claimed</Row>
         {:else if $linkMachineState?.matches('claimed')}

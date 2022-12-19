@@ -241,7 +241,7 @@
           iconIos="material:video_call"
           iconAurora="material:video_call"
           iconMd="material:video_call"
-          text="Preview"
+          text="Showtime"
         />
         <Link
           tabLink="#view-profile"
