@@ -54,23 +54,14 @@
   onMount(async () => {});
 </script>
 
-<div class="min-h-full">
-  <main class="py-6">
-    <!-- Page header -->
-    <div class="text-center">
-      <h1 class="font-bold text-center text-5xl">Make your pCall</h1>
-      <p class="py-6">
-        Scis vis facere illud pCall. Carpe florem et fac quod nunc vocant.
-      </p>
-    </div>
-    <div
-      class="container	 mx-auto max-w-max  items-center sm:px-6 md:flex md:space-x-5 md:items-stretch  lg:px-8"
-    >
-      <div class="rounded-box h-full bg-base-200">
-        <div>
-          <ShowDetail {show} />
-        </div>
-      </div>
-    </div>
-  </main>
+<div class="grid grid-flow-row place-content-center">
+  <!-- Page header -->
+  <div class="text-center">
+    <h1 class="font-bold text-center text-5xl p-4">
+      Welcome to the Champagne Room
+    </h1>
+  </div>
+  <div class="grid place-content-center">
+    <ShowDetail {show} />
+  </div>
 </div>
