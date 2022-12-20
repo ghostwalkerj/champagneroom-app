@@ -1,30 +1,30 @@
 import { PUBLIC_PUBLIC_ENDPOINT, PUBLIC_RXDB_PASSWORD } from '$env/static/public';
-import { linkSchema, type LinkCollection, type LinkDocument } from '$lib/ORM/models/link';
 import { initRXDB, StorageTypes } from '$lib/ORM/rxdb';
 import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
 
 import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
+import { type ShowCollection, type ShowDocument, showSchema } from '$lib/ORM/models/show';
 
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 100;
 type PublicCollections = {
-	links: LinkCollection;
+	shows: ShowCollection;
 };
 
-export type PublicDBType = RxDatabase<PublicCollections>;
-const _publicDB = new Map<string, PublicDBType>();
-export const publicDB = async (
+export type PublicShowDBType = RxDatabase<PublicCollections>;
+const _publicDB = new Map<string, PublicShowDBType>();
+export const publicShowDB = async (
 	token: string,
-	linkId: string,
+	showId: string,
 	storage: StorageTypes
-): Promise<PublicDBType> => await create(token, linkId, storage);
+): Promise<PublicShowDBType> => await create(token, showId, storage);
 
-let _thisLink: LinkDocument;
+let _thisShow: ShowDocument;
 
-const create = async (token: string, linkId: string, storage: StorageTypes) => {
-	let _db = _publicDB.get(linkId);
+const create = async (token: string, showId: string, storage: StorageTypes) => {
+	let _db = _publicDB.get(showId);
 	if (_db) return _db;
 
 	initRXDB(storage);
@@ -41,8 +41,8 @@ const create = async (token: string, linkId: string, storage: StorageTypes) => {
 	});
 
 	await _db.addCollections({
-		links: {
-			schema: linkSchema
+		shows: {
+			schema: showSchema
 		}
 	});
 
@@ -57,31 +57,31 @@ const create = async (token: string, linkId: string, storage: StorageTypes) => {
 				return PouchDB.fetch(url, opts);
 			}
 		});
-		const linkQuery = _db.links.findOne(linkId);
+		const showQuery = _db.shows.findOne(showId);
 
-		const repState = _db.links.syncCouchDB({
+		const repState = _db.shows.syncCouchDB({
 			remote: remoteDB,
 			waitForLeadership: false,
 			options: {
 				retry: true
 			},
-			query: linkQuery
+			query: showQuery
 		});
 		await repState.awaitInitialReplication();
 
-		_thisLink = (await linkQuery.exec()) as LinkDocument;
-		if (_thisLink) {
-			_db.links.syncCouchDB({
+		_thisShow = (await showQuery.exec()) as ShowDocument;
+		if (_thisShow) {
+			_db.shows.syncCouchDB({
 				remote: remoteDB,
 				waitForLeadership: false,
 				options: {
 					retry: true,
 					live: true
 				},
-				query: linkQuery
+				query: showQuery
 			});
 		}
 	}
-	_publicDB.set(linkId, _db);
+	_publicDB.set(showId, _db);
 	return _db;
 };

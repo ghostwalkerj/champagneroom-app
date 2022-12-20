@@ -1,0 +1,18 @@
+[
+    {
+        "type": "Directory",
+        "name": "/Users/joseph/Dev/pcall/web/src/lib",
+        "parent_id": null,
+        "workspaceRoot": "/Users/joseph/Dev/pcall/web",
+        "workspacePath": "src/lib",
+        "id": "YO3P5loyunsFi4JR"
+    },
+    {
+        "type": "Directory",
+        "name": "/Users/joseph/Dev/pcall/web/src/routes",
+        "parent_id": null,
+        "workspaceRoot": "/Users/joseph/Dev/pcall/web",
+        "workspacePath": "src/routes",
+        "id": "IZ4fYnFRrxXihpTw"
+    }
+]

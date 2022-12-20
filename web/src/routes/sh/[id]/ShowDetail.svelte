@@ -1,0 +1,49 @@
+<script lang="ts">
+  import type { ShowDocType } from '$lib/ORM/models/show';
+  import { currencyFormatter } from '$lib/util/constants';
+  import FaMoneyBillWave from 'svelte-icons/fa/FaMoneyBillWave.svelte';
+  import StarRating from 'svelte-star-rating';
+  export let show: ShowDocType;
+</script>
+
+{#if show}
+  <div
+    class=" flex-shrink-0  mx-2 grid  p-4 py-8 gap-4 col-span-3 row-span-3 place-items-center lg:w-100 xl:mx-0"
+  >
+    <div class="text-center">
+      <div class="font-extrabold text-lg">This pCall is For</div>
+      <div class="font-extrabold text-3xl">{show.talentInfo.name}</div>
+    </div>
+    <div
+      class="bg-cover bg-no-repeat bg-center rounded-full h-48 w-48"
+      style="background-image: url('{show.talentInfo.profileImageUrl}')"
+    />
+
+    <StarRating rating={show.talentInfo.stats.ratingAvg} />
+
+    <div class="stats stats-vertical stats-shadow lg:stats-horizontal">
+      <div class="stat">
+        <div class="text-primary w-10 stat-figure">
+          <FaMoneyBillWave />
+        </div>
+        <div class="stat-title">Price</div>
+        <div class="text-primary stat-value">
+          {currencyFormatter.format(show.price)}
+        </div>
+      </div>
+
+      <div class="stat">
+        <div class="text-secondary w-10 stat-figure">
+          <FaMoneyBillWave />
+        </div>
+        <div class="stat-title">Funded</div>
+        <div class="text-secondary stat-value" />
+      </div>
+    </div>
+    <section
+      class="flex flex-col bg-base-100 rounded-2xl flex-shrink-0 text-white text-center p-4  items-center justify-center "
+    >
+      <div>Funding Address</div>
+    </section>
+  </div>
+{/if}

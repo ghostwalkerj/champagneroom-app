@@ -1,25 +1,17 @@
 import { PUBLIC_CREATORS_ENDPOINT, PUBLIC_RXDB_PASSWORD } from '$env/static/public';
-import {
-	linkDocMethods,
-	linkSchema,
-	type LinkCollection,
-	type LinkDocument
-} from '$lib/ORM/models/link';
-import { transactionSchema, type TransactionCollection } from '$lib/ORM/models/transaction';
+
 import type { StorageTypes } from '$lib/ORM/rxdb';
 import { initRXDB } from '$lib/ORM/rxdb';
 import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
 import { PouchDB, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
-import { callEventSchema, type CallEventCollection } from '../models/callEvent';
+import { type ShowCollection, type ShowDocument, showDocMethods, showSchema } from '$lib/ORM/models/show';
 
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 100;
 type APICollections = {
-	links: LinkCollection;
-	callEvents: CallEventCollection;
-	transactions: TransactionCollection;
+	shows: ShowCollection;
 };
 
 export type APIDBType = RxDatabase<APICollections>;
@@ -27,14 +19,14 @@ const _apiDB = new Map<string, APIDBType>();
 
 export const apiDB = async (
 	token: string,
-	linkId: string,
+	showId: string,
 	storage: StorageTypes
-): Promise<APIDBType> => await create(token, linkId, storage);
+): Promise<APIDBType> => await create(token, showId, storage);
 
-let _thisLink: LinkDocument;
+let _thisShow: ShowDocument;
 
-const create = async (token: string, linkId: string, storage: StorageTypes) => {
-	let _db = _apiDB.get(linkId);
+const create = async (token: string, showId: string, storage: StorageTypes) => {
+	let _db = _apiDB.get(showId);
 	if (_db) return _db;
 
 	initRXDB(storage);
@@ -51,15 +43,9 @@ const create = async (token: string, linkId: string, storage: StorageTypes) => {
 	});
 
 	await _db.addCollections({
-		links: {
-			schema: linkSchema,
-			methods: linkDocMethods
-		},
-		callEvents: {
-			schema: callEventSchema
-		},
-		transactions: {
-			schema: transactionSchema
+		shows: {
+			schema: showSchema,
+			methods: showDocMethods
 		}
 	});
 
@@ -74,74 +60,31 @@ const create = async (token: string, linkId: string, storage: StorageTypes) => {
 				return PouchDB.fetch(url, opts);
 			}
 		});
-		const linkQuery = _db.links.findOne(linkId);
+		const showQuery = _db.shows.findOne(showId);
 
-		let repState = _db.links.syncCouchDB({
+		const repState = _db.shows.syncCouchDB({
 			remote: remoteDB,
 			waitForLeadership: false,
 			options: {
 				retry: true
 			},
-			query: linkQuery
+			query: showQuery
 		});
 		await repState.awaitInitialReplication();
 
-		_thisLink = (await linkQuery.exec()) as LinkDocument;
-		if (_thisLink) {
-			const transactionQuery = _db.transactions.findOne().where('link').eq(linkId);
-			const callEventsQuery = _db.callEvents.findOne().where('link').eq(linkId);
-
-			repState = _db.transactions.syncCouchDB({
-				remote: remoteDB,
-				waitForLeadership: false,
-				options: {
-					retry: true
-				},
-				query: transactionQuery
-			});
-			await repState.awaitInitialReplication();
-
-			repState = _db.callEvents.syncCouchDB({
-				remote: remoteDB,
-				waitForLeadership: false,
-				options: {
-					retry: true
-				},
-				query: callEventsQuery
-			});
-			await repState.awaitInitialReplication();
-
-			_db.links.syncCouchDB({
+		_thisShow = (await showQuery.exec()) as ShowDocument;
+		if (_thisShow) {
+			_db.shows.syncCouchDB({
 				remote: remoteDB,
 				waitForLeadership: false,
 				options: {
 					retry: true,
 					live: true
 				},
-				query: linkQuery
-			});
-
-			_db.transactions.syncCouchDB({
-				remote: remoteDB,
-				waitForLeadership: false,
-				options: {
-					retry: true,
-					live: true
-				},
-				query: transactionQuery
-			});
-
-			_db.callEvents.syncCouchDB({
-				remote: remoteDB,
-				waitForLeadership: false,
-				options: {
-					retry: true,
-					live: true
-				},
-				query: callEventsQuery
+				query: showQuery
 			});
 		}
 	}
-	_apiDB.set(linkId, _db);
+	_apiDB.set(showId, _db);
 	return _db;
 };

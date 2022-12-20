@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { PUBLIC_ESCROW_PERIOD, PUBLIC_ROOM_PATH } from '$env/static/public';
+	import type { LinkMachineStateType } from '$lib/machines/linkMachine';
+	import type { LinkDocument } from '$lib/ORM/models/link';
 	import { currencyFormatter } from '$lib/util/constants';
 	import getProfileImage from '$lib/util/profilePhoto';
 	import spacetime from 'spacetime';
 	import FaMoneyBillWave from 'svelte-icons/fa/FaMoneyBillWave.svelte';
 	import FaRegCopy from 'svelte-icons/fa/FaRegCopy.svelte';
 	import urlJoin from 'url-join';
-	import type { LinkDocument } from '$lib/ORM/models/link';
-	import type { LinkMachineStateType } from '$lib/machines/linkMachine';
 	export let link: LinkDocument;
 	export let linkMachineState: LinkMachineStateType;
 

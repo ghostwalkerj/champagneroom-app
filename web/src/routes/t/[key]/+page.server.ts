@@ -1,10 +1,10 @@
 import { JWT_CREATOR_USER, JWT_EXPIRY, JWT_SECRET } from '$env/static/private';
-import { createLinkMachineService } from '$lib/machines/linkMachine';
 import { talentDB } from '$lib/ORM/dbs/talentDB';
 import { ActorType, type LinkDocument } from '$lib/ORM/models/link';
 import { TransactionReasonType } from '$lib/ORM/models/transaction';
 import { StorageTypes } from '$lib/ORM/rxdb';
-import { error, invalid } from '@sveltejs/kit';
+import { createLinkMachineService } from '$lib/machines/linkMachine';
+import { error, fail } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import type { PageServerLoad } from './$types';
 
@@ -67,10 +67,10 @@ export const actions: import('./$types').Actions = {
 		const amount = data.get('amount') as string;
 
 		if (!amount) {
-			return invalid(400, { amount, missingAmount: true });
+			return fail(400, { amount, missingAmount: true });
 		}
 		if (isNaN(Number(amount)) || Number(amount) < 1 || Number(amount) > 10000) {
-			return invalid(400, { amount, invalidAmount: true });
+			return fail(400, { amount, invalidAmount: true });
 		}
 		const talent = await getTalent(key);
 
@@ -114,11 +114,11 @@ export const actions: import('./$types').Actions = {
 		const amount = data.get('amount') as string;
 
 		if (!amount) {
-			return invalid(400, { amount, missingAmount: true });
+			return fail(400, { amount, missingAmount: true });
 		}
 
 		if (isNaN(Number(amount))) {
-			return invalid(400, { amount, invalidAmount: true });
+			return fail(400, { amount, invalidAmount: true });
 		}
 
 		const talent = await getTalent(key);

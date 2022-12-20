@@ -1,6 +1,6 @@
 {
-  "_id": "858d5b2a73aab4eb8a8039d0ab0234d7",
-  "_rev": "1-f5909f59577337fa73de3c8148841c89",
+  "_id": "9c16b7a080317b15c0db3f6e1906d77e",
+  "_rev": "3-5429fd8d751babe78b1bd551a757d81a",
   "user_ctx": {
     "name": "admin",
     "roles": [
@@ -29,7 +29,7 @@
   "owner": "admin",
   "selector": {
     "_id": {
-      "$regex": "^feedback:"
+      "$regex": "^(show:|ticket:)"
     }
   }
 }
