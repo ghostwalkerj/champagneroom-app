@@ -57,7 +57,7 @@
 <div class="grid grid-flow-row place-content-center">
   <!-- Page header -->
   <div class="text-center">
-    <h1 class="font-bold text-center text-5xl p-4">
+    <h1 class="font-bold text-center text-3xl lg:text-5xl  p-4">
       Welcome to the Champagne Room
     </h1>
   </div>

@@ -6,6 +6,7 @@
 
   import type { ShowDocType } from '$lib/ORM/models/show';
   import type { ShowMachineStateType } from '$lib/machines/showMachine';
+  import { durationFormatter } from '$lib/util/constants';
 
   import {
     BlockTitle,
@@ -47,14 +48,6 @@
   let price = 50;
   let showName = '';
   let showDuration = 15;
-
-  const duration2String = (duration: number): string => {
-    const hours = Math.floor(duration / 60);
-    const minutes = duration % 60;
-    const hoursString = hours > 0 ? `${hours}h ` : '';
-    const minuteString = minutes > 0 ? `${minutes}m` : '';
-    return `${hoursString} ${minuteString}`;
-  };
 
   $: canCreateShow =
     !$currentShow ||
@@ -168,7 +161,7 @@
         <div>
           <BlockTitle class="display-flex justify-content-space-between mt-3">
             <span>Show Duration</span>
-            <span>{duration2String(showDuration)}</span>
+            <span>{durationFormatter(showDuration)}</span>
           </BlockTitle>
           <ListItem class="-mt-2">
             <ListItemCell class="width-auto flex-shrink-0">
@@ -255,7 +248,7 @@
           <Col class="flex flex-col items-center">
             <div class="text-center">
               <div>Duration</div>
-              <div>{duration2String(showDuration)}</div>
+              <div>{durationFormatter(showDuration)}</div>
             </div>
           </Col>
           <Col class="flex flex-col items-center">
@@ -302,7 +295,7 @@
           <Col class="flex flex-col items-center">
             <div class="text-center">
               <div>Duration</div>
-              <div>{duration2String($currentShow.duration)}</div>
+              <div>{durationFormatter($currentShow.duration)}</div>
             </div>
           </Col>
           <Col class="flex flex-col items-center">
