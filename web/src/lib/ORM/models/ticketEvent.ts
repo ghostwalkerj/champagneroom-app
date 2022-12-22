@@ -5,20 +5,19 @@ import {
 	type RxDocument,
 	type RxJsonSchema
 } from 'rxdb';
-import type { ShowDocument } from './show';
 import type { TalentDocument } from './talent';
 import type { TicketDocument } from './ticket';
+import type { ShowDocument } from './show';
 
-export enum ShowEventType {
-	STARTED,
+export enum TicketEventType {
+	ATTEMPT,
 	JOINED,
-	LEFT,
-	ENDED
+	LEFT
 }
 
-const ShowEventSchemaLiteral = {
-	title: 'showEvent',
-	description: 'showEvent for a show',
+const TicketEventSchemaLiteral = {
+	title: 'ticketEvent',
+	description: 'ticketEvent for a ticket',
 	version: 0,
 	type: 'object',
 	primaryKey: '_id',
@@ -29,7 +28,7 @@ const ShowEventSchemaLiteral = {
 		},
 		entityType: {
 			type: 'string',
-			default: 'showEvent',
+			default: 'ticketEvent',
 			maxLength: 20,
 			final: true
 		},
@@ -42,11 +41,11 @@ const ShowEventSchemaLiteral = {
 		},
 		type: {
 			type: 'string',
-			enum: Object.values(ShowEventType),
+			enum: Object.values(TicketEventType),
 		},
 		show: {
 			type: 'string',
-			ref: 'shows',
+			ref: 'ticket',
 			maxLength: 50
 		},
 		talent: {
@@ -60,21 +59,21 @@ const ShowEventSchemaLiteral = {
 			maxLength: 50
 		},
 	},
-	required: ['_id', 'show', 'createdAt', 'type', 'talent']
+	required: ['_id', 'ticket', 'createdAt', 'type', 'talent', 'show']
 } as const;
 
-type ShowEventRef = {
-	show_?: Promise<ShowDocument>;
-	talent_?: Promise<TalentDocument>;
+type TicketEventRef = {
 	ticket_?: Promise<TicketDocument>;
+	talent_?: Promise<TalentDocument>;
+	show_?: Promise<ShowDocument>;
 };
 
-export const ShowEventString = 'showEvent';
+export const TicketEventString = 'ticketEvent';
 
-const schemaTyped = toTypedRxJsonSchema(ShowEventSchemaLiteral);
-export type ShowEventDocType = ExtractDocumentTypeFromTypedRxJsonSchema<typeof schemaTyped>;
+const schemaTyped = toTypedRxJsonSchema(TicketEventSchemaLiteral);
+export type TicketEventDocType = ExtractDocumentTypeFromTypedRxJsonSchema<typeof schemaTyped>;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-export const showEventSchema: RxJsonSchema<ShowEventDocType> = ShowEventSchemaLiteral;
-export type ShowEventDocument = RxDocument<ShowEventDocType> & ShowEventRef;
-export type ShowEventCollection = RxCollection<ShowEventDocType>;
+export const ticketEventSchema: RxJsonSchema<TicketEventDocType> = TicketEventSchemaLiteral;
+export type TicketEventDocument = RxDocument<TicketEventDocType> & TicketEventRef;
+export type TicketEventCollection = RxCollection<TicketEventDocType>;
