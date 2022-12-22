@@ -46,7 +46,13 @@ export const showDocMethods: ShowDocMethods = {
     const db = this.collection.database;
     ticket.show = this._id;
 
-    ticket.ticketState = { status: TicketStatus.CLAIMED, updatedAt: new Date().getTime() };
+    ticket.ticketState = {
+      status: TicketStatus.CLAIMED,
+      updatedAt: new Date().getTime(),
+      price: this.price,
+      refundedAmount: 0,
+      totalPaid: 0,
+    };
     return db.tickets.insert(ticket);
   }
 };

@@ -65,6 +65,12 @@ const ticketSchemaLiteral = {
 					minimum: 0,
 					maximum: 99999
 				},
+				totalPaid: {
+					type: 'integer',
+					default: 0,
+					minimum: 0,
+					maximum: 99999
+				},
 				refundedAmount: {
 					type: 'integer',
 					default: 0,
@@ -91,7 +97,7 @@ const ticketSchemaLiteral = {
 				claim: {
 					type: 'object',
 					properties: {
-						caller: { type: 'string' },
+						ticketHolder: { type: 'string' },
 						pin: { type: 'string' },
 						createdAt: { type: 'integer' },
 						transactions: {
@@ -104,11 +110,11 @@ const ticketSchemaLiteral = {
 							properties: {
 								startedAt: { type: 'integer' },
 								endedAt: { type: 'integer' },
-								callEvents: { type: 'array', ref: 'callEvents', items: { type: 'string' } }
+								showEvents: { type: 'array', ref: 'showEvents', items: { type: 'string' } }
 							}
 						}
 					},
-					required: ['caller', 'pin', 'createdAt']
+					required: ['ticketHolder', 'pin', 'createdAt']
 				},
 				escrow: {
 					type: 'object',
@@ -176,7 +182,7 @@ const ticketSchemaLiteral = {
 				},
 				updatedAt: { type: 'integer' }
 			},
-			required: ['status', 'updatedAt', 'price', 'refundedAmount']
+			required: ['status', 'updatedAt', 'price', 'refundedAmount', 'totalPaid']
 		},
 		talent: { type: 'string', ref: 'talents', maxLength: 50 },
 		agent: { type: 'string', ref: 'agents', maxLength: 70 },

@@ -1,7 +1,7 @@
 import { PUBLIC_ESCROW_PERIOD, PUBLIC_GRACE_PERIOD } from '$env/static/public';
 import { TicketStatus } from '$lib/ORM/models/ticket';
 import type { TransactionDocType } from '$lib/ORM/models/transaction';
-import { actions, assign, createMachine, interpret, type StateFrom } from 'xstate';
+import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 import type { TicketDocType } from '$lib/ORM/models/ticket';
 import { graceTimer, escrowTimer } from './linkMachine';
 
@@ -35,6 +35,9 @@ export const createTicketMachine = (ticketState: TicketStateType, saveState?: St
 					| {
 						type: 'DISPUTE INITIATED';
 						dispute: NonNullable<TicketStateType['dispute']>;
+					}
+					| {
+						type: '';
 					}
 			},
 			predictableActionArguments: true,
@@ -72,7 +75,7 @@ export const createTicketMachine = (ticketState: TicketStateType, saveState?: St
 				claimed: {
 					initial: 'waitin4Payment',
 					states: {
-						waiting4Funding: {
+						waitin4Payment: {
 							always: {
 								target: 'canJoin',
 								cond: 'paid'
@@ -109,6 +112,14 @@ export const createTicketMachine = (ticketState: TicketStateType, saveState?: St
 										'PAYMENT RECEIVED': {
 										}
 									},
+								},
+								connected: {
+									on: {
+										'CALL DISCONNECTED': {
+											actions: ['endCall', 'saveLinkState'],
+											target: 'inGracePeriod'
+										}
+									}
 								},
 								inGracePeriod: {
 									tags: 'callerCanInteract',
@@ -181,58 +192,9 @@ export const createTicketMachine = (ticketState: TicketStateType, saveState?: St
 			},
 		}, {
 		actions: {
-			cancelTicket: assign((context, event) => {
-				return {
-					ticketState: {
-						...context.ticketState,
-						updatedAt: new Date().getTime(),
-						status: TicketStatus.CANCELED,
-						cancel: event.cancel
-					}
-				};
-			}),
-			startCall: assign((context) => {
-				if (context.ticketState.claim) {
-					const call = {
-						...context.ticketState.claim.call,
-						startedAt: Date.now()
-					};
-					return {
-						ticketState: {
-							...context.ticketState,
-							updatedAt: new Date().getTime(),
-							claim: {
-								...context.ticketState.claim,
-								call: call
-							}
-						}
-					};
-				}
-				return {};
-			}),
-
-			endCall: assign((context) => {
-				if (
-					context.ticketState.claim &&
-					context.ticketState.claim.call &&
-					context.ticketState.claim.call.startedAt
-				) {
-					return {
-						ticketState: {
-							...context.ticketState,
-							updatedAt: new Date().getTime(),
-							claim: {
-								...context.ticketState.claim,
-								call: {
-									...context.ticketState.claim.call,
-									endedAt: new Date().getTime()
-								}
-							}
-						}
-					};
-				}
-				return {};
-			}),
+			saveTicketState: (context) => {
+				if (stateCallback) stateCallback(context.ticketState);
+			},
 
 			receiveCallEvent: assign((context, event) => {
 				if (context.ticketState.claim) {
@@ -245,7 +207,7 @@ export const createTicketMachine = (ticketState: TicketStateType, saveState?: St
 								...context.ticketState.claim,
 								call: {
 									...call,
-									callEvents: [...(call.callEvents || []), event.callEvent._id]
+									showEvents: [...(call.showEvents || []), event.callEvent._id]
 								}
 							}
 						}
@@ -274,10 +236,6 @@ export const createTicketMachine = (ticketState: TicketStateType, saveState?: St
 					}
 				};
 			}),
-
-			saveTicketState: (context) => {
-				if (stateCallback) stateCallback(context.ticketState);
-			},
 
 			receivePayment: assign((context, event) => {
 				if (context.ticketState.claim) {
@@ -414,7 +372,7 @@ export const createTicketMachine = (ticketState: TicketStateType, saveState?: St
 					timer = escrowTimer(endTime);
 				}
 				return timer > 0 ? timer : 0;
-			};
+			}
 		},
 		guards: {
 			ticketCancelled: (context) => context.ticketState.status === TicketStatus.CANCELED,
@@ -424,8 +382,8 @@ export const createTicketMachine = (ticketState: TicketStateType, saveState?: St
 			ticketClaimed: (context) => context.ticketState.status === TicketStatus.CLAIMED,
 			ticketInCancellationRequested: (context) =>
 				context.ticketState.status === TicketStatus.CANCELLATION_REQUESTED,
-			fullyFunded: (context) =>
-				context.ticketState.totalFunding >= context.ticketState.requestedAmount,
+			paid: (context) =>
+				context.ticketState.totalPaid >= context.ticketState.price,
 			callConnected: (context) => {
 				return (
 					context.ticketState.status === TicketStatus.CLAIMED &&
@@ -442,7 +400,7 @@ export const createTicketMachine = (ticketState: TicketStateType, saveState?: St
 					context.ticketState.claim.call.startedAt !== undefined &&
 					context.ticketState.claim.call.endedAt !== undefined
 				);
-			};
+			},
 		}
 	}
 	);
