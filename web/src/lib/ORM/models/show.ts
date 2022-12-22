@@ -7,7 +7,7 @@ import {
 } from 'rxdb';
 import type { AgentDocument } from './agent';
 import type { TalentDocument } from './talent';
-import type { TicketDocument } from './ticket';
+import { type TicketDocument, TicketStatus } from './ticket';
 
 export enum ShowStatus {
   CREATED,
@@ -22,8 +22,8 @@ export enum ShowStatus {
 
 type ShowDocMethods = {
   updateShowStateCallBack: () => (_showState: ShowDocument['showState']) => void;
+  createTicket: (show: Partial<TicketDocument>) => Promise<TicketDocument>;
 };
-
 export const showDocMethods: ShowDocMethods = {
   updateShowStateCallBack: function (this: ShowDocument) {
     return (_showState: ShowDocument['showState']) => {
@@ -41,6 +41,13 @@ export const showDocMethods: ShowDocMethods = {
         this.atomicUpdate(atomicUpdate);
       }
     };
+  },
+  createTicket: async function (this: ShowDocument, ticket: Partial<TicketDocument>) {
+    const db = this.collection.database;
+    ticket.show = this._id;
+
+    ticket.ticketState = { status: TicketStatus.CLAIMED, updatedAt: new Date().getTime() };
+    return db.tickets.insert(ticket);
   }
 };
 
@@ -170,4 +177,4 @@ export type ShowDocType = ExtractDocumentTypeFromTypedRxJsonSchema<typeof schema
 // @ts-ignore
 export const showSchema: RxJsonSchema<ShowDocType> = showSchemaLiteral;
 export type ShowDocument = RxDocument<ShowDocType, ShowDocMethods> & showRef;
-export type ShowCollection = RxCollection<ShowDocType, ShowDocMethods>;
+export type ShowCollection = RxCollection<ShowDocType, ShowDocMethods>;;

@@ -118,7 +118,7 @@ type talentRef = {
 };
 
 type TalentDocMethods = {
-	createShow: (ticket: Partial<ShowDocType>) => Promise<ShowDocument>;
+	createShow: (show: Partial<ShowDocType>) => Promise<ShowDocument>;
 	updateStats: () => Promise<TalentDocument['stats']>;
 	getStatsByRange: (range?: { start: number; end: number; }) => Promise<TalentDocument['stats']>;
 };

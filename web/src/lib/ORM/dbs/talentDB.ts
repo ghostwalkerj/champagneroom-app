@@ -6,7 +6,7 @@ import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
 import { PouchDB, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
-import { type ShowCollection, showSchema, showDocMethods } from '$lib/ORM/models/show';
+import { type ShowCollection, showSchema, createTicket, showDocMethods } from '$lib/ORM/models/show';
 import { type TicketCollection, ticketSchema } from '$lib/ORM/models/ticket';
 
 // Sync requires more listeners but ok with http2

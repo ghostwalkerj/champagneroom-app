@@ -1,7 +1,6 @@
 <script lang="ts">
   import type { ShowDocType } from '$lib/ORM/models/show';
   import { currencyFormatter, durationFormatter } from '$lib/util/constants';
-  import FaMoneyBillWave from 'svelte-icons/fa/FaMoneyBillWave.svelte';
   import StarRating from 'svelte-star-rating';
   export let show: ShowDocType;
 </script>
@@ -45,8 +44,6 @@
           </div>
         </div>
       </div>
-
-      <button class="btn btn-primary">Buy a Ticket</button>
     </div>
   </div>
 {/if}

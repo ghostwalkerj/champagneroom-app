@@ -18,3 +18,9 @@ export const durationFormatter = (duration: number): string => {
 	const minuteString = minutes > 0 ? `${minutes}m` : '';
 	return `${hoursString} ${minuteString}`;
 };
+
+export enum ActorType {
+	AGENT,
+	TALENT,
+	CALLER
+}

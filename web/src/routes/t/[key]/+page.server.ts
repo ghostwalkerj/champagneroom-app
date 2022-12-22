@@ -1,12 +1,13 @@
 import { JWT_CREATOR_USER, JWT_EXPIRY, JWT_SECRET } from '$env/static/private';
 import { talentDB } from '$lib/ORM/dbs/talentDB';
-import { ActorType, type LinkDocument } from '$lib/ORM/models/link';
+import type { LinkDocument } from '$lib/ORM/models/link';
 import { TransactionReasonType } from '$lib/ORM/models/transaction';
 import { StorageTypes } from '$lib/ORM/rxdb';
 import { createLinkMachineService } from '$lib/machines/linkMachine';
 import { error, fail } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import type { PageServerLoad } from './$types';
+import { ActorType } from '$lib/util/constants';
 
 const token = jwt.sign(
 	{

@@ -54,14 +54,9 @@
   onMount(async () => {});
 </script>
 
-<div class="grid grid-flow-row place-content-center">
+<div class="grid grid-flow-row place-content-center mt-6">
   <!-- Page header -->
-  <div class="text-center">
-    <h1 class="font-bold text-center text-3xl lg:text-5xl  p-4">
-      Welcome to the Champagne Room
-    </h1>
-  </div>
-  <div class="grid place-content-center">
-    <ShowDetail {show} />
-  </div>
+  <ShowDetail {show} />
+
+  <button class="btn btn-primary">Buy a Ticket</button>
 </div>

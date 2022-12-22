@@ -10,21 +10,16 @@ import {
 } from 'rxdb';
 
 import type { ShowDocument } from './show';
+import { ActorType } from '$lib/util/constants';
 
 export enum TicketStatus {
-	UNCLAIMED,
 	CLAIMED,
+	PAID,
+	CANCELLATION_REQUESTED,
 	CANCELED,
 	FINALIZED,
 	IN_ESCROW,
-	IN_DISPUTE,
-	CANCELLATION_REQUESTED
-}
-
-export enum ActorType {
-	AGENT,
-	TALENT,
-	CUSTOMER
+	IN_DISPUTE
 }
 
 export enum DisputeDecision {
@@ -67,7 +62,7 @@ const ticketSchemaLiteral = {
 				status: {
 					type: 'string',
 					enum: Object.values(TicketStatus),
-					default: TicketStatus.UNCLAIMED
+					default: TicketStatus.CLAIMED
 				},
 				refundedAmount: {
 					type: 'integer',
@@ -180,7 +175,7 @@ const ticketSchemaLiteral = {
 				},
 				updatedAt: { type: 'integer' }
 			},
-			required: ['status', 'totalFunding', 'requestedAmount', 'refundedAmount', 'updatedAt']
+			required: ['status', 'updatedAt']
 		},
 		talent: { type: 'string', ref: 'talents', maxLength: 50 },
 		agent: { type: 'string', ref: 'agents', maxLength: 70 },
@@ -203,6 +198,7 @@ const ticketSchemaLiteral = {
 		'show',
 		'price',
 		'fundingAddress',
+		'ticketState',
 		'createdAt'
 	],
 	indexes: []

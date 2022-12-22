@@ -20,6 +20,7 @@ import {
 	type TransactionDocType,
 	type TransactionDocument
 } from './transaction';
+import { ActorType } from '$lib/util/constants';
 
 export enum LinkStatus {
 	UNCLAIMED,
@@ -29,12 +30,6 @@ export enum LinkStatus {
 	IN_ESCROW,
 	IN_DISPUTE,
 	CANCELLATION_REQUESTED
-}
-
-export enum ActorType {
-	AGENT,
-	TALENT,
-	CALLER
 }
 
 export enum DisputeDecision {
