@@ -4,6 +4,7 @@ import type { TransactionDocType } from '$lib/ORM/models/transaction';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 import type { TicketDocType } from '$lib/ORM/models/ticket';
 import { graceTimer, escrowTimer } from './linkMachine';
+import type { TicketEventDocType } from '$lib/ORM/models/ticketEvent';
 
 type TicketStateType = TicketDocType['ticketState'];
 
@@ -37,7 +38,14 @@ export const createTicketMachine = (ticketState: TicketStateType, saveState?: St
 						dispute: NonNullable<TicketStateType['dispute']>;
 					}
 					| {
-						type: '';
+						type: 'TICKET EVENT RECEIVED';
+						ticketEvent: TicketEventDocType;
+					}
+					| {
+						type: 'JOINED SHOW';
+					}
+					| {
+						type: 'LEFT SHOW';
 					}
 			},
 			predictableActionArguments: true,
@@ -91,17 +99,17 @@ export const createTicketMachine = (ticketState: TicketStateType, saveState?: St
 							}
 						},
 						canJoin: {
-							initial: 'neverConnected',
+							initial: 'neverJoined',
 							states: {
-								neverConnected: {
+								neverJoined: {
 									always: [
 										{
-											target: 'inGracePeriod',
+											target: 'gracePeriod',
 											cond: 'inGracePeriod'
 										},
 										{
-											target: 'connected',
-											cond: 'callConnected'
+											target: 'joined',
+											cond: 'showJoined'
 										}
 									],
 									on: {
@@ -110,18 +118,20 @@ export const createTicketMachine = (ticketState: TicketStateType, saveState?: St
 											actions: ['requestCancellation', 'saveTicketState']
 										},
 										'PAYMENT RECEIVED': {
+										},
+										'JOINED SHOW': {
 										}
 									},
 								},
-								connected: {
+								joined: {
 									on: {
-										'CALL DISCONNECTED': {
+										'LEFT SHOW': {
 											actions: ['endCall', 'saveLinkState'],
-											target: 'inGracePeriod'
+											target: 'gracePeriod'
 										}
 									}
 								},
-								inGracePeriod: {
+								gracePeriod: {
 									tags: 'callerCanInteract',
 									after: {
 										graceDelay: {
@@ -142,6 +152,11 @@ export const createTicketMachine = (ticketState: TicketStateType, saveState?: St
 									}
 								}
 							},
+							on: {
+								'TICKET EVENT RECEIVED': {
+									actions: ['receiveTicketEvent', 'saveTicketState']
+								}
+							}
 						},
 						requestedCancellation: {
 							initial: 'waiting4Refund',
@@ -196,7 +211,7 @@ export const createTicketMachine = (ticketState: TicketStateType, saveState?: St
 				if (stateCallback) stateCallback(context.ticketState);
 			},
 
-			receiveCallEvent: assign((context, event) => {
+			receiveTicketEvent: assign((context, event) => {
 				if (context.ticketState.claim) {
 					const call = context.ticketState.claim.call || {};
 					return {
@@ -207,7 +222,7 @@ export const createTicketMachine = (ticketState: TicketStateType, saveState?: St
 								...context.ticketState.claim,
 								call: {
 									...call,
-									showEvents: [...(call.showEvents || []), event.callEvent._id]
+									showEvents: [...(call.showEvents || []), event.ticketEvent._id]
 								}
 							}
 						}
@@ -384,7 +399,7 @@ export const createTicketMachine = (ticketState: TicketStateType, saveState?: St
 				context.ticketState.status === TicketStatus.CANCELLATION_REQUESTED,
 			paid: (context) =>
 				context.ticketState.totalPaid >= context.ticketState.price,
-			callConnected: (context) => {
+			showJoined: (context) => {
 				return (
 					context.ticketState.status === TicketStatus.CLAIMED &&
 					context.ticketState.claim !== undefined &&
