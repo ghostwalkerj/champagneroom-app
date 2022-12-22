@@ -100,6 +100,7 @@
 				"group": "Default"
 			}
 		],
-		"favorites.sortOrder": "ASC"
+		"favorites.sortOrder": "ASC",
+		"favorites.sortDirection": "ASC"
 	}
 }

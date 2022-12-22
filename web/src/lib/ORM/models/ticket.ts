@@ -50,12 +50,7 @@ const ticketSchemaLiteral = {
 			type: 'string',
 			maxLength: 50
 		},
-		price: {
-			type: 'integer',
-			default: 0,
-			minimum: 0,
-			maximum: 99999
-		},
+
 		ticketState: {
 			type: 'object',
 			properties: {
@@ -63,6 +58,12 @@ const ticketSchemaLiteral = {
 					type: 'string',
 					enum: Object.values(TicketStatus),
 					default: TicketStatus.CLAIMED
+				},
+				price: {
+					type: 'integer',
+					default: 0,
+					minimum: 0,
+					maximum: 99999
 				},
 				refundedAmount: {
 					type: 'integer',
@@ -175,7 +176,7 @@ const ticketSchemaLiteral = {
 				},
 				updatedAt: { type: 'integer' }
 			},
-			required: ['status', 'updatedAt']
+			required: ['status', 'updatedAt', 'price', 'refundedAmount']
 		},
 		talent: { type: 'string', ref: 'talents', maxLength: 50 },
 		agent: { type: 'string', ref: 'agents', maxLength: 70 },
@@ -196,7 +197,6 @@ const ticketSchemaLiteral = {
 		'talent',
 		'agent',
 		'show',
-		'price',
 		'fundingAddress',
 		'ticketState',
 		'createdAt'
