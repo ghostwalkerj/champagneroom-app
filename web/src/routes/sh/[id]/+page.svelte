@@ -1,17 +1,13 @@
 <script lang="ts">
   import { applyAction, enhance } from '$app/forms';
   import { page } from '$app/stores';
-  import {
-    createShowMachineService,
-    type ShowMachineStateType,
-    type ShowMachineServiceType,
-  } from '$lib/machines/showMachine';
+  import { createShowMachineService } from '$lib/machines/showMachine';
 
   import {
     publicShowDB,
     type PublicShowDBType,
   } from '$lib/ORM/dbs/publicShowDB';
-  import type { ShowDocument } from '$lib/ORM/models/show';
+  import { type ShowDocument, ShowStatus } from '$lib/ORM/models/show';
   import { StorageTypes } from '$lib/ORM/rxdb';
   import getProfileImage from '$lib/util/profilePhoto';
   import { onMount } from 'svelte';
@@ -28,21 +24,25 @@
 
   $: waiting4StateChange = false;
   $: profileImage = getProfileImage(displayName);
-  $: canBuyTicket = false;
+  $: canBuyTicket = show.showState.status === ShowStatus.BOX_OFFICE_OPEN;
 
   publicShowDB(token, showId, StorageTypes.IDB).then((db: PublicShowDBType) => {
     db.shows.findOne(showId).$.subscribe(_show => {
       if (_show) {
-        // Here is where we run the machine and do all the logic based on the state
-        const showService = createShowMachineService(_show.showState);
-        showService.onTransition(state => {
-          if (state.changed) {
-            canBuyTicket = state.matches('boxOfficeOpen');
+        _show.$.subscribe(_show => {
+          if (_show) {
+            // Here is where we run the machine and do all the logic based on the state
+            // const showService = createShowMachineService(_show.showState);
+            // showService.onTransition(state => {
+            //   if (state.changed) {
+            //     canBuyTicket = state.matches('boxOfficeOpen');
+            //   }
+            // });
+            show = _show as ShowDocument;
+            waiting4StateChange = false;
           }
         });
       }
-      show = _show as ShowDocument;
-      waiting4StateChange = false;
     });
   });
 
@@ -62,10 +62,11 @@
   onMount(async () => {});
 </script>
 
-<div class="grid grid-flow-row mt-6 h-[calc(100vh-120px)] ">
+<div class="mt-6 flex flex-col h-[calc(100vh-120px)] ">
   <!-- Page header -->
-  <ShowDetail {show} />
-
+  {#key show}
+    <ShowDetail {show} />
+  {/key}
   {#if canBuyTicket}
     <div class="text-center p-4">
       <button class="btn btn-primary">Buy a Ticket</button>

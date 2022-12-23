@@ -29,7 +29,7 @@
 </script>
 
 {#if show}
-  <div class="w-screen flex justify-center">
+  <div class="w-screen flex h-full justify-center">
     <div
       class="flex  flex-col w-full p-4  max-w-2xl  gap-4 rounded-xl bg-base-200 h-full overflow-auto"
     >
