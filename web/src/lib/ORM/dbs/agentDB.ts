@@ -14,7 +14,6 @@ import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
 import { PouchDB, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
-import { callEventSchema, type CallEventCollection } from '../models/callEvent';
 
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 100;
@@ -23,7 +22,6 @@ type AllCollections = {
 	agents: AgentCollection;
 	talents: TalentCollection;
 	links: LinkCollection;
-	callEvents: CallEventCollection;
 	transactions: TransactionCollection;
 };
 
@@ -64,9 +62,7 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 			schema: linkSchema,
 			methods: linkDocMethods
 		},
-		callEvents: {
-			schema: callEventSchema
-		},
+
 		transactions: {
 			schema: transactionSchema
 		}
@@ -88,7 +84,6 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 		const talentQuery = _db.talents.find().where('agent').eq(agentId);
 		const talentIDs = await talentQuery.exec().then((talents) => talents.map((t) => t._id));
 		const linkQuery = _db.links.find().where('talent').in(talentIDs);
-		const callEventQuery = _db.callEvents.find().where('talent').in(talentIDs);
 		const transactionQuery = _db.transactions.find().where('talent').in(talentIDs);
 
 		let repState = _db.agents.syncCouchDB({
@@ -118,16 +113,6 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 				retry: true
 			},
 			query: linkQuery
-		});
-		await repState.awaitInitialReplication();
-
-		repState = _db.callEvents.syncCouchDB({
-			remote: remoteDB,
-			waitForLeadership: false,
-			options: {
-				retry: true
-			},
-			query: callEventQuery
 		});
 		await repState.awaitInitialReplication();
 
@@ -168,15 +153,7 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 			},
 			query: linkQuery
 		});
-		_db.callEvents.syncCouchDB({
-			remote: remoteDB,
-			waitForLeadership: false,
-			options: {
-				retry: true,
-				live: true
-			},
-			query: callEventQuery
-		});
+
 		_db.transactions.syncCouchDB({
 			remote: remoteDB,
 			waitForLeadership: false,

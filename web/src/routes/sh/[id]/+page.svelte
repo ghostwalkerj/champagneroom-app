@@ -1,6 +1,11 @@
 <script lang="ts">
   import { applyAction, enhance } from '$app/forms';
   import { page } from '$app/stores';
+  import {
+    createShowMachineService,
+    type ShowMachineStateType,
+    type ShowMachineServiceType,
+  } from '$lib/machines/showMachine';
 
   import {
     publicShowDB,
@@ -23,15 +28,18 @@
 
   $: waiting4StateChange = false;
   $: profileImage = getProfileImage(displayName);
+  $: canBuyTicket = false;
 
   publicShowDB(token, showId, StorageTypes.IDB).then((db: PublicShowDBType) => {
     db.shows.findOne(showId).$.subscribe(_show => {
       if (_show) {
         // Here is where we run the machine and do all the logic based on the state
-        // linkService = createLinkMachineService(_show.linkState);
-        // linkService.subscribe(state => {
-        //   linkMachineState = state;
-        // });
+        const showService = createShowMachineService(_show.showState);
+        showService.onTransition(state => {
+          if (state.changed) {
+            canBuyTicket = state.matches('boxOfficeOpen');
+          }
+        });
       }
       show = _show as ShowDocument;
       waiting4StateChange = false;
@@ -58,5 +66,7 @@
   <!-- Page header -->
   <ShowDetail {show} />
 
-  <button class="btn btn-primary">Buy a Ticket</button>
+  {#if canBuyTicket}
+    <button class="btn btn-primary">Buy a Ticket</button>
+  {/if}
 </div>

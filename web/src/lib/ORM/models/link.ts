@@ -1,10 +1,5 @@
 import type { AgentDocument } from '$lib/ORM/models/agent';
-import {
-	CallEventString,
-	type CallEventDocType,
-	type CallEventDocument,
-	type CallEventType
-} from '$lib/ORM/models/callEvent';
+
 import type { TalentDocument } from '$lib/ORM/models/talent';
 import { nanoid } from 'nanoid';
 import {
@@ -47,7 +42,6 @@ type LinkDocMethods = {
 		value: string;
 		reason: TransactionReasonType;
 	}) => Promise<TransactionDocument>;
-	createCallEvent: (type: CallEventType) => Promise<CallEventDocument>;
 	updateLinkStateCallBack: () => (_linkState: LinkDocument['linkState']) => void;
 };
 
@@ -74,21 +68,7 @@ export const linkDocMethods: LinkDocMethods = {
 		};
 		return db.transactions.insert(_transaction);
 	},
-	createCallEvent: async function (this: LinkDocument, type: CallEventType) {
-		const _linkState = this.linkState;
-		if (!_linkState.claim) throw new Error('Link not claimed');
 
-		const db = this.collection.database;
-		const _callEvent: CallEventDocType = {
-			_id: `${CallEventString}:ce-${nanoid()}`,
-			createdAt: new Date().getTime(),
-			updatedAt: new Date().getTime(),
-			link: this._id,
-			talent: this.talent,
-			type
-		};
-		return db.callEvents.insert(_callEvent);
-	},
 	updateLinkStateCallBack: function (this: LinkDocument) {
 		return (_linkState: LinkDocument['linkState']) => {
 			if (_linkState.updatedAt > this.linkState.updatedAt) {
@@ -329,7 +309,6 @@ const linkSchemaLiteral = {
 type linkRef = {
 	talent_?: Promise<TalentDocument>;
 	agent_?: Promise<AgentDocument>;
-	callEvents_?: Promise<CallEventDocument>;
 	transactions_?: Promise<TransactionDocument[]>;
 };
 

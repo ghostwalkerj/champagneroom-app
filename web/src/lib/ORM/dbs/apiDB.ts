@@ -6,7 +6,7 @@ import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
 import { PouchDB, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
-import { type ShowCollection, type ShowDocument, createTicket, showSchema } from '$lib/ORM/models/show';
+import { type ShowCollection, type ShowDocument, showSchema, showDocMethods } from '$lib/ORM/models/show';
 
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 100;
@@ -45,7 +45,7 @@ const create = async (token: string, showId: string, storage: StorageTypes) => {
 	await _db.addCollections({
 		shows: {
 			schema: showSchema,
-			methods: createTicket
+			methods: showDocMethods
 		}
 	});
 

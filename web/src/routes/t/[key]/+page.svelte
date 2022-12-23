@@ -12,7 +12,6 @@
     type LinkMachineServiceType,
   } from '$lib/machines/linkMachine';
   import { talentDB, type TalentDBType } from '$lib/ORM/dbs/talentDB';
-  import { CallEventType } from '$lib/ORM/models/callEvent';
   import type { LinkDocType, LinkDocument } from '$lib/ORM/models/link';
   import type { TalentDocType, TalentDocument } from '$lib/ORM/models/talent';
   import { StorageTypes } from '$lib/ORM/rxdb';
@@ -149,52 +148,52 @@
     import('$lib/util/videoCall').then(_vc => {
       videoCall = _vc.videoCall;
       vc = videoCall(callId);
-      vc.callEvent.subscribe(ce => {
-        // Log call events on the Talent side
-        if (ce) {
-          callEvent = ce;
-          let eventType: CallEventType | undefined;
-          switch (ce.type) {
-            case 'CALL INCOMING':
-              eventType = CallEventType.ATTEMPT;
-              break;
+      // vc.callEvent.subscribe(ce => {
+      //   // Log call events on the Talent side
+      //   if (ce) {
+      //     callEvent = ce;
+      //     let eventType: CallEventType | undefined;
+      //     switch (ce.type) {
+      //       case 'CALL INCOMING':
+      //         eventType = CallEventType.ATTEMPT;
+      //         break;
 
-            case 'CALL ACCEPTED':
-              eventType = CallEventType.ANSWER;
-              break;
+      //       case 'CALL ACCEPTED':
+      //         eventType = CallEventType.ANSWER;
+      //         break;
 
-            case 'CALL CONNECTED':
-              eventType = CallEventType.CONNECT;
-              linkMachineService.send('CALL CONNECTED');
-              break;
+      //       case 'CALL CONNECTED':
+      //         eventType = CallEventType.CONNECT;
+      //         linkMachineService.send('CALL CONNECTED');
+      //         break;
 
-            case 'CALL UNANSWERED':
-              eventType = CallEventType.NO_ANSWER;
-              break;
+      //       case 'CALL UNANSWERED':
+      //         eventType = CallEventType.NO_ANSWER;
+      //         break;
 
-            case 'CALL REJECTED':
-              eventType = CallEventType.REJECT;
-              break;
+      //       case 'CALL REJECTED':
+      //         eventType = CallEventType.REJECT;
+      //         break;
 
-            case 'CALL DISCONNECTED':
-              eventType = CallEventType.DISCONNECT;
-              linkMachineService.send('CALL DISCONNECTED');
-              break;
+      //       case 'CALL DISCONNECTED':
+      //         eventType = CallEventType.DISCONNECT;
+      //         linkMachineService.send('CALL DISCONNECTED');
+      //         break;
 
-            case 'CALL HANGUP':
-              eventType = CallEventType.HANGUP;
-              break;
-          }
-          if (eventType !== undefined) {
-            currentLink.createCallEvent(eventType).then(callEvent => {
-              linkMachineService.send({
-                type: 'CALL EVENT RECEIVED',
-                callEvent,
-              });
-            });
-          }
-        }
-      });
+      //       case 'CALL HANGUP':
+      //         eventType = CallEventType.HANGUP;
+      //         break;
+      //     }
+      //     if (eventType !== undefined) {
+      //       currentLink.createCallEvent(eventType).then(callEvent => {
+      //         linkMachineService.send({
+      //           type: 'CALL EVENT RECEIVED',
+      //           callEvent,
+      //         });
+      //       });
+      //     }
+      //   }
+      // });
 
       vc.callMachineState.subscribe(cs => {
         // Logic for all of the possible call states
@@ -246,14 +245,14 @@
             talentObj = _talent;
             talent = _talent;
             talent.get$('currentLink').subscribe(linkId => {
-              if (linkId) {
-                db.links
-                  .findOne(linkId)
-                  .exec()
-                  .then(link => {
-                    if (link) useLink(link);
-                  });
-              }
+              // if (linkId) {
+              //   db.links
+              //     .findOne(linkId)
+              //     .exec()
+              //     .then(link => {
+              //       if (link) useLink(link);
+              //     });
+              // }
             });
           }
         });
