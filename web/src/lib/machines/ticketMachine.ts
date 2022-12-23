@@ -1,15 +1,19 @@
-import { PUBLIC_ESCROW_PERIOD, PUBLIC_GRACE_PERIOD } from '$env/static/public';
+import { PUBLIC_ESCROW_PERIOD } from '$env/static/public';
 import { TicketStatus } from '$lib/ORM/models/ticket';
 import type { TransactionDocType } from '$lib/ORM/models/transaction';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 import type { TicketDocType } from '$lib/ORM/models/ticket';
-import { graceTimer, escrowTimer } from './linkMachine';
 import type { TicketEventDocType } from '$lib/ORM/models/ticketEvent';
 
 type TicketStateType = TicketDocType['ticketState'];
+const ESCROW_PERIOD = Number(PUBLIC_ESCROW_PERIOD || 3600000);
 
 type StateCallBackType = (state: TicketStateType) => void;
 
+export const escrowTimer = (endTime: number) => {
+	const timer = endTime + ESCROW_PERIOD - new Date().getTime();
+	return timer > 0 ? timer : 0;
+};
 export const createTicketMachine = (ticketState: TicketStateType, saveState?: StateCallBackType) => {
 	const stateCallback = saveState;
 
@@ -81,12 +85,12 @@ export const createTicketMachine = (ticketState: TicketStateType, saveState?: St
 					]
 				},
 				claimed: {
-					initial: 'waitin4Payment',
+					initial: 'waiting4Payment',
 					states: {
-						waitin4Payment: {
+						waiting4Payment: {
 							always: {
 								target: 'canJoin',
-								cond: 'paid'
+								cond: 'fullyPaid'
 							},
 							on: {
 								'REQUEST CANCELLATION': {
@@ -103,10 +107,6 @@ export const createTicketMachine = (ticketState: TicketStateType, saveState?: St
 							states: {
 								neverJoined: {
 									always: [
-										{
-											target: 'gracePeriod',
-											cond: 'inGracePeriod'
-										},
 										{
 											target: 'joined',
 											cond: 'showJoined'
@@ -126,31 +126,11 @@ export const createTicketMachine = (ticketState: TicketStateType, saveState?: St
 								joined: {
 									on: {
 										'LEFT SHOW': {
-											actions: ['endCall', 'saveLinkState'],
-											target: 'gracePeriod'
+											actions: ['saveTicketState'],
 										}
 									}
 								},
-								gracePeriod: {
-									tags: 'callerCanInteract',
-									after: {
-										graceDelay: {
-											target: '#ticketMachine.inEscrow',
-											actions: ['enterEscrow', 'saveTicketState'],
-											internal: false
-										}
-									},
-									on: {
-										'FEEDBACK RECEIVED': {
-											target: '#ticketMachine.finalized',
-											actions: ['receiveFeedback', 'finalizeticket', 'saveTicketState']
-										},
-										'DISPUTE INITIATED': {
-											target: '#ticketMachine.inDispute',
-											actions: ['initiateDispute', 'saveTicketState']
-										}
-									}
-								}
+
 							},
 							on: {
 								'TICKET EVENT RECEIVED': {
@@ -213,21 +193,18 @@ export const createTicketMachine = (ticketState: TicketStateType, saveState?: St
 
 			receiveTicketEvent: assign((context, event) => {
 				if (context.ticketState.claim) {
-					const call = context.ticketState.claim.call || {};
+					const claim = context.ticketState.claim || {};
 					return {
 						ticketState: {
 							...context.ticketState,
 							updatedAt: new Date().getTime(),
 							claim: {
-								...context.ticketState.claim,
-								call: {
-									...call,
-									showEvents: [...(call.showEvents || []), event.ticketEvent._id]
-								}
+								...claim,
+								showEvents: [...(claim.ticketEvents || []), event.ticketEvent._id]
 							}
 						}
 					};
-				}
+				};
 				return {};
 			}),
 
@@ -258,7 +235,7 @@ export const createTicketMachine = (ticketState: TicketStateType, saveState?: St
 						ticketState: {
 							...context.ticketState,
 							updatedAt: new Date().getTime(),
-							totalFunding: context.ticketState.totalFunding + Number(event.transaction.value),
+							totalPaid: context.ticketState.totalPaid + Number(event.transaction.value),
 							claim: {
 								...context.ticketState.claim,
 								transactions: context.ticketState.claim.transactions
@@ -311,23 +288,6 @@ export const createTicketMachine = (ticketState: TicketStateType, saveState?: St
 				};
 			}),
 
-			enterEscrow: assign((context) => {
-				if (context.ticketState.status !== TicketStatus.IN_ESCROW) {
-					const escrow = {
-						startedAt: new Date().getTime()
-					} as NonNullable<TicketStateType['escrow']>;
-					return {
-						ticketState: {
-							...context.ticketState,
-							updatedAt: new Date().getTime(),
-							status: TicketStatus.IN_ESCROW,
-							escrow: escrow
-						}
-					};
-				}
-				return {};
-			}),
-
 			exitEscrow: assign((context) => {
 				if (context.ticketState.status === TicketStatus.IN_ESCROW && context.ticketState.escrow) {
 					return {
@@ -362,30 +322,9 @@ export const createTicketMachine = (ticketState: TicketStateType, saveState?: St
 			})
 		},
 		delays: {
-			graceDelay: (context) => {
-				let timer = 0;
-				if (
-					context.ticketState.claim &&
-					context.ticketState.claim.call &&
-					context.ticketState.claim.call.startedAt
-				) {
-					timer = graceTimer(context.ticketState.claim.call.startedAt);
-				}
-				console.log('graceDelay', timer);
-				return timer > 0 ? timer : 0;
-			},
-			escrowDelay: (context) => {
-				let timer = 0;
+			escrowDelay: () => {
+				const timer = 0;
 
-				if (
-					context.ticketState.claim &&
-					context.ticketState.claim.call &&
-					context.ticketState.claim.call.startedAt
-				) {
-					const endTime =
-						context.ticketState.claim.call.endedAt || context.ticketState.claim.call.startedAt;
-					timer = escrowTimer(endTime);
-				}
 				return timer > 0 ? timer : 0;
 			}
 		},
@@ -397,23 +336,12 @@ export const createTicketMachine = (ticketState: TicketStateType, saveState?: St
 			ticketClaimed: (context) => context.ticketState.status === TicketStatus.CLAIMED,
 			ticketInCancellationRequested: (context) =>
 				context.ticketState.status === TicketStatus.CANCELLATION_REQUESTED,
-			paid: (context) =>
+			fullyPaid: (context) =>
 				context.ticketState.totalPaid >= context.ticketState.price,
 			showJoined: (context) => {
 				return (
 					context.ticketState.status === TicketStatus.CLAIMED &&
-					context.ticketState.claim !== undefined &&
-					context.ticketState.claim.call !== undefined &&
-					context.ticketState.claim.call.startedAt !== undefined
-				);
-			},
-			inGracePeriod: (context) => {
-				return (
-					context.ticketState.status === TicketStatus.CLAIMED &&
-					context.ticketState.claim !== undefined &&
-					context.ticketState.claim.call !== undefined &&
-					context.ticketState.claim.call.startedAt !== undefined &&
-					context.ticketState.claim.call.endedAt !== undefined
+					context.ticketState.claim !== undefined
 				);
 			},
 		}

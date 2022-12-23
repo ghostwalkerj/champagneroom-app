@@ -118,7 +118,7 @@ type talentRef = {
 };
 
 type TalentDocMethods = {
-	createShow: (show: Partial<ShowDocType>) => Promise<ShowDocument>;
+	createShow: (showProps: { duration: number, name: string, maxNumTickets: number, price: number; }) => Promise<ShowDocument>;
 	updateStats: () => Promise<TalentDocument['stats']>;
 	getStatsByRange: (range?: { start: number; end: number; }) => Promise<TalentDocument['stats']>;
 };
@@ -126,25 +126,28 @@ type TalentDocMethods = {
 export const talentDocMethods: TalentDocMethods = {
 	createShow: async function (
 		this: TalentDocument,
-		show: Partial<ShowDocType>
+		showProps: { duration: number, name: string, maxNumTickets: number, price: number; }
 	): Promise<ShowDocument> {
 		const db = this.collection.database;
-		show.talent = this._id;
-		show.talentInfo = {
-			name: this.name,
-			profileImageUrl: this.profileImageUrl,
-			stats: {
-				ratingAvg: this.stats.ratingAvg,
-				numCompletedShows: this.stats.numCompletedShows,
-			}
-		};
-		show.showState = { status: ShowStatus.BOX_OFFICE_OPEN, updatedAt: new Date().getTime() };
-		show.salesStats = { ticketsSold: 0, totalSales: 0 };
-		show._id = `${ShowString}:sh-${nanoid()}`;
-		show.createdAt = new Date().getTime();
-		show.updatedAt = new Date().getTime();
-		show.agent = this.agent;
-		show.roomId = uuidv4();
+		const show = {
+			...showProps,
+			talent: this._id,
+			talentInfo: {
+				name: this.name,
+				profileImageUrl: this.profileImageUrl,
+				stats: {
+					ratingAvg: this.stats.ratingAvg,
+					numCompletedShows: this.stats.numCompletedShows,
+				}
+			},
+			showState: { status: ShowStatus.BOX_OFFICE_OPEN, updatedAt: new Date().getTime() },
+			salesStats: { ticketsSold: 0, totalSales: 0 },
+			_id: `${ShowString}:sh-${nanoid()}`,
+			createdAt: new Date().getTime(),
+			updatedAt: new Date().getTime(),
+			agent: this.agent,
+			roomId: uuidv4()
+		} as ShowDocType;
 		const newShow = await db.shows.insert(show);
 		this.update({ $set: { currentShow: newShow._id } });
 		return newShow;

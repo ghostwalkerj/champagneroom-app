@@ -8,6 +8,8 @@ import { error, fail } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import type { PageServerLoad } from './$types';
 import { ActorType } from '$lib/util/constants';
+import type { ShowDocument } from '$lib/ORM/models/show';
+import { createShowMachineService } from '$lib/machines/showMachine';
 
 const token = jwt.sign(
 	{
@@ -44,69 +46,90 @@ export const load: PageServerLoad = async ({ params }) => {
 
 	const _talent = await getTalent(key);
 	await _talent.updateStats();
-	const _currentLink = (await _talent.populate('currentLink')) as LinkDocument;
-	const _completedCalls = (await _talent.populate('stats.completedCalls')) as LinkDocument[];
+	const _currentShow = (await _talent.populate('currentShow')) as ShowDocument;
+	const _completedShows = (await _talent.populate('stats.completedShows')) as ShowDocument[];
 	const talent = _talent.toJSON();
-	const currentLink = _currentLink ? _currentLink.toJSON() : undefined;
-	const completedCalls = _completedCalls.map((link) => link.toJSON());
+	const currentShow = _currentShow ? _currentShow.toJSON() : undefined;
+	const completedShows = _completedShows.map((link) => link.toJSON());
 
 	return {
 		token,
 		talent,
-		currentLink,
-		completedCalls
+		currentShow,
+		completedShows
 	};
 };
 
 export const actions: import('./$types').Actions = {
-	create_link: async ({ params, request }) => {
+	create_show: async ({ params, request }) => {
 		const key = params.key;
 		if (key === null) {
 			throw error(404, 'Key not found');
 		}
 		const data = await request.formData();
-		const amount = data.get('amount') as string;
+		const price = data.get('amount') as string;
+		const name = data.get('name') as string;
+		const duration = data.get('duration') as string;
+		const maxNumTickets = data.get('maxNumTickets') as string;
 
-		if (!amount) {
-			return fail(400, { amount, missingAmount: true });
+		if (!price) {
+			return fail(400, { price, missingPrice: true });
 		}
-		if (isNaN(Number(amount)) || Number(amount) < 1 || Number(amount) > 10000) {
-			return fail(400, { amount, invalidAmount: true });
+		if (isNaN(Number(price)) || Number(price) < 1 || Number(price) > 10000) {
+			return fail(400, { price, invalidPrice: true });
 		}
+
+		if (!name) {
+			return fail(400, { name, missingName: true });
+		}
+
+		if (!duration) {
+			return fail(400, { duration, missingDuration: true });
+		}
+		if (isNaN(Number(duration)) || Number(duration) < 1 || Number(duration) > 360) {
+			return fail(400, { duration, invalidDuration: true });
+		}
+
+		if (!maxNumTickets) {
+			return fail(400, { maxNumTickets, missingMaxNumTickets: true });
+		}
+		if (isNaN(Number(maxNumTickets)) || Number(maxNumTickets) < 1 || Number(maxNumTickets) > 1000) {
+			return fail(400, { maxNumTickets, invalidMaxNumTickets: true });
+		}
+
 		const talent = await getTalent(key);
-
-		talent.createShow(Number(amount));
+		talent.createShow(
+			{
+				name,
+				price: Number(price),
+				duration: Number(duration),
+				maxNumTickets: Number(maxNumTickets)
+			}
+		);
 		return { success: true };
 	},
-	cancel_link: async ({ params }) => {
+	cancel_show: async ({ params }) => {
 		const key = params.key;
 		if (key === null) {
 			throw error(404, 'Key not found');
 		}
 
 		const talent = await getTalent(key);
-		const cancelLink = (await talent.populate('currentLink')) as LinkDocument;
-		if (!cancelLink) {
+		const cancelShow = (await talent.populate('currentShow')) as ShowDocument;
+		if (!cancelShow) {
 			throw error(404, 'Link not found');
 		}
 
-		const linkService = createLinkMachineService(
-			cancelLink.linkState,
-			cancelLink.updateLinkStateCallBack()
+		const showService = createShowMachineService(
+			cancelShow.showState,
+			cancelShow.updateShowStateCallBack()
 		);
-		const currentLinkState = linkService.getSnapshot();
-
-		linkService.send({
+		showService.send({
 			type: 'REQUEST CANCELLATION',
-			cancel: {
-				createdAt: new Date().getTime(),
-				canceledInState: JSON.stringify(currentLinkState.value),
-				canceler: ActorType.TALENT
-			}
 		});
 		return { success: true };
 	},
-	send_refund: async ({ params, request }) => {
+	send_refunds: async ({ params, request }) => {
 		const key = params.key;
 		if (key === null) {
 			throw error(404, 'Key not found');

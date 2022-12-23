@@ -7,7 +7,8 @@ import {
 } from 'rxdb';
 import type { AgentDocument } from './agent';
 import type { TalentDocument } from './talent';
-import { type TicketDocument, TicketStatus } from './ticket';
+import { type TicketDocument, TicketStatus, TicketDocType, TicketString } from './ticket';
+import { nanoid } from 'nanoid';
 
 export enum ShowStatus {
   CREATED,
@@ -22,7 +23,7 @@ export enum ShowStatus {
 
 type ShowDocMethods = {
   updateShowStateCallBack: () => (_showState: ShowDocument['showState']) => void;
-  createTicket: (show: Partial<TicketDocument>) => Promise<TicketDocument>;
+  createTicket: (ticketProps: { ticketHolder: string, pin: string; }) => Promise<TicketDocument>;
 };
 export const showDocMethods: ShowDocMethods = {
   updateShowStateCallBack: function (this: ShowDocument) {
@@ -42,17 +43,30 @@ export const showDocMethods: ShowDocMethods = {
       }
     };
   },
-  createTicket: async function (this: ShowDocument, ticket: Partial<TicketDocument>) {
+  createTicket: async function (this: ShowDocument, ticketProps: { ticketHolder: string, pin: string; }) {
     const db = this.collection.database;
-    ticket.show = this._id;
-
-    ticket.ticketState = {
-      status: TicketStatus.CLAIMED,
+    const ticket = {
+      _id: `${TicketString}:ti-${nanoid()}`,
+      createdAt: new Date().getTime(),
       updatedAt: new Date().getTime(),
-      price: this.price,
-      refundedAmount: 0,
-      totalPaid: 0,
-    };
+      entityType: TicketString,
+      paymentAddress: '0x0000000000000000000000000000000000000000', // TODO: generate payment address
+      show: this._id,
+      agent: this.agent,
+      talent: this.talent,
+      ticketState: {
+        status: TicketStatus.CLAIMED,
+        updatedAt: new Date().getTime(),
+        price: this.price,
+        refundedAmount: 0,
+        totalPaid: 0,
+        claim: {
+          createdAt: new Date().getTime(),
+          ticketHolder: ticketProps.ticketHolder,
+          pin: ticketProps.pin,
+        }
+      }
+    } as TicketDocType;
     return db.tickets.insert(ticket);
   }
 };

@@ -46,7 +46,7 @@ const ticketSchemaLiteral = {
 			maxLength: 20,
 			final: true
 		},
-		fundingAddress: {
+		paymentAddress: {
 			type: 'string',
 			maxLength: 50
 		},
@@ -105,13 +105,8 @@ const ticketSchemaLiteral = {
 							ref: 'transactions',
 							items: { type: 'string' }
 						},
-						call: {
-							type: 'object',
-							properties: {
-								startedAt: { type: 'integer' },
-								endedAt: { type: 'integer' },
-								showEvents: { type: 'array', ref: 'showEvents', items: { type: 'string' } }
-							}
+						ticketEvents: {
+							type: 'array', ref: 'ticketEvents', items: { type: 'string' }
 						}
 					},
 					required: ['ticketHolder', 'pin', 'createdAt']
@@ -182,7 +177,7 @@ const ticketSchemaLiteral = {
 				},
 				updatedAt: { type: 'integer' }
 			},
-			required: ['status', 'updatedAt', 'price', 'refundedAmount', 'totalPaid']
+			required: ['status', 'updatedAt', 'price', 'refundedAmount', 'totalPaid', 'claim']
 		},
 		talent: { type: 'string', ref: 'talents', maxLength: 50 },
 		agent: { type: 'string', ref: 'agents', maxLength: 70 },
@@ -203,7 +198,7 @@ const ticketSchemaLiteral = {
 		'talent',
 		'agent',
 		'show',
-		'fundingAddress',
+		'paymentAddress',
 		'ticketState',
 		'createdAt'
 	],
