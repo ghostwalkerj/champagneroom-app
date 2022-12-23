@@ -34,7 +34,10 @@ export const createShowMachine = (showState: ShowStateType, saveState?: StateCal
 				events: {} as
 					| { type: 'REQUEST CANCELLATION'; }
 					| { type: 'REFUNDED'; }
-
+					| { type: 'TICKET RESERVED'; }
+					| { type: 'TICKET RESERVATION TIMEOUT'; }
+					| { type: 'START SHOW'; }
+					| { type: 'END SHOW'; }
 			},
 			predictableActionArguments: true,
 			id: 'showMachine',
@@ -69,6 +72,14 @@ export const createShowMachine = (showState: ShowStateType, saveState?: StateCal
 						{
 							target: 'inDispute',
 							cond: 'showInDispute'
+						},
+						{
+							target: 'started',
+							cond: 'showStarted'
+						},
+						{
+							target: 'ended',
+							cond: 'showEnded'
 						}
 					]
 				},
@@ -81,12 +92,25 @@ export const createShowMachine = (showState: ShowStateType, saveState?: StateCal
 				inEscrow: {
 				},
 				boxOfficeOpen: {
+					always: {
+						target: 'boxOfficeClosed',
+						cond: 'soldOut'
+					},
 					on: {
 						'REQUEST CANCELLATION': {
 							target: 'cancelled',
 							actions: ['cancelShow', 'saveShowState']
 						},
-
+						'TICKET RESERVED': {
+							actions: ['decrementTickets']
+						},
+						'TICKET RESERVATION TIMEOUT': {
+							actions: ['incrementTickets']
+						},
+						'START SHOW': {
+							target: 'started',
+							actions: ['saveShowState']
+						}
 					}
 				},
 				boxOfficeClosed: {
@@ -96,6 +120,16 @@ export const createShowMachine = (showState: ShowStateType, saveState?: StateCal
 							actions: ['requestCancellation', 'saveShowState']
 						},
 					}
+				},
+				started: {
+					on: {
+						'END SHOW': {
+							target: 'ended',
+							actions: ['saveShowState']
+						}
+					}
+				},
+				ended: {
 				},
 				requestedCancellation: {
 					initial: 'waiting4Refund',
@@ -139,10 +173,10 @@ export const createShowMachine = (showState: ShowStateType, saveState?: StateCal
 				saveShowState: (context) => {
 					if (saveState) saveState(context.showState);
 				},
-				incrementShowCounter: () => {
+				incrementTickets: () => {
 					if (ticketCounter) ticketCounter().increment();
 				},
-				decrementShowCounter: () => {
+				decrementTickets: () => {
 					if (ticketCounter) ticketCounter().decrement();
 				}
 			},
@@ -155,6 +189,9 @@ export const createShowMachine = (showState: ShowStateType, saveState?: StateCal
 					context.showState.status === ShowStatus.CANCELLATION_REQUESTED,
 				showBoxOfficeOpen: (context) => context.showState.status === ShowStatus.BOX_OFFICE_OPEN,
 				showBoxOfficeClosed: (context) => context.showState.status === ShowStatus.BOX_OFFICE_CLOSED,
+				showStarted: (context) => context.showState.status === ShowStatus.STARTED,
+				showEnded: (context) => context.showState.status === ShowStatus.ENDED,
+				soldOut: (context) => context.showState.ticketsAvailable === 0
 			}
 		}
 	);

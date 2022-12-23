@@ -19,7 +19,9 @@ export enum ShowStatus {
   FINALIZED,
   IN_ESCROW,
   IN_DISPUTE,
-  CANCELLATION_REQUESTED
+  CANCELLATION_REQUESTED,
+  STARTED,
+  ENDED
 }
 
 type ShowDocMethods = {
