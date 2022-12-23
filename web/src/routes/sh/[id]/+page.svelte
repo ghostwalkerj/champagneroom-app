@@ -67,6 +67,8 @@
   <ShowDetail {show} />
 
   {#if canBuyTicket}
-    <button class="btn btn-primary">Buy a Ticket</button>
+    <div class="text-center p-4">
+      <button class="btn btn-primary">Buy a Ticket</button>
+    </div>
   {/if}
 </div>
