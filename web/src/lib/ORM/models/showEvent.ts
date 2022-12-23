@@ -13,7 +13,9 @@ export enum ShowEventType {
 	STARTED,
 	JOINED,
 	LEFT,
-	ENDED
+	ENDED,
+	REFUNDED,
+	CANCELED,
 }
 
 const ShowEventSchemaLiteral = {

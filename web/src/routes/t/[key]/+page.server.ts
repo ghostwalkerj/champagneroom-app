@@ -129,51 +129,30 @@ export const actions: import('./$types').Actions = {
 		});
 		return { success: true };
 	},
-	send_refunds: async ({ params, request }) => {
+	send_refunds: async ({ params }) => {
 		const key = params.key;
 		if (key === null) {
 			throw error(404, 'Key not found');
 		}
-		const data = await request.formData();
-		const amount = data.get('amount') as string;
-
-		if (!amount) {
-			return fail(400, { amount, missingAmount: true });
-		}
-
-		if (isNaN(Number(amount))) {
-			return fail(400, { amount, invalidAmount: true });
-		}
 
 		const talent = await getTalent(key);
-		const refundLink = (await talent.populate('currentLink')) as LinkDocument;
-		if (!refundLink) {
-			throw error(404, 'Link not found');
+		const refundShow = (await talent.populate('currentShow')) as ShowDocument;
+		if (!refundShow) {
+			throw error(404, 'Show not found');
 		}
 
-		const linkService = createLinkMachineService(
-			refundLink.linkState,
-			refundLink.updateLinkStateCallBack()
+		const showService = createShowMachineService(
+			refundShow.showState,
+			refundShow.updateShowStateCallBack()
 		);
-		const state = linkService.getSnapshot();
+		const state = showService.getSnapshot();
 
-		if (!state.matches('claimed.requestedCancellation.waiting4Refund')) {
-			return error(400, 'Link cannot be refunded');
+		if (!state.matches('requestedCancellation.waiting4Refund')) {
+			return error(400, 'Show cannot be refunded');
 		}
 
-		// Create and save a faux transaction
-		const transaction = await refundLink.createTransaction({
-			hash: '0x1234567890',
-			block: 1234567890,
-			to: '0x1234567890',
-			from: refundLink.fundingAddress,
-			value: amount,
-			reason: TransactionReasonType.REFUND
-		});
-
-		linkService.send({
-			type: 'REFUND RECEIVED',
-			transaction
+		showService.send({
+			type: 'REFUNDED',
 		});
 
 		return { success: true };

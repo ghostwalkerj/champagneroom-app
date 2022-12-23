@@ -13,7 +13,7 @@ import type { ShowDocument } from './show';
 import { ActorType } from '$lib/util/constants';
 
 export enum TicketStatus {
-	CLAIMED,
+	RESERVED,
 	PAID,
 	CANCELLATION_REQUESTED,
 	CANCELED,
@@ -57,7 +57,7 @@ const ticketSchemaLiteral = {
 				status: {
 					type: 'string',
 					enum: Object.values(TicketStatus),
-					default: TicketStatus.CLAIMED
+					default: TicketStatus.RESERVED
 				},
 				price: {
 					type: 'integer',
@@ -94,10 +94,10 @@ const ticketSchemaLiteral = {
 					},
 					required: ['createdAt', 'canceler', 'canceledInState']
 				},
-				claim: {
+				reservation: {
 					type: 'object',
 					properties: {
-						ticketHolder: { type: 'string' },
+						name: { type: 'string' },
 						pin: { type: 'string' },
 						createdAt: { type: 'integer' },
 						transactions: {
@@ -109,7 +109,7 @@ const ticketSchemaLiteral = {
 							type: 'array', ref: 'ticketEvents', items: { type: 'string' }
 						}
 					},
-					required: ['ticketHolder', 'pin', 'createdAt']
+					required: ['name', 'pin', 'createdAt']
 				},
 				escrow: {
 					type: 'object',
@@ -177,7 +177,7 @@ const ticketSchemaLiteral = {
 				},
 				updatedAt: { type: 'integer' }
 			},
-			required: ['status', 'updatedAt', 'price', 'refundedAmount', 'totalPaid', 'claim']
+			required: ['status', 'updatedAt', 'price', 'refundedAmount', 'totalPaid', 'reservation']
 		},
 		talent: { type: 'string', ref: 'talents', maxLength: 50 },
 		agent: { type: 'string', ref: 'agents', maxLength: 70 },

@@ -9,6 +9,7 @@ import type { AgentDocument } from './agent';
 import type { TalentDocument } from './talent';
 import { type TicketDocument, TicketStatus, TicketDocType, TicketString } from './ticket';
 import { nanoid } from 'nanoid';
+import type { StateCallBackType, ticketCounterCallBackType } from '$lib/machines/showMachine';
 
 export enum ShowStatus {
   CREATED,
@@ -22,8 +23,10 @@ export enum ShowStatus {
 }
 
 type ShowDocMethods = {
-  updateShowStateCallBack: () => (_showState: ShowDocument['showState']) => void;
+  updateShowStateCallBack: StateCallBackType;
   createTicket: (ticketProps: { ticketHolder: string, pin: string; }) => Promise<TicketDocument>;
+  refundTickets: () => void;
+  ticketCounter: ticketCounterCallBackType;
 };
 export const showDocMethods: ShowDocMethods = {
   updateShowStateCallBack: function (this: ShowDocument) {
@@ -55,7 +58,7 @@ export const showDocMethods: ShowDocMethods = {
       agent: this.agent,
       talent: this.talent,
       ticketState: {
-        status: TicketStatus.CLAIMED,
+        status: TicketStatus.RESERVED,
         updatedAt: new Date().getTime(),
         price: this.price,
         refundedAmount: 0,
@@ -68,6 +71,18 @@ export const showDocMethods: ShowDocMethods = {
       }
     } as TicketDocType;
     return db.tickets.insert(ticket);
+  },
+  refundTickets: async function (this: ShowDocument) { //TODO: implement
+  },
+  ticketCounter: function (this: ShowDocument) {
+    return {
+      increment: () => {
+        this.update({ $inc: { 'showState.ticketsAvailable': 1 } });
+      },
+      decrement: () => {
+        this.update({ $inc: { 'showState.ticketsAvailable': -1 } });
+      }
+    };
   }
 };
 
@@ -105,6 +120,7 @@ const showSchemaLiteral = {
           default: ShowStatus.CREATED
         },
         updatedAt: { type: 'integer' },
+        ticketsAvailable: { type: 'integer' },
         cancel: {
           type: 'object',
           properties: {
@@ -118,8 +134,9 @@ const showSchemaLiteral = {
           },
           required: ['createdAt', 'canceledInState']
         },
+
       },
-      required: ['status', 'updatedAt']
+      required: ['status', 'updatedAt', 'ticketsAvailable']
     },
     tickets: {
       type: 'array',
