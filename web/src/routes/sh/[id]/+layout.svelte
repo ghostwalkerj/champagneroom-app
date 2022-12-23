@@ -19,6 +19,4 @@
   </div>
 </div>
 
-<div class="h-full">
-  <slot />
-</div>
+<slot />

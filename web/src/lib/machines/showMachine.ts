@@ -149,7 +149,7 @@ export const createShowMachine = (showState: ShowStateType, saveState?: StateCal
 						showState: {
 							...context.showState,
 							updatedAt: new Date().getTime(),
-							status: ShowStatus.CANCELED,
+							status: ShowStatus.CANCELLED,
 							cancel: {
 								createdAt: new Date().getTime(),
 								canceledInState: meta.state ? JSON.stringify(meta.state.value) : 'unknown'
@@ -181,7 +181,7 @@ export const createShowMachine = (showState: ShowStateType, saveState?: StateCal
 				}
 			},
 			guards: {
-				showCancelled: (context) => context.showState.status === ShowStatus.CANCELED,
+				showCancelled: (context) => context.showState.status === ShowStatus.CANCELLED,
 				showFinalized: (context) => context.showState.status === ShowStatus.FINALIZED,
 				showInDispute: (context) => context.showState.status === ShowStatus.IN_DISPUTE,
 				showInEscrow: (context) => context.showState.status === ShowStatus.IN_ESCROW,

@@ -15,7 +15,7 @@ export enum ShowStatus {
   CREATED,
   BOX_OFFICE_OPEN,
   BOX_OFFICE_CLOSED,
-  CANCELED,
+  CANCELLED,
   FINALIZED,
   IN_ESCROW,
   IN_DISPUTE,
@@ -26,7 +26,7 @@ export enum ShowStatus {
 
 type ShowDocMethods = {
   updateShowStateCallBack: StateCallBackType;
-  createTicket: (ticketProps: { ticketHolder: string, pin: string; }) => Promise<TicketDocument>;
+  createTicket: (ticketProps: { name: string, pin: string; }) => Promise<TicketDocument>;
   refundTickets: () => void;
   ticketCounter: ticketCounterCallBackType;
 };
@@ -48,7 +48,7 @@ export const showDocMethods: ShowDocMethods = {
       }
     };
   },
-  createTicket: async function (this: ShowDocument, ticketProps: { ticketHolder: string, pin: string; }) {
+  createTicket: async function (this: ShowDocument, ticketProps: { name: string, pin: string; }) {
     const db = this.collection.database;
     const ticket = {
       _id: `${TicketString}:ti-${nanoid()}`,
@@ -65,9 +65,9 @@ export const showDocMethods: ShowDocMethods = {
         price: this.price,
         refundedAmount: 0,
         totalPaid: 0,
-        claim: {
+        reservation: {
           createdAt: new Date().getTime(),
-          ticketHolder: ticketProps.ticketHolder,
+          name: ticketProps.name,
           pin: ticketProps.pin,
         }
       }

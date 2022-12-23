@@ -62,7 +62,7 @@
   onMount(async () => {});
 </script>
 
-<div class="grid grid-flow-row place-content-center mt-6">
+<div class="grid grid-flow-row mt-6 h-[calc(100vh-120px)] ">
   <!-- Page header -->
   <ShowDetail {show} />
 
