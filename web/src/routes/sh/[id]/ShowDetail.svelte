@@ -29,12 +29,12 @@
 </script>
 
 {#if show}
-  <div class="w-screen flex h-full justify-center">
+  <div class=" flex justify-center">
     <div
-      class="flex  flex-col w-full p-4  max-w-2xl  gap-4 rounded-xl bg-base-200 h-full overflow-auto"
+      class="flex  flex-col w-full p-4 max-w-2xl  gap-4 rounded-xl bg-base-200  overflow-auto"
     >
       <div
-        class="relative bg-cover bg-no-repeat bg-center rounded-xl h-4/6 lg:h-4/5"
+        class="relative bg-cover bg-no-repeat bg-center rounded-xl h-96"
         style="background-image: url('{show.talentInfo.profileImageUrl}')"
       >
         <div class="absolute top-1 left-2 text-lg">{show.name}</div>

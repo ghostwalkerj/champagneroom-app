@@ -122,7 +122,7 @@ export const actions: import('./$types').Actions = {
 
 		const showService = createShowMachineService(
 			cancelShow.showState,
-			cancelShow.updateShowStateCallBack()
+			cancelShow.updateShowStateCallBack
 		);
 		showService.send({
 			type: 'REQUEST CANCELLATION',
@@ -143,7 +143,7 @@ export const actions: import('./$types').Actions = {
 
 		const showService = createShowMachineService(
 			refundShow.showState,
-			refundShow.updateShowStateCallBack()
+			refundShow.updateShowStateCallBack
 		);
 		const state = showService.getSnapshot();
 

@@ -4,9 +4,10 @@ import { publicShowDB } from '$lib/ORM/dbs/publicShowDB';
 import type { ShowDocType } from '$lib/ORM/models/show';
 import { StorageTypes } from '$lib/ORM/rxdb';
 import { mensNames } from '$lib/util/mensNames';
-import { error } from '@sveltejs/kit';
+import { error, fail } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import { uniqueNamesGenerator } from 'unique-names-generator';
+import { createShowMachineService } from '$lib/machines/showMachine';
 
 export const load: import('./$types').PageServerLoad = async ({ params }) => {
 	const showId = params.id;
@@ -70,5 +71,39 @@ const getShow = async (showId: string) => {
 };
 
 export const actions: import('./$types').Actions = {
+	buy_ticket: async ({ params, request }) => {
+		const showId = params.id;
+		if (showId === null) {
+			throw error(404, 'Key not found');
+		}
+		const data = await request.formData();
+		const name = data.get('name') as string;
+		const pin = data.get('pin') as string;
 
+		if (!name) {
+			return fail(400, { name, missingName: true });
+		}
+
+		if (!pin) {
+			return fail(400, { pin, missingPin: true });
+		}
+
+		const isNum = /^\d+$/.test(pin);
+		if (!isNum) {
+			return fail(400, { pin, invalidPin: true });
+		}
+
+		const show = await getShow(showId);
+		const showService = createShowMachineService(show.showState, show.updateShowStateCallBack);
+		if (!showService.getSnapshot().can("TICKET RESERVED")) return error(501, 'Show cannot Reserve Ticket'); // TODO: This should be atomic
+
+		const ticket = await show.createTicket(
+			{
+				name,
+				pin,
+			}
+		);
+		showService.send('TICKET RESERVED');
+		return { success: true, ticket };
+	},
 };
