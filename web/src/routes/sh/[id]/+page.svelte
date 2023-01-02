@@ -63,7 +63,7 @@
   });
 </script>
 
-<div class="mt-6 flex flex-col h-[calc(100vh-120px)] items-center">
+<div class="mt-6 flex items-center">
   <div class="min-w-full">
     <!-- Page header -->
     {#key show}
