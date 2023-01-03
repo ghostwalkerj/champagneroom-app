@@ -7,11 +7,13 @@ import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
 import { PouchDB, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
 import { type ShowCollection, type ShowDocument, showSchema, showDocMethods } from '$lib/ORM/models/show';
+import { TicketCollection, ticketSchema } from '$lib/ORM/models/ticket';
 
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 100;
 type APICollections = {
 	shows: ShowCollection;
+	tickets: TicketCollection;
 };
 
 export type APIDBType = RxDatabase<APICollections>;
@@ -46,6 +48,9 @@ const create = async (token: string, showId: string, storage: StorageTypes) => {
 		shows: {
 			schema: showSchema,
 			methods: showDocMethods
+		},
+		tickets: {
+			schema: ticketSchema
 		}
 	});
 
@@ -61,8 +66,9 @@ const create = async (token: string, showId: string, storage: StorageTypes) => {
 			}
 		});
 		const showQuery = _db.shows.findOne(showId);
+		const ticketQuery = _db.tickets.find().where('show').eq(showId);
 
-		const repState = _db.shows.syncCouchDB({
+		let repState = _db.shows.syncCouchDB({
 			remote: remoteDB,
 			waitForLeadership: false,
 			options: {
@@ -72,8 +78,32 @@ const create = async (token: string, showId: string, storage: StorageTypes) => {
 		});
 		await repState.awaitInitialReplication();
 
+		repState = _db.tickets.syncCouchDB({
+			remote: remoteDB,
+			waitForLeadership: false,
+			options: {
+				retry: true
+			},
+			query: ticketQuery
+		});
+		await repState.awaitInitialReplication();
+
 		_thisShow = (await showQuery.exec()) as ShowDocument;
+
 		if (_thisShow) {
+
+			// Sync tickets
+			_db.tickets.syncCouchDB({
+				remote: remoteDB,
+				waitForLeadership: false,
+				options: {
+					retry: true,
+					live: true
+				},
+				query: ticketQuery
+			});
+
+			// Sync shows
 			_db.shows.syncCouchDB({
 				remote: remoteDB,
 				waitForLeadership: false,

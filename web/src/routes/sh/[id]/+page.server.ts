@@ -97,13 +97,13 @@ export const actions: import('./$types').Actions = {
 		const showService = createShowMachineService(show.showState, show.updateShowStateCallBack);
 		if (!showService.getSnapshot().can("TICKET RESERVED")) return error(501, 'Show cannot Reserve Ticket'); // TODO: This should be atomic
 
-		const ticket = await show.createTicket(
+		await show.createTicket(
 			{
 				name,
 				pin,
 			}
 		);
 		showService.send('TICKET RESERVED');
-		return { success: true, ticket, name, pin };
+		return { success: true, name, pin };
 	},
 };
