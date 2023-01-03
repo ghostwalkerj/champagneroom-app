@@ -1,4 +1,5 @@
 import { JWT_EXPIRY, JWT_PUBLIC_USER, JWT_SECRET } from '$env/static/private';
+import { PUBLIC_PIN_PATH } from '$env/static/public';
 import { publicTicketDB } from '$lib/ORM/dbs/publicTicketDB';
 import type { TicketDocType } from '$lib/ORM/models/ticket';
 import { StorageTypes } from '$lib/ORM/rxdb';
@@ -9,7 +10,7 @@ import urlJoin from 'url-join';
 export const load: import('./$types').PageServerLoad = async ({ params, cookies, url }) => {
 	const ticketId = params.id;
 	const pin = cookies.get('pin');
-	const redirectUrl = urlJoin(url.href, 'pin');
+	const redirectUrl = urlJoin(url.href, PUBLIC_PIN_PATH);
 
 	if (!pin) {
 		throw redirect(307, redirectUrl);

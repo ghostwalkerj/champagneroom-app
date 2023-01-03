@@ -6,23 +6,17 @@
     publicShowDB,
     type PublicShowDBType,
   } from '$lib/ORM/dbs/publicShowDB';
-  import { type ShowDocument, ShowStatus } from '$lib/ORM/models/show';
   import { StorageTypes } from '$lib/ORM/rxdb';
-  import getProfileImage from '$lib/util/profilePhoto';
   import { onMount } from 'svelte';
   import type { PageData, ActionData } from './$types';
-  import ShowDetail from './ShowDetail.svelte';
 
   export let data: PageData;
   export let form: ActionData;
   const token = data.token;
-  let show = data.show;
-  let displayName = data.displayName;
+  let ticket = data.ticket;
   let showId = $page.params.id;
 
   $: waiting4StateChange = false;
-  $: profileImage = getProfileImage(displayName);
-  $: canBuyTicket = show.showState.status === ShowStatus.BOX_OFFICE_OPEN;
 
   const onSubmit = ({ form }) => {
     waiting4StateChange = true;
@@ -51,7 +45,7 @@
                 //     canBuyTicket = state.matches('boxOfficeOpen');
                 //   }
                 // });
-                show = _show as ShowDocument;
+                ticket = _show as ShowDocument;
                 waiting4StateChange = false;
               }
             });
@@ -65,9 +59,9 @@
 <div class="mt-6 flex items-center">
   <div class="min-w-full">
     <!-- Page header -->
-    {#key show}
+    {#key ticket}
       <div class="pb-4 text-center">
-        <ShowDetail {show} />
+        <ShowDetail show={ticket} />
         {#if canBuyTicket}
           <label for="buy-ticket" class="btn btn-secondary m-4"
             >Buy Ticket</label

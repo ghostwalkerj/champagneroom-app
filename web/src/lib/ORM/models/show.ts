@@ -51,7 +51,7 @@ export const showDocMethods: ShowDocMethods = {
   createTicket: async function (this: ShowDocument, ticketProps: { name: string, pin: string; }) {
     const db = this.collection.database;
     const ticket = {
-      _id: `${TicketString}:ti-${nanoid()}`,
+      _id: `${TicketString}:tk-${nanoid()}`,
       createdAt: new Date().getTime(),
       updatedAt: new Date().getTime(),
       entityType: TicketString,
