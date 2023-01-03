@@ -4,10 +4,13 @@ import { publicShowDB } from '$lib/ORM/dbs/publicShowDB';
 import type { ShowDocType } from '$lib/ORM/models/show';
 import { StorageTypes } from '$lib/ORM/rxdb';
 import { mensNames } from '$lib/util/mensNames';
-import { error, fail } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 import { createShowMachineService } from '$lib/machines/showMachine';
+import { url } from 'inspector';
+import urlJoin from 'url-join';
+import { PUBLIC_TICKET_PATH } from '$env/static/public';
 
 export const load: import('./$types').PageServerLoad = async ({ params }) => {
 	const showId = params.id;
@@ -71,7 +74,7 @@ const getShow = async (showId: string) => {
 };
 
 export const actions: import('./$types').Actions = {
-	buy_ticket: async ({ params, request }) => {
+	buy_ticket: async ({ params, cookies, request, url }) => {
 		const showId = params.id;
 		if (showId === null) {
 			throw error(404, 'Key not found');
@@ -97,13 +100,15 @@ export const actions: import('./$types').Actions = {
 		const showService = createShowMachineService(show.showState, show.updateShowStateCallBack);
 		if (!showService.getSnapshot().can("TICKET RESERVED")) return error(501, 'Show cannot Reserve Ticket'); // TODO: This should be atomic
 
-		await show.createTicket(
+		const ticket = await show.createTicket(
 			{
 				name,
 				pin,
 			}
 		);
 		showService.send('TICKET RESERVED');
-		return { success: true, name, pin };
+		cookies.set('pin', pin, { path: '/' });
+		const redirectUrl = urlJoin(url.origin, PUBLIC_TICKET_PATH, ticket._id);
+		throw redirect(307, redirectUrl);
 	},
 };

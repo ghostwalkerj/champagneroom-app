@@ -9,8 +9,8 @@ import {
 	type RxJsonSchema
 } from 'rxdb';
 
-import type { ShowDocument } from './show';
 import { ActorType } from '$lib/util/constants';
+import type { ShowDocument } from './show';
 
 export enum TicketStatus {
 	RESERVED,

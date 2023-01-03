@@ -1,3 +1,5 @@
+import type { StateCallBackType, ticketCounterCallBackType } from '$lib/machines/showMachine';
+import { nanoid } from 'nanoid';
 import {
   toTypedRxJsonSchema,
   type ExtractDocumentTypeFromTypedRxJsonSchema,
@@ -7,9 +9,7 @@ import {
 } from 'rxdb';
 import type { AgentDocument } from './agent';
 import type { TalentDocument } from './talent';
-import { type TicketDocument, TicketStatus, type TicketDocType, TicketString } from './ticket';
-import { nanoid } from 'nanoid';
-import type { StateCallBackType, ticketCounterCallBackType } from '$lib/machines/showMachine';
+import { TicketStatus, TicketString, type TicketDocType, type TicketDocument } from './ticket';
 
 export enum ShowStatus {
   CREATED,

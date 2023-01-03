@@ -1,30 +1,29 @@
 import { PUBLIC_PUBLIC_ENDPOINT, PUBLIC_RXDB_PASSWORD } from '$env/static/public';
-import { StorageTypes, initRXDB } from '$lib/ORM/rxdb';
+import { initRXDB, StorageTypes } from '$lib/ORM/rxdb';
 import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
 
-import { showSchema, type ShowCollection, type ShowDocument } from '$lib/ORM/models/show';
-import { PouchDB, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
+import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
+
+import { ticketSchema, type TicketCollection, type TicketDocument } from '$lib/ORM/models/ticket';
 
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 100;
 type PublicCollections = {
-	shows: ShowCollection;
+	tickets: TicketCollection;
 };
 
-export type PublicShowDBType = RxDatabase<PublicCollections>;
-const _publicShowDB = new Map<string, PublicShowDBType>();
-export const publicShowDB = async (
+export type PublicTicketDBType = RxDatabase<PublicCollections>;
+const _publicTicketDB = new Map<string, PublicTicketDBType>();
+export const publicTicketDB = async (
 	token: string,
-	showId: string,
+	ticketId: string,
 	storage: StorageTypes
-): Promise<PublicShowDBType> => await create(token, showId, storage);
+): Promise<PublicTicketDBType> => await create(token, ticketId, storage);
 
-let _thisShow: ShowDocument;
-
-const create = async (token: string, showId: string, storage: StorageTypes) => {
-	let _db = _publicShowDB.get(showId);
+const create = async (token: string, ticketId: string, storage: StorageTypes) => {
+	let _db = _publicTicketDB.get(ticketId);
 	if (_db) return _db;
 
 	initRXDB(storage);
@@ -34,15 +33,15 @@ const create = async (token: string, showId: string, storage: StorageTypes) => {
 	});
 
 	_db = await createRxDatabase({
-		name: 'pouchdb/publicShow_db',
+		name: 'pouchdb/publicTicket_db',
 		storage: wrappedStorage,
 		ignoreDuplicate: true,
 		password: PUBLIC_RXDB_PASSWORD
 	});
 
 	await _db.addCollections({
-		shows: {
-			schema: showSchema
+		tickets: {
+			schema: ticketSchema
 		}
 	});
 
@@ -57,31 +56,31 @@ const create = async (token: string, showId: string, storage: StorageTypes) => {
 				return PouchDB.fetch(url, opts);
 			}
 		});
-		const showQuery = _db.shows.findOne(showId);
+		const ticketQuery = _db.tickets.findOne(ticketId);
 
-		const repState = _db.shows.syncCouchDB({
+		const repState = _db.tickets.syncCouchDB({
 			remote: remoteDB,
 			waitForLeadership: false,
 			options: {
 				retry: true
 			},
-			query: showQuery
+			query: ticketQuery
 		});
 		await repState.awaitInitialReplication();
 
-		_thisShow = (await showQuery.exec()) as ShowDocument;
-		if (_thisShow) {
-			_db.shows.syncCouchDB({
+		const _thisTicket = (await ticketQuery.exec()) as TicketDocument;
+		if (_thisTicket) {
+			_db.tickets.syncCouchDB({
 				remote: remoteDB,
 				waitForLeadership: false,
 				options: {
 					retry: true,
 					live: true
 				},
-				query: showQuery
+				query: ticketQuery
 			});
 		}
 	}
-	_publicShowDB.set(showId, _db);
+	_publicTicketDB.set(ticketId, _db);
 	return _db;
 };
