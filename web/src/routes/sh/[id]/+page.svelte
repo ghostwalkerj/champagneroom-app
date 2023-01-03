@@ -10,12 +10,11 @@
   import { StorageTypes } from '$lib/ORM/rxdb';
   import getProfileImage from '$lib/util/profilePhoto';
   import { onMount } from 'svelte';
-  import type { PageData } from './$types';
+  import type { PageData, ActionData } from './$types';
   import ShowDetail from './ShowDetail.svelte';
 
-  export let form: import('./$types').ActionData;
   export let data: PageData;
-
+  export let form: ActionData;
   const token = data.token;
   let show = data.show;
   let displayName = data.displayName;
@@ -67,22 +66,35 @@
   <div class="min-w-full">
     <!-- Page header -->
     {#key show}
-      <div class="pb-4">
+      <div class="pb-4 text-center">
         <ShowDetail {show} />
+        {#if canBuyTicket}
+          <label for="buy-ticket" class="btn btn-secondary m-4"
+            >Buy Ticket</label
+          >
+        {/if}
       </div>
     {/key}
-    {#if canBuyTicket}
-      <div class="flex justify-center place-content-center">
-        <div class="gap-4 rounded-xl bg-base-200 flex flex-col items-center">
+    <input type="checkbox" id="buy-ticket" class="modal-toggle" />
+    <div class="modal">
+      <div class="modal-box relative">
+        <label
+          for="buy-ticket"
+          class="btn btn-sm btn-circle absolute right-2 top-2">✕</label
+        >
+
+        <div
+          class="grid grid-rows-1 gap-4 grid-flow-col justify-center items-center"
+        >
           <div
-            class="bg-cover  bg-no-repeat rounded-full h-48 w-48"
+            class="bg-cover  bg-no-repeat rounded-full h-48 w-48 row-span-2"
             style="background-image: url('{profileImage}')"
           />
           <form method="post" action="?/buy_ticket" use:enhance={onSubmit}>
             <div class="max-w-xs w-full py-2 form-control ">
               <!-- svelte-ignore a11y-label-has-associated-control -->
               <label for="caller" class="label">
-                <span class="label-text">Your Display Name</span></label
+                <span class="label-text">Your Name</span></label
               >
               <div class="rounded-md shadow-sm mt-1 relative">
                 <input
@@ -123,12 +135,12 @@
               <button
                 class="btn btn-secondary "
                 type="submit"
-                disabled={waiting4StateChange}>Buy a Ticket</button
+                disabled={waiting4StateChange}>Reserve</button
               >
             </div>
           </form>
         </div>
       </div>
-    {/if}
+    </div>
   </div>
 </div>

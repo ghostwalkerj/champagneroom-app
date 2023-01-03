@@ -32,7 +32,7 @@ export const load: import('./$types').PageServerLoad = async ({ params }) => {
 	const _show = await db.shows.findOne(showId).exec();
 
 	if (!_show) {
-		throw error(404, 'pCall not found');
+		throw error(404, 'Show not found');
 	}
 
 	const show = _show.toJSON() as ShowDocType;
@@ -104,6 +104,6 @@ export const actions: import('./$types').Actions = {
 			}
 		);
 		showService.send('TICKET RESERVED');
-		return { success: true, ticket };
+		return { success: true, ticket, name, pin };
 	},
 };
