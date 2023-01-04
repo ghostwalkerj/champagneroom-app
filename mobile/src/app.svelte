@@ -57,7 +57,7 @@
       }
       talent.set(_talent);
 
-      _talent.get$('currentShow').subscribe(showId => {
+      _talent.get$('currentShow').subscribe((showId: string) => {
         if (showId && $talentDB) {
           $talentDB.shows
             .findOne(showId)
@@ -71,7 +71,7 @@
                   $showMachineService?.stop();
                   const _showMachineService = createShowMachineService(
                     _showState,
-                    show.updateShowStateCallBack()
+                    show.saveState
                   );
                   showMachineService.set(_showMachineService);
                   _showMachineService.onTransition(state => {

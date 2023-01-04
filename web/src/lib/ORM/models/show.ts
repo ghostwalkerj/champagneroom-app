@@ -25,27 +25,44 @@ export enum ShowStatus {
 }
 
 type ShowDocMethods = {
-  updateShowStateCallBack: StateCallBackType;
+  saveState: () => {
+    updateShowStateCallBack: StateCallBackType;
+    ticketCounter: ticketCounterCallBackType;
+  };
   createTicket: (ticketProps: { name: string, pin: string; }) => Promise<TicketDocument>;
   refundTickets: () => void;
-  ticketCounter: ticketCounterCallBackType;
 };
 export const showDocMethods: ShowDocMethods = {
-  updateShowStateCallBack: function (this: ShowDocument) {
-    return (_showState: ShowDocument['showState']) => {
-      if (_showState.updatedAt > this.showState.updatedAt) {
-        const atomicUpdate = (showDoc: ShowDocType) => {
-          const newState = {
-            ...showDoc.showState,
-            ..._showState
+  saveState: function (this: ShowDocument) {
+    const updateShowStateCallBack = () => {
+      return (_showState: ShowDocument['showState']) => {
+        if (_showState.updatedAt > this.showState.updatedAt) {
+          const atomicUpdate = (showDoc: ShowDocType) => {
+            const newState = {
+              ...showDoc.showState,
+              ..._showState
+            };
+            return {
+              ...showDoc,
+              showState: newState
+            };
           };
-          return {
-            ...showDoc,
-            showState: newState
-          };
-        };
-        this.atomicUpdate(atomicUpdate);
-      }
+          this.atomicUpdate(atomicUpdate);
+        }
+      };
+    };
+    const ticketCounter = () => {
+      return {
+        increment: () => {
+          this.update({ $inc: { 'showState.ticketsAvailable': 1 } });
+        },
+        decrement: () => {
+          this.update({ $inc: { 'showState.ticketsAvailable': -1 } });
+        }
+      };
+    };
+    return {
+      updateShowStateCallBack, ticketCounter
     };
   },
   createTicket: async function (this: ShowDocument, ticketProps: { name: string, pin: string; }) {
@@ -76,16 +93,7 @@ export const showDocMethods: ShowDocMethods = {
   },
   refundTickets: async function (this: ShowDocument) { //TODO: implement
   },
-  ticketCounter: function (this: ShowDocument) {
-    return {
-      increment: () => {
-        this.update({ $inc: { 'showState.ticketsAvailable': 1 } });
-      },
-      decrement: () => {
-        this.update({ $inc: { 'showState.ticketsAvailable': -1 } });
-      }
-    };
-  }
+
 };
 
 const showSchemaLiteral = {
@@ -216,4 +224,4 @@ export type ShowDocType = ExtractDocumentTypeFromTypedRxJsonSchema<typeof schema
 // @ts-ignore
 export const showSchema: RxJsonSchema<ShowDocType> = showSchemaLiteral;
 export type ShowDocument = RxDocument<ShowDocType, ShowDocMethods> & showRef;
-export type ShowCollection = RxCollection<ShowDocType, ShowDocMethods>;;
+export type ShowCollection = RxCollection<ShowDocType, ShowDocMethods>;
