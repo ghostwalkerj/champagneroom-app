@@ -1,17 +1,16 @@
 import { JWT_CREATOR_USER, JWT_EXPIRY, JWT_PUBLIC_USER, JWT_SECRET } from '$env/static/private';
+import { PUBLIC_TICKET_PATH } from '$env/static/public';
 import { apiDB } from '$lib/ORM/dbs/apiDB';
 import { publicShowDB } from '$lib/ORM/dbs/publicShowDB';
 import type { ShowDocType } from '$lib/ORM/models/show';
 import { StorageTypes } from '$lib/ORM/rxdb';
+import { createShowMachineService } from '$lib/machines/showMachine';
 import { mensNames } from '$lib/util/mensNames';
+import { createPinHash } from '$lib/util/pin';
 import { error, fail, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import { uniqueNamesGenerator } from 'unique-names-generator';
-import { createShowMachineService } from '$lib/machines/showMachine';
-import { url } from 'inspector';
 import urlJoin from 'url-join';
-import { PUBLIC_TICKET_PATH } from '$env/static/public';
-import { createPinHash } from '$lib/util/pin';
 
 export const load: import('./$types').PageServerLoad = async ({ params }) => {
 	const showId = params.id;
@@ -111,6 +110,6 @@ export const actions: import('./$types').Actions = {
 		const hash = createPinHash(ticket._id, pin);
 		cookies.set('pin', hash, { path: '/' });
 		const redirectUrl = urlJoin(url.origin, PUBLIC_TICKET_PATH, ticket._id);
-		throw redirect(307, redirectUrl);
+		throw redirect(303, redirectUrl);
 	},
 };

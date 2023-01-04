@@ -1,5 +1,5 @@
 import { PUBLIC_ESCROW_PERIOD, PUBLIC_GRACE_PERIOD } from '$env/static/public';
-import { type ShowDocType, ShowStatus } from '$lib/ORM/models/show';
+import { ShowStatus, type ShowDocType } from '$lib/ORM/models/show';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 
 const GRACE_PERIOD = Number(PUBLIC_GRACE_PERIOD || 90000);
@@ -199,9 +199,10 @@ export const createShowMachine = (showState: ShowStateType, saveState?: StateCal
 
 export const createShowMachineService = (
 	showState: ShowStateType,
-	saveState?: StateCallBackType
+	saveState?: StateCallBackType,
+	ticketCounter?: ticketCounterCallBackType
 ) => {
-	const showMachine = createShowMachine(showState, saveState);
+	const showMachine = createShowMachine(showState, saveState, ticketCounter);
 	return interpret(showMachine).start();
 };
 

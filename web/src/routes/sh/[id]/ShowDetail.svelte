@@ -73,7 +73,7 @@
         <div class="stat">
           <div class="stat-title">Tickets Available</div>
           <div class="text-primary stat-value">
-            {show.maxNumTickets - show.salesStats.ticketsSold}
+            {show.showState.ticketsAvailable}
           </div>
         </div>
       </div>

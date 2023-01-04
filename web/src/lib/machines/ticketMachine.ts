@@ -1,9 +1,9 @@
 import { PUBLIC_ESCROW_PERIOD } from '$env/static/public';
+import type { TicketDocType } from '$lib/ORM/models/ticket';
 import { TicketStatus } from '$lib/ORM/models/ticket';
+import type { TicketEventDocType } from '$lib/ORM/models/ticketEvent';
 import type { TransactionDocType } from '$lib/ORM/models/transaction';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
-import type { TicketDocType } from '$lib/ORM/models/ticket';
-import type { TicketEventDocType } from '$lib/ORM/models/ticketEvent';
 
 type TicketStateType = TicketDocType['ticketState'];
 const ESCROW_PERIOD = Number(PUBLIC_ESCROW_PERIOD || 3600000);

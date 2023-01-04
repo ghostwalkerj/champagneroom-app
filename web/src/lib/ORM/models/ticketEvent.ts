@@ -5,9 +5,9 @@ import {
 	type RxDocument,
 	type RxJsonSchema
 } from 'rxdb';
+import type { ShowDocument } from './show';
 import type { TalentDocument } from './talent';
 import type { TicketDocument } from './ticket';
-import type { ShowDocument } from './show';
 
 export enum TicketEventType {
 	ATTEMPT,

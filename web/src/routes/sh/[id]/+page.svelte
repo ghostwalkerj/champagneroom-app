@@ -36,26 +36,12 @@
     };
   };
 
-  // Wait for onMount to grab user Stream only if we plan to call or do we grab to to make sure it works?
   onMount(async () => {
     publicShowDB(token, showId, StorageTypes.IDB).then(
       (db: PublicShowDBType) => {
         db.shows.findOne(showId).$.subscribe(_show => {
-          if (_show) {
-            _show.$.subscribe(_show => {
-              if (_show) {
-                // Here is where we run the machine and do all the logic based on the state
-                // const showService = createShowMachineService(_show.showState);
-                // showService.onTransition(state => {
-                //   if (state.changed) {
-                //     canBuyTicket = state.matches('boxOfficeOpen');
-                //   }
-                // });
-                show = _show as ShowDocument;
-                waiting4StateChange = false;
-              }
-            });
-          }
+          show = _show as ShowDocument;
+          waiting4StateChange = false;
         });
       }
     );

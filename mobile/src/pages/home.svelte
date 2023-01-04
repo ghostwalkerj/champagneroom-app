@@ -4,7 +4,7 @@
   import { Share } from '@capacitor/share';
   import { possessive } from 'i18n-possessive';
 
-  import type { ShowDocType } from '$lib/ORM/models/show';
+  import type { ShowDocType, ShowDocument } from '$lib/ORM/models/show';
   import type { ShowMachineStateType } from '$lib/machines/showMachine';
   import { durationFormatter } from '$lib/util/constants';
 
@@ -91,7 +91,7 @@
       maxNumTickets: 1,
       coverPhotoUrl: $talent?.profileImageUrl,
     } as Partial<ShowDocType>;
-    $talent?.createShow(show).then(show => {
+    $talent?.createShow(show).then((show: ShowDocument) => {
       Clipboard.write({
         string: urlJoin(APP_URL, SHOW_PATH, show._id),
       });
@@ -315,6 +315,9 @@
           </ListItem>
           <ListItem title="Total Tickets">
             {$currentShow.maxNumTickets}
+          </ListItem>
+          <ListItem title="Tickets Available">
+            {$currentShow.showState.ticketsAvailable}
           </ListItem>
           <ListItem title="Tickets Sold">
             {$currentShow.salesStats.ticketsSold}

@@ -1,13 +1,13 @@
 import { PUBLIC_CREATORS_ENDPOINT, PUBLIC_RXDB_PASSWORD } from '$env/static/public';
+import { showDocMethods, showSchema, type ShowCollection } from '$lib/ORM/models/show';
 import { talentDocMethods, talentSchema, type TalentCollection } from '$lib/ORM/models/talent';
+import { ticketSchema, type TicketCollection } from '$lib/ORM/models/ticket';
 import type { StorageTypes } from '$lib/ORM/rxdb';
 import { initRXDB } from '$lib/ORM/rxdb';
 import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
 import { PouchDB, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
-import { type ShowCollection, showSchema, showDocMethods } from '$lib/ORM/models/show';
-import { type TicketCollection, ticketSchema } from '$lib/ORM/models/ticket';
 
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 100;

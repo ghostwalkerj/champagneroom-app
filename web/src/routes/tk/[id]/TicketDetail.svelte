@@ -1,8 +1,10 @@
 <script lang="ts">
-  import { type ShowDocType, ShowStatus } from '$lib/ORM/models/show';
+  import { ShowStatus, type ShowDocType } from '$lib/ORM/models/show';
+  import type { TicketDocType } from '$lib/ORM/models/ticket';
   import { currencyFormatter, durationFormatter } from '$lib/util/constants';
   import StarRating from 'svelte-star-rating';
   export let show: ShowDocType;
+  export let ticket: TicketDocType;
   $: waterMark = true;
   $: waterMarkText = '';
 

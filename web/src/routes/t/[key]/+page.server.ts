@@ -1,15 +1,11 @@
 import { JWT_CREATOR_USER, JWT_EXPIRY, JWT_SECRET } from '$env/static/private';
 import { talentDB } from '$lib/ORM/dbs/talentDB';
-import type { LinkDocument } from '$lib/ORM/models/link';
-import { TransactionReasonType } from '$lib/ORM/models/transaction';
+import type { ShowDocument } from '$lib/ORM/models/show';
 import { StorageTypes } from '$lib/ORM/rxdb';
-import { createLinkMachineService } from '$lib/machines/linkMachine';
+import { createShowMachineService } from '$lib/machines/showMachine';
 import { error, fail } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import type { PageServerLoad } from './$types';
-import { ActorType } from '$lib/util/constants';
-import type { ShowDocument } from '$lib/ORM/models/show';
-import { createShowMachineService } from '$lib/machines/showMachine';
 
 const token = jwt.sign(
 	{

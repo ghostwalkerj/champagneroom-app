@@ -7,8 +7,8 @@ import {
 	type RxDocument,
 	type RxJsonSchema
 } from 'rxdb';
-import { type ShowDocType, type ShowDocument, ShowStatus, ShowString } from './show';
 import { v4 as uuidv4 } from 'uuid';
+import { ShowStatus, ShowString, type ShowDocType, type ShowDocument } from './show';
 
 export const TalentString = 'talent';
 
@@ -140,13 +140,18 @@ export const talentDocMethods: TalentDocMethods = {
 					numCompletedShows: this.stats.numCompletedShows,
 				}
 			},
-			showState: { status: ShowStatus.BOX_OFFICE_OPEN, updatedAt: new Date().getTime() },
+			showState: {
+				status: ShowStatus.BOX_OFFICE_OPEN,
+				updatedAt: new Date().getTime(),
+				ticketsAvailable: showProps.maxNumTickets
+			},
 			salesStats: { ticketsSold: 0, totalSales: 0 },
 			_id: `${ShowString}:sh-${nanoid()}`,
 			createdAt: new Date().getTime(),
 			updatedAt: new Date().getTime(),
 			agent: this.agent,
-			roomId: uuidv4()
+			roomId: uuidv4(),
+			maxNumTickets: showProps.maxNumTickets,
 		} as ShowDocType;
 		const newShow = await db.shows.insert(show);
 		this.update({ $set: { currentShow: newShow._id } });

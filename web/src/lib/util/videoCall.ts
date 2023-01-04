@@ -1,9 +1,9 @@
 import { PUBLIC_CALL_TIMEOUT } from '$env/static/public';
 import callMachine from '$lib/machines/callMachine';
 import { Peer } from 'peerjs';
+import type { Subscriber } from 'svelte/store';
 import { readable, writable } from 'svelte/store';
 import { interpret, type EventObject } from 'xstate';
-import type { Subscriber } from 'svelte/store';
 
 const CALL_TIMEOUT = Number.parseInt(PUBLIC_CALL_TIMEOUT || '30000');
 

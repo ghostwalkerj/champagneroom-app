@@ -1,6 +1,7 @@
 import type { AgentDocument } from '$lib/ORM/models/agent';
 
 import type { TalentDocument } from '$lib/ORM/models/talent';
+import { ActorType } from '$lib/util/constants';
 import { nanoid } from 'nanoid';
 import {
 	toTypedRxJsonSchema,
@@ -15,7 +16,6 @@ import {
 	type TransactionDocType,
 	type TransactionDocument
 } from './transaction';
-import { ActorType } from '$lib/util/constants';
 
 export enum LinkStatus {
 	UNCLAIMED,
