@@ -12,10 +12,11 @@
       break;
 
     case ShowStatus.BOX_OFFICE_CLOSED:
+      waterMarkText = 'Sold Out';
+      break;
     case ShowStatus.STARTED:
       waterMarkText = 'Box Office Closed';
       break;
-
     case ShowStatus.FINALIZED:
     case ShowStatus.ENDED:
     case ShowStatus.IN_ESCROW:

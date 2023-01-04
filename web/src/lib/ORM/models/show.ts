@@ -34,22 +34,20 @@ type ShowDocMethods = {
 };
 export const showDocMethods: ShowDocMethods = {
   saveState: function (this: ShowDocument) {
-    const updateShowStateCallBack = () => {
-      return (_showState: ShowDocument['showState']) => {
-        if (_showState.updatedAt > this.showState.updatedAt) {
-          const atomicUpdate = (showDoc: ShowDocType) => {
-            const newState = {
-              ...showDoc.showState,
-              ..._showState
-            };
-            return {
-              ...showDoc,
-              showState: newState
-            };
+    const updateShowStateCallBack = (_showState: ShowDocument['showState']) => {
+      if (_showState.updatedAt > this.showState.updatedAt) {
+        const atomicUpdate = (showDoc: ShowDocType) => {
+          const newState = {
+            ...showDoc.showState,
+            ..._showState
           };
-          this.atomicUpdate(atomicUpdate);
-        }
-      };
+          return {
+            ...showDoc,
+            showState: newState
+          };
+        };
+        this.atomicUpdate(atomicUpdate);
+      }
     };
     const ticketCounter = () => {
       return {

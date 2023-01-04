@@ -94,7 +94,8 @@ export const createShowMachine = (showState: ShowStateType, saveState?: { update
 				boxOfficeOpen: {
 					always: {
 						target: 'boxOfficeClosed',
-						cond: 'soldOut'
+						cond: 'soldOut',
+						actions: ['closeBoxOffice', 'saveShowState']
 					},
 					on: {
 						'REQUEST CANCELLATION': {
@@ -114,6 +115,11 @@ export const createShowMachine = (showState: ShowStateType, saveState?: { update
 					}
 				},
 				boxOfficeClosed: {
+					always: {
+						target: 'boxOfficeOpen',
+						cond: 'notSoldOut',
+						actions: ['openBoxOffice', 'saveShowState']
+					},
 					on: {
 						'REQUEST CANCELLATION': {
 							target: 'requestedCancellation',
@@ -144,6 +150,24 @@ export const createShowMachine = (showState: ShowStateType, saveState?: { update
 		},
 		{
 			actions: {
+				closeBoxOffice: assign((context) => {
+					return {
+						showState: {
+							...context.showState,
+							updatedAt: new Date().getTime(),
+							status: ShowStatus.BOX_OFFICE_CLOSED,
+						}
+					};
+				}),
+				openBoxOffice: assign((context) => {
+					return {
+						showState: {
+							...context.showState,
+							updatedAt: new Date().getTime(),
+							status: ShowStatus.BOX_OFFICE_OPEN,
+						}
+					};
+				}),
 				cancelShow: assign((context, _event, meta) => {
 					return {
 						showState: {
@@ -191,7 +215,8 @@ export const createShowMachine = (showState: ShowStateType, saveState?: { update
 				showBoxOfficeClosed: (context) => context.showState.status === ShowStatus.BOX_OFFICE_CLOSED,
 				showStarted: (context) => context.showState.status === ShowStatus.STARTED,
 				showEnded: (context) => context.showState.status === ShowStatus.ENDED,
-				soldOut: (context) => context.showState.ticketsAvailable === 0
+				soldOut: (context) => context.showState.ticketsAvailable === 0,
+				notSoldOut: (context) => context.showState.ticketsAvailable > 0,
 			}
 		}
 	);
