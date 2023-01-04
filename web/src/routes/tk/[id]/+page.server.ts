@@ -3,20 +3,21 @@ import { PUBLIC_PIN_PATH } from '$env/static/public';
 import { publicTicketDB } from '$lib/ORM/dbs/publicTicketDB';
 import type { TicketDocType } from '$lib/ORM/models/ticket';
 import { StorageTypes } from '$lib/ORM/rxdb';
+import { verifyPin } from '$lib/util/pin';
 import { error, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import urlJoin from 'url-join';
 
 export const load: import('./$types').PageServerLoad = async ({ params, cookies, url }) => {
 	const ticketId = params.id;
-	const pin = cookies.get('pin');
+	const pinHash = cookies.get('pin');
 	const redirectUrl = urlJoin(url.href, PUBLIC_PIN_PATH);
 
-	if (!pin) {
+	if (!pinHash) {
 		throw redirect(307, redirectUrl);
 	}
 	if (ticketId === null) {
-		throw error(404, 'Ticket not found');
+		throw error(404, 'Bad ticket id');
 	}
 
 	// Because we are returning the token to the client, we only allow access to the public database
@@ -39,7 +40,7 @@ export const load: import('./$types').PageServerLoad = async ({ params, cookies,
 		throw error(404, 'Ticket not found');
 	}
 
-	if (_ticket.ticketState.reservation.pin !== pin) {
+	if (!verifyPin(ticketId, _ticket.ticketState.reservation.pin, pinHash)) {
 		throw redirect(307, redirectUrl);
 	}
 

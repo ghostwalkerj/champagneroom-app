@@ -11,6 +11,7 @@ import { createShowMachineService } from '$lib/machines/showMachine';
 import { url } from 'inspector';
 import urlJoin from 'url-join';
 import { PUBLIC_TICKET_PATH } from '$env/static/public';
+import { createPinHash } from '$lib/util/pin';
 
 export const load: import('./$types').PageServerLoad = async ({ params }) => {
 	const showId = params.id;
@@ -107,7 +108,8 @@ export const actions: import('./$types').Actions = {
 			}
 		);
 		showService.send('TICKET RESERVED');
-		cookies.set('pin', pin, { path: '/' });
+		const hash = createPinHash(ticket._id, pin);
+		cookies.set('pin', hash, { path: '/' });
 		const redirectUrl = urlJoin(url.origin, PUBLIC_TICKET_PATH, ticket._id);
 		throw redirect(307, redirectUrl);
 	},
