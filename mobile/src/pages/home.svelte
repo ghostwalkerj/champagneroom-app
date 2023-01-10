@@ -36,6 +36,7 @@
   } from 'lib/stores';
   import spacetime from 'spacetime';
   import urlJoin from 'url-join';
+  import { onMount } from 'svelte';
 
   const APP_URL = import.meta.env.VITE_APP_URL;
   const SHOW_PATH = import.meta.env.VITE_SHOW_PATH;
@@ -114,12 +115,14 @@
     );
   };
 
-  showMachineState.subscribe((state: ShowMachineStateType | null) => {
-    if (state && state.changed) {
-      console.log(state.value);
-      canCancelShow = state.can('REQUEST CANCELLATION');
-      canCreateShow = !state.done || !state.matches('inEscrow');
-    }
+  onMount(() => {
+    showMachineState.subscribe((state: ShowMachineStateType | null) => {
+      if (state && state.changed) {
+        console.log(state.value);
+        canCancelShow = state.can('REQUEST CANCELLATION');
+        canCreateShow = !state.done || !state.matches('inEscrow');
+      }
+    });
   });
 </script>
 

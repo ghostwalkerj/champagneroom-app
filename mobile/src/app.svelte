@@ -64,21 +64,25 @@
             .exec()
             .then((show: ShowDocument | null) => {
               if (show) {
-                currentShow.set(show);
+                show.$.subscribe(_show => {
+                  currentShow.set(_show);
+                });
 
                 // New show, start showMachine
-                show.get$('showState').subscribe(_showState => {
-                  $showMachineService?.stop();
-                  const _showMachineService = createShowMachineService(
-                    _showState,
-                    show.saveState()
-                  );
-                  showMachineService.set(_showMachineService);
-                  _showMachineService.onTransition(state => {
-                    showMachineState.set(state);
+                show
+                  .get$('showState')
+                  .subscribe((_showState: ShowDocument['showState']) => {
+                    $showMachineService?.stop();
+                    const _showMachineService = createShowMachineService(
+                      _showState,
+                      show.saveState()
+                    );
+                    showMachineService.set(_showMachineService);
+                    _showMachineService.onTransition(state => {
+                      showMachineState.set(state);
+                    });
+                    _showMachineService.start();
                   });
-                  _showMachineService.start();
-                });
               }
             });
         }
