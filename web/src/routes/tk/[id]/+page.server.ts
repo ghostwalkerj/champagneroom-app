@@ -1,6 +1,6 @@
 import { JWT_EXPIRY, JWT_PUBLIC_USER, JWT_SECRET } from '$env/static/private';
 import { PUBLIC_PIN_PATH } from '$env/static/public';
-import { publicTicketDB } from '$lib/ORM/dbs/publicTicketDB';
+import { publicTicketDB as ticketDB } from '$lib/ORM/dbs/publicTicketDB';
 import type { TicketDocType, TicketDocument } from '$lib/ORM/models/ticket';
 import { StorageTypes } from '$lib/ORM/rxdb';
 import { verifyPin } from '$lib/util/pin';
@@ -29,7 +29,7 @@ export const load: import('./$types').PageServerLoad = async ({ params, cookies,
 		JWT_SECRET //TODO: Need to change this to one specific to the public database
 	);
 
-	const db = await publicTicketDB(token, ticketId, StorageTypes.NODE_WEBSQL);
+	const db = await ticketDB(token, ticketId, StorageTypes.NODE_WEBSQL);
 	if (!db) {
 		throw error(500, 'no db');
 	}

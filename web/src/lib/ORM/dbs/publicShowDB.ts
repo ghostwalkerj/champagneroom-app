@@ -34,7 +34,7 @@ const create = async (token: string, showId: string, storage: StorageTypes) => {
 	});
 
 	_db = await createRxDatabase({
-		name: 'pouchdb/publicShow_db',
+		name: 'pouchdb/cb_db',
 		storage: wrappedStorage,
 		ignoreDuplicate: true,
 		password: PUBLIC_RXDB_PASSWORD

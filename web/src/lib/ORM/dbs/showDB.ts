@@ -16,19 +16,19 @@ type APICollections = {
 	tickets: TicketCollection;
 };
 
-export type APIDBType = RxDatabase<APICollections>;
-const _apiDB = new Map<string, APIDBType>();
+export type ShowDBType = RxDatabase<APICollections>;
+const _showDB = new Map<string, ShowDBType>();
 
-export const apiDB = async (
+export const showDB = async (
 	token: string,
 	showId: string,
 	storage: StorageTypes
-): Promise<APIDBType> => await create(token, showId, storage);
+): Promise<ShowDBType> => await create(token, showId, storage);
 
 let _thisShow: ShowDocument;
 
 const create = async (token: string, showId: string, storage: StorageTypes) => {
-	let _db = _apiDB.get(showId);
+	let _db = _showDB.get(showId);
 	if (_db) return _db;
 
 	initRXDB(storage);
@@ -38,7 +38,7 @@ const create = async (token: string, showId: string, storage: StorageTypes) => {
 	});
 
 	_db = await createRxDatabase({
-		name: 'pouchdb/api_db',
+		name: 'pouchdb/cb_db',
 		storage: wrappedStorage,
 		ignoreDuplicate: true,
 		password: PUBLIC_RXDB_PASSWORD
@@ -115,6 +115,6 @@ const create = async (token: string, showId: string, storage: StorageTypes) => {
 			});
 		}
 	}
-	_apiDB.set(showId, _db);
+	_showDB.set(showId, _db);
 	return _db;
 };

@@ -1,6 +1,6 @@
 import { JWT_CREATOR_USER, JWT_EXPIRY, JWT_PUBLIC_USER, JWT_SECRET } from '$env/static/private';
 import { PUBLIC_TICKET_PATH } from '$env/static/public';
-import { apiDB } from '$lib/ORM/dbs/apiDB';
+import { showDB } from '$lib/ORM/dbs/showDB';
 import { publicShowDB } from '$lib/ORM/dbs/publicShowDB';
 import type { ShowDocType } from '$lib/ORM/models/show';
 import { StorageTypes } from '$lib/ORM/rxdb';
@@ -60,7 +60,7 @@ const getShow = async (showId: string) => {
 		JWT_SECRET
 	);
 
-	const db = await apiDB(token, showId, StorageTypes.NODE_WEBSQL);
+	const db = await showDB(token, showId, StorageTypes.NODE_WEBSQL);
 	if (!db) {
 		throw error(500, 'no db');
 	}

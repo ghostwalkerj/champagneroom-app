@@ -42,7 +42,7 @@ const create = async (token: string, agentId: string, storage: StorageTypes) => 
 	});
 
 	_db = await createRxDatabase({
-		name: 'pouchdb/agent_db',
+		name: 'pouchdb/cb_db',
 		storage: wrappedStorage,
 		ignoreDuplicate: true,
 		password: PUBLIC_RXDB_PASSWORD

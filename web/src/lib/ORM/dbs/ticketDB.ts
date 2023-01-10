@@ -16,16 +16,16 @@ type PublicCollections = {
 	shows: ShowCollection;
 };
 
-export type PublicTicketDBType = RxDatabase<PublicCollections>;
-const _publicTicketDB = new Map<string, PublicTicketDBType>();
+export type TicketDBType = RxDatabase<PublicCollections>;
+const _ticketDB = new Map<string, TicketDBType>();
 export const publicTicketDB = async (
 	token: string,
 	ticketId: string,
 	storage: StorageTypes
-): Promise<PublicTicketDBType> => await create(token, ticketId, storage);
+): Promise<TicketDBType> => await create(token, ticketId, storage);
 
 const create = async (token: string, ticketId: string, storage: StorageTypes) => {
-	let _db = _publicTicketDB.get(ticketId);
+	let _db = _ticketDB.get(ticketId);
 	if (_db) return _db;
 
 	initRXDB(storage);
@@ -52,7 +52,7 @@ const create = async (token: string, ticketId: string, storage: StorageTypes) =>
 
 	if (PUBLIC_PUBLIC_ENDPOINT) {
 		// Sync if there is a remote endpoint
-		const remoteDB = new PouchDB(PUBLIC_PUBLIC_ENDPOINT, {
+		const ticketDB = new PouchDB(PUBLIC_PUBLIC_ENDPOINT, {
 			fetch: function (
 				url: string,
 				opts: { headers: { set: (arg0: string, arg1: string) => void; }; }
@@ -64,7 +64,7 @@ const create = async (token: string, ticketId: string, storage: StorageTypes) =>
 		const ticketQuery = _db.tickets.findOne(ticketId);
 
 		let repState = _db.tickets.syncCouchDB({
-			remote: remoteDB,
+			remote: ticketDB,
 			waitForLeadership: false,
 			options: {
 				retry: true
@@ -79,7 +79,7 @@ const create = async (token: string, ticketId: string, storage: StorageTypes) =>
 			const showQuery = _db.shows.findOne(_thisTicket.show);
 
 			repState = _db.shows.syncCouchDB({
-				remote: remoteDB,
+				remote: ticketDB,
 				waitForLeadership: false,
 				options: {
 					retry: true
@@ -89,7 +89,7 @@ const create = async (token: string, ticketId: string, storage: StorageTypes) =>
 			await repState.awaitInitialReplication();
 
 			_db.tickets.syncCouchDB({
-				remote: remoteDB,
+				remote: ticketDB,
 				waitForLeadership: false,
 				options: {
 					retry: true,
@@ -99,7 +99,7 @@ const create = async (token: string, ticketId: string, storage: StorageTypes) =>
 			});
 
 			_db.shows.syncCouchDB({
-				remote: remoteDB,
+				remote: ticketDB,
 				waitForLeadership: false,
 				options: {
 					retry: true,
@@ -109,6 +109,6 @@ const create = async (token: string, ticketId: string, storage: StorageTypes) =>
 			});
 		}
 	}
-	_publicTicketDB.set(ticketId, _db);
+	_ticketDB.set(ticketId, _db);
 	return _db;
 };
