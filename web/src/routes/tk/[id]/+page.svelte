@@ -22,18 +22,6 @@
 
   $: waiting4StateChange = false;
 
-  const onSubmit = ({ form }) => {
-    waiting4StateChange = true;
-    return async ({ result }) => {
-      if (result.type !== 'success') {
-        waiting4StateChange = false;
-      } else {
-        if (form) form.reset();
-      }
-      await applyAction(result);
-    };
-  };
-
   onMount(async () => {
     publicTicketDB(token, ticketId, StorageTypes.IDB).then(
       (db: PublicTicketDBType) => {
