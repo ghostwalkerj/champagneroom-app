@@ -90,7 +90,7 @@
       price: price,
       maxNumTickets: 1,
       coverPhotoUrl: $talent?.profileImageUrl,
-    } as Partial<ShowDocType>;
+    };
     $talent?.createShow(show).then((show: ShowDocument) => {
       Clipboard.write({
         string: urlJoin(APP_URL, SHOW_PATH, show._id),
@@ -320,10 +320,10 @@
             {$currentShow.showState.ticketsAvailable}
           </ListItem>
           <ListItem title="Tickets Sold">
-            {$currentShow.salesStats.ticketsSold}
+            {$currentShow.showState.ticketsSold}
           </ListItem>
           <ListItem title="Sales">
-            {currencyFormatter.format($currentShow.salesStats.totalSales)}
+            {currencyFormatter.format($currentShow.showState.totalSales)}
           </ListItem>
         </List>
       </CardContent>

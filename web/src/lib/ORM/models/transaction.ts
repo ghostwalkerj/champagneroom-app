@@ -8,10 +8,9 @@ import {
 import type { LinkDocument } from './link';
 
 export enum TransactionReasonType {
-	FUNDING,
-	REFUND,
+	TICKET_PAYMENT,
+	TICKET_REFUND,
 	DISPUTE_RESOLUTION,
-	FINALIZATION
 }
 
 const transactionSchemaLiteral = {

@@ -129,22 +129,30 @@ const showSchemaLiteral = {
         },
         updatedAt: { type: 'integer' },
         ticketsAvailable: { type: 'integer' },
+        ticketsSold: { type: 'integer', default: 0 },
+        totalSales: { type: 'integer', default: 0 },
+        refundedAmount: {
+          type: 'integer',
+          default: 0,
+          minimum: 0,
+          maximum: 99999
+        },
         cancel: {
           type: 'object',
           properties: {
             createdAt: { type: 'integer' },
             canceledInState: { type: 'string' },
-            transactions: {
-              type: 'array',
-              ref: 'transactions',
-              items: { type: 'string' }
-            }
+
           },
           required: ['createdAt', 'canceledInState']
         },
-
+        transactions: {
+          type: 'array',
+          ref: 'transactions',
+          items: { type: 'string' }
+        }
       },
-      required: ['status', 'updatedAt', 'ticketsAvailable']
+      required: ['status', 'updatedAt', 'ticketsAvailable', 'ticketsSold', 'totalSales', 'refundedAmount']
     },
     tickets: {
       type: 'array',
@@ -194,17 +202,9 @@ const showSchemaLiteral = {
     duration: { type: 'integer' },
     price: { type: 'integer' },
     name: { type: 'string', maxLength: 50 },
-    maxNumTickets: { type: 'integer' },
-    salesStats: {
-      type: 'object',
-      properties: {
-        ticketsSold: { type: 'integer', default: 0 },
-        totalSales: { type: 'integer', default: 0 },
-      },
-      required: ['ticketsSold', 'totalSales']
-    }
+    maxNumTickets: { type: 'integer' }
   },
-  required: ['_id', 'createdAt', 'agent', 'talent', 'duration', 'price', 'name', 'maxNumTickets', 'roomId', 'salesStats', 'showState', 'talentInfo'],
+  required: ['_id', 'createdAt', 'agent', 'talent', 'duration', 'price', 'name', 'maxNumTickets', 'roomId', 'showState', 'talentInfo'],
   encrypted: ['roomId']
 } as const;
 

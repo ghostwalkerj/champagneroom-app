@@ -19,7 +19,8 @@ export enum TicketStatus {
 	CANCELED,
 	FINALIZED,
 	IN_ESCROW,
-	IN_DISPUTE
+	IN_DISPUTE,
+	REFUNDED
 }
 
 export enum DisputeDecision {
@@ -50,7 +51,6 @@ const ticketSchemaLiteral = {
 			type: 'string',
 			maxLength: 50
 		},
-
 		ticketState: {
 			type: 'object',
 			properties: {
@@ -86,11 +86,6 @@ const ticketSchemaLiteral = {
 							enum: Object.values(ActorType)
 						},
 						canceledInState: { type: 'string' },
-						transactions: {
-							type: 'array',
-							ref: 'transactions',
-							items: { type: 'string' }
-						}
 					},
 					required: ['createdAt', 'canceler', 'canceledInState']
 				},
@@ -100,14 +95,7 @@ const ticketSchemaLiteral = {
 						name: { type: 'string' },
 						pin: { type: 'string' },
 						createdAt: { type: 'integer' },
-						transactions: {
-							type: 'array',
-							ref: 'transactions',
-							items: { type: 'string' }
-						},
-						ticketEvents: {
-							type: 'array', ref: 'ticketEvents', items: { type: 'string' }
-						}
+
 					},
 					required: ['name', 'pin', 'createdAt']
 				},
@@ -135,11 +123,6 @@ const ticketSchemaLiteral = {
 									type: 'string',
 									enum: Object.values(DisputeDecision)
 								},
-								transactions: {
-									type: 'array',
-									ref: 'transactions',
-									items: { type: 'string' }
-								}
 							},
 							required: ['decision']
 						}
@@ -150,11 +133,6 @@ const ticketSchemaLiteral = {
 					type: 'object',
 					properties: {
 						endedAt: { type: 'integer' },
-						transactions: {
-							type: 'array',
-							ref: 'transactions',
-							items: { type: 'string' }
-						}
 					},
 					required: ['endedAt']
 				},
@@ -174,6 +152,16 @@ const ticketSchemaLiteral = {
 						createdAt: { type: 'integer' }
 					},
 					required: ['createdAt', 'rating']
+				},
+				ticketEvents: {
+					type: 'array',
+					ref: 'ticketEvents',
+					items: { type: 'string' }
+				},
+				transactions: {
+					type: 'array',
+					ref: 'transactions',
+					items: { type: 'string' }
 				},
 				updatedAt: { type: 'integer' }
 			},

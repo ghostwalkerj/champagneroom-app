@@ -1,5 +1,6 @@
 import { PUBLIC_ESCROW_PERIOD, PUBLIC_GRACE_PERIOD } from '$env/static/public';
 import { ShowStatus, type ShowDocType } from '$lib/ORM/models/show';
+import type { TransactionDocType } from '$lib/ORM/models/transaction';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 
 const GRACE_PERIOD = Number(PUBLIC_GRACE_PERIOD || 90000);
@@ -33,7 +34,10 @@ export const createShowMachine = (showState: ShowStateType, saveState?: { update
 			schema: {
 				events: {} as
 					| { type: 'REQUEST CANCELLATION'; }
-					| { type: 'REFUNDED'; }
+					| {
+						type: 'REFUND RECEIVED';
+						transaction: TransactionDocType;
+					}
 					| { type: 'TICKET RESERVED'; }
 					| { type: 'TICKET RESERVATION TIMEOUT'; }
 					| { type: 'START SHOW'; }
@@ -99,8 +103,8 @@ export const createShowMachine = (showState: ShowStateType, saveState?: { update
 					},
 					on: {
 						'REQUEST CANCELLATION': {
-							target: 'cancelled',
-							actions: ['cancelShow', 'saveShowState']
+							target: 'requestedCancellation',
+							actions: ['requestCancellation', 'saveShowState']
 						},
 						'TICKET RESERVED': {
 							actions: ['decrementTickets']
@@ -141,9 +145,19 @@ export const createShowMachine = (showState: ShowStateType, saveState?: { update
 					initial: 'waiting4Refund',
 					states: {
 						waiting4Refund: {
-
+							on: {
+								'REFUND RECEIVED': {
+								}
+							}
 						}
 					},
+					always: {
+						target: 'cancelled',
+						cond: (context) =>
+							context.showState.totalSales <=
+							context.showState.refundedAmount,
+						actions: ['cancelShow', 'saveShowState']
+					}
 				},
 				inDispute: {}
 			}
