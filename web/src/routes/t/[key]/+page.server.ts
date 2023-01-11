@@ -118,7 +118,7 @@ export const actions: import('./$types').Actions = {
 
 		const showService = createShowMachineService(
 			cancelShow.showState,
-			cancelShow.saveState(),
+			cancelShow.saveShowStateCallBack,
 		);
 		showService.send({
 			type: 'REQUEST CANCELLATION',
@@ -139,17 +139,13 @@ export const actions: import('./$types').Actions = {
 
 		const showService = createShowMachineService(
 			refundShow.showState,
-			refundShow.saveState(),
+			refundShow.saveShowStateCallBack,
 		);
 		const state = showService.getSnapshot();
 
 		if (!state.matches('requestedCancellation.waiting4Refund')) {
 			return error(400, 'Show cannot be refunded');
 		}
-
-		showService.send({
-			type: 'REFUNDED',
-		});
 
 		return { success: true };
 	}

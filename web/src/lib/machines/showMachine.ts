@@ -8,11 +8,7 @@ const ESCROW_PERIOD = Number(PUBLIC_ESCROW_PERIOD || 3600000);
 
 type ShowStateType = ShowDocType['showState'];
 
-export type StateCallBackType = (state: ShowStateType) => void;
-export type ticketCounterCallBackType = () => {
-	increment: () => void;
-	decrement: () => void;
-};
+export type SaveStateCallBackType = (state: ShowStateType) => void;
 
 export const graceTimer = (timerStart: number) => {
 	const timer = timerStart + GRACE_PERIOD - new Date().getTime();
@@ -24,7 +20,7 @@ export const escrowTimer = (endTime: number) => {
 	return timer > 0 ? timer : 0;
 };
 
-export const createShowMachine = (showState: ShowStateType, saveState?: { updateShowStateCallBack: StateCallBackType, ticketCounter: ticketCounterCallBackType; }) => {
+export const createShowMachine = (showState: ShowStateType, saveShowStateCallBack?: SaveStateCallBackType) => {
 
 	/** @xstate-layout N4IgpgJg5mDOIC5SwBYHsDuBZAhgYxQEsA7MAOlUwAIAbNHCSAYgG0AGAXUVAAc1ZCAF0Jpi3EAA9EAJgAsbMgDYAnNLZsAzAEZp0gOxblWrQBoQATxmKNZPbOka2ejQFZlitXoC+Xs5Wz4RKQU6Bi09IwQrFpcSCB8AsKi4lIIcgoqapo6+obGZpYILtZkGrJljnp2ABwailo+fqG4BCTk-uEMzCzSsbz8QiJicanpSqrq2roGRqYWiBoOZGz21Spsinq6td6+IP4tQe2hnZGsGn3xA0nDoKPy41lTubMFiNWyZMWKHkZ6TtJ6tJGvtmoE2iFqHQulEWLJLglBskRjIHplJjkZvl5ghZPZxtpZMpVFpNNItIoQQdwcEOtCziwXAjrkMUqiMhNstM8nNCmpPnitHZii41FpHNUqWDWrSTvTuopmYlWSi0mjOc8sbzEFpZC4yLrjLVlHj5C4XFLMIcISQAKKwPAAJ0wTAksEEOEE5BwADMvY6ABRwJ2YAAiYBoOHMAEomNSZeQ7Q7nRh2EqkbdJIgqloyHJrK4flNNm8EFoXDZjOpFOVqtVpObVD49sQ0Ix4HF40dxIibmyEABaRSlgf64njtjitb1UmyS0BBOQsLyiA9lnIu6Ieyl5R6L5saTVFbODZEjQaefW4J4HDEPARmiQNfKjdZoqyap56Qm6o6f4ORRqlLX8yCJKtSTkXRZF2JorRpcgfRIHAaEIAAvJ84l7FVNwQE1pDIYkZyFfQ623HE1GUA07H0Ow6iJBtL3gsgkxDDBnwzfs3EUA1HGKD9yjYes9FLNR8JrA9SRcAwXFqPVGMXAAjNAJAAeR9RD7xUngwEzLDX1SFwPy-H8-wPOogPI+oCPkKppiMIwVnko4yCU1T1MIe8AGE6FgDD+hfTMDKM3QTP0MzANLYpc0MrRqmUYoTXkawnIhR0wAARwAVzgL0IE8297xoSM+0w9dAsQQzPxCj9TIAizCkWXM5HFc9lDWPQ2rsFLghIUNCFgHhMq9diSpwyrjJqsK6tLXUbFams62sXcZN2HwgA */
 	return createMachine(
@@ -107,10 +103,10 @@ export const createShowMachine = (showState: ShowStateType, saveState?: { update
 							actions: ['requestCancellation', 'saveShowState']
 						},
 						'TICKET RESERVED': {
-							actions: ['decrementTickets']
+							actions: ['decrementTickets', 'saveShowState']
 						},
 						'TICKET RESERVATION TIMEOUT': {
-							actions: ['incrementTickets']
+							actions: ['incrementTickets', 'saveShowState']
 						},
 						'START SHOW': {
 							target: 'started',
@@ -147,6 +143,7 @@ export const createShowMachine = (showState: ShowStateType, saveState?: { update
 						waiting4Refund: {
 							on: {
 								'REFUND RECEIVED': {
+									actions: ['receiveRefund', 'saveShowState'],
 								}
 							}
 						}
@@ -201,6 +198,7 @@ export const createShowMachine = (showState: ShowStateType, saveState?: { update
 							...context.showState,
 							updatedAt: new Date().getTime(),
 							status: ShowStatus.CANCELLATION_REQUESTED,
+							ticketsAvailable: 0,
 							cancel: {
 								createdAt: new Date().getTime(),
 								canceledInState: meta.state ? JSON.stringify(meta.state.value) : 'unknown'
@@ -208,15 +206,37 @@ export const createShowMachine = (showState: ShowStateType, saveState?: { update
 						}
 					};
 				}),
+				receiveRefund: assign((context, event) => {
+					return {
+						showState: {
+							...context.showState,
+							updatedAt: new Date().getTime(),
+							refundedAmount: context.showState.refundedAmount + Number(event.transaction.value),
+							transactions: [...context.showState.transactions || [], event.transaction._id]
+						}
+					};
+				}),
 				saveShowState: (context) => {
-					if (saveState) saveState.updateShowStateCallBack(context.showState);
+					if (saveShowStateCallBack) saveShowStateCallBack(context.showState);
 				},
-				incrementTickets: () => {
-					if (saveState) saveState.ticketCounter().increment();
-				},
-				decrementTickets: () => {
-					if (saveState) saveState.ticketCounter().decrement();
-				}
+				incrementTickets: assign((context) => {
+					return {
+						showState: {
+							...context.showState,
+							updatedAt: new Date().getTime(),
+							ticketsAvailable: context.showState.ticketsAvailable + 1,
+						}
+					};
+				}),
+				decrementTickets: assign((context) => {
+					return {
+						showState: {
+							...context.showState,
+							updatedAt: new Date().getTime(),
+							ticketsAvailable: context.showState.ticketsAvailable - 1,
+						}
+					};
+				}),
 			},
 			guards: {
 				showCancelled: (context) => context.showState.status === ShowStatus.CANCELLED,
@@ -238,12 +258,9 @@ export const createShowMachine = (showState: ShowStateType, saveState?: { update
 
 export const createShowMachineService = (
 	showState: ShowStateType,
-	saveState?: {
-		updateShowStateCallBack: StateCallBackType,
-		ticketCounter: ticketCounterCallBackType;
-	}
+	saveShowStateCallBack?: SaveStateCallBackType,
 ) => {
-	const showMachine = createShowMachine(showState, saveState);
+	const showMachine = createShowMachine(showState, saveShowStateCallBack);
 	return interpret(showMachine).start();
 };
 

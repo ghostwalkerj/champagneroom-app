@@ -1,4 +1,4 @@
-import type { StateCallBackType, ticketCounterCallBackType } from '$lib/machines/showMachine';
+import type { SaveStateCallBackType } from '$lib/machines/showMachine';
 import { nanoid } from 'nanoid';
 import {
   toTypedRxJsonSchema,
@@ -25,43 +25,24 @@ export enum ShowStatus {
 }
 
 type ShowDocMethods = {
-  saveState: () => {
-    updateShowStateCallBack: StateCallBackType;
-    ticketCounter: ticketCounterCallBackType;
-  };
+  saveShowStateCallBack: SaveStateCallBackType;
   createTicket: (ticketProps: { name: string, pin: string; }) => Promise<TicketDocument>;
-  refundTickets: () => void;
 };
 export const showDocMethods: ShowDocMethods = {
-  saveState: function (this: ShowDocument) {
-    const updateShowStateCallBack = (_showState: ShowDocument['showState']) => {
-      if (_showState.updatedAt > this.showState.updatedAt) {
-        const atomicUpdate = (showDoc: ShowDocType) => {
-          const newState = {
-            ...showDoc.showState,
-            ..._showState
-          };
-          return {
-            ...showDoc,
-            showState: newState
-          };
+  saveShowStateCallBack: async function (this: ShowDocument, _showState: ShowDocument['showState']) {
+    if (_showState.updatedAt > this.showState.updatedAt) {
+      const atomicUpdate = (showDoc: ShowDocType) => {
+        const newState = {
+          ...showDoc.showState,
+          ..._showState
         };
-        this.atomicUpdate(atomicUpdate);
-      }
-    };
-    const ticketCounter = () => {
-      return {
-        increment: () => {
-          this.update({ $inc: { 'showState.ticketsAvailable': 1 } });
-        },
-        decrement: () => {
-          this.update({ $inc: { 'showState.ticketsAvailable': -1 } });
-        }
+        return {
+          ...showDoc,
+          showState: newState
+        };
       };
-    };
-    return {
-      updateShowStateCallBack, ticketCounter
-    };
+      this.atomicUpdate(atomicUpdate);
+    }
   },
   createTicket: async function (this: ShowDocument, ticketProps: { name: string, pin: string; }) {
     const db = this.collection.database;
@@ -90,9 +71,6 @@ export const showDocMethods: ShowDocMethods = {
     const ticket = await db.tickets.insert(_ticket);
     return ticket;
   },
-  refundTickets: async function (this: ShowDocument) { //TODO: implement
-  },
-
 };
 
 const showSchemaLiteral = {

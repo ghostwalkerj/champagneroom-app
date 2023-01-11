@@ -75,7 +75,7 @@
                     $showMachineService?.stop();
                     const _showMachineService = createShowMachineService(
                       _showState,
-                      show.saveState()
+                      show.saveShowStateCallBack
                     );
                     showMachineService.set(_showMachineService);
                     _showMachineService.onTransition(state => {

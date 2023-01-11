@@ -32,7 +32,7 @@ export const createTicketMachine = (ticketState: TicketStateType, saveState?: St
 			schema: {
 				events: {} as
 					| { type: 'REQUEST CANCELLATION'; cancel: TicketStateType['cancel']; }
-					| { type: 'CANCELL TICKET'; cancel: TicketStateType['cancel']; }
+					| { type: 'CANCEL TICKET'; cancel: TicketStateType['cancel']; }
 
 					| {
 						type: 'REFUND RECEIVED';
@@ -68,8 +68,8 @@ export const createTicketMachine = (ticketState: TicketStateType, saveState?: St
 				'ticket loaded': {
 					always: [
 						{
-							target: 'claimed',
-							cond: 'ticketClaimed'
+							target: 'reserved',
+							cond: 'ticketreserved'
 						},
 						{
 							target: 'cancelled',
@@ -80,7 +80,7 @@ export const createTicketMachine = (ticketState: TicketStateType, saveState?: St
 							cond: 'ticketFinalized'
 						},
 						{
-							target: '#ticketMachine.claimed.requestedCancellation',
+							target: '#ticketMachine.reserved.requestedCancellation',
 							cond: 'ticketInCancellationRequested'
 						},
 						{
@@ -93,7 +93,8 @@ export const createTicketMachine = (ticketState: TicketStateType, saveState?: St
 						}
 					]
 				},
-				claimed: {
+
+				reserved: {
 					initial: 'waiting4Payment',
 					states: {
 						waiting4Payment: {
@@ -117,6 +118,7 @@ export const createTicketMachine = (ticketState: TicketStateType, saveState?: St
 								}
 							}
 						},
+
 						canJoin: {
 							initial: 'neverJoined',
 							states: {
@@ -129,7 +131,7 @@ export const createTicketMachine = (ticketState: TicketStateType, saveState?: St
 									],
 									on: {
 										'REQUEST CANCELLATION': {
-											target: '#ticketMachine.claimed.requestedCancellation',
+											target: '#ticketMachine.reserved.requestedCancellation',
 											actions: ['requestCancellation', 'saveTicketState']
 										},
 										'PAYMENT RECEIVED': {
@@ -145,7 +147,6 @@ export const createTicketMachine = (ticketState: TicketStateType, saveState?: St
 										}
 									}
 								},
-
 							},
 							on: {
 								'TICKET EVENT RECEIVED': {
@@ -153,6 +154,7 @@ export const createTicketMachine = (ticketState: TicketStateType, saveState?: St
 								}
 							}
 						},
+
 						requestedCancellation: {
 							initial: 'waiting4Refund',
 							states: {
@@ -173,12 +175,15 @@ export const createTicketMachine = (ticketState: TicketStateType, saveState?: St
 						}
 					}
 				},
+
 				cancelled: {
 					type: 'final'
 				},
+
 				finalized: {
 					type: 'final'
 				},
+
 				inEscrow: {
 					after: {
 						escrowDelay: {
@@ -198,24 +203,23 @@ export const createTicketMachine = (ticketState: TicketStateType, saveState?: St
 						}
 					}
 				},
+
 				inDispute: {},
 			},
 		}, {
+
 		actions: {
 			saveTicketState: (context) => {
 				if (stateCallback) stateCallback(context.ticketState);
 			},
 
 			receiveTicketEvent: assign((context, event) => {
-				const reservation = context.ticketState.reservation;
+				const state = context.ticketState;
 				return {
 					ticketState: {
 						...context.ticketState,
 						updatedAt: new Date().getTime(),
-						reservation: {
-							...reservation,
-							showEvents: [...(reservation.ticketEvents || []), event.ticketEvent._id]
-						}
+						showEvents: [...(state.ticketEvents || []), event.ticketEvent._id],
 					}
 				};
 			}),
@@ -252,39 +256,33 @@ export const createTicketMachine = (ticketState: TicketStateType, saveState?: St
 			}),
 
 			receivePayment: assign((context, event) => {
-				const reservation = context.ticketState.reservation;
+				const state = context.ticketState;
 				return {
 					ticketState: {
 						...context.ticketState,
 						updatedAt: new Date().getTime(),
 						totalPaid: context.ticketState.totalPaid + Number(event.transaction.value),
-						reservation: {
-							...reservation,
-							transactions: reservation.transactions
-								? [...reservation.transactions, event.transaction._id]
-								: [event.transaction._id]
-						}
+						transactions: state.transactions
+							? [...state.transactions, event.transaction._id]
+							: [event.transaction._id]
 					}
+
 				};
 			}),
 
 			receiveRefund: assign((context, event) => {
-				if (context.ticketState.cancel) {
-					return {
-						ticketState: {
-							...context.ticketState,
-							updatedAt: new Date().getTime(),
-							refundedAmount: context.ticketState.refundedAmount + Number(event.transaction.value),
-							cancel: {
-								...context.ticketState.cancel,
-								transactions: context.ticketState.cancel.transactions
-									? [...context.ticketState.cancel.transactions, event.transaction._id]
-									: [event.transaction._id]
-							}
-						}
-					};
-				}
-				return {};
+				const state = context.ticketState;
+				return {
+					ticketState: {
+						...context.ticketState,
+						updatedAt: new Date().getTime(),
+						totalPaid: context.ticketState.refundedAmount + Number(event.transaction.value),
+						transactions: state.transactions
+							? [...state.transactions, event.transaction._id]
+							: [event.transaction._id]
+					}
+
+				};
 			}),
 
 			receiveFeedback: assign((context, event) => {
@@ -355,7 +353,7 @@ export const createTicketMachine = (ticketState: TicketStateType, saveState?: St
 			ticketFinalized: (context) => context.ticketState.status === TicketStatus.FINALIZED,
 			ticketInDispute: (context) => context.ticketState.status === TicketStatus.IN_DISPUTE,
 			ticketInEscrow: (context) => context.ticketState.status === TicketStatus.IN_ESCROW,
-			ticketClaimed: (context) => context.ticketState.status === TicketStatus.RESERVED,
+			ticketreserved: (context) => context.ticketState.status === TicketStatus.RESERVED,
 			ticketInCancellationRequested: (context) =>
 				context.ticketState.status === TicketStatus.CANCELLATION_REQUESTED,
 			fullyPaid: (context) =>

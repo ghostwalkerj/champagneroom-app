@@ -11,13 +11,14 @@
 
   $: waterMark = true;
   $: waterMarkText = '';
+  $: canBuyTicket = show.showState.status === ShowStatus.BOX_OFFICE_OPEN;
 
   $: switch (show.showState.status) {
     case ShowStatus.CANCELLED:
       waterMarkText = 'Cancelled';
       break;
     case ShowStatus.STARTED:
-      waterMarkText = 'Box Office Closed';
+      waterMarkText = 'Show Started';
       break;
     case ShowStatus.FINALIZED:
     case ShowStatus.ENDED:
@@ -69,7 +70,10 @@
               </div>
 
               <div class="py-4 text-center">
-                <button class="btn btn-secondary " type="submit">Reserve</button
+                <button
+                  class="btn btn-secondary "
+                  type="submit"
+                  disabled={!canBuyTicket}>Reserve</button
                 >
               </div>
             </form>
@@ -77,7 +81,7 @@
         </div>
         <div class="flex justify-center flex-col">
           <div
-            class="relative bg-cover bg-no-repeat bg-center rounded-xl h-96"
+            class="relative bg-cover bg-no-repeat bg-center rounded-xl h-48"
             style="background-image: url('{show.talentInfo.profileImageUrl}')"
           >
             <div class="absolute top-1 left-2 text-lg">{show.name}</div>
