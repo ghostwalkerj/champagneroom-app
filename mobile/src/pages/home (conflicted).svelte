@@ -4,8 +4,7 @@
   import { Share } from '@capacitor/share';
   import { possessive } from 'i18n-possessive';
 
-  import type { ShowDocument } from '$lib/ORM/models/show';
-  import type { TicketDocument } from '$lib/ORM/models/ticket';
+  import type { ShowDocType, ShowDocument } from '$lib/ORM/models/show';
   import type { ShowMachineStateType } from '$lib/machines/showMachine';
   import { durationFormatter } from '$lib/util/constants';
 
@@ -34,7 +33,6 @@
     showMachineState,
     showMachineService,
     talent,
-    talentDB,
   } from 'lib/stores';
   import spacetime from 'spacetime';
   import urlJoin from 'url-join';
@@ -107,14 +105,7 @@
       'This will Refund all Tickets. Are you sure?',
       'Cancel Show',
       async () => {
-        const tickets = await $talentDB?.tickets
-          .find()
-          .where('show')
-          .eq($currentShow?._id)
-          .exec();
-        tickets?.forEach((ticket: TicketDocument) => {
-          // Cancel each ticket
-        });
+        const talents = await $currentShow?.populate('talents');
         $showMachineService?.send('REQUEST CANCELLATION');
         confirm.close();
       },

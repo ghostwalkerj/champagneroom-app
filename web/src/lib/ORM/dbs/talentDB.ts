@@ -92,6 +92,29 @@ const create = async (token: string, key: string, storage: StorageTypes) => {
 			});
 			await repState.awaitInitialReplication();
 
+			const ticketQuery = _db.tickets.find().where('talent').eq(_currentTalent?._id);
+
+			// Wait for tickets
+			repState = _db.tickets.syncCouchDB({
+				remote: remoteDB,
+				waitForLeadership: false,
+				options: {
+					retry: true
+				},
+				query: ticketQuery
+			});
+
+			// Live sync this Talent's tickets
+			_db.tickets.syncCouchDB({
+				remote: remoteDB,
+				waitForLeadership: false,
+				options: {
+					retry: true,
+					live: true
+				},
+				query: ticketQuery
+			});
+
 			// Live sync this Talent's shows
 			_db.shows.syncCouchDB({
 				remote: remoteDB,

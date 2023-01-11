@@ -190,7 +190,7 @@ const ticketSchemaLiteral = {
 		'ticketState',
 		'createdAt'
 	],
-	indexes: []
+	indexes: ['show']
 } as const;
 
 type ticketRef = {

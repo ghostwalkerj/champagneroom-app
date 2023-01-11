@@ -65,7 +65,7 @@ export const showDocMethods: ShowDocMethods = {
   },
   createTicket: async function (this: ShowDocument, ticketProps: { name: string, pin: string; }) {
     const db = this.collection.database;
-    const ticket = {
+    const _ticket = {
       _id: `${TicketString}:tk-${nanoid()}`,
       createdAt: new Date().getTime(),
       updatedAt: new Date().getTime(),
@@ -87,7 +87,8 @@ export const showDocMethods: ShowDocMethods = {
         }
       }
     } as TicketDocType;
-    return db.tickets.insert(ticket);
+    const ticket = await db.tickets.insert(_ticket);
+    return ticket;
   },
   refundTickets: async function (this: ShowDocument) { //TODO: implement
   },
@@ -154,15 +155,6 @@ const showSchemaLiteral = {
       },
       required: ['status', 'updatedAt', 'ticketsAvailable', 'ticketsSold', 'totalSales', 'refundedAmount']
     },
-    tickets: {
-      type: 'array',
-      ref: 'tickets',
-      items: {
-        type: 'string',
-        maxLength: 50
-      },
-      default: []
-    },
     talent: {
       type: 'string',
       ref: 'talents',
@@ -211,7 +203,6 @@ const showSchemaLiteral = {
 type showRef = {
   talent_?: Promise<TalentDocument>;
   agent_?: Promise<AgentDocument>;
-  tickets_?: Promise<TicketDocument[]>;
 };
 
 export const ShowString = 'show';
