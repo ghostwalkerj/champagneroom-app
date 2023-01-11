@@ -27,10 +27,8 @@
   const onSubmit = ({ form }) => {
     waiting4StateChange = true;
     return async ({ result }) => {
-      if (result.type !== 'success') {
+      if (result.type === 'failure') {
         waiting4StateChange = false;
-      } else {
-        if (form) form.reset();
       }
       await applyAction(result);
     };
@@ -41,7 +39,6 @@
       (db: PublicShowDBType) => {
         db.shows.findOne(showId).$.subscribe(_show => {
           show = _show as ShowDocument;
-          waiting4StateChange = false;
         });
       }
     );
