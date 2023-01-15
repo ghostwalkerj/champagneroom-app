@@ -1,7 +1,7 @@
 import { JWT_CREATOR_USER, JWT_EXPIRY, JWT_PUBLIC_USER, JWT_SECRET } from '$env/static/private';
 import { PUBLIC_TICKET_PATH } from '$env/static/public';
 import { showDB } from '$lib/ORM/dbs/showDB';
-import { publicShowDB } from '$lib/ORM/dbs/publicShowDB';
+import { apiShowDB } from '$lib/ORM/dbs/apiShowDB';
 import type { ShowDocType } from '$lib/ORM/models/show';
 import { StorageTypes } from '$lib/ORM/rxdb';
 import { createShowMachineService } from '$lib/machines/showMachine';
@@ -27,7 +27,7 @@ export const load: import('./$types').PageServerLoad = async ({ params }) => {
 		JWT_SECRET //TODO: Need to change this to one specific to the public database
 	);
 
-	const db = await publicShowDB(token, showId, StorageTypes.NODE_WEBSQL);
+	const db = await showDB(token, showId, StorageTypes.NODE_WEBSQL);
 	if (!db) {
 		throw error(500, 'no db');
 	}
@@ -60,7 +60,7 @@ const getShow = async (showId: string) => {
 		JWT_SECRET
 	);
 
-	const db = await showDB(token, showId, StorageTypes.NODE_WEBSQL);
+	const db = await apiShowDB(token, showId, StorageTypes.NODE_WEBSQL);
 	if (!db) {
 		throw error(500, 'no db');
 	}
@@ -74,7 +74,7 @@ const getShow = async (showId: string) => {
 };
 
 export const actions: import('./$types').Actions = {
-	buy_ticket: async ({ params, cookies, request, url }) => {
+	reserve_ticket: async ({ params, cookies, request, url }) => {
 		const showId = params.id;
 		if (showId === null) {
 			throw error(404, 'Key not found');

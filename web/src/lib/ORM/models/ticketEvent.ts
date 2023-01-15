@@ -53,13 +53,18 @@ const TicketEventSchemaLiteral = {
 			ref: 'talents',
 			maxLength: 50
 		},
+		agent: {
+			type: 'string',
+			ref: 'agents',
+			maxLength: 50
+		},
 		ticket: {
 			type: 'string',
 			ref: 'tickets',
 			maxLength: 50
 		},
 	},
-	required: ['_id', 'ticket', 'createdAt', 'type', 'talent', 'show']
+	required: ['_id', 'ticket', 'createdAt', 'type', 'talent', 'show', 'agent']
 } as const;
 
 type TicketEventRef = {

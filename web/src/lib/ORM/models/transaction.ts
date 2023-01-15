@@ -5,7 +5,7 @@ import {
 	type RxDocument,
 	type RxJsonSchema
 } from 'rxdb';
-import type { LinkDocument } from './link';
+import type { TicketDocument } from './ticket';
 
 export enum TransactionReasonType {
 	TICKET_PAYMENT,
@@ -60,23 +60,28 @@ const transactionSchemaLiteral = {
 		value: {
 			type: 'string'
 		},
-		link: {
+		ticket: {
 			type: 'string',
 			maxLength: 50,
-			ref: 'links'
+			ref: 'tickets'
 		},
 		talent: {
 			type: 'string',
 			ref: 'talents',
 			maxLength: 50
+		},
+		agent: {
+			type: 'string',
+			ref: 'agents',
+			maxLength: 50
 		}
 	},
 	indexes: [],
-	required: ['_id', 'createdAt', 'hash', 'block', 'from', 'to', 'reason', 'value', 'link', 'talent']
+	required: ['_id', 'createdAt', 'hash', 'block', 'from', 'to', 'reason', 'value', 'ticket', 'talent', 'agent']
 } as const;
 
 type transactionRef = {
-	link_?: Promise<LinkDocument>;
+	ticket_?: Promise<TicketDocument>;
 };
 
 export const TransactionString = 'transaction';

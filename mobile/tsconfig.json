@@ -16,6 +16,7 @@
     "esModuleInterop": true,
     "strict": true,
     "noImplicitAny": false,
+    "importsNotUsedAsValues": "error",
     "module": "es2022",
     "moduleResolution": "Node",
     "types": [

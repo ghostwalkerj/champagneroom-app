@@ -113,7 +113,7 @@
           .eq($currentShow?._id)
           .exec();
         tickets?.forEach((ticket: TicketDocument) => {
-          // Cancel each ticket
+          // TODO: Cancel each ticket
         });
         $showMachineService?.send('REQUEST CANCELLATION');
         confirm.close();

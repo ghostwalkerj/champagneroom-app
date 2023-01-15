@@ -1,5 +1,5 @@
 import { JWT_CREATOR_USER, JWT_EXPIRY, JWT_SECRET } from '$env/static/private';
-import { talentDB } from '$lib/ORM/dbs/talentDB';
+import { talentDB } from '$lib/ORM/dbs/apiTalentDB';
 import type { ShowDocument } from '$lib/ORM/models/show';
 import { StorageTypes } from '$lib/ORM/rxdb';
 import { createShowMachineService } from '$lib/machines/showMachine';

@@ -1,44 +1,39 @@
-import { PUBLIC_CREATORS_ENDPOINT, PUBLIC_RXDB_PASSWORD } from '$env/static/public';
-
-import { showDocMethods, showSchema, type ShowCollection, type ShowDocument } from '$lib/ORM/models/show';
-import { TicketCollection, ticketSchema } from '$lib/ORM/models/ticket';
-import type { StorageTypes } from '$lib/ORM/rxdb';
-import { initRXDB } from '$lib/ORM/rxdb';
+import { PUBLIC_SHOW_DB_ENDPOINT, PUBLIC_RXDB_PASSWORD } from '$env/static/public';
+import { StorageTypes, initRXDB } from '$lib/ORM/rxdb';
 import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
+
+import { showSchema, type ShowCollection, type ShowDocument } from '$lib/ORM/models/show';
 import { PouchDB, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
 
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 100;
-type APICollections = {
+type PublicCollections = {
 	shows: ShowCollection;
-	tickets: TicketCollection;
 };
 
-export type ShowDBType = RxDatabase<APICollections>;
+export type ShowDBType = RxDatabase<PublicCollections>;
 const _showDB = new Map<string, ShowDBType>();
-
 export const showDB = async (
 	token: string,
 	showId: string,
-	storage: StorageTypes
-): Promise<ShowDBType> => await create(token, showId, storage);
+): Promise<ShowDBType> => await create(token, showId);
 
 let _thisShow: ShowDocument;
 
-const create = async (token: string, showId: string, storage: StorageTypes) => {
+const create = async (token: string, showId: string) => {
 	let _db = _showDB.get(showId);
 	if (_db) return _db;
 
-	initRXDB(storage);
+	initRXDB(StorageTypes.IDB);
 
 	const wrappedStorage = wrappedKeyEncryptionStorage({
-		storage: getRxStoragePouch(storage)
+		storage: getRxStoragePouch(StorageTypes.IDB)
 	});
 
 	_db = await createRxDatabase({
-		name: 'pouchdb/cb_db',
+		name: 'pouchdb/pcall_db',
 		storage: wrappedStorage,
 		ignoreDuplicate: true,
 		password: PUBLIC_RXDB_PASSWORD
@@ -46,17 +41,13 @@ const create = async (token: string, showId: string, storage: StorageTypes) => {
 
 	await _db.addCollections({
 		shows: {
-			schema: showSchema,
-			methods: showDocMethods
-		},
-		tickets: {
-			schema: ticketSchema
+			schema: showSchema
 		}
 	});
 
-	if (PUBLIC_CREATORS_ENDPOINT) {
+	if (PUBLIC_SHOW_DB_ENDPOINT) {
 		// Sync if there is a remote endpoint
-		const remoteDB = new PouchDB(PUBLIC_CREATORS_ENDPOINT, {
+		const remoteDB = new PouchDB(PUBLIC_SHOW_DB_ENDPOINT, {
 			fetch: function (
 				url: string,
 				opts: { headers: { set: (arg0: string, arg1: string) => void; }; }
@@ -66,9 +57,8 @@ const create = async (token: string, showId: string, storage: StorageTypes) => {
 			}
 		});
 		const showQuery = _db.shows.findOne(showId);
-		const ticketQuery = _db.tickets.find().where('show').eq(showId);
 
-		let repState = _db.shows.syncCouchDB({
+		const repState = _db.shows.syncCouchDB({
 			remote: remoteDB,
 			waitForLeadership: false,
 			options: {
@@ -78,32 +68,8 @@ const create = async (token: string, showId: string, storage: StorageTypes) => {
 		});
 		await repState.awaitInitialReplication();
 
-		repState = _db.tickets.syncCouchDB({
-			remote: remoteDB,
-			waitForLeadership: false,
-			options: {
-				retry: true
-			},
-			query: ticketQuery
-		});
-		await repState.awaitInitialReplication();
-
 		_thisShow = (await showQuery.exec()) as ShowDocument;
-
 		if (_thisShow) {
-
-			// Sync tickets
-			_db.tickets.syncCouchDB({
-				remote: remoteDB,
-				waitForLeadership: false,
-				options: {
-					retry: true,
-					live: true
-				},
-				query: ticketQuery
-			});
-
-			// Sync shows
 			_db.shows.syncCouchDB({
 				remote: remoteDB,
 				waitForLeadership: false,

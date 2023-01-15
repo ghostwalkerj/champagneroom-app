@@ -6,11 +6,11 @@
     publicShowDB,
     type PublicShowDBType,
   } from '$lib/ORM/dbs/publicShowDB';
-  import { type ShowDocument, ShowStatus } from '$lib/ORM/models/show';
+  import { ShowStatus, type ShowDocument } from '$lib/ORM/models/show';
   import { StorageTypes } from '$lib/ORM/rxdb';
   import getProfileImage from '$lib/util/profilePhoto';
   import { onMount } from 'svelte';
-  import type { PageData, ActionData } from './$types';
+  import type { ActionData, PageData } from './$types';
   import ShowDetail from './ShowDetail.svelte';
 
   export let data: PageData;
@@ -24,7 +24,7 @@
   $: profileImage = getProfileImage(displayName);
   $: canBuyTicket = show.showState.status === ShowStatus.BOX_OFFICE_OPEN;
 
-  const onSubmit = ({ form }) => {
+  const onSubmit = () => {
     waiting4StateChange = true;
     return async ({ result }) => {
       if (result.type === 'failure') {
@@ -73,7 +73,11 @@
               class="bg-cover  bg-no-repeat rounded-full h-48 w-48 row-span-2"
               style="background-image: url('{profileImage}')"
             />
-            <form method="post" action="?/buy_ticket" use:enhance={onSubmit}>
+            <form
+              method="post"
+              action="?/reserve_ticket"
+              use:enhance={onSubmit}
+            >
               <div class="max-w-xs w-full py-2 form-control ">
                 <!-- svelte-ignore a11y-label-has-associated-control -->
                 <label for="caller" class="label">

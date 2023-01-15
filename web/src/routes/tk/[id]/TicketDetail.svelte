@@ -1,15 +1,12 @@
 <script lang="ts">
-  import { type ShowDocType, ShowStatus } from '$lib/ORM/models/show';
+  import type { ShowDocType } from '$lib/ORM/models/show';
   import type { TicketDocType } from '$lib/ORM/models/ticket';
   import { currencyFormatter, durationFormatter } from '$lib/util/constants';
   import getProfileImage from '$lib/util/profilePhoto';
-  import StarRating from 'svelte-star-rating';
   export let show: ShowDocType;
   export let ticket: TicketDocType;
 
   $: profileImage = getProfileImage(ticket.ticketState.reservation.name);
-
-  $: canBuyTicket = show.showState.status === ShowStatus.BOX_OFFICE_OPEN;
 </script>
 
 {#if show}
@@ -47,8 +44,7 @@
           />
         </div>
         <div class="w-full flex">
-          <div>Payment Address:</div>
-          <div class="btn">Pay</div>
+          <div>Payment Address: {ticket.paymentAddress}</div>
         </div>
       </div>
     </div>

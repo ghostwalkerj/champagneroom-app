@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { applyAction } from '$app/forms';
+  import { applyAction, enhance } from '$app/forms';
   import { page } from '$app/stores';
   import {
     publicShowDB,
@@ -11,20 +11,30 @@
     type PublicTicketDBType,
   } from '$lib/ORM/dbs/publicTicketDB';
   import type { ShowDocType, ShowDocument } from '$lib/ORM/models/show';
-  import type { TicketDocument } from '$lib/ORM/models/ticket';
+  import { TicketStatus, type TicketDocument } from '$lib/ORM/models/ticket';
   import { StorageTypes } from '$lib/ORM/rxdb';
   import { onMount } from 'svelte';
-  import type { ActionData, PageData } from './$types';
+  import type { PageData } from './$types';
   import TicketDetail from './TicketDetail.svelte';
 
   export let data: PageData;
-  export let form: ActionData;
   const token = data.token;
   let ticket = data.ticket;
   let show = data.show as ShowDocType;
   let ticketId = $page.params.id;
 
   $: waiting4StateChange = false;
+  $: canBuyTicket = true;
+
+  const onSubmit = () => {
+    waiting4StateChange = true;
+    return async ({ result }) => {
+      if (result.type === 'failure') {
+        waiting4StateChange = false;
+      }
+      await applyAction(result);
+    };
+  };
 
   onMount(async () => {
     publicShowDB(token, show._id, StorageTypes.IDB).then(
@@ -40,6 +50,7 @@
           if (_ticket) {
             ticket = _ticket as TicketDocument;
             waiting4StateChange = false;
+            canBuyTicket = ticket.ticketState.status === TicketStatus.RESERVED;
           }
         });
       }
@@ -54,6 +65,13 @@
       <div class="pb-4 text-center">
         <TicketDetail {ticket} {show} />
       </div>
+      {#if canBuyTicket}
+        <form method="post" action="?/buy_ticket" use:enhance={onSubmit}>
+          <div class="w-full flex justify-center">
+            <button class="btn" type="submit">Send Payment</button>
+          </div>
+        </form>
+      {/if}
     {/key}
   </div>
 </div>

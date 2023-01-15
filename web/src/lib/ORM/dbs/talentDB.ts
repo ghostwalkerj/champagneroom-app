@@ -1,8 +1,7 @@
-import { PUBLIC_CREATORS_ENDPOINT, PUBLIC_RXDB_PASSWORD } from '$env/static/public';
+import { PUBLIC_TALENT_DB_ENDPOINT, PUBLIC_RXDB_PASSWORD } from '$env/static/public';
 import { showDocMethods, showSchema, type ShowCollection } from '$lib/ORM/models/show';
 import { talentDocMethods, talentSchema, type TalentCollection } from '$lib/ORM/models/talent';
-import { ticketSchema, type TicketCollection } from '$lib/ORM/models/ticket';
-import type { StorageTypes } from '$lib/ORM/rxdb';
+import { StorageTypes } from '$lib/ORM/rxdb';
 import { initRXDB } from '$lib/ORM/rxdb';
 import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
@@ -11,29 +10,29 @@ import { PouchDB, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
 
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 100;
+
 type CreatorsCollections = {
 	talents: TalentCollection;
 	shows: ShowCollection;
-	tickets: TicketCollection;
 };
 
 export type TalentDBType = RxDatabase<CreatorsCollections>;
 const _talentDB = new Map<string, TalentDBType>();
 
-export const talentDB = async (token: string, key: string, storage: StorageTypes) =>
-	await create(token, key, storage);
+export const talentDB = async (token: string, key: string) =>
+	await create(token, key);
 
-const create = async (token: string, key: string, storage: StorageTypes) => {
+const create = async (token: string, key: string) => {
 	let _db = _talentDB.get(key);
 	if (_db) return _db;
-	initRXDB(storage);
+	initRXDB(StorageTypes.IDB);
 
 	const wrappedStorage = wrappedKeyEncryptionStorage({
-		storage: getRxStoragePouch(storage)
+		storage: getRxStoragePouch(StorageTypes.IDB)
 	});
 
 	_db = await createRxDatabase({
-		name: 'pouchdb/cb_db',
+		name: 'pouchdb/pcall_db',
 		storage: wrappedStorage,
 		ignoreDuplicate: true,
 		password: PUBLIC_RXDB_PASSWORD
@@ -48,14 +47,11 @@ const create = async (token: string, key: string, storage: StorageTypes) => {
 			schema: showSchema,
 			methods: showDocMethods
 		},
-		tickets: {
-			schema: ticketSchema
-		},
 	});
 
-	if (PUBLIC_CREATORS_ENDPOINT) {
+	if (PUBLIC_TALENT_DB_ENDPOINT) {
 		// Sync if there is a remote endpoint
-		const remoteDB = new PouchDB(PUBLIC_CREATORS_ENDPOINT, {
+		const remoteDB = new PouchDB(PUBLIC_TALENT_DB_ENDPOINT, {
 			fetch: function (
 				url: string,
 				opts: { headers: { set: (arg0: string, arg1: string) => void; }; }
@@ -91,29 +87,6 @@ const create = async (token: string, key: string, storage: StorageTypes) => {
 				query: showQuery
 			});
 			await repState.awaitInitialReplication();
-
-			const ticketQuery = _db.tickets.find().where('talent').eq(_currentTalent?._id);
-
-			// Wait for tickets
-			repState = _db.tickets.syncCouchDB({
-				remote: remoteDB,
-				waitForLeadership: false,
-				options: {
-					retry: true
-				},
-				query: ticketQuery
-			});
-
-			// Live sync this Talent's tickets
-			_db.tickets.syncCouchDB({
-				remote: remoteDB,
-				waitForLeadership: false,
-				options: {
-					retry: true,
-					live: true
-				},
-				query: ticketQuery
-			});
 
 			// Live sync this Talent's shows
 			_db.shows.syncCouchDB({

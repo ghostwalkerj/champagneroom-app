@@ -101,6 +101,7 @@
 			}
 		],
 		"favorites.sortOrder": "ASC",
-		"favorites.sortDirection": "ASC"
+		"favorites.sortDirection": "ASC",
+		"typescript.tsdk": "mobile/node_modules/typescript/lib"
 	}
 }

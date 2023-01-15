@@ -1,12 +1,42 @@
-import { JWT_EXPIRY, JWT_PUBLIC_USER, JWT_SECRET } from '$env/static/private';
+import { JWT_API_SECRET, JWT_API_USER, JWT_EXPIRY } from '$env/static/private';
 import { PUBLIC_PIN_PATH } from '$env/static/public';
-import { publicTicketDB as ticketDB } from '$lib/ORM/dbs/publicTicketDB';
+import { apiTicketDB } from '$lib/ORM/dbs/apiTicketDB';
 import type { TicketDocType, TicketDocument } from '$lib/ORM/models/ticket';
 import { StorageTypes } from '$lib/ORM/rxdb';
 import { verifyPin } from '$lib/util/pin';
 import { error, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import urlJoin from 'url-join';
+
+const getTicket = async (ticketId: string) => {
+	const token = jwt.sign(
+		{
+			exp: Math.floor(Date.now() / 1000) + Number.parseInt(JWT_EXPIRY),
+			sub: JWT_API_USER,
+			kid: JWT_API_USER
+		},
+		JWT_API_SECRET
+	);
+
+	const db = await apiTicketDB(token, ticketId, StorageTypes.NODE_WEBSQL);
+	if (!db) {
+		throw error(500, 'no db');
+	}
+
+	const ticket = await db.tickets.findOne(ticketId).exec() as TicketDocument;
+
+	if (!ticket) {
+		throw error(404, 'Ticket not found');
+	}
+
+	const show = await ticket.show_;
+	if (!show) {
+		throw error(404, 'Show not found');
+	}
+
+	return ({ token, ticket, show });
+
+};
 
 export const load: import('./$types').PageServerLoad = async ({ params, cookies, url }) => {
 	const ticketId = params.id;
@@ -20,30 +50,7 @@ export const load: import('./$types').PageServerLoad = async ({ params, cookies,
 		throw error(404, 'Bad ticket id');
 	}
 
-	// Because we are returning the token to the client, we only allow access to the public database
-	const token = jwt.sign(
-		{
-			exp: Math.floor(Date.now() / 1000) + Number.parseInt(JWT_EXPIRY),
-			sub: JWT_PUBLIC_USER
-		},
-		JWT_SECRET //TODO: Need to change this to one specific to the public database
-	);
-
-	const db = await ticketDB(token, ticketId, StorageTypes.NODE_WEBSQL);
-	if (!db) {
-		throw error(500, 'no db');
-	}
-
-	const _ticket = await db.tickets.findOne(ticketId).exec() as TicketDocument;
-
-	if (!_ticket) {
-		throw error(404, 'Ticket not found');
-	}
-
-	const _show = await _ticket.show_;
-	if (!_show) {
-		throw error(404, 'Show not found');
-	}
+	const { token, ticket: _ticket, show: _show } = await getTicket(ticketId);
 
 	if (!verifyPin(ticketId, _ticket.ticketState.reservation.pin, pinHash)) {
 		throw redirect(303, redirectUrl);
@@ -57,4 +64,18 @@ export const load: import('./$types').PageServerLoad = async ({ params, cookies,
 		ticket,
 		show
 	};
+};
+
+export const actions: import('./$types').Actions = {
+	buy_ticket: async ({ params, cookies, request, url }) => {
+		const ticketId = params.id;
+		if (ticketId === null) {
+			throw error(404, 'Key not found');
+		}
+
+		const { ticket } = await getTicket(ticketId);
+
+		// Create transaction to buy ticket 
+
+	},
 };

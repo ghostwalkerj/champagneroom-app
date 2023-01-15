@@ -85,7 +85,7 @@
     "ts-loader": "9.4.2",
     "ts-node": "^10.8.2",
     "tslib": "2.4.1",
-    "typescript": "^4.9.4",
+    "typescript": "@next",
     "vite": "^3.2.4",
     "workbox-cli": "^6.5.4"
   }

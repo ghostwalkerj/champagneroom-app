@@ -1,4 +1,5 @@
-import { PUBLIC_RXDB_PASSWORD, PUBLIC_AGENT_DB_ENDPOINT } from '$env/static/public';
+import { JWT_EXPIRY, JWT_MASTER_DB_USER, JWT_MASTER_DB_SECRET, PRIVATE_MASTER_DB_ENDPOINT } from '$env/static/private';
+import { PUBLIC_RXDB_PASSWORD } from '$env/static/public';
 import {
 	agentDocMethods,
 	agentSchema,
@@ -13,15 +14,26 @@ import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
 import { PouchDB, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
+import jwt from 'jsonwebtoken';
 import { ShowCollection, showDocMethods, showSchema } from '$lib/ORM/models/show';
+import { TicketCollection, ticketDocMethods, ticketSchema } from
+	'$lib/ORM/models/ticket';;
 import { ShowEventCollection, showEventSchema } from '$lib/ORM/models/showEvent';
-import { TicketCollection, ticketDocMethods, ticketSchema } from '$lib/ORM/models/ticket';
 import { TicketEventCollection, ticketEventSchema } from '$lib/ORM/models/ticketEvent';
 
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 100;
 
-type AgentCollections = {
+const token = jwt.sign(
+	{
+		exp: Math.floor(Date.now() / 1000) + Number.parseInt(JWT_EXPIRY),
+		sub: JWT_MASTER_DB_USER,
+		kid: JWT_MASTER_DB_USER
+	},
+	JWT_MASTER_DB_SECRET
+);
+
+type MasterCollections = {
 	agents: AgentCollection;
 	talents: TalentCollection;
 	tickets: TicketCollection;
@@ -31,30 +43,26 @@ type AgentCollections = {
 	ticketEvents: TicketEventCollection;
 };
 
-export type AgentDBType = RxDatabase<AgentCollections>;
-const _agentDB = new Map<string, AgentDBType>();
+export type MasterDBType = RxDatabase<MasterCollections>;
+let _masterDB: MasterDBType;
 
-export const creatorAgentDB = async (token: string, agentId: string) =>
-	await create(token, agentId);
+export const masterDB = async () => {
+	if (_masterDB) return _masterDB;
 
-const create = async (token: string, agentId: string) => {
-	let _db = _agentDB.get(agentId);
-	if (_db) return _db;
-
-	initRXDB(StorageTypes.IDB);
+	initRXDB(StorageTypes.NODE_WEBSQL);
 
 	const wrappedStorage = wrappedKeyEncryptionStorage({
-		storage: getRxStoragePouch(StorageTypes.IDB)
+		storage: getRxStoragePouch(StorageTypes.NODE_WEBSQL)
 	});
 
-	_db = await createRxDatabase({
+	_masterDB = await createRxDatabase({
 		name: 'pouchdb/pcall_db',
 		storage: wrappedStorage,
 		ignoreDuplicate: true,
 		password: PUBLIC_RXDB_PASSWORD
 	});
 
-	await _db.addCollections({
+	await _masterDB.addCollections({
 		agents: {
 			schema: agentSchema,
 			methods: agentDocMethods,
@@ -83,9 +91,9 @@ const create = async (token: string, agentId: string) => {
 		},
 	});
 
-	if (PUBLIC_AGENT_DB_ENDPOINT) {
+	if (PRIVATE_MASTER_DB_ENDPOINT) {
 		// Sync if there is a remote endpoint
-		const remoteDB = new PouchDB(PUBLIC_AGENT_DB_ENDPOINT, {
+		const remoteDB = new PouchDB(PRIVATE_MASTER_DB_ENDPOINT, {
 			fetch: function (
 				url: string,
 				opts: { headers: { set: (arg0: string, arg1: string) => void; }; }
@@ -95,155 +103,125 @@ const create = async (token: string, agentId: string) => {
 			}
 		});
 
-		const agentQuery = _db.agents.findOne(agentId);
-		const talentQuery = _db.talents.find().where('agent').eq(agentId);
-		const showQuery = _db.shows.find().where('agent').eq(agentId);
-		const ticketQuery = _db.tickets.find().where('agent').eq(agentId);
-		const showEventQuery = _db.showEvents.find().where('agent').eq(agentId);
-		const ticketEventQuery = _db.ticketEvents.find().where('agent').eq(agentId);
-		const transactionQuery = _db.transactions.find().where('agent').eq(agentId);
-
-		let repState = _db.agents.syncCouchDB({
+		let repState = _masterDB.agents.syncCouchDB({
 			remote: remoteDB,
 			waitForLeadership: false,
 			options: {
 				retry: true
 			},
-			query: agentQuery
 		});
 		await repState.awaitInitialReplication();
 
-		repState = _db.talents.syncCouchDB({
+		repState = _masterDB.talents.syncCouchDB({
 			remote: remoteDB,
 			waitForLeadership: false,
 			options: {
 				retry: true
 			},
-			query: talentQuery
 		});
 		await repState.awaitInitialReplication();
 
-		repState = _db.shows.syncCouchDB({
+		repState = _masterDB.shows.syncCouchDB({
 			remote: remoteDB,
 			waitForLeadership: false,
 			options: {
 				retry: true
 			},
-			query: showQuery
 		});
 		await repState.awaitInitialReplication();
 
-		repState = _db.tickets.syncCouchDB({
+		repState = _masterDB.showEvents.syncCouchDB({
 			remote: remoteDB,
 			waitForLeadership: false,
 			options: {
 				retry: true
 			},
-			query: ticketQuery
 		});
 		await repState.awaitInitialReplication();
 
-		repState = _db.showEvents.syncCouchDB({
+		repState = _masterDB.tickets.syncCouchDB({
 			remote: remoteDB,
 			waitForLeadership: false,
 			options: {
 				retry: true
 			},
-			query: showEventQuery
 		});
 		await repState.awaitInitialReplication();
 
-		repState = _db.ticketEvents.syncCouchDB({
+		repState = _masterDB.ticketEvents.syncCouchDB({
 			remote: remoteDB,
 			waitForLeadership: false,
 			options: {
 				retry: true
 			},
-			query: ticketEventQuery
 		});
 		await repState.awaitInitialReplication();
 
-		repState = _db.transactions.syncCouchDB({
+		repState = _masterDB.transactions.syncCouchDB({
 			remote: remoteDB,
 			waitForLeadership: false,
 			options: {
 				retry: true
 			},
-			query: transactionQuery
 		});
 		await repState.awaitInitialReplication();
 
-		_db.agents.syncCouchDB({
+		_masterDB.agents.syncCouchDB({
 			remote: remoteDB,
 			waitForLeadership: false,
 			options: {
 				retry: true,
 				live: true
 			},
-			query: agentQuery
 		});
-
-		_db.talents.syncCouchDB({
+		_masterDB.talents.syncCouchDB({
 			remote: remoteDB,
 			waitForLeadership: false,
 			options: {
 				retry: true,
 				live: true
 			},
-			query: talentQuery
 		});
-
-		_db.shows.syncCouchDB({
+		_masterDB.shows.syncCouchDB({
 			remote: remoteDB,
 			waitForLeadership: false,
 			options: {
 				retry: true,
 				live: true
 			},
-			query: showQuery
 		});
-
-		_db.tickets.syncCouchDB({
+		_masterDB.showEvents.syncCouchDB({
 			remote: remoteDB,
 			waitForLeadership: false,
 			options: {
 				retry: true,
 				live: true
 			},
-			query: ticketQuery
 		});
-
-		_db.showEvents.syncCouchDB({
+		_masterDB.tickets.syncCouchDB({
 			remote: remoteDB,
 			waitForLeadership: false,
 			options: {
 				retry: true,
 				live: true
 			},
-			query: showEventQuery
 		});
-
-		_db.ticketEvents.syncCouchDB({
+		_masterDB.ticketEvents.syncCouchDB({
 			remote: remoteDB,
 			waitForLeadership: false,
 			options: {
 				retry: true,
 				live: true
 			},
-			query: ticketEventQuery
 		});
-
-		_db.transactions.syncCouchDB({
+		_masterDB.transactions.syncCouchDB({
 			remote: remoteDB,
 			waitForLeadership: false,
 			options: {
 				retry: true,
 				live: true
 			},
-			query: transactionQuery
 		});
-
-		_agentDB.set(agentId, _db);
-		return _db;;
 	}
-}; 
+	return _masterDB;
+};

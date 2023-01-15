@@ -4,7 +4,7 @@ import { json } from '@sveltejs/kit';
 import { Web3Storage } from 'web3.storage';
 import type { RequestHandler } from './$types';
 
-import { talentDB } from '$lib/ORM/dbs/talentDB';
+import { creatorTalentDB } from '$lib/ORM/dbs/privateTalentDB';
 import type { LinkDocument } from '$lib/ORM/models/link';
 import { StorageTypes } from '$lib/ORM/rxdb';
 import { error } from '@sveltejs/kit';
@@ -21,7 +21,7 @@ const token = jwt.sign(
 );
 
 const getDb = async (key: string) => {
-	const db = await talentDB(token, key, StorageTypes.NODE_WEBSQL);
+	const db = await creatorTalentDB(token, key, StorageTypes.NODE_WEBSQL);
 	return db;
 };
 

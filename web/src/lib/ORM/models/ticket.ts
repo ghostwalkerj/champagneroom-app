@@ -11,6 +11,8 @@ import {
 
 import { ActorType } from '$lib/util/constants';
 import type { ShowDocument } from './show';
+import { TransactionReasonType, TransactionDocument, TransactionString } from './transaction';
+import { nanoid } from 'nanoid';
 
 export enum TicketStatus {
 	RESERVED,
@@ -28,6 +30,43 @@ export enum DisputeDecision {
 	CUSTOMER_WON,
 	SPLIT
 }
+
+type TicketDocMethods = {
+	createTransaction: (transactionProps: {
+		hash: string;
+		block: number;
+		from: string;
+		to: string;
+		value: string;
+		reason: TransactionReasonType;
+	}) => Promise<TransactionDocument>;
+};
+
+export const ticketDocMethods: TicketDocMethods = {
+	createTransaction: async function (
+		this: TicketDocument,
+		transactionProps: {
+			hash: string;
+			block: number;
+			from: string;
+			to: string;
+			value: string;
+			reason: TransactionReasonType;
+		}
+	) {
+		const db = this.collection.database;
+		const transaction = await db.transactions.insert({
+			_id: `${TransactionString}:tr-${nanoid()}`,
+			createdAt: new Date().getTime(),
+			updatedAt: new Date().getTime(),
+			talent: this.talent,
+			ticket: this._id,
+			agent: this.agent,
+			...transactionProps,
+		});
+		return transaction;
+	}
+};
 
 export const TicketString = 'ticket';
 const ticketSchemaLiteral = {
@@ -205,4 +244,4 @@ export type TicketDocType = ExtractDocumentTypeFromTypedRxJsonSchema<typeof sche
 // @ts-ignore
 export const ticketSchema: RxJsonSchema<TicketDocType> = ticketSchemaLiteral;
 export type TicketDocument = RxDocument<TicketDocType> & ticketRef;
-export type TicketCollection = RxCollection<TicketDocType>;
+export type TicketCollection = RxCollection<TicketDocType>;;

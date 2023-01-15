@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { type ShowDocType, ShowStatus } from '$lib/ORM/models/show';
+  import { ShowStatus, type ShowDocType } from '$lib/ORM/models/show';
   import { currencyFormatter, durationFormatter } from '$lib/util/constants';
   import StarRating from 'svelte-star-rating';
   export let show: ShowDocType;
