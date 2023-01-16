@@ -9,32 +9,32 @@
     type ShowMachineServiceType,
   } from '$lib/machines/showMachine';
   import { talentDB, type TalentDBType } from '$lib/ORM/dbs/talentDB';
-  import type { ShowDocType, ShowDocument } from '$lib/ORM/models/show';
+  import type { ShowDocument } from '$lib/ORM/models/show';
   import type { TalentDocType, TalentDocument } from '$lib/ORM/models/talent';
-  import { currencyFormatter } from '$lib/util/constants';
-  import type { VideoCallType } from '$lib/util/videoCall';
+  import { currencyFormatter, durationFormatter } from '$lib/util/constants';
   import { onMount } from 'svelte';
   import StarRating from 'svelte-star-rating';
+  import { possessive } from 'i18n-possessive';
+
   import type { Subscription } from 'xstate';
   import type { PageData } from './$types';
   import TalentWallet from './TalentWallet.svelte';
 
   export let form: import('./$types').ActionData;
-
   export let data: PageData;
+
   const token = data.token;
 
   let talentObj = data.talent as TalentDocType;
-  let completedShows = data.completedShows as ShowDocType[];
+  let showName = possessive(talentObj.name, 'en') + ' Show';
+  $: showDuration = 60;
   $: currentShow = data.currentShow as ShowDocument;
   let key = $page.params.key;
-  let vc: VideoCallType;
   let talent: TalentDocument;
   let showMachineService: ShowMachineServiceType;
   let showSub: Subscription;
 
   $: ready4Call = false;
-  $: inCall = false;
   let showMachineState =
     currentShow &&
     createShowMachineService(currentShow.showState).getSnapshot();
@@ -143,7 +143,7 @@
     >
       <div class="flex space-x-5 items-center">
         <div>
-          <h1 class="font-bold text-5xl">Request a pCall</h1>
+          <h1 class="font-bold text-5xl">Manage Your Shows</h1>
           <p class="pt-6">
             Pretioso flos est, nihil ad vos nunc. Posset faciens pecuniam.
             Posuit eam ad opus nunc et adepto a pCall!
@@ -151,245 +151,222 @@
         </div>
       </div>
     </div>
-    {#if !inCall}
-      <div
-        class="mx-auto mt-8 max-w-3xl grid gap-6 grid-cols-1 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3"
-      >
-        <div class="space-y-6 lg:col-start-1 lg:col-span-2">
-          <div />
-          {#if canCancelShow}
-            <!-- Link Form-->
-            <form method="post" action="?/cancel_link" use:enhance={onSubmit}>
-              <div class="bg-primary text-primary-content card">
-                <div class="text-center card-body items-center">
-                  <div class="text-2xl card-title">Cancel Your pCall Link</div>
-                  <div class="text xl">
-                    If you cancel this pCall link, the link will be deactivated
-                    and nobody can use it to call.
-                  </div>
-                  {#if showMachineState.context.showState.totalSales > 0}
-                    {currencyFormatter.format(
-                      showMachineState.context.showState.totalSales
-                    )} will be refunded"
-                  {/if}
-
-                  <div
-                    class="flex flex-col text-white p-2 justify-center items-center"
-                  >
-                    <div class="py-4">
-                      <button
-                        class="btn btn-secondary"
-                        type="submit"
-                        disabled={waiting4StateChange}>Cancel Link</button
-                      >
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </form>
-          {:else if canCreateShow}
+    <div
+      class="mx-auto mt-8 max-w-3xl grid gap-6 grid-cols-1 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3"
+    >
+      <div class="space-y-6 lg:col-start-1 lg:col-span-2">
+        <div />
+        {#if canCancelShow}
+          <!-- Link Form-->
+          <form method="post" action="?/cancel_link" use:enhance={onSubmit}>
             <div class="bg-primary text-primary-content card">
               <div class="text-center card-body items-center">
-                <h2 class="text-2xl card-title">Create a New pCall Link</h2>
+                <div class="text-2xl card-title">Cancel Your pCall Link</div>
+                <div class="text xl">
+                  If you cancel this pCall link, the link will be deactivated
+                  and nobody can use it to call.
+                </div>
+                {#if showMachineState.context.showState.totalSales > 0}
+                  {currencyFormatter.format(
+                    showMachineState.context.showState.totalSales
+                  )} will be refunded"
+                {/if}
+
                 <div
                   class="flex flex-col text-white p-2 justify-center items-center"
                 >
-                  <form
-                    method="post"
-                    action="?/create_link"
-                    use:enhance={onSubmit}
-                  >
-                    <div class="max-w-xs w-full py-2 form-control ">
-                      <!-- svelte-ignore a11y-label-has-associated-control -->
-                      <label for="price" class="label">
-                        <span class="label-text">Requested Amount in USD</span
-                        ></label
-                      >
-                      <div class="rounded-md shadow-sm mt-1 relative">
-                        <div
-                          class="flex pl-3 inset-y-0 left-0 absolute items-center pointer-events-none"
-                        >
-                          <span class="text-gray-500 sm:text-sm"> $ </span>
-                        </div>
-                        <input
-                          type="text"
-                          name="amount"
-                          class=" max-w-xs w-full py-2 pl-6 input input-bordered input-primary "
-                          placeholder="0.00"
-                          aria-describedby="price-currency"
-                          value={form?.amount ?? ''}
-                        />
-                        <div
-                          class="flex pr-3 inset-y-0 right-0 absolute items-center pointer-events-none"
-                        >
-                          <span
-                            class="text-gray-500 sm:text-sm"
-                            id="price-currency"
-                          >
-                            USDC
-                          </span>
-                        </div>
-                      </div>
-                      {#if form?.missingAmount}<div
-                          class="shadow-lg alert alert-error"
-                        >
-                          Amount is required
-                        </div>{/if}
-                      {#if form?.invalidAmount}<div
-                          class="shadow-lg alert alert-error"
-                        >
-                          Invalid Amount
-                        </div>{/if}
-                    </div>
-
-                    <div class="py-4">
-                      <button
-                        class="btn btn-secondary"
-                        type="submit"
-                        disabled={waiting4StateChange}>Generate Link</button
-                      >
-                    </div>
-                  </form>
+                  <div class="py-4">
+                    <button
+                      class="btn btn-secondary"
+                      type="submit"
+                      disabled={waiting4StateChange}>Cancel Link</button
+                    >
+                  </div>
                 </div>
               </div>
             </div>
-
-            <div class="bg-primary text-primary-content card">
-              <div class="text-center card-body items-center">
-                <h2 class="text-2xl card-title">
-                  Issue Refund for Cancelled Link
-                </h2>
-                <div
-                  class="flex flex-col text-white p-2 justify-center items-center"
-                >
-                  <form
-                    method="post"
-                    action="?/send_refund"
-                    use:enhance={onSubmit}
-                  >
-                    <div class="max-w-xs w-full py-2 form-control ">
-                      <!-- svelte-ignore a11y-label-has-associated-control -->
-                      <label for="price" class="label">
-                        <span class="label-text">Refund </span></label
-                      >
-                      <div class="rounded-md shadow-sm mt-1 relative">
-                        <div
-                          class="flex pl-3 inset-y-0 left-0 absolute items-center pointer-events-none"
-                        >
-                          <span class="text-gray-500 sm:text-sm"> $ </span>
-                        </div>
-                        <input
-                          type="text"
-                          name="amount"
-                          class=" max-w-xs w-full py-2 pl-6 input input-bordered input-primary "
-                          placeholder="0.00"
-                          aria-describedby="price-currency"
-                          value={form?.amount ?? ''}
-                        />
-                        <div
-                          class="flex pr-3 inset-y-0 right-0 absolute items-center pointer-events-none"
-                        >
-                          <span
-                            class="text-gray-500 sm:text-sm"
-                            id="price-currency"
-                          >
-                            USDC
-                          </span>
-                        </div>
-                      </div>
-                      {#if form?.missingAmount}<div
-                          class="shadow-lg alert alert-error"
-                        >
-                          Amount is required
-                        </div>{/if}
-                      {#if form?.invalidAmount}<div
-                          class="shadow-lg alert alert-error"
-                        >
-                          Invalid Amount
-                        </div>{/if}
-                    </div>
-
-                    <div class="py-4">
-                      <button
-                        class="btn btn-secondary"
-                        type="submit"
-                        disabled={waiting4StateChange}>Send Refund</button
-                      >
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </div>
-          {/if}
-
-          <!-- Camera  Preview -->
+          </form>
+        {:else if canCreateShow}
           <div class="bg-primary text-primary-content card">
             <div class="text-center card-body items-center">
-              <h2 class="text-2xl card-title">Your Video Preview</h2>
-              <div class="rounded-2xl" />
-            </div>
-          </div>
-        </div>
-
-        <!--Next Column-->
-        <div class="space-y-6 lg:col-start-3 lg:col-span-1">
-          <!-- Status -->
-          <div class="lg:col-start-3 lg:col-span-1">
-            <div class="bg-primary text-primary-content card">
-              <div class="text-center card-body items-center">
-                <h2 class="text-2xl card-title">Call Status</h2>
-                {#if ready4Call}
-                  <div class="text-2xl">Waiting for Incoming Call</div>
-                {:else}
-                  <p>Signed in as {talentObj.name}</p>
-                {/if}
-              </div>
-            </div>
-          </div>
-          <!-- Photo -->
-          <div>
-            <div class="lg:col-start-3 lg:col-span-1">
-              <div class="bg-primary text-primary-content card">
-                <div class="text-center card-body items-center">
-                  <h2 class="text-3xl card-title">{talentObj.name}</h2>
-                  <div>
-                    <ProfilePhoto
-                      profileImage={talentObj.profileImageUrl ||
-                        PUBLIC_DEFAULT_PROFILE_IMAGE}
-                      callBack={value => {
-                        updateProfileImage(value);
-                      }}
+              <h2 class="text-2xl card-title">Create a New Show</h2>
+              <div
+                class="flex flex-col text-white p-2 justify-center items-center"
+              >
+                <form
+                  method="post"
+                  action="?/create_show"
+                  use:enhance={onSubmit}
+                >
+                  <div class="max-w-xs  py-2 form-control">
+                    <!-- svelte-ignore a11y-label-has-associated-control -->
+                    <label class="label">
+                      <span class="label-text">Title</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      class="max-w-xs  py-2 input input-bordered input-primary"
+                      bind:value={showName}
+                      minlength="3"
+                      maxlength="50"
                     />
                   </div>
-                </div>
+                  {#if form?.badName}
+                    <div class="shadow-lg alert alert-error">
+                      Show Name should be between 3 and 50 characters
+                    </div>
+                  {/if}
+
+                  <div class="max-w-xs w-full py-2 form-control ">
+                    <!-- svelte-ignore a11y-label-has-associated-control -->
+                    <label for="price" class="label">
+                      <span class="label-text">Ticket Price in USD</span></label
+                    >
+                    <div class="rounded-md shadow-sm mt-1 relative">
+                      <div
+                        class="flex pl-3 inset-y-0 left-0 absolute items-center pointer-events-none"
+                      >
+                        <span class="text-gray-500 sm:text-sm"> $ </span>
+                      </div>
+                      <input
+                        type="text"
+                        name="price"
+                        class=" max-w-xs w-full py-2 pl-6 input input-bordered input-primary "
+                        placeholder="0.00"
+                        aria-describedby="price-currency"
+                        value={form?.price ?? ''}
+                      />
+                      <div
+                        class="flex pr-3 inset-y-0 right-0 absolute items-center pointer-events-none"
+                      >
+                        <span
+                          class="text-gray-500 sm:text-sm"
+                          id="price-currency"
+                        >
+                          USDC
+                        </span>
+                      </div>
+                    </div>
+                    {#if form?.missingPrice}<div
+                        class="shadow-lg alert alert-error"
+                      >
+                        Price is required
+                      </div>{/if}
+                    {#if form?.invalidPrice}<div
+                        class="shadow-lg alert alert-error"
+                      >
+                        Invalid Price
+                      </div>{/if}
+                  </div>
+                  <input type="hidden" name="maxNumTickets" value="1" />
+                  <div class="max-w-xs  py-2 form-control">
+                    <!-- svelte-ignore a11y-label-has-associated-control -->
+                    <label class="label">
+                      <span class="label-text"
+                        >Duration ({durationFormatter(showDuration)})</span
+                      >
+                    </label>
+                    <input
+                      type="range"
+                      min="15"
+                      max="120"
+                      bind:value={showDuration}
+                      class="range"
+                      step="15"
+                    />
+                    <div class="w-full flex justify-between text-xs px-2">
+                      <span>|</span>
+                      <span>|</span>
+                      <span>|</span>
+                      <span>|</span>
+                      <span>|</span>
+                      <span>|</span>
+                      <span>|</span>
+                      <span>|</span>
+                    </div>
+                  </div>
+
+                  <div class="py-4">
+                    <button
+                      class="btn btn-secondary"
+                      type="submit"
+                      disabled={waiting4StateChange}>Create Show</button
+                    >
+                  </div>
+                </form>
               </div>
             </div>
           </div>
+        {/if}
 
-          <!-- Wallet -->
-          <div>
-            <TalentWallet {talent} />
-          </div>
-
-          <!-- Feedback -->
-          <div>
-            <div class="lg:col-start-3 lg:col-span-1">
-              <div class="bg-primary text-primary-content card">
-                <div class="text-center card-body items-center">
-                  <h2 class="text-2xl card-title">Your Average Rating</h2>
-                  {talentObj.stats.ratingAvg.toFixed(2)}
-                  <StarRating rating={talentObj.stats.ratingAvg ?? 0} />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Activity Feed -->
-          <div>
-            <div class="lg:col-start-3 lg:col-span-1" />
+        <!-- Camera  Preview -->
+        <div class="bg-primary text-primary-content card">
+          <div class="text-center card-body items-center">
+            <h2 class="text-2xl card-title">Your Video Preview</h2>
+            <div class="rounded-2xl" />
           </div>
         </div>
       </div>
-    {/if}
+
+      <!--Next Column-->
+      <div class="space-y-6 lg:col-start-3 lg:col-span-1">
+        <!-- Status -->
+        <div class="lg:col-start-3 lg:col-span-1">
+          <div class="bg-primary text-primary-content card">
+            <div class="text-center card-body items-center">
+              <h2 class="text-2xl card-title">Call Status</h2>
+              {#if ready4Call}
+                <div class="text-2xl">Waiting for Incoming Call</div>
+              {:else}
+                <p>Signed in as {talentObj.name}</p>
+              {/if}
+            </div>
+          </div>
+        </div>
+        <!-- Photo -->
+        <div>
+          <div class="lg:col-start-3 lg:col-span-1">
+            <div class="bg-primary text-primary-content card">
+              <div class="text-center card-body items-center">
+                <h2 class="text-3xl card-title">{talentObj.name}</h2>
+                <div>
+                  <ProfilePhoto
+                    profileImage={talentObj.profileImageUrl ||
+                      PUBLIC_DEFAULT_PROFILE_IMAGE}
+                    callBack={value => {
+                      updateProfileImage(value);
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Wallet -->
+        <div>
+          <TalentWallet {talent} />
+        </div>
+
+        <!-- Feedback -->
+        <div>
+          <div class="lg:col-start-3 lg:col-span-1">
+            <div class="bg-primary text-primary-content card">
+              <div class="text-center card-body items-center">
+                <h2 class="text-2xl card-title">Your Average Rating</h2>
+                {talentObj.stats.ratingAvg.toFixed(2)}
+                <StarRating rating={talentObj.stats.ratingAvg ?? 0} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activity Feed -->
+        <div>
+          <div class="lg:col-start-3 lg:col-span-1" />
+        </div>
+      </div>
+    </div>
   </main>
 </div>

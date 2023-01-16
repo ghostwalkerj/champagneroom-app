@@ -60,7 +60,7 @@ export const actions: Actions = {
     if (agentId === null) {
       return fail(400, { agentId, missingAgentId: true });
     }
-    if (name.length < 3 || name.length > 50) {
+    if (!name || name.length < 3 || name.length > 50) {
       return fail(400, { name, badName: true });
     }
 
@@ -86,6 +86,7 @@ export const actions: Actions = {
 
     return {
       success: true,
+      agent: agent.toJSON(),
     };
   },
 };

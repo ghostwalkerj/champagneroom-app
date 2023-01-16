@@ -19,7 +19,7 @@ export const load: PageServerLoad = async ({ params }) => {
 
   const token = jwt.sign(
     {
-      exp: Math.floor(Date.now() / 1000) + Number.parseInt(JWT_EXPIRY),
+      exp: Math.floor(Date.now() / 1000) + +JWT_EXPIRY,
       sub: JWT_TALENT_DB_USER,
     },
     JWT_TALENT_DB_SECRET,
@@ -99,37 +99,15 @@ export const actions: Actions = {
     const duration = data.get('duration') as string;
     const maxNumTickets = data.get('maxNumTickets') as string;
 
+    if (!name || name.length < 3 || name.length > 50) {
+      return fail(400, { name, badName: true });
+    }
+
     if (!price) {
       return fail(400, { price, missingPrice: true });
     }
-    if (isNaN(Number(price)) || Number(price) < 1 || Number(price) > 10000) {
+    if (isNaN(+price) || +price < 1 || +price > 10000) {
       return fail(400, { price, invalidPrice: true });
-    }
-
-    if (!name) {
-      return fail(400, { name, missingName: true });
-    }
-
-    if (!duration) {
-      return fail(400, { duration, missingDuration: true });
-    }
-    if (
-      isNaN(Number(duration)) ||
-      Number(duration) < 1 ||
-      Number(duration) > 360
-    ) {
-      return fail(400, { duration, invalidDuration: true });
-    }
-
-    if (!maxNumTickets) {
-      return fail(400, { maxNumTickets, missingMaxNumTickets: true });
-    }
-    if (
-      isNaN(Number(maxNumTickets)) ||
-      Number(maxNumTickets) < 1 ||
-      Number(maxNumTickets) > 1000
-    ) {
-      return fail(400, { maxNumTickets, invalidMaxNumTickets: true });
     }
 
     const db = await masterDB();
@@ -137,14 +115,17 @@ export const actions: Actions = {
     if (!talent) {
       throw error(404, 'Talent not found');
     }
-
-    talent.createShow({
+    const show = await talent.createShow({
+      price: +price,
       name,
-      price: Number(price),
-      duration: Number(duration),
-      maxNumTickets: Number(maxNumTickets),
+      duration: +duration,
+      maxNumTickets: +maxNumTickets,
     });
-    return { success: true };
+
+    return {
+      show: show.toJSON(),
+      success: true,
+    };
   },
   cancel_show: async ({ params }) => {
     const key = params.key;
