@@ -1,5 +1,5 @@
 import type { AgentDocument } from '$lib/ORM/models/agent';
-import { LinkStatus, LinkString, type LinkDocType } from '$lib/ORM/models/link';
+import { LinkStatuses, LinkString, type LinkDocType } from '$lib/ORM/models/link';
 import type { TalentDocument } from '$lib/ORM/models/talent';
 import { womensNames } from '$lib/util/womensNames';
 import { nanoid } from 'nanoid';

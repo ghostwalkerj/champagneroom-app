@@ -9,14 +9,15 @@ import {
 	type RxJsonSchema
 } from 'rxdb';
 type AgentDocMethods = {
-	createTalent: (
+	createTalent: (talentProps: {
 		name: string,
 		agentCommission: number,
-		profileImageUrl?: string
-	) => Promise<TalentDocument>;
+		profileImageUrl?: string;
+	}) => Promise<TalentDocument>;
 };
 
 export const AgentString = 'agent';
+export const getAgentId = (address: string) => `${AgentString}:a-${address}`;
 
 type AgentStaticMethods = {
 	createAgent: (address: string) => Promise<AgentDocument>;
@@ -24,17 +25,19 @@ type AgentStaticMethods = {
 export const agentDocMethods: AgentDocMethods = {
 	createTalent: async function (
 		this: AgentDocument,
-		name: string,
-		agentCommission: number,
-		profileImageUrl: string = PUBLIC_DEFAULT_PROFILE_IMAGE
+		talentProps: {
+			name: string,
+			agentCommission: number,
+			profileImageUrl?: string;
+		}
 	) {
 		const _talent: TalentDocType = {
 			_id: `${TalentString}:t-${nanoid()}`,
-			name,
-			agentCommission,
+			name: talentProps.name,
+			agentCommission: talentProps.agentCommission,
 			key: nanoid(),
 			agent: this._id,
-			profileImageUrl,
+			profileImageUrl: talentProps.profileImageUrl || PUBLIC_DEFAULT_PROFILE_IMAGE,
 			stats: {
 				ratingAvg: 0,
 				totalEarnings: 0,

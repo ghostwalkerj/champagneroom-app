@@ -1,32 +1,10 @@
 <script lang="ts">
+  import { applyAction, enhance } from '$app/forms';
   import type { AgentDocument } from '$lib/ORM/models/agent';
-  import type { TalentDocument } from '$lib/ORM/models/talent';
-  import { createForm } from 'svelte-forms-lib';
-  import * as yup from 'yup';
+  import type { ActionData } from './$types';
 
   export let agent: AgentDocument;
-  export let talents: TalentDocument[];
-
-  const { form, errors, handleReset, handleChange, handleSubmit } = createForm({
-    initialValues: { name: '', agentCommission: '10' },
-    validationSchema: yup.object({
-      name: yup.string().required('Talent name is required'),
-      agentCommission: yup
-        .number()
-        .min(0)
-        .max(100)
-        .integer()
-        .required('Agent commission between 0 and 100 required'),
-    }),
-    onSubmit: async values => {
-      const talent = await agent.createTalent(
-        values.name,
-        Number.parseInt(values.agentCommission)
-      );
-      handleReset();
-      talents = talents.concat([talent]);
-    },
-  });
+  export let form: ActionData;
 </script>
 
 <div class="bg-primary h-full text-primary-content w-full card">
@@ -34,23 +12,27 @@
     <h2 class="text-2xl card-title">Add New Talent</h2>
 
     <div class="text-white text-left whitespace-nowrap">
-      <form on:submit|preventDefault={handleSubmit}>
+      <form method="post" action="?/create_talent" use:enhance>
         <div class="max-w-xs  py-2 form-control">
           <!-- svelte-ignore a11y-label-has-associated-control -->
           <label class="label">
             <span class="label-text">Talent Name</span>
           </label>
+          <input type="hidden" name="agentId" value={agent._id} />
           <input
             type="text"
             name="name"
             placeholder="Enter a name"
             class="max-w-xs  py-2 input input-bordered input-primary"
-            on:change={handleChange}
-            bind:value={$form.name}
+            value={form?.name ?? ''}
+            minlength="3"
+            maxlength="50"
           />
         </div>
-        {#if $errors.name}
-          <div class="shadow-lg alert alert-error">{$errors.name}</div>
+        {#if form?.badName}
+          <div class="shadow-lg alert alert-error">
+            Name should be between 3 and 50 characters
+          </div>
         {/if}
 
         <label for="price" class="label">
@@ -64,21 +46,20 @@
               type="text"
               name="agentCommission"
               class="py-2 w-20 input input-bordered input-primary"
-              bind:value={$form.agentCommission}
-              on:change={handleChange}
+              value={form?.agentCommission ?? '10'}
             />
             <div class="flex  inset-y-4 right-4 absolute pointer-events-none">
               <span class="text-gray-500 sm:text-sm"> % </span>
             </div>
           </div>
         </div>
-        {#if $errors.agentCommission}
+        {#if form?.badAgentCommission}
           <div class="shadow-lg alert alert-error">
-            {$errors.agentCommission}
+            Commission should be between 0 and 100.
           </div>
         {/if}
         <div class="py-4">
-          <button class="btn btn-secondary" type="submit">Save </button>
+          <button class="btn btn-secondary" type="submit">Save</button>
         </div>
       </form>
     </div>

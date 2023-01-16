@@ -28,9 +28,9 @@ const token = jwt.sign(
 	{
 		exp: Math.floor(Date.now() / 1000) + Number.parseInt(JWT_EXPIRY),
 		sub: JWT_MASTER_DB_USER,
-		kid: JWT_MASTER_DB_USER
 	},
-	JWT_MASTER_DB_SECRET
+	JWT_MASTER_DB_SECRET,
+	{ keyid: JWT_MASTER_DB_USER }
 );
 
 type MasterCollections = {

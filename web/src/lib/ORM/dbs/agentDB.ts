@@ -13,10 +13,10 @@ import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
 import { PouchDB, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
-import { ShowCollection, showDocMethods, showSchema } from '$lib/ORM/models/show';
-import { ShowEventCollection, showEventSchema } from '$lib/ORM/models/showEvent';
-import { TicketCollection, ticketDocMethods, ticketSchema } from '$lib/ORM/models/ticket';
-import { TicketEventCollection, ticketEventSchema } from '$lib/ORM/models/ticketEvent';
+import { type ShowCollection, showDocMethods, showSchema } from '$lib/ORM/models/show';
+import { type ShowEventCollection, showEventSchema } from '$lib/ORM/models/showEvent';
+import { type TicketCollection, ticketDocMethods, ticketSchema } from '$lib/ORM/models/ticket';
+import { type TicketEventCollection, ticketEventSchema } from '$lib/ORM/models/ticketEvent';
 
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 100;
@@ -34,7 +34,7 @@ type AgentCollections = {
 export type AgentDBType = RxDatabase<AgentCollections>;
 const _agentDB = new Map<string, AgentDBType>();
 
-export const creatorAgentDB = async (token: string, agentId: string) =>
+export const agentDB = async (token: string, agentId: string) =>
 	await create(token, agentId);
 
 const create = async (token: string, agentId: string) => {

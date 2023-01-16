@@ -1,11 +1,12 @@
 <script lang="ts">
+  import { applyAction } from '$app/forms';
   import { agentDB } from '$lib/ORM/dbs/agentDB';
-  import { AgentString, type AgentDocument } from '$lib/ORM/models/agent';
+  import { getAgentId, type AgentDocument } from '$lib/ORM/models/agent';
   import type { TalentDocument } from '$lib/ORM/models/talent';
-  import { StorageTypes } from '$lib/ORM/rxdb';
   import { generateTalent } from '$lib/util/dataHelper';
+  import { onMount } from 'svelte';
   import { selectedAccount } from 'svelte-web3';
-  import type { PageData } from './$types';
+  import type { ActionData, PageData } from './$types';
   import AgentWallet from './AgentWallet.svelte';
   import TalentForm from './TalentForm.svelte';
   import TalentTable from './TalentTable.svelte';
@@ -13,31 +14,50 @@
   import WeeklyBooking from './WeeklyBooking.svelte';
 
   export let data: PageData;
+  export let form: ActionData;
   const token = data.token;
-  //TODO: This will be authentication later
-  selectedAccount.subscribe(async account => {
-    if (account) {
-      const agentId = AgentString + ':' + account;
-      const db = await agentDB(token, agentId, StorageTypes.IDB);
-      db.agents
-        .findOne(agentId)
-        .exec()
-        .then(_agent => {
-          if (_agent) {
-            agent = _agent;
-            talents = [];
-            agent.populate('talents').then(_talents => {
-              talents = _talents;
-            });
-          } else {
-            console.log('Create new agent');
-            db.agents.createAgent(account);
-          }
-        });
-    }
-  });
   let agent: AgentDocument;
   let talents: TalentDocument[] = [];
+
+  //TODO: This will be authentication later
+  onMount(() => {
+    selectedAccount.subscribe(async account => {
+      if (account) {
+        const agentId = getAgentId(account);
+        const db = await agentDB(token, agentId);
+        db?.agents
+          .findOne(agentId)
+          .exec()
+          .then(_agent => {
+            if (_agent) {
+              agent = _agent;
+              talents = [];
+              agent.get$('talents').subscribe(_talents => {
+                agent.populate('talents').then(_talents => {
+                  talents = _talents;
+                });
+              });
+            } else {
+              console.log('Create new agent');
+              let formData = new FormData();
+              formData.append('account', account);
+              fetch('?/create_agent', {
+                method: 'POST',
+                body: formData,
+              }).then(res => {
+                if (res.ok) {
+                  res.json().then(_res => {
+                    if (_res.success) {
+                      agent = _res.agent;
+                    }
+                  });
+                }
+              });
+            }
+          });
+      }
+    });
+  });
 </script>
 
 {#if agent}
@@ -67,7 +87,7 @@
             </div>
             <!-- Talent viewing and adding -->
             <div class="p-1">
-              <TalentForm {agent} bind:talents />
+              <TalentForm {form} {agent} />
             </div>
             {#key talents}
               <div class="p-1 row-span-2 ">

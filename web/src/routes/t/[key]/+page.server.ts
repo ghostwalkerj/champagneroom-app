@@ -5,7 +5,7 @@ import { StorageTypes } from '$lib/ORM/rxdb';
 import { createShowMachineService } from '$lib/machines/showMachine';
 import { error, fail } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
-import type { PageServerLoad } from './$types';
+import type { PageServerLoad, Actions } from './$types';
 
 const token = jwt.sign(
 	{
@@ -56,7 +56,7 @@ export const load: PageServerLoad = async ({ params }) => {
 	};
 };
 
-export const actions: import('./$types').Actions = {
+export const actions: Actions = {
 	create_show: async ({ params, request }) => {
 		const key = params.key;
 		if (key === null) {

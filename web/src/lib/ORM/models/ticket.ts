@@ -11,7 +11,7 @@ import {
 
 import { ActorType } from '$lib/util/constants';
 import type { ShowDocument } from './show';
-import { TransactionReasonType, TransactionDocument, TransactionString } from './transaction';
+import { TransactionReasonType, type TransactionDocument, TransactionString } from './transaction';
 import { nanoid } from 'nanoid';
 
 export enum TicketStatus {
