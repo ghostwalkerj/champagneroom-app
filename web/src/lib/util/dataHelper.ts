@@ -1,5 +1,6 @@
 import type { AgentDocument } from '$lib/ORM/models/agent';
 import { LinkStatuses, LinkString, type LinkDocType } from '$lib/ORM/models/link';
+import type { ShowEventDocType } from '$lib/ORM/models/showEvent';
 import type { TalentDocument } from '$lib/ORM/models/talent';
 import { womensNames } from '$lib/util/womensNames';
 import { nanoid } from 'nanoid';
@@ -52,59 +53,63 @@ export const generateTalent = async (agent: AgentDocument) => {
 		dictionaries: [womensNames]
 	});
 	const profileImageUrl = profileImageUrls[Math.floor(Math.random() * profileImageUrls.length)];
-	const talent = await agent.createTalent(name, 10, profileImageUrl);
+	const talent = await agent.createTalent({
+		name,
+		agentCommission: 10,
+		profileImageUrl
+	});
 	const count = Math.floor(Math.random() * 100) + 1;
-	generateLinks(talent, count);
+	//generateShows(talent, count);
 	await talent.updateStats();
 	return talent;
 };
 
-const generateLinks = (talent: TalentDocument, count: number) => {
-	const links: LinkDocType[] = [];
+// const generateShows = (talent: TalentDocument, count: number) => {
+// 	const shows: ShowEventDocType[] = [];
 
-	// Create completedCalls
-	for (let i = 0; i < count; i++) {
-		const key = nanoid();
-		const amount = Math.floor(Math.random() * 1000) + 1;
-		const endedAt = spacetime.now().subtract(Math.floor(Math.random() * 45) + 1, 'day');
-		const _feedback = {
-			rating: Math.floor(Math.random() * 5) + 1,
-			createdAt: new Date().getTime(),
-			comments: 'This is a comment'
-		};
-		const _link = {
-			linkState: {
-				status: LinkStatus.FINALIZED,
-				totalFunding: amount,
-				requestedAmount: amount,
-				refundedAmount: 0,
-				finalized: {
-					endedAt: endedAt.epoch
-				},
-				feedback: _feedback,
-				updatedAt: new Date().getTime()
-			},
-			requestedAmount: amount,
-			fundingAddress: '0x251281e1516e6E0A145d28a41EE63BfcDd9E18Bf',
-			callId: uuidv4(),
-			talent: talent._id,
-			talentInfo: {
-				name: talent.name,
-				profileImageUrl: talent.profileImageUrl,
-				stats: {
-					ratingAvg: Math.floor(Math.random() * 5) + 1,
-					numCompletedCalls: i
-				}
-			},
-			_id: `${LinkString}:l-${key}`,
-			createdAt: new Date().getTime(),
-			updatedAt: new Date().getTime(),
-			entityType: LinkString,
-			agent: talent.agent
-		} as LinkDocType;
-		links.push(_link);
-	}
+// 	// Create completedCalls
+// 	for (let i = 0; i < count; i++) {
+// 		const key = nanoid();
+// 		const amount = Math.floor(Math.random() * 1000) + 1;
+// 		const endedAt = spacetime.now().subtract(Math.floor(Math.random() * 45) + 1, 'day');
+// 		const _feedback = {
+// 			rating: Math.floor(Math.random() * 5) + 1,
+// 			createdAt: new Date().getTime(),
+// 			comments: 'This is a comment'
+// 		};
+// 		const _link = {
+// 			linkState: {
+// 				status: LinkStatus.FINALIZED,
+// 				totalFunding: amount,
+// 				requestedAmount: amount,
+// 				refundedAmount: 0,
+// 				finalized: {
+// 					endedAt: endedAt.epoch
+// 				},
+// 				feedback: _feedback,
+// 				updatedAt: new Date().getTime()
+// 			},
+// 			requestedAmount: amount,
+// 			fundingAddress: '0x251281e1516e6E0A145d28a41EE63BfcDd9E18Bf',
+// 			callId: uuidv4(),
+// 			talent: talent._id,
+// 			talentInfo: {
+// 				name: talent.name,
+// 				profileImageUrl: talent.profileImageUrl,
+// 				stats: {
+// 					ratingAvg: Math.floor(Math.random() * 5) + 1,
+// 					numCompletedCalls: i
+// 				}
+// 			},
+// 			_id: `${LinkString}:l-${key}`,
+// 			createdAt: new Date().getTime(),
+// 			updatedAt: new Date().getTime(),
+// 			entityType: LinkString,
+// 			agent: talent.agent
+// 		} as LinkDocType;
+// 		links.push(_link);
+// 	}
 
-	const db = talent.collection.database;
-	db.links.bulkInsert(links);
-};
+// 	const db = talent.collection.database;
+// 	db.links.bulkInsert(links);
+// };

@@ -54,7 +54,6 @@
 		"svelte": "^3.49.0",
 		"svelte-check": "^2.8.0",
 		"svelte-feather-icons": "^4.0.0",
-		"svelte-forms-lib": "^2.0.1",
 		"svelte-icons": "^2.1.0",
 		"svelte-moveable": "^0.22.0",
 		"svelte-preprocess": "^4.10.7",
@@ -102,7 +101,6 @@
 		"uuidv4": "^6.2.13",
 		"web3": "^1.7.4",
 		"web3modal": "^1.9.8",
-		"xstate": "^4.33.6",
-		"yup": "v1.0.0-beta.3"
+		"xstate": "^4.33.6"
 	}
 }

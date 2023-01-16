@@ -13,8 +13,8 @@
   } from '$lib/machines/linkMachine';
   import { talentDB, type TalentDBType } from '$lib/ORM/dbs/talentDB';
   import type { LinkDocType, LinkDocument } from '$lib/ORM/models/link';
+  import type { ShowDocType, ShowDocument } from '$lib/ORM/models/show';
   import type { TalentDocType, TalentDocument } from '$lib/ORM/models/talent';
-  import { StorageTypes } from '$lib/ORM/rxdb';
   import { currencyFormatter } from '$lib/util/constants';
   import { userStream, type UserStreamType } from '$lib/util/userStream';
   import type { VideoCallType } from '$lib/util/videoCall';
@@ -33,8 +33,8 @@
   const token = data.token;
 
   let talentObj = data.talent as TalentDocType;
-  let completedCalls = data.completedCalls as LinkDocType[];
-  $: currentLink = data.currentLink as LinkDocument;
+  let completedShows = data.completedShows as ShowDocType[];
+  $: currentShow = data.currentShow as ShowDocument;
   let key = $page.params.key;
   let vc: VideoCallType;
   let talent: TalentDocument;
@@ -51,8 +51,8 @@
   $: callerName = '';
   let videoCall: any;
   let linkMachineState =
-    currentLink &&
-    createLinkMachineService(currentLink.linkState).getSnapshot();
+    currentShow &&
+    createLinkMachineService(currentShow.linkState).getSnapshot();
 
   $: canCancelLink =
     linkMachineState &&
@@ -62,7 +62,7 @@
     });
 
   $: canCreateLink =
-    !currentLink ||
+    !currentShow ||
     (linkMachineState && linkMachineState.done) ||
     (linkMachineState && linkMachineState.matches('inEscrow'));
 
@@ -92,9 +92,9 @@
         canCreateLink = state.done ?? true;
 
         if (state.matches('claimed.canCall')) {
-          if (connectedCallId !== currentLink.callId) {
-            connectedCallId = currentLink.callId;
-            initVC(currentLink.callId);
+          if (connectedCallId !== currentShow.callId) {
+            connectedCallId = currentShow.callId;
+            initVC(currentShow.callId);
           }
         } else if (vc && !callMachineState.done) {
           connectedCallId = '';
@@ -105,7 +105,7 @@
   };
 
   const useLink = (link: LinkDocument) => {
-    currentLink = link;
+    currentShow = link;
     waiting4StateChange = false; // link changed, so can submit again
     useLinkState(link, link.linkState);
     link.get$('linkState').subscribe(_linkState => {
@@ -122,11 +122,11 @@
           updatedAt: new Date().getTime(),
         },
       });
-      if (currentLink) {
-        currentLink.update({
+      if (currentShow) {
+        currentShow.update({
           $set: {
             talentInfo: {
-              ...currentLink.talentInfo,
+              ...currentShow.talentInfo,
               profileImageUrl: url,
             },
             updatedAt: new Date().getTime(),
@@ -236,7 +236,7 @@
   };
 
   if (browser) {
-    talentDB(token, key, StorageTypes.IDB).then((db: TalentDBType) => {
+    talentDB(token, key).then((db: TalentDBType) => {
       db.talents
         .findOne(talentObj._id)
         .exec()
@@ -309,7 +309,7 @@
       >
         <div class="space-y-6 lg:col-start-1 lg:col-span-2">
           <div>
-            <LinkViewer link={currentLink} {linkMachineState} />
+            <LinkViewer link={currentShow} {linkMachineState} />
           </div>
           {#if canCancelLink}
             <!-- Link Form-->
@@ -552,7 +552,7 @@
           <!-- Activity Feed -->
           <div>
             <div class="lg:col-start-3 lg:col-span-1">
-              <TalentActivity {completedCalls} />
+              <TalentActivity completedCalls={completedShows} />
             </div>
           </div>
         </div>

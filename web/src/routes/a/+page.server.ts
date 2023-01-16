@@ -1,16 +1,16 @@
-
 import jwt from 'jsonwebtoken';
-
 import type { PageServerLoad, Actions } from './$types';
-import { JWT_EXPIRY, JWT_AGENT_DB_SECRET, JWT_AGENT_DB_USER } from '$env/static/private';
+import {
+	JWT_EXPIRY,
+	JWT_AGENT_DB_SECRET,
+	JWT_AGENT_DB_USER,
+} from '$env/static/private';
 import { fail } from '@sveltejs/kit';
 import { masterDB } from '$lib/ORM/dbs/masterDB';
-import { AgentString, getAgentId } from '$lib/ORM/models/agent';
-import { t } from 'xstate';
+import { getAgentId } from '$lib/ORM/models/agent';
 
 //TODO: Only return token if agent address is good.  How?
 export const load: PageServerLoad = async () => {
-
 	const token = jwt.sign(
 		{
 			exp: Math.floor(Date.now() / 1000) + Number.parseInt(JWT_EXPIRY),
@@ -46,7 +46,7 @@ export const actions: Actions = {
 		agent = await db.agents.createAgent(account);
 		return {
 			success: true,
-			agent: agent.toJSON()
+			agent: agent.toJSON(),
 		};
 	},
 	create_talent: async ({ request }) => {
@@ -64,7 +64,11 @@ export const actions: Actions = {
 			return fail(400, { name, badName: true });
 		}
 
-		if (isNaN(+agentCommission) || +agentCommission < 0 || +agentCommission > 100) {
+		if (
+			isNaN(+agentCommission) ||
+			+agentCommission < 0 ||
+			+agentCommission > 100
+		) {
 			return fail(400, { agentCommission, badAgentCommission: true });
 		}
 
@@ -74,11 +78,14 @@ export const actions: Actions = {
 			return fail(400, { agentId, agentExists: false });
 		}
 
-		await agent.createTalent({ name, agentCommission: + agentCommission, profileImageUrl });
+		await agent.createTalent({
+			name,
+			agentCommission: +agentCommission,
+			profileImageUrl,
+		});
 
 		return {
 			success: true,
 		};
-
-	}
+	},
 };

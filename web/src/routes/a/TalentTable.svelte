@@ -11,7 +11,7 @@
     name: string;
     photo: string;
     rating: number;
-    calls: number;
+    shows: number;
     earnings: number;
     commission: number;
     myEarnings: number;
@@ -50,9 +50,9 @@
       },
     },
     {
-      key: 'calls',
-      title: 'Calls',
-      value: (v: TalentRow) => v.calls,
+      key: 'shows',
+      title: 'Shows',
+      value: (v: TalentRow) => v.shows,
       sortable: true,
       headerClass: 'font-semibold text-left text-sm py-3.5 px-3 text-gray-900',
     },
@@ -101,14 +101,14 @@
 
   if (talents) {
     talents.forEach(async (talent: TalentDocument) => {
-      if (talent.stats.numCompletedCalls == 0) {
+      if (talent.stats.numCompletedShows == 0) {
         await talent.updateStats();
       }
       talentRows = talentRows.concat({
         name: talent.name,
         photo: talent.profileImageUrl,
         rating: talent.stats.ratingAvg,
-        calls: talent.stats.completedShows.length,
+        shows: talent.stats.completedShows.length,
         earnings: talent.stats.totalEarnings,
         url: talent.key,
         commission: talent.agentCommission,

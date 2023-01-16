@@ -110,6 +110,8 @@ const showSchemaLiteral = {
         ticketsAvailable: { type: 'integer' },
         ticketsSold: { type: 'integer', default: 0 },
         totalSales: { type: 'integer', default: 0 },
+        startDate: { type: 'integer' },
+        endDate: { type: 'integer' },
         refundedAmount: {
           type: 'integer',
           default: 0,
@@ -124,6 +126,13 @@ const showSchemaLiteral = {
 
           },
           required: ['createdAt', 'canceledInState']
+        },
+        finalized: {
+          type: 'object',
+          properties: {
+            endedAt: { type: 'integer' },
+          },
+          required: ['endedAt']
         },
         transactions: {
           type: 'array',
