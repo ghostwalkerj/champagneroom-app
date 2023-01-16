@@ -1,32 +1,35 @@
 <script lang="ts">
   import { ShowStatus, type ShowDocType } from '$lib/ORM/models/show';
   import { currencyFormatter, durationFormatter } from '$lib/util/constants';
+  import { onMount } from 'svelte';
   import StarRating from 'svelte-star-rating';
   export let show: ShowDocType;
-  $: waterMark = true;
   $: waterMarkText = '';
 
-  $: switch (show.showState.status) {
-    case ShowStatus.CANCELLED:
-      waterMarkText = 'Cancelled';
-      break;
+  onMount(() => {
+    if (show)
+      $: switch (show.showState.status) {
+        case ShowStatus.CANCELLED:
+          waterMarkText = 'Cancelled';
+          break;
 
-    case ShowStatus.BOX_OFFICE_CLOSED:
-      waterMarkText = 'Sold Out';
-      break;
-    case ShowStatus.STARTED:
-      waterMarkText = 'Box Office Closed';
-      break;
-    case ShowStatus.FINALIZED:
-    case ShowStatus.ENDED:
-    case ShowStatus.IN_ESCROW:
-    case ShowStatus.IN_DISPUTE:
-      waterMarkText = 'ENDED';
-      break;
+        case ShowStatus.BOX_OFFICE_CLOSED:
+          waterMarkText = 'Sold Out';
+          break;
+        case ShowStatus.STARTED:
+          waterMarkText = 'Box Office Closed';
+          break;
+        case ShowStatus.FINALIZED:
+        case ShowStatus.ENDED:
+        case ShowStatus.IN_ESCROW:
+        case ShowStatus.IN_DISPUTE:
+          waterMarkText = 'ENDED';
+          break;
 
-    default:
-      waterMark = false;
-  }
+        default:
+          waterMarkText = '';
+      }
+  });
 </script>
 
 {#if show}
@@ -39,7 +42,7 @@
         style="background-image: url('{show.talentInfo.profileImageUrl}')"
       >
         <div class="absolute top-1 left-2 text-lg">{show.name}</div>
-        {#if waterMark}
+        {#if waterMarkText}
           <div
             class="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50  rounded-xl"
           />

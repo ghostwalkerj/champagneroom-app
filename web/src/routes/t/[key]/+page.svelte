@@ -11,11 +11,12 @@
   import { talentDB, type TalentDBType } from '$lib/ORM/dbs/talentDB';
   import type { ShowDocument } from '$lib/ORM/models/show';
   import type { TalentDocType, TalentDocument } from '$lib/ORM/models/talent';
-  import { currencyFormatter, durationFormatter } from '$lib/util/constants';
+  import { durationFormatter } from '$lib/util/constants';
+  import { possessive } from 'i18n-possessive';
   import { onMount } from 'svelte';
   import StarRating from 'svelte-star-rating';
-  import { possessive } from 'i18n-possessive';
 
+  import ShowDetail from '$lib/components/ShowDetail.svelte';
   import type { Subscription } from 'xstate';
   import type { PageData } from './$types';
   import TalentWallet from './TalentWallet.svelte';
@@ -26,9 +27,9 @@
   const token = data.token;
 
   let talentObj = data.talent as TalentDocType;
+  $: currentShow = data.currentShow as ShowDocument;
   let showName = possessive(talentObj.name, 'en') + ' Show';
   $: showDuration = 60;
-  $: currentShow = data.currentShow as ShowDocument;
   let key = $page.params.key;
   let talent: TalentDocument;
   let showMachineService: ShowMachineServiceType;
@@ -101,6 +102,7 @@
   const onSubmit = ({ form }) => {
     waiting4StateChange = true;
     return async ({ result }) => {
+      console.log(result);
       if (result.type !== 'success') {
         waiting4StateChange = false;
       } else {
@@ -119,15 +121,11 @@
           if (_talent) {
             talentObj = _talent;
             talent = _talent;
-            talent.get$('currentShow').subscribe(showId => {
-              // if (linkId) {
-              //   db.links
-              //     .findOne(linkId)
-              //     .exec()
-              //     .then(link => {
-              //       if (link) useLink(link);
-              //     });
-              // }
+            talent.get$('currentShow').subscribe(async showId => {
+              if (showId) {
+                currentShow = await talent.populate('currentShow');
+                useShow(currentShow);
+              }
             });
           }
         });
@@ -156,37 +154,8 @@
     >
       <div class="space-y-6 lg:col-start-1 lg:col-span-2">
         <div />
-        {#if canCancelShow}
-          <!-- Link Form-->
-          <form method="post" action="?/cancel_link" use:enhance={onSubmit}>
-            <div class="bg-primary text-primary-content card">
-              <div class="text-center card-body items-center">
-                <div class="text-2xl card-title">Cancel Your pCall Link</div>
-                <div class="text xl">
-                  If you cancel this pCall link, the link will be deactivated
-                  and nobody can use it to call.
-                </div>
-                {#if showMachineState.context.showState.totalSales > 0}
-                  {currencyFormatter.format(
-                    showMachineState.context.showState.totalSales
-                  )} will be refunded"
-                {/if}
 
-                <div
-                  class="flex flex-col text-white p-2 justify-center items-center"
-                >
-                  <div class="py-4">
-                    <button
-                      class="btn btn-secondary"
-                      type="submit"
-                      disabled={waiting4StateChange}>Cancel Link</button
-                    >
-                  </div>
-                </div>
-              </div>
-            </div>
-          </form>
-        {:else if canCreateShow}
+        {#if canCreateShow}
           <div class="bg-primary text-primary-content card">
             <div class="text-center card-body items-center">
               <h2 class="text-2xl card-title">Create a New Show</h2>
@@ -274,6 +243,7 @@
                       bind:value={showDuration}
                       class="range"
                       step="15"
+                      name="duration"
                     />
                     <div class="w-full flex justify-between text-xs px-2">
                       <span>|</span>
@@ -298,7 +268,34 @@
               </div>
             </div>
           </div>
+        {:else if canCancelShow}
+          <!-- Link Form-->
+          <form method="post" action="?/cancel_show" use:enhance={onSubmit}>
+            <div class="bg-primary text-primary-content card">
+              <div class="text-center card-body items-center">
+                <div class="text-2xl card-title">Cancel Your Show</div>
+                <div class="text xl">
+                  If you cancel this show any tickets sold will be refunded.
+                </div>
+
+                <div
+                  class="flex flex-col text-white p-2 justify-center items-center"
+                >
+                  <div class="py-4">
+                    <button
+                      class="btn btn-secondary"
+                      type="submit"
+                      disabled={waiting4StateChange}>Cancel Show</button
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
         {/if}
+        {#key currentShow}
+          <ShowDetail show={currentShow} />
+        {/key}
 
         <!-- Camera  Preview -->
         <div class="bg-primary text-primary-content card">

@@ -94,7 +94,7 @@ export const actions: Actions = {
       throw error(404, 'Key not found');
     }
     const data = await request.formData();
-    const price = data.get('amount') as string;
+    const price = data.get('price') as string;
     const name = data.get('name') as string;
     const duration = data.get('duration') as string;
     const maxNumTickets = data.get('maxNumTickets') as string;

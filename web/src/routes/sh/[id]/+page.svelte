@@ -2,6 +2,7 @@
   import { applyAction, enhance } from '$app/forms';
   import { page } from '$app/stores';
 
+  import ShowDetail from '$lib/components/ShowDetail.svelte';
   import {
     publicShowDB,
     type PublicShowDBType,
@@ -11,7 +12,6 @@
   import getProfileImage from '$lib/util/profilePhoto';
   import { onMount } from 'svelte';
   import type { ActionData, PageData } from './$types';
-  import ShowDetail from './ShowDetail.svelte';
 
   export let data: PageData;
   export let form: ActionData;

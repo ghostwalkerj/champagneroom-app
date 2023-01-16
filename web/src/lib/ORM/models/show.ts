@@ -5,11 +5,16 @@ import {
   type ExtractDocumentTypeFromTypedRxJsonSchema,
   type RxCollection,
   type RxDocument,
-  type RxJsonSchema
+  type RxJsonSchema,
 } from 'rxdb';
 import type { AgentDocument } from './agent';
 import type { TalentDocument } from './talent';
-import { TicketStatus, TicketString, type TicketDocType, type TicketDocument } from './ticket';
+import {
+  TicketStatus,
+  TicketString,
+  type TicketDocType,
+  type TicketDocument,
+} from './ticket';
 
 export enum ShowStatus {
   CREATED,
@@ -21,30 +26,39 @@ export enum ShowStatus {
   IN_DISPUTE,
   CANCELLATION_REQUESTED,
   STARTED,
-  ENDED
+  ENDED,
 }
 
 type ShowDocMethods = {
   saveShowStateCallBack: SaveStateCallBackType;
-  createTicket: (ticketProps: { name: string, pin: string; }) => Promise<TicketDocument>;
+  createTicket: (ticketProps: {
+    name: string;
+    pin: string;
+  }) => Promise<TicketDocument>;
 };
 export const showDocMethods: ShowDocMethods = {
-  saveShowStateCallBack: async function (this: ShowDocument, _showState: ShowDocument['showState']) {
+  saveShowStateCallBack: async function (
+    this: ShowDocument,
+    _showState: ShowDocument['showState']
+  ) {
     if (_showState.updatedAt > this.showState.updatedAt) {
       const atomicUpdate = (showDoc: ShowDocType) => {
         const newState = {
           ...showDoc.showState,
-          ..._showState
+          ..._showState,
         };
         return {
           ...showDoc,
-          showState: newState
+          showState: newState,
         };
       };
       this.atomicUpdate(atomicUpdate);
     }
   },
-  createTicket: async function (this: ShowDocument, ticketProps: { name: string, pin: string; }) {
+  createTicket: async function (
+    this: ShowDocument,
+    ticketProps: { name: string; pin: string }
+  ) {
     const db = this.collection.database;
     const _ticket = {
       _id: `${TicketString}:tk-${nanoid()}`,
@@ -65,8 +79,8 @@ export const showDocMethods: ShowDocMethods = {
           createdAt: new Date().getTime(),
           name: ticketProps.name,
           pin: ticketProps.pin,
-        }
-      }
+        },
+      },
     } as TicketDocType;
     const ticket = await db.tickets.insert(_ticket);
     return ticket;
@@ -82,21 +96,21 @@ const showSchemaLiteral = {
   properties: {
     _id: {
       type: 'string',
-      maxLength: 70
+      maxLength: 70,
     },
     entityType: {
       type: 'string',
       default: 'show',
       maxLength: 20,
-      final: true
+      final: true,
     },
     createdAt: { type: 'integer' },
     updatedAt: {
-      type: 'integer'
+      type: 'integer',
     },
     _deleted: {
       type: 'boolean',
-      default: false
+      default: false,
     },
     showState: {
       type: 'object',
@@ -104,7 +118,7 @@ const showSchemaLiteral = {
         status: {
           type: 'string',
           enum: Object.values(ShowStatus),
-          default: ShowStatus.CREATED
+          default: ShowStatus.CREATED,
         },
         updatedAt: { type: 'integer' },
         ticketsAvailable: { type: 'integer' },
@@ -116,36 +130,42 @@ const showSchemaLiteral = {
           type: 'integer',
           default: 0,
           minimum: 0,
-          maximum: 99999
+          maximum: 99999,
         },
         cancel: {
           type: 'object',
           properties: {
             createdAt: { type: 'integer' },
             canceledInState: { type: 'string' },
-
           },
-          required: ['createdAt', 'canceledInState']
+          required: ['createdAt', 'canceledInState'],
         },
         finalized: {
           type: 'object',
           properties: {
             endedAt: { type: 'integer' },
           },
-          required: ['endedAt']
+          required: ['endedAt'],
         },
         transactions: {
           type: 'array',
           ref: 'transactions',
-          items: { type: 'string' }
-        }
+          items: { type: 'string' },
+        },
       },
-      required: ['status', 'updatedAt', 'ticketsAvailable', 'ticketsSold', 'totalSales', 'refundedAmount']
+      required: [
+        'status',
+        'updatedAt',
+        'ticketsAvailable',
+        'ticketsSold',
+        'totalSales',
+        'refundedAmount',
+      ],
     },
     talent: {
       type: 'string',
       ref: 'talents',
-      maxLength: 50
+      maxLength: 50,
     },
     agent: { type: 'string', ref: 'agents', maxLength: 70 },
     roomId: { type: 'string', maxLength: 50 },
@@ -154,37 +174,49 @@ const showSchemaLiteral = {
       type: 'object',
       properties: {
         profileImageUrl: {
-          type: 'string'
+          type: 'string',
         },
         name: {
           type: 'string',
-          maxLength: 50
+          maxLength: 50,
         },
         stats: {
           type: 'object',
           properties: {
             numCompletedShows: {
               type: 'integer',
-              minimum: 0
+              minimum: 0,
             },
             ratingAvg: {
               type: 'number',
               minimum: 0,
-              maximum: 5
-            }
+              maximum: 5,
+            },
           },
-          required: ['numCompletedShows', 'ratingAvg']
-        }
+          required: ['numCompletedShows', 'ratingAvg'],
+        },
       },
-      required: ['profileImageUrl', 'name', 'stats']
+      required: ['profileImageUrl', 'name', 'stats'],
     },
     duration: { type: 'integer' },
     price: { type: 'integer' },
     name: { type: 'string', maxLength: 50 },
-    maxNumTickets: { type: 'integer' }
+    maxNumTickets: { type: 'integer' },
   },
-  required: ['_id', 'createdAt', 'agent', 'talent', 'duration', 'price', 'name', 'maxNumTickets', 'roomId', 'showState', 'talentInfo'],
-  encrypted: ['roomId']
+  required: [
+    '_id',
+    'createdAt',
+    'agent',
+    'talent',
+    'duration',
+    'price',
+    'name',
+    'maxNumTickets',
+    'roomId',
+    'showState',
+    'talentInfo',
+  ],
+  encrypted: ['roomId'],
 } as const;
 
 type showRef = {
@@ -195,7 +227,9 @@ type showRef = {
 export const ShowString = 'show';
 
 const schemaTyped = toTypedRxJsonSchema(showSchemaLiteral);
-export type ShowDocType = ExtractDocumentTypeFromTypedRxJsonSchema<typeof schemaTyped>;
+export type ShowDocType = ExtractDocumentTypeFromTypedRxJsonSchema<
+  typeof schemaTyped
+>;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 export const showSchema: RxJsonSchema<ShowDocType> = showSchemaLiteral;
