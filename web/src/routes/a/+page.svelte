@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { applyAction } from '$app/forms';
   import { agentDB } from '$lib/ORM/dbs/agentDB';
   import { getAgentId, type AgentDocument } from '$lib/ORM/models/agent';
   import type { TalentDocument } from '$lib/ORM/models/talent';

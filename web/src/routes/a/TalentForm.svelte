@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { applyAction, enhance } from '$app/forms';
+  import { enhance } from '$app/forms';
   import type { AgentDocument } from '$lib/ORM/models/agent';
   import type { ActionData } from './$types';
 

@@ -3,12 +3,12 @@ import {
   JWT_TALENT_DB_SECRET,
   JWT_TALENT_DB_USER,
 } from '$env/static/private';
+import { masterDB } from '$lib/ORM/dbs/masterDB';
 import type { ShowDocument } from '$lib/ORM/models/show';
 import { createShowMachineService } from '$lib/machines/showMachine';
 import { error, fail } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
-import type { PageServerLoad, Actions } from './$types';
-import { masterDB } from '$lib/ORM/dbs/masterDB';
+import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params }) => {
   const key = params.key;
@@ -50,6 +50,44 @@ export const load: PageServerLoad = async ({ params }) => {
 };
 
 export const actions: Actions = {
+  update_profile_image: async ({
+    params,
+    request,
+  }: import('./$types').RequestEvent) => {
+    const key = params.key;
+    if (key === null) {
+      throw error(404, 'Key not found');
+    }
+    const data = await request.formData();
+    const url = data.get('url') as string;
+    if (!url) {
+      return fail(400, { url, missingUrl: true });
+    }
+    const db = await masterDB();
+    const talent = await db.talents.findOne().where('key').eq(key).exec();
+    if (!talent) {
+      throw error(404, 'Talent not found');
+    }
+    talent.update({
+      $set: {
+        profileImageUrl: url,
+        updatedAt: new Date().getTime(),
+      },
+    });
+    if (talent.currentShow) {
+      const currentShow = await talent.populate('currentShow');
+      currentShow.update({
+        $set: {
+          talentInfo: {
+            ...currentShow.talentInfo,
+            profileImageUrl: url,
+          },
+          updatedAt: new Date().getTime(),
+        },
+      });
+    }
+    return { success: true };
+  },
   create_show: async ({ params, request }) => {
     const key = params.key;
     if (key === null) {
