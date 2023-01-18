@@ -6,7 +6,6 @@ import {
 import { PUBLIC_TICKET_PATH } from '$env/static/public';
 import { masterDB } from '$lib/ORM/dbs/masterDB';
 import type { ShowDocType } from '$lib/ORM/models/show';
-import { StorageTypes } from '$lib/ORM/rxdb';
 import { createShowMachineService } from '$lib/machines/showMachine';
 import { mensNames } from '$lib/util/mensNames';
 import { createPinHash } from '$lib/util/pin';

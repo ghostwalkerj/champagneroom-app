@@ -8,7 +8,7 @@
     type ShowMachineServiceType,
   } from '$lib/machines/showMachine';
   import { talentDB, type TalentDBType } from '$lib/ORM/dbs/talentDB';
-  import { type ShowDocument, ShowStatus } from '$lib/ORM/models/show';
+  import { ShowStatus, type ShowDocument } from '$lib/ORM/models/show';
   import type { TalentDocType, TalentDocument } from '$lib/ORM/models/talent';
   import { durationFormatter } from '$lib/util/constants';
   import { possessive } from 'i18n-possessive';

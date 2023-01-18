@@ -49,7 +49,7 @@
       class="flex  flex-col w-full p-4   gap-4 rounded-xl bg-base-200  overflow-auto"
     >
       <div
-        class="relative bg-cover bg-no-repeat bg-center rounded-xl h-96"
+        class="relative bg-cover bg-no-repeat bg-center rounded-xl h-[calc(50vh)]"
         style="background-image: url('{show.talentInfo.profileImageUrl}')"
       >
         <div class="absolute top-1 left-2 text-lg">{show.name}</div>

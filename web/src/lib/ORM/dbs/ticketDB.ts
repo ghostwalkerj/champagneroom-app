@@ -23,15 +23,15 @@ type PublicCollections = {
   shows: ShowCollection;
 };
 
-export type PublicTicketDBType = RxDatabase<PublicCollections>;
-const _publicTicketDB = new Map<string, PublicTicketDBType>();
-export const publicTicketDB = async (
+export type TicketDBType = RxDatabase<PublicCollections>;
+const _ticketDB = new Map<string, TicketDBType>();
+export const ticketDB = async (
   token: string,
   ticketId: string
-): Promise<PublicTicketDBType> => await create(token, ticketId);
+): Promise<TicketDBType> => await create(token, ticketId);
 
 const create = async (token: string, ticketId: string) => {
-  let _db = _publicTicketDB.get(ticketId);
+  let _db = _ticketDB.get(ticketId);
   if (_db) return _db;
 
   initRXDB(StorageTypes.IDB);
@@ -114,6 +114,6 @@ const create = async (token: string, ticketId: string) => {
       });
     }
   }
-  _publicTicketDB.set(ticketId, _db);
+  _ticketDB.set(ticketId, _db);
   return _db;
 };

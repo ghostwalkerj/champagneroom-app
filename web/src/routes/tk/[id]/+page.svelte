@@ -1,26 +1,22 @@
 <script lang="ts">
   import { applyAction, enhance } from '$app/forms';
   import { page } from '$app/stores';
-  import {
-    publicShowDB,
-    type PublicShowDBType,
-  } from '$lib/ORM/dbs/publicShowDB';
 
-  import {
-    publicTicketDB,
-    type PublicTicketDBType,
-  } from '$lib/ORM/dbs/publicTicketDB';
+  import { ticketDB } from '$lib/ORM/dbs/ticketDB';
   import type { ShowDocType, ShowDocument } from '$lib/ORM/models/show';
-  import { TicketStatus, type TicketDocument } from '$lib/ORM/models/ticket';
-  import { StorageTypes } from '$lib/ORM/rxdb';
+  import {
+    type TicketDocType,
+    TicketStatus,
+    type TicketDocument,
+  } from '$lib/ORM/models/ticket';
   import { onMount } from 'svelte';
   import type { PageData } from './$types';
   import TicketDetail from './TicketDetail.svelte';
 
   export let data: PageData;
   const token = data.token;
-  let ticket = data.ticket;
-  let show = data.show as ShowDocType;
+  let ticket = data.ticket as TicketDocument | null;
+  let show = data.show as ShowDocument | null;
   let ticketId = $page.params.id;
 
   $: waiting4StateChange = false;
@@ -37,24 +33,15 @@
   };
 
   onMount(async () => {
-    publicShowDB(token, show._id, StorageTypes.IDB).then(
-      (db: PublicShowDBType) => {
-        db.shows.findOne(show._id).$.subscribe(_show => {
-          show = _show as ShowDocument;
-        });
-      }
-    );
-    publicTicketDB(token, ticketId, StorageTypes.IDB).then(
-      (db: PublicTicketDBType) => {
-        db.tickets.findOne(ticketId).$.subscribe(_ticket => {
-          if (_ticket) {
-            ticket = _ticket as TicketDocument;
-            waiting4StateChange = false;
-            canBuyTicket = ticket.ticketState.status === TicketStatus.RESERVED;
-          }
-        });
-      }
-    );
+    const db = await ticketDB(token, ticketId);
+    show = await db.shows.findOne(show?._id).exec();
+    ticket = await db.tickets.findOne(ticketId).exec();
+    if (ticket) {
+      ticket.$.subscribe(_ticket => {
+        waiting4StateChange = false;
+        canBuyTicket = _ticket.ticketState.status === TicketStatus.RESERVED;
+      });
+    }
   });
 </script>
 

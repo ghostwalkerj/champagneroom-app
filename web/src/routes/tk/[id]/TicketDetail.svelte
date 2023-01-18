@@ -3,13 +3,13 @@
   import type { TicketDocType } from '$lib/ORM/models/ticket';
   import { currencyFormatter, durationFormatter } from '$lib/util/constants';
   import getProfileImage from '$lib/util/profilePhoto';
-  export let show: ShowDocType;
-  export let ticket: TicketDocType;
+  export let show: ShowDocType | null;
+  export let ticket: TicketDocType | null;
 
-  $: profileImage = getProfileImage(ticket.ticketState.reservation.name);
+  $: profileImage = getProfileImage(ticket?.ticketState.reservation.name);
 </script>
 
-{#if show}
+{#if show && ticket}
   <div class="flex justify-center">
     <div
       class="flex flex-col w-full p-4 max-w-2xl gap-4 rounded-xl bg-base-200  overflow-auto"
