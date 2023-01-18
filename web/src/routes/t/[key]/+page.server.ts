@@ -152,33 +152,38 @@ export const actions: Actions = {
       cancelShow.showState,
       cancelShow.saveShowStateCallBack
     );
-    showService.send({
-      type: 'REQUEST CANCELLATION',
-    });
-    // Loop through all tickets and refund them
-    const db = await masterDB();
-    const tickets = await db.tickets
-      .find()
-      .where('show')
-      .eq(cancelShow._id)
-      .exec();
-    for (const ticket of tickets) {
-      if (
-        ticket.ticketState.status !== TicketStatus.CANCELED &&
-        ticket.ticketState.status !== TicketStatus.CANCELLATION_REQUESTED
-      ) {
-        const ticketService = createTicketMachineService(
-          ticket.ticketState,
-          ticket.saveTicketStateCallBack
-        );
-        ticketService.send({
-          type: 'REQUEST CANCELLATION',
-          cancel: {
-            createdAt: new Date().getTime(),
-            canceler: ActorType.TALENT,
-            canceledInState: showService.getSnapshot().value.toString(),
-          },
-        });
+
+    const showState = showService.getSnapshot();
+
+    if (showState.can({ type: 'REQUEST CANCELLATION' })) {
+      showService.send({
+        type: 'REQUEST CANCELLATION',
+      });
+      // Loop through all tickets and refund them
+      const db = await masterDB();
+      const tickets = await db.tickets
+        .find()
+        .where('show')
+        .eq(cancelShow._id)
+        .exec();
+      for (const ticket of tickets) {
+        if (
+          ticket.ticketState.status !== TicketStatus.CANCELED &&
+          ticket.ticketState.status !== TicketStatus.CANCELLATION_REQUESTED
+        ) {
+          const ticketService = createTicketMachineService(
+            ticket.ticketState,
+            ticket.saveTicketStateCallBack
+          );
+          ticketService.send({
+            type: 'REQUEST CANCELLATION',
+            cancel: {
+              createdAt: new Date().getTime(),
+              canceler: ActorType.TALENT,
+              canceledInState: showState.value.toString(),
+            },
+          });
+        }
 
         // if (ticket.ticketState.totalPaid > ticket.ticketState.refundedAmount) {
         //   const transaction = await ticket.createTransaction({
@@ -196,8 +201,6 @@ export const actions: Actions = {
         //     transaction,
         //   });
         // }
-
-        ticketService.stop();
       }
     }
     showService.stop();

@@ -124,9 +124,9 @@ export const actions: import('./$types').Actions = {
       ticket.saveTicketStateCallBack
     );
     const state = ticketService.getSnapshot();
-    console.log(state.value);
     if (state.can({ type: 'REQUEST CANCELLATION', cancel: undefined })) {
       //TODO: make real transaction
+      console.log(state.value);
 
       ticketService.send({
         type: 'REQUEST CANCELLATION',
