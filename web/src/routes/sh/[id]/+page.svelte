@@ -3,12 +3,8 @@
   import { page } from '$app/stores';
 
   import ShowDetail from '$lib/components/ShowDetail.svelte';
-  import {
-    publicShowDB,
-    type PublicShowDBType,
-  } from '$lib/ORM/dbs/publicShowDB';
+  import { showDB, type ShowDBType } from '$lib/ORM/dbs/showDB';
   import { ShowStatus, type ShowDocument } from '$lib/ORM/models/show';
-  import { StorageTypes } from '$lib/ORM/rxdb';
   import getProfileImage from '$lib/util/profilePhoto';
   import { onMount } from 'svelte';
   import type { ActionData, PageData } from './$types';
@@ -35,21 +31,19 @@
   };
 
   onMount(async () => {
-    publicShowDB(token, showId, StorageTypes.IDB).then(
-      (db: PublicShowDBType) => {
-        db.shows.findOne(showId).$.subscribe(_show => {
-          show = _show as ShowDocument;
-        });
-      }
-    );
+    showDB(token, showId).then((db: ShowDBType) => {
+      db.shows.findOne(showId).$.subscribe(_show => {
+        show = _show as ShowDocument;
+      });
+    });
   });
 </script>
 
-<div class="mt-6 flex items-center">
-  <div class="min-w-full">
+<div class="mt-6   ">
+  <div class="flex flex-row justify-center	">
     <!-- Page header -->
     {#key show}
-      <div class="pb-4 text-center">
+      <div class="pb-4 w-screen text-center max-w-2xl ">
         <ShowDetail {show} />
         {#if canBuyTicket}
           <label for="buy-ticket" class="btn btn-secondary m-4"

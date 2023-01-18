@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { browser } from '$app/environment';
   import { applyAction, enhance } from '$app/forms';
   import { page } from '$app/stores';
   import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
@@ -9,7 +8,7 @@
     type ShowMachineServiceType,
   } from '$lib/machines/showMachine';
   import { talentDB, type TalentDBType } from '$lib/ORM/dbs/talentDB';
-  import type { ShowDocument } from '$lib/ORM/models/show';
+  import { type ShowDocument, ShowStatus } from '$lib/ORM/models/show';
   import type { TalentDocType, TalentDocument } from '$lib/ORM/models/talent';
   import { durationFormatter } from '$lib/util/constants';
   import { possessive } from 'i18n-possessive';
@@ -27,7 +26,7 @@
   const token = data.token;
 
   let talentObj = data.talent as TalentDocType;
-  $: currentShow = data.currentShow as ShowDocument;
+  $: currentShow = data.currentShow as ShowDocument | null;
   let showName = possessive(talentObj.name, 'en') + ' Show';
   $: showDuration = 60;
   let key = $page.params.key;
@@ -48,8 +47,9 @@
 
   $: canCreateShow =
     !currentShow ||
-    (showMachineState && showMachineState.done) ||
-    (showMachineState && showMachineState.matches('inEscrow'));
+    currentShow.showState.status === ShowStatus.CANCELLED ||
+    currentShow.showState.status === ShowStatus.FINALIZED ||
+    currentShow.showState.status === ShowStatus.ENDED;
 
   $: waiting4StateChange = false;
 
@@ -99,38 +99,35 @@
 
   onMount(async () => {});
 
-  const onSubmit = ({ form }) => {
+  const onSubmit = ({}) => {
     waiting4StateChange = true;
     return async ({ result }) => {
-      console.log(result);
       if (result.type !== 'success') {
         waiting4StateChange = false;
-      } else {
-        if (form) form.reset();
       }
       await applyAction(result);
     };
   };
 
-  if (browser) {
-    talentDB(token, key).then((db: TalentDBType) => {
-      db.talents
-        .findOne(talentObj._id)
-        .exec()
-        .then(_talent => {
-          if (_talent) {
-            talentObj = _talent;
-            talent = _talent;
-            talent.get$('currentShow').subscribe(async showId => {
-              if (showId) {
-                currentShow = await talent.populate('currentShow');
+  talentDB(token, key).then((db: TalentDBType) => {
+    db.talents
+      .findOne(talentObj._id)
+      .exec()
+      .then(_talent => {
+        if (_talent) {
+          talentObj = _talent;
+          talent = _talent;
+          talent.get$('currentShow').subscribe(async showId => {
+            if (showId) {
+              currentShow = await db.shows.findOne(showId).exec();
+              if (currentShow) {
                 useShow(currentShow);
               }
-            });
-          }
-        });
-    });
-  }
+            }
+          });
+        }
+      });
+  });
 </script>
 
 <div class="min-h-full">
@@ -141,7 +138,7 @@
     >
       <div class="flex space-x-5 items-center">
         <div>
-          <h1 class="font-bold text-5xl">Manage Your Shows</h1>
+          <h1 class="font-bold text-5xl">Manage Your Show</h1>
           <p class="pt-6">
             Pretioso flos est, nihil ad vos nunc. Posset faciens pecuniam.
             Posuit eam ad opus nunc et adepto a pCall!
@@ -266,7 +263,11 @@
               </div>
             </div>
           </div>
-        {:else if canCancelShow}
+        {/if}
+        {#key showMachineState || currentShow}
+          <ShowDetail show={currentShow} showCopy={true} />
+        {/key}
+        {#if canCancelShow}
           <!-- Link Form-->
           <form method="post" action="?/cancel_show" use:enhance={onSubmit}>
             <div class="bg-primary text-primary-content card">
@@ -291,17 +292,8 @@
             </div>
           </form>
         {/if}
-        {#key currentShow}
-          <ShowDetail show={currentShow} />
-        {/key}
 
         <!-- Camera  Preview -->
-        <div class="bg-primary text-primary-content card">
-          <div class="text-center card-body items-center">
-            <h2 class="text-2xl card-title">Your Video Preview</h2>
-            <div class="rounded-2xl" />
-          </div>
-        </div>
       </div>
 
       <!--Next Column-->

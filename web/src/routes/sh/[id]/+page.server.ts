@@ -1,12 +1,10 @@
 import {
-  JWT_CREATOR_USER,
   JWT_EXPIRY,
-  JWT_PUBLIC_USER,
-  JWT_SECRET,
+  JWT_SHOW_DB_SECRET,
+  JWT_SHOW_DB_USER,
 } from '$env/static/private';
 import { PUBLIC_TICKET_PATH } from '$env/static/public';
-import { apiShowDB } from '$lib/ORM/dbs/apiShowDB';
-import { showDB } from '$lib/ORM/dbs/showDB';
+import { masterDB } from '$lib/ORM/dbs/masterDB';
 import type { ShowDocType } from '$lib/ORM/models/show';
 import { StorageTypes } from '$lib/ORM/rxdb';
 import { createShowMachineService } from '$lib/machines/showMachine';
@@ -23,16 +21,16 @@ export const load: import('./$types').PageServerLoad = async ({ params }) => {
     throw error(404, 'Champagne Show not found');
   }
 
-  // Because we are returning the token to the client, we only allow access to the public database
   const token = jwt.sign(
     {
-      exp: Math.floor(Date.now() / 1000) + Number.parseInt(JWT_EXPIRY),
-      sub: JWT_PUBLIC_USER,
+      exp: Math.floor(Date.now() / 1000) + +JWT_EXPIRY,
+      sub: JWT_SHOW_DB_USER,
     },
-    JWT_SECRET //TODO: Need to change this to one specific to the public database
+    JWT_SHOW_DB_SECRET,
+    { keyid: JWT_SHOW_DB_USER }
   );
 
-  const db = await showDB(token, showId, StorageTypes.NODE_WEBSQL);
+  const db = await masterDB();
   if (!db) {
     throw error(500, 'no db');
   }
@@ -57,15 +55,7 @@ export const load: import('./$types').PageServerLoad = async ({ params }) => {
 };
 
 const getShow = async (showId: string) => {
-  const token = jwt.sign(
-    {
-      exp: Math.floor(Date.now() / 1000) + Number.parseInt(JWT_EXPIRY),
-      sub: JWT_CREATOR_USER,
-    },
-    JWT_SECRET
-  );
-
-  const db = await apiShowDB(token, showId, StorageTypes.NODE_WEBSQL);
+  const db = await masterDB();
   if (!db) {
     throw error(500, 'no db');
   }

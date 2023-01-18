@@ -3,39 +3,50 @@
   import { currencyFormatter, durationFormatter } from '$lib/util/constants';
   import { onMount } from 'svelte';
   import StarRating from 'svelte-star-rating';
-  export let show: ShowDocType;
+  import { PUBLIC_SHOW_PATH } from '$env/static/public';
+  import urlJoin from 'url-join';
+
+  export let show: ShowDocType | null;
+  export let showCopy = false;
   $: waterMarkText = '';
+  $: showStatus = show?.showState.status;
 
-  onMount(() => {
-    if (show)
-      $: switch (show.showState.status) {
-        case ShowStatus.CANCELLED:
-          waterMarkText = 'Cancelled';
-          break;
+  const copyShowUrl = () => {
+    const showUrl = urlJoin(
+      window.location.origin,
+      PUBLIC_SHOW_PATH,
+      show!._id
+    );
+    navigator.clipboard.writeText(showUrl);
+  };
 
-        case ShowStatus.BOX_OFFICE_CLOSED:
-          waterMarkText = 'Sold Out';
-          break;
-        case ShowStatus.STARTED:
-          waterMarkText = 'Box Office Closed';
-          break;
-        case ShowStatus.FINALIZED:
-        case ShowStatus.ENDED:
-        case ShowStatus.IN_ESCROW:
-        case ShowStatus.IN_DISPUTE:
-          waterMarkText = 'ENDED';
-          break;
+  $: switch (showStatus) {
+    case ShowStatus.CANCELLED:
+      waterMarkText = 'Cancelled';
+      break;
 
-        default:
-          waterMarkText = '';
-      }
-  });
+    case ShowStatus.BOX_OFFICE_CLOSED:
+      waterMarkText = 'Sold Out';
+      break;
+    case ShowStatus.STARTED:
+      waterMarkText = 'Box Office Closed';
+      break;
+    case ShowStatus.FINALIZED:
+    case ShowStatus.ENDED:
+    case ShowStatus.IN_ESCROW:
+    case ShowStatus.IN_DISPUTE:
+      waterMarkText = 'ENDED';
+      break;
+
+    default:
+      waterMarkText = '';
+  }
 </script>
 
 {#if show}
   <div class=" flex justify-center">
     <div
-      class="flex  flex-col w-full p-4 max-w-2xl  gap-4 rounded-xl bg-base-200  overflow-auto"
+      class="flex  flex-col w-full p-4   gap-4 rounded-xl bg-base-200  overflow-auto"
     >
       <div
         class="relative bg-cover bg-no-repeat bg-center rounded-xl h-96"
@@ -81,6 +92,14 @@
           </div>
         </div>
       </div>
+      {#if showCopy}
+        <div class="text-center">
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
+          <div class="btn btn-primary" on:click={copyShowUrl}>
+            Copy Show Link
+          </div>
+        </div>
+      {/if}
     </div>
   </div>
 {/if}
