@@ -107,7 +107,7 @@ export const actions: import('./$types').Actions = {
       );
       showService.send({ type: 'TICKET SOLD', transaction, ticket });
     }
-    ticketService.stop();
+    //ticketService.stop();
 
     return { success: true };
   },
@@ -124,20 +124,20 @@ export const actions: import('./$types').Actions = {
       ticket.saveTicketStateCallBack
     );
     const state = ticketService.getSnapshot();
+    console.log(state.value);
     if (state.can({ type: 'REQUEST CANCELLATION', cancel: undefined })) {
       //TODO: make real transaction
-      console.dir(state.value);
+
       ticketService.send({
         type: 'REQUEST CANCELLATION',
         cancel: {
           createdAt: new Date().getTime(),
           canceler: ActorType.CUSTOMER,
-          canceledInState: state.value.toString(),
+          canceledInState: JSON.stringify(state.value),
         },
       });
-
-      ticketService.stop();
     }
+    //ticketService.stop();
     return { success: true };
   },
 };

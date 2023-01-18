@@ -239,6 +239,7 @@ const ticketSchemaLiteral = {
       default: false,
     },
   },
+  encrypted: ['ticketState.reservation.pin'],
   required: [
     '_id',
     'talent',

@@ -60,7 +60,7 @@
         </div>
       {/if}
       <div class="p-4">
-        <form method="post" action="?/cancel_ticket" use:enhance={onSubmit}>
+        <form method="post" action="?/cancel_ticket" use:enhance>
           <div class="w-full flex justify-center">
             <button class="btn" type="submit">Cancel Ticket</button>
           </div>

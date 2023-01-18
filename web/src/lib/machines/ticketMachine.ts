@@ -165,13 +165,13 @@ export const createTicketMachine = (
                   },
                 },
               },
-              always: {
-                target: '#ticketMachine.cancelled',
-                cond: context =>
-                  context.ticketState.totalPaid <=
-                  context.ticketState.refundedAmount,
-                actions: ['cancelApproved', 'saveTicketState'],
-              },
+              // always: {
+              //   target: '#ticketMachine.cancelled',
+              //   cond: context =>
+              //     context.ticketState.totalPaid <=
+              //     context.ticketState.refundedAmount,
+              //   actions: ['cancelApproved', 'saveTicketState'],
+              // },
             },
           },
         },

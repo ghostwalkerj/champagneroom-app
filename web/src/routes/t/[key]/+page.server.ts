@@ -9,9 +9,9 @@ import { createShowMachineService } from '$lib/machines/showMachine';
 import { error, fail } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import type { Actions, PageServerLoad } from './$types';
-import { TransactionReasonType } from '$lib/ORM/models/transaction';
 import { createTicketMachineService } from '$lib/machines/ticketMachine';
 import { ActorType } from '$lib/util/constants';
+import { TicketStatus } from '$lib/ORM/models/ticket';
 
 const getTalent = async (key: string) => {
   const db = await masterDB();
@@ -163,17 +163,20 @@ export const actions: Actions = {
       .eq(cancelShow._id)
       .exec();
     for (const ticket of tickets) {
-      const ticketService = createTicketMachineService(ticket.ticketState);
-      const state = ticketService.getSnapshot();
-      if (state.can({ type: 'REQUEST CANCELLATION', cancel: undefined })) {
-        //TODO: make real transaction
-        console.dir(state.value);
+      if (
+        ticket.ticketState.status !== TicketStatus.CANCELED &&
+        ticket.ticketState.status !== TicketStatus.CANCELLATION_REQUESTED
+      ) {
+        const ticketService = createTicketMachineService(
+          ticket.ticketState,
+          ticket.saveTicketStateCallBack
+        );
         ticketService.send({
           type: 'REQUEST CANCELLATION',
           cancel: {
             createdAt: new Date().getTime(),
             canceler: ActorType.TALENT,
-            canceledInState: state.value.toString(),
+            canceledInState: showService.getSnapshot().value.toString(),
           },
         });
 
@@ -193,8 +196,9 @@ export const actions: Actions = {
         //     transaction,
         //   });
         // }
+
+        ticketService.stop();
       }
-      ticketService.stop();
     }
     showService.stop();
     return { success: true };

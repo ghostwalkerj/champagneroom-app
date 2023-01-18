@@ -95,9 +95,9 @@ export const actions: import('./$types').Actions = {
       show.showState,
       show.saveShowStateCallBack
     );
-    if (!showService.getSnapshot().can('TICKET RESERVED'))
+    if (show.showState.ticketsAvailable == 0) {
       return error(501, 'Show cannot Reserve Ticket'); // TODO: This should be atomic
-
+    }
     const ticket = await show.createTicket({
       name,
       pin,
