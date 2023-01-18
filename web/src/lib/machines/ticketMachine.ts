@@ -38,7 +38,6 @@ export const createTicketMachine = (
       schema: {
         events: {} as
           | { type: 'REQUEST CANCELLATION'; cancel: TicketStateType['cancel'] }
-          | { type: 'CANCEL TICKET'; cancel: TicketStateType['cancel'] }
           | {
               type: 'REFUND RECEIVED';
               transaction: TransactionDocType;
@@ -98,7 +97,6 @@ export const createTicketMachine = (
             },
           ],
         },
-
         reserved: {
           initial: 'waiting4Payment',
           states: {
@@ -107,12 +105,12 @@ export const createTicketMachine = (
                 target: 'canJoin',
                 cond: 'fullyPaid',
               },
-              after: {
-                paymentDelay: {
-                  target: '#ticketMachine.cancelled',
-                  actions: ['cancelTicket', 'saveTicketState'],
-                },
-              },
+              // after: {
+              //   paymentDelay: {
+              //     target: '#ticketMachine.cancelled',
+              //     actions: ['cancelTicket', 'saveTicketState'],
+              //   },
+              // },
               on: {
                 'PAYMENT RECEIVED': {
                   actions: ['receivePayment', 'saveTicketState'],
@@ -170,7 +168,7 @@ export const createTicketMachine = (
               always: {
                 target: '#ticketMachine.cancelled',
                 cond: context =>
-                  context.ticketState.price <=
+                  context.ticketState.totalPaid <=
                   context.ticketState.refundedAmount,
                 actions: ['cancelApproved', 'saveTicketState'],
               },
@@ -240,16 +238,6 @@ export const createTicketMachine = (
               updatedAt: new Date().getTime(),
               status: TicketStatus.CANCELLATION_REQUESTED,
               cancel: event.cancel,
-            },
-          };
-        }),
-
-        cancelTicket: assign(context => {
-          return {
-            ticketState: {
-              ...context.ticketState,
-              updatedAt: new Date().getTime(),
-              status: TicketStatus.CANCELED,
             },
           };
         }),
@@ -355,9 +343,6 @@ export const createTicketMachine = (
         escrowDelay: () => {
           const timer = 0;
           return timer > 0 ? timer : 0;
-        },
-        paymentDelay: context => {
-          return paymentTimer(context.ticketState.reservation.createdAt);
         },
       },
       guards: {

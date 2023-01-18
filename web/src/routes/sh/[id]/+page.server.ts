@@ -103,6 +103,8 @@ export const actions: import('./$types').Actions = {
       pin,
     });
     showService.send('TICKET RESERVED');
+    showService.stop();
+
     const hash = createPinHash(ticket._id, pin);
     cookies.set('pin', hash, { path: '/' });
     const redirectUrl = urlJoin(url.origin, PUBLIC_TICKET_PATH, ticket._id);

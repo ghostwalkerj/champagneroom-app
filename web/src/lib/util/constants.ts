@@ -22,5 +22,5 @@ export const durationFormatter = (duration: number): string => {
 export enum ActorType {
   AGENT,
   TALENT,
-  CALLER,
+  CUSTOMER,
 }

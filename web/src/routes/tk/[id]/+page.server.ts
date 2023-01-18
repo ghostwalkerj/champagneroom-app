@@ -9,6 +9,7 @@ import type { TicketDocType, TicketDocument } from '$lib/ORM/models/ticket';
 import { TransactionReasonType } from '$lib/ORM/models/transaction';
 import { createShowMachineService } from '$lib/machines/showMachine';
 import { createTicketMachineService } from '$lib/machines/ticketMachine';
+import { ActorType } from '$lib/util/constants';
 import { verifyPin } from '$lib/util/pin';
 import { error, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
@@ -106,5 +107,37 @@ export const actions: import('./$types').Actions = {
       );
       showService.send({ type: 'TICKET SOLD', transaction, ticket });
     }
+    ticketService.stop();
+
+    return { success: true };
+  },
+  cancel_ticket: async ({ params }) => {
+    const ticketId = params.id;
+    if (ticketId === null) {
+      throw error(404, 'Key not found');
+    }
+
+    const { ticket } = await getTicket(ticketId);
+
+    const ticketService = createTicketMachineService(
+      ticket.ticketState,
+      ticket.saveTicketStateCallBack
+    );
+    const state = ticketService.getSnapshot();
+    if (state.can({ type: 'REQUEST CANCELLATION', cancel: undefined })) {
+      //TODO: make real transaction
+      console.dir(state.value);
+      ticketService.send({
+        type: 'REQUEST CANCELLATION',
+        cancel: {
+          createdAt: new Date().getTime(),
+          canceler: ActorType.CUSTOMER,
+          canceledInState: state.value.toString(),
+        },
+      });
+
+      ticketService.stop();
+    }
+    return { success: true };
   },
 };

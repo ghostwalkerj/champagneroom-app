@@ -65,21 +65,21 @@
       show.saveShowStateCallBack
     );
     showSub = showMachineService.subscribe(state => {
-      showMachineState = state;
-
       if (state.changed) {
-        canCancelShow = state.can({
-          type: 'REQUEST CANCELLATION',
-        });
-        canCreateShow = state.done ?? true;
+        showMachineState = state;
+        console.log(state.value);
+
+        if (state.changed) {
+          canCancelShow = state.can({
+            type: 'REQUEST CANCELLATION',
+          });
+          canCreateShow = state.done ?? true;
+        }
       }
     });
   };
 
   const useShow = (show: ShowDocument) => {
-    currentShow = show;
-    waiting4StateChange = false; // link changed, so can submit again
-    useShowState(show, show.showState);
     show.get$('showState').subscribe(_showState => {
       waiting4StateChange = false; // link changed, so can submit again
       useShowState(show, _showState);
@@ -97,7 +97,27 @@
     }
   };
 
-  onMount(async () => {});
+  onMount(async () => {
+    talentDB(token, key).then((db: TalentDBType) => {
+      db.talents
+        .findOne(talentObj._id)
+        .exec()
+        .then(_talent => {
+          if (_talent) {
+            talentObj = _talent;
+            talent = _talent;
+            talent.get$('currentShow').subscribe(async showId => {
+              if (showId) {
+                currentShow = await db.shows.findOne(showId).exec();
+                if (currentShow) {
+                  useShow(currentShow);
+                }
+              }
+            });
+          }
+        });
+    });
+  });
 
   const onSubmit = ({}) => {
     waiting4StateChange = true;
@@ -108,26 +128,6 @@
       await applyAction(result);
     };
   };
-
-  talentDB(token, key).then((db: TalentDBType) => {
-    db.talents
-      .findOne(talentObj._id)
-      .exec()
-      .then(_talent => {
-        if (_talent) {
-          talentObj = _talent;
-          talent = _talent;
-          talent.get$('currentShow').subscribe(async showId => {
-            if (showId) {
-              currentShow = await db.shows.findOne(showId).exec();
-              if (currentShow) {
-                useShow(currentShow);
-              }
-            }
-          });
-        }
-      });
-  });
 </script>
 
 <div class="min-h-full">

@@ -9,6 +9,21 @@ import { createShowMachineService } from '$lib/machines/showMachine';
 import { error, fail } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import type { Actions, PageServerLoad } from './$types';
+import { TransactionReasonType } from '$lib/ORM/models/transaction';
+import { createTicketMachineService } from '$lib/machines/ticketMachine';
+import { ActorType } from '$lib/util/constants';
+
+const getTalent = async (key: string) => {
+  const db = await masterDB();
+  if (!db) {
+    throw error(500, 'no db');
+  }
+  const talent = await db.talents.findOne().where('key').eq(key).exec();
+  if (!talent) {
+    throw error(404, 'Talent not found');
+  }
+  return talent;
+};
 
 export const load: PageServerLoad = async ({ params }) => {
   const key = params.key;
@@ -26,11 +41,7 @@ export const load: PageServerLoad = async ({ params }) => {
     { keyid: JWT_TALENT_DB_USER }
   );
 
-  const db = await masterDB();
-  const _talent = await db.talents.findOne().where('key').eq(key).exec();
-  if (!_talent) {
-    throw error(404, 'Talent not found');
-  }
+  const _talent = await getTalent(key);
 
   await _talent.updateStats();
   const _currentShow = (await _talent.populate('currentShow')) as ShowDocument;
@@ -63,11 +74,8 @@ export const actions: Actions = {
     if (!url) {
       return fail(400, { url, missingUrl: true });
     }
-    const db = await masterDB();
-    const talent = await db.talents.findOne().where('key').eq(key).exec();
-    if (!talent) {
-      throw error(404, 'Talent not found');
-    }
+    const talent = await getTalent(key);
+
     talent.update({
       $set: {
         profileImageUrl: url,
@@ -88,6 +96,7 @@ export const actions: Actions = {
     }
     return { success: true };
   },
+
   create_show: async ({ params, request }) => {
     const key = params.key;
     if (key === null) {
@@ -110,11 +119,8 @@ export const actions: Actions = {
       return fail(400, { price, invalidPrice: true });
     }
 
-    const db = await masterDB();
-    const talent = await db.talents.findOne().where('key').eq(key).exec();
-    if (!talent) {
-      throw error(404, 'Talent not found');
-    }
+    const talent = await getTalent(key);
+
     const show = await talent.createShow({
       price: +price,
       name,
@@ -133,8 +139,7 @@ export const actions: Actions = {
       throw error(404, 'Key not found');
     }
 
-    const db = await masterDB();
-    const talent = await db.talents.findOne().where('key').eq(key).exec();
+    const talent = await getTalent(key);
     if (!talent) {
       throw error(404, 'Talent not found');
     }
@@ -150,34 +155,48 @@ export const actions: Actions = {
     showService.send({
       type: 'REQUEST CANCELLATION',
     });
-    return { success: true };
-  },
-  send_refunds: async ({ params }) => {
-    const key = params.key;
-    if (key === null) {
-      throw error(404, 'Key not found');
-    }
-
+    // Loop through all tickets and refund them
     const db = await masterDB();
-    const talent = await db.talents.findOne().where('key').eq(key).exec();
-    if (!talent) {
-      throw error(404, 'Talent not found');
-    }
-    const refundShow = (await talent.populate('currentShow')) as ShowDocument;
-    if (!refundShow) {
-      throw error(404, 'Show not found');
-    }
+    const tickets = await db.tickets
+      .find()
+      .where('show')
+      .eq(cancelShow._id)
+      .exec();
+    for (const ticket of tickets) {
+      const ticketService = createTicketMachineService(ticket.ticketState);
+      const state = ticketService.getSnapshot();
+      if (state.can({ type: 'REQUEST CANCELLATION', cancel: undefined })) {
+        //TODO: make real transaction
+        console.dir(state.value);
+        ticketService.send({
+          type: 'REQUEST CANCELLATION',
+          cancel: {
+            createdAt: new Date().getTime(),
+            canceler: ActorType.TALENT,
+            canceledInState: state.value.toString(),
+          },
+        });
 
-    const showService = createShowMachineService(
-      refundShow.showState,
-      refundShow.saveShowStateCallBack
-    );
-    const state = showService.getSnapshot();
-
-    if (!state.matches('requestedCancellation.waiting4Refund')) {
-      return error(400, 'Show cannot be refunded');
+        // if (ticket.ticketState.totalPaid > ticket.ticketState.refundedAmount) {
+        //   const transaction = await ticket.createTransaction({
+        //     hash: '0xeba2df809e7a612a0a0d444ccfa5c839624bdc00dd29e3340d46df3870f8a30e',
+        //     from: '0x5B38Da6a701c568545dCfcB03FcB875f56beddC4',
+        //     to: '0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2',
+        //     value: (
+        //       ticket.ticketState.totalPaid - ticket.ticketState.refundedAmount
+        //     ).toString(),
+        //     block: 123,
+        //     reason: TransactionReasonType.TICKET_REFUND,
+        //   });
+        //   ticketService.send({
+        //     type: 'REFUND RECEIVED',
+        //     transaction,
+        //   });
+        // }
+      }
+      ticketService.stop();
     }
-
+    showService.stop();
     return { success: true };
   },
 };

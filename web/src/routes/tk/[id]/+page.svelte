@@ -44,19 +44,28 @@
 </script>
 
 <div class="mt-6 flex items-center">
-  <div class="min-w-full">
+  <div class="min-w-full ">
     <!-- Page header -->
     {#key ticket || show}
       <div class="pb-4 text-center">
         <TicketDetail {ticket} {show} />
       </div>
       {#if needs2Pay}
-        <form method="post" action="?/buy_ticket" use:enhance={onSubmit}>
+        <div>
+          <form method="post" action="?/buy_ticket" use:enhance={onSubmit}>
+            <div class="w-full flex justify-center">
+              <button class="btn" type="submit">Send Payment</button>
+            </div>
+          </form>
+        </div>
+      {/if}
+      <div class="p-4">
+        <form method="post" action="?/cancel_ticket" use:enhance={onSubmit}>
           <div class="w-full flex justify-center">
-            <button class="btn" type="submit">Send Payment</button>
+            <button class="btn" type="submit">Cancel Ticket</button>
           </div>
         </form>
-      {/if}
+      </div>
     {/key}
   </div>
 </div>

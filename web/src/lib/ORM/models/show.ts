@@ -15,6 +15,7 @@ import {
   type TicketDocType,
   type TicketDocument,
 } from './ticket';
+import type { async } from 'rxjs';
 
 export enum ShowStatus {
   CREATED,
@@ -41,19 +42,9 @@ export const showDocMethods: ShowDocMethods = {
     this: ShowDocument,
     _showState: ShowDocument['showState']
   ) {
-    if (_showState.updatedAt > this.showState.updatedAt) {
-      const atomicUpdate = (showDoc: ShowDocType) => {
-        const newState = {
-          ...showDoc.showState,
-          ..._showState,
-        };
-        return {
-          ...showDoc,
-          showState: newState,
-        };
-      };
-      this.atomicUpdate(atomicUpdate);
-    }
+    this.atomicPatch({
+      showState: _showState,
+    });
   },
   createTicket: async function (
     this: ShowDocument,

@@ -68,10 +68,10 @@ type MasterCollections = {
 };
 
 export type MasterDBType = RxDatabase<MasterCollections>;
-let _masterDB: MasterDBType;
+let _masterDB: MasterDBType | undefined = undefined;
 
 export const masterDB = async () => {
-  if (_masterDB) return _masterDB;
+  if (_masterDB !== undefined) return _masterDB;
 
   initRXDB(StorageTypes.NODE_WEBSQL);
 
