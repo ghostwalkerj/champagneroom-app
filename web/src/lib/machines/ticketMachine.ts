@@ -9,7 +9,7 @@ type TicketStateType = TicketDocType['ticketState'];
 const ESCROW_PERIOD = +PUBLIC_ESCROW_PERIOD || 3600000;
 const PAYMENT_PERIOD = +PUBLIC_ESCROW_PERIOD || 3600000;
 
-type StateCallBackType = (state: TicketStateType) => void;
+export type TicketStateCallBackType = (state: TicketStateType) => void;
 
 export const escrowTimer = (endTime: number) => {
   const timer = endTime + ESCROW_PERIOD - new Date().getTime();
@@ -23,7 +23,7 @@ export const paymentTimer = (timerStart: number) => {
 
 export const createTicketMachine = (
   ticketState: TicketStateType,
-  saveState?: StateCallBackType
+  saveState?: TicketStateCallBackType
 ) => {
   const stateCallback = saveState;
 
@@ -114,16 +114,15 @@ export const createTicketMachine = (
                 },
               },
               on: {
+                'PAYMENT RECEIVED': {
+                  actions: ['receivePayment', 'saveTicketState'],
+                },
                 'REQUEST CANCELLATION': {
                   target: 'requestedCancellation',
                   actions: ['requestCancellation', 'saveTicketState'],
                 },
-                'PAYMENT RECEIVED': {
-                  actions: ['receivePayment', 'saveTicketState'],
-                },
               },
             },
-
             canJoin: {
               initial: 'neverJoined',
               states: {
@@ -139,7 +138,6 @@ export const createTicketMachine = (
                       target: '#ticketMachine.reserved.requestedCancellation',
                       actions: ['requestCancellation', 'saveTicketState'],
                     },
-                    'PAYMENT RECEIVED': {},
                     'JOINED SHOW': {},
                   },
                 },
@@ -212,7 +210,6 @@ export const createTicketMachine = (
             },
           },
         },
-
         inDispute: {},
       },
     },
@@ -386,9 +383,9 @@ export const createTicketMachine = (
   );
 };
 
-export const createticketMachineService = (
+export const createTicketMachineService = (
   ticketState: TicketStateType,
-  saveState?: StateCallBackType
+  saveState?: TicketStateCallBackType
 ) => {
   const ticketMachine = createTicketMachine(ticketState, saveState);
   return interpret(ticketMachine).start();
@@ -397,5 +394,5 @@ export const createticketMachineService = (
 export type ticketMachineType = ReturnType<typeof createTicketMachine>;
 export type ticketMachineStateType = StateFrom<typeof createTicketMachine>;
 export type ticketMachineServiceType = ReturnType<
-  typeof createticketMachineService
+  typeof createTicketMachineService
 >;

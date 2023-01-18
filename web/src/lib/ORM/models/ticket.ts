@@ -17,10 +17,10 @@ import {
   TransactionString,
   type TransactionDocument,
 } from './transaction';
+import type { TicketStateCallBackType } from '$lib/machines/ticketMachine';
 
 export enum TicketStatus {
   RESERVED,
-  PAID,
   CANCELLATION_REQUESTED,
   CANCELED,
   FINALIZED,
@@ -36,6 +36,7 @@ export enum DisputeDecision {
 }
 
 type TicketDocMethods = {
+  saveTicketStateCallBack: TicketStateCallBackType;
   createTransaction: (transactionProps: {
     hash: string;
     block: number;
@@ -47,6 +48,24 @@ type TicketDocMethods = {
 };
 
 export const ticketDocMethods: TicketDocMethods = {
+  saveTicketStateCallBack: async function (
+    this: TicketDocument,
+    _ticketState: TicketDocument['ticketState']
+  ) {
+    if (_ticketState.updatedAt > this.ticketState.updatedAt) {
+      const atomicUpdate = (ticketDoc: TicketDocType) => {
+        const newState = {
+          ...ticketDoc.ticketState,
+          ..._ticketState,
+        };
+        return {
+          ...ticketDoc,
+          ticketState: newState,
+        };
+      };
+      this.atomicUpdate(atomicUpdate);
+    }
+  },
   createTransaction: async function (
     this: TicketDocument,
     transactionProps: {
@@ -255,5 +274,6 @@ export type TicketDocType = ExtractDocumentTypeFromTypedRxJsonSchema<
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 export const ticketSchema: RxJsonSchema<TicketDocType> = ticketSchemaLiteral;
-export type TicketDocument = RxDocument<TicketDocType> & ticketRef;
-export type TicketCollection = RxCollection<TicketDocType>;
+export type TicketDocument = RxDocument<TicketDocType, TicketDocMethods> &
+  ticketRef;
+export type TicketCollection = RxCollection<TicketDocType, TicketDocMethods>;

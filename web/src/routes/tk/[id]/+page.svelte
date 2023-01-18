@@ -3,12 +3,9 @@
   import { page } from '$app/stores';
 
   import { ticketDB } from '$lib/ORM/dbs/ticketDB';
-  import type { ShowDocType, ShowDocument } from '$lib/ORM/models/show';
-  import {
-    type TicketDocType,
-    TicketStatus,
-    type TicketDocument,
-  } from '$lib/ORM/models/ticket';
+  import type { ShowDocument } from '$lib/ORM/models/show';
+  import type { TicketDocument } from '$lib/ORM/models/ticket';
+
   import { onMount } from 'svelte';
   import type { PageData } from './$types';
   import TicketDetail from './TicketDetail.svelte';
@@ -20,7 +17,8 @@
   let ticketId = $page.params.id;
 
   $: waiting4StateChange = false;
-  $: canBuyTicket = true;
+  $: needs2Pay =
+    ticket && ticket.ticketState.totalPaid < ticket.ticketState.price;
 
   const onSubmit = () => {
     waiting4StateChange = true;
@@ -39,7 +37,7 @@
     if (ticket) {
       ticket.$.subscribe(_ticket => {
         waiting4StateChange = false;
-        canBuyTicket = _ticket.ticketState.status === TicketStatus.RESERVED;
+        needs2Pay = _ticket.ticketState.totalPaid < _ticket.ticketState.price;
       });
     }
   });
@@ -52,7 +50,7 @@
       <div class="pb-4 text-center">
         <TicketDetail {ticket} {show} />
       </div>
-      {#if canBuyTicket}
+      {#if needs2Pay}
         <form method="post" action="?/buy_ticket" use:enhance={onSubmit}>
           <div class="w-full flex justify-center">
             <button class="btn" type="submit">Send Payment</button>

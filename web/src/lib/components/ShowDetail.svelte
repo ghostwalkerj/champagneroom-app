@@ -58,7 +58,7 @@
             class="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50  rounded-xl"
           />
           <div
-            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-7xl lg:text-8xl text-red-900 -rotate-45"
+            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-7xl lg:text-8xl text-red-900 -rotate-45 whitespace-nowrap"
           >
             {waterMarkText}
           </div>

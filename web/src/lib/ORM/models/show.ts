@@ -1,4 +1,4 @@
-import type { SaveStateCallBackType } from '$lib/machines/showMachine';
+import type { ShowStateCallBackType } from '$lib/machines/showMachine';
 import { nanoid } from 'nanoid';
 import {
   toTypedRxJsonSchema,
@@ -30,7 +30,7 @@ export enum ShowStatus {
 }
 
 type ShowDocMethods = {
-  saveShowStateCallBack: SaveStateCallBackType;
+  saveShowStateCallBack: ShowStateCallBackType;
   createTicket: (ticketProps: {
     name: string;
     pin: string;

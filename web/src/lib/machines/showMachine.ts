@@ -1,6 +1,7 @@
 import { PUBLIC_ESCROW_PERIOD, PUBLIC_GRACE_PERIOD } from '$env/static/public';
 import { ShowStatus, type ShowDocType } from '$lib/ORM/models/show';
 import type { ShowEventDocType } from '$lib/ORM/models/showEvent';
+import type { TicketDocType } from '$lib/ORM/models/ticket';
 import type { TransactionDocType } from '$lib/ORM/models/transaction';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 
@@ -9,7 +10,7 @@ const ESCROW_PERIOD = +PUBLIC_ESCROW_PERIOD || 3600000;
 
 type ShowStateType = ShowDocType['showState'];
 
-export type SaveStateCallBackType = (state: ShowStateType) => void;
+export type ShowStateCallBackType = (state: ShowStateType) => void;
 
 export const graceTimer = (timerStart: number) => {
   const timer = timerStart + GRACE_PERIOD - new Date().getTime();
@@ -23,7 +24,7 @@ export const escrowTimer = (endTime: number) => {
 
 export const createShowMachine = (
   showState: ShowStateType,
-  saveShowStateCallBack?: SaveStateCallBackType
+  saveShowStateCallBack?: ShowStateCallBackType
 ) => {
   /** @xstate-layout N4IgpgJg5mDOIC5SwBYHsDuBZAhgYxQEsA7MAOlUwAIAbNHCSAYgG0AGAXUVAAc1ZCAF0Jpi3EAA9EAJgAsbMgDYAnNLZsAzAEZp0gOxblWrQBoQATxmKNZPbOka2ejQFZlitXoC+Xs5Wz4RKQU6Bi09IwQrFpcSCB8AsKi4lIIcgoqapo6+obGZpYILtZkGrJljnp2ABwailo+fqG4BCTk-uEMzCzSsbz8QiJicanpSqrq2roGRqYWiBoOZGz21Spsinq6td6+IP4tQe2hnZGsGn3xA0nDoKPy41lTubMFiNWyZMWKHkZ6TtJ6tJGvtmoE2iFqHQulEWLJLglBskRjIHplJjkZvl5ghZPZxtpZMpVFpNNItIoQQdwcEOtCziwXAjrkMUqiMhNstM8nNCmpPnitHZii41FpHNUqWDWrSTvTuopmYlWSi0mjOc8sbzEFpZC4yLrjLVlHj5C4XFLMIcISQAKKwPAAJ0wTAksEEOEE5BwADMvY6ABRwJ2YAAiYBoOHMAEomNSZeQ7Q7nRh2EqkbdJIgqloyHJrK4flNNm8EFoXDZjOpFOVqtVpObVD49sQ0Ix4HF40dxIibmyEABaRSlgf64njtjitb1UmyS0BBOQsLyiA9lnIu6Ieyl5R6L5saTVFbODZEjQaefW4J4HDEPARmiQNfKjdZoqyap56Qm6o6f4ORRqlLX8yCJKtSTkXRZF2JorRpcgfRIHAaEIAAvJ84l7FVNwQE1pDIYkZyFfQ623HE1GUA07H0Ow6iJBtL3gsgkxDDBnwzfs3EUA1HGKD9yjYes9FLNR8JrA9SRcAwXFqPVGMXAAjNAJAAeR9RD7xUngwEzLDX1SFwPy-H8-wPOogPI+oCPkKppiMIwVnko4yCU1T1MIe8AGE6FgDD+hfTMDKM3QTP0MzANLYpc0MrRqmUYoTXkawnIhR0wAARwAVzgL0IE8297xoSM+0w9dAsQQzPxCj9TIAizCkWXM5HFc9lDWPQ2rsFLghIUNCFgHhMq9diSpwyrjJqsK6tLXUbFams62sXcZN2HwgA */
   return createMachine(
@@ -41,11 +42,16 @@ export const createShowMachine = (
               transaction: TransactionDocType;
             }
           | {
-              type: 'Show EVENT RECEIVED';
+              type: 'SHOW EVENT RECEIVED';
               showEvent: ShowEventDocType;
             }
           | { type: 'TICKET RESERVED' }
           | { type: 'TICKET RESERVATION TIMEOUT' }
+          | {
+              type: 'TICKET SOLD';
+              transaction: TransactionDocType;
+              ticket: TicketDocType;
+            }
           | { type: 'START SHOW' }
           | { type: 'END SHOW' },
       },
@@ -112,10 +118,13 @@ export const createShowMachine = (
               actions: ['requestCancellation', 'saveShowState'],
             },
             'TICKET RESERVED': {
-              actions: ['decrementTickets', 'saveShowState'],
+              actions: ['decrementTicketsAvailable', 'saveShowState'],
             },
             'TICKET RESERVATION TIMEOUT': {
-              actions: ['incrementTickets', 'saveShowState'],
+              actions: ['incrementTicketsAvailable', 'saveShowState'],
+            },
+            'TICKET SOLD': {
+              actions: ['sellTicket', 'saveShowState'],
             },
             'START SHOW': {
               target: 'started',
@@ -130,6 +139,9 @@ export const createShowMachine = (
             actions: ['openBoxOffice', 'saveShowState'],
           },
           on: {
+            'TICKET SOLD': {
+              actions: ['sellTicket', 'saveShowState'],
+            },
             'REQUEST CANCELLATION': {
               target: 'requestedCancellation',
               actions: ['requestCancellation', 'saveShowState'],
@@ -234,7 +246,7 @@ export const createShowMachine = (
         saveShowState: context => {
           if (saveShowStateCallBack) saveShowStateCallBack(context.showState);
         },
-        incrementTickets: assign(context => {
+        incrementTicketsAvailable: assign(context => {
           return {
             showState: {
               ...context.showState,
@@ -243,12 +255,26 @@ export const createShowMachine = (
             },
           };
         }),
-        decrementTickets: assign(context => {
+        decrementTicketsAvailable: assign(context => {
           return {
             showState: {
               ...context.showState,
               updatedAt: new Date().getTime(),
               ticketsAvailable: context.showState.ticketsAvailable - 1,
+            },
+          };
+        }),
+        sellTicket: assign((context, event) => {
+          const state = context.showState;
+          return {
+            showState: {
+              ...state,
+              updatedAt: new Date().getTime(),
+              ticketsSold: state.ticketsSold + 1,
+              totalSales: state.totalSales + +event.transaction.value,
+              transactions: state.transactions
+                ? [...state.transactions, event.transaction._id]
+                : [event.transaction._id],
             },
           };
         }),
@@ -279,7 +305,7 @@ export const createShowMachine = (
 
 export const createShowMachineService = (
   showState: ShowStateType,
-  saveShowStateCallBack?: SaveStateCallBackType
+  saveShowStateCallBack?: ShowStateCallBackType
 ) => {
   const showMachine = createShowMachine(showState, saveShowStateCallBack);
   return interpret(showMachine).start();
