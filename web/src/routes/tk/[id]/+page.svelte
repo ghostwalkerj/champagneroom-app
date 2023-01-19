@@ -4,7 +4,7 @@
 
   import { ticketDB } from '$lib/ORM/dbs/ticketDB';
   import type { ShowDocument } from '$lib/ORM/models/show';
-  import type { TicketDocument } from '$lib/ORM/models/ticket';
+  import { type TicketDocument, TicketStatus } from '$lib/ORM/models/ticket';
 
   import { onMount } from 'svelte';
   import type { PageData } from './$types';
@@ -18,7 +18,9 @@
 
   $: waiting4StateChange = false;
   $: needs2Pay =
-    ticket && ticket.ticketState.totalPaid < ticket.ticketState.price;
+    ticket &&
+    ticket.ticketState.status === TicketStatus.RESERVED &&
+    ticket.ticketState.totalPaid < ticket.ticketState.price;
 
   const onSubmit = () => {
     waiting4StateChange = true;
@@ -37,7 +39,9 @@
     if (ticket) {
       ticket.$.subscribe(_ticket => {
         waiting4StateChange = false;
-        needs2Pay = _ticket.ticketState.totalPaid < _ticket.ticketState.price;
+        needs2Pay =
+          _ticket.ticketState.status === TicketStatus.RESERVED &&
+          _ticket.ticketState.totalPaid < _ticket.ticketState.price;
       });
     }
   });
@@ -58,14 +62,14 @@
             </div>
           </form>
         </div>
+        <div class="p-4">
+          <form method="post" action="?/cancel_ticket" use:enhance>
+            <div class="w-full flex justify-center">
+              <button class="btn" type="submit">Cancel Ticket</button>
+            </div>
+          </form>
+        </div>
       {/if}
-      <div class="p-4">
-        <form method="post" action="?/cancel_ticket" use:enhance>
-          <div class="w-full flex justify-center">
-            <button class="btn" type="submit">Cancel Ticket</button>
-          </div>
-        </form>
-      </div>
     {/key}
   </div>
 </div>

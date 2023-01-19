@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { ShowDocType } from '$lib/ORM/models/show';
-  import type { TicketDocType } from '$lib/ORM/models/ticket';
+  import { type TicketDocType, TicketStatus } from '$lib/ORM/models/ticket';
   import { currencyFormatter, durationFormatter } from '$lib/util/constants';
   import getProfileImage from '$lib/util/profilePhoto';
   export let show: ShowDocType | null;
@@ -45,6 +45,9 @@
         </div>
         <div class="w-full flex">
           <div>Payment Address: {ticket.paymentAddress}</div>
+        </div>
+        <div class="w-full flex">
+          <div>Ticket Status: {TicketStatus[ticket.ticketState.status]}</div>
         </div>
       </div>
     </div>

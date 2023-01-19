@@ -37,7 +37,9 @@
   $: ready4Call = false;
   let showMachineState =
     currentShow &&
-    createShowMachineService(currentShow.showState).getSnapshot();
+    createShowMachineService({
+      showState: currentShow.showState,
+    }).getSnapshot();
 
   $: canCancelShow =
     showMachineState &&
@@ -60,10 +62,10 @@
     if (showMachineService) showMachineService.stop();
     if (showSub) showSub.unsubscribe();
 
-    showMachineService = createShowMachineService(
-      showState,
-      show.saveShowStateCallback
-    );
+    showMachineService = createShowMachineService({
+      showState: showState,
+      saveShowStateCallback: show.saveShowStateCallback,
+    });
     showSub = showMachineService.subscribe(state => {
       if (state.changed) {
         showMachineState = state;
