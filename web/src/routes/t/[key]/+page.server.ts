@@ -64,7 +64,8 @@ export const actions: Actions = {
   update_profile_image: async ({
     params,
     request,
-  }: import('./$types').RequestEvent) => {
+  }: // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+  import('./$types').RequestEvent) => {
     const key = params.key;
     if (key === null) {
       throw error(404, 'Key not found');
@@ -168,7 +169,7 @@ export const actions: Actions = {
         .exec();
       for (const ticket of tickets) {
         if (
-          ticket.ticketState.status !== TicketStatus.CANCELED &&
+          ticket.ticketState.status !== TicketStatus.CANCELLED &&
           ticket.ticketState.status !== TicketStatus.CANCELLATION_REQUESTED
         ) {
           const ticketService = createTicketMachineService(
@@ -180,7 +181,7 @@ export const actions: Actions = {
             cancel: {
               createdAt: new Date().getTime(),
               canceler: ActorType.TALENT,
-              canceledInState: showState.value.toString(),
+              cancelledInState: showState.value.toString(),
             },
           });
         }

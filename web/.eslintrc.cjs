@@ -20,4 +20,7 @@ module.exports = {
 		es2017: true,
 		node: true,
 	},
+	rules: {
+		'@typescript-eslint/consistent-type-imports': 'error',
+	}
 };

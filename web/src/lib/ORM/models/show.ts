@@ -15,7 +15,6 @@ import {
   type TicketDocType,
   type TicketDocument,
 } from './ticket';
-import type { async } from 'rxjs';
 
 export enum ShowStatus {
   CREATED,
@@ -127,9 +126,9 @@ const showSchemaLiteral = {
           type: 'object',
           properties: {
             createdAt: { type: 'integer' },
-            canceledInState: { type: 'string' },
+            cancelledInState: { type: 'string' },
           },
-          required: ['createdAt', 'canceledInState'],
+          required: ['createdAt', 'cancelledInState'],
         },
         finalized: {
           type: 'object',

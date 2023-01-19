@@ -45,6 +45,7 @@ const getTicket = async (ticketId: string) => {
   return { token, ticket, show };
 };
 
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
 export const load: import('./$types').PageServerLoad = async ({
   params,
   cookies,
@@ -77,6 +78,7 @@ export const load: import('./$types').PageServerLoad = async ({
   };
 };
 
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
 export const actions: import('./$types').Actions = {
   buy_ticket: async ({ params }) => {
     const ticketId = params.id;
@@ -133,7 +135,7 @@ export const actions: import('./$types').Actions = {
         cancel: {
           createdAt: new Date().getTime(),
           canceler: ActorType.CUSTOMER,
-          canceledInState: JSON.stringify(state.value),
+          cancelledInState: JSON.stringify(state.value),
         },
       });
     }

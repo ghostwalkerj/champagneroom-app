@@ -34,10 +34,14 @@ export const createTicketMachine = (
         ticketState: ticketState,
         errorMessage: undefined as string | undefined,
       },
+      // eslint-disable-next-line @typescript-eslint/consistent-type-imports
       tsTypes: {} as import('./ticketMachine.typegen').Typegen0,
       schema: {
         events: {} as
-          | { type: 'REQUEST CANCELLATION'; cancel: TicketStateType['cancel'] }
+          | {
+              type: 'REQUEST CANCELLATION';
+              cancel: TicketStateType['cancel'];
+            }
           | {
               type: 'REFUND RECEIVED';
               transaction: TransactionDocType;
@@ -105,20 +109,28 @@ export const createTicketMachine = (
                 target: 'canJoin',
                 cond: 'fullyPaid',
               },
-              // after: {
-              //   paymentDelay: {
-              //     target: '#ticketMachine.cancelled',
-              //     actions: ['cancelTicket', 'saveTicketState'],
-              //   },
-              // },
               on: {
-                'PAYMENT RECEIVED': {
-                  actions: ['receivePayment', 'saveTicketState'],
-                },
-                'REQUEST CANCELLATION': {
-                  target: 'requestedCancellation',
-                  actions: ['requestCancellation', 'saveTicketState'],
-                },
+                'PAYMENT RECEIVED': [
+                  {
+                    target: 'canJoin',
+                    cond: 'fullyPaid',
+                    actions: ['receivePayment', 'saveTicketState'],
+                  },
+                  {
+                    actions: ['receivePayment', 'saveTicketState'],
+                  },
+                ],
+                'REQUEST CANCELLATION': [
+                  {
+                    target: '#ticketMachine.cancelled',
+                    cond: 'canCancel',
+                    actions: ['cancelTicket', 'saveTicketState'],
+                  },
+                  {
+                    target: 'requestedCancellation',
+                    actions: ['requestCancellation', 'saveTicketState'],
+                  },
+                ],
               },
             },
             canJoin: {
@@ -132,10 +144,17 @@ export const createTicketMachine = (
                     },
                   ],
                   on: {
-                    'REQUEST CANCELLATION': {
-                      target: '#ticketMachine.reserved.requestedCancellation',
-                      actions: ['requestCancellation', 'saveTicketState'],
-                    },
+                    'REQUEST CANCELLATION': [
+                      {
+                        target: '#ticketMachine.cancelled',
+                        cond: 'canCancel',
+                        actions: ['cancelTicket', 'saveTicketState'],
+                      },
+                      {
+                        target: '#ticketMachine.reserved.requestedCancellation',
+                        actions: ['requestCancellation', 'saveTicketState'],
+                      },
+                    ],
                     'JOINED SHOW': {},
                   },
                 },
@@ -153,25 +172,24 @@ export const createTicketMachine = (
                 },
               },
             },
-
             requestedCancellation: {
               initial: 'waiting4Refund',
               states: {
                 waiting4Refund: {
                   on: {
-                    'REFUND RECEIVED': {
-                      actions: ['receiveRefund', 'saveTicketState'],
-                    },
+                    'REFUND RECEIVED': [
+                      {
+                        target: '#ticketMachine.cancelled',
+                        cond: 'fullyRefunded',
+                        actions: ['receiveRefund', 'saveTicketState'],
+                      },
+                      {
+                        actions: ['receiveRefund', 'saveTicketState'],
+                      },
+                    ],
                   },
                 },
               },
-              // always: {
-              //   target: '#ticketMachine.cancelled',
-              //   cond: context =>
-              //     context.ticketState.totalPaid <=
-              //     context.ticketState.refundedAmount,
-              //   actions: ['cancelApproved', 'saveTicketState'],
-              // },
             },
           },
         },
@@ -185,13 +203,13 @@ export const createTicketMachine = (
         },
 
         inEscrow: {
-          after: {
-            escrowDelay: {
-              target: '#ticketMachine.finalized',
-              actions: ['exitEscrow', 'finalizeTicket', 'saveTicketState'],
-              internal: false,
-            },
-          },
+          // after: {
+          //   escrowDelay: {
+          //     target: '#ticketMachine.finalized',
+          //     actions: ['exitEscrow', 'finalizeTicket', 'saveTicketState'],
+          //     internal: false,
+          //   },
+          // },
           on: {
             'FEEDBACK RECEIVED': {
               target: 'finalized',
@@ -242,12 +260,13 @@ export const createTicketMachine = (
           };
         }),
 
-        cancelApproved: assign(context => {
+        cancelTicket: assign((context, event) => {
           return {
             ticketState: {
               ...context.ticketState,
               updatedAt: new Date().getTime(),
-              status: TicketStatus.CANCELED,
+              status: TicketStatus.CANCELLED,
+              cancel: event.cancel,
             },
           };
         }),
@@ -346,8 +365,10 @@ export const createTicketMachine = (
         },
       },
       guards: {
+        canCancel: context =>
+          context.ticketState.totalPaid <= context.ticketState.refundedAmount,
         ticketCancelled: context =>
-          context.ticketState.status === TicketStatus.CANCELED,
+          context.ticketState.status === TicketStatus.CANCELLED,
         ticketFinalized: context =>
           context.ticketState.status === TicketStatus.FINALIZED,
         ticketInDispute: context =>
@@ -358,11 +379,23 @@ export const createTicketMachine = (
           context.ticketState.status === TicketStatus.RESERVED,
         ticketInCancellationRequested: context =>
           context.ticketState.status === TicketStatus.CANCELLATION_REQUESTED,
-        fullyPaid: context =>
-          context.ticketState.totalPaid >= context.ticketState.price,
-        showJoined: context => {
-          return context.ticketState.status === TicketStatus.RESERVED; //TODO: add show joined
+        fullyPaid: (context, event) => {
+          const value =
+            event.type === 'PAYMENT RECEIVED' ? event.transaction?.value : 0;
+          return (
+            context.ticketState.totalPaid + +value >= context.ticketState.price
+          );
         },
+        fullyRefunded: (context, event) => {
+          const value =
+            event.type === 'REFUND RECEIVED' ? event.transaction?.value : 0;
+          return (
+            context.ticketState.refundedAmount + +value >=
+            context.ticketState.totalPaid
+          );
+        },
+        showJoined: context =>
+          context.ticketState.status === TicketStatus.RESERVED,
       },
     }
   );

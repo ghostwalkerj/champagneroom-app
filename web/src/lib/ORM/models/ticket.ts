@@ -13,7 +13,7 @@ import { ActorType } from '$lib/util/constants';
 import { nanoid } from 'nanoid';
 import type { ShowDocument } from './show';
 import {
-  TransactionReasonType,
+  type TransactionReasonType,
   TransactionString,
   type TransactionDocument,
 } from './transaction';
@@ -22,7 +22,7 @@ import type { TicketStateCallBackType } from '$lib/machines/ticketMachine';
 export enum TicketStatus {
   RESERVED,
   CANCELLATION_REQUESTED,
-  CANCELED,
+  CANCELLED,
   FINALIZED,
   IN_ESCROW,
   IN_DISPUTE,
@@ -137,9 +137,9 @@ const ticketSchemaLiteral = {
               type: 'string',
               enum: Object.values(ActorType),
             },
-            canceledInState: { type: 'string' },
+            cancelledInState: { type: 'string' },
           },
-          required: ['createdAt', 'canceler', 'canceledInState'],
+          required: ['createdAt', 'canceler', 'cancelledInState'],
         },
         reservation: {
           type: 'object',

@@ -33,6 +33,7 @@ export const createShowMachine = (
         showState: showState,
         errorMessage: undefined as string | undefined,
       },
+      // eslint-disable-next-line @typescript-eslint/consistent-type-imports
       tsTypes: {} as import('./showMachine.typegen').Typegen0,
       schema: {
         events: {} as
@@ -206,7 +207,7 @@ export const createShowMachine = (
               status: ShowStatus.CANCELLED,
               cancel: {
                 createdAt: new Date().getTime(),
-                canceledInState: meta.state
+                cancelledInState: meta.state
                   ? JSON.stringify(meta.state.value)
                   : 'unknown',
               },
@@ -222,7 +223,7 @@ export const createShowMachine = (
               ticketsAvailable: 0,
               cancel: {
                 createdAt: new Date().getTime(),
-                canceledInState: meta.state
+                cancelledInState: meta.state
                   ? JSON.stringify(meta.state.value)
                   : 'unknown',
               },

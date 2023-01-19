@@ -15,7 +15,7 @@ export enum ShowEventType {
   LEFT,
   ENDED,
   REFUNDED,
-  CANCELED,
+  CANCELLED,
 }
 
 const ShowEventSchemaLiteral = {
