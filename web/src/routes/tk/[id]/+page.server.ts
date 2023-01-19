@@ -97,19 +97,18 @@ export const actions: import('./$types').Actions = {
       block: 123,
       reason: TransactionReasonType.TICKET_PAYMENT,
     });
-    const ticketService = createTicketMachineService(
-      ticket.ticketState,
-      ticket.saveTicketStateCallBack
-    );
+    const ticketService = createTicketMachineService({
+      ticketState: ticket.ticketState,
+      saveTicketStateCallback: ticket.saveTicketStateCallback,
+    });
     ticketService.send({ type: 'PAYMENT RECEIVED', transaction });
     if (+transaction.value >= amountToPay) {
-      const showService = createShowMachineService(
-        show.showState,
-        show.saveShowStateCallBack
-      );
+      const showService = createShowMachineService({
+        showState: show.showState,
+        saveShowStateCallback: show.saveShowStateCallback,
+      });
       showService.send({ type: 'TICKET SOLD', transaction, ticket });
     }
-    //ticketService.stop();
 
     return { success: true };
   },
@@ -121,14 +120,13 @@ export const actions: import('./$types').Actions = {
 
     const { ticket } = await getTicket(ticketId);
 
-    const ticketService = createTicketMachineService(
-      ticket.ticketState,
-      ticket.saveTicketStateCallBack
-    );
+    const ticketService = createTicketMachineService({
+      ticketState: ticket.ticketState,
+      saveTicketStateCallback: ticket.saveTicketStateCallback,
+    });
     const state = ticketService.getSnapshot();
     if (state.can({ type: 'REQUEST CANCELLATION', cancel: undefined })) {
       //TODO: make real transaction
-      console.log(state.value);
 
       ticketService.send({
         type: 'REQUEST CANCELLATION',

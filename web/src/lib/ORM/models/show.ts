@@ -1,4 +1,4 @@
-import type { ShowStateCallBackType } from '$lib/machines/showMachine';
+import type { ShowStateCallbackType } from '$lib/machines/showMachine';
 import { nanoid } from 'nanoid';
 import {
   toTypedRxJsonSchema,
@@ -30,14 +30,14 @@ export enum ShowStatus {
 }
 
 type ShowDocMethods = {
-  saveShowStateCallBack: ShowStateCallBackType;
+  saveShowStateCallback: ShowStateCallbackType;
   createTicket: (ticketProps: {
     name: string;
     pin: string;
   }) => Promise<TicketDocument>;
 };
 export const showDocMethods: ShowDocMethods = {
-  saveShowStateCallBack: async function (
+  saveShowStateCallback: async function (
     this: ShowDocument,
     _showState: ShowDocument['showState']
   ) {
@@ -112,7 +112,9 @@ const showSchemaLiteral = {
         },
         updatedAt: { type: 'integer' },
         ticketsAvailable: { type: 'integer' },
+        ticketsReserved: { type: 'integer', default: 0 },
         ticketsSold: { type: 'integer', default: 0 },
+        ticketsRefunded: { type: 'integer', default: 0 },
         totalSales: { type: 'integer', default: 0 },
         startDate: { type: 'integer' },
         endDate: { type: 'integer' },
@@ -147,6 +149,8 @@ const showSchemaLiteral = {
         'status',
         'updatedAt',
         'ticketsAvailable',
+        'ticketsReserved',
+        'ticketsRefunded',
         'ticketsSold',
         'totalSales',
         'refundedAmount',

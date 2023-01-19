@@ -17,7 +17,7 @@ import {
   TransactionString,
   type TransactionDocument,
 } from './transaction';
-import type { TicketStateCallBackType } from '$lib/machines/ticketMachine';
+import type { TicketStateCallbackType } from '$lib/machines/ticketMachine';
 
 export enum TicketStatus {
   RESERVED,
@@ -36,7 +36,7 @@ export enum DisputeDecision {
 }
 
 type TicketDocMethods = {
-  saveTicketStateCallBack: TicketStateCallBackType;
+  saveTicketStateCallback: TicketStateCallbackType;
   createTransaction: (transactionProps: {
     hash: string;
     block: number;
@@ -48,7 +48,7 @@ type TicketDocMethods = {
 };
 
 export const ticketDocMethods: TicketDocMethods = {
-  saveTicketStateCallBack: async function (
+  saveTicketStateCallback: async function (
     this: TicketDocument,
     _ticketState: TicketDocument['ticketState']
   ) {

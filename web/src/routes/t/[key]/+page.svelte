@@ -62,12 +62,11 @@
 
     showMachineService = createShowMachineService(
       showState,
-      show.saveShowStateCallBack
+      show.saveShowStateCallback
     );
     showSub = showMachineService.subscribe(state => {
       if (state.changed) {
         showMachineState = state;
-        console.log(state.value);
 
         if (state.changed) {
           canCancelShow = state.can({

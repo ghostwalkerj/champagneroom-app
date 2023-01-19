@@ -10,7 +10,7 @@ const ESCROW_PERIOD = +PUBLIC_ESCROW_PERIOD || 3600000;
 
 type ShowStateType = ShowDocType['showState'];
 
-export type ShowStateCallBackType = (state: ShowStateType) => void;
+export type ShowStateCallbackType = (state: ShowStateType) => void;
 
 export const graceTimer = (timerStart: number) => {
   const timer = timerStart + GRACE_PERIOD - new Date().getTime();
@@ -22,10 +22,13 @@ export const escrowTimer = (endTime: number) => {
   return timer > 0 ? timer : 0;
 };
 
-export const createShowMachine = (
-  showState: ShowStateType,
-  saveShowStateCallBack?: ShowStateCallBackType
-) => {
+export const createShowMachine = ({
+  showState,
+  saveShowStateCallback,
+}: {
+  showState: ShowStateType;
+  saveShowStateCallback?: ShowStateCallbackType;
+}) => {
   /** @xstate-layout N4IgpgJg5mDOIC5SwBYHsDuBZAhgYxQEsA7MAOlUwAIAbNHCSAYgG0AGAXUVAAc1ZCAF0Jpi3EAA9EAJgAsbMgDYAnNLZsAzAEZp0gOxblWrQBoQATxmKNZPbOka2ejQFZlitXoC+Xs5Wz4RKQU6Bi09IwQrFpcSCB8AsKi4lIIcgoqapo6+obGZpYILtZkGrJljnp2ABwailo+fqG4BCTk-uEMzCzSsbz8QiJicanpSqrq2roGRqYWiBoOZGz21Spsinq6td6+IP4tQe2hnZGsGn3xA0nDoKPy41lTubMFiNWyZMWKHkZ6TtJ6tJGvtmoE2iFqHQulEWLJLglBskRjIHplJjkZvl5ghZPZxtpZMpVFpNNItIoQQdwcEOtCziwXAjrkMUqiMhNstM8nNCmpPnitHZii41FpHNUqWDWrSTvTuopmYlWSi0mjOc8sbzEFpZC4yLrjLVlHj5C4XFLMIcISQAKKwPAAJ0wTAksEEOEE5BwADMvY6ABRwJ2YAAiYBoOHMAEomNSZeQ7Q7nRh2EqkbdJIgqloyHJrK4flNNm8EFoXDZjOpFOVqtVpObVD49sQ0Ix4HF40dxIibmyEABaRSlgf64njtjitb1UmyS0BBOQsLyiA9lnIu6Ieyl5R6L5saTVFbODZEjQaefW4J4HDEPARmiQNfKjdZoqyap56Qm6o6f4ORRqlLX8yCJKtSTkXRZF2JorRpcgfRIHAaEIAAvJ84l7FVNwQE1pDIYkZyFfQ623HE1GUA07H0Ow6iJBtL3gsgkxDDBnwzfs3EUA1HGKD9yjYes9FLNR8JrA9SRcAwXFqPVGMXAAjNAJAAeR9RD7xUngwEzLDX1SFwPy-H8-wPOogPI+oCPkKppiMIwVnko4yCU1T1MIe8AGE6FgDD+hfTMDKM3QTP0MzANLYpc0MrRqmUYoTXkawnIhR0wAARwAVzgL0IE8297xoSM+0w9dAsQQzPxCj9TIAizCkWXM5HFc9lDWPQ2rsFLghIUNCFgHhMq9diSpwyrjJqsK6tLXUbFams62sXcZN2HwgA */
   return createMachine(
     {
@@ -39,7 +42,7 @@ export const createShowMachine = (
         events: {} as
           | { type: 'REQUEST CANCELLATION' }
           | {
-              type: 'REFUND RECEIVED';
+              type: 'REFUND SENT';
               transaction: TransactionDocType;
             }
           | {
@@ -48,6 +51,7 @@ export const createShowMachine = (
             }
           | { type: 'TICKET RESERVED' }
           | { type: 'TICKET RESERVATION TIMEOUT' }
+          | { type: 'TICKET CANCELLED' }
           | {
               type: 'TICKET SOLD';
               transaction: TransactionDocType;
@@ -108,20 +112,36 @@ export const createShowMachine = (
         },
         inEscrow: {},
         boxOfficeOpen: {
-          always: {
-            target: 'boxOfficeClosed',
-            cond: 'soldOut',
-            actions: ['closeBoxOffice', 'saveShowState'],
-          },
           on: {
-            'REQUEST CANCELLATION': {
-              target: 'requestedCancellation',
-              actions: ['requestCancellation', 'saveShowState'],
-            },
-            'TICKET RESERVED': {
-              actions: ['decrementTicketsAvailable', 'saveShowState'],
-            },
+            'REQUEST CANCELLATION': [
+              {
+                target: 'cancelled',
+                cond: 'canCancel',
+                actions: ['cancelShow', 'saveShowState'],
+              },
+              {
+                target: 'requestedCancellation',
+                actions: ['requestCancellation', 'saveShowState'],
+              },
+            ],
+            'TICKET RESERVED': [
+              {
+                target: 'boxOfficeClosed',
+                cond: 'soldOut',
+                actions: [
+                  'decrementTicketsAvailable',
+                  'closeBoxOffice',
+                  'saveShowState',
+                ],
+              },
+              {
+                actions: ['decrementTicketsAvailable', 'saveShowState'],
+              },
+            ],
             'TICKET RESERVATION TIMEOUT': {
+              actions: ['incrementTicketsAvailable', 'saveShowState'],
+            },
+            'TICKET CANCELLED': {
               actions: ['incrementTicketsAvailable', 'saveShowState'],
             },
             'TICKET SOLD': {
@@ -134,19 +154,53 @@ export const createShowMachine = (
           },
         },
         boxOfficeClosed: {
-          always: {
-            target: 'boxOfficeOpen',
-            cond: 'notSoldOut',
-            actions: ['openBoxOffice', 'saveShowState'],
-          },
           on: {
+            'START SHOW': {
+              target: 'started',
+              actions: ['saveShowState'],
+            },
+            'TICKET RESERVATION TIMEOUT': [
+              {
+                target: 'boxOfficeOpen',
+                cond: 'notSoldOut',
+                actions: [
+                  'openBoxOffice',
+                  'incrementTicketsAvailable',
+                  'saveShowState',
+                ],
+              },
+              {
+                actions: ['incrementTicketsAvailable', 'saveShowState'],
+              },
+            ],
+            'TICKET CANCELLED': [
+              {
+                target: 'boxOfficeOpen',
+                cond: 'notSoldOut',
+                actions: [
+                  'openBoxOffice',
+                  'incrementTicketsAvailable',
+                  'saveShowState',
+                ],
+              },
+              {
+                actions: ['incrementTicketsAvailable', 'saveShowState'],
+              },
+            ],
             'TICKET SOLD': {
               actions: ['sellTicket', 'saveShowState'],
             },
-            'REQUEST CANCELLATION': {
-              target: 'requestedCancellation',
-              actions: ['requestCancellation', 'saveShowState'],
-            },
+            'REQUEST CANCELLATION': [
+              {
+                target: 'cancelled',
+                cond: 'canCancel',
+                actions: ['cancelShow', 'saveShowState'],
+              },
+              {
+                target: 'requestedCancellation',
+                actions: ['requestCancellation', 'saveShowState'],
+              },
+            ],
           },
         },
         started: {
@@ -159,21 +213,22 @@ export const createShowMachine = (
         },
         ended: {},
         requestedCancellation: {
-          initial: 'waiting4Refund',
+          initial: 'waiting2Refund',
           states: {
-            waiting4Refund: {
+            waiting2Refund: {
               on: {
-                'REFUND RECEIVED': {
-                  actions: ['receiveRefund', 'saveShowState'],
-                },
+                'REFUND SENT': [
+                  {
+                    target: '#showMachine.cancelled',
+                    cond: 'fullyRefunded',
+                    actions: ['sendRefund', 'saveShowState'],
+                  },
+                  {
+                    actions: ['sendRefund', 'saveShowState'],
+                  },
+                ],
               },
             },
-          },
-          always: {
-            target: 'cancelled',
-            cond: context =>
-              context.showState.totalSales <= context.showState.refundedAmount,
-            actions: ['cancelShow', 'saveShowState'],
           },
         },
         inDispute: {},
@@ -230,7 +285,7 @@ export const createShowMachine = (
             },
           };
         }),
-        receiveRefund: assign((context, event) => {
+        sendRefund: assign((context, event) => {
           return {
             showState: {
               ...context.showState,
@@ -245,7 +300,7 @@ export const createShowMachine = (
           };
         }),
         saveShowState: context => {
-          if (saveShowStateCallBack) saveShowStateCallBack(context.showState);
+          if (saveShowStateCallback) saveShowStateCallback(context.showState);
         },
         incrementTicketsAvailable: assign(context => {
           return {
@@ -253,6 +308,7 @@ export const createShowMachine = (
               ...context.showState,
               updatedAt: new Date().getTime(),
               ticketsAvailable: context.showState.ticketsAvailable + 1,
+              ticketsReserved: context.showState.ticketsReserved - 1,
             },
           };
         }),
@@ -262,6 +318,7 @@ export const createShowMachine = (
               ...context.showState,
               updatedAt: new Date().getTime(),
               ticketsAvailable: context.showState.ticketsAvailable - 1,
+              ticketsReserved: context.showState.ticketsReserved + 1,
             },
           };
         }),
@@ -281,6 +338,9 @@ export const createShowMachine = (
         }),
       },
       guards: {
+        canCancel: context =>
+          context.showState.ticketsSold === 0 &&
+          context.showState.ticketsReserved === 0,
         showCancelled: context =>
           context.showState.status === ShowStatus.CANCELLED,
         showFinalized: context =>
@@ -297,18 +357,29 @@ export const createShowMachine = (
           context.showState.status === ShowStatus.BOX_OFFICE_CLOSED,
         showStarted: context => context.showState.status === ShowStatus.STARTED,
         showEnded: context => context.showState.status === ShowStatus.ENDED,
-        soldOut: context => context.showState.ticketsAvailable === 0,
-        notSoldOut: context => context.showState.ticketsAvailable > 0,
+        soldOut: context => context.showState.ticketsAvailable === 1,
+        notSoldOut: context => context.showState.ticketsAvailable > 1,
+        fullyRefunded: (context, event) => {
+          const value =
+            event.type === 'REFUND SENT' ? event.transaction?.value : 0;
+          return (
+            context.showState.refundedAmount + +value >=
+            context.showState.totalSales
+          );
+        },
       },
     }
   );
 };
 
-export const createShowMachineService = (
-  showState: ShowStateType,
-  saveShowStateCallBack?: ShowStateCallBackType
-) => {
-  const showMachine = createShowMachine(showState, saveShowStateCallBack);
+export const createShowMachineService = ({
+  showState,
+  saveShowStateCallback,
+}: {
+  showState: ShowStateType;
+  saveShowStateCallback?: ShowStateCallbackType;
+}) => {
+  const showMachine = createShowMachine({ showState, saveShowStateCallback });
   return interpret(showMachine).start();
 };
 

@@ -149,10 +149,10 @@ export const actions: Actions = {
       throw error(404, 'Show not found');
     }
 
-    const showService = createShowMachineService(
-      cancelShow.showState,
-      cancelShow.saveShowStateCallBack
-    );
+    const showService = createShowMachineService({
+      showState: cancelShow.showState,
+      saveShowStateCallback: cancelShow.saveShowStateCallback,
+    });
 
     const showState = showService.getSnapshot();
 
@@ -172,10 +172,10 @@ export const actions: Actions = {
           ticket.ticketState.status !== TicketStatus.CANCELLED &&
           ticket.ticketState.status !== TicketStatus.CANCELLATION_REQUESTED
         ) {
-          const ticketService = createTicketMachineService(
-            ticket.ticketState,
-            ticket.saveTicketStateCallBack
-          );
+          const ticketService = createTicketMachineService({
+            ticketState: ticket.ticketState,
+            saveTicketStateCallback: ticket.saveTicketStateCallback,
+          });
           ticketService.send({
             type: 'REQUEST CANCELLATION',
             cancel: {

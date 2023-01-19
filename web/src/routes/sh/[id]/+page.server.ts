@@ -14,6 +14,7 @@ import jwt from 'jsonwebtoken';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 import urlJoin from 'url-join';
 
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
 export const load: import('./$types').PageServerLoad = async ({ params }) => {
   const showId = params.id;
   if (showId === null) {
@@ -67,6 +68,7 @@ const getShow = async (showId: string) => {
   return show;
 };
 
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
 export const actions: import('./$types').Actions = {
   reserve_ticket: async ({ params, cookies, request, url }) => {
     const showId = params.id;
@@ -91,19 +93,20 @@ export const actions: import('./$types').Actions = {
     }
 
     const show = await getShow(showId);
-    const showService = createShowMachineService(
-      show.showState,
-      show.saveShowStateCallBack
-    );
+    const showService = createShowMachineService({
+      showState: show.showState,
+      saveShowStateCallback: show.saveShowStateCallback,
+    });
     if (show.showState.ticketsAvailable == 0) {
       return error(501, 'Show cannot Reserve Ticket'); // TODO: This should be atomic
     }
+
     const ticket = await show.createTicket({
       name,
       pin,
     });
+
     showService.send('TICKET RESERVED');
-    showService.stop();
 
     const hash = createPinHash(ticket._id, pin);
     cookies.set('pin', hash, { path: '/' });
