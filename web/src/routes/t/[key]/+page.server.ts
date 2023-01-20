@@ -6,14 +6,14 @@ import {
 import { masterDB } from '$lib/ORM/dbs/masterDB';
 import type { ShowDocument } from '$lib/ORM/models/show';
 import { ShowCancelReason } from '$lib/ORM/models/show';
+import { TicketCancelReason, TicketStatus } from '$lib/ORM/models/ticket';
+import { TransactionReasonType } from '$lib/ORM/models/transaction';
 import { createShowMachineService } from '$lib/machines/showMachine';
+import { createTicketMachineService } from '$lib/machines/ticketMachine';
+import { ActorType } from '$lib/util/constants';
 import { error, fail } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import type { Actions, PageServerLoad } from './$types';
-import { createTicketMachineService } from '$lib/machines/ticketMachine';
-import { ActorType } from '$lib/util/constants';
-import { TicketCancelReason, TicketStatus } from '$lib/ORM/models/ticket';
-import { TransactionReasonType } from '$lib/ORM/models/transaction';
 
 const getTalent = async (key: string) => {
   const db = await masterDB();

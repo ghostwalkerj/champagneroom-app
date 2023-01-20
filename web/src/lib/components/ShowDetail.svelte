@@ -1,8 +1,8 @@
 <script lang="ts">
+  import { PUBLIC_SHOW_PATH } from '$env/static/public';
   import { ShowStatus, type ShowDocType } from '$lib/ORM/models/show';
   import { currencyFormatter, durationFormatter } from '$lib/util/constants';
   import StarRating from 'svelte-star-rating';
-  import { PUBLIC_SHOW_PATH } from '$env/static/public';
   import urlJoin from 'url-join';
 
   export let show: ShowDocType | null;

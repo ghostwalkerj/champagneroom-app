@@ -9,15 +9,15 @@ import {
   type RxJsonSchema,
 } from 'rxdb';
 
+import type { TicketStateCallbackType } from '$lib/machines/ticketMachine';
 import { ActorType } from '$lib/util/constants';
 import { nanoid } from 'nanoid';
 import type { ShowDocument } from './show';
 import {
-  type TransactionReasonType,
   TransactionString,
   type TransactionDocument,
+  type TransactionReasonType,
 } from './transaction';
-import type { TicketStateCallbackType } from '$lib/machines/ticketMachine';
 
 export enum TicketStatus {
   RESERVED,

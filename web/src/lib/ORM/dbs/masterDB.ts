@@ -13,13 +13,13 @@ import {
 } from '$lib/ORM/models/agent';
 
 import {
-  type ShowCollection,
   showDocMethods,
   showSchema,
+  type ShowCollection,
 } from '$lib/ORM/models/show';
 import {
-  type ShowEventCollection,
   showEventSchema,
+  type ShowEventCollection,
 } from '$lib/ORM/models/showEvent';
 import {
   talentDocMethods,
@@ -27,13 +27,13 @@ import {
   type TalentCollection,
 } from '$lib/ORM/models/talent';
 import {
-  type TicketCollection,
   ticketDocMethods,
   ticketSchema,
+  type TicketCollection,
 } from '$lib/ORM/models/ticket';
 import {
-  type TicketEventCollection,
   ticketEventSchema,
+  type TicketEventCollection,
 } from '$lib/ORM/models/ticketEvent';
 import {
   transactionSchema,

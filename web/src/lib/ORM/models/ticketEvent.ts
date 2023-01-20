@@ -1,84 +1,88 @@
 import {
-	toTypedRxJsonSchema,
-	type ExtractDocumentTypeFromTypedRxJsonSchema,
-	type RxCollection,
-	type RxDocument,
-	type RxJsonSchema
+  toTypedRxJsonSchema,
+  type ExtractDocumentTypeFromTypedRxJsonSchema,
+  type RxCollection,
+  type RxDocument,
+  type RxJsonSchema,
 } from 'rxdb';
 import type { ShowDocument } from './show';
 import type { TalentDocument } from './talent';
 import type { TicketDocument } from './ticket';
 
 export enum TicketEventType {
-	ATTEMPT,
-	JOINED,
-	LEFT
+  ATTEMPT,
+  JOINED,
+  LEFT,
 }
 
 const TicketEventSchemaLiteral = {
-	title: 'ticketEvent',
-	description: 'ticketEvent for a ticket',
-	version: 0,
-	type: 'object',
-	primaryKey: '_id',
-	properties: {
-		_id: {
-			type: 'string',
-			maxLength: 70
-		},
-		entityType: {
-			type: 'string',
-			default: 'ticketEvent',
-			maxLength: 20,
-			final: true
-		},
-		createdAt: { type: 'integer' },
-		updatedAt: { type: 'integer' },
-		endedAt: { type: 'integer' },
-		_deleted: {
-			type: 'boolean',
-			default: false
-		},
-		type: {
-			type: 'string',
-			enum: Object.values(TicketEventType),
-		},
-		show: {
-			type: 'string',
-			ref: 'ticket',
-			maxLength: 50
-		},
-		talent: {
-			type: 'string',
-			ref: 'talents',
-			maxLength: 50
-		},
-		agent: {
-			type: 'string',
-			ref: 'agents',
-			maxLength: 50
-		},
-		ticket: {
-			type: 'string',
-			ref: 'tickets',
-			maxLength: 50
-		},
-	},
-	required: ['_id', 'ticket', 'createdAt', 'type', 'talent', 'show', 'agent']
+  title: 'ticketEvent',
+  description: 'ticketEvent for a ticket',
+  version: 0,
+  type: 'object',
+  primaryKey: '_id',
+  properties: {
+    _id: {
+      type: 'string',
+      maxLength: 70,
+    },
+    entityType: {
+      type: 'string',
+      default: 'ticketEvent',
+      maxLength: 20,
+      final: true,
+    },
+    createdAt: { type: 'integer' },
+    updatedAt: { type: 'integer' },
+    endedAt: { type: 'integer' },
+    _deleted: {
+      type: 'boolean',
+      default: false,
+    },
+    type: {
+      type: 'string',
+      enum: Object.values(TicketEventType),
+    },
+    show: {
+      type: 'string',
+      ref: 'ticket',
+      maxLength: 50,
+    },
+    talent: {
+      type: 'string',
+      ref: 'talents',
+      maxLength: 50,
+    },
+    agent: {
+      type: 'string',
+      ref: 'agents',
+      maxLength: 50,
+    },
+    ticket: {
+      type: 'string',
+      ref: 'tickets',
+      maxLength: 50,
+    },
+  },
+  required: ['_id', 'ticket', 'createdAt', 'type', 'talent', 'show', 'agent'],
 } as const;
 
 type TicketEventRef = {
-	ticket_?: Promise<TicketDocument>;
-	talent_?: Promise<TalentDocument>;
-	show_?: Promise<ShowDocument>;
+  ticket_?: Promise<TicketDocument>;
+  talent_?: Promise<TalentDocument>;
+  show_?: Promise<ShowDocument>;
 };
 
 export const TicketEventString = 'ticketEvent';
 
 const schemaTyped = toTypedRxJsonSchema(TicketEventSchemaLiteral);
-export type TicketEventDocType = ExtractDocumentTypeFromTypedRxJsonSchema<typeof schemaTyped>;
+export type TicketEventDocType = ExtractDocumentTypeFromTypedRxJsonSchema<
+  typeof schemaTyped
+>;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-export const ticketEventSchema: RxJsonSchema<TicketEventDocType> = TicketEventSchemaLiteral;
-export type TicketEventDocument = RxDocument<TicketEventDocType> & TicketEventRef;
+export const ticketEventSchema: RxJsonSchema<TicketEventDocType> =
+  TicketEventSchemaLiteral;
+export type TicketEventDocument = RxDocument<TicketEventDocType> &
+  TicketEventRef;
 export type TicketEventCollection = RxCollection<TicketEventDocType>;

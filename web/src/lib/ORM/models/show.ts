@@ -1,4 +1,5 @@
 import type { ShowStateCallbackType } from '$lib/machines/showMachine';
+import { ActorType } from '$lib/util/constants';
 import { nanoid } from 'nanoid';
 import {
   toTypedRxJsonSchema,
@@ -15,7 +16,6 @@ import {
   type TicketDocType,
   type TicketDocument,
 } from './ticket';
-import { ActorType } from '$lib/util/constants';
 
 export enum ShowStatus {
   CREATED,
