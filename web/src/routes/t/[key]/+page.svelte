@@ -34,7 +34,6 @@
   let showMachineService: ShowMachineServiceType;
   let showSub: Subscription;
 
-  $: ready4Call = false;
   let showMachineState =
     currentShow &&
     createShowMachineService({
@@ -45,6 +44,7 @@
     showMachineState &&
     showMachineState.can({
       type: 'REQUEST CANCELLATION',
+      cancel: undefined,
     });
 
   $: canCreateShow =
@@ -54,6 +54,8 @@
     currentShow.showState.status === ShowStatus.ENDED;
 
   $: waiting4StateChange = false;
+  $: soldOut = false;
+  $: canStartShow = false;
 
   const useShowState = (
     show: ShowDocument,
@@ -73,6 +75,7 @@
         if (state.changed) {
           canCancelShow = state.can({
             type: 'REQUEST CANCELLATION',
+            cancel: undefined,
           });
           canCreateShow = state.done ?? true;
         }
@@ -81,10 +84,17 @@
   };
 
   const useShow = (show: ShowDocument) => {
-    show.get$('showState').subscribe(_showState => {
-      waiting4StateChange = false; // link changed, so can submit again
-      useShowState(show, _showState);
-    });
+    show
+      .get$('showState')
+      .subscribe((_showState: ShowDocument['showState']) => {
+        waiting4StateChange = false; // link changed, so can submit again
+        useShowState(show, _showState);
+        soldOut = _showState.ticketsSold === show.maxNumTickets;
+        canStartShow =
+          _showState.ticketsSold > 0 &&
+          (_showState.status === ShowStatus.BOX_OFFICE_CLOSED ||
+            _showState.status === ShowStatus.BOX_OFFICE_OPEN);
+      });
   };
 
   const updateProfileImage = async (url: string) => {
@@ -109,6 +119,8 @@
             talent = _talent;
             talent.get$('currentShow').subscribe(async showId => {
               if (showId) {
+                soldOut = false;
+                canStartShow = false;
                 currentShow = await db.shows.findOne(showId).exec();
                 if (currentShow) {
                   useShow(currentShow);
@@ -266,7 +278,7 @@
           </div>
         {/if}
         {#key showMachineState || currentShow}
-          <ShowDetail show={currentShow} showCopy={true} />
+          <ShowDetail show={currentShow} showCopy showSalesStats />
         {/key}
         {#if canCancelShow}
           <!-- Link Form-->
@@ -303,11 +315,33 @@
         <div class="lg:col-start-3 lg:col-span-1">
           <div class="bg-primary text-primary-content card">
             <div class="text-center card-body items-center">
-              <h2 class="text-2xl card-title">Call Status</h2>
-              {#if ready4Call}
-                <div class="text-2xl">Waiting for Incoming Call</div>
-              {:else}
-                <p>Signed in as {talentObj.name}</p>
+              <h2 class="text-2xl card-title">Show Status</h2>
+              {#if soldOut}
+                <div>
+                  <div class="alert alert-success shadow-lg">
+                    <div>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        class="stroke-current flex-shrink-0 w-6 h-6"
+                        ><path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        /></svg
+                      >
+                      <span>All Tickets are Sold</span>
+                    </div>
+                  </div>
+                </div>
+              {/if}
+              <p>Signed in as {talentObj.name}</p>
+              {#if canStartShow}
+                <div class="ring-2 bg-info p-1  ring-inset rounded-xl">
+                  <button class="btn">Start Show</button>
+                </div>
               {/if}
             </div>
           </div>

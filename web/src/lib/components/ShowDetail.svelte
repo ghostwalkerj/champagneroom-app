@@ -1,13 +1,13 @@
 <script lang="ts">
   import { ShowStatus, type ShowDocType } from '$lib/ORM/models/show';
   import { currencyFormatter, durationFormatter } from '$lib/util/constants';
-  import { onMount } from 'svelte';
   import StarRating from 'svelte-star-rating';
   import { PUBLIC_SHOW_PATH } from '$env/static/public';
   import urlJoin from 'url-join';
 
   export let show: ShowDocType | null;
   export let showCopy = false;
+  export let showSalesStats = false;
   $: waterMarkText = '';
   $: showStatus = show?.showState.status;
 
@@ -26,10 +26,10 @@
       break;
 
     case ShowStatus.BOX_OFFICE_CLOSED:
-      waterMarkText = 'Sold Out';
+      waterMarkText = 'No Tickets Available';
       break;
     case ShowStatus.STARTED:
-      waterMarkText = 'Box Office Closed';
+      waterMarkText = 'No Tickets Available';
       break;
     case ShowStatus.FINALIZED:
     case ShowStatus.ENDED:
@@ -92,6 +92,30 @@
           </div>
         </div>
       </div>
+      {#if showSalesStats}
+        <div
+          class="stats stats-vertical stats-shadow text-center lg:stats-horizontal"
+        >
+          <div class="stat">
+            <div class="stat-title">Reserved</div>
+            <div class="text-primary stat-value">
+              {show.showState.ticketsReserved}
+            </div>
+          </div>
+          <div class="stat">
+            <div class="stat-title">Sold</div>
+            <div class="text-primary stat-value">
+              {show.showState.ticketsSold}
+            </div>
+          </div>
+          <div class="stat">
+            <div class="stat-title">Total Sales</div>
+            <div class="text-primary stat-value">
+              {currencyFormatter.format(show.showState.totalSales)}
+            </div>
+          </div>
+        </div>
+      {/if}
       {#if showCopy}
         <div class="text-center">
           <!-- svelte-ignore a11y-click-events-have-key-events -->
