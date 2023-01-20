@@ -40,7 +40,10 @@ export const createShowMachine = ({
       tsTypes: {} as import('./showMachine.typegen').Typegen0,
       schema: {
         events: {} as
-          | { type: 'REQUEST CANCELLATION' }
+          | {
+              type: 'REQUEST CANCELLATION';
+              cancel: ShowStateType['cancel'];
+            }
           | {
               type: 'REFUND SENT';
               transaction: TransactionDocType;
@@ -127,7 +130,7 @@ export const createShowMachine = ({
               {
                 target: 'cancelled',
                 cond: 'canCancel',
-                actions: ['cancelShow', 'saveShowState'],
+                actions: ['requestCancellation', 'cancelShow', 'saveShowState'],
               },
               {
                 target: 'requestedCancellation',
@@ -196,7 +199,7 @@ export const createShowMachine = ({
               {
                 target: 'cancelled',
                 cond: 'canCancel',
-                actions: ['cancelShow', 'saveShowState'],
+                actions: ['requestCancellation', 'cancelShow', 'saveShowState'],
               },
               {
                 target: 'requestedCancellation',
@@ -223,7 +226,7 @@ export const createShowMachine = ({
                   {
                     target: '#showMachine.cancelled',
                     cond: 'fullyRefunded',
-                    actions: ['sendRefund', 'saveShowState'],
+                    actions: ['sendRefund', 'cancelShow', 'saveShowState'],
                   },
                   {
                     actions: ['sendRefund', 'saveShowState'],
@@ -256,34 +259,23 @@ export const createShowMachine = ({
             },
           };
         }),
-        cancelShow: assign((context, _event, meta) => {
+        cancelShow: assign(context => {
           return {
             showState: {
               ...context.showState,
               updatedAt: new Date().getTime(),
               status: ShowStatus.CANCELLED,
-              cancel: {
-                createdAt: new Date().getTime(),
-                cancelledInState: meta.state
-                  ? JSON.stringify(meta.state.value)
-                  : 'unknown',
-              },
             },
           };
         }),
-        requestCancellation: assign((context, _event, meta) => {
+        requestCancellation: assign((context, event) => {
           return {
             showState: {
               ...context.showState,
               updatedAt: new Date().getTime(),
               status: ShowStatus.CANCELLATION_REQUESTED,
               ticketsAvailable: 0,
-              cancel: {
-                createdAt: new Date().getTime(),
-                cancelledInState: meta.state
-                  ? JSON.stringify(meta.state.value)
-                  : 'unknown',
-              },
+              cancel: event.cancel,
             },
           };
         }),

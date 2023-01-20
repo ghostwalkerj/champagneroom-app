@@ -6,6 +6,7 @@ import {
 import { PUBLIC_PIN_PATH } from '$env/static/public';
 import { masterDB } from '$lib/ORM/dbs/masterDB';
 import type { TicketDocType, TicketDocument } from '$lib/ORM/models/ticket';
+import { TicketCancelReason } from '$lib/ORM/models/ticket';
 import { TransactionReasonType } from '$lib/ORM/models/transaction';
 import { createShowMachineService } from '$lib/machines/showMachine';
 import { createTicketMachineService } from '$lib/machines/ticketMachine';
@@ -132,8 +133,9 @@ export const actions: import('./$types').Actions = {
         type: 'REQUEST CANCELLATION',
         cancel: {
           createdAt: new Date().getTime(),
-          canceler: ActorType.CUSTOMER,
+          canceller: ActorType.CUSTOMER,
           cancelledInState: JSON.stringify(state.value),
+          reason: TicketCancelReason.CUSTOMER_CANCELLED,
         },
       });
 

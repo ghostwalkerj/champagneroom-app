@@ -29,6 +29,14 @@ export enum TicketStatus {
   REFUNDED,
 }
 
+export enum TicketCancelReason {
+  SHOW_CANCELLED,
+  TALENT_NO_SHOW,
+  CUSTOMER_NO_SHOW,
+  SHOW_RESCHEDULED,
+  CUSTOMER_CANCELLED,
+}
+
 export enum DisputeDecision {
   TALENT_WON,
   CUSTOMER_WON,
@@ -133,13 +141,17 @@ const ticketSchemaLiteral = {
           type: 'object',
           properties: {
             createdAt: { type: 'integer' },
-            canceler: {
+            canceller: {
               type: 'string',
               enum: Object.values(ActorType),
             },
             cancelledInState: { type: 'string' },
+            reason: {
+              type: 'string',
+              enum: Object.values(TicketCancelReason),
+            },
           },
-          required: ['createdAt', 'canceler', 'cancelledInState'],
+          required: ['createdAt', 'canceller', 'cancelledInState', 'reason'],
         },
         reservation: {
           type: 'object',

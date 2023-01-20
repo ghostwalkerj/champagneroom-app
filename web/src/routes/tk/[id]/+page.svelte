@@ -48,29 +48,33 @@
   });
 </script>
 
-<div class="mt-6 flex items-center">
-  <div class="min-w-full ">
-    <!-- Page header -->
-    {#key ticket || show}
-      <div class="pb-4 text-center">
-        <TicketDetail {ticket} {show} />
-      </div>
-      {#if needs2Pay}
-        <div>
-          <form method="post" action="?/buy_ticket" use:enhance={onSubmit}>
-            <div class="w-full flex justify-center">
-              <button class="btn" type="submit">Send Payment</button>
-            </div>
-          </form>
+{#if ticket}
+  <div class="mt-6 flex items-center">
+    <div class="min-w-full ">
+      <!-- Page header -->
+      {#key ticket || show}
+        <div class="pb-4 text-center">
+          <TicketDetail {ticket} {show} />
         </div>
-        <div class="p-4">
-          <form method="post" action="?/cancel_ticket" use:enhance>
-            <div class="w-full flex justify-center">
-              <button class="btn" type="submit">Cancel Ticket</button>
-            </div>
-          </form>
-        </div>
-      {/if}
-    {/key}
+        {#if needs2Pay}
+          <div>
+            <form method="post" action="?/buy_ticket" use:enhance={onSubmit}>
+              <div class="w-full flex justify-center">
+                <button class="btn" type="submit">Send Payment</button>
+              </div>
+            </form>
+          </div>
+        {/if}
+        {#if ticket.ticketState.status !== TicketStatus.CANCELLED && ticket.ticketState.status !== TicketStatus.CANCELLATION_REQUESTED}
+          <div class="p-4">
+            <form method="post" action="?/cancel_ticket" use:enhance>
+              <div class="w-full flex justify-center">
+                <button class="btn" type="submit">Cancel Ticket</button>
+              </div>
+            </form>
+          </div>
+        {/if}
+      {/key}
+    </div>
   </div>
-</div>
+{/if}

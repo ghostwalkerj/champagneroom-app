@@ -5,13 +5,15 @@ import {
 } from '$env/static/private';
 import { masterDB } from '$lib/ORM/dbs/masterDB';
 import type { ShowDocument } from '$lib/ORM/models/show';
+import { ShowCancelReason } from '$lib/ORM/models/show';
 import { createShowMachineService } from '$lib/machines/showMachine';
 import { error, fail } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import type { Actions, PageServerLoad } from './$types';
 import { createTicketMachineService } from '$lib/machines/ticketMachine';
 import { ActorType } from '$lib/util/constants';
-import { TicketStatus } from '$lib/ORM/models/ticket';
+import { TicketCancelReason, TicketStatus } from '$lib/ORM/models/ticket';
+import { TransactionReasonType } from '$lib/ORM/models/transaction';
 
 const getTalent = async (key: string) => {
   const db = await masterDB();
@@ -156,7 +158,20 @@ export const actions: Actions = {
 
     const showState = showService.getSnapshot();
 
-    if (showState.can({ type: 'REQUEST CANCELLATION' })) {
+    const cancel = {
+      createdAt: new Date().getTime(),
+      cancelledInState: JSON.stringify(showState.value),
+      reason: ShowCancelReason.TALENT_CANCELLED,
+      canceller: ActorType.TALENT,
+    };
+
+    if (showState.can({ type: 'REQUEST CANCELLATION', cancel })) {
+      // Cancel the show and prevent new ticket sales, etc
+      showService.send({
+        type: 'REQUEST CANCELLATION',
+        cancel,
+      });
+
       // Loop through all tickets and refund them
       const db = await masterDB();
       const tickets = await db.tickets
@@ -174,36 +189,38 @@ export const actions: Actions = {
             type: 'REQUEST CANCELLATION',
             cancel: {
               createdAt: new Date().getTime(),
-              canceler: ActorType.TALENT,
-              cancelledInState: showState.value.toString(),
+              canceller: ActorType.TALENT,
+              cancelledInState: JSON.stringify(showState.value),
+              reason: TicketCancelReason.SHOW_CANCELLED,
             },
           });
+
+          if (
+            ticket.ticketState.totalPaid > ticket.ticketState.refundedAmount
+          ) {
+            const transaction = await ticket.createTransaction({
+              hash: '0xeba2df809e7a612a0a0d444ccfa5c839624bdc00dd29e3340d46df3870f8a30e',
+              from: '0x5B38Da6a701c568545dCfcB03FcB875f56beddC4',
+              to: '0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2',
+              value: (
+                ticket.ticketState.totalPaid - ticket.ticketState.refundedAmount
+              ).toString(),
+              block: 123,
+              reason: TransactionReasonType.TICKET_REFUND,
+            });
+            ticketService.send({
+              type: 'REFUND RECEIVED',
+              transaction,
+            });
+            showService.send({
+              type: 'REFUND SENT',
+              transaction,
+              ticket,
+            });
+          }
         }
-
-        // After the ticket has been cancelled, we can cancel show
-        showService.send({
-          type: 'REQUEST CANCELLATION',
-        });
-
-        // if (ticket.ticketState.totalPaid > ticket.ticketState.refundedAmount) {
-        //   const transaction = await ticket.createTransaction({
-        //     hash: '0xeba2df809e7a612a0a0d444ccfa5c839624bdc00dd29e3340d46df3870f8a30e',
-        //     from: '0x5B38Da6a701c568545dCfcB03FcB875f56beddC4',
-        //     to: '0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2',
-        //     value: (
-        //       ticket.ticketState.totalPaid - ticket.ticketState.refundedAmount
-        //     ).toString(),
-        //     block: 123,
-        //     reason: TransactionReasonType.TICKET_REFUND,
-        //   });
-        //   ticketService.send({
-        //     type: 'REFUND RECEIVED',
-        //     transaction,
-        //   });
-        // }
       }
     }
-    showService.stop();
     return { success: true };
   },
 };

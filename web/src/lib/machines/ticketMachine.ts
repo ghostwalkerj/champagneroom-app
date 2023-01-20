@@ -125,7 +125,11 @@ export const createTicketMachine = ({
                   {
                     target: '#ticketMachine.cancelled',
                     cond: 'canCancel',
-                    actions: ['cancelTicket', 'saveTicketState'],
+                    actions: [
+                      'requestCancellation',
+                      'cancelTicket',
+                      'saveTicketState',
+                    ],
                   },
                   {
                     target: 'requestedCancellation',
@@ -149,7 +153,11 @@ export const createTicketMachine = ({
                       {
                         target: '#ticketMachine.cancelled',
                         cond: 'canCancel',
-                        actions: ['cancelTicket', 'saveTicketState'],
+                        actions: [
+                          'requestCancellation',
+                          'cancelTicket',
+                          'saveTicketState',
+                        ],
                       },
                       {
                         target: '#ticketMachine.reserved.requestedCancellation',
@@ -182,7 +190,11 @@ export const createTicketMachine = ({
                       {
                         target: '#ticketMachine.cancelled',
                         cond: 'fullyRefunded',
-                        actions: ['receiveRefund', 'saveTicketState'],
+                        actions: [
+                          'receiveRefund',
+                          'cancelTicket',
+                          'saveTicketState',
+                        ],
                       },
                       {
                         actions: ['receiveRefund', 'saveTicketState'],
@@ -261,13 +273,12 @@ export const createTicketMachine = ({
           };
         }),
 
-        cancelTicket: assign((context, event) => {
+        cancelTicket: assign(context => {
           return {
             ticketState: {
               ...context.ticketState,
               updatedAt: new Date().getTime(),
               status: TicketStatus.CANCELLED,
-              cancel: event.cancel,
             },
           };
         }),
@@ -293,7 +304,7 @@ export const createTicketMachine = ({
             ticketState: {
               ...context.ticketState,
               updatedAt: new Date().getTime(),
-              totalPaid:
+              refundedAmount:
                 context.ticketState.refundedAmount + +event.transaction.value,
               transactions: state.transactions
                 ? [...state.transactions, event.transaction._id]
@@ -395,8 +406,7 @@ export const createTicketMachine = ({
             context.ticketState.totalPaid
           );
         },
-        showJoined: context =>
-          context.ticketState.status === TicketStatus.RESERVED,
+        showJoined: context => false,
       },
     }
   );

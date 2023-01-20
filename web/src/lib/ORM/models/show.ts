@@ -15,6 +15,7 @@ import {
   type TicketDocType,
   type TicketDocument,
 } from './ticket';
+import { ActorType } from '$lib/util/constants';
 
 export enum ShowStatus {
   CREATED,
@@ -27,6 +28,14 @@ export enum ShowStatus {
   CANCELLATION_REQUESTED,
   STARTED,
   ENDED,
+}
+
+export enum ShowCancelReason {
+  TALENT_NO_SHOW,
+  CUSTOMER_NO_SHOW,
+  SHOW_RESCHEDULED,
+  TALENT_CANCELLED,
+  CUSTOMER_CANCELLED,
 }
 
 type ShowDocMethods = {
@@ -129,8 +138,21 @@ const showSchemaLiteral = {
           properties: {
             createdAt: { type: 'integer' },
             cancelledInState: { type: 'string' },
+            canceller: {
+              type: 'string',
+              enum: Object.values(ActorType),
+            },
+            reason: {
+              type: 'string',
+              enum: Object.values(ShowCancelReason),
+            },
           },
-          required: ['createdAt', 'cancelledInState'],
+          required: [
+            'createdAt',
+            'cancelledInState',
+            'showCancelReason',
+            'canceller',
+          ],
         },
         finalized: {
           type: 'object',

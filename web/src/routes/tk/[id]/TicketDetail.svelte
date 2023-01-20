@@ -7,6 +7,11 @@
   export let ticket: TicketDocType | null;
 
   $: profileImage = getProfileImage(ticket?.ticketState.reservation.name);
+  $: ticketStatus = ticket
+    ? ticket.ticketState.totalPaid >= ticket.ticketState.price
+      ? 'Paid' + ' ' + TicketStatus[ticket.ticketState.status]
+      : TicketStatus[ticket.ticketState.status]
+    : '';
 </script>
 
 {#if show && ticket}
@@ -46,8 +51,9 @@
         <div class="w-full flex">
           <div>Payment Address: {ticket.paymentAddress}</div>
         </div>
+
         <div class="w-full flex">
-          <div>Ticket Status: {TicketStatus[ticket.ticketState.status]}</div>
+          <div>Ticket Status: {ticketStatus}</div>
         </div>
       </div>
     </div>
