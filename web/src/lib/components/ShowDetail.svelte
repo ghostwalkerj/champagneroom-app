@@ -52,7 +52,11 @@
         class="relative bg-cover bg-no-repeat bg-center rounded-xl h-[calc(50vh)]"
         style="background-image: url('{show.talentInfo.profileImageUrl}')"
       >
-        <div class="absolute top-1 left-2 text-lg">{show.name}</div>
+        <div
+          class="absolute top-1 left-2 text-lg text-black ring-2 bg-info p-2  ring-inset rounded-xl"
+        >
+          {show.name}
+        </div>
         {#if waterMarkText}
           <div
             class="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50  rounded-xl"
@@ -106,6 +110,18 @@
             <div class="stat-title">Sold</div>
             <div class="text-primary stat-value">
               {show.showState.ticketsSold}
+            </div>
+          </div>
+          <div class="stat">
+            <div class="stat-title">Refunded</div>
+            <div class="text-primary stat-value">
+              {show.showState.ticketsRefunded}
+            </div>
+          </div>
+          <div class="stat">
+            <div class="stat-title">Refunded Amount</div>
+            <div class="text-primary stat-value">
+              {currencyFormatter.format(show.showState.refundedAmount)}
             </div>
           </div>
           <div class="stat">

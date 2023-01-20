@@ -1,7 +1,6 @@
 import { PUBLIC_TICKET_PATH } from '$env/static/public';
-import { masterDB } from '$lib/ORM/dbs/masterDB';
 import { createPinHash } from '$lib/util/pin';
-import { error, fail, redirect } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import urlJoin from 'url-join';
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports

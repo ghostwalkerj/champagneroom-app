@@ -47,7 +47,7 @@ export const createShowMachine = ({
           | {
               type: 'REFUND SENT';
               transaction: TransactionDocType;
-              ticket?: TicketDocType;
+              ticket: TicketDocType;
             }
           | {
               type: 'SHOW EVENT RECEIVED';
@@ -164,6 +164,16 @@ export const createShowMachine = ({
               target: 'started',
               actions: ['saveShowState'],
             },
+            'REFUND SENT': [
+              {
+                target: '#showMachine.cancelled',
+                cond: 'fullyRefunded',
+                actions: ['sendRefund', 'cancelShow', 'saveShowState'],
+              },
+              {
+                actions: ['sendRefund', 'saveShowState'],
+              },
+            ],
           },
         },
         boxOfficeClosed: {
@@ -195,6 +205,16 @@ export const createShowMachine = ({
             'TICKET SOLD': {
               actions: ['sellTicket', 'saveShowState'],
             },
+            'REFUND SENT': [
+              {
+                target: '#showMachine.cancelled',
+                cond: 'fullyRefunded',
+                actions: ['sendRefund', 'cancelShow', 'saveShowState'],
+              },
+              {
+                actions: ['sendRefund', 'saveShowState'],
+              },
+            ],
             'REQUEST CANCELLATION': [
               {
                 target: 'cancelled',
@@ -280,10 +300,14 @@ export const createShowMachine = ({
           };
         }),
         sendRefund: assign((context, event) => {
+          // Check if this is full refund for a ticket
+          const ticketsRefunded = context.showState.ticketsRefunded + 1;
+
           return {
             showState: {
               ...context.showState,
               updatedAt: new Date().getTime(),
+              ticketsRefunded,
               refundedAmount:
                 context.showState.refundedAmount + +event.transaction.value,
               transactions: [

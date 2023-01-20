@@ -89,7 +89,9 @@
       .subscribe((_showState: ShowDocument['showState']) => {
         waiting4StateChange = false; // link changed, so can submit again
         useShowState(show, _showState);
-        soldOut = _showState.ticketsSold === show.maxNumTickets;
+        soldOut =
+          _showState.ticketsSold - _showState.ticketsRefunded ===
+          show.maxNumTickets;
         canStartShow =
           _showState.ticketsSold > 0 &&
           (_showState.status === ShowStatus.BOX_OFFICE_CLOSED ||
