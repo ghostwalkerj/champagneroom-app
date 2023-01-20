@@ -11274,9 +11274,9 @@ svelte-star-rating@^2.0.0:
   integrity sha512-bURPn91T+uBCi4XXdh2eE0k2sCILcJrfb8NfKOBfpVbOJYjTfWllBtSKQMoXRnXwRmgx/52HC87ziG1KTywkFg==
 
 svelte-table@^0.5.0:
-  version "0.5.3"
-  resolved "https://registry.yarnpkg.com/svelte-table/-/svelte-table-0.5.3.tgz#345d1467edd251cb7e66ce71126ae722480e41ef"
-  integrity sha512-T88hFzXMFeNoHbcUfnWGscmVdESfD0EAH+Kk0Rp8JCw6NDNgeFPFxIVUR5ihYqeeJKDILqu4NESEBIxYxzB16g==
+  version "0.5.4"
+  resolved "https://registry.yarnpkg.com/svelte-table/-/svelte-table-0.5.4.tgz#04db80539b257231877854d77034bdedfa5473d9"
+  integrity sha512-XOyAIoXd14oyxmZpnrNhMXvzTwpKOdQsWULuysAxOglBfsIcfKhV21GiytEehd6x+TqsWzjGgCzVuxZV8CXFKw==
 
 svelte-waypoint@latest:
   version "0.1.4"

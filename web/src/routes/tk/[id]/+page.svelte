@@ -39,6 +39,7 @@
     if (ticket) {
       ticket.$.subscribe(_ticket => {
         waiting4StateChange = false;
+        ticket = _ticket;
         needs2Pay =
           _ticket.ticketState.status === TicketStatus.RESERVED &&
           _ticket.ticketState.totalPaid < _ticket.ticketState.price;

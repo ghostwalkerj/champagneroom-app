@@ -118,7 +118,7 @@ export const actions: import('./$types').Actions = {
       throw error(404, 'Key not found');
     }
 
-    const { ticket } = await getTicket(ticketId);
+    const { ticket, show } = await getTicket(ticketId);
 
     const ticketService = createTicketMachineService({
       ticketState: ticket.ticketState,
@@ -136,8 +136,15 @@ export const actions: import('./$types').Actions = {
           cancelledInState: JSON.stringify(state.value),
         },
       });
+
+      const showService = createShowMachineService({
+        showState: show.showState,
+        saveShowStateCallback: show.saveShowStateCallback,
+      });
+      showService.send({ type: 'TICKET CANCELLED', ticket });
+
+      // TODO: Need to check if ticket really cancelled
     }
-    //ticketService.stop();
     return { success: true };
   },
 };

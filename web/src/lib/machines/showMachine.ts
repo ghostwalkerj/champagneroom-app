@@ -44,18 +44,28 @@ export const createShowMachine = ({
           | {
               type: 'REFUND SENT';
               transaction: TransactionDocType;
+              ticket?: TicketDocType;
             }
           | {
               type: 'SHOW EVENT RECEIVED';
               showEvent: ShowEventDocType;
             }
-          | { type: 'TICKET RESERVED' }
-          | { type: 'TICKET RESERVATION TIMEOUT' }
-          | { type: 'TICKET CANCELLED' }
+          | {
+              type: 'TICKET RESERVED';
+              ticket?: TicketDocType;
+            }
+          | {
+              type: 'TICKET RESERVATION TIMEOUT';
+              ticket?: TicketDocType;
+            }
+          | {
+              type: 'TICKET CANCELLED';
+              ticket?: TicketDocType;
+            }
           | {
               type: 'TICKET SOLD';
               transaction: TransactionDocType;
-              ticket: TicketDocType;
+              ticket?: TicketDocType;
             }
           | { type: 'START SHOW' }
           | { type: 'END SHOW' },
@@ -162,29 +172,21 @@ export const createShowMachine = ({
             'TICKET RESERVATION TIMEOUT': [
               {
                 target: 'boxOfficeOpen',
-                cond: 'notSoldOut',
                 actions: [
                   'openBoxOffice',
                   'incrementTicketsAvailable',
                   'saveShowState',
                 ],
-              },
-              {
-                actions: ['incrementTicketsAvailable', 'saveShowState'],
               },
             ],
             'TICKET CANCELLED': [
               {
                 target: 'boxOfficeOpen',
-                cond: 'notSoldOut',
                 actions: [
                   'openBoxOffice',
                   'incrementTicketsAvailable',
                   'saveShowState',
                 ],
-              },
-              {
-                actions: ['incrementTicketsAvailable', 'saveShowState'],
               },
             ],
             'TICKET SOLD': {
@@ -358,7 +360,6 @@ export const createShowMachine = ({
         showStarted: context => context.showState.status === ShowStatus.STARTED,
         showEnded: context => context.showState.status === ShowStatus.ENDED,
         soldOut: context => context.showState.ticketsAvailable === 1,
-        notSoldOut: context => context.showState.ticketsAvailable > 1,
         fullyRefunded: (context, event) => {
           const value =
             event.type === 'REFUND SENT' ? event.transaction?.value : 0;

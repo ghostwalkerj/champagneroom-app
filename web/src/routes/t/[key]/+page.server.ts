@@ -157,9 +157,6 @@ export const actions: Actions = {
     const showState = showService.getSnapshot();
 
     if (showState.can({ type: 'REQUEST CANCELLATION' })) {
-      showService.send({
-        type: 'REQUEST CANCELLATION',
-      });
       // Loop through all tickets and refund them
       const db = await masterDB();
       const tickets = await db.tickets
@@ -168,10 +165,7 @@ export const actions: Actions = {
         .eq(cancelShow._id)
         .exec();
       for (const ticket of tickets) {
-        if (
-          ticket.ticketState.status !== TicketStatus.CANCELLED &&
-          ticket.ticketState.status !== TicketStatus.CANCELLATION_REQUESTED
-        ) {
+        if (ticket.ticketState.status === TicketStatus.RESERVED) {
           const ticketService = createTicketMachineService({
             ticketState: ticket.ticketState,
             saveTicketStateCallback: ticket.saveTicketStateCallback,
@@ -185,6 +179,11 @@ export const actions: Actions = {
             },
           });
         }
+
+        // After the ticket has been cancelled, we can cancel show
+        showService.send({
+          type: 'REQUEST CANCELLATION',
+        });
 
         // if (ticket.ticketState.totalPaid > ticket.ticketState.refundedAmount) {
         //   const transaction = await ticket.createTransaction({
