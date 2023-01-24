@@ -1,7 +1,10 @@
 <script lang="ts">
   import { applyAction, enhance } from '$app/forms';
   import { page } from '$app/stores';
-  import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
+  import {
+    PUBLIC_DEFAULT_PROFILE_IMAGE,
+    PUBLIC_SHOW_PATH,
+  } from '$env/static/public';
   import ProfilePhoto from '$lib/components/forms/ProfilePhoto.svelte';
   import {
     createShowMachineService,
@@ -19,20 +22,24 @@
   import type { Subscription } from 'xstate';
   import type { PageData } from './$types';
   import TalentWallet from './TalentWallet.svelte';
+  import urlJoin from 'url-join';
+  import { goto } from '$app/navigation';
 
   export let form: import('./$types').ActionData;
   export let data: PageData;
 
   const token = data.token;
-
   let talentObj = data.talent as TalentDocType;
   $: currentShow = data.currentShow as ShowDocument | null;
+
   let showName = possessive(talentObj.name, 'en') + ' Show';
   $: showDuration = 60;
   let key = $page.params.key;
   let talent: TalentDocument;
   let showMachineService: ShowMachineServiceType;
   let showSub: Subscription;
+
+  const showPath = urlJoin($page.url.href, PUBLIC_SHOW_PATH);
 
   let showMachineState =
     currentShow &&
@@ -342,7 +349,12 @@
               <p>Signed in as {talentObj.name}</p>
               {#if canStartShow}
                 <div class="ring-2 bg-info p-1  ring-inset rounded-xl">
-                  <button class="btn">Start Show</button>
+                  <button
+                    class="btn"
+                    on:click={() => {
+                      goto(showPath);
+                    }}>Start Show</button
+                  >
                 </div>
               {/if}
             </div>
