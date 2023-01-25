@@ -6,11 +6,9 @@
   import type { PageData } from '../$types';
 
   let videoCallElement: HTMLDivElement;
-  let innerHeight = 0;
-  let innerWidth = 0;
+
   export let data: PageData;
 
-  const token = data.token;
   let talentObj = data.talent as TalentDocType;
   $: currentShow = data.currentShow as ShowDocument | null;
 
@@ -27,12 +25,6 @@
         prejoinPageEnabled: false,
       },
       interfaceConfigOverwrite: {
-        BRAND_WATERMARK_LINK: '',
-
-        SHOW_JITSI_WATERMARK: false,
-        HIDE_DEEP_LINKING_LOGO: true,
-        SHOW_BRAND_WATERMARK: false,
-        SHOW_WATERMARK_FOR_GUESTS: false,
         TOOLBAR_BUTTONS: [
           'microphone',
           'camera',
