@@ -26,10 +26,10 @@
       break;
 
     case ShowStatus.BOX_OFFICE_CLOSED:
-      waterMarkText = 'No Tickets Available';
+      waterMarkText = 'Sold Out';
       break;
     case ShowStatus.STARTED:
-      waterMarkText = 'No Tickets Available';
+      waterMarkText = 'Show Started';
       break;
     case ShowStatus.FINALIZED:
     case ShowStatus.ENDED:
@@ -62,7 +62,7 @@
             class="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50  rounded-xl"
           />
           <div
-            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-7xl lg:text-8xl text-red-900 -rotate-45 whitespace-nowrap"
+            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-7xl lg:text8xl text-red-900 -rotate-45 whitespace-nowrap font-extrabold"
           >
             {waterMarkText}
           </div>

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { applyAction, enhance } from '$app/forms';
+  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
   import { ticketDB } from '$lib/ORM/dbs/ticketDB';
@@ -7,6 +8,7 @@
   import { type TicketDocument, TicketStatus } from '$lib/ORM/models/ticket';
 
   import { onMount } from 'svelte';
+  import urlJoin from 'url-join';
   import type { PageData } from './$types';
   import TicketDetail from './TicketDetail.svelte';
 
@@ -15,6 +17,8 @@
   let ticket = data.ticket as TicketDocument | null;
   let show = data.show as ShowDocument | null;
   let ticketId = $page.params.id;
+
+  const showPath = urlJoin($page.url.href, 'show');
 
   $: waiting4StateChange = false;
   $: needs2Pay =
@@ -65,7 +69,18 @@
             </form>
           </div>
         {/if}
-        {#if ticket.ticketState.status !== TicketStatus.CANCELLED && ticket.ticketState.status !== TicketStatus.CANCELLATION_REQUESTED}
+        {#if ticket.ticketState.totalPaid - ticket.ticketState.refundedAmount >= ticket.ticketState.price}
+          <div class="p-4">
+            <div class="w-full flex justify-center">
+              <button
+                class="btn"
+                on:click={() => {
+                  goto(showPath);
+                }}>Go to the Show</button
+              >
+            </div>
+          </div>
+        {:else if ticket.ticketState.status !== TicketStatus.CANCELLED && ticket.ticketState.status !== TicketStatus.CANCELLATION_REQUESTED}
           <div class="p-4">
             <form method="post" action="?/cancel_ticket" use:enhance>
               <div class="w-full flex justify-center">

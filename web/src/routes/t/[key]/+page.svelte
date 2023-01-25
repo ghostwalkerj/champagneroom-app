@@ -1,10 +1,7 @@
 <script lang="ts">
   import { applyAction, enhance } from '$app/forms';
   import { page } from '$app/stores';
-  import {
-    PUBLIC_DEFAULT_PROFILE_IMAGE,
-    PUBLIC_SHOW_PATH,
-  } from '$env/static/public';
+  import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
   import ProfilePhoto from '$lib/components/forms/ProfilePhoto.svelte';
   import {
     createShowMachineService,
@@ -39,7 +36,7 @@
   let showMachineService: ShowMachineServiceType;
   let showSub: Subscription;
 
-  const showPath = urlJoin($page.url.href, PUBLIC_SHOW_PATH);
+  const showPath = urlJoin($page.url.href, 'show');
 
   let showMachineState =
     currentShow &&
