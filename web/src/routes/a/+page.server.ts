@@ -2,12 +2,16 @@ import {
   JWT_AGENT_DB_SECRET,
   JWT_AGENT_DB_USER,
   JWT_EXPIRY,
+  JWT_MASTER_DB_SECRET,
+  JWT_MASTER_DB_USER,
+  PRIVATE_MASTER_DB_ENDPOINT,
 } from '$env/static/private';
-import { masterDB } from '$lib/ORM/dbs/masterDB';
 import { getAgentId } from '$lib/ORM/models/agent';
 import { fail } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import type { Actions, PageServerLoad } from './$types';
+import { agentDB } from '$lib/ORM/dbs/agentDB';
+import { StorageType } from '$lib/ORM/rxdb';
 
 //TODO: Only return token if agent address is good.  How?
 export const load: PageServerLoad = async () => {
@@ -35,8 +39,20 @@ export const actions: Actions = {
       return fail(400, { account, badAccount: true });
     }
 
-    const db = await masterDB();
     const agentId = getAgentId(account);
+    const token = jwt.sign(
+      {
+        exp: Math.floor(Date.now() / 1000) + Number.parseInt(JWT_EXPIRY),
+        sub: JWT_MASTER_DB_USER,
+      },
+      JWT_MASTER_DB_SECRET,
+      { keyid: JWT_MASTER_DB_USER }
+    );
+
+    const db = await agentDB(agentId, token, {
+      endPoint: PRIVATE_MASTER_DB_ENDPOINT,
+      storageType: StorageType.NODE_WEBSQL,
+    });
 
     let agent = await db.agents.findOne(agentId).exec();
     if (agent !== null) {
@@ -72,7 +88,20 @@ export const actions: Actions = {
       return fail(400, { agentCommission, badAgentCommission: true });
     }
 
-    const db = await masterDB();
+    const token = jwt.sign(
+      {
+        exp: Math.floor(Date.now() / 1000) + Number.parseInt(JWT_EXPIRY),
+        sub: JWT_MASTER_DB_USER,
+      },
+      JWT_MASTER_DB_SECRET,
+      { keyid: JWT_MASTER_DB_USER }
+    );
+
+    const db = await agentDB(agentId, token, {
+      endPoint: PRIVATE_MASTER_DB_ENDPOINT,
+      storageType: StorageType.NODE_WEBSQL,
+    });
+
     const agent = await db.agents.findOne(agentId).exec();
     if (agent === null) {
       return fail(400, { agentId, agentExists: false });

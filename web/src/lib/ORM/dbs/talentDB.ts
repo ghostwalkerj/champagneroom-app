@@ -12,6 +12,7 @@ import {
   talentSchema,
   type TalentCollection,
 } from '$lib/ORM/models/talent';
+import type { DatabaseOptions } from '$lib/ORM/rxdb';
 import { StorageType, initRXDB } from '$lib/ORM/rxdb';
 import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
@@ -32,19 +33,13 @@ const _talentDB = new Map<string, TalentDBType>();
 export const talentDB = async (
   key: string,
   token: string,
-  databaseOptions?: {
-    endPoint: string;
-    storageType: StorageType;
-  }
+  databaseOptions?: DatabaseOptions
 ) => await create(key, token, databaseOptions);
 
 const create = async (
   key: string,
   token: string,
-  databaseOptions?: {
-    endPoint: string;
-    storageType: StorageType;
-  }
+  databaseOptions?: DatabaseOptions
 ) => {
   let _db = _talentDB.get(key);
   if (_db) return _db;

@@ -1,7 +1,10 @@
 import {
   PUBLIC_RXDB_PASSWORD,
+  PUBLIC_SHOW_DB_ENDPOINT,
+  PUBLIC_TALENT_DB_ENDPOINT,
   PUBLIC_TICKET_DB_ENDPOINT,
 } from '$env/static/public';
+import type { DatabaseOptions } from '$lib/ORM/rxdb';
 import { StorageType, initRXDB } from '$lib/ORM/rxdb';
 import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
@@ -26,18 +29,30 @@ type PublicCollections = {
 export type TicketDBType = RxDatabase<PublicCollections>;
 const _ticketDB = new Map<string, TicketDBType>();
 export const ticketDB = async (
+  ticketId: string,
   token: string,
-  ticketId: string
-): Promise<TicketDBType> => await create(token, ticketId);
+  databaseOptions?: DatabaseOptions
+): Promise<TicketDBType> => await create(ticketId, token, databaseOptions);
 
-const create = async (token: string, ticketId: string) => {
+const create = async (
+  ticketId: string,
+  token: string,
+  databaseOptions?: DatabaseOptions
+) => {
   let _db = _ticketDB.get(ticketId);
   if (_db) return _db;
 
-  initRXDB(StorageType.IDB);
+  const storageType = databaseOptions
+    ? databaseOptions.storageType
+    : StorageType.IDB;
+  const endPoint = databaseOptions
+    ? databaseOptions.endPoint
+    : PUBLIC_SHOW_DB_ENDPOINT;
+
+  initRXDB(storageType);
 
   const wrappedStorage = wrappedKeyEncryptionStorage({
-    storage: getRxStoragePouch(StorageType.IDB),
+    storage: getRxStoragePouch(storageType),
   });
 
   _db = await createRxDatabase({
@@ -56,63 +71,60 @@ const create = async (token: string, ticketId: string) => {
     },
   });
 
-  if (PUBLIC_TICKET_DB_ENDPOINT) {
-    // Sync if there is a remote endpoint
-    const remoteDB = new PouchDB(PUBLIC_TICKET_DB_ENDPOINT, {
-      fetch: function (
-        url: string,
-        opts: { headers: { set: (arg0: string, arg1: string) => void } }
-      ) {
-        opts.headers.set('Authorization', 'Bearer ' + token);
-        return PouchDB.fetch(url, opts);
-      },
-    });
-    const ticketQuery = _db.tickets.findOne(ticketId);
+  const remoteDB = new PouchDB(endPoint, {
+    fetch: function (
+      url: string,
+      opts: { headers: { set: (arg0: string, arg1: string) => void } }
+    ) {
+      opts.headers.set('Authorization', 'Bearer ' + token);
+      return PouchDB.fetch(url, opts);
+    },
+  });
+  const ticketQuery = _db.tickets.findOne(ticketId);
 
-    let repState = _db.tickets.syncCouchDB({
+  let repState = _db.tickets.syncCouchDB({
+    remote: remoteDB,
+    waitForLeadership: false,
+    options: {
+      retry: true,
+    },
+    query: ticketQuery,
+  });
+  await repState.awaitInitialReplication();
+
+  const _thisTicket = (await ticketQuery.exec()) as TicketDocument;
+  if (_thisTicket) {
+    const showQuery = _db.shows.findOne(_thisTicket.show);
+
+    repState = _db.shows.syncCouchDB({
       remote: remoteDB,
       waitForLeadership: false,
       options: {
         retry: true,
       },
-      query: ticketQuery,
+      query: showQuery,
     });
     await repState.awaitInitialReplication();
 
-    const _thisTicket = (await ticketQuery.exec()) as TicketDocument;
-    if (_thisTicket) {
-      const showQuery = _db.shows.findOne(_thisTicket.show);
+    _db.tickets.syncCouchDB({
+      remote: remoteDB,
+      waitForLeadership: false,
+      options: {
+        retry: true,
+        live: true,
+      },
+      query: ticketQuery,
+    });
 
-      repState = _db.shows.syncCouchDB({
-        remote: remoteDB,
-        waitForLeadership: false,
-        options: {
-          retry: true,
-        },
-        query: showQuery,
-      });
-      await repState.awaitInitialReplication();
-
-      _db.tickets.syncCouchDB({
-        remote: remoteDB,
-        waitForLeadership: false,
-        options: {
-          retry: true,
-          live: true,
-        },
-        query: ticketQuery,
-      });
-
-      _db.shows.syncCouchDB({
-        remote: remoteDB,
-        waitForLeadership: false,
-        options: {
-          retry: true,
-          live: true,
-        },
-        query: showQuery,
-      });
-    }
+    _db.shows.syncCouchDB({
+      remote: remoteDB,
+      waitForLeadership: false,
+      options: {
+        retry: true,
+        live: true,
+      },
+      query: showQuery,
+    });
   }
   _ticketDB.set(ticketId, _db);
   return _db;

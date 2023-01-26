@@ -1,11 +1,15 @@
 import {
   JWT_EXPIRY,
+  JWT_MASTER_DB_SECRET,
+  JWT_MASTER_DB_USER,
   JWT_TICKET_DB_SECRET,
   JWT_TICKET_DB_USER,
+  PRIVATE_MASTER_DB_ENDPOINT,
 } from '$env/static/private';
 import { PUBLIC_PIN_PATH, PUBLIC_TICKET_PATH } from '$env/static/public';
-import { masterDB } from '$lib/ORM/dbs/masterDB';
+import { ticketDB } from '$lib/ORM/dbs/ticketDB';
 import type { TicketDocType, TicketDocument } from '$lib/ORM/models/ticket';
+import { StorageType } from '$lib/ORM/rxdb';
 import { verifyPin } from '$lib/util/pin';
 import { error, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
@@ -22,7 +26,19 @@ const getTicket = async (ticketId: string) => {
     { keyid: JWT_TICKET_DB_USER }
   );
 
-  const db = await masterDB();
+  const masterToken = jwt.sign(
+    {
+      exp: Math.floor(Date.now() / 1000) + Number.parseInt(JWT_EXPIRY),
+      sub: JWT_MASTER_DB_USER,
+    },
+    JWT_MASTER_DB_SECRET,
+    { keyid: JWT_MASTER_DB_USER }
+  );
+
+  const db = await ticketDB(ticketId, masterToken, {
+    endPoint: PRIVATE_MASTER_DB_ENDPOINT,
+    storageType: StorageType.NODE_WEBSQL,
+  });
   if (!db) {
     throw error(500, 'no db');
   }

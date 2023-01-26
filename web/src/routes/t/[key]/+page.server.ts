@@ -2,11 +2,8 @@ import {
   JWT_EXPIRY,
   JWT_MASTER_DB_SECRET,
   JWT_MASTER_DB_USER,
-  JWT_TALENT_DB_SECRET,
-  JWT_TALENT_DB_USER,
   PRIVATE_MASTER_DB_ENDPOINT,
 } from '$env/static/private';
-import { masterDB } from '$lib/ORM/dbs/masterDB';
 import type { ShowDocument } from '$lib/ORM/models/show';
 import { ShowCancelReason } from '$lib/ORM/models/show';
 import { TicketCancelReason, TicketStatus } from '$lib/ORM/models/ticket';
@@ -155,7 +152,7 @@ export const actions: Actions = {
       });
 
       // Loop through all tickets and refund them
-      const db = await masterDB();
+      const db = talent.collection.database;
       const tickets = await db.tickets
         .find()
         .where('show')

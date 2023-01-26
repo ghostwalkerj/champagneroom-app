@@ -19,6 +19,11 @@ export enum StorageType {
   NODE_WEBSQL = 'websql',
 }
 
+export type DatabaseOptions = {
+  endPoint: string;
+  storageType: StorageType;
+};
+
 export const initRXDB = (storage: StorageType) => {
   if (initialized[storage]) return;
   if (storage === StorageType.IDB) addPouchPlugin(idb);

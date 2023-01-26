@@ -2,6 +2,7 @@ import {
   PUBLIC_RXDB_PASSWORD,
   PUBLIC_SHOW_DB_ENDPOINT,
 } from '$env/static/public';
+import type { DatabaseOptions } from '$lib/ORM/rxdb';
 import { StorageType, initRXDB } from '$lib/ORM/rxdb';
 import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
@@ -23,20 +24,32 @@ type PublicCollections = {
 export type ShowDBType = RxDatabase<PublicCollections>;
 const _showDB = new Map<string, ShowDBType>();
 export const showDB = async (
+  showId: string,
   token: string,
-  showId: string
-): Promise<ShowDBType> => await create(token, showId);
+  databaseOptions?: DatabaseOptions
+): Promise<ShowDBType> => await create(showId, token, databaseOptions);
 
 let _thisShow: ShowDocument;
 
-const create = async (token: string, showId: string) => {
+const create = async (
+  showId: string,
+  token: string,
+  databaseOptions?: DatabaseOptions
+) => {
   let _db = _showDB.get(showId);
   if (_db) return _db;
 
-  initRXDB(StorageType.IDB);
+  const storageType = databaseOptions
+    ? databaseOptions.storageType
+    : StorageType.IDB;
+  const endPoint = databaseOptions
+    ? databaseOptions.endPoint
+    : PUBLIC_SHOW_DB_ENDPOINT;
+
+  initRXDB(storageType);
 
   const wrappedStorage = wrappedKeyEncryptionStorage({
-    storage: getRxStoragePouch(StorageType.IDB),
+    storage: getRxStoragePouch(storageType),
   });
 
   _db = await createRxDatabase({
@@ -52,41 +65,39 @@ const create = async (token: string, showId: string) => {
     },
   });
 
-  if (PUBLIC_SHOW_DB_ENDPOINT) {
-    // Sync if there is a remote endpoint
-    const remoteDB = new PouchDB(PUBLIC_SHOW_DB_ENDPOINT, {
-      fetch: function (
-        url: string,
-        opts: { headers: { set: (arg0: string, arg1: string) => void } }
-      ) {
-        opts.headers.set('Authorization', 'Bearer ' + token);
-        return PouchDB.fetch(url, opts);
-      },
-    });
-    const showQuery = _db.shows.findOne(showId);
+  // Sync if there is a remote endpoint
+  const remoteDB = new PouchDB(endPoint, {
+    fetch: function (
+      url: string,
+      opts: { headers: { set: (arg0: string, arg1: string) => void } }
+    ) {
+      opts.headers.set('Authorization', 'Bearer ' + token);
+      return PouchDB.fetch(url, opts);
+    },
+  });
+  const showQuery = _db.shows.findOne(showId);
 
-    const repState = _db.shows.syncCouchDB({
+  const repState = _db.shows.syncCouchDB({
+    remote: remoteDB,
+    waitForLeadership: false,
+    options: {
+      retry: true,
+    },
+    query: showQuery,
+  });
+  await repState.awaitInitialReplication();
+
+  _thisShow = (await showQuery.exec()) as ShowDocument;
+  if (_thisShow) {
+    _db.shows.syncCouchDB({
       remote: remoteDB,
       waitForLeadership: false,
       options: {
         retry: true,
+        live: true,
       },
       query: showQuery,
     });
-    await repState.awaitInitialReplication();
-
-    _thisShow = (await showQuery.exec()) as ShowDocument;
-    if (_thisShow) {
-      _db.shows.syncCouchDB({
-        remote: remoteDB,
-        waitForLeadership: false,
-        options: {
-          retry: true,
-          live: true,
-        },
-        query: showQuery,
-      });
-    }
   }
   _showDB.set(showId, _db);
   return _db;

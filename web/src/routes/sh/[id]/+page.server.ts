@@ -1,11 +1,15 @@
 import {
   JWT_EXPIRY,
+  JWT_MASTER_DB_SECRET,
+  JWT_MASTER_DB_USER,
   JWT_SHOW_DB_SECRET,
   JWT_SHOW_DB_USER,
+  PRIVATE_MASTER_DB_ENDPOINT,
 } from '$env/static/private';
 import { PUBLIC_TICKET_PATH } from '$env/static/public';
-import { masterDB } from '$lib/ORM/dbs/masterDB';
+import { showDB } from '$lib/ORM/dbs/showDB';
 import type { ShowDocType } from '$lib/ORM/models/show';
+import { StorageType } from '$lib/ORM/rxdb';
 import { createShowMachineService } from '$lib/machines/showMachine';
 import { mensNames } from '$lib/util/mensNames';
 import { createPinHash } from '$lib/util/pin';
@@ -30,7 +34,19 @@ export const load: import('./$types').PageServerLoad = async ({ params }) => {
     { keyid: JWT_SHOW_DB_USER }
   );
 
-  const db = await masterDB();
+  const masterToken = jwt.sign(
+    {
+      exp: Math.floor(Date.now() / 1000) + Number.parseInt(JWT_EXPIRY),
+      sub: JWT_MASTER_DB_USER,
+    },
+    JWT_MASTER_DB_SECRET,
+    { keyid: JWT_MASTER_DB_USER }
+  );
+
+  const db = await showDB(showId, masterToken, {
+    endPoint: PRIVATE_MASTER_DB_ENDPOINT,
+    storageType: StorageType.NODE_WEBSQL,
+  });
   if (!db) {
     throw error(500, 'no db');
   }
@@ -55,7 +71,18 @@ export const load: import('./$types').PageServerLoad = async ({ params }) => {
 };
 
 const getShow = async (showId: string) => {
-  const db = await masterDB();
+  const masterToken = jwt.sign(
+    {
+      exp: Math.floor(Date.now() / 1000) + Number.parseInt(JWT_EXPIRY),
+      sub: JWT_MASTER_DB_USER,
+    },
+    JWT_MASTER_DB_SECRET,
+    { keyid: JWT_MASTER_DB_USER }
+  );
+  const db = await showDB(showId, masterToken, {
+    endPoint: PRIVATE_MASTER_DB_ENDPOINT,
+    storageType: StorageType.NODE_WEBSQL,
+  });
   if (!db) {
     throw error(500, 'no db');
   }

@@ -31,7 +31,7 @@
   };
 
   onMount(async () => {
-    showDB(token, showId).then((db: ShowDBType) => {
+    showDB(showId, token).then((db: ShowDBType) => {
       db.shows.findOne(showId).$.subscribe(_show => {
         show = _show as ShowDocument;
       });

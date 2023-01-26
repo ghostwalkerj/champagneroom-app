@@ -23,7 +23,7 @@
     selectedAccount.subscribe(async account => {
       if (account) {
         const agentId = getAgentId(account);
-        const db = await agentDB(token, agentId);
+        const db = await agentDB(agentId, token);
         db?.agents
           .findOne(agentId)
           .exec()
