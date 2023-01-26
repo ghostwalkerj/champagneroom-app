@@ -2,9 +2,7 @@
 	"name": "pcall",
 	"version": "0.0.1",
 	"license": "UNLICENSED",
-	"engines": {
-		"node": "17.x"
-	},
+	"engines": {},
 	"scripts": {
 		"dev": "vite dev ",
 		"build": "node --experimental-specifier-resolution=node ./node_modules/vite/bin/vite.js  build",
