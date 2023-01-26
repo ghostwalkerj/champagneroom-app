@@ -12,7 +12,7 @@ import {
   talentSchema,
   type TalentCollection,
 } from '$lib/ORM/models/talent';
-import { StorageTypes, initRXDB } from '$lib/ORM/rxdb';
+import { StorageType, initRXDB } from '$lib/ORM/rxdb';
 import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
@@ -21,24 +21,45 @@ import { PouchDB, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 100;
 
-type CreatorsCollections = {
+type TalentCollections = {
   talents: TalentCollection;
   shows: ShowCollection;
 };
 
-export type TalentDBType = RxDatabase<CreatorsCollections>;
+export type TalentDBType = RxDatabase<TalentCollections>;
 const _talentDB = new Map<string, TalentDBType>();
 
-export const talentDB = async (token: string, key: string) =>
-  await create(token, key);
+export const talentDB = async (
+  key: string,
+  token: string,
+  databaseOptions?: {
+    endPoint: string;
+    storageType: StorageType;
+  }
+) => await create(key, token, databaseOptions);
 
-const create = async (token: string, key: string) => {
+const create = async (
+  key: string,
+  token: string,
+  databaseOptions?: {
+    endPoint: string;
+    storageType: StorageType;
+  }
+) => {
   let _db = _talentDB.get(key);
   if (_db) return _db;
-  initRXDB(StorageTypes.IDB);
+
+  const storageType = databaseOptions
+    ? databaseOptions.storageType
+    : StorageType.IDB;
+  const endPoint = databaseOptions
+    ? databaseOptions.endPoint
+    : PUBLIC_TALENT_DB_ENDPOINT;
+
+  initRXDB(storageType);
 
   const wrappedStorage = wrappedKeyEncryptionStorage({
-    storage: getRxStoragePouch(StorageTypes.IDB),
+    storage: getRxStoragePouch(storageType),
   });
 
   _db = await createRxDatabase({
@@ -59,71 +80,67 @@ const create = async (token: string, key: string) => {
     },
   });
 
-  if (PUBLIC_TALENT_DB_ENDPOINT) {
-    // Sync if there is a remote endpoint
-    const remoteDB = new PouchDB(PUBLIC_TALENT_DB_ENDPOINT, {
-      fetch: function (
-        url: string,
-        opts: { headers: { set: (arg0: string, arg1: string) => void } }
-      ) {
-        opts.headers.set('Authorization', 'Bearer ' + token);
-        return PouchDB.fetch(url, opts);
-      },
-    });
-    const talentQuery = _db.talents.findOne().where('key').eq(key);
+  // Sync if there is a remote endpoint
+  const remoteDB = new PouchDB(endPoint, {
+    fetch: function (
+      url: string,
+      opts: { headers: { set: (arg0: string, arg1: string) => void } }
+    ) {
+      opts.headers.set('Authorization', 'Bearer ' + token);
+      return PouchDB.fetch(url, opts);
+    },
+  });
+  const talentQuery = _db.talents.findOne().where('key').eq(key);
 
-    let repState = _db.talents.syncCouchDB({
+  let repState = _db.talents.syncCouchDB({
+    remote: remoteDB,
+    waitForLeadership: false,
+    options: {
+      retry: true,
+    },
+    query: talentQuery,
+  });
+  await repState.awaitInitialReplication();
+
+  const _currentTalent = await talentQuery.exec();
+
+  if (_currentTalent) {
+    const showQuery = _db.shows.find().where('talent').eq(_currentTalent?._id);
+
+    // Wait for shows
+    repState = _db.shows.syncCouchDB({
       remote: remoteDB,
       waitForLeadership: false,
       options: {
         retry: true,
       },
-      query: talentQuery,
+      query: showQuery,
     });
     await repState.awaitInitialReplication();
 
-    const _currentTalent = await talentQuery.exec();
+    // Live sync this Talent's shows
+    _db.shows.syncCouchDB({
+      remote: remoteDB,
+      waitForLeadership: false,
+      options: {
+        retry: true,
+        live: true,
+      },
+      query: showQuery,
+    });
 
-    if (_currentTalent) {
-      const showQuery = _db.shows
-        .find()
-        .where('talent')
-        .eq(_currentTalent?._id);
-
-      // Wait for shows
-      repState = _db.shows.syncCouchDB({
-        remote: remoteDB,
-        waitForLeadership: false,
-        options: {
-          retry: true,
-        },
-        query: showQuery,
-      });
-      await repState.awaitInitialReplication();
-
-      // Live sync this Talent's shows
-      _db.shows.syncCouchDB({
-        remote: remoteDB,
-        waitForLeadership: false,
-        options: {
-          retry: true,
-          live: true,
-        },
-        query: showQuery,
-      });
-
-      // Live sync this Talent
-      _db.talents.syncCouchDB({
-        remote: remoteDB,
-        waitForLeadership: false,
-        options: {
-          retry: true,
-          live: true,
-        },
-        query: talentQuery,
-      });
-    }
+    // Live sync this Talent
+    _db.talents.syncCouchDB({
+      remote: remoteDB,
+      waitForLeadership: false,
+      options: {
+        retry: true,
+        live: true,
+      },
+      query: talentQuery,
+    });
   }
+
   _talentDB.set(key, _db);
   return _db;
 };

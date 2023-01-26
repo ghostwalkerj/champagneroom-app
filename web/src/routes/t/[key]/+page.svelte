@@ -115,7 +115,7 @@
   };
 
   onMount(async () => {
-    talentDB(token, key).then((db: TalentDBType) => {
+    talentDB(key, token).then((db: TalentDBType) => {
       db.talents
         .findOne(talentObj._id)
         .exec()

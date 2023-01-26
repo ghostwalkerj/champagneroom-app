@@ -36,7 +36,7 @@ import {
   transactionSchema,
   type TransactionCollection,
 } from '$lib/ORM/models/transaction';
-import { StorageTypes, initRXDB } from '$lib/ORM/rxdb';
+import { StorageType, initRXDB } from '$lib/ORM/rxdb';
 import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
@@ -65,10 +65,10 @@ const create = async (token: string, agentId: string) => {
   let _db = _agentDB.get(agentId);
   if (_db) return _db;
 
-  initRXDB(StorageTypes.IDB);
+  initRXDB(StorageType.IDB);
 
   const wrappedStorage = wrappedKeyEncryptionStorage({
-    storage: getRxStoragePouch(StorageTypes.IDB),
+    storage: getRxStoragePouch(StorageType.IDB),
   });
 
   _db = await createRxDatabase({

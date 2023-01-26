@@ -1,16 +1,32 @@
-import { masterDB } from '$lib/ORM/dbs/masterDB';
 import type { ShowDocument } from '$lib/ORM/models/show';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import jwt from 'jsonwebtoken';
 import {
   JWT_EXPIRY,
+  JWT_MASTER_DB_SECRET,
+  JWT_MASTER_DB_USER,
   JWT_TALENT_DB_SECRET,
   JWT_TALENT_DB_USER,
+  PRIVATE_MASTER_DB_ENDPOINT,
 } from '$env/static/private';
+import { talentDB } from '$lib/ORM/dbs/talentDB';
+import { StorageType } from '$lib/ORM/rxdb';
 
 const getTalent = async (key: string) => {
-  const db = await masterDB();
+  const token = jwt.sign(
+    {
+      exp: Math.floor(Date.now() / 1000) + Number.parseInt(JWT_EXPIRY),
+      sub: JWT_MASTER_DB_USER,
+    },
+    JWT_MASTER_DB_SECRET,
+    { keyid: JWT_MASTER_DB_USER }
+  );
+
+  const db = await talentDB(key, token, {
+    endPoint: PRIVATE_MASTER_DB_ENDPOINT,
+    storageType: StorageType.NODE_WEBSQL,
+  });
   if (!db) {
     throw error(500, 'no db');
   }

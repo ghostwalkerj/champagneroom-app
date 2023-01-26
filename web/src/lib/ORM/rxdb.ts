@@ -14,14 +14,14 @@ const initialized = {
   websql: false,
 };
 
-export enum StorageTypes {
+export enum StorageType {
   IDB = 'idb',
   NODE_WEBSQL = 'websql',
 }
 
-export const initRXDB = (storage: StorageTypes) => {
+export const initRXDB = (storage: StorageType) => {
   if (initialized[storage]) return;
-  if (storage === StorageTypes.IDB) addPouchPlugin(idb);
+  if (storage === StorageType.IDB) addPouchPlugin(idb);
   else addPouchPlugin(nodewebsql);
   initialized[storage] = true;
 

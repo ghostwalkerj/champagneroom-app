@@ -2,7 +2,7 @@ import {
   PUBLIC_RXDB_PASSWORD,
   PUBLIC_SHOW_DB_ENDPOINT,
 } from '$env/static/public';
-import { StorageTypes, initRXDB } from '$lib/ORM/rxdb';
+import { StorageType, initRXDB } from '$lib/ORM/rxdb';
 import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
@@ -33,10 +33,10 @@ const create = async (token: string, showId: string) => {
   let _db = _showDB.get(showId);
   if (_db) return _db;
 
-  initRXDB(StorageTypes.IDB);
+  initRXDB(StorageType.IDB);
 
   const wrappedStorage = wrappedKeyEncryptionStorage({
-    storage: getRxStoragePouch(StorageTypes.IDB),
+    storage: getRxStoragePouch(StorageType.IDB),
   });
 
   _db = await createRxDatabase({

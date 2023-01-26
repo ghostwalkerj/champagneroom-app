@@ -2,7 +2,7 @@ import {
   PUBLIC_RXDB_PASSWORD,
   PUBLIC_TICKET_DB_ENDPOINT,
 } from '$env/static/public';
-import { StorageTypes, initRXDB } from '$lib/ORM/rxdb';
+import { StorageType, initRXDB } from '$lib/ORM/rxdb';
 import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
@@ -34,10 +34,10 @@ const create = async (token: string, ticketId: string) => {
   let _db = _ticketDB.get(ticketId);
   if (_db) return _db;
 
-  initRXDB(StorageTypes.IDB);
+  initRXDB(StorageType.IDB);
 
   const wrappedStorage = wrappedKeyEncryptionStorage({
-    storage: getRxStoragePouch(StorageTypes.IDB),
+    storage: getRxStoragePouch(StorageType.IDB),
   });
 
   _db = await createRxDatabase({

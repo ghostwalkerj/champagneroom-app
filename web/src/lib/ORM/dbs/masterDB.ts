@@ -39,7 +39,7 @@ import {
   transactionSchema,
   type TransactionCollection,
 } from '$lib/ORM/models/transaction';
-import { StorageTypes, initRXDB } from '$lib/ORM/rxdb';
+import { StorageType, initRXDB } from '$lib/ORM/rxdb';
 import { EventEmitter } from 'events';
 import jwt from 'jsonwebtoken';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
@@ -73,10 +73,10 @@ let _masterDB: MasterDBType | undefined = undefined;
 export const masterDB = async () => {
   if (_masterDB !== undefined) return _masterDB;
 
-  initRXDB(StorageTypes.NODE_WEBSQL);
+  initRXDB(StorageType.NODE_WEBSQL);
 
   const wrappedStorage = wrappedKeyEncryptionStorage({
-    storage: getRxStoragePouch(StorageTypes.NODE_WEBSQL),
+    storage: getRxStoragePouch(StorageType.NODE_WEBSQL),
   });
 
   _masterDB = await createRxDatabase({
