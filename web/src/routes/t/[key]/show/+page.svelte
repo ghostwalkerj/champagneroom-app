@@ -1,5 +1,7 @@
 <script lang="ts">
-  import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
+  import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
+  import { PUBLIC_JITSI_DOMAIN, PUBLIC_TALENT_PATH } from '$env/static/public';
   import type { ShowDocument } from '$lib/ORM/models/show';
   import type { TalentDocType } from '$lib/ORM/models/talent';
   import {
@@ -7,14 +9,15 @@
     jitsiInterfaceConfigOverwrite,
   } from '$lib/util/constants';
   import { onMount } from 'svelte';
+  import urlJoin from 'url-join';
   import type { PageData } from '../$types';
-
-  let videoCallElement: HTMLDivElement;
-
   export let data: PageData;
 
   let talentObj = data.talent as TalentDocType;
   $: currentShow = data.currentShow as ShowDocument | null;
+
+  let videoCallElement: HTMLDivElement;
+  let returnUrl = urlJoin($page.url.origin, PUBLIC_TALENT_PATH, talentObj.key);
 
   onMount(() => {
     const options = {
@@ -29,6 +32,9 @@
       interfaceConfigOverwrite: jitsiInterfaceConfigOverwrite,
     };
     const api = new JitsiMeetExternalAPI(PUBLIC_JITSI_DOMAIN, options);
+    api.addListener('readyToClose', () => {
+      goto(returnUrl);
+    });
   });
 </script>
 
