@@ -65,12 +65,7 @@ export const load: import('./$types').PageServerLoad = async ({
 }) => {
   const ticketId = params.id;
   const pinHash = cookies.get('pin');
-  const redirectUrl = urlJoin(
-    url.hostname,
-    PUBLIC_TICKET_PATH,
-    ticketId,
-    PUBLIC_PIN_PATH
-  );
+  const redirectUrl = urlJoin(PUBLIC_TICKET_PATH, ticketId, PUBLIC_PIN_PATH);
 
   if (!pinHash) {
     throw redirect(303, redirectUrl);
