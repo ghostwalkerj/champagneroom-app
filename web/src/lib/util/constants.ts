@@ -31,10 +31,12 @@ export const jitsiConfigOverwrite = {
   hideLobbyButton: true,
   hideEmailInSettings: true,
   readOnlyName: true,
+  defaultRemoteDisplayName: 'Guest',
   gravatar: {
     disabled: true,
   },
   notifications: [],
+  subject: 'Champagne Room',
 };
 
 export const jitsiInterfaceConfigOverwrite = {

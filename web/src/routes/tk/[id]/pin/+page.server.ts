@@ -44,22 +44,21 @@ const getTicket = async (ticketId: string) => {
 export const load: import('./$types').PageServerLoad = async ({
   params,
   cookies,
-  url,
 }) => {
   const ticketId = params.id;
   const pinHash = cookies.get('pin');
   const redirectUrl = urlJoin(PUBLIC_TICKET_PATH, ticketId);
 
-  if (!pinHash) {
-    throw redirect(303, redirectUrl);
-  }
   if (ticketId === null) {
     throw error(404, 'Bad ticket id');
   }
 
   const { ticket } = await getTicket(ticketId);
 
-  if (verifyPin(ticketId, ticket.ticketState.reservation.pin, pinHash)) {
+  if (
+    pinHash &&
+    verifyPin(ticketId, ticket.ticketState.reservation.pin, pinHash)
+  ) {
     throw redirect(303, redirectUrl);
   }
 };

@@ -22,7 +22,7 @@
 
   onMount(() => {
     const options = {
-      roomName: show.name,
+      roomName: show.roomId,
       width: 800,
       height: 800,
       parentNode: videoCallElement,

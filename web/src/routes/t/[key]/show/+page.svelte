@@ -21,7 +21,7 @@
 
   onMount(() => {
     const options = {
-      roomName: currentShow?.name,
+      roomName: currentShow?.roomId,
       width: 800,
       height: 800,
       parentNode: videoCallElement,
@@ -32,6 +32,7 @@
       interfaceConfigOverwrite: jitsiInterfaceConfigOverwrite,
     };
     const api = new JitsiMeetExternalAPI(PUBLIC_JITSI_DOMAIN, options);
+    api.executeCommand('subject', currentShow?.name);
     api.addListener('readyToClose', () => {
       goto(returnUrl);
     });
