@@ -136,14 +136,14 @@ export const masterDB = async () => {
     // });
     // await repState.awaitInitialReplication();
 
-    // repState = _masterDB.talents.syncCouchDB({
-    //   remote: remoteDB,
-    //   waitForLeadership: false,
-    //   options: {
-    //     retry: true,
-    //   },
-    // });
-    // await repState.awaitInitialReplication();
+    const repState = _masterDB.talents.syncCouchDB({
+      remote: remoteDB,
+      waitForLeadership: false,
+      options: {
+        retry: true,
+      },
+    });
+    await repState.awaitInitialReplication();
 
     // repState = _masterDB.shows.syncCouchDB({
     //   remote: remoteDB,
