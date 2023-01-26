@@ -35,6 +35,16 @@ export const jitsiConfigOverwrite = {
   gravatar: {
     disabled: true,
   },
+  remoteVideoMenu: {
+    // Whether the remote video context menu to be rendered or not.
+    disabled: true,
+    // If set to true the 'Kick out' button will be disabled.
+    disableKick: true,
+    // If set to true the 'Grant moderator' button will be disabled.
+    disableGrantModerator: true,
+    // If set to true the 'Send private message' button will be disabled.
+    disablePrivateChat: true,
+  },
   notifications: [],
   subject: 'Champagne Room',
 };
