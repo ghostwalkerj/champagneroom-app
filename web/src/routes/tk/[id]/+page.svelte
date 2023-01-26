@@ -20,33 +20,37 @@
 
   const showPath = urlJoin($page.url.href, 'show');
 
-  $: waiting4StateChange = false;
   $: needs2Pay =
     ticket &&
     ticket.ticketState.status === TicketStatus.RESERVED &&
     ticket.ticketState.totalPaid < ticket.ticketState.price;
 
+  $: canGotoShow =
+    ticket &&
+    ticket.ticketState.totalPaid - ticket.ticketState.refundedAmount >=
+      ticket.ticketState.price;
+
   const onSubmit = () => {
-    waiting4StateChange = true;
     return async ({ result }) => {
       if (result.type === 'failure') {
-        waiting4StateChange = false;
       }
       await applyAction(result);
     };
   };
 
   onMount(async () => {
-    const db = await ticketDB(token, ticketId);
+    const db = await ticketDB(ticketId, token);
     show = await db.shows.findOne(show?._id).exec();
     ticket = await db.tickets.findOne(ticketId).exec();
     if (ticket) {
       ticket.$.subscribe(_ticket => {
-        waiting4StateChange = false;
         ticket = _ticket;
         needs2Pay =
           _ticket.ticketState.status === TicketStatus.RESERVED &&
           _ticket.ticketState.totalPaid < _ticket.ticketState.price;
+        canGotoShow =
+          _ticket.ticketState.totalPaid - _ticket.ticketState.refundedAmount >=
+          _ticket.ticketState.price;
       });
     }
   });
@@ -69,7 +73,7 @@
             </form>
           </div>
         {/if}
-        {#if ticket.ticketState.totalPaid - ticket.ticketState.refundedAmount >= ticket.ticketState.price}
+        {#if canGotoShow}
           <div class="p-4">
             <div class="w-full flex justify-center">
               <button

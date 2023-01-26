@@ -53,7 +53,7 @@ const create = async (
     : StorageType.IDB;
   const endPoint = databaseOptions
     ? databaseOptions.endPoint
-    : PUBLIC_SHOW_DB_ENDPOINT;
+    : PUBLIC_TICKET_DB_ENDPOINT;
 
   initRXDB(storageType);
 
