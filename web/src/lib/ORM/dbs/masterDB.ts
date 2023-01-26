@@ -127,68 +127,68 @@ export const masterDB = async () => {
       },
     });
 
-    let repState = _masterDB.agents.syncCouchDB({
-      remote: remoteDB,
-      waitForLeadership: false,
-      options: {
-        retry: true,
-      },
-    });
-    await repState.awaitInitialReplication();
+    // let repState = _masterDB.agents.syncCouchDB({
+    //   remote: remoteDB,
+    //   waitForLeadership: false,
+    //   options: {
+    //     retry: true,
+    //   },
+    // });
+    // await repState.awaitInitialReplication();
 
-    repState = _masterDB.talents.syncCouchDB({
-      remote: remoteDB,
-      waitForLeadership: false,
-      options: {
-        retry: true,
-      },
-    });
-    await repState.awaitInitialReplication();
+    // repState = _masterDB.talents.syncCouchDB({
+    //   remote: remoteDB,
+    //   waitForLeadership: false,
+    //   options: {
+    //     retry: true,
+    //   },
+    // });
+    // await repState.awaitInitialReplication();
 
-    repState = _masterDB.shows.syncCouchDB({
-      remote: remoteDB,
-      waitForLeadership: false,
-      options: {
-        retry: true,
-      },
-    });
-    await repState.awaitInitialReplication();
+    // repState = _masterDB.shows.syncCouchDB({
+    //   remote: remoteDB,
+    //   waitForLeadership: false,
+    //   options: {
+    //     retry: true,
+    //   },
+    // });
+    // await repState.awaitInitialReplication();
 
-    repState = _masterDB.showEvents.syncCouchDB({
-      remote: remoteDB,
-      waitForLeadership: false,
-      options: {
-        retry: true,
-      },
-    });
-    await repState.awaitInitialReplication();
+    // repState = _masterDB.showEvents.syncCouchDB({
+    //   remote: remoteDB,
+    //   waitForLeadership: false,
+    //   options: {
+    //     retry: true,
+    //   },
+    // });
+    // await repState.awaitInitialReplication();
 
-    repState = _masterDB.tickets.syncCouchDB({
-      remote: remoteDB,
-      waitForLeadership: false,
-      options: {
-        retry: true,
-      },
-    });
-    await repState.awaitInitialReplication();
+    // repState = _masterDB.tickets.syncCouchDB({
+    //   remote: remoteDB,
+    //   waitForLeadership: false,
+    //   options: {
+    //     retry: true,
+    //   },
+    // });
+    // await repState.awaitInitialReplication();
 
-    repState = _masterDB.ticketEvents.syncCouchDB({
-      remote: remoteDB,
-      waitForLeadership: false,
-      options: {
-        retry: true,
-      },
-    });
-    await repState.awaitInitialReplication();
+    // repState = _masterDB.ticketEvents.syncCouchDB({
+    //   remote: remoteDB,
+    //   waitForLeadership: false,
+    //   options: {
+    //     retry: true,
+    //   },
+    // });
+    // await repState.awaitInitialReplication();
 
-    repState = _masterDB.transactions.syncCouchDB({
-      remote: remoteDB,
-      waitForLeadership: false,
-      options: {
-        retry: true,
-      },
-    });
-    await repState.awaitInitialReplication();
+    // repState = _masterDB.transactions.syncCouchDB({
+    //   remote: remoteDB,
+    //   waitForLeadership: false,
+    //   options: {
+    //     retry: true,
+    //   },
+    // });
+    // await repState.awaitInitialReplication();
 
     _masterDB.agents.syncCouchDB({
       remote: remoteDB,
