@@ -12,12 +12,18 @@ import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
 
 import { PouchDB, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
 
-import { showSchema, type ShowCollection } from '$lib/ORM/models/show';
+import {
+  showSchema,
+  type ShowCollection,
+  showDocMethods,
+} from '$lib/ORM/models/show';
 import {
   ticketSchema,
   type TicketCollection,
   type TicketDocument,
+  ticketDocMethods,
 } from '$lib/ORM/models/ticket';
+import { transactionSchema } from '../models/transaction';
 
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 100;
@@ -65,9 +71,14 @@ const create = async (
   await _db.addCollections({
     tickets: {
       schema: ticketSchema,
+      methods: ticketDocMethods,
     },
     shows: {
       schema: showSchema,
+      methods: showDocMethods,
+    },
+    transactions: {
+      schema: transactionSchema,
     },
   });
 

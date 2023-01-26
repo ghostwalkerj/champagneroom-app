@@ -12,8 +12,11 @@ import {
   showSchema,
   type ShowCollection,
   type ShowDocument,
+  showDocMethods,
 } from '$lib/ORM/models/show';
 import { PouchDB, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
+import { ticketSchema } from '../models/ticket';
+import { transactionSchema } from '../models/transaction';
 
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 100;
@@ -62,6 +65,13 @@ const create = async (
   await _db.addCollections({
     shows: {
       schema: showSchema,
+      methods: showDocMethods,
+    },
+    tickets: {
+      schema: ticketSchema,
+    },
+    transactions: {
+      schema: transactionSchema,
     },
   });
 

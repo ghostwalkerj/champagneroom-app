@@ -24,3 +24,26 @@ export enum ActorType {
   TALENT,
   CUSTOMER,
 }
+
+export const jitsiConfigOverwrite = {
+  prejoinPageEnabled: false,
+  disablePolls: true,
+  hideLobbyButton: true,
+  hideEmailInSettings: true,
+  readOnlyName: true,
+  gravatar: {
+    disabled: true,
+  },
+  notifications: [],
+};
+
+export const jitsiInterfaceConfigOverwrite = {
+  TOOLBAR_BUTTONS: [
+    'microphone',
+    'camera',
+    'fullscreen',
+    'fodeviceselection',
+    'hangup',
+    'tileview',
+  ],
+};

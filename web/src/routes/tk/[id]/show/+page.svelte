@@ -2,6 +2,10 @@
   import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
   import type { ShowDocument } from '$lib/ORM/models/show';
   import type { TicketDocument } from '$lib/ORM/models/ticket';
+  import {
+    jitsiConfigOverwrite,
+    jitsiInterfaceConfigOverwrite,
+  } from '$lib/util/constants';
   import { onMount } from 'svelte';
   import type { PageData } from '../$types';
 
@@ -21,19 +25,8 @@
       userInfo: {
         displayName: ticket.ticketState.reservation.name,
       },
-      configOverwrite: {
-        prejoinPageEnabled: false,
-      },
-      interfaceConfigOverwrite: {
-        TOOLBAR_BUTTONS: [
-          'microphone',
-          'camera',
-          'fullscreen',
-          'fodeviceselection',
-          'hangup',
-          'tileview',
-        ],
-      },
+      configOverwrite: jitsiConfigOverwrite,
+      interfaceConfigOverwrite: jitsiInterfaceConfigOverwrite,
     };
 
     const api = new JitsiMeetExternalAPI(PUBLIC_JITSI_DOMAIN, options);
