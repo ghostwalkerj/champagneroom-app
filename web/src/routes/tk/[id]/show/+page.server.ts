@@ -61,7 +61,6 @@ const getTicket = async (ticketId: string) => {
 export const load: import('./$types').PageServerLoad = async ({
   params,
   cookies,
-  url,
 }) => {
   const ticketId = params.id;
   const pinHash = cookies.get('pin');
