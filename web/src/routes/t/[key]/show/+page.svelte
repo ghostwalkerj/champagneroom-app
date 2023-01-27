@@ -23,8 +23,8 @@
   onMount(() => {
     const options = {
       roomName: currentShow?.roomId,
-      width: 800,
-      height: 800,
+      width: '100%',
+      height: '100%',
       parentNode: videoCallElement,
       userInfo: {
         displayName: talentObj.name,
@@ -46,6 +46,7 @@
   });
 </script>
 
-<div class="w-screen flex justify-center">
-  <div bind:this={videoCallElement} />
-</div>
+<div
+  bind:this={videoCallElement}
+  class="w-screen h-screen fixed top-0 left-0 right-0"
+/>
