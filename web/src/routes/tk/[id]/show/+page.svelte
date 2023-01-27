@@ -30,7 +30,7 @@
     const options = {
       roomName: show.roomId,
       width: '100%',
-      height: '100%',
+      height: '99%',
       parentNode: videoCallElement,
       userInfo: {
         displayName: ticket.ticketState.reservation.name,
@@ -50,5 +50,5 @@
 
 <div
   bind:this={videoCallElement}
-  class="w-screen  h-[calc(100vh-50px)] fixed top-0 left-0 right-0"
+  class="w-screen  h-full fixed top-0 left-0 right-0"
 />

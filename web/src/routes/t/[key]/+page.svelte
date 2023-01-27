@@ -60,6 +60,7 @@
   $: waiting4StateChange = false;
   $: soldOut = false;
   $: canStartShow = false;
+  $: statusText = '';
 
   const useShowState = (
     show: ShowDocument,
@@ -93,6 +94,31 @@
       .subscribe((_showState: ShowDocument['showState']) => {
         waiting4StateChange = false; // link changed, so can submit again
         useShowState(show, _showState);
+        switch (_showState.status) {
+          case ShowStatus.CANCELLED:
+            statusText = 'Cancelled';
+            break;
+          case ShowStatus.CANCELLATION_REQUESTED:
+            statusText = 'Cancellation Requested';
+            break;
+          case ShowStatus.BOX_OFFICE_CLOSED:
+            statusText = 'Sold Out';
+            break;
+          case ShowStatus.STARTED:
+            statusText = 'Show Started';
+            break;
+          case ShowStatus.FINALIZED:
+          case ShowStatus.ENDED:
+          case ShowStatus.IN_ESCROW:
+          case ShowStatus.IN_DISPUTE:
+            statusText = 'Ended';
+            break;
+
+          default:
+            statusText = '';
+        }
+        console.log(_showState.status);
+
         soldOut =
           _showState.ticketsSold - _showState.ticketsRefunded ===
           show.maxNumTickets;
@@ -170,28 +196,25 @@
           <div class="bg-primary text-primary-content card">
             <div class="text-center card-body -m-4 items-center">
               <div class="flex w-full flex-row justify-between gap-2">
-                {#if soldOut}
-                  <div class="grow">
-                    <div class="alert alert-info shadow-lg p-3">
-                      <div>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          class="stroke-current flex-shrink-0 h-6 w-6"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          ><path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                          /></svg
-                        >
-
-                        <span>Sold Out</span>
-                      </div>
+                <div class="grow">
+                  <div class="alert alert-info shadow-lg p-3">
+                    <div>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        class="stroke-current flex-shrink-0 w-6 h-6"
+                        ><path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        /></svg
+                      >
+                      <span>{statusText}</span>
                     </div>
                   </div>
-                {/if}
+                </div>
                 {#if canStartShow}
                   <button
                     class="btn"

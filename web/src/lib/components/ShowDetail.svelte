@@ -35,7 +35,7 @@
     case ShowStatus.ENDED:
     case ShowStatus.IN_ESCROW:
     case ShowStatus.IN_DISPUTE:
-      waterMarkText = 'ENDED';
+      waterMarkText = 'Ended';
       break;
 
     default:
@@ -47,7 +47,7 @@
   <div class="flex justify-center h-full min-h-max overflow-auto">
     <div class="flex flex-col w-full p-4 gap-4 rounded-xl bg-base-200">
       <div
-        class="relative bg-contain bg-no-repeat bg-center rounded-xl h-full min-h-[300px]"
+        class="relative bg-cover bg-no-repeat rounded-xl h-full min-h-[600px]"
         style="background-image: url('{show.talentInfo.profileImageUrl}')"
       >
         <div
