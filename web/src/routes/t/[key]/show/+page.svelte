@@ -4,6 +4,7 @@
   import { PUBLIC_JITSI_DOMAIN, PUBLIC_TALENT_PATH } from '$env/static/public';
   import type { ShowDocument } from '$lib/ORM/models/show';
   import type { TalentDocType } from '$lib/ORM/models/talent';
+  import { browserType } from '$lib/stores';
   import {
     jitsiConfigOverwrite,
     jitsiInterfaceConfigOverwrite,
@@ -35,6 +36,11 @@
     api.executeCommand('subject', currentShow?.name);
     api.addListener('readyToClose', () => {
       goto(returnUrl);
+    });
+    browserType.subscribe(browserType => {
+      if (browserType === 'mobile' || browserType === 'tablet') {
+        api.executeCommand('subject', currentShow?.name);
+      }
     });
   });
 </script>

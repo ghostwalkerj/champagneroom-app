@@ -31,6 +31,7 @@ export const jitsiConfigOverwrite = {
   hideLobbyButton: true,
   hideEmailInSettings: true,
   readOnlyName: true,
+  mobileAppPromo: false,
   defaultRemoteDisplayName: 'Guest',
   gravatar: {
     disabled: true,
