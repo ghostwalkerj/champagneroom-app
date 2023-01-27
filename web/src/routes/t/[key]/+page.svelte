@@ -158,10 +158,6 @@
       <div class="flex space-x-5 items-center">
         <div>
           <h1 class="font-bold text-5xl">Manage Show</h1>
-          <p class="pt-6">
-            Pretioso flos est, nihil ad vos nunc. Posset faciens pecuniam.
-            Posuit eam ad opus nunc et adepto a pCall!
-          </p>
         </div>
       </div>
     </div>
