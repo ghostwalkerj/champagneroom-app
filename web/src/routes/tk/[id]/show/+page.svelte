@@ -8,6 +8,7 @@
     jitsiConfigOverwrite,
     jitsiInterfaceConfigOverwrite,
   } from '$lib/util/constants';
+  import getProfileImage from '$lib/util/profilePhoto';
   import { onMount } from 'svelte';
   import urlJoin from 'url-join';
   import type { PageData } from '../$types';
@@ -19,6 +20,11 @@
 
   let returnUrl = urlJoin($page.url.origin, PUBLIC_SHOW_PATH, show._id);
   let videoCallElement: HTMLDivElement;
+
+  const profileImage = urlJoin(
+    $page.url.origin,
+    getProfileImage(ticket.ticketState.reservation.name)
+  );
 
   onMount(() => {
     const options = {
@@ -34,6 +40,8 @@
     };
 
     const api = new JitsiMeetExternalAPI(PUBLIC_JITSI_DOMAIN, options);
+    api.executeCommand('avatarUrl', profileImage);
+
     api.addListener('readyToClose', () => {
       goto(returnUrl);
     });

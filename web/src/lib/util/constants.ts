@@ -31,8 +31,8 @@ export const jitsiConfigOverwrite = {
   hideLobbyButton: true,
   hideEmailInSettings: true,
   readOnlyName: true,
-  mobileAppPromo: false,
   defaultRemoteDisplayName: 'Guest',
+  disableDeepLinking: true,
   gravatar: {
     disabled: true,
   },
@@ -51,6 +51,8 @@ export const jitsiConfigOverwrite = {
 };
 
 export const jitsiInterfaceConfigOverwrite = {
+  MOBILE_APP_PROMO: false,
+
   TOOLBAR_BUTTONS: [
     'microphone',
     'camera',

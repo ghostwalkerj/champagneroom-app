@@ -34,6 +34,7 @@
     };
     const api = new JitsiMeetExternalAPI(PUBLIC_JITSI_DOMAIN, options);
     api.executeCommand('subject', currentShow?.name);
+    api.executeCommand('avatarUrl', talentObj.profileImageUrl);
     api.addListener('readyToClose', () => {
       goto(returnUrl);
     });
