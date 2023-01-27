@@ -24,7 +24,7 @@
     const options = {
       roomName: currentShow?.roomId,
       width: '100%',
-      height: '95%',
+      height: '99%',
       parentNode: videoCallElement,
       userInfo: {
         displayName: talentObj.name,
