@@ -44,7 +44,7 @@
 </script>
 
 {#if show}
-  <div class="flex justify-center h-full min-h-max overflow-auto">
+  <div class="flex justify-center h-full min-h-max ">
     <div class="flex flex-col w-full p-4 gap-4 rounded-xl bg-base-200">
       <div
         class="relative bg-cover bg-no-repeat rounded-xl h-full min-h-[600px]"
@@ -73,9 +73,7 @@
         <StarRating rating={show.talentInfo.stats.ratingAvg} />
       </div>
       <div class="text-center flex justify-center">
-        <div
-          class="stats stats-vertical stats-shadow text-center  lg:stats-horizontal"
-        >
+        <div class="stats stats-horizontal stats-shadow text-center ">
           <div class="stat">
             <div class="stat-title">Duration</div>
             <div class="text-primary stat-value">
@@ -89,7 +87,7 @@
             </div>
           </div>
           <div class="stat">
-            <div class="stat-title">Tickets Available</div>
+            <div class="stat-title whitespace-normal">Available</div>
             <div class="text-primary stat-value">
               {show.showState.ticketsAvailable}
             </div>
@@ -97,38 +95,42 @@
         </div>
       </div>
       {#if showSalesStats}
-        <div class="text-center">
-          <div
-            class="stats stats-vertical stats-shadow text-center lg:stats-horizontal"
-          >
-            <div class="stat">
-              <div class="stat-title">Reserved</div>
-              <div class="text-primary stat-value">
-                {show.showState.ticketsReserved}
+        <div class="flex gap-4 w-full justify-center flex-col lg:flex-row">
+          <div class="text-center">
+            <div class="stats stats-horizontal stats-shadow text-center">
+              <div class="stat">
+                <div class="stat-title">Reserved</div>
+                <div class="text-primary stat-value">
+                  {show.showState.ticketsReserved}
+                </div>
+              </div>
+              <div class="stat">
+                <div class="stat-title">Sold</div>
+                <div class="text-primary stat-value">
+                  {show.showState.ticketsSold}
+                </div>
+              </div>
+              <div class="stat">
+                <div class="stat-title">Refunded</div>
+                <div class="text-primary stat-value">
+                  {show.showState.ticketsRefunded}
+                </div>
               </div>
             </div>
-            <div class="stat">
-              <div class="stat-title">Sold</div>
-              <div class="text-primary stat-value">
-                {show.showState.ticketsSold}
+          </div>
+          <div class="text-center">
+            <div class="stats stats-horizontal stats-shadow text-center">
+              <div class="stat">
+                <div class="stat-title">Refunded Amount</div>
+                <div class="text-primary stat-value">
+                  {currencyFormatter.format(show.showState.refundedAmount)}
+                </div>
               </div>
-            </div>
-            <div class="stat">
-              <div class="stat-title">Refunded</div>
-              <div class="text-primary stat-value">
-                {show.showState.ticketsRefunded}
-              </div>
-            </div>
-            <div class="stat">
-              <div class="stat-title">Refunded Amount</div>
-              <div class="text-primary stat-value">
-                {currencyFormatter.format(show.showState.refundedAmount)}
-              </div>
-            </div>
-            <div class="stat">
-              <div class="stat-title">Total Sales</div>
-              <div class="text-primary stat-value">
-                {currencyFormatter.format(show.showState.totalSales)}
+              <div class="stat">
+                <div class="stat-title">Total Sales</div>
+                <div class="text-primary stat-value">
+                  {currencyFormatter.format(show.showState.totalSales)}
+                </div>
               </div>
             </div>
           </div>
