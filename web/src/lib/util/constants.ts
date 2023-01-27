@@ -37,7 +37,7 @@ export const jitsiConfigOverwrite = {
     disabled: true,
   },
   toolbarConfig: {
-    alwaysVisible: true,
+    alwaysVisible: false,
   },
   analytics: {
     disabled: true,

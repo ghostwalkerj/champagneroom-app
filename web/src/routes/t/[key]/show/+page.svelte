@@ -48,5 +48,5 @@
 
 <div
   bind:this={videoCallElement}
-  class="w-screen  h-[calc(100vh-200px)] fixed top-0 left-0 right-0"
+  class="w-screen  h-[calc(100vh-1px)] fixed top-0 left-0 right-0"
 />

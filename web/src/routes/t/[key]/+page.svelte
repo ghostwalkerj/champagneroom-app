@@ -191,7 +191,7 @@
                           /></svg
                         >
 
-                        <span>All Tickets are Sold</span>
+                        <span>Sold Out</span>
                       </div>
                     </div>
                   </div>
