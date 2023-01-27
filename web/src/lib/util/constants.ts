@@ -36,6 +36,12 @@ export const jitsiConfigOverwrite = {
   gravatar: {
     disabled: true,
   },
+  toolbarConfig: {
+    alwaysVisible: true,
+  },
+  analytics: {
+    disabled: true,
+  },
   remoteVideoMenu: {
     // Whether the remote video context menu to be rendered or not.
     disabled: true,
