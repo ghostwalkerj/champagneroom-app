@@ -44,16 +44,14 @@
 </script>
 
 {#if show}
-  <div class=" flex justify-center">
-    <div
-      class="flex  flex-col w-full p-4   gap-4 rounded-xl bg-base-200  overflow-auto"
-    >
+  <div class="flex justify-center h-full min-h-max overflow-auto">
+    <div class="flex flex-col w-full p-4 gap-4 rounded-xl bg-base-200">
       <div
-        class="relative bg-cover bg-no-repeat bg-center rounded-xl h-[calc(50vh)]"
+        class="relative bg-contain bg-no-repeat bg-center rounded-xl h-full min-h-[300px]"
         style="background-image: url('{show.talentInfo.profileImageUrl}')"
       >
         <div
-          class="absolute top-1 left-2 text-lg text-black ring-2 bg-info p-2  ring-inset rounded-xl"
+          class="absolute top-2 left-2 text-lg text-black ring-2 bg-info p-2  ring-inset rounded-xl"
         >
           {show.name}
         </div>
@@ -74,60 +72,64 @@
       <div class="place-self-center">
         <StarRating rating={show.talentInfo.stats.ratingAvg} />
       </div>
-      <div
-        class="stats stats-vertical stats-shadow text-center lg:stats-horizontal"
-      >
-        <div class="stat">
-          <div class="stat-title">Duration</div>
-          <div class="text-primary stat-value">
-            {durationFormatter(show.duration)}
+      <div class="text-center flex justify-center">
+        <div
+          class="stats stats-vertical stats-shadow text-center  lg:stats-horizontal"
+        >
+          <div class="stat">
+            <div class="stat-title">Duration</div>
+            <div class="text-primary stat-value">
+              {durationFormatter(show.duration)}
+            </div>
           </div>
-        </div>
-        <div class="stat">
-          <div class="stat-title">Price</div>
-          <div class="text-primary stat-value">
-            {currencyFormatter.format(show.price)}
+          <div class="stat">
+            <div class="stat-title">Price</div>
+            <div class="text-primary stat-value">
+              {currencyFormatter.format(show.price)}
+            </div>
           </div>
-        </div>
-        <div class="stat">
-          <div class="stat-title">Tickets Available</div>
-          <div class="text-primary stat-value">
-            {show.showState.ticketsAvailable}
+          <div class="stat">
+            <div class="stat-title">Tickets Available</div>
+            <div class="text-primary stat-value">
+              {show.showState.ticketsAvailable}
+            </div>
           </div>
         </div>
       </div>
       {#if showSalesStats}
-        <div
-          class="stats stats-vertical stats-shadow text-center lg:stats-horizontal"
-        >
-          <div class="stat">
-            <div class="stat-title">Reserved</div>
-            <div class="text-primary stat-value">
-              {show.showState.ticketsReserved}
+        <div class="text-center">
+          <div
+            class="stats stats-vertical stats-shadow text-center lg:stats-horizontal"
+          >
+            <div class="stat">
+              <div class="stat-title">Reserved</div>
+              <div class="text-primary stat-value">
+                {show.showState.ticketsReserved}
+              </div>
             </div>
-          </div>
-          <div class="stat">
-            <div class="stat-title">Sold</div>
-            <div class="text-primary stat-value">
-              {show.showState.ticketsSold}
+            <div class="stat">
+              <div class="stat-title">Sold</div>
+              <div class="text-primary stat-value">
+                {show.showState.ticketsSold}
+              </div>
             </div>
-          </div>
-          <div class="stat">
-            <div class="stat-title">Refunded</div>
-            <div class="text-primary stat-value">
-              {show.showState.ticketsRefunded}
+            <div class="stat">
+              <div class="stat-title">Refunded</div>
+              <div class="text-primary stat-value">
+                {show.showState.ticketsRefunded}
+              </div>
             </div>
-          </div>
-          <div class="stat">
-            <div class="stat-title">Refunded Amount</div>
-            <div class="text-primary stat-value">
-              {currencyFormatter.format(show.showState.refundedAmount)}
+            <div class="stat">
+              <div class="stat-title">Refunded Amount</div>
+              <div class="text-primary stat-value">
+                {currencyFormatter.format(show.showState.refundedAmount)}
+              </div>
             </div>
-          </div>
-          <div class="stat">
-            <div class="stat-title">Total Sales</div>
-            <div class="text-primary stat-value">
-              {currencyFormatter.format(show.showState.totalSales)}
+            <div class="stat">
+              <div class="stat-title">Total Sales</div>
+              <div class="text-primary stat-value">
+                {currencyFormatter.format(show.showState.totalSales)}
+              </div>
             </div>
           </div>
         </div>

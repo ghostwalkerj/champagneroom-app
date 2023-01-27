@@ -40,10 +40,10 @@
 </script>
 
 <div class="mt-6   ">
-  <div class="flex flex-row justify-center	">
+  <div class="flex flex-row justify-center  min-h-[calc(100vh-200px)]">
     <!-- Page header -->
     {#key show}
-      <div class="pb-4 w-screen text-center max-w-2xl ">
+      <div class="pb-4  text-center w-full max-w-xl">
         <ShowDetail {show} />
         {#if canBuyTicket}
           <label for="buy-ticket" class="btn btn-secondary m-4"

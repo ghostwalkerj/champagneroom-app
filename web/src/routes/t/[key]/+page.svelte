@@ -169,6 +169,45 @@
       class="mx-auto mt-8 max-w-3xl grid gap-6 grid-cols-1 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3"
     >
       <div class="space-y-6 lg:col-start-1 lg:col-span-2">
+        <!-- Status -->
+        <div class="lg:col-start-3 lg:col-span-1">
+          <div class="bg-primary text-primary-content card">
+            <div class="text-center card-body items-center">
+              <div class="flex w-full flex-row justify-between gap-2">
+                {#if soldOut}
+                  <div class="grow">
+                    <div class="alert alert-info shadow-lg p-3">
+                      <div>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="stroke-current flex-shrink-0 h-6 w-6"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          ><path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                          /></svg
+                        >
+
+                        <span>All Tickets are Sold</span>
+                      </div>
+                    </div>
+                  </div>
+                {/if}
+                {#if canStartShow}
+                  <button
+                    class="btn"
+                    on:click={() => {
+                      goto(showPath);
+                    }}>Start Show</button
+                  >
+                {/if}
+              </div>
+            </div>
+          </div>
+        </div>
         {#if canCreateShow}
           <div class="bg-primary text-primary-content card">
             <div class="text-center card-body items-center">
@@ -284,7 +323,9 @@
           </div>
         {/if}
         {#key showMachineState || currentShow}
-          <ShowDetail show={currentShow} showCopy showSalesStats />
+          <div class=" ">
+            <ShowDetail show={currentShow} showCopy showSalesStats />
+          </div>
         {/key}
         {#if canCancelShow}
           <!-- Link Form-->
@@ -299,7 +340,7 @@
                 <div
                   class="flex flex-col text-white p-2 justify-center items-center"
                 >
-                  <div class="py-4">
+                  <div class="">
                     <button
                       class="btn btn-secondary"
                       type="submit"
@@ -311,52 +352,10 @@
             </div>
           </form>
         {/if}
-
-        <!-- Camera  Preview -->
       </div>
 
       <!--Next Column-->
       <div class="space-y-6 lg:col-start-3 lg:col-span-1">
-        <!-- Status -->
-        <div class="lg:col-start-3 lg:col-span-1">
-          <div class="bg-primary text-primary-content card">
-            <div class="text-center card-body items-center">
-              <h2 class="text-2xl card-title">Show Status</h2>
-              {#if soldOut}
-                <div>
-                  <div class="alert alert-success shadow-lg">
-                    <div>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        class="stroke-current flex-shrink-0 w-6 h-6"
-                        ><path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                        /></svg
-                      >
-                      <span>All Tickets are Sold</span>
-                    </div>
-                  </div>
-                </div>
-              {/if}
-              <p>Signed in as {talentObj.name}</p>
-              {#if canStartShow}
-                <div class="ring-2 bg-info p-1  ring-inset rounded-xl">
-                  <button
-                    class="btn"
-                    on:click={() => {
-                      goto(showPath);
-                    }}>Start Show</button
-                  >
-                </div>
-              {/if}
-            </div>
-          </div>
-        </div>
         <!-- Photo -->
         <div>
           <div class="lg:col-start-3 lg:col-span-1">
