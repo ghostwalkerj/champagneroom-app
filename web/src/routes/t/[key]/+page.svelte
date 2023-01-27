@@ -168,7 +168,7 @@
         <!-- Status -->
         <div class="lg:col-start-3 lg:col-span-1">
           <div class="bg-primary text-primary-content card">
-            <div class="text-center card-body items-center">
+            <div class="text-center card-body -m-4 items-center">
               <div class="flex w-full flex-row justify-between gap-2">
                 {#if soldOut}
                   <div class="grow">
