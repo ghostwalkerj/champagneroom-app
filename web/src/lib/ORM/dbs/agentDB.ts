@@ -63,7 +63,7 @@ export const agentDB = async (
   agentId: string,
   token: string,
   databaseOptions?: DatabaseOptions
-) => await create(token, agentId);
+) => await create(agentId, token, databaseOptions);
 
 const create = async (
   agentId: string,
