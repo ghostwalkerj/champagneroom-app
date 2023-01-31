@@ -26,7 +26,6 @@
       parentNode: videoCallElement,
       userInfo: {
         displayName: talentObj.name,
-        avatarUrl: talentObj.profileImageUrl,
       },
       interfaceConfigOverwrite: jitsiInterfaceConfigOverwrite,
       configOverwrite: {
@@ -37,6 +36,7 @@
       },
     };
     const api = new JitsiMeetExternalAPI(PUBLIC_JITSI_DOMAIN, options);
+    api.executeCommand('avatarUrl', talentObj.profileImageUrl);
     api.addListener('readyToClose', () => {
       goto(returnUrl);
     });

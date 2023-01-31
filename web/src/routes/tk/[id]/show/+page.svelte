@@ -33,16 +33,18 @@
       parentNode: videoCallElement,
       userInfo: {
         displayName: ticket.ticketState.reservation.name,
-        avatarUrl: profileImage,
       },
       interfaceConfigOverwrite: jitsiInterfaceConfigOverwrite,
       configOverwrite: {
         subject: show.name,
+        filmstrip: {
+          enabled: false,
+        },
       },
     };
 
     const api = new JitsiMeetExternalAPI(PUBLIC_JITSI_DOMAIN, options);
-
+    api.executeCommand('avatarUrl', profileImage);
     api.addListener('readyToClose', () => {
       goto(returnUrl);
     });
