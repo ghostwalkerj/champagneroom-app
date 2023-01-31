@@ -6,12 +6,12 @@ import {
   JWT_MASTER_DB_USER,
   PRIVATE_MASTER_DB_ENDPOINT,
 } from '$env/static/private';
+import { agentDB } from '$lib/ORM/dbs/agentDB';
 import { getAgentId } from '$lib/ORM/models/agent';
+import { StorageType } from '$lib/ORM/rxdb';
 import { fail } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import type { Actions, PageServerLoad } from './$types';
-import { agentDB } from '$lib/ORM/dbs/agentDB';
-import { StorageType } from '$lib/ORM/rxdb';
 
 //TODO: Only return token if agent address is good.  How?
 export const load: PageServerLoad = async () => {

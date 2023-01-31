@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { ShowDocType } from '$lib/ORM/models/show';
-  import { type TicketDocType, TicketStatus } from '$lib/ORM/models/ticket';
+  import { TicketStatus, type TicketDocType } from '$lib/ORM/models/ticket';
   import { currencyFormatter, durationFormatter } from '$lib/util/constants';
   import getProfileImage from '$lib/util/profilePhoto';
   export let show: ShowDocType | null;

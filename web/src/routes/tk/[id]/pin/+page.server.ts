@@ -1,17 +1,17 @@
-import { PUBLIC_TICKET_PATH } from '$env/static/public';
 import {
   JWT_EXPIRY,
   JWT_MASTER_DB_SECRET,
   JWT_MASTER_DB_USER,
   PRIVATE_MASTER_DB_ENDPOINT,
 } from '$env/static/private';
+import { PUBLIC_TICKET_PATH } from '$env/static/public';
+import { ticketDB } from '$lib/ORM/dbs/ticketDB';
+import type { TicketDocument } from '$lib/ORM/models/ticket';
+import { StorageType } from '$lib/ORM/rxdb';
 import { createPinHash, verifyPin } from '$lib/util/pin';
 import { error, fail, redirect } from '@sveltejs/kit';
-import urlJoin from 'url-join';
 import jwt from 'jsonwebtoken';
-import { ticketDB } from '$lib/ORM/dbs/ticketDB';
-import { StorageType } from '$lib/ORM/rxdb';
-import type { TicketDocument } from '$lib/ORM/models/ticket';
+import urlJoin from 'url-join';
 
 const getTicket = async (ticketId: string) => {
   const masterToken = jwt.sign(

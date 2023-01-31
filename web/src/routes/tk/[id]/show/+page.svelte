@@ -4,10 +4,7 @@
   import { PUBLIC_JITSI_DOMAIN, PUBLIC_SHOW_PATH } from '$env/static/public';
   import type { ShowDocument } from '$lib/ORM/models/show';
   import type { TicketDocument } from '$lib/ORM/models/ticket';
-  import {
-    jitsiConfigOverwrite,
-    jitsiInterfaceConfigOverwrite,
-  } from '$lib/util/constants';
+  import { jitsiInterfaceConfigOverwrite } from '$lib/util/constants';
   import getProfileImage from '$lib/util/profilePhoto';
   import { onMount } from 'svelte';
   import urlJoin from 'url-join';
@@ -17,6 +14,7 @@
 
   let ticket = data.ticket as TicketDocument;
   let show = data.show as ShowDocument;
+  let jitsiToken = data.jitsiToken as string;
 
   let returnUrl = urlJoin($page.url.origin, PUBLIC_SHOW_PATH, show._id);
   let videoCallElement: HTMLDivElement;
@@ -29,18 +27,21 @@
   onMount(() => {
     const options = {
       roomName: show.roomId,
+      jwt: jitsiToken,
       width: '100%',
       height: '99%',
       parentNode: videoCallElement,
       userInfo: {
         displayName: ticket.ticketState.reservation.name,
+        avatarUrl: profileImage,
       },
-      configOverwrite: jitsiConfigOverwrite,
       interfaceConfigOverwrite: jitsiInterfaceConfigOverwrite,
+      configOverwrite: {
+        subject: show.name,
+      },
     };
 
     const api = new JitsiMeetExternalAPI(PUBLIC_JITSI_DOMAIN, options);
-    api.executeCommand('avatarUrl', profileImage);
 
     api.addListener('readyToClose', () => {
       goto(returnUrl);

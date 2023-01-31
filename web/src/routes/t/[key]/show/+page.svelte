@@ -4,11 +4,7 @@
   import { PUBLIC_JITSI_DOMAIN, PUBLIC_TALENT_PATH } from '$env/static/public';
   import type { ShowDocument } from '$lib/ORM/models/show';
   import type { TalentDocType } from '$lib/ORM/models/talent';
-  import { browserType } from '$lib/stores';
-  import {
-    jitsiConfigOverwrite,
-    jitsiInterfaceConfigOverwrite,
-  } from '$lib/util/constants';
+  import { jitsiInterfaceConfigOverwrite } from '$lib/util/constants';
   import { onMount } from 'svelte';
   import urlJoin from 'url-join';
   import type { PageData } from '../$types';
@@ -16,6 +12,7 @@
 
   let talentObj = data.talent as TalentDocType;
   $: currentShow = data.currentShow as ShowDocument | null;
+  let jitsiToken = data.jitsiToken as string;
 
   let videoCallElement: HTMLDivElement;
   let returnUrl = urlJoin($page.url.origin, PUBLIC_TALENT_PATH, talentObj.key);
@@ -23,25 +20,25 @@
   onMount(() => {
     const options = {
       roomName: currentShow?.roomId,
+      jwt: jitsiToken,
       width: '100%',
       height: '99%',
       parentNode: videoCallElement,
       userInfo: {
         displayName: talentObj.name,
+        avatarUrl: talentObj.profileImageUrl,
       },
-      configOverwrite: jitsiConfigOverwrite,
       interfaceConfigOverwrite: jitsiInterfaceConfigOverwrite,
+      configOverwrite: {
+        subject: currentShow?.name,
+        filmstrip: {
+          enabled: false,
+        },
+      },
     };
     const api = new JitsiMeetExternalAPI(PUBLIC_JITSI_DOMAIN, options);
-    api.executeCommand('subject', currentShow?.name);
-    api.executeCommand('avatarUrl', talentObj.profileImageUrl);
     api.addListener('readyToClose', () => {
       goto(returnUrl);
-    });
-    browserType.subscribe(browserType => {
-      if (browserType === 'mobile' || browserType === 'tablet') {
-        api.executeCommand('subject', currentShow?.name);
-      }
     });
   });
 </script>

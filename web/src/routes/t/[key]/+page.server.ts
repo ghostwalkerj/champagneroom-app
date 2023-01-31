@@ -4,18 +4,18 @@ import {
   JWT_MASTER_DB_USER,
   PRIVATE_MASTER_DB_ENDPOINT,
 } from '$env/static/private';
+import { talentDB } from '$lib/ORM/dbs/talentDB';
 import type { ShowDocument } from '$lib/ORM/models/show';
 import { ShowCancelReason } from '$lib/ORM/models/show';
 import { TicketCancelReason, TicketStatus } from '$lib/ORM/models/ticket';
 import { TransactionReasonType } from '$lib/ORM/models/transaction';
+import { StorageType } from '$lib/ORM/rxdb';
 import { createShowMachineService } from '$lib/machines/showMachine';
 import { createTicketMachineService } from '$lib/machines/ticketMachine';
 import { ActorType } from '$lib/util/constants';
 import { error, fail } from '@sveltejs/kit';
-import type { Actions } from './$types';
-import { talentDB } from '$lib/ORM/dbs/talentDB';
-import { StorageType } from '$lib/ORM/rxdb';
 import jwt from 'jsonwebtoken';
+import type { Actions } from './$types';
 
 const getTalent = async (key: string) => {
   const token = jwt.sign(

@@ -1,4 +1,6 @@
 import {
+  JITSI_APP_ID,
+  JITSI_JWT_SECRET,
   JWT_EXPIRY,
   JWT_MASTER_DB_SECRET,
   JWT_MASTER_DB_USER,
@@ -6,7 +8,11 @@ import {
   JWT_TICKET_DB_USER,
   PRIVATE_MASTER_DB_ENDPOINT,
 } from '$env/static/private';
-import { PUBLIC_PIN_PATH, PUBLIC_TICKET_PATH } from '$env/static/public';
+import {
+  PUBLIC_JITSI_DOMAIN,
+  PUBLIC_PIN_PATH,
+  PUBLIC_TICKET_PATH,
+} from '$env/static/public';
 import { ticketDB } from '$lib/ORM/dbs/ticketDB';
 import type { TicketDocType, TicketDocument } from '$lib/ORM/models/ticket';
 import { StorageType } from '$lib/ORM/rxdb';
@@ -73,7 +79,7 @@ export const load: import('./$types').PageServerLoad = async ({
     throw error(404, 'Bad ticket id');
   }
 
-  const { token, ticket: _ticket, show: _show } = await getTicket(ticketId);
+  const { ticket: _ticket, show: _show } = await getTicket(ticketId);
 
   if (!verifyPin(ticketId, _ticket.ticketState.reservation.pin, pinHash)) {
     throw redirect(303, redirectUrl);
@@ -82,8 +88,19 @@ export const load: import('./$types').PageServerLoad = async ({
   const ticket = _ticket.toJSON() as TicketDocType;
   const show = _show.toJSON();
 
+  const jitsiToken = jwt.sign(
+    {
+      aud: 'jitsi',
+      iss: JITSI_APP_ID,
+      exp: Math.floor(Date.now() / 1000) + +JWT_EXPIRY,
+      sub: PUBLIC_JITSI_DOMAIN,
+      room: _show.roomId,
+    },
+    JITSI_JWT_SECRET
+  );
+
   return {
-    token,
+    jitsiToken,
     ticket,
     show,
   };

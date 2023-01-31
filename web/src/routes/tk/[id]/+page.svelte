@@ -5,7 +5,7 @@
 
   import { ticketDB } from '$lib/ORM/dbs/ticketDB';
   import type { ShowDocument } from '$lib/ORM/models/show';
-  import { type TicketDocument, TicketStatus } from '$lib/ORM/models/ticket';
+  import { TicketStatus, type TicketDocument } from '$lib/ORM/models/ticket';
 
   import { onMount } from 'svelte';
   import urlJoin from 'url-join';

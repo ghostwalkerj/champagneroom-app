@@ -1,17 +1,17 @@
 import {
+  JITSI_APP_ID,
+  JITSI_JWT_SECRET,
   JWT_EXPIRY,
   JWT_MASTER_DB_SECRET,
   JWT_MASTER_DB_USER,
-  JWT_TALENT_DB_SECRET,
-  JWT_TALENT_DB_USER,
   PRIVATE_MASTER_DB_ENDPOINT,
 } from '$env/static/private';
+import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 import { talentDB } from '$lib/ORM/dbs/talentDB';
 import type { ShowDocument } from '$lib/ORM/models/show';
 import { StorageType } from '$lib/ORM/rxdb';
 import { error } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
-import type { PageServerLoad } from './$types';
 
 const getTalent = async (key: string) => {
   const token = jwt.sign(
@@ -37,37 +37,32 @@ const getTalent = async (key: string) => {
   return talent;
 };
 
-export const load: PageServerLoad = async ({ params }) => {
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+export const load: import('./$types').PageServerLoad = async ({ params }) => {
   const key = params.key;
 
   if (key === null) {
     throw error(404, 'Key not found');
   }
-
-  const token = jwt.sign(
-    {
-      exp: Math.floor(Date.now() / 1000) + +JWT_EXPIRY,
-      sub: JWT_TALENT_DB_USER,
-    },
-    JWT_TALENT_DB_SECRET,
-    { keyid: JWT_TALENT_DB_USER }
-  );
-
   const _talent = await getTalent(key);
-
-  await _talent.updateStats();
   const _currentShow = (await _talent.populate('currentShow')) as ShowDocument;
-  const _completedShows = (await _talent.populate(
-    'stats.completedShows'
-  )) as ShowDocument[];
-  const talent = _talent.toJSON();
-  const currentShow = _currentShow ? _currentShow.toJSON() : undefined;
-  const completedShows = _completedShows.map(link => link.toJSON());
 
+  if (!_currentShow) {
+    throw error(404, 'Show not found');
+  }
+
+  const jitsiToken = jwt.sign(
+    {
+      aud: 'jitsi',
+      iss: JITSI_APP_ID,
+      exp: Math.floor(Date.now() / 1000) + +JWT_EXPIRY,
+      sub: PUBLIC_JITSI_DOMAIN,
+      room: _currentShow.roomId,
+      moderator: true,
+    },
+    JITSI_JWT_SECRET
+  );
   return {
-    token,
-    talent,
-    currentShow,
-    completedShows,
+    jitsiToken,
   };
 };

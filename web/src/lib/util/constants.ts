@@ -25,37 +25,6 @@ export enum ActorType {
   CUSTOMER,
 }
 
-export const jitsiConfigOverwrite = {
-  prejoinPageEnabled: false,
-  disablePolls: true,
-  hideLobbyButton: true,
-  hideEmailInSettings: true,
-  readOnlyName: true,
-  defaultRemoteDisplayName: 'Guest',
-  disableDeepLinking: true,
-  gravatar: {
-    disabled: true,
-  },
-  toolbarConfig: {
-    alwaysVisible: false,
-  },
-  analytics: {
-    disabled: true,
-  },
-  remoteVideoMenu: {
-    // Whether the remote video context menu to be rendered or not.
-    disabled: true,
-    // If set to true the 'Kick out' button will be disabled.
-    disableKick: true,
-    // If set to true the 'Grant moderator' button will be disabled.
-    disableGrantModerator: true,
-    // If set to true the 'Send private message' button will be disabled.
-    disablePrivateChat: true,
-  },
-  notifications: [],
-  subject: 'Champagne Room',
-};
-
 export const jitsiInterfaceConfigOverwrite = {
   MOBILE_APP_PROMO: false,
 

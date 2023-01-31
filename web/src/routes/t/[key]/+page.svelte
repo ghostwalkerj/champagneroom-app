@@ -15,12 +15,12 @@
   import { onMount } from 'svelte';
   import StarRating from 'svelte-star-rating';
 
+  import { goto } from '$app/navigation';
   import ShowDetail from '$lib/components/ShowDetail.svelte';
+  import urlJoin from 'url-join';
   import type { Subscription } from 'xstate';
   import type { PageData } from './$types';
   import TalentWallet from './TalentWallet.svelte';
-  import urlJoin from 'url-join';
-  import { goto } from '$app/navigation';
 
   export let form: import('./$types').ActionData;
   export let data: PageData;
@@ -60,7 +60,7 @@
   $: waiting4StateChange = false;
   $: soldOut = false;
   $: canStartShow = false;
-  $: statusText = '';
+  $: statusText = 'No Current Show';
 
   const useShowState = (
     show: ShowDocument,
@@ -104,6 +104,9 @@
           case ShowStatus.BOX_OFFICE_CLOSED:
             statusText = 'Sold Out';
             break;
+          case ShowStatus.BOX_OFFICE_OPEN:
+            statusText = 'Box Office Open';
+            break;
           case ShowStatus.STARTED:
             statusText = 'Show Started';
             break;
@@ -115,9 +118,7 @@
             break;
 
           default:
-            statusText = '';
         }
-        console.log(_showState.status);
 
         soldOut =
           _showState.ticketsSold - _showState.ticketsRefunded ===
