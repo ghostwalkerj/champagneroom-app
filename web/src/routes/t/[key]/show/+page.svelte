@@ -50,8 +50,6 @@
     api = new JitsiMeetExternalAPI(PUBLIC_JITSI_DOMAIN, options);
     api.executeCommand('avatarUrl', talentObj.profileImageUrl);
     api.executeCommand('subject', currentShow?.name);
-    const numberOfParticipants = api.getNumberOfParticipants();
-    console.log('numberOfParticipants', numberOfParticipants);
     api.addListener('participantJoined', participantJoined);
     api.addListener('readyToClose', () => {
       goto(returnUrl);

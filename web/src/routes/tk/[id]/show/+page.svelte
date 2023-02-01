@@ -37,9 +37,6 @@
       interfaceConfigOverwrite: jitsiInterfaceConfigOverwrite,
       configOverwrite: {
         localSubject: show.name,
-        filmstrip: {
-          enabled: false,
-        },
       },
     };
 
