@@ -36,13 +36,14 @@
       },
       interfaceConfigOverwrite: jitsiInterfaceConfigOverwrite,
       configOverwrite: {
-        subject: show.name,
+        localSubject: show.name,
         filmstrip: {
           enabled: false,
         },
       },
     };
 
+    // @ts-ignore
     const api = new JitsiMeetExternalAPI(PUBLIC_JITSI_DOMAIN, options);
     api.executeCommand('avatarUrl', profileImage);
     api.addListener('readyToClose', () => {

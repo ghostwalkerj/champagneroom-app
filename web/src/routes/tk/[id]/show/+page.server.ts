@@ -95,6 +95,13 @@ export const load: import('./$types').PageServerLoad = async ({
       exp: Math.floor(Date.now() / 1000) + +JWT_EXPIRY,
       sub: PUBLIC_JITSI_DOMAIN,
       room: _show.roomId,
+      context: {
+        user: {
+          name: _ticket.ticketState.reservation.name,
+          affiliation: 'member',
+          lobby_bypass: false,
+        },
+      },
     },
     JITSI_JWT_SECRET
   );

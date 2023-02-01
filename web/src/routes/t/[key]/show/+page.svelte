@@ -16,6 +16,16 @@
 
   let videoCallElement: HTMLDivElement;
   let returnUrl = urlJoin($page.url.origin, PUBLIC_TALENT_PATH, talentObj.key);
+  let api: any;
+
+  const participantJoined = (event: any) => {
+    console.log('participantJoined', event);
+    const numberOfParticipants = api.getNumberOfParticipants();
+    console.log('numberOfParticipants', numberOfParticipants);
+    api.getRoomsInfo().then(rooms => {
+      console.log('rooms', rooms);
+    });
+  };
 
   onMount(() => {
     const options = {
@@ -29,14 +39,20 @@
       },
       interfaceConfigOverwrite: jitsiInterfaceConfigOverwrite,
       configOverwrite: {
-        subject: currentShow?.name,
+        localSubject: currentShow?.name,
         filmstrip: {
           enabled: false,
         },
       },
     };
-    const api = new JitsiMeetExternalAPI(PUBLIC_JITSI_DOMAIN, options);
+
+    // @ts-ignore
+    api = new JitsiMeetExternalAPI(PUBLIC_JITSI_DOMAIN, options);
     api.executeCommand('avatarUrl', talentObj.profileImageUrl);
+    api.executeCommand('subject', currentShow?.name);
+    const numberOfParticipants = api.getNumberOfParticipants();
+    console.log('numberOfParticipants', numberOfParticipants);
+    api.addListener('participantJoined', participantJoined);
     api.addListener('readyToClose', () => {
       goto(returnUrl);
     });

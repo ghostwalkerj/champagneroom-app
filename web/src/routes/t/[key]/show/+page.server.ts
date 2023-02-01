@@ -59,6 +59,13 @@ export const load: import('./$types').PageServerLoad = async ({ params }) => {
       sub: PUBLIC_JITSI_DOMAIN,
       room: _currentShow.roomId,
       moderator: true,
+      context: {
+        user: {
+          name: _talent.name,
+          affiliation: 'owner',
+          lobby_bypass: true,
+        },
+      },
     },
     JITSI_JWT_SECRET
   );
