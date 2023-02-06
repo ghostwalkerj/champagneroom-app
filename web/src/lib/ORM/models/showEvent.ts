@@ -70,7 +70,7 @@ const ShowEventSchemaLiteral = {
       ref: 'tickets',
       maxLength: 50,
     },
-    ticket_info: {
+    ticketInfo: {
       type: 'object',
       properties: {
         name: { type: 'string' },

@@ -128,8 +128,8 @@ export const actions: import('./$types').Actions = {
       showService.send({ type: 'TICKET SOLD', transaction, ticket });
       show.createShowEvent({
         type: ShowEventType.TICKET_SOLD,
-        ticket: ticket,
-        transaction: transaction,
+        ticket,
+        transaction,
       });
     }
 
@@ -188,8 +188,8 @@ export const actions: import('./$types').Actions = {
         });
         show.createShowEvent({
           type: ShowEventType.TICKET_REFUNDED,
-          ticket: ticket,
-          transaction: transaction,
+          ticket,
+          transaction,
         });
       }
 

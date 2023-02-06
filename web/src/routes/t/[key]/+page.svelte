@@ -19,6 +19,7 @@
   import type { Subscription } from 'xstate';
   import type { PageData } from './$types';
   import TalentWallet from './TalentWallet.svelte';
+  import { showEventSchema, ShowEventType } from '$lib/ORM/models/showEvent';
 
   export let form: import('./$types').ActionData;
   export let data: PageData;
@@ -57,7 +58,7 @@
   $: soldOut = false;
   $: canStartShow = false;
   $: statusText = 'No Current Show';
-  $: eventText = 'No Event';
+  $: eventText = 'No Events';
 
   const useShowState = (
     show: ShowDocument,
@@ -162,20 +163,19 @@
                     .sort({ createdAt: 'desc' })
                     .$.subscribe(async event => {
                       if (event) {
-                        console.log('event: ', event);
                         switch (event.type) {
-                          case 'TICKET SOLD':
+                          case ShowEventType.TICKET_SOLD:
                             eventText =
-                              event.ticket_info?.name + ' bought a ticket!';
+                              event.ticketInfo?.name + ' bought a ticket!';
                             break;
 
-                          case 'TICKET RESERVED':
+                          case ShowEventType.TICKET_RESERVED:
                             eventText =
-                              event.ticket_info?.name + ' reserved a ticket!';
+                              event.ticketInfo?.name + ' reserved a ticket!';
                             break;
 
-                          case 'TICKET CANCELLED':
-                            eventText = event.ticket_info?.name + ' cancelled';
+                          case ShowEventType.TICKET_CANCELLED:
+                            eventText = event.ticketInfo?.name + ' cancelled';
                             break;
 
                           default:
@@ -243,27 +243,25 @@
                     </div>
                   </div>
                 </div>
-                {#if eventText !== ''}
-                  <div class="grow">
-                    <div class="alert alert-info shadow-lg p-3">
-                      <div>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          class="stroke-current flex-shrink-0 w-6 h-6"
-                          ><path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                          /></svg
-                        >
-                        <span>{eventText}</span>
-                      </div>
+                <div class="grow">
+                  <div class="alert alert-info shadow-lg p-3">
+                    <div>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        class="stroke-current flex-shrink-0 w-6 h-6"
+                        ><path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        /></svg
+                      >
+                      <span>{eventText}</span>
                     </div>
                   </div>
-                {/if}
+                </div>
                 {#if canStartShow}
                   <form
                     method="post"

@@ -134,12 +134,12 @@ export const actions: import('./$types').Actions = {
       pin,
     });
 
+    showService.send('TICKET RESERVED');
+
     show.createShowEvent({
       type: ShowEventType.TICKET_RESERVED,
-      ticket: ticket,
+      ticket,
     });
-
-    showService.send('TICKET RESERVED');
 
     const hash = createPinHash(ticket._id, pin);
     cookies.set('pin', hash, { path: '/' });
