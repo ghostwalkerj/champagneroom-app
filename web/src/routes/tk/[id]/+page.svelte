@@ -4,7 +4,7 @@
   import { page } from '$app/stores';
 
   import { ticketDB } from '$lib/ORM/dbs/ticketDB';
-  import type { ShowDocument } from '$lib/ORM/models/show';
+  import { type ShowDocument, ShowStatus } from '$lib/ORM/models/show';
   import { TicketStatus, type TicketDocument } from '$lib/ORM/models/ticket';
 
   import { onMount } from 'svelte';
@@ -29,6 +29,7 @@
     ticket &&
     ticket.ticketState.totalPaid - ticket.ticketState.refundedAmount >=
       ticket.ticketState.price;
+  $: showStarted = false;
 
   const onSubmit = () => {
     return async ({ result }) => {
@@ -53,6 +54,12 @@
           _ticket.ticketState.price;
       });
     }
+    if (show) {
+      show.$.subscribe(_show => {
+        show = _show;
+        showStarted = _show.showState.status === ShowStatus.STARTED;
+      });
+    }
   });
 </script>
 
@@ -73,7 +80,7 @@
             </form>
           </div>
         {/if}
-        {#if canGotoShow}
+        {#if canGotoShow && showStarted}
           <div class="p-4">
             <div class="w-full flex justify-center">
               <button
@@ -81,6 +88,14 @@
                 on:click={() => {
                   goto(showPath);
                 }}>Go to the Show</button
+              >
+            </div>
+          </div>
+        {:else if canGotoShow && !showStarted}
+          <div class="p-4">
+            <div class="w-full flex justify-center">
+              <button class="btn" disabled={true}
+                >Waiting for Show to Start</button
               >
             </div>
           </div>

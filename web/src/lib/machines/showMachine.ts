@@ -50,10 +50,6 @@ export const createShowMachine = ({
               ticket: TicketDocType;
             }
           | {
-              type: 'SHOW EVENT RECEIVED';
-              showEvent: ShowEventDocType;
-            }
-          | {
               type: 'TICKET RESERVED';
               ticket?: TicketDocType;
             }
@@ -68,10 +64,14 @@ export const createShowMachine = ({
           | {
               type: 'TICKET SOLD';
               transaction: TransactionDocType;
-              ticket?: TicketDocType;
+              ticket: TicketDocType;
             }
-          | { type: 'START SHOW' }
-          | { type: 'END SHOW' },
+          | {
+              type: 'START SHOW';
+            }
+          | {
+              type: 'END SHOW';
+            },
       },
       predictableActionArguments: true,
       id: 'showMachine',
@@ -162,7 +162,7 @@ export const createShowMachine = ({
             },
             'START SHOW': {
               target: 'started',
-              actions: ['saveShowState'],
+              actions: ['startShow', 'saveShowState'],
             },
             'REFUND SENT': [
               {
@@ -180,7 +180,7 @@ export const createShowMachine = ({
           on: {
             'START SHOW': {
               target: 'started',
-              actions: ['saveShowState'],
+              actions: ['startShow', 'saveShowState'],
             },
             'TICKET RESERVATION TIMEOUT': [
               {
@@ -230,9 +230,12 @@ export const createShowMachine = ({
         },
         started: {
           on: {
+            'START SHOW': {
+              actions: ['startShow', 'saveShowState'],
+            },
             'END SHOW': {
               target: 'ended',
-              actions: ['saveShowState'],
+              actions: ['endShow', 'saveShowState'],
             },
           },
         },
@@ -285,6 +288,39 @@ export const createShowMachine = ({
               ...context.showState,
               updatedAt: new Date().getTime(),
               status: ShowStatus.CANCELLED,
+            },
+          };
+        }),
+        startShow: assign((context, event) => {
+          return {
+            showState: {
+              ...context.showState,
+              updatedAt: new Date().getTime(),
+              status: ShowStatus.STARTED,
+              // events: [
+              //   ...(context.showState.events || []),
+              //   event.showEvent._id,
+              // ],
+              run: {
+                startedAt: new Date().getTime(),
+              },
+            },
+          };
+        }),
+        endShow: assign((context, event) => {
+          return {
+            showState: {
+              ...context.showState,
+              updatedAt: new Date().getTime(),
+              status: ShowStatus.STARTED,
+              // events: [
+              //   ...(context.showState.events || []),
+              //   event.showEvent._id,
+              // ],
+              run: {
+                ...context.showState.run,
+                startedAt: new Date().getTime(),
+              },
             },
           };
         }),

@@ -16,6 +16,9 @@ import {
   type TicketDocType,
   type TicketDocument,
 } from './ticket';
+import type { ShowEventDocument, ShowEventType } from './showEvent';
+import { ShowEventString } from './showEvent';
+import type { TransactionDocType, TransactionDocument } from './transaction';
 
 export enum ShowStatus {
   CREATED,
@@ -44,6 +47,11 @@ type ShowDocMethods = {
     name: string;
     pin: string;
   }) => Promise<TicketDocument>;
+  createShowEvent: (showEventProps: {
+    type: ShowEventType;
+    ticket?: TicketDocType;
+    transaction?: TransactionDocType;
+  }) => Promise<ShowEventDocument>;
 };
 export const showDocMethods: ShowDocMethods = {
   saveShowStateCallback: async function (
@@ -83,6 +91,40 @@ export const showDocMethods: ShowDocMethods = {
     } as TicketDocType;
     const ticket = await db.tickets.insert(_ticket);
     return ticket;
+  },
+  createShowEvent: async function (
+    this: ShowDocument,
+    showEventProps: {
+      type: ShowEventType;
+      ticket?: TicketDocType;
+      transaction?: TransactionDocType;
+    }
+  ) {
+    const db = this.collection.database;
+    let ticketId: string | undefined = undefined;
+    let name: string | undefined = undefined;
+    const transactionId = showEventProps.transaction?._id || undefined;
+    if (showEventProps.ticket) {
+      ticketId = showEventProps.ticket._id;
+      name = showEventProps.ticket.ticketState.reservation.name;
+    }
+    const _showEvent = {
+      _id: `showEvent:se-${nanoid()}`,
+      createdAt: new Date().getTime(),
+      updatedAt: new Date().getTime(),
+      entityType: ShowEventString,
+      type: showEventProps.type,
+      show: this._id,
+      talent: this.talent,
+      agent: this.agent,
+      ticket: ticketId,
+      ticketInfo: {
+        name,
+      },
+      transaction: transactionId,
+    };
+    const showEvent = await db.showEvents.insert(_showEvent);
+    return showEvent;
   },
 };
 
@@ -161,9 +203,22 @@ const showSchemaLiteral = {
           },
           required: ['endedAt'],
         },
+        run: {
+          type: 'object',
+          properties: {
+            startedAt: { type: 'integer' },
+            endedAt: { type: 'integer' },
+          },
+          required: ['startedAt'],
+        },
         transactions: {
           type: 'array',
           ref: 'transactions',
+          items: { type: 'string' },
+        },
+        events: {
+          type: 'array',
+          ref: 'showEvents',
           items: { type: 'string' },
         },
       },

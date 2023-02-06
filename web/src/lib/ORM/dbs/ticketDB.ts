@@ -1,7 +1,5 @@
 import {
   PUBLIC_RXDB_PASSWORD,
-  PUBLIC_SHOW_DB_ENDPOINT,
-  PUBLIC_TALENT_DB_ENDPOINT,
   PUBLIC_TICKET_DB_ENDPOINT,
 } from '$env/static/public';
 import type { DatabaseOptions } from '$lib/ORM/rxdb';
@@ -13,23 +11,29 @@ import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
 import { PouchDB, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
 
 import {
+  showDocMethods,
   showSchema,
   type ShowCollection,
-  showDocMethods,
 } from '$lib/ORM/models/show';
 import {
+  ticketDocMethods,
   ticketSchema,
   type TicketCollection,
   type TicketDocument,
-  ticketDocMethods,
 } from '$lib/ORM/models/ticket';
-import { transactionSchema } from '../models/transaction';
+import {
+  type TransactionCollection,
+  transactionSchema,
+} from '../models/transaction';
+import { type ShowEventCollection, showEventSchema } from '../models/showEvent';
 
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 100;
 type PublicCollections = {
   tickets: TicketCollection;
   shows: ShowCollection;
+  showEvents: ShowEventCollection;
+  transactions: TransactionCollection;
 };
 
 export type TicketDBType = RxDatabase<PublicCollections>;
@@ -77,6 +81,9 @@ const create = async (
       schema: showSchema,
       methods: showDocMethods,
     },
+    showEvents: {
+      schema: showEventSchema,
+    },
     transactions: {
       schema: transactionSchema,
     },
@@ -106,6 +113,10 @@ const create = async (
   const _thisTicket = (await ticketQuery.exec()) as TicketDocument;
   if (_thisTicket) {
     const showQuery = _db.shows.findOne(_thisTicket.show);
+    const showEventQuery = _db.showEvents
+      .find()
+      .where('ticket')
+      .eq(_thisTicket._id);
 
     repState = _db.shows.syncCouchDB({
       remote: remoteDB,
@@ -135,6 +146,16 @@ const create = async (
         live: true,
       },
       query: showQuery,
+    });
+
+    _db.showEvents.syncCouchDB({
+      remote: remoteDB,
+      waitForLeadership: false,
+      options: {
+        retry: true,
+        live: true,
+      },
+      query: showEventQuery,
     });
   }
   _ticketDB.set(ticketId, _db);

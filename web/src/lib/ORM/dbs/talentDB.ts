@@ -18,6 +18,10 @@ import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
 import { PouchDB, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
+import type { ShowEventCollection } from '../models/showEvent';
+import { showEventSchema } from '../models/showEvent';
+import type { TicketCollection } from '../models/ticket';
+import { ticketSchema } from '../models/ticket';
 
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 100;
@@ -25,6 +29,8 @@ EventEmitter.defaultMaxListeners = 100;
 type TalentCollections = {
   talents: TalentCollection;
   shows: ShowCollection;
+  showEvents: ShowEventCollection;
+  tickets: TicketCollection;
 };
 
 export type TalentDBType = RxDatabase<TalentCollections>;
@@ -73,6 +79,12 @@ const create = async (
       schema: showSchema,
       methods: showDocMethods,
     },
+    showEvents: {
+      schema: showEventSchema,
+    },
+    tickets: {
+      schema: ticketSchema,
+    },
   });
 
   // Sync if there is a remote endpoint
@@ -85,6 +97,7 @@ const create = async (
       return PouchDB.fetch(url, opts);
     },
   });
+
   const talentQuery = _db.talents.findOne().where('key').eq(key);
 
   let repState = _db.talents.syncCouchDB({
@@ -100,8 +113,16 @@ const create = async (
   const _currentTalent = await talentQuery.exec();
 
   if (_currentTalent) {
-    const showQuery = _db.shows.find().where('talent').eq(_currentTalent?._id);
-
+    const currentShowQuery = _db.shows.findOne(_currentTalent.currentShow);
+    const ticketQuery = _db.tickets
+      .find()
+      .where('show')
+      .eq(_currentTalent?.currentShow);
+    const showQuery = _db.shows.find().where('talent').eq(_currentTalent._id);
+    const showEventQuery = _db.showEvents
+      .find()
+      .where('talent')
+      .eq(_currentTalent._id);
     // Wait for shows
     repState = _db.shows.syncCouchDB({
       remote: remoteDB,
@@ -109,7 +130,7 @@ const create = async (
       options: {
         retry: true,
       },
-      query: showQuery,
+      query: currentShowQuery,
     });
     await repState.awaitInitialReplication();
 
@@ -134,8 +155,30 @@ const create = async (
       },
       query: talentQuery,
     });
-  }
 
-  _talentDB.set(key, _db);
-  return _db;
+    // Live sync this Talent's showEvents
+    _db.showEvents.syncCouchDB({
+      remote: remoteDB,
+      waitForLeadership: false,
+      options: {
+        retry: true,
+        live: true,
+      },
+      query: showEventQuery,
+    });
+
+    // Live sync this Talent's tickets
+    _db.tickets.syncCouchDB({
+      remote: remoteDB,
+      waitForLeadership: false,
+      options: {
+        retry: true,
+        live: true,
+      },
+      query: ticketQuery,
+    });
+
+    _talentDB.set(key, _db);
+    return _db;
+  }
 };

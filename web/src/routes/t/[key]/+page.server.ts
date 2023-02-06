@@ -4,6 +4,7 @@ import {
   JWT_MASTER_DB_USER,
   PRIVATE_MASTER_DB_ENDPOINT,
 } from '$env/static/private';
+import { PUBLIC_TALENT_PATH } from '$env/static/public';
 import { talentDB } from '$lib/ORM/dbs/talentDB';
 import type { ShowDocument } from '$lib/ORM/models/show';
 import { ShowCancelReason } from '$lib/ORM/models/show';
@@ -13,8 +14,9 @@ import { StorageType } from '$lib/ORM/rxdb';
 import { createShowMachineService } from '$lib/machines/showMachine';
 import { createTicketMachineService } from '$lib/machines/ticketMachine';
 import { ActorType } from '$lib/util/constants';
-import { error, fail } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
+import urlJoin from 'url-join';
 import type { Actions } from './$types';
 
 const getTalent = async (key: string) => {
@@ -78,7 +80,6 @@ export const actions: Actions = {
     }
     return { success: true };
   },
-
   create_show: async ({ params, request }) => {
     const key = params.key;
     if (key === null) {
@@ -199,6 +200,39 @@ export const actions: Actions = {
           }
         }
       }
+    }
+    return { success: true };
+  },
+  start_show: async ({ params }) => {
+    const key = params.key;
+    const redirectUrl = urlJoin(PUBLIC_TALENT_PATH, key, 'show');
+
+    if (key === null) {
+      throw error(404, 'Key not found');
+    }
+
+    const talent = await getTalent(key);
+    if (!talent) {
+      throw error(404, 'Talent not found');
+    }
+    const startShow = (await talent.populate('currentShow')) as ShowDocument;
+    if (!startShow) {
+      throw error(404, 'Show not found');
+    }
+
+    const showService = createShowMachineService({
+      showState: startShow.showState,
+      saveShowStateCallback: startShow.saveShowStateCallback,
+    });
+
+    const showState = showService.getSnapshot();
+
+    if (showState.can({ type: 'START SHOW' })) {
+      // Cancel the show and prevent new ticket sales, etc
+      showService.send({
+        type: 'START SHOW',
+      });
+      throw redirect(303, redirectUrl);
     }
     return { success: true };
   },

@@ -14,5 +14,13 @@
         "workspaceRoot": "/Users/joseph/Dev/pcall/web",
         "workspacePath": "src/routes",
         "id": "IZ4fYnFRrxXihpTw"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/web/.env",
+        "parent_id": null,
+        "workspaceRoot": "/Users/joseph/Dev/pcall/web",
+        "workspacePath": ".env",
+        "id": "vUzM1FflEYNKGQBJ"
     }
 ]

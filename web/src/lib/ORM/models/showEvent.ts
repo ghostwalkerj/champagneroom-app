@@ -14,7 +14,11 @@ export enum ShowEventType {
   JOINED,
   LEFT,
   ENDED,
-  REFUNDED,
+  TICKET_RESERVED,
+  TICKET_SOLD,
+  TICKET_REFUNDED,
+  TICKET_CANCELLED,
+  CANCELLATION_REQUESTED,
   CANCELLED,
 }
 
@@ -66,8 +70,20 @@ const ShowEventSchemaLiteral = {
       ref: 'tickets',
       maxLength: 50,
     },
+    ticket_info: {
+      type: 'object',
+      properties: {
+        name: { type: 'string' },
+      },
+    },
+    transaction: {
+      type: 'string',
+      ref: 'transactions',
+      maxLength: 50,
+    },
   },
   required: ['_id', 'show', 'createdAt', 'type', 'talent', 'agent'],
+  indexes: ['show', 'talent', 'agent', 'ticket', 'createdAt'],
 } as const;
 
 type ShowEventRef = {

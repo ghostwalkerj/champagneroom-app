@@ -15,9 +15,7 @@
   import { onMount } from 'svelte';
   import StarRating from 'svelte-star-rating';
 
-  import { goto } from '$app/navigation';
   import ShowDetail from '$lib/components/ShowDetail.svelte';
-  import urlJoin from 'url-join';
   import type { Subscription } from 'xstate';
   import type { PageData } from './$types';
   import TalentWallet from './TalentWallet.svelte';
@@ -35,8 +33,6 @@
   let talent: TalentDocument;
   let showMachineService: ShowMachineServiceType;
   let showSub: Subscription;
-
-  const showPath = urlJoin($page.url.href, 'show');
 
   let showMachineState =
     currentShow &&
@@ -61,6 +57,7 @@
   $: soldOut = false;
   $: canStartShow = false;
   $: statusText = 'No Current Show';
+  $: eventText = 'No Event';
 
   const useShowState = (
     show: ShowDocument,
@@ -83,6 +80,9 @@
             cancel: undefined,
           });
           canCreateShow = state.done ?? true;
+          canStartShow = state.can({
+            type: 'START SHOW',
+          });
         }
       }
     });
@@ -123,10 +123,6 @@
         soldOut =
           _showState.ticketsSold - _showState.ticketsRefunded ===
           show.maxNumTickets;
-        canStartShow =
-          _showState.ticketsSold > 0 &&
-          (_showState.status === ShowStatus.BOX_OFFICE_CLOSED ||
-            _showState.status === ShowStatus.BOX_OFFICE_OPEN);
       });
   };
 
@@ -142,7 +138,8 @@
   };
 
   onMount(async () => {
-    talentDB(key, token).then((db: TalentDBType) => {
+    talentDB(key, token).then((db: TalentDBType | undefined) => {
+      if (!db) return;
       db.talents
         .findOne(talentObj._id)
         .exec()
@@ -157,7 +154,37 @@
                 currentShow = await db.shows.findOne(showId).exec();
                 if (currentShow) {
                   useShow(currentShow);
+
+                  db.showEvents
+                    .findOne()
+                    .where('show')
+                    .eq(currentShow._id)
+                    .sort({ createdAt: 'desc' })
+                    .$.subscribe(async event => {
+                      if (event) {
+                        console.log('event: ', event);
+                        switch (event.type) {
+                          case 'TICKET SOLD':
+                            eventText =
+                              event.ticket_info?.name + ' bought a ticket!';
+                            break;
+
+                          case 'TICKET RESERVED':
+                            eventText =
+                              event.ticket_info?.name + ' reserved a ticket!';
+                            break;
+
+                          case 'TICKET CANCELLED':
+                            eventText = event.ticket_info?.name + ' cancelled';
+                            break;
+
+                          default:
+                        }
+                      }
+                    });
                 }
+              } else {
+                currentShow = null;
               }
             });
           }
@@ -216,13 +243,35 @@
                     </div>
                   </div>
                 </div>
+                {#if eventText !== ''}
+                  <div class="grow">
+                    <div class="alert alert-info shadow-lg p-3">
+                      <div>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          class="stroke-current flex-shrink-0 w-6 h-6"
+                          ><path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                          /></svg
+                        >
+                        <span>{eventText}</span>
+                      </div>
+                    </div>
+                  </div>
+                {/if}
                 {#if canStartShow}
-                  <button
-                    class="btn"
-                    on:click={() => {
-                      goto(showPath);
-                    }}>Start Show</button
+                  <form
+                    method="post"
+                    action="?/start_show"
+                    use:enhance={onSubmit}
                   >
+                    <button class="btn" type="submit">Start Show</button>
+                  </form>
                 {/if}
               </div>
             </div>

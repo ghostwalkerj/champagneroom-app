@@ -32,7 +32,7 @@
       roomName: currentShow?.roomId,
       jwt: jitsiToken,
       width: '100%',
-      height: '99%',
+      height: '100%',
       parentNode: videoCallElement,
       userInfo: {
         displayName: talentObj.name,
@@ -52,12 +52,13 @@
     api.executeCommand('subject', currentShow?.name);
     api.addListener('participantJoined', participantJoined);
     api.addListener('readyToClose', () => {
-      goto(returnUrl);
+      //goto(returnUrl);
     });
   });
 </script>
 
 <div
-  bind:this={videoCallElement}
-  class="w-screen  h-full fixed top-0 left-0 right-0"
-/>
+  class="rounded-xl h-[calc(100vh-12px)] w-[calc(100vw-8px)] fixed top-0.5 m-1 overflow-hidden"
+>
+  <div bind:this={videoCallElement} class="h-full" />
+</div>

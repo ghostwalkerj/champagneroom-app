@@ -14,6 +14,7 @@ import {
   PUBLIC_TICKET_PATH,
 } from '$env/static/public';
 import { ticketDB } from '$lib/ORM/dbs/ticketDB';
+import { ShowStatus } from '$lib/ORM/models/show';
 import type { TicketDocType, TicketDocument } from '$lib/ORM/models/ticket';
 import { StorageType } from '$lib/ORM/rxdb';
 import { verifyPin } from '$lib/util/pin';
@@ -70,10 +71,11 @@ export const load: import('./$types').PageServerLoad = async ({
 }) => {
   const ticketId = params.id;
   const pinHash = cookies.get('pin');
-  const redirectUrl = urlJoin(PUBLIC_TICKET_PATH, ticketId, PUBLIC_PIN_PATH);
+  const ticketUrl = urlJoin(PUBLIC_TICKET_PATH, ticketId);
+  const pinUrl = urlJoin(ticketUrl, PUBLIC_PIN_PATH);
 
   if (!pinHash) {
-    throw redirect(303, redirectUrl);
+    throw redirect(303, pinUrl);
   }
   if (ticketId === null) {
     throw error(404, 'Bad ticket id');
@@ -82,7 +84,10 @@ export const load: import('./$types').PageServerLoad = async ({
   const { ticket: _ticket, show: _show } = await getTicket(ticketId);
 
   if (!verifyPin(ticketId, _ticket.ticketState.reservation.pin, pinHash)) {
-    throw redirect(303, redirectUrl);
+    throw redirect(303, pinUrl);
+  }
+  if (_show.showState.status !== ShowStatus.STARTED) {
+    throw redirect(303, ticketUrl);
   }
 
   const ticket = _ticket.toJSON() as TicketDocType;

@@ -9,22 +9,25 @@ import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
 
 import {
+  showDocMethods,
   showSchema,
   type ShowCollection,
   type ShowDocument,
-  showDocMethods,
 } from '$lib/ORM/models/show';
 import { PouchDB, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
-import { ticketSchema } from '../models/ticket';
-import { transactionSchema } from '../models/transaction';
+import { ticketSchema, type TicketCollection } from '../models/ticket';
+import type { ShowEventCollection } from '../models/showEvent';
+import { showEventSchema } from '../models/showEvent';
 
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 100;
-type PublicCollections = {
+type ShowCollections = {
   shows: ShowCollection;
+  tickets: TicketCollection;
+  showEvents: ShowEventCollection;
 };
 
-export type ShowDBType = RxDatabase<PublicCollections>;
+export type ShowDBType = RxDatabase<ShowCollections>;
 const _showDB = new Map<string, ShowDBType>();
 export const showDB = async (
   showId: string,
@@ -67,11 +70,11 @@ const create = async (
       schema: showSchema,
       methods: showDocMethods,
     },
+    showEvents: {
+      schema: showEventSchema,
+    },
     tickets: {
       schema: ticketSchema,
-    },
-    transactions: {
-      schema: transactionSchema,
     },
   });
 

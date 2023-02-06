@@ -6,12 +6,14 @@ import {
   JWT_MASTER_DB_USER,
   PRIVATE_MASTER_DB_ENDPOINT,
 } from '$env/static/private';
-import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
+import { PUBLIC_JITSI_DOMAIN, PUBLIC_TALENT_PATH } from '$env/static/public';
 import { talentDB } from '$lib/ORM/dbs/talentDB';
 import type { ShowDocument } from '$lib/ORM/models/show';
+import { ShowStatus } from '$lib/ORM/models/show';
 import { StorageType } from '$lib/ORM/rxdb';
-import { error } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
+import urlJoin from 'url-join';
 
 const getTalent = async (key: string) => {
   const token = jwt.sign(
@@ -51,6 +53,10 @@ export const load: import('./$types').PageServerLoad = async ({ params }) => {
     throw error(404, 'Show not found');
   }
 
+  if (_currentShow.showState.status !== ShowStatus.STARTED) {
+    const url = urlJoin(PUBLIC_TALENT_PATH, key);
+    throw redirect(303, url);
+  }
   const jitsiToken = jwt.sign(
     {
       aud: 'jitsi',
