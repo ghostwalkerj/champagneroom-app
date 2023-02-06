@@ -20,6 +20,7 @@
 
   const showPath = urlJoin($page.url.href, 'show');
 
+  $: waiting4StateChange = false;
   $: needs2Pay =
     ticket &&
     ticket.ticketState.status === TicketStatus.RESERVED &&
@@ -31,9 +32,11 @@
       ticket.ticketState.price;
   $: showStarted = false;
 
-  const onSubmit = () => {
+  const onSubmit = ({}) => {
+    waiting4StateChange = true;
     return async ({ result }) => {
-      if (result.type === 'failure') {
+      if (result.type !== 'success') {
+        waiting4StateChange = false;
       }
       await applyAction(result);
     };
@@ -45,6 +48,8 @@
     ticket = await db.tickets.findOne(ticketId).exec();
     if (ticket) {
       ticket.$.subscribe(_ticket => {
+        waiting4StateChange = false;
+
         ticket = _ticket;
         needs2Pay =
           _ticket.ticketState.status === TicketStatus.RESERVED &&
@@ -75,7 +80,9 @@
           <div>
             <form method="post" action="?/buy_ticket" use:enhance={onSubmit}>
               <div class="w-full flex justify-center">
-                <button class="btn" type="submit">Send Payment</button>
+                <button class="btn" type="submit" disabled={waiting4StateChange}
+                  >Send Payment</button
+                >
               </div>
             </form>
           </div>
@@ -85,6 +92,7 @@
             <div class="w-full flex justify-center">
               <button
                 class="btn"
+                disabled={waiting4StateChange}
                 on:click={() => {
                   goto(showPath);
                 }}>Go to the Show</button

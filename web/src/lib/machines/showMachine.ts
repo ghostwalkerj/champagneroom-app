@@ -383,6 +383,7 @@ export const createShowMachine = ({
               ...state,
               updatedAt: new Date().getTime(),
               ticketsSold: state.ticketsSold + 1,
+              ticketsReserved: context.showState.ticketsReserved - 1,
               totalSales: state.totalSales + +event.transaction.value,
               transactions: state.transactions
                 ? [...state.transactions, event.transaction._id]

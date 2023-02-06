@@ -19,7 +19,7 @@
   import type { Subscription } from 'xstate';
   import type { PageData } from './$types';
   import TalentWallet from './TalentWallet.svelte';
-  import { showEventSchema, ShowEventType } from '$lib/ORM/models/showEvent';
+  import { ShowEventType } from '$lib/ORM/models/showEvent';
 
   export let form: import('./$types').ActionData;
   export let data: PageData;
@@ -81,9 +81,11 @@
             cancel: undefined,
           });
           canCreateShow = state.done ?? true;
-          canStartShow = state.can({
-            type: 'START SHOW',
-          });
+          canStartShow =
+            show.showState.ticketsSold > 0 &&
+            state.can({
+              type: 'START SHOW',
+            });
         }
       }
     });
@@ -93,7 +95,7 @@
     show
       .get$('showState')
       .subscribe((_showState: ShowDocument['showState']) => {
-        waiting4StateChange = false; // link changed, so can submit again
+        waiting4StateChange = false;
         useShowState(show, _showState);
         switch (_showState.status) {
           case ShowStatus.CANCELLED:
