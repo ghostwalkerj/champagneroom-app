@@ -20,6 +20,7 @@
   import type { PageData } from './$types';
   import TalentWallet from './TalentWallet.svelte';
   import { ShowEventType } from '$lib/ORM/models/showEvent';
+  import spacetime from 'spacetime';
 
   export let form: import('./$types').ActionData;
   export let data: PageData;
@@ -165,22 +166,25 @@
                     .sort({ createdAt: 'desc' })
                     .$.subscribe(async event => {
                       if (event) {
+                        eventText =
+                          spacetime(event.createdAt).format('nice-short') +
+                          ' ' +
+                          event.ticketInfo?.name;
                         switch (event.type) {
                           case ShowEventType.TICKET_SOLD:
-                            eventText =
-                              event.ticketInfo?.name + ' bought a ticket!';
+                            eventText += ' bought a ticket!';
                             break;
 
                           case ShowEventType.TICKET_RESERVED:
-                            eventText =
-                              event.ticketInfo?.name + ' reserved a ticket!';
+                            eventText += ' reserved a ticket!';
                             break;
 
                           case ShowEventType.TICKET_CANCELLED:
-                            eventText = event.ticketInfo?.name + ' cancelled';
+                            eventText += ' cancelled';
                             break;
 
                           default:
+                            eventText = 'No Events';
                         }
                       }
                     });

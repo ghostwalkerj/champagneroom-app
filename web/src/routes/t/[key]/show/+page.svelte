@@ -5,7 +5,7 @@
   import type { ShowDocument } from '$lib/ORM/models/show';
   import type { TalentDocType } from '$lib/ORM/models/talent';
   import { jitsiInterfaceConfigOverwrite } from '$lib/util/constants';
-  import { onMount } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
   import urlJoin from 'url-join';
   import type { PageData } from '../$types';
   export let data: PageData;
@@ -45,6 +45,10 @@
         },
       },
     };
+
+    onDestroy(() => {
+      console.log('the component is being destroyed');
+    });
 
     // @ts-ignore
     api = new JitsiMeetExternalAPI(PUBLIC_JITSI_DOMAIN, options);
