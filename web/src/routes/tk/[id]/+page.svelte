@@ -111,7 +111,9 @@
           <div class="p-4">
             <form method="post" action="?/cancel_ticket" use:enhance>
               <div class="w-full flex justify-center">
-                <button class="btn" type="submit">Cancel Ticket</button>
+                <button class="btn" type="submit" disabled={waiting4StateChange}
+                  >Cancel Ticket</button
+                >
               </div>
             </form>
           </div>

@@ -21,11 +21,11 @@ import {
   type TicketCollection,
   type TicketDocument,
 } from '$lib/ORM/models/ticket';
+import { showEventSchema, type ShowEventCollection } from '../models/showEvent';
 import {
-  type TransactionCollection,
   transactionSchema,
+  type TransactionCollection,
 } from '../models/transaction';
-import { type ShowEventCollection, showEventSchema } from '../models/showEvent';
 
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 100;

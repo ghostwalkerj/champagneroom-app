@@ -15,9 +15,9 @@ import {
   type ShowDocument,
 } from '$lib/ORM/models/show';
 import { PouchDB, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
-import { ticketSchema, type TicketCollection } from '../models/ticket';
 import type { ShowEventCollection } from '../models/showEvent';
 import { showEventSchema } from '../models/showEvent';
+import { ticketSchema, type TicketCollection } from '../models/ticket';
 
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 100;

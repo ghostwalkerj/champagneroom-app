@@ -9,6 +9,8 @@ import {
   type RxJsonSchema,
 } from 'rxdb';
 import type { AgentDocument } from './agent';
+import type { ShowEventDocument, ShowEventType } from './showEvent';
+import { ShowEventString } from './showEvent';
 import type { TalentDocument } from './talent';
 import {
   TicketStatus,
@@ -16,9 +18,7 @@ import {
   type TicketDocType,
   type TicketDocument,
 } from './ticket';
-import type { ShowEventDocument, ShowEventType } from './showEvent';
-import { ShowEventString } from './showEvent';
-import type { TransactionDocType, TransactionDocument } from './transaction';
+import type { TransactionDocType } from './transaction';
 
 export enum ShowStatus {
   CREATED,

@@ -10,7 +10,10 @@ import { PUBLIC_JITSI_DOMAIN, PUBLIC_TALENT_PATH } from '$env/static/public';
 import { talentDB } from '$lib/ORM/dbs/talentDB';
 import type { ShowDocument } from '$lib/ORM/models/show';
 import { ShowStatus } from '$lib/ORM/models/show';
+import { ShowEventType } from '$lib/ORM/models/showEvent';
 import { StorageType } from '$lib/ORM/rxdb';
+import { createShowMachineService } from '$lib/machines/showMachine';
+import type { Actions } from '@sveltejs/kit';
 import { error, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import urlJoin from 'url-join';
@@ -78,4 +81,43 @@ export const load: import('./$types').PageServerLoad = async ({ params }) => {
   return {
     jitsiToken,
   };
+};
+
+export const actions: Actions = {
+  end_show: async ({ params }) => {
+    console.log('end show');
+
+    const key = params.key;
+
+    if (key === undefined) {
+      throw error(404, 'Key not found');
+    }
+    const talent = await getTalent(key);
+    if (!talent) {
+      throw error(404, 'Talent not found');
+    }
+    const endShow = (await talent.populate('currentShow')) as ShowDocument;
+    if (!endShow) {
+      throw error(404, 'Show not found');
+    }
+
+    const showService = createShowMachineService({
+      showState: endShow.showState,
+      saveShowStateCallback: endShow.saveShowStateCallback,
+    });
+
+    const showState = showService.getSnapshot();
+
+    if (showState.can({ type: 'END SHOW' })) {
+      // Cancel the show and prevent new ticket sales, etc
+      showService.send({
+        type: 'END SHOW',
+      });
+      endShow.createShowEvent({
+        type: ShowEventType.ENDED,
+      });
+      //throw redirect(303, redirectUrl);
+    }
+    return { success: true };
+  },
 };

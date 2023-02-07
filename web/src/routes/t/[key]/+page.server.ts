@@ -8,6 +8,7 @@ import { PUBLIC_TALENT_PATH } from '$env/static/public';
 import { talentDB } from '$lib/ORM/dbs/talentDB';
 import type { ShowDocument } from '$lib/ORM/models/show';
 import { ShowCancelReason } from '$lib/ORM/models/show';
+import { ShowEventType } from '$lib/ORM/models/showEvent';
 import { TicketCancelReason, TicketStatus } from '$lib/ORM/models/ticket';
 import { TransactionReasonType } from '$lib/ORM/models/transaction';
 import { StorageType } from '$lib/ORM/rxdb';
@@ -152,6 +153,10 @@ export const actions: Actions = {
         cancel,
       });
 
+      cancelShow.createShowEvent({
+        type: ShowEventType.CANCELLATION_REQUESTED,
+      });
+
       // Loop through all tickets and refund them
       const db = talent.collection.database;
       const tickets = await db.tickets
@@ -197,6 +202,11 @@ export const actions: Actions = {
               transaction,
               ticket,
             });
+            cancelShow.createShowEvent({
+              type: ShowEventType.TICKET_REFUNDED,
+              ticket,
+              transaction,
+            });
           }
         }
       }
@@ -231,6 +241,9 @@ export const actions: Actions = {
       // Cancel the show and prevent new ticket sales, etc
       showService.send({
         type: 'START SHOW',
+      });
+      startShow.createShowEvent({
+        type: ShowEventType.STARTED,
       });
       throw redirect(303, redirectUrl);
     }

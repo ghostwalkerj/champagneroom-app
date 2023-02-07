@@ -93,6 +93,7 @@
 		"svelte-star-rating": "^2.0.0",
 		"svelte-table": "^0.5.0",
 		"svelte-web3": "^3.5.0",
+		"timeago.js": "^4.0.2",
 		"ua-parser-js": "^1.0.2",
 		"unique-names-generator": "^4.7.1",
 		"url-join": "^5.0.0",

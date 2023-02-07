@@ -16,11 +16,11 @@
   import StarRating from 'svelte-star-rating';
 
   import ShowDetail from '$lib/components/ShowDetail.svelte';
+  import { ShowEventType } from '$lib/ORM/models/showEvent';
+  import * as timeago from 'timeago.js';
   import type { Subscription } from 'xstate';
   import type { PageData } from './$types';
   import TalentWallet from './TalentWallet.svelte';
-  import { ShowEventType } from '$lib/ORM/models/showEvent';
-  import spacetime from 'spacetime';
 
   export let form: import('./$types').ActionData;
   export let data: PageData;
@@ -56,7 +56,6 @@
     currentShow.showState.status === ShowStatus.ENDED;
 
   $: waiting4StateChange = false;
-  $: soldOut = false;
   $: canStartShow = false;
   $: statusText = 'No Current Show';
   $: eventText = 'No Events';
@@ -123,10 +122,6 @@
 
           default:
         }
-
-        soldOut =
-          _showState.ticketsSold - _showState.ticketsRefunded ===
-          show.maxNumTickets;
       });
   };
 
@@ -153,7 +148,6 @@
             talent = _talent;
             talent.get$('currentShow').subscribe(async showId => {
               if (showId) {
-                soldOut = false;
                 canStartShow = false;
                 currentShow = await db.shows.findOne(showId).exec();
                 if (currentShow) {
@@ -167,7 +161,7 @@
                     .$.subscribe(async event => {
                       if (event) {
                         eventText =
-                          spacetime(event.createdAt).format('nice-short') +
+                          timeago.format(event.createdAt) +
                           ' ' +
                           event.ticketInfo?.name;
                         switch (event.type) {
@@ -191,6 +185,8 @@
                 }
               } else {
                 currentShow = null;
+                eventText = 'No Events';
+                statusText = 'No Current Show';
               }
             });
           }

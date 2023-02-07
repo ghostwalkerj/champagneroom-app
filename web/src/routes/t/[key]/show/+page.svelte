@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
+  import { beforeNavigate, goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { PUBLIC_JITSI_DOMAIN, PUBLIC_TALENT_PATH } from '$env/static/public';
   import type { ShowDocument } from '$lib/ORM/models/show';
@@ -27,6 +27,19 @@
     });
   };
 
+  onDestroy(() => {
+    endShow();
+  });
+
+  const endShow = () => {
+    let formData = new FormData();
+    fetch($page.url.href + '?/end_show', {
+      method: 'POST',
+      body: formData,
+    });
+    api?.executeCommand('endConference');
+  };
+
   onMount(() => {
     const options = {
       roomName: currentShow?.roomId,
@@ -46,17 +59,13 @@
       },
     };
 
-    onDestroy(() => {
-      console.log('the component is being destroyed');
-    });
-
     // @ts-ignore
     api = new JitsiMeetExternalAPI(PUBLIC_JITSI_DOMAIN, options);
     api.executeCommand('avatarUrl', talentObj.profileImageUrl);
     api.executeCommand('subject', currentShow?.name);
     api.addListener('participantJoined', participantJoined);
     api.addListener('readyToClose', () => {
-      //goto(returnUrl);
+      goto(returnUrl);
     });
   });
 </script>

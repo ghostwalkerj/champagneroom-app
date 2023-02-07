@@ -1,6 +1,5 @@
 import { PUBLIC_ESCROW_PERIOD, PUBLIC_GRACE_PERIOD } from '$env/static/public';
 import { ShowStatus, type ShowDocType } from '$lib/ORM/models/show';
-import type { ShowEventDocType } from '$lib/ORM/models/showEvent';
 import type { TicketDocType } from '$lib/ORM/models/ticket';
 import type { TransactionDocType } from '$lib/ORM/models/transaction';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
