@@ -2,6 +2,8 @@ import {
   JWT_EXPIRY,
   JWT_MASTER_DB_SECRET,
   JWT_MASTER_DB_USER,
+  JWT_TALENT_DB_SECRET,
+  JWT_TALENT_DB_USER,
   PRIVATE_MASTER_DB_ENDPOINT,
 } from '$env/static/private';
 import { PUBLIC_TALENT_PATH } from '$env/static/public';
@@ -18,7 +20,7 @@ import { ActorType } from '$lib/util/constants';
 import { error, fail, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import urlJoin from 'url-join';
-import type { Actions } from './$types';
+import type { Actions, PageServerLoad } from './$types';
 
 const getTalent = async (key: string) => {
   const token = jwt.sign(
@@ -42,6 +44,55 @@ const getTalent = async (key: string) => {
     throw error(404, 'Talent not found');
   }
   return talent;
+};
+
+const getShow = async (key: string) => {
+  const talent = await getTalent(key);
+
+  const show = (await talent.populate('currentShow')) as ShowDocument;
+  if (!show) {
+    throw error(404, 'Show not found');
+  }
+
+  const showService = createShowMachineService({
+    showState: show.showState,
+    saveShowStateCallback: show.saveShowStateCallback,
+  });
+
+  return { talent, show, showService };
+};
+
+export const load: PageServerLoad = async ({ params }) => {
+  const key = params.key;
+
+  if (key === null) {
+    throw error(404, 'Key not found');
+  }
+
+  const token = jwt.sign(
+    {
+      exp: Math.floor(Date.now() / 1000) + +JWT_EXPIRY,
+      sub: JWT_TALENT_DB_USER,
+    },
+    JWT_TALENT_DB_SECRET,
+    { keyid: JWT_TALENT_DB_USER }
+  );
+
+  const { talent: _talent, show } = await getShow(key);
+
+  const _completedShows = (await _talent.populate(
+    'stats.completedShows'
+  )) as ShowDocument[];
+  const talent = _talent.toJSON();
+  const currentShow = show ? show.toJSON() : undefined;
+  const completedShows = _completedShows.map(link => link.toJSON());
+
+  return {
+    token,
+    talent,
+    currentShow,
+    completedShows,
+  };
 };
 
 export const actions: Actions = {
@@ -123,20 +174,7 @@ export const actions: Actions = {
       throw error(404, 'Key not found');
     }
 
-    const talent = await getTalent(key);
-    if (!talent) {
-      throw error(404, 'Talent not found');
-    }
-    const cancelShow = (await talent.populate('currentShow')) as ShowDocument;
-    if (!cancelShow) {
-      throw error(404, 'Show not found');
-    }
-
-    const showService = createShowMachineService({
-      showState: cancelShow.showState,
-      saveShowStateCallback: cancelShow.saveShowStateCallback,
-    });
-
+    const { talent, show: cancelShow, showService } = await getShow(key);
     const showState = showService.getSnapshot();
 
     const cancel = {
@@ -210,42 +248,6 @@ export const actions: Actions = {
           }
         }
       }
-    }
-    return { success: true };
-  },
-  start_show: async ({ params }) => {
-    const key = params.key;
-    const redirectUrl = urlJoin(PUBLIC_TALENT_PATH, key, 'show');
-
-    if (key === null) {
-      throw error(404, 'Key not found');
-    }
-
-    const talent = await getTalent(key);
-    if (!talent) {
-      throw error(404, 'Talent not found');
-    }
-    const startShow = (await talent.populate('currentShow')) as ShowDocument;
-    if (!startShow) {
-      throw error(404, 'Show not found');
-    }
-
-    const showService = createShowMachineService({
-      showState: startShow.showState,
-      saveShowStateCallback: startShow.saveShowStateCallback,
-    });
-
-    const showState = showService.getSnapshot();
-
-    if (showState.can({ type: 'START SHOW' })) {
-      // Cancel the show and prevent new ticket sales, etc
-      showService.send({
-        type: 'START SHOW',
-      });
-      startShow.createShowEvent({
-        type: ShowEventType.STARTED,
-      });
-      throw redirect(303, redirectUrl);
     }
     return { success: true };
   },

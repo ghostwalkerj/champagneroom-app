@@ -290,36 +290,31 @@ export const createShowMachine = ({
             },
           };
         }),
-        startShow: assign((context, event) => {
+        startShow: assign(context => {
           return {
             showState: {
               ...context.showState,
               updatedAt: new Date().getTime(),
               status: ShowStatus.STARTED,
-              // events: [
-              //   ...(context.showState.events || []),
-              //   event.showEvent._id,
-              // ],
               run: {
                 startedAt: new Date().getTime(),
               },
             },
           };
         }),
-        endShow: assign((context, event) => {
+        endShow: assign(context => {
+          const run = context.showState.run
+            ? {
+                ...context.showState.run,
+                endedAt: new Date().getTime(),
+              }
+            : undefined;
           return {
             showState: {
               ...context.showState,
               updatedAt: new Date().getTime(),
-              status: ShowStatus.STARTED,
-              // events: [
-              //   ...(context.showState.events || []),
-              //   event.showEvent._id,
-              // ],
-              run: {
-                ...context.showState.run,
-                startedAt: new Date().getTime(),
-              },
+              status: ShowStatus.ENDED,
+              run,
             },
           };
         }),

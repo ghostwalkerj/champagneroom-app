@@ -21,6 +21,8 @@
   import type { Subscription } from 'xstate';
   import type { PageData } from './$types';
   import TalentWallet from './TalentWallet.svelte';
+  import { goto } from '$app/navigation';
+  import urlJoin from 'url-join';
 
   export let form: import('./$types').ActionData;
   export let data: PageData;
@@ -35,6 +37,7 @@
   let talent: TalentDocument;
   let showMachineService: ShowMachineServiceType;
   let showSub: Subscription;
+  const showPath = urlJoin($page.url.href, 'show');
 
   let showMachineState =
     currentShow &&
@@ -265,13 +268,11 @@
                   </div>
                 </div>
                 {#if canStartShow}
-                  <form
-                    method="post"
-                    action="?/start_show"
-                    use:enhance={onSubmit}
+                  <button
+                    class="btn"
+                    type="submit"
+                    on:click={() => goto(showPath)}>Start Show</button
                   >
-                    <button class="btn" type="submit">Start Show</button>
-                  </form>
                 {/if}
               </div>
             </div>
