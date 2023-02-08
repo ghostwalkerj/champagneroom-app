@@ -166,11 +166,6 @@ export const createShowMachine = ({
             },
             'REFUND SENT': [
               {
-                target: '#showMachine.cancelled',
-                cond: 'fullyRefunded',
-                actions: ['sendRefund', 'cancelShow', 'saveShowState'],
-              },
-              {
                 actions: ['sendRefund', 'saveShowState'],
               },
             ],
@@ -206,11 +201,6 @@ export const createShowMachine = ({
               actions: ['sellTicket', 'saveShowState'],
             },
             'REFUND SENT': [
-              {
-                target: '#showMachine.cancelled',
-                cond: 'fullyRefunded',
-                actions: ['sendRefund', 'cancelShow', 'saveShowState'],
-              },
               {
                 actions: ['sendRefund', 'saveShowState'],
               },

@@ -24,13 +24,20 @@
     showState: show.showState,
   });
 
+  const stateSnapshot = ticketMachineService.getSnapshot();
+
   $: waiting4StateChange = false;
-  $: needs2Pay = false;
-  $: canWatchShow = false;
-  $: canCancelTicket = false;
+  $: needs2Pay = stateSnapshot.matches('reserved.waiting4Payment');
+  $: canWatchShow = stateSnapshot.can('WATCH SHOW');
+  $: canCancelTicket = stateSnapshot.can({
+    type: 'REQUEST CANCELLATION',
+    cancel: undefined,
+  });
+  $: ticketDone = stateSnapshot.done;
 
   $: ticketMachineService.onTransition(state => {
     if (state.changed) {
+      ticketDone = state.done;
       needs2Pay = state.matches('reserved.waiting4Payment');
       canWatchShow = state.can('WATCH SHOW');
       canCancelTicket = state.can({
@@ -80,47 +87,53 @@
         <div class="pb-4 text-center">
           <TicketDetail {ticket} {show} />
         </div>
-        {#if needs2Pay}
-          <div>
-            <form method="post" action="?/buy_ticket" use:enhance={onSubmit}>
+        {#if !ticketDone}
+          {#if needs2Pay}
+            <div>
+              <form method="post" action="?/buy_ticket" use:enhance={onSubmit}>
+                <div class="w-full flex justify-center">
+                  <button
+                    class="btn"
+                    type="submit"
+                    disabled={waiting4StateChange}>Send Payment</button
+                  >
+                </div>
+              </form>
+            </div>
+          {:else if canWatchShow}
+            <div class="p-4">
               <div class="w-full flex justify-center">
-                <button class="btn" type="submit" disabled={waiting4StateChange}
-                  >Send Payment</button
+                <button
+                  class="btn"
+                  disabled={waiting4StateChange}
+                  on:click={() => {
+                    goto(showPath);
+                  }}>Go to the Show</button
                 >
               </div>
-            </form>
-          </div>
-        {:else if canWatchShow}
-          <div class="p-4">
-            <div class="w-full flex justify-center">
-              <button
-                class="btn"
-                disabled={waiting4StateChange}
-                on:click={() => {
-                  goto(showPath);
-                }}>Go to the Show</button
-              >
             </div>
-          </div>
-        {:else}
-          <div class="p-4">
-            <div class="w-full flex justify-center">
-              <button class="btn" disabled={true}
-                >Waiting for Show to Start</button
-              >
-            </div>
-          </div>
-        {/if}
-        {#if canCancelTicket}
-          <div class="p-4">
-            <form method="post" action="?/cancel_ticket" use:enhance>
+          {:else}
+            <div class="p-4">
               <div class="w-full flex justify-center">
-                <button class="btn" type="submit" disabled={waiting4StateChange}
-                  >Cancel Ticket</button
+                <button class="btn" disabled={true}
+                  >Waiting for Show to Start</button
                 >
               </div>
-            </form>
-          </div>
+            </div>
+          {/if}
+          {#if canCancelTicket}
+            <div class="p-4">
+              <form method="post" action="?/cancel_ticket" use:enhance>
+                <div class="w-full flex justify-center">
+                  <button
+                    class="btn"
+                    type="submit"
+                    disabled={waiting4StateChange}>Cancel Ticket</button
+                  >
+                </div>
+              </form>
+            </div>
+          {/if}
         {/if}
       {/key}
     </div>

@@ -53,7 +53,8 @@
   $: canCreateShow =
     !currentShow ||
     showMachineState?.done ||
-    currentShow.showState.status === ShowStatus.ENDED;
+    currentShow.showState.status === ShowStatus.ENDED ||
+    currentShow.showState.status === ShowStatus.CANCELLED;
 
   $: waiting4StateChange = false;
   $: canStartShow = false;
