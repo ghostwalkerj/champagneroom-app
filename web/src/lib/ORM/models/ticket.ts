@@ -24,6 +24,7 @@ export enum TicketStatus {
   CANCELLATION_REQUESTED = 'CANCELLATION REQUESTED',
   CANCELLED = 'CANCELLED',
   FINALIZED = 'FINALIZED',
+  REDEEMED = 'REDEEMED',
   IN_ESCROW = 'IN ESCROW',
   IN_DISPUTE = 'IN DISPUTE',
   REFUNDED = 'REFUNDED',
@@ -152,6 +153,13 @@ const ticketSchemaLiteral = {
             },
           },
           required: ['createdAt', 'canceller', 'cancelledInState', 'reason'],
+        },
+        redemption: {
+          type: 'object',
+          properties: {
+            createdAt: { type: 'integer' },
+          },
+          required: ['createdAt'],
         },
         reservation: {
           type: 'object',

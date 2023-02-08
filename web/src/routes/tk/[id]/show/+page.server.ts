@@ -14,10 +14,12 @@ import {
   PUBLIC_TICKET_PATH,
 } from '$env/static/public';
 import { ticketDB } from '$lib/ORM/dbs/ticketDB';
-import { ShowStatus } from '$lib/ORM/models/show';
+import { ShowEventType } from '$lib/ORM/models/showEvent';
 import type { TicketDocType, TicketDocument } from '$lib/ORM/models/ticket';
 import { StorageType } from '$lib/ORM/rxdb';
+import { createTicketMachineService } from '$lib/machines/ticketMachine';
 import { verifyPin } from '$lib/util/pin';
+import type { Actions } from '@sveltejs/kit';
 import { error, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import urlJoin from 'url-join';
@@ -86,9 +88,24 @@ export const load: import('./$types').PageServerLoad = async ({
   if (!verifyPin(ticketId, _ticket.ticketState.reservation.pin, pinHash)) {
     throw redirect(303, pinUrl);
   }
-  if (_show.showState.status !== ShowStatus.STARTED) {
+
+  // Check if can watch the show
+  const ticketService = createTicketMachineService({
+    ticketState: _ticket.ticketState,
+    saveTicketStateCallback: _ticket.saveTicketStateCallback,
+    showState: _show.showState,
+  });
+  const ticketMachineState = ticketService.getSnapshot();
+
+  if (!ticketMachineState.can('WATCH SHOW')) {
     throw redirect(303, ticketUrl);
   }
+
+  ticketService.send('WATCH SHOW');
+  _show.createShowEvent({
+    type: ShowEventType.JOINED,
+    ticket: _ticket,
+  });
 
   const ticket = _ticket.toJSON() as TicketDocType;
   const show = _show.toJSON();
@@ -116,4 +133,36 @@ export const load: import('./$types').PageServerLoad = async ({
     ticket,
     show,
   };
+};
+
+export const actions: Actions = {
+  leave_show: async ({ params, cookies }) => {
+    console.log('leave show');
+    const ticketId = params.id as string;
+    const pinHash = cookies.get('pin');
+
+    if (ticketId === null) {
+      throw error(404, 'Bad ticket id');
+    }
+    const { ticket, show } = await getTicket(ticketId);
+
+    if (
+      pinHash &&
+      verifyPin(ticketId, ticket.ticketState.reservation.pin, pinHash)
+    ) {
+      const ticketService = createTicketMachineService({
+        ticketState: ticket.ticketState,
+        saveTicketStateCallback: ticket.saveTicketStateCallback,
+        showState: show.showState,
+      });
+
+      ticketService.send('LEAVE SHOW');
+
+      show.createShowEvent({
+        type: ShowEventType.LEFT,
+        ticket,
+      });
+    }
+    return { success: true };
+  },
 };

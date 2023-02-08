@@ -203,14 +203,6 @@ const showSchemaLiteral = {
           },
           required: ['endedAt'],
         },
-        run: {
-          type: 'object',
-          properties: {
-            startedAt: { type: 'integer' },
-            endedAt: { type: 'integer' },
-          },
-          required: ['startedAt'],
-        },
         transactions: {
           type: 'array',
           ref: 'transactions',

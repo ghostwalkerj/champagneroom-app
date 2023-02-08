@@ -297,25 +297,17 @@ export const createShowMachine = ({
               ...context.showState,
               updatedAt: new Date().getTime(),
               status: ShowStatus.STARTED,
-              run: {
-                startedAt: new Date().getTime(),
-              },
+              startDate: new Date().getTime(),
             },
           };
         }),
         endShow: assign(context => {
-          const run = context.showState.run
-            ? {
-                ...context.showState.run,
-                endedAt: new Date().getTime(),
-              }
-            : undefined;
           return {
             showState: {
               ...context.showState,
               updatedAt: new Date().getTime(),
               status: ShowStatus.ENDED,
-              run,
+              endDate: new Date().getTime(),
             },
           };
         }),

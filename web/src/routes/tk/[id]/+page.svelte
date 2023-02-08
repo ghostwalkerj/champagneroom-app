@@ -32,7 +32,7 @@
   $: ticketMachineService.onTransition(state => {
     if (state.changed) {
       needs2Pay = state.matches('reserved.waiting4Payment');
-      canWatchShow = state.matches('reserved.waiting4Show');
+      canWatchShow = state.can('WATCH SHOW');
       canCancelTicket = state.can({
         type: 'REQUEST CANCELLATION',
         cancel: undefined,

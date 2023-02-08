@@ -8,15 +8,10 @@ import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 
 type TicketStateType = TicketDocType['ticketState'];
 type ShowStateType = ShowDocType['showState'];
-const ESCROW_PERIOD = +PUBLIC_ESCROW_PERIOD || 3600000;
 const PAYMENT_PERIOD = +PUBLIC_ESCROW_PERIOD || 3600000;
+const GRACE_PERIOD = +PUBLIC_ESCROW_PERIOD || 900000;
 
 export type TicketStateCallbackType = (state: TicketStateType) => void;
-
-export const escrowTimer = (endTime: number) => {
-  const timer = endTime + ESCROW_PERIOD - new Date().getTime();
-  return timer > 0 ? timer : 0;
-};
 
 export const paymentTimer = (timerStart: number) => {
   const timer = timerStart + PAYMENT_PERIOD - new Date().getTime();
@@ -32,7 +27,7 @@ export const createTicketMachine = ({
   showState: ShowStateType;
   saveTicketStateCallback?: TicketStateCallbackType;
 }) => {
-  /** @xstate-layout N4IgpgJg5mDOIC5QBsCWA7A1gWQIYGMALDMAOjSwAJkB7XCSAYgG0AGAXUVAAcbZUALqhrouIAB6IAjAA4ALKQCsU1gHYAnIpkA2AMyLVUuQBoQAT0QAmdQt26Vc1brkzLc9TMUBfL6Yo4CYnQyf2o6BggWKU4kEF5+IRExSQQpVQVlNU0dfUMTc0RPVlI3PQ1WRTs5RTkfPwwAohJyBrD6JmZLGJ4+QWFRWJTZDJUNLT0DI1MLVMsZUnVndVZPFxkpKWc6kH88JuCWqlp2yOZdbrjexIHQIfSlUeyJvOnCywWZXTVWFUtddUsUks212gWaoWOERYcgu8T6SUG0nkDyy41yUwKCG0lmKMnWeOU6kWLm0IIaeyCZAAruh8MhcKgALZMADCABkAIIASWwbFhV36yUQ7gUGwMejmFWszleCDkgNIMkWStY8tU2lYqrJWApzRpdIZzMiACUAKIARQAqqaAMoAFUoLI5ADkWaa2Zy7VyAPLOvliOHXIVymykMXq3SSxTS-IzNyqUhyFTrDXaDw6bSk3w7clgg4GpmQUgAdwZQnQUDkADEaRAMFBGGarbaHU7Xe7PT6-RwAwKEbdEIZ3nJ7Kp1dpKhtI7KVIpFInlnY0qqNZYs-UdXmyAWjSWy-Xq7X64wAAocgCa2FNzodZrdXIAaqaACL+2KBwWI1LredGaqKMo0yTbRZUURZSGxLQwKBVRAX0bVGkpUgdyLUs+grQ90DrCsWB7d8+xuCRCnUBM5xqJxdGxJw8VlJwFEsVRVU+P45DkVVdAQ3V83pQsIGQ3B0BZXBkGQUhggANzAAAnFkRGCfABCYJtrXtR0XTdD0OS9X03x6BJPwHVJ0nnSiNSMbRZFUZRdBnZx3ikNMvnKLQ7HUTit2Qnjd3wAShJEsSwEkmS5LABTWQ5D1HV9Z1TRZO0X10y59P7IiEEWXRExHH55WxTM0hnQwMrAyw3HkfQCQ47NQX2bcvKLHzBOE0SMAAcSkggwBPaThEiKtTRfAAhDkWQAaUoO9TUfBK8L0+FCJSbFZTXCylE1YDJk1SqN0Q5oUL4hq-Oa9A2o6rqpJ6xgnUilloti+LXxmpK5uDIxQxqP5tE8KyNnUEDMQchjSEo6Nlg1FcpG8KrcxqzzDXq3ymtIVr2vwTrupoSIrrZShny5G0budGK4um-lkvm6QXHeCypF+tIbE2VQZ0UTUFh+L44KcdVaihzcYb2-jGv85HTvRyJcZtE9LXiyguWdLkvS0knezJsQZjSLRFWsBjQf0ORtHyIYgKBmp5UXIEgXcvm6v2hGheOlG0fOjHGHEWABFwRTSFwAAzRSpIACigB3nzAekzAASkYaqkP5g7EeF1Gzp6xKPxSlJoyW5Z1EysDDEMVhIy2nNeZj62BcOy6Iux00nxvcbYsmp8HtJ56vw2PWSlUeQNjHbQx0Z-6aakBZ3tkAuiTTNyeZ27i4ZtwXkFwlug1iGYAFoAUTT4NVcap5Fp0whnkeZgZ0TYiUqVjLdLufy6aqJl4M1KcTSTLFkgzU1D1pmgTDYz5AmLoWCU9tpcVqrfKSYAACOVI4CKQgEJWkod6TXD3OhSsxowDe1rI2U0VZLTOmfPXe8TcU4EWDDiSw841yuEqCsCcfcbL-TXCZWcdhqZULXNfXaZdIEwLgZARBqMRIe36EvZWrdDKwSWjUYeqoxzyEMBZew3CDgYFNLAfAUkaDFkYH1Qaw0xoTSms3CRK9DLFQggxIE8oAL4ljFYGQsEwyaGqI4RYa4-iqLIOozR2jdHi0ltLWW8suSK1MfhFWX5LFURsVQz6wxM4eAgmBPQqpljuAnN4pG6ANFaJ0S7N2HsyA+z9v7OA+TiwhzDpHaOzRfGVLIVEixm9YluHifYparhih-D+ECRY2UbA+GzOgDGcAxB1IOBCcIkAzFPxSPKTOw91huOqJPCoMhsn6mtnMtOiBKIKD7gYH4ahDBKlYksxURgTYASJBs7J-M0LlkrDWLC9ZdnkwQIxBMeIz42BkKwIkrhaJUNICsDwjgwKsGsDoB5Zc47+QktJWS6B5LwI+cGKyCYRxpHHJOTYlgCqsQgn3MclEIZc2BNPMBsNeJ3ztidROosMVt2UO8LQ+d9ZZzmDIAqGtXAAnKBMPW3NQEeVjrbZALKpGAsTKOPF9gCWyjXrIYeetMxdxKgXMocKIHQNgW7QRAlhEoP6Gg55chMHYKwtK5+48FjuGsCRHlVCB5q3+NoUgY5qhavSHYMcuq6V8INfAoRyDREpVTp8mmY4SifSoV8HQAEnAzjSJ6yMVlso4pxKK4uM9wG8VtQtMCio8QWX+YCjwhLMRrwYsUViJEXA0xcP3VQDzjXINmZEyRz8AJeoYcm-WVl3BLXlMUOc2JKJKiVIxXNkyyDewwMJVAAAvLts1zGpXWMPbW0Yp16BgqO+wSgAIfWnSRLU1KPINP8UW-ZyJWK5CVBfRVf04zyHnI4IEibwVtqvTDDAz5UCwG4FSRSd6vmbw+i4JyNQvgOIQF8SiQMiQMWlJGdQmxvEQbXm+xAa99DZxHHMVVjlMOeGGV4IAA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QBcCWBjA1mZBZAhugBaoB2YAdGljgAQA2A9vhJAMQDaADALqKgAHRrFRpGpfiAAeiAEwBGLhVkBmACwqA7AFYANCACeiAGzHtFAJxcLW7QF87+6tjyES5KhhcNmrCJ3k+JBAhETEJYJkEeStldVt9IwQADnkKe0cQZxwCYjJKbOQfFnYOWSDBYVFUcUkozVlEuTU1Y0tZDKcvHLd8zxoiphL-DhUKkKrwurlFOI0dJuiLGIp5HQcugdz3Au7B31K1cdDq2si5LiVVeb1DOW1ZdI2sve2+wuK-Tm1jyZqI0BRB6LWSaeQqChqbSKNTyUzw4yaZ6FN4eD5DL4cYy-ML-aZLK7xBZ3BAKbRtCwdZGvXoeABOcDAdIAbpAKAB3fDVUhQNQABXwBgAtmBSMg2HyAIIATVwAFEAHIAFVoACU5QBhOUASQAanKACLcHGnAHSRDJUwUMzGDqLNSaCHaLgqeSyNQWT1eiydF5bWmUBmwJmsiAcrloHn8wUisUSmXy5VqzU6-VGwKSE5Tc7RS6aSxcW23JJaeTU-15emMllsznc3kC4Wi8XqgCKAFU5QBlFUayUKrUAGUHkqV2oA8grjZm-mdAYh5M7zApksSkvI4UoVMltDZ1pkUQGKEGQ7WI2QGzHm2w252e7Q+wO5cPRxOpxnglm8TntMk1OlFmSH1lELKkDxpStA2rUNw3raMmzjadP1nM0oktNobTtEk1FBdIXTdD1vU9X1D0g49oLPOCuyIRh2RvOUO27Xt+yHEcx0nJDKlxOdzWiJdlHkVdiwXFRrGUKFXTAzYXFRKDgxrMM60jXlqNo+jGPvR9WNfDiPy4018QafNFD3YTohUUSKFdckpL9GSjxPBTYOUtRVLogB1UcNQACVoLtvPHdzOImbjUIXfiVzXBcPWSCguEE-dpJ6MjHJghkAEcAFc4GQSANXwUh0DAeh6HwcJnIvNRVTAAAzTLSH8dUADF2wVA1ky1PVDWCr8eKiRcuGXBKzNkS5y3slKKLDDLstgXKIHywritK8qlMq6q6oa+iWrajrU26vSQoMnMN3dCggNAsybAhNRrFscbkp2cjIDAEV-EHOVJX1PyAqC3gZ1C-FRs0f9jDWYbFkEsH2hIiCnoZF63rYTylR8n7Ap6lCgcuWKEhJQSN0hWzSPhsBEfYfzAtoRUDW6-7kMBnNbRBXc0i4FpNGWBFTCRcCKyesg5VgdA6TUpq5UNAAhSUNQAaT2rqjXp-Ts3nBAVBsCgotJclzBw2H+b6QXhdFuiDW1Ls+XbJU5VobUFW1MdRzpk1Vd4jWIW10Fbq1+7nlIRhWHgYISfyAHjrVgBaYxFmjh7XDI9EDggcO3aiHDIeMZZVkSuzHr6VLIFT781YeNIRuSJ149k8j5Jgtao0bWNkGLvqTEXVYVFkVIsKSGLIUu6uHKmiqozc1uwoQckLAA-GHn-P9jCEofJrrtkZpyvKCqKkqypLo604XLhNDaC6i0AqEC1MlfSbX6awCyzeFu35a9-EUfeQ2+qU4ZiPeI3YCag-x43XIWJQqQbIGwmqTcmP8Vb736poEGkJtYxDWETKB+cPDoBfiVIuv9D7RGSDuRYlIrI3z6DVMg+B6CoAAF74PgW3BAYMIQWGAV7KE5cubc3hLzJKCcBakCFiLWiE8gaOmtHdL2xh1BawdDw7m-C86CKNqQA0qBYACEyrlcRP4LD5kRBDEkoI-yQlukWBwDggA */
   return createMachine(
     {
       context: {
@@ -69,6 +64,9 @@ export const createTicketMachine = ({
             }
           | {
               type: 'LEAVE SHOW';
+            }
+          | {
+              type: 'SHOW ENDED';
             },
       },
       predictableActionArguments: true,
@@ -79,7 +77,7 @@ export const createTicketMachine = ({
           always: [
             {
               target: 'reserved',
-              cond: 'ticketreserved',
+              cond: 'ticketReserved',
             },
             {
               target: 'cancelled',
@@ -88,6 +86,10 @@ export const createTicketMachine = ({
             {
               target: 'finalized',
               cond: 'ticketFinalized',
+            },
+            {
+              target: 'reedemed',
+              cond: 'ticketReedemed',
             },
             {
               target: '#ticketMachine.reserved.requestedCancellation',
@@ -157,17 +159,10 @@ export const createTicketMachine = ({
                   },
                 ],
                 'WATCH SHOW': {
-                  target: 'watchingShow',
+                  target: '#ticketMachine.reedemed',
                   cond: 'canWatchShow',
+                  actions: ['redeemTicket', 'saveTicketState'],
                 },
-              },
-            },
-            watchingShow: {
-              on: {
-                'LEAVE SHOW': {
-                  actions: ['saveTicketState'],
-                },
-                'WATCH SHOW': {},
               },
             },
             requestedCancellation: {
@@ -195,6 +190,16 @@ export const createTicketMachine = ({
             },
           },
         },
+        reedemed: {
+          on: {
+            'LEAVE SHOW': {},
+            'WATCH SHOW': { cond: 'canWatchShow' },
+            'SHOW ENDED': {
+              target: '#ticketMachine.inEscrow',
+              actions: ['enterEscrow', 'saveTicketState'],
+            },
+          },
+        },
         cancelled: {
           type: 'final',
         },
@@ -202,22 +207,10 @@ export const createTicketMachine = ({
           type: 'final',
         },
         inEscrow: {
-          // after: {
-          //   escrowDelay: {
-          //     target: '#ticketMachine.finalized',
-          //     actions: ['exitEscrow', 'finalizeTicket', 'saveTicketState'],
-          //     internal: false,
-          //   },
-          // },
           on: {
             'FEEDBACK RECEIVED': {
               target: 'finalized',
-              actions: [
-                'receiveFeedback',
-                'exitEscrow',
-                'finalizeTicket',
-                'saveTicketState',
-              ],
+              actions: ['receiveFeedback', 'finalizeTicket', 'saveTicketState'],
             },
             'DISPUTE INITIATED': {
               target: 'inDispute',
@@ -242,6 +235,20 @@ export const createTicketMachine = ({
               updatedAt: new Date().getTime(),
               status: TicketStatus.CANCELLATION_REQUESTED,
               cancel: event.cancel,
+            },
+          };
+        }),
+
+        redeemTicket: assign(context => {
+          if (context.ticketState.status === TicketStatus.REDEEMED) return {};
+          return {
+            ticketState: {
+              ...context.ticketState,
+              updatedAt: new Date().getTime(),
+              status: TicketStatus.REDEEMED,
+              redemption: {
+                createdAt: new Date().getTime(),
+              },
             },
           };
         }),
@@ -307,23 +314,17 @@ export const createTicketMachine = ({
           };
         }),
 
-        exitEscrow: assign(context => {
-          if (
-            context.ticketState.status === TicketStatus.IN_ESCROW &&
-            context.ticketState.escrow
-          ) {
-            return {
-              ticketState: {
-                ...context.ticketState,
-                updatedAt: new Date().getTime(),
-                escrow: {
-                  ...context.ticketState.escrow,
-                  endedAt: new Date().getTime(),
-                },
+        enterEscrow: assign(context => {
+          return {
+            ticketState: {
+              ...context.ticketState,
+              updatedAt: new Date().getTime(),
+              escrow: {
+                ...context.ticketState.escrow,
+                startedAt: new Date().getTime(),
               },
-            };
-          }
-          return {};
+            },
+          };
         }),
 
         finalizeTicket: assign(context => {
@@ -343,12 +344,6 @@ export const createTicketMachine = ({
           return {};
         }),
       },
-      delays: {
-        escrowDelay: () => {
-          const timer = 0;
-          return timer > 0 ? timer : 0;
-        },
-      },
       guards: {
         canCancel: context =>
           context.ticketState.totalPaid <= context.ticketState.refundedAmount &&
@@ -361,8 +356,10 @@ export const createTicketMachine = ({
           context.ticketState.status === TicketStatus.IN_DISPUTE,
         ticketInEscrow: context =>
           context.ticketState.status === TicketStatus.IN_ESCROW,
-        ticketreserved: context =>
+        ticketReserved: context =>
           context.ticketState.status === TicketStatus.RESERVED,
+        ticketReedemed: context =>
+          context.ticketState.status === TicketStatus.REDEEMED,
         ticketInCancellationRequested: context =>
           context.ticketState.status === TicketStatus.CANCELLATION_REQUESTED,
         fullyPaid: (context, event) => {
@@ -380,9 +377,12 @@ export const createTicketMachine = ({
             context.ticketState.totalPaid
           );
         },
-        canWatchShow: context =>
-          context.ticketState.totalPaid >= context.ticketState.price &&
-          context.showState.status === ShowStatus.STARTED,
+        canWatchShow: context => {
+          return (
+            context.ticketState.totalPaid >= context.ticketState.price &&
+            context.showState.status === ShowStatus.STARTED
+          );
+        },
       },
     }
   );

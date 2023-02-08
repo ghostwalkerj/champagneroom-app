@@ -62,10 +62,7 @@ export const load: import('./$types').PageServerLoad = async ({ params }) => {
   const { talent, show, showService } = await getShow(key);
   const showState = showService.getSnapshot();
 
-  if (
-    show.showState.ticketsSold === 0 ||
-    !showState.can({ type: 'START SHOW' })
-  ) {
+  if (!showState.can({ type: 'START SHOW' })) {
     const talentUrl = urlJoin(PUBLIC_TALENT_PATH, key);
     throw redirect(303, talentUrl);
   }
