@@ -117,6 +117,7 @@ export const actions: import('./$types').Actions = {
     });
     const ticketService = createTicketMachineService({
       ticketState: ticket.ticketState,
+      showState: show.showState,
       saveTicketStateCallback: ticket.saveTicketStateCallback,
     });
     ticketService.send({ type: 'PAYMENT RECEIVED', transaction });
@@ -145,6 +146,7 @@ export const actions: import('./$types').Actions = {
 
     const ticketService = createTicketMachineService({
       ticketState: ticket.ticketState,
+      showState: show.showState,
       saveTicketStateCallback: ticket.saveTicketStateCallback,
     });
     const state = ticketService.getSnapshot();

@@ -21,24 +21,24 @@ import {
 import type { TransactionDocType } from './transaction';
 
 export enum ShowStatus {
-  CREATED,
-  BOX_OFFICE_OPEN,
-  BOX_OFFICE_CLOSED,
-  CANCELLED,
-  FINALIZED,
-  IN_ESCROW,
-  IN_DISPUTE,
-  CANCELLATION_REQUESTED,
-  STARTED,
-  ENDED,
+  CREATED = 'CREATED',
+  BOX_OFFICE_OPEN = 'BOX OFFICE OPEN',
+  BOX_OFFICE_CLOSED = 'BOX OFFICE CLOSED',
+  CANCELLED = 'CANCELLED',
+  FINALIZED = 'FINALIZED',
+  IN_ESCROW = 'IN ESCROW',
+  IN_DISPUTE = 'IN DISPUTE',
+  CANCELLATION_REQUESTED = 'CANCELLATION REQUESTED',
+  STARTED = 'STARTED',
+  ENDED = 'ENDED',
 }
 
 export enum ShowCancelReason {
-  TALENT_NO_SHOW,
-  CUSTOMER_NO_SHOW,
-  SHOW_RESCHEDULED,
-  TALENT_CANCELLED,
-  CUSTOMER_CANCELLED,
+  TALENT_NO_SHOW = 'TALENT NO SHOW',
+  CUSTOMER_NO_SHOW = 'CUSTOMER NO SHOW',
+  SHOW_RESCHEDULED = 'SHOW RESCHEDULED',
+  TALENT_CANCELLED = 'TALENT CANCELLED',
+  CUSTOMER_CANCELLED = 'CUSTOMER CANCELLED',
 }
 
 type ShowDocMethods = {
@@ -214,11 +214,6 @@ const showSchemaLiteral = {
         transactions: {
           type: 'array',
           ref: 'transactions',
-          items: { type: 'string' },
-        },
-        events: {
-          type: 'array',
-          ref: 'showEvents',
           items: { type: 'string' },
         },
       },

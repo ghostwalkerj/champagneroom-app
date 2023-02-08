@@ -8,9 +8,9 @@ import {
 import type { TicketDocument } from './ticket';
 
 export enum TransactionReasonType {
-  TICKET_PAYMENT,
-  TICKET_REFUND,
-  DISPUTE_RESOLUTION,
+  TICKET_PAYMENT = 'TICKET PAYMENT',
+  TICKET_REFUND = 'TICKET REFUND',
+  DISPUTE_RESOLUTION = 'DISPUTE RESOLUTION',
 }
 
 const transactionSchemaLiteral = {

@@ -20,27 +20,27 @@ import {
 } from './transaction';
 
 export enum TicketStatus {
-  RESERVED,
-  CANCELLATION_REQUESTED,
-  CANCELLED,
-  FINALIZED,
-  IN_ESCROW,
-  IN_DISPUTE,
-  REFUNDED,
+  RESERVED = 'RESERVED',
+  CANCELLATION_REQUESTED = 'CANCELLATION REQUESTED',
+  CANCELLED = 'CANCELLED',
+  FINALIZED = 'FINALIZED',
+  IN_ESCROW = 'IN ESCROW',
+  IN_DISPUTE = 'IN DISPUTE',
+  REFUNDED = 'REFUNDED',
 }
 
 export enum TicketCancelReason {
-  SHOW_CANCELLED,
-  TALENT_NO_SHOW,
-  CUSTOMER_NO_SHOW,
-  SHOW_RESCHEDULED,
-  CUSTOMER_CANCELLED,
+  SHOW_CANCELLED = 'SHOW CANCELLED',
+  TALENT_NO_SHOW = 'TALENT NO SHOW',
+  CUSTOMER_NO_SHOW = 'CUSTOMER NO SHOW',
+  SHOW_RESCHEDULED = 'SHOW RESCHEDULED',
+  CUSTOMER_CANCELLED = 'CUSTOMER CANCELLED',
 }
 
 export enum DisputeDecision {
-  TALENT_WON,
-  CUSTOMER_WON,
-  SPLIT,
+  TALENT_WON = 'TALENT WON',
+  CUSTOMER_WON = 'CUSTOMER WON',
+  SPLIT = 'SPLIT',
 }
 
 type TicketDocMethods = {
@@ -215,11 +215,6 @@ const ticketSchemaLiteral = {
             createdAt: { type: 'integer' },
           },
           required: ['createdAt', 'rating'],
-        },
-        ticketEvents: {
-          type: 'array',
-          ref: 'ticketEvents',
-          items: { type: 'string' },
         },
         transactions: {
           type: 'array',
