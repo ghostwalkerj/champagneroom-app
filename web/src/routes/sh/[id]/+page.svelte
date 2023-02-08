@@ -6,7 +6,6 @@
   import { showDB, type ShowDBType } from '$lib/ORM/dbs/showDB';
   import { ShowStatus, type ShowDocument } from '$lib/ORM/models/show';
   import getProfileImage from '$lib/util/profilePhoto';
-  import { onMount } from 'svelte';
   import type { ActionData, PageData } from './$types';
 
   export let data: PageData;
@@ -30,11 +29,9 @@
     };
   };
 
-  onMount(async () => {
-    showDB(showId, token).then((db: ShowDBType) => {
-      db.shows.findOne(showId).$.subscribe(_show => {
-        show = _show as ShowDocument;
-      });
+  showDB(showId, token).then((db: ShowDBType) => {
+    db.shows.findOne(showId).$.subscribe(_show => {
+      show = _show as ShowDocument;
     });
   });
 </script>

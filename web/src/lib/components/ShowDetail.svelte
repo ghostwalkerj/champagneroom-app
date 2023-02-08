@@ -1,6 +1,6 @@
 <script lang="ts">
   import { PUBLIC_SHOW_PATH } from '$env/static/public';
-  import { ShowStatus, type ShowDocType } from '$lib/ORM/models/show';
+  import type { ShowDocType } from '$lib/ORM/models/show';
   import { currencyFormatter, durationFormatter } from '$lib/util/constants';
   import StarRating from 'svelte-star-rating';
   import urlJoin from 'url-join';
@@ -8,8 +8,8 @@
   export let show: ShowDocType | null;
   export let showCopy = false;
   export let showSalesStats = false;
-  $: waterMarkText = '';
   $: showStatus = show?.showState.status;
+  $: waterMarkText = showStatus ?? '';
 
   const copyShowUrl = () => {
     const showUrl = urlJoin(
@@ -19,28 +19,6 @@
     );
     navigator.clipboard.writeText(showUrl);
   };
-
-  $: switch (showStatus) {
-    case ShowStatus.CANCELLED:
-      waterMarkText = 'Cancelled';
-      break;
-
-    case ShowStatus.BOX_OFFICE_CLOSED:
-      waterMarkText = 'Sold Out';
-      break;
-    case ShowStatus.STARTED:
-      waterMarkText = 'Show Started';
-      break;
-    case ShowStatus.FINALIZED:
-    case ShowStatus.ENDED:
-    case ShowStatus.IN_ESCROW:
-    case ShowStatus.IN_DISPUTE:
-      waterMarkText = 'Ended';
-      break;
-
-    default:
-      waterMarkText = '';
-  }
 </script>
 
 {#if show}

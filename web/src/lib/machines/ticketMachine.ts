@@ -1,10 +1,13 @@
 import { PUBLIC_ESCROW_PERIOD } from '$env/static/public';
+import type { ShowDocType } from '$lib/ORM/models/show';
+import { ShowStatus } from '$lib/ORM/models/show';
 import type { TicketDocType } from '$lib/ORM/models/ticket';
 import { TicketStatus } from '$lib/ORM/models/ticket';
 import type { TransactionDocType } from '$lib/ORM/models/transaction';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 
 type TicketStateType = TicketDocType['ticketState'];
+type ShowStateType = ShowDocType['showState'];
 const ESCROW_PERIOD = +PUBLIC_ESCROW_PERIOD || 3600000;
 const PAYMENT_PERIOD = +PUBLIC_ESCROW_PERIOD || 3600000;
 
@@ -22,16 +25,19 @@ export const paymentTimer = (timerStart: number) => {
 
 export const createTicketMachine = ({
   ticketState,
-  saveTicketStateCallback: saveStateCallback,
+  showState,
+  saveTicketStateCallback,
 }: {
   ticketState: TicketStateType;
+  showState: ShowStateType;
   saveTicketStateCallback?: TicketStateCallbackType;
 }) => {
   /** @xstate-layout N4IgpgJg5mDOIC5QBsCWA7A1gWQIYGMALDMAOjSwAJkB7XCSAYgG0AGAXUVAAcbZUALqhrouIAB6IAjAA4ALKQCsU1gHYAnIpkA2AMyLVUuQBoQAT0QAmdQt26Vc1brkzLc9TMUBfL6Yo4CYnQyf2o6BggWKU4kEF5+IRExSQQpVQVlNU0dfUMTc0RPVlI3PQ1WRTs5RTkfPwwAohJyBrD6JmZLGJ4+QWFRWJTZDJUNLT0DI1MLVMsZUnVndVZPFxkpKWc6kH88JuCWqlp2yOZdbrjexIHQIfSlUeyJvOnCywWZXTVWFUtddUsUks212gWaoWOERYcgu8T6SUG0nkDyy41yUwKCG0lmKMnWeOU6kWLm0IIaeyCZAAruh8MhcKgALZMADCABkAIIASWwbFhV36yUQ7gUGwMejmFWszleCDkgNIMkWStY8tU2lYqrJWApzRpdIZzMiACUAKIARQAqqaAMoAFUoLI5ADkWaa2Zy7VyAPLOvliOHXIVymykMXq3SSxTS-IzNyqUhyFTrDXaDw6bSk3w7clgg4GpmQUgAdwZQnQUDkADEaRAMFBGGarbaHU7Xe7PT6-RwAwKEbdEIZ3nJ7Kp1dpKhtI7KVIpFInlnY0qqNZYs-UdXmyAWjSWy-Xq7X64wAAocgCa2FNzodZrdXIAaqaACL+2KBwWI1LredGaqKMo0yTbRZUURZSGxLQwKBVRAX0bVGkpUgdyLUs+grQ90DrCsWB7d8+xuCRCnUBM5xqJxdGxJw8VlJwFEsVRVU+P45DkVVdAQ3V83pQsIGQ3B0BZXBkGQUhggANzAAAnFkRGCfABCYJtrXtR0XTdD0OS9X03x6BJPwHVJ0nnSiNSMbRZFUZRdBnZx3ikNMvnKLQ7HUTit2Qnjd3wAShJEsSwEkmS5LABTWQ5D1HV9Z1TRZO0X10y59P7IiEEWXRExHH55WxTM0hnQwMrAyw3HkfQCQ47NQX2bcvKLHzBOE0SMAAcSkggwBPaThEiKtTRfAAhDkWQAaUoO9TUfBK8L0+FCJSbFZTXCylE1YDJk1SqN0Q5oUL4hq-Oa9A2o6rqpJ6xgnUilloti+LXxmpK5uDIxQxqP5tE8KyNnUEDMQchjSEo6Nlg1FcpG8KrcxqzzDXq3ymtIVr2vwTrupoSIrrZShny5G0budGK4um-lkvm6QXHeCypF+tIbE2VQZ0UTUFh+L44KcdVaihzcYb2-jGv85HTvRyJcZtE9LXiyguWdLkvS0knezJsQZjSLRFWsBjQf0ORtHyIYgKBmp5UXIEgXcvm6v2hGheOlG0fOjHGHEWABFwRTSFwAAzRSpIACigB3nzAekzAASkYaqkP5g7EeF1Gzp6xKPxSlJoyW5Z1EysDDEMVhIy2nNeZj62BcOy6Iux00nxvcbYsmp8HtJ56vw2PWSlUeQNjHbQx0Z-6aakBZ3tkAuiTTNyeZ27i4ZtwXkFwlug1iGYAFoAUTT4NVcap5Fp0whnkeZgZ0TYiUqVjLdLufy6aqJl4M1KcTSTLFkgzU1D1pmgTDYz5AmLoWCU9tpcVqrfKSYAACOVI4CKQgEJWkod6TXD3OhSsxowDe1rI2U0VZLTOmfPXe8TcU4EWDDiSw841yuEqCsCcfcbL-TXCZWcdhqZULXNfXaZdIEwLgZARBqMRIe36EvZWrdDKwSWjUYeqoxzyEMBZew3CDgYFNLAfAUkaDFkYH1Qaw0xoTSms3CRK9DLFQggxIE8oAL4ljFYGQsEwyaGqI4RYa4-iqLIOozR2jdHi0ltLWW8suSK1MfhFWX5LFURsVQz6wxM4eAgmBPQqpljuAnN4pG6ANFaJ0S7N2HsyA+z9v7OA+TiwhzDpHaOzRfGVLIVEixm9YluHifYparhih-D+ECRY2UbA+GzOgDGcAxB1IOBCcIkAzFPxSPKTOw91huOqJPCoMhsn6mtnMtOiBKIKD7gYH4ahDBKlYksxURgTYASJBs7J-M0LlkrDWLC9ZdnkwQIxBMeIz42BkKwIkrhaJUNICsDwjgwKsGsDoB5Zc47+QktJWS6B5LwI+cGKyCYRxpHHJOTYlgCqsQgn3MclEIZc2BNPMBsNeJ3ztidROosMVt2UO8LQ+d9ZZzmDIAqGtXAAnKBMPW3NQEeVjrbZALKpGAsTKOPF9gCWyjXrIYeetMxdxKgXMocKIHQNgW7QRAlhEoP6Gg55chMHYKwtK5+48FjuGsCRHlVCB5q3+NoUgY5qhavSHYMcuq6V8INfAoRyDREpVTp8mmY4SifSoV8HQAEnAzjSJ6yMVlso4pxKK4uM9wG8VtQtMCio8QWX+YCjwhLMRrwYsUViJEXA0xcP3VQDzjXINmZEyRz8AJeoYcm-WVl3BLXlMUOc2JKJKiVIxXNkyyDewwMJVAAAvLts1zGpXWMPbW0Yp16BgqO+wSgAIfWnSRLU1KPINP8UW-ZyJWK5CVBfRVf04zyHnI4IEibwVtqvTDDAz5UCwG4FSRSd6vmbw+i4JyNQvgOIQF8SiQMiQMWlJGdQmxvEQbXm+xAa99DZxHHMVVjlMOeGGV4IAA */
   return createMachine(
     {
       context: {
-        ticketState: ticketState,
+        ticketState,
+        showState,
         errorMessage: undefined as string | undefined,
       },
       // eslint-disable-next-line @typescript-eslint/consistent-type-imports
@@ -59,10 +65,10 @@ export const createTicketMachine = ({
               dispute: NonNullable<TicketStateType['dispute']>;
             }
           | {
-              type: 'JOINED SHOW';
+              type: 'WATCH SHOW';
             }
           | {
-              type: 'LEFT SHOW';
+              type: 'LEAVE SHOW';
             },
       },
       predictableActionArguments: true,
@@ -102,13 +108,13 @@ export const createTicketMachine = ({
           states: {
             waiting4Payment: {
               always: {
-                target: 'canJoin',
+                target: 'waiting4Show',
                 cond: 'fullyPaid',
               },
               on: {
                 'PAYMENT RECEIVED': [
                   {
-                    target: 'canJoin',
+                    target: 'waiting4Show',
                     cond: 'fullyPaid',
                     actions: ['receivePayment', 'saveTicketState'],
                   },
@@ -133,42 +139,35 @@ export const createTicketMachine = ({
                 ],
               },
             },
-            canJoin: {
-              initial: 'neverJoined',
-              states: {
-                neverJoined: {
-                  always: [
-                    {
-                      target: 'joined',
-                      cond: 'showJoined',
-                    },
-                  ],
-                  on: {
-                    'REQUEST CANCELLATION': [
-                      {
-                        target: '#ticketMachine.cancelled',
-                        cond: 'canCancel',
-                        actions: [
-                          'requestCancellation',
-                          'cancelTicket',
-                          'saveTicketState',
-                        ],
-                      },
-                      {
-                        target: '#ticketMachine.reserved.requestedCancellation',
-                        actions: ['requestCancellation', 'saveTicketState'],
-                      },
+            waiting4Show: {
+              on: {
+                'REQUEST CANCELLATION': [
+                  {
+                    target: '#ticketMachine.cancelled',
+                    cond: 'canCancel',
+                    actions: [
+                      'requestCancellation',
+                      'cancelTicket',
+                      'saveTicketState',
                     ],
-                    'JOINED SHOW': {},
                   },
-                },
-                joined: {
-                  on: {
-                    'LEFT SHOW': {
-                      actions: ['saveTicketState'],
-                    },
+                  {
+                    target: '#ticketMachine.reserved.requestedCancellation',
+                    actions: ['requestCancellation', 'saveTicketState'],
                   },
+                ],
+                'WATCH SHOW': {
+                  target: 'watchingShow',
+                  cond: 'canWatchShow',
                 },
+              },
+            },
+            watchingShow: {
+              on: {
+                'LEAVE SHOW': {
+                  actions: ['saveTicketState'],
+                },
+                'WATCH SHOW': {},
               },
             },
             requestedCancellation: {
@@ -196,15 +195,12 @@ export const createTicketMachine = ({
             },
           },
         },
-
         cancelled: {
           type: 'final',
         },
-
         finalized: {
           type: 'final',
         },
-
         inEscrow: {
           // after: {
           //   escrowDelay: {
@@ -235,7 +231,8 @@ export const createTicketMachine = ({
     {
       actions: {
         saveTicketState: context => {
-          if (saveStateCallback) saveStateCallback(context.ticketState);
+          if (saveTicketStateCallback)
+            saveTicketStateCallback(context.ticketState);
         },
 
         requestCancellation: assign((context, event) => {
@@ -382,6 +379,9 @@ export const createTicketMachine = ({
             context.ticketState.totalPaid
           );
         },
+        canWatchShow: context =>
+          context.ticketState.totalPaid >= context.ticketState.price &&
+          context.showState.status === ShowStatus.STARTED,
       },
     }
   );
@@ -389,13 +389,16 @@ export const createTicketMachine = ({
 
 export const createTicketMachineService = ({
   ticketState,
+  showState,
   saveTicketStateCallback,
 }: {
   ticketState: TicketStateType;
+  showState: ShowStateType;
   saveTicketStateCallback?: TicketStateCallbackType;
 }) => {
   const ticketMachine = createTicketMachine({
     ticketState,
+    showState,
     saveTicketStateCallback,
   });
   return interpret(ticketMachine).start();

@@ -3,33 +3,25 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
-  import { ticketDB } from '$lib/ORM/dbs/ticketDB';
+  import { ticketDB, TicketDBType } from '$lib/ORM/dbs/ticketDB';
   import { ShowStatus, type ShowDocument } from '$lib/ORM/models/show';
   import { TicketStatus, type TicketDocument } from '$lib/ORM/models/ticket';
 
-  import { onMount } from 'svelte';
   import urlJoin from 'url-join';
   import type { PageData } from './$types';
   import TicketDetail from './TicketDetail.svelte';
 
   export let data: PageData;
   const token = data.token;
-  let ticket = data.ticket as TicketDocument | null;
-  let show = data.show as ShowDocument | null;
+  let ticket = data.ticket as TicketDocument;
+  let show = data.show as ShowDocument;
   let ticketId = $page.params.id;
 
   const showPath = urlJoin($page.url.href, 'show');
 
   $: waiting4StateChange = false;
-  $: needs2Pay =
-    ticket &&
-    ticket.ticketState.status === TicketStatus.RESERVED &&
-    ticket.ticketState.totalPaid < ticket.ticketState.price;
-
-  $: canGotoShow =
-    ticket &&
-    ticket.ticketState.totalPaid - ticket.ticketState.refundedAmount >=
-      ticket.ticketState.price;
+  $: needs2Pay = false;
+  $: canWatchShow = false;
   $: showStarted = false;
 
   const onSubmit = ({}) => {
@@ -42,29 +34,25 @@
     };
   };
 
-  onMount(async () => {
-    const db = await ticketDB(ticketId, token);
-    show = await db.shows.findOne(show?._id).exec();
-    ticket = await db.tickets.findOne(ticketId).exec();
-    if (ticket) {
-      ticket.$.subscribe(_ticket => {
-        waiting4StateChange = false;
+  ticketDB(ticketId, token).then(async (db: TicketDBType) => {
+    show = (await db.shows.findOne(show._id).exec()) as ShowDocument;
+    ticket = (await db.tickets.findOne(ticketId).exec()) as TicketDocument;
+    ticket.$.subscribe(_ticket => {
+      waiting4StateChange = false;
 
-        ticket = _ticket;
-        needs2Pay =
-          _ticket.ticketState.status === TicketStatus.RESERVED &&
-          _ticket.ticketState.totalPaid < _ticket.ticketState.price;
-        canGotoShow =
-          _ticket.ticketState.totalPaid - _ticket.ticketState.refundedAmount >=
-          _ticket.ticketState.price;
-      });
-    }
-    if (show) {
-      show.$.subscribe(_show => {
-        show = _show;
-        showStarted = _show.showState.status === ShowStatus.STARTED;
-      });
-    }
+      ticket = _ticket;
+      needs2Pay =
+        _ticket.ticketState.status === TicketStatus.RESERVED &&
+        _ticket.ticketState.totalPaid < _ticket.ticketState.price;
+      canWatchShow =
+        _ticket.ticketState.totalPaid - _ticket.ticketState.refundedAmount >=
+        _ticket.ticketState.price;
+    });
+
+    show.$.subscribe(_show => {
+      show = _show;
+      showStarted = _show.showState.status === ShowStatus.STARTED;
+    });
   });
 </script>
 
@@ -87,7 +75,7 @@
             </form>
           </div>
         {/if}
-        {#if canGotoShow && showStarted}
+        {#if canWatchShow && showStarted}
           <div class="p-4">
             <div class="w-full flex justify-center">
               <button
@@ -99,7 +87,7 @@
               >
             </div>
           </div>
-        {:else if canGotoShow && !showStarted}
+        {:else if canWatchShow && !showStarted}
           <div class="p-4">
             <div class="w-full flex justify-center">
               <button class="btn" disabled={true}

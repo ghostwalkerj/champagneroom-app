@@ -76,13 +76,14 @@ export const load: PageServerLoad = async ({ params }) => {
     { keyid: JWT_TALENT_DB_USER }
   );
 
-  const { talent: _talent, show } = await getShow(key);
+  const _talent = await getTalent(key);
+  const _currentShow = await _talent.populate('currentShow');
 
   const _completedShows = (await _talent.populate(
     'stats.completedShows'
   )) as ShowDocument[];
   const talent = _talent.toJSON();
-  const currentShow = show ? show.toJSON() : undefined;
+  const currentShow = _currentShow ? _currentShow.toJSON() : undefined;
   const completedShows = _completedShows.map(link => link.toJSON());
 
   return {
@@ -204,6 +205,7 @@ export const actions: Actions = {
         if (ticket.ticketState.status === TicketStatus.RESERVED) {
           const ticketService = createTicketMachineService({
             ticketState: ticket.ticketState,
+            showState: cancelShow.showState,
             saveTicketStateCallback: ticket.saveTicketStateCallback,
           });
           ticketService.send({

@@ -9,10 +9,9 @@
   } from '$lib/machines/showMachine';
   import { talentDB, type TalentDBType } from '$lib/ORM/dbs/talentDB';
   import { ShowStatus, type ShowDocument } from '$lib/ORM/models/show';
-  import type { TalentDocType, TalentDocument } from '$lib/ORM/models/talent';
+  import type { TalentDocType } from '$lib/ORM/models/talent';
   import { durationFormatter } from '$lib/util/constants';
   import { possessive } from 'i18n-possessive';
-  import { onMount } from 'svelte';
   import StarRating from 'svelte-star-rating';
 
   import { goto } from '$app/navigation';
@@ -28,13 +27,12 @@
   export let data: PageData;
 
   const token = data.token;
-  let talentObj = data.talent as TalentDocType;
+  let talent = data.talent as TalentDocType;
   $: currentShow = data.currentShow as ShowDocument | null;
 
-  let showName = possessive(talentObj.name, 'en') + ' Show';
+  let showName = possessive(talent.name, 'en') + ' Show';
   $: showDuration = 60;
   let key = $page.params.key;
-  let talent: TalentDocument;
   let showMachineService: ShowMachineServiceType;
   let showSub: Subscription;
   const showPath = urlJoin($page.url.href, 'show');
@@ -54,13 +52,12 @@
 
   $: canCreateShow =
     !currentShow ||
-    currentShow.showState.status === ShowStatus.CANCELLED ||
-    currentShow.showState.status === ShowStatus.FINALIZED ||
+    showMachineState?.done ||
     currentShow.showState.status === ShowStatus.ENDED;
 
   $: waiting4StateChange = false;
   $: canStartShow = false;
-  $: statusText = 'No Current Show';
+  $: statusText = currentShow?.showState.status ?? 'No Current Show';
   $: eventText = 'No Events';
 
   const useShowState = (
@@ -77,19 +74,14 @@
     showSub = showMachineService.subscribe(state => {
       if (state.changed) {
         showMachineState = state;
-
-        if (state.changed) {
-          canCancelShow = state.can({
-            type: 'REQUEST CANCELLATION',
-            cancel: undefined,
-          });
-          canCreateShow = state.done ?? true;
-          canStartShow =
-            show.showState.ticketsSold > 0 &&
-            state.can({
-              type: 'START SHOW',
-            });
-        }
+        canCancelShow = state.can({
+          type: 'REQUEST CANCELLATION',
+          cancel: undefined,
+        });
+        canCreateShow = state.done ?? true;
+        canStartShow = state.can({
+          type: 'START SHOW',
+        });
       }
     });
   };
@@ -99,31 +91,9 @@
       .get$('showState')
       .subscribe((_showState: ShowDocument['showState']) => {
         waiting4StateChange = false;
-        useShowState(show, _showState);
-        switch (_showState.status) {
-          case ShowStatus.CANCELLED:
-            statusText = 'Cancelled';
-            break;
-          case ShowStatus.CANCELLATION_REQUESTED:
-            statusText = 'Cancellation Requested';
-            break;
-          case ShowStatus.BOX_OFFICE_CLOSED:
-            statusText = 'Sold Out';
-            break;
-          case ShowStatus.BOX_OFFICE_OPEN:
-            statusText = 'Box Office Open';
-            break;
-          case ShowStatus.STARTED:
-            statusText = 'Show Started';
-            break;
-          case ShowStatus.FINALIZED:
-          case ShowStatus.ENDED:
-          case ShowStatus.IN_ESCROW:
-          case ShowStatus.IN_DISPUTE:
-            statusText = 'Ended';
-            break;
-
-          default:
+        if (_showState) {
+          useShowState(show, _showState);
+          statusText = _showState.status;
         }
       });
   };
@@ -139,62 +109,58 @@
     }
   };
 
-  onMount(async () => {
-    talentDB(key, token).then((db: TalentDBType | undefined) => {
-      if (!db) return;
-      db.talents
-        .findOne(talentObj._id)
-        .exec()
-        .then(_talent => {
-          if (_talent) {
-            talentObj = _talent;
-            talent = _talent;
-            talent.get$('currentShow').subscribe(async showId => {
-              if (showId) {
-                canStartShow = false;
-                currentShow = await db.shows.findOne(showId).exec();
-                if (currentShow) {
-                  useShow(currentShow);
+  talentDB(key, token).then((db: TalentDBType | undefined) => {
+    if (!db) return;
+    db.talents
+      .findOne(talent._id)
+      .exec()
+      .then(_talent => {
+        if (_talent) {
+          talent = _talent;
+          _talent.get$('currentShow').subscribe(async showId => {
+            if (showId) {
+              canStartShow = false;
+              currentShow = await db.shows.findOne(showId).exec();
+              if (currentShow) {
+                useShow(currentShow);
+                db.showEvents
+                  .findOne()
+                  .where('show')
+                  .eq(currentShow._id)
+                  .sort({ createdAt: 'desc' })
+                  .$.subscribe(async event => {
+                    if (event) {
+                      eventText =
+                        timeago.format(event.createdAt) +
+                        ' ' +
+                        event.ticketInfo?.name;
+                      switch (event.type) {
+                        case ShowEventType.TICKET_SOLD:
+                          eventText += ' bought a ticket!';
+                          break;
 
-                  db.showEvents
-                    .findOne()
-                    .where('show')
-                    .eq(currentShow._id)
-                    .sort({ createdAt: 'desc' })
-                    .$.subscribe(async event => {
-                      if (event) {
-                        eventText =
-                          timeago.format(event.createdAt) +
-                          ' ' +
-                          event.ticketInfo?.name;
-                        switch (event.type) {
-                          case ShowEventType.TICKET_SOLD:
-                            eventText += ' bought a ticket!';
-                            break;
+                        case ShowEventType.TICKET_RESERVED:
+                          eventText += ' reserved a ticket!';
+                          break;
 
-                          case ShowEventType.TICKET_RESERVED:
-                            eventText += ' reserved a ticket!';
-                            break;
+                        case ShowEventType.TICKET_CANCELLED:
+                          eventText += ' cancelled';
+                          break;
 
-                          case ShowEventType.TICKET_CANCELLED:
-                            eventText += ' cancelled';
-                            break;
-
-                          default:
-                            eventText = 'No Events';
-                        }
+                        default:
+                          eventText = 'No Events';
                       }
-                    });
-                }
-              } else {
-                currentShow = null;
-                eventText = 'No Events';
-                statusText = 'No Current Show';
+                    }
+                  });
               }
-            });
-          }
-        });
-    });
+            } else {
+              currentShow = null;
+              eventText = 'No Events';
+              statusText = 'No Current Show';
+            }
+          });
+        }
+      });
   });
 
   const onSubmit = ({}) => {
@@ -244,7 +210,7 @@
                           d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                         /></svg
                       >
-                      <span>{statusText}</span>
+                      <p class="capitalize">{statusText.toLowerCase()}</p>
                     </div>
                   </div>
                 </div>
@@ -431,10 +397,10 @@
           <div class="lg:col-start-3 lg:col-span-1">
             <div class="bg-primary text-primary-content card">
               <div class="text-center card-body items-center">
-                <h2 class="text-3xl card-title">{talentObj.name}</h2>
+                <h2 class="text-3xl card-title">{talent.name}</h2>
                 <div>
                   <ProfilePhoto
-                    profileImage={talentObj.profileImageUrl ||
+                    profileImage={talent.profileImageUrl ||
                       PUBLIC_DEFAULT_PROFILE_IMAGE}
                     callBack={value => {
                       updateProfileImage(value);
@@ -457,8 +423,8 @@
             <div class="bg-primary text-primary-content card">
               <div class="text-center card-body items-center">
                 <h2 class="text-2xl card-title">Your Average Rating</h2>
-                {talentObj.stats.ratingAvg.toFixed(2)}
-                <StarRating rating={talentObj.stats.ratingAvg ?? 0} />
+                {talent.stats.ratingAvg.toFixed(2)}
+                <StarRating rating={talent.stats.ratingAvg ?? 0} />
               </div>
             </div>
           </div>

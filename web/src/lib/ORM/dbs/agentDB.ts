@@ -28,10 +28,7 @@ import {
   ticketSchema,
   type TicketCollection,
 } from '$lib/ORM/models/ticket';
-import {
-  ticketEventSchema,
-  type TicketEventCollection,
-} from '$lib/ORM/models/ticketEvent';
+
 import {
   transactionSchema,
   type TransactionCollection,
@@ -53,7 +50,6 @@ type AgentCollections = {
   shows: ShowCollection;
   transactions: TransactionCollection;
   showEvents: ShowEventCollection;
-  ticketEvents: TicketEventCollection;
 };
 
 export type AgentDBType = RxDatabase<AgentCollections>;
@@ -117,9 +113,6 @@ const create = async (
     showEvents: {
       schema: showEventSchema,
     },
-    ticketEvents: {
-      schema: ticketEventSchema,
-    },
   });
 
   // Sync if there is a remote endpoint
@@ -138,7 +131,6 @@ const create = async (
   const showQuery = _db.shows.find().where('agent').eq(agentId);
   const ticketQuery = _db.tickets.find().where('agent').eq(agentId);
   const showEventQuery = _db.showEvents.find().where('agent').eq(agentId);
-  const ticketEventQuery = _db.ticketEvents.find().where('agent').eq(agentId);
   const transactionQuery = _db.transactions.find().where('agent').eq(agentId);
 
   let repState = _db.agents.syncCouchDB({
@@ -191,14 +183,6 @@ const create = async (
   });
   await repState.awaitInitialReplication();
 
-  repState = _db.ticketEvents.syncCouchDB({
-    remote: remoteDB,
-    waitForLeadership: false,
-    options: {
-      retry: true,
-    },
-    query: ticketEventQuery,
-  });
   await repState.awaitInitialReplication();
 
   repState = _db.transactions.syncCouchDB({
@@ -259,16 +243,6 @@ const create = async (
       live: true,
     },
     query: showEventQuery,
-  });
-
-  _db.ticketEvents.syncCouchDB({
-    remote: remoteDB,
-    waitForLeadership: false,
-    options: {
-      retry: true,
-      live: true,
-    },
-    query: ticketEventQuery,
   });
 
   _db.transactions.syncCouchDB({

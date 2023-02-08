@@ -161,6 +161,7 @@ export const createShowMachine = ({
             },
             'START SHOW': {
               target: 'started',
+              cond: 'canStartShow',
               actions: ['startShow', 'saveShowState'],
             },
             'REFUND SENT': [
@@ -407,6 +408,7 @@ export const createShowMachine = ({
         showStarted: context => context.showState.status === ShowStatus.STARTED,
         showEnded: context => context.showState.status === ShowStatus.ENDED,
         soldOut: context => context.showState.ticketsAvailable === 1,
+        canStartShow: context => context.showState.ticketsSold > 0,
         fullyRefunded: (context, event) => {
           const value =
             event.type === 'REFUND SENT' ? event.transaction?.value : 0;
