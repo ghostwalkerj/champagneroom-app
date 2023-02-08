@@ -2,10 +2,11 @@
   import { applyAction, enhance } from '$app/forms';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
+  import { createTicketMachineService } from '$lib/machines/ticketMachine';
 
-  import { ticketDB, TicketDBType } from '$lib/ORM/dbs/ticketDB';
-  import { ShowStatus, type ShowDocument } from '$lib/ORM/models/show';
-  import { TicketStatus, type TicketDocument } from '$lib/ORM/models/ticket';
+  import { ticketDB, type TicketDBType } from '$lib/ORM/dbs/ticketDB';
+  import type { ShowDocument } from '$lib/ORM/models/show';
+  import type { TicketDocument } from '$lib/ORM/models/ticket';
 
   import urlJoin from 'url-join';
   import type { PageData } from './$types';
@@ -18,11 +19,26 @@
   let ticketId = $page.params.id;
 
   const showPath = urlJoin($page.url.href, 'show');
+  let ticketMachineService = createTicketMachineService({
+    ticketState: ticket.ticketState,
+    showState: show.showState,
+  });
 
   $: waiting4StateChange = false;
   $: needs2Pay = false;
   $: canWatchShow = false;
-  $: showStarted = false;
+  $: canCancelTicket = false;
+
+  $: ticketMachineService.onTransition(state => {
+    if (state.changed) {
+      needs2Pay = state.matches('reserved.waiting4Payment');
+      canWatchShow = state.matches('reserved.waiting4Show');
+      canCancelTicket = state.can({
+        type: 'REQUEST CANCELLATION',
+        cancel: undefined,
+      });
+    }
+  });
 
   const onSubmit = ({}) => {
     waiting4StateChange = true;
@@ -39,19 +55,19 @@
     ticket = (await db.tickets.findOne(ticketId).exec()) as TicketDocument;
     ticket.$.subscribe(_ticket => {
       waiting4StateChange = false;
-
       ticket = _ticket;
-      needs2Pay =
-        _ticket.ticketState.status === TicketStatus.RESERVED &&
-        _ticket.ticketState.totalPaid < _ticket.ticketState.price;
-      canWatchShow =
-        _ticket.ticketState.totalPaid - _ticket.ticketState.refundedAmount >=
-        _ticket.ticketState.price;
+      ticketMachineService = createTicketMachineService({
+        ticketState: ticket.ticketState,
+        showState: show.showState,
+      });
     });
 
     show.$.subscribe(_show => {
       show = _show;
-      showStarted = _show.showState.status === ShowStatus.STARTED;
+      ticketMachineService = createTicketMachineService({
+        ticketState: ticket.ticketState,
+        showState: show.showState,
+      });
     });
   });
 </script>
@@ -74,8 +90,7 @@
               </div>
             </form>
           </div>
-        {/if}
-        {#if canWatchShow && showStarted}
+        {:else if canWatchShow}
           <div class="p-4">
             <div class="w-full flex justify-center">
               <button
@@ -87,7 +102,7 @@
               >
             </div>
           </div>
-        {:else if canWatchShow && !showStarted}
+        {:else}
           <div class="p-4">
             <div class="w-full flex justify-center">
               <button class="btn" disabled={true}
@@ -95,7 +110,8 @@
               >
             </div>
           </div>
-        {:else if ticket.ticketState.status !== TicketStatus.CANCELLED && ticket.ticketState.status !== TicketStatus.CANCELLATION_REQUESTED}
+        {/if}
+        {#if canCancelTicket}
           <div class="p-4">
             <form method="post" action="?/cancel_ticket" use:enhance>
               <div class="w-full flex justify-center">

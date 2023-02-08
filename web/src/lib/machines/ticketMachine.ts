@@ -351,7 +351,8 @@ export const createTicketMachine = ({
       },
       guards: {
         canCancel: context =>
-          context.ticketState.totalPaid <= context.ticketState.refundedAmount,
+          context.ticketState.totalPaid <= context.ticketState.refundedAmount &&
+          context.showState.status !== ShowStatus.STARTED,
         ticketCancelled: context =>
           context.ticketState.status === TicketStatus.CANCELLED,
         ticketFinalized: context =>
