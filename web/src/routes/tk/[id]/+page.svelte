@@ -4,7 +4,7 @@
   import { page } from '$app/stores';
 
   import { ticketDB } from '$lib/ORM/dbs/ticketDB';
-  import { type ShowDocument, ShowStatus } from '$lib/ORM/models/show';
+  import { ShowStatus, type ShowDocument } from '$lib/ORM/models/show';
   import { TicketStatus, type TicketDocument } from '$lib/ORM/models/ticket';
 
   import { onMount } from 'svelte';

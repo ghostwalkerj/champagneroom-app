@@ -1,7 +1,6 @@
 import { PUBLIC_ESCROW_PERIOD } from '$env/static/public';
 import type { TicketDocType } from '$lib/ORM/models/ticket';
 import { TicketStatus } from '$lib/ORM/models/ticket';
-import type { TicketEventDocType } from '$lib/ORM/models/ticketEvent';
 import type { TransactionDocType } from '$lib/ORM/models/transaction';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 
@@ -58,10 +57,6 @@ export const createTicketMachine = ({
           | {
               type: 'DISPUTE INITIATED';
               dispute: NonNullable<TicketStateType['dispute']>;
-            }
-          | {
-              type: 'TICKET EVENT RECEIVED';
-              ticketEvent: TicketEventDocType;
             }
           | {
               type: 'JOINED SHOW';
@@ -175,11 +170,6 @@ export const createTicketMachine = ({
                   },
                 },
               },
-              on: {
-                'TICKET EVENT RECEIVED': {
-                  actions: ['receiveTicketEvent', 'saveTicketState'],
-                },
-              },
             },
             requestedCancellation: {
               initial: 'waiting4Refund',
@@ -247,20 +237,6 @@ export const createTicketMachine = ({
         saveTicketState: context => {
           if (saveStateCallback) saveStateCallback(context.ticketState);
         },
-
-        receiveTicketEvent: assign((context, event) => {
-          const state = context.ticketState;
-          return {
-            ticketState: {
-              ...context.ticketState,
-              updatedAt: new Date().getTime(),
-              showEvents: [
-                ...(state.ticketEvents || []),
-                event.ticketEvent._id,
-              ],
-            },
-          };
-        }),
 
         requestCancellation: assign((context, event) => {
           return {
@@ -406,7 +382,6 @@ export const createTicketMachine = ({
             context.ticketState.totalPaid
           );
         },
-        showJoined: context => false,
       },
     }
   );

@@ -15,14 +15,14 @@
   import { onMount } from 'svelte';
   import StarRating from 'svelte-star-rating';
 
+  import { goto } from '$app/navigation';
   import ShowDetail from '$lib/components/ShowDetail.svelte';
   import { ShowEventType } from '$lib/ORM/models/showEvent';
   import * as timeago from 'timeago.js';
+  import urlJoin from 'url-join';
   import type { Subscription } from 'xstate';
   import type { PageData } from './$types';
   import TalentWallet from './TalentWallet.svelte';
-  import { goto } from '$app/navigation';
-  import urlJoin from 'url-join';
 
   export let form: import('./$types').ActionData;
   export let data: PageData;
