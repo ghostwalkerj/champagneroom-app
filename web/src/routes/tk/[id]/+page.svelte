@@ -24,33 +24,27 @@
     showState: show.showState,
   });
 
-  const stateSnapshot = ticketMachineService.getSnapshot();
+  $: needs2Pay = false;
+  $: canWatchShow = false;
+  $: canCancelTicket = false;
+  $: ticketDone = false;
+
+  $: ticketMachineService.subscribe(state => {
+    needs2Pay = state.matches('reserved.waiting4Payment');
+    canWatchShow = state.can('WATCH SHOW');
+    canCancelTicket = state.can({
+      type: 'REQUEST CANCELLATION',
+      cancel: undefined,
+    });
+    ticketDone = state.done ?? false;
+  });
 
   $: waiting4StateChange = false;
-  $: needs2Pay = stateSnapshot.matches('reserved.waiting4Payment');
-  $: canWatchShow = stateSnapshot.can('WATCH SHOW');
-  $: canCancelTicket = stateSnapshot.can({
-    type: 'REQUEST CANCELLATION',
-    cancel: undefined,
-  });
-  $: ticketDone = stateSnapshot.done;
 
-  $: ticketMachineService.onTransition(state => {
-    if (state.changed) {
-      ticketDone = state.done;
-      needs2Pay = state.matches('reserved.waiting4Payment');
-      canWatchShow = state.can('WATCH SHOW');
-      canCancelTicket = state.can({
-        type: 'REQUEST CANCELLATION',
-        cancel: undefined,
-      });
-    }
-  });
-
-  const onSubmit = ({}) => {
+  const onSubmit = () => {
     waiting4StateChange = true;
     return async ({ result }) => {
-      if (result.type !== 'success') {
+      if (result.type === 'failure') {
         waiting4StateChange = false;
       }
       await applyAction(result);
@@ -123,7 +117,11 @@
           {/if}
           {#if canCancelTicket}
             <div class="p-4">
-              <form method="post" action="?/cancel_ticket" use:enhance>
+              <form
+                method="post"
+                action="?/cancel_ticket"
+                use:enhance={onSubmit}
+              >
                 <div class="w-full flex justify-center">
                   <button
                     class="btn"

@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { ShowDocType } from '$lib/ORM/models/show';
-  import { TicketStatus, type TicketDocType } from '$lib/ORM/models/ticket';
+  import type { TicketDocType } from '$lib/ORM/models/ticket';
   import { currencyFormatter, durationFormatter } from '$lib/util/constants';
   import getProfileImage from '$lib/util/profilePhoto';
   export let show: ShowDocType | null;
@@ -9,8 +9,8 @@
   $: profileImage = getProfileImage(ticket?.ticketState.reservation.name);
   $: ticketStatus = ticket
     ? ticket.ticketState.totalPaid >= ticket.ticketState.price
-      ? 'Paid' + ' ' + TicketStatus[ticket.ticketState.status]
-      : TicketStatus[ticket.ticketState.status]
+      ? 'Paid' + ' ' + ticket.ticketState.status
+      : ticket.ticketState.status
     : '';
 </script>
 

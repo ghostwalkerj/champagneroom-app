@@ -119,6 +119,7 @@
         if (_talent) {
           talent = _talent;
           _talent.get$('currentShow').subscribe(async showId => {
+            eventText = 'No Events';
             if (showId) {
               canStartShow = false;
               currentShow = await db.shows.findOne(showId).exec();

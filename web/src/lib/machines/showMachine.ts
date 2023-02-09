@@ -174,6 +174,7 @@ export const createShowMachine = ({
         boxOfficeClosed: {
           on: {
             'START SHOW': {
+              cond: 'canStartShow',
               target: 'started',
               actions: ['startShow', 'saveShowState'],
             },
@@ -229,7 +230,15 @@ export const createShowMachine = ({
             },
           },
         },
-        ended: {},
+        ended: {
+          on: {
+            'START SHOW': {
+              target: 'started',
+              cond: 'canStartShow',
+              actions: ['startShow', 'saveShowState'],
+            },
+          },
+        },
         requestedCancellation: {
           initial: 'waiting2Refund',
           states: {
@@ -390,7 +399,16 @@ export const createShowMachine = ({
         showStarted: context => context.showState.status === ShowStatus.STARTED,
         showEnded: context => context.showState.status === ShowStatus.ENDED,
         soldOut: context => context.showState.ticketsAvailable === 1,
-        canStartShow: context => context.showState.ticketsSold > 0,
+        canStartShow: context => {
+          if (context.showState.status === ShowStatus.ENDED) {
+            // Allow grace period to start show again
+            return (
+              (context.showState.startDate ?? 0 + GRACE_PERIOD) >
+              new Date().getTime()
+            );
+          }
+          return context.showState.ticketsSold > 0;
+        },
         fullyRefunded: (context, event) => {
           const value =
             event.type === 'REFUND SENT' ? event.transaction?.value : 0;
