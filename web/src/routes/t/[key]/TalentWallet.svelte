@@ -4,7 +4,7 @@
 </script>
 
 <div class="bg-primary h-full text-primary-content w-full card">
-  <div class="text-center card-body items-center">
+  <div class="text-center card-body items-center  p-3">
     <h2 class="text-2xl card-title">My Wallet</h2>
 
     <div class="bg-primary text-primary-content stats">

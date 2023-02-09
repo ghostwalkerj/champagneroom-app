@@ -1,13 +1,31 @@
 <script lang="ts">
   import { PUBLIC_SHOW_PATH } from '$env/static/public';
-  import type { ShowDocType } from '$lib/ORM/models/show';
+  import type { ShowDocType, showSchema } from '$lib/ORM/models/show';
   import { currencyFormatter, durationFormatter } from '$lib/util/constants';
   import StarRating from 'svelte-star-rating';
   import urlJoin from 'url-join';
 
+  type ShowDetailOptions = {
+    showCopy?: boolean;
+    showSalesStats?: boolean;
+    showName?: boolean;
+    showStats?: boolean;
+    showRating?: boolean;
+  };
+  let defaultOptions: ShowDetailOptions = {
+    showCopy: false,
+    showSalesStats: false,
+    showName: true,
+    showStats: true,
+    showRating: true,
+  };
   export let show: ShowDocType | null;
-  export let showCopy = false;
-  export let showSalesStats = false;
+  export let options: ShowDetailOptions = defaultOptions;
+
+  options = {
+    ...defaultOptions,
+    ...options,
+  };
   $: showStatus = show?.showState.status;
   $: waterMarkText = showStatus ?? '';
 
@@ -22,10 +40,10 @@
 </script>
 
 {#if show}
-  <div class="flex justify-center h-full min-h-max ">
+  <div class="flex justify-center h-full ">
     <div class="flex flex-col w-full p-4 gap-4 rounded-xl bg-base-200">
       <div
-        class="relative bg-cover bg-no-repeat rounded-xl h-full min-h-[600px]"
+        class="relative bg-cover bg-no-repeat rounded-xl h-full min-h-[450px]"
         style="background-image: url('{show.talentInfo.profileImageUrl}')"
       >
         <div
@@ -44,38 +62,40 @@
           </div>
         {/if}
       </div>
-      <div class="text-center">
-        {show.talentInfo.name}
-      </div>
-      <div class="place-self-center">
-        <StarRating rating={show.talentInfo.stats.ratingAvg} />
-      </div>
-      <div class="text-center flex justify-center">
-        <div class="stats stats-horizontal stats-shadow text-center ">
-          <div class="stat">
-            <div class="stat-title">Duration</div>
-            <div class="text-primary stat-value">
-              {durationFormatter(show.duration)}
-            </div>
-          </div>
-          <div class="stat">
-            <div class="stat-title">Price</div>
-            <div class="text-primary stat-value">
-              {currencyFormatter.format(show.price)}
-            </div>
-          </div>
-          <div class="stat">
-            <div class="stat-title whitespace-normal">Available</div>
-            <div class="text-primary stat-value">
-              {show.showState.ticketsAvailable}
-            </div>
-          </div>
+      {#if options.showName}
+        <div class="text-center">
+          {show.talentInfo.name}
         </div>
-      </div>
-      {#if showSalesStats}
-        <div class="flex gap-4 w-full justify-center flex-col lg:flex-row">
-          <div class="text-center">
-            <div class="stats stats-horizontal stats-shadow text-center">
+      {/if}
+      {#if options.showRating}
+        <div class="place-self-center">
+          <StarRating rating={show.talentInfo.stats.ratingAvg} />
+        </div>
+      {/if}
+      {#if options.showStats}
+        <div class="text-center flex justify-center ">
+          <div
+            class="stats stats-vertical md:stats-horizontal stats-shadow text-center "
+          >
+            <div class="stat">
+              <div class="stat-title">Duration</div>
+              <div class="text-primary stat-value">
+                {durationFormatter(show.duration)}
+              </div>
+            </div>
+            <div class="stat">
+              <div class="stat-title">Price</div>
+              <div class="text-primary stat-value">
+                {currencyFormatter.format(show.price)}
+              </div>
+            </div>
+            <div class="stat">
+              <div class="stat-title whitespace-normal">Available</div>
+              <div class="text-primary stat-value">
+                {show.showState.ticketsAvailable}
+              </div>
+            </div>
+            {#if options.showSalesStats}
               <div class="stat">
                 <div class="stat-title">Reserved</div>
                 <div class="text-primary stat-value">
@@ -88,33 +108,35 @@
                   {show.showState.ticketsSold}
                 </div>
               </div>
-              <div class="stat">
-                <div class="stat-title">Refunded</div>
-                <div class="text-primary stat-value">
-                  {show.showState.ticketsRefunded}
+              {#if show.showState.ticketsRefunded > 0}
+                <div class="stat">
+                  <div class="stat-title">Refunded</div>
+                  <div class="text-primary stat-value">
+                    {show.showState.ticketsRefunded}
+                  </div>
                 </div>
-              </div>
-            </div>
-          </div>
-          <div class="text-center">
-            <div class="stats stats-horizontal stats-shadow text-center">
-              <div class="stat">
-                <div class="stat-title">Refunded Amount</div>
-                <div class="text-primary stat-value">
-                  {currencyFormatter.format(show.showState.refundedAmount)}
+              {/if}
+              {#if show.showState.refundedAmount > 0}
+                <div class="stat">
+                  <div class="stat-title whitespace-normal">
+                    Refunded Amount
+                  </div>
+                  <div class="text-primary stat-value">
+                    {currencyFormatter.format(show.showState.refundedAmount)}
+                  </div>
                 </div>
-              </div>
+              {/if}
               <div class="stat">
-                <div class="stat-title">Total Sales</div>
+                <div class="stat-title  whitespace-normal">Total Sales</div>
                 <div class="text-primary stat-value">
                   {currencyFormatter.format(show.showState.totalSales)}
                 </div>
               </div>
-            </div>
+            {/if}
           </div>
         </div>
       {/if}
-      {#if showCopy}
+      {#if options.showCopy}
         <div class="text-center">
           <!-- svelte-ignore a11y-click-events-have-key-events -->
           <div class="btn btn-primary" on:click={copyShowUrl}>

@@ -74,76 +74,73 @@
   }
 </script>
 
-<div class="p-4">
-  <div
-    class="container rounded-full flex-none h-50 text-center w-50 relative  items-center mask-circle"
-    in:scale
-  >
+<div class="flex flex-col items-center">
+  <div class="p-4">
     <div
-      class="bg-cover bg-no-repeat bg-center rounded-full h-48 w-48"
+      class="bg-cover relative bg-no-repeat bg-center rounded-full w-32 h-32"
       style="background-image: url('{imageUrl}')"
-    />
-    <div
-      use:filedrop={options}
-      on:filedrop={onChange}
-      class="absolute inset-0 flex flex-col justify-center z-10 bg-gray-500 opacity-75 rounded-full h-48 items-center w-48 {uploadVisibility}"
     >
-      <div class="self-center">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          width="50"
-          height="50"
-          ><path fill="none" d="M0 0h24v24H0z" /><path
-            d="M1 14.5a6.496 6.496 0 0 1 3.064-5.519 8.001 8.001 0 0 1 15.872 0 6.5 6.5 0 0 1-2.936 12L7 21c-3.356-.274-6-3.078-6-6.5zm15.848 4.487a4.5 4.5 0 0 0 2.03-8.309l-.807-.503-.12-.942a6.001 6.001 0 0 0-11.903 0l-.12.942-.805.503a4.5 4.5 0 0 0 2.029 8.309l.173.013h9.35l.173-.013zM13 13v4h-2v-4H8l4-5 4 5h-3z"
-          /></svg
-        >
-      </div>
-      <div class="self-center">
-        <p>Click or Drag & Drop Image</p>
-      </div>
-    </div>
-  </div>
-  <div
-    class="absolute m-4 inset-0 flex flex-col justify-center items-center z-10 bg-gray-500 opacity-75 rounded-xl {progressVisibility}"
-  />
-</div>
-
-{#if !update}
-  <div class="justify-center card-actions last:my-2">
-    <button
-      class="btn btn-xs btn-secondary md:btn-sm"
-      on:click={() => {
-        setUpdate(true);
-      }}
-    >
-      Change Photo
-    </button>
-  </div>
-{:else}
-  <div class="justify-center card-actions last:my-2">
-    {#if !uploadReady}
-      <label
-        class="custom-file-upload btn  btn-xs btn-secondary md:btn-sm"
+      <div
         use:filedrop={options}
         on:filedrop={onChange}
+        class="absolute inset-0 flex flex-col justify-center z-10 bg-gray-500 opacity-75 rounded-full h-32 items-center w-32 {uploadVisibility}"
       >
-        <input type="file" class="hidden" />
-        Choose Image
-      </label>
-    {:else}
+        <div class="self-center">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 32 32"
+            width="32"
+            height="32"
+            ><path fill="none" d="M0 0h24v24H0z" /><path
+              d="M1 14.5a6.496 6.496 0 0 1 3.064-5.519 8.001 8.001 0 0 1 15.872 0 6.5 6.5 0 0 1-2.936 12L7 21c-3.356-.274-6-3.078-6-6.5zm15.848 4.487a4.5 4.5 0 0 0 2.03-8.309l-.807-.503-.12-.942a6.001 6.001 0 0 0-11.903 0l-.12.942-.805.503a4.5 4.5 0 0 0 2.029 8.309l.173.013h9.35l.173-.013zM13 13v4h-2v-4H8l4-5 4 5h-3z"
+            /></svg
+          >
+        </div>
+        <div class="self-center">
+          <p>Click or Drag & Drop Image</p>
+        </div>
+      </div>
+    </div>
+    <div
+      class="absolute m-4 inset-0 flex flex-col justify-center items-center z-10 bg-gray-500 opacity-75 rounded-xl {progressVisibility}"
+    />
+  </div>
+  {#if !update}
+    <div class="justify-center card-actions last:my-2">
       <button
         class="btn btn-xs btn-secondary md:btn-sm"
-        on:click={e => upload()}
+        on:click={() => {
+          setUpdate(true);
+        }}
       >
-        Upload</button
+        Change Photo
+      </button>
+    </div>
+  {:else}
+    <div class="justify-center card-actions last:my-2">
+      {#if !uploadReady}
+        <label
+          class="custom-file-upload btn  btn-xs btn-secondary md:btn-sm"
+          use:filedrop={options}
+          on:filedrop={onChange}
+        >
+          <input type="file" class="hidden" />
+          Choose Image
+        </label>
+      {:else}
+        <button
+          class="btn btn-xs btn-secondary md:btn-sm"
+          on:click={e => upload()}
+        >
+          Upload</button
+        >
+      {/if}
+      <button
+        class="btn btn-xs btn-outline btn-secondary md:btn-sm"
+        on:click={resetForm}
       >
-    {/if}
-    <button
-      class="btn btn-xs btn-outline btn-secondary md:btn-sm"
-      on:click={resetForm}
-    >
-      Cancel</button
-    >
-  </div>
-{/if}
+        Cancel</button
+      >
+    </div>
+  {/if}
+</div>

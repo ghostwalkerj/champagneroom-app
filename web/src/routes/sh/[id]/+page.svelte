@@ -37,18 +37,14 @@
 </script>
 
 <div class="mt-6   ">
-  <div class="flex flex-row justify-center  min-h-[calc(100vh-200px)]">
+  <div class="flex flex-row justify-center">
     <!-- Page header -->
-    {#key show}
-      <div class="pb-4  text-center w-full max-w-xl">
-        <ShowDetail {show} />
-        {#if canBuyTicket}
-          <label for="buy-ticket" class="btn btn-secondary m-4"
-            >Buy Ticket</label
-          >
-        {/if}
-      </div>
-    {/key}
+    <div class="pb-4  text-center w-full max-w-xl">
+      <ShowDetail {show} />
+      {#if canBuyTicket}
+        <label for="buy-ticket" class="btn btn-secondary m-4">Buy Ticket</label>
+      {/if}
+    </div>
     <input type="checkbox" id="buy-ticket" class="modal-toggle" />
     <div class="modal">
       <div class="modal-box relative">
