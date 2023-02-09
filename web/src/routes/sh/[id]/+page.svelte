@@ -36,10 +36,10 @@
   });
 </script>
 
-<div class="mt-6   ">
-  <div class="flex flex-row justify-center">
+<div class="mt-4   h-[calc(100vh-100px)] md:min-h-full">
+  <div class="flex flex-row justify-center h-full">
     <!-- Page header -->
-    <div class="pb-4  text-center w-full max-w-xl">
+    <div class="pb-4  text-center w-full max-w-3xl h-full">
       <ShowDetail {show} />
       {#if canBuyTicket}
         <label for="buy-ticket" class="btn btn-secondary m-4">Buy Ticket</label>

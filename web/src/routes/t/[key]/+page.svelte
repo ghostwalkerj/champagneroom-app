@@ -176,12 +176,10 @@
   };
 </script>
 
-<div class="min-h-full">
+<div class="h-full w-full flex place-content-center">
   <!-- Page header -->
 
-  <div
-    class="m-auto p-4 grid gap-3 grid-cols-1 min-w-full md:min-w-min max-w-7xl  md:grid-flow-col-dense md:grid-cols-4"
-  >
+  <div class="p-4 grid gap-3 min-w-full md:min-w-min max-w-7xl md:grid-cols-4">
     <!-- 1st column -->
     <div class="space-y-3 md:col-start-1 md:col-span-3">
       <!-- Status -->
@@ -351,19 +349,17 @@
           </div>
         </div>
       {/if}
-      {#key showMachineState || currentShow}
-        <div class="h-full">
-          <ShowDetail
-            show={currentShow}
-            options={{
-              showCopy: true,
-              showSalesStats: true,
-              showName: false,
-              showRating: false,
-            }}
-          />
-        </div>
-      {/key}
+      <div class="">
+        <ShowDetail
+          show={currentShow}
+          options={{
+            showCopy: true,
+            showSalesStats: true,
+            showRating: false,
+            showWaterMark: false,
+          }}
+        />
+      </div>
       {#if canCancelShow}
         <!-- Link Form-->
         <form method="post" action="?/cancel_show" use:enhance={onSubmit}>
@@ -392,7 +388,7 @@
     </div>
 
     <!--Next Column-->
-    <div class="space-y-3 lg:col-start-4 lg:col-span-1">
+    <div class="space-y-3 md:col-start-4 md:col-span-1">
       <!-- Photo -->
       <div>
         <div class="lg:col-start-3 lg:col-span-1">

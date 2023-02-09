@@ -22,7 +22,7 @@
     </div>
   </div>
 
-  <div>
+  <div class="">
     <slot />
   </div>
 </div>
