@@ -205,11 +205,9 @@ export const actions: Actions = {
         .find()
         .where('show')
         .eq(cancelShow._id)
-        .where('entityType')
-        .eq(TicketString)
         .exec()) as TicketDocument[];
       for (const ticket of tickets) {
-        console.log('ticket', JSON.stringify(ticket));
+        console.log('ticket', ticket.toJSON());
         if (ticket.ticketState.status === TicketStatus.RESERVED) {
           const ticketService = createTicketMachineService({
             ticketState: ticket.ticketState,

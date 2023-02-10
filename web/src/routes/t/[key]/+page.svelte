@@ -33,22 +33,21 @@
   let showName = possessive(talent.name, 'en') + ' Show';
   $: showDuration = 60;
   let key = $page.params.key;
-  let showMachineService: ShowMachineServiceType;
+  let showMachineService =
+    currentShow &&
+    createShowMachineService({
+      showState: currentShow.showState,
+    });
   let showSub: Subscription;
   const showPath = urlJoin($page.url.href, 'show');
 
   let showMachineState =
-    currentShow &&
-    createShowMachineService({
-      showState: currentShow.showState,
-    }).getSnapshot();
+    currentShow && showMachineService && showMachineService.getSnapshot();
 
   $: canCancelShow =
-    showMachineState &&
-    showMachineState.can({
-      type: 'REQUEST CANCELLATION',
-      cancel: undefined,
-    });
+    currentShow &&
+    (currentShow.showState.status === ShowStatus.BOX_OFFICE_CLOSED ||
+      currentShow.showState.status === ShowStatus.BOX_OFFICE_OPEN);
 
   $: canCreateShow =
     !currentShow ||
