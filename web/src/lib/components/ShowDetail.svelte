@@ -42,7 +42,7 @@
 {#if show}
   <div class="flex justify-center h-full relative">
     <div
-      class="flex flex-col bg-cover w-full p-4 gap-4 rounded-xl bg-base-200 min-h-[800px]"
+      class="flex flex-col bg-cover w-full p-4 gap-4 rounded-xl bg-base-200 min-h-[700px]"
       style="background-image: url('{show.talentInfo.profileImageUrl}')"
     >
       <div class="h-full">

@@ -83,7 +83,7 @@ const ShowEventSchemaLiteral = {
     },
   },
   required: ['_id', 'show', 'createdAt', 'type', 'talent', 'agent'],
-  indexes: ['show', 'talent', 'agent', 'ticket', 'createdAt'],
+  indexes: ['show', 'talent', 'agent', 'ticket', 'createdAt', 'entityType'],
 } as const;
 
 type ShowEventRef = {

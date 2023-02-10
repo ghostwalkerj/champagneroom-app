@@ -275,6 +275,7 @@ const showSchemaLiteral = {
     'talentInfo',
   ],
   encrypted: ['roomId'],
+  indexes: ['talent', 'agent', 'entityType'],
 } as const;
 
 type showRef = {

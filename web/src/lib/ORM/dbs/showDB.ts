@@ -13,11 +13,17 @@ import {
   showSchema,
   type ShowCollection,
   type ShowDocument,
+  ShowString,
 } from '$lib/ORM/models/show';
 import { PouchDB, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
 import type { ShowEventCollection } from '../models/showEvent';
+import { ShowEventString } from '../models/showEvent';
 import { showEventSchema } from '../models/showEvent';
-import { ticketSchema, type TicketCollection } from '../models/ticket';
+import {
+  ticketSchema,
+  type TicketCollection,
+  TicketString,
+} from '../models/ticket';
 
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 100;
@@ -88,7 +94,24 @@ const create = async (
       return PouchDB.fetch(url, opts);
     },
   });
-  const showQuery = _db.shows.findOne(showId);
+  const showQuery = _db.shows
+    .findOne(showId)
+    .where('entityType')
+    .eq(ShowString);
+
+  const ticketQuery = _db.tickets
+    .find()
+    .where('show')
+    .eq(showId)
+    .where('entityType')
+    .eq(TicketString);
+
+  const showEventQuery = _db.showEvents
+    .find()
+    .where('show')
+    .eq(showId)
+    .where('entityType')
+    .eq(ShowEventString);
 
   const repState = _db.shows.syncCouchDB({
     remote: remoteDB,
@@ -110,6 +133,28 @@ const create = async (
         live: true,
       },
       query: showQuery,
+    });
+
+    // Live sync showEvents
+    _db.showEvents.syncCouchDB({
+      remote: remoteDB,
+      waitForLeadership: false,
+      options: {
+        retry: true,
+        live: true,
+      },
+      query: showEventQuery,
+    });
+
+    // Live sync tickets
+    _db.tickets.syncCouchDB({
+      remote: remoteDB,
+      waitForLeadership: false,
+      options: {
+        retry: true,
+        live: true,
+      },
+      query: ticketQuery,
     });
   }
   _showDB.set(showId, _db);

@@ -11,17 +11,23 @@ import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
 import { PouchDB, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
 
 import {
+  ShowString,
   showDocMethods,
   showSchema,
   type ShowCollection,
 } from '$lib/ORM/models/show';
 import {
+  TicketString,
   ticketDocMethods,
   ticketSchema,
   type TicketCollection,
   type TicketDocument,
 } from '$lib/ORM/models/ticket';
-import { showEventSchema, type ShowEventCollection } from '../models/showEvent';
+import {
+  ShowEventString,
+  showEventSchema,
+  type ShowEventCollection,
+} from '../models/showEvent';
 import {
   transactionSchema,
   type TransactionCollection,
@@ -98,7 +104,10 @@ const create = async (
       return PouchDB.fetch(url, opts);
     },
   });
-  const ticketQuery = _db.tickets.findOne(ticketId);
+  const ticketQuery = _db.tickets
+    .findOne(ticketId)
+    .where('entityType')
+    .eq(TicketString);
 
   let repState = _db.tickets.syncCouchDB({
     remote: remoteDB,
@@ -112,11 +121,16 @@ const create = async (
 
   const _thisTicket = (await ticketQuery.exec()) as TicketDocument;
   if (_thisTicket) {
-    const showQuery = _db.shows.findOne(_thisTicket.show);
+    const showQuery = _db.shows
+      .findOne(_thisTicket.show)
+      .where('entityType')
+      .eq(ShowString);
     const showEventQuery = _db.showEvents
       .find()
       .where('ticket')
-      .eq(_thisTicket._id);
+      .eq(_thisTicket._id)
+      .where('entityType')
+      .eq(ShowEventString);
 
     repState = _db.shows.syncCouchDB({
       remote: remoteDB,

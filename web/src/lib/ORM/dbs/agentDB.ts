@@ -3,6 +3,7 @@ import {
   PUBLIC_RXDB_PASSWORD,
 } from '$env/static/public';
 import {
+  AgentString,
   agentDocMethods,
   agentSchema,
   agentStaticMethods,
@@ -10,11 +11,13 @@ import {
 } from '$lib/ORM/models/agent';
 
 import {
+  ShowString,
   showDocMethods,
   showSchema,
   type ShowCollection,
 } from '$lib/ORM/models/show';
 import {
+  ShowEventString,
   showEventSchema,
   type ShowEventCollection,
 } from '$lib/ORM/models/showEvent';
@@ -24,12 +27,14 @@ import {
   type TalentCollection,
 } from '$lib/ORM/models/talent';
 import {
+  TicketString,
   ticketDocMethods,
   ticketSchema,
   type TicketCollection,
 } from '$lib/ORM/models/ticket';
 
 import {
+  TransactionString,
   transactionSchema,
   type TransactionCollection,
 } from '$lib/ORM/models/transaction';
@@ -127,11 +132,36 @@ const create = async (
   });
 
   const agentQuery = _db.agents.findOne(agentId);
-  const talentQuery = _db.talents.find().where('agent').eq(agentId);
-  const showQuery = _db.shows.find().where('agent').eq(agentId);
-  const ticketQuery = _db.tickets.find().where('agent').eq(agentId);
-  const showEventQuery = _db.showEvents.find().where('agent').eq(agentId);
-  const transactionQuery = _db.transactions.find().where('agent').eq(agentId);
+  const talentQuery = _db.talents
+    .find()
+    .where('agent')
+    .eq(agentId)
+    .where('entityType')
+    .eq(AgentString);
+  const showQuery = _db.shows
+    .find()
+    .where('agent')
+    .eq(agentId)
+    .where('entityType')
+    .eq(ShowString);
+  const ticketQuery = _db.tickets
+    .find()
+    .where('agent')
+    .eq(agentId)
+    .where('entityType')
+    .eq(TicketString);
+  const showEventQuery = _db.showEvents
+    .find()
+    .where('agent')
+    .eq(agentId)
+    .where('entityType')
+    .eq(ShowEventString);
+  const transactionQuery = _db.transactions
+    .find()
+    .where('agent')
+    .eq(agentId)
+    .where('entityType')
+    .eq(TransactionString);
 
   let repState = _db.agents.syncCouchDB({
     remote: remoteDB,

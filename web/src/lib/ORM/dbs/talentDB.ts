@@ -3,6 +3,7 @@ import {
   PUBLIC_TALENT_DB_ENDPOINT,
 } from '$env/static/public';
 import {
+  ShowString,
   showDocMethods,
   showSchema,
   type ShowCollection,
@@ -18,10 +19,13 @@ import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
 import { PouchDB, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
-import type { ShowEventCollection } from '../models/showEvent';
-import { showEventSchema } from '../models/showEvent';
+import {
+  type ShowEventCollection,
+  ShowEventString,
+  showEventSchema,
+} from '../models/showEvent';
 import type { TicketCollection } from '../models/ticket';
-import { ticketSchema } from '../models/ticket';
+import { TicketString, ticketSchema } from '../models/ticket';
 
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 100;
@@ -113,16 +117,23 @@ const create = async (
   const _currentTalent = await talentQuery.exec();
 
   if (_currentTalent) {
-    const currentShowQuery = _db.shows.findOne(_currentTalent.currentShow);
+    const showQuery = _db.shows
+      .findOne(_currentTalent.currentShow)
+      .where('entityType')
+      .eq(ShowString);
     const ticketQuery = _db.tickets
       .find()
       .where('show')
-      .eq(_currentTalent?.currentShow);
-    const showQuery = _db.shows.find().where('talent').eq(_currentTalent._id);
+      .eq(_currentTalent?.currentShow)
+      .where('entityType')
+      .eq(TicketString);
     const showEventQuery = _db.showEvents
       .find()
-      .where('talent')
-      .eq(_currentTalent._id);
+      .where('show')
+      .eq(_currentTalent?.currentShow)
+      .where('entityType')
+      .eq(ShowEventString);
+
     // Wait for shows
     repState = _db.shows.syncCouchDB({
       remote: remoteDB,
@@ -130,8 +141,20 @@ const create = async (
       options: {
         retry: true,
       },
-      query: currentShowQuery,
+      query: showQuery,
     });
+    await repState.awaitInitialReplication();
+
+    // Wait for any tickets
+    repState = _db.tickets.syncCouchDB({
+      remote: remoteDB,
+      waitForLeadership: false,
+      options: {
+        retry: true,
+      },
+      query: ticketQuery,
+    });
+
     await repState.awaitInitialReplication();
 
     // Live sync this Talent's shows

@@ -1632,9 +1632,9 @@
     import-meta-resolve "^2.2.0"
 
 "@sveltejs/adapter-node@^1.1.2":
-  version "1.1.7"
-  resolved "https://registry.yarnpkg.com/@sveltejs/adapter-node/-/adapter-node-1.1.7.tgz#0bf087fa4b9c73987f8ac0d762e45bb5be0a5dda"
-  integrity sha512-N93uYDzH8+RlneYdfgS33nudVk9e8JhYy9vPOsJKeMCkWPb5ejJ0D+LUAEuyA1BOyA7ZkaVTupLStAG4nuhT2A==
+  version "1.1.8"
+  resolved "https://registry.yarnpkg.com/@sveltejs/adapter-node/-/adapter-node-1.1.8.tgz#9bcee04b5552122e8439d03cc421da8589246cae"
+  integrity sha512-jxvj+E24SziP/0IhNWDxNeleC/S5yeEMhAYKuuKIyygw7C8NjyrbwUEizBjn4sb/XyGfJWw1/yoXqtCANoyl4g==
   dependencies:
     "@rollup/plugin-commonjs" "^24.0.0"
     "@rollup/plugin-json" "^6.0.0"
@@ -1642,9 +1642,9 @@
     rollup "^3.7.0"
 
 "@sveltejs/kit@^1.1.1":
-  version "1.5.2"
-  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-1.5.2.tgz#2eb20719d8571061459036b8a7dffc6db06fd99a"
-  integrity sha512-ZLi5x1dy5M4EU/NlH/fvSJ1k2wT3/04NaEOkSMJvGS0JYyFPn+H2tXbVQg7XI/eX84d5GeScxwmn4UVZWaMbsA==
+  version "1.5.3"
+  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-1.5.3.tgz#f73a8849d2e642e288db6f039cbebd10bc2aabc3"
+  integrity sha512-R0WsMf8yhtU31jiDzaj2zMchCyDsBcSlDFJJ24EzJyOeZ+VJvDLg7YbegvbNU0vfdfRUTWhIrCSaOQ6po+oEVQ==
   dependencies:
     "@sveltejs/vite-plugin-svelte" "^2.0.0"
     "@types/cookie" "^0.5.1"

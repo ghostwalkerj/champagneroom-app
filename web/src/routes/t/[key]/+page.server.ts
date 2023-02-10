@@ -10,7 +10,12 @@ import { talentDB } from '$lib/ORM/dbs/talentDB';
 import type { ShowDocument } from '$lib/ORM/models/show';
 import { ShowCancelReason } from '$lib/ORM/models/show';
 import { ShowEventType } from '$lib/ORM/models/showEvent';
-import { TicketCancelReason, TicketStatus } from '$lib/ORM/models/ticket';
+import type { TicketDocument } from '$lib/ORM/models/ticket';
+import {
+  TicketCancelReason,
+  TicketStatus,
+  TicketString,
+} from '$lib/ORM/models/ticket';
 import { TransactionReasonType } from '$lib/ORM/models/transaction';
 import { StorageType } from '$lib/ORM/rxdb';
 import { createShowMachineService } from '$lib/machines/showMachine';
@@ -196,12 +201,15 @@ export const actions: Actions = {
 
       // Loop through all tickets and refund them
       const db = talent.collection.database;
-      const tickets = await db.tickets
+      const tickets = (await db.tickets
         .find()
         .where('show')
         .eq(cancelShow._id)
-        .exec();
+        .where('entityType')
+        .eq(TicketString)
+        .exec()) as TicketDocument[];
       for (const ticket of tickets) {
+        console.log('ticket', JSON.stringify(ticket));
         if (ticket.ticketState.status === TicketStatus.RESERVED) {
           const ticketService = createTicketMachineService({
             ticketState: ticket.ticketState,

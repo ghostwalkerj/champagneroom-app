@@ -348,18 +348,22 @@
             </div>
           </div>
         </div>
+      {:else}
+        {#key showMachineState || currentShow}
+          <div class="h-full">
+            <ShowDetail
+              show={currentShow}
+              options={{
+                showCopy: true,
+                showSalesStats: true,
+                showRating: false,
+                showWaterMark: false,
+              }}
+            />
+          </div>
+        {/key}
       {/if}
-      <div class="">
-        <ShowDetail
-          show={currentShow}
-          options={{
-            showCopy: true,
-            showSalesStats: true,
-            showRating: false,
-            showWaterMark: false,
-          }}
-        />
-      </div>
+
       {#if canCancelShow}
         <!-- Link Form-->
         <form method="post" action="?/cancel_show" use:enhance={onSubmit}>

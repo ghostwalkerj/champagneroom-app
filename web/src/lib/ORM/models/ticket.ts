@@ -264,7 +264,7 @@ const ticketSchemaLiteral = {
     'ticketState',
     'createdAt',
   ],
-  indexes: ['show'],
+  indexes: ['show', 'entityType', 'agent', 'talent'],
 } as const;
 
 type ticketRef = {
