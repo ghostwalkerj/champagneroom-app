@@ -11,11 +11,7 @@ import type { ShowDocument } from '$lib/ORM/models/show';
 import { ShowCancelReason } from '$lib/ORM/models/show';
 import { ShowEventType } from '$lib/ORM/models/showEvent';
 import type { TicketDocument } from '$lib/ORM/models/ticket';
-import {
-  TicketCancelReason,
-  TicketStatus,
-  TicketString,
-} from '$lib/ORM/models/ticket';
+import { TicketCancelReason, TicketStatus } from '$lib/ORM/models/ticket';
 import { TransactionReasonType } from '$lib/ORM/models/transaction';
 import { StorageType } from '$lib/ORM/rxdb';
 import { createShowMachineService } from '$lib/machines/showMachine';
