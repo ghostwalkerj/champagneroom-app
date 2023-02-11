@@ -9,7 +9,7 @@ import {
 import { talentDB } from '$lib/ORM/dbs/talentDB';
 import type { ShowDocument } from '$lib/ORM/models/show';
 import { ShowCancelReason } from '$lib/ORM/models/show';
-import { ShowEventType } from '$lib/ORM/models/showEvent';
+import { ShowEventType } from '$lib/ORM/models/showevent';
 import type { TicketDocument } from '$lib/ORM/models/ticket';
 import { TicketCancelReason, TicketStatus } from '$lib/ORM/models/ticket';
 import { TransactionReasonType } from '$lib/ORM/models/transaction';
@@ -191,7 +191,7 @@ export const actions: Actions = {
         cancel,
       });
 
-      cancelShow.createShowEvent({
+      cancelShow.createShowevent({
         type: ShowEventType.CANCELLATION_REQUESTED,
       });
 
@@ -242,7 +242,7 @@ export const actions: Actions = {
               transaction,
               ticket,
             });
-            cancelShow.createShowEvent({
+            cancelShow.createShowevent({
               type: ShowEventType.TICKET_REFUNDED,
               ticket,
               transaction,

@@ -16,15 +16,12 @@ import {
   showSchema,
   type ShowCollection,
 } from '$lib/ORM/models/show';
-import {
-  ShowEventString,
-  showEventSchema,
-  type ShowEventCollection,
-} from '$lib/ORM/models/showEvent';
+
 import {
   talentDocMethods,
   talentSchema,
   type TalentCollection,
+  TalentString,
 } from '$lib/ORM/models/talent';
 import {
   TicketString,
@@ -54,7 +51,6 @@ type AgentCollections = {
   tickets: TicketCollection;
   shows: ShowCollection;
   transactions: TransactionCollection;
-  showEvents: ShowEventCollection;
 };
 
 export type AgentDBType = RxDatabase<AgentCollections>;
@@ -115,9 +111,6 @@ const create = async (
     transactions: {
       schema: transactionSchema,
     },
-    showEvents: {
-      schema: showEventSchema,
-    },
   });
 
   // Sync if there is a remote endpoint
@@ -131,31 +124,34 @@ const create = async (
     },
   });
 
-  const agentQuery = _db.agents.findOne(agentId);
+  const agentQuery = _db.agents
+    .findOne(agentId)
+    .where('entityType')
+    .eq(AgentString);
+
   const talentQuery = _db.talents
     .find()
     .where('agent')
     .eq(agentId)
     .where('entityType')
-    .eq(AgentString);
+    .eq(TalentString);
+
   const showQuery = _db.shows
     .find()
     .where('agent')
     .eq(agentId)
     .where('entityType')
-    .eq(ShowString);
+    .eq(ShowString)
+    .where('showState.active')
+    .eq(true);
   const ticketQuery = _db.tickets
     .find()
     .where('agent')
     .eq(agentId)
     .where('entityType')
-    .eq(TicketString);
-  const showEventQuery = _db.showEvents
-    .find()
-    .where('agent')
-    .eq(agentId)
-    .where('entityType')
-    .eq(ShowEventString);
+    .eq(TicketString)
+    .where('ticketState.active')
+    .eq(true);
   const transactionQuery = _db.transactions
     .find()
     .where('agent')
@@ -200,16 +196,6 @@ const create = async (
       retry: true,
     },
     query: ticketQuery,
-  });
-  await repState.awaitInitialReplication();
-
-  repState = _db.showEvents.syncCouchDB({
-    remote: remoteDB,
-    waitForLeadership: false,
-    options: {
-      retry: true,
-    },
-    query: showEventQuery,
   });
   await repState.awaitInitialReplication();
 
@@ -263,16 +249,6 @@ const create = async (
       live: true,
     },
     query: ticketQuery,
-  });
-
-  _db.showEvents.syncCouchDB({
-    remote: remoteDB,
-    waitForLeadership: false,
-    options: {
-      retry: true,
-      live: true,
-    },
-    query: showEventQuery,
   });
 
   _db.transactions.syncCouchDB({

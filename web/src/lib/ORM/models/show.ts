@@ -9,8 +9,8 @@ import {
   type RxJsonSchema,
 } from 'rxdb';
 import type { AgentDocument } from './agent';
-import type { ShowEventDocument, ShowEventType } from './showEvent';
-import { ShowEventString } from './showEvent';
+import type { ShowEventDocument, ShowEventType } from './showevent';
+import { ShowEventString } from './showevent';
 import type { TalentDocument } from './talent';
 import {
   TicketStatus,
@@ -47,7 +47,7 @@ type ShowDocMethods = {
     name: string;
     pin: string;
   }) => Promise<TicketDocument>;
-  createShowEvent: (showEventProps: {
+  createShowevent: (showeventProps: {
     type: ShowEventType;
     ticket?: TicketDocType;
     transaction?: TransactionDocType;
@@ -82,6 +82,7 @@ export const showDocMethods: ShowDocMethods = {
         price: this.price,
         refundedAmount: 0,
         totalPaid: 0,
+        active: true,
         reservation: {
           createdAt: new Date().getTime(),
           name: ticketProps.name,
@@ -92,9 +93,9 @@ export const showDocMethods: ShowDocMethods = {
     const ticket = await db.tickets.insert(_ticket);
     return ticket;
   },
-  createShowEvent: async function (
+  createShowevent: async function (
     this: ShowDocument,
-    showEventProps: {
+    showeventProps: {
       type: ShowEventType;
       ticket?: TicketDocType;
       transaction?: TransactionDocType;
@@ -103,17 +104,17 @@ export const showDocMethods: ShowDocMethods = {
     const db = this.collection.database;
     let ticketId: string | undefined = undefined;
     let name: string | undefined = undefined;
-    const transactionId = showEventProps.transaction?._id || undefined;
-    if (showEventProps.ticket) {
-      ticketId = showEventProps.ticket._id;
-      name = showEventProps.ticket.ticketState.reservation.name;
+    const transactionId = showeventProps.transaction?._id || undefined;
+    if (showeventProps.ticket) {
+      ticketId = showeventProps.ticket._id;
+      name = showeventProps.ticket.ticketState.reservation.name;
     }
-    const _showEvent = {
-      _id: `showEvent:se-${nanoid()}`,
+    const _showevent = {
+      _id: `showevent:se-${nanoid()}`,
       createdAt: new Date().getTime(),
       updatedAt: new Date().getTime(),
       entityType: ShowEventString,
-      type: showEventProps.type,
+      type: showeventProps.type,
       show: this._id,
       talent: this.talent,
       agent: this.agent,
@@ -123,8 +124,8 @@ export const showDocMethods: ShowDocMethods = {
       },
       transaction: transactionId,
     };
-    const showEvent = await db.showEvents.insert(_showEvent);
-    return showEvent;
+    const showevent = await db.showevents.insert(_showevent);
+    return showevent;
   },
 };
 
@@ -145,7 +146,7 @@ const showSchemaLiteral = {
       maxLength: 20,
       final: true,
     },
-    createdAt: { type: 'integer' },
+    createdAt: { type: 'integer', minimum: 0, maximum: 9999999999999 },
     updatedAt: {
       type: 'integer',
     },
@@ -159,14 +160,16 @@ const showSchemaLiteral = {
         status: {
           type: 'string',
           enum: Object.values(ShowStatus),
-          default: ShowStatus.CREATED,
+        },
+        active: {
+          type: 'boolean',
         },
         updatedAt: { type: 'integer' },
         ticketsAvailable: { type: 'integer' },
-        ticketsReserved: { type: 'integer', default: 0 },
-        ticketsSold: { type: 'integer', default: 0 },
-        ticketsRefunded: { type: 'integer', default: 0 },
-        totalSales: { type: 'integer', default: 0 },
+        ticketsReserved: { type: 'integer' },
+        ticketsSold: { type: 'integer' },
+        ticketsRefunded: { type: 'integer' },
+        totalSales: { type: 'integer' },
         startDate: { type: 'integer' },
         endDate: { type: 'integer' },
         refundedAmount: {
@@ -275,7 +278,13 @@ const showSchemaLiteral = {
     'talentInfo',
   ],
   encrypted: ['roomId'],
-  indexes: ['talent', 'agent', 'entityType'],
+  indexes: [
+    ['talent', 'entityType', 'showState.active'],
+    ['agent', 'entityType', 'showState.active'],
+    ['_id', 'entityType'],
+    ['entityType', 'showState.active'],
+    'createdAt',
+  ],
 } as const;
 
 type showRef = {

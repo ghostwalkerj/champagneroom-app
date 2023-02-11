@@ -120,7 +120,10 @@ const talentSchemaLiteral = {
     'agentCommission',
     'createdAt',
   ],
-  indexes: ['key', 'agent', 'entityType'],
+  indexes: [
+    ['key', 'entityType'],
+    ['agent', 'entityType'],
+  ],
 } as const;
 
 type talentRef = {
@@ -173,6 +176,7 @@ export const talentDocMethods: TalentDocMethods = {
         ticketsRefunded: 0,
         totalSales: 0,
         refundedAmount: 0,
+        active: true,
       },
       _id: `${ShowString}:sh-${nanoid()}`,
       createdAt: new Date().getTime(),
@@ -181,6 +185,7 @@ export const talentDocMethods: TalentDocMethods = {
       roomId: uuidv4(),
       maxNumTickets: showProps.maxNumTickets,
     } as ShowDocType;
+
     const newShow = await db.shows.insert(show);
     this.update({ $set: { currentShow: newShow._id } });
     return newShow;

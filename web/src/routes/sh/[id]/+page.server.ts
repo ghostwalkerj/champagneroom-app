@@ -9,7 +9,7 @@ import {
 import { PUBLIC_TICKET_PATH } from '$env/static/public';
 import { showDB } from '$lib/ORM/dbs/showDB';
 import type { ShowDocType } from '$lib/ORM/models/show';
-import { ShowEventType } from '$lib/ORM/models/showEvent';
+import { ShowEventType } from '$lib/ORM/models/showevent';
 import { StorageType } from '$lib/ORM/rxdb';
 import { createShowMachineService } from '$lib/machines/showMachine';
 import { mensNames } from '$lib/util/mensNames';
@@ -136,7 +136,7 @@ export const actions: import('./$types').Actions = {
 
     showService.send('TICKET RESERVED');
 
-    show.createShowEvent({
+    show.createShowevent({
       type: ShowEventType.TICKET_RESERVED,
       ticket,
     });

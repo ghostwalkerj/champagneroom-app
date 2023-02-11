@@ -108,6 +108,7 @@ const ticketSchemaLiteral = {
       maxLength: 20,
       final: true,
     },
+
     paymentAddress: {
       type: 'string',
       maxLength: 50,
@@ -118,23 +119,23 @@ const ticketSchemaLiteral = {
         status: {
           type: 'string',
           enum: Object.values(TicketStatus),
-          default: TicketStatus.RESERVED,
+        },
+        active: {
+          type: 'boolean',
+          default: true,
         },
         price: {
           type: 'integer',
-          default: 0,
           minimum: 0,
           maximum: 99999,
         },
         totalPaid: {
           type: 'integer',
-          default: 0,
           minimum: 0,
           maximum: 99999,
         },
         refundedAmount: {
           type: 'integer',
-          default: 0,
           minimum: 0,
           maximum: 99999,
         },
@@ -212,7 +213,6 @@ const ticketSchemaLiteral = {
           properties: {
             rating: {
               type: 'integer',
-              default: 0,
               minimum: 0,
               maximum: 5,
             },
@@ -264,7 +264,13 @@ const ticketSchemaLiteral = {
     'ticketState',
     'createdAt',
   ],
-  indexes: ['show', 'entityType', 'agent', 'talent'],
+  indexes: [
+    ['show', 'entityType', 'ticketState.active'],
+    ['_id', 'entityType'],
+    ['agent', 'entityType', 'ticketState.active'],
+    ['talent', 'entityType', 'ticketState.active'],
+    'ticketState.active',
+  ],
 } as const;
 
 type ticketRef = {

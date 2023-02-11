@@ -25,12 +25,13 @@ import {
 } from '$lib/ORM/models/ticket';
 import {
   ShowEventString,
-  showEventSchema,
+  showeventSchema,
   type ShowEventCollection,
-} from '../models/showEvent';
+} from '../models/showevent';
 import {
   transactionSchema,
   type TransactionCollection,
+  TransactionString,
 } from '../models/transaction';
 
 // Sync requires more listeners but ok with http2
@@ -38,7 +39,7 @@ EventEmitter.defaultMaxListeners = 100;
 type PublicCollections = {
   tickets: TicketCollection;
   shows: ShowCollection;
-  showEvents: ShowEventCollection;
+  showevents: ShowEventCollection;
   transactions: TransactionCollection;
 };
 
@@ -87,8 +88,8 @@ const create = async (
       schema: showSchema,
       methods: showDocMethods,
     },
-    showEvents: {
-      schema: showEventSchema,
+    showevents: {
+      schema: showeventSchema,
     },
     transactions: {
       schema: transactionSchema,
@@ -125,12 +126,20 @@ const create = async (
       .findOne(_thisTicket.show)
       .where('entityType')
       .eq(ShowString);
-    const showEventQuery = _db.showEvents
+
+    const showeventQuery = _db.showevents
       .find()
       .where('ticket')
       .eq(_thisTicket._id)
       .where('entityType')
       .eq(ShowEventString);
+
+    const transactionQuery = _db.transactions
+      .find()
+      .where('ticket')
+      .eq(ticketId)
+      .where('entityType')
+      .eq(TransactionString);
 
     repState = _db.shows.syncCouchDB({
       remote: remoteDB,
@@ -142,16 +151,6 @@ const create = async (
     });
     await repState.awaitInitialReplication();
 
-    _db.tickets.syncCouchDB({
-      remote: remoteDB,
-      waitForLeadership: false,
-      options: {
-        retry: true,
-        live: true,
-      },
-      query: ticketQuery,
-    });
-
     _db.shows.syncCouchDB({
       remote: remoteDB,
       waitForLeadership: false,
@@ -162,14 +161,34 @@ const create = async (
       query: showQuery,
     });
 
-    _db.showEvents.syncCouchDB({
+    repState = _db.tickets.syncCouchDB({
       remote: remoteDB,
       waitForLeadership: false,
       options: {
         retry: true,
         live: true,
       },
-      query: showEventQuery,
+      query: ticketQuery,
+    });
+
+    _db.showevents.syncCouchDB({
+      remote: remoteDB,
+      waitForLeadership: false,
+      options: {
+        retry: true,
+        live: true,
+      },
+      query: showeventQuery,
+    });
+
+    _db.transactions.syncCouchDB({
+      remote: remoteDB,
+      waitForLeadership: false,
+      options: {
+        retry: true,
+        live: true,
+      },
+      query: transactionQuery,
     });
   }
   _ticketDB.set(ticketId, _db);

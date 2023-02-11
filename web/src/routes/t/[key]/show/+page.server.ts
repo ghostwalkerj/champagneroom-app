@@ -9,7 +9,7 @@ import {
 import { PUBLIC_JITSI_DOMAIN, PUBLIC_TALENT_PATH } from '$env/static/public';
 import { talentDB } from '$lib/ORM/dbs/talentDB';
 import type { ShowDocument } from '$lib/ORM/models/show';
-import { ShowEventType } from '$lib/ORM/models/showEvent';
+import { ShowEventType } from '$lib/ORM/models/showevent';
 import { StorageType } from '$lib/ORM/rxdb';
 import { createShowMachineService } from '$lib/machines/showMachine';
 import type { Actions } from '@sveltejs/kit';
@@ -70,7 +70,7 @@ export const load: import('./$types').PageServerLoad = async ({ params }) => {
   showService.send({
     type: 'START SHOW',
   });
-  show.createShowEvent({
+  show.createShowevent({
     type: ShowEventType.STARTED,
   });
 
@@ -117,7 +117,7 @@ export const actions: Actions = {
       showService.send({
         type: 'END SHOW',
       });
-      endShow.createShowEvent({
+      endShow.createShowevent({
         type: ShowEventType.ENDED,
       });
     }

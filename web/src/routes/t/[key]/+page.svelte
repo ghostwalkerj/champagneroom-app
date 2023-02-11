@@ -16,7 +16,7 @@
 
   import { goto } from '$app/navigation';
   import ShowDetail from '$lib/components/ShowDetail.svelte';
-  import { ShowEventType } from '$lib/ORM/models/showEvent';
+  import { ShowEventType } from '$lib/ORM/models/showevent';
   import * as timeago from 'timeago.js';
   import urlJoin from 'url-join';
   import type { Subscription } from 'xstate';
@@ -124,7 +124,7 @@
               currentShow = await db.shows.findOne(showId).exec();
               if (currentShow) {
                 useShow(currentShow);
-                db.showEvents
+                db.showevents
                   .findOne()
                   .where('show')
                   .eq(currentShow._id)

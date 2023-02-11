@@ -259,6 +259,7 @@ export const createTicketMachine = ({
               ...context.ticketState,
               updatedAt: new Date().getTime(),
               status: TicketStatus.CANCELLED,
+              active: false,
             },
           };
         }),
@@ -338,6 +339,7 @@ export const createTicketMachine = ({
                 updatedAt: new Date().getTime(),
                 finalized: finalized,
                 status: TicketStatus.FINALIZED,
+                active: false,
               },
             };
           }

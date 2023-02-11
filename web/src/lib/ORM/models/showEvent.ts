@@ -23,8 +23,8 @@ export enum ShowEventType {
 }
 
 const ShowEventSchemaLiteral = {
-  title: 'showEvent',
-  description: 'showEvent for a show',
+  title: 'showevent',
+  description: 'showevent for a show',
   version: 0,
   type: 'object',
   primaryKey: '_id',
@@ -35,11 +35,11 @@ const ShowEventSchemaLiteral = {
     },
     entityType: {
       type: 'string',
-      default: 'showEvent',
+      default: 'showevent',
       maxLength: 20,
       final: true,
     },
-    createdAt: { type: 'integer' },
+    createdAt: { type: 'integer', minimum: 0, maximum: 9999999999999 },
     updatedAt: { type: 'integer' },
     endedAt: { type: 'integer' },
     _deleted: {
@@ -83,7 +83,14 @@ const ShowEventSchemaLiteral = {
     },
   },
   required: ['_id', 'show', 'createdAt', 'type', 'talent', 'agent'],
-  indexes: ['show', 'talent', 'agent', 'ticket', 'createdAt', 'entityType'],
+  indexes: [
+    ['show', 'entityType'],
+    ['talent', 'entityType', 'createdAt'],
+    'agent',
+    ['ticket', 'entityType'],
+    'createdAt',
+    'entityType',
+  ],
 } as const;
 
 type ShowEventRef = {
@@ -92,7 +99,7 @@ type ShowEventRef = {
   ticket_?: Promise<TicketDocument>;
 };
 
-export const ShowEventString = 'showEvent';
+export const ShowEventString = 'showevent';
 
 const schemaTyped = toTypedRxJsonSchema(ShowEventSchemaLiteral);
 export type ShowEventDocType = ExtractDocumentTypeFromTypedRxJsonSchema<
@@ -100,7 +107,7 @@ export type ShowEventDocType = ExtractDocumentTypeFromTypedRxJsonSchema<
 >;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-export const showEventSchema: RxJsonSchema<ShowEventDocType> =
+export const showeventSchema: RxJsonSchema<ShowEventDocType> =
   ShowEventSchemaLiteral;
 export type ShowEventDocument = RxDocument<ShowEventDocType> & ShowEventRef;
 export type ShowEventCollection = RxCollection<ShowEventDocType>;

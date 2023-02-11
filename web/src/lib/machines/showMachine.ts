@@ -287,6 +287,7 @@ export const createShowMachine = ({
               ...context.showState,
               updatedAt: new Date().getTime(),
               status: ShowStatus.CANCELLED,
+              active: false,
             },
           };
         }),

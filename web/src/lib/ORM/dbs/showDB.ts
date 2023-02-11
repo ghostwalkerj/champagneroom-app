@@ -16,21 +16,27 @@ import {
   ShowString,
 } from '$lib/ORM/models/show';
 import { PouchDB, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
-import type { ShowEventCollection } from '../models/showEvent';
-import { ShowEventString } from '../models/showEvent';
-import { showEventSchema } from '../models/showEvent';
+import type { ShowEventCollection } from '../models/showevent';
+import { ShowEventString } from '../models/showevent';
+import { showeventSchema } from '../models/showevent';
 import {
   ticketSchema,
   type TicketCollection,
   TicketString,
 } from '../models/ticket';
+import {
+  type TransactionCollection,
+  TransactionString,
+  transactionSchema,
+} from '../models/transaction';
 
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 100;
 type ShowCollections = {
   shows: ShowCollection;
   tickets: TicketCollection;
-  showEvents: ShowEventCollection;
+  showevents: ShowEventCollection;
+  transactions: TransactionCollection;
 };
 
 export type ShowDBType = RxDatabase<ShowCollections>;
@@ -76,11 +82,14 @@ const create = async (
       schema: showSchema,
       methods: showDocMethods,
     },
-    showEvents: {
-      schema: showEventSchema,
+    showevents: {
+      schema: showeventSchema,
     },
     tickets: {
       schema: ticketSchema,
+    },
+    transactions: {
+      schema: transactionSchema,
     },
   });
 
@@ -106,12 +115,19 @@ const create = async (
     .where('entityType')
     .eq(TicketString);
 
-  const showEventQuery = _db.showEvents
+  const showeventQuery = _db.showevents
     .find()
     .where('show')
     .eq(showId)
     .where('entityType')
     .eq(ShowEventString);
+
+  const transactionQuery = _db.transactions
+    .find()
+    .where('show')
+    .eq(showId)
+    .where('entityType')
+    .eq(TransactionString);
 
   const repState = _db.shows.syncCouchDB({
     remote: remoteDB,
@@ -135,15 +151,15 @@ const create = async (
       query: showQuery,
     });
 
-    // Live sync showEvents
-    _db.showEvents.syncCouchDB({
+    // Live sync showevents
+    _db.showevents.syncCouchDB({
       remote: remoteDB,
       waitForLeadership: false,
       options: {
         retry: true,
         live: true,
       },
-      query: showEventQuery,
+      query: showeventQuery,
     });
 
     // Live sync tickets
@@ -155,6 +171,17 @@ const create = async (
         live: true,
       },
       query: ticketQuery,
+    });
+
+    // Live sync transactions
+    _db.transactions.syncCouchDB({
+      remote: remoteDB,
+      waitForLeadership: false,
+      options: {
+        retry: true,
+        live: true,
+      },
+      query: transactionQuery,
     });
   }
   _showDB.set(showId, _db);
