@@ -132,6 +132,8 @@ export const createTicketMachine = ({
                       'requestCancellation',
                       'cancelTicket',
                       'saveTicketState',
+                      'deactivateTicket',
+                      'saveTicketState',
                     ],
                   },
                   {
@@ -150,6 +152,8 @@ export const createTicketMachine = ({
                     actions: [
                       'requestCancellation',
                       'cancelTicket',
+                      'saveTicketState',
+                      'deactivateTicket',
                       'saveTicketState',
                     ],
                   },
@@ -177,6 +181,8 @@ export const createTicketMachine = ({
                         actions: [
                           'receiveRefund',
                           'cancelTicket',
+                          'saveTicketState',
+                          'deactivateTicket',
                           'saveTicketState',
                         ],
                       },
@@ -259,6 +265,15 @@ export const createTicketMachine = ({
               ...context.ticketState,
               updatedAt: new Date().getTime(),
               status: TicketStatus.CANCELLED,
+            },
+          };
+        }),
+
+        deactivateTicket: assign(context => {
+          return {
+            ticketState: {
+              ...context.ticketState,
+              updatedAt: new Date().getTime(),
               active: false,
             },
           };
@@ -339,7 +354,6 @@ export const createTicketMachine = ({
                 updatedAt: new Date().getTime(),
                 finalized: finalized,
                 status: TicketStatus.FINALIZED,
-                active: false,
               },
             };
           }
@@ -348,7 +362,6 @@ export const createTicketMachine = ({
       },
       guards: {
         canCancel: context => {
-          console.log(JSON.stringify(context));
           return (
             context.ticketState.totalPaid <=
               context.ticketState.refundedAmount &&

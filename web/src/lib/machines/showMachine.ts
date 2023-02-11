@@ -129,7 +129,13 @@ export const createShowMachine = ({
               {
                 target: 'cancelled',
                 cond: 'canCancel',
-                actions: ['requestCancellation', 'cancelShow', 'saveShowState'],
+                actions: [
+                  'requestCancellation',
+                  'cancelShow',
+                  'saveShowState',
+                  'deactivateShow',
+                  'saveShowState',
+                ],
               },
               {
                 target: 'requestedCancellation',
@@ -210,7 +216,13 @@ export const createShowMachine = ({
               {
                 target: 'cancelled',
                 cond: 'canCancel',
-                actions: ['requestCancellation', 'cancelShow', 'saveShowState'],
+                actions: [
+                  'requestCancellation',
+                  'cancelShow',
+                  'saveShowState',
+                  'deactivateShow',
+                  'saveShowState',
+                ],
               },
               {
                 target: 'requestedCancellation',
@@ -287,7 +299,6 @@ export const createShowMachine = ({
               ...context.showState,
               updatedAt: new Date().getTime(),
               status: ShowStatus.CANCELLED,
-              active: false,
             },
           };
         }),
@@ -337,6 +348,15 @@ export const createShowMachine = ({
                 ...(context.showState.transactions || []),
                 event.transaction._id,
               ],
+            },
+          };
+        }),
+        deactivateShow: assign(context => {
+          return {
+            showState: {
+              ...context.showState,
+              updatedAt: new Date().getTime(),
+              active: false,
             },
           };
         }),
