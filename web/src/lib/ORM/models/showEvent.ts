@@ -39,7 +39,12 @@ const ShowEventSchemaLiteral = {
       maxLength: 20,
       final: true,
     },
-    createdAt: { type: 'integer', minimum: 0, maximum: 9999999999999 },
+    createdAt: {
+      type: 'integer',
+      minimum: 0,
+      maximum: 9999999999999,
+      multipleOf: 1,
+    },
     updatedAt: { type: 'integer' },
     endedAt: { type: 'integer' },
     _deleted: {

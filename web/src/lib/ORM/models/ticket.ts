@@ -61,9 +61,11 @@ export const ticketDocMethods: TicketDocMethods = {
     this: TicketDocument,
     _ticketState: TicketDocument['ticketState']
   ) {
-    this.atomicPatch({
-      ticketState: _ticketState,
-    });
+    if (this.ticketState.updatedAt !== _ticketState.updatedAt) {
+      this.atomicPatch({
+        ticketState: _ticketState,
+      });
+    }
   },
   createTransaction: async function (
     this: TicketDocument,
@@ -84,6 +86,7 @@ export const ticketDocMethods: TicketDocMethods = {
       talent: this.talent,
       ticket: this._id,
       agent: this.agent,
+      show: this.show,
       ...transactionProps,
     });
     return transaction;
@@ -122,7 +125,6 @@ const ticketSchemaLiteral = {
         },
         active: {
           type: 'boolean',
-          default: true,
         },
         price: {
           type: 'integer',
@@ -238,6 +240,7 @@ const ticketSchemaLiteral = {
         'refundedAmount',
         'totalPaid',
         'reservation',
+        'active',
       ],
     },
     talent: { type: 'string', ref: 'talents', maxLength: 50 },
@@ -265,7 +268,7 @@ const ticketSchemaLiteral = {
     'createdAt',
   ],
   indexes: [
-    ['show', 'entityType', 'ticketState.active'],
+    ['show', 'entityType'],
     ['_id', 'entityType'],
     ['agent', 'entityType', 'ticketState.active'],
     ['talent', 'entityType', 'ticketState.active'],

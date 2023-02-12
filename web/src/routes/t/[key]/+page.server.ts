@@ -78,6 +78,7 @@ export const load: PageServerLoad = async ({ params }) => {
   );
 
   const _talent = await getTalent(key);
+
   const _currentShow = await _talent.populate('currentShow');
 
   const _completedShows = (await _talent.populate(

@@ -58,9 +58,11 @@ export const showDocMethods: ShowDocMethods = {
     this: ShowDocument,
     _showState: ShowDocument['showState']
   ) {
-    this.atomicPatch({
-      showState: _showState,
-    });
+    if (this.showState.updatedAt !== _showState.updatedAt) {
+      this.atomicPatch({
+        showState: _showState,
+      });
+    }
   },
   createTicket: async function (
     this: ShowDocument,
@@ -146,7 +148,12 @@ const showSchemaLiteral = {
       maxLength: 20,
       final: true,
     },
-    createdAt: { type: 'integer', minimum: 0, maximum: 9999999999999 },
+    createdAt: {
+      type: 'integer',
+      minimum: 0,
+      maximum: 9999999999999,
+      final: true,
+    },
     updatedAt: {
       type: 'integer',
     },
@@ -174,7 +181,6 @@ const showSchemaLiteral = {
         endDate: { type: 'integer' },
         refundedAmount: {
           type: 'integer',
-          default: 0,
           minimum: 0,
           maximum: 99999,
         },
@@ -221,6 +227,7 @@ const showSchemaLiteral = {
         'ticketsSold',
         'totalSales',
         'refundedAmount',
+        'active',
       ],
     },
     talent: {
@@ -279,11 +286,10 @@ const showSchemaLiteral = {
   ],
   encrypted: ['roomId'],
   indexes: [
-    ['talent', 'entityType', 'showState.active'],
-    ['agent', 'entityType', 'showState.active'],
+    ['talent', 'entityType', 'createdAt'],
+    ['agent', 'entityType', 'createdAt'],
     ['_id', 'entityType'],
     ['entityType', 'showState.active'],
-    'createdAt',
   ],
 } as const;
 

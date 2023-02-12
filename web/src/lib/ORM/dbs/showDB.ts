@@ -45,14 +45,6 @@ export const showDB = async (
   showId: string,
   token: string,
   databaseOptions?: DatabaseOptions
-): Promise<ShowDBType> => await create(showId, token, databaseOptions);
-
-let _thisShow: ShowDocument;
-
-const create = async (
-  showId: string,
-  token: string,
-  databaseOptions?: DatabaseOptions
 ) => {
   let _db = _showDB.get(showId);
   if (_db) return _db;
@@ -139,51 +131,49 @@ const create = async (
   });
   await repState.awaitInitialReplication();
 
-  _thisShow = (await showQuery.exec()) as ShowDocument;
-  if (_thisShow) {
-    _db.shows.syncCouchDB({
-      remote: remoteDB,
-      waitForLeadership: false,
-      options: {
-        retry: true,
-        live: true,
-      },
-      query: showQuery,
-    });
+  _db.shows.syncCouchDB({
+    remote: remoteDB,
+    waitForLeadership: false,
+    options: {
+      retry: true,
+      live: true,
+    },
+    query: showQuery,
+  });
 
-    // Live sync showevents
-    _db.showevents.syncCouchDB({
-      remote: remoteDB,
-      waitForLeadership: false,
-      options: {
-        retry: true,
-        live: true,
-      },
-      query: showeventQuery,
-    });
+  // Live sync showevents
+  _db.showevents.syncCouchDB({
+    remote: remoteDB,
+    waitForLeadership: false,
+    options: {
+      retry: true,
+      live: true,
+    },
+    query: showeventQuery,
+  });
 
-    // Live sync tickets
-    _db.tickets.syncCouchDB({
-      remote: remoteDB,
-      waitForLeadership: false,
-      options: {
-        retry: true,
-        live: true,
-      },
-      query: ticketQuery,
-    });
+  // Live sync tickets
+  _db.tickets.syncCouchDB({
+    remote: remoteDB,
+    waitForLeadership: false,
+    options: {
+      retry: true,
+      live: true,
+    },
+    query: ticketQuery,
+  });
 
-    // Live sync transactions
-    _db.transactions.syncCouchDB({
-      remote: remoteDB,
-      waitForLeadership: false,
-      options: {
-        retry: true,
-        live: true,
-      },
-      query: transactionQuery,
-    });
-  }
+  // Live sync transactions
+  _db.transactions.syncCouchDB({
+    remote: remoteDB,
+    waitForLeadership: false,
+    options: {
+      retry: true,
+      live: true,
+    },
+    query: transactionQuery,
+  });
+
   _showDB.set(showId, _db);
   return _db;
 };

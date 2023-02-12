@@ -118,9 +118,11 @@ export const createShowMachine = ({
         },
         cancelled: {
           type: 'final',
+          entry: ['deactivateShow', 'saveShowState'],
         },
         finalized: {
           type: 'final',
+          entry: ['deactivateShow', 'saveShowState'],
         },
         inEscrow: {},
         boxOfficeOpen: {
@@ -129,13 +131,7 @@ export const createShowMachine = ({
               {
                 target: 'cancelled',
                 cond: 'canCancel',
-                actions: [
-                  'requestCancellation',
-                  'cancelShow',
-                  'saveShowState',
-                  'deactivateShow',
-                  'saveShowState',
-                ],
+                actions: ['requestCancellation', 'cancelShow', 'saveShowState'],
               },
               {
                 target: 'requestedCancellation',
@@ -216,13 +212,7 @@ export const createShowMachine = ({
               {
                 target: 'cancelled',
                 cond: 'canCancel',
-                actions: [
-                  'requestCancellation',
-                  'cancelShow',
-                  'saveShowState',
-                  'deactivateShow',
-                  'saveShowState',
-                ],
+                actions: ['requestCancellation', 'cancelShow', 'saveShowState'],
               },
               {
                 target: 'requestedCancellation',
@@ -352,6 +342,7 @@ export const createShowMachine = ({
           };
         }),
         deactivateShow: assign(context => {
+          if (!context.showState.active) return {};
           return {
             showState: {
               ...context.showState,

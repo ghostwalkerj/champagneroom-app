@@ -3,10 +3,7 @@
   import { page } from '$app/stores';
   import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
   import ProfilePhoto from '$lib/components/forms/ProfilePhoto.svelte';
-  import {
-    createShowMachineService,
-    type ShowMachineServiceType,
-  } from '$lib/machines/showMachine';
+  import { createShowMachineService } from '$lib/machines/showMachine';
   import { talentDB, type TalentDBType } from '$lib/ORM/dbs/talentDB';
   import { ShowStatus, type ShowDocument } from '$lib/ORM/models/show';
   import type { TalentDocType } from '$lib/ORM/models/talent';
@@ -59,6 +56,7 @@
   $: canStartShow = false;
   $: statusText = currentShow?.showState.status ?? 'No Current Show';
   $: eventText = 'No Events';
+  $: active = currentShow?.showState.active ?? false;
 
   const useShowState = (
     show: ShowDocument,
@@ -66,6 +64,8 @@
   ) => {
     if (showMachineService) showMachineService.stop();
     if (showSub) showSub.unsubscribe();
+
+    active = showState.active;
 
     showMachineService = createShowMachineService({
       showState: showState,
@@ -121,39 +121,40 @@
             eventText = 'No Events';
             if (showId) {
               canStartShow = false;
-              currentShow = await db.shows.findOne(showId).exec();
-              if (currentShow) {
-                useShow(currentShow);
-                db.showevents
-                  .findOne()
-                  .where('show')
-                  .eq(currentShow._id)
-                  .sort({ createdAt: 'desc' })
-                  .$.subscribe(async event => {
-                    if (event) {
-                      eventText =
-                        timeago.format(event.createdAt) +
-                        ' ' +
-                        event.ticketInfo?.name;
-                      switch (event.type) {
-                        case ShowEventType.TICKET_SOLD:
-                          eventText += ' bought a ticket!';
-                          break;
+              db.shows.findOne(showId).$.subscribe(async currentShow => {
+                if (currentShow) {
+                  useShow(currentShow);
+                  db.showevents
+                    .findOne()
+                    .where('show')
+                    .eq(currentShow._id)
+                    .sort({ createdAt: 'desc' })
+                    .$.subscribe(async event => {
+                      if (event) {
+                        eventText =
+                          timeago.format(event.createdAt) +
+                          ' ' +
+                          event.ticketInfo?.name;
+                        switch (event.type) {
+                          case ShowEventType.TICKET_SOLD:
+                            eventText += ' bought a ticket!';
+                            break;
 
-                        case ShowEventType.TICKET_RESERVED:
-                          eventText += ' reserved a ticket!';
-                          break;
+                          case ShowEventType.TICKET_RESERVED:
+                            eventText += ' reserved a ticket!';
+                            break;
 
-                        case ShowEventType.TICKET_CANCELLED:
-                          eventText += ' cancelled';
-                          break;
+                          case ShowEventType.TICKET_CANCELLED:
+                            eventText += ' cancelled';
+                            break;
 
-                        default:
-                          eventText = 'No Events';
+                          default:
+                            eventText = 'No Events';
+                        }
                       }
-                    }
-                  });
-              }
+                    });
+                }
+              });
             } else {
               currentShow = null;
               eventText = 'No Events';
@@ -347,7 +348,8 @@
             </div>
           </div>
         </div>
-      {:else}
+      {/if}
+      {#if active}
         {#key showMachineState || currentShow}
           <div class="h-full">
             <ShowDetail

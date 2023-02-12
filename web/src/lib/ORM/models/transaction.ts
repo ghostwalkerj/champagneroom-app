@@ -30,7 +30,12 @@ const transactionSchemaLiteral = {
       maxLength: 20,
       final: true,
     },
-    createdAt: { type: 'integer', minimum: 0, maximum: 9999999999999 },
+    createdAt: {
+      type: 'integer',
+      minimum: 0,
+      maximum: 9999999999999,
+      multipleOf: 1,
+    },
     updatedAt: {
       type: 'integer',
     },
@@ -75,13 +80,18 @@ const transactionSchemaLiteral = {
       ref: 'agents',
       maxLength: 50,
     },
+    show: {
+      type: 'string',
+      ref: 'shows',
+      maxLength: 50,
+    },
   },
   indexes: [
     'entityType',
     ['talent', 'entityType', 'createdAt'],
     ['ticket', 'entityType'],
-    ['show', 'entityType'],
     ['agent', 'entityType'],
+    ['show', 'entityType'],
   ],
   required: [
     '_id',

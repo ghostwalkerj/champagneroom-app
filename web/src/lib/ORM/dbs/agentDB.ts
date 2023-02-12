@@ -141,17 +141,15 @@ const create = async (
     .where('agent')
     .eq(agentId)
     .where('entityType')
-    .eq(ShowString)
-    .where('showState.active')
-    .eq(true);
+    .eq(ShowString);
+
   const ticketQuery = _db.tickets
     .find()
     .where('agent')
     .eq(agentId)
     .where('entityType')
-    .eq(TicketString)
-    .where('ticketState.active')
-    .eq(true);
+    .eq(TicketString);
+
   const transactionQuery = _db.transactions
     .find()
     .where('agent')

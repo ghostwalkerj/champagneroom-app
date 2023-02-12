@@ -129,21 +129,30 @@ const create = async (
     query: talentQuery,
   });
   await repState.awaitInitialReplication();
+  _db.talents.syncCouchDB({
+    remote: remoteDB,
+    waitForLeadership: false,
+    options: {
+      retry: true,
+      live: true,
+    },
+    query: talentQuery,
+  });
 
-  const _currentTalent = await talentQuery.exec();
+  const currentTalent = await talentQuery.exec();
 
-  if (_currentTalent) {
-    const showQuery = _db.shows
-      .find()
-      .where('talent')
-      .eq(_currentTalent._id)
+  const addCurrentShowDB = async (
+    showId: string,
+    db: TalentDBType | undefined
+  ) => {
+    if (!db) return;
+    const showQuery = db.shows
+      .findOne(showId)
       .where('entityType')
-      .eq(ShowString)
-      .where('showState.active')
-      .eq(true);
+      .eq(ShowString);
 
-    // Wait for shows
-    repState = _db.shows.syncCouchDB({
+    // Wait for currentShow
+    repState = db.shows.syncCouchDB({
       remote: remoteDB,
       waitForLeadership: false,
       options: {
@@ -153,17 +162,25 @@ const create = async (
     });
     await repState.awaitInitialReplication();
 
-    const ticketQuery = _db.tickets
-      .find()
-      .where('talent')
-      .eq(_currentTalent._id)
-      .where('entityType')
-      .eq(TicketString)
-      .where('ticketState.active')
-      .eq(true);
+    db.shows.syncCouchDB({
+      remote: remoteDB,
+      waitForLeadership: false,
+      options: {
+        retry: true,
+        live: true,
+      },
+      query: showQuery,
+    });
 
-    // Wait for any tickets
-    repState = _db.tickets.syncCouchDB({
+    const ticketQuery = db.tickets
+      .find()
+      .where('show')
+      .eq(showId)
+      .where('entityType')
+      .eq(TicketString);
+
+    // Wait for tickets
+    repState = db.tickets.syncCouchDB({
       remote: remoteDB,
       waitForLeadership: false,
       options: {
@@ -173,58 +190,32 @@ const create = async (
     });
     await repState.awaitInitialReplication();
 
-    let maxDate = new Date().getTime();
-
-    if (_currentTalent.currentShow) {
-      const _currentShow = (await _db.shows
-        .findOne(_currentTalent.currentShow)
-        .exec()) as ShowDocument;
-
-      maxDate = _currentShow?.createdAt || maxDate;
-    }
-
-    const showeventQuery = _db.showevents
-      .find()
-      .where('talent')
-      .eq(_currentTalent._id)
-      .where('entityType')
-      .eq(ShowEventString)
-      .where('createdAt')
-      .gte(maxDate);
-
-    const transactionQuery = _db.transactions
-      .find()
-      .where('talent')
-      .eq(_currentTalent._id)
-      .where('entityType')
-      .eq(TransactionString)
-      .where('createdAt')
-      .gte(maxDate);
-
-    // Live sync this Talent's shows
-    _db.shows.syncCouchDB({
+    db.tickets.syncCouchDB({
       remote: remoteDB,
       waitForLeadership: false,
       options: {
         retry: true,
         live: true,
       },
-      query: showQuery,
+      query: ticketQuery,
     });
 
-    // Live sync this Talent
-    _db.talents.syncCouchDB({
-      remote: remoteDB,
-      waitForLeadership: false,
-      options: {
-        retry: true,
-        live: true,
-      },
-      query: talentQuery,
-    });
+    const showeventQuery = db.showevents
+      .find()
+      .where('show')
+      .eq(showId)
+      .where('entityType')
+      .eq(ShowEventString);
+
+    const transactionQuery = db.transactions
+      .find()
+      .where('show')
+      .eq(showId)
+      .where('entityType')
+      .eq(TransactionString);
 
     // Live sync this Talent's showevents
-    _db.showevents.syncCouchDB({
+    db.showevents.syncCouchDB({
       remote: remoteDB,
       waitForLeadership: false,
       options: {
@@ -234,19 +225,8 @@ const create = async (
       query: showeventQuery,
     });
 
-    // Live sync this Talent's tickets
-    _db.tickets.syncCouchDB({
-      remote: remoteDB,
-      waitForLeadership: false,
-      options: {
-        retry: true,
-        live: true,
-      },
-      query: ticketQuery,
-    });
-
     // Live sync this Talent's transaction
-    _db.transactions.syncCouchDB({
+    db.transactions.syncCouchDB({
       remote: remoteDB,
       waitForLeadership: false,
       options: {
@@ -255,8 +235,15 @@ const create = async (
       },
       query: transactionQuery,
     });
+  };
 
-    _talentDB.set(key, _db);
-    return _db;
+  if (currentTalent) {
+    currentTalent.get$('currentShow').subscribe(async currentShow => {
+      await addCurrentShowDB(currentShow, _db);
+    });
   }
+
+  _talentDB.set(key, _db);
+
+  return _db;
 };

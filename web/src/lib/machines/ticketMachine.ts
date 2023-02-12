@@ -132,8 +132,6 @@ export const createTicketMachine = ({
                       'requestCancellation',
                       'cancelTicket',
                       'saveTicketState',
-                      'deactivateTicket',
-                      'saveTicketState',
                     ],
                   },
                   {
@@ -152,8 +150,6 @@ export const createTicketMachine = ({
                     actions: [
                       'requestCancellation',
                       'cancelTicket',
-                      'saveTicketState',
-                      'deactivateTicket',
                       'saveTicketState',
                     ],
                   },
@@ -182,8 +178,6 @@ export const createTicketMachine = ({
                           'receiveRefund',
                           'cancelTicket',
                           'saveTicketState',
-                          'deactivateTicket',
-                          'saveTicketState',
                         ],
                       },
                       {
@@ -208,9 +202,11 @@ export const createTicketMachine = ({
         },
         cancelled: {
           type: 'final',
+          entry: ['deactivateTicket', 'saveTicketState'],
         },
         finalized: {
           type: 'final',
+          entry: ['deactivateTicket', 'saveTicketState'],
         },
         inEscrow: {
           on: {
@@ -270,6 +266,7 @@ export const createTicketMachine = ({
         }),
 
         deactivateTicket: assign(context => {
+          if (!context.ticketState.active) return {};
           return {
             ticketState: {
               ...context.ticketState,
