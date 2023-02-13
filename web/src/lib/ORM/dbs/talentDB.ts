@@ -244,6 +244,7 @@ const create = async (
 
   if (currentTalent) {
     currentTalent.get$('currentShow').subscribe(async currentShow => {
+      if (!currentShow) return;
       await addCurrentShowDB(currentShow, _db);
     });
   }

@@ -284,10 +284,8 @@ const showSchemaLiteral = {
   ],
   encrypted: ['roomId'],
   indexes: [
-    ['talent', 'entityType', 'createdAt'],
-    ['agent', 'entityType', 'createdAt'],
+    ['agent', 'entityType'],
     ['_id', 'entityType'],
-    ['entityType', 'showState.active'],
   ],
 } as const;
 

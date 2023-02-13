@@ -87,10 +87,7 @@ const transactionSchemaLiteral = {
     },
   },
   indexes: [
-    'entityType',
-    ['talent', 'entityType', 'createdAt'],
     ['ticket', 'entityType'],
-    ['agent', 'entityType'],
     ['show', 'entityType'],
   ],
   required: [

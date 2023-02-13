@@ -268,9 +268,6 @@ const ticketSchemaLiteral = {
   indexes: [
     ['show', 'entityType'],
     ['_id', 'entityType'],
-    ['agent', 'entityType', 'ticketState.active'],
-    ['talent', 'entityType', 'ticketState.active'],
-    'ticketState.active',
   ],
 } as const;
 
