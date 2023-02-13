@@ -43,7 +43,7 @@ import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
 import { PouchDB, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
 
 // Sync requires more listeners but ok with http2
-EventEmitter.defaultMaxListeners = 100;
+EventEmitter.defaultMaxListeners = 0;
 
 type AgentCollections = {
   agents: AgentCollection;

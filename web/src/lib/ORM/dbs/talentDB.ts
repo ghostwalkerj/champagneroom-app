@@ -165,81 +165,79 @@ const create = async (
 
     const show = await showQuery.exec();
 
-    if (show?.showState.active) {
-      db.shows.syncCouchDB({
-        remote: remoteDB,
-        waitForLeadership: false,
-        options: {
-          retry: true,
-          live: true,
-        },
-        query: showQuery,
-      });
+    db.shows.syncCouchDB({
+      remote: remoteDB,
+      waitForLeadership: false,
+      options: {
+        retry: true,
+        live: true,
+      },
+      query: showQuery,
+    });
 
-      const ticketQuery = db.tickets
-        .find()
-        .where('show')
-        .eq(showId)
-        .where('entityType')
-        .eq(TicketString);
+    const ticketQuery = db.tickets
+      .find()
+      .where('show')
+      .eq(showId)
+      .where('entityType')
+      .eq(TicketString);
 
-      // Wait for tickets
-      repState = db.tickets.syncCouchDB({
-        remote: remoteDB,
-        waitForLeadership: false,
-        options: {
-          retry: true,
-        },
-        query: ticketQuery,
-      });
-      await repState.awaitInitialReplication();
+    // Wait for tickets
+    repState = db.tickets.syncCouchDB({
+      remote: remoteDB,
+      waitForLeadership: false,
+      options: {
+        retry: true,
+      },
+      query: ticketQuery,
+    });
+    await repState.awaitInitialReplication();
 
-      db.tickets.syncCouchDB({
-        remote: remoteDB,
-        waitForLeadership: false,
-        options: {
-          retry: true,
-          live: true,
-        },
-        query: ticketQuery,
-      });
+    db.tickets.syncCouchDB({
+      remote: remoteDB,
+      waitForLeadership: false,
+      options: {
+        retry: true,
+        live: true,
+      },
+      query: ticketQuery,
+    });
 
-      const showeventQuery = db.showevents
-        .find()
-        .where('show')
-        .eq(showId)
-        .where('entityType')
-        .eq(ShowEventString);
+    const showeventQuery = db.showevents
+      .find()
+      .where('show')
+      .eq(showId)
+      .where('entityType')
+      .eq(ShowEventString);
 
-      const transactionQuery = db.transactions
-        .find()
-        .where('show')
-        .eq(showId)
-        .where('entityType')
-        .eq(TransactionString);
+    const transactionQuery = db.transactions
+      .find()
+      .where('show')
+      .eq(showId)
+      .where('entityType')
+      .eq(TransactionString);
 
-      // Live sync this Talent's showevents
-      db.showevents.syncCouchDB({
-        remote: remoteDB,
-        waitForLeadership: false,
-        options: {
-          retry: true,
-          live: true,
-        },
-        query: showeventQuery,
-      });
+    // Live sync this Talent's showevents
+    db.showevents.syncCouchDB({
+      remote: remoteDB,
+      waitForLeadership: false,
+      options: {
+        retry: true,
+        live: true,
+      },
+      query: showeventQuery,
+    });
 
-      // Live sync this Talent's transaction
-      db.transactions.syncCouchDB({
-        remote: remoteDB,
-        waitForLeadership: false,
-        options: {
-          retry: true,
-          live: true,
-        },
-        query: transactionQuery,
-      });
-    }
+    // Live sync this Talent's transaction
+    db.transactions.syncCouchDB({
+      remote: remoteDB,
+      waitForLeadership: false,
+      options: {
+        retry: true,
+        live: true,
+      },
+      query: transactionQuery,
+    });
   };
 
   if (currentTalent) {

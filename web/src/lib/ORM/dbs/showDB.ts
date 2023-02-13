@@ -31,7 +31,7 @@ import {
 } from '../models/transaction';
 
 // Sync requires more listeners but ok with http2
-EventEmitter.defaultMaxListeners = 100;
+EventEmitter.defaultMaxListeners = 0;
 type ShowCollections = {
   shows: ShowCollection;
   tickets: TicketCollection;

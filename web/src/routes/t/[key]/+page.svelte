@@ -19,6 +19,7 @@
   import type { Subscription } from 'xstate';
   import type { PageData } from './$types';
   import TalentWallet from './TalentWallet.svelte';
+  import { onMount } from 'svelte';
 
   export let form: import('./$types').ActionData;
   export let data: PageData;
@@ -58,18 +59,12 @@
   $: eventText = 'No Events';
   $: active = currentShow?.showState.active ?? false;
 
-  const useShowState = (
-    show: ShowDocument,
-    showState: ShowDocument['showState']
-  ) => {
+  const useShowState = (showState: ShowDocument['showState']) => {
     if (showMachineService) showMachineService.stop();
     if (showSub) showSub.unsubscribe();
-
     active = showState.active;
-
     showMachineService = createShowMachineService({
       showState: showState,
-      saveShowStateCallback: show.saveShowStateCallback,
     });
     showSub = showMachineService.subscribe(state => {
       if (state.changed) {
@@ -92,7 +87,7 @@
       .subscribe((_showState: ShowDocument['showState']) => {
         waiting4StateChange = false;
         if (_showState) {
-          useShowState(show, _showState);
+          useShowState(_showState);
           statusText = _showState.status;
         }
       });
@@ -109,63 +104,65 @@
     }
   };
 
-  talentDB(key, token).then((db: TalentDBType | undefined) => {
-    if (!db) return;
-    db.talents
-      .findOne(talent._id)
-      .exec()
-      .then(_talent => {
-        if (_talent) {
-          talent = _talent;
-          _talent.get$('currentShow').subscribe(async showId => {
-            eventText = 'No Events';
-            if (showId) {
-              canStartShow = false;
-              db.shows.findOne(showId).$.subscribe(async _currentShow => {
-                if (_currentShow) {
-                  currentShow = _currentShow;
-                  if (currentShow.showState.active) {
-                    useShow(_currentShow);
-                    db.showevents
-                      .findOne()
-                      .where('show')
-                      .eq(_currentShow._id)
-                      .sort({ createdAt: 'desc' })
-                      .$.subscribe(async event => {
-                        if (event) {
-                          eventText =
-                            timeago.format(event.createdAt) +
-                            ' ' +
-                            event.ticketInfo?.name;
-                          switch (event.type) {
-                            case ShowEventType.TICKET_SOLD:
-                              eventText += ' bought a ticket!';
-                              break;
-
-                            case ShowEventType.TICKET_RESERVED:
-                              eventText += ' reserved a ticket!';
-                              break;
-
-                            case ShowEventType.TICKET_CANCELLED:
-                              eventText += ' cancelled';
-                              break;
-
-                            default:
-                              eventText = 'No Events';
-                          }
-                        }
-                      });
-                  }
-                }
-              });
-            } else {
-              currentShow = null;
+  onMount(async () => {
+    talentDB(key, token).then((db: TalentDBType | undefined) => {
+      if (!db) return;
+      db.talents
+        .findOne(talent._id)
+        .exec()
+        .then(_talent => {
+          if (_talent) {
+            talent = _talent;
+            _talent.get$('currentShow').subscribe(async showId => {
               eventText = 'No Events';
-              statusText = 'No Current Show';
-            }
-          });
-        }
-      });
+              if (showId) {
+                canStartShow = false;
+                db.shows.findOne(showId).$.subscribe(async _currentShow => {
+                  if (_currentShow) {
+                    currentShow = _currentShow;
+                    if (currentShow.showState.active) {
+                      useShow(_currentShow);
+                      db.showevents
+                        .findOne()
+                        .where('show')
+                        .eq(_currentShow._id)
+                        .sort({ createdAt: 'desc' })
+                        .$.subscribe(async event => {
+                          if (event) {
+                            eventText =
+                              timeago.format(event.createdAt) +
+                              ' ' +
+                              event.ticketInfo?.name;
+                            switch (event.type) {
+                              case ShowEventType.TICKET_SOLD:
+                                eventText += ' bought a ticket!';
+                                break;
+
+                              case ShowEventType.TICKET_RESERVED:
+                                eventText += ' reserved a ticket!';
+                                break;
+
+                              case ShowEventType.TICKET_CANCELLED:
+                                eventText += ' cancelled';
+                                break;
+
+                              default:
+                                eventText = 'No Events';
+                            }
+                          }
+                        });
+                    }
+                  }
+                });
+              } else {
+                currentShow = null;
+                eventText = 'No Events';
+                statusText = 'No Current Show';
+              }
+            });
+          }
+        });
+    });
   });
 
   const onSubmit = ({}) => {
