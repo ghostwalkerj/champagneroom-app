@@ -29,11 +29,13 @@
     };
   };
 
-  showDB(showId, token).then((db: ShowDBType) => {
-    db.shows.findOne(showId).$.subscribe(_show => {
-      show = _show as ShowDocument;
+  if (show.showState.active) {
+    showDB(showId, token).then((db: ShowDBType) => {
+      db.shows.findOne(showId).$.subscribe(_show => {
+        show = _show as ShowDocument;
+      });
     });
-  });
+  }
 </script>
 
 <div class="mt-4  ">

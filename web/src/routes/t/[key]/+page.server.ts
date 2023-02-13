@@ -204,6 +204,7 @@ export const actions: Actions = {
         .eq(cancelShow._id)
         .exec()) as TicketDocument[];
       for (const ticket of tickets) {
+        console.log('cancel ticket', ticket.ticketState);
         if (ticket.ticketState.status === TicketStatus.RESERVED) {
           const ticketService = createTicketMachineService({
             ticketState: ticket.ticketState,

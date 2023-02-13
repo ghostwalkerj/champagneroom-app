@@ -51,26 +51,28 @@
     };
   };
 
-  ticketDB(ticketId, token).then(async (db: TicketDBType) => {
-    show = (await db.shows.findOne(show._id).exec()) as ShowDocument;
-    ticket = (await db.tickets.findOne(ticketId).exec()) as TicketDocument;
-    ticket.$.subscribe(_ticket => {
-      waiting4StateChange = false;
-      ticket = _ticket;
-      ticketMachineService = createTicketMachineService({
-        ticketState: ticket.ticketState,
-        showState: show.showState,
+  if (ticket.ticketState.active) {
+    ticketDB(ticketId, token).then(async (db: TicketDBType) => {
+      show = (await db.shows.findOne(show._id).exec()) as ShowDocument;
+      ticket = (await db.tickets.findOne(ticketId).exec()) as TicketDocument;
+      ticket.$.subscribe(_ticket => {
+        waiting4StateChange = false;
+        ticket = _ticket;
+        ticketMachineService = createTicketMachineService({
+          ticketState: ticket.ticketState,
+          showState: show.showState,
+        });
       });
-    });
 
-    show.$.subscribe(_show => {
-      show = _show;
-      ticketMachineService = createTicketMachineService({
-        ticketState: ticket.ticketState,
-        showState: show.showState,
+      show.$.subscribe(_show => {
+        show = _show;
+        ticketMachineService = createTicketMachineService({
+          ticketState: ticket.ticketState,
+          showState: show.showState,
+        });
       });
     });
-  });
+  }
 </script>
 
 {#if ticket}
