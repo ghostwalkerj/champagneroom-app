@@ -11,6 +11,7 @@ import type { ShowDocument } from '$lib/ORM/models/show';
 import { ShowCancelReason } from '$lib/ORM/models/show';
 import { ShowEventType } from '$lib/ORM/models/showevent';
 import type { TicketDocument } from '$lib/ORM/models/ticket';
+import { TicketString } from '$lib/ORM/models/ticket';
 import { TicketCancelReason, TicketStatus } from '$lib/ORM/models/ticket';
 import { TransactionReasonType } from '$lib/ORM/models/transaction';
 import { StorageType } from '$lib/ORM/rxdb';
@@ -203,8 +204,8 @@ export const actions: Actions = {
         .where('show')
         .eq(cancelShow._id)
         .exec()) as TicketDocument[];
+
       for (const ticket of tickets) {
-        console.log('cancel ticket', ticket.ticketState);
         if (ticket.ticketState.status === TicketStatus.RESERVED) {
           const ticketService = createTicketMachineService({
             ticketState: ticket.ticketState,

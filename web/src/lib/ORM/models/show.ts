@@ -58,11 +58,9 @@ export const showDocMethods: ShowDocMethods = {
     this: ShowDocument,
     _showState: ShowDocument['showState']
   ) {
-    if (this.showState.updatedAt !== _showState.updatedAt) {
-      this.atomicPatch({
-        showState: _showState,
-      });
-    }
+    this.atomicPatch({
+      showState: _showState,
+    });
   },
   createTicket: async function (
     this: ShowDocument,

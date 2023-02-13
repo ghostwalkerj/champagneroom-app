@@ -120,17 +120,17 @@ const create = async (
   });
   await repState.awaitInitialReplication();
 
-  const _thisTicket = (await ticketQuery.exec()) as TicketDocument;
-  if (_thisTicket) {
+  const ticket = (await ticketQuery.exec()) as TicketDocument;
+  if (ticket?.ticketState.active) {
     const showQuery = _db.shows
-      .findOne(_thisTicket.show)
+      .findOne(ticket.show)
       .where('entityType')
       .eq(ShowString);
 
     const showeventQuery = _db.showevents
       .find()
       .where('ticket')
-      .eq(_thisTicket._id)
+      .eq(ticket._id)
       .where('entityType')
       .eq(ShowEventString);
 

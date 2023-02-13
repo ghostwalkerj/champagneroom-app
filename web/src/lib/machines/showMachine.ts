@@ -23,11 +23,13 @@ export const escrowTimer = (endTime: number) => {
 
 export const createShowMachine = ({
   showState,
-  saveShowStateCallback,
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  saveShowStateCallback = () => {},
 }: {
   showState: ShowStateType;
   saveShowStateCallback?: ShowStateCallbackType;
 }) => {
+  const saveShowState = saveShowStateCallback;
   /** @xstate-layout N4IgpgJg5mDOIC5SwBYHsDuBZAhgYxQEsA7MAOlUwAIAbNHCSAYgG0AGAXUVAAc1ZCAF0Jpi3EAA9EAJgAsbMgDYAnNLZsAzAEZp0gOxblWrQBoQATxmKNZPbOka2ejQFZlitXoC+Xs5Wz4RKQU6Bi09IwQrFpcSCB8AsKi4lIIcgoqapo6+obGZpYILtZkGrJljnp2ABwailo+fqG4BCTk-uEMzCzSsbz8QiJicanpSqrq2roGRqYWiBoOZGz21Spsinq6td6+IP4tQe2hnZGsGn3xA0nDoKPy41lTubMFiNWyZMWKHkZ6TtJ6tJGvtmoE2iFqHQulEWLJLglBskRjIHplJjkZvl5ghZPZxtpZMpVFpNNItIoQQdwcEOtCziwXAjrkMUqiMhNstM8nNCmpPnitHZii41FpHNUqWDWrSTvTuopmYlWSi0mjOc8sbzEFpZC4yLrjLVlHj5C4XFLMIcISQAKKwPAAJ0wTAksEEOEE5BwADMvY6ABRwJ2YAAiYBoOHMAEomNSZeQ7Q7nRh2EqkbdJIgqloyHJrK4flNNm8EFoXDZjOpFOVqtVpObVD49sQ0Ix4HF40dxIibmyEABaRSlgf64njtjitb1UmyS0BBOQsLyiA9lnIu6Ieyl5R6L5saTVFbODZEjQaefW4J4HDEPARmiQNfKjdZoqyap56Qm6o6f4ORRqlLX8yCJKtSTkXRZF2JorRpcgfRIHAaEIAAvJ84l7FVNwQE1pDIYkZyFfQ623HE1GUA07H0Ow6iJBtL3gsgkxDDBnwzfs3EUA1HGKD9yjYes9FLNR8JrA9SRcAwXFqPVGMXAAjNAJAAeR9RD7xUngwEzLDX1SFwPy-H8-wPOogPI+oCPkKppiMIwVnko4yCU1T1MIe8AGE6FgDD+hfTMDKM3QTP0MzANLYpc0MrRqmUYoTXkawnIhR0wAARwAVzgL0IE8297xoSM+0w9dAsQQzPxCj9TIAizCkWXM5HFc9lDWPQ2rsFLghIUNCFgHhMq9diSpwyrjJqsK6tLXUbFams62sXcZN2HwgA */
   return createMachine(
     {
@@ -352,7 +354,7 @@ export const createShowMachine = ({
           };
         }),
         saveShowState: context => {
-          if (saveShowStateCallback) saveShowStateCallback(context.showState);
+          saveShowState(context.showState);
         },
         incrementTicketsAvailable: assign(context => {
           return {
@@ -390,9 +392,7 @@ export const createShowMachine = ({
         }),
       },
       guards: {
-        canCancel: context =>
-          context.showState.ticketsSold === 0 &&
-          context.showState.ticketsReserved === 0,
+        canCancel: context => context.showState.ticketsSold === 0,
         showCancelled: context =>
           context.showState.status === ShowStatus.CANCELLED,
         showFinalized: context =>

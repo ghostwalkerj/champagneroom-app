@@ -61,11 +61,9 @@ export const ticketDocMethods: TicketDocMethods = {
     this: TicketDocument,
     _ticketState: TicketDocument['ticketState']
   ) {
-    if (this.ticketState.updatedAt !== _ticketState.updatedAt) {
-      this.atomicPatch({
-        ticketState: _ticketState,
-      });
-    }
+    this.atomicPatch({
+      ticketState: _ticketState,
+    });
   },
   createTransaction: async function (
     this: TicketDocument,

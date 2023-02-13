@@ -2,7 +2,6 @@ import {
   PUBLIC_RXDB_PASSWORD,
   PUBLIC_TALENT_DB_ENDPOINT,
 } from '$env/static/public';
-import type { ShowDocument } from '$lib/ORM/models/show';
 import {
   ShowString,
   showDocMethods,
@@ -27,6 +26,7 @@ import {
   showeventSchema,
 } from '../models/showevent';
 import type { TicketCollection } from '../models/ticket';
+import { ticketDocMethods } from '../models/ticket';
 import { TicketString, ticketSchema } from '../models/ticket';
 import {
   type TransactionCollection,
@@ -35,7 +35,7 @@ import {
 } from '../models/transaction';
 
 // Sync requires more listeners but ok with http2
-EventEmitter.defaultMaxListeners = 100;
+EventEmitter.defaultMaxListeners = 0;
 
 type TalentCollections = {
   talents: TalentCollection;
@@ -96,6 +96,7 @@ const create = async (
     },
     tickets: {
       schema: ticketSchema,
+      methods: ticketDocMethods,
     },
     transactions: {
       schema: transactionSchema,
@@ -162,79 +163,83 @@ const create = async (
     });
     await repState.awaitInitialReplication();
 
-    db.shows.syncCouchDB({
-      remote: remoteDB,
-      waitForLeadership: false,
-      options: {
-        retry: true,
-        live: true,
-      },
-      query: showQuery,
-    });
+    const show = await showQuery.exec();
 
-    const ticketQuery = db.tickets
-      .find()
-      .where('show')
-      .eq(showId)
-      .where('entityType')
-      .eq(TicketString);
+    if (show?.showState.active) {
+      db.shows.syncCouchDB({
+        remote: remoteDB,
+        waitForLeadership: false,
+        options: {
+          retry: true,
+          live: true,
+        },
+        query: showQuery,
+      });
 
-    // Wait for tickets
-    repState = db.tickets.syncCouchDB({
-      remote: remoteDB,
-      waitForLeadership: false,
-      options: {
-        retry: true,
-      },
-      query: ticketQuery,
-    });
-    await repState.awaitInitialReplication();
+      const ticketQuery = db.tickets
+        .find()
+        .where('show')
+        .eq(showId)
+        .where('entityType')
+        .eq(TicketString);
 
-    db.tickets.syncCouchDB({
-      remote: remoteDB,
-      waitForLeadership: false,
-      options: {
-        retry: true,
-        live: true,
-      },
-      query: ticketQuery,
-    });
+      // Wait for tickets
+      repState = db.tickets.syncCouchDB({
+        remote: remoteDB,
+        waitForLeadership: false,
+        options: {
+          retry: true,
+        },
+        query: ticketQuery,
+      });
+      await repState.awaitInitialReplication();
 
-    const showeventQuery = db.showevents
-      .find()
-      .where('show')
-      .eq(showId)
-      .where('entityType')
-      .eq(ShowEventString);
+      db.tickets.syncCouchDB({
+        remote: remoteDB,
+        waitForLeadership: false,
+        options: {
+          retry: true,
+          live: true,
+        },
+        query: ticketQuery,
+      });
 
-    const transactionQuery = db.transactions
-      .find()
-      .where('show')
-      .eq(showId)
-      .where('entityType')
-      .eq(TransactionString);
+      const showeventQuery = db.showevents
+        .find()
+        .where('show')
+        .eq(showId)
+        .where('entityType')
+        .eq(ShowEventString);
 
-    // Live sync this Talent's showevents
-    db.showevents.syncCouchDB({
-      remote: remoteDB,
-      waitForLeadership: false,
-      options: {
-        retry: true,
-        live: true,
-      },
-      query: showeventQuery,
-    });
+      const transactionQuery = db.transactions
+        .find()
+        .where('show')
+        .eq(showId)
+        .where('entityType')
+        .eq(TransactionString);
 
-    // Live sync this Talent's transaction
-    db.transactions.syncCouchDB({
-      remote: remoteDB,
-      waitForLeadership: false,
-      options: {
-        retry: true,
-        live: true,
-      },
-      query: transactionQuery,
-    });
+      // Live sync this Talent's showevents
+      db.showevents.syncCouchDB({
+        remote: remoteDB,
+        waitForLeadership: false,
+        options: {
+          retry: true,
+          live: true,
+        },
+        query: showeventQuery,
+      });
+
+      // Live sync this Talent's transaction
+      db.transactions.syncCouchDB({
+        remote: remoteDB,
+        waitForLeadership: false,
+        options: {
+          retry: true,
+          live: true,
+        },
+        query: transactionQuery,
+      });
+    }
   };
 
   if (currentTalent) {
