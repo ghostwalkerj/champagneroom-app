@@ -111,7 +111,6 @@ const talentSchemaLiteral = {
     agent: { type: 'string', ref: 'agents', maxLength: 50 },
   },
   required: [
-    '_id',
     'key',
     'name',
     'stats',
@@ -120,10 +119,7 @@ const talentSchemaLiteral = {
     'agentCommission',
     'createdAt',
   ],
-  indexes: [
-    ['key', 'entityType'],
-    ['agent', 'entityType'],
-  ],
+  indexes: [['key', 'entityType'], ['agent', 'entityType'], ['entityType']],
 } as const;
 
 type talentRef = {

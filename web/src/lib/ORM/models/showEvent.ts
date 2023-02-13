@@ -87,8 +87,13 @@ const ShowEventSchemaLiteral = {
       maxLength: 50,
     },
   },
-  required: ['_id', 'show', 'createdAt', 'type', 'talent', 'agent'],
-  indexes: [['show', 'entityType'], ['ticket', 'entityType'], 'createdAt'],
+  required: ['show', 'createdAt', 'type', 'talent', 'agent'],
+  indexes: [
+    ['show', 'entityType'],
+    ['ticket', 'entityType'],
+    'entityType',
+    'createdAt',
+  ],
 } as const;
 
 type ShowEventRef = {

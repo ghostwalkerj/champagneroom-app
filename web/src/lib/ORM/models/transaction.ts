@@ -86,12 +86,8 @@ const transactionSchemaLiteral = {
       maxLength: 50,
     },
   },
-  indexes: [
-    ['ticket', 'entityType'],
-    ['show', 'entityType'],
-  ],
+  indexes: [['ticket', 'entityType'], ['show', 'entityType'], ['entityType']],
   required: [
-    '_id',
     'createdAt',
     'hash',
     'block',

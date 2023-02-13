@@ -163,8 +163,6 @@ const create = async (
     });
     await repState.awaitInitialReplication();
 
-    const show = await showQuery.exec();
-
     db.shows.syncCouchDB({
       remote: remoteDB,
       waitForLeadership: false,

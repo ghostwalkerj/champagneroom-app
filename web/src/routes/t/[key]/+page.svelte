@@ -104,65 +104,63 @@
     }
   };
 
-  onMount(async () => {
-    talentDB(key, token).then((db: TalentDBType | undefined) => {
-      if (!db) return;
-      db.talents
-        .findOne(talent._id)
-        .exec()
-        .then(_talent => {
-          if (_talent) {
-            talent = _talent;
-            _talent.get$('currentShow').subscribe(async showId => {
-              eventText = 'No Events';
-              if (showId) {
-                canStartShow = false;
-                db.shows.findOne(showId).$.subscribe(async _currentShow => {
-                  if (_currentShow) {
-                    currentShow = _currentShow;
-                    if (currentShow.showState.active) {
-                      useShow(_currentShow);
-                      db.showevents
-                        .findOne()
-                        .where('show')
-                        .eq(_currentShow._id)
-                        .sort({ createdAt: 'desc' })
-                        .$.subscribe(async event => {
-                          if (event) {
-                            eventText =
-                              timeago.format(event.createdAt) +
-                              ' ' +
-                              event.ticketInfo?.name;
-                            switch (event.type) {
-                              case ShowEventType.TICKET_SOLD:
-                                eventText += ' bought a ticket!';
-                                break;
+  talentDB(key, token).then((db: TalentDBType | undefined) => {
+    if (!db) return;
+    db.talents
+      .findOne(talent._id)
+      .exec()
+      .then(_talent => {
+        if (_talent) {
+          talent = _talent;
+          _talent.get$('currentShow').subscribe(async showId => {
+            eventText = 'No Events';
+            if (showId) {
+              canStartShow = false;
+              db.shows.findOne(showId).$.subscribe(async _currentShow => {
+                if (_currentShow) {
+                  currentShow = _currentShow;
+                  if (currentShow.showState.active) {
+                    useShow(_currentShow);
+                    db.showevents
+                      .findOne()
+                      .where('show')
+                      .eq(_currentShow._id)
+                      .sort({ createdAt: 'desc' })
+                      .$.subscribe(async event => {
+                        if (event) {
+                          eventText =
+                            timeago.format(event.createdAt) +
+                            ' ' +
+                            event.ticketInfo?.name;
+                          switch (event.type) {
+                            case ShowEventType.TICKET_SOLD:
+                              eventText += ' bought a ticket!';
+                              break;
 
-                              case ShowEventType.TICKET_RESERVED:
-                                eventText += ' reserved a ticket!';
-                                break;
+                            case ShowEventType.TICKET_RESERVED:
+                              eventText += ' reserved a ticket!';
+                              break;
 
-                              case ShowEventType.TICKET_CANCELLED:
-                                eventText += ' cancelled';
-                                break;
+                            case ShowEventType.TICKET_CANCELLED:
+                              eventText += ' cancelled';
+                              break;
 
-                              default:
-                                eventText = 'No Events';
-                            }
+                            default:
+                              eventText = 'No Events';
                           }
-                        });
-                    }
+                        }
+                      });
                   }
-                });
-              } else {
-                currentShow = null;
-                eventText = 'No Events';
-                statusText = 'No Current Show';
-              }
-            });
-          }
-        });
-    });
+                }
+              });
+            } else {
+              currentShow = null;
+              eventText = 'No Events';
+              statusText = 'No Current Show';
+            }
+          });
+        }
+      });
   });
 
   const onSubmit = ({}) => {

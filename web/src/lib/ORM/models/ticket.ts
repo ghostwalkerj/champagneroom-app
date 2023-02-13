@@ -257,7 +257,6 @@ const ticketSchemaLiteral = {
   },
   encrypted: ['ticketState.reservation.pin'],
   required: [
-    '_id',
     'talent',
     'agent',
     'show',
@@ -265,10 +264,7 @@ const ticketSchemaLiteral = {
     'ticketState',
     'createdAt',
   ],
-  indexes: [
-    ['show', 'entityType'],
-    ['_id', 'entityType'],
-  ],
+  indexes: [['show', 'entityType'], ['entityType']],
 } as const;
 
 type ticketRef = {

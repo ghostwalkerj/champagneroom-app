@@ -123,8 +123,8 @@ const agentSchemaLiteral = {
       default: [],
     },
   },
-  required: ['_id', 'address', 'createdAt'],
-  indexes: ['_id', 'entityType'],
+  required: ['address', 'createdAt'],
+  indexes: ['entityType'],
 } as const;
 type agentRef = {
   talents_?: Promise<TalentDocument[]>;

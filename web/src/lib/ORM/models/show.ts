@@ -270,7 +270,6 @@ const showSchemaLiteral = {
     maxNumTickets: { type: 'integer' },
   },
   required: [
-    '_id',
     'createdAt',
     'agent',
     'talent',
@@ -283,10 +282,7 @@ const showSchemaLiteral = {
     'talentInfo',
   ],
   encrypted: ['roomId'],
-  indexes: [
-    ['agent', 'entityType'],
-    ['_id', 'entityType'],
-  ],
+  indexes: [['agent', 'entityType'], ['entityType']],
 } as const;
 
 type showRef = {
