@@ -78,6 +78,7 @@ export const showDocMethods: ShowDocMethods = {
       talent: this.talent,
       ticketState: {
         status: TicketStatus.RESERVED,
+        showStatus: this.showState.status,
         updatedAt: new Date().getTime(),
         price: this.price,
         refundedAmount: 0,
@@ -270,6 +271,7 @@ const showSchemaLiteral = {
     maxNumTickets: { type: 'integer' },
   },
   required: [
+    '_id',
     'createdAt',
     'agent',
     'talent',

@@ -111,6 +111,7 @@ const talentSchemaLiteral = {
     agent: { type: 'string', ref: 'agents', maxLength: 50 },
   },
   required: [
+    '_id',
     'key',
     'name',
     'stats',

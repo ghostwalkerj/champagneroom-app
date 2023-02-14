@@ -133,6 +133,9 @@ export const actions: import('./$types').Actions = {
       name,
       pin,
     });
+    if (!ticket) {
+      return error(501, 'Show cannot Reserve Ticket');
+    }
 
     showService.send('TICKET RESERVED');
 

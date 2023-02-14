@@ -21,7 +21,6 @@
   const showPath = urlJoin($page.url.href, 'show');
   let ticketMachineService = createTicketMachineService({
     ticketState: ticket.ticketState,
-    showState: show.showState,
   });
 
   let needs2Pay = false;
@@ -54,21 +53,17 @@
   if (ticket.ticketState.active) {
     ticketDB(ticketId, token).then(async (db: TicketDBType) => {
       show = (await db.shows.findOne(show._id).exec()) as ShowDocument;
+      const showState$ = show.get$('showState');
       ticket = (await db.tickets.findOne(ticketId).exec()) as TicketDocument;
       ticket.$.subscribe(_ticket => {
         waiting4StateChange = false;
         ticket = _ticket;
+        if (ticketMachineService) {
+          ticketMachineService.stop();
+        }
         ticketMachineService = createTicketMachineService({
           ticketState: ticket.ticketState,
-          showState: show.showState,
-        });
-      });
-
-      show.$.subscribe(_show => {
-        show = _show;
-        ticketMachineService = createTicketMachineService({
-          ticketState: ticket.ticketState,
-          showState: show.showState,
+          showState$,
         });
       });
     });

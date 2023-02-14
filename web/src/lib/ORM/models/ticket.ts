@@ -57,12 +57,9 @@ type TicketDocMethods = {
 };
 
 export const ticketDocMethods: TicketDocMethods = {
-  saveTicketStateCallback: async function (
-    this: TicketDocument,
-    _ticketState: TicketDocument['ticketState']
-  ) {
+  saveTicketStateCallback: async function (this: TicketDocument, ticketState) {
     this.atomicPatch({
-      ticketState: _ticketState,
+      ticketState,
     });
   },
   createTransaction: async function (
@@ -263,6 +260,7 @@ const ticketSchemaLiteral = {
     'paymentAddress',
     'ticketState',
     'createdAt',
+    '_id',
   ],
   indexes: [['show', 'entityType'], ['entityType']],
 } as const;

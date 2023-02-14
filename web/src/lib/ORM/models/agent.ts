@@ -123,7 +123,7 @@ const agentSchemaLiteral = {
       default: [],
     },
   },
-  required: ['address', 'createdAt'],
+  required: ['_id', 'address', 'createdAt'],
   indexes: ['entityType'],
 } as const;
 type agentRef = {

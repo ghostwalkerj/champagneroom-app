@@ -180,16 +180,16 @@ const create = async (
       .where('entityType')
       .eq(TicketString);
 
-    // Wait for tickets
-    repState = db.tickets.syncCouchDB({
-      remote: remoteDB,
-      waitForLeadership: false,
-      options: {
-        retry: true,
-      },
-      query: ticketQuery,
-    });
-    await repState.awaitInitialReplication();
+    // // Wait for tickets
+    // repState = db.tickets.syncCouchDB({
+    //   remote: remoteDB,
+    //   waitForLeadership: false,
+    //   options: {
+    //     retry: true,
+    //   },
+    //   query: ticketQuery,
+    // });
+    // await repState.awaitInitialReplication();
 
     db.tickets.syncCouchDB({
       remote: remoteDB,
