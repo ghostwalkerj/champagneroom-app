@@ -7,6 +7,7 @@
   import { ticketDB, type TicketDBType } from '$lib/ORM/dbs/ticketDB';
   import type { ShowDocument } from '$lib/ORM/models/show';
   import type { TicketDocument } from '$lib/ORM/models/ticket';
+  import { onMount } from 'svelte';
 
   import urlJoin from 'url-join';
   import type { PageData } from './$types';
@@ -20,7 +21,10 @@
 
   const showPath = urlJoin($page.url.href, 'show');
   let ticketMachineService = createTicketMachineService({
-    ticketState: ticket.ticketState,
+    ticketDocument: ticket,
+    showDocument: show,
+    saveState: false,
+    observeState: false,
   });
 
   let needs2Pay = false;
@@ -50,24 +54,45 @@
     };
   };
 
-  if (ticket.ticketState.active) {
-    ticketDB(ticketId, token).then(async (db: TicketDBType) => {
-      show = (await db.shows.findOne(show._id).exec()) as ShowDocument;
-      const showState$ = show.get$('showState');
-      ticket = (await db.tickets.findOne(ticketId).exec()) as TicketDocument;
-      ticket.$.subscribe(_ticket => {
-        waiting4StateChange = false;
-        ticket = _ticket;
+  onMount(async () => {
+    if (ticket.ticketState.active) {
+      ticketDB(ticketId, token).then(async (db: TicketDBType) => {
+        show = (await db.shows.findOne(show._id).exec()) as ShowDocument;
+        const _ticket = (await db.tickets
+          .findOne(ticketId)
+          .exec()) as TicketDocument;
         if (ticketMachineService) {
           ticketMachineService.stop();
         }
+        _ticket.$.subscribe(newTicket => {
+          ticket = newTicket;
+        });
+
         ticketMachineService = createTicketMachineService({
-          ticketState: ticket.ticketState,
-          showState$,
+          ticketDocument: _ticket,
+          showDocument: show,
+          saveState: false,
+          observeState: true,
+        });
+
+        ticketMachineService.subscribe(state => {
+          needs2Pay = state.matches('reserved.waiting4Payment');
+          canWatchShow = state.can('WATCH SHOW');
+          canCancelTicket = state.can({
+            type: 'REQUEST CANCELLATION',
+            cancel: undefined,
+          });
+          ticketDone = state.done ?? false;
+        });
+
+        console.log('canCancelTicket', canCancelTicket);
+
+        ticketMachineService.onEvent(event => {
+          console.log('event', event);
         });
       });
-    });
-  }
+    }
+  });
 </script>
 
 {#if ticket}

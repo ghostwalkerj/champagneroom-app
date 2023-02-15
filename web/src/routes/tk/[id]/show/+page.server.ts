@@ -14,7 +14,7 @@ import {
   PUBLIC_TICKET_PATH,
 } from '$env/static/public';
 import { ticketDB } from '$lib/ORM/dbs/ticketDB';
-import { ShowEventType } from '$lib/ORM/models/showevent';
+import { ShowEventType } from '$lib/ORM/models/showEvent';
 import type { TicketDocType, TicketDocument } from '$lib/ORM/models/ticket';
 import { StorageType } from '$lib/ORM/rxdb';
 import { createTicketMachineService } from '$lib/machines/ticketMachine';
@@ -91,9 +91,10 @@ export const load: import('./$types').PageServerLoad = async ({
 
   // Check if can watch the show
   const ticketService = createTicketMachineService({
-    ticketState: _ticket.ticketState,
-    saveTicketStateCallback: _ticket.saveTicketStateCallback,
-    showState: _show.showState,
+    ticketDocument: _ticket,
+    showDocument: _show,
+    saveState: true,
+    observeState: false,
   });
   const ticketMachineState = ticketService.getSnapshot();
 
@@ -150,10 +151,12 @@ export const actions: Actions = {
       pinHash &&
       verifyPin(ticketId, ticket.ticketState.reservation.pin, pinHash)
     ) {
+      // Check if can watch the show
       const ticketService = createTicketMachineService({
-        ticketState: ticket.ticketState,
-        saveTicketStateCallback: ticket.saveTicketStateCallback,
-        showState: show.showState,
+        ticketDocument: ticket,
+        showDocument: show,
+        saveState: true,
+        observeState: false,
       });
 
       ticketService.send('LEAVE SHOW');

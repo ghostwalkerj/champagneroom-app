@@ -27,7 +27,7 @@ import {
   ShowEventString,
   showeventSchema,
   type ShowEventCollection,
-} from '../models/showevent';
+} from '../models/showEvent';
 import {
   transactionSchema,
   type TransactionCollection,

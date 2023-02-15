@@ -8,7 +8,7 @@ import {
 } from '$env/static/private';
 import { PUBLIC_PIN_PATH } from '$env/static/public';
 import { ticketDB } from '$lib/ORM/dbs/ticketDB';
-import { ShowEventType } from '$lib/ORM/models/showevent';
+import { ShowEventType } from '$lib/ORM/models/showEvent';
 import type { TicketDocType, TicketDocument } from '$lib/ORM/models/ticket';
 import { TicketCancelReason } from '$lib/ORM/models/ticket';
 import { TransactionReasonType } from '$lib/ORM/models/transaction';
@@ -116,9 +116,10 @@ export const actions: import('./$types').Actions = {
       reason: TransactionReasonType.TICKET_PAYMENT,
     });
     const ticketService = createTicketMachineService({
-      ticketState: ticket.ticketState,
-      showState: show.showState,
-      saveTicketStateCallback: ticket.saveTicketStateCallback,
+      ticketDocument: ticket,
+      showDocument: show,
+      saveState: true,
+      observeState: false,
     });
     ticketService.send({ type: 'PAYMENT RECEIVED', transaction });
     if (+transaction.value >= amountToPay) {
@@ -143,11 +144,11 @@ export const actions: import('./$types').Actions = {
     }
 
     const { ticket, show } = await getTicket(ticketId);
-
     const ticketService = createTicketMachineService({
-      ticketState: ticket.ticketState,
-      showState: show.showState,
-      saveTicketStateCallback: ticket.saveTicketStateCallback,
+      ticketDocument: ticket,
+      showDocument: show,
+      saveState: true,
+      observeState: false,
     });
     const state = ticketService.getSnapshot();
     if (state.can({ type: 'REQUEST CANCELLATION', cancel: undefined })) {

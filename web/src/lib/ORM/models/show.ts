@@ -9,8 +9,8 @@ import {
   type RxJsonSchema,
 } from 'rxdb';
 import type { AgentDocument } from './agent';
-import type { ShowEventDocument, ShowEventType } from './showevent';
-import { ShowEventString } from './showevent';
+import type { ShowEventDocument, ShowEventType } from './showEvent';
+import { ShowEventString } from './showEvent';
 import type { TalentDocument } from './talent';
 import {
   TicketStatus,
@@ -29,7 +29,7 @@ export enum ShowStatus {
   IN_ESCROW = 'IN ESCROW',
   IN_DISPUTE = 'IN DISPUTE',
   CANCELLATION_REQUESTED = 'CANCELLATION REQUESTED',
-  STARTED = 'STARTED',
+  LIVE = 'LIVE',
   ENDED = 'ENDED',
 }
 
@@ -78,7 +78,6 @@ export const showDocMethods: ShowDocMethods = {
       talent: this.talent,
       ticketState: {
         status: TicketStatus.RESERVED,
-        showStatus: this.showState.status,
         updatedAt: new Date().getTime(),
         price: this.price,
         refundedAmount: 0,

@@ -9,7 +9,7 @@ import {
 import { talentDB } from '$lib/ORM/dbs/talentDB';
 import type { ShowDocument } from '$lib/ORM/models/show';
 import { ShowCancelReason } from '$lib/ORM/models/show';
-import { ShowEventType } from '$lib/ORM/models/showevent';
+import { ShowEventType } from '$lib/ORM/models/showEvent';
 import type { TicketDocument } from '$lib/ORM/models/ticket';
 import { TicketCancelReason, TicketStatus } from '$lib/ORM/models/ticket';
 import { TransactionReasonType } from '$lib/ORM/models/transaction';
@@ -206,10 +206,12 @@ export const actions: Actions = {
       for (const ticket of tickets) {
         if (ticket.ticketState.status === TicketStatus.RESERVED) {
           const ticketService = createTicketMachineService({
-            ticketState: ticket.ticketState,
-            showState: cancelShow.showState,
-            saveTicketStateCallback: ticket.saveTicketStateCallback,
+            ticketDocument: ticket,
+            showDocument: cancelShow,
+            saveState: true,
+            observeState: false,
           });
+
           ticketService.send({
             type: 'REQUEST CANCELLATION',
             cancel: {

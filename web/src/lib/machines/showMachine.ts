@@ -299,7 +299,7 @@ export const createShowMachine = ({
             showState: {
               ...context.showState,
               updatedAt: new Date().getTime(),
-              status: ShowStatus.STARTED,
+              status: ShowStatus.LIVE,
               startDate: new Date().getTime(),
             },
           };
@@ -407,7 +407,7 @@ export const createShowMachine = ({
           context.showState.status === ShowStatus.BOX_OFFICE_OPEN,
         showBoxOfficeClosed: context =>
           context.showState.status === ShowStatus.BOX_OFFICE_CLOSED,
-        showStarted: context => context.showState.status === ShowStatus.STARTED,
+        showStarted: context => context.showState.status === ShowStatus.LIVE,
         showEnded: context => context.showState.status === ShowStatus.ENDED,
         soldOut: context => context.showState.ticketsAvailable === 1,
         canStartShow: context => {
