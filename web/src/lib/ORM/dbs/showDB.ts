@@ -16,9 +16,9 @@ import {
   ShowString,
 } from '$lib/ORM/models/show';
 import { PouchDB, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
-import type { ShowEventCollection } from '../models/showevent';
-import { ShowEventString } from '../models/showevent';
-import { showeventSchema } from '../models/showevent';
+import type { ShowEventCollection } from '../models/showEvent';
+import { ShowEventString } from '../models/showEvent';
+import { showeventSchema } from '../models/showEvent';
 import {
   ticketSchema,
   type TicketCollection,

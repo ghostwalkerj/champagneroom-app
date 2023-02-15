@@ -301,7 +301,6 @@ export const createTicketMachine = ({
           const ticketState = {
             ...context.ticketState,
             updatedAt: new Date().getTime(),
-            updatedBy: `ticketMachine-${context.id}`,
           };
           ticketDocument.saveTicketStateCallback(ticketState);
         },

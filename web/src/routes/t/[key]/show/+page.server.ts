@@ -9,7 +9,7 @@ import {
 import { PUBLIC_JITSI_DOMAIN, PUBLIC_TALENT_PATH } from '$env/static/public';
 import { talentDB } from '$lib/ORM/dbs/talentDB';
 import type { ShowDocument } from '$lib/ORM/models/show';
-import { ShowEventType } from '$lib/ORM/models/showevent';
+import { ShowEventType } from '$lib/ORM/models/showEvent';
 import { StorageType } from '$lib/ORM/rxdb';
 import { createShowMachineService } from '$lib/machines/showMachine';
 import type { Actions } from '@sveltejs/kit';
@@ -45,8 +45,9 @@ const getShow = async (key: string) => {
   }
 
   const showService = createShowMachineService({
-    showState: show.showState,
-    saveShowStateCallback: show.saveShowStateCallback,
+    showDocument: show,
+    saveState: true,
+    observeState: false,
   });
 
   return { talent, show, showService };

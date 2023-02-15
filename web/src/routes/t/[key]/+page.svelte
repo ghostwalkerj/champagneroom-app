@@ -13,13 +13,12 @@
 
   import { goto } from '$app/navigation';
   import ShowDetail from '$lib/components/ShowDetail.svelte';
-  import { ShowEventType } from '$lib/ORM/models/showevent';
   import * as timeago from 'timeago.js';
   import urlJoin from 'url-join';
   import type { Subscription } from 'xstate';
   import type { PageData } from './$types';
   import TalentWallet from './TalentWallet.svelte';
-  import { onMount } from 'svelte';
+  import { ShowEventType } from '$lib/ORM/models/showEvent';
 
   export let form: import('./$types').ActionData;
   export let data: PageData;
@@ -34,61 +33,66 @@
   let showMachineService =
     currentShow &&
     createShowMachineService({
-      showState: currentShow.showState,
+      showDocument: currentShow,
+      observeState: true,
+      saveState: false,
     });
   let showSub: Subscription;
   const showPath = urlJoin($page.url.href, 'show');
 
-  let showMachineState =
+  $: showMachineState =
     currentShow && showMachineService && showMachineService.getSnapshot();
 
   $: canCancelShow =
     currentShow &&
-    (currentShow.showState.status === ShowStatus.BOX_OFFICE_CLOSED ||
-      currentShow.showState.status === ShowStatus.BOX_OFFICE_OPEN);
+    showMachineState?.can({ type: 'REQUEST CANCELLATION', cancel: undefined });
 
-  $: canCreateShow =
-    !currentShow ||
-    showMachineState?.done ||
-    currentShow.showState.status === ShowStatus.ENDED ||
-    currentShow.showState.status === ShowStatus.CANCELLED;
+  $: canCreateShow = !currentShow || showMachineState?.hasTag('canCreateShow');
 
   $: waiting4StateChange = false;
-  $: canStartShow = false;
+  $: canStartShow =
+    currentShow && showMachineState?.can({ type: 'START SHOW' });
   $: statusText = currentShow?.showState.status ?? 'No Current Show';
   $: eventText = 'No Events';
   $: active = currentShow?.showState.active ?? false;
 
-  const useShowState = (showState: ShowDocument['showState']) => {
-    if (showMachineService) showMachineService.stop();
-    if (showSub) showSub.unsubscribe();
-    active = showState.active;
-    showMachineService = createShowMachineService({
-      showState: showState,
-    });
-    showSub = showMachineService.subscribe(state => {
-      if (state.changed) {
-        showMachineState = state;
-        canCancelShow = state.can({
-          type: 'REQUEST CANCELLATION',
-          cancel: undefined,
-        });
-        canCreateShow = state.done ?? true;
-        canStartShow = state.can({
-          type: 'START SHOW',
-        });
+  const useShow = (show: ShowDocument) => {
+    show.$.subscribe((_show: ShowDocument) => {
+      waiting4StateChange = false;
+      if (_show) {
+        statusText = _show.showState.status;
       }
     });
+
+    active = show.showState.active;
   };
 
-  const useShow = (show: ShowDocument) => {
-    show
-      .get$('showState')
-      .subscribe((_showState: ShowDocument['showState']) => {
-        waiting4StateChange = false;
-        if (_showState) {
-          useShowState(_showState);
-          statusText = _showState.status;
+  const useShowEvents = (show: ShowDocument) => {
+    show.collection.database.showevents
+      .findOne()
+      .where('show')
+      .eq(show._id)
+      .sort({ createdAt: 'desc' })
+      .$.subscribe(async event => {
+        if (event) {
+          eventText =
+            timeago.format(event.createdAt) + ' ' + event.ticketInfo?.name;
+          switch (event.type) {
+            case ShowEventType.TICKET_SOLD:
+              eventText += ' bought a ticket!';
+              break;
+
+            case ShowEventType.TICKET_RESERVED:
+              eventText += ' reserved a ticket!';
+              break;
+
+            case ShowEventType.TICKET_CANCELLED:
+              eventText += ' cancelled';
+              break;
+
+            default:
+              eventText = 'No Events';
+          }
         }
       });
   };
@@ -117,39 +121,25 @@
             if (showId) {
               canStartShow = false;
               db.shows.findOne(showId).$.subscribe(async _currentShow => {
+                showMachineService?.stop();
+                showSub?.unsubscribe();
                 if (_currentShow) {
                   currentShow = _currentShow;
                   if (currentShow.showState.active) {
+                    showMachineService = createShowMachineService({
+                      showDocument: _currentShow,
+                      observeState: true,
+                      saveState: false,
+                    });
+                    showSub = showMachineService.subscribe(state => {
+                      console.log(state.value);
+                      if (state.changed) {
+                        showMachineState = state;
+                        console.log('canStartShow', canStartShow);
+                      }
+                    });
                     useShow(_currentShow);
-                    db.showevents
-                      .findOne()
-                      .where('show')
-                      .eq(_currentShow._id)
-                      .sort({ createdAt: 'desc' })
-                      .$.subscribe(async event => {
-                        if (event) {
-                          eventText =
-                            timeago.format(event.createdAt) +
-                            ' ' +
-                            event.ticketInfo?.name;
-                          switch (event.type) {
-                            case ShowEventType.TICKET_SOLD:
-                              eventText += ' bought a ticket!';
-                              break;
-
-                            case ShowEventType.TICKET_RESERVED:
-                              eventText += ' reserved a ticket!';
-                              break;
-
-                            case ShowEventType.TICKET_CANCELLED:
-                              eventText += ' cancelled';
-                              break;
-
-                            default:
-                              eventText = 'No Events';
-                          }
-                        }
-                      });
+                    useShowEvents(_currentShow);
                   }
                 }
               });
@@ -157,6 +147,7 @@
               currentShow = null;
               eventText = 'No Events';
               statusText = 'No Current Show';
+              active = false;
             }
           });
         }

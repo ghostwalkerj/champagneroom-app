@@ -124,8 +124,9 @@ export const actions: import('./$types').Actions = {
     ticketService.send({ type: 'PAYMENT RECEIVED', transaction });
     if (+transaction.value >= amountToPay) {
       const showService = createShowMachineService({
-        showState: show.showState,
-        saveShowStateCallback: show.saveShowStateCallback,
+        showDocument: show,
+        saveState: true,
+        observeState: false,
       });
       showService.send({ type: 'TICKET SOLD', transaction, ticket });
       show.createShowevent({
@@ -165,8 +166,9 @@ export const actions: import('./$types').Actions = {
       });
 
       const showService = createShowMachineService({
-        showState: show.showState,
-        saveShowStateCallback: show.saveShowStateCallback,
+        showDocument: show,
+        saveState: true,
+        observeState: false,
       });
 
       if (ticket.ticketState.totalPaid > ticket.ticketState.refundedAmount) {

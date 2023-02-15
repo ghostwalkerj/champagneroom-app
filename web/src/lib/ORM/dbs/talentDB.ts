@@ -24,7 +24,7 @@ import {
   type ShowEventCollection,
   ShowEventString,
   showeventSchema,
-} from '../models/showevent';
+} from '../models/showEvent';
 import type { TicketCollection } from '../models/ticket';
 import { ticketDocMethods } from '../models/ticket';
 import { TicketString, ticketSchema } from '../models/ticket';

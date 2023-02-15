@@ -33,13 +33,15 @@
   let ticketDone = false;
 
   $: ticketMachineService.subscribe(state => {
-    needs2Pay = state.matches('reserved.waiting4Payment');
-    canWatchShow = state.can('WATCH SHOW');
-    canCancelTicket = state.can({
-      type: 'REQUEST CANCELLATION',
-      cancel: undefined,
-    });
-    ticketDone = state.done ?? false;
+    if (state.changed) {
+      needs2Pay = state.matches('reserved.waiting4Payment');
+      canWatchShow = state.can('WATCH SHOW');
+      canCancelTicket = state.can({
+        type: 'REQUEST CANCELLATION',
+        cancel: undefined,
+      });
+      ticketDone = state.done ?? false;
+    }
   });
 
   $: waiting4StateChange = false;

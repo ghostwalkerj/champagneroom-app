@@ -54,8 +54,9 @@ const getShow = async (key: string) => {
   }
 
   const showService = createShowMachineService({
-    showState: show.showState,
-    saveShowStateCallback: show.saveShowStateCallback,
+    showDocument: show,
+    saveState: true,
+    observeState: false,
   });
 
   return { talent, show, showService };
