@@ -476,7 +476,10 @@ export const createShowMachine = ({
               new Date().getTime()
             );
           }
-          return context.showState.ticketsSold > 0;
+          return (
+            context.showState.ticketsSold - context.showState.ticketsAvailable >
+            0
+          );
         },
         fullyRefunded: (context, event) => {
           const value =

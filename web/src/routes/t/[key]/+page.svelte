@@ -119,7 +119,6 @@
           _talent.get$('currentShow').subscribe(async showId => {
             eventText = 'No Events';
             if (showId) {
-              canStartShow = false;
               db.shows.findOne(showId).$.subscribe(async _currentShow => {
                 showMachineService?.stop();
                 showSub?.unsubscribe();
@@ -132,8 +131,9 @@
                       saveState: false,
                     });
                     showSub = showMachineService.subscribe(state => {
-                      console.log(state.value);
                       if (state.changed) {
+                        console.log(state.value);
+
                         showMachineState = state;
                         console.log('canStartShow', canStartShow);
                       }
