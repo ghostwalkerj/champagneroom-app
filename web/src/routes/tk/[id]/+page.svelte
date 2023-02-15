@@ -74,22 +74,6 @@
           saveState: false,
           observeState: true,
         });
-
-        ticketMachineService.subscribe(state => {
-          needs2Pay = state.matches('reserved.waiting4Payment');
-          canWatchShow = state.can('WATCH SHOW');
-          canCancelTicket = state.can({
-            type: 'REQUEST CANCELLATION',
-            cancel: undefined,
-          });
-          ticketDone = state.done ?? false;
-        });
-
-        console.log('canCancelTicket', canCancelTicket);
-
-        ticketMachineService.onEvent(event => {
-          console.log('event', event);
-        });
       });
     }
   });

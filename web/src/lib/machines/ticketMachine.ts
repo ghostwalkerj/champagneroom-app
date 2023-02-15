@@ -497,7 +497,6 @@ export const createTicketMachine = ({
           return updateState;
         },
         canUpdateShowState: (context, event) => {
-          console.log('can update show state');
           const updateState =
             context.showState.updatedAt !== event.showState.updatedAt;
           return updateState;
