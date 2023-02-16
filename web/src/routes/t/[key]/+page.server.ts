@@ -85,7 +85,7 @@ export const load: PageServerLoad = async ({ params }) => {
     'stats.completedShows'
   )) as ShowDocument[];
   const talent = _talent.toJSON();
-  const currentShow = _currentShow ? _currentShow.toJSON() : undefined;
+  const currentShow = _currentShow ? _currentShow.toJSON() : null;
   const completedShows = _completedShows.map(link => link.toJSON());
 
   return {
@@ -209,12 +209,14 @@ export const actions: Actions = {
           });
 
           let state = ticketService.getSnapshot();
+
           const cancel = {
             createdAt: new Date().getTime(),
             canceller: ActorType.TALENT,
             cancelledInState: JSON.stringify(showState.value),
             reason: TicketCancelReason.SHOW_CANCELLED,
           };
+
           if (state.can({ type: 'REQUEST CANCELLATION', cancel })) {
             ticketService.send({
               type: 'REQUEST CANCELLATION',

@@ -6,6 +6,8 @@
   import {
     createShowMachineService,
     ShowEventType,
+    type ShowMachineServiceType,
+    type ShowMachineStateType,
   } from '$lib/machines/showMachine';
   import { talentDB, type TalentDBType } from '$lib/ORM/dbs/talentDB';
   import type { ShowDocument } from '$lib/ORM/models/show';
@@ -28,10 +30,37 @@
   const token = data.token;
   let talent = data.talent as TalentDocType;
   $: currentShow = data.currentShow as ShowDocument | null;
+  $: showDuration = 60;
 
   let showName = possessive(talent.name, 'en') + ' Show';
-  $: showDuration = 60;
   let key = $page.params.key;
+
+  let showSub: Subscription;
+  const showPath = urlJoin($page.url.href, 'show');
+
+  $: showMachineState = null as ShowMachineStateType | null;
+  $: canCancelShow = false;
+  $: canCreateShow = data.currentShow === null;
+  $: canStartShow = false;
+
+  $: statusText = currentShow?.showState.status ?? 'No Current Show';
+  $: eventText = 'No Events';
+  $: active = currentShow?.showState.active ?? false;
+  $: waiting4StateChange = false;
+
+  const useShowMachine = (showMachineService: ShowMachineServiceType) => {
+    showSub && showSub.unsubscribe();
+    showSub = showMachineService.subscribe((state: ShowMachineStateType) => {
+      canCancelShow = state.can({
+        type: 'REQUEST CANCELLATION',
+        cancel: undefined,
+      });
+      canCreateShow = state.hasTag('canCreateShow');
+      canStartShow = state.can({ type: 'START SHOW' });
+      showMachineState = state;
+    });
+  };
+
   let showMachineService =
     currentShow &&
     createShowMachineService({
@@ -39,24 +68,8 @@
       observeState: true,
       saveState: false,
     });
-  let showSub: Subscription;
-  const showPath = urlJoin($page.url.href, 'show');
 
-  $: showMachineState =
-    currentShow && showMachineService && showMachineService.getSnapshot();
-
-  $: canCancelShow =
-    currentShow &&
-    showMachineState?.can({ type: 'REQUEST CANCELLATION', cancel: undefined });
-
-  $: canCreateShow = !currentShow || showMachineState?.hasTag('canCreateShow');
-
-  $: waiting4StateChange = false;
-  $: canStartShow =
-    currentShow && showMachineState?.can({ type: 'START SHOW' });
-  $: statusText = currentShow?.showState.status ?? 'No Current Show';
-  $: eventText = 'No Events';
-  $: active = currentShow?.showState.active ?? false;
+  showMachineService && useShowMachine(showMachineService);
 
   const useShow = (show: ShowDocument) => {
     show.$.subscribe((_show: ShowDocument) => {
@@ -126,17 +139,13 @@
                 showSub?.unsubscribe();
                 if (_currentShow) {
                   currentShow = _currentShow;
+                  showMachineService = createShowMachineService({
+                    showDocument: _currentShow,
+                    observeState: true,
+                    saveState: false,
+                  });
+                  useShowMachine(showMachineService);
                   if (currentShow.showState.active) {
-                    showMachineService = createShowMachineService({
-                      showDocument: _currentShow,
-                      observeState: true,
-                      saveState: false,
-                    });
-                    showSub = showMachineService.subscribe(state => {
-                      if (state.changed) {
-                        showMachineState = state;
-                      }
-                    });
                     useShow(_currentShow);
                     useShowEvents(_currentShow);
                   }
