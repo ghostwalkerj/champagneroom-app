@@ -8,7 +8,6 @@ import {
 } from '$env/static/private';
 import { PUBLIC_PIN_PATH } from '$env/static/public';
 import { ticketDB } from '$lib/ORM/dbs/ticketDB';
-import { ShowEventType } from '$lib/ORM/models/showEvent';
 import type { TicketDocType, TicketDocument } from '$lib/ORM/models/ticket';
 import { TicketCancelReason } from '$lib/ORM/models/ticket';
 import { TransactionReasonType } from '$lib/ORM/models/transaction';
@@ -129,11 +128,6 @@ export const actions: import('./$types').Actions = {
         observeState: false,
       });
       showService.send({ type: 'TICKET SOLD', transaction, ticket });
-      show.createShowevent({
-        type: ShowEventType.TICKET_SOLD,
-        ticket,
-        transaction,
-      });
     }
 
     return { success: true };
@@ -191,18 +185,9 @@ export const actions: import('./$types').Actions = {
           transaction,
           ticket,
         });
-        show.createShowevent({
-          type: ShowEventType.TICKET_REFUNDED,
-          ticket,
-          transaction,
-        });
       }
 
       showService.send({ type: 'TICKET CANCELLED', ticket });
-      show.createShowevent({
-        type: ShowEventType.TICKET_CANCELLED,
-        ticket,
-      });
 
       // TODO: Need to check if ticket really cancelled
     }

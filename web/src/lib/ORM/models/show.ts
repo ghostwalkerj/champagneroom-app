@@ -9,7 +9,7 @@ import {
   type RxJsonSchema,
 } from 'rxdb';
 import type { AgentDocument } from './agent';
-import type { ShowEventDocument, ShowEventType } from './showEvent';
+import type { ShowEventDocument } from './showEvent';
 import { ShowEventString } from './showEvent';
 import type { TalentDocument } from './talent';
 import {
@@ -48,7 +48,7 @@ type ShowDocMethods = {
     pin: string;
   }) => Promise<TicketDocument>;
   createShowevent: (showeventProps: {
-    type: ShowEventType;
+    type: string;
     ticket?: TicketDocType;
     transaction?: TransactionDocType;
   }) => Promise<ShowEventDocument>;
@@ -96,7 +96,7 @@ export const showDocMethods: ShowDocMethods = {
   createShowevent: async function (
     this: ShowDocument,
     showeventProps: {
-      type: ShowEventType;
+      type: string;
       ticket?: TicketDocType;
       transaction?: TransactionDocType;
     }

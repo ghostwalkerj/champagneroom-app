@@ -73,15 +73,15 @@ export const createShowMachine = ({
             }
           | {
               type: 'TICKET RESERVED';
-              ticket?: TicketDocType;
+              ticket: TicketDocType;
             }
           | {
               type: 'TICKET RESERVATION TIMEOUT';
-              ticket?: TicketDocType;
+              ticket: TicketDocType;
             }
           | {
               type: 'TICKET CANCELLED';
-              ticket?: TicketDocType;
+              ticket: TicketDocType;
             }
           | {
               type: 'TICKET SOLD';
@@ -312,8 +312,17 @@ export const createShowMachine = ({
     },
     {
       actions: {
-        saveShowState: context => {
+        saveShowState: (context, event) => {
           if (!saveState) return;
+
+          const ticket = 'ticket' in event ? event.ticket : undefined;
+          const transaction =
+            'transaction' in event ? event.transaction : undefined;
+          context.showDocument.createShowevent({
+            type: event.type,
+            ticket,
+            transaction,
+          });
           const showState = {
             ...context.showState,
             updatedAt: new Date().getTime(),

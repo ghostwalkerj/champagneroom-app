@@ -9,19 +9,6 @@ import type { ShowDocument } from './show';
 import type { TalentDocument } from './talent';
 import type { TicketDocument } from './ticket';
 
-export enum ShowEventType {
-  STARTED = 'STARTED',
-  JOINED = 'JOINED',
-  LEFT = 'LEFT',
-  ENDED = 'ENDED',
-  TICKET_RESERVED = 'TICKET RESERVED',
-  TICKET_SOLD = 'TICKET SOLD',
-  TICKET_REFUNDED = 'TICKET REFUNDED',
-  TICKET_CANCELLED = 'TICKET CANCELLED',
-  CANCELLATION_REQUESTED = 'CANCELLATION REQUESTED',
-  CANCELLED = 'CANCELLED',
-}
-
 const ShowEventSchemaLiteral = {
   title: 'showevent',
   description: 'showevent for a show',
@@ -53,7 +40,6 @@ const ShowEventSchemaLiteral = {
     },
     type: {
       type: 'string',
-      enum: Object.values(ShowEventType),
     },
     show: {
       type: 'string',

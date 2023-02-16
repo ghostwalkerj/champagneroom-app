@@ -9,7 +9,6 @@ import {
 import { PUBLIC_TICKET_PATH } from '$env/static/public';
 import { showDB } from '$lib/ORM/dbs/showDB';
 import type { ShowDocType } from '$lib/ORM/models/show';
-import { ShowEventType } from '$lib/ORM/models/showEvent';
 import { StorageType } from '$lib/ORM/rxdb';
 import { createShowMachineService } from '$lib/machines/showMachine';
 import { mensNames } from '$lib/util/mensNames';
@@ -138,12 +137,7 @@ export const actions: import('./$types').Actions = {
       return error(501, 'Show cannot Reserve Ticket');
     }
 
-    showService.send('TICKET RESERVED');
-
-    show.createShowevent({
-      type: ShowEventType.TICKET_RESERVED,
-      ticket,
-    });
+    showService.send('TICKET RESERVED', { ticket });
 
     const hash = createPinHash(ticket._id, pin);
     cookies.set('pin', hash, { path: '/' });

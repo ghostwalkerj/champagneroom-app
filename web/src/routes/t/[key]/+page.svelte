@@ -5,7 +5,7 @@
   import ProfilePhoto from '$lib/components/forms/ProfilePhoto.svelte';
   import { createShowMachineService } from '$lib/machines/showMachine';
   import { talentDB, type TalentDBType } from '$lib/ORM/dbs/talentDB';
-  import { ShowStatus, type ShowDocument } from '$lib/ORM/models/show';
+  import type { ShowDocument } from '$lib/ORM/models/show';
   import type { TalentDocType } from '$lib/ORM/models/talent';
   import { durationFormatter } from '$lib/util/constants';
   import { possessive } from 'i18n-possessive';
