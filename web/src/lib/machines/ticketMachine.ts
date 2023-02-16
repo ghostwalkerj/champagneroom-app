@@ -3,7 +3,7 @@ import { ShowStatus } from '$lib/ORM/models/show';
 import type { TicketDocType, TicketDocument } from '$lib/ORM/models/ticket';
 import { TicketStatus } from '$lib/ORM/models/ticket';
 import type { TransactionDocType } from '$lib/ORM/models/transaction';
-import type { ActorRef } from 'xstate';
+import type { ActorRef, ActorRefFrom } from 'xstate';
 import {
   assign,
   createMachine,
@@ -14,6 +14,8 @@ import {
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';
 import { nanoid } from 'nanoid';
+import type { ShowMachineType } from './showMachine';
+import { createShowMachine } from './showMachine';
 
 type TicketStateType = TicketDocType['ticketState'];
 type ShowStateType = ShowDocType['showState'];
@@ -26,15 +28,6 @@ export type TicketStateCallbackType = (state: TicketStateType) => void;
 //   return timer > 0 ? timer : 0;
 // };
 
-const createShowStateObservable = (showDocument: ShowDocument) => {
-  const showState$ = showDocument.get$(
-    'showState'
-  ) as Observable<ShowStateType>;
-
-  return showState$.pipe(
-    map(showState => ({ type: 'SHOWSTATE UPDATE', showState }))
-  );
-};
 const createTicketStateObservable = (ticketDocument: TicketDocument) => {
   const ticketState$ = ticketDocument.get$(
     'ticketState'
@@ -56,6 +49,11 @@ export const createTicketMachine = ({
   saveState: boolean;
   observeState: boolean;
 }) => {
+  const parentShowMachine = createShowMachine({
+    showDocument,
+    saveState,
+    observeState,
+  });
   /** @xstate-layout N4IgpgJg5mDOIC5QBcCWBjA1mZBZAhugBaoB2YAdGljgAQA2A9vhJAMQDaADALqKgAHRrFRpGpfiAAeiAEwBGLhVkBmACwqA7AFYANCACeiAGzHtFAJxcLW7QF87+6tjyES5KhhcNmrCJ3k+JBAhETEJYJkEeStldVt9IwQADnkKe0cQZxwCYjJKbOQfFnYOWSDBYVFUcUkozVlEuTU1Y0tZDKcvHLd8zxoiphL-DhUKkKrwurlFOI0dJuiLGIp5HQcugdz3Au7B31K1cdDq2si5LiVVeb1DOW1ZdI2sve2+wuK-Tm1jyZqI0BRB6LWSaeQqChqbSKNTyUzw4yaZ6FN4eD5DL4cYy-ML-aZLK7xBZ3BAKbRtCwdZGvXoeABOcDAdIAbpAKAB3fDVUhQNQABXwBgAtmBSMg2HyAIIATVwAFEAHIAFVoACU5QBhOUASQAanKACLcHGnAHSRDJUwUMzGDqLNSaCHaLgqeSyNQWT1eiydF5bWmUBmwJmsiAcrloHn8wUisUSmXy5VqzU6-VGwKSE5Tc7RS6aSxcW23JJaeTU-15emMllsznc3kC4Wi8XqgCKAFU5QBlFUayUKrUAGUHkqV2oA8grjZm-mdAYh5M7zApksSkvI4UoVMltDZ1pkUQGKEGQ7WI2QGzHm2w252e7Q+wO5cPRxOpxnglm8TntMk1OlFmSH1lELKkDxpStA2rUNw3raMmzjadP1nM0oktNobTtEk1FBdIXTdD1vU9X1D0g49oLPOCuyIRh2RvOUO27Xt+yHEcx0nJDKlxOdzWiJdlHkVdiwXFRrGUKFXTAzYXFRKDgxrMM60jXlqNo+jGPvR9WNfDiPy4018QafNFD3YTohUUSKFdckpL9GSjxPBTYOUtRVLogB1UcNQACVoLtvPHdzOImbjUIXfiVzXBcPWSCguEE-dpJ6MjHJghkAEcAFc4GQSANXwUh0DAeh6HwcJnIvNRVTAAAzTLSH8dUADF2wVA1ky1PVDWCr8eKiRcuGXBKzNkS5y3slKKLDDLstgXKIHywritK8qlMq6q6oa+iWrajrU26vSQoMnMN3dCggNAsybAhNRrFscbkp2cjIDAEV-EHOVJX1PyAqC3gZ1C-FRs0f9jDWYbFkEsH2hIiCnoZF63rYTylR8n7Ap6lCgcuWKEhJQSN0hWzSPhsBEfYfzAtoRUDW6-7kMBnNbRBXc0i4FpNGWBFTCRcCKyesg5VgdA6TUpq5UNAAhSUNQAaT2rqjXp-Ts3nBAVBsCgotJclzBw2H+b6QXhdFuiDW1Ls+XbJU5VobUFW1MdRzpk1Vd4jWIW10Fbq1+7nlIRhWHgYISfyAHjrVgBaYxFmjh7XDI9EDggcO3aiHDIeMZZVkSuzHr6VLIFT781YeNIRuSJ149k8j5Jgtao0bWNkGLvqTEXVYVFkVIsKSGLIUu6uHKmiqozc1uwoQckLAA-GHn-P9jCEofJrrtkZpyvKCqKkqypLo604XLhNDaC6i0AqEC1MlfSbX6awCyzeFu35a9-EUfeQ2+qU4ZiPeI3YCag-x43XIWJQqQbIGwmqTcmP8Vb736poEGkJtYxDWETKB+cPDoBfiVIuv9D7RGSDuRYlIrI3z6DVMg+B6CoAAF74PgW3BAYMIQWGAV7KE5cubc3hLzJKCcBakCFiLWiE8gaOmtHdL2xh1BawdDw7m-C86CKNqQA0qBYACEyrlcRP4LD5kRBDEkoI-yQlukWBwDggA */
   return createMachine(
     {
@@ -65,17 +63,12 @@ export const createTicketMachine = ({
         ticketStateRef: undefined as
           | ActorRef<{ type: string }, TicketStateType>
           | undefined,
-        showStateRef: undefined as
-          | ActorRef<{ type: string }, ShowStateType>
-          | undefined,
         ticketState: JSON.parse(
           JSON.stringify(ticketDocument.ticketState)
         ) as TicketStateType,
         errorMessage: undefined as string | undefined,
-        showState: JSON.parse(
-          JSON.stringify(showDocument.showState)
-        ) as ShowStateType,
         id: nanoid(),
+        showMachineRef: undefined as ActorRefFrom<ShowMachineType> | undefined,
       },
       // eslint-disable-next-line @typescript-eslint/consistent-type-imports
       tsTypes: {} as import('./ticketMachine.typegen').Typegen0,
@@ -121,18 +114,19 @@ export const createTicketMachine = ({
       },
       predictableActionArguments: true,
       id: 'ticketMachine',
-      initial: 'ticket loaded',
+      initial: 'ticketLoaded',
       entry: assign(() => {
+        const showMachineRef = spawn(parentShowMachine, { sync: true });
         if (observeState) {
           return {
             ticketStateRef: spawn(createTicketStateObservable(ticketDocument)),
-            showStateRef: spawn(createShowStateObservable(showDocument)),
+            showMachineRef,
           };
         }
-        return {};
+        return { showMachineRef };
       }),
       states: {
-        'ticket loaded': {
+        ticketLoaded: {
           always: [
             {
               target: 'reserved',
@@ -166,6 +160,7 @@ export const createTicketMachine = ({
         },
         reserved: {
           initial: 'waiting4Payment',
+
           states: {
             waiting4Payment: {
               always: {
@@ -283,12 +278,8 @@ export const createTicketMachine = ({
         inDispute: {},
       },
       on: {
-        'SHOWSTATE UPDATE': {
-          actions: ['updateShowState'],
-          cond: 'canUpdateShowState',
-        },
         'TICKETSTATE UPDATE': {
-          target: 'ticket loaded',
+          target: 'ticketLoaded',
           cond: 'canUpdateTicketState',
           actions: ['updateTicketState'],
         },
@@ -309,14 +300,6 @@ export const createTicketMachine = ({
           return {
             ticketState: {
               ...event.ticketState,
-            },
-          };
-        }),
-
-        updateShowState: assign((context, event) => {
-          return {
-            showState: {
-              ...event.showState,
             },
           };
         }),
@@ -439,19 +422,26 @@ export const createTicketMachine = ({
       },
       guards: {
         canCancel: context => {
+          const state = context.showMachineRef?.getSnapshot();
           const canCancel =
             context.ticketState.totalPaid <=
               context.ticketState.refundedAmount &&
-            (context.showState.status === ShowStatus.BOX_OFFICE_CLOSED ||
-              context.showState.status === ShowStatus.BOX_OFFICE_OPEN); // TODO: use showMachine
+            state !== undefined &&
+            state.can({
+              type: 'TICKET CANCELLED',
+              ticket: context.ticketDocument,
+            });
 
           return canCancel;
         },
         canRequestCancellation: context => {
+          const state = context.showMachineRef?.getSnapshot();
           const canRequestCancellation =
-            context.showState.active &&
-            (context.showState.status === ShowStatus.BOX_OFFICE_OPEN ||
-              context.showState.status === ShowStatus.BOX_OFFICE_CLOSED);
+            state !== undefined &&
+            state.can({
+              type: 'TICKET CANCELLED',
+              ticket: context.ticketDocument,
+            });
           return canRequestCancellation;
         },
         ticketCancelled: context =>
@@ -484,20 +474,17 @@ export const createTicketMachine = ({
           );
         },
         canWatchShow: context => {
+          const state = context.showMachineRef?.getSnapshot();
           return (
+            state !== undefined &&
             context.ticketState.totalPaid >= context.ticketState.price &&
-            context.showState.status === ShowStatus.LIVE
+            state.matches('started')
           );
         },
         canUpdateTicketState: (context, event) => {
           const updateState =
             context.ticketState.updatedAt !== event.ticketState.updatedAt;
 
-          return updateState;
-        },
-        canUpdateShowState: (context, event) => {
-          const updateState =
-            context.showState.updatedAt !== event.showState.updatedAt;
           return updateState;
         },
       },

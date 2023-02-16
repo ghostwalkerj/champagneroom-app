@@ -14,7 +14,6 @@ import {
   PUBLIC_TICKET_PATH,
 } from '$env/static/public';
 import { ticketDB } from '$lib/ORM/dbs/ticketDB';
-import { ShowEventType } from '$lib/ORM/models/showEvent';
 import type { TicketDocType, TicketDocument } from '$lib/ORM/models/ticket';
 import { StorageType } from '$lib/ORM/rxdb';
 import { createTicketMachineService } from '$lib/machines/ticketMachine';
@@ -103,10 +102,6 @@ export const load: import('./$types').PageServerLoad = async ({
   }
 
   ticketService.send('WATCH SHOW');
-  _show.createShowevent({
-    type: ShowEventType.JOINED,
-    ticket: _ticket,
-  });
 
   const ticket = _ticket.toJSON() as TicketDocType;
   const show = _show.toJSON();
@@ -160,11 +155,6 @@ export const actions: Actions = {
       });
 
       ticketService.send('LEAVE SHOW');
-
-      show.createShowevent({
-        type: ShowEventType.LEFT,
-        ticket,
-      });
     }
     return { success: true };
   },

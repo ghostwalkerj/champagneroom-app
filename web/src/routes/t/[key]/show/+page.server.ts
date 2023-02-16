@@ -9,7 +9,6 @@ import {
 import { PUBLIC_JITSI_DOMAIN, PUBLIC_TALENT_PATH } from '$env/static/public';
 import { talentDB } from '$lib/ORM/dbs/talentDB';
 import type { ShowDocument } from '$lib/ORM/models/show';
-import { ShowEventType } from '$lib/ORM/models/showEvent';
 import { StorageType } from '$lib/ORM/rxdb';
 import { createShowMachineService } from '$lib/machines/showMachine';
 import type { Actions } from '@sveltejs/kit';
@@ -71,9 +70,6 @@ export const load: import('./$types').PageServerLoad = async ({ params }) => {
   showService.send({
     type: 'START SHOW',
   });
-  show.createShowevent({
-    type: ShowEventType.STARTED,
-  });
 
   const jitsiToken = jwt.sign(
     {
@@ -117,9 +113,6 @@ export const actions: Actions = {
       // Cancel the show and prevent new ticket sales, etc
       showService.send({
         type: 'END SHOW',
-      });
-      endShow.createShowevent({
-        type: ShowEventType.ENDED,
       });
     }
     return { success: true };

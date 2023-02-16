@@ -117,6 +117,7 @@ export const actions: import('./$types').Actions = {
     const ticketService = createTicketMachineService({
       ticketDocument: ticket,
       showDocument: show,
+
       saveState: true,
       observeState: false,
     });

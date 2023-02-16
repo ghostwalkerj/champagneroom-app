@@ -33,18 +33,16 @@
   let ticketDone = false;
 
   $: ticketMachineService.subscribe(state => {
-    if (state.changed) {
-      needs2Pay = state.matches('reserved.waiting4Payment');
-      canWatchShow = state.can('WATCH SHOW');
-      canCancelTicket = state.can({
-        type: 'REQUEST CANCELLATION',
-        cancel: undefined,
-      });
-      ticketDone = state.done ?? false;
-    }
+    needs2Pay = state.matches('reserved.waiting4Payment');
+    canWatchShow = state.can('WATCH SHOW');
+    canCancelTicket = state.can({
+      type: 'REQUEST CANCELLATION',
+      cancel: undefined,
+    });
+    ticketDone = state.done ?? false;
   });
 
-  $: waiting4StateChange = false;
+  $: waiting4StateChange = true;
 
   const onSubmit = () => {
     waiting4StateChange = true;
@@ -56,28 +54,31 @@
     };
   };
 
-  onMount(async () => {
-    if (ticket.ticketState.active) {
-      ticketDB(ticketId, token).then(async (db: TicketDBType) => {
-        show = (await db.shows.findOne(show._id).exec()) as ShowDocument;
-        const _ticket = (await db.tickets
-          .findOne(ticketId)
-          .exec()) as TicketDocument;
-        if (ticketMachineService) {
-          ticketMachineService.stop();
-        }
-        _ticket.$.subscribe(newTicket => {
-          ticket = newTicket;
-        });
-
-        ticketMachineService = createTicketMachineService({
-          ticketDocument: _ticket,
-          showDocument: show,
-          saveState: false,
-          observeState: true,
-        });
+  if (ticket.ticketState.active) {
+    ticketDB(ticketId, token).then(async (db: TicketDBType) => {
+      show = (await db.shows.findOne(show._id).exec()) as ShowDocument;
+      const _ticket = (await db.tickets
+        .findOne(ticketId)
+        .exec()) as TicketDocument;
+      if (ticketMachineService) {
+        ticketMachineService.stop();
+      }
+      _ticket.$.subscribe(newTicket => {
+        ticket = newTicket;
+        waiting4StateChange = false;
       });
-    }
+
+      ticketMachineService = createTicketMachineService({
+        ticketDocument: _ticket,
+        showDocument: show,
+        saveState: false,
+        observeState: true,
+      });
+    });
+  }
+
+  onMount(() => {
+    waiting4StateChange = false;
   });
 </script>
 

@@ -3,7 +3,10 @@
   import { page } from '$app/stores';
   import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
   import ProfilePhoto from '$lib/components/forms/ProfilePhoto.svelte';
-  import { createShowMachineService } from '$lib/machines/showMachine';
+  import {
+    createShowMachineService,
+    ShowEventType,
+  } from '$lib/machines/showMachine';
   import { talentDB, type TalentDBType } from '$lib/ORM/dbs/talentDB';
   import type { ShowDocument } from '$lib/ORM/models/show';
   import type { TalentDocType } from '$lib/ORM/models/talent';
@@ -18,7 +21,6 @@
   import type { Subscription } from 'xstate';
   import type { PageData } from './$types';
   import TalentWallet from './TalentWallet.svelte';
-  import { ShowEventType } from '$lib/ORM/models/showEvent';
 
   export let form: import('./$types').ActionData;
   export let data: PageData;
@@ -132,10 +134,7 @@
                     });
                     showSub = showMachineService.subscribe(state => {
                       if (state.changed) {
-                        console.log(state.value);
-
                         showMachineState = state;
-                        console.log('canStartShow', canStartShow);
                       }
                     });
                     useShow(_currentShow);

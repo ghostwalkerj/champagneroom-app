@@ -25,6 +25,18 @@ export const escrowTimer = (endTime: number) => {
   return timer > 0 ? timer : 0;
 };
 
+export enum ShowEventType {
+  REQUEST_CANCELLATION = 'REQUEST CANCELLATION',
+  REFUND_SENT = 'REFUND SENT',
+  TICKET_RESERVED = 'TICKET RESERVED',
+  TICKET_RESERVATION_TIMEOUT = 'TICKET RESERVATION TIMEOUT',
+  TICKET_CANCELLED = 'TICKET CANCELLED',
+  TICKET_SOLD = 'TICKET SOLD',
+  START_SHOW = 'START SHOW',
+  END_SHOW = 'END SHOW',
+  SHOWSTATE_UPDATE = 'SHOWSTATE UPDATE',
+}
+
 const createShowStateObservable = (showDocument: ShowDocument) => {
   const showState$ = showDocument.get$(
     'showState'
@@ -101,7 +113,7 @@ export const createShowMachine = ({
       },
       predictableActionArguments: true,
       id: 'showMachine',
-      initial: 'show loaded',
+      initial: 'showLoaded',
       entry: assign(() => {
         if (observeState) {
           return {
@@ -111,7 +123,7 @@ export const createShowMachine = ({
         return {};
       }),
       states: {
-        'show loaded': {
+        showLoaded: {
           always: [
             {
               target: 'boxOfficeOpen',
