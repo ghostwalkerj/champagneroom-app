@@ -333,10 +333,11 @@ export const createTicketMachine = ({
 
         sendTicketCancelled: context => {
           if (!context.showMachineRef) return;
-          sendTo(context.showMachineRef, {
+          const send = sendTo(context.showMachineRef, {
             type: 'TICKET CANCELLED',
             ticket: context.ticketDocument,
           });
+          console.log('send', send);
         },
 
         requestCancellation: assign((context, event) => {
