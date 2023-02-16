@@ -4,6 +4,8 @@ import type { TicketDocType, TicketDocument } from '$lib/ORM/models/ticket';
 import { TicketStatus } from '$lib/ORM/models/ticket';
 import type { TransactionDocType } from '$lib/ORM/models/transaction';
 import type { ActorRef, ActorRefFrom } from 'xstate';
+import { sendTo } from 'xstate';
+import { send } from 'xstate';
 import {
   assign,
   createMachine,
@@ -172,7 +174,11 @@ export const createTicketMachine = ({
                   {
                     target: 'waiting4Show',
                     cond: 'fullyPaid',
-                    actions: ['receivePayment', 'saveTicketState'],
+                    actions: [
+                      'receivePayment',
+                      'saveTicketState',
+                      'sendTicketSold',
+                    ],
                   },
                   {
                     actions: ['receivePayment', 'saveTicketState'],
@@ -233,6 +239,7 @@ export const createTicketMachine = ({
                           'receiveRefund',
                           'cancelTicket',
                           'saveTicketState',
+                          'sendTicketRefunded',
                         ],
                       },
                       {
@@ -303,6 +310,24 @@ export const createTicketMachine = ({
             },
           };
         }),
+
+        sendTicketSold: (context, event) => {
+          if (!context.showMachineRef) return;
+          sendTo(context.showMachineRef, {
+            type: 'TICKET SOLD',
+            ticket: context.ticketDocument,
+            transaction: event.transaction,
+          });
+        },
+
+        sendTicketRefunded: (context, event) => {
+          if (!context.showMachineRef) return;
+          sendTo(context.showMachineRef, {
+            type: 'TICKET REFUNDED',
+            ticket: context.ticketDocument,
+            transaction: event.transaction,
+          });
+        },
 
         requestCancellation: assign((context, event) => {
           return {

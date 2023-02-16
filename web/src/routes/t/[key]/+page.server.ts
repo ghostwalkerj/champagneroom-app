@@ -200,7 +200,7 @@ export const actions: Actions = {
         .exec()) as TicketDocument[];
 
       for (const ticket of tickets) {
-        if (ticket.ticketState.status === TicketStatus.RESERVED) {
+        if (ticket.ticketState.active) {
           const ticketService = createTicketMachineService({
             ticketDocument: ticket,
             showDocument: cancelShow,
@@ -208,19 +208,22 @@ export const actions: Actions = {
             observeState: false,
           });
 
-          ticketService.send({
-            type: 'REQUEST CANCELLATION',
-            cancel: {
-              createdAt: new Date().getTime(),
-              canceller: ActorType.TALENT,
-              cancelledInState: JSON.stringify(showState.value),
-              reason: TicketCancelReason.SHOW_CANCELLED,
-            },
-          });
+          let state = ticketService.getSnapshot();
+          const cancel = {
+            createdAt: new Date().getTime(),
+            canceller: ActorType.TALENT,
+            cancelledInState: JSON.stringify(showState.value),
+            reason: TicketCancelReason.SHOW_CANCELLED,
+          };
+          if (state.can({ type: 'REQUEST CANCELLATION', cancel })) {
+            ticketService.send({
+              type: 'REQUEST CANCELLATION',
+              cancel,
+            });
+          }
 
-          if (
-            ticket.ticketState.totalPaid > ticket.ticketState.refundedAmount
-          ) {
+          state = ticketService.getSnapshot();
+          if (state.matches('reserved.requestedCancellation.waiting4Refund')) {
             const transaction = await ticket.createTransaction({
               hash: '0xeba2df809e7a612a0a0d444ccfa5c839624bdc00dd29e3340d46df3870f8a30e',
               from: '0x5B38Da6a701c568545dCfcB03FcB875f56beddC4',
@@ -234,11 +237,6 @@ export const actions: Actions = {
             ticketService.send({
               type: 'REFUND RECEIVED',
               transaction,
-            });
-            showService.send({
-              type: 'REFUND SENT',
-              transaction,
-              ticket,
             });
           }
         }

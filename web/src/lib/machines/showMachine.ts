@@ -27,7 +27,7 @@ export const escrowTimer = (endTime: number) => {
 
 export enum ShowEventType {
   REQUEST_CANCELLATION = 'REQUEST CANCELLATION',
-  REFUND_SENT = 'REFUND SENT',
+  TICKET_REFUNDED = 'TICKET REFUNDED',
   TICKET_RESERVED = 'TICKET RESERVED',
   TICKET_RESERVATION_TIMEOUT = 'TICKET RESERVATION TIMEOUT',
   TICKET_CANCELLED = 'TICKET CANCELLED',
@@ -79,26 +79,26 @@ export const createShowMachine = ({
               cancel: ShowStateType['cancel'];
             }
           | {
-              type: 'REFUND SENT';
+              type: 'TICKET REFUNDED';
               transaction: TransactionDocType;
-              ticket: TicketDocType;
+              ticket?: TicketDocType;
             }
           | {
               type: 'TICKET RESERVED';
-              ticket: TicketDocType;
+              ticket?: TicketDocType;
             }
           | {
               type: 'TICKET RESERVATION TIMEOUT';
-              ticket: TicketDocType;
+              ticket?: TicketDocType;
             }
           | {
               type: 'TICKET CANCELLED';
-              ticket: TicketDocType;
+              ticket?: TicketDocType;
             }
           | {
               type: 'TICKET SOLD';
               transaction: TransactionDocType;
-              ticket: TicketDocType;
+              ticket?: TicketDocType;
             }
           | {
               type: 'START SHOW';
@@ -219,9 +219,9 @@ export const createShowMachine = ({
               cond: 'canStartShow',
               actions: ['startShow', 'saveShowState'],
             },
-            'REFUND SENT': [
+            'TICKET REFUNDED': [
               {
-                actions: ['sendRefund', 'saveShowState'],
+                actions: ['refundTicket', 'saveShowState'],
               },
             ],
           },
@@ -256,9 +256,9 @@ export const createShowMachine = ({
             'TICKET SOLD': {
               actions: ['sellTicket', 'saveShowState'],
             },
-            'REFUND SENT': [
+            'TICKET REFUNDED': [
               {
-                actions: ['sendRefund', 'saveShowState'],
+                actions: ['refundTicket', 'saveShowState'],
               },
             ],
             'REQUEST CANCELLATION': [
@@ -299,14 +299,14 @@ export const createShowMachine = ({
           states: {
             waiting2Refund: {
               on: {
-                'REFUND SENT': [
+                'TICKET REFUNDED': [
                   {
                     target: '#showMachine.cancelled',
                     cond: 'fullyRefunded',
-                    actions: ['sendRefund', 'cancelShow', 'saveShowState'],
+                    actions: ['refundTicket', 'cancelShow', 'saveShowState'],
                   },
                   {
-                    actions: ['sendRefund', 'saveShowState'],
+                    actions: ['refundTicket', 'saveShowState'],
                   },
                 ],
               },
@@ -408,7 +408,7 @@ export const createShowMachine = ({
           };
         }),
 
-        sendRefund: assign((context, event) => {
+        refundTicket: assign((context, event) => {
           // Check if this is full refund for a ticket
           const ticketsRefunded = context.showState.ticketsRefunded + 1;
 
@@ -504,7 +504,7 @@ export const createShowMachine = ({
         },
         fullyRefunded: (context, event) => {
           const value =
-            event.type === 'REFUND SENT' ? event.transaction?.value : 0;
+            event.type === 'TICKET REFUNDED' ? event.transaction?.value : 0;
           return (
             context.showState.refundedAmount + +value >=
             context.showState.totalSales

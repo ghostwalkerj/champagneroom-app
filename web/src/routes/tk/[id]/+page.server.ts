@@ -104,7 +104,6 @@ export const actions: import('./$types').Actions = {
     }
 
     const { ticket, show } = await getTicket(ticketId);
-    const amountToPay = show.price - ticket.ticketState.totalPaid;
     const transaction = await ticket.createTransaction({
       //TODO: add transaction data
       hash: '0xeba2df809e7a612a0a0d444ccfa5c839624bdc00dd29e3340d46df3870f8a30e',
@@ -117,19 +116,10 @@ export const actions: import('./$types').Actions = {
     const ticketService = createTicketMachineService({
       ticketDocument: ticket,
       showDocument: show,
-
       saveState: true,
       observeState: false,
     });
     ticketService.send({ type: 'PAYMENT RECEIVED', transaction });
-    if (+transaction.value >= amountToPay) {
-      const showService = createShowMachineService({
-        showDocument: show,
-        saveState: true,
-        observeState: false,
-      });
-      showService.send({ type: 'TICKET SOLD', transaction, ticket });
-    }
 
     return { success: true };
   },
@@ -160,12 +150,6 @@ export const actions: import('./$types').Actions = {
         },
       });
 
-      const showService = createShowMachineService({
-        showDocument: show,
-        saveState: true,
-        observeState: false,
-      });
-
       if (ticket.ticketState.totalPaid > ticket.ticketState.refundedAmount) {
         const transaction = await ticket.createTransaction({
           hash: '0xeba2df809e7a612a0a0d444ccfa5c839624bdc00dd29e3340d46df3870f8a30e',
@@ -181,14 +165,7 @@ export const actions: import('./$types').Actions = {
           type: 'REFUND RECEIVED',
           transaction,
         });
-        showService.send({
-          type: 'REFUND SENT',
-          transaction,
-          ticket,
-        });
       }
-
-      showService.send({ type: 'TICKET CANCELLED', ticket });
 
       // TODO: Need to check if ticket really cancelled
     }
