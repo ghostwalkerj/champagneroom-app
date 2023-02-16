@@ -105,7 +105,7 @@ export const actions: Actions = {
     if (key === undefined) {
       throw error(404, 'Key not found');
     }
-    const { show: endShow, showService } = await getShow(key);
+    const { showService } = await getShow(key);
 
     const showState = showService.getSnapshot();
 

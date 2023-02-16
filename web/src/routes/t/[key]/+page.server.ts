@@ -10,7 +10,7 @@ import { talentDB } from '$lib/ORM/dbs/talentDB';
 import type { ShowDocument } from '$lib/ORM/models/show';
 import { ShowCancelReason } from '$lib/ORM/models/show';
 import type { TicketDocument } from '$lib/ORM/models/ticket';
-import { TicketCancelReason, TicketStatus } from '$lib/ORM/models/ticket';
+import { TicketCancelReason } from '$lib/ORM/models/ticket';
 import { TransactionReasonType } from '$lib/ORM/models/transaction';
 import { StorageType } from '$lib/ORM/rxdb';
 import { createShowMachineService } from '$lib/machines/showMachine';
