@@ -12,6 +12,7 @@ import type { TicketDocType, TicketDocument } from '$lib/ORM/models/ticket';
 import { TicketCancelReason } from '$lib/ORM/models/ticket';
 import { TransactionReasonType } from '$lib/ORM/models/transaction';
 import { StorageType } from '$lib/ORM/rxdb';
+
 import { createTicketMachineService } from '$lib/machines/ticketMachine';
 import { ActorType } from '$lib/util/constants';
 import { verifyPin } from '$lib/util/pin';
@@ -116,7 +117,7 @@ export const actions: import('./$types').Actions = {
       ticketDocument: ticket,
       showDocument: show,
       saveState: true,
-      observeState: false,
+      observeState: true,
     });
     ticketService.send({ type: 'PAYMENT RECEIVED', transaction });
 
@@ -129,11 +130,12 @@ export const actions: import('./$types').Actions = {
     }
 
     const { ticket, show } = await getTicket(ticketId);
+
     const ticketService = createTicketMachineService({
       ticketDocument: ticket,
       showDocument: show,
       saveState: true,
-      observeState: false,
+      observeState: true,
     });
     const state = ticketService.getSnapshot();
     if (state.can({ type: 'REQUEST CANCELLATION', cancel: undefined })) {

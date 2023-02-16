@@ -23,6 +23,7 @@
   import type { Subscription } from 'xstate';
   import type { PageData } from './$types';
   import TalentWallet from './TalentWallet.svelte';
+  import { onMount } from 'svelte';
 
   export let form: import('./$types').ActionData;
   export let data: PageData;
@@ -61,16 +62,6 @@
     });
   };
 
-  let showMachineService =
-    currentShow &&
-    createShowMachineService({
-      showDocument: currentShow,
-      observeState: true,
-      saveState: false,
-    });
-
-  showMachineService && useShowMachine(showMachineService);
-
   const useShow = (show: ShowDocument) => {
     show.$.subscribe((_show: ShowDocument) => {
       waiting4StateChange = false;
@@ -78,7 +69,6 @@
         statusText = _show.showState.status;
       }
     });
-
     active = show.showState.active;
   };
 
@@ -112,6 +102,57 @@
       });
   };
 
+  let showMachineService: ShowMachineServiceType | null = null;
+
+  onMount(() => {
+    if (currentShow) {
+      showMachineService = createShowMachineService({
+        showDocument: currentShow,
+        observeState: false,
+        saveState: false,
+      });
+      useShowMachine(showMachineService);
+    }
+    talentDB(key, token).then((db: TalentDBType | undefined) => {
+      if (!db) return;
+      db.talents
+        .findOne(talent._id)
+        .exec()
+        .then(_talent => {
+          if (_talent) {
+            talent = _talent;
+            _talent.get$('currentShow').subscribe(async showId => {
+              eventText = 'No Events';
+              if (showId) {
+                db.shows.findOne(showId).$.subscribe(async _currentShow => {
+                  showMachineService?.stop();
+                  showSub?.unsubscribe();
+                  if (_currentShow) {
+                    currentShow = _currentShow;
+                    showMachineService = createShowMachineService({
+                      showDocument: _currentShow,
+                      observeState: true,
+                      saveState: false,
+                    });
+                    useShowMachine(showMachineService);
+                    if (currentShow.showState.active) {
+                      useShow(_currentShow);
+                      useShowEvents(_currentShow);
+                    }
+                  }
+                });
+              } else {
+                currentShow = null;
+                eventText = 'No Events';
+                statusText = 'No Current Show';
+                active = false;
+              }
+            });
+          }
+        });
+    });
+  });
+
   const updateProfileImage = async (url: string) => {
     if (url && talent) {
       let formData = new FormData();
@@ -122,45 +163,6 @@
       });
     }
   };
-
-  talentDB(key, token).then((db: TalentDBType | undefined) => {
-    if (!db) return;
-    db.talents
-      .findOne(talent._id)
-      .exec()
-      .then(_talent => {
-        if (_talent) {
-          talent = _talent;
-          _talent.get$('currentShow').subscribe(async showId => {
-            eventText = 'No Events';
-            if (showId) {
-              db.shows.findOne(showId).$.subscribe(async _currentShow => {
-                showMachineService?.stop();
-                showSub?.unsubscribe();
-                if (_currentShow) {
-                  currentShow = _currentShow;
-                  showMachineService = createShowMachineService({
-                    showDocument: _currentShow,
-                    observeState: true,
-                    saveState: false,
-                  });
-                  useShowMachine(showMachineService);
-                  if (currentShow.showState.active) {
-                    useShow(_currentShow);
-                    useShowEvents(_currentShow);
-                  }
-                }
-              });
-            } else {
-              currentShow = null;
-              eventText = 'No Events';
-              statusText = 'No Current Show';
-              active = false;
-            }
-          });
-        }
-      });
-  });
 
   const onSubmit = ({}) => {
     waiting4StateChange = true;

@@ -3,8 +3,8 @@ import type { TicketDocType, TicketDocument } from '$lib/ORM/models/ticket';
 import { TicketStatus } from '$lib/ORM/models/ticket';
 import type { TransactionDocType } from '$lib/ORM/models/transaction';
 import type { ActorRef, ActorRefFrom } from 'xstate';
-import { sendTo } from 'xstate';
 import {
+  sendTo,
   assign,
   createMachine,
   interpret,
@@ -117,6 +117,7 @@ export const createTicketMachine = ({
       initial: 'ticketLoaded',
       entry: assign(() => {
         const showMachineRef = spawn(parentShowMachine, { sync: true });
+
         if (observeState) {
           return {
             ticketStateRef: spawn(createTicketStateObservable(ticketDocument)),
@@ -190,6 +191,7 @@ export const createTicketMachine = ({
                       'requestCancellation',
                       'cancelTicket',
                       'saveTicketState',
+                      'sendTicketCancelled',
                     ],
                   },
                   {
@@ -209,6 +211,7 @@ export const createTicketMachine = ({
                       'requestCancellation',
                       'cancelTicket',
                       'saveTicketState',
+                      'sendTicketCancelled',
                     ],
                   },
                   {
@@ -238,6 +241,7 @@ export const createTicketMachine = ({
                           'cancelTicket',
                           'saveTicketState',
                           'sendTicketRefunded',
+                          'sendTicketCancelled',
                         ],
                       },
                       {
@@ -324,6 +328,14 @@ export const createTicketMachine = ({
             type: 'TICKET REFUNDED',
             ticket: context.ticketDocument,
             transaction: event.transaction,
+          });
+        },
+
+        sendTicketCancelled: context => {
+          if (!context.showMachineRef) return;
+          sendTo(context.showMachineRef, {
+            type: 'TICKET CANCELLED',
+            ticket: context.ticketDocument,
           });
         },
 
