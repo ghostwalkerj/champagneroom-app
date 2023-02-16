@@ -477,7 +477,9 @@ export const createShowMachine = ({
         }),
       },
       guards: {
-        canCancel: context => context.showState.ticketsSold === 0,
+        canCancel: context =>
+          context.showState.ticketsSold - context.showState.ticketsRefunded ===
+          0,
         showCancelled: context =>
           context.showState.status === ShowStatus.CANCELLED,
         showFinalized: context =>

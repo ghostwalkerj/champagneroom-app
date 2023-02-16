@@ -1,11 +1,9 @@
 import type { ShowDocType, ShowDocument } from '$lib/ORM/models/show';
-import { ShowStatus } from '$lib/ORM/models/show';
 import type { TicketDocType, TicketDocument } from '$lib/ORM/models/ticket';
 import { TicketStatus } from '$lib/ORM/models/ticket';
 import type { TransactionDocType } from '$lib/ORM/models/transaction';
 import type { ActorRef, ActorRefFrom } from 'xstate';
 import { sendTo } from 'xstate';
-import { send } from 'xstate';
 import {
   assign,
   createMachine,
