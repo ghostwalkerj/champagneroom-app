@@ -94,6 +94,7 @@ export const showDB = async (
       return PouchDB.fetch(url, opts);
     },
   });
+
   const showQuery = _db.shows
     .findOne(showId)
     .where('entityType')
@@ -132,7 +133,7 @@ export const showDB = async (
 
   const show = (await showQuery.exec()) as ShowDocument;
 
-  if (show.showState.active) {
+  if (show && show.showState.active) {
     _db.shows.syncCouchDB({
       remote: remoteDB,
       waitForLeadership: false,

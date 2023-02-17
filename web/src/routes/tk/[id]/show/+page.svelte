@@ -1,7 +1,14 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import { PUBLIC_JITSI_DOMAIN, PUBLIC_SHOW_PATH } from '$env/static/public';
+  import {
+    PUBLIC_JITSI_DOMAIN,
+    PUBLIC_SHOW_PATH,
+    PUBLIC_TICKET_PATH,
+  } from '$env/static/public';
+  import { createShowMachineService } from '$lib/machines/showMachine';
+  import { createTicketMachineService } from '$lib/machines/ticketMachine';
+  import { ticketDB } from '$lib/ORM/dbs/ticketDB';
   import type { ShowDocument } from '$lib/ORM/models/show';
   import type { TicketDocument } from '$lib/ORM/models/ticket';
   import { jitsiInterfaceConfigOverwrite } from '$lib/util/constants';
@@ -14,10 +21,13 @@
 
   let ticket = data.ticket as TicketDocument;
   let show = data.show as ShowDocument;
+  const ticketId = $page.params.id;
+  const token = data.token;
+
   // @ts-ignore
   let jitsiToken = data.jitsiToken as string;
 
-  let returnUrl = urlJoin($page.url.origin, PUBLIC_SHOW_PATH, show._id);
+  let returnUrl = urlJoin($page.url.origin, PUBLIC_TICKET_PATH, ticket._id);
   let videoCallElement: HTMLDivElement;
 
   onDestroy(() => {
@@ -58,6 +68,27 @@
     api.executeCommand('avatarUrl', profileImage);
     api.addListener('readyToClose', () => {
       goto(returnUrl);
+    });
+
+    ticketDB(ticket._id, token).then(async (db: TicketDBType) => {
+      show = (await db.shows.findOne(show._id).exec()) as ShowDocument;
+      ticket = (await db.tickets.findOne(ticket._id).exec()) as TicketDocument;
+      const ticketMachineService = createTicketMachineService({
+        ticketDocument: ticket,
+        showDocument: show,
+        saveState: false,
+        observeState: true,
+      });
+
+      ticketMachineService.subscribe(state => {
+        const timeToLeave = !state.can({
+          type: 'JOINED SHOW',
+        });
+        if (timeToLeave) {
+          api.executeCommand('hangup');
+          goto(returnUrl);
+        }
+      });
     });
   });
 </script>

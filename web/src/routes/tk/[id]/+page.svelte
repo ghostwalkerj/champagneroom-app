@@ -17,7 +17,7 @@
   const token = data.token;
   let ticket = data.ticket as TicketDocument;
   let show = data.show as ShowDocument;
-  let ticketId = $page.params.id;
+  const ticketId = $page.params.id;
 
   const showPath = urlJoin($page.url.href, 'show');
   let ticketMachineService = createTicketMachineService({

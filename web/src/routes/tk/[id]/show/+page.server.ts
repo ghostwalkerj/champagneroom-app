@@ -82,7 +82,7 @@ export const load: import('./$types').PageServerLoad = async ({
     throw error(404, 'Bad ticket id');
   }
 
-  const { ticket: _ticket, show: _show } = await getTicket(ticketId);
+  const { ticket: _ticket, show: _show, token } = await getTicket(ticketId);
 
   if (!verifyPin(ticketId, _ticket.ticketState.reservation.pin, pinHash)) {
     throw redirect(303, pinUrl);
@@ -126,6 +126,7 @@ export const load: import('./$types').PageServerLoad = async ({
 
   return {
     jitsiToken,
+    token,
     ticket,
     show,
   };
