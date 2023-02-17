@@ -6,7 +6,7 @@
   import type { TicketDocument } from '$lib/ORM/models/ticket';
   import { jitsiInterfaceConfigOverwrite } from '$lib/util/constants';
   import getProfileImage from '$lib/util/profilePhoto';
-  import { onMount } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
   import urlJoin from 'url-join';
   import type { PageData } from '../$types';
 
@@ -19,6 +19,18 @@
 
   let returnUrl = urlJoin($page.url.origin, PUBLIC_SHOW_PATH, show._id);
   let videoCallElement: HTMLDivElement;
+
+  onDestroy(() => {
+    endShow();
+  });
+
+  const endShow = () => {
+    let formData = new FormData();
+    fetch($page.url.href + '?/leave_show', {
+      method: 'POST',
+      body: formData,
+    });
+  };
 
   const profileImage = urlJoin(
     $page.url.origin,

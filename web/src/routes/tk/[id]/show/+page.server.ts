@@ -97,11 +97,11 @@ export const load: import('./$types').PageServerLoad = async ({
   });
   const ticketMachineState = ticketService.getSnapshot();
 
-  if (!ticketMachineState.can('WATCH SHOW')) {
+  if (!ticketMachineState.can('JOINED SHOW')) {
     throw redirect(303, ticketUrl);
   }
 
-  ticketService.send('WATCH SHOW');
+  ticketService.send('JOINED SHOW');
 
   const ticket = _ticket.toJSON() as TicketDocType;
   const show = _show.toJSON();
@@ -154,7 +154,7 @@ export const actions: Actions = {
         observeState: false,
       });
 
-      ticketService.send('LEAVE SHOW');
+      ticketService.send('LEFT SHOW');
     }
     return { success: true };
   },
