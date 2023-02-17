@@ -207,7 +207,7 @@ export const actions: Actions = {
             ticketDocument: ticket,
             showDocument: cancelShow,
             saveState: true,
-            observeState: false,
+            observeState: true,
           });
 
           let state = ticketService.getSnapshot();
