@@ -96,13 +96,25 @@
       {#if !ticketDone}
         {#if needs2Pay}
           <div>
-            <form method="post" action="?/buy_ticket" use:enhance={onSubmit}>
-              <div class="w-full flex justify-center">
-                <button class="btn" type="submit" disabled={waiting4StateChange}
-                  >Send Payment</button
-                >
+            {#if waiting4StateChange}
+              <div class="p-4">
+                <div class="w-full flex justify-center">
+                  <button class="btn loading" disabled={true}
+                    >Sending Payment</button
+                  >
+                </div>
               </div>
-            </form>
+            {:else}
+              <form method="post" action="?/buy_ticket" use:enhance={onSubmit}>
+                <div class="w-full flex justify-center">
+                  <button
+                    class="btn"
+                    type="submit"
+                    disabled={waiting4StateChange}>Send Payment</button
+                  >
+                </div>
+              </form>
+            {/if}
           </div>
         {:else if canWatchShow}
           <div class="p-4">

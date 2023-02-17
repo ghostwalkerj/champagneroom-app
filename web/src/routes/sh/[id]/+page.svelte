@@ -112,7 +112,7 @@
                 <button
                   class="btn btn-secondary loading"
                   type="submit"
-                  disabled={true}>Reserve</button
+                  disabled={true}>Reserving</button
                 >
               {:else}
                 <button

@@ -1,14 +1,9 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import {
-    PUBLIC_JITSI_DOMAIN,
-    PUBLIC_SHOW_PATH,
-    PUBLIC_TICKET_PATH,
-  } from '$env/static/public';
-  import { createShowMachineService } from '$lib/machines/showMachine';
+  import { PUBLIC_JITSI_DOMAIN, PUBLIC_TICKET_PATH } from '$env/static/public';
   import { createTicketMachineService } from '$lib/machines/ticketMachine';
-  import { ticketDB } from '$lib/ORM/dbs/ticketDB';
+  import { ticketDB, type TicketDBType } from '$lib/ORM/dbs/ticketDB';
   import type { ShowDocument } from '$lib/ORM/models/show';
   import type { TicketDocument } from '$lib/ORM/models/ticket';
   import { jitsiInterfaceConfigOverwrite } from '$lib/util/constants';

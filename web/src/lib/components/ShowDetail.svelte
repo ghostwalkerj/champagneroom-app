@@ -72,7 +72,9 @@
       {/if}
 
       {#if options.showStats}
-        <div class="flex flex-col lg:flex-row w-full place-content-evenly ">
+        <div
+          class="flex flex-col flex-wrap lg:flex-row w-full place-content-evenly "
+        >
           <div class="stats stats-horizontal stats-shadow text-center m-2 ">
             <div class="stat">
               <div class="stat-title">Duration</div>
