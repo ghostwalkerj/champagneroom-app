@@ -463,7 +463,6 @@ export const createShowMachine = ({
         }),
 
         sellTicket: assign((context, event) => {
-          console.log('sellTicket', event);
           const state = context.showState;
           return {
             showState: {
@@ -545,9 +544,6 @@ export const createShowMachineService = ({
   });
   showMachine;
   const showService = interpret(showMachine).start();
-  showService.onEvent(event => {
-    console.log('showMachine', event.type);
-  });
   return showService;
 };
 

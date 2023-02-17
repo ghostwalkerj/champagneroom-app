@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import type { ShowDocType, ShowDocument } from '$lib/ORM/models/show';
 import type { TicketDocType, TicketDocument } from '$lib/ORM/models/ticket';
 import { TicketStatus } from '$lib/ORM/models/ticket';
@@ -5,6 +6,7 @@ import type { TransactionDocType } from '$lib/ORM/models/transaction';
 import type { ActorRef, ActorRefFrom } from 'xstate';
 import {
   sendTo,
+  send,
   assign,
   createMachine,
   interpret,
@@ -313,32 +315,31 @@ export const createTicketMachine = ({
           };
         }),
 
-        sendTicketSold: (context, event) => {
-          if (!context.showMachineRef) return;
-          sendTo(context.showMachineRef, {
+        sendTicketSold: send(
+          (context, event) => ({
             type: 'TICKET SOLD',
             ticket: context.ticketDocument,
             transaction: event.transaction,
-          });
-        },
+          }),
+          { to: context => context.showMachineRef! }
+        ),
 
-        sendTicketRefunded: (context, event) => {
-          if (!context.showMachineRef) return;
-          sendTo(context.showMachineRef, {
+        sendTicketRefunded: send(
+          (context, event) => ({
             type: 'TICKET REFUNDED',
             ticket: context.ticketDocument,
             transaction: event.transaction,
-          });
-        },
+          }),
+          { to: context => context.showMachineRef! }
+        ),
 
-        sendTicketCancelled: context => {
-          if (!context.showMachineRef) return;
-          const send = sendTo(context.showMachineRef, {
+        sendTicketCancelled: send(
+          context => ({
             type: 'TICKET CANCELLED',
             ticket: context.ticketDocument,
-          });
-          console.log('send', send);
-        },
+          }),
+          { to: context => context.showMachineRef! }
+        ),
 
         requestCancellation: assign((context, event) => {
           return {
