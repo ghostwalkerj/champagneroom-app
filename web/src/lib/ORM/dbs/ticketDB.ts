@@ -29,9 +29,9 @@ import {
   type ShowEventCollection,
 } from '../models/showEvent';
 import {
+  TransactionString,
   transactionSchema,
   type TransactionCollection,
-  TransactionString,
 } from '../models/transaction';
 
 // Sync requires more listeners but ok with http2

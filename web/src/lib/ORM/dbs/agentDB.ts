@@ -18,10 +18,10 @@ import {
 } from '$lib/ORM/models/show';
 
 import {
+  TalentString,
   talentDocMethods,
   talentSchema,
   type TalentCollection,
-  TalentString,
 } from '$lib/ORM/models/talent';
 import {
   TicketString,

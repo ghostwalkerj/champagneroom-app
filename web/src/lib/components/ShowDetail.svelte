@@ -40,41 +40,39 @@
 </script>
 
 {#if show}
-  <div class="flex justify-center h-full relative">
-    <div
-      class="flex flex-col bg-cover w-full p-4 gap-4 rounded-xl bg-base-200 min-h-[700px]"
-      style="background-image: url('{show.talentInfo.profileImageUrl}')"
-    >
-      <div class="h-full">
-        <div
-          class="absolute top-2 left-2 text-lg text-primary ring-2 ring-primary  bg-base-200 p-2  ring-inset rounded-xl"
-        >
-          {show.name}
-        </div>
-        {#if options.showRating}
-          <div
-            class="absolute top-2 right-2 text-lg text-primary ring-2 ring-primary  bg-base-200 p-2 ring-inset rounded-xl"
-          >
-            <div class="">
-              {show.talentInfo.name}
-            </div>
-            <div>
-              <StarRating rating={show.talentInfo.stats.ratingAvg} />
-            </div>
-          </div>
-        {/if}
-
-        {#if options.showWaterMark && waterMarkText}
-          <div
-            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-5xl md:text-6xl  -rotate-45 whitespace-nowrap font-extrabold  text-primary ring-2 ring-primary  bg-base-200 p-2  ring-inset rounded-xl"
-          >
-            {waterMarkText}
-          </div>
-        {/if}
+  <div
+    class="flex flex-col h-full justify-end relative p-4 bg-base-200 rounded-xl min-h-[700px] bg-cover"
+    style="background-image: url('{show.talentInfo.profileImageUrl}')"
+  >
+    <div class="flex flex-col ">
+      <div
+        class="absolute top-4 left-4 text-lg text-primary ring-2 ring-primary  bg-base-200 p-2  ring-inset rounded-xl"
+      >
+        {show.name}
       </div>
+      {#if options.showRating}
+        <div
+          class="absolute top-4 right-4 text-lg text-primary ring-2 ring-primary  bg-base-200 p-2 ring-inset rounded-xl"
+        >
+          <div class="">
+            {show.talentInfo.name}
+          </div>
+          <div>
+            <StarRating rating={show.talentInfo.stats.ratingAvg} />
+          </div>
+        </div>
+      {/if}
+
+      {#if options.showWaterMark && waterMarkText}
+        <div
+          class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-5xl md:text-6xl  -rotate-45 whitespace-nowrap font-extrabold  text-primary ring-2 ring-primary  bg-base-200 p-2  ring-inset rounded-xl"
+        >
+          {waterMarkText}
+        </div>
+      {/if}
 
       {#if options.showStats}
-        <div class="text-center flex-row justify-center space-y-4">
+        <div class="text-center flex-row justify-center m-4 space-y-4">
           <div class="stats stats-horizontal stats-shadow text-center ">
             <div class="stat">
               <div class="stat-title">Duration</div>
@@ -137,14 +135,12 @@
           {/if}
         </div>
       {/if}
-      {#if options.showCopy}
-        <div class="text-center">
-          <!-- svelte-ignore a11y-click-events-have-key-events -->
-          <div class="btn btn-primary" on:click={copyShowUrl}>
-            Copy Show Link
-          </div>
-        </div>
-      {/if}
     </div>
+    {#if options.showCopy}
+      <div class="text-center">
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <div class="btn btn-primary" on:click={copyShowUrl}>Copy Show Link</div>
+      </div>
+    {/if}
   </div>
 {/if}

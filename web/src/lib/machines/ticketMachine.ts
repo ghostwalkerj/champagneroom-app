@@ -3,19 +3,18 @@ import type { ShowDocType, ShowDocument } from '$lib/ORM/models/show';
 import type { TicketDocType, TicketDocument } from '$lib/ORM/models/ticket';
 import { TicketStatus } from '$lib/ORM/models/ticket';
 import type { TransactionDocType } from '$lib/ORM/models/transaction';
+import { nanoid } from 'nanoid';
+import type { Observable } from 'rxjs';
+import { map } from 'rxjs';
 import type { ActorRef, ActorRefFrom } from 'xstate';
 import {
-  sendTo,
-  send,
   assign,
   createMachine,
   interpret,
+  send,
   spawn,
   type StateFrom,
 } from 'xstate';
-import type { Observable } from 'rxjs';
-import { map } from 'rxjs';
-import { nanoid } from 'nanoid';
 import type { ShowMachineType } from './showMachine';
 import { createShowMachine } from './showMachine';
 

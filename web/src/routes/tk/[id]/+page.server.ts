@@ -12,7 +12,6 @@ import type { TicketDocType, TicketDocument } from '$lib/ORM/models/ticket';
 import { TicketCancelReason } from '$lib/ORM/models/ticket';
 import { TransactionReasonType } from '$lib/ORM/models/transaction';
 import { StorageType } from '$lib/ORM/rxdb';
-import { createShowMachineService } from '$lib/machines/showMachine';
 
 import { createTicketMachineService } from '$lib/machines/ticketMachine';
 import { ActorType } from '$lib/util/constants';
@@ -168,19 +167,6 @@ export const actions: import('./$types').Actions = {
           transaction,
         });
       }
-
-      // const showMachine = createShowMachineService({
-      //   showDocument: show,
-      //   saveState: true,
-      //   observeState: true,
-      // });
-
-      // showMachine.send({
-      //   type: 'TICKET CANCELLED',
-      //   ticket: ticket,
-      // });
-
-      // TODO: Need to check if ticket really cancelled
     }
     return { success: true };
   },

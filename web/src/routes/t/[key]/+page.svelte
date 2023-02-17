@@ -18,12 +18,12 @@
 
   import { goto } from '$app/navigation';
   import ShowDetail from '$lib/components/ShowDetail.svelte';
+  import { onMount } from 'svelte';
   import * as timeago from 'timeago.js';
   import urlJoin from 'url-join';
   import type { Subscription } from 'xstate';
   import type { PageData } from './$types';
   import TalentWallet from './TalentWallet.svelte';
-  import { onMount } from 'svelte';
 
   export let form: import('./$types').ActionData;
   export let data: PageData;
@@ -40,7 +40,7 @@
   const showPath = urlJoin($page.url.href, 'show');
 
   $: showMachineState = null as ShowMachineStateType | null;
-  $: canCancelShow = false;
+  $: canCancelShow = data.currentShow !== null;
   $: canCreateShow = data.currentShow === null;
   $: canStartShow = false;
 
@@ -175,12 +175,14 @@
   };
 </script>
 
-<div class="h-full w-full flex place-content-center">
+<div class="flex place-content-center">
   <!-- Page header -->
 
-  <div class="p-4 grid gap-3 min-w-full md:min-w-min max-w-7xl md:grid-cols-4">
+  <div
+    class="p-4 flex-col gap-3  min-w-full md:min-w-min max-w-7xl md:grid md:grid-cols-4"
+  >
     <!-- 1st column -->
-    <div class="space-y-3 md:col-start-1 md:col-span-3">
+    <div class="flex-1 space-y-3 md:col-start-1 md:col-span-3">
       <!-- Status -->
       <div class="md:col-start-3 md:col-span-1">
         <div class="bg-primary text-primary-content card">
@@ -363,32 +365,33 @@
           </div>
         {/key}
       {/if}
+      <div class="pb-4">
+        {#if canCancelShow}
+          <!-- Link Form-->
+          <form method="post" action="?/cancel_show" use:enhance={onSubmit}>
+            <div class="bg-primary text-primary-content card ">
+              <div class="text-center card-body items-center p-3">
+                <div class="text-2xl card-title">Cancel Your Show</div>
+                <div class="text xl">
+                  If you cancel this show any tickets sold will be refunded.
+                </div>
 
-      {#if canCancelShow}
-        <!-- Link Form-->
-        <form method="post" action="?/cancel_show" use:enhance={onSubmit}>
-          <div class="bg-primary text-primary-content card ">
-            <div class="text-center card-body items-center p-3">
-              <div class="text-2xl card-title">Cancel Your Show</div>
-              <div class="text xl">
-                If you cancel this show any tickets sold will be refunded.
-              </div>
-
-              <div
-                class="flex flex-col text-white p-2 justify-center items-center"
-              >
-                <div class="">
-                  <button
-                    class="btn btn-secondary"
-                    type="submit"
-                    disabled={waiting4StateChange}>Cancel Show</button
-                  >
+                <div
+                  class="flex flex-col text-white p-2 justify-center items-center"
+                >
+                  <div class="">
+                    <button
+                      class="btn btn-secondary"
+                      type="submit"
+                      disabled={waiting4StateChange}>Cancel Show</button
+                    >
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </form>
-      {/if}
+          </form>
+        {/if}
+      </div>
     </div>
 
     <!--Next Column-->

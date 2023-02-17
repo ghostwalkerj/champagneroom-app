@@ -9,25 +9,24 @@ import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
 
 import {
+  ShowString,
   showDocMethods,
   showSchema,
   type ShowCollection,
   type ShowDocument,
-  ShowString,
 } from '$lib/ORM/models/show';
 import { PouchDB, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
 import type { ShowEventCollection } from '../models/showEvent';
-import { ShowEventString } from '../models/showEvent';
-import { showeventSchema } from '../models/showEvent';
+import { ShowEventString, showeventSchema } from '../models/showEvent';
 import {
+  TicketString,
   ticketSchema,
   type TicketCollection,
-  TicketString,
 } from '../models/ticket';
 import {
-  type TransactionCollection,
   TransactionString,
   transactionSchema,
+  type TransactionCollection,
 } from '../models/transaction';
 
 // Sync requires more listeners but ok with http2

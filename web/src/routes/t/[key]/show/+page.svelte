@@ -12,6 +12,7 @@
 
   let talentObj = data.talent as TalentDocType;
   $: currentShow = data.currentShow as ShowDocument | null;
+  // @ts-ignore
   let jitsiToken = data.jitsiToken as string;
 
   let videoCallElement: HTMLDivElement;
