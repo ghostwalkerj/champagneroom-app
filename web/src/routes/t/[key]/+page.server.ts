@@ -157,7 +157,7 @@ export const actions: Actions = {
 
     const talent = await getTalent(key);
 
-    talent.createShow({
+    const _show = await talent.createShow({
       price: +price,
       name,
       duration: +duration,
@@ -166,6 +166,8 @@ export const actions: Actions = {
 
     return {
       success: true,
+      showCreated: true,
+      show: _show.toJSON(),
     };
   },
   cancel_show: async ({ params }) => {
@@ -244,6 +246,9 @@ export const actions: Actions = {
         }
       }
     }
-    return { success: true };
+    return {
+      success: true,
+      showCancelled: true,
+    };
   },
 };

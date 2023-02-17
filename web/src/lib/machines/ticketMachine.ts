@@ -105,10 +105,6 @@ export const createTicketMachine = ({
               type: 'SHOW ENDED';
             }
           | {
-              type: 'SHOWSTATE UPDATE';
-              showState: ShowStateType;
-            }
-          | {
               type: 'TICKETSTATE UPDATE';
               ticketState: TicketStateType;
             },

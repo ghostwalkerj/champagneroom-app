@@ -6,7 +6,7 @@
 
   import { ticketDB, type TicketDBType } from '$lib/ORM/dbs/ticketDB';
   import type { ShowDocument } from '$lib/ORM/models/show';
-  import type { TicketDocument } from '$lib/ORM/models/ticket';
+  import { type TicketDocument, TicketStatus } from '$lib/ORM/models/ticket';
   import { onMount } from 'svelte';
 
   import urlJoin from 'url-join';
@@ -28,7 +28,7 @@
   });
 
   let needs2Pay = false;
-  let canWatchShow = false;
+  $: canWatchShow = false;
   let canCancelTicket = false;
   let ticketDone = false;
 
@@ -49,6 +49,10 @@
     return async ({ result }) => {
       if (result.type === 'failure') {
         waiting4StateChange = false;
+      }
+      if (result.data.ticketCancelled) {
+        ticketDone = true;
+        ticket.ticketState.status = TicketStatus.CANCELLED;
       }
       await applyAction(result);
     };

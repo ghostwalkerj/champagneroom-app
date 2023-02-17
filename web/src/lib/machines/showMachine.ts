@@ -14,7 +14,7 @@ import {
   type StateFrom,
 } from 'xstate';
 
-const GRACE_PERIOD = +PUBLIC_GRACE_PERIOD || 90000;
+const GRACE_PERIOD = +PUBLIC_GRACE_PERIOD || 3600000;
 const ESCROW_PERIOD = +PUBLIC_ESCROW_PERIOD || 3600000;
 
 type ShowStateType = ShowDocType['showState'];
@@ -337,6 +337,7 @@ export const createShowMachine = ({
       },
       on: {
         'SHOWSTATE UPDATE': {
+          target: '.showLoaded',
           actions: ['updateShowState'],
           cond: 'canUpdateShowState',
         },
@@ -515,7 +516,7 @@ export const createShowMachine = ({
           if (context.showState.status === ShowStatus.ENDED) {
             // Allow grace period to start show again
             return (
-              (context.showState.startDate ?? 0 + GRACE_PERIOD) >
+              (context.showState.startDate ?? 0) + +GRACE_PERIOD >
               new Date().getTime()
             );
           }

@@ -49,13 +49,6 @@ const getShow = async (key: string) => {
     observeState: false,
   });
 
-  const state = showService.getSnapshot();
-
-  if(!state.matches('started')) {
-  showService.send({
-    type: 'START SHOW',
-  });
-
   return { talent, show, showService };
 };
 
@@ -74,9 +67,10 @@ export const load: import('./$types').PageServerLoad = async ({ params }) => {
     throw redirect(303, talentUrl);
   }
 
-  showService.send({
-    type: 'START SHOW',
-  });
+  if (!showState.matches('started'))
+    showService.send({
+      type: 'START SHOW',
+    });
 
   const jitsiToken = jwt.sign(
     {

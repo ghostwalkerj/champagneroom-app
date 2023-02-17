@@ -1,5 +1,6 @@
 <script lang="ts">
   import { applyAction, enhance } from '$app/forms';
+  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
   import ShowDetail from '$lib/components/ShowDetail.svelte';
@@ -18,13 +19,14 @@
   $: waiting4StateChange = false;
   $: profileImage = getProfileImage(displayName);
   $: canBuyTicket = show.showState.status === ShowStatus.BOX_OFFICE_OPEN;
-
   const onSubmit = () => {
     waiting4StateChange = true;
+    canBuyTicket = false;
     return async ({ result }) => {
       if (result.type === 'failure') {
         waiting4StateChange = false;
       }
+
       await applyAction(result);
     };
   };
@@ -106,11 +108,19 @@
             </div>
 
             <div class="py-4 text-center">
-              <button
-                class="btn btn-secondary "
-                type="submit"
-                disabled={waiting4StateChange}>Reserve</button
-              >
+              {#if waiting4StateChange}
+                <button
+                  class="btn btn-secondary loading"
+                  type="submit"
+                  disabled={true}>Reserve</button
+                >
+              {:else}
+                <button
+                  class="btn btn-secondary"
+                  type="submit"
+                  disabled={waiting4StateChange}>Reserve</button
+                >
+              {/if}
             </div>
           </form>
         </div>

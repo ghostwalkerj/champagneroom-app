@@ -1,7 +1,10 @@
 <script lang="ts">
   import { applyAction, enhance } from '$app/forms';
   import { page } from '$app/stores';
-  import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
+  import {
+    PUBLIC_DEFAULT_PROFILE_IMAGE,
+    PUBLIC_SHOW_PATH,
+  } from '$env/static/public';
   import ProfilePhoto from '$lib/components/forms/ProfilePhoto.svelte';
   import {
     createShowMachineService,
@@ -40,7 +43,8 @@
   const showPath = urlJoin($page.url.href, 'show');
 
   $: showMachineState = null as ShowMachineStateType | null;
-  $: canCancelShow = data.currentShow !== null;
+  $: canCancelShow =
+    data.currentShow !== null && data.currentShow.showState.active;
   $: canCreateShow = data.currentShow === null;
   $: canStartShow = false;
 
@@ -143,6 +147,8 @@
                 });
               } else {
                 currentShow = null;
+                canCreateShow = true;
+                canCancelShow = false;
                 eventText = 'No Events';
                 statusText = 'No Current Show';
                 active = false;
@@ -169,6 +175,24 @@
     return async ({ result }) => {
       if (result.type !== 'success') {
         waiting4StateChange = false;
+      }
+      if (result.data.showCreated) {
+        currentShow = result.data.show;
+        canCreateShow = false;
+        canCancelShow = true;
+        const showUrl = urlJoin(
+          window.location.origin,
+          PUBLIC_SHOW_PATH,
+          currentShow!._id
+        );
+        navigator.clipboard.writeText(showUrl);
+        waiting4StateChange = false;
+      }
+      if (result.data.showCancelled) {
+        active = false;
+        canCancelShow = false;
+        canCreateShow = true;
+        //
       }
       await applyAction(result);
     };
