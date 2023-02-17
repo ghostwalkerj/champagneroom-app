@@ -219,9 +219,9 @@ export const actions: Actions = {
             reason: TicketCancelReason.SHOW_CANCELLED,
           };
 
-          if (state.can({ type: 'REQUEST CANCELLATION', cancel })) {
+          if (state.can({ type: 'SHOW CANCELLED', cancel })) {
             ticketService.send({
-              type: 'REQUEST CANCELLATION',
+              type: 'SHOW CANCELLED',
               cancel,
             });
           }

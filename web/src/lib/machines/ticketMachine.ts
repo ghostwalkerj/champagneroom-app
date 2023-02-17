@@ -105,6 +105,10 @@ export const createTicketMachine = ({
               type: 'SHOW ENDED';
             }
           | {
+              type: 'SHOW CANCELLED';
+              cancel: TicketStateType['cancel'];
+            }
+          | {
               type: 'TICKETSTATE UPDATE';
               ticketState: TicketStateType;
             },
@@ -161,10 +165,13 @@ export const createTicketMachine = ({
 
           states: {
             waiting4Payment: {
-              always: {
-                target: 'waiting4Show',
-                cond: 'fullyPaid',
-              },
+              always: [
+                {
+                  target: 'waiting4Show',
+                  cond: 'fullyPaid',
+                },
+              ],
+
               on: {
                 'PAYMENT RECEIVED': [
                   {
@@ -296,6 +303,22 @@ export const createTicketMachine = ({
           cond: 'canUpdateTicketState',
           actions: ['updateTicketState'],
         },
+        'SHOW CANCELLED': [
+          {
+            target: '#ticketMachine.cancelled',
+            cond: 'canCancel',
+            actions: [
+              'requestCancellation',
+              'cancelTicket',
+              'saveTicketState',
+              'sendTicketCancelled',
+            ],
+          },
+          {
+            target: '#ticketMachine.reserved.requestedCancellation',
+            actions: ['requestCancellation', 'saveTicketState'],
+          },
+        ],
       },
     },
     {
@@ -477,27 +500,10 @@ export const createTicketMachine = ({
       },
       guards: {
         canCancel: context => {
-          const state = context.showMachineRef?.getSnapshot();
           const canCancel =
-            context.ticketState.totalPaid <=
-              context.ticketState.refundedAmount &&
-            state !== undefined &&
-            state.can({
-              type: 'TICKET CANCELLED',
-              ticket: context.ticketDocument,
-            });
+            context.ticketState.totalPaid <= context.ticketState.refundedAmount;
 
           return canCancel;
-        },
-        canRequestCancellation: context => {
-          const state = context.showMachineRef?.getSnapshot();
-          const canRequestCancellation =
-            state !== undefined &&
-            state.can({
-              type: 'TICKET CANCELLED',
-              ticket: context.ticketDocument,
-            });
-          return canRequestCancellation;
         },
         ticketCancelled: context =>
           context.ticketState.status === TicketStatus.CANCELLED,
