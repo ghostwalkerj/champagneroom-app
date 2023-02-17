@@ -113,6 +113,14 @@ export const createShowMachine = ({
               type: 'END SHOW';
             }
           | {
+              type: 'CUSTOMER JOINED';
+              ticket: TicketDocType;
+            }
+          | {
+              type: 'CUSTOMER LEFT';
+              ticket: TicketDocType;
+            }
+          | {
               type: 'SHOWSTATE UPDATE';
               showState: ShowStateType;
             },
@@ -284,6 +292,12 @@ export const createShowMachine = ({
           on: {
             'START SHOW': {
               actions: ['startShow', 'saveShowState'],
+            },
+            'CUSTOMER JOINED': {
+              actions: ['saveShowState'],
+            },
+            'CUSTOMER LEFT': {
+              actions: ['saveShowState'],
             },
             'END SHOW': {
               target: 'ended',

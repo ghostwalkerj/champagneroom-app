@@ -14,6 +14,7 @@
 
   let ticket = data.ticket as TicketDocument;
   let show = data.show as ShowDocument;
+  // @ts-ignore
   let jitsiToken = data.jitsiToken as string;
 
   let returnUrl = urlJoin($page.url.origin, PUBLIC_SHOW_PATH, show._id);

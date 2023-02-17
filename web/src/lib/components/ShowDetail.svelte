@@ -72,8 +72,8 @@
       {/if}
 
       {#if options.showStats}
-        <div class="text-center flex-row justify-center m-4 space-y-4">
-          <div class="stats stats-horizontal stats-shadow text-center ">
+        <div class="flex flex-col lg:flex-row w-full place-content-evenly ">
+          <div class="stats stats-horizontal stats-shadow text-center m-2 ">
             <div class="stat">
               <div class="stat-title">Duration</div>
               <div class="text-primary stat-value">
@@ -94,7 +94,7 @@
             </div>
           </div>
           {#if options.showSalesStats}
-            <div class="stats stats-horizontal stats-shadow text-center ">
+            <div class="stats stats-horizontal stats-shadow text-center m-2 ">
               <div class="stat">
                 <div class="stat-title">Reserved</div>
                 <div class="text-primary stat-value">

@@ -96,10 +96,10 @@ export const createTicketMachine = ({
               dispute: NonNullable<TicketStateType['dispute']>;
             }
           | {
-              type: 'WATCH SHOW';
+              type: 'JOINED SHOW';
             }
           | {
-              type: 'LEAVE SHOW';
+              type: 'LEFT SHOW';
             }
           | {
               type: 'SHOW ENDED';
@@ -221,10 +221,14 @@ export const createTicketMachine = ({
                     actions: ['requestCancellation', 'saveTicketState'],
                   },
                 ],
-                'WATCH SHOW': {
+                'JOINED SHOW': {
                   target: '#ticketMachine.reedemed',
                   cond: 'canWatchShow',
-                  actions: ['redeemTicket', 'saveTicketState'],
+                  actions: [
+                    'redeemTicket',
+                    'saveTicketState',
+                    'sendShowJoined',
+                  ],
                 },
               },
             },
@@ -257,11 +261,14 @@ export const createTicketMachine = ({
         },
         reedemed: {
           on: {
-            'LEAVE SHOW': {},
-            'WATCH SHOW': { cond: 'canWatchShow' },
+            'LEFT SHOW': { actions: ['sendShowLeft'] },
+            'JOINED SHOW': {
+              cond: 'canWatchShow',
+              actions: ['sendShowJoined'],
+            },
             'SHOW ENDED': {
               target: '#ticketMachine.inEscrow',
-              actions: ['enterEscrow', 'saveTicketState'],
+              actions: ['enterEscrow', 'saveTicketState', 'sendShowLeft'],
             },
           },
         },
@@ -313,6 +320,22 @@ export const createTicketMachine = ({
             },
           };
         }),
+
+        sendShowJoined: send(
+          context => ({
+            type: 'CUSTOMER JOINED',
+            ticket: context.ticketDocument,
+          }),
+          { to: context => context.showMachineRef! }
+        ),
+
+        sendShowLeft: send(
+          context => ({
+            type: 'CUSTOMER LEFT',
+            ticket: context.ticketDocument,
+          }),
+          { to: context => context.showMachineRef! }
+        ),
 
         sendTicketSold: send(
           (context, event) => ({

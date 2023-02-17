@@ -49,6 +49,13 @@ const getShow = async (key: string) => {
     observeState: false,
   });
 
+  const state = showService.getSnapshot();
+
+  if(!state.matches('started')) {
+  showService.send({
+    type: 'START SHOW',
+  });
+
   return { talent, show, showService };
 };
 

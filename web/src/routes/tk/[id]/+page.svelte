@@ -34,7 +34,7 @@
 
   $: ticketMachineService.subscribe(state => {
     needs2Pay = state.matches('reserved.waiting4Payment');
-    canWatchShow = state.can('WATCH SHOW');
+    canWatchShow = state.can('JOINED SHOW');
     canCancelTicket = state.can({
       type: 'REQUEST CANCELLATION',
       cancel: undefined,
