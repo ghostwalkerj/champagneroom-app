@@ -1,7 +1,7 @@
 import { PUBLIC_ESCROW_PERIOD, PUBLIC_GRACE_PERIOD } from '$env/static/public';
 import type { ShowDocument } from '$lib/ORM/models/show';
 import { ShowStatus, type ShowDocType } from '$lib/ORM/models/show';
-import type { TicketDocType } from '$lib/ORM/models/ticket';
+import type { TicketDocType, TicketDocument } from '$lib/ORM/models/ticket';
 import type { TransactionDocType } from '$lib/ORM/models/transaction';
 import { nanoid } from 'nanoid';
 import { map, type Observable } from 'rxjs';
@@ -83,6 +83,7 @@ export const createShowMachine = ({
           | {
               type: 'REQUEST CANCELLATION';
               cancel: ShowStateType['cancel'];
+              tickets: TicketDocument[];
             }
           | {
               type: 'TICKET REFUNDED';
@@ -319,16 +320,14 @@ export const createShowMachine = ({
           states: {
             waiting2Refund: {
               on: {
-                'TICKET REFUNDED': [
-                  {
-                    target: '#showMachine.cancelled',
-                    cond: 'fullyRefunded',
-                    actions: ['refundTicket', 'cancelShow', 'saveShowState'],
-                  },
-                  {
-                    actions: ['refundTicket', 'saveShowState'],
-                  },
-                ],
+                'TICKET REFUNDED': {
+                  actions: ['refundTicket', 'saveShowState'],
+                },
+                'TICKET CANCELLED': {
+                  target: '#showMachine.cancelled',
+                  cond: 'fullyRefunded',
+                  actions: ['cancelShow', 'saveShowState'],
+                },
               },
             },
           },
@@ -525,12 +524,9 @@ export const createShowMachine = ({
             0
           );
         },
-        fullyRefunded: (context, event) => {
-          const value =
-            event.type === 'TICKET REFUNDED' ? event.transaction?.value : 0;
+        fullyRefunded: context => {
           return (
-            context.showState.refundedAmount + +value >=
-            context.showState.totalSales
+            context.showState.refundedAmount >= context.showState.totalSales
           );
         },
         canUpdateShowState: (context, event) => {

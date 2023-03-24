@@ -9,7 +9,6 @@ import {
 import { talentDB } from '$lib/ORM/dbs/talentDB';
 import type { ShowDocument } from '$lib/ORM/models/show';
 import { ShowCancelReason } from '$lib/ORM/models/show';
-import type { TicketDocument } from '$lib/ORM/models/ticket';
 import { TicketCancelReason } from '$lib/ORM/models/ticket';
 import { TransactionReasonType } from '$lib/ORM/models/transaction';
 import { StorageType } from '$lib/ORM/rxdb';
@@ -176,7 +175,7 @@ export const actions: Actions = {
       throw error(404, 'Key not found');
     }
 
-    const { talent, show: cancelShow, showService } = await getShow(key);
+    const { show: cancelShow, showService } = await getShow(key);
     const showState = showService.getSnapshot();
 
     const cancel = {
@@ -186,63 +185,53 @@ export const actions: Actions = {
       canceller: ActorType.TALENT,
     };
 
-    if (showState.can({ type: 'REQUEST CANCELLATION', cancel })) {
+    if (showState.can({ type: 'REQUEST CANCELLATION', cancel, tickets: [] })) {
       // Cancel the show and prevent new ticket sales, etc
+      const tickets = await cancelShow.getActiveTickets();
       showService.send({
         type: 'REQUEST CANCELLATION',
         cancel,
+        tickets,
       });
 
-      // Loop through all tickets and refund them
-      const db = talent.collection.database;
-      const tickets = (await db.tickets
-        .find()
-        .where('show')
-        .eq(cancelShow._id)
-        .exec()) as TicketDocument[];
-
       for (const ticket of tickets) {
-        if (ticket.ticketState.active) {
-          const ticketService = createTicketMachineService({
-            ticketDocument: ticket,
-            showDocument: cancelShow,
-            saveState: true,
-            observeState: true,
+        const ticketService = createTicketMachineService({
+          ticketDocument: ticket,
+          showDocument: cancelShow,
+          saveState: true,
+          observeState: true,
+        });
+
+        let state = ticketService.getSnapshot();
+
+        const cancel = {
+          createdAt: new Date().getTime(),
+          canceller: ActorType.TALENT,
+          cancelledInState: JSON.stringify(showState.value),
+          reason: TicketCancelReason.SHOW_CANCELLED,
+        };
+
+        ticketService.send({
+          type: 'SHOW CANCELLED',
+          cancel,
+        });
+
+        state = ticketService.getSnapshot();
+        if (state.matches('reserved.requestedCancellation.waiting4Refund')) {
+          const transaction = await ticket.createTransaction({
+            hash: '0xeba2df809e7a612a0a0d444ccfa5c839624bdc00dd29e3340d46df3870f8a30e',
+            from: '0x5B38Da6a701c568545dCfcB03FcB875f56beddC4',
+            to: '0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2',
+            value: (
+              ticket.ticketState.totalPaid - ticket.ticketState.refundedAmount
+            ).toString(),
+            block: 123,
+            reason: TransactionReasonType.TICKET_REFUND,
           });
-
-          let state = ticketService.getSnapshot();
-
-          const cancel = {
-            createdAt: new Date().getTime(),
-            canceller: ActorType.TALENT,
-            cancelledInState: JSON.stringify(showState.value),
-            reason: TicketCancelReason.SHOW_CANCELLED,
-          };
-
-          if (state.can({ type: 'SHOW CANCELLED', cancel })) {
-            ticketService.send({
-              type: 'SHOW CANCELLED',
-              cancel,
-            });
-          }
-
-          state = ticketService.getSnapshot();
-          if (state.matches('reserved.requestedCancellation.waiting4Refund')) {
-            const transaction = await ticket.createTransaction({
-              hash: '0xeba2df809e7a612a0a0d444ccfa5c839624bdc00dd29e3340d46df3870f8a30e',
-              from: '0x5B38Da6a701c568545dCfcB03FcB875f56beddC4',
-              to: '0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2',
-              value: (
-                ticket.ticketState.totalPaid - ticket.ticketState.refundedAmount
-              ).toString(),
-              block: 123,
-              reason: TransactionReasonType.TICKET_REFUND,
-            });
-            ticketService.send({
-              type: 'REFUND RECEIVED',
-              transaction,
-            });
-          }
+          ticketService.send({
+            type: 'REFUND RECEIVED',
+            transaction,
+          });
         }
       }
     }

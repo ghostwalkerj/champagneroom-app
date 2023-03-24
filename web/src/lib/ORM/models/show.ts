@@ -52,6 +52,7 @@ type ShowDocMethods = {
     ticket?: TicketDocType;
     transaction?: TransactionDocType;
   }) => Promise<ShowEventDocument>;
+  getActiveTickets: () => Promise<TicketDocument[]>;
 };
 export const showDocMethods: ShowDocMethods = {
   saveShowStateCallback: async function (
@@ -126,6 +127,17 @@ export const showDocMethods: ShowDocMethods = {
     };
     const showevent = await db.showevents.insert(_showevent);
     return showevent;
+  },
+  getActiveTickets: async function (this: ShowDocument) {
+    const db = this.collection.database;
+    const tickets = await db.tickets
+      .find()
+      .where('show')
+      .eq(this._id)
+      .where('ticketState.active')
+      .eq(true)
+      .exec();
+    return tickets as TicketDocument[];
   },
 };
 
