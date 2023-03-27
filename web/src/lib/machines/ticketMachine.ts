@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import type { ShowDocType, ShowDocument } from '$lib/ORM/models/show';
+import type { ShowDocument } from '$lib/ORM/models/show';
 import type { TicketDocType, TicketDocument } from '$lib/ORM/models/ticket';
 import { TicketStatus } from '$lib/ORM/models/ticket';
 import type { TransactionDocType } from '$lib/ORM/models/transaction';
@@ -19,7 +19,6 @@ import type { ShowMachineType } from './showMachine';
 import { createShowMachine } from './showMachine';
 
 type TicketStateType = TicketDocType['ticketState'];
-type ShowStateType = ShowDocType['showState'];
 // const PAYMENT_PERIOD = +PUBLIC_ESCROW_PERIOD || 3600000;
 
 export type TicketStateCallbackType = (state: TicketStateType) => void;
@@ -55,7 +54,7 @@ export const createTicketMachine = ({
     saveState,
     observeState,
   });
-  /** @xstate-layout N4IgpgJg5mDOIC5QBcCWBjA1mZBZAhugBaoB2YAxACoCSAwgNICiVAylQIJVMAEAqgAUAIlyYBtAAwBdRKAAOAe1io0C0rJAAPRABYATABoQAT0QBGABwBWHQDo9VvRYkB2AMw6zOiwE4Avn5GaFg4BMRklKwAEgDyAOo8dBwAcnRMADLpTEKSMkggisqq6vnaCPpGpghmTrY6Pg0+VlZuLj4uNToBQRjYeIQk5BTR8YkpaZnZYmZ58koqqGoaZRUmiG4+ZrZNbhJuVi4SZpYSXYEgwX1hg2C2lzjpCvgQkBS5GoULS6WIAGx7tj2NTMLhcejcbl+ZislUQ7Ss9h8egkFkO-zMEj03QuvVCAwid1xyEez1e01mBXmxWWiCsFjcgLcwNB4Mh0NhCCZW1+Vl+rIsxx0mN+Lmx9364XIhJCxKeLwgbz0FM+1J+CDBHL0Lh0v1s9NRenqngxVjFROuBPFJPlbzcyqpixKoDK-wZQL0ILBEKhMLWCD0Hp8gIsviOv3qjl+vzNMotUqtcrJOntRUdNIQVh8bqZHpZ3vZfpsFlsPJ91lOFgDpvO4rjtwTpIVYisKa+Tq0tMMft2LXsHh0Ll+PgkEiHMau+PjROtZN+rdVztp9MZzK9bN9VUNvL1bhDI8Ng+s47xktuACc4GAzwA3SC2ADu+AWpCgOgE+GMAFswKRkBQBBwACauBMMkVA8AASkwaQ0AAalM0gfA63yLtUDhBjoLRmBsByGq0HIuNuOhuHovwhiR7S7liNbmpO56Xjed6Ps+r7vl+P5-gBwGgeBUEwfBOQzEhqYoR21SOAio4OHoPiVpYTIbn8Iq2NCULItY0IkdWPSxnRtgXrAV63hAD5PmgL5vh+36-hQUEAIp8Ew7BjKkGTpFwNAxMk7z5CqaZqsiNS2K09SVpC4a-G4HJeNuGKYaFDjEVGx4Sjc+kMcZpksZZ7E2fZjnOUkrmZB5XnksJbbpu0LiImR3iYWp9LRVWth0r4pGuiCKV1ulhmMSZzHmaxVkcW8iG+ch7ZlDUmZ1FhOFgsRLgERidQkZFObuJsZjdXpBlGUxZlkK+rBEAo962UwDlOeBRUTO5tBleNcwiVNiCBXowXarJ4JRjqUV+mYkVbJ4hyka04K7aevUHQNR0Wad52XddhXjG5pXeUJE2vemxxmEGw58joxGtIRy2A1RiLIkao4CvjUNpft-VZUNOiIxdABSMQ0Mk2Q8CMcQ+S9lUBUcn0hT94X-dFDQ1WCWaLRiv3aTiunQ0zmUXgAjgArnAyCQHQ+CkOgYAADZm-gxQs8dOgQWAABmOukAqUEAGJ8MkQiQdBTBwQh87+ahH1fQlUuRc1NjBbu7XNMR+Mq7We0ZXe2t67ABsQEbJvm5b1uDbb9tOy7l0e17Pv8VMWPCwuYlAyRgI6ttKI6pWzXeLYbTUz4Qpkcc-g0WrjNgJAYDfgqWRu+BAtC5SOMBW0QZDs0EjNBsQrNJqxy6ruBztP88uJ7R6sjy848UFzPN8zPz1zyLwfuHYj-1DUIpDhYmqYhIa0ddq78jmcHSE4T6j3PgLHgoEhABwqrXF0XZNzDjsBLawTJW4DyASeNKZAmCwHQGeJGbsmDZAAEIcEYBXP2AlZ5+VEmUDYDJCL7l7vjMiWZNQWB5NHDhBpUQCkwgzAk2DcH4IukIGgrABB8G4DwHmNBaCiByLfGhb1ORZk7lYJho4WG+ABlUXYXgVLtE2C4awmYoQBHOKQBQLx4D5CTqeGBQcxIAFpfgclcYCEcXjvEjkFAIqcMoZwQEcbQ3QEJO48jpFRJE+g3GA1RDVAcPd1y8JMf4+ifVjIhJUZsOwMk6oWAajUJqhY2gll5NCQpOEDTpJhszAuFk2LWWQNk3GI4apIh8GRJwuZtRmAIj3VqfIpZtXrrUjWh1srs1aWqLpn18mFMKRUpwujzDLxLD9JoRwhRNFFIPYBw9MmpzALrfWhtjamwtlbJxyjcZ0jsKcIcxwW7dOikDLYMkE7hmsFmHu4yU4mTTmcrOFzc7XLUDbCyRdnbBOxvfOuYMSy9wcBsHuexoqtF1PjQpDhHC7EhvszBBILygMgDM4Ou5uQSGSQ4TSkJVn+lzFwpEoJiYmI4bU9AoKLZkrhbA96nhPqqQhH01wHpopQl1ITRwIZwS5PQarA5BIHZkHwGbVAAAvXlNcnEumwtsQp+gdjA3cOwg4a0NFdL5EOdatShF4POuSsSWoGT-CzJWLUIoknkz0acPJHhHD6HimOQlqVBGkCEKgWAcgdYGydWUTMNURT4wDF0-YhEGUkRHCpU4rRfBg08BYvwQA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QBcCWBjA1mZBZAhugBaoB2YAxACoCSAwgNICiVAylQIJVMAEAqgAUAIlyYBtAAwBdRKAAOAe1io0C0rJAAPRABYATABoQAT0QBGABwBWHQDo9VgMx6dATlcB2F3sc6Avn5GaFg4BMRklKwAEgDyAOo8dBwAcnRMADLpTEKSMkggisqq6vnaCPpGpghmeha2VhKNEhauVgBsro0ejgFBGNh4hCTkFNHxiSlpmdliZnnySiqoahplFSaIjq5mtq2OZjoNVhYSjha9IMEDYcNgtlc46Qr4EJAUuRqFSyuliG2ntlONVcegkbS8ZjBlUQnis9hBtQknmanR6gUu-VCQwi90xyCeLzes3mBUWxVWiGOjkB+z0ILBEKhGwQ+x2bXaem6nLMnVcFg8Fweg3C5FxIXxz1eEHeehJX3JvwQXmhCE5OjatgsW1qjnZVksFn86KFNxxQoJUvejjlZOWJVAZX+1KBdNB4L0kLaKr0HtcgJakKc6osbXBgrxptF5slRJ0NqKdopCCsrmdtPp7s9KpsdXZbT0-wkOh0NQ8ZnD4sjd2jhOlYis8e+9q0lMMzMcEic9kc+s6EjMBzaFeu2KjeItRLajYVDspWppwLdjK9zJc7U1WyLblq7Vcw6xIruACc4GAjwA3SC2ADu+CWpCgOgE+GMAFswKRkBQBBwAJq4JhkioHgACUmDSGgADUZmkT5bR+WdqgcP1DlZbYJA8EszBVDx1x0Zx0JODsGnOY0I1HY9TwvK9b3vR9nzfD8vx-f9AOAsCIOgnI5jghMEJbaorAcQF82OCQfS2GoLBVUMPFsMwOUNEFULacsyMrCjbBPWAz0vCAbzvNAHyfF930-CgwIART4Jh2AmVIMnSLgaBiZIPnyeVE0VUEalsRxMNcNxDkOdppOZA510hdUDlTU4LBDfdhVuLSqL0gy6JMxjzKsmy7KSBzMmc1ziV4psk08OS6Q6HddSEnQVRqYTjm2Tl+VDJEh3UkdDxSnTqP02ijPo0ymPeWCPPg5syhqFNbFQgd0MwgccMhOaCP5ftAscLZEqrXrdJowyyEfVgiAUa8LKYazbOA-Kpic2hivGhY+KmxAfL0PyAqCmwrFChq2n2OazDLXDOx0DwMIFLqD2S7SDoGo7jNO87LuuvLJkcoq3J4ibXqTAceV2MEfHw8FXAas5PtdNUew6dxds0+H+vSoadBRi6ACkYhoZJsh4MY4ncl6yu8-tPv8oLAt+-7wvcOSvE8HsQc6As9xhpKcWZtKTwARwAVzgZBIDofBSHQMAABtLfwYpWeOnQQLAAAzfXSGlMCADE+GSIRQPApgoJg6cvMQj6vql4K-raMKqhmuxtpaQ0PTpRpOr6DSeu1q89cN2BjYgU3zatm27cGh2ndd93Lu933-c4mZcZFmcBLMQHPqLGPk-+Dx+SsBqXDqDwEUwun3HVjPurhsBIDAd9pSyT3gMF4XSXx7zh79DohKRD1xcw70Bw1M4Uw7NuKrRSfYa1mfXnnihud5-mV+etfRbD7o7E-jtXFDD1sNXOJCQa1OQYROB6QG6cMSZ2nrPe+gseCASEMHUqLdHRtiqKnBOuELAFkOLhAc0Mr6a1FGQJgsB0BHlRp7Jg2QABCHBGD10DlxVenl+JlC2NSMGpw2jqh8LhXU3oQxwm2iCDwkMSxVSgSaTSZCKFUIukIGgrABB8G4DwXmNBaCiByK-dhb0WSplsDw3U-D-JOBXFUM+dgeQhh0J2Voa5obolIAoV48B8iyMPKg0OAkAC0VjED+LhOPMJ4TcGtEZj1GsUpfEcN0NtExeZDg+hcN0VoDV+RyQhr-QGacfC1GidPPqel4mGO2HYKqIJrC1RcNmYetg8zISDBI7oxSb6lMOhlBiZlkDlIJl0XY1Tf5Fg9IaHCgV6iiQkfFJwBxSLEL2tnRGGUOYDMVL-amv8amWLqgDVoTS+TFjML4TsEiOmihWSlA2RsTZmwttbW2fiDEE2OHYTu8V9A9z7g1NuOwaY6BaO6Bxl9oFT06QjG5ecC5F0eaXO09tjKVzdhADZiEQbiSaQ4-4Phf4gxDJTDwGo7HtG6CDNpizwXXyubfOekB0UCR8BYNkSJnBbAcWy+qq4PRyTEQpBw-kqaXLuOgB5JcGV43fkyqR8l2gKWOPmGOEiAZt2JuCfUxFpYyPIj1Z2ZB8CW1QAAL0lc3PxjpTm7ENOqXw+oOSOGEVYHJPYUzOu3r4EVth5GUPOoysonJqT-FTN0dkbgywU3bFubsQk-qnPBBInVMCcRkCEKgWAch9bG39ZSTwTSI2cnZAtY4KpnCNHkkWX+21xJajRAEIAA */
   return createMachine(
     {
       context: {
@@ -531,6 +530,11 @@ export const createTicketMachine = ({
             context.ticketState.refundedAmount + +value >=
             context.ticketState.totalPaid
           );
+        },
+        canRequestCancellation: context => {
+          const state = context.showMachineRef?.getSnapshot();
+          return state?.context.showState.startDate === undefined; // show has not started
+          //TODO: Check this
         },
         canWatchShow: context => {
           const state = context.showMachineRef?.getSnapshot();

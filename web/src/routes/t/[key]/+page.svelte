@@ -59,6 +59,7 @@
       canCancelShow = state.can({
         type: 'REQUEST CANCELLATION',
         cancel: undefined,
+        tickets: [],
       });
       canCreateShow = state.hasTag('canCreateShow');
       canStartShow = state.can({ type: 'START SHOW' });
@@ -246,7 +247,7 @@
                         d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                       /></svg
                     >
-                    <span>{eventText}</span>
+                    <p class="capitalize">{eventText}</p>
                   </div>
                 </div>
               </div>
@@ -376,7 +377,7 @@
       {/if}
       {#if active}
         {#key showMachineState || currentShow}
-          <div class="h-full">
+          <div>
             <ShowDetail
               show={currentShow}
               options={{
