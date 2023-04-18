@@ -6,7 +6,11 @@
 
   import { ticketDB, type TicketDBType } from '$lib/ORM/dbs/ticketDB';
   import type { ShowDocument } from '$lib/ORM/models/show';
-  import { type TicketDocument, TicketStatus } from '$lib/ORM/models/ticket';
+  import {
+    type TicketDocument,
+    TicketStatus,
+    DisputeReason,
+  } from '$lib/ORM/models/ticket';
   import { onMount } from 'svelte';
 
   import urlJoin from 'url-join';
@@ -22,6 +26,7 @@
   const ticketId = $page.params.id;
 
   const showPath = urlJoin($page.url.href, 'show');
+  const reasons = Object.values(DisputeReason);
   let ticketMachineService = createTicketMachineService({
     ticketDocument: ticket,
     showDocument: show,
@@ -157,6 +162,7 @@
           <input type="checkbox" id="leave-feedback" class="modal-toggle" />
           <div class="modal">
             <div class="modal-box relative">
+              <div class="text-lg text-center">Leave Feedback</div>
               <label
                 for="leave-feedback"
                 class="btn btn-sm btn-circle absolute right-2 top-2">✕</label
@@ -171,7 +177,7 @@
                 >
                   <div class="max-w-xs w-full py-2 form-control">
                     <!-- svelte-ignore a11y-label-has-associated-control -->
-                    <label for="caller" class="label">
+                    <label for="rating" class="label">
                       <span class="label-text">Rating</span></label
                     >
                     <div class="rating rating-lg">
@@ -252,12 +258,73 @@
             <div class="divider w-36">OR</div>
           </div>
         {/if}
-        {#if canLeaveFeedback}
+        {#if canDispute}
+          <input type="checkbox" id="initiate-dispute" class="modal-toggle" />
+          <div class="modal">
+            <div class="modal-box relative">
+              <div class="text-lg text-center">Initiate Dispute</div>
+
+              <label
+                for="initiate-dispute"
+                class="btn btn-sm btn-circle absolute right-2 top-2">✕</label
+              >
+              <div
+                class="grid grid-rows-1 gap-4 grid-flow-col justify-center items-center"
+              >
+                <form
+                  method="post"
+                  action="?/initiate_dispute"
+                  use:enhance={onSubmit}
+                >
+                  <div class="max-w-xs w-full py-2 form-control">
+                    <!-- svelte-ignore a11y-label-has-associated-control -->
+                    <label for="reason" class="label">
+                      <span class="label-text">Reason</span></label
+                    >
+                  </div>
+                  <select class="select select-primary w-full max-w-xs">
+                    <option disabled selected>Reason for the Dispute</option>
+
+                    {#each reasons as reason}
+                      <option>{reason}</option>
+                    {/each}
+                  </select>
+                  <div class="max-w-xs w-full py-2 form-control">
+                    <!-- svelte-ignore a11y-label-has-associated-control -->
+                    <label for="reaon" class="label">
+                      <span class="label-text">Explanation</span></label
+                    >
+                    <div class="rounded-md shadow-sm mt-1 relative">
+                      <textarea
+                        name="explanation"
+                        class="textarea textarea-primary"
+                        value={form?.explanation ?? ''}
+                      />
+                    </div>
+                  </div>
+
+                  <div class="py-4 text-center">
+                    {#if waiting4StateChange}
+                      <button
+                        class="btn btn-secondary loading"
+                        type="submit"
+                        disabled={true}>Submitting</button
+                      >
+                    {:else}
+                      <button
+                        class="btn btn-secondary"
+                        type="submit"
+                        disabled={waiting4StateChange}>Submit</button
+                      >
+                    {/if}
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
           <div class="p-4">
             <div class="w-full flex justify-center">
-              <button class="btn" disabled={waiting4StateChange}
-                >Initiate Dispute</button
-              >
+              <label for="initiate-dispute" class="btn">Initiate Dispute</label>
             </div>
           </div>
         {/if}

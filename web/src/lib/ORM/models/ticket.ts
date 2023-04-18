@@ -45,6 +45,14 @@ export enum DisputeDecision {
   SPLIT = 'SPLIT',
 }
 
+export enum DisputeReason {
+  ATTEMPTED_SCAM = 'ATTEMPTED SCAM',
+  ENDED_EARLY = 'ENDED EARLY',
+  LOW_QUALITY = 'LOW QUALITY',
+  TALENT_NO_SHOW = 'TALENT NO SHOW',
+  SHOW_NEVER_STARTED = 'SHOW NEVER STARTED',
+}
+
 type TicketDocMethods = {
   saveTicketStateCallback: TicketStateCallbackType;
   createTransaction: (transactionProps: {
@@ -185,6 +193,11 @@ const ticketSchemaLiteral = {
               type: 'string',
               enum: Object.values(ActorType),
             },
+            reason: {
+              type: 'string',
+              enum: Object.values(DisputeReason),
+            },
+            explanation: { type: 'string' },
             outcome: {
               type: 'object',
               properties: {
@@ -196,7 +209,7 @@ const ticketSchemaLiteral = {
               required: ['decision'],
             },
           },
-          required: ['startedAt', 'disputer'],
+          required: ['startedAt', 'disputer', 'reason', 'explanation'],
         },
         finalized: {
           type: 'object',
