@@ -16,7 +16,7 @@ import { StorageType } from '$lib/ORM/rxdb';
 import { createTicketMachineService } from '$lib/machines/ticketMachine';
 import { ActorType } from '$lib/util/constants';
 import { verifyPin } from '$lib/util/pin';
-import { error, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import urlJoin from 'url-join';
 
@@ -140,6 +140,7 @@ export const actions: import('./$types').Actions = {
       saveState: true,
       observeState: true,
     });
+
     const state = ticketService.getSnapshot();
     if (state.can({ type: 'REQUEST CANCELLATION', cancel: undefined })) {
       //TODO: make real transaction
@@ -175,5 +176,44 @@ export const actions: import('./$types').Actions = {
       }
     }
     return { success: true, ticketCancelled: true };
+  },
+  leave_feedback: async ({ params, request }) => {
+    const ticketId = params.id;
+    if (ticketId === null) {
+      throw error(404, 'Key not found');
+    }
+
+    const data = await request.formData();
+    const rating = data.get('rating') as string;
+    const review = data.get('review') as string;
+
+    if (!rating || rating === '0') {
+      return fail(400, { rating, missingRating: true });
+    }
+
+    const { ticket, show } = await getTicket(ticketId);
+
+    const ticketService = createTicketMachineService({
+      ticketDocument: ticket,
+      showDocument: show,
+      saveState: true,
+      observeState: true,
+    });
+
+    const state = ticketService.getSnapshot();
+    const feedback = {
+      rating: +rating,
+      review,
+      createdAt: new Date().getTime(),
+    } as TicketDocument['ticketState']['feedback'];
+
+    if (state.can({ type: 'FEEDBACK RECEIVED', feedback })) {
+      ticketService.send({
+        type: 'FEEDBACK RECEIVED',
+        feedback,
+      });
+    }
+
+    return { success: true };
   },
 };

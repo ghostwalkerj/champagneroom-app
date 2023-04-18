@@ -183,36 +183,47 @@
                     <div class="rating rating-lg">
                       <input
                         type="radio"
-                        name="rating-9"
+                        name="rating"
                         class="rating-hidden"
+                        value="0"
                         checked
                       />
                       <input
                         type="radio"
-                        name="rating-9"
+                        name="rating"
+                        value="1"
                         class="mask mask-star-2 bg-primary"
                       />
                       <input
                         type="radio"
-                        name="rating-9"
+                        name="rating"
+                        value="2"
                         class="mask mask-star-2 bg-primary"
                       />
                       <input
                         type="radio"
-                        name="rating-9"
+                        name="rating"
+                        value="3"
                         class="mask mask-star-2 bg-primary"
                       />
                       <input
                         type="radio"
-                        name="rating-9"
+                        name="rating"
+                        value="4"
                         class="mask mask-star-2 bg-primary"
                       />
                       <input
                         type="radio"
-                        name="rating-9"
+                        name="rating"
+                        value="5"
                         class="mask mask-star-2 bg-primary"
                       />
                     </div>
+                    {#if form?.missingRating}<div
+                        class="shadow-lg alert alert-error"
+                      >
+                        Rating is Required
+                      </div>{/if}
                   </div>
                   <div class="max-w-xs w-full py-2 form-control">
                     <!-- svelte-ignore a11y-label-has-associated-control -->
