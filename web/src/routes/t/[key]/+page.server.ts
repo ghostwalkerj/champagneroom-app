@@ -18,6 +18,7 @@ import { ActorType } from '$lib/util/constants';
 import { error, fail } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import type { Actions, PageServerLoad } from './$types';
+import { waitFor } from 'xstate/lib/waitFor';
 
 const getTalent = async (key: string) => {
   const token = jwt.sign(
@@ -54,7 +55,7 @@ const getShow = async (key: string) => {
   const showService = createShowMachineService({
     showDocument: show,
     saveState: true,
-    observeState: false,
+    observeState: true,
   });
 
   return { talent, show, showService };
@@ -175,8 +176,10 @@ export const actions: Actions = {
       throw error(404, 'Key not found');
     }
 
-    const { show: cancelShow, showService } = await getShow(key);
-    const showState = showService.getSnapshot();
+    const { show, showService } = await getShow(key);
+    let showState = showService.getSnapshot();
+
+    const cancelShow = show;
 
     const cancel = {
       createdAt: new Date().getTime(),
@@ -194,44 +197,57 @@ export const actions: Actions = {
         tickets,
       });
 
-      for (const ticket of tickets) {
-        const ticketService = createTicketMachineService({
-          ticketDocument: ticket,
-          showDocument: cancelShow,
-          saveState: true,
-          observeState: true,
-        });
+      showState = showService.getSnapshot();
 
-        let state = ticketService.getSnapshot();
+      const waitState = await waitFor(
+        showService,
+        state =>
+          state.matches('cancelled') || state.matches('requestedCancellation')
+      );
+      console.log(waitState.value);
 
-        const cancel = {
-          createdAt: new Date().getTime(),
-          canceller: ActorType.TALENT,
-          cancelledInState: JSON.stringify(showState.value),
-          reason: TicketCancelReason.SHOW_CANCELLED,
-        };
+      if (showState.matches('requestedCancellation')) {
+        // Cancel all tickets
 
-        ticketService.send({
-          type: 'SHOW CANCELLED',
-          cancel,
-        });
-
-        state = ticketService.getSnapshot();
-        if (state.matches('reserved.requestedCancellation.waiting4Refund')) {
-          const transaction = await ticket.createTransaction({
-            hash: '0xeba2df809e7a612a0a0d444ccfa5c839624bdc00dd29e3340d46df3870f8a30e',
-            from: '0x5B38Da6a701c568545dCfcB03FcB875f56beddC4',
-            to: '0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2',
-            value: (
-              ticket.ticketState.totalPaid - ticket.ticketState.refundedAmount
-            ).toString(),
-            block: 123,
-            reason: TransactionReasonType.TICKET_REFUND,
+        for (const ticket of tickets) {
+          const ticketService = createTicketMachineService({
+            ticketDocument: ticket,
+            showDocument: cancelShow,
+            saveState: true,
+            observeState: true,
           });
+
+          const cancel = {
+            createdAt: new Date().getTime(),
+            canceller: ActorType.TALENT,
+            cancelledInState: JSON.stringify(showState.value),
+            reason: TicketCancelReason.SHOW_CANCELLED,
+          };
+
           ticketService.send({
-            type: 'REFUND RECEIVED',
-            transaction,
+            type: 'SHOW CANCELLED',
+            cancel,
           });
+
+          const ticketState = ticketService.getSnapshot();
+          if (
+            ticketState.matches('reserved.requestedCancellation.waiting4Refund')
+          ) {
+            const transaction = await ticket.createTransaction({
+              hash: '0xeba2df809e7a612a0a0d444ccfa5c839624bdc00dd29e3340d46df3870f8a30e',
+              from: '0x5B38Da6a701c568545dCfcB03FcB875f56beddC4',
+              to: '0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2',
+              value: (
+                ticket.ticketState.totalPaid - ticket.ticketState.refundedAmount
+              ).toString(),
+              block: 123,
+              reason: TransactionReasonType.TICKET_REFUND,
+            });
+            ticketService.send({
+              type: 'REFUND RECEIVED',
+              transaction,
+            });
+          }
         }
       }
     }

@@ -102,7 +102,7 @@
                     Pin must be 8 digits
                   </div>{/if}
                 <div class="text-center text-sm p-1">
-                  You need your pin if you want to access your ticket later!
+                  You need a pin to access the ticket later!
                 </div>
               </div>
             </div>

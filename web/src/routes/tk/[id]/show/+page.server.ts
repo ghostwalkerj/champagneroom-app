@@ -147,7 +147,6 @@ export const actions: Actions = {
       pinHash &&
       verifyPin(ticketId, ticket.ticketState.reservation.pin, pinHash)
     ) {
-      // Check if can watch the show
       const ticketService = createTicketMachineService({
         ticketDocument: ticket,
         showDocument: show,

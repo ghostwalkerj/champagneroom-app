@@ -56,14 +56,17 @@
   const useShowMachine = (showMachineService: ShowMachineServiceType) => {
     showSub && showSub.unsubscribe();
     showSub = showMachineService.subscribe((state: ShowMachineStateType) => {
-      canCancelShow = state.can({
-        type: 'REQUEST CANCELLATION',
-        cancel: undefined,
-        tickets: [],
-      });
-      canCreateShow = state.hasTag('canCreateShow');
-      canStartShow = state.can({ type: 'START SHOW' });
-      showMachineState = state;
+      if (state.changed) {
+        canCancelShow = state.can({
+          type: 'REQUEST CANCELLATION',
+          cancel: undefined,
+          tickets: [],
+        });
+        canCreateShow = state.hasTag('canCreateShow');
+        canStartShow = state.can({ type: 'START SHOW' });
+        showMachineState = state;
+        console.log('state', state.value);
+      }
     });
   };
 
@@ -204,7 +207,7 @@
   <!-- Page header -->
 
   <div
-    class="p-4 flex-col gap-3  min-w-full md:min-w-min max-w-7xl md:grid md:grid-cols-4"
+    class="p-4 flex-col gap-3 min-w-full md:min-w-min max-w-7xl md:grid md:grid-cols-4"
   >
     <!-- 1st column -->
     <div class="flex-1 space-y-3 md:col-start-1 md:col-span-3">
@@ -269,7 +272,7 @@
             <div class="flex flex-col w-full">
               <form method="post" action="?/create_show" use:enhance={onSubmit}>
                 <div
-                  class="flex flex-col md:flex-row  text-white p-2 justify-center items-center gap-4"
+                  class="flex flex-col md:flex-row text-white p-2 justify-center items-center gap-4"
                 >
                   <div class="form-control flex-grow">
                     <!-- svelte-ignore a11y-label-has-associated-control -->
@@ -305,7 +308,7 @@
                       <input
                         type="text"
                         name="price"
-                        class="w-full py-2 pl-6 input input-bordered input-primary "
+                        class="w-full py-2 pl-6 input input-bordered input-primary"
                         placeholder="0.00"
                         aria-describedby="price-currency"
                         value={form?.price ?? ''}
@@ -394,7 +397,7 @@
         {#if canCancelShow}
           <!-- Link Form-->
           <form method="post" action="?/cancel_show" use:enhance={onSubmit}>
-            <div class="bg-primary text-primary-content card ">
+            <div class="bg-primary text-primary-content card">
               <div class="text-center card-body items-center p-3">
                 <div class="text-2xl card-title">Cancel Your Show</div>
                 <div class="text xl">
@@ -425,7 +428,7 @@
       <div>
         <div class="lg:col-start-3 lg:col-span-1">
           <div class="bg-primary text-primary-content card">
-            <div class="text-center card-body items-center  p-3">
+            <div class="text-center card-body items-center p-3">
               <h2 class="text-xl card-title">{talent.name}</h2>
               <div>
                 <ProfilePhoto
@@ -450,7 +453,7 @@
       <div>
         <div class="lg:col-start-3 lg:col-span-1">
           <div class="bg-primary text-primary-content card">
-            <div class="text-center card-body items-center  p-3">
+            <div class="text-center card-body items-center p-3">
               <h2 class="text-2xl card-title">Your Average Rating</h2>
               {talent.stats.ratingAvg.toFixed(2)}
               <StarRating rating={talent.stats.ratingAvg ?? 0} />
