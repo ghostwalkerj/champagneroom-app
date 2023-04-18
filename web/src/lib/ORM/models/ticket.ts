@@ -28,6 +28,7 @@ export enum TicketStatus {
   IN_ESCROW = 'IN ESCROW',
   IN_DISPUTE = 'IN DISPUTE',
   REFUNDED = 'REFUNDED',
+  MISSED_SHOW = 'MISSED SHOW',
 }
 
 export enum TicketCancelReason {

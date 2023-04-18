@@ -9,8 +9,11 @@ import {
 import { PUBLIC_JITSI_DOMAIN, PUBLIC_TALENT_PATH } from '$env/static/public';
 import { talentDB } from '$lib/ORM/dbs/talentDB';
 import type { ShowDocument } from '$lib/ORM/models/show';
+import { TicketCancelReason } from '$lib/ORM/models/ticket';
 import { StorageType } from '$lib/ORM/rxdb';
 import { createShowMachineService } from '$lib/machines/showMachine';
+import { createTicketMachineService } from '$lib/machines/ticketMachine';
+import { ActorType } from '$lib/util/constants';
 import type { Actions } from '@sveltejs/kit';
 import { error, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
@@ -106,7 +109,7 @@ export const actions: Actions = {
     if (key === undefined) {
       throw error(404, 'Key not found');
     }
-    const { showService } = await getShow(key);
+    const { show, showService } = await getShow(key);
 
     const showState = showService.getSnapshot();
 
@@ -115,6 +118,21 @@ export const actions: Actions = {
       showService.send({
         type: 'END SHOW',
       });
+
+      const tickets = await show.getActiveTickets();
+
+      for (const ticket of tickets) {
+        const ticketService = createTicketMachineService({
+          ticketDocument: ticket,
+          showDocument: show,
+          saveState: true,
+          observeState: true,
+        });
+
+        ticketService.send({
+          type: 'SHOW ENDED',
+        });
+      }
     }
     return { success: true };
   },

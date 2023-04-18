@@ -65,7 +65,6 @@
         canCreateShow = state.hasTag('canCreateShow');
         canStartShow = state.can({ type: 'START SHOW' });
         showMachineState = state;
-        console.log('state', state.value);
       }
     });
   };

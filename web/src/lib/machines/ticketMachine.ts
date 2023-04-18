@@ -150,12 +150,16 @@ export const createTicketMachine = ({
               cond: 'ticketInCancellationRequested',
             },
             {
-              target: 'inEscrow',
+              target: '#ticketMachine.ended.inEscrow',
               cond: 'ticketInEscrow',
             },
             {
-              target: 'inDispute',
+              target: '#ticketMachine.ended.inDispute',
               cond: 'ticketInDispute',
+            },
+            {
+              target: '#ticketMachine.ended.missedShow',
+              cond: 'ticketMissedShow',
             },
           ],
         },
@@ -227,7 +231,7 @@ export const createTicketMachine = ({
                   actions: [
                     'redeemTicket',
                     'saveTicketState',
-                    'sendShowJoined',
+                    'sendJoinedShow',
                   ],
                 },
               },
@@ -258,17 +262,23 @@ export const createTicketMachine = ({
               },
             },
           },
+          on: {
+            'SHOW ENDED': {
+              target: '#ticketMachine.ended.missedShow',
+              actions: ['missShow', 'saveTicketState'],
+            },
+          },
         },
         reedemed: {
           on: {
-            'LEFT SHOW': { actions: ['sendShowLeft'] },
+            'LEFT SHOW': { actions: ['sendLeftShow'] },
             'JOINED SHOW': {
               cond: 'canWatchShow',
-              actions: ['sendShowJoined'],
+              actions: ['sendJoinedShow'],
             },
             'SHOW ENDED': {
-              target: '#ticketMachine.inEscrow',
-              actions: ['enterEscrow', 'saveTicketState', 'sendShowLeft'],
+              target: '#ticketMachine.ended',
+              actions: ['enterEscrow', 'saveTicketState'],
             },
           },
         },
@@ -280,19 +290,29 @@ export const createTicketMachine = ({
           type: 'final',
           entry: ['deactivateTicket', 'saveTicketState'],
         },
-        inEscrow: {
-          on: {
-            'FEEDBACK RECEIVED': {
-              target: 'finalized',
-              actions: ['receiveFeedback', 'finalizeTicket', 'saveTicketState'],
+        ended: {
+          initial: 'inEscrow',
+          states: {
+            inEscrow: {
+              on: {
+                'FEEDBACK RECEIVED': {
+                  target: '#ticketMachine.finalized',
+                  actions: [
+                    'receiveFeedback',
+                    'finalizeTicket',
+                    'saveTicketState',
+                  ],
+                },
+                'DISPUTE INITIATED': {
+                  target: 'inDispute',
+                  actions: ['initiateDispute', 'saveTicketState'],
+                },
+              },
             },
-            'DISPUTE INITIATED': {
-              target: 'inDispute',
-              actions: ['initiateDispute', 'saveTicketState'],
-            },
+            inDispute: {},
+            missedShow: {},
           },
         },
-        inDispute: {},
       },
       on: {
         'TICKETSTATE UPDATE': {
@@ -337,7 +357,7 @@ export const createTicketMachine = ({
           };
         }),
 
-        sendShowJoined: send(
+        sendJoinedShow: send(
           context => ({
             type: 'CUSTOMER JOINED',
             ticket: context.ticketDocument,
@@ -345,7 +365,7 @@ export const createTicketMachine = ({
           { to: context => context.showMachineRef! }
         ),
 
-        sendShowLeft: send(
+        sendLeftShow: send(
           context => ({
             type: 'CUSTOMER LEFT',
             ticket: context.ticketDocument,
@@ -494,6 +514,15 @@ export const createTicketMachine = ({
           }
           return {};
         }),
+
+        missShow: assign(context => {
+          return {
+            ticketState: {
+              ...context.ticketState,
+              status: TicketStatus.MISSED_SHOW,
+            },
+          };
+        }),
       },
       guards: {
         canCancel: context => {
@@ -516,6 +545,8 @@ export const createTicketMachine = ({
           context.ticketState.status === TicketStatus.REDEEMED,
         ticketInCancellationRequested: context =>
           context.ticketState.status === TicketStatus.CANCELLATION_REQUESTED,
+        ticketMissedShow: context =>
+          context.ticketState.status === TicketStatus.MISSED_SHOW,
         fullyPaid: (context, event) => {
           const value =
             event.type === 'PAYMENT RECEIVED' ? event.transaction?.value : 0;
