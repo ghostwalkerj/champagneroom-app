@@ -107,7 +107,6 @@ const ticketSchemaLiteral = {
       maxLength: 20,
       final: true,
     },
-
     paymentAddress: {
       type: 'string',
       maxLength: 50,
@@ -214,7 +213,7 @@ const ticketSchemaLiteral = {
               minimum: 0,
               maximum: 5,
             },
-            comment: {
+            review: {
               type: 'string',
               maxLength: 500,
             },

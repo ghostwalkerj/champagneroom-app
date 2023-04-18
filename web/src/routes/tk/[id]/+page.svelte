@@ -10,10 +10,12 @@
   import { onMount } from 'svelte';
 
   import urlJoin from 'url-join';
-  import type { PageData } from './$types';
+  import type { ActionData, PageData } from './$types';
   import TicketDetail from './TicketDetail.svelte';
 
   export let data: PageData;
+  export let form: ActionData;
+
   const token = data.token;
   let ticket = data.ticket as TicketDocument;
   let show = data.show as ShowDocument;
@@ -139,14 +141,6 @@
               >
             </div>
           </div>
-        {:else}
-          <div class="p-4">
-            <div class="w-full flex justify-center">
-              <button class="btn" disabled={true}
-                >Waiting for Show to Start</button
-              >
-            </div>
-          </div>
         {/if}
         {#if canCancelTicket}
           <div class="p-4">
@@ -157,6 +151,114 @@
                 >
               </div>
             </form>
+          </div>
+        {/if}
+        {#if canLeaveFeedback}
+          <input type="checkbox" id="leave-feedback" class="modal-toggle" />
+          <div class="modal">
+            <div class="modal-box relative">
+              <label
+                for="leave-feedback"
+                class="btn btn-sm btn-circle absolute right-2 top-2">✕</label
+              >
+              <div
+                class="grid grid-rows-1 gap-4 grid-flow-col justify-center items-center"
+              >
+                <form
+                  method="post"
+                  action="?/leave_feedback"
+                  use:enhance={onSubmit}
+                >
+                  <div class="max-w-xs w-full py-2 form-control">
+                    <!-- svelte-ignore a11y-label-has-associated-control -->
+                    <label for="caller" class="label">
+                      <span class="label-text">Rating</span></label
+                    >
+                    <div class="rating rating-lg">
+                      <input
+                        type="radio"
+                        name="rating-9"
+                        class="rating-hidden"
+                        checked
+                      />
+                      <input
+                        type="radio"
+                        name="rating-9"
+                        class="mask mask-star-2 bg-primary"
+                      />
+                      <input
+                        type="radio"
+                        name="rating-9"
+                        class="mask mask-star-2 bg-primary"
+                      />
+                      <input
+                        type="radio"
+                        name="rating-9"
+                        class="mask mask-star-2 bg-primary"
+                      />
+                      <input
+                        type="radio"
+                        name="rating-9"
+                        class="mask mask-star-2 bg-primary"
+                      />
+                      <input
+                        type="radio"
+                        name="rating-9"
+                        class="mask mask-star-2 bg-primary"
+                      />
+                    </div>
+                  </div>
+                  <div class="max-w-xs w-full py-2 form-control">
+                    <!-- svelte-ignore a11y-label-has-associated-control -->
+                    <label for="review" class="label">
+                      <span class="label-text">Review</span></label
+                    >
+                    <div class="rounded-md shadow-sm mt-1 relative">
+                      <textarea
+                        name="review"
+                        class="textarea textarea-primary"
+                        value={form?.review ?? ''}
+                      />
+                    </div>
+                  </div>
+
+                  <div class="py-4 text-center">
+                    {#if waiting4StateChange}
+                      <button
+                        class="btn btn-secondary loading"
+                        type="submit"
+                        disabled={true}>Submitting</button
+                      >
+                    {:else}
+                      <button
+                        class="btn btn-secondary"
+                        type="submit"
+                        disabled={waiting4StateChange}>Submit</button
+                      >
+                    {/if}
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          <div class="p-4">
+            <div class="w-full flex justify-center">
+              <label for="leave-feedback" class="btn">Leave Feedback</label>
+            </div>
+          </div>
+        {/if}
+        {#if canLeaveFeedback && canDispute}
+          <div class="w-full flex justify-center">
+            <div class="divider w-36">OR</div>
+          </div>
+        {/if}
+        {#if canLeaveFeedback}
+          <div class="p-4">
+            <div class="w-full flex justify-center">
+              <button class="btn" disabled={waiting4StateChange}
+                >Initiate Dispute</button
+              >
+            </div>
           </div>
         {/if}
       {/if}

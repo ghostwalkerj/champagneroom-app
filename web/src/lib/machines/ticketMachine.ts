@@ -17,7 +17,6 @@ import {
 } from 'xstate';
 import type { ShowMachineType } from './showMachine';
 import { createShowMachine } from './showMachine';
-import type { on } from 'events';
 
 type TicketStateType = TicketDocType['ticketState'];
 // const PAYMENT_PERIOD = +PUBLIC_ESCROW_PERIOD || 3600000;
