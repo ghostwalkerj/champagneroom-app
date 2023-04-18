@@ -28,9 +28,11 @@
   });
 
   let needs2Pay = false;
-  $: canWatchShow = false;
+  let canWatchShow = false;
   let canCancelTicket = false;
   let ticketDone = false;
+  let canLeaveFeedback = false;
+  let canDispute = false;
 
   $: ticketMachineService.subscribe(state => {
     needs2Pay = state.matches('reserved.waiting4Payment');
@@ -39,6 +41,15 @@
       type: 'REQUEST CANCELLATION',
       cancel: undefined,
     });
+    canLeaveFeedback = state.can({
+      type: 'FEEDBACK RECEIVED',
+      feedback: undefined,
+    });
+    canDispute = state.can({
+      type: 'DISPUTE INITIATED',
+      dispute: undefined,
+    });
+
     ticketDone = state.done ?? false;
   });
 
@@ -88,7 +99,7 @@
 
 {#if ticket}
   <div class="mt-6 flex items-center">
-    <div class="min-w-full ">
+    <div class="min-w-full">
       <!-- Page header -->
       <div class="pb-4 text-center">
         <TicketDetail {ticket} {show} />

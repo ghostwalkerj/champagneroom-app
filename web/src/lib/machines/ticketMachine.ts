@@ -17,6 +17,7 @@ import {
 } from 'xstate';
 import type { ShowMachineType } from './showMachine';
 import { createShowMachine } from './showMachine';
+import type { on } from 'events';
 
 type TicketStateType = TicketDocType['ticketState'];
 // const PAYMENT_PERIOD = +PUBLIC_ESCROW_PERIOD || 3600000;
@@ -88,11 +89,11 @@ export const createTicketMachine = ({
             }
           | {
               type: 'FEEDBACK RECEIVED';
-              feedback: NonNullable<TicketStateType['feedback']>;
+              feedback: TicketStateType['feedback'];
             }
           | {
               type: 'DISPUTE INITIATED';
-              dispute: NonNullable<TicketStateType['dispute']>;
+              dispute: TicketStateType['dispute'];
             }
           | {
               type: 'JOINED SHOW';

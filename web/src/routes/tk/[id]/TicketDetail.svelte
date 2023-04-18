@@ -12,21 +12,22 @@
       ? 'Paid' + ' ' + ticket.ticketState.status
       : ticket.ticketState.status
     : '';
+  $: showStatus = show ? show.showState.status : '';
 </script>
 
 {#if show && ticket}
   <div class="flex justify-center">
     <div
-      class="flex flex-col w-full p-4 max-w-2xl gap-4 rounded-xl bg-base-200  overflow-auto"
+      class="flex flex-col w-full p-4 max-w-2xl gap-4 rounded-xl bg-base-200 overflow-auto"
     >
       <div class="grid grid-flow-row gap-4">
-        <div class="flex gap-4 ">
+        <div class="flex gap-4">
           <div class="">
             <div
               class="bg-cover bg-no-repeat rounded-full h-24 w-24 row-span-2"
               style="background-image: url('{profileImage}')"
             />
-            <div>
+            <div class="pt-2">
               {ticket.ticketState.reservation.name}
             </div>
           </div>
@@ -51,9 +52,12 @@
         <div class="w-full flex">
           <div>Payment Address: {ticket.paymentAddress}</div>
         </div>
-
         <div class="w-full flex">
           <div>Ticket Status: {ticketStatus}</div>
+        </div>
+
+        <div class="w-full flex">
+          <div>Show Status: {showStatus}</div>
         </div>
       </div>
     </div>
