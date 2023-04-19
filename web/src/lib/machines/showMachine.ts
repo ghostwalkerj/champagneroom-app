@@ -161,14 +161,6 @@ export const createShowMachine = ({
               cond: 'showFinalized',
             },
             {
-              target: 'inEscrow',
-              cond: 'showInEscrow',
-            },
-            {
-              target: 'inDispute',
-              cond: 'showInDispute',
-            },
-            {
               target: 'started',
               cond: 'showStarted',
             },
@@ -189,9 +181,6 @@ export const createShowMachine = ({
           tags: ['canCreateShow'],
 
           entry: ['deactivateShow', 'saveShowState'],
-        },
-        inEscrow: {
-          tags: ['canCreateShow'],
         },
         boxOfficeOpen: {
           on: {
@@ -307,10 +296,15 @@ export const createShowMachine = ({
           },
         },
         ended: {
+          after: {
+            GRACE_DELAY: {
+              target: 'finalized',
+              actions: ['finalizeShow', 'saveShowState'],
+            },
+          },
           on: {
             'START SHOW': {
               target: 'started',
-              cond: 'canStartShow',
               actions: ['startShow', 'saveShowState'],
             },
           },
@@ -332,7 +326,6 @@ export const createShowMachine = ({
             },
           },
         },
-        inDispute: {},
       },
       on: {
         'SHOWSTATE UPDATE': {
@@ -403,6 +396,7 @@ export const createShowMachine = ({
               ...context.showState,
               status: ShowStatus.LIVE,
               startDate: new Date().getTime(),
+              endDate: undefined,
             },
           };
         }),
@@ -489,6 +483,26 @@ export const createShowMachine = ({
             },
           };
         }),
+
+        finalizeShow: assign(context => {
+          return {
+            showState: {
+              ...context.showState,
+              status: ShowStatus.FINALIZED,
+            },
+          };
+        }),
+      },
+
+      delays: {
+        GRACE_DELAY: context => {
+          const delay =
+            +GRACE_PERIOD -
+            (context.showState.endDate
+              ? new Date().getTime() - context.showState.endDate
+              : 0);
+          return delay > 0 ? delay : 0;
+        },
       },
       guards: {
         canCancel: context =>
@@ -498,10 +512,6 @@ export const createShowMachine = ({
           context.showState.status === ShowStatus.CANCELLED,
         showFinalized: context =>
           context.showState.status === ShowStatus.FINALIZED,
-        showInDispute: context =>
-          context.showState.status === ShowStatus.IN_DISPUTE,
-        showInEscrow: context =>
-          context.showState.status === ShowStatus.IN_ESCROW,
         showRequestedCancellation: context =>
           context.showState.status === ShowStatus.CANCELLATION_REQUESTED,
         showBoxOfficeOpen: context =>

@@ -6,8 +6,7 @@
 
   import { ticketDB, type TicketDBType } from '$lib/ORM/dbs/ticketDB';
   import type { ShowDocument } from '$lib/ORM/models/show';
-  import {
-    type TicketDocument,
+  imporTicketDisputeReasonTicketDocument,
     TicketStatus,
     DisputeReason,
   } from '$lib/ORM/models/ticket';

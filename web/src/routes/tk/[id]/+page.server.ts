@@ -9,7 +9,7 @@ import {
 import { PUBLIC_PIN_PATH } from '$env/static/public';
 import { ticketDB } from '$lib/ORM/dbs/ticketDB';
 import type {
-  DisputeReason,
+  TicketDisputeReason,
   TicketDocType,
   TicketDocument,
 } from '$lib/ORM/models/ticket';
@@ -250,7 +250,7 @@ export const actions: import('./$types').Actions = {
     const state = ticketService.getSnapshot();
     const dispute = {
       disputer: ActorType.CUSTOMER,
-      reason: reason as DisputeReason,
+      reason: reason as TicketDisputeReason,
       explanation,
       startedAt: new Date().getTime(),
     } as TicketDocument['ticketState']['dispute'];

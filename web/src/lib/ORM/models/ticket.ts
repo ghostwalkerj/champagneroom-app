@@ -39,13 +39,13 @@ export enum TicketCancelReason {
   CUSTOMER_CANCELLED = 'CUSTOMER CANCELLED',
 }
 
-export enum DisputeDecision {
+export enum TicketDisputeDecision {
   TALENT_WON = 'TALENT WON',
   CUSTOMER_WON = 'CUSTOMER WON',
   SPLIT = 'SPLIT',
 }
 
-export enum DisputeReason {
+export enum TicketDisputeReason {
   ATTEMPTED_SCAM = 'ATTEMPTED SCAM',
   ENDED_EARLY = 'ENDED EARLY',
   LOW_QUALITY = 'LOW QUALITY',
@@ -195,7 +195,7 @@ const ticketSchemaLiteral = {
             },
             reason: {
               type: 'string',
-              enum: Object.values(DisputeReason),
+              enum: Object.values(TicketDisputeReason),
             },
             explanation: { type: 'string' },
             outcome: {
@@ -203,7 +203,7 @@ const ticketSchemaLiteral = {
               properties: {
                 decision: {
                   type: 'string',
-                  enum: Object.values(DisputeDecision),
+                  enum: Object.values(TicketDisputeDecision),
                 },
               },
               required: ['decision'],
