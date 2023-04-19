@@ -1,8 +1,8 @@
 export enum TokenRoles {
-  ADMIN = 'admin',
-  PUBLIC = 'public',
-  AGENT = 'agent',
-  TALENT = 'talent',
+  ADMIN = 'ADMIN',
+  PUBLIC = 'PUBLIC',
+  AGENT = 'AGENT',
+  TALENT = 'TALENT',
 }
 
 export const currencyFormatter = new Intl.NumberFormat('en-US', {
@@ -20,9 +20,9 @@ export const durationFormatter = (duration: number): string => {
 };
 
 export enum ActorType {
-  AGENT = 'Agent',
-  TALENT = 'Talent',
-  CUSTOMER = 'Customer',
+  AGENT = 'AGENT',
+  TALENT = 'TALENT',
+  CUSTOMER = 'CUSTOMER',
 }
 
 export const jitsiInterfaceConfigOverwrite = {

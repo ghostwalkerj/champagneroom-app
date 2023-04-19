@@ -293,13 +293,21 @@
                       <span class="label-text">Reason</span></label
                     >
                   </div>
-                  <select class="select select-primary w-full max-w-xs">
+                  <select
+                    class="select select-primary w-full max-w-xs"
+                    name="reason"
+                  >
                     <option disabled selected>Reason for the Dispute</option>
 
                     {#each reasons as reason}
                       <option>{reason}</option>
                     {/each}
                   </select>
+                  {#if form?.missingReason}<div
+                      class="shadow-lg alert alert-error"
+                    >
+                      Select a Reason
+                    </div>{/if}
                   <div class="max-w-xs w-full py-2 form-control">
                     <!-- svelte-ignore a11y-label-has-associated-control -->
                     <label for="reaon" class="label">
@@ -311,6 +319,11 @@
                         class="textarea textarea-primary"
                         value={form?.explanation ?? ''}
                       />
+                      {#if form?.missingExplanation}<div
+                          class="shadow-lg alert alert-error"
+                        >
+                          Provide an Explanation
+                        </div>{/if}
                     </div>
                   </div>
 

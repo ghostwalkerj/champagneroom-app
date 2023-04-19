@@ -8,7 +8,11 @@ import {
 } from '$env/static/private';
 import { PUBLIC_PIN_PATH } from '$env/static/public';
 import { ticketDB } from '$lib/ORM/dbs/ticketDB';
-import type { TicketDocType, TicketDocument } from '$lib/ORM/models/ticket';
+import type {
+  DisputeReason,
+  TicketDocType,
+  TicketDocument,
+} from '$lib/ORM/models/ticket';
 import { TicketCancelReason } from '$lib/ORM/models/ticket';
 import { TransactionReasonType } from '$lib/ORM/models/transaction';
 import { StorageType } from '$lib/ORM/rxdb';
@@ -214,6 +218,50 @@ export const actions: import('./$types').Actions = {
       });
     }
 
-    return { success: true };
+    return { success: true, rating, review };
+  },
+  initiate_dispute: async ({ params, request }) => {
+    const ticketId = params.id;
+    if (ticketId === null) {
+      throw error(404, 'Key not found');
+    }
+
+    const data = await request.formData();
+    const reason = data.get('reason') as string;
+    const explanation = data.get('explanation') as string;
+
+    if (!explanation || explanation === '') {
+      return fail(400, { explanation, missingExplanation: true });
+    }
+
+    if (!reason) {
+      return fail(400, { reason, missingReason: true });
+    }
+
+    const { ticket, show } = await getTicket(ticketId);
+
+    const ticketService = createTicketMachineService({
+      ticketDocument: ticket,
+      showDocument: show,
+      saveState: true,
+      observeState: true,
+    });
+
+    const state = ticketService.getSnapshot();
+    const dispute = {
+      disputer: ActorType.CUSTOMER,
+      reason: reason as DisputeReason,
+      explanation,
+      startedAt: new Date().getTime(),
+    } as TicketDocument['ticketState']['dispute'];
+
+    if (state.can({ type: 'DISPUTE INITIATED', dispute })) {
+      ticketService.send({
+        type: 'DISPUTE INITIATED',
+        dispute,
+      });
+    }
+
+    return { success: true, reason, explanation };
   },
 };
