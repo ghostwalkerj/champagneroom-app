@@ -29,6 +29,7 @@ export enum TicketStatus {
   IN_DISPUTE = 'IN DISPUTE',
   REFUNDED = 'REFUNDED',
   MISSED_SHOW = 'MISSED SHOW',
+  SHOW_CANCELLED = 'SHOW CANCELLED',
 }
 
 export enum TicketCancelReason {
@@ -67,7 +68,7 @@ type TicketDocMethods = {
 
 export const ticketDocMethods: TicketDocMethods = {
   saveTicketStateCallback: async function (this: TicketDocument, ticketState) {
-    this.atomicPatch({
+    await this.atomicPatch({
       ticketState,
     });
   },

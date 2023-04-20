@@ -47,6 +47,7 @@
     data.currentShow !== null && data.currentShow.showState.active;
   $: canCreateShow = data.currentShow === null;
   $: canStartShow = false;
+  $: waiting4Refunds = false;
 
   $: statusText = currentShow?.showState.status ?? 'No Current Show';
   $: eventText = 'No Events';
@@ -65,6 +66,7 @@
         canCreateShow = state.hasTag('canCreateShow');
         canStartShow = state.can({ type: 'START SHOW' });
         showMachineState = state;
+        waiting4Refunds = state.matches('requestedCancellation.waiting2Refund');
       }
     });
   };
@@ -411,6 +413,28 @@
                       class="btn btn-secondary"
                       type="submit"
                       disabled={waiting4StateChange}>Cancel Show</button
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        {/if}
+        {#if waiting4Refunds}
+          <!-- Link Form-->
+          <form method="post" action="?/refund_tickets" use:enhance={onSubmit}>
+            <div class="bg-primary text-primary-content card">
+              <div class="text-center card-body items-center p-3">
+                <div class="text-2xl card-title">Send Refunds</div>
+
+                <div
+                  class="flex flex-col text-white p-2 justify-center items-center"
+                >
+                  <div class="">
+                    <button
+                      class="btn btn-secondary"
+                      type="submit"
+                      disabled={waiting4StateChange}>Send Refunds</button
                     >
                   </div>
                 </div>

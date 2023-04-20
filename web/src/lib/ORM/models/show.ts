@@ -57,7 +57,7 @@ export const showDocMethods: ShowDocMethods = {
     this: ShowDocument,
     _showState: ShowDocument['showState']
   ) {
-    this.atomicPatch({
+    return this.atomicPatch({
       showState: _showState,
     });
   },

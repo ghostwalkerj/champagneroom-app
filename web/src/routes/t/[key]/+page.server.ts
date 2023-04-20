@@ -177,9 +177,7 @@ export const actions: Actions = {
     }
 
     const { show, showService } = await getShow(key);
-    let showState = showService.getSnapshot();
-
-    const cancelShow = show;
+    const showState = showService.getSnapshot();
 
     const cancel = {
       createdAt: new Date().getTime(),
@@ -190,70 +188,84 @@ export const actions: Actions = {
 
     if (showState.can({ type: 'REQUEST CANCELLATION', cancel, tickets: [] })) {
       // Cancel the show and prevent new ticket sales, etc
-      const tickets = await cancelShow.getActiveTickets();
+      const tickets = await show.getActiveTickets();
       showService.send({
         type: 'REQUEST CANCELLATION',
         cancel,
         tickets,
       });
 
-      showState = showService.getSnapshot();
+      // Cancel all tickets
+      for (const ticket of tickets) {
+        const show = (await ticket.populate('show')) as ShowDocument;
+        console.log('show', show.showState.status);
 
-      const waitState = await waitFor(
-        showService,
-        state =>
-          state.matches('cancelled') || state.matches('requestedCancellation')
-      );
-      console.log(waitState.value);
+        const ticketService = createTicketMachineService({
+          ticketDocument: ticket,
+          showDocument: show,
+          saveState: true,
+          observeState: true,
+        });
 
-      if (showState.matches('requestedCancellation')) {
-        // Cancel all tickets
+        const cancel = {
+          createdAt: new Date().getTime(),
+          canceller: ActorType.TALENT,
+          cancelledInState: JSON.stringify(showState.value),
+          reason: TicketCancelReason.SHOW_CANCELLED,
+        };
 
-        for (const ticket of tickets) {
-          const ticketService = createTicketMachineService({
-            ticketDocument: ticket,
-            showDocument: cancelShow,
-            saveState: true,
-            observeState: true,
+        ticketService.send({
+          type: 'SHOW CANCELLED',
+          cancel,
+        });
+      }
+    }
+    return {
+      success: true,
+    };
+  },
+  refund_tickets: async ({ params }) => {
+    const key = params.key;
+    if (key === null) {
+      throw error(404, 'Key not found');
+    }
+
+    const { show, showService } = await getShow(key);
+    const showState = showService.getSnapshot();
+
+    if (showState.matches('requestedCancellation.waiting2Refund')) {
+      const tickets = await show.getActiveTickets();
+      for (const ticket of tickets) {
+        const ticketService = createTicketMachineService({
+          ticketDocument: ticket,
+          showDocument: show,
+          saveState: true,
+          observeState: true,
+        });
+
+        const ticketState = ticketService.getSnapshot();
+        if (
+          ticketState.matches('reserved.requestedCancellation.waiting4Refund')
+        ) {
+          const transaction = await ticket.createTransaction({
+            hash: '0xeba2df809e7a612a0a0d444ccfa5c839624bdc00dd29e3340d46df3870f8a30e',
+            from: '0x5B38Da6a701c568545dCfcB03FcB875f56beddC4',
+            to: '0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2',
+            value: (
+              ticket.ticketState.totalPaid - ticket.ticketState.refundedAmount
+            ).toString(),
+            block: 123,
+            reason: TransactionReasonType.TICKET_REFUND,
           });
-
-          const cancel = {
-            createdAt: new Date().getTime(),
-            canceller: ActorType.TALENT,
-            cancelledInState: JSON.stringify(showState.value),
-            reason: TicketCancelReason.SHOW_CANCELLED,
-          };
-
           ticketService.send({
-            type: 'SHOW CANCELLED',
-            cancel,
+            type: 'REFUND RECEIVED',
+            transaction,
           });
-
-          const ticketState = ticketService.getSnapshot();
-          if (
-            ticketState.matches('reserved.requestedCancellation.waiting4Refund')
-          ) {
-            const transaction = await ticket.createTransaction({
-              hash: '0xeba2df809e7a612a0a0d444ccfa5c839624bdc00dd29e3340d46df3870f8a30e',
-              from: '0x5B38Da6a701c568545dCfcB03FcB875f56beddC4',
-              to: '0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2',
-              value: (
-                ticket.ticketState.totalPaid - ticket.ticketState.refundedAmount
-              ).toString(),
-              block: 123,
-              reason: TransactionReasonType.TICKET_REFUND,
-            });
-            ticketService.send({
-              type: 'REFUND RECEIVED',
-              transaction,
-            });
-          }
         }
       }
     }
     return {
       success: true,
-      showCancelled: true,
     };
   },
 };

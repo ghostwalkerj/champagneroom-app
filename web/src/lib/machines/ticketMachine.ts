@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import type { ShowDocument } from '$lib/ORM/models/show';
-import type { TicketDocType, TicketDocument } from '$lib/ORM/models/ticket';
+import type {
+  TicketDocType,
+  TicketDocument,
+  TicketDocument,
+} from '$lib/ORM/models/ticket';
 import { TicketStatus } from '$lib/ORM/models/ticket';
 import type { TransactionDocType } from '$lib/ORM/models/transaction';
 import { nanoid } from 'nanoid';
@@ -21,7 +25,9 @@ import { createShowMachine } from './showMachine';
 type TicketStateType = TicketDocType['ticketState'];
 // const PAYMENT_PERIOD = +PUBLIC_ESCROW_PERIOD || 3600000;
 
-export type TicketStateCallbackType = (state: TicketStateType) => void;
+export type TicketStateCallbackType = (
+  state: TicketStateType
+) => Promise<TicketDocument>;
 
 // const paymentTimer = (timerStart: number) => {
 //   const timer = timerStart + PAYMENT_PERIOD - new Date().getTime();

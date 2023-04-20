@@ -19,7 +19,9 @@ const ESCROW_PERIOD = +PUBLIC_ESCROW_PERIOD || 3600000;
 
 type ShowStateType = ShowDocType['showState'];
 
-export type ShowStateCallbackType = (state: ShowStateType) => void;
+export type ShowStateCallbackType = (
+  state: ShowStateType
+) => Promise<ShowDocument>;
 
 export const graceTimer = (timerStart: number) => {
   const timer = timerStart + GRACE_PERIOD - new Date().getTime();
@@ -329,7 +331,7 @@ export const createShowMachine = ({
       },
       on: {
         'SHOWSTATE UPDATE': {
-          target: '.showLoaded',
+          target: 'showLoaded',
           actions: ['updateShowState'],
           cond: 'canUpdateShowState',
         },
@@ -337,8 +339,8 @@ export const createShowMachine = ({
     },
     {
       actions: {
-        saveShowState: (context, event) => {
-          if (!saveState) return;
+        saveShowState: assign((context, event) => {
+          if (!saveState) return { showDocument: context.showDocument };
 
           const ticket = 'ticket' in event ? event.ticket : undefined;
           const transaction =
@@ -353,7 +355,9 @@ export const createShowMachine = ({
             updatedAt: new Date().getTime(),
           };
           showDocument.saveShowStateCallback(showState);
-        },
+
+          return { showDocument: context.showDocument };
+        }),
 
         updateShowState: assign((context, event) => {
           return {
