@@ -524,6 +524,7 @@ export const createTicketMachine = ({
           };
         }),
       },
+
       guards: {
         canCancel: context => {
           const canCancel =

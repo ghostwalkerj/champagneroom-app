@@ -6,13 +6,15 @@
 
   import { ticketDB, type TicketDBType } from '$lib/ORM/dbs/ticketDB';
   import type { ShowDocument } from '$lib/ORM/models/show';
-  imporTicketDisputeReasonTicketDocument,
+  import {
+    TicketDisputeReason,
+    type TicketDocument,
     TicketStatus,
-    DisputeReason,
   } from '$lib/ORM/models/ticket';
   import { onMount } from 'svelte';
 
   import urlJoin from 'url-join';
+
   import type { ActionData, PageData } from './$types';
   import TicketDetail from './TicketDetail.svelte';
 
@@ -25,7 +27,7 @@
   const ticketId = $page.params.id;
 
   const showPath = urlJoin($page.url.href, 'show');
-  const reasons = Object.values(DisputeReason);
+  const reasons = Object.values(TicketDisputeReason);
   let ticketMachineService = createTicketMachineService({
     ticketDocument: ticket,
     showDocument: show,
@@ -39,6 +41,7 @@
   let ticketDone = false;
   let canLeaveFeedback = false;
   let canDispute = false;
+  let waitingForShow = false;
 
   $: ticketMachineService.subscribe(state => {
     needs2Pay = state.matches('reserved.waiting4Payment');
@@ -55,6 +58,8 @@
       type: 'DISPUTE INITIATED',
       dispute: undefined,
     });
+
+    waitingForShow = state.matches('reserved.waiting4Show') && !canWatchShow;
 
     ticketDone = state.done ?? false;
   });
@@ -107,9 +112,17 @@
   <div class="mt-6 flex items-center">
     <div class="min-w-full">
       <!-- Page header -->
-      <div class="pb-4 text-center">
+      <div class="pb-4 text-center relative">
         <TicketDetail {ticket} {show} />
+        {#if waitingForShow}
+          <div
+            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-4xl -rotate-12 whitespace-nowrap font-extrabold text-primary ring-2 ring-primary bg-base-200/50 p-2 ring-inset rounded-xl"
+          >
+            Waiting for Show to Start
+          </div>
+        {/if}
       </div>
+
       {#if !ticketDone}
         {#if needs2Pay}
           <div>

@@ -44,15 +44,15 @@
     class="flex flex-col h-full justify-end relative p-4 bg-base-200 rounded-xl min-h-[700px] bg-cover"
     style="background-image: url('{show.talentInfo.profileImageUrl}')"
   >
-    <div class="flex flex-col ">
+    <div class="flex flex-col">
       <div
-        class="absolute top-4 left-4 text-lg text-primary ring-2 ring-primary  bg-base-200 p-2  ring-inset rounded-xl"
+        class="absolute top-4 left-4 text-lg text-primary ring-2 ring-primary bg-base-200 p-2 ring-inset rounded-xl"
       >
         {show.name}
       </div>
       {#if options.showRating}
         <div
-          class="absolute top-4 right-4 text-lg text-primary ring-2 ring-primary  bg-base-200 p-2 ring-inset rounded-xl"
+          class="absolute top-4 right-4 text-lg text-primary ring-2 ring-primary bg-base-200 p-2 ring-inset rounded-xl"
         >
           <div class="">
             {show.talentInfo.name}
@@ -65,7 +65,7 @@
 
       {#if options.showWaterMark && waterMarkText}
         <div
-          class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-5xl md:text-6xl  -rotate-45 whitespace-nowrap font-extrabold  text-primary ring-2 ring-primary  bg-base-200 p-2  ring-inset rounded-xl"
+          class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-5xl md:text-6xl -rotate-45 whitespace-nowrap font-extrabold text-primary ring-2 ring-primary bg-base-200 p-2 ring-inset rounded-xl"
         >
           {waterMarkText}
         </div>
@@ -73,9 +73,9 @@
 
       {#if options.showStats}
         <div
-          class="flex flex-col flex-wrap lg:flex-row w-full place-content-evenly "
+          class="flex flex-col flex-wrap lg:flex-row w-full place-content-evenly"
         >
-          <div class="stats stats-horizontal stats-shadow text-center m-2 ">
+          <div class="stats stats-horizontal stats-shadow text-center m-2">
             <div class="stat">
               <div class="stat-title">Duration</div>
               <div class="text-primary stat-value">
@@ -96,7 +96,7 @@
             </div>
           </div>
           {#if options.showSalesStats}
-            <div class="stats stats-horizontal stats-shadow text-center m-2 ">
+            <div class="stats stats-horizontal stats-shadow text-center m-2">
               <div class="stat">
                 <div class="stat-title">Reserved</div>
                 <div class="text-primary stat-value">
@@ -128,7 +128,7 @@
                 </div>
               {/if}
               <div class="stat">
-                <div class="stat-title  whitespace-normal">Total Sales</div>
+                <div class="stat-title whitespace-normal">Total Sales</div>
                 <div class="text-primary stat-value">
                   {currencyFormatter.format(show.showState.totalSales)}
                 </div>
