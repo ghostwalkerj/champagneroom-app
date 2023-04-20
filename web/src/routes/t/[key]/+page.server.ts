@@ -18,7 +18,6 @@ import { ActorType } from '$lib/util/constants';
 import { error, fail } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import type { Actions, PageServerLoad } from './$types';
-import { waitFor } from 'xstate/lib/waitFor';
 
 const getTalent = async (key: string) => {
   const token = jwt.sign(
@@ -176,6 +175,8 @@ export const actions: Actions = {
       throw error(404, 'Key not found');
     }
 
+    let showCancelled = false;
+
     const { show, showService } = await getShow(key);
     const showState = showService.getSnapshot();
 
@@ -198,7 +199,6 @@ export const actions: Actions = {
       // Cancel all tickets
       for (const ticket of tickets) {
         const show = (await ticket.populate('show')) as ShowDocument;
-        console.log('show', show.showState.status);
 
         const ticketService = createTicketMachineService({
           ticketDocument: ticket,
@@ -218,10 +218,13 @@ export const actions: Actions = {
           type: 'SHOW CANCELLED',
           cancel,
         });
+
+        showCancelled = showService.getSnapshot().matches('cancelled');
       }
     }
     return {
       success: true,
+      showCancelled,
     };
   },
   refund_tickets: async ({ params }) => {
@@ -266,6 +269,7 @@ export const actions: Actions = {
     }
     return {
       success: true,
+      showCancelled: true,
     };
   },
 };

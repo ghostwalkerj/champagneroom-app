@@ -14,15 +14,19 @@
   let show = data.show;
   let displayName = data.displayName;
   let showId = $page.params.id;
+  let buyingTicket = false;
 
   $: waiting4StateChange = false;
   $: profileImage = getProfileImage(displayName);
-  $: canBuyTicket = show.showState.status === ShowStatus.BOX_OFFICE_OPEN;
+  $: canBuyTicket =
+    show.showState.status === ShowStatus.BOX_OFFICE_OPEN || buyingTicket;
   const onSubmit = () => {
+    buyingTicket = true;
     waiting4StateChange = true;
     return async ({ result }) => {
       if (result.type === 'failure') {
         waiting4StateChange = false;
+        buyingTicket = false;
       }
 
       await applyAction(result);

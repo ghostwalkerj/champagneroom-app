@@ -43,8 +43,7 @@
   const showPath = urlJoin($page.url.href, 'show');
 
   $: showMachineState = null as ShowMachineStateType | null;
-  $: canCancelShow =
-    data.currentShow !== null && data.currentShow.showState.active;
+  $: canCancelShow = false;
   $: canCreateShow = data.currentShow === null;
   $: canStartShow = false;
   $: waiting4Refunds = false;
