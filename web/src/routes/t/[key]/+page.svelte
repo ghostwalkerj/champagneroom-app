@@ -39,7 +39,7 @@
   let showName = possessive(talent.name, 'en') + ' Show';
   let key = $page.params.key;
 
-  let showSub: Subscription;
+  let showMachineSub: Subscription;
   const showPath = urlJoin($page.url.href, 'show');
 
   $: showMachineState = null as ShowMachineStateType | null;
@@ -54,23 +54,28 @@
   $: waiting4StateChange = false;
 
   const useShowMachine = (showMachineService: ShowMachineServiceType) => {
-    showSub && showSub.unsubscribe();
-    showSub = showMachineService.subscribe((state: ShowMachineStateType) => {
-      if (state.changed) {
-        canCancelShow = state.can({
-          type: 'REQUEST CANCELLATION',
-          cancel: undefined,
-          tickets: [],
-        });
-        canCreateShow = state.hasTag('canCreateShow');
-        canStartShow = state.can({ type: 'START SHOW' });
-        showMachineState = state;
-        waiting4Refunds = state.matches('requestedCancellation.waiting2Refund');
+    showMachineSub && showMachineSub.unsubscribe();
+    showMachineSub = showMachineService.subscribe(
+      (state: ShowMachineStateType) => {
+        if (state.changed) {
+          canCancelShow = state.can({
+            type: 'REQUEST CANCELLATION',
+            cancel: undefined,
+            tickets: [],
+          });
+          canCreateShow = state.hasTag('canCreateShow');
+          canStartShow = state.can({ type: 'START SHOW' });
+          showMachineState = state;
+          waiting4Refunds = state.matches(
+            'requestedCancellation.waiting2Refund'
+          );
+        }
       }
-    });
+    );
   };
 
   const useShow = (show: ShowDocument) => {
+    console.log('useShow', show);
     show.$.subscribe((_show: ShowDocument) => {
       waiting4StateChange = false;
       if (_show) {
@@ -131,10 +136,11 @@
             talent = _talent;
             _talent.get$('currentShow').subscribe(async showId => {
               eventText = 'No Events';
+              console.log('showId', showId);
               if (showId) {
                 db.shows.findOne(showId).$.subscribe(async _currentShow => {
                   showMachineService?.stop();
-                  showSub?.unsubscribe();
+                  showMachineSub?.unsubscribe();
                   if (_currentShow) {
                     currentShow = _currentShow;
                     showMachineService = createShowMachineService({
@@ -150,7 +156,6 @@
                   }
                 });
               } else {
-                currentShow = null;
                 canCreateShow = true;
                 canCancelShow = false;
                 eventText = 'No Events';
@@ -193,10 +198,12 @@
         waiting4StateChange = false;
       }
       if (result.data.showCancelled) {
-        active = false;
-        canCancelShow = false;
         canCreateShow = true;
-        //
+        canCancelShow = false;
+        eventText = 'No Events';
+        statusText = 'Cancelled';
+        active = false;
+        waiting4StateChange = false;
       }
       await applyAction(result);
     };

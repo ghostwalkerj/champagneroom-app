@@ -218,9 +218,9 @@ export const actions: Actions = {
           type: 'SHOW CANCELLED',
           cancel,
         });
-
-        showCancelled = showService.getSnapshot().matches('cancelled');
       }
+
+      showCancelled = showService.getSnapshot().matches('cancelled');
     }
     return {
       success: true,
