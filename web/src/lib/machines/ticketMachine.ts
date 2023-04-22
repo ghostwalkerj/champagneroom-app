@@ -1,10 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import type { ShowDocument } from '$lib/ORM/models/show';
-import type {
-  TicketDocType,
-  TicketDocument,
-  TicketDocument,
-} from '$lib/ORM/models/ticket';
+import type { TicketDocType, TicketDocument } from '$lib/ORM/models/ticket';
 import { TicketStatus } from '$lib/ORM/models/ticket';
 import type { TransactionDocType } from '$lib/ORM/models/transaction';
 import { nanoid } from 'nanoid';
@@ -77,7 +73,7 @@ export const createTicketMachine = ({
         showMachineRef: undefined as ActorRefFrom<ShowMachineType> | undefined,
       },
       // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-      tsTypes: {} as import('./ticketMachine.typegen').Typegen0,
+      tsTypes: {} as import('./ticketMachine.typegen.d.ts').Typegen0,
       schema: {
         events: {} as
           | {

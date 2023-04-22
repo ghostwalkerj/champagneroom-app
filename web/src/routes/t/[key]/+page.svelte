@@ -14,7 +14,7 @@
   } from '$lib/machines/showMachine';
   import { talentDB, type TalentDBType } from '$lib/ORM/dbs/talentDB';
   import type { ShowDocument } from '$lib/ORM/models/show';
-  import type { TalentDocType } from '$lib/ORM/models/talent';
+  import type { TalentDocType, TalentDocument } from '$lib/ORM/models/talent';
   import { durationFormatter } from '$lib/util/constants';
   import { possessive } from 'i18n-possessive';
   import StarRating from 'svelte-star-rating';
@@ -40,7 +40,9 @@
   let key = $page.params.key;
 
   let showMachineSub: Subscription;
+  let showEventSub: Subscription;
   const showPath = urlJoin($page.url.href, 'show');
+  let showMachineService: ShowMachineServiceType | null = null;
 
   $: showMachineState = null as ShowMachineStateType | null;
   $: canCancelShow = false;
@@ -53,8 +55,17 @@
   $: active = currentShow?.showState.active ?? false;
   $: waiting4StateChange = false;
 
+  const noCurrentShow = () => {
+    canCreateShow = true;
+    canCancelShow = false;
+    canStartShow = false;
+    statusText = 'No Current Show';
+    eventText = 'No Events';
+    active = false;
+  };
+
   const useShowMachine = (showMachineService: ShowMachineServiceType) => {
-    showMachineSub && showMachineSub.unsubscribe();
+    showMachineSub?.unsubscribe();
     showMachineSub = showMachineService.subscribe(
       (state: ShowMachineStateType) => {
         if (state.changed) {
@@ -69,24 +80,16 @@
           waiting4Refunds = state.matches(
             'requestedCancellation.waiting2Refund'
           );
+          active = !state.done;
+          statusText = state.context.showState.status;
         }
       }
     );
   };
 
-  const useShow = (show: ShowDocument) => {
-    console.log('useShow', show);
-    show.$.subscribe((_show: ShowDocument) => {
-      waiting4StateChange = false;
-      if (_show) {
-        statusText = _show.showState.status;
-      }
-    });
-    active = show.showState.active;
-  };
-
   const useShowEvents = (show: ShowDocument) => {
-    show.collection.database.showevents
+    showEventSub?.unsubscribe();
+    showEventSub = show.collection.database.showevents
       .findOne()
       .where('show')
       .eq(show._id)
@@ -115,17 +118,32 @@
       });
   };
 
-  let showMachineService: ShowMachineServiceType | null = null;
+  const subscribeCurrentShow = (talent: TalentDocument) => {
+    talent.get$('currentShow').subscribe(async showId => {
+      eventText = 'No Events';
+      if (showId) {
+        talent.collection.database.shows
+          .findOne(showId)
+          .$.subscribe(async _currentShow => {
+            showMachineService?.stop();
+            showMachineSub?.unsubscribe();
+            if (_currentShow) {
+              currentShow = _currentShow;
+              showMachineService = createShowMachineService({
+                showDocument: _currentShow,
+                saveState: false,
+              });
+              useShowMachine(showMachineService);
+              useShowEvents(_currentShow);
+            }
+          });
+      } else {
+        noCurrentShow();
+      }
+    });
+  };
 
   onMount(() => {
-    if (currentShow) {
-      showMachineService = createShowMachineService({
-        showDocument: currentShow,
-        observeState: false,
-        saveState: false,
-      });
-      useShowMachine(showMachineService);
-    }
     talentDB(key, token).then((db: TalentDBType | undefined) => {
       if (!db) return;
       db.talents
@@ -134,35 +152,7 @@
         .then(_talent => {
           if (_talent) {
             talent = _talent;
-            _talent.get$('currentShow').subscribe(async showId => {
-              eventText = 'No Events';
-              console.log('showId', showId);
-              if (showId) {
-                db.shows.findOne(showId).$.subscribe(async _currentShow => {
-                  showMachineService?.stop();
-                  showMachineSub?.unsubscribe();
-                  if (_currentShow) {
-                    currentShow = _currentShow;
-                    showMachineService = createShowMachineService({
-                      showDocument: _currentShow,
-                      observeState: true,
-                      saveState: false,
-                    });
-                    useShowMachine(showMachineService);
-                    if (currentShow.showState.active) {
-                      useShow(_currentShow);
-                      useShowEvents(_currentShow);
-                    }
-                  }
-                });
-              } else {
-                canCreateShow = true;
-                canCancelShow = false;
-                eventText = 'No Events';
-                statusText = 'No Current Show';
-                active = false;
-              }
-            });
+            subscribeCurrentShow(_talent);
           }
         });
     });
@@ -182,9 +172,7 @@
   const onSubmit = ({}) => {
     waiting4StateChange = true;
     return async ({ result }) => {
-      if (result.type !== 'success') {
-        waiting4StateChange = false;
-      }
+      waiting4StateChange = false;
       if (result.data.showCreated) {
         currentShow = result.data.show;
         canCreateShow = false;
@@ -195,15 +183,9 @@
           currentShow!._id
         );
         navigator.clipboard.writeText(showUrl);
-        waiting4StateChange = false;
       }
       if (result.data.showCancelled) {
-        canCreateShow = true;
-        canCancelShow = false;
-        eventText = 'No Events';
-        statusText = 'Cancelled';
-        active = false;
-        waiting4StateChange = false;
+        noCurrentShow();
       }
       await applyAction(result);
     };

@@ -1,6 +1,7 @@
 import { PUBLIC_ESCROW_PERIOD, PUBLIC_GRACE_PERIOD } from '$env/static/public';
 import type { ShowDocument } from '$lib/ORM/models/show';
 import { ShowStatus, type ShowDocType } from '$lib/ORM/models/show';
+import type { TalentDocument } from '$lib/ORM/models/talent.js';
 import type { TicketDocType, TicketDocument } from '$lib/ORM/models/ticket';
 import type { TransactionDocType } from '$lib/ORM/models/transaction';
 import { nanoid } from 'nanoid';
@@ -12,6 +13,7 @@ import {
   spawn,
   type ActorRef,
   type StateFrom,
+  actions,
 } from 'xstate';
 
 const GRACE_PERIOD = +PUBLIC_GRACE_PERIOD || 3600000;
@@ -58,11 +60,9 @@ const createShowStateObservable = (showDocument: ShowDocument) => {
 export const createShowMachine = ({
   showDocument,
   saveState,
-  observeState,
 }: {
   showDocument: ShowDocument;
   saveState: boolean;
-  observeState: boolean;
 }) => {
   /** @xstate-layout N4IgpgJg5mDOIC5SwBYHsDuBZAhgYxQEsA7MAOlUwAIAbNHCSAYgG0AGAXUVAAc1ZCAF0Jpi3EAA9EAJgAsbMgDYAnNLZsAzAEZp0gOxblWrQBoQATxmKNZPbOka2ejQFZlitXoC+Xs5Wz4RKQU6Bi09IwQrFpcSCB8AsKi4lIIcgoqapo6+obGZpYILtZkGrJljnp2ABwailo+fqG4BCTk-uEMzCzSsbz8QiJicanpSqrq2roGRqYWiBoOZGz21Spsinq6td6+IP4tQe2hnZGsGn3xA0nDoKPy41lTubMFiNWyZMWKHkZ6TtJ6tJGvtmoE2iFqHQulEWLJLglBskRjIHplJjkZvl5ghZPZxtpZMpVFpNNItIoQQdwcEOtCziwXAjrkMUqiMhNstM8nNCmpPnitHZii41FpHNUqWDWrSTvTuopmYlWSi0mjOc8sbzEFpZC4yLrjLVlHj5C4XFLMIcISQAKKwPAAJ0wTAksEEOEE5BwADMvY6ABRwJ2YAAiYBoOHMAEomNSZeQ7Q7nRh2EqkbdJIgqloyHJrK4flNNm8EFoXDZjOpFOVqtVpObVD49sQ0Ix4HF40dxIibmyEABaRSlgf64njtjitb1UmyS0BBOQsLyiA9lnIu6Ieyl5R6L5saTVFbODZEjQaefW4J4HDEPARmiQNfKjdZoqyap56Qm6o6f4ORRqlLX8yCJKtSTkXRZF2JorRpcgfRIHAaEIAAvJ84l7FVNwQE1pDIYkZyFfQ623HE1GUA07H0Ow6iJBtL3gsgkxDDBnwzfs3EUA1HGKD9yjYes9FLNR8JrA9SRcAwXFqPVGMXAAjNAJAAeR9RD7xUngwEzLDX1SFwPy-H8-wPOogPI+oCPkKppiMIwVnko4yCU1T1MIe8AGE6FgDD+hfTMDKM3QTP0MzANLYpc0MrRqmUYoTXkawnIhR0wAARwAVzgL0IE8297xoSM+0w9dAsQQzPxCj9TIAizCkWXM5HFc9lDWPQ2rsFLghIUNCFgHhMq9diSpwyrjJqsK6tLXUbFams62sXcZN2HwgA */
   return createMachine(
@@ -79,7 +79,7 @@ export const createShowMachine = ({
         id: nanoid(),
       },
       // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-      tsTypes: {} as import('./showMachine.typegen').Typegen0,
+      tsTypes: {} as import('./showMachine.typegen.d.ts').Typegen0,
       schema: {
         events: {} as
           | {
@@ -132,12 +132,9 @@ export const createShowMachine = ({
       id: 'showMachine',
       initial: 'showLoaded',
       entry: assign(() => {
-        if (observeState) {
-          return {
-            showStateRef: spawn(createShowStateObservable(showDocument)),
-          };
-        }
-        return {};
+        return {
+          showStateRef: spawn(createShowStateObservable(showDocument)),
+        };
       }),
       states: {
         showLoaded: {
@@ -339,8 +336,8 @@ export const createShowMachine = ({
     },
     {
       actions: {
-        saveShowState: assign((context, event) => {
-          if (!saveState) return { showDocument: context.showDocument };
+        saveShowState: (context, event) => {
+          if (!saveState) return {};
 
           const ticket = 'ticket' in event ? event.ticket : undefined;
           const transaction =
@@ -354,10 +351,9 @@ export const createShowMachine = ({
             ...context.showState,
             updatedAt: new Date().getTime(),
           };
-          showDocument.saveShowStateCallback(showState);
 
-          return { showDocument: context.showDocument };
-        }),
+          showDocument.saveShowStateCallback(showState);
+        },
 
         updateShowState: assign((context, event) => {
           return {
@@ -556,16 +552,13 @@ export const createShowMachine = ({
 export const createShowMachineService = ({
   showDocument,
   saveState,
-  observeState,
 }: {
   showDocument: ShowDocument;
   saveState: boolean;
-  observeState: boolean;
 }) => {
   const showMachine = createShowMachine({
     showDocument,
     saveState,
-    observeState,
   });
   showMachine;
   const showService = interpret(showMachine).start();
