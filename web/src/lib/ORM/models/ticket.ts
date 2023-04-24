@@ -68,7 +68,7 @@ type TicketDocMethods = {
 
 export const ticketDocMethods: TicketDocMethods = {
   saveTicketStateCallback: async function (this: TicketDocument, ticketState) {
-    await this.atomicPatch({
+    return await this.atomicPatch({
       ticketState,
     });
   },

@@ -64,7 +64,7 @@
     ticketDone = state.done ?? false;
   });
 
-  $: waiting4StateChange = true;
+  $: waiting4StateChange = false;
 
   const onSubmit = () => {
     waiting4StateChange = true;
@@ -82,7 +82,10 @@
 
   if (ticket.ticketState.active) {
     ticketDB(ticketId, token).then(async (db: TicketDBType) => {
-      show = (await db.shows.findOne(show._id).exec()) as ShowDocument;
+      const _show = (await db.shows.findOne(show._id).exec()) as ShowDocument;
+      _show.$.subscribe(newShow => {
+        show = newShow;
+      });
       const _ticket = (await db.tickets
         .findOne(ticketId)
         .exec()) as TicketDocument;
@@ -96,16 +99,12 @@
 
       ticketMachineService = createTicketMachineService({
         ticketDocument: _ticket,
-        showDocument: show,
+        showDocument: _show,
         saveState: false,
         observeState: true,
       });
     });
   }
-
-  onMount(() => {
-    waiting4StateChange = false;
-  });
 </script>
 
 {#if ticket}

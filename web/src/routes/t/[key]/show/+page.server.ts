@@ -114,7 +114,6 @@ export const actions: Actions = {
     const showState = showService.getSnapshot();
 
     if (showState.can({ type: 'END SHOW' })) {
-      // Cancel the show and prevent new ticket sales, etc
       showService.send({
         type: 'END SHOW',
       });

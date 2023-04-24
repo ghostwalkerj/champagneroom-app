@@ -14,6 +14,8 @@ import {
   type ShowDocType,
   type ShowDocument,
 } from './show';
+import type { TicketDocument } from './ticket';
+import { TicketStatus } from './ticket';
 
 export const TalentString = 'talent';
 
@@ -207,28 +209,35 @@ export const talentDocMethods: TalentDocMethods = {
     range = { start: 0, end: new Date().getTime() }
   ): Promise<TalentDocument['stats']> {
     let ratingAvg = 0;
-    const totalRating = 0;
+    let totalRating = 0;
     let totalEarnings = 0;
-    const numRatings = 0;
+    let numRatings = 0;
     const db = this.collection.database;
-    const completedShowIds: string[] = [];
-    const completedShows = (await db.shows
+    const completedTicketIds: string[] = [];
+    const completedShowsSet = new Set<string>();
+
+    const completedTickets = (await db.tickets
       .find({
         selector: {
           talent: this._id,
-          showState: {
-            status: ShowStatus.FINALIZED,
+          ticketState: {
+            status: TicketStatus.FINALIZED,
             finalized: {
               endedAt: { $gte: range.start, $lte: range.end },
             },
           },
         },
       })
-      .exec()) as ShowDocument[];
+      .exec()) as TicketDocument[];
 
-    completedShows.map(show => {
-      totalEarnings += show.showState.totalSales || 0;
-      completedShowIds.push(show._id);
+    completedTickets.map(ticket => {
+      completedShowsSet.add(ticket.show);
+      totalEarnings += ticket.ticketState.totalPaid || 0;
+      if (ticket.ticketState.feedback?.rating) {
+        totalRating += ticket.ticketState.feedback.rating;
+        numRatings++;
+      }
+      completedTicketIds.push(ticket._id);
     });
     if (numRatings > 0) {
       ratingAvg = totalRating / numRatings;
@@ -237,8 +246,8 @@ export const talentDocMethods: TalentDocMethods = {
       ratingAvg,
       totalEarnings,
       totalRating,
-      completedShows: completedShowIds,
-      numCompletedShows: completedShows.length,
+      completedShows: Array.from(completedShowsSet),
+      numCompletedShows: completedShowsSet.size,
     };
     return stats;
   },

@@ -493,6 +493,7 @@ export const createTicketMachine = ({
           return {
             ticketState: {
               ...context.ticketState,
+              status: TicketStatus.IN_ESCROW,
               escrow: {
                 ...context.ticketState.escrow,
                 startedAt: new Date().getTime(),

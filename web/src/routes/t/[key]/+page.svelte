@@ -46,7 +46,8 @@
 
   $: showMachineState = null as ShowMachineStateType | null;
   $: canCancelShow = false;
-  $: canCreateShow = data.currentShow === null;
+  $: canCreateShow =
+    data.currentShow === null || data.currentShow.showState.active === false;
   $: canStartShow = false;
   $: waiting4Refunds = false;
 
@@ -143,19 +144,17 @@
     });
   };
 
-  onMount(() => {
-    talentDB(key, token).then((db: TalentDBType | undefined) => {
-      if (!db) return;
-      db.talents
-        .findOne(talent._id)
-        .exec()
-        .then(_talent => {
-          if (_talent) {
-            talent = _talent;
-            subscribeCurrentShow(_talent);
-          }
-        });
-    });
+  talentDB(key, token).then((db: TalentDBType | undefined) => {
+    if (!db) return;
+    db.talents
+      .findOne(talent._id)
+      .exec()
+      .then(_talent => {
+        if (_talent) {
+          talent = _talent;
+          subscribeCurrentShow(_talent);
+        }
+      });
   });
 
   const updateProfileImage = async (url: string) => {
@@ -186,6 +185,7 @@
       }
       if (result.data.showCancelled) {
         noCurrentShow();
+        statusText = 'Cancelled';
       }
       await applyAction(result);
     };
