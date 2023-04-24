@@ -102,8 +102,6 @@ export const load: import('./$types').PageServerLoad = async ({ params }) => {
 
 export const actions: Actions = {
   end_show: async ({ params }) => {
-    console.log('end show');
-
     const key = params.key;
 
     if (key === undefined) {

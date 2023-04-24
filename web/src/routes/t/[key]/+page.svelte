@@ -55,6 +55,7 @@
   $: eventText = 'No Events';
   $: active = currentShow?.showState.active ?? false;
   $: waiting4StateChange = false;
+  $: inGracePeriod = false;
 
   const noCurrentShow = () => {
     canCreateShow = true;
@@ -69,21 +70,20 @@
     showMachineSub?.unsubscribe();
     showMachineSub = showMachineService.subscribe(
       (state: ShowMachineStateType) => {
-        if (state.changed) {
-          canCancelShow = state.can({
-            type: 'REQUEST CANCELLATION',
-            cancel: undefined,
-            tickets: [],
-          });
-          canCreateShow = state.hasTag('canCreateShow');
-          canStartShow = state.can({ type: 'START SHOW' });
-          showMachineState = state;
-          waiting4Refunds = state.matches(
-            'requestedCancellation.waiting2Refund'
-          );
-          active = !state.done;
-          statusText = state.context.showState.status;
-        }
+        inGracePeriod = state.matches('ended');
+        console.log('inGracePeriod', inGracePeriod);
+        canCancelShow = state.can({
+          type: 'REQUEST CANCELLATION',
+          cancel: undefined,
+          tickets: [],
+        });
+        canCreateShow = state.hasTag('canCreateShow');
+        canStartShow = state.can({ type: 'START SHOW' });
+        showMachineState = state;
+        waiting4Refunds = state.matches('requestedCancellation.waiting2Refund');
+
+        active = !state.done;
+        statusText = state.context.showState.status;
       }
     );
   };
@@ -133,6 +133,7 @@
               showMachineService = createShowMachineService({
                 showDocument: _currentShow,
                 saveState: false,
+                observeState: true,
               });
               useShowMachine(showMachineService);
               useShowEvents(_currentShow);
@@ -194,6 +195,24 @@
 
 <div class="flex place-content-center">
   <!-- Page header -->
+  <!-- Modal for Restarting Show -->
+
+  {#if inGracePeriod}
+    <!-- Put this part before </body> tag -->
+    <input type="checkbox" id="restart-show-modal" class="modal-toggle" />
+    <div class="modal modal-open">
+      <div class="modal-box">
+        <h3 class="font-bold text-lg">Congratulations random Internet user!</h3>
+        <p class="py-4">
+          You've been selected for a chance to get one year of subscription to
+          use Wikipedia for free!
+        </p>
+        <div class="modal-action">
+          <label for="restart-show-modal" class="btn">Yay!</label>
+        </div>
+      </div>
+    </div>
+  {/if}
 
   <div
     class="p-4 flex-col gap-3 min-w-full md:min-w-min max-w-7xl md:grid md:grid-cols-4"
