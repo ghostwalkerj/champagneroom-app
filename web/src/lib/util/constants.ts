@@ -23,6 +23,8 @@ export enum ActorType {
   AGENT = 'AGENT',
   TALENT = 'TALENT',
   CUSTOMER = 'CUSTOMER',
+  SERVICE = 'SERVICE',
+  TIMER = 'TIMER',
 }
 
 export const jitsiInterfaceConfigOverwrite = {

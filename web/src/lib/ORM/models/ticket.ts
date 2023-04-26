@@ -212,7 +212,7 @@ const ticketSchemaLiteral = {
           },
           required: ['startedAt', 'disputer', 'reason', 'explanation'],
         },
-        finalized: {
+        finalize: {
           type: 'object',
           properties: {
             endedAt: { type: 'integer' },

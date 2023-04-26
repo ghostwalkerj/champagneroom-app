@@ -12,6 +12,7 @@ import { ShowCancelReason } from '$lib/ORM/models/show';
 import { TicketCancelReason } from '$lib/ORM/models/ticket';
 import { TransactionReasonType } from '$lib/ORM/models/transaction';
 import { StorageType } from '$lib/ORM/rxdb';
+import type { ShowStateType } from '$lib/machines/showMachine';
 import { createShowMachineService } from '$lib/machines/showMachine';
 import { createTicketMachineService } from '$lib/machines/ticketMachine';
 import { ActorType } from '$lib/util/constants';
@@ -185,7 +186,7 @@ export const actions: Actions = {
       cancelledInState: JSON.stringify(showState.value),
       reason: ShowCancelReason.TALENT_CANCELLED,
       canceller: ActorType.TALENT,
-    };
+    } as ShowStateType['cancel'];
 
     if (showState.can({ type: 'REQUEST CANCELLATION', cancel, tickets: [] })) {
       // Cancel the show and prevent new ticket sales, etc
@@ -225,6 +226,35 @@ export const actions: Actions = {
     return {
       success: true,
       showCancelled,
+    };
+  },
+  finalize_show: async ({ params }) => {
+    const key = params.key;
+    if (key === null) {
+      throw error(404, 'Key not found');
+    }
+
+    let showFinalized = false;
+
+    const { showService } = await getShow(key);
+    const showState = showService.getSnapshot();
+
+    const finalize = {
+      finalizedAt: new Date().getTime(),
+      finalizer: ActorType.TALENT,
+    } as ShowStateType['finalize'];
+
+    if (showState.can({ type: 'SHOW FINALIZED', finalize })) {
+      showService.send({
+        type: 'SHOW FINALIZED',
+        finalize,
+      });
+
+      showFinalized = showService.getSnapshot().matches('finalized');
+    }
+    return {
+      success: true,
+      showFinalized,
     };
   },
   refund_tickets: async ({ params }) => {

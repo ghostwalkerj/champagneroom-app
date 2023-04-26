@@ -1,9 +1,9 @@
 import { PUBLIC_ESCROW_PERIOD, PUBLIC_GRACE_PERIOD } from '$env/static/public';
 import type { ShowDocument } from '$lib/ORM/models/show';
 import { ShowStatus, type ShowDocType } from '$lib/ORM/models/show';
-import type { TalentDocument } from '$lib/ORM/models/talent.js';
 import type { TicketDocType, TicketDocument } from '$lib/ORM/models/ticket';
 import type { TransactionDocType } from '$lib/ORM/models/transaction';
+import { ActorType } from '$lib/util/constants.js';
 import { nanoid } from 'nanoid';
 import { map, type Observable } from 'rxjs';
 import {
@@ -13,13 +13,13 @@ import {
   spawn,
   type ActorRef,
   type StateFrom,
-  actions,
+  raise,
 } from 'xstate';
 
 const GRACE_PERIOD = +PUBLIC_GRACE_PERIOD || 3600000;
 const ESCROW_PERIOD = +PUBLIC_ESCROW_PERIOD || 3600000;
 
-type ShowStateType = ShowDocType['showState'];
+export type ShowStateType = ShowDocType['showState'];
 
 export type ShowStateCallbackType = (
   state: ShowStateType
@@ -116,6 +116,10 @@ export const createShowMachine = ({
             }
           | {
               type: 'END SHOW';
+            }
+          | {
+              type: 'SHOW FINALIZED';
+              finalize: ShowStateType['finalize'];
             }
           | {
               type: 'CUSTOMER JOINED';
@@ -302,14 +306,17 @@ export const createShowMachine = ({
         ended: {
           after: {
             GRACE_DELAY: {
-              target: 'finalized',
-              actions: ['finalizeShow', 'saveShowState'],
+              actions: ['raiseFinalize'],
             },
           },
           on: {
             'START SHOW': {
               target: 'started',
               actions: ['startShow', 'saveShowState'],
+            },
+            'SHOW FINALIZED': {
+              target: 'finalized',
+              actions: ['finalizeShow', 'saveShowState'],
             },
           },
         },
@@ -489,11 +496,20 @@ export const createShowMachine = ({
           };
         }),
 
-        finalizeShow: assign(context => {
+        raiseFinalize: raise({
+          type: 'SHOW FINALIZED',
+          finalize: {
+            finalizedAt: new Date().getTime(),
+            finalizer: ActorType.TIMER,
+          },
+        }),
+
+        finalizeShow: assign((context, event) => {
           return {
             showState: {
               ...context.showState,
               status: ShowStatus.FINALIZED,
+              finalized: event.finalize,
             },
           };
         }),

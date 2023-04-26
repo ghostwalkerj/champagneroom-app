@@ -213,12 +213,16 @@ const showSchemaLiteral = {
             'canceller',
           ],
         },
-        finalized: {
+        finalize: {
           type: 'object',
           properties: {
-            endedAt: { type: 'integer' },
+            finalizedAt: { type: 'integer' },
+            finalizer: {
+              type: 'string',
+              enum: Object.values(ActorType),
+            },
           },
-          required: ['endedAt'],
+          required: ['finalizedAt', 'finalizer'],
         },
         transactions: {
           type: 'array',

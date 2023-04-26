@@ -51,9 +51,9 @@
   $: canStartShow = false;
   $: waiting4Refunds = false;
 
-  $: statusText = currentShow?.showState.status ?? 'No Current Show';
+  $: statusText = data.currentShow?.showState.status ?? 'No Current Show';
   $: eventText = 'No Events';
-  $: active = currentShow?.showState.active ?? false;
+  $: active = data.currentShow ? data.currentShow.showState.active : false;
   $: waiting4StateChange = false;
   $: inGracePeriod = false;
 
@@ -71,7 +71,6 @@
     showMachineSub = showMachineService.subscribe(
       (state: ShowMachineStateType) => {
         inGracePeriod = state.matches('ended');
-        console.log('inGracePeriod', inGracePeriod);
         canCancelShow = state.can({
           type: 'REQUEST CANCELLATION',
           cancel: undefined,
@@ -81,7 +80,6 @@
         canStartShow = state.can({ type: 'START SHOW' });
         showMachineState = state;
         waiting4Refunds = state.matches('requestedCancellation.waiting2Refund');
-
         active = !state.done;
         statusText = state.context.showState.status;
       }
@@ -129,14 +127,17 @@
             showMachineService?.stop();
             showMachineSub?.unsubscribe();
             if (_currentShow) {
-              currentShow = _currentShow;
+              currentShow = _currentShow as ShowDocument;
+
               showMachineService = createShowMachineService({
                 showDocument: _currentShow,
-                saveState: false,
+                saveState: true,
                 observeState: true,
               });
-              useShowMachine(showMachineService);
-              useShowEvents(_currentShow);
+              if (currentShow.showState.active) {
+                useShowMachine(showMachineService);
+                useShowEvents(_currentShow);
+              }
             }
           });
       } else {
@@ -145,17 +146,27 @@
     });
   };
 
-  talentDB(key, token).then((db: TalentDBType | undefined) => {
-    if (!db) return;
-    db.talents
-      .findOne(talent._id)
-      .exec()
-      .then(_talent => {
-        if (_talent) {
-          talent = _talent;
-          subscribeCurrentShow(_talent);
-        }
+  onMount(() => {
+    if (currentShow) {
+      showMachineService = createShowMachineService({
+        showDocument: currentShow,
+        observeState: false,
+        saveState: false,
       });
+      useShowMachine(showMachineService);
+    }
+    talentDB(key, token).then((db: TalentDBType | undefined) => {
+      if (!db) return;
+      db.talents
+        .findOne(talent._id)
+        .exec()
+        .then(_talent => {
+          if (_talent) {
+            talent = _talent;
+            subscribeCurrentShow(_talent);
+          }
+        });
+    });
   });
 
   const updateProfileImage = async (url: string) => {
@@ -172,9 +183,8 @@
   const onSubmit = ({}) => {
     waiting4StateChange = true;
     return async ({ result }) => {
-      waiting4StateChange = false;
       if (result.data.showCreated) {
-        currentShow = result.data.show;
+        currentShow = result.data.show as ShowDocument;
         canCreateShow = false;
         canCancelShow = true;
         const showUrl = urlJoin(
@@ -183,32 +193,47 @@
           currentShow!._id
         );
         navigator.clipboard.writeText(showUrl);
-      }
-      if (result.data.showCancelled) {
+        showMachineService = createShowMachineService({
+          showDocument: currentShow,
+          observeState: false,
+          saveState: false,
+        });
+        useShowMachine(showMachineService);
+      } else if (result.data.showCancelled) {
         noCurrentShow();
         statusText = 'Cancelled';
+      } else if (result.data.showFinalized) {
+        noCurrentShow();
+        statusText = 'Finalized';
       }
       await applyAction(result);
+      waiting4StateChange = false;
     };
   };
 </script>
 
 <div class="flex place-content-center">
   <!-- Page header -->
-  <!-- Modal for Restarting Show -->
 
+  <!-- Modal for Restarting Show -->
   {#if inGracePeriod}
     <!-- Put this part before </body> tag -->
     <input type="checkbox" id="restart-show-modal" class="modal-toggle" />
     <div class="modal modal-open">
       <div class="modal-box">
-        <h3 class="font-bold text-lg">Congratulations random Internet user!</h3>
+        <h3 class="font-bold text-lg">You have Ended the Show</h3>
         <p class="py-4">
-          You've been selected for a chance to get one year of subscription to
-          use Wikipedia for free!
+          Are you sure you want to end the show? You will not be able to restart
+          later. Ticket holders will be able to give feedback once the show is
+          ended.
         </p>
         <div class="modal-action">
-          <label for="restart-show-modal" class="btn">Yay!</label>
+          <button class="btn" on:click={() => goto(showPath)}
+            >Restart Show</button
+          >
+          <form method="post" action="?/finalize_show" use:enhance={onSubmit}>
+            <button class="btn">End Show</button>
+          </form>
         </div>
       </div>
     </div>
