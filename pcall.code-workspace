@@ -5,6 +5,9 @@
 		},
 		{
 			"path": "web"
+		},
+		{
+			"path": "server"
 		}
 	],
 	"settings": {
@@ -105,6 +108,17 @@
 		"typescript.tsdk": "mobile/node_modules/typescript/lib",
 		"cSpell.words": [
 			"keyid"
-		]
+		],
+		"workbench.colorCustomizations": {
+			"editor.background": "#000000",
+			"sideBar.background": "#000000",
+			"activityBar.background": "#000000",
+			"statusBar.background": "#000000",
+			"terminal.background": "#000000",
+			"tab.activeBorder": "#ff0000",
+			"tab.unfocusedActiveBorder": "#000000",
+			"minimap.background": "#00000000",
+			"scrollbar.shadow": "#00000000"
+		}
 	}
 }

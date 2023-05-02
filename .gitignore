@@ -21,3 +21,5 @@ web/src/routes/sh/[id]/oldpage.svelte
 
 web/src/lib/machines/showMachine.typegen.d.ts
 web/src/lib/machines/ticketMachine.typegen.d.ts
+web/dist/**
+server/dist/**
