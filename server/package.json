@@ -4,8 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "bree": "^9.1.3",
-    "express": "^4.18.2"
+    "bree": "^9.1.3"
   },
   "type": "module",
   "scripts": {
