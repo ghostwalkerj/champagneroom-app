@@ -55,7 +55,7 @@
   $: eventText = 'No Events';
   $: active = data.currentShow ? data.currentShow.showState.active : false;
   $: waiting4StateChange = false;
-  $: inGracePeriod = false;
+  $: showEnded = false;
 
   const noCurrentShow = () => {
     canCreateShow = true;
@@ -70,7 +70,7 @@
     showMachineSub?.unsubscribe();
     showMachineSub = showMachineService.subscribe(
       (state: ShowMachineStateType) => {
-        inGracePeriod = state.matches('ended');
+        showEnded = state.matches('ended');
         canCancelShow = state.can({
           type: 'REQUEST CANCELLATION',
           cancel: undefined,
@@ -131,7 +131,7 @@
 
               showMachineService = createShowMachineService({
                 showDocument: _currentShow,
-                saveState: true,
+                saveState: false,
                 observeState: true,
               });
               if (currentShow.showState.active) {
@@ -215,9 +215,8 @@
 <div class="flex place-content-center">
   <!-- Page header -->
 
-  <!-- Modal for Restarting Show -->
-  {#if inGracePeriod}
-    <!-- Put this part before </body> tag -->
+  <!-- Modal for Restarting or Finalizing Show -->
+  {#if showEnded}
     <input type="checkbox" id="restart-show-modal" class="modal-toggle" />
     <div class="modal modal-open">
       <div class="modal-box">
@@ -228,8 +227,10 @@
           ended.
         </p>
         <div class="modal-action">
-          <button class="btn" on:click={() => goto(showPath)}
-            >Restart Show</button
+          <button
+            class="btn"
+            on:click={() => goto(showPath)}
+            disabled={!canStartShow}>Restart Show</button
           >
           <form method="post" action="?/finalize_show" use:enhance={onSubmit}>
             <button class="btn">End Show</button>

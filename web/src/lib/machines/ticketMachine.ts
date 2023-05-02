@@ -505,7 +505,7 @@ export const createTicketMachine = ({
         finalizeTicket: assign(context => {
           const finalized = {
             endedAt: new Date().getTime(),
-          } as NonNullable<TicketStateType['finalized']>;
+          } as NonNullable<TicketStateType['finalize']>;
           if (context.ticketState.status !== TicketStatus.FINALIZED) {
             return {
               ticketState: {

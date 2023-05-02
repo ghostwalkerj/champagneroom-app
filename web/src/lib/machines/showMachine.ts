@@ -3,7 +3,6 @@ import type { ShowDocument } from '$lib/ORM/models/show';
 import { ShowStatus, type ShowDocType } from '$lib/ORM/models/show';
 import type { TicketDocType, TicketDocument } from '$lib/ORM/models/ticket';
 import type { TransactionDocType } from '$lib/ORM/models/transaction';
-import { ActorType } from '$lib/util/constants.js';
 import { nanoid } from 'nanoid';
 import { map, type Observable } from 'rxjs';
 import {
@@ -13,7 +12,6 @@ import {
   spawn,
   type ActorRef,
   type StateFrom,
-  raise,
 } from 'xstate';
 
 const GRACE_PERIOD = +PUBLIC_GRACE_PERIOD || 3600000;
@@ -66,7 +64,7 @@ export const createShowMachine = ({
   saveState: boolean;
   observeState: boolean;
 }) => {
-  /** @xstate-layout N4IgpgJg5mDOIC5SwBYHsDuBZAhgYxQEsA7MAOlUwAIAbNHCSAYgG0AGAXUVAAc1ZCAF0Jpi3EAA9EAJgAsbMgDYAnNLZsAzAEZp0gOxblWrQBoQATxmKNZPbOka2ejQFZlitXoC+Xs5Wz4RKQU6Bi09IwQrFpcSCB8AsKi4lIIcgoqapo6+obGZpYILtZkGrJljnp2ABwailo+fqG4BCTk-uEMzCzSsbz8QiJicanpSqrq2roGRqYWiBoOZGz21Spsinq6td6+IP4tQe2hnZGsGn3xA0nDoKPy41lTubMFiNWyZMWKHkZ6TtJ6tJGvtmoE2iFqHQulEWLJLglBskRjIHplJjkZvl5ghZPZxtpZMpVFpNNItIoQQdwcEOtCziwXAjrkMUqiMhNstM8nNCmpPnitHZii41FpHNUqWDWrSTvTuopmYlWSi0mjOc8sbzEFpZC4yLrjLVlHj5C4XFLMIcISQAKKwPAAJ0wTAksEEOEE5BwADMvY6ABRwJ2YAAiYBoOHMAEomNSZeQ7Q7nRh2EqkbdJIgqloyHJrK4flNNm8EFoXDZjOpFOVqtVpObVD49sQ0Ix4HF40dxIibmyEABaRSlgf64njtjitb1UmyS0BBOQsLyiA9lnIu6Ieyl5R6L5saTVFbODZEjQaefW4J4HDEPARmiQNfKjdZoqyap56Qm6o6f4ORRqlLX8yCJKtSTkXRZF2JorRpcgfRIHAaEIAAvJ84l7FVNwQE1pDIYkZyFfQ623HE1GUA07H0Ow6iJBtL3gsgkxDDBnwzfs3EUA1HGKD9yjYes9FLNR8JrA9SRcAwXFqPVGMXAAjNAJAAeR9RD7xUngwEzLDX1SFwPy-H8-wPOogPI+oCPkKppiMIwVnko4yCU1T1MIe8AGE6FgDD+hfTMDKM3QTP0MzANLYpc0MrRqmUYoTXkawnIhR0wAARwAVzgL0IE8297xoSM+0w9dAsQQzPxCj9TIAizCkWXM5HFc9lDWPQ2rsFLghIUNCFgHhMq9diSpwyrjJqsK6tLXUbFams62sXcZN2HwgA */
+  /** @xstate-layout N4IgpgJg5mDOIC5SwBYHsDuBZAhgYxQEsA7MAYgGUAJAeQHUKAVAQUYFEACAVQAUARVmwDaABgC6iUAAc0sQgBdCaYpJAAPRABYATABoQAT0QBOAOzGAdAGYArDe3GAHKZH3tARm0BfL-tSZcAhIwC38MABk0HAhIMlEJJBAZOUVlVQ0EG2MRa00rU1tHdxtXdwA2fSMEdxERTWsrd0dNZ3zHGytHHz90bHwiUlDeyOjYoXcE6VkFJRVEjKycqzyCmyKSm3LKxHdNLItHfNtTB21NTTrukDDAgZCwkZiIOO1JpOnUudAF7NyjteKpQqhkQJ0s7mKWRsZSsx2M3l8116t2CQ0wjzGVjeyRmaXmiDWSxWhUBm2BVWKjjKDQKZRcdKOZSuN36qIeUSecU02I+s3SBL0IIQjW0jgsLTyOghWXhTMRLKCg3Zo2eQhsPJSfPxmUcRP+6yB2wQ2n2tTK2m0IhO2jKEJEVmZyNZSuGHLGZQ1uK+6gJLj+qwNZKNnjFJVqrkcDmMxjKdkdAWdIQARmg1DQAGbpwh4MA0KRgYhkABKbAAilw2EwOABhZgAOWrbHC4VYAEkaHX4qocZ9+dUyi0LGVnJpTCVGi5HI5g4cbBYrbGrGU6WUnND431FcnUxmszm8wXi2WK1Xaw2my3GO3OxNu7y8d8dgOxcPTKPx+5J9OhbtRRZ3MY+Q2CcA62nkG4ooMKZppm2a5vmhZXtWADSbCMBwJYUGwRYAGpsHwXaJD2WqPtUdTUpo0bRsBNTFE0waeNoByNO0dIiLqnSmBBiYWNBu5wQeiGtihaEYZW2F4QRt5Efe3oZAB5wWNk5qOMY7hWCItHBrCpgWGcIgwh45q1Fx8pOluvE7rB+4IWQSGoehmESW2HYcFeWBsDQXCMIRUyag+PrVMY9gHJajQAjaTSaMGHj1IceQdDowG1A6ZkJhZfHWfBh72aJZ6Ns2+G+e8-lyTsa5DhcMIQoCmifsGIjwuKoqNSptpWNG3EZVZe7ZUJInoRQNDhAR4h3qVfaWuU1jKR0wFjpotpGmYOQiB4zQwnslHnF1dyWTBvWCZQLBFoNtB0MVxEBfJ0JWOKJSRU4n5NDYRqJXpjW2Eu1VNKZPTpXtmWHbZuWOWwABiXB1nwRVjTJE3apatQWB02RvsUY6MUazS6ba0L2mU9qmAOCL-ZugM9XB1YADayLETDMKdHDUPQl2yX2NR1OKv2wmtNoXMYRr5LpJTmqKq7aOYWRymTkHbgdVO07AsSg2JWG4S5dZua2HleT5cN+V6HPkeKVHBaYtGbN+FKS+4Q5qRatrtFS4FpeTqJA4rdPPKr+UXrDnq9tqNTQqbVE0ZpVvBjoOR2K49ijppTik0iAMe5TOY097dnCQ5zPDaNgckYF6n7KKykwgUMZ1Np+RKY0ngtFY2jLJ0u3pwrmdKyrueiSWkPQwH41G8HrfivkLSrqjNpWDFxQo2cI6qeUTipbLPGe132cluWlboX7zaa2zCOkTUi1h9RFuR-RQpI3OZotwC+Sil0bty-t-Fb8rzw7ye+-1gVS815xhF2ujsVwFEzYRzotbHYaw4oxinBaZYgE-qp3dkqeQOAABO8h6YnTOqzA2JUR6kRtCcecA46gAXMEUGMRo8himUmcAEuxNhr3Qe-WAWDcGxGrFwJgNAPJFg4AAKRoK2OsQ94akMCjaDo1gOg1U0s0copghY6CUko1oZh1KRnbpgnBeDnj8MEcIjg4QIb61AWVY0y4mLNHsMnMwzdySIDOLpcMmlOi1CaLsV+68LLcKMbENg0NmbnWPrIjI8IjT8yYrbdo9hm4pwVHtAsnIGZMxZhdYhV1bE1EFFUE0AEDixkJk4yEO0348QyfTc6HBwaSOYOEVsAAtaRhsg6kXyHbSMRRPAdRNNkM4cTDKVVfCuFqtgDEhGwWAAAjgAVzgMY6sOBiA5mptTHAnwLAYBwDMYgUBtBFjAOmJZxAfa9zBgPGGhdh7dLkRA8Ur5iYxnKCadRP5CZik5iZS09gsgBM4TxeZyzVmQHWZssA2zdmzH2YcxQxzTnnMudcgaNYAH+weTIp5GRIxxOJvUOkRRSgnEcT4RExA0AxHgIkNJwRHnFwyAAWjcQgdl84vE8t8S4Gwsy0QRDdBAZlYCEA6DulKF2EJKJWw5ZzJiAJnCNQDHsQVeANlbOppAMVtiLhilUgZUUGlyhZBtHEwCdsnB5AcMuVBJpBVZmIDgamhAABeuq8UssQDCcEn1brFDyPkIWBlwQlFXsYc4HRliCs3n1PVHM6pMSoSpM4XzXo-kWiSxaSDCmxjOHGjOYAs7f0TdqKkOR1oFHKFKDo3yKSLTnDpCepgwSqQ4YywxvDRXevFU0doBxzBPVKLUewb1lzWEbubewrUQVdpCHU3tXSfXGgtkpZoS4xwuEaFGsZq5-zhnOOYYNnbzJ7XBSs7hUKtWwp2U8-Jk1ahilzW21ctpzTAWDLOoc4YkYWjHDYTQgrL2QogNC7V8LlCIqOScs5FyrnlrIVaWOph1h1SJo0YMqwUbGpNQ9c4qUfBAA */
   return createMachine(
     {
       context: {
@@ -304,11 +302,6 @@ export const createShowMachine = ({
           },
         },
         ended: {
-          after: {
-            GRACE_DELAY: {
-              actions: ['raiseFinalize'],
-            },
-          },
           on: {
             'START SHOW': {
               target: 'started',
@@ -496,13 +489,13 @@ export const createShowMachine = ({
           };
         }),
 
-        raiseFinalize: raise({
-          type: 'SHOW FINALIZED',
-          finalize: {
-            finalizedAt: new Date().getTime(),
-            finalizer: ActorType.TIMER,
-          },
-        }),
+        // raiseFinalize: raise({
+        //   type: 'SHOW FINALIZED',
+        //   finalize: {
+        //     finalizedAt: new Date().getTime(),
+        //     finalizer: ActorType.TIMER,
+        //   },
+        // }),
 
         finalizeShow: assign((context, event) => {
           return {
