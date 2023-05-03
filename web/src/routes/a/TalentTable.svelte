@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type { TalentDocument } from '$lib/ORM/models/talent';
-  import { currencyFormatter } from '$lib/util/constants';
+  import type { TalentDocument } from 'plib/dist/ORM/models/talent';
+  import { currencyFormatter } from 'plib/dist/util/constants';
   import SvelteTable from 'svelte-table';
   import TableCopyLink from './TableCopyLink.svelte';
   import TableRating from './TableRating.svelte';

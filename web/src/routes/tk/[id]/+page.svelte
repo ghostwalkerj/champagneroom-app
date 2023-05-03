@@ -2,26 +2,26 @@
   import { applyAction, enhance } from '$app/forms';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import { createTicketMachineService } from '$lib/machines/ticketMachine';
+  import { createTicketMachineService } from 'plib/dist/machines/ticketMachine';
 
-  import { ticketDB, type TicketDBType } from '$lib/ORM/dbs/ticketDB';
-  import type { ShowDocument } from '$lib/ORM/models/show';
+  import { ticketDB, type TicketDBType } from 'plib/dist/ORM/dbs/ticketDB';
+  import type { ShowDocument } from 'plib/dist/ORM/models/show';
   import {
     TicketDisputeReason,
-    type TicketDocument,
     TicketStatus,
-  } from '$lib/ORM/models/ticket';
+    type TicketDocument,
+  } from 'plib/dist/ORM/models/ticket';
   import { onMount } from 'svelte';
 
   import urlJoin from 'url-join';
 
-  import type { ActionData, PageData } from './$types';
-  import TicketDetail from './TicketDetail.svelte';
   import {
     PUBLIC_RXDB_PASSWORD,
     PUBLIC_TICKET_DB_ENDPOINT,
   } from '$env/static/public';
-  import { StorageType } from '$lib/ORM/rxdb';
+  import { StorageType } from 'plib/dist/ORM/rxdb';
+  import type { ActionData, PageData } from './$types';
+  import TicketDetail from './TicketDetail.svelte';
 
   export let data: PageData;
   export let form: ActionData;

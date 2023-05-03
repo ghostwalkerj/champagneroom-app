@@ -1,9 +1,8 @@
 <script lang="ts">
-  import { browser } from '$app/environment';
   import { browserType } from '$lib/stores';
+  import { onMount } from 'svelte';
   import { UAParser } from 'ua-parser-js';
   import '../app.css';
-  import { onMount } from 'svelte';
 
   onMount(() => {
     if ($browserType == null) {

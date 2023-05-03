@@ -4,22 +4,22 @@ import {
   JWT_MASTER_DB_USER,
   JWT_TICKET_DB_SECRET,
   JWT_TICKET_DB_USER,
-  PRIVATE_MASTER_DB_ENDPOINT,
+  MASTER_DB_ENDPOINT,
 } from '$env/static/private';
 import { PUBLIC_PIN_PATH, PUBLIC_RXDB_PASSWORD } from '$env/static/public';
-import { ticketDB } from '$lib/ORM/dbs/ticketDB';
+import { ticketDB } from 'plib/dist/ORM/dbs/ticketDB';
 import type {
   TicketDisputeReason,
   TicketDocType,
   TicketDocument,
-} from '$lib/ORM/models/ticket';
-import { TicketCancelReason } from '$lib/ORM/models/ticket';
-import { TransactionReasonType } from '$lib/ORM/models/transaction';
-import { StorageType } from '$lib/ORM/rxdb';
+} from 'plib/dist/ORM/models/ticket';
+import { TicketCancelReason } from 'plib/dist/ORM/models/ticket';
+import { TransactionReasonType } from 'plib/dist/ORM/models/transaction';
+import { StorageType } from 'plib/dist/ORM/rxdb';
 
-import { createTicketMachineService } from '$lib/machines/ticketMachine';
-import { ActorType } from '$lib/util/constants';
-import { verifyPin } from '$lib/util/pin';
+import { createTicketMachineService } from 'plib/dist/machines/ticketMachine';
+import { ActorType } from 'plib/dist/util/constants';
+import { verifyPin } from 'plib/dist/util/pin';
 import { error, fail, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import urlJoin from 'url-join';
@@ -45,7 +45,7 @@ const getTicket = async (ticketId: string) => {
   );
 
   const db = await ticketDB(ticketId, masterToken, {
-    endPoint: PRIVATE_MASTER_DB_ENDPOINT,
+    endPoint: MASTER_DB_ENDPOINT,
     storageType: StorageType.NODE_WEBSQL,
     rxdbPassword: PUBLIC_RXDB_PASSWORD,
   });

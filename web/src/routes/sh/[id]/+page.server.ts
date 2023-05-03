@@ -4,17 +4,16 @@ import {
   JWT_MASTER_DB_USER,
   JWT_SHOW_DB_SECRET,
   JWT_SHOW_DB_USER,
-  PRIVATE_MASTER_DB_ENDPOINT,
+  MASTER_DB_ENDPOINT,
 } from '$env/static/private';
 import { PUBLIC_RXDB_PASSWORD, PUBLIC_TICKET_PATH } from '$env/static/public';
-import { showDB } from '$lib/ORM/dbs/showDB';
-import type { ShowDocType } from '$lib/ORM/models/show';
-import { StorageType } from '$lib/ORM/rxdb';
-import { createShowMachineService } from '$lib/machines/showMachine';
-import { mensNames } from '$lib/util/mensNames';
-import { createPinHash } from '$lib/util/pin';
+import { showDB } from 'plib/dist/ORM/dbs/showDB';
+import type { ShowDocType } from 'plib/dist/ORM/models/show';
+import { StorageType } from 'plib/dist/ORM/rxdb';
+import { createShowMachineService } from 'plib/dist/machines/showMachine';
+import { mensNames } from 'plib/dist/util/mensNames';
+import { createPinHash } from 'plib/dist/util/pin';
 import { error, fail, redirect } from '@sveltejs/kit';
-import { url } from 'inspector';
 import jwt from 'jsonwebtoken';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 import urlJoin from 'url-join';
@@ -45,7 +44,7 @@ export const load: import('./$types').PageServerLoad = async ({ params }) => {
   );
 
   const db = await showDB(showId, masterToken, {
-    endPoint: PRIVATE_MASTER_DB_ENDPOINT,
+    endPoint: MASTER_DB_ENDPOINT,
     storageType: StorageType.NODE_WEBSQL,
     rxdbPassword: PUBLIC_RXDB_PASSWORD,
   });
@@ -82,7 +81,7 @@ const getShow = async (showId: string) => {
     { keyid: JWT_MASTER_DB_USER }
   );
   const db = await showDB(showId, masterToken, {
-    endPoint: PRIVATE_MASTER_DB_ENDPOINT,
+    endPoint: MASTER_DB_ENDPOINT,
     storageType: StorageType.NODE_WEBSQL,
     rxdbPassword: PUBLIC_RXDB_PASSWORD,
   });

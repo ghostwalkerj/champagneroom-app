@@ -1,6 +1,6 @@
-import type { AgentDocument } from '$lib/ORM/models/agent';
+import type { AgentDocument } from './agent';
 
-import type { TalentDocument } from '$lib/ORM/models/talent';
+import type { TalentDocument } from './talent';
 import {
   toTypedRxJsonSchema,
   type ExtractDocumentTypeFromTypedRxJsonSchema,
@@ -9,8 +9,8 @@ import {
   type RxJsonSchema,
 } from 'rxdb';
 
-import type { TicketStateCallbackType } from '$lib/machines/ticketMachine';
-import { ActorType } from '$lib/util/constants';
+import type { TicketStateCallbackType } from '../../machines/ticketMachine';
+import { ActorType } from '../../util/constants';
 import { nanoid } from 'nanoid';
 import type { ShowDocument } from './show';
 import {

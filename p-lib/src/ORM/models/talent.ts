@@ -1,4 +1,4 @@
-import type { AgentDocument } from '$lib/ORM/models/agent';
+import type { AgentDocument } from './agent';
 import { nanoid } from 'nanoid';
 import {
   toTypedRxJsonSchema,

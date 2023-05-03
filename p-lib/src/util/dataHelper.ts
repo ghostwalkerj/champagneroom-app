@@ -1,7 +1,7 @@
-import type { AgentDocument } from '$lib/ORM/models/agent';
-import type { ShowDocType } from '$lib/ORM/models/show';
-import type { TalentDocument } from '$lib/ORM/models/talent';
-import { womensNames } from '$lib/util/womensNames';
+import type { AgentDocument } from '../ORM/models/agent';
+import type { ShowDocType } from '../ORM/models/show';
+import type { TalentDocument } from '../ORM/models/talent';
+import { womensNames } from './womensNames';
 import { nanoid } from 'nanoid';
 import spacetime from 'spacetime';
 import { uniqueNamesGenerator } from 'unique-names-generator';

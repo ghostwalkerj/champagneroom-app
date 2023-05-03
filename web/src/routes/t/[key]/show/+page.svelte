@@ -2,9 +2,9 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { PUBLIC_JITSI_DOMAIN, PUBLIC_TALENT_PATH } from '$env/static/public';
-  import type { ShowDocument } from '$lib/ORM/models/show';
-  import type { TalentDocType } from '$lib/ORM/models/talent';
-  import { jitsiInterfaceConfigOverwrite } from '$lib/util/constants';
+  import type { ShowDocument } from 'plib/dist/ORM/models/show';
+  import type { TalentDocType } from 'plib/dist/ORM/models/talent';
+  import { jitsiInterfaceConfigOverwrite } from 'plib/dist/util/constants';
   import { onDestroy, onMount } from 'svelte';
   import urlJoin from 'url-join';
   import type { PageData } from '../$types';

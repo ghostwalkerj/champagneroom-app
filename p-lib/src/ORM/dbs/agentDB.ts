@@ -4,35 +4,35 @@ import {
   agentSchema,
   agentStaticMethods,
   type AgentCollection,
-} from '$lib/ORM/models/agent';
+} from '../models/agent';
 
 import {
   ShowString,
   showDocMethods,
   showSchema,
   type ShowCollection,
-} from '$lib/ORM/models/show';
+} from '../models/show';
 
 import {
   TalentString,
   talentDocMethods,
   talentSchema,
   type TalentCollection,
-} from '$lib/ORM/models/talent';
+} from '../models/talent';
 import {
   TicketString,
   ticketDocMethods,
   ticketSchema,
   type TicketCollection,
-} from '$lib/ORM/models/ticket';
+} from '../models/ticket';
 
 import {
   TransactionString,
   transactionSchema,
   type TransactionCollection,
-} from '$lib/ORM/models/transaction';
-import type { DatabaseOptions } from '$lib/ORM/rxdb';
-import { StorageType, initRXDB } from '$lib/ORM/rxdb';
+} from '../models/transaction';
+import type { DatabaseOptions } from '../rxdb';
+import { initRXDB } from '../rxdb';
 import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';

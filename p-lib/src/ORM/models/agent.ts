@@ -2,7 +2,7 @@ import {
   TalentString,
   type TalentDocType,
   type TalentDocument,
-} from '$lib/ORM/models/talent';
+} from './talent';
 import { nanoid } from 'nanoid';
 import {
   toTypedRxJsonSchema,

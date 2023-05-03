@@ -1,7 +1,7 @@
-import type { ShowDocument } from '$lib/ORM/models/show';
-import { ShowStatus, type ShowDocType } from '$lib/ORM/models/show';
-import type { TicketDocType, TicketDocument } from '$lib/ORM/models/ticket';
-import type { TransactionDocType } from '$lib/ORM/models/transaction';
+import type { ShowDocument } from '../ORM/models/show';
+import { ShowStatus, type ShowDocType } from '../ORM/models/show';
+import type { TicketDocType, TicketDocument } from '../ORM/models/ticket';
+import type { TransactionDocType } from '../ORM/models/transaction';
 import { nanoid } from 'nanoid';
 import { map, type Observable } from 'rxjs';
 import {

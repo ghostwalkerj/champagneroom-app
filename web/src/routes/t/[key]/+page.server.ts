@@ -4,22 +4,22 @@ import {
   JWT_MASTER_DB_USER,
   JWT_TALENT_DB_SECRET,
   JWT_TALENT_DB_USER,
-  PRIVATE_MASTER_DB_ENDPOINT,
+  MASTER_DB_ENDPOINT,
 } from '$env/static/private';
-import { talentDB } from '$lib/ORM/dbs/talentDB';
-import type { ShowDocument } from '$lib/ORM/models/show';
-import { ShowCancelReason } from '$lib/ORM/models/show';
-import { TicketCancelReason } from '$lib/ORM/models/ticket';
-import { TransactionReasonType } from '$lib/ORM/models/transaction';
-import { StorageType } from '$lib/ORM/rxdb';
-import type { ShowStateType } from '$lib/machines/showMachine';
-import { createShowMachineService } from '$lib/machines/showMachine';
-import { createTicketMachineService } from '$lib/machines/ticketMachine';
-import { ActorType } from '$lib/util/constants';
+import { PUBLIC_RXDB_PASSWORD } from '$env/static/public';
+import { talentDB } from 'plib/dist/ORM/dbs/talentDB';
+import type { ShowDocument } from 'plib/dist/ORM/models/show';
+import { ShowCancelReason } from 'plib/dist/ORM/models/show';
+import { TicketCancelReason } from 'plib/dist/ORM/models/ticket';
+import { TransactionReasonType } from 'plib/dist/ORM/models/transaction';
+import { StorageType } from 'plib/dist/ORM/rxdb';
+import type { ShowStateType } from 'plib/dist/machines/showMachine';
+import { createShowMachineService } from 'plib/dist/machines/showMachine';
+import { createTicketMachineService } from 'plib/dist/machines/ticketMachine';
+import { ActorType } from 'plib/dist/util/constants';
 import { error, fail } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import type { Actions, PageServerLoad } from './$types';
-import { PUBLIC_RXDB_PASSWORD } from '$env/static/public';
 
 const getTalent = async (key: string) => {
   const token = jwt.sign(
@@ -32,7 +32,7 @@ const getTalent = async (key: string) => {
   );
 
   const db = await talentDB(key, token, {
-    endPoint: PRIVATE_MASTER_DB_ENDPOINT,
+    endPoint: MASTER_DB_ENDPOINT,
     storageType: StorageType.NODE_WEBSQL,
     rxdbPassword: PUBLIC_RXDB_PASSWORD,
   });

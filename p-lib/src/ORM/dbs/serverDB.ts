@@ -1,4 +1,5 @@
-import { StorageType, initRXDB } from '$lib/ORM/rxdb';
+import type { DatabaseOptions } from '../rxdb';
+import { initRXDB } from '../rxdb';
 import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
@@ -8,7 +9,7 @@ import {
   showDocMethods,
   showSchema,
   type ShowCollection,
-} from '$lib/ORM/models/show';
+} from '../models/show';
 import { PouchDB, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
 import type { ShowEventCollection } from '../models/showEvent';
 import { ShowEventString, showeventSchema } from '../models/showEvent';
@@ -34,18 +35,21 @@ type ServerCollections = {
 
 export type ServerDBType = RxDatabase<ServerCollections>;
 
-export const serverDB = async (token: string) => {
-  initRXDB(StorageType.NODE_WEBSQL);
+export const serverDB = async (
+  token: string,
+  databaseOptions: DatabaseOptions
+) => {
+  initRXDB(databaseOptions.storageType);
 
   const wrappedStorage = wrappedKeyEncryptionStorage({
-    storage: getRxStoragePouch(StorageType.NODE_WEBSQL),
+    storage: getRxStoragePouch(databaseOptions.storageType),
   });
 
   const _db = await createRxDatabase({
     name: 'pouchdb/pcall_db',
     storage: wrappedStorage,
     ignoreDuplicate: true,
-    password: PUBLIC_RXDB_PASSWORD,
+    password: databaseOptions.rxdbPassword,
   });
 
   await _db.addCollections({
@@ -65,7 +69,7 @@ export const serverDB = async (token: string) => {
   });
 
   // Sync if there is a remote endpoint
-  const remoteDB = new PouchDB(PRIVATE_MASTER_DB_ENDPOINT, {
+  const remoteDB = new PouchDB(databaseOptions.endPoint, {
     fetch: function (
       url: string,
       opts: { headers: { set: (arg0: string, arg1: string) => void } }

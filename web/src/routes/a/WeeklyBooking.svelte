@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { TalentDocument } from '$lib/ORM/models/talent';
+  import type { TalentDocument } from 'plib/dist/ORM/models/talent';
   import Chart from 'chart.js/auto';
   import ChartDataLabels from 'chartjs-plugin-datalabels';
   import spacetime from 'spacetime';
@@ -74,7 +74,7 @@
   Chart.register(ChartDataLabels);
 </script>
 
-<div class="bg-primary text-primary-content  card">
+<div class="bg-primary text-primary-content card">
   <div class="text-center card-body items-center">
     <div class="text-2xl card-title capitalize">Weekly Bookings</div>
     {#if talents && talents.length != 0}

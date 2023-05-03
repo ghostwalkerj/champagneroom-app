@@ -64,5 +64,29 @@
         "workspaceRoot": "/Users/joseph/Dev/pcall/mobile",
         "workspacePath": "src/pages",
         "id": "7xRkFAXJOBoT5yVj"
+    },
+    {
+        "type": "Group",
+        "name": "Server",
+        "parent_id": null,
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "7SCETt1RjdVJA3LM"
+    },
+    {
+        "type": "Directory",
+        "name": "/Users/joseph/Dev/pcall/server/jobs",
+        "parent_id": "7SCETt1RjdVJA3LM",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/server",
+        "workspacePath": "jobs",
+        "id": "GTg7noB6rFfKWw1J"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/server/index.ts",
+        "parent_id": "7SCETt1RjdVJA3LM",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/server",
+        "workspacePath": "index.ts",
+        "id": "RJPbi3DFuyhsn478"
     }
 ]

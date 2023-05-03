@@ -1,5 +1,5 @@
-import type { ShowStateCallbackType } from '$lib/machines/showMachine';
-import { ActorType } from '$lib/util/constants';
+import type { ShowStateCallbackType } from '../../machines/showMachine';
+import { ActorType } from '../../util/constants';
 import { nanoid } from 'nanoid';
 import {
   toTypedRxJsonSchema,

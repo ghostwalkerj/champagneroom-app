@@ -3,15 +3,15 @@ import {
   showDocMethods,
   showSchema,
   type ShowCollection,
-} from '$lib/ORM/models/show';
+} from '../models/show';
 import {
   TalentString,
   talentDocMethods,
   talentSchema,
   type TalentCollection,
-} from '$lib/ORM/models/talent';
-import type { DatabaseOptions } from '$lib/ORM/rxdb';
-import { initRXDB } from '$lib/ORM/rxdb';
+} from '../models/talent';
+import type { DatabaseOptions } from '../rxdb';
+import { initRXDB } from '../rxdb';
 import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';

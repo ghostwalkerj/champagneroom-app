@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import type { ShowDocument } from '$lib/ORM/models/show';
-import type { TicketDocType, TicketDocument } from '$lib/ORM/models/ticket';
-import { TicketStatus } from '$lib/ORM/models/ticket';
-import type { TransactionDocType } from '$lib/ORM/models/transaction';
+import type { ShowDocument } from '../ORM/models/show';
+import type { TicketDocType, TicketDocument } from '../ORM/models/ticket';
+import { TicketStatus } from '../ORM/models/ticket';
+import type { TransactionDocType } from '../ORM/models/transaction';
 import { nanoid } from 'nanoid';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';

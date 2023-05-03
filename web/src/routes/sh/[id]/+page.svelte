@@ -3,16 +3,16 @@
   import { page } from '$app/stores';
 
   import ShowDetail from '$components/ShowDetail.svelte';
-  import { showDB, type ShowDBType } from '$lib/ORM/dbs/showDB';
-  import { ShowStatus, type ShowDocument } from '$lib/ORM/models/show';
-  import getProfileImage from '$lib/util/profilePhoto';
+  import { showDB, type ShowDBType } from 'plib/dist/ORM/dbs/showDB';
+  import { ShowStatus, type ShowDocument } from 'plib/dist/ORM/models/show';
+  import getProfileImage from 'plib/dist/util/profilePhoto';
   import type { ActionData, PageData } from './$types';
   import { PUBLIC_PROFILE_IMAGE_PATH } from '$env/static/public';
   import {
     PUBLIC_RXDB_PASSWORD,
     PUBLIC_SHOW_DB_ENDPOINT,
   } from '$env/static/public';
-  import { StorageType } from '$lib/ORM/rxdb';
+  import { StorageType } from 'plib/dist/ORM/rxdb';
 
   export let data: PageData;
   export let form: ActionData;

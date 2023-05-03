@@ -6,7 +6,7 @@ import {
   JWT_MASTER_DB_USER,
   JWT_TICKET_DB_SECRET,
   JWT_TICKET_DB_USER,
-  PRIVATE_MASTER_DB_ENDPOINT,
+  MASTER_DB_ENDPOINT,
 } from '$env/static/private';
 import {
   PUBLIC_JITSI_DOMAIN,
@@ -14,11 +14,14 @@ import {
   PUBLIC_RXDB_PASSWORD,
   PUBLIC_TICKET_PATH,
 } from '$env/static/public';
-import { ticketDB } from '$lib/ORM/dbs/ticketDB';
-import type { TicketDocType, TicketDocument } from '$lib/ORM/models/ticket';
-import { StorageType } from '$lib/ORM/rxdb';
-import { createTicketMachineService } from '$lib/machines/ticketMachine';
-import { verifyPin } from '$lib/util/pin';
+import { ticketDB } from 'plib/dist/ORM/dbs/ticketDB';
+import type {
+  TicketDocType,
+  TicketDocument,
+} from 'plib/dist/ORM/models/ticket';
+import { StorageType } from 'plib/dist/ORM/rxdb';
+import { createTicketMachineService } from 'plib/dist/machines/ticketMachine';
+import { verifyPin } from 'plib/dist/util/pin';
 import type { Actions } from '@sveltejs/kit';
 import { error, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
@@ -45,7 +48,7 @@ const getTicket = async (ticketId: string) => {
   );
 
   const db = await ticketDB(ticketId, masterToken, {
-    endPoint: PRIVATE_MASTER_DB_ENDPOINT,
+    endPoint: MASTER_DB_ENDPOINT,
     storageType: StorageType.NODE_WEBSQL,
     rxdbPassword: PUBLIC_RXDB_PASSWORD,
   });

@@ -8,16 +8,16 @@
     PUBLIC_TICKET_DB_ENDPOINT,
     PUBLIC_TICKET_PATH,
   } from '$env/static/public';
-  import { createTicketMachineService } from '$lib/machines/ticketMachine';
-  import { ticketDB, type TicketDBType } from '$lib/ORM/dbs/ticketDB';
-  import type { ShowDocument } from '$lib/ORM/models/show';
-  import type { TicketDocument } from '$lib/ORM/models/ticket';
-  import { jitsiInterfaceConfigOverwrite } from '$lib/util/constants';
-  import getProfileImage from '$lib/util/profilePhoto';
+  import { ticketDB, type TicketDBType } from 'plib/dist/ORM/dbs/ticketDB';
+  import type { ShowDocument } from 'plib/dist/ORM/models/show';
+  import type { TicketDocument } from 'plib/dist/ORM/models/ticket';
+  import { type DatabaseOptions, StorageType } from 'plib/dist/ORM/rxdb';
+  import { createTicketMachineService } from 'plib/dist/machines/ticketMachine';
+  import { jitsiInterfaceConfigOverwrite } from 'plib/dist/util/constants';
+  import getProfileImage from 'plib/dist/util/profilePhoto';
   import { onDestroy, onMount } from 'svelte';
   import urlJoin from 'url-join';
   import type { PageData } from '../$types';
-  import { DatabaseOptions, StorageType } from '$lib/ORM/rxdb';
 
   export let data: PageData;
 

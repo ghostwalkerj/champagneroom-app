@@ -4,20 +4,18 @@ import {
   JWT_EXPIRY,
   JWT_MASTER_DB_SECRET,
   JWT_MASTER_DB_USER,
-  PRIVATE_MASTER_DB_ENDPOINT,
+  MASTER_DB_ENDPOINT,
 } from '$env/static/private';
 import {
   PUBLIC_JITSI_DOMAIN,
   PUBLIC_RXDB_PASSWORD,
   PUBLIC_TALENT_PATH,
 } from '$env/static/public';
-import { talentDB } from '$lib/ORM/dbs/talentDB';
-import type { ShowDocument } from '$lib/ORM/models/show';
-import { TicketCancelReason } from '$lib/ORM/models/ticket';
-import { StorageType } from '$lib/ORM/rxdb';
-import { createShowMachineService } from '$lib/machines/showMachine';
-import { createTicketMachineService } from '$lib/machines/ticketMachine';
-import { ActorType } from '$lib/util/constants';
+import { talentDB } from 'plib/dist/ORM/dbs/talentDB';
+import type { ShowDocument } from 'plib/dist/ORM/models/show';
+import { StorageType } from 'plib/dist/ORM/rxdb';
+import { createShowMachineService } from 'plib/dist/machines/showMachine';
+import { createTicketMachineService } from 'plib/dist/machines/ticketMachine';
 import type { Actions } from '@sveltejs/kit';
 import { error, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
@@ -34,7 +32,7 @@ const getShow = async (key: string) => {
   );
 
   const db = await talentDB(key, token, {
-    endPoint: PRIVATE_MASTER_DB_ENDPOINT,
+    endPoint: MASTER_DB_ENDPOINT,
     storageType: StorageType.NODE_WEBSQL,
     rxdbPassword: PUBLIC_RXDB_PASSWORD,
   });

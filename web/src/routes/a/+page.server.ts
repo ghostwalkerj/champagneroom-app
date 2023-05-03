@@ -4,15 +4,15 @@ import {
   JWT_EXPIRY,
   JWT_MASTER_DB_SECRET,
   JWT_MASTER_DB_USER,
-  PRIVATE_MASTER_DB_ENDPOINT,
+  MASTER_DB_ENDPOINT,
 } from '$env/static/private';
-import { agentDB } from '$lib/ORM/dbs/agentDB';
-import { getAgentId } from '$lib/ORM/models/agent';
-import { StorageType } from '$lib/ORM/rxdb';
+import { PUBLIC_RXDB_PASSWORD } from '$env/static/public';
+import { agentDB } from 'plib/dist/ORM/dbs/agentDB';
+import { getAgentId } from 'plib/dist/ORM/models/agent';
+import { StorageType } from 'plib/dist/ORM/rxdb';
 import { fail } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import type { Actions, PageServerLoad } from './$types';
-import { PUBLIC_RXDB_PASSWORD } from '$env/static/public';
 
 //TODO: Only return token if agent address is good.  How?
 export const load: PageServerLoad = async () => {
@@ -51,7 +51,7 @@ export const actions: Actions = {
     );
 
     const db = await agentDB(agentId, token, {
-      endPoint: PRIVATE_MASTER_DB_ENDPOINT,
+      endPoint: MASTER_DB_ENDPOINT,
       storageType: StorageType.NODE_WEBSQL,
       rxdbPassword: PUBLIC_RXDB_PASSWORD,
     });
@@ -100,7 +100,7 @@ export const actions: Actions = {
     );
 
     const db = await agentDB(agentId, token, {
-      endPoint: PRIVATE_MASTER_DB_ENDPOINT,
+      endPoint: MASTER_DB_ENDPOINT,
       storageType: StorageType.NODE_WEBSQL,
       rxdbPassword: PUBLIC_RXDB_PASSWORD,
     });

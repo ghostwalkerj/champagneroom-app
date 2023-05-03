@@ -1,47 +1,58 @@
-import type { DatabaseOptions } from '$lib/ORM/rxdb';
-import { initRXDB } from '$lib/ORM/rxdb';
+import type { DatabaseOptions } from '../rxdb';
+import { initRXDB } from '../rxdb';
 import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
 
+import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
+
 import {
-  ShowString,
   showDocMethods,
   showSchema,
+  ShowString,
   type ShowCollection,
-  type ShowDocument,
-} from '$lib/ORM/models/show';
-import { PouchDB, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
-import type { ShowEventCollection } from '../models/showEvent';
-import { ShowEventString, showeventSchema } from '../models/showEvent';
+} from '../models/show';
 import {
-  TicketString,
+  ticketDocMethods,
   ticketSchema,
+  TicketString,
   type TicketCollection,
+  type TicketDocument,
 } from '../models/ticket';
 import {
-  TransactionString,
+  showeventSchema,
+  ShowEventString,
+  type ShowEventCollection,
+} from '../models/showEvent';
+import {
   transactionSchema,
+  TransactionString,
   type TransactionCollection,
 } from '../models/transaction';
 
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 0;
-type ShowCollections = {
-  shows: ShowCollection;
+type PublicCollections = {
   tickets: TicketCollection;
+  shows: ShowCollection;
   showevents: ShowEventCollection;
   transactions: TransactionCollection;
 };
 
-export type ShowDBType = RxDatabase<ShowCollections>;
-const _showDB = new Map<string, ShowDBType>();
-export const showDB = async (
-  showId: string,
+export type TicketDBType = RxDatabase<PublicCollections>;
+const _ticketDB = new Map<string, TicketDBType>();
+export const ticketDB = async (
+  ticketId: string,
+  token: string,
+  databaseOptions: DatabaseOptions
+): Promise<TicketDBType> => await create(ticketId, token, databaseOptions);
+
+const create = async (
+  ticketId: string,
   token: string,
   databaseOptions: DatabaseOptions
 ) => {
-  let _db = _showDB.get(showId);
+  let _db = _ticketDB.get(ticketId);
   if (_db) return _db;
 
   const storageType = databaseOptions.storageType;
@@ -61,6 +72,10 @@ export const showDB = async (
   });
 
   await _db.addCollections({
+    tickets: {
+      schema: ticketSchema,
+      methods: ticketDocMethods,
+    },
     shows: {
       schema: showSchema,
       methods: showDocMethods,
@@ -68,15 +83,11 @@ export const showDB = async (
     showevents: {
       schema: showeventSchema,
     },
-    tickets: {
-      schema: ticketSchema,
-    },
     transactions: {
       schema: transactionSchema,
     },
   });
 
-  // Sync if there is a remote endpoint
   const remoteDB = new PouchDB(endPoint, {
     fetch: function (
       url: string,
@@ -86,46 +97,52 @@ export const showDB = async (
       return PouchDB.fetch(url, opts);
     },
   });
-
-  const showQuery = _db.shows
-    .findOne(showId)
-    .where('entityType')
-    .eq(ShowString);
-
   const ticketQuery = _db.tickets
-    .find()
-    .where('show')
-    .eq(showId)
+    .findOne(ticketId)
     .where('entityType')
     .eq(TicketString);
 
-  const showeventQuery = _db.showevents
-    .find()
-    .where('show')
-    .eq(showId)
-    .where('entityType')
-    .eq(ShowEventString);
-
-  const transactionQuery = _db.transactions
-    .find()
-    .where('show')
-    .eq(showId)
-    .where('entityType')
-    .eq(TransactionString);
-
-  const repState = _db.shows.syncCouchDB({
+  let repState = _db.tickets.syncCouchDB({
     remote: remoteDB,
     waitForLeadership: false,
     options: {
       retry: true,
     },
-    query: showQuery,
+    query: ticketQuery,
   });
   await repState.awaitInitialReplication();
 
-  const show = (await showQuery.exec()) as ShowDocument;
+  const ticket = (await ticketQuery.exec()) as TicketDocument;
+  if (ticket?.ticketState.active) {
+    const showQuery = _db.shows
+      .findOne(ticket.show)
+      .where('entityType')
+      .eq(ShowString);
 
-  if (show && show.showState.active) {
+    const showeventQuery = _db.showevents
+      .find()
+      .where('ticket')
+      .eq(ticket._id)
+      .where('entityType')
+      .eq(ShowEventString);
+
+    const transactionQuery = _db.transactions
+      .find()
+      .where('ticket')
+      .eq(ticketId)
+      .where('entityType')
+      .eq(TransactionString);
+
+    repState = _db.shows.syncCouchDB({
+      remote: remoteDB,
+      waitForLeadership: false,
+      options: {
+        retry: true,
+      },
+      query: showQuery,
+    });
+    await repState.awaitInitialReplication();
+
     _db.shows.syncCouchDB({
       remote: remoteDB,
       waitForLeadership: false,
@@ -136,7 +153,16 @@ export const showDB = async (
       query: showQuery,
     });
 
-    // Live sync showevents
+    repState = _db.tickets.syncCouchDB({
+      remote: remoteDB,
+      waitForLeadership: false,
+      options: {
+        retry: true,
+        live: true,
+      },
+      query: ticketQuery,
+    });
+
     _db.showevents.syncCouchDB({
       remote: remoteDB,
       waitForLeadership: false,
@@ -147,18 +173,6 @@ export const showDB = async (
       query: showeventQuery,
     });
 
-    // Live sync tickets
-    _db.tickets.syncCouchDB({
-      remote: remoteDB,
-      waitForLeadership: false,
-      options: {
-        retry: true,
-        live: true,
-      },
-      query: ticketQuery,
-    });
-
-    // Live sync transactions
     _db.transactions.syncCouchDB({
       remote: remoteDB,
       waitForLeadership: false,
@@ -169,7 +183,6 @@ export const showDB = async (
       query: transactionQuery,
     });
   }
-
-  _showDB.set(showId, _db);
+  _ticketDB.set(ticketId, _db);
   return _db;
 };

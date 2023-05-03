@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type { TalentDocument } from '$lib/ORM/models/talent';
-  import { currencyFormatter } from '$lib/util/constants';
+  import type { TalentDocument } from 'plib/dist/ORM/models/talent';
+  import { currencyFormatter } from 'plib/dist/util/constants';
   import Chart from 'chart.js/auto';
   import ChartDataLabels from 'chartjs-plugin-datalabels';
   import spacetime from 'spacetime';
@@ -57,7 +57,7 @@
   Chart.register(ChartDataLabels);
 </script>
 
-<div class="bg-primary text-primary-content  card">
+<div class="bg-primary text-primary-content card">
   <div class="text-center card-body items-center">
     <div class="text-2xl card-title capitalize">
       Top Talent - {now.monthName()}
