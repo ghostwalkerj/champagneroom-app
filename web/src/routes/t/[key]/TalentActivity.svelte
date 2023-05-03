@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { LinkDocType } from '$lib/ORM/models/link';
   import { currencyFormatter } from '$lib/util/constants';
   import spacetime from 'spacetime';
   import StarRating from 'svelte-star-rating';
@@ -47,7 +46,7 @@
                   {currencyFormatter.format(call.linkState.totalFunding)}
                 </div>
               </div>
-              <div class="flex  flex-row w-full">
+              <div class="flex flex-row w-full">
                 {#if call.linkState.feedback}
                   <div class="ml-3 -mb-3">
                     <StarRating rating={call.linkState.feedback.rating ?? 0} />

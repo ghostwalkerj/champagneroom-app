@@ -1,4 +1,8 @@
 <script lang="ts">
+  import {
+    PUBLIC_DEFAULT_PROFILE_IMAGE,
+    PUBLIC_PROFILE_IMAGE_PATH,
+  } from '$env/static/public';
   import type { ShowDocType } from '$lib/ORM/models/show';
   import type { TicketDocType } from '$lib/ORM/models/ticket';
   import { currencyFormatter, durationFormatter } from '$lib/util/constants';
@@ -6,7 +10,12 @@
   export let show: ShowDocType | null;
   export let ticket: TicketDocType | null;
 
-  $: profileImage = getProfileImage(ticket?.ticketState.reservation.name);
+  $: profileImage = ticket
+    ? getProfileImage(
+        ticket.ticketState.reservation.name,
+        PUBLIC_PROFILE_IMAGE_PATH
+      )
+    : PUBLIC_DEFAULT_PROFILE_IMAGE;
   $: ticketStatus = ticket
     ? ticket.ticketState.totalPaid >= ticket.ticketState.price
       ? 'Paid' + ' ' + ticket.ticketState.status

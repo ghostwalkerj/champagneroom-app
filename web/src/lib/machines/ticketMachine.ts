@@ -15,11 +15,16 @@ import {
   spawn,
   type StateFrom,
 } from 'xstate';
-import type { ShowMachineType } from './showMachine';
+import type { ShowMachineOptions, ShowMachineType } from './showMachine';
 import { createShowMachine } from './showMachine';
 
 type TicketStateType = TicketDocType['ticketState'];
-// const PAYMENT_PERIOD = +PUBLIC_ESCROW_PERIOD || 3600000;
+export type TicketMachineOptions = {
+  saveState: boolean;
+  observeState: boolean;
+  gracePeriod?: number;
+  escrowPeriod?: number;
+};
 
 export type TicketStateCallbackType = (
   state: TicketStateType
@@ -40,22 +45,15 @@ const createTicketStateObservable = (ticketDocument: TicketDocument) => {
   );
 };
 
-export const createTicketMachine = ({
-  ticketDocument,
-  showDocument,
-  saveState,
-  observeState,
-}: {
-  ticketDocument: TicketDocument;
-  showDocument: ShowDocument;
-  saveState: boolean;
-  observeState: boolean;
-}) => {
-  const parentShowMachine = createShowMachine({
+export const createTicketMachine = (
+  ticketDocument: TicketDocument,
+  showDocument: ShowDocument,
+  tickeMachineOptions: TicketMachineOptions
+) => {
+  const parentShowMachine = createShowMachine(
     showDocument,
-    saveState,
-    observeState,
-  });
+    tickeMachineOptions as ShowMachineOptions
+  );
   /** @xstate-layout N4IgpgJg5mDOIC5QBcCWBjA1mZBZAhugBaoB2YAxACoCSAwgNICiVAylQIJVMAEAqgAUAIlyYBtAAwBdRKAAOAe1io0C0rJAAPRABYATABoQAT0QBGABwBWHQDo9VgMx6dATlcB2F3sc6Avn5GaFg4BMRklKwAEgDyAOo8dBwAcnRMADLpTEKSMkggisqq6vnaCPpGpghmeha2VhKNEhauVgBsro0ejgFBGNh4hCTkFNHxiSlpmdliZnnySiqoahplFSaIjq5mtq2OZjoNVhYSjha9IMEDYcNgtlc46Qr4EJAUuRqFSyuliG2ntlONVcegkbS8ZjBlUQnis9hBtQknmanR6gUu-VCQwi90xyCeLzes3mBUWxVWiGOjkB+z0ILBEKhGwQ+x2bXaem6nLMnVcFg8Fweg3C5FxIXxz1eEHeehJX3JvwQXmhCE5OjatgsW1qjnZVksFn86KFNxxQoJUvejjlZOWJVAZX+1KBdNB4L0kLaKr0HtcgJakKc6osbXBgrxptF5slRJ0NqKdopCCsrmdtPp7s9KpsdXZbT0-wkOh0NQ8ZnD4sjd2jhOlYis8e+9q0lMMzMcEic9kc+s6EjMBzaFeu2KjeItRLajYVDspWppwLdjK9zJc7U1WyLblq7Vcw6xIruACc4GAjwA3SC2ADu+CWpCgOgE+GMAFswKRkBQBBwAJq4JhkioHgACUmDSGgADUZmkT5bR+WdqgcP1DlZbYJA8EszBVDx1x0Zx0JODsGnOY0I1HY9TwvK9b3vR9nzfD8vx-f9AOAsCIOgnI5jghMEJbaorAcQF82OCQfS2GoLBVUMPFsMwOUNEFULacsyMrCjbBPWAz0vCAbzvNAHyfF930-CgwIART4Jh2AmVIMnSLgaBiZIPnyeVE0VUEalsRxMNcNxDkOdppOZA510hdUDlTU4LBDfdhVuLSqL0gy6JMxjzKsmy7KSBzMmc1ziV4psk08OS6Q6HddSEnQVRqYTjm2Tl+VDJEh3UkdDxSnTqP02ijPo0ymPeWCPPg5syhqFNbFQgd0MwgccMhOaCP5ftAscLZEqrXrdJowyyEfVgiAUa8LKYazbOA-Kpic2hivGhY+KmxAfL0PyAqCmwrFChq2n2OazDLXDOx0DwMIFLqD2S7SDoGo7jNO87LuuvLJkcoq3J4ibXqTAceV2MEfHw8FXAas5PtdNUew6dxds0+H+vSoadBRi6ACkYhoZJsh4MY4ncl6yu8-tPv8oLAt+-7wvcOSvE8HsQc6As9xhpKcWZtKTwARwAVzgZBIDofBSHQMAABtLfwYpWeOnQQLAAAzfXSGlMCADE+GSIRQPApgoJg6cvMQj6vql4K-raMKqhmuxtpaQ0PTpRpOr6DSeu1q89cN2BjYgU3zatm27cGh2ndd93Lu933-c4mZcZFmcBLMQHPqLGPk-+Dx+SsBqXDqDwEUwun3HVjPurhsBIDAd9pSyT3gMF4XSXx7zh79DohKRD1xcw70Bw1M4Uw7NuKrRSfYa1mfXnnihud5-mV+etfRbD7o7E-jtXFDD1sNXOJCQa1OQYROB6QG6cMSZ2nrPe+gseCASEMHUqLdHRtiqKnBOuELAFkOLhAc0Mr6a1FGQJgsB0BHlRp7Jg2QABCHBGD10DlxVenl+JlC2NSMGpw2jqh8LhXU3oQxwm2iCDwkMSxVSgSaTSZCKFUIukIGgrABB8G4DwXmNBaCiByK-dhb0WSplsDw3U-D-JOBXFUM+dgeQhh0J2Voa5obolIAoV48B8iyMPKg0OAkAC0VjED+LhOPMJ4TcGtEZj1GsUpfEcN0NtExeZDg+hcN0VoDV+RyQhr-QGacfC1GidPPqel4mGO2HYKqIJrC1RcNmYetg8zISDBI7oxSb6lMOhlBiZlkDlIJl0XY1Tf5Fg9IaHCgV6iiQkfFJwBxSLEL2tnRGGUOYDMVL-amv8amWLqgDVoTS+TFjML4TsEiOmihWSlA2RsTZmwttbW2fiDEE2OHYTu8V9A9z7g1NuOwaY6BaO6Bxl9oFT06QjG5ecC5F0eaXO09tjKVzdhADZiEQbiSaQ4-4Phf4gxDJTDwGo7HtG6CDNpizwXXyubfOekB0UCR8BYNkSJnBbAcWy+qq4PRyTEQpBw-kqaXLuOgB5JcGV43fkyqR8l2gKWOPmGOEiAZt2JuCfUxFpYyPIj1Z2ZB8CW1QAAL0lc3PxjpTm7ENOqXw+oOSOGEVYHJPYUzOu3r4EVth5GUPOoysonJqT-FTN0dkbgywU3bFubsQk-qnPBBInVMCcRkCEKgWAch9bG39ZSTwTSI2cnZAtY4KpnCNHkkWX+21xJajRAEIAA */
   return createMachine(
     {
@@ -120,7 +118,7 @@ export const createTicketMachine = ({
       entry: assign(() => {
         const showMachineRef = spawn(parentShowMachine, { sync: true });
 
-        if (observeState) {
+        if (tickeMachineOptions.observeState) {
           return {
             ticketStateRef: spawn(createTicketStateObservable(ticketDocument)),
             showMachineRef,
@@ -343,7 +341,7 @@ export const createTicketMachine = ({
     {
       actions: {
         saveTicketState: context => {
-          if (!saveState) return;
+          if (!tickeMachineOptions.saveState) return;
           const ticketState = {
             ...context.ticketState,
             updatedAt: new Date().getTime(),
@@ -590,23 +588,16 @@ export const createTicketMachine = ({
   );
 };
 
-export const createTicketMachineService = ({
-  ticketDocument,
-  showDocument,
-  saveState,
-  observeState,
-}: {
-  ticketDocument: TicketDocument;
-  showDocument: ShowDocument;
-  saveState: boolean;
-  observeState: boolean;
-}) => {
-  const ticketMachine = createTicketMachine({
+export const createTicketMachineService = (
+  ticketDocument: TicketDocument,
+  showDocument: ShowDocument,
+  tickeMachineOptions: TicketMachineOptions
+) => {
+  const ticketMachine = createTicketMachine(
     ticketDocument,
     showDocument,
-    saveState,
-    observeState,
-  });
+    tickeMachineOptions
+  );
   return interpret(ticketMachine).start();
 };
 

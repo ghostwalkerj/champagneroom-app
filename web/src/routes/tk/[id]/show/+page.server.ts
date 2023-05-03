@@ -11,6 +11,7 @@ import {
 import {
   PUBLIC_JITSI_DOMAIN,
   PUBLIC_PIN_PATH,
+  PUBLIC_RXDB_PASSWORD,
   PUBLIC_TICKET_PATH,
 } from '$env/static/public';
 import { ticketDB } from '$lib/ORM/dbs/ticketDB';
@@ -46,6 +47,7 @@ const getTicket = async (ticketId: string) => {
   const db = await ticketDB(ticketId, masterToken, {
     endPoint: PRIVATE_MASTER_DB_ENDPOINT,
     storageType: StorageType.NODE_WEBSQL,
+    rxdbPassword: PUBLIC_RXDB_PASSWORD,
   });
   if (!db) {
     throw error(500, 'no db');
@@ -89,11 +91,9 @@ export const load: import('./$types').PageServerLoad = async ({
   }
 
   // Check if can watch the show
-  const ticketService = createTicketMachineService({
-    ticketDocument: _ticket,
-    showDocument: _show,
+  const ticketService = createTicketMachineService(_ticket, _show, {
     saveState: true,
-    observeState: false,
+    observeState: true,
   });
   const ticketMachineState = ticketService.getSnapshot();
 
@@ -147,13 +147,10 @@ export const actions: Actions = {
       pinHash &&
       verifyPin(ticketId, ticket.ticketState.reservation.pin, pinHash)
     ) {
-      const ticketService = createTicketMachineService({
-        ticketDocument: ticket,
-        showDocument: show,
+      const ticketService = createTicketMachineService(ticket, show, {
         saveState: true,
-        observeState: false,
+        observeState: true,
       });
-
       ticketService.send('LEFT SHOW');
     }
     return { success: true };

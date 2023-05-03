@@ -22,6 +22,7 @@ export enum StorageType {
 export type DatabaseOptions = {
   endPoint: string;
   storageType: StorageType;
+  rxdbPassword: string;
 };
 
 export const initRXDB = (storage: StorageType) => {

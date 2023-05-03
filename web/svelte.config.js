@@ -7,6 +7,7 @@ const config = {
   kit: {
     adapter: adapter(),
     csrf: { checkOrigin: false },
+    alias: { $components: './src/components' },
   },
   preprocess: [
     preprocess({

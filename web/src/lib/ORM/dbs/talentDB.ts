@@ -1,8 +1,4 @@
 import {
-  PUBLIC_RXDB_PASSWORD,
-  PUBLIC_TALENT_DB_ENDPOINT,
-} from '$env/static/public';
-import {
   ShowString,
   showDocMethods,
   showSchema,
@@ -15,7 +11,7 @@ import {
   type TalentCollection,
 } from '$lib/ORM/models/talent';
 import type { DatabaseOptions } from '$lib/ORM/rxdb';
-import { StorageType, initRXDB } from '$lib/ORM/rxdb';
+import { initRXDB } from '$lib/ORM/rxdb';
 import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
@@ -50,23 +46,19 @@ const _talentDB = new Map<string, TalentDBType>();
 export const talentDB = async (
   key: string,
   token: string,
-  databaseOptions?: DatabaseOptions
+  databaseOptions: DatabaseOptions
 ) => await create(key, token, databaseOptions);
 
 const create = async (
   key: string,
   token: string,
-  databaseOptions?: DatabaseOptions
+  databaseOptions: DatabaseOptions
 ) => {
   let _db = _talentDB.get(key);
   if (_db) return _db;
 
-  const storageType = databaseOptions
-    ? databaseOptions.storageType
-    : StorageType.IDB;
-  const endPoint = databaseOptions
-    ? databaseOptions.endPoint
-    : PUBLIC_TALENT_DB_ENDPOINT;
+  const storageType = databaseOptions.storageType;
+  const endPoint = databaseOptions.endPoint;
 
   initRXDB(storageType);
 
@@ -78,7 +70,7 @@ const create = async (
     name: 'pouchdb/pcall_db',
     storage: wrappedStorage,
     ignoreDuplicate: true,
-    password: PUBLIC_RXDB_PASSWORD,
+    password: databaseOptions.rxdbPassword,
   });
 
   await _db.addCollections({

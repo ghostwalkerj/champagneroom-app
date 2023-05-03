@@ -11,6 +11,11 @@
   import TalentTable from './TalentTable.svelte';
   import TopTalent from './TopTalent.svelte';
   import WeeklyBooking from './WeeklyBooking.svelte';
+  import {
+    PUBLIC_AGENT_DB_ENDPOINT,
+    PUBLIC_RXDB_PASSWORD,
+  } from '$env/static/public';
+  import { StorageType } from '$lib/ORM/rxdb';
 
   export let data: PageData;
   export let form: ActionData;
@@ -23,7 +28,11 @@
     selectedAccount.subscribe(async account => {
       if (account) {
         const agentId = getAgentId(account);
-        const db = await agentDB(agentId, token);
+        const db = await agentDB(agentId, token, {
+          endPoint: PUBLIC_AGENT_DB_ENDPOINT,
+          storageType: StorageType.IDB,
+          rxdbPassword: PUBLIC_RXDB_PASSWORD,
+        });
         db?.agents
           .findOne(agentId)
           .exec()
@@ -64,7 +73,7 @@
     <main class="p-10">
       <!-- Page header -->
       {#key agent._id}
-        <div class="bg-black  rounded-lg mx-auto py-4 px-4 sm:px-6 lg:px-8">
+        <div class="bg-black rounded-lg mx-auto py-4 px-4 sm:px-6 lg:px-8">
           <div class="font-semibold text-primary text-md leading-6">
             Agent Dashboard
 
@@ -89,13 +98,13 @@
               <TalentForm {form} {agent} />
             </div>
             {#key talents}
-              <div class="p-1 row-span-2 ">
+              <div class="p-1 row-span-2">
                 <TopTalent {talents} />
               </div>
-              <div class="p-1  lg:col-span-2">
+              <div class="p-1 lg:col-span-2">
                 <WeeklyBooking {talents} />
               </div>
-              <div class="p-1  lg:col-span-2">
+              <div class="p-1 lg:col-span-2">
                 <TalentTable {talents} />
               </div>
             {/key}

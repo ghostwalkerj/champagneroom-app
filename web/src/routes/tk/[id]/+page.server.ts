@@ -6,7 +6,7 @@ import {
   JWT_TICKET_DB_USER,
   PRIVATE_MASTER_DB_ENDPOINT,
 } from '$env/static/private';
-import { PUBLIC_PIN_PATH } from '$env/static/public';
+import { PUBLIC_PIN_PATH, PUBLIC_RXDB_PASSWORD } from '$env/static/public';
 import { ticketDB } from '$lib/ORM/dbs/ticketDB';
 import type {
   TicketDisputeReason,
@@ -47,6 +47,7 @@ const getTicket = async (ticketId: string) => {
   const db = await ticketDB(ticketId, masterToken, {
     endPoint: PRIVATE_MASTER_DB_ENDPOINT,
     storageType: StorageType.NODE_WEBSQL,
+    rxdbPassword: PUBLIC_RXDB_PASSWORD,
   });
   if (!db) {
     throw error(500, 'no db');
@@ -108,9 +109,7 @@ export const actions: import('./$types').Actions = {
     }
 
     const { ticket, show } = await getTicket(ticketId);
-    const ticketService = createTicketMachineService({
-      ticketDocument: ticket,
-      showDocument: show,
+    const ticketService = createTicketMachineService(ticket, show, {
       saveState: true,
       observeState: true,
     });
@@ -138,9 +137,7 @@ export const actions: import('./$types').Actions = {
 
     const { ticket, show } = await getTicket(ticketId);
 
-    const ticketService = createTicketMachineService({
-      ticketDocument: ticket,
-      showDocument: show,
+    const ticketService = createTicketMachineService(ticket, show, {
       saveState: true,
       observeState: true,
     });
@@ -197,9 +194,7 @@ export const actions: import('./$types').Actions = {
 
     const { ticket, show } = await getTicket(ticketId);
 
-    const ticketService = createTicketMachineService({
-      ticketDocument: ticket,
-      showDocument: show,
+    const ticketService = createTicketMachineService(ticket, show, {
       saveState: true,
       observeState: true,
     });
@@ -240,9 +235,7 @@ export const actions: import('./$types').Actions = {
 
     const { ticket, show } = await getTicket(ticketId);
 
-    const ticketService = createTicketMachineService({
-      ticketDocument: ticket,
-      showDocument: show,
+    const ticketService = createTicketMachineService(ticket, show, {
       saveState: true,
       observeState: true,
     });

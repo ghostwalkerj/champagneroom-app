@@ -3,9 +3,11 @@
   import { page } from '$app/stores';
   import {
     PUBLIC_DEFAULT_PROFILE_IMAGE,
+    PUBLIC_RXDB_PASSWORD,
     PUBLIC_SHOW_PATH,
+    PUBLIC_TALENT_DB_ENDPOINT,
   } from '$env/static/public';
-  import ProfilePhoto from '$lib/components/forms/ProfilePhoto.svelte';
+  import ProfilePhoto from '$components/forms/ProfilePhoto.svelte';
   import {
     createShowMachineService,
     ShowEventType,
@@ -20,13 +22,14 @@
   import StarRating from 'svelte-star-rating';
 
   import { goto } from '$app/navigation';
-  import ShowDetail from '$lib/components/ShowDetail.svelte';
+  import ShowDetail from '$components/ShowDetail.svelte';
   import { onMount } from 'svelte';
   import * as timeago from 'timeago.js';
   import urlJoin from 'url-join';
   import type { Subscription } from 'xstate';
   import type { PageData } from './$types';
   import TalentWallet from './TalentWallet.svelte';
+  import { StorageType } from '$lib/ORM/rxdb';
 
   export let form: import('./$types').ActionData;
   export let data: PageData;
@@ -129,8 +132,7 @@
             if (_currentShow) {
               currentShow = _currentShow as ShowDocument;
 
-              showMachineService = createShowMachineService({
-                showDocument: _currentShow,
+              showMachineService = createShowMachineService(_currentShow, {
                 saveState: false,
                 observeState: true,
               });
@@ -148,14 +150,18 @@
 
   onMount(() => {
     if (currentShow) {
-      showMachineService = createShowMachineService({
-        showDocument: currentShow,
+      showMachineService = createShowMachineService(currentShow, {
         observeState: false,
         saveState: false,
       });
       useShowMachine(showMachineService);
     }
-    talentDB(key, token).then((db: TalentDBType | undefined) => {
+    const dbOptions = {
+      rxdbPassword: PUBLIC_RXDB_PASSWORD,
+      endPoint: PUBLIC_TALENT_DB_ENDPOINT,
+      storageType: StorageType.IDB,
+    };
+    talentDB(key, token, dbOptions).then((db: TalentDBType | undefined) => {
       if (!db) return;
       db.talents
         .findOne(talent._id)
@@ -193,8 +199,8 @@
           currentShow!._id
         );
         navigator.clipboard.writeText(showUrl);
-        showMachineService = createShowMachineService({
-          showDocument: currentShow,
+        showMachineService = createShowMachineService(
+         currentShow,{
           observeState: false,
           saveState: false,
         });

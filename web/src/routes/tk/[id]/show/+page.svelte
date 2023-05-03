@@ -1,7 +1,13 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import { PUBLIC_JITSI_DOMAIN, PUBLIC_TICKET_PATH } from '$env/static/public';
+  import {
+    PUBLIC_JITSI_DOMAIN,
+    PUBLIC_PROFILE_IMAGE_PATH,
+    PUBLIC_RXDB_PASSWORD,
+    PUBLIC_TICKET_DB_ENDPOINT,
+    PUBLIC_TICKET_PATH,
+  } from '$env/static/public';
   import { createTicketMachineService } from '$lib/machines/ticketMachine';
   import { ticketDB, type TicketDBType } from '$lib/ORM/dbs/ticketDB';
   import type { ShowDocument } from '$lib/ORM/models/show';
@@ -11,12 +17,12 @@
   import { onDestroy, onMount } from 'svelte';
   import urlJoin from 'url-join';
   import type { PageData } from '../$types';
+  import { DatabaseOptions, StorageType } from '$lib/ORM/rxdb';
 
   export let data: PageData;
 
   let ticket = data.ticket as TicketDocument;
   let show = data.show as ShowDocument;
-  const ticketId = $page.params.id;
   const token = data.token;
 
   // @ts-ignore
@@ -39,7 +45,10 @@
 
   const profileImage = urlJoin(
     $page.url.origin,
-    getProfileImage(ticket.ticketState.reservation.name)
+    getProfileImage(
+      ticket.ticketState.reservation.name,
+      PUBLIC_PROFILE_IMAGE_PATH
+    )
   );
 
   onMount(() => {
@@ -65,12 +74,16 @@
       goto(returnUrl);
     });
 
-    ticketDB(ticket._id, token).then(async (db: TicketDBType) => {
+    const dbOptions = {
+      endPoint: PUBLIC_TICKET_DB_ENDPOINT,
+      storageType: StorageType.IDB,
+      rxdbPassword: PUBLIC_RXDB_PASSWORD,
+    } as DatabaseOptions;
+
+    ticketDB(ticket._id, token, dbOptions).then(async (db: TicketDBType) => {
       show = (await db.shows.findOne(show._id).exec()) as ShowDocument;
       ticket = (await db.tickets.findOne(ticket._id).exec()) as TicketDocument;
-      const ticketMachineService = createTicketMachineService({
-        ticketDocument: ticket,
-        showDocument: show,
+      const ticketMachineService = createTicketMachineService(ticket, show, {
         saveState: false,
         observeState: true,
       });

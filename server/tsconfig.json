@@ -6,6 +6,14 @@
   "compilerOptions": {
     "outDir": "dist",
     "module": "esnext",
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "paths": {
+      "$lib": [
+        "./node_modules/pcall/src/lib"
+      ],
+      "$lib/*": [
+        "./node_modules/pcall/src/lib/*"
+      ]
+    },
   }
 }

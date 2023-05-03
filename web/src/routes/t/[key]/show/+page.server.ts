@@ -6,7 +6,11 @@ import {
   JWT_MASTER_DB_USER,
   PRIVATE_MASTER_DB_ENDPOINT,
 } from '$env/static/private';
-import { PUBLIC_JITSI_DOMAIN, PUBLIC_TALENT_PATH } from '$env/static/public';
+import {
+  PUBLIC_JITSI_DOMAIN,
+  PUBLIC_RXDB_PASSWORD,
+  PUBLIC_TALENT_PATH,
+} from '$env/static/public';
 import { talentDB } from '$lib/ORM/dbs/talentDB';
 import type { ShowDocument } from '$lib/ORM/models/show';
 import { TicketCancelReason } from '$lib/ORM/models/ticket';
@@ -32,6 +36,7 @@ const getShow = async (key: string) => {
   const db = await talentDB(key, token, {
     endPoint: PRIVATE_MASTER_DB_ENDPOINT,
     storageType: StorageType.NODE_WEBSQL,
+    rxdbPassword: PUBLIC_RXDB_PASSWORD,
   });
   if (!db) {
     throw error(500, 'no db');
@@ -46,8 +51,7 @@ const getShow = async (key: string) => {
     throw error(404, 'Show not found');
   }
 
-  const showService = createShowMachineService({
-    showDocument: show,
+  const showService = createShowMachineService(show, {
     saveState: true,
     observeState: false,
   });
@@ -119,9 +123,7 @@ export const actions: Actions = {
       const tickets = await show.getActiveTickets();
 
       for (const ticket of tickets) {
-        const ticketService = createTicketMachineService({
-          ticketDocument: ticket,
-          showDocument: show,
+        const ticketService = createTicketMachineService(ticket, show, {
           saveState: true,
           observeState: true,
         });

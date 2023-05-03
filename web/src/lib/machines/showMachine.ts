@@ -1,4 +1,3 @@
-import { PUBLIC_ESCROW_PERIOD, PUBLIC_GRACE_PERIOD } from '$env/static/public';
 import type { ShowDocument } from '$lib/ORM/models/show';
 import { ShowStatus, type ShowDocType } from '$lib/ORM/models/show';
 import type { TicketDocType, TicketDocument } from '$lib/ORM/models/ticket';
@@ -14,24 +13,18 @@ import {
   type StateFrom,
 } from 'xstate';
 
-const GRACE_PERIOD = +PUBLIC_GRACE_PERIOD || 3600000;
-const ESCROW_PERIOD = +PUBLIC_ESCROW_PERIOD || 3600000;
-
 export type ShowStateType = ShowDocType['showState'];
+
+export type ShowMachineOptions = {
+  saveState: boolean;
+  observeState: boolean;
+  gracePeriod?: number;
+  escrowPeriod?: number;
+};
 
 export type ShowStateCallbackType = (
   state: ShowStateType
 ) => Promise<ShowDocument>;
-
-export const graceTimer = (timerStart: number) => {
-  const timer = timerStart + GRACE_PERIOD - new Date().getTime();
-  return timer > 0 ? timer : 0;
-};
-
-export const escrowTimer = (endTime: number) => {
-  const timer = endTime + ESCROW_PERIOD - new Date().getTime();
-  return timer > 0 ? timer : 0;
-};
 
 export enum ShowEventType {
   REQUEST_CANCELLATION = 'REQUEST CANCELLATION',
@@ -55,16 +48,13 @@ const createShowStateObservable = (showDocument: ShowDocument) => {
   );
 };
 
-export const createShowMachine = ({
-  showDocument,
-  saveState,
-  observeState,
-}: {
-  showDocument: ShowDocument;
-  saveState: boolean;
-  observeState: boolean;
-}) => {
-  /** @xstate-layout N4IgpgJg5mDOIC5SwBYHsDuBZAhgYxQEsA7MAYgGUAJAeQHUKAVAQUYFEACAVQAUARVmwDaABgC6iUAAc0sQgBdCaYpJAAPRABYATABoQAT0QBOAOzGAdAGYArDe3GAHKZH3tARm0BfL-tSZcAhIwC38MABk0HAhIMlEJJBAZOUVlVQ0EG2MRa00rU1tHdxtXdwA2fSMEdxERTWsrd0dNZ3zHGytHHz90bHwiUlDeyOjYoXcE6VkFJRVEjKycqzyCmyKSm3LKxHdNLItHfNtTB21NTTrukDDAgZCwkZiIOO1JpOnUudAF7NyjteKpQqhkQJ0s7mKWRsZSsx2M3l8116t2CQ0wjzGVjeyRmaXmiDWSxWhUBm2BVWKjjKDQKZRcdKOZSuN36qIeUSecU02I+s3SBL0IIQjW0jgsLTyOghWXhTMRLKCg3Zo2eQhsPJSfPxmUcRP+6yB2wQ2n2tTK2m0IhO2jKEJEVmZyNZSuGHLGZQ1uK+6gJLj+qwNZKNnjFJVqrkcDmMxjKdkdAWdIQARmg1DQAGbpwh4MA0KRgYhkABKbAAilw2EwOABhZgAOWrbHC4VYAEkaHX4qocZ9+dUyi0LGVnJpTCVGi5HI5g4cbBYrbGrGU6WUnND431FcnUxmszm8wXi2WK1Xaw2my3GO3OxNu7y8d8dgOxcPTKPx+5J9OhbtRRZ3MY+Q2CcA62nkG4ooMKZppm2a5vmhZXtWADSbCMBwJYUGwRYAGpsHwXaJD2WqPtUdTUpo0bRsBNTFE0waeNoByNO0dIiLqnSmBBiYWNBu5wQeiGtihaEYZW2F4QRt5Efe3oZAB5wWNk5qOMY7hWCItHBrCpgWGcIgwh45q1Fx8pOluvE7rB+4IWQSGoehmESW2HYcFeWBsDQXCMIRUyag+PrVMY9gHJajQAjaTSaMGHj1IceQdDowG1A6ZkJhZfHWfBh72aJZ6Ns2+G+e8-lyTsa5DhcMIQoCmifsGIjwuKoqNSptpWNG3EZVZe7ZUJInoRQNDhAR4h3qVfaWuU1jKR0wFjpotpGmYOQiB4zQwnslHnF1dyWTBvWCZQLBFoNtB0MVxEBfJ0JWOKJSRU4n5NDYRqJXpjW2Eu1VNKZPTpXtmWHbZuWOWwABiXB1nwRVjTJE3apatQWB02RvsUY6MUazS6ba0L2mU9qmAOCL-ZugM9XB1YADayLETDMKdHDUPQl2yX2NR1OKv2wmtNoXMYRr5LpJTmqKq7aOYWRymTkHbgdVO07AsSg2JWG4S5dZua2HleT5cN+V6HPkeKVHBaYtGbN+FKS+4Q5qRatrtFS4FpeTqJA4rdPPKr+UXrDnq9tqNTQqbVE0ZpVvBjoOR2K49ijppTik0iAMe5TOY097dnCQ5zPDaNgckYF6n7KKykwgUMZ1Np+RKY0ngtFY2jLJ0u3pwrmdKyrueiSWkPQwH41G8HrfivkLSrqjNpWDFxQo2cI6qeUTipbLPGe132cluWlboX7zaa2zCOkTUi1h9RFuR-RQpI3OZotwC+Sil0bty-t-Fb8rzw7ye+-1gVS815xhF2ujsVwFEzYRzotbHYaw4oxinBaZYgE-qp3dkqeQOAABO8h6YnTOqzA2JUR6kRtCcecA46gAXMEUGMRo8himUmcAEuxNhr3Qe-WAWDcGxGrFwJgNAPJFg4AAKRoK2OsQ94akMCjaDo1gOg1U0s0copghY6CUko1oZh1KRnbpgnBeDnj8MEcIjg4QIb61AWVY0y4mLNHsMnMwzdySIDOLpcMmlOi1CaLsV+68LLcKMbENg0NmbnWPrIjI8IjT8yYrbdo9hm4pwVHtAsnIGZMxZhdYhV1bE1EFFUE0AEDixkJk4yEO0348QyfTc6HBwaSOYOEVsAAtaRhsg6kXyHbSMRRPAdRNNkM4cTDKVVfCuFqtgDEhGwWAAAjgAVzgMY6sOBiA5mptTHAnwLAYBwDMYgUBtBFjAOmJZxAfa9zBgPGGhdh7dLkRA8Ur5iYxnKCadRP5CZik5iZS09gsgBM4TxeZyzVmQHWZssA2zdmzH2YcxQxzTnnMudcgaNYAH+weTIp5GRIxxOJvUOkRRSgnEcT4RExA0AxHgIkNJwRHnFwyAAWjcQgdl84vE8t8S4Gwsy0QRDdBAZlYCEA6DulKF2EJKJWw5ZzJiAJnCNQDHsQVeANlbOppAMVtiLhilUgZUUGlyhZBtHEwCdsnB5AcMuVBJpBVZmIDgamhAABeuq8UssQDCcEn1brFDyPkIWBlwQlFXsYc4HRliCs3n1PVHM6pMSoSpM4XzXo-kWiSxaSDCmxjOHGjOYAs7f0TdqKkOR1oFHKFKDo3yKSLTnDpCepgwSqQ4YywxvDRXevFU0doBxzBPVKLUewb1lzWEbubewrUQVdpCHU3tXSfXGgtkpZoS4xwuEaFGsZq5-zhnOOYYNnbzJ7XBSs7hUKtWwp2U8-Jk1ahilzW21ctpzTAWDLOoc4YkYWjHDYTQgrL2QogNC7V8LlCIqOScs5FyrnlrIVaWOph1h1SJo0YMqwUbGpNQ9c4qUfBAA */
+export const createShowMachine = (
+  showDocument: ShowDocument,
+  showMachineOptions: ShowMachineOptions
+) => {
+  const GRACE_PERIOD = showMachineOptions.gracePeriod || 3600000;
+
+  /** @xstate-layout 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-S4yLitA0NcNDCb33rtG-UOSchwkJCcZoNQdhpvnAXaEnS-TvkuDEjaaj6EQCLdvN1843VODlBNeqIh7BmnOtSMUzQ3UjLujGGhJSO32s5frA1ywzZiORj0yoflLCkRLfCcauaW0onGdM2ZAKFXApWVc1JQ0rRhjuecQkdEvXbBjH7d5BxbB9uiUUo9vzT0QEBYq0FyhwVbJ2Xsg5RzO3XL9HDKJRwzZwkXDOTwI9rQTQUa4C4zEfBAA */
   return createMachine(
     {
       context: {
@@ -136,7 +126,7 @@ export const createShowMachine = ({
       id: 'showMachine',
       initial: 'showLoaded',
       entry: assign(() => {
-        if (!observeState) {
+        if (!showMachineOptions.observeState) {
           return {};
         }
         return {
@@ -342,7 +332,7 @@ export const createShowMachine = ({
     {
       actions: {
         saveShowState: (context, event) => {
-          if (!saveState) return {};
+          if (!showMachineOptions.saveState) return {};
 
           const ticket = 'ticket' in event ? event.ticket : undefined;
           const transaction =
@@ -563,20 +553,11 @@ export const createShowMachine = ({
   );
 };
 
-export const createShowMachineService = ({
-  showDocument,
-  saveState,
-  observeState,
-}: {
-  showDocument: ShowDocument;
-  saveState: boolean;
-  observeState: boolean;
-}) => {
-  const showMachine = createShowMachine({
-    showDocument,
-    saveState,
-    observeState,
-  });
+export const createShowMachineService = (
+  showDocument: ShowDocument,
+  showMachineOptions: ShowMachineOptions
+) => {
+  const showMachine = createShowMachine(showDocument, showMachineOptions);
   showMachine;
   const showService = interpret(showMachine).start();
   return showService;

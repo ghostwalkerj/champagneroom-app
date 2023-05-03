@@ -1,4 +1,3 @@
-import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
 import {
   TalentString,
   type TalentDocType,
@@ -16,7 +15,7 @@ type AgentDocMethods = {
   createTalent: (talentProps: {
     name: string;
     agentCommission: number;
-    profileImageUrl?: string;
+    profileImageUrl: string;
   }) => Promise<TalentDocument>;
 };
 
@@ -32,7 +31,7 @@ export const agentDocMethods: AgentDocMethods = {
     talentProps: {
       name: string;
       agentCommission: number;
-      profileImageUrl?: string;
+      profileImageUrl: string;
     }
   ) {
     const _talent: TalentDocType = {
@@ -41,8 +40,7 @@ export const agentDocMethods: AgentDocMethods = {
       agentCommission: talentProps.agentCommission,
       key: nanoid(),
       agent: this._id,
-      profileImageUrl:
-        talentProps.profileImageUrl || PUBLIC_DEFAULT_PROFILE_IMAGE,
+      profileImageUrl: talentProps.profileImageUrl,
       stats: {
         ratingAvg: 0,
         totalEarnings: 0,

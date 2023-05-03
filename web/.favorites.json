@@ -22,5 +22,13 @@
         "workspaceRoot": "/Users/joseph/Dev/pcall/web",
         "workspacePath": ".env",
         "id": "vUzM1FflEYNKGQBJ"
+    },
+    {
+        "type": "Directory",
+        "name": "/Users/joseph/Dev/pcall/web/src/components",
+        "parent_id": null,
+        "workspaceRoot": "/Users/joseph/Dev/pcall/web",
+        "workspacePath": "src/components",
+        "id": "6tsecdK0Q4C2Pmr1"
     }
 ]

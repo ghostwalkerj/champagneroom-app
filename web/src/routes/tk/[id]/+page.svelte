@@ -17,6 +17,11 @@
 
   import type { ActionData, PageData } from './$types';
   import TicketDetail from './TicketDetail.svelte';
+  import {
+    PUBLIC_RXDB_PASSWORD,
+    PUBLIC_TICKET_DB_ENDPOINT,
+  } from '$env/static/public';
+  import { StorageType } from '$lib/ORM/rxdb';
 
   export let data: PageData;
   export let form: ActionData;
@@ -28,9 +33,7 @@
 
   const showPath = urlJoin($page.url.href, 'show');
   const reasons = Object.values(TicketDisputeReason);
-  let ticketMachineService = createTicketMachineService({
-    ticketDocument: ticket,
-    showDocument: show,
+  let ticketMachineService = createTicketMachineService(ticket, show, {
     saveState: false,
     observeState: false,
   });
@@ -80,31 +83,36 @@
     };
   };
 
-  if (ticket.ticketState.active) {
-    ticketDB(ticketId, token).then(async (db: TicketDBType) => {
-      const _show = (await db.shows.findOne(show._id).exec()) as ShowDocument;
-      _show.$.subscribe(newShow => {
-        show = newShow;
-      });
-      const _ticket = (await db.tickets
-        .findOne(ticketId)
-        .exec()) as TicketDocument;
-      if (ticketMachineService) {
-        ticketMachineService.stop();
-      }
-      _ticket.$.subscribe(newTicket => {
-        ticket = newTicket;
-        waiting4StateChange = false;
-      });
+  onMount(() => {
+    if (ticket.ticketState.active) {
+      const dbOptions = {
+        endPoint: PUBLIC_TICKET_DB_ENDPOINT,
+        storageType: StorageType.IDB,
+        rxdbPassword: PUBLIC_RXDB_PASSWORD,
+      };
+      ticketDB(ticketId, token, dbOptions).then(async (db: TicketDBType) => {
+        const _show = (await db.shows.findOne(show._id).exec()) as ShowDocument;
+        _show.$.subscribe(newShow => {
+          show = newShow;
+        });
+        const _ticket = (await db.tickets
+          .findOne(ticketId)
+          .exec()) as TicketDocument;
+        if (ticketMachineService) {
+          ticketMachineService.stop();
+        }
+        _ticket.$.subscribe(newTicket => {
+          ticket = newTicket;
+          waiting4StateChange = false;
+        });
 
-      ticketMachineService = createTicketMachineService({
-        ticketDocument: _ticket,
-        showDocument: _show,
-        saveState: false,
-        observeState: true,
+        ticketMachineService = createTicketMachineService(_ticket, _show, {
+          saveState: false,
+          observeState: true,
+        });
       });
-    });
-  }
+    }
+  });
 </script>
 
 {#if ticket}

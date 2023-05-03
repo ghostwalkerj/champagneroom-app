@@ -18,7 +18,7 @@ const bree = new Bree({
    * the compiled-to-js code still needs to use JS
    */
   defaultExtension: process.env.TS_NODE ? 'ts' : 'js',
-  jobs: ['job'],
+  jobs: ['runActiveShowMachines'],
 });
 
 await bree.start();

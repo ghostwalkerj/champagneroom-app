@@ -12,6 +12,7 @@ import { StorageType } from '$lib/ORM/rxdb';
 import { fail } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import type { Actions, PageServerLoad } from './$types';
+import { PUBLIC_RXDB_PASSWORD } from '$env/static/public';
 
 //TODO: Only return token if agent address is good.  How?
 export const load: PageServerLoad = async () => {
@@ -52,6 +53,7 @@ export const actions: Actions = {
     const db = await agentDB(agentId, token, {
       endPoint: PRIVATE_MASTER_DB_ENDPOINT,
       storageType: StorageType.NODE_WEBSQL,
+      rxdbPassword: PUBLIC_RXDB_PASSWORD,
     });
 
     let agent = await db.agents.findOne(agentId).exec();
@@ -70,7 +72,7 @@ export const actions: Actions = {
     const agentId = data.get('agentId') as string;
     const name = data.get('name') as string;
     const agentCommission = data.get('agentCommission') as string;
-    const profileImageUrl = data.get('profileImageUrl') as string | undefined;
+    const profileImageUrl = data.get('profileImageUrl') as string;
 
     // Validation
     if (agentId === null) {
@@ -100,6 +102,7 @@ export const actions: Actions = {
     const db = await agentDB(agentId, token, {
       endPoint: PRIVATE_MASTER_DB_ENDPOINT,
       storageType: StorageType.NODE_WEBSQL,
+      rxdbPassword: PUBLIC_RXDB_PASSWORD,
     });
 
     const agent = await db.agents.findOne(agentId).exec();

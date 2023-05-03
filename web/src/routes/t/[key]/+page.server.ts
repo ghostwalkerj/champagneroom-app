@@ -19,6 +19,7 @@ import { ActorType } from '$lib/util/constants';
 import { error, fail } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import type { Actions, PageServerLoad } from './$types';
+import { PUBLIC_RXDB_PASSWORD } from '$env/static/public';
 
 const getTalent = async (key: string) => {
   const token = jwt.sign(
@@ -33,6 +34,7 @@ const getTalent = async (key: string) => {
   const db = await talentDB(key, token, {
     endPoint: PRIVATE_MASTER_DB_ENDPOINT,
     storageType: StorageType.NODE_WEBSQL,
+    rxdbPassword: PUBLIC_RXDB_PASSWORD,
   });
   if (!db) {
     throw error(500, 'no db');
@@ -52,8 +54,7 @@ const getShow = async (key: string) => {
     throw error(404, 'Show not found');
   }
 
-  const showService = createShowMachineService({
-    showDocument: show,
+  const showService = createShowMachineService(show, {
     saveState: true,
     observeState: true,
   });
@@ -201,9 +202,7 @@ export const actions: Actions = {
       for (const ticket of tickets) {
         const show = (await ticket.populate('show')) as ShowDocument;
 
-        const ticketService = createTicketMachineService({
-          ticketDocument: ticket,
-          showDocument: show,
+        const ticketService = createTicketMachineService(ticket, show, {
           saveState: true,
           observeState: true,
         });
@@ -269,9 +268,7 @@ export const actions: Actions = {
     if (showState.matches('requestedCancellation.waiting2Refund')) {
       const tickets = await show.getActiveTickets();
       for (const ticket of tickets) {
-        const ticketService = createTicketMachineService({
-          ticketDocument: ticket,
-          showDocument: show,
+        const ticketService = createTicketMachineService(ticket, show, {
           saveState: true,
           observeState: true,
         });

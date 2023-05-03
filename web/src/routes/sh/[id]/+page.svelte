@@ -2,11 +2,17 @@
   import { applyAction, enhance } from '$app/forms';
   import { page } from '$app/stores';
 
-  import ShowDetail from '$lib/components/ShowDetail.svelte';
+  import ShowDetail from '$components/ShowDetail.svelte';
   import { showDB, type ShowDBType } from '$lib/ORM/dbs/showDB';
   import { ShowStatus, type ShowDocument } from '$lib/ORM/models/show';
   import getProfileImage from '$lib/util/profilePhoto';
   import type { ActionData, PageData } from './$types';
+  import { PUBLIC_PROFILE_IMAGE_PATH } from '$env/static/public';
+  import {
+    PUBLIC_RXDB_PASSWORD,
+    PUBLIC_SHOW_DB_ENDPOINT,
+  } from '$env/static/public';
+  import { StorageType } from '$lib/ORM/rxdb';
 
   export let data: PageData;
   export let form: ActionData;
@@ -17,7 +23,7 @@
   let buyingTicket = false;
 
   $: waiting4StateChange = false;
-  $: profileImage = getProfileImage(displayName);
+  $: profileImage = getProfileImage(displayName, PUBLIC_PROFILE_IMAGE_PATH);
   $: canBuyTicket =
     show.showState.status === ShowStatus.BOX_OFFICE_OPEN || buyingTicket;
   const onSubmit = () => {
@@ -33,8 +39,14 @@
     };
   };
 
+  const dbOptions = {
+    rxdbPassword: PUBLIC_RXDB_PASSWORD,
+    endPoint: PUBLIC_SHOW_DB_ENDPOINT,
+    storageType: StorageType.IDB,
+  };
+
   if (show.showState.active) {
-    showDB(showId, token).then((db: ShowDBType) => {
+    showDB(showId, token, dbOptions).then((db: ShowDBType) => {
       db.shows.findOne(showId).$.subscribe(_show => {
         show = _show as ShowDocument;
       });

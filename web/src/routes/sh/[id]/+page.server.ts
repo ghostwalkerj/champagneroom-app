@@ -6,7 +6,7 @@ import {
   JWT_SHOW_DB_USER,
   PRIVATE_MASTER_DB_ENDPOINT,
 } from '$env/static/private';
-import { PUBLIC_TICKET_PATH } from '$env/static/public';
+import { PUBLIC_RXDB_PASSWORD, PUBLIC_TICKET_PATH } from '$env/static/public';
 import { showDB } from '$lib/ORM/dbs/showDB';
 import type { ShowDocType } from '$lib/ORM/models/show';
 import { StorageType } from '$lib/ORM/rxdb';
@@ -14,6 +14,7 @@ import { createShowMachineService } from '$lib/machines/showMachine';
 import { mensNames } from '$lib/util/mensNames';
 import { createPinHash } from '$lib/util/pin';
 import { error, fail, redirect } from '@sveltejs/kit';
+import { url } from 'inspector';
 import jwt from 'jsonwebtoken';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 import urlJoin from 'url-join';
@@ -46,6 +47,7 @@ export const load: import('./$types').PageServerLoad = async ({ params }) => {
   const db = await showDB(showId, masterToken, {
     endPoint: PRIVATE_MASTER_DB_ENDPOINT,
     storageType: StorageType.NODE_WEBSQL,
+    rxdbPassword: PUBLIC_RXDB_PASSWORD,
   });
   if (!db) {
     throw error(500, 'no db');
@@ -82,6 +84,7 @@ const getShow = async (showId: string) => {
   const db = await showDB(showId, masterToken, {
     endPoint: PRIVATE_MASTER_DB_ENDPOINT,
     storageType: StorageType.NODE_WEBSQL,
+    rxdbPassword: PUBLIC_RXDB_PASSWORD,
   });
   if (!db) {
     throw error(500, 'no db');
@@ -120,8 +123,7 @@ export const actions: import('./$types').Actions = {
     }
 
     const show = await getShow(showId);
-    const showService = createShowMachineService({
-      showDocument: show,
+    const showService = createShowMachineService(show, {
       observeState: true,
       saveState: true,
     });

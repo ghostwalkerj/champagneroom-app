@@ -1,9 +1,5 @@
-import {
-  PUBLIC_RXDB_PASSWORD,
-  PUBLIC_TICKET_DB_ENDPOINT,
-} from '$env/static/public';
 import type { DatabaseOptions } from '$lib/ORM/rxdb';
-import { StorageType, initRXDB } from '$lib/ORM/rxdb';
+import { initRXDB } from '$lib/ORM/rxdb';
 import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
@@ -48,23 +44,19 @@ const _ticketDB = new Map<string, TicketDBType>();
 export const ticketDB = async (
   ticketId: string,
   token: string,
-  databaseOptions?: DatabaseOptions
+  databaseOptions: DatabaseOptions
 ): Promise<TicketDBType> => await create(ticketId, token, databaseOptions);
 
 const create = async (
   ticketId: string,
   token: string,
-  databaseOptions?: DatabaseOptions
+  databaseOptions: DatabaseOptions
 ) => {
   let _db = _ticketDB.get(ticketId);
   if (_db) return _db;
 
-  const storageType = databaseOptions
-    ? databaseOptions.storageType
-    : StorageType.IDB;
-  const endPoint = databaseOptions
-    ? databaseOptions.endPoint
-    : PUBLIC_TICKET_DB_ENDPOINT;
+  const storageType = databaseOptions.storageType;
+  const endPoint = databaseOptions.endPoint;
 
   initRXDB(storageType);
 
@@ -76,7 +68,7 @@ const create = async (
     name: 'pouchdb/pcall_db',
     storage: wrappedStorage,
     ignoreDuplicate: true,
-    password: PUBLIC_RXDB_PASSWORD,
+    password: databaseOptions.rxdbPassword,
   });
 
   await _db.addCollections({

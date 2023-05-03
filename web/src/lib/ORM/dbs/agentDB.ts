@@ -1,8 +1,4 @@
 import {
-  PUBLIC_AGENT_DB_ENDPOINT,
-  PUBLIC_RXDB_PASSWORD,
-} from '$env/static/public';
-import {
   AgentString,
   agentDocMethods,
   agentSchema,
@@ -59,23 +55,19 @@ const _agentDB = new Map<string, AgentDBType>();
 export const agentDB = async (
   agentId: string,
   token: string,
-  databaseOptions?: DatabaseOptions
+  databaseOptions: DatabaseOptions
 ) => await create(agentId, token, databaseOptions);
 
 const create = async (
   agentId: string,
   token: string,
-  databaseOptions?: DatabaseOptions
+  databaseOptions: DatabaseOptions
 ) => {
   let _db = _agentDB.get(agentId);
   if (_db) return _db;
 
-  const storageType = databaseOptions
-    ? databaseOptions.storageType
-    : StorageType.IDB;
-  const endPoint = databaseOptions
-    ? databaseOptions.endPoint
-    : PUBLIC_AGENT_DB_ENDPOINT;
+  const storageType = databaseOptions.storageType;
+  const endPoint = databaseOptions.endPoint;
 
   initRXDB(storageType);
 
@@ -87,7 +79,7 @@ const create = async (
     name: 'pouchdb/pcall_db',
     storage: wrappedStorage,
     ignoreDuplicate: true,
-    password: PUBLIC_RXDB_PASSWORD,
+    password: databaseOptions.rxdbPassword,
   });
 
   await _db.addCollections({
