@@ -64,53 +64,5 @@
         "workspaceRoot": "/Users/joseph/Dev/pcall/mobile",
         "workspacePath": "src/pages",
         "id": "7xRkFAXJOBoT5yVj"
-    },
-    {
-        "type": "Group",
-        "name": "Pshared",
-        "parent_id": null,
-        "workspaceRoot": null,
-        "workspacePath": null,
-        "id": "vUkH4lefJsbBa62W"
-    },
-    {
-        "type": "Directory",
-        "name": "/Users/joseph/Dev/pcall/pshared/src/machines",
-        "parent_id": "vUkH4lefJsbBa62W",
-        "workspaceRoot": "/Users/joseph/Dev/pcall/pshared",
-        "workspacePath": "src/machines",
-        "id": "w8lDZ5jiG0LITWnV"
-    },
-    {
-        "type": "Directory",
-        "name": "/Users/joseph/Dev/pcall/pshared/src/ORM",
-        "parent_id": "vUkH4lefJsbBa62W",
-        "workspaceRoot": "/Users/joseph/Dev/pcall/pshared",
-        "workspacePath": "src/ORM",
-        "id": "BblFDSYxOfLyIZVe"
-    },
-    {
-        "type": "Directory",
-        "name": "/Users/joseph/Dev/pcall/pshared/src/util",
-        "parent_id": "vUkH4lefJsbBa62W",
-        "workspaceRoot": "/Users/joseph/Dev/pcall/pshared",
-        "workspacePath": "src/util",
-        "id": "1iWY0sVl4gKEJfov"
-    },
-    {
-        "type": "Group",
-        "name": "pServer",
-        "parent_id": null,
-        "workspaceRoot": null,
-        "workspacePath": null,
-        "id": "LVuvIMwrinJBm8Tc"
-    },
-    {
-        "type": "Directory",
-        "name": "/Users/joseph/Dev/pcall/pserver/src",
-        "parent_id": "LVuvIMwrinJBm8Tc",
-        "workspaceRoot": "/Users/joseph/Dev/pcall/pserver",
-        "workspacePath": "src",
-        "id": "FidkRb7PE5DtheqK"
     }
 ]
