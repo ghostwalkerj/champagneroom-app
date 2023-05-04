@@ -7,9 +7,9 @@ import {
   MASTER_DB_ENDPOINT,
 } from '$env/static/private';
 import { PUBLIC_RXDB_PASSWORD } from '$env/static/public';
-import { agentDB } from 'pshared/src/ORM/dbs/agentDB';
-import { getAgentId } from 'pshared/src/ORM/models/agent';
-import { StorageType } from 'pshared/src/ORM/rxdb';
+import { agentDB } from '$lib/ORM/dbs/agentDB';
+import { getAgentId } from '$lib/ORM/models/agent';
+import { StorageType } from '$lib/ORM/rxdb';
 import { fail } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import type { Actions, PageServerLoad } from './$types';

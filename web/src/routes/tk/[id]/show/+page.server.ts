@@ -14,14 +14,11 @@ import {
   PUBLIC_RXDB_PASSWORD,
   PUBLIC_TICKET_PATH,
 } from '$env/static/public';
-import { ticketDB } from 'pshared/src/ORM/dbs/ticketDB';
-import type {
-  TicketDocType,
-  TicketDocument,
-} from 'pshared/src/ORM/models/ticket';
-import { StorageType } from 'pshared/src/ORM/rxdb';
-import { createTicketMachineService } from 'pshared/src/machines/ticketMachine';
-import { verifyPin } from 'pshared/src/util/pin';
+import { ticketDB } from '$lib/ORM/dbs/ticketDB';
+import type { TicketDocType, TicketDocument } from '$lib/ORM/models/ticket';
+import { StorageType } from '$lib/ORM/rxdb';
+import { createTicketMachineService } from '$lib/machines/ticketMachine';
+import { verifyPin } from '$lib/util/pin';
 import type { Actions } from '@sveltejs/kit';
 import { error, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';

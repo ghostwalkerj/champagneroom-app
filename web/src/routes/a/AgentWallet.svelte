@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { AgentDocument } from 'pshared/src/ORM/models/agent';
+  import type { AgentDocument } from '$lib/ORM/models/agent';
 
   export let agent: AgentDocument;
 </script>

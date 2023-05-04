@@ -1,10 +1,10 @@
 <script lang="ts">
   import { PUBLIC_SHOW_PATH } from '$env/static/public';
-  import type { ShowDocType, showSchema } from 'pshared/src/ORM/models/show';
+  import type { ShowDocType, showSchema } from '$lib/ORM/models/show';
   import {
     currencyFormatter,
     durationFormatter,
-  } from 'pshared/src/util/constants';
+  } from '$lib/util/constants';
   import StarRating from 'svelte-star-rating';
   import urlJoin from 'url-join';
 

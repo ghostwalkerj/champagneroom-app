@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { TalentDocType } from 'pshared/src/ORM/models/talent';
+  import type { TalentDocType } from '$lib/ORM/models/talent';
   export let talent: TalentDocType;
 </script>
 

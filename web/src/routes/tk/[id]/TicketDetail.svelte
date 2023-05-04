@@ -3,13 +3,13 @@
     PUBLIC_DEFAULT_PROFILE_IMAGE,
     PUBLIC_PROFILE_IMAGE_PATH,
   } from '$env/static/public';
-  import type { ShowDocType } from 'pshared/src/ORM/models/show';
-  import type { TicketDocType } from 'pshared/src/ORM/models/ticket';
+  import type { ShowDocType } from '$lib/ORM/models/show';
+  import type { TicketDocType } from '$lib/ORM/models/ticket';
   import {
     currencyFormatter,
     durationFormatter,
-  } from 'pshared/src/util/constants';
-  import getProfileImage from 'pshared/src/util/profilePhoto';
+  } from '$lib/util/constants';
+  import getProfileImage from '$lib/util/profilePhoto';
   export let show: ShowDocType | null;
   export let ticket: TicketDocType | null;
 
