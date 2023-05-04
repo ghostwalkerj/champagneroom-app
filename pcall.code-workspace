@@ -7,10 +7,10 @@
 			"path": "web"
 		},
 		{
-			"path": "server"
+			"path": "pserver"
 		},
 		{
-			"path": "p-lib"
+			"path": "pshared"
 		}
 	],
 	"settings": {

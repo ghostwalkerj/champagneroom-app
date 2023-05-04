@@ -88,5 +88,37 @@
         "workspaceRoot": "/Users/joseph/Dev/pcall/server",
         "workspacePath": "index.ts",
         "id": "RJPbi3DFuyhsn478"
+    },
+    {
+        "type": "Group",
+        "name": "Pshared",
+        "parent_id": null,
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "vUkH4lefJsbBa62W"
+    },
+    {
+        "type": "Directory",
+        "name": "/Users/joseph/Dev/pcall/pshared/src/machines",
+        "parent_id": "vUkH4lefJsbBa62W",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/pshared",
+        "workspacePath": "src/machines",
+        "id": "w8lDZ5jiG0LITWnV"
+    },
+    {
+        "type": "Directory",
+        "name": "/Users/joseph/Dev/pcall/pshared/src/ORM",
+        "parent_id": "vUkH4lefJsbBa62W",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/pshared",
+        "workspacePath": "src/ORM",
+        "id": "BblFDSYxOfLyIZVe"
+    },
+    {
+        "type": "Directory",
+        "name": "/Users/joseph/Dev/pcall/pshared/src/util",
+        "parent_id": "vUkH4lefJsbBa62W",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/pshared",
+        "workspacePath": "src/util",
+        "id": "1iWY0sVl4gKEJfov"
     }
 ]

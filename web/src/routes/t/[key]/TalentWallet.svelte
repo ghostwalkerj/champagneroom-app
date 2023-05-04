@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { TalentDocType } from 'plib/dist/ORM/models/talent';
+  import type { TalentDocType } from 'pshared/dist/ORM/models/talent';
   export let talent: TalentDocType;
 </script>
 

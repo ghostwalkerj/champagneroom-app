@@ -7,12 +7,12 @@ import {
   MASTER_DB_ENDPOINT,
 } from '$env/static/private';
 import { PUBLIC_RXDB_PASSWORD, PUBLIC_TICKET_PATH } from '$env/static/public';
-import { showDB } from 'plib/dist/ORM/dbs/showDB';
-import type { ShowDocType } from 'plib/dist/ORM/models/show';
-import { StorageType } from 'plib/dist/ORM/rxdb';
-import { createShowMachineService } from 'plib/dist/machines/showMachine';
-import { mensNames } from 'plib/dist/util/mensNames';
-import { createPinHash } from 'plib/dist/util/pin';
+import { showDB } from 'pshared/dist/ORM/dbs/showDB';
+import type { ShowDocType } from 'pshared/dist/ORM/models/show';
+import { StorageType } from 'pshared/dist/ORM/rxdb';
+import { createShowMachineService } from 'pshared/dist/machines/showMachine';
+import { mensNames } from 'pshared/dist/util/mensNames';
+import { createPinHash } from 'pshared/dist/util/pin';
 import { error, fail, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import { uniqueNamesGenerator } from 'unique-names-generator';

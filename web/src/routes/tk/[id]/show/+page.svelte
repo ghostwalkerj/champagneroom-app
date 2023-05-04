@@ -8,13 +8,13 @@
     PUBLIC_TICKET_DB_ENDPOINT,
     PUBLIC_TICKET_PATH,
   } from '$env/static/public';
-  import { ticketDB, type TicketDBType } from 'plib/dist/ORM/dbs/ticketDB';
-  import type { ShowDocument } from 'plib/dist/ORM/models/show';
-  import type { TicketDocument } from 'plib/dist/ORM/models/ticket';
-  import { type DatabaseOptions, StorageType } from 'plib/dist/ORM/rxdb';
-  import { createTicketMachineService } from 'plib/dist/machines/ticketMachine';
-  import { jitsiInterfaceConfigOverwrite } from 'plib/dist/util/constants';
-  import getProfileImage from 'plib/dist/util/profilePhoto';
+  import { ticketDB, type TicketDBType } from 'pshared/dist/ORM/dbs/ticketDB';
+  import type { ShowDocument } from 'pshared/dist/ORM/models/show';
+  import type { TicketDocument } from 'pshared/dist/ORM/models/ticket';
+  import { type DatabaseOptions, StorageType } from 'pshared/dist/ORM/rxdb';
+  import { createTicketMachineService } from 'pshared/dist/machines/ticketMachine';
+  import { jitsiInterfaceConfigOverwrite } from 'pshared/dist/util/constants';
+  import getProfileImage from 'pshared/dist/util/profilePhoto';
   import { onDestroy, onMount } from 'svelte';
   import urlJoin from 'url-join';
   import type { PageData } from '../$types';
