@@ -26,6 +26,7 @@ import {
 
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 0;
+
 type ServerCollections = {
   shows: ShowCollection;
   tickets: TicketCollection;
@@ -38,19 +39,19 @@ export type ServerDBType = RxDatabase<ServerCollections>;
 export const serverDB = async (
   token: string,
   databaseOptions: DatabaseOptions
-) => {
+): Promise<ServerDBType> => {
   initRXDB(databaseOptions.storageType);
 
   const wrappedStorage = wrappedKeyEncryptionStorage({
     storage: getRxStoragePouch(databaseOptions.storageType),
   });
 
-  const _db = await createRxDatabase({
+  const _db = (await createRxDatabase({
     name: 'pouchdb/pcall_db',
     storage: wrappedStorage,
     ignoreDuplicate: true,
     password: databaseOptions.rxdbPassword,
-  });
+  })) as ServerDBType;
 
   await _db.addCollections({
     shows: {

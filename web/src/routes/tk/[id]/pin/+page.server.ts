@@ -5,10 +5,10 @@ import {
   MASTER_DB_ENDPOINT,
 } from '$env/static/private';
 import { PUBLIC_RXDB_PASSWORD, PUBLIC_TICKET_PATH } from '$env/static/public';
-import { ticketDB } from 'pshared/dist/ORM/dbs/ticketDB';
-import type { TicketDocument } from 'pshared/dist/ORM/models/ticket';
-import { StorageType } from 'pshared/dist/ORM/rxdb';
-import { createPinHash, verifyPin } from 'pshared/dist/util/pin';
+import { ticketDB } from 'pshared/src/ORM/dbs/ticketDB';
+import type { TicketDocument } from 'pshared/src/ORM/models/ticket';
+import { StorageType } from 'pshared/src/ORM/rxdb';
+import { createPinHash, verifyPin } from 'pshared/src/util/pin';
 import { error, fail, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import urlJoin from 'url-join';

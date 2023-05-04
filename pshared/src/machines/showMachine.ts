@@ -69,7 +69,7 @@ export const createShowMachine = (
         id: nanoid(),
       },
       // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-      tsTypes: {} as import('./showMachine.typegen.d.ts').Typegen0,
+      tsTypes: {} as import('./showMachine.typegen').Typegen0,
       schema: {
         events: {} as
           | {

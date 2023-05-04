@@ -1,6 +1,6 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
-  import type { AgentDocument } from 'pshared/dist/ORM/models/agent';
+  import type { AgentDocument } from 'pshared/src/ORM/models/agent';
   import type { ActionData } from './$types';
 
   export let agent: AgentDocument;

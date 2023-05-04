@@ -2,15 +2,15 @@
   import { applyAction, enhance } from '$app/forms';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import { createTicketMachineService } from 'pshared/dist/machines/ticketMachine';
+  import { createTicketMachineService } from 'pshared/src/machines/ticketMachine';
 
-  import { ticketDB, type TicketDBType } from 'pshared/dist/ORM/dbs/ticketDB';
-  import type { ShowDocument } from 'pshared/dist/ORM/models/show';
+  import { ticketDB, type TicketDBType } from 'pshared/src/ORM/dbs/ticketDB';
+  import type { ShowDocument } from 'pshared/src/ORM/models/show';
   import {
     TicketDisputeReason,
     TicketStatus,
     type TicketDocument,
-  } from 'pshared/dist/ORM/models/ticket';
+  } from 'pshared/src/ORM/models/ticket';
   import { onMount } from 'svelte';
 
   import urlJoin from 'url-join';
@@ -19,7 +19,7 @@
     PUBLIC_RXDB_PASSWORD,
     PUBLIC_TICKET_DB_ENDPOINT,
   } from '$env/static/public';
-  import { StorageType } from 'pshared/dist/ORM/rxdb';
+  import { StorageType } from 'pshared/src/ORM/rxdb';
   import type { ActionData, PageData } from './$types';
   import TicketDetail from './TicketDetail.svelte';
 

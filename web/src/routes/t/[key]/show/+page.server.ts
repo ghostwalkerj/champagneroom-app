@@ -11,11 +11,11 @@ import {
   PUBLIC_RXDB_PASSWORD,
   PUBLIC_TALENT_PATH,
 } from '$env/static/public';
-import { talentDB } from 'pshared/dist/ORM/dbs/talentDB';
-import type { ShowDocument } from 'pshared/dist/ORM/models/show';
-import { StorageType } from 'pshared/dist/ORM/rxdb';
-import { createShowMachineService } from 'pshared/dist/machines/showMachine';
-import { createTicketMachineService } from 'pshared/dist/machines/ticketMachine';
+import { talentDB } from 'pshared/src/ORM/dbs/talentDB';
+import type { ShowDocument } from 'pshared/src/ORM/models/show';
+import { StorageType } from 'pshared/src/ORM/rxdb';
+import { createShowMachineService } from 'pshared/src/machines/showMachine';
+import { createTicketMachineService } from 'pshared/src/machines/ticketMachine';
 import type { Actions } from '@sveltejs/kit';
 import { error, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';

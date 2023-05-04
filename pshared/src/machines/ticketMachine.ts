@@ -71,7 +71,7 @@ export const createTicketMachine = (
         showMachineRef: undefined as ActorRefFrom<ShowMachineType> | undefined,
       },
       // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-      tsTypes: {} as import('./ticketMachine.typegen.d.ts').Typegen0,
+      tsTypes: {} as import('./ticketMachine.typegen').Typegen0,
       schema: {
         events: {} as
           | {

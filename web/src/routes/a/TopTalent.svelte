@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type { TalentDocument } from 'pshared/dist/ORM/models/talent';
-  import { currencyFormatter } from 'pshared/dist/util/constants';
+  import type { TalentDocument } from 'pshared/src/ORM/models/talent';
+  import { currencyFormatter } from 'pshared/src/util/constants';
   import Chart from 'chart.js/auto';
   import ChartDataLabels from 'chartjs-plugin-datalabels';
   import spacetime from 'spacetime';

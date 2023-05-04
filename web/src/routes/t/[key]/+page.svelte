@@ -13,14 +13,14 @@
     ShowEventType,
     type ShowMachineServiceType,
     type ShowMachineStateType,
-  } from 'pshared/dist/machines/showMachine';
-  import { talentDB, type TalentDBType } from 'pshared/dist/ORM/dbs/talentDB';
-  import type { ShowDocument } from 'pshared/dist/ORM/models/show';
+  } from 'pshared/src/machines/showMachine';
+  import { talentDB, type TalentDBType } from 'pshared/src/ORM/dbs/talentDB';
+  import type { ShowDocument } from 'pshared/src/ORM/models/show';
   import type {
     TalentDocType,
     TalentDocument,
-  } from 'pshared/dist/ORM/models/talent';
-  import { durationFormatter } from 'pshared/dist/util/constants';
+  } from 'pshared/src/ORM/models/talent';
+  import { durationFormatter } from 'pshared/src/util/constants';
   import { possessive } from 'i18n-possessive';
   import StarRating from 'svelte-star-rating';
 
@@ -32,7 +32,7 @@
   import type { Subscription } from 'xstate';
   import type { PageData } from './$types';
   import TalentWallet from './TalentWallet.svelte';
-  import { StorageType } from 'pshared/dist/ORM/rxdb';
+  import { StorageType } from 'pshared/src/ORM/rxdb';
 
   export let form: import('./$types').ActionData;
   export let data: PageData;

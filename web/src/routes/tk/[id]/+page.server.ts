@@ -7,19 +7,19 @@ import {
   MASTER_DB_ENDPOINT,
 } from '$env/static/private';
 import { PUBLIC_PIN_PATH, PUBLIC_RXDB_PASSWORD } from '$env/static/public';
-import { ticketDB } from 'pshared/dist/ORM/dbs/ticketDB';
+import { ticketDB } from 'pshared/src/ORM/dbs/ticketDB';
 import type {
   TicketDisputeReason,
   TicketDocType,
   TicketDocument,
-} from 'pshared/dist/ORM/models/ticket';
-import { TicketCancelReason } from 'pshared/dist/ORM/models/ticket';
-import { TransactionReasonType } from 'pshared/dist/ORM/models/transaction';
-import { StorageType } from 'pshared/dist/ORM/rxdb';
+} from 'pshared/src/ORM/models/ticket';
+import { TicketCancelReason } from 'pshared/src/ORM/models/ticket';
+import { TransactionReasonType } from 'pshared/src/ORM/models/transaction';
+import { StorageType } from 'pshared/src/ORM/rxdb';
 
-import { createTicketMachineService } from 'pshared/dist/machines/ticketMachine';
-import { ActorType } from 'pshared/dist/util/constants';
-import { verifyPin } from 'pshared/dist/util/pin';
+import { createTicketMachineService } from 'pshared/src/machines/ticketMachine';
+import { ActorType } from 'pshared/src/util/constants';
+import { verifyPin } from 'pshared/src/util/pin';
 import { error, fail, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import urlJoin from 'url-join';

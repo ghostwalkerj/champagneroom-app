@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { agentDB } from 'pshared/dist/ORM/dbs/agentDB';
+  import { agentDB } from 'pshared/src/ORM/dbs/agentDB';
   import {
     getAgentId,
     type AgentDocument,
-  } from 'pshared/dist/ORM/models/agent';
-  import type { TalentDocument } from 'pshared/dist/ORM/models/talent';
-  import { generateTalent } from 'pshared/dist/util/dataHelper';
+  } from 'pshared/src/ORM/models/agent';
+  import type { TalentDocument } from 'pshared/src/ORM/models/talent';
+  import { generateTalent } from 'pshared/src/util/dataHelper';
   import { onMount } from 'svelte';
   import { selectedAccount } from 'svelte-web3';
   import type { ActionData, PageData } from './$types';
@@ -18,7 +18,7 @@
     PUBLIC_AGENT_DB_ENDPOINT,
     PUBLIC_RXDB_PASSWORD,
   } from '$env/static/public';
-  import { StorageType } from 'pshared/dist/ORM/rxdb';
+  import { StorageType } from 'pshared/src/ORM/rxdb';
 
   export let data: PageData;
   export let form: ActionData;
