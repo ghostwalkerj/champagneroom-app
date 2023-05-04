@@ -67,30 +67,6 @@
     },
     {
         "type": "Group",
-        "name": "Server",
-        "parent_id": null,
-        "workspaceRoot": null,
-        "workspacePath": null,
-        "id": "7SCETt1RjdVJA3LM"
-    },
-    {
-        "type": "Directory",
-        "name": "/Users/joseph/Dev/pcall/server/jobs",
-        "parent_id": "7SCETt1RjdVJA3LM",
-        "workspaceRoot": "/Users/joseph/Dev/pcall/server",
-        "workspacePath": "jobs",
-        "id": "GTg7noB6rFfKWw1J"
-    },
-    {
-        "type": "File",
-        "name": "/Users/joseph/Dev/pcall/server/index.ts",
-        "parent_id": "7SCETt1RjdVJA3LM",
-        "workspaceRoot": "/Users/joseph/Dev/pcall/server",
-        "workspacePath": "index.ts",
-        "id": "RJPbi3DFuyhsn478"
-    },
-    {
-        "type": "Group",
         "name": "Pshared",
         "parent_id": null,
         "workspaceRoot": null,
@@ -120,5 +96,21 @@
         "workspaceRoot": "/Users/joseph/Dev/pcall/pshared",
         "workspacePath": "src/util",
         "id": "1iWY0sVl4gKEJfov"
+    },
+    {
+        "type": "Group",
+        "name": "pServer",
+        "parent_id": null,
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "LVuvIMwrinJBm8Tc"
+    },
+    {
+        "type": "Directory",
+        "name": "/Users/joseph/Dev/pcall/pserver/src",
+        "parent_id": "LVuvIMwrinJBm8Tc",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/pserver",
+        "workspacePath": "src",
+        "id": "FidkRb7PE5DtheqK"
     }
 ]
