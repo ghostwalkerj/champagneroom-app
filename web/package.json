@@ -86,6 +86,7 @@
 		"peerjs": "^1.4.6",
 		"pouchdb-adapter-idb": "^7.3.0",
 		"pouchdb-adapter-node-websql": "^7.0.0",
+		"quirrel": "^1.13.4",
 		"rxdb": ">=13.8.2 <14.0.0",
 		"rxjs": "^7.5.6",
 		"set-cookie-parser": "^2.5.1",

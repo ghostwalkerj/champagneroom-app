@@ -20,6 +20,7 @@ import { ActorType } from '$lib/util/constants';
 import { error, fail } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import type { Actions, PageServerLoad } from './$types';
+import showQueue from '$queues/show/+server';
 
 const getTalent = async (key: string) => {
   const token = jwt.sign(

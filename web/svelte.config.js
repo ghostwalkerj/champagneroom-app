@@ -7,7 +7,11 @@ const config = {
   kit: {
     adapter: adapter(),
     csrf: { checkOrigin: false },
-    alias: { $components: './src/components' },
+    alias: {
+      $components: './src/components',
+      $lib: './src/lib',
+      $queues: './src/routes/api/v1/queues',
+    },
   },
   preprocess: [
     preprocess({

@@ -8,5 +8,25 @@
     "strict": true,
     "noImplicitAny": false,
     "importsNotUsedAsValues": "error",
+    "paths": {
+      "$components": [
+        "./src/components"
+      ],
+      "$components/*": [
+        "./src/components/*"
+      ],
+      "$lib": [
+        "./src/lib"
+      ],
+      "$lib/*": [
+        "./src/lib/*"
+      ],
+      "$queues": [
+        "./src/routes/api/v1/queues"
+      ],
+      "$queues/*": [
+        "./src/routes/api/v1/queues/*"
+      ]
+    },
   }
 }
