@@ -17,7 +17,7 @@ import type { ShowStateType } from '$lib/machines/showMachine';
 import { createShowMachineService } from '$lib/machines/showMachine';
 import { createTicketMachineService } from '$lib/machines/ticketMachine';
 import { ActorType } from '$lib/util/constants';
-import escrowQueue from '$queues/show/escrow/+server';
+import { _escrowQueue } from '$queues/show/escrow/+server';
 import { error, fail } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import type { Actions, PageServerLoad } from './$types';
@@ -247,7 +247,7 @@ export const actions: Actions = {
       inEscrow = showService.getSnapshot().matches('inEscrow');
 
       if (inEscrow) {
-        escrowQueue.enqueue(show._id, {
+        _escrowQueue.enqueue(show._id, {
           id: show._id,
           override: true,
           delay: +PUBLIC_ESCROW_PERIOD,
