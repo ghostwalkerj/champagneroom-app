@@ -228,13 +228,13 @@ export const actions: Actions = {
       showCancelled,
     };
   },
-  finalize_show: async ({ params }) => {
+  end_show: async ({ params }) => {
     const key = params.key;
     if (key === null) {
       throw error(404, 'Key not found');
     }
 
-    let showFinalized = false;
+    let showEnded = false;
 
     const { show, showService } = await getShow(key);
     const showState = showService.getSnapshot();
@@ -250,15 +250,15 @@ export const actions: Actions = {
         finalize,
       });
 
-      showFinalized = showService.getSnapshot().matches('finalized');
+      showEnded = showService.getSnapshot().matches('finalized');
 
-      if (showFinalized) {
+      if (showEnded) {
         showQueue.enqueue(show._id);
       }
     }
     return {
       success: true,
-      showFinalized,
+      showFinalized: showEnded,
     };
   },
   refund_tickets: async ({ params }) => {

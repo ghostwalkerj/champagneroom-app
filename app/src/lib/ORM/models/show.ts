@@ -29,6 +29,8 @@ export enum ShowStatus {
   CANCELLATION_REQUESTED = 'CANCELLATION REQUESTED',
   LIVE = 'LIVE',
   ENDED = 'ENDED',
+  STOPPED = 'STOPPED',
+  IN_ESCROW = 'IN ESCROW',
 }
 
 export enum ShowCancelReason {
@@ -223,6 +225,14 @@ const showSchemaLiteral = {
             },
           },
           required: ['finalizedAt', 'finalizer'],
+        },
+        escrow: {
+          type: 'object',
+          properties: {
+            startDate: { type: 'integer' },
+            endDate: { type: 'integer' },
+          },
+          required: ['startDate'],
         },
         transactions: {
           type: 'array',

@@ -16,10 +16,7 @@
   } from '$lib/machines/showMachine';
   import { talentDB, type TalentDBType } from '$lib/ORM/dbs/talentDB';
   import type { ShowDocument } from '$lib/ORM/models/show';
-  import type {
-    TalentDocType,
-    TalentDocument,
-  } from '$lib/ORM/models/talent';
+  import type { TalentDocType, TalentDocument } from '$lib/ORM/models/talent';
   import { durationFormatter } from '$lib/util/constants';
   import { possessive } from 'i18n-possessive';
   import StarRating from 'svelte-star-rating';
@@ -61,7 +58,7 @@
   $: eventText = 'No Events';
   $: active = data.currentShow ? data.currentShow.showState.active : false;
   $: waiting4StateChange = false;
-  $: showEnded = false;
+  $: showStopped = false;
 
   const noCurrentShow = () => {
     canCreateShow = true;
@@ -76,7 +73,7 @@
     showMachineSub?.unsubscribe();
     showMachineSub = showMachineService.subscribe(
       (state: ShowMachineStateType) => {
-        showEnded = state.matches('ended');
+        showStopped = state.matches('stopped');
         canCancelShow = state.can({
           type: 'REQUEST CANCELLATION',
           cancel: undefined,
@@ -223,12 +220,12 @@
 <div class="flex place-content-center">
   <!-- Page header -->
 
-  <!-- Modal for Restarting or Finalizing Show -->
-  {#if showEnded}
+  <!-- Modal for Restarting or Ending Show -->
+  {#if showStopped}
     <input type="checkbox" id="restart-show-modal" class="modal-toggle" />
     <div class="modal modal-open">
       <div class="modal-box">
-        <h3 class="font-bold text-lg">You have Ended the Show</h3>
+        <h3 class="font-bold text-lg">You have Stopped the Show</h3>
         <p class="py-4">
           Are you sure you want to end the show? You will not be able to restart
           later. Ticket holders will be able to give feedback once the show is
@@ -240,7 +237,7 @@
             on:click={() => goto(showPath)}
             disabled={!canStartShow}>Restart Show</button
           >
-          <form method="post" action="?/finalize_show" use:enhance={onSubmit}>
+          <form method="post" action="?/end_show" use:enhance={onSubmit}>
             <button class="btn">End Show</button>
           </form>
         </div>

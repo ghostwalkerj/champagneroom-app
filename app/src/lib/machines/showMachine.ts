@@ -11,6 +11,7 @@ import {
   spawn,
   type ActorRef,
   type StateFrom,
+  actions,
 } from 'xstate';
 
 export type ShowStateType = ShowDocType['showState'];
@@ -54,7 +55,7 @@ export const createShowMachine = (
 ) => {
   const GRACE_PERIOD = showMachineOptions.gracePeriod || 3600000;
 
-  /** @xstate-layout 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-S4yLitA0NcNDCb33rtG-UOSchwkJCcZoNQdhpvnAXaEnS-TvkuDEjaaj6EQCLdvN1843VODlBNeqIh7BmnOtSMUzQ3UjLujGGhJSO32s5frA1ywzZiORj0yoflLCkRLfCcauaW0onGdM2ZAKFXApWVc1JQ0rRhjuecQkdEvXbBjH7d5BxbB9uiUUo9vzT0QEBYq0FyhwVbJ2Xsg5RzO3XL9HDKJRwzZwkXDOTwI9rQTQUa4C4zEfBAA */
+  /** @xstate-layout N4IgpgJg5mDOIC5SwBYHsDuBZAhgYxQEsA7MAYgGUAJAeQHUKAVAQUYFEACAVQAUARVmwDaABgC6iUAAc0sQgBdCaYpJAAPRABYATABoQAT0QBOAOzGAdAGYArDavGrpgBwjNx4wEYAvt-2pMXAISMAsAjAAZNBwISDJRCSQQGTlFZVUNBBtjEWtNK2crERFTbRttR30jBE9izWsrT0dTN2NC0xtff3RsfCJSMJ6omLihT0TpWQUlFSTM7NyrfMLi0vLKw0RPTWyLdvKANk8Djs0RKy6QcKD+0PDh2Ih47QnkqbTZ0HmcvIKikrKFSsVUQpUsnk8NgOIkcmk82mcpk0l2ufRCg0wD1GVleKWm6TmiBsrl+KwB62BmxqxIODQ6ZXO5lKKJ6N3R92ij3imlx7xmGSJeipjQRFk0zhs5ysRWOOVMLMCaIGHJGTyENl5qX5hKyJKWf1WgI21TKlmKBwqkOcELaB2RfiurKVdyGnNGB01+M+6iJLVJ-zWQJBNVFkuKtWcOk0plqBwVvWCAwARmg1DQAGbpwh4MA0KRgYhkABKbAAilw2EwOABhZgAOWrbAiEVYAEkaHWEqo8R8BTU7c4LAdnMPTB1su5tAdg55CjYLCVh5HtJ4-pH42zk6mM1mc3mC8WyxWq7WG02W4x253xt2+QSvlsB0OR4jx8ZJ9OqdtRU0Cq5Z642giHGDqoomoQpmmmbZrm+aFpe1YANJsIwHAlhQbBFgAamwfBdkkPbag+NRuLS7hmB45yeKYRSftUELaNoeyNO+EJuDGXgbs6FiQTuMH7vBrZIShaGVphOF4TeBF3t6mRNJo9Q5DYNHbNsNj5JoM7SqYFjaGcErlDshRNFx4E8du0F7nBZAIchqHoeJbYdhwl5YGwNBcIw+GTFq94+jUxjlHsTQqaUMbrDOK71IUOwlK4xRWNoFygU6Zm8ZZsEHrZImno2za4d5by+bJWxtPOBwOMYBxtFVJzijOMJMTo1rQrYOiJfKKWKmlFm7plgnCahFA0BEeHiLexV9kBxzWDkIhTtRbS2JS1RmLk80AaO5TFM4pm3OZUF9QJlAsEWQ20HQhWEX5clQlYYruKUO0lHCmlUvY9RAaxf4OOcu1dQm+3pUd1nZfZbAAGJcHWfAFeN0mTTqQHFBY9hzkczg5Apb3VJGOlHFCq4OEcw4gd03VA71MHVgANrIcRMMwZ0cNQ9BXTJfa1G4YqzicwHuDoNjBk4OmShagUVdC5j-eTgPosD1N07AcRg6JGHYU5dYua2bkeV58M+V6nOkWKHjmDkjQ0cBkUxkOXgsQpHSmGTjoU-LVM5rT9NPKruXnnDnq9jqtRQqbFEW9RtEzjouR2MBZjmG40p7e7h2K97NlCXZLMjWNgdEf5q67Aizil24IiSvCONbNpFiOBChRLNswEp1uaee0rKtZyJJZQzDAcTUbwf6mKTi2DFY5QpFkKo3pS3OJacLJbLm4QR7YBe8rTwluWlaoX7zaa+ziPEbUmhkWblGW1HVLI-O5rKdKEpTp1K-cQrHcZzvx77-WeUXleMY+cbpbArhfcOVErZ0S2MSaKZh4QuDHKOF2YF9qwHkDgAATvIBmp1zpswNkVIexEX5MWAksE4FokSlyFlSZYddgJ6QhEgq0rc7gYOwXEasXAmA0DckWDgAApGgrY6wDwRsQ-yU57DWHKGjbQ45SjCx0HXew2wDjrGospNhYQOE4KeNw3h-COAREhvrYBJUEBTgtHsBS6koRuC0cGPSOlijhnFGYWwjFl6uzlsqPRcQ2AwxZhdY+kjMjGCFCaO0TEFGMQ8JHSJycAarwsAWLkjNmas0uoQ66ljahRMQGUJoewNGBWogiKuOj0kMwuhwCGojmARFbAALXEYbIOxEnCeD2AidwI4FFm1XM4iqTE7RgkCmYGw8IdGYLAAARwAK5wH0dWHAxAcw0xpjgD4FgMA4GmMQKA2gixgHTIs4gPtu7gz7rDPOg9OlSLAWKYctQvANzsDOaEg4uaMWdk-bQsyFnLPQZANZGywBbJ2TMPZBzFBHJOWci5VzBo1j-v7e5EjHmZAXs4529QTgjnPkcMwSVfAOmIGgWI8AkioJCA8gumQAC00CEBMvnB4TlXLOVjh8XS5UrpVQMpAQgdqYoVyl2qo0CqY5q4kXmqja0WMqoSghJ0FJ3E8DrM2TTSAwrLH6T2DkKhiUHBNAOKyoEPSyoiDUsccMgKNVmSzMQHANNCAAC89VYsZYgCq4IYReIUklcpwt44WEhMcO0zdoR6R0R-fq+rOZwjGWcSENFsjE1MNHO0Q5owV2jMSGEdp43r03t6jpvqEAjlyBK6ZxxrQFHPjm+c2l7BxSetop1aCAkQCTcHGhexzBTkiU9J+wYoS0hFNM8+k7owoNSvtGpfafUioUdayMVCkQsQlCtIpFqA3sThCcYkSIgVLJWWC7VkLtmPLyVNHaLzrQwghLOT5X5tpDnDLaDqOwF1uwGHMi9oKIDgp1dC5QsLDnHNOecy5-aSElFjpPDRAyPDvvohm1GwFlKSnMCS5KvggA */
   return createMachine(
     {
       context: {
@@ -103,11 +104,14 @@ export const createShowMachine = (
               type: 'START SHOW';
             }
           | {
-              type: 'END SHOW';
+              type: 'STOP SHOW';
             }
           | {
               type: 'SHOW FINALIZED';
               finalize: ShowStateType['finalize'];
+            }
+          | {
+              type: 'SHOW ENDED';
             }
           | {
               type: 'CUSTOMER JOINED';
@@ -161,8 +165,12 @@ export const createShowMachine = (
               cond: 'showStarted',
             },
             {
-              target: 'ended',
-              cond: 'showEnded',
+              target: 'stopped',
+              cond: 'showStopped',
+            },
+            {
+              target: 'inEscrow',
+              cond: 'showInEscrow',
             },
           ],
         },
@@ -172,10 +180,20 @@ export const createShowMachine = (
 
           entry: ['deactivateShow', 'saveShowState'],
         },
+        inEscrow: {
+          tags: ['canCreateShow'],
+          entry: ['enterEscrow', 'saveShowState'],
+          exit: ['exitEscrow', 'saveShowState'],
+          on: {
+            'SHOW FINALIZED': {
+              target: 'finalized',
+              actions: ['finalizeShow', 'saveShowState'],
+            },
+          },
+        },
         finalized: {
           type: 'final',
           tags: ['canCreateShow'],
-
           entry: ['deactivateShow', 'saveShowState'],
         },
         boxOfficeOpen: {
@@ -285,21 +303,20 @@ export const createShowMachine = (
             'CUSTOMER LEFT': {
               actions: ['saveShowState'],
             },
-            'END SHOW': {
-              target: 'ended',
-              actions: ['endShow', 'saveShowState'],
+            'STOP SHOW': {
+              target: 'stopped',
+              actions: ['stopShow', 'saveShowState'],
             },
           },
         },
-        ended: {
+        stopped: {
           on: {
             'START SHOW': {
               target: 'started',
               actions: ['startShow', 'saveShowState'],
             },
-            'SHOW FINALIZED': {
-              target: 'finalized',
-              actions: ['finalizeShow', 'saveShowState'],
+            'SHOW ENDED': {
+              target: 'inEscrow',
             },
           },
         },
@@ -396,11 +413,11 @@ export const createShowMachine = (
           };
         }),
 
-        endShow: assign(context => {
+        stopShow: assign(context => {
           return {
             showState: {
               ...context.showState,
-              status: ShowStatus.ENDED,
+              status: ShowStatus.STOPPED,
               endDate: new Date().getTime(),
             },
           };
@@ -445,6 +462,32 @@ export const createShowMachine = (
           };
         }),
 
+        enterEscrow: assign(context => {
+          return {
+            showState: {
+              ...context.showState,
+              status: ShowStatus.IN_ESCROW,
+              escrow: {
+                startDate: new Date().getTime(),
+              },
+            },
+          };
+        }),
+
+        exitEscrow: assign(context => {
+          if (!context.showState.escrow) return {};
+          return {
+            showState: {
+              ...context.showState,
+              status: ShowStatus.IN_ESCROW,
+              escrow: {
+                startDate: context.showState.escrow.startDate,
+                endDate: new Date().getTime(),
+              },
+            },
+          };
+        }),
+
         incrementTicketsAvailable: assign(context => {
           return {
             showState: {
@@ -478,14 +521,6 @@ export const createShowMachine = (
             },
           };
         }),
-
-        // raiseFinalize: raise({
-        //   type: 'SHOW FINALIZED',
-        //   finalize: {
-        //     finalizedAt: new Date().getTime(),
-        //     finalizer: ActorType.TIMER,
-        //   },
-        // }),
 
         finalizeShow: assign((context, event) => {
           return {
@@ -523,7 +558,9 @@ export const createShowMachine = (
         showBoxOfficeClosed: context =>
           context.showState.status === ShowStatus.BOX_OFFICE_CLOSED,
         showStarted: context => context.showState.status === ShowStatus.LIVE,
-        showEnded: context => context.showState.status === ShowStatus.ENDED,
+        showStopped: context => context.showState.status === ShowStatus.STOPPED,
+        showInEscrow: context =>
+          context.showState.status === ShowStatus.IN_ESCROW,
         soldOut: context => context.showState.ticketsAvailable === 1,
         canStartShow: context => {
           if (context.showState.status === ShowStatus.ENDED) {

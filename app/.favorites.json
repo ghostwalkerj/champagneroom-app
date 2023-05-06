@@ -1,34 +1,34 @@
 [
     {
         "type": "Directory",
-        "name": "/Users/joseph/Dev/pcall/web/src/lib",
+        "name": "/Users/joseph/Dev/pcall/app/src/components",
         "parent_id": null,
-        "workspaceRoot": "/Users/joseph/Dev/pcall/web",
-        "workspacePath": "src/lib",
-        "id": "YO3P5loyunsFi4JR"
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/components",
+        "id": "hprSK9if4ORUJcoq"
     },
     {
         "type": "Directory",
-        "name": "/Users/joseph/Dev/pcall/web/src/routes",
+        "name": "/Users/joseph/Dev/pcall/app/src/lib",
         "parent_id": null,
-        "workspaceRoot": "/Users/joseph/Dev/pcall/web",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/lib",
+        "id": "KBm3Hz7kb6AZROLI"
+    },
+    {
+        "type": "Directory",
+        "name": "/Users/joseph/Dev/pcall/app/src/routes",
+        "parent_id": null,
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
         "workspacePath": "src/routes",
-        "id": "IZ4fYnFRrxXihpTw"
+        "id": "w4jEbLnAoHfhTIdX"
     },
     {
         "type": "File",
-        "name": "/Users/joseph/Dev/pcall/web/.env",
+        "name": "/Users/joseph/Dev/pcall/app/.env",
         "parent_id": null,
-        "workspaceRoot": "/Users/joseph/Dev/pcall/web",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
         "workspacePath": ".env",
-        "id": "vUzM1FflEYNKGQBJ"
-    },
-    {
-        "type": "Directory",
-        "name": "/Users/joseph/Dev/pcall/web/src/components",
-        "parent_id": null,
-        "workspaceRoot": "/Users/joseph/Dev/pcall/web",
-        "workspacePath": "src/components",
-        "id": "6tsecdK0Q4C2Pmr1"
+        "id": "b9r7o2N4lSjmGXIT"
     }
 ]
