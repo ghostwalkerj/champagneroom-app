@@ -1,7 +1,3 @@
-import type { ShowDocument } from '../ORM/models/show';
-import { ShowStatus, type ShowDocType } from '../ORM/models/show';
-import type { TicketDocType, TicketDocument } from '../ORM/models/ticket';
-import type { TransactionDocType } from '../ORM/models/transaction';
 import { nanoid } from 'nanoid';
 import { map, type Observable } from 'rxjs';
 import {
@@ -11,8 +7,11 @@ import {
   spawn,
   type ActorRef,
   type StateFrom,
-  actions,
 } from 'xstate';
+import type { ShowDocument } from '../ORM/models/show';
+import { ShowStatus, type ShowDocType } from '../ORM/models/show';
+import type { TicketDocType, TicketDocument } from '../ORM/models/ticket';
+import type { TransactionDocType } from '../ORM/models/transaction';
 
 export type ShowStateType = ShowDocType['showState'];
 
@@ -182,7 +181,7 @@ export const createShowMachine = (
         },
         inEscrow: {
           tags: ['canCreateShow'],
-          entry: ['enterEscrow', 'saveShowState'],
+          entry: ['enterEscrow', 'deactivateShow', 'saveShowState'],
           exit: ['exitEscrow', 'saveShowState'],
           on: {
             'SHOW FINALIZED': {

@@ -26,6 +26,10 @@ import {
   type TicketCollection,
 } from '../models/ticket';
 
+import { EventEmitter } from 'events';
+import { createRxDatabase, type RxDatabase } from 'rxdb';
+import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
+import { PouchDB, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
 import {
   TransactionString,
   transactionSchema,
@@ -33,10 +37,6 @@ import {
 } from '../models/transaction';
 import type { DatabaseOptions } from '../rxdb';
 import { initRXDB } from '../rxdb';
-import { EventEmitter } from 'events';
-import { createRxDatabase, type RxDatabase } from 'rxdb';
-import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
-import { PouchDB, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
 
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 0;

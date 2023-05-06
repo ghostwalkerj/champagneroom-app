@@ -83,7 +83,7 @@
         canStartShow = state.can({ type: 'START SHOW' });
         showMachineState = state;
         waiting4Refunds = state.matches('requestedCancellation.waiting2Refund');
-        active = !state.done;
+        active = state.context.showState.active;
         statusText = state.context.showState.status;
       }
     );
@@ -207,9 +207,9 @@
       } else if (result.data.showCancelled) {
         noCurrentShow();
         statusText = 'Cancelled';
-      } else if (result.data.showFinalized) {
+      } else if (result.data.inEscrow) {
         noCurrentShow();
-        statusText = 'Finalized';
+        statusText = 'In Escrow';
       }
       await applyAction(result);
       waiting4StateChange = false;

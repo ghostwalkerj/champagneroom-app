@@ -1,3 +1,7 @@
+import { EventEmitter } from 'events';
+import { createRxDatabase, type RxDatabase } from 'rxdb';
+import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
+import { PouchDB, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
 import {
   ShowString,
   showDocMethods,
@@ -5,22 +9,16 @@ import {
   type ShowCollection,
 } from '../models/show';
 import {
+  ShowEventString,
+  showeventSchema,
+  type ShowEventCollection,
+} from '../models/showEvent';
+import {
   TalentString,
   talentDocMethods,
   talentSchema,
   type TalentCollection,
 } from '../models/talent';
-import type { DatabaseOptions } from '../rxdb';
-import { initRXDB } from '../rxdb';
-import { EventEmitter } from 'events';
-import { createRxDatabase, type RxDatabase } from 'rxdb';
-import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
-import { PouchDB, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
-import {
-  ShowEventString,
-  showeventSchema,
-  type ShowEventCollection,
-} from '../models/showEvent';
 import type { TicketCollection } from '../models/ticket';
 import { TicketString, ticketDocMethods, ticketSchema } from '../models/ticket';
 import {
@@ -28,6 +26,8 @@ import {
   transactionSchema,
   type TransactionCollection,
 } from '../models/transaction';
+import type { DatabaseOptions } from '../rxdb';
+import { initRXDB } from '../rxdb';
 
 // Sync requires more listeners but ok with http2
 EventEmitter.defaultMaxListeners = 0;

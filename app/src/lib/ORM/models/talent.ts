@@ -1,4 +1,3 @@
-import type { AgentDocument } from './agent';
 import { nanoid } from 'nanoid';
 import {
   toTypedRxJsonSchema,
@@ -8,6 +7,7 @@ import {
   type RxJsonSchema,
 } from 'rxdb';
 import { v4 as uuidv4 } from 'uuid';
+import type { AgentDocument } from './agent';
 import {
   ShowStatus,
   ShowString,

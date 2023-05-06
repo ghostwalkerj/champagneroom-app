@@ -1,8 +1,3 @@
-import {
-  TalentString,
-  type TalentDocType,
-  type TalentDocument,
-} from './talent';
 import { nanoid } from 'nanoid';
 import {
   toTypedRxJsonSchema,
@@ -11,6 +6,11 @@ import {
   type RxDocument,
   type RxJsonSchema,
 } from 'rxdb';
+import {
+  TalentString,
+  type TalentDocType,
+  type TalentDocument,
+} from './talent';
 type AgentDocMethods = {
   createTalent: (talentProps: {
     name: string;

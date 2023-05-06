@@ -1,5 +1,3 @@
-import type { ShowStateCallbackType } from '../../machines/showMachine';
-import { ActorType } from '../../util/constants';
 import { nanoid } from 'nanoid';
 import {
   toTypedRxJsonSchema,
@@ -8,6 +6,8 @@ import {
   type RxDocument,
   type RxJsonSchema,
 } from 'rxdb';
+import type { ShowStateCallbackType } from '../../machines/showMachine';
+import { ActorType } from '../../util/constants';
 import type { AgentDocument } from './agent';
 import type { ShowEventDocument } from './showEvent';
 import { ShowEventString } from './showEvent';

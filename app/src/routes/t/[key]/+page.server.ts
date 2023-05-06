@@ -6,7 +6,7 @@ import {
   JWT_TALENT_DB_USER,
   MASTER_DB_ENDPOINT,
 } from '$env/static/private';
-import { PUBLIC_RXDB_PASSWORD } from '$env/static/public';
+import { PUBLIC_RXDB_PASSWORD, PUBLIC_ESCROW_PERIOD } from '$env/static/public';
 import { talentDB } from '$lib/ORM/dbs/talentDB';
 import type { ShowDocument } from '$lib/ORM/models/show';
 import { ShowCancelReason } from '$lib/ORM/models/show';
@@ -17,10 +17,10 @@ import type { ShowStateType } from '$lib/machines/showMachine';
 import { createShowMachineService } from '$lib/machines/showMachine';
 import { createTicketMachineService } from '$lib/machines/ticketMachine';
 import { ActorType } from '$lib/util/constants';
+import escrowQueue from '$queues/show/escrow/+server';
 import { error, fail } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import type { Actions, PageServerLoad } from './$types';
-import showQueue from '$queues/show/+server';
 
 const getTalent = async (key: string) => {
   const token = jwt.sign(
@@ -234,31 +234,29 @@ export const actions: Actions = {
       throw error(404, 'Key not found');
     }
 
-    let showEnded = false;
+    let inEscrow = false;
 
     const { show, showService } = await getShow(key);
     const showState = showService.getSnapshot();
 
-    const finalize = {
-      finalizedAt: new Date().getTime(),
-      finalizer: ActorType.TALENT,
-    } as ShowStateType['finalize'];
-
-    if (showState.can({ type: 'SHOW FINALIZED', finalize })) {
+    if (showState.can({ type: 'SHOW ENDED' })) {
       showService.send({
-        type: 'SHOW FINALIZED',
-        finalize,
+        type: 'SHOW ENDED',
       });
 
-      showEnded = showService.getSnapshot().matches('finalized');
+      inEscrow = showService.getSnapshot().matches('inEscrow');
 
-      if (showEnded) {
-        showQueue.enqueue(show._id);
+      if (inEscrow) {
+        escrowQueue.enqueue(show._id, {
+          id: show._id,
+          override: true,
+          delay: +PUBLIC_ESCROW_PERIOD,
+        });
       }
     }
     return {
       success: true,
-      showFinalized: showEnded,
+      inEscrow,
     };
   },
   refund_tickets: async ({ params }) => {

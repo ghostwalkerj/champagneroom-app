@@ -1,26 +1,26 @@
-import type { DatabaseOptions } from '../rxdb';
-import { initRXDB } from '../rxdb';
 import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
+import type { DatabaseOptions } from '../rxdb';
+import { initRXDB } from '../rxdb';
 
+import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
 import {
-  ShowString,
   showDocMethods,
   showSchema,
+  ShowString,
   type ShowCollection,
 } from '../models/show';
-import { PouchDB, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
 import type { ShowEventCollection } from '../models/showEvent';
-import { ShowEventString, showeventSchema } from '../models/showEvent';
+import { showeventSchema, ShowEventString } from '../models/showEvent';
 import {
-  TicketString,
   ticketSchema,
+  TicketString,
   type TicketCollection,
 } from '../models/ticket';
 import {
-  TransactionString,
   transactionSchema,
+  TransactionString,
   type TransactionCollection,
 } from '../models/transaction';
 

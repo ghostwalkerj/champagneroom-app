@@ -1,6 +1,5 @@
 import type { AgentDocument } from './agent';
 
-import type { TalentDocument } from './talent';
 import {
   toTypedRxJsonSchema,
   type ExtractDocumentTypeFromTypedRxJsonSchema,
@@ -8,10 +7,11 @@ import {
   type RxDocument,
   type RxJsonSchema,
 } from 'rxdb';
+import type { TalentDocument } from './talent';
 
+import { nanoid } from 'nanoid';
 import type { TicketStateCallbackType } from '../../machines/ticketMachine';
 import { ActorType } from '../../util/constants';
-import { nanoid } from 'nanoid';
 import type { ShowDocument } from './show';
 import {
   TransactionString,

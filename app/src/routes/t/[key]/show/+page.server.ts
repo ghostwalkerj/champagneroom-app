@@ -113,9 +113,9 @@ export const actions: Actions = {
 
     const showState = showService.getSnapshot();
 
-    if (showState.can({ type: 'END SHOW' })) {
+    if (showState.can({ type: 'STOP SHOW' })) {
       showService.send({
-        type: 'END SHOW',
+        type: 'STOP SHOW',
       });
 
       const tickets = await show.getActiveTickets();

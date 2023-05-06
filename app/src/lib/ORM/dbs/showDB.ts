@@ -1,9 +1,10 @@
-import type { DatabaseOptions } from '../rxdb';
-import { initRXDB } from '../rxdb';
 import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
+import type { DatabaseOptions } from '../rxdb';
+import { initRXDB } from '../rxdb';
 
+import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
 import {
   showDocMethods,
   showSchema,
@@ -11,7 +12,6 @@ import {
   type ShowCollection,
   type ShowDocument,
 } from '../models/show';
-import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
 import type { ShowEventCollection } from '../models/showEvent';
 import { showeventSchema, ShowEventString } from '../models/showEvent';
 import {
