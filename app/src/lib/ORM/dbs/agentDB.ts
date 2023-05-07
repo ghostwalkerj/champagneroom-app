@@ -1,5 +1,4 @@
 import {
-  AgentString,
   agentDocMethods,
   agentSchema,
   agentStaticMethods,
@@ -7,32 +6,32 @@ import {
 } from '../models/agent';
 
 import {
-  ShowString,
   showDocMethods,
   showSchema,
+  ShowString,
   type ShowCollection,
 } from '../models/show';
 
 import {
-  TalentString,
   talentDocMethods,
   talentSchema,
+  TalentString,
   type TalentCollection,
 } from '../models/talent';
 import {
-  TicketString,
   ticketDocMethods,
   ticketSchema,
+  TicketString,
   type TicketCollection,
 } from '../models/ticket';
 
 import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
-import { PouchDB, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
+import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
 import {
-  TransactionString,
   transactionSchema,
+  TransactionString,
   type TransactionCollection,
 } from '../models/transaction';
 import type { DatabaseOptions } from '../rxdb';
@@ -116,10 +115,7 @@ const create = async (
     },
   });
 
-  const agentQuery = _db.agents
-    .findOne(agentId)
-    .where('entityType')
-    .eq(AgentString);
+  const agentQuery = _db.agents.findOne(agentId);
 
   const talentQuery = _db.talents
     .find()
@@ -187,8 +183,6 @@ const create = async (
     },
     query: ticketQuery,
   });
-  await repState.awaitInitialReplication();
-
   await repState.awaitInitialReplication();
 
   repState = _db.transactions.syncCouchDB({

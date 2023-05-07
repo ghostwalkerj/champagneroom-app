@@ -1,29 +1,28 @@
 import { EventEmitter } from 'events';
 import { createRxDatabase, type RxDatabase } from 'rxdb';
 import { wrappedKeyEncryptionStorage } from 'rxdb/plugins/encryption';
-import { PouchDB, getRxStoragePouch } from 'rxdb/plugins/pouchdb';
+import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
 import {
-  ShowString,
   showDocMethods,
   showSchema,
   type ShowCollection,
 } from '../models/show';
 import {
-  ShowEventString,
   showeventSchema,
+  ShowEventString,
   type ShowEventCollection,
 } from '../models/showEvent';
 import {
-  TalentString,
   talentDocMethods,
   talentSchema,
+  TalentString,
   type TalentCollection,
 } from '../models/talent';
 import type { TicketCollection } from '../models/ticket';
-import { TicketString, ticketDocMethods, ticketSchema } from '../models/ticket';
+import { ticketDocMethods, ticketSchema, TicketString } from '../models/ticket';
 import {
-  TransactionString,
   transactionSchema,
+  TransactionString,
   type TransactionCollection,
 } from '../models/transaction';
 import type { DatabaseOptions } from '../rxdb';
@@ -138,10 +137,7 @@ const create = async (
     db: TalentDBType | undefined
   ) => {
     if (!db) return;
-    const showQuery = db.shows
-      .findOne(showId)
-      .where('entityType')
-      .eq(ShowString);
+    const showQuery = db.shows.findOne(showId);
 
     // Wait for currentShow
     repState = db.shows.syncCouchDB({

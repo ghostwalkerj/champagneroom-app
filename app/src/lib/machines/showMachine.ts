@@ -196,6 +196,7 @@ export const createShowMachine = (
           entry: ['deactivateShow', 'saveShowState'],
         },
         boxOfficeOpen: {
+          tags: ['uiSubscribe'],
           on: {
             'REQUEST CANCELLATION': [
               {
@@ -244,6 +245,7 @@ export const createShowMachine = (
           },
         },
         boxOfficeClosed: {
+          tags: ['uiSubscribe'],
           on: {
             'START SHOW': {
               cond: 'canStartShow',
@@ -292,6 +294,8 @@ export const createShowMachine = (
           },
         },
         started: {
+          tags: ['uiSubscribe'],
+
           on: {
             'START SHOW': {
               actions: ['startShow', 'saveShowState'],
@@ -309,6 +313,8 @@ export const createShowMachine = (
           },
         },
         stopped: {
+          tags: ['uiSubscribe'],
+
           on: {
             'START SHOW': {
               target: 'started',
@@ -320,6 +326,8 @@ export const createShowMachine = (
           },
         },
         requestedCancellation: {
+          tags: ['uiSubscribe'],
+
           initial: 'waiting2Refund',
           states: {
             waiting2Refund: {

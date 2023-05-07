@@ -30,5 +30,13 @@
         "workspaceRoot": "/Users/joseph/Dev/pcall/app",
         "workspacePath": ".env",
         "id": "b9r7o2N4lSjmGXIT"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/package.json",
+        "parent_id": null,
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "package.json",
+        "id": "gmx0M1sDpC3KO5Ul"
     }
 ]

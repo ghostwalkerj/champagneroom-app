@@ -9,7 +9,6 @@ import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
 import {
   showDocMethods,
   showSchema,
-  ShowString,
   type ShowCollection,
 } from '../models/show';
 import {
@@ -20,7 +19,6 @@ import {
 import {
   ticketDocMethods,
   ticketSchema,
-  TicketString,
   type TicketCollection,
   type TicketDocument,
 } from '../models/ticket';
@@ -97,10 +95,7 @@ const create = async (
       return PouchDB.fetch(url, opts);
     },
   });
-  const ticketQuery = _db.tickets
-    .findOne(ticketId)
-    .where('entityType')
-    .eq(TicketString);
+  const ticketQuery = _db.tickets.findOne(ticketId);
 
   let repState = _db.tickets.syncCouchDB({
     remote: remoteDB,
@@ -114,10 +109,7 @@ const create = async (
 
   const ticket = (await ticketQuery.exec()) as TicketDocument;
   if (ticket?.ticketState.active) {
-    const showQuery = _db.shows
-      .findOne(ticket.show)
-      .where('entityType')
-      .eq(ShowString);
+    const showQuery = _db.shows.findOne(ticket.show);
 
     const showeventQuery = _db.showevents
       .find()

@@ -8,7 +8,6 @@ import { getRxStoragePouch, PouchDB } from 'rxdb/plugins/pouchdb';
 import {
   showDocMethods,
   showSchema,
-  ShowString,
   type ShowCollection,
   type ShowDocument,
 } from '../models/show';
@@ -87,10 +86,7 @@ export const showDB = async (
     },
   });
 
-  const showQuery = _db.shows
-    .findOne(showId)
-    .where('entityType')
-    .eq(ShowString);
+  const showQuery = _db.shows.findOne(showId);
 
   const ticketQuery = _db.tickets
     .find()

@@ -7,6 +7,7 @@ import {
   MASTER_DB_ENDPOINT,
 } from '$env/static/private';
 import {
+  PUBLIC_GRACE_PERIOD,
   PUBLIC_JITSI_DOMAIN,
   PUBLIC_RXDB_PASSWORD,
   PUBLIC_TALENT_PATH,
@@ -16,6 +17,7 @@ import type { ShowDocument } from '$lib/ORM/models/show';
 import { StorageType } from '$lib/ORM/rxdb';
 import { createShowMachineService } from '$lib/machines/showMachine';
 import { createTicketMachineService } from '$lib/machines/ticketMachine';
+import { _graceQueue } from '$queues/show/grace/+server';
 import type { Actions } from '@sveltejs/kit';
 import { error, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
@@ -116,6 +118,12 @@ export const actions: Actions = {
     if (showState.can({ type: 'STOP SHOW' })) {
       showService.send({
         type: 'STOP SHOW',
+      });
+
+      _graceQueue.enqueue(show._id, {
+        id: show._id,
+        override: true,
+        delay: PUBLIC_GRACE_PERIOD,
       });
 
       const tickets = await show.getActiveTickets();

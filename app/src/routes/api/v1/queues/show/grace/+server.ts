@@ -8,9 +8,7 @@ import { PUBLIC_RXDB_PASSWORD } from '$env/static/public';
 import { showDB } from '$lib/ORM/dbs/showDB';
 import type { ShowDocument } from '$lib/ORM/models/show';
 import { StorageType } from '$lib/ORM/rxdb';
-import type { ShowStateType } from '$lib/machines/showMachine';
 import { createShowMachineService } from '$lib/machines/showMachine';
-import { ActorType } from '$lib/util/constants';
 import { error } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import { Queue } from 'quirrel/sveltekit';
@@ -47,21 +45,19 @@ const getShow = async (showId: string) => {
   return { show, showService };
 };
 
-export const _escrowQueue = Queue(
-  'api/v1/queues/show/escrow', // 👈 the route it's reachable on
+export const _graceQueue = Queue(
+  'api/v1/queues/show/grace', // 👈 the route it's reachable on
   async (job: string) => {
     const { showService } = await getShow(job);
+
     const showState = showService.getSnapshot();
-    if (showState.matches('inEscrow')) {
-      const finalize = {
-        finalizedAt: new Date().getTime(),
-        finalizer: ActorType.TIMER,
-      } as ShowStateType['finalize'];
-      showService.send({ type: 'SHOW FINALIZED', finalize });
+
+    if (showState.matches('stopped')) {
+      showService.send('SHOW ENDED');
     }
   }
 );
 
-export const POST = _escrowQueue;
+export const POST = _graceQueue;
 
 export const prerender = false;

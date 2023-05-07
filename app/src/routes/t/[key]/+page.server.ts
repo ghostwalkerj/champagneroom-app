@@ -6,7 +6,7 @@ import {
   JWT_TALENT_DB_USER,
   MASTER_DB_ENDPOINT,
 } from '$env/static/private';
-import { PUBLIC_RXDB_PASSWORD, PUBLIC_ESCROW_PERIOD } from '$env/static/public';
+import { PUBLIC_ESCROW_PERIOD, PUBLIC_RXDB_PASSWORD } from '$env/static/public';
 import { talentDB } from '$lib/ORM/dbs/talentDB';
 import type { ShowDocument } from '$lib/ORM/models/show';
 import { ShowCancelReason } from '$lib/ORM/models/show';
