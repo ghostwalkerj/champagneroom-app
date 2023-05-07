@@ -127,19 +127,25 @@
         talent.collection.database.shows
           .findOne(showId)
           .$.subscribe(async _currentShow => {
-            showMachineService?.stop();
-            showMachineSub?.unsubscribe();
             if (_currentShow) {
-              currentShow = _currentShow as ShowDocument;
+              if (
+                !currentShow ||
+                _currentShow.showState.updatedAt >=
+                  currentShow.showState.updatedAt
+              ) {
+                showMachineService?.stop();
+                showMachineSub?.unsubscribe();
+                currentShow = _currentShow as ShowDocument;
 
-              showMachineService = createShowMachineService(_currentShow, {
-                saveState: false,
-                observeState: true,
-              });
-              const showState = showMachineService.getSnapshot();
-              if (showState.hasTag('uiSubscribe')) {
-                useShowMachine(showMachineService);
-                useShowEvents(_currentShow);
+                showMachineService = createShowMachineService(_currentShow, {
+                  saveState: false,
+                  observeState: true,
+                });
+                const showState = showMachineService.getSnapshot();
+                if (showState.hasTag('uiSubscribe')) {
+                  useShowMachine(showMachineService);
+                  useShowEvents(_currentShow);
+                }
               }
             }
           });
