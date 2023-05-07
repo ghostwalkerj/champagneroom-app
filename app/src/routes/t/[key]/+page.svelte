@@ -1,35 +1,35 @@
 <script lang="ts">
   import { applyAction, enhance } from '$app/forms';
   import { page } from '$app/stores';
+  import ProfilePhoto from '$components/forms/ProfilePhoto.svelte';
   import {
     PUBLIC_DEFAULT_PROFILE_IMAGE,
     PUBLIC_RXDB_PASSWORD,
     PUBLIC_SHOW_PATH,
     PUBLIC_TALENT_DB_ENDPOINT,
   } from '$env/static/public';
-  import ProfilePhoto from '$components/forms/ProfilePhoto.svelte';
-  import {
-    createShowMachineService,
-    ShowEventType,
-    type ShowMachineServiceType,
-    type ShowMachineStateType,
-  } from '$lib/machines/showMachine';
   import { talentDB, type TalentDBType } from '$lib/ORM/dbs/talentDB';
   import type { ShowDocument } from '$lib/ORM/models/show';
   import type { TalentDocType, TalentDocument } from '$lib/ORM/models/talent';
+  import {
+    ShowEventType,
+    createShowMachineService,
+    type ShowMachineServiceType,
+    type ShowMachineStateType,
+  } from '$lib/machines/showMachine';
   import { durationFormatter } from '$lib/util/constants';
   import { possessive } from 'i18n-possessive';
   import StarRating from 'svelte-star-rating';
 
   import { goto } from '$app/navigation';
   import ShowDetail from '$components/ShowDetail.svelte';
+  import { StorageType } from '$lib/ORM/rxdb';
   import { onMount } from 'svelte';
   import * as timeago from 'timeago.js';
   import urlJoin from 'url-join';
   import type { Subscription } from 'xstate';
   import type { PageData } from './$types';
   import TalentWallet from './TalentWallet.svelte';
-  import { StorageType } from '$lib/ORM/rxdb';
 
   export let form: import('./$types').ActionData;
   export let data: PageData;
@@ -56,7 +56,7 @@
 
   $: statusText = data.currentShow?.showState.status ?? 'No Current Show';
   $: eventText = 'No Events';
-  $: active = data.currentShow ? data.currentShow.showState.active : false;
+  $: uiSubscribe = false;
   $: waiting4StateChange = false;
   $: showStopped = false;
 
@@ -66,7 +66,7 @@
     canStartShow = false;
     statusText = 'No Current Show';
     eventText = 'No Events';
-    active = false;
+    uiSubscribe = false;
   };
 
   const useShowMachine = (showMachineService: ShowMachineServiceType) => {
@@ -83,7 +83,7 @@
         canStartShow = state.can({ type: 'START SHOW' });
         showMachineState = state;
         waiting4Refunds = state.matches('requestedCancellation.waiting2Refund');
-        active = state.context.showState.active;
+        uiSubscribe = state.hasTag('uiSubscribe');
         statusText = state.context.showState.status;
       }
     );
@@ -136,7 +136,8 @@
                 saveState: false,
                 observeState: true,
               });
-              if (currentShow.showState.active) {
+              const showState = showMachineService.getSnapshot();
+              if (showState.hasTag('uiSubscribe')) {
                 useShowMachine(showMachineService);
                 useShowEvents(_currentShow);
               }
@@ -417,7 +418,7 @@
           </div>
         </div>
       {/if}
-      {#if active}
+      {#if uiSubscribe}
         {#key showMachineState || currentShow}
           <div>
             <ShowDetail
