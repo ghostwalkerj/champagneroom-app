@@ -3,8 +3,8 @@ import mongoose from 'mongoose';
 import type { Actions } from './$types';
 
 import { MONGO_DB_ENDPOINT } from '$env/static/private';
-import { Agent } from '$lib/ORM/models/agent';
-import { Talent } from '$lib/ORM/models/talent';
+import { Agent } from '$lib/models/agent';
+import { Talent } from '$lib/models/talent';
 
 export const actions: Actions = {
   get_or_create_agent: async ({ request }) => {

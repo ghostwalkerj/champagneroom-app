@@ -1,10 +1,9 @@
 import { MONGO_DB_ENDPOINT } from '$env/static/private';
-import { Talent } from '$lib/ORM/models/talent';
+import { Talent } from '$lib/models/talent';
 import { error, fail } from '@sveltejs/kit';
 import mongoose from 'mongoose';
 import type { Actions, PageServerLoad } from './$types';
-import { Show, ShowStatus } from '$lib/ORM/models/show';
-import { v4 as uuidv4 } from 'uuid';
+import { Show, ShowStatus } from '$lib/models/show';
 
 const getTalent = async (key: string) => {
   mongoose.connect(MONGO_DB_ENDPOINT);
@@ -57,7 +56,7 @@ export const actions: Actions = {
     const price = data.get('price') as string;
     const name = data.get('name') as string;
     const duration = data.get('duration') as string;
-    const maxNumTickets = data.get('maxNumTickets') as string;
+    const numTickets = data.get('numTickets') as string;
     const talentId = data.get('talentId') as string;
     const agentId = data.get('agentId') as string;
     const coverImageUrl = data.get('coverImageUrl') as string;
@@ -78,15 +77,13 @@ export const actions: Actions = {
       price: +price,
       name,
       duration: +duration,
-      maxNumTickets: +maxNumTickets,
+      numTickets: +numTickets,
       talent: talentId,
       agent: agentId,
       coverImageUrl,
       showState: {
         status: ShowStatus.BOX_OFFICE_OPEN,
-        active: true,
       },
-      roomId: uuidv4(),
     });
 
     return {

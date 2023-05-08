@@ -1,6 +1,7 @@
 import { ActorType } from '$lib/util/constants';
 import type { InferSchemaType } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
+import { v4 as uuidv4 } from 'uuid';
 
 export enum ShowStatus {
   CREATED = 'CREATED',
@@ -36,8 +37,13 @@ const finalizeSchema = new Schema({
 });
 
 const escrowSchema = new Schema({
-  startDateTime: { type: Date, required: true },
-  endDateTime: { type: Date },
+  startDate: { type: Date, required: true },
+  endDate: { type: Date },
+});
+
+const engagementSchema = new Schema({
+  startDate: { type: Date, required: true },
+  endDate: { type: Date },
 });
 
 const showStateSchema = new Schema(
@@ -48,24 +54,24 @@ const showStateSchema = new Schema(
       required: true,
       default: ShowStatus.CREATED,
     },
-    active: { type: Boolean, required: true, default: true },
-    ticketStats: {
-      available: { type: Number, required: true, default: 0 },
-      sold: { type: Number, required: true, default: 0 },
-      reserved: { type: Number, required: true, default: 0 },
-      refunded: { type: Number, required: true, default: 0 },
-      redeemed: { type: Number, required: true, default: 0 },
+    salesStats: {
+      ticketsAvailable: { type: Number, required: true, default: 0 },
+      ticketsSold: { type: Number, required: true, default: 0 },
+      ticketsReserved: { type: Number, required: true, default: 0 },
+      ticketsRefunded: { type: Number, required: true, default: 0 },
+      ticketsRedeemed: { type: Number, required: true, default: 0 },
+      totalSales: { type: Number, required: true, default: 0 },
+      totalRefunded: { type: Number, required: true, default: 0 },
     },
-    totalSales: { type: Number, required: true, default: 0 },
-    startDate: { type: Date },
-    endDate: { type: Date },
-    refundedAmount: { type: Number, required: true, default: 0 },
     cancel: {
       type: cancelSchema,
     },
     finalize: { type: finalizeSchema },
     escrow: {
       type: escrowSchema,
+    },
+    runtime: {
+      type: engagementSchema,
     },
   },
   { timestamps: true }
@@ -76,12 +82,18 @@ const showSchema = new Schema(
     _id: { type: Schema.Types.ObjectId, required: true, auto: true },
     talent: { type: Schema.Types.ObjectId, ref: 'Talent', required: true },
     agent: { type: Schema.Types.ObjectId, ref: 'Agent', required: true },
-    roomId: { type: String, required: true },
+    roomId: {
+      type: String,
+      required: true,
+      default: function () {
+        return uuidv4();
+      },
+    },
     coverImageUrl: { type: String, trim: true },
     duration: { type: Number, required: true },
     name: { type: String, required: true, trim: true },
-    maxNumTickets: { type: Number, required: true },
-    price: { type: Number, required: true },
+    numTickets: { type: Number, required: true, min: 1 },
+    price: { type: Number, required: true, min: 1 },
     showState: { type: showStateSchema, required: true },
   },
   { timestamps: true }

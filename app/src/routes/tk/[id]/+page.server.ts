@@ -14,7 +14,7 @@ import type {
   TicketDocument,
 } from '$lib/ORM/models/ticket';
 import { TicketCancelReason } from '$lib/ORM/models/ticket';
-import { TransactionReasonType } from '$lib/ORM/models/transaction';
+import { TransactionReasonType } from '$lib/models/transaction';
 import { StorageType } from '$lib/ORM/rxdb';
 
 import { createTicketMachineService } from '$lib/machines/ticketMachine';

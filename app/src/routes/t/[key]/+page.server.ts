@@ -8,10 +8,10 @@ import {
 } from '$env/static/private';
 import { PUBLIC_ESCROW_PERIOD, PUBLIC_RXDB_PASSWORD } from '$env/static/public';
 import { talentDB } from '$lib/ORM/dbs/talentDB';
-import type { ShowDocument } from '$lib/ORM/models/show';
-import { ShowCancelReason } from '$lib/ORM/models/show';
+import type { ShowDocument } from '$lib/models/show';
+import { ShowCancelReason } from '$lib/models/show';
 import { TicketCancelReason } from '$lib/ORM/models/ticket';
-import { TransactionReasonType } from '$lib/ORM/models/transaction';
+import { TransactionReasonType } from '$lib/models/transaction';
 import { StorageType } from '$lib/ORM/rxdb';
 import type { ShowStateType } from '$lib/machines/showMachine';
 import { createShowMachineService } from '$lib/machines/showMachine';

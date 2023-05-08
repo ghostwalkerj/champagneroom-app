@@ -13,7 +13,7 @@ import {
   PUBLIC_TALENT_PATH,
 } from '$env/static/public';
 import { talentDB } from '$lib/ORM/dbs/talentDB';
-import type { ShowDocument } from '$lib/ORM/models/show';
+import type { ShowDocument } from '$lib/models/show';
 import { StorageType } from '$lib/ORM/rxdb';
 import { createShowMachineService } from '$lib/machines/showMachine';
 import { createTicketMachineService } from '$lib/machines/ticketMachine';

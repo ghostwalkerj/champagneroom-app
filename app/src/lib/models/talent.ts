@@ -3,6 +3,7 @@ import { womensNames } from '$lib/util/womensNames';
 import type { InferSchemaType } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 import { nanoid } from 'nanoid';
+import type { type } from 'os';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 
 const talentSchema = new Schema(
@@ -33,7 +34,7 @@ const talentSchema = new Schema(
     profileImageUrl: { type: String, default: PUBLIC_DEFAULT_PROFILE_IMAGE },
     agentCommission: { type: Number, default: 0, min: 0, max: 100 },
     agent: { type: Schema.Types.ObjectId, ref: 'Agent', required: true },
-    currentShow: { type: Schema.Types.ObjectId, ref: 'Show' },
+    activeShows: [{ type: Schema.Types.ObjectId, ref: 'Show' }],
   },
   { timestamps: true }
 );

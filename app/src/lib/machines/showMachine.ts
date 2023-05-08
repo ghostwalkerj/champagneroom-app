@@ -8,10 +8,10 @@ import {
   type ActorRef,
   type StateFrom,
 } from 'xstate';
-import type { ShowDocument } from '../ORM/models/show';
-import { ShowStatus, type ShowDocType } from '../ORM/models/show';
-import type { TicketDocType, TicketDocument } from '../ORM/models/ticket';
-import type { TransactionDocType } from '../ORM/models/transaction';
+import type { ShowDocument } from '../models/show';
+import { ShowStatus, type ShowDocType } from '../models/show';
+import type { TicketDocType, TicketDocument } from '../models/ticket';
+import type { TransactionDocType } from '../models/transaction';
 
 export type ShowStateType = ShowDocType['showState'];
 

@@ -11,10 +11,10 @@ import {
   spawn,
   type StateFrom,
 } from 'xstate';
-import type { ShowDocument } from '../ORM/models/show';
-import type { TicketDocType, TicketDocument } from '../ORM/models/ticket';
-import { TicketStatus } from '../ORM/models/ticket';
-import type { TransactionDocType } from '../ORM/models/transaction';
+import type { ShowDocument } from '../models/show';
+import type { TicketDocType, TicketDocument } from '../models/ticket';
+import { TicketStatus } from '../models/ticket';
+import type { TransactionDocType } from '../models/transaction';
 import type { ShowMachineOptions, ShowMachineType } from './showMachine';
 import { createShowMachine } from './showMachine';
 
