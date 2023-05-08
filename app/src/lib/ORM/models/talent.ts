@@ -1,5 +1,6 @@
-import type { InferSchemaType, model } from 'mongoose';
-import mongoose, { Schema, Types } from 'mongoose';
+import type { InferSchemaType } from 'mongoose';
+import { Schema } from 'mongoose';
+import mongoose from 'mongoose';
 import { nanoid } from 'nanoid';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 import { womensNames } from '$lib/util/womensNames';
@@ -7,6 +8,8 @@ import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
 
 const talentSchema = new Schema(
   {
+    _id: Schema.Types.ObjectId,
+
     key: {
       type: String,
       required: true,
@@ -31,8 +34,8 @@ const talentSchema = new Schema(
     },
     profileImageUrl: { type: String, default: PUBLIC_DEFAULT_PROFILE_IMAGE },
     agentCommission: { type: Number, default: 0, min: 0, max: 100 },
-    agent: { type: Types.ObjectId, ref: 'Agent', required: true },
-    currentShow: { type: Types.ObjectId, ref: 'Show' },
+    agent: { type: Schema.Types.ObjectId, ref: 'Agent', required: true },
+    currentShow: { type: Schema.Types.ObjectId, ref: 'Show' },
   },
   { timestamps: true }
 );

@@ -12086,6 +12086,11 @@ svelte-proxied-store@^1.1.4:
   resolved "https://registry.yarnpkg.com/svelte-proxied-store/-/svelte-proxied-store-1.1.5.tgz#c7db6b70073501cab785cf27193bd7c0b6005eb6"
   integrity sha512-1hJyVy5AJigC8l2RLs9xIa7qdm10P/7juzAS/gW8zSPEs9XxT30i3XLMYxmd7NKjwqrOYo01dOfMQdz8eGgEOw==
 
+svelte-proxied-store@^2.0.1:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/svelte-proxied-store/-/svelte-proxied-store-2.0.3.tgz#3fe84f609a8c688ea7cf417967f2207523686e87"
+  integrity sha512-OYv12l9YQ6J2JW90uksMCWuA3XUI36ToVbxY0cLDsb6KuXUaB8OvMplqv98xgDnHIrY+ZYST4Ux+ScVhDRfIug==
+
 svelte-star-rating@^2.0.0:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/svelte-star-rating/-/svelte-star-rating-2.0.1.tgz#f1a019eea5179e928550ac49b3c7bfebe149c130"
@@ -12101,13 +12106,13 @@ svelte-waypoint@latest:
   resolved "https://registry.yarnpkg.com/svelte-waypoint/-/svelte-waypoint-0.1.4.tgz#ab467bed08c5f38716709872cf53d3f9da17831b"
   integrity sha512-UEqoXZjJeKj2sWlAIsBOFjxjMn+KP8aFCc/zjdmZi1cCOE59z6T2C+I6ZaAf8EmNQqNzfZVB/Lci4Ci9spzXAw==
 
-svelte-web3@^3.5.0:
-  version "3.6.0"
-  resolved "https://registry.yarnpkg.com/svelte-web3/-/svelte-web3-3.6.0.tgz#4783b93f6cfd86570c305f03862498a9ad3e09ed"
-  integrity sha512-5VSdGgvoKYZtsKQ3tRnV8hAznf1+FIU0CNdMNVRWyd40GKsiEBTjf7U0kwpgX+ZlSNUso+8UOnfZ9bYxLFvFDg==
+svelte-web3@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/svelte-web3/-/svelte-web3-4.1.0.tgz#860231921b3e3b7c1f8a6f0951f18b57e13075f0"
+  integrity sha512-CLQFMwv+7Ug0cU6s9no82W90dtSTi+w1DLpPYaztyoNJe/E32btMAbBB7bB7moRJ/bjFJ/RIDzgR8TF776I1Pg==
   dependencies:
     svelte "^3.0.0"
-    svelte-proxied-store "^1.1.4"
+    svelte-proxied-store "^2.0.1"
 
 svelte2tsx@~0.6.0:
   version "0.6.11"

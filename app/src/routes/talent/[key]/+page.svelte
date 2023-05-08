@@ -8,11 +8,8 @@
     PUBLIC_SHOW_PATH,
     PUBLIC_TALENT_DB_ENDPOINT,
   } from '$env/static/public';
-  import { talentDB, type TalentDBType } from '$lib/ORM/dbs/talentDB';
-  import type { ShowDocument } from '$lib/ORM/models/show';
-  import type { TalentDocType, TalentDocument } from '$lib/ORM/models/talent';
+  import type { ShowDocType } from '$lib/ORM/models/show';
   import {
-    ShowEventType,
     createShowMachineService,
     type ShowMachineServiceType,
     type ShowMachineStateType,
@@ -23,9 +20,9 @@
 
   import { goto } from '$app/navigation';
   import ShowDetail from '$components/ShowDetail.svelte';
+  import type { TalentDocType } from '$lib/ORM/models/talent';
   import { StorageType } from '$lib/ORM/rxdb';
   import { onMount } from 'svelte';
-  import * as timeago from 'timeago.js';
   import urlJoin from 'url-join';
   import type { Subscription } from 'xstate';
   import type { PageData } from './$types';
@@ -34,27 +31,26 @@
   export let form: import('./$types').ActionData;
   export let data: PageData;
 
-  const token = data.token;
   let talent = data.talent as TalentDocType;
-  $: currentShow = data.currentShow as ShowDocument | null;
+  $: currentShow = data.currentShow as ShowDocType | null;
   $: showDuration = 60;
 
+  console.log('talent', talent);
+  console.log('currentShow', currentShow);
+
   let showName = possessive(talent.name, 'en') + ' Show';
-  let key = $page.params.key;
 
   let showMachineSub: Subscription;
-  let showEventSub: Subscription;
   const showPath = urlJoin($page.url.href, 'show');
   let showMachineService: ShowMachineServiceType | null = null;
 
   $: showMachineState = null as ShowMachineStateType | null;
   $: canCancelShow = false;
-  $: canCreateShow =
-    data.currentShow === null || data.currentShow.showState.active === false;
+  $: canCreateShow = false;
   $: canStartShow = false;
   $: waiting4Refunds = false;
 
-  $: statusText = data.currentShow?.showState.status ?? 'No Current Show';
+  $: statusText = 'No Current Show';
   $: eventText = 'No Events';
   $: uiSubscribe = false;
   $: waiting4StateChange = false;
@@ -89,99 +85,7 @@
     );
   };
 
-  const useShowEvents = (show: ShowDocument) => {
-    showEventSub?.unsubscribe();
-    showEventSub = show.collection.database.showevents
-      .findOne()
-      .where('show')
-      .eq(show._id)
-      .sort({ createdAt: 'desc' })
-      .$.subscribe(async event => {
-        if (event) {
-          eventText =
-            timeago.format(event.createdAt) + ' ' + event.ticketInfo?.name;
-          switch (event.type) {
-            case ShowEventType.TICKET_SOLD:
-              eventText += ' bought a ticket!';
-              break;
-
-            case ShowEventType.TICKET_RESERVED:
-              eventText += ' reserved a ticket!';
-              break;
-
-            case ShowEventType.TICKET_CANCELLED:
-              eventText += ' cancelled';
-              break;
-
-            default:
-              eventText = 'No Events';
-          }
-        }
-      });
-  };
-
-  const subscribeCurrentShow = (talent: TalentDocument) => {
-    talent.get$('currentShow').subscribe(async showId => {
-      eventText = 'No Events';
-      if (showId) {
-        talent.collection.database.shows
-          .findOne(showId)
-          .$.subscribe(async _currentShow => {
-            if (_currentShow) {
-              if (
-                !currentShow ||
-                _currentShow.createdAt >= currentShow.createdAt ||
-                _currentShow.showState.updatedAt >=
-                  currentShow.showState.updatedAt
-              ) {
-                showMachineService?.stop();
-                showMachineSub?.unsubscribe();
-                currentShow = _currentShow as ShowDocument;
-
-                showMachineService = createShowMachineService(_currentShow, {
-                  saveState: false,
-                  observeState: true,
-                });
-                const showState = showMachineService.getSnapshot();
-                if (showState.hasTag('uiSubscribe')) {
-                  useShowMachine(showMachineService);
-                  useShowEvents(_currentShow);
-                }
-              }
-            }
-          });
-      } else {
-        noCurrentShow();
-      }
-    });
-  };
-
-  onMount(() => {
-    if (currentShow) {
-      showMachineService = createShowMachineService(currentShow, {
-        observeState: false,
-        saveState: false,
-      });
-      useShowMachine(showMachineService);
-    }
-    const dbOptions = {
-      rxdbPassword: PUBLIC_RXDB_PASSWORD,
-      endPoint: PUBLIC_TALENT_DB_ENDPOINT,
-      storageType: StorageType.IDB,
-    };
-    talentDB(key, token, dbOptions).then((db: TalentDBType | undefined) => {
-      if (!db) return;
-      db.talents
-        .findOne(talent._id)
-        .exec()
-        .then(_talent => {
-          if (_talent) {
-            talent = _talent;
-            subscribeCurrentShow(_talent);
-          }
-        });
-    });
-  });
+  onMount(() => {});
 
   const updateProfileImage = async (url: string) => {
     if (url && talent) {
@@ -198,13 +102,13 @@
     waiting4StateChange = true;
     return async ({ result }) => {
       if (result.data.showCreated) {
-        currentShow = result.data.show as ShowDocument;
+        currentShow = result.data.show as ShowDocType;
         canCreateShow = false;
         canCancelShow = true;
         const showUrl = urlJoin(
           window.location.origin,
           PUBLIC_SHOW_PATH,
-          currentShow!._id
+          currentShow!._id.toString()
         );
         navigator.clipboard.writeText(showUrl);
         showMachineService = createShowMachineService(currentShow, {
@@ -427,7 +331,7 @@
       {/if}
       {#if uiSubscribe}
         {#key showMachineState || currentShow}
-          <div>
+          <!-- <div>
             <ShowDetail
               show={currentShow}
               options={{
@@ -437,7 +341,7 @@
                 showWaterMark: false,
               }}
             />
-          </div>
+          </div> -->
         {/key}
       {/if}
       <div class="pb-4">
@@ -522,11 +426,11 @@
       <div>
         <div class="lg:col-start-3 lg:col-span-1">
           <div class="bg-primary text-primary-content card">
-            <div class="text-center card-body items-center p-3">
+            <!-- <div class="text-center card-body items-center p-3">
               <h2 class="text-2xl card-title">Your Average Rating</h2>
               {talent.stats.ratingAvg.toFixed(2)}
               <StarRating rating={talent.stats.ratingAvg ?? 0} />
-            </div>
+            </div> -->
           </div>
         </div>
       </div>

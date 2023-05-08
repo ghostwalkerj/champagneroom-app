@@ -1,6 +1,6 @@
 import { fail } from '@sveltejs/kit';
-import type { Actions } from './$types';
 import mongoose from 'mongoose';
+import type { Actions } from './$types';
 
 import { MONGO_DB_ENDPOINT } from '$env/static/private';
 import { Agent } from '$lib/ORM/models/agent';
@@ -8,7 +8,8 @@ import { Talent } from '$lib/ORM/models/talent';
 
 export const actions: Actions = {
   get_or_create_agent: async ({ request }) => {
-    mongoose.connect(MONGO_DB_ENDPOINT);
+    await mongoose.connect(MONGO_DB_ENDPOINT);
+
     const data = await request.formData();
     const account = data.get('account') as string;
 
@@ -34,7 +35,7 @@ export const actions: Actions = {
     };
   },
   create_talent: async ({ request }) => {
-    mongoose.connect(MONGO_DB_ENDPOINT);
+    await mongoose.connect(MONGO_DB_ENDPOINT);
 
     const data = await request.formData();
     const agentId = data.get('agentId') as string;

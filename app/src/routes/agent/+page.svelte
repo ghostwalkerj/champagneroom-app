@@ -1,19 +1,17 @@
 <script lang="ts">
+  import { deserialize } from '$app/forms';
+  import type { AgentDocType } from '$lib/ORM/models/agent';
+  import type { TalentDocType } from '$lib/ORM/models/talent';
   import { onMount } from 'svelte';
   import { selectedAccount } from 'svelte-web3';
   import type { ActionData, PageData } from './$types';
   import AgentWallet from './AgentWallet.svelte';
   import TalentForm from './TalentForm.svelte';
-  import TalentTable from './TalentTable.svelte';
-  import TopTalent from './TopTalent.svelte';
-  import WeeklyBooking from './WeeklyBooking.svelte';
-  import type { Talent } from '$lib/ORM/models/talent';
-  import { deserialize } from '$app/forms';
 
   export let data: PageData;
   export let form: ActionData;
-  let agent: AgentType;
-  let talents: (typeof Talent)[] = [];
+  let agent: AgentDocType;
+  let talents: TalentDocType[] = [];
 
   //TODO: This will be authentication later
   onMount(() => {

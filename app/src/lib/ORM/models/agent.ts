@@ -3,6 +3,8 @@ import mongoose, { Schema } from 'mongoose';
 
 const agentSchema = new Schema(
   {
+    _id: Schema.Types.ObjectId,
+
     address: {
       type: String,
       required: true,
