@@ -21,7 +21,9 @@ import { ActorType } from '$lib/util/constants';
 import { _escrowQueue } from '$queues/show/escrow/+server';
 import { error, fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
+import type { TalentType } from '$lib/ORM/models/talent';
 import { Talent } from '$lib/ORM/models/talent';
+import type { model } from 'mongoose';
 import mongoose from 'mongoose';
 
 const getTalent = async (key: string) => {
@@ -35,7 +37,7 @@ const getTalent = async (key: string) => {
 };
 
 const getShow = async (key: string) => {
-  const talent = (await getTalent(key)) as typeof Talent;
+  const talent = (await getTalent(key)) as typeof model<TalentType>;
 
   const show = await talent.populate('currentShow').exec();
   if (!show) {

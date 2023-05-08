@@ -14,7 +14,6 @@ const agentSchema = new Schema(
   { timestamps: true }
 );
 
-export type AgentType = InferSchemaType<typeof agentSchema>;
+export type AgentDocType = InferSchemaType<typeof agentSchema>;
 
-export const Agent =
-  mongoose.models.Agent || mongoose.model<AgentType>('Agent', agentSchema);
+export const Agent = mongoose.model<AgentDocType>('Agent', agentSchema);

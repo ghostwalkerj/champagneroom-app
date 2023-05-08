@@ -28,7 +28,6 @@ const showSchema = new Schema(
   { timestamps: true }
 );
 
-export type ShowType = InferSchemaType<typeof showSchema>;
+export type ShowDocType = InferSchemaType<typeof showSchema>;
 
-export const Show =
-  mongoose.models.Show || mongoose.model<ShowType>('Show', showSchema);
+export const Show = mongoose.model<ShowDocType>('Show', showSchema);

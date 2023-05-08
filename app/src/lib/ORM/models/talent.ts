@@ -37,7 +37,6 @@ const talentSchema = new Schema(
   { timestamps: true }
 );
 
-export type TalentType = InferSchemaType<typeof talentSchema>;
+export type TalentDocType = InferSchemaType<typeof talentSchema>;
 
-export const Talent =
-  mongoose.models.Talent || mongoose.model<TalentType>('Talent', talentSchema);
+export const Talent = mongoose.model<TalentDocType>('Talent', talentSchema);

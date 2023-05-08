@@ -9,7 +9,6 @@
   import WeeklyBooking from './WeeklyBooking.svelte';
   import type { Talent } from '$lib/ORM/models/talent';
   import { deserialize } from '$app/forms';
-  import type { AgentType } from '$lib/ORM/models/agent';
 
   export let data: PageData;
   export let form: ActionData;
