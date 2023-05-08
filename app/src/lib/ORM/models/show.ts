@@ -1,6 +1,6 @@
+import { ActorType } from '$lib/util/constants';
 import type { InferSchemaType } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
-import { ActorType } from '$lib/util/constants';
 
 export enum ShowStatus {
   CREATED = 'CREATED',
@@ -23,6 +23,23 @@ export enum ShowCancelReason {
   CUSTOMER_CANCELLED = 'CUSTOMER CANCELLED',
 }
 
+const cancelSchema = new Schema({
+  createdAt: { type: Date, required: true, default: Date.now },
+  cancelledInState: { type: String, enum: ShowStatus },
+  canceller: { type: String, enum: ActorType, required: true },
+  reason: { type: String, enum: ShowCancelReason, required: true },
+});
+
+const finalizeSchema = new Schema({
+  finalizedAt: { type: Date, required: true, default: Date.now },
+  finalizer: { type: String, enum: ActorType, required: true },
+});
+
+const escrowSchema = new Schema({
+  startDateTime: { type: Date, required: true },
+  endDateTime: { type: Date },
+});
+
 const showStateSchema = new Schema(
   {
     status: {
@@ -44,18 +61,11 @@ const showStateSchema = new Schema(
     endDate: { type: Date },
     refundedAmount: { type: Number, required: true, default: 0 },
     cancel: {
-      createdAt: { type: Date, required: true, default: Date.now },
-      cancelledInState: { type: String, enum: ShowStatus },
-      canceller: { type: String, enum: ActorType, required: true },
-      reason: { type: String, enum: ShowCancelReason, required: true },
+      type: cancelSchema,
     },
-    finalize: {
-      finalizedAt: { type: Date, required: true, default: Date.now },
-      finalizer: { type: String, enum: ActorType, required: true },
-    },
+    finalize: { type: finalizeSchema },
     escrow: {
-      startDateTime: { type: Date, required: true },
-      endDateTime: { type: Date },
+      type: escrowSchema,
     },
   },
   { timestamps: true }
@@ -63,8 +73,7 @@ const showStateSchema = new Schema(
 
 const showSchema = new Schema(
   {
-    _id: Schema.Types.ObjectId,
-
+    _id: { type: Schema.Types.ObjectId, required: true, auto: true },
     talent: { type: Schema.Types.ObjectId, ref: 'Talent', required: true },
     agent: { type: Schema.Types.ObjectId, ref: 'Agent', required: true },
     roomId: { type: String, required: true },

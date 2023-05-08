@@ -1,15 +1,13 @@
+import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
+import { womensNames } from '$lib/util/womensNames';
 import type { InferSchemaType } from 'mongoose';
-import { Schema } from 'mongoose';
-import mongoose from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 import { nanoid } from 'nanoid';
 import { uniqueNamesGenerator } from 'unique-names-generator';
-import { womensNames } from '$lib/util/womensNames';
-import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
 
 const talentSchema = new Schema(
   {
-    _id: Schema.Types.ObjectId,
-
+    _id: { type: Schema.Types.ObjectId, required: true, auto: true },
     key: {
       type: String,
       required: true,

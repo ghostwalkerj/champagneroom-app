@@ -4,9 +4,7 @@
   import ProfilePhoto from '$components/forms/ProfilePhoto.svelte';
   import {
     PUBLIC_DEFAULT_PROFILE_IMAGE,
-    PUBLIC_RXDB_PASSWORD,
     PUBLIC_SHOW_PATH,
-    PUBLIC_TALENT_DB_ENDPOINT,
   } from '$env/static/public';
   import type { ShowDocType } from '$lib/ORM/models/show';
   import {
@@ -16,12 +14,9 @@
   } from '$lib/machines/showMachine';
   import { durationFormatter } from '$lib/util/constants';
   import { possessive } from 'i18n-possessive';
-  import StarRating from 'svelte-star-rating';
 
-  import { goto } from '$app/navigation';
-  import ShowDetail from '$components/ShowDetail.svelte';
+  import { goto, invalidateAll } from '$app/navigation';
   import type { TalentDocType } from '$lib/ORM/models/talent';
-  import { StorageType } from '$lib/ORM/rxdb';
   import { onMount } from 'svelte';
   import urlJoin from 'url-join';
   import type { Subscription } from 'xstate';
@@ -35,9 +30,6 @@
   $: currentShow = data.currentShow as ShowDocType | null;
   $: showDuration = 60;
 
-  console.log('talent', talent);
-  console.log('currentShow', currentShow);
-
   let showName = possessive(talent.name, 'en') + ' Show';
 
   let showMachineSub: Subscription;
@@ -46,7 +38,7 @@
 
   $: showMachineState = null as ShowMachineStateType | null;
   $: canCancelShow = false;
-  $: canCreateShow = false;
+  $: canCreateShow = !data.talent.currentShow;
   $: canStartShow = false;
   $: waiting4Refunds = false;
 
@@ -102,20 +94,13 @@
     waiting4StateChange = true;
     return async ({ result }) => {
       if (result.data.showCreated) {
-        currentShow = result.data.show as ShowDocType;
-        canCreateShow = false;
-        canCancelShow = true;
         const showUrl = urlJoin(
           window.location.origin,
           PUBLIC_SHOW_PATH,
-          currentShow!._id.toString()
+          result.data.show!._id.toString()
         );
         navigator.clipboard.writeText(showUrl);
-        showMachineService = createShowMachineService(currentShow, {
-          observeState: false,
-          saveState: false,
-        });
-        useShowMachine(showMachineService);
+        invalidateAll();
       } else if (result.data.showCancelled) {
         noCurrentShow();
         statusText = 'Cancelled';
@@ -288,6 +273,9 @@
                   </div>
 
                   <input type="hidden" name="maxNumTickets" value="1" />
+                  <input type="hidden" name="talentId" value={talent._id} />
+                  <input type="hidden" name="agentId" value={talent.agent} />
+                  <input type="hidden" name="coverImageUrl" value={talent.profileImageUrl} />
                   <div class="form-control md:w-1/5">
                     <!-- svelte-ignore a11y-label-has-associated-control -->
                     <label class="label">
