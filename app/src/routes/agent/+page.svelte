@@ -7,13 +7,13 @@
   import TalentTable from './TalentTable.svelte';
   import TopTalent from './TopTalent.svelte';
   import WeeklyBooking from './WeeklyBooking.svelte';
-  import type { Agent } from '$lib/ORM/schemas/agent';
-  import type { Talent } from '$lib/ORM/schemas/talent';
+  import type { Talent } from '$lib/ORM/models/talent';
   import { deserialize } from '$app/forms';
+  import type { AgentType } from '$lib/ORM/models/agent';
 
   export let data: PageData;
   export let form: ActionData;
-  let agent: typeof Agent;
+  let agent: AgentType;
   let talents: (typeof Talent)[] = [];
 
   //TODO: This will be authentication later
