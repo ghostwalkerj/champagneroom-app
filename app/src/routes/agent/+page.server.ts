@@ -38,7 +38,6 @@ export const actions: Actions = {
     const agentId = data.get('agentId') as string;
     const name = data.get('name') as string;
     const agentCommission = data.get('agentCommission') as string;
-    const profileImageUrl = data.get('profileImageUrl') as string;
 
     // Validation
     if (agentId === null) {
@@ -64,13 +63,11 @@ export const actions: Actions = {
     Talent.create({
       name,
       agentCommission: +agentCommission,
-      profileImageUrl,
       agent,
     });
 
     return {
       success: true,
-      agent: agent.toJSON(),
     };
   },
 };

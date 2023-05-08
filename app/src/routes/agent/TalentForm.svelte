@@ -46,7 +46,7 @@
               type="text"
               name="agentCommission"
               class="py-2 w-20 input input-bordered input-primary"
-              value={form?.agentCommission ?? '10'}
+              value="10"
             />
             <div class="flex inset-y-4 right-4 absolute pointer-events-none">
               <span class="text-gray-500 sm:text-sm"> % </span>
