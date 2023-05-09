@@ -23,11 +23,12 @@ export const load: PageServerLoad = async ({ params }) => {
   }
 
   const talent = await getTalent(key);
-  const currentShow = await talent.populate('currentShow');
+  await talent.populate('activeShows');
+
+  console.log('talent', talent);
 
   return {
     talent: JSON.parse(JSON.stringify(talent)),
-    currentShow: currentShow ? JSON.parse(JSON.stringify(currentShow)) : null,
   };
 };
 export const actions: Actions = {
@@ -51,7 +52,7 @@ export const actions: Actions = {
 
     return { success: true, talent: JSON.parse(JSON.stringify(talent)) };
   },
-  create_show: async ({ params, request }) => {
+  create_show: async ({ request }) => {
     const data = await request.formData();
     const price = data.get('price') as string;
     const name = data.get('name') as string;
@@ -85,6 +86,13 @@ export const actions: Actions = {
         status: ShowStatus.BOX_OFFICE_OPEN,
       },
     });
+
+    const talent = await Talent.findById(talentId).exec();
+    if (!talent) {
+      throw error(404, 'Talent not found');
+    }
+    talent.activeShows.push(show._id);
+    talent.save();
 
     return {
       success: true,

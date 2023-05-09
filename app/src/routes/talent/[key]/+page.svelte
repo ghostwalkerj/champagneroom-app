@@ -6,28 +6,28 @@
     PUBLIC_DEFAULT_PROFILE_IMAGE,
     PUBLIC_SHOW_PATH,
   } from '$env/static/public';
-  import type { ShowDocType } from '$lib/ORM/models/show';
-  import {
-    createShowMachineService,
-    type ShowMachineServiceType,
-    type ShowMachineStateType,
-  } from '$lib/machines/showMachine';
+  import type { ShowDocType } from '$lib/models/show';
+
   import { durationFormatter } from '$lib/util/constants';
   import { possessive } from 'i18n-possessive';
 
   import { goto, invalidateAll } from '$app/navigation';
-  import type { TalentDocType } from '$lib/ORM/models/talent';
+  import type { TalentDocType } from '$lib/models/talent';
   import { onMount } from 'svelte';
   import urlJoin from 'url-join';
   import type { Subscription } from 'xstate';
   import type { PageData } from './$types';
   import TalentWallet from './TalentWallet.svelte';
+  import type {
+    ShowMachineServiceType,
+    ShowMachineStateType,
+  } from '$lib/machines/showMachine';
 
   export let form: import('./$types').ActionData;
   export let data: PageData;
 
   let talent = data.talent as TalentDocType;
-  $: currentShow = data.currentShow as ShowDocType | null;
+  $: activeShows = talent.activeShows;
   $: showDuration = 60;
 
   let showName = possessive(talent.name, 'en') + ' Show';
@@ -272,10 +272,14 @@
                       </div>{/if}
                   </div>
 
-                  <input type="hidden" name="maxNumTickets" value="1" />
+                  <input type="hidden" name="numTickets" value="1" />
                   <input type="hidden" name="talentId" value={talent._id} />
                   <input type="hidden" name="agentId" value={talent.agent} />
-                  <input type="hidden" name="coverImageUrl" value={talent.profileImageUrl} />
+                  <input
+                    type="hidden"
+                    name="coverImageUrl"
+                    value={talent.profileImageUrl}
+                  />
                   <div class="form-control md:w-1/5">
                     <!-- svelte-ignore a11y-label-has-associated-control -->
                     <label class="label">
@@ -318,7 +322,7 @@
         </div>
       {/if}
       {#if uiSubscribe}
-        {#key showMachineState || currentShow}
+        {#key showMachineState || activeShows}
           <!-- <div>
             <ShowDetail
               show={currentShow}

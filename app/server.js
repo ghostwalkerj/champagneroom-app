@@ -10,12 +10,6 @@ var corsOptions = {
 
 const app = express();
 
-// need pouchdb directory for SSR DB
-const dir = './pouchdb';
-!fs.existsSync(dir) && fs.mkdirSync(dir);
-fs.chmodSync(dir, 0o777);
-console.log('process dir', process.cwd());
-
 // add a route that lives separately from the SvelteKit app
 app.get('/healthcheck', (req, res) => {
   res.end('ok');
