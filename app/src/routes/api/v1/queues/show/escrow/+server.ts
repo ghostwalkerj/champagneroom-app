@@ -6,10 +6,10 @@ import {
 } from '$env/static/private';
 import { PUBLIC_RXDB_PASSWORD } from '$env/static/public';
 import { showDB } from '$lib/ORM/dbs/showDB';
-import type { ShowDocument } from '$lib/models/show';
 import { StorageType } from '$lib/ORM/rxdb';
 import type { ShowStateType } from '$lib/machines/showMachine';
 import { createShowMachineService } from '$lib/machines/showMachine';
+import type { ShowDocument } from '$lib/models/show';
 import { ActorType } from '$lib/util/constants';
 import { error } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';

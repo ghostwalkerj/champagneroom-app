@@ -1,9 +1,9 @@
 import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
 import { womensNames } from '$lib/util/womensNames';
-import type { InferSchemaType } from 'mongoose';
+import type { InferSchemaType, Model, Model } from 'mongoose';
+import { models } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 import { nanoid } from 'nanoid';
-import type { type } from 'os';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 
 const talentSchema = new Schema(
@@ -41,4 +41,9 @@ const talentSchema = new Schema(
 
 export type TalentDocType = InferSchemaType<typeof talentSchema>;
 
-export const Talent = mongoose.model<TalentDocType>('Talent', talentSchema);
+export const Talent = models.Talent
+  ? (models.Talent as Model<TalentDocType>)
+  : (mongoose.model<TalentDocType>(
+      'Talent',
+      talentSchema
+    ) as Model<TalentDocType>);

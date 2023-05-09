@@ -1,7 +1,10 @@
 import { ActorType } from '$lib/util/constants';
-import type { InferSchemaType } from 'mongoose';
+import type { InferSchemaType, Model } from 'mongoose';
+import { models } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
+import { MONGO_FIELD_SECRET } from '$env/static/private';
+import { fieldEncryption } from 'mongoose-field-encryption';
 
 export enum ShowStatus {
   CREATED = 'CREATED',
@@ -99,6 +102,13 @@ const showSchema = new Schema(
   { timestamps: true }
 );
 
+showSchema.plugin(fieldEncryption, {
+  fields: ['roomId'],
+  secret: MONGO_FIELD_SECRET,
+});
+
 export type ShowDocType = InferSchemaType<typeof showSchema>;
 
-export const Show = mongoose.model<ShowDocType>('Show', showSchema);
+export const Show = (
+  models.Show ? models.Show : mongoose.model<ShowDocType>('Show', showSchema)
+) as Model<ShowDocType>;

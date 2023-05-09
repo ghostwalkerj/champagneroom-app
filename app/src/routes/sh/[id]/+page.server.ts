@@ -8,9 +8,9 @@ import {
 } from '$env/static/private';
 import { PUBLIC_RXDB_PASSWORD, PUBLIC_TICKET_PATH } from '$env/static/public';
 import { showDB } from '$lib/ORM/dbs/showDB';
-import type { ShowDocType } from '$lib/models/show';
 import { StorageType } from '$lib/ORM/rxdb';
 import { createShowMachineService } from '$lib/machines/showMachine';
+import type { ShowDocType } from '$lib/models/show';
 import { mensNames } from '$lib/util/mensNames';
 import { createPinHash } from '$lib/util/pin';
 import { error, fail, redirect } from '@sveltejs/kit';

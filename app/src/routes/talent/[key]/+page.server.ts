@@ -1,9 +1,9 @@
 import { MONGO_DB_ENDPOINT } from '$env/static/private';
+import { Show, ShowStatus } from '$lib/models/show';
 import { Talent } from '$lib/models/talent';
 import { error, fail } from '@sveltejs/kit';
 import mongoose from 'mongoose';
 import type { Actions, PageServerLoad } from './$types';
-import { Show, ShowStatus } from '$lib/models/show';
 
 const getTalent = async (key: string) => {
   mongoose.connect(MONGO_DB_ENDPOINT);

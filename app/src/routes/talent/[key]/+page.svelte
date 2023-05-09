@@ -6,22 +6,21 @@
     PUBLIC_DEFAULT_PROFILE_IMAGE,
     PUBLIC_SHOW_PATH,
   } from '$env/static/public';
-  import type { ShowDocType } from '$lib/models/show';
 
   import { durationFormatter } from '$lib/util/constants';
   import { possessive } from 'i18n-possessive';
 
   import { goto, invalidateAll } from '$app/navigation';
+  import type {
+    ShowMachineServiceType,
+    ShowMachineStateType,
+  } from '$lib/machines/showMachine';
   import type { TalentDocType } from '$lib/models/talent';
   import { onMount } from 'svelte';
   import urlJoin from 'url-join';
   import type { Subscription } from 'xstate';
   import type { PageData } from './$types';
   import TalentWallet from './TalentWallet.svelte';
-  import type {
-    ShowMachineServiceType,
-    ShowMachineStateType,
-  } from '$lib/machines/showMachine';
 
   export let form: import('./$types').ActionData;
   export let data: PageData;

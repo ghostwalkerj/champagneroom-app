@@ -1,4 +1,5 @@
-import type { InferSchemaType } from 'mongoose';
+import type { InferSchemaType, Model } from 'mongoose';
+import { models } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 
 export enum TransactionReasonType {
@@ -25,7 +26,9 @@ const transactionSchema = new Schema(
 );
 
 export type TransactionDocType = InferSchemaType<typeof transactionSchema>;
-export const Transaction = mongoose.model<TransactionDocType>(
-  'Transaction',
-  transactionSchema
-);
+export const Transaction = models.Transaction
+  ? (models.Transaction as Model<TransactionDocType>)
+  : (mongoose.model<TransactionDocType>(
+      'Transaction',
+      transactionSchema
+    ) as Model<TransactionDocType>);

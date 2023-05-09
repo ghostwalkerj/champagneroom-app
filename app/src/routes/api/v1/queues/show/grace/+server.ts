@@ -6,9 +6,9 @@ import {
 } from '$env/static/private';
 import { PUBLIC_RXDB_PASSWORD } from '$env/static/public';
 import { showDB } from '$lib/ORM/dbs/showDB';
-import type { ShowDocument } from '$lib/models/show';
 import { StorageType } from '$lib/ORM/rxdb';
 import { createShowMachineService } from '$lib/machines/showMachine';
+import type { ShowDocument } from '$lib/models/show';
 import { error } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import { Queue } from 'quirrel/sveltekit';

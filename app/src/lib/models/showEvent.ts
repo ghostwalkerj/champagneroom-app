@@ -1,4 +1,5 @@
-import type { InferSchemaType } from 'mongoose';
+import type { InferSchemaType, Model } from 'mongoose';
+import { models } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 
 const showeventSchema = new Schema(
@@ -16,7 +17,9 @@ const showeventSchema = new Schema(
 
 export type ShowEventDocType = InferSchemaType<typeof showeventSchema>;
 
-export const ShowEvent = mongoose.model<ShowEventDocType>(
-  'ShowEvent',
-  showeventSchema
-);
+export const ShowEvent = models.Showevent
+  ? (models.Showevent as Model<ShowEventDocType>)
+  : (mongoose.model<ShowEventDocType>(
+      'ShowEvent',
+      showeventSchema
+    ) as Model<ShowEventDocType>);

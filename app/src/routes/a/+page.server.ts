@@ -8,8 +8,8 @@ import {
 } from '$env/static/private';
 import { PUBLIC_RXDB_PASSWORD } from '$env/static/public';
 import { agentDB } from '$lib/ORM/dbs/agentDB';
-import { getAgentId } from '$lib/models/agent';
 import { StorageType } from '$lib/ORM/rxdb';
+import { getAgentId } from '$lib/models/agent';
 import { fail } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import type { Actions, PageServerLoad } from './$types';
