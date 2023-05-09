@@ -21,12 +21,15 @@
   import type { Subscription } from 'xstate';
   import type { PageData } from './$types';
   import TalentWallet from './TalentWallet.svelte';
+  import ShowDetail from '$components/ShowDetail.svelte';
+  import type { ShowDocType } from '$lib/models/show';
 
   export let form: import('./$types').ActionData;
   export let data: PageData;
 
   let talent = data.talent as TalentDocType;
-  $: activeShows = talent.activeShows;
+  $: activeShows = data.activeShows as ShowDocType[];
+  $: activeShow = activeShows[0] ?? null;
   $: showDuration = 60;
 
   let showName = possessive(talent.name, 'en') + ' Show';
@@ -37,13 +40,12 @@
 
   $: showMachineState = null as ShowMachineStateType | null;
   $: canCancelShow = false;
-  $: canCreateShow = !data.talent.currentShow;
+  $: canCreateShow = activeShows.length === 0;
   $: canStartShow = false;
   $: waiting4Refunds = false;
 
-  $: statusText = 'No Current Show';
+  $: statusText = activeShow ? activeShow.showState.status : 'No Current Show';
   $: eventText = 'No Events';
-  $: uiSubscribe = false;
   $: waiting4StateChange = false;
   $: showStopped = false;
 
@@ -53,7 +55,6 @@
     canStartShow = false;
     statusText = 'No Current Show';
     eventText = 'No Events';
-    uiSubscribe = false;
   };
 
   const useShowMachine = (showMachineService: ShowMachineServiceType) => {
@@ -70,7 +71,6 @@
         canStartShow = state.can({ type: 'START SHOW' });
         showMachineState = state;
         waiting4Refunds = state.matches('requestedCancellation.waiting2Refund');
-        uiSubscribe = state.hasTag('uiSubscribe');
         statusText = state.context.showState.status;
       }
     );
@@ -320,11 +320,12 @@
           </div>
         </div>
       {/if}
-      {#if uiSubscribe}
+      {#if activeShows.length > 0}
         {#key showMachineState || activeShows}
-          <!-- <div>
+          <div>
             <ShowDetail
-              show={currentShow}
+              show={activeShow}
+              {talent}
               options={{
                 showCopy: true,
                 showSalesStats: true,
@@ -332,7 +333,7 @@
                 showWaterMark: false,
               }}
             />
-          </div> -->
+          </div>
         {/key}
       {/if}
       <div class="pb-4">

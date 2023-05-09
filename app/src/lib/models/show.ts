@@ -49,6 +49,16 @@ const engagementSchema = new Schema({
   endDate: { type: Date },
 });
 
+const salesStatsSchema = new Schema({
+  ticketsAvailable: { type: Number, required: true, default: 0 },
+  ticketsSold: { type: Number, required: true, default: 0 },
+  ticketsReserved: { type: Number, required: true, default: 0 },
+  ticketsRefunded: { type: Number, required: true, default: 0 },
+  ticketsRedeemed: { type: Number, required: true, default: 0 },
+  totalSales: { type: Number, required: true, default: 0 },
+  totalRefunded: { type: Number, required: true, default: 0 },
+});
+
 const showStateSchema = new Schema(
   {
     status: {
@@ -58,13 +68,9 @@ const showStateSchema = new Schema(
       default: ShowStatus.CREATED,
     },
     salesStats: {
-      ticketsAvailable: { type: Number, required: true, default: 0 },
-      ticketsSold: { type: Number, required: true, default: 0 },
-      ticketsReserved: { type: Number, required: true, default: 0 },
-      ticketsRefunded: { type: Number, required: true, default: 0 },
-      ticketsRedeemed: { type: Number, required: true, default: 0 },
-      totalSales: { type: Number, required: true, default: 0 },
-      totalRefunded: { type: Number, required: true, default: 0 },
+      type: salesStatsSchema,
+      required: true,
+      default: () => ({}),
     },
     cancel: {
       type: cancelSchema,

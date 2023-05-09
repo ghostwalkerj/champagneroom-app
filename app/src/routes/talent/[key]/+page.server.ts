@@ -29,6 +29,7 @@ export const load: PageServerLoad = async ({ params }) => {
 
   return {
     talent: JSON.parse(JSON.stringify(talent)),
+    activeShows: JSON.parse(JSON.stringify(talent.activeShows)),
   };
 };
 export const actions: Actions = {

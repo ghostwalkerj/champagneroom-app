@@ -1,10 +1,20 @@
 import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
 import { womensNames } from '$lib/util/womensNames';
-import type { InferSchemaType, Model, Model } from 'mongoose';
+import type { InferSchemaType, Model } from 'mongoose';
 import { models } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 import { nanoid } from 'nanoid';
 import { uniqueNamesGenerator } from 'unique-names-generator';
+
+const statSchema = new Schema(
+  {
+    ratingAvg: { type: Number, default: 0, min: 0, max: 5, required: true },
+    totalEarnings: { type: Number, default: 0, min: 0, required: true },
+    totalRating: { type: Number, default: 0, min: 0, required: true },
+    completedShows: [{ type: Schema.Types.ObjectId, ref: 'Show' }],
+  },
+  { timestamps: true }
+);
 
 const talentSchema = new Schema(
   {
@@ -31,10 +41,21 @@ const talentSchema = new Schema(
         });
       },
     },
-    profileImageUrl: { type: String, default: PUBLIC_DEFAULT_PROFILE_IMAGE },
-    agentCommission: { type: Number, default: 0, min: 0, max: 100 },
+    profileImageUrl: {
+      type: String,
+      default: PUBLIC_DEFAULT_PROFILE_IMAGE,
+      required: true,
+    },
+    agentCommission: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 100,
+      required: true,
+    },
     agent: { type: Schema.Types.ObjectId, ref: 'Agent', required: true },
     activeShows: [{ type: Schema.Types.ObjectId, ref: 'Show' }],
+    stats: { type: statSchema, required: true, default: () => ({}) },
   },
   { timestamps: true }
 );

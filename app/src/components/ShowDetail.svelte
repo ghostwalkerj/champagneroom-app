@@ -1,10 +1,8 @@
 <script lang="ts">
   import { PUBLIC_SHOW_PATH } from '$env/static/public';
-  import type { ShowDocType, showSchema } from '$lib/ORM/models/show';
-  import {
-    currencyFormatter,
-    durationFormatter,
-  } from '$lib/util/constants';
+  import type { ShowDocType } from '$lib/models/show';
+  import type { TalentDocType } from '$lib/models/talent';
+  import { currencyFormatter, durationFormatter } from '$lib/util/constants';
   import StarRating from 'svelte-star-rating';
   import urlJoin from 'url-join';
 
@@ -22,7 +20,8 @@
     showRating: true,
     showWaterMark: true,
   };
-  export let show: ShowDocType | null;
+  export let show: ShowDocType;
+  export let talent: TalentDocType;
   export let options: ShowDetailOptions = defaultOptions;
 
   options = {
@@ -36,7 +35,7 @@
     const showUrl = urlJoin(
       window.location.origin,
       PUBLIC_SHOW_PATH,
-      show!._id
+      show._id.toString()
     );
     navigator.clipboard.writeText(showUrl);
   };
@@ -45,7 +44,7 @@
 {#if show}
   <div
     class="flex flex-col h-full justify-end relative p-4 bg-base-200 rounded-xl min-h-[700px] bg-cover"
-    style="background-image: url('{show.talentInfo.profileImageUrl}')"
+    style="background-image: url('{show.coverImageUrl}')"
   >
     <div class="flex flex-col">
       <div
@@ -58,10 +57,10 @@
           class="absolute top-4 right-4 text-lg text-primary ring-2 ring-primary bg-base-200 p-2 ring-inset rounded-xl"
         >
           <div class="">
-            {show.talentInfo.name}
+            {talent.name}
           </div>
           <div>
-            <StarRating rating={show.talentInfo.stats.ratingAvg} />
+            <StarRating rating={talent.stats.ratingAvg} />
           </div>
         </div>
       {/if}
@@ -94,7 +93,7 @@
             <div class="stat">
               <div class="stat-title whitespace-normal">Available</div>
               <div class="text-primary stat-value">
-                {show.showState.ticketsAvailable}
+                {show.showState.salesStats.ticketsAvailable}
               </div>
             </div>
           </div>
@@ -103,37 +102,39 @@
               <div class="stat">
                 <div class="stat-title">Reserved</div>
                 <div class="text-primary stat-value">
-                  {show.showState.ticketsReserved}
+                  {show.showState.salesStats.ticketsReserved}
                 </div>
               </div>
               <div class="stat">
                 <div class="stat-title">Sold</div>
                 <div class="text-primary stat-value">
-                  {show.showState.ticketsSold}
+                  {show.showState.salesStats.ticketsSold}
                 </div>
               </div>
-              {#if show.showState.ticketsRefunded > 0}
+              {#if show.showState.salesStats.ticketsRefunded > 0}
                 <div class="stat">
                   <div class="stat-title">Refunded</div>
                   <div class="text-primary stat-value">
-                    {show.showState.ticketsRefunded}
+                    {show.showState.salesStats.ticketsRefunded}
                   </div>
                 </div>
               {/if}
-              {#if show.showState.refundedAmount > 0}
+              {#if show.showState.salesStats.totalRefunded > 0}
                 <div class="stat">
                   <div class="stat-title whitespace-normal">
                     Refunded Amount
                   </div>
                   <div class="text-primary stat-value">
-                    {currencyFormatter.format(show.showState.refundedAmount)}
+                    {currencyFormatter.format(
+                      show.showState.salesStats.totalRefunded
+                    )}
                   </div>
                 </div>
               {/if}
               <div class="stat">
                 <div class="stat-title whitespace-normal">Total Sales</div>
                 <div class="text-primary stat-value">
-                  {currencyFormatter.format(show.showState.totalSales)}
+                  {currencyFormatter.format(show.showState.salesStats.totalSales)}
                 </div>
               </div>
             </div>
