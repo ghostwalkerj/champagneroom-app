@@ -1,6 +1,5 @@
 import type { InferSchemaType, Model } from 'mongoose';
-import { models } from 'mongoose';
-import mongoose, { Schema } from 'mongoose';
+import mongoose, { Schema, models } from 'mongoose';
 
 export enum TransactionReasonType {
   TICKET_PAYMENT = 'TICKET PAYMENT',
@@ -16,7 +15,7 @@ const transactionSchema = new Schema(
     from: { type: String },
     to: { type: String },
     reason: { type: String, enum: TransactionReasonType },
-    value: { type: String },
+    value: { type: String, required: true },
     ticket: { type: Schema.Types.ObjectId, ref: 'Ticket' },
     talent: { type: Schema.Types.ObjectId, ref: 'Talent' },
     agent: { type: Schema.Types.ObjectId, ref: 'Agent' },
@@ -26,9 +25,11 @@ const transactionSchema = new Schema(
 );
 
 export type TransactionDocType = InferSchemaType<typeof transactionSchema>;
-export const Transaction = models.Transaction
+export const TransactionModel = models.Transaction
   ? (models.Transaction as Model<TransactionDocType>)
   : (mongoose.model<TransactionDocType>(
       'Transaction',
       transactionSchema
     ) as Model<TransactionDocType>);
+
+export type TransactionType = InstanceType<typeof TransactionModel>;

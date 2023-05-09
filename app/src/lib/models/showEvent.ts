@@ -1,6 +1,5 @@
 import type { InferSchemaType, Model } from 'mongoose';
-import { models } from 'mongoose';
-import mongoose, { Schema } from 'mongoose';
+import mongoose, { Schema, models } from 'mongoose';
 
 const showeventSchema = new Schema(
   {
@@ -23,3 +22,5 @@ export const ShowEvent = models.Showevent
       'ShowEvent',
       showeventSchema
     ) as Model<ShowEventDocType>);
+
+export type ShowEventType = InstanceType<typeof ShowEvent>;

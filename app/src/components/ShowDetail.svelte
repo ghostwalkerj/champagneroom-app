@@ -134,7 +134,9 @@
               <div class="stat">
                 <div class="stat-title whitespace-normal">Total Sales</div>
                 <div class="text-primary stat-value">
-                  {currencyFormatter.format(show.showState.salesStats.totalSales)}
+                  {currencyFormatter.format(
+                    show.showState.salesStats.totalSales
+                  )}
                 </div>
               </div>
             </div>

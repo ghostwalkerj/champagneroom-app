@@ -3,8 +3,8 @@
     PUBLIC_DEFAULT_PROFILE_IMAGE,
     PUBLIC_PROFILE_IMAGE_PATH,
   } from '$env/static/public';
-  import type { ShowDocType } from '$lib/ORM/models/show';
-  import type { TicketDocType } from '$lib/ORM/models/ticket';
+  import type { ShowDocType } from '$lib/models/show';
+  import type { TicketDocType } from '$lib/models/ticket';
   import { currencyFormatter, durationFormatter } from '$lib/util/constants';
   import getProfileImage from '$lib/util/profilePhoto';
   export let show: ShowDocType | null;

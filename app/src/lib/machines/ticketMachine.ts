@@ -1,53 +1,23 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
+import type { ShowDocType } from '$lib/models/show';
+import type { TicketDocType, TicketStateType } from '$lib/models/ticket';
+import { TicketStatus } from '$lib/models/ticket';
+import type { TransactionDocType } from '$lib/models/transaction';
 import { nanoid } from 'nanoid';
-import type { Observable } from 'rxjs';
-import { map } from 'rxjs';
 import type { ActorRef, ActorRefFrom } from 'xstate';
-import {
-  assign,
-  createMachine,
-  interpret,
-  send,
-  spawn,
-  type StateFrom,
-} from 'xstate';
-import type { ShowDocument } from '../models/show';
-import type { TicketDocType, TicketDocument } from '../models/ticket';
-import { TicketStatus } from '../models/ticket';
-import type { TransactionDocType } from '../models/transaction';
+import { assign, createMachine, interpret, send, type StateFrom } from 'xstate';
 import type { ShowMachineOptions, ShowMachineType } from './showMachine';
 import { createShowMachine } from './showMachine';
 
-type TicketStateType = TicketDocType['ticketState'];
 export type TicketMachineOptions = {
-  saveState: boolean;
-  observeState: boolean;
+  saveStateCallback?: (state: TicketStateType) => Promise<void>;
   gracePeriod?: number;
   escrowPeriod?: number;
 };
 
-export type TicketStateCallbackType = (
-  state: TicketStateType
-) => Promise<TicketDocument>;
-
-// const paymentTimer = (timerStart: number) => {
-//   const timer = timerStart + PAYMENT_PERIOD - new Date().getTime();
-//   return timer > 0 ? timer : 0;
-// };
-
-const createTicketStateObservable = (ticketDocument: TicketDocument) => {
-  const ticketState$ = ticketDocument.get$(
-    'ticketState'
-  ) as Observable<TicketStateType>;
-
-  return ticketState$.pipe(
-    map(ticketState => ({ type: 'TICKETSTATE UPDATE', ticketState }))
-  );
-};
-
 export const createTicketMachine = (
-  ticketDocument: TicketDocument,
-  showDocument: ShowDocument,
+  ticketDocument: TicketDocType,
+  showDocument: ShowDocType,
   tickeMachineOptions: TicketMachineOptions
 ) => {
   const parentShowMachine = createShowMachine(
@@ -115,17 +85,7 @@ export const createTicketMachine = (
       predictableActionArguments: true,
       id: 'ticketMachine',
       initial: 'ticketLoaded',
-      entry: assign(() => {
-        const showMachineRef = spawn(parentShowMachine, { sync: true });
 
-        if (tickeMachineOptions.observeState) {
-          return {
-            ticketStateRef: spawn(createTicketStateObservable(ticketDocument)),
-            showMachineRef,
-          };
-        }
-        return { showMachineRef };
-      }),
       states: {
         ticketLoaded: {
           always: [
@@ -341,12 +301,11 @@ export const createTicketMachine = (
     {
       actions: {
         saveTicketState: context => {
-          if (!tickeMachineOptions.saveState) return;
+          if (!tickeMachineOptions.saveStateCallback) return;
           const ticketState = {
             ...context.ticketState,
-            updatedAt: new Date().getTime(),
           };
-          ticketDocument.saveTicketStateCallback(ticketState);
+          tickeMachineOptions.saveStateCallback(ticketState);
         },
 
         updateTicketState: assign((context, event) => {
@@ -416,7 +375,7 @@ export const createTicketMachine = (
               ...context.ticketState,
               status: TicketStatus.REDEEMED,
               redemption: {
-                createdAt: new Date().getTime(),
+                redeemedAt: new Date(),
               },
             },
           };
@@ -460,7 +419,7 @@ export const createTicketMachine = (
             ticketState: {
               ...context.ticketState,
               refundedAmount:
-                context.ticketState.refundedAmount + +event.transaction.value,
+                context.ticketState.totalRefunded + +event.transaction.value,
               transactions: state.transactions
                 ? [...state.transactions, event.transaction._id]
                 : [event.transaction._id],
@@ -494,7 +453,7 @@ export const createTicketMachine = (
               status: TicketStatus.IN_ESCROW,
               escrow: {
                 ...context.ticketState.escrow,
-                startedAt: new Date().getTime(),
+                startedAt: new Date(),
               },
             },
           };
@@ -502,7 +461,7 @@ export const createTicketMachine = (
 
         finalizeTicket: assign(context => {
           const finalized = {
-            endedAt: new Date().getTime(),
+            finalizedAt: new Date(),
           } as NonNullable<TicketStateType['finalize']>;
           if (context.ticketState.status !== TicketStatus.FINALIZED) {
             return {
@@ -529,7 +488,7 @@ export const createTicketMachine = (
       guards: {
         canCancel: context => {
           const canCancel =
-            context.ticketState.totalPaid <= context.ticketState.refundedAmount;
+            context.ticketState.totalPaid <= context.ticketState.totalRefunded;
 
           return canCancel;
         },
@@ -553,27 +512,28 @@ export const createTicketMachine = (
           const value =
             event.type === 'PAYMENT RECEIVED' ? event.transaction?.value : 0;
           return (
-            context.ticketState.totalPaid + +value >= context.ticketState.price
+            context.ticketState.totalPaid + +value >=
+            context.ticketDocument.price
           );
         },
         fullyRefunded: (context, event) => {
           const value =
             event.type === 'REFUND RECEIVED' ? event.transaction?.value : 0;
           return (
-            context.ticketState.refundedAmount + +value >=
+            context.ticketState.totalRefunded + +value >=
             context.ticketState.totalPaid
           );
         },
         canRequestCancellation: context => {
           const state = context.showMachineRef?.getSnapshot();
-          return state?.context.showState.startDate === undefined; // show has not started
+          return state?.context.showState.runtime === undefined; // show has not started
           //TODO: Check this
         },
         canWatchShow: context => {
           const state = context.showMachineRef?.getSnapshot();
           return (
             state !== undefined &&
-            context.ticketState.totalPaid >= context.ticketState.price &&
+            context.ticketState.totalPaid >= context.ticketDocument.price &&
             state.matches('started')
           );
         },
@@ -589,8 +549,8 @@ export const createTicketMachine = (
 };
 
 export const createTicketMachineService = (
-  ticketDocument: TicketDocument,
-  showDocument: ShowDocument,
+  ticketDocument: TicketDocType,
+  showDocument: ShowDocType,
   tickeMachineOptions: TicketMachineOptions
 ) => {
   const ticketMachine = createTicketMachine(

@@ -3,20 +3,14 @@
   import { page } from '$app/stores';
 
   import ShowDetail from '$components/ShowDetail.svelte';
-  import {
-    PUBLIC_PROFILE_IMAGE_PATH,
-    PUBLIC_RXDB_PASSWORD,
-    PUBLIC_SHOW_DB_ENDPOINT,
-  } from '$env/static/public';
-  import { showDB, type ShowDBType } from '$lib/ORM/dbs/showDB';
-  import { ShowStatus, type ShowDocument } from '$lib/ORM/models/show';
-  import { StorageType } from '$lib/ORM/rxdb';
+  import { PUBLIC_PROFILE_IMAGE_PATH } from '$env/static/public';
+  import { ShowStatus } from '$lib/models/show';
+
   import getProfileImage from '$lib/util/profilePhoto';
   import type { ActionData, PageData } from './$types';
 
   export let data: PageData;
   export let form: ActionData;
-  const token = data.token;
   let show = data.show;
   let displayName = data.displayName;
   let showId = $page.params.id;
@@ -38,20 +32,6 @@
       await applyAction(result);
     };
   };
-
-  const dbOptions = {
-    rxdbPassword: PUBLIC_RXDB_PASSWORD,
-    endPoint: PUBLIC_SHOW_DB_ENDPOINT,
-    storageType: StorageType.IDB,
-  };
-
-  if (show.showState.active) {
-    showDB(showId, token, dbOptions).then((db: ShowDBType) => {
-      db.shows.findOne(showId).$.subscribe(_show => {
-        show = _show as ShowDocument;
-      });
-    });
-  }
 </script>
 
 <div class="mt-4">

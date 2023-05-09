@@ -149,7 +149,7 @@
 
 <div class="w-full">
   <section
-    class="h-full bg-base-100  grid grid-cols-1 grid-rows-1 grow overflow-hidden md:border-2  md:rounded-2xl"
+    class="h-full bg-base-100 grid grid-cols-1 grid-rows-1 grow overflow-hidden md:border-2 md:rounded-2xl"
   >
     <div class="flex flex-col m-2 relative">
       <div
@@ -187,7 +187,7 @@
         Call
       {:else if $callMachineState.matches('makingCall')}
         <button
-          class="h-14 animate-flash animate-loop w-14 animated  btn btn-circle"
+          class="h-14 animate-flash animate-loop w-14 animated btn btn-circle"
           disabled={!buttonOptions.makeCall}
         >
           <PhoneOutgoingIcon size="34" />
@@ -195,7 +195,7 @@
         Waiting
       {:else if $callMachineState.matches('receivingCall')}
         <button
-          class="h-14 animate-shock animate-loop w-14 animated  btn btn-circle"
+          class="h-14 animate-shock animate-loop w-14 animated btn btn-circle"
           on:click={() => vc.acceptCall(mediaStream)}
           disabled={!buttonOptions.answerCall}
         >
@@ -212,7 +212,7 @@
 
     <div class="flex flex-col gap-2 items-center">
       <button
-        class="h-14 w-14 btn btn-circle "
+        class="h-14 w-14 btn btn-circle"
         on:click={() => camService.send('TOGGLE')}
       >
         {#if camState?.matches('on')}

@@ -1,10 +1,13 @@
+import { MONGO_FIELD_SECRET } from '$env/static/private';
+import { ShowEvent } from '$lib/models/showEvent';
 import { ActorType } from '$lib/util/constants';
 import type { InferSchemaType, Model } from 'mongoose';
-import { models } from 'mongoose';
-import mongoose, { Schema } from 'mongoose';
-import { v4 as uuidv4 } from 'uuid';
-import { MONGO_FIELD_SECRET } from '$env/static/private';
+import mongoose, { Schema, models } from 'mongoose';
 import { fieldEncryption } from 'mongoose-field-encryption';
+import { v4 as uuidv4 } from 'uuid';
+import type { TicketDocType } from './ticket';
+import type { TransactionDocType } from './transaction';
+import type { TalentType } from './talent';
 
 export enum ShowStatus {
   CREATED = 'CREATED',
@@ -28,7 +31,7 @@ export enum ShowCancelReason {
 }
 
 const cancelSchema = new Schema({
-  createdAt: { type: Date, required: true, default: Date.now },
+  cancelledAt: { type: Date, required: true, default: Date.now },
   cancelledInState: { type: String, enum: ShowStatus },
   canceller: { type: String, enum: ActorType, required: true },
   reason: { type: String, enum: ShowCancelReason, required: true },
@@ -44,7 +47,7 @@ const escrowSchema = new Schema({
   endDate: { type: Date },
 });
 
-const engagementSchema = new Schema({
+const runtimeSchema = new Schema({
   startDate: { type: Date, required: true },
   endDate: { type: Date },
 });
@@ -80,8 +83,9 @@ const showStateSchema = new Schema(
       type: escrowSchema,
     },
     runtime: {
-      type: engagementSchema,
+      type: runtimeSchema,
     },
+    transactions: [{ type: Schema.Types.ObjectId, ref: 'Transaction' }],
   },
   { timestamps: true }
 );
@@ -103,9 +107,16 @@ const showSchema = new Schema(
     name: { type: String, required: true, trim: true },
     numTickets: { type: Number, required: true, min: 1 },
     price: { type: Number, required: true, min: 1 },
-    showState: { type: showStateSchema, required: true },
+    showState: { type: showStateSchema, required: true, default: () => ({}) },
+    talentInfo: {
+      name: { type: String, required: true, trim: true },
+      ratingAvg: { type: Number, required: true, default: 0 },
+      numCompletedShow: { type: Number, required: true, default: 0 },
+    },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
 showSchema.plugin(fieldEncryption, {
@@ -113,8 +124,32 @@ showSchema.plugin(fieldEncryption, {
   secret: MONGO_FIELD_SECRET,
 });
 
+showSchema.methods.createShowevent = async function ({
+  type,
+  ticket,
+  transaction,
+}: {
+  type: string;
+  ticket?: TicketDocType;
+  transaction?: TransactionDocType;
+}): Promise<void> {
+  const showevent = new ShowEvent({
+    type,
+    show: this._id,
+    talent: this.talent,
+    agent: this.agent,
+    ticket,
+    transaction,
+  });
+  showevent.save();
+};
+
+export type ShowStateType = InferSchemaType<typeof showStateSchema>;
+
 export type ShowDocType = InferSchemaType<typeof showSchema>;
 
-export const Show = (
+export const ShowModel = (
   models.Show ? models.Show : mongoose.model<ShowDocType>('Show', showSchema)
 ) as Model<ShowDocType>;
+
+export type ShowType = InstanceType<typeof ShowModel>;

@@ -1,7 +1,6 @@
 import { womensNames } from '$lib/util/womensNames';
 import type { InferSchemaType, Model } from 'mongoose';
-import { models } from 'mongoose';
-import mongoose, { Schema } from 'mongoose';
+import mongoose, { Schema, models } from 'mongoose';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 
 const agentSchema = new Schema(
@@ -33,6 +32,8 @@ const agentSchema = new Schema(
 
 export type AgentDocType = InferSchemaType<typeof agentSchema>;
 
-export const Agent = models.Agent
+export const AgentModel = models.Agent
   ? (models.Agent as Model<AgentDocType>)
   : (mongoose.model<AgentDocType>('Agent', agentSchema) as Model<AgentDocType>);
+
+export type AgentType = InstanceType<typeof AgentModel>;

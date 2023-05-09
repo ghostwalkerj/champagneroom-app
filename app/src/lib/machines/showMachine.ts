@@ -1,30 +1,25 @@
+import { ShowStatus, type ShowDocType } from '$lib/models/show';
+import type { TicketDocType } from '$lib/models/ticket';
+import type { TransactionDocType } from '$lib/models/transaction';
 import { nanoid } from 'nanoid';
-import { map, type Observable } from 'rxjs';
-import {
-  assign,
-  createMachine,
-  interpret,
-  spawn,
-  type ActorRef,
-  type StateFrom,
-} from 'xstate';
-import type { ShowDocument } from '../models/show';
-import { ShowStatus, type ShowDocType } from '../models/show';
-import type { TicketDocType, TicketDocument } from '../models/ticket';
-import type { TransactionDocType } from '../models/transaction';
+import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 
 export type ShowStateType = ShowDocType['showState'];
 
 export type ShowMachineOptions = {
-  saveState: boolean;
-  observeState: boolean;
+  saveStateCallback?: (state: ShowStateType) => void;
+  createShowEventCallback?: ({
+    type,
+    ticket,
+    transaction,
+  }: {
+    type: string;
+    ticket?: TicketDocType;
+    transaction?: TransactionDocType;
+  }) => Promise<void>;
   gracePeriod?: number;
   escrowPeriod?: number;
 };
-
-export type ShowStateCallbackType = (
-  state: ShowStateType
-) => Promise<ShowDocument>;
 
 export enum ShowEventType {
   REQUEST_CANCELLATION = 'REQUEST CANCELLATION',
@@ -38,18 +33,8 @@ export enum ShowEventType {
   SHOWSTATE_UPDATE = 'SHOWSTATE UPDATE',
 }
 
-const createShowStateObservable = (showDocument: ShowDocument) => {
-  const showState$ = showDocument.get$(
-    'showState'
-  ) as Observable<ShowStateType>;
-
-  return showState$.pipe(
-    map(showState => ({ type: 'SHOWSTATE UPDATE', showState }))
-  );
-};
-
 export const createShowMachine = (
-  showDocument: ShowDocument,
+  showDocument: ShowDocType,
   showMachineOptions: ShowMachineOptions
 ) => {
   const GRACE_PERIOD = showMachineOptions.gracePeriod || 3600000;
@@ -59,9 +44,6 @@ export const createShowMachine = (
     {
       context: {
         showDocument,
-        showStateRef: undefined as
-          | ActorRef<{ type: string }, ShowStateType>
-          | undefined,
         showState: JSON.parse(
           JSON.stringify(showDocument.showState)
         ) as ShowStateType,
@@ -75,7 +57,7 @@ export const createShowMachine = (
           | {
               type: 'REQUEST CANCELLATION';
               cancel: ShowStateType['cancel'];
-              tickets: TicketDocument[];
+              tickets: TicketDocType[];
             }
           | {
               type: 'TICKET REFUNDED';
@@ -128,14 +110,7 @@ export const createShowMachine = (
       predictableActionArguments: true,
       id: 'showMachine',
       initial: 'showLoaded',
-      entry: assign(() => {
-        if (!showMachineOptions.observeState) {
-          return {};
-        }
-        return {
-          showStateRef: spawn(createShowStateObservable(showDocument)),
-        };
-      }),
+
       states: {
         showLoaded: {
           always: [
@@ -176,12 +151,10 @@ export const createShowMachine = (
         cancelled: {
           type: 'final',
           tags: ['canCreateShow'],
-
-          entry: ['deactivateShow', 'saveShowState'],
         },
         inEscrow: {
           tags: ['canCreateShow'],
-          entry: ['enterEscrow', 'deactivateShow', 'saveShowState'],
+          entry: ['enterEscrow', 'saveShowState'],
           exit: ['exitEscrow', 'saveShowState'],
           on: {
             'SHOW FINALIZED': {
@@ -193,7 +166,6 @@ export const createShowMachine = (
         finalized: {
           type: 'final',
           tags: ['canCreateShow'],
-          entry: ['deactivateShow', 'saveShowState'],
         },
         boxOfficeOpen: {
           tags: ['uiSubscribe'],
@@ -356,24 +328,24 @@ export const createShowMachine = (
     {
       actions: {
         saveShowState: (context, event) => {
-          if (!showMachineOptions.saveState) return {};
+          if (showMachineOptions.saveStateCallback) {
+            const showState = {
+              ...context.showState,
+            };
+            showMachineOptions.saveStateCallback(showState);
+          }
 
-          const ticket = 'ticket' in event ? event.ticket : undefined;
-          const transaction =
-            'transaction' in event ? event.transaction : undefined;
-          context.showDocument.createShowevent({
-            type: event.type,
-            ticket,
-            transaction,
-          });
-          const showState = {
-            ...context.showState,
-            updatedAt: new Date().getTime(),
-          };
-
-          showDocument.saveShowStateCallback(showState);
+          if (showMachineOptions.createShowEventCallback) {
+            const ticket = 'ticket' in event ? event.ticket : undefined;
+            const transaction =
+              'transaction' in event ? event.transaction : undefined;
+            showMachineOptions.createShowEventCallback({
+              type: event.type,
+              ticket,
+              transaction,
+            });
+          }
         },
-
         updateShowState: assign((context, event) => {
           return {
             showState: {
@@ -443,28 +415,20 @@ export const createShowMachine = (
 
         refundTicket: assign((context, event) => {
           // Check if this is full refund for a ticket
-          const ticketsRefunded = context.showState.ticketsRefunded + 1;
+          const ticketsRefunded =
+            context.showState.salesStats.ticketsRefunded + 1;
 
           return {
             showState: {
               ...context.showState,
               ticketsRefunded,
               refundedAmount:
-                context.showState.refundedAmount + +event.transaction.value,
+                context.showState.salesStats.totalRefunded +
+                +event.transaction.value,
               transactions: [
                 ...(context.showState.transactions || []),
                 event.transaction._id,
               ],
-            },
-          };
-        }),
-
-        deactivateShow: assign(context => {
-          if (!context.showState.active) return {};
-          return {
-            showState: {
-              ...context.showState,
-              active: false,
             },
           };
         }),
@@ -475,7 +439,7 @@ export const createShowMachine = (
               ...context.showState,
               status: ShowStatus.IN_ESCROW,
               escrow: {
-                startDate: new Date().getTime(),
+                startDate: new Date(),
               },
             },
           };
@@ -489,7 +453,7 @@ export const createShowMachine = (
               status: ShowStatus.IN_ESCROW,
               escrow: {
                 startDate: context.showState.escrow.startDate,
-                endDate: new Date().getTime(),
+                endDate: new Date(),
               },
             },
           };
@@ -499,8 +463,9 @@ export const createShowMachine = (
           return {
             showState: {
               ...context.showState,
-              ticketsAvailable: context.showState.ticketsAvailable + 1,
-              ticketsReserved: context.showState.ticketsReserved - 1,
+              ticketsAvailable:
+                context.showState.salesStats.ticketsAvailable + 1,
+              ticketsReserved: context.showState.salesStats.ticketsReserved - 1,
             },
           };
         }),
@@ -509,8 +474,9 @@ export const createShowMachine = (
           return {
             showState: {
               ...context.showState,
-              ticketsAvailable: context.showState.ticketsAvailable - 1,
-              ticketsReserved: context.showState.ticketsReserved + 1,
+              ticketsAvailable:
+                context.showState.salesStats.ticketsAvailable - 1,
+              ticketsReserved: context.showState.salesStats.ticketsReserved + 1,
             },
           };
         }),
@@ -520,8 +486,9 @@ export const createShowMachine = (
           return {
             showState: {
               ...state,
-              ticketsSold: state.ticketsSold + 1,
-              totalSales: state.totalSales + +event.transaction.value,
+              ticketsSold: state.salesStats.ticketsSold + 1,
+              totalSales:
+                state.salesStats.totalSales + +event.transaction.value,
               transactions: state.transactions
                 ? [...state.transactions, event.transaction._id]
                 : [event.transaction._id],
@@ -544,15 +511,17 @@ export const createShowMachine = (
         GRACE_DELAY: context => {
           const delay =
             +GRACE_PERIOD -
-            (context.showState.endDate
-              ? new Date().getTime() - context.showState.endDate
+            (context.showState.runtime?.endDate
+              ? new Date().getTime() -
+                context.showState.runtime.endDate.getTime()
               : 0);
           return delay > 0 ? delay : 0;
         },
       },
       guards: {
         canCancel: context =>
-          context.showState.ticketsSold - context.showState.ticketsRefunded ===
+          context.showState.salesStats.ticketsSold -
+            context.showState.salesStats.ticketsRefunded ===
           0,
         showCancelled: context =>
           context.showState.status === ShowStatus.CANCELLED,
@@ -568,23 +537,26 @@ export const createShowMachine = (
         showStopped: context => context.showState.status === ShowStatus.STOPPED,
         showInEscrow: context =>
           context.showState.status === ShowStatus.IN_ESCROW,
-        soldOut: context => context.showState.ticketsAvailable === 1,
+        soldOut: context => context.showState.salesStats.ticketsAvailable === 1,
         canStartShow: context => {
           if (context.showState.status === ShowStatus.ENDED) {
             // Allow grace period to start show again
             return (
-              (context.showState.startDate ?? 0) + +GRACE_PERIOD >
+              (context.showState.runtime?.startDate.getTime() ?? 0) +
+                +GRACE_PERIOD >
               new Date().getTime()
             );
           }
           return (
-            context.showState.ticketsSold - context.showState.ticketsAvailable >
+            context.showState.salesStats.ticketsSold -
+              context.showState.salesStats.ticketsAvailable >
             0
           );
         },
         fullyRefunded: context => {
           return (
-            context.showState.refundedAmount >= context.showState.totalSales
+            context.showState.salesStats.totalRefunded >=
+            context.showState.salesStats.totalSales
           );
         },
         canUpdateShowState: (context, event) => {
@@ -598,10 +570,10 @@ export const createShowMachine = (
 };
 
 export const createShowMachineService = (
-  showDocument: ShowDocument,
+  show: ShowDocType,
   showMachineOptions: ShowMachineOptions
 ) => {
-  const showMachine = createShowMachine(showDocument, showMachineOptions);
+  const showMachine = createShowMachine(show, showMachineOptions);
   showMachine;
   const showService = interpret(showMachine).start();
   return showService;

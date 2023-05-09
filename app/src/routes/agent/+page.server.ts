@@ -3,8 +3,8 @@ import mongoose from 'mongoose';
 import type { Actions } from './$types';
 
 import { MONGO_DB_ENDPOINT } from '$env/static/private';
-import { Agent } from '$lib/models/agent';
-import { Talent } from '$lib/models/talent';
+import { AgentModel } from '$lib/models/agent';
+import { TalentModel } from '$lib/models/talent';
 
 export const actions: Actions = {
   get_or_create_agent: async ({ request }) => {
@@ -21,12 +21,12 @@ export const actions: Actions = {
       return fail(400, { account, badAccount: true });
     }
 
-    let agent = await Agent.findOne({
+    let agent = await AgentModel.findOne({
       address: account,
     }).exec();
     if (agent === null) {
       console.log('creating agent');
-      agent = await Agent.create({ address: account });
+      agent = await AgentModel.create({ address: account });
     }
 
     return {
@@ -58,12 +58,12 @@ export const actions: Actions = {
       return fail(400, { agentCommission, badAgentCommission: true });
     }
 
-    const agent = await Agent.findById(agentId).exec();
+    const agent = await AgentModel.findById(agentId).exec();
     if (agent === null) {
       return fail(400, { agentId, agentExists: false });
     }
 
-    Talent.create({
+    TalentModel.create({
       name,
       agentCommission: +agentCommission,
       agent,

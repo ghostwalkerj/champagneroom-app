@@ -61,7 +61,7 @@
   <button class="btn" on:click={connect}>Connect Wallet</button>
 {:else}
   <div>
-    <div class="card card-side bordered  ">
+    <div class="card card-side bordered">
       <div class="px-2 pt-2.5 card">
         {#if $selectedAccount}{#await balance}{pending}{:then value}{formatEth(
               value
@@ -84,11 +84,11 @@
     </div>
     <input type="checkbox" id="my-modal" class="modal-toggle" />
     <div class="modal">
-      <div class="bg-base-300  p-0.5 top-1/4 modal-box fixed">
+      <div class="bg-base-300 p-0.5 top-1/4 modal-box fixed">
         <div class="flex px-4 pt-2 justify-between">
           <div class="">Wallet Connection</div>
           <div class="place-content-end">
-            <label for="my-modal" class="btn btn-circle btn-outline btn-xs ">
+            <label for="my-modal" class="btn btn-circle btn-outline btn-xs">
               <IoIosClose />
             </label>
           </div>
@@ -97,16 +97,16 @@
           <div class="flex mb-2 justify-between items-center">
             <p class="text-sm text-gray-400">Connected with MetaMask</p>
             <button
-              class="border font-medium border-[#610094] rounded-3xl shadow-sm text-xs py-1.5 px-2.5 text-gray-400 inline-flex items-center hover:border-indigo-400 hover:text-indigo-500 hover:underline focus:outline-none focus:ring-2  focus:ring-offset-2 focus:ring-indigo-500"
+              class="border font-medium border-[#610094] rounded-3xl shadow-sm text-xs py-1.5 px-2.5 text-gray-400 inline-flex items-center hover:border-indigo-400 hover:text-indigo-500 hover:underline focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               on:click={disable}
             >
               Change
             </button>
           </div>
-          <div class="flex  mt-2 mb-4 leading-4 items-center align-middle">
+          <div class="flex mt-2 mb-4 leading-4 items-center align-middle">
             <JazzIcon address={$selectedAccount} />
 
-            <div class="font-semibold  text-xl ml-2 text-gray-200">
+            <div class="font-semibold text-xl ml-2 text-gray-200">
               {$selectedAccount.slice(0, 14)}...{$selectedAccount.slice(
                 $selectedAccount.length - 14,
                 $selectedAccount.length
@@ -150,7 +150,7 @@
             </div>
           </div>
         </div>
-        <div class="flex flex-row bg-[#3F0071] m-4 mt-2 p-4   card">
+        <div class="flex flex-row bg-[#3F0071] m-4 mt-2 p-4 card">
           Your transactions will appear here...
         </div>
       </div>

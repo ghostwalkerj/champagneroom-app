@@ -3,7 +3,6 @@
   import { page } from '$app/stores';
   import { PUBLIC_IMAGE_UPDATE_PATH } from '$env/static/public';
   import { filedrop } from 'filedrop-svelte';
-  import { scale } from 'svelte/transition';
   import urlJoin from 'url-join';
 
   export let profileImage: string;
@@ -120,7 +119,7 @@
     <div class="justify-center card-actions last:my-2">
       {#if !uploadReady}
         <label
-          class="custom-file-upload btn  btn-xs btn-secondary md:btn-sm"
+          class="custom-file-upload btn btn-xs btn-secondary md:btn-sm"
           use:filedrop={options}
           on:filedrop={onChange}
         >
