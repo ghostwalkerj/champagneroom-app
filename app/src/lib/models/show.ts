@@ -1,5 +1,5 @@
 import { MONGO_FIELD_SECRET } from '$env/static/private';
-import { ShowEvent } from '$lib/models/showEvent';
+import { ShowEventModel } from '$lib/models/showEvent';
 import { ActorType } from '$lib/util/constants';
 import type { InferSchemaType, Model } from 'mongoose';
 import mongoose, { Schema, models } from 'mongoose';
@@ -108,11 +108,6 @@ const showSchema = new Schema(
     numTickets: { type: Number, required: true, min: 1 },
     price: { type: Number, required: true, min: 1 },
     showState: { type: showStateSchema, required: true, default: () => ({}) },
-    talentInfo: {
-      name: { type: String, required: true, trim: true },
-      ratingAvg: { type: Number, required: true, default: 0 },
-      numCompletedShow: { type: Number, required: true, default: 0 },
-    },
   },
   {
     timestamps: true,
@@ -133,7 +128,7 @@ showSchema.methods.createShowevent = async function ({
   ticket?: TicketDocType;
   transaction?: TransactionDocType;
 }): Promise<void> {
-  const showevent = new ShowEvent({
+  const showevent = new ShowEventModel({
     type,
     show: this._id,
     talent: this.talent,

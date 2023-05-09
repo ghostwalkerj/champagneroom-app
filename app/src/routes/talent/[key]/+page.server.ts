@@ -5,34 +5,22 @@ import { TalentModel } from '$lib/models/talent';
 import { error, fail } from '@sveltejs/kit';
 import mongoose from 'mongoose';
 import type { Actions, PageServerLoad } from './$types';
-
-const getTalent = async (key: string) => {
-  mongoose.connect(MONGO_DB_ENDPOINT);
-
-  const talent = await TalentModel.findOne().where({ key }).exec();
-  if (!talent) {
-    throw error(404, 'Talent not found');
-  }
-  return talent;
-};
+import { AgentModel } from '$lib/models/agent';
 
 export const load: PageServerLoad = async ({ params }) => {
+  mongoose.connect(MONGO_DB_ENDPOINT);
+
   const key = params.key;
 
   if (key === null) {
     throw error(404, 'Key not found');
   }
 
-  const talent = await getTalent(key);
-  await talent.populate({
-    path: 'activeShows',
-  });
-
+  const talent = AgentModel.findOne({ key }).lean().populate('activeShows');
   console.log('talent', talent);
 
   return {
-    talent: JSON.parse(JSON.stringify(talent)),
-    activeShows: JSON.parse(JSON.stringify(talent.activeShows)),
+    talent,
   };
 };
 export const actions: Actions = {
@@ -50,11 +38,12 @@ export const actions: Actions = {
     if (!url) {
       return fail(400, { url, missingUrl: true });
     }
-    const talent = await getTalent(key);
-    talent.profileImageUrl = url;
-    talent.save();
+    const talent = TalentModel.findOneAndUpdate(
+      { key },
+      { profileImageUrl: url }
+    );
 
-    return { success: true, talent: JSON.parse(JSON.stringify(talent)) };
+    return { success: true, talent };
   },
   create_show: async ({ request }) => {
     const data = await request.formData();
@@ -94,11 +83,6 @@ export const actions: Actions = {
       coverImageUrl,
       showState: {
         status: ShowStatus.BOX_OFFICE_OPEN,
-      },
-      talentInfo: {
-        name: talent.name,
-        ratingAvg: talent.stats.ratingAvg,
-        numCompletedShow: talent.stats.completedShows.length,
       },
     });
 

@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import type { Actions } from './$types';
 
 import { MONGO_DB_ENDPOINT } from '$env/static/private';
+import type { AgentType } from '$lib/models/agent';
 import { AgentModel } from '$lib/models/agent';
 import { TalentModel } from '$lib/models/talent';
 
@@ -21,13 +22,9 @@ export const actions: Actions = {
       return fail(400, { account, badAccount: true });
     }
 
-    let agent = await AgentModel.findOne({
+    const agent = (await AgentModel.findOrCreate({
       address: account,
-    }).exec();
-    if (agent === null) {
-      console.log('creating agent');
-      agent = await AgentModel.create({ address: account });
-    }
+    })) as AgentType;
 
     return {
       success: true,
