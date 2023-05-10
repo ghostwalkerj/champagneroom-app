@@ -77,11 +77,11 @@ const talentSchema = new Schema(
 
 export type TalentDocType = InferSchemaType<typeof talentSchema>;
 
-export const TalentModel = models.Talent
+export const Talent = models.Talent
   ? (models.Talent as Model<TalentDocType>)
   : (mongoose.model<TalentDocType>(
       'Talent',
       talentSchema
     ) as Model<TalentDocType>);
 
-export type TalentType = InstanceType<typeof TalentModel>;
+export type TalentType = InstanceType<typeof Talent>;

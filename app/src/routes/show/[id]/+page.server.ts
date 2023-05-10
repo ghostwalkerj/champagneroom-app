@@ -2,8 +2,8 @@ import { MONGO_DB_ENDPOINT } from '$env/static/private';
 import { PUBLIC_TICKET_PATH } from '$env/static/public';
 import { createShowMachineService } from '$lib/machines/showMachine';
 import type { ShowType } from '$lib/models/show';
-import { ShowModel } from '$lib/models/show';
-import { TicketModel } from '$lib/models/ticket';
+import { Show } from '$lib/models/show';
+import { Ticket } from '$lib/models/ticket';
 import { mensNames } from '$lib/util/mensNames';
 import { createPinHash } from '$lib/util/pin';
 import { error, fail, redirect } from '@sveltejs/kit';
@@ -20,7 +20,7 @@ export const load: import('./$types').PageServerLoad = async ({ params }) => {
     throw error(404, 'Champagne Show not found');
   }
 
-  const show = await ShowModel.findById(showId).exec();
+  const show = await Show.findById(showId).exec();
 
   if (!show) {
     throw error(404, 'Show not found');
@@ -61,7 +61,7 @@ export const actions: import('./$types').Actions = {
     }
 
     mongoose.connect(MONGO_DB_ENDPOINT);
-    const show = (await ShowModel.findById(showId).exec()) as ShowType;
+    const show = (await Show.findById(showId).exec()) as ShowType;
     if (!show) {
       return error(404, 'Show not found');
     }
@@ -81,7 +81,7 @@ export const actions: import('./$types').Actions = {
       return error(501, 'Show cannot Reserve Ticket'); // TODO: This should be atomic
     }
 
-    const ticket = await TicketModel.create({
+    const ticket = await Ticket.create({
       show: show._id,
       price: show.price,
       paymentAddress: '0x0000000000000000000000000000000000000000',

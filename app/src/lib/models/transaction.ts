@@ -30,11 +30,11 @@ const transactionSchema = new Schema(
 );
 
 export type TransactionDocType = InferSchemaType<typeof transactionSchema>;
-export const TransactionModel = models.Transaction
+export const Transaction = models.Transaction
   ? (models.Transaction as Model<TransactionDocType>)
   : (mongoose.model<TransactionDocType>(
       'Transaction',
       transactionSchema
     ) as Model<TransactionDocType>);
 
-export type TransactionType = InstanceType<typeof TransactionModel>;
+export type TransactionType = InstanceType<typeof Transaction>;

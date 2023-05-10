@@ -15,20 +15,20 @@
     ShowMachineServiceType,
     ShowMachineStateType,
   } from '$lib/machines/showMachine';
-  import type { TalentDocType } from '$lib/models/talent';
   import { onMount } from 'svelte';
   import urlJoin from 'url-join';
   import type { Subscription } from 'xstate';
   import type { PageData } from './$types';
   import TalentWallet from './TalentWallet.svelte';
   import ShowDetail from '$components/ShowDetail.svelte';
+  import type { TalentDocType } from '$lib/models/talent';
   import type { ShowDocType } from '$lib/models/show';
 
   export let form: import('./$types').ActionData;
   export let data: PageData;
 
-  let talent = data.talent;
-  $: activeShows = data.activeShows as ShowDocType[];
+  let talent = data.talent as TalentDocType;
+  $: activeShows = data.talent?.activeShows as ShowDocType[];
   $: activeShow = activeShows[0] ?? null;
   $: showDuration = 60;
 

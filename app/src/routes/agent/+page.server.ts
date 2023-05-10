@@ -4,8 +4,8 @@ import type { Actions } from './$types';
 
 import { MONGO_DB_ENDPOINT } from '$env/static/private';
 import type { AgentType } from '$lib/models/agent';
-import { AgentModel } from '$lib/models/agent';
-import { TalentModel } from '$lib/models/talent';
+import { Agent } from '$lib/models/agent';
+import { Talent } from '$lib/models/talent';
 
 export const actions: Actions = {
   get_or_create_agent: async ({ request }) => {
@@ -22,7 +22,7 @@ export const actions: Actions = {
       return fail(400, { account, badAccount: true });
     }
 
-    const agent = (await AgentModel.findOrCreate({
+    const agent = (await Agent.findOrCreate({
       address: account,
     })) as AgentType;
 
@@ -55,12 +55,12 @@ export const actions: Actions = {
       return fail(400, { agentCommission, badAgentCommission: true });
     }
 
-    const agent = await AgentModel.findById(agentId).exec();
+    const agent = await Agent.findById(agentId).exec();
     if (agent === null) {
       return fail(400, { agentId, agentExists: false });
     }
 
-    TalentModel.create({
+    Talent.create({
       name,
       agentCommission: +agentCommission,
       agent,

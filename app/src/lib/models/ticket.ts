@@ -139,11 +139,11 @@ export const ticketSchema = new Schema(
 export type TicketStateType = InferSchemaType<typeof ticketStateSchema>;
 export type TicketDocType = InferSchemaType<typeof ticketSchema>;
 
-export const TicketModel = models.Ticket
+export const Ticket = models.Ticket
   ? (models.Ticket as Model<TicketDocType>)
   : (mongoose.model<TicketDocType>(
       'Ticket',
       ticketSchema
     ) as Model<TicketDocType>);
 
-export type TicketType = InstanceType<typeof TicketModel>;
+export type TicketType = InstanceType<typeof Ticket>;

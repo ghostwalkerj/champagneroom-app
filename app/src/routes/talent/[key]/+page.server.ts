@@ -1,10 +1,9 @@
 import { MONGO_DB_ENDPOINT } from '$env/static/private';
-import { ShowModel, ShowStatus } from '$lib/models/show';
-import { TalentModel } from '$lib/models/talent';
+import { Show, ShowStatus } from '$lib/models/show';
+import { Talent } from '$lib/models/talent';
 import { error, fail } from '@sveltejs/kit';
 import mongoose from 'mongoose';
 import type { Actions, PageServerLoad } from './$types';
-import { AgentModel } from '$lib/models/agent';
 
 export const load: PageServerLoad = async ({ params }) => {
   mongoose.connect(MONGO_DB_ENDPOINT);
@@ -15,11 +14,18 @@ export const load: PageServerLoad = async ({ params }) => {
     throw error(404, 'Key not found');
   }
 
-  const talent = AgentModel.findOne({ key }).lean().populate('activeShows');
+  const talent = await Talent.findOne({ key })
+    .lean()
+    .populate('activeShows')
+    .exec();
+
+  if (talent === null) {
+    throw error(404, 'Talent not found');
+  }
   console.log('talent', talent);
 
   return {
-    talent,
+    talent: JSON.parse(JSON.stringify(talent)),
   };
 };
 export const actions: Actions = {
@@ -37,10 +43,7 @@ export const actions: Actions = {
     if (!url) {
       return fail(400, { url, missingUrl: true });
     }
-    const talent = TalentModel.findOneAndUpdate(
-      { key },
-      { profileImageUrl: url }
-    );
+    const talent = Talent.findOneAndUpdate({ key }, { profileImageUrl: url });
 
     return { success: true, talent };
   },
@@ -67,12 +70,12 @@ export const actions: Actions = {
 
     mongoose.connect(MONGO_DB_ENDPOINT);
 
-    const talent = await TalentModel.findById(talentId).exec();
+    const talent = await Talent.findById(talentId).exec();
     if (!talent) {
       throw error(404, 'Talent not found');
     }
 
-    const show = await ShowModel.create({
+    const show = await Show.create({
       price: +price,
       name,
       duration: +duration,
