@@ -1,5 +1,4 @@
 import { MONGO_DB_ENDPOINT } from '$env/static/private';
-import type { ShowType } from '$lib/models/show';
 import { ShowModel, ShowStatus } from '$lib/models/show';
 import { TalentModel } from '$lib/models/talent';
 import { error, fail } from '@sveltejs/kit';

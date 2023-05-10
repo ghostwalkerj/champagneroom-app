@@ -3,6 +3,7 @@ import { ActorType } from '$lib/util/constants';
 import type { InferSchemaType, Model } from 'mongoose';
 import mongoose, { Schema, models } from 'mongoose';
 import { fieldEncryption } from 'mongoose-field-encryption';
+import validator from 'validator';
 
 export enum TicketStatus {
   RESERVED = 'RESERVED',
@@ -53,7 +54,13 @@ const redemptionSchema = new Schema({
 const reservationSchema = new Schema({
   reservedAt: { type: Date, required: true, default: Date.now },
   name: { type: String, required: true },
-  pin: { type: String, required: true },
+  pin: {
+    type: String,
+    required: true,
+    minLength: 8,
+    maxLength: 8,
+    validator: (v: string) => validator.isNumeric(v, { no_symbols: true }),
+  },
 });
 
 reservationSchema.plugin(fieldEncryption, {
@@ -81,7 +88,7 @@ const finalizeSchema = new Schema({
 });
 
 const feedbackSchema = new Schema({
-  rating: { type: Number, required: true, min: 1, max: 5 },
+  rating: { type: Number, required: true, min: 1, max: 5, integer: true },
   review: { type: String },
   createdAt: { type: Date, required: true, default: Date.now },
 });
@@ -111,7 +118,12 @@ const ticketStateSchema = new Schema(
 export const ticketSchema = new Schema(
   {
     _id: { type: Schema.Types.ObjectId, required: true, auto: true },
-    paymentAddress: { type: String, maxLength: 50, required: true },
+    paymentAddress: {
+      type: String,
+      maxLength: 50,
+      required: true,
+      validator: (v: string) => validator.isEthereumAddress(v),
+    },
     price: { type: Number, required: true },
     show: { type: Schema.Types.ObjectId, ref: 'Show' },
     ticketState: {

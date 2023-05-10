@@ -27,7 +27,7 @@
   export let form: import('./$types').ActionData;
   export let data: PageData;
 
-  let talent = data.talent as TalentDocType;
+  let talent = data.talent;
   $: activeShows = data.activeShows as ShowDocType[];
   $: activeShow = activeShows[0] ?? null;
   $: showDuration = 60;

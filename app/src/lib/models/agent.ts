@@ -1,19 +1,26 @@
 import { womensNames } from '$lib/util/womensNames';
 import type { InferSchemaType, Model } from 'mongoose';
 import mongoose, { Schema, models } from 'mongoose';
-import { uniqueNamesGenerator } from 'unique-names-generator';
 import findOrCreate from 'mongoose-findorcreate';
+import 'mongoose-valid8';
+import { uniqueNamesGenerator } from 'unique-names-generator';
+import validator from 'validator';
 
 const agentSchema = new Schema(
   {
     _id: { type: Schema.Types.ObjectId, required: true, auto: true },
-    walletAddress: { type: String, maxLength: 50 },
+    walletAddress: {
+      type: String,
+      maxLength: 50,
+      validator: (v: string) => validator.isEthereumAddress(v),
+    },
     name: {
       type: String,
       maxLength: 50,
       minLength: [4, 'Name is too short'],
       required: true,
       trim: true,
+      startcase: true,
       default: function () {
         return uniqueNamesGenerator({
           dictionaries: [womensNames],
@@ -26,6 +33,7 @@ const agentSchema = new Schema(
       maxLength: 50,
       unique: true,
       index: true,
+      validator: (v: string) => validator.isEthereumAddress(v),
     },
   },
   { timestamps: true }

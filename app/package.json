@@ -81,6 +81,7 @@
     "mongoose": "^7.1.0",
     "mongoose-field-encryption": "^6.0.0",
     "mongoose-findorcreate": "^4.0.0",
+    "mongoose-valid8": "^1.7.1",
     "nanoid": "^4.0.0",
     "npm-check": "^6.0.1",
     "peer": "^0.6.1",
@@ -100,6 +101,7 @@
     "url-join": "^5.0.0",
     "uuid": "^8.3.2",
     "uuidv4": "^6.2.13",
+    "validator": "^13.9.0",
     "web3": "^1.7.4",
     "web3modal": "^1.9.8",
     "xstate": "^4.36.0"

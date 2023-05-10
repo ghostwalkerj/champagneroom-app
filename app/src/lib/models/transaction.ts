@@ -1,5 +1,6 @@
 import type { InferSchemaType, Model } from 'mongoose';
 import mongoose, { Schema, models } from 'mongoose';
+import validator from 'validator';
 
 export enum TransactionReasonType {
   TICKET_PAYMENT = 'TICKET PAYMENT',
@@ -15,7 +16,11 @@ const transactionSchema = new Schema(
     from: { type: String },
     to: { type: String },
     reason: { type: String, enum: TransactionReasonType },
-    value: { type: String, required: true },
+    value: {
+      type: String,
+      required: true,
+      validator: (v: string) => validator.isNumeric(v),
+    },
     ticket: { type: Schema.Types.ObjectId, ref: 'Ticket' },
     talent: { type: Schema.Types.ObjectId, ref: 'Talent' },
     agent: { type: Schema.Types.ObjectId, ref: 'Agent' },

@@ -7,7 +7,6 @@ import { fieldEncryption } from 'mongoose-field-encryption';
 import { v4 as uuidv4 } from 'uuid';
 import type { TicketDocType } from './ticket';
 import type { TransactionDocType } from './transaction';
-import type { TalentType } from './talent';
 
 export enum ShowStatus {
   CREATED = 'CREATED',
@@ -53,13 +52,13 @@ const runtimeSchema = new Schema({
 });
 
 const salesStatsSchema = new Schema({
-  ticketsAvailable: { type: Number, required: true, default: 0 },
-  ticketsSold: { type: Number, required: true, default: 0 },
-  ticketsReserved: { type: Number, required: true, default: 0 },
-  ticketsRefunded: { type: Number, required: true, default: 0 },
-  ticketsRedeemed: { type: Number, required: true, default: 0 },
-  totalSales: { type: Number, required: true, default: 0 },
-  totalRefunded: { type: Number, required: true, default: 0 },
+  ticketsAvailable: { type: Number, required: true, default: 0, integer: true },
+  ticketsSold: { type: Number, required: true, default: 0, integer: true },
+  ticketsReserved: { type: Number, required: true, default: 0, integer: true },
+  ticketsRefunded: { type: Number, required: true, default: 0, integer: true },
+  ticketsRedeemed: { type: Number, required: true, default: 0, integer: true },
+  totalSales: { type: Number, required: true, default: 0, integer: true },
+  totalRefunded: { type: Number, required: true, default: 0, integer: true },
 });
 
 const showStateSchema = new Schema(
@@ -101,11 +100,25 @@ const showSchema = new Schema(
       default: function () {
         return uuidv4();
       },
+      unique: true,
     },
     coverImageUrl: { type: String, trim: true },
-    duration: { type: Number, required: true },
-    name: { type: String, required: true, trim: true },
-    numTickets: { type: Number, required: true, min: 1 },
+    duration: {
+      type: Number,
+      required: true,
+      min: [0, 'Duration must be over 0'],
+      max: [180, 'Duration must be under 180 minutes'],
+      integer: true,
+    },
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+      minLength: [3, 'Name must be at least 3 characters'],
+      maxLength: [50, 'Name must be under 50 characters'],
+      startcase: true,
+    },
+    numTickets: { type: Number, required: true, min: 1, integer: true },
     price: { type: Number, required: true, min: 1 },
     showState: { type: showStateSchema, required: true, default: () => ({}) },
   },
