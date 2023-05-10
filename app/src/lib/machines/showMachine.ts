@@ -332,6 +332,7 @@ export const createShowMachine = (
             const showState = {
               ...context.showState,
             };
+            console.log('saveShowState', showState);
             showMachineOptions.saveStateCallback(showState);
           }
 
@@ -386,18 +387,27 @@ export const createShowMachine = (
             showState: {
               ...context.showState,
               status: ShowStatus.LIVE,
-              startDate: new Date().getTime(),
-              endDate: undefined,
+              runtime: {
+                startDate: new Date(),
+                endDate: undefined,
+              },
             },
           };
         }),
 
         stopShow: assign(context => {
+          const startDate = context.showState.runtime?.startDate;
+          if (!startDate) {
+            throw new Error('Show start date is not defined');
+          }
           return {
             showState: {
               ...context.showState,
               status: ShowStatus.STOPPED,
-              endDate: new Date().getTime(),
+              runtime: {
+                startDate,
+                endDate: new Date(),
+              },
             },
           };
         }),
@@ -407,7 +417,10 @@ export const createShowMachine = (
             showState: {
               ...context.showState,
               status: ShowStatus.CANCELLATION_REQUESTED,
-              ticketsAvailable: 0,
+              salesStats: {
+                ...context.showState.salesStats,
+                ticketsAvailable: 0,
+              },
               cancel: event.cancel,
             },
           };
@@ -463,9 +476,13 @@ export const createShowMachine = (
           return {
             showState: {
               ...context.showState,
-              ticketsAvailable:
-                context.showState.salesStats.ticketsAvailable + 1,
-              ticketsReserved: context.showState.salesStats.ticketsReserved - 1,
+              salesStats: {
+                ...context.showState.salesStats,
+                ticketsAvailable:
+                  context.showState.salesStats.ticketsAvailable + 1,
+                ticketsReserved:
+                  context.showState.salesStats.ticketsReserved - 1,
+              },
             },
           };
         }),
@@ -474,9 +491,13 @@ export const createShowMachine = (
           return {
             showState: {
               ...context.showState,
-              ticketsAvailable:
-                context.showState.salesStats.ticketsAvailable - 1,
-              ticketsReserved: context.showState.salesStats.ticketsReserved + 1,
+              salesStats: {
+                ...context.showState.salesStats,
+                ticketsAvailable:
+                  context.showState.salesStats.ticketsAvailable - 1,
+                ticketsReserved:
+                  context.showState.salesStats.ticketsReserved + 1,
+              },
             },
           };
         }),

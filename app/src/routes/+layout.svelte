@@ -4,10 +4,10 @@
   import { UAParser } from 'ua-parser-js';
   import '../app.css';
 
-  import { Talent } from '$lib/models/talent';
-  import { Show } from '$lib/models/show';
   import { Agent } from '$lib/models/agent';
+  import { Show } from '$lib/models/show';
   import { ShowEvent } from '$lib/models/showEvent';
+  import { Talent } from '$lib/models/talent';
   import { Transaction } from '$lib/models/transaction';
 
   globalThis.Talent = Talent;

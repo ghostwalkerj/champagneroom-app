@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { Agent } from '$lib/ORM/schemas/agent';
+  import type { AgentDocType } from '$lib/models/agent';
 
-  export let agent: typeof Agent;
+  export let agent: AgentDocType;
 </script>
 
 <div class="bg-primary h-full text-primary-content w-full card p-2">

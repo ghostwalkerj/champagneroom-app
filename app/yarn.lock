@@ -7672,11 +7672,6 @@ mongoose-field-encryption@^6.0.0:
   resolved "https://registry.yarnpkg.com/mongoose-field-encryption/-/mongoose-field-encryption-6.0.0.tgz#fd0dbb84773c7f4c6aa4fb83616fccdb9d9b9c2e"
   integrity sha512-mcdrd/SYKZT9eMUL1gdKDRKsxBdKd/dn9xED+MojWMD7fuLpeAuRSFD80zoagc9inNOXxdZYAup1d0LFgObomw==
 
-mongoose-findorcreate@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/mongoose-findorcreate/-/mongoose-findorcreate-4.0.0.tgz#3172ca1100197620f362eb2fbb90f1cb27924da7"
-  integrity sha512-wi0vrTmazWBeZn8wHVdb8NEa+ZrAbnmfI8QltnFeIgvC33VlnooapvPSk21W22IEhs0vZ0cBz0MmXcc7eTTSZQ==
-
 mongoose-valid8@^1.7.1:
   version "1.7.1"
   resolved "https://registry.yarnpkg.com/mongoose-valid8/-/mongoose-valid8-1.7.1.tgz#da0ee5cca5fce1ed92f79e29e540e46d18d71ffe"

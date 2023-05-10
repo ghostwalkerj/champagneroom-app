@@ -3,7 +3,6 @@ import mongoose from 'mongoose';
 import type { Actions } from './$types';
 
 import { MONGO_DB_ENDPOINT } from '$env/static/private';
-import type { AgentType } from '$lib/models/agent';
 import { Agent } from '$lib/models/agent';
 import { Talent } from '$lib/models/talent';
 
@@ -24,9 +23,17 @@ export const actions: Actions = {
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    const agent = (await Agent.findOrCreate({
+    let agent = await Agent.findOne({
       address: account,
-    })) as AgentType;
+    })
+      .lean()
+      .exec();
+
+    if (agent === null) {
+      agent = await Agent.create({
+        address: account,
+      });
+    }
 
     return {
       success: true,
@@ -57,15 +64,10 @@ export const actions: Actions = {
       return fail(400, { agentCommission, badAgentCommission: true });
     }
 
-    const agent = await Agent.findById(agentId).exec();
-    if (agent === null) {
-      return fail(400, { agentId, agentExists: false });
-    }
-
     Talent.create({
       name,
       agentCommission: +agentCommission,
-      agent,
+      agent: agentId,
     });
 
     return {

@@ -1,7 +1,6 @@
 import { MONGO_DB_ENDPOINT } from '$env/static/private';
 import { PUBLIC_TICKET_PATH } from '$env/static/public';
 import { createShowMachineService } from '$lib/machines/showMachine';
-import type { ShowType } from '$lib/models/show';
 import { Show } from '$lib/models/show';
 import { Ticket } from '$lib/models/ticket';
 import { mensNames } from '$lib/util/mensNames';
@@ -24,7 +23,7 @@ export const load: import('./$types').PageServerLoad = async ({ params }) => {
     .lean()
     .populate(
       'talent',
-      'name profileImageUrl stats.ratingAvg stats.completedShows'
+      'name profileImageUrl stats.ratingAvg stats.numCompletedShows'
     )
     .exec();
 
@@ -67,7 +66,7 @@ export const actions: import('./$types').Actions = {
     }
 
     mongoose.connect(MONGO_DB_ENDPOINT);
-    const show = (await Show.findById(showId).exec()) as ShowType;
+    const show = await Show.findById(showId).exec();
     if (!show) {
       return error(404, 'Show not found');
     }

@@ -1,7 +1,6 @@
 import { womensNames } from '$lib/util/womensNames';
 import type { InferSchemaType, Model } from 'mongoose';
 import mongoose, { Schema, models } from 'mongoose';
-import findOrCreate from 'mongoose-findorcreate';
 import 'mongoose-valid8';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 import validator from 'validator';
@@ -38,8 +37,6 @@ const agentSchema = new Schema(
   },
   { timestamps: true }
 );
-
-agentSchema.plugin(findOrCreate);
 
 export type AgentDocType = InferSchemaType<typeof agentSchema>;
 

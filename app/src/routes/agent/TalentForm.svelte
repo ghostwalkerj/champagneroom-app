@@ -1,10 +1,28 @@
 <script lang="ts">
-  import { enhance } from '$app/forms';
-  import type { Agent } from '$lib/ORM/schemas/agent';
+  import { applyAction, enhance } from '$app/forms';
+  import { invalidateAll } from '$app/navigation';
+  import type { AgentDocType } from '$lib/models/agent';
   import type { ActionData } from './$types';
 
-  export let agent: typeof Agent;
+  export let agent: AgentDocType;
   export let form: ActionData;
+
+  $: loading = false;
+  let talentName = '';
+
+  const onSubmit = ({}) => {
+    loading = true;
+    return async ({ result }) => {
+      if (result.success) {
+        invalidateAll();
+        talentName = '';
+      } else {
+        talentName = form?.name || '';
+      }
+      await applyAction(result);
+      loading = false;
+    };
+  };
 </script>
 
 <div class="bg-primary h-full text-primary-content w-full card">
@@ -12,7 +30,7 @@
     <h2 class="text-2xl card-title">Add New Talent</h2>
 
     <div class="text-white text-left whitespace-nowrap">
-      <form method="post" action="?/create_talent" use:enhance>
+      <form method="post" action="?/create_talent" use:enhance={onSubmit}>
         <div class="max-w-xs py-2 form-control">
           <!-- svelte-ignore a11y-label-has-associated-control -->
           <label class="label">
@@ -24,7 +42,7 @@
             name="name"
             placeholder="Enter a name"
             class="max-w-xs py-2 input input-bordered input-primary"
-            value={form?.name ?? ''}
+            bind:value={talentName}
             minlength="3"
             maxlength="50"
           />
@@ -59,7 +77,9 @@
           </div>
         {/if}
         <div class="py-4">
-          <button class="btn btn-secondary" type="submit">Save</button>
+          <button class="btn btn-secondary" type="submit" disabled={loading}
+            >Save</button
+          >
         </div>
       </form>
     </div>

@@ -1,4 +1,3 @@
-import { MONGO_FIELD_SECRET } from '$env/static/private';
 import { PUBLIC_MONGO_FIELD_SECRET } from '$env/static/public';
 import { ActorType } from '$lib/util/constants';
 import type { InferSchemaType, Model } from 'mongoose';

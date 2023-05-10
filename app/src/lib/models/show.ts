@@ -49,7 +49,12 @@ const runtimeSchema = new Schema({
 });
 
 const salesStatsSchema = new Schema({
-  ticketsAvailable: { type: Number, required: true, default: 0, integer: true },
+  ticketsAvailable: {
+    type: Number,
+    required: true,
+    default: 0,
+    integer: true,
+  },
   ticketsSold: { type: Number, required: true, default: 0, integer: true },
   ticketsReserved: { type: Number, required: true, default: 0, integer: true },
   ticketsRefunded: { type: Number, required: true, default: 0, integer: true },
@@ -127,6 +132,12 @@ const showSchema = new Schema(
 showSchema.plugin(fieldEncryption, {
   fields: ['roomId'],
   secret: PUBLIC_MONGO_FIELD_SECRET,
+});
+
+showSchema.pre('save', function (next) {
+  if (this.showState.salesStats.ticketsAvailable === 0)
+    this.showState.salesStats.ticketsAvailable = this.numTickets;
+  next();
 });
 
 export type ShowStateType = InferSchemaType<typeof showStateSchema>;

@@ -1,7 +1,6 @@
 import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
 import { womensNames } from '$lib/util/womensNames';
 import type { InferSchemaType, Model } from 'mongoose';
-import { VirtualType } from 'mongoose';
 import mongoose, { Schema, models } from 'mongoose';
 import { nanoid } from 'nanoid';
 import { uniqueNamesGenerator } from 'unique-names-generator';
@@ -12,6 +11,20 @@ const statSchema = new Schema(
     ratingAvg: { type: Number, default: 0, min: 0, max: 5, required: true },
     totalEarnings: { type: Number, default: 0, min: 0, required: true },
     totalRating: {
+      type: Number,
+      default: 0,
+      min: 0,
+      required: true,
+      integer: true,
+    },
+    numRatings: {
+      type: Number,
+      default: 0,
+      min: 0,
+      required: true,
+      integer: true,
+    },
+    numCompletedShows: {
       type: Number,
       default: 0,
       min: 0,
