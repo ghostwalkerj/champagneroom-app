@@ -86,9 +86,6 @@ export const actions: Actions = {
       coverImageUrl,
       showState: {
         status: ShowStatus.BOX_OFFICE_OPEN,
-        salesStats: {
-          ticketsAvailable: +numTickets,
-        },
       },
     });
 

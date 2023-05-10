@@ -27,7 +27,7 @@
   export let form: import('./$types').ActionData;
   export let data: PageData;
 
-  let talent = data.talent as TalentDocType;
+  const talent = data.talent as TalentDocType;
   $: activeShows = data.talent?.activeShows as ShowDocType[];
   $: activeShow = activeShows[0] ?? null;
   $: showDuration = 60;
@@ -78,13 +78,13 @@
 
   const updateProfileImage = async (url: string) => {
     if (url && talent) {
+      talent.profileImageUrl = url;
       let formData = new FormData();
       formData.append('url', url);
-      fetch('?/update_profile_image', {
+      await fetch('?/update_profile_image', {
         method: 'POST',
         body: formData,
       });
-      invalidateAll();
     }
   };
 

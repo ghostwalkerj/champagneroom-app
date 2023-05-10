@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { invalidateAll } from '$app/navigation';
+
   // TODO:Add validation
   import { page } from '$app/stores';
   import { PUBLIC_IMAGE_UPDATE_PATH } from '$env/static/public';
