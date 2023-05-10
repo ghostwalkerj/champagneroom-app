@@ -22,8 +22,6 @@ export const load: PageServerLoad = async ({ params }) => {
   if (talent === null) {
     throw error(404, 'Talent not found');
   }
-  console.log('talent', talent);
-
   return {
     talent: JSON.parse(JSON.stringify(talent)),
   };
@@ -43,9 +41,12 @@ export const actions: Actions = {
     if (!url) {
       return fail(400, { url, missingUrl: true });
     }
-    const talent = Talent.findOneAndUpdate({ key }, { profileImageUrl: url });
+    const talent = await Talent.findOneAndUpdate(
+      { key },
+      { profileImageUrl: url }
+    ).exec();
 
-    return { success: true, talent };
+    return { success: true, talent: JSON.parse(JSON.stringify(talent)) };
   },
   create_show: async ({ request }) => {
     const data = await request.formData();

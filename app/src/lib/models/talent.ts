@@ -1,6 +1,7 @@
 import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
 import { womensNames } from '$lib/util/womensNames';
 import type { InferSchemaType, Model } from 'mongoose';
+import { VirtualType } from 'mongoose';
 import mongoose, { Schema, models } from 'mongoose';
 import { nanoid } from 'nanoid';
 import { uniqueNamesGenerator } from 'unique-names-generator';
@@ -77,8 +78,8 @@ const talentSchema = new Schema(
 
 export type TalentDocType = InferSchemaType<typeof talentSchema>;
 
-export const Talent = models.Talent
-  ? (models.Talent as Model<TalentDocType>)
+export const Talent = models?.Talent
+  ? (models?.Talent as Model<TalentDocType>)
   : (mongoose.model<TalentDocType>(
       'Talent',
       talentSchema

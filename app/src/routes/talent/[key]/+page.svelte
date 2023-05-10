@@ -46,7 +46,7 @@
 
   $: statusText = activeShow ? activeShow.showState.status : 'No Current Show';
   $: eventText = 'No Events';
-  $: waiting4StateChange = false;
+  $: loading = false;
   $: showStopped = false;
 
   const noCurrentShow = () => {
@@ -76,8 +76,6 @@
     );
   };
 
-  onMount(() => {});
-
   const updateProfileImage = async (url: string) => {
     if (url && talent) {
       let formData = new FormData();
@@ -86,11 +84,12 @@
         method: 'POST',
         body: formData,
       });
+      invalidateAll();
     }
   };
 
   const onSubmit = ({}) => {
-    waiting4StateChange = true;
+    loading = true;
     return async ({ result }) => {
       if (result.data.showCreated) {
         const showUrl = urlJoin(
@@ -108,7 +107,7 @@
         statusText = 'In Escrow';
       }
       await applyAction(result);
-      waiting4StateChange = false;
+      loading = false;
     };
   };
 </script>
@@ -312,7 +311,7 @@
                   <button
                     class="btn btn-secondary"
                     type="submit"
-                    disabled={waiting4StateChange}>Create Show</button
+                    disabled={loading}>Create Show</button
                   >
                 </div>
               </form>
@@ -354,7 +353,7 @@
                     <button
                       class="btn btn-secondary"
                       type="submit"
-                      disabled={waiting4StateChange}>Cancel Show</button
+                      disabled={loading}>Cancel Show</button
                     >
                   </div>
                 </div>
@@ -376,7 +375,7 @@
                     <button
                       class="btn btn-secondary"
                       type="submit"
-                      disabled={waiting4StateChange}>Send Refunds</button
+                      disabled={loading}>Send Refunds</button
                     >
                   </div>
                 </div>

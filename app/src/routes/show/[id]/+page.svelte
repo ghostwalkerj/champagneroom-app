@@ -13,19 +13,18 @@
   export let form: ActionData;
   let show = data.show;
   let displayName = data.displayName;
-  let showId = $page.params.id;
   let buyingTicket = false;
 
-  $: waiting4StateChange = false;
+  $: loading = false;
   $: profileImage = getProfileImage(displayName, PUBLIC_PROFILE_IMAGE_PATH);
   $: canBuyTicket =
     show.showState.status === ShowStatus.BOX_OFFICE_OPEN || buyingTicket;
   const onSubmit = () => {
     buyingTicket = true;
-    waiting4StateChange = true;
+    loading = true;
     return async ({ result }) => {
       if (result.type === 'failure') {
-        waiting4StateChange = false;
+        loading = false;
         buyingTicket = false;
       }
 
@@ -38,7 +37,7 @@
   <div class="flex flex-row justify-center h-full">
     <!-- Page header -->
     <div class="pb-4 text-center w-full max-w-3xl">
-      <ShowDetail {show} />
+      <ShowDetail {show} talent={show.talent} />
       {#if canBuyTicket}
         <input type="checkbox" id="buy-ticket" class="modal-toggle" />
         <div class="modal">
@@ -109,7 +108,7 @@
                 </div>
 
                 <div class="py-4 text-center">
-                  {#if waiting4StateChange}
+                  {#if loading}
                     <button
                       class="btn btn-secondary loading"
                       type="submit"
@@ -119,7 +118,7 @@
                     <button
                       class="btn btn-secondary"
                       type="submit"
-                      disabled={waiting4StateChange}>Reserve</button
+                      disabled={loading}>Reserve</button
                     >
                   {/if}
                 </div>

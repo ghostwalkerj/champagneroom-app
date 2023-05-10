@@ -20,7 +20,13 @@ export const load: import('./$types').PageServerLoad = async ({ params }) => {
     throw error(404, 'Champagne Show not found');
   }
 
-  const show = await Show.findById(showId).exec();
+  const show = await Show.findById(showId)
+    .lean()
+    .populate(
+      'talent',
+      'name profileImageUrl stats.ratingAvg stats.completedShows'
+    )
+    .exec();
 
   if (!show) {
     throw error(404, 'Show not found');

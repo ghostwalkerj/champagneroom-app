@@ -43,7 +43,7 @@ agentSchema.plugin(findOrCreate);
 
 export type AgentDocType = InferSchemaType<typeof agentSchema>;
 
-export const Agent = models.Agent
+export const Agent = models?.Agent
   ? (models.Agent as Model<AgentDocType>)
   : (mongoose.model<AgentDocType>('Agent', agentSchema) as Model<AgentDocType>);
 

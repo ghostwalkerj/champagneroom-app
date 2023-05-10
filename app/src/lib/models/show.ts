@@ -1,12 +1,9 @@
-import { MONGO_FIELD_SECRET } from '$env/static/private';
+import { PUBLIC_MONGO_FIELD_SECRET } from '$env/static/public';
 import { ActorType } from '$lib/util/constants';
 import type { InferSchemaType, Model } from 'mongoose';
 import mongoose, { Schema, models } from 'mongoose';
 import { fieldEncryption } from 'mongoose-field-encryption';
 import { v4 as uuidv4 } from 'uuid';
-import type { TicketDocType } from './ticket';
-import type { TransactionDocType } from './transaction';
-import { ShowEvent } from './showEvent';
 
 export enum ShowStatus {
   CREATED = 'CREATED',
@@ -129,35 +126,15 @@ const showSchema = new Schema(
 
 showSchema.plugin(fieldEncryption, {
   fields: ['roomId'],
-  secret: MONGO_FIELD_SECRET,
+  secret: PUBLIC_MONGO_FIELD_SECRET,
 });
-
-showSchema.methods.createShowevent = async function ({
-  type,
-  ticket,
-  transaction,
-}: {
-  type: string;
-  ticket?: TicketDocType;
-  transaction?: TransactionDocType;
-}): Promise<void> {
-  const showevent = new ShowEvent({
-    type,
-    show: this._id,
-    talent: this.talent,
-    agent: this.agent,
-    ticket,
-    transaction,
-  });
-  showevent.save();
-};
 
 export type ShowStateType = InferSchemaType<typeof showStateSchema>;
 
 export type ShowDocType = InferSchemaType<typeof showSchema>;
 
 export const Show = (
-  models.Show ? models.Show : mongoose.model<ShowDocType>('Show', showSchema)
+  models?.Show ? models.Show : mongoose.model<ShowDocType>('Show', showSchema)
 ) as Model<ShowDocType>;
 
 export type ShowType = InstanceType<typeof Show>;

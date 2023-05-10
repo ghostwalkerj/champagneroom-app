@@ -22,6 +22,8 @@ export const actions: Actions = {
       return fail(400, { account, badAccount: true });
     }
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     const agent = (await Agent.findOrCreate({
       address: account,
     })) as AgentType;

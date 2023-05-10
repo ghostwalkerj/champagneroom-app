@@ -17,8 +17,8 @@ const showeventSchema = new Schema(
 export type ShowEventDocType = InferSchemaType<typeof showeventSchema>;
 
 export const ShowEvent = (
-  models.ShowEvent
-    ? models.ShowEvent
+  models?.ShowEvent
+    ? models?.ShowEvent
     : mongoose.model<ShowEventDocType>('ShowEvent', showeventSchema)
 ) as Model<ShowEventDocType>;
 

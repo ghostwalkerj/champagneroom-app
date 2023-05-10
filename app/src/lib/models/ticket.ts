@@ -1,4 +1,5 @@
 import { MONGO_FIELD_SECRET } from '$env/static/private';
+import { PUBLIC_MONGO_FIELD_SECRET } from '$env/static/public';
 import { ActorType } from '$lib/util/constants';
 import type { InferSchemaType, Model } from 'mongoose';
 import mongoose, { Schema, models } from 'mongoose';
@@ -65,7 +66,7 @@ const reservationSchema = new Schema({
 
 reservationSchema.plugin(fieldEncryption, {
   fields: ['pin'],
-  secret: MONGO_FIELD_SECRET,
+  secret: PUBLIC_MONGO_FIELD_SECRET,
 });
 
 const escrowSchema = new Schema({
