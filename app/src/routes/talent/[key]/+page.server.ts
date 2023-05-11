@@ -15,6 +15,9 @@ export const load: PageServerLoad = async ({ params }) => {
   }
 
   const talent = await Talent.findOne({ key })
+    .orFail(() => {
+      throw error(404, 'Talent not found');
+    })
     .lean()
     .populate('activeShows')
     .exec();
@@ -71,10 +74,11 @@ export const actions: Actions = {
 
     mongoose.connect(MONGO_DB_ENDPOINT);
 
-    const talent = await Talent.findById(talentId).exec();
-    if (!talent) {
-      throw error(404, 'Talent not found');
-    }
+    const talent = await Talent.findById(talentId)
+      .orFail(() => {
+        throw error(404, 'Talent not found');
+      })
+      .exec();
 
     const show = await Show.create({
       price: +price,

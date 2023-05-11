@@ -131,6 +131,8 @@ export const ticketSchema = new Schema(
       required: true,
       default: () => ({}),
     },
+    agent: { type: Schema.Types.ObjectId, ref: 'Agent', required: true },
+    talent: { type: Schema.Types.ObjectId, ref: 'Talent', required: true },
     transactions: [{ type: Schema.Types.ObjectId, ref: 'Transaction' }],
   },
   { timestamps: true }
@@ -139,7 +141,7 @@ export const ticketSchema = new Schema(
 export type TicketStateType = InferSchemaType<typeof ticketStateSchema>;
 export type TicketDocType = InferSchemaType<typeof ticketSchema>;
 
-export const Ticket = models.Ticket
+export const Ticket = models?.Ticket
   ? (models.Ticket as Model<TicketDocType>)
   : (mongoose.model<TicketDocType>(
       'Ticket',

@@ -7,17 +7,17 @@
   import type { TicketDocType } from '$lib/models/ticket';
   import { currencyFormatter, durationFormatter } from '$lib/util/constants';
   import getProfileImage from '$lib/util/profilePhoto';
-  export let show: ShowDocType | null;
-  export let ticket: TicketDocType | null;
+  export let show: ShowDocType;
+  export let ticket: TicketDocType;
 
-  $: profileImage = ticket
+  $: profileImage = ticket.ticketState.reservation
     ? getProfileImage(
         ticket.ticketState.reservation.name,
         PUBLIC_PROFILE_IMAGE_PATH
       )
     : PUBLIC_DEFAULT_PROFILE_IMAGE;
   $: ticketStatus = ticket
-    ? ticket.ticketState.totalPaid >= ticket.ticketState.price
+    ? ticket.ticketState.totalPaid >= ticket.price
       ? 'Paid' + ' ' + ticket.ticketState.status
       : ticket.ticketState.status
     : '';
@@ -37,12 +37,12 @@
               style="background-image: url('{profileImage}')"
             />
             <div class="pt-2">
-              {ticket.ticketState.reservation.name}
+              {ticket.ticketState.reservation?.name}
             </div>
           </div>
           <div class="flex flex-col">
             <div>
-              {show.talentInfo.name}
+              {ticket.talent.name}
             </div>
             <div>{show.name}</div>
 
@@ -55,7 +55,7 @@
           </div>
           <div
             class="relative bg-cover bg-no-repeat bg-center rounded-xl h-32 w-48"
-            style="background-image: url('{show.talentInfo.profileImageUrl}')"
+            style="background-image: url('{show.coverImageUrl}')"
           />
         </div>
         <div class="w-full flex">

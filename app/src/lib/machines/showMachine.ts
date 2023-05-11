@@ -35,7 +35,7 @@ export enum ShowEventType {
 
 export const createShowMachine = (
   showDocument: ShowDocType,
-  showMachineOptions: ShowMachineOptions
+  showMachineOptions?: ShowMachineOptions
 ) => {
   const GRACE_PERIOD = showMachineOptions.gracePeriod || 3600000;
 
@@ -328,7 +328,7 @@ export const createShowMachine = (
     {
       actions: {
         saveShowState: (context, event) => {
-          if (showMachineOptions.saveStateCallback) {
+          if (showMachineOptions?.saveStateCallback) {
             const showState = {
               ...context.showState,
             };
@@ -336,7 +336,7 @@ export const createShowMachine = (
             showMachineOptions.saveStateCallback(showState);
           }
 
-          if (showMachineOptions.createShowEventCallback) {
+          if (showMachineOptions?.createShowEventCallback) {
             const ticket = 'ticket' in event ? event.ticket : undefined;
             const transaction =
               'transaction' in event ? event.transaction : undefined;
@@ -592,7 +592,7 @@ export const createShowMachine = (
 
 export const createShowMachineService = (
   show: ShowDocType,
-  showMachineOptions: ShowMachineOptions
+  showMachineOptions?: ShowMachineOptions
 ) => {
   const showMachine = createShowMachine(show, showMachineOptions);
   showMachine;

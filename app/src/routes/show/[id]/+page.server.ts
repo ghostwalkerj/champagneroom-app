@@ -88,6 +88,8 @@ export const actions: import('./$types').Actions = {
 
     const ticket = await Ticket.create({
       show: show._id,
+      agent: show.agent,
+      talent: show.talent,
       price: show.price,
       paymentAddress: '0x0000000000000000000000000000000000000000',
       ticketState: {

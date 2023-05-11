@@ -3,40 +3,27 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { createTicketMachineService } from '$lib/machines/ticketMachine';
-
-  import { ticketDB, type TicketDBType } from '$lib/ORM/dbs/ticketDB';
-  import type { ShowDocument } from '$lib/ORM/models/show';
+  import type { ShowDocType } from '$lib/models/show';
   import {
     TicketDisputeReason,
+    type TicketDocType,
     TicketStatus,
-    type TicketDocument,
-  } from '$lib/ORM/models/ticket';
-  import { onMount } from 'svelte';
-
+  } from '$lib/models/ticket';
   import urlJoin from 'url-join';
 
-  import {
-    PUBLIC_RXDB_PASSWORD,
-    PUBLIC_TICKET_DB_ENDPOINT,
-  } from '$env/static/public';
-  import { StorageType } from '$lib/ORM/rxdb';
   import type { ActionData, PageData } from './$types';
   import TicketDetail from './TicketDetail.svelte';
 
   export let data: PageData;
   export let form: ActionData;
 
-  const token = data.token;
-  let ticket = data.ticket as TicketDocument;
-  let show = data.show as ShowDocument;
+  let ticket = data.ticket as TicketDocType;
+  let show = ticket.show as unknown as ShowDocType;
   const ticketId = $page.params.id;
 
   const showPath = urlJoin($page.url.href, 'show');
   const reasons = Object.values(TicketDisputeReason);
-  let ticketMachineService = createTicketMachineService(ticket, show, {
-    saveState: false,
-    observeState: false,
-  });
+  let ticketMachineService = createTicketMachineService(ticket, show);
 
   let needs2Pay = false;
   let canWatchShow = false;
@@ -82,37 +69,6 @@
       await applyAction(result);
     };
   };
-
-  onMount(() => {
-    if (ticket.ticketState.active) {
-      const dbOptions = {
-        endPoint: PUBLIC_TICKET_DB_ENDPOINT,
-        storageType: StorageType.IDB,
-        rxdbPassword: PUBLIC_RXDB_PASSWORD,
-      };
-      ticketDB(ticketId, token, dbOptions).then(async (db: TicketDBType) => {
-        const _show = (await db.shows.findOne(show._id).exec()) as ShowDocument;
-        _show.$.subscribe(newShow => {
-          show = newShow;
-        });
-        const _ticket = (await db.tickets
-          .findOne(ticketId)
-          .exec()) as TicketDocument;
-        if (ticketMachineService) {
-          ticketMachineService.stop();
-        }
-        _ticket.$.subscribe(newTicket => {
-          ticket = newTicket;
-          waiting4StateChange = false;
-        });
-
-        ticketMachineService = createTicketMachineService(_ticket, _show, {
-          saveState: false,
-          observeState: true,
-        });
-      });
-    }
-  });
 </script>
 
 {#if ticket}
