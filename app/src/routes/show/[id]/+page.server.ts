@@ -6,6 +6,7 @@ import { Ticket } from '$lib/models/ticket';
 import { mensNames } from '$lib/util/mensNames';
 import { createPinHash } from '$lib/util/pin';
 import { error, fail, redirect } from '@sveltejs/kit';
+import { exec } from 'child_process';
 import mongoose from 'mongoose';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 import urlJoin from 'url-join';
@@ -66,10 +67,12 @@ export const actions: import('./$types').Actions = {
     }
 
     mongoose.connect(MONGO_DB_ENDPOINT);
-    const show = await Show.findById(showId).exec();
-    if (!show) {
-      return error(404, 'Show not found');
-    }
+    const show = await Show.findById(showId)
+      .orFail(() => {
+        throw error(404, 'Show not found');
+      })
+      .exec();
+
     const showService = createShowMachineService(show, {
       saveStateCallback: showState => {
         show.showState = showState;

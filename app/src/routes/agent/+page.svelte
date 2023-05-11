@@ -7,12 +7,9 @@
   import AgentWallet from './AgentWallet.svelte';
   import TalentForm from './TalentForm.svelte';
   import type { AgentDocType } from '$lib/models/agent';
-  import type { TalentDocType } from '$lib/models/talent';
 
-  export let data: PageData;
   export let form: ActionData;
   let agent: AgentDocType;
-  let talents: TalentDocType[] = [];
 
   //TODO: This will be authentication later
   onMount(() => {

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { applyAction, enhance } from '$app/forms';
+  import { applyAction, deserialize, enhance } from '$app/forms';
   import { page } from '$app/stores';
   import ProfilePhoto from '$components/forms/ProfilePhoto.svelte';
   import {
@@ -22,6 +22,7 @@
   import type { Subscription } from 'xstate';
   import type { PageData } from './$types';
   import TalentWallet from './TalentWallet.svelte';
+  import { onMount } from 'svelte';
 
   export let form: import('./$types').ActionData;
   export let data: PageData;
@@ -54,6 +55,16 @@
     statusText = 'No Current Show';
     eventText = 'No Events';
   };
+
+  onMount(async () => {
+    while (activeShow) {
+      const response = await fetch('/api/v1/changesets/show/' + activeShow._id);
+
+      const changeset = (await response.json()) as ShowDocType;
+      console.log(changeset);
+      activeShow = changeset;
+    }
+  });
 
   const useShowMachine = (showMachineService: ShowMachineServiceType) => {
     showMachineSub?.unsubscribe();
@@ -319,7 +330,7 @@
         </div>
       {/if}
       {#if activeShow}
-        {#key showMachineState || activeShow}
+        {#key activeShow}
           <div>
             <ShowDetail
               show={activeShow}
