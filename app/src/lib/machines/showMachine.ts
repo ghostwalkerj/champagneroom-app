@@ -332,7 +332,6 @@ export const createShowMachine = (
             const showState = {
               ...context.showState,
             };
-            console.log('saveShowState', showState);
             showMachineOptions.saveStateCallback(showState);
           }
 
