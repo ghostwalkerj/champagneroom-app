@@ -1,10 +1,13 @@
 import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
 import { womensNames } from '$lib/util/womensNames';
 import type { InferSchemaType, Model } from 'mongoose';
-import mongoose, { Schema, models } from 'mongoose';
+import mongoose from 'mongoose';
 import { nanoid } from 'nanoid';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 import validator from 'validator';
+import pkg from 'mongoose';
+
+const { Schema, models } = pkg;
 
 const statSchema = new Schema(
   {
@@ -15,24 +18,40 @@ const statSchema = new Schema(
       default: 0,
       min: 0,
       required: true,
-      integer: true,
+      validate: {
+        validator: Number.isInteger,
+        message: '{VALUE} is not an integer value',
+      },
     },
     numRatings: {
       type: Number,
       default: 0,
       min: 0,
       required: true,
-      integer: true,
+      validate: {
+        validator: Number.isInteger,
+        message: '{VALUE} is not an integer value',
+      },
     },
     numCompletedShows: {
       type: Number,
       default: 0,
       min: 0,
       required: true,
-      integer: true,
+      validate: {
+        validator: Number.isInteger,
+        message: '{VALUE} is not an integer value',
+      },
     },
     completedShows: [
-      { type: Schema.Types.ObjectId, ref: 'Show', integer: true },
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Show',
+        validate: {
+          validator: Number.isInteger,
+          message: '{VALUE} is not an integer value',
+        },
+      },
     ],
   },
   { timestamps: true }
@@ -62,7 +81,6 @@ const talentSchema = new Schema(
       minLength: [4, 'Name is too short'],
       required: true,
       trim: true,
-      startcase: true,
       default: function () {
         return uniqueNamesGenerator({
           dictionaries: [womensNames],
@@ -80,7 +98,10 @@ const talentSchema = new Schema(
       min: 0,
       max: 100,
       required: true,
-      integer: true,
+      validate: {
+        validator: Number.isInteger,
+        message: '{VALUE} is not an integer value',
+      },
     },
     agent: { type: Schema.Types.ObjectId, ref: 'Agent', required: true },
     activeShows: [{ type: Schema.Types.ObjectId, ref: 'Show' }],

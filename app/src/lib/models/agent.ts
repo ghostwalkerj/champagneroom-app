@@ -1,10 +1,11 @@
 import { womensNames } from '$lib/util/womensNames';
 import type { InferSchemaType, Model } from 'mongoose';
-import mongoose, { Schema, models } from 'mongoose';
-import 'mongoose-valid8';
+import mongoose from 'mongoose';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 import validator from 'validator';
+import pkg from 'mongoose';
 
+const { Schema, models } = pkg;
 const agentSchema = new Schema(
   {
     _id: { type: Schema.Types.ObjectId, required: true, auto: true },
@@ -19,7 +20,6 @@ const agentSchema = new Schema(
       minLength: [4, 'Name is too short'],
       required: true,
       trim: true,
-      startcase: true,
       default: function () {
         return uniqueNamesGenerator({
           dictionaries: [womensNames],

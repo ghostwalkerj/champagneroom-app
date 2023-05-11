@@ -80,7 +80,6 @@
     "mongodb": "^5.4.0",
     "mongoose": "^7.1.0",
     "mongoose-field-encryption": "^6.0.0",
-    "mongoose-valid8": "^1.7.1",
     "nanoid": "^4.0.0",
     "npm-check": "^6.0.1",
     "peer": "^0.6.1",

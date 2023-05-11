@@ -11,25 +11,23 @@
   import { possessive } from 'i18n-possessive';
 
   import { goto, invalidateAll } from '$app/navigation';
+  import ShowDetail from '$components/ShowDetail.svelte';
   import type {
     ShowMachineServiceType,
     ShowMachineStateType,
   } from '$lib/machines/showMachine';
-  import { onMount } from 'svelte';
+  import type { ShowDocType } from '$lib/models/show';
+  import type { TalentDocType } from '$lib/models/talent';
   import urlJoin from 'url-join';
   import type { Subscription } from 'xstate';
   import type { PageData } from './$types';
   import TalentWallet from './TalentWallet.svelte';
-  import ShowDetail from '$components/ShowDetail.svelte';
-  import type { TalentDocType } from '$lib/models/talent';
-  import type { ShowDocType } from '$lib/models/show';
 
   export let form: import('./$types').ActionData;
   export let data: PageData;
 
   const talent = data.talent as TalentDocType;
-  $: activeShows = data.talent?.activeShows as ShowDocType[];
-  $: activeShow = activeShows[0] ?? null;
+  $: activeShow = data.activeShow as ShowDocType | null;
   $: showDuration = 60;
 
   let showName = possessive(talent.name, 'en') + ' Show';
@@ -40,7 +38,7 @@
 
   $: showMachineState = null as ShowMachineStateType | null;
   $: canCancelShow = false;
-  $: canCreateShow = activeShows.length === 0;
+  $: canCreateShow = activeShow === null;
   $: canStartShow = false;
   $: waiting4Refunds = false;
 
@@ -98,7 +96,8 @@
           result.data.show!._id.toString()
         );
         navigator.clipboard.writeText(showUrl);
-        invalidateAll();
+
+        await invalidateAll();
       } else if (result.data.showCancelled) {
         noCurrentShow();
         statusText = 'Cancelled';
@@ -319,8 +318,8 @@
           </div>
         </div>
       {/if}
-      {#if activeShows.length > 0}
-        {#key showMachineState || activeShows}
+      {#if activeShow}
+        {#key showMachineState || activeShow}
           <div>
             <ShowDetail
               show={activeShow}

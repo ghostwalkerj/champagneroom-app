@@ -4,15 +4,11 @@
   import {
     PUBLIC_JITSI_DOMAIN,
     PUBLIC_PROFILE_IMAGE_PATH,
-    PUBLIC_RXDB_PASSWORD,
-    PUBLIC_TICKET_DB_ENDPOINT,
     PUBLIC_TICKET_PATH,
   } from '$env/static/public';
-  import { ticketDB, type TicketDBType } from '$lib/ORM/dbs/ticketDB';
-  import type { ShowDocument } from '$lib/ORM/models/show';
-  import type { TicketDocument } from '$lib/ORM/models/ticket';
-  import { StorageType, type DatabaseOptions } from '$lib/ORM/rxdb';
   import { createTicketMachineService } from '$lib/machines/ticketMachine';
+  import type { ShowDocType } from '$lib/models/show';
+  import type { TicketDocType } from '$lib/models/ticket';
   import { jitsiInterfaceConfigOverwrite } from '$lib/util/constants';
   import getProfileImage from '$lib/util/profilePhoto';
   import { onDestroy, onMount } from 'svelte';
@@ -21,14 +17,17 @@
 
   export let data: PageData;
 
-  let ticket = data.ticket as TicketDocument;
-  let show = data.show as ShowDocument;
-  const token = data.token;
+  let ticket = data.ticket as TicketDocType;
+  let show = data.show as ShowDocType;
 
   // @ts-ignore
   let jitsiToken = data.jitsiToken as string;
 
-  let returnUrl = urlJoin($page.url.origin, PUBLIC_TICKET_PATH, ticket._id);
+  let returnUrl = urlJoin(
+    $page.url.origin,
+    PUBLIC_TICKET_PATH,
+    ticket._id.toString()
+  );
   let videoCallElement: HTMLDivElement;
 
   onDestroy(() => {
@@ -46,7 +45,7 @@
   const profileImage = urlJoin(
     $page.url.origin,
     getProfileImage(
-      ticket.ticketState.reservation.name,
+      ticket.ticketState.reservation?.name,
       PUBLIC_PROFILE_IMAGE_PATH
     )
   );
@@ -59,7 +58,7 @@
       height: '100%',
       parentNode: videoCallElement,
       userInfo: {
-        displayName: ticket.ticketState.reservation.name,
+        displayName: ticket.ticketState.reservation?.name,
       },
       interfaceConfigOverwrite: jitsiInterfaceConfigOverwrite,
       configOverwrite: {
@@ -74,29 +73,16 @@
       goto(returnUrl);
     });
 
-    const dbOptions = {
-      endPoint: PUBLIC_TICKET_DB_ENDPOINT,
-      storageType: StorageType.IDB,
-      rxdbPassword: PUBLIC_RXDB_PASSWORD,
-    } as DatabaseOptions;
+    const ticketMachineService = createTicketMachineService(ticket, show);
 
-    ticketDB(ticket._id, token, dbOptions).then(async (db: TicketDBType) => {
-      show = (await db.shows.findOne(show._id).exec()) as ShowDocument;
-      ticket = (await db.tickets.findOne(ticket._id).exec()) as TicketDocument;
-      const ticketMachineService = createTicketMachineService(ticket, show, {
-        saveState: false,
-        observeState: true,
+    ticketMachineService.subscribe(state => {
+      const timeToLeave = !state.can({
+        type: 'JOINED SHOW',
       });
-
-      ticketMachineService.subscribe(state => {
-        const timeToLeave = !state.can({
-          type: 'JOINED SHOW',
-        });
-        if (timeToLeave) {
-          api.executeCommand('hangup');
-          goto(returnUrl);
-        }
-      });
+      if (timeToLeave) {
+        api.executeCommand('hangup');
+        goto(returnUrl);
+      }
     });
   });
 </script>

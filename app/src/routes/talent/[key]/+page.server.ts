@@ -27,6 +27,10 @@ export const load: PageServerLoad = async ({ params }) => {
   }
   return {
     talent: JSON.parse(JSON.stringify(talent)),
+    activeShow:
+      talent.activeShows.length > 0
+        ? JSON.parse(JSON.stringify(talent.activeShows[0]))
+        : null,
   };
 };
 export const actions: Actions = {
@@ -97,7 +101,7 @@ export const actions: Actions = {
     });
 
     talent.activeShows.push(show._id);
-    talent.save();
+    await talent.save();
 
     return {
       success: true,

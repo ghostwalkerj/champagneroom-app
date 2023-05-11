@@ -1,10 +1,12 @@
 import { PUBLIC_MONGO_FIELD_SECRET } from '$env/static/public';
 import { ActorType } from '$lib/util/constants';
 import type { InferSchemaType, Model } from 'mongoose';
-import mongoose, { Schema, models } from 'mongoose';
+import mongoose from 'mongoose';
 import { fieldEncryption } from 'mongoose-field-encryption';
 import validator from 'validator';
+import pkg from 'mongoose';
 
+const { Schema, models } = pkg;
 export enum TicketStatus {
   RESERVED = 'RESERVED',
   CANCELLATION_REQUESTED = 'CANCELLATION REQUESTED',
@@ -88,7 +90,16 @@ const finalizeSchema = new Schema({
 });
 
 const feedbackSchema = new Schema({
-  rating: { type: Number, required: true, min: 1, max: 5, integer: true },
+  rating: {
+    type: Number,
+    required: true,
+    min: 1,
+    max: 5,
+    validate: {
+      validator: Number.isInteger,
+      message: '{VALUE} is not an integer value',
+    },
+  },
   review: { type: String },
   createdAt: { type: Date, required: true, default: Date.now },
 });
