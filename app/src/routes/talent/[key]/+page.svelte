@@ -27,11 +27,11 @@
   export let form: import('./$types').ActionData;
   export let data: PageData;
 
-  const talent = data.talent as TalentDocType;
+  let talent = data.talent as TalentDocType;
   $: activeShow = data.activeShow as ShowDocType | null;
   $: showDuration = 60;
 
-  let showName = possessive(talent.name, 'en') + ' Show';
+  let showName = talent ? possessive(talent.name, 'en') + ' Show' : 'Show';
 
   let showMachineSub: Subscription;
   const showPath = urlJoin($page.url.href, 'show');
@@ -42,6 +42,7 @@
   $: canCreateShow = activeShow === null;
   $: canStartShow = false;
   $: waiting4Refunds = false;
+  $: talentName = talent ? talent.name : 'Talent';
 
   $: statusText = activeShow ? activeShow.showState.status : 'No Current Show';
   $: eventText = 'No Events';
@@ -54,15 +55,35 @@
     canStartShow = false;
     statusText = 'No Current Show';
     eventText = 'No Events';
+    activeShow = null;
   };
 
-  onMount(async () => {
+  const observeShow = async (activeShow: ShowDocType) => {
     while (activeShow) {
       const response = await fetch('/api/v1/changesets/show/' + activeShow._id);
 
       const changeset = (await response.json()) as ShowDocType;
       activeShow = changeset;
     }
+  };
+
+  const observeTalent = async (talent: TalentDocType) => {
+    while (talent) {
+      const response = await fetch('/api/v1/changesets/talent/' + talent.key);
+      const changeset = (await response.json()) as TalentDocType;
+      if (changeset) {
+        talent = changeset;
+        talentName = talent.name;
+        if (talent.activeShows.length === 0) {
+          noCurrentShow();
+        }
+      }
+    }
+  };
+
+  onMount(async () => {
+    if (activeShow) observeShow(activeShow);
+    observeTalent(talent);
   });
 
   const useShowMachine = (showMachineService: ShowMachineServiceType) => {
@@ -402,7 +423,7 @@
         <div class="lg:col-start-3 lg:col-span-1">
           <div class="bg-primary text-primary-content card">
             <div class="text-center card-body items-center p-3">
-              <h2 class="text-xl card-title">{talent.name}</h2>
+              <h2 class="text-xl card-title">{talentName}</h2>
               <div>
                 <ProfilePhoto
                   profileImage={talent.profileImageUrl ||
