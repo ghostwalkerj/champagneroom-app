@@ -4,6 +4,7 @@
   import type { TalentDocType } from '$lib/models/talent';
   import { currencyFormatter, durationFormatter } from '$lib/util/constants';
   import StarRating from 'svelte-star-rating';
+  import { onMount, beforeUpdate } from 'svelte';
   import urlJoin from 'url-join';
 
   type ShowDetailOptions = {
@@ -28,8 +29,52 @@
     ...defaultOptions,
     ...options,
   };
-  $: showStatus = show?.showState.status;
-  $: waterMarkText = showStatus ?? '';
+  $: showStatus = show.showState.status;
+  $: waterMarkText = showStatus;
+  $: name = show.name;
+  $: duration = durationFormatter(show.duration);
+  $: price = currencyFormatter.format(show.price);
+  $: ticketsAvailable = show.showState.salesStats.ticketsAvailable;
+  $: ticketsReserved = show.showState.salesStats.ticketsReserved;
+  $: ticketsSold = show.showState.salesStats.ticketsSold;
+  $: ticketsRefunded = show.showState.salesStats.ticketsRefunded;
+  $: totalRefunded = currencyFormatter.format(
+    show.showState.salesStats.totalRefunded
+  );
+  $: totalSales = currencyFormatter.format(
+    show.showState.salesStats.totalSales
+  );
+
+  const setStats = (show: ShowDocType) => {
+    showStatus = show.showState.status;
+    waterMarkText = showStatus;
+    name = show.name;
+    duration = durationFormatter(show.duration);
+    price = currencyFormatter.format(show.price);
+    ticketsAvailable = show.showState.salesStats.ticketsAvailable;
+    ticketsReserved = show.showState.salesStats.ticketsReserved;
+    ticketsSold = show.showState.salesStats.ticketsSold;
+    ticketsRefunded = show.showState.salesStats.ticketsRefunded;
+    totalRefunded = currencyFormatter.format(
+      show.showState.salesStats.totalRefunded
+    );
+    totalSales = currencyFormatter.format(show.showState.salesStats.totalSales);
+  };
+
+  const observeShow = async (show: ShowDocType) => {
+    while (show) {
+      const response = await fetch('/api/v1/changesets/show/' + show._id);
+      const changeset = (await response.json()) as ShowDocType;
+      show = changeset;
+      setStats(show);
+    }
+  };
+
+  onMount(async () => {
+    if (show) {
+      observeShow(show);
+    }
+  });
 
   const copyShowUrl = () => {
     const showUrl = urlJoin(
@@ -50,7 +95,7 @@
       <div
         class="absolute top-4 left-4 text-lg text-primary ring-2 ring-primary bg-base-200 p-2 ring-inset rounded-xl"
       >
-        {show.name}
+        {name}
       </div>
       {#if options.showRating}
         <div
@@ -81,19 +126,19 @@
             <div class="stat">
               <div class="stat-title">Duration</div>
               <div class="text-primary stat-value">
-                {durationFormatter(show.duration)}
+                {duration}
               </div>
             </div>
             <div class="stat">
               <div class="stat-title">Price</div>
               <div class="text-primary stat-value">
-                {currencyFormatter.format(show.price)}
+                {price}
               </div>
             </div>
             <div class="stat">
               <div class="stat-title whitespace-normal">Available</div>
               <div class="text-primary stat-value">
-                {show.showState.salesStats.ticketsAvailable}
+                {ticketsAvailable}
               </div>
             </div>
           </div>
@@ -102,42 +147,34 @@
               <div class="stat">
                 <div class="stat-title">Reserved</div>
                 <div class="text-primary stat-value">
-                  {show.showState.salesStats.ticketsReserved}
+                  {ticketsReserved}
                 </div>
               </div>
               <div class="stat">
                 <div class="stat-title">Sold</div>
                 <div class="text-primary stat-value">
-                  {show.showState.salesStats.ticketsSold}
+                  {ticketsSold}
                 </div>
               </div>
-              {#if show.showState.salesStats.ticketsRefunded > 0}
+              {#if ticketsRefunded > 0}
                 <div class="stat">
                   <div class="stat-title">Refunded</div>
                   <div class="text-primary stat-value">
-                    {show.showState.salesStats.ticketsRefunded}
+                    {ticketsRefunded}
                   </div>
                 </div>
               {/if}
-              {#if show.showState.salesStats.totalRefunded > 0}
+              {#if +totalRefunded > 0}
                 <div class="stat">
                   <div class="stat-title whitespace-normal">
                     Refunded Amount
                   </div>
-                  <div class="text-primary stat-value">
-                    {currencyFormatter.format(
-                      show.showState.salesStats.totalRefunded
-                    )}
-                  </div>
+                  <div class="text-primary stat-value">totalRefunded }</div>
                 </div>
               {/if}
               <div class="stat">
                 <div class="stat-title whitespace-normal">Total Sales</div>
-                <div class="text-primary stat-value">
-                  {currencyFormatter.format(
-                    show.showState.salesStats.totalSales
-                  )}
-                </div>
+                <div class="text-primary stat-value">{totalSales}</div>
               </div>
             </div>
           {/if}

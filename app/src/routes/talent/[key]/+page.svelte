@@ -28,8 +28,9 @@
   export let data: PageData;
 
   let talent = data.talent as TalentDocType;
-  $: activeShow = data.activeShow as ShowDocType | null;
+  let activeShow = data.activeShow as ShowDocType | null;
   $: showDuration = 60;
+  $: showUpdateCounter = 0;
 
   let showName = talent ? possessive(talent.name, 'en') + ' Show' : 'Show';
 
@@ -58,15 +59,6 @@
     activeShow = null;
   };
 
-  const observeShow = async (activeShow: ShowDocType) => {
-    while (activeShow) {
-      const response = await fetch('/api/v1/changesets/show/' + activeShow._id);
-
-      const changeset = (await response.json()) as ShowDocType;
-      activeShow = changeset;
-    }
-  };
-
   const observeTalent = async (talent: TalentDocType) => {
     while (talent) {
       const response = await fetch('/api/v1/changesets/talent/' + talent.key);
@@ -82,7 +74,6 @@
   };
 
   onMount(async () => {
-    if (activeShow) observeShow(activeShow);
     observeTalent(talent);
   });
 
@@ -349,22 +340,20 @@
           </div>
         </div>
       {/if}
-      {#if activeShow}
-        {#key activeShow}
-          <div>
-            <ShowDetail
-              show={activeShow}
-              {talent}
-              options={{
-                showCopy: true,
-                showSalesStats: true,
-                showRating: false,
-                showWaterMark: false,
-              }}
-            />
-          </div>
-        {/key}
-      {/if}
+      <div>
+        {#if activeShow}
+          <ShowDetail
+            show={activeShow}
+            {talent}
+            options={{
+              showCopy: true,
+              showSalesStats: true,
+              showRating: false,
+              showWaterMark: false,
+            }}
+          />
+        {/if}
+      </div>
       <div class="pb-4">
         {#if canCancelShow}
           <!-- Link Form-->
