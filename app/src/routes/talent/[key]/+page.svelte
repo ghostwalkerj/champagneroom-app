@@ -124,7 +124,7 @@
           result.data.show!._id.toString()
         );
         navigator.clipboard.writeText(showUrl);
-
+        activeShow = result.data.show;
         await invalidateAll();
       } else if (result.data.showCancelled) {
         noCurrentShow();
