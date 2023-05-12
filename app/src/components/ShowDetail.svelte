@@ -4,7 +4,7 @@
   import type { TalentDocType } from '$lib/models/talent';
   import { currencyFormatter, durationFormatter } from '$lib/util/constants';
   import StarRating from 'svelte-star-rating';
-  import { onMount, beforeUpdate } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import urlJoin from 'url-join';
 
   type ShowDetailOptions = {
@@ -45,6 +45,9 @@
     show.showState.salesStats.totalSales
   );
 
+  const controller = new AbortController();
+  const signal = controller.signal;
+
   const setStats = (show: ShowDocType) => {
     showStatus = show.showState.status;
     waterMarkText = showStatus;
@@ -61,18 +64,24 @@
     totalSales = currencyFormatter.format(show.showState.salesStats.totalSales);
   };
 
-  const observeShow = async (show: ShowDocType) => {
+  const observeShow = async (show: ShowDocType, signal?: AbortSignal) => {
     while (show) {
-      const response = await fetch('/api/v1/changesets/show/' + show._id);
+      const response = await fetch('/api/v1/changesets/show/' + show._id, {
+        signal,
+      });
       const changeset = (await response.json()) as ShowDocType;
       show = changeset;
       setStats(show);
     }
   };
 
+  onDestroy(() => {
+    controller.abort();
+  });
+
   onMount(async () => {
     if (show) {
-      observeShow(show);
+      observeShow(show, signal);
     }
   });
 

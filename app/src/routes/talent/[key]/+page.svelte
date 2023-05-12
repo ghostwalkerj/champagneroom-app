@@ -22,7 +22,7 @@
   import type { Subscription } from 'xstate';
   import type { PageData } from './$types';
   import TalentWallet from './TalentWallet.svelte';
-  import { onMount } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
 
   export let form: import('./$types').ActionData;
   export let data: PageData;
@@ -30,8 +30,8 @@
   let talent = data.talent as TalentDocType;
   let activeShow = data.activeShow as ShowDocType | null;
   $: showDuration = 60;
-  $: showUpdateCounter = 0;
-
+  const controller = new AbortController();
+  const signal = controller.signal;
   let showName = talent ? possessive(talent.name, 'en') + ' Show' : 'Show';
 
   let showMachineSub: Subscription;
@@ -59,9 +59,11 @@
     activeShow = null;
   };
 
-  const observeTalent = async (talent: TalentDocType) => {
+  const observeTalent = async (talent: TalentDocType, signal?: AbortSignal) => {
     while (talent) {
-      const response = await fetch('/api/v1/changesets/talent/' + talent.key);
+      const response = await fetch('/api/v1/changesets/talent/' + talent.key, {
+        signal,
+      });
       const changeset = (await response.json()) as TalentDocType;
       if (changeset) {
         talent = changeset;
@@ -74,7 +76,11 @@
   };
 
   onMount(async () => {
-    observeTalent(talent);
+    observeTalent(talent, signal);
+  });
+
+  onDestroy(() => {
+    controller.abort();
   });
 
   const useShowMachine = (showMachineService: ShowMachineServiceType) => {
