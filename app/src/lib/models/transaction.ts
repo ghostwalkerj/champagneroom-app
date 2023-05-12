@@ -1,7 +1,6 @@
 import type { InferSchemaType, Model } from 'mongoose';
-import mongoose from 'mongoose';
+import { default as mongoose, default as pkg } from 'mongoose';
 import validator from 'validator';
-import pkg from 'mongoose';
 
 const { Schema, models } = pkg;
 export enum TransactionReasonType {

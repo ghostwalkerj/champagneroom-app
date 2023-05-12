@@ -1,6 +1,5 @@
 import type { InferSchemaType, Model } from 'mongoose';
-import mongoose from 'mongoose';
-import pkg from 'mongoose';
+import { default as mongoose, default as pkg } from 'mongoose';
 
 const { Schema, models } = pkg;
 const showeventSchema = new Schema(

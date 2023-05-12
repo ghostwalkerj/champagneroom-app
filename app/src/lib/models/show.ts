@@ -1,10 +1,9 @@
 import { PUBLIC_MONGO_FIELD_SECRET } from '$env/static/public';
 import { ActorType } from '$lib/util/constants';
 import type { InferSchemaType, Model } from 'mongoose';
-import mongoose from 'mongoose';
+import { default as mongoose, default as pkg } from 'mongoose';
 import { fieldEncryption } from 'mongoose-field-encryption';
 import { v4 as uuidv4 } from 'uuid';
-import pkg from 'mongoose';
 import type { TicketDocType } from './ticket';
 import type { TransactionDocType } from './transaction';
 
@@ -233,3 +232,17 @@ export const Show = models?.Show
   : (mongoose.model<ShowDocType>('Show', showSchema) as Model<ShowDocType>);
 
 export type ShowType = InstanceType<typeof Show>;
+
+export const observeShow = async (
+  show: ShowDocType,
+  callback: (show: ShowDocType) => void,
+  signal: AbortSignal
+) => {
+  while (show) {
+    const response = await fetch('/api/v1/changesets/show/' + show._id, {
+      signal,
+    });
+    const changeset = await response.json();
+    callback(changeset);
+  }
+};

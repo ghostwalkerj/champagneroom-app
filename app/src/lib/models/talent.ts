@@ -1,11 +1,10 @@
 import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
 import { womensNames } from '$lib/util/womensNames';
 import type { InferSchemaType, Model } from 'mongoose';
-import mongoose from 'mongoose';
+import { default as mongoose, default as pkg } from 'mongoose';
 import { nanoid } from 'nanoid';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 import validator from 'validator';
-import pkg from 'mongoose';
 
 const { Schema, models } = pkg;
 
@@ -120,3 +119,19 @@ export const Talent = models?.Talent
     ) as Model<TalentDocType>);
 
 export type TalentType = InstanceType<typeof Talent>;
+
+export const observeTalent = async (
+  talent: TalentDocType,
+  callback: (talent: TalentDocType) => void,
+  signal?: AbortSignal
+) => {
+  while (talent) {
+    const response = await fetch('/api/v1/changesets/talent/' + talent.key, {
+      signal,
+    });
+    const changeset = (await response.json()) as TalentDocType;
+    if (changeset) {
+      callback(changeset);
+    }
+  }
+};

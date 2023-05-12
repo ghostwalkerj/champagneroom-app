@@ -1,6 +1,6 @@
-import type { RequestHandler } from '@sveltejs/kit';
 import { MONGO_DB_ENDPOINT } from '$env/static/private';
 import { Show } from '$lib/models/show';
+import type { RequestHandler } from '@sveltejs/kit';
 import mongoose from 'mongoose';
 
 /** @type {import('./$types').PageServerLoad} */

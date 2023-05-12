@@ -1,10 +1,10 @@
 <script lang="ts">
   import { PUBLIC_SHOW_PATH } from '$env/static/public';
-  import type { ShowDocType } from '$lib/models/show';
+  import { observeShow, type ShowDocType } from '$lib/models/show';
   import type { TalentDocType } from '$lib/models/talent';
   import { currencyFormatter, durationFormatter } from '$lib/util/constants';
+  import { onDestroy, onMount } from 'svelte';
   import StarRating from 'svelte-star-rating';
-  import { onMount, onDestroy } from 'svelte';
   import urlJoin from 'url-join';
 
   type ShowDetailOptions = {
@@ -64,24 +64,19 @@
     totalSales = currencyFormatter.format(show.showState.salesStats.totalSales);
   };
 
-  const observeShow = async (show: ShowDocType, signal?: AbortSignal) => {
-    while (show) {
-      const response = await fetch('/api/v1/changesets/show/' + show._id, {
-        signal,
-      });
-      const changeset = (await response.json()) as ShowDocType;
-      show = changeset;
-      setStats(show);
-    }
-  };
-
   onDestroy(() => {
     controller.abort();
   });
 
   onMount(async () => {
     if (show) {
-      observeShow(show, signal);
+      observeShow(
+        show,
+        (s: ShowDocType) => {
+          setStats(s);
+        },
+        signal
+      );
     }
   });
 

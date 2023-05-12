@@ -1,10 +1,9 @@
 import { PUBLIC_MONGO_FIELD_SECRET } from '$env/static/public';
 import { ActorType } from '$lib/util/constants';
 import type { InferSchemaType, Model } from 'mongoose';
-import mongoose from 'mongoose';
+import { default as mongoose, default as pkg } from 'mongoose';
 import { fieldEncryption } from 'mongoose-field-encryption';
 import validator from 'validator';
-import pkg from 'mongoose';
 
 const { Schema, models } = pkg;
 export enum TicketStatus {

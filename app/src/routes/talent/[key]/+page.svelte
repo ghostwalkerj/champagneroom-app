@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { applyAction, deserialize, enhance } from '$app/forms';
+  import { applyAction, enhance } from '$app/forms';
   import { page } from '$app/stores';
   import ProfilePhoto from '$components/forms/ProfilePhoto.svelte';
   import {
@@ -16,13 +16,13 @@
     ShowMachineServiceType,
     ShowMachineStateType,
   } from '$lib/machines/showMachine';
-  import type { ShowDocType } from '$lib/models/show';
-  import type { TalentDocType } from '$lib/models/talent';
+  import { type ShowDocType, observeShow } from '$lib/models/show';
+  import { type TalentDocType, observeTalent } from '$lib/models/talent';
+  import { onDestroy, onMount } from 'svelte';
   import urlJoin from 'url-join';
   import type { Subscription } from 'xstate';
   import type { PageData } from './$types';
   import TalentWallet from './TalentWallet.svelte';
-  import { onDestroy, onMount } from 'svelte';
 
   export let form: import('./$types').ActionData;
   export let data: PageData;
@@ -30,8 +30,10 @@
   let talent = data.talent as TalentDocType;
   let activeShow = data.activeShow as ShowDocType | null;
   $: showDuration = 60;
-  const controller = new AbortController();
-  const signal = controller.signal;
+  const abortTalent = new AbortController();
+  const abortShow = new AbortController();
+  const talentSignal = abortTalent.signal;
+  const showSignal = abortShow.signal;
   let showName = talent ? possessive(talent.name, 'en') + ' Show' : 'Show';
 
   let showMachineSub: Subscription;
@@ -59,28 +61,39 @@
     activeShow = null;
   };
 
-  const observeTalent = async (talent: TalentDocType, signal?: AbortSignal) => {
-    while (talent) {
-      const response = await fetch('/api/v1/changesets/talent/' + talent.key, {
-        signal,
-      });
-      const changeset = (await response.json()) as TalentDocType;
-      if (changeset) {
-        talent = changeset;
-        talentName = talent.name;
-        if (talent.activeShows.length === 0) {
-          noCurrentShow();
-        }
-      }
-    }
-  };
-
   onMount(async () => {
-    observeTalent(talent, signal);
+    observeTalent(
+      //TODO: Makes this a store with subscriber model
+      talent,
+      newTalent => {
+        if (talent.activeShows.length === 0) {
+          abortShow.abort();
+          noCurrentShow();
+        } else if (
+          activeShow?._id.toString() !== talent.activeShows[0]._id.toString()
+        ) {
+          invalidateAll();
+        }
+        talent = newTalent;
+        talentName = talent.name;
+      },
+      talentSignal
+    );
+
+    if (activeShow) {
+      observeShow(
+        activeShow,
+        newShow => {
+          statusText = newShow.showState.status;
+        },
+        showSignal
+      );
+    }
   });
 
   onDestroy(() => {
-    controller.abort();
+    abortTalent.abort();
+    abortShow.abort();
   });
 
   const useShowMachine = (showMachineService: ShowMachineServiceType) => {

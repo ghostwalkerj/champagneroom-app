@@ -1,7 +1,7 @@
-import type { RequestHandler } from '@sveltejs/kit';
 import { MONGO_DB_ENDPOINT } from '$env/static/private';
-import mongoose from 'mongoose';
 import { Talent } from '$lib/models/talent';
+import type { RequestHandler } from '@sveltejs/kit';
+import mongoose from 'mongoose';
 
 /** @type {import('./$types').PageServerLoad} */
 export const GET: RequestHandler<{ key: string }> = async ({ params }) => {

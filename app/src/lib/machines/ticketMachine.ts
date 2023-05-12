@@ -4,12 +4,20 @@ import type { TicketDocType, TicketStateType } from '$lib/models/ticket';
 import { TicketStatus } from '$lib/models/ticket';
 import type { TransactionDocType } from '$lib/models/transaction';
 import { nanoid } from 'nanoid';
-import { type ActorRef, type ActorRefFrom, spawn } from 'xstate';
-import { assign, createMachine, interpret, send, type StateFrom } from 'xstate';
 import {
+  assign,
+  createMachine,
+  interpret,
+  send,
+  spawn,
+  type ActorRef,
+  type ActorRefFrom,
+  type StateFrom,
+} from 'xstate';
+import {
+  createShowMachine,
   type ShowMachineOptions,
   type ShowMachineType,
-  createShowMachine,
 } from './showMachine';
 
 export type TicketMachineOptions = {
