@@ -2,14 +2,18 @@ import { MONGO_DB_ENDPOINT } from '$env/static/private';
 import { PUBLIC_TICKET_PATH } from '$env/static/public';
 import { createShowMachineService } from '$lib/machines/showMachine';
 import { Show } from '$lib/models/show';
-import { Ticket } from '$lib/models/ticket';
+import { ShowEvent } from '$lib/models/showEvent';
+import { Ticket, TicketDocType } from '$lib/models/ticket';
+import type { TransactionDocType } from '$lib/models/transaction';
 import { mensNames } from '$lib/util/mensNames';
 import { createPinHash } from '$lib/util/pin';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { exec } from 'child_process';
+import { url } from 'inspector';
 import mongoose from 'mongoose';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 import urlJoin from 'url-join';
+import { t } from 'xstate';
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 export const load: import('./$types').PageServerLoad = async ({ params }) => {
@@ -74,10 +78,26 @@ export const actions: import('./$types').Actions = {
       .exec();
 
     const showService = createShowMachineService(show, {
-      saveStateCallback: showState => {
-        show.showState = showState;
-        show.save();
-      },
+      // @ts-ignore
+      saveStateCallback: async showState => show.saveState(showState),
+      // saveShowEventCallback: ({
+      //   type,
+      //   ticket,
+      //   transaction,
+      // }: {
+      //   type: string;
+      //   ticket?: TicketDocType;
+      //   transaction?: TransactionDocType;
+      // }) => {
+      //   ShowEvent.create({
+      //     show: show._id,
+      //     type,
+      //     ticket: ticket?._id,
+      //     transaction: transaction?._id,
+      //     agent: show.agent,
+      //     talent: show.talent,
+      //   });
+      // },
     });
 
     const showState = showService.getSnapshot();

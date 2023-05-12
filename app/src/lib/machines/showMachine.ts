@@ -8,7 +8,7 @@ export type ShowStateType = ShowDocType['showState'];
 
 export type ShowMachineOptions = {
   saveStateCallback?: (state: ShowStateType) => void;
-  createShowEventCallback?: ({
+  saveShowEventCallback?: ({
     type,
     ticket,
     transaction,
@@ -16,7 +16,7 @@ export type ShowMachineOptions = {
     type: string;
     ticket?: TicketDocType;
     transaction?: TransactionDocType;
-  }) => Promise<void>;
+  }) => void;
   gracePeriod?: number;
   escrowPeriod?: number;
 };
@@ -335,11 +335,11 @@ export const createShowMachine = (
             showMachineOptions.saveStateCallback(showState);
           }
 
-          if (showMachineOptions?.createShowEventCallback) {
+          if (showMachineOptions?.saveShowEventCallback) {
             const ticket = 'ticket' in event ? event.ticket : undefined;
             const transaction =
               'transaction' in event ? event.transaction : undefined;
-            showMachineOptions.createShowEventCallback({
+            showMachineOptions.saveShowEventCallback({
               type: event.type,
               ticket,
               transaction,

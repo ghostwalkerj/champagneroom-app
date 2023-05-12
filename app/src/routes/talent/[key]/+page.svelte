@@ -61,7 +61,6 @@
       const response = await fetch('/api/v1/changesets/show/' + activeShow._id);
 
       const changeset = (await response.json()) as ShowDocType;
-      console.log(changeset);
       activeShow = changeset;
     }
   });

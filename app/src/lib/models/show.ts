@@ -5,6 +5,8 @@ import mongoose from 'mongoose';
 import { fieldEncryption } from 'mongoose-field-encryption';
 import { v4 as uuidv4 } from 'uuid';
 import pkg from 'mongoose';
+import type { TicketDocType } from './ticket';
+import type { TransactionDocType } from './transaction';
 
 const { Schema, models } = pkg;
 export enum ShowStatus {
@@ -188,6 +190,32 @@ const showSchema = new Schema(
   },
   {
     timestamps: true,
+    methods: {
+      saveState(newState) {
+        mongoose
+          .model('Show')
+          .updateOne({ _id: this._id }, { $set: { showState: newState } })
+          .exec();
+      },
+      createShowEvent({
+        type,
+        ticket,
+        transaction,
+      }: {
+        type: string;
+        ticket?: TicketDocType;
+        transaction?: TransactionDocType;
+      }) {
+        mongoose.model('ShowEvent').create({
+          show: this._id,
+          type,
+          ticket: ticket?._id,
+          transaction: transaction?._id,
+          agent: this.agent,
+          talent: this.talent,
+        });
+      },
+    },
   }
 );
 
@@ -200,8 +228,8 @@ export type ShowStateType = InferSchemaType<typeof showStateSchema>;
 
 export type ShowDocType = InferSchemaType<typeof showSchema>;
 
-export const Show = (
-  models?.Show ? models.Show : mongoose.model<ShowDocType>('Show', showSchema)
-) as Model<ShowDocType>;
+export const Show = models?.Show
+  ? (models.Show as Model<ShowDocType>)
+  : (mongoose.model<ShowDocType>('Show', showSchema) as Model<ShowDocType>);
 
 export type ShowType = InstanceType<typeof Show>;

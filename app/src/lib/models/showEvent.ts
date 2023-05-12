@@ -16,6 +16,8 @@ const showeventSchema = new Schema(
   { timestamps: true }
 );
 
+showeventSchema.index({ createdAt: 1 });
+
 export type ShowEventDocType = InferSchemaType<typeof showeventSchema>;
 
 export const ShowEvent = (
