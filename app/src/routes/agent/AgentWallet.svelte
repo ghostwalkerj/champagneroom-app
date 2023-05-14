@@ -1,7 +1,4 @@
 <script lang="ts">
-  import type { AgentDocType } from '$lib/models/agent';
-
-  export let agent: AgentDocType;
 </script>
 
 <div class="bg-primary h-full text-primary-content w-full card p-2">

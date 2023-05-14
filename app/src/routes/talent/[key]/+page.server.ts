@@ -6,7 +6,7 @@ import {
 import {
   Show,
   ShowCancelReason,
-  ShowStateType,
+  type ShowStateType,
   ShowStatus,
 } from '$lib/models/show';
 import { Talent } from '$lib/models/talent';

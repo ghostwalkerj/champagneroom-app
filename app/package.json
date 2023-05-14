@@ -65,6 +65,7 @@
     "tslib": "^2.4.0",
     "typescript": "^5.0.4",
     "vite": "^4.0.0",
+    "vite-plugin-node-polyfills": "^0.8.2",
     "web3.storage": "^4.4.0"
   },
   "type": "module",

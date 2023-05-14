@@ -1,6 +1,4 @@
 <script lang="ts">
-  import type { TalentDocType } from '$lib/ORM/models/talent';
-  export let talent: TalentDocType;
 </script>
 
 <div class="bg-primary h-full text-primary-content w-full card">
