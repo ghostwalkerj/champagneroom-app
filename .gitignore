@@ -22,3 +22,4 @@ app/src/routes/sh/[id]/oldpage.svelte
 app/src/lib/machines/showMachine.typegen.d.ts
 app/src/lib/machines/ticketMachine.typegen.d.ts
 app/dist/**
+.vercel

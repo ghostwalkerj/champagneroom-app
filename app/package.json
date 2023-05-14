@@ -69,6 +69,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@sveltejs/adapter-vercel": "^2.4.3",
     "@walletconnect/web3-provider": "^1.7.8",
     "@xstate/svelte": "^2.0.0",
     "chart.js": "^3.9.1",

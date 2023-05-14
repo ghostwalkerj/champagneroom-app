@@ -1,9 +1,13 @@
-import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
+import {
+  PUBLIC_CHANGESET_PATH,
+  PUBLIC_DEFAULT_PROFILE_IMAGE,
+} from '$env/static/public';
 import { womensNames } from '$lib/util/womensNames';
 import type { InferSchemaType, Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
 import { nanoid } from 'nanoid';
 import { uniqueNamesGenerator } from 'unique-names-generator';
+import urlJoin from 'url-join';
 import validator from 'validator';
 
 const { Schema, models } = pkg;
@@ -126,7 +130,8 @@ export const observeTalent = async (
   signal?: AbortSignal
 ) => {
   while (talent) {
-    const response = await fetch('/api/v1/changesets/talent/' + talent.key, {
+    const changesetPath = urlJoin(PUBLIC_CHANGESET_PATH, 'talent', talent.key);
+    const response = await fetch(changesetPath, {
       signal,
     });
     const changeset = (await response.json()) as TalentDocType;

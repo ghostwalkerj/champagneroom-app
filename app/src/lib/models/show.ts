@@ -1,4 +1,7 @@
-import { PUBLIC_MONGO_FIELD_SECRET } from '$env/static/public';
+import {
+  PUBLIC_CHANGESET_PATH,
+  PUBLIC_MONGO_FIELD_SECRET,
+} from '$env/static/public';
 import { ActorType } from '$lib/util/constants';
 import type { InferSchemaType, Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
@@ -6,6 +9,8 @@ import { fieldEncryption } from 'mongoose-field-encryption';
 import { v4 as uuidv4 } from 'uuid';
 import type { TicketDocType } from './ticket';
 import type { TransactionDocType } from './transaction';
+import urlJoin from 'url-join';
+import type { response } from 'express';
 
 const { Schema, models } = pkg;
 export enum ShowStatus {
@@ -238,8 +243,14 @@ export const observeShow = async (
   callback: (show: ShowDocType) => void,
   signal: AbortSignal
 ) => {
+  const changesetPath = urlJoin(
+    PUBLIC_CHANGESET_PATH,
+    'show',
+    show._id.toString()
+  );
+
   while (show) {
-    const response = await fetch('/api/v1/changesets/show/' + show._id, {
+    const response = await fetch(changesetPath, {
       signal,
     });
     const changeset = await response.json();
