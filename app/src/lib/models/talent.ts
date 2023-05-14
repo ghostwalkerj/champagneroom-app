@@ -3,6 +3,7 @@ import {
   PUBLIC_DEFAULT_PROFILE_IMAGE,
 } from '$env/static/public';
 import { womensNames } from '$lib/util/womensNames';
+import to from 'await-to-js';
 import type { InferSchemaType, Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
 import { nanoid } from 'nanoid';
@@ -129,13 +130,18 @@ export const observeTalent = async (
   callback: (talent: TalentDocType) => void,
   signal?: AbortSignal
 ) => {
-  while (talent) {
+  let loop = true;
+  while (loop) {
     const changesetPath = urlJoin(PUBLIC_CHANGESET_PATH, 'talent', talent.key);
-    const response = await fetch(changesetPath, {
-      signal,
-    });
-    const changeset = (await response.json()) as TalentDocType;
-    if (changeset) {
+    const [err, response] = await to(
+      fetch(changesetPath, {
+        signal,
+      })
+    );
+    if (err) {
+      loop = false;
+    } else {
+      const changeset = await response.json();
       callback(changeset);
     }
   }

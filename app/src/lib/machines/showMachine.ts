@@ -1,3 +1,4 @@
+import { PUBLIC_ESCROW_PERIOD, PUBLIC_GRACE_PERIOD } from '$env/static/public';
 import { ShowStatus, type ShowDocType } from '$lib/models/show';
 import type { TicketDocType } from '$lib/models/ticket';
 import type { TransactionDocType } from '$lib/models/transaction';
@@ -336,11 +337,18 @@ export const createShowMachine = (
           };
         }),
 
-        stopShow: assign(context => {
+        stopShow: assign((context, event) => {
           const startDate = context.showState.runtime?.startDate;
           if (!startDate) {
             throw new Error('Show start date is not defined');
           }
+          showMachineOptions?.jobQueue?.add(
+            event.type,
+            {
+              showId: context.showDocument._id,
+            },
+            { delay: +PUBLIC_GRACE_PERIOD }
+          );
           return {
             showState: {
               ...context.showState,
@@ -391,7 +399,14 @@ export const createShowMachine = (
           };
         }),
 
-        enterEscrow: assign(context => {
+        enterEscrow: assign((context, event) => {
+          showMachineOptions?.jobQueue?.add(
+            event.type,
+            {
+              showId: context.showDocument._id,
+            },
+            { delay: +PUBLIC_ESCROW_PERIOD }
+          );
           return {
             showState: {
               ...context.showState,

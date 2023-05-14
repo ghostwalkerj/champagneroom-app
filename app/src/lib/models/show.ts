@@ -10,6 +10,9 @@ import urlJoin from 'url-join';
 import { v4 as uuidv4 } from 'uuid';
 import type { TicketDocType } from './ticket';
 import type { TransactionDocType } from './transaction';
+import to from 'await-to-js';
+import e from 'cors';
+import console from 'console';
 
 const { Schema, models } = pkg;
 export enum ShowStatus {
@@ -248,11 +251,19 @@ export const observeShow = async (
     show._id.toString()
   );
 
-  while (show) {
-    const response = await fetch(changesetPath, {
-      signal,
-    });
-    const changeset = await response.json();
-    callback(changeset);
+  let loop = true;
+
+  while (loop) {
+    const [err, response] = await to(
+      fetch(changesetPath, {
+        signal,
+      })
+    );
+    if (err) {
+      loop = false;
+    } else {
+      const changeset = await response.json();
+      callback(changeset);
+    }
   }
 };

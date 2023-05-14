@@ -16,7 +16,7 @@ const config: UserConfig = {
     }),
   ],
   ssr: {
-    noExternal: ['chart.js/**', 'quirrel/**'],
+    //noExternal: ['chart.js/**'],
   },
 };
 
