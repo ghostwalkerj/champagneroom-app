@@ -1,12 +1,12 @@
 <script lang="ts">
   import { deserialize } from '$app/forms';
 
+  import type { AgentDocType } from '$lib/models/agent';
   import { onMount } from 'svelte';
   import { selectedAccount } from 'svelte-web3';
-  import type { ActionData, PageData } from './$types';
+  import type { ActionData } from './$types';
   import AgentWallet from './AgentWallet.svelte';
   import TalentForm from './TalentForm.svelte';
-  import type { AgentDocType } from '$lib/models/agent';
 
   export let form: ActionData;
   let agent: AgentDocType;

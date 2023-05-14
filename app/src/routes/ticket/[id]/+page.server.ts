@@ -4,10 +4,13 @@ import { Ticket, TicketCancelReason } from '$lib/models/ticket';
 import { Transaction, TransactionReasonType } from '$lib/models/transaction';
 
 import { MONGO_DB_ENDPOINT } from '$env/static/private';
-import { createTicketMachineService } from '$lib/machines/ticketMachine';
 import type { ShowType } from '$lib/models/show';
 import { ActorType } from '$lib/util/constants';
 import { verifyPin } from '$lib/util/pin';
+import {
+  getTicketMachineService,
+  getTicketMachineServiceFromId,
+} from '$lib/util/serverSideHelper';
 import { error, fail, redirect } from '@sveltejs/kit';
 import mongoose from 'mongoose';
 import urlJoin from 'url-join';
@@ -22,13 +25,7 @@ const getTicketService = async (ticketId: string) => {
 
   const show = ticket.show as unknown as ShowType;
 
-  const ticketService = createTicketMachineService(ticket, show, {
-    saveStateCallback: ticketState => {
-      ticket.ticketState = ticketState;
-      ticket.save();
-    },
-  });
-
+  const ticketService = await getTicketMachineService(ticket, show);
   return { ticket, show, ticketService };
 };
 
@@ -158,7 +155,7 @@ export const actions: import('./$types').Actions = {
       return fail(400, { rating, missingRating: true });
     }
 
-    const { ticketService } = await getTicketService(ticketId);
+    const ticketService = await getTicketMachineServiceFromId(ticketId);
 
     const state = ticketService.getSnapshot();
     const feedback = {
@@ -193,8 +190,7 @@ export const actions: import('./$types').Actions = {
       return fail(400, { reason, missingReason: true });
     }
 
-    mongoose.connect(MONGO_DB_ENDPOINT);
-    const { ticketService } = await getTicketService(ticketId);
+    const ticketService = await getTicketMachineServiceFromId(ticketId);
 
     const state = ticketService.getSnapshot();
     const dispute = {

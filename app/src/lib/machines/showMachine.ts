@@ -24,7 +24,7 @@ export type ShowMachineOptions = {
   escrowPeriod?: number;
 };
 
-export type ShowEventType =
+export type ShowMachineEventType =
   | {
       type: 'REQUEST CANCELLATION';
       cancel: ShowStateType['cancel'];
@@ -98,7 +98,7 @@ export const createShowMachine = (
       // eslint-disable-next-line @typescript-eslint/consistent-type-imports
       tsTypes: {} as import('./showMachine.typegen').Typegen0,
       schema: {
-        events: {} as ShowEventType,
+        events: {} as ShowMachineEventType,
       },
       predictableActionArguments: true,
       id: 'showMachine',

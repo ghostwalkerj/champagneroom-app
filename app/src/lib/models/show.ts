@@ -3,16 +3,12 @@ import {
   PUBLIC_MONGO_FIELD_SECRET,
 } from '$env/static/public';
 import { ActorType } from '$lib/util/constants';
+import to from 'await-to-js';
 import type { InferSchemaType, Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
 import { fieldEncryption } from 'mongoose-field-encryption';
 import urlJoin from 'url-join';
 import { v4 as uuidv4 } from 'uuid';
-import type { TicketDocType } from './ticket';
-import type { TransactionDocType } from './transaction';
-import to from 'await-to-js';
-import e from 'cors';
-import console from 'console';
 
 const { Schema, models } = pkg;
 export enum ShowStatus {
@@ -196,32 +192,6 @@ const showSchema = new Schema(
   },
   {
     timestamps: true,
-    methods: {
-      saveState(newState) {
-        mongoose
-          .model('Show')
-          .updateOne({ _id: this._id }, { $set: { showState: newState } })
-          .exec();
-      },
-      createShowEvent({
-        type,
-        ticket,
-        transaction,
-      }: {
-        type: string;
-        ticket?: TicketDocType;
-        transaction?: TransactionDocType;
-      }) {
-        mongoose.model('ShowEvent').create({
-          show: this._id,
-          type,
-          ticket: ticket?._id,
-          transaction: transaction?._id,
-          agent: this.agent,
-          talent: this.talent,
-        });
-      },
-    },
   }
 );
 

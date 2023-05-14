@@ -19,7 +19,6 @@ import {
   type ShowMachineOptions,
   type ShowMachineType,
 } from './showMachine';
-import type { cancel } from 'timeago.js';
 
 export type TicketMachineOptions = {
   saveStateCallback?: (state: TicketStateType) => void;

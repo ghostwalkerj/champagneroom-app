@@ -1,6 +1,5 @@
 <script lang="ts">
   import { applyAction, enhance } from '$app/forms';
-  import { page } from '$app/stores';
 
   import ShowDetail from '$components/ShowDetail.svelte';
   import { PUBLIC_PROFILE_IMAGE_PATH } from '$env/static/public';

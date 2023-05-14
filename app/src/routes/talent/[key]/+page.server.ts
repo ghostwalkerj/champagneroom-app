@@ -1,19 +1,16 @@
 import { MONGO_DB_ENDPOINT } from '$env/static/private';
-import {
-  createShowMachineService,
-  type ShowEventType,
-} from '$lib/machines/showMachine';
+
+import type { ShowMachineEventType } from '$lib/machines/showMachine';
 import {
   Show,
   ShowCancelReason,
-  type ShowStateType,
   ShowStatus,
+  type ShowStateType,
 } from '$lib/models/show';
 import { Talent } from '$lib/models/talent';
-import { redisOptions } from '$lib/util/bullMQ';
 import { ActorType } from '$lib/util/constants';
+import { getShowMachineServiceFromId } from '$lib/util/serverSideHelper';
 import { error, fail } from '@sveltejs/kit';
-import { Queue } from 'bullmq';
 import mongoose from 'mongoose';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -122,25 +119,9 @@ export const actions: Actions = {
     if (key === null) {
       throw error(404, 'Key not found');
     }
-    const showQueue = new Queue('show', redisOptions);
 
     mongoose.connect(MONGO_DB_ENDPOINT);
-
-    const show = await Show.findById(showId)
-      .orFail(() => {
-        throw error(404, 'Show not found');
-      })
-      .exec();
-
-    const showService = createShowMachineService(show, {
-      // @ts-ignore
-      saveStateCallback: async showState => show.saveState(showState),
-      saveShowEventCallback: async ({ type, ticket, transaction }) =>
-        // @ts-ignore
-        show.createShowEvent({ type, ticket, transaction }),
-      jobQueue: showQueue,
-    });
-
+    const showService = await getShowMachineServiceFromId(showId);
     const showMachineState = showService.getSnapshot();
 
     const cancel = {
@@ -154,7 +135,7 @@ export const actions: Actions = {
       type: 'REQUEST CANCELLATION',
       cancel,
       tickets: [],
-    } as ShowEventType;
+    } as ShowMachineEventType;
 
     if (showMachineState.can(cancelEvent)) {
       showService.send(cancelEvent);
