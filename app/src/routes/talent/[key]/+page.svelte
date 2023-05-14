@@ -16,13 +16,16 @@
     ShowMachineServiceType,
     ShowMachineStateType,
   } from '$lib/machines/showMachine';
-  import { observeShow, type ShowDocType } from '$lib/models/show';
-  import { observeTalent, type TalentDocType } from '$lib/models/talent';
+
   import { onDestroy, onMount } from 'svelte';
   import urlJoin from 'url-join';
   import type { Subscription } from 'xstate';
   import type { PageData } from './$types';
   import TalentWallet from './TalentWallet.svelte';
+  import { talentStore } from '$lib/stores';
+  import type { Unsubscriber } from 'svelte/store';
+  import type { TalentDocType } from '$lib/models/talent';
+  import type { ShowDocType } from '$lib/models/show';
 
   export let form: import('./$types').ActionData;
   export let data: PageData;
@@ -30,10 +33,7 @@
   let talent = data.talent as TalentDocType;
   let activeShow = data.activeShow as ShowDocType | null;
   $: showDuration = 60;
-  const abortTalent = new AbortController();
-  const abortShow = new AbortController();
-  const talentSignal = abortTalent.signal;
-  const showSignal = abortShow.signal;
+
   let showName = talent ? possessive(talent.name, 'en') + ' Show' : 'Show';
 
   let showMachineSub: Subscription;
@@ -62,39 +62,26 @@
     activeShow = null;
   };
 
+  let talentUnSub: Unsubscriber;
+
   onMount(async () => {
-    observeTalent(
-      //TODO: Makes this a store with subscriber model
-      talent,
-      newTalent => {
-        if (talent.activeShows.length === 0) {
-          abortShow.abort();
+    talentUnSub = talentStore(talent).subscribe(_talent => {
+      if (_talent) {
+        if (_talent.activeShows.length === 0) {
           noCurrentShow();
         } else if (
-          activeShow?._id.toString() !== talent.activeShows[0]._id.toString()
+          activeShow?._id.toString() !== _talent.activeShows[0]._id.toString()
         ) {
           invalidateAll();
         }
-        talent = newTalent;
-        talentName = talent.name;
-      },
-      talentSignal
-    );
-
-    if (activeShow) {
-      observeShow(
-        activeShow,
-        newShow => {
-          statusText = newShow.showState.status;
-        },
-        showSignal
-      );
-    }
+        talent = _talent;
+        talentName = _talent.name;
+      }
+    });
   });
 
   onDestroy(() => {
-    abortTalent.abort();
-    abortShow.abort();
+    talentUnSub?.();
   });
 
   const useShowMachine = (showMachineService: ShowMachineServiceType) => {
@@ -170,10 +157,10 @@
         <div class="modal-action">
           <button
             class="btn"
-            on:click={() => goto(showPath)}
-            disabled={!canStartShow}>Restart Show</button
+            on:click="{() => goto(showPath)}"
+            disabled="{!canStartShow}">Restart Show</button
           >
-          <form method="post" action="?/end_show" use:enhance={onSubmit}>
+          <form method="post" action="?/end_show" use:enhance="{onSubmit}">
             <button class="btn">End Show</button>
           </form>
         </div>
@@ -204,7 +191,7 @@
                         stroke-linejoin="round"
                         stroke-width="2"
                         d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      /></svg
+                      ></path></svg
                     >
                     <p class="capitalize">{statusText.toLowerCase()}</p>
                   </div>
@@ -223,7 +210,7 @@
                         stroke-linejoin="round"
                         stroke-width="2"
                         d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      /></svg
+                      ></path></svg
                     >
                     <p class="capitalize">{eventText}</p>
                   </div>
@@ -233,7 +220,7 @@
                 <button
                   class="btn"
                   type="submit"
-                  on:click={() => goto(showPath)}>Start Show</button
+                  on:click="{() => goto(showPath)}">Start Show</button
                 >
               {/if}
             </div>
@@ -245,7 +232,11 @@
           <div class="text-center card-body items-center p-3">
             <h2 class="text-2xl card-title">Create a New Show</h2>
             <div class="flex flex-col w-full">
-              <form method="post" action="?/create_show" use:enhance={onSubmit}>
+              <form
+                method="post"
+                action="?/create_show"
+                use:enhance="{onSubmit}"
+              >
                 <div
                   class="flex flex-col md:flex-row text-white p-2 justify-center items-center gap-4"
                 >
@@ -258,7 +249,7 @@
                       type="text"
                       name="name"
                       class="input input-bordered input-primary"
-                      bind:value={showName}
+                      bind:value="{showName}"
                       minlength="3"
                       maxlength="50"
                     />
@@ -286,7 +277,7 @@
                         class="w-full py-2 pl-6 input input-bordered input-primary"
                         placeholder="0.00"
                         aria-describedby="price-currency"
-                        value={form?.price ?? ''}
+                        value="{form?.price ?? ''}"
                       />
                       <div
                         class="flex pr-3 inset-y-0 right-0 absolute items-center pointer-events-none"
@@ -312,12 +303,12 @@
                   </div>
 
                   <input type="hidden" name="numTickets" value="1" />
-                  <input type="hidden" name="talentId" value={talent._id} />
-                  <input type="hidden" name="agentId" value={talent.agent} />
+                  <input type="hidden" name="talentId" value="{talent._id}" />
+                  <input type="hidden" name="agentId" value="{talent.agent}" />
                   <input
                     type="hidden"
                     name="coverImageUrl"
-                    value={talent.profileImageUrl}
+                    value="{talent.profileImageUrl}"
                   />
                   <div class="form-control md:w-1/5">
                     <!-- svelte-ignore a11y-label-has-associated-control -->
@@ -330,7 +321,7 @@
                       type="range"
                       min="15"
                       max="120"
-                      bind:value={showDuration}
+                      bind:value="{showDuration}"
                       class="range"
                       step="15"
                       name="duration"
@@ -352,7 +343,7 @@
                   <button
                     class="btn btn-secondary"
                     type="submit"
-                    disabled={loading}>Create Show</button
+                    disabled="{loading}">Create Show</button
                   >
                 </div>
               </form>
@@ -363,22 +354,22 @@
       <div>
         {#if activeShow}
           <ShowDetail
-            show={activeShow}
-            {talent}
-            options={{
+            show="{activeShow}"
+            talent="{talent}"
+            options="{{
               showCopy: true,
               showSalesStats: true,
               showRating: false,
               showWaterMark: false,
-            }}
+            }}"
           />
         {/if}
       </div>
       <div class="pb-4">
         {#if canCancelShow}
           <!-- Link Form-->
-          <form method="post" action="?/cancel_show" use:enhance={onSubmit}>
-            <input type="hidden" name="showId" value={activeShow?._id} />
+          <form method="post" action="?/cancel_show" use:enhance="{onSubmit}">
+            <input type="hidden" name="showId" value="{activeShow?._id}" />
             <div class="bg-primary text-primary-content card">
               <div class="text-center card-body items-center p-3">
                 <div class="text-2xl card-title">Cancel Your Show</div>
@@ -393,7 +384,7 @@
                     <button
                       class="btn btn-secondary"
                       type="submit"
-                      disabled={loading}>Cancel Show</button
+                      disabled="{loading}">Cancel Show</button
                     >
                   </div>
                 </div>
@@ -403,7 +394,11 @@
         {/if}
         {#if waiting4Refunds}
           <!-- Link Form-->
-          <form method="post" action="?/refund_tickets" use:enhance={onSubmit}>
+          <form
+            method="post"
+            action="?/refund_tickets"
+            use:enhance="{onSubmit}"
+          >
             <div class="bg-primary text-primary-content card">
               <div class="text-center card-body items-center p-3">
                 <div class="text-2xl card-title">Send Refunds</div>
@@ -415,7 +410,7 @@
                     <button
                       class="btn btn-secondary"
                       type="submit"
-                      disabled={loading}>Send Refunds</button
+                      disabled="{loading}">Send Refunds</button
                     >
                   </div>
                 </div>
@@ -436,11 +431,11 @@
               <h2 class="text-xl card-title">{talentName}</h2>
               <div>
                 <ProfilePhoto
-                  profileImage={talent.profileImageUrl ||
-                    PUBLIC_DEFAULT_PROFILE_IMAGE}
-                  callBack={value => {
+                  profileImage="{talent.profileImageUrl ||
+                    PUBLIC_DEFAULT_PROFILE_IMAGE}"
+                  callBack="{value => {
                     updateProfileImage(value);
-                  }}
+                  }}"
                 />
               </div>
             </div>
@@ -450,7 +445,7 @@
 
       <!-- Wallet -->
       <div>
-        <TalentWallet {talent} />
+        <TalentWallet />
       </div>
 
       <!-- Feedback -->
@@ -468,7 +463,7 @@
 
       <!-- Activity Feed -->
       <div>
-        <div class="lg:col-start-3 lg:col-span-1" />
+        <div class="lg:col-start-3 lg:col-span-1"></div>
       </div>
     </div>
   </div>

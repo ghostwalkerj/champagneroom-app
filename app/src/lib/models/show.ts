@@ -209,31 +209,3 @@ export const Show = models?.Show
   : (mongoose.model<ShowDocType>('Show', showSchema) as Model<ShowDocType>);
 
 export type ShowType = InstanceType<typeof Show>;
-
-export const observeShow = async (
-  show: ShowDocType,
-  callback: (show: ShowDocType) => void,
-  signal: AbortSignal
-) => {
-  const changesetPath = urlJoin(
-    PUBLIC_CHANGESET_PATH,
-    'show',
-    show._id.toString()
-  );
-
-  let loop = true;
-
-  while (loop) {
-    const [err, response] = await to(
-      fetch(changesetPath, {
-        signal,
-      })
-    );
-    if (err) {
-      loop = false;
-    } else {
-      const changeset = await response.json();
-      callback(changeset);
-    }
-  }
-};

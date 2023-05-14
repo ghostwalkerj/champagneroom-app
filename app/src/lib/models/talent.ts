@@ -124,25 +124,3 @@ export const Talent = models?.Talent
     ) as Model<TalentDocType>);
 
 export type TalentType = InstanceType<typeof Talent>;
-
-export const observeTalent = async (
-  talent: TalentDocType,
-  callback: (talent: TalentDocType) => void,
-  signal?: AbortSignal
-) => {
-  let loop = true;
-  while (loop) {
-    const changesetPath = urlJoin(PUBLIC_CHANGESET_PATH, 'talent', talent.key);
-    const [err, response] = await to(
-      fetch(changesetPath, {
-        signal,
-      })
-    );
-    if (err) {
-      loop = false;
-    } else {
-      const changeset = await response.json();
-      callback(changeset);
-    }
-  }
-};

@@ -1,7 +1,0 @@
-{
-  "name": "pcall",
-  "integrations": {
-    "capacitor": {}
-  },
-  "type": "custom"
-}

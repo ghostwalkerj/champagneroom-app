@@ -1,11 +1,13 @@
 <script lang="ts">
   import { PUBLIC_SHOW_PATH } from '$env/static/public';
-  import { observeShow, type ShowDocType } from '$lib/models/show';
+  import type { ShowDocType } from '$lib/models/show';
   import type { TalentDocType } from '$lib/models/talent';
   import { currencyFormatter, durationFormatter } from '$lib/util/constants';
   import { onDestroy, onMount } from 'svelte';
   import StarRating from 'svelte-star-rating';
+  import type { Unsubscriber } from 'svelte/store';
   import urlJoin from 'url-join';
+  import { showStore } from '$lib/stores';
 
   type ShowDetailOptions = {
     showCopy?: boolean;
@@ -45,8 +47,7 @@
     show.showState.salesStats.totalSales
   );
 
-  const controller = new AbortController();
-  const signal = controller.signal;
+  let showUnSub: Unsubscriber;
 
   const setStats = (show: ShowDocType) => {
     showStatus = show.showState.status;
@@ -65,18 +66,14 @@
   };
 
   onDestroy(() => {
-    controller.abort();
+    showUnSub?.();
   });
 
   onMount(async () => {
     if (show) {
-      observeShow(
-        show,
-        (s: ShowDocType) => {
-          setStats(s);
-        },
-        signal
-      );
+      showUnSub = showStore(show).subscribe(s => {
+        setStats(s);
+      });
     }
   });
 
