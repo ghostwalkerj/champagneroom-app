@@ -1,5 +1,4 @@
 import express from 'express';
-import fs from 'fs';
 import { handler } from './build/handler.js';
 import cors from 'cors';
 

@@ -19,12 +19,52 @@ import {
   type ShowMachineOptions,
   type ShowMachineType,
 } from './showMachine';
+import type { cancel } from 'timeago.js';
 
 export type TicketMachineOptions = {
   saveStateCallback?: (state: TicketStateType) => void;
   gracePeriod?: number;
   escrowPeriod?: number;
 };
+
+export type TicketMachineEventType =
+  | {
+      type: 'REQUEST CANCELLATION';
+      cancel: TicketStateType['cancel'];
+    }
+  | {
+      type: 'REFUND RECEIVED';
+      transaction: TransactionDocType;
+    }
+  | {
+      type: 'PAYMENT RECEIVED';
+      transaction: TransactionDocType;
+    }
+  | {
+      type: 'FEEDBACK RECEIVED';
+      feedback: TicketStateType['feedback'];
+    }
+  | {
+      type: 'DISPUTE INITIATED';
+      dispute: TicketStateType['dispute'];
+    }
+  | {
+      type: 'JOINED SHOW';
+    }
+  | {
+      type: 'LEFT SHOW';
+    }
+  | {
+      type: 'SHOW ENDED';
+    }
+  | {
+      type: 'SHOW CANCELLED';
+      cancel: TicketStateType['cancel'];
+    }
+  | {
+      type: 'TICKETSTATE UPDATE';
+      ticketState: TicketStateType;
+    };
 
 export const createTicketMachine = (
   ticketDocument: TicketDocType,
@@ -53,44 +93,7 @@ export const createTicketMachine = (
       // eslint-disable-next-line @typescript-eslint/consistent-type-imports
       tsTypes: {} as import('./ticketMachine.typegen').Typegen0,
       schema: {
-        events: {} as
-          | {
-              type: 'REQUEST CANCELLATION';
-              cancel: TicketStateType['cancel'];
-            }
-          | {
-              type: 'REFUND RECEIVED';
-              transaction: TransactionDocType;
-            }
-          | {
-              type: 'PAYMENT RECEIVED';
-              transaction: TransactionDocType;
-            }
-          | {
-              type: 'FEEDBACK RECEIVED';
-              feedback: TicketStateType['feedback'];
-            }
-          | {
-              type: 'DISPUTE INITIATED';
-              dispute: TicketStateType['dispute'];
-            }
-          | {
-              type: 'JOINED SHOW';
-            }
-          | {
-              type: 'LEFT SHOW';
-            }
-          | {
-              type: 'SHOW ENDED';
-            }
-          | {
-              type: 'SHOW CANCELLED';
-              cancel: TicketStateType['cancel'];
-            }
-          | {
-              type: 'TICKETSTATE UPDATE';
-              ticketState: TicketStateType;
-            },
+        events: {} as TicketMachineEventType,
       },
       predictableActionArguments: true,
       id: 'ticketMachine',

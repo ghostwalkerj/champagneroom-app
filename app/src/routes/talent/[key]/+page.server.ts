@@ -1,16 +1,21 @@
 import { MONGO_DB_ENDPOINT } from '$env/static/private';
 import {
+  createShowMachineService,
+  type ShowEventType,
+} from '$lib/machines/showMachine';
+import {
   Show,
   ShowCancelReason,
   ShowStateType,
   ShowStatus,
 } from '$lib/models/show';
 import { Talent } from '$lib/models/talent';
+import { redisOptions } from '$lib/util/bullMQ';
+import { ActorType } from '$lib/util/constants';
 import { error, fail } from '@sveltejs/kit';
+import { Queue } from 'bullmq';
 import mongoose from 'mongoose';
 import type { Actions, PageServerLoad } from './$types';
-import { createShowMachineService } from '$lib/machines/showMachine';
-import { ActorType } from '$lib/util/constants';
 
 export const load: PageServerLoad = async ({ params }) => {
   mongoose.connect(MONGO_DB_ENDPOINT);
@@ -62,7 +67,7 @@ export const actions: Actions = {
 
     return { success: true, talent: JSON.parse(JSON.stringify(talent)) };
   },
-  create_show: async ({ request }) => {
+  create_show: async ({ params, request }) => {
     const data = await request.formData();
     const price = data.get('price') as string;
     const name = data.get('name') as string;
@@ -71,6 +76,7 @@ export const actions: Actions = {
     const talentId = data.get('talentId') as string;
     const agentId = data.get('agentId') as string;
     const coverImageUrl = data.get('coverImageUrl') as string;
+    const key = params.key;
 
     if (!name || name.length < 3 || name.length > 50) {
       return fail(400, { name, badName: true });
@@ -84,12 +90,6 @@ export const actions: Actions = {
     }
 
     mongoose.connect(MONGO_DB_ENDPOINT);
-
-    const talent = await Talent.findById(talentId)
-      .orFail(() => {
-        throw error(404, 'Talent not found');
-      })
-      .exec();
 
     const show = await Show.create({
       price: +price,
@@ -107,8 +107,7 @@ export const actions: Actions = {
       },
     });
 
-    talent.activeShows.push(show._id);
-    await talent.save();
+    Talent.updateOne({ key }, { $push: { activeShows: show._id } }).exec();
 
     return {
       success: true,
@@ -123,12 +122,9 @@ export const actions: Actions = {
     if (key === null) {
       throw error(404, 'Key not found');
     }
-    let showCancelled = false;
+    const showQueue = new Queue('show', redisOptions);
 
     mongoose.connect(MONGO_DB_ENDPOINT);
-    const talent = await Talent.findOne({ key }).orFail(() => {
-      throw error(404, 'Talent not found');
-    });
 
     const show = await Show.findById(showId)
       .orFail(() => {
@@ -142,26 +138,35 @@ export const actions: Actions = {
       saveShowEventCallback: async ({ type, ticket, transaction }) =>
         // @ts-ignore
         show.createShowEvent({ type, ticket, transaction }),
+      jobQueue: showQueue,
     });
 
-    const showState = showService.getSnapshot();
+    const showMachineState = showService.getSnapshot();
 
     const cancel = {
       cancelledAt: new Date(),
-      cancelledInState: JSON.stringify(showState.value),
+      cancelledInState: JSON.stringify(showMachineState.value),
       reason: ShowCancelReason.TALENT_CANCELLED,
       canceller: ActorType.TALENT,
     } as ShowStateType['cancel'];
 
-    if (showState.can({ type: 'REQUEST CANCELLATION', cancel, tickets: [] })) {
-      showService.send({ type: 'REQUEST CANCELLATION', cancel, tickets: [] });
+    const cancelEvent = {
+      type: 'REQUEST CANCELLATION',
+      cancel,
+      tickets: [],
+    } as ShowEventType;
+
+    if (showMachineState.can(cancelEvent)) {
+      showService.send(cancelEvent);
+      Talent.updateOne({ key }, { $pull: { activeShows: showId } }).exec();
     }
 
-    showCancelled = showService.getSnapshot().matches('cancelled');
+    const showState = showService.getSnapshot().context.showState;
 
     return {
       success: true,
-      showCancelled,
+      showState,
+      showCancelled: true,
     };
   },
 };

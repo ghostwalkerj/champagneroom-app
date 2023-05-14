@@ -1,6 +1,7 @@
 import { ShowStatus, type ShowDocType } from '$lib/models/show';
 import type { TicketDocType } from '$lib/models/ticket';
 import type { TransactionDocType } from '$lib/models/transaction';
+import type { Queue } from 'bullmq';
 import { nanoid } from 'nanoid';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 
@@ -17,21 +18,64 @@ export type ShowMachineOptions = {
     ticket?: TicketDocType;
     transaction?: TransactionDocType;
   }) => void;
+  jobQueue?: Queue;
   gracePeriod?: number;
   escrowPeriod?: number;
 };
 
-export enum ShowEventType {
-  REQUEST_CANCELLATION = 'REQUEST CANCELLATION',
-  TICKET_REFUNDED = 'TICKET REFUNDED',
-  TICKET_RESERVED = 'TICKET RESERVED',
-  TICKET_RESERVATION_TIMEOUT = 'TICKET RESERVATION TIMEOUT',
-  TICKET_CANCELLED = 'TICKET CANCELLED',
-  TICKET_SOLD = 'TICKET SOLD',
-  START_SHOW = 'START SHOW',
-  END_SHOW = 'END SHOW',
-  SHOWSTATE_UPDATE = 'SHOWSTATE UPDATE',
-}
+export type ShowEventType =
+  | {
+      type: 'REQUEST CANCELLATION';
+      cancel: ShowStateType['cancel'];
+      tickets: TicketDocType[];
+    }
+  | {
+      type: 'TICKET REFUNDED';
+      transaction: TransactionDocType;
+      ticket?: TicketDocType;
+    }
+  | {
+      type: 'TICKET RESERVED';
+      ticket?: TicketDocType;
+    }
+  | {
+      type: 'TICKET RESERVATION TIMEOUT';
+      ticket?: TicketDocType;
+    }
+  | {
+      type: 'TICKET CANCELLED';
+      ticket?: TicketDocType;
+    }
+  | {
+      type: 'TICKET SOLD';
+      transaction: TransactionDocType;
+      ticket?: TicketDocType;
+    }
+  | {
+      type: 'START SHOW';
+    }
+  | {
+      type: 'STOP SHOW';
+    }
+  | {
+      type: 'SHOW FINALIZED';
+      finalize: ShowStateType['finalize'];
+    }
+  | {
+      type: 'SHOW ENDED';
+    }
+  | {
+      type: 'CUSTOMER JOINED';
+      ticket: TicketDocType;
+    }
+  | {
+      type: 'CUSTOMER LEFT';
+      ticket: TicketDocType;
+    }
+  | {
+      type: 'SHOWSTATE UPDATE';
+      showState: ShowStateType;
+    };
 
 export const createShowMachine = (
   showDocument: ShowDocType,
@@ -53,59 +97,7 @@ export const createShowMachine = (
       // eslint-disable-next-line @typescript-eslint/consistent-type-imports
       tsTypes: {} as import('./showMachine.typegen').Typegen0,
       schema: {
-        events: {} as
-          | {
-              type: 'REQUEST CANCELLATION';
-              cancel: ShowStateType['cancel'];
-              tickets: TicketDocType[];
-            }
-          | {
-              type: 'TICKET REFUNDED';
-              transaction: TransactionDocType;
-              ticket?: TicketDocType;
-            }
-          | {
-              type: 'TICKET RESERVED';
-              ticket?: TicketDocType;
-            }
-          | {
-              type: 'TICKET RESERVATION TIMEOUT';
-              ticket?: TicketDocType;
-            }
-          | {
-              type: 'TICKET CANCELLED';
-              ticket?: TicketDocType;
-            }
-          | {
-              type: 'TICKET SOLD';
-              transaction: TransactionDocType;
-              ticket?: TicketDocType;
-            }
-          | {
-              type: 'START SHOW';
-            }
-          | {
-              type: 'STOP SHOW';
-            }
-          | {
-              type: 'SHOW FINALIZED';
-              finalize: ShowStateType['finalize'];
-            }
-          | {
-              type: 'SHOW ENDED';
-            }
-          | {
-              type: 'CUSTOMER JOINED';
-              ticket: TicketDocType;
-            }
-          | {
-              type: 'CUSTOMER LEFT';
-              ticket: TicketDocType;
-            }
-          | {
-              type: 'SHOWSTATE UPDATE';
-              showState: ShowStateType;
-            },
+        events: {} as ShowEventType,
       },
       predictableActionArguments: true,
       id: 'showMachine',
@@ -185,11 +177,7 @@ export const createShowMachine = (
               {
                 target: 'boxOfficeClosed',
                 cond: 'soldOut',
-                actions: [
-                  'decrementTicketsAvailable',
-                  'closeBoxOffice',
-                  'saveShowState',
-                ],
+                actions: ['decrementTicketsAvailable', 'closeBoxOffice'],
               },
               {
                 actions: ['decrementTicketsAvailable'],
@@ -227,21 +215,13 @@ export const createShowMachine = (
             'TICKET RESERVATION TIMEOUT': [
               {
                 target: 'boxOfficeOpen',
-                actions: [
-                  'openBoxOffice',
-                  'incrementTicketsAvailable',
-                  'saveShowState',
-                ],
+                actions: ['openBoxOffice', 'incrementTicketsAvailable'],
               },
             ],
             'TICKET CANCELLED': [
               {
                 target: 'boxOfficeOpen',
-                actions: [
-                  'openBoxOffice',
-                  'incrementTicketsAvailable',
-                  'saveShowState',
-                ],
+                actions: ['openBoxOffice', 'incrementTicketsAvailable'],
               },
             ],
             'TICKET SOLD': {
@@ -272,12 +252,8 @@ export const createShowMachine = (
             'START SHOW': {
               actions: ['startShow'],
             },
-            'CUSTOMER JOINED': {
-              actions: ['saveShowState'],
-            },
-            'CUSTOMER LEFT': {
-              actions: ['saveShowState'],
-            },
+            'CUSTOMER JOINED': {},
+            'CUSTOMER LEFT': {},
             'STOP SHOW': {
               target: 'stopped',
               actions: ['stopShow'],
@@ -378,6 +354,10 @@ export const createShowMachine = (
         }),
 
         requestCancellation: assign((context, event) => {
+          showMachineOptions?.jobQueue?.add(event.type, {
+            showId: context.showDocument._id,
+            cancel: event.cancel,
+          });
           return {
             showState: {
               ...context.showState,
