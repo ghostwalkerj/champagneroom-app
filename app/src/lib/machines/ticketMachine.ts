@@ -151,14 +151,10 @@ export const createTicketMachine = (
                   {
                     target: 'waiting4Show',
                     cond: 'fullyPaid',
-                    actions: [
-                      'receivePayment',
-                      'saveTicketState',
-                      'sendTicketSold',
-                    ],
+                    actions: ['receivePayment', 'sendTicketSold'],
                   },
                   {
-                    actions: ['receivePayment', 'saveTicketState'],
+                    actions: ['receivePayment'],
                   },
                 ],
                 'REQUEST CANCELLATION': [
@@ -168,13 +164,12 @@ export const createTicketMachine = (
                     actions: [
                       'requestCancellation',
                       'cancelTicket',
-                      'saveTicketState',
                       'sendTicketCancelled',
                     ],
                   },
                   {
                     target: 'requestedCancellation',
-                    actions: ['requestCancellation', 'saveTicketState'],
+                    actions: ['requestCancellation'],
                   },
                 ],
               },
@@ -188,24 +183,19 @@ export const createTicketMachine = (
                     actions: [
                       'requestCancellation',
                       'cancelTicket',
-                      'saveTicketState',
                       'sendTicketCancelled',
                     ],
                   },
                   {
                     target: '#ticketMachine.reserved.requestedCancellation',
                     cond: 'canRequestCancellation',
-                    actions: ['requestCancellation', 'saveTicketState'],
+                    actions: ['requestCancellation'],
                   },
                 ],
                 'JOINED SHOW': {
                   target: '#ticketMachine.reedemed',
                   cond: 'canWatchShow',
-                  actions: [
-                    'redeemTicket',
-                    'saveTicketState',
-                    'sendJoinedShow',
-                  ],
+                  actions: ['redeemTicket', 'sendJoinedShow'],
                 },
               },
             },
@@ -221,13 +211,12 @@ export const createTicketMachine = (
                         actions: [
                           'receiveRefund',
                           'cancelTicket',
-                          'saveTicketState',
                           'sendTicketRefunded',
                           'sendTicketCancelled',
                         ],
                       },
                       {
-                        actions: ['receiveRefund', 'saveTicketState'],
+                        actions: ['receiveRefund'],
                       },
                     ],
                   },
@@ -238,7 +227,7 @@ export const createTicketMachine = (
           on: {
             'SHOW ENDED': {
               target: '#ticketMachine.ended.missedShow',
-              actions: ['missShow', 'saveTicketState'],
+              actions: ['missShow'],
             },
           },
         },
@@ -251,7 +240,7 @@ export const createTicketMachine = (
             },
             'SHOW ENDED': {
               target: '#ticketMachine.ended',
-              actions: ['enterEscrow', 'saveTicketState'],
+              actions: ['enterEscrow'],
             },
           },
         },
@@ -268,15 +257,11 @@ export const createTicketMachine = (
               on: {
                 'FEEDBACK RECEIVED': {
                   target: '#ticketMachine.finalized',
-                  actions: [
-                    'receiveFeedback',
-                    'finalizeTicket',
-                    'saveTicketState',
-                  ],
+                  actions: ['receiveFeedback', 'finalizeTicket'],
                 },
                 'DISPUTE INITIATED': {
                   target: 'inDispute',
-                  actions: ['initiateDispute', 'saveTicketState'],
+                  actions: ['initiateDispute'],
                 },
               },
             },
@@ -286,11 +271,6 @@ export const createTicketMachine = (
         },
       },
       on: {
-        'TICKETSTATE UPDATE': {
-          target: 'ticketLoaded',
-          cond: 'canUpdateTicketState',
-          actions: ['updateTicketState'],
-        },
         'SHOW CANCELLED': [
           {
             target: '#ticketMachine.cancelled',
@@ -298,36 +278,18 @@ export const createTicketMachine = (
             actions: [
               'requestCancellation',
               'cancelTicket',
-              'saveTicketState',
               'sendTicketCancelled',
             ],
           },
           {
             target: '#ticketMachine.reserved.requestedCancellation',
-            actions: ['requestCancellation', 'saveTicketState'],
+            actions: ['requestCancellation'],
           },
         ],
       },
     },
     {
       actions: {
-        saveTicketState: context => {
-          if (ticketMachineOptions?.saveStateCallback) {
-            const ticketState = {
-              ...context.ticketState,
-            };
-            ticketMachineOptions.saveStateCallback(ticketState);
-          }
-        },
-
-        updateTicketState: assign((context, event) => {
-          return {
-            ticketState: {
-              ...event.ticketState,
-            },
-          };
-        }),
-
         sendJoinedShow: send(
           context => ({
             type: 'CUSTOMER JOINED',
@@ -540,12 +502,6 @@ export const createTicketMachine = (
             state.matches('started')
           );
         },
-        canUpdateTicketState: (context, event) => {
-          const updateState =
-            context.ticketState.updatedAt !== event.ticketState.updatedAt;
-
-          return updateState;
-        },
       },
     }
   );
@@ -563,7 +519,16 @@ export const createTicketMachineService = (
     tickeMachineOptions,
     showMachineOptions
   );
-  return interpret(ticketMachine).start();
+  const ticketServce = interpret(ticketMachine).start();
+
+  if (tickeMachineOptions?.saveStateCallback) {
+    ticketServce.onChange(context => {
+      tickeMachineOptions.saveStateCallback &&
+        tickeMachineOptions.saveStateCallback(context.ticketState);
+    });
+  }
+
+  return ticketServce;
 };
 
 export type ticketMachineType = ReturnType<typeof createTicketMachine>;

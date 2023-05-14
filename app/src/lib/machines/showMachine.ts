@@ -1,6 +1,9 @@
 import { ShowStatus, type ShowDocType } from '$lib/models/show';
 import type { TicketDocType } from '$lib/models/ticket';
-import type { TransactionDocType } from '$lib/models/transaction';
+import type {
+  TransactionDocType,
+  TransactionDocType,
+} from '$lib/models/transaction';
 import { nanoid } from 'nanoid';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 
@@ -154,12 +157,12 @@ export const createShowMachine = (
         },
         inEscrow: {
           tags: ['canCreateShow'],
-          entry: ['enterEscrow', 'saveShowState'],
-          exit: ['exitEscrow', 'saveShowState'],
+          entry: ['enterEscrow'],
+          exit: ['exitEscrow'],
           on: {
             'SHOW FINALIZED': {
               target: 'finalized',
-              actions: ['finalizeShow', 'saveShowState'],
+              actions: ['finalizeShow'],
             },
           },
         },
@@ -174,11 +177,11 @@ export const createShowMachine = (
               {
                 target: 'cancelled',
                 cond: 'canCancel',
-                actions: ['requestCancellation', 'cancelShow', 'saveShowState'],
+                actions: ['requestCancellation', 'cancelShow'],
               },
               {
                 target: 'requestedCancellation',
-                actions: ['requestCancellation', 'saveShowState'],
+                actions: ['requestCancellation'],
               },
             ],
             'TICKET RESERVED': [
@@ -192,26 +195,26 @@ export const createShowMachine = (
                 ],
               },
               {
-                actions: ['decrementTicketsAvailable', 'saveShowState'],
+                actions: ['decrementTicketsAvailable'],
               },
             ],
             'TICKET RESERVATION TIMEOUT': {
-              actions: ['incrementTicketsAvailable', 'saveShowState'],
+              actions: ['incrementTicketsAvailable'],
             },
             'TICKET CANCELLED': {
-              actions: ['incrementTicketsAvailable', 'saveShowState'],
+              actions: ['incrementTicketsAvailable'],
             },
             'TICKET SOLD': {
-              actions: ['sellTicket', 'saveShowState'],
+              actions: ['sellTicket'],
             },
             'START SHOW': {
               target: 'started',
               cond: 'canStartShow',
-              actions: ['startShow', 'saveShowState'],
+              actions: ['startShow'],
             },
             'TICKET REFUNDED': [
               {
-                actions: ['refundTicket', 'saveShowState'],
+                actions: ['refundTicket'],
               },
             ],
           },
@@ -222,7 +225,7 @@ export const createShowMachine = (
             'START SHOW': {
               cond: 'canStartShow',
               target: 'started',
-              actions: ['startShow', 'saveShowState'],
+              actions: ['startShow'],
             },
             'TICKET RESERVATION TIMEOUT': [
               {
@@ -245,22 +248,22 @@ export const createShowMachine = (
               },
             ],
             'TICKET SOLD': {
-              actions: ['sellTicket', 'saveShowState'],
+              actions: ['sellTicket'],
             },
             'TICKET REFUNDED': [
               {
-                actions: ['refundTicket', 'saveShowState'],
+                actions: ['refundTicket'],
               },
             ],
             'REQUEST CANCELLATION': [
               {
                 target: 'cancelled',
                 cond: 'canCancel',
-                actions: ['requestCancellation', 'cancelShow', 'saveShowState'],
+                actions: ['requestCancellation', 'cancelShow'],
               },
               {
                 target: 'requestedCancellation',
-                actions: ['requestCancellation', 'saveShowState'],
+                actions: ['requestCancellation'],
               },
             ],
           },
@@ -270,7 +273,7 @@ export const createShowMachine = (
 
           on: {
             'START SHOW': {
-              actions: ['startShow', 'saveShowState'],
+              actions: ['startShow'],
             },
             'CUSTOMER JOINED': {
               actions: ['saveShowState'],
@@ -280,7 +283,7 @@ export const createShowMachine = (
             },
             'STOP SHOW': {
               target: 'stopped',
-              actions: ['stopShow', 'saveShowState'],
+              actions: ['stopShow'],
             },
           },
         },
@@ -290,7 +293,7 @@ export const createShowMachine = (
           on: {
             'START SHOW': {
               target: 'started',
-              actions: ['startShow', 'saveShowState'],
+              actions: ['startShow'],
             },
             'SHOW ENDED': {
               target: 'inEscrow',
@@ -305,55 +308,21 @@ export const createShowMachine = (
             waiting2Refund: {
               on: {
                 'TICKET REFUNDED': {
-                  actions: ['refundTicket', 'saveShowState'],
+                  actions: ['refundTicket'],
                 },
                 'TICKET CANCELLED': {
                   target: '#showMachine.cancelled',
                   cond: 'fullyRefunded',
-                  actions: ['cancelShow', 'saveShowState'],
+                  actions: ['cancelShow'],
                 },
               },
             },
           },
         },
       },
-      on: {
-        'SHOWSTATE UPDATE': {
-          target: 'showLoaded',
-          actions: ['updateShowState'],
-          cond: 'canUpdateShowState',
-        },
-      },
     },
     {
       actions: {
-        saveShowState: (context, event) => {
-          if (showMachineOptions?.saveStateCallback) {
-            const showState = {
-              ...context.showState,
-            };
-            showMachineOptions.saveStateCallback(showState);
-          }
-
-          if (showMachineOptions?.saveShowEventCallback) {
-            const ticket = 'ticket' in event ? event.ticket : undefined;
-            const transaction =
-              'transaction' in event ? event.transaction : undefined;
-            showMachineOptions.saveShowEventCallback({
-              type: event.type,
-              ticket,
-              transaction,
-            });
-          }
-        },
-        updateShowState: assign((context, event) => {
-          return {
-            showState: {
-              ...event.showState,
-            },
-          };
-        }),
-
         closeBoxOffice: assign(context => {
           return {
             showState: {
@@ -579,11 +548,6 @@ export const createShowMachine = (
             context.showState.salesStats.totalSales
           );
         },
-        canUpdateShowState: (context, event) => {
-          const updateState =
-            context.showState.updatedAt !== event.showState.updatedAt;
-          return updateState;
-        },
       },
     }
   );
@@ -596,6 +560,31 @@ export const createShowMachineService = (
   const showMachine = createShowMachine(show, showMachineOptions);
   showMachine;
   const showService = interpret(showMachine).start();
+
+  if (showMachineOptions?.saveStateCallback) {
+    showService.onChange(context => {
+      showMachineOptions.saveStateCallback &&
+        showMachineOptions.saveStateCallback(context.showState);
+    });
+  }
+
+  if (showMachineOptions?.saveShowEventCallback) {
+    showService.onEvent(event => {
+      const ticket = ('ticket' in event ? event.ticket : undefined) as
+        | TicketDocType
+        | undefined;
+      const transaction = (
+        'transaction' in event ? event.transaction : undefined
+      ) as TransactionDocType | undefined;
+      showMachineOptions.saveShowEventCallback &&
+        showMachineOptions.saveShowEventCallback({
+          type: event.type,
+          ticket,
+          transaction,
+        });
+    });
+  }
+
   return showService;
 };
 
