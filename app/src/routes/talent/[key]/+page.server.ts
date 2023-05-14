@@ -1,9 +1,16 @@
 import { MONGO_DB_ENDPOINT } from '$env/static/private';
-import { Show, ShowStatus } from '$lib/models/show';
+import {
+  Show,
+  ShowCancelReason,
+  ShowStateType,
+  ShowStatus,
+} from '$lib/models/show';
 import { Talent } from '$lib/models/talent';
 import { error, fail } from '@sveltejs/kit';
 import mongoose from 'mongoose';
 import type { Actions, PageServerLoad } from './$types';
+import { createShowMachineService } from '$lib/machines/showMachine';
+import { ActorType } from '$lib/util/constants';
 
 export const load: PageServerLoad = async ({ params }) => {
   mongoose.connect(MONGO_DB_ENDPOINT);
@@ -107,6 +114,54 @@ export const actions: Actions = {
       success: true,
       showCreated: true,
       show: JSON.parse(JSON.stringify(show)),
+    };
+  },
+  cancel_show: async ({ request, params }) => {
+    const key = params.key;
+    const data = await request.formData();
+    const showId = data.get('showId') as string;
+    if (key === null) {
+      throw error(404, 'Key not found');
+    }
+    let showCancelled = false;
+
+    mongoose.connect(MONGO_DB_ENDPOINT);
+    const talent = await Talent.findOne({ key }).orFail(() => {
+      throw error(404, 'Talent not found');
+    });
+
+    const show = await Show.findById(showId)
+      .orFail(() => {
+        throw error(404, 'Show not found');
+      })
+      .exec();
+
+    const showService = createShowMachineService(show, {
+      // @ts-ignore
+      saveStateCallback: async showState => show.saveState(showState),
+      saveShowEventCallback: async ({ type, ticket, transaction }) =>
+        // @ts-ignore
+        show.createShowEvent({ type, ticket, transaction }),
+    });
+
+    const showState = showService.getSnapshot();
+
+    const cancel = {
+      cancelledAt: new Date(),
+      cancelledInState: JSON.stringify(showState.value),
+      reason: ShowCancelReason.TALENT_CANCELLED,
+      canceller: ActorType.TALENT,
+    } as ShowStateType['cancel'];
+
+    if (showState.can({ type: 'REQUEST CANCELLATION', cancel, tickets: [] })) {
+      showService.send({ type: 'REQUEST CANCELLATION', cancel, tickets: [] });
+    }
+
+    showCancelled = showService.getSnapshot().matches('cancelled');
+
+    return {
+      success: true,
+      showCancelled,
     };
   },
 };

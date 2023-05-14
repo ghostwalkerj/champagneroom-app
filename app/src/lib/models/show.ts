@@ -6,11 +6,10 @@ import { ActorType } from '$lib/util/constants';
 import type { InferSchemaType, Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
 import { fieldEncryption } from 'mongoose-field-encryption';
+import urlJoin from 'url-join';
 import { v4 as uuidv4 } from 'uuid';
 import type { TicketDocType } from './ticket';
 import type { TransactionDocType } from './transaction';
-import urlJoin from 'url-join';
-import type { response } from 'express';
 
 const { Schema, models } = pkg;
 export enum ShowStatus {

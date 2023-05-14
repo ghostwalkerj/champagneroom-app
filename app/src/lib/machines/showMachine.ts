@@ -1,9 +1,6 @@
 import { ShowStatus, type ShowDocType } from '$lib/models/show';
 import type { TicketDocType } from '$lib/models/ticket';
-import type {
-  TransactionDocType,
-  TransactionDocType,
-} from '$lib/models/transaction';
+import type { TransactionDocType } from '$lib/models/transaction';
 import { nanoid } from 'nanoid';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 

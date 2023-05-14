@@ -75,24 +75,9 @@ export const actions: import('./$types').Actions = {
     const showService = createShowMachineService(show, {
       // @ts-ignore
       saveStateCallback: async showState => show.saveState(showState),
-      // saveShowEventCallback: ({
-      //   type,
-      //   ticket,
-      //   transaction,
-      // }: {
-      //   type: string;
-      //   ticket?: TicketDocType;
-      //   transaction?: TransactionDocType;
-      // }) => {
-      //   ShowEvent.create({
-      //     show: show._id,
-      //     type,
-      //     ticket: ticket?._id,
-      //     transaction: transaction?._id,
-      //     agent: show.agent,
-      //     talent: show.talent,
-      //   });
-      // },
+      saveShowEventCallback: async ({ type, ticket, transaction }) =>
+        // @ts-ignore
+        show.createShowEvent({ type, ticket, transaction }),
     });
 
     const showState = showService.getSnapshot();

@@ -16,8 +16,8 @@
     ShowMachineServiceType,
     ShowMachineStateType,
   } from '$lib/machines/showMachine';
-  import { type ShowDocType, observeShow } from '$lib/models/show';
-  import { type TalentDocType, observeTalent } from '$lib/models/talent';
+  import { observeShow, type ShowDocType } from '$lib/models/show';
+  import { observeTalent, type TalentDocType } from '$lib/models/talent';
   import { onDestroy, onMount } from 'svelte';
   import urlJoin from 'url-join';
   import type { Subscription } from 'xstate';
@@ -41,8 +41,9 @@
   let showMachineService: ShowMachineServiceType | null = null;
 
   $: showMachineState = null as ShowMachineStateType | null;
-  $: canCancelShow = false;
   $: canCreateShow = activeShow === null;
+  $: canCancelShow = !canCreateShow;
+
   $: canStartShow = false;
   $: waiting4Refunds = false;
   $: talentName = talent ? talent.name : 'Talent';
@@ -377,6 +378,7 @@
         {#if canCancelShow}
           <!-- Link Form-->
           <form method="post" action="?/cancel_show" use:enhance={onSubmit}>
+            <input type="hidden" name="showId" value={activeShow?._id} />
             <div class="bg-primary text-primary-content card">
               <div class="text-center card-body items-center p-3">
                 <div class="text-2xl card-title">Cancel Your Show</div>
