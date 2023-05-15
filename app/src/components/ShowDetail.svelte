@@ -72,7 +72,7 @@
   onMount(async () => {
     if (show) {
       showUnSub = showStore(show).subscribe(s => {
-        setStats(s);
+        s && setStats(s);
       });
     }
   });
@@ -106,7 +106,7 @@
             {talent.name}
           </div>
           <div>
-            <StarRating rating={talent.stats.ratingAvg} />
+            <StarRating rating="{talent.stats.ratingAvg}" />
           </div>
         </div>
       {/if}
@@ -185,7 +185,9 @@
     {#if options.showCopy}
       <div class="text-center">
         <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <div class="btn btn-primary" on:click={copyShowUrl}>Copy Show Link</div>
+        <div class="btn btn-primary" on:click="{copyShowUrl}">
+          Copy Show Link
+        </div>
       </div>
     {/if}
   </div>

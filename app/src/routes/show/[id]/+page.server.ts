@@ -1,11 +1,10 @@
 import { MONGO_DB_ENDPOINT } from '$env/static/private';
 import { PUBLIC_TICKET_PATH } from '$env/static/public';
-import { createShowMachineService } from '$lib/machines/showMachine';
 import { Show } from '$lib/models/show';
 import { Ticket } from '$lib/models/ticket';
-import { Talent } from '$lib/models/talent';
 import { mensNames } from '$lib/util/mensNames';
 import { createPinHash } from '$lib/util/pin';
+import { getShowMachineService } from '$lib/util/serverSideHelper';
 import { error, fail, redirect } from '@sveltejs/kit';
 import mongoose from 'mongoose';
 import { uniqueNamesGenerator } from 'unique-names-generator';
@@ -72,13 +71,7 @@ export const actions: import('./$types').Actions = {
       })
       .exec();
 
-    const showService = createShowMachineService(show, {
-      // @ts-ignore
-      saveStateCallback: async showState => show.saveState(showState),
-      saveShowEventCallback: async ({ type, ticket, transaction }) =>
-        // @ts-ignore
-        show.createShowEvent({ type, ticket, transaction }),
-    });
+    const showService = getShowMachineService(show);
 
     const showState = showService.getSnapshot();
     if (

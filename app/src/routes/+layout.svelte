@@ -8,8 +8,8 @@
   import { Show } from '$lib/models/show';
   import { ShowEvent } from '$lib/models/showEvent';
   import { Talent } from '$lib/models/talent';
-  import { Transaction } from '$lib/models/transaction';
   import { Ticket } from '$lib/models/ticket';
+  import { Transaction } from '$lib/models/transaction';
 
   globalThis.Talent = Talent;
   globalThis.Show = Show;

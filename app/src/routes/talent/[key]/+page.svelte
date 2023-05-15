@@ -20,14 +20,14 @@
   import type { ShowDocType } from '$lib/models/show';
   import type { ShowEventDocType } from '$lib/models/showEvent';
   import type { TalentDocType } from '$lib/models/talent';
-  import { showEventStore, talentStore } from '$lib/stores';
+  import { showEventStore, talentStore, showStore } from '$lib/stores';
   import { createEventText } from '$lib/util/eventUtil';
   import { onDestroy, onMount } from 'svelte';
+  import type { Unsubscriber } from 'svelte/store';
   import urlJoin from 'url-join';
   import type { Subscription } from 'xstate';
   import type { PageData } from './$types';
   import TalentWallet from './TalentWallet.svelte';
-  import type { Unsubscriber } from 'svelte/store';
 
   export let form: import('./$types').ActionData;
   export let data: PageData;
@@ -60,6 +60,7 @@
 
   let talentUnSub: Unsubscriber;
   let showEventUnSub: Unsubscriber;
+  let showUnSub: Unsubscriber;
 
   const noCurrentShow = () => {
     canCreateShow = true;
@@ -69,6 +70,7 @@
     eventText = 'No Events';
     activeShow = null;
     showEventUnSub?.();
+    showUnSub?.();
   };
 
   onMount(async () => {
@@ -86,6 +88,24 @@
       }
     });
     if (activeShow) {
+      useNewShow(activeShow);
+    }
+  });
+
+  const useNewShow = (show: ShowDocType) => {
+    if (show) {
+      activeShow = show;
+      canCreateShow = false;
+      canCancelShow = true;
+      statusText = show.showState.status;
+      eventText = 'No Events';
+      showEventUnSub?.();
+      showUnSub?.();
+      showUnSub = showStore(activeShow).subscribe(_show => {
+        if (_show) {
+          statusText = _show.showState.status;
+        }
+      });
       showEventUnSub = showEventStore(activeShow).subscribe(
         (_showEvent: ShowEventDocType) => {
           if (_showEvent) {
@@ -94,11 +114,12 @@
         }
       );
     }
-  });
+  };
 
   onDestroy(() => {
     talentUnSub?.();
     showEventUnSub?.();
+    showUnSub?.();
   });
 
   const useShowMachine = (showMachineService: ShowMachineServiceType) => {
@@ -132,17 +153,6 @@
     }
   };
 
-  const useShowEvents = (show: ShowDocType) => {
-    showEventUnSub?.();
-    showEventUnSub = showEventStore(show).subscribe(
-      (_showEvent: ShowEventDocType) => {
-        if (_showEvent) {
-          eventText = createEventText(_showEvent);
-        }
-      }
-    );
-  };
-
   const onSubmit = ({}) => {
     loading = true;
     return async ({ result }) => {
@@ -153,8 +163,8 @@
           result.data.show!._id.toString()
         );
         navigator.clipboard.writeText(showUrl);
-        activeShow = result.data.show;
-        await invalidateAll();
+        activeShow = result.data.show as ShowDocType;
+        useNewShow(activeShow);
       } else if (result.data.showCancelled) {
         noCurrentShow();
         statusText = 'Cancelled';

@@ -13,10 +13,10 @@ const showeventSchema = new Schema(
     transaction: { type: Schema.Types.ObjectId, ref: 'Transaction' },
     ticketInfo: {
       type: {
-        name: { type: String, required: true },
-        price: { type: Number, required: true },
+        name: { type: String },
+        price: { type: Number },
       },
-      required: true,
+      required: false,
     },
   },
   { timestamps: true }
