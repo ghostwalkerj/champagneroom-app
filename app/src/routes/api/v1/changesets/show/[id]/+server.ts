@@ -21,7 +21,7 @@ export const GET: RequestHandler<{ id: string }> = async ({ params }) => {
     },
   ];
 
-  const changeStream = Show.watch(pipeline);
+  const changeStream = Show.watch(pipeline, { fullDocument: 'updateLookup' });
   const next = await changeStream.next();
   const doc = next.fullDocument;
 

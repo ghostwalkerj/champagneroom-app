@@ -12,7 +12,7 @@ export const GET: RequestHandler<{ address: string }> = async ({ params }) => {
   mongoose.connect(MONGO_DB_ENDPOINT);
 
   const pipeline = [{ $match: { 'fullDocument.address': address } }];
-  const changeStream = Agent.watch(pipeline);
+  const changeStream = Agent.watch(pipeline, { fullDocument: 'updateLookup' });
   const next = await changeStream.next();
   const doc = next.fullDocument;
 

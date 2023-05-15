@@ -14,7 +14,7 @@ export const GET: RequestHandler<{ id: string }> = async ({ params }) => {
   const id = new mongoose.Types.ObjectId(ticketId);
 
   const pipeline = [{ $match: { 'fullDocument._id': id } }];
-  const changeStream = Ticket.watch(pipeline);
+  const changeStream = Ticket.watch(pipeline, { fullDocument: 'updateLookup' });
   const next = await changeStream.next();
   const doc = next.fullDocument;
 

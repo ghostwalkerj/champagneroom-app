@@ -13,7 +13,7 @@ export const GET: RequestHandler<{ key: string }> = async ({ params }) => {
   mongoose.connect(MONGO_DB_ENDPOINT);
 
   const pipeline = [{ $match: { 'fullDocument.key': talentKey } }];
-  const changeStream = Talent.watch(pipeline);
+  const changeStream = Talent.watch(pipeline, { fullDocument: 'updateLookup' });
 
   const next = await changeStream.next();
   const doc = next.fullDocument;

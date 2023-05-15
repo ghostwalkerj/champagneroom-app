@@ -98,7 +98,6 @@
       canCreateShow = false;
       canCancelShow = true;
       statusText = show.showState.status;
-      eventText = 'No Events';
       showEventUnSub?.();
       showUnSub?.();
       showUnSub = showStore(activeShow).subscribe(_show => {
