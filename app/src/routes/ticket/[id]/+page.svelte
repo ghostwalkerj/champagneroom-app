@@ -18,12 +18,13 @@
   export let form: ActionData;
 
   let ticket = data.ticket as TicketDocType;
-  let show = ticket.show as unknown as ShowDocType;
-  const ticketId = $page.params.id;
+  let show = data.show as ShowDocType;
 
   const showPath = urlJoin($page.url.href, 'show');
   const reasons = Object.values(TicketDisputeReason);
-  let ticketMachineService = createTicketMachineService(ticket, show);
+  let ticketMachineService = createTicketMachineService({
+    ticketDocument: ticket,
+  });
 
   let needs2Pay = false;
   let canWatchShow = false;
@@ -76,7 +77,7 @@
     <div class="min-w-full">
       <!-- Page header -->
       <div class="pb-4 text-center relative">
-        <TicketDetail {ticket} {show} />
+        <TicketDetail ticket="{ticket}" show="{show}" />
         {#if waitingForShow}
           <div
             class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-4xl -rotate-12 whitespace-nowrap font-extrabold text-primary ring-2 ring-primary bg-base-200/50 p-2 ring-inset rounded-xl"
@@ -92,18 +93,22 @@
             {#if waiting4StateChange}
               <div class="p-4">
                 <div class="w-full flex justify-center">
-                  <button class="btn loading" disabled={true}
+                  <button class="btn loading" disabled="{true}"
                     >Sending Payment</button
                   >
                 </div>
               </div>
             {:else}
-              <form method="post" action="?/buy_ticket" use:enhance={onSubmit}>
+              <form
+                method="post"
+                action="?/buy_ticket"
+                use:enhance="{onSubmit}"
+              >
                 <div class="w-full flex justify-center">
                   <button
                     class="btn"
                     type="submit"
-                    disabled={waiting4StateChange}>Send Payment</button
+                    disabled="{waiting4StateChange}">Send Payment</button
                   >
                 </div>
               </form>
@@ -114,20 +119,26 @@
             <div class="w-full flex justify-center">
               <button
                 class="btn"
-                disabled={waiting4StateChange}
-                on:click={() => {
+                disabled="{waiting4StateChange}"
+                on:click="{() => {
                   goto(showPath);
-                }}>Go to the Show</button
+                }}">Go to the Show</button
               >
             </div>
           </div>
         {/if}
         {#if canCancelTicket}
           <div class="p-4">
-            <form method="post" action="?/cancel_ticket" use:enhance={onSubmit}>
+            <form
+              method="post"
+              action="?/cancel_ticket"
+              use:enhance="{onSubmit}"
+            >
               <div class="w-full flex justify-center">
-                <button class="btn" type="submit" disabled={waiting4StateChange}
-                  >Cancel Ticket</button
+                <button
+                  class="btn"
+                  type="submit"
+                  disabled="{waiting4StateChange}">Cancel Ticket</button
                 >
               </div>
             </form>
@@ -148,7 +159,7 @@
                 <form
                   method="post"
                   action="?/leave_feedback"
-                  use:enhance={onSubmit}
+                  use:enhance="{onSubmit}"
                 >
                   <div class="max-w-xs w-full py-2 form-control">
                     <!-- svelte-ignore a11y-label-has-associated-control -->
@@ -209,8 +220,7 @@
                       <textarea
                         name="review"
                         class="textarea textarea-primary"
-                        value={form?.review ?? ''}
-                      />
+                        value="{form?.review ?? ''}"></textarea>
                     </div>
                   </div>
 
@@ -219,13 +229,13 @@
                       <button
                         class="btn btn-secondary loading"
                         type="submit"
-                        disabled={true}>Submitting</button
+                        disabled="{true}">Submitting</button
                       >
                     {:else}
                       <button
                         class="btn btn-secondary"
                         type="submit"
-                        disabled={waiting4StateChange}>Submit</button
+                        disabled="{waiting4StateChange}">Submit</button
                       >
                     {/if}
                   </div>
@@ -260,7 +270,7 @@
                 <form
                   method="post"
                   action="?/initiate_dispute"
-                  use:enhance={onSubmit}
+                  use:enhance="{onSubmit}"
                 >
                   <div class="max-w-xs w-full py-2 form-control">
                     <!-- svelte-ignore a11y-label-has-associated-control -->
@@ -292,8 +302,7 @@
                       <textarea
                         name="explanation"
                         class="textarea textarea-primary"
-                        value={form?.explanation ?? ''}
-                      />
+                        value="{form?.explanation ?? ''}"></textarea>
                       {#if form?.missingExplanation}<div
                           class="shadow-lg alert alert-error"
                         >
@@ -307,13 +316,13 @@
                       <button
                         class="btn btn-secondary loading"
                         type="submit"
-                        disabled={true}>Submitting</button
+                        disabled="{true}">Submitting</button
                       >
                     {:else}
                       <button
                         class="btn btn-secondary"
                         type="submit"
-                        disabled={waiting4StateChange}>Submit</button
+                        disabled="{waiting4StateChange}">Submit</button
                       >
                     {/if}
                   </div>

@@ -1,5 +1,9 @@
 import { PUBLIC_PIN_PATH } from '$env/static/public';
-import type { TicketDisputeReason, TicketType } from '$lib/models/ticket';
+import type {
+  TicketDisputeReason,
+  TicketDocType,
+  TicketType,
+} from '$lib/models/ticket';
 import { Ticket, TicketCancelReason } from '$lib/models/ticket';
 import { Transaction, TransactionReasonType } from '$lib/models/transaction';
 
@@ -48,13 +52,12 @@ export const load: import('./$types').PageServerLoad = async ({
     throw error(404, 'Bad ticket id');
   }
 
-  const ticket = await Ticket.findById(ticketId)
+  const ticket = (await Ticket.findById(ticketId)
     .orFail(() => {
       throw error(404, 'Ticket not found');
     })
     .populate('show')
-    .populate('talent', 'name')
-    .exec();
+    .exec()) as TicketDocType;
 
   if (ticket.ticketState.reservation === undefined) {
     throw error(404, 'Ticket not reserved');
@@ -66,6 +69,7 @@ export const load: import('./$types').PageServerLoad = async ({
 
   return {
     ticket: JSON.parse(JSON.stringify(ticket)),
+    show: JSON.parse(JSON.stringify(ticket.show)),
   };
 };
 
