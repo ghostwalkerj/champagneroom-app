@@ -102,8 +102,9 @@
       showEventUnSub?.();
       showUnSub?.();
       showUnSub = showStore(activeShow).subscribe(_show => {
+        console.log('showStore', _show);
         if (_show) {
-          statusText = _show.showState.status;
+          activeShow = _show;
         }
       });
       showEventUnSub = showEventStore(activeShow).subscribe(

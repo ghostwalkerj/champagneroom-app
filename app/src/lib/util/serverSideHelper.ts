@@ -7,7 +7,7 @@ import {
 } from '$env/static/private';
 import { createShowMachineService } from '$lib/machines/showMachine';
 import { createTicketMachineService } from '$lib/machines/ticketMachine';
-import type { ShowStateType, ShowType } from '$lib/models/show';
+import { Show, ShowStateType, ShowType } from '$lib/models/show';
 import type { TicketDocType, TicketType } from '$lib/models/ticket';
 import type { TransactionDocType } from '$lib/models/transaction';
 import { Queue } from 'bullmq';

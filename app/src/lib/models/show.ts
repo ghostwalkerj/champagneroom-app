@@ -29,7 +29,7 @@ export enum ShowCancelReason {
 
 const cancelSchema = new Schema({
   cancelledAt: { type: Date, required: true, default: Date.now },
-  cancelledInState: { type: String, enum: ShowStatus },
+  cancelledInState: { type: String },
   canceller: { type: String, enum: ActorType, required: true },
   reason: { type: String, enum: ShowCancelReason, required: true },
 });
