@@ -9,12 +9,14 @@
   import { ShowEvent } from '$lib/models/showEvent';
   import { Talent } from '$lib/models/talent';
   import { Transaction } from '$lib/models/transaction';
+  import { Ticket } from '$lib/models/ticket';
 
   globalThis.Talent = Talent;
   globalThis.Show = Show;
   globalThis.Agent = Agent;
   globalThis.ShowEvent = ShowEvent;
   globalThis.Transaction = Transaction;
+  globalThis.Ticket = Ticket;
 
   onMount(() => {
     if ($browserType == null) {

@@ -1,5 +1,5 @@
 import { MONGO_DB_ENDPOINT } from '$env/static/private';
-import { ShowEvent } from '$lib/models/showEvent';
+import { ShowEvent, type ShowEventDocType } from '$lib/models/showEvent';
 import type { RequestHandler } from '@sveltejs/kit';
 import mongoose from 'mongoose';
 
@@ -22,8 +22,7 @@ export const GET: RequestHandler<{ showId: string }> = async ({ params }) => {
   ];
   const changeStream = ShowEvent.watch(pipeline, { showExpandedEvents: true });
   const next = await changeStream.next();
-  const doc = next.fullDocument;
-
+  const doc = next.fullDocument as ShowEventDocType;
   changeStream.close();
 
   return new Response(JSON.stringify(doc), {

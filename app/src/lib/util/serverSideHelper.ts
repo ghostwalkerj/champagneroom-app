@@ -49,6 +49,10 @@ export const getShowMachineService = (show: ShowType) => {
       transaction: transaction?._id,
       agent: show.agent,
       talent: show.talent,
+      ticketInfo: {
+        name: ticket?.ticketState?.reservation?.name,
+        price: ticket?.price,
+      },
     });
   };
 

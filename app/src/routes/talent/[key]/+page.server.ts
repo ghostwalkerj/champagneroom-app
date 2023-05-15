@@ -7,6 +7,7 @@ import {
   ShowStatus,
   type ShowStateType,
 } from '$lib/models/show';
+import { ShowEvent } from '$lib/models/showEvent';
 import { Talent } from '$lib/models/talent';
 import { ActorType } from '$lib/util/constants';
 import { getShowMachineServiceFromId } from '$lib/util/serverSideHelper';
@@ -34,12 +35,23 @@ export const load: PageServerLoad = async ({ params }) => {
   if (talent === null) {
     throw error(404, 'Talent not found');
   }
+
+  const activeShow =
+    talent.activeShows.length > 0 ? talent.activeShows[0] : null;
+
+  const lastActiveShowEvent = activeShow
+    ? await ShowEvent.findOne({ show: activeShow._id })
+        .sort({ createdAt: -1 })
+        .lean()
+        .exec()
+    : null;
+
   return {
     talent: JSON.parse(JSON.stringify(talent)),
-    activeShow:
-      talent.activeShows.length > 0
-        ? JSON.parse(JSON.stringify(talent.activeShows[0]))
-        : null,
+    activeShow: activeShow ? JSON.parse(JSON.stringify(activeShow)) : null,
+    lastActiveShowEvent: lastActiveShowEvent
+      ? JSON.parse(JSON.stringify(lastActiveShowEvent))
+      : null,
   };
 };
 export const actions: Actions = {

@@ -17,21 +17,24 @@
     ShowMachineStateType,
   } from '$lib/machines/showMachine';
 
+  import type { ShowDocType } from '$lib/models/show';
+  import type { ShowEventDocType } from '$lib/models/showEvent';
+  import type { TalentDocType } from '$lib/models/talent';
+  import { showEventStore, talentStore } from '$lib/stores';
+  import { createEventText } from '$lib/util/eventUtil';
   import { onDestroy, onMount } from 'svelte';
   import urlJoin from 'url-join';
   import type { Subscription } from 'xstate';
   import type { PageData } from './$types';
   import TalentWallet from './TalentWallet.svelte';
-  import { talentStore } from '$lib/stores';
   import type { Unsubscriber } from 'svelte/store';
-  import type { TalentDocType } from '$lib/models/talent';
-  import type { ShowDocType } from '$lib/models/show';
 
   export let form: import('./$types').ActionData;
   export let data: PageData;
 
   let talent = data.talent as TalentDocType;
   let activeShow = data.activeShow as ShowDocType | null;
+  let lastActiveShowEvent = data.lastActiveShowEvent as ShowEventDocType | null;
   $: showDuration = 60;
 
   let showName = talent ? possessive(talent.name, 'en') + ' Show' : 'Show';
@@ -49,9 +52,14 @@
   $: talentName = talent ? talent.name : 'Talent';
 
   $: statusText = activeShow ? activeShow.showState.status : 'No Current Show';
-  $: eventText = 'No Events';
+  $: eventText = lastActiveShowEvent
+    ? createEventText(lastActiveShowEvent)
+    : 'No Events';
   $: loading = false;
   $: showStopped = false;
+
+  let talentUnSub: Unsubscriber;
+  let showEventUnSub: Unsubscriber;
 
   const noCurrentShow = () => {
     canCreateShow = true;
@@ -60,9 +68,8 @@
     statusText = 'No Current Show';
     eventText = 'No Events';
     activeShow = null;
+    showEventUnSub?.();
   };
-
-  let talentUnSub: Unsubscriber;
 
   onMount(async () => {
     talentUnSub = talentStore(talent).subscribe(_talent => {
@@ -78,10 +85,20 @@
         talentName = _talent.name;
       }
     });
+    if (activeShow) {
+      showEventUnSub = showEventStore(activeShow).subscribe(
+        (_showEvent: ShowEventDocType) => {
+          if (_showEvent) {
+            eventText = createEventText(_showEvent);
+          }
+        }
+      );
+    }
   });
 
   onDestroy(() => {
     talentUnSub?.();
+    showEventUnSub?.();
   });
 
   const useShowMachine = (showMachineService: ShowMachineServiceType) => {
@@ -113,6 +130,17 @@
         body: formData,
       });
     }
+  };
+
+  const useShowEvents = (show: ShowDocType) => {
+    showEventUnSub?.();
+    showEventUnSub = showEventStore(show).subscribe(
+      (_showEvent: ShowEventDocType) => {
+        if (_showEvent) {
+          eventText = createEventText(_showEvent);
+        }
+      }
+    );
   };
 
   const onSubmit = ({}) => {

@@ -3,6 +3,7 @@ import { PUBLIC_TICKET_PATH } from '$env/static/public';
 import { createShowMachineService } from '$lib/machines/showMachine';
 import { Show } from '$lib/models/show';
 import { Ticket } from '$lib/models/ticket';
+import { Talent } from '$lib/models/talent';
 import { mensNames } from '$lib/util/mensNames';
 import { createPinHash } from '$lib/util/pin';
 import { error, fail, redirect } from '@sveltejs/kit';
@@ -13,7 +14,6 @@ import urlJoin from 'url-join';
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 export const load: import('./$types').PageServerLoad = async ({ params }) => {
   mongoose.connect(MONGO_DB_ENDPOINT);
-
   const showId = params.id;
   if (showId === null) {
     throw error(404, 'Champagne Show not found');

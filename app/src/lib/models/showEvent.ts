@@ -11,11 +11,18 @@ const showeventSchema = new Schema(
     agent: { type: Schema.Types.ObjectId, ref: 'Agent', required: true },
     ticket: { type: Schema.Types.ObjectId, ref: 'Ticket' },
     transaction: { type: Schema.Types.ObjectId, ref: 'Transaction' },
+    ticketInfo: {
+      type: {
+        name: { type: String, required: true },
+        price: { type: Number, required: true },
+      },
+      required: true,
+    },
   },
   { timestamps: true }
 );
 
-showeventSchema.index({ createdAt: 1 });
+showeventSchema.index({ createdAt: -1 });
 
 export type ShowEventDocType = InferSchemaType<typeof showeventSchema>;
 

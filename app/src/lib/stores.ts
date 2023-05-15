@@ -1,12 +1,12 @@
-import { writable } from 'svelte/store';
-import type { ShowDocType } from './models/show';
 import { PUBLIC_CHANGESET_PATH } from '$env/static/public';
 import to from 'await-to-js';
+import { derived, writable } from 'svelte/store';
 import urlJoin from 'url-join';
-import type { TalentDocType } from './models/talent';
-import type { ShowEventDocType } from './models/showEvent';
-import type { TicketDocType } from './models/ticket';
 import type { AgentDocType } from './models/agent';
+import type { ShowDocType } from './models/show';
+import type { ShowEventDocType } from './models/showEvent';
+import type { TalentDocType } from './models/talent';
+import type { TicketDocType } from './models/ticket';
 
 export const browserType = writable();
 
@@ -60,11 +60,27 @@ export const showStore = (show: ShowDocType) => {
   );
 };
 
-export const showEventStore = (showEvent: ShowEventDocType) => {
-  return abstractStore(
-    showEvent,
-    urlJoin(PUBLIC_CHANGESET_PATH, 'showEvent', showEvent._id.toString())
+export const showEventStore = (show: ShowDocType) => {
+  const _showStore = writable<ShowDocType>(show);
+  const _showEventStore = derived<typeof _showStore, ShowEventDocType>(
+    _showStore,
+    ($show, set) => {
+      const abortShowEvent = new AbortController();
+      const showEventSignal = abortShowEvent.signal;
+      getChangeset(
+        urlJoin(PUBLIC_CHANGESET_PATH, 'showEvent', $show._id.toString()),
+        set,
+        showEventSignal
+      );
+      return () => {
+        abortShowEvent.abort();
+      };
+    }
   );
+  return {
+    set: _showStore.set,
+    subscribe: _showEventStore.subscribe,
+  };
 };
 
 export const ticketStore = (ticket: TicketDocType) => {

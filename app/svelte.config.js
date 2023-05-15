@@ -10,7 +10,6 @@ const config = {
     alias: {
       $components: './src/components',
       $lib: './src/lib',
-      $queues: './src/routes/api/v1/queues',
     },
   },
   preprocess: [
