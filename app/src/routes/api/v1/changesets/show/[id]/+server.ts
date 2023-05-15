@@ -13,8 +13,15 @@ export const GET: RequestHandler<{ id: string }> = async ({ params }) => {
 
   const id = new mongoose.Types.ObjectId(showId);
 
-  const pipeline = [{ $match: { 'fullDocument._id': id } }];
-  const changeStream = Show.watch(pipeline, { showExpandedEvents: true });
+  const pipeline = [
+    {
+      $match: {
+        'fullDocument._id': id,
+      },
+    },
+  ];
+
+  const changeStream = Show.watch(pipeline);
   const next = await changeStream.next();
   const doc = next.fullDocument;
 

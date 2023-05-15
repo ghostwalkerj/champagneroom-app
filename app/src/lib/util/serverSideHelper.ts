@@ -8,7 +8,7 @@ import {
 import { createShowMachineService } from '$lib/machines/showMachine';
 import { createTicketMachineService } from '$lib/machines/ticketMachine';
 import { Show, ShowStateType, ShowType } from '$lib/models/show';
-import type { TicketDocType, TicketType } from '$lib/models/ticket';
+import { Ticket, TicketDocType, TicketType } from '$lib/models/ticket';
 import type { TransactionDocType } from '$lib/models/transaction';
 import { Queue } from 'bullmq';
 import mongoose from 'mongoose';
@@ -27,10 +27,7 @@ export const getShowMachineService = (show: ShowType) => {
   mongoose.connect(MONGO_DB_ENDPOINT);
 
   const saveState = (newState: ShowStateType) => {
-    mongoose
-      .model('Show')
-      .updateOne({ _id: show._id }, { $set: { showState: newState } })
-      .exec();
+    Show.updateOne({ _id: show._id }, { $set: { showState: newState } }).exec();
   };
   const showQueue = new Queue('show', redisOptions);
   const createShowEvent = ({
@@ -95,10 +92,7 @@ export const getTicketMachineService = async (
 
   return createTicketMachineService(ticket, _show, {
     saveStateCallback: ticketState => {
-      mongoose
-        .model('Ticket')
-        .updateOne({ _id: ticket._id }, { $set: { ticketState } })
-        .exec();
+      Ticket.updateOne({ _id: ticket._id }, { $set: { ticketState } }).exec();
     },
   });
 };
