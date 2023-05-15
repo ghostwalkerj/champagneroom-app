@@ -22,7 +22,7 @@ const statSchema = new Schema(
         message: '{VALUE} is not an integer value',
       },
     },
-    numRatings: {
+    numReviews: {
       type: Number,
       default: 0,
       min: 0,

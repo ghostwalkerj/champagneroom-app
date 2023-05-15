@@ -10,7 +10,7 @@ import { verifyPin } from '$lib/util/pin';
 import {
   getTicketMachineService,
   getTicketMachineServiceFromId,
-} from '$lib/util/serverSideHelper';
+} from '$lib/util/ssHelper';
 import { error, fail, redirect } from '@sveltejs/kit';
 import mongoose from 'mongoose';
 import urlJoin from 'url-join';

@@ -8,9 +8,9 @@ import {
   type ShowStateType,
 } from '$lib/models/show';
 import { ShowEvent } from '$lib/models/showEvent';
-import { Talent } from '$lib/models/talent';
+import { Talent, type TalentDocType } from '$lib/models/talent';
 import { ActorType } from '$lib/util/constants';
-import { getShowMachineServiceFromId } from '$lib/util/serverSideHelper';
+import { getShowMachineServiceFromId } from '$lib/util/ssHelper';
 import { error, fail } from '@sveltejs/kit';
 import mongoose from 'mongoose';
 import type { Actions, PageServerLoad } from './$types';
@@ -82,8 +82,6 @@ export const actions: Actions = {
     const name = data.get('name') as string;
     const duration = data.get('duration') as string;
     const numTickets = data.get('numTickets') as string;
-    const talentId = data.get('talentId') as string;
-    const agentId = data.get('agentId') as string;
     const coverImageUrl = data.get('coverImageUrl') as string;
     const key = params.key;
 
@@ -100,19 +98,32 @@ export const actions: Actions = {
 
     mongoose.connect(MONGO_DB_ENDPOINT);
 
+    const talent = (await Talent.findOne({ key })
+      .orFail(() => {
+        throw error(404, 'Talent not found');
+      })
+      .lean()
+      .exec()) as TalentDocType;
+
     const show = await Show.create({
       price: +price,
       name,
       duration: +duration,
       numTickets: +numTickets,
-      talent: talentId,
-      agent: agentId,
+      talent: talent._id,
+      agent: talent.agent,
       coverImageUrl,
       showState: {
         status: ShowStatus.BOX_OFFICE_OPEN,
         salesStats: {
           ticketsAvailable: +numTickets,
         },
+      },
+      talentInfo: {
+        name: talent.name,
+        profileImageUrl: talent.profileImageUrl,
+        ratingAvg: talent.stats.ratingAvg,
+        numReviews: talent.stats.numReviews,
       },
     });
 

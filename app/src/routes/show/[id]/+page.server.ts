@@ -4,7 +4,7 @@ import { Show } from '$lib/models/show';
 import { Ticket } from '$lib/models/ticket';
 import { mensNames } from '$lib/util/mensNames';
 import { createPinHash } from '$lib/util/pin';
-import { getShowMachineService } from '$lib/util/serverSideHelper';
+import { getShowMachineService } from '$lib/util/ssHelper';
 import { error, fail, redirect } from '@sveltejs/kit';
 import mongoose from 'mongoose';
 import { uniqueNamesGenerator } from 'unique-names-generator';
@@ -19,16 +19,11 @@ export const load: import('./$types').PageServerLoad = async ({ params }) => {
   }
 
   const show = await Show.findById(showId)
+    .orFail(() => {
+      throw error(404, 'Show not found');
+    })
     .lean()
-    .populate(
-      'talent',
-      'name profileImageUrl stats.ratingAvg stats.numCompletedShows'
-    )
     .exec();
-
-  if (!show) {
-    throw error(404, 'Show not found');
-  }
 
   const displayName = uniqueNamesGenerator({
     dictionaries: [mensNames],

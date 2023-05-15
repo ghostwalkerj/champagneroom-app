@@ -341,8 +341,7 @@
                   </div>
 
                   <input type="hidden" name="numTickets" value="1" />
-                  <input type="hidden" name="talentId" value="{talent._id}" />
-                  <input type="hidden" name="agentId" value="{talent.agent}" />
+
                   <input
                     type="hidden"
                     name="coverImageUrl"
@@ -393,7 +392,6 @@
         {#if activeShow}
           <ShowDetail
             show="{activeShow}"
-            talent="{talent}"
             options="{{
               showCopy: true,
               showSalesStats: true,

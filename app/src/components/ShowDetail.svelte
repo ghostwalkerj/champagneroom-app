@@ -24,7 +24,6 @@
     showWaterMark: true,
   };
   export let show: ShowDocType;
-  export let talent: TalentDocType;
   export let options: ShowDetailOptions = defaultOptions;
 
   options = {
@@ -103,10 +102,10 @@
           class="absolute top-4 right-4 text-lg text-primary ring-2 ring-primary bg-base-200 p-2 ring-inset rounded-xl"
         >
           <div class="">
-            {talent.name}
+            {show.talentInfo.name}
           </div>
           <div>
-            <StarRating rating="{talent.stats.ratingAvg}" />
+            <StarRating rating="{show.talentInfo.ratingAvg}" />
           </div>
         </div>
       {/if}

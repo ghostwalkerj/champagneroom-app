@@ -183,6 +183,15 @@ const showSchema = new Schema(
       },
     },
     price: { type: Number, required: true, min: 1 },
+    talentInfo: {
+      type: {
+        name: { type: String, required: true },
+        profileImageUrl: { type: String, required: true },
+        ratingAvg: { type: Number, required: true, default: 0 },
+        numReviews: { type: Number, required: true, default: 0 },
+      },
+      required: true,
+    },
     showState: { type: showStateSchema, required: true, default: () => ({}) },
   },
   {
