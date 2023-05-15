@@ -14,6 +14,7 @@ import {
 import { error, fail, redirect } from '@sveltejs/kit';
 import mongoose from 'mongoose';
 import urlJoin from 'url-join';
+import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
 
 const getTicketService = async (ticketId: string) => {
   const ticket = await Ticket.findById(ticketId)
@@ -106,20 +107,24 @@ export const actions: import('./$types').Actions = {
     mongoose.connect(MONGO_DB_ENDPOINT);
 
     const { ticket, show, ticketService } = await getTicketService(ticketId);
-
     const state = ticketService.getSnapshot();
-    if (state.can({ type: 'REQUEST CANCELLATION', cancel: undefined })) {
+
+    const cancel = {
+      canceller: ActorType.CUSTOMER,
+      cancelledInState: JSON.stringify(state.value),
+      reason: TicketCancelReason.CUSTOMER_CANCELLED,
+      cancelledAt: new Date(),
+    };
+
+    const cancelEvent = {
+      type: 'REQUEST CANCELLATION',
+      cancel,
+    } as TicketMachineEventType;
+
+    if (state.can(cancelEvent)) {
       //TODO: make real transaction
 
-      ticketService.send({
-        type: 'REQUEST CANCELLATION',
-        cancel: {
-          canceller: ActorType.CUSTOMER,
-          cancelledInState: JSON.stringify(state.value),
-          reason: TicketCancelReason.CUSTOMER_CANCELLED,
-          cancelledAt: new Date(),
-        },
-      });
+      ticketService.send(cancelEvent);
 
       if (ticket.ticketState.totalPaid > ticket.ticketState.totalRefunded) {
         Transaction.create({

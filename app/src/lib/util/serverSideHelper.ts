@@ -7,8 +7,17 @@ import {
 } from '$env/static/private';
 import { createShowMachineService } from '$lib/machines/showMachine';
 import { createTicketMachineService } from '$lib/machines/ticketMachine';
-import { Show, ShowStateType, ShowType } from '$lib/models/show';
-import { Ticket, TicketDocType, TicketType } from '$lib/models/ticket';
+import {
+  Show,
+  type ShowDocType,
+  type ShowStateType,
+  type ShowType,
+} from '$lib/models/show';
+import {
+  Ticket,
+  type TicketDocType,
+  type TicketType,
+} from '$lib/models/ticket';
 import type { TransactionDocType } from '$lib/models/transaction';
 import { Queue } from 'bullmq';
 import mongoose from 'mongoose';
@@ -23,41 +32,47 @@ export const redisOptions = {
   },
 };
 
+const saveState = (show: ShowDocType, newState: ShowStateType) => {
+  Show.updateOne({ _id: show._id }, { $set: { showState: newState } }).exec();
+};
+
+const createShowEvent = ({
+  show,
+  type,
+  ticket,
+  transaction,
+}: {
+  show: ShowDocType;
+  type: string;
+  ticket?: TicketDocType;
+  transaction?: TransactionDocType;
+}) => {
+  mongoose.model('ShowEvent').create({
+    show: show._id,
+    type,
+    ticket: ticket?._id,
+    transaction: transaction?._id,
+    agent: show.agent,
+    talent: show.talent,
+    ticketInfo: {
+      name: ticket?.ticketState?.reservation?.name,
+      price: ticket?.price,
+    },
+  });
+};
+
+const showQueue = new Queue('show', redisOptions);
+
 export const getShowMachineService = (show: ShowType) => {
   mongoose.connect(MONGO_DB_ENDPOINT);
-
-  const saveState = (newState: ShowStateType) => {
-    Show.updateOne({ _id: show._id }, { $set: { showState: newState } }).exec();
-  };
-  const showQueue = new Queue('show', redisOptions);
-  const createShowEvent = ({
-    type,
-    ticket,
-    transaction,
-  }: {
-    type: string;
-    ticket?: TicketDocType;
-    transaction?: TransactionDocType;
-  }) => {
-    mongoose.model('ShowEvent').create({
-      show: show._id,
-      type,
-      ticket: ticket?._id,
-      transaction: transaction?._id,
-      agent: show.agent,
-      talent: show.talent,
-      ticketInfo: {
-        name: ticket?.ticketState?.reservation?.name,
-        price: ticket?.price,
-      },
-    });
-  };
-
-  return createShowMachineService(show, {
-    saveStateCallback: async showState => saveState(showState),
-    saveShowEventCallback: async ({ type, ticket, transaction }) =>
-      createShowEvent({ type, ticket, transaction }),
-    jobQueue: showQueue,
+  return createShowMachineService({
+    showDocument: show,
+    showMachineOptions: {
+      saveStateCallback: async showState => saveState(show, showState),
+      saveShowEventCallback: async ({ type, ticket, transaction }) =>
+        createShowEvent({ show, type, ticket, transaction }),
+      jobQueue: showQueue,
+    },
   });
 };
 
@@ -90,9 +105,19 @@ export const getTicketMachineService = async (
       })
       .exec());
 
-  return createTicketMachineService(ticket, _show, {
-    saveStateCallback: ticketState => {
-      Ticket.updateOne({ _id: ticket._id }, { $set: { ticketState } }).exec();
+  return createTicketMachineService({
+    ticketDocument: ticket,
+    ticketMachineOptions: {
+      saveStateCallback: ticketState => {
+        Ticket.updateOne({ _id: ticket._id }, { $set: { ticketState } }).exec();
+      },
+    },
+    showDocument: _show,
+    showMachineOptions: {
+      saveStateCallback: async showState => saveState(_show, showState),
+      saveShowEventCallback: async ({ type, ticket, transaction }) =>
+        createShowEvent({ show: _show, type, ticket, transaction }),
+      jobQueue: showQueue,
     },
   });
 };
