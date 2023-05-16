@@ -15,11 +15,10 @@ import {
 } from 'xstate';
 import {
   createShowMachine,
-  type ShowMachineServiceType,
   type ShowMachineOptions,
+  type ShowMachineServiceType,
   type ShowMachineType,
 } from './showMachine';
-import console from 'console';
 
 export type TicketMachineOptions = {
   saveStateCallback?: (state: TicketStateType) => void;

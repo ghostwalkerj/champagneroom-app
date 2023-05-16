@@ -15,8 +15,8 @@ import {
 } from '$lib/models/show';
 import {
   Ticket,
-  TicketStateType,
   type TicketDocType,
+  type TicketStateType,
   type TicketType,
 } from '$lib/models/ticket';
 import type { TransactionDocType } from '$lib/models/transaction';

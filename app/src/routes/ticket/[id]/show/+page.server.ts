@@ -9,7 +9,6 @@ import {
   PUBLIC_PIN_PATH,
   PUBLIC_TICKET_PATH,
 } from '$env/static/public';
-import { createTicketMachineService } from '$lib/machines/ticketMachine';
 import type { ShowType } from '$lib/models/show';
 import { Ticket } from '$lib/models/ticket';
 import { verifyPin } from '$lib/util/pin';

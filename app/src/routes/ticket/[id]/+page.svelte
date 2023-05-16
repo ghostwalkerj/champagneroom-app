@@ -3,18 +3,18 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import {
-    type TicketMachineServiceType,
     createTicketMachineService,
+    type TicketMachineServiceType,
   } from '$lib/machines/ticketMachine';
-  import type { ShowDocType } from '$lib/models/show';
   import { TicketDisputeReason, type TicketDocType } from '$lib/models/ticket';
   import urlJoin from 'url-join';
 
+  import type { ShowDocType } from '$lib/models/show';
+  import { showStore, ticketStore } from '$lib/stores';
+  import { onDestroy, onMount } from 'svelte';
+  import type { Unsubscriber } from 'svelte/store';
   import type { ActionData, PageData } from './$types';
   import TicketDetail from './TicketDetail.svelte';
-  import type { Unsubscriber } from 'svelte/store';
-  import { onDestroy, onMount } from 'svelte';
-  import { showStore, ticketStore } from '$lib/stores';
 
   export let data: PageData;
   export let form: ActionData;
@@ -54,41 +54,30 @@
 
     waitingForShow = state.matches('reserved.waiting4Show') && !canWatchShow;
     ticketDone = state.done ?? false;
-
-    if (ticketDone) {
-      console.log('ticketDone', ticketDone);
-      showUnSub?.();
-      ticketUnSub?.();
-    }
   };
 
   $: loading = false;
 
   onMount(() => {
-    const state = createTicketMachineService({
-      ticketDocument: ticket,
-      showDocument: show,
-    }).getSnapshot();
-    if (!state.done) {
-      ticketStore(ticket).subscribe(ticketDoc => {
-        ticket = ticketDoc;
-        useTicketMachine(
-          createTicketMachineService({
-            ticketDocument: ticket,
-            showDocument: show,
-          })
-        );
-      });
-      showStore(show).subscribe(showDoc => {
-        show = showDoc;
-        useTicketMachine(
-          createTicketMachineService({
-            ticketDocument: ticket,
-            showDocument: show,
-          })
-        );
-      });
-    }
+    ticketStore(ticket).subscribe(ticketDoc => {
+      ticket = ticketDoc;
+      useTicketMachine(
+        createTicketMachineService({
+          ticketDocument: ticket,
+          showDocument: show,
+        })
+      );
+    });
+
+    showStore(show).subscribe(showDoc => {
+      show = showDoc;
+      useTicketMachine(
+        createTicketMachineService({
+          ticketDocument: ticket,
+          showDocument: show,
+        })
+      );
+    });
   });
 
   onDestroy(() => {
@@ -103,9 +92,10 @@
         loading = false;
       }
       if (result.data.ticketCancelled) {
-        ticketDone = true;
         ticket = result.data.ticket;
         show = result.data.show;
+        showUnSub?.();
+        ticketUnSub?.();
         useTicketMachine(
           createTicketMachineService({
             ticketDocument: ticket,

@@ -40,7 +40,7 @@ export const actions: import('./$types').Actions = {
   reserve_ticket: async ({ params, cookies, request, url }) => {
     const showId = params.id;
     if (showId === null) {
-      return fail(404, 'Key not found');
+      return fail(404, { showId, missingShowId: true });
     }
     const data = await request.formData();
     const name = data.get('name') as string;

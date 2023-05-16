@@ -102,8 +102,6 @@
     statusText = state.context.showState.status;
     if (state.done) {
       showMachineService.stop();
-      showEventUnSub?.();
-      showUnSub?.();
     }
   };
 
