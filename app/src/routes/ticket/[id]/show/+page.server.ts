@@ -13,6 +13,7 @@ import { createTicketMachineService } from '$lib/machines/ticketMachine';
 import type { ShowType } from '$lib/models/show';
 import { Ticket } from '$lib/models/ticket';
 import { verifyPin } from '$lib/util/pin';
+import { getTicketMachineService } from '$lib/util/ssHelper';
 import type { Actions } from '@sveltejs/kit';
 import { error, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
@@ -56,12 +57,7 @@ export const load: import('./$types').PageServerLoad = async ({
   }
 
   // Check if can watch the show
-  const ticketService = createTicketMachineService(ticket, show, {
-    saveStateCallback: ticketState => {
-      ticket.ticketState = ticketState;
-      ticket.save();
-    },
-  });
+  const ticketService = getTicketMachineService(ticket, show);
   const ticketMachineState = ticketService.getSnapshot();
 
   if (!ticketMachineState.can('JOINED SHOW')) {
@@ -120,7 +116,7 @@ export const actions: Actions = {
       ticket.ticketState.reservation &&
       verifyPin(ticketId, ticket.ticketState.reservation?.pin, pinHash)
     ) {
-      const ticketService = createTicketMachineService(ticket, show);
+      const ticketService = getTicketMachineService(ticket, show);
       ticketService.send('LEFT SHOW');
     }
     return { success: true };

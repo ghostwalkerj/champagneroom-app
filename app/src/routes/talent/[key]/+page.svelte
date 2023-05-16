@@ -12,10 +12,8 @@
 
   import { goto, invalidateAll } from '$app/navigation';
   import ShowDetail from '$components/ShowDetail.svelte';
-  import type {
-    ShowMachineServiceType,
-    ShowMachineStateType,
-  } from '$lib/machines/showMachine';
+  import type { ShowMachineServiceType } from '$lib/machines/showMachine';
+  import { createShowMachineService } from '$lib/machines/showMachine';
 
   import type { ShowDocType } from '$lib/models/show';
   import type { ShowEventDocType } from '$lib/models/showEvent';
@@ -25,36 +23,30 @@
   import { onDestroy, onMount } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
   import urlJoin from 'url-join';
-  import type { Subscription } from 'xstate';
   import type { PageData } from './$types';
   import TalentWallet from './TalentWallet.svelte';
 
   export let form: import('./$types').ActionData;
   export let data: PageData;
 
+  const showPath = urlJoin($page.url.href, 'show');
+
   let talent = data.talent as TalentDocType;
   let activeShow = data.activeShow as ShowDocType | null;
   let lastActiveShowEvent = data.lastActiveShowEvent as ShowEventDocType | null;
-  $: showDuration = 60;
-
   let showName = talent ? possessive(talent.name, 'en') + ' Show' : 'Show';
 
-  let showMachineSub: Subscription;
-  const showPath = urlJoin($page.url.href, 'show');
-  let showMachineService: ShowMachineServiceType | null = null;
-
-  $: showMachineState = null as ShowMachineStateType | null;
-  $: canCreateShow = activeShow === null;
-  $: canCancelShow = !canCreateShow;
-
-  $: canStartShow = false;
-  $: waiting4Refunds = false;
+  $: showDuration = 60;
   $: talentName = talent ? talent.name : 'Talent';
-
   $: statusText = activeShow ? activeShow.showState.status : 'No Current Show';
   $: eventText = lastActiveShowEvent
     ? createEventText(lastActiveShowEvent)
     : 'No Events';
+
+  $: canCreateShow = activeShow === null;
+  $: canCancelShow = !canCreateShow;
+  $: canStartShow = false;
+  $: waiting4Refunds = false;
   $: loading = false;
   $: showStopped = false;
 
@@ -73,25 +65,6 @@
     showUnSub?.();
   };
 
-  onMount(() => {
-    talentUnSub = talentStore(talent).subscribe(_talent => {
-      if (_talent) {
-        if (_talent.activeShows.length === 0) {
-          noCurrentShow();
-        } else if (
-          activeShow?._id.toString() !== _talent.activeShows[0].toString()
-        ) {
-          invalidateAll();
-        }
-        talent = _talent;
-        talentName = _talent.name;
-      }
-    });
-    if (activeShow) {
-      useNewShow(activeShow);
-    }
-  });
-
   const useNewShow = (show: ShowDocType) => {
     if (show) {
       activeShow = show;
@@ -100,13 +73,12 @@
       statusText = show.showState.status;
       showEventUnSub?.();
       showUnSub?.();
-      showUnSub = showStore(activeShow).subscribe(_show => {
-        console.log('showStore', _show);
+      showUnSub = showStore(show).subscribe(_show => {
         if (_show) {
           activeShow = _show;
         }
       });
-      showEventUnSub = showEventStore(activeShow).subscribe(
+      showEventUnSub = showEventStore(show).subscribe(
         (_showEvent: ShowEventDocType) => {
           if (_showEvent) {
             eventText = createEventText(_showEvent);
@@ -116,29 +88,18 @@
     }
   };
 
-  onDestroy(() => {
-    talentUnSub?.();
-    showEventUnSub?.();
-    showUnSub?.();
-  });
-
   const useShowMachine = (showMachineService: ShowMachineServiceType) => {
-    showMachineSub?.unsubscribe();
-    showMachineSub = showMachineService.subscribe(
-      (state: ShowMachineStateType) => {
-        showStopped = state.matches('stopped');
-        canCancelShow = state.can({
-          type: 'REQUEST CANCELLATION',
-          cancel: undefined,
-          tickets: [],
-        });
-        canCreateShow = state.hasTag('canCreateShow');
-        canStartShow = state.can({ type: 'START SHOW' });
-        showMachineState = state;
-        waiting4Refunds = state.matches('requestedCancellation.waiting2Refund');
-        statusText = state.context.showState.status;
-      }
-    );
+    const state = showMachineService.getSnapshot();
+    showStopped = state.matches('stopped');
+    canCancelShow = state.can({
+      type: 'REQUEST CANCELLATION',
+      cancel: undefined,
+      tickets: [],
+    });
+    canCreateShow = state.hasTag('canCreateShow');
+    canStartShow = state.can({ type: 'START SHOW' });
+    waiting4Refunds = state.matches('requestedCancellation.waiting2Refund');
+    statusText = state.context.showState.status;
   };
 
   const updateProfileImage = async (url: string) => {
@@ -152,6 +113,35 @@
       });
     }
   };
+
+  onMount(() => {
+    talentUnSub = talentStore(talent).subscribe(_talent => {
+      if (_talent) {
+        if (_talent.activeShows.length === 0) {
+          noCurrentShow();
+        } else if (
+          activeShow?._id.toString() !== _talent.activeShows[0]?.toString()
+        ) {
+          invalidateAll();
+        }
+        talent = _talent;
+        talentName = _talent.name;
+      }
+    });
+    if (activeShow) {
+      useNewShow(activeShow);
+      const showMachine = createShowMachineService({
+        showDocument: activeShow,
+      });
+      useShowMachine(showMachine);
+    }
+  });
+
+  onDestroy(() => {
+    talentUnSub?.();
+    showEventUnSub?.();
+    showUnSub?.();
+  });
 
   const onSubmit = ({}) => {
     loading = true;
@@ -390,15 +380,17 @@
       {/if}
       <div>
         {#if activeShow}
-          <ShowDetail
-            show="{activeShow}"
-            options="{{
-              showCopy: true,
-              showSalesStats: true,
-              showRating: false,
-              showWaterMark: false,
-            }}"
-          />
+          {#key activeShow.showState}
+            <ShowDetail
+              show="{activeShow}"
+              options="{{
+                showCopy: true,
+                showSalesStats: true,
+                showRating: false,
+                showWaterMark: false,
+              }}"
+            />
+          {/key}
         {/if}
       </div>
       <div class="pb-4">

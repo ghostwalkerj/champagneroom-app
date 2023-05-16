@@ -1,6 +1,6 @@
 <script lang="ts">
   import { applyAction, enhance } from '$app/forms';
-  import { goto } from '$app/navigation';
+  import { goto, invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
   import { createTicketMachineService } from '$lib/machines/ticketMachine';
   import type { ShowDocType } from '$lib/models/show';
@@ -84,7 +84,8 @@
       }
       if (result.data.ticketCancelled) {
         ticketDone = true;
-        ticket.ticketState.status = TicketStatus.CANCELLED;
+        ticket = result.data.ticket;
+        show = result.data.show;
       }
       loading = false;
       await applyAction(result);
@@ -97,7 +98,7 @@
     <div class="min-w-full">
       <!-- Page header -->
       <div class="pb-4 text-center relative">
-        {#key ticket && show}
+        {#key ticket.ticketState || show.showState}
           <TicketDetail ticket="{ticket}" show="{show}" />
         {/key}
         {#if waitingForShow}

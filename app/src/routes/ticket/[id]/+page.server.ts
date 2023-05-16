@@ -19,6 +19,7 @@ import {
 import { error, fail, redirect } from '@sveltejs/kit';
 import mongoose from 'mongoose';
 import urlJoin from 'url-join';
+import type { ShowMachineServiceType } from '$lib/machines/showMachine';
 
 const getTicketService = async (ticketId: string) => {
   const ticket = await Ticket.findById(ticketId)
@@ -59,8 +60,13 @@ export const load: import('./$types').PageServerLoad = async ({
     .orFail(() => {
       throw error(404, 'Ticket not found');
     })
-    .populate('show')
     .exec()) as TicketDocType;
+
+  const show = (await Show.findById(ticket.show)
+    .orFail(() => {
+      throw error(404, 'Show not found');
+    })
+    .exec()) as ShowType;
 
   if (ticket.ticketState.reservation === undefined) {
     throw error(404, 'Ticket not reserved');
@@ -72,7 +78,7 @@ export const load: import('./$types').PageServerLoad = async ({
 
   return {
     ticket: JSON.parse(JSON.stringify(ticket)),
-    show: JSON.parse(JSON.stringify(ticket.show)),
+    show: JSON.parse(JSON.stringify(show)),
   };
 };
 
@@ -151,7 +157,18 @@ export const actions: import('./$types').Actions = {
         });
       }
     }
-    return { success: true, ticketCancelled: true };
+    const snapshot = ticketService.getSnapshot();
+    const _ticket = snapshot.context.ticketDocument;
+    const _showService = snapshot.children[
+      'showMachineService'
+    ] as ShowMachineServiceType;
+    const _show = _showService?.getSnapshot().context.showDocument;
+    return {
+      success: true,
+      ticketCancelled: true,
+      ticket: JSON.parse(JSON.stringify(_ticket)),
+      show: JSON.parse(JSON.stringify(_show)),
+    };
   },
   leave_feedback: async ({ params, request }) => {
     const ticketId = params.id;
