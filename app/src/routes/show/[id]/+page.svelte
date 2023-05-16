@@ -6,13 +6,17 @@
   import { ShowStatus } from '$lib/models/show';
 
   import getProfileImage from '$lib/util/profilePhoto';
+  import { onDestroy, onMount } from 'svelte';
   import type { ActionData, PageData } from './$types';
+  import type { Unsubscriber } from 'svelte/store';
+  import { showStore } from '$lib/stores';
 
   export let data: PageData;
   export let form: ActionData;
   let show = data.show;
   let displayName = data.displayName;
   let buyingTicket = false;
+  let showUnSub: Unsubscriber;
 
   $: loading = false;
   $: profileImage = getProfileImage(displayName, PUBLIC_PROFILE_IMAGE_PATH);
@@ -30,6 +34,15 @@
       await applyAction(result);
     };
   };
+  onMount(() => {
+    showUnSub = showStore(show).subscribe(_show => {
+      _show = _show;
+    });
+  });
+
+  onDestroy(() => {
+    showUnSub?.();
+  });
 </script>
 
 <div class="mt-4">
