@@ -10,6 +10,7 @@
   import type { ActionData, PageData } from './$types';
   import type { Unsubscriber } from 'svelte/store';
   import { showStore } from '$lib/stores';
+  import { createShowMachineService } from '$lib/machines/showMachine';
 
   export let data: PageData;
   export let form: ActionData;
@@ -35,9 +36,12 @@
     };
   };
   onMount(() => {
-    showUnSub = showStore(show).subscribe(_show => {
-      _show = _show;
-    });
+    const showMachineService = createShowMachineService({ showDocument: show });
+    if (!showMachineService.getSnapshot().done) {
+      showUnSub = showStore(show).subscribe(_show => {
+        show = _show;
+      });
+    }
   });
 
   onDestroy(() => {
@@ -49,7 +53,9 @@
   <div class="flex flex-row justify-center h-full">
     <!-- Page header -->
     <div class="pb-4 text-center w-full max-w-3xl">
-      <ShowDetail show="{show}" />
+      {#key show.showState}
+        <ShowDetail show="{show}" />
+      {/key}
       {#if canBuyTicket}
         <input type="checkbox" id="buy-ticket" class="modal-toggle" />
         <div class="modal">

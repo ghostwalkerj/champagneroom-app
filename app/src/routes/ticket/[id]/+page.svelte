@@ -1,14 +1,13 @@
 <script lang="ts">
   import { applyAction, enhance } from '$app/forms';
-  import { goto, invalidateAll } from '$app/navigation';
+  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import { createTicketMachineService } from '$lib/machines/ticketMachine';
-  import type { ShowDocType } from '$lib/models/show';
   import {
-    TicketDisputeReason,
-    TicketStatus,
-    type TicketDocType,
-  } from '$lib/models/ticket';
+    type TicketMachineServiceType,
+    createTicketMachineService,
+  } from '$lib/machines/ticketMachine';
+  import type { ShowDocType } from '$lib/models/show';
+  import { TicketDisputeReason, type TicketDocType } from '$lib/models/ticket';
   import urlJoin from 'url-join';
 
   import type { ActionData, PageData } from './$types';
@@ -25,10 +24,6 @@
 
   const showPath = urlJoin($page.url.href, 'show');
   const reasons = Object.values(TicketDisputeReason);
-  let ticketMachineService = createTicketMachineService({
-    ticketDocument: ticket,
-    showDocument: show,
-  });
 
   let needs2Pay = false;
   let canWatchShow = false;
@@ -40,7 +35,8 @@
   let showUnSub: Unsubscriber;
   let ticketUnSub: Unsubscriber;
 
-  $: ticketMachineService.subscribe(state => {
+  const useTicketMachine = (ticketMachineService: TicketMachineServiceType) => {
+    const state = ticketMachineService.getSnapshot();
     needs2Pay = state.matches('reserved.waiting4Payment');
     canWatchShow = state.can('JOINED SHOW');
     canCancelTicket = state.can({
@@ -58,17 +54,41 @@
 
     waitingForShow = state.matches('reserved.waiting4Show') && !canWatchShow;
     ticketDone = state.done ?? false;
-  });
+
+    if (ticketDone) {
+      console.log('ticketDone', ticketDone);
+      showUnSub?.();
+      ticketUnSub?.();
+    }
+  };
 
   $: loading = false;
 
   onMount(() => {
-    showUnSub = showStore(show).subscribe(showDoc => {
-      show = showDoc;
-    });
-    ticketUnSub = ticketStore(ticket).subscribe(ticketDoc => {
-      ticket = ticketDoc;
-    });
+    const state = createTicketMachineService({
+      ticketDocument: ticket,
+      showDocument: show,
+    }).getSnapshot();
+    if (!state.done) {
+      ticketStore(ticket).subscribe(ticketDoc => {
+        ticket = ticketDoc;
+        useTicketMachine(
+          createTicketMachineService({
+            ticketDocument: ticket,
+            showDocument: show,
+          })
+        );
+      });
+      showStore(show).subscribe(showDoc => {
+        show = showDoc;
+        useTicketMachine(
+          createTicketMachineService({
+            ticketDocument: ticket,
+            showDocument: show,
+          })
+        );
+      });
+    }
   });
 
   onDestroy(() => {
@@ -86,6 +106,12 @@
         ticketDone = true;
         ticket = result.data.ticket;
         show = result.data.show;
+        useTicketMachine(
+          createTicketMachineService({
+            ticketDocument: ticket,
+            showDocument: show,
+          })
+        );
       }
       loading = false;
       await applyAction(result);

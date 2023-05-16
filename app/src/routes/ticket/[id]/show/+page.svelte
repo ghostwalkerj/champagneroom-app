@@ -45,7 +45,7 @@
   const profileImage = urlJoin(
     $page.url.origin,
     getProfileImage(
-      ticket.ticketState.reservation?.name,
+      ticket.ticketState.reservation!.name,
       PUBLIC_PROFILE_IMAGE_PATH
     )
   );
@@ -73,7 +73,7 @@
       goto(returnUrl);
     });
 
-    const ticketMachineService = createTicketMachineService(ticket, show);
+    const ticketMachineService = createTicketMachineService({ ticket, show });
 
     ticketMachineService.subscribe(state => {
       const timeToLeave = !state.can({
@@ -90,5 +90,5 @@
 <div
   class="rounded-xl h-[calc(100vh-12px)] w-[calc(100vw-8px)] fixed top-0.5 m-1 overflow-hidden"
 >
-  <div bind:this={videoCallElement} class="h-full" />
+  <div bind:this="{videoCallElement}" class="h-full"></div>
 </div>

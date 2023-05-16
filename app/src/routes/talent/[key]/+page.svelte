@@ -100,6 +100,11 @@
     canStartShow = state.can({ type: 'START SHOW' });
     waiting4Refunds = state.matches('requestedCancellation.waiting2Refund');
     statusText = state.context.showState.status;
+    if (state.done) {
+      showMachineService.stop();
+      showEventUnSub?.();
+      showUnSub?.();
+    }
   };
 
   const updateProfileImage = async (url: string) => {

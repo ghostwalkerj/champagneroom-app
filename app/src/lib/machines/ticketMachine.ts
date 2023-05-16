@@ -574,10 +574,10 @@ export const createTicketMachineService = ({
   return ticketService;
 };
 
-export type ticketMachineType = ReturnType<typeof createTicketMachine>;
-export type ticketMachineStateType = StateFrom<
+export type TicketMachineType = ReturnType<typeof createTicketMachine>;
+export type TicketMachineStateType = StateFrom<
   ReturnType<typeof createTicketMachine>
 >;
-export type ticketMachineServiceType = ReturnType<
+export type TicketMachineServiceType = ReturnType<
   typeof createTicketMachineService
 >;
