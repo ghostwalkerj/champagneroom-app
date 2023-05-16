@@ -15,6 +15,7 @@ import {
 } from '$lib/models/show';
 import {
   Ticket,
+  TicketStateType,
   type TicketDocType,
   type TicketType,
 } from '$lib/models/ticket';
@@ -78,7 +79,6 @@ export const getShowMachineService = (show: ShowType) => {
 
 export const getShowMachineServiceFromId = async (showId: string) => {
   mongoose.connect(MONGO_DB_ENDPOINT);
-
   const show = await mongoose
     .model('Show')
     .findById(showId)
@@ -90,48 +90,45 @@ export const getShowMachineServiceFromId = async (showId: string) => {
   return getShowMachineService(show);
 };
 
-export const getTicketMachineService = async (
-  ticket: TicketType,
-  show?: ShowType
-) => {
+export const getTicketMachineService = (ticket: TicketType, show: ShowType) => {
   mongoose.connect(MONGO_DB_ENDPOINT);
-  const _show =
-    show ??
-    (await mongoose
-      .model('Show')
-      .findById(ticket.show)
-      .orFail(() => {
-        throw new Error('Show not found');
-      })
-      .exec());
+
+  const ticketMachineOptions = {
+    saveStateCallback: (ticketState: TicketStateType) => {
+      Ticket.updateOne({ _id: ticket._id }, { $set: { ticketState } }).exec();
+    },
+  };
 
   return createTicketMachineService({
     ticketDocument: ticket,
-    ticketMachineOptions: {
-      saveStateCallback: ticketState => {
-        Ticket.updateOne({ _id: ticket._id }, { $set: { ticketState } }).exec();
-      },
-    },
-    showDocument: _show,
+    ticketMachineOptions,
+    showDocument: show,
     showMachineOptions: {
-      saveStateCallback: async showState => saveState(_show, showState),
+      saveStateCallback: async showState => saveState(show, showState),
       saveShowEventCallback: async ({ type, ticket, transaction }) =>
-        createShowEvent({ show: _show, type, ticket, transaction }),
+        createShowEvent({ show, type, ticket, transaction }),
       jobQueue: showQueue,
     },
   });
 };
 
-export const getTicketMachineServiceFromId = async (ticketId: string) => {
+export const getTicketMachineServiceFromId = async (TicketId: string) => {
   mongoose.connect(MONGO_DB_ENDPOINT);
-
   const ticket = await mongoose
     .model('Ticket')
-    .findById(ticketId)
+    .findById(TicketId)
     .orFail(() => {
       throw new Error('Ticket not found');
     })
     .exec();
 
-  return getTicketMachineService(ticket);
+  const show = await mongoose
+    .model('Show')
+    .findById(ticket.show)
+    .orFail(() => {
+      throw new Error('Ticket not found');
+    })
+    .exec();
+
+  return getTicketMachineService(ticket, show);
 };

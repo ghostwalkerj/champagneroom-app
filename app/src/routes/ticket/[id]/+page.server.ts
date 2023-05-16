@@ -9,7 +9,7 @@ import { Transaction, TransactionReasonType } from '$lib/models/transaction';
 
 import { MONGO_DB_ENDPOINT } from '$env/static/private';
 import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
-import type { ShowType } from '$lib/models/show';
+import { Show, ShowType } from '$lib/models/show';
 import { ActorType } from '$lib/util/constants';
 import { verifyPin } from '$lib/util/pin';
 import {
@@ -25,12 +25,15 @@ const getTicketService = async (ticketId: string) => {
     .orFail(() => {
       throw error(404, 'Ticket not found');
     })
-    .populate('show')
     .exec();
 
-  const show = ticket.show as unknown as ShowType;
+  const show = await Show.findById(ticket.show)
+    .orFail(() => {
+      throw error(404, 'Show not found');
+    })
+    .exec();
 
-  const ticketService = await getTicketMachineService(ticket, show);
+  const ticketService = getTicketMachineService(ticket, show);
   return { ticket, show, ticketService };
 };
 

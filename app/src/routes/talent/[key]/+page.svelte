@@ -79,7 +79,7 @@
         if (_talent.activeShows.length === 0) {
           noCurrentShow();
         } else if (
-          activeShow?._id.toString() !== _talent.activeShows[0]._id.toString()
+          activeShow?._id.toString() !== _talent.activeShows[0].toString()
         ) {
           invalidateAll();
         }

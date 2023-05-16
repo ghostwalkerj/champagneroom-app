@@ -45,6 +45,36 @@
     show.showState.salesStats.totalSales
   );
 
+  let showUnSub: Unsubscriber;
+
+  const setStats = (show: ShowDocType) => {
+    showStatus = show.showState.status;
+    waterMarkText = showStatus;
+    name = show.name;
+    duration = durationFormatter(show.duration);
+    price = currencyFormatter.format(show.price);
+    ticketsAvailable = show.showState.salesStats.ticketsAvailable;
+    ticketsReserved = show.showState.salesStats.ticketsReserved;
+    ticketsSold = show.showState.salesStats.ticketsSold;
+    ticketsRefunded = show.showState.salesStats.ticketsRefunded;
+    totalRefunded = currencyFormatter.format(
+      show.showState.salesStats.totalRefunded
+    );
+    totalSales = currencyFormatter.format(show.showState.salesStats.totalSales);
+  };
+
+  onDestroy(() => {
+    showUnSub?.();
+  });
+
+  onMount(async () => {
+    if (show) {
+      showUnSub = showStore(show).subscribe(s => {
+        s && setStats(s);
+      });
+    }
+  });
+
   const copyShowUrl = () => {
     const showUrl = urlJoin(
       window.location.origin,

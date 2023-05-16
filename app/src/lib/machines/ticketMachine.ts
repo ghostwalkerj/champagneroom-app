@@ -10,15 +10,16 @@ import {
   interpret,
   send,
   spawn,
-  type ActorRef,
   type ActorRefFrom,
   type StateFrom,
 } from 'xstate';
 import {
   createShowMachine,
+  type ShowMachineServiceType,
   type ShowMachineOptions,
   type ShowMachineType,
 } from './showMachine';
+import console from 'console';
 
 export type TicketMachineOptions = {
   saveStateCallback?: (state: TicketStateType) => void;
@@ -87,9 +88,6 @@ export const createTicketMachine = ({
       context: {
         ticketDocument,
         showDocument,
-        ticketStateRef: undefined as
-          | ActorRef<{ type: string }, TicketStateType>
-          | undefined,
         ticketState: JSON.parse(
           JSON.stringify(ticketDocument.ticketState)
         ) as TicketStateType,
@@ -105,7 +103,13 @@ export const createTicketMachine = ({
       predictableActionArguments: true,
       id: 'ticketMachine',
       initial: 'ticketLoaded',
-      entry: assign(() => spawn(parentShowMachine, { sync: true })),
+      entry: assign(() => {
+        const showMachineRef = spawn(parentShowMachine, {
+          name: 'showMachineService',
+          sync: true,
+        });
+        return { showMachineRef };
+      }),
       states: {
         ticketLoaded: {
           always: [
@@ -531,16 +535,43 @@ export const createTicketMachineService = ({
     showDocument,
     showMachineOptions,
   });
-  const ticketServce = interpret(ticketMachine).start();
+  const ticketService = interpret(ticketMachine).start();
 
   if (ticketMachineOptions?.saveStateCallback) {
-    ticketServce.onChange(context => {
+    ticketService.onChange(context => {
       ticketMachineOptions.saveStateCallback &&
         ticketMachineOptions.saveStateCallback(context.ticketState);
     });
   }
 
-  return ticketServce;
+  const showService = ticketService.getSnapshot().children[
+    'showMachineService'
+  ] as ShowMachineServiceType;
+
+  if (showMachineOptions?.saveStateCallback) {
+    showService.onChange(context => {
+      showMachineOptions.saveStateCallback &&
+        showMachineOptions.saveStateCallback(context.showState);
+    });
+  }
+
+  if (showMachineOptions?.saveShowEventCallback) {
+    showService.onEvent(event => {
+      const ticket = ('ticket' in event ? event.ticket : undefined) as
+        | TicketDocType
+        | undefined;
+      const transaction = (
+        'transaction' in event ? event.transaction : undefined
+      ) as TransactionDocType | undefined;
+      showMachineOptions.saveShowEventCallback &&
+        showMachineOptions.saveShowEventCallback({
+          type: event.type,
+          ticket,
+          transaction,
+        });
+    });
+  }
+  return ticketService;
 };
 
 export type ticketMachineType = ReturnType<typeof createTicketMachine>;
