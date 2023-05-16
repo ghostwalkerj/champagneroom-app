@@ -20,7 +20,7 @@
   import type { ShowDocType } from '$lib/models/show';
   import type { ShowEventDocType } from '$lib/models/showEvent';
   import type { TalentDocType } from '$lib/models/talent';
-  import { showEventStore, talentStore, showStore } from '$lib/stores';
+  import { showEventStore, showStore, talentStore } from '$lib/stores';
   import { createEventText } from '$lib/util/eventUtil';
   import { onDestroy, onMount } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
@@ -73,7 +73,7 @@
     showUnSub?.();
   };
 
-  onMount(async () => {
+  onMount(() => {
     talentUnSub = talentStore(talent).subscribe(_talent => {
       if (_talent) {
         if (_talent.activeShows.length === 0) {

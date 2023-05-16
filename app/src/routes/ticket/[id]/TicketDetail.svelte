@@ -22,6 +22,15 @@
       : ticket.ticketState.status
     : '';
   $: showStatus = show ? show.showState.status : '';
+  $: customerName = ticket.ticketState.reservation
+    ? ticket.ticketState.reservation.name
+    : '';
+  $: talentName = show ? show.talentInfo.name : '';
+  $: showName = show ? show.name : '';
+  $: showDuration = show ? durationFormatter(show.duration) : '';
+  $: ticketPrice = show ? currencyFormatter.format(ticket.price) : '';
+  $: showCoverImageUrl = show ? show.coverImageUrl : '';
+  $: ticketPaymentAddress = ticket ? ticket.paymentAddress : '';
 </script>
 
 {#if show && ticket}
@@ -37,29 +46,29 @@
               style="background-image: url('{profileImage}')"
             ></div>
             <div class="pt-2">
-              {ticket.ticketState.reservation?.name}
+              {customerName}
             </div>
           </div>
           <div class="flex flex-col">
             <div>
-              {show.talentInfo.name}
+              {talentName}
             </div>
-            <div>{show.name}</div>
+            <div>{showName}</div>
 
             <div class="">
-              {durationFormatter(show.duration)}
+              {showDuration}
             </div>
             <div class="">
-              {currencyFormatter.format(show.price)}
+              {ticketPrice}
             </div>
           </div>
           <div
             class="relative bg-cover bg-no-repeat bg-center rounded-xl h-32 w-48"
-            style="background-image: url('{show.coverImageUrl}')"
+            style="background-image: url('{showCoverImageUrl}')"
           ></div>
         </div>
         <div class="w-full flex">
-          <div>Payment Address: {ticket.paymentAddress}</div>
+          <div>Payment Address: {ticketPaymentAddress}</div>
         </div>
         <div class="w-full flex">
           <div>Ticket Status: {ticketStatus}</div>

@@ -6,13 +6,16 @@
   import type { ShowDocType } from '$lib/models/show';
   import {
     TicketDisputeReason,
-    type TicketDocType,
     TicketStatus,
+    type TicketDocType,
   } from '$lib/models/ticket';
   import urlJoin from 'url-join';
 
   import type { ActionData, PageData } from './$types';
   import TicketDetail from './TicketDetail.svelte';
+  import type { Unsubscriber } from 'svelte/store';
+  import { onDestroy, onMount } from 'svelte';
+  import { showStore, ticketStore } from '$lib/stores';
 
   export let data: PageData;
   export let form: ActionData;
@@ -24,6 +27,7 @@
   const reasons = Object.values(TicketDisputeReason);
   let ticketMachineService = createTicketMachineService({
     ticketDocument: ticket,
+    showDocument: show,
   });
 
   let needs2Pay = false;
@@ -33,6 +37,8 @@
   let canLeaveFeedback = false;
   let canDispute = false;
   let waitingForShow = false;
+  let showUnSub: Unsubscriber;
+  let ticketUnSub: Unsubscriber;
 
   $: ticketMachineService.subscribe(state => {
     needs2Pay = state.matches('reserved.waiting4Payment');
@@ -51,22 +57,36 @@
     });
 
     waitingForShow = state.matches('reserved.waiting4Show') && !canWatchShow;
-
     ticketDone = state.done ?? false;
   });
 
-  $: waiting4StateChange = false;
+  $: loading = false;
+
+  onMount(() => {
+    showUnSub = showStore(show).subscribe(showDoc => {
+      show = showDoc;
+    });
+    ticketUnSub = ticketStore(ticket).subscribe(ticketDoc => {
+      ticket = ticketDoc;
+    });
+  });
+
+  onDestroy(() => {
+    showUnSub?.();
+    ticketUnSub?.();
+  });
 
   const onSubmit = () => {
-    waiting4StateChange = true;
+    loading = true;
     return async ({ result }) => {
       if (result.type === 'failure') {
-        waiting4StateChange = false;
+        loading = false;
       }
       if (result.data.ticketCancelled) {
         ticketDone = true;
         ticket.ticketState.status = TicketStatus.CANCELLED;
       }
+      loading = false;
       await applyAction(result);
     };
   };
@@ -90,7 +110,7 @@
       {#if !ticketDone}
         {#if needs2Pay}
           <div>
-            {#if waiting4StateChange}
+            {#if loading}
               <div class="p-4">
                 <div class="w-full flex justify-center">
                   <button class="btn loading" disabled="{true}"
@@ -105,10 +125,8 @@
                 use:enhance="{onSubmit}"
               >
                 <div class="w-full flex justify-center">
-                  <button
-                    class="btn"
-                    type="submit"
-                    disabled="{waiting4StateChange}">Send Payment</button
+                  <button class="btn" type="submit" disabled="{loading}"
+                    >Send Payment</button
                   >
                 </div>
               </form>
@@ -119,7 +137,7 @@
             <div class="w-full flex justify-center">
               <button
                 class="btn"
-                disabled="{waiting4StateChange}"
+                disabled="{loading}"
                 on:click="{() => {
                   goto(showPath);
                 }}">Go to the Show</button
@@ -135,10 +153,8 @@
               use:enhance="{onSubmit}"
             >
               <div class="w-full flex justify-center">
-                <button
-                  class="btn"
-                  type="submit"
-                  disabled="{waiting4StateChange}">Cancel Ticket</button
+                <button class="btn" type="submit" disabled="{loading}"
+                  >Cancel Ticket</button
                 >
               </div>
             </form>
@@ -225,7 +241,7 @@
                   </div>
 
                   <div class="py-4 text-center">
-                    {#if waiting4StateChange}
+                    {#if loading}
                       <button
                         class="btn btn-secondary loading"
                         type="submit"
@@ -235,7 +251,7 @@
                       <button
                         class="btn btn-secondary"
                         type="submit"
-                        disabled="{waiting4StateChange}">Submit</button
+                        disabled="{loading}">Submit</button
                       >
                     {/if}
                   </div>
@@ -312,7 +328,7 @@
                   </div>
 
                   <div class="py-4 text-center">
-                    {#if waiting4StateChange}
+                    {#if loading}
                       <button
                         class="btn btn-secondary loading"
                         type="submit"
@@ -322,7 +338,7 @@
                       <button
                         class="btn btn-secondary"
                         type="submit"
-                        disabled="{waiting4StateChange}">Submit</button
+                        disabled="{loading}">Submit</button
                       >
                     {/if}
                   </div>

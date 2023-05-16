@@ -1,13 +1,12 @@
 <script lang="ts">
   import { PUBLIC_SHOW_PATH } from '$env/static/public';
   import type { ShowDocType } from '$lib/models/show';
-  import type { TalentDocType } from '$lib/models/talent';
+  import { showStore } from '$lib/stores';
   import { currencyFormatter, durationFormatter } from '$lib/util/constants';
   import { onDestroy, onMount } from 'svelte';
   import StarRating from 'svelte-star-rating';
   import type { Unsubscriber } from 'svelte/store';
   import urlJoin from 'url-join';
-  import { showStore } from '$lib/stores';
 
   type ShowDetailOptions = {
     showCopy?: boolean;
@@ -45,36 +44,6 @@
   $: totalSales = currencyFormatter.format(
     show.showState.salesStats.totalSales
   );
-
-  let showUnSub: Unsubscriber;
-
-  const setStats = (show: ShowDocType) => {
-    showStatus = show.showState.status;
-    waterMarkText = showStatus;
-    name = show.name;
-    duration = durationFormatter(show.duration);
-    price = currencyFormatter.format(show.price);
-    ticketsAvailable = show.showState.salesStats.ticketsAvailable;
-    ticketsReserved = show.showState.salesStats.ticketsReserved;
-    ticketsSold = show.showState.salesStats.ticketsSold;
-    ticketsRefunded = show.showState.salesStats.ticketsRefunded;
-    totalRefunded = currencyFormatter.format(
-      show.showState.salesStats.totalRefunded
-    );
-    totalSales = currencyFormatter.format(show.showState.salesStats.totalSales);
-  };
-
-  onDestroy(() => {
-    showUnSub?.();
-  });
-
-  onMount(async () => {
-    if (show) {
-      showUnSub = showStore(show).subscribe(s => {
-        s && setStats(s);
-      });
-    }
-  });
 
   const copyShowUrl = () => {
     const showUrl = urlJoin(
