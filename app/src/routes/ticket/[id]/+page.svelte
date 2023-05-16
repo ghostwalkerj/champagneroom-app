@@ -97,7 +97,9 @@
     <div class="min-w-full">
       <!-- Page header -->
       <div class="pb-4 text-center relative">
-        <TicketDetail ticket="{ticket}" show="{show}" />
+        {#key ticket && show}
+          <TicketDetail ticket="{ticket}" show="{show}" />
+        {/key}
         {#if waitingForShow}
           <div
             class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-4xl -rotate-12 whitespace-nowrap font-extrabold text-primary ring-2 ring-primary bg-base-200/50 p-2 ring-inset rounded-xl"
