@@ -35,7 +35,7 @@
             <div
               class="bg-cover bg-no-repeat rounded-full h-24 w-24 row-span-2"
               style="background-image: url('{profileImage}')"
-            />
+            ></div>
             <div class="pt-2">
               {ticket.ticketState.reservation.name}
             </div>
@@ -56,7 +56,7 @@
           <div
             class="relative bg-cover bg-no-repeat bg-center rounded-xl h-32 w-48"
             style="background-image: url('{show.talentInfo.profileImageUrl}')"
-          />
+          ></div>
         </div>
         <div class="w-full flex">
           <div>Payment Address: {ticket.paymentAddress}</div>

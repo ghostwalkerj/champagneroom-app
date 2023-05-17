@@ -58,7 +58,7 @@
 </script>
 
 {#if !$selectedAccount}
-  <button class="btn" on:click={connect}>Connect Wallet</button>
+  <button class="btn" on:click="{connect}">Connect Wallet</button>
 {:else}
   <div>
     <div class="card card-side bordered">
@@ -76,7 +76,7 @@
                 $selectedAccount.length
               )}
             </div>
-            <JazzIcon address={$selectedAccount} />
+            <JazzIcon address="{$selectedAccount}" />
           </div>
         </label>
         <input type="checkbox" id="my-modal-2" class="modal-toggle" />
@@ -98,13 +98,13 @@
             <p class="text-sm text-gray-400">Connected with MetaMask</p>
             <button
               class="border font-medium border-[#610094] rounded-3xl shadow-sm text-xs py-1.5 px-2.5 text-gray-400 inline-flex items-center hover:border-indigo-400 hover:text-indigo-500 hover:underline focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              on:click={disable}
+              on:click="{disable}"
             >
               Change
             </button>
           </div>
           <div class="flex mt-2 mb-4 leading-4 items-center align-middle">
-            <JazzIcon address={$selectedAccount} />
+            <JazzIcon address="{$selectedAccount}" />
 
             <div class="font-semibold text-xl ml-2 text-gray-200">
               {$selectedAccount.slice(0, 14)}...{$selectedAccount.slice(
@@ -114,7 +114,7 @@
             </div>
           </div>
           <div class="flex justify-start">
-            <button on:click={copyAddress}>
+            <button on:click="{copyAddress}">
               <div class="cursor-pointer flex group">
                 <div class="h-5 mr-1 mb-1 pl-2 group-hover:text-white">
                   <FaRegCopy />
@@ -132,7 +132,7 @@
 
             <div class="pl-6 group">
               <a
-                href={`https://etherscan.io/address/${$selectedAccount}`}
+                href="{`https://etherscan.io/address/${$selectedAccount}`}"
                 target="_blank"
                 rel="noreferrer"
               >

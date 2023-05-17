@@ -125,8 +125,8 @@
   <div class="p-2">
     {#key talentRows}
       <SvelteTable
-        {columns}
-        rows={talentRows}
+        columns="{columns}"
+        rows="{talentRows}"
         classNameTable="w-full bg-white  rounded-xl"
         classNameTbody="divide-y border-3 rounded-xl"
         classNameCell="text-sm py-4 px-3 m-10 text-gray-500 whitespace-nowrap "

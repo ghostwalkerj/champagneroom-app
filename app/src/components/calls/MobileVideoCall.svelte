@@ -94,11 +94,10 @@
   >
     <!-- svelte-ignore a11y-media-has-caption -->
     <video
-      bind:this={remoteVideo}
+      bind:this="{remoteVideo}"
       playsinline
       autoplay
-      class="h-full object-cover w-full"
-    />
+      class="h-full object-cover w-full"></video>
   </section>
 
   <section
@@ -107,7 +106,7 @@
     <div class="flex flex-col gap-2 items-center">
       {#if $callMachineState.matches('ready4Call')}
         <button
-          disabled={!buttonOptions.makeCall}
+          disabled="{!buttonOptions.makeCall}"
           class="h-14 w-14 btn btn-circle"
         >
           <PhoneIcon size="34" />
@@ -116,7 +115,7 @@
       {:else if $callMachineState.matches('makingCall')}
         <button
           class="h-14 animate-flash animate-loop w-14 animated btn btn-circle"
-          disabled={!buttonOptions.makeCall}
+          disabled="{!buttonOptions.makeCall}"
         >
           <PhoneOutgoingIcon size="34" />
         </button>
@@ -124,14 +123,14 @@
       {:else if $callMachineState.matches('receivingCall')}
         <button
           class="h-14 animate-shock animate-loop w-14 animated btn btn-circle"
-          on:click={() => vc.acceptCall(mediaStream)}
-          disabled={!buttonOptions.answerCall}
+          on:click="{() => vc.acceptCall(mediaStream)}"
+          disabled="{!buttonOptions.answerCall}"
         >
           <PhoneIncomingIcon size="34" />
         </button>
         Answer
       {:else}
-        <button class="h-14 w-14 btn btn-circle" disabled={true}>
+        <button class="h-14 w-14 btn btn-circle" disabled="{true}">
           <PhoneCallIcon size="34" />
         </button>
         In Call
@@ -141,7 +140,7 @@
     <div class="flex flex-col gap-2 items-center">
       <button
         class="h-14 w-14 btn btn-circle"
-        on:click={() => camMachine.send('TOGGLE')}
+        on:click="{() => camMachine.send('TOGGLE')}"
       >
         {#if $camState.matches('on')}
           <VideoIcon size="34" />
@@ -156,7 +155,7 @@
       <div class="flex flex-col gap-2 items-center">
         <button
           class="h-14 w-14 btn btn-circle"
-          on:click={() => micMachine.send('TOGGLE')}
+          on:click="{() => micMachine.send('TOGGLE')}"
         >
           {#if $micState.matches('on')}
             <MicIcon size="34" />
@@ -172,8 +171,8 @@
       {#if $callMachineState.matches('receivingCall')}
         <button
           class="h-14 w-14 btn-primary btn btn-circle"
-          on:click={() => vc.rejectCall()}
-          disabled={!buttonOptions.rejectCall}
+          on:click="{() => vc.rejectCall()}"
+          disabled="{!buttonOptions.rejectCall}"
         >
           <PhoneMissedIcon size="34" />
         </button>
@@ -181,8 +180,8 @@
       {:else if $callMachineState.matches('makingCall')}
         <button
           class="h-14 w-14 btn btn-circle btn-primary"
-          on:click={() => vc.cancelCall()}
-          disabled={!buttonOptions.rejectCall}
+          on:click="{() => vc.cancelCall()}"
+          disabled="{!buttonOptions.rejectCall}"
         >
           <PhoneMissedIcon size="34" />
         </button>
@@ -190,8 +189,8 @@
       {:else if $callMachineState.matches('inCall')}
         <button
           class="h-14 w-14 btn btn-circle btn-primary"
-          on:click={() => vc.hangUp()}
-          disabled={!buttonOptions.hangup}
+          on:click="{() => vc.hangUp()}"
+          disabled="{!buttonOptions.hangup}"
         >
           <PhoneMissedIcon size="34" />
         </button>
@@ -199,8 +198,8 @@
       {:else}
         <button
           class="h-14 w-14 btn btn-primary btn-circle"
-          on:click={() => vc.cancelCall()}
-          disabled={!buttonOptions.hangup}
+          on:click="{() => vc.cancelCall()}"
+          disabled="{!buttonOptions.hangup}"
         >
           <div class="h-8 w-8"><MdClose /></div></button
         >

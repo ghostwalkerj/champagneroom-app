@@ -18,7 +18,7 @@
 </script>
 
 {#key row.id}
-  <button on:click={copyUrl}>
+  <button on:click="{copyUrl}">
     <div class="cursor-pointer flex group">
       <div class="h-5 mr-1 mb-1 pl-2 group-hover:text-black">
         <FaRegCopy />

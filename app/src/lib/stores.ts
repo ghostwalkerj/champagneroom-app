@@ -95,8 +95,7 @@ export const showEventStore = (show: ShowDocType) => {
         getChangeset(
           urlJoin(PUBLIC_CHANGESET_PATH, 'showEvent', $show._id.toString()),
           set,
-          showEventSignal,
-          showCancel
+          showEventSignal
         );
         return () => {
           abortShowEvent.abort();

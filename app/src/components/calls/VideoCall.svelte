@@ -109,21 +109,21 @@
 </script>
 
 <svelte:component
-  this={Moveable}
-  draggable={true}
-  resizable={true}
-  keepRatio={true}
-  {target}
-  throttleDrag={0}
-  on:dragStart={({ detail: { set } }) => {
+  this="{Moveable}"
+  draggable="{true}"
+  resizable="{true}"
+  keepRatio="{true}"
+  target="{target}"
+  throttleDrag="{0}"
+  on:dragStart="{({ detail: { set } }) => {
     set(frame.translate);
-  }}
-  on:drag={({ detail: { target, beforeTranslate } }) => {
+  }}"
+  on:drag="{({ detail: { target, beforeTranslate } }) => {
     frame.translate = beforeTranslate;
     target.style.transform = `translate(${beforeTranslate[0]}px, ${beforeTranslate[1]}px)`;
-  }}
-  on:dragEnd={({ detail: { target, isDrag, clientX, clientY } }) => {}}
-  on:resizeStart={({ detail: { target, set, setOrigin, dragStart } }) => {
+  }}"
+  on:dragEnd="{({ detail: { target, isDrag, clientX, clientY } }) => {}}"
+  on:resizeStart="{({ detail: { target, set, setOrigin, dragStart } }) => {
     // Set origin if transform-origin use %.
     setOrigin(['%', '%']);
 
@@ -135,16 +135,16 @@
 
     // If a drag event has already occurred, there is no dragStart.
     dragStart && dragStart.set(frame.translate);
-  }}
-  on:resize={({ detail: { target, width, height, drag } }) => {
+  }}"
+  on:resize="{({ detail: { target, width, height, drag } }) => {
     target.style.width = `${width}px`;
     target.style.height = `${height}px`;
 
     // get drag event
     frame.translate = drag.beforeTranslate;
     target.style.transform = `translate(${drag.beforeTranslate[0]}px, ${drag.beforeTranslate[1]}px)`;
-  }}
-  on:resizeEnd={({ detail: { target, isDrag, clientX, clientY } }) => {}}
+  }}"
+  on:resizeEnd="{({ detail: { target, isDrag, clientX, clientY } }) => {}}"
 />
 
 <div class="w-full">
@@ -154,22 +154,21 @@
     <div class="flex flex-col m-2 relative">
       <div
         class="rounded-xl border-2 h-68 p-2 w-120 z-10 absolute"
-        bind:this={target}
+        bind:this="{target}"
       >
         <!-- svelte-ignore a11y-media-has-caption -->
-        <video bind:this={localVideo} playsinline autoplay />
+        <video bind:this="{localVideo}" playsinline autoplay></video>
       </div>
 
       <div class="h-full w-full align-top">
         <!-- svelte-ignore a11y-media-has-caption -->
         <video
-          bind:this={remoteVideo}
+          bind:this="{remoteVideo}"
           playsinline
           autoplay
-          class="h-full object-cover w-full"
-        />
+          class="h-full object-cover w-full"></video>
       </div>
-      <canvas bind:this={canvas} />
+      <canvas bind:this="{canvas}"></canvas>
     </div>
   </section>
 
@@ -179,7 +178,7 @@
     <div class="flex flex-col gap-2 items-center">
       {#if $callMachineState.matches('ready4Call')}
         <button
-          disabled={!buttonOptions.makeCall}
+          disabled="{!buttonOptions.makeCall}"
           class="h-14 w-14 btn btn-circle"
         >
           <PhoneIcon size="34" />
@@ -188,7 +187,7 @@
       {:else if $callMachineState.matches('makingCall')}
         <button
           class="h-14 animate-flash animate-loop w-14 animated btn btn-circle"
-          disabled={!buttonOptions.makeCall}
+          disabled="{!buttonOptions.makeCall}"
         >
           <PhoneOutgoingIcon size="34" />
         </button>
@@ -196,14 +195,14 @@
       {:else if $callMachineState.matches('receivingCall')}
         <button
           class="h-14 animate-shock animate-loop w-14 animated btn btn-circle"
-          on:click={() => vc.acceptCall(mediaStream)}
-          disabled={!buttonOptions.answerCall}
+          on:click="{() => vc.acceptCall(mediaStream)}"
+          disabled="{!buttonOptions.answerCall}"
         >
           <PhoneIncomingIcon size="34" />
         </button>
         Answer
       {:else}
-        <button class="h-14 w-14 btn btn-circle" disabled={true}>
+        <button class="h-14 w-14 btn btn-circle" disabled="{true}">
           <PhoneCallIcon size="34" />
         </button>
         In Call
@@ -213,7 +212,7 @@
     <div class="flex flex-col gap-2 items-center">
       <button
         class="h-14 w-14 btn btn-circle"
-        on:click={() => camService.send('TOGGLE')}
+        on:click="{() => camService.send('TOGGLE')}"
       >
         {#if camState?.matches('on')}
           <VideoIcon size="34" />
@@ -228,7 +227,7 @@
       <div class="flex flex-col gap-2 items-center">
         <button
           class="h-14 w-14 btn btn-circle"
-          on:click={() => micService.send('TOGGLE')}
+          on:click="{() => micService.send('TOGGLE')}"
         >
           {#if micState?.matches('on')}
             <MicIcon size="34" />
@@ -244,8 +243,8 @@
       {#if $callMachineState.matches('receivingCall')}
         <button
           class="h-14 w-14 btn-primary btn btn-circle"
-          on:click={() => vc.rejectCall()}
-          disabled={!buttonOptions.rejectCall}
+          on:click="{() => vc.rejectCall()}"
+          disabled="{!buttonOptions.rejectCall}"
         >
           <PhoneMissedIcon size="34" />
         </button>
@@ -253,8 +252,8 @@
       {:else if $callMachineState.matches('makingCall')}
         <button
           class="h-14 w-14 btn btn-circle btn-primary"
-          on:click={() => vc.cancelCall()}
-          disabled={!buttonOptions.rejectCall}
+          on:click="{() => vc.cancelCall()}"
+          disabled="{!buttonOptions.rejectCall}"
         >
           <PhoneMissedIcon size="34" />
         </button>
@@ -262,8 +261,8 @@
       {:else if $callMachineState.matches('inCall')}
         <button
           class="h-14 w-14 btn btn-circle btn-primary"
-          on:click={() => vc.hangUp()}
-          disabled={!buttonOptions.hangup}
+          on:click="{() => vc.hangUp()}"
+          disabled="{!buttonOptions.hangup}"
         >
           <PhoneMissedIcon size="34" />
         </button>
@@ -271,8 +270,8 @@
       {:else}
         <button
           class="h-14 w-14 btn btn-primary btn-circle"
-          on:click={() => vc.cancelCall()}
-          disabled={!buttonOptions.hangup}
+          on:click="{() => vc.cancelCall()}"
+          disabled="{!buttonOptions.hangup}"
         >
           <div class="h-8 w-8"><MdClose /></div></button
         >

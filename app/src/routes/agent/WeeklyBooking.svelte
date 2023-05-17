@@ -80,7 +80,7 @@
     {#if talents && talents.length != 0}
       {#if talentData.length > 0}
         {#key talentData}
-          <Line {data} {options} />
+          <Line data="{data}" options="{options}" />
         {/key}
       {:else}
         <div class="text-center">

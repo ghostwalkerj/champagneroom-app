@@ -48,7 +48,7 @@
 <div class=" h-full w-full">
   <div class="w-full p-1 transform -scale-x-100">
     <!-- svelte-ignore a11y-media-has-caption -->
-    <video bind:this={localVideo} playsinline autoplay />
+    <video bind:this="{localVideo}" playsinline autoplay></video>
   </div>
   {#if initialized}
     <section
@@ -57,7 +57,7 @@
       <div class="flex flex-col gap-2 items-center">
         <button
           class="h-14 w-14 btn btn-circle"
-          on:click={() => camService.send('TOGGLE')}
+          on:click="{() => camService.send('TOGGLE')}"
         >
           {#if camState?.matches('on')}
             <VideoIcon size="34" />
@@ -70,7 +70,7 @@
       <div class="flex flex-col gap-2 items-center">
         <button
           class="h-14 w-14 btn btn-circle"
-          on:click={() => micService.send('TOGGLE')}
+          on:click="{() => micService.send('TOGGLE')}"
         >
           {#if micState?.matches('on')}
             <MicIcon size="34" />

@@ -58,20 +58,19 @@
 
 <div class="flex flex-col">
   <video
-    bind:this={localVideo}
+    bind:this="{localVideo}"
     muted
     autoplay
     playsinline
     preload="none"
     class="rounded-xl p-2 max-h-screen -scale-x-100"
-    on:click={toggleVideo}
-  />
+    on:click="{toggleVideo}"></video>
   <!-- svelte-ignore a11y-click-events-have-key-events -->
 
   {#if showOverlay}
     <div
       class="absolute inset-0 flex justify-center items-center z-10"
-      on:click={toggleVideo}
+      on:click="{toggleVideo}"
     >
       <p class="text-2xl font-bold">Click to Start Video</p>
     </div>
@@ -81,7 +80,7 @@
       class="flex bg-base-100 flex-shrink-0 text-white p-4 gap-4 items-center justify-center md:rounded-2xl md:gap-8"
     >
       <div class="flex flex-col gap-2 items-center">
-        <button class="h-14 w-14 btn btn-circle" on:click={toggleVideo}>
+        <button class="h-14 w-14 btn btn-circle" on:click="{toggleVideo}">
           {#if $camState.matches('on')}
             <VideoIcon size="34" />
           {:else}
@@ -93,7 +92,7 @@
       <div class="flex flex-col gap-2 items-center">
         <button
           class="h-14 w-14 btn btn-circle"
-          on:click={() => micSend('TOGGLE')}
+          on:click="{() => micSend('TOGGLE')}"
         >
           {#if $micState.matches('on')}
             <MicIcon size="34" />

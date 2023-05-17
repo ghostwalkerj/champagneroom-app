@@ -1,9 +1,7 @@
 <script lang="ts">
   import { PUBLIC_SHOW_PATH } from '$env/static/public';
   import type { ShowDocType } from '$lib/models/show';
-  import { showStore } from '$lib/stores';
   import { currencyFormatter, durationFormatter } from '$lib/util/constants';
-  import { onDestroy, onMount } from 'svelte';
   import StarRating from 'svelte-star-rating';
   import type { Unsubscriber } from 'svelte/store';
   import urlJoin from 'url-join';

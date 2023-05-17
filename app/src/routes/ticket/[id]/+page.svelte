@@ -34,6 +34,9 @@
   let waitingForShow = false;
   let showUnSub: Unsubscriber;
   let ticketUnSub: Unsubscriber;
+  let showPaymentLoading = false;
+  let showCancelLoading = false;
+  $: loading = false;
 
   const useTicketMachine = (ticketMachineService: TicketMachineServiceType) => {
     const state = ticketMachineService.getSnapshot();
@@ -55,8 +58,6 @@
     waitingForShow = state.matches('reserved.waiting4Show') && !canWatchShow;
     ticketDone = state.done ?? false;
   };
-
-  $: loading = false;
 
   onMount(() => {
     ticketStore(ticket).subscribe(ticketDoc => {
@@ -85,7 +86,12 @@
     ticketUnSub?.();
   });
 
-  const onSubmit = () => {
+  const onSubmit = (form: HTMLFormElement) => {
+    if (form.name === 'buyTicket') {
+      showPaymentLoading = true;
+    } else if (form.name === 'cancelTicket') {
+      showCancelLoading = true;
+    }
     loading = true;
     return async ({ result }) => {
       if (result.type === 'failure') {
@@ -129,10 +135,10 @@
       {#if !ticketDone}
         {#if needs2Pay}
           <div>
-            {#if loading}
+            {#if showPaymentLoading}
               <div class="p-4">
                 <div class="w-full flex justify-center">
-                  <button class="btn loading" disabled="{true}"
+                  <button class="btn btn-secondary loading" disabled="{true}"
                     >Sending Payment</button
                   >
                 </div>
@@ -141,11 +147,14 @@
               <form
                 method="post"
                 action="?/buy_ticket"
-                use:enhance="{onSubmit}"
+                name="buyTicket"
+                use:enhance="{({ form }) => onSubmit(form)}"
               >
                 <div class="w-full flex justify-center">
-                  <button class="btn" type="submit" disabled="{loading}"
-                    >Send Payment</button
+                  <button
+                    class="btn btn-secondary"
+                    type="submit"
+                    disabled="{loading}">Send Payment</button
                   >
                 </div>
               </form>
@@ -155,7 +164,7 @@
           <div class="p-4">
             <div class="w-full flex justify-center">
               <button
-                class="btn"
+                class="btn btn-secondary"
                 disabled="{loading}"
                 on:click="{() => {
                   goto(showPath);
@@ -165,19 +174,32 @@
           </div>
         {/if}
         {#if canCancelTicket}
-          <div class="p-4">
-            <form
-              method="post"
-              action="?/cancel_ticket"
-              use:enhance="{onSubmit}"
-            >
+          {#if showCancelLoading}
+            <div class="p-4">
               <div class="w-full flex justify-center">
-                <button class="btn" type="submit" disabled="{loading}"
-                  >Cancel Ticket</button
+                <button class="btn btn-secondary loading" disabled="{true}"
+                  >Cancelling</button
                 >
               </div>
-            </form>
-          </div>
+            </div>
+          {:else}
+            <div class="p-4">
+              <form
+                method="post"
+                action="?/cancel_ticket"
+                name="cancelTicket"
+                use:enhance="{({ form }) => onSubmit(form)}"
+              >
+                <div class="w-full flex justify-center">
+                  <button
+                    class="btn btn-secondary"
+                    type="submit"
+                    disabled="{loading}">Cancel Ticket</button
+                  >
+                </div>
+              </form>
+            </div>
+          {/if}
         {/if}
         {#if canLeaveFeedback}
           <input type="checkbox" id="leave-feedback" class="modal-toggle" />
@@ -194,7 +216,7 @@
                 <form
                   method="post"
                   action="?/leave_feedback"
-                  use:enhance="{onSubmit}"
+                  use:enhance="{({ form }) => onSubmit(form)}"
                 >
                   <div class="max-w-xs w-full py-2 form-control">
                     <!-- svelte-ignore a11y-label-has-associated-control -->
@@ -280,7 +302,9 @@
           </div>
           <div class="p-4">
             <div class="w-full flex justify-center">
-              <label for="leave-feedback" class="btn">Leave Feedback</label>
+              <label for="leave-feedback" class="btn btn-secondary"
+                >Leave Feedback</label
+              >
             </div>
           </div>
         {/if}
@@ -305,7 +329,7 @@
                 <form
                   method="post"
                   action="?/initiate_dispute"
-                  use:enhance="{onSubmit}"
+                  use:enhance="{({ form }) => onSubmit(form)}"
                 >
                   <div class="max-w-xs w-full py-2 form-control">
                     <!-- svelte-ignore a11y-label-has-associated-control -->
@@ -367,7 +391,9 @@
           </div>
           <div class="p-4">
             <div class="w-full flex justify-center">
-              <label for="initiate-dispute" class="btn">Initiate Dispute</label>
+              <label for="initiate-dispute" class="btn btn-secondary"
+                >Initiate Dispute</label
+              >
             </div>
           </div>
         {/if}

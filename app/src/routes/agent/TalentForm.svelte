@@ -30,19 +30,19 @@
     <h2 class="text-2xl card-title">Add New Talent</h2>
 
     <div class="text-white text-left whitespace-nowrap">
-      <form method="post" action="?/create_talent" use:enhance={onSubmit}>
+      <form method="post" action="?/create_talent" use:enhance="{onSubmit}">
         <div class="max-w-xs py-2 form-control">
           <!-- svelte-ignore a11y-label-has-associated-control -->
           <label class="label">
             <span class="label-text">Talent Name</span>
           </label>
-          <input type="hidden" name="agentId" value={agent._id} />
+          <input type="hidden" name="agentId" value="{agent._id}" />
           <input
             type="text"
             name="name"
             placeholder="Enter a name"
             class="max-w-xs py-2 input input-bordered input-primary"
-            bind:value={talentName}
+            bind:value="{talentName}"
             minlength="3"
             maxlength="50"
           />
@@ -77,7 +77,7 @@
           </div>
         {/if}
         <div class="py-4">
-          <button class="btn btn-secondary" type="submit" disabled={loading}
+          <button class="btn btn-secondary" type="submit" disabled="{loading}"
             >Save</button
           >
         </div>
