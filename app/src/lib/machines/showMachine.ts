@@ -147,6 +147,7 @@ export const createShowMachine = ({
         cancelled: {
           type: 'final',
           tags: ['canCreateShow'],
+          entry: ['deactivateShow'],
         },
         inEscrow: {
           tags: ['canCreateShow'],
@@ -162,6 +163,7 @@ export const createShowMachine = ({
         finalized: {
           type: 'final',
           tags: ['canCreateShow'],
+          entry: ['deactivateShow'],
         },
         boxOfficeOpen: {
           tags: ['uiSubscribe'],
@@ -431,6 +433,15 @@ export const createShowMachine = ({
                 startDate: context.showState.escrow.startDate,
                 endDate: new Date(),
               },
+            },
+          };
+        }),
+
+        deactivateShow: assign(context => {
+          return {
+            showState: {
+              ...context.showState,
+              active: false,
             },
           };
         }),

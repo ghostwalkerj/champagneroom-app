@@ -122,6 +122,7 @@ const showStateSchema = new Schema(
       required: true,
       default: ShowStatus.CREATED,
     },
+    active: { type: Boolean, required: true, default: true },
     salesStats: {
       type: salesStatsSchema,
       required: true,

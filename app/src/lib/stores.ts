@@ -3,10 +3,10 @@ import to from 'await-to-js';
 import { derived, writable } from 'svelte/store';
 import urlJoin from 'url-join';
 import type { AgentDocType } from './models/agent';
-import { ShowStatus, type ShowDocType } from './models/show';
+import type { ShowDocType } from './models/show';
 import type { ShowEventDocType } from './models/showEvent';
 import type { TalentDocType } from './models/talent';
-import { TicketStatus, type TicketDocType } from './models/ticket';
+import type { TicketDocType } from './models/ticket';
 
 export const browserType = writable();
 
@@ -65,12 +65,8 @@ export const talentStore = (talent: TalentDocType) => {
 };
 
 export const showStore = (show: ShowDocType) => {
-  const showCancel = (show: ShowDocType) => {
-    return (
-      show.showState.status === ShowStatus.CANCELLED ||
-      show.showState.status === ShowStatus.FINALIZED
-    );
-  };
+  const showCancel = (show: ShowDocType) => !show.showState.active;
+
   return abstractStore(
     show,
     urlJoin(PUBLIC_CHANGESET_PATH, 'show', show._id.toString()),
@@ -79,12 +75,7 @@ export const showStore = (show: ShowDocType) => {
 };
 
 export const showEventStore = (show: ShowDocType) => {
-  const showCancel = (show: ShowDocType) => {
-    return (
-      show.showState.status === ShowStatus.CANCELLED ||
-      show.showState.status === ShowStatus.FINALIZED
-    );
-  };
+  const showCancel = (show: ShowDocType) => !show.showState.active;
   const _showStore = writable<ShowDocType>(show);
   const _showEventStore = derived<typeof _showStore, ShowEventDocType>(
     _showStore,
@@ -110,12 +101,7 @@ export const showEventStore = (show: ShowDocType) => {
 };
 
 export const ticketStore = (ticket: TicketDocType) => {
-  const ticketCancel = (ticket: TicketDocType) => {
-    return (
-      ticket.ticketState.status === TicketStatus.CANCELLED ||
-      ticket.ticketState.status === TicketStatus.FINALIZED
-    );
-  };
+  const ticketCancel = (ticket: TicketDocType) => !ticket.ticketState.active;
   return abstractStore(
     ticket,
     urlJoin(PUBLIC_CHANGESET_PATH, 'ticket', ticket._id.toString()),

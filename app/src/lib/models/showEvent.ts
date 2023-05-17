@@ -16,7 +16,7 @@ const showeventSchema = new Schema(
         name: { type: String },
         price: { type: Number },
       },
-      required: false,
+      required: true,
     },
   },
   { timestamps: true }

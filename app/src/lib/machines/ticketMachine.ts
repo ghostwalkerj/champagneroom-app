@@ -256,9 +256,11 @@ export const createTicketMachine = ({
         },
         cancelled: {
           type: 'final',
+          entry: ['deactivateTicket'],
         },
         finalized: {
           type: 'final',
+          entry: ['deactivateTicket'],
         },
         ended: {
           initial: 'inEscrow',
@@ -448,6 +450,15 @@ export const createTicketMachine = ({
             };
           }
           return {};
+        }),
+
+        deactivateTicket: assign(context => {
+          return {
+            ticketState: {
+              ...context.ticketState,
+              active: false,
+            },
+          };
         }),
 
         missShow: assign(context => {

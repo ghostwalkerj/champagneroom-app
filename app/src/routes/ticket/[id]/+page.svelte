@@ -60,25 +60,27 @@
   };
 
   onMount(() => {
-    ticketStore(ticket).subscribe(ticketDoc => {
-      ticket = ticketDoc;
-      useTicketMachine(
-        createTicketMachineService({
-          ticketDocument: ticket,
-          showDocument: show,
-        })
-      );
-    });
+    if (ticket.ticketState.active) {
+      ticketStore(ticket).subscribe(ticketDoc => {
+        ticket = ticketDoc;
+        useTicketMachine(
+          createTicketMachineService({
+            ticketDocument: ticket,
+            showDocument: show,
+          })
+        );
+      });
 
-    showStore(show).subscribe(showDoc => {
-      show = showDoc;
-      useTicketMachine(
-        createTicketMachineService({
-          ticketDocument: ticket,
-          showDocument: show,
-        })
-      );
-    });
+      showStore(show).subscribe(showDoc => {
+        show = showDoc;
+        useTicketMachine(
+          createTicketMachineService({
+            ticketDocument: ticket,
+            showDocument: show,
+          })
+        );
+      });
+    }
   });
 
   onDestroy(() => {

@@ -4,7 +4,8 @@ import * as timeago from 'timeago.js';
 
 export const createEventText = (showEvent: ShowEventDocType) => {
   let eventText =
-    timeago.format(showEvent.createdAt) + ' ' + showEvent.ticketInfo.name;
+    timeago.format(showEvent.createdAt) + ' ' + showEvent.ticketInfo.name ??
+    'someone';
 
   switch (showEvent.type) {
     case 'TICKET SOLD':
