@@ -166,7 +166,6 @@ export const createShowMachine = ({
           entry: ['deactivateShow'],
         },
         boxOfficeOpen: {
-          tags: ['uiSubscribe'],
           on: {
             'REQUEST CANCELLATION': [
               {
@@ -211,7 +210,6 @@ export const createShowMachine = ({
           },
         },
         boxOfficeClosed: {
-          tags: ['uiSubscribe'],
           on: {
             'START SHOW': {
               cond: 'canStartShow',
@@ -252,8 +250,6 @@ export const createShowMachine = ({
           },
         },
         started: {
-          tags: ['uiSubscribe'],
-
           on: {
             'START SHOW': {
               actions: ['startShow'],
@@ -267,8 +263,6 @@ export const createShowMachine = ({
           },
         },
         stopped: {
-          tags: ['uiSubscribe'],
-
           on: {
             'START SHOW': {
               target: 'started',
@@ -280,8 +274,6 @@ export const createShowMachine = ({
           },
         },
         requestedCancellation: {
-          tags: ['uiSubscribe'],
-
           initial: 'waiting2Refund',
           states: {
             waiting2Refund: {
@@ -481,9 +473,12 @@ export const createShowMachine = ({
           return {
             showState: {
               ...state,
-              ticketsSold: state.salesStats.ticketsSold + 1,
-              totalSales:
-                state.salesStats.totalSales + +event.transaction.value,
+              salesStats: {
+                ...state.salesStats,
+                ticketsSold: state.salesStats.ticketsSold + 1,
+                totalSales:
+                  state.salesStats.totalSales + +event.transaction.value,
+              },
               transactions: state.transactions
                 ? [...state.transactions, event.transaction._id]
                 : [event.transaction._id],

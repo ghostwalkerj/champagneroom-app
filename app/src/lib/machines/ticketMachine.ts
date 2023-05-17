@@ -186,22 +186,6 @@ export const createTicketMachine = ({
             },
             waiting4Show: {
               on: {
-                'REQUEST CANCELLATION': [
-                  {
-                    target: '#ticketMachine.cancelled',
-                    cond: 'canCancel',
-                    actions: [
-                      'requestCancellation',
-                      'cancelTicket',
-                      'sendTicketCancelled',
-                    ],
-                  },
-                  {
-                    target: '#ticketMachine.reserved.requestedCancellation',
-                    cond: 'canRequestCancellation',
-                    actions: ['requestCancellation'],
-                  },
-                ],
                 'JOINED SHOW': {
                   target: '#ticketMachine.reedemed',
                   cond: 'canWatchShow',

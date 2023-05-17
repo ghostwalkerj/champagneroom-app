@@ -32,10 +32,6 @@ export const load: PageServerLoad = async ({ params }) => {
     .populate('activeShows')
     .exec();
 
-  if (talent === null) {
-    throw error(404, 'Talent not found');
-  }
-
   const activeShow =
     talent.activeShows.length > 0 ? talent.activeShows[0] : null;
 

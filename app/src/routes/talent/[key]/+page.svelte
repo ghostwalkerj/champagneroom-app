@@ -4,6 +4,7 @@
   import ProfilePhoto from '$components/forms/ProfilePhoto.svelte';
   import {
     PUBLIC_DEFAULT_PROFILE_IMAGE,
+    PUBLIC_SHOWTIME_PATH,
     PUBLIC_SHOW_PATH,
   } from '$env/static/public';
 
@@ -12,8 +13,10 @@
 
   import { goto, invalidateAll } from '$app/navigation';
   import ShowDetail from '$components/ShowDetail.svelte';
-  import type { ShowMachineServiceType } from '$lib/machines/showMachine';
-  import { createShowMachineService } from '$lib/machines/showMachine';
+  import {
+    createShowMachineService,
+    type ShowMachineServiceType,
+  } from '$lib/machines/showMachine';
 
   import type { ShowDocType } from '$lib/models/show';
   import type { ShowEventDocType } from '$lib/models/showEvent';
@@ -29,7 +32,7 @@
   export let form: import('./$types').ActionData;
   export let data: PageData;
 
-  const showPath = urlJoin($page.url.href, 'show');
+  const showTimePath = urlJoin($page.url.href, PUBLIC_SHOWTIME_PATH);
 
   let talent = data.talent as TalentDocType;
   let activeShow = data.activeShow as ShowDocType | null;
@@ -53,6 +56,7 @@
   let talentUnSub: Unsubscriber;
   let showEventUnSub: Unsubscriber;
   let showUnSub: Unsubscriber;
+  let showMachineService: ShowMachineServiceType;
 
   const noCurrentShow = () => {
     canCreateShow = true;
@@ -76,6 +80,11 @@
       showUnSub = showStore(show).subscribe(_show => {
         if (_show) {
           activeShow = _show;
+          showMachineService?.stop();
+          showMachineService = createShowMachineService({
+            showDocument: _show,
+          });
+          useShowMachine(showMachineService);
         }
       });
       showEventUnSub = showEventStore(show).subscribe(
@@ -133,10 +142,6 @@
     });
     if (activeShow) {
       useNewShow(activeShow);
-      const showMachine = createShowMachineService({
-        showDocument: activeShow,
-      });
-      useShowMachine(showMachine);
     }
   });
 
@@ -188,7 +193,7 @@
         <div class="modal-action">
           <button
             class="btn"
-            on:click="{() => goto(showPath)}"
+            on:click="{() => goto(showTimePath)}"
             disabled="{!canStartShow}">Restart Show</button
           >
           <form method="post" action="?/end_show" use:enhance="{onSubmit}">
@@ -251,7 +256,7 @@
                 <button
                   class="btn"
                   type="submit"
-                  on:click="{() => goto(showPath)}">Start Show</button
+                  on:click="{() => goto(showTimePath)}">Start Show</button
                 >
               {/if}
             </div>

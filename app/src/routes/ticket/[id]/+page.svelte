@@ -9,6 +9,7 @@
   import { TicketDisputeReason, type TicketDocType } from '$lib/models/ticket';
   import urlJoin from 'url-join';
 
+  import { PUBLIC_SHOWTIME_PATH } from '$env/static/public';
   import type { ShowDocType } from '$lib/models/show';
   import { showStore, ticketStore } from '$lib/stores';
   import { onDestroy, onMount } from 'svelte';
@@ -22,7 +23,7 @@
   let ticket = data.ticket as TicketDocType;
   let show = data.show as ShowDocType;
 
-  const showPath = urlJoin($page.url.href, 'show');
+  const showTimePath = urlJoin($page.url.href, PUBLIC_SHOWTIME_PATH);
   const reasons = Object.values(TicketDisputeReason);
 
   let needs2Pay = false;
@@ -61,7 +62,7 @@
 
   onMount(() => {
     if (ticket.ticketState.active) {
-      ticketStore(ticket).subscribe(ticketDoc => {
+      ticketUnSub = ticketStore(ticket).subscribe(ticketDoc => {
         ticket = ticketDoc;
         useTicketMachine(
           createTicketMachineService({
@@ -71,7 +72,7 @@
         );
       });
 
-      showStore(show).subscribe(showDoc => {
+      showUnSub = showStore(show).subscribe(showDoc => {
         show = showDoc;
         useTicketMachine(
           createTicketMachineService({
@@ -102,14 +103,13 @@
       if (result.data.ticketCancelled) {
         ticket = result.data.ticket;
         show = result.data.show;
-        showUnSub?.();
-        ticketUnSub?.();
         useTicketMachine(
           createTicketMachineService({
             ticketDocument: ticket,
             showDocument: show,
           })
         );
+        showUnSub?.();
       }
       loading = false;
       await applyAction(result);
@@ -169,7 +169,7 @@
                 class="btn btn-secondary"
                 disabled="{loading}"
                 on:click="{() => {
-                  goto(showPath);
+                  goto(showTimePath);
                 }}">Go to the Show</button
               >
             </div>
