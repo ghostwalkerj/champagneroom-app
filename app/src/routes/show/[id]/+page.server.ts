@@ -9,9 +9,9 @@ import { error, fail, redirect } from '@sveltejs/kit';
 import mongoose from 'mongoose';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 import urlJoin from 'url-join';
+import type { Actions, PageServerLoad } from './$types';
 
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
-export const load: import('./$types').PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params }) => {
   mongoose.connect(MONGO_DB_ENDPOINT);
   const showId = params.id;
   if (showId === null) {
@@ -35,8 +35,7 @@ export const load: import('./$types').PageServerLoad = async ({ params }) => {
   };
 };
 
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
-export const actions: import('./$types').Actions = {
+export const actions: Actions = {
   reserve_ticket: async ({ params, cookies, request, url }) => {
     const showId = params.id;
     if (showId === null) {

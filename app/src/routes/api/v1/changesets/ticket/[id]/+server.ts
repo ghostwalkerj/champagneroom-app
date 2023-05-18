@@ -3,7 +3,6 @@ import { Ticket } from '$lib/models/ticket';
 import type { RequestHandler } from '@sveltejs/kit';
 import mongoose from 'mongoose';
 
-/** @type {import('./$types').PageServerLoad} */
 export const GET: RequestHandler<{ id: string }> = async ({ params }) => {
   const ticketId = params.id;
   if (ticketId === null) {

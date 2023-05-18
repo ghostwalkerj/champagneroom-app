@@ -5,12 +5,9 @@ import { createPinHash, verifyPin } from '$lib/util/pin';
 import { error, fail, redirect } from '@sveltejs/kit';
 import mongoose from 'mongoose';
 import urlJoin from 'url-join';
+import type { Actions, PageServerLoad } from './$types';
 
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
-export const load: import('./$types').PageServerLoad = async ({
-  params,
-  cookies,
-}) => {
+export const load: PageServerLoad = async ({ params, cookies }) => {
   const ticketId = params.id;
   const pinHash = cookies.get('pin');
   const redirectUrl = urlJoin(PUBLIC_TICKET_PATH, ticketId);
@@ -34,8 +31,7 @@ export const load: import('./$types').PageServerLoad = async ({
   }
 };
 
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
-export const actions: import('./$types').Actions = {
+export const actions: Actions = {
   set_pin: async ({ params, cookies, request, url }) => {
     const ticketId = params.id;
 
@@ -51,9 +47,9 @@ export const actions: import('./$types').Actions = {
       return fail(400, { pin, invalidPin: true });
     }
 
-    const hash = createPinHash(ticketId, pin);
+    const hash = createPinHash(ticketId!, pin);
     cookies.set('pin', hash, { path: '/' });
-    const redirectUrl = urlJoin(url.origin, PUBLIC_TICKET_PATH, ticketId);
+    const redirectUrl = urlJoin(url.origin, PUBLIC_TICKET_PATH, ticketId!);
     throw redirect(303, redirectUrl);
   },
 };

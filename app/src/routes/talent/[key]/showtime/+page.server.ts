@@ -5,7 +5,7 @@ import {
   MONGO_DB_ENDPOINT,
 } from '$env/static/private';
 import { PUBLIC_JITSI_DOMAIN, PUBLIC_TALENT_PATH } from '$env/static/public';
-import { Show, ShowType } from '$lib/models/show';
+import { Show, type ShowType } from '$lib/models/show';
 import { Talent } from '$lib/models/talent';
 import {
   getShowMachineService,
@@ -16,8 +16,9 @@ import { error, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import urlJoin from 'url-join';
+import type { PageServerLoad } from './$types';
 
-export const load: import('./$types').PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params }) => {
   const key = params.key;
 
   if (key === null) {
@@ -77,6 +78,7 @@ export const load: import('./$types').PageServerLoad = async ({ params }) => {
     },
     JITSI_JWT_SECRET
   );
+
   return {
     talent: JSON.parse(JSON.stringify(talent)),
     show: JSON.parse(JSON.stringify(show)),

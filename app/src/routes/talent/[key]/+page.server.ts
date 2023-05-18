@@ -13,7 +13,7 @@ import { ActorType } from '$lib/util/constants';
 import { getShowMachineServiceFromId } from '$lib/util/ssHelper';
 import { error, fail } from '@sveltejs/kit';
 import mongoose from 'mongoose';
-import type { Actions, PageServerLoad } from './$types';
+import type { Actions, PageServerLoad, RequestEvent } from './$types';
 
 export const load: PageServerLoad = async ({ params }) => {
   mongoose.connect(MONGO_DB_ENDPOINT);
@@ -51,11 +51,7 @@ export const load: PageServerLoad = async ({ params }) => {
   };
 };
 export const actions: Actions = {
-  update_profile_image: async ({
-    params,
-    request,
-  }: // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-  import('./$types').RequestEvent) => {
+  update_profile_image: async ({ params, request }: RequestEvent) => {
     const key = params.key;
     if (key === null) {
       throw error(404, 'Key not found');

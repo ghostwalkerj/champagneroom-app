@@ -3,6 +3,7 @@
   import { page } from '$app/stores';
   import { PUBLIC_JITSI_DOMAIN, PUBLIC_TALENT_PATH } from '$env/static/public';
 
+  import { browser } from '$app/environment';
   import type { ShowDocType } from '$lib/models/show';
   import type { TalentDocType } from '$lib/models/talent';
   import { jitsiInterfaceConfigOverwrite } from '$lib/util/constants';
@@ -20,6 +21,22 @@
   let returnUrl = urlJoin($page.url.origin, PUBLIC_TALENT_PATH, talentObj.key);
   let api: any;
 
+  if (browser) {
+    onDestroy(() => {
+      endShow();
+    });
+
+    const endShow = () => {
+      let formData = new FormData();
+      formData.append('showId', currentShow?._id.toString());
+      fetch($page.url.href + '?/end_show', {
+        method: 'POST',
+        body: formData,
+      });
+      api?.executeCommand('endConference');
+    };
+  }
+
   const participantJoined = (event: any) => {
     console.log('participantJoined', event);
     const numberOfParticipants = api.getNumberOfParticipants();
@@ -27,20 +44,6 @@
     api.getRoomsInfo().then(rooms => {
       console.log('rooms', rooms);
     });
-  };
-
-  onDestroy(() => {
-    endShow();
-  });
-
-  const endShow = () => {
-    let formData = new FormData();
-    formData.append('showId', currentShow?._id.toString());
-    fetch($page.url.href + '?/end_show', {
-      method: 'POST',
-      body: formData,
-    });
-    api?.executeCommand('endConference');
   };
 
   onMount(() => {

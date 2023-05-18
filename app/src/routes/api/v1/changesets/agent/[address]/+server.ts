@@ -3,7 +3,6 @@ import { Agent } from '$lib/models/agent';
 import type { RequestHandler } from '@sveltejs/kit';
 import mongoose from 'mongoose';
 
-/** @type {import('./$types').PageServerLoad} */
 export const GET: RequestHandler<{ address: string }> = async ({ params }) => {
   const address = params.address;
   if (address === null) {

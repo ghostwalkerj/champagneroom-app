@@ -14,6 +14,7 @@
   import { onDestroy, onMount } from 'svelte';
   import urlJoin from 'url-join';
   import type { PageData } from '../$types';
+  import { browser } from '$app/environment';
 
   export let data: PageData;
 
@@ -30,17 +31,19 @@
   );
   let videoCallElement: HTMLDivElement;
 
-  onDestroy(() => {
-    endShow();
-  });
-
-  const endShow = () => {
-    let formData = new FormData();
-    fetch($page.url.href + '?/leave_show', {
-      method: 'POST',
-      body: formData,
+  if (browser) {
+    onDestroy(() => {
+      endShow();
     });
-  };
+
+    const endShow = () => {
+      let formData = new FormData();
+      fetch($page.url.href + '?/leave_show', {
+        method: 'POST',
+        body: formData,
+      });
+    };
+  }
 
   const profileImage = urlJoin(
     $page.url.origin,
@@ -49,7 +52,6 @@
       PUBLIC_PROFILE_IMAGE_PATH
     )
   );
-
   onMount(() => {
     const options = {
       roomName: show.roomId,
@@ -73,7 +75,10 @@
       goto(returnUrl);
     });
 
-    const ticketMachineService = createTicketMachineService({ ticket, show });
+    const ticketMachineService = createTicketMachineService({
+      ticketDocument: ticket,
+      showDocument: show,
+    });
 
     ticketMachineService.subscribe(state => {
       const timeToLeave = !state.can({

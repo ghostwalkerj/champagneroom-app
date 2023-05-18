@@ -20,6 +20,7 @@ import {
 import { error, fail, redirect } from '@sveltejs/kit';
 import mongoose from 'mongoose';
 import urlJoin from 'url-join';
+import type { Actions, PageServerLoad } from './$types';
 
 const getTicketService = async (ticketId: string) => {
   const ticket = await Ticket.findById(ticketId)
@@ -38,12 +39,7 @@ const getTicketService = async (ticketId: string) => {
   return { ticket, show, ticketService };
 };
 
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
-export const load: import('./$types').PageServerLoad = async ({
-  params,
-  cookies,
-  url,
-}) => {
+export const load: PageServerLoad = async ({ params, cookies, url }) => {
   const ticketId = params.id;
   const pinHash = cookies.get('pin');
   const redirectUrl = urlJoin(url.href, PUBLIC_PIN_PATH);
@@ -82,8 +78,7 @@ export const load: import('./$types').PageServerLoad = async ({
   };
 };
 
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
-export const actions: import('./$types').Actions = {
+export const actions: Actions = {
   buy_ticket: async ({ params }) => {
     const ticketId = params.id;
     if (ticketId === null) {

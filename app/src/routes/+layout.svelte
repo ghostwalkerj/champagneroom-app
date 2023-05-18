@@ -4,19 +4,20 @@
   import { UAParser } from 'ua-parser-js';
   import '../app.css';
 
+  import { ShowEvent } from '$lib/models/showEvent';
+
   import { Agent } from '$lib/models/agent';
   import { Show } from '$lib/models/show';
-  import { ShowEvent } from '$lib/models/showEvent';
   import { Talent } from '$lib/models/talent';
   import { Ticket } from '$lib/models/ticket';
   import { Transaction } from '$lib/models/transaction';
 
-  globalThis.Talent = Talent;
+  globalThis.ShowEvent = ShowEvent;
   globalThis.Show = Show;
   globalThis.Agent = Agent;
-  globalThis.ShowEvent = ShowEvent;
   globalThis.Transaction = Transaction;
   globalThis.Ticket = Ticket;
+  globalThis.Talent = Talent;
 
   onMount(() => {
     if ($browserType == null) {

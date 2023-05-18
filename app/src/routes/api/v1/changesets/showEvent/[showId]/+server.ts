@@ -3,7 +3,6 @@ import { ShowEvent, type ShowEventDocType } from '$lib/models/showEvent';
 import type { RequestHandler } from '@sveltejs/kit';
 import mongoose from 'mongoose';
 
-/** @type {import('./$types').PageServerLoad} */
 export const GET: RequestHandler<{ showId: string }> = async ({ params }) => {
   const showId = params.showId;
   if (showId === null) {

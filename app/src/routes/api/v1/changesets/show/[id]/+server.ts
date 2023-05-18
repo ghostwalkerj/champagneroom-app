@@ -3,7 +3,6 @@ import { Show } from '$lib/models/show';
 import type { RequestHandler } from '@sveltejs/kit';
 import mongoose from 'mongoose';
 
-/** @type {import('./$types').PageServerLoad} */
 export const GET: RequestHandler<{ id: string }> = async ({ params }) => {
   const showId = params.id;
   if (showId === null) {

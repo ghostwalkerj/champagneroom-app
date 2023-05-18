@@ -18,12 +18,10 @@ import { error, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import urlJoin from 'url-join';
+import type { PageServerLoad } from '../$types';
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-export const load: import('./$types').PageServerLoad = async ({
-  params,
-  cookies,
-}) => {
+export const load: PageServerLoad = async ({ params, cookies }) => {
   const ticketId = params.id;
   const pinHash = cookies.get('pin');
   const ticketUrl = urlJoin(PUBLIC_TICKET_PATH, ticketId);
@@ -85,8 +83,8 @@ export const load: import('./$types').PageServerLoad = async ({
 
   return {
     jitsiToken,
-    ticket,
-    show,
+    ticket: JSON.parse(JSON.stringify(ticket)),
+    show: JSON.parse(JSON.stringify(show)),
   };
 };
 
