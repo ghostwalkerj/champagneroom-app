@@ -5,19 +5,19 @@ import { TicketStatus } from '$lib/models/ticket';
 import type { TransactionDocType } from '$lib/models/transaction';
 import { nanoid } from 'nanoid';
 import {
-    assign,
-    createMachine,
-    interpret,
-    send,
-    spawn,
-    type ActorRefFrom,
-    type StateFrom,
+  assign,
+  createMachine,
+  interpret,
+  send,
+  spawn,
+  type ActorRefFrom,
+  type StateFrom,
 } from 'xstate';
 import {
-    createShowMachine,
-    type ShowMachineOptions,
-    type ShowMachineServiceType,
-    type ShowMachineType,
+  createShowMachine,
+  type ShowMachineOptions,
+  type ShowMachineServiceType,
+  type ShowMachineType,
 } from './showMachine';
 
 export type TicketMachineOptions = {
@@ -63,7 +63,6 @@ export type TicketMachineEventType =
 
 export const createTicketMachine = ({
   ticketDocument,
-  ticketMachineOptions,
   showDocument,
   showMachineOptions,
 }: {
@@ -490,11 +489,7 @@ export const createTicketMachine = ({
             context.ticketState.totalPaid
           );
         },
-        canInitiateCancellation: context => {
-          const state = context.showMachineRef?.getSnapshot();
-          return state?.context.showState.runtime === undefined; // show has not started
-          //TODO: Check this
-        },
+ 
         canWatchShow: context => {
           const state = context.showMachineRef?.getSnapshot();
           return (

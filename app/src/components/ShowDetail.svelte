@@ -3,7 +3,6 @@
   import type { ShowDocType } from '$lib/models/show';
   import { currencyFormatter, durationFormatter } from '$lib/util/constants';
   import StarRating from 'svelte-star-rating';
-  import type { Unsubscriber } from 'svelte/store';
   import urlJoin from 'url-join';
 
   type ShowDetailOptions = {
