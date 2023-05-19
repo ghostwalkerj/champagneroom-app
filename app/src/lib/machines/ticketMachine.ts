@@ -5,19 +5,19 @@ import { TicketStatus } from '$lib/models/ticket';
 import type { TransactionDocType } from '$lib/models/transaction';
 import { nanoid } from 'nanoid';
 import {
-  assign,
-  createMachine,
-  interpret,
-  send,
-  spawn,
-  type ActorRefFrom,
-  type StateFrom,
+    assign,
+    createMachine,
+    interpret,
+    send,
+    spawn,
+    type ActorRefFrom,
+    type StateFrom,
 } from 'xstate';
 import {
-  createShowMachine,
-  type ShowMachineOptions,
-  type ShowMachineServiceType,
-  type ShowMachineType,
+    createShowMachine,
+    type ShowMachineOptions,
+    type ShowMachineServiceType,
+    type ShowMachineType,
 } from './showMachine';
 
 export type TicketMachineOptions = {
@@ -28,7 +28,7 @@ export type TicketMachineOptions = {
 
 export type TicketMachineEventType =
   | {
-      type: 'REQUEST CANCELLATION';
+      type: 'CANCELLATION INITIATED';
       cancel: TicketStateType['cancel'];
     }
   | {
@@ -59,10 +59,6 @@ export type TicketMachineEventType =
   | {
       type: 'SHOW CANCELLED';
       cancel: TicketStateType['cancel'];
-    }
-  | {
-      type: 'TICKETSTATE UPDATE';
-      ticketState: TicketStateType;
     };
 
 export const createTicketMachine = ({
@@ -129,8 +125,8 @@ export const createTicketMachine = ({
               cond: 'ticketReedemed',
             },
             {
-              target: '#ticketMachine.reserved.requestedCancellation',
-              cond: 'ticketInCancellationRequested',
+              target: '#ticketMachine.reserved.initiatedCancellation',
+              cond: 'ticketInCancellationInitiated',
             },
             {
               target: '#ticketMachine.ended.inEscrow',
@@ -167,19 +163,19 @@ export const createTicketMachine = ({
                     actions: ['receivePayment'],
                   },
                 ],
-                'REQUEST CANCELLATION': [
+                'CANCELLATION INITIATED': [
                   {
                     target: '#ticketMachine.cancelled',
                     cond: 'canCancel',
                     actions: [
-                      'requestCancellation',
+                      'initiateCancellation',
                       'cancelTicket',
                       'sendTicketCancelled',
                     ],
                   },
                   {
-                    target: 'requestedCancellation',
-                    actions: ['requestCancellation'],
+                    target: 'initiatedCancellation',
+                    actions: ['initiateCancellation'],
                   },
                 ],
               },
@@ -193,7 +189,7 @@ export const createTicketMachine = ({
                 },
               },
             },
-            requestedCancellation: {
+            initiatedCancellation: {
               initial: 'waiting4Refund',
               states: {
                 waiting4Refund: {
@@ -272,14 +268,14 @@ export const createTicketMachine = ({
             target: '#ticketMachine.cancelled',
             cond: 'canCancel',
             actions: [
-              'requestCancellation',
+              'initiateCancellation',
               'cancelTicket',
               'sendTicketCancelled',
             ],
           },
           {
-            target: '#ticketMachine.reserved.requestedCancellation',
-            actions: ['requestCancellation'],
+            target: '#ticketMachine.reserved.initiatedCancellation',
+            actions: ['initiateCancellation'],
           },
         ],
       },
@@ -328,11 +324,11 @@ export const createTicketMachine = ({
           { to: context => context.showMachineRef! }
         ),
 
-        requestCancellation: assign((context, event) => {
+        initiateCancellation: assign((context, event) => {
           return {
             ticketState: {
               ...context.ticketState,
-              status: TicketStatus.CANCELLATION_REQUESTED,
+              status: TicketStatus.CANCELLATION_INITIATED,
               cancel: event.cancel,
             },
           };
@@ -474,8 +470,8 @@ export const createTicketMachine = ({
           context.ticketState.status === TicketStatus.RESERVED,
         ticketReedemed: context =>
           context.ticketState.status === TicketStatus.REDEEMED,
-        ticketInCancellationRequested: context =>
-          context.ticketState.status === TicketStatus.CANCELLATION_REQUESTED,
+        ticketInCancellationInitiated: context =>
+          context.ticketState.status === TicketStatus.CANCELLATION_INITIATED,
         ticketMissedShow: context =>
           context.ticketState.status === TicketStatus.MISSED_SHOW,
         fullyPaid: (context, event) => {
@@ -494,7 +490,7 @@ export const createTicketMachine = ({
             context.ticketState.totalPaid
           );
         },
-        canRequestCancellation: context => {
+        canInitiateCancellation: context => {
           const state = context.showMachineRef?.getSnapshot();
           return state?.context.showState.runtime === undefined; // show has not started
           //TODO: Check this

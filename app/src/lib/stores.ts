@@ -43,6 +43,7 @@ const abstractStore = <T>(
   const { subscribe, set } = writable<T>(doc, () => {
     set(doc);
     if (cancelOn && cancelOn(doc)) {
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
       return () => {};
     }
     const abortDoc = new AbortController();

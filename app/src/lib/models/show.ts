@@ -12,7 +12,8 @@ export enum ShowStatus {
   BOX_OFFICE_CLOSED = 'BOX OFFICE CLOSED',
   CANCELLED = 'CANCELLED',
   FINALIZED = 'FINALIZED',
-  CANCELLATION_REQUESTED = 'CANCELLATION REQUESTED',
+  CANCELLATION_INITIATED = 'CANCELLATION INITIATED',
+  REFUND_INITIATED = 'REFUND INITIATED',
   LIVE = 'LIVE',
   ENDED = 'ENDED',
   STOPPED = 'STOPPED',
@@ -30,18 +31,35 @@ export enum ShowCancelReason {
 const cancelSchema = new Schema({
   cancelledAt: { type: Date, required: true, default: Date.now },
   cancelledInState: { type: String },
-  canceller: { type: String, enum: ActorType, required: true },
+  requestedBy: { type: String, enum: ActorType, required: true },
   reason: { type: String, enum: ShowCancelReason, required: true },
 });
 
 const finalizeSchema = new Schema({
   finalizedAt: { type: Date, required: true, default: Date.now },
-  finalizer: { type: String, enum: ActorType, required: true },
+  finalizedBy: { type: String, enum: ActorType, required: true },
 });
 
 const escrowSchema = new Schema({
   startDate: { type: Date, required: true },
   endDate: { type: Date },
+});
+
+const refundSchema = new Schema({
+  refundedAt: { type: Date, required: true, default: Date.now },
+  transactions: [
+    { type: Schema.Types.ObjectId, ref: 'Transaction', required: true },
+  ],
+  ticket: { type: Schema.Types.ObjectId, ref: 'Ticket', required: true },
+  requestedBy: { type: String, enum: ActorType, required: true },
+});
+
+const saleSchema = new Schema({
+  soldAt: { type: Date, required: true, default: Date.now },
+  transactions: [
+    { type: Schema.Types.ObjectId, ref: 'Transaction', required: true },
+  ],
+  ticket: { type: Schema.Types.ObjectId, ref: 'Ticket', required: true },
 });
 
 const runtimeSchema = new Schema({
@@ -128,17 +146,12 @@ const showStateSchema = new Schema(
       required: true,
       default: () => ({}),
     },
-    cancel: {
-      type: cancelSchema,
-    },
-    finalize: { type: finalizeSchema },
-    escrow: {
-      type: escrowSchema,
-    },
-    runtime: {
-      type: runtimeSchema,
-    },
-    transactions: [{ type: Schema.Types.ObjectId, ref: 'Transaction' }],
+    cancel: cancelSchema,
+    finalize: finalizeSchema,
+    escrow: escrowSchema,
+    runtime: runtimeSchema,
+    refunds: [refundSchema],
+    sales: [saleSchema],
   },
   { timestamps: true }
 );
@@ -174,7 +187,7 @@ const showSchema = new Schema(
       minLength: [3, 'Name must be at least 3 characters'],
       maxLength: [50, 'Name must be under 50 characters'],
     },
-    numTickets: {
+    capacity: {
       type: Number,
       required: true,
       min: 1,
@@ -209,8 +222,12 @@ export type ShowStateType = InferSchemaType<typeof showStateSchema>;
 
 export type ShowDocType = InferSchemaType<typeof showSchema>;
 
+export type ShowRefundType = InferSchemaType<typeof refundSchema>;
+
+export type ShowSaleType = InferSchemaType<typeof saleSchema>;
+
 export const Show = models?.Show
   ? (models.Show as Model<ShowDocType>)
-  : (mongoose.model<ShowDocType>('Show', showSchema) as Model<ShowDocType>);
+  : (mongoose.model<ShowDocType>('Show', showSchema) );
 
 export type ShowType = InstanceType<typeof Show>;

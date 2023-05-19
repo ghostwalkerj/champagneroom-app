@@ -14,9 +14,7 @@
       >
         <form method="post" action="?/set_pin" use:enhance>
           <div class="max-w-xs w-full py-2 form-control ">
-            <!-- svelte-ignore a11y-label-has-associated-control -->
             <div class="max-w-xs w-full py-2 form-control ">
-              <!-- svelte-ignore a11y-label-has-associated-control -->
               <label for="pin" class="label">
                 <span class="label-text">8 Digit Pin</span></label
               >

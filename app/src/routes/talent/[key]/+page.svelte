@@ -101,13 +101,13 @@
     const state = showMachineService.getSnapshot();
     showStopped = state.matches('stopped');
     canCancelShow = state.can({
-      type: 'REQUEST CANCELLATION',
+      type: 'CANCELLATION INITIATED',
       cancel: undefined,
       tickets: [],
     });
     canCreateShow = state.hasTag('canCreateShow');
     canStartShow = state.can({ type: 'START SHOW' });
-    waiting4Refunds = state.matches('requestedCancellation.waiting2Refund');
+    waiting4Refunds = state.matches('initiatedCancellation.waiting2Refund');
     statusText = state.context.showState.status;
     if (state.done) {
       showMachineService.stop();
@@ -197,6 +197,7 @@
             disabled="{!canStartShow}">Restart Show</button
           >
           <form method="post" action="?/end_show" use:enhance="{onSubmit}">
+            <input type="hidden" name="showId" value="{activeShow?._id}" />
             <button class="btn">End Show</button>
           </form>
         </div>
@@ -338,7 +339,7 @@
                       </div>{/if}
                   </div>
 
-                  <input type="hidden" name="numTickets" value="1" />
+                  <input type="hidden" name="capacity" value="1" />
 
                   <input
                     type="hidden"
@@ -435,6 +436,8 @@
             action="?/refund_tickets"
             use:enhance="{onSubmit}"
           >
+            <input type="hidden" name="showId" value="{activeShow?._id}" />
+
             <div class="bg-primary text-primary-content card">
               <div class="text-center card-body items-center p-3">
                 <div class="text-2xl card-title">Send Refunds</div>

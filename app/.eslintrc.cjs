@@ -1,26 +1,36 @@
 module.exports = {
-	root: true,
-	parser: '@typescript-eslint/parser',
-	extends: [
-		'eslint:recommended',
-		'plugin:@typescript-eslint/recommended',
-		'prettier',
-	],
-	plugins: ['svelte3', '@typescript-eslint', 'prettier', 'xstate'],
-	overrides: [{ files: ['*.svelte'], processor: 'svelte3/svelte3' }],
-	settings: {
-		'svelte3/typescript': () => require('typescript'),
-	},
-	parserOptions: {
-		sourceType: 'module',
-		ecmaVersion: 2020,
-	},
-	env: {
-		browser: true,
-		es2017: true,
-		node: true,
-	},
-	rules: {
-		'@typescript-eslint/consistent-type-imports': 'error',
-	}
+  // ...
+  extends: [
+    'plugin:svelte/recommended',
+    'plugin:@typescript-eslint/recommended',
+  ],
+  parser: '@typescript-eslint/parser',
+  parserOptions: {
+    project: './tsconfig.eslint.json',
+    extraFileExtensions: ['.svelte'], // This is a required setting in `@typescript-eslint/parser` v4.24.0.
+  },
+  overrides: [
+    {
+      files: ['*.svelte'],
+      parser: 'svelte-eslint-parser',
+      // Parse the `<script>` in `.svelte` as TypeScript by adding the following configuration.
+      parserOptions: {
+        parser: '@typescript-eslint/parser',
+      },
+    },
+  ],
+  rules: {
+    '@typescript-eslint/ban-ts-comment': 'off',
+    '@typescript-eslint/no-non-null-assertion': 'off',
+    'svelte/no-unused-svelte-ignore': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/consistent-type-imports': [
+      'error',
+      {
+        prefer: 'type-imports',
+        disallowTypeAnnotations: false,
+        fixStyle: 'separate-type-imports',
+      },
+    ],
+  },
 };

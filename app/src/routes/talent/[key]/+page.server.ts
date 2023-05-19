@@ -73,7 +73,7 @@ export const actions: Actions = {
     const price = data.get('price') as string;
     const name = data.get('name') as string;
     const duration = data.get('duration') as string;
-    const numTickets = data.get('numTickets') as string;
+    const capacity = data.get('capacity') as string;
     const coverImageUrl = data.get('coverImageUrl') as string;
     const key = params.key;
 
@@ -101,14 +101,14 @@ export const actions: Actions = {
       price: +price,
       name,
       duration: +duration,
-      numTickets: +numTickets,
+      capacity: +capacity,
       talent: talent._id,
       agent: talent.agent,
       coverImageUrl,
       showState: {
         status: ShowStatus.BOX_OFFICE_OPEN,
         salesStats: {
-          ticketsAvailable: +numTickets,
+          ticketsAvailable: +capacity,
         },
       },
       talentInfo: {
@@ -135,6 +135,10 @@ export const actions: Actions = {
       throw error(404, 'Key not found');
     }
 
+    if (showId === null) {
+      throw error(404, 'Show ID not found');
+    }
+
     mongoose.connect(MONGO_DB_ENDPOINT);
     const showService = await getShowMachineServiceFromId(showId);
     const showMachineState = showService.getSnapshot();
@@ -143,13 +147,12 @@ export const actions: Actions = {
       cancelledAt: new Date(),
       cancelledInState: JSON.stringify(showMachineState.value),
       reason: ShowCancelReason.TALENT_CANCELLED,
-      canceller: ActorType.TALENT,
+      requestedBy: ActorType.TALENT,
     } as ShowStateType['cancel'];
 
     const cancelEvent = {
-      type: 'REQUEST CANCELLATION',
+      type: 'CANCELLATION INITIATED',
       cancel,
-      tickets: [],
     } as ShowMachineEventType;
 
     if (showMachineState.can(cancelEvent)) {
@@ -162,6 +165,49 @@ export const actions: Actions = {
     return {
       success: true,
       showState,
+      showCancelled: true,
+    };
+  },
+  end_show: async ({ request }) => {
+    const data = await request.formData();
+    const showId = data.get('showId') as string;
+
+    if (showId === null) {
+      throw error(404, 'Show ID not found');
+    }
+
+    let inEscrow = false;
+    const showService = await getShowMachineServiceFromId(showId);
+    const showState = showService.getSnapshot();
+
+    if (showState.can({ type: 'SHOW ENDED' })) {
+      showService.send({
+        type: 'SHOW ENDED',
+      });
+
+      inEscrow = showService.getSnapshot().matches('inEscrow');
+    }
+
+    return {
+      success: true,
+      inEscrow,
+    };
+  },
+  refund_tickets: async ({ request }) => {
+    const data = await request.formData();
+    const showId = data.get('showId') as string;
+
+    if (showId === null) {
+      throw error(404, 'Show ID not found');
+    }
+
+    const showService = await getShowMachineServiceFromId(showId);
+    const showState = showService.getSnapshot();
+
+    if (showState.matches('initiatedCancellation.waiting2Refund')) {
+    }
+    return {
+      success: true,
       showCancelled: true,
     };
   },

@@ -1,4 +1,5 @@
-node_modules
-artifacts
-cache
-coverage
+dist/*
+build/*
+tsconfig.eslint.json
+vite.config.ts
+**.typegen.ts

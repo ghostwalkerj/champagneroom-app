@@ -1,23 +1,23 @@
 import {
-  MONGO_DB_ENDPOINT,
-  REDIS_HOST,
-  REDIS_PASSWORD,
-  REDIS_PORT,
-  REDIS_USERNAME,
+    MONGO_DB_ENDPOINT,
+    REDIS_HOST,
+    REDIS_PASSWORD,
+    REDIS_PORT,
+    REDIS_USERNAME,
 } from '$env/static/private';
 import { createShowMachineService } from '$lib/machines/showMachine';
 import { createTicketMachineService } from '$lib/machines/ticketMachine';
 import {
-  Show,
-  type ShowDocType,
-  type ShowStateType,
-  type ShowType,
+    Show,
+    type ShowDocType,
+    type ShowStateType,
+    type ShowType,
 } from '$lib/models/show';
 import {
-  Ticket,
-  type TicketDocType,
-  type TicketStateType,
-  type TicketType,
+    Ticket,
+    type TicketDocType,
+    type TicketStateType,
+    type TicketType,
 } from '$lib/models/ticket';
 import type { TransactionDocType } from '$lib/models/transaction';
 import { Queue } from 'bullmq';

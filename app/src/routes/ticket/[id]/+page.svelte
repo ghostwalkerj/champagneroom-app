@@ -44,7 +44,7 @@
     needs2Pay = state.matches('reserved.waiting4Payment');
     canWatchShow = state.can('JOINED SHOW');
     canCancelTicket = state.can({
-      type: 'REQUEST CANCELLATION',
+      type: 'CANCELLATION INITIATED',
       cancel: undefined,
     });
     canLeaveFeedback = state.can({

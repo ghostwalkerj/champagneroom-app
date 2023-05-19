@@ -8,7 +8,7 @@ import validator from 'validator';
 const { Schema, models } = pkg;
 export enum TicketStatus {
   RESERVED = 'RESERVED',
-  CANCELLATION_REQUESTED = 'CANCELLATION REQUESTED',
+  CANCELLATION_INITIATED = 'CANCELLATION INITIATED',
   CANCELLED = 'CANCELLED',
   FINALIZED = 'FINALIZED',
   REDEEMED = 'REDEEMED',
@@ -43,7 +43,7 @@ export enum TicketDisputeReason {
 
 const cancelSchema = new Schema({
   cancelledAt: { type: Date, required: true, default: Date.now },
-  canceller: { type: String, enum: ActorType, required: true },
+  cancelledBy: { type: String, enum: ActorType, required: true },
   reason: { type: String, enum: TicketCancelReason, required: true },
   cancelledInState: { type: String, enum: TicketStatus },
 });
@@ -78,7 +78,7 @@ const disputeSchema = new Schema({
   startedAt: { type: Date, required: true, default: Date.now },
   endedAt: { type: Date },
   reason: { type: String, enum: TicketDisputeReason, required: true },
-  disputer: { type: String, enum: ActorType, required: true },
+  disputedBy: { type: String, enum: ActorType, required: true },
   explanation: { type: String, required: true },
   decision: { type: String, enum: TicketDisputeDecision },
 });
@@ -115,13 +115,13 @@ const ticketStateSchema = new Schema(
 
     totalPaid: { type: Number, required: true, default: 0 },
     totalRefunded: { type: Number, required: true, default: 0 },
-    cancel: { type: cancelSchema },
-    redemption: { type: redemptionSchema },
-    reservation: { type: reservationSchema },
-    escrow: { type: escrowSchema },
-    dispute: { type: disputeSchema },
-    finalize: { type: finalizeSchema },
-    feedback: { type: feedbackSchema },
+    cancel: cancelSchema,
+    redemption: redemptionSchema,
+    reservation: reservationSchema,
+    escrow: escrowSchema,
+    dispute: disputeSchema,
+    finalize: finalizeSchema,
+    feedback: feedbackSchema,
     transactions: [{ type: Schema.Types.ObjectId, ref: 'Transaction' }],
   },
   { timestamps: true }
@@ -158,6 +158,6 @@ export const Ticket = models?.Ticket
   : (mongoose.model<TicketDocType>(
       'Ticket',
       ticketSchema
-    ) as Model<TicketDocType>);
+    ) );
 
 export type TicketType = InstanceType<typeof Ticket>;

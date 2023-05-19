@@ -5,7 +5,8 @@
         "parent_id": null,
         "workspaceRoot": null,
         "workspacePath": null,
-        "id": "uBGhyC8JLtzS7rMH"
+        "id": "uBGhyC8JLtzS7rMH",
+        "iconColor": "rgb(128, 0, 128)"
     },
     {
         "type": "Group",
@@ -13,7 +14,8 @@
         "parent_id": null,
         "workspaceRoot": null,
         "workspacePath": null,
-        "id": "AJm2pcnTvzslH7Uo"
+        "id": "AJm2pcnTvzslH7Uo",
+        "iconColor": "rgb(173, 216, 230)"
     },
     {
         "type": "Group",
@@ -21,7 +23,8 @@
         "parent_id": null,
         "workspaceRoot": null,
         "workspacePath": null,
-        "id": "5O6S0J3dcsvABnjo"
+        "id": "5O6S0J3dcsvABnjo",
+        "iconColor": "rgb(255, 0, 255)"
     },
     {
         "type": "Group",
@@ -29,7 +32,8 @@
         "parent_id": null,
         "workspaceRoot": null,
         "workspacePath": null,
-        "id": "EqAQP6es0W7aL35V"
+        "id": "EqAQP6es0W7aL35V",
+        "iconColor": "rgb(0, 0, 255)"
     },
     {
         "type": "Group",
@@ -37,7 +41,8 @@
         "parent_id": null,
         "workspaceRoot": null,
         "workspacePath": null,
-        "id": "8z9xT1DJ04BrNEWf"
+        "id": "8z9xT1DJ04BrNEWf",
+        "iconColor": "rgb(255, 0, 0)"
     },
     {
         "type": "Group",
@@ -45,7 +50,8 @@
         "parent_id": null,
         "workspaceRoot": null,
         "workspacePath": null,
-        "id": "IXQnFASuioYN1pcj"
+        "id": "IXQnFASuioYN1pcj",
+        "iconColor": "rgb(255, 255, 0)"
     },
     {
         "type": "Directory",
@@ -117,7 +123,8 @@
         "parent_id": null,
         "workspaceRoot": null,
         "workspacePath": null,
-        "id": "ZcmNbtRBnv97xAfr"
+        "id": "ZcmNbtRBnv97xAfr",
+        "iconColor": "rgb(0, 128, 0)"
     },
     {
         "type": "File",
@@ -197,7 +204,8 @@
         "parent_id": null,
         "workspaceRoot": null,
         "workspacePath": null,
-        "id": "tJ1ZfMYlU0Xb2TWq"
+        "id": "tJ1ZfMYlU0Xb2TWq",
+        "iconColor": "rgb(255, 165, 0)"
     },
     {
         "type": "Directory",
@@ -297,5 +305,406 @@
         "workspaceRoot": "/Users/joseph/Dev/pcall/app",
         "workspacePath": "svelte.config.js",
         "id": "jtQAIZyXRNp2lx3f"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/lib/models/agent.ts",
+        "parent_id": "uBGhyC8JLtzS7rMH",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/lib/models/agent.ts",
+        "id": "DnLQve7d5CiH0xbc"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/lib/models/show.ts",
+        "parent_id": "uBGhyC8JLtzS7rMH",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/lib/models/show.ts",
+        "id": "AYRanZd8QLpJwDG2"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/lib/models/showEvent.ts",
+        "parent_id": "uBGhyC8JLtzS7rMH",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/lib/models/showEvent.ts",
+        "id": "u2WZYkDE8xJO13zj"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/lib/models/talent.ts",
+        "parent_id": "uBGhyC8JLtzS7rMH",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/lib/models/talent.ts",
+        "id": "72QjdMFJKDwmRN8v"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/lib/models/ticket.ts",
+        "parent_id": "uBGhyC8JLtzS7rMH",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/lib/models/ticket.ts",
+        "id": "TP4d7Kpl8Ygwhcit"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/lib/models/transaction.ts",
+        "parent_id": "uBGhyC8JLtzS7rMH",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/lib/models/transaction.ts",
+        "id": "6LOo5f8e4imYtrcg"
+    },
+    {
+        "type": "Group",
+        "name": "groupByModel",
+        "parent_id": null,
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "361t5BgAwFrK9vea",
+        "iconColor": "rgb(0, 206, 209)"
+    },
+    {
+        "type": "Group",
+        "name": "show",
+        "parent_id": "361t5BgAwFrK9vea",
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "cqTrRk8dnVulmAFC"
+    },
+    {
+        "type": "Group",
+        "name": "talent",
+        "parent_id": "361t5BgAwFrK9vea",
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "L219NPSQndHu4UwI"
+    },
+    {
+        "type": "Group",
+        "name": "ticket",
+        "parent_id": "361t5BgAwFrK9vea",
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "fUpQaRBvoPqAMSdw"
+    },
+    {
+        "type": "Group",
+        "name": "agent",
+        "parent_id": "361t5BgAwFrK9vea",
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "0p4F2SOMZWJKcAsl"
+    },
+    {
+        "type": "Group",
+        "name": "pages",
+        "parent_id": "0p4F2SOMZWJKcAsl",
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "vSteflaW7bBuiUrd"
+    },
+    {
+        "type": "Group",
+        "name": "pages",
+        "parent_id": "cqTrRk8dnVulmAFC",
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "Y2CVlvn7FeSZNpHI"
+    },
+    {
+        "type": "Group",
+        "name": "pages",
+        "parent_id": "L219NPSQndHu4UwI",
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "CGnTLus7r0yeYFA5"
+    },
+    {
+        "type": "Group",
+        "name": "pages",
+        "parent_id": "fUpQaRBvoPqAMSdw",
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "fazxjXI9ueby32nw"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/routes/agent/+layout.svelte",
+        "parent_id": "vSteflaW7bBuiUrd",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/routes/agent/+layout.svelte",
+        "id": "KehHVW1zdZpqj84i"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/routes/agent/+page.svelte",
+        "parent_id": "vSteflaW7bBuiUrd",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/routes/agent/+page.svelte",
+        "id": "DSFhKGLsouEBbmXg"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/routes/agent/AgentWallet.svelte",
+        "parent_id": "vSteflaW7bBuiUrd",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/routes/agent/AgentWallet.svelte",
+        "id": "m4Fjw1QqV73e8UlE"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/routes/agent/TableCopyLink.svelte",
+        "parent_id": "vSteflaW7bBuiUrd",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/routes/agent/TableCopyLink.svelte",
+        "id": "L7tH1XWUs8InkdcN"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/routes/agent/TableRating.svelte",
+        "parent_id": "vSteflaW7bBuiUrd",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/routes/agent/TableRating.svelte",
+        "id": "jz0ncEXMwQRTDGvf"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/routes/agent/TalentForm.svelte",
+        "parent_id": "vSteflaW7bBuiUrd",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/routes/agent/TalentForm.svelte",
+        "id": "2lLrfqjBaN0xDSwu"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/routes/agent/TalentTable.svelte",
+        "parent_id": "vSteflaW7bBuiUrd",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/routes/agent/TalentTable.svelte",
+        "id": "wIiO16eVHUosalTy"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/routes/agent/TopTalent.svelte",
+        "parent_id": "vSteflaW7bBuiUrd",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/routes/agent/TopTalent.svelte",
+        "id": "30pCvNY6zAjxGw8a"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/routes/agent/WeeklyBooking.svelte",
+        "parent_id": "vSteflaW7bBuiUrd",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/routes/agent/WeeklyBooking.svelte",
+        "id": "UTQK0WjfLlmgyRZ7"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/lib/models/agent.ts",
+        "parent_id": "0p4F2SOMZWJKcAsl",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/lib/models/agent.ts",
+        "id": "j2QZzlpJFXLM4INA"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/routes/show/[id]/+layout.svelte",
+        "parent_id": "Y2CVlvn7FeSZNpHI",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/routes/show/[id]/+layout.svelte",
+        "id": "mMERabQpUPCVIB0n"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/routes/show/[id]/+page.svelte",
+        "parent_id": "Y2CVlvn7FeSZNpHI",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/routes/show/[id]/+page.svelte",
+        "id": "s6USRgnaCz92bY0X"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/lib/machines/showMachine.ts",
+        "parent_id": "cqTrRk8dnVulmAFC",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/lib/machines/showMachine.ts",
+        "id": "MDzqaCkx4NVL8076"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/lib/machines/ticketMachine.ts",
+        "parent_id": "fUpQaRBvoPqAMSdw",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/lib/machines/ticketMachine.ts",
+        "id": "rQkm01cXu7ieVCGw"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/lib/models/show.ts",
+        "parent_id": "cqTrRk8dnVulmAFC",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/lib/models/show.ts",
+        "id": "vckYIfzqRm1s39OE"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/lib/models/showEvent.ts",
+        "parent_id": "cqTrRk8dnVulmAFC",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/lib/models/showEvent.ts",
+        "id": "kBuCtQGg0IDpKO82"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/lib/models/talent.ts",
+        "parent_id": "L219NPSQndHu4UwI",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/lib/models/talent.ts",
+        "id": "2PFezEosLwAZIXyM"
+    },
+    {
+        "type": "Directory",
+        "name": "/Users/joseph/Dev/pcall/app/src/routes/talent/[key]/showtime",
+        "parent_id": "CGnTLus7r0yeYFA5",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/routes/talent/[key]/showtime",
+        "id": "NEZGvY7xzmKVa6MD"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/routes/talent/[key]/+layout.svelte",
+        "parent_id": "CGnTLus7r0yeYFA5",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/routes/talent/[key]/+layout.svelte",
+        "id": "5QvZfbdKc7NztlmR"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/routes/talent/[key]/+page.svelte",
+        "parent_id": "CGnTLus7r0yeYFA5",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/routes/talent/[key]/+page.svelte",
+        "id": "bQdwBxey0lHNItJg"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/routes/talent/[key]/+page.server.ts",
+        "parent_id": "CGnTLus7r0yeYFA5",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/routes/talent/[key]/+page.server.ts",
+        "id": "xuQzVh5ADBbaUjkK"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/routes/talent/[key]/TalentActivity.svelte",
+        "parent_id": "CGnTLus7r0yeYFA5",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/routes/talent/[key]/TalentActivity.svelte",
+        "id": "MLPCNmGVY314RXsf"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/routes/talent/[key]/TalentWallet.svelte",
+        "parent_id": "CGnTLus7r0yeYFA5",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/routes/talent/[key]/TalentWallet.svelte",
+        "id": "wuK9phoz1V374nJf"
+    },
+    {
+        "type": "Directory",
+        "name": "/Users/joseph/Dev/pcall/app/src/routes/ticket/[id]/pin",
+        "parent_id": "fazxjXI9ueby32nw",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/routes/ticket/[id]/pin",
+        "id": "yYd5SiqOtFfKVrU9"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/routes/ticket/[id]/pin/+page.svelte",
+        "parent_id": "fazxjXI9ueby32nw",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/routes/ticket/[id]/pin/+page.svelte",
+        "id": "Vmi4cP1oNTAebG2D"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/routes/ticket/[id]/pin/+page.server.ts",
+        "parent_id": "fazxjXI9ueby32nw",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/routes/ticket/[id]/pin/+page.server.ts",
+        "id": "GdoVczFClM65k4fD"
+    },
+    {
+        "type": "Directory",
+        "name": "/Users/joseph/Dev/pcall/app/src/routes/ticket/[id]/showtime",
+        "parent_id": "fazxjXI9ueby32nw",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/routes/ticket/[id]/showtime",
+        "id": "WCA6YjIJ3alfUDLZ"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/routes/ticket/[id]/+layout.svelte",
+        "parent_id": "fazxjXI9ueby32nw",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/routes/ticket/[id]/+layout.svelte",
+        "id": "I2k0tWqOH8YczLhX"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/routes/ticket/[id]/+page.svelte",
+        "parent_id": "fazxjXI9ueby32nw",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/routes/ticket/[id]/+page.svelte",
+        "id": "UO7FZgKXlzWqreb4"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/routes/ticket/[id]/TicketDetail.svelte",
+        "parent_id": "fazxjXI9ueby32nw",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/routes/ticket/[id]/TicketDetail.svelte",
+        "id": "PK8JaGI3jTWv0fkr"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/routes/ticket/[id]/TicketFeedback.svelte",
+        "parent_id": "fazxjXI9ueby32nw",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/routes/ticket/[id]/TicketFeedback.svelte",
+        "id": "KlyoCZ7XVHIvGPMN"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/routes/+layout.svelte",
+        "parent_id": "fazxjXI9ueby32nw",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/routes/+layout.svelte",
+        "id": "QDZhjr1ByK8EVM0k"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/routes/+page.svelte",
+        "parent_id": "fazxjXI9ueby32nw",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/routes/+page.svelte",
+        "id": "Mqv6Bg1yXOLUjuVH"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/lib/machines/refundMachine.ts",
+        "parent_id": "AJm2pcnTvzslH7Uo",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/lib/machines/refundMachine.ts",
+        "id": "WSVtU2oAIQuZT8Cb"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/lib/machines/saleMachine.ts",
+        "parent_id": "AJm2pcnTvzslH7Uo",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/lib/machines/saleMachine.ts",
+        "id": "M7mepAq2lNUSwIF8"
     }
 ]

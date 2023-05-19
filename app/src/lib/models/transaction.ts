@@ -36,6 +36,6 @@ export const Transaction = models?.Transaction
   : (mongoose.model<TransactionDocType>(
       'Transaction',
       transactionSchema
-    ) as Model<TransactionDocType>);
+    ) );
 
 export type TransactionType = InstanceType<typeof Transaction>;

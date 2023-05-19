@@ -5,7 +5,7 @@ import {
   MONGO_DB_ENDPOINT,
 } from '$env/static/private';
 import { PUBLIC_JITSI_DOMAIN, PUBLIC_TALENT_PATH } from '$env/static/public';
-import { Show, type ShowType } from '$lib/models/show';
+import { Show } from '$lib/models/show';
 import { Talent } from '$lib/models/talent';
 import {
   getShowMachineService,
@@ -44,7 +44,7 @@ export const load: PageServerLoad = async ({ params }) => {
     .orFail(() => {
       throw error(404, 'Show not found');
     })
-    .exec()) as ShowType;
+    .exec());
 
   const showService = getShowMachineService(show);
 

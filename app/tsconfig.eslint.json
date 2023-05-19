@@ -1,0 +1,25 @@
+{
+  "extends": "./tsconfig.json",
+  "exclude": [
+    "node_modules",
+    "dist",
+    ".svelte-kit",
+    "src/node_modules",
+    "src/dist",
+    "src/.svelte-kit",
+    "build",
+  ],
+  "include": [
+    "server.js",
+    "svelte.config.js",
+    ".eslintrc.cjs",
+    "ambient.d.ts",
+    "./types/**/$types.d.ts",
+    "./src/**/*.js",
+    "./src/**/*.ts",
+    "./src/**/*.svelte",
+    "./tests/**/*.js",
+    "./tests/**/*.ts",
+    "./tests/**/*.svelte"
+  ],
+}

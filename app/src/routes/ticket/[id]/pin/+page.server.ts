@@ -47,9 +47,9 @@ export const actions: Actions = {
       return fail(400, { pin, invalidPin: true });
     }
 
-    const hash = createPinHash(ticketId!, pin);
+    const hash = createPinHash(ticketId, pin);
     cookies.set('pin', hash, { path: '/' });
-    const redirectUrl = urlJoin(url.origin, PUBLIC_TICKET_PATH, ticketId!);
+    const redirectUrl = urlJoin(url.origin, PUBLIC_TICKET_PATH, ticketId);
     throw redirect(303, redirectUrl);
   },
 };

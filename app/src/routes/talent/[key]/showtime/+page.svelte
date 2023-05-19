@@ -15,7 +15,7 @@
   let talentObj = data.talent as TalentDocType;
   $: currentShow = data.show as ShowDocType;
   // @ts-ignore
-  let jitsiToken = data.jitsiToken as string;
+  let jitsiToken = data.jitsiToken ;
 
   let videoCallElement: HTMLDivElement;
   let returnUrl = urlJoin($page.url.origin, PUBLIC_TALENT_PATH, talentObj.key);

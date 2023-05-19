@@ -1,5 +1,12 @@
 import { PUBLIC_ESCROW_PERIOD, PUBLIC_GRACE_PERIOD } from '$env/static/public';
-import { ShowStatus, type ShowDocType } from '$lib/models/show';
+import type {
+  ShowDocType,
+  ShowRefundType,
+  ShowSaleType
+} from '$lib/models/show';
+import {
+  ShowStatus,
+} from '$lib/models/show';
 import type { TicketDocType } from '$lib/models/ticket';
 import type { TransactionDocType } from '$lib/models/transaction';
 import type { Queue } from 'bullmq';
@@ -26,57 +33,50 @@ export type ShowMachineOptions = {
 
 export type ShowMachineEventType =
   | {
-      type: 'REQUEST CANCELLATION';
-      cancel: ShowStateType['cancel'];
-      tickets: TicketDocType[];
-    }
+    type: 'CANCELLATION INITIATED';
+    cancel: ShowStateType['cancel'];
+  }
   | {
-      type: 'TICKET REFUNDED';
-      transaction: TransactionDocType;
-      ticket?: TicketDocType;
-    }
+    type: 'TICKET REFUNDED';
+    refund: ShowRefundType;
+  }
   | {
-      type: 'TICKET RESERVED';
-      ticket?: TicketDocType;
-    }
+    type: 'TICKET RESERVED';
+    ticket?: TicketDocType;
+  }
   | {
-      type: 'TICKET RESERVATION TIMEOUT';
-      ticket?: TicketDocType;
-    }
+    type: 'TICKET RESERVATION TIMEOUT';
+    ticket: TicketDocType;
+  }
   | {
-      type: 'TICKET CANCELLED';
-      ticket?: TicketDocType;
-    }
+    type: 'TICKET CANCELLED';
+    ticket: TicketDocType;
+  }
   | {
-      type: 'TICKET SOLD';
-      transaction: TransactionDocType;
-      ticket?: TicketDocType;
-    }
+    type: 'TICKET SOLD';
+    sale: ShowSaleType;
+  }
   | {
-      type: 'START SHOW';
-    }
+    type: 'START SHOW';
+  }
   | {
-      type: 'STOP SHOW';
-    }
+    type: 'STOP SHOW';
+  }
   | {
-      type: 'SHOW FINALIZED';
-      finalize: ShowStateType['finalize'];
-    }
+    type: 'SHOW FINALIZED';
+    finalize: ShowStateType['finalize'];
+  }
   | {
-      type: 'SHOW ENDED';
-    }
+    type: 'SHOW ENDED';
+  }
   | {
-      type: 'CUSTOMER JOINED';
-      ticket: TicketDocType;
-    }
+    type: 'CUSTOMER JOINED';
+    ticket: TicketDocType;
+  }
   | {
-      type: 'CUSTOMER LEFT';
-      ticket: TicketDocType;
-    }
-  | {
-      type: 'SHOWSTATE UPDATE';
-      showState: ShowStateType;
-    };
+    type: 'CUSTOMER LEFT';
+    ticket: TicketDocType;
+  };
 
 export const createShowMachine = ({
   showDocument,
@@ -98,7 +98,6 @@ export const createShowMachine = ({
         errorMessage: undefined as string | undefined,
         id: nanoid(),
       },
-      // eslint-disable-next-line @typescript-eslint/consistent-type-imports
       tsTypes: {} as import('./showMachine.typegen').Typegen0,
       schema: {
         events: {} as ShowMachineEventType,
@@ -119,8 +118,8 @@ export const createShowMachine = ({
               cond: 'showBoxOfficeClosed',
             },
             {
-              target: 'requestedCancellation',
-              cond: 'showRequestedCancellation',
+              target: 'initiatedCancellation',
+              cond: 'showInitiatedCancellation',
             },
             {
               target: 'cancelled',
@@ -167,15 +166,15 @@ export const createShowMachine = ({
         },
         boxOfficeOpen: {
           on: {
-            'REQUEST CANCELLATION': [
+            'CANCELLATION INITIATED': [
               {
                 target: 'cancelled',
                 cond: 'canCancel',
-                actions: ['requestCancellation', 'cancelShow'],
+                actions: ['initiateCancellation', 'cancelShow'],
               },
               {
-                target: 'requestedCancellation',
-                actions: ['requestCancellation'],
+                target: 'initiatedCancellation',
+                actions: ['initiateCancellation'],
               },
             ],
             'TICKET RESERVED': [
@@ -236,15 +235,15 @@ export const createShowMachine = ({
                 actions: ['refundTicket'],
               },
             ],
-            'REQUEST CANCELLATION': [
+            'CANCELLATION INITIATED': [
               {
                 target: 'cancelled',
                 cond: 'canCancel',
-                actions: ['requestCancellation', 'cancelShow'],
+                actions: ['initiateCancellation', 'cancelShow'],
               },
               {
-                target: 'requestedCancellation',
-                actions: ['requestCancellation'],
+                target: 'initiatedCancellation',
+                actions: ['initiateCancellation'],
               },
             ],
           },
@@ -273,19 +272,26 @@ export const createShowMachine = ({
             },
           },
         },
-        requestedCancellation: {
+        initiatedCancellation: {
           initial: 'waiting2Refund',
           states: {
             waiting2Refund: {
               on: {
-                'TICKET REFUNDED': {
-                  actions: ['refundTicket'],
-                },
-                'TICKET CANCELLED': {
-                  target: '#showMachine.cancelled',
-                  cond: 'fullyRefunded',
-                  actions: ['cancelShow'],
-                },
+                'REFUND INITIATED': {},
+              },
+            },
+            initiatedRefund: {
+              on: {
+                'TICKET REFUNDED': [
+                  {
+                    target: '#showMachine.cancelled',
+                    cond: 'fullyRefunded',
+                    actions: ['cancelShow'],
+                  },
+                  {
+                    actions: ['refundTicket'],
+                  },
+                ],
               },
             },
           },
@@ -358,7 +364,7 @@ export const createShowMachine = ({
           };
         }),
 
-        requestCancellation: assign((context, event) => {
+        initiateCancellation: assign((context, event) => {
           showMachineOptions?.jobQueue?.add(event.type, {
             showId: context.showDocument._id,
             cancel: event.cancel,
@@ -366,7 +372,7 @@ export const createShowMachine = ({
           return {
             showState: {
               ...context.showState,
-              status: ShowStatus.CANCELLATION_REQUESTED,
+              status: ShowStatus.CANCELLATION_INITIATED,
               salesStats: {
                 ...context.showState.salesStats,
                 ticketsAvailable: 0,
@@ -378,20 +384,22 @@ export const createShowMachine = ({
 
         refundTicket: assign((context, event) => {
           // Check if this is full refund for a ticket
-          const ticketsRefunded =
-            context.showState.salesStats.ticketsRefunded + 1;
+          const st = context.showState;
+          const ticketsRefunded = st.salesStats.ticketsRefunded + 1;
+          const refundedAmount =
+            st.salesStats.totalRefunded + +event.transaction.value;
+          const refund = {
+            refundedAt: new Date(),
+            transactions: [event.transaction._id],
+            ticket: event.ticket._id,
+          } as ShowRefundType;
+          st.refunds.push(refund);
 
           return {
             showState: {
               ...context.showState,
               ticketsRefunded,
-              refundedAmount:
-                context.showState.salesStats.totalRefunded +
-                +event.transaction.value,
-              transactions: [
-                ...(context.showState.transactions || []),
-                event.transaction._id,
-              ],
+              refundedAmount,
             },
           };
         }),
@@ -469,19 +477,24 @@ export const createShowMachine = ({
         }),
 
         sellTicket: assign((context, event) => {
-          const state = context.showState;
+          const st = context.showState;
+          const ticketsSold = st.salesStats.ticketsSold + 1;
+          const totalSales =
+            st.salesStats.totalSales + +event.transaction.value;
+          const sale = {
+            soldAt: new Date(),
+            transactions: [event.transaction._id],
+            ticket: event.ticket._id,
+          };
+          st.sales.push(sale);
           return {
             showState: {
-              ...state,
+              ...st,
               salesStats: {
-                ...state.salesStats,
-                ticketsSold: state.salesStats.ticketsSold + 1,
-                totalSales:
-                  state.salesStats.totalSales + +event.transaction.value,
+                ...st.salesStats,
+                ticketsSold,
+                totalSales,
               },
-              transactions: state.transactions
-                ? [...state.transactions, event.transaction._id]
-                : [event.transaction._id],
             },
           };
         }),
@@ -503,7 +516,7 @@ export const createShowMachine = ({
             +GRACE_PERIOD -
             (context.showState.runtime?.endDate
               ? new Date().getTime() -
-                context.showState.runtime.endDate.getTime()
+              context.showState.runtime.endDate.getTime()
               : 0);
           return delay > 0 ? delay : 0;
         },
@@ -511,14 +524,14 @@ export const createShowMachine = ({
       guards: {
         canCancel: context =>
           context.showState.salesStats.ticketsSold -
-            context.showState.salesStats.ticketsRefunded ===
+          context.showState.salesStats.ticketsRefunded ===
           0,
         showCancelled: context =>
           context.showState.status === ShowStatus.CANCELLED,
         showFinalized: context =>
           context.showState.status === ShowStatus.FINALIZED,
-        showRequestedCancellation: context =>
-          context.showState.status === ShowStatus.CANCELLATION_REQUESTED,
+        showInitiatedCancellation: context =>
+          context.showState.status === ShowStatus.CANCELLATION_INITIATED,
         showBoxOfficeOpen: context =>
           context.showState.status === ShowStatus.BOX_OFFICE_OPEN,
         showBoxOfficeClosed: context =>
@@ -533,13 +546,13 @@ export const createShowMachine = ({
             // Allow grace period to start show again
             return (
               (context.showState.runtime?.startDate.getTime() ?? 0) +
-                +GRACE_PERIOD >
+              +GRACE_PERIOD >
               new Date().getTime()
             );
           }
           return (
             context.showState.salesStats.ticketsSold -
-              context.showState.salesStats.ticketsAvailable >
+            context.showState.salesStats.ticketsAvailable >
             0
           );
         },

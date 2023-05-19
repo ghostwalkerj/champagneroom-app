@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { browser } from '$app/environment';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import {
@@ -14,7 +15,6 @@
   import { onDestroy, onMount } from 'svelte';
   import urlJoin from 'url-join';
   import type { PageData } from '../$types';
-  import { browser } from '$app/environment';
 
   export let data: PageData;
 

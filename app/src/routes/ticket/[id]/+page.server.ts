@@ -10,7 +10,7 @@ import { Transaction, TransactionReasonType } from '$lib/models/transaction';
 import { MONGO_DB_ENDPOINT } from '$env/static/private';
 import type { ShowMachineServiceType } from '$lib/machines/showMachine';
 import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
-import { Show, type ShowType } from '$lib/models/show';
+import { Show } from '$lib/models/show';
 import { ActorType } from '$lib/util/constants';
 import { verifyPin } from '$lib/util/pin';
 import {
@@ -62,7 +62,7 @@ export const load: PageServerLoad = async ({ params, cookies, url }) => {
     .orFail(() => {
       throw error(404, 'Show not found');
     })
-    .exec()) as ShowType;
+    .exec());
 
   if (ticket.ticketState.reservation === undefined) {
     throw error(404, 'Ticket not reserved');
@@ -125,7 +125,7 @@ export const actions: Actions = {
     };
 
     const cancelEvent = {
-      type: 'REQUEST CANCELLATION',
+      type: 'CANCELLATION INITIATED',
       cancel,
     } as TicketMachineEventType;
 
@@ -218,7 +218,7 @@ export const actions: Actions = {
 
     const state = ticketService.getSnapshot();
     const dispute = {
-      disputer: ActorType.CUSTOMER,
+      disputedBy: ActorType.CUSTOMER,
       reason: reason as TicketDisputeReason,
       explanation,
       startedAt: new Date(),

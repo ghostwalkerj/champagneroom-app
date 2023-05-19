@@ -5,6 +5,7 @@
 	export let path = '';
 </script>
 
+<!-- svelte-ignore a11y-click-events-have-key-events -->
 <div
 	class="cursor-pointer flex flex-col text-gray-300 w-16 items-center group  hover:text-white"
 	on:click={() => goto(path)}

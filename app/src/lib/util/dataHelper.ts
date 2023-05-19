@@ -82,7 +82,7 @@ const generateShows = (talent: TalentDocument, count: number) => {
     //   linkState: {
     //     status: LinkStatus.FINALIZED,
     //     totalFunding: amount,
-    //     requestedAmount: amount,
+    //     initiatedAmount: amount,
     //     refundedAmount: 0,
     //     finalized: {
     //       endedAt: endedAt.epoch,
@@ -90,7 +90,7 @@ const generateShows = (talent: TalentDocument, count: number) => {
     //     feedback: _feedback,
     //     updatedAt: new Date().getTime(),
     //   },
-    //   requestedAmount: amount,
+    //   initiatedAmount: amount,
     //   fundingAddress: '0x251281e1516e6E0A145d28a41EE63BfcDd9E18Bf',
     //   callId: uuidv4(),
     //   talent: talent._id,

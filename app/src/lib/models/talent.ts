@@ -116,6 +116,6 @@ export const Talent = models?.Talent
   : (mongoose.model<TalentDocType>(
       'Talent',
       talentSchema
-    ) as Model<TalentDocType>);
+    ) );
 
 export type TalentType = InstanceType<typeof Talent>;
