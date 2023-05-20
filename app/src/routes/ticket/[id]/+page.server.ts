@@ -2,6 +2,7 @@ import { PUBLIC_PIN_PATH } from '$env/static/public';
 import type {
   TicketDisputeReason,
   TicketDocType,
+  TicketStateType,
   TicketType,
 } from '$lib/models/ticket';
 import { Ticket, TicketCancelReason } from '$lib/models/ticket';
@@ -114,15 +115,15 @@ export const actions: Actions = {
     }
     mongoose.connect(MONGO_DB_ENDPOINT);
 
-    const { ticket, show, ticketService } = await getTicketService(ticketId);
+    const ticketService = await getTicketMachineServiceFromId(ticketId);
     const state = ticketService.getSnapshot();
 
     const cancel = {
-      canceller: ActorType.CUSTOMER,
+      cancelledBy: ActorType.CUSTOMER,
       cancelledInState: JSON.stringify(state.value),
       reason: TicketCancelReason.CUSTOMER_CANCELLED,
       cancelledAt: new Date(),
-    };
+    } as TicketStateType['cancel'];
 
     const cancelEvent = {
       type: 'CANCELLATION INITIATED',
@@ -134,23 +135,6 @@ export const actions: Actions = {
 
       ticketService.send(cancelEvent);
 
-      if (ticket.ticketState.totalPaid > ticket.ticketState.totalRefunded) {
-        Transaction.create({
-          //TODO: add transaction data
-          hash: '0xeba2df809e7a612a0a0d444ccfa5c839624bdc00dd29e3340d46df3870f8a30e',
-          from: '0x5B38Da6a701c568545dCfcB03FcB875f56beddC4',
-          to: '0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2',
-          value: ticket.price.toString(),
-          block: 123,
-          reason: TransactionReasonType.TICKET_PAYMENT,
-          ticket: ticket._id,
-          show: show._id,
-          agent: show.agent,
-          talent: show.talent,
-        }).then(transaction => {
-          ticketService.send({ type: 'REFUND RECEIVED', transaction });
-        });
-      }
     }
     const snapshot = ticketService.getSnapshot();
     const _ticket = snapshot.context.ticketDocument;

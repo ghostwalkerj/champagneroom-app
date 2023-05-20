@@ -5,7 +5,6 @@
   import urlJoin from 'url-join';
 
   export let row;
-  export let col;
 
   $: url = urlJoin($page.url.origin, PUBLIC_TALENT_PATH, row.url);
   let tooltipOpen = '';

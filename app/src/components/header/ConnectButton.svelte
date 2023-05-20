@@ -158,7 +158,7 @@
   </div>
 {/if}
 
-<style>
+<style >
   :global .walletconnect-modal__base {
     background: rgb(39, 49, 56) !important;
     color: black;

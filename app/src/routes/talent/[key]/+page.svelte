@@ -103,7 +103,6 @@
     canCancelShow = state.can({
       type: 'CANCELLATION INITIATED',
       cancel: undefined,
-      tickets: [],
     });
     canCreateShow = state.hasTag('canCreateShow');
     canStartShow = state.can({ type: 'START SHOW' });
@@ -169,6 +168,9 @@
       } else if (result.data.inEscrow) {
         noCurrentShow();
         statusText = 'In Escrow';
+      }else if (result.data.refundInitiated) {
+        noCurrentShow();
+        statusText = 'Refund Initiated';
       }
       await applyAction(result);
       loading = false;

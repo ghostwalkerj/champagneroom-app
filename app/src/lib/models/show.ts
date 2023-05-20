@@ -220,6 +220,8 @@ showSchema.plugin(fieldEncryption, {
 
 export type ShowStateType = InferSchemaType<typeof showStateSchema>;
 
+export type ShowCancelType = InferSchemaType<typeof cancelSchema>;
+
 export type ShowDocType = InferSchemaType<typeof showSchema>;
 
 export type ShowRefundType = InferSchemaType<typeof refundSchema>;

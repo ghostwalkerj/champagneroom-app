@@ -1,7 +1,6 @@
 <script lang="ts">
 	import StarRating from 'svelte-star-rating';
 	export let row;
-	export let col;
 
 	$: rating = row.rating;
 </script>

@@ -205,10 +205,13 @@ export const actions: Actions = {
     const showState = showService.getSnapshot();
 
     if (showState.matches('initiatedCancellation.waiting2Refund')) {
+      showService.send({
+        type: 'REFUND INITIATED',
+      });
     }
     return {
       success: true,
-      showCancelled: true,
+      refundInitiated: true,
     };
   },
 };

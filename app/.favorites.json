@@ -55,46 +55,6 @@
     },
     {
         "type": "Directory",
-        "name": "/Users/joseph/Dev/pcall/app/src/components/calls",
-        "parent_id": "8z9xT1DJ04BrNEWf",
-        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
-        "workspacePath": "src/components/calls",
-        "id": "JN1YERWwHB9j7skF"
-    },
-    {
-        "type": "File",
-        "name": "/Users/joseph/Dev/pcall/app/src/components/calls/MobileVideoCall.svelte",
-        "parent_id": "8z9xT1DJ04BrNEWf",
-        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
-        "workspacePath": "src/components/calls/MobileVideoCall.svelte",
-        "id": "Fp76lAOCgLW8Ioiv"
-    },
-    {
-        "type": "File",
-        "name": "/Users/joseph/Dev/pcall/app/src/components/calls/MobileVideoPreview.svelte",
-        "parent_id": "8z9xT1DJ04BrNEWf",
-        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
-        "workspacePath": "src/components/calls/MobileVideoPreview.svelte",
-        "id": "BvCYG2S9g0nlusZJ"
-    },
-    {
-        "type": "File",
-        "name": "/Users/joseph/Dev/pcall/app/src/components/calls/VideoCall.svelte",
-        "parent_id": "8z9xT1DJ04BrNEWf",
-        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
-        "workspacePath": "src/components/calls/VideoCall.svelte",
-        "id": "49nQdD2b0ir6Ekc7"
-    },
-    {
-        "type": "File",
-        "name": "/Users/joseph/Dev/pcall/app/src/components/calls/VideoPreview.svelte",
-        "parent_id": "8z9xT1DJ04BrNEWf",
-        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
-        "workspacePath": "src/components/calls/VideoPreview.svelte",
-        "id": "vFVxGOks7z2Ng13J"
-    },
-    {
-        "type": "Directory",
         "name": "/Users/joseph/Dev/pcall/app/src/components/forms",
         "parent_id": "8z9xT1DJ04BrNEWf",
         "workspaceRoot": "/Users/joseph/Dev/pcall/app",
@@ -613,30 +573,6 @@
     },
     {
         "type": "Directory",
-        "name": "/Users/joseph/Dev/pcall/app/src/routes/ticket/[id]/pin",
-        "parent_id": "fazxjXI9ueby32nw",
-        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
-        "workspacePath": "src/routes/ticket/[id]/pin",
-        "id": "yYd5SiqOtFfKVrU9"
-    },
-    {
-        "type": "File",
-        "name": "/Users/joseph/Dev/pcall/app/src/routes/ticket/[id]/pin/+page.svelte",
-        "parent_id": "fazxjXI9ueby32nw",
-        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
-        "workspacePath": "src/routes/ticket/[id]/pin/+page.svelte",
-        "id": "Vmi4cP1oNTAebG2D"
-    },
-    {
-        "type": "File",
-        "name": "/Users/joseph/Dev/pcall/app/src/routes/ticket/[id]/pin/+page.server.ts",
-        "parent_id": "fazxjXI9ueby32nw",
-        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
-        "workspacePath": "src/routes/ticket/[id]/pin/+page.server.ts",
-        "id": "GdoVczFClM65k4fD"
-    },
-    {
-        "type": "Directory",
         "name": "/Users/joseph/Dev/pcall/app/src/routes/ticket/[id]/showtime",
         "parent_id": "fazxjXI9ueby32nw",
         "workspaceRoot": "/Users/joseph/Dev/pcall/app",
@@ -677,22 +613,6 @@
     },
     {
         "type": "File",
-        "name": "/Users/joseph/Dev/pcall/app/src/routes/+layout.svelte",
-        "parent_id": "fazxjXI9ueby32nw",
-        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
-        "workspacePath": "src/routes/+layout.svelte",
-        "id": "QDZhjr1ByK8EVM0k"
-    },
-    {
-        "type": "File",
-        "name": "/Users/joseph/Dev/pcall/app/src/routes/+page.svelte",
-        "parent_id": "fazxjXI9ueby32nw",
-        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
-        "workspacePath": "src/routes/+page.svelte",
-        "id": "Mqv6Bg1yXOLUjuVH"
-    },
-    {
-        "type": "File",
         "name": "/Users/joseph/Dev/pcall/app/src/lib/machines/refundMachine.ts",
         "parent_id": "AJm2pcnTvzslH7Uo",
         "workspaceRoot": "/Users/joseph/Dev/pcall/app",
@@ -706,5 +626,21 @@
         "workspaceRoot": "/Users/joseph/Dev/pcall/app",
         "workspacePath": "src/lib/machines/saleMachine.ts",
         "id": "M7mepAq2lNUSwIF8"
+    },
+    {
+        "type": "Directory",
+        "name": "/Users/joseph/Dev/pcall/app/src/routes/ticket/[id]/pin",
+        "parent_id": "fazxjXI9ueby32nw",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/routes/ticket/[id]/pin",
+        "id": "0mUHJdtgqaNP4prK"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/routes/ticket/[id]/+page.server.ts",
+        "parent_id": "fazxjXI9ueby32nw",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/routes/ticket/[id]/+page.server.ts",
+        "id": "4yU2mhdOZr8TNvIX"
     }
 ]
