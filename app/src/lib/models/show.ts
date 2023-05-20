@@ -52,6 +52,8 @@ const refundSchema = new Schema({
   ],
   ticket: { type: Schema.Types.ObjectId, ref: 'Ticket', required: true },
   requestedBy: { type: String, enum: ActorType, required: true },
+  amount: { type: Number, required: true, default: 0 },
+
 });
 
 const saleSchema = new Schema({
@@ -60,6 +62,7 @@ const saleSchema = new Schema({
     { type: Schema.Types.ObjectId, ref: 'Transaction', required: true },
   ],
   ticket: { type: Schema.Types.ObjectId, ref: 'Ticket', required: true },
+  amount: { type: Number, required: true, default: 0 },
 });
 
 const runtimeSchema = new Schema({
@@ -150,8 +153,8 @@ const showStateSchema = new Schema(
     finalize: finalizeSchema,
     escrow: escrowSchema,
     runtime: runtimeSchema,
-    refunds: [refundSchema],
-    sales: [saleSchema],
+    refunds: {type: [refundSchema], required: true, default: () => []},
+    sales: {type: [saleSchema], required: true, default: () => []},
   },
   { timestamps: true }
 );

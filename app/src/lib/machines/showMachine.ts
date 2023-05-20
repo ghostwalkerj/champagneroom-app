@@ -43,6 +43,8 @@ export type ShowMachineEventType =
       ticket: TicketDocType;
       transactions: TransactionDocType[];
       requestedBy: ActorType;
+      refundedAt?: Date;
+      amount: number;
     }
   | {
       type: 'TICKET RESERVED';
@@ -60,7 +62,8 @@ export type ShowMachineEventType =
       type: 'TICKET SOLD';
       ticket: TicketDocType;
       transactions: TransactionDocType[];
-      sale: ShowSaleType;
+      soldAt?: Date;
+      amount: number;
     }
   | {
       type: 'START SHOW';
@@ -414,15 +417,13 @@ export const createShowMachine = ({
         refundTicket: assign((context, event) => {
           const st = context.showState;
           const ticketsRefunded = st.salesStats.ticketsRefunded + 1;
-          let totalValue = 0;
-          event.transactions.forEach(t => {
-            totalValue += +t.value;
-          });
-          const refundedAmount = st.salesStats.totalRefunded + totalValue;
+        
+          const refundedAmount = st.salesStats.totalRefunded + event.amount;
           const refund = {
-            refundedAt: new Date(),
+            refundedAt: event.refundedAt || new Date(),
             transactions: event.transactions.map(t => t._id),
             ticket: event.ticket._id,
+            amount: event.amount,
           } as ShowRefundType;
           st.refunds.push(refund);
 
@@ -509,18 +510,15 @@ export const createShowMachine = ({
 
         sellTicket: assign((context, event) => {
           const st = context.showState;
-          let totalValue = 0;
-          event.transactions.forEach(t => {
-            totalValue += +t.value;
-          });
-
+        
           const ticketsSold = st.salesStats.ticketsSold + 1;
-          const totalSales = st.salesStats.totalSales + +totalValue;
+          const totalSales = st.salesStats.totalSales + +event.amount;
 
           const sale = {
-            soldAt: new Date(),
+            soldAt: event.soldAt || new Date(),
             transactions: event.transactions.map(t => t._id),
             ticket: event.ticket._id,
+            amount: event.amount,
           } as ShowSaleType;
 
           st.sales.push(sale);

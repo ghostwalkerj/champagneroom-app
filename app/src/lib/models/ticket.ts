@@ -103,6 +103,22 @@ const feedbackSchema = new Schema({
   createdAt: { type: Date, required: true, default: Date.now },
 });
 
+const refundSchema = new Schema({
+  refundedAt: { type: Date, required: true, default: Date.now },
+  transactions: [
+    { type: Schema.Types.ObjectId, ref: 'Transaction', required: true },
+  ],
+  amount: { type: Number, required: true, default: 0 },
+});
+
+const saleSchema = new Schema({
+  soldAt: { type: Date, required: true, default: Date.now },
+  transactions: [
+    { type: Schema.Types.ObjectId, ref: 'Transaction', required: true },
+  ],
+  amount: { type: Number, required: true, default: 0 },
+});
+
 const ticketStateSchema = new Schema(
   {
     status: {
@@ -122,7 +138,8 @@ const ticketStateSchema = new Schema(
     dispute: disputeSchema,
     finalize: finalizeSchema,
     feedback: feedbackSchema,
-    transactions: [{ type: Schema.Types.ObjectId, ref: 'Transaction' }],
+    refund: refundSchema,
+    sale: saleSchema,
   },
   { timestamps: true }
 );

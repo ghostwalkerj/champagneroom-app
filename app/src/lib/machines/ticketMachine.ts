@@ -298,19 +298,23 @@ export const createTicketMachine = ({
         ),
 
         sendTicketSold: send(
-          (context, event) => ({
+          (context) => ({
             type: 'TICKET SOLD',
             ticket: context.ticketDocument,
-            transaction: event.transaction,
+            soldAt: context.ticketState.sale?.soldAt,
+            transactions: context.ticketState.sale?.transactions,
+            amount: context.ticketState.sale?.amount,
           }),
           { to: context => context.showMachineRef! }
         ),
 
         sendTicketRefunded: send(
-          (context, event) => ({
+          (context) => ({
             type: 'TICKET REFUNDED',
             ticket: context.ticketDocument,
-            transaction: event.transaction,
+            refundedAt: context.ticketState.refund?.refundedAt,
+            transactions: context.ticketState.refund?.transactions,
+            amount: context.ticketState.refund?.amount,
           }),
           { to: context => context.showMachineRef! }
         ),
@@ -356,33 +360,42 @@ export const createTicketMachine = ({
         }),
 
         receivePayment: assign((context, event) => {
-          const state = context.ticketState;
+          const sale = context.ticketState.sale || {
+            soldAt: new Date(),
+            transactions: [],
+            amount: 0,
+          };
+
+          sale.amount += +event.transaction.value;
+          sale.transactions.push(event.transaction._id);
           return {
             ticketState: {
               ...context.ticketState,
               totalPaid:
                 context.ticketState.totalPaid + +event.transaction.value,
-              transactions: state.transactions
-                ? [...state.transactions, event.transaction._id]
-                : [event.transaction._id],
+              sale,
             },
           };
         }),
 
         receiveRefund: assign((context, event) => {
           const state = context.ticketState;
+          const refund = state.refund || {
+            refundedAt: new Date(),
+            transactions: [],
+            amount: 0,
+          };
+
+          refund.amount += +event.transaction.value;
+          refund.transactions.push(event.transaction._id);
           return {
             ticketState: {
               ...context.ticketState,
               refundedAmount:
                 context.ticketState.totalRefunded + +event.transaction.value,
-              transactions: state.transactions
-                ? [...state.transactions, event.transaction._id]
-                : [event.transaction._id],
-            },
-          };
-        }),
-
+              refund,
+          }}}),
+          
         receiveFeedback: assign((context, event) => {
           return {
             ticketState: {
