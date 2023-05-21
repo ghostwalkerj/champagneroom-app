@@ -3,8 +3,8 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import {
-    createTicketMachineService,
-    type TicketMachineServiceType,
+      createTicketMachineService,
+      type TicketMachineServiceType,
   } from '$lib/machines/ticketMachine';
   import { TicketDisputeReason, type TicketDocType } from '$lib/models/ticket';
   import urlJoin from 'url-join';

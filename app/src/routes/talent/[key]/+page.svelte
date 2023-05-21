@@ -13,10 +13,8 @@
 
   import { goto, invalidateAll } from '$app/navigation';
   import ShowDetail from '$components/ShowDetail.svelte';
-  import {
-    createShowMachineService,
-    type ShowMachineServiceType,
-  } from '$lib/machines/showMachine';
+  import type { ShowMachineServiceType } from '$lib/machines/showMachine';
+  import { createShowMachineService } from '$lib/machines/showMachine';
 
   import type { ShowDocType } from '$lib/models/show';
   import type { ShowEventDocType } from '$lib/models/showEvent';
@@ -35,18 +33,16 @@
   const showTimePath = urlJoin($page.url.href, PUBLIC_SHOWTIME_PATH);
 
   let talent = data.talent as TalentDocType;
-  let activeShow = data.activeShow as ShowDocType | null;
-  let lastActiveShowEvent = data.lastActiveShowEvent as ShowEventDocType | null;
+  let activeShow = data.activeShow as ShowDocType | undefined;
+
   let showName = talent ? possessive(talent.name, 'en') + ' Show' : 'Show';
 
   $: showDuration = 60;
   $: talentName = talent ? talent.name : 'Talent';
   $: statusText = activeShow ? activeShow.showState.status : 'No Current Show';
-  $: eventText = lastActiveShowEvent
-    ? createEventText(lastActiveShowEvent)
-    : 'No Events';
+  $: eventText = 'No Events';
 
-  $: canCreateShow = activeShow === null;
+  $: canCreateShow = activeShow === undefined;
   $: canCancelShow = !canCreateShow;
   $: canStartShow = false;
   $: waiting4Refunds = false;
@@ -64,7 +60,8 @@
     canStartShow = false;
     statusText = 'No Current Show';
     eventText = 'No Events';
-    activeShow = null;
+    activeShow = undefined;
+    showStopped = false;
     showEventUnSub?.();
     showUnSub?.();
   };
@@ -106,6 +103,7 @@
     });
     canCreateShow = state.hasTag('canCreateShow');
     canStartShow = state.can({ type: 'START SHOW' });
+
     waiting4Refunds = state.matches('initiatedCancellation.waiting2Refund');
     statusText = state.context.showState.status;
     if (state.done) {
@@ -139,9 +137,7 @@
         talentName = _talent.name;
       }
     });
-    if (activeShow) {
-      useNewShow(activeShow);
-    }
+    activeShow && useNewShow(activeShow);
   });
 
   onDestroy(() => {
@@ -168,7 +164,7 @@
       } else if (result.data.inEscrow) {
         noCurrentShow();
         statusText = 'In Escrow';
-      }else if (result.data.refundInitiated) {
+      } else if (result.data.refundInitiated) {
         noCurrentShow();
         statusText = 'Refund Initiated';
       }

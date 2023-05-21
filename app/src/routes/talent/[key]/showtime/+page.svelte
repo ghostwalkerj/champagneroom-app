@@ -14,19 +14,20 @@
 
   let talentObj = data.talent as TalentDocType;
   $: currentShow = data.show as ShowDocType;
-  // @ts-ignore
-  let jitsiToken = data.jitsiToken ;
+  let jitsiToken = data.jitsiToken;
 
   let videoCallElement: HTMLDivElement;
   let returnUrl = urlJoin($page.url.origin, PUBLIC_TALENT_PATH, talentObj.key);
   let api: any;
+  let participantName = '';
+  let participantAvatarUrl = '';
 
   if (browser) {
     onDestroy(() => {
       endShow();
     });
 
-    const endShow = () => {
+    const endShow = async () => {
       let formData = new FormData();
       formData.append('showId', currentShow?._id.toString());
       fetch($page.url.href + '?/end_show', {
@@ -36,15 +37,6 @@
       api?.executeCommand('endConference');
     };
   }
-
-  const participantJoined = (event: any) => {
-    console.log('participantJoined', event);
-    const numberOfParticipants = api.getNumberOfParticipants();
-    console.log('numberOfParticipants', numberOfParticipants);
-    api.getRoomsInfo().then(rooms => {
-      console.log('rooms', rooms);
-    });
-  };
 
   onMount(() => {
     const options = {
@@ -65,11 +57,31 @@
       },
     };
 
+    const participantJoined = (event: any) => {
+      console.log('participantJoined', event);
+      const numberOfParticipants = api.getNumberOfParticipants();
+      console.log('numberOfParticipants', numberOfParticipants);
+      api.getRoomsInfo().then(rooms => {
+        console.log('rooms', rooms);
+      });
+    };
+
+    const participantKnocked = (participant: any) => {
+      participantName = participant?.displayName;
+      participantAvatarUrl = participant?.avatarURL;
+      console.log('participantName', participantName);
+    };
+
+    const answerKnock = (id: string, approved: boolean) => {
+      console.log('answerKnock', id, approved);
+    };
+
     // @ts-ignore
     api = new JitsiMeetExternalAPI(PUBLIC_JITSI_DOMAIN, options);
     api.executeCommand('avatarUrl', talentObj.profileImageUrl);
     api.executeCommand('subject', currentShow?.name);
     api.addListener('participantJoined', participantJoined);
+    api.addListener('knockingParticipant', participantKnocked);
     api.addListener('readyToClose', () => {
       goto(returnUrl);
     });

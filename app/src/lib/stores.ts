@@ -1,54 +1,73 @@
-import { PUBLIC_CHANGESET_PATH } from '$env/static/public';
-import to from 'await-to-js';
-import { derived, writable } from 'svelte/store';
-import urlJoin from 'url-join';
-import type { AgentDocType } from './models/agent';
-import type { ShowDocType } from './models/show';
-import type { ShowEventDocType } from './models/showEvent';
-import type { TalentDocType } from './models/talent';
-import type { TicketDocType } from './models/ticket';
+import { PUBLIC_CHANGESET_PATH } from "$env/static/public";
+import to from "await-to-js";
+import { derived, writable } from "svelte/store";
+import urlJoin from "url-join";
+import type { AgentDocType } from "./models/agent";
+import type { ShowDocType } from "./models/show";
+import type { ShowEventDocType } from "./models/showEvent";
+import type { TalentDocType } from "./models/talent";
+import type { TicketDocType } from "./models/ticket";
 
 export const browserType = writable();
 
-const getChangeset = async <T>(
-  changesetPath: string,
-  callback: (changeset: any) => void,
-  signal?: AbortSignal,
-  cancelOn?: (doc: T) => boolean
-) => {
+const getChangeset = async <T>({
+  changesetPath,
+  callback,
+  signal,
+  cancelOn,
+}: {
+  changesetPath: string;
+  callback: (changeset: T) => void;
+  signal?: AbortSignal;
+  cancelOn?: (doc: T) => boolean;
+}) => {
   let loop = true;
+  let firstFetch = true;
   while (loop) {
+    const path = firstFetch
+      ? urlJoin(changesetPath, "?firstFetch=true")
+      : changesetPath;
+    firstFetch = false;
+
     const [err, response] = await to(
-      fetch(changesetPath, {
+      fetch(path, {
         signal,
       })
     );
     if (err) {
       loop = false;
     } else {
-      const changeset = (await response.json()) as T;
-      callback(changeset);
-      if (cancelOn) {
-        loop = !cancelOn(changeset);
+      try {
+        const jsonResponse = await response.json();
+        callback(jsonResponse);
+        if (cancelOn) {
+          loop = !cancelOn(jsonResponse);
+        }
+      } catch (e) {
+        console.error(e);
+        loop = false;
       }
     }
   }
 };
 
-const abstractStore = <T>(
-  doc: T,
-  changesetPath: string,
-  cancelOn?: (doc: T) => boolean
-) => {
+const abstractStore = <T>({
+  doc,
+  changesetPath,
+  cancelOn,
+}: {
+  doc: T;
+  changesetPath: string;
+  cancelOn?: (doc: T) => boolean;
+}) => {
   const { subscribe, set } = writable<T>(doc, () => {
-    set(doc);
     if (cancelOn && cancelOn(doc)) {
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       return () => {};
     }
     const abortDoc = new AbortController();
-    const docSignal = abortDoc.signal;
-    getChangeset(changesetPath, set, docSignal, cancelOn);
+    const signal = abortDoc.signal;
+    getChangeset<T>({ changesetPath, callback: set, signal, cancelOn });
     return () => {
       abortDoc.abort();
     };
@@ -59,20 +78,20 @@ const abstractStore = <T>(
 };
 
 export const talentStore = (talent: TalentDocType) => {
-  return abstractStore(
-    talent,
-    urlJoin(PUBLIC_CHANGESET_PATH, 'talent', talent.key)
-  );
+  return abstractStore({
+    doc: talent,
+    changesetPath: urlJoin(PUBLIC_CHANGESET_PATH, "talent", talent.key),
+  });
 };
 
 export const showStore = (show: ShowDocType) => {
   const showCancel = (show: ShowDocType) => !show.showState.active;
 
-  return abstractStore(
-    show,
-    urlJoin(PUBLIC_CHANGESET_PATH, 'show', show._id.toString()),
-    showCancel
-  );
+  return abstractStore({
+    doc: show,
+    changesetPath: urlJoin(PUBLIC_CHANGESET_PATH, "show", show._id.toString()),
+    cancelOn: showCancel,
+  });
 };
 
 export const showEventStore = (show: ShowDocType) => {
@@ -84,11 +103,15 @@ export const showEventStore = (show: ShowDocType) => {
       if (!showCancel($show)) {
         const abortShowEvent = new AbortController();
         const showEventSignal = abortShowEvent.signal;
-        getChangeset(
-          urlJoin(PUBLIC_CHANGESET_PATH, 'showEvent', $show._id.toString()),
-          set,
-          showEventSignal
-        );
+        getChangeset<ShowEventDocType>({
+          changesetPath: urlJoin(
+            PUBLIC_CHANGESET_PATH,
+            "showEvent",
+            $show._id.toString()
+          ),
+          callback: set,
+          signal: showEventSignal,
+        });
         return () => {
           abortShowEvent.abort();
         };
@@ -103,16 +126,20 @@ export const showEventStore = (show: ShowDocType) => {
 
 export const ticketStore = (ticket: TicketDocType) => {
   const ticketCancel = (ticket: TicketDocType) => !ticket.ticketState.active;
-  return abstractStore(
-    ticket,
-    urlJoin(PUBLIC_CHANGESET_PATH, 'ticket', ticket._id.toString()),
-    ticketCancel
-  );
+  return abstractStore({
+    doc: ticket,
+    changesetPath: urlJoin(
+      PUBLIC_CHANGESET_PATH,
+      "ticket",
+      ticket._id.toString()
+    ),
+    cancelOn: ticketCancel,
+  });
 };
 
 export const agentStore = (agent: AgentDocType) => {
-  return abstractStore(
-    agent,
-    urlJoin(PUBLIC_CHANGESET_PATH, 'agent', agent.address)
-  );
+  return abstractStore({
+    doc: agent,
+    changesetPath: urlJoin(PUBLIC_CHANGESET_PATH, "agent", agent.address),
+  });
 };

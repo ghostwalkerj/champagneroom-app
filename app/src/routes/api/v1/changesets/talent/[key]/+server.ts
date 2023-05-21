@@ -1,29 +1,37 @@
-import { MONGO_DB_ENDPOINT } from '$env/static/private';
-import { Talent } from '$lib/models/talent';
-import type { RequestHandler } from '@sveltejs/kit';
-import mongoose from 'mongoose';
+import { MONGO_DB_ENDPOINT } from "$env/static/private";
+import { Talent } from "$lib/models/talent";
+import type { RequestHandler } from "@sveltejs/kit";
+import mongoose from "mongoose";
 
 /** @type {import('./$types').PageServerLoad} */
-export const GET: RequestHandler<{ key: string }> = async ({ params }) => {
+export const GET: RequestHandler<{ key: string }> = async ({ params, url }) => {
   const talentKey = params.key;
   if (talentKey === null) {
-    return new Response('Talent key not found', { status: 404 });
+    return new Response("Talent key not found", { status: 404 });
   }
-
+  const firstFetch = url.searchParams.get("firstFetch") || false;
+  let doc: string | undefined = undefined;
   mongoose.connect(MONGO_DB_ENDPOINT);
 
-  const pipeline = [{ $match: { 'fullDocument.key': talentKey } }];
-  const changeStream = Talent.watch(pipeline, { fullDocument: 'updateLookup' });
+  if (firstFetch) {
+    const show = await Talent.findOne({ key: talentKey }).lean().exec();
+    if (show !== undefined) {
+      doc = JSON.stringify(show);
+    }
+  } else {
+    const pipeline = [{ $match: { "fullDocument.key": talentKey } }];
+    const changeStream = Talent.watch(pipeline, {
+      fullDocument: "updateLookup",
+    });
+    const next = await changeStream.next();
+    doc = next.fullDocument;
+    changeStream.close();
+  }
 
-  const next = await changeStream.next();
-  const doc = next.fullDocument;
-
-  changeStream.close();
-
-  return new Response(JSON.stringify(doc), {
+  return new Response(doc, {
     status: 200,
     headers: {
-      'content-type': 'application/json',
+      "content-type": "application/json",
     },
   });
 };

@@ -1,35 +1,45 @@
-import { MONGO_DB_ENDPOINT } from '$env/static/private';
-import { Show } from '$lib/models/show';
-import type { RequestHandler } from '@sveltejs/kit';
-import mongoose from 'mongoose';
+import { MONGO_DB_ENDPOINT } from "$env/static/private";
+import { Show } from "$lib/models/show";
+import mongoose from "mongoose";
+import type { RequestHandler } from "./$types";
 
-export const GET: RequestHandler<{ id: string }> = async ({ params }) => {
+export const GET: RequestHandler = async ({ params, url }) => {
   const showId = params.id;
+  const firstFetch = url.searchParams.get("firstFetch") || false;
   if (showId === null) {
-    return new Response('Show not found', { status: 404 });
+    return new Response("Show not found", { status: 404 });
   }
   mongoose.connect(MONGO_DB_ENDPOINT);
 
   const id = new mongoose.Types.ObjectId(showId);
 
-  const pipeline = [
-    {
-      $match: {
-        'fullDocument._id': id,
+  let doc: string | undefined = undefined;
+
+  if (firstFetch) {
+    const show = await Show.findById(id).lean().exec();
+    if (show !== undefined) {
+      doc = JSON.stringify(show);
+    }
+  } else {
+    const pipeline = [
+      {
+        $match: {
+          "fullDocument._id": id,
+        },
       },
-    },
-  ];
+    ];
 
-  const changeStream = Show.watch(pipeline, { fullDocument: 'updateLookup' });
-  const next = await changeStream.next();
-  const doc = next.fullDocument;
+    const changeStream = Show.watch(pipeline, { fullDocument: "updateLookup" });
+    const next = await changeStream.next();
+    doc = JSON.stringify(next.fullDocument);
 
-  changeStream.close();
+    changeStream.close();
+  }
 
-  return new Response(JSON.stringify(doc), {
+  return new Response(doc, {
     status: 200,
     headers: {
-      'content-type': 'application/json',
+      "content-type": "application/json",
     },
   });
 };
