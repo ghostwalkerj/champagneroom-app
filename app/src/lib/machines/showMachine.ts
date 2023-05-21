@@ -1,18 +1,18 @@
-import { PUBLIC_ESCROW_PERIOD, PUBLIC_GRACE_PERIOD } from '$env/static/public';
+import { PUBLIC_ESCROW_PERIOD, PUBLIC_GRACE_PERIOD } from "$env/static/public";
 import type {
   ShowDocType,
   ShowRefundType,
   ShowSaleType,
-} from '$lib/models/show';
-import { ShowStatus } from '$lib/models/show';
-import type { TicketDocType } from '$lib/models/ticket';
-import type { TransactionDocType } from '$lib/models/transaction';
-import type { ActorType } from '$lib/util/constants';
-import type { Queue } from 'bullmq';
-import { nanoid } from 'nanoid';
-import { assign, createMachine, interpret, type StateFrom } from 'xstate';
+} from "$lib/models/show";
+import { ShowStatus } from "$lib/models/show";
+import type { TicketDocType } from "$lib/models/ticket";
+import type { TransactionDocType } from "$lib/models/transaction";
+import type { ActorType } from "$lib/util/constants";
+import type { Queue } from "bullmq";
+import { nanoid } from "nanoid";
+import { assign, createMachine, interpret, type StateFrom } from "xstate";
 
-export type ShowStateType = ShowDocType['showState'];
+export type ShowStateType = ShowDocType["showState"];
 
 export type ShowMachineOptions = {
   saveStateCallback?: (state: ShowStateType) => void;
@@ -32,14 +32,14 @@ export type ShowMachineOptions = {
 
 export type ShowMachineEventType =
   | {
-      type: 'CANCELLATION INITIATED';
-      cancel: ShowStateType['cancel'];
+      type: "CANCELLATION INITIATED";
+      cancel: ShowStateType["cancel"];
     }
   | {
-      type: 'REFUND INITIATED';
+      type: "REFUND INITIATED";
     }
   | {
-      type: 'TICKET REFUNDED';
+      type: "TICKET REFUNDED";
       ticket: TicketDocType;
       transactions: TransactionDocType[];
       requestedBy: ActorType;
@@ -47,43 +47,43 @@ export type ShowMachineEventType =
       amount: number;
     }
   | {
-      type: 'TICKET RESERVED';
+      type: "TICKET RESERVED";
       ticket?: TicketDocType;
     }
   | {
-      type: 'TICKET RESERVATION TIMEOUT';
+      type: "TICKET RESERVATION TIMEOUT";
       ticket: TicketDocType;
     }
   | {
-      type: 'TICKET CANCELLED';
+      type: "TICKET CANCELLED";
       ticket: TicketDocType;
     }
   | {
-      type: 'TICKET SOLD';
+      type: "TICKET SOLD";
       ticket: TicketDocType;
       transactions: TransactionDocType[];
       soldAt?: Date;
       amount: number;
     }
   | {
-      type: 'START SHOW';
+      type: "START SHOW";
     }
   | {
-      type: 'STOP SHOW';
+      type: "STOP SHOW";
     }
   | {
-      type: 'SHOW FINALIZED';
-      finalize: ShowStateType['finalize'];
+      type: "SHOW FINALIZED";
+      finalize: ShowStateType["finalize"];
     }
   | {
-      type: 'SHOW ENDED';
+      type: "SHOW ENDED";
     }
   | {
-      type: 'CUSTOMER JOINED';
+      type: "CUSTOMER JOINED";
       ticket: TicketDocType;
     }
   | {
-      type: 'CUSTOMER LEFT';
+      type: "CUSTOMER LEFT";
       ticket: TicketDocType;
     };
 
@@ -107,202 +107,202 @@ export const createShowMachine = ({
         errorMessage: undefined as string | undefined,
         id: nanoid(),
       },
-      tsTypes: {} as import('./showMachine.typegen').Typegen0,
+      tsTypes: {} as import("./showMachine.typegen").Typegen0,
       schema: {
         events: {} as ShowMachineEventType,
       },
       predictableActionArguments: true,
-      id: 'showMachine',
-      initial: 'showLoaded',
+      id: "showMachine",
+      initial: "showLoaded",
 
       states: {
         showLoaded: {
           always: [
             {
-              target: 'boxOfficeOpen',
-              cond: 'showBoxOfficeOpen',
+              target: "boxOfficeOpen",
+              cond: "showBoxOfficeOpen",
             },
             {
-              target: 'boxOfficeClosed',
-              cond: 'showBoxOfficeClosed',
+              target: "boxOfficeClosed",
+              cond: "showBoxOfficeClosed",
             },
             {
-              target: 'initiatedCancellation',
-              cond: 'showInitiatedCancellation',
+              target: "initiatedCancellation",
+              cond: "showInitiatedCancellation",
             },
             {
-              target: 'cancelled',
-              cond: 'showCancelled',
+              target: "cancelled",
+              cond: "showCancelled",
             },
             {
-              target: 'finalized',
-              cond: 'showFinalized',
+              target: "finalized",
+              cond: "showFinalized",
             },
             {
-              target: 'started',
-              cond: 'showStarted',
+              target: "started",
+              cond: "showStarted",
             },
             {
-              target: 'stopped',
-              cond: 'showStopped',
+              target: "stopped",
+              cond: "showStopped",
             },
             {
-              target: 'inEscrow',
-              cond: 'showInEscrow',
+              target: "inEscrow",
+              cond: "showInEscrow",
             },
           ],
         },
         cancelled: {
-          type: 'final',
-          tags: ['canCreateShow'],
-          entry: ['deactivateShow'],
+          type: "final",
+          tags: ["canCreateShow"],
+          entry: ["deactivateShow"],
         },
         inEscrow: {
-          tags: ['canCreateShow'],
-          entry: ['enterEscrow'],
-          exit: ['exitEscrow'],
+          tags: ["canCreateShow"],
+          entry: ["enterEscrow"],
+          exit: ["exitEscrow"],
           on: {
-            'SHOW FINALIZED': {
-              target: 'finalized',
-              actions: ['finalizeShow'],
+            "SHOW FINALIZED": {
+              target: "finalized",
+              actions: ["finalizeShow"],
             },
           },
         },
         finalized: {
-          type: 'final',
-          tags: ['canCreateShow'],
-          entry: ['deactivateShow'],
+          type: "final",
+          tags: ["canCreateShow"],
+          entry: ["deactivateShow"],
         },
         boxOfficeOpen: {
           on: {
-            'CANCELLATION INITIATED': [
+            "CANCELLATION INITIATED": [
               {
-                target: 'cancelled',
-                cond: 'canCancel',
-                actions: ['initiateCancellation', 'cancelShow'],
+                target: "cancelled",
+                cond: "canCancel",
+                actions: ["initiateCancellation", "cancelShow"],
               },
               {
-                target: 'initiatedCancellation',
-                actions: ['initiateCancellation'],
-              },
-            ],
-            'TICKET RESERVED': [
-              {
-                target: 'boxOfficeClosed',
-                cond: 'soldOut',
-                actions: ['decrementTicketsAvailable', 'closeBoxOffice'],
-              },
-              {
-                actions: ['decrementTicketsAvailable'],
+                target: "initiatedCancellation",
+                actions: ["initiateCancellation"],
               },
             ],
-            'TICKET RESERVATION TIMEOUT': {
-              actions: ['incrementTicketsAvailable'],
-            },
-            'TICKET CANCELLED': {
-              actions: ['incrementTicketsAvailable'],
-            },
-            'TICKET SOLD': {
-              actions: ['sellTicket'],
-            },
-            'START SHOW': {
-              target: 'started',
-              cond: 'canStartShow',
-              actions: ['startShow'],
-            },
-            'TICKET REFUNDED': [
+            "TICKET RESERVED": [
               {
-                actions: ['refundTicket'],
+                target: "boxOfficeClosed",
+                cond: "soldOut",
+                actions: ["decrementTicketsAvailable", "closeBoxOffice"],
+              },
+              {
+                actions: ["decrementTicketsAvailable"],
+              },
+            ],
+            "TICKET RESERVATION TIMEOUT": {
+              actions: ["incrementTicketsAvailable"],
+            },
+            "TICKET CANCELLED": {
+              actions: ["incrementTicketsAvailable"],
+            },
+            "TICKET SOLD": {
+              actions: ["sellTicket"],
+            },
+            "START SHOW": {
+              target: "started",
+              cond: "canStartShow",
+              actions: ["startShow"],
+            },
+            "TICKET REFUNDED": [
+              {
+                actions: ["refundTicket"],
               },
             ],
           },
         },
         boxOfficeClosed: {
           on: {
-            'START SHOW': {
-              cond: 'canStartShow',
-              target: 'started',
-              actions: ['startShow'],
+            "START SHOW": {
+              cond: "canStartShow",
+              target: "started",
+              actions: ["startShow"],
             },
-            'TICKET RESERVATION TIMEOUT': [
+            "TICKET RESERVATION TIMEOUT": [
               {
-                target: 'boxOfficeOpen',
-                actions: ['openBoxOffice', 'incrementTicketsAvailable'],
+                target: "boxOfficeOpen",
+                actions: ["openBoxOffice", "incrementTicketsAvailable"],
               },
             ],
-            'TICKET CANCELLED': [
+            "TICKET CANCELLED": [
               {
-                target: 'boxOfficeOpen',
-                actions: ['openBoxOffice', 'incrementTicketsAvailable'],
+                target: "boxOfficeOpen",
+                actions: ["openBoxOffice", "incrementTicketsAvailable"],
               },
             ],
-            'TICKET SOLD': {
-              actions: ['sellTicket'],
+            "TICKET SOLD": {
+              actions: ["sellTicket"],
             },
-            'TICKET REFUNDED': [
+            "TICKET REFUNDED": [
               {
-                actions: ['refundTicket'],
+                actions: ["refundTicket"],
               },
             ],
-            'CANCELLATION INITIATED': [
+            "CANCELLATION INITIATED": [
               {
-                target: 'cancelled',
-                cond: 'canCancel',
-                actions: ['initiateCancellation', 'cancelShow'],
+                target: "cancelled",
+                cond: "canCancel",
+                actions: ["initiateCancellation", "cancelShow"],
               },
               {
-                target: 'initiatedCancellation',
-                actions: ['initiateCancellation'],
+                target: "initiatedCancellation",
+                actions: ["initiateCancellation"],
               },
             ],
           },
         },
         started: {
           on: {
-            'START SHOW': {
-              actions: ['startShow'],
+            "START SHOW": {
+              actions: ["startShow"],
             },
-            'CUSTOMER JOINED': {},
-            'CUSTOMER LEFT': {},
-            'STOP SHOW': {
-              target: 'stopped',
-              actions: ['stopShow'],
+            "CUSTOMER JOINED": {},
+            "CUSTOMER LEFT": {},
+            "STOP SHOW": {
+              target: "stopped",
+              actions: ["stopShow"],
             },
           },
         },
         stopped: {
           on: {
-            'START SHOW': {
-              target: 'started',
-              actions: ['startShow'],
+            "START SHOW": {
+              target: "started",
+              actions: ["startShow"],
             },
-            'SHOW ENDED': {
-              target: 'inEscrow',
-              actions: ['endShow'],
+            "SHOW ENDED": {
+              target: "inEscrow",
+              actions: ["endShow"],
             },
           },
         },
         initiatedCancellation: {
-          initial: 'waiting2Refund',
+          initial: "waiting2Refund",
           states: {
             waiting2Refund: {
               on: {
-                'REFUND INITIATED': {
-                  target: 'initiatedRefund',
-                  actions: ['initiateRefund'],
+                "REFUND INITIATED": {
+                  target: "initiatedRefund",
+                  actions: ["initiateRefund"],
                 },
               },
             },
             initiatedRefund: {
               on: {
-                'TICKET REFUNDED': [
+                "TICKET REFUNDED": [
                   {
-                    target: '#showMachine.cancelled',
-                    cond: 'fullyRefunded',
-                    actions: ['cancelShow'],
+                    target: "#showMachine.cancelled",
+                    cond: "fullyRefunded",
+                    actions: ["cancelShow"],
                   },
                   {
-                    actions: ['refundTicket'],
+                    actions: ["refundTicket"],
                   },
                 ],
               },
@@ -313,7 +313,7 @@ export const createShowMachine = ({
     },
     {
       actions: {
-        closeBoxOffice: assign(context => {
+        closeBoxOffice: assign((context) => {
           return {
             showState: {
               ...context.showState,
@@ -322,7 +322,7 @@ export const createShowMachine = ({
           };
         }),
 
-        openBoxOffice: assign(context => {
+        openBoxOffice: assign((context) => {
           return {
             showState: {
               ...context.showState,
@@ -331,7 +331,7 @@ export const createShowMachine = ({
           };
         }),
 
-        cancelShow: assign(context => {
+        cancelShow: assign((context) => {
           return {
             showState: {
               ...context.showState,
@@ -340,7 +340,7 @@ export const createShowMachine = ({
           };
         }),
 
-        startShow: assign(context => {
+        startShow: assign((context) => {
           return {
             showState: {
               ...context.showState,
@@ -353,7 +353,7 @@ export const createShowMachine = ({
           };
         }),
 
-        endShow: assign(context => {
+        endShow: assign((context) => {
           return {
             showState: {
               ...context.showState,
@@ -365,7 +365,7 @@ export const createShowMachine = ({
         stopShow: assign((context, event) => {
           const startDate = context.showState.runtime?.startDate;
           if (!startDate) {
-            throw new Error('Show start date is not defined');
+            throw new Error("Show start date is not defined");
           }
           showMachineOptions?.jobQueue?.add(
             event.type,
@@ -417,11 +417,11 @@ export const createShowMachine = ({
         refundTicket: assign((context, event) => {
           const st = context.showState;
           const ticketsRefunded = st.salesStats.ticketsRefunded + 1;
-        
+
           const refundedAmount = st.salesStats.totalRefunded + event.amount;
           const refund = {
             refundedAt: event.refundedAt || new Date(),
-            transactions: event.transactions.map(t => t._id),
+            transactions: event.transactions.map((t) => t._id),
             ticket: event.ticket._id,
             amount: event.amount,
           } as ShowRefundType;
@@ -455,7 +455,7 @@ export const createShowMachine = ({
           };
         }),
 
-        exitEscrow: assign(context => {
+        exitEscrow: assign((context) => {
           if (!context.showState.escrow) return {};
           return {
             showState: {
@@ -469,7 +469,7 @@ export const createShowMachine = ({
           };
         }),
 
-        deactivateShow: assign(context => {
+        deactivateShow: assign((context) => {
           return {
             showState: {
               ...context.showState,
@@ -478,7 +478,7 @@ export const createShowMachine = ({
           };
         }),
 
-        incrementTicketsAvailable: assign(context => {
+        incrementTicketsAvailable: assign((context) => {
           return {
             showState: {
               ...context.showState,
@@ -493,7 +493,7 @@ export const createShowMachine = ({
           };
         }),
 
-        decrementTicketsAvailable: assign(context => {
+        decrementTicketsAvailable: assign((context) => {
           return {
             showState: {
               ...context.showState,
@@ -510,13 +510,13 @@ export const createShowMachine = ({
 
         sellTicket: assign((context, event) => {
           const st = context.showState;
-        
+
           const ticketsSold = st.salesStats.ticketsSold + 1;
           const totalSales = st.salesStats.totalSales + +event.amount;
 
           const sale = {
             soldAt: event.soldAt || new Date(),
-            transactions: event.transactions.map(t => t._id),
+            transactions: event.transactions.map((t) => t._id),
             ticket: event.ticket._id,
             amount: event.amount,
           } as ShowSaleType;
@@ -546,7 +546,7 @@ export const createShowMachine = ({
       },
 
       delays: {
-        GRACE_DELAY: context => {
+        GRACE_DELAY: (context) => {
           const delay =
             +GRACE_PERIOD -
             (context.showState.runtime?.endDate
@@ -557,26 +557,28 @@ export const createShowMachine = ({
         },
       },
       guards: {
-        canCancel: context =>
+        canCancel: (context) =>
           context.showState.salesStats.ticketsSold -
             context.showState.salesStats.ticketsRefunded ===
           0,
-        showCancelled: context =>
+        showCancelled: (context) =>
           context.showState.status === ShowStatus.CANCELLED,
-        showFinalized: context =>
+        showFinalized: (context) =>
           context.showState.status === ShowStatus.FINALIZED,
-        showInitiatedCancellation: context =>
+        showInitiatedCancellation: (context) =>
           context.showState.status === ShowStatus.CANCELLATION_INITIATED,
-        showBoxOfficeOpen: context =>
+        showBoxOfficeOpen: (context) =>
           context.showState.status === ShowStatus.BOX_OFFICE_OPEN,
-        showBoxOfficeClosed: context =>
+        showBoxOfficeClosed: (context) =>
           context.showState.status === ShowStatus.BOX_OFFICE_CLOSED,
-        showStarted: context => context.showState.status === ShowStatus.LIVE,
-        showStopped: context => context.showState.status === ShowStatus.STOPPED,
-        showInEscrow: context =>
+        showStarted: (context) => context.showState.status === ShowStatus.LIVE,
+        showStopped: (context) =>
+          context.showState.status === ShowStatus.STOPPED,
+        showInEscrow: (context) =>
           context.showState.status === ShowStatus.IN_ESCROW,
-        soldOut: context => context.showState.salesStats.ticketsAvailable === 1,
-        canStartShow: context => {
+        soldOut: (context) =>
+          context.showState.salesStats.ticketsAvailable === 1,
+        canStartShow: (context) => {
           if (context.showState.status === ShowStatus.ENDED) {
             // Allow grace period to start show again
             return (
@@ -591,7 +593,7 @@ export const createShowMachine = ({
             0
           );
         },
-        fullyRefunded: context => {
+        fullyRefunded: (context) => {
           return (
             context.showState.salesStats.totalRefunded >=
             context.showState.salesStats.totalSales
@@ -614,19 +616,19 @@ export const createShowMachineService = ({
   const showService = interpret(showMachine).start();
 
   if (showMachineOptions?.saveStateCallback) {
-    showService.onChange(context => {
+    showService.onChange((context) => {
       showMachineOptions.saveStateCallback &&
         showMachineOptions.saveStateCallback(context.showState);
     });
   }
 
   if (showMachineOptions?.saveShowEventCallback) {
-    showService.onEvent(event => {
-      const ticket = ('ticket' in event ? event.ticket : undefined) as
+    showService.onEvent((event) => {
+      const ticket = ("ticket" in event ? event.ticket : undefined) as
         | TicketDocType
         | undefined;
       const transaction = (
-        'transaction' in event ? event.transaction : undefined
+        "transaction" in event ? event.transaction : undefined
       ) as TransactionDocType | undefined;
       showMachineOptions.saveShowEventCallback &&
         showMachineOptions.saveShowEventCallback({

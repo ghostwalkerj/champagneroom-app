@@ -1,10 +1,10 @@
-import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
-import { womensNames } from '$lib/util/womensNames';
-import type { InferSchemaType, Model } from 'mongoose';
-import { default as mongoose, default as pkg } from 'mongoose';
-import { nanoid } from 'nanoid';
-import { uniqueNamesGenerator } from 'unique-names-generator';
-import validator from 'validator';
+import { PUBLIC_DEFAULT_PROFILE_IMAGE } from "$env/static/public";
+import { womensNames } from "$lib/util/womensNames";
+import type { InferSchemaType, Model } from "mongoose";
+import { default as mongoose, default as pkg } from "mongoose";
+import { nanoid } from "nanoid";
+import { uniqueNamesGenerator } from "unique-names-generator";
+import validator from "validator";
 
 const { Schema, models } = pkg;
 
@@ -19,7 +19,7 @@ const statSchema = new Schema(
       required: true,
       validate: {
         validator: Number.isInteger,
-        message: '{VALUE} is not an integer value',
+        message: "{VALUE} is not an integer value",
       },
     },
     numReviews: {
@@ -29,7 +29,7 @@ const statSchema = new Schema(
       required: true,
       validate: {
         validator: Number.isInteger,
-        message: '{VALUE} is not an integer value',
+        message: "{VALUE} is not an integer value",
       },
     },
     numCompletedShows: {
@@ -39,16 +39,16 @@ const statSchema = new Schema(
       required: true,
       validate: {
         validator: Number.isInteger,
-        message: '{VALUE} is not an integer value',
+        message: "{VALUE} is not an integer value",
       },
     },
     completedShows: [
       {
         type: Schema.Types.ObjectId,
-        ref: 'Show',
+        ref: "Show",
         validate: {
           validator: Number.isInteger,
-          message: '{VALUE} is not an integer value',
+          message: "{VALUE} is not an integer value",
         },
       },
     ],
@@ -77,7 +77,7 @@ const talentSchema = new Schema(
     name: {
       type: String,
       maxLength: 50,
-      minLength: [4, 'Name is too short'],
+      minLength: [4, "Name is too short"],
       required: true,
       trim: true,
       default: function () {
@@ -99,11 +99,11 @@ const talentSchema = new Schema(
       required: true,
       validate: {
         validator: Number.isInteger,
-        message: '{VALUE} is not an integer value',
+        message: "{VALUE} is not an integer value",
       },
     },
-    agent: { type: Schema.Types.ObjectId, ref: 'Agent', required: true },
-    activeShows: [{ type: Schema.Types.ObjectId, ref: 'Show' }],
+    agent: { type: Schema.Types.ObjectId, ref: "Agent", required: true },
+    activeShows: [{ type: Schema.Types.ObjectId, ref: "Show" }],
     stats: { type: statSchema, required: true, default: () => ({}) },
   },
   { timestamps: true }
@@ -113,9 +113,6 @@ export type TalentDocType = InferSchemaType<typeof talentSchema>;
 
 export const Talent = models?.Talent
   ? (models?.Talent as Model<TalentDocType>)
-  : (mongoose.model<TalentDocType>(
-      'Talent',
-      talentSchema
-    ) );
+  : mongoose.model<TalentDocType>("Talent", talentSchema);
 
 export type TalentType = InstanceType<typeof Talent>;

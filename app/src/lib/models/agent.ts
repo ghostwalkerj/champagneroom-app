@@ -1,8 +1,8 @@
-import { womensNames } from '$lib/util/womensNames';
-import type { InferSchemaType, Model } from 'mongoose';
-import { default as mongoose, default as pkg } from 'mongoose';
-import { uniqueNamesGenerator } from 'unique-names-generator';
-import validator from 'validator';
+import { womensNames } from "$lib/util/womensNames";
+import type { InferSchemaType, Model } from "mongoose";
+import { default as mongoose, default as pkg } from "mongoose";
+import { uniqueNamesGenerator } from "unique-names-generator";
+import validator from "validator";
 
 const { Schema, models } = pkg;
 const agentSchema = new Schema(
@@ -16,7 +16,7 @@ const agentSchema = new Schema(
     name: {
       type: String,
       maxLength: 50,
-      minLength: [4, 'Name is too short'],
+      minLength: [4, "Name is too short"],
       required: true,
       trim: true,
       default: function () {
@@ -41,6 +41,6 @@ export type AgentDocType = InferSchemaType<typeof agentSchema>;
 
 export const Agent = models?.Agent
   ? (models.Agent as Model<AgentDocType>)
-  : (mongoose.model<AgentDocType>('Agent', agentSchema) );
+  : mongoose.model<AgentDocType>("Agent", agentSchema);
 
 export type AgentType = InstanceType<typeof Agent>;

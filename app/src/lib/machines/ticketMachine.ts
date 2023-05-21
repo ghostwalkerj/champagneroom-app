@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import type { ShowDocType } from '$lib/models/show';
-import type { TicketDocType, TicketStateType } from '$lib/models/ticket';
-import { TicketStatus } from '$lib/models/ticket';
-import type { TransactionDocType } from '$lib/models/transaction';
-import { nanoid } from 'nanoid';
+import type { ShowDocType } from "$lib/models/show";
+import type { TicketDocType, TicketStateType } from "$lib/models/ticket";
+import { TicketStatus } from "$lib/models/ticket";
+import type { TransactionDocType } from "$lib/models/transaction";
+import { nanoid } from "nanoid";
 import {
   assign,
   createMachine,
@@ -12,13 +12,13 @@ import {
   spawn,
   type ActorRefFrom,
   type StateFrom,
-} from 'xstate';
+} from "xstate";
 import {
   createShowMachine,
   type ShowMachineOptions,
   type ShowMachineServiceType,
   type ShowMachineType,
-} from './showMachine';
+} from "./showMachine";
 
 export type TicketMachineOptions = {
   saveStateCallback?: (state: TicketStateType) => void;
@@ -28,37 +28,37 @@ export type TicketMachineOptions = {
 
 export type TicketMachineEventType =
   | {
-      type: 'CANCELLATION INITIATED';
-      cancel: TicketStateType['cancel'];
+      type: "CANCELLATION INITIATED";
+      cancel: TicketStateType["cancel"];
     }
   | {
-      type: 'REFUND RECEIVED';
+      type: "REFUND RECEIVED";
       transaction: TransactionDocType;
     }
   | {
-      type: 'PAYMENT RECEIVED';
+      type: "PAYMENT RECEIVED";
       transaction: TransactionDocType;
     }
   | {
-      type: 'FEEDBACK RECEIVED';
-      feedback: TicketStateType['feedback'];
+      type: "FEEDBACK RECEIVED";
+      feedback: TicketStateType["feedback"];
     }
   | {
-      type: 'DISPUTE INITIATED';
-      dispute: TicketStateType['dispute'];
+      type: "DISPUTE INITIATED";
+      dispute: TicketStateType["dispute"];
     }
   | {
-      type: 'JOINED SHOW';
+      type: "JOINED SHOW";
     }
   | {
-      type: 'LEFT SHOW';
+      type: "LEFT SHOW";
     }
   | {
-      type: 'SHOW ENDED';
+      type: "SHOW ENDED";
     }
   | {
-      type: 'SHOW CANCELLED';
-      cancel: TicketStateType['cancel'];
+      type: "SHOW CANCELLED";
+      cancel: TicketStateType["cancel"];
     };
 
 export const createTicketMachine = ({
@@ -90,16 +90,16 @@ export const createTicketMachine = ({
         showMachineRef: undefined as ActorRefFrom<ShowMachineType> | undefined,
       },
       // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-      tsTypes: {} as import('./ticketMachine.typegen').Typegen0,
+      tsTypes: {} as import("./ticketMachine.typegen").Typegen0,
       schema: {
         events: {} as TicketMachineEventType,
       },
       predictableActionArguments: true,
-      id: 'ticketMachine',
-      initial: 'ticketLoaded',
+      id: "ticketMachine",
+      initial: "ticketLoaded",
       entry: assign(() => {
         const showMachineRef = spawn(parentShowMachine, {
-          name: 'showMachineService',
+          name: "showMachineService",
           sync: true,
         });
         return { showMachineRef };
@@ -108,104 +108,104 @@ export const createTicketMachine = ({
         ticketLoaded: {
           always: [
             {
-              target: 'reserved',
-              cond: 'ticketReserved',
+              target: "reserved",
+              cond: "ticketReserved",
             },
             {
-              target: 'cancelled',
-              cond: 'ticketCancelled',
+              target: "cancelled",
+              cond: "ticketCancelled",
             },
             {
-              target: 'finalized',
-              cond: 'ticketFinalized',
+              target: "finalized",
+              cond: "ticketFinalized",
             },
             {
-              target: 'reedemed',
-              cond: 'ticketReedemed',
+              target: "reedemed",
+              cond: "ticketReedemed",
             },
             {
-              target: '#ticketMachine.reserved.initiatedCancellation',
-              cond: 'ticketInCancellationInitiated',
+              target: "#ticketMachine.reserved.initiatedCancellation",
+              cond: "ticketInCancellationInitiated",
             },
             {
-              target: '#ticketMachine.ended.inEscrow',
-              cond: 'ticketInEscrow',
+              target: "#ticketMachine.ended.inEscrow",
+              cond: "ticketInEscrow",
             },
             {
-              target: '#ticketMachine.ended.inDispute',
-              cond: 'ticketInDispute',
+              target: "#ticketMachine.ended.inDispute",
+              cond: "ticketInDispute",
             },
             {
-              target: '#ticketMachine.ended.missedShow',
-              cond: 'ticketMissedShow',
+              target: "#ticketMachine.ended.missedShow",
+              cond: "ticketMissedShow",
             },
           ],
         },
         reserved: {
-          initial: 'waiting4Payment',
+          initial: "waiting4Payment",
           states: {
             waiting4Payment: {
               always: [
                 {
-                  target: 'waiting4Show',
-                  cond: 'fullyPaid',
+                  target: "waiting4Show",
+                  cond: "fullyPaid",
                 },
               ],
               on: {
-                'PAYMENT RECEIVED': [
+                "PAYMENT RECEIVED": [
                   {
-                    target: 'waiting4Show',
-                    cond: 'fullyPaid',
-                    actions: ['receivePayment', 'sendTicketSold'],
+                    target: "waiting4Show",
+                    cond: "fullyPaid",
+                    actions: ["receivePayment", "sendTicketSold"],
                   },
                   {
-                    actions: ['receivePayment'],
+                    actions: ["receivePayment"],
                   },
                 ],
-                'CANCELLATION INITIATED': [
+                "CANCELLATION INITIATED": [
                   {
-                    target: '#ticketMachine.cancelled',
-                    cond: 'canCancel',
+                    target: "#ticketMachine.cancelled",
+                    cond: "canCancel",
                     actions: [
-                      'initiateCancellation',
-                      'cancelTicket',
-                      'sendTicketCancelled',
+                      "initiateCancellation",
+                      "cancelTicket",
+                      "sendTicketCancelled",
                     ],
                   },
                   {
-                    target: 'initiatedCancellation',
-                    actions: ['initiateCancellation'],
+                    target: "initiatedCancellation",
+                    actions: ["initiateCancellation"],
                   },
                 ],
               },
             },
             waiting4Show: {
               on: {
-                'JOINED SHOW': {
-                  target: '#ticketMachine.reedemed',
-                  cond: 'canWatchShow',
-                  actions: ['redeemTicket', 'sendJoinedShow'],
+                "JOINED SHOW": {
+                  target: "#ticketMachine.reedemed",
+                  cond: "canWatchShow",
+                  actions: ["redeemTicket", "sendJoinedShow"],
                 },
               },
             },
             initiatedCancellation: {
-              initial: 'waiting4Refund',
+              initial: "waiting4Refund",
               states: {
                 waiting4Refund: {
                   on: {
-                    'REFUND RECEIVED': [
+                    "REFUND RECEIVED": [
                       {
-                        target: '#ticketMachine.cancelled',
-                        cond: 'fullyRefunded',
+                        target: "#ticketMachine.cancelled",
+                        cond: "fullyRefunded",
                         actions: [
-                          'receiveRefund',
-                          'cancelTicket',
-                          'sendTicketRefunded',
-                          'sendTicketCancelled',
+                          "receiveRefund",
+                          "cancelTicket",
+                          "sendTicketRefunded",
+                          "sendTicketCancelled",
                         ],
                       },
                       {
-                        actions: ['receiveRefund'],
+                        actions: ["receiveRefund"],
                       },
                     ],
                   },
@@ -214,45 +214,45 @@ export const createTicketMachine = ({
             },
           },
           on: {
-            'SHOW ENDED': {
-              target: '#ticketMachine.ended.missedShow',
-              actions: ['missShow'],
+            "SHOW ENDED": {
+              target: "#ticketMachine.ended.missedShow",
+              actions: ["missShow"],
             },
           },
         },
         reedemed: {
           on: {
-            'LEFT SHOW': { actions: ['sendLeftShow'] },
-            'JOINED SHOW': {
-              cond: 'canWatchShow',
-              actions: ['sendJoinedShow'],
+            "LEFT SHOW": { actions: ["sendLeftShow"] },
+            "JOINED SHOW": {
+              cond: "canWatchShow",
+              actions: ["sendJoinedShow"],
             },
-            'SHOW ENDED': {
-              target: '#ticketMachine.ended',
-              actions: ['enterEscrow'],
+            "SHOW ENDED": {
+              target: "#ticketMachine.ended",
+              actions: ["enterEscrow"],
             },
           },
         },
         cancelled: {
-          type: 'final',
-          entry: ['deactivateTicket'],
+          type: "final",
+          entry: ["deactivateTicket"],
         },
         finalized: {
-          type: 'final',
-          entry: ['deactivateTicket'],
+          type: "final",
+          entry: ["deactivateTicket"],
         },
         ended: {
-          initial: 'inEscrow',
+          initial: "inEscrow",
           states: {
             inEscrow: {
               on: {
-                'FEEDBACK RECEIVED': {
-                  target: '#ticketMachine.finalized',
-                  actions: ['receiveFeedback', 'finalizeTicket'],
+                "FEEDBACK RECEIVED": {
+                  target: "#ticketMachine.finalized",
+                  actions: ["receiveFeedback", "finalizeTicket"],
                 },
-                'DISPUTE INITIATED': {
-                  target: 'inDispute',
-                  actions: ['initiateDispute'],
+                "DISPUTE INITIATED": {
+                  target: "inDispute",
+                  actions: ["initiateDispute"],
                 },
               },
             },
@@ -262,19 +262,19 @@ export const createTicketMachine = ({
         },
       },
       on: {
-        'SHOW CANCELLED': [
+        "SHOW CANCELLED": [
           {
-            target: '#ticketMachine.cancelled',
-            cond: 'canCancel',
+            target: "#ticketMachine.cancelled",
+            cond: "canCancel",
             actions: [
-              'initiateCancellation',
-              'cancelTicket',
-              'sendTicketCancelled',
+              "initiateCancellation",
+              "cancelTicket",
+              "sendTicketCancelled",
             ],
           },
           {
-            target: '#ticketMachine.reserved.initiatedCancellation',
-            actions: ['initiateCancellation'],
+            target: "#ticketMachine.reserved.initiatedCancellation",
+            actions: ["initiateCancellation"],
           },
         ],
       },
@@ -282,49 +282,49 @@ export const createTicketMachine = ({
     {
       actions: {
         sendJoinedShow: send(
-          context => ({
-            type: 'CUSTOMER JOINED',
+          (context) => ({
+            type: "CUSTOMER JOINED",
             ticket: context.ticketDocument,
           }),
-          { to: context => context.showMachineRef! }
+          { to: (context) => context.showMachineRef! }
         ),
 
         sendLeftShow: send(
-          context => ({
-            type: 'CUSTOMER LEFT',
+          (context) => ({
+            type: "CUSTOMER LEFT",
             ticket: context.ticketDocument,
           }),
-          { to: context => context.showMachineRef! }
+          { to: (context) => context.showMachineRef! }
         ),
 
         sendTicketSold: send(
           (context) => ({
-            type: 'TICKET SOLD',
+            type: "TICKET SOLD",
             ticket: context.ticketDocument,
             soldAt: context.ticketState.sale?.soldAt,
             transactions: context.ticketState.sale?.transactions,
             amount: context.ticketState.sale?.amount,
           }),
-          { to: context => context.showMachineRef! }
+          { to: (context) => context.showMachineRef! }
         ),
 
         sendTicketRefunded: send(
           (context) => ({
-            type: 'TICKET REFUNDED',
+            type: "TICKET REFUNDED",
             ticket: context.ticketDocument,
             refundedAt: context.ticketState.refund?.refundedAt,
             transactions: context.ticketState.refund?.transactions,
             amount: context.ticketState.refund?.amount,
           }),
-          { to: context => context.showMachineRef! }
+          { to: (context) => context.showMachineRef! }
         ),
 
         sendTicketCancelled: send(
-          context => ({
-            type: 'TICKET CANCELLED',
+          (context) => ({
+            type: "TICKET CANCELLED",
             ticket: context.ticketDocument,
           }),
-          { to: context => context.showMachineRef! }
+          { to: (context) => context.showMachineRef! }
         ),
 
         initiateCancellation: assign((context, event) => {
@@ -337,7 +337,7 @@ export const createTicketMachine = ({
           };
         }),
 
-        redeemTicket: assign(context => {
+        redeemTicket: assign((context) => {
           if (context.ticketState.status === TicketStatus.REDEEMED) return {};
           return {
             ticketState: {
@@ -350,7 +350,7 @@ export const createTicketMachine = ({
           };
         }),
 
-        cancelTicket: assign(context => {
+        cancelTicket: assign((context) => {
           return {
             ticketState: {
               ...context.ticketState,
@@ -394,8 +394,10 @@ export const createTicketMachine = ({
               refundedAmount:
                 context.ticketState.totalRefunded + +event.transaction.value,
               refund,
-          }}}),
-          
+            },
+          };
+        }),
+
         receiveFeedback: assign((context, event) => {
           return {
             ticketState: {
@@ -415,7 +417,7 @@ export const createTicketMachine = ({
           };
         }),
 
-        enterEscrow: assign(context => {
+        enterEscrow: assign((context) => {
           return {
             ticketState: {
               ...context.ticketState,
@@ -428,10 +430,10 @@ export const createTicketMachine = ({
           };
         }),
 
-        finalizeTicket: assign(context => {
+        finalizeTicket: assign((context) => {
           const finalized = {
             finalizedAt: new Date(),
-          } as NonNullable<TicketStateType['finalize']>;
+          } as NonNullable<TicketStateType["finalize"]>;
           if (context.ticketState.status !== TicketStatus.FINALIZED) {
             return {
               ticketState: {
@@ -444,7 +446,7 @@ export const createTicketMachine = ({
           return {};
         }),
 
-        deactivateTicket: assign(context => {
+        deactivateTicket: assign((context) => {
           return {
             ticketState: {
               ...context.ticketState,
@@ -453,7 +455,7 @@ export const createTicketMachine = ({
           };
         }),
 
-        missShow: assign(context => {
+        missShow: assign((context) => {
           return {
             ticketState: {
               ...context.ticketState,
@@ -464,31 +466,31 @@ export const createTicketMachine = ({
       },
 
       guards: {
-        canCancel: context => {
+        canCancel: (context) => {
           const canCancel =
             context.ticketState.totalPaid <= context.ticketState.totalRefunded;
 
           return canCancel;
         },
-        ticketCancelled: context =>
+        ticketCancelled: (context) =>
           context.ticketState.status === TicketStatus.CANCELLED,
-        ticketFinalized: context =>
+        ticketFinalized: (context) =>
           context.ticketState.status === TicketStatus.FINALIZED,
-        ticketInDispute: context =>
+        ticketInDispute: (context) =>
           context.ticketState.status === TicketStatus.IN_DISPUTE,
-        ticketInEscrow: context =>
+        ticketInEscrow: (context) =>
           context.ticketState.status === TicketStatus.IN_ESCROW,
-        ticketReserved: context =>
+        ticketReserved: (context) =>
           context.ticketState.status === TicketStatus.RESERVED,
-        ticketReedemed: context =>
+        ticketReedemed: (context) =>
           context.ticketState.status === TicketStatus.REDEEMED,
-        ticketInCancellationInitiated: context =>
+        ticketInCancellationInitiated: (context) =>
           context.ticketState.status === TicketStatus.CANCELLATION_INITIATED,
-        ticketMissedShow: context =>
+        ticketMissedShow: (context) =>
           context.ticketState.status === TicketStatus.MISSED_SHOW,
         fullyPaid: (context, event) => {
           const value =
-            event.type === 'PAYMENT RECEIVED' ? event.transaction?.value : 0;
+            event.type === "PAYMENT RECEIVED" ? event.transaction?.value : 0;
           return (
             context.ticketState.totalPaid + +value >=
             context.ticketDocument.price
@@ -496,19 +498,19 @@ export const createTicketMachine = ({
         },
         fullyRefunded: (context, event) => {
           const value =
-            event.type === 'REFUND RECEIVED' ? event.transaction?.value : 0;
+            event.type === "REFUND RECEIVED" ? event.transaction?.value : 0;
           return (
             context.ticketState.totalRefunded + +value >=
             context.ticketState.totalPaid
           );
         },
- 
-        canWatchShow: context => {
+
+        canWatchShow: (context) => {
           const state = context.showMachineRef?.getSnapshot();
           return (
             state !== undefined &&
             context.ticketState.totalPaid >= context.ticketDocument.price &&
-            state.matches('started')
+            state.matches("started")
           );
         },
       },
@@ -536,30 +538,30 @@ export const createTicketMachineService = ({
   const ticketService = interpret(ticketMachine).start();
 
   if (ticketMachineOptions?.saveStateCallback) {
-    ticketService.onChange(context => {
+    ticketService.onChange((context) => {
       ticketMachineOptions.saveStateCallback &&
         ticketMachineOptions.saveStateCallback(context.ticketState);
     });
   }
 
   const showService = ticketService.getSnapshot().children[
-    'showMachineService'
+    "showMachineService"
   ] as ShowMachineServiceType;
 
   if (showMachineOptions?.saveStateCallback) {
-    showService.onChange(context => {
+    showService.onChange((context) => {
       showMachineOptions.saveStateCallback &&
         showMachineOptions.saveStateCallback(context.showState);
     });
   }
 
   if (showMachineOptions?.saveShowEventCallback) {
-    showService.onEvent(event => {
-      const ticket = ('ticket' in event ? event.ticket : undefined) as
+    showService.onEvent((event) => {
+      const ticket = ("ticket" in event ? event.ticket : undefined) as
         | TicketDocType
         | undefined;
       const transaction = (
-        'transaction' in event ? event.transaction : undefined
+        "transaction" in event ? event.transaction : undefined
       ) as TransactionDocType | undefined;
       showMachineOptions.saveShowEventCallback &&
         showMachineOptions.saveShowEventCallback({

@@ -3,27 +3,27 @@ import {
   JITSI_JWT_SECRET,
   JWT_EXPIRY,
   MONGO_DB_ENDPOINT,
-} from '$env/static/private';
+} from "$env/static/private";
 import {
   PUBLIC_JITSI_DOMAIN,
   PUBLIC_PIN_PATH,
   PUBLIC_TICKET_PATH,
-} from '$env/static/public';
-import type { ShowType } from '$lib/models/show';
-import { Ticket } from '$lib/models/ticket';
-import { verifyPin } from '$lib/util/pin';
-import { getTicketMachineService } from '$lib/util/ssHelper';
-import type { Actions } from '@sveltejs/kit';
-import { error, redirect } from '@sveltejs/kit';
-import jwt from 'jsonwebtoken';
-import mongoose from 'mongoose';
-import urlJoin from 'url-join';
-import type { PageServerLoad } from '../$types';
+} from "$env/static/public";
+import type { ShowType } from "$lib/models/show";
+import { Ticket } from "$lib/models/ticket";
+import { verifyPin } from "$lib/util/pin";
+import { getTicketMachineService } from "$lib/util/ssHelper";
+import type { Actions } from "@sveltejs/kit";
+import { error, redirect } from "@sveltejs/kit";
+import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
+import urlJoin from "url-join";
+import type { PageServerLoad } from "../$types";
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 export const load: PageServerLoad = async ({ params, cookies }) => {
   const ticketId = params.id;
-  const pinHash = cookies.get('pin');
+  const pinHash = cookies.get("pin");
   const ticketUrl = urlJoin(PUBLIC_TICKET_PATH, ticketId);
   const pinUrl = urlJoin(ticketUrl, PUBLIC_PIN_PATH);
 
@@ -31,16 +31,16 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
     throw redirect(303, pinUrl);
   }
   if (ticketId === null) {
-    throw error(404, 'Bad ticket id');
+    throw error(404, "Bad ticket id");
   }
 
   mongoose.connect(MONGO_DB_ENDPOINT);
 
   const ticket = await Ticket.findById(ticketId)
     .orFail(() => {
-      throw error(404, 'Ticket not found');
+      throw error(404, "Ticket not found");
     })
-    .populate('show')
+    .populate("show")
     .exec();
 
   const show = ticket.show as unknown as ShowType;
@@ -57,15 +57,15 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
   const ticketService = getTicketMachineService(ticket, show);
   const ticketMachineState = ticketService.getSnapshot();
 
-  if (!ticketMachineState.can('JOINED SHOW')) {
+  if (!ticketMachineState.can("JOINED SHOW")) {
     throw redirect(303, ticketUrl);
   }
 
-  ticketService.send('JOINED SHOW');
+  ticketService.send("JOINED SHOW");
 
   const jitsiToken = jwt.sign(
     {
-      aud: 'jitsi',
+      aud: "jitsi",
       iss: JITSI_APP_ID,
       exp: Math.floor(Date.now() / 1000) + +JWT_EXPIRY,
       sub: PUBLIC_JITSI_DOMAIN,
@@ -73,7 +73,7 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
       context: {
         user: {
           name: ticket.ticketState.reservation?.name,
-          affiliation: 'member',
+          affiliation: "member",
           lobby_bypass: false,
         },
       },
@@ -90,21 +90,21 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
 
 export const actions: Actions = {
   leave_show: async ({ params, cookies }) => {
-    console.log('leave show');
+    console.log("leave show");
     const ticketId = params.id as string;
-    const pinHash = cookies.get('pin');
+    const pinHash = cookies.get("pin");
 
     if (ticketId === null) {
-      throw error(404, 'Bad ticket id');
+      throw error(404, "Bad ticket id");
     }
 
     mongoose.connect(MONGO_DB_ENDPOINT);
 
     const ticket = await Ticket.findById(ticketId)
       .orFail(() => {
-        throw error(404, 'Ticket not found');
+        throw error(404, "Ticket not found");
       })
-      .populate('show')
+      .populate("show")
       .exec();
 
     const show = ticket.show as unknown as ShowType;
@@ -114,7 +114,7 @@ export const actions: Actions = {
       verifyPin(ticketId, ticket.ticketState.reservation?.pin, pinHash)
     ) {
       const ticketService = getTicketMachineService(ticket, show);
-      ticketService.send('LEFT SHOW');
+      ticketService.send("LEFT SHOW");
     }
     return { success: true };
   },

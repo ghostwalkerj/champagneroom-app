@@ -3,66 +3,66 @@ import {
   JITSI_JWT_SECRET,
   JWT_EXPIRY,
   MONGO_DB_ENDPOINT,
-} from '$env/static/private';
-import { PUBLIC_JITSI_DOMAIN, PUBLIC_TALENT_PATH } from '$env/static/public';
-import { Show } from '$lib/models/show';
-import { Talent } from '$lib/models/talent';
+} from "$env/static/private";
+import { PUBLIC_JITSI_DOMAIN, PUBLIC_TALENT_PATH } from "$env/static/public";
+import { Show } from "$lib/models/show";
+import { Talent } from "$lib/models/talent";
 import {
   getShowMachineService,
   getShowMachineServiceFromId,
-} from '$lib/util/ssHelper';
-import type { Actions } from '@sveltejs/kit';
-import { error, redirect } from '@sveltejs/kit';
-import jwt from 'jsonwebtoken';
-import mongoose from 'mongoose';
-import urlJoin from 'url-join';
-import type { PageServerLoad } from './$types';
+} from "$lib/util/ssHelper";
+import type { Actions } from "@sveltejs/kit";
+import { error, redirect } from "@sveltejs/kit";
+import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
+import urlJoin from "url-join";
+import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ params }) => {
   const key = params.key;
 
   if (key === null) {
-    throw error(404, 'Key not found');
+    throw error(404, "Key not found");
   }
 
   mongoose.connect(MONGO_DB_ENDPOINT);
 
   const talent = await Talent.findOne({ key })
     .orFail(() => {
-      throw error(404, 'Talent not found');
+      throw error(404, "Talent not found");
     })
     .lean()
     .exec();
 
   if (talent.activeShows.length === 0) {
-    throw error(404, 'No active shows');
+    throw error(404, "No active shows");
   }
 
   const showId = talent.activeShows[0];
 
-  const show = (await Show.findById(showId)
+  const show = await Show.findById(showId)
     .orFail(() => {
-      throw error(404, 'Show not found');
+      throw error(404, "Show not found");
     })
-    .exec());
+    .exec();
 
   const showService = getShowMachineService(show);
 
   const showState = showService.getSnapshot();
 
-  if (!showState.can({ type: 'START SHOW' })) {
+  if (!showState.can({ type: "START SHOW" })) {
     const talentUrl = urlJoin(PUBLIC_TALENT_PATH, key);
     throw redirect(303, talentUrl);
   }
 
-  if (!showState.matches('started'))
+  if (!showState.matches("started"))
     showService.send({
-      type: 'START SHOW',
+      type: "START SHOW",
     });
 
   const jitsiToken = jwt.sign(
     {
-      aud: 'jitsi',
+      aud: "jitsi",
       iss: JITSI_APP_ID,
       exp: Math.floor(Date.now() / 1000) + +JWT_EXPIRY,
       sub: PUBLIC_JITSI_DOMAIN,
@@ -71,7 +71,7 @@ export const load: PageServerLoad = async ({ params }) => {
       context: {
         user: {
           name: talent.name,
-          affiliation: 'owner',
+          affiliation: "owner",
           lobby_bypass: true,
         },
       },
@@ -90,15 +90,15 @@ export const actions: Actions = {
   end_show: async ({ request }) => {
     const data = await request.formData();
 
-    const showId = data.get('showId') as string;
+    const showId = data.get("showId") as string;
 
     const showService = await getShowMachineServiceFromId(showId);
 
     const showState = showService.getSnapshot();
 
-    if (showState.can({ type: 'STOP SHOW' })) {
+    if (showState.can({ type: "STOP SHOW" })) {
       showService.send({
-        type: 'STOP SHOW',
+        type: "STOP SHOW",
       });
 
       return { success: true };

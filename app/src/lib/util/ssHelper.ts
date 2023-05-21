@@ -1,27 +1,27 @@
 import {
-    MONGO_DB_ENDPOINT,
-    REDIS_HOST,
-    REDIS_PASSWORD,
-    REDIS_PORT,
-    REDIS_USERNAME,
-} from '$env/static/private';
-import { createShowMachineService } from '$lib/machines/showMachine';
-import { createTicketMachineService } from '$lib/machines/ticketMachine';
+  MONGO_DB_ENDPOINT,
+  REDIS_HOST,
+  REDIS_PASSWORD,
+  REDIS_PORT,
+  REDIS_USERNAME,
+} from "$env/static/private";
+import { createShowMachineService } from "$lib/machines/showMachine";
+import { createTicketMachineService } from "$lib/machines/ticketMachine";
 import {
-    Show,
-    type ShowDocType,
-    type ShowStateType,
-    type ShowType,
-} from '$lib/models/show';
+  Show,
+  type ShowDocType,
+  type ShowStateType,
+  type ShowType,
+} from "$lib/models/show";
 import {
-    Ticket,
-    type TicketDocType,
-    type TicketStateType,
-    type TicketType,
-} from '$lib/models/ticket';
-import type { TransactionDocType } from '$lib/models/transaction';
-import { Queue } from 'bullmq';
-import mongoose from 'mongoose';
+  Ticket,
+  type TicketDocType,
+  type TicketStateType,
+  type TicketType,
+} from "$lib/models/ticket";
+import type { TransactionDocType } from "$lib/models/transaction";
+import { Queue } from "bullmq";
+import mongoose from "mongoose";
 
 export const redisOptions = {
   connection: {
@@ -48,7 +48,7 @@ const createShowEvent = ({
   ticket?: TicketDocType;
   transaction?: TransactionDocType;
 }) => {
-  mongoose.model('ShowEvent').create({
+  mongoose.model("ShowEvent").create({
     show: show._id,
     type,
     ticket: ticket?._id,
@@ -62,14 +62,14 @@ const createShowEvent = ({
   });
 };
 
-const showQueue = new Queue('show', redisOptions);
+const showQueue = new Queue("show", redisOptions);
 
 export const getShowMachineService = (show: ShowType) => {
   mongoose.connect(MONGO_DB_ENDPOINT);
   return createShowMachineService({
     showDocument: show,
     showMachineOptions: {
-      saveStateCallback: async showState => saveState(show, showState),
+      saveStateCallback: async (showState) => saveState(show, showState),
       saveShowEventCallback: async ({ type, ticket, transaction }) =>
         createShowEvent({ show, type, ticket, transaction }),
       jobQueue: showQueue,
@@ -80,10 +80,10 @@ export const getShowMachineService = (show: ShowType) => {
 export const getShowMachineServiceFromId = async (showId: string) => {
   mongoose.connect(MONGO_DB_ENDPOINT);
   const show = await mongoose
-    .model('Show')
+    .model("Show")
     .findById(showId)
     .orFail(() => {
-      throw new Error('Show not found');
+      throw new Error("Show not found");
     })
     .exec();
 
@@ -104,7 +104,7 @@ export const getTicketMachineService = (ticket: TicketType, show: ShowType) => {
     ticketMachineOptions,
     showDocument: show,
     showMachineOptions: {
-      saveStateCallback: async showState => saveState(show, showState),
+      saveStateCallback: async (showState) => saveState(show, showState),
       saveShowEventCallback: async ({ type, ticket, transaction }) =>
         createShowEvent({ show, type, ticket, transaction }),
       jobQueue: showQueue,
@@ -115,18 +115,18 @@ export const getTicketMachineService = (ticket: TicketType, show: ShowType) => {
 export const getTicketMachineServiceFromId = async (TicketId: string) => {
   mongoose.connect(MONGO_DB_ENDPOINT);
   const ticket = await mongoose
-    .model('Ticket')
+    .model("Ticket")
     .findById(TicketId)
     .orFail(() => {
-      throw new Error('Ticket not found');
+      throw new Error("Ticket not found");
     })
     .exec();
 
   const show = await mongoose
-    .model('Show')
+    .model("Show")
     .findById(ticket.show)
     .orFail(() => {
-      throw new Error('Ticket not found');
+      throw new Error("Ticket not found");
     })
     .exec();
 
