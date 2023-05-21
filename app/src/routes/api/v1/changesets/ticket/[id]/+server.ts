@@ -14,7 +14,7 @@ export const GET: RequestHandler<{ id: string }> = async ({ params, url }) => {
   mongoose.connect(MONGO_DB_ENDPOINT);
 
   if (firstFetch) {
-    const ticket = await Ticket.findById(id).exec();
+    const ticket = await Ticket.findById(id).lean().exec();
     if (ticket !== undefined) {
       doc = JSON.stringify(ticket);
     }
@@ -24,12 +24,12 @@ export const GET: RequestHandler<{ id: string }> = async ({ params, url }) => {
       fullDocument: "updateLookup",
     });
     const next = await changeStream.next();
-    doc = next.fullDocument;
+    doc = JSON.stringify(next.fullDocument);
 
     changeStream.close();
   }
 
-  return new Response(JSON.stringify(doc), {
+  return new Response(doc, {
     status: 200,
     headers: {
       "content-type": "application/json",

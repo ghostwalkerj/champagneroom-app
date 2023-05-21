@@ -14,9 +14,9 @@ export const GET: RequestHandler<{ key: string }> = async ({ params, url }) => {
   mongoose.connect(MONGO_DB_ENDPOINT);
 
   if (firstFetch) {
-    const show = await Talent.findOne({ key: talentKey }).lean().exec();
-    if (show !== undefined) {
-      doc = JSON.stringify(show);
+    const talent = await Talent.findOne({ key: talentKey }).lean().exec();
+    if (talent !== undefined) {
+      doc = JSON.stringify(talent);
     }
   } else {
     const pipeline = [{ $match: { "fullDocument.key": talentKey } }];
