@@ -8,11 +8,17 @@
   "engines": {
     "node": "16.x"
   },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "svelte": "./dist/index.js"
+    }
+  },
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
-    "build:digitalOcean": "yarn install --production=false && rimraf dist && yarn build && yarn install --production --frozen-lockfile",
-    "start": "ts-node-esm   src/server.ts",
+    "build:digitalOcean": "yarn install --production=false && rimraf dist && yarn build && yarn install --production --frozen-lockfile && yarn svelte-package",
+    "start": "node server.js",
     "package": "svelte-kit package",
     "preview": "vite preview",
     "test": "playwright test",
@@ -75,6 +81,7 @@
     "chart.js": "^4.3.0",
     "chartjs-plugin-datalabels": "^2.2.0",
     "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "filedrop-svelte": "^0.1.2",
     "i18n-possessive": "^1.0.0",
