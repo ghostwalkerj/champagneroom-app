@@ -1,38 +1,38 @@
-import { PUBLIC_PIN_PATH } from "$env/static/public";
+import { PUBLIC_PIN_PATH } from '$env/static/public';
 import type {
   TicketDisputeReason,
   TicketDocType,
   TicketStateType,
   TicketType,
-} from "$lib/models/ticket";
-import { Ticket, TicketCancelReason } from "$lib/models/ticket";
-import { Transaction, TransactionReasonType } from "$lib/models/transaction";
+} from '$lib/models/ticket';
+import { Ticket, TicketCancelReason } from '$lib/models/ticket';
+import { Transaction, TransactionReasonType } from '$lib/models/transaction';
 
-import { MONGO_DB_ENDPOINT } from "$env/static/private";
-import type { ShowMachineServiceType } from "$lib/machines/showMachine";
-import type { TicketMachineEventType } from "$lib/machines/ticketMachine";
-import { Show } from "$lib/models/show";
-import { ActorType } from "$lib/util/constants";
-import { verifyPin } from "$lib/util/pin";
+import { MONGO_DB_ENDPOINT } from '$env/static/private';
+import type { ShowMachineServiceType } from '$lib/machines/showMachine';
+import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
+import { Show } from '$lib/models/show';
+import { ActorType } from '$lib/util/constants';
+import { verifyPin } from '$lib/util/pin';
 import {
   getTicketMachineService,
   getTicketMachineServiceFromId,
-} from "$lib/util/ssHelper";
-import { error, fail, redirect } from "@sveltejs/kit";
-import mongoose from "mongoose";
-import urlJoin from "url-join";
-import type { Actions, PageServerLoad } from "./$types";
+} from '$lib/util/ssHelper';
+import { error, fail, redirect } from '@sveltejs/kit';
+import mongoose from 'mongoose';
+import urlJoin from 'url-join';
+import type { Actions, PageServerLoad } from './$types';
 
 const getTicketService = async (ticketId: string) => {
   const ticket = await Ticket.findById(ticketId)
     .orFail(() => {
-      throw error(404, "Ticket not found");
+      throw error(404, 'Ticket not found');
     })
     .exec();
 
   const show = await Show.findById(ticket.show)
     .orFail(() => {
-      throw error(404, "Show not found");
+      throw error(404, 'Show not found');
     })
     .exec();
 
@@ -42,7 +42,7 @@ const getTicketService = async (ticketId: string) => {
 
 export const load: PageServerLoad = async ({ params, cookies, url }) => {
   const ticketId = params.id;
-  const pinHash = cookies.get("pin");
+  const pinHash = cookies.get('pin');
   const redirectUrl = urlJoin(url.href, PUBLIC_PIN_PATH);
   mongoose.connect(MONGO_DB_ENDPOINT);
 
@@ -50,23 +50,23 @@ export const load: PageServerLoad = async ({ params, cookies, url }) => {
     throw redirect(303, redirectUrl);
   }
   if (ticketId === null) {
-    throw error(404, "Bad ticket id");
+    throw error(404, 'Bad ticket id');
   }
 
   const ticket = (await Ticket.findById(ticketId)
     .orFail(() => {
-      throw error(404, "Ticket not found");
+      throw error(404, 'Ticket not found');
     })
     .exec()) as TicketDocType;
 
   const show = await Show.findById(ticket.show)
     .orFail(() => {
-      throw error(404, "Show not found");
+      throw error(404, 'Show not found');
     })
     .exec();
 
   if (ticket.ticketState.reservation === undefined) {
-    throw error(404, "Ticket not reserved");
+    throw error(404, 'Ticket not reserved');
   }
 
   if (!verifyPin(ticketId, ticket.ticketState.reservation.pin, pinHash)) {
@@ -83,7 +83,7 @@ export const actions: Actions = {
   buy_ticket: async ({ params }) => {
     const ticketId = params.id;
     if (ticketId === null) {
-      throw error(404, "Key not found");
+      throw error(404, 'Key not found');
     }
 
     mongoose.connect(MONGO_DB_ENDPOINT);
@@ -92,9 +92,9 @@ export const actions: Actions = {
 
     Transaction.create({
       //TODO: add transaction data
-      hash: "0xeba2df809e7a612a0a0d444ccfa5c839624bdc00dd29e3340d46df3870f8a30e",
-      from: "0x5B38Da6a701c568545dCfcB03FcB875f56beddC4",
-      to: "0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2",
+      hash: '0xeba2df809e7a612a0a0d444ccfa5c839624bdc00dd29e3340d46df3870f8a30e',
+      from: '0x5B38Da6a701c568545dCfcB03FcB875f56beddC4',
+      to: '0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2',
       value: ticket.price.toString(),
       block: 123,
       reason: TransactionReasonType.TICKET_PAYMENT,
@@ -103,7 +103,7 @@ export const actions: Actions = {
       agent: show.agent,
       talent: show.talent,
     }).then((transaction) => {
-      ticketService.send({ type: "PAYMENT RECEIVED", transaction });
+      ticketService.send({ type: 'PAYMENT RECEIVED', transaction });
     });
 
     return { success: true, ticketBought: true };
@@ -111,7 +111,7 @@ export const actions: Actions = {
   cancel_ticket: async ({ params }) => {
     const ticketId = params.id;
     if (ticketId === null) {
-      throw error(404, "Key not found");
+      throw error(404, 'Key not found');
     }
     mongoose.connect(MONGO_DB_ENDPOINT);
 
@@ -123,10 +123,10 @@ export const actions: Actions = {
       cancelledInState: JSON.stringify(state.value),
       reason: TicketCancelReason.CUSTOMER_CANCELLED,
       cancelledAt: new Date(),
-    } as TicketStateType["cancel"];
+    } as TicketStateType['cancel'];
 
     const cancelEvent = {
-      type: "CANCELLATION INITIATED",
+      type: 'CANCELLATION INITIATED',
       cancel,
     } as TicketMachineEventType;
 
@@ -138,7 +138,7 @@ export const actions: Actions = {
     const snapshot = ticketService.getSnapshot();
     const _ticket = snapshot.context.ticketDocument;
     const _showService = snapshot.children[
-      "showMachineService"
+      'showMachineService'
     ] as ShowMachineServiceType;
     const _show = _showService?.getSnapshot().context.showDocument;
     return {
@@ -151,14 +151,14 @@ export const actions: Actions = {
   leave_feedback: async ({ params, request }) => {
     const ticketId = params.id;
     if (ticketId === null) {
-      throw error(404, "Key not found");
+      throw error(404, 'Key not found');
     }
 
     const data = await request.formData();
-    const rating = data.get("rating") as string;
-    const review = data.get("review") as string;
+    const rating = data.get('rating') as string;
+    const review = data.get('review') as string;
 
-    if (!rating || rating === "0") {
+    if (!rating || rating === '0') {
       return fail(400, { rating, missingRating: true });
     }
 
@@ -168,11 +168,11 @@ export const actions: Actions = {
     const feedback = {
       rating: +rating,
       review,
-    } as TicketType["ticketState"]["feedback"];
+    } as TicketType['ticketState']['feedback'];
 
-    if (state.can({ type: "FEEDBACK RECEIVED", feedback })) {
+    if (state.can({ type: 'FEEDBACK RECEIVED', feedback })) {
       ticketService.send({
-        type: "FEEDBACK RECEIVED",
+        type: 'FEEDBACK RECEIVED',
         feedback,
       });
     }
@@ -182,14 +182,14 @@ export const actions: Actions = {
   initiate_dispute: async ({ params, request }) => {
     const ticketId = params.id;
     if (ticketId === null) {
-      throw error(404, "Key not found");
+      throw error(404, 'Key not found');
     }
 
     const data = await request.formData();
-    const reason = data.get("reason") as string;
-    const explanation = data.get("explanation") as string;
+    const reason = data.get('reason') as string;
+    const explanation = data.get('explanation') as string;
 
-    if (!explanation || explanation === "") {
+    if (!explanation || explanation === '') {
       return fail(400, { explanation, missingExplanation: true });
     }
 
@@ -205,11 +205,11 @@ export const actions: Actions = {
       reason: reason as TicketDisputeReason,
       explanation,
       startedAt: new Date(),
-    } as TicketType["ticketState"]["dispute"];
+    } as TicketType['ticketState']['dispute'];
 
-    if (state.can({ type: "DISPUTE INITIATED", dispute })) {
+    if (state.can({ type: 'DISPUTE INITIATED', dispute })) {
       ticketService.send({
-        type: "DISPUTE INITIATED",
+        type: 'DISPUTE INITIATED',
         dispute,
       });
     }

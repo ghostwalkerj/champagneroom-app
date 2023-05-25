@@ -5,6 +5,14 @@ export enum TokenRoles {
   TALENT = 'TALENT',
 }
 
+export enum EntityType {
+  AGENT = 'AGENT',
+  TALENT = 'TALENT',
+  SHOW = 'SHOW',
+  TICKET = 'TICKET',
+  USER = 'USER',
+}
+
 export const currencyFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: 'USD',

@@ -1,7 +1,7 @@
-import { MONGO_DB_ENDPOINT } from "$env/static/private";
-import { ShowEvent } from "$lib/models/showEvent";
-import type { RequestHandler } from "@sveltejs/kit";
-import mongoose from "mongoose";
+import { MONGO_DB_ENDPOINT } from '$env/static/private';
+import { ShowEvent } from '$lib/models/showEvent';
+import type { RequestHandler } from '@sveltejs/kit';
+import mongoose from 'mongoose';
 
 export const GET: RequestHandler<{ showId: string }> = async ({
   params,
@@ -9,9 +9,9 @@ export const GET: RequestHandler<{ showId: string }> = async ({
 }) => {
   const showId = params.showId;
   if (showId === null) {
-    return new Response("Show Id not found", { status: 404 });
+    return new Response('Show Id not found', { status: 404 });
   }
-  const firstFetch = url.searchParams.get("firstFetch") || false;
+  const firstFetch = url.searchParams.get('firstFetch') || false;
   let doc: string | undefined = undefined;
 
   mongoose.connect(MONGO_DB_ENDPOINT);
@@ -31,8 +31,8 @@ export const GET: RequestHandler<{ showId: string }> = async ({
     const pipeline = [
       {
         $match: {
-          "fullDocument.show": id,
-          operationType: "insert",
+          'fullDocument.show': id,
+          operationType: 'insert',
         },
       },
     ];
@@ -47,7 +47,7 @@ export const GET: RequestHandler<{ showId: string }> = async ({
   return new Response(doc, {
     status: 200,
     headers: {
-      "content-type": "application/json",
+      'content-type': 'application/json',
     },
   });
 };

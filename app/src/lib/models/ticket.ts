@@ -1,44 +1,44 @@
-import { PUBLIC_MONGO_FIELD_SECRET } from "$env/static/public";
-import { ActorType } from "$lib/util/constants";
-import type { InferSchemaType, Model } from "mongoose";
-import { default as mongoose, default as pkg } from "mongoose";
-import { fieldEncryption } from "mongoose-field-encryption";
-import validator from "validator";
+import { PUBLIC_MONGO_FIELD_SECRET } from '$env/static/public';
+import { ActorType } from '$lib/util/constants';
+import type { InferSchemaType, Model } from 'mongoose';
+import { default as mongoose, default as pkg } from 'mongoose';
+import { fieldEncryption } from 'mongoose-field-encryption';
+import validator from 'validator';
 
 const { Schema, models } = pkg;
 export enum TicketStatus {
-  RESERVED = "RESERVED",
-  CANCELLATION_INITIATED = "CANCELLATION INITIATED",
-  CANCELLED = "CANCELLED",
-  FINALIZED = "FINALIZED",
-  REDEEMED = "REDEEMED",
-  IN_ESCROW = "IN ESCROW",
-  IN_DISPUTE = "IN DISPUTE",
-  REFUNDED = "REFUNDED",
-  MISSED_SHOW = "MISSED SHOW",
-  SHOW_CANCELLED = "SHOW CANCELLED",
+  RESERVED = 'RESERVED',
+  CANCELLATION_INITIATED = 'CANCELLATION INITIATED',
+  CANCELLED = 'CANCELLED',
+  FINALIZED = 'FINALIZED',
+  REDEEMED = 'REDEEMED',
+  IN_ESCROW = 'IN ESCROW',
+  IN_DISPUTE = 'IN DISPUTE',
+  REFUNDED = 'REFUNDED',
+  MISSED_SHOW = 'MISSED SHOW',
+  SHOW_CANCELLED = 'SHOW CANCELLED',
 }
 
 export enum TicketCancelReason {
-  SHOW_CANCELLED = "SHOW CANCELLED",
-  TALENT_NO_SHOW = "TALENT NO SHOW",
-  CUSTOMER_NO_SHOW = "CUSTOMER NO SHOW",
-  SHOW_RESCHEDULED = "SHOW RESCHEDULED",
-  CUSTOMER_CANCELLED = "CUSTOMER CANCELLED",
+  SHOW_CANCELLED = 'SHOW CANCELLED',
+  TALENT_NO_SHOW = 'TALENT NO SHOW',
+  CUSTOMER_NO_SHOW = 'CUSTOMER NO SHOW',
+  SHOW_RESCHEDULED = 'SHOW RESCHEDULED',
+  CUSTOMER_CANCELLED = 'CUSTOMER CANCELLED',
 }
 
 export enum TicketDisputeDecision {
-  TALENT_WON = "TALENT WON",
-  CUSTOMER_WON = "CUSTOMER WON",
-  SPLIT = "SPLIT",
+  TALENT_WON = 'TALENT WON',
+  CUSTOMER_WON = 'CUSTOMER WON',
+  SPLIT = 'SPLIT',
 }
 
 export enum TicketDisputeReason {
-  ATTEMPTED_SCAM = "ATTEMPTED SCAM",
-  ENDED_EARLY = "ENDED EARLY",
-  LOW_QUALITY = "LOW QUALITY",
-  TALENT_NO_SHOW = "TALENT NO SHOW",
-  SHOW_NEVER_STARTED = "SHOW NEVER STARTED",
+  ATTEMPTED_SCAM = 'ATTEMPTED SCAM',
+  ENDED_EARLY = 'ENDED EARLY',
+  LOW_QUALITY = 'LOW QUALITY',
+  TALENT_NO_SHOW = 'TALENT NO SHOW',
+  SHOW_NEVER_STARTED = 'SHOW NEVER STARTED',
 }
 
 const cancelSchema = new Schema({
@@ -65,7 +65,7 @@ const reservationSchema = new Schema({
 });
 
 reservationSchema.plugin(fieldEncryption, {
-  fields: ["pin"],
+  fields: ['pin'],
   secret: PUBLIC_MONGO_FIELD_SECRET,
 });
 
@@ -96,7 +96,7 @@ const feedbackSchema = new Schema({
     max: 5,
     validate: {
       validator: Number.isInteger,
-      message: "{VALUE} is not an integer value",
+      message: '{VALUE} is not an integer value',
     },
   },
   review: { type: String },
@@ -106,7 +106,7 @@ const feedbackSchema = new Schema({
 const refundSchema = new Schema({
   refundedAt: { type: Date, required: true, default: Date.now },
   transactions: [
-    { type: Schema.Types.ObjectId, ref: "Transaction", required: true },
+    { type: Schema.Types.ObjectId, ref: 'Transaction', required: true },
   ],
   amount: { type: Number, required: true, default: 0 },
 });
@@ -114,7 +114,7 @@ const refundSchema = new Schema({
 const saleSchema = new Schema({
   soldAt: { type: Date, required: true, default: Date.now },
   transactions: [
-    { type: Schema.Types.ObjectId, ref: "Transaction", required: true },
+    { type: Schema.Types.ObjectId, ref: 'Transaction', required: true },
   ],
   amount: { type: Number, required: true, default: 0 },
 });
@@ -154,15 +154,15 @@ export const ticketSchema = new Schema(
       validator: (v: string) => validator.isEthereumAddress(v),
     },
     price: { type: Number, required: true },
-    show: { type: Schema.Types.ObjectId, ref: "Show" },
+    show: { type: Schema.Types.ObjectId, ref: 'Show' },
     ticketState: {
       type: ticketStateSchema,
       required: true,
       default: () => ({}),
     },
-    agent: { type: Schema.Types.ObjectId, ref: "Agent", required: true },
-    talent: { type: Schema.Types.ObjectId, ref: "Talent", required: true },
-    transactions: [{ type: Schema.Types.ObjectId, ref: "Transaction" }],
+    agent: { type: Schema.Types.ObjectId, ref: 'Agent', required: true },
+    talent: { type: Schema.Types.ObjectId, ref: 'Talent', required: true },
+    transactions: [{ type: Schema.Types.ObjectId, ref: 'Transaction' }],
   },
   { timestamps: true }
 );
@@ -172,6 +172,6 @@ export type TicketDocType = InferSchemaType<typeof ticketSchema>;
 
 export const Ticket = models?.Ticket
   ? (models.Ticket as Model<TicketDocType>)
-  : mongoose.model<TicketDocType>("Ticket", ticketSchema);
+  : mongoose.model<TicketDocType>('Ticket', ticketSchema);
 
 export type TicketType = InstanceType<typeof Ticket>;

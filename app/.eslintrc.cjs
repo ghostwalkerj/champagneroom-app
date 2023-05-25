@@ -23,7 +23,9 @@ module.exports = {
     '@typescript-eslint/ban-ts-comment': 'off',
     '@typescript-eslint/no-non-null-assertion': 'off',
     'svelte/no-unused-svelte-ignore': 'off',
-    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',    
+    'quotes': [2, 'single', { 'avoidEscape': true }],
+    'semi': [2, 'always'],
     '@typescript-eslint/consistent-type-imports': [
       'error',
       {
@@ -33,4 +35,4 @@ module.exports = {
       },
     ],
   },
-};
+}

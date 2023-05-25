@@ -1,18 +1,18 @@
-import { MONGO_DB_ENDPOINT } from "$env/static/private";
+import { MONGO_DB_ENDPOINT } from '$env/static/private';
 
-import type { ShowMachineEventType } from "$lib/machines/showMachine";
+import type { ShowMachineEventType } from '$lib/machines/showMachine';
 import {
   Show,
   ShowCancelReason,
   ShowStatus,
   type ShowStateType,
-} from "$lib/models/show";
-import { Talent, type TalentDocType } from "$lib/models/talent";
-import { ActorType } from "$lib/util/constants";
-import { getShowMachineServiceFromId } from "$lib/util/ssHelper";
-import { error, fail } from "@sveltejs/kit";
-import mongoose from "mongoose";
-import type { Actions, PageServerLoad, RequestEvent } from "./$types";
+} from '$lib/models/show';
+import { Talent, type TalentDocType } from '$lib/models/talent';
+import { ActorType } from '$lib/util/constants';
+import { getShowMachineServiceFromId } from '$lib/util/ssHelper';
+import { error, fail } from '@sveltejs/kit';
+import mongoose from 'mongoose';
+import type { Actions, PageServerLoad, RequestEvent } from './$types';
 
 export const load: PageServerLoad = async ({ params }) => {
   mongoose.connect(MONGO_DB_ENDPOINT);
@@ -20,12 +20,12 @@ export const load: PageServerLoad = async ({ params }) => {
   const key = params.key;
 
   if (key === null) {
-    throw error(404, "Key not found");
+    throw error(404, 'Key not found');
   }
 
   const talent = await Talent.findOne({ key })
     .orFail(() => {
-      throw error(404, "Talent not found");
+      throw error(404, 'Talent not found');
     })
     .lean()
     .exec();
@@ -44,10 +44,10 @@ export const actions: Actions = {
   update_profile_image: async ({ params, request }: RequestEvent) => {
     const key = params.key;
     if (key === null) {
-      throw error(404, "Key not found");
+      throw error(404, 'Key not found');
     }
     const data = await request.formData();
-    const url = data.get("url") as string;
+    const url = data.get('url') as string;
     if (!url) {
       return fail(400, { url, missingUrl: true });
     }
@@ -60,11 +60,11 @@ export const actions: Actions = {
   },
   create_show: async ({ params, request }) => {
     const data = await request.formData();
-    const price = data.get("price") as string;
-    const name = data.get("name") as string;
-    const duration = data.get("duration") as string;
-    const capacity = data.get("capacity") as string;
-    const coverImageUrl = data.get("coverImageUrl") as string;
+    const price = data.get('price') as string;
+    const name = data.get('name') as string;
+    const duration = data.get('duration') as string;
+    const capacity = data.get('capacity') as string;
+    const coverImageUrl = data.get('coverImageUrl') as string;
     const key = params.key;
 
     if (!name || name.length < 3 || name.length > 50) {
@@ -82,7 +82,7 @@ export const actions: Actions = {
 
     const talent = (await Talent.findOne({ key })
       .orFail(() => {
-        throw error(404, "Talent not found");
+        throw error(404, 'Talent not found');
       })
       .lean()
       .exec()) as TalentDocType;
@@ -120,13 +120,13 @@ export const actions: Actions = {
   cancel_show: async ({ request, params }) => {
     const key = params.key;
     const data = await request.formData();
-    const showId = data.get("showId") as string;
+    const showId = data.get('showId') as string;
     if (key === null) {
-      throw error(404, "Key not found");
+      throw error(404, 'Key not found');
     }
 
     if (showId === null) {
-      throw error(404, "Show ID not found");
+      throw error(404, 'Show ID not found');
     }
 
     mongoose.connect(MONGO_DB_ENDPOINT);
@@ -138,10 +138,10 @@ export const actions: Actions = {
       cancelledInState: JSON.stringify(showMachineState.value),
       reason: ShowCancelReason.TALENT_CANCELLED,
       requestedBy: ActorType.TALENT,
-    } as ShowStateType["cancel"];
+    } as ShowStateType['cancel'];
 
     const cancelEvent = {
-      type: "CANCELLATION INITIATED",
+      type: 'CANCELLATION INITIATED',
       cancel,
     } as ShowMachineEventType;
 
@@ -160,22 +160,22 @@ export const actions: Actions = {
   },
   end_show: async ({ request }) => {
     const data = await request.formData();
-    const showId = data.get("showId") as string;
+    const showId = data.get('showId') as string;
 
     if (showId === null) {
-      throw error(404, "Show ID not found");
+      throw error(404, 'Show ID not found');
     }
 
     let inEscrow = false;
     const showService = await getShowMachineServiceFromId(showId);
     const showState = showService.getSnapshot();
 
-    if (showState.can({ type: "SHOW ENDED" })) {
+    if (showState.can({ type: 'SHOW ENDED' })) {
       showService.send({
-        type: "SHOW ENDED",
+        type: 'SHOW ENDED',
       });
 
-      inEscrow = showService.getSnapshot().matches("inEscrow");
+      inEscrow = showService.getSnapshot().matches('inEscrow');
     }
 
     return {
@@ -185,18 +185,18 @@ export const actions: Actions = {
   },
   refund_tickets: async ({ request }) => {
     const data = await request.formData();
-    const showId = data.get("showId") as string;
+    const showId = data.get('showId') as string;
 
     if (showId === null) {
-      throw error(404, "Show ID not found");
+      throw error(404, 'Show ID not found');
     }
 
     const showService = await getShowMachineServiceFromId(showId);
     const showState = showService.getSnapshot();
 
-    if (showState.matches("initiatedCancellation.waiting2Refund")) {
+    if (showState.matches('initiatedCancellation.waiting2Refund')) {
       showService.send({
-        type: "REFUND INITIATED",
+        type: 'REFUND INITIATED',
       });
     }
     return {

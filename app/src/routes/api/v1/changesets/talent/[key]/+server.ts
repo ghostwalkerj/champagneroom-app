@@ -1,15 +1,15 @@
-import { MONGO_DB_ENDPOINT } from "$env/static/private";
-import { Talent } from "$lib/models/talent";
-import type { RequestHandler } from "@sveltejs/kit";
-import mongoose from "mongoose";
+import { MONGO_DB_ENDPOINT } from '$env/static/private';
+import { Talent } from '$lib/models/talent';
+import type { RequestHandler } from '@sveltejs/kit';
+import mongoose from 'mongoose';
 
 /** @type {import('./$types').PageServerLoad} */
 export const GET: RequestHandler<{ key: string }> = async ({ params, url }) => {
   const talentKey = params.key;
   if (talentKey === null) {
-    return new Response("Talent key not found", { status: 404 });
+    return new Response('Talent key not found', { status: 404 });
   }
-  const firstFetch = url.searchParams.get("firstFetch") || false;
+  const firstFetch = url.searchParams.get('firstFetch') || false;
   let doc: string | undefined = undefined;
   mongoose.connect(MONGO_DB_ENDPOINT);
 
@@ -19,9 +19,9 @@ export const GET: RequestHandler<{ key: string }> = async ({ params, url }) => {
       doc = JSON.stringify(talent);
     }
   } else {
-    const pipeline = [{ $match: { "fullDocument.key": talentKey } }];
+    const pipeline = [{ $match: { 'fullDocument.key': talentKey } }];
     const changeStream = Talent.watch(pipeline, {
-      fullDocument: "updateLookup",
+      fullDocument: 'updateLookup',
     });
     const next = await changeStream.next();
     doc = next.fullDocument;
@@ -31,7 +31,7 @@ export const GET: RequestHandler<{ key: string }> = async ({ params, url }) => {
   return new Response(doc, {
     status: 200,
     headers: {
-      "content-type": "application/json",
+      'content-type': 'application/json',
     },
   });
 };

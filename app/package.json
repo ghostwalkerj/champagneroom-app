@@ -64,6 +64,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@bull-board/express": "^5.2.0",
     "@sveltejs/adapter-vercel": "^3.0.0",
     "@walletconnect/web3-provider": "^1.8.0",
     "@xstate/svelte": "^2.0.1",

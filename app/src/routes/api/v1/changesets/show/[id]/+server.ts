@@ -1,13 +1,13 @@
-import { MONGO_DB_ENDPOINT } from "$env/static/private";
-import { Show } from "$lib/models/show";
-import mongoose from "mongoose";
-import type { RequestHandler } from "./$types";
+import { MONGO_DB_ENDPOINT } from '$env/static/private';
+import { Show } from '$lib/models/show';
+import mongoose from 'mongoose';
+import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ params, url }) => {
   const showId = params.id;
-  const firstFetch = url.searchParams.get("firstFetch") || false;
+  const firstFetch = url.searchParams.get('firstFetch') || false;
   if (showId === null) {
-    return new Response("Show not found", { status: 404 });
+    return new Response('Show not found', { status: 404 });
   }
   mongoose.connect(MONGO_DB_ENDPOINT);
 
@@ -24,12 +24,12 @@ export const GET: RequestHandler = async ({ params, url }) => {
     const pipeline = [
       {
         $match: {
-          "fullDocument._id": id,
+          'fullDocument._id': id,
         },
       },
     ];
 
-    const changeStream = Show.watch(pipeline, { fullDocument: "updateLookup" });
+    const changeStream = Show.watch(pipeline, { fullDocument: 'updateLookup' });
     const next = await changeStream.next();
     doc = JSON.stringify(next.fullDocument);
 
@@ -39,7 +39,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
   return new Response(doc, {
     status: 200,
     headers: {
-      "content-type": "application/json",
+      'content-type': 'application/json',
     },
   });
 };

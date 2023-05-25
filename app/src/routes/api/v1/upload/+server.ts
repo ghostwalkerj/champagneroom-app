@@ -1,14 +1,14 @@
-import { WEB3STORAGE_API_TOKEN, WEB3STORAGE_DOMAIN } from "$env/static/private";
-import { json } from "@sveltejs/kit";
-import { Web3Storage } from "web3.storage";
-import type { RequestHandler } from "./$types";
+import { WEB3STORAGE_API_TOKEN, WEB3STORAGE_DOMAIN } from '$env/static/private';
+import { json } from '@sveltejs/kit';
+import { Web3Storage } from 'web3.storage';
+import type { RequestHandler } from './$types';
 
 const client = new Web3Storage({ token: WEB3STORAGE_API_TOKEN });
 
 export const POST: RequestHandler = async ({ request }) => {
-  let url = "";
+  let url = '';
   const body = await request.formData();
-  const file = body.get("file") as File;
+  const file = body.get('file') as File;
   if (file) {
     try {
       const rootCid = await client.put([file]);
@@ -22,7 +22,7 @@ export const POST: RequestHandler = async ({ request }) => {
         }
       }
     } catch (error) {
-      console.log("error", error);
+      console.log('error', error);
     }
     return json({ url });
   } else {

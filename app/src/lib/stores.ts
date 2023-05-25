@@ -1,12 +1,12 @@
-import { PUBLIC_CHANGESET_PATH } from "$env/static/public";
-import to from "await-to-js";
-import { derived, writable } from "svelte/store";
-import urlJoin from "url-join";
-import type { AgentDocType } from "./models/agent";
-import type { ShowDocType } from "./models/show";
-import type { ShowEventDocType } from "./models/showEvent";
-import type { TalentDocType } from "./models/talent";
-import type { TicketDocType } from "./models/ticket";
+import { PUBLIC_CHANGESET_PATH } from '$env/static/public';
+import to from 'await-to-js';
+import { derived, writable } from 'svelte/store';
+import urlJoin from 'url-join';
+import type { AgentDocType } from './models/agent';
+import type { ShowDocType } from './models/show';
+import type { ShowEventDocType } from './models/showEvent';
+import type { TalentDocType } from './models/talent';
+import type { TicketDocType } from './models/ticket';
 
 export const browserType = writable();
 
@@ -25,7 +25,7 @@ const getChangeset = async <T>({
   let firstFetch = true;
   while (loop) {
     const path = firstFetch
-      ? urlJoin(changesetPath, "?firstFetch=true")
+      ? urlJoin(changesetPath, '?firstFetch=true')
       : changesetPath;
     firstFetch = false;
 
@@ -80,7 +80,7 @@ const abstractStore = <T>({
 export const talentStore = (talent: TalentDocType) => {
   return abstractStore({
     doc: talent,
-    changesetPath: urlJoin(PUBLIC_CHANGESET_PATH, "talent", talent.key),
+    changesetPath: urlJoin(PUBLIC_CHANGESET_PATH, 'talent', talent.key),
   });
 };
 
@@ -89,7 +89,7 @@ export const showStore = (show: ShowDocType) => {
 
   return abstractStore({
     doc: show,
-    changesetPath: urlJoin(PUBLIC_CHANGESET_PATH, "show", show._id.toString()),
+    changesetPath: urlJoin(PUBLIC_CHANGESET_PATH, 'show', show._id.toString()),
     cancelOn: showCancel,
   });
 };
@@ -106,7 +106,7 @@ export const showEventStore = (show: ShowDocType) => {
         getChangeset<ShowEventDocType>({
           changesetPath: urlJoin(
             PUBLIC_CHANGESET_PATH,
-            "showEvent",
+            'showEvent',
             $show._id.toString()
           ),
           callback: set,
@@ -130,7 +130,7 @@ export const ticketStore = (ticket: TicketDocType) => {
     doc: ticket,
     changesetPath: urlJoin(
       PUBLIC_CHANGESET_PATH,
-      "ticket",
+      'ticket',
       ticket._id.toString()
     ),
     cancelOn: ticketCancel,
@@ -140,6 +140,6 @@ export const ticketStore = (ticket: TicketDocType) => {
 export const agentStore = (agent: AgentDocType) => {
   return abstractStore({
     doc: agent,
-    changesetPath: urlJoin(PUBLIC_CHANGESET_PATH, "agent", agent.address),
+    changesetPath: urlJoin(PUBLIC_CHANGESET_PATH, 'agent', agent.address),
   });
 };
