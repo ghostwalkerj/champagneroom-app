@@ -5,7 +5,10 @@
   "files": [
     "dist"
   ],
-  "engines": {},
+  "engines": {
+    "yarn": ">=3.5.1",
+    "node": "16.x"
+  },
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
