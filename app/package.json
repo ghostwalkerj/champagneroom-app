@@ -17,7 +17,7 @@
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
-    "build:digitalOcean": "yarn install --production=false && rimraf dist && yarn build && yarn install --production --frozen-lockfile && svelte-package",
+    "build:digitalOcean": "yarn install --production=false && rimraf dist && yarn build && yarn install --production --frozen-lockfile && yarn svelte-package",
     "start": "node server.js",
     "package": "svelte-package",
     "preview": "vite preview",
