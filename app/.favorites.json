@@ -316,7 +316,7 @@
     },
     {
         "type": "Group",
-        "name": "groupByModel",
+        "name": "entity",
         "parent_id": null,
         "workspaceRoot": null,
         "workspacePath": null,
