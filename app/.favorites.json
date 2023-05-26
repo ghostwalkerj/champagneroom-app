@@ -683,5 +683,21 @@
         "workspaceRoot": "/Users/joseph/Dev/pcall/app",
         "workspacePath": "src/lib/workers/showWorker.ts",
         "id": "TmkB9dq5RaNxDZOf"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/server.js",
+        "parent_id": null,
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "server.js",
+        "id": "b7ATn3X1igh6LyP2"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/tsconfig.json",
+        "parent_id": "IXQnFASuioYN1pcj",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "tsconfig.json",
+        "id": "LgN9yJnbu1EGix5p"
     }
 ]
