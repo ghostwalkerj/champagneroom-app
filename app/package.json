@@ -18,7 +18,7 @@
     "dev": "vite dev",
     "build": "vite build",
     "build:digitalOcean": "yarn install --production=false && rimraf dist && yarn build && yarn install --production --frozen-lockfile",
-    "start": "npx svelte-package && vite build && node server.js",
+    "start": "node server.js",
     "package": "svelte-package",
     "preview": "vite preview",
     "test": "playwright test",

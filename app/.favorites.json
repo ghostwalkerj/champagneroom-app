@@ -699,5 +699,21 @@
         "workspaceRoot": "/Users/joseph/Dev/pcall/app",
         "workspacePath": "tsconfig.json",
         "id": "LgN9yJnbu1EGix5p"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/docker-compose.dev.yml",
+        "parent_id": "IXQnFASuioYN1pcj",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "docker-compose.dev.yml",
+        "id": "jGQ0Uv9sDMFo8kJX"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/Dockerfile.dev",
+        "parent_id": "IXQnFASuioYN1pcj",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "Dockerfile.dev",
+        "id": "j6mUTpb1t9FOgloa"
     }
 ]

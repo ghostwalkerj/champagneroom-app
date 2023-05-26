@@ -9,7 +9,6 @@ services:
       dockerfile: Dockerfile.dev
     ports:
       - 3000:3000
-      - 24678:24678
     volumes:
       - ./:/usr/src/app
       - /usr/src/app/node_modules
