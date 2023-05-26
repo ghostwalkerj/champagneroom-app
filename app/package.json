@@ -6,7 +6,7 @@
     "dist"
   ],
   "engines": {
-    "node": "16.x"
+    "node": "18.x"
   },
   "exports": {
     ".": {
@@ -18,7 +18,7 @@
     "dev": "vite dev",
     "build": "vite build",
     "build:digitalOcean": "yarn install --production=false && rimraf dist && yarn build && yarn install --production --frozen-lockfile",
-    "start": "svelte-package && node server.js",
+    "start": "npx svelte-package && node server.js",
     "package": "svelte-package",
     "preview": "vite preview",
     "test": "playwright test",
