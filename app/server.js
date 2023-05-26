@@ -41,5 +41,5 @@ app.use(cors(corsOptions), handler);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
-  console.log('pCall server on: ', port);
+  console.log('pCall server running on: ', port);
 });
