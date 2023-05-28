@@ -19,7 +19,7 @@
   import type { ShowDocType } from '$lib/models/show';
   import type { ShowEventDocType } from '$lib/models/showEvent';
   import type { TalentDocType } from '$lib/models/talent';
-  import { showEventStore, showStore, talentStore } from '$lib/stores';
+  import { showEventStore, showStore, talentStore } from '$stores';
   import { createEventText } from '$lib/util/eventUtil';
   import { onDestroy, onMount } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';

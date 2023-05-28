@@ -10,6 +10,7 @@ const config = {
     alias: {
       $components: './src/components',
       $lib: './src/lib',
+      $stores: './src/stores',
     },
   },
   preprocess: [

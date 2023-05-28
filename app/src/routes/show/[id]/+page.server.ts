@@ -1,10 +1,10 @@
-import { MONGO_DB_ENDPOINT } from '$env/static/private';
 import { PUBLIC_TICKET_PATH } from '$env/static/public';
 import { Show } from '$lib/models/show';
 import { Ticket } from '$lib/models/ticket';
 import { mensNames } from '$lib/util/mensNames';
 import { createPinHash } from '$lib/util/pin';
-import { getShowMachineService } from '$lib/util/ssHelper';
+import { MONGO_DB_ENDPOINT } from '$lib/util/secrets';
+import { getShowMachineService } from '$lib/util/serverUtils';
 import { error, fail, redirect } from '@sveltejs/kit';
 import mongoose from 'mongoose';
 import { uniqueNamesGenerator } from 'unique-names-generator';

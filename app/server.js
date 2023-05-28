@@ -3,23 +3,14 @@ import { BullMQAdapter } from '@bull-board/api/bullMQAdapter.js';
 import { ExpressAdapter } from '@bull-board/express';
 import { Queue } from 'bullmq';
 import cors from 'cors';
-import 'dotenv/config';
 import express from 'express';
 import { handler } from './build/handler.js';
 import { EntityType } from './dist/util/constants.js';
+import { redisOptions } from './dist/util/secrets.js';
 
 const corsOptions = {
   origin: '*',
   optionsSuccessStatus: 200,
-};
-const redisOptions = {
-  connection: {
-    host: process.env.REDIS_HOST,
-    port: +(process.env.REDIS_PORT || 6379),
-    username: process.env.REDIS_USERNAME,
-    password: process.env.REDIS_PASSWORD,
-    enableReadyCheck: false,
-  },
 };
 
 const showQueue = new Queue(EntityType.SHOW, redisOptions ); 

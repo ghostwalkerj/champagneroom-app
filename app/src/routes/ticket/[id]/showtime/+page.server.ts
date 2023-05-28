@@ -1,10 +1,4 @@
 import {
-  JITSI_APP_ID,
-  JITSI_JWT_SECRET,
-  JWT_EXPIRY,
-  MONGO_DB_ENDPOINT,
-} from '$env/static/private';
-import {
   PUBLIC_JITSI_DOMAIN,
   PUBLIC_PIN_PATH,
   PUBLIC_TICKET_PATH,
@@ -12,7 +6,13 @@ import {
 import type { ShowType } from '$lib/models/show';
 import { Ticket } from '$lib/models/ticket';
 import { verifyPin } from '$lib/util/pin';
-import { getTicketMachineService } from '$lib/util/ssHelper';
+import {
+  JITSI_APP_ID,
+  JITSI_JWT_SECRET,
+  JWT_EXPIRY,
+  MONGO_DB_ENDPOINT,
+} from '$lib/util/secrets';
+import { getTicketMachineService } from '$lib/util/serverUtils';
 import type { Actions } from '@sveltejs/kit';
 import { error, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';

@@ -2,7 +2,6 @@ import { fail } from '@sveltejs/kit';
 import mongoose from 'mongoose';
 import type { Actions } from './$types';
 
-import { MONGO_DB_ENDPOINT } from '$env/static/private';
 import { Agent } from '$lib/models/agent';
 import { Talent } from '$lib/models/talent';
 

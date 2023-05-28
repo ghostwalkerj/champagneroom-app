@@ -1,4 +1,3 @@
-import { MONGO_DB_ENDPOINT } from '$env/static/private';
 import { Show } from '$lib/models/show';
 import mongoose from 'mongoose';
 import type { RequestHandler } from './$types';

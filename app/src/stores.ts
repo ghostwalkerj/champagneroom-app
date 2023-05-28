@@ -2,11 +2,11 @@ import { PUBLIC_CHANGESET_PATH } from '$env/static/public';
 import to from 'await-to-js';
 import { derived, writable } from 'svelte/store';
 import urlJoin from 'url-join';
-import type { AgentDocType } from './models/agent';
-import type { ShowDocType } from './models/show';
-import type { ShowEventDocType } from './models/showEvent';
-import type { TalentDocType } from './models/talent';
-import type { TicketDocType } from './models/ticket';
+import type { AgentDocType } from './lib/models/agent';
+import type { ShowDocType } from './lib/models/show';
+import type { ShowEventDocType } from './lib/models/showEvent';
+import type { TalentDocType } from './lib/models/talent';
+import type { TicketDocType } from './lib/models/ticket';
 
 export const browserType = writable();
 

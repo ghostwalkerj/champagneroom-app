@@ -1,4 +1,3 @@
-import { MONGO_DB_ENDPOINT } from '$env/static/private';
 import { ShowEvent } from '$lib/models/showEvent';
 import type { RequestHandler } from '@sveltejs/kit';
 import mongoose from 'mongoose';

@@ -20,6 +20,9 @@
       "$lib/*": [
         "./src/lib/*"
       ],
+      "$stores": [
+        "./src/stores"
+      ],
     },
   }
 }

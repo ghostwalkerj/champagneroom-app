@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { browserType } from '$lib/stores';
   import { onMount } from 'svelte';
   import { UAParser } from 'ua-parser-js';
   import '../app.css';
+  import { browserType } from '$stores';
 
   import { ShowEvent } from '$lib/models/showEvent';
 

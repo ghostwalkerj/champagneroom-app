@@ -1,4 +1,4 @@
-import { PUBLIC_ESCROW_PERIOD, PUBLIC_GRACE_PERIOD } from '$env/static/public';
+import { PUBLIC_ESCROW_PERIOD } from '$env/static/public';
 import type {
   ShowDocType,
   ShowRefundType,
@@ -372,7 +372,7 @@ export const createShowMachine = ({
             {
               showId: context.showDocument._id,
             },
-            { delay: +PUBLIC_GRACE_PERIOD }
+            { delay: GRACE_PERIOD }
           );
           return {
             showState: {

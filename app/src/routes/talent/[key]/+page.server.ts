@@ -1,5 +1,3 @@
-import { MONGO_DB_ENDPOINT } from '$env/static/private';
-
 import type { ShowMachineEventType } from '$lib/machines/showMachine';
 import {
   Show,
@@ -9,10 +7,11 @@ import {
 } from '$lib/models/show';
 import { Talent, type TalentDocType } from '$lib/models/talent';
 import { ActorType } from '$lib/util/constants';
-import { getShowMachineServiceFromId } from '$lib/util/ssHelper';
+import { getShowMachineServiceFromId } from '$lib/util/serverUtils';
 import { error, fail } from '@sveltejs/kit';
 import mongoose from 'mongoose';
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
+import { MONGO_DB_ENDPOINT } from '$lib/util/secrets';
 
 export const load: PageServerLoad = async ({ params }) => {
   mongoose.connect(MONGO_DB_ENDPOINT);

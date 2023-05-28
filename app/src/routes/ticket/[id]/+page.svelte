@@ -11,7 +11,7 @@
 
   import { PUBLIC_SHOWTIME_PATH } from '$env/static/public';
   import type { ShowDocType } from '$lib/models/show';
-  import { showStore, ticketStore } from '$lib/stores';
+  import { showStore, ticketStore } from '$stores';
   import { onDestroy, onMount } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
   import type { ActionData, PageData } from './$types';

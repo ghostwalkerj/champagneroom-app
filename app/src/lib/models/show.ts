@@ -1,10 +1,9 @@
-import { PUBLIC_MONGO_FIELD_SECRET } from '$env/static/public';
 import { ActorType } from '$lib/util/constants';
+import { MONGO_DB_FIELD_SECRET } from '$lib/util/secrets';
 import type { InferSchemaType, Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
 import { fieldEncryption } from 'mongoose-field-encryption';
 import { v4 as uuidv4 } from 'uuid';
-
 const { Schema, models } = pkg;
 export enum ShowStatus {
   CREATED = 'CREATED',
@@ -217,7 +216,7 @@ const showSchema = new Schema(
 
 showSchema.plugin(fieldEncryption, {
   fields: ['roomId'],
-  secret: PUBLIC_MONGO_FIELD_SECRET,
+  secret: MONGO_DB_FIELD_SECRET,
 });
 
 export type ShowStateType = InferSchemaType<typeof showStateSchema>;

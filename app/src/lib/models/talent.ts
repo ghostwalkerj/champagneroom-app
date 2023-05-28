@@ -1,4 +1,3 @@
-import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
 import { womensNames } from '$lib/util/womensNames';
 import type { InferSchemaType, Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
@@ -88,7 +87,6 @@ const talentSchema = new Schema(
     },
     profileImageUrl: {
       type: String,
-      default: PUBLIC_DEFAULT_PROFILE_IMAGE,
       required: true,
     },
     agentCommission: {
