@@ -22,6 +22,7 @@ RUN yarn package
 # build
 RUN yarn build
 
+
 # Expose port 3000 for the SvelteKit app and 24678 for Vite's HMR
 EXPOSE 3000
 

@@ -1,19 +1,15 @@
 import { createBullBoard } from '@bull-board/api';
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter.js';
 import { ExpressAdapter } from '@bull-board/express';
-import { Queue } from 'bullmq';
 import cors from 'cors';
 import express from 'express';
 import { handler } from './build/handler.js';
-import { EntityType } from './dist/util/constants.js';
-import { REDIS_OPTIONS } from './dist/util/secrets.js';
+import { showQueue } from './dist/workers/showWorker.js';
 
 const corsOptions = {
   origin: '*',
   optionsSuccessStatus: 200,
 };
-
-const showQueue = new Queue(EntityType.SHOW, REDIS_OPTIONS ); 
 
 const serverAdapter = new ExpressAdapter();
 serverAdapter.setBasePath('/admin/queues');

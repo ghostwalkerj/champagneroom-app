@@ -694,22 +694,6 @@
     },
     {
         "type": "File",
-        "name": "/Users/joseph/Dev/pcall/app/docker-compose.dev.yml",
-        "parent_id": "IXQnFASuioYN1pcj",
-        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
-        "workspacePath": "docker-compose.dev.yml",
-        "id": "jGQ0Uv9sDMFo8kJX"
-    },
-    {
-        "type": "File",
-        "name": "/Users/joseph/Dev/pcall/app/Dockerfile.dev",
-        "parent_id": "IXQnFASuioYN1pcj",
-        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
-        "workspacePath": "Dockerfile.dev",
-        "id": "j6mUTpb1t9FOgloa"
-    },
-    {
-        "type": "File",
         "name": "/Users/joseph/Dev/pcall/app/src/lib/util/secrets.ts",
         "parent_id": "ZcmNbtRBnv97xAfr",
         "workspaceRoot": "/Users/joseph/Dev/pcall/app",
@@ -723,5 +707,38 @@
         "workspaceRoot": "/Users/joseph/Dev/pcall/app",
         "workspacePath": "src/lib/util/serverUtils.ts",
         "id": "onRCI6HBWOeNszhM"
+    },
+    {
+        "type": "Group",
+        "name": "docker",
+        "parent_id": null,
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "vToCPlhjmJ4kexYQ",
+        "iconColor": "rgb(0, 0, 139)"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/.dockerignore",
+        "parent_id": "vToCPlhjmJ4kexYQ",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": ".dockerignore",
+        "id": "M6cCGdYWkBs7rauj"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/docker-compose.dev.yml",
+        "parent_id": "vToCPlhjmJ4kexYQ",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "docker-compose.dev.yml",
+        "id": "aEgBeVkFcrtp08LP"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/Dockerfile.dev",
+        "parent_id": "vToCPlhjmJ4kexYQ",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "Dockerfile.dev",
+        "id": "32pnwJuWFsya8cfK"
     }
 ]
