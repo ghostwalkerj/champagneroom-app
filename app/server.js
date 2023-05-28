@@ -6,14 +6,14 @@ import cors from 'cors';
 import express from 'express';
 import { handler } from './build/handler.js';
 import { EntityType } from './dist/util/constants.js';
-import { redisOptions } from './dist/util/secrets.js';
+import { REDIS_OPTIONS } from './dist/util/secrets.js';
 
 const corsOptions = {
   origin: '*',
   optionsSuccessStatus: 200,
 };
 
-const showQueue = new Queue(EntityType.SHOW, redisOptions ); 
+const showQueue = new Queue(EntityType.SHOW, REDIS_OPTIONS ); 
 
 const serverAdapter = new ExpressAdapter();
 serverAdapter.setBasePath('/admin/queues');
