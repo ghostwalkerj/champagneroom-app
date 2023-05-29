@@ -1,6 +1,7 @@
 import { MONGO_DB_ENDPOINT } from '$env/static/private';
 import { ActorType } from '$lib/constants';
 import type { ShowMachineEventType } from '$lib/machines/showMachine';
+import { ShowMachineEventString } from '$lib/machines/showMachine';
 import {
   Show,
   ShowCancelReason,
@@ -168,9 +169,9 @@ export const actions: Actions = {
     const showService = await getShowMachineServiceFromId(showId);
     const showState = showService.getSnapshot();
 
-    if (showState.can({ type: 'SHOW ENDED' })) {
+    if (showState.can({ type: ShowMachineEventString.SHOW_ENDED })) {
       showService.send({
-        type: 'SHOW ENDED',
+        type: ShowMachineEventString.SHOW_ENDED,
       });
 
       inEscrow = showService.getSnapshot().matches('inEscrow');
@@ -194,7 +195,7 @@ export const actions: Actions = {
 
     if (showState.matches('initiatedCancellation.waiting2Refund')) {
       showService.send({
-        type: 'REFUND INITIATED',
+        type: ShowMachineEventString.REFUND_INITIATED,
       });
     }
     return {

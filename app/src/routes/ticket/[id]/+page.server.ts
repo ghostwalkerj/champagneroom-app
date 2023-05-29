@@ -12,6 +12,7 @@ import { MONGO_DB_ENDPOINT } from '$env/static/private';
 import { ActorType } from '$lib/constants';
 import type { ShowMachineServiceType } from '$lib/machines/showMachine';
 import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
+import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 import { Show } from '$lib/models/show';
 import { verifyPin } from '$util/pin';
 import {
@@ -103,7 +104,10 @@ export const actions: Actions = {
       agent: show.agent,
       talent: show.talent,
     }).then((transaction) => {
-      ticketService.send({ type: 'PAYMENT RECEIVED', transaction });
+      ticketService.send({
+        type: TicketMachineEventString.PAYMENT_RECEIVED,
+        transaction,
+      });
     });
 
     return { success: true, ticketBought: true };
@@ -170,9 +174,11 @@ export const actions: Actions = {
       review,
     } as TicketType['ticketState']['feedback'];
 
-    if (state.can({ type: 'FEEDBACK RECEIVED', feedback })) {
+    if (
+      state.can({ type: TicketMachineEventString.FEEDBACK_RECEIVED, feedback })
+    ) {
       ticketService.send({
-        type: 'FEEDBACK RECEIVED',
+        type: TicketMachineEventString.FEEDBACK_RECEIVED,
         feedback,
       });
     }
@@ -207,9 +213,11 @@ export const actions: Actions = {
       startedAt: new Date(),
     } as TicketType['ticketState']['dispute'];
 
-    if (state.can({ type: 'DISPUTE INITIATED', dispute })) {
+    if (
+      state.can({ type: TicketMachineEventString.DISPUTE_INITIATED, dispute })
+    ) {
       ticketService.send({
-        type: 'DISPUTE INITIATED',
+        type: TicketMachineEventString.DISPUTE_INITIATED,
         dispute,
       });
     }

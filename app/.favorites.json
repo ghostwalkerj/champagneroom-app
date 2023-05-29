@@ -570,14 +570,6 @@
     },
     {
         "type": "Directory",
-        "name": "/Users/joseph/Dev/pcall/app/src/lib",
-        "parent_id": null,
-        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
-        "workspacePath": "src/lib",
-        "id": "YaxhWzrGoZVq3TjS"
-    },
-    {
-        "type": "Directory",
         "name": "/Users/joseph/Dev/pcall/app/src/util",
         "parent_id": null,
         "workspaceRoot": "/Users/joseph/Dev/pcall/app",
@@ -625,5 +617,13 @@
         "workspaceRoot": "/Users/joseph/Dev/pcall/app",
         "workspacePath": "Dockerfile.dev",
         "id": "lX9cn2GFJVbAL8x5"
+    },
+    {
+        "type": "Directory",
+        "name": "/Users/joseph/Dev/pcall/app/src/lib/workers",
+        "parent_id": null,
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/lib/workers",
+        "id": "iSVZxnIjHFDlX83q"
     }
 ]

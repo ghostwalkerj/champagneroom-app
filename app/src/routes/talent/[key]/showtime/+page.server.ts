@@ -5,6 +5,7 @@ import {
   MONGO_DB_ENDPOINT,
 } from '$env/static/private';
 import { PUBLIC_JITSI_DOMAIN, PUBLIC_TALENT_PATH } from '$env/static/public';
+import { ShowMachineEventString } from '$lib/machines/showMachine';
 import { Show } from '$lib/models/show';
 import { Talent } from '$lib/models/talent';
 import {
@@ -57,7 +58,7 @@ export const load: PageServerLoad = async ({ params }) => {
 
   if (!showState.matches('started'))
     showService.send({
-      type: 'START SHOW',
+      type: ShowMachineEventString.START_SHOW,
     });
 
   const jitsiToken = jwt.sign(
@@ -98,7 +99,7 @@ export const actions: Actions = {
 
     if (showState.can({ type: 'STOP SHOW' })) {
       showService.send({
-        type: 'STOP SHOW',
+        type: ShowMachineEventString.STOP_SHOW,
       });
 
       return { success: true };
