@@ -1,5 +1,6 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import type { UserConfig } from 'vite';
+import EnvironmentPlugin from 'vite-plugin-environment';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
 const config: UserConfig = {
@@ -13,7 +14,8 @@ const config: UserConfig = {
       // ],
       // Whether to polyfill `node:` protocol imports.
       protocolImports: true,
-    }),
+    }),    EnvironmentPlugin(['MONGO_DB_FIELD_SECRET']),
+
   ],
   build: {
     chunkSizeWarningLimit: 16000,

@@ -11,14 +11,14 @@ import {
 } from '$env/static/public';
 import type { ShowType } from '$lib/models/show';
 import { Ticket } from '$lib/models/ticket';
+import { verifyPin } from '$util/pin';
+import { getTicketMachineService } from '$util/serverUtil';
 import type { Actions } from '@sveltejs/kit';
 import { error, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import urlJoin from 'url-join';
-import type { PageServerLoad } from '../$types';
-import { verifyPin } from '../../../../util/pin';
-import { getTicketMachineService } from '../../../../util/serverUtils';
+import type { PageServerLoad } from './$types';
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 export const load: PageServerLoad = async ({ params, cookies }) => {

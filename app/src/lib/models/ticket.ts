@@ -65,7 +65,7 @@ const reservationSchema = new Schema({
 
 reservationSchema.plugin(fieldEncryption, {
   fields: ['pin'],
-  secret: import.meta.env.VITE_MONGO_DB_FIELD_SECRET || 'secret',
+  secret: process.env.MONGO_DB_FIELD_SECRET,
 });
 
 const escrowSchema = new Schema({
@@ -126,7 +126,7 @@ const ticketStateSchema = new Schema(
       required: true,
       default: TicketStatus.RESERVED,
     },
-    active: { type: Boolean, required: true, default: true },
+    active: { type: Boolean, required: true, default: true, index: true },
 
     totalPaid: { type: Number, required: true, default: 0 },
     totalRefunded: { type: Number, required: true, default: 0 },
@@ -153,7 +153,7 @@ export const ticketSchema = new Schema(
       validator: (v: string) => validator.isEthereumAddress(v),
     },
     price: { type: Number, required: true },
-    show: { type: Schema.Types.ObjectId, ref: 'Show' },
+    show: { type: Schema.Types.ObjectId, ref: 'Show', index: true },
     ticketState: {
       type: ticketStateSchema,
       required: true,

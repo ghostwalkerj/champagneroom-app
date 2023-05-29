@@ -215,7 +215,7 @@ const showSchema = new Schema(
 
 showSchema.plugin(fieldEncryption, {
   fields: ['roomId'],
-  secret: import.meta.env.VITE_MONGO_DB_FIELD_SECRET || 'secret',
+  secret: process.env.MONGO_DB_FIELD_SECRET,
 });
 
 export type ShowStateType = InferSchemaType<typeof showStateSchema>;

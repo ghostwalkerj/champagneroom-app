@@ -22,10 +22,12 @@ const redisOptions = {
     username: process.env.REDIS_USERNAME || '',
     enableReadyCheck: false,
   }
-}; 
+};
+
+const mongoDBEndpoint = process.env.MONGO_DB_ENDPOINT; 
 
 // Workers
-const showWorker = getWorker(EntityType.SHOW, redisOptions);
+const showWorker = getWorker(EntityType.SHOW, redisOptions, mongoDBEndpoint);
 showWorker.run();
 
 // Bull Dashboard

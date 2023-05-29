@@ -26,6 +26,18 @@ export type TicketMachineOptions = {
   escrowPeriod?: number;
 };
 
+export enum TicketMachineEventString {
+  CANCELLATION_INITIATED = 'CANCELLATION INITIATED',
+  REFUND_RECEIVED = 'REFUND RECEIVED',
+  PAYMENT_RECEIVED = 'PAYMENT RECEIVED',
+  FEEDBACK_RECEIVED = 'FEEDBACK RECEIVED',
+  DISPUTE_INITIATED = 'DISPUTE INITIATED',
+  JOINED_SHOW = 'JOINED SHOW',
+  LEFT_SHOW = 'LEFT SHOW',
+  SHOW_ENDED = 'SHOW ENDED',
+  SHOW_CANCELLED = 'SHOW CANCELLED',
+}
+
 export type TicketMachineEventType =
   | {
       type: 'CANCELLATION INITIATED';

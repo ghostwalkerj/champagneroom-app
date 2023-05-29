@@ -12,10 +12,11 @@ export const getQueue = (
 
 export const getWorker = (
   entityType: EntityType,
-  redisOptions: RedisOptionsType
+  redisOptions: RedisOptionsType,
+  mongoDBEndpoint: string
 ) => {
   switch (entityType) {
     case EntityType.SHOW:
-      return getShowWorker(redisOptions);
+      return getShowWorker(redisOptions, mongoDBEndpoint);
   }
 };

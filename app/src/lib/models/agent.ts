@@ -2,7 +2,7 @@ import type { InferSchemaType, Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 import validator from 'validator';
-import { womensNames } from '../../util/womensNames';
+import { womensNames } from '$util/womensNames';
 
 const { Schema, models } = pkg;
 const agentSchema = new Schema(

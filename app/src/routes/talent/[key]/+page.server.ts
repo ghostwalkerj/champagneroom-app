@@ -8,7 +8,7 @@ import {
   type ShowStateType,
 } from '$lib/models/show';
 import { Talent, type TalentDocType } from '$lib/models/talent';
-import { getShowMachineServiceFromId } from '$util/serverUtils';
+import { getShowMachineServiceFromId } from '$util/serverUtil';
 import { error, fail } from '@sveltejs/kit';
 import mongoose from 'mongoose';
 import type { Actions, PageServerLoad, RequestEvent } from './$types';

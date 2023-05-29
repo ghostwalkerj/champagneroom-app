@@ -1,27 +1,189 @@
 import type { RedisOptionsType } from '$lib/constants';
-import { EntityType } from '$lib/constants';
-import type { Job } from 'bullmq';
+import { ActorType, EntityType } from '$lib/constants';
+import {
+  ShowMachineEventString,
+  createShowMachineService,
+} from '$lib/machines/showMachine';
+import type {
+  TicketMachineEventType,
+  TicketMachineServiceType,
+} from '$lib/machines/ticketMachine';
+import {
+  TicketMachineEventString,
+  createTicketMachineService,
+} from '$lib/machines/ticketMachine';
+import type { ShowDocType, ShowStateType, ShowType } from '$lib/models/show';
+import { Show } from '$lib/models/show';
+import type {
+  TicketDocType,
+  TicketStateType,
+  TicketType,
+} from '$lib/models/ticket';
+import { Ticket, TicketCancelReason } from '$lib/models/ticket';
+import type {
+  TransactionDocType,
+  TransactionType,
+} from '$lib/models/transaction';
+import { Transaction, TransactionReasonType } from '$lib/models/transaction';
+import type { Job, Queue } from 'bullmq';
 import { Worker } from 'bullmq';
+import mongoose from 'mongoose';
+import { getQueue } from '..';
 
 export type ShowJobDataType = {
   showId: string;
   [key: string]: any;
 };
 
-export const getShowWorker = (redisOptions: RedisOptionsType) => {
+const saveState = (show: ShowDocType, newState: ShowStateType) => {
+  Show.updateOne({ _id: show._id }, { $set: { showState: newState } }).exec();
+};
+
+const createShowEvent = ({
+  show,
+  type,
+  ticket,
+  transaction,
+}: {
+  show: ShowDocType;
+  type: string;
+  ticket?: TicketDocType;
+  transaction?: TransactionDocType;
+}) => {
+  mongoose.model('ShowEvent').create({
+    show: show._id,
+    type,
+    ticket: ticket?._id,
+    transaction: transaction?._id,
+    agent: show.agent,
+    talent: show.talent,
+    ticketInfo: {
+      name: ticket?.ticketState?.reservation?.name,
+      price: ticket?.price,
+    },
+  });
+};
+
+const getShowMachineService = (show: ShowType, showQueue: Queue) => {
+  return createShowMachineService({
+    showDocument: show,
+    showMachineOptions: {
+      saveStateCallback: async (showState) => saveState(show, showState),
+      saveShowEventCallback: async ({ type, ticket, transaction }) =>
+        createShowEvent({ show, type, ticket, transaction }),
+      jobQueue: showQueue,
+    },
+  });
+};
+
+export const getTicketMachineService = (
+  ticket: TicketType,
+  show: ShowType,
+  showQueue: Queue
+) => {
+  const ticketMachineOptions = {
+    saveStateCallback: (ticketState: TicketStateType) => {
+      Ticket.updateOne({ _id: ticket._id }, { $set: { ticketState } }).exec();
+    },
+  };
+
+  return createTicketMachineService({
+    ticketDocument: ticket,
+    ticketMachineOptions,
+    showDocument: show,
+    showMachineOptions: {
+      saveStateCallback: async (showState) => saveState(show, showState),
+      saveShowEventCallback: async ({ type, ticket, transaction }) =>
+        createShowEvent({ show, type, ticket, transaction }),
+      jobQueue: showQueue,
+    },
+  });
+};
+export const getShowWorker = (
+  redisOptions: RedisOptionsType,
+  mongoDBEndpoint: string
+) => {
   return new Worker(
     EntityType.SHOW,
-    async (job: Job) => {
+    async (job: Job<ShowJobDataType, any, ShowMachineEventString>) => {
       console.log('Show Worker: ', job.data);
       switch (job.name) {
-        case 'cancelShow':
-          cancelShow(job.data);
+        case ShowMachineEventString.CANCELLATION_INITIATED:
+          cancelShow(job, redisOptions, mongoDBEndpoint);
       }
     },
     { autorun: false, connection: redisOptions.connection }
   );
 };
 
-const cancelShow = async (data: ShowJobDataType) => {
-  const showId = data.showId;
+const cancelShow = async (
+  job: Job<ShowJobDataType, any, ShowMachineEventString>,
+  redisOptions: RedisOptionsType,
+  mongoDBEndpoint: string
+) => {
+  mongoose.connect(mongoDBEndpoint);
+  const show = (await Show.findById(job.data.showId)) as ShowType;
+  const showQueue = getQueue(EntityType.SHOW, redisOptions);
+  const showService = getShowMachineService(show, showQueue);
+  // Check if show needs to send refunds to cancel.
+  const showState = showService.getSnapshot();
+  const tickets = await Ticket.find({
+    show: show._id,
+    ticketState: { active: true },
+  });
+  const ticketServices: TicketMachineServiceType[] = [];
+  tickets.forEach((ticket: TicketType) => {
+    // send cancel show to all tickets
+    const ticketService = getTicketMachineService(ticket, show, showQueue);
+    ticketServices.push(ticketService);
+
+    const cancel = {
+      cancelledBy: ActorType.TALENT,
+      cancelledInState: JSON.stringify(showState.value),
+      reason: TicketCancelReason.SHOW_CANCELLED,
+      cancelledAt: new Date(),
+    } as TicketStateType['cancel'];
+
+    const cancelEvent = {
+      type: 'SHOW CANCELLED',
+      cancel,
+    } as TicketMachineEventType;
+    ticketService.send(cancelEvent);
+  });
+
+  if (showState.matches('initiatedCancellation.waiting2Refund')) {
+    showService.send({
+      type: ShowMachineEventString.REFUND_INITIATED,
+    });
+
+    // Send refunds
+    ticketServices.forEach(async (ticketService) => {
+      const ticketState = ticketService.getSnapshot();
+      if (
+        ticketState.matches('reserved.initiatedCancellation.waiting4Refund')
+      ) {
+        const ticket = ticketState.context.ticketDocument;
+        const refundTransaction = (await Transaction.create({
+          ticket: ticket._id,
+          talent: ticket.talent,
+          agent: ticket.agent,
+          show: ticket.show,
+          reason: TransactionReasonType.TICKET_REFUND,
+          hash: '0xeba2df809e7a612a0a0d444ccfa5c839624bdc00dd29e3340d46df3870f8a30e',
+          from: '0x5B38Da6a701c568545dCfcB03FcB875f56beddC4',
+          to: '0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2',
+          value:
+            ticket.ticketState.totalPaid - ticket.ticketState.totalRefunded,
+        })) as TransactionType;
+
+        ticketService.send({
+          type: TicketMachineEventString.REFUND_RECEIVED,
+          transaction: refundTransaction,
+        });
+      }
+    });
+
+    showService.stop();
+    ticketServices.forEach((ticketService) => ticketService.stop());
+  }
 };
