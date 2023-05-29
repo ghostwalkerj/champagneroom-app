@@ -1,9 +1,9 @@
 import { nanoid } from 'nanoid';
 import spacetime from 'spacetime';
 import { uniqueNamesGenerator } from 'unique-names-generator';
-import type { AgentDocument } from '../models/agent';
-import type { ShowDocType } from '../models/show';
-import type { TalentDocument } from '../models/talent';
+import type { AgentDocument } from '../lib/models/agent';
+import type { ShowDocType } from '../lib/models/show';
+import type { TalentDocument } from '../lib/models/talent';
 import { womensNames } from './womensNames';
 
 const profileImageUrls = [

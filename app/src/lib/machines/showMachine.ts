@@ -1,4 +1,5 @@
 import { PUBLIC_ESCROW_PERIOD } from '$env/static/public';
+import type { ActorType } from '$lib/constants';
 import type {
   ShowDocType,
   ShowRefundType,
@@ -7,7 +8,6 @@ import type {
 import { ShowStatus } from '$lib/models/show';
 import type { TicketDocType } from '$lib/models/ticket';
 import type { TransactionDocType } from '$lib/models/transaction';
-import type { ActorType } from '$lib/util/constants';
 import type { Queue } from 'bullmq';
 import { nanoid } from 'nanoid';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';

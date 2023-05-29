@@ -1,3 +1,11 @@
+import {
+  MONGO_DB_ENDPOINT,
+  REDIS_HOST,
+  REDIS_PASSWORD,
+  REDIS_PORT,
+  REDIS_USERNAME,
+} from '$env/static/private';
+import { EntityType } from '$lib/constants';
 import { createShowMachineService } from '$lib/machines/showMachine';
 import { createTicketMachineService } from '$lib/machines/ticketMachine';
 import {
@@ -13,10 +21,18 @@ import {
   type TicketType,
 } from '$lib/models/ticket';
 import type { TransactionDocType } from '$lib/models/transaction';
-import { Queue } from 'bullmq';
+import { getQueue } from '$lib/queues';
 import mongoose from 'mongoose';
-import { EntityType } from './constants';
-import { MONGO_DB_ENDPOINT, REDIS_OPTIONS } from './secrets';
+
+const redis_options = {
+  connection: {
+    host: REDIS_HOST,
+    port: +REDIS_PORT,
+    password: REDIS_PASSWORD,
+    username: REDIS_USERNAME,
+    enableReadyCheck: false,
+  },
+};
 
 const saveState = (show: ShowDocType, newState: ShowStateType) => {
   Show.updateOne({ _id: show._id }, { $set: { showState: newState } }).exec();
@@ -48,7 +64,7 @@ const createShowEvent = ({
 };
 
 export const getShowMachineService = (show: ShowType) => {
-  const showQueue = new Queue(EntityType.SHOW, REDIS_OPTIONS);
+  const showQueue = getQueue(EntityType.SHOW, redis_options);
   mongoose.connect(MONGO_DB_ENDPOINT);
   return createShowMachineService({
     showDocument: show,
@@ -76,7 +92,7 @@ export const getShowMachineServiceFromId = async (showId: string) => {
 
 export const getTicketMachineService = (ticket: TicketType, show: ShowType) => {
   mongoose.connect(MONGO_DB_ENDPOINT);
-  const showQueue = new Queue(EntityType.SHOW, REDIS_OPTIONS);
+  const showQueue = getQueue(EntityType.SHOW, redis_options);
 
   const ticketMachineOptions = {
     saveStateCallback: (ticketState: TicketStateType) => {

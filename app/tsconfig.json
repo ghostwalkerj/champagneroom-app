@@ -23,6 +23,12 @@
       "$stores": [
         "./src/stores"
       ],
+      "$util/*": [
+        "./src/util/*"
+      ],
+      "$util": [
+        "./src/util"
+      ],
     },
   }
 }

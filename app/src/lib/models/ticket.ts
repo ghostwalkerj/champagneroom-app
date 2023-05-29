@@ -1,5 +1,4 @@
-import { ActorType } from '$lib/util/constants';
-import { MONGO_DB_FIELD_SECRET } from '$lib/util/secrets';
+import { ActorType } from '$lib/constants';
 import type { InferSchemaType, Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
 import { fieldEncryption } from 'mongoose-field-encryption';
@@ -66,7 +65,7 @@ const reservationSchema = new Schema({
 
 reservationSchema.plugin(fieldEncryption, {
   fields: ['pin'],
-  secret: MONGO_DB_FIELD_SECRET,
+  secret: import.meta.env.VITE_MONGO_DB_FIELD_SECRET || 'secret',
 });
 
 const escrowSchema = new Schema({

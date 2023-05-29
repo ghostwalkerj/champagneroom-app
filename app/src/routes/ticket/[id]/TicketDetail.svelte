@@ -3,10 +3,10 @@
     PUBLIC_DEFAULT_PROFILE_IMAGE,
     PUBLIC_PROFILE_IMAGE_PATH,
   } from '$env/static/public';
+  import { currencyFormatter, durationFormatter } from '$lib/constants';
   import type { ShowDocType } from '$lib/models/show';
   import type { TicketDocType } from '$lib/models/ticket';
-  import { currencyFormatter, durationFormatter } from '$lib/util/constants';
-  import getProfileImage from '$lib/util/profilePhoto';
+  import getProfileImage from '$util/profilePhoto';
   export let show: ShowDocType;
   export let ticket: TicketDocType;
 

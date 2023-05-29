@@ -1,5 +1,5 @@
+import { MONGO_DB_ENDPOINT } from '$env/static/private';
 import { Talent } from '$lib/models/talent';
-import { MONGO_DB_ENDPOINT } from '$lib/util/secrets';
 import type { RequestHandler } from '@sveltejs/kit';
 import mongoose from 'mongoose';
 

@@ -8,20 +8,20 @@ import type {
 import { Ticket, TicketCancelReason } from '$lib/models/ticket';
 import { Transaction, TransactionReasonType } from '$lib/models/transaction';
 
+import { MONGO_DB_ENDPOINT } from '$env/static/private';
+import { ActorType } from '$lib/constants';
 import type { ShowMachineServiceType } from '$lib/machines/showMachine';
 import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
-import { Show } from '$lib/models/show';
-import { ActorType } from '$lib/util/constants';
-import { verifyPin } from '$lib/util/pin';
-import {
-  getTicketMachineService,
-  getTicketMachineServiceFromId,
-} from '$lib/util/serverUtils';
+import { verifyPin } from '$util/pin';
 import { error, fail, redirect } from '@sveltejs/kit';
 import mongoose from 'mongoose';
 import urlJoin from 'url-join';
 import type { Actions, PageServerLoad } from './$types';
-import { MONGO_DB_ENDPOINT } from '$lib/util/secrets';
+import { Show } from '$lib/models/show';
+import {
+  getTicketMachineService,
+  getTicketMachineServiceFromId,
+} from '$util/serverUtils';
 
 const getTicketService = async (ticketId: string) => {
   const ticket = await Ticket.findById(ticketId)

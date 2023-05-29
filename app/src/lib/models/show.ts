@@ -1,5 +1,4 @@
-import { ActorType } from '$lib/util/constants';
-import { MONGO_DB_FIELD_SECRET } from '$lib/util/secrets';
+import { ActorType } from '$lib/constants';
 import type { InferSchemaType, Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
 import { fieldEncryption } from 'mongoose-field-encryption';
@@ -216,7 +215,7 @@ const showSchema = new Schema(
 
 showSchema.plugin(fieldEncryption, {
   fields: ['roomId'],
-  secret: MONGO_DB_FIELD_SECRET,
+  secret: import.meta.env.VITE_MONGO_DB_FIELD_SECRET || 'secret',
 });
 
 export type ShowStateType = InferSchemaType<typeof showStateSchema>;

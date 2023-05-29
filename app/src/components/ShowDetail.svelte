@@ -1,7 +1,7 @@
 <script lang="ts">
   import { PUBLIC_SHOW_PATH } from '$env/static/public';
+  import { currencyFormatter, durationFormatter } from '$lib/constants';
   import type { ShowDocType } from '$lib/models/show';
-  import { currencyFormatter, durationFormatter } from '$lib/util/constants';
   import StarRating from 'svelte-star-rating';
   import urlJoin from 'url-join';
 

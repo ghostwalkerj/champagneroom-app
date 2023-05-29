@@ -1,11 +1,11 @@
+import { MONGO_DB_ENDPOINT } from '$env/static/private';
 import { PUBLIC_TICKET_PATH } from '$env/static/public';
 import { Ticket } from '$lib/models/ticket';
-import { createPinHash, verifyPin } from '$lib/util/pin';
 import { error, fail, redirect } from '@sveltejs/kit';
 import mongoose from 'mongoose';
 import urlJoin from 'url-join';
+import { createPinHash, verifyPin } from '../../../../util/pin';
 import type { Actions, PageServerLoad } from './$types';
-import { MONGO_DB_ENDPOINT } from '$lib/util/secrets';
 
 export const load: PageServerLoad = async ({ params, cookies }) => {
   const ticketId = params.id;

@@ -4,9 +4,9 @@
   import { PUBLIC_JITSI_DOMAIN, PUBLIC_TALENT_PATH } from '$env/static/public';
 
   import { browser } from '$app/environment';
+  import { jitsiInterfaceConfigOverwrite } from '$lib/constants';
   import type { ShowDocType } from '$lib/models/show';
   import type { TalentDocType } from '$lib/models/talent';
-  import { jitsiInterfaceConfigOverwrite } from '$lib/util/constants';
   import { onDestroy, onMount } from 'svelte';
   import urlJoin from 'url-join';
   import type { PageData } from './$types';

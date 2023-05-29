@@ -1,21 +1,21 @@
-import { PUBLIC_JITSI_DOMAIN, PUBLIC_TALENT_PATH } from '$env/static/public';
-import { Show } from '$lib/models/show';
-import { Talent } from '$lib/models/talent';
 import {
   JITSI_APP_ID,
   JITSI_JWT_SECRET,
   JWT_EXPIRY,
   MONGO_DB_ENDPOINT,
-} from '$lib/util/secrets';
-import {
-  getShowMachineService,
-  getShowMachineServiceFromId,
-} from '$lib/util/serverUtils';
+} from '$env/static/private';
+import { PUBLIC_JITSI_DOMAIN, PUBLIC_TALENT_PATH } from '$env/static/public';
+import { Show } from '$lib/models/show';
+import { Talent } from '$lib/models/talent';
 import type { Actions } from '@sveltejs/kit';
 import { error, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import urlJoin from 'url-join';
+import {
+  getShowMachineService,
+  getShowMachineServiceFromId,
+} from '../../../../util/serverUtils';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params }) => {

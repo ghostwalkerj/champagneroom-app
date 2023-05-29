@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { currencyFormatter } from '$lib/util/constants';
+  import { currencyFormatter } from '$lib/constants';
   import spacetime from 'spacetime';
   import StarRating from 'svelte-star-rating';
   export let completedCalls: LinkDocType[];

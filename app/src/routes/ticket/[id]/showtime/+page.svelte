@@ -7,11 +7,11 @@
     PUBLIC_PROFILE_IMAGE_PATH,
     PUBLIC_TICKET_PATH,
   } from '$env/static/public';
+  import { jitsiInterfaceConfigOverwrite } from '$lib/constants';
   import { createTicketMachineService } from '$lib/machines/ticketMachine';
   import type { ShowDocType } from '$lib/models/show';
   import type { TicketDocType } from '$lib/models/ticket';
-  import { jitsiInterfaceConfigOverwrite } from '$lib/util/constants';
-  import getProfileImage from '$lib/util/profilePhoto';
+  import getProfileImage from '$util/profilePhoto';
   import { onDestroy, onMount } from 'svelte';
   import urlJoin from 'url-join';
   import type { PageData } from '../$types';

@@ -8,7 +8,7 @@
     PUBLIC_SHOW_PATH,
   } from '$env/static/public';
 
-  import { durationFormatter } from '$lib/util/constants';
+  import { durationFormatter } from '$lib/constants';
   import { possessive } from 'i18n-possessive';
 
   import { goto, invalidateAll } from '$app/navigation';
@@ -19,8 +19,8 @@
   import type { ShowDocType } from '$lib/models/show';
   import type { ShowEventDocType } from '$lib/models/showEvent';
   import type { TalentDocType } from '$lib/models/talent';
-  import { createEventText } from '$lib/util/eventUtil';
   import { showEventStore, showStore, talentStore } from '$stores';
+  import { createEventText } from '$util/eventUtil';
   import { onDestroy, onMount } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
   import urlJoin from 'url-join';

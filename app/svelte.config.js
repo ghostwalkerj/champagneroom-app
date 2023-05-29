@@ -11,6 +11,7 @@ const config = {
       $components: './src/components',
       $lib: './src/lib',
       $stores: './src/stores',
+      $util: './src/util',
     },
   },
   preprocess: [
