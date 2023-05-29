@@ -1,6 +1,7 @@
 import { Show } from '$lib/models/show';
 import mongoose from 'mongoose';
 import type { RequestHandler } from './$types';
+import { MONGO_DB_ENDPOINT } from '$env/static/private';
 
 export const GET: RequestHandler = async ({ params, url }) => {
   const showId = params.id;
