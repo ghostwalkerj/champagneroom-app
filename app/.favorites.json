@@ -69,15 +69,6 @@
         "id": "1yWrLw4OCzgP0nbE"
     },
     {
-        "type": "Group",
-        "name": "api",
-        "parent_id": null,
-        "workspaceRoot": null,
-        "workspacePath": null,
-        "id": "tJ1ZfMYlU0Xb2TWq",
-        "iconColor": "rgb(255, 165, 0)"
-    },
-    {
         "type": "Directory",
         "name": "/Users/joseph/Dev/pcall/app/src/routes/agent",
         "parent_id": "5O6S0J3dcsvABnjo",
@@ -111,22 +102,6 @@
         "workspacePath": "src/routes/ticket/[id]",
         "id": "jEy9i6rzO5HdY0qw",
         "label": "ticket"
-    },
-    {
-        "type": "Directory",
-        "name": "/Users/joseph/Dev/pcall/app/src/routes/api/v1/changesets",
-        "parent_id": "tJ1ZfMYlU0Xb2TWq",
-        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
-        "workspacePath": "src/routes/api/v1/changesets",
-        "id": "WZDtx9oYvwIaMSVd"
-    },
-    {
-        "type": "Directory",
-        "name": "/Users/joseph/Dev/pcall/app/src/routes/api/v1/upload",
-        "parent_id": "tJ1ZfMYlU0Xb2TWq",
-        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
-        "workspacePath": "src/routes/api/v1/upload",
-        "id": "XVOAWIBunCYeHjS8"
     },
     {
         "type": "File",
@@ -578,23 +553,6 @@
         "id": "nKpXRQHieqslzG4W"
     },
     {
-        "type": "Group",
-        "name": "workers",
-        "parent_id": null,
-        "workspaceRoot": null,
-        "workspacePath": null,
-        "id": "OJujt8fXWHRsc1zl",
-        "iconColor": "rgb(0, 139, 139)"
-    },
-    {
-        "type": "File",
-        "name": "/Users/joseph/Dev/pcall/app/src/lib/workers/showWorker.ts",
-        "parent_id": "OJujt8fXWHRsc1zl",
-        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
-        "workspacePath": "src/lib/workers/showWorker.ts",
-        "id": "TmkB9dq5RaNxDZOf"
-    },
-    {
         "type": "File",
         "name": "/Users/joseph/Dev/pcall/app/server.js",
         "parent_id": null,
@@ -611,39 +569,6 @@
         "id": "LgN9yJnbu1EGix5p"
     },
     {
-        "type": "Group",
-        "name": "docker",
-        "parent_id": null,
-        "workspaceRoot": null,
-        "workspacePath": null,
-        "id": "vToCPlhjmJ4kexYQ",
-        "iconColor": "rgb(0, 0, 139)"
-    },
-    {
-        "type": "File",
-        "name": "/Users/joseph/Dev/pcall/app/.dockerignore",
-        "parent_id": "vToCPlhjmJ4kexYQ",
-        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
-        "workspacePath": ".dockerignore",
-        "id": "M6cCGdYWkBs7rauj"
-    },
-    {
-        "type": "File",
-        "name": "/Users/joseph/Dev/pcall/app/docker-compose.dev.yml",
-        "parent_id": "vToCPlhjmJ4kexYQ",
-        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
-        "workspacePath": "docker-compose.dev.yml",
-        "id": "aEgBeVkFcrtp08LP"
-    },
-    {
-        "type": "File",
-        "name": "/Users/joseph/Dev/pcall/app/Dockerfile.dev",
-        "parent_id": "vToCPlhjmJ4kexYQ",
-        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
-        "workspacePath": "Dockerfile.dev",
-        "id": "32pnwJuWFsya8cfK"
-    },
-    {
         "type": "Directory",
         "name": "/Users/joseph/Dev/pcall/app/src/lib",
         "parent_id": null,
@@ -658,5 +583,47 @@
         "workspaceRoot": "/Users/joseph/Dev/pcall/app",
         "workspacePath": "src/util",
         "id": "M7w3CkVz4rAH8dEI"
+    },
+    {
+        "type": "Group",
+        "name": "api",
+        "parent_id": "5O6S0J3dcsvABnjo",
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "LArhgOaCREfGsD0u",
+        "iconColor": "rgb(255, 165, 0)"
+    },
+    {
+        "type": "Directory",
+        "name": "/Users/joseph/Dev/pcall/app/src/routes/api/v1",
+        "parent_id": "LArhgOaCREfGsD0u",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/routes/api/v1",
+        "id": "MumxVcLTkPhy6fIO"
+    },
+    {
+        "type": "Group",
+        "name": "docker",
+        "parent_id": "IXQnFASuioYN1pcj",
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "zauImbj7oXAFCGps",
+        "iconColor": "rgb(0, 0, 255)"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/.env.dockerfile",
+        "parent_id": "zauImbj7oXAFCGps",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": ".env.dockerfile",
+        "id": "ZFGi4UdJWm1T5PVj"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/Dockerfile.dev",
+        "parent_id": "zauImbj7oXAFCGps",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "Dockerfile.dev",
+        "id": "lX9cn2GFJVbAL8x5"
     }
 ]

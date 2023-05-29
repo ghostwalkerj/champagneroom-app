@@ -21,7 +21,7 @@ import {
   type TicketType,
 } from '$lib/models/ticket';
 import type { TransactionDocType } from '$lib/models/transaction';
-import { getQueue } from '$lib/queues';
+import { getQueue } from '$lib/workers';
 import mongoose from 'mongoose';
 
 const redis_options = {

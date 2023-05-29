@@ -8,6 +8,7 @@ import type {
 import { ShowStatus } from '$lib/models/show';
 import type { TicketDocType } from '$lib/models/ticket';
 import type { TransactionDocType } from '$lib/models/transaction';
+import type { ShowJobDataType } from '$lib/workers/show/showWorker';
 import type { Queue } from 'bullmq';
 import { nanoid } from 'nanoid';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
@@ -25,7 +26,7 @@ export type ShowMachineOptions = {
     ticket?: TicketDocType;
     transaction?: TransactionDocType;
   }) => void;
-  jobQueue?: Queue;
+  jobQueue?: Queue<ShowJobDataType, any, string>;
   gracePeriod?: number;
   escrowPeriod?: number;
 };
@@ -370,7 +371,7 @@ export const createShowMachine = ({
           showMachineOptions?.jobQueue?.add(
             event.type,
             {
-              showId: context.showDocument._id,
+              showId: context.showDocument._id.toString(),
             },
             { delay: GRACE_PERIOD }
           );
@@ -388,7 +389,7 @@ export const createShowMachine = ({
 
         initiateCancellation: assign((context, event) => {
           showMachineOptions?.jobQueue?.add(event.type, {
-            showId: context.showDocument._id,
+            showId: context.showDocument._id.toString(),
             cancel: event.cancel,
           });
           return {
@@ -405,7 +406,7 @@ export const createShowMachine = ({
         }),
         initiateRefund: assign((context, event) => {
           showMachineOptions?.jobQueue?.add(event.type, {
-            showId: context.showDocument._id,
+            showId: context.showDocument._id.toString(),
           });
           return {
             showState: {
@@ -440,7 +441,7 @@ export const createShowMachine = ({
           showMachineOptions?.jobQueue?.add(
             event.type,
             {
-              showId: context.showDocument._id,
+              showId: context.showDocument._id.toString(),
             },
             { delay: +PUBLIC_ESCROW_PERIOD }
           );

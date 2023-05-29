@@ -6,7 +6,7 @@ import 'dotenv/config';
 import express from 'express';
 import { handler } from './build/handler';
 import { EntityType } from './dist/constants';
-import { getQueue, getWorker } from './dist/queues';
+import { getQueue, getWorker } from './dist/workers';
 
 const app = express();
 const corsOptions = {
