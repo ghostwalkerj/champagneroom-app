@@ -24,7 +24,7 @@ const redisOptions = {
   }
 };
 
-const mongoDBEndpoint = process.env.MONGO_DB_ENDPOINT; 
+const mongoDBEndpoint = process.env.MONGO_DB_ENDPOINT || 'mongodb://localhost:27017'; 
 
 // Workers
 const showWorker = getWorker(EntityType.SHOW, redisOptions, mongoDBEndpoint);

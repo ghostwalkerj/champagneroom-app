@@ -18,5 +18,7 @@ export const getWorker = (
   switch (entityType) {
     case EntityType.SHOW:
       return getShowWorker(redisOptions, mongoDBEndpoint);
+    default:
+      return getShowWorker(redisOptions, mongoDBEndpoint);
   }
 };

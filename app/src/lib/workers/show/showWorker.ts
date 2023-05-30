@@ -4,10 +4,7 @@ import {
   ShowMachineEventString,
   createShowMachineService,
 } from '$lib/machines/showMachine';
-import type {
-  TicketMachineEventType,
-  TicketMachineServiceType,
-} from '$lib/machines/ticketMachine';
+import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
 import {
   TicketMachineEventString,
   createTicketMachineService,
@@ -110,6 +107,10 @@ export const getShowWorker = (
       switch (job.name) {
         case ShowMachineEventString.CANCELLATION_INITIATED:
           cancelShow(job, redisOptions, mongoDBEndpoint);
+          break;
+        case ShowMachineEventString.REFUND_INITIATED:
+          refundShow(job, redisOptions, mongoDBEndpoint);
+          break;
       }
     },
     { autorun: false, connection: redisOptions.connection }
@@ -125,18 +126,14 @@ const cancelShow = async (
   const show = (await Show.findById(job.data.showId)) as ShowType;
   const showQueue = getQueue(EntityType.SHOW, redisOptions);
   const showService = getShowMachineService(show, showQueue);
-  // Check if show needs to send refunds to cancel.
   const showState = showService.getSnapshot();
   const tickets = await Ticket.find({
     show: show._id,
     ticketState: { active: true },
   });
-  const ticketServices: TicketMachineServiceType[] = [];
   tickets.forEach((ticket: TicketType) => {
     // send cancel show to all tickets
     const ticketService = getTicketMachineService(ticket, show, showQueue);
-    ticketServices.push(ticketService);
-
     const cancel = {
       cancelledBy: ActorType.TALENT,
       cancelledInState: JSON.stringify(showState.value),
@@ -149,15 +146,33 @@ const cancelShow = async (
       cancel,
     } as TicketMachineEventType;
     ticketService.send(cancelEvent);
+    ticketService.stop();
   });
-
   if (showState.matches('initiatedCancellation.waiting2Refund')) {
-    showService.send({
-      type: ShowMachineEventString.REFUND_INITIATED,
-    });
+    showService.send(ShowMachineEventString.REFUND_INITIATED);
+  }
+  showService.stop();
+};
 
-    // Send refunds
-    ticketServices.forEach(async (ticketService) => {
+const refundShow = async (
+  job: Job<ShowJobDataType, any, ShowMachineEventString>,
+  redisOptions: RedisOptionsType,
+  mongoDBEndpoint: string
+) => {
+  mongoose.connect(mongoDBEndpoint);
+  const show = (await Show.findById(job.data.showId)) as ShowType;
+  const showQueue = getQueue(EntityType.SHOW, redisOptions);
+  const showService = getShowMachineService(show, showQueue);
+  // Check if show needs to send refunds
+  const showState = showService.getSnapshot();
+  if (showState.matches('initiatedCancellation.initiatedRefund')) {
+    const tickets = await Ticket.find({
+      show: show._id,
+      ticketState: { active: true },
+    });
+    tickets.forEach(async (ticket: TicketType) => {
+      // send cancel show to all tickets
+      const ticketService = getTicketMachineService(ticket, show, showQueue);
       const ticketState = ticketService.getSnapshot();
       if (
         ticketState.matches('reserved.initiatedCancellation.waiting4Refund')
@@ -180,10 +195,9 @@ const cancelShow = async (
           type: TicketMachineEventString.REFUND_RECEIVED,
           transaction: refundTransaction,
         });
+        ticketService.stop();
       }
     });
-
     showService.stop();
-    ticketServices.forEach((ticketService) => ticketService.stop());
   }
 };
