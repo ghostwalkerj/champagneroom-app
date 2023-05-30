@@ -5,7 +5,6 @@
   import { browserType } from '$stores';
 
   import { ShowEvent } from '$lib/models/showEvent';
-
   import { Agent } from '$lib/models/agent';
   import { Show } from '$lib/models/show';
   import { Talent } from '$lib/models/talent';

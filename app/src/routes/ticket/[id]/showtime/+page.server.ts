@@ -46,10 +46,7 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
   const show = ticket.show as unknown as ShowType;
 
   // Check if pin is correct
-  if (
-    !ticket.ticketState.reservation ||
-    !verifyPin(ticketId, ticket.ticketState.reservation?.pin, pinHash)
-  ) {
+  if (!verifyPin(ticketId, ticket.pin, pinHash)) {
     throw redirect(303, pinUrl);
   }
 
@@ -72,7 +69,7 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
       room: show.roomId,
       context: {
         user: {
-          name: ticket.ticketState.reservation?.name,
+          name: ticket.customerName,
           affiliation: 'member',
           lobby_bypass: false,
         },
@@ -108,11 +105,7 @@ export const actions: Actions = {
       .exec();
 
     const show = ticket.show as unknown as ShowType;
-    if (
-      pinHash &&
-      ticket.ticketState.reservation &&
-      verifyPin(ticketId, ticket.ticketState.reservation?.pin, pinHash)
-    ) {
+    if (pinHash && verifyPin(ticketId, ticket.pin, pinHash)) {
       const ticketService = getTicketMachineService(ticket, show);
       ticketService.send('LEFT SHOW');
     }

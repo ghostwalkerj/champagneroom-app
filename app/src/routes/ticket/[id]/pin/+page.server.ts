@@ -19,14 +19,7 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
 
   const ticket = await Ticket.findById(ticketId).exec();
 
-  if (!ticket || ticket.ticketState.reservation === undefined) {
-    throw error(404, 'Ticket not found');
-  }
-
-  if (
-    pinHash &&
-    verifyPin(ticketId, ticket.ticketState.reservation.pin, pinHash)
-  ) {
+  if (pinHash && verifyPin(ticketId, ticket.pin, pinHash)) {
     throw redirect(303, redirectUrl);
   }
 };

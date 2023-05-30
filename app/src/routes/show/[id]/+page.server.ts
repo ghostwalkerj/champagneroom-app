@@ -82,12 +82,8 @@ export const actions: Actions = {
       talent: show.talent,
       price: show.price,
       paymentAddress: '0x0000000000000000000000000000000000000000',
-      ticketState: {
-        reservation: {
-          name,
-          pin,
-        },
-      },
+      customerName: name,
+      pin,
     });
     if (!ticket) {
       return error(501, 'Show cannot Reserve Ticket');

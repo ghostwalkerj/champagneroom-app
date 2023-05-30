@@ -57,7 +57,7 @@ const createShowEvent = ({
     agent: show.agent,
     talent: show.talent,
     ticketInfo: {
-      name: ticket?.ticketState?.reservation?.name,
+      name: ticket?.customerName,
       price: ticket?.price,
     },
   });

@@ -51,23 +51,6 @@ const redemptionSchema = new Schema({
   redeemedAt: { type: Date, required: true, default: Date.now },
 });
 
-const reservationSchema = new Schema({
-  reservedAt: { type: Date, required: true, default: Date.now },
-  name: { type: String, required: true },
-  pin: {
-    type: String,
-    required: true,
-    minLength: 8,
-    maxLength: 8,
-    validator: (v: string) => validator.isNumeric(v, { no_symbols: true }),
-  },
-});
-
-reservationSchema.plugin(fieldEncryption, {
-  fields: ['pin'],
-  secret: process.env.MONGO_DB_FIELD_SECRET,
-});
-
 const escrowSchema = new Schema({
   startedAt: { type: Date, required: true, default: Date.now },
   endedAt: { type: Date },
@@ -132,7 +115,6 @@ const ticketStateSchema = new Schema(
     totalRefunded: { type: Number, required: true, default: 0 },
     cancel: cancelSchema,
     redemption: redemptionSchema,
-    reservation: reservationSchema,
     escrow: escrowSchema,
     dispute: disputeSchema,
     finalize: finalizeSchema,
@@ -159,12 +141,24 @@ export const ticketSchema = new Schema(
       required: true,
       default: () => ({}),
     },
+    customerName: { type: String, required: true },
+    pin: {
+      type: String,
+      required: true,
+      minLength: 8,
+      maxLength: 8,
+      validator: (v: string) => validator.isNumeric(v, { no_symbols: true }),
+    },
     agent: { type: Schema.Types.ObjectId, ref: 'Agent', required: true },
     talent: { type: Schema.Types.ObjectId, ref: 'Talent', required: true },
-    transactions: [{ type: Schema.Types.ObjectId, ref: 'Transaction' }],
   },
   { timestamps: true }
 );
+
+ticketSchema.plugin(fieldEncryption, {
+  fields: ['pin'],
+  secret: process.env.MONGO_DB_FIELD_SECRET,
+});
 
 export type TicketStateType = InferSchemaType<typeof ticketStateSchema>;
 export type TicketDocType = InferSchemaType<typeof ticketSchema>;

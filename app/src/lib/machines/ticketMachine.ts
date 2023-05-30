@@ -322,7 +322,7 @@ export const createTicketMachine = ({
             ticket: context.ticketDocument,
             refundedAt: context.ticketState.refund?.refundedAt,
             transactions: context.ticketState.refund?.transactions,
-            amount: context.ticketState.refund?.amount,
+            amount: context.ticketState.totalRefunded,
           }),
           { to: (context) => context.showMachineRef! }
         ),
@@ -397,8 +397,8 @@ export const createTicketMachine = ({
           return {
             ticketState: {
               ...context.ticketState,
-              refundedAmount:
-                context.ticketState.totalRefunded + +event.transaction.value,
+              totalRefunded: (context.ticketState.totalRefunded +=
+                +event.transaction.value),
               refund,
             },
           };
@@ -510,7 +510,6 @@ export const createTicketMachine = ({
             context.ticketState.totalPaid
           );
         },
-
         canWatchShow: (context) => {
           const state = context.showMachineRef?.getSnapshot();
           return (
