@@ -213,7 +213,6 @@ export const createTicketMachine = ({
                           'receiveRefund',
                           'cancelTicket',
                           'sendTicketRefunded',
-                          'sendTicketCancelled',
                         ],
                       },
                       {
@@ -322,7 +321,7 @@ export const createTicketMachine = ({
             ticket: context.ticketDocument,
             refundedAt: context.ticketState.refund?.refundedAt,
             transactions: context.ticketState.refund?.transactions,
-            amount: context.ticketState.totalRefunded,
+            amount: context.ticketState.refund?.amount,
           }),
           { to: (context) => context.showMachineRef! }
         ),
@@ -397,8 +396,8 @@ export const createTicketMachine = ({
           return {
             ticketState: {
               ...context.ticketState,
-              totalRefunded: (context.ticketState.totalRefunded +=
-                +event.transaction.value),
+              totalRefunded:
+                context.ticketState.totalRefunded + +event.transaction.value,
               refund,
             },
           };

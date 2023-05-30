@@ -435,11 +435,12 @@ export const createShowMachine = ({
             },
           };
         }),
+
         refundTicket: assign((context, event) => {
           const st = context.showState;
           const ticketsRefunded = st.salesStats.ticketsRefunded + 1;
+          const totalRefunded = st.salesStats.totalRefunded + event.amount;
 
-          const refundedAmount = st.salesStats.totalRefunded + event.amount;
           const refund = {
             refundedAt: event.refundedAt || new Date(),
             transactions: event.transactions.map((t) => t._id),
@@ -450,9 +451,12 @@ export const createShowMachine = ({
 
           return {
             showState: {
-              ...context.showState,
-              ticketsRefunded,
-              refundedAmount,
+              ...st,
+              salesStats: {
+                ...st.salesStats,
+                ticketsRefunded,
+                totalRefunded,
+              },
             },
           };
         }),
@@ -531,9 +535,8 @@ export const createShowMachine = ({
 
         sellTicket: assign((context, event) => {
           const st = context.showState;
-
           const ticketsSold = st.salesStats.ticketsSold + 1;
-          const totalSales = st.salesStats.totalSales + +event.amount;
+          const totalSales = st.salesStats.totalSales + event.amount;
 
           const sale = {
             soldAt: event.soldAt || new Date(),
@@ -541,8 +544,8 @@ export const createShowMachine = ({
             ticket: event.ticket._id,
             amount: event.amount,
           } as ShowSaleType;
-
           st.sales.push(sale);
+
           return {
             showState: {
               ...st,
@@ -616,10 +619,11 @@ export const createShowMachine = ({
             0
           );
         },
-        fullyRefunded: (context) => {
+        fullyRefunded: (context, event) => {
+          const refunded = event.type === 'TICKET REFUNDED' ? 1 : 0;
           return (
-            context.showState.salesStats.totalRefunded >=
-            context.showState.salesStats.totalSales
+            context.showState.salesStats.ticketsSold ===
+            context.showState.salesStats.ticketsRefunded + refunded
           );
         },
       },
