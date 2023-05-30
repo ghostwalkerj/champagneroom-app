@@ -278,11 +278,7 @@ export const createTicketMachine = ({
           {
             target: '#ticketMachine.cancelled',
             cond: 'canCancel',
-            actions: [
-              'initiateCancellation',
-              'cancelTicket',
-              'sendTicketCancelled',
-            ],
+            actions: ['initiateCancellation', 'cancelTicket'],
           },
           {
             target: '#ticketMachine.reserved.initiatedCancellation',
@@ -377,7 +373,6 @@ export const createTicketMachine = ({
             transactions: [],
             amount: 0,
           };
-
           sale.amount += +event.transaction.value;
           sale.transactions.push(event.transaction._id);
           return {
@@ -397,7 +392,6 @@ export const createTicketMachine = ({
             transactions: [],
             amount: 0,
           };
-
           refund.amount += +event.transaction.value;
           refund.transactions.push(event.transaction._id);
           return {
@@ -560,28 +554,30 @@ export const createTicketMachineService = ({
     'showMachineService'
   ] as ShowMachineServiceType;
 
-  if (showMachineOptions?.saveStateCallback) {
-    showService.onChange((context) => {
-      showMachineOptions.saveStateCallback &&
-        showMachineOptions.saveStateCallback(context.showState);
-    });
-  }
+  if (showService) {
+    if (showMachineOptions?.saveStateCallback) {
+      showService.onChange((context) => {
+        showMachineOptions.saveStateCallback &&
+          showMachineOptions.saveStateCallback(context.showState);
+      });
+    }
 
-  if (showMachineOptions?.saveShowEventCallback) {
-    showService.onEvent((event) => {
-      const ticket = ('ticket' in event ? event.ticket : undefined) as
-        | TicketDocType
-        | undefined;
-      const transaction = (
-        'transaction' in event ? event.transaction : undefined
-      ) as TransactionDocType | undefined;
-      showMachineOptions.saveShowEventCallback &&
-        showMachineOptions.saveShowEventCallback({
-          type: event.type,
-          ticket,
-          transaction,
-        });
-    });
+    if (showMachineOptions?.saveShowEventCallback) {
+      showService.onEvent((event) => {
+        const ticket = ('ticket' in event ? event.ticket : undefined) as
+          | TicketDocType
+          | undefined;
+        const transaction = (
+          'transaction' in event ? event.transaction : undefined
+        ) as TransactionDocType | undefined;
+        showMachineOptions.saveShowEventCallback &&
+          showMachineOptions.saveShowEventCallback({
+            type: event.type,
+            ticket,
+            transaction,
+          });
+      });
+    }
   }
   return ticketService;
 };

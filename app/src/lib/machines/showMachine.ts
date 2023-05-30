@@ -148,6 +148,10 @@ export const createShowMachine = ({
               cond: 'showInitiatedCancellation',
             },
             {
+              target: 'initiatedCancellation.initiatedRefund',
+              cond: 'showInitiatedRefund',
+            },
+            {
               target: 'cancelled',
               cond: 'showCancelled',
             },
@@ -584,6 +588,8 @@ export const createShowMachine = ({
           context.showState.status === ShowStatus.FINALIZED,
         showInitiatedCancellation: (context) =>
           context.showState.status === ShowStatus.CANCELLATION_INITIATED,
+        showInitiatedRefund: (context) =>
+          context.showState.status === ShowStatus.REFUND_INITIATED,
         showBoxOfficeOpen: (context) =>
           context.showState.status === ShowStatus.BOX_OFFICE_OPEN,
         showBoxOfficeClosed: (context) =>

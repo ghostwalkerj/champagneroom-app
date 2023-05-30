@@ -103,7 +103,7 @@ export const getShowWorker = (
   return new Worker(
     EntityType.SHOW,
     async (job: Job<ShowJobDataType, any, ShowMachineEventString>) => {
-      console.log('Show Worker: ', job.data);
+      console.log('Show Worker: ', job.name);
       switch (job.name) {
         case ShowMachineEventString.CANCELLATION_INITIATED:
           cancelShow(job, redisOptions, mongoDBEndpoint);
@@ -129,7 +129,7 @@ const cancelShow = async (
   const showState = showService.getSnapshot();
   const tickets = await Ticket.find({
     show: show._id,
-    ticketState: { active: true },
+    'ticketState.active': true,
   });
   tickets.forEach((ticket: TicketType) => {
     // send cancel show to all tickets
@@ -163,17 +163,20 @@ const refundShow = async (
   const show = (await Show.findById(job.data.showId)) as ShowType;
   const showQueue = getQueue(EntityType.SHOW, redisOptions);
   const showService = getShowMachineService(show, showQueue);
+
   // Check if show needs to send refunds
   const showState = showService.getSnapshot();
   if (showState.matches('initiatedCancellation.initiatedRefund')) {
     const tickets = await Ticket.find({
       show: show._id,
-      ticketState: { active: true },
+      'ticketState.active': true,
     });
     tickets.forEach(async (ticket: TicketType) => {
-      // send cancel show to all tickets
+      // send refunds
+      //TODO: Send real transactions
       const ticketService = getTicketMachineService(ticket, show, showQueue);
       const ticketState = ticketService.getSnapshot();
+      console.log('ticketState', ticketState.value);
       if (
         ticketState.matches('reserved.initiatedCancellation.waiting4Refund')
       ) {
