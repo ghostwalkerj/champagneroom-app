@@ -2750,6 +2750,11 @@ bufferutil@^4.0.1:
   dependencies:
     node-gyp-build "^4.3.0"
 
+build-number-generator@^2.0.4:
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/build-number-generator/-/build-number-generator-2.0.4.tgz#2882b20c6520b228b03f9717b4b03d627b5485ac"
+  integrity sha512-hkKFhopqgcEoFxXKke87V/MkJ0IcNY1Jnh38TioGoFbasXC6li4VKDdjQ3VcgoER0KuhKeRlyxZD1LVTlw5imQ==
+
 builtin-modules@^3.3.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/builtin-modules/-/builtin-modules-3.3.0.tgz#cae62812b89801e9656336e46223e030386be7b6"
@@ -9175,6 +9180,11 @@ tiny-glob@^0.2.9:
   dependencies:
     globalyzer "0.1.0"
     globrex "^0.1.2"
+
+tiny-parse-argv@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/tiny-parse-argv/-/tiny-parse-argv-2.2.0.tgz#0fc217411a4e968d2fff9e65316382ffece02ee6"
+  integrity sha512-wtEWBArTcc4hHeT3F5otv5vay31AYsN/R9LURrrYhfVlQn4unk6XzaFRtmbU4y40WzKOsUP5NidN+x4lkBO8jQ==
 
 tinycolor2@^1.4.1:
   version "1.6.0"

@@ -1,13 +1,18 @@
 import { createBullBoard } from '@bull-board/api';
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
 import { ExpressAdapter } from '@bull-board/express';
+import { format, generate } from 'build-number-generator';
 import cors from 'cors';
 import 'dotenv/config';
 import express from 'express';
+import parseArgv from 'tiny-parse-argv';
 import { handler } from './build/handler';
 import { EntityType } from './dist/constants';
 import { getQueue, getWorker } from './dist/workers';
+const buildNumber = generate('0.1');
+const buildTime = format(buildNumber);
 
+const startWorker = parseArgv(process.argv).worker || false;
 const app = express();
 const corsOptions = {
   origin: '*',
@@ -27,8 +32,10 @@ const redisOptions = {
 const mongoDBEndpoint = process.env.MONGO_DB_ENDPOINT || 'mongodb://localhost:27017'; 
 
 // Workers
+if(startWorker) {
 const showWorker = getWorker(EntityType.SHOW, redisOptions, mongoDBEndpoint);
 showWorker.run();
+}
 
 // Bull Dashboard
 const queue = getQueue(EntityType.SHOW, redisOptions);
@@ -45,4 +52,7 @@ app.use(cors(corsOptions), handler);
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log('pCall server running on: ', port);
+  console.log('Workers running: ', startWorker);
+  console.log('Build number: ', buildNumber);
+  console.log('Build time: ', buildTime);
 });
