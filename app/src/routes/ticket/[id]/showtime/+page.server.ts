@@ -9,6 +9,7 @@ import {
   PUBLIC_PIN_PATH,
   PUBLIC_TICKET_PATH,
 } from '$env/static/public';
+import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 import type { ShowType } from '$lib/models/show';
 import { Ticket } from '$lib/models/ticket';
 import { verifyPin } from '$util/pin';
@@ -54,11 +55,11 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
   const ticketService = getTicketMachineService(ticket, show);
   const ticketMachineState = ticketService.getSnapshot();
 
-  if (!ticketMachineState.can('JOINED SHOW')) {
+  if (!ticketMachineState.can(TicketMachineEventString.SHOW_JOINED)) {
     throw redirect(303, ticketUrl);
   }
 
-  ticketService.send('JOINED SHOW');
+  ticketService.send(TicketMachineEventString.SHOW_JOINED);
 
   const jitsiToken = jwt.sign(
     {
@@ -107,7 +108,7 @@ export const actions: Actions = {
     const show = ticket.show as unknown as ShowType;
     if (pinHash && verifyPin(ticketId, ticket.pin, pinHash)) {
       const ticketService = getTicketMachineService(ticket, show);
-      ticketService.send('LEFT SHOW');
+      ticketService.send(TicketMachineEventString.SHOW_LEFT);
     }
     return { success: true };
   },

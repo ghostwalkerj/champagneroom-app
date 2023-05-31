@@ -51,14 +51,14 @@ export const load: PageServerLoad = async ({ params }) => {
 
   const showState = showService.getSnapshot();
 
-  if (!showState.can({ type: 'START SHOW' })) {
+  if (!showState.can({ type: ShowMachineEventString.SHOW_STARTED })) {
     const talentUrl = urlJoin(PUBLIC_TALENT_PATH, key);
     throw redirect(303, talentUrl);
   }
 
   if (!showState.matches('started'))
     showService.send({
-      type: ShowMachineEventString.START_SHOW,
+      type: ShowMachineEventString.SHOW_STARTED,
     });
 
   const jitsiToken = jwt.sign(
@@ -97,9 +97,9 @@ export const actions: Actions = {
 
     const showState = showService.getSnapshot();
 
-    if (showState.can({ type: 'STOP SHOW' })) {
+    if (showState.can({ type: ShowMachineEventString.SHOW_STOPPED })) {
       showService.send({
-        type: ShowMachineEventString.STOP_SHOW,
+        type: ShowMachineEventString.SHOW_STOPPED,
       });
 
       return { success: true };

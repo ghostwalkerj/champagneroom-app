@@ -9,7 +9,12 @@ import {
   TicketMachineEventString,
   createTicketMachineService,
 } from '$lib/machines/ticketMachine';
-import type { ShowDocType, ShowStateType, ShowType } from '$lib/models/show';
+import type {
+  ShowDocType,
+  ShowFinalizedType,
+  ShowStateType,
+  ShowType,
+} from '$lib/models/show';
 import { Show } from '$lib/models/show';
 import type {
   TicketDocType,
@@ -111,6 +116,9 @@ export const getShowWorker = (
         case ShowMachineEventString.REFUND_INITIATED:
           refundShow(job, redisOptions, mongoDBEndpoint);
           break;
+        case ShowMachineEventString.SHOW_ENDED:
+          finalizeShow(job, redisOptions, mongoDBEndpoint);
+          break;
       }
     },
     { autorun: false, connection: redisOptions.connection }
@@ -142,7 +150,7 @@ const cancelShow = async (
     } as TicketStateType['cancel'];
 
     const cancelEvent = {
-      type: 'SHOW CANCELLED',
+      type: TicketMachineEventString.SHOW_CANCELLED,
       cancel,
     } as TicketMachineEventType;
     ticketService.send(cancelEvent);
@@ -201,6 +209,32 @@ const refundShow = async (
         ticketService.stop();
       }
     });
-    showService.stop();
   }
+  showService.stop();
+};
+
+const finalizeShow = async (
+  job: Job<ShowJobDataType, any, ShowMachineEventString>,
+  redisOptions: RedisOptionsType,
+  mongoDBEndpoint: string
+) => {
+  mongoose.connect(mongoDBEndpoint);
+  const show = (await Show.findById(job.data.showId)) as ShowType;
+  const showQueue = getQueue(EntityType.SHOW, redisOptions);
+  const showService = getShowMachineService(show, showQueue);
+
+  // Check if show needs to send refunds
+  const showState = showService.getSnapshot();
+  if (showState.matches('inEscrow')) {
+    const finalize = {
+      finalizedAt: new Date(),
+      finalizedBy: ActorType.TIMER,
+    } as ShowFinalizedType;
+
+    showService.send({
+      type: ShowMachineEventString.SHOW_FINALIZED,
+      finalize,
+    });
+  }
+  showService.stop();
 };

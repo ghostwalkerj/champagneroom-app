@@ -32,8 +32,8 @@ export enum TicketMachineEventString {
   PAYMENT_RECEIVED = 'PAYMENT RECEIVED',
   FEEDBACK_RECEIVED = 'FEEDBACK RECEIVED',
   DISPUTE_INITIATED = 'DISPUTE INITIATED',
-  JOINED_SHOW = 'JOINED SHOW',
-  LEFT_SHOW = 'LEFT SHOW',
+  SHOW_JOINED = 'SHOW JOINED',
+  SHOW_LEFT = 'SHOW LEFT',
   SHOW_ENDED = 'SHOW ENDED',
   SHOW_CANCELLED = 'SHOW CANCELLED',
 }
@@ -60,10 +60,10 @@ export type TicketMachineEventType =
       dispute: TicketStateType['dispute'];
     }
   | {
-      type: 'JOINED SHOW';
+      type: 'SHOW JOINED';
     }
   | {
-      type: 'LEFT SHOW';
+      type: 'SHOW LEFT';
     }
   | {
       type: 'SHOW ENDED';
@@ -193,7 +193,7 @@ export const createTicketMachine = ({
             },
             waiting4Show: {
               on: {
-                'JOINED SHOW': {
+                'SHOW JOINED': {
                   target: '#ticketMachine.reedemed',
                   cond: 'canWatchShow',
                   actions: ['redeemTicket', 'sendJoinedShow'],
@@ -233,8 +233,8 @@ export const createTicketMachine = ({
         },
         reedemed: {
           on: {
-            'LEFT SHOW': { actions: ['sendLeftShow'] },
-            'JOINED SHOW': {
+            'SHOW LEFT': { actions: ['sendLeftShow'] },
+            'SHOW JOINED': {
               cond: 'canWatchShow',
               actions: ['sendJoinedShow'],
             },

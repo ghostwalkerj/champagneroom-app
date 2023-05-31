@@ -38,8 +38,8 @@ export enum ShowMachineEventString {
   TICKET_RESERVATION_TIMEOUT = 'TICKET RESERVATION TIMEOUT',
   TICKET_CANCELLED = 'TICKET CANCELLED',
   TICKET_SOLD = 'TICKET SOLD',
-  START_SHOW = 'START SHOW',
-  STOP_SHOW = 'STOP SHOW',
+  SHOW_STARTED = 'SHOW STARTED',
+  SHOW_STOPPED = 'SHOW STOPPED',
   SHOW_FINALIZED = 'SHOW FINALIZED',
   SHOW_ENDED = 'SHOW ENDED',
   CUSTOMER_JOINED = 'CUSTOMER JOINED',
@@ -82,10 +82,10 @@ export type ShowMachineEventType =
       amount: number;
     }
   | {
-      type: 'START SHOW';
+      type: 'SHOW STARTED';
     }
   | {
-      type: 'STOP SHOW';
+      type: 'SHOW STOPPED';
     }
   | {
       type: 'SHOW FINALIZED';
@@ -226,7 +226,7 @@ export const createShowMachine = ({
             'TICKET SOLD': {
               actions: ['sellTicket'],
             },
-            'START SHOW': {
+            'SHOW STARTED': {
               target: 'started',
               cond: 'canStartShow',
               actions: ['startShow'],
@@ -240,7 +240,7 @@ export const createShowMachine = ({
         },
         boxOfficeClosed: {
           on: {
-            'START SHOW': {
+            'SHOW STOPPED': {
               cond: 'canStartShow',
               target: 'started',
               actions: ['startShow'],
@@ -280,12 +280,12 @@ export const createShowMachine = ({
         },
         started: {
           on: {
-            'START SHOW': {
+            'SHOW STARTED': {
               actions: ['startShow'],
             },
             'CUSTOMER JOINED': {},
             'CUSTOMER LEFT': {},
-            'STOP SHOW': {
+            'SHOW STOPPED': {
               target: 'stopped',
               actions: ['stopShow'],
             },
@@ -293,7 +293,7 @@ export const createShowMachine = ({
         },
         stopped: {
           on: {
-            'START SHOW': {
+            'SHOW STARTED': {
               target: 'started',
               actions: ['startShow'],
             },
@@ -424,6 +424,7 @@ export const createShowMachine = ({
             },
           };
         }),
+
         initiateRefund: assign((context, event) => {
           showMachineOptions?.jobQueue?.add(event.type, {
             showId: context.showDocument._id.toString(),

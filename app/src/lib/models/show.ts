@@ -228,6 +228,8 @@ export type ShowRefundType = InferSchemaType<typeof refundSchema>;
 
 export type ShowSaleType = InferSchemaType<typeof saleSchema>;
 
+export type ShowFinalizedType = InferSchemaType<typeof finalizeSchema>;
+
 export const Show = models?.Show
   ? (models.Show as Model<ShowDocType>)
   : mongoose.model<ShowDocType>('Show', showSchema);
