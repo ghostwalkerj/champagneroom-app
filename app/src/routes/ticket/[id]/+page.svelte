@@ -42,7 +42,7 @@
   const useTicketMachine = (ticketMachineService: TicketMachineServiceType) => {
     const state = ticketMachineService.getSnapshot();
     needs2Pay = state.matches('reserved.waiting4Payment');
-    canWatchShow = state.can('JOINED SHOW');
+    canWatchShow = state.can('SHOW JOINED');
     canCancelTicket = state.can({
       type: 'CANCELLATION INITIATED',
       cancel: undefined,

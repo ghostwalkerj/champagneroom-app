@@ -132,6 +132,19 @@ const salesStatsSchema = new Schema({
   },
 });
 
+const feedbackStatsSchema = new Schema({
+  totalReviews: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
+  averageRating: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
+});
+
 const showStateSchema = new Schema(
   {
     status: {
@@ -143,6 +156,11 @@ const showStateSchema = new Schema(
     active: { type: Boolean, required: true, default: true },
     salesStats: {
       type: salesStatsSchema,
+      required: true,
+      default: () => ({}),
+    },
+    feedbackStats: {
+      type: feedbackStatsSchema,
       required: true,
       default: () => ({}),
     },
@@ -208,9 +226,7 @@ const showSchema = new Schema(
     },
     showState: { type: showStateSchema, required: true, default: () => ({}) },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
 showSchema.plugin(fieldEncryption, {

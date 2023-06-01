@@ -259,7 +259,11 @@ export const createTicketMachine = ({
               on: {
                 'FEEDBACK RECEIVED': {
                   target: '#ticketMachine.finalized',
-                  actions: ['receiveFeedback', 'finalizeTicket'],
+                  actions: [
+                    'receiveFeedback',
+                    'sendFeedbackReceived',
+                    'finalizeTicket',
+                  ],
                 },
                 'DISPUTE INITIATED': {
                   target: 'inDispute',
@@ -329,6 +333,14 @@ export const createTicketMachine = ({
         sendTicketCancelled: send(
           (context) => ({
             type: 'TICKET CANCELLED',
+            ticket: context.ticketDocument,
+          }),
+          { to: (context) => context.showMachineRef! }
+        ),
+
+        sendFeedbackReceived: send(
+          (context) => ({
+            type: 'FEEDBACK RECEIVED',
             ticket: context.ticketDocument,
           }),
           { to: (context) => context.showMachineRef! }

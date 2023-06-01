@@ -7,54 +7,6 @@ import validator from 'validator';
 
 const { Schema, models } = pkg;
 
-const statSchema = new Schema(
-  {
-    ratingAvg: { type: Number, default: 0, min: 0, max: 5, required: true },
-    totalEarnings: { type: Number, default: 0, min: 0, required: true },
-    totalRating: {
-      type: Number,
-      default: 0,
-      min: 0,
-      required: true,
-      validate: {
-        validator: Number.isInteger,
-        message: '{VALUE} is not an integer value',
-      },
-    },
-    numReviews: {
-      type: Number,
-      default: 0,
-      min: 0,
-      required: true,
-      validate: {
-        validator: Number.isInteger,
-        message: '{VALUE} is not an integer value',
-      },
-    },
-    numCompletedShows: {
-      type: Number,
-      default: 0,
-      min: 0,
-      required: true,
-      validate: {
-        validator: Number.isInteger,
-        message: '{VALUE} is not an integer value',
-      },
-    },
-    completedShows: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: 'Show',
-        validate: {
-          validator: Number.isInteger,
-          message: '{VALUE} is not an integer value',
-        },
-      },
-    ],
-  },
-  { timestamps: true }
-);
-
 const talentSchema = new Schema(
   {
     _id: { type: Schema.Types.ObjectId, required: true, auto: true },
@@ -102,7 +54,6 @@ const talentSchema = new Schema(
     },
     agent: { type: Schema.Types.ObjectId, ref: 'Agent', required: true },
     activeShows: [{ type: Schema.Types.ObjectId, ref: 'Show' }],
-    stats: { type: statSchema, required: true, default: () => ({}) },
   },
   { timestamps: true }
 );

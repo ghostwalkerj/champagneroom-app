@@ -30,7 +30,7 @@ import { Transaction, TransactionReasonType } from '$lib/models/transaction';
 import type { Job, Queue } from 'bullmq';
 import { Worker } from 'bullmq';
 import mongoose from 'mongoose';
-import { getQueue } from '..';
+import { getQueue } from '.';
 
 export type ShowJobDataType = {
   showId: string;
@@ -184,7 +184,6 @@ const refundShow = async (
       //TODO: Send real transactions
       const ticketService = getTicketMachineService(ticket, show, showQueue);
       const ticketState = ticketService.getSnapshot();
-      console.log('ticketState', ticketState.value);
       if (
         ticketState.matches('reserved.initiatedCancellation.waiting4Refund')
       ) {

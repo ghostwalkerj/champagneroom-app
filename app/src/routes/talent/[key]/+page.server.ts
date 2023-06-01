@@ -104,7 +104,7 @@ export const actions: Actions = {
         name: talent.name,
         profileImageUrl: talent.profileImageUrl,
         ratingAvg: talent.stats.ratingAvg,
-        numReviews: talent.stats.numReviews,
+        numReviews: talent.stats.totalReviews,
       },
     });
 

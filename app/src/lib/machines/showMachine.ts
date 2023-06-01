@@ -1,4 +1,4 @@
-import type { ActorType } from '$lib/constants';
+import { ActorType } from '$lib/constants';
 import type {
   ShowDocType,
   ShowRefundType,
@@ -7,10 +7,11 @@ import type {
 import { ShowStatus } from '$lib/models/show';
 import type { TicketDocType } from '$lib/models/ticket';
 import type { TransactionDocType } from '$lib/models/transaction';
-import type { ShowJobDataType } from '$lib/workers/show/showWorker';
+import type { ShowJobDataType } from '$lib/workers/showWorker';
 import type { Queue } from 'bullmq';
 import { nanoid } from 'nanoid';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
+import { raise } from 'xstate/lib/actions';
 
 export type ShowStateType = ShowDocType['showState'];
 
@@ -44,12 +45,17 @@ export enum ShowMachineEventString {
   SHOW_ENDED = 'SHOW ENDED',
   CUSTOMER_JOINED = 'CUSTOMER JOINED',
   CUSTOMER_LEFT = 'CUSTOMER LEFT',
+  FEEDBACK_RECEIVED = 'FEEDBACK RECEIVED',
 }
 
 export type ShowMachineEventType =
   | {
       type: 'CANCELLATION INITIATED';
       cancel: ShowStateType['cancel'];
+    }
+  | {
+      type: 'FEEDBACK RECEIVED';
+      ticket: TicketDocType;
     }
   | {
       type: 'REFUND INITIATED';
@@ -187,6 +193,23 @@ export const createShowMachine = ({
               target: 'finalized',
               actions: ['finalizeShow'],
             },
+            'FEEDBACK RECEIVED': [
+              {
+                target: 'finalized',
+                actions: [
+                  'receiveFeedback',
+                  raise({
+                    type: 'SHOW FINALIZED',
+                    finalize: {
+                      finalizedAt: new Date(),
+                      finalizedBy: ActorType.CUSTOMER,
+                    },
+                  }),
+                ],
+                cond: 'fullyReviewed',
+              },
+              { actions: ['receiveFeedback'] },
+            ],
           },
         },
         finalized: {
@@ -437,6 +460,13 @@ export const createShowMachine = ({
           };
         }),
 
+        receiveFeedback: (context, event) => {
+          showMachineOptions?.jobQueue?.add(event.type, {
+            showId: context.showDocument._id.toString(),
+            ticket: event.ticket,
+          });
+        },
+
         refundTicket: assign((context, event) => {
           const st = context.showState;
           const ticketsRefunded = st.salesStats.ticketsRefunded + 1;
@@ -581,6 +611,7 @@ export const createShowMachine = ({
           return delay > 0 ? delay : 0;
         },
       },
+
       guards: {
         canCancel: (context) =>
           context.showState.salesStats.ticketsSold -
@@ -625,6 +656,14 @@ export const createShowMachine = ({
           return (
             context.showState.salesStats.ticketsSold ===
             context.showState.salesStats.ticketsRefunded + refunded
+          );
+        },
+        fullyReviewed: (context, event) => {
+          const feedback = event.type === 'FEEDBACK RECEIVED' ? 1 : 0;
+          return (
+            context.showState.feedbackStats.totalReviews + feedback ===
+            context.showState.salesStats.ticketsSold -
+              context.showState.salesStats.ticketsRefunded
           );
         },
       },

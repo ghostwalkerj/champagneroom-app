@@ -8,7 +8,10 @@
     PUBLIC_TICKET_PATH,
   } from '$env/static/public';
   import { jitsiInterfaceConfigOverwrite } from '$lib/constants';
-  import { createTicketMachineService } from '$lib/machines/ticketMachine';
+  import {
+    TicketMachineEventString,
+    createTicketMachineService,
+  } from '$lib/machines/ticketMachine';
   import type { ShowDocType } from '$lib/models/show';
   import type { TicketDocType } from '$lib/models/ticket';
   import getProfileImage from '$util/profilePhoto';
@@ -47,10 +50,7 @@
 
   const profileImage = urlJoin(
     $page.url.origin,
-    getProfileImage(
-      ticket.ticketState.reservation!.name,
-      PUBLIC_PROFILE_IMAGE_PATH
-    )
+    getProfileImage(ticket.customerName, PUBLIC_PROFILE_IMAGE_PATH)
   );
   onMount(() => {
     const options = {
@@ -60,7 +60,7 @@
       height: '100%',
       parentNode: videoCallElement,
       userInfo: {
-        displayName: ticket.ticketState.reservation?.name,
+        displayName: ticket.customerName,
       },
       interfaceConfigOverwrite: jitsiInterfaceConfigOverwrite,
       configOverwrite: {
@@ -82,7 +82,7 @@
 
     ticketMachineService.subscribe(state => {
       const timeToLeave = !state.can({
-        type: 'JOINED SHOW',
+        type: TicketMachineEventString.SHOW_JOINED,
       });
       if (timeToLeave) {
         api.executeCommand('hangup');
