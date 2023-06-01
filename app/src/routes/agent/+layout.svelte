@@ -1,6 +1,5 @@
 <script lang="ts">
   import ConnectButton from '$components/header/ConnectButton.svelte';
-  import { BellIcon, MailIcon, MenuIcon } from 'svelte-feather-icons';
   import { selectedAccount } from 'svelte-web3';
 </script>
 
@@ -11,14 +10,14 @@
       <a class="text-xl btn btn-ghost normal-case">
         <img src="/logo.png" alt="Logo" width="48" /></a
       >
-      <MenuIcon />
+      <iconify-icon icon="mingcute:menu-fill" />
     </div>
 
     <div class="flex-none">
       {#if $selectedAccount}
         <div class="flex space-x-6 pr-6">
-          <MailIcon />
-          <BellIcon />
+          <iconify-icon icon="mingcute:mail-line" />
+          <iconify-icon icon="mingcute:notification-line" />
         </div>
       {/if}
       <ConnectButton />
