@@ -132,17 +132,3 @@
     </div>
   </div>
 {/if}
-
-<style>
-  :global .walletconnect-modal__base {
-    background: rgb(39, 49, 56) !important;
-    color: black;
-  }
-  :global .walletconnect-qrcode__text {
-    color: white !important;
-  }
-
-  :global .walletconnect-connect__button__text {
-    color: white !important;
-  }
-</style>

@@ -110,7 +110,6 @@ const ticketStateSchema = new Schema(
       default: TicketStatus.RESERVED,
     },
     active: { type: Boolean, required: true, default: true, index: true },
-
     totalPaid: { type: Number, required: true, default: 0 },
     totalRefunded: { type: Number, required: true, default: 0 },
     cancel: cancelSchema,
