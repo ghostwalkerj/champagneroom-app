@@ -17,9 +17,9 @@
       )
     : PUBLIC_DEFAULT_PROFILE_IMAGE;
   $: ticketStatus = ticket
-    ? ticket.ticketState.totalPaid >= ticket.ticketState.price
+    ? (ticket.ticketState.totalPaid >= ticket.ticketState.price
       ? 'Paid' + ' ' + ticket.ticketState.status
-      : ticket.ticketState.status
+      : ticket.ticketState.status)
     : '';
   $: showStatus = show ? show.showState.status : '';
 </script>

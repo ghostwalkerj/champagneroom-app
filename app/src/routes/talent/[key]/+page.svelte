@@ -14,11 +14,12 @@
   import { goto, invalidateAll } from '$app/navigation';
   import ShowDetail from '$components/ShowDetail.svelte';
   import type { ShowMachineServiceType } from '$lib/machines/showMachine';
+  import { ShowMachineEventString } from '$lib/machines/showMachine';
   import { createShowMachineService } from '$lib/machines/showMachine';
 
-  import type { ShowDocType } from '$lib/models/show';
-  import type { ShowEventDocType } from '$lib/models/showEvent';
-  import type { TalentDocType } from '$lib/models/talent';
+  import type { ShowDocumentType } from '$lib/models/show';
+  import type { ShowEventDocumentType } from '$lib/models/showEvent';
+  import type { TalentDocumentType } from '$lib/models/talent';
   import { showEventStore, showStore, talentStore } from '$stores';
   import { createEventText } from '$util/eventUtil';
   import { onDestroy, onMount } from 'svelte';
@@ -32,8 +33,8 @@
 
   const showTimePath = urlJoin($page.url.href, PUBLIC_SHOWTIME_PATH);
 
-  let talent = data.talent as TalentDocType;
-  let activeShow = data.activeShow as ShowDocType | undefined;
+  let talent = data.talent as TalentDocumentType;
+  let activeShow = data.activeShow as ShowDocumentType | undefined;
 
   let showName = talent ? possessive(talent.name, 'en') + ' Show' : 'Show';
 
@@ -66,7 +67,7 @@
     showUnSub?.();
   };
 
-  const useNewShow = (show: ShowDocType) => {
+  const useNewShow = (show: ShowDocumentType) => {
     if (show) {
       activeShow = show;
       canCreateShow = false;
@@ -85,7 +86,7 @@
         }
       });
       showEventUnSub = showEventStore(show).subscribe(
-        (_showEvent: ShowEventDocType) => {
+        (_showEvent: ShowEventDocumentType) => {
           if (_showEvent) {
             eventText = createEventText(_showEvent);
           }
@@ -102,7 +103,7 @@
       cancel: undefined,
     });
     canCreateShow = state.hasTag('canCreateShow');
-    canStartShow = state.can({ type: 'START SHOW' });
+    canStartShow = state.can(ShowMachineEventString.SHOW_STARTED);
 
     waiting4Refunds = state.matches('initiatedCancellation.waiting2Refund');
     statusText = state.context.showState.status;
@@ -156,7 +157,7 @@
           result.data.show!._id.toString()
         );
         navigator.clipboard.writeText(showUrl);
-        activeShow = result.data.show as ShowDocType;
+        activeShow = result.data.show as ShowDocumentType;
         useNewShow(activeShow);
       } else if (result.data.showCancelled) {
         noCurrentShow();
@@ -191,11 +192,11 @@
         <div class="modal-action">
           <button
             class="btn"
-            on:click="{() => goto(showTimePath)}"
-            disabled="{!canStartShow}">Restart Show</button
+            on:click={() => goto(showTimePath)}
+            disabled={!canStartShow}>Restart Show</button
           >
-          <form method="post" action="?/end_show" use:enhance="{onSubmit}">
-            <input type="hidden" name="showId" value="{activeShow?._id}" />
+          <form method="post" action="?/end_show" use:enhance={onSubmit}>
+            <input type="hidden" name="showId" value={activeShow?._id} />
             <button class="btn">End Show</button>
           </form>
         </div>
@@ -226,7 +227,7 @@
                         stroke-linejoin="round"
                         stroke-width="2"
                         d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      ></path></svg
+                      /></svg
                     >
                     <p class="capitalize">{statusText.toLowerCase()}</p>
                   </div>
@@ -245,7 +246,7 @@
                         stroke-linejoin="round"
                         stroke-width="2"
                         d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      ></path></svg
+                      /></svg
                     >
                     <p class="capitalize">{eventText}</p>
                   </div>
@@ -255,7 +256,7 @@
                 <button
                   class="btn"
                   type="submit"
-                  on:click="{() => goto(showTimePath)}">Start Show</button
+                  on:click={() => goto(showTimePath)}>Start Show</button
                 >
               {/if}
             </div>
@@ -267,11 +268,7 @@
           <div class="text-center card-body items-center p-3">
             <h2 class="text-2xl card-title">Create a New Show</h2>
             <div class="flex flex-col w-full">
-              <form
-                method="post"
-                action="?/create_show"
-                use:enhance="{onSubmit}"
-              >
+              <form method="post" action="?/create_show" use:enhance={onSubmit}>
                 <div
                   class="flex flex-col md:flex-row text-white p-2 justify-center items-center gap-4"
                 >
@@ -284,7 +281,7 @@
                       type="text"
                       name="name"
                       class="input input-bordered input-primary"
-                      bind:value="{showName}"
+                      bind:value={showName}
                       minlength="3"
                       maxlength="50"
                     />
@@ -312,7 +309,7 @@
                         class="w-full py-2 pl-6 input input-bordered input-primary"
                         placeholder="0.00"
                         aria-describedby="price-currency"
-                        value="{form?.price ?? ''}"
+                        value={form?.price ?? ''}
                       />
                       <div
                         class="flex pr-3 inset-y-0 right-0 absolute items-center pointer-events-none"
@@ -342,7 +339,7 @@
                   <input
                     type="hidden"
                     name="coverImageUrl"
-                    value="{talent.profileImageUrl}"
+                    value={talent.profileImageUrl}
                   />
                   <div class="form-control md:w-1/5">
                     <!-- svelte-ignore a11y-label-has-associated-control -->
@@ -355,7 +352,7 @@
                       type="range"
                       min="15"
                       max="120"
-                      bind:value="{showDuration}"
+                      bind:value={showDuration}
                       class="range"
                       step="15"
                       name="duration"
@@ -377,7 +374,7 @@
                   <button
                     class="btn btn-secondary"
                     type="submit"
-                    disabled="{loading}">Create Show</button
+                    disabled={loading}>Create Show</button
                   >
                 </div>
               </form>
@@ -389,13 +386,13 @@
         {#if activeShow}
           {#key activeShow.showState}
             <ShowDetail
-              show="{activeShow}"
-              options="{{
+              show={activeShow}
+              options={{
                 showCopy: true,
                 showSalesStats: true,
                 showRating: false,
                 showWaterMark: false,
-              }}"
+              }}
             />
           {/key}
         {/if}
@@ -403,8 +400,8 @@
       <div class="pb-4">
         {#if canCancelShow}
           <!-- Link Form-->
-          <form method="post" action="?/cancel_show" use:enhance="{onSubmit}">
-            <input type="hidden" name="showId" value="{activeShow?._id}" />
+          <form method="post" action="?/cancel_show" use:enhance={onSubmit}>
+            <input type="hidden" name="showId" value={activeShow?._id} />
             <div class="bg-primary text-primary-content card">
               <div class="text-center card-body items-center p-3">
                 <div class="text-2xl card-title">Cancel Your Show</div>
@@ -419,7 +416,7 @@
                     <button
                       class="btn btn-secondary"
                       type="submit"
-                      disabled="{loading}">Cancel Show</button
+                      disabled={loading}>Cancel Show</button
                     >
                   </div>
                 </div>
@@ -429,12 +426,8 @@
         {/if}
         {#if waiting4Refunds}
           <!-- Link Form-->
-          <form
-            method="post"
-            action="?/refund_tickets"
-            use:enhance="{onSubmit}"
-          >
-            <input type="hidden" name="showId" value="{activeShow?._id}" />
+          <form method="post" action="?/refund_tickets" use:enhance={onSubmit}>
+            <input type="hidden" name="showId" value={activeShow?._id} />
 
             <div class="bg-primary text-primary-content card">
               <div class="text-center card-body items-center p-3">
@@ -447,7 +440,7 @@
                     <button
                       class="btn btn-secondary"
                       type="submit"
-                      disabled="{loading}">Send Refunds</button
+                      disabled={loading}>Send Refunds</button
                     >
                   </div>
                 </div>
@@ -468,11 +461,11 @@
               <h2 class="text-xl card-title">{talentName}</h2>
               <div>
                 <ProfilePhoto
-                  profileImage="{talent.profileImageUrl ||
-                    PUBLIC_DEFAULT_PROFILE_IMAGE}"
-                  callBack="{value => {
+                  profileImage={talent.profileImageUrl ||
+                    PUBLIC_DEFAULT_PROFILE_IMAGE}
+                  callBack={value => {
                     updateProfileImage(value);
-                  }}"
+                  }}
                 />
               </div>
             </div>
@@ -500,7 +493,7 @@
 
       <!-- Activity Feed -->
       <div>
-        <div class="lg:col-start-3 lg:col-span-1"></div>
+        <div class="lg:col-start-3 lg:col-span-1" />
       </div>
     </div>
   </div>

@@ -4,9 +4,10 @@ const PROFILE_IMAGE_EXTENSION = 'jpg';
 const PROFILE_IMAGE_PREFIX = 'profile';
 
 const getProfileImage = (name: string, defaultProfileImagePath: string) => {
-  const code = name
-    .split('')
-    .reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const code = [...name].reduce(
+    (accumulator, char) => accumulator + (char.codePointAt(0) || 0),
+    0
+  );
 
   const profileNumber = ((code % MAX_PROFILE_NUMBER) + 1)
     .toString()

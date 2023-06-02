@@ -16,9 +16,11 @@ export const getWorker = (
   mongoDBEndpoint: string
 ) => {
   switch (entityType) {
-    case EntityType.SHOW:
+    case EntityType.SHOW: {
       return getShowWorker(redisOptions, mongoDBEndpoint);
-    default:
+    }
+    default: {
       return getShowWorker(redisOptions, mongoDBEndpoint);
+    }
   }
 };

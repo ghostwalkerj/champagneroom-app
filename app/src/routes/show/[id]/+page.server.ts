@@ -53,8 +53,8 @@ export const actions: Actions = {
       return fail(400, { pin, missingPin: true });
     }
 
-    const isNum = /^\d+$/.test(pin);
-    if (!isNum) {
+    const isNumber = /^\d+$/.test(pin);
+    if (!isNumber) {
       return fail(400, { pin, invalidPin: true });
     }
 

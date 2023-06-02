@@ -1,11 +1,11 @@
 <script lang="ts">
-  import type { TalentDocument } from '$lib/ORM/models/talent';
+  import type { TalentDocumentType } from '$lib/models/talent';
   import { currencyFormatter } from '$lib/constants';
   import SvelteTable from 'svelte-table';
   import TableCopyLink from './TableCopyLink.svelte';
   import TableRating from './TableRating.svelte';
 
-  export let talents: TalentDocument[];
+  export let talents: TalentDocumentType[];
 
   type TalentRow = {
     name: string;

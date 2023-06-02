@@ -4,6 +4,7 @@ import { default as mongoose, default as pkg } from 'mongoose';
 const { Schema, models } = pkg;
 const showeventSchema = new Schema(
   {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     _id: { type: Schema.Types.ObjectId, required: true, auto: true },
     type: { type: String, required: true },
     show: { type: Schema.Types.ObjectId, ref: 'Show', required: true },
@@ -24,12 +25,12 @@ const showeventSchema = new Schema(
 
 showeventSchema.index({ createdAt: -1 });
 
-export type ShowEventDocType = InferSchemaType<typeof showeventSchema>;
+export type ShowEventDocumentType = InferSchemaType<typeof showeventSchema>;
 
-export const ShowEvent = (
-  models?.ShowEvent
-    ? models?.ShowEvent
-    : mongoose.model<ShowEventDocType>('ShowEvent', showeventSchema)
-) as Model<ShowEventDocType>;
+export const ShowEvent = (models?.ShowEvent ??
+  mongoose.model<ShowEventDocumentType>(
+    'ShowEvent',
+    showeventSchema
+  )) as Model<ShowEventDocumentType>;
 
 export type ShowEventType = InstanceType<typeof ShowEvent>;

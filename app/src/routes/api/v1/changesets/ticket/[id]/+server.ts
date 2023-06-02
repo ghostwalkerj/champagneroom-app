@@ -9,14 +9,14 @@ export const GET: RequestHandler<{ id: string }> = async ({ params, url }) => {
     return new Response('Ticket not found', { status: 404 });
   }
   const firstFetch = url.searchParams.get('firstFetch') || false;
-  let doc: string | undefined = undefined;
+  let document: string | undefined;
   const id = new mongoose.Types.ObjectId(ticketId);
   mongoose.connect(MONGO_DB_ENDPOINT);
 
   if (firstFetch) {
     const ticket = await Ticket.findById(id).lean().exec();
     if (ticket !== undefined) {
-      doc = JSON.stringify(ticket);
+      document = JSON.stringify(ticket);
     }
   } else {
     const pipeline = [{ $match: { 'fullDocument._id': id } }];
@@ -24,12 +24,12 @@ export const GET: RequestHandler<{ id: string }> = async ({ params, url }) => {
       fullDocument: 'updateLookup',
     });
     const next = await changeStream.next();
-    doc = JSON.stringify(next.fullDocument);
+    document = JSON.stringify(next.fullDocument);
 
     changeStream.close();
   }
 
-  return new Response(doc, {
+  return new Response(document, {
     status: 200,
     headers: {
       'content-type': 'application/json',

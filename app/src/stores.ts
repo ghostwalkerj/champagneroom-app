@@ -2,11 +2,11 @@ import { PUBLIC_CHANGESET_PATH } from '$env/static/public';
 import to from 'await-to-js';
 import { derived, writable } from 'svelte/store';
 import urlJoin from 'url-join';
-import type { AgentDocType } from './lib/models/agent';
-import type { ShowDocType } from './lib/models/show';
-import type { ShowEventDocType } from './lib/models/showEvent';
-import type { TalentDocType } from './lib/models/talent';
-import type { TicketDocType } from './lib/models/ticket';
+import type { AgentDocumentType } from './lib/models/agent';
+import type { ShowDocumentType as ShowDocumentType } from './lib/models/show';
+import type { ShowEventDocumentType as ShowEventDocumentType } from './lib/models/showEvent';
+import type { TalentDocumentType as TalentDocumentType } from './lib/models/talent';
+import type { TicketDocumentType as TicketDocumentType } from './lib/models/ticket';
 
 export const browserType = writable();
 
@@ -19,7 +19,7 @@ const getChangeset = async <T>({
   changesetPath: string;
   callback: (changeset: T) => void;
   signal?: AbortSignal;
-  cancelOn?: (doc: T) => boolean;
+  cancelOn?: (document: T) => boolean;
 }) => {
   let loop = true;
   let firstFetch = true;
@@ -29,12 +29,12 @@ const getChangeset = async <T>({
       : changesetPath;
     firstFetch = false;
 
-    const [err, response] = await to(
+    const [error, response] = await to(
       fetch(path, {
         signal,
       })
     );
-    if (err) {
+    if (error) {
       loop = false;
     } else {
       try {
@@ -43,8 +43,8 @@ const getChangeset = async <T>({
         if (cancelOn) {
           loop = !cancelOn(jsonResponse);
         }
-      } catch (e) {
-        console.error(e);
+      } catch (error) {
+        console.error(error);
         loop = false;
       }
     }
@@ -58,18 +58,18 @@ const abstractStore = <T>({
 }: {
   doc: T;
   changesetPath: string;
-  cancelOn?: (doc: T) => boolean;
+  cancelOn?: (document: T) => boolean;
 }) => {
   const { subscribe, set } = writable<T>(doc, () => {
     if (cancelOn && cancelOn(doc)) {
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       return () => {};
     }
-    const abortDoc = new AbortController();
-    const signal = abortDoc.signal;
+    const abortDocument = new AbortController();
+    const signal = abortDocument.signal;
     getChangeset<T>({ changesetPath, callback: set, signal, cancelOn });
     return () => {
-      abortDoc.abort();
+      abortDocument.abort();
     };
   });
   return {
@@ -77,15 +77,15 @@ const abstractStore = <T>({
   };
 };
 
-export const talentStore = (talent: TalentDocType) => {
+export const talentStore = (talent: TalentDocumentType) => {
   return abstractStore({
     doc: talent,
     changesetPath: urlJoin(PUBLIC_CHANGESET_PATH, 'talent', talent.key),
   });
 };
 
-export const showStore = (show: ShowDocType) => {
-  const showCancel = (show: ShowDocType) => !show.showState.active;
+export const showStore = (show: ShowDocumentType) => {
+  const showCancel = (show: ShowDocumentType) => !show.showState.active;
 
   return abstractStore({
     doc: show,
@@ -94,16 +94,16 @@ export const showStore = (show: ShowDocType) => {
   });
 };
 
-export const showEventStore = (show: ShowDocType) => {
-  const showCancel = (show: ShowDocType) => !show.showState.active;
-  const _showStore = writable<ShowDocType>(show);
-  const _showEventStore = derived<typeof _showStore, ShowEventDocType>(
+export const showEventStore = (show: ShowDocumentType) => {
+  const showCancel = (show: ShowDocumentType) => !show.showState.active;
+  const _showStore = writable<ShowDocumentType>(show);
+  const _showEventStore = derived<typeof _showStore, ShowEventDocumentType>(
     _showStore,
     ($show, set) => {
       if (!showCancel($show)) {
         const abortShowEvent = new AbortController();
         const showEventSignal = abortShowEvent.signal;
-        getChangeset<ShowEventDocType>({
+        getChangeset<ShowEventDocumentType>({
           changesetPath: urlJoin(
             PUBLIC_CHANGESET_PATH,
             'showEvent',
@@ -124,8 +124,9 @@ export const showEventStore = (show: ShowDocType) => {
   };
 };
 
-export const ticketStore = (ticket: TicketDocType) => {
-  const ticketCancel = (ticket: TicketDocType) => !ticket.ticketState.active;
+export const ticketStore = (ticket: TicketDocumentType) => {
+  const ticketCancel = (ticket: TicketDocumentType) =>
+    !ticket.ticketState.active;
   return abstractStore({
     doc: ticket,
     changesetPath: urlJoin(
@@ -137,7 +138,7 @@ export const ticketStore = (ticket: TicketDocType) => {
   });
 };
 
-export const agentStore = (agent: AgentDocType) => {
+export const agentStore = (agent: AgentDocumentType) => {
   return abstractStore({
     doc: agent,
     changesetPath: urlJoin(PUBLIC_CHANGESET_PATH, 'agent', agent.address),

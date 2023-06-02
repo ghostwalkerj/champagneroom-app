@@ -15,20 +15,20 @@
   export let form: ActionData;
   let show = data.show;
   let displayName = data.displayName;
-  let buyingTicket = false;
+  let isBuyingTicket = false;
   let showUnSub: Unsubscriber;
 
   $: loading = false;
   $: profileImage = getProfileImage(displayName, PUBLIC_PROFILE_IMAGE_PATH);
   $: canBuyTicket =
-    show.showState.status === ShowStatus.BOX_OFFICE_OPEN || buyingTicket;
+    show.showState.status === ShowStatus.BOX_OFFICE_OPEN || isBuyingTicket;
   const onSubmit = () => {
-    buyingTicket = true;
+    isBuyingTicket = true;
     loading = true;
     return async ({ result }) => {
       if (result.type === 'failure') {
         loading = false;
-        buyingTicket = false;
+        isBuyingTicket = false;
       }
       await applyAction(result);
     };

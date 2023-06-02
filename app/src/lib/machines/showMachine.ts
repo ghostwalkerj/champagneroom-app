@@ -1,19 +1,20 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { ActorType } from '$lib/constants';
 import type {
-  ShowDocType,
+  ShowDocumentType,
   ShowRefundType,
   ShowSaleType,
 } from '$lib/models/show';
 import { ShowStatus } from '$lib/models/show';
-import type { TicketDocType } from '$lib/models/ticket';
-import type { TransactionDocType } from '$lib/models/transaction';
+import type { TicketDocumentType } from '$lib/models/ticket';
+import type { TransactionDocumentType } from '$lib/models/transaction';
 import type { ShowJobDataType } from '$lib/workers/showWorker';
 import type { Queue } from 'bullmq';
 import { nanoid } from 'nanoid';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 import { raise } from 'xstate/lib/actions';
 
-export type ShowStateType = ShowDocType['showState'];
+export type ShowStateType = ShowDocumentType['showState'];
 
 export type ShowMachineOptions = {
   saveStateCallback?: (state: ShowStateType) => void;
@@ -23,8 +24,8 @@ export type ShowMachineOptions = {
     transaction,
   }: {
     type: string;
-    ticket?: TicketDocType;
-    transaction?: TransactionDocType;
+    ticket?: TicketDocumentType;
+    transaction?: TransactionDocumentType;
   }) => void;
   jobQueue?: Queue<ShowJobDataType, any, string>;
   gracePeriod?: number;
@@ -55,35 +56,35 @@ export type ShowMachineEventType =
     }
   | {
       type: 'FEEDBACK RECEIVED';
-      ticket: TicketDocType;
+      ticket: TicketDocumentType;
     }
   | {
       type: 'REFUND INITIATED';
     }
   | {
       type: 'TICKET REFUNDED';
-      ticket: TicketDocType;
-      transactions: TransactionDocType[];
+      ticket: TicketDocumentType;
+      transactions: TransactionDocumentType[];
       requestedBy: ActorType;
       refundedAt?: Date;
       amount: number;
     }
   | {
       type: 'TICKET RESERVED';
-      ticket?: TicketDocType;
+      ticket?: TicketDocumentType;
     }
   | {
       type: 'TICKET RESERVATION TIMEOUT';
-      ticket: TicketDocType;
+      ticket: TicketDocumentType;
     }
   | {
       type: 'TICKET CANCELLED';
-      ticket: TicketDocType;
+      ticket: TicketDocumentType;
     }
   | {
       type: 'TICKET SOLD';
-      ticket: TicketDocType;
-      transactions: TransactionDocType[];
+      ticket: TicketDocumentType;
+      transactions: TransactionDocumentType[];
       soldAt?: Date;
       amount: number;
     }
@@ -102,18 +103,18 @@ export type ShowMachineEventType =
     }
   | {
       type: 'CUSTOMER JOINED';
-      ticket: TicketDocType;
+      ticket: TicketDocumentType;
     }
   | {
       type: 'CUSTOMER LEFT';
-      ticket: TicketDocType;
+      ticket: TicketDocumentType;
     };
 
 export const createShowMachine = ({
   showDocument,
   showMachineOptions,
 }: {
-  showDocument: ShowDocType;
+  showDocument: ShowDocumentType;
   showMachineOptions?: ShowMachineOptions;
 }) => {
   const GRACE_PERIOD = showMachineOptions?.gracePeriod || 3_600_000;
@@ -672,7 +673,7 @@ export const createShowMachineService = ({
   showDocument,
   showMachineOptions,
 }: {
-  showDocument: ShowDocType;
+  showDocument: ShowDocumentType;
   showMachineOptions?: ShowMachineOptions;
 }) => {
   const showMachine = createShowMachine({ showDocument, showMachineOptions });
@@ -689,11 +690,11 @@ export const createShowMachineService = ({
   if (showMachineOptions?.saveShowEventCallback) {
     showService.onEvent(event => {
       const ticket = ('ticket' in event ? event.ticket : undefined) as
-        | TicketDocType
+        | TicketDocumentType
         | undefined;
       const transaction = (
         'transaction' in event ? event.transaction : undefined
-      ) as TransactionDocType | undefined;
+      ) as TransactionDocumentType | undefined;
       showMachineOptions.saveShowEventCallback &&
         showMachineOptions.saveShowEventCallback({
           type: event.type,

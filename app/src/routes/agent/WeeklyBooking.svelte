@@ -77,7 +77,7 @@
 <div class="bg-primary text-primary-content card">
   <div class="text-center card-body items-center">
     <div class="text-2xl card-title capitalize">Weekly Bookings</div>
-    {#if talents && talents.length != 0}
+    {#if talents && talents.length > 0}
       {#if talentData.length > 0}
         {#key talentData}
           <Line data="{data}" options="{options}" />

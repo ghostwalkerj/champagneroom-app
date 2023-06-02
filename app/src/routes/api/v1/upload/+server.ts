@@ -12,10 +12,10 @@ export const POST: RequestHandler = async ({ request }) => {
   if (file) {
     try {
       const rootCid = await client.put([file]);
-      const res = await client.get(rootCid);
+      const response = await client.get(rootCid);
       // Web3Response
-      if (res) {
-        const files = await res.files(); // Web3File[]
+      if (response) {
+        const files = await response.files(); // Web3File[]
         for (const file of files) {
           url = `https://${file.cid}.ipfs.${WEB3STORAGE_DOMAIN}`;
           break;

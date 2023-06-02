@@ -8,7 +8,7 @@ import {
   ShowStatus,
   type ShowStateType,
 } from '$lib/models/show';
-import { Talent, type TalentDocType } from '$lib/models/talent';
+import { Talent, type TalentDocumentType } from '$lib/models/talent';
 import { getShowMachineServiceFromId } from '$util/serverUtil';
 import { error, fail } from '@sveltejs/kit';
 import mongoose from 'mongoose';
@@ -35,7 +35,9 @@ export const load: PageServerLoad = async ({ params }) => {
     const activeShow = await Show.findById(showId);
     return {
       talent: JSON.parse(JSON.stringify(talent)),
-      activeShow: activeShow ? JSON.parse(JSON.stringify(activeShow)) : null,
+      activeShow: activeShow
+        ? JSON.parse(JSON.stringify(activeShow))
+        : undefined,
     };
   } else return { talent: JSON.parse(JSON.stringify(talent)) };
 };
@@ -73,7 +75,7 @@ export const actions: Actions = {
     if (!price) {
       return fail(400, { price, missingPrice: true });
     }
-    if (isNaN(+price) || +price < 1 || +price > 10000) {
+    if (Number.isNaN(+price) || +price < 1 || +price > 10_000) {
       return fail(400, { price, invalidPrice: true });
     }
 
@@ -84,7 +86,7 @@ export const actions: Actions = {
         throw error(404, 'Talent not found');
       })
       .lean()
-      .exec()) as TalentDocType;
+      .exec()) as TalentDocumentType;
 
     const show = await Show.create({
       price: +price,
@@ -163,7 +165,7 @@ export const actions: Actions = {
       throw error(404, 'Show ID not found');
     }
 
-    let inEscrow = false;
+    let isInEscrow = false;
     const showService = await getShowMachineServiceFromId(showId);
     const showState = showService.getSnapshot();
 
@@ -172,12 +174,12 @@ export const actions: Actions = {
         type: ShowMachineEventString.SHOW_ENDED,
       });
 
-      inEscrow = showService.getSnapshot().matches('inEscrow');
+      isInEscrow = showService.getSnapshot().matches('inEscrow');
     }
 
     return {
       success: true,
-      inEscrow,
+      inEscrow: isInEscrow,
     };
   },
   refund_tickets: async ({ request }) => {

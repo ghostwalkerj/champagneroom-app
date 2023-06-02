@@ -11,6 +11,7 @@ export enum TransactionReasonType {
 
 const transactionSchema = new Schema(
   {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     _id: { type: Schema.Types.ObjectId, required: true, auto: true },
     hash: { type: String },
     block: { type: Number },
@@ -30,9 +31,9 @@ const transactionSchema = new Schema(
   { timestamps: true }
 );
 
-export type TransactionDocType = InferSchemaType<typeof transactionSchema>;
+export type TransactionDocumentType = InferSchemaType<typeof transactionSchema>;
 export const Transaction = models?.Transaction
-  ? (models?.Transaction as Model<TransactionDocType>)
-  : mongoose.model<TransactionDocType>('Transaction', transactionSchema);
+  ? (models?.Transaction as Model<TransactionDocumentType>)
+  : mongoose.model<TransactionDocumentType>('Transaction', transactionSchema);
 
 export type TransactionType = InstanceType<typeof Transaction>;

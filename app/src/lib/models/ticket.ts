@@ -126,6 +126,7 @@ const ticketStateSchema = new Schema(
 
 export const ticketSchema = new Schema(
   {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     _id: { type: Schema.Types.ObjectId, required: true, auto: true },
     paymentAddress: {
       type: String,
@@ -146,6 +147,7 @@ export const ticketSchema = new Schema(
       required: true,
       minLength: 8,
       maxLength: 8,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       validator: (v: string) => validator.isNumeric(v, { no_symbols: true }),
     },
     agent: { type: Schema.Types.ObjectId, ref: 'Agent', required: true },
@@ -160,10 +162,10 @@ ticketSchema.plugin(fieldEncryption, {
 });
 
 export type TicketStateType = InferSchemaType<typeof ticketStateSchema>;
-export type TicketDocType = InferSchemaType<typeof ticketSchema>;
+export type TicketDocumentType = InferSchemaType<typeof ticketSchema>;
 
 export const Ticket = models?.Ticket
-  ? (models.Ticket as Model<TicketDocType>)
-  : mongoose.model<TicketDocType>('Ticket', ticketSchema);
+  ? (models.Ticket as Model<TicketDocumentType>)
+  : mongoose.model<TicketDocumentType>('Ticket', ticketSchema);
 
 export type TicketType = InstanceType<typeof Ticket>;

@@ -17,7 +17,7 @@ export const actions: Actions = {
       return fail(400, { account, missingAccount: true });
     }
 
-    if (!account.match(/^0x[0-9a-f]{40}$/)) {
+    if (!/^0x[\da-f]{40}$/.test(account)) {
       return fail(400, { account, badAccount: true });
     }
 
@@ -57,7 +57,7 @@ export const actions: Actions = {
     }
 
     if (
-      isNaN(+agentCommission) ||
+      Number.isNaN(+agentCommission) ||
       +agentCommission < 0 ||
       +agentCommission > 100
     ) {

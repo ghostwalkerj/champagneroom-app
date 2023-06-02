@@ -5,19 +5,19 @@
 
   import { browser } from '$app/environment';
   import { jitsiInterfaceConfigOverwrite } from '$lib/constants';
-  import type { ShowDocType } from '$lib/models/show';
-  import type { TalentDocType } from '$lib/models/talent';
+  import type { ShowDocumentType } from '$lib/models/show';
+  import type { TalentDocumentType } from '$lib/models/talent';
   import { onDestroy, onMount } from 'svelte';
   import urlJoin from 'url-join';
   import type { PageData } from './$types';
   export let data: PageData;
 
-  let talentObj = data.talent as TalentDocType;
-  $: currentShow = data.show as ShowDocType;
+  let talentObject = data.talent as TalentDocumentType;
+  $: currentShow = data.show as ShowDocumentType;
   let jitsiToken = data.jitsiToken;
 
   let videoCallElement: HTMLDivElement;
-  let returnUrl = urlJoin($page.url.origin, PUBLIC_TALENT_PATH, talentObj.key);
+  let returnUrl = urlJoin($page.url.origin, PUBLIC_TALENT_PATH, talentObject.key);
   let api: any;
   let participantName = '';
   let participantAvatarUrl = '';
@@ -46,7 +46,7 @@
       height: '100%',
       parentNode: videoCallElement,
       userInfo: {
-        displayName: talentObj.name,
+        displayName: talentObject.name,
       },
       interfaceConfigOverwrite: jitsiInterfaceConfigOverwrite,
       configOverwrite: {
@@ -78,7 +78,7 @@
 
     // @ts-ignore
     api = new JitsiMeetExternalAPI(PUBLIC_JITSI_DOMAIN, options);
-    api.executeCommand('avatarUrl', talentObj.profileImageUrl);
+    api.executeCommand('avatarUrl', talentObject.profileImageUrl);
     api.executeCommand('subject', currentShow?.name);
     api.addListener('participantJoined', participantJoined);
     api.addListener('knockingParticipant', participantKnocked);

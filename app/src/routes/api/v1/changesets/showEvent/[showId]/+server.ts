@@ -12,7 +12,7 @@ export const GET: RequestHandler<{ showId: string }> = async ({
     return new Response('Show Id not found', { status: 404 });
   }
   const firstFetch = url.searchParams.get('firstFetch') || false;
-  let doc: string | undefined = undefined;
+  let document: string | undefined;
 
   mongoose.connect(MONGO_DB_ENDPOINT);
   const id = new mongoose.Types.ObjectId(showId);
@@ -25,7 +25,7 @@ export const GET: RequestHandler<{ showId: string }> = async ({
       .lean()
       .exec();
     if (showEvent !== undefined) {
-      doc = JSON.stringify(showEvent);
+      document = JSON.stringify(showEvent);
     }
   } else {
     const pipeline = [
@@ -40,11 +40,11 @@ export const GET: RequestHandler<{ showId: string }> = async ({
       showExpandedEvents: true,
     });
     const next = await changeStream.next();
-    doc = JSON.stringify(next.fullDocument);
+    document = JSON.stringify(next.fullDocument);
     changeStream.close();
   }
 
-  return new Response(doc, {
+  return new Response(document, {
     status: 200,
     headers: {
       'content-type': 'application/json',

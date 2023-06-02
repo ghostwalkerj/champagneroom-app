@@ -10,20 +10,20 @@ import {
   createTicketMachineService,
 } from '$lib/machines/ticketMachine';
 import type {
-  ShowDocType,
+  ShowDocumentType,
   ShowFinalizedType,
   ShowStateType,
   ShowType,
 } from '$lib/models/show';
 import { Show } from '$lib/models/show';
 import type {
-  TicketDocType,
+  TicketDocumentType,
   TicketStateType,
   TicketType,
 } from '$lib/models/ticket';
 import { Ticket, TicketCancelReason } from '$lib/models/ticket';
 import type {
-  TransactionDocType,
+  TransactionDocumentType,
   TransactionType,
 } from '$lib/models/transaction';
 import { Transaction, TransactionReasonType } from '$lib/models/transaction';
@@ -37,7 +37,8 @@ export type ShowJobDataType = {
   [key: string]: any;
 };
 
-const saveState = (show: ShowDocType, newState: ShowStateType) => {
+const saveState = (show: ShowDocumentType, newState: ShowStateType) => {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   Show.updateOne({ _id: show._id }, { $set: { showState: newState } }).exec();
 };
 
@@ -47,10 +48,10 @@ const createShowEvent = ({
   ticket,
   transaction,
 }: {
-  show: ShowDocType;
+  show: ShowDocumentType;
   type: string;
-  ticket?: TicketDocType;
-  transaction?: TransactionDocType;
+  ticket?: TicketDocumentType;
+  transaction?: TransactionDocumentType;
 }) => {
   mongoose.model('ShowEvent').create({
     show: show._id,
@@ -70,7 +71,7 @@ const getShowMachineService = (show: ShowType, showQueue: Queue) => {
   return createShowMachineService({
     showDocument: show,
     showMachineOptions: {
-      saveStateCallback: async (showState) => saveState(show, showState),
+      saveStateCallback: async showState => saveState(show, showState),
       saveShowEventCallback: async ({ type, ticket, transaction }) =>
         createShowEvent({ show, type, ticket, transaction }),
       jobQueue: showQueue,
@@ -85,6 +86,7 @@ export const getTicketMachineService = (
 ) => {
   const ticketMachineOptions = {
     saveStateCallback: (ticketState: TicketStateType) => {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       Ticket.updateOne({ _id: ticket._id }, { $set: { ticketState } }).exec();
     },
   };
@@ -94,7 +96,7 @@ export const getTicketMachineService = (
     ticketMachineOptions,
     showDocument: show,
     showMachineOptions: {
-      saveStateCallback: async (showState) => saveState(show, showState),
+      saveStateCallback: async showState => saveState(show, showState),
       saveShowEventCallback: async ({ type, ticket, transaction }) =>
         createShowEvent({ show, type, ticket, transaction }),
       jobQueue: showQueue,
@@ -108,17 +110,20 @@ export const getShowWorker = (
   return new Worker(
     EntityType.SHOW,
     async (job: Job<ShowJobDataType, any, ShowMachineEventString>) => {
-      console.log('Show Worker: ', job.name);
+      console.log('Show Worker:', job.name);
       switch (job.name) {
-        case ShowMachineEventString.CANCELLATION_INITIATED:
+        case ShowMachineEventString.CANCELLATION_INITIATED: {
           cancelShow(job, redisOptions, mongoDBEndpoint);
           break;
-        case ShowMachineEventString.REFUND_INITIATED:
+        }
+        case ShowMachineEventString.REFUND_INITIATED: {
           refundShow(job, redisOptions, mongoDBEndpoint);
           break;
-        case ShowMachineEventString.SHOW_ENDED:
+        }
+        case ShowMachineEventString.SHOW_ENDED: {
           finalizeShow(job, redisOptions, mongoDBEndpoint);
           break;
+        }
       }
     },
     { autorun: false, connection: redisOptions.connection }
@@ -137,9 +142,10 @@ const cancelShow = async (
   const showState = showService.getSnapshot();
   const tickets = await Ticket.find({
     show: show._id,
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     'ticketState.active': true,
   });
-  tickets.forEach((ticket: TicketType) => {
+  for (const ticket of tickets) {
     // send cancel show to all tickets
     const ticketService = getTicketMachineService(ticket, show, showQueue);
     const cancel = {
@@ -155,7 +161,7 @@ const cancelShow = async (
     } as TicketMachineEventType;
     ticketService.send(cancelEvent);
     ticketService.stop();
-  });
+  }
   if (showState.matches('initiatedCancellation.waiting2Refund')) {
     showService.send(ShowMachineEventString.REFUND_INITIATED);
   }
@@ -177,9 +183,10 @@ const refundShow = async (
   if (showState.matches('initiatedCancellation.initiatedRefund')) {
     const tickets = await Ticket.find({
       show: show._id,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       'ticketState.active': true,
     });
-    tickets.forEach(async (ticket: TicketType) => {
+    for (const ticket of tickets) {
       // send refunds
       //TODO: Send real transactions
       const ticketService = getTicketMachineService(ticket, show, showQueue);
@@ -207,7 +214,7 @@ const refundShow = async (
         });
         ticketService.stop();
       }
-    });
+    }
   }
   showService.stop();
 };

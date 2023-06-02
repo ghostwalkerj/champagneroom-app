@@ -1,7 +1,7 @@
 <script lang="ts">
   import { deserialize } from '$app/forms';
 
-  import type { AgentDocType } from '$lib/models/agent';
+  import type { AgentDocumentType } from '$lib/models/agent';
   import { onMount } from 'svelte';
   import { selectedAccount } from 'svelte-web3';
   import type { ActionData } from './$types';
@@ -9,7 +9,7 @@
   import TalentForm from './TalentForm.svelte';
 
   export let form: ActionData;
-  let agent: AgentDocType;
+  let agent: AgentDocumentType;
 
   //TODO: This will be authentication later
   onMount(() => {
@@ -24,7 +24,7 @@
 
         const result = deserialize(await response.text());
         if (result.type === 'success' && result.data) {
-          agent = result.data.agent;
+          agent = result.data.agent as AgentDocumentType;
         }
       }
     });
@@ -54,7 +54,7 @@
             class="mx-auto grid gap-2 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3"
           >
             <div class="p-1">
-              <AgentWallet agent="{agent}" />
+              <AgentWallet />
             </div>
             <!-- Talent viewing and adding -->
             <div class="p-1">

@@ -20,7 +20,7 @@
   globalThis.Talent = Talent;
 
   onMount(() => {
-    if ($browserType == null) {
+    if ($browserType == undefined) {
       const parser = new UAParser();
       let result = parser.getDevice();
       browserType.set(result.type);

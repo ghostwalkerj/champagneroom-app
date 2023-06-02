@@ -1,27 +1,31 @@
-import type { ShowEventDocType } from '$lib/models/showEvent';
+import type { ShowEventDocumentType } from '$lib/models/showEvent';
 
 import * as timeago from 'timeago.js';
 
-export const createEventText = (showEvent: ShowEventDocType) => {
+export const createEventText = (showEvent: ShowEventDocumentType) => {
   let eventText =
     timeago.format(showEvent.createdAt) + ' ' + showEvent.ticketInfo.name ??
     'someone';
 
   switch (showEvent.type) {
-    case 'TICKET SOLD':
+    case 'TICKET SOLD': {
       eventText += ' bought a ticket!';
       break;
+    }
 
-    case 'TICKET RESERVED':
+    case 'TICKET RESERVED': {
       eventText += ' reserved a ticket!';
       break;
+    }
 
-    case 'TICKET CANCELLED':
+    case 'TICKET CANCELLED': {
       eventText += ' cancelled';
       break;
+    }
 
-    default:
+    default: {
       eventText = 'No Events';
+    }
   }
 
   return eventText;

@@ -1,9 +1,9 @@
 import { nanoid } from 'nanoid';
 import spacetime from 'spacetime';
 import { uniqueNamesGenerator } from 'unique-names-generator';
-import type { AgentDocument } from '../lib/models/agent';
-import type { ShowDocType } from '../lib/models/show';
-import type { TalentDocument } from '../lib/models/talent';
+import type { AgentDocumentType } from '../lib/models/agent';
+import type { ShowDocumentType } from '../lib/models/show';
+import type { TalentDocumentType } from '../lib/models/talent';
 import { womensNames } from './womensNames';
 
 const profileImageUrls = [
@@ -46,7 +46,7 @@ const profileImageUrls = [
   'https://pcall.infura-ipfs.io/ipfs/QmUUGzAdikeq3Atnp92dKPaCzeRdAQTKw7ef4koBjRLqxj?filename=269670589_264057749154930_5652168677962690913_n.jpeg',
 ];
 
-export const generateTalent = async (agent: AgentDocument) => {
+export const generateTalent = async (agent: AgentDocumentType) => {
   const name: string = uniqueNamesGenerator({
     dictionaries: [womensNames],
   });
@@ -64,10 +64,10 @@ export const generateTalent = async (agent: AgentDocument) => {
 };
 
 const generateShows = (talent: TalentDocument, count: number) => {
-  const shows: ShowDocType[] = [];
+  const shows: ShowDocumentType[] = [];
 
   // Create completedCalls
-  for (let i = 0; i < count; i++) {
+  for (let index = 0; index < count; index++) {
     const key = nanoid();
     const amount = Math.floor(Math.random() * 1000) + 1;
     const endedAt = spacetime
@@ -75,7 +75,7 @@ const generateShows = (talent: TalentDocument, count: number) => {
       .subtract(Math.floor(Math.random() * 45) + 1, 'day');
     const _feedback = {
       rating: Math.floor(Math.random() * 5) + 1,
-      createdAt: new Date().getTime(),
+      createdAt: Date.now(),
       comments: 'This is a comment',
     };
     // const _link = {
@@ -111,6 +111,6 @@ const generateShows = (talent: TalentDocument, count: number) => {
     // links.push(_link);
   }
 
-  const db = talent.collection.database;
+  const database = talent.collection.database;
   //db.links.bulkInsert(links);
 };

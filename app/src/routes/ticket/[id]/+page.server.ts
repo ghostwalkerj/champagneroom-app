@@ -1,7 +1,7 @@
 import { PUBLIC_PIN_PATH } from '$env/static/public';
 import type {
   TicketDisputeReason,
-  TicketDocType,
+  TicketDocumentType,
   TicketStateType,
   TicketType,
 } from '$lib/models/ticket';
@@ -58,7 +58,7 @@ export const load: PageServerLoad = async ({ params, cookies, url }) => {
     .orFail(() => {
       throw error(404, 'Ticket not found');
     })
-    .exec()) as TicketDocType;
+    .exec()) as TicketDocumentType;
 
   const show = await Show.findById(ticket.show)
     .orFail(() => {
@@ -99,7 +99,7 @@ export const actions: Actions = {
       show: show._id,
       agent: show.agent,
       talent: show.talent,
-    }).then((transaction) => {
+    }).then(transaction => {
       ticketService.send({
         type: TicketMachineEventString.PAYMENT_RECEIVED,
         transaction,
@@ -136,16 +136,16 @@ export const actions: Actions = {
       ticketService.send(cancelEvent);
     }
     const snapshot = ticketService.getSnapshot();
-    const _ticket = snapshot.context.ticketDocument;
-    const _showService = snapshot.children[
+    const ticket = snapshot.context.ticketDocument;
+    const showService = snapshot.children[
       'showMachineService'
     ] as ShowMachineServiceType;
-    const _show = _showService?.getSnapshot().context.showDocument;
+    const show = showService?.getSnapshot().context.showDocument;
     return {
       success: true,
       ticketCancelled: true,
-      ticket: JSON.parse(JSON.stringify(_ticket)),
-      show: JSON.parse(JSON.stringify(_show)),
+      ticket: JSON.parse(JSON.stringify(ticket)),
+      show: JSON.parse(JSON.stringify(show)),
     };
   },
   leave_feedback: async ({ params, request }) => {

@@ -5,6 +5,7 @@ const { Schema, models } = pkg;
 
 const talentStatsSchema = new Schema(
   {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     _id: { type: Schema.Types.ObjectId, required: true, auto: true },
     talent: { type: Schema.Types.ObjectId, ref: 'Talent', required: true },
     ratingAvg: { type: Number, default: 0, min: 0, max: 5, required: true },
@@ -53,10 +54,10 @@ const talentStatsSchema = new Schema(
   { timestamps: true }
 );
 
-export type TalentStatsDocType = InferSchemaType<typeof talentStatsSchema>;
+export type TalentStatsDocumentType = InferSchemaType<typeof talentStatsSchema>;
 
 export const TalentStats = models?.Talent
-  ? (models?.Talent as Model<TalentStatsDocType>)
-  : mongoose.model<TalentStatsDocType>('TalentStats', talentStatsSchema);
+  ? (models?.Talent as Model<TalentStatsDocumentType>)
+  : mongoose.model<TalentStatsDocumentType>('TalentStats', talentStatsSchema);
 
 export type TalentStatsType = InstanceType<typeof TalentStats>;

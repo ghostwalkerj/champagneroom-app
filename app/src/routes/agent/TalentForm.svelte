@@ -1,10 +1,10 @@
 <script lang="ts">
   import { applyAction, enhance } from '$app/forms';
   import { invalidateAll } from '$app/navigation';
-  import type { AgentDocType } from '$lib/models/agent';
+  import type { AgentDocumentType } from '$lib/models/agent';
   import type { ActionData } from './$types';
 
-  export let agent: AgentDocType;
+  export let agent: AgentDocumentType;
   export let form: ActionData;
 
   $: loading = false;

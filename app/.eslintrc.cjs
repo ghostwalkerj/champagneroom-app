@@ -1,3 +1,5 @@
+const { format } = require('build-number-generator');
+
 /* eslint-disable @typescript-eslint/naming-convention */
 module.exports = {
   // ...
@@ -58,6 +60,7 @@ module.exports = {
       {
         selector: 'parameter',
         format: ['camelCase'],
+        leadingUnderscore: 'allow',
       },
       {
         selector: 'memberLike',
@@ -77,6 +80,14 @@ module.exports = {
       {
         selector: 'enumMember',
         format: ['UPPER_CASE'],
+      },
+      {
+        selector: 'objectLiteralMethod',
+        format: ['snake_case', 'camelCase'],
+      },
+      {
+        selector: 'objectLiteralProperty',
+        format: [],
       },
     ],
     '@typescript-eslint/ban-ts-comment': 'off',

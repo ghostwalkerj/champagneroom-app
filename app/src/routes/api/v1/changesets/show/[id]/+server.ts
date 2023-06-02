@@ -13,12 +13,12 @@ export const GET: RequestHandler = async ({ params, url }) => {
 
   const id = new mongoose.Types.ObjectId(showId);
 
-  let doc: string | undefined = undefined;
+  let document: string | undefined;
 
   if (firstFetch) {
     const show = await Show.findById(id).lean().exec();
     if (show !== undefined) {
-      doc = JSON.stringify(show);
+      document = JSON.stringify(show);
     }
   } else {
     const pipeline = [
@@ -31,12 +31,12 @@ export const GET: RequestHandler = async ({ params, url }) => {
 
     const changeStream = Show.watch(pipeline, { fullDocument: 'updateLookup' });
     const next = await changeStream.next();
-    doc = JSON.stringify(next.fullDocument);
+    document = JSON.stringify(next.fullDocument);
 
     changeStream.close();
   }
 
-  return new Response(doc, {
+  return new Response(document, {
     status: 200,
     headers: {
       'content-type': 'application/json',

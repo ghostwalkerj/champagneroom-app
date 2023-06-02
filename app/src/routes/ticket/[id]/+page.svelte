@@ -6,11 +6,11 @@
     createTicketMachineService,
     type TicketMachineServiceType,
   } from '$lib/machines/ticketMachine';
-  import { TicketDisputeReason, type TicketDocType } from '$lib/models/ticket';
+  import { TicketDisputeReason, type TicketDocumentType } from '$lib/models/ticket';
   import urlJoin from 'url-join';
 
   import { PUBLIC_SHOWTIME_PATH } from '$env/static/public';
-  import type { ShowDocType } from '$lib/models/show';
+  import type { ShowDocumentType } from '$lib/models/show';
   import { showStore, ticketStore } from '$stores';
   import { onDestroy, onMount } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
@@ -20,28 +20,28 @@
   export let data: PageData;
   export let form: ActionData;
 
-  let ticket = data.ticket as TicketDocType;
-  let show = data.show as ShowDocType;
+  let ticket = data.ticket as TicketDocumentType;
+  let show = data.show as ShowDocumentType;
 
   const showTimePath = urlJoin($page.url.href, PUBLIC_SHOWTIME_PATH);
   const reasons = Object.values(TicketDisputeReason);
 
-  let needs2Pay = false;
+  let shouldPay = false;
   let canWatchShow = false;
   let canCancelTicket = false;
-  let ticketDone = false;
+  let isTicketDone = false;
   let canLeaveFeedback = false;
   let canDispute = false;
-  let waitingForShow = false;
+  let isWaitingForShow = false;
   let showUnSub: Unsubscriber;
   let ticketUnSub: Unsubscriber;
-  let showPaymentLoading = false;
-  let showCancelLoading = false;
+  let isShowPaymentLoading = false;
+  let isShowCancelLoading = false;
   $: loading = false;
 
   const useTicketMachine = (ticketMachineService: TicketMachineServiceType) => {
     const state = ticketMachineService.getSnapshot();
-    needs2Pay = state.matches('reserved.waiting4Payment');
+    shouldPay = state.matches('reserved.waiting4Payment');
     canWatchShow = state.can('SHOW JOINED');
     canCancelTicket = state.can({
       type: 'CANCELLATION INITIATED',
@@ -56,14 +56,14 @@
       dispute: undefined,
     });
 
-    waitingForShow = state.matches('reserved.waiting4Show') && !canWatchShow;
-    ticketDone = state.done ?? false;
+    isWaitingForShow = state.matches('reserved.waiting4Show') && !canWatchShow;
+    isTicketDone = state.done ?? false;
   };
 
   onMount(() => {
     if (ticket.ticketState.active) {
-      ticketUnSub = ticketStore(ticket).subscribe(ticketDoc => {
-        ticket = ticketDoc;
+      ticketUnSub = ticketStore(ticket).subscribe(ticketDocument => {
+        ticket = ticketDocument;
         useTicketMachine(
           createTicketMachineService({
             ticketDocument: ticket,
@@ -71,8 +71,8 @@
           })
         );
       });
-      showUnSub = showStore(show).subscribe(showDoc => {
-        show = showDoc;
+      showUnSub = showStore(show).subscribe(showDocument => {
+        show = showDocument;
         useTicketMachine(
           createTicketMachineService({
             ticketDocument: ticket,
@@ -90,9 +90,9 @@
 
   const onSubmit = (form: HTMLFormElement) => {
     if (form.name === 'buyTicket') {
-      showPaymentLoading = true;
+      isShowPaymentLoading = true;
     } else if (form.name === 'cancelTicket') {
-      showCancelLoading = true;
+      isShowCancelLoading = true;
     }
     loading = true;
     return async ({ result }) => {
@@ -124,7 +124,7 @@
         {#key ticket.ticketState || show.showState}
           <TicketDetail ticket="{ticket}" show="{show}" />
         {/key}
-        {#if waitingForShow}
+        {#if isWaitingForShow}
           <div
             class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-4xl -rotate-12 whitespace-nowrap font-extrabold text-primary ring-2 ring-primary bg-base-200/50 p-2 ring-inset rounded-xl"
           >
@@ -133,10 +133,10 @@
         {/if}
       </div>
 
-      {#if !ticketDone}
-        {#if needs2Pay}
+      {#if !isTicketDone}
+        {#if shouldPay}
           <div>
-            {#if showPaymentLoading}
+            {#if isShowPaymentLoading}
               <div class="p-4">
                 <div class="w-full flex justify-center">
                   <button class="btn btn-secondary loading" disabled="{true}"
@@ -175,7 +175,7 @@
           </div>
         {/if}
         {#if canCancelTicket}
-          {#if showCancelLoading}
+          {#if isShowCancelLoading}
             <div class="p-4">
               <div class="w-full flex justify-center">
                 <button class="btn btn-secondary loading" disabled="{true}"

@@ -237,7 +237,7 @@ export type ShowStateType = InferSchemaType<typeof showStateSchema>;
 
 export type ShowCancelType = InferSchemaType<typeof cancelSchema>;
 
-export type ShowDocType = InferSchemaType<typeof showSchema>;
+export type ShowDocumentType = InferSchemaType<typeof showSchema>;
 
 export type ShowRefundType = InferSchemaType<typeof refundSchema>;
 
@@ -246,7 +246,7 @@ export type ShowSaleType = InferSchemaType<typeof saleSchema>;
 export type ShowFinalizedType = InferSchemaType<typeof finalizeSchema>;
 
 export const Show = models?.Show
-  ? (models.Show as Model<ShowDocType>)
-  : mongoose.model<ShowDocType>('Show', showSchema);
+  ? (models.Show as Model<ShowDocumentType>)
+  : mongoose.model<ShowDocumentType>('Show', showSchema);
 
 export type ShowType = InstanceType<typeof Show>;

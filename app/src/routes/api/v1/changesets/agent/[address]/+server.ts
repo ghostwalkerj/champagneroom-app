@@ -12,13 +12,13 @@ export const GET: RequestHandler<{ address: string }> = async ({
     return new Response('Agent not found', { status: 404 });
   }
   const firstFetch = url.searchParams.get('firstFetch') || false;
-  let doc: string | undefined = undefined;
+  let document: string | undefined;
 
   mongoose.connect(MONGO_DB_ENDPOINT);
   if (firstFetch) {
     const agent = await Agent.findOne({ address }).exec();
     if (agent !== undefined) {
-      doc = JSON.stringify(agent);
+      document = JSON.stringify(agent);
     }
   } else {
     const pipeline = [{ $match: { 'fullDocument.address': address } }];
@@ -26,12 +26,12 @@ export const GET: RequestHandler<{ address: string }> = async ({
       fullDocument: 'updateLookup',
     });
     const next = await changeStream.next();
-    doc = next.fullDocument;
+    document = next.fullDocument;
 
     changeStream.close();
   }
 
-  return new Response(JSON.stringify(doc), {
+  return new Response(JSON.stringify(document), {
     status: 200,
     headers: {
       'content-type': 'application/json',

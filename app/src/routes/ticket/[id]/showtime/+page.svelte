@@ -12,8 +12,8 @@
     TicketMachineEventString,
     createTicketMachineService,
   } from '$lib/machines/ticketMachine';
-  import type { ShowDocType } from '$lib/models/show';
-  import type { TicketDocType } from '$lib/models/ticket';
+  import type { ShowDocumentType } from '$lib/models/show';
+  import type { TicketDocumentType } from '$lib/models/ticket';
   import getProfileImage from '$util/profilePhoto';
   import { onDestroy, onMount } from 'svelte';
   import urlJoin from 'url-join';
@@ -21,8 +21,8 @@
 
   export let data: PageData;
 
-  let ticket = data.ticket as TicketDocType;
-  let show = data.show as ShowDocType;
+  let ticket = data.ticket as TicketDocumentType;
+  let show = data.show as ShowDocumentType;
 
   // @ts-ignore
   let jitsiToken = data.jitsiToken as string;
@@ -81,10 +81,10 @@
     });
 
     ticketMachineService.subscribe(state => {
-      const timeToLeave = !state.can({
+      const isTimeToLeave = !state.can({
         type: TicketMachineEventString.SHOW_JOINED,
       });
-      if (timeToLeave) {
+      if (isTimeToLeave) {
         api.executeCommand('hangup');
         goto(returnUrl);
       }

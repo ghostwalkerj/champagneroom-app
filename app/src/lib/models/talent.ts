@@ -9,6 +9,7 @@ const { Schema, models } = pkg;
 
 const talentSchema = new Schema(
   {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     _id: { type: Schema.Types.ObjectId, required: true, auto: true },
     key: {
       type: String,
@@ -58,10 +59,10 @@ const talentSchema = new Schema(
   { timestamps: true }
 );
 
-export type TalentDocType = InferSchemaType<typeof talentSchema>;
+export type TalentDocumentType = InferSchemaType<typeof talentSchema>;
 
 export const Talent = models?.Talent
-  ? (models?.Talent as Model<TalentDocType>)
-  : mongoose.model<TalentDocType>('Talent', talentSchema);
+  ? (models?.Talent as Model<TalentDocumentType>)
+  : mongoose.model<TalentDocumentType>('Talent', talentSchema);
 
 export type TalentType = InstanceType<typeof Talent>;

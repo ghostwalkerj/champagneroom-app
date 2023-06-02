@@ -1,7 +1,7 @@
 <script lang="ts">
   import { PUBLIC_SHOW_PATH } from '$env/static/public';
   import { currencyFormatter, durationFormatter } from '$lib/constants';
-  import type { ShowDocType } from '$lib/models/show';
+  import type { ShowDocumentType } from '$lib/models/show';
   import StarRating from 'svelte-star-rating';
   import urlJoin from 'url-join';
 
@@ -19,7 +19,7 @@
     showRating: true,
     showWaterMark: true,
   };
-  export let show: ShowDocType;
+  export let show: ShowDocumentType;
   export let options: ShowDetailOptions = defaultOptions;
 
   options = {

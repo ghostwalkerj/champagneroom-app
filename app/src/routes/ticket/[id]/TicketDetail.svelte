@@ -4,10 +4,10 @@
     PUBLIC_PROFILE_IMAGE_PATH,
   } from '$env/static/public';
   import { currencyFormatter, durationFormatter } from '$lib/constants';
-  import type { ShowDocType } from '$lib/models/show';
+  import type { ShowDocumentType } from '$lib/models/show';
   import type { TicketDocType } from '$lib/models/ticket';
   import getProfileImage from '$util/profilePhoto';
-  export let show: ShowDocType;
+  export let show: ShowDocumentType;
   export let ticket: TicketDocType;
 
   $: profileImage = ticket.ticketState.reservation
@@ -17,9 +17,9 @@
       )
     : PUBLIC_DEFAULT_PROFILE_IMAGE;
   $: ticketStatus = ticket
-    ? ticket.ticketState.totalPaid >= ticket.price
+    ? (ticket.ticketState.totalPaid >= ticket.price
       ? 'Paid' + ' ' + ticket.ticketState.status
-      : ticket.ticketState.status
+      : ticket.ticketState.status)
     : '';
   $: showStatus = show.showState.status;
   $: customerName = ticket.ticketState.reservation

@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 
 export const createPinHash = (id: string, pin: string) => {
   const input = `id:${id}-pin:${pin}`;

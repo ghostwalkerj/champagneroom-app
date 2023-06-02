@@ -7,7 +7,9 @@ import { womensNames } from '$util/womensNames';
 const { Schema, models } = pkg;
 const agentSchema = new Schema(
   {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     _id: { type: Schema.Types.ObjectId, required: true, auto: true },
+
     walletAddress: {
       type: String,
       maxLength: 50,
@@ -37,10 +39,10 @@ const agentSchema = new Schema(
   { timestamps: true }
 );
 
-export type AgentDocType = InferSchemaType<typeof agentSchema>;
+export type AgentDocumentType = InferSchemaType<typeof agentSchema>;
 
 export const Agent = models?.Agent
-  ? (models.Agent as Model<AgentDocType>)
-  : mongoose.model<AgentDocType>('Agent', agentSchema);
+  ? (models.Agent as Model<AgentDocumentType>)
+  : mongoose.model<AgentDocumentType>('Agent', agentSchema);
 
 export type AgentType = InstanceType<typeof Agent>;

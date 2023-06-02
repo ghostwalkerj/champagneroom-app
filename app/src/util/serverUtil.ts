@@ -10,21 +10,21 @@ import { createShowMachineService } from '$lib/machines/showMachine';
 import { createTicketMachineService } from '$lib/machines/ticketMachine';
 import {
   Show,
-  type ShowDocType,
+  type ShowDocumentType,
   type ShowStateType,
   type ShowType,
 } from '$lib/models/show';
 import {
   Ticket,
-  type TicketDocType,
+  type TicketDocumentType,
   type TicketStateType,
   type TicketType,
 } from '$lib/models/ticket';
-import type { TransactionDocType } from '$lib/models/transaction';
+import type { TransactionDocumentType } from '$lib/models/transaction';
 import { getQueue } from '$lib/workers';
 import mongoose from 'mongoose';
 
-const redis_options = {
+const redisOptions = {
   connection: {
     host: REDIS_HOST,
     port: +REDIS_PORT,
@@ -34,7 +34,7 @@ const redis_options = {
   },
 };
 
-const saveState = (show: ShowDocType, newState: ShowStateType) => {
+const saveState = (show: ShowDocumentType, newState: ShowStateType) => {
   Show.updateOne({ _id: show._id }, { $set: { showState: newState } }).exec();
 };
 
@@ -44,10 +44,10 @@ const createShowEvent = ({
   ticket,
   transaction,
 }: {
-  show: ShowDocType;
+  show: ShowDocumentType;
   type: string;
-  ticket?: TicketDocType;
-  transaction?: TransactionDocType;
+  ticket?: TicketDocumentType;
+  transaction?: TransactionDocumentType;
 }) => {
   mongoose.model('ShowEvent').create({
     show: show._id,
@@ -64,12 +64,12 @@ const createShowEvent = ({
 };
 
 export const getShowMachineService = (show: ShowType) => {
-  const showQueue = getQueue(EntityType.SHOW, redis_options);
+  const showQueue = getQueue(EntityType.SHOW, redisOptions);
   mongoose.connect(MONGO_DB_ENDPOINT);
   return createShowMachineService({
     showDocument: show,
     showMachineOptions: {
-      saveStateCallback: async (showState) => saveState(show, showState),
+      saveStateCallback: async showState => saveState(show, showState),
       saveShowEventCallback: async ({ type, ticket, transaction }) =>
         createShowEvent({ show, type, ticket, transaction }),
       jobQueue: showQueue,
@@ -92,7 +92,7 @@ export const getShowMachineServiceFromId = async (showId: string) => {
 
 export const getTicketMachineService = (ticket: TicketType, show: ShowType) => {
   mongoose.connect(MONGO_DB_ENDPOINT);
-  const showQueue = getQueue(EntityType.SHOW, redis_options);
+  const showQueue = getQueue(EntityType.SHOW, redisOptions);
 
   const ticketMachineOptions = {
     saveStateCallback: (ticketState: TicketStateType) => {
@@ -105,7 +105,7 @@ export const getTicketMachineService = (ticket: TicketType, show: ShowType) => {
     ticketMachineOptions,
     showDocument: show,
     showMachineOptions: {
-      saveStateCallback: async (showState) => saveState(show, showState),
+      saveStateCallback: async showState => saveState(show, showState),
       saveShowEventCallback: async ({ type, ticket, transaction }) =>
         createShowEvent({ show, type, ticket, transaction }),
       jobQueue: showQueue,
@@ -113,11 +113,11 @@ export const getTicketMachineService = (ticket: TicketType, show: ShowType) => {
   });
 };
 
-export const getTicketMachineServiceFromId = async (TicketId: string) => {
+export const getTicketMachineServiceFromId = async (ticketId: string) => {
   mongoose.connect(MONGO_DB_ENDPOINT);
   const ticket = await mongoose
     .model('Ticket')
-    .findById(TicketId)
+    .findById(ticketId)
     .orFail(() => {
       throw new Error('Ticket not found');
     })
