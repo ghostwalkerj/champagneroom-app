@@ -2,6 +2,7 @@ import { ActorType } from '$lib/constants';
 import type { InferSchemaType, Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
 import { fieldEncryption } from 'mongoose-field-encryption';
+import { nanoid } from 'nanoid';
 const { Schema, models } = pkg;
 export enum ShowStatus {
   CREATED = 'CREATED',
@@ -182,6 +183,7 @@ const showSchema = new Schema(
       type: String,
       required: true,
       unique: true,
+      default: () => nanoid(),
     },
     coverImageUrl: { type: String, trim: true },
     duration: {

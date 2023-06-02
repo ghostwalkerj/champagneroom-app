@@ -13,7 +13,6 @@ import { getShowMachineServiceFromId } from '$util/serverUtil';
 import { error, fail } from '@sveltejs/kit';
 import mongoose from 'mongoose';
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
-import { v4 as uuidv4 } from 'uuid';
 
 export const load: PageServerLoad = async ({ params }) => {
   mongoose.connect(MONGO_DB_ENDPOINT);
@@ -101,7 +100,6 @@ export const actions: Actions = {
           ticketsAvailable: +capacity,
         },
       },
-      roomId: uuidv4(),
       talentInfo: {
         name: talent.name,
         profileImageUrl: talent.profileImageUrl,
