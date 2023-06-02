@@ -51,6 +51,7 @@
     "daisyui": "^2.51.6",
     "eslint": "^8.41.0",
     "eslint-plugin-svelte": "^2.29.0",
+    "eslint-plugin-unicorn": "^47.0.0",
     "install-peers": "^1.0.4",
     "nodemon": "^2.0.22",
     "postcss": "^8.4.23",

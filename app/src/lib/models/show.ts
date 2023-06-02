@@ -176,6 +176,7 @@ const showStateSchema = new Schema(
 
 const showSchema = new Schema(
   {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     _id: { type: Schema.Types.ObjectId, required: true, auto: true },
     talent: { type: Schema.Types.ObjectId, ref: 'Talent', required: true },
     agent: { type: Schema.Types.ObjectId, ref: 'Agent', required: true },

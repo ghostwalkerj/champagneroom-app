@@ -6,7 +6,7 @@
   import urlJoin from 'url-join';
 
   export let profileImage: string;
-  export let callBack: (arg0: string) => void;
+  export let callBack: (argument0: string) => void;
 
   let uploadVisibility = 'invisible';
   let progressVisibility = 'invisible';
@@ -14,7 +14,7 @@
 
   let options = {
     fileLimit: 1,
-    maxSize: 1048576,
+    maxSize: 1_048_576,
     accept: ['image/png', 'image/jpeg'],
     multiple: false,
   };
@@ -23,8 +23,8 @@
   $: imageUrl = profileImage;
   $: uploadReady = false;
 
-  function onChange(e: CustomEvent) {
-    const files = e.detail.files.accepted;
+  function onChange(event: CustomEvent) {
+    const files = event.detail.files.accepted;
     if (files.length > 0) {
       file = files[0];
       if (file) {
@@ -60,12 +60,12 @@
     progressVisibility = 'visible';
     let formData = new FormData();
     formData.append('file', file);
-    const upload_url = urlJoin($page.url.origin, PUBLIC_IMAGE_UPDATE_PATH);
-    const res = await fetch(upload_url, {
+    const uploadUrl = urlJoin($page.url.origin, PUBLIC_IMAGE_UPDATE_PATH);
+    const response = await fetch(uploadUrl, {
       method: 'POST',
       body: formData,
     });
-    const data = await res.json();
+    const data = await response.json();
     profileImage = data.url;
     callBack(profileImage);
     progressVisibility = 'invisible';
@@ -129,7 +129,7 @@
       {:else}
         <button
           class="btn btn-xs btn-secondary md:btn-sm"
-          on:click="{e => upload()}"
+          on:click="{() => upload()}"
         >
           Upload</button
         >

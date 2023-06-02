@@ -47,7 +47,7 @@
           <div class="flex font-medium items-center">
             <div class="mr-2">
               {$selectedAccount.slice(0, 6)}...{$selectedAccount.slice(
-                $selectedAccount.length - 4,
+                - 4,
                 $selectedAccount.length
               )}
             </div>
@@ -83,7 +83,7 @@
 
             <div class="font-semibold text-xl ml-2 text-gray-200">
               {$selectedAccount.slice(0, 14)}...{$selectedAccount.slice(
-                $selectedAccount.length - 14,
+                - 14,
                 $selectedAccount.length
               )}
             </div>

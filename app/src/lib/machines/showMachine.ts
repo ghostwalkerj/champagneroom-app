@@ -116,8 +116,8 @@ export const createShowMachine = ({
   showDocument: ShowDocType;
   showMachineOptions?: ShowMachineOptions;
 }) => {
-  const GRACE_PERIOD = showMachineOptions?.gracePeriod || 3600000;
-  const ESCROW_PERIOD = showMachineOptions?.escrowPeriod || 3600000;
+  const GRACE_PERIOD = showMachineOptions?.gracePeriod || 3_600_000;
+  const ESCROW_PERIOD = showMachineOptions?.escrowPeriod || 3_600_000;
 
   /** @xstate-layout N4IgpgJg5mDOIC5SwBYHsDuBZAhgYxQEsA7MAYgGUAJAeQHUKAVAQUYFEACAVQAUARVmwDaABgC6iUAAc0sQgBdCaYpJAAPRABYATABoQAT0QBOAOzGAdAGYArDavGrpgBwjNx4wEYAvt-2pMXAISMAsAjAAZNBwISDJRCSQQGTlFZVUNBBtjEWtNK2crERFTbRttR30jBE9izWsrT0dTN2NC0xtff3RsfCJSMJ6omLihT0TpWQUlFSTM7NyrfMLi0vLKw0RPTWyLdvKANk8Djs0RKy6QcKD+0PDh2Ih47QnkqbTZ0HmcvIKikrKFSsVUQpUsnk8NgOIkcmk82mcpk0l2ufRCg0wD1GVleKWm6TmiBsrl+KwB62BmxqxIODQ6ZXO5lKKJ6N3R92ij3imlx7xmGSJeipjQRFk0zhs5ysRWOOVMLMCaIGHJGTyENl5qX5hKyJKWf1WgI21TKlmKBwqkOcELaB2RfiurKVdyGnNGB01+M+6iJLVJ-zWQJBNVFkuKtWcOk0plqBwVvWCAwARmg1DQAGbpwh4MA0KRgYhkABKbAAilw2EwOABhZgAOWrbAiEVYAEkaHWEqo8R8BTU7c4LAdnMPTB1su5tAdg55CjYLCVh5HtJ4-pH42zk6mM1mc3mC8WyxWq7WG02W4x253xt2+QSvlsB0OR4jx8ZJ9OqdtRU0Cq5Z642giHGDqoomoQpmmmbZrm+aFpe1YANJsIwHAlhQbBFgAamwfBdkkPbag+NRuLS7hmB45yeKYRSftUELaNoeyNO+EJuDGXgbs6FiQTuMH7vBrZIShaGVphOF4TeBF3t6mRNJo9Q5DYNHbNsNj5JoM7SqYFjaGcErlDshRNFx4E8du0F7nBZAIchqHoeJbYdhwl5YGwNBcIw+GTFq94+jUxjlHsTQqaUMbrDOK71IUOwlK4xRWNoFygU6Zm8ZZsEHrZImno2za4d5by+bJWxtPOBwOMYBxtFVJzijOMJMTo1rQrYOiJfKKWKmlFm7plgnCahFA0BEeHiLexV9kBxzWDkIhTtRbS2JS1RmLk80AaO5TFM4pm3OZUF9QJlAsEWQ20HQhWEX5clQlYYruKUO0lHCmlUvY9RAaxf4OOcu1dQm+3pUd1nZfZbAAGJcHWfAFeN0mTTqQHFBY9hzkczg5Apb3VJGOlHFCq4OEcw4gd03VA71MHVgANrIcRMMwZ0cNQ9BXTJfa1G4YqzicwHuDoNjBk4OmShagUVdC5j-eTgPosD1N07AcRg6JGHYU5dYua2bkeV58M+V6nOkWKHjmDkjQ0cBkUxkOXgsQpHSmGTjoU-LVM5rT9NPKruXnnDnq9jqtRQqbFEW9RtEzjouR2MBZjmG40p7e7h2K97NlCXZLMjWNgdEf5q67Aizil24IiSvCONbNpFiOBChRLNswEp1uaee0rKtZyJJZQzDAcTUbwf6mKTi2DFY5QpFkKo3pS3OJacLJbLm4QR7YBe8rTwluWlaoX7zaa+ziPEbUmhkWblGW1HVLI-O5rKdKEpTp1K-cQrHcZzvx77-WeUXleMY+cbpbArhfcOVErZ0S2MSaKZh4QuDHKOF2YF9qwHkDgAATvIBmp1zpswNkVIexEX5MWAksE4FokSlyFlSZYddgJ6QhEgq0rc7gYOwXEasXAmA0DckWDgAApGgrY6wDwRsQ-yU57DWHKGjbQ45SjCx0HXew2wDjrGospNhYQOE4KeNw3h-COAREhvrYBJUEBTgtHsBS6koRuC0cGPSOlijhnFGYWwjFl6uzlsqPRcQ2AwxZhdY+kjMjGCFCaO0TEFGMQ8JHSJycAarwsAWLkjNmas0uoQ66ljahRMQGUJoewNGBWogiKuOj0kMwuhwCGojmARFbAALXEYbIOxEnCeD2AidwI4FFm1XM4iqTE7RgkCmYGw8IdGYLAAARwAK5wH0dWHAxAcw0xpjgD4FgMA4GmMQKA2gixgHTIs4gPtu7gz7rDPOg9OlSLAWKYctQvANzsDOaEg4uaMWdk-bQsyFnLPQZANZGywBbJ2TMPZBzFBHJOWci5VzBo1j-v7e5EjHmZAXs4529QTgjnPkcMwSVfAOmIGgWI8AkioJCA8gumQAC00CEBMvnB4TlXLOVjh8XS5UrpVQMpAQgdqYoVyl2qo0CqY5q4kXmqja0WMqoSghJ0FJ3E8DrM2TTSAwrLH6T2DkKhiUHBNAOKyoEPSyoiDUsccMgKNVmSzMQHANNCAAC89VYsZYgCq4IYReIUklcpwt44WEhMcO0zdoR6R0R-fq+rOZwjGWcSENFsjE1MNHO0Q5owV2jMSGEdp43r03t6jpvqEAjlyBK6ZxxrQFHPjm+c2l7BxSetop1aCAkQCTcHGhexzBTkiU9J+wYoS0hFNM8+k7owoNSvtGpfafUioUdayMVCkQsQlCtIpFqA3sThCcYkSIgVLJWWC7VkLtmPLyVNHaLzrQwghLOT5X5tpDnDLaDqOwF1uwGHMi9oKIDgp1dC5QsLDnHNOecy5-aSElFjpPDRAyPDvvohm1GwFlKSnMCS5KvggA */
   return createMachine(
@@ -357,7 +357,7 @@ export const createShowMachine = ({
     },
     {
       actions: {
-        closeBoxOffice: assign((context) => {
+        closeBoxOffice: assign(context => {
           return {
             showState: {
               ...context.showState,
@@ -366,7 +366,7 @@ export const createShowMachine = ({
           };
         }),
 
-        openBoxOffice: assign((context) => {
+        openBoxOffice: assign(context => {
           return {
             showState: {
               ...context.showState,
@@ -375,7 +375,7 @@ export const createShowMachine = ({
           };
         }),
 
-        cancelShow: assign((context) => {
+        cancelShow: assign(context => {
           return {
             showState: {
               ...context.showState,
@@ -384,7 +384,7 @@ export const createShowMachine = ({
           };
         }),
 
-        startShow: assign((context) => {
+        startShow: assign(context => {
           return {
             showState: {
               ...context.showState,
@@ -397,7 +397,7 @@ export const createShowMachine = ({
           };
         }),
 
-        endShow: assign((context) => {
+        endShow: assign(context => {
           return {
             showState: {
               ...context.showState,
@@ -474,7 +474,7 @@ export const createShowMachine = ({
 
           const refund = {
             refundedAt: event.refundedAt || new Date(),
-            transactions: event.transactions.map((t) => t._id),
+            transactions: event.transactions.map(t => t._id),
             ticket: event.ticket._id,
             amount: event.amount,
           } as ShowRefundType;
@@ -511,7 +511,7 @@ export const createShowMachine = ({
           };
         }),
 
-        exitEscrow: assign((context) => {
+        exitEscrow: assign(context => {
           if (!context.showState.escrow) return {};
           return {
             showState: {
@@ -525,7 +525,7 @@ export const createShowMachine = ({
           };
         }),
 
-        deactivateShow: assign((context) => {
+        deactivateShow: assign(context => {
           return {
             showState: {
               ...context.showState,
@@ -534,7 +534,7 @@ export const createShowMachine = ({
           };
         }),
 
-        incrementTicketsAvailable: assign((context) => {
+        incrementTicketsAvailable: assign(context => {
           return {
             showState: {
               ...context.showState,
@@ -549,7 +549,7 @@ export const createShowMachine = ({
           };
         }),
 
-        decrementTicketsAvailable: assign((context) => {
+        decrementTicketsAvailable: assign(context => {
           return {
             showState: {
               ...context.showState,
@@ -571,7 +571,7 @@ export const createShowMachine = ({
 
           const sale = {
             soldAt: event.soldAt || new Date(),
-            transactions: event.transactions.map((t) => t._id),
+            transactions: event.transactions.map(t => t._id),
             ticket: event.ticket._id,
             amount: event.amount,
           } as ShowSaleType;
@@ -601,48 +601,45 @@ export const createShowMachine = ({
       },
 
       delays: {
-        GRACE_DELAY: (context) => {
+        GRACE_DELAY: context => {
           const delay =
             +GRACE_PERIOD -
             (context.showState.runtime?.endDate
-              ? new Date().getTime() -
-                context.showState.runtime.endDate.getTime()
+              ? Date.now() - context.showState.runtime.endDate.getTime()
               : 0);
           return delay > 0 ? delay : 0;
         },
       },
 
       guards: {
-        canCancel: (context) =>
+        canCancel: context =>
           context.showState.salesStats.ticketsSold -
             context.showState.salesStats.ticketsRefunded ===
           0,
-        showCancelled: (context) =>
+        showCancelled: context =>
           context.showState.status === ShowStatus.CANCELLED,
-        showFinalized: (context) =>
+        showFinalized: context =>
           context.showState.status === ShowStatus.FINALIZED,
-        showInitiatedCancellation: (context) =>
+        showInitiatedCancellation: context =>
           context.showState.status === ShowStatus.CANCELLATION_INITIATED,
-        showInitiatedRefund: (context) =>
+        showInitiatedRefund: context =>
           context.showState.status === ShowStatus.REFUND_INITIATED,
-        showBoxOfficeOpen: (context) =>
+        showBoxOfficeOpen: context =>
           context.showState.status === ShowStatus.BOX_OFFICE_OPEN,
-        showBoxOfficeClosed: (context) =>
+        showBoxOfficeClosed: context =>
           context.showState.status === ShowStatus.BOX_OFFICE_CLOSED,
-        showStarted: (context) => context.showState.status === ShowStatus.LIVE,
-        showStopped: (context) =>
-          context.showState.status === ShowStatus.STOPPED,
-        showInEscrow: (context) =>
+        showStarted: context => context.showState.status === ShowStatus.LIVE,
+        showStopped: context => context.showState.status === ShowStatus.STOPPED,
+        showInEscrow: context =>
           context.showState.status === ShowStatus.IN_ESCROW,
-        soldOut: (context) =>
-          context.showState.salesStats.ticketsAvailable === 1,
-        canStartShow: (context) => {
+        soldOut: context => context.showState.salesStats.ticketsAvailable === 1,
+        canStartShow: context => {
           if (context.showState.status === ShowStatus.ENDED) {
             // Allow grace period to start show again
             return (
               (context.showState.runtime?.startDate.getTime() ?? 0) +
                 +GRACE_PERIOD >
-              new Date().getTime()
+              Date.now()
             );
           }
           return (
@@ -683,14 +680,14 @@ export const createShowMachineService = ({
   const showService = interpret(showMachine).start();
 
   if (showMachineOptions?.saveStateCallback) {
-    showService.onChange((context) => {
+    showService.onChange(context => {
       showMachineOptions.saveStateCallback &&
         showMachineOptions.saveStateCallback(context.showState);
     });
   }
 
   if (showMachineOptions?.saveShowEventCallback) {
-    showService.onEvent((event) => {
+    showService.onEvent(event => {
       const ticket = ('ticket' in event ? event.ticket : undefined) as
         | TicketDocType
         | undefined;
