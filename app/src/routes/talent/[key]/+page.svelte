@@ -67,7 +67,7 @@
     showUnSub?.();
   };
 
-  if(!currentShow) {
+  if (!currentShow) {
     noCurrentShow();
   }
 
@@ -214,7 +214,10 @@
               <div class="grow">
                 <div class="alert alert-info shadow-lg p-3">
                   <div>
-                    <iconify-icon icon="mingcute:information-line" />
+                    <iconify-icon
+                      icon="mingcute:information-line"
+                      class="text-2xl"
+                    />
                     <p class="capitalize">{statusText.toLowerCase()}</p>
                   </div>
                 </div>
@@ -222,7 +225,10 @@
               <div class="grow">
                 <div class="alert alert-info shadow-lg p-3">
                   <div>
-                    <iconify-icon icon="mingcute:information-line" />
+                    <iconify-icon
+                      icon="mingcute:information-line"
+                      class="text-2xl"
+                    />
 
                     <p class="capitalize">{eventText}</p>
                   </div>
