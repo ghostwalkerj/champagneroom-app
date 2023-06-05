@@ -71,7 +71,7 @@
             {show.talentInfo.name}
           </div>
           <div>
-            <StarRating rating="{show.talentInfo.ratingAvg}" />
+            <StarRating rating={show.talentInfo.ratingAvg} />
           </div>
         </div>
       {/if}
@@ -150,9 +150,7 @@
     {#if options.showCopy}
       <div class="text-center">
         <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <div class="btn btn-primary" on:click="{copyShowUrl}">
-          Copy Show Link
-        </div>
+        <div class="btn btn-primary" on:click={copyShowUrl}>Copy Show Link</div>
       </div>
     {/if}
   </div>

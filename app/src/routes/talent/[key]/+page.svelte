@@ -1,6 +1,8 @@
 <script lang="ts">
   import { applyAction, enhance } from '$app/forms';
+  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
+  import ShowDetail from '$components/ShowDetail.svelte';
   import ProfilePhoto from '$components/forms/ProfilePhoto.svelte';
   import {
     PUBLIC_DEFAULT_PROFILE_IMAGE,
@@ -8,9 +10,6 @@
     PUBLIC_SHOW_PATH,
   } from '$env/static/public';
   import { durationFormatter } from '$lib/constants';
-  import { possessive } from 'i18n-possessive';
-  import { goto, invalidateAll } from '$app/navigation';
-  import ShowDetail from '$components/ShowDetail.svelte';
   import type { ShowMachineServiceType } from '$lib/machines/showMachine';
   import {
     ShowMachineEventString,
@@ -21,6 +20,7 @@
   import type { TalentDocumentType } from '$lib/models/talent';
   import { showEventStore, showStore, talentStore } from '$stores';
   import { createEventText } from '$util/eventUtil';
+  import { possessive } from 'i18n-possessive';
   import { onDestroy, onMount } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
   import urlJoin from 'url-join';

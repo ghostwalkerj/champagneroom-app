@@ -33,6 +33,7 @@ export const load: PageServerLoad = async ({ params }) => {
     talent: talent._id,
     showState: { current: true },
   }).exec();
+
   return {
     talent: JSON.parse(JSON.stringify(talent)),
     currentShow: currentShow

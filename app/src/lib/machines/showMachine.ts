@@ -11,7 +11,6 @@ import type { TransactionDocumentType } from '$lib/models/transaction';
 import type { ShowJobDataType } from '$lib/workers/showWorker';
 import type { Queue } from 'bullmq';
 import { nanoid } from 'nanoid';
-import type { exit } from 'process';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 import { raise } from 'xstate/lib/actions';
 

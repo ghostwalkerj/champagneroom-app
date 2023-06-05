@@ -35,13 +35,10 @@ export const load: PageServerLoad = async ({ params }) => {
     .lean()
     .exec();
 
-  if (talent.activeShows.length === 0) {
-    throw error(404, 'No active shows');
-  }
-
-  const showId = talent.activeShows[0];
-
-  const show = await Show.findById(showId)
+  const show = await Show.findOne({
+    talent: talent._id,
+    showState: { current: true },
+  })
     .orFail(() => {
       throw error(404, 'Show not found');
     })

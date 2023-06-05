@@ -65,7 +65,7 @@
     {#if talents && talents.length > 0}
       {#if talentData.length > 0}
         {#key talentData}
-          <Doughnut data="{data}" options="{options}" />
+          <Doughnut {data} {options} />
         {/key}
       {:else}
         <div class="text-center">

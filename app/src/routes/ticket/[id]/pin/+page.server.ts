@@ -17,7 +17,11 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
     throw error(404, 'Bad ticket id');
   }
 
-  const ticket = await Ticket.findById(ticketId).exec();
+  const ticket = await Ticket.findById(ticketId)
+    .orFail(() => {
+      throw error(404, 'Ticket not found');
+    })
+    .exec();
 
   if (pinHash && verifyPin(ticketId, ticket.pin, pinHash)) {
     throw redirect(303, redirectUrl);

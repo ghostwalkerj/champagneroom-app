@@ -49,7 +49,7 @@
     <!-- Page header -->
     <div class="pb-4 text-center w-full max-w-3xl">
       {#key show.showState}
-        <ShowDetail show="{show}" />
+        <ShowDetail {show} />
       {/key}
       {#if canBuyTicket}
         <input type="checkbox" id="buy-ticket" class="modal-toggle" />
@@ -65,11 +65,11 @@
               <div
                 class="bg-cover bg-no-repeat rounded-full h-48 w-48 row-span-2"
                 style="background-image: url('{profileImage}')"
-              ></div>
+              />
               <form
                 method="post"
                 action="?/reserve_ticket"
-                use:enhance="{onSubmit}"
+                use:enhance={onSubmit}
               >
                 <div class="max-w-xs w-full py-2 form-control">
                   <!-- svelte-ignore a11y-label-has-associated-control -->
@@ -81,7 +81,7 @@
                       name="name"
                       type="text"
                       class=" max-w-xs w-full py-2 pl-6 input input-bordered input-primary"
-                      bind:value="{displayName}"
+                      bind:value={displayName}
                     />
                     {#if form?.missingName}<div
                         class="shadow-lg alert alert-error"
@@ -100,7 +100,7 @@
                       name="pin"
                       type="text"
                       class="max-w-xs w-full py-2 pl-6 input input-bordered input-primary"
-                      value="{form?.pin ?? ''}"
+                      value={form?.pin ?? ''}
                       minlength="8"
                       maxlength="8"
                     />
@@ -125,13 +125,13 @@
                     <button
                       class="btn btn-secondary loading"
                       type="submit"
-                      disabled="{true}">Reserving</button
+                      disabled={true}>Reserving</button
                     >
                   {:else}
                     <button
                       class="btn btn-secondary"
                       type="submit"
-                      disabled="{loading}">Reserve</button
+                      disabled={loading}>Reserve</button
                     >
                   {/if}
                 </div>

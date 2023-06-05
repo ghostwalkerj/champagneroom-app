@@ -42,13 +42,13 @@
 
             <button
               class="btn btn-sm"
-              on:click="{async () => {
+              on:click={async () => {
                 //const talent = await generateTalent(agent);
                 //talents = [...talents, talent];
-              }}">Create Data</button
+              }}>Create Data</button
             >
           </div>
-          <div class="divider"></div>
+          <div class="divider" />
 
           <div
             class="mx-auto grid gap-2 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3"
@@ -58,7 +58,7 @@
             </div>
             <!-- Talent viewing and adding -->
             <div class="p-1">
-              <TalentForm form="{form}" agent="{agent}" />
+              <TalentForm {form} {agent} />
             </div>
             <!-- {#key talents}
               <div class="p-1 row-span-2">

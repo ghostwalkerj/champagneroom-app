@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type { TalentDocumentType } from '$lib/models/talent';
   import { currencyFormatter } from '$lib/constants';
+  import type { TalentDocumentType } from '$lib/models/talent';
   import SvelteTable from 'svelte-table';
   import TableCopyLink from './TableCopyLink.svelte';
   import TableRating from './TableRating.svelte';
@@ -125,8 +125,8 @@
   <div class="p-2">
     {#key talentRows}
       <SvelteTable
-        columns="{columns}"
-        rows="{talentRows}"
+        {columns}
+        rows={talentRows}
         classNameTable="w-full bg-white  rounded-xl"
         classNameTbody="divide-y border-3 rounded-xl"
         classNameCell="text-sm py-4 px-3 m-10 text-gray-500 whitespace-nowrap "
