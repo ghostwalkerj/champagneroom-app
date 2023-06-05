@@ -641,5 +641,13 @@
         "workspaceRoot": "/Users/joseph/Dev/pcall/app",
         "workspacePath": "src/lib/models/talentStats.ts",
         "id": "YU4pMN0hcP25THVs"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/stores.ts",
+        "parent_id": null,
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/stores.ts",
+        "id": "uTPt6SsvzNgLdXej"
     }
 ]

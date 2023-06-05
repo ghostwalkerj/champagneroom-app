@@ -121,7 +121,19 @@ export const getShowWorker = (
           break;
         }
         case ShowMachineEventString.SHOW_ENDED: {
+          stopShow(job, redisOptions, mongoDBEndpoint);
+          break;
+        }
+        case ShowMachineEventString.SHOW_STOPPED: {
+          stopShow(job, redisOptions, mongoDBEndpoint);
+          break;
+        }
+        case ShowMachineEventString.SHOW_FINALIZED: {
           finalizeShow(job, redisOptions, mongoDBEndpoint);
+          break;
+        }
+        case ShowMachineEventString.FEEDBACK_RECEIVED: {
+          feedbackReceived(job, mongoDBEndpoint);
           break;
         }
       }
@@ -143,7 +155,7 @@ const cancelShow = async (
   const tickets = await Ticket.find({
     show: show._id,
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    'ticketState.active': true,
+    'ticketState.activeState': true,
   });
   for (const ticket of tickets) {
     // send cancel show to all tickets
@@ -184,7 +196,7 @@ const refundShow = async (
     const tickets = await Ticket.find({
       show: show._id,
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      'ticketState.active': true,
+      'ticketState.activeState': true,
     });
     for (const ticket of tickets) {
       // send refunds
@@ -219,6 +231,55 @@ const refundShow = async (
   showService.stop();
 };
 
+// Stop show, allow grace period before ending
+const stopShow = async (
+  job: Job<ShowJobDataType, any, ShowMachineEventString>,
+  redisOptions: RedisOptionsType,
+  mongoDBEndpoint: string
+) => {
+  mongoose.connect(mongoDBEndpoint);
+  const show = (await Show.findById(job.data.showId)) as ShowType;
+  const showQueue = getQueue(EntityType.SHOW, redisOptions);
+  const showService = getShowMachineService(show, showQueue);
+
+  const showState = showService.getSnapshot();
+  // End show if grace period is over
+  if (showState.matches('stopped')) {
+    showService.send(ShowMachineEventString.SHOW_ENDED);
+  }
+  showService.stop();
+};
+
+// End show, alert ticket
+const endShow = async (
+  job: Job<ShowJobDataType, any, ShowMachineEventString>,
+  redisOptions: RedisOptionsType,
+  mongoDBEndpoint: string
+) => {
+  mongoose.connect(mongoDBEndpoint);
+  const show = (await Show.findById(job.data.showId)) as ShowType;
+  const showQueue = getQueue(EntityType.SHOW, redisOptions);
+  const showService = getShowMachineService(show, showQueue);
+
+  // Tell ticket holders the show is over folks
+  const showState = showService.getSnapshot();
+  if (showState.matches('inEscrow')) {
+    const tickets = await Ticket.find({
+      show: show._id,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      'ticketState.activeState': true,
+    });
+    for (const ticket of tickets) {
+      // send show is over
+      const ticketService = getTicketMachineService(ticket, show, showQueue);
+      ticketService.send(TicketMachineEventString.SHOW_ENDED);
+      ticketService.stop();
+    }
+  }
+  showService.stop();
+};
+
+// Calculate sales stats
 const finalizeShow = async (
   job: Job<ShowJobDataType, any, ShowMachineEventString>,
   redisOptions: RedisOptionsType,
@@ -243,4 +304,36 @@ const finalizeShow = async (
     });
   }
   showService.stop();
+};
+
+// Calculate feedback stats
+const feedbackReceived = async (
+  job: Job<ShowJobDataType, any, ShowMachineEventString>,
+  mongoDBEndpoint: string
+) => {
+  const connect = await mongoose.connect(mongoDBEndpoint);
+  const session = await connect.startSession();
+  await session.withTransaction(async () => {
+    const show = await Show.findById(job.data.showId);
+    const ticketFilter = {
+      show: job.data.showId,
+      'ticketState.feedback.rating': { $exists: true },
+    };
+    const ticketAggregate = Ticket.aggregate([
+      { $match: ticketFilter },
+      {
+        $group: {
+          _id: job.data.showId,
+          totalReviews: { $sum: 1 },
+          averageRating: { $avg: '$ticketState.feedback.rating' },
+        },
+      },
+    ]);
+    show?.$set({
+      'showState.feedback.averageRating': ticketAggregate['totalReviews'],
+      'showState.feedback.totalReviews': ticketAggregate['averageRating'],
+    });
+    show?.save();
+    console.log('show', show);
+  });
 };

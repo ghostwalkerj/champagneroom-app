@@ -130,6 +130,15 @@ const salesStatsSchema = new Schema({
       message: '{VALUE} is not an integer value',
     },
   },
+  totalRevenue: {
+    type: Number,
+    required: true,
+    default: 0,
+    validate: {
+      validator: Number.isInteger,
+      message: '{VALUE} is not an integer value',
+    },
+  },
 });
 
 const feedbackStatsSchema = new Schema({
@@ -153,7 +162,7 @@ const showStateSchema = new Schema(
       required: true,
       default: ShowStatus.CREATED,
     },
-    active: { type: Boolean, required: true, default: true },
+    activeState: { type: Boolean, required: true, default: true, index: true },
     salesStats: {
       type: salesStatsSchema,
       required: true,
@@ -170,6 +179,12 @@ const showStateSchema = new Schema(
     runtime: runtimeSchema,
     refunds: { type: [refundSchema], required: true, default: () => [] },
     sales: { type: [saleSchema], required: true, default: () => [] },
+    current: {
+      type: Boolean,
+      required: true,
+      default: true,
+      index: true,
+    },
   },
   { timestamps: true }
 );
@@ -178,7 +193,12 @@ const showSchema = new Schema(
   {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     _id: { type: Schema.Types.ObjectId, required: true, auto: true },
-    talent: { type: Schema.Types.ObjectId, ref: 'Talent', required: true },
+    talent: {
+      type: Schema.Types.ObjectId,
+      ref: 'Talent',
+      required: true,
+      index: true,
+    },
     agent: { type: Schema.Types.ObjectId, ref: 'Agent', required: true },
     roomId: {
       type: String,

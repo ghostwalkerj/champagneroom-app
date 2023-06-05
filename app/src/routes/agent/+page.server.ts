@@ -2,9 +2,9 @@ import { fail } from '@sveltejs/kit';
 import mongoose from 'mongoose';
 import type { Actions } from './$types';
 
+import { MONGO_DB_ENDPOINT } from '$env/static/private';
 import { Agent } from '$lib/models/agent';
 import { Talent } from '$lib/models/talent';
-import { MONGO_DB_ENDPOINT } from '$env/static/private';
 
 export const actions: Actions = {
   get_or_create_agent: async ({ request }) => {

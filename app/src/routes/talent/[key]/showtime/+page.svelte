@@ -17,7 +17,11 @@
   let jitsiToken = data.jitsiToken;
 
   let videoCallElement: HTMLDivElement;
-  let returnUrl = urlJoin($page.url.origin, PUBLIC_TALENT_PATH, talentObject.key);
+  let returnUrl = urlJoin(
+    $page.url.origin,
+    PUBLIC_TALENT_PATH,
+    talentObject.key
+  );
   let api: any;
   let participantName = '';
   let participantAvatarUrl = '';
@@ -38,6 +42,20 @@
     };
   }
 
+  const participantJoined = (event: any) => {
+    console.log('participantJoined', event);
+    const numberOfParticipants = api.getNumberOfParticipants();
+    console.log('numberOfParticipants', numberOfParticipants);
+    api.getRoomsInfo().then((rooms: any) => {
+      console.log('rooms', rooms);
+    });
+  };
+
+  const participantKnocked = (participant: any) => {
+    participantName = participant?.displayName;
+    console.log('participantName', participantName);
+  };
+
   onMount(() => {
     const options = {
       roomName: currentShow?.roomId,
@@ -57,25 +75,6 @@
       },
     };
 
-    const participantJoined = (event: any) => {
-      console.log('participantJoined', event);
-      const numberOfParticipants = api.getNumberOfParticipants();
-      console.log('numberOfParticipants', numberOfParticipants);
-      api.getRoomsInfo().then(rooms => {
-        console.log('rooms', rooms);
-      });
-    };
-
-    const participantKnocked = (participant: any) => {
-      participantName = participant?.displayName;
-      participantAvatarUrl = participant?.avatarURL;
-      console.log('participantName', participantName);
-    };
-
-    const answerKnock = (id: string, approved: boolean) => {
-      console.log('answerKnock', id, approved);
-    };
-
     // @ts-ignore
     api = new JitsiMeetExternalAPI(PUBLIC_JITSI_DOMAIN, options);
     api.executeCommand('avatarUrl', talentObject.profileImageUrl);
@@ -91,5 +90,5 @@
 <div
   class="rounded-xl h-[calc(100vh-12px)] w-[calc(100vw-8px)] fixed top-0.5 m-1 overflow-hidden"
 >
-  <div bind:this="{videoCallElement}" class="h-full"></div>
+  <div bind:this={videoCallElement} class="h-full" />
 </div>

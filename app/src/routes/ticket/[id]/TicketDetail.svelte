@@ -1,30 +1,23 @@
 <script lang="ts">
-  import {
-    PUBLIC_DEFAULT_PROFILE_IMAGE,
-    PUBLIC_PROFILE_IMAGE_PATH,
-  } from '$env/static/public';
+  import { PUBLIC_PROFILE_IMAGE_PATH } from '$env/static/public';
   import { currencyFormatter, durationFormatter } from '$lib/constants';
   import type { ShowDocumentType } from '$lib/models/show';
-  import type { TicketDocType } from '$lib/models/ticket';
+  import type { TicketDocumentType } from '$lib/models/ticket';
   import getProfileImage from '$util/profilePhoto';
   export let show: ShowDocumentType;
-  export let ticket: TicketDocType;
+  export let ticket: TicketDocumentType;
 
-  $: profileImage = ticket.ticketState.reservation
-    ? getProfileImage(
-        ticket.ticketState.reservation.name,
-        PUBLIC_PROFILE_IMAGE_PATH
-      )
-    : PUBLIC_DEFAULT_PROFILE_IMAGE;
+  $: profileImage = getProfileImage(
+    ticket.customerName,
+    PUBLIC_PROFILE_IMAGE_PATH
+  );
   $: ticketStatus = ticket
-    ? (ticket.ticketState.totalPaid >= ticket.price
+    ? ticket.ticketState.totalPaid >= ticket.price
       ? 'Paid' + ' ' + ticket.ticketState.status
-      : ticket.ticketState.status)
+      : ticket.ticketState.status
     : '';
   $: showStatus = show.showState.status;
-  $: customerName = ticket.ticketState.reservation
-    ? ticket.ticketState.reservation.name
-    : '';
+  $: customerName = ticket.customerName;
   $: talentName = show.talentInfo.name;
   $: showName = show.name;
   $: showDuration = durationFormatter(show.duration);
@@ -43,7 +36,7 @@
           <div
             class="bg-cover bg-no-repeat rounded-full h-24 w-24 row-span-2"
             style="background-image: url('{profileImage}')"
-          ></div>
+          />
           <div class="pt-2">
             {customerName}
           </div>
@@ -64,7 +57,7 @@
         <div
           class="relative bg-cover bg-no-repeat bg-center rounded-xl h-32 w-48"
           style="background-image: url('{showCoverImageUrl}')"
-        ></div>
+        />
       </div>
       <div class="w-full flex">
         <div>Payment Address: {ticketPaymentAddress}</div>

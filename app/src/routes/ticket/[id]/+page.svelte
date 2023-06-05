@@ -6,7 +6,10 @@
     createTicketMachineService,
     type TicketMachineServiceType,
   } from '$lib/machines/ticketMachine';
-  import { TicketDisputeReason, type TicketDocumentType } from '$lib/models/ticket';
+  import {
+    TicketDisputeReason,
+    type TicketDocumentType,
+  } from '$lib/models/ticket';
   import urlJoin from 'url-join';
 
   import { PUBLIC_SHOWTIME_PATH } from '$env/static/public';
@@ -55,7 +58,6 @@
       type: 'DISPUTE INITIATED',
       dispute: undefined,
     });
-
     isWaitingForShow = state.matches('reserved.waiting4Show') && !canWatchShow;
     isTicketDone = state.done ?? false;
   };
@@ -122,7 +124,7 @@
       <!-- Page header -->
       <div class="pb-4 text-center relative">
         {#key ticket.ticketState || show.showState}
-          <TicketDetail ticket="{ticket}" show="{show}" />
+          <TicketDetail {ticket} {show} />
         {/key}
         {#if isWaitingForShow}
           <div
@@ -139,7 +141,7 @@
             {#if isShowPaymentLoading}
               <div class="p-4">
                 <div class="w-full flex justify-center">
-                  <button class="btn btn-secondary loading" disabled="{true}"
+                  <button class="btn btn-secondary loading" disabled={true}
                     >Sending Payment</button
                   >
                 </div>
@@ -149,13 +151,13 @@
                 method="post"
                 action="?/buy_ticket"
                 name="buyTicket"
-                use:enhance="{({ form }) => onSubmit(form)}"
+                use:enhance={({ form }) => onSubmit(form)}
               >
                 <div class="w-full flex justify-center">
                   <button
                     class="btn btn-secondary"
                     type="submit"
-                    disabled="{loading}">Send Payment</button
+                    disabled={loading}>Send Payment</button
                   >
                 </div>
               </form>
@@ -166,10 +168,10 @@
             <div class="w-full flex justify-center">
               <button
                 class="btn btn-secondary"
-                disabled="{loading}"
-                on:click="{() => {
+                disabled={loading}
+                on:click={() => {
                   goto(showTimePath);
-                }}">Go to the Show</button
+                }}>Go to the Show</button
               >
             </div>
           </div>
@@ -178,7 +180,7 @@
           {#if isShowCancelLoading}
             <div class="p-4">
               <div class="w-full flex justify-center">
-                <button class="btn btn-secondary loading" disabled="{true}"
+                <button class="btn btn-secondary loading" disabled={true}
                   >Cancelling</button
                 >
               </div>
@@ -189,13 +191,13 @@
                 method="post"
                 action="?/cancel_ticket"
                 name="cancelTicket"
-                use:enhance="{({ form }) => onSubmit(form)}"
+                use:enhance={({ form }) => onSubmit(form)}
               >
                 <div class="w-full flex justify-center">
                   <button
                     class="btn btn-secondary"
                     type="submit"
-                    disabled="{loading}">Cancel Ticket</button
+                    disabled={loading}>Cancel Ticket</button
                   >
                 </div>
               </form>
@@ -217,7 +219,7 @@
                 <form
                   method="post"
                   action="?/leave_feedback"
-                  use:enhance="{({ form }) => onSubmit(form)}"
+                  use:enhance={({ form }) => onSubmit(form)}
                 >
                   <div class="max-w-xs w-full py-2 form-control">
                     <!-- svelte-ignore a11y-label-has-associated-control -->
@@ -278,7 +280,8 @@
                       <textarea
                         name="review"
                         class="textarea textarea-primary"
-                        value="{form?.review ?? ''}"></textarea>
+                        value={form?.review ?? ''}
+                      />
                     </div>
                   </div>
 
@@ -287,13 +290,13 @@
                       <button
                         class="btn btn-secondary loading"
                         type="submit"
-                        disabled="{true}">Submitting</button
+                        disabled={true}>Submitting</button
                       >
                     {:else}
                       <button
                         class="btn btn-secondary"
                         type="submit"
-                        disabled="{loading}">Submit</button
+                        disabled={loading}>Submit</button
                       >
                     {/if}
                   </div>
@@ -330,7 +333,7 @@
                 <form
                   method="post"
                   action="?/initiate_dispute"
-                  use:enhance="{({ form }) => onSubmit(form)}"
+                  use:enhance={({ form }) => onSubmit(form)}
                 >
                   <div class="max-w-xs w-full py-2 form-control">
                     <!-- svelte-ignore a11y-label-has-associated-control -->
@@ -362,7 +365,8 @@
                       <textarea
                         name="explanation"
                         class="textarea textarea-primary"
-                        value="{form?.explanation ?? ''}"></textarea>
+                        value={form?.explanation ?? ''}
+                      />
                       {#if form?.missingExplanation}<div
                           class="shadow-lg alert alert-error"
                         >
@@ -376,13 +380,13 @@
                       <button
                         class="btn btn-secondary loading"
                         type="submit"
-                        disabled="{true}">Submitting</button
+                        disabled={true}>Submitting</button
                       >
                     {:else}
                       <button
                         class="btn btn-secondary"
                         type="submit"
-                        disabled="{loading}">Submit</button
+                        disabled={loading}>Submit</button
                       >
                     {/if}
                   </div>

@@ -3,7 +3,6 @@ import { Talent } from '$lib/models/talent';
 import type { RequestHandler } from '@sveltejs/kit';
 import mongoose from 'mongoose';
 
-/** @type {import('./$types').PageServerLoad} */
 export const GET: RequestHandler<{ key: string }> = async ({ params, url }) => {
   const talentKey = params.key;
   if (talentKey === null) {

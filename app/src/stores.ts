@@ -3,10 +3,10 @@ import to from 'await-to-js';
 import { derived, writable } from 'svelte/store';
 import urlJoin from 'url-join';
 import type { AgentDocumentType } from './lib/models/agent';
-import type { ShowDocumentType as ShowDocumentType } from './lib/models/show';
-import type { ShowEventDocumentType as ShowEventDocumentType } from './lib/models/showEvent';
-import type { TalentDocumentType as TalentDocumentType } from './lib/models/talent';
-import type { TicketDocumentType as TicketDocumentType } from './lib/models/ticket';
+import type { ShowDocumentType } from './lib/models/show';
+import type { ShowEventDocumentType } from './lib/models/showEvent';
+import type { TalentDocumentType } from './lib/models/talent';
+import type { TicketDocumentType } from './lib/models/ticket';
 
 export const browserType = writable();
 
@@ -85,7 +85,7 @@ export const talentStore = (talent: TalentDocumentType) => {
 };
 
 export const showStore = (show: ShowDocumentType) => {
-  const showCancel = (show: ShowDocumentType) => !show.showState.active;
+  const showCancel = (show: ShowDocumentType) => !show.showState.activeState;
 
   return abstractStore({
     doc: show,
@@ -95,7 +95,7 @@ export const showStore = (show: ShowDocumentType) => {
 };
 
 export const showEventStore = (show: ShowDocumentType) => {
-  const showCancel = (show: ShowDocumentType) => !show.showState.active;
+  const showCancel = (show: ShowDocumentType) => !show.showState.activeState;
   const _showStore = writable<ShowDocumentType>(show);
   const _showEventStore = derived<typeof _showStore, ShowEventDocumentType>(
     _showStore,
@@ -126,7 +126,7 @@ export const showEventStore = (show: ShowDocumentType) => {
 
 export const ticketStore = (ticket: TicketDocumentType) => {
   const ticketCancel = (ticket: TicketDocumentType) =>
-    !ticket.ticketState.active;
+    !ticket.ticketState.activeState;
   return abstractStore({
     doc: ticket,
     changesetPath: urlJoin(

@@ -1,74 +1,67 @@
 <script lang="ts">
-  import {
-    PUBLIC_DEFAULT_PROFILE_IMAGE,
-    PUBLIC_PROFILE_IMAGE_PATH,
-  } from '$env/static/public';
-  import type { ShowDocType } from '$lib/ORM/models/show';
-  import type { TicketDocType } from '$lib/ORM/models/ticket';
+  import { PUBLIC_PROFILE_IMAGE_PATH } from '$env/static/public';
   import { currencyFormatter, durationFormatter } from '$lib/constants';
+  import type { ShowDocumentType } from '$lib/models/show';
+  import type { TicketDocumentType } from '$lib/models/ticket';
   import getProfileImage from '$util/profilePhoto';
-  export let show: ShowDocType | null;
-  export let ticket: TicketDocType | null;
+  export let show: ShowDocumentType;
+  export let ticket: TicketDocumentType;
 
-  $: profileImage = ticket
-    ? getProfileImage(
-        ticket.ticketState.reservation.name,
-        PUBLIC_PROFILE_IMAGE_PATH
-      )
-    : PUBLIC_DEFAULT_PROFILE_IMAGE;
+  $: profileImage = getProfileImage(
+    ticket.customerName,
+    PUBLIC_PROFILE_IMAGE_PATH
+  );
   $: ticketStatus = ticket
-    ? (ticket.ticketState.totalPaid >= ticket.ticketState.price
+    ? ticket.ticketState.totalPaid >= ticket.price
       ? 'Paid' + ' ' + ticket.ticketState.status
-      : ticket.ticketState.status)
+      : ticket.ticketState.status
     : '';
   $: showStatus = show ? show.showState.status : '';
 </script>
 
-{#if show && ticket}
-  <div class="flex justify-center">
-    <div
-      class="flex flex-col w-full p-4 max-w-2xl gap-4 rounded-xl bg-base-200 overflow-auto"
-    >
-      <div class="grid grid-flow-row gap-4">
-        <div class="flex gap-4">
-          <div class="">
-            <div
-              class="bg-cover bg-no-repeat rounded-full h-24 w-24 row-span-2"
-              style="background-image: url('{profileImage}')"
-            ></div>
-            <div class="pt-2">
-              {ticket.ticketState.reservation.name}
-            </div>
-          </div>
-          <div class="flex flex-col">
-            <div>
-              {show.talentInfo.name}
-            </div>
-            <div>{show.name}</div>
-
-            <div class="">
-              {durationFormatter(show.duration)}
-            </div>
-            <div class="">
-              {currencyFormatter.format(show.price)}
-            </div>
-          </div>
+<div class="flex justify-center">
+  <div
+    class="flex flex-col w-full p-4 max-w-2xl gap-4 rounded-xl bg-base-200 overflow-auto"
+  >
+    <div class="grid grid-flow-row gap-4">
+      <div class="flex gap-4">
+        <div class="">
           <div
-            class="relative bg-cover bg-no-repeat bg-center rounded-xl h-32 w-48"
-            style="background-image: url('{show.talentInfo.profileImageUrl}')"
-          ></div>
+            class="bg-cover bg-no-repeat rounded-full h-24 w-24 row-span-2"
+            style="background-image: url('{profileImage}')"
+          />
+          <div class="pt-2">
+            {ticket.customerName}
+          </div>
         </div>
-        <div class="w-full flex">
-          <div>Payment Address: {ticket.paymentAddress}</div>
-        </div>
-        <div class="w-full flex">
-          <div>Ticket Status: {ticketStatus}</div>
-        </div>
+        <div class="flex flex-col">
+          <div>
+            {show.talentInfo.name}
+          </div>
+          <div>{show.name}</div>
 
-        <div class="w-full flex">
-          <div>Show Status: {showStatus}</div>
+          <div class="">
+            {durationFormatter(show.duration)}
+          </div>
+          <div class="">
+            {currencyFormatter.format(show.price)}
+          </div>
         </div>
+        <div
+          class="relative bg-cover bg-no-repeat bg-center rounded-xl h-32 w-48"
+          style="background-image: url('{show.talentInfo.profileImageUrl}')"
+        />
+      </div>
+      <div class="w-full flex">
+        <div>Payment Address: {ticket.paymentAddress}</div>
+      </div>
+      <div class="w-full flex">
+        <div>Ticket Status: {ticketStatus}</div>
+      </div>
+
+      <div class="w-full flex">
+        <div>Show Status: {showStatus}</div>
       </div>
     </div>
   </div>
-{/if}
+</div>

@@ -223,10 +223,10 @@
     minimatch "^3.1.2"
     strip-json-comments "^3.1.1"
 
-"@eslint/js@8.41.0":
-  version "8.41.0"
-  resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.41.0.tgz#080321c3b68253522f7646b55b577dd99d2950b3"
-  integrity sha512-LxcyMGxwmTh2lY9FwHPGWOHmYFCZvbrFCBZL4FzSSsxsRPuhrYUg/49/0KDfW8tnIEaEHtfmn6+NPN+1DqaNmA==
+"@eslint/js@8.42.0":
+  version "8.42.0"
+  resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.42.0.tgz#484a1d638de2911e6f5a30c12f49c7e4a3270fb6"
+  integrity sha512-6SWlXpWU5AvId8Ac7zjzmIOqMOba/JWY8XZ4A7q7Gn1Vlfg/SFFIlrtHXt9nPn4op9ZPAkl91Jao+QQv3r/ukw==
 
 "@ethereumjs/common@2.5.0":
   version "2.5.0"
@@ -429,7 +429,7 @@
     "@ethersproject/properties" "^5.7.0"
     "@ethersproject/strings" "^5.7.0"
 
-"@humanwhocodes/config-array@^0.11.8":
+"@humanwhocodes/config-array@^0.11.10":
   version "0.11.10"
   resolved "https://registry.yarnpkg.com/@humanwhocodes/config-array/-/config-array-0.11.10.tgz#5a3ffe32cc9306365fb3fd572596cd602d5e12d2"
   integrity sha512-KVVjQmNUepDVGXNuoRRdmmEjruj0KfiGSbS8LVc12LMsWDQzRXJ0qdhN8L8uUigKpfEHRhlaQFY0ib1tnUbNeQ==
@@ -2531,9 +2531,9 @@ domain-browser@^4.22.0:
   integrity sha512-IGBwjF7tNk3cwypFNH/7bfzBcgSCbaMOD3GsaY1AU/JRrnHnYgEM0+9kQt52iZxjNsjBtJYtao146V+f8jFZNw==
 
 dotenv@^16.0.3:
-  version "16.1.3"
-  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-16.1.3.tgz#0c67e90d0ddb48d08c570888f709b41844928210"
-  integrity sha512-FYssxsmCTtKL72fGBSvb1K9dRz0/VZeWqFme/vSb7r7323x4CRaHu4LvQ5JG3+s6yt2YPbBrkpiEODktfyjI9A==
+  version "16.1.4"
+  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-16.1.4.tgz#67ac1a10cd9c25f5ba604e4e08bc77c0ebe0ca8c"
+  integrity sha512-m55RtE8AsPeJBpOIFKihEmqUcoVncQIwo7x9U8ZwLEZw9ZpXboz2c+rvog+jUaJvVrZ5kBOeYQBX5+8Aa/OZQw==
 
 ecc-jsbn@~0.1.1:
   version "0.1.2"
@@ -2766,15 +2766,15 @@ eslint-visitor-keys@^3.0.0, eslint-visitor-keys@^3.3.0, eslint-visitor-keys@^3.4
   integrity sha512-pZnmmLwYzf+kWaM/Qgrvpen51upAktaaiI01nsJD/Yr3lMOdNtq0cxkrrg16w64VtisN6okbs7Q8AfGqj4c9fA==
 
 eslint@^8.41.0:
-  version "8.41.0"
-  resolved "https://registry.yarnpkg.com/eslint/-/eslint-8.41.0.tgz#3062ca73363b4714b16dbc1e60f035e6134b6f1c"
-  integrity sha512-WQDQpzGBOP5IrXPo4Hc0814r4/v2rrIsB0rhT7jtunIalgg6gYXWhRMOejVO8yH21T/FGaxjmFjBMNqcIlmH1Q==
+  version "8.42.0"
+  resolved "https://registry.yarnpkg.com/eslint/-/eslint-8.42.0.tgz#7bebdc3a55f9ed7167251fe7259f75219cade291"
+  integrity sha512-ulg9Ms6E1WPf67PHaEY4/6E2tEn5/f7FXGzr3t9cBMugOmf1INYvuUwwh1aXQN4MfJ6a5K2iNwP3w4AColvI9A==
   dependencies:
     "@eslint-community/eslint-utils" "^4.2.0"
     "@eslint-community/regexpp" "^4.4.0"
     "@eslint/eslintrc" "^2.0.3"
-    "@eslint/js" "8.41.0"
-    "@humanwhocodes/config-array" "^0.11.8"
+    "@eslint/js" "8.42.0"
+    "@humanwhocodes/config-array" "^0.11.10"
     "@humanwhocodes/module-importer" "^1.0.1"
     "@nodelib/fs.walk" "^1.2.8"
     ajv "^6.10.0"
@@ -2891,6 +2891,13 @@ eth-lib@^0.1.26:
     servify "^0.1.12"
     ws "^3.0.0"
     xhr-request-promise "^0.1.2"
+
+ethereum-blockies-base64@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/ethereum-blockies-base64/-/ethereum-blockies-base64-1.0.2.tgz#4aebca52142bf4d16a3144e6e2b59303e39ed2b3"
+  integrity sha512-Vg2HTm7slcWNKaRhCUl/L3b4KrB8ohQXdd5Pu3OI897EcR6tVRvUqdTwAyx+dnmoDzj8e2bwBLDQ50ByFmcz6w==
+  dependencies:
+    pnglib "0.0.1"
 
 ethereum-bloom-filters@^1.0.6:
   version "1.0.10"
@@ -5437,6 +5444,11 @@ pluralize@^8.0.0:
   resolved "https://registry.yarnpkg.com/pluralize/-/pluralize-8.0.0.tgz#1a6fa16a38d12a1901e0320fa017051c539ce3b1"
   integrity sha512-Nc3IT5yHzflTfbjgqWcCPpo7DaKy4FnpB0l/zCAW0Tc7jxAiuqSxHasntB3D7887LSrA93kDJ9IXovxJYxyLCA==
 
+pnglib@0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/pnglib/-/pnglib-0.0.1.tgz#f9ab6f9c688f4a9d579ad8be28878a716e30c096"
+  integrity sha512-95ChzOoYLOPIyVmL+Y6X+abKGXUJlvOVLkB1QQkyXl7Uczc6FElUy/x01NS7r2GX6GRezloO/ecCX9h4U9KadA==
+
 postcss-import@^15.1.0:
   version "15.1.0"
   resolved "https://registry.yarnpkg.com/postcss-import/-/postcss-import-15.1.0.tgz#41c64ed8cc0e23735a9698b3249ffdbf704adc70"
@@ -6493,10 +6505,12 @@ svelte-table@^0.5.11:
   integrity sha512-hgmZaOAI7+iNXJgR9fEJ4umCeY5a9fIOzkYPexqcHYbw3voQquM+SfFd4lhmJOj5O5ui8PiB8JQnnDLBaKrAtw==
 
 svelte-web3@^4.1.1:
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/svelte-web3/-/svelte-web3-4.1.1.tgz#8effc3eee52523acb614d3c0d7cc2c8328334285"
-  integrity sha512-mSF11WQnmDdSgUzk+6sZd6dhfo/qU6BqBqcvRrF3kgivXvfYFT4OU1wwZafdLIfGuDGluaSbkcoZiyHTMrQrpw==
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/svelte-web3/-/svelte-web3-4.2.1.tgz#1e9bb2a730d23892c5c73e1a543f572725a7bcb9"
+  integrity sha512-dwbbpswYlQqC8npnToD7qpeN2mLxHeeuOHDvoY824Ha8D5xU7yKsGP2TgAfYZEZ9LzTpo82NRrPHiaw7a0mrAw==
   dependencies:
+    "@metamask/jazzicon" "^2.0.0"
+    ethereum-blockies-base64 "^1.0.2"
     svelte "^3.0.0"
     svelte-proxied-store "^2.0.3"
 

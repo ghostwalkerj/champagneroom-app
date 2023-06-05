@@ -51,8 +51,8 @@ app.use('/admin/queues', serverAdapter.getRouter());
 app.use(cors(corsOptions), handler);
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
-  console.log('pCall server running on: ', port);
-  console.log('Workers running: ', startWorker);
-  console.log('Build number: ', buildNumber);
-  console.log('Build time: ', buildTime);
+  console.log('pCall server running on:', port);
+  console.log('Workers running:', startWorker);
+  console.log('Build number:', buildNumber);
+  console.log('Build time:', buildTime);
 });

@@ -7,16 +7,15 @@
     PUBLIC_SHOWTIME_PATH,
     PUBLIC_SHOW_PATH,
   } from '$env/static/public';
-
   import { durationFormatter } from '$lib/constants';
   import { possessive } from 'i18n-possessive';
-
   import { goto, invalidateAll } from '$app/navigation';
   import ShowDetail from '$components/ShowDetail.svelte';
   import type { ShowMachineServiceType } from '$lib/machines/showMachine';
-  import { ShowMachineEventString } from '$lib/machines/showMachine';
-  import { createShowMachineService } from '$lib/machines/showMachine';
-
+  import {
+    ShowMachineEventString,
+    createShowMachineService,
+  } from '$lib/machines/showMachine';
   import type { ShowDocumentType } from '$lib/models/show';
   import type { ShowEventDocumentType } from '$lib/models/showEvent';
   import type { TalentDocumentType } from '$lib/models/talent';
@@ -25,26 +24,28 @@
   import { onDestroy, onMount } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
   import urlJoin from 'url-join';
-  import type { PageData } from './$types';
+  import type { ActionData, PageData } from './$types';
   import TalentWallet from './TalentWallet.svelte';
 
-  export let form: import('./$types').ActionData;
+  export let form: ActionData;
   export let data: PageData;
 
   const showTimePath = urlJoin($page.url.href, PUBLIC_SHOWTIME_PATH);
 
   let talent = data.talent as TalentDocumentType;
-  let activeShow = data.activeShow as ShowDocumentType | undefined;
+  let currentShow = data.currentShow as ShowDocumentType | undefined;
 
   let showName = talent ? possessive(talent.name, 'en') + ' Show' : 'Show';
 
   $: showDuration = 60;
   $: talentName = talent ? talent.name : 'Talent';
-  $: statusText = activeShow ? activeShow.showState.status : 'No Current Show';
+  $: statusText = currentShow
+    ? currentShow.showState.status
+    : 'No Current Show';
   $: eventText = 'No Events';
 
-  $: canCreateShow = activeShow === undefined;
-  $: canCancelShow = !canCreateShow;
+  $: canCreateShow = false;
+  $: canCancelShow = false;
   $: canStartShow = false;
   $: waiting4Refunds = false;
   $: loading = false;
@@ -61,37 +62,39 @@
     canStartShow = false;
     statusText = 'No Current Show';
     eventText = 'No Events';
-    activeShow = undefined;
+    currentShow = undefined;
     showStopped = false;
     showEventUnSub?.();
     showUnSub?.();
   };
 
   const useNewShow = (show: ShowDocumentType) => {
-    if (show) {
-      activeShow = show;
+    if (show && show.showState.current) {
+      currentShow = show;
       canCreateShow = false;
       canCancelShow = true;
       statusText = show.showState.status;
       showEventUnSub?.();
       showUnSub?.();
       showUnSub = showStore(show).subscribe(_show => {
-        if (_show) {
-          activeShow = _show;
+        if (_show && _show.showState.current) {
+          currentShow = _show;
           showMachineService?.stop();
           showMachineService = createShowMachineService({
             showDocument: _show,
           });
           useShowMachine(showMachineService);
+          showEventUnSub = showEventStore(show).subscribe(
+            (_showEvent: ShowEventDocumentType) => {
+              if (_showEvent) {
+                eventText = createEventText(_showEvent);
+              }
+            }
+          );
+        } else {
+          noCurrentShow();
         }
       });
-      showEventUnSub = showEventStore(show).subscribe(
-        (_showEvent: ShowEventDocumentType) => {
-          if (_showEvent) {
-            eventText = createEventText(_showEvent);
-          }
-        }
-      );
     }
   };
 
@@ -102,15 +105,29 @@
       type: 'CANCELLATION INITIATED',
       cancel: undefined,
     });
-    canCreateShow = state.hasTag('canCreateShow');
     canStartShow = state.can(ShowMachineEventString.SHOW_STARTED);
-
     waiting4Refunds = state.matches('initiatedCancellation.waiting2Refund');
     statusText = state.context.showState.status;
     if (state.done) {
       showMachineService.stop();
     }
   };
+
+  onMount(() => {
+    talentUnSub = talentStore(talent).subscribe(_talent => {
+      if (_talent) {
+        talent = _talent;
+        talentName = _talent.name;
+      }
+    });
+    currentShow ? useNewShow(currentShow) : noCurrentShow();
+  });
+
+  onDestroy(() => {
+    talentUnSub?.();
+    showEventUnSub?.();
+    showUnSub?.();
+  });
 
   const updateProfileImage = async (url: string) => {
     if (url && talent) {
@@ -124,29 +141,6 @@
     }
   };
 
-  onMount(() => {
-    talentUnSub = talentStore(talent).subscribe(_talent => {
-      if (_talent) {
-        if (_talent.activeShows.length === 0) {
-          noCurrentShow();
-        } else if (
-          activeShow?._id.toString() !== _talent.activeShows[0]?.toString()
-        ) {
-          invalidateAll();
-        }
-        talent = _talent;
-        talentName = _talent.name;
-      }
-    });
-    activeShow && useNewShow(activeShow);
-  });
-
-  onDestroy(() => {
-    talentUnSub?.();
-    showEventUnSub?.();
-    showUnSub?.();
-  });
-
   const onSubmit = ({}) => {
     loading = true;
     return async ({ result }) => {
@@ -157,8 +151,8 @@
           result.data.show!._id.toString()
         );
         navigator.clipboard.writeText(showUrl);
-        activeShow = result.data.show as ShowDocumentType;
-        useNewShow(activeShow);
+        currentShow = result.data.show as ShowDocumentType;
+        useNewShow(currentShow);
       } else if (result.data.showCancelled) {
         noCurrentShow();
         statusText = 'Cancelled';
@@ -196,7 +190,7 @@
             disabled={!canStartShow}>Restart Show</button
           >
           <form method="post" action="?/end_show" use:enhance={onSubmit}>
-            <input type="hidden" name="showId" value={activeShow?._id} />
+            <input type="hidden" name="showId" value={currentShow?._id} />
             <button class="btn">End Show</button>
           </form>
         </div>
@@ -217,18 +211,7 @@
               <div class="grow">
                 <div class="alert alert-info shadow-lg p-3">
                   <div>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      class="stroke-current flex-shrink-0 w-6 h-6"
-                      ><path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      /></svg
-                    >
+                    <iconify-icon icon="mingcute:information-line" />
                     <p class="capitalize">{statusText.toLowerCase()}</p>
                   </div>
                 </div>
@@ -236,18 +219,8 @@
               <div class="grow">
                 <div class="alert alert-info shadow-lg p-3">
                   <div>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      class="stroke-current flex-shrink-0 w-6 h-6"
-                      ><path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      /></svg
-                    >
+                    <iconify-icon icon="mingcute:information-line" />
+
                     <p class="capitalize">{eventText}</p>
                   </div>
                 </div>
@@ -383,10 +356,10 @@
         </div>
       {/if}
       <div>
-        {#if activeShow}
-          {#key activeShow.showState}
+        {#if currentShow}
+          {#key currentShow.showState}
             <ShowDetail
-              show={activeShow}
+              show={currentShow}
               options={{
                 showCopy: true,
                 showSalesStats: true,
@@ -401,7 +374,7 @@
         {#if canCancelShow}
           <!-- Link Form-->
           <form method="post" action="?/cancel_show" use:enhance={onSubmit}>
-            <input type="hidden" name="showId" value={activeShow?._id} />
+            <input type="hidden" name="showId" value={currentShow?._id} />
             <div class="bg-primary text-primary-content card">
               <div class="text-center card-body items-center p-3">
                 <div class="text-2xl card-title">Cancel Your Show</div>
@@ -427,7 +400,7 @@
         {#if waiting4Refunds}
           <!-- Link Form-->
           <form method="post" action="?/refund_tickets" use:enhance={onSubmit}>
-            <input type="hidden" name="showId" value={activeShow?._id} />
+            <input type="hidden" name="showId" value={currentShow?._id} />
 
             <div class="bg-primary text-primary-content card">
               <div class="text-center card-body items-center p-3">

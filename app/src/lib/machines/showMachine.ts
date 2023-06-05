@@ -11,6 +11,7 @@ import type { TransactionDocumentType } from '$lib/models/transaction';
 import type { ShowJobDataType } from '$lib/workers/showWorker';
 import type { Queue } from 'bullmq';
 import { nanoid } from 'nanoid';
+import type { exit } from 'process';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 import { raise } from 'xstate/lib/actions';
 
@@ -182,12 +183,10 @@ export const createShowMachine = ({
         },
         cancelled: {
           type: 'final',
-          tags: ['canCreateShow'],
           entry: ['deactivateShow'],
         },
         inEscrow: {
-          tags: ['canCreateShow'],
-          entry: ['enterEscrow'],
+          entry: ['makeShowNotCurrent', 'enterEscrow'],
           exit: ['exitEscrow'],
           on: {
             'SHOW FINALIZED': {
@@ -215,7 +214,6 @@ export const createShowMachine = ({
         },
         finalized: {
           type: 'final',
-          tags: ['canCreateShow'],
           entry: ['deactivateShow'],
         },
         boxOfficeOpen: {
@@ -264,7 +262,7 @@ export const createShowMachine = ({
         },
         boxOfficeClosed: {
           on: {
-            'SHOW STOPPED': {
+            'SHOW STARTED': {
               cond: 'canStartShow',
               target: 'started',
               actions: ['startShow'],
@@ -320,6 +318,7 @@ export const createShowMachine = ({
             'SHOW STARTED': {
               target: 'started',
               actions: ['startShow'],
+              cond: 'canStartShow',
             },
             'SHOW ENDED': {
               target: 'inEscrow',
@@ -398,7 +397,10 @@ export const createShowMachine = ({
           };
         }),
 
-        endShow: assign(context => {
+        endShow: assign((context, event) => {
+          showMachineOptions?.jobQueue?.add(event.type, {
+            showId: context.showDocument._id.toString(),
+          });
           return {
             showState: {
               ...context.showState,
@@ -471,7 +473,9 @@ export const createShowMachine = ({
         refundTicket: assign((context, event) => {
           const st = context.showState;
           const ticketsRefunded = st.salesStats.ticketsRefunded + 1;
+          const ticketsSold = st.salesStats.ticketsSold - 1;
           const totalRefunded = st.salesStats.totalRefunded + event.amount;
+          const totalRevenue = st.salesStats.totalRevenue - event.amount;
 
           const refund = {
             refundedAt: event.refundedAt || new Date(),
@@ -488,6 +492,8 @@ export const createShowMachine = ({
                 ...st.salesStats,
                 ticketsRefunded,
                 totalRefunded,
+                ticketsSold,
+                totalRevenue,
               },
             },
           };
@@ -530,7 +536,17 @@ export const createShowMachine = ({
           return {
             showState: {
               ...context.showState,
-              active: false,
+              activeState: false,
+              current: false,
+            },
+          };
+        }),
+
+        makeShowNotCurrent: assign(context => {
+          return {
+            showState: {
+              ...context.showState,
+              current: false,
             },
           };
         }),
@@ -568,7 +584,9 @@ export const createShowMachine = ({
         sellTicket: assign((context, event) => {
           const st = context.showState;
           const ticketsSold = st.salesStats.ticketsSold + 1;
+          const ticketsReserved = st.salesStats.ticketsReserved - 1;
           const totalSales = st.salesStats.totalSales + event.amount;
+          const totalRevenue = st.salesStats.totalRevenue + event.amount;
 
           const sale = {
             soldAt: event.soldAt || new Date(),
@@ -585,6 +603,8 @@ export const createShowMachine = ({
                 ...st.salesStats,
                 ticketsSold,
                 totalSales,
+                ticketsReserved,
+                totalRevenue,
               },
             },
           };
@@ -643,25 +663,17 @@ export const createShowMachine = ({
               Date.now()
             );
           }
-          return (
-            context.showState.salesStats.ticketsSold -
-              context.showState.salesStats.ticketsAvailable >
-            0
-          );
+          return context.showState.salesStats.ticketsSold > 0;
         },
         fullyRefunded: (context, event) => {
           const refunded = event.type === 'TICKET REFUNDED' ? 1 : 0;
-          return (
-            context.showState.salesStats.ticketsSold ===
-            context.showState.salesStats.ticketsRefunded + refunded
-          );
+          return context.showState.salesStats.ticketsSold - refunded === 0;
         },
         fullyReviewed: (context, event) => {
           const feedback = event.type === 'FEEDBACK RECEIVED' ? 1 : 0;
           return (
             context.showState.feedbackStats.totalReviews + feedback ===
-            context.showState.salesStats.ticketsSold -
-              context.showState.salesStats.ticketsRefunded
+            context.showState.salesStats.ticketsSold
           );
         },
       },

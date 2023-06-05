@@ -29,18 +29,18 @@ export const load: PageServerLoad = async ({ params }) => {
     .lean()
     .exec();
 
-  const showId = talent.activeShows[0];
-
-  if (showId) {
-    const activeShow = await Show.findById(showId);
-    return {
-      talent: JSON.parse(JSON.stringify(talent)),
-      activeShow: activeShow
-        ? JSON.parse(JSON.stringify(activeShow))
-        : undefined,
-    };
-  } else return { talent: JSON.parse(JSON.stringify(talent)) };
+  const currentShow = await Show.findOne({
+    talent: talent._id,
+    showState: { current: true },
+  }).exec();
+  return {
+    talent: JSON.parse(JSON.stringify(talent)),
+    currentShow: currentShow
+      ? JSON.parse(JSON.stringify(currentShow))
+      : undefined,
+  };
 };
+
 export const actions: Actions = {
   update_profile_image: async ({ params, request }: RequestEvent) => {
     const key = params.key;

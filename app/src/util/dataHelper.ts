@@ -3,7 +3,6 @@ import spacetime from 'spacetime';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 import type { AgentDocumentType } from '../lib/models/agent';
 import type { ShowDocumentType } from '../lib/models/show';
-import type { TalentDocumentType } from '../lib/models/talent';
 import { womensNames } from './womensNames';
 
 const profileImageUrls = [

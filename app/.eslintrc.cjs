@@ -1,5 +1,3 @@
-const { format } = require('build-number-generator');
-
 /* eslint-disable @typescript-eslint/naming-convention */
 module.exports = {
   // ...
@@ -7,6 +5,7 @@ module.exports = {
     'plugin:svelte/recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:unicorn/recommended',
+    'prettier',
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {

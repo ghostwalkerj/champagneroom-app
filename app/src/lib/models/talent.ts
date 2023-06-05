@@ -54,7 +54,6 @@ const talentSchema = new Schema(
       },
     },
     agent: { type: Schema.Types.ObjectId, ref: 'Agent', required: true },
-    activeShows: [{ type: Schema.Types.ObjectId, ref: 'Show' }],
   },
   { timestamps: true }
 );
