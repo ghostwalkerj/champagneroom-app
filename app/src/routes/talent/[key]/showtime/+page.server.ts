@@ -37,7 +37,7 @@ export const load: PageServerLoad = async ({ params }) => {
 
   const show = await Show.findOne({
     talent: talent._id,
-    showState: { current: true },
+    'showState.current': true,
   })
     .orFail(() => {
       throw error(404, 'Show not found');

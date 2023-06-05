@@ -34,7 +34,6 @@
 
   let talent = data.talent as TalentDocumentType;
   let currentShow = data.currentShow as ShowDocumentType | undefined;
-
   let showName = talent ? possessive(talent.name, 'en') + ' Show' : 'Show';
 
   $: showDuration = 60;
@@ -67,6 +66,10 @@
     showEventUnSub?.();
     showUnSub?.();
   };
+
+  if(!currentShow) {
+    noCurrentShow();
+  }
 
   const useNewShow = (show: ShowDocumentType) => {
     if (show && show.showState.current) {

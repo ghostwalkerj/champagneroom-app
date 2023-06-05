@@ -31,8 +31,10 @@ export const load: PageServerLoad = async ({ params }) => {
 
   const currentShow = await Show.findOne({
     talent: talent._id,
-    showState: { current: true },
+    'showState.current': true,
   }).exec();
+
+  console.log('currentShow', currentShow);
 
   return {
     talent: JSON.parse(JSON.stringify(talent)),
@@ -41,7 +43,6 @@ export const load: PageServerLoad = async ({ params }) => {
       : undefined,
   };
 };
-
 export const actions: Actions = {
   update_profile_image: async ({ params, request }: RequestEvent) => {
     const key = params.key;
