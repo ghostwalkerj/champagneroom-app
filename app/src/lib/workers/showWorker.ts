@@ -32,6 +32,7 @@ import { Worker } from 'bullmq';
 import type IORedis from 'ioredis';
 import mongoose from 'mongoose';
 import { getQueue } from '.';
+import { ObjectId } from 'mongodb';
 
 export type ShowJobDataType = {
   showId: string;
@@ -303,29 +304,33 @@ const feedbackReceived = async (
 ) => {
   const connect = await mongoose.connect(mongoDBEndpoint);
   const session = await connect.startSession();
+  const showId = new ObjectId(job.data.showId);
+  const show = await Show.findById(showId).orFail(new Error('Show not found'));
   await session.withTransaction(async () => {
-    const show = await Show.findById(job.data.showId);
     const ticketFilter = {
-      show: job.data.showId,
+      show: new ObjectId(job.data.showId),
       'ticketState.feedback.rating': { $exists: true },
     };
-    const ticketAggregate = await Ticket.aggregate([
-      { $match: ticketFilter },
-      {
-        $group: {
-          _id: job.data.showId,
-          totalReviews: { $sum: 1 },
-          averageRating: { $avg: '$ticketState.feedback.rating' },
-        },
-      },
-    ]).exec();
 
-    console.log('ticketAggregate', ticketAggregate);
-    show?.$set({
-      'showState.feedback.averageRating': ticketAggregate['totalReviews'],
-      'showState.feedback.totalReviews': ticketAggregate['averageRating'],
-    });
-    show?.save();
+    const groupBy = {
+      _id: null,
+      totalReviews: { $sum: 1 },
+      averageRating: { $avg: '$ticketState.feedback.rating' },
+    };
+
+    const aggregate = await Ticket.aggregate()
+      .match(ticketFilter)
+      .group(groupBy);
+
+    const averageRating = aggregate[0]['averageRating'] as number;
+    const totalReviews = aggregate[0]['totalReviews'] as number;
+    show.showState.feedbackStats = {
+      averageRating,
+      totalReviews,
+    };
+
+    show.save();
+    session.endSession();
 
     //TODO: Update Talent Stats
   });
