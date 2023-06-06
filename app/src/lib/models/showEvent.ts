@@ -27,10 +27,8 @@ showeventSchema.index({ createdAt: -1 });
 
 export type ShowEventDocumentType = InferSchemaType<typeof showeventSchema>;
 
-export const ShowEvent = (models?.ShowEvent ??
-  mongoose.model<ShowEventDocumentType>(
-    'ShowEvent',
-    showeventSchema
-  )) as Model<ShowEventDocumentType>;
+export const ShowEvent = models?.ShowEvent
+  ? (models.ShowEvent as Model<ShowEventDocumentType>)
+  : mongoose.model<ShowEventDocumentType>('ShowEvent', showeventSchema);
 
 export type ShowEventType = InstanceType<typeof ShowEvent>;

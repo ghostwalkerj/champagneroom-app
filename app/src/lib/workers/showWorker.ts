@@ -1,4 +1,3 @@
-import type { RedisOptionsType } from '$lib/constants';
 import { ActorType, EntityType } from '$lib/constants';
 import {
   ShowMachineEventString,
@@ -16,6 +15,7 @@ import type {
   ShowType,
 } from '$lib/models/show';
 import { Show } from '$lib/models/show';
+import { ShowEvent } from '$lib/models/showEvent';
 import type {
   TicketDocumentType,
   TicketStateType,
@@ -29,6 +29,7 @@ import type {
 import { Transaction, TransactionReasonType } from '$lib/models/transaction';
 import type { Job, Queue } from 'bullmq';
 import { Worker } from 'bullmq';
+import type IORedis from 'ioredis';
 import mongoose from 'mongoose';
 import { getQueue } from '.';
 
@@ -53,7 +54,7 @@ const createShowEvent = ({
   ticket?: TicketDocumentType;
   transaction?: TransactionDocumentType;
 }) => {
-  mongoose.model('ShowEvent').create({
+  ShowEvent.create({
     show: show._id,
     type,
     ticket: ticket?._id,
@@ -103,33 +104,37 @@ export const getTicketMachineService = (
     },
   });
 };
-export const getShowWorker = (
-  redisOptions: RedisOptionsType,
-  mongoDBEndpoint: string
-) => {
+
+export const getShowWorker = (connection: IORedis, mongoDBEndpoint: string) => {
+  const showQueue = getQueue(EntityType.SHOW, connection) as Queue<
+    ShowJobDataType,
+    any,
+    ShowMachineEventString
+  >;
+  mongoose.connect(mongoDBEndpoint);
+
   return new Worker(
     EntityType.SHOW,
     async (job: Job<ShowJobDataType, any, ShowMachineEventString>) => {
-      console.log('Show Worker:', job.name);
       switch (job.name) {
         case ShowMachineEventString.CANCELLATION_INITIATED: {
-          cancelShow(job, redisOptions, mongoDBEndpoint);
+          cancelShow(job, showQueue);
           break;
         }
         case ShowMachineEventString.REFUND_INITIATED: {
-          refundShow(job, redisOptions, mongoDBEndpoint);
+          refundShow(job, showQueue);
           break;
         }
         case ShowMachineEventString.SHOW_ENDED: {
-          stopShow(job, redisOptions, mongoDBEndpoint);
+          endShow(job, showQueue);
           break;
         }
         case ShowMachineEventString.SHOW_STOPPED: {
-          stopShow(job, redisOptions, mongoDBEndpoint);
+          stopShow(job, showQueue);
           break;
         }
         case ShowMachineEventString.SHOW_FINALIZED: {
-          finalizeShow(job, redisOptions, mongoDBEndpoint);
+          finalizeShow(job, showQueue);
           break;
         }
         case ShowMachineEventString.FEEDBACK_RECEIVED: {
@@ -138,18 +143,15 @@ export const getShowWorker = (
         }
       }
     },
-    { autorun: false, connection: redisOptions.connection }
+    { autorun: false, connection }
   );
 };
 
 const cancelShow = async (
   job: Job<ShowJobDataType, any, ShowMachineEventString>,
-  redisOptions: RedisOptionsType,
-  mongoDBEndpoint: string
+  showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>
 ) => {
-  mongoose.connect(mongoDBEndpoint);
   const show = (await Show.findById(job.data.showId)) as ShowType;
-  const showQueue = getQueue(EntityType.SHOW, redisOptions);
   const showService = getShowMachineService(show, showQueue);
   const showState = showService.getSnapshot();
   const tickets = await Ticket.find({
@@ -182,12 +184,9 @@ const cancelShow = async (
 
 const refundShow = async (
   job: Job<ShowJobDataType, any, ShowMachineEventString>,
-  redisOptions: RedisOptionsType,
-  mongoDBEndpoint: string
+  showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>
 ) => {
-  mongoose.connect(mongoDBEndpoint);
   const show = (await Show.findById(job.data.showId)) as ShowType;
-  const showQueue = getQueue(EntityType.SHOW, redisOptions);
   const showService = getShowMachineService(show, showQueue);
 
   // Check if show needs to send refunds
@@ -234,12 +233,9 @@ const refundShow = async (
 // Stop show, allow grace period before ending
 const stopShow = async (
   job: Job<ShowJobDataType, any, ShowMachineEventString>,
-  redisOptions: RedisOptionsType,
-  mongoDBEndpoint: string
+  showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>
 ) => {
-  mongoose.connect(mongoDBEndpoint);
   const show = (await Show.findById(job.data.showId)) as ShowType;
-  const showQueue = getQueue(EntityType.SHOW, redisOptions);
   const showService = getShowMachineService(show, showQueue);
 
   const showState = showService.getSnapshot();
@@ -253,12 +249,9 @@ const stopShow = async (
 // End show, alert ticket
 const endShow = async (
   job: Job<ShowJobDataType, any, ShowMachineEventString>,
-  redisOptions: RedisOptionsType,
-  mongoDBEndpoint: string
+  showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>
 ) => {
-  mongoose.connect(mongoDBEndpoint);
   const show = (await Show.findById(job.data.showId)) as ShowType;
-  const showQueue = getQueue(EntityType.SHOW, redisOptions);
   const showService = getShowMachineService(show, showQueue);
 
   // Tell ticket holders the show is over folks
@@ -282,12 +275,9 @@ const endShow = async (
 // Calculate sales stats
 const finalizeShow = async (
   job: Job<ShowJobDataType, any, ShowMachineEventString>,
-  redisOptions: RedisOptionsType,
-  mongoDBEndpoint: string
+  showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>
 ) => {
-  mongoose.connect(mongoDBEndpoint);
   const show = (await Show.findById(job.data.showId)) as ShowType;
-  const showQueue = getQueue(EntityType.SHOW, redisOptions);
   const showService = getShowMachineService(show, showQueue);
 
   // Check if show needs to send refunds
@@ -319,7 +309,7 @@ const feedbackReceived = async (
       show: job.data.showId,
       'ticketState.feedback.rating': { $exists: true },
     };
-    const ticketAggregate = Ticket.aggregate([
+    const ticketAggregate = await Ticket.aggregate([
       { $match: ticketFilter },
       {
         $group: {
@@ -328,12 +318,15 @@ const feedbackReceived = async (
           averageRating: { $avg: '$ticketState.feedback.rating' },
         },
       },
-    ]);
+    ]).exec();
+
+    console.log('ticketAggregate', ticketAggregate);
     show?.$set({
       'showState.feedback.averageRating': ticketAggregate['totalReviews'],
       'showState.feedback.totalReviews': ticketAggregate['averageRating'],
     });
     show?.save();
-    console.log('show', show);
+
+    //TODO: Update Talent Stats
   });
 };

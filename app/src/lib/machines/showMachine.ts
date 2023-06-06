@@ -194,7 +194,6 @@ export const createShowMachine = ({
             },
             'FEEDBACK RECEIVED': [
               {
-                target: 'finalized',
                 actions: [
                   'receiveFeedback',
                   raise({
@@ -465,7 +464,7 @@ export const createShowMachine = ({
         receiveFeedback: (context, event) => {
           showMachineOptions?.jobQueue?.add(event.type, {
             showId: context.showDocument._id.toString(),
-            ticket: event.ticket,
+            ticketId: event.ticket._id.toString(),
           });
         },
 
@@ -669,11 +668,11 @@ export const createShowMachine = ({
           return context.showState.salesStats.ticketsSold - refunded === 0;
         },
         fullyReviewed: (context, event) => {
-          const feedback = event.type === 'FEEDBACK RECEIVED' ? 1 : 0;
-          return (
-            context.showState.feedbackStats.totalReviews + feedback ===
-            context.showState.salesStats.ticketsSold
-          );
+          const count = event.type === 'FEEDBACK RECEIVED' ? 1 : 0;
+          const fullReviewed =
+            context.showState.feedbackStats.totalReviews + count ===
+            context.showState.salesStats.ticketsSold;
+          return fullReviewed;
         },
       },
     }

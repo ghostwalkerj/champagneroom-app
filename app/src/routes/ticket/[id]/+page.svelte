@@ -112,8 +112,8 @@
         );
         showUnSub?.();
       }
-      loading = false;
       await applyAction(result);
+      loading = false;
     };
   };
 </script>
@@ -219,7 +219,7 @@
                 <form
                   method="post"
                   action="?/leave_feedback"
-                  use:enhance={({ form }) => onSubmit(form)}
+                  use:enhance={({ formElement }) => onSubmit(formElement)}
                 >
                   <div class="max-w-xs w-full py-2 form-control">
                     <!-- svelte-ignore a11y-label-has-associated-control -->

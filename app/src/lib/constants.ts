@@ -48,12 +48,3 @@ export const jitsiInterfaceConfigOverwrite = {
     'tileview',
   ],
 };
-export type RedisOptionsType = {
-  connection: {
-    host: string;
-    port: number;
-    password: string;
-    username: string;
-    enableReadyCheck?: boolean;
-  };
-};

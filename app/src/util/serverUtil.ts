@@ -22,6 +22,7 @@ import {
 } from '$lib/models/ticket';
 import type { TransactionDocumentType } from '$lib/models/transaction';
 import { getQueue } from '$lib/workers';
+import IORedis from 'ioredis';
 import mongoose from 'mongoose';
 
 const redisOptions = {
@@ -31,6 +32,7 @@ const redisOptions = {
     password: REDIS_PASSWORD,
     username: REDIS_USERNAME,
     enableReadyCheck: false,
+    maxRetriesPerRequest: null,
   },
 };
 
@@ -64,7 +66,9 @@ const createShowEvent = ({
 };
 
 export const getShowMachineService = (show: ShowType) => {
-  const showQueue = getQueue(EntityType.SHOW, redisOptions);
+  const connection = new IORedis(redisOptions.connection);
+
+  const showQueue = getQueue(EntityType.SHOW, connection);
   mongoose.connect(MONGO_DB_ENDPOINT);
   return createShowMachineService({
     showDocument: show,
@@ -92,7 +96,9 @@ export const getShowMachineServiceFromId = async (showId: string) => {
 
 export const getTicketMachineService = (ticket: TicketType, show: ShowType) => {
   mongoose.connect(MONGO_DB_ENDPOINT);
-  const showQueue = getQueue(EntityType.SHOW, redisOptions);
+  const connection = new IORedis(redisOptions.connection);
+
+  const showQueue = getQueue(EntityType.SHOW, connection);
 
   const ticketMachineOptions = {
     saveStateCallback: (ticketState: TicketStateType) => {
@@ -127,7 +133,7 @@ export const getTicketMachineServiceFromId = async (ticketId: string) => {
     .model('Show')
     .findById(ticket.show)
     .orFail(() => {
-      throw new Error('Ticket not found');
+      throw new Error('Show not found');
     })
     .exec();
 

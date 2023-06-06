@@ -151,7 +151,7 @@ export const actions: Actions = {
   leave_feedback: async ({ params, request }) => {
     const ticketId = params.id;
     if (ticketId === null) {
-      throw error(404, 'Key not found');
+      throw error(404, 'TicketId not found');
     }
 
     const data = await request.formData();

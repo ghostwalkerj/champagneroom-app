@@ -11,6 +11,7 @@ import { EntityType } from './dist/constants';
 import { getQueue, getWorker } from './dist/workers';
 const buildNumber = generate('0.1');
 const buildTime = format(buildNumber);
+import IORedis from 'ioredis';
 
 const startWorker = parseArgv(process.argv).worker || false;
 const app = express();
@@ -26,19 +27,23 @@ const redisOptions = {
     password: process.env.REDIS_PASSWORD || '',
     username: process.env.REDIS_USERNAME || '',
     enableReadyCheck: false,
-  }
+    maxRetriesPerRequest: null,
+  },
 };
 
-const mongoDBEndpoint = process.env.MONGO_DB_ENDPOINT || 'mongodb://localhost:27017'; 
+const connection = new IORedis(redisOptions.connection);
+
+const mongoDBEndpoint =
+  process.env.MONGO_DB_ENDPOINT || 'mongodb://localhost:27017';
 
 // Workers
-if(startWorker) {
-const showWorker = getWorker(EntityType.SHOW, redisOptions, mongoDBEndpoint);
-showWorker.run();
+if (startWorker) {
+  const showWorker = getWorker(EntityType.SHOW, connection, mongoDBEndpoint);
+  showWorker.run();
 }
 
 // Bull Dashboard
-const queue = getQueue(EntityType.SHOW, redisOptions);
+const queue = getQueue(EntityType.SHOW, connection);
 const serverAdapter = new ExpressAdapter();
 serverAdapter.setBasePath('/admin/queues');
 const { addQueue, removeQueue, setQueues, replaceQueues } = createBullBoard({

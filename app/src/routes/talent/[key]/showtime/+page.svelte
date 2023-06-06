@@ -26,20 +26,20 @@
   let participantName = '';
   let participantAvatarUrl = '';
 
+  const endShow = async () => {
+    let formData = new FormData();
+    formData.append('showId', currentShow?._id.toString());
+    fetch($page.url.href + '?/end_show', {
+      method: 'POST',
+      body: formData,
+    });
+    api?.executeCommand('endConference');
+  };
+
   if (browser) {
     onDestroy(() => {
       endShow();
     });
-
-    const endShow = async () => {
-      let formData = new FormData();
-      formData.append('showId', currentShow?._id.toString());
-      fetch($page.url.href + '?/end_show', {
-        method: 'POST',
-        body: formData,
-      });
-      api?.executeCommand('endConference');
-    };
   }
 
   const participantJoined = (event: any) => {
@@ -82,6 +82,7 @@
     api.addListener('participantJoined', participantJoined);
     api.addListener('knockingParticipant', participantKnocked);
     api.addListener('readyToClose', () => {
+      endShow();
       goto(returnUrl);
     });
   });

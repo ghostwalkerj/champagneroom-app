@@ -1,26 +1,23 @@
-import type { RedisOptionsType } from '$lib/constants';
 import { EntityType } from '$lib/constants';
 import { Queue } from 'bullmq';
+import type IORedis from 'ioredis';
 import { getShowWorker } from './showWorker';
 
-export const getQueue = (
-  entityType: EntityType,
-  redisOptions: RedisOptionsType
-) => {
-  return new Queue(entityType, redisOptions);
+export const getQueue = (entityType: EntityType, connection: IORedis) => {
+  return new Queue(entityType, { connection });
 };
 
 export const getWorker = (
   entityType: EntityType,
-  redisOptions: RedisOptionsType,
+  connection: IORedis,
   mongoDBEndpoint: string
 ) => {
   switch (entityType) {
     case EntityType.SHOW: {
-      return getShowWorker(redisOptions, mongoDBEndpoint);
+      return getShowWorker(connection, mongoDBEndpoint);
     }
     default: {
-      return getShowWorker(redisOptions, mongoDBEndpoint);
+      return getShowWorker(connection, mongoDBEndpoint);
     }
   }
 };

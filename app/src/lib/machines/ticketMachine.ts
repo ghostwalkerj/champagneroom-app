@@ -262,8 +262,8 @@ export const createTicketMachine = ({
                   target: '#ticketMachine.finalized',
                   actions: [
                     'receiveFeedback',
-                    'sendFeedbackReceived',
                     'finalizeTicket',
+                    'sendFeedbackReceived',
                   ],
                 },
                 'DISPUTE INITIATED': {
