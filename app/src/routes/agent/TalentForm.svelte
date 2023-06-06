@@ -2,20 +2,26 @@
   import { applyAction, enhance } from '$app/forms';
   import { invalidateAll } from '$app/navigation';
   import type { AgentDocumentType } from '$lib/models/agent';
+  import { womensNames } from '$util/womensNames';
+  import { uniqueNamesGenerator } from 'unique-names-generator';
   import type { ActionData } from './$types';
 
   export let agent: AgentDocumentType;
   export let form: ActionData;
 
   $: loading = false;
-  let talentName = '';
+  let talentName = uniqueNamesGenerator({
+    dictionaries: [womensNames],
+  });
 
   const onSubmit = ({}) => {
     loading = true;
     return async ({ result }) => {
       if (result.success) {
         invalidateAll();
-        talentName = '';
+        talentName = uniqueNamesGenerator({
+          dictionaries: [womensNames],
+        });
       } else {
         talentName = form?.name || '';
       }

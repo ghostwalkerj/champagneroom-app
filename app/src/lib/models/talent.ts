@@ -1,8 +1,6 @@
-import { womensNames } from '$util/womensNames';
 import type { InferSchemaType, Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
 import { nanoid } from 'nanoid';
-import { uniqueNamesGenerator } from 'unique-names-generator';
 import validator from 'validator';
 
 const { Schema, models } = pkg;
@@ -32,11 +30,6 @@ const talentSchema = new Schema(
       minLength: [4, 'Name is too short'],
       required: true,
       trim: true,
-      default: function () {
-        return uniqueNamesGenerator({
-          dictionaries: [womensNames],
-        });
-      },
     },
     profileImageUrl: {
       type: String,

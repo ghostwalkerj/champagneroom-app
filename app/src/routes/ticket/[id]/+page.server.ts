@@ -8,7 +8,6 @@ import type {
 import { Ticket, TicketCancelReason } from '$lib/models/ticket';
 import { Transaction, TransactionReasonType } from '$lib/models/transaction';
 
-import { MONGO_DB_ENDPOINT } from '$env/static/private';
 import { ActorType } from '$lib/constants';
 import type { ShowMachineServiceType } from '$lib/machines/showMachine';
 import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
@@ -18,13 +17,12 @@ import { verifyPin } from '$util/pin';
 import {
   getTicketMachineService,
   getTicketMachineServiceFromId,
-} from '$util/serverUtil';
+} from '$util/util.server';
 import { error, fail, redirect } from '@sveltejs/kit';
-import mongoose from 'mongoose';
 import urlJoin from 'url-join';
 import type { Actions, PageServerLoad } from './$types';
 
-const getTicketService = async (ticketId: string) => {
+const getTicketService = async (ticketId: string, connection: IORedis) => {
   const ticket = await Ticket.findById(ticketId)
     .orFail(() => {
       throw error(404, 'Ticket not found');
@@ -37,7 +35,7 @@ const getTicketService = async (ticketId: string) => {
     })
     .exec();
 
-  const ticketService = getTicketMachineService(ticket, show);
+  const ticketService = getTicketMachineService(ticket, show, connection);
   return { ticket, show, ticketService };
 };
 
@@ -45,7 +43,6 @@ export const load: PageServerLoad = async ({ params, cookies, url }) => {
   const ticketId = params.id;
   const pinHash = cookies.get('pin');
   const redirectUrl = urlJoin(url.href, PUBLIC_PIN_PATH);
-  mongoose.connect(MONGO_DB_ENDPOINT);
 
   if (!pinHash) {
     throw redirect(303, redirectUrl);
@@ -83,8 +80,6 @@ export const actions: Actions = {
       throw error(404, 'Key not found');
     }
 
-    mongoose.connect(MONGO_DB_ENDPOINT);
-
     const { ticket, show, ticketService } = await getTicketService(ticketId);
 
     Transaction.create({
@@ -113,7 +108,6 @@ export const actions: Actions = {
     if (ticketId === null) {
       throw error(404, 'Key not found');
     }
-    mongoose.connect(MONGO_DB_ENDPOINT);
 
     const ticketService = await getTicketMachineServiceFromId(ticketId);
     const state = ticketService.getSnapshot();

@@ -1,15 +1,13 @@
 import { fail } from '@sveltejs/kit';
-import mongoose from 'mongoose';
 import type { Actions } from './$types';
 
-import { MONGO_DB_ENDPOINT } from '$env/static/private';
 import { Agent } from '$lib/models/agent';
 import { Talent } from '$lib/models/talent';
+import { womensNames } from '$util/womensNames';
+import { uniqueNamesGenerator } from 'unique-names-generator';
 
 export const actions: Actions = {
   get_or_create_agent: async ({ request }) => {
-    await mongoose.connect(MONGO_DB_ENDPOINT);
-
     const data = await request.formData();
     const account = data.get('account') as string;
 
@@ -32,6 +30,11 @@ export const actions: Actions = {
     if (agent === null) {
       agent = await Agent.create({
         address: account,
+        name:
+          'Agent ' +
+          uniqueNamesGenerator({
+            dictionaries: [womensNames],
+          }),
       });
     }
 
@@ -41,11 +44,9 @@ export const actions: Actions = {
     };
   },
   create_talent: async ({ request }) => {
-    await mongoose.connect(MONGO_DB_ENDPOINT);
-
     const data = await request.formData();
     const agentId = data.get('agentId') as string;
-    const name = data.get('name') as string;
+    let name = data.get('name') as string;
     const agentCommission = data.get('agentCommission') as string;
 
     // Validation
@@ -53,9 +54,10 @@ export const actions: Actions = {
       return fail(400, { agentId, missingAgentId: true });
     }
     if (!name || name.length < 3 || name.length > 50) {
-      return fail(400, { name, badName: true });
+      name = uniqueNamesGenerator({
+        dictionaries: [womensNames],
+      });
     }
-
     if (
       Number.isNaN(+agentCommission) ||
       +agentCommission < 0 ||

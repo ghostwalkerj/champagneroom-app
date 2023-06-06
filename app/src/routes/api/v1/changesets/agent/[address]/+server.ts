@@ -1,7 +1,5 @@
-import { MONGO_DB_ENDPOINT } from '$env/static/private';
 import { Agent } from '$lib/models/agent';
 import type { RequestHandler } from '@sveltejs/kit';
-import mongoose from 'mongoose';
 
 export const GET: RequestHandler<{ address: string }> = async ({
   params,
@@ -14,7 +12,6 @@ export const GET: RequestHandler<{ address: string }> = async ({
   const firstFetch = url.searchParams.get('firstFetch') || false;
   let document: string | undefined;
 
-  mongoose.connect(MONGO_DB_ENDPOINT);
   if (firstFetch) {
     const agent = await Agent.findOne({ address }).exec();
     if (agent !== undefined) {

@@ -1,7 +1,5 @@
-import { MONGO_DB_ENDPOINT } from '$env/static/private';
 import { Talent } from '$lib/models/talent';
 import type { RequestHandler } from '@sveltejs/kit';
-import mongoose from 'mongoose';
 
 export const GET: RequestHandler<{ key: string }> = async ({ params, url }) => {
   const talentKey = params.key;
@@ -10,7 +8,6 @@ export const GET: RequestHandler<{ key: string }> = async ({ params, url }) => {
   }
   const firstFetch = url.searchParams.get('firstFetch') || false;
   let document: string | undefined;
-  mongoose.connect(MONGO_DB_ENDPOINT);
 
   if (firstFetch) {
     const talent = await Talent.findOne({ key: talentKey }).lean().exec();

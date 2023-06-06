@@ -17,7 +17,7 @@
   import getProfileImage from '$util/profilePhoto';
   import { onDestroy, onMount } from 'svelte';
   import urlJoin from 'url-join';
-  import type { PageData } from '../$types';
+  import type { PageData } from './$types';
 
   export let data: PageData;
 

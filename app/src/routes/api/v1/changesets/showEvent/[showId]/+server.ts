@@ -1,4 +1,3 @@
-import { MONGO_DB_ENDPOINT } from '$env/static/private';
 import { ShowEvent } from '$lib/models/showEvent';
 import type { RequestHandler } from '@sveltejs/kit';
 import mongoose from 'mongoose';
@@ -14,7 +13,6 @@ export const GET: RequestHandler<{ showId: string }> = async ({
   const firstFetch = url.searchParams.get('firstFetch') || false;
   let document: string | undefined;
 
-  mongoose.connect(MONGO_DB_ENDPOINT);
   const id = new mongoose.Types.ObjectId(showId);
   if (firstFetch) {
     const showEvent = await ShowEvent.findOne(

@@ -1,18 +1,15 @@
-import { MONGO_DB_ENDPOINT } from '$env/static/private';
 import { PUBLIC_TICKET_PATH } from '$env/static/public';
 import { Show } from '$lib/models/show';
 import { Ticket } from '$lib/models/ticket';
 import { mensNames } from '$util/mensNames';
 import { createPinHash } from '$util/pin';
-import { getShowMachineService } from '$util/serverUtil';
+import { getShowMachineService } from '$util/util.server';
 import { error, fail, redirect } from '@sveltejs/kit';
-import mongoose from 'mongoose';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 import urlJoin from 'url-join';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params }) => {
-  mongoose.connect(MONGO_DB_ENDPOINT);
   const showId = params.id;
   if (showId === null) {
     throw error(404, 'Champagne Show not found');
@@ -58,7 +55,6 @@ export const actions: Actions = {
       return fail(400, { pin, invalidPin: true });
     }
 
-    mongoose.connect(MONGO_DB_ENDPOINT);
     const show = await Show.findById(showId)
       .orFail(() => {
         throw error(404, 'Show not found');

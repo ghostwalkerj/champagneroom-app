@@ -16,6 +16,7 @@ import type {
 } from '$lib/models/show';
 import { Show } from '$lib/models/show';
 import { ShowEvent } from '$lib/models/showEvent';
+import { Talent } from '$lib/models/talent';
 import type {
   TicketDocumentType,
   TicketStateType,
@@ -30,9 +31,9 @@ import { Transaction, TransactionReasonType } from '$lib/models/transaction';
 import type { Job, Queue } from 'bullmq';
 import { Worker } from 'bullmq';
 import type IORedis from 'ioredis';
+import { ObjectId } from 'mongodb';
 import mongoose from 'mongoose';
 import { getQueue } from '.';
-import { ObjectId } from 'mongodb';
 
 export type ShowJobDataType = {
   showId: string;
@@ -152,7 +153,9 @@ const cancelShow = async (
   job: Job<ShowJobDataType, any, ShowMachineEventString>,
   showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>
 ) => {
-  const show = (await Show.findById(job.data.showId)) as ShowType;
+  const show = (await Show.findById(job.data.showId).orFail(
+    new Error('Show not found')
+  )) as ShowType;
   const showService = getShowMachineService(show, showQueue);
   const showState = showService.getSnapshot();
   const tickets = await Ticket.find({
@@ -187,7 +190,9 @@ const refundShow = async (
   job: Job<ShowJobDataType, any, ShowMachineEventString>,
   showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>
 ) => {
-  const show = (await Show.findById(job.data.showId)) as ShowType;
+  const show = (await Show.findById(job.data.showId).orFail(
+    new Error('Show not found')
+  )) as ShowType;
   const showService = getShowMachineService(show, showQueue);
 
   // Check if show needs to send refunds
@@ -236,7 +241,9 @@ const stopShow = async (
   job: Job<ShowJobDataType, any, ShowMachineEventString>,
   showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>
 ) => {
-  const show = (await Show.findById(job.data.showId)) as ShowType;
+  const show = (await Show.findById(job.data.showId).orFail(
+    new Error('Show not found')
+  )) as ShowType;
   const showService = getShowMachineService(show, showQueue);
 
   const showState = showService.getSnapshot();
@@ -252,7 +259,9 @@ const endShow = async (
   job: Job<ShowJobDataType, any, ShowMachineEventString>,
   showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>
 ) => {
-  const show = (await Show.findById(job.data.showId)) as ShowType;
+  const show = (await Show.findById(job.data.showId).orFail(
+    new Error('Show not found')
+  )) as ShowType;
   const showService = getShowMachineService(show, showQueue);
 
   // Tell ticket holders the show is over folks
@@ -278,7 +287,9 @@ const finalizeShow = async (
   job: Job<ShowJobDataType, any, ShowMachineEventString>,
   showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>
 ) => {
-  const show = (await Show.findById(job.data.showId)) as ShowType;
+  const show = (await Show.findById(job.data.showId).orFail(
+    new Error('Show not found')
+  )) as ShowType;
   const showService = getShowMachineService(show, showQueue);
 
   // Check if show needs to send refunds
@@ -303,10 +314,12 @@ const feedbackReceived = async (
   mongoDBEndpoint: string
 ) => {
   const connect = await mongoose.connect(mongoDBEndpoint);
-  const session = await connect.startSession();
-  const showId = new ObjectId(job.data.showId);
-  const show = await Show.findById(showId).orFail(new Error('Show not found'));
+  let session = await connect.startSession();
+  const show = (await Show.findById(job.data.showId).orFail(
+    new Error('Show not found')
+  )) as ShowType;
   await session.withTransaction(async () => {
+    // aggregate ticket feedback into show
     const ticketFilter = {
       show: new ObjectId(job.data.showId),
       'ticketState.feedback.rating': { $exists: true },
@@ -332,6 +345,37 @@ const feedbackReceived = async (
     show.save();
     session.endSession();
 
-    //TODO: Update Talent Stats
+    // aggregate show feedback into talent
+    session = await connect.startSession();
+    await session.withTransaction(async () => {
+      const showFilter = {
+        talent: show.talent,
+        'showState.feedbackStats.totalReviews': { $gte: 1 },
+      };
+
+      const groupBy = {
+        _id: null,
+        totalReviews: { $sum: '$showState.feedbackStats.totalReviews' },
+        averageRating: { $avg: '$showState.feedbackStats.averageRating' },
+      };
+
+      const aggregate = await Show.aggregate().match(showFilter).group(groupBy);
+
+      const averageRating = aggregate[0]['averageRating'] as number;
+      const totalReviews = aggregate[0]['totalReviews'] as number;
+
+      Talent.findByIdAndUpdate(
+        { _id: show.talent },
+        {
+          talentState: {
+            feedbackStats: {
+              averageRating,
+              totalReviews,
+            },
+          },
+        }
+      );
+      session.endSession();
+    });
   });
 };

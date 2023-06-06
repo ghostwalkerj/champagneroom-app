@@ -1,4 +1,3 @@
-import { MONGO_DB_ENDPOINT } from '$env/static/private';
 import { Show } from '$lib/models/show';
 import mongoose from 'mongoose';
 import type { RequestHandler } from './$types';
@@ -9,8 +8,6 @@ export const GET: RequestHandler = async ({ params, url }) => {
   if (showId === null) {
     return new Response('Show not found', { status: 404 });
   }
-  mongoose.connect(MONGO_DB_ENDPOINT);
-
   const id = new mongoose.Types.ObjectId(showId);
 
   let document: string | undefined;

@@ -1,4 +1,3 @@
-import { MONGO_DB_ENDPOINT } from '$env/static/private';
 import { ActorType } from '$lib/constants';
 import type { ShowMachineEventType } from '$lib/machines/showMachine';
 import { ShowMachineEventString } from '$lib/machines/showMachine';
@@ -9,13 +8,11 @@ import {
   type ShowStateType,
 } from '$lib/models/show';
 import { Talent, type TalentDocumentType } from '$lib/models/talent';
-import { getShowMachineServiceFromId } from '$util/serverUtil';
+import { getShowMachineServiceFromId } from '$util/util.server';
 import { error, fail } from '@sveltejs/kit';
-import mongoose from 'mongoose';
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
 
 export const load: PageServerLoad = async ({ params }) => {
-  mongoose.connect(MONGO_DB_ENDPOINT);
   const key = params.key;
 
   if (key === null) {
@@ -79,8 +76,6 @@ export const actions: Actions = {
       return fail(400, { price, invalidPrice: true });
     }
 
-    mongoose.connect(MONGO_DB_ENDPOINT);
-
     const talent = (await Talent.findOne({ key })
       .orFail(() => {
         throw error(404, 'Talent not found');
@@ -128,7 +123,6 @@ export const actions: Actions = {
       throw error(404, 'Show ID not found');
     }
 
-    mongoose.connect(MONGO_DB_ENDPOINT);
     const showService = await getShowMachineServiceFromId(showId);
     const showMachineState = showService.getSnapshot();
 

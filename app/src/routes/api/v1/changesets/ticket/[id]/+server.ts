@@ -1,4 +1,3 @@
-import { MONGO_DB_ENDPOINT } from '$env/static/private';
 import { Ticket } from '$lib/models/ticket';
 import type { RequestHandler } from '@sveltejs/kit';
 import mongoose from 'mongoose';
@@ -11,7 +10,6 @@ export const GET: RequestHandler<{ id: string }> = async ({ params, url }) => {
   const firstFetch = url.searchParams.get('firstFetch') || false;
   let document: string | undefined;
   const id = new mongoose.Types.ObjectId(ticketId);
-  mongoose.connect(MONGO_DB_ENDPOINT);
 
   if (firstFetch) {
     const ticket = await Ticket.findById(id).lean().exec();

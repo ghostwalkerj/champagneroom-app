@@ -1,5 +1,4 @@
 import {
-  MONGO_DB_ENDPOINT,
   REDIS_HOST,
   REDIS_PASSWORD,
   REDIS_PORT,
@@ -25,20 +24,18 @@ import { getQueue } from '$lib/workers';
 import IORedis from 'ioredis';
 import mongoose from 'mongoose';
 
-const redisOptions = {
-  connection: {
-    host: REDIS_HOST,
-    port: +REDIS_PORT,
-    password: REDIS_PASSWORD,
-    username: REDIS_USERNAME,
-    enableReadyCheck: false,
-    maxRetriesPerRequest: null,
-  },
-};
-
 const saveState = (show: ShowDocumentType, newState: ShowStateType) => {
   Show.updateOne({ _id: show._id }, { $set: { showState: newState } }).exec();
 };
+
+const connection = new IORedis({
+  host: REDIS_HOST,
+  port: +REDIS_PORT,
+  password: REDIS_PASSWORD,
+  username: REDIS_USERNAME,
+  enableReadyCheck: false,
+  maxRetriesPerRequest: null,
+});
 
 const createShowEvent = ({
   show,
@@ -66,10 +63,7 @@ const createShowEvent = ({
 };
 
 export const getShowMachineService = (show: ShowType) => {
-  const connection = new IORedis(redisOptions.connection);
-
   const showQueue = getQueue(EntityType.SHOW, connection);
-  mongoose.connect(MONGO_DB_ENDPOINT);
   return createShowMachineService({
     showDocument: show,
     showMachineOptions: {
@@ -82,7 +76,6 @@ export const getShowMachineService = (show: ShowType) => {
 };
 
 export const getShowMachineServiceFromId = async (showId: string) => {
-  mongoose.connect(MONGO_DB_ENDPOINT);
   const show = await mongoose
     .model('Show')
     .findById(showId)
@@ -95,9 +88,6 @@ export const getShowMachineServiceFromId = async (showId: string) => {
 };
 
 export const getTicketMachineService = (ticket: TicketType, show: ShowType) => {
-  mongoose.connect(MONGO_DB_ENDPOINT);
-  const connection = new IORedis(redisOptions.connection);
-
   const showQueue = getQueue(EntityType.SHOW, connection);
 
   const ticketMachineOptions = {
@@ -120,7 +110,6 @@ export const getTicketMachineService = (ticket: TicketType, show: ShowType) => {
 };
 
 export const getTicketMachineServiceFromId = async (ticketId: string) => {
-  mongoose.connect(MONGO_DB_ENDPOINT);
   const ticket = await mongoose
     .model('Ticket')
     .findById(ticketId)

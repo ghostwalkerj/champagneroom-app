@@ -2,7 +2,6 @@ import {
   JITSI_APP_ID,
   JITSI_JWT_SECRET,
   JWT_EXPIRY,
-  MONGO_DB_ENDPOINT,
 } from '$env/static/private';
 import {
   PUBLIC_JITSI_DOMAIN,
@@ -13,11 +12,10 @@ import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 import type { ShowType } from '$lib/models/show';
 import { Ticket } from '$lib/models/ticket';
 import { verifyPin } from '$util/pin';
-import { getTicketMachineService } from '$util/serverUtil';
+import { getTicketMachineService } from '$util/util.server';
 import type { Actions } from '@sveltejs/kit';
 import { error, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
-import mongoose from 'mongoose';
 import urlJoin from 'url-join';
 import type { PageServerLoad } from './$types';
 
@@ -34,8 +32,6 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
   if (ticketId === null) {
     throw error(404, 'Bad ticket id');
   }
-
-  mongoose.connect(MONGO_DB_ENDPOINT);
 
   const ticket = await Ticket.findById(ticketId)
     .orFail(() => {
@@ -95,8 +91,6 @@ export const actions: Actions = {
     if (ticketId === null) {
       throw error(404, 'Bad ticket id');
     }
-
-    mongoose.connect(MONGO_DB_ENDPOINT);
 
     const ticket = await Ticket.findById(ticketId)
       .orFail(() => {

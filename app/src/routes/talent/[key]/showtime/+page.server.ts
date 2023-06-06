@@ -2,7 +2,6 @@ import {
   JITSI_APP_ID,
   JITSI_JWT_SECRET,
   JWT_EXPIRY,
-  MONGO_DB_ENDPOINT,
 } from '$env/static/private';
 import { PUBLIC_JITSI_DOMAIN, PUBLIC_TALENT_PATH } from '$env/static/public';
 import { ShowMachineEventString } from '$lib/machines/showMachine';
@@ -11,11 +10,10 @@ import { Talent } from '$lib/models/talent';
 import {
   getShowMachineService,
   getShowMachineServiceFromId,
-} from '$util/serverUtil';
+} from '$util/util.server';
 import type { Actions } from '@sveltejs/kit';
 import { error, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
-import mongoose from 'mongoose';
 import urlJoin from 'url-join';
 import type { PageServerLoad } from './$types';
 
@@ -25,8 +23,6 @@ export const load: PageServerLoad = async ({ params }) => {
   if (key === null) {
     throw error(404, 'Key not found');
   }
-
-  mongoose.connect(MONGO_DB_ENDPOINT);
 
   const talent = await Talent.findOne({ key })
     .orFail(() => {
