@@ -74,7 +74,7 @@ export const getShowWorker = (
           break;
         }
         case ShowMachineEventString.ESCROW_ENDED: {
-          endEscrow(show, showService);
+          endEscrow(showService);
           break;
         }
       }
@@ -244,7 +244,7 @@ const feedbackReceived = async (show: ShowType) => {
 
     const groupBy = {
       _id: null,
-      totalReviews: { $sum: 1 },
+      numberOfReviews: { $sum: 1 },
       averageRating: { $avg: '$ticketState.feedback.rating' },
     };
 
@@ -253,13 +253,16 @@ const feedbackReceived = async (show: ShowType) => {
       .group(groupBy);
 
     const averageRating = aggregate[0]['averageRating'] as number;
-    const totalReviews = aggregate[0]['totalReviews'] as number;
+    const numberOfReviews = aggregate[0]['numberOfReviews'] as number;
+    if (aggregate.length === 0) {
+      return;
+    }
     show.showState.feedbackStats = {
       averageRating,
-      totalReviews,
+      numberOfReviews,
     };
 
-    show.save();
+    await show.save();
     showSession!.endSession();
   });
 
@@ -268,28 +271,29 @@ const feedbackReceived = async (show: ShowType) => {
   await talentSession.withTransaction(async () => {
     const showFilter = {
       talent: show.talent,
-      'showState.feedbackStats.totalReviews': { $gte: 1 },
+      'showState.feedbackStats.numberOfReviews': { $gt: 0 },
     };
 
     const groupBy = {
       _id: null,
-      totalReviews: { $sum: '$showState.feedbackStats.totalReviews' },
+      numberOfReviews: { $sum: '$showState.feedbackStats.numberOfReviews' },
       averageRating: { $avg: '$showState.feedbackStats.averageRating' },
     };
 
     const aggregate = await Show.aggregate().match(showFilter).group(groupBy);
-    console.log('aggregate', aggregate);
+
+    if (aggregate.length === 0) {
+      return;
+    }
 
     const averageRating = aggregate[0]['averageRating'] as number;
-    const totalReviews = aggregate[0]['totalReviews'] as number;
+    const numberOfReviews = aggregate[0]['numberOfReviews'] as number;
 
-    Talent.findByIdAndUpdate(
+    await Talent.findByIdAndUpdate(
       { _id: show.talent },
       {
-        feedbackStats: {
-          averageRating,
-          totalReviews,
-        },
+        'feedbackStats.averageRating': averageRating,
+        'feedbackStats.numberOfReviews': numberOfReviews,
       }
     );
     showSession.endSession();

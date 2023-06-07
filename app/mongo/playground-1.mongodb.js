@@ -1,24 +1,22 @@
 use("test");
 
-db.tickets.aggregate([
+db.shows.aggregate([
   {
     $match: {
-      "ticketState.feedback": { $exists: true },
+      "showState.feedbackStats.numberOfReviews": { $gt: 0 },
     },
   },
   {
     $group: {
-      _id: "$show",
-      totalReviews: { $sum: 1 },
-      averageRating: {
-        $avg: "$ticketState.feedback.rating",
-      },
+      _id: null,
+      numberOfReviews: { $sum: "$showState.feedbackStats.numberOfReviews" },
+      averageRating: { $avg: "$showState.feedbackStats.averageRating" },
     },
   },
   {
     $project: {
       _id: 1,
-      totalReviews: 1,
+      numberOfReviews: 1,
       averageRating: 1,
     },
   },

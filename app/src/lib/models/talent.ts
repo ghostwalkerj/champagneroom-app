@@ -13,7 +13,7 @@ const feedbackSchema = new Schema({
     max: 5,
     required: true,
   },
-  totalReviews: {
+  numberOfReviews: {
     type: Number,
     default: 0,
     min: 0,
@@ -90,8 +90,12 @@ const talentSchema = new Schema(
       },
     },
     agent: { type: Schema.Types.ObjectId, ref: 'Agent', required: true },
-    feedbackStats: feedbackSchema,
-    salesStats: salesSchema,
+    feedbackStats: {
+      type: feedbackSchema,
+      required: true,
+      default: () => ({}),
+    },
+    salesStats: { type: salesSchema, required: true, default: () => ({}) },
   },
   { timestamps: true }
 );

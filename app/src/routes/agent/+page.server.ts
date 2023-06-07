@@ -5,6 +5,7 @@ import { Agent } from '$lib/models/agent';
 import { Talent } from '$lib/models/talent';
 import { womensNames } from '$lib/util/womensNames';
 import { uniqueNamesGenerator } from 'unique-names-generator';
+import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
 
 export const actions: Actions = {
   get_or_create_agent: async ({ request }) => {
@@ -70,6 +71,7 @@ export const actions: Actions = {
       name,
       agentCommission: +agentCommission,
       agent: agentId,
+      profileImageUrl: PUBLIC_DEFAULT_PROFILE_IMAGE,
     });
 
     return {

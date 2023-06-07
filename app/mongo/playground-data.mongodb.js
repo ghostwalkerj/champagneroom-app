@@ -31,7 +31,7 @@ const agent = db.getCollection("agents").findOne();
 //       ratingAvg: 0,
 //       totalEarnings: 0,
 //       totalRating: 0,
-//       numReviews: 0,
+//       numberOfReviews: 0,
 //       numCompletedShows: 0,
 //       completedShows: [],
 //       createdAt: {
@@ -67,7 +67,7 @@ db.getCollection("shows").insertMany([
       profileImageUrl:
         "https://bafkreieyzmlltipqvqgpx66uupuqm7c7llkbtgtrgynewfnmcid45s2i4m.ipfs.w3s.link",
       ratingAvg: 0,
-      numReviews: 0,
+      numberOfReviews: 0,
     },
     showState: {
       status: "CANCELLED",
@@ -82,7 +82,7 @@ db.getCollection("shows").insertMany([
         totalRefunded: 0,
       },
       feedbackStats: {
-        totalReviews: 0,
+        numberOfReviews: 0,
         averageRating: 0,
       },
       cancel: {
@@ -126,7 +126,7 @@ db.getCollection("shows").insertMany([
 //       profileImageUrl:
 //         "https://bafkreieyzmlltipqvqgpx66uupuqm7c7llkbtgtrgynewfnmcid45s2i4m.ipfs.w3s.link",
 //       ratingAvg: 0,
-//       numReviews: 0,
+//       numberOfReviews: 0,
 //     },
 //     showState: {
 //       status: "BOX OFFICE OPEN",
@@ -141,7 +141,7 @@ db.getCollection("shows").insertMany([
 //         totalRefunded: 0,
 //       },
 //       feedbackStats: {
-//         totalReviews: 0,
+//         numberOfReviews: 0,
 //         averageRating: 0,
 //       },
 //       refunds: [],

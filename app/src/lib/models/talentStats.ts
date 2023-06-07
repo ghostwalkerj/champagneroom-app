@@ -20,7 +20,7 @@ const talentStatsSchema = new Schema(
         message: '{VALUE} is not an integer value',
       },
     },
-    totalReviews: {
+    numberOfReviews: {
       type: Number,
       default: 0,
       min: 0,

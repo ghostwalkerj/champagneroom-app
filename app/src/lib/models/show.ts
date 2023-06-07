@@ -142,7 +142,7 @@ const salesStatsSchema = new Schema({
 });
 
 const feedbackStatsSchema = new Schema({
-  totalReviews: {
+  numberOfReviews: {
     type: Number,
     required: true,
     default: 0,
@@ -239,7 +239,7 @@ const showSchema = new Schema(
         name: { type: String, required: true },
         profileImageUrl: { type: String, required: true },
         ratingAvg: { type: Number, required: true, default: 0 },
-        numReviews: { type: Number, required: true, default: 0 },
+        numberOfReviews: { type: Number, required: true, default: 0 },
       },
       required: true,
     },

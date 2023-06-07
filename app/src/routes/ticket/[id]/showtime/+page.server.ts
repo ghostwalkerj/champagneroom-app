@@ -87,7 +87,6 @@ export const load: PageServerLoad = async ({ params, cookies, locals }) => {
 
 export const actions: Actions = {
   leave_show: async ({ params, cookies, locals }) => {
-    console.log('leave show');
     const ticketId = params.id as string;
     const pinHash = cookies.get('pin');
 

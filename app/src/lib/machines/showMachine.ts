@@ -675,7 +675,7 @@ export const createShowMachine = ({
         fullyReviewed: (context, event) => {
           const count = event.type === 'FEEDBACK RECEIVED' ? 1 : 0;
           const fullReviewed =
-            context.showState.feedbackStats.totalReviews + count ===
+            context.showState.feedbackStats.numberOfReviews + count ===
             context.showState.salesStats.ticketsSold;
           return fullReviewed;
         },

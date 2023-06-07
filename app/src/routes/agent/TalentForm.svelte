@@ -10,7 +10,7 @@
   export let form: ActionData;
 
   $: loading = false;
-  let talentName = uniqueNamesGenerator({
+  $: talentName = uniqueNamesGenerator({
     dictionaries: [womensNames],
   });
 
@@ -19,14 +19,12 @@
     return async ({ result }) => {
       if (result.success) {
         invalidateAll();
-        talentName = uniqueNamesGenerator({
-          dictionaries: [womensNames],
-        });
-      } else {
-        talentName = form?.name || '';
       }
       await applyAction(result);
       loading = false;
+      talentName = uniqueNamesGenerator({
+        dictionaries: [womensNames],
+      });
     };
   };
 </script>
