@@ -214,14 +214,14 @@
                 class="btn btn-sm btn-circle absolute right-2 top-2">✕</label
               >
               <div
-                class="grid grid-rows-1 gap-4 grid-flow-col justify-center items-center"
+                class="grid grid-rows-1 gap-4 grid-flow-col justify-center items-center w-full"
               >
                 <form
                   method="post"
                   action="?/leave_feedback"
                   use:enhance={({ formElement }) => onSubmit(formElement)}
                 >
-                  <div class="max-w-xs w-full py-2 form-control">
+                  <div class=" w-full py-2 form-control">
                     <!-- svelte-ignore a11y-label-has-associated-control -->
                     <label for="rating" class="label">
                       <span class="label-text">Rating</span></label
@@ -271,7 +271,7 @@
                         Rating is Required
                       </div>{/if}
                   </div>
-                  <div class="max-w-xs w-full py-2 form-control">
+                  <div class="max-w-s w-full py-2 form-control">
                     <!-- svelte-ignore a11y-label-has-associated-control -->
                     <label for="review" class="label">
                       <span class="label-text">Review</span></label
@@ -279,7 +279,7 @@
                     <div class="rounded-md shadow-sm mt-1 relative">
                       <textarea
                         name="review"
-                        class="textarea textarea-primary"
+                        class="textarea textarea-lg textarea-primary"
                         value={form?.review ?? ''}
                       />
                     </div>
@@ -364,7 +364,7 @@
                     <div class="rounded-md shadow-sm mt-1 relative">
                       <textarea
                         name="explanation"
-                        class="textarea textarea-primary"
+                        class="textarea textarea-primary textarea-lg"
                         value={form?.explanation ?? ''}
                       />
                       {#if form?.missingExplanation}<div
