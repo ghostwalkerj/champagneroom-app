@@ -8,10 +8,12 @@ import express from 'express';
 import parseArgv from 'tiny-parse-argv';
 import { handler } from './build/handler';
 import { EntityType } from './dist/constants';
-import { getQueue, getWorker } from './dist/workers';
+import { getWorker } from './dist/workers';
 const buildNumber = generate('0.1');
 const buildTime = format(buildNumber);
 import IORedis from 'ioredis';
+import mongoose from 'mongoose';
+import { Queue } from 'bullmq';
 
 const startWorker = parseArgv(process.argv).worker || false;
 const app = express();
@@ -31,23 +33,25 @@ const redisOptions = {
   },
 };
 
-const connection = new IORedis(redisOptions.connection);
+const redisConnection = new IORedis(redisOptions.connection);
 
 const mongoDBEndpoint =
   process.env.MONGO_DB_ENDPOINT || 'mongodb://localhost:27017';
+mongoose.connect(mongoDBEndpoint);
+
+const showQueue = new Queue(EntityType.SHOW, { connection: redisConnection });
 
 // Workers
 if (startWorker) {
-  const showWorker = getWorker(EntityType.SHOW, connection, mongoDBEndpoint);
+  const showWorker = getWorker(EntityType.SHOW, showQueue, redisConnection);
   showWorker.run();
 }
 
 // Bull Dashboard
-const queue = getQueue(EntityType.SHOW, connection);
 const serverAdapter = new ExpressAdapter();
 serverAdapter.setBasePath('/admin/queues');
 const { addQueue, removeQueue, setQueues, replaceQueues } = createBullBoard({
-  queues: [new BullMQAdapter(queue)],
+  queues: [new BullMQAdapter(showQueue)],
   serverAdapter: serverAdapter,
 });
 app.use('/admin/queues', serverAdapter.getRouter());

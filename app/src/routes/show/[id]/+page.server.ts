@@ -1,10 +1,11 @@
 import { PUBLIC_TICKET_PATH } from '$env/static/public';
 import { Show } from '$lib/models/show';
 import { Ticket } from '$lib/models/ticket';
-import { mensNames } from '$util/mensNames';
-import { createPinHash } from '$util/pin';
-import { getShowMachineService } from '$util/util.server';
+import { mensNames } from '$lib/util/mensNames';
+import { createPinHash } from '$lib/util/pin';
+import { getShowMachineServiceFromId } from '$lib/util/util.server';
 import { error, fail, redirect } from '@sveltejs/kit';
+import type IORedis from 'ioredis';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 import urlJoin from 'url-join';
 import type { Actions, PageServerLoad } from './$types';
@@ -33,7 +34,7 @@ export const load: PageServerLoad = async ({ params }) => {
 };
 
 export const actions: Actions = {
-  reserve_ticket: async ({ params, cookies, request, url }) => {
+  reserve_ticket: async ({ params, cookies, request, url, locals }) => {
     const showId = params.id;
     if (showId === null) {
       return fail(404, { showId, missingShowId: true });
@@ -61,7 +62,12 @@ export const actions: Actions = {
       })
       .exec();
 
-    const showService = getShowMachineService(show);
+    const redisConnection = locals.redisConnection as IORedis;
+
+    const showService = await getShowMachineServiceFromId(
+      showId,
+      redisConnection
+    );
 
     const showState = showService.getSnapshot();
     if (

@@ -8,8 +8,9 @@ import {
   type ShowStateType,
 } from '$lib/models/show';
 import { Talent, type TalentDocumentType } from '$lib/models/talent';
-import { getShowMachineServiceFromId } from '$util/util.server';
+import { getShowMachineServiceFromId } from '$lib/util/util.server';
 import { error, fail } from '@sveltejs/kit';
+import type IORedis from 'ioredis';
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
 
 export const load: PageServerLoad = async ({ params }) => {
@@ -111,7 +112,7 @@ export const actions: Actions = {
       show: JSON.parse(JSON.stringify(show)),
     };
   },
-  cancel_show: async ({ request, params }) => {
+  cancel_show: async ({ request, params, locals }) => {
     const key = params.key;
     const data = await request.formData();
     const showId = data.get('showId') as string;
@@ -123,7 +124,12 @@ export const actions: Actions = {
       throw error(404, 'Show ID not found');
     }
 
-    const showService = await getShowMachineServiceFromId(showId);
+    const redisConnection = locals.redisConnection as IORedis;
+
+    const showService = await getShowMachineServiceFromId(
+      showId,
+      redisConnection
+    );
     const showMachineState = showService.getSnapshot();
 
     const cancel = {
@@ -151,7 +157,7 @@ export const actions: Actions = {
       showCancelled: true,
     };
   },
-  end_show: async ({ request }) => {
+  end_show: async ({ request, locals }) => {
     const data = await request.formData();
     const showId = data.get('showId') as string;
 
@@ -160,7 +166,13 @@ export const actions: Actions = {
     }
 
     let isInEscrow = false;
-    const showService = await getShowMachineServiceFromId(showId);
+
+    const redisConnection = locals.redisConnection as IORedis;
+
+    const showService = await getShowMachineServiceFromId(
+      showId,
+      redisConnection
+    );
     const showState = showService.getSnapshot();
 
     if (showState.can({ type: ShowMachineEventString.SHOW_ENDED })) {
@@ -176,7 +188,7 @@ export const actions: Actions = {
       inEscrow: isInEscrow,
     };
   },
-  refund_tickets: async ({ request }) => {
+  refund_tickets: async ({ request, locals }) => {
     const data = await request.formData();
     const showId = data.get('showId') as string;
 
@@ -184,7 +196,11 @@ export const actions: Actions = {
       throw error(404, 'Show ID not found');
     }
 
-    const showService = await getShowMachineServiceFromId(showId);
+    const redisConnection = locals.redisConnection as IORedis;
+    const showService = await getShowMachineServiceFromId(
+      showId,
+      redisConnection
+    );
     const showState = showService.getSnapshot();
 
     if (showState.matches('initiatedCancellation.waiting2Refund')) {

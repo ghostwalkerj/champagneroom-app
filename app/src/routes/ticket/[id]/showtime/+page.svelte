@@ -14,7 +14,7 @@
   } from '$lib/machines/ticketMachine';
   import type { ShowDocumentType } from '$lib/models/show';
   import type { TicketDocumentType } from '$lib/models/ticket';
-  import getProfileImage from '$util/profilePhoto';
+  import getProfileImage from '$lib/util/profilePhoto';
   import { onDestroy, onMount } from 'svelte';
   import urlJoin from 'url-join';
   import type { PageData } from './$types';

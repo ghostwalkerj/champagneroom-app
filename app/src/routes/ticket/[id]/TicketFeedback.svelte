@@ -3,7 +3,7 @@
   import { currencyFormatter, durationFormatter } from '$lib/constants';
   import type { ShowDocumentType } from '$lib/models/show';
   import type { TicketDocumentType } from '$lib/models/ticket';
-  import getProfileImage from '$util/profilePhoto';
+  import getProfileImage from '$lib/util/profilePhoto';
   export let show: ShowDocumentType;
   export let ticket: TicketDocumentType;
 

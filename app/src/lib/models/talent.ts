@@ -5,6 +5,49 @@ import validator from 'validator';
 
 const { Schema, models } = pkg;
 
+const feedbackSchema = new Schema({
+  averageRating: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 5,
+    required: true,
+  },
+  totalReviews: {
+    type: Number,
+    default: 0,
+    min: 0,
+    required: true,
+  },
+});
+
+const salesSchema = new Schema({
+  totalSales: {
+    type: Number,
+    default: 0,
+    min: 0,
+    required: true,
+  },
+  totalEarnings: {
+    type: Number,
+    default: 0,
+    min: 0,
+    required: true,
+  },
+  numberOfShows: {
+    type: Number,
+    default: 0,
+    min: 0,
+    required: true,
+  },
+  totalRefunds: {
+    type: Number,
+    default: 0,
+    min: 0,
+    required: true,
+  },
+});
+
 const talentSchema = new Schema(
   {
     // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -47,6 +90,8 @@ const talentSchema = new Schema(
       },
     },
     agent: { type: Schema.Types.ObjectId, ref: 'Agent', required: true },
+    feedbackStats: feedbackSchema,
+    salesStats: salesSchema,
   },
   { timestamps: true }
 );

@@ -2,161 +2,92 @@ import { ActorType, EntityType } from '$lib/constants';
 import {
   ShowMachineEventString,
   createShowMachineService,
+  type ShowMachineServiceType,
 } from '$lib/machines/showMachine';
 import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
-import {
-  TicketMachineEventString,
-  createTicketMachineService,
-} from '$lib/machines/ticketMachine';
-import type {
-  ShowDocumentType,
-  ShowFinalizedType,
-  ShowStateType,
-  ShowType,
-} from '$lib/models/show';
-import { Show } from '$lib/models/show';
-import { ShowEvent } from '$lib/models/showEvent';
+import { TicketMachineEventString } from '$lib/machines/ticketMachine';
+import type { ShowFinalizedType, ShowType } from '$lib/models/show';
+import { SaveState, Show } from '$lib/models/show';
 import { Talent } from '$lib/models/talent';
-import type {
-  TicketDocumentType,
-  TicketStateType,
-  TicketType,
-} from '$lib/models/ticket';
+import type { TicketStateType } from '$lib/models/ticket';
 import { Ticket, TicketCancelReason } from '$lib/models/ticket';
-import type {
-  TransactionDocumentType,
-  TransactionType,
-} from '$lib/models/transaction';
+import type { TransactionType } from '$lib/models/transaction';
 import { Transaction, TransactionReasonType } from '$lib/models/transaction';
+
+import { createShowEvent } from '$lib/models/showEvent';
+import { getTicketMachineService } from '$lib/util/util.server';
 import type { Job, Queue } from 'bullmq';
 import { Worker } from 'bullmq';
 import type IORedis from 'ioredis';
-import { ObjectId } from 'mongodb';
-import mongoose from 'mongoose';
-import { getQueue } from '.';
+import type { connection } from 'mongoose';
 
 export type ShowJobDataType = {
   showId: string;
   [key: string]: any;
 };
 
-const saveState = (show: ShowDocumentType, newState: ShowStateType) => {
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  Show.updateOne({ _id: show._id }, { $set: { showState: newState } }).exec();
-};
-
-const createShowEvent = ({
-  show,
-  type,
-  ticket,
-  transaction,
-}: {
-  show: ShowDocumentType;
-  type: string;
-  ticket?: TicketDocumentType;
-  transaction?: TransactionDocumentType;
-}) => {
-  ShowEvent.create({
-    show: show._id,
-    type,
-    ticket: ticket?._id,
-    transaction: transaction?._id,
-    agent: show.agent,
-    talent: show.talent,
-    ticketInfo: {
-      name: ticket?.customerName,
-      price: ticket?.price,
-    },
-  });
-};
-
-const getShowMachineService = (show: ShowType, showQueue: Queue) => {
-  return createShowMachineService({
-    showDocument: show,
-    showMachineOptions: {
-      saveStateCallback: async showState => saveState(show, showState),
-      saveShowEventCallback: async ({ type, ticket, transaction }) =>
-        createShowEvent({ show, type, ticket, transaction }),
-      jobQueue: showQueue,
-    },
-  });
-};
-
-export const getTicketMachineService = (
-  ticket: TicketType,
-  show: ShowType,
-  showQueue: Queue
+export const getShowWorker = (
+  showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>,
+  redisConnection: IORedis
 ) => {
-  const ticketMachineOptions = {
-    saveStateCallback: (ticketState: TicketStateType) => {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      Ticket.updateOne({ _id: ticket._id }, { $set: { ticketState } }).exec();
-    },
-  };
-
-  return createTicketMachineService({
-    ticketDocument: ticket,
-    ticketMachineOptions,
-    showDocument: show,
-    showMachineOptions: {
-      saveStateCallback: async showState => saveState(show, showState),
-      saveShowEventCallback: async ({ type, ticket, transaction }) =>
-        createShowEvent({ show, type, ticket, transaction }),
-      jobQueue: showQueue,
-    },
-  });
-};
-
-export const getShowWorker = (connection: IORedis, mongoDBEndpoint: string) => {
-  const showQueue = getQueue(EntityType.SHOW, connection) as Queue<
-    ShowJobDataType,
-    any,
-    ShowMachineEventString
-  >;
-  mongoose.connect(mongoDBEndpoint);
-
   return new Worker(
     EntityType.SHOW,
     async (job: Job<ShowJobDataType, any, ShowMachineEventString>) => {
+      const show = (await Show.findById(job.data.showId).exec()) as ShowType;
+
+      const showService = createShowMachineService({
+        showDocument: show,
+        showMachineOptions: {
+          saveStateCallback: async showState => SaveState(show, showState),
+          saveShowEventCallback: async ({ type, ticket, transaction }) =>
+            createShowEvent({ show, type, ticket, transaction }),
+          jobQueue: showQueue,
+        },
+      });
+
+      if (!show) {
+        return;
+      }
       switch (job.name) {
         case ShowMachineEventString.CANCELLATION_INITIATED: {
-          cancelShow(job, showQueue);
+          cancelShow(show, showService, showQueue);
           break;
         }
         case ShowMachineEventString.REFUND_INITIATED: {
-          refundShow(job, showQueue);
+          refundShow(show, showService, showQueue);
           break;
         }
         case ShowMachineEventString.SHOW_ENDED: {
-          endShow(job, showQueue);
+          endShow(show, showQueue, showService);
           break;
         }
         case ShowMachineEventString.SHOW_STOPPED: {
-          stopShow(job, showQueue);
+          stopShow(showService);
           break;
         }
         case ShowMachineEventString.SHOW_FINALIZED: {
-          finalizeShow(job, showQueue);
+          finalizeShow(showService);
           break;
         }
         case ShowMachineEventString.FEEDBACK_RECEIVED: {
-          feedbackReceived(job, mongoDBEndpoint);
+          feedbackReceived(show);
+          break;
+        }
+        case ShowMachineEventString.ESCROW_ENDED: {
+          endEscrow(show, showService);
           break;
         }
       }
     },
-    { autorun: false, connection }
+    { autorun: false, connection: redisConnection }
   );
 };
 
 const cancelShow = async (
-  job: Job<ShowJobDataType, any, ShowMachineEventString>,
+  show: ShowType,
+  showService: ShowMachineServiceType,
   showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>
 ) => {
-  const show = (await Show.findById(job.data.showId).orFail(
-    new Error('Show not found')
-  )) as ShowType;
-  const showService = getShowMachineService(show, showQueue);
   const showState = showService.getSnapshot();
   const tickets = await Ticket.find({
     show: show._id,
@@ -187,14 +118,10 @@ const cancelShow = async (
 };
 
 const refundShow = async (
-  job: Job<ShowJobDataType, any, ShowMachineEventString>,
+  show: ShowType,
+  showService: ShowMachineServiceType,
   showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>
 ) => {
-  const show = (await Show.findById(job.data.showId).orFail(
-    new Error('Show not found')
-  )) as ShowType;
-  const showService = getShowMachineService(show, showQueue);
-
   // Check if show needs to send refunds
   const showState = showService.getSnapshot();
   if (showState.matches('initiatedCancellation.initiatedRefund')) {
@@ -237,15 +164,7 @@ const refundShow = async (
 };
 
 // Stop show, allow grace period before ending
-const stopShow = async (
-  job: Job<ShowJobDataType, any, ShowMachineEventString>,
-  showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>
-) => {
-  const show = (await Show.findById(job.data.showId).orFail(
-    new Error('Show not found')
-  )) as ShowType;
-  const showService = getShowMachineService(show, showQueue);
-
+const stopShow = async (showService: ShowMachineServiceType) => {
   const showState = showService.getSnapshot();
   // End show if grace period is over
   if (showState.matches('stopped')) {
@@ -254,16 +173,26 @@ const stopShow = async (
   showService.stop();
 };
 
+const endEscrow = async (showService: ShowMachineServiceType) => {
+  const showState = showService.getSnapshot();
+  if (showState.matches('inEscrow')) {
+    showService.send({
+      type: ShowMachineEventString.SHOW_FINALIZED,
+      finalize: {
+        finalizedAt: new Date(),
+        finalizedBy: ActorType.TIMER,
+      },
+    });
+  }
+  showService.stop();
+};
+
 // End show, alert ticket
 const endShow = async (
-  job: Job<ShowJobDataType, any, ShowMachineEventString>,
-  showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>
+  show: ShowType,
+  showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>,
+  showService: ShowMachineServiceType
 ) => {
-  const show = (await Show.findById(job.data.showId).orFail(
-    new Error('Show not found')
-  )) as ShowType;
-  const showService = getShowMachineService(show, showQueue);
-
   // Tell ticket holders the show is over folks
   const showState = showService.getSnapshot();
   if (showState.matches('inEscrow')) {
@@ -280,18 +209,12 @@ const endShow = async (
     }
   }
   showService.stop();
+
+  // Send a job to finalize the show after escrow period
 };
 
 // Calculate sales stats
-const finalizeShow = async (
-  job: Job<ShowJobDataType, any, ShowMachineEventString>,
-  showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>
-) => {
-  const show = (await Show.findById(job.data.showId).orFail(
-    new Error('Show not found')
-  )) as ShowType;
-  const showService = getShowMachineService(show, showQueue);
-
+const finalizeShow = async (showService: ShowMachineServiceType) => {
   // Check if show needs to send refunds
   const showState = showService.getSnapshot();
   if (showState.matches('inEscrow')) {
@@ -309,19 +232,13 @@ const finalizeShow = async (
 };
 
 // Calculate feedback stats
-const feedbackReceived = async (
-  job: Job<ShowJobDataType, any, ShowMachineEventString>,
-  mongoDBEndpoint: string
-) => {
-  const connect = await mongoose.connect(mongoDBEndpoint);
-  let session = await connect.startSession();
-  const show = (await Show.findById(job.data.showId).orFail(
-    new Error('Show not found')
-  )) as ShowType;
-  await session.withTransaction(async () => {
+const feedbackReceived = async (show: ShowType) => {
+  const showSession = await Show.startSession();
+
+  await showSession.withTransaction(async () => {
     // aggregate ticket feedback into show
     const ticketFilter = {
-      show: new ObjectId(job.data.showId),
+      show: show._id,
       'ticketState.feedback.rating': { $exists: true },
     };
 
@@ -343,39 +260,38 @@ const feedbackReceived = async (
     };
 
     show.save();
-    session.endSession();
+    showSession!.endSession();
+  });
 
-    // aggregate show feedback into talent
-    session = await connect.startSession();
-    await session.withTransaction(async () => {
-      const showFilter = {
-        talent: show.talent,
-        'showState.feedbackStats.totalReviews': { $gte: 1 },
-      };
+  // aggregate show feedback into talent
+  const talentSession = await Talent.startSession();
+  await talentSession.withTransaction(async () => {
+    const showFilter = {
+      talent: show.talent,
+      'showState.feedbackStats.totalReviews': { $gte: 1 },
+    };
 
-      const groupBy = {
-        _id: null,
-        totalReviews: { $sum: '$showState.feedbackStats.totalReviews' },
-        averageRating: { $avg: '$showState.feedbackStats.averageRating' },
-      };
+    const groupBy = {
+      _id: null,
+      totalReviews: { $sum: '$showState.feedbackStats.totalReviews' },
+      averageRating: { $avg: '$showState.feedbackStats.averageRating' },
+    };
 
-      const aggregate = await Show.aggregate().match(showFilter).group(groupBy);
+    const aggregate = await Show.aggregate().match(showFilter).group(groupBy);
+    console.log('aggregate', aggregate);
 
-      const averageRating = aggregate[0]['averageRating'] as number;
-      const totalReviews = aggregate[0]['totalReviews'] as number;
+    const averageRating = aggregate[0]['averageRating'] as number;
+    const totalReviews = aggregate[0]['totalReviews'] as number;
 
-      Talent.findByIdAndUpdate(
-        { _id: show.talent },
-        {
-          talentState: {
-            feedbackStats: {
-              averageRating,
-              totalReviews,
-            },
-          },
-        }
-      );
-      session.endSession();
-    });
+    Talent.findByIdAndUpdate(
+      { _id: show.talent },
+      {
+        feedbackStats: {
+          averageRating,
+          totalReviews,
+        },
+      }
+    );
+    showSession.endSession();
   });
 };

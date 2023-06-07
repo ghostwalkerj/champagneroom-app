@@ -47,6 +47,7 @@ export enum ShowMachineEventString {
   CUSTOMER_JOINED = 'CUSTOMER JOINED',
   CUSTOMER_LEFT = 'CUSTOMER LEFT',
   FEEDBACK_RECEIVED = 'FEEDBACK RECEIVED',
+  ESCROW_ENDED = 'ESCROW ENDED',
 }
 
 export type ShowMachineEventType =
@@ -108,6 +109,9 @@ export type ShowMachineEventType =
   | {
       type: 'CUSTOMER LEFT';
       ticket: TicketDocumentType;
+    }
+  | {
+      type: 'ESCROW ENDED';
     };
 
 export const createShowMachine = ({
@@ -398,6 +402,7 @@ export const createShowMachine = ({
         endShow: assign((context, event) => {
           showMachineOptions?.jobQueue?.add(event.type, {
             showId: context.showDocument._id.toString(),
+            escrowPeriod: ESCROW_PERIOD,
           });
           return {
             showState: {
@@ -418,6 +423,13 @@ export const createShowMachine = ({
               showId: context.showDocument._id.toString(),
             },
             { delay: GRACE_PERIOD }
+          );
+          showMachineOptions?.jobQueue?.add(
+            ShowMachineEventString.ESCROW_ENDED,
+            {
+              showId: context.showDocument._id.toString(),
+            },
+            { delay: ESCROW_PERIOD }
           );
           return {
             showState: {
@@ -497,14 +509,7 @@ export const createShowMachine = ({
           };
         }),
 
-        enterEscrow: assign((context, event) => {
-          showMachineOptions?.jobQueue?.add(
-            event.type,
-            {
-              showId: context.showDocument._id.toString(),
-            },
-            { delay: +ESCROW_PERIOD }
-          );
+        enterEscrow: assign(context => {
           return {
             showState: {
               ...context.showState,

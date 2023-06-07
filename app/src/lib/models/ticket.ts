@@ -169,3 +169,10 @@ export const Ticket = models?.Ticket
   : mongoose.model<TicketDocumentType>('Ticket', ticketSchema);
 
 export type TicketType = InstanceType<typeof Ticket>;
+
+export const SaveState = (ticket: TicketType, newState: TicketStateType) => {
+  Ticket.updateOne(
+    { _id: ticket._id },
+    { $set: { showState: newState } }
+  ).exec();
+};

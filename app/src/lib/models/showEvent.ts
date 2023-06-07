@@ -1,5 +1,8 @@
 import type { InferSchemaType, Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
+import type { ShowDocumentType } from './show';
+import type { TicketDocumentType } from './ticket';
+import type { TransactionDocumentType } from './transaction';
 
 const { Schema, models } = pkg;
 const showeventSchema = new Schema(
@@ -32,3 +35,28 @@ export const ShowEvent = models?.ShowEvent
   : mongoose.model<ShowEventDocumentType>('ShowEvent', showeventSchema);
 
 export type ShowEventType = InstanceType<typeof ShowEvent>;
+
+export const createShowEvent = ({
+  show,
+  type,
+  ticket,
+  transaction,
+}: {
+  show: ShowDocumentType;
+  type: string;
+  ticket?: TicketDocumentType;
+  transaction?: TransactionDocumentType;
+}) => {
+  ShowEvent.create({
+    show: show._id,
+    type,
+    ticket: ticket?._id,
+    transaction: transaction?._id,
+    agent: show.agent,
+    talent: show.talent,
+    ticketInfo: {
+      name: ticket?.customerName,
+      price: ticket?.price,
+    },
+  });
+};

@@ -10,14 +10,15 @@ import { Talent } from '$lib/models/talent';
 import {
   getShowMachineService,
   getShowMachineServiceFromId,
-} from '$util/util.server';
+} from '$lib/util/util.server';
 import type { Actions } from '@sveltejs/kit';
 import { error, redirect } from '@sveltejs/kit';
+import type IORedis from 'ioredis';
 import jwt from 'jsonwebtoken';
 import urlJoin from 'url-join';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params, locals }) => {
   const key = params.key;
 
   if (key === null) {
@@ -40,8 +41,8 @@ export const load: PageServerLoad = async ({ params }) => {
     })
     .exec();
 
-  const showService = getShowMachineService(show);
-
+  const redisConnection = locals.redisConnection as IORedis;
+  const showService = getShowMachineService(show, redisConnection);
   const showState = showService.getSnapshot();
 
   if (!showState.can({ type: ShowMachineEventString.SHOW_STARTED })) {
@@ -81,12 +82,17 @@ export const load: PageServerLoad = async ({ params }) => {
 };
 
 export const actions: Actions = {
-  end_show: async ({ request }) => {
+  end_show: async ({ request, locals }) => {
     const data = await request.formData();
 
     const showId = data.get('showId') as string;
 
-    const showService = await getShowMachineServiceFromId(showId);
+    const redisConnection = locals.redisConnection as IORedis;
+
+    const showService = await getShowMachineServiceFromId(
+      showId,
+      redisConnection
+    );
 
     const showState = showService.getSnapshot();
 

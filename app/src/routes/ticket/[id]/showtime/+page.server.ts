@@ -11,16 +11,17 @@ import {
 import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 import type { ShowType } from '$lib/models/show';
 import { Ticket } from '$lib/models/ticket';
-import { verifyPin } from '$util/pin';
-import { getTicketMachineService } from '$util/util.server';
+import { verifyPin } from '$lib/util/pin';
+import { getTicketMachineService } from '$lib/util/util.server';
 import type { Actions } from '@sveltejs/kit';
 import { error, redirect } from '@sveltejs/kit';
+import type IORedis from 'ioredis';
 import jwt from 'jsonwebtoken';
 import urlJoin from 'url-join';
 import type { PageServerLoad } from './$types';
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-export const load: PageServerLoad = async ({ params, cookies }) => {
+export const load: PageServerLoad = async ({ params, cookies, locals }) => {
   const ticketId = params.id;
   const pinHash = cookies.get('pin');
   const ticketUrl = urlJoin(PUBLIC_TICKET_PATH, ticketId);
@@ -48,7 +49,9 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
   }
 
   // Check if can watch the show
-  const ticketService = getTicketMachineService(ticket, show);
+  const redisConnection = locals.redisConnection as IORedis;
+
+  const ticketService = getTicketMachineService(ticket, show, redisConnection);
   const ticketMachineState = ticketService.getSnapshot();
 
   if (!ticketMachineState.can(TicketMachineEventString.SHOW_JOINED)) {
@@ -83,7 +86,7 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
 };
 
 export const actions: Actions = {
-  leave_show: async ({ params, cookies }) => {
+  leave_show: async ({ params, cookies, locals }) => {
     console.log('leave show');
     const ticketId = params.id as string;
     const pinHash = cookies.get('pin');
@@ -101,7 +104,12 @@ export const actions: Actions = {
 
     const show = ticket.show as unknown as ShowType;
     if (pinHash && verifyPin(ticketId, ticket.pin, pinHash)) {
-      const ticketService = getTicketMachineService(ticket, show);
+      const redisConnection = locals.redisConnection as IORedis;
+      const ticketService = getTicketMachineService(
+        ticket,
+        show,
+        redisConnection
+      );
       ticketService.send(TicketMachineEventString.SHOW_LEFT);
     }
     return { success: true };

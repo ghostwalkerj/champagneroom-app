@@ -2,7 +2,7 @@
   import { applyAction, enhance } from '$app/forms';
   import { invalidateAll } from '$app/navigation';
   import type { AgentDocumentType } from '$lib/models/agent';
-  import { womensNames } from '$util/womensNames';
+  import { womensNames } from '$lib/util/womensNames';
   import { uniqueNamesGenerator } from 'unique-names-generator';
   import type { ActionData } from './$types';
 

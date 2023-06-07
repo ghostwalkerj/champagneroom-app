@@ -270,3 +270,7 @@ export const Show = models?.Show
   : mongoose.model<ShowDocumentType>('Show', showSchema);
 
 export type ShowType = InstanceType<typeof Show>;
+
+export const SaveState = (show: ShowType, newState: ShowStateType) => {
+  Show.updateOne({ _id: show._id }, { $set: { showState: newState } }).exec();
+};

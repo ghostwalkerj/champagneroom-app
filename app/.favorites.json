@@ -569,14 +569,6 @@
         "id": "LgN9yJnbu1EGix5p"
     },
     {
-        "type": "Directory",
-        "name": "/Users/joseph/Dev/pcall/app/src/util",
-        "parent_id": null,
-        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
-        "workspacePath": "src/util",
-        "id": "M7w3CkVz4rAH8dEI"
-    },
-    {
         "type": "Group",
         "name": "api",
         "parent_id": "5O6S0J3dcsvABnjo",
@@ -649,5 +641,13 @@
         "workspaceRoot": "/Users/joseph/Dev/pcall/app",
         "workspacePath": "src/stores.ts",
         "id": "uTPt6SsvzNgLdXej"
+    },
+    {
+        "type": "Directory",
+        "name": "/Users/joseph/Dev/pcall/app/src/lib/util",
+        "parent_id": null,
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/lib/util",
+        "id": "ro8uBgdEx4GHfqyV"
     }
 ]

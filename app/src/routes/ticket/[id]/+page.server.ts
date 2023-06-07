@@ -13,16 +13,17 @@ import type { ShowMachineServiceType } from '$lib/machines/showMachine';
 import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
 import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 import { Show } from '$lib/models/show';
-import { verifyPin } from '$util/pin';
+import { verifyPin } from '$lib/util/pin';
 import {
   getTicketMachineService,
   getTicketMachineServiceFromId,
-} from '$util/util.server';
+} from '$lib/util/util.server';
 import { error, fail, redirect } from '@sveltejs/kit';
+import type IORedis from 'ioredis';
 import urlJoin from 'url-join';
 import type { Actions, PageServerLoad } from './$types';
 
-const getTicketService = async (ticketId: string, connection: IORedis) => {
+const getTicketService = async (ticketId: string, redisConnection: IORedis) => {
   const ticket = await Ticket.findById(ticketId)
     .orFail(() => {
       throw error(404, 'Ticket not found');
@@ -35,7 +36,7 @@ const getTicketService = async (ticketId: string, connection: IORedis) => {
     })
     .exec();
 
-  const ticketService = getTicketMachineService(ticket, show, connection);
+  const ticketService = getTicketMachineService(ticket, show, redisConnection);
   return { ticket, show, ticketService };
 };
 
@@ -74,13 +75,18 @@ export const load: PageServerLoad = async ({ params, cookies, url }) => {
 };
 
 export const actions: Actions = {
-  buy_ticket: async ({ params }) => {
+  buy_ticket: async ({ params, locals }) => {
     const ticketId = params.id;
     if (ticketId === null) {
       throw error(404, 'Key not found');
     }
 
-    const { ticket, show, ticketService } = await getTicketService(ticketId);
+    const redisConnection = locals.redisConnection as IORedis;
+
+    const { ticket, show, ticketService } = await getTicketService(
+      ticketId,
+      redisConnection
+    );
 
     Transaction.create({
       //TODO: add transaction data
@@ -103,13 +109,18 @@ export const actions: Actions = {
 
     return { success: true, ticketBought: true };
   },
-  cancel_ticket: async ({ params }) => {
+  cancel_ticket: async ({ params, locals }) => {
     const ticketId = params.id;
     if (ticketId === null) {
       throw error(404, 'Key not found');
     }
 
-    const ticketService = await getTicketMachineServiceFromId(ticketId);
+    const redisConnection = locals.redisConnection as IORedis;
+
+    const ticketService = await getTicketMachineServiceFromId(
+      ticketId,
+      redisConnection
+    );
     const state = ticketService.getSnapshot();
 
     const cancel = {
@@ -142,7 +153,7 @@ export const actions: Actions = {
       show: JSON.parse(JSON.stringify(show)),
     };
   },
-  leave_feedback: async ({ params, request }) => {
+  leave_feedback: async ({ params, request, locals }) => {
     const ticketId = params.id;
     if (ticketId === null) {
       throw error(404, 'TicketId not found');
@@ -156,7 +167,12 @@ export const actions: Actions = {
       return fail(400, { rating, missingRating: true });
     }
 
-    const ticketService = await getTicketMachineServiceFromId(ticketId);
+    const redisConnection = locals.redisConnection as IORedis;
+
+    const ticketService = await getTicketMachineServiceFromId(
+      ticketId,
+      redisConnection
+    );
 
     const state = ticketService.getSnapshot();
     const feedback = {
@@ -175,7 +191,7 @@ export const actions: Actions = {
 
     return { success: true, rating, review };
   },
-  initiate_dispute: async ({ params, request }) => {
+  initiate_dispute: async ({ params, request, locals }) => {
     const ticketId = params.id;
     if (ticketId === null) {
       throw error(404, 'Key not found');
@@ -193,7 +209,11 @@ export const actions: Actions = {
       return fail(400, { reason, missingReason: true });
     }
 
-    const ticketService = await getTicketMachineServiceFromId(ticketId);
+    const redisConnection = locals.redisConnection as IORedis;
+    const ticketService = await getTicketMachineServiceFromId(
+      ticketId,
+      redisConnection
+    );
 
     const state = ticketService.getSnapshot();
     const dispute = {

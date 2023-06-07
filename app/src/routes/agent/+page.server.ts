@@ -3,7 +3,7 @@ import type { Actions } from './$types';
 
 import { Agent } from '$lib/models/agent';
 import { Talent } from '$lib/models/talent';
-import { womensNames } from '$util/womensNames';
+import { womensNames } from '$lib/util/womensNames';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 
 export const actions: Actions = {
