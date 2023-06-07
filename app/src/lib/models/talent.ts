@@ -28,19 +28,19 @@ const salesSchema = new Schema({
     min: 0,
     required: true,
   },
-  totalEarnings: {
+  numberOfCompletedShows: {
     type: Number,
     default: 0,
     min: 0,
     required: true,
   },
-  numberOfShows: {
+  totalRefunded: {
     type: Number,
     default: 0,
     min: 0,
     required: true,
   },
-  totalRefunds: {
+  totalRevenue: {
     type: Number,
     default: 0,
     min: 0,

@@ -614,6 +614,9 @@ export const createShowMachine = ({
         }),
 
         finalizeShow: assign((context, event) => {
+          showMachineOptions?.jobQueue?.add(event.type, {
+            showId: context.showDocument._id.toString(),
+          });
           return {
             showState: {
               ...context.showState,

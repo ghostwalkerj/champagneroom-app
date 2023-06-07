@@ -71,8 +71,11 @@
     // @ts-ignore
     const api = new JitsiMeetExternalAPI(PUBLIC_JITSI_DOMAIN, options);
     api.executeCommand('avatarUrl', profileImage);
-    api.addListener('readyToClose', () => {
-      goto(returnUrl);
+
+    api.addListener('toolbarButtonClicked', (event: any) => {
+      if (event?.key === 'leave-show') {
+        goto(returnUrl);
+      }
     });
 
     const ticketMachineService = createTicketMachineService({

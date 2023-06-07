@@ -49,6 +49,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
     const talentUrl = urlJoin(PUBLIC_TALENT_PATH, key);
     throw redirect(303, talentUrl);
   }
+  console.log('showState', showState.value);
 
   if (!showState.matches('started'))
     showService.send({

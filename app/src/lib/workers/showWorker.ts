@@ -7,7 +7,7 @@ import {
 import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
 import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 import type { ShowFinalizedType, ShowType } from '$lib/models/show';
-import { SaveState, Show } from '$lib/models/show';
+import { SaveState, Show, ShowStatus } from '$lib/models/show';
 import { Talent } from '$lib/models/talent';
 import type { TicketStateType } from '$lib/models/ticket';
 import { Ticket, TicketCancelReason } from '$lib/models/ticket';
@@ -66,7 +66,7 @@ export const getShowWorker = (
           break;
         }
         case ShowMachineEventString.SHOW_FINALIZED: {
-          finalizeShow(showService);
+          finalizeShow(show);
           break;
         }
         case ShowMachineEventString.FEEDBACK_RECEIVED: {
@@ -163,10 +163,8 @@ const refundShow = async (
   showService.stop();
 };
 
-// Stop show, allow grace period before ending
 const stopShow = async (showService: ShowMachineServiceType) => {
   const showState = showService.getSnapshot();
-  // End show if grace period is over
   if (showState.matches('stopped')) {
     showService.send(ShowMachineEventString.SHOW_ENDED);
   }
@@ -209,26 +207,49 @@ const endShow = async (
     }
   }
   showService.stop();
-
-  // Send a job to finalize the show after escrow period
 };
 
-// Calculate sales stats
-const finalizeShow = async (showService: ShowMachineServiceType) => {
-  // Check if show needs to send refunds
-  const showState = showService.getSnapshot();
-  if (showState.matches('inEscrow')) {
-    const finalize = {
-      finalizedAt: new Date(),
-      finalizedBy: ActorType.TIMER,
-    } as ShowFinalizedType;
+const finalizeShow = async (show: ShowType) => {
+  // Calculate sales stats
+  const talentSession = await Talent.startSession();
+  await talentSession.withTransaction(async () => {
+    const showFilter = {
+      talent: show.talent,
+      'showState.status': ShowStatus.FINALIZED,
+    };
 
-    showService.send({
-      type: ShowMachineEventString.SHOW_FINALIZED,
-      finalize,
-    });
-  }
-  showService.stop();
+    const groupBy = {
+      _id: null,
+      totalSales: { $sum: '$showState.salesStats.totalSales' },
+      numberOfCompletedShows: { $sum: 1 },
+      totalRefunded: { $sum: '$showState.salesStats.totalRefunded' },
+      totalRevenue: { $sum: '$showState.salesStats.totalRevenue' },
+    };
+
+    const aggregate = await Show.aggregate().match(showFilter).group(groupBy);
+
+    if (aggregate.length === 0) {
+      return;
+    }
+
+    const totalSales = aggregate[0]['totalSales'] as number;
+    const numberOfCompletedShows = aggregate[0][
+      'numberOfCompletedShows'
+    ] as number;
+    const totalRefunded = aggregate[0]['totalRefunded'] as number;
+    const totalRevenue = aggregate[0]['totalRevenue'] as number;
+
+    await Talent.findByIdAndUpdate(
+      { _id: show.talent },
+      {
+        'salesStats.totalSales': totalSales,
+        'salesStats.numberOfCompletedShows': numberOfCompletedShows,
+        'salesStats.totalRefunded': totalRefunded,
+        'salesStats.totalRevenue': totalRevenue,
+      }
+    );
+    talentSession.endSession();
+  });
 };
 
 // Calculate feedback stats
@@ -296,6 +317,6 @@ const feedbackReceived = async (show: ShowType) => {
         'feedbackStats.numberOfReviews': numberOfReviews,
       }
     );
-    showSession.endSession();
+    talentSession.endSession();
   });
 };

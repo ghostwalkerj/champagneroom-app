@@ -24,7 +24,6 @@
   );
   let api: any;
   let participantName = '';
-  let participantAvatarUrl = '';
 
   const endShow = async () => {
     let formData = new FormData();
@@ -81,9 +80,11 @@
     api.executeCommand('subject', currentShow?.name);
     api.addListener('participantJoined', participantJoined);
     api.addListener('knockingParticipant', participantKnocked);
-    api.addListener('readyToClose', () => {
-      endShow();
-      goto(returnUrl);
+    api.addListener('toolbarButtonClicked', (event: any) => {
+      if (event?.key === 'leave-show') {
+        endShow();
+        goto(returnUrl);
+      }
     });
   });
 </script>

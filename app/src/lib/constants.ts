@@ -44,7 +44,8 @@ export const jitsiInterfaceConfigOverwrite = {
     'camera',
     'fullscreen',
     'fodeviceselection',
-    'hangup',
     'tileview',
   ],
+
+  APP_NAME: 'Champagne Room',
 };
