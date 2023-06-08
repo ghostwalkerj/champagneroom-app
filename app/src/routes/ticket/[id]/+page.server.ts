@@ -1,17 +1,17 @@
 import { PUBLIC_PIN_PATH } from '$env/static/public';
 import type {
-  TicketDisputeReason,
   TicketDocumentType,
   TicketStateType,
   TicketType,
 } from '$lib/models/ticket';
-import { Ticket, TicketCancelReason } from '$lib/models/ticket';
+import { Ticket } from '$lib/models/ticket';
 import { Transaction, TransactionReasonType } from '$lib/models/transaction';
 
 import { ActorType } from '$lib/constants';
 import type { ShowMachineServiceType } from '$lib/machines/showMachine';
 import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
 import { TicketMachineEventString } from '$lib/machines/ticketMachine';
+import { CancelReason, DisputeReason } from '$lib/models/common';
 import { Show } from '$lib/models/show';
 import { verifyPin } from '$lib/util/pin';
 import {
@@ -126,7 +126,7 @@ export const actions: Actions = {
     const cancel = {
       cancelledBy: ActorType.CUSTOMER,
       cancelledInState: JSON.stringify(state.value),
-      reason: TicketCancelReason.CUSTOMER_CANCELLED,
+      reason: CancelReason.CUSTOMER_CANCELLED,
       cancelledAt: new Date(),
     } as TicketStateType['cancel'];
 
@@ -218,7 +218,7 @@ export const actions: Actions = {
     const state = ticketService.getSnapshot();
     const dispute = {
       disputedBy: ActorType.CUSTOMER,
-      reason: reason as TicketDisputeReason,
+      reason: reason as DisputeReason,
       explanation,
       startedAt: new Date(),
     } as TicketType['ticketState']['dispute'];

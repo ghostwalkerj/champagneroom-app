@@ -6,14 +6,12 @@
     createTicketMachineService,
     type TicketMachineServiceType,
   } from '$lib/machines/ticketMachine';
-  import {
-    TicketDisputeReason,
-    type TicketDocumentType,
-  } from '$lib/models/ticket';
   import urlJoin from 'url-join';
 
   import { PUBLIC_SHOWTIME_PATH } from '$env/static/public';
+  import { DisputeReason } from '$lib/models/common';
   import type { ShowDocumentType } from '$lib/models/show';
+  import type { TicketDocumentType } from '$lib/models/ticket';
   import { showStore, ticketStore } from '$stores';
   import { onDestroy, onMount } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
@@ -27,7 +25,7 @@
   let show = data.show as ShowDocumentType;
 
   const showTimePath = urlJoin($page.url.href, PUBLIC_SHOWTIME_PATH);
-  const reasons = Object.values(TicketDisputeReason);
+  const reasons = Object.values(DisputeReason);
 
   let shouldPay = false;
   let canWatchShow = false;

@@ -6,20 +6,20 @@ import {
 } from '$lib/machines/showMachine';
 import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
 import { TicketMachineEventString } from '$lib/machines/ticketMachine';
-import type { ShowFinalizedType, ShowType } from '$lib/models/show';
+import type { ShowType } from '$lib/models/show';
 import { SaveState, Show, ShowStatus } from '$lib/models/show';
 import { Talent } from '$lib/models/talent';
 import type { TicketStateType } from '$lib/models/ticket';
-import { Ticket, TicketCancelReason } from '$lib/models/ticket';
+import { Ticket } from '$lib/models/ticket';
 import type { TransactionType } from '$lib/models/transaction';
 import { Transaction, TransactionReasonType } from '$lib/models/transaction';
 
+import { CancelReason, type FinalizeType } from '$lib/models/common';
 import { createShowEvent } from '$lib/models/showEvent';
 import { getTicketMachineService } from '$lib/util/util.server';
 import type { Job, Queue } from 'bullmq';
 import { Worker } from 'bullmq';
 import type IORedis from 'ioredis';
-import type { connection } from 'mongoose';
 
 export type ShowJobDataType = {
   showId: string;
@@ -66,7 +66,7 @@ export const getShowWorker = (
           break;
         }
         case ShowMachineEventString.SHOW_FINALIZED: {
-          finalizeShow(show);
+          finalizeShow(show, job.data.finalize, showQueue);
           break;
         }
         case ShowMachineEventString.FEEDBACK_RECEIVED: {
@@ -100,7 +100,7 @@ const cancelShow = async (
     const cancel = {
       cancelledBy: ActorType.TALENT,
       cancelledInState: JSON.stringify(showState.value),
-      reason: TicketCancelReason.SHOW_CANCELLED,
+      reason: CancelReason.TALENT_CANCELLED,
       cancelledAt: new Date(),
     } as TicketStateType['cancel'];
 
@@ -179,7 +179,7 @@ const endEscrow = async (showService: ShowMachineServiceType) => {
       finalize: {
         finalizedAt: new Date(),
         finalizedBy: ActorType.TIMER,
-      },
+      } as FinalizeType,
     });
   }
   showService.stop();
@@ -209,7 +209,29 @@ const endShow = async (
   showService.stop();
 };
 
-const finalizeShow = async (show: ShowType) => {
+const finalizeShow = async (
+  show: ShowType,
+  finalize: FinalizeType,
+  showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>
+) => {
+  // Finalize all the tickets, feedback or not
+  const tickets = await Ticket.find({
+    show: show._id,
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    'ticketState.activeState': true,
+  });
+  for (const ticket of tickets) {
+    const ticketService = getTicketMachineService(ticket, show, showQueue);
+    const ticketState = ticketService.getSnapshot();
+
+    if (ticketState.matches('inEscrow')) {
+      ticketService.send({
+        type: TicketMachineEventString.TICKET_FINALIZED,
+        finalize,
+      });
+    }
+    ticketService.stop();
+  }
   // Calculate sales stats
   const talentSession = await Talent.startSession();
   await talentSession.withTransaction(async () => {

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
+import { ActorType } from '$lib/constants';
 import type { ShowDocumentType } from '$lib/models/show';
 import type { TicketDocumentType, TicketStateType } from '$lib/models/ticket';
 import { TicketStatus } from '$lib/models/ticket';
@@ -14,6 +15,7 @@ import {
   type ActorRefFrom,
   type StateFrom,
 } from 'xstate';
+import { raise } from 'xstate/lib/actions';
 import {
   createShowMachine,
   type ShowMachineOptions,
@@ -37,6 +39,7 @@ export enum TicketMachineEventString {
   SHOW_LEFT = 'SHOW LEFT',
   SHOW_ENDED = 'SHOW ENDED',
   SHOW_CANCELLED = 'SHOW CANCELLED',
+  TICKET_FINALIZED = 'TICKET FINALIZED',
 }
 
 export type TicketMachineEventType =
@@ -72,6 +75,10 @@ export type TicketMachineEventType =
   | {
       type: 'SHOW CANCELLED';
       cancel: TicketStateType['cancel'];
+    }
+  | {
+      type: 'TICKET FINALIZED';
+      finalize: TicketStateType['finalize'];
     };
 
 export const createTicketMachine = ({
@@ -141,15 +148,15 @@ export const createTicketMachine = ({
               cond: 'ticketInCancellationInitiated',
             },
             {
-              target: '#ticketMachine.ended.inEscrow',
+              target: '#ticketMachine.inEscrow',
               cond: 'ticketInEscrow',
             },
             {
-              target: '#ticketMachine.ended.inDispute',
+              target: '#ticketMachine.inDispute',
               cond: 'ticketInDispute',
             },
             {
-              target: '#ticketMachine.ended.missedShow',
+              target: '#ticketMachine.missedShow',
               cond: 'ticketMissedShow',
             },
           ],
@@ -227,7 +234,7 @@ export const createTicketMachine = ({
           },
           on: {
             'SHOW ENDED': {
-              target: '#ticketMachine.ended.missedShow',
+              target: '#ticketMachine.missedShow',
               actions: ['missShow'],
             },
           },
@@ -240,7 +247,7 @@ export const createTicketMachine = ({
               actions: ['sendJoinedShow'],
             },
             'SHOW ENDED': {
-              target: '#ticketMachine.ended',
+              target: '#ticketMachine.inEscrow',
               actions: ['enterEscrow'],
             },
           },
@@ -253,29 +260,34 @@ export const createTicketMachine = ({
           type: 'final',
           entry: ['deactivateTicket'],
         },
-        ended: {
-          initial: 'inEscrow',
-          states: {
-            inEscrow: {
-              on: {
-                'FEEDBACK RECEIVED': {
-                  target: '#ticketMachine.finalized',
-                  actions: [
-                    'receiveFeedback',
-                    'finalizeTicket',
-                    'sendFeedbackReceived',
-                  ],
-                },
-                'DISPUTE INITIATED': {
-                  target: 'inDispute',
-                  actions: ['initiateDispute'],
-                },
-              },
+        inEscrow: {
+          on: {
+            'FEEDBACK RECEIVED': {
+              target: '#ticketMachine.finalized',
+              actions: [
+                'receiveFeedback',
+                raise({
+                  type: 'TICKET FINALIZED',
+                  finalize: {
+                    finalizedAt: new Date(),
+                    finalizedBy: ActorType.CUSTOMER,
+                  },
+                }),
+                'sendFeedbackReceived',
+              ],
             },
-            inDispute: {},
-            missedShow: {},
+            'DISPUTE INITIATED': {
+              target: 'inDispute',
+              actions: ['initiateDispute'],
+            },
+            'TICKET FINALIZED': {
+              target: '#ticketMachine.finalized',
+              actions: ['finalizeTicket'],
+            },
           },
         },
+        inDispute: {},
+        missedShow: {},
       },
       on: {
         'SHOW CANCELLED': [
@@ -448,15 +460,13 @@ export const createTicketMachine = ({
           };
         }),
 
-        finalizeTicket: assign(context => {
-          const finalized = {
-            finalizedAt: new Date(),
-          } as NonNullable<TicketStateType['finalize']>;
+        finalizeTicket: assign((context, event) => {
+          const finalize = event.finalize;
           if (context.ticketState.status !== TicketStatus.FINALIZED) {
             return {
               ticketState: {
                 ...context.ticketState,
-                finalized: finalized,
+                finalize,
                 status: TicketStatus.FINALIZED,
               },
             };

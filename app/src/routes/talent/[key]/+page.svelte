@@ -213,7 +213,7 @@
             <div class="flex w-full flex-row justify-between gap-2">
               <div class="grow">
                 <div class="alert alert-info shadow-lg p-3">
-                  <div>
+                  <div class="flex gap-2">
                     <iconify-icon
                       icon="mingcute:information-line"
                       class="text-2xl"
@@ -224,7 +224,7 @@
               </div>
               <div class="grow">
                 <div class="alert alert-info shadow-lg p-3">
-                  <div>
+                  <div class="flex gap-2">
                     <iconify-icon
                       icon="mingcute:information-line"
                       class="text-2xl"

@@ -48,6 +48,7 @@ export enum ShowMachineEventString {
   CUSTOMER_LEFT = 'CUSTOMER LEFT',
   FEEDBACK_RECEIVED = 'FEEDBACK RECEIVED',
   ESCROW_ENDED = 'ESCROW ENDED',
+  TICKET_DISPUTED = 'TICKET DISPUTED',
 }
 
 export type ShowMachineEventType =
@@ -402,8 +403,14 @@ export const createShowMachine = ({
         endShow: assign((context, event) => {
           showMachineOptions?.jobQueue?.add(event.type, {
             showId: context.showDocument._id.toString(),
-            escrowPeriod: ESCROW_PERIOD,
           });
+          showMachineOptions?.jobQueue?.add(
+            ShowMachineEventString.ESCROW_ENDED,
+            {
+              showId: context.showDocument._id.toString(),
+            },
+            { delay: ESCROW_PERIOD }
+          );
           return {
             showState: {
               ...context.showState,
@@ -424,13 +431,7 @@ export const createShowMachine = ({
             },
             { delay: GRACE_PERIOD }
           );
-          showMachineOptions?.jobQueue?.add(
-            ShowMachineEventString.ESCROW_ENDED,
-            {
-              showId: context.showDocument._id.toString(),
-            },
-            { delay: ESCROW_PERIOD }
-          );
+
           return {
             showState: {
               ...context.showState,
@@ -515,7 +516,7 @@ export const createShowMachine = ({
               ...context.showState,
               status: ShowStatus.IN_ESCROW,
               escrow: {
-                startDate: new Date(),
+                startedAt: new Date(),
               },
             },
           };
@@ -528,8 +529,8 @@ export const createShowMachine = ({
               ...context.showState,
               status: ShowStatus.IN_ESCROW,
               escrow: {
-                startDate: context.showState.escrow.startDate,
-                endDate: new Date(),
+                startedAt: context.showState.escrow.startedAt,
+                endedAt: new Date(),
               },
             },
           };
@@ -616,6 +617,7 @@ export const createShowMachine = ({
         finalizeShow: assign((context, event) => {
           showMachineOptions?.jobQueue?.add(event.type, {
             showId: context.showDocument._id.toString(),
+            finalize: event.finalize,
           });
           return {
             showState: {

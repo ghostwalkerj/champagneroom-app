@@ -8,7 +8,7 @@ import express from 'express';
 import parseArgv from 'tiny-parse-argv';
 import { handler } from './build/handler';
 import { EntityType } from './dist/constants';
-import { getWorker } from './dist/workers';
+import { getShowWorker } from './dist/workers/showWorker';
 const buildNumber = generate('0.1');
 const buildTime = format(buildNumber);
 import IORedis from 'ioredis';
@@ -43,7 +43,8 @@ const showQueue = new Queue(EntityType.SHOW, { connection: redisConnection });
 
 // Workers
 if (startWorker) {
-  const showWorker = getWorker(EntityType.SHOW, showQueue, redisConnection);
+  // @ts-ignore
+  const showWorker = getShowWorker(showQueue, redisConnection);
   showWorker.run();
 }
 

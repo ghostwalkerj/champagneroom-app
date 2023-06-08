@@ -1,12 +1,8 @@
 import { ActorType } from '$lib/constants';
 import type { ShowMachineEventType } from '$lib/machines/showMachine';
 import { ShowMachineEventString } from '$lib/machines/showMachine';
-import {
-  Show,
-  ShowCancelReason,
-  ShowStatus,
-  type ShowStateType,
-} from '$lib/models/show';
+import { CancelReason } from '$lib/models/common';
+import { Show, ShowStatus, type ShowStateType } from '$lib/models/show';
 import { Talent, type TalentDocumentType } from '$lib/models/talent';
 import { getShowMachineServiceFromId } from '$lib/util/util.server';
 import { error, fail } from '@sveltejs/kit';
@@ -135,8 +131,8 @@ export const actions: Actions = {
     const cancel = {
       cancelledAt: new Date(),
       cancelledInState: JSON.stringify(showMachineState.value),
-      reason: ShowCancelReason.TALENT_CANCELLED,
-      requestedBy: ActorType.TALENT,
+      reason: CancelReason.TALENT_CANCELLED,
+      cancelledBy: ActorType.TALENT,
     } as ShowStateType['cancel'];
 
     const cancelEvent = {
