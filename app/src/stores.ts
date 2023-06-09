@@ -10,7 +10,12 @@ import type { ShowEventDocumentType } from '$lib/models/showEvent';
 import type { TalentDocumentType } from '$lib/models/talent';
 import type { TicketDocumentType } from '$lib/models/ticket';
 
-export const browserType = writable();
+export const agentStore = (agent: AgentDocumentType) => {
+  return abstractStore({
+    doc: agent,
+    changesetPath: urlJoin(PUBLIC_CHANGESET_PATH, 'agent', agent.address),
+  });
+};
 
 const getChangeset = async <T>({
   changesetPath,
@@ -79,22 +84,7 @@ const abstractStore = <T>({
   };
 };
 
-export const talentStore = (talent: TalentDocumentType) => {
-  return abstractStore({
-    doc: talent,
-    changesetPath: urlJoin(PUBLIC_CHANGESET_PATH, 'talent', talent.key),
-  });
-};
-
-export const showStore = (show: ShowDocumentType) => {
-  const showCancel = (show: ShowDocumentType) => !show.showState.activeState;
-
-  return abstractStore({
-    doc: show,
-    changesetPath: urlJoin(PUBLIC_CHANGESET_PATH, 'show', show._id.toString()),
-    cancelOn: showCancel,
-  });
-};
+export const browserType = writable();
 
 export const showEventStore = (show: ShowDocumentType) => {
   const showCancel = (show: ShowDocumentType) => !show.showState.activeState;
@@ -126,6 +116,23 @@ export const showEventStore = (show: ShowDocumentType) => {
   };
 };
 
+export const showStore = (show: ShowDocumentType) => {
+  const showCancel = (show: ShowDocumentType) => !show.showState.activeState;
+
+  return abstractStore({
+    doc: show,
+    changesetPath: urlJoin(PUBLIC_CHANGESET_PATH, 'show', show._id.toString()),
+    cancelOn: showCancel,
+  });
+};
+
+export const talentStore = (talent: TalentDocumentType) => {
+  return abstractStore({
+    doc: talent,
+    changesetPath: urlJoin(PUBLIC_CHANGESET_PATH, 'talent', talent.key),
+  });
+};
+
 export const ticketStore = (ticket: TicketDocumentType) => {
   const ticketCancel = (ticket: TicketDocumentType) =>
     !ticket.ticketState.activeState;
@@ -137,12 +144,5 @@ export const ticketStore = (ticket: TicketDocumentType) => {
       ticket._id.toString()
     ),
     cancelOn: ticketCancel,
-  });
-};
-
-export const agentStore = (agent: AgentDocumentType) => {
-  return abstractStore({
-    doc: agent,
-    changesetPath: urlJoin(PUBLIC_CHANGESET_PATH, 'agent', agent.address),
   });
 };

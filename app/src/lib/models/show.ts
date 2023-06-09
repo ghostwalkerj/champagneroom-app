@@ -8,7 +8,11 @@ import { ActorType } from '$lib/constants';
 import { cancelSchema, escrowSchema, finalizeSchema } from './common';
 
 const { Schema, models } = pkg;
-export enum ShowStatus {
+export const SaveState = (show: ShowType, newState: ShowStateType) => {
+  Show.updateOne({ _id: show._id }, { $set: { showState: newState } }).exec();
+};
+
+enum ShowStatus {
   CREATED = 'CREATED',
   BOX_OFFICE_OPEN = 'BOX OFFICE OPEN',
   BOX_OFFICE_CLOSED = 'BOX OFFICE CLOSED',
@@ -156,8 +160,26 @@ const showStateSchema = new Schema(
     finalize: finalizeSchema,
     escrow: escrowSchema,
     runtime: runtimeSchema,
-    refunds: { type: [refundSchema], required: true, default: () => [] },
-    sales: { type: [saleSchema], required: true, default: () => [] },
+    refunds: {
+      type: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: 'Ticket.ticketState.refund',
+        },
+      ],
+      required: true,
+      default: () => [],
+    },
+    sales: {
+      type: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: 'Ticket.ticketState.sale',
+        },
+      ],
+      required: true,
+      default: () => [],
+    },
     current: {
       type: Boolean,
       required: true,
@@ -232,7 +254,11 @@ showSchema.plugin(fieldEncryption, {
   secret: process.env.MONGO_DB_FIELD_SECRET,
 });
 
-export type ShowStateType = InferSchemaType<typeof showStateSchema>;
+export const Show = models?.Show
+  ? (models.Show as Model<ShowDocumentType>)
+  : mongoose.model<ShowDocumentType>('Show', showSchema);
+
+export { ShowStatus };
 
 export type ShowDocumentType = InferSchemaType<typeof showSchema>;
 
@@ -240,12 +266,6 @@ export type ShowRefundType = InferSchemaType<typeof refundSchema>;
 
 export type ShowSaleType = InferSchemaType<typeof saleSchema>;
 
-export const Show = models?.Show
-  ? (models.Show as Model<ShowDocumentType>)
-  : mongoose.model<ShowDocumentType>('Show', showSchema);
+export type ShowStateType = InferSchemaType<typeof showStateSchema>;
 
 export type ShowType = InstanceType<typeof Show>;
-
-export const SaveState = (show: ShowType, newState: ShowStateType) => {
-  Show.updateOne({ _id: show._id }, { $set: { showState: newState } }).exec();
-};

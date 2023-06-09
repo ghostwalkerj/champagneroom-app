@@ -25,6 +25,37 @@ import { getTicketMachineService } from '$lib/util/util.server';
 
 import type { PageServerLoad } from './$types';
 
+
+export const actions: Actions = {
+  leave_show: async ({ params, cookies, locals }) => {
+    const ticketId = params.id as string;
+    const pinHash = cookies.get('pin');
+
+    if (ticketId === null) {
+      throw error(404, 'Bad ticket id');
+    }
+
+    const ticket = await Ticket.findById(ticketId)
+      .orFail(() => {
+        throw error(404, 'Ticket not found');
+      })
+      .populate('show')
+      .exec();
+
+    const show = ticket.show as unknown as ShowType;
+    if (pinHash && verifyPin(ticketId, ticket.pin, pinHash)) {
+      const redisConnection = locals.redisConnection as IORedis;
+      const ticketService = getTicketMachineService(
+        ticket,
+        show,
+        redisConnection
+      );
+      ticketService.send(TicketMachineEventString.SHOW_LEFT);
+    }
+    return { success: true };
+  },
+};
+
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 export const load: PageServerLoad = async ({ params, cookies, locals }) => {
   const ticketId = params.id;
@@ -88,34 +119,4 @@ export const load: PageServerLoad = async ({ params, cookies, locals }) => {
     ticket: JSON.parse(JSON.stringify(ticket)),
     show: JSON.parse(JSON.stringify(show)),
   };
-};
-
-export const actions: Actions = {
-  leave_show: async ({ params, cookies, locals }) => {
-    const ticketId = params.id as string;
-    const pinHash = cookies.get('pin');
-
-    if (ticketId === null) {
-      throw error(404, 'Bad ticket id');
-    }
-
-    const ticket = await Ticket.findById(ticketId)
-      .orFail(() => {
-        throw error(404, 'Ticket not found');
-      })
-      .populate('show')
-      .exec();
-
-    const show = ticket.show as unknown as ShowType;
-    if (pinHash && verifyPin(ticketId, ticket.pin, pinHash)) {
-      const redisConnection = locals.redisConnection as IORedis;
-      const ticketService = getTicketMachineService(
-        ticket,
-        show,
-        redisConnection
-      );
-      ticketService.send(TicketMachineEventString.SHOW_LEFT);
-    }
-    return { success: true };
-  },
 };

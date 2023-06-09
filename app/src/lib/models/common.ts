@@ -2,6 +2,14 @@ import { type InferSchemaType, Schema } from 'mongoose';
 
 import { ActorType } from '$lib/constants';
 
+export enum CancelReason {
+  TALENT_NO_SHOW = 'TALENT NO SHOW',
+  CUSTOMER_NO_SHOW = 'CUSTOMER NO SHOW',
+  SHOW_RESCHEDULED = 'SHOW RESCHEDULED',
+  CUSTOMER_CANCELLED = 'CUSTOMER CANCELLED',
+  TALENT_CANCELLED = 'TALENT CANCELLED',
+}
+
 export enum DisputeDecision {
   TALENT_WON = 'TALENT WON',
   CUSTOMER_WON = 'CUSTOMER WON',
@@ -16,41 +24,18 @@ export enum DisputeReason {
   SHOW_NEVER_STARTED = 'SHOW NEVER STARTED',
 }
 
-export enum CancelReason {
-  TALENT_NO_SHOW = 'TALENT NO SHOW',
-  CUSTOMER_NO_SHOW = 'CUSTOMER NO SHOW',
-  SHOW_RESCHEDULED = 'SHOW RESCHEDULED',
-  CUSTOMER_CANCELLED = 'CUSTOMER CANCELLED',
-  TALENT_CANCELLED = 'TALENT CANCELLED',
-}
-
 export const cancelSchema = new Schema({
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  _id: { type: Schema.Types.ObjectId, required: true, auto: true },
   cancelledAt: { type: Date, required: true, default: Date.now },
   cancelledInState: { type: String },
   cancelledBy: { type: String, enum: ActorType, required: true },
   reason: { type: String, enum: CancelReason, required: true },
 });
 
-export const finalizeSchema = new Schema({
-  finalizedAt: { type: Date, required: true, default: Date.now },
-  finalizedBy: { type: String, enum: ActorType, required: true },
-});
-
-export const escrowSchema = new Schema({
-  startedAt: { type: Date, required: true, default: Date.now },
-  endedAt: { type: Date },
-});
-
-export const refundSchema = new Schema({
-  refundedAt: { type: Date, required: true, default: Date.now },
-  transactions: [
-    { type: Schema.Types.ObjectId, ref: 'Transaction', required: true },
-  ],
-  requestedBy: { type: String, enum: ActorType, required: true },
-  amount: { type: Number, required: true, default: 0 },
-});
-
 export const disputeSchema = new Schema({
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  _id: { type: Schema.Types.ObjectId, required: true, index: true },
   startedAt: { type: Date, required: true, default: Date.now },
   endedAt: { type: Date },
   reason: { type: String, enum: DisputeReason, required: true },
@@ -59,15 +44,16 @@ export const disputeSchema = new Schema({
   decision: { type: String, enum: DisputeDecision },
 });
 
-export const saleSchema = new Schema({
-  soldAt: { type: Date, required: true, default: Date.now },
-  transactions: [
-    { type: Schema.Types.ObjectId, ref: 'Transaction', required: true },
-  ],
-  amount: { type: Number, required: true, default: 0 },
+export const escrowSchema = new Schema({
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  _id: { type: Schema.Types.ObjectId, required: true, index: true },
+  startedAt: { type: Date, required: true, default: Date.now },
+  endedAt: { type: Date },
 });
 
 export const feedbackSchema = new Schema({
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  _id: { type: Schema.Types.ObjectId, required: true, index: true },
   rating: {
     type: Number,
     required: true,
@@ -82,4 +68,38 @@ export const feedbackSchema = new Schema({
   createdAt: { type: Date, required: true, default: Date.now },
 });
 
+export const finalizeSchema = new Schema({
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  _id: { type: Schema.Types.ObjectId, required: true, index: true },
+  finalizedAt: { type: Date, required: true, default: Date.now },
+  finalizedBy: { type: String, enum: ActorType, required: true },
+});
+
+export const refundSchema = new Schema({
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  _id: { type: Schema.Types.ObjectId, required: true, index: true },
+  refundedAt: { type: Date, required: true, default: Date.now },
+  transactions: [
+    { type: Schema.Types.ObjectId, ref: 'Transaction', required: true },
+  ],
+  requestedBy: { type: String, enum: ActorType, required: true },
+  amount: { type: Number, required: true, default: 0 },
+});
+
+export const saleSchema = new Schema({
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  _id: { type: Schema.Types.ObjectId, required: true, index: true },
+  soldAt: { type: Date, required: true, default: Date.now },
+  transactions: [
+    { type: Schema.Types.ObjectId, ref: 'Transaction', required: true },
+  ],
+  amount: { type: Number, required: true, default: 0 },
+});
+
+export type CancelType = InferSchemaType<typeof cancelSchema>;
+export type DisputeType = InferSchemaType<typeof disputeSchema>;
+export type EscrowType = InferSchemaType<typeof escrowSchema>;
+export type FeedbackType = InferSchemaType<typeof feedbackSchema>;
 export type FinalizeType = InferSchemaType<typeof finalizeSchema>;
+export type RefundType = InferSchemaType<typeof refundSchema>;
+export type SaleType = InferSchemaType<typeof saleSchema>;

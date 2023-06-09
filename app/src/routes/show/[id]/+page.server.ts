@@ -14,29 +14,6 @@ import { getShowMachineServiceFromId } from '$lib/util/util.server';
 
 import type { Actions, PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ params }) => {
-  const showId = params.id;
-  if (showId === null) {
-    throw error(404, 'Champagne Show not found');
-  }
-
-  const show = await Show.findById(showId)
-    .orFail(() => {
-      throw error(404, 'Show not found');
-    })
-    .lean()
-    .exec();
-
-  const displayName = uniqueNamesGenerator({
-    dictionaries: [mensNames],
-  });
-
-  return {
-    show: JSON.parse(JSON.stringify(show)),
-    displayName,
-  };
-};
-
 export const actions: Actions = {
   reserve_ticket: async ({ params, cookies, request, url, locals }) => {
     const showId = params.id;
@@ -106,4 +83,27 @@ export const actions: Actions = {
     );
     throw redirect(303, redirectUrl);
   },
+};
+
+export const load: PageServerLoad = async ({ params }) => {
+  const showId = params.id;
+  if (showId === null) {
+    throw error(404, 'Champagne Show not found');
+  }
+
+  const show = await Show.findById(showId)
+    .orFail(() => {
+      throw error(404, 'Show not found');
+    })
+    .lean()
+    .exec();
+
+  const displayName = uniqueNamesGenerator({
+    dictionaries: [mensNames],
+  });
+
+  return {
+    show: JSON.parse(JSON.stringify(show)),
+    displayName,
+  };
 };

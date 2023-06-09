@@ -13,8 +13,7 @@ import {
   saleSchema,
 } from './common';
 
-const { Schema, models } = pkg;
-export enum TicketStatus {
+enum TicketStatus {
   RESERVED = 'RESERVED',
   CANCELLATION_INITIATED = 'CANCELLATION INITIATED',
   CANCELLED = 'CANCELLED',
@@ -26,6 +25,14 @@ export enum TicketStatus {
   MISSED_SHOW = 'MISSED SHOW',
   SHOW_CANCELLED = 'SHOW CANCELLED',
 }
+
+const { Schema, models } = pkg;
+export const SaveState = (ticket: TicketType, newState: TicketStateType) => {
+  Ticket.updateOne(
+    { _id: ticket._id },
+    { $set: { showState: newState } }
+  ).exec();
+};
 
 const redemptionSchema = new Schema({
   redeemedAt: { type: Date, required: true, default: Date.now },
@@ -54,7 +61,7 @@ const ticketStateSchema = new Schema(
   { timestamps: true }
 );
 
-export const ticketSchema = new Schema(
+const ticketSchema = new Schema(
   {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     _id: { type: Schema.Types.ObjectId, required: true, auto: true },
@@ -91,18 +98,14 @@ ticketSchema.plugin(fieldEncryption, {
   secret: process.env.MONGO_DB_FIELD_SECRET,
 });
 
-export type TicketStateType = InferSchemaType<typeof ticketStateSchema>;
-export type TicketDocumentType = InferSchemaType<typeof ticketSchema>;
-
 export const Ticket = models?.Ticket
   ? (models.Ticket as Model<TicketDocumentType>)
   : mongoose.model<TicketDocumentType>('Ticket', ticketSchema);
 
-export type TicketType = InstanceType<typeof Ticket>;
+export { TicketStatus };
 
-export const SaveState = (ticket: TicketType, newState: TicketStateType) => {
-  Ticket.updateOne(
-    { _id: ticket._id },
-    { $set: { showState: newState } }
-  ).exec();
-};
+export type TicketDocumentType = InferSchemaType<typeof ticketSchema>;
+
+export type TicketStateType = InferSchemaType<typeof ticketStateSchema>;
+
+export type TicketType = InstanceType<typeof Ticket>;

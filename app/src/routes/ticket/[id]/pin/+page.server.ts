@@ -9,26 +9,6 @@ import { createPinHash, verifyPin } from '$lib/util/pin';
 
 import type { Actions, PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ params, cookies }) => {
-  const ticketId = params.id;
-  const pinHash = cookies.get('pin');
-  const redirectUrl = urlJoin(PUBLIC_TICKET_PATH, ticketId);
-
-  if (ticketId === null) {
-    throw error(404, 'Bad ticket id');
-  }
-
-  const ticket = await Ticket.findById(ticketId)
-    .orFail(() => {
-      throw error(404, 'Ticket not found');
-    })
-    .exec();
-
-  if (pinHash && verifyPin(ticketId, ticket.pin, pinHash)) {
-    throw redirect(303, redirectUrl);
-  }
-};
-
 export const actions: Actions = {
   set_pin: async ({ params, cookies, request, url }) => {
     const ticketId = params.id;
@@ -50,4 +30,24 @@ export const actions: Actions = {
     const redirectUrl = urlJoin(url.origin, PUBLIC_TICKET_PATH, ticketId);
     throw redirect(303, redirectUrl);
   },
+};
+
+export const load: PageServerLoad = async ({ params, cookies }) => {
+  const ticketId = params.id;
+  const pinHash = cookies.get('pin');
+  const redirectUrl = urlJoin(PUBLIC_TICKET_PATH, ticketId);
+
+  if (ticketId === null) {
+    throw error(404, 'Bad ticket id');
+  }
+
+  const ticket = await Ticket.findById(ticketId)
+    .orFail(() => {
+      throw error(404, 'Ticket not found');
+    })
+    .exec();
+
+  if (pinHash && verifyPin(ticketId, ticket.pin, pinHash)) {
+    throw redirect(303, redirectUrl);
+  }
 };

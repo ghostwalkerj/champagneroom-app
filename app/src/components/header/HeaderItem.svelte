@@ -1,8 +1,8 @@
 <script>
 	import { goto } from '$app/navigation';
 
-	export let title = '';
 	export let path = '';
+	export let title = '';
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->

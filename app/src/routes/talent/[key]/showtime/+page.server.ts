@@ -23,6 +23,31 @@ import {
 
 import type { PageServerLoad } from './$types';
 
+export const actions: Actions = {
+  end_show: async ({ request, locals }) => {
+    const data = await request.formData();
+
+    const showId = data.get('showId') as string;
+
+    const redisConnection = locals.redisConnection as IORedis;
+
+    const showService = await getShowMachineServiceFromId(
+      showId,
+      redisConnection
+    );
+
+    const showState = showService.getSnapshot();
+
+    if (showState.can({ type: ShowMachineEventString.SHOW_STOPPED })) {
+      showService.send({
+        type: ShowMachineEventString.SHOW_STOPPED,
+      });
+
+      return { success: true };
+    }
+  },
+};
+
 export const load: PageServerLoad = async ({ params, locals }) => {
   const key = params.key;
 
@@ -85,29 +110,4 @@ export const load: PageServerLoad = async ({ params, locals }) => {
     show: JSON.parse(JSON.stringify(show)),
     jitsiToken,
   };
-};
-
-export const actions: Actions = {
-  end_show: async ({ request, locals }) => {
-    const data = await request.formData();
-
-    const showId = data.get('showId') as string;
-
-    const redisConnection = locals.redisConnection as IORedis;
-
-    const showService = await getShowMachineServiceFromId(
-      showId,
-      redisConnection
-    );
-
-    const showState = showService.getSnapshot();
-
-    if (showState.can({ type: ShowMachineEventString.SHOW_STOPPED })) {
-      showService.send({
-        type: ShowMachineEventString.SHOW_STOPPED,
-      });
-
-      return { success: true };
-    }
-  },
 };

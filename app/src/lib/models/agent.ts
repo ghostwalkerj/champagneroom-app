@@ -33,10 +33,10 @@ const agentSchema = new Schema(
   { timestamps: true }
 );
 
-export type AgentDocumentType = InferSchemaType<typeof agentSchema>;
-
 export const Agent = models?.Agent
   ? (models.Agent as Model<AgentDocumentType>)
   : mongoose.model<AgentDocumentType>('Agent', agentSchema);
+
+export type AgentDocumentType = InferSchemaType<typeof agentSchema>;
 
 export type AgentType = InstanceType<typeof Agent>;

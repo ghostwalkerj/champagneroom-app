@@ -2,12 +2,13 @@ import type { InferSchemaType, Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
 import validator from 'validator';
 
-const { Schema, models } = pkg;
-export enum TransactionReasonType {
+enum TransactionReasonType {
   TICKET_PAYMENT = 'TICKET PAYMENT',
   TICKET_REFUND = 'TICKET REFUND',
   DISPUTE_RESOLUTION = 'DISPUTE RESOLUTION',
 }
+
+const { Schema, models } = pkg;
 
 const transactionSchema = new Schema(
   {
@@ -31,9 +32,10 @@ const transactionSchema = new Schema(
   { timestamps: true }
 );
 
-export type TransactionDocumentType = InferSchemaType<typeof transactionSchema>;
 export const Transaction = models?.Transaction
   ? (models?.Transaction as Model<TransactionDocumentType>)
   : mongoose.model<TransactionDocumentType>('Transaction', transactionSchema);
+export { TransactionReasonType };
 
+export type TransactionDocumentType = InferSchemaType<typeof transactionSchema>;
 export type TransactionType = InstanceType<typeof Transaction>;

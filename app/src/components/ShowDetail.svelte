@@ -22,8 +22,8 @@
     showRating: true,
     showWaterMark: true,
   };
-  export let show: ShowDocumentType;
   export let options: ShowDetailOptions = defaultOptions;
+  export let show: ShowDocumentType;
 
   options = {
     ...defaultOptions,

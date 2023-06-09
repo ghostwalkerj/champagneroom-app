@@ -4,7 +4,7 @@ import urlJoin from 'url-join';
 
 import { PUBLIC_PIN_PATH } from '$env/static/public';
 
-import type { DisputeReason } from '$lib/models/common';
+import type { DisputeReason, FeedbackType } from '$lib/models/common';
 import { CancelReason } from '$lib/models/common';
 import { Show } from '$lib/models/show';
 import type {
@@ -27,6 +27,7 @@ import {
 } from '$lib/util/util.server';
 
 import type { Actions, PageServerLoad } from './$types';
+import { Types } from 'mongoose';
 
 const getTicketService = async (ticketId: string, redisConnection: IORedis) => {
   const ticket = await Ticket.findById(ticketId)
@@ -43,40 +44,6 @@ const getTicketService = async (ticketId: string, redisConnection: IORedis) => {
 
   const ticketService = getTicketMachineService(ticket, show, redisConnection);
   return { ticket, show, ticketService };
-};
-
-export const load: PageServerLoad = async ({ params, cookies, url }) => {
-  const ticketId = params.id;
-  const pinHash = cookies.get('pin');
-  const redirectUrl = urlJoin(url.href, PUBLIC_PIN_PATH);
-
-  if (!pinHash) {
-    throw redirect(303, redirectUrl);
-  }
-  if (ticketId === null) {
-    throw error(404, 'Bad ticket id');
-  }
-
-  const ticket = (await Ticket.findById(ticketId)
-    .orFail(() => {
-      throw error(404, 'Ticket not found');
-    })
-    .exec()) as TicketDocumentType;
-
-  const show = await Show.findById(ticket.show)
-    .orFail(() => {
-      throw error(404, 'Show not found');
-    })
-    .exec();
-
-  if (!verifyPin(ticketId, ticket.pin, pinHash)) {
-    throw redirect(303, redirectUrl);
-  }
-
-  return {
-    ticket: JSON.parse(JSON.stringify(ticket)),
-    show: JSON.parse(JSON.stringify(show)),
-  };
 };
 
 export const actions: Actions = {
@@ -181,9 +148,10 @@ export const actions: Actions = {
 
     const state = ticketService.getSnapshot();
     const feedback = {
+      _id: new Types.ObjectId(),
       rating: +rating,
       review,
-    } as TicketType['ticketState']['feedback'];
+    } as FeedbackType;
 
     if (
       state.can({ type: TicketMachineEventString.FEEDBACK_RECEIVED, feedback })
@@ -239,4 +207,38 @@ export const actions: Actions = {
 
     return { success: true, reason, explanation };
   },
+};
+
+export const load: PageServerLoad = async ({ params, cookies, url }) => {
+  const ticketId = params.id;
+  const pinHash = cookies.get('pin');
+  const redirectUrl = urlJoin(url.href, PUBLIC_PIN_PATH);
+
+  if (!pinHash) {
+    throw redirect(303, redirectUrl);
+  }
+  if (ticketId === null) {
+    throw error(404, 'Bad ticket id');
+  }
+
+  const ticket = (await Ticket.findById(ticketId)
+    .orFail(() => {
+      throw error(404, 'Ticket not found');
+    })
+    .exec()) as TicketDocumentType;
+
+  const show = await Show.findById(ticket.show)
+    .orFail(() => {
+      throw error(404, 'Show not found');
+    })
+    .exec();
+
+  if (!verifyPin(ticketId, ticket.pin, pinHash)) {
+    throw redirect(303, redirectUrl);
+  }
+
+  return {
+    ticket: JSON.parse(JSON.stringify(ticket)),
+    show: JSON.parse(JSON.stringify(show)),
+  };
 };

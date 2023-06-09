@@ -1,14 +1,18 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import type { Queue } from 'bullmq';
+import { Types } from 'mongoose';
 import { nanoid } from 'nanoid';
-import { assign, createMachine, interpret,type StateFrom } from 'xstate';
+import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 import { raise } from 'xstate/lib/actions';
 
 import type {
-  ShowDocumentType,
-  ShowRefundType,
-  ShowSaleType,
-} from '$lib/models/show';
+  CancelType,
+  FeedbackType,
+  FinalizeType,
+  RefundType,
+  SaleType,
+} from '$lib/models/common';
+import type { ShowDocumentType } from '$lib/models/show';
 import { ShowStatus } from '$lib/models/show';
 import type { TicketDocumentType } from '$lib/models/ticket';
 import type { TransactionDocumentType } from '$lib/models/transaction';
@@ -17,25 +21,7 @@ import type { ShowJobDataType } from '$lib/workers/showWorker';
 
 import { ActorType } from '$lib/constants';
 
-export type ShowStateType = ShowDocumentType['showState'];
-
-export type ShowMachineOptions = {
-  saveStateCallback?: (state: ShowStateType) => void;
-  saveShowEventCallback?: ({
-    type,
-    ticket,
-    transaction,
-  }: {
-    type: string;
-    ticket?: TicketDocumentType;
-    transaction?: TransactionDocumentType;
-  }) => void;
-  jobQueue?: Queue<ShowJobDataType, any, string>;
-  gracePeriod?: number;
-  escrowPeriod?: number;
-};
-
-export enum ShowMachineEventString {
+enum ShowMachineEventString {
   CANCELLATION_INITIATED = 'CANCELLATION INITIATED',
   REFUND_INITIATED = 'REFUND INITIATED',
   TICKET_REFUNDED = 'TICKET REFUNDED',
@@ -54,44 +40,77 @@ export enum ShowMachineEventString {
   TICKET_DISPUTED = 'TICKET DISPUTED',
 }
 
+export { ShowMachineEventString };
+
+export { createShowMachine };
+
+export const createShowMachineService = ({
+  showDocument,
+  showMachineOptions,
+}: {
+  showDocument: ShowDocumentType;
+  showMachineOptions?: ShowMachineOptions;
+}) => {
+  const showMachine = createShowMachine({ showDocument, showMachineOptions });
+  showMachine;
+  const showService = interpret(showMachine).start();
+
+  if (showMachineOptions?.saveStateCallback) {
+    showService.onChange((context) => {
+      showMachineOptions.saveStateCallback &&
+        showMachineOptions.saveStateCallback(context.showState);
+    });
+  }
+
+  if (showMachineOptions?.saveShowEventCallback) {
+    showService.onEvent((event) => {
+      const ticket = ('ticket' in event ? event.ticket : undefined) as
+        | TicketDocumentType
+        | undefined;
+      const transaction = (
+        'transaction' in event ? event.transaction : undefined
+      ) as TransactionDocumentType | undefined;
+      showMachineOptions.saveShowEventCallback &&
+        showMachineOptions.saveShowEventCallback({
+          type: event.type,
+          ticket,
+          transaction,
+        });
+    });
+  }
+
+  return showService;
+};
+
 export type ShowMachineEventType =
   | {
       type: 'CANCELLATION INITIATED';
-      cancel: ShowStateType['cancel'];
+      cancel: CancelType;
     }
   | {
       type: 'FEEDBACK RECEIVED';
-      ticket: TicketDocumentType;
+      ticket: FeedbackType;
     }
   | {
       type: 'REFUND INITIATED';
     }
   | {
       type: 'TICKET REFUNDED';
-      ticket: TicketDocumentType;
-      transactions: TransactionDocumentType[];
-      requestedBy: ActorType;
-      refundedAt?: Date;
-      amount: number;
+      refund: RefundType;
     }
   | {
       type: 'TICKET RESERVED';
-      ticket?: TicketDocumentType;
     }
   | {
       type: 'TICKET RESERVATION TIMEOUT';
-      ticket: TicketDocumentType;
     }
   | {
       type: 'TICKET CANCELLED';
-      ticket: TicketDocumentType;
+      ticket: CancelType;
     }
   | {
       type: 'TICKET SOLD';
-      ticket: TicketDocumentType;
-      transactions: TransactionDocumentType[];
-      soldAt?: Date;
-      amount: number;
+      sale: SaleType;
     }
   | {
       type: 'SHOW STARTED';
@@ -101,7 +120,7 @@ export type ShowMachineEventType =
     }
   | {
       type: 'SHOW FINALIZED';
-      finalize: ShowStateType['finalize'];
+      finalize: FinalizeType;
     }
   | {
       type: 'SHOW ENDED';
@@ -118,7 +137,27 @@ export type ShowMachineEventType =
       type: 'ESCROW ENDED';
     };
 
-export const createShowMachine = ({
+export type ShowMachineOptions = {
+  saveStateCallback?: (state: ShowStateType) => void;
+  saveShowEventCallback?: ({
+    type,
+    ticket,
+    transaction,
+  }: {
+    type: string;
+    ticket?: TicketDocumentType;
+    transaction?: TransactionDocumentType;
+  }) => void;
+  jobQueue?: Queue<ShowJobDataType, any, string>;
+  gracePeriod?: number;
+  escrowPeriod?: number;
+};
+
+export type ShowMachineServiceType = ReturnType<
+  typeof createShowMachineService
+>;
+
+const createShowMachine = ({
   showDocument,
   showMachineOptions,
 }: {
@@ -128,7 +167,7 @@ export const createShowMachine = ({
   const GRACE_PERIOD = showMachineOptions?.gracePeriod || 3_600_000;
   const ESCROW_PERIOD = showMachineOptions?.escrowPeriod || 3_600_000;
 
-  /** @xstate-layout N4IgpgJg5mDOIC5SwBYHsDuBZAhgYxQEsA7MAYgGUAJAeQHUKAVAQUYFEACAVQAUARVmwDaABgC6iUAAc0sQgBdCaYpJAAPRABYATABoQAT0QBOAOzGAdAGYArDavGrpgBwjNx4wEYAvt-2pMXAISMAsAjAAZNBwISDJRCSQQGTlFZVUNBBtjEWtNK2crERFTbRttR30jBE9izWsrT0dTN2NC0xtff3RsfCJSMJ6omLihT0TpWQUlFSTM7NyrfMLi0vLKw0RPTWyLdvKANk8Djs0RKy6QcKD+0PDh2Ih47QnkqbTZ0HmcvIKikrKFSsVUQpUsnk8NgOIkcmk82mcpk0l2ufRCg0wD1GVleKWm6TmiBsrl+KwB62BmxqxIODQ6ZXO5lKKJ6N3R92ij3imlx7xmGSJeipjQRFk0zhs5ysRWOOVMLMCaIGHJGTyENl5qX5hKyJKWf1WgI21TKlmKBwqkOcELaB2RfiurKVdyGnNGB01+M+6iJLVJ-zWQJBNVFkuKtWcOk0plqBwVvWCAwARmg1DQAGbpwh4MA0KRgYhkABKbAAilw2EwOABhZgAOWrbAiEVYAEkaHWEqo8R8BTU7c4LAdnMPTB1su5tAdg55CjYLCVh5HtJ4-pH42zk6mM1mc3mC8WyxWq7WG02W4x253xt2+QSvlsB0OR4jx8ZJ9OqdtRU0Cq5Z642giHGDqoomoQpmmmbZrm+aFpe1YANJsIwHAlhQbBFgAamwfBdkkPbag+NRuLS7hmB45yeKYRSftUELaNoeyNO+EJuDGXgbs6FiQTuMH7vBrZIShaGVphOF4TeBF3t6mRNJo9Q5DYNHbNsNj5JoM7SqYFjaGcErlDshRNFx4E8du0F7nBZAIchqHoeJbYdhwl5YGwNBcIw+GTFq94+jUxjlHsTQqaUMbrDOK71IUOwlK4xRWNoFygU6Zm8ZZsEHrZImno2za4d5by+bJWxtPOBwOMYBxtFVJzijOMJMTo1rQrYOiJfKKWKmlFm7plgnCahFA0BEeHiLexV9kBxzWDkIhTtRbS2JS1RmLk80AaO5TFM4pm3OZUF9QJlAsEWQ20HQhWEX5clQlYYruKUO0lHCmlUvY9RAaxf4OOcu1dQm+3pUd1nZfZbAAGJcHWfAFeN0mTTqQHFBY9hzkczg5Apb3VJGOlHFCq4OEcw4gd03VA71MHVgANrIcRMMwZ0cNQ9BXTJfa1G4YqzicwHuDoNjBk4OmShagUVdC5j-eTgPosD1N07AcRg6JGHYU5dYua2bkeV58M+V6nOkWKHjmDkjQ0cBkUxkOXgsQpHSmGTjoU-LVM5rT9NPKruXnnDnq9jqtRQqbFEW9RtEzjouR2MBZjmG40p7e7h2K97NlCXZLMjWNgdEf5q67Aizil24IiSvCONbNpFiOBChRLNswEp1uaee0rKtZyJJZQzDAcTUbwf6mKTi2DFY5QpFkKo3pS3OJacLJbLm4QR7YBe8rTwluWlaoX7zaa+ziPEbUmhkWblGW1HVLI-O5rKdKEpTp1K-cQrHcZzvx77-WeUXleMY+cbpbArhfcOVErZ0S2MSaKZh4QuDHKOF2YF9qwHkDgAATvIBmp1zpswNkVIexEX5MWAksE4FokSlyFlSZYddgJ6QhEgq0rc7gYOwXEasXAmA0DckWDgAApGgrY6wDwRsQ-yU57DWHKGjbQ45SjCx0HXew2wDjrGospNhYQOE4KeNw3h-COAREhvrYBJUEBTgtHsBS6koRuC0cGPSOlijhnFGYWwjFl6uzlsqPRcQ2AwxZhdY+kjMjGCFCaO0TEFGMQ8JHSJycAarwsAWLkjNmas0uoQ66ljahRMQGUJoewNGBWogiKuOj0kMwuhwCGojmARFbAALXEYbIOxEnCeD2AidwI4FFm1XM4iqTE7RgkCmYGw8IdGYLAAARwAK5wH0dWHAxAcw0xpjgD4FgMA4GmMQKA2gixgHTIs4gPtu7gz7rDPOg9OlSLAWKYctQvANzsDOaEg4uaMWdk-bQsyFnLPQZANZGywBbJ2TMPZBzFBHJOWci5VzBo1j-v7e5EjHmZAXs4529QTgjnPkcMwSVfAOmIGgWI8AkioJCA8gumQAC00CEBMvnB4TlXLOVjh8XS5UrpVQMpAQgdqYoVyl2qo0CqY5q4kXmqja0WMqoSghJ0FJ3E8DrM2TTSAwrLH6T2DkKhiUHBNAOKyoEPSyoiDUsccMgKNVmSzMQHANNCAAC89VYsZYgCq4IYReIUklcpwt44WEhMcO0zdoR6R0R-fq+rOZwjGWcSENFsjE1MNHO0Q5owV2jMSGEdp43r03t6jpvqEAjlyBK6ZxxrQFHPjm+c2l7BxSetop1aCAkQCTcHGhexzBTkiU9J+wYoS0hFNM8+k7owoNSvtGpfafUioUdayMVCkQsQlCtIpFqA3sThCcYkSIgVLJWWC7VkLtmPLyVNHaLzrQwghLOT5X5tpDnDLaDqOwF1uwGHMi9oKIDgp1dC5QsLDnHNOecy5-aSElFjpPDRAyPDvvohm1GwFlKSnMCS5KvggA */
+  /** @xstate-layout N4IgpgJg5mDOIC5SwBYHsDuBZAhgYxQEsA7MAOlUwBk0cJIBiAbQAYBdRUABzVkIBdCaYpxAAPRACYWADjIBOSQEYZAdnkAWFgDZt8pfNUAaEAE9EAVhlKyF+dtXrJMjVe0yAvh5OVs+IqQU6Bg0dIxMShxIIDx8gsKiEgjKcooq6lq6+oYm5ggyirYsAMwl2hYskhpKxUpePsG4BCTkvqH0EMySUdy8AkIi0UkGqSkZOnoGxmaISpKqRSwsSu4G2nOa9SC+TQGtwe3hxT0xffGDoMMyo+maE9nTedaLJcWOcxbatVs7-i1B1FoHWYGhOsX6CSGUhUCjGdyyU1ysxUFjIkgsFlqelcki+Fh+jT+gTaQPCFjBZwGiUskiRCGK1nkZA08gsyg0GlU2mqLgJmF2-xJYU6TG0FLiVKhyRhaTU8MmORmCCUnMkZFUsi0MgsrnkLFUxT5fmaxIOpJFqnFEIu4ikslht0yCseswsMI1LmUSjZBmcRoFpsBwuYMit52pCG0tKVxXKLHVrjmqlxKNU-qJ5BIAFFYHgAE6YBgAZQAEgB5ADqAAIAGIASQAcgBBKh1gBaWYAIqww5LLogowtuToNAVKvYqnTY+jbCirNIHCzDd5toSTZniDn84Wa1muwAhJsAYQA0lWAEpZo9ZusANS7PdE4PDUtUShsbNkUc+FUk8mKU6cjYshqH+ybVDq6brmQ2a5gWGAMLuB7Hmel7XneD6RE+lKQv2CDJmqHLzAyrLKOo8hTm8GhkHiFjqEsXJssuDT8hmZAAEZoGIZYAGY8YQeBgGWXBgMQDBHk2DbXlQVBNgAKnWZYNlWjZ1gp8kPuw2ESrhtr5NGeRVJ8ZAsPo7KSFUOiSFBewcVxvH8YJwmieJknSbJClKSpDZqXWGndlh0TPn2elKJUdLKG66qyMUf4yLGKxpiuvzQZx3F8QJQkiWJCmnlmckXlmRZZue97dlpQU4TaSQOKi+olKZ6KsqoMgGYgqgaGqmJxl8MiVN8yVrrZaUOZlzk5XWeUFZexWlZhva6Uk0hviZGh6Os-UOPFdLZGi5TuCOBiaPig2sal9kZU52UMLlJ75YVs23vJinKQpWBZmWACqcmPpVOnVXaLUKHR+rlAUVgUUqrVqtY6Kfv+COeKdxrDRdjlZS5t33RJUlZjJmkLQD0rvuqBpAUufXlHSybaGQxR2BopT-t1b42f8I2XRjE1TVWRZllQ5WExG7K01GcwsDq8gFLGGh0lGTJ6vLLKGPFlRs4EHPo+NxbltWRZyU255yQT2nWhGyYReRJmGG6mQstY2jq+QmtjddWPTVmNafQ2nYm39ZtSsouI0W+9jWMm8iaHSmLFMymJKAa8WKHRJ0sSj7No5lR4ADa8IwpaVrzBtG37vT-RGtUmRqTNNXRrV0jUJTqhiuLVLFOpqE7dnpejOd5507sPSVT2ea9dbvV9P0VWXAd4e4dXV41dh121+TlAonVciROjzl3LuCX3sCMIPOPuaXpzl1K89Vw1yfNfXSpS0yxQspUKrLLImJ75nB+50fA+TTugVPmAtfozxfHhFUegaLFBfiwaoeo3hcmpvYWwysVQ1DrtUb+Pcs5-2PoA+6l4vY+3PsFRaswORMncJ1JqfU-wASVBqeMpktoYjUBHJGacAzOx-mAQ+jBT54w8i9byvl-JgIvrPPSigIqwLVDQgoqg7COEcDg0av9+6uVxjJZ6XlVLqWNgFIWV9YoKBkA4Aw9NXgyAimtEySx+pzHmBiRQXdYD8BwHmfg+ddZF0NkYyR5CiZ9TkPMEoEE7iaCUBFNQNgWTKNqFYEcndkY8IoJ47xgjPr6zLO9c8VYABSZZGxkKqubVByx0T0wSesWWSpnDSAUDbbQ+oyat3cZknxnQjw5LknkkqVYqCeyniYvCfVUQVC-G+b0nJOqWw1MyG2pRtQRK+J0rx3SdaF1yQABV2WUy+eFPhMglmtMOljjoRWarYOinVZBhQZHUNJbEPFoC4CJToBc9bF0CdPKREC9InJMjqdaFjQ6uFiesMgYVN5LH-HKTp7zPnbOrFmUhgtTaAqSBbGMGJqJ-imOUVw9M6JdxIP0HA3Sjw4GIIJbO2cqUDDIBgHA-RiBQEkOeMAPEACuxBOjEO9p2MRhjDnSJqn1dU+0ORzIlgYCKCdCIvz1G6TQ1QWrkuIJS6ltL6WMvODBbVggqWQG5XygVN1CEexIb7TF-tsWzAsvE+OjhWoJP-IqqKHp6a6HlioLVOrIA0rpWABlTLhBGqDRAc1-KAE8yFRiiIYy9JqFRIoQwGDSXvkYYZWQCxpAuFqmBF+SUVzEDQPQeA0QUp7CxSFJIABabQdJm0OMcR2jtfoXnQSFB0etFCEDzKVO+eKRQ2RvlgcdNkXc8B6rDdnSAA6ibeisOqF+jMpa1BmRFFRtgbaM2xPFDqWqtzwWXRGWKwEWo1CliUdEKopx2CZCyCoa1rGM3il3fixAcDZ0IAALyXQ6htiBrCpEUBZAoBQmounpKopZTEVTxVKPTdRnNxoXqlLC050GtBvm5BOhulR4xvmuKZAwSwlzod7vgiAWG8KjjkE4FWegJbLEVE8KWDjUNsk0L6rhq4zq2Q8Zs4D4DQNDpVHTKWa1rAqDeNcephlDBqlZDoaGmbU5CfTsSfgyLxMAskxY5jYV7DpDsH+FtMZ3yokwZLTUdFrI9tshSk1urQ3hsBcEiMa1qKlCAiRyyDCG6RyZB6RmbwrCci-S5-4bnCCmogCG-VEbiAsrZYIDlXKeVxoY0CuYdN4FviC1oP8irWQKHfGtVx74-yBvc8G+dXnmUJaS7GgV+WkiaDkPtZwFjaidSloq64NF1jrHdVGWMXgvBAA */
   return createMachine(
     {
       context: {
@@ -207,6 +246,7 @@ export const createShowMachine = ({
                   raise({
                     type: 'SHOW FINALIZED',
                     finalize: {
+                      _id: new Types.ObjectId(),
                       finalizedAt: new Date(),
                       finalizedBy: ActorType.CUSTOMER,
                     },
@@ -480,24 +520,18 @@ export const createShowMachine = ({
         receiveFeedback: (context, event) => {
           showMachineOptions?.jobQueue?.add(event.type, {
             showId: context.showDocument._id.toString(),
-            ticketId: event.ticket._id.toString(),
           });
         },
 
         refundTicket: assign((context, event) => {
           const st = context.showState;
+          const refund = event.refund;
+
           const ticketsRefunded = st.salesStats.ticketsRefunded + 1;
           const ticketsSold = st.salesStats.ticketsSold - 1;
-          const totalRefunded = st.salesStats.totalRefunded + event.amount;
-          const totalRevenue = st.salesStats.totalRevenue - event.amount;
-
-          const refund = {
-            refundedAt: event.refundedAt || new Date(),
-            transactions: event.transactions.map((t) => t._id),
-            ticket: event.ticket._id,
-            amount: event.amount,
-          } as ShowRefundType;
-          st.refunds.push(refund);
+          const totalRefunded = st.salesStats.totalRefunded + refund.amount;
+          const totalRevenue = st.salesStats.totalRevenue - refund.amount;
+          st.refunds.push(refund._id);
 
           return {
             showState: {
@@ -519,6 +553,7 @@ export const createShowMachine = ({
               ...context.showState,
               status: ShowStatus.IN_ESCROW,
               escrow: {
+                _id: new Types.ObjectId(),
                 startedAt: new Date(),
               },
             },
@@ -532,7 +567,7 @@ export const createShowMachine = ({
               ...context.showState,
               status: ShowStatus.IN_ESCROW,
               escrow: {
-                startedAt: context.showState.escrow.startedAt,
+                ...context.showState.escrow,
                 endedAt: new Date(),
               },
             },
@@ -590,18 +625,15 @@ export const createShowMachine = ({
 
         sellTicket: assign((context, event) => {
           const st = context.showState;
+          const sale = event.sale;
+          if (!sale) {
+            throw new Error('Ticket sale is not defined');
+          }
           const ticketsSold = st.salesStats.ticketsSold + 1;
           const ticketsReserved = st.salesStats.ticketsReserved - 1;
-          const totalSales = st.salesStats.totalSales + event.amount;
-          const totalRevenue = st.salesStats.totalRevenue + event.amount;
-
-          const sale = {
-            soldAt: event.soldAt || new Date(),
-            transactions: event.transactions.map((t) => t._id),
-            ticket: event.ticket._id,
-            amount: event.amount,
-          } as ShowSaleType;
-          st.sales.push(sale);
+          const totalSales = st.salesStats.totalSales + sale.amount;
+          const totalRevenue = st.salesStats.totalRevenue + sale.amount;
+          st.sales.push(sale._id);
 
           return {
             showState: {
@@ -694,46 +726,6 @@ export const createShowMachine = ({
   );
 };
 
-export const createShowMachineService = ({
-  showDocument,
-  showMachineOptions,
-}: {
-  showDocument: ShowDocumentType;
-  showMachineOptions?: ShowMachineOptions;
-}) => {
-  const showMachine = createShowMachine({ showDocument, showMachineOptions });
-  showMachine;
-  const showService = interpret(showMachine).start();
-
-  if (showMachineOptions?.saveStateCallback) {
-    showService.onChange((context) => {
-      showMachineOptions.saveStateCallback &&
-        showMachineOptions.saveStateCallback(context.showState);
-    });
-  }
-
-  if (showMachineOptions?.saveShowEventCallback) {
-    showService.onEvent((event) => {
-      const ticket = ('ticket' in event ? event.ticket : undefined) as
-        | TicketDocumentType
-        | undefined;
-      const transaction = (
-        'transaction' in event ? event.transaction : undefined
-      ) as TransactionDocumentType | undefined;
-      showMachineOptions.saveShowEventCallback &&
-        showMachineOptions.saveShowEventCallback({
-          type: event.type,
-          ticket,
-          transaction,
-        });
-    });
-  }
-
-  return showService;
-};
-
-export type ShowMachineType = ReturnType<typeof createShowMachine>;
 export type ShowMachineStateType = StateFrom<typeof createShowMachine>;
-export type ShowMachineServiceType = ReturnType<
-  typeof createShowMachineService
->;
+export type ShowMachineType = ReturnType<typeof createShowMachine>;
+export type ShowStateType = ShowDocumentType['showState'];

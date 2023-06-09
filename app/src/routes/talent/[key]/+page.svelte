@@ -34,8 +34,8 @@
 
   import type { ActionData, PageData } from './$types';
 
-  export let form: ActionData;
   export let data: PageData;
+  export let form: ActionData;
 
   const showTimePath = urlJoin($page.url.href, PUBLIC_SHOWTIME_PATH);
 

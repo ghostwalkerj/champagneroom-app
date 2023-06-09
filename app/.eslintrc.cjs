@@ -6,7 +6,7 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'plugin:unicorn/recommended',
   ],
-  plugins: ['simple-import-sort'],
+  plugins: ['simple-import-sort', 'sort-exports'],
 
   parser: '@typescript-eslint/parser',
   parserOptions: {
@@ -32,7 +32,13 @@ module.exports = {
     {
       files: ['*.svelte', '*.ts'],
       rules: {
-        'simple-import-sort/exports': 'error',
+        'sort-exports/sort-exports': [
+          'error',
+          {
+            sortDir: 'asc',
+            sortExportKindFirst: 'value',
+          },
+        ],
         'simple-import-sort/imports': [
           'error',
           {

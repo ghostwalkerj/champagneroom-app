@@ -23,11 +23,6 @@ import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 import { ActorType, EntityType } from '$lib/constants';
 import { getTicketMachineService } from '$lib/util/util.server';
 
-export type ShowJobDataType = {
-  showId: string;
-  [key: string]: any;
-};
-
 export const getShowWorker = (
   showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>,
   redisConnection: IORedis
@@ -85,6 +80,11 @@ export const getShowWorker = (
     },
     { autorun: false, connection: redisConnection }
   );
+};
+
+export type ShowJobDataType = {
+  showId: string;
+  [key: string]: any;
 };
 
 const cancelShow = async (

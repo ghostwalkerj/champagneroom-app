@@ -1,3 +1,19 @@
+export enum ActorType {
+  AGENT = 'AGENT',
+  TALENT = 'TALENT',
+  CUSTOMER = 'CUSTOMER',
+  TIMER = 'TIMER',
+  UNKNOWN = 'UNKNOWN',
+}
+
+export enum EntityType {
+  AGENT = 'AGENT',
+  TALENT = 'TALENT',
+  SHOW = 'SHOW',
+  TICKET = 'TICKET',
+  USER = 'USER',
+}
+
 /* eslint-disable @typescript-eslint/naming-convention */
 export enum TokenRoles {
   ADMIN = 'ADMIN',
@@ -12,14 +28,6 @@ export const currencyFormatter = new Intl.NumberFormat('en-US', {
   maximumFractionDigits: 0,
 });
 
-export enum EntityType {
-  AGENT = 'AGENT',
-  TALENT = 'TALENT',
-  SHOW = 'SHOW',
-  TICKET = 'TICKET',
-  USER = 'USER',
-}
-
 export const durationFormatter = (duration: number): string => {
   const hours = Math.floor(duration / 60);
   const minutes = duration % 60;
@@ -27,14 +35,6 @@ export const durationFormatter = (duration: number): string => {
   const minuteString = minutes > 0 ? `${minutes}m` : '';
   return `${hoursString} ${minuteString}`.trim();
 };
-
-export enum ActorType {
-  AGENT = 'AGENT',
-  TALENT = 'TALENT',
-  CUSTOMER = 'CUSTOMER',
-  TIMER = 'TIMER',
-  UNKNOWN = 'UNKNOWN',
-}
 
 export const jitsiInterfaceConfigOverwrite = {
   MOBILE_APP_PROMO: false,

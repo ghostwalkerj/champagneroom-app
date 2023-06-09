@@ -13,32 +13,6 @@ import { getShowMachineServiceFromId } from '$lib/util/util.server';
 
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
 
-export const load: PageServerLoad = async ({ params }) => {
-  const key = params.key;
-
-  if (key === null) {
-    throw error(404, 'Key not found');
-  }
-
-  const talent = await Talent.findOne({ key })
-    .orFail(() => {
-      throw error(404, 'Talent not found');
-    })
-    .lean()
-    .exec();
-
-  const currentShow = await Show.findOne({
-    talent: talent._id,
-    'showState.current': true,
-  }).exec();
-
-  return {
-    talent: JSON.parse(JSON.stringify(talent)),
-    currentShow: currentShow
-      ? JSON.parse(JSON.stringify(currentShow))
-      : undefined,
-  };
-};
 export const actions: Actions = {
   update_profile_image: async ({ params, request }: RequestEvent) => {
     const key = params.key;
@@ -213,4 +187,30 @@ export const actions: Actions = {
       refundInitiated: true,
     };
   },
+};
+export const load: PageServerLoad = async ({ params }) => {
+  const key = params.key;
+
+  if (key === null) {
+    throw error(404, 'Key not found');
+  }
+
+  const talent = await Talent.findOne({ key })
+    .orFail(() => {
+      throw error(404, 'Talent not found');
+    })
+    .lean()
+    .exec();
+
+  const currentShow = await Show.findOne({
+    talent: talent._id,
+    'showState.current': true,
+  }).exec();
+
+  return {
+    talent: JSON.parse(JSON.stringify(talent)),
+    currentShow: currentShow
+      ? JSON.parse(JSON.stringify(currentShow))
+      : undefined,
+  };
 };

@@ -6,8 +6,8 @@
   import { page } from '$app/stores';
   import { PUBLIC_IMAGE_UPDATE_PATH } from '$env/static/public';
 
-  export let profileImage: string;
   export let callBack: (argument0: string) => void;
+  export let profileImage: string;
 
   let uploadVisibility = 'invisible';
   let progressVisibility = 'invisible';

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
+import { Types } from 'mongoose';
 import { nanoid } from 'nanoid';
 import {
   type ActorRefFrom,
@@ -12,6 +13,12 @@ import {
 } from 'xstate';
 import { raise } from 'xstate/lib/actions';
 
+import type {
+  CancelType,
+  DisputeType,
+  FeedbackType,
+  FinalizeType,
+} from '$lib/models/common';
 import type { ShowDocumentType } from '$lib/models/show';
 import type { TicketDocumentType, TicketStateType } from '$lib/models/ticket';
 import { TicketStatus } from '$lib/models/ticket';
@@ -26,12 +33,6 @@ import {
   type ShowMachineType,
 } from './showMachine';
 
-export type TicketMachineOptions = {
-  saveStateCallback?: (state: TicketStateType) => void;
-  gracePeriod?: number;
-  escrowPeriod?: number;
-};
-
 export enum TicketMachineEventString {
   CANCELLATION_INITIATED = 'CANCELLATION INITIATED',
   REFUND_RECEIVED = 'REFUND RECEIVED',
@@ -44,11 +45,10 @@ export enum TicketMachineEventString {
   SHOW_CANCELLED = 'SHOW CANCELLED',
   TICKET_FINALIZED = 'TICKET FINALIZED',
 }
-
-export type TicketMachineEventType =
+type TicketMachineEventType =
   | {
       type: 'CANCELLATION INITIATED';
-      cancel: TicketStateType['cancel'];
+      cancel: CancelType;
     }
   | {
       type: 'REFUND RECEIVED';
@@ -60,11 +60,11 @@ export type TicketMachineEventType =
     }
   | {
       type: 'FEEDBACK RECEIVED';
-      feedback: TicketStateType['feedback'];
+      feedback: FeedbackType;
     }
   | {
       type: 'DISPUTE INITIATED';
-      dispute: TicketStateType['dispute'];
+      dispute: DisputeType;
     }
   | {
       type: 'SHOW JOINED';
@@ -77,14 +77,14 @@ export type TicketMachineEventType =
     }
   | {
       type: 'SHOW CANCELLED';
-      cancel: TicketStateType['cancel'];
+      cancel: CancelType;
     }
   | {
       type: 'TICKET FINALIZED';
-      finalize: TicketStateType['finalize'];
+      finalize: FinalizeType;
     };
 
-export const createTicketMachine = ({
+const createTicketMachine = ({
   ticketDocument,
   showDocument,
   showMachineOptions,
@@ -99,7 +99,7 @@ export const createTicketMachine = ({
     showMachineOptions,
   });
 
-  /** @xstate-layout N4IgpgJg5mDOIC5QBcCWBjA1mZBZAhugBaoB2YAxACoCSAwgNICiVAylQIJVMAEAqgAUAIlyYBtAAwBdRKAAOAe1io0C0rJAAPRABYATABoQAT0QBGABwBWHQDo9VgMx6dATlcB2F3sc6Avn5GaFg4BMRklKwAEgDyAOo8dBwAcnRMADLpTEKSMkggisqq6vnaCPpGpghmeha2VhKNEhauVgBsro0ejgFBGNh4hCTkFNHxiSlpmdliZnnySiqoahplFSaIjq5mtq2OZjoNVhYSjha9IMEDYcNgtlc46Qr4EJAUuRqFSyuliG2ntlONVcegkbS8ZjBlUQnis9hBtQknmanR6gUu-VCQwi90xyCeLzes3mBUWxVWiGOjkB+z0ILBEKhGwQ+x2bXaem6nLMnVcFg8Fweg3C5FxIXxz1eEHeehJX3JvwQXmhCE5OjatgsW1qjnZVksFn86KFNxxQoJUvejjlZOWJVAZX+1KBdNB4L0kLaKr0HtcgJakKc6osbXBgrxptF5slRJ0NqKdopCCsrmdtPp7s9KpsdXZbT0-wkOh0NQ8ZnD4sjd2jhOlYis8e+9q0lMMzMcEic9kc+s6EjMBzaFeu2KjeItRLajYVDspWppwLdjK9zJc7U1WyLblq7Vcw6xIruACc4GAjwA3SC2ADu+CWpCgOgE+GMAFswKRkBQBBwAJq4JhkioHgACUmDSGgADUZmkT5bR+WdqgcP1DlZbYJA8EszBVDx1x0Zx0JODsGnOY0I1HY9TwvK9b3vR9nzfD8vx-f9AOAsCIOgnI5jghMEJbaorAcQF82OCQfS2GoLBVUMPFsMwOUNEFULacsyMrCjbBPWAz0vCAbzvNAHyfF930-CgwIART4Jh2AmVIMnSLgaBiZIPnyeVE0VUEalsRxMNcNxDkOdppOZA510hdUDlTU4LBDfdhVuLSqL0gy6JMxjzKsmy7KSBzMmc1ziV4psk08OS6Q6HddSEnQVRqYTjm2Tl+VDJEh3UkdDxSnTqP02ijPo0ymPeWCPPg5syhqFNbFQgd0MwgccMhOaCP5ftAscLZEqrXrdJowyyEfVgiAUa8LKYazbOA-Kpic2hivGhY+KmxAfL0PyAqCmwrFChq2n2OazDLXDOx0DwMIFLqD2S7SDoGo7jNO87LuuvLJkcoq3J4ibXqTAceV2MEfHw8FXAas5PtdNUew6dxds0+H+vSoadBRi6ACkYhoZJsh4MY4ncl6yu8-tPv8oLAt+-7wvcOSvE8HsQc6As9xhpKcWZtKTwARwAVzgZBIDofBSHQMAABtLfwYpWeOnQQLAAAzfXSGlMCADE+GSIRQPApgoJg6cvMQj6vql4K-raMKqhmuxtpaQ0PTpRpOr6DSeu1q89cN2BjYgU3zatm27cGh2ndd93Lu933-c4mZcZFmcBLMQHPqLGPk-+Dx+SsBqXDqDwEUwun3HVjPurhsBIDAd9pSyT3gMF4XSXx7zh79DohKRD1xcw70Bw1M4Uw7NuKrRSfYa1mfXnnihud5-mV+etfRbD7o7E-jtXFDD1sNXOJCQa1OQYROB6QG6cMSZ2nrPe+gseCASEMHUqLdHRtiqKnBOuELAFkOLhAc0Mr6a1FGQJgsB0BHlRp7Jg2QABCHBGD10DlxVenl+JlC2NSMGpw2jqh8LhXU3oQxwm2iCDwkMSxVSgSaTSZCKFUIukIGgrABB8G4DwXmNBaCiByK-dhb0WSplsDw3U-D-JOBXFUM+dgeQhh0J2Voa5obolIAoV48B8iyMPKg0OAkAC0VjED+LhOPMJ4TcGtEZj1GsUpfEcN0NtExeZDg+hcN0VoDV+RyQhr-QGacfC1GidPPqel4mGO2HYKqIJrC1RcNmYetg8zISDBI7oxSb6lMOhlBiZlkDlIJl0XY1Tf5Fg9IaHCgV6iiQkfFJwBxSLEL2tnRGGUOYDMVL-amv8amWLqgDVoTS+TFjML4TsEiOmihWSlA2RsTZmwttbW2fiDEE2OHYTu8V9A9z7g1NuOwaY6BaO6Bxl9oFT06QjG5ecC5F0eaXO09tjKVzdhADZiEQbiSaQ4-4Phf4gxDJTDwGo7HtG6CDNpizwXXyubfOekB0UCR8BYNkSJnBbAcWy+qq4PRyTEQpBw-kqaXLuOgB5JcGV43fkyqR8l2gKWOPmGOEiAZt2JuCfUxFpYyPIj1Z2ZB8CW1QAAL0lc3PxjpTm7ENOqXw+oOSOGEVYHJPYUzOu3r4EVth5GUPOoysonJqT-FTN0dkbgywU3bFubsQk-qnPBBInVMCcRkCEKgWAch9bG39ZSTwTSI2cnZAtY4KpnCNHkkWX+21xJajRAEIAA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QBcCWBjA1mZBZAhugBaoB2YAxAMoASA8gOoAEAwgIIByLAogDK-cAIgG0ADAF1EoAA4B7WKjSzSUkAA9EAFgBMAGhABPRNoCM2zQDoAHCZObRVgOyaAnNqsuAvp-1osOAmIySlpGVk4efiFhE0kkEDkFJRV4jQQdfSMEEwBmF0cLAFYANjdtQtETYs0rYqtvXwxsPEIScgs-Zt5ZfAhICjE4mXlFVGVVNJzHQos7UWLi0ULzURcTZ0zEXNFLbRdC2tFHHM0qzRyGkE6A1uCOppxu3v6YoYSR5InEHMKZuYWlis1htDMYdjNKpoalZRDlio5HKJtJdri0gu1UU8+hABto3olRuNUogrHpQQhzG4LKZHNUctp5vkTCiHmi2mB7v5kFiXjl8R8xilQGltKZqcVfgdCvS3BVHJsEMUfhZXDlYZopSYdpoWVzAuzOV0etiBpp+UlBV8EFM-vYAct7MDNAqzAdqfs1vYEXZcrrmvq7pjjS9CubCUL1IhHGSstpSjMpnDnCVRKtkT4rqyAxjWTyccJimHPsSEMsFWq4yqrGqXOdYfNmRnUdmOUHnvnHEXLSWGSZxZKrNK9uUjgrRS4inkXE5HGtlm5in6buiOQAnOBgVcAN36oWY3A4gmiElUBOLwq2NgK6wZLhyHkKjisGXJJysFlh09K1cfn51TazW52nXWBNx3CALAAd3wUZSCgTQAAV8AMABbMBSGQCgELYABNXADwAFSYAAlbgeAASQANWPLsiQvbJYWKIpChqaZYQRGF5XJKxn1mJUjlycxim0RxG0aPUgLXDdt0gKCYLQODEOQtCMKw3D8I4IjSIo6iRFiU8BToyMEGOSw7RE4oTEfcpygVUkciKbYTGfeltkKJc2TuECwNk6DYPgpDUPQzD2C4PheDYAjyLoDgmHIjhyKiyKaIMi0jLSZyRNmaNVnvfYnxfLIqlEixZwOI48lsJwLgAiSVwsbyZIgvyFIC5TgooULIgiqKYrihKkoI6J9PiM9u3orVK1+ViKimJ9R3JMwsufOMdGqdZan-cT-UkhrpPAuT-KUoLVMGVLwytSamOmpxZo4hasmrd8qhyMxNAWWkdhq7blwNRqDpash4KoIhZEg6h6GYAApOh4pS0bDIjDKr2y288sfFa7PmUqtVTFx+Oc+YPJbPbQKaiwyFGfBkEgFh8FIdAwAAGyZ6nBUO1rNGIsAADMAFdSBxUiADEAFVDxIsjuCo+HhjSpHL3WVHcofAqY0vUVZl+WwrMfKzYWJ3b-tkym0Gp2n6cZlm2eUDmga53mBaF7gxYl7Tpd015zvPYy7DhaxCnyJw4xOUxihdON30ZUUKjOWpF1qnb6vXSAwDQnE9yYARhYIs6Eflq1ykRCw8g1VadjMeEFWcbRqVx8rVcHQ3k7AVP04hsIYbhkQT3zi6ewqGZzjYwp1hyV7nXJaoZmmOo7xOSonzEzM6r+1u+nbzODyPHvaIVxV1YpZw+0TGEpkHJ9n2bg0yG4WB0FXMGKGF7ghAAITYFgAGlJZ02X3gLiWU4DlTKImcDKQccYxxgOyg4aMJQ3AmHyNfO4t976P3BoIciVAEKiyGv1RK5Fkq729uNYywDSonDAecPYkDw7kncI+Sci94Q-Eyu5ROv1UGkDvg-J+UVv7cCIsLeKbBeDkQAFr-zGulLQuRKGaGoRA5Y9DYyWVEDjaYNlR52BKN4DMpBZB9HgPEZsklSGyIQAAWlUYgfYH57Cpicc4xwKCcxcjzBY-ehUtjlDMkcJYUJFHVAcG4qSZNwJeKtHUJi5laRWXgbZckxwmKVBrGsfI+wRJhNJj5Zq8l7aBRUsgKJJYEQQjYQcKYfspgKjcJYfGllqzOSsq9HJxt8lHRBmDUpE0fhmQ1Kcaos5KiijsucCwCxXqvWmtUdMP1PLAX2ibUgVMaYQDpgzZmrMfYyP3rkHiAcg7RiVDoKoLpCZFFKKYKEmToztOWRBU2qBzYbMttsm2pA7aKW5vzQWvTfZyhVK4Coz4mS2BdHCCcyxtB5VpAcJwDy26QABSKZyTF7xqmEh4H4cJbEIBcpMpUop3Bwq8JwxZHJ0DvJZiivuPs0UuAnDUDUr1ygShKIfUwqxZh2HODxIu30V5JwNDzMg+AmaoAAF50rlv3eidILD4wXNKFiiwzDQJ5YsesiwGT0iODktBfDIKouMHeSZlRiV2HxrUQo0CmHaoWMJcB2SKUkzIIIVAsBpB8xpqaxUSsJTwhYnixYs5yyLyrK9L6DJR6uoWSTFCXrQIQG6Sa+lZCMrTlrvSeyHhFHLFhOWao4olT5EshUI4719GeCAA */
   return createMachine(
     {
       context: {
@@ -272,6 +272,7 @@ export const createTicketMachine = ({
                 raise({
                   type: 'TICKET FINALIZED',
                   finalize: {
+                    _id: new Types.ObjectId(),
                     finalizedAt: new Date(),
                     finalizedBy: ActorType.CUSTOMER,
                   },
@@ -327,10 +328,7 @@ export const createTicketMachine = ({
         sendTicketSold: send(
           (context) => ({
             type: 'TICKET SOLD',
-            ticket: context.ticketDocument,
-            soldAt: context.ticketState.sale?.soldAt,
-            transactions: context.ticketState.sale?.transactions,
-            amount: context.ticketState.sale?.amount,
+            sale: context.ticketState.sale,
           }),
           { to: (context) => context.showMachineRef! }
         ),
@@ -338,10 +336,7 @@ export const createTicketMachine = ({
         sendTicketRefunded: send(
           (context) => ({
             type: 'TICKET REFUNDED',
-            ticket: context.ticketDocument,
-            refundedAt: context.ticketState.refund?.refundedAt,
-            transactions: context.ticketState.refund?.transactions,
-            amount: context.ticketState.refund?.amount,
+            refund: context.ticketState.refund,
           }),
           { to: (context) => context.showMachineRef! }
         ),
@@ -349,7 +344,7 @@ export const createTicketMachine = ({
         sendTicketCancelled: send(
           (context) => ({
             type: 'TICKET CANCELLED',
-            ticket: context.ticketDocument,
+            cancel: context.ticketState.cancel,
           }),
           { to: (context) => context.showMachineRef! }
         ),
@@ -357,7 +352,7 @@ export const createTicketMachine = ({
         sendFeedbackReceived: send(
           (context) => ({
             type: 'FEEDBACK RECEIVED',
-            ticket: context.ticketDocument,
+            feedback: context.ticketState.feedback,
           }),
           { to: (context) => context.showMachineRef! }
         ),
@@ -396,6 +391,7 @@ export const createTicketMachine = ({
 
         receivePayment: assign((context, event) => {
           const sale = context.ticketState.sale || {
+            _id: new Types.ObjectId(),
             soldAt: new Date(),
             transactions: [],
             amount: 0,
@@ -415,6 +411,7 @@ export const createTicketMachine = ({
         receiveRefund: assign((context, event) => {
           const state = context.ticketState;
           const refund = state.refund || {
+            _id: new Types.ObjectId(),
             refundedAt: new Date(),
             transactions: [],
             amount: 0,
@@ -458,7 +455,7 @@ export const createTicketMachine = ({
               ...context.ticketState,
               status: TicketStatus.IN_ESCROW,
               escrow: {
-                ...context.ticketState.escrow,
+                _id: new Types.ObjectId(),
                 startedAt: new Date(),
               },
             },
@@ -550,6 +547,10 @@ export const createTicketMachine = ({
   );
 };
 
+export { TicketMachineEventType };
+
+export { createTicketMachine };
+
 export const createTicketMachineService = ({
   ticketDocument,
   ticketMachineOptions,
@@ -608,10 +609,18 @@ export const createTicketMachineService = ({
   return ticketService;
 };
 
-export type TicketMachineType = ReturnType<typeof createTicketMachine>;
-export type TicketMachineStateType = StateFrom<
-  ReturnType<typeof createTicketMachine>
->;
+export type TicketMachineOptions = {
+  saveStateCallback?: (state: TicketStateType) => void;
+  gracePeriod?: number;
+  escrowPeriod?: number;
+};
+
 export type TicketMachineServiceType = ReturnType<
   typeof createTicketMachineService
 >;
+
+export type TicketMachineStateType = StateFrom<
+  ReturnType<typeof createTicketMachine>
+>;
+
+export type TicketMachineType = ReturnType<typeof createTicketMachine>;
