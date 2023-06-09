@@ -5,8 +5,9 @@ module.exports = {
     'plugin:svelte/recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:unicorn/recommended',
-    'prettier'
   ],
+  plugins: ['simple-import-sort'],
+
   parser: '@typescript-eslint/parser',
   parserOptions: {
     project: './tsconfig.eslint.json',
@@ -15,79 +16,108 @@ module.exports = {
     ecmaFeatures: {
       globalReturn: false,
       impliedStrict: false,
-      jsx: false
+      jsx: false,
     },
-    extraFileExtensions: ['.svelte'] // This is a required setting in `@typescript-eslint/parser` v4.24.0.
+    extraFileExtensions: ['.svelte'], // This is a required setting in `@typescript-eslint/parser` v4.24.0.
   },
   overrides: [
     {
-      files: ['**/*.svelte'],
+      files: ['*.svelte'],
       parser: 'svelte-eslint-parser',
       // Parse the `<script>` in `.svelte` as TypeScript by adding the following configuration.
       parserOptions: {
-        parser: '@typescript-eslint/parser'
-      }
-    }
+        parser: '@typescript-eslint/parser',
+      },
+    },
+    {
+      files: ['*.svelte', '*.ts'],
+      rules: {
+        'simple-import-sort/imports': [
+          'error',
+          {
+            groups: [
+              // Side effect imports.
+              ['^\\u0000'],
+              // Node.js builtins prefixed with `node:`.
+              ['^node:'],
+              // Packages.
+              // Things that start with a letter (or digit or underscore), or `@` followed by a letter.
+              ['^@?\\w'],
+              // svelte
+              ['^\\$env?|\\$app?\\w'],
+              // Absolute imports and other imports such as Vue-style `@/foo`.
+              // Anything not matched in another group.
+              ['^'],
+              // Relative imports.
+              // Anything that starts with a dot.
+              ['^\\.'],
+            ],
+          },
+        ],
+      },
+    },
   ],
   rules: {
+    '@typescript-eslint/keyword-spacing': 'error',
+    'no-multi-spaces': ['error'],
     'unicorn/filename-case': [
       'error',
       {
         cases: {
           camelCase: true,
-          pascalCase: true
-        }
-      }
+          pascalCase: true,
+        },
+      },
     ],
     '@typescript-eslint/naming-convention': [
       'error',
       {
         selector: 'default',
-        format: ['camelCase']
+        format: ['camelCase'],
       },
       {
         selector: 'variable',
         format: ['PascalCase', 'UPPER_CASE'],
         types: ['boolean'],
-        prefix: ['is', 'should', 'has', 'can', 'did', 'will']
+        prefix: ['is', 'should', 'has', 'can', 'did', 'will'],
       },
       {
         selector: 'variableLike',
-        format: ['camelCase', 'UPPER_CASE', 'PascalCase']
+        format: ['camelCase', 'UPPER_CASE', 'PascalCase'],
       },
 
       {
         selector: 'parameter',
         format: ['camelCase'],
-        leadingUnderscore: 'allow'
+        leadingUnderscore: 'allow',
       },
       {
         selector: 'memberLike',
         modifiers: ['private'],
         format: ['camelCase'],
-        leadingUnderscore: 'forbid'
+        leadingUnderscore: 'forbid',
       },
       {
         selector: 'typeLike',
-        format: ['PascalCase']
+        format: ['PascalCase'],
       },
       {
         selector: 'property',
         modifiers: ['readonly'],
-        format: ['PascalCase']
+        format: ['PascalCase'],
       },
       {
         selector: 'enumMember',
-        format: ['UPPER_CASE']
+        format: ['UPPER_CASE'],
       },
       {
         selector: 'objectLiteralMethod',
-        format: ['snake_case', 'camelCase']
+        format: ['snake_case', 'camelCase'],
       },
       {
         selector: 'objectLiteralProperty',
-        format: []
-      }
+        format: [],
+      },
     ],
     '@typescript-eslint/ban-ts-comment': 'off',
     '@typescript-eslint/no-non-null-assertion': 'off',
@@ -100,8 +130,8 @@ module.exports = {
       {
         prefer: 'type-imports',
         disallowTypeAnnotations: false,
-        fixStyle: 'separate-type-imports'
-      }
-    ]
-  }
+        fixStyle: 'separate-type-imports',
+      },
+    ],
+  },
 };

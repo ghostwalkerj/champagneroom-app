@@ -2,13 +2,13 @@ import to from 'await-to-js';
 import { derived, writable } from 'svelte/store';
 import urlJoin from 'url-join';
 
+import { PUBLIC_CHANGESET_PATH } from '$env/static/public';
+
 import type { AgentDocumentType } from '$lib/models/agent';
 import type { ShowDocumentType } from '$lib/models/show';
 import type { ShowEventDocumentType } from '$lib/models/showEvent';
 import type { TalentDocumentType } from '$lib/models/talent';
 import type { TicketDocumentType } from '$lib/models/ticket';
-
-import { PUBLIC_CHANGESET_PATH } from '$env/static/public';
 
 export const browserType = writable();
 
@@ -23,13 +23,13 @@ const getChangeset = async <T>({
   signal?: AbortSignal;
   cancelOn?: (document: T) => boolean;
 }) => {
-  let loop = true;
-  let firstFetch = true;
-  while (loop) {
-    const path = firstFetch
+  let shouldLoop = true;
+  let isFirstFetch = true;
+  while (shouldLoop) {
+    const path = isFirstFetch
       ? urlJoin(changesetPath, '?firstFetch=true')
       : changesetPath;
-    firstFetch = false;
+    isFirstFetch = false;
 
     const [error, response] = await to(
       fetch(path, {
@@ -37,17 +37,17 @@ const getChangeset = async <T>({
       })
     );
     if (error) {
-      loop = false;
+      shouldLoop = false;
     } else {
       try {
         const jsonResponse = await response.json();
         callback(jsonResponse);
         if (cancelOn) {
-          loop = !cancelOn(jsonResponse);
+          shouldLoop = !cancelOn(jsonResponse);
         }
       } catch (error) {
         console.error(error);
-        loop = false;
+        shouldLoop = false;
       }
     }
   }
@@ -98,9 +98,9 @@ export const showStore = (show: ShowDocumentType) => {
 
 export const showEventStore = (show: ShowDocumentType) => {
   const showCancel = (show: ShowDocumentType) => !show.showState.activeState;
-  const _showStore = writable<ShowDocumentType>(show);
-  const _showEventStore = derived<typeof _showStore, ShowEventDocumentType>(
-    _showStore,
+  const showStore = writable<ShowDocumentType>(show);
+  const showEventStore = derived<typeof showStore, ShowEventDocumentType>(
+    showStore,
     ($show, set) => {
       if (!showCancel($show)) {
         const abortShowEvent = new AbortController();
@@ -121,8 +121,8 @@ export const showEventStore = (show: ShowDocumentType) => {
     }
   );
   return {
-    set: _showStore.set,
-    subscribe: _showEventStore.subscribe,
+    set: showStore.set,
+    subscribe: showEventStore.subscribe,
   };
 };
 

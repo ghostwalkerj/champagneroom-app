@@ -3,6 +3,13 @@
   import type { Unsubscriber } from 'svelte/store';
   import urlJoin from 'url-join';
 
+  import { applyAction, enhance } from '$app/forms';
+  import { goto } from '$app/navigation';  
+  import { page } from '$app/stores';
+  import { PUBLIC_SHOWTIME_PATH } from '$env/static/public';
+
+  import type { TicketMachineServiceType } from '$lib/machines/ticketMachine';
+  import {createTicketMachineService} from '$lib/machines/ticketMachine';
   import { DisputeReason } from '$lib/models/common';
   import type { ShowDocumentType } from '$lib/models/show';
   import type { TicketDocumentType } from '$lib/models/ticket';
@@ -11,10 +18,6 @@
   import type { ActionData, PageData } from './$types';
   import TicketDetail from './TicketDetail.svelte';
 
-  import { applyAction, enhance } from '$app/forms';
-  import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
-  import { PUBLIC_SHOWTIME_PATH } from '$env/static/public';
 
   export let data: PageData;
   export let form: ActionData;
