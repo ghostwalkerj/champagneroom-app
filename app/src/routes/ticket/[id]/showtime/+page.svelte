@@ -1,4 +1,9 @@
 <script lang="ts">
+  import { onDestroy, onMount } from 'svelte';
+  import urlJoin from 'url-join';
+
+  import type { PageData } from './$types';
+
   import { browser } from '$app/environment';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
@@ -15,9 +20,7 @@
   import type { ShowDocumentType } from '$lib/models/show';
   import type { TicketDocumentType } from '$lib/models/ticket';
   import getProfileImage from '$lib/util/profilePhoto';
-  import { onDestroy, onMount } from 'svelte';
-  import urlJoin from 'url-join';
-  import type { PageData } from './$types';
+
 
   export let data: PageData;
 

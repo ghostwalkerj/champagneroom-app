@@ -1,9 +1,10 @@
 <script lang="ts">
-  import type { TalentDocument } from '$lib/ORM/models/talent';
   import Chart from 'chart.js/auto';
   import ChartDataLabels from 'chartjs-plugin-datalabels';
   import spacetime from 'spacetime';
   import { Line } from 'svelte-chartjs';
+
+  import type { TalentDocument } from '$lib/ORM/models/talent';
 
   export let talents: TalentDocument[];
 

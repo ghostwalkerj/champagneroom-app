@@ -1,15 +1,16 @@
 <script lang="ts">
-  import { applyAction, enhance } from '$app/forms';
+  import { onDestroy, onMount } from 'svelte';
+  import type { Unsubscriber } from 'svelte/store';
 
+  import type { ActionData, PageData } from './$types';
+
+  import { applyAction, enhance } from '$app/forms';
   import ShowDetail from '$components/ShowDetail.svelte';
   import { PUBLIC_PROFILE_IMAGE_PATH } from '$env/static/public';
   import { ShowStatus } from '$lib/models/show';
-
   import getProfileImage from '$lib/util/profilePhoto';
   import { showStore } from '$stores';
-  import { onDestroy, onMount } from 'svelte';
-  import type { Unsubscriber } from 'svelte/store';
-  import type { ActionData, PageData } from './$types';
+
 
   export let data: PageData;
   export let form: ActionData;

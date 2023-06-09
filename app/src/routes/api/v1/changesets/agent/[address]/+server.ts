@@ -1,5 +1,6 @@
-import { Agent } from '$lib/models/agent';
 import type { RequestHandler } from '@sveltejs/kit';
+
+import { Agent } from '$lib/models/agent';
 
 export const GET: RequestHandler<{ address: string }> = async ({
   params,

@@ -1,5 +1,6 @@
 import type { InferSchemaType, Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
+
 import type { ShowDocumentType } from './show';
 import type { TicketDocumentType } from './ticket';
 import type { TransactionDocumentType } from './transaction';

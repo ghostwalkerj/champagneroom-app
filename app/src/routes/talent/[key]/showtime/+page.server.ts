@@ -1,3 +1,11 @@
+import type { Actions } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
+import type IORedis from 'ioredis';
+import jwt from 'jsonwebtoken';
+import urlJoin from 'url-join';
+
+import type { PageServerLoad } from './$types';
+
 import {
   JITSI_APP_ID,
   JITSI_JWT_SECRET,
@@ -11,12 +19,6 @@ import {
   getShowMachineService,
   getShowMachineServiceFromId,
 } from '$lib/util/util.server';
-import type { Actions } from '@sveltejs/kit';
-import { error, redirect } from '@sveltejs/kit';
-import type IORedis from 'ioredis';
-import jwt from 'jsonwebtoken';
-import urlJoin from 'url-join';
-import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
   const key = params.key;

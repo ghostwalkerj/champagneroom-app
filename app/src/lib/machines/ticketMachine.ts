@@ -1,26 +1,28 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { ActorType } from '$lib/constants';
-import type { ShowDocumentType } from '$lib/models/show';
-import type { TicketDocumentType, TicketStateType } from '$lib/models/ticket';
-import { TicketStatus } from '$lib/models/ticket';
-import type { TransactionDocumentType } from '$lib/models/transaction';
 import { nanoid } from 'nanoid';
 import {
+  type ActorRefFrom,
+  type StateFrom,
   assign,
   createMachine,
   interpret,
   send,
   spawn,
-  type ActorRefFrom,
-  type StateFrom,
 } from 'xstate';
 import { raise } from 'xstate/lib/actions';
+
+import { ActorType } from '$lib/constants';
+import type { ShowDocumentType } from '$lib/models/show';
+import type { TicketDocumentType, TicketStateType } from '$lib/models/ticket';
+import { TicketStatus } from '$lib/models/ticket';
+import type { TransactionDocumentType } from '$lib/models/transaction';
+
 import {
-  createShowMachine,
   type ShowMachineOptions,
   type ShowMachineServiceType,
   type ShowMachineType,
+  createShowMachine,
 } from './showMachine';
 
 export type TicketMachineOptions = {
@@ -306,57 +308,57 @@ export const createTicketMachine = ({
     {
       actions: {
         sendJoinedShow: send(
-          context => ({
+          (context) => ({
             type: 'CUSTOMER JOINED',
             ticket: context.ticketDocument,
           }),
-          { to: context => context.showMachineRef! }
+          { to: (context) => context.showMachineRef! }
         ),
 
         sendLeftShow: send(
-          context => ({
+          (context) => ({
             type: 'CUSTOMER LEFT',
             ticket: context.ticketDocument,
           }),
-          { to: context => context.showMachineRef! }
+          { to: (context) => context.showMachineRef! }
         ),
 
         sendTicketSold: send(
-          context => ({
+          (context) => ({
             type: 'TICKET SOLD',
             ticket: context.ticketDocument,
             soldAt: context.ticketState.sale?.soldAt,
             transactions: context.ticketState.sale?.transactions,
             amount: context.ticketState.sale?.amount,
           }),
-          { to: context => context.showMachineRef! }
+          { to: (context) => context.showMachineRef! }
         ),
 
         sendTicketRefunded: send(
-          context => ({
+          (context) => ({
             type: 'TICKET REFUNDED',
             ticket: context.ticketDocument,
             refundedAt: context.ticketState.refund?.refundedAt,
             transactions: context.ticketState.refund?.transactions,
             amount: context.ticketState.refund?.amount,
           }),
-          { to: context => context.showMachineRef! }
+          { to: (context) => context.showMachineRef! }
         ),
 
         sendTicketCancelled: send(
-          context => ({
+          (context) => ({
             type: 'TICKET CANCELLED',
             ticket: context.ticketDocument,
           }),
-          { to: context => context.showMachineRef! }
+          { to: (context) => context.showMachineRef! }
         ),
 
         sendFeedbackReceived: send(
-          context => ({
+          (context) => ({
             type: 'FEEDBACK RECEIVED',
             ticket: context.ticketDocument,
           }),
-          { to: context => context.showMachineRef! }
+          { to: (context) => context.showMachineRef! }
         ),
 
         initiateCancellation: assign((context, event) => {
@@ -369,7 +371,7 @@ export const createTicketMachine = ({
           };
         }),
 
-        redeemTicket: assign(context => {
+        redeemTicket: assign((context) => {
           if (context.ticketState.status === TicketStatus.REDEEMED) return {};
           return {
             ticketState: {
@@ -382,7 +384,7 @@ export const createTicketMachine = ({
           };
         }),
 
-        cancelTicket: assign(context => {
+        cancelTicket: assign((context) => {
           return {
             ticketState: {
               ...context.ticketState,
@@ -447,7 +449,7 @@ export const createTicketMachine = ({
           };
         }),
 
-        enterEscrow: assign(context => {
+        enterEscrow: assign((context) => {
           return {
             ticketState: {
               ...context.ticketState,
@@ -474,7 +476,7 @@ export const createTicketMachine = ({
           return {};
         }),
 
-        deactivateTicket: assign(context => {
+        deactivateTicket: assign((context) => {
           return {
             ticketState: {
               ...context.ticketState,
@@ -483,7 +485,7 @@ export const createTicketMachine = ({
           };
         }),
 
-        missShow: assign(context => {
+        missShow: assign((context) => {
           return {
             ticketState: {
               ...context.ticketState,
@@ -494,27 +496,27 @@ export const createTicketMachine = ({
       },
 
       guards: {
-        canCancel: context => {
+        canCancel: (context) => {
           const canCancel =
             context.ticketState.totalPaid <= context.ticketState.totalRefunded;
 
           return canCancel;
         },
-        ticketCancelled: context =>
+        ticketCancelled: (context) =>
           context.ticketState.status === TicketStatus.CANCELLED,
-        ticketFinalized: context =>
+        ticketFinalized: (context) =>
           context.ticketState.status === TicketStatus.FINALIZED,
-        ticketInDispute: context =>
+        ticketInDispute: (context) =>
           context.ticketState.status === TicketStatus.IN_DISPUTE,
-        ticketInEscrow: context =>
+        ticketInEscrow: (context) =>
           context.ticketState.status === TicketStatus.IN_ESCROW,
-        ticketReserved: context =>
+        ticketReserved: (context) =>
           context.ticketState.status === TicketStatus.RESERVED,
-        ticketReedemed: context =>
+        ticketReedemed: (context) =>
           context.ticketState.status === TicketStatus.REDEEMED,
-        ticketInCancellationInitiated: context =>
+        ticketInCancellationInitiated: (context) =>
           context.ticketState.status === TicketStatus.CANCELLATION_INITIATED,
-        ticketMissedShow: context =>
+        ticketMissedShow: (context) =>
           context.ticketState.status === TicketStatus.MISSED_SHOW,
         fullyPaid: (context, event) => {
           const value =
@@ -532,7 +534,7 @@ export const createTicketMachine = ({
             context.ticketState.totalPaid
           );
         },
-        canWatchShow: context => {
+        canWatchShow: (context) => {
           const state = context.showMachineRef?.getSnapshot();
           return (
             state !== undefined &&
@@ -565,7 +567,7 @@ export const createTicketMachineService = ({
   const ticketService = interpret(ticketMachine).start();
 
   if (ticketMachineOptions?.saveStateCallback) {
-    ticketService.onChange(context => {
+    ticketService.onChange((context) => {
       ticketMachineOptions.saveStateCallback &&
         ticketMachineOptions.saveStateCallback(context.ticketState);
     });
@@ -577,14 +579,14 @@ export const createTicketMachineService = ({
 
   if (showService) {
     if (showMachineOptions?.saveStateCallback) {
-      showService.onChange(context => {
+      showService.onChange((context) => {
         showMachineOptions.saveStateCallback &&
           showMachineOptions.saveStateCallback(context.showState);
       });
     }
 
     if (showMachineOptions?.saveShowEventCallback) {
-      showService.onEvent(event => {
+      showService.onEvent((event) => {
         const ticket = ('ticket' in event ? event.ticket : undefined) as
           | TicketDocumentType
           | undefined;

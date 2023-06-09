@@ -1,5 +1,6 @@
-import { ActorType } from '$lib/constants';
 import { type InferSchemaType, Schema } from 'mongoose';
+
+import { ActorType } from '$lib/constants';
 
 export enum DisputeDecision {
   TALENT_WON = 'TALENT WON',

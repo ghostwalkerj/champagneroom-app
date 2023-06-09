@@ -1,6 +1,6 @@
-import type { ShowEventDocumentType } from '$lib/models/showEvent';
-
 import * as timeago from 'timeago.js';
+
+import type { ShowEventDocumentType } from '$lib/models/showEvent';
 
 export const createEventText = (showEvent: ShowEventDocumentType) => {
   let eventText =

@@ -1,3 +1,7 @@
+import type { Handle } from '@sveltejs/kit';
+import IORedis from 'ioredis';
+import mongoose from 'mongoose';
+
 import {
   MONGO_DB_ENDPOINT,
   REDIS_HOST,
@@ -5,9 +9,6 @@ import {
   REDIS_PORT,
   REDIS_USERNAME,
 } from '$env/static/private';
-import type { Handle } from '@sveltejs/kit';
-import IORedis from 'ioredis';
-import mongoose from 'mongoose';
 
 mongoose.connect(MONGO_DB_ENDPOINT);
 const redisConnection = new IORedis({

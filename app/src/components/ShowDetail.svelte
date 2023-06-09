@@ -1,9 +1,10 @@
 <script lang="ts">
+  import StarRating from 'svelte-star-rating';
+  import urlJoin from 'url-join';
+
   import { PUBLIC_SHOW_PATH } from '$env/static/public';
   import { currencyFormatter, durationFormatter } from '$lib/constants';
   import type { ShowDocumentType } from '$lib/models/show';
-  import StarRating from 'svelte-star-rating';
-  import urlJoin from 'url-join';
 
   type ShowDetailOptions = {
     showCopy?: boolean;

@@ -1,5 +1,6 @@
-import { Talent } from '$lib/models/talent';
 import type { RequestHandler } from '@sveltejs/kit';
+
+import { Talent } from '$lib/models/talent';
 
 export const GET: RequestHandler<{ key: string }> = async ({ params, url }) => {
   const talentKey = params.key;

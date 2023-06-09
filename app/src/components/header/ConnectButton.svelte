@@ -5,6 +5,7 @@
     selectedAccount,
     web3,
   } from 'svelte-web3';
+
   import JazzIcon from './JazzIcon.svelte';
 
   let pending = 'pending';

@@ -1,6 +1,7 @@
-import { Ticket } from '$lib/models/ticket';
 import type { RequestHandler } from '@sveltejs/kit';
 import mongoose from 'mongoose';
+
+import { Ticket } from '$lib/models/ticket';
 
 export const GET: RequestHandler<{ id: string }> = async ({ params, url }) => {
   const ticketId = params.id;

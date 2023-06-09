@@ -1,7 +1,8 @@
 <script lang="ts">
+  import urlJoin from 'url-join';
+
   import { page } from '$app/stores';
   import { PUBLIC_TALENT_PATH } from '$env/static/public';
-  import urlJoin from 'url-join';
 
   export let row;
 

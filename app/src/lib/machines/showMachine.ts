@@ -1,4 +1,9 @@
 /* eslint-disable @typescript-eslint/naming-convention */
+import type { Queue } from 'bullmq';
+import { nanoid } from 'nanoid';
+import { type StateFrom, assign, createMachine, interpret } from 'xstate';
+import { raise } from 'xstate/lib/actions';
+
 import { ActorType } from '$lib/constants';
 import type {
   ShowDocumentType,
@@ -9,10 +14,6 @@ import { ShowStatus } from '$lib/models/show';
 import type { TicketDocumentType } from '$lib/models/ticket';
 import type { TransactionDocumentType } from '$lib/models/transaction';
 import type { ShowJobDataType } from '$lib/workers/showWorker';
-import type { Queue } from 'bullmq';
-import { nanoid } from 'nanoid';
-import { assign, createMachine, interpret, type StateFrom } from 'xstate';
-import { raise } from 'xstate/lib/actions';
 
 export type ShowStateType = ShowDocumentType['showState'];
 
@@ -360,7 +361,7 @@ export const createShowMachine = ({
     },
     {
       actions: {
-        closeBoxOffice: assign(context => {
+        closeBoxOffice: assign((context) => {
           return {
             showState: {
               ...context.showState,
@@ -369,7 +370,7 @@ export const createShowMachine = ({
           };
         }),
 
-        openBoxOffice: assign(context => {
+        openBoxOffice: assign((context) => {
           return {
             showState: {
               ...context.showState,
@@ -378,7 +379,7 @@ export const createShowMachine = ({
           };
         }),
 
-        cancelShow: assign(context => {
+        cancelShow: assign((context) => {
           return {
             showState: {
               ...context.showState,
@@ -387,7 +388,7 @@ export const createShowMachine = ({
           };
         }),
 
-        startShow: assign(context => {
+        startShow: assign((context) => {
           return {
             showState: {
               ...context.showState,
@@ -490,7 +491,7 @@ export const createShowMachine = ({
 
           const refund = {
             refundedAt: event.refundedAt || new Date(),
-            transactions: event.transactions.map(t => t._id),
+            transactions: event.transactions.map((t) => t._id),
             ticket: event.ticket._id,
             amount: event.amount,
           } as ShowRefundType;
@@ -510,7 +511,7 @@ export const createShowMachine = ({
           };
         }),
 
-        enterEscrow: assign(context => {
+        enterEscrow: assign((context) => {
           return {
             showState: {
               ...context.showState,
@@ -522,7 +523,7 @@ export const createShowMachine = ({
           };
         }),
 
-        exitEscrow: assign(context => {
+        exitEscrow: assign((context) => {
           if (!context.showState.escrow) return {};
           return {
             showState: {
@@ -536,7 +537,7 @@ export const createShowMachine = ({
           };
         }),
 
-        deactivateShow: assign(context => {
+        deactivateShow: assign((context) => {
           return {
             showState: {
               ...context.showState,
@@ -546,7 +547,7 @@ export const createShowMachine = ({
           };
         }),
 
-        makeShowNotCurrent: assign(context => {
+        makeShowNotCurrent: assign((context) => {
           return {
             showState: {
               ...context.showState,
@@ -555,7 +556,7 @@ export const createShowMachine = ({
           };
         }),
 
-        incrementTicketsAvailable: assign(context => {
+        incrementTicketsAvailable: assign((context) => {
           return {
             showState: {
               ...context.showState,
@@ -570,7 +571,7 @@ export const createShowMachine = ({
           };
         }),
 
-        decrementTicketsAvailable: assign(context => {
+        decrementTicketsAvailable: assign((context) => {
           return {
             showState: {
               ...context.showState,
@@ -594,7 +595,7 @@ export const createShowMachine = ({
 
           const sale = {
             soldAt: event.soldAt || new Date(),
-            transactions: event.transactions.map(t => t._id),
+            transactions: event.transactions.map((t) => t._id),
             ticket: event.ticket._id,
             amount: event.amount,
           } as ShowSaleType;
@@ -630,7 +631,7 @@ export const createShowMachine = ({
       },
 
       delays: {
-        GRACE_DELAY: context => {
+        GRACE_DELAY: (context) => {
           const delay =
             +GRACE_PERIOD -
             (context.showState.runtime?.endDate
@@ -641,28 +642,30 @@ export const createShowMachine = ({
       },
 
       guards: {
-        canCancel: context =>
+        canCancel: (context) =>
           context.showState.salesStats.ticketsSold -
             context.showState.salesStats.ticketsRefunded ===
           0,
-        showCancelled: context =>
+        showCancelled: (context) =>
           context.showState.status === ShowStatus.CANCELLED,
-        showFinalized: context =>
+        showFinalized: (context) =>
           context.showState.status === ShowStatus.FINALIZED,
-        showInitiatedCancellation: context =>
+        showInitiatedCancellation: (context) =>
           context.showState.status === ShowStatus.CANCELLATION_INITIATED,
-        showInitiatedRefund: context =>
+        showInitiatedRefund: (context) =>
           context.showState.status === ShowStatus.REFUND_INITIATED,
-        showBoxOfficeOpen: context =>
+        showBoxOfficeOpen: (context) =>
           context.showState.status === ShowStatus.BOX_OFFICE_OPEN,
-        showBoxOfficeClosed: context =>
+        showBoxOfficeClosed: (context) =>
           context.showState.status === ShowStatus.BOX_OFFICE_CLOSED,
-        showStarted: context => context.showState.status === ShowStatus.LIVE,
-        showStopped: context => context.showState.status === ShowStatus.STOPPED,
-        showInEscrow: context =>
+        showStarted: (context) => context.showState.status === ShowStatus.LIVE,
+        showStopped: (context) =>
+          context.showState.status === ShowStatus.STOPPED,
+        showInEscrow: (context) =>
           context.showState.status === ShowStatus.IN_ESCROW,
-        soldOut: context => context.showState.salesStats.ticketsAvailable === 1,
-        canStartShow: context => {
+        soldOut: (context) =>
+          context.showState.salesStats.ticketsAvailable === 1,
+        canStartShow: (context) => {
           if (context.showState.status === ShowStatus.ENDED) {
             // Allow grace period to start show again
             return (
@@ -701,14 +704,14 @@ export const createShowMachineService = ({
   const showService = interpret(showMachine).start();
 
   if (showMachineOptions?.saveStateCallback) {
-    showService.onChange(context => {
+    showService.onChange((context) => {
       showMachineOptions.saveStateCallback &&
         showMachineOptions.saveStateCallback(context.showState);
     });
   }
 
   if (showMachineOptions?.saveShowEventCallback) {
-    showService.onEvent(event => {
+    showService.onEvent((event) => {
       const ticket = ('ticket' in event ? event.ticket : undefined) as
         | TicketDocumentType
         | undefined;

@@ -1,6 +1,7 @@
-import { ShowEvent } from '$lib/models/showEvent';
 import type { RequestHandler } from '@sveltejs/kit';
 import mongoose from 'mongoose';
+
+import { ShowEvent } from '$lib/models/showEvent';
 
 export const GET: RequestHandler<{ showId: string }> = async ({
   params,

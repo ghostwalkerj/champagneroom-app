@@ -1,3 +1,11 @@
+import type { Actions } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
+import type IORedis from 'ioredis';
+import jwt from 'jsonwebtoken';
+import urlJoin from 'url-join';
+
+import type { PageServerLoad } from './$types';
+
 import {
   JITSI_APP_ID,
   JITSI_JWT_SECRET,
@@ -13,12 +21,6 @@ import type { ShowType } from '$lib/models/show';
 import { Ticket } from '$lib/models/ticket';
 import { verifyPin } from '$lib/util/pin';
 import { getTicketMachineService } from '$lib/util/util.server';
-import type { Actions } from '@sveltejs/kit';
-import { error, redirect } from '@sveltejs/kit';
-import type IORedis from 'ioredis';
-import jwt from 'jsonwebtoken';
-import urlJoin from 'url-join';
-import type { PageServerLoad } from './$types';
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 export const load: PageServerLoad = async ({ params, cookies, locals }) => {

@@ -1,10 +1,11 @@
 <script lang="ts">
-  import type { TalentDocument } from '$lib/ORM/models/talent';
-  import { currencyFormatter } from '$lib/constants';
   import Chart from 'chart.js/auto';
   import ChartDataLabels from 'chartjs-plugin-datalabels';
   import spacetime from 'spacetime';
   import { Doughnut } from 'svelte-chartjs';
+
+  import { currencyFormatter } from '$lib/constants';
+  import type { TalentDocument } from '$lib/ORM/models/talent';
 
   export let talents: TalentDocument[];
 

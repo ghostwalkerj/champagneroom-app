@@ -1,25 +1,24 @@
+import type { Job, Queue } from 'bullmq';
+import { Worker } from 'bullmq';
+import type IORedis from 'ioredis';
 import { ActorType, EntityType } from '$lib/constants';
 import {
   ShowMachineEventString,
-  createShowMachineService,
   type ShowMachineServiceType,
+  createShowMachineService
 } from '$lib/machines/showMachine';
 import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
 import { TicketMachineEventString } from '$lib/machines/ticketMachine';
+import { CancelReason, type FinalizeType } from '$lib/models/common';
 import type { ShowType } from '$lib/models/show';
 import { SaveState, Show, ShowStatus } from '$lib/models/show';
+import { createShowEvent } from '$lib/models/showEvent';
 import { Talent } from '$lib/models/talent';
 import type { TicketStateType } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
 import type { TransactionType } from '$lib/models/transaction';
 import { Transaction, TransactionReasonType } from '$lib/models/transaction';
-
-import { CancelReason, type FinalizeType } from '$lib/models/common';
-import { createShowEvent } from '$lib/models/showEvent';
 import { getTicketMachineService } from '$lib/util/util.server';
-import type { Job, Queue } from 'bullmq';
-import { Worker } from 'bullmq';
-import type IORedis from 'ioredis';
 
 export type ShowJobDataType = {
   showId: string;
@@ -35,19 +34,20 @@ export const getShowWorker = (
     async (job: Job<ShowJobDataType, any, ShowMachineEventString>) => {
       const show = (await Show.findById(job.data.showId).exec()) as ShowType;
 
-      const showService = createShowMachineService({
-        showDocument: show,
-        showMachineOptions: {
-          saveStateCallback: async showState => SaveState(show, showState),
-          saveShowEventCallback: async ({ type, ticket, transaction }) =>
-            createShowEvent({ show, type, ticket, transaction }),
-          jobQueue: showQueue,
-        },
-      });
-
       if (!show) {
         return;
       }
+
+      const showService = createShowMachineService({
+        showDocument: show,
+        showMachineOptions: {
+          saveStateCallback: async (showState) => SaveState(show, showState),
+          saveShowEventCallback: async ({ type, ticket, transaction }) =>
+            createShowEvent({ show, type, ticket, transaction }),
+          jobQueue: showQueue
+        }
+      });
+
       switch (job.name) {
         case ShowMachineEventString.CANCELLATION_INITIATED: {
           cancelShow(show, showService, showQueue);
@@ -78,6 +78,7 @@ export const getShowWorker = (
           break;
         }
       }
+      showService.stop();
     },
     { autorun: false, connection: redisConnection }
   );
@@ -92,7 +93,7 @@ const cancelShow = async (
   const tickets = await Ticket.find({
     show: show._id,
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    'ticketState.activeState': true,
+    'ticketState.activeState': true
   });
   for (const ticket of tickets) {
     // send cancel show to all tickets
@@ -101,12 +102,12 @@ const cancelShow = async (
       cancelledBy: ActorType.TALENT,
       cancelledInState: JSON.stringify(showState.value),
       reason: CancelReason.TALENT_CANCELLED,
-      cancelledAt: new Date(),
+      cancelledAt: new Date()
     } as TicketStateType['cancel'];
 
     const cancelEvent = {
       type: TicketMachineEventString.SHOW_CANCELLED,
-      cancel,
+      cancel
     } as TicketMachineEventType;
     ticketService.send(cancelEvent);
     ticketService.stop();
@@ -114,7 +115,6 @@ const cancelShow = async (
   if (showState.matches('initiatedCancellation.waiting2Refund')) {
     showService.send(ShowMachineEventString.REFUND_INITIATED);
   }
-  showService.stop();
 };
 
 const refundShow = async (
@@ -128,7 +128,7 @@ const refundShow = async (
     const tickets = await Ticket.find({
       show: show._id,
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      'ticketState.activeState': true,
+      'ticketState.activeState': true
     });
     for (const ticket of tickets) {
       // send refunds
@@ -148,19 +148,17 @@ const refundShow = async (
           hash: '0xeba2df809e7a612a0a0d444ccfa5c839624bdc00dd29e3340d46df3870f8a30e',
           from: '0x5B38Da6a701c568545dCfcB03FcB875f56beddC4',
           to: '0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2',
-          value:
-            ticket.ticketState.totalPaid - ticket.ticketState.totalRefunded,
+          value: ticket.ticketState.totalPaid - ticket.ticketState.totalRefunded
         })) as TransactionType;
 
         ticketService.send({
           type: TicketMachineEventString.REFUND_RECEIVED,
-          transaction: refundTransaction,
+          transaction: refundTransaction
         });
         ticketService.stop();
       }
     }
   }
-  showService.stop();
 };
 
 const stopShow = async (showService: ShowMachineServiceType) => {
@@ -168,7 +166,6 @@ const stopShow = async (showService: ShowMachineServiceType) => {
   if (showState.matches('stopped')) {
     showService.send(ShowMachineEventString.SHOW_ENDED);
   }
-  showService.stop();
 };
 
 const endEscrow = async (showService: ShowMachineServiceType) => {
@@ -178,11 +175,10 @@ const endEscrow = async (showService: ShowMachineServiceType) => {
       type: ShowMachineEventString.SHOW_FINALIZED,
       finalize: {
         finalizedAt: new Date(),
-        finalizedBy: ActorType.TIMER,
-      } as FinalizeType,
+        finalizedBy: ActorType.TIMER
+      } as FinalizeType
     });
   }
-  showService.stop();
 };
 
 // End show, alert ticket
@@ -197,7 +193,7 @@ const endShow = async (
     const tickets = await Ticket.find({
       show: show._id,
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      'ticketState.activeState': true,
+      'ticketState.activeState': true
     });
     for (const ticket of tickets) {
       // send show is over
@@ -206,7 +202,6 @@ const endShow = async (
       ticketService.stop();
     }
   }
-  showService.stop();
 };
 
 const finalizeShow = async (
@@ -218,7 +213,7 @@ const finalizeShow = async (
   const tickets = await Ticket.find({
     show: show._id,
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    'ticketState.activeState': true,
+    'ticketState.activeState': true
   });
   for (const ticket of tickets) {
     const ticketService = getTicketMachineService(ticket, show, showQueue);
@@ -227,25 +222,24 @@ const finalizeShow = async (
     if (ticketState.matches('inEscrow')) {
       ticketService.send({
         type: TicketMachineEventString.TICKET_FINALIZED,
-        finalize,
+        finalize
       });
     }
-    ticketService.stop();
   }
   // Calculate sales stats
   const talentSession = await Talent.startSession();
   await talentSession.withTransaction(async () => {
     const showFilter = {
       talent: show.talent,
-      'showState.status': ShowStatus.FINALIZED,
+      'showState.status': ShowStatus.FINALIZED
     };
 
     const groupBy = {
-      _id: null,
+      _id: undefined,
       totalSales: { $sum: '$showState.salesStats.totalSales' },
       numberOfCompletedShows: { $sum: 1 },
       totalRefunded: { $sum: '$showState.salesStats.totalRefunded' },
-      totalRevenue: { $sum: '$showState.salesStats.totalRevenue' },
+      totalRevenue: { $sum: '$showState.salesStats.totalRevenue' }
     };
 
     const aggregate = await Show.aggregate().match(showFilter).group(groupBy);
@@ -267,7 +261,7 @@ const finalizeShow = async (
         'salesStats.totalSales': totalSales,
         'salesStats.numberOfCompletedShows': numberOfCompletedShows,
         'salesStats.totalRefunded': totalRefunded,
-        'salesStats.totalRevenue': totalRevenue,
+        'salesStats.totalRevenue': totalRevenue
       }
     );
     talentSession.endSession();
@@ -282,13 +276,13 @@ const feedbackReceived = async (show: ShowType) => {
     // aggregate ticket feedback into show
     const ticketFilter = {
       show: show._id,
-      'ticketState.feedback.rating': { $exists: true },
+      'ticketState.feedback.rating': { $exists: true }
     };
 
     const groupBy = {
-      _id: null,
+      _id: undefined,
       numberOfReviews: { $sum: 1 },
-      averageRating: { $avg: '$ticketState.feedback.rating' },
+      averageRating: { $avg: '$ticketState.feedback.rating' }
     };
 
     const aggregate = await Ticket.aggregate()
@@ -302,7 +296,7 @@ const feedbackReceived = async (show: ShowType) => {
     }
     show.showState.feedbackStats = {
       averageRating,
-      numberOfReviews,
+      numberOfReviews
     };
 
     await show.save();
@@ -314,13 +308,13 @@ const feedbackReceived = async (show: ShowType) => {
   await talentSession.withTransaction(async () => {
     const showFilter = {
       talent: show.talent,
-      'showState.feedbackStats.numberOfReviews': { $gt: 0 },
+      'showState.feedbackStats.numberOfReviews': { $gt: 0 }
     };
 
     const groupBy = {
-      _id: null,
+      _id: undefined,
       numberOfReviews: { $sum: '$showState.feedbackStats.numberOfReviews' },
-      averageRating: { $avg: '$showState.feedbackStats.averageRating' },
+      averageRating: { $avg: '$showState.feedbackStats.averageRating' }
     };
 
     const aggregate = await Show.aggregate().match(showFilter).group(groupBy);
@@ -336,7 +330,7 @@ const feedbackReceived = async (show: ShowType) => {
       { _id: show.talent },
       {
         'feedbackStats.averageRating': averageRating,
-        'feedbackStats.numberOfReviews': numberOfReviews,
+        'feedbackStats.numberOfReviews': numberOfReviews
       }
     );
     talentSession.endSession();

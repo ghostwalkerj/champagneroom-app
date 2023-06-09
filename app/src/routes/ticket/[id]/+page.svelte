@@ -1,22 +1,20 @@
 <script lang="ts">
-  import { applyAction, enhance } from '$app/forms';
-  import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
-  import {
-    createTicketMachineService,
-    type TicketMachineServiceType,
-  } from '$lib/machines/ticketMachine';
+  import { onDestroy, onMount } from 'svelte';
+  import type { Unsubscriber } from 'svelte/store';
   import urlJoin from 'url-join';
 
-  import { PUBLIC_SHOWTIME_PATH } from '$env/static/public';
   import { DisputeReason } from '$lib/models/common';
   import type { ShowDocumentType } from '$lib/models/show';
   import type { TicketDocumentType } from '$lib/models/ticket';
   import { showStore, ticketStore } from '$stores';
-  import { onDestroy, onMount } from 'svelte';
-  import type { Unsubscriber } from 'svelte/store';
+
   import type { ActionData, PageData } from './$types';
   import TicketDetail from './TicketDetail.svelte';
+
+  import { applyAction, enhance } from '$app/forms';
+  import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
+  import { PUBLIC_SHOWTIME_PATH } from '$env/static/public';
 
   export let data: PageData;
   export let form: ActionData;

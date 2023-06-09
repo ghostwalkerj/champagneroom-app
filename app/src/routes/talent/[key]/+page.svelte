@@ -1,9 +1,17 @@
 <script lang="ts">
+  import { possessive } from 'i18n-possessive';
+  import { onDestroy, onMount } from 'svelte';
+  import type { Unsubscriber } from 'svelte/store';
+  import urlJoin from 'url-join';
+
+  import type { ActionData, PageData } from './$types';
+  import TalentWallet from './TalentWallet.svelte';
+
   import { applyAction, enhance } from '$app/forms';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import ShowDetail from '$components/ShowDetail.svelte';
   import ProfilePhoto from '$components/forms/ProfilePhoto.svelte';
+  import ShowDetail from '$components/ShowDetail.svelte';
   import {
     PUBLIC_DEFAULT_PROFILE_IMAGE,
     PUBLIC_SHOWTIME_PATH,
@@ -20,12 +28,6 @@
   import type { TalentDocumentType } from '$lib/models/talent';
   import { createEventText } from '$lib/util/eventUtil';
   import { showEventStore, showStore, talentStore } from '$stores';
-  import { possessive } from 'i18n-possessive';
-  import { onDestroy, onMount } from 'svelte';
-  import type { Unsubscriber } from 'svelte/store';
-  import urlJoin from 'url-join';
-  import type { ActionData, PageData } from './$types';
-  import TalentWallet from './TalentWallet.svelte';
 
   export let form: ActionData;
   export let data: PageData;

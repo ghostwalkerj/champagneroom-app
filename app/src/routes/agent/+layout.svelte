@@ -1,6 +1,7 @@
 <script lang="ts">
-  import ConnectButton from '$components/header/ConnectButton.svelte';
   import { selectedAccount } from 'svelte-web3';
+
+  import ConnectButton from '$components/header/ConnectButton.svelte';
 </script>
 
 <header>

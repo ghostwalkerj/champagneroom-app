@@ -1,9 +1,10 @@
 <script lang="ts">
   // TODO:Add validation
-  import { page } from '$app/stores';
-  import { PUBLIC_IMAGE_UPDATE_PATH } from '$env/static/public';
   import { filedrop } from 'filedrop-svelte';
   import urlJoin from 'url-join';
+
+  import { page } from '$app/stores';
+  import { PUBLIC_IMAGE_UPDATE_PATH } from '$env/static/public';
 
   export let profileImage: string;
   export let callBack: (argument0: string) => void;

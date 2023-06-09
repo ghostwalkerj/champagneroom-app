@@ -1,27 +1,29 @@
+import { error, fail, redirect } from '@sveltejs/kit';
+import type IORedis from 'ioredis';
+import urlJoin from 'url-join';
+
+import type { Actions, PageServerLoad } from './$types';
+
 import { PUBLIC_PIN_PATH } from '$env/static/public';
+import { ActorType } from '$lib/constants';
+import type { ShowMachineServiceType } from '$lib/machines/showMachine';
+import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
+import { TicketMachineEventString } from '$lib/machines/ticketMachine';
+import type { DisputeReason } from '$lib/models/common';
+import { CancelReason } from '$lib/models/common';
+import { Show } from '$lib/models/show';
+import { Ticket } from '$lib/models/ticket';
 import type {
   TicketDocumentType,
   TicketStateType,
   TicketType,
 } from '$lib/models/ticket';
-import { Ticket } from '$lib/models/ticket';
 import { Transaction, TransactionReasonType } from '$lib/models/transaction';
-
-import { ActorType } from '$lib/constants';
-import type { ShowMachineServiceType } from '$lib/machines/showMachine';
-import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
-import { TicketMachineEventString } from '$lib/machines/ticketMachine';
-import { CancelReason, DisputeReason } from '$lib/models/common';
-import { Show } from '$lib/models/show';
 import { verifyPin } from '$lib/util/pin';
 import {
   getTicketMachineService,
   getTicketMachineServiceFromId,
 } from '$lib/util/util.server';
-import { error, fail, redirect } from '@sveltejs/kit';
-import type IORedis from 'ioredis';
-import urlJoin from 'url-join';
-import type { Actions, PageServerLoad } from './$types';
 
 const getTicketService = async (ticketId: string, redisConnection: IORedis) => {
   const ticket = await Ticket.findById(ticketId)
@@ -100,7 +102,7 @@ export const actions: Actions = {
       show: show._id,
       agent: show.agent,
       talent: show.talent,
-    }).then(transaction => {
+    }).then((transaction) => {
       ticketService.send({
         type: TicketMachineEventString.PAYMENT_RECEIVED,
         transaction,

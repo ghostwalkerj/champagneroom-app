@@ -1,8 +1,10 @@
+import { Queue } from 'bullmq';
+import type IORedis from 'ioredis';
+import mongoose, { Error } from 'mongoose';
+
 import { EntityType } from '$lib/constants';
-import {
-  ShowMachineEventString,
-  createShowMachineService,
-} from '$lib/machines/showMachine';
+import type { ShowMachineEventString } from '$lib/machines/showMachine';
+import { createShowMachineService } from '$lib/machines/showMachine';
 import { createTicketMachineService } from '$lib/machines/ticketMachine';
 import { SaveState, type ShowType } from '$lib/models/show';
 import { createShowEvent } from '$lib/models/showEvent';
@@ -12,15 +14,12 @@ import {
   type TicketType,
 } from '$lib/models/ticket';
 import type { ShowJobDataType } from '$lib/workers/showWorker';
-import { Queue } from 'bullmq';
-import type IORedis from 'ioredis';
-import mongoose, { Error } from 'mongoose';
 
 export const getShowMachineService = (
   show: ShowType,
   connection: Queue<ShowJobDataType, any, ShowMachineEventString> | IORedis
 ) => {
-  let jobQueue =
+  const jobQueue =
     connection instanceof Queue
       ? connection
       : (new Queue(EntityType.SHOW, { connection }) as Queue<
@@ -32,7 +31,7 @@ export const getShowMachineService = (
   return createShowMachineService({
     showDocument: show,
     showMachineOptions: {
-      saveStateCallback: async showState => SaveState(show, showState),
+      saveStateCallback: async (showState) => SaveState(show, showState),
       saveShowEventCallback: async ({ type, ticket, transaction }) =>
         createShowEvent({ show, type, ticket, transaction }),
       jobQueue,
@@ -44,7 +43,7 @@ export const getShowMachineServiceFromId = async (
   showId: string,
   connection: Queue<ShowJobDataType, any, ShowMachineEventString> | IORedis
 ) => {
-  let jobQueue =
+  const jobQueue =
     connection instanceof Queue
       ? connection
       : (new Queue(EntityType.SHOW, { connection }) as Queue<
@@ -73,7 +72,7 @@ export const getTicketMachineService = (
     },
   };
 
-  let jobQueue =
+  const jobQueue =
     connection instanceof Queue
       ? connection
       : (new Queue(EntityType.SHOW, { connection }) as Queue<
@@ -87,7 +86,7 @@ export const getTicketMachineService = (
     ticketMachineOptions,
     showDocument: show,
     showMachineOptions: {
-      saveStateCallback: async showState => SaveState(show, showState),
+      saveStateCallback: async (showState) => SaveState(show, showState),
       saveShowEventCallback: async ({ type, ticket, transaction }) =>
         createShowEvent({ show, type, ticket, transaction }),
       jobQueue,
@@ -107,7 +106,7 @@ export const getTicketMachineServiceFromId = async (
     })
     .exec();
 
-  let jobQueue =
+  const jobQueue =
     connection instanceof Queue
       ? connection
       : (new Queue(EntityType.SHOW, { connection }) as Queue<

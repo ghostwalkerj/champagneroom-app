@@ -1,11 +1,12 @@
 import { fail } from '@sveltejs/kit';
+import { uniqueNamesGenerator } from 'unique-names-generator';
+
 import type { Actions } from './$types';
 
 import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
 import { Agent } from '$lib/models/agent';
 import { Talent } from '$lib/models/talent';
 import { womensNames } from '$lib/util/womensNames';
-import { uniqueNamesGenerator } from 'unique-names-generator';
 
 export const actions: Actions = {
   get_or_create_agent: async ({ request }) => {
