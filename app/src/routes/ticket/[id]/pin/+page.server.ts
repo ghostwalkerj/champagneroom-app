@@ -1,11 +1,13 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import urlJoin from 'url-join';
 
-import type { Actions, PageServerLoad } from './$types';
-
 import { PUBLIC_TICKET_PATH } from '$env/static/public';
+
 import { Ticket } from '$lib/models/ticket';
+
 import { createPinHash, verifyPin } from '$lib/util/pin';
+
+import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params, cookies }) => {
   const ticketId = params.id;

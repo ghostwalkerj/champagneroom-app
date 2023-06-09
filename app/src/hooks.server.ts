@@ -17,7 +17,7 @@ const redisConnection = new IORedis({
   password: REDIS_PASSWORD,
   username: REDIS_USERNAME,
   enableReadyCheck: false,
-  maxRetriesPerRequest: null,
+  maxRetriesPerRequest: undefined,
 });
 
 export const handle = (async ({ event, resolve }) => {

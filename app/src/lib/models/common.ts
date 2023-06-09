@@ -67,4 +67,19 @@ export const saleSchema = new Schema({
   amount: { type: Number, required: true, default: 0 },
 });
 
+export const feedbackSchema = new Schema({
+  rating: {
+    type: Number,
+    required: true,
+    min: 1,
+    max: 5,
+    validate: {
+      validator: Number.isInteger,
+      message: '{VALUE} is not an integer value',
+    },
+  },
+  review: { type: String },
+  createdAt: { type: Date, required: true, default: Date.now },
+});
+
 export type FinalizeType = InferSchemaType<typeof finalizeSchema>;

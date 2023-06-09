@@ -6,6 +6,12 @@ export enum TokenRoles {
   TALENT = 'TALENT',
 }
 
+export const currencyFormatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  maximumFractionDigits: 0,
+});
+
 export enum EntityType {
   AGENT = 'AGENT',
   TALENT = 'TALENT',
@@ -13,12 +19,6 @@ export enum EntityType {
   TICKET = 'TICKET',
   USER = 'USER',
 }
-
-export const currencyFormatter = new Intl.NumberFormat('en-US', {
-  style: 'currency',
-  currency: 'USD',
-  maximumFractionDigits: 0,
-});
 
 export const durationFormatter = (duration: number): string => {
   const hours = Math.floor(duration / 60);
@@ -32,8 +32,8 @@ export enum ActorType {
   AGENT = 'AGENT',
   TALENT = 'TALENT',
   CUSTOMER = 'CUSTOMER',
-  SERVICE = 'SERVICE',
   TIMER = 'TIMER',
+  UNKNOWN = 'UNKNOWN',
 }
 
 export const jitsiInterfaceConfigOverwrite = {

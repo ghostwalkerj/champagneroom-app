@@ -7,7 +7,10 @@ import {
   cancelSchema,
   disputeSchema,
   escrowSchema,
+  feedbackSchema,
   finalizeSchema,
+  refundSchema,
+  saleSchema,
 } from './common';
 
 const { Schema, models } = pkg;
@@ -26,37 +29,6 @@ export enum TicketStatus {
 
 const redemptionSchema = new Schema({
   redeemedAt: { type: Date, required: true, default: Date.now },
-});
-
-const feedbackSchema = new Schema({
-  rating: {
-    type: Number,
-    required: true,
-    min: 1,
-    max: 5,
-    validate: {
-      validator: Number.isInteger,
-      message: '{VALUE} is not an integer value',
-    },
-  },
-  review: { type: String },
-  createdAt: { type: Date, required: true, default: Date.now },
-});
-
-const refundSchema = new Schema({
-  refundedAt: { type: Date, required: true, default: Date.now },
-  transactions: [
-    { type: Schema.Types.ObjectId, ref: 'Transaction', required: true },
-  ],
-  amount: { type: Number, required: true, default: 0 },
-});
-
-const saleSchema = new Schema({
-  soldAt: { type: Date, required: true, default: Date.now },
-  transactions: [
-    { type: Schema.Types.ObjectId, ref: 'Transaction', required: true },
-  ],
-  amount: { type: Number, required: true, default: 0 },
 });
 
 const ticketStateSchema = new Schema(

@@ -2,10 +2,6 @@ import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 import mongoose, { Error } from 'mongoose';
 
-import { EntityType } from '$lib/constants';
-import type { ShowMachineEventString } from '$lib/machines/showMachine';
-import { createShowMachineService } from '$lib/machines/showMachine';
-import { createTicketMachineService } from '$lib/machines/ticketMachine';
 import { SaveState, type ShowType } from '$lib/models/show';
 import { createShowEvent } from '$lib/models/showEvent';
 import {
@@ -13,7 +9,14 @@ import {
   type TicketStateType,
   type TicketType,
 } from '$lib/models/ticket';
+
+import type { ShowMachineEventString } from '$lib/machines/showMachine';
+import { createShowMachineService } from '$lib/machines/showMachine';
+import { createTicketMachineService } from '$lib/machines/ticketMachine';
+
 import type { ShowJobDataType } from '$lib/workers/showWorker';
+
+import { EntityType } from '$lib/constants';
 
 export const getShowMachineService = (
   show: ShowType,

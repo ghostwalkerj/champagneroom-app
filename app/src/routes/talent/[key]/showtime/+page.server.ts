@@ -4,21 +4,24 @@ import type IORedis from 'ioredis';
 import jwt from 'jsonwebtoken';
 import urlJoin from 'url-join';
 
-import type { PageServerLoad } from './$types';
-
 import {
   JITSI_APP_ID,
   JITSI_JWT_SECRET,
   JWT_EXPIRY,
 } from '$env/static/private';
 import { PUBLIC_JITSI_DOMAIN, PUBLIC_TALENT_PATH } from '$env/static/public';
-import { ShowMachineEventString } from '$lib/machines/showMachine';
+
 import { Show } from '$lib/models/show';
 import { Talent } from '$lib/models/talent';
+
+import { ShowMachineEventString } from '$lib/machines/showMachine';
+
 import {
   getShowMachineService,
   getShowMachineServiceFromId,
 } from '$lib/util/util.server';
+
+import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
   const key = params.key;

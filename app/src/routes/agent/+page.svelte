@@ -3,12 +3,14 @@
   import { onMount } from 'svelte';
   import { selectedAccount } from 'svelte-web3';
 
-  import type { ActionData } from './$types';
+  import { deserialize } from '$app/forms';
+
+  import type { AgentDocumentType } from '$lib/models/agent';
+
   import AgentWallet from './AgentWallet.svelte';
   import TalentForm from './TalentForm.svelte';
 
-  import { deserialize } from '$app/forms';
-  import type { AgentDocumentType } from '$lib/models/agent';
+  import type { ActionData } from './$types';
 
   export let form: ActionData;
   let agent: AgentDocumentType;

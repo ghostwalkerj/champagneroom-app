@@ -2,15 +2,17 @@
   import { onDestroy, onMount } from 'svelte';
   import urlJoin from 'url-join';
 
-  import type { PageData } from './$types';
-
   import { browser } from '$app/environment';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { PUBLIC_JITSI_DOMAIN, PUBLIC_TALENT_PATH } from '$env/static/public';
-  import { jitsiInterfaceConfigOverwrite } from '$lib/constants';
+
   import type { ShowDocumentType } from '$lib/models/show';
   import type { TalentDocumentType } from '$lib/models/talent';
+
+  import { jitsiInterfaceConfigOverwrite } from '$lib/constants';
+
+  import type { PageData } from './$types';
 
   export let data: PageData;
 

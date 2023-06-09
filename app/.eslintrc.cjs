@@ -32,6 +32,7 @@ module.exports = {
     {
       files: ['*.svelte', '*.ts'],
       rules: {
+        'simple-import-sort/exports': 'error',
         'simple-import-sort/imports': [
           'error',
           {
@@ -44,13 +45,20 @@ module.exports = {
               // Things that start with a letter (or digit or underscore), or `@` followed by a letter.
               ['^@?\\w'],
               // svelte
-              ['^\\$env?|\\$app?\\w'],
+              ['^\\$env|\\$app'],
+              ['^\\$lib/models'],
+              ['^\\$lib/machines'],
+              ['^\\$lib/workers'],
+              ['^\\$lib'],
+
               // Absolute imports and other imports such as Vue-style `@/foo`.
               // Anything not matched in another group.
               ['^'],
               // Relative imports.
               // Anything that starts with a dot.
+
               ['^\\.'],
+              ['^\\./\\$types'],
             ],
           },
         ],

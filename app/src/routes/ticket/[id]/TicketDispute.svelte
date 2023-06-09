@@ -1,8 +1,10 @@
 <script lang="ts">
   import { PUBLIC_PROFILE_IMAGE_PATH } from '$env/static/public';
-  import { currencyFormatter, durationFormatter } from '$lib/constants';
+
   import type { ShowDocumentType } from '$lib/models/show';
   import type { TicketDocumentType } from '$lib/models/ticket';
+
+  import { currencyFormatter, durationFormatter } from '$lib/constants';
   import getProfileImage from '$lib/util/profilePhoto';
   export let show: ShowDocumentType;
   export let ticket: TicketDocumentType;
@@ -12,9 +14,9 @@
     PUBLIC_PROFILE_IMAGE_PATH
   );
   $: ticketStatus = ticket
-    ? ticket.ticketState.totalPaid >= ticket.price
+    ? (ticket.ticketState.totalPaid >= ticket.price
       ? 'Paid' + ' ' + ticket.ticketState.status
-      : ticket.ticketState.status
+      : ticket.ticketState.status)
     : '';
   $: showStatus = show ? show.showState.status : '';
 </script>

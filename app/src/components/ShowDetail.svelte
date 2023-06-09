@@ -3,8 +3,10 @@
   import urlJoin from 'url-join';
 
   import { PUBLIC_SHOW_PATH } from '$env/static/public';
-  import { currencyFormatter, durationFormatter } from '$lib/constants';
+
   import type { ShowDocumentType } from '$lib/models/show';
+
+  import { currencyFormatter, durationFormatter } from '$lib/constants';
 
   type ShowDetailOptions = {
     showCopy?: boolean;

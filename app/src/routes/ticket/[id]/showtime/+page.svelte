@@ -2,8 +2,6 @@
   import { onDestroy, onMount } from 'svelte';
   import urlJoin from 'url-join';
 
-  import type { PageData } from './$types';
-
   import { browser } from '$app/environment';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
@@ -12,14 +10,19 @@
     PUBLIC_PROFILE_IMAGE_PATH,
     PUBLIC_TICKET_PATH,
   } from '$env/static/public';
-  import { jitsiInterfaceConfigOverwrite } from '$lib/constants';
-  import {
-    TicketMachineEventString,
-    createTicketMachineService,
-  } from '$lib/machines/ticketMachine';
+
   import type { ShowDocumentType } from '$lib/models/show';
   import type { TicketDocumentType } from '$lib/models/ticket';
+
+  import {
+    createTicketMachineService,
+    TicketMachineEventString,
+  } from '$lib/machines/ticketMachine';
+
+  import { jitsiInterfaceConfigOverwrite } from '$lib/constants';
   import getProfileImage from '$lib/util/profilePhoto';
+
+  import type { PageData } from './$types';
 
 
   export let data: PageData;

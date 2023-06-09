@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import type { Queue } from 'bullmq';
 import { nanoid } from 'nanoid';
-import { type StateFrom, assign, createMachine, interpret } from 'xstate';
+import { assign, createMachine, interpret,type StateFrom } from 'xstate';
 import { raise } from 'xstate/lib/actions';
 
-import { ActorType } from '$lib/constants';
 import type {
   ShowDocumentType,
   ShowRefundType,
@@ -13,7 +12,10 @@ import type {
 import { ShowStatus } from '$lib/models/show';
 import type { TicketDocumentType } from '$lib/models/ticket';
 import type { TransactionDocumentType } from '$lib/models/transaction';
+
 import type { ShowJobDataType } from '$lib/workers/showWorker';
+
+import { ActorType } from '$lib/constants';
 
 export type ShowStateType = ShowDocumentType['showState'];
 

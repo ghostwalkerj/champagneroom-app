@@ -2,14 +2,6 @@ import type { Job, Queue } from 'bullmq';
 import { Worker } from 'bullmq';
 import type IORedis from 'ioredis';
 
-import { ActorType, EntityType } from '$lib/constants';
-import {
-  createShowMachineService,
-  ShowMachineEventString,
-  type ShowMachineServiceType,
-} from '$lib/machines/showMachine';
-import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
-import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 import { CancelReason, type FinalizeType } from '$lib/models/common';
 import type { ShowType } from '$lib/models/show';
 import { SaveState, Show, ShowStatus } from '$lib/models/show';
@@ -19,6 +11,16 @@ import type { TicketStateType } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
 import type { TransactionType } from '$lib/models/transaction';
 import { Transaction, TransactionReasonType } from '$lib/models/transaction';
+
+import {
+  createShowMachineService,
+  ShowMachineEventString,
+  type ShowMachineServiceType,
+} from '$lib/machines/showMachine';
+import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
+import { TicketMachineEventString } from '$lib/machines/ticketMachine';
+
+import { ActorType, EntityType } from '$lib/constants';
 import { getTicketMachineService } from '$lib/util/util.server';
 
 export type ShowJobDataType = {

@@ -8,15 +8,18 @@
   import { page } from '$app/stores';
   import { PUBLIC_SHOWTIME_PATH } from '$env/static/public';
 
-  import type { TicketMachineServiceType } from '$lib/machines/ticketMachine';
-  import {createTicketMachineService} from '$lib/machines/ticketMachine';
   import { DisputeReason } from '$lib/models/common';
   import type { ShowDocumentType } from '$lib/models/show';
   import type { TicketDocumentType } from '$lib/models/ticket';
+
+  import type { TicketMachineServiceType } from '$lib/machines/ticketMachine';
+  import {createTicketMachineService} from '$lib/machines/ticketMachine';
+
   import { showStore, ticketStore } from '$stores';
 
-  import type { ActionData, PageData } from './$types';
   import TicketDetail from './TicketDetail.svelte';
+
+  import type { ActionData, PageData } from './$types';
 
 
   export let data: PageData;

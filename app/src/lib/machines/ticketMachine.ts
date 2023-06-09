@@ -3,26 +3,27 @@
 import { nanoid } from 'nanoid';
 import {
   type ActorRefFrom,
-  type StateFrom,
   assign,
   createMachine,
   interpret,
   send,
   spawn,
+  type StateFrom,
 } from 'xstate';
 import { raise } from 'xstate/lib/actions';
 
-import { ActorType } from '$lib/constants';
 import type { ShowDocumentType } from '$lib/models/show';
 import type { TicketDocumentType, TicketStateType } from '$lib/models/ticket';
 import { TicketStatus } from '$lib/models/ticket';
 import type { TransactionDocumentType } from '$lib/models/transaction';
 
+import { ActorType } from '$lib/constants';
+
 import {
+  createShowMachine,
   type ShowMachineOptions,
   type ShowMachineServiceType,
   type ShowMachineType,
-  createShowMachine,
 } from './showMachine';
 
 export type TicketMachineOptions = {
@@ -417,6 +418,8 @@ export const createTicketMachine = ({
             refundedAt: new Date(),
             transactions: [],
             amount: 0,
+            requestedBy:
+              context.ticketState.cancel?.cancelledBy || ActorType.UNKNOWN,
           };
           refund.amount += +event.transaction.value;
           refund.transactions.push(event.transaction._id);

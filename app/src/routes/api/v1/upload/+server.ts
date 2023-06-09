@@ -1,9 +1,9 @@
 import { json } from '@sveltejs/kit';
 import { Web3Storage } from 'web3.storage';
 
-import type { RequestHandler } from './$types';
-
 import { WEB3STORAGE_API_TOKEN, WEB3STORAGE_DOMAIN } from '$env/static/private';
+
+import type { RequestHandler } from './$types';
 
 const client = new Web3Storage({ token: WEB3STORAGE_API_TOKEN });
 

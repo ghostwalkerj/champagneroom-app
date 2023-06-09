@@ -1,15 +1,17 @@
 import { error, fail } from '@sveltejs/kit';
 import type IORedis from 'ioredis';
 
-import type { Actions, PageServerLoad, RequestEvent } from './$types';
-
-import { ActorType } from '$lib/constants';
-import type { ShowMachineEventType } from '$lib/machines/showMachine';
-import { ShowMachineEventString } from '$lib/machines/showMachine';
 import { CancelReason } from '$lib/models/common';
 import { Show, type ShowStateType, ShowStatus } from '$lib/models/show';
 import { Talent, type TalentDocumentType } from '$lib/models/talent';
+
+import type { ShowMachineEventType } from '$lib/machines/showMachine';
+import { ShowMachineEventString } from '$lib/machines/showMachine';
+
+import { ActorType } from '$lib/constants';
 import { getShowMachineServiceFromId } from '$lib/util/util.server';
+
+import type { Actions, PageServerLoad, RequestEvent } from './$types';
 
 export const load: PageServerLoad = async ({ params }) => {
   const key = params.key;

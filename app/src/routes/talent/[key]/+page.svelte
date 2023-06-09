@@ -4,30 +4,35 @@
   import type { Unsubscriber } from 'svelte/store';
   import urlJoin from 'url-join';
 
-  import type { ActionData, PageData } from './$types';
-  import TalentWallet from './TalentWallet.svelte';
-
   import { applyAction, enhance } from '$app/forms';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import ProfilePhoto from '$components/forms/ProfilePhoto.svelte';
-  import ShowDetail from '$components/ShowDetail.svelte';
   import {
     PUBLIC_DEFAULT_PROFILE_IMAGE,
-    PUBLIC_SHOWTIME_PATH,
     PUBLIC_SHOW_PATH,
+    PUBLIC_SHOWTIME_PATH,
   } from '$env/static/public';
-  import { durationFormatter } from '$lib/constants';
-  import type { ShowMachineServiceType } from '$lib/machines/showMachine';
-  import {
-    ShowMachineEventString,
-    createShowMachineService,
-  } from '$lib/machines/showMachine';
+
   import type { ShowDocumentType } from '$lib/models/show';
   import type { ShowEventDocumentType } from '$lib/models/showEvent';
   import type { TalentDocumentType } from '$lib/models/talent';
+
+  import type { ShowMachineServiceType } from '$lib/machines/showMachine';
+  import {
+    createShowMachineService,
+    ShowMachineEventString,
+  } from '$lib/machines/showMachine';
+
+  import { durationFormatter } from '$lib/constants';
   import { createEventText } from '$lib/util/eventUtil';
+
+  import ProfilePhoto from '$components/forms/ProfilePhoto.svelte';
+  import ShowDetail from '$components/ShowDetail.svelte';
   import { showEventStore, showStore, talentStore } from '$stores';
+
+  import TalentWallet from './TalentWallet.svelte';
+
+  import type { ActionData, PageData } from './$types';
 
   export let form: ActionData;
   export let data: PageData;
