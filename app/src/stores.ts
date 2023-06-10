@@ -50,8 +50,7 @@ const getChangeset = async <T>({
         if (cancelOn) {
           shouldLoop = !cancelOn(jsonResponse);
         }
-      } catch (error) {
-        console.error(error);
+      } catch {
         shouldLoop = false;
       }
     }

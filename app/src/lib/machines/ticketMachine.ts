@@ -143,8 +143,8 @@ const createTicketMachine = ({
               cond: 'ticketFinalized',
             },
             {
-              target: 'reedemed',
-              cond: 'ticketReedemed',
+              target: 'redeemed',
+              cond: 'ticketRedeemed',
             },
             {
               target: '#ticketMachine.reserved.initiatedCancellation',
@@ -205,7 +205,7 @@ const createTicketMachine = ({
             waiting4Show: {
               on: {
                 'SHOW JOINED': {
-                  target: '#ticketMachine.reedemed',
+                  target: '#ticketMachine.redeemed',
                   cond: 'canWatchShow',
                   actions: ['redeemTicket', 'sendJoinedShow'],
                 },
@@ -242,7 +242,7 @@ const createTicketMachine = ({
             },
           },
         },
-        reedemed: {
+        redeemed: {
           on: {
             'SHOW LEFT': { actions: ['sendLeftShow'] },
             'SHOW JOINED': {
@@ -266,7 +266,6 @@ const createTicketMachine = ({
         inEscrow: {
           on: {
             'FEEDBACK RECEIVED': {
-              target: '#ticketMachine.finalized',
               actions: [
                 'receiveFeedback',
                 raise({
@@ -510,7 +509,7 @@ const createTicketMachine = ({
           context.ticketState.status === TicketStatus.IN_ESCROW,
         ticketReserved: (context) =>
           context.ticketState.status === TicketStatus.RESERVED,
-        ticketReedemed: (context) =>
+        ticketRedeemed: (context) =>
           context.ticketState.status === TicketStatus.REDEEMED,
         ticketInCancellationInitiated: (context) =>
           context.ticketState.status === TicketStatus.CANCELLATION_INITIATED,
