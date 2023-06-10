@@ -26,8 +26,8 @@ export enum DisputeReason {
 
 export const cancelSchema = new Schema({
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  _id: { type: Schema.Types.ObjectId, required: true, auto: true },
-  cancelledAt: { type: Date, required: true, default: Date.now },
+  _id: { type: Schema.Types.ObjectId, auto: true },
+  cancelledAt: { type: Date, default: Date.now },
   cancelledInState: { type: String },
   cancelledBy: { type: String, enum: ActorType, required: true },
   reason: { type: String, enum: CancelReason, required: true },
@@ -35,8 +35,8 @@ export const cancelSchema = new Schema({
 
 export const disputeSchema = new Schema({
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  _id: { type: Schema.Types.ObjectId, required: true, index: true },
-  startedAt: { type: Date, required: true, default: Date.now },
+  _id: { type: Schema.Types.ObjectId, auto: true },
+  startedAt: { type: Date, default: Date.now },
   endedAt: { type: Date },
   reason: { type: String, enum: DisputeReason, required: true },
   disputedBy: { type: String, enum: ActorType, required: true },
@@ -46,14 +46,14 @@ export const disputeSchema = new Schema({
 
 export const escrowSchema = new Schema({
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  _id: { type: Schema.Types.ObjectId, required: true, index: true },
-  startedAt: { type: Date, required: true, default: Date.now },
+  _id: { type: Schema.Types.ObjectId, auto: true },
+  startedAt: { type: Date, default: Date.now },
   endedAt: { type: Date },
 });
 
 export const feedbackSchema = new Schema({
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  _id: { type: Schema.Types.ObjectId, required: true, index: true },
+  _id: { type: Schema.Types.ObjectId, auto: true },
   rating: {
     type: Number,
     required: true,
@@ -65,20 +65,20 @@ export const feedbackSchema = new Schema({
     },
   },
   review: { type: String },
-  createdAt: { type: Date, required: true, default: Date.now },
+  createdAt: { type: Date, default: Date.now },
 });
 
 export const finalizeSchema = new Schema({
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  _id: { type: Schema.Types.ObjectId, required: true, index: true },
-  finalizedAt: { type: Date, required: true, default: Date.now },
+  _id: { type: Schema.Types.ObjectId, auto: true },
+  finalizedAt: { type: Date, default: Date.now },
   finalizedBy: { type: String, enum: ActorType, required: true },
 });
 
 export const refundSchema = new Schema({
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  _id: { type: Schema.Types.ObjectId, required: true, index: true },
-  refundedAt: { type: Date, required: true, default: Date.now },
+  _id: { type: Schema.Types.ObjectId, auto: true },
+  refundedAt: { type: Date, default: Date.now },
   transactions: [
     { type: Schema.Types.ObjectId, ref: 'Transaction', required: true },
   ],
@@ -88,8 +88,8 @@ export const refundSchema = new Schema({
 
 export const saleSchema = new Schema({
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  _id: { type: Schema.Types.ObjectId, required: true, index: true },
-  soldAt: { type: Date, required: true, default: Date.now },
+  _id: { type: Schema.Types.ObjectId, auto: true },
+  soldAt: { type: Date, default: Date.now },
   transactions: [
     { type: Schema.Types.ObjectId, ref: 'Transaction', required: true },
   ],

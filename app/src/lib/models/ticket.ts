@@ -35,7 +35,7 @@ export const SaveState = (ticket: TicketType, newState: TicketStateType) => {
 };
 
 const redemptionSchema = new Schema({
-  redeemedAt: { type: Date, required: true, default: Date.now },
+  redeemedAt: { type: Date, default: Date.now },
 });
 
 const ticketStateSchema = new Schema(
@@ -43,12 +43,11 @@ const ticketStateSchema = new Schema(
     status: {
       type: String,
       enum: TicketStatus,
-      required: true,
       default: TicketStatus.RESERVED,
     },
-    activeState: { type: Boolean, required: true, default: true, index: true },
-    totalPaid: { type: Number, required: true, default: 0 },
-    totalRefunded: { type: Number, required: true, default: 0 },
+    activeState: { type: Boolean, default: true, index: true },
+    totalPaid: { type: Number, default: 0 },
+    totalRefunded: { type: Number, default: 0 },
     cancel: cancelSchema,
     redemption: redemptionSchema,
     escrow: escrowSchema,
@@ -78,7 +77,7 @@ const ticketSchema = new Schema(
       required: true,
       default: () => ({}),
     },
-    customerName: { type: String, required: true },
+    customerName: { type: String, required: true, trim: true },
     pin: {
       type: String,
       required: true,

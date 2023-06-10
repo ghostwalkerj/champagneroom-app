@@ -2,12 +2,12 @@ import type { Job, Queue } from 'bullmq';
 import { Worker } from 'bullmq';
 import type IORedis from 'ioredis';
 
+import type { CancelType } from '$lib/models/common';
 import { CancelReason, type FinalizeType } from '$lib/models/common';
 import type { ShowType } from '$lib/models/show';
 import { SaveState, Show, ShowStatus } from '$lib/models/show';
 import { createShowEvent } from '$lib/models/showEvent';
 import { Talent } from '$lib/models/talent';
-import type { TicketStateType } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
 import type { TransactionType } from '$lib/models/transaction';
 import { Transaction, TransactionReasonType } from '$lib/models/transaction';
@@ -106,7 +106,7 @@ const cancelShow = async (
       cancelledInState: JSON.stringify(showState.value),
       reason: CancelReason.TALENT_CANCELLED,
       cancelledAt: new Date(),
-    } as TicketStateType['cancel'];
+    } as CancelType;
 
     const cancelEvent = {
       type: TicketMachineEventString.SHOW_CANCELLED,
@@ -141,7 +141,6 @@ const refundShow = async (
       if (
         ticketState.matches('reserved.initiatedCancellation.waiting4Refund')
       ) {
-        const ticket = ticketState.context.ticketDocument;
         const refundTransaction = (await Transaction.create({
           ticket: ticket._id,
           talent: ticket.talent,

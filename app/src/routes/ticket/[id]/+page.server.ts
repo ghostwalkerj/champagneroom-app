@@ -1,17 +1,19 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import type IORedis from 'ioredis';
+import { Types } from 'mongoose';
 import urlJoin from 'url-join';
 
 import { PUBLIC_PIN_PATH } from '$env/static/public';
 
-import type { DisputeReason, FeedbackType } from '$lib/models/common';
+import type {
+  CancelType,
+  DisputeReason,
+  DisputeType,
+  FeedbackType,
+} from '$lib/models/common';
 import { CancelReason } from '$lib/models/common';
 import { Show } from '$lib/models/show';
-import type {
-  TicketDocumentType,
-  TicketStateType,
-  TicketType,
-} from '$lib/models/ticket';
+import type { TicketDocumentType } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
 import { Transaction, TransactionReasonType } from '$lib/models/transaction';
 
@@ -27,7 +29,6 @@ import {
 } from '$lib/util/util.server';
 
 import type { Actions, PageServerLoad } from './$types';
-import { Types } from 'mongoose';
 
 const getTicketService = async (ticketId: string, redisConnection: IORedis) => {
   const ticket = await Ticket.findById(ticketId)
@@ -100,7 +101,7 @@ export const actions: Actions = {
       cancelledInState: JSON.stringify(state.value),
       reason: CancelReason.CUSTOMER_CANCELLED,
       cancelledAt: new Date(),
-    } as TicketStateType['cancel'];
+    } as CancelType;
 
     const cancelEvent = {
       type: 'CANCELLATION INITIATED',
@@ -194,7 +195,7 @@ export const actions: Actions = {
       reason: reason as DisputeReason,
       explanation,
       startedAt: new Date(),
-    } as TicketType['ticketState']['dispute'];
+    } as DisputeType;
 
     if (
       state.can({ type: TicketMachineEventString.DISPUTE_INITIATED, dispute })

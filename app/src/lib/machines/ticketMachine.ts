@@ -272,7 +272,6 @@ const createTicketMachine = ({
                 raise({
                   type: 'TICKET FINALIZED',
                   finalize: {
-                    _id: new Types.ObjectId(),
                     finalizedAt: new Date(),
                     finalizedBy: ActorType.CUSTOMER,
                   },
@@ -455,7 +454,6 @@ const createTicketMachine = ({
               ...context.ticketState,
               status: TicketStatus.IN_ESCROW,
               escrow: {
-                _id: new Types.ObjectId(),
                 startedAt: new Date(),
               },
             },

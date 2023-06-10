@@ -1,8 +1,9 @@
 import { error, fail } from '@sveltejs/kit';
 import type IORedis from 'ioredis';
 
+import type { CancelType } from '$lib/models/common';
 import { CancelReason } from '$lib/models/common';
-import { Show, type ShowStateType, ShowStatus } from '$lib/models/show';
+import { Show, ShowStatus } from '$lib/models/show';
 import { Talent, type TalentDocumentType } from '$lib/models/talent';
 
 import type { ShowMachineEventType } from '$lib/machines/showMachine';
@@ -78,8 +79,6 @@ export const actions: Actions = {
       },
     });
 
-    Talent.updateOne({ key }, { $push: { activeShows: show._id } }).exec();
-
     return {
       success: true,
       showCreated: true,
@@ -107,11 +106,10 @@ export const actions: Actions = {
     const showMachineState = showService.getSnapshot();
 
     const cancel = {
-      cancelledAt: new Date(),
       cancelledInState: JSON.stringify(showMachineState.value),
       reason: CancelReason.TALENT_CANCELLED,
       cancelledBy: ActorType.TALENT,
-    } as ShowStateType['cancel'];
+    } as CancelType;
 
     const cancelEvent = {
       type: 'CANCELLATION INITIATED',

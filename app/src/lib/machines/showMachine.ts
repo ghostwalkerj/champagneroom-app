@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import type { Queue } from 'bullmq';
-import { Types } from 'mongoose';
 import { nanoid } from 'nanoid';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 import { raise } from 'xstate/lib/actions';
@@ -246,7 +245,6 @@ const createShowMachine = ({
                   raise({
                     type: 'SHOW FINALIZED',
                     finalize: {
-                      _id: new Types.ObjectId(),
                       finalizedAt: new Date(),
                       finalizedBy: ActorType.CUSTOMER,
                     },
@@ -531,7 +529,7 @@ const createShowMachine = ({
           const ticketsSold = st.salesStats.ticketsSold - 1;
           const totalRefunded = st.salesStats.totalRefunded + refund.amount;
           const totalRevenue = st.salesStats.totalRevenue - refund.amount;
-          st.refunds.push(refund._id);
+          st.refunds.push(refund._id!);
 
           return {
             showState: {
@@ -553,7 +551,6 @@ const createShowMachine = ({
               ...context.showState,
               status: ShowStatus.IN_ESCROW,
               escrow: {
-                _id: new Types.ObjectId(),
                 startedAt: new Date(),
               },
             },
@@ -633,7 +630,7 @@ const createShowMachine = ({
           const ticketsReserved = st.salesStats.ticketsReserved - 1;
           const totalSales = st.salesStats.totalSales + sale.amount;
           const totalRevenue = st.salesStats.totalRevenue + sale.amount;
-          st.sales.push(sale._id);
+          st.sales.push(sale._id!);
 
           return {
             showState: {

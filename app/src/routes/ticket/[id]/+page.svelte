@@ -4,16 +4,18 @@
   import urlJoin from 'url-join';
 
   import { applyAction, enhance } from '$app/forms';
-  import { goto } from '$app/navigation';  
+  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { PUBLIC_SHOWTIME_PATH } from '$env/static/public';
 
-  import { DisputeReason } from '$lib/models/common';
+  import { CancelReason, DisputeReason } from '$lib/models/common';
   import type { ShowDocumentType } from '$lib/models/show';
   import type { TicketDocumentType } from '$lib/models/ticket';
 
   import type { TicketMachineServiceType } from '$lib/machines/ticketMachine';
-  import {createTicketMachineService} from '$lib/machines/ticketMachine';
+  import { createTicketMachineService } from '$lib/machines/ticketMachine';
+
+  import { ActorType } from '$lib/constants';
 
   import { showStore, ticketStore } from '$stores';
 
@@ -50,15 +52,27 @@
     canWatchShow = state.can('SHOW JOINED');
     canCancelTicket = state.can({
       type: 'CANCELLATION INITIATED',
-      cancel: undefined,
+      cancel: {
+        cancelledAt: new Date(),
+        cancelledBy: ActorType.CUSTOMER,
+        reason: CancelReason.CUSTOMER_CANCELLED,
+      },
     });
     canLeaveFeedback = state.can({
       type: 'FEEDBACK RECEIVED',
-      feedback: undefined,
+      feedback: {
+        createdAt: new Date(),
+        rating: 5,
+      },
     });
     canDispute = state.can({
       type: 'DISPUTE INITIATED',
-      dispute: undefined,
+      dispute:{
+        startedAt: new Date(),
+        disputedBy: ActorType.CUSTOMER,
+        reason: DisputeReason.ENDED_EARLY,
+        explanation: 'The show ended early',
+      },
     });
     isWaitingForShow = state.matches('reserved.waiting4Show') && !canWatchShow;
     isTicketDone = state.done ?? false;

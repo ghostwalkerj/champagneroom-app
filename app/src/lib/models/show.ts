@@ -3,8 +3,7 @@ import { default as mongoose, default as pkg } from 'mongoose';
 import { fieldEncryption } from 'mongoose-field-encryption';
 import { nanoid } from 'nanoid';
 
-import { ActorType } from '$lib/constants';
-
+import type { refundSchema, saleSchema } from './common';
 import { cancelSchema, escrowSchema, finalizeSchema } from './common';
 
 const { Schema, models } = pkg;
@@ -26,27 +25,8 @@ enum ShowStatus {
   IN_ESCROW = 'IN ESCROW',
 }
 
-const refundSchema = new Schema({
-  refundedAt: { type: Date, required: true, default: Date.now },
-  transactions: [
-    { type: Schema.Types.ObjectId, ref: 'Transaction', required: true },
-  ],
-  ticket: { type: Schema.Types.ObjectId, ref: 'Ticket', required: true },
-  requestedBy: { type: String, enum: ActorType, required: true },
-  amount: { type: Number, required: true, default: 0 },
-});
-
-const saleSchema = new Schema({
-  soldAt: { type: Date, required: true, default: Date.now },
-  transactions: [
-    { type: Schema.Types.ObjectId, ref: 'Transaction', required: true },
-  ],
-  ticket: { type: Schema.Types.ObjectId, ref: 'Ticket', required: true },
-  amount: { type: Number, required: true, default: 0 },
-});
-
 const runtimeSchema = new Schema({
-  startDate: { type: Date, required: true },
+  startDate: { type: Date, default: Date.now },
   endDate: { type: Date },
 });
 
@@ -61,7 +41,6 @@ const salesStatsSchema = new Schema({
   },
   ticketsSold: {
     type: Number,
-    required: true,
     default: 0,
     validate: {
       validator: Number.isInteger,
@@ -70,7 +49,6 @@ const salesStatsSchema = new Schema({
   },
   ticketsReserved: {
     type: Number,
-    required: true,
     default: 0,
     validate: {
       validator: Number.isInteger,
@@ -79,7 +57,6 @@ const salesStatsSchema = new Schema({
   },
   ticketsRefunded: {
     type: Number,
-    required: true,
     default: 0,
     validate: {
       validator: Number.isInteger,
@@ -88,7 +65,6 @@ const salesStatsSchema = new Schema({
   },
   ticketsRedeemed: {
     type: Number,
-    required: true,
     default: 0,
     validate: {
       validator: Number.isInteger,
@@ -97,7 +73,6 @@ const salesStatsSchema = new Schema({
   },
   totalSales: {
     type: Number,
-    required: true,
     default: 0,
     validate: {
       validator: Number.isInteger,
@@ -106,7 +81,6 @@ const salesStatsSchema = new Schema({
   },
   totalRefunded: {
     type: Number,
-    required: true,
     default: 0,
     validate: {
       validator: Number.isInteger,
@@ -115,7 +89,6 @@ const salesStatsSchema = new Schema({
   },
   totalRevenue: {
     type: Number,
-    required: true,
     default: 0,
     validate: {
       validator: Number.isInteger,
@@ -145,7 +118,7 @@ const showStateSchema = new Schema(
       required: true,
       default: ShowStatus.CREATED,
     },
-    activeState: { type: Boolean, required: true, default: true, index: true },
+    activeState: { type: Boolean, default: true, index: true },
     salesStats: {
       type: salesStatsSchema,
       required: true,

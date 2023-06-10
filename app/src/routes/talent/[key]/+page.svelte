@@ -13,6 +13,7 @@
     PUBLIC_SHOWTIME_PATH,
   } from '$env/static/public';
 
+  import { CancelReason } from '$lib/models/common';
   import type { ShowDocumentType } from '$lib/models/show';
   import type { ShowEventDocumentType } from '$lib/models/showEvent';
   import type { TalentDocumentType } from '$lib/models/talent';
@@ -23,7 +24,7 @@
     ShowMachineEventString,
   } from '$lib/machines/showMachine';
 
-  import { durationFormatter } from '$lib/constants';
+  import { ActorType, durationFormatter } from '$lib/constants';
   import { createEventText } from '$lib/util/eventUtil';
 
   import ProfilePhoto from '$components/forms/ProfilePhoto.svelte';
@@ -113,7 +114,11 @@
     showStopped = state.matches('stopped');
     canCancelShow = state.can({
       type: 'CANCELLATION INITIATED',
-      cancel: undefined,
+      cancel: {
+        cancelledAt: new Date(),
+        cancelledBy: ActorType.TALENT,
+        reason: CancelReason.TALENT_CANCELLED,
+      },
     });
     canStartShow = state.can(ShowMachineEventString.SHOW_STARTED);
     waiting4Refunds = state.matches('initiatedCancellation.waiting2Refund');

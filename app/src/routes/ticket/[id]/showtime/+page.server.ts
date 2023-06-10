@@ -25,7 +25,6 @@ import { getTicketMachineService } from '$lib/util/util.server';
 
 import type { PageServerLoad } from './$types';
 
-
 export const actions: Actions = {
   leave_show: async ({ params, cookies, locals }) => {
     const ticketId = params.id as string;
