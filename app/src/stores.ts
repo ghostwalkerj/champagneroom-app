@@ -32,7 +32,7 @@ const getChangeset = async <T>({
   let isFirstFetch = true;
   while (shouldLoop) {
     const path = isFirstFetch
-      ? urlJoin(changesetPath, '?firstFetch=true')
+      ? urlJoin(changesetPath, '?isFirstFetch=true')
       : changesetPath;
     isFirstFetch = false;
 
@@ -50,7 +50,8 @@ const getChangeset = async <T>({
         if (cancelOn) {
           shouldLoop = !cancelOn(jsonResponse);
         }
-      } catch {
+      } catch (error) {
+        console.error('Error parsing JSON', error);
         shouldLoop = false;
       }
     }

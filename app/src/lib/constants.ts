@@ -4,6 +4,7 @@ export enum ActorType {
   CUSTOMER = 'CUSTOMER',
   TIMER = 'TIMER',
   UNKNOWN = 'UNKNOWN',
+  ARBITRATOR = 'ARBITRATOR',
 }
 
 export enum EntityType {

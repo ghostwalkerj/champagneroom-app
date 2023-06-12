@@ -72,6 +72,7 @@
         disputedBy: ActorType.CUSTOMER,
         reason: DisputeReason.ENDED_EARLY,
         explanation: 'The show ended early',
+        resolved: false,
       },
     });
     isWaitingForShow = state.matches('reserved.waiting4Show') && !canWatchShow;

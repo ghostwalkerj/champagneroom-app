@@ -29,10 +29,10 @@
   let api: any;
   let participantName = '';
 
-  const endShow = async () => {
+  const stopShow = async () => {
     let formData = new FormData();
     formData.append('showId', currentShow?._id.toString());
-    fetch($page.url.href + '?/end_show', {
+    fetch($page.url.href + '?/stop_show', {
       method: 'POST',
       body: formData,
     });
@@ -41,7 +41,7 @@
 
   if (browser) {
     onDestroy(() => {
-      endShow();
+      stopShow();
     });
   }
 
@@ -86,7 +86,7 @@
     api.addListener('knockingParticipant', participantKnocked);
     api.addListener('toolbarButtonClicked', (event: any) => {
       if (event?.key === 'leave-show') {
-        endShow();
+        stopShow();
         goto(returnUrl);
       }
     });

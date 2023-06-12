@@ -25,7 +25,6 @@
           method: 'POST',
           body: formData,
         });
-
         const result = deserialize(await response.text());
         if (result.type === 'success' && result.data) {
           agent = result.data.agent as AgentDocumentType;

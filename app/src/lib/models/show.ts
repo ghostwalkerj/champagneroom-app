@@ -20,14 +20,37 @@ enum ShowStatus {
   CANCELLATION_INITIATED = 'CANCELLATION INITIATED',
   REFUND_INITIATED = 'REFUND INITIATED',
   LIVE = 'LIVE',
-  ENDED = 'ENDED',
   STOPPED = 'STOPPED',
   IN_ESCROW = 'IN ESCROW',
+  IN_DISPUTE = 'IN DISPUTE',
 }
 
 const runtimeSchema = new Schema({
-  startDate: { type: Date, default: Date.now },
+  startDate: { type: Date, required: true, default: new Date() },
   endDate: { type: Date },
+});
+
+const disputeStatsSchema = new Schema({
+  totalDisputes: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
+  totalDisputesRefunded: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
+  totalDisputesResolved: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
+  totalDisputesPending: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
 });
 
 const salesStatsSchema = new Schema({
@@ -63,6 +86,7 @@ const salesStatsSchema = new Schema({
       message: '{VALUE} is not an integer value',
     },
   },
+
   ticketsRedeemed: {
     type: Number,
     default: 0,
@@ -129,6 +153,11 @@ const showStateSchema = new Schema(
       required: true,
       default: () => ({}),
     },
+    disputeStats: {
+      type: disputeStatsSchema,
+      required: true,
+      default: () => ({}),
+    },
     cancel: cancelSchema,
     finalize: finalizeSchema,
     escrow: escrowSchema,
@@ -148,6 +177,16 @@ const showStateSchema = new Schema(
         {
           type: Schema.Types.ObjectId,
           ref: 'Ticket.ticketState.sale',
+        },
+      ],
+      required: true,
+      default: () => [],
+    },
+    disputes: {
+      type: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: 'Ticket.ticketState.dispute',
         },
       ],
       required: true,

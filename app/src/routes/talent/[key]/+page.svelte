@@ -54,7 +54,6 @@
   $: canCreateShow = false;
   $: canCancelShow = false;
   $: canStartShow = false;
-  $: waiting4Refunds = false;
   $: loading = false;
   $: showStopped = false;
 
@@ -121,7 +120,6 @@
       },
     });
     canStartShow = state.can(ShowMachineEventString.SHOW_STARTED);
-    waiting4Refunds = state.matches('initiatedCancellation.waiting2Refund');
     statusText = state.context.showState.status;
     if (state.done) {
       showMachineService.stop();
@@ -418,30 +416,7 @@
             </div>
           </form>
         {/if}
-        {#if waiting4Refunds}
-          <!-- Link Form-->
-          <form method="post" action="?/refund_tickets" use:enhance={onSubmit}>
-            <input type="hidden" name="showId" value={currentShow?._id} />
-
-            <div class="bg-primary text-primary-content card">
-              <div class="text-center card-body items-center p-3">
-                <div class="text-2xl card-title">Send Refunds</div>
-
-                <div
-                  class="flex flex-col text-white p-2 justify-center items-center"
-                >
-                  <div class="">
-                    <button
-                      class="btn btn-secondary"
-                      type="submit"
-                      disabled={loading}>Send Refunds</button
-                    >
-                  </div>
-                </div>
-              </div>
-            </div>
-          </form>
-        {/if}
+      
       </div>
     </div>
 

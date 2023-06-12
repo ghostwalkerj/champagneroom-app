@@ -4,7 +4,8 @@ import type IORedis from 'ioredis';
 import type { CancelType } from '$lib/models/common';
 import { CancelReason } from '$lib/models/common';
 import { Show, ShowStatus } from '$lib/models/show';
-import { Talent, type TalentDocumentType } from '$lib/models/talent';
+import type { TalentType } from '$lib/models/talent';
+import { Talent } from '$lib/models/talent';
 
 import type { ShowMachineEventType } from '$lib/machines/showMachine';
 import { ShowMachineEventString } from '$lib/machines/showMachine';
@@ -30,7 +31,10 @@ export const actions: Actions = {
       { profileImageUrl: url }
     ).exec();
 
-    return { success: true, talent: JSON.parse(JSON.stringify(talent)) };
+    return {
+      success: true,
+      talent: talent?.toObject({ flattenObjectIds: true }),
+    };
   },
   create_show: async ({ params, request }) => {
     const data = await request.formData();
@@ -56,8 +60,7 @@ export const actions: Actions = {
       .orFail(() => {
         throw error(404, 'Talent not found');
       })
-      .lean()
-      .exec()) as TalentDocumentType;
+      .exec()) as TalentType;
 
     const show = await Show.create({
       price: +price,
@@ -82,7 +85,7 @@ export const actions: Actions = {
     return {
       success: true,
       showCreated: true,
-      show: JSON.parse(JSON.stringify(show)),
+      show: show.toObject({ flattenObjectIds: true }),
     };
   },
   cancel_show: async ({ request, params, locals }) => {
@@ -152,37 +155,12 @@ export const actions: Actions = {
         type: ShowMachineEventString.SHOW_ENDED,
       });
 
-      isInEscrow = showService.getSnapshot().matches('inEscrow');
+      isInEscrow = showService.getSnapshot().matches('ended.inEscrow');
     }
 
     return {
       success: true,
       inEscrow: isInEscrow,
-    };
-  },
-  refund_tickets: async ({ request, locals }) => {
-    const data = await request.formData();
-    const showId = data.get('showId') as string;
-
-    if (showId === null) {
-      throw error(404, 'Show ID not found');
-    }
-
-    const redisConnection = locals.redisConnection as IORedis;
-    const showService = await getShowMachineServiceFromId(
-      showId,
-      redisConnection
-    );
-    const showState = showService.getSnapshot();
-
-    if (showState.matches('initiatedCancellation.waiting2Refund')) {
-      showService.send({
-        type: ShowMachineEventString.REFUND_INITIATED,
-      });
-    }
-    return {
-      success: true,
-      refundInitiated: true,
     };
   },
 };
@@ -197,7 +175,6 @@ export const load: PageServerLoad = async ({ params }) => {
     .orFail(() => {
       throw error(404, 'Talent not found');
     })
-    .lean()
     .exec();
 
   const currentShow = await Show.findOne({
@@ -206,9 +183,9 @@ export const load: PageServerLoad = async ({ params }) => {
   }).exec();
 
   return {
-    talent: JSON.parse(JSON.stringify(talent)),
+    talent: talent.toObject({ flattenObjectIds: true }),
     currentShow: currentShow
-      ? JSON.parse(JSON.stringify(currentShow))
+      ? currentShow.toObject({ flattenObjectIds: true })
       : undefined,
   };
 };

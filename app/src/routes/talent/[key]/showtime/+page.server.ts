@@ -24,7 +24,7 @@ import {
 import type { PageServerLoad } from './$types';
 
 export const actions: Actions = {
-  end_show: async ({ request, locals }) => {
+  stop_show: async ({ request, locals }) => {
     const data = await request.formData();
 
     const showId = data.get('showId') as string;
@@ -59,7 +59,6 @@ export const load: PageServerLoad = async ({ params, locals }) => {
     .orFail(() => {
       throw error(404, 'Talent not found');
     })
-    .lean()
     .exec();
 
   const show = await Show.findOne({
@@ -105,8 +104,8 @@ export const load: PageServerLoad = async ({ params, locals }) => {
   );
 
   return {
-    talent: JSON.parse(JSON.stringify(talent)),
-    show: JSON.parse(JSON.stringify(show)),
+    talent: talent.toObject({ flattenObjectIds: true }),
+    show: show.toObject({ flattenObjectIds: true }),
     jitsiToken,
   };
 };

@@ -4,41 +4,33 @@ import { Show } from '$lib/models/show';
 
 import type { RequestHandler } from './$types';
 
-export const GET: RequestHandler = async ({ params, url }) => {
+export const GET = (async ({ params, url }) => {
   const showId = params.id;
-  const firstFetch = url.searchParams.get('firstFetch') || false;
+  const isFirstFetch = url.searchParams.has('isFirstFetch')
+    ? url.searchParams.get('isFirstFetch') === 'true'
+    : false;
+
   if (showId === null) {
     return new Response('Show not found', { status: 404 });
   }
   const id = new mongoose.Types.ObjectId(showId);
 
-  let document: string | undefined;
-
-  if (firstFetch) {
-    const show = await Show.findById(id).lean().exec();
+  if (isFirstFetch) {
+    const show = await Show.findById(id).exec();
     if (show !== undefined) {
-      document = JSON.stringify(show);
+      return new Response(JSON.stringify(show));
     }
-  } else {
-    const pipeline = [
-      {
-        $match: {
-          'fullDocument._id': id,
-        },
-      },
-    ];
-
-    const changeStream = Show.watch(pipeline, { fullDocument: 'updateLookup' });
-    const next = await changeStream.next();
-    document = JSON.stringify(next.fullDocument);
-
-    changeStream.close();
   }
-
-  return new Response(document, {
-    status: 200,
-    headers: {
-      'content-type': 'application/json',
+  const pipeline = [
+    {
+      $match: {
+        'fullDocument._id': id,
+      },
     },
-  });
-};
+  ];
+  const changeStream = Show.watch(pipeline, { fullDocument: 'updateLookup' });
+  const next = await changeStream.next();
+  const document = next.fullDocument;
+  changeStream.close();
+return new Response(String(JSON.stringify(document)));
+}) satisfies RequestHandler;

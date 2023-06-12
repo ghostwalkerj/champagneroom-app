@@ -6,11 +6,13 @@ import { raise } from 'xstate/lib/actions';
 
 import type {
   CancelType,
+  DisputeType,
   FeedbackType,
   FinalizeType,
   RefundType,
   SaleType,
 } from '$lib/models/common';
+import { DisputeDecision } from '$lib/models/common';
 import type { ShowDocumentType } from '$lib/models/show';
 import { ShowStatus } from '$lib/models/show';
 import type { TicketDocumentType } from '$lib/models/ticket';
@@ -37,6 +39,7 @@ enum ShowMachineEventString {
   FEEDBACK_RECEIVED = 'FEEDBACK RECEIVED',
   ESCROW_ENDED = 'ESCROW ENDED',
   TICKET_DISPUTED = 'TICKET DISPUTED',
+  DISPUTE_RESOLVED = 'DISPUTE RESOLVED',
 }
 
 export { ShowMachineEventString };
@@ -133,7 +136,15 @@ export type ShowMachineEventType =
       ticket: TicketDocumentType;
     }
   | {
+      type: 'TICKET DISPUTED';
+      dispute: DisputeType;
+    }
+  | {
       type: 'ESCROW ENDED';
+    }
+  | {
+      type: 'DISPUTE RESOLVED';
+      decision: DisputeDecision;
     };
 
 export type ShowMachineOptions = {
@@ -221,22 +232,23 @@ const createShowMachine = ({
               cond: 'showStopped',
             },
             {
-              target: 'inEscrow',
+              target: 'ended.inEscrow',
               cond: 'showInEscrow',
             },
+            { target: 'ended.inDispute', cond: 'showInDispute' },
           ],
         },
         cancelled: {
           type: 'final',
           entry: ['deactivateShow'],
         },
-        inEscrow: {
-          entry: ['makeShowNotCurrent', 'enterEscrow'],
-          exit: ['exitEscrow'],
+        ended: {
+          initial: 'inEscrow',
           on: {
             'SHOW FINALIZED': {
               target: 'finalized',
               actions: ['finalizeShow'],
+              cond: 'canFinalize',
             },
             'FEEDBACK RECEIVED': [
               {
@@ -250,10 +262,44 @@ const createShowMachine = ({
                     },
                   }),
                 ],
-                cond: 'fullyReviewed',
+                cond: 'canFinalize',
               },
               { actions: ['receiveFeedback'] },
             ],
+            'TICKET DISPUTED': {
+              target: 'ended.inDispute',
+              actions: ['receiveDispute'],
+            },
+          },
+          states: {
+            inEscrow: {},
+            inDispute: {
+              on: {
+                'DISPUTE RESOLVED': [
+                  {
+                    actions: [
+                      'receiveResolution',
+                      raise({
+                        type: 'SHOW FINALIZED',
+                        finalize: {
+                          finalizedAt: new Date(),
+                          finalizedBy: ActorType.ARBITRATOR,
+                        },
+                      }),
+                    ],
+                    cond: 'canFinalize',
+                  },
+                  {
+                    actions: ['receiveResolution'],
+                    target: 'inEscrow',
+                    cond: 'disputesResolved',
+                  },
+                  {
+                    actions: ['receiveResolution'],
+                  },
+                ],
+              },
+            },
           },
         },
         finalized: {
@@ -365,7 +411,7 @@ const createShowMachine = ({
               cond: 'canStartShow',
             },
             'SHOW ENDED': {
-              target: 'inEscrow',
+              target: 'ended.inEscrow',
               actions: ['endShow'],
             },
           },
@@ -455,7 +501,11 @@ const createShowMachine = ({
           return {
             showState: {
               ...context.showState,
-              status: ShowStatus.ENDED,
+              status: ShowStatus.IN_ESCROW,
+              escrow: {
+                startedAt: new Date(),
+              },
+              current: false,
             },
           };
         }),
@@ -521,6 +571,40 @@ const createShowMachine = ({
           });
         },
 
+        receiveDispute: assign((context, event) => {
+          const st = context.showState;
+          return {
+            showState: {
+              ...st,
+              status: ShowStatus.IN_DISPUTE,
+              disputes: [...st.disputes, event.dispute._id!],
+              disputeStats: {
+                ...st.disputeStats,
+                totalDisputes: st.disputeStats.totalDisputes + 1,
+                totalDisputesPending: st.disputeStats.totalDisputesPending + 1,
+              },
+            },
+          };
+        }),
+
+        receiveResolution: assign((context, event) => {
+          const st = context.showState;
+          const refunded = event.decision === DisputeDecision.NO_REFUND ? 0 : 1;
+          return {
+            showState: {
+              ...st,
+              disputeStats: {
+                ...st.disputeStats,
+                totalDisputesPending: st.disputeStats.totalDisputesPending - 1,
+                totalDisputesResolved:
+                  st.disputeStats.totalDisputesResolved + 1,
+                totalDisputesRefunded:
+                  st.disputeStats.totalDisputesRefunded + refunded,
+              },
+            },
+          };
+        }),
+
         refundTicket: assign((context, event) => {
           const st = context.showState;
           const refund = event.refund;
@@ -544,47 +628,11 @@ const createShowMachine = ({
             },
           };
         }),
-
-        enterEscrow: assign((context) => {
-          return {
-            showState: {
-              ...context.showState,
-              status: ShowStatus.IN_ESCROW,
-              escrow: {
-                startedAt: new Date(),
-              },
-            },
-          };
-        }),
-
-        exitEscrow: assign((context) => {
-          if (!context.showState.escrow) return {};
-          return {
-            showState: {
-              ...context.showState,
-              status: ShowStatus.IN_ESCROW,
-              escrow: {
-                ...context.showState.escrow,
-                endedAt: new Date(),
-              },
-            },
-          };
-        }),
-
         deactivateShow: assign((context) => {
           return {
             showState: {
               ...context.showState,
               activeState: false,
-              current: false,
-            },
-          };
-        }),
-
-        makeShowNotCurrent: assign((context) => {
-          return {
-            showState: {
-              ...context.showState,
               current: false,
             },
           };
@@ -651,9 +699,16 @@ const createShowMachine = ({
             showId: context.showDocument._id.toString(),
             finalize: event.finalize,
           });
+          const escrow = context.showState.escrow || {
+            startedAt: new Date(),
+          };
           return {
             showState: {
               ...context.showState,
+              escrow: {
+                ...escrow,
+                endedAt: new Date(),
+              },
               status: ShowStatus.FINALIZED,
               finalized: event.finalize,
             },
@@ -694,16 +749,18 @@ const createShowMachine = ({
           context.showState.status === ShowStatus.STOPPED,
         showInEscrow: (context) =>
           context.showState.status === ShowStatus.IN_ESCROW,
+        showInDispute: (context) =>
+          context.showState.status === ShowStatus.IN_DISPUTE,
         soldOut: (context) =>
           context.showState.salesStats.ticketsAvailable === 1,
         canStartShow: (context) => {
-          if (context.showState.status === ShowStatus.ENDED) {
+          if (context.showState.status === ShowStatus.STOPPED) {
             // Allow grace period to start show again
-            return (
-              (context.showState.runtime?.startDate.getTime() ?? 0) +
-                +GRACE_PERIOD >
-              Date.now()
-            );
+            if (!context.showState.runtime!.startDate) {
+              return false;
+            }
+            const startDate = new Date(context.showState.runtime!.startDate);
+            return (startDate.getTime() ?? 0) + +GRACE_PERIOD > Date.now();
           }
           return context.showState.salesStats.ticketsSold > 0;
         },
@@ -711,13 +768,17 @@ const createShowMachine = ({
           const refunded = event.type === 'TICKET REFUNDED' ? 1 : 0;
           return context.showState.salesStats.ticketsSold - refunded === 0;
         },
-        fullyReviewed: (context, event) => {
+        canFinalize: (context, event) => {
           const count = event.type === 'FEEDBACK RECEIVED' ? 1 : 0;
           const fullReviewed =
             context.showState.feedbackStats.numberOfReviews + count ===
             context.showState.salesStats.ticketsSold;
-          return fullReviewed;
+          const hasDisputes =
+            context.showState.disputeStats.totalDisputesPending === 0;
+          return fullReviewed && !hasDisputes;
         },
+        disputesResolved: (context) =>
+          context.showState.disputeStats.totalDisputesPending === 0,
       },
     }
   );

@@ -27,9 +27,7 @@ export const actions: Actions = {
     // @ts-ignore
     let agent = await Agent.findOne({
       address: account,
-    })
-      .lean()
-      .exec();
+    }).exec();
 
     if (agent === null) {
       agent = await Agent.create({
@@ -44,7 +42,7 @@ export const actions: Actions = {
 
     return {
       success: true,
-      agent: JSON.parse(JSON.stringify(agent)),
+      agent: agent.toObject({ flattenObjectIds: true }),
     };
   },
   create_talent: async ({ request }) => {

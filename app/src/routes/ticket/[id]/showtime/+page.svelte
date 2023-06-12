@@ -42,10 +42,10 @@
 
   if (browser) {
     onDestroy(() => {
-      endShow();
+      leaveShow();
     });
 
-    const endShow = () => {
+    const leaveShow = () => {
       let formData = new FormData();
       fetch($page.url.href + '?/leave_show', {
         method: 'POST',

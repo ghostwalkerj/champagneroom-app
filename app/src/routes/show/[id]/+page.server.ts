@@ -95,7 +95,6 @@ export const load: PageServerLoad = async ({ params }) => {
     .orFail(() => {
       throw error(404, 'Show not found');
     })
-    .lean()
     .exec();
 
   const displayName = uniqueNamesGenerator({
@@ -103,7 +102,7 @@ export const load: PageServerLoad = async ({ params }) => {
   });
 
   return {
-    show: JSON.parse(JSON.stringify(show)),
+    show: show.toObject({ flattenObjectIds: true }),
     displayName,
   };
 };

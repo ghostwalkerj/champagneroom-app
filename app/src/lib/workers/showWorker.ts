@@ -3,7 +3,11 @@ import { Worker } from 'bullmq';
 import type IORedis from 'ioredis';
 
 import type { CancelType } from '$lib/models/common';
-import { CancelReason, type FinalizeType } from '$lib/models/common';
+import {
+  CancelReason,
+  type FinalizeType,
+  RefundReason,
+} from '$lib/models/common';
 import type { ShowType } from '$lib/models/show';
 import { SaveState, Show, ShowStatus } from '$lib/models/show';
 import { createShowEvent } from '$lib/models/showEvent';
@@ -157,6 +161,7 @@ const refundShow = async (
         ticketService.send({
           type: TicketMachineEventString.REFUND_RECEIVED,
           transaction: refundTransaction,
+          reason: RefundReason.SHOW_CANCELLED,
         });
         ticketService.stop();
       }
@@ -173,7 +178,7 @@ const stopShow = async (showService: ShowMachineServiceType) => {
 
 const endEscrow = async (showService: ShowMachineServiceType) => {
   const showState = showService.getSnapshot();
-  if (showState.matches('inEscrow')) {
+  if (showState.matches('ended.inEscrow')) {
     showService.send({
       type: ShowMachineEventString.SHOW_FINALIZED,
       finalize: {
@@ -192,7 +197,7 @@ const endShow = async (
 ) => {
   // Tell ticket holders the show is over folks
   const showState = showService.getSnapshot();
-  if (showState.matches('inEscrow')) {
+  if (showState.matches('ended.inEscrow')) {
     const tickets = await Ticket.find({
       show: show._id,
       // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -222,7 +227,7 @@ const finalizeShow = async (
     const ticketService = getTicketMachineService(ticket, show, showQueue);
     const ticketState = ticketService.getSnapshot();
 
-    if (ticketState.matches('inEscrow')) {
+    if (ticketState.matches('ended.inEscrow')) {
       ticketService.send({
         type: TicketMachineEventString.TICKET_FINALIZED,
         finalize,

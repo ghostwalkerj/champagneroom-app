@@ -1,37 +1,33 @@
-import type { RequestHandler } from '@sveltejs/kit';
 import mongoose from 'mongoose';
 
 import { Ticket } from '$lib/models/ticket';
 
-export const GET: RequestHandler<{ id: string }> = async ({ params, url }) => {
+import type { RequestHandler } from './$types';
+
+export const GET = (async ({ params, url }) => {
   const ticketId = params.id;
   if (ticketId === null) {
     return new Response('Ticket not found', { status: 404 });
   }
-  const firstFetch = url.searchParams.get('firstFetch') || false;
-  let document: string | undefined;
+  const isFirstFetch = url.searchParams.has('isFirstFetch')
+    ? url.searchParams.get('isFirstFetch') === 'true'
+    : false;
+
   const id = new mongoose.Types.ObjectId(ticketId);
 
-  if (firstFetch) {
-    const ticket = await Ticket.findById(id).lean().exec();
+  if (isFirstFetch) {
+    const ticket = await Ticket.findById(id).exec();
     if (ticket !== undefined) {
-      document = JSON.stringify(ticket);
+      return new Response(JSON.stringify(ticket));
     }
-  } else {
-    const pipeline = [{ $match: { 'fullDocument._id': id } }];
-    const changeStream = Ticket.watch(pipeline, {
-      fullDocument: 'updateLookup',
-    });
-    const next = await changeStream.next();
-    document = JSON.stringify(next.fullDocument);
-
-    changeStream.close();
   }
-
-  return new Response(document, {
-    status: 200,
-    headers: {
-      'content-type': 'application/json',
-    },
+  const pipeline = [{ $match: { 'fullDocument._id': id } }];
+  const changeStream = Ticket.watch(pipeline, {
+    fullDocument: 'updateLookup',
   });
-};
+  const next = await changeStream.next();
+  const document = next.fullDocument;
+
+  changeStream.close();
+  return new Response(String(JSON.stringify(document)));
+}) satisfies RequestHandler;

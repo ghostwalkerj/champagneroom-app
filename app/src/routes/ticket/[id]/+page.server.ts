@@ -12,8 +12,9 @@ import type {
   FeedbackType,
 } from '$lib/models/common';
 import { CancelReason } from '$lib/models/common';
+import type { ShowType } from '$lib/models/show';
 import { Show } from '$lib/models/show';
-import type { TicketDocumentType } from '$lib/models/ticket';
+import type { TicketType } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
 import { Transaction, TransactionReasonType } from '$lib/models/transaction';
 
@@ -114,16 +115,16 @@ export const actions: Actions = {
       ticketService.send(cancelEvent);
     }
     const snapshot = ticketService.getSnapshot();
-    const ticket = snapshot.context.ticketDocument;
+    const ticket = snapshot.context.ticketDocument as TicketType;
     const showService = snapshot.children[
       'showMachineService'
     ] as ShowMachineServiceType;
-    const show = showService?.getSnapshot().context.showDocument;
+    const show = showService?.getSnapshot().context.showDocument as ShowType;
     return {
       success: true,
       ticketCancelled: true,
-      ticket: JSON.parse(JSON.stringify(ticket)),
-      show: JSON.parse(JSON.stringify(show)),
+      ticket: ticket.toObject({ flattenObjectIds: true }),
+      show: show?.toObject({ flattenObjectIds: true }),
     };
   },
   leave_feedback: async ({ params, request, locals }) => {
@@ -222,11 +223,11 @@ export const load: PageServerLoad = async ({ params, cookies, url }) => {
     throw error(404, 'Bad ticket id');
   }
 
-  const ticket = (await Ticket.findById(ticketId)
+  const ticket = await Ticket.findById(ticketId)
     .orFail(() => {
       throw error(404, 'Ticket not found');
     })
-    .exec()) as TicketDocumentType;
+    .exec();
 
   const show = await Show.findById(ticket.show)
     .orFail(() => {
@@ -239,7 +240,7 @@ export const load: PageServerLoad = async ({ params, cookies, url }) => {
   }
 
   return {
-    ticket: JSON.parse(JSON.stringify(ticket)),
-    show: JSON.parse(JSON.stringify(show)),
+    ticket: ticket.toObject({ flattenObjectIds: true }),
+    show: show.toObject({ flattenObjectIds: true }),
   };
 };

@@ -665,5 +665,21 @@
         "workspaceRoot": "/Users/joseph/Dev/pcall/app",
         "workspacePath": "src/routes/ticket/[id]/TicketDispute.svelte",
         "id": "Uwiz2KcSuXRQpb7M"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/lib/models/common.ts",
+        "parent_id": "uBGhyC8JLtzS7rMH",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/lib/models/common.ts",
+        "id": "gEAaNRdu5tM2PQCF"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/.eslintrc.cjs",
+        "parent_id": "IXQnFASuioYN1pcj",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": ".eslintrc.cjs",
+        "id": "5cMgzHp9UnjkmuaE"
     }
 ]
