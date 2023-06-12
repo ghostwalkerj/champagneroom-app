@@ -19,7 +19,6 @@ import { Transaction, TransactionReasonType } from '$lib/models/transaction';
 import {
   createShowMachineService,
   ShowMachineEventString,
-  type ShowMachineServiceType,
 } from '$lib/machines/showMachine';
 import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
 import { TicketMachineEventString } from '$lib/machines/ticketMachine';
@@ -39,32 +38,21 @@ export const getShowWorker = (
       if (!show) {
         return;
       }
-
-      const showService = createShowMachineService({
-        showDocument: show,
-        showMachineOptions: {
-          saveStateCallback: async (showState) => SaveState(show, showState),
-          saveShowEventCallback: async ({ type, ticket, transaction }) =>
-            createShowEvent({ show, type, ticket, transaction }),
-          jobQueue: showQueue,
-        },
-      });
-
       switch (job.name) {
         case ShowMachineEventString.CANCELLATION_INITIATED: {
-          cancelShow(show, showService, showQueue);
+          cancelShow(show, showQueue);
           break;
         }
         case ShowMachineEventString.REFUND_INITIATED: {
-          refundShow(show, showService, showQueue);
+          refundShow(show, showQueue);
           break;
         }
         case ShowMachineEventString.SHOW_ENDED: {
-          endShow(show, showQueue, showService);
+          endShow(show, showQueue);
           break;
         }
         case ShowMachineEventString.SHOW_STOPPED: {
-          stopShow(showService);
+          stopShow(show, showQueue);
           break;
         }
         case ShowMachineEventString.SHOW_FINALIZED: {
@@ -76,11 +64,10 @@ export const getShowWorker = (
           break;
         }
         case ShowMachineEventString.ESCROW_ENDED: {
-          endEscrow(showService);
+          endEscrow(show, showQueue);
           break;
         }
       }
-      showService.stop();
     },
     { autorun: false, connection: redisConnection }
   );
@@ -93,10 +80,18 @@ export type ShowJobDataType = {
 
 const cancelShow = async (
   show: ShowType,
-  showService: ShowMachineServiceType,
   showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>
 ) => {
-  const showState = showService.getSnapshot();
+  const showService = createShowMachineService({
+    showDocument: show,
+    showMachineOptions: {
+      saveStateCallback: async (showState) => SaveState(show, showState),
+      saveShowEventCallback: async ({ type, ticket, transaction }) =>
+        createShowEvent({ show, type, ticket, transaction }),
+      jobQueue: showQueue,
+    },
+  });
+
   const tickets = await Ticket.find({
     show: show._id,
     // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -107,7 +102,7 @@ const cancelShow = async (
     const ticketService = getTicketMachineService(ticket, show, showQueue);
     const cancel = {
       cancelledBy: ActorType.TALENT,
-      cancelledInState: JSON.stringify(showState.value),
+      cancelledInState: JSON.stringify(ticketService.getSnapshot().value),
       reason: CancelReason.TALENT_CANCELLED,
       cancelledAt: new Date(),
     } as CancelType;
@@ -119,16 +114,27 @@ const cancelShow = async (
     ticketService.send(cancelEvent);
     ticketService.stop();
   }
+  const showState = showService.getSnapshot();
   if (showState.matches('initiatedCancellation.waiting2Refund')) {
     showService.send(ShowMachineEventString.REFUND_INITIATED);
   }
+  showService.stop();
 };
 
 const refundShow = async (
   show: ShowType,
-  showService: ShowMachineServiceType,
   showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>
 ) => {
+  const showService = createShowMachineService({
+    showDocument: show,
+    showMachineOptions: {
+      saveStateCallback: async (showState) => SaveState(show, showState),
+      saveShowEventCallback: async ({ type, ticket, transaction }) =>
+        createShowEvent({ show, type, ticket, transaction }),
+      jobQueue: showQueue,
+    },
+  });
+
   // Check if show needs to send refunds
   const showState = showService.getSnapshot();
   if (showState.matches('initiatedCancellation.initiatedRefund')) {
@@ -167,16 +173,43 @@ const refundShow = async (
       }
     }
   }
+  showService.stop();
 };
 
-const stopShow = async (showService: ShowMachineServiceType) => {
+const stopShow = async (
+  show: ShowType,
+  showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>
+) => {
+  const showService = createShowMachineService({
+    showDocument: show,
+    showMachineOptions: {
+      saveStateCallback: async (showState) => SaveState(show, showState),
+      saveShowEventCallback: async ({ type, ticket, transaction }) =>
+        createShowEvent({ show, type, ticket, transaction }),
+      jobQueue: showQueue,
+    },
+  });
+
   const showState = showService.getSnapshot();
   if (showState.matches('stopped')) {
     showService.send(ShowMachineEventString.SHOW_ENDED);
   }
 };
 
-const endEscrow = async (showService: ShowMachineServiceType) => {
+const endEscrow = async (
+  show: ShowType,
+  showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>
+) => {
+  const showService = createShowMachineService({
+    showDocument: show,
+    showMachineOptions: {
+      saveStateCallback: async (showState) => SaveState(show, showState),
+      saveShowEventCallback: async ({ type, ticket, transaction }) =>
+        createShowEvent({ show, type, ticket, transaction }),
+      jobQueue: showQueue,
+    },
+  });
+
   const showState = showService.getSnapshot();
   if (showState.matches('ended.inEscrow')) {
     showService.send({
@@ -187,14 +220,24 @@ const endEscrow = async (showService: ShowMachineServiceType) => {
       } as FinalizeType,
     });
   }
+  showService.stop();
 };
 
 // End show, alert ticket
 const endShow = async (
   show: ShowType,
-  showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>,
-  showService: ShowMachineServiceType
+  showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>
 ) => {
+  const showService = createShowMachineService({
+    showDocument: show,
+    showMachineOptions: {
+      saveStateCallback: async (showState) => SaveState(show, showState),
+      saveShowEventCallback: async ({ type, ticket, transaction }) =>
+        createShowEvent({ show, type, ticket, transaction }),
+      jobQueue: showQueue,
+    },
+  });
+
   // Tell ticket holders the show is over folks
   const showState = showService.getSnapshot();
   if (showState.matches('ended.inEscrow')) {
@@ -210,6 +253,7 @@ const endShow = async (
       ticketService.stop();
     }
   }
+  showService.stop();
 };
 
 const finalizeShow = async (
