@@ -1,10 +1,5 @@
 <script lang="ts">
-  import {
-    connected,
-    defaultEvmStores,
-    selectedAccount,
-    web3,
-  } from 'svelte-web3';
+
 
   import JazzIcon from './JazzIcon.svelte';
 

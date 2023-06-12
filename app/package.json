@@ -98,7 +98,6 @@
     "svelte-proxied-store": "^1.1.5",
     "svelte-star-rating": "^2.0.1",
     "svelte-table": "^0.5.11",
-    "svelte-web3": "^4.1.1",
     "timeago.js": "^4.0.2",
     "tiny-parse-argv": "^2.2.0",
     "ua-parser-js": "^1.0.35",
