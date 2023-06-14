@@ -5,8 +5,8 @@ import type IORedis from 'ioredis';
 import type { CancelType } from '$lib/models/common';
 import {
   CancelReason,
-  type FinalizeType,
   RefundReason,
+  type FinalizeType,
 } from '$lib/models/common';
 import type { ShowType } from '$lib/models/show';
 import { SaveState, Show, ShowStatus } from '$lib/models/show';

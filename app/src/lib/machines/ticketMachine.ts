@@ -4,12 +4,12 @@
 import { Types } from 'mongoose';
 import { nanoid } from 'nanoid';
 import {
-  type ActorRefFrom,
   assign,
   createMachine,
   interpret,
   send,
   spawn,
+  type ActorRefFrom,
   type StateFrom,
 } from 'xstate';
 import { raise } from 'xstate/lib/actions';

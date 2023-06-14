@@ -1,5 +1,5 @@
 <script lang="ts">
-	import StarRating from 'svelte-star-rating';
+	import StarRating from 'svelte-star-rating'
 	export let row;
 
 	$: rating = row.rating;

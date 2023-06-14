@@ -19,6 +19,7 @@ const config: UserConfig = {
   ],
   build: {
     chunkSizeWarningLimit: 16000,
+   
   },
   ssr: {
     //noExternal: ['chart.js/**'],

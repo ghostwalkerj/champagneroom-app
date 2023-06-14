@@ -1,11 +1,14 @@
 <script lang="ts">
 
   import { onMount } from 'svelte';
-  import { selectedAccount } from 'svelte-web3';
 
   import { deserialize } from '$app/forms';
 
   import type { AgentDocumentType } from '$lib/models/agent';
+
+  import { selectedAccount } from '$lib/util/web3';
+
+  import ConnectButton from '$components/header/ConnectButton.svelte';
 
   import AgentWallet from './AgentWallet.svelte';
   import TalentForm from './TalentForm.svelte';
@@ -20,7 +23,7 @@
     selectedAccount.subscribe(async account => {
       if (account) {
         let formData = new FormData();
-        formData.append('account', account);
+        formData.append('account', account.address);
         const response = await fetch('?/get_or_create_agent', {
           method: 'POST',
           body: formData,
@@ -54,7 +57,7 @@
           <div class="divider" />
 
           <div
-            class="mx-auto grid gap-2 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3"
+            class="mx-auto grid gap-2 grid-cols-1 lg:grid-cols-2 "
           >
             <div class="p-1">
               <AgentWallet />
@@ -80,5 +83,16 @@
     </main>
   </div>
 {:else}
-  Loading Agent....
+<div class="min-h-screen-md bg-base-100 hero">
+  <div class="text-center hero-content">
+    <div class="max-w-md">
+      <h1 class="font-bold text-5xl">Welcome to Champagne Room</h1>
+      <p class="pt-6">
+        Pretioso flos est, nihil ad vos nunc. Posset faciens pecuniam.
+        Posuit eam ad opus nunc et adepto a pCall!
+      </p>
+      <ConnectButton />
+    </div>
+  </div>
+</div>
 {/if}

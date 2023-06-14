@@ -1,4 +1,4 @@
-use("test");
+use('test');
 
 // Insert a few documents into the sales collection.
 // db.getCollection("agents").insertMany([
@@ -16,7 +16,7 @@ use("test");
 //   },
 // ]);
 
-const agent = db.getCollection("agents").findOne();
+//const agent = db.getCollection("agents").findOne();
 
 // db.getCollection("talents").insertMany([
 //   {
@@ -50,68 +50,68 @@ const agent = db.getCollection("agents").findOne();
 //   },
 // ]);
 
-const talent = db.getCollection("talents").findOne();
+//const talent = db.getCollection("talents").findOne();
 
-db.getCollection("shows").insertMany([
-  {
-    talent: talent._id,
-    agent: agent._id,
-    coverImageUrl:
-      "https://bafkreieyzmlltipqvqgpx66uupuqm7c7llkbtgtrgynewfnmcid45s2i4m.ipfs.w3s.link",
-    duration: 60,
-    name: "Sexy Babes Show",
-    capacity: 1,
-    price: 22,
-    talentInfo: {
-      name: "Sexy Babe",
-      profileImageUrl:
-        "https://bafkreieyzmlltipqvqgpx66uupuqm7c7llkbtgtrgynewfnmcid45s2i4m.ipfs.w3s.link",
-      ratingAvg: 0,
-      numberOfReviews: 0,
-    },
-    showState: {
-      status: "CANCELLED",
-      active: false,
-      salesStats: {
-        ticketsAvailable: 0,
-        ticketsSold: 0,
-        ticketsReserved: 0,
-        ticketsRefunded: 0,
-        ticketsRedeemed: 0,
-        totalSales: 0,
-        totalRefunded: 0,
-      },
-      feedbackStats: {
-        numberOfReviews: 0,
-        averageRating: 0,
-      },
-      cancel: {
-        cancelledAt: {
-          $date: "2023-06-02T22:09:47.124Z",
-        },
-        cancelledInState: "boxOfficeOpen",
-        requestedBy: "TALENT",
-        reason: "TALENT CANCELLED",
-      },
-      refunds: [],
-      sales: [],
-      createdAt: {
-        $date: "2023-06-02T22:09:47.131Z",
-      },
-      updatedAt: {
-        $date: "2023-06-02T22:09:47.131Z",
-      },
-    },
-    roomId:
-      "531891c9d837a6115b1be870e41014fb:5f43e7ef75e4f5c2074ad5e1c446b94da8588c6674792a0f9cc2bbb38ffd7887",
-    createdAt: {
-      $date: "2023-06-02T00:49:02.445Z",
-    },
-    updatedAt: {
-      $date: "2023-06-02T22:09:47.131Z",
-    },
-    __enc_roomId: true,
-  },
+// db.getCollection("shows").insertMany([
+//   {
+//     talent: talent._id,
+//     agent: agent._id,
+//     coverImageUrl:
+//       "https://bafkreieyzmlltipqvqgpx66uupuqm7c7llkbtgtrgynewfnmcid45s2i4m.ipfs.w3s.link",
+//     duration: 60,
+//     name: "Sexy Babes Show",
+//     capacity: 1,
+//     price: 22,
+//     talentInfo: {
+//       name: "Sexy Babe",
+//       profileImageUrl:
+//         "https://bafkreieyzmlltipqvqgpx66uupuqm7c7llkbtgtrgynewfnmcid45s2i4m.ipfs.w3s.link",
+//       ratingAvg: 0,
+//       numberOfReviews: 0,
+//     },
+//     showState: {
+//       status: "CANCELLED",
+//       active: false,
+//       salesStats: {
+//         ticketsAvailable: 0,
+//         ticketsSold: 0,
+//         ticketsReserved: 0,
+//         ticketsRefunded: 0,
+//         ticketsRedeemed: 0,
+//         totalSales: 0,
+//         totalRefunded: 0,
+//       },
+//       feedbackStats: {
+//         numberOfReviews: 0,
+//         averageRating: 0,
+//       },
+//       cancel: {
+//         cancelledAt: {
+//           $date: "2023-06-02T22:09:47.124Z",
+//         },
+//         cancelledInState: "boxOfficeOpen",
+//         requestedBy: "TALENT",
+//         reason: "TALENT CANCELLED",
+//       },
+//       refunds: [],
+//       sales: [],
+//       createdAt: {
+//         $date: "2023-06-02T22:09:47.131Z",
+//       },
+//       updatedAt: {
+//         $date: "2023-06-02T22:09:47.131Z",
+//       },
+//     },
+//     roomId:
+//       "531891c9d837a6115b1be870e41014fb:5f43e7ef75e4f5c2074ad5e1c446b94da8588c6674792a0f9cc2bbb38ffd7887",
+//     createdAt: {
+//       $date: "2023-06-02T00:49:02.445Z",
+//     },
+//     updatedAt: {
+//       $date: "2023-06-02T22:09:47.131Z",
+//     },
+//     __enc_roomId: true,
+//   },
 //   {
 //     talent: talent._id,
 //     agent: agent._id,
@@ -165,7 +165,7 @@ db.getCollection("shows").insertMany([
 //   },
 // ]);
 
-const show = db.getCollection("shows").findOne();
+//const show = db.getCollection("shows").findOne();
 
 // db.getCollection("tickets").insertMany([
 //   {
@@ -218,3 +218,7 @@ const show = db.getCollection("shows").findOne();
 //     __v: 0,
 //   },
 // ]);
+
+db.getCollection('operators').insertOne({
+  address: '0x5E90C65c58a4AD95EEA3b04615A4270d1D2ec1B1',
+});
