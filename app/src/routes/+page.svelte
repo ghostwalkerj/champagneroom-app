@@ -1,11 +1,3 @@
-<div class="bg-base-100 navbar">
-  <div class="flex-1">
-    <!-- svelte-ignore a11y-missing-attribute -->
-    <a class="text-xl btn btn-ghost normal-case">
-      <img src="/logo.png" alt="Logo" width="48" /></a
-    >
-  </div>
-</div>
 
 <div class="min-h-full">
   <main class="py-10">
@@ -15,12 +7,9 @@
     >
       <div class="flex space-x-5 items-center">
         <div>
-          <h1 class="font-bold text-5xl">Welcome to Champagne Room</h1>
-          <p class="pt-6">
+          <div class="text-center text-2xl">
             Pretioso flos est, nihil ad vos nunc. Posset faciens pecuniam.
             Posuit eam ad opus nunc et adepto a pCall!
-          </p>
-        </div>
       </div>
     </div>
   </main>

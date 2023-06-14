@@ -274,14 +274,6 @@
     },
     {
         "type": "File",
-        "name": "/Users/joseph/Dev/pcall/app/src/routes/agent/+layout.svelte",
-        "parent_id": "vSteflaW7bBuiUrd",
-        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
-        "workspacePath": "src/routes/agent/+layout.svelte",
-        "id": "KehHVW1zdZpqj84i"
-    },
-    {
-        "type": "File",
         "name": "/Users/joseph/Dev/pcall/app/src/routes/agent/+page.svelte",
         "parent_id": "vSteflaW7bBuiUrd",
         "workspaceRoot": "/Users/joseph/Dev/pcall/app",
@@ -681,5 +673,61 @@
         "workspaceRoot": "/Users/joseph/Dev/pcall/app",
         "workspacePath": ".eslintrc.cjs",
         "id": "5cMgzHp9UnjkmuaE"
+    },
+    {
+        "type": "Group",
+        "name": "operator",
+        "parent_id": "361t5BgAwFrK9vea",
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "z3oCvxJG75NBMYf9"
+    },
+    {
+        "type": "Group",
+        "name": "pages",
+        "parent_id": "z3oCvxJG75NBMYf9",
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "XGE42qWuJiyLHAFR"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/routes/operator/+page.svelte",
+        "parent_id": "XGE42qWuJiyLHAFR",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/routes/operator/+page.svelte",
+        "id": "WDT2xhBGlZO4tNCy"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/routes/operator/+page.server.ts",
+        "parent_id": "XGE42qWuJiyLHAFR",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/routes/operator/+page.server.ts",
+        "id": "0VwJ48Pkb5ITpoy9"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/lib/models/operator.ts",
+        "parent_id": "z3oCvxJG75NBMYf9",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/lib/models/operator.ts",
+        "id": "LPchWi09Z3FJfOex"
+    },
+    {
+        "type": "File",
+        "name": "/Users/joseph/Dev/pcall/app/src/lib/models/operator.ts",
+        "parent_id": "uBGhyC8JLtzS7rMH",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/lib/models/operator.ts",
+        "id": "d61UVusmc7BaT3DA"
+    },
+    {
+        "type": "Directory",
+        "name": "/Users/joseph/Dev/pcall/app/src/routes/operator",
+        "parent_id": "5O6S0J3dcsvABnjo",
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "src/routes/operator",
+        "id": "9eRltjmMiGgEfyAK"
     }
 ]

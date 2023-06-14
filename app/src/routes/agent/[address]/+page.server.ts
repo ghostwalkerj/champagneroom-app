@@ -1,37 +1,38 @@
-import { fail } from '@sveltejs/kit';
+import { error, fail } from '@sveltejs/kit';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 
 import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
 
 import { Agent } from '$lib/models/agent';
+import { Show } from '$lib/models/show';
 import { Talent } from '$lib/models/talent';
 
 import { womensNames } from '$lib/util/womensNames';
 
-import type { Actions } from './$types';
+import type { Actions, PageServerLoad } from './$types';
 
 export const actions: Actions = {
   get_or_create_agent: async ({ request }) => {
     const data = await request.formData();
-    const account = data.get('account') as string;
+    const address = data.get('address') as string;
 
-    if (account === null) {
-      return fail(400, { account, missingAccount: true });
+    if (address === null) {
+      return fail(400, { address, missingAddress: true });
     }
 
-    if (!/^0x[\da-f]{40}$/.test(account)) {
-      return fail(400, { account, badAccount: true });
+    if (!/^0x[\da-f]{40}$/.test(address)) {
+      return fail(400, { address, badAddress: true });
     }
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     let agent = await Agent.findOne({
-      address: account,
+      address,
     }).exec();
 
     if (agent === null) {
       agent = await Agent.create({
-        address: account,
+        address: address,
         name:
           'Agent ' +
           uniqueNamesGenerator({
@@ -79,4 +80,22 @@ export const actions: Actions = {
       success: true,
     };
   },
+};
+
+export const load: PageServerLoad = async ({ params }) => {
+  const address = params.address;
+
+  if (address === null) {
+    throw error(404, 'Address not found');
+  }
+
+  const agent = await Agent.findOne({ address })
+    .orFail(() => {
+      throw error(404, 'Agent not found');
+    })
+    .exec();
+
+  return {
+    agent: agent.toObject({ flattenObjectIds: true }),
+  };
 };
