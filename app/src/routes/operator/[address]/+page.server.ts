@@ -25,12 +25,13 @@ export const load: PageServerLoad = async ({ params, url }) => {
   
   const agents = await Agent.find();
 
-  const disputedTickets = Ticket.find({
+  const disputedTickets = await Ticket.find({
     'ticketState.status': 'IN_DISPUTE',
   });
 
   return {
     operator: operator.toObject({ flattenObjectIds: true }),
     agents: agents.map((agent) => agent.toObject({ flattenObjectIds: true })),
+    disputedTickets: disputedTickets.map((ticket) => ticket.toObject({ flattenObjectIds: true })),
   };
 };
