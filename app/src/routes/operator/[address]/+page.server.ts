@@ -1,49 +1,36 @@
-import { Agent } from 'node:http';
+import { redirect } from '@sveltejs/kit';
+import urlJoin from 'url-join';
 
-import { fail } from '@sveltejs/kit';
-import { uniqueNamesGenerator } from 'unique-names-generator';
+import { PUBLIC_OPERATOR_PATH } from '$env/static/public';
 
-import { womensNames } from '$lib/util/womensNames';
+import { Operator } from '$lib/models/operator';
 
-import type { Actions, PageServerLoad } from './$types';
+import type { PageServerLoad } from './$types';
+import { Agent } from '$lib/models/agent';
+import { Ticket } from '$lib/models/ticket';
 
-export const actions: Actions = {
-  get_operator: async ({ request }) => {
-    const data = await request.formData();
-    const account = data.get('account') as string;
+export const load: PageServerLoad = async ({ params, url }) => {
+  const address = params.address;
+  const redirectUrl = urlJoin(url.origin, PUBLIC_OPERATOR_PATH);
 
-    if (account === null) {
-      return fail(400, { account, missingAccount: true });
-    }
+  if (address === null) {
+    throw redirect(307, redirectUrl);
+  }
 
-    if (!/^0x[\da-f]{40}$/.test(account)) {
-      return fail(400, { account, badAccount: true });
-    }
+  const operator = await Operator.findOne({ address })
+    .orFail(() => {
+      throw redirect(307, redirectUrl);
+    })
+    .exec();
+  
+  const agents = await Agent.find();
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    let agent = await Agent.findOne({
-      address: account,
-    }).exec();
+  const disputedTickets = Ticket.find({
+    'ticketState.status': 'IN_DISPUTE',
+  });
 
-    if (agent === null) {
-      agent = await Agent.create({
-        address: account,
-        name:
-          'Agent ' +
-          uniqueNamesGenerator({
-            dictionaries: [womensNames],
-          }),
-      });
-    }
-
-    return {
-      success: true,
-      agent: agent.toObject({ flattenObjectIds: true }),
-    };
-  },
+  return {
+    operator: operator.toObject({ flattenObjectIds: true }),
+    agents: agents.map((agent) => agent.toObject({ flattenObjectIds: true })),
+  };
 };
-
-export const load = (async () => {
-  return {};
-}) satisfies PageServerLoad;

@@ -1,6 +1,6 @@
 <script lang="ts">
 
-  import { connect, selectedAccount } from '$lib/util/web3';
+  import { connect, selectedAccount } from '$lib/util/web3'
 
 
 </script>

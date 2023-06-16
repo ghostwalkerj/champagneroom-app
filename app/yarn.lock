@@ -52,29 +52,29 @@
   dependencies:
     regenerator-runtime "^0.13.11"
 
-"@bull-board/api@5.3.1":
-  version "5.3.1"
-  resolved "https://registry.yarnpkg.com/@bull-board/api/-/api-5.3.1.tgz#1222769bd5164399aecaa1d9475fd3bb4a251a7c"
-  integrity sha512-Ttwjz46eekgM39iyU+BjNKiygpyLgzrq/DT/NKC0KUqW7PaLiqkrN1rRj8SEioLce/X9DuWzCwqflBJedGXk/w==
+"@bull-board/api@5.4.0":
+  version "5.4.0"
+  resolved "https://registry.yarnpkg.com/@bull-board/api/-/api-5.4.0.tgz#3efcebf0fdf135f1c4d1bd11be4c8e38f69acfe2"
+  integrity sha512-SsUsOU2ZspQCG58MEcQL+MSeSos5onTmS4UhdRBOPRqjzJKuD2xPMKC2+r+TvX18+7ZzeqGonqztvKw4H3MROA==
   dependencies:
     redis-info "^3.0.8"
 
 "@bull-board/express@^5.2.0":
-  version "5.3.1"
-  resolved "https://registry.yarnpkg.com/@bull-board/express/-/express-5.3.1.tgz#e939113652e29f49bf0d8713bca151e0ce00c684"
-  integrity sha512-+udV0QEGqgXm/ujlf3DyVJQRd3T0yy+FwtoWyXww39zkpZ8jzx/UpRFJC1D1pQqzgICnrc3fyEvRyB3eEPG3/g==
+  version "5.4.0"
+  resolved "https://registry.yarnpkg.com/@bull-board/express/-/express-5.4.0.tgz#906932293edbe4a60f0a14e10c70e7c96521c4ec"
+  integrity sha512-E3KQnhcwNWlHYLFLGLTU7OGZLGcTgZw1AGv09rU+UOR04wOi3a+weSq07cJjiJsU0N9baeXbAsluJHiq4vtrcQ==
   dependencies:
-    "@bull-board/api" "5.3.1"
-    "@bull-board/ui" "5.3.1"
+    "@bull-board/api" "5.4.0"
+    "@bull-board/ui" "5.4.0"
     ejs "3.1.7"
     express "4.17.3"
 
-"@bull-board/ui@5.3.1":
-  version "5.3.1"
-  resolved "https://registry.yarnpkg.com/@bull-board/ui/-/ui-5.3.1.tgz#0da25a90b7d2d10e45b47101a52d6b8d0a01ea93"
-  integrity sha512-o0fCzOcNb6n+MrpcFrCFh9zVIZU1AU8HKl7VHnEJY/ZP0v2MIQ3QZFd1QAuaG3C8RH+JuzaY+R5g/mpr5mAifQ==
+"@bull-board/ui@5.4.0":
+  version "5.4.0"
+  resolved "https://registry.yarnpkg.com/@bull-board/ui/-/ui-5.4.0.tgz#9ac365db498c6af0f866d36dfc1fb768887485bc"
+  integrity sha512-dwBwSk4Fy/KPHLquN0zCo12P+ZVxWaJq4bZelbCWYOMLWOnjArJ6lAaGY29BGKLAUMh7vSeZMHEnZnE4jYtRxw==
   dependencies:
-    "@bull-board/api" "5.3.1"
+    "@bull-board/api" "5.4.0"
 
 "@coinbase/wallet-sdk@^3.6.0":
   version "3.6.6"
@@ -1744,9 +1744,9 @@
     rollup "^3.7.0"
 
 "@sveltejs/kit@^1.18.0":
-  version "1.20.2"
-  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-1.20.2.tgz#4167cdc04387c67216b7b3d5875c3553c7315e78"
-  integrity sha512-MtR1i+HtmYWcRgtubw1GQqT/+CWXL/z24PegE0xYAdObbhdr7YtEfmoe705D/JZMtMmoPXrmSk4W0MfL5A3lYw==
+  version "1.20.4"
+  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-1.20.4.tgz#5082de689ef5ae49dc0185344968c065682cfe0d"
+  integrity sha512-MmAzIuMrP7A+8fqDVbxm6ekGHRHL/+Fk8sQPAzPG4G2TxUDtHdn/WcIxeEqHzARMf0OtGSC+VPyOSFuw2Cy2Mg==
   dependencies:
     "@sveltejs/vite-plugin-svelte" "^2.4.1"
     "@types/cookie" "^0.5.1"
@@ -1759,7 +1759,6 @@
     sade "^1.8.1"
     set-cookie-parser "^2.6.0"
     sirv "^2.0.2"
-    tiny-glob "^0.2.9"
     undici "~5.22.0"
 
 "@sveltejs/package@^2.0.2":
@@ -2763,9 +2762,9 @@
     joi "17.9.1"
 
 "@web3-onboard/core@^2.20.1":
-  version "2.20.1"
-  resolved "https://registry.yarnpkg.com/@web3-onboard/core/-/core-2.20.1.tgz#ad3a15aa6c1083d6da83fd9d06d5fe250e750b5a"
-  integrity sha512-OlNQUYBsbvy389AQD5VggqCRGvmiE7/w0LeLt6yyUwAksGnRPSpLjiPaOOjMAJFq0d3TnSX5yXbAoG1SRJM7ww==
+  version "2.20.2"
+  resolved "https://registry.yarnpkg.com/@web3-onboard/core/-/core-2.20.2.tgz#06c35b2d39a119950d3d850d23e2126f6f77c1f5"
+  integrity sha512-XrdOatA00ULnPleQbAbXppGGVErUZpscrauoXy/Zt8qpr7i+NQSeRD2/fllfx5JP6wI0whP8ZoVb9yRp52Ii0Q==
   dependencies:
     "@web3-onboard/common" "^2.3.3"
     bignumber.js "^9.0.0"
@@ -2801,9 +2800,9 @@
     rxjs "^7.5.2"
 
 "@web3-onboard/injected-wallets@^2.10.0":
-  version "2.10.0"
-  resolved "https://registry.yarnpkg.com/@web3-onboard/injected-wallets/-/injected-wallets-2.10.0.tgz#c33ed40efd8bc615fb205bd537b23c0c17b84e7f"
-  integrity sha512-I/14Z511Oft1UTx/ZezT/UC2LqUBH3mMN1kABcxCy4t3zx4Yfh6LMEBmR2XWBoxSvz9iaLIQz4egH+u9mdz0sg==
+  version "2.10.1"
+  resolved "https://registry.yarnpkg.com/@web3-onboard/injected-wallets/-/injected-wallets-2.10.1.tgz#d4a45ba897c578819544805399761c61b8173166"
+  integrity sha512-PhmMI+RNeGowL2cfmp7/v3atrJ8KsjKXgXs6CofwMzDxQXfu1DwXdIh+Hd2Py/ZeRgOEeAehf63gftaVvfn/9g==
   dependencies:
     "@web3-onboard/common" "^2.3.3"
     joi "17.9.1"
@@ -3562,9 +3561,9 @@ builtin-status-codes@^3.0.0:
   integrity sha512-HpGFw18DgFWlncDfjTa2rcQ4W88O1mC8e8yZ2AvQY5KDaktSTwo+KRf6nHK6FRI5FyRyb/5T6+TSxfP7QyGsmQ==
 
 bullmq@^3.14.0:
-  version "3.15.6"
-  resolved "https://registry.yarnpkg.com/bullmq/-/bullmq-3.15.6.tgz#5a4021fe14965b0965ca4806dc956b25b44661a2"
-  integrity sha512-MHmzSVzhxb088rY/kS65VWuTBbgJriVn4BmUpQtRzLH3VAm9jTodIClu6nRSw0Yss94/+cpJ1hMyjhieGDmeKw==
+  version "3.15.8"
+  resolved "https://registry.yarnpkg.com/bullmq/-/bullmq-3.15.8.tgz#e8ec5b46b0b7d7ce57e509280d03745109411e05"
+  integrity sha512-k3uimHGhl5svqD7SEak+iI6c5DxeLOaOXzCufI9Ic0ST3nJr69v71TGR4cXCTXdgCff3tLec5HgoBnfyWjgn5A==
   dependencies:
     cron-parser "^4.6.0"
     glob "^8.0.3"
@@ -4048,9 +4047,9 @@ d@1, d@^1.0.1:
     type "^1.0.1"
 
 daisyui@^3.0.20:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/daisyui/-/daisyui-3.1.0.tgz#e32651e06cfb00bc4b9fada3399b91ca8f6f779b"
-  integrity sha512-G4dz/bRZVvlhQ/FtezXSg0rXOXzDJ0PcnMqeLSwCYNWXxf46fNJ8LWeV5qwsYOdJbXiXoZLnwyy+BsNoWZ+Bjg==
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/daisyui/-/daisyui-3.1.1.tgz#078e24a5758d0f72c67345b4ecb94ce0c7af3758"
+  integrity sha512-+SPwlCvbk/dQd40Op3jv+C8s5pL/Ix4z/U+Q8KDKnF7oXNmvDYZlZ9e2RkouoevaW/Jta4e/iLTj5ve2WBoSkw==
   dependencies:
     colord "^2.9"
     css-selector-tokenizer "^0.8"
@@ -4245,9 +4244,9 @@ domain-browser@^4.22.0:
   integrity sha512-IGBwjF7tNk3cwypFNH/7bfzBcgSCbaMOD3GsaY1AU/JRrnHnYgEM0+9kQt52iZxjNsjBtJYtao146V+f8jFZNw==
 
 dotenv@^16.0.3:
-  version "16.1.4"
-  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-16.1.4.tgz#67ac1a10cd9c25f5ba604e4e08bc77c0ebe0ca8c"
-  integrity sha512-m55RtE8AsPeJBpOIFKihEmqUcoVncQIwo7x9U8ZwLEZw9ZpXboz2c+rvog+jUaJvVrZ5kBOeYQBX5+8Aa/OZQw==
+  version "16.3.0"
+  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-16.3.0.tgz#1c61ae0a7b6f7b7e2285d50016ebab048f12ec6d"
+  integrity sha512-tHB+hmf8MRCkT3VVivGiG8kq9HiGTmQ3FzOKgztfpJQH1IWuZTOvKSJmHNnQPowecAmkCJhLrxdPhOr06LLqIQ==
 
 drbg.js@^1.0.1:
   version "1.0.1"
@@ -8094,10 +8093,17 @@ secp256k1@^4.0.0, secp256k1@^4.0.1:
   resolved "https://registry.yarnpkg.com/semver/-/semver-5.7.1.tgz#a954f931aeba508d307bbf069eff0c01c96116f7"
   integrity sha512-sauaDf/PZdVgrLTNYHRtpXa1iRiKcaebiKQ1BJdpQlWH2lCvexQdX55snPFyK7QzpudqbCI0qXFfOasHdyNDGQ==
 
-semver@^7.3.4, semver@^7.3.7, semver@^7.3.8:
+semver@^7.3.4, semver@^7.3.8:
   version "7.5.1"
   resolved "https://registry.yarnpkg.com/semver/-/semver-7.5.1.tgz#c90c4d631cf74720e46b21c1d37ea07edfab91ec"
   integrity sha512-Wvss5ivl8TMRZXXESstBA4uR5iXgEN/VC5/sOcuXdVLzcdkz4HWetIoRfG5gb5X+ij/G9rw9YoGn3QoQ8OCSpw==
+  dependencies:
+    lru-cache "^6.0.0"
+
+semver@^7.3.7:
+  version "7.5.2"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-7.5.2.tgz#5b851e66d1be07c1cdaf37dfc856f543325a2beb"
+  integrity sha512-SoftuTROv/cRjCze/scjGyiDtcUyxw1rgYQSZY7XTmtR5hX+dm76iDbTH8TkLPHCQmlbQVSSbNZCPM2hb0knnQ==
   dependencies:
     lru-cache "^6.0.0"
 

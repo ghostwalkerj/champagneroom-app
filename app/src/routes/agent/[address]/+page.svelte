@@ -1,9 +1,11 @@
 <script lang="ts">
 
   import { onMount } from 'svelte';
+  import urlJoin from 'url-join';
 
-  import { deserialize } from '$app/forms';
   import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
+  import { PUBLIC_AGENT_PATH } from '$env/static/public';
 
   import type { AgentDocumentType } from '$lib/models/agent';
 
@@ -19,10 +21,17 @@
   export let form: ActionData;
 
 
+
   onMount(() => {
     selectedAccount.subscribe(async account => {
-      if (!account || account.address !== agent.address) {
-        goto( window.location.origin);
+      if (account) {
+        const agentPath = urlJoin(
+          window.location.origin,
+          PUBLIC_AGENT_PATH,
+          account.address
+        );
+        if (agentPath !== $page.url.href)
+        goto(agentPath);
       }
     });
   });

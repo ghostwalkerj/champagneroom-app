@@ -1,10 +1,13 @@
-import { error, fail } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import { uniqueNamesGenerator } from 'unique-names-generator';
+import urlJoin from 'url-join';
 
-import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
+import {
+  PUBLIC_AGENT_PATH,
+  PUBLIC_DEFAULT_PROFILE_IMAGE,
+} from '$env/static/public';
 
 import { Agent } from '$lib/models/agent';
-import { Show } from '$lib/models/show';
 import { Talent } from '$lib/models/talent';
 
 import { womensNames } from '$lib/util/womensNames';
@@ -82,16 +85,17 @@ export const actions: Actions = {
   },
 };
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params, url }) => {
   const address = params.address;
+  const redirectUrl = urlJoin(url.origin, PUBLIC_AGENT_PATH);
 
   if (address === null) {
-    throw error(404, 'Address not found');
+    throw redirect(307, redirectUrl);
   }
 
   const agent = await Agent.findOne({ address })
     .orFail(() => {
-      throw error(404, 'Agent not found');
+      throw redirect(307, redirectUrl);
     })
     .exec();
 

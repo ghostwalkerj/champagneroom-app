@@ -6,7 +6,7 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'plugin:unicorn/recommended',
   ],
-  plugins: ['simple-import-sort', 'sort-exports'],
+  plugins: ['simple-import-sort', 'sort-exports', 'prettier-plugin-svelte'],
 
   parser: '@typescript-eslint/parser',
   parserOptions: {

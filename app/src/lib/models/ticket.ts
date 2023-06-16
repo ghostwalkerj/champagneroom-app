@@ -44,6 +44,7 @@ const ticketStateSchema = new Schema(
       type: String,
       enum: TicketStatus,
       default: TicketStatus.RESERVED,
+      index: true,
     },
     activeState: { type: Boolean, default: true, index: true },
     totalPaid: { type: Number, default: 0 },
