@@ -1,8 +1,13 @@
 <script lang="ts">
   import 'iconify-icon';
   import '../app.css';
-
   import ConnectButton from '$components/header/ConnectButton.svelte';
+
+  import {nameStore} from '$stores';
+
+  const title = 'Welcome to the Champagne Room'
+
+
 </script>
 
 <div class="grid grid-cols-1">
@@ -14,8 +19,10 @@
           <img src="/logo.png" alt="Logo" width="48" /></a
         >
       </div>
+      <div>
       <div class="grow text-center font-bold text-2xl lg:text-3xl xl:text-4xl">
-        Welcome to the Champagne Room
+{title}     </div>
+<div class="text-center text-xl">{$nameStore} </div>
       </div>
       <div class="w-1/4 text-right">
         <ConnectButton />

@@ -10,6 +10,8 @@ import type { ShowEventDocumentType } from '$lib/models/showEvent';
 import type { TalentDocumentType } from '$lib/models/talent';
 import type { TicketDocumentType } from '$lib/models/ticket';
 
+export const nameStore = writable<String>('');
+
 export const agentStore = (agent: AgentDocumentType) => {
   return abstractStore({
     doc: agent,

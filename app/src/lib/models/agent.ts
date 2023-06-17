@@ -13,12 +13,19 @@ const agentSchema = new Schema(
       maxLength: 50,
       validator: (v: string) => validator.isEthereumAddress(v),
     },
+    
     name: {
       type: String,
       maxLength: 50,
       minLength: [4, 'Name is too short'],
       required: true,
       trim: true,
+    },
+
+    active: {
+      type: Boolean,
+      default: true,
+      index: true,
     },
 
     address: {

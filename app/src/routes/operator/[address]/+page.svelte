@@ -11,12 +11,20 @@
   import { selectedAccount } from '$lib/util/web3';
 
   import type { PageData } from './$types';
+  import { nameStore } from '$stores';
+  import { relative } from 'path';
 
   export let data: PageData;
   const operator = data.operator as OperatorDocumentType;
+  const agents = data.agents;
+  const disputedTickets = data.disputedTickets;
 
+  nameStore.set(operator.name);
+
+  let activeTab = 'Agents' as 'Agents' | 'Disputes';
+  let activeRow = 0;
   onMount(() => {
-    selectedAccount.subscribe(async account => {
+    selectedAccount.subscribe(async (account) => {
       if (account) {
         const operatorPath = urlJoin(
           window.location.origin,
@@ -39,12 +47,90 @@
             Operator Dashboard
           </div>
           <div class="divider" />
+          <!-- Tabs -->
+          <div class="tabs tabs-boxed">
+            <!-- svelte-ignore a11y-missing-attribute -->
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <a
+              class="tab"
+              class:tab-active={activeTab === 'Agents'}
+              on:click={() => {
+                activeTab = 'Agents';
+              }}>Agents</a
+            >
 
-          <div class="mx-auto grid gap-2 grid-cols-1 lg:grid-cols-2">
-            <div class="p-1">Agents</div>
-            <div class="p-1">Disputes</div>
+            <!-- svelte-ignore a11y-missing-attribute -->
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <a
+              class="tab"
+              class:tab-active={activeTab == 'Disputes'}
+              on:click={() => {
+                activeTab = 'Disputes';
+              }}>Disputes</a
+            >
           </div>
         </div>
+
+          <!-- Tables -->
+            <div class="relative">
+            <div
+              class:invisible={activeTab !== 'Agents'}
+              class="absolute top-4 left-0 bg-neutral w-full rounded-lg" 
+            >
+
+              <div class="overflow-x-auto reo">
+                <table class="table ">
+                  <thead>
+                    <tr>
+                      <th />
+                      <th>Name</th>
+                      <th>Address</th>
+                      <th>Active</th>
+                      <th>Impersonate</th>
+                    </tr>
+                  </thead>
+                  <tbody >
+                    {#each agents as agent, i}
+                      <tr class:bg-base-300={activeRow === i} on:click={()=>activeRow=i}>
+                        <td>{i + 1}</td>
+                        <td>{agent.name}</td>
+                        <td>{agent.address}</td>
+                        <td>{agent.active}</td>
+                        <td
+                          ><button
+                            class="btn btn-primary"
+                            on:click={() => {
+                             
+                            }}>Impersonate</button
+                          ></td
+                        >
+                      </tr>
+                    {/each}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div
+              class:invisible={activeTab !== 'Disputes'}
+              class="absolute top-4 left-0 bg-neutral w-full rounded-lg" 
+>
+              <div class="overflow-x-auto">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th />
+                      <th>Talent</th>
+                      <th>Amount</th>
+                      <th>Show Start</th>
+                      <th>Show End</th>
+                      <th>Reason</th>
+                      <th>Explanation</th>
+                    </tr>
+                  </thead>
+                </table>
+              </div>
+            </div>
+          </div>
       {/key}
     </main>
   </div>

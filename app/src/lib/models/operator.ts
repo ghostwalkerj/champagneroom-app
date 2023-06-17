@@ -16,6 +16,8 @@ const OperatorSchema = new Schema(
       index: true,
       validator: (v: string) => validator.isEthereumAddress(v),
     },
+
+    name: { type: String, required: true, trim: true },
   },
   { timestamps: true }
 );
