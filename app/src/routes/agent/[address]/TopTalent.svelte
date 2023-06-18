@@ -17,7 +17,7 @@
     talents.forEach(async (talent: TalentDocument) => {
       const range = {
         start: now.startOf('month').epoch,
-        end: now.endOf('month').epoch,
+        end: now.endOf('month').epoch
       };
       const stats = await talent.getStatsByRange(range);
       if (stats.totalEarnings > 0) {
@@ -32,17 +32,17 @@
     circumference: 180,
     rotation: -90,
     animation: {
-      animateScal: true,
+      animateScal: true
     },
     plugins: {
       legend: { display: true, position: 'bottom' },
       datalabels: {
         formatter: function (value: number | bigint) {
           return currencyFormatter.format(value);
-        },
+        }
         //anchor: 'end'
-      },
-    },
+      }
+    }
   };
 
   $: data = {
@@ -51,9 +51,9 @@
       {
         data: talentData,
         backgroundColor: ['#2D1B69', '#58C7F3', '#F3CC30', '#20134E'],
-        borderWidth: 0,
-      },
-    ],
+        borderWidth: 0
+      }
+    ]
   };
   Chart.register(ChartDataLabels);
 </script>

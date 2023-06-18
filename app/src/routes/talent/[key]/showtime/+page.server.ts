@@ -7,7 +7,7 @@ import urlJoin from 'url-join';
 import {
   JITSI_APP_ID,
   JITSI_JWT_SECRET,
-  JWT_EXPIRY,
+  JWT_EXPIRY
 } from '$env/static/private';
 import { PUBLIC_JITSI_DOMAIN, PUBLIC_TALENT_PATH } from '$env/static/public';
 
@@ -18,7 +18,7 @@ import { ShowMachineEventString } from '$lib/machines/showMachine';
 
 import {
   getShowMachineService,
-  getShowMachineServiceFromId,
+  getShowMachineServiceFromId
 } from '$lib/util/util.server';
 
 import type { PageServerLoad } from './$types';
@@ -40,12 +40,12 @@ export const actions: Actions = {
 
     if (showState.can({ type: ShowMachineEventString.SHOW_STOPPED })) {
       showService.send({
-        type: ShowMachineEventString.SHOW_STOPPED,
+        type: ShowMachineEventString.SHOW_STOPPED
       });
 
       return { success: true };
     }
-  },
+  }
 };
 
 export const load: PageServerLoad = async ({ params, locals }) => {
@@ -63,7 +63,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
   const show = await Show.findOne({
     talent: talent._id,
-    'showState.current': true,
+    'showState.current': true
   })
     .orFail(() => {
       throw error(404, 'Show not found');
@@ -81,7 +81,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
   if (!showState.matches('started'))
     showService.send({
-      type: ShowMachineEventString.SHOW_STARTED,
+      type: ShowMachineEventString.SHOW_STARTED
     });
 
   const jitsiToken = jwt.sign(
@@ -96,9 +96,9 @@ export const load: PageServerLoad = async ({ params, locals }) => {
         user: {
           name: talent.name,
           affiliation: 'owner',
-          lobby_bypass: true,
-        },
-      },
+          lobby_bypass: true
+        }
+      }
     },
     JITSI_JWT_SECRET
   );
@@ -106,6 +106,6 @@ export const load: PageServerLoad = async ({ params, locals }) => {
   return {
     talent: talent.toObject({ flattenObjectIds: true }),
     show: show.toObject({ flattenObjectIds: true }),
-    jitsiToken,
+    jitsiToken
   };
 };

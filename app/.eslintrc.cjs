@@ -4,9 +4,9 @@ module.exports = {
   extends: [
     'plugin:svelte/recommended',
     'plugin:@typescript-eslint/recommended',
-    'plugin:unicorn/recommended',
+    'plugin:unicorn/recommended'
   ],
-  plugins: ['simple-import-sort', 'sort-exports', 'prettier-plugin-svelte'],
+  plugins: ['simple-import-sort', 'sort-exports', 'prettier'],
 
   parser: '@typescript-eslint/parser',
   parserOptions: {
@@ -16,9 +16,9 @@ module.exports = {
     ecmaFeatures: {
       globalReturn: false,
       impliedStrict: false,
-      jsx: false,
+      jsx: false
     },
-    extraFileExtensions: ['.svelte'], // This is a required setting in `@typescript-eslint/parser` v4.24.0.
+    extraFileExtensions: ['.svelte'] // This is a required setting in `@typescript-eslint/parser` v4.24.0.
   },
   overrides: [
     {
@@ -26,8 +26,8 @@ module.exports = {
       parser: 'svelte-eslint-parser',
       // Parse the `<script>` in `.svelte` as TypeScript by adding the following configuration.
       parserOptions: {
-        parser: '@typescript-eslint/parser',
-      },
+        parser: '@typescript-eslint/parser'
+      }
     },
     {
       files: ['*.svelte', '*.ts'],
@@ -36,8 +36,8 @@ module.exports = {
           'error',
           {
             sortDir: 'asc',
-            sortExportKindFirst: 'value',
-          },
+            sortExportKindFirst: 'value'
+          }
         ],
         'simple-import-sort/imports': [
           'error',
@@ -64,74 +64,76 @@ module.exports = {
               // Anything that starts with a dot.
 
               ['^\\.'],
-              ['^\\./\\$types'],
-            ],
-          },
-        ],
-      },
-    },
+              ['^\\./\\$types']
+            ]
+          }
+        ]
+      }
+    }
   ],
   rules: {
+    'prettier/prettier': 'error',
     '@typescript-eslint/keyword-spacing': 'error',
     'no-multi-spaces': ['error'],
+    'unicorn/no-nested-ternary': 'off',
     'unicorn/filename-case': [
       'error',
       {
         cases: {
           camelCase: true,
-          pascalCase: true,
-        },
-      },
+          pascalCase: true
+        }
+      }
     ],
     '@typescript-eslint/naming-convention': [
       'error',
       {
         selector: 'default',
-        format: ['camelCase'],
+        format: ['camelCase']
       },
       {
         selector: 'variable',
         format: ['PascalCase', 'UPPER_CASE'],
         types: ['boolean'],
-        prefix: ['is', 'should', 'has', 'can', 'did', 'will'],
+        prefix: ['is', 'should', 'has', 'can', 'did', 'will']
       },
       {
         selector: 'variableLike',
-        format: ['camelCase', 'UPPER_CASE', 'PascalCase'],
+        format: ['camelCase', 'UPPER_CASE', 'PascalCase']
       },
 
       {
         selector: 'parameter',
         format: ['camelCase'],
-        leadingUnderscore: 'allow',
+        leadingUnderscore: 'allow'
       },
       {
         selector: 'memberLike',
         modifiers: ['private'],
         format: ['camelCase'],
-        leadingUnderscore: 'forbid',
+        leadingUnderscore: 'forbid'
       },
       {
         selector: 'typeLike',
-        format: ['PascalCase'],
+        format: ['PascalCase']
       },
       {
         selector: 'property',
         modifiers: ['readonly'],
-        format: ['PascalCase'],
+        format: ['PascalCase']
       },
       {
         selector: 'enumMember',
-        format: ['UPPER_CASE'],
+        format: ['UPPER_CASE']
       },
       {
         selector: 'objectLiteralMethod',
-        format: ['snake_case', 'camelCase'],
+        format: ['snake_case', 'camelCase']
       },
       {
         selector: 'objectLiteralProperty',
-        format: [],
-      },
+        format: []
+      }
     ],
     '@typescript-eslint/ban-ts-comment': 'off',
     '@typescript-eslint/no-non-null-assertion': 'off',
@@ -144,8 +146,8 @@ module.exports = {
       {
         prefer: 'type-imports',
         disallowTypeAnnotations: false,
-        fixStyle: 'separate-type-imports',
-      },
-    ],
-  },
+        fixStyle: 'separate-type-imports'
+      }
+    ]
+  }
 };

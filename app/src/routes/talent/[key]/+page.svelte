@@ -10,7 +10,7 @@
   import {
     PUBLIC_DEFAULT_PROFILE_IMAGE,
     PUBLIC_SHOW_PATH,
-    PUBLIC_SHOWTIME_PATH,
+    PUBLIC_SHOWTIME_PATH
   } from '$env/static/public';
 
   import { CancelReason } from '$lib/models/common';
@@ -21,7 +21,7 @@
   import type { ShowMachineServiceType } from '$lib/machines/showMachine';
   import {
     createShowMachineService,
-    ShowMachineEventString,
+    ShowMachineEventString
   } from '$lib/machines/showMachine';
 
   import { ActorType, durationFormatter } from '$lib/constants';
@@ -86,12 +86,12 @@
       statusText = show.showState.status;
       showEventUnSub?.();
       showUnSub?.();
-      showUnSub = showStore(show).subscribe(_show => {
+      showUnSub = showStore(show).subscribe((_show) => {
         if (_show && _show.showState.current) {
           currentShow = _show;
           showMachineService?.stop();
           showMachineService = createShowMachineService({
-            showDocument: _show,
+            showDocument: _show
           });
           useShowMachine(showMachineService);
           showEventUnSub = showEventStore(show).subscribe(
@@ -116,8 +116,8 @@
       cancel: {
         cancelledAt: new Date(),
         cancelledBy: ActorType.TALENT,
-        reason: CancelReason.TALENT_CANCELLED,
-      },
+        reason: CancelReason.TALENT_CANCELLED
+      }
     });
     canStartShow = state.can(ShowMachineEventString.SHOW_STARTED);
     statusText = state.context.showState.status;
@@ -127,7 +127,7 @@
   };
 
   onMount(() => {
-    talentUnSub = talentStore(talent).subscribe(_talent => {
+    talentUnSub = talentStore(talent).subscribe((_talent) => {
       if (_talent) {
         talent = _talent;
         talentName = _talent.name;
@@ -149,7 +149,7 @@
       formData.append('url', url);
       await fetch('?/update_profile_image', {
         method: 'POST',
-        body: formData,
+        body: formData
       });
     }
   };
@@ -383,7 +383,7 @@
                 showCopy: true,
                 showSalesStats: true,
                 showRating: false,
-                showWaterMark: false,
+                showWaterMark: false
               }}
             />
           {/key}
@@ -416,7 +416,6 @@
             </div>
           </form>
         {/if}
-      
       </div>
     </div>
 
@@ -432,7 +431,7 @@
                 <ProfilePhoto
                   profileImage={talent.profileImageUrl ||
                     PUBLIC_DEFAULT_PROFILE_IMAGE}
-                  callBack={value => {
+                  callBack={(value) => {
                     updateProfileImage(value);
                   }}
                 />

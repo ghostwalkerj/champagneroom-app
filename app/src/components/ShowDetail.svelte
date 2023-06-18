@@ -20,14 +20,14 @@
     showSalesStats: false,
     showStats: true,
     showRating: true,
-    showWaterMark: true,
+    showWaterMark: true
   };
   export let options: ShowDetailOptions = defaultOptions;
   export let show: ShowDocumentType;
 
   options = {
     ...defaultOptions,
-    ...options,
+    ...options
   };
   $: showStatus = show.showState.status;
   $: waterMarkText = showStatus;

@@ -10,20 +10,20 @@ import type { ShowEventDocumentType } from '$lib/models/showEvent';
 import type { TalentDocumentType } from '$lib/models/talent';
 import type { TicketDocumentType } from '$lib/models/ticket';
 
-export const nameStore = writable<String>('');
-
 export const agentStore = (agent: AgentDocumentType) => {
   return abstractStore({
     doc: agent,
-    changesetPath: urlJoin(PUBLIC_CHANGESET_PATH, 'agent', agent.address),
+    changesetPath: urlJoin(PUBLIC_CHANGESET_PATH, 'agent', agent.address)
   });
 };
+
+export const browserType = writable();
 
 const getChangeset = async <T>({
   changesetPath,
   callback,
   signal,
-  cancelOn,
+  cancelOn
 }: {
   changesetPath: string;
   callback: (changeset: T) => void;
@@ -40,7 +40,7 @@ const getChangeset = async <T>({
 
     const [error, response] = await to(
       fetch(path, {
-        signal,
+        signal
       })
     );
     if (error) {
@@ -63,7 +63,7 @@ const getChangeset = async <T>({
 const abstractStore = <T>({
   doc,
   changesetPath,
-  cancelOn,
+  cancelOn
 }: {
   doc: T;
   changesetPath: string;
@@ -82,11 +82,11 @@ const abstractStore = <T>({
     };
   });
   return {
-    subscribe,
+    subscribe
   };
 };
 
-export const browserType = writable();
+export const nameStore = writable<string>('');
 
 export const showEventStore = (show: ShowDocumentType) => {
   const showCancel = (show: ShowDocumentType) => !show.showState.activeState;
@@ -104,7 +104,7 @@ export const showEventStore = (show: ShowDocumentType) => {
             $show._id.toString()
           ),
           callback: set,
-          signal: showEventSignal,
+          signal: showEventSignal
         });
         return () => {
           abortShowEvent.abort();
@@ -114,7 +114,7 @@ export const showEventStore = (show: ShowDocumentType) => {
   );
   return {
     set: showStore.set,
-    subscribe: showEventStore.subscribe,
+    subscribe: showEventStore.subscribe
   };
 };
 
@@ -124,14 +124,14 @@ export const showStore = (show: ShowDocumentType) => {
   return abstractStore({
     doc: show,
     changesetPath: urlJoin(PUBLIC_CHANGESET_PATH, 'show', show._id.toString()),
-    cancelOn: showCancel,
+    cancelOn: showCancel
   });
 };
 
 export const talentStore = (talent: TalentDocumentType) => {
   return abstractStore({
     doc: talent,
-    changesetPath: urlJoin(PUBLIC_CHANGESET_PATH, 'talent', talent.key),
+    changesetPath: urlJoin(PUBLIC_CHANGESET_PATH, 'talent', talent.key)
   });
 };
 
@@ -145,6 +145,6 @@ export const ticketStore = (ticket: TicketDocumentType) => {
       'ticket',
       ticket._id.toString()
     ),
-    cancelOn: ticketCancel,
+    cancelOn: ticketCancel
   });
 };

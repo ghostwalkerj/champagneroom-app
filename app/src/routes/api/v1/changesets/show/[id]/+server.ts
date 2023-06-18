@@ -24,13 +24,13 @@ export const GET = (async ({ params, url }) => {
   const pipeline = [
     {
       $match: {
-        'fullDocument._id': id,
-      },
-    },
+        'fullDocument._id': id
+      }
+    }
   ];
   const changeStream = Show.watch(pipeline, { fullDocument: 'updateLookup' });
   const next = await changeStream.next();
   const document = next.fullDocument;
   changeStream.close();
-return new Response(String(JSON.stringify(document)));
+  return new Response(String(JSON.stringify(document)));
 }) satisfies RequestHandler;

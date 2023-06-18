@@ -11,14 +11,14 @@ const feedbackSchema = new Schema({
     default: 0,
     min: 0,
     max: 5,
-    required: true,
+    required: true
   },
   numberOfReviews: {
     type: Number,
     default: 0,
     min: 0,
-    required: true,
-  },
+    required: true
+  }
 });
 
 const salesSchema = new Schema({
@@ -26,26 +26,26 @@ const salesSchema = new Schema({
     type: Number,
     default: 0,
     min: 0,
-    required: true,
+    required: true
   },
   numberOfCompletedShows: {
     type: Number,
     default: 0,
     min: 0,
-    required: true,
+    required: true
   },
   totalRefunded: {
     type: Number,
     default: 0,
     min: 0,
-    required: true,
+    required: true
   },
   totalRevenue: {
     type: Number,
     default: 0,
     min: 0,
-    required: true,
-  },
+    required: true
+  }
 });
 
 const talentSchema = new Schema(
@@ -60,23 +60,23 @@ const talentSchema = new Schema(
       unique: true,
       default: function () {
         return nanoid(30);
-      },
+      }
     },
     walletAddress: {
       type: String,
       maxLength: 50,
-      validator: (v: string) => validator.isEthereumAddress(v),
+      validator: (v: string) => validator.isEthereumAddress(v)
     },
     name: {
       type: String,
       maxLength: 50,
       minLength: [4, 'Name is too short'],
       required: true,
-      trim: true,
+      trim: true
     },
     profileImageUrl: {
       type: String,
-      required: true,
+      required: true
     },
     agentCommission: {
       type: Number,
@@ -86,16 +86,16 @@ const talentSchema = new Schema(
       required: true,
       validate: {
         validator: Number.isInteger,
-        message: '{VALUE} is not an integer value',
-      },
+        message: '{VALUE} is not an integer value'
+      }
     },
     agent: { type: Schema.Types.ObjectId, ref: 'Agent', required: true },
     feedbackStats: {
       type: feedbackSchema,
       required: true,
-      default: () => ({}),
+      default: () => ({})
     },
-    salesStats: { type: salesSchema, required: true, default: () => ({}) },
+    salesStats: { type: salesSchema, required: true, default: () => ({}) }
   },
   { timestamps: true }
 );

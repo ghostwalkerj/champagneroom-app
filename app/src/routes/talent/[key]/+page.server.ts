@@ -33,7 +33,7 @@ export const actions: Actions = {
 
     return {
       success: true,
-      talent: talent?.toObject({ flattenObjectIds: true }),
+      talent: talent?.toObject({ flattenObjectIds: true })
     };
   },
   create_show: async ({ params, request }) => {
@@ -73,19 +73,19 @@ export const actions: Actions = {
       showState: {
         status: ShowStatus.BOX_OFFICE_OPEN,
         salesStats: {
-          ticketsAvailable: +capacity,
-        },
+          ticketsAvailable: +capacity
+        }
       },
       talentInfo: {
         name: talent.name,
-        profileImageUrl: talent.profileImageUrl,
-      },
+        profileImageUrl: talent.profileImageUrl
+      }
     });
 
     return {
       success: true,
       showCreated: true,
-      show: show.toObject({ flattenObjectIds: true }),
+      show: show.toObject({ flattenObjectIds: true })
     };
   },
   cancel_show: async ({ request, params, locals }) => {
@@ -111,12 +111,12 @@ export const actions: Actions = {
     const cancel = {
       cancelledInState: JSON.stringify(showMachineState.value),
       reason: CancelReason.TALENT_CANCELLED,
-      cancelledBy: ActorType.TALENT,
+      cancelledBy: ActorType.TALENT
     } as CancelType;
 
     const cancelEvent = {
       type: 'CANCELLATION INITIATED',
-      cancel,
+      cancel
     } as ShowMachineEventType;
 
     if (showMachineState.can(cancelEvent)) {
@@ -129,7 +129,7 @@ export const actions: Actions = {
     return {
       success: true,
       showState,
-      showCancelled: true,
+      showCancelled: true
     };
   },
   end_show: async ({ request, locals }) => {
@@ -152,7 +152,7 @@ export const actions: Actions = {
 
     if (showState.can({ type: ShowMachineEventString.SHOW_ENDED })) {
       showService.send({
-        type: ShowMachineEventString.SHOW_ENDED,
+        type: ShowMachineEventString.SHOW_ENDED
       });
 
       isInEscrow = showService.getSnapshot().matches('ended.inEscrow');
@@ -160,9 +160,9 @@ export const actions: Actions = {
 
     return {
       success: true,
-      inEscrow: isInEscrow,
+      inEscrow: isInEscrow
     };
-  },
+  }
 };
 export const load: PageServerLoad = async ({ params }) => {
   const key = params.key;
@@ -179,13 +179,13 @@ export const load: PageServerLoad = async ({ params }) => {
 
   const currentShow = await Show.findOne({
     talent: talent._id,
-    'showState.current': true,
+    'showState.current': true
   }).exec();
 
   return {
     talent: talent.toObject({ flattenObjectIds: true }),
     currentShow: currentShow
       ? currentShow.toObject({ flattenObjectIds: true })
-      : undefined,
+      : undefined
   };
 };

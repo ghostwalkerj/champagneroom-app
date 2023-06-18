@@ -1,5 +1,4 @@
 <script lang="ts">
-
   import { onMount } from 'svelte';
   import urlJoin from 'url-join';
 
@@ -20,18 +19,15 @@
   const agent = data.agent as AgentDocumentType;
   export let form: ActionData;
 
-
-
   onMount(() => {
-    selectedAccount.subscribe(async account => {
+    selectedAccount.subscribe(async (account) => {
       if (account) {
         const agentPath = urlJoin(
           window.location.origin,
           PUBLIC_AGENT_PATH,
           account.address
         );
-        if (agentPath !== $page.url.href)
-        goto(agentPath);
+        if (agentPath !== $page.url.href) goto(agentPath);
       }
     });
   });
@@ -56,9 +52,7 @@
           </div>
           <div class="divider" />
 
-          <div
-            class="mx-auto grid gap-2 grid-cols-1 lg:grid-cols-2 "
-          >
+          <div class="mx-auto grid gap-2 grid-cols-1 lg:grid-cols-2">
             <div class="p-1">
               <AgentWallet />
             </div>
@@ -82,5 +76,4 @@
       {/key}
     </main>
   </div>
-
 {/if}

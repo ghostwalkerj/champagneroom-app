@@ -7,7 +7,7 @@ import { createShowEvent } from '$lib/models/showEvent';
 import {
   Ticket,
   type TicketStateType,
-  type TicketType,
+  type TicketType
 } from '$lib/models/ticket';
 
 import type { ShowMachineEventString } from '$lib/machines/showMachine';
@@ -37,8 +37,8 @@ export const getShowMachineService = (
       saveStateCallback: async (showState) => SaveState(show, showState),
       saveShowEventCallback: async ({ type, ticket, transaction }) =>
         createShowEvent({ show, type, ticket, transaction }),
-      jobQueue,
-    },
+      jobQueue
+    }
   });
 };
 
@@ -72,7 +72,7 @@ export const getTicketMachineService = (
   const ticketMachineOptions = {
     saveStateCallback: (ticketState: TicketStateType) => {
       Ticket.updateOne({ _id: ticket._id }, { $set: { ticketState } }).exec();
-    },
+    }
   };
 
   const jobQueue =
@@ -92,8 +92,8 @@ export const getTicketMachineService = (
       saveStateCallback: async (showState) => SaveState(show, showState),
       saveShowEventCallback: async ({ type, ticket, transaction }) =>
         createShowEvent({ show, type, ticket, transaction }),
-      jobQueue,
-    },
+      jobQueue
+    }
   });
 };
 

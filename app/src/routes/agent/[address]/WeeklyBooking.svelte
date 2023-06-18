@@ -16,7 +16,7 @@
     talents.forEach(async (talent: TalentDocument) => {
       const range = {
         start: now.startOf('month').epoch,
-        end: now.endOf('month').epoch,
+        end: now.endOf('month').epoch
       };
       const stats = await talent.getStatsByRange(range);
       if (stats.totalEarnings > 0) {
@@ -30,22 +30,22 @@
     elements: {
       line: {
         borderColor: '#58C7F3',
-        tension: 0.4,
-      },
+        tension: 0.4
+      }
     },
     scales: {
       x: {
         grid: {
-          display: false,
-        },
-      },
+          display: false
+        }
+      }
     },
     legend: {
       labels: {
         usePointStyle: true, // show legend as point instead of box
-        fontSize: 10, // legend point size is based on fontsize
-      },
-    },
+        fontSize: 10 // legend point size is based on fontsize
+      }
+    }
   };
 
   $: data = {
@@ -57,7 +57,7 @@
       'Thursday',
       'Friday',
       'Saturday',
-      'Sunday',
+      'Sunday'
     ],
     datasets: [
       {
@@ -68,9 +68,9 @@
         pointBorderWidth: 1,
         pointStyle: 'circle',
         pointRadius: 10,
-        pointHoverRadius: 15,
-      },
-    ],
+        pointHoverRadius: 15
+      }
+    ]
   };
   Chart.register(ChartDataLabels);
 </script>

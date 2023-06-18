@@ -17,7 +17,7 @@
     fileLimit: 1,
     maxSize: 1_048_576,
     accept: ['image/png', 'image/jpeg'],
-    multiple: false,
+    multiple: false
   };
 
   $: update = false;
@@ -64,7 +64,7 @@
     const uploadUrl = urlJoin($page.url.origin, PUBLIC_IMAGE_UPDATE_PATH);
     const response = await fetch(uploadUrl, {
       method: 'POST',
-      body: formData,
+      body: formData
     });
     const data = await response.json();
     profileImage = data.url;

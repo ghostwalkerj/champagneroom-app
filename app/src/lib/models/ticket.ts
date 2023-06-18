@@ -4,13 +4,13 @@ import { fieldEncryption } from 'mongoose-field-encryption';
 import validator from 'validator';
 
 import {
-  cancelSchema,
-  disputeSchema,
-  escrowSchema,
-  feedbackSchema,
-  finalizeSchema,
-  refundSchema,
-  saleSchema,
+    cancelSchema,
+    disputeSchema,
+    escrowSchema,
+    feedbackSchema,
+    finalizeSchema,
+    refundSchema,
+    saleSchema
 } from './common';
 
 enum TicketStatus {
@@ -23,7 +23,7 @@ enum TicketStatus {
   IN_DISPUTE = 'IN DISPUTE',
   REFUNDED = 'REFUNDED',
   MISSED_SHOW = 'MISSED SHOW',
-  SHOW_CANCELLED = 'SHOW CANCELLED',
+  SHOW_CANCELLED = 'SHOW CANCELLED'
 }
 
 const { Schema, models } = pkg;
@@ -35,7 +35,7 @@ export const SaveState = (ticket: TicketType, newState: TicketStateType) => {
 };
 
 const redemptionSchema = new Schema({
-  redeemedAt: { type: Date, default: Date.now },
+  redeemedAt: { type: Date, default: Date.now }
 });
 
 const ticketStateSchema = new Schema(
@@ -44,7 +44,7 @@ const ticketStateSchema = new Schema(
       type: String,
       enum: TicketStatus,
       default: TicketStatus.RESERVED,
-      index: true,
+      index: true
     },
     activeState: { type: Boolean, default: true, index: true },
     totalPaid: { type: Number, default: 0 },
@@ -56,7 +56,7 @@ const ticketStateSchema = new Schema(
     finalize: finalizeSchema,
     feedback: feedbackSchema,
     refund: refundSchema,
-    sale: saleSchema,
+    sale: saleSchema
   },
   { timestamps: true }
 );
@@ -69,14 +69,14 @@ const ticketSchema = new Schema(
       type: String,
       maxLength: 50,
       required: true,
-      validator: (v: string) => validator.isEthereumAddress(v),
+      validator: (v: string) => validator.isEthereumAddress(v)
     },
     price: { type: Number, required: true },
     show: { type: Schema.Types.ObjectId, ref: 'Show', index: true },
     ticketState: {
       type: ticketStateSchema,
       required: true,
-      default: () => ({}),
+      default: () => ({})
     },
     customerName: { type: String, required: true, trim: true },
     pin: {
@@ -85,17 +85,17 @@ const ticketSchema = new Schema(
       minLength: 8,
       maxLength: 8,
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      validator: (v: string) => validator.isNumeric(v, { no_symbols: true }),
+      validator: (v: string) => validator.isNumeric(v, { no_symbols: true })
     },
     agent: { type: Schema.Types.ObjectId, ref: 'Agent', required: true },
-    talent: { type: Schema.Types.ObjectId, ref: 'Talent', required: true },
+    talent: { type: Schema.Types.ObjectId, ref: 'Talent', required: true }
   },
   { timestamps: true }
 );
 
 ticketSchema.plugin(fieldEncryption, {
   fields: ['pin'],
-  secret: process.env.MONGO_DB_FIELD_SECRET,
+  secret: process.env.MONGO_DB_FIELD_SECRET
 });
 
 export const Ticket = models?.Ticket

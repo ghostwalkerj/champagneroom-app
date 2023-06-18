@@ -39,7 +39,7 @@
 						<div class="ml-4">
 								<div class="font-medium text-gray-900">${v.name}</div>
 						</div>
-				</div>`,
+				</div>`
     },
     {
       key: 'rating',
@@ -49,15 +49,15 @@
       headerClass: 'font-semibold text-left text-sm py-3.5 px-3 text-gray-900',
       renderComponent: {
         component: TableRating,
-        props: {},
-      },
+        props: {}
+      }
     },
     {
       key: 'shows',
       title: 'Shows',
       value: (v: TalentRow) => v.shows,
       sortable: true,
-      headerClass: 'font-semibold text-left text-sm py-3.5 px-3 text-gray-900',
+      headerClass: 'font-semibold text-left text-sm py-3.5 px-3 text-gray-900'
     },
     {
       key: 'earnings',
@@ -65,7 +65,7 @@
       value: (v: TalentRow) => v.earnings,
       sortable: true,
       headerClass: 'font-semibold text-left text-sm py-3.5 px-3 text-gray-900',
-      renderValue: (v: TalentRow) => currencyFormatter.format(v.earnings),
+      renderValue: (v: TalentRow) => currencyFormatter.format(v.earnings)
     },
     {
       key: 'commission',
@@ -73,7 +73,7 @@
       value: (v: TalentRow) => v.commission,
       sortable: true,
       headerClass: 'font-semibold text-left text-sm py-3.5 px-3 text-gray-900',
-      renderValue: (v: TalentRow) => `${v.commission}%`,
+      renderValue: (v: TalentRow) => `${v.commission}%`
     },
     {
       key: 'myearnings',
@@ -81,7 +81,7 @@
       value: (v: TalentRow) => v.myEarnings,
       sortable: true,
       headerClass: 'font-semibold text-left text-sm py-3.5 px-3 text-gray-900',
-      renderValue: (v: TalentRow) => currencyFormatter.format(v.myEarnings),
+      renderValue: (v: TalentRow) => currencyFormatter.format(v.myEarnings)
     },
     {
       key: 'url',
@@ -90,9 +90,9 @@
       sortable: false,
       headerClass: 'font-semibold text-left text-sm py-3.5 px-3 text-gray-900',
       renderComponent: {
-        component: TableCopyLink,
-      },
-    },
+        component: TableCopyLink
+      }
+    }
     // {
     // 	key: 'action',
     // 	title: '',
@@ -115,7 +115,7 @@
         earnings: talent.stats.totalEarnings,
         url: talent.key,
         commission: talent.agentCommission,
-        myEarnings: talent.stats.totalEarnings * (1 / talent.agentCommission),
+        myEarnings: talent.stats.totalEarnings * (1 / talent.agentCommission)
       });
     });
   }

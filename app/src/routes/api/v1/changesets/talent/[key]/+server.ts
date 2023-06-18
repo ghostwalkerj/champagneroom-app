@@ -20,7 +20,7 @@ export const GET = (async ({ params, url }) => {
 
   const pipeline = [{ $match: { 'fullDocument.key': talentKey } }];
   const changeStream = Talent.watch(pipeline, {
-    fullDocument: 'updateLookup',
+    fullDocument: 'updateLookup'
   });
   const next = await changeStream.next();
   const document = next.fullDocument;

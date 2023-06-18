@@ -53,7 +53,7 @@ export const actions: Actions = {
     const showState = showService.getSnapshot();
     if (
       !showState.can({
-        type: 'TICKET RESERVED',
+        type: 'TICKET RESERVED'
       })
     ) {
       return error(501, 'Show cannot Reserve Ticket'); // TODO: This should be atomic
@@ -66,7 +66,7 @@ export const actions: Actions = {
       price: show.price,
       paymentAddress: '0x0000000000000000000000000000000000000000',
       customerName: name,
-      pin,
+      pin
     });
     if (!ticket) {
       return error(501, 'Show cannot Reserve Ticket');
@@ -82,7 +82,7 @@ export const actions: Actions = {
       ticket._id.toString()
     );
     throw redirect(303, redirectUrl);
-  },
+  }
 };
 
 export const load: PageServerLoad = async ({ params }) => {
@@ -98,11 +98,11 @@ export const load: PageServerLoad = async ({ params }) => {
     .exec();
 
   const displayName = uniqueNamesGenerator({
-    dictionaries: [mensNames],
+    dictionaries: [mensNames]
   });
 
   return {
     show: show.toObject({ flattenObjectIds: true }),
-    displayName,
+    displayName
   };
 };

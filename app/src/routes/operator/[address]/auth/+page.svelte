@@ -1,19 +1,32 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import urlJoin from 'url-join';
 
   import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
 
-  import { selectedAccount } from '$lib/util/web3';
+  import { defaultWallet, selectedAccount } from '$lib/util/web3';
 
   import ConnectButton from '$components/header/ConnectButton.svelte';
 
-  onMount(() => {
+  import type { PageData } from './$types';
+
+  export let data: PageData;
+
+  const signingMessage = data.signingMessage;
+
+  onMount(async () => {
     selectedAccount.subscribe(async (account) => {
-      if (account) {
-        const agentPath = urlJoin($page.url.href, account.address);
-        goto(agentPath);
+      if (account && $defaultWallet && account) {
+        const address = account.address;
+        try {
+          const signature = await $defaultWallet.provider.request({
+            method: 'personal_sign',
+            params: [signingMessage, address]
+          });
+          console.log(signature);
+        } catch (error) {
+          console.log(error);
+          goto('/');
+        }
       }
     });
   });

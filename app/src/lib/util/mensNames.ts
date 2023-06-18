@@ -148,5 +148,5 @@ export const mensNames = [
   'Tony Ice',
   'Drake Wood',
   'John Gun',
-  'Ian Silver',
+  'Ian Silver'
 ];

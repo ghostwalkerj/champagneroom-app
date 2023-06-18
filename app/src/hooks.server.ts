@@ -7,7 +7,7 @@ import {
   REDIS_HOST,
   REDIS_PASSWORD,
   REDIS_PORT,
-  REDIS_USERNAME,
+  REDIS_USERNAME
 } from '$env/static/private';
 
 mongoose.connect(MONGO_DB_ENDPOINT);
@@ -17,7 +17,7 @@ const redisConnection = new IORedis({
   password: REDIS_PASSWORD,
   username: REDIS_USERNAME,
   enableReadyCheck: false,
-  maxRetriesPerRequest: undefined,
+  maxRetriesPerRequest: undefined
 });
 
 export const handle = (async ({ event, resolve }) => {

@@ -27,12 +27,12 @@ export const GET = (async ({ params, url }) => {
     {
       $match: {
         'fullDocument.show': id,
-        operationType: 'insert',
-      },
-    },
+        operationType: 'insert'
+      }
+    }
   ];
   const changeStream = ShowEvent.watch(pipeline, {
-    showExpandedEvents: true,
+    showExpandedEvents: true
   });
   const next = await changeStream.next();
   const document = next.fullDocument;

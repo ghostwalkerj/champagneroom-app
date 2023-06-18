@@ -9,7 +9,7 @@ import type {
   CancelType,
   DisputeReason,
   DisputeType,
-  FeedbackType,
+  FeedbackType
 } from '$lib/models/common';
 import { CancelReason } from '$lib/models/common';
 import type { ShowType } from '$lib/models/show';
@@ -26,7 +26,7 @@ import { ActorType } from '$lib/constants';
 import { verifyPin } from '$lib/util/pin';
 import {
   getTicketMachineService,
-  getTicketMachineServiceFromId,
+  getTicketMachineServiceFromId
 } from '$lib/util/util.server';
 
 import type { Actions, PageServerLoad } from './$types';
@@ -73,11 +73,11 @@ export const actions: Actions = {
       ticket: ticket._id,
       show: show._id,
       agent: show.agent,
-      talent: show.talent,
+      talent: show.talent
     }).then((transaction) => {
       ticketService.send({
         type: TicketMachineEventString.PAYMENT_RECEIVED,
-        transaction,
+        transaction
       });
     });
 
@@ -101,12 +101,12 @@ export const actions: Actions = {
       cancelledBy: ActorType.CUSTOMER,
       cancelledInState: JSON.stringify(state.value),
       reason: CancelReason.CUSTOMER_CANCELLED,
-      cancelledAt: new Date(),
+      cancelledAt: new Date()
     } as CancelType;
 
     const cancelEvent = {
       type: 'CANCELLATION INITIATED',
-      cancel,
+      cancel
     } as TicketMachineEventType;
 
     if (state.can(cancelEvent)) {
@@ -124,7 +124,7 @@ export const actions: Actions = {
       success: true,
       ticketCancelled: true,
       ticket: ticket.toObject({ flattenObjectIds: true }),
-      show: show?.toObject({ flattenObjectIds: true }),
+      show: show?.toObject({ flattenObjectIds: true })
     };
   },
   leave_feedback: async ({ params, request, locals }) => {
@@ -152,7 +152,7 @@ export const actions: Actions = {
     const feedback = {
       _id: new Types.ObjectId(),
       rating: +rating,
-      review,
+      review
     } as FeedbackType;
 
     if (
@@ -160,7 +160,7 @@ export const actions: Actions = {
     ) {
       ticketService.send({
         type: TicketMachineEventString.FEEDBACK_RECEIVED,
-        feedback,
+        feedback
       });
     }
 
@@ -195,7 +195,7 @@ export const actions: Actions = {
       disputedBy: ActorType.CUSTOMER,
       reason: reason as DisputeReason,
       explanation,
-      startedAt: new Date(),
+      startedAt: new Date()
     } as DisputeType;
 
     if (
@@ -203,12 +203,12 @@ export const actions: Actions = {
     ) {
       ticketService.send({
         type: TicketMachineEventString.DISPUTE_INITIATED,
-        dispute,
+        dispute
       });
     }
 
     return { success: true, reason, explanation };
-  },
+  }
 };
 
 export const load: PageServerLoad = async ({ params, cookies, url }) => {
@@ -241,6 +241,6 @@ export const load: PageServerLoad = async ({ params, cookies, url }) => {
 
   return {
     ticket: ticket.toObject({ flattenObjectIds: true }),
-    show: show.toObject({ flattenObjectIds: true }),
+    show: show.toObject({ flattenObjectIds: true })
   };
 };

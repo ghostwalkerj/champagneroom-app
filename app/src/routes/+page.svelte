@@ -1,4 +1,3 @@
-
 <div class="min-h-full">
   <main class="py-10">
     <!-- Page header -->
@@ -10,6 +9,8 @@
           <div class="text-center text-2xl">
             Pretioso flos est, nihil ad vos nunc. Posset faciens pecuniam.
             Posuit eam ad opus nunc et adepto a pCall!
+          </div>
+        </div>
       </div>
     </div>
   </main>

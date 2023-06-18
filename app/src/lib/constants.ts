@@ -4,7 +4,7 @@ export enum ActorType {
   CUSTOMER = 'CUSTOMER',
   TIMER = 'TIMER',
   UNKNOWN = 'UNKNOWN',
-  ARBITRATOR = 'ARBITRATOR',
+  ARBITRATOR = 'ARBITRATOR'
 }
 
 export enum EntityType {
@@ -12,7 +12,7 @@ export enum EntityType {
   TALENT = 'TALENT',
   SHOW = 'SHOW',
   TICKET = 'TICKET',
-  USER = 'USER',
+  USER = 'USER'
 }
 
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -20,13 +20,13 @@ export enum TokenRoles {
   ADMIN = 'ADMIN',
   PUBLIC = 'PUBLIC',
   AGENT = 'AGENT',
-  TALENT = 'TALENT',
+  TALENT = 'TALENT'
 }
 
 export const currencyFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: 'USD',
-  maximumFractionDigits: 0,
+  maximumFractionDigits: 0
 });
 
 export const durationFormatter = (duration: number): string => {
@@ -45,8 +45,8 @@ export const jitsiInterfaceConfigOverwrite = {
     'camera',
     'fullscreen',
     'fodeviceselection',
-    'tileview',
+    'tileview'
   ],
 
-  APP_NAME: 'Champagne Room',
+  APP_NAME: 'Champagne Room'
 };

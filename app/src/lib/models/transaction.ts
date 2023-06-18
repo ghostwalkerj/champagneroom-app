@@ -5,7 +5,7 @@ import validator from 'validator';
 enum TransactionReasonType {
   TICKET_PAYMENT = 'TICKET PAYMENT',
   TICKET_REFUND = 'TICKET REFUND',
-  DISPUTE_RESOLUTION = 'DISPUTE RESOLUTION',
+  DISPUTE_RESOLUTION = 'DISPUTE RESOLUTION'
 }
 
 const { Schema, models } = pkg;
@@ -22,12 +22,12 @@ const transactionSchema = new Schema(
     value: {
       type: String,
       required: true,
-      validator: (v: string) => validator.isNumeric(v),
+      validator: (v: string) => validator.isNumeric(v)
     },
     ticket: { type: Schema.Types.ObjectId, ref: 'Ticket' },
     talent: { type: Schema.Types.ObjectId, ref: 'Talent' },
     agent: { type: Schema.Types.ObjectId, ref: 'Agent' },
-    show: { type: Schema.Types.ObjectId, ref: 'Show' },
+    show: { type: Schema.Types.ObjectId, ref: 'Show' }
   },
   { timestamps: true }
 );

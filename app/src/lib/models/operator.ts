@@ -1,6 +1,7 @@
 import type { InferSchemaType, Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
-import validator from 'validator';
+
+import { userSchema } from '$lib/models/common';
 
 const { Schema, models } = pkg;
 const OperatorSchema = new Schema(
@@ -8,16 +9,11 @@ const OperatorSchema = new Schema(
     // eslint-disable-next-line @typescript-eslint/naming-convention
     _id: { type: Schema.Types.ObjectId, required: true, auto: true },
 
-    address: {
-      type: String,
+    user: {
+      type: userSchema,
       required: true,
-      maxLength: 50,
-      unique: true,
-      index: true,
-      validator: (v: string) => validator.isEthereumAddress(v),
-    },
-
-    name: { type: String, required: true, trim: true },
+      index: true
+    }
   },
   { timestamps: true }
 );

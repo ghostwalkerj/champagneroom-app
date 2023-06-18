@@ -10,7 +10,7 @@ import type {
   FeedbackType,
   FinalizeType,
   RefundType,
-  SaleType,
+  SaleType
 } from '$lib/models/common';
 import { DisputeDecision } from '$lib/models/common';
 import type { ShowDocumentType } from '$lib/models/show';
@@ -39,7 +39,7 @@ enum ShowMachineEventString {
   FEEDBACK_RECEIVED = 'FEEDBACK RECEIVED',
   ESCROW_ENDED = 'ESCROW ENDED',
   TICKET_DISPUTED = 'TICKET DISPUTED',
-  DISPUTE_RESOLVED = 'DISPUTE RESOLVED',
+  DISPUTE_RESOLVED = 'DISPUTE RESOLVED'
 }
 
 export { ShowMachineEventString };
@@ -48,7 +48,7 @@ export { createShowMachine };
 
 export const createShowMachineService = ({
   showDocument,
-  showMachineOptions,
+  showMachineOptions
 }: {
   showDocument: ShowDocumentType;
   showMachineOptions?: ShowMachineOptions;
@@ -76,7 +76,7 @@ export const createShowMachineService = ({
         showMachineOptions.saveShowEventCallback({
           type: event.type,
           ticket,
-          transaction,
+          transaction
         });
     });
   }
@@ -152,7 +152,7 @@ export type ShowMachineOptions = {
   saveShowEventCallback?: ({
     type,
     ticket,
-    transaction,
+    transaction
   }: {
     type: string;
     ticket?: TicketDocumentType;
@@ -169,7 +169,7 @@ export type ShowMachineServiceType = ReturnType<
 
 const createShowMachine = ({
   showDocument,
-  showMachineOptions,
+  showMachineOptions
 }: {
   showDocument: ShowDocumentType;
   showMachineOptions?: ShowMachineOptions;
@@ -186,11 +186,11 @@ const createShowMachine = ({
           JSON.stringify(showDocument.showState)
         ) as ShowStateType,
         errorMessage: undefined as string | undefined,
-        id: nanoid(),
+        id: nanoid()
       },
       tsTypes: {} as import('./showMachine.typegen').Typegen0,
       schema: {
-        events: {} as ShowMachineEventType,
+        events: {} as ShowMachineEventType
       },
       predictableActionArguments: true,
       id: 'showMachine',
@@ -201,46 +201,46 @@ const createShowMachine = ({
           always: [
             {
               target: 'boxOfficeOpen',
-              cond: 'showBoxOfficeOpen',
+              cond: 'showBoxOfficeOpen'
             },
             {
               target: 'boxOfficeClosed',
-              cond: 'showBoxOfficeClosed',
+              cond: 'showBoxOfficeClosed'
             },
             {
               target: 'initiatedCancellation',
-              cond: 'showInitiatedCancellation',
+              cond: 'showInitiatedCancellation'
             },
             {
               target: 'initiatedCancellation.initiatedRefund',
-              cond: 'showInitiatedRefund',
+              cond: 'showInitiatedRefund'
             },
             {
               target: 'cancelled',
-              cond: 'showCancelled',
+              cond: 'showCancelled'
             },
             {
               target: 'finalized',
-              cond: 'showFinalized',
+              cond: 'showFinalized'
             },
             {
               target: 'started',
-              cond: 'showStarted',
+              cond: 'showStarted'
             },
             {
               target: 'stopped',
-              cond: 'showStopped',
+              cond: 'showStopped'
             },
             {
               target: 'ended.inEscrow',
-              cond: 'showInEscrow',
+              cond: 'showInEscrow'
             },
-            { target: 'ended.inDispute', cond: 'showInDispute' },
-          ],
+            { target: 'ended.inDispute', cond: 'showInDispute' }
+          ]
         },
         cancelled: {
           type: 'final',
-          entry: ['deactivateShow'],
+          entry: ['deactivateShow']
         },
         ended: {
           initial: 'inEscrow',
@@ -248,7 +248,7 @@ const createShowMachine = ({
             'SHOW FINALIZED': {
               target: 'finalized',
               actions: ['finalizeShow'],
-              cond: 'canFinalize',
+              cond: 'canFinalize'
             },
             'FEEDBACK RECEIVED': [
               {
@@ -258,18 +258,18 @@ const createShowMachine = ({
                     type: 'SHOW FINALIZED',
                     finalize: {
                       finalizedAt: new Date(),
-                      finalizedBy: ActorType.CUSTOMER,
-                    },
-                  }),
+                      finalizedBy: ActorType.CUSTOMER
+                    }
+                  })
                 ],
-                cond: 'canFinalize',
+                cond: 'canFinalize'
               },
-              { actions: ['receiveFeedback'] },
+              { actions: ['receiveFeedback'] }
             ],
             'TICKET DISPUTED': {
               target: 'ended.inDispute',
-              actions: ['receiveDispute'],
-            },
+              actions: ['receiveDispute']
+            }
           },
           states: {
             inEscrow: {},
@@ -283,28 +283,28 @@ const createShowMachine = ({
                         type: 'SHOW FINALIZED',
                         finalize: {
                           finalizedAt: new Date(),
-                          finalizedBy: ActorType.ARBITRATOR,
-                        },
-                      }),
+                          finalizedBy: ActorType.ARBITRATOR
+                        }
+                      })
                     ],
-                    cond: 'canFinalize',
+                    cond: 'canFinalize'
                   },
                   {
                     actions: ['receiveResolution'],
                     target: 'inEscrow',
-                    cond: 'disputesResolved',
+                    cond: 'disputesResolved'
                   },
                   {
-                    actions: ['receiveResolution'],
-                  },
-                ],
-              },
-            },
-          },
+                    actions: ['receiveResolution']
+                  }
+                ]
+              }
+            }
+          }
         },
         finalized: {
           type: 'final',
-          entry: ['deactivateShow'],
+          entry: ['deactivateShow']
         },
         boxOfficeOpen: {
           on: {
@@ -312,109 +312,109 @@ const createShowMachine = ({
               {
                 target: 'cancelled',
                 cond: 'canCancel',
-                actions: ['initiateCancellation', 'cancelShow'],
+                actions: ['initiateCancellation', 'cancelShow']
               },
               {
                 target: 'initiatedCancellation',
-                actions: ['initiateCancellation'],
-              },
+                actions: ['initiateCancellation']
+              }
             ],
             'TICKET RESERVED': [
               {
                 target: 'boxOfficeClosed',
                 cond: 'soldOut',
-                actions: ['decrementTicketsAvailable', 'closeBoxOffice'],
+                actions: ['decrementTicketsAvailable', 'closeBoxOffice']
               },
               {
-                actions: ['decrementTicketsAvailable'],
-              },
+                actions: ['decrementTicketsAvailable']
+              }
             ],
             'TICKET RESERVATION TIMEOUT': {
-              actions: ['incrementTicketsAvailable'],
+              actions: ['incrementTicketsAvailable']
             },
             'TICKET CANCELLED': {
-              actions: ['incrementTicketsAvailable'],
+              actions: ['incrementTicketsAvailable']
             },
             'TICKET SOLD': {
-              actions: ['sellTicket'],
+              actions: ['sellTicket']
             },
             'SHOW STARTED': {
               target: 'started',
               cond: 'canStartShow',
-              actions: ['startShow'],
+              actions: ['startShow']
             },
             'TICKET REFUNDED': [
               {
-                actions: ['refundTicket'],
-              },
-            ],
-          },
+                actions: ['refundTicket']
+              }
+            ]
+          }
         },
         boxOfficeClosed: {
           on: {
             'SHOW STARTED': {
               cond: 'canStartShow',
               target: 'started',
-              actions: ['startShow'],
+              actions: ['startShow']
             },
             'TICKET RESERVATION TIMEOUT': [
               {
                 target: 'boxOfficeOpen',
-                actions: ['openBoxOffice', 'incrementTicketsAvailable'],
-              },
+                actions: ['openBoxOffice', 'incrementTicketsAvailable']
+              }
             ],
             'TICKET CANCELLED': [
               {
                 target: 'boxOfficeOpen',
-                actions: ['openBoxOffice', 'incrementTicketsAvailable'],
-              },
+                actions: ['openBoxOffice', 'incrementTicketsAvailable']
+              }
             ],
             'TICKET SOLD': {
-              actions: ['sellTicket'],
+              actions: ['sellTicket']
             },
             'TICKET REFUNDED': [
               {
-                actions: ['refundTicket'],
-              },
+                actions: ['refundTicket']
+              }
             ],
             'CANCELLATION INITIATED': [
               {
                 target: 'cancelled',
                 cond: 'canCancel',
-                actions: ['initiateCancellation', 'cancelShow'],
+                actions: ['initiateCancellation', 'cancelShow']
               },
               {
                 target: 'initiatedCancellation',
-                actions: ['initiateCancellation'],
-              },
-            ],
-          },
+                actions: ['initiateCancellation']
+              }
+            ]
+          }
         },
         started: {
           on: {
             'SHOW STARTED': {
-              actions: ['startShow'],
+              actions: ['startShow']
             },
             'CUSTOMER JOINED': {},
             'CUSTOMER LEFT': {},
             'SHOW STOPPED': {
               target: 'stopped',
-              actions: ['stopShow'],
-            },
-          },
+              actions: ['stopShow']
+            }
+          }
         },
         stopped: {
           on: {
             'SHOW STARTED': {
               target: 'started',
               actions: ['startShow'],
-              cond: 'canStartShow',
+              cond: 'canStartShow'
             },
             'SHOW ENDED': {
               target: 'ended.inEscrow',
-              actions: ['endShow'],
-            },
-          },
+              actions: ['endShow']
+            }
+          }
         },
         initiatedCancellation: {
           initial: 'waiting2Refund',
@@ -423,9 +423,9 @@ const createShowMachine = ({
               on: {
                 'REFUND INITIATED': {
                   target: 'initiatedRefund',
-                  actions: ['initiateRefund'],
-                },
-              },
+                  actions: ['initiateRefund']
+                }
+              }
             },
             initiatedRefund: {
               on: {
@@ -433,17 +433,17 @@ const createShowMachine = ({
                   {
                     target: '#showMachine.cancelled',
                     cond: 'fullyRefunded',
-                    actions: ['refundTicket', 'cancelShow'],
+                    actions: ['refundTicket', 'cancelShow']
                   },
                   {
-                    actions: ['refundTicket'],
-                  },
-                ],
-              },
-            },
-          },
-        },
-      },
+                    actions: ['refundTicket']
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
     },
     {
       actions: {
@@ -451,8 +451,8 @@ const createShowMachine = ({
           return {
             showState: {
               ...context.showState,
-              status: ShowStatus.BOX_OFFICE_CLOSED,
-            },
+              status: ShowStatus.BOX_OFFICE_CLOSED
+            }
           };
         }),
 
@@ -460,8 +460,8 @@ const createShowMachine = ({
           return {
             showState: {
               ...context.showState,
-              status: ShowStatus.BOX_OFFICE_OPEN,
-            },
+              status: ShowStatus.BOX_OFFICE_OPEN
+            }
           };
         }),
 
@@ -469,8 +469,8 @@ const createShowMachine = ({
           return {
             showState: {
               ...context.showState,
-              status: ShowStatus.CANCELLED,
-            },
+              status: ShowStatus.CANCELLED
+            }
           };
         }),
 
@@ -481,20 +481,20 @@ const createShowMachine = ({
               status: ShowStatus.LIVE,
               runtime: {
                 startDate: new Date(),
-                endDate: undefined,
-              },
-            },
+                endDate: undefined
+              }
+            }
           };
         }),
 
         endShow: assign((context, event) => {
           showMachineOptions?.jobQueue?.add(event.type, {
-            showId: context.showDocument._id.toString(),
+            showId: context.showDocument._id.toString()
           });
           showMachineOptions?.jobQueue?.add(
             ShowMachineEventString.ESCROW_ENDED,
             {
-              showId: context.showDocument._id.toString(),
+              showId: context.showDocument._id.toString()
             },
             { delay: ESCROW_PERIOD }
           );
@@ -503,10 +503,10 @@ const createShowMachine = ({
               ...context.showState,
               status: ShowStatus.IN_ESCROW,
               escrow: {
-                startedAt: new Date(),
+                startedAt: new Date()
               },
-              current: false,
-            },
+              current: false
+            }
           };
         }),
 
@@ -518,7 +518,7 @@ const createShowMachine = ({
           showMachineOptions?.jobQueue?.add(
             event.type,
             {
-              showId: context.showDocument._id.toString(),
+              showId: context.showDocument._id.toString()
             },
             { delay: GRACE_PERIOD }
           );
@@ -529,16 +529,16 @@ const createShowMachine = ({
               status: ShowStatus.STOPPED,
               runtime: {
                 startDate,
-                endDate: new Date(),
-              },
-            },
+                endDate: new Date()
+              }
+            }
           };
         }),
 
         initiateCancellation: assign((context, event) => {
           showMachineOptions?.jobQueue?.add(event.type, {
             showId: context.showDocument._id.toString(),
-            cancel: event.cancel,
+            cancel: event.cancel
           });
           return {
             showState: {
@@ -546,28 +546,28 @@ const createShowMachine = ({
               status: ShowStatus.CANCELLATION_INITIATED,
               salesStats: {
                 ...context.showState.salesStats,
-                ticketsAvailable: 0,
+                ticketsAvailable: 0
               },
-              cancel: event.cancel,
-            },
+              cancel: event.cancel
+            }
           };
         }),
 
         initiateRefund: assign((context, event) => {
           showMachineOptions?.jobQueue?.add(event.type, {
-            showId: context.showDocument._id.toString(),
+            showId: context.showDocument._id.toString()
           });
           return {
             showState: {
               ...context.showState,
-              status: ShowStatus.REFUND_INITIATED,
-            },
+              status: ShowStatus.REFUND_INITIATED
+            }
           };
         }),
 
         receiveFeedback: (context, event) => {
           showMachineOptions?.jobQueue?.add(event.type, {
-            showId: context.showDocument._id.toString(),
+            showId: context.showDocument._id.toString()
           });
         },
 
@@ -581,9 +581,9 @@ const createShowMachine = ({
               disputeStats: {
                 ...st.disputeStats,
                 totalDisputes: st.disputeStats.totalDisputes + 1,
-                totalDisputesPending: st.disputeStats.totalDisputesPending + 1,
-              },
-            },
+                totalDisputesPending: st.disputeStats.totalDisputesPending + 1
+              }
+            }
           };
         }),
 
@@ -599,9 +599,9 @@ const createShowMachine = ({
                 totalDisputesResolved:
                   st.disputeStats.totalDisputesResolved + 1,
                 totalDisputesRefunded:
-                  st.disputeStats.totalDisputesRefunded + refunded,
-              },
-            },
+                  st.disputeStats.totalDisputesRefunded + refunded
+              }
+            }
           };
         }),
 
@@ -623,9 +623,9 @@ const createShowMachine = ({
                 ticketsRefunded,
                 totalRefunded,
                 ticketsSold,
-                totalRevenue,
-              },
-            },
+                totalRevenue
+              }
+            }
           };
         }),
         deactivateShow: assign((context) => {
@@ -633,8 +633,8 @@ const createShowMachine = ({
             showState: {
               ...context.showState,
               activeState: false,
-              current: false,
-            },
+              current: false
+            }
           };
         }),
 
@@ -647,9 +647,9 @@ const createShowMachine = ({
                 ticketsAvailable:
                   context.showState.salesStats.ticketsAvailable + 1,
                 ticketsReserved:
-                  context.showState.salesStats.ticketsReserved - 1,
-              },
-            },
+                  context.showState.salesStats.ticketsReserved - 1
+              }
+            }
           };
         }),
 
@@ -662,9 +662,9 @@ const createShowMachine = ({
                 ticketsAvailable:
                   context.showState.salesStats.ticketsAvailable - 1,
                 ticketsReserved:
-                  context.showState.salesStats.ticketsReserved + 1,
-              },
-            },
+                  context.showState.salesStats.ticketsReserved + 1
+              }
+            }
           };
         }),
 
@@ -688,32 +688,32 @@ const createShowMachine = ({
                 ticketsSold,
                 totalSales,
                 ticketsReserved,
-                totalRevenue,
-              },
-            },
+                totalRevenue
+              }
+            }
           };
         }),
 
         finalizeShow: assign((context, event) => {
           showMachineOptions?.jobQueue?.add(event.type, {
             showId: context.showDocument._id.toString(),
-            finalize: event.finalize,
+            finalize: event.finalize
           });
           const escrow = context.showState.escrow || {
-            startedAt: new Date(),
+            startedAt: new Date()
           };
           return {
             showState: {
               ...context.showState,
               escrow: {
                 ...escrow,
-                endedAt: new Date(),
+                endedAt: new Date()
               },
               status: ShowStatus.FINALIZED,
-              finalized: event.finalize,
-            },
+              finalized: event.finalize
+            }
           };
-        }),
+        })
       },
 
       delays: {
@@ -724,7 +724,7 @@ const createShowMachine = ({
               ? Date.now() - context.showState.runtime.endDate.getTime()
               : 0);
           return delay > 0 ? delay : 0;
-        },
+        }
       },
 
       guards: {
@@ -778,8 +778,8 @@ const createShowMachine = ({
           return fullReviewed && !hasDisputes;
         },
         disputesResolved: (context) =>
-          context.showState.disputeStats.totalDisputesPending === 0,
-      },
+          context.showState.disputeStats.totalDisputesPending === 0
+      }
     }
   );
 };

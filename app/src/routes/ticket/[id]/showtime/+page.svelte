@@ -8,7 +8,7 @@
   import {
     PUBLIC_JITSI_DOMAIN,
     PUBLIC_PROFILE_IMAGE_PATH,
-    PUBLIC_TICKET_PATH,
+    PUBLIC_TICKET_PATH
   } from '$env/static/public';
 
   import type { ShowDocumentType } from '$lib/models/show';
@@ -16,14 +16,13 @@
 
   import {
     createTicketMachineService,
-    TicketMachineEventString,
+    TicketMachineEventString
   } from '$lib/machines/ticketMachine';
 
   import { jitsiInterfaceConfigOverwrite } from '$lib/constants';
   import getProfileImage from '$lib/util/profilePhoto';
 
   import type { PageData } from './$types';
-
 
   export let data: PageData;
 
@@ -49,7 +48,7 @@
       let formData = new FormData();
       fetch($page.url.href + '?/leave_show', {
         method: 'POST',
-        body: formData,
+        body: formData
       });
     };
   }
@@ -66,12 +65,12 @@
       height: '100%',
       parentNode: videoCallElement,
       userInfo: {
-        displayName: ticket.customerName,
+        displayName: ticket.customerName
       },
       interfaceConfigOverwrite: jitsiInterfaceConfigOverwrite,
       configOverwrite: {
-        localSubject: show.name,
-      },
+        localSubject: show.name
+      }
     };
 
     // @ts-ignore
@@ -86,12 +85,12 @@
 
     const ticketMachineService = createTicketMachineService({
       ticketDocument: ticket,
-      showDocument: show,
+      showDocument: show
     });
 
-    ticketMachineService.subscribe(state => {
+    ticketMachineService.subscribe((state) => {
       const isTimeToLeave = !state.can({
-        type: TicketMachineEventString.SHOW_JOINED,
+        type: TicketMachineEventString.SHOW_JOINED
       });
       if (isTimeToLeave) {
         api.executeCommand('hangup');

@@ -220,5 +220,5 @@ use('test');
 // ]);
 
 db.getCollection('operators').insertOne({
-  address: '0x5E90C65c58a4AD95EEA3b04615A4270d1D2ec1B1',
+  user: { address: '0x5E90C65c58a4AD95EEA3b04615A4270d1D2ec1B1' },
 });

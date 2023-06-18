@@ -329,5 +329,5 @@ export const womensNames = [
   'Zaria',
   'Zelda',
   'Zephyr',
-  'Zion',
+  'Zion'
 ];

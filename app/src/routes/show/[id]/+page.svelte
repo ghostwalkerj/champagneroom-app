@@ -14,7 +14,6 @@
 
   import type { ActionData, PageData } from './$types';
 
-
   export let data: PageData;
   export let form: ActionData;
   let show = data.show;
@@ -38,7 +37,7 @@
     };
   };
   onMount(() => {
-    showUnSub = showStore(show).subscribe(_show => {
+    showUnSub = showStore(show).subscribe((_show) => {
       show = _show;
     });
   });

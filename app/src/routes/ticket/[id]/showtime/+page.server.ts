@@ -5,14 +5,14 @@ import jwt from 'jsonwebtoken';
 import urlJoin from 'url-join';
 
 import {
-  JITSI_APP_ID,
-  JITSI_JWT_SECRET,
-  JWT_EXPIRY,
+    JITSI_APP_ID,
+    JITSI_JWT_SECRET,
+    JWT_EXPIRY
 } from '$env/static/private';
 import {
-  PUBLIC_JITSI_DOMAIN,
-  PUBLIC_PIN_PATH,
-  PUBLIC_TICKET_PATH,
+    PUBLIC_JITSI_DOMAIN,
+    PUBLIC_PIN_PATH,
+    PUBLIC_TICKET_PATH
 } from '$env/static/public';
 
 import type { ShowType } from '$lib/models/show';
@@ -52,7 +52,7 @@ export const actions: Actions = {
       ticketService.send(TicketMachineEventString.SHOW_LEFT);
     }
     return { success: true };
-  },
+  }
 };
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
@@ -106,9 +106,9 @@ export const load: PageServerLoad = async ({ params, cookies, locals }) => {
         user: {
           name: ticket.customerName,
           affiliation: 'member',
-          lobby_bypass: false,
-        },
-      },
+          lobby_bypass: false
+        }
+      }
     },
     JITSI_JWT_SECRET
   );
@@ -116,8 +116,8 @@ export const load: PageServerLoad = async ({ params, cookies, locals }) => {
   return {
     jitsiToken,
     ticket: ticket.toObject({
-      flattenObjectIds: true,
+      flattenObjectIds: true
     }),
-    show: show.toObject({ flattenObjectIds: true }),
+    show: show.toObject({ flattenObjectIds: true })
   };
 };

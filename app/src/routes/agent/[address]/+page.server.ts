@@ -3,8 +3,8 @@ import { uniqueNamesGenerator } from 'unique-names-generator';
 import urlJoin from 'url-join';
 
 import {
-  PUBLIC_AGENT_PATH,
-  PUBLIC_DEFAULT_PROFILE_IMAGE,
+    PUBLIC_AGENT_PATH,
+    PUBLIC_DEFAULT_PROFILE_IMAGE
 } from '$env/static/public';
 
 import { Agent } from '$lib/models/agent';
@@ -30,7 +30,7 @@ export const actions: Actions = {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     let agent = await Agent.findOne({
-      address,
+      address
     }).exec();
 
     if (agent === null) {
@@ -39,14 +39,14 @@ export const actions: Actions = {
         name:
           'Agent ' +
           uniqueNamesGenerator({
-            dictionaries: [womensNames],
-          }),
+            dictionaries: [womensNames]
+          })
       });
     }
 
     return {
       success: true,
-      agent: agent.toObject({ flattenObjectIds: true }),
+      agent: agent.toObject({ flattenObjectIds: true })
     };
   },
   create_talent: async ({ request }) => {
@@ -61,7 +61,7 @@ export const actions: Actions = {
     }
     if (!name || name.length < 3 || name.length > 50) {
       name = uniqueNamesGenerator({
-        dictionaries: [womensNames],
+        dictionaries: [womensNames]
       });
     }
     if (
@@ -76,13 +76,13 @@ export const actions: Actions = {
       name,
       agentCommission: +agentCommission,
       agent: agentId,
-      profileImageUrl: PUBLIC_DEFAULT_PROFILE_IMAGE,
+      profileImageUrl: PUBLIC_DEFAULT_PROFILE_IMAGE
     });
 
     return {
-      success: true,
+      success: true
     };
-  },
+  }
 };
 
 export const load: PageServerLoad = async ({ params, url }) => {
@@ -100,6 +100,6 @@ export const load: PageServerLoad = async ({ params, url }) => {
     .exec();
 
   return {
-    agent: agent.toObject({ flattenObjectIds: true }),
+    agent: agent.toObject({ flattenObjectIds: true })
   };
 };

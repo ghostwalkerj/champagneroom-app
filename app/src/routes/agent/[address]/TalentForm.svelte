@@ -15,7 +15,7 @@
 
   $: loading = false;
   $: talentName = uniqueNamesGenerator({
-    dictionaries: [womensNames],
+    dictionaries: [womensNames]
   });
 
   const onSubmit = ({}) => {
@@ -27,7 +27,7 @@
       await applyAction(result);
       loading = false;
       talentName = uniqueNamesGenerator({
-        dictionaries: [womensNames],
+        dictionaries: [womensNames]
       });
     };
   };

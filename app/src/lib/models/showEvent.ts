@@ -19,10 +19,10 @@ const showeventSchema = new Schema(
     ticketInfo: {
       type: {
         name: { type: String },
-        price: { type: Number },
+        price: { type: Number }
       },
-      required: true,
-    },
+      required: true
+    }
   },
   { timestamps: true }
 );
@@ -37,7 +37,7 @@ export const createShowEvent = ({
   show,
   type,
   ticket,
-  transaction,
+  transaction
 }: {
   show: ShowDocumentType;
   type: string;
@@ -53,8 +53,8 @@ export const createShowEvent = ({
     talent: show.talent,
     ticketInfo: {
       name: ticket?.customerName,
-      price: ticket?.price,
-    },
+      price: ticket?.price
+    }
   });
 };
 

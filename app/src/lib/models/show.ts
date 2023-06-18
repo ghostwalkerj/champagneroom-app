@@ -22,35 +22,35 @@ enum ShowStatus {
   LIVE = 'LIVE',
   STOPPED = 'STOPPED',
   IN_ESCROW = 'IN ESCROW',
-  IN_DISPUTE = 'IN DISPUTE',
+  IN_DISPUTE = 'IN DISPUTE'
 }
 
 const runtimeSchema = new Schema({
   startDate: { type: Date, required: true, default: new Date() },
-  endDate: { type: Date },
+  endDate: { type: Date }
 });
 
 const disputeStatsSchema = new Schema({
   totalDisputes: {
     type: Number,
     required: true,
-    default: 0,
+    default: 0
   },
   totalDisputesRefunded: {
     type: Number,
     required: true,
-    default: 0,
+    default: 0
   },
   totalDisputesResolved: {
     type: Number,
     required: true,
-    default: 0,
+    default: 0
   },
   totalDisputesPending: {
     type: Number,
     required: true,
-    default: 0,
-  },
+    default: 0
+  }
 });
 
 const salesStatsSchema = new Schema({
@@ -59,32 +59,32 @@ const salesStatsSchema = new Schema({
     required: true,
     validate: {
       validator: Number.isInteger,
-      message: '{VALUE} is not an integer value',
-    },
+      message: '{VALUE} is not an integer value'
+    }
   },
   ticketsSold: {
     type: Number,
     default: 0,
     validate: {
       validator: Number.isInteger,
-      message: '{VALUE} is not an integer value',
-    },
+      message: '{VALUE} is not an integer value'
+    }
   },
   ticketsReserved: {
     type: Number,
     default: 0,
     validate: {
       validator: Number.isInteger,
-      message: '{VALUE} is not an integer value',
-    },
+      message: '{VALUE} is not an integer value'
+    }
   },
   ticketsRefunded: {
     type: Number,
     default: 0,
     validate: {
       validator: Number.isInteger,
-      message: '{VALUE} is not an integer value',
-    },
+      message: '{VALUE} is not an integer value'
+    }
   },
 
   ticketsRedeemed: {
@@ -92,46 +92,46 @@ const salesStatsSchema = new Schema({
     default: 0,
     validate: {
       validator: Number.isInteger,
-      message: '{VALUE} is not an integer value',
-    },
+      message: '{VALUE} is not an integer value'
+    }
   },
   totalSales: {
     type: Number,
     default: 0,
     validate: {
       validator: Number.isInteger,
-      message: '{VALUE} is not an integer value',
-    },
+      message: '{VALUE} is not an integer value'
+    }
   },
   totalRefunded: {
     type: Number,
     default: 0,
     validate: {
       validator: Number.isInteger,
-      message: '{VALUE} is not an integer value',
-    },
+      message: '{VALUE} is not an integer value'
+    }
   },
   totalRevenue: {
     type: Number,
     default: 0,
     validate: {
       validator: Number.isInteger,
-      message: '{VALUE} is not an integer value',
-    },
-  },
+      message: '{VALUE} is not an integer value'
+    }
+  }
 });
 
 const feedbackStatsSchema = new Schema({
   numberOfReviews: {
     type: Number,
     required: true,
-    default: 0,
+    default: 0
   },
   averageRating: {
     type: Number,
     required: true,
-    default: 0,
-  },
+    default: 0
+  }
 });
 
 const showStateSchema = new Schema(
@@ -140,23 +140,23 @@ const showStateSchema = new Schema(
       type: String,
       enum: ShowStatus,
       required: true,
-      default: ShowStatus.CREATED,
+      default: ShowStatus.CREATED
     },
     activeState: { type: Boolean, default: true, index: true },
     salesStats: {
       type: salesStatsSchema,
       required: true,
-      default: () => ({}),
+      default: () => ({})
     },
     feedbackStats: {
       type: feedbackStatsSchema,
       required: true,
-      default: () => ({}),
+      default: () => ({})
     },
     disputeStats: {
       type: disputeStatsSchema,
       required: true,
-      default: () => ({}),
+      default: () => ({})
     },
     cancel: cancelSchema,
     finalize: finalizeSchema,
@@ -166,38 +166,38 @@ const showStateSchema = new Schema(
       type: [
         {
           type: Schema.Types.ObjectId,
-          ref: 'Ticket.ticketState.refund',
-        },
+          ref: 'Ticket.ticketState.refund'
+        }
       ],
       required: true,
-      default: () => [],
+      default: () => []
     },
     sales: {
       type: [
         {
           type: Schema.Types.ObjectId,
-          ref: 'Ticket.ticketState.sale',
-        },
+          ref: 'Ticket.ticketState.sale'
+        }
       ],
       required: true,
-      default: () => [],
+      default: () => []
     },
     disputes: {
       type: [
         {
           type: Schema.Types.ObjectId,
-          ref: 'Ticket.ticketState.dispute',
-        },
+          ref: 'Ticket.ticketState.dispute'
+        }
       ],
       required: true,
-      default: () => [],
+      default: () => []
     },
     current: {
       type: Boolean,
       required: true,
       default: true,
-      index: true,
-    },
+      index: true
+    }
   },
   { timestamps: true }
 );
@@ -210,14 +210,14 @@ const showSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'Talent',
       required: true,
-      index: true,
+      index: true
     },
     agent: { type: Schema.Types.ObjectId, ref: 'Agent', required: true },
     roomId: {
       type: String,
       required: true,
       unique: true,
-      default: () => nanoid(),
+      default: () => nanoid()
     },
     coverImageUrl: { type: String, trim: true },
     duration: {
@@ -227,15 +227,15 @@ const showSchema = new Schema(
       max: [180, 'Duration must be under 180 minutes'],
       validate: {
         validator: Number.isInteger,
-        message: '{VALUE} is not an integer value',
-      },
+        message: '{VALUE} is not an integer value'
+      }
     },
     name: {
       type: String,
       required: true,
       trim: true,
       minLength: [3, 'Name must be at least 3 characters'],
-      maxLength: [50, 'Name must be under 50 characters'],
+      maxLength: [50, 'Name must be under 50 characters']
     },
     capacity: {
       type: Number,
@@ -243,8 +243,8 @@ const showSchema = new Schema(
       min: 1,
       validate: {
         validator: Number.isInteger,
-        message: '{VALUE} is not an integer value',
-      },
+        message: '{VALUE} is not an integer value'
+      }
     },
     price: { type: Number, required: true, min: 1 },
     talentInfo: {
@@ -252,18 +252,18 @@ const showSchema = new Schema(
         name: { type: String, required: true },
         profileImageUrl: { type: String, required: true },
         ratingAvg: { type: Number, required: true, default: 0 },
-        numberOfReviews: { type: Number, required: true, default: 0 },
+        numberOfReviews: { type: Number, required: true, default: 0 }
       },
-      required: true,
+      required: true
     },
-    showState: { type: showStateSchema, required: true, default: () => ({}) },
+    showState: { type: showStateSchema, required: true, default: () => ({}) }
   },
   { timestamps: true }
 );
 
 showSchema.plugin(fieldEncryption, {
   fields: ['roomId'],
-  secret: process.env.MONGO_DB_FIELD_SECRET,
+  secret: process.env.MONGO_DB_FIELD_SECRET
 });
 
 export const Show = models?.Show

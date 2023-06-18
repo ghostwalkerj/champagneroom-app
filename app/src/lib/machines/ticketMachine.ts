@@ -4,13 +4,13 @@
 import { Types } from 'mongoose';
 import { nanoid } from 'nanoid';
 import {
+  type ActorRefFrom,
   assign,
   createMachine,
   interpret,
   send,
   spawn,
-  type ActorRefFrom,
-  type StateFrom,
+  type StateFrom
 } from 'xstate';
 import { raise } from 'xstate/lib/actions';
 
@@ -20,7 +20,7 @@ import type {
   DisputeType,
   FeedbackType,
   FinalizeType,
-  RefundReason,
+  RefundReason
 } from '$lib/models/common';
 import type { ShowDocumentType } from '$lib/models/show';
 import type { TicketDocumentType, TicketStateType } from '$lib/models/ticket';
@@ -33,7 +33,7 @@ import {
   createShowMachine,
   type ShowMachineOptions,
   type ShowMachineServiceType,
-  type ShowMachineType,
+  type ShowMachineType
 } from './showMachine';
 
 export enum TicketMachineEventString {
@@ -47,7 +47,7 @@ export enum TicketMachineEventString {
   SHOW_ENDED = 'SHOW ENDED',
   SHOW_CANCELLED = 'SHOW CANCELLED',
   TICKET_FINALIZED = 'TICKET FINALIZED',
-  DISPUTE_RESOLVED = 'DISPUTE RESOLVED',
+  DISPUTE_RESOLVED = 'DISPUTE RESOLVED'
 }
 type TicketMachineEventType =
   | {
@@ -96,7 +96,7 @@ type TicketMachineEventType =
 const createTicketMachine = ({
   ticketDocument,
   showDocument,
-  showMachineOptions,
+  showMachineOptions
 }: {
   ticketDocument: TicketDocumentType;
   ticketMachineOptions?: TicketMachineOptions;
@@ -105,7 +105,7 @@ const createTicketMachine = ({
 }) => {
   const parentShowMachine = createShowMachine({
     showDocument,
-    showMachineOptions,
+    showMachineOptions
   });
 
   /** @xstate-layout N4IgpgJg5mDOIC5QBcCWBjA1mZBZAhugBaoB2YAxAMoASA8gOoAEAwgIIByLAogDK-cAIgG0ADAF1EoAA4B7WKjSzSUkAA9EAFgBMAGhABPRNoCM2zQDoAHCZObRVgOyaAnNqsuAvp-1osOAmIySlpGVk4efiFhE0kkEDkFJRV4jQQdfSMEEwBmF0cLAFYANjdtQtETYs0rYqtvXwxsPEIScgs-Zt5ZfAhICjE4mXlFVGVVNJzHQos7UWLi0ULzURcTZ0zEXNFLbRdC2tFHHM0qzRyGkE6A1uCOppxu3v6YoYSR5InEHMKZuYWlis1htDMYdjNKpoalZRDlio5HKJtJdri0gu1UU8+hABto3olRuNUogrHpQQhzG4LKZHNUctp5vkTCiHmi2mB7v5kFiXjl8R8xilQGltKZqcVfgdCvS3BVHJsEMUfhZXDlYZopSYdpoWVzAuzOV0etiBpp+UlBV8EFM-vYAct7MDNAqzAdqfs1vYEXZcrrmvq7pjjS9CubCUL1IhHGSstpSjMpnDnCVRKtkT4rqyAxjWTyccJimHPsSEMsFWq4yqrGqXOdYfNmRnUdmOUHnvnHEXLSWGSZxZKrNK9uUjgrRS4inkXE5HGtlm5in6buiOQAnOBgVcAN36oWY3A4gmiElUBOLwq2NgK6wZLhyHkKjisGXJJysFlh09K1cfn51TazW52nXWBNx3CALAAd3wUZSCgTQAAV8AMABbMBSGQCgELYABNXADwAFSYAAlbgeAASQANWPLsiQvbJYWKIpChqaZYQRGF5XJKxn1mJUjlycxim0RxG0aPUgLXDdt0gKCYLQODEOQtCMKw3D8I4IjSIo6iRFiU8BToyMEGOSw7RE4oTEfcpygVUkciKbYTGfeltkKJc2TuECwNk6DYPgpDUPQzD2C4PheDYAjyLoDgmHIjhyKiyKaIMi0jLSZyRNmaNVnvfYnxfLIqlEixZwOI48lsJwLgAiSVwsbyZIgvyFIC5TgooULIgiqKYrihKkoI6J9PiM9u3orVK1+ViKimJ9R3JMwsufOMdGqdZan-cT-UkhrpPAuT-KUoLVMGVLwytSamOmpxZo4hasmrd8qhyMxNAWWkdhq7blwNRqDpash4KoIhZEg6h6GYAApOh4pS0bDIjDKr2y288sfFa7PmUqtVTFx+Oc+YPJbPbQKaiwyFGfBkEgFh8FIdAwAAGyZ6nBUO1rNGIsAADMAFdSBxUiADEAFVDxIsjuCo+HhjSpHL3WVHcofAqY0vUVZl+WwrMfKzYWJ3b-tkym0Gp2n6cZlm2eUDmga53mBaF7gxYl7Tpd015zvPYy7DhaxCnyJw4xOUxihdON30ZUUKjOWpF1qnb6vXSAwDQnE9yYARhYIs6Eflq1ykRCw8g1VadjMeEFWcbRqVx8rVcHQ3k7AVP04hsIYbhkQT3zi6ewqGZzjYwp1hyV7nXJaoZmmOo7xOSonzEzM6r+1u+nbzODyPHvaIVxV1YpZw+0TGEpkHJ9n2bg0yG4WB0FXMGKGF7ghAAITYFgAGlJZ02X3gLiWU4DlTKImcDKQccYxxgOyg4aMJQ3AmHyNfO4t976P3BoIciVAEKiyGv1RK5Fkq729uNYywDSonDAecPYkDw7kncI+Sci94Q-Eyu5ROv1UGkDvg-J+UVv7cCIsLeKbBeDkQAFr-zGulLQuRKGaGoRA5Y9DYyWVEDjaYNlR52BKN4DMpBZB9HgPEZsklSGyIQAAWlUYgfYH57Cpicc4xwKCcxcjzBY-ehUtjlDMkcJYUJFHVAcG4qSZNwJeKtHUJi5laRWXgbZckxwmKVBrGsfI+wRJhNJj5Zq8l7aBRUsgKJJYEQQjYQcKYfspgKjcJYfGllqzOSsq9HJxt8lHRBmDUpE0fhmQ1Kcaos5KiijsucCwCxXqvWmtUdMP1PLAX2ibUgVMaYQDpgzZmrMfYyP3rkHiAcg7RiVDoKoLpCZFFKKYKEmToztOWRBU2qBzYbMttsm2pA7aKW5vzQWvTfZyhVK4Coz4mS2BdHCCcyxtB5VpAcJwDy26QABSKZyTF7xqmEh4H4cJbEIBcpMpUop3Bwq8JwxZHJ0DvJZiivuPs0UuAnDUDUr1ygShKIfUwqxZh2HODxIu30V5JwNDzMg+AmaoAAF50rlv3eidILD4wXNKFiiwzDQJ5YsesiwGT0iODktBfDIKouMHeSZlRiV2HxrUQo0CmHaoWMJcB2SKUkzIIIVAsBpB8xpqaxUSsJTwhYnixYs5yyLyrK9L6DJR6uoWSTFCXrQIQG6Sa+lZCMrTlrvSeyHhFHLFhOWao4olT5EshUI4719GeCAA */
@@ -119,12 +119,12 @@ const createTicketMachine = ({
         ) as TicketStateType,
         errorMessage: undefined as string | undefined,
         id: nanoid(),
-        showMachineRef: undefined as ActorRefFrom<ShowMachineType> | undefined,
+        showMachineRef: undefined as ActorRefFrom<ShowMachineType> | undefined
       },
       // eslint-disable-next-line @typescript-eslint/consistent-type-imports
       tsTypes: {} as import('./ticketMachine.typegen').Typegen0,
       schema: {
-        events: {} as TicketMachineEventType,
+        events: {} as TicketMachineEventType
       },
       predictableActionArguments: true,
       id: 'ticketMachine',
@@ -132,7 +132,7 @@ const createTicketMachine = ({
       entry: assign(() => {
         const showMachineReference = spawn(parentShowMachine, {
           name: 'showMachineService',
-          sync: true,
+          sync: true
         });
         return { showMachineRef: showMachineReference };
       }),
@@ -141,37 +141,37 @@ const createTicketMachine = ({
           always: [
             {
               target: 'reserved',
-              cond: 'ticketReserved',
+              cond: 'ticketReserved'
             },
             {
               target: 'cancelled',
-              cond: 'ticketCancelled',
+              cond: 'ticketCancelled'
             },
             {
               target: 'finalized',
-              cond: 'ticketFinalized',
+              cond: 'ticketFinalized'
             },
             {
               target: 'redeemed',
-              cond: 'ticketRedeemed',
+              cond: 'ticketRedeemed'
             },
             {
               target: '#ticketMachine.reserved.initiatedCancellation',
-              cond: 'ticketInCancellationInitiated',
+              cond: 'ticketInCancellationInitiated'
             },
             {
               target: '#ticketMachine.ended.inEscrow',
-              cond: 'ticketInEscrow',
+              cond: 'ticketInEscrow'
             },
             {
               target: '#ticketMachine.ended.inDispute',
-              cond: 'ticketInDispute',
+              cond: 'ticketInDispute'
             },
             {
               target: '#ticketMachine.ended.missedShow',
-              cond: 'ticketMissedShow',
-            },
-          ],
+              cond: 'ticketMissedShow'
+            }
+          ]
         },
         reserved: {
           initial: 'waiting4Payment',
@@ -180,19 +180,19 @@ const createTicketMachine = ({
               always: [
                 {
                   target: 'waiting4Show',
-                  cond: 'fullyPaid',
-                },
+                  cond: 'fullyPaid'
+                }
               ],
               on: {
                 'PAYMENT RECEIVED': [
                   {
                     target: 'waiting4Show',
                     cond: 'fullyPaid',
-                    actions: ['receivePayment', 'sendTicketSold'],
+                    actions: ['receivePayment', 'sendTicketSold']
                   },
                   {
-                    actions: ['receivePayment'],
-                  },
+                    actions: ['receivePayment']
+                  }
                 ],
                 'CANCELLATION INITIATED': [
                   {
@@ -201,24 +201,24 @@ const createTicketMachine = ({
                     actions: [
                       'initiateCancellation',
                       'cancelTicket',
-                      'sendTicketCancelled',
-                    ],
+                      'sendTicketCancelled'
+                    ]
                   },
                   {
                     target: 'initiatedCancellation',
-                    actions: ['initiateCancellation'],
-                  },
-                ],
-              },
+                    actions: ['initiateCancellation']
+                  }
+                ]
+              }
             },
             waiting4Show: {
               on: {
                 'SHOW JOINED': {
                   target: '#ticketMachine.redeemed',
                   cond: 'canWatchShow',
-                  actions: ['redeemTicket', 'sendJoinedShow'],
-                },
-              },
+                  actions: ['redeemTicket', 'sendJoinedShow']
+                }
+              }
             },
             initiatedCancellation: {
               initial: 'waiting4Refund',
@@ -232,43 +232,43 @@ const createTicketMachine = ({
                         actions: [
                           'receiveRefund',
                           'cancelTicket',
-                          'sendTicketRefunded',
-                        ],
+                          'sendTicketRefunded'
+                        ]
                       },
                       {
-                        actions: ['receiveRefund'],
-                      },
-                    ],
-                  },
-                },
-              },
-            },
-          },
+                        actions: ['receiveRefund']
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
         },
         redeemed: {
           on: {
             'SHOW LEFT': { actions: ['sendLeftShow'] },
             'SHOW JOINED': {
               cond: 'canWatchShow',
-              actions: ['sendJoinedShow'],
-            },
-          },
+              actions: ['sendJoinedShow']
+            }
+          }
         },
         cancelled: {
           type: 'final',
-          entry: ['deactivateTicket'],
+          entry: ['deactivateTicket']
         },
         finalized: {
           type: 'final',
-          entry: ['deactivateTicket'],
+          entry: ['deactivateTicket']
         },
         ended: {
           initial: 'inEscrow',
           on: {
             'TICKET FINALIZED': {
               target: '#ticketMachine.finalized',
-              actions: ['finalizeTicket'],
-            },
+              actions: ['finalizeTicket']
+            }
           },
           states: {
             inEscrow: {
@@ -276,8 +276,8 @@ const createTicketMachine = ({
                 {
                   target: 'missedShow',
                   cond: 'showMissed',
-                  actions: ['missShow'],
-                },
+                  actions: ['missShow']
+                }
               ],
               on: {
                 'FEEDBACK RECEIVED': {
@@ -287,17 +287,17 @@ const createTicketMachine = ({
                       type: 'TICKET FINALIZED',
                       finalize: {
                         finalizedAt: new Date(),
-                        finalizedBy: ActorType.CUSTOMER,
-                      },
+                        finalizedBy: ActorType.CUSTOMER
+                      }
                     }),
-                    'sendFeedbackReceived',
-                  ],
+                    'sendFeedbackReceived'
+                  ]
                 },
                 'DISPUTE INITIATED': {
                   target: 'inDispute',
-                  actions: ['initiateDispute', 'sendDisputeInitiated'],
-                },
-              },
+                  actions: ['initiateDispute', 'sendDisputeInitiated']
+                }
+              }
             },
             inDispute: {
               on: {
@@ -308,42 +308,42 @@ const createTicketMachine = ({
                       type: 'TICKET FINALIZED',
                       finalize: {
                         finalizedAt: new Date(),
-                        finalizedBy: ActorType.ARBITRATOR,
-                      },
+                        finalizedBy: ActorType.ARBITRATOR
+                      }
                     }),
-                    'sendDisputeResolved',
-                  ],
-                },
-              },
+                    'sendDisputeResolved'
+                  ]
+                }
+              }
             },
-            missedShow: {},
-          },
-        },
+            missedShow: {}
+          }
+        }
       },
       on: {
         'SHOW CANCELLED': [
           {
             target: '#ticketMachine.cancelled',
             cond: 'canCancel',
-            actions: ['initiateCancellation', 'cancelTicket'],
+            actions: ['initiateCancellation', 'cancelTicket']
           },
           {
             target: '#ticketMachine.reserved.initiatedCancellation',
-            actions: ['initiateCancellation'],
-          },
+            actions: ['initiateCancellation']
+          }
         ],
         'SHOW ENDED': {
           target: '#ticketMachine.ended',
-          actions: ['endShow'],
-        },
-      },
+          actions: ['endShow']
+        }
+      }
     },
     {
       actions: {
         sendJoinedShow: send(
           (context) => ({
             type: 'CUSTOMER JOINED',
-            ticket: context.ticketDocument,
+            ticket: context.ticketDocument
           }),
           { to: (context) => context.showMachineRef! }
         ),
@@ -351,7 +351,7 @@ const createTicketMachine = ({
         sendLeftShow: send(
           (context) => ({
             type: 'CUSTOMER LEFT',
-            ticket: context.ticketDocument,
+            ticket: context.ticketDocument
           }),
           { to: (context) => context.showMachineRef! }
         ),
@@ -359,7 +359,7 @@ const createTicketMachine = ({
         sendTicketSold: send(
           (context) => ({
             type: 'TICKET SOLD',
-            sale: context.ticketState.sale,
+            sale: context.ticketState.sale
           }),
           { to: (context) => context.showMachineRef! }
         ),
@@ -367,7 +367,7 @@ const createTicketMachine = ({
         sendTicketRefunded: send(
           (context) => ({
             type: 'TICKET REFUNDED',
-            refund: context.ticketState.refund,
+            refund: context.ticketState.refund
           }),
           { to: (context) => context.showMachineRef! }
         ),
@@ -375,7 +375,7 @@ const createTicketMachine = ({
         sendTicketCancelled: send(
           (context) => ({
             type: 'TICKET CANCELLED',
-            cancel: context.ticketState.cancel,
+            cancel: context.ticketState.cancel
           }),
           { to: (context) => context.showMachineRef! }
         ),
@@ -383,7 +383,7 @@ const createTicketMachine = ({
         sendFeedbackReceived: send(
           (context) => ({
             type: 'FEEDBACK RECEIVED',
-            feedback: context.ticketState.feedback,
+            feedback: context.ticketState.feedback
           }),
           { to: (context) => context.showMachineRef! }
         ),
@@ -391,7 +391,7 @@ const createTicketMachine = ({
         sendDisputeInitiated: send(
           (context) => ({
             type: 'TICKET_DISPUTED',
-            dispute: context.ticketState.dispute,
+            dispute: context.ticketState.dispute
           }),
           { to: (context) => context.showMachineRef! }
         ),
@@ -399,7 +399,7 @@ const createTicketMachine = ({
         sendDisputeResolved: send(
           (context) => ({
             type: 'DISPUTE RESOLVED',
-            decision: context.ticketState.dispute!.decision,
+            decision: context.ticketState.dispute!.decision
           }),
           { to: (context) => context.showMachineRef! }
         ),
@@ -409,8 +409,8 @@ const createTicketMachine = ({
             ticketState: {
               ...context.ticketState,
               status: TicketStatus.CANCELLATION_INITIATED,
-              cancel: event.cancel,
-            },
+              cancel: event.cancel
+            }
           };
         }),
 
@@ -421,9 +421,9 @@ const createTicketMachine = ({
               ...context.ticketState,
               status: TicketStatus.REDEEMED,
               redemption: {
-                redeemedAt: new Date(),
-              },
-            },
+                redeemedAt: new Date()
+              }
+            }
           };
         }),
 
@@ -431,8 +431,8 @@ const createTicketMachine = ({
           return {
             ticketState: {
               ...context.ticketState,
-              status: TicketStatus.CANCELLED,
-            },
+              status: TicketStatus.CANCELLED
+            }
           };
         }),
 
@@ -441,7 +441,7 @@ const createTicketMachine = ({
             _id: new Types.ObjectId(),
             soldAt: new Date(),
             transactions: [],
-            amount: 0,
+            amount: 0
           };
           sale.amount += +event.transaction.value;
           sale.transactions.push(event.transaction._id);
@@ -450,8 +450,8 @@ const createTicketMachine = ({
               ...context.ticketState,
               totalPaid:
                 context.ticketState.totalPaid + +event.transaction.value,
-              sale,
-            },
+              sale
+            }
           };
         }),
 
@@ -462,7 +462,7 @@ const createTicketMachine = ({
             refundedAt: new Date(),
             transactions: [],
             amount: 0,
-            reason: event.reason,
+            reason: event.reason
           };
           refund.amount += +event.transaction.value;
           refund.transactions.push(event.transaction._id);
@@ -471,8 +471,8 @@ const createTicketMachine = ({
               ...context.ticketState,
               totalRefunded:
                 context.ticketState.totalRefunded + +event.transaction.value,
-              refund,
-            },
+              refund
+            }
           };
         }),
 
@@ -480,8 +480,8 @@ const createTicketMachine = ({
           return {
             ticketState: {
               ...context.ticketState,
-              feedback: event.feedback,
-            },
+              feedback: event.feedback
+            }
           };
         }),
 
@@ -490,8 +490,8 @@ const createTicketMachine = ({
             ticketState: {
               ...context.ticketState,
               status: TicketStatus.IN_DISPUTE,
-              dispute: event.dispute,
-            },
+              dispute: event.dispute
+            }
           };
         }),
 
@@ -501,9 +501,9 @@ const createTicketMachine = ({
               ...context.ticketState,
               status: TicketStatus.IN_ESCROW,
               escrow: {
-                startedAt: new Date(),
-              },
-            },
+                startedAt: new Date()
+              }
+            }
           };
         }),
 
@@ -514,8 +514,8 @@ const createTicketMachine = ({
               ticketState: {
                 ...context.ticketState,
                 finalize,
-                status: TicketStatus.FINALIZED,
-              },
+                status: TicketStatus.FINALIZED
+              }
             };
           }
           return {};
@@ -527,13 +527,13 @@ const createTicketMachine = ({
             ...context.ticketState.dispute,
             decision: event.decision,
             endedAt: new Date(),
-            resolved: true,
+            resolved: true
           };
           return {
             ticketState: {
               ...context.ticketState,
-              dispute,
-            },
+              dispute
+            }
           };
         }),
 
@@ -541,8 +541,8 @@ const createTicketMachine = ({
           return {
             ticketState: {
               ...context.ticketState,
-              activeState: false,
-            },
+              activeState: false
+            }
           };
         }),
 
@@ -550,10 +550,10 @@ const createTicketMachine = ({
           return {
             ticketState: {
               ...context.ticketState,
-              status: TicketStatus.MISSED_SHOW,
-            },
+              status: TicketStatus.MISSED_SHOW
+            }
           };
-        }),
+        })
       },
 
       guards: {
@@ -607,8 +607,8 @@ const createTicketMachine = ({
             context.ticketState.totalPaid >= context.ticketDocument.price &&
             state.matches('started')
           );
-        },
-      },
+        }
+      }
     }
   );
 };
@@ -621,7 +621,7 @@ export const createTicketMachineService = ({
   ticketDocument,
   ticketMachineOptions,
   showDocument,
-  showMachineOptions,
+  showMachineOptions
 }: {
   ticketDocument: TicketDocumentType;
   ticketMachineOptions?: TicketMachineOptions;
@@ -632,7 +632,7 @@ export const createTicketMachineService = ({
     ticketDocument,
     ticketMachineOptions,
     showDocument,
-    showMachineOptions,
+    showMachineOptions
   });
   const ticketService = interpret(ticketMachine).start();
 
@@ -667,7 +667,7 @@ export const createTicketMachineService = ({
           showMachineOptions.saveShowEventCallback({
             type: event.type,
             ticket,
-            transaction,
+            transaction
           });
       });
     }

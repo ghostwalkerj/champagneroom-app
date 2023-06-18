@@ -29,7 +29,7 @@ export const actions: Actions = {
     cookies.set('pin', hash, { path: '/' });
     const redirectUrl = urlJoin(url.origin, PUBLIC_TICKET_PATH, ticketId);
     throw redirect(303, redirectUrl);
-  },
+  }
 };
 
 export const load: PageServerLoad = async ({ params, cookies }) => {

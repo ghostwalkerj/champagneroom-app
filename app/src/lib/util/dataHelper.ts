@@ -44,19 +44,19 @@ const profileImageUrls = [
   'https://pcall.infura-ipfs.io/ipfs/QmQemzd1t1QormQctzCJH3TxF8b1ro7DDEvTkYqgcgN179?filename=265624746_718266912481588_5736966446373157921_n.jpeg',
   'https://pcall.infura-ipfs.io/ipfs/Qmez8feDWECfUZhmDwrJk2tuZymAhwh9skKDnXYpEWGw6X?filename=267571575_284077180433574_7982436933756852482_n.jpeg',
   'https://pcall.infura-ipfs.io/ipfs/QmWYJEjuAKRNWcStgREBtnYeNcTwT6yVMHRtrm9xpusQiV?filename=269165828_1335886283519646_1028280590026415409_n.jpeg',
-  'https://pcall.infura-ipfs.io/ipfs/QmUUGzAdikeq3Atnp92dKPaCzeRdAQTKw7ef4koBjRLqxj?filename=269670589_264057749154930_5652168677962690913_n.jpeg',
+  'https://pcall.infura-ipfs.io/ipfs/QmUUGzAdikeq3Atnp92dKPaCzeRdAQTKw7ef4koBjRLqxj?filename=269670589_264057749154930_5652168677962690913_n.jpeg'
 ];
 
 export const generateTalent = async (agent: AgentDocumentType) => {
   const name: string = uniqueNamesGenerator({
-    dictionaries: [womensNames],
+    dictionaries: [womensNames]
   });
   const profileImageUrl =
     profileImageUrls[Math.floor(Math.random() * profileImageUrls.length)];
   const talent = await agent.createTalent({
     name,
     agentCommission: 10,
-    profileImageUrl,
+    profileImageUrl
   });
   const count = Math.floor(Math.random() * 100) + 1;
   generateShows(talent, count);
@@ -77,7 +77,7 @@ const generateShows = (talent: TalentDocument, count: number) => {
     const _feedback = {
       rating: Math.floor(Math.random() * 5) + 1,
       createdAt: Date.now(),
-      comments: 'This is a comment',
+      comments: 'This is a comment'
     };
     // const _link = {
     //   linkState: {

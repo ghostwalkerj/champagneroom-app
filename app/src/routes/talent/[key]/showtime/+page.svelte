@@ -34,7 +34,7 @@
     formData.append('showId', currentShow?._id.toString());
     fetch($page.url.href + '?/stop_show', {
       method: 'POST',
-      body: formData,
+      body: formData
     });
     api?.executeCommand('endConference');
   };
@@ -67,15 +67,15 @@
       height: '100%',
       parentNode: videoCallElement,
       userInfo: {
-        displayName: talentObject.name,
+        displayName: talentObject.name
       },
       interfaceConfigOverwrite: jitsiInterfaceConfigOverwrite,
       configOverwrite: {
         localSubject: currentShow?.name,
         filmstrip: {
-          enabled: false,
-        },
-      },
+          enabled: false
+        }
+      }
     };
 
     // @ts-ignore

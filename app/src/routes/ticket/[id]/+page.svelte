@@ -23,7 +23,6 @@
 
   import type { ActionData, PageData } from './$types';
 
-
   export let data: PageData;
   export let form: ActionData;
 
@@ -55,25 +54,25 @@
       cancel: {
         cancelledAt: new Date(),
         cancelledBy: ActorType.CUSTOMER,
-        reason: CancelReason.CUSTOMER_CANCELLED,
-      },
+        reason: CancelReason.CUSTOMER_CANCELLED
+      }
     });
     canLeaveFeedback = state.can({
       type: 'FEEDBACK RECEIVED',
       feedback: {
         createdAt: new Date(),
-        rating: 5,
-      },
+        rating: 5
+      }
     });
     canDispute = state.can({
       type: 'DISPUTE INITIATED',
-      dispute:{
+      dispute: {
         startedAt: new Date(),
         disputedBy: ActorType.CUSTOMER,
         reason: DisputeReason.ENDED_EARLY,
         explanation: 'The show ended early',
-        resolved: false,
-      },
+        resolved: false
+      }
     });
     isWaitingForShow = state.matches('reserved.waiting4Show') && !canWatchShow;
     isTicketDone = state.done ?? false;
@@ -81,21 +80,21 @@
 
   onMount(() => {
     if (ticket.ticketState.activeState) {
-      ticketUnSub = ticketStore(ticket).subscribe(ticketDocument => {
+      ticketUnSub = ticketStore(ticket).subscribe((ticketDocument) => {
         ticket = ticketDocument;
         useTicketMachine(
           createTicketMachineService({
             ticketDocument: ticket,
-            showDocument: show,
+            showDocument: show
           })
         );
       });
-      showUnSub = showStore(show).subscribe(showDocument => {
+      showUnSub = showStore(show).subscribe((showDocument) => {
         show = showDocument;
         useTicketMachine(
           createTicketMachineService({
             ticketDocument: ticket,
-            showDocument: show,
+            showDocument: show
           })
         );
       });
@@ -124,7 +123,7 @@
         useTicketMachine(
           createTicketMachineService({
             ticketDocument: ticket,
-            showDocument: show,
+            showDocument: show
           })
         );
         showUnSub?.();
