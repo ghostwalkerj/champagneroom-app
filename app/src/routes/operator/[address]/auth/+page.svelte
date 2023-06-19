@@ -11,7 +11,7 @@
 
   export let data: PageData;
 
-  const signingMessage = data.signingMessage;
+  const message = data.message;
 
   onMount(async () => {
     selectedAccount.subscribe(async (account) => {
@@ -20,7 +20,7 @@
         try {
           const signature = await $defaultWallet.provider.request({
             method: 'personal_sign',
-            params: [signingMessage, address]
+            params: [message, address]
           });
           console.log(signature);
         } catch (error) {

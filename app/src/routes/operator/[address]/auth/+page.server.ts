@@ -2,6 +2,7 @@ import type { Actions } from '@sveltejs/kit';
 import { error, fail, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import urlJoin from 'url-join';
+import { recover } from 'web3-eth-accounts';
 
 import {
   AUTH_SIGNING_MESSAGE,
@@ -20,7 +21,7 @@ const verifySignature = (
   signature: string
 ) => {
   try {
-    const signerAddr = ethers.verifyMessage(message, signature);
+    const signerAddr = recover(message, signature);
     if (signerAddr !== address) {
       return false;
     }
