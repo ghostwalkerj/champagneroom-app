@@ -28,7 +28,7 @@ export const actions: Actions = {
     const hash = createPinHash(ticketId, pin);
     cookies.set('pin', hash, { path: '/' });
     const redirectUrl = urlJoin(url.origin, PUBLIC_TICKET_PATH, ticketId);
-    throw redirect(303, redirectUrl);
+    throw redirect(302, redirectUrl);
   }
 };
 
@@ -48,6 +48,6 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
     .exec();
 
   if (pinHash && verifyPin(ticketId, ticket.pin, pinHash)) {
-    throw redirect(303, redirectUrl);
+    throw redirect(302, redirectUrl);
   }
 };

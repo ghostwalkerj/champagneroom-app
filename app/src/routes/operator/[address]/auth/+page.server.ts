@@ -22,7 +22,7 @@ const verifySignature = (
 ) => {
   try {
     const signerAddr = recover(message, signature);
-    if (signerAddr !== address) {
+    if (signerAddr.toLowerCase() !== address.toLowerCase()) {
       return false;
     }
     return true;
@@ -33,7 +33,7 @@ const verifySignature = (
 };
 
 export const actions: Actions = {
-  set_auth: async ({ params, cookies, request, url }) => {
+  auth: async ({ params, cookies, request, url }) => {
     const address = params.address;
     const operatorUrl = urlJoin(url.origin, PUBLIC_OPERATOR_PATH);
 
@@ -45,7 +45,7 @@ export const actions: Actions = {
     const signature = data.get('signature') as string;
 
     if (!signature) {
-      return fail(400, { signature, missingSignature: true });
+      throw error(400, 'Missing Signature');
     }
 
     const operator = await Operator.findOne({ 'user.address': address })
@@ -57,10 +57,8 @@ export const actions: Actions = {
     const message = AUTH_SIGNING_MESSAGE + operator.user.nonce;
 
     // Verify Auth
-    // auth
-
     if (!verifySignature(message, address, signature)) {
-      return fail(400, { signature, invalidSignature: true });
+      throw error(400, 'Invalid Signature');
     }
 
     // Update Operator
@@ -83,10 +81,6 @@ export const actions: Actions = {
       sameSite: 'lax',
       maxAge: exp
     });
-
-    // Redirect
-    const redirectUrl = urlJoin(url.origin, PUBLIC_OPERATOR_PATH, address);
-    throw redirect(303, redirectUrl);
   }
 };
 

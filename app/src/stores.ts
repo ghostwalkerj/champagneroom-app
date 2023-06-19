@@ -13,7 +13,7 @@ import type { TicketDocumentType } from '$lib/models/ticket';
 export const agentStore = (agent: AgentDocumentType) => {
   return abstractStore({
     doc: agent,
-    changesetPath: urlJoin(PUBLIC_CHANGESET_PATH, 'agent', agent.address)
+    changesetPath: urlJoin(PUBLIC_CHANGESET_PATH, 'agent', agent.user.address)
   });
 };
 

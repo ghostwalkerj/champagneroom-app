@@ -81,7 +81,7 @@ export const actions: Actions = {
       PUBLIC_TICKET_PATH,
       ticket._id.toString()
     );
-    throw redirect(303, redirectUrl);
+    throw redirect(302, redirectUrl);
   }
 };
 

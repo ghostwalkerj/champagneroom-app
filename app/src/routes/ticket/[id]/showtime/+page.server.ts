@@ -5,14 +5,14 @@ import jwt from 'jsonwebtoken';
 import urlJoin from 'url-join';
 
 import {
-    JITSI_APP_ID,
-    JITSI_JWT_SECRET,
-    JWT_EXPIRY
+  JITSI_APP_ID,
+  JITSI_JWT_SECRET,
+  JWT_EXPIRY
 } from '$env/static/private';
 import {
-    PUBLIC_JITSI_DOMAIN,
-    PUBLIC_PIN_PATH,
-    PUBLIC_TICKET_PATH
+  PUBLIC_JITSI_DOMAIN,
+  PUBLIC_PIN_PATH,
+  PUBLIC_TICKET_PATH
 } from '$env/static/public';
 
 import type { ShowType } from '$lib/models/show';
@@ -63,7 +63,7 @@ export const load: PageServerLoad = async ({ params, cookies, locals }) => {
   const pinUrl = urlJoin(ticketUrl, PUBLIC_PIN_PATH);
 
   if (!pinHash) {
-    throw redirect(303, pinUrl);
+    throw redirect(302, pinUrl);
   }
   if (ticketId === null) {
     throw error(404, 'Bad ticket id');
@@ -80,7 +80,7 @@ export const load: PageServerLoad = async ({ params, cookies, locals }) => {
 
   // Check if pin is correct
   if (!verifyPin(ticketId, ticket.pin, pinHash)) {
-    throw redirect(303, pinUrl);
+    throw redirect(302, pinUrl);
   }
 
   // Check if can watch the show
@@ -90,7 +90,7 @@ export const load: PageServerLoad = async ({ params, cookies, locals }) => {
   const ticketMachineState = ticketService.getSnapshot();
 
   if (!ticketMachineState.can(TicketMachineEventString.SHOW_JOINED)) {
-    throw redirect(303, ticketUrl);
+    throw redirect(302, ticketUrl);
   }
 
   ticketService.send(TicketMachineEventString.SHOW_JOINED);

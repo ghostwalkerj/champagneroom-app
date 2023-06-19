@@ -6,10 +6,10 @@ import urlJoin from 'url-join';
 import { PUBLIC_PIN_PATH } from '$env/static/public';
 
 import type {
-    CancelType,
-    DisputeReason,
-    DisputeType,
-    FeedbackType
+  CancelType,
+  DisputeReason,
+  DisputeType,
+  FeedbackType
 } from '$lib/models/common';
 import { CancelReason } from '$lib/models/common';
 import type { ShowType } from '$lib/models/show';
@@ -25,8 +25,8 @@ import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 import { ActorType } from '$lib/constants';
 import { verifyPin } from '$lib/util/pin';
 import {
-    getTicketMachineService,
-    getTicketMachineServiceFromId
+  getTicketMachineService,
+  getTicketMachineServiceFromId
 } from '$lib/util/util.server';
 
 import type { Actions, PageServerLoad } from './$types';
@@ -217,7 +217,7 @@ export const load: PageServerLoad = async ({ params, cookies, url }) => {
   const redirectUrl = urlJoin(url.href, PUBLIC_PIN_PATH);
 
   if (!pinHash) {
-    throw redirect(303, redirectUrl);
+    throw redirect(302, redirectUrl);
   }
   if (ticketId === null) {
     throw error(404, 'Bad ticket id');
@@ -236,7 +236,7 @@ export const load: PageServerLoad = async ({ params, cookies, url }) => {
     .exec();
 
   if (!verifyPin(ticketId, ticket.pin, pinHash)) {
-    throw redirect(303, redirectUrl);
+    throw redirect(302, redirectUrl);
   }
 
   return {

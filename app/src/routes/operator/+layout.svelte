@@ -9,14 +9,24 @@
   import { selectedAccount } from '$lib/util/web3';
 
   onMount(() => {
+    const operatorBasePath = urlJoin(
+      window.location.origin,
+      PUBLIC_OPERATOR_PATH
+    );
+
+    if (!$selectedAccount && $page.url.href !== operatorBasePath) {
+      goto(operatorBasePath);
+    }
     selectedAccount.subscribe(async (account) => {
       if (account) {
-        const operatorPath = urlJoin(
-          window.location.origin,
-          PUBLIC_OPERATOR_PATH,
-          account.address
-        );
-        if (!$page.url.href.startsWith(operatorPath)) goto(operatorPath);
+        const operatorFullPath = urlJoin(operatorBasePath, account.address);
+        if ($page.url.href === operatorBasePath) {
+          goto(operatorFullPath);
+        } else if (!$page.url.href.startsWith(operatorFullPath)) {
+          goto(operatorBasePath);
+        }
+      } else {
+        goto(operatorBasePath);
       }
     });
   });

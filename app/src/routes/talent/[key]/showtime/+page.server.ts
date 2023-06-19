@@ -76,7 +76,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
   if (!showState.can({ type: ShowMachineEventString.SHOW_STARTED })) {
     const talentUrl = urlJoin(PUBLIC_TALENT_PATH, key);
-    throw redirect(303, talentUrl);
+    throw redirect(302, talentUrl);
   }
 
   if (!showState.matches('started'))

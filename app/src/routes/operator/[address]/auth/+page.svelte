@@ -1,9 +1,12 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import urlJoin from 'url-join';
 
   import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
+  import { PUBLIC_OPERATOR_PATH } from '$env/static/public';
 
-  import { defaultWallet, selectedAccount } from '$lib/util/web3';
+  import { defaultWallet } from '$lib/util/web3';
 
   import ConnectButton from '$components/header/ConnectButton.svelte';
 
@@ -13,22 +16,44 @@
 
   const message = data.message;
 
+  const setAuth = async (address: string, signature: string) => {
+    const operatorFullPath = urlJoin(
+      window.location.origin,
+      PUBLIC_OPERATOR_PATH,
+      address
+    );
+    let formData = new FormData();
+    formData.append('signature', signature);
+    await fetch($page.url.href + '?/auth', {
+      method: 'POST',
+      body: formData,
+      redirect: 'follow'
+    });
+    goto(operatorFullPath);
+  };
+
   onMount(async () => {
-    selectedAccount.subscribe(async (account) => {
-      if (account && $defaultWallet && account) {
-        const address = account.address;
+    const wallet = $defaultWallet;
+    if (wallet) {
+      const address = wallet.accounts[0].address;
+      if (
+        $defaultWallet &&
+        address.toLowerCase() === $page.params.address.toLowerCase()
+      ) {
         try {
           const signature = await $defaultWallet.provider.request({
             method: 'personal_sign',
             params: [message, address]
           });
-          console.log(signature);
+          await setAuth(address, signature);
         } catch (error) {
           console.log(error);
           goto('/');
         }
       }
-    });
+    } else {
+      goto('/');
+    }
   });
 </script>
 

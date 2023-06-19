@@ -1,4 +1,5 @@
-import { Schema, type InferSchemaType } from 'mongoose';
+import { lowerCase } from 'lodash';
+import { type InferSchemaType, Schema } from 'mongoose';
 import validator from 'validator';
 
 import { ActorType } from '$lib/constants';
@@ -112,7 +113,8 @@ export const userSchema = new Schema(
     walletAddress: {
       type: String,
       maxLength: 50,
-      validator: (v: string) => validator.isEthereumAddress(v)
+      validator: (v: string) => validator.isEthereumAddress(v),
+      lowerCase: true
     },
 
     nonce: {
@@ -140,7 +142,8 @@ export const userSchema = new Schema(
       maxLength: 50,
       unique: true,
       index: true,
-      validator: (v: string) => validator.isEthereumAddress(v)
+      validator: (v: string) => validator.isEthereumAddress(v),
+      lowerCase: true
     }
   },
   { timestamps: true }
