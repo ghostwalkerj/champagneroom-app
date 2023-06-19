@@ -117,8 +117,3 @@ export const disconnect = () => {
 export const selectedAccount = derived(_selectedAccount, ($selectedAccount) => {
   return $selectedAccount;
 });
-
-// auth
-export const verifySignature = async (authToken: string | undefined) => {
-  return authToken ? true : false;
-};

@@ -1,14 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import urlJoin from 'url-join';
-
-  import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
-  import { PUBLIC_OPERATOR_PATH } from '$env/static/public';
-
   import type { OperatorDocumentType } from '$lib/models/operator';
-
-  import { selectedAccount } from '$lib/util/web3';
 
   import { nameStore } from '$stores';
 
@@ -23,18 +14,6 @@
 
   let activeTab = 'Agents' as 'Agents' | 'Disputes';
   let activeRow = 0;
-  onMount(() => {
-    selectedAccount.subscribe(async (account) => {
-      if (account) {
-        const operatorPath = urlJoin(
-          window.location.origin,
-          PUBLIC_OPERATOR_PATH,
-          account.address
-        );
-        if (operatorPath !== $page.url.href) goto(operatorPath);
-      }
-    });
-  });
 </script>
 
 {#if operator}

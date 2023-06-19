@@ -14,9 +14,9 @@
     PUBLIC_PROFILE_IMAGE_PATH
   );
   $: ticketStatus = ticket
-    ? (ticket.ticketState.totalPaid >= ticket.price
+    ? ticket.ticketState.totalPaid >= ticket.price
       ? 'Paid' + ' ' + ticket.ticketState.status
-      : ticket.ticketState.status)
+      : ticket.ticketState.status
     : '';
   $: showStatus = show ? show.showState.status : '';
 </script>

@@ -1,40 +1,15 @@
-import type { Actions } from '@sveltejs/kit';
-import { fail, redirect } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
+import jwt from 'jsonwebtoken';
 import urlJoin from 'url-join';
 
-import { PUBLIC_OPERATOR_PATH, PUBLIC_TICKET_PATH } from '$env/static/public';
+import { JWT_PRIVATE_KEY } from '$env/static/private';
+import { PUBLIC_OPERATOR_PATH } from '$env/static/public';
 
 import { Agent } from '$lib/models/agent';
 import { Operator } from '$lib/models/operator';
 import { Ticket } from '$lib/models/ticket';
 
-import { createPinHash } from '$lib/util/pin';
-import { verifySignature } from '$lib/util/web3';
-
 import type { PageServerLoad } from './$types';
-
-export const actions: Actions = {
-  set_auth: async ({ params, cookies, request, url }) => {
-    const ticketId = params.id;
-
-    const data = await request.formData();
-    const pin = data.get('pin') as string;
-
-    if (!pin) {
-      return fail(400, { pin, missingPin: true });
-    }
-
-    const isNumber = /^\d+$/.test(pin);
-    if (!isNumber) {
-      return fail(400, { pin, invalidPin: true });
-    }
-
-    const hash = createPinHash(ticketId, pin);
-    cookies.set('pin', hash, { path: '/' });
-    const redirectUrl = urlJoin(url.origin, PUBLIC_TICKET_PATH, ticketId);
-    throw redirect(303, redirectUrl);
-  }
-};
 
 export const load: PageServerLoad = async ({ params, url, cookies }) => {
   const address = params.address;
@@ -45,7 +20,7 @@ export const load: PageServerLoad = async ({ params, url, cookies }) => {
   }
 
   const authToken = cookies.get('authToken');
-  if (!(await verifySignature(authToken))) {
+  if (!authToken || !jwt.verify(authToken, JWT_PRIVATE_KEY)) {
     const authUrl = urlJoin(operatorUrl, address, 'auth');
     throw redirect(307, authUrl);
   }

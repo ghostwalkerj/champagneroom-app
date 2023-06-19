@@ -1,22 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import urlJoin from 'url-join';
-
-  import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
-
-  import { selectedAccount } from '$lib/util/web3';
-
   import ConnectButton from '$components/header/ConnectButton.svelte';
-
-  onMount(() => {
-    selectedAccount.subscribe(async (account) => {
-      if (account) {
-        const operatorPath = urlJoin($page.url.href, account.address);
-        goto(operatorPath);
-      }
-    });
-  });
 </script>
 
 <div class="min-h-screen-md bg-base-100 hero">
