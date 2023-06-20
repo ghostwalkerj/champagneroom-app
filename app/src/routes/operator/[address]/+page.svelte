@@ -9,6 +9,7 @@
   const operator = data.operator as OperatorDocumentType;
   const agents = data.agents;
   const disputedTickets = data.disputedTickets;
+  const addAgent = false;
 
   nameStore.set(operator.user.name);
 
@@ -74,9 +75,26 @@
                       on:click={() => (activeRow = index)}
                     >
                       <td>{index + 1}</td>
-                      <td>{agent.user.name}</td>
-                      <td>{agent.user.address}</td>
-                      <td>{agent.user.active}</td>
+                      <td
+                        contenteditable="true"
+                        on:blur={(event) => {
+                          console.log(event.target?.textContent);
+                        }}>{agent.user.name}</td
+                      >
+                      <td contenteditable="true">{agent.user.address}</td>
+                      <td>
+                        <select
+                          class="select select-bordered select-xs max-w-xs"
+                        >
+                          {#if agent.user.active}
+                            <option value="true" selected>True</option>
+                            <option value="false">False</option>
+                          {:else}
+                            <option value="true">True</option>
+                            <option value="false" selected>False</option>
+                          {/if}
+                        </select>
+                      </td>
                       <td
                         ><button
                           class="btn btn-primary btn-xs"

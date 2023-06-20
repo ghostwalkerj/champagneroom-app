@@ -13,14 +13,12 @@ COPY ["package.json", "package-lock.json*", "npm-shrinkwrap.json*", "yarn.lock",
 # Copy over rest of the project files
 COPY . .
 
-# Install Node modules
-RUN yarn
-
-# Dist directory
-RUN yarn package
-
-# build
-RUN yarn build
+# yarn build
+RUN set -ex; \
+  yarn install --frozen-lockfile --development; \
+  yarn cache clean; \
+  yarn package \
+  yarn run build
 
 
 # Expose port 3000 for the SvelteKit app and 24678 for Vite's HMR

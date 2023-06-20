@@ -4,13 +4,13 @@ import { fieldEncryption } from 'mongoose-field-encryption';
 import validator from 'validator';
 
 import {
-    cancelSchema,
-    disputeSchema,
-    escrowSchema,
-    feedbackSchema,
-    finalizeSchema,
-    refundSchema,
-    saleSchema
+  cancelSchema,
+  disputeSchema,
+  escrowSchema,
+  feedbackSchema,
+  finalizeSchema,
+  refundSchema,
+  saleSchema
 } from './common';
 
 enum TicketStatus {

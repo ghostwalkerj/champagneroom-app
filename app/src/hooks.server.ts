@@ -3,11 +3,11 @@ import IORedis from 'ioredis';
 import mongoose from 'mongoose';
 
 import {
-    MONGO_DB_ENDPOINT,
-    REDIS_HOST,
-    REDIS_PASSWORD,
-    REDIS_PORT,
-    REDIS_USERNAME
+  MONGO_DB_ENDPOINT,
+  REDIS_HOST,
+  REDIS_PASSWORD,
+  REDIS_PORT,
+  REDIS_USERNAME
 } from '$env/static/private';
 
 mongoose.connect(MONGO_DB_ENDPOINT);

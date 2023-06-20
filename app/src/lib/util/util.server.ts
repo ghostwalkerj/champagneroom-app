@@ -5,9 +5,9 @@ import mongoose, { Error } from 'mongoose';
 import { SaveState, type ShowType } from '$lib/models/show';
 import { createShowEvent } from '$lib/models/showEvent';
 import {
-    Ticket,
-    type TicketStateType,
-    type TicketType
+  Ticket,
+  type TicketStateType,
+  type TicketType
 } from '$lib/models/ticket';
 
 import type { ShowMachineEventString } from '$lib/machines/showMachine';

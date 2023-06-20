@@ -1,5 +1,5 @@
 import type { Actions } from '@sveltejs/kit';
-import { error, fail, redirect } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import urlJoin from 'url-join';
 import { recover } from 'web3-eth-accounts';

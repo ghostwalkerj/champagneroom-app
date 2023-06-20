@@ -5,12 +5,12 @@ import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 import { raise } from 'xstate/lib/actions';
 
 import type {
-    CancelType,
-    DisputeType,
-    FeedbackType,
-    FinalizeType,
-    RefundType,
-    SaleType
+  CancelType,
+  DisputeType,
+  FeedbackType,
+  FinalizeType,
+  RefundType,
+  SaleType
 } from '$lib/models/common';
 import { DisputeDecision } from '$lib/models/common';
 import type { ShowDocumentType } from '$lib/models/show';
@@ -44,7 +44,7 @@ enum ShowMachineEventString {
 
 export { ShowMachineEventString };
 
-    export { createShowMachine };
+export { createShowMachine };
 
 export const createShowMachineService = ({
   showDocument,

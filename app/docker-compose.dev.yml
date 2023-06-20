@@ -1,8 +1,9 @@
-version: "3.4"
+version: '3.4'
 
 services:
   client:
     image: pcall
+    platform: linux/amd64
     restart: on-failure
     build:
       context: ./

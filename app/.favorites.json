@@ -684,14 +684,6 @@
     },
     {
         "type": "File",
-        "name": "/Users/joseph/Dev/pcall/app/src/routes/operator/+page.server.ts",
-        "parent_id": "XGE42qWuJiyLHAFR",
-        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
-        "workspacePath": "src/routes/operator/+page.server.ts",
-        "id": "0VwJ48Pkb5ITpoy9"
-    },
-    {
-        "type": "File",
         "name": "/Users/joseph/Dev/pcall/app/src/lib/models/operator.ts",
         "parent_id": "z3oCvxJG75NBMYf9",
         "workspaceRoot": "/Users/joseph/Dev/pcall/app",

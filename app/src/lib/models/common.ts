@@ -1,4 +1,3 @@
-import { lowerCase } from 'lodash';
 import { type InferSchemaType, Schema } from 'mongoose';
 import validator from 'validator';
 

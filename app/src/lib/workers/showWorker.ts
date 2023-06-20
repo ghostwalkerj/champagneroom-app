@@ -4,9 +4,9 @@ import type IORedis from 'ioredis';
 
 import type { CancelType } from '$lib/models/common';
 import {
-    CancelReason,
-    RefundReason,
-    type FinalizeType
+  CancelReason,
+  type FinalizeType,
+  RefundReason
 } from '$lib/models/common';
 import type { ShowType } from '$lib/models/show';
 import { SaveState, Show, ShowStatus } from '$lib/models/show';
@@ -17,8 +17,8 @@ import type { TransactionType } from '$lib/models/transaction';
 import { Transaction, TransactionReasonType } from '$lib/models/transaction';
 
 import {
-    createShowMachineService,
-    ShowMachineEventString
+  createShowMachineService,
+  ShowMachineEventString
 } from '$lib/machines/showMachine';
 import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
 import { TicketMachineEventString } from '$lib/machines/ticketMachine';

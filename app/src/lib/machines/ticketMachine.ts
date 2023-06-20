@@ -4,23 +4,23 @@
 import { Types } from 'mongoose';
 import { nanoid } from 'nanoid';
 import {
-    assign,
-    createMachine,
-    interpret,
-    send,
-    spawn,
-    type ActorRefFrom,
-    type StateFrom
+  type ActorRefFrom,
+  assign,
+  createMachine,
+  interpret,
+  send,
+  spawn,
+  type StateFrom
 } from 'xstate';
 import { raise } from 'xstate/lib/actions';
 
 import type {
-    CancelType,
-    DisputeDecision,
-    DisputeType,
-    FeedbackType,
-    FinalizeType,
-    RefundReason
+  CancelType,
+  DisputeDecision,
+  DisputeType,
+  FeedbackType,
+  FinalizeType,
+  RefundReason
 } from '$lib/models/common';
 import type { ShowDocumentType } from '$lib/models/show';
 import type { TicketDocumentType, TicketStateType } from '$lib/models/ticket';
@@ -30,10 +30,10 @@ import type { TransactionDocumentType } from '$lib/models/transaction';
 import { ActorType } from '$lib/constants';
 
 import {
-    createShowMachine,
-    type ShowMachineOptions,
-    type ShowMachineServiceType,
-    type ShowMachineType
+  createShowMachine,
+  type ShowMachineOptions,
+  type ShowMachineServiceType,
+  type ShowMachineType
 } from './showMachine';
 
 export enum TicketMachineEventString {
@@ -615,7 +615,7 @@ const createTicketMachine = ({
 
 export { TicketMachineEventType };
 
-    export { createTicketMachine };
+export { createTicketMachine };
 
 export const createTicketMachineService = ({
   ticketDocument,
