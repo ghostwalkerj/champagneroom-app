@@ -2,11 +2,6 @@
 # yarn lockfile v1
 
 
-"-@^0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/-/-/--0.0.1.tgz#db6db7cd866142880dd03e5b8781d1b4fac0e5bd"
-  integrity sha512-3HfneK3DGAm05fpyj20sT3apkNcvPpCuccOThOPdzz8sY7GgQGe0l93XH9bt+YzibcTIgUAIMoyVJI740RtgyQ==
-
 "@alloc/quick-lru@^5.2.0":
   version "5.2.0"
   resolved "https://registry.yarnpkg.com/@alloc/quick-lru/-/quick-lru-5.2.0.tgz#7bf68b20c0a350f936915fcae06f58e32007ce30"
@@ -3939,10 +3934,10 @@ d@1, d@^1.0.1:
     es5-ext "^0.10.50"
     type "^1.0.1"
 
-daisyui@^3.0.20:
-  version "3.1.2"
-  resolved "https://registry.yarnpkg.com/daisyui/-/daisyui-3.1.2.tgz#6dc7e87ab8054e0a9523509ed6c8e9a3edcc35de"
-  integrity sha512-st57fbVWm8bzZV/Z+cPs3LkgRiFTARfMAGMTVf/NRBVYZUhaf31HaiZfCRQ3lUjd6ojU531ob4a10CJCC2WnjA==
+daisyui@^3.1.5:
+  version "3.1.5"
+  resolved "https://registry.yarnpkg.com/daisyui/-/daisyui-3.1.5.tgz#49cb961d03504beebd238d58f0169dbe81103c95"
+  integrity sha512-3nk5L//IU31ISzsonKEFG8ris8hS/MRAc+PrOTOyRbssjv1fYmNKSdIrOhG6op2ED3RyJL4p6I81JUwd7RWqTw==
   dependencies:
     colord "^2.9"
     css-selector-tokenizer "^0.8"

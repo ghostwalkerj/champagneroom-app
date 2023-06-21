@@ -76,6 +76,7 @@ module.exports = {
     '@typescript-eslint/keyword-spacing': 'error',
     'no-multi-spaces': ['error'],
     'unicorn/no-nested-ternary': 'off',
+    'unicorn/prefer-dom-node-text-content': 'off',
     'unicorn/filename-case': [
       'error',
       {

@@ -48,7 +48,7 @@
     "@vitejs/plugin-basic-ssl": "^0.1.2",
     "autoprefixer": "^10.4.14",
     "build-number-generator": "^2.0.4",
-    "daisyui": "^3.0.20",
+    "daisyui": "^3.1.5",
     "eslint": "^8.41.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^4.2.1",
@@ -74,7 +74,6 @@
   },
   "type": "module",
   "dependencies": {
-    "-": "^0.0.1",
     "@bull-board/express": "^5.2.0",
     "@web3-onboard/coinbase": "^2.2.4",
     "@web3-onboard/core": "^2.20.1",
