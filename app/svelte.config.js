@@ -11,14 +11,14 @@ const config = {
       $components: './src/components',
       $lib: './src/lib',
       $stores: './src/stores',
-      $util: './src/util',
-    },
+      $util: './src/util'
+    }
   },
   preprocess: [
     preprocess({
-      postcss: true,
-    }),
-  ],
+      postcss: true
+    })
+  ]
 };
 
 export default config;
