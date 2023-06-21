@@ -1,7 +1,9 @@
 import { fail, redirect } from '@sveltejs/kit';
+import jwt from 'jsonwebtoken';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 import urlJoin from 'url-join';
 
+import { JWT_PRIVATE_KEY } from '$env/static/private';
 import {
   PUBLIC_AGENT_PATH,
   PUBLIC_DEFAULT_PROFILE_IMAGE
@@ -15,40 +17,6 @@ import { womensNames } from '$lib/util/womensNames';
 import type { Actions, PageServerLoad } from './$types';
 
 export const actions: Actions = {
-  get_or_create_agent: async ({ request }) => {
-    const data = await request.formData();
-    const address = data.get('address') as string;
-
-    if (address === null) {
-      return fail(400, { address, missingAddress: true });
-    }
-
-    if (!/^0x[\da-f]{40}$/.test(address)) {
-      return fail(400, { address, badAddress: true });
-    }
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    let agent = await Agent.findOne({
-      address
-    }).exec();
-
-    if (agent === null) {
-      agent = await Agent.create({
-        address: address,
-        name:
-          'Agent ' +
-          uniqueNamesGenerator({
-            dictionaries: [womensNames]
-          })
-      });
-    }
-
-    return {
-      success: true,
-      agent: agent.toObject({ flattenObjectIds: true })
-    };
-  },
   create_talent: async ({ request }) => {
     const data = await request.formData();
     const agentId = data.get('agentId') as string;
@@ -85,17 +53,30 @@ export const actions: Actions = {
   }
 };
 
-export const load: PageServerLoad = async ({ params, url }) => {
+export const load: PageServerLoad = async ({ params, url, cookies }) => {
   const address = params.address;
-  const redirectUrl = urlJoin(url.origin, PUBLIC_AGENT_PATH);
+  const agentUrl = urlJoin(url.origin, PUBLIC_AGENT_PATH);
 
   if (address === null) {
-    throw redirect(307, redirectUrl);
+    throw redirect(307, agentUrl);
   }
 
-  const agent = await Agent.findOne({ address })
+  const authUrl = urlJoin(agentUrl, address, 'auth');
+
+  const authToken = cookies.get('agentAuthToken');
+  if (!authToken) {
+    throw redirect(307, authUrl);
+  }
+
+  try {
+    jwt.verify(authToken, JWT_PRIVATE_KEY);
+  } catch {
+    throw redirect(307, authUrl);
+  }
+
+  const agent = await Agent.findOne({ 'user.address': address })
     .orFail(() => {
-      throw redirect(307, redirectUrl);
+      throw redirect(307, agentUrl);
     })
     .exec();
 

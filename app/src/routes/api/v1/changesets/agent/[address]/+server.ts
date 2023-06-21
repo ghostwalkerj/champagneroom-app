@@ -12,13 +12,13 @@ export const GET = (async ({ params, url }) => {
     : false;
 
   if (isFirstFetch) {
-    const agent = await Agent.findOne({ address }).exec();
+    const agent = await Agent.findOne({ 'user.address': address }).exec();
     if (agent !== undefined) {
       return new Response(JSON.stringify(agent));
     }
   }
 
-  const pipeline = [{ $match: { 'fullDocument.address': address } }];
+  const pipeline = [{ $match: { 'fullDocument.user.address': address } }];
   const changeStream = Agent.watch(pipeline, {
     fullDocument: 'updateLookup'
   });

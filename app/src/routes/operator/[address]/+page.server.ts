@@ -1,5 +1,5 @@
 import type { Actions, RequestEvent } from '@sveltejs/kit';
-import { error, fail, redirect } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import urlJoin from 'url-join';
 import validator from 'validator';
@@ -26,7 +26,7 @@ export const actions: Actions = {
       return fail(400, { name, badName: true });
     }
 
-    if (address === null || !validator.isEthereumAddress(address)) {
+    if (address === null) {
       console.log('bad address', address);
       return fail(400, { address, badAddress: true });
     }
@@ -54,10 +54,16 @@ export const load: PageServerLoad = async ({ params, url, cookies }) => {
   if (address === null) {
     throw redirect(307, operatorUrl);
   }
+  const authUrl = urlJoin(operatorUrl, address, 'auth');
 
-  const authToken = cookies.get('authToken');
-  if (!authToken || !jwt.verify(authToken, JWT_PRIVATE_KEY)) {
-    const authUrl = urlJoin(operatorUrl, address, 'auth');
+  const authToken = cookies.get('operatorAuthToken');
+  if (!authToken) {
+    throw redirect(307, authUrl);
+  }
+
+  try {
+    jwt.verify(authToken, JWT_PRIVATE_KEY);
+  } catch {
     throw redirect(307, authUrl);
   }
 

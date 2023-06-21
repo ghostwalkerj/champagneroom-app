@@ -9,8 +9,9 @@ import {
   JWT_EXPIRY,
   JWT_PRIVATE_KEY
 } from '$env/static/private';
-import { PUBLIC_OPERATOR_PATH } from '$env/static/public';
+import { PUBLIC_AGENT_PATH } from '$env/static/public';
 
+import { Agent } from '$lib/models/agent';
 import { Operator } from '$lib/models/operator';
 
 import type { PageServerLoad } from './$types';
@@ -35,7 +36,7 @@ const verifySignature = (
 export const actions: Actions = {
   auth: async ({ params, cookies, request, url }) => {
     const address = params.address;
-    const operatorUrl = urlJoin(url.origin, PUBLIC_OPERATOR_PATH);
+    const agentUrl = urlJoin(url.origin, PUBLIC_AGENT_PATH);
 
     if (!address) {
       throw error(404, 'Bad address');
@@ -48,13 +49,13 @@ export const actions: Actions = {
       throw error(400, 'Missing Signature');
     }
 
-    const operator = await Operator.findOne({ 'user.address': address })
+    const agent = await Agent.findOne({ 'user.address': address })
       .orFail(() => {
-        throw redirect(307, operatorUrl);
+        throw redirect(307, agentUrl);
       })
       .exec();
 
-    const message = AUTH_SIGNING_MESSAGE + operator.user.nonce;
+    const message = AUTH_SIGNING_MESSAGE + agent.user.nonce;
 
     // Verify Auth
     if (!verifySignature(message, address, signature)) {
@@ -62,20 +63,20 @@ export const actions: Actions = {
     }
 
     // Update Operator
-    operator.user.nonce = Math.floor(Math.random() * 1_000_000);
-    await operator.save();
+    agent.user.nonce = Math.floor(Math.random() * 1_000_000);
+    await agent.save();
 
     const exp = Math.floor(Date.now() / 1000) + +JWT_EXPIRY;
 
     // Set JWT Token
     const authToken = jwt.sign(
       {
-        operator: address,
+        agent: address,
         exp
       },
       JWT_PRIVATE_KEY
     );
-    cookies.set('operatorAuthToken', authToken, {
+    cookies.set('agentAuthToken', authToken, {
       path: '/',
       httpOnly: true,
       sameSite: 'lax',
@@ -86,20 +87,20 @@ export const actions: Actions = {
 
 export const load: PageServerLoad = async ({ params, url }) => {
   const address = params.address;
-  const operatorUrl = urlJoin(url.origin, PUBLIC_OPERATOR_PATH);
+  const agentUrl = urlJoin(url.origin, PUBLIC_AGENT_PATH);
 
   if (address === null) {
-    throw redirect(307, operatorUrl);
+    throw redirect(307, agentUrl);
   }
 
-  const operator = await Operator.findOne({ 'user.address': address })
+  const agent = await Agent.findOne({ 'user.address': address })
     .orFail(() => {
-      throw redirect(307, operatorUrl);
+      throw redirect(307, agentUrl);
     })
     .lean()
     .exec();
 
-  const message = AUTH_SIGNING_MESSAGE + operator.user.nonce;
+  const message = AUTH_SIGNING_MESSAGE + agent.user.nonce;
   return {
     message
   };

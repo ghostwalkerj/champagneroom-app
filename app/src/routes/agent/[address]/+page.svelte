@@ -1,14 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import urlJoin from 'url-join';
-
-  import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
-  import { PUBLIC_AGENT_PATH } from '$env/static/public';
-
   import type { AgentDocumentType } from '$lib/models/agent';
-
-  import { selectedAccount } from '$lib/util/web3';
 
   import AgentWallet from './AgentWallet.svelte';
   import TalentForm from './TalentForm.svelte';
@@ -18,19 +9,6 @@
   export let data: PageData;
   const agent = data.agent as AgentDocumentType;
   export let form: ActionData;
-
-  onMount(() => {
-    selectedAccount.subscribe(async (account) => {
-      if (account) {
-        const agentPath = urlJoin(
-          window.location.origin,
-          PUBLIC_AGENT_PATH,
-          account.address
-        );
-        if (agentPath !== $page.url.href) goto(agentPath);
-      }
-    });
-  });
 </script>
 
 {#if agent}

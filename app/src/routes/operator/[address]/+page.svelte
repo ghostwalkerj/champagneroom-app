@@ -127,8 +127,9 @@
                               type="hidden"
                               name="address"
                               value={agentAddress}
-                            /><button class="btn btn-xs btn-ghost" type="submit"
-                              >Add</button
+                            /><button
+                              class="btn btn-xs btn-ghost p-0"
+                              type="submit">Add</button
                             >
                           </form>
                         </td>
