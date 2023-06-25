@@ -426,14 +426,6 @@
     },
     {
         "type": "File",
-        "name": "/Users/joseph/Dev/pcall/app/src/routes/talent/[key]/TalentActivity.svelte",
-        "parent_id": "CGnTLus7r0yeYFA5",
-        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
-        "workspacePath": "src/routes/talent/[key]/TalentActivity.svelte",
-        "id": "MLPCNmGVY314RXsf"
-    },
-    {
-        "type": "File",
         "name": "/Users/joseph/Dev/pcall/app/src/routes/talent/[key]/TalentWallet.svelte",
         "parent_id": "CGnTLus7r0yeYFA5",
         "workspaceRoot": "/Users/joseph/Dev/pcall/app",

@@ -4,7 +4,7 @@
 
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import { PUBLIC_AGENT_PATH, PUBLIC_OPERATOR_PATH } from '$env/static/public';
+  import { PUBLIC_AGENT_PATH } from '$env/static/public';
 
   import { defaultWallet } from '$lib/util/web3';
 

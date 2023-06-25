@@ -124,9 +124,15 @@ export const userSchema = new Schema(
     name: {
       type: String,
       maxLength: 50,
-      minLength: [4, 'Name is too short'],
+      minLength: [3, 'Name is too short'],
       required: true,
       trim: true
+    },
+
+    auth: {
+      type: Boolean,
+      default: true,
+      index: true
     },
 
     active: {
@@ -139,10 +145,9 @@ export const userSchema = new Schema(
       type: String,
       required: true,
       maxLength: 50,
+      minLength: 30,
       unique: true,
-      index: true,
-      validator: (v: string) => validator.isEthereumAddress(v),
-      lowerCase: true
+      index: true
     }
   },
   { timestamps: true }

@@ -47,29 +47,29 @@
   dependencies:
     regenerator-runtime "^0.13.11"
 
-"@bull-board/api@5.5.1":
-  version "5.5.1"
-  resolved "https://registry.yarnpkg.com/@bull-board/api/-/api-5.5.1.tgz#575021afde1863d2c6014d2f790ee1cb84032822"
-  integrity sha512-JRCiXpDspazAQH+4W8SPMWTzLD5xk/DOPU6XRaA+woOvTgX/LLs7vtQ0ZevC/o3Xogbvz7xR+/pNetHHk2nAEQ==
+"@bull-board/api@5.5.3":
+  version "5.5.3"
+  resolved "https://registry.yarnpkg.com/@bull-board/api/-/api-5.5.3.tgz#5683d0956f20aae6f7c7724436825c5e1a91b82f"
+  integrity sha512-v3q0NmXPIkXwN4UKbrbbh/uQ+r9P00hN0f6QD3dmNBE/AYG2QD3MO4i4gxvrsjvEL7uKatXWwgAfVwKIXJAgAQ==
   dependencies:
     redis-info "^3.0.8"
 
 "@bull-board/express@^5.2.0":
-  version "5.5.1"
-  resolved "https://registry.yarnpkg.com/@bull-board/express/-/express-5.5.1.tgz#715451b3616fc3ec26ddaaea11d3ed18f3106b0d"
-  integrity sha512-/Po9WiU1JmHdHr5syi5hI+3+XRblzod8l09+YX706N7FNw1/y7A2SBUtq2Q809JOees9sddo9EHHgA9B05cnEw==
+  version "5.5.3"
+  resolved "https://registry.yarnpkg.com/@bull-board/express/-/express-5.5.3.tgz#0addd6f448f50a5e7b5bb758d938ade1a00403a5"
+  integrity sha512-BOB1rGKqH1CIUTv9rHRRl+RppdT9Ww6j5OyYVXDyqqRIXg+M2wsJAkt4UsvAjKmE+IaIwrIjY8bmFttRNyM3Uw==
   dependencies:
-    "@bull-board/api" "5.5.1"
-    "@bull-board/ui" "5.5.1"
+    "@bull-board/api" "5.5.3"
+    "@bull-board/ui" "5.5.3"
     ejs "3.1.7"
     express "4.17.3"
 
-"@bull-board/ui@5.5.1":
-  version "5.5.1"
-  resolved "https://registry.yarnpkg.com/@bull-board/ui/-/ui-5.5.1.tgz#0f6243ee4aa8d4add06470eef425da63964c0a31"
-  integrity sha512-/BtSXndO0F3cbM9gLrrclRsrQAfubeuWl/7dYtmwC+mDdF10F35yIvSw1z4fy3HzOFHW/A07lhPYt1flDRNVIg==
+"@bull-board/ui@5.5.3":
+  version "5.5.3"
+  resolved "https://registry.yarnpkg.com/@bull-board/ui/-/ui-5.5.3.tgz#93590b2fa149489c2437b9651204b8cd70f3d1ac"
+  integrity sha512-Ow373Jtjm249shNi8gdQMawe+lcTrqh6ZGe7duD1+mJqBDDdqtrjWre4/aQenDBK1eFSIXtGYUfvs0UKkNQMYQ==
   dependencies:
-    "@bull-board/api" "5.5.1"
+    "@bull-board/api" "5.5.3"
 
 "@coinbase/wallet-sdk@^3.6.0":
   version "3.7.1"
@@ -1729,9 +1729,9 @@
     rollup "^3.7.0"
 
 "@sveltejs/kit@^1.18.0":
-  version "1.20.4"
-  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-1.20.4.tgz#5082de689ef5ae49dc0185344968c065682cfe0d"
-  integrity sha512-MmAzIuMrP7A+8fqDVbxm6ekGHRHL/+Fk8sQPAzPG4G2TxUDtHdn/WcIxeEqHzARMf0OtGSC+VPyOSFuw2Cy2Mg==
+  version "1.20.5"
+  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-1.20.5.tgz#5797ff20413b6b49e54012de4a19eb9a1f00a56a"
+  integrity sha512-8rJYZ2boRlO75lwpbpB+DlSzIwmTuamXTpVlDtw4dBk86o3UaDe/+Ro4xCsV/4FtTw2U8xPHyV83edAWbQHG0w==
   dependencies:
     "@sveltejs/vite-plugin-svelte" "^2.4.1"
     "@types/cookie" "^0.5.1"
@@ -1747,33 +1747,33 @@
     undici "~5.22.0"
 
 "@sveltejs/package@^2.0.2":
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/@sveltejs/package/-/package-2.0.2.tgz#3c5a2a67ade8429c6c54b163b081c70cf04b30d8"
-  integrity sha512-cCOCcO8yMHnhHyaR51nQtvKZ3o/vSU9UYI1EXLT1j2CKNPMuH1/g6JNwKcNNrtQGwwquudc69ZeYy8D/TDNwEw==
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@sveltejs/package/-/package-2.1.0.tgz#971e9dcab9061c490a50de6f4782cd8391e587ce"
+  integrity sha512-c6PLH9G2YLQ48kqrS2XX422BrLNABBstSiapamchVJaQnOTXyJmUR8KmoCCySnzVy3PiYL6jg12UnoPmjW3SwA==
   dependencies:
     chokidar "^3.5.3"
     kleur "^4.1.5"
     sade "^1.8.1"
     svelte2tsx "~0.6.0"
 
-"@sveltejs/vite-plugin-svelte-inspector@^1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@sveltejs/vite-plugin-svelte-inspector/-/vite-plugin-svelte-inspector-1.0.2.tgz#da51dd8da54e69a706ad4793103f90aedae2c481"
-  integrity sha512-Cy1dUMcYCnDVV/hPLXa43YZJ2jGKVW5rA0xuNL9dlmYhT0yoS1g7+FOFSRlgk0BXKk/Oc7grs+8BVA5Iz2fr8A==
+"@sveltejs/vite-plugin-svelte-inspector@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@sveltejs/vite-plugin-svelte-inspector/-/vite-plugin-svelte-inspector-1.0.3.tgz#fdbf80b43bfaa20deaa5ff6d0676351aa9aecbcc"
+  integrity sha512-Khdl5jmmPN6SUsVuqSXatKpQTMIifoQPDanaxC84m9JxIibWvSABJyHpyys0Z+1yYrxY5TTEQm+6elh0XCMaOA==
   dependencies:
     debug "^4.3.4"
 
 "@sveltejs/vite-plugin-svelte@^2.4.1":
-  version "2.4.1"
-  resolved "https://registry.yarnpkg.com/@sveltejs/vite-plugin-svelte/-/vite-plugin-svelte-2.4.1.tgz#bab9d97a83fee641562f2657ce6ea755808bc149"
-  integrity sha512-bNNKvoRY89ptY7udeBSCmTdCVwkjmMcZ0j/z9J5MuedT8jPjq0zrknAo/jF1sToAza4NVaAgR9AkZoD9oJJmnA==
+  version "2.4.2"
+  resolved "https://registry.yarnpkg.com/@sveltejs/vite-plugin-svelte/-/vite-plugin-svelte-2.4.2.tgz#04f9fb698853a6a681a2a7d32016487316c30917"
+  integrity sha512-ePfcC48ftMKhkT0OFGdOyycYKnnkT6i/buzey+vHRTR/JpQvuPzzhf1PtKqCDQfJRgoPSN2vscXs6gLigx/zGw==
   dependencies:
-    "@sveltejs/vite-plugin-svelte-inspector" "^1.0.2"
+    "@sveltejs/vite-plugin-svelte-inspector" "^1.0.3"
     debug "^4.3.4"
     deepmerge "^4.3.1"
     kleur "^4.1.5"
     magic-string "^0.30.0"
-    svelte-hmr "^0.15.1"
+    svelte-hmr "^0.15.2"
     vitefu "^0.2.4"
 
 "@tailwindcss/typography@^0.5.9":
@@ -3935,9 +3935,9 @@ d@1, d@^1.0.1:
     type "^1.0.1"
 
 daisyui@^3.1.5:
-  version "3.1.5"
-  resolved "https://registry.yarnpkg.com/daisyui/-/daisyui-3.1.5.tgz#49cb961d03504beebd238d58f0169dbe81103c95"
-  integrity sha512-3nk5L//IU31ISzsonKEFG8ris8hS/MRAc+PrOTOyRbssjv1fYmNKSdIrOhG6op2ED3RyJL4p6I81JUwd7RWqTw==
+  version "3.1.6"
+  resolved "https://registry.yarnpkg.com/daisyui/-/daisyui-3.1.6.tgz#e6cda37eeddeb8724fc07f11c3e1b2e257cc0e40"
+  integrity sha512-P/2WUn4ZImEc2IfPSYw3qPCUnnJNju0P6ii0fUqtTURUj0oda6L0tm4EzrUmB2EbqB6grZ9nKHPTSniKaPYp1w==
   dependencies:
     colord "^2.9"
     css-selector-tokenizer "^0.8"
@@ -4388,9 +4388,9 @@ eslint-plugin-sort-exports@^0.8.0:
   integrity sha512-5x7kJNjIS5bSyehFJ6Gk2gh2wUPt/rmhwDHF8JPDicSH7bvrLRFdlkhHu74YqYBjEySHYaOZVoKNP90TjI0v6w==
 
 eslint-plugin-svelte@^2.29.0:
-  version "2.31.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-svelte/-/eslint-plugin-svelte-2.31.0.tgz#6bbc30abc6dd49620cf6f33f79c9a3328ab564bd"
-  integrity sha512-Q70jPFRraTkc/giPSfY7yuatmJcb5fPelWNplevqd45gfaJDjc3qXRtWQ6m9U5tWVVYERU9dcdUod294vwD8Gw==
+  version "2.31.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-svelte/-/eslint-plugin-svelte-2.31.1.tgz#61f898880723a9f107d8917b45f1788d525cd124"
+  integrity sha512-08v+DqzHiwIVEbi+266D7+BDhayp9OSqCwa/lHaZlZOlFY0vZLYs/h7SkkUPzA5fTVt8OUJBtvCxFiWEYOvvGg==
   dependencies:
     "@eslint-community/eslint-utils" "^4.2.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
@@ -4401,6 +4401,7 @@ eslint-plugin-svelte@^2.29.0:
     postcss-load-config "^3.1.4"
     postcss-safe-parser "^6.0.0"
     postcss-selector-parser "^6.0.11"
+    semver "^7.5.3"
     svelte-eslint-parser "^0.31.0"
 
 eslint-plugin-unicorn@^47.0.0:
@@ -5409,9 +5410,9 @@ i18n-possessive@^1.0.0:
   integrity sha512-VbnbubpG6zWrq1VxAw2m2YMgzm+uBhVR01nluByx0yeh60zOWwk02yTIK5bWAlfxa8xH4FLTqO/ZMQ6gBk9cOg==
 
 iconify-icon@^1.0.7:
-  version "1.0.7"
-  resolved "https://registry.yarnpkg.com/iconify-icon/-/iconify-icon-1.0.7.tgz#d7e1f5d45a88486abcc977583da62e6e9e635572"
-  integrity sha512-MxaO3Jhf3f5ymPWGHR9x74f90TNKcq1D+B2iGucGhVtqAgbC9EtM06kKiTGH2CKELNnexckwhrA3/+OpT4HKFw==
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/iconify-icon/-/iconify-icon-1.0.8.tgz#ad7a36731dca0da0204e488ef0b9ebdad2a7d760"
+  integrity sha512-jvbUKHXf8EnGGArmhlP2IG8VqQLFFyTvTqb9LVL2TKTh7/eCCD1o2HHE9thpbJJb6B8hzhcFb6rOKhvo7reNKA==
   dependencies:
     "@iconify/types" "^2.0.0"
 
@@ -7936,6 +7937,13 @@ semver@^7.3.4, semver@^7.3.7, semver@^7.3.8:
   dependencies:
     lru-cache "^6.0.0"
 
+semver@^7.5.3:
+  version "7.5.3"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-7.5.3.tgz#161ce8c2c6b4b3bdca6caadc9fa3317a4c4fe88e"
+  integrity sha512-QBlUtyVk/5EeHbi7X0fw6liDZc7BBmEaSYn01fMU1OUYbf6GPsbTtd8WmnqbI20SeycoHSeiybkE/q1Q+qlThQ==
+  dependencies:
+    lru-cache "^6.0.0"
+
 semver@~7.0.0:
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/semver/-/semver-7.0.0.tgz#5f3ca35761e47e05b206c6daff2cf814f0316b8e"
@@ -8356,7 +8364,7 @@ svelte-eslint-parser@^0.31.0:
     postcss "^8.4.23"
     postcss-scss "^4.0.6"
 
-svelte-hmr@^0.15.1:
+svelte-hmr@^0.15.2:
   version "0.15.2"
   resolved "https://registry.yarnpkg.com/svelte-hmr/-/svelte-hmr-0.15.2.tgz#d2f6fc82e040f2734abd54cea5cbef46828f2538"
   integrity sha512-q/bAruCvFLwvNbeE1x3n37TYFb3mTBJ6TrCq6p2CoFbSTNhDE9oAtEfpy+wmc9So8AG0Tja+X0/mJzX9tSfvIg==
@@ -8401,9 +8409,9 @@ svelte-table@^0.5.11:
   integrity sha512-hgmZaOAI7+iNXJgR9fEJ4umCeY5a9fIOzkYPexqcHYbw3voQquM+SfFd4lhmJOj5O5ui8PiB8JQnnDLBaKrAtw==
 
 svelte2tsx@~0.6.0:
-  version "0.6.15"
-  resolved "https://registry.yarnpkg.com/svelte2tsx/-/svelte2tsx-0.6.15.tgz#c85c3360ed8fcea62f6156dd1024303ba6bc79ec"
-  integrity sha512-+j6RmA3g5pPs1DHa/rdzJjjhZuCfWx0IbNPaR99A2bvOSPPY6BlVkBGU0urI+DGcWHhYEG28Flo942KqlAkpEQ==
+  version "0.6.16"
+  resolved "https://registry.yarnpkg.com/svelte2tsx/-/svelte2tsx-0.6.16.tgz#c21a5db0a3ef4885d87c0f037a5284f68e39ada2"
+  integrity sha512-AX2iYEvQdd4tq5BokRdOOA0N/nD37ZnhXAomrAG9EEGl2cjkvoQUwe1Aluo6FSzA684WJjhxW+1ZXmveCmvDrA==
   dependencies:
     dedent-js "^1.0.1"
     pascal-case "^3.1.1"
@@ -9086,9 +9094,9 @@ xhr2-cookies@1.1.0:
     cookiejar "^2.1.1"
 
 xstate@^4.37.2:
-  version "4.37.2"
-  resolved "https://registry.yarnpkg.com/xstate/-/xstate-4.37.2.tgz#c5f4c1d8062784238b91e2dfddca05f821cb4eac"
-  integrity sha512-Qm337O49CRTZ3PRyRuK6b+kvI+D3JGxXIZCTul+xEsyFCVkTFDt5jixaL1nBWcUBcaTQ9um/5CRGVItPi7fveg==
+  version "4.38.0"
+  resolved "https://registry.yarnpkg.com/xstate/-/xstate-4.38.0.tgz#94c4316bea8e9e7a2974c7c501e5306f6e17ac19"
+  integrity sha512-oFjw2YZPyu6HeO0JWCSqfhAALsjFPURsrD2FUFN3u213dWwYU68RFuLtSHco+cEUhpQFW+hRG3PNYgq8HatudQ==
 
 xtend@^4.0.0, xtend@^4.0.1:
   version "4.0.2"

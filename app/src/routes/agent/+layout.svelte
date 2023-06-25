@@ -18,7 +18,6 @@
       if (account) {
         const agentFullPath = urlJoin(agentBasePath, account.address);
         if ($page.url.href === agentBasePath) {
-
           goto(agentFullPath);
         } else if (!$page.url.href.startsWith(agentFullPath)) {
           goto(agentBasePath);

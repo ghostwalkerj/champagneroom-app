@@ -1,9 +1,13 @@
 <script lang="ts">
+  import { uniqueNamesGenerator } from 'unique-names-generator';
+
   import { enhance } from '$app/forms';
   import { invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
 
   import type { OperatorDocumentType } from '$lib/models/operator';
+
+  import { womensNames } from '$lib/util/womensNames';
 
   import { nameStore } from '$stores';
 
@@ -22,7 +26,11 @@
 
   let agentNameElement: HTMLTableCellElement;
   let agentAddressElement: HTMLTableCellElement;
-  let agentName = '';
+  let agentName =
+    'Agent ' +
+    uniqueNamesGenerator({
+      dictionaries: [womensNames]
+    });
   let agentAddress = '';
 
   const onSubmit = ({}) => {
@@ -30,7 +38,11 @@
       if (result?.type === 'success') {
         canAddAgent = false;
         await invalidateAll();
-        agentName = '';
+        agentName =
+          'Agent ' +
+          uniqueNamesGenerator({
+            dictionaries: [womensNames]
+          });
         agentAddress = '';
         agents = $page.data.agents;
       } else {

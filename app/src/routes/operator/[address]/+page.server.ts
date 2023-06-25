@@ -2,7 +2,6 @@ import type { Actions, RequestEvent } from '@sveltejs/kit';
 import { fail, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import urlJoin from 'url-join';
-import validator from 'validator';
 
 import { JWT_PRIVATE_KEY } from '$env/static/private';
 import { PUBLIC_OPERATOR_PATH } from '$env/static/public';

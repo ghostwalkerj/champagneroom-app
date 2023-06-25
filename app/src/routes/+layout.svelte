@@ -11,7 +11,7 @@
 <div class="grid grid-cols-1">
   <div class="bg-base-100 navbar">
     <div class="flex w-screen">
-      <div class="w-1/4">
+      <div class="w-1/3">
         <!-- svelte-ignore a11y-missing-attribute -->
         <a class="text-xl btn btn-ghost normal-case">
           <img src="/logo.png" alt="Logo" width="48" /></a

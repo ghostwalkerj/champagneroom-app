@@ -12,7 +12,6 @@ import {
 import { PUBLIC_AGENT_PATH } from '$env/static/public';
 
 import { Agent } from '$lib/models/agent';
-import { Operator } from '$lib/models/operator';
 
 import type { PageServerLoad } from './$types';
 

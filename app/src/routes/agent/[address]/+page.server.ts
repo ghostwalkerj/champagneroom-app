@@ -21,7 +21,8 @@ export const actions: Actions = {
     const data = await request.formData();
     const agentId = data.get('agentId') as string;
     let name = data.get('name') as string;
-    const agentCommission = data.get('agentCommission') as string;
+    const commission = data.get('commission') as string;
+    const address = data.get('address') as string;
 
     // Validation
     if (agentId === null) {
@@ -32,20 +33,32 @@ export const actions: Actions = {
         dictionaries: [womensNames]
       });
     }
-    if (
-      Number.isNaN(+agentCommission) ||
-      +agentCommission < 0 ||
-      +agentCommission > 100
-    ) {
-      return fail(400, { agentCommission, badAgentCommission: true });
+    if (Number.isNaN(+commission) || +commission < 0 || +commission > 100) {
+      return fail(400, { commission, badCommission: true });
     }
 
-    Talent.create({
-      name,
-      agentCommission: +agentCommission,
-      agent: agentId,
-      profileImageUrl: PUBLIC_DEFAULT_PROFILE_IMAGE
-    });
+    if (!address) {
+      return fail(400, { address, missingAddress: true });
+    }
+
+    if (address.length < 30 || address.length > 50) {
+      return fail(400, { address, badAddress: true });
+    }
+
+    try {
+      Talent.create({
+        user: {
+          name,
+          auth: false,
+          address
+        },
+        agentCommission: +commission,
+        agent: agentId,
+        profileImageUrl: PUBLIC_DEFAULT_PROFILE_IMAGE
+      });
+    } catch (error) {
+      return fail(400, { err: error });
+    }
 
     return {
       success: true
@@ -80,7 +93,14 @@ export const load: PageServerLoad = async ({ params, url, cookies }) => {
     })
     .exec();
 
+  const talents = await Talent.find({ agent: agent._id }).sort({
+    'user.name': 1
+  });
+
   return {
-    agent: agent.toObject({ flattenObjectIds: true })
+    agent: agent.toObject({ flattenObjectIds: true }),
+    talents: talents.map((talent) =>
+      talent.toObject({ flattenObjectIds: true })
+    )
   };
 };
