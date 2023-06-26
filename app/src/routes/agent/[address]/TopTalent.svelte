@@ -25,11 +25,9 @@
     responsive: true,
     circumference: 180,
     rotation: -90,
-    animation: {
-      animateScal: true
-    },
+    animation: true,
     plugins: {
-      legend: { display: true, position: 'bottom' },
+      legend: { display: true, position: 'bottom' as const },
       datalabels: {
         formatter: function (value: number | bigint) {
           return currencyFormatter.format(value);

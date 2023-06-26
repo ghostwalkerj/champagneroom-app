@@ -27,7 +27,7 @@ export const actions: Actions = {
       return fail(400, { url, missingUrl: true });
     }
     const talent = await Talent.findOneAndUpdate(
-      { key },
+      { 'user.address': key },
       { profileImageUrl: url }
     ).exec();
 

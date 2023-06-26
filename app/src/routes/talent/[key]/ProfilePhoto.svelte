@@ -120,25 +120,19 @@
     <div class="justify-center card-actions last:my-2">
       {#if !uploadReady}
         <label
-          class="custom-file-upload btn btn-xs btn-secondary md:btn-sm"
+          class="custom-file-upload btn btn-xs btn-secondary"
           use:filedrop={options}
           on:filedrop={onChange}
         >
           <input type="file" class="hidden" />
-          Choose Image
+          Select Image
         </label>
       {:else}
-        <button
-          class="btn btn-xs btn-secondary md:btn-sm"
-          on:click={() => upload()}
-        >
+        <button class="btn btn-xs btn-secondary" on:click={() => upload()}>
           Upload</button
         >
       {/if}
-      <button
-        class="btn btn-xs btn-outline btn-secondary md:btn-sm"
-        on:click={resetForm}
-      >
+      <button class="btn btn-xs btn-outline btn-secondary" on:click={resetForm}>
         Cancel</button
       >
     </div>

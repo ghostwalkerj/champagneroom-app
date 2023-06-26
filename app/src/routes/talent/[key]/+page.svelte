@@ -27,10 +27,10 @@
   import { ActorType, durationFormatter } from '$lib/constants';
   import { createEventText } from '$lib/util/eventUtil';
 
-  import ProfilePhoto from '$components/forms/ProfilePhoto.svelte';
   import ShowDetail from '$components/ShowDetail.svelte';
   import { showEventStore, showStore, talentStore } from '$stores';
 
+  import ProfilePhoto from './ProfilePhoto.svelte';
   import TalentWallet from './TalentWallet.svelte';
 
   import type { ActionData, PageData } from './$types';
@@ -277,12 +277,12 @@
                       minlength="3"
                       maxlength="50"
                     />
+                    {#if form?.badName}
+                      <div class="shadow-lg alert alert-error">
+                        Show Name should be between 3 and 50 characters
+                      </div>
+                    {/if}
                   </div>
-                  {#if form?.badName}
-                    <div class="shadow-lg alert alert-error">
-                      Show Name should be between 3 and 50 characters
-                    </div>
-                  {/if}
 
                   <div class="form-control md:w-40">
                     <!-- svelte-ignore a11y-label-has-associated-control -->
@@ -315,12 +315,12 @@
                       </div>
                     </div>
                     {#if form?.missingPrice}<div
-                        class="shadow-lg alert alert-error"
+                        class="shadow-lg alert alert-error whitespace-nowrap"
                       >
                         Price is required
                       </div>{/if}
                     {#if form?.invalidPrice}<div
-                        class="shadow-lg alert alert-error"
+                        class="shadow-lg alert alert-error whitespace-nowrap"
                       >
                         Invalid Price
                       </div>{/if}
@@ -336,7 +336,7 @@
                   <div class="form-control md:w-1/5">
                     <!-- svelte-ignore a11y-label-has-associated-control -->
                     <label class="label">
-                      <span class="label-text"
+                      <span class="label-text whitespace-nowrap"
                         >Duration ({durationFormatter(showDuration)})</span
                       >
                     </label>
