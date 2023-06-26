@@ -21,6 +21,7 @@
   import { nameStore } from '$stores';
 
   import AgentWallet from './AgentWallet.svelte';
+  import TopTalent from './TopTalent.svelte';
 
   import type { PageData } from './$types';
 
@@ -284,24 +285,18 @@
                 <!-- Status -->
                 <div class="md:col-start-3 md:col-span-1">
                   <div class="bg-primary text-primary-content card">
-                    <div class="text-center card-body -m-4 items-center" />
+                    <div class="text-center card-body items-center">
+                      <TopTalent {talents} />
+                    </div>
                   </div>
                 </div>
-
-                <div />
-                <div class="pb-4" />
               </div>
 
               <!--Next Column-->
               <div class="space-y-3 md:col-start-4 md:col-span-1">
                 <!-- Wallet -->
-                <div>
+                <div class="h-full">
                   <AgentWallet />
-                </div>
-
-                <!-- Activity Feed -->
-                <div>
-                  <div class="lg:col-start-3 lg:col-span-1" />
                 </div>
               </div>
             </div>

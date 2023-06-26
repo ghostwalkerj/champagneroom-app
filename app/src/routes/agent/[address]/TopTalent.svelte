@@ -16,15 +16,8 @@
 
   if (talents) {
     for (const talent of talents) {
-      const range = {
-        start: now.startOf('month').epoch,
-        end: now.endOf('month').epoch
-      };
-      const stats = await talent.getStatsByRange(range);
-      if (stats.totalEarnings > 0) {
-        talentData = talentData.concat(stats.totalEarnings);
-        labels = labels.concat(talent.user.name);
-      }
+      talentData = [...talentData, talent.salesStats.totalRevenue];
+      labels = [...labels, talent.user.name];
     }
   }
 
