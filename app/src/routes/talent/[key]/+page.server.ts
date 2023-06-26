@@ -56,7 +56,7 @@ export const actions: Actions = {
       return fail(400, { price, invalidPrice: true });
     }
 
-    const talent = (await Talent.findOne({ key })
+    const talent = (await Talent.findOne({ 'user.address': key })
       .orFail(() => {
         throw error(404, 'Talent not found');
       })
@@ -77,7 +77,7 @@ export const actions: Actions = {
         }
       },
       talentInfo: {
-        name: talent.name,
+        name: talent.user.name,
         profileImageUrl: talent.profileImageUrl
       }
     });
@@ -121,7 +121,10 @@ export const actions: Actions = {
 
     if (showMachineState.can(cancelEvent)) {
       showService.send(cancelEvent);
-      Talent.updateOne({ key }, { $pull: { activeShows: showId } }).exec();
+      Talent.updateOne(
+        { 'user.address': key },
+        { $pull: { activeShows: showId } }
+      ).exec();
     }
 
     const showState = showService.getSnapshot().context.showState;
@@ -171,7 +174,7 @@ export const load: PageServerLoad = async ({ params }) => {
     throw error(404, 'Key not found');
   }
 
-  const talent = await Talent.findOne({ key })
+  const talent = await Talent.findOne({ 'user.address': key })
     .orFail(() => {
       throw error(404, 'Talent not found');
     })

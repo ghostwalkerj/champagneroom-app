@@ -42,10 +42,10 @@
 
   let talent = data.talent as TalentDocumentType;
   let currentShow = data.currentShow as ShowDocumentType | undefined;
-  let showName = talent ? possessive(talent.name, 'en') + ' Show' : 'Show';
+  let showName = talent ? possessive(talent.user.name, 'en') + ' Show' : 'Show';
 
   $: showDuration = 60;
-  $: talentName = talent ? talent.name : 'Talent';
+  $: talentName = talent ? talent.user.name : 'Talent';
   $: statusText = currentShow
     ? currentShow.showState.status
     : 'No Current Show';
@@ -130,7 +130,7 @@
     talentUnSub = talentStore(talent).subscribe((_talent) => {
       if (_talent) {
         talent = _talent;
-        talentName = _talent.name;
+        talentName = _talent.user.name;
       }
     });
     currentShow ? useNewShow(currentShow) : noCurrentShow();

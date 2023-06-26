@@ -4,17 +4,18 @@
   import spacetime from 'spacetime';
   import { Doughnut } from 'svelte-chartjs';
 
-  import { currencyFormatter } from '$lib/constants';
-  import type { TalentDocument } from '$lib/ORM/models/talent';
+  import type { TalentDocumentType } from '$lib/models/talent';
 
-  export let talents: TalentDocument[];
+  import { currencyFormatter } from '$lib/constants';
+
+  export let talents: TalentDocumentType[];
 
   const now = spacetime.now();
   let labels = [] as string[];
   let talentData = [] as number[];
 
   if (talents) {
-    talents.forEach(async (talent: TalentDocument) => {
+    for (const talent of talents) {
       const range = {
         start: now.startOf('month').epoch,
         end: now.endOf('month').epoch
@@ -22,9 +23,9 @@
       const stats = await talent.getStatsByRange(range);
       if (stats.totalEarnings > 0) {
         talentData = talentData.concat(stats.totalEarnings);
-        labels = labels.concat(talent.name);
+        labels = labels.concat(talent.user.name);
       }
-    });
+    }
   }
 
   const options = {

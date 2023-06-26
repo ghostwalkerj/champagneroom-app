@@ -24,7 +24,7 @@
   let returnUrl = urlJoin(
     $page.url.origin,
     PUBLIC_TALENT_PATH,
-    talentObject.key
+    talentObject.user.address
   );
   let api: any;
   let participantName = '';

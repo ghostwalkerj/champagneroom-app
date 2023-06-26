@@ -5,7 +5,7 @@
   <div class="text-center card-body items-center">
     <h2 class="text-2xl card-title">My Wallet</h2>
 
-    <div class="bg-primary text-primary-content stats">
+    <div class="bg-primary text-primary-content stats stats-vertical">
       <div class="stat">
         <div class="stat-title">Account balance</div>
         <div class="stat-value">$89,400</div>

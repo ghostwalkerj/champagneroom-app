@@ -55,7 +55,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
     throw error(404, 'Key not found');
   }
 
-  const talent = await Talent.findOne({ key })
+  const talent = await Talent.findOne({ 'user.address': key })
     .orFail(() => {
       throw error(404, 'Talent not found');
     })
@@ -94,7 +94,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
       moderator: true,
       context: {
         user: {
-          name: talent.name,
+          name: talent.user.name,
           affiliation: 'owner',
           lobby_bypass: true
         }

@@ -21,7 +21,7 @@
       const stats = await talent.getStatsByRange(range);
       if (stats.totalEarnings > 0) {
         talentData = talentData.concat(stats.totalEarnings);
-        labels = labels.concat(talent.name);
+        labels = labels.concat(talent.user.name);
       }
     });
   }

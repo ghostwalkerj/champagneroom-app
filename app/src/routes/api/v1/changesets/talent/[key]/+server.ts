@@ -12,13 +12,13 @@ export const GET = (async ({ params, url }) => {
     : false;
 
   if (isFirstFetch) {
-    const talent = await Talent.findOne({ key: talentKey }).exec();
+    const talent = await Talent.findOne({ 'user.address': talentKey }).exec();
     if (talent !== undefined) {
       return new Response(JSON.stringify(talent));
     }
   }
 
-  const pipeline = [{ $match: { 'fullDocument.key': talentKey } }];
+  const pipeline = [{ $match: { 'fullDocument.user.address': talentKey } }];
   const changeStream = Talent.watch(pipeline, {
     fullDocument: 'updateLookup'
   });

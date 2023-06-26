@@ -131,7 +131,7 @@ export const showStore = (show: ShowDocumentType) => {
 export const talentStore = (talent: TalentDocumentType) => {
   return abstractStore({
     doc: talent,
-    changesetPath: urlJoin(PUBLIC_CHANGESET_PATH, 'talent', talent.key)
+    changesetPath: urlJoin(PUBLIC_CHANGESET_PATH, 'talent', talent.user.address)
   });
 };
 

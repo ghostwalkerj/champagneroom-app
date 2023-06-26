@@ -1,23 +1,28 @@
 <script lang="ts">
   import { nanoid } from 'nanoid';
+  import StarRating from 'svelte-star-rating';
   import { uniqueNamesGenerator } from 'unique-names-generator';
+  import urlJoin from 'url-join';
 
   import { enhance } from '$app/forms';
   import { invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
-  import { PUBLIC_DEFAULT_COMMISSION } from '$env/static/public';
+  import {
+    PUBLIC_DEFAULT_COMMISSION,
+    PUBLIC_TALENT_PATH
+  } from '$env/static/public';
 
   import type { AgentDocumentType } from '$lib/models/agent';
   import type { TalentDocumentType } from '$lib/models/talent';
 
+  import { currencyFormatter } from '$lib/constants';
   import { womensNames } from '$lib/util/womensNames';
 
   import { nameStore } from '$stores';
 
   import AgentWallet from './AgentWallet.svelte';
-  import TalentForm from './TalentForm.svelte';
 
-  import type { ActionData, PageData } from './$types';
+  import type { PageData } from './$types';
 
   export let data: PageData;
   const agent = data.agent as AgentDocumentType;
@@ -105,7 +110,7 @@
           >
             <div class="overflow-x-auto reo">
               {#key talents}
-                <table class="table table-pin-rows table-pin-cols">
+                <table class="table table-pin-rows">
                   <thead>
                     <tr>
                       <th
@@ -122,10 +127,14 @@
                         >
                       </th>
                       <th>Name</th>
-                      <th>Key</th>
-                      <th>Commission</th>
+                      <th>Comm %</th>
                       <th>Active</th>
-                      <th>Impersonate</th>
+                      <th>URL</th>
+                      <th>Sales</th>
+                      <th>Revenue</th>
+                      <th>Refunds</th>
+                      <th>Reviews</th>
+                      <th>Rating</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -168,11 +177,7 @@
                           bind:this={talentNameElement}
                           bind:innerText={talentName}
                         />
-                        <td
-                          contenteditable="true"
-                          bind:this={talentAddressElement}
-                          bind:innerText={talentAddress}
-                        />
+
                         <td
                           contenteditable="true"
                           bind:this={talentCommissionElement}
@@ -194,7 +199,7 @@
                             console.log(event.target?.textContent);
                           }}>{talent.user.name}</td
                         >
-                        <td contenteditable="true">{talent.user.address}</td>
+
                         <td contenteditable="true">{talent.agentCommission}</td>
 
                         <td>
@@ -211,14 +216,58 @@
                           </select>
                         </td>
                         <td
-                          ><button
-                            class="btn btn-primary btn-xs"
-                            on:click={() => {}}>Impersonate</button
-                          ></td
+                          ><a
+                            href={urlJoin(
+                              PUBLIC_TALENT_PATH,
+                              talent.user.address
+                            )}
+                            class="btn btn-primary btn-xs">URL</a
+                          >
+                        </td>
+
+                        <td
+                          >{currencyFormatter.format(
+                            talent.salesStats.totalSales
+                          )}</td
                         >
+                        <td
+                          >{currencyFormatter.format(
+                            talent.salesStats.totalRevenue
+                          )}</td
+                        >
+                        <td
+                          >{currencyFormatter.format(
+                            talent.salesStats.totalRefunded
+                          )}</td
+                        >
+                        <td>{talent.feedbackStats.numberOfReviews}</td>
+                        <td
+                          class="tooltip"
+                          data-tip={talent.feedbackStats.averageRating.toFixed(
+                            2
+                          )}
+                        >
+                          <StarRating
+                            rating={talent.feedbackStats.averageRating}
+                          />
+                        </td>
                       </tr>
                     {/each}
                   </tbody>
+                  <tfoot>
+                    <tr>
+                      <th />
+                      <th>Name</th>
+                      <th>Comm %</th>
+                      <th>Active</th>
+                      <th>URL</th>
+                      <th>Sales</th>
+                      <th>Revenue</th>
+                      <th>Refunds</th>
+                      <th>Reviews</th>
+                      <th>Rating</th>
+                    </tr>
+                  </tfoot>
                 </table>
               {/key}
             </div>
@@ -227,20 +276,34 @@
             class:invisible={activeTab !== 'Dashboard'}
             class="absolute top-4 left-0 bg-neutral w-full rounded-lg"
           >
-            <div class="overflow-x-auto">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th />
-                    <th>Talent</th>
-                    <th>Amount</th>
-                    <th>Show Start</th>
-                    <th>Show End</th>
-                    <th>Reason</th>
-                    <th>Explanation</th>
-                  </tr>
-                </thead>
-              </table>
+            <div
+              class="p-4 flex-col gap-3 min-w-full md:min-w-min md:grid md:grid-cols-3"
+            >
+              <!-- 1st column -->
+              <div class="flex-1 space-y-3 md:col-start-1 md:col-span-3">
+                <!-- Status -->
+                <div class="md:col-start-3 md:col-span-1">
+                  <div class="bg-primary text-primary-content card">
+                    <div class="text-center card-body -m-4 items-center" />
+                  </div>
+                </div>
+
+                <div />
+                <div class="pb-4" />
+              </div>
+
+              <!--Next Column-->
+              <div class="space-y-3 md:col-start-4 md:col-span-1">
+                <!-- Wallet -->
+                <div>
+                  <AgentWallet />
+                </div>
+
+                <!-- Activity Feed -->
+                <div>
+                  <div class="lg:col-start-3 lg:col-span-1" />
+                </div>
+              </div>
             </div>
           </div>
         </div>

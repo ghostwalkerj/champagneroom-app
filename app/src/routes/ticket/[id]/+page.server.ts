@@ -52,7 +52,7 @@ export const actions: Actions = {
   buy_ticket: async ({ params, locals }) => {
     const ticketId = params.id;
     if (ticketId === null) {
-      throw error(404, 'Key not found');
+      throw error(404, 'Ticket not found');
     }
 
     const redisConnection = locals.redisConnection as IORedis;
@@ -86,7 +86,7 @@ export const actions: Actions = {
   cancel_ticket: async ({ params, locals }) => {
     const ticketId = params.id;
     if (ticketId === null) {
-      throw error(404, 'Key not found');
+      throw error(404, 'Ticket not found');
     }
 
     const redisConnection = locals.redisConnection as IORedis;
@@ -169,7 +169,7 @@ export const actions: Actions = {
   initiate_dispute: async ({ params, request, locals }) => {
     const ticketId = params.id;
     if (ticketId === null) {
-      throw error(404, 'Key not found');
+      throw error(404, 'Ticket not found');
     }
 
     const data = await request.formData();
