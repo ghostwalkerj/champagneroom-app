@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
+  import type { Unsubscriber } from 'svelte/store';
   import urlJoin from 'url-join';
 
   import { browser } from '$app/environment';
@@ -11,16 +12,13 @@
     PUBLIC_TICKET_PATH
   } from '$env/static/public';
 
-  import type { ShowDocumentType } from '$lib/models/show';
+  import { type ShowDocumentType, ShowStatus } from '$lib/models/show';
   import type { TicketDocumentType } from '$lib/models/ticket';
-
-  import {
-    createTicketMachineService,
-    TicketMachineEventString
-  } from '$lib/machines/ticketMachine';
 
   import { jitsiInterfaceConfigOverwrite } from '$lib/constants';
   import getProfileImage from '$lib/util/profilePhoto';
+
+  import { showStore } from '$stores';
 
   import type { PageData } from './$types';
 
@@ -31,6 +29,7 @@
 
   // @ts-ignore
   let jitsiToken = data.jitsiToken as string;
+  let showUnSub: Unsubscriber;
 
   let returnUrl = urlJoin(
     $page.url.origin,
@@ -42,6 +41,7 @@
   if (browser) {
     onDestroy(() => {
       leaveShow();
+      showUnSub?.();
     });
 
     const leaveShow = () => {
@@ -83,15 +83,10 @@
       }
     });
 
-    const ticketMachineService = createTicketMachineService({
-      ticketDocument: ticket,
-      showDocument: show
-    });
-
-    ticketMachineService.subscribe((state) => {
-      const isTimeToLeave = !state.can({
-        type: TicketMachineEventString.SHOW_JOINED
-      });
+    showUnSub = showStore(show).subscribe((_show) => {
+      const isTimeToLeave =
+        _show.showState.status !== ShowStatus.LIVE &&
+        _show.showState.status !== ShowStatus.STOPPED;
       if (isTimeToLeave) {
         api.executeCommand('hangup');
         goto(returnUrl);
