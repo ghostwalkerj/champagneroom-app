@@ -21,6 +21,7 @@ import type { TransactionDocumentType } from '$lib/models/transaction';
 import type { ShowJobDataType } from '$lib/workers/showWorker';
 
 import { ActorType } from '$lib/constants';
+import console from 'console';
 
 enum ShowMachineEventString {
   CANCELLATION_INITIATED = 'CANCELLATION INITIATED',
@@ -571,6 +572,7 @@ const createShowMachine = ({
         },
 
         receiveDispute: assign((context, event) => {
+          console.log('receiveDispute', event);
           const st = context.showState;
           return {
             showState: {
