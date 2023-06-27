@@ -340,11 +340,13 @@ const feedbackReceived = async (show: ShowType) => {
       .match(ticketFilter)
       .group(groupBy);
 
-    const averageRating = aggregate[0]['averageRating'] as number;
-    const numberOfReviews = aggregate[0]['numberOfReviews'] as number;
     if (aggregate.length === 0) {
       return;
     }
+
+    const averageRating = aggregate[0]['averageRating'] as number;
+    const numberOfReviews = aggregate[0]['numberOfReviews'] as number;
+
     show.showState.feedbackStats = {
       averageRating,
       numberOfReviews

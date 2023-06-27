@@ -247,8 +247,7 @@ const createShowMachine = ({
           on: {
             'SHOW FINALIZED': {
               target: 'finalized',
-              actions: ['finalizeShow'],
-              cond: 'canFinalize'
+              actions: ['finalizeShow']
             },
             'FEEDBACK RECEIVED': [
               {
@@ -628,6 +627,7 @@ const createShowMachine = ({
             }
           };
         }),
+
         deactivateShow: assign((context) => {
           return {
             showState: {
@@ -770,12 +770,13 @@ const createShowMachine = ({
         },
         canFinalize: (context, event) => {
           const count = event.type === 'FEEDBACK RECEIVED' ? 1 : 0;
-          const fullReviewed =
+          const fullyReviewed =
             context.showState.feedbackStats.numberOfReviews + count ===
             context.showState.salesStats.ticketsSold;
           const hasDisputes =
-            context.showState.disputeStats.totalDisputesPending === 0;
-          return fullReviewed && !hasDisputes;
+            context.showState.disputeStats.totalDisputesPending > 0;
+
+          return fullyReviewed && !hasDisputes;
         },
         disputesResolved: (context) =>
           context.showState.disputeStats.totalDisputesPending === 0
