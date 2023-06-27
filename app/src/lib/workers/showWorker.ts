@@ -12,7 +12,7 @@ import type { ShowType } from '$lib/models/show';
 import { SaveState, Show, ShowStatus } from '$lib/models/show';
 import { createShowEvent } from '$lib/models/showEvent';
 import { Talent } from '$lib/models/talent';
-import { Ticket } from '$lib/models/ticket';
+import { Ticket, TicketStatus } from '$lib/models/ticket';
 import type { TransactionType } from '$lib/models/transaction';
 import { Transaction, TransactionReasonType } from '$lib/models/transaction';
 
@@ -327,7 +327,7 @@ const feedbackReceived = async (show: ShowType) => {
     // aggregate ticket feedback into show
     const ticketFilter = {
       show: show._id,
-      'ticketState.feedback.rating': { $exists: true }
+      'ticketState.status': TicketStatus.FINALIZED
     };
 
     const groupBy = {
