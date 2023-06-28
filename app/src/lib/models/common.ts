@@ -1,4 +1,4 @@
-import { type InferSchemaType, Schema } from 'mongoose';
+import { Schema, type InferSchemaType } from 'mongoose';
 import validator from 'validator';
 
 import { ActorType } from '$lib/constants';

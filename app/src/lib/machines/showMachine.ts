@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import type { Queue } from 'bullmq';
 import { Types } from 'mongoose';
 import { nanoid } from 'nanoid';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
@@ -17,8 +16,6 @@ import { DisputeDecision } from '$lib/models/common';
 import type { ShowDocumentType } from '$lib/models/show';
 import { ShowStatus } from '$lib/models/show';
 import type { TransactionDocumentType } from '$lib/models/transaction';
-
-import type { ShowJobDataType } from '$lib/workers/showWorker';
 
 import { ActorType } from '$lib/constants';
 
@@ -122,6 +119,7 @@ export type ShowMachineEventType =
   | {
       type: 'TICKET CANCELLED';
       ticketId: string;
+      customerName: string;
     }
   | {
       type: 'TICKET SOLD';
@@ -157,9 +155,6 @@ export type ShowMachineEventType =
       dispute: DisputeType;
     }
   | {
-      type: 'ESCROW ENDED';
-    }
-  | {
       type: 'DISPUTE RESOLVED';
       decision: DisputeDecision;
     };
@@ -177,7 +172,6 @@ export type ShowMachineOptions = {
     transaction?: TransactionDocumentType;
     ticketInfo?: { customerName: string };
   }) => void;
-  jobQueue?: Queue<ShowJobDataType, any, string>;
   gracePeriod?: number;
   escrowPeriod?: number;
 };
@@ -506,17 +500,7 @@ const createShowMachine = ({
           };
         }),
 
-        endShow: assign((context, event) => {
-          showMachineOptions?.jobQueue?.add(event.type, {
-            showId: context.showDocument._id.toString()
-          });
-          showMachineOptions?.jobQueue?.add(
-            ShowMachineEventString.ESCROW_ENDED,
-            {
-              showId: context.showDocument._id.toString()
-            },
-            { delay: ESCROW_PERIOD }
-          );
+        endShow: assign((context) => {
           return {
             showState: {
               ...context.showState,
@@ -529,18 +513,11 @@ const createShowMachine = ({
           };
         }),
 
-        stopShow: assign((context, event) => {
+        stopShow: assign((context) => {
           const startDate = context.showState.runtime?.startDate;
           if (!startDate) {
             throw new Error('Show start date is not defined');
           }
-          showMachineOptions?.jobQueue?.add(
-            event.type,
-            {
-              showId: context.showDocument._id.toString()
-            },
-            { delay: GRACE_PERIOD }
-          );
 
           return {
             showState: {
@@ -555,10 +532,6 @@ const createShowMachine = ({
         }),
 
         initiateCancellation: assign((context, event) => {
-          showMachineOptions?.jobQueue?.add(event.type, {
-            showId: context.showDocument._id.toString(),
-            cancel: event.cancel
-          });
           return {
             showState: {
               ...context.showState,
@@ -572,10 +545,7 @@ const createShowMachine = ({
           };
         }),
 
-        initiateRefund: assign((context, event) => {
-          showMachineOptions?.jobQueue?.add(event.type, {
-            showId: context.showDocument._id.toString()
-          });
+        initiateRefund: assign((context) => {
           return {
             showState: {
               ...context.showState,
@@ -736,10 +706,6 @@ const createShowMachine = ({
         }),
 
         finalizeShow: assign((context, event) => {
-          showMachineOptions?.jobQueue?.add(event.type, {
-            showId: context.showDocument._id.toString(),
-            finalize: event.finalize
-          });
           const escrow = context.showState.escrow || {
             startedAt: new Date()
           };
@@ -805,8 +771,11 @@ const createShowMachine = ({
             context.showState.salesStats.ticketsSold;
           const hasDisputes =
             context.showState.disputeStats.totalDisputesPending > 0;
-
-          return fullyReviewed && !hasDisputes;
+          const escrowOver =
+            (context.showState.escrow?.startedAt?.getTime() || 0) +
+              GRACE_PERIOD <
+            Date.now();
+          return escrowOver || (fullyReviewed && !hasDisputes);
         },
         disputesResolved: (context) =>
           context.showState.disputeStats.totalDisputesPending === 0

@@ -35,16 +35,16 @@ export const actions: Actions = {
 
     const redisConnection = locals.redisConnection as IORedis;
 
-    const jobQueue = new Queue(EntityType.SHOW, {
+    const showQueue = new Queue(EntityType.SHOW, {
       connection: redisConnection
     }) as Queue<ShowJobDataType, any, ShowMachineEventString>;
 
-    const showService = await getShowMachineServiceFromId(showId, jobQueue);
+    const showService = await getShowMachineServiceFromId(showId);
 
     const showState = showService.getSnapshot();
 
     if (showState.can({ type: ShowMachineEventString.SHOW_STOPPED })) {
-      jobQueue.add(ShowMachineEventString.SHOW_STOPPED, {
+      showQueue.add(ShowMachineEventString.SHOW_STOPPED, {
         showId
       });
     }
@@ -75,11 +75,11 @@ export const load: PageServerLoad = async ({ params, locals }) => {
     .exec();
 
   const redisConnection = locals.redisConnection as IORedis;
-  const jobQueue = new Queue(EntityType.SHOW, {
+  const showQueue = new Queue(EntityType.SHOW, {
     connection: redisConnection
   }) as Queue<ShowJobDataType, any, ShowMachineEventString>;
 
-  const showService = getShowMachineService(show, jobQueue);
+  const showService = getShowMachineService(show);
   const showState = showService.getSnapshot();
 
   if (!showState.can({ type: ShowMachineEventString.SHOW_STARTED })) {
@@ -88,7 +88,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
   }
 
   if (!showState.matches('started'))
-    jobQueue.add(ShowMachineEventString.SHOW_STARTED, {
+    showQueue.add(ShowMachineEventString.SHOW_STARTED, {
       showId: show._id.toString()
     });
 

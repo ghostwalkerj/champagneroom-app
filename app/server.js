@@ -44,7 +44,13 @@ const showQueue = new Queue(EntityType.SHOW, { connection: redisConnection });
 // Workers
 if (startWorker) {
   // @ts-ignore
-  const showWorker = getShowWorker(showQueue, redisConnection);
+  const showWorker = getShowWorker({
+    // @ts-ignore
+    showQueue,
+    redisConnection,
+    escrowPeriod: +(process.env.PUBLIC_ESCROW_PERIOD || 36_000_000),
+    gracePeriod: +(process.env.PUBLIC_GRACE_PERIOD || 36_000_000)
+  });
   showWorker.run();
 }
 

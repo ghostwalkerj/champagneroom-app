@@ -50,11 +50,11 @@ export const actions: Actions = {
       .exec();
 
     const redisConnection = locals.redisConnection as IORedis;
-    const jobQueue = new Queue(EntityType.SHOW, {
+    const showQueue = new Queue(EntityType.SHOW, {
       connection: redisConnection
     }) as Queue<ShowJobDataType, any, ShowMachineEventString>;
 
-    const showService = await getShowMachineServiceFromId(showId, jobQueue);
+    const showService = await getShowMachineServiceFromId(showId, showQueue);
 
     const ticket = await Ticket.create({
       show: show._id,
@@ -81,7 +81,7 @@ export const actions: Actions = {
       return error(501, 'Show cannot Reserve Ticket'); // TODO: This should be atomic
     }
 
-    jobQueue.add(ShowMachineEventString.TICKET_RESERVED, {
+    showQueue.add(ShowMachineEventString.TICKET_RESERVED, {
       showId: show._id.toString(),
       ticketId: ticket._id.toString(),
       customerName: name

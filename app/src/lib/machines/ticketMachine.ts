@@ -319,7 +319,7 @@ const createTicketMachine = ({
     {
       actions: {
         sendJoinedShow: (context) => {
-          ticketMachineOptions?.jobQueue?.add(
+          ticketMachineOptions?.showQueue?.add(
             ShowMachineEventString.CUSTOMER_JOINED,
             {
               showId: context.ticketDocument.show.toString(),
@@ -330,7 +330,7 @@ const createTicketMachine = ({
         },
 
         sendLeftShow: (context) => {
-          ticketMachineOptions?.jobQueue?.add(
+          ticketMachineOptions?.showQueue?.add(
             ShowMachineEventString.CUSTOMER_LEFT,
             {
               showId: context.ticketDocument.show.toString(),
@@ -341,7 +341,7 @@ const createTicketMachine = ({
         },
 
         sendTicketSold: (context) => {
-          ticketMachineOptions?.jobQueue?.add(
+          ticketMachineOptions?.showQueue?.add(
             ShowMachineEventString.TICKET_SOLD,
             {
               showId: context.ticketDocument.show.toString(),
@@ -353,7 +353,7 @@ const createTicketMachine = ({
         },
 
         sendTicketRedeemed: (context) => {
-          ticketMachineOptions?.jobQueue?.add(
+          ticketMachineOptions?.showQueue?.add(
             ShowMachineEventString.TICKET_REDEEMED,
             {
               showId: context.ticketDocument.show.toString(),
@@ -363,7 +363,7 @@ const createTicketMachine = ({
         },
 
         sendTicketRefunded: (context) => {
-          ticketMachineOptions?.jobQueue?.add(
+          ticketMachineOptions?.showQueue?.add(
             ShowMachineEventString.TICKET_REFUNDED,
             {
               showId: context.ticketDocument.show.toString(),
@@ -374,18 +374,18 @@ const createTicketMachine = ({
         },
 
         sendTicketCancelled: (context) => {
-          ticketMachineOptions?.jobQueue?.add(
+          ticketMachineOptions?.showQueue?.add(
             ShowMachineEventString.TICKET_CANCELLED,
             {
               showId: context.ticketDocument.show.toString(),
               ticketId: context.ticketDocument._id.toString(),
-              cancel: context.ticketState.cancel
+              customerName: context.ticketDocument.customerName
             }
           );
         },
 
         sendFeedbackReceived: (context) => {
-          ticketMachineOptions?.jobQueue?.add(
+          ticketMachineOptions?.showQueue?.add(
             ShowMachineEventString.FEEDBACK_RECEIVED,
             {
               showId: context.ticketDocument.show.toString(),
@@ -398,7 +398,7 @@ const createTicketMachine = ({
         },
 
         sendDisputeInitiated: (context) => {
-          ticketMachineOptions?.jobQueue?.add(
+          ticketMachineOptions?.showQueue?.add(
             ShowMachineEventString.TICKET_DISPUTED,
             {
               showId: context.ticketDocument.show.toString(),
@@ -409,7 +409,7 @@ const createTicketMachine = ({
         },
 
         sendDisputeResolved: (context) => {
-          ticketMachineOptions?.jobQueue?.add(
+          ticketMachineOptions?.showQueue?.add(
             ShowMachineEventString.DISPUTE_RESOLVED,
             {
               showId: context.ticketDocument.show.toString(),
@@ -654,7 +654,7 @@ export type TicketMachineOptions = {
   saveStateCallback?: (state: TicketStateType) => void;
   gracePeriod?: number;
   escrowPeriod?: number;
-  jobQueue?: Queue<ShowJobDataType, any, string>;
+  showQueue?: Queue<ShowJobDataType, any, string>;
 };
 
 export type TicketMachineServiceType = ReturnType<

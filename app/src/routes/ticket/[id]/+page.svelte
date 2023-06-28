@@ -9,7 +9,7 @@
   import { PUBLIC_SHOWTIME_PATH } from '$env/static/public';
 
   import { CancelReason, DisputeReason } from '$lib/models/common';
-  import { ShowStatus, type ShowDocumentType } from '$lib/models/show';
+  import { type ShowDocumentType, ShowStatus } from '$lib/models/show';
   import type { TicketDocumentType } from '$lib/models/ticket';
 
   import type { TicketMachineServiceType } from '$lib/machines/ticketMachine';
@@ -33,7 +33,7 @@
   const reasons = Object.values(DisputeReason);
 
   let shouldPay = false;
-  let canWatchShow = false;
+  $: canWatchShow = false;
   let canCancelTicket = false;
   let isTicketDone = false;
   let canLeaveFeedback = false;
@@ -43,13 +43,14 @@
   let ticketUnSub: Unsubscriber;
   let isShowPaymentLoading = false;
   let isShowCancelLoading = false;
-  let hasShowStarted = false;
+  $: hasShowStarted = false;
   $: loading = false;
 
   const useTicketMachine = (ticketMachineService: TicketMachineServiceType) => {
     const state = ticketMachineService.getSnapshot();
     shouldPay = state.matches('reserved.waiting4Payment');
-    canWatchShow = state.can('SHOW JOINED') && hasShowStarted;
+    canWatchShow =
+      state.matches('reserved.waiting4Show') || state.matches('redeemed');
     canCancelTicket = state.can({
       type: 'CANCELLATION INITIATED',
       cancel: {
@@ -174,7 +175,7 @@
               </form>
             {/if}
           </div>
-        {:else if canWatchShow}
+        {:else if canWatchShow && hasShowStarted}
           <div class="p-4">
             <div class="w-full flex justify-center">
               <button

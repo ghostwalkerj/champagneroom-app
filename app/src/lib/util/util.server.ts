@@ -18,19 +18,7 @@ import type { ShowJobDataType } from '$lib/workers/showWorker';
 
 import { EntityType } from '$lib/constants';
 
-export const getShowMachineService = (
-  show: ShowType,
-  connection: Queue<ShowJobDataType, any, ShowMachineEventString> | IORedis
-) => {
-  const jobQueue =
-    connection instanceof Queue
-      ? connection
-      : (new Queue(EntityType.SHOW, { connection }) as Queue<
-          ShowJobDataType,
-          any,
-          ShowMachineEventString
-        >);
-
+export const getShowMachineService = (show: ShowType) => {
   return createShowMachineService({
     showDocument: show,
     showMachineOptions: {
@@ -40,24 +28,12 @@ export const getShowMachineService = (
         ticketId,
         transaction,
         ticketInfo
-      }) => createShowEvent({ show, type, ticketId, transaction, ticketInfo }),
-      jobQueue
+      }) => createShowEvent({ show, type, ticketId, transaction, ticketInfo })
     }
   });
 };
 
-export const getShowMachineServiceFromId = async (
-  showId: string,
-  connection: Queue<ShowJobDataType, any, ShowMachineEventString> | IORedis
-) => {
-  const jobQueue =
-    connection instanceof Queue
-      ? connection
-      : (new Queue(EntityType.SHOW, { connection }) as Queue<
-          ShowJobDataType,
-          any,
-          ShowMachineEventString
-        >);
+export const getShowMachineServiceFromId = async (showId: string) => {
   const show = await mongoose
     .model('Show')
     .findById(showId)
@@ -65,7 +41,7 @@ export const getShowMachineServiceFromId = async (
       throw new Error('Show not found');
     })
     .exec();
-  return getShowMachineService(show, jobQueue);
+  return getShowMachineService(show);
 };
 
 export const getTicketMachineService = (
@@ -76,7 +52,7 @@ export const getTicketMachineService = (
     saveStateCallback: (ticketState: TicketStateType) => {
       Ticket.updateOne({ _id: ticket._id }, { $set: { ticketState } }).exec();
     },
-    jobQueue:
+    showQueue:
       connection instanceof Queue
         ? connection
         : (new Queue(EntityType.SHOW, { connection }) as Queue<

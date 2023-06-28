@@ -5,8 +5,8 @@ import urlJoin from 'url-join';
 
 import { JWT_PRIVATE_KEY } from '$env/static/private';
 import {
-  PUBLIC_AGENT_PATH,
-  PUBLIC_DEFAULT_PROFILE_IMAGE
+    PUBLIC_AGENT_PATH,
+    PUBLIC_DEFAULT_PROFILE_IMAGE
 } from '$env/static/public';
 
 import { Agent } from '$lib/models/agent';

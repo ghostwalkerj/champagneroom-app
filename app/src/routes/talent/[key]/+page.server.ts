@@ -104,11 +104,11 @@ export const actions: Actions = {
     }
 
     const redisConnection = locals.redisConnection as IORedis;
-    const jobQueue = new Queue(EntityType.SHOW, {
+    const showQueue = new Queue(EntityType.SHOW, {
       connection: redisConnection
     }) as Queue<ShowJobDataType, any, ShowMachineEventString>;
 
-    const showService = await getShowMachineServiceFromId(showId, jobQueue);
+    const showService = await getShowMachineServiceFromId(showId);
     const showMachineState = showService.getSnapshot();
 
     const cancel = {
@@ -123,7 +123,7 @@ export const actions: Actions = {
     } as ShowMachineEventType;
 
     if (showMachineState.can(cancelEvent)) {
-      jobQueue.add(ShowMachineEventString.CANCELLATION_INITIATED, {
+      showQueue.add(ShowMachineEventString.CANCELLATION_INITIATED, {
         showId,
         cancel
       });
@@ -145,15 +145,15 @@ export const actions: Actions = {
     let isInEscrow = false;
 
     const redisConnection = locals.redisConnection as IORedis;
-    const jobQueue = new Queue(EntityType.SHOW, {
+    const showQueue = new Queue(EntityType.SHOW, {
       connection: redisConnection
     }) as Queue<ShowJobDataType, any, ShowMachineEventString>;
 
-    const showService = await getShowMachineServiceFromId(showId, jobQueue);
+    const showService = await getShowMachineServiceFromId(showId);
     const showState = showService.getSnapshot();
 
     if (showState.can({ type: ShowMachineEventString.SHOW_ENDED })) {
-      jobQueue.add(ShowMachineEventString.SHOW_ENDED, {
+      showQueue.add(ShowMachineEventString.SHOW_ENDED, {
         showId
       });
       isInEscrow = true;
