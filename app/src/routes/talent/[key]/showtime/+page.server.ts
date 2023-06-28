@@ -1,5 +1,6 @@
 import type { Actions } from '@sveltejs/kit';
 import { error, redirect } from '@sveltejs/kit';
+import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 import jwt from 'jsonwebtoken';
 import urlJoin from 'url-join';
@@ -16,6 +17,9 @@ import { Talent } from '$lib/models/talent';
 
 import { ShowMachineEventString } from '$lib/machines/showMachine';
 
+import type { ShowJobDataType } from '$lib/workers/showWorker';
+
+import { EntityType } from '$lib/constants';
 import {
   getShowMachineService,
   getShowMachineServiceFromId
@@ -31,20 +35,20 @@ export const actions: Actions = {
 
     const redisConnection = locals.redisConnection as IORedis;
 
-    const showService = await getShowMachineServiceFromId(
-      showId,
-      redisConnection
-    );
+    const jobQueue = new Queue(EntityType.SHOW, {
+      connection: redisConnection
+    }) as Queue<ShowJobDataType, any, ShowMachineEventString>;
+
+    const showService = await getShowMachineServiceFromId(showId, jobQueue);
 
     const showState = showService.getSnapshot();
 
     if (showState.can({ type: ShowMachineEventString.SHOW_STOPPED })) {
-      showService.send({
-        type: ShowMachineEventString.SHOW_STOPPED
+      jobQueue.add(ShowMachineEventString.SHOW_STOPPED, {
+        showId
       });
-
-      return { success: true };
     }
+    return { success: true };
   }
 };
 
@@ -71,7 +75,11 @@ export const load: PageServerLoad = async ({ params, locals }) => {
     .exec();
 
   const redisConnection = locals.redisConnection as IORedis;
-  const showService = getShowMachineService(show, redisConnection);
+  const jobQueue = new Queue(EntityType.SHOW, {
+    connection: redisConnection
+  }) as Queue<ShowJobDataType, any, ShowMachineEventString>;
+
+  const showService = getShowMachineService(show, jobQueue);
   const showState = showService.getSnapshot();
 
   if (!showState.can({ type: ShowMachineEventString.SHOW_STARTED })) {
@@ -80,8 +88,8 @@ export const load: PageServerLoad = async ({ params, locals }) => {
   }
 
   if (!showState.matches('started'))
-    showService.send({
-      type: ShowMachineEventString.SHOW_STARTED
+    jobQueue.add(ShowMachineEventString.SHOW_STARTED, {
+      showId: show._id.toString()
     });
 
   const jitsiToken = jwt.sign(

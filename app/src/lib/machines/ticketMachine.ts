@@ -1,17 +1,10 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
+import type { Queue } from 'bullmq';
 import { Types } from 'mongoose';
 import { nanoid } from 'nanoid';
-import {
-  type ActorRefFrom,
-  assign,
-  createMachine,
-  interpret,
-  send,
-  spawn,
-  type StateFrom
-} from 'xstate';
+import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 import { raise } from 'xstate/lib/actions';
 
 import type {
@@ -22,19 +15,15 @@ import type {
   FinalizeType,
   RefundReason
 } from '$lib/models/common';
-import type { ShowDocumentType } from '$lib/models/show';
 import type { TicketDocumentType, TicketStateType } from '$lib/models/ticket';
 import { TicketStatus } from '$lib/models/ticket';
 import type { TransactionDocumentType } from '$lib/models/transaction';
 
+import type { ShowJobDataType } from '$lib/workers/showWorker';
+
 import { ActorType } from '$lib/constants';
 
-import {
-  createShowMachine,
-  type ShowMachineOptions,
-  type ShowMachineServiceType,
-  type ShowMachineType
-} from './showMachine';
+import { ShowMachineEventString } from './showMachine';
 
 export enum TicketMachineEventString {
   CANCELLATION_INITIATED = 'CANCELLATION INITIATED',
@@ -47,7 +36,8 @@ export enum TicketMachineEventString {
   SHOW_ENDED = 'SHOW ENDED',
   SHOW_CANCELLED = 'SHOW CANCELLED',
   TICKET_FINALIZED = 'TICKET FINALIZED',
-  DISPUTE_RESOLVED = 'DISPUTE RESOLVED'
+  DISPUTE_RESOLVED = 'DISPUTE RESOLVED',
+  TICKET_REDEEMED = 'TICKET REDEEMED'
 }
 type TicketMachineEventType =
   | {
@@ -70,6 +60,9 @@ type TicketMachineEventType =
   | {
       type: 'DISPUTE INITIATED';
       dispute: DisputeType;
+    }
+  | {
+      type: 'TICKET REDEEMED';
     }
   | {
       type: 'SHOW JOINED';
@@ -95,31 +88,22 @@ type TicketMachineEventType =
 
 const createTicketMachine = ({
   ticketDocument,
-  showDocument,
-  showMachineOptions
+  ticketMachineOptions
 }: {
   ticketDocument: TicketDocumentType;
   ticketMachineOptions?: TicketMachineOptions;
-  showDocument: ShowDocumentType;
-  showMachineOptions?: ShowMachineOptions;
 }) => {
-  const parentShowMachine = createShowMachine({
-    showDocument,
-    showMachineOptions
-  });
-
   /** @xstate-layout N4IgpgJg5mDOIC5QBcCWBjA1mZBZAhugBaoB2YAxAMoASA8gOoAEAwgIIByLAogDK-cAIgG0ADAF1EoAA4B7WKjSzSUkAA9EAFgBMAGhABPRNoCM2zQDoAHCZObRVgOyaAnNqsuAvp-1osOAmIySlpGVk4efiFhE0kkEDkFJRV4jQQdfSMEEwBmF0cLAFYANjdtQtETYs0rYqtvXwxsPEIScgs-Zt5ZfAhICjE4mXlFVGVVNJzHQos7UWLi0ULzURcTZ0zEXNFLbRdC2tFHHM0qzRyGkE6A1uCOppxu3v6YoYSR5InEHMKZuYWlis1htDMYdjNKpoalZRDlio5HKJtJdri0gu1UU8+hABto3olRuNUogrHpQQhzG4LKZHNUctp5vkTCiHmi2mB7v5kFiXjl8R8xilQGltKZqcVfgdCvS3BVHJsEMUfhZXDlYZopSYdpoWVzAuzOV0etiBpp+UlBV8EFM-vYAct7MDNAqzAdqfs1vYEXZcrrmvq7pjjS9CubCUL1IhHGSstpSjMpnDnCVRKtkT4rqyAxjWTyccJimHPsSEMsFWq4yqrGqXOdYfNmRnUdmOUHnvnHEXLSWGSZxZKrNK9uUjgrRS4inkXE5HGtlm5in6buiOQAnOBgVcAN36oWY3A4gmiElUBOLwq2NgK6wZLhyHkKjisGXJJysFlh09K1cfn51TazW52nXWBNx3CALAAd3wUZSCgTQAAV8AMABbMBSGQCgELYABNXADwAFSYAAlbgeAASQANWPLsiQvbJYWKIpChqaZYQRGF5XJKxn1mJUjlycxim0RxG0aPUgLXDdt0gKCYLQODEOQtCMKw3D8I4IjSIo6iRFiU8BToyMEGOSw7RE4oTEfcpygVUkciKbYTGfeltkKJc2TuECwNk6DYPgpDUPQzD2C4PheDYAjyLoDgmHIjhyKiyKaIMi0jLSZyRNmaNVnvfYnxfLIqlEixZwOI48lsJwLgAiSVwsbyZIgvyFIC5TgooULIgiqKYrihKkoI6J9PiM9u3orVK1+ViKimJ9R3JMwsufOMdGqdZan-cT-UkhrpPAuT-KUoLVMGVLwytSamOmpxZo4hasmrd8qhyMxNAWWkdhq7blwNRqDpash4KoIhZEg6h6GYAApOh4pS0bDIjDKr2y288sfFa7PmUqtVTFx+Oc+YPJbPbQKaiwyFGfBkEgFh8FIdAwAAGyZ6nBUO1rNGIsAADMAFdSBxUiADEAFVDxIsjuCo+HhjSpHL3WVHcofAqY0vUVZl+WwrMfKzYWJ3b-tkym0Gp2n6cZlm2eUDmga53mBaF7gxYl7Tpd015zvPYy7DhaxCnyJw4xOUxihdON30ZUUKjOWpF1qnb6vXSAwDQnE9yYARhYIs6Eflq1ykRCw8g1VadjMeEFWcbRqVx8rVcHQ3k7AVP04hsIYbhkQT3zi6ewqGZzjYwp1hyV7nXJaoZmmOo7xOSonzEzM6r+1u+nbzODyPHvaIVxV1YpZw+0TGEpkHJ9n2bg0yG4WB0FXMGKGF7ghAAITYFgAGlJZ02X3gLiWU4DlTKImcDKQccYxxgOyg4aMJQ3AmHyNfO4t976P3BoIciVAEKiyGv1RK5Fkq729uNYywDSonDAecPYkDw7kncI+Sci94Q-Eyu5ROv1UGkDvg-J+UVv7cCIsLeKbBeDkQAFr-zGulLQuRKGaGoRA5Y9DYyWVEDjaYNlR52BKN4DMpBZB9HgPEZsklSGyIQAAWlUYgfYH57Cpicc4xwKCcxcjzBY-ehUtjlDMkcJYUJFHVAcG4qSZNwJeKtHUJi5laRWXgbZckxwmKVBrGsfI+wRJhNJj5Zq8l7aBRUsgKJJYEQQjYQcKYfspgKjcJYfGllqzOSsq9HJxt8lHRBmDUpE0fhmQ1Kcaos5KiijsucCwCxXqvWmtUdMP1PLAX2ibUgVMaYQDpgzZmrMfYyP3rkHiAcg7RiVDoKoLpCZFFKKYKEmToztOWRBU2qBzYbMttsm2pA7aKW5vzQWvTfZyhVK4Coz4mS2BdHCCcyxtB5VpAcJwDy26QABSKZyTF7xqmEh4H4cJbEIBcpMpUop3Bwq8JwxZHJ0DvJZiivuPs0UuAnDUDUr1ygShKIfUwqxZh2HODxIu30V5JwNDzMg+AmaoAAF50rlv3eidILD4wXNKFiiwzDQJ5YsesiwGT0iODktBfDIKouMHeSZlRiV2HxrUQo0CmHaoWMJcB2SKUkzIIIVAsBpB8xpqaxUSsJTwhYnixYs5yyLyrK9L6DJR6uoWSTFCXrQIQG6Sa+lZCMrTlrvSeyHhFHLFhOWao4olT5EshUI4719GeCAA */
   return createMachine(
     {
       context: {
         ticketDocument,
-        showDocument,
+        ticketMachineOptions,
         ticketState: JSON.parse(
           JSON.stringify(ticketDocument.ticketState)
         ) as TicketStateType,
         errorMessage: undefined as string | undefined,
-        id: nanoid(),
-        showMachineRef: undefined as ActorRefFrom<ShowMachineType> | undefined
+        id: nanoid()
       },
       // eslint-disable-next-line @typescript-eslint/consistent-type-imports
       tsTypes: {} as import('./ticketMachine.typegen').Typegen0,
@@ -129,13 +113,7 @@ const createTicketMachine = ({
       predictableActionArguments: true,
       id: 'ticketMachine',
       initial: 'ticketLoaded',
-      entry: assign(() => {
-        const showMachineReference = spawn(parentShowMachine, {
-          name: 'showMachineService',
-          sync: true
-        });
-        return { showMachineRef: showMachineReference };
-      }),
+
       states: {
         ticketLoaded: {
           always: [
@@ -213,10 +191,10 @@ const createTicketMachine = ({
             },
             waiting4Show: {
               on: {
-                'SHOW JOINED': {
+                'TICKET REDEEMED': {
                   target: '#ticketMachine.redeemed',
                   cond: 'canWatchShow',
-                  actions: ['redeemTicket', 'sendJoinedShow']
+                  actions: ['redeemTicket', 'sendTicketRedeemed']
                 }
               }
             },
@@ -340,69 +318,106 @@ const createTicketMachine = ({
     },
     {
       actions: {
-        sendJoinedShow: send(
-          (context) => ({
-            type: 'CUSTOMER JOINED',
-            ticket: context.ticketDocument
-          }),
-          { to: (context) => context.showMachineRef! }
-        ),
+        sendJoinedShow: (context) => {
+          ticketMachineOptions?.jobQueue?.add(
+            ShowMachineEventString.CUSTOMER_JOINED,
+            {
+              showId: context.ticketDocument.show.toString(),
+              ticketId: context.ticketDocument._id.toString(),
+              customerName: context.ticketDocument.customerName
+            }
+          );
+        },
 
-        sendLeftShow: send(
-          (context) => ({
-            type: 'CUSTOMER LEFT',
-            ticket: context.ticketDocument
-          }),
-          { to: (context) => context.showMachineRef! }
-        ),
+        sendLeftShow: (context) => {
+          ticketMachineOptions?.jobQueue?.add(
+            ShowMachineEventString.CUSTOMER_LEFT,
+            {
+              showId: context.ticketDocument.show.toString(),
+              ticketId: context.ticketDocument._id.toString(),
+              customerName: context.ticketDocument.customerName
+            }
+          );
+        },
 
-        sendTicketSold: send(
-          (context) => ({
-            type: 'TICKET SOLD',
-            sale: context.ticketState.sale
-          }),
-          { to: (context) => context.showMachineRef! }
-        ),
+        sendTicketSold: (context) => {
+          ticketMachineOptions?.jobQueue?.add(
+            ShowMachineEventString.TICKET_SOLD,
+            {
+              showId: context.ticketDocument.show.toString(),
+              ticketId: context.ticketDocument._id.toString(),
+              sale: context.ticketState.sale,
+              customerName: context.ticketDocument.customerName
+            }
+          );
+        },
 
-        sendTicketRefunded: send(
-          (context) => ({
-            type: 'TICKET REFUNDED',
-            refund: context.ticketState.refund
-          }),
-          { to: (context) => context.showMachineRef! }
-        ),
+        sendTicketRedeemed: (context) => {
+          ticketMachineOptions?.jobQueue?.add(
+            ShowMachineEventString.TICKET_REDEEMED,
+            {
+              showId: context.ticketDocument.show.toString(),
+              ticketId: context.ticketDocument._id.toString()
+            }
+          );
+        },
 
-        sendTicketCancelled: send(
-          (context) => ({
-            type: 'TICKET CANCELLED',
-            cancel: context.ticketState.cancel
-          }),
-          { to: (context) => context.showMachineRef! }
-        ),
+        sendTicketRefunded: (context) => {
+          ticketMachineOptions?.jobQueue?.add(
+            ShowMachineEventString.TICKET_REFUNDED,
+            {
+              showId: context.ticketDocument.show.toString(),
+              ticketId: context.ticketDocument._id.toString(),
+              refund: context.ticketState.refund
+            }
+          );
+        },
 
-        sendFeedbackReceived: send(
-          (context) => ({
-            type: 'FEEDBACK RECEIVED',
-            feedback: context.ticketState.feedback
-          }),
-          { to: (context) => context.showMachineRef! }
-        ),
+        sendTicketCancelled: (context) => {
+          ticketMachineOptions?.jobQueue?.add(
+            ShowMachineEventString.TICKET_CANCELLED,
+            {
+              showId: context.ticketDocument.show.toString(),
+              ticketId: context.ticketDocument._id.toString(),
+              cancel: context.ticketState.cancel
+            }
+          );
+        },
 
-        sendDisputeInitiated: send(
-          (context) => ({
-            type: 'TICKET_DISPUTED',
-            dispute: context.ticketState.dispute
-          }),
-          { to: (context) => context.showMachineRef! }
-        ),
+        sendFeedbackReceived: (context) => {
+          ticketMachineOptions?.jobQueue?.add(
+            ShowMachineEventString.FEEDBACK_RECEIVED,
+            {
+              showId: context.ticketDocument.show.toString(),
+              ticketId: context.ticketDocument._id.toString(),
+              feedback: context.ticketState.feedback
+            },
 
-        sendDisputeResolved: send(
-          (context) => ({
-            type: 'DISPUTE RESOLVED',
-            decision: context.ticketState.dispute!.decision
-          }),
-          { to: (context) => context.showMachineRef! }
-        ),
+            { delay: 10_000 }
+          );
+        },
+
+        sendDisputeInitiated: (context) => {
+          ticketMachineOptions?.jobQueue?.add(
+            ShowMachineEventString.TICKET_DISPUTED,
+            {
+              showId: context.ticketDocument.show.toString(),
+              ticketId: context.ticketDocument._id.toString(),
+              dispute: context.ticketState.dispute
+            }
+          );
+        },
+
+        sendDisputeResolved: (context) => {
+          ticketMachineOptions?.jobQueue?.add(
+            ShowMachineEventString.DISPUTE_RESOLVED,
+            {
+              showId: context.ticketDocument.show.toString(),
+              ticketId: context.ticketDocument._id.toString(),
+              decision: context.ticketState.dispute!.decision
+            }
+          );
+        },
 
         initiateCancellation: assign((context, event) => {
           return {
@@ -601,12 +616,7 @@ const createTicketMachine = ({
           );
         },
         canWatchShow: (context) => {
-          const state = context.showMachineRef?.getSnapshot();
-          return (
-            state !== undefined &&
-            context.ticketState.totalPaid >= context.ticketDocument.price &&
-            state.matches('started')
-          );
+          return context.ticketState.totalPaid >= context.ticketDocument.price;
         }
       }
     }
@@ -619,20 +629,14 @@ export { createTicketMachine };
 
 export const createTicketMachineService = ({
   ticketDocument,
-  ticketMachineOptions,
-  showDocument,
-  showMachineOptions
+  ticketMachineOptions
 }: {
   ticketDocument: TicketDocumentType;
   ticketMachineOptions?: TicketMachineOptions;
-  showDocument: ShowDocumentType;
-  showMachineOptions?: ShowMachineOptions;
 }) => {
   const ticketMachine = createTicketMachine({
     ticketDocument,
-    ticketMachineOptions,
-    showDocument,
-    showMachineOptions
+    ticketMachineOptions
   });
   const ticketService = interpret(ticketMachine).start();
 
@@ -643,35 +647,6 @@ export const createTicketMachineService = ({
     });
   }
 
-  const showService = ticketService.getSnapshot().children[
-    'showMachineService'
-  ] as ShowMachineServiceType;
-
-  if (showService) {
-    if (showMachineOptions?.saveStateCallback) {
-      showService.onChange((context) => {
-        showMachineOptions.saveStateCallback &&
-          showMachineOptions.saveStateCallback(context.showState);
-      });
-    }
-
-    if (showMachineOptions?.saveShowEventCallback) {
-      showService.onEvent((event) => {
-        const ticket = ('ticket' in event ? event.ticket : undefined) as
-          | TicketDocumentType
-          | undefined;
-        const transaction = (
-          'transaction' in event ? event.transaction : undefined
-        ) as TransactionDocumentType | undefined;
-        showMachineOptions.saveShowEventCallback &&
-          showMachineOptions.saveShowEventCallback({
-            type: event.type,
-            ticket,
-            transaction
-          });
-      });
-    }
-  }
   return ticketService;
 };
 
@@ -679,6 +654,7 @@ export type TicketMachineOptions = {
   saveStateCallback?: (state: TicketStateType) => void;
   gracePeriod?: number;
   escrowPeriod?: number;
+  jobQueue?: Queue<ShowJobDataType, any, string>;
 };
 
 export type TicketMachineServiceType = ReturnType<

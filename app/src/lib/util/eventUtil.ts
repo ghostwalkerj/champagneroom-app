@@ -4,8 +4,9 @@ import type { ShowEventDocumentType } from '$lib/models/showEvent';
 
 export const createEventText = (showEvent: ShowEventDocumentType) => {
   let eventText =
-    timeago.format(showEvent.createdAt) + ' ' + showEvent.ticketInfo.name ??
-    'someone';
+    timeago.format(showEvent.createdAt) +
+      ' ' +
+      showEvent.ticketInfo?.customerName ?? 'someone';
 
   switch (showEvent.type) {
     case 'TICKET SOLD': {

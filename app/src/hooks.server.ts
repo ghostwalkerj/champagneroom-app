@@ -10,7 +10,7 @@ import {
   REDIS_USERNAME
 } from '$env/static/private';
 
-mongoose.connect(MONGO_DB_ENDPOINT);
+await mongoose.connect(MONGO_DB_ENDPOINT);
 const redisConnection = new IORedis({
   host: REDIS_HOST,
   port: +REDIS_PORT,

@@ -72,7 +72,12 @@ const ticketSchema = new Schema(
       validator: (v: string) => validator.isEthereumAddress(v)
     },
     price: { type: Number, required: true },
-    show: { type: Schema.Types.ObjectId, ref: 'Show', index: true },
+    show: {
+      type: Schema.Types.ObjectId,
+      ref: 'Show',
+      index: true,
+      required: true
+    },
     ticketState: {
       type: ticketStateSchema,
       required: true,

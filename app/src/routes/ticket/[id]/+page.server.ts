@@ -12,13 +12,10 @@ import type {
   FeedbackType
 } from '$lib/models/common';
 import { CancelReason } from '$lib/models/common';
-import type { ShowType } from '$lib/models/show';
 import { Show } from '$lib/models/show';
-import type { TicketType } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
 import { Transaction, TransactionReasonType } from '$lib/models/transaction';
 
-import type { ShowMachineServiceType } from '$lib/machines/showMachine';
 import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
 import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 
@@ -44,7 +41,7 @@ const getTicketService = async (ticketId: string, redisConnection: IORedis) => {
     })
     .exec();
 
-  const ticketService = getTicketMachineService(ticket, show, redisConnection);
+  const ticketService = getTicketMachineService(ticket, redisConnection);
   return { ticket, show, ticketService };
 };
 
@@ -111,20 +108,11 @@ export const actions: Actions = {
 
     if (state.can(cancelEvent)) {
       //TODO: make real transaction
-
       ticketService.send(cancelEvent);
     }
-    const snapshot = ticketService.getSnapshot();
-    const ticket = snapshot.context.ticketDocument as TicketType;
-    const showService = snapshot.children[
-      'showMachineService'
-    ] as ShowMachineServiceType;
-    const show = showService?.getSnapshot().context.showDocument as ShowType;
     return {
       success: true,
-      ticketCancelled: true,
-      ticket: ticket.toObject({ flattenObjectIds: true }),
-      show: show?.toObject({ flattenObjectIds: true })
+      ticketCancelled: true
     };
   },
   leave_feedback: async ({ params, request, locals }) => {

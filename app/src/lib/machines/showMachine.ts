@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import type { Queue } from 'bullmq';
+import { Types } from 'mongoose';
 import { nanoid } from 'nanoid';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 import { raise } from 'xstate/lib/actions';
@@ -15,13 +16,11 @@ import type {
 import { DisputeDecision } from '$lib/models/common';
 import type { ShowDocumentType } from '$lib/models/show';
 import { ShowStatus } from '$lib/models/show';
-import type { TicketDocumentType } from '$lib/models/ticket';
 import type { TransactionDocumentType } from '$lib/models/transaction';
 
 import type { ShowJobDataType } from '$lib/workers/showWorker';
 
 import { ActorType } from '$lib/constants';
-import console from 'console';
 
 enum ShowMachineEventString {
   CANCELLATION_INITIATED = 'CANCELLATION INITIATED',
@@ -40,7 +39,8 @@ enum ShowMachineEventString {
   FEEDBACK_RECEIVED = 'FEEDBACK RECEIVED',
   ESCROW_ENDED = 'ESCROW ENDED',
   TICKET_DISPUTED = 'TICKET DISPUTED',
-  DISPUTE_RESOLVED = 'DISPUTE RESOLVED'
+  DISPUTE_RESOLVED = 'DISPUTE RESOLVED',
+  TICKET_REDEEMED = 'TICKET REDEEMED'
 }
 
 export { ShowMachineEventString };
@@ -67,17 +67,22 @@ export const createShowMachineService = ({
 
   if (showMachineOptions?.saveShowEventCallback) {
     showService.onEvent((event) => {
-      const ticket = ('ticket' in event ? event.ticket : undefined) as
-        | TicketDocumentType
+      const ticketId = ('ticketId' in event ? event.ticketId : undefined) as
+        | string
         | undefined;
       const transaction = (
         'transaction' in event ? event.transaction : undefined
       ) as TransactionDocumentType | undefined;
+      const ticketInfo = ('customerName' in event ? event : undefined) as
+        | { customerName: string }
+        | undefined;
+
       showMachineOptions.saveShowEventCallback &&
         showMachineOptions.saveShowEventCallback({
           type: event.type,
-          ticket,
-          transaction
+          ticketId,
+          transaction,
+          ticketInfo
         });
     });
   }
@@ -102,18 +107,27 @@ export type ShowMachineEventType =
       refund: RefundType;
     }
   | {
+      type: 'TICKET REDEEMED';
+      ticketId: string;
+    }
+  | {
       type: 'TICKET RESERVED';
+      ticketId: string;
+      customerName: string;
     }
   | {
       type: 'TICKET RESERVATION TIMEOUT';
+      ticketId: string;
     }
   | {
       type: 'TICKET CANCELLED';
-      ticket: CancelType;
+      ticketId: string;
     }
   | {
       type: 'TICKET SOLD';
+      ticketId: string;
       sale: SaleType;
+      customerName: string;
     }
   | {
       type: 'SHOW STARTED';
@@ -130,11 +144,13 @@ export type ShowMachineEventType =
     }
   | {
       type: 'CUSTOMER JOINED';
-      ticket: TicketDocumentType;
+      ticketId: string;
+      customerName: string;
     }
   | {
       type: 'CUSTOMER LEFT';
-      ticket: TicketDocumentType;
+      ticketId: string;
+      customerName: string;
     }
   | {
       type: 'TICKET DISPUTED';
@@ -152,12 +168,14 @@ export type ShowMachineOptions = {
   saveStateCallback?: (state: ShowStateType) => void;
   saveShowEventCallback?: ({
     type,
-    ticket,
-    transaction
+    ticketId,
+    transaction,
+    ticketInfo
   }: {
     type: string;
-    ticket?: TicketDocumentType;
+    ticketId?: string;
     transaction?: TransactionDocumentType;
+    ticketInfo?: { customerName: string };
   }) => void;
   jobQueue?: Queue<ShowJobDataType, any, string>;
   gracePeriod?: number;
@@ -253,7 +271,6 @@ const createShowMachine = ({
             'FEEDBACK RECEIVED': [
               {
                 actions: [
-                  'receiveFeedback',
                   raise({
                     type: 'SHOW FINALIZED',
                     finalize: {
@@ -263,8 +280,7 @@ const createShowMachine = ({
                   })
                 ],
                 cond: 'canFinalize'
-              },
-              { actions: ['receiveFeedback'] }
+              }
             ],
             'TICKET DISPUTED': {
               target: 'ended.inDispute',
@@ -323,17 +339,17 @@ const createShowMachine = ({
               {
                 target: 'boxOfficeClosed',
                 cond: 'soldOut',
-                actions: ['decrementTicketsAvailable', 'closeBoxOffice']
+                actions: ['reserveTicket', 'closeBoxOffice']
               },
               {
-                actions: ['decrementTicketsAvailable']
+                actions: ['reserveTicket']
               }
             ],
             'TICKET RESERVATION TIMEOUT': {
-              actions: ['incrementTicketsAvailable']
+              actions: ['timeoutReservation']
             },
             'TICKET CANCELLED': {
-              actions: ['incrementTicketsAvailable']
+              actions: ['cancelTicket']
             },
             'TICKET SOLD': {
               actions: ['sellTicket']
@@ -360,13 +376,13 @@ const createShowMachine = ({
             'TICKET RESERVATION TIMEOUT': [
               {
                 target: 'boxOfficeOpen',
-                actions: ['openBoxOffice', 'incrementTicketsAvailable']
+                actions: ['openBoxOffice', 'timeoutReservation']
               }
             ],
             'TICKET CANCELLED': [
               {
                 target: 'boxOfficeOpen',
-                actions: ['openBoxOffice', 'incrementTicketsAvailable']
+                actions: ['openBoxOffice', 'cancelTicket']
               }
             ],
             'TICKET SOLD': {
@@ -394,6 +410,9 @@ const createShowMachine = ({
           on: {
             'SHOW STARTED': {
               actions: ['startShow']
+            },
+            'TICKET REDEEMED': {
+              actions: ['redeemTicket']
             },
             'CUSTOMER JOINED': {},
             'CUSTOMER LEFT': {},
@@ -565,12 +584,6 @@ const createShowMachine = ({
           };
         }),
 
-        receiveFeedback: (context, event) => {
-          showMachineOptions?.jobQueue?.add(event.type, {
-            showId: context.showDocument._id.toString()
-          });
-        },
-
         receiveDispute: assign((context, event) => {
           console.log('receiveDispute', event);
           const st = context.showState;
@@ -640,31 +653,61 @@ const createShowMachine = ({
           };
         }),
 
-        incrementTicketsAvailable: assign((context) => {
+        cancelTicket: assign((context, event) => {
+          const st = context.showState;
+          st.cancellations.push(new Types.ObjectId(event.ticketId));
           return {
             showState: {
-              ...context.showState,
+              ...st,
               salesStats: {
-                ...context.showState.salesStats,
-                ticketsAvailable:
-                  context.showState.salesStats.ticketsAvailable + 1,
-                ticketsReserved:
-                  context.showState.salesStats.ticketsReserved - 1
+                ...st.salesStats,
+                ticketsAvailable: st.salesStats.ticketsAvailable + 1,
+                ticketsReserved: st.salesStats.ticketsReserved - 1
               }
             }
           };
         }),
 
-        decrementTicketsAvailable: assign((context) => {
+        reserveTicket: assign((context, event) => {
+          const st = context.showState;
+          st.reservations.push(new Types.ObjectId(event.ticketId));
           return {
             showState: {
-              ...context.showState,
+              ...st,
               salesStats: {
-                ...context.showState.salesStats,
-                ticketsAvailable:
-                  context.showState.salesStats.ticketsAvailable - 1,
-                ticketsReserved:
-                  context.showState.salesStats.ticketsReserved + 1
+                ...st.salesStats,
+                ticketsAvailable: st.salesStats.ticketsAvailable - 1,
+                ticketsReserved: st.salesStats.ticketsReserved + 1
+              }
+            }
+          };
+        }),
+
+        redeemTicket: assign((context, event) => {
+          const st = context.showState;
+          st.redemptions.push(new Types.ObjectId(event.ticketId));
+          return {
+            showState: {
+              ...st
+            }
+          };
+        }),
+
+        timeoutReservation: assign((context, event) => {
+          const st = context.showState;
+          const index = st.reservations.indexOf(
+            new Types.ObjectId(event.ticketId)
+          );
+          if (index > -1) {
+            st.reservations.splice(index, 1);
+          }
+          return {
+            showState: {
+              ...st,
+              salesStats: {
+                ...st.salesStats,
+                ticketsAvailable: st.salesStats.ticketsAvailable + 1,
+                ticketsReserved: st.salesStats.ticketsReserved - 1
               }
             }
           };
@@ -673,15 +716,11 @@ const createShowMachine = ({
         sellTicket: assign((context, event) => {
           const st = context.showState;
           const sale = event.sale;
-          if (!sale) {
-            throw new Error('Ticket sale is not defined');
-          }
           const ticketsSold = st.salesStats.ticketsSold + 1;
           const ticketsReserved = st.salesStats.ticketsReserved - 1;
           const totalSales = st.salesStats.totalSales + sale.amount;
           const totalRevenue = st.salesStats.totalRevenue + sale.amount;
           st.sales.push(sale._id!);
-
           return {
             showState: {
               ...st,
@@ -716,17 +755,6 @@ const createShowMachine = ({
             }
           };
         })
-      },
-
-      delays: {
-        GRACE_DELAY: (context) => {
-          const delay =
-            +GRACE_PERIOD -
-            (context.showState.runtime?.endDate
-              ? Date.now() - context.showState.runtime.endDate.getTime()
-              : 0);
-          return delay > 0 ? delay : 0;
-        }
       },
 
       guards: {

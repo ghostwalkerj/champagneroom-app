@@ -35,8 +35,12 @@ export const getShowMachineService = (
     showDocument: show,
     showMachineOptions: {
       saveStateCallback: async (showState) => SaveState(show, showState),
-      saveShowEventCallback: async ({ type, ticket, transaction }) =>
-        createShowEvent({ show, type, ticket, transaction }),
+      saveShowEventCallback: async ({
+        type,
+        ticketId,
+        transaction,
+        ticketInfo
+      }) => createShowEvent({ show, type, ticketId, transaction, ticketInfo }),
       jobQueue
     }
   });
@@ -66,34 +70,25 @@ export const getShowMachineServiceFromId = async (
 
 export const getTicketMachineService = (
   ticket: TicketType,
-  show: ShowType,
   connection: Queue<ShowJobDataType, any, ShowMachineEventString> | IORedis
 ) => {
   const ticketMachineOptions = {
     saveStateCallback: (ticketState: TicketStateType) => {
       Ticket.updateOne({ _id: ticket._id }, { $set: { ticketState } }).exec();
-    }
+    },
+    jobQueue:
+      connection instanceof Queue
+        ? connection
+        : (new Queue(EntityType.SHOW, { connection }) as Queue<
+            ShowJobDataType,
+            any,
+            ShowMachineEventString
+          >)
   };
-
-  const jobQueue =
-    connection instanceof Queue
-      ? connection
-      : (new Queue(EntityType.SHOW, { connection }) as Queue<
-          ShowJobDataType,
-          any,
-          ShowMachineEventString
-        >);
 
   return createTicketMachineService({
     ticketDocument: ticket,
-    ticketMachineOptions,
-    showDocument: show,
-    showMachineOptions: {
-      saveStateCallback: async (showState) => SaveState(show, showState),
-      saveShowEventCallback: async ({ type, ticket, transaction }) =>
-        createShowEvent({ show, type, ticket, transaction }),
-      jobQueue
-    }
+    ticketMachineOptions
   });
 };
 
@@ -109,22 +104,5 @@ export const getTicketMachineServiceFromId = async (
     })
     .exec();
 
-  const jobQueue =
-    connection instanceof Queue
-      ? connection
-      : (new Queue(EntityType.SHOW, { connection }) as Queue<
-          ShowJobDataType,
-          any,
-          ShowMachineEventString
-        >);
-
-  const show = await mongoose
-    .model('Show')
-    .findById(ticket.show)
-    .orFail(() => {
-      throw new Error('Show not found');
-    })
-    .exec();
-
-  return getTicketMachineService(ticket, show, jobQueue);
+  return getTicketMachineService(ticket, connection);
 };

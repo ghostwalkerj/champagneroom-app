@@ -4,12 +4,12 @@
   import urlJoin from 'url-join';
 
   import { applyAction, enhance } from '$app/forms';
-  import { goto } from '$app/navigation';
+  import { goto, invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
   import { PUBLIC_SHOWTIME_PATH } from '$env/static/public';
 
   import { CancelReason, DisputeReason } from '$lib/models/common';
-  import type { ShowDocumentType } from '$lib/models/show';
+  import { ShowStatus, type ShowDocumentType } from '$lib/models/show';
   import type { TicketDocumentType } from '$lib/models/ticket';
 
   import type { TicketMachineServiceType } from '$lib/machines/ticketMachine';
@@ -43,12 +43,13 @@
   let ticketUnSub: Unsubscriber;
   let isShowPaymentLoading = false;
   let isShowCancelLoading = false;
+  let hasShowStarted = false;
   $: loading = false;
 
   const useTicketMachine = (ticketMachineService: TicketMachineServiceType) => {
     const state = ticketMachineService.getSnapshot();
     shouldPay = state.matches('reserved.waiting4Payment');
-    canWatchShow = state.can('SHOW JOINED');
+    canWatchShow = state.can('SHOW JOINED') && hasShowStarted;
     canCancelTicket = state.can({
       type: 'CANCELLATION INITIATED',
       cancel: {
@@ -84,19 +85,13 @@
         ticket = ticketDocument;
         useTicketMachine(
           createTicketMachineService({
-            ticketDocument: ticket,
-            showDocument: show
+            ticketDocument: ticket
           })
         );
       });
       showUnSub = showStore(show).subscribe((showDocument) => {
         show = showDocument;
-        useTicketMachine(
-          createTicketMachineService({
-            ticketDocument: ticket,
-            showDocument: show
-          })
-        );
+        hasShowStarted = show.showState.status === ShowStatus.LIVE;
       });
     }
   });
@@ -118,12 +113,12 @@
         loading = false;
       }
       if (result.data.ticketCancelled) {
-        ticket = result.data.ticket;
-        show = result.data.show;
+        invalidateAll();
+        ticket = $page.data.ticket;
+        show = $page.data.show;
         useTicketMachine(
           createTicketMachineService({
-            ticketDocument: ticket,
-            showDocument: show
+            ticketDocument: ticket
           })
         );
         showUnSub?.();

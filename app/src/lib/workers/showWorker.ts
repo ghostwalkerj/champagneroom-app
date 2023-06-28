@@ -2,7 +2,13 @@ import type { Job, Queue } from 'bullmq';
 import { Worker } from 'bullmq';
 import type IORedis from 'ioredis';
 
-import type { CancelType } from '$lib/models/common';
+import type {
+  CancelType,
+  DisputeDecision,
+  DisputeType,
+  RefundType,
+  SaleType
+} from '$lib/models/common';
 import {
   CancelReason,
   type FinalizeType,
@@ -34,13 +40,13 @@ export const getShowWorker = (
     EntityType.SHOW,
     async (job: Job<ShowJobDataType, any, ShowMachineEventString>) => {
       const show = (await Show.findById(job.data.showId).exec()) as ShowType;
-
       if (!show) {
         return;
       }
+
       switch (job.name) {
         case ShowMachineEventString.CANCELLATION_INITIATED: {
-          cancelShow(show, showQueue);
+          cancelShow(show, job.data.cancel, showQueue);
           break;
         }
         case ShowMachineEventString.REFUND_INITIATED: {
@@ -59,12 +65,70 @@ export const getShowWorker = (
           finalizeShow(show, job.data.finalize, showQueue);
           break;
         }
-        case ShowMachineEventString.FEEDBACK_RECEIVED: {
-          feedbackReceived(show);
-          break;
-        }
         case ShowMachineEventString.ESCROW_ENDED: {
           endEscrow(show, showQueue);
+          break;
+        }
+        // From Ticket Machine
+        case ShowMachineEventString.CUSTOMER_JOINED: {
+          customerJoined(
+            show,
+            job.data.ticketId,
+            job.data.customerName,
+            showQueue
+          );
+          break;
+        }
+        case ShowMachineEventString.CUSTOMER_LEFT: {
+          customerLeft(
+            show,
+            job.data.ticketId,
+            job.data.customerName,
+            showQueue
+          );
+          break;
+        }
+        case ShowMachineEventString.TICKET_SOLD: {
+          ticketSold(
+            show,
+            job.data.ticketId,
+            job.data.sale,
+            job.data.customerName,
+            showQueue
+          );
+          break;
+        }
+        case ShowMachineEventString.TICKET_REDEEMED: {
+          ticketRedeemed(show, job.data.ticketId, showQueue);
+          break;
+        }
+        case ShowMachineEventString.TICKET_RESERVED: {
+          ticketReserved(
+            show,
+            job.data.ticketId,
+            job.data.customerName,
+            showQueue
+          );
+          break;
+        }
+        case ShowMachineEventString.TICKET_REFUNDED: {
+          ticketRefunded(show, job.data.refund, showQueue);
+          break;
+        }
+        case ShowMachineEventString.TICKET_CANCELLED: {
+          ticketCancelled(show, job.data.ticketId, showQueue);
+          break;
+        }
+        case ShowMachineEventString.FEEDBACK_RECEIVED: {
+          feedbackReceived(show, showQueue);
+          break;
+        }
+        case ShowMachineEventString.TICKET_DISPUTED: {
+          ticketDisputed(show, job.data.dispute, showQueue);
+          break;
+        }
+        case ShowMachineEventString.DISPUTE_RESOLVED: {
+          ticketDisputeResolved(show, job.data.decision, showQueue);
           break;
         }
       }
@@ -80,16 +144,22 @@ export type ShowJobDataType = {
 
 const cancelShow = async (
   show: ShowType,
+  cancel: CancelType,
   showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>
 ) => {
   const showService = createShowMachineService({
     showDocument: show,
     showMachineOptions: {
       saveStateCallback: async (showState) => SaveState(show, showState),
-      saveShowEventCallback: async ({ type, ticket, transaction }) =>
-        createShowEvent({ show, type, ticket, transaction }),
+      saveShowEventCallback: async ({ type, ticketId, transaction }) =>
+        createShowEvent({ show, type, ticketId, transaction }),
       jobQueue: showQueue
     }
+  });
+
+  showService.send({
+    type: ShowMachineEventString.CANCELLATION_INITIATED,
+    cancel
   });
 
   const tickets = await Ticket.find({
@@ -99,13 +169,7 @@ const cancelShow = async (
   });
   for (const ticket of tickets) {
     // send cancel show to all tickets
-    const ticketService = getTicketMachineService(ticket, show, showQueue);
-    const cancel = {
-      cancelledBy: ActorType.TALENT,
-      cancelledInState: JSON.stringify(ticketService.getSnapshot().value),
-      reason: CancelReason.TALENT_CANCELLED,
-      cancelledAt: new Date()
-    } as CancelType;
+    const ticketService = getTicketMachineService(ticket, showQueue);
 
     const cancelEvent = {
       type: TicketMachineEventString.SHOW_CANCELLED,
@@ -129,8 +193,8 @@ const refundShow = async (
     showDocument: show,
     showMachineOptions: {
       saveStateCallback: async (showState) => SaveState(show, showState),
-      saveShowEventCallback: async ({ type, ticket, transaction }) =>
-        createShowEvent({ show, type, ticket, transaction }),
+      saveShowEventCallback: async ({ type, transaction }) =>
+        createShowEvent({ show, type, transaction }),
       jobQueue: showQueue
     }
   });
@@ -146,7 +210,7 @@ const refundShow = async (
     for (const ticket of tickets) {
       // send refunds
       //TODO: Send real transactions
-      const ticketService = getTicketMachineService(ticket, show, showQueue);
+      const ticketService = getTicketMachineService(ticket, showQueue);
       const ticketState = ticketService.getSnapshot();
       if (
         ticketState.matches('reserved.initiatedCancellation.waiting4Refund')
@@ -183,8 +247,8 @@ const stopShow = async (
     showDocument: show,
     showMachineOptions: {
       saveStateCallback: async (showState) => SaveState(show, showState),
-      saveShowEventCallback: async ({ type, ticket, transaction }) =>
-        createShowEvent({ show, type, ticket, transaction }),
+      saveShowEventCallback: async ({ type, transaction }) =>
+        createShowEvent({ show, type, transaction }),
       jobQueue: showQueue
     }
   });
@@ -203,8 +267,8 @@ const endEscrow = async (
     showDocument: show,
     showMachineOptions: {
       saveStateCallback: async (showState) => SaveState(show, showState),
-      saveShowEventCallback: async ({ type, ticket, transaction }) =>
-        createShowEvent({ show, type, ticket, transaction }),
+      saveShowEventCallback: async ({ type, transaction }) =>
+        createShowEvent({ show, type, transaction }),
       jobQueue: showQueue
     }
   });
@@ -231,8 +295,8 @@ const endShow = async (
     showDocument: show,
     showMachineOptions: {
       saveStateCallback: async (showState) => SaveState(show, showState),
-      saveShowEventCallback: async ({ type, ticket, transaction }) =>
-        createShowEvent({ show, type, ticket, transaction }),
+      saveShowEventCallback: async ({ type, transaction }) =>
+        createShowEvent({ show, type, transaction }),
       jobQueue: showQueue
     }
   });
@@ -247,7 +311,7 @@ const endShow = async (
     });
     for (const ticket of tickets) {
       // send show is over
-      const ticketService = getTicketMachineService(ticket, show, showQueue);
+      const ticketService = getTicketMachineService(ticket, showQueue);
       ticketService.send(TicketMachineEventString.SHOW_ENDED);
       ticketService.stop();
     }
@@ -267,7 +331,7 @@ const finalizeShow = async (
     'ticketState.activeState': true
   });
   for (const ticket of tickets) {
-    const ticketService = getTicketMachineService(ticket, show, showQueue);
+    const ticketService = getTicketMachineService(ticket, showQueue);
     const ticketState = ticketService.getSnapshot();
 
     if (ticketState.matches('ended.inEscrow')) {
@@ -319,8 +383,201 @@ const finalizeShow = async (
   });
 };
 
+// Ticket Events
+const customerJoined = async (
+  show: ShowType,
+  ticketId: string,
+  customerName: string,
+  showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>
+) => {
+  const showService = createShowMachineService({
+    showDocument: show,
+    showMachineOptions: {
+      saveStateCallback: async (showState) => SaveState(show, showState),
+      saveShowEventCallback: async ({ type, transaction }) =>
+        createShowEvent({
+          show,
+          type,
+          ticketId,
+          transaction,
+          ticketInfo: { customerName }
+        }),
+      jobQueue: showQueue
+    }
+  });
+  showService.send({
+    type: ShowMachineEventString.CUSTOMER_JOINED,
+    ticketId,
+    customerName
+  });
+};
+
+const customerLeft = async (
+  show: ShowType,
+  ticketId: string,
+  customerName: string,
+  showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>
+) => {
+  const showService = createShowMachineService({
+    showDocument: show,
+    showMachineOptions: {
+      saveStateCallback: async (showState) => SaveState(show, showState),
+      saveShowEventCallback: async ({ type, transaction }) =>
+        createShowEvent({
+          show,
+          type,
+          ticketId,
+          transaction,
+          ticketInfo: { customerName }
+        }),
+      jobQueue: showQueue
+    }
+  });
+  showService.send({
+    type: ShowMachineEventString.CUSTOMER_LEFT,
+    ticketId,
+    customerName
+  });
+};
+
+const ticketSold = async (
+  show: ShowType,
+  ticketId: string,
+  sale: SaleType,
+  customerName: string,
+
+  showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>
+) => {
+  const showService = createShowMachineService({
+    showDocument: show,
+    showMachineOptions: {
+      saveStateCallback: async (showState) => SaveState(show, showState),
+      saveShowEventCallback: async ({ type, transaction }) =>
+        createShowEvent({
+          show,
+          type,
+          ticketId,
+          transaction,
+          ticketInfo: { customerName }
+        }),
+      jobQueue: showQueue
+    }
+  });
+  showService.send({
+    type: ShowMachineEventString.TICKET_SOLD,
+    ticketId,
+    sale,
+    customerName
+  });
+};
+
+const ticketRedeemed = async (
+  show: ShowType,
+  ticketId: string,
+  showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>
+) => {
+  const showService = createShowMachineService({
+    showDocument: show,
+    showMachineOptions: {
+      saveStateCallback: async (showState) => SaveState(show, showState),
+      saveShowEventCallback: async ({ type, ticketId, transaction }) =>
+        createShowEvent({ show, type, ticketId, transaction }),
+      jobQueue: showQueue
+    }
+  });
+
+  showService.send({
+    type: ShowMachineEventString.TICKET_REDEEMED,
+    ticketId
+  });
+};
+
+const ticketReserved = async (
+  show: ShowType,
+  ticketId: string,
+  customerName: string,
+  showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>
+) => {
+  const showService = createShowMachineService({
+    showDocument: show,
+    showMachineOptions: {
+      saveStateCallback: async (showState) => SaveState(show, showState),
+      saveShowEventCallback: async ({ type, transaction }) =>
+        createShowEvent({
+          show,
+          type,
+          ticketId,
+          transaction,
+          ticketInfo: { customerName }
+        }),
+      jobQueue: showQueue
+    }
+  });
+
+  showService.send({
+    type: ShowMachineEventString.TICKET_RESERVED,
+    ticketId,
+    customerName
+  });
+};
+
+const ticketRefunded = async (
+  show: ShowType,
+  refund: RefundType,
+  showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>
+) => {
+  const showService = createShowMachineService({
+    showDocument: show,
+    showMachineOptions: {
+      saveStateCallback: async (showState) => SaveState(show, showState),
+      saveShowEventCallback: async ({ type, ticketId, transaction }) =>
+        createShowEvent({ show, type, ticketId, transaction }),
+      jobQueue: showQueue
+    }
+  });
+
+  showService.send({
+    type: ShowMachineEventString.TICKET_REFUNDED,
+    refund
+  });
+};
+
+const ticketCancelled = async (
+  show: ShowType,
+  ticketId: string,
+  showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>
+) => {
+  const showService = createShowMachineService({
+    showDocument: show,
+    showMachineOptions: {
+      saveStateCallback: async (showState) => SaveState(show, showState),
+      saveShowEventCallback: async ({ type, ticketId, transaction }) =>
+        createShowEvent({ show, type, ticketId, transaction }),
+      jobQueue: showQueue
+    }
+  });
+
+  showService.send({
+    type: ShowMachineEventString.TICKET_CANCELLED,
+    ticketId
+  });
+};
+
 // Calculate feedback stats
-const feedbackReceived = async (show: ShowType) => {
+const feedbackReceived = async (
+  show: ShowType,
+  showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>
+) => {
+  const showService = createShowMachineService({
+    showDocument: show,
+    showMachineOptions: {
+      saveStateCallback: async (showState) => SaveState(show, showState),
+      saveShowEventCallback: async ({ type, ticketId, transaction }) =>
+        createShowEvent({ show, type, ticketId, transaction }),
+      jobQueue: showQueue
+    }
+  });
+  showService.send(ShowMachineEventString.FEEDBACK_RECEIVED);
   const showSession = await Show.startSession();
 
   await showSession.withTransaction(async () => {
@@ -389,5 +646,47 @@ const feedbackReceived = async (show: ShowType) => {
       }
     );
     talentSession.endSession();
+  });
+};
+
+const ticketDisputed = async (
+  show: ShowType,
+  dispute: DisputeType,
+  showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>
+) => {
+  const showService = createShowMachineService({
+    showDocument: show,
+    showMachineOptions: {
+      saveStateCallback: async (showState) => SaveState(show, showState),
+      saveShowEventCallback: async ({ type, ticketId, transaction }) =>
+        createShowEvent({ show, type, ticketId, transaction }),
+      jobQueue: showQueue
+    }
+  });
+
+  showService.send({
+    type: ShowMachineEventString.TICKET_DISPUTED,
+    dispute
+  });
+};
+
+const ticketDisputeResolved = async (
+  show: ShowType,
+  decision: DisputeDecision,
+  showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>
+) => {
+  const showService = createShowMachineService({
+    showDocument: show,
+    showMachineOptions: {
+      saveStateCallback: async (showState) => SaveState(show, showState),
+      saveShowEventCallback: async ({ type, ticketId, transaction }) =>
+        createShowEvent({ show, type, ticketId, transaction }),
+      jobQueue: showQueue
+    }
+  });
+
+  showService.send({
+    type: ShowMachineEventString.DISPUTE_RESOLVED,
+    decision
   });
 };

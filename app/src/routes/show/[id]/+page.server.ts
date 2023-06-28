@@ -1,4 +1,5 @@
 import { error, fail, redirect } from '@sveltejs/kit';
+import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 import urlJoin from 'url-join';
@@ -8,6 +9,11 @@ import { PUBLIC_TICKET_PATH } from '$env/static/public';
 import { Show } from '$lib/models/show';
 import { Ticket } from '$lib/models/ticket';
 
+import { ShowMachineEventString } from '$lib/machines/showMachine';
+
+import type { ShowJobDataType } from '$lib/workers/showWorker';
+
+import { EntityType } from '$lib/constants';
 import { mensNames } from '$lib/util/mensNames';
 import { createPinHash } from '$lib/util/pin';
 import { getShowMachineServiceFromId } from '$lib/util/util.server';
@@ -44,20 +50,11 @@ export const actions: Actions = {
       .exec();
 
     const redisConnection = locals.redisConnection as IORedis;
+    const jobQueue = new Queue(EntityType.SHOW, {
+      connection: redisConnection
+    }) as Queue<ShowJobDataType, any, ShowMachineEventString>;
 
-    const showService = await getShowMachineServiceFromId(
-      showId,
-      redisConnection
-    );
-
-    const showState = showService.getSnapshot();
-    if (
-      !showState.can({
-        type: 'TICKET RESERVED'
-      })
-    ) {
-      return error(501, 'Show cannot Reserve Ticket'); // TODO: This should be atomic
-    }
+    const showService = await getShowMachineServiceFromId(showId, jobQueue);
 
     const ticket = await Ticket.create({
       show: show._id,
@@ -72,7 +69,23 @@ export const actions: Actions = {
       return error(501, 'Show cannot Reserve Ticket');
     }
 
-    showService.send('TICKET RESERVED', { ticket });
+    const showState = showService.getSnapshot();
+
+    if (
+      !showState.can({
+        type: ShowMachineEventString.TICKET_RESERVED,
+        ticketId: ticket._id.toString(),
+        customerName: name
+      })
+    ) {
+      return error(501, 'Show cannot Reserve Ticket'); // TODO: This should be atomic
+    }
+
+    jobQueue.add(ShowMachineEventString.TICKET_RESERVED, {
+      showId: show._id.toString(),
+      ticketId: ticket._id.toString(),
+      customerName: name
+    });
 
     const hash = createPinHash(ticket._id.toString(), pin);
     cookies.set('pin', hash, { path: '/' });

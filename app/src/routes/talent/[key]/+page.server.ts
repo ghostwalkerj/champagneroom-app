@@ -1,4 +1,5 @@
 import { error, fail } from '@sveltejs/kit';
+import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 
 import type { CancelType } from '$lib/models/common';
@@ -10,7 +11,9 @@ import { Talent } from '$lib/models/talent';
 import type { ShowMachineEventType } from '$lib/machines/showMachine';
 import { ShowMachineEventString } from '$lib/machines/showMachine';
 
-import { ActorType } from '$lib/constants';
+import type { ShowJobDataType } from '$lib/workers/showWorker';
+
+import { ActorType, EntityType } from '$lib/constants';
 import { getShowMachineServiceFromId } from '$lib/util/util.server';
 
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
@@ -101,11 +104,11 @@ export const actions: Actions = {
     }
 
     const redisConnection = locals.redisConnection as IORedis;
+    const jobQueue = new Queue(EntityType.SHOW, {
+      connection: redisConnection
+    }) as Queue<ShowJobDataType, any, ShowMachineEventString>;
 
-    const showService = await getShowMachineServiceFromId(
-      showId,
-      redisConnection
-    );
+    const showService = await getShowMachineServiceFromId(showId, jobQueue);
     const showMachineState = showService.getSnapshot();
 
     const cancel = {
@@ -120,18 +123,14 @@ export const actions: Actions = {
     } as ShowMachineEventType;
 
     if (showMachineState.can(cancelEvent)) {
-      showService.send(cancelEvent);
-      Talent.updateOne(
-        { 'user.address': key },
-        { $pull: { activeShows: showId } }
-      ).exec();
+      jobQueue.add(ShowMachineEventString.CANCELLATION_INITIATED, {
+        showId,
+        cancel
+      });
     }
-
-    const showState = showService.getSnapshot().context.showState;
 
     return {
       success: true,
-      showState,
       showCancelled: true
     };
   },
@@ -146,19 +145,18 @@ export const actions: Actions = {
     let isInEscrow = false;
 
     const redisConnection = locals.redisConnection as IORedis;
+    const jobQueue = new Queue(EntityType.SHOW, {
+      connection: redisConnection
+    }) as Queue<ShowJobDataType, any, ShowMachineEventString>;
 
-    const showService = await getShowMachineServiceFromId(
-      showId,
-      redisConnection
-    );
+    const showService = await getShowMachineServiceFromId(showId, jobQueue);
     const showState = showService.getSnapshot();
 
     if (showState.can({ type: ShowMachineEventString.SHOW_ENDED })) {
-      showService.send({
-        type: ShowMachineEventString.SHOW_ENDED
+      jobQueue.add(ShowMachineEventString.SHOW_ENDED, {
+        showId
       });
-
-      isInEscrow = showService.getSnapshot().matches('ended.inEscrow');
+      isInEscrow = true;
     }
 
     return {

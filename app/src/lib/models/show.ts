@@ -192,6 +192,36 @@ const showStateSchema = new Schema(
       required: true,
       default: () => []
     },
+    reservations: {
+      type: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: 'Ticket'
+        }
+      ],
+      required: true,
+      default: () => []
+    },
+    redemptions: {
+      type: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: 'Ticket'
+        }
+      ],
+      required: true,
+      default: () => []
+    },
+    cancellations: {
+      type: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: 'Ticket'
+        }
+      ],
+      required: true,
+      default: () => []
+    },
     current: {
       type: Boolean,
       required: true,

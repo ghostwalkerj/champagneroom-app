@@ -3,6 +3,7 @@ import { error, redirect } from '@sveltejs/kit';
 import type IORedis from 'ioredis';
 import jwt from 'jsonwebtoken';
 import urlJoin from 'url-join';
+import { waitFor } from 'xstate/lib/waitFor';
 
 import {
   JITSI_APP_ID,
@@ -44,11 +45,7 @@ export const actions: Actions = {
     const show = ticket.show as unknown as ShowType;
     if (pinHash && verifyPin(ticketId, ticket.pin, pinHash)) {
       const redisConnection = locals.redisConnection as IORedis;
-      const ticketService = getTicketMachineService(
-        ticket,
-        show,
-        redisConnection
-      );
+      const ticketService = getTicketMachineService(ticket, redisConnection);
       ticketService.send(TicketMachineEventString.SHOW_LEFT);
     }
     return { success: true };
@@ -83,12 +80,17 @@ export const load: PageServerLoad = async ({ params, cookies, locals }) => {
     throw redirect(302, pinUrl);
   }
 
-  // Check if can watch the show
   const redisConnection = locals.redisConnection as IORedis;
 
-  const ticketService = getTicketMachineService(ticket, show, redisConnection);
+  const ticketService = getTicketMachineService(ticket, redisConnection);
   const ticketMachineState = ticketService.getSnapshot();
 
+  if (ticketMachineState.can(TicketMachineEventString.TICKET_REDEEMED)) {
+    ticketService.send(TicketMachineEventString.TICKET_REDEEMED);
+    await waitFor(ticketService, (state) => state.matches('redeemed'));
+  }
+
+  // Check if can watch the show
   if (!ticketMachineState.can(TicketMachineEventString.SHOW_JOINED)) {
     throw redirect(302, ticketUrl);
   }

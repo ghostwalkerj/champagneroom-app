@@ -67,7 +67,7 @@
       height: '100%',
       parentNode: videoCallElement,
       userInfo: {
-        displayName: talentObject.name
+        displayName: talentObject.user.name
       },
       interfaceConfigOverwrite: jitsiInterfaceConfigOverwrite,
       configOverwrite: {

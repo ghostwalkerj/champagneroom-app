@@ -19,7 +19,7 @@ const startWorker = parseArgv(process.argv).worker || false;
 const app = express();
 const corsOptions = {
   origin: '*',
-  optionsSuccessStatus: 200,
+  optionsSuccessStatus: 200
 };
 
 const redisOptions = {
@@ -29,8 +29,8 @@ const redisOptions = {
     password: process.env.REDIS_PASSWORD || '',
     username: process.env.REDIS_USERNAME || '',
     enableReadyCheck: false,
-    maxRetriesPerRequest: null,
-  },
+    maxRetriesPerRequest: null
+  }
 };
 
 const redisConnection = new IORedis(redisOptions.connection);
@@ -53,7 +53,7 @@ const serverAdapter = new ExpressAdapter();
 serverAdapter.setBasePath('/admin/queues');
 const { addQueue, removeQueue, setQueues, replaceQueues } = createBullBoard({
   queues: [new BullMQAdapter(showQueue)],
-  serverAdapter: serverAdapter,
+  serverAdapter: serverAdapter
 });
 app.use('/admin/queues', serverAdapter.getRouter());
 
