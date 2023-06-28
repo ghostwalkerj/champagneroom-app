@@ -28,7 +28,7 @@
   import { createEventText } from '$lib/util/eventUtil';
 
   import ShowDetail from '$components/ShowDetail.svelte';
-  import { showEventStore, showStore, talentStore } from '$stores';
+  import { nameStore, showEventStore, showStore, talentStore } from '$stores';
 
   import ProfilePhoto from './ProfilePhoto.svelte';
   import TalentWallet from './TalentWallet.svelte';
@@ -61,6 +61,8 @@
   let showEventUnSub: Unsubscriber;
   let showUnSub: Unsubscriber;
   let showMachineService: ShowMachineServiceType;
+
+  nameStore.set(talent.user.name);
 
   const noCurrentShow = () => {
     canCreateShow = true;

@@ -765,16 +765,16 @@ const createShowMachine = ({
           return context.showState.salesStats.ticketsSold - refunded === 0;
         },
         canFinalize: (context, event) => {
+          const escrowStartDate = context.showState.escrow?.startedAt;
+          const escrowStartTime = escrowStartDate?.getTime() ?? 0;
+          console.log('escrowStartTime', escrowStartTime);
           const count = event.type === 'FEEDBACK RECEIVED' ? 1 : 0;
           const fullyReviewed =
             context.showState.feedbackStats.numberOfReviews + count ===
             context.showState.salesStats.ticketsSold;
           const hasDisputes =
             context.showState.disputeStats.totalDisputesPending > 0;
-          const escrowOver =
-            (context.showState.escrow?.startedAt?.getTime() || 0) +
-              GRACE_PERIOD <
-            Date.now();
+          const escrowOver = escrowStartTime + GRACE_PERIOD < Date.now();
           return escrowOver || (fullyReviewed && !hasDisputes);
         },
         disputesResolved: (context) =>

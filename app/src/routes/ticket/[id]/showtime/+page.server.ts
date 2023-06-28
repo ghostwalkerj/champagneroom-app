@@ -39,10 +39,8 @@ export const actions: Actions = {
       .orFail(() => {
         throw error(404, 'Ticket not found');
       })
-      .populate('show')
       .exec();
 
-    const show = ticket.show as unknown as ShowType;
     if (pinHash && verifyPin(ticketId, ticket.pin, pinHash)) {
       const redisConnection = locals.redisConnection as IORedis;
       const ticketService = getTicketMachineService(ticket, redisConnection);

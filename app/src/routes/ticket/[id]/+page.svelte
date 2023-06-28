@@ -17,7 +17,7 @@
 
   import { ActorType } from '$lib/constants';
 
-  import { showStore, ticketStore } from '$stores';
+  import { nameStore, showStore, ticketStore } from '$stores';
 
   import TicketDetail from './TicketDetail.svelte';
 
@@ -45,6 +45,8 @@
   let isShowCancelLoading = false;
   $: hasShowStarted = false;
   $: loading = false;
+
+  nameStore.set(ticket.customerName);
 
   const useTicketMachine = (ticketMachineService: TicketMachineServiceType) => {
     const state = ticketMachineService.getSnapshot();
@@ -76,7 +78,7 @@
         resolved: false
       }
     });
-    isWaitingForShow = state.matches('reserved.waiting4Show') && !canWatchShow;
+    isWaitingForShow = state.matches('reserved.waiting4Show') && hasShowStarted;
     isTicketDone = state.done ?? false;
   };
 

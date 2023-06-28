@@ -77,7 +77,7 @@ const onboard = Onboard({
     desktop: {
       enabled: true,
       position: 'topRight',
-      minimal: false
+      minimal: true
     },
     mobile: {
       enabled: true,
