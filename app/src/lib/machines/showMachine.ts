@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { Types } from 'mongoose';
 import { nanoid } from 'nanoid';
+import { count } from 'rxjs';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 import { raise } from 'xstate/lib/actions';
 
@@ -765,16 +766,19 @@ const createShowMachine = ({
           return context.showState.salesStats.ticketsSold - refunded === 0;
         },
         canFinalize: (context, event) => {
-          const escrowStartDate = context.showState.escrow?.startedAt;
-          const escrowStartTime = escrowStartDate?.getTime() ?? 0;
-          console.log('escrowStartTime', escrowStartTime);
+          let startTime = 0;
+          const startedAt = context.showState.escrow?.startedAt;
+          if (startedAt) {
+            startTime = new Date(startedAt).getTime();
+          }
+          const escrowTime = 0 + ESCROW_PERIOD + startTime;
           const count = event.type === 'FEEDBACK RECEIVED' ? 1 : 0;
           const fullyReviewed =
             context.showState.feedbackStats.numberOfReviews + count ===
             context.showState.salesStats.ticketsSold;
           const hasDisputes =
             context.showState.disputeStats.totalDisputesPending > 0;
-          const escrowOver = escrowStartTime + GRACE_PERIOD < Date.now();
+          const escrowOver = escrowTime < Date.now();
           return escrowOver || (fullyReviewed && !hasDisputes);
         },
         disputesResolved: (context) =>

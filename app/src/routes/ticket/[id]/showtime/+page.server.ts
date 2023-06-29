@@ -16,7 +16,7 @@ import {
   PUBLIC_TICKET_PATH
 } from '$env/static/public';
 
-import type { ShowType } from '$lib/models/show';
+import { Show } from '$lib/models/show';
 import { Ticket } from '$lib/models/ticket';
 
 import { TicketMachineEventString } from '$lib/machines/ticketMachine';
@@ -68,11 +68,13 @@ export const load: PageServerLoad = async ({ params, cookies, locals }) => {
     .orFail(() => {
       throw error(404, 'Ticket not found');
     })
-    .populate('show')
     .exec();
 
-  const show = ticket.show as unknown as ShowType;
-
+  const show = await Show.findById(ticket.show)
+    .orFail(() => {
+      throw error(404, 'Show not found');
+    })
+    .exec();
   // Check if pin is correct
   if (!verifyPin(ticketId, ticket.pin, pinHash)) {
     throw redirect(302, pinUrl);
@@ -85,11 +87,10 @@ export const load: PageServerLoad = async ({ params, cookies, locals }) => {
 
   if (ticketMachineState.can(TicketMachineEventString.TICKET_REDEEMED)) {
     ticketService.send(TicketMachineEventString.TICKET_REDEEMED);
-    await waitFor(ticketService, (state) => state.matches('redeemed'));
   }
 
   // Check if can watch the show
-  if (!ticketMachineState.can(TicketMachineEventString.SHOW_JOINED)) {
+  else if (!ticketMachineState.can(TicketMachineEventString.SHOW_JOINED)) {
     throw redirect(302, ticketUrl);
   }
 

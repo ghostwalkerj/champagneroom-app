@@ -78,7 +78,8 @@
         resolved: false
       }
     });
-    isWaitingForShow = state.matches('reserved.waiting4Show') && hasShowStarted;
+    isWaitingForShow =
+      state.matches('reserved.waiting4Show') && !hasShowStarted;
     isTicketDone = state.done ?? false;
   };
 
