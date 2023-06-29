@@ -95,6 +95,7 @@ export const actions: Actions = {
     const state = ticketService.getSnapshot();
 
     const cancel = {
+      _id: new Types.ObjectId(),
       cancelledBy: ActorType.CUSTOMER,
       cancelledInState: JSON.stringify(state.value),
       reason: CancelReason.CUSTOMER_CANCELLED,
@@ -180,6 +181,7 @@ export const actions: Actions = {
 
     const state = ticketService.getSnapshot();
     const dispute = {
+      _id: new Types.ObjectId(),
       disputedBy: ActorType.CUSTOMER,
       reason: reason as DisputeReason,
       explanation,

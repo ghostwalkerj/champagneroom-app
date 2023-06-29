@@ -3,7 +3,6 @@ import { error, redirect } from '@sveltejs/kit';
 import type IORedis from 'ioredis';
 import jwt from 'jsonwebtoken';
 import urlJoin from 'url-join';
-import { waitFor } from 'xstate/lib/waitFor';
 
 import {
   JITSI_APP_ID,

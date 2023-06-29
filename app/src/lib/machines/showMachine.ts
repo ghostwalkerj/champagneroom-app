@@ -259,10 +259,6 @@ const createShowMachine = ({
         ended: {
           initial: 'inEscrow',
           on: {
-            'SHOW FINALIZED': {
-              target: 'finalized',
-              actions: ['finalizeShow']
-            },
             'FEEDBACK RECEIVED': [
               {
                 actions: [
@@ -283,7 +279,14 @@ const createShowMachine = ({
             }
           },
           states: {
-            inEscrow: {},
+            inEscrow: {
+              on: {
+                'SHOW FINALIZED': {
+                  target: '#showMachine.finalized',
+                  actions: ['finalizeShow']
+                }
+              }
+            },
             inDispute: {
               on: {
                 'DISPUTE RESOLVED': [
