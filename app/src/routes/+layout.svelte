@@ -2,8 +2,12 @@
   import 'iconify-icon';
   import '../app.css';
 
+  import { format, generate } from 'build-number-generator';
+
   import ConnectButton from '$components/header/ConnectButton.svelte';
   import { nameStore } from '$stores';
+  const buildNumber = generate('0.2');
+  const buildTime = format(buildNumber);
 </script>
 
 <div class="grid grid-cols-1">
@@ -32,5 +36,13 @@
 
   <div class="">
     <slot />
+    <footer
+      class="absolute bottom-0 footer footer-center p-4 bg-base-300 text-base-content"
+    >
+      <div>
+        <p>Build Number: {buildNumber}</p>
+        <p>Build Time: {buildTime}</p>
+      </div>
+    </footer>
   </div>
 </div>

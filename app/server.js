@@ -9,7 +9,7 @@ import parseArgv from 'tiny-parse-argv';
 import { handler } from './build/handler';
 import { EntityType } from './dist/constants';
 import { getShowWorker } from './dist/workers/showWorker';
-const buildNumber = generate('0.1');
+const buildNumber = generate('0.2');
 const buildTime = format(buildNumber);
 import IORedis from 'ioredis';
 import mongoose from 'mongoose';
@@ -57,7 +57,7 @@ if (startWorker) {
 // Bull Dashboard
 const serverAdapter = new ExpressAdapter();
 serverAdapter.setBasePath('/admin/queues');
-const { addQueue, removeQueue, setQueues, replaceQueues } = createBullBoard({
+createBullBoard({
   queues: [new BullMQAdapter(showQueue)],
   serverAdapter: serverAdapter
 });
