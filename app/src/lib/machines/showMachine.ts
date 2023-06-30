@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { Types } from 'mongoose';
 import { nanoid } from 'nanoid';
-import { count } from 'rxjs';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 import { raise } from 'xstate/lib/actions';
 
@@ -559,7 +558,6 @@ const createShowMachine = ({
         }),
 
         receiveDispute: assign((context, event) => {
-          console.log('receiveDispute', event);
           const st = context.showState;
           return {
             showState: {

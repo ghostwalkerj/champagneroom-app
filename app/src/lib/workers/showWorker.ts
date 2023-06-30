@@ -594,8 +594,6 @@ const feedbackReceived = async (show: ShowType) => {
       .match(ticketFilter)
       .group(groupBy);
 
-    console.log('aggregate', aggregate);
-
     if (aggregate.length === 0) {
       return;
     }
