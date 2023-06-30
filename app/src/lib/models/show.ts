@@ -281,7 +281,7 @@ const showSchema = new Schema(
       type: {
         name: { type: String, required: true },
         profileImageUrl: { type: String, required: true },
-        ratingAvg: { type: Number, required: true, default: 0 },
+        averageRating: { type: Number, required: true, default: 0 },
         numberOfReviews: { type: Number, required: true, default: 0 }
       },
       required: true

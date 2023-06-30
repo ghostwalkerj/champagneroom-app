@@ -1,4 +1,5 @@
 <script lang="ts">
+  import spacetime from 'spacetime';
   import { uniqueNamesGenerator } from 'unique-names-generator';
 
   import { enhance } from '$app/forms';
@@ -7,6 +8,7 @@
 
   import type { OperatorDocumentType } from '$lib/models/operator';
 
+  import { currencyFormatter } from '$lib/constants';
   import { womensNames } from '$lib/util/womensNames';
 
   import { nameStore } from '$stores';
@@ -212,10 +214,40 @@
                     <th>Amount</th>
                     <th>Show Start</th>
                     <th>Show End</th>
+                    <th>Run Time</th>
                     <th>Reason</th>
                     <th>Explanation</th>
                   </tr>
                 </thead>
+                <tbody>
+                  {#each disputedTickets as ticket, index}
+                    <tr
+                      class:bg-base-300={activeRow === index}
+                      on:click={() => (activeRow = index)}
+                    >
+                      <td>{index + 1}</td>
+                      <td>{ticket.show.talentInfo.name}</td>
+                      <td>{currencyFormatter.format(ticket.price)}</td>
+                      <td
+                        >{spacetime(
+                          ticket.show.showState.runtime.startDate
+                        ).format('nice')}</td
+                      >
+                      <td
+                        >{spacetime(
+                          ticket.show.showState.runtime.endDate
+                        ).format('nice')}</td
+                      >
+                      <td
+                        >{spacetime(
+                          ticket.show.showState.runtime.startDate
+                        ).diff(ticket.show.showState.runtime.endDate).minutes} min</td
+                      >
+                      <td>{ticket.ticketState.dispute?.reason}</td>
+                      <td>{ticket.ticketState.dispute?.explanation}</td>
+                    </tr>
+                  {/each}
+                </tbody>
               </table>
             </div>
           </div>

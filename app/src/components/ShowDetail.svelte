@@ -74,7 +74,7 @@
             {show.talentInfo.name}
           </div>
           <div>
-            <StarRating rating={show.talentInfo.ratingAvg} />
+            <StarRating rating={show.talentInfo.averageRating} />
           </div>
         </div>
       {/if}

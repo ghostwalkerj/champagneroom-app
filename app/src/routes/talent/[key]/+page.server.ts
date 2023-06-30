@@ -81,7 +81,9 @@ export const actions: Actions = {
       },
       talentInfo: {
         name: talent.user.name,
-        profileImageUrl: talent.profileImageUrl
+        profileImageUrl: talent.profileImageUrl,
+        averageRating: talent.feedbackStats.averageRating,
+        numberOfReviews: talent.feedbackStats.numberOfReviews
       }
     });
 

@@ -8,7 +8,8 @@ import { PUBLIC_OPERATOR_PATH } from '$env/static/public';
 
 import { Agent } from '$lib/models/agent';
 import { Operator } from '$lib/models/operator';
-import { Ticket } from '$lib/models/ticket';
+import { Show, type ShowType } from '$lib/models/show';
+import { Ticket, TicketStatus } from '$lib/models/ticket';
 
 import type { PageServerLoad } from './$types';
 
@@ -82,9 +83,11 @@ export const load: PageServerLoad = async ({ params, url, cookies }) => {
   // }
   const agents = await Agent.find().sort({ 'user.name': 1 });
 
+  Show.init();
+
   const disputedTickets = await Ticket.find({
-    'ticketState.status': 'IN_DISPUTE'
-  });
+    'ticketState.status': TicketStatus.IN_DISPUTE
+  }).populate<{ show: ShowType }>('show');
 
   return {
     operator: operator.toObject({ flattenObjectIds: true }),

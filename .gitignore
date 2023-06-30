@@ -1,4 +1,4 @@
-app/server/data
+Tapp/server/data
 app/.yarnclean
 app/pouchdb/*rxdb*
 app/build.out.txt

@@ -384,7 +384,7 @@
               options={{
                 showCopy: true,
                 showSalesStats: true,
-                showRating: false,
+                showRating: true,
                 showWaterMark: false
               }}
             />
