@@ -3,7 +3,6 @@ import Onboard from '@web3-onboard/core';
 import type { Account, WalletState } from '@web3-onboard/core/dist/types';
 import frameModule from '@web3-onboard/frame';
 import injectedModule from '@web3-onboard/injected-wallets';
-import ledgerModule from '@web3-onboard/ledger';
 import trezorModule from '@web3-onboard/trezor';
 import walletConnectModule from '@web3-onboard/walletconnect';
 import { derived, writable } from 'svelte/store';
@@ -21,7 +20,6 @@ const trezor = trezorModule({
   email: 'admin@champagneroom.app',
   appUrl: 'https://champagneroom.app'
 });
-const ledger = ledgerModule();
 
 const wcV2InitOptions = {
   version: 2 as const,
@@ -36,14 +34,7 @@ const wcV2InitOptions = {
 };
 const walletConnect = walletConnectModule(wcV2InitOptions);
 
-const wallets = [
-  injected,
-  coinbaseWalletSdk,
-  frame,
-  trezor,
-  ledger,
-  walletConnect
-];
+const wallets = [injected, coinbaseWalletSdk, frame, trezor, walletConnect];
 
 const appMetadata = {
   name: 'Champagne Room',

@@ -59,7 +59,10 @@ export const load: PageServerLoad = async ({ params, locals }) => {
     throw error(404, 'Key not found');
   }
 
-  const talent = await Talent.findOne({ 'user.address': key })
+  const talent = await Talent.findOne({
+    'user.address': key,
+    'user.active': true
+  })
     .orFail(() => {
       throw error(404, 'Talent not found');
     })

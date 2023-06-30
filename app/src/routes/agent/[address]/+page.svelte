@@ -43,6 +43,48 @@
 
   nameStore.set(agent.user.name);
 
+  const updateTalent = async (
+    index: number,
+    {
+      name,
+      commission,
+      active
+    }: { name?: string; commission?: number; active?: boolean }
+  ) => {
+    const talent = talents[index];
+    let formData = new FormData();
+    formData.append('talentId', talent._id.toString());
+    formData.append('name', name || talent.user.name);
+    formData.append(
+      'commission',
+      commission ? commission.toString() : talent.agentCommission.toString()
+    );
+    formData.append(
+      'active',
+      active ? active.toString() : talent.user.active.toString()
+    );
+
+    await fetch('?/update_talent', {
+      method: 'POST',
+      body: formData
+    });
+  };
+
+  const updateName = (index: number, name: string) => {
+    talents[index].user.name = name;
+    updateTalent(index, { name });
+  };
+
+  const updateCommission = (index: number, commission: number) => {
+    talents[index].agentCommission = commission;
+    updateTalent(index, { commission });
+  };
+
+  const updateActive = (index: number, active: string) => {
+    talents[index].user.active = active == 'true' ? true : false;
+    updateTalent(index, { active: talents[index].user.active });
+  };
+
   const onSubmit = ({}) => {
     return async ({ result }) => {
       if (result?.type === 'success') {
@@ -197,15 +239,21 @@
                         <td
                           contenteditable="true"
                           on:blur={(event) => {
-                            console.log(event.target?.textContent);
+                            updateName(index, event.target?.textContent);
                           }}>{talent.user.name}</td
                         >
-
-                        <td contenteditable="true">{talent.agentCommission}</td>
-
+                        <td
+                          contenteditable="true"
+                          on:blur={(event) => {
+                            updateCommission(index, event.target?.textContent);
+                          }}>{talent.agentCommission}</td
+                        >
                         <td>
                           <select
                             class="select select-bordered select-xs max-w-xs"
+                            on:change={(event) => {
+                              updateActive(index, event.target?.value);
+                            }}
                           >
                             {#if talent.user.active}
                               <option value="true" selected>True</option>

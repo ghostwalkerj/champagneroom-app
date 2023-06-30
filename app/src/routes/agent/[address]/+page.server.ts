@@ -63,6 +63,44 @@ export const actions: Actions = {
     return {
       success: true
     };
+  },
+  update_talent: async ({ request }) => {
+    const data = await request.formData();
+    const talentId = data.get('talentId') as string;
+    const name = data.get('name') as string;
+    const commission = data.get('commission') as string;
+    const active = data.get('active') as string;
+
+    // Validation
+    if (talentId === null) {
+      return fail(400, { talentId, missingTalentId: true });
+    }
+    if (Number.isNaN(+commission) || +commission < 0 || +commission > 100) {
+      return fail(400, { commission, badCommission: true });
+    }
+
+    if (active !== 'true' && active !== 'false') {
+      return fail(400, { active, badActive: true });
+    }
+
+    try {
+      await Talent.findOneAndUpdate(
+        {
+          _id: talentId
+        },
+        {
+          'user.name': name,
+          agentCommission: +commission,
+          'user.active': active === 'true'
+        }
+      );
+    } catch (error) {
+      return fail(400, { err: error });
+    }
+
+    return {
+      success: true
+    };
   }
 };
 
