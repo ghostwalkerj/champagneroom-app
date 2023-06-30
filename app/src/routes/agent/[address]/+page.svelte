@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { nanoid } from 'nanoid';
   import StarRating from 'svelte-star-rating';
   import { uniqueNamesGenerator } from 'unique-names-generator';
   import urlJoin from 'url-join';
@@ -39,7 +38,7 @@
   let talentName = uniqueNamesGenerator({
     dictionaries: [womensNames]
   });
-  let talentAddress = nanoid(30);
+  let isChangeUrl = false;
 
   nameStore.set(agent.user.name);
 
@@ -70,19 +69,37 @@
     });
   };
 
-  const updateName = (index: number, name: string) => {
-    talents[index].user.name = name;
-    updateTalent(index, { name });
+  const updateName = (name: string) => {
+    talents[activeRow].user.name = name;
+    updateTalent(activeRow, { name });
   };
 
-  const updateCommission = (index: number, commission: number) => {
-    talents[index].agentCommission = commission;
-    updateTalent(index, { commission });
+  const updateCommission = (commission: number) => {
+    talents[activeRow].agentCommission = commission;
+    updateTalent(activeRow, { commission });
   };
 
-  const updateActive = (index: number, active: string) => {
-    talents[index].user.active = active == 'true' ? true : false;
-    updateTalent(index, { active: talents[index].user.active });
+  const updateActive = (active: string) => {
+    talents[activeRow].user.active = active == 'true' ? true : false;
+    updateTalent(activeRow, { active: talents[activeRow].user.active });
+  };
+
+  const changeUrl = async () => {
+    const index = activeRow;
+    const talentId = talents[index]._id.toString();
+    let formData = new FormData();
+    formData.append('talentId', talentId);
+    const response = await fetch('?/change_talent_key', {
+      method: 'POST',
+      body: formData
+    });
+    const resp = await response.json();
+    const respData = JSON.parse(resp.data);
+    const addressIndex = respData[0]['address'];
+    if (addressIndex) {
+      talents[index].user.address = respData[addressIndex];
+    }
+    isChangeUrl = false;
   };
 
   const onSubmit = ({}) => {
@@ -93,7 +110,7 @@
         talentName = uniqueNamesGenerator({
           dictionaries: [womensNames]
         });
-        talentAddress = nanoid(30);
+
         commission = PUBLIC_DEFAULT_COMMISSION;
         talents = $page.data.talents;
       } else {
@@ -112,6 +129,26 @@
 </script>
 
 {#if agent}
+  <!-- Modal for Restarting or Ending Show -->
+  {#if isChangeUrl}
+    <input type="checkbox" id="changeUrl-show-modal" class="modal-toggle" />
+    <div class="modal modal-open">
+      <div class="modal-box">
+        <h3 class="font-bold text-lg">Change Talent URL</h3>
+        <p class="py-4">
+          Changing the Talent's Unique URL will disable the current URL and
+          create a new one.
+        </p>
+        <div class="modal-action">
+          <button class="btn" on:click={() => (isChangeUrl = false)}
+            >Cancel</button
+          >
+          <button class="btn" on:click={changeUrl}>Change</button>
+        </div>
+      </div>
+    </div>
+  {/if}
+
   <div class="min-h-full">
     <main class="p-10">
       <!-- Page header -->
@@ -173,6 +210,7 @@
                       <th>Comm %</th>
                       <th>Active</th>
                       <th>URL</th>
+                      <th>Change URL</th>
                       <th>Sales</th>
                       <th>Revenue</th>
                       <th>Refunds</th>
@@ -199,11 +237,7 @@
                               name="name"
                               value={talentName}
                             />
-                            <input
-                              type="hidden"
-                              name="address"
-                              value={talentAddress}
-                            />
+
                             <input
                               type="hidden"
                               name="commission"
@@ -239,20 +273,20 @@
                         <td
                           contenteditable="true"
                           on:blur={(event) => {
-                            updateName(index, event.target?.textContent);
+                            updateName(event.target?.textContent);
                           }}>{talent.user.name}</td
                         >
                         <td
                           contenteditable="true"
                           on:blur={(event) => {
-                            updateCommission(index, event.target?.textContent);
+                            updateCommission(event.target?.textContent);
                           }}>{talent.agentCommission}</td
                         >
                         <td>
                           <select
                             class="select select-bordered select-xs max-w-xs"
                             on:change={(event) => {
-                              updateActive(index, event.target?.value);
+                              updateActive(event.target?.value);
                             }}
                           >
                             {#if talent.user.active}
@@ -270,8 +304,16 @@
                               PUBLIC_TALENT_PATH,
                               talent.user.address
                             )}
-                            class="btn btn-primary btn-xs">URL</a
+                            class="link link-primary">Talent Url</a
                           >
+                        </td>
+                        <td>
+                          <button
+                            class="btn btn-xs btn-outline btn-primary"
+                            on:click={() => (isChangeUrl = true)}
+                          >
+                            Change
+                          </button>
                         </td>
 
                         <td
@@ -310,6 +352,7 @@
                       <th>Comm %</th>
                       <th>Active</th>
                       <th>URL</th>
+                      <th>Change URL</th>
                       <th>Sales</th>
                       <th>Revenue</th>
                       <th>Refunds</th>

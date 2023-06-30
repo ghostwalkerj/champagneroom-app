@@ -1,5 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
+import { nanoid } from 'nanoid';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 import urlJoin from 'url-join';
 
@@ -22,7 +23,6 @@ export const actions: Actions = {
     const agentId = data.get('agentId') as string;
     let name = data.get('name') as string;
     const commission = data.get('commission') as string;
-    const address = data.get('address') as string;
 
     // Validation
     if (agentId === null) {
@@ -37,20 +37,12 @@ export const actions: Actions = {
       return fail(400, { commission, badCommission: true });
     }
 
-    if (!address) {
-      return fail(400, { address, missingAddress: true });
-    }
-
-    if (address.length < 30 || address.length > 50) {
-      return fail(400, { address, badAddress: true });
-    }
-
     try {
       Talent.create({
         user: {
           name,
           auth: false,
-          address
+          address: nanoid(30)
         },
         agentCommission: +commission,
         agent: agentId,
@@ -101,6 +93,32 @@ export const actions: Actions = {
     return {
       success: true
     };
+  },
+  change_talent_key: async ({ request }) => {
+    const data = await request.formData();
+    const talentId = data.get('talentId') as string;
+
+    // Validation
+    if (talentId === null) {
+      return fail(400, { talentId, missingTalentId: true });
+    }
+
+    const address = nanoid(30);
+
+    try {
+      await Talent.findOneAndUpdate(
+        {
+          _id: talentId
+        },
+        {
+          'user.address': address
+        }
+      );
+    } catch (error) {
+      return fail(400, { err: error });
+    }
+
+    return { success: true, address };
   }
 };
 
