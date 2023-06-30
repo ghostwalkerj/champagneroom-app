@@ -188,10 +188,18 @@ export const load: PageServerLoad = async ({ params }) => {
     'showState.current': true
   }).exec();
 
+  const completedShows = await Show.find({
+    talent: talent._id,
+    'showState.status': ShowStatus.FINALIZED
+  });
+
   return {
     talent: talent.toObject({ flattenObjectIds: true }),
     currentShow: currentShow
       ? currentShow.toObject({ flattenObjectIds: true })
-      : undefined
+      : undefined,
+    completedShows: completedShows.map((show) =>
+      show.toObject({ flattenObjectIds: true })
+    )
   };
 };

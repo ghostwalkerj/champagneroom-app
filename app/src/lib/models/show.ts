@@ -131,6 +131,10 @@ const feedbackStatsSchema = new Schema({
     type: Number,
     required: true,
     default: 0
+  },
+  comments: {
+    type: [String],
+    default: () => []
   }
 });
 

@@ -304,6 +304,7 @@
                               PUBLIC_TALENT_PATH,
                               talent.user.address
                             )}
+                            target="_blank"
                             class="link link-primary">Talent Url</a
                           >
                         </td>

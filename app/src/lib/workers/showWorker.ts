@@ -587,7 +587,8 @@ const feedbackReceived = async (show: ShowType) => {
     const groupBy = {
       _id: undefined,
       numberOfReviews: { $sum: 1 },
-      averageRating: { $avg: '$ticketState.feedback.rating' }
+      averageRating: { $avg: '$ticketState.feedback.rating' },
+      comments: { $push: '$ticketState.feedback.comment' }
     };
 
     const aggregate = await Ticket.aggregate()
@@ -600,10 +601,12 @@ const feedbackReceived = async (show: ShowType) => {
 
     const averageRating = aggregate[0]['averageRating'] as number;
     const numberOfReviews = aggregate[0]['numberOfReviews'] as number;
+    const comments = aggregate[0]['comments'] as string[];
 
     show.showState.feedbackStats = {
       averageRating,
-      numberOfReviews
+      numberOfReviews,
+      comments
     };
 
     await show.save();

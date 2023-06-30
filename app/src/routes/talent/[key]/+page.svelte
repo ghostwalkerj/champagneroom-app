@@ -2,6 +2,7 @@
   import { possessive } from 'i18n-possessive';
   import { onDestroy, onMount } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
+  import StarRating from 'svelte-star-rating';
   import urlJoin from 'url-join';
 
   import { applyAction, enhance } from '$app/forms';
@@ -31,6 +32,7 @@
   import { nameStore, showEventStore, showStore, talentStore } from '$stores';
 
   import ProfilePhoto from './ProfilePhoto.svelte';
+  import TalentActivity from './TalentActivity.svelte';
   import TalentWallet from './TalentWallet.svelte';
 
   import type { ActionData, PageData } from './$types';
@@ -42,6 +44,7 @@
 
   let talent = data.talent as TalentDocumentType;
   let currentShow = data.currentShow as ShowDocumentType | undefined;
+  let completedShows = data.completedShows as ShowDocumentType[];
   let showName = talent ? possessive(talent.user.name, 'en') + ' Show' : 'Show';
 
   $: showDuration = 60;
@@ -393,7 +396,7 @@
       </div>
       <div class="pb-4">
         {#if canCancelShow}
-          <!-- Link Form-->
+          <!-- Cancel Form-->
           <form method="post" action="?/cancel_show" use:enhance={onSubmit}>
             <input type="hidden" name="showId" value={currentShow?._id} />
             <div class="bg-primary text-primary-content card">
@@ -438,6 +441,12 @@
                   }}
                 />
               </div>
+              <div
+                class="tooltip"
+                data-tip={talent.feedbackStats.averageRating.toFixed(2)}
+              >
+                <StarRating rating={talent.feedbackStats.averageRating} />
+              </div>
             </div>
           </div>
         </div>
@@ -448,22 +457,11 @@
         <TalentWallet />
       </div>
 
-      <!-- Feedback -->
-      <div>
-        <div class="lg:col-start-3 lg:col-span-1">
-          <div class="bg-primary text-primary-content card">
-            <!-- <div class="text-center card-body items-center p-3">
-              <h2 class="text-2xl card-title">Your Average Rating</h2>
-              {talent.stats.ratingAvg.toFixed(2)}
-              <StarRating rating={talent.stats.ratingAvg ?? 0} />
-            </div> -->
-          </div>
-        </div>
-      </div>
-
       <!-- Activity Feed -->
       <div>
-        <div class="lg:col-start-3 lg:col-span-1" />
+        <div class="lg:col-start-3 lg:col-span-1">
+          <TalentActivity {completedShows} />
+        </div>
       </div>
     </div>
   </div>
