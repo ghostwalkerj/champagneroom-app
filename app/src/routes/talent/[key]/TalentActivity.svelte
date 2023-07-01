@@ -20,7 +20,7 @@
           <div class="flex flex-row w-full my-2">
             <iconify-icon
               icon="mingcute:award-fill"
-              class="text-xl text-secondary"
+              class="text-xl text-primary-content"
             />
 
             <div class="flex flex-col w-full">

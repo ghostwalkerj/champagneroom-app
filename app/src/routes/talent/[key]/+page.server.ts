@@ -1,3 +1,5 @@
+import { exec } from 'node:child_process';
+
 import { error, fail } from '@sveltejs/kit';
 import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
@@ -191,7 +193,10 @@ export const load: PageServerLoad = async ({ params }) => {
   const completedShows = await Show.find({
     talent: talent._id,
     'showState.status': ShowStatus.FINALIZED
-  });
+  })
+    .sort({ 'showState.finalize.finalizedAt': -1 })
+    .limit(10)
+    .exec();
 
   return {
     talent: talent.toObject({ flattenObjectIds: true }),
