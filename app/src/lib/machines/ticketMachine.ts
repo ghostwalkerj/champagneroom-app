@@ -245,7 +245,7 @@ const createTicketMachine = ({
           on: {
             'TICKET FINALIZED': {
               target: '#ticketMachine.finalized',
-              actions: ['finalizeTicket']
+              actions: ['finalizeTicket', 'sendTicketFinalized']
             }
           },
           states: {
@@ -267,8 +267,7 @@ const createTicketMachine = ({
                         finalizedAt: new Date(),
                         finalizedBy: ActorType.CUSTOMER
                       }
-                    }),
-                    'sendFeedbackReceived'
+                    })
                   ]
                 },
                 'DISPUTE INITIATED': {
@@ -294,7 +293,14 @@ const createTicketMachine = ({
                 }
               }
             },
-            missedShow: {}
+            missedShow: {
+              on: {
+                'DISPUTE INITIATED': {
+                  target: 'inDispute',
+                  actions: ['initiateDispute', 'sendDisputeInitiated']
+                }
+              }
+            }
           }
         }
       },
@@ -383,17 +389,13 @@ const createTicketMachine = ({
             }
           );
         },
-
-        sendFeedbackReceived: (context) => {
+        sendTicketFinalized: (context) => {
           ticketMachineOptions?.showQueue?.add(
-            ShowMachineEventString.FEEDBACK_RECEIVED,
+            ShowMachineEventString.TICKET_FINALIZED,
             {
               showId: context.ticketDocument.show.toString(),
-              ticketId: context.ticketDocument._id.toString(),
-              feedback: context.ticketState.feedback
-            },
-
-            { delay: 10_000 }
+              ticketId: context.ticketDocument._id.toString()
+            }
           );
         },
 
@@ -625,7 +627,7 @@ const createTicketMachine = ({
 
 export { TicketMachineEventType };
 
-  export { createTicketMachine };
+export { createTicketMachine };
 
 export const createTicketMachineService = ({
   ticketDocument,

@@ -111,8 +111,8 @@ export const getShowWorker = ({
           ticketCancelled(show, job.data.ticketId, job.data.customerName);
           break;
         }
-        case ShowMachineEventString.FEEDBACK_RECEIVED: {
-          feedbackReceived(show);
+        case ShowMachineEventString.TICKET_FINALIZED: {
+          ticketFinalized(show, job.data.ticketId);
           break;
         }
         case ShowMachineEventString.TICKET_DISPUTED: {
@@ -569,7 +569,7 @@ const ticketCancelled = async (
 };
 
 // Calculate feedback stats
-const feedbackReceived = async (show: ShowType) => {
+const ticketFinalized = async (show: ShowType, ticketId: string) => {
   const showService = createShowMachineService({
     showDocument: show,
     showMachineOptions: {
@@ -578,7 +578,19 @@ const feedbackReceived = async (show: ShowType) => {
         createShowEvent({ show, type, ticketId, transaction })
     }
   });
-  showService.send(ShowMachineEventString.FEEDBACK_RECEIVED);
+  const showState = showService.getSnapshot();
+
+  if (
+    showState.can({
+      type: ShowMachineEventString.TICKET_FINALIZED,
+      ticketId
+    })
+  ) {
+    showService.send({
+      type: ShowMachineEventString.TICKET_FINALIZED,
+      ticketId
+    });
+  }
   const showSession = await Show.startSession();
 
   await showSession.withTransaction(async () => {

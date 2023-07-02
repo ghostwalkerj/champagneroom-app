@@ -33,7 +33,7 @@ enum ShowMachineEventString {
   SHOW_ENDED = 'SHOW ENDED',
   CUSTOMER_JOINED = 'CUSTOMER JOINED',
   CUSTOMER_LEFT = 'CUSTOMER LEFT',
-  FEEDBACK_RECEIVED = 'FEEDBACK RECEIVED',
+  TICKET_FINALIZED = 'TICKET FINALIZED',
   ESCROW_ENDED = 'ESCROW ENDED',
   TICKET_DISPUTED = 'TICKET DISPUTED',
   DISPUTE_RESOLVED = 'DISPUTE RESOLVED',
@@ -93,8 +93,8 @@ export type ShowMachineEventType =
       cancel: CancelType;
     }
   | {
-      type: 'FEEDBACK RECEIVED';
-      ticket: FeedbackType;
+      type: 'TICKET FINALIZED';
+      ticketId: string;
     }
   | {
       type: 'REFUND INITIATED';
@@ -259,9 +259,10 @@ const createShowMachine = ({
         ended: {
           initial: 'inEscrow',
           on: {
-            'FEEDBACK RECEIVED': [
+            'TICKET FINALIZED': [
               {
                 actions: [
+                  'finalizeTicket',
                   raise({
                     type: 'SHOW FINALIZED',
                     finalize: {
@@ -271,6 +272,9 @@ const createShowMachine = ({
                   })
                 ],
                 cond: 'canFinalize'
+              },
+              {
+                actions: ['finalizeTicket']
               }
             ],
             'TICKET DISPUTED': {
@@ -661,7 +665,25 @@ const createShowMachine = ({
           st.redemptions.push(new Types.ObjectId(event.ticketId));
           return {
             showState: {
-              ...st
+              ...st,
+              salesStats: {
+                ...st.salesStats,
+                ticketsRedeemed: st.salesStats.ticketsReserved + 1
+              }
+            }
+          };
+        }),
+
+        finalizeTicket: assign((context, event) => {
+          const st = context.showState;
+          st.finalizations.push(new Types.ObjectId(event.ticketId));
+          return {
+            showState: {
+              ...st,
+              salesStats: {
+                ...st.salesStats,
+                ticketsFinalized: st.salesStats.ticketsFinalized + 1
+              }
             }
           };
         }),
@@ -773,15 +795,17 @@ const createShowMachine = ({
           if (startedAt) {
             startTime = new Date(startedAt).getTime();
           }
+          const finalized = event.type === 'TICKET FINALIZED' ? 1 : 0;
+          const hasUnfinalizedTickets =
+            context.showState.salesStats.ticketsSold -
+              finalized -
+              context.showState.salesStats.ticketsFinalized >
+            0;
           const escrowTime = 0 + ESCROW_PERIOD + startTime;
-          const count = event.type === 'FEEDBACK RECEIVED' ? 1 : 0;
-          const fullyReviewed =
-            context.showState.feedbackStats.numberOfReviews + count ===
-            context.showState.salesStats.ticketsSold;
           const hasDisputes =
             context.showState.disputeStats.totalDisputesPending > 0;
           const escrowOver = escrowTime < Date.now();
-          return escrowOver || (fullyReviewed && !hasDisputes);
+          return escrowOver || (!hasDisputes && !hasUnfinalizedTickets);
         },
         disputesResolved: (context) =>
           context.showState.disputeStats.totalDisputesPending === 0

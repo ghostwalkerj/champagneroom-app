@@ -86,7 +86,14 @@ const salesStatsSchema = new Schema({
       message: '{VALUE} is not an integer value'
     }
   },
-
+  ticketsFinalized: {
+    type: Number,
+    default: 0,
+    validate: {
+      validator: Number.isInteger,
+      message: '{VALUE} is not an integer value'
+    }
+  },
   ticketsRedeemed: {
     type: Number,
     default: 0,
@@ -207,6 +214,16 @@ const showStateSchema = new Schema(
       default: () => []
     },
     redemptions: {
+      type: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: 'Ticket'
+        }
+      ],
+      required: true,
+      default: () => []
+    },
+    finalizations: {
       type: [
         {
           type: Schema.Types.ObjectId,
