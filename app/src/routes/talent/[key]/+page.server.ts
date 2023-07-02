@@ -1,5 +1,3 @@
-import { exec } from 'node:child_process';
-
 import { error, fail } from '@sveltejs/kit';
 import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
@@ -13,7 +11,7 @@ import { Talent } from '$lib/models/talent';
 import type { ShowMachineEventType } from '$lib/machines/showMachine';
 import { ShowMachineEventString } from '$lib/machines/showMachine';
 
-import type { ShowJobDataType } from '$lib/workers/showWorker';
+import type { ShowQueueType } from '$lib/workers/showWorker';
 
 import { ActorType, EntityType } from '$lib/constants';
 import { getShowMachineServiceFromId } from '$lib/util/util.server';
@@ -110,7 +108,7 @@ export const actions: Actions = {
     const redisConnection = locals.redisConnection as IORedis;
     const showQueue = new Queue(EntityType.SHOW, {
       connection: redisConnection
-    }) as Queue<ShowJobDataType, any, ShowMachineEventString>;
+    }) as ShowQueueType;
 
     const showService = await getShowMachineServiceFromId(showId);
     const showMachineState = showService.getSnapshot();
@@ -151,7 +149,7 @@ export const actions: Actions = {
     const redisConnection = locals.redisConnection as IORedis;
     const showQueue = new Queue(EntityType.SHOW, {
       connection: redisConnection
-    }) as Queue<ShowJobDataType, any, ShowMachineEventString>;
+    }) as ShowQueueType;
 
     const showService = await getShowMachineServiceFromId(showId);
     const showState = showService.getSnapshot();

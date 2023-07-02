@@ -26,7 +26,10 @@ import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
 import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 
 import { ActorType, EntityType } from '$lib/constants';
-import { getTicketMachineService } from '$lib/util/util.server';
+import {
+  getTicketMachineService,
+  getTicketMachineServiceFromId
+} from '$lib/util/util.server';
 
 export const getShowWorker = ({
   showQueue,
@@ -34,7 +37,7 @@ export const getShowWorker = ({
   escrowPeriod = 3_600_000,
   gracePeriod = 3_600_000
 }: {
-  showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>;
+  showQueue: ShowQueueType;
   redisConnection: IORedis;
   escrowPeriod: number;
   gracePeriod: number;
@@ -70,7 +73,7 @@ export const getShowWorker = ({
           break;
         }
         case ShowMachineEventString.SHOW_FINALIZED: {
-          finalizeShow(show, job.data.showQueue);
+          finalizeShow(show, showQueue);
           break;
         }
 
@@ -117,7 +120,12 @@ export const getShowWorker = ({
           break;
         }
         case ShowMachineEventString.DISPUTE_RESOLVED: {
-          ticketDisputeResolved(show, job.data.decision);
+          ticketDisputeResolved(
+            show,
+            job.data.ticketId,
+            job.data.decision,
+            showQueue
+          );
           break;
         }
       }
@@ -131,10 +139,12 @@ export type ShowJobDataType = {
   [key: string]: any;
 };
 
+export type ShowQueueType = Queue<ShowJobDataType, any, ShowMachineEventString>;
+
 const cancelShow = async (
   show: ShowType,
   cancel: CancelType,
-  showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>
+  showQueue: ShowQueueType
 ) => {
   const showService = createShowMachineService({
     showDocument: show,
@@ -176,10 +186,7 @@ const cancelShow = async (
   showService.stop();
 };
 
-const refundShow = async (
-  show: ShowType,
-  showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>
-) => {
+const refundShow = async (show: ShowType, showQueue: ShowQueueType) => {
   const showService = createShowMachineService({
     showDocument: show,
     showMachineOptions: {
@@ -243,7 +250,7 @@ const startShow = async (show: ShowType) => {
 const stopShow = async (
   show: ShowType,
   gracePeriod: number,
-  showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>
+  showQueue: ShowQueueType
 ) => {
   const showService = createShowMachineService({
     showDocument: show,
@@ -269,7 +276,7 @@ const stopShow = async (
 const endShow = async (
   show: ShowType,
   escrowPeriod: number,
-  showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>
+  showQueue: ShowQueueType
 ) => {
   const showService = createShowMachineService({
     showDocument: show,
@@ -307,10 +314,7 @@ const endShow = async (
   showService.stop();
 };
 
-const finalizeShow = async (
-  show: ShowType,
-  showQueue: Queue<ShowJobDataType, any, ShowMachineEventString>
-) => {
+const finalizeShow = async (show: ShowType, showQueue: ShowQueueType) => {
   // Finalize show if not already finalized
   const showService = createShowMachineService({
     showDocument: show,
@@ -665,8 +669,11 @@ const ticketDisputed = async (show: ShowType, dispute: DisputeType) => {
 
 const ticketDisputeResolved = async (
   show: ShowType,
-  decision: DisputeDecision
+  ticketId: string,
+  decision: DisputeDecision,
+  showQueue: ShowQueueType
 ) => {
+  console.log('ticketDisputeResolved', ticketId, decision);
   const showService = createShowMachineService({
     showDocument: show,
     showMachineOptions: {
@@ -678,6 +685,17 @@ const ticketDisputeResolved = async (
 
   showService.send({
     type: ShowMachineEventString.DISPUTE_RESOLVED,
+    ticketId,
+    decision
+  });
+
+  const ticketService = await getTicketMachineServiceFromId(
+    ticketId,
+    showQueue
+  );
+
+  ticketService.send({
+    type: TicketMachineEventString.DISPUTE_RESOLVED,
     decision
   });
 };

@@ -11,7 +11,6 @@ import { Ticket } from '$lib/models/ticket';
 
 import { ShowMachineEventString } from '$lib/machines/showMachine';
 
-import type { ShowJobDataType } from '$lib/workers/showWorker';
 
 import { EntityType } from '$lib/constants';
 import { mensNames } from '$lib/util/mensNames';
@@ -52,7 +51,7 @@ export const actions: Actions = {
     const redisConnection = locals.redisConnection as IORedis;
     const showQueue = new Queue(EntityType.SHOW, {
       connection: redisConnection
-    }) as Queue<ShowJobDataType, any, ShowMachineEventString>;
+    }) as ShowQueueType;
 
     const showService = await getShowMachineServiceFromId(showId, showQueue);
 

@@ -6,7 +6,9 @@
   import { invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
 
+  import { DisputeDecision } from '$lib/models/common';
   import type { OperatorDocumentType } from '$lib/models/operator';
+  import type { ShowType } from '$lib/models/show';
 
   import { currencyFormatter } from '$lib/constants';
   import { womensNames } from '$lib/util/womensNames';
@@ -19,12 +21,16 @@
   const operator = data.operator as OperatorDocumentType;
   let agents = data.agents;
   const disputedTickets = data.disputedTickets;
-  $: canAddAgent = false;
 
   nameStore.set(operator.user.name);
 
+  $: canAddAgent = false;
+  const decisions = Object.values(DisputeDecision);
+  let decision = decisions[0];
   let activeTab = 'Agents' as 'Agents' | 'Disputes';
-  let activeRow = 0;
+  let activeAgentRow = 0;
+  let activeDisputeRow = 0;
+  let isDecideDispute = false;
 
   let agentNameElement: HTMLTableCellElement;
   let agentAddressElement: HTMLTableCellElement;
@@ -34,6 +40,25 @@
       dictionaries: [womensNames]
     });
   let agentAddress = '';
+
+  const decideDispute = async (decision: DisputeDecision) => {
+    const index = activeDisputeRow;
+    const ticket = disputedTickets[index];
+    const show = ticket.show as unknown as ShowType;
+
+    let formData = new FormData();
+    formData.append('ticketId', ticket._id.toString());
+    formData.append('decision', decision.toString());
+    formData.append('showId', show._id.toString());
+    fetch('?/decide_dispute', {
+      method: 'POST',
+      body: formData
+    });
+
+    disputedTickets.splice(index, 1);
+
+    isDecideDispute = false;
+  };
 
   const onSubmit = ({}) => {
     return async ({ result }) => {
@@ -60,6 +85,34 @@
 </script>
 
 {#if operator}
+  <!-- Modal for Restarting or Ending Show -->
+  {#if isDecideDispute}
+    <input type="checkbox" id="changeUrl-show-modal" class="modal-toggle" />
+    <div class="modal modal-open">
+      <div class="modal-box">
+        <h3 class="font-bold text-lg">Dispute Decision</h3>
+        <select
+          class="select select-primary w-full max-w-xs"
+          name="decision"
+          bind:value={decision}
+        >
+          <option disabled selected>Decision</option>
+
+          {#each decisions as decision}
+            <option>{decision}</option>
+          {/each}
+        </select>
+        <div class="modal-action">
+          <button class="btn" on:click={() => (isDecideDispute = false)}
+            >Cancel</button
+          >
+          <button class="btn" on:click={() => decideDispute(decision)}
+            >Finalize</button
+          >
+        </div>
+      </div>
+    </div>
+  {/if}
   <div class="min-h-full">
     <main class="p-10">
       <!-- Page header -->
@@ -164,8 +217,8 @@
                     {/if}
                     {#each agents as agent, index}
                       <tr
-                        class:bg-base-300={activeRow === index}
-                        on:click={() => (activeRow = index)}
+                        class:bg-base-300={activeAgentRow === index}
+                        on:click={() => (activeAgentRow = index)}
                       >
                         <td>{index + 1}</td>
                         <td
@@ -222,8 +275,8 @@
                 <tbody>
                   {#each disputedTickets as ticket, index}
                     <tr
-                      class:bg-base-300={activeRow === index}
-                      on:click={() => (activeRow = index)}
+                      class:bg-base-300={activeDisputeRow === index}
+                      on:click={() => (activeDisputeRow = index)}
                     >
                       <td>{index + 1}</td>
                       <td>{ticket.show.talentInfo.name}</td>
@@ -245,6 +298,13 @@
                       >
                       <td>{ticket.ticketState.dispute?.reason}</td>
                       <td>{ticket.ticketState.dispute?.explanation}</td>
+                      <td
+                        ><button
+                          class="btn btn-primary btn-xs"
+                          on:click={() => (isDecideDispute = true)}
+                          >Decide</button
+                        ></td
+                      >
                     </tr>
                   {/each}
                 </tbody>

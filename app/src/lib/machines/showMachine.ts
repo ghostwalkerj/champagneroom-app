@@ -156,6 +156,7 @@ export type ShowMachineEventType =
     }
   | {
       type: 'DISPUTE RESOLVED';
+      ticketId: string;
       decision: DisputeDecision;
     };
 

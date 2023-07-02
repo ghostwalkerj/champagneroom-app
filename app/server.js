@@ -9,11 +9,14 @@ import parseArgv from 'tiny-parse-argv';
 import { handler } from './build/handler';
 import { EntityType } from './dist/constants';
 import { getShowWorker } from './dist/workers/showWorker';
-const buildNumber = generate('0.2');
-const buildTime = format(buildNumber);
+import packageFile from './package.json' assert { type: 'json' };
 import IORedis from 'ioredis';
 import mongoose from 'mongoose';
 import { Queue } from 'bullmq';
+import basicAuth from 'express-basic-auth';
+
+const buildNumber = generate(packageFile.version);
+const buildTime = format(buildNumber);
 
 const startWorker = parseArgv(process.argv).worker || false;
 const app = express();
@@ -61,6 +64,14 @@ createBullBoard({
   queues: [new BullMQAdapter(showQueue)],
   serverAdapter: serverAdapter
 });
+// app.get(
+//   '/admin/queues',
+//   basicAuth({
+//     users: { admin: 'admin' },
+//     challenge: true
+//   })
+// );
+
 app.use('/admin/queues', serverAdapter.getRouter());
 
 // Svelte App

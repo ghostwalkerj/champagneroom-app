@@ -33,7 +33,12 @@ const config: UserConfig = {
       transformMixedEsModules: true
     }
   },
-
+  server: {
+    fs: {
+      // Allow serving files from one level up to the project root
+      allow: ['..'],
+    },
+  },
   optimizeDeps: {
     exclude: ['@ethersproject/hash', 'wrtc', 'http'],
     include: [

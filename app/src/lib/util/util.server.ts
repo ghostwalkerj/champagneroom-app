@@ -10,11 +10,10 @@ import {
   type TicketType
 } from '$lib/models/ticket';
 
-import type { ShowMachineEventString } from '$lib/machines/showMachine';
 import { createShowMachineService } from '$lib/machines/showMachine';
 import { createTicketMachineService } from '$lib/machines/ticketMachine';
 
-import type { ShowJobDataType } from '$lib/workers/showWorker';
+import type { ShowQueueType } from '$lib/workers/showWorker';
 
 import { EntityType } from '$lib/constants';
 
@@ -46,7 +45,7 @@ export const getShowMachineServiceFromId = async (showId: string) => {
 
 export const getTicketMachineService = (
   ticket: TicketType,
-  connection: Queue<ShowJobDataType, any, ShowMachineEventString> | IORedis
+  connection: ShowQueueType | IORedis
 ) => {
   const ticketMachineOptions = {
     saveStateCallback: (ticketState: TicketStateType) => {
@@ -55,11 +54,7 @@ export const getTicketMachineService = (
     showQueue:
       connection instanceof Queue
         ? connection
-        : (new Queue(EntityType.SHOW, { connection }) as Queue<
-            ShowJobDataType,
-            any,
-            ShowMachineEventString
-          >)
+        : (new Queue(EntityType.SHOW, { connection }) as ShowQueueType)
   };
 
   return createTicketMachineService({
@@ -70,7 +65,7 @@ export const getTicketMachineService = (
 
 export const getTicketMachineServiceFromId = async (
   ticketId: string,
-  connection: Queue<ShowJobDataType, any, ShowMachineEventString> | IORedis
+  connection: ShowQueueType | IORedis
 ) => {
   const ticket = await mongoose
     .model('Ticket')

@@ -1,6 +1,6 @@
 {
   "name": "pcall",
-  "version": "0.0.1",
+  "version": "0.1.1",
   "license": "UNLICENSED",
   "files": [
     "dist"
@@ -92,6 +92,7 @@
     "crypto-browserify": "^3.12.0",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "express-basic-auth": "^1.2.1",
     "filedrop-svelte": "^0.1.2",
     "i18n-possessive": "^1.0.0",
     "iconify-icon": "^1.0.7",

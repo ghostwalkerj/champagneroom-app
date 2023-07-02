@@ -17,7 +17,7 @@ import { Talent } from '$lib/models/talent';
 
 import { ShowMachineEventString } from '$lib/machines/showMachine';
 
-import type { ShowJobDataType } from '$lib/workers/showWorker';
+import type { ShowQueueType } from '$lib/workers/showWorker';
 
 import { EntityType } from '$lib/constants';
 import {
@@ -37,7 +37,7 @@ export const actions: Actions = {
 
     const showQueue = new Queue(EntityType.SHOW, {
       connection: redisConnection
-    }) as Queue<ShowJobDataType, any, ShowMachineEventString>;
+    }) as ShowQueueType;
 
     const showService = await getShowMachineServiceFromId(showId);
 
@@ -80,7 +80,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
   const redisConnection = locals.redisConnection as IORedis;
   const showQueue = new Queue(EntityType.SHOW, {
     connection: redisConnection
-  }) as Queue<ShowJobDataType, any, ShowMachineEventString>;
+  }) as ShowQueueType;
 
   const showService = getShowMachineService(show);
   const showState = showService.getSnapshot();

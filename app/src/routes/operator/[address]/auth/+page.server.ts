@@ -5,9 +5,9 @@ import urlJoin from 'url-join';
 import { recover } from 'web3-eth-accounts';
 
 import {
-  AUTH_SIGNING_MESSAGE,
-  JWT_EXPIRY,
-  JWT_PRIVATE_KEY
+    AUTH_SIGNING_MESSAGE,
+    JWT_EXPIRY,
+    JWT_PRIVATE_KEY
 } from '$env/static/private';
 import { PUBLIC_OPERATOR_PATH } from '$env/static/public';
 

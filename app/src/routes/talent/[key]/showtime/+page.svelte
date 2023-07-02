@@ -94,7 +94,7 @@
 </script>
 
 <div
-  class="rounded-xl h-[calc(100vh-12px)] w-[calc(100vw-8px)] fixed top-0.5 m-1 overflow-hidden"
+  class="rounded-xl h-[calc(100vh-12px)] w-[calc(100vw-8px)] fixed top-0.5 m-1 overflow-hidden z-10"
 >
   <div bind:this={videoCallElement} class="h-full" />
 </div>

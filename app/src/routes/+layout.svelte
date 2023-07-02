@@ -4,10 +4,28 @@
 
   import { format, generate } from 'build-number-generator';
 
+  import { browser } from '$app/environment';
+
   import ConnectButton from '$components/header/ConnectButton.svelte';
   import { nameStore } from '$stores';
-  const buildNumber = generate('0.2');
+
+  import { version } from '../../package.json';
+
+  const buildNumber = generate(version);
   const buildTime = format(buildNumber);
+
+  if (browser) {
+    (function () {
+      window.ybug_settings = { id: 'vmjfcvd23zharamd1bb8' };
+      var ybug = document.createElement('script');
+      ybug.type = 'text/javascript';
+      ybug.async = true;
+      ybug.src =
+        'https://widget.ybug.io/button/' + window.ybug_settings.id + '.js';
+      var s = document.querySelectorAll('script')[0];
+      s.parentNode.insertBefore(ybug, s);
+    })();
+  }
 </script>
 
 <div class="grid grid-cols-1">
@@ -37,7 +55,7 @@
   <div class="">
     <slot />
     <footer
-      class="absolute bottom-0 footer footer-center p-4 bg-base-300 text-base-content"
+      class="ticky top-[100vh] footer footer-center p-4 bg-base-300 text-base-content z-0"
     >
       <div>
         <p>Build Number: {buildNumber}</p>
