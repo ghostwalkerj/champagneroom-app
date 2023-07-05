@@ -1,4 +1,4 @@
-import { Schema, type InferSchemaType } from 'mongoose';
+import { type InferSchemaType, Schema } from 'mongoose';
 import validator from 'validator';
 
 import { ActorType } from '$lib/constants';
@@ -8,7 +8,8 @@ export enum CancelReason {
   CUSTOMER_NO_SHOW = 'CUSTOMER NO SHOW',
   SHOW_RESCHEDULED = 'SHOW RESCHEDULED',
   CUSTOMER_CANCELLED = 'CUSTOMER CANCELLED',
-  TALENT_CANCELLED = 'TALENT CANCELLED'
+  TALENT_CANCELLED = 'TALENT CANCELLED',
+  TICKET_PAYMENT_TIMEOUT = 'TICKET PAYMENT TIMEOUT'
 }
 
 export enum DisputeDecision {

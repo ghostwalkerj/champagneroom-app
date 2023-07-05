@@ -7,7 +7,6 @@ import { raise } from 'xstate/lib/actions';
 import type {
   CancelType,
   DisputeType,
-  FeedbackType,
   FinalizeType,
   RefundType,
   SaleType
@@ -34,7 +33,6 @@ enum ShowMachineEventString {
   CUSTOMER_JOINED = 'CUSTOMER JOINED',
   CUSTOMER_LEFT = 'CUSTOMER LEFT',
   TICKET_FINALIZED = 'TICKET FINALIZED',
-  ESCROW_ENDED = 'ESCROW ENDED',
   TICKET_DISPUTED = 'TICKET DISPUTED',
   DISPUTE_RESOLVED = 'DISPUTE RESOLVED',
   TICKET_REDEEMED = 'TICKET REDEEMED'

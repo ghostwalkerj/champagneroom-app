@@ -38,6 +38,7 @@
   let isTicketDone = false;
   let canLeaveFeedback = false;
   let canDispute = false;
+  let hasMissedShow = false;
   let isWaitingForShow = false;
   let showUnSub: Unsubscriber;
   let ticketUnSub: Unsubscriber;
@@ -78,6 +79,7 @@
         resolved: false
       }
     });
+    hasMissedShow = state.matches('ended.missedShow');
     isWaitingForShow =
       state.matches('reserved.waiting4Show') && !hasShowStarted;
     isTicketDone = state.done ?? false;
