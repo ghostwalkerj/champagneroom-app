@@ -58,7 +58,6 @@
   </div>
 
   <div class="bg-gradient-to-r from-indigo-900">
-
     <slot />
     <footer
       class="ticky top-[100vh] footer footer-center p-4 bg-base-300 text-base-content z-0"
