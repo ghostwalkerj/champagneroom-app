@@ -5,6 +5,7 @@
   import { format, generate } from 'build-number-generator';
 
   import { browser } from '$app/environment';
+  import { PUBLIC_STATIC_URL } from '$env/static/public';
 
   import ConnectButton from '$components/header/ConnectButton.svelte';
   import { nameStore } from '$stores';
@@ -34,7 +35,11 @@
       <div class="w-1/3">
         <!-- svelte-ignore a11y-missing-attribute -->
         <a class="text-xl btn btn-ghost normal-case">
-          <img src="/logo.png" alt="Logo" width="48" /></a
+          <img
+            src="{PUBLIC_STATIC_URL}/assets/logo.png"
+            alt="Logo"
+            width="48"
+          /></a
         >
       </div>
       <div>
@@ -52,7 +57,8 @@
     </div>
   </div>
 
-  <div class="">
+  <div class="bg-gradient-to-r from-indigo-900">
+
     <slot />
     <footer
       class="ticky top-[100vh] footer footer-center p-4 bg-base-300 text-base-content z-0"
