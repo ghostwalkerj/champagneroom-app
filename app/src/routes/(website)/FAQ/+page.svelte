@@ -2,7 +2,9 @@
   import { PUBLIC_STATIC_URL } from '$env/static/public';
 </script>
 
-<div class="w-screen text-center">FAQ</div>
+<div class="w-screen text-center font-bold text-xl lg:text-2xl xl:text-3xl">
+  FAQ
+</div>
 
 <div
   class="absolute mt-2 mt-2 mx-auto opacity-20 rounded-lg opacity-10 justify-center justify-center w-screen h-screen"
@@ -40,9 +42,80 @@
           </div>
         </div>
       </div>
-      <div class="text-center text-2xl w-full">
-        Pretioso flos est, nihil ad vos nunc. Posset faciens pecuniam. Posuit
-        eam ad opus nunc et adepto a pCall!
+      <div class="w-screen flex place-content-center">
+        <div class="max-w-2xl flex flex-col gap-4">
+          <div class="collapse collapse-arrow bg-base-200">
+            <input type="radio" name="faq-accordion" />
+            <div class="collapse-title text-xl font-medium">
+              What is Champagne Room?
+            </div>
+            <div class="collapse-content">
+              <div class="flex flex-col gap-2">
+                <div>
+                  The Champagne Room is a rapidly growing ecosystem in the NSFW
+                  niche. It functions as a decentralized layer 2 DApp,
+                  connecting Creators with Fans. Initially, it offers
+                  Fan-Creator video calls as a means of interaction. In the
+                  future, the project aims to build an NFT marketplace where
+                  creators can connect with fans and receive support through
+                  exclusive drops.
+                </div>
+
+                <div>
+                  Overall, the Champagne Room aims to create an ecosystem that
+                  bridges the gap between NSFW creators and their fans, offering
+                  a decentralized platform for interaction and support.
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="collapse collapse-arrow bg-base-200">
+            <input type="radio" name="faq-accordion" />
+            <div class="collapse-title text-xl font-medium">
+              How does it work?
+            </div>
+            <div class="collapse-content">
+              <p>hello</p>
+            </div>
+          </div>
+          <div class="collapse collapse-arrow bg-base-200">
+            <input type="radio" name="faq-accordion" />
+            <div class="collapse-title text-xl font-medium">
+              How are my transactions protected?
+            </div>
+            <div class="collapse-content">
+              <p>hello</p>
+            </div>
+          </div>
+          <div class="collapse collapse-arrow bg-base-200">
+            <input type="radio" name="faq-accordion" />
+            <div class="collapse-title text-xl font-medium">
+              Is it anonymous?
+            </div>
+            <div class="collapse-content">
+              <p>hello</p>
+            </div>
+          </div>
+          <div class="collapse collapse-arrow bg-base-200">
+            <input type="radio" name="faq-accordion" />
+            <div class="collapse-title text-xl font-medium">
+              How is Champagne Room different from other platforms like Only
+              Fans?
+            </div>
+            <div class="collapse-content">
+              <p>hello</p>
+            </div>
+          </div>
+          <div class="collapse collapse-arrow bg-base-200">
+            <input type="radio" name="faq-accordion" />
+            <div class="collapse-title text-xl font-medium">
+              What is the road map and future of Champagne Room?
+            </div>
+            <div class="collapse-content">
+              <p>hello</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
