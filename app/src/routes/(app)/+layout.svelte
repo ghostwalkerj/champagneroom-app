@@ -1,6 +1,6 @@
 <script lang="ts">
   import 'iconify-icon';
-  import '../app.css';
+  import '../../app.css';
 
   import { format, generate } from 'build-number-generator';
 
@@ -10,7 +10,7 @@
   import ConnectButton from '$components/header/ConnectButton.svelte';
   import { nameStore } from '$stores';
 
-  import { version } from '../../package.json';
+  import { version } from '../../../package.json';
 
   const buildNumber = generate(version);
   const buildTime = format(buildNumber);
@@ -29,12 +29,12 @@
   }
 </script>
 
-<div class="grid grid-cols-1">
-  <div class="bg-base-100 navbar">
+<div class="min-h-screen flex flex-col">
+  <div class="bg-gradient-to-r from-indigo-900 navbar">
     <div class="flex w-screen">
-      <div class="w-1/3">
+      <div class="w-1/3 flex">
         <!-- svelte-ignore a11y-missing-attribute -->
-        <a class="text-xl btn btn-ghost normal-case">
+        <a class="text-xl btn btn-ghost normal-case" href="/">
           <img
             src="{PUBLIC_STATIC_URL}/assets/logo.png"
             alt="Logo"
@@ -57,15 +57,13 @@
     </div>
   </div>
 
-  <div class="bg-gradient-to-r from-indigo-900">
+  <div class="bg-gradient-to-r from-indigo-900 min-h-screen">
     <slot />
-    <footer
-      class="ticky top-[100vh] footer footer-center p-4 bg-base-300 text-base-content z-0"
-    >
-      <div>
-        <p>Build Number: {buildNumber}</p>
-        <p>Build Time: {buildTime}</p>
-      </div>
-    </footer>
   </div>
 </div>
+<footer class="footer footer-center p-4 bg-base-300 text-base-content z-0">
+  <div>
+    <p>Build Number: {buildNumber}</p>
+    <p>Build Time: {buildTime}</p>
+  </div>
+</footer>

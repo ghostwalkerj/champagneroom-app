@@ -47,7 +47,7 @@
   });
 </script>
 
-<div class="mt-4">
+<div class="mt-4 h-full">
   <div class="flex flex-row justify-center h-full">
     <!-- Page header -->
     <div class="pb-4 text-center w-full max-w-3xl">
