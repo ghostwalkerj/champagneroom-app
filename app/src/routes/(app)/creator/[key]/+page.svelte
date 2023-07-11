@@ -1,8 +1,8 @@
 <script lang="ts">
   import { possessive } from 'i18n-possessive';
   import { onDestroy, onMount } from 'svelte';
-  import type { Unsubscriber } from 'svelte/store';
   import StarRating from 'svelte-star-rating';
+  import type { Unsubscriber } from 'svelte/store';
   import urlJoin from 'url-join';
 
   import { applyAction, enhance } from '$app/forms';

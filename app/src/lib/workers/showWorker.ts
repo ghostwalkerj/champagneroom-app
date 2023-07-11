@@ -1,8 +1,6 @@
-import type { delay, Job, Queue } from 'bullmq';
+import type { Job, Queue } from 'bullmq';
 import { Worker } from 'bullmq';
 import type IORedis from 'ioredis';
-import pkg from 'mongoose';
-const { connection } = pkg;
 
 import type {
   CancelType,

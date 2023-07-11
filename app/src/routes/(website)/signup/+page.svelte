@@ -82,10 +82,12 @@
                     class="select select-primary w-full max-w-xs"
                     name="interest"
                   >
-                    <option disabled selected>I am interesting about </option>
+                    <option disabled selected>I am interested in</option>
                     <option>Agents</option>
                     <option>Creators</option>
-                    <option>Investing</option>
+                    <option>Investors</option>
+                    <option>Partners</option>
+                    <option>Other</option>
                   </select>
                   {#if form?.missingInterest}<div
                       class="shadow-lg alert alert-error"

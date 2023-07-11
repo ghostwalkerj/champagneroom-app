@@ -16,8 +16,8 @@ import { mensNames } from '$lib/util/mensNames';
 import { createPinHash } from '$lib/util/pin';
 import { getShowMachineServiceFromId } from '$lib/util/util.server';
 
-import type { Actions, PageServerLoad } from './$types';
 import type { ShowQueueType } from '$lib/workers/showWorker';
+import type { Actions, PageServerLoad } from './$types';
 
 export const actions: Actions = {
   reserve_ticket: async ({ params, cookies, request, url, locals }) => {
