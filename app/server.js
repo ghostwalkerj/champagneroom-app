@@ -64,14 +64,14 @@ createBullBoard({
   queues: [new BullMQAdapter(showQueue)],
   serverAdapter: serverAdapter
 });
-// app.get(
-//   '/admin/queues',
-//   basicAuth({
-//     users: { admin: 'admin' },
-//     challenge: true
-//   })
-// );
+const staticAuth = basicAuth({
+  users: {
+    admin: 'Credibly-Displease5-Harddisk'
+  },
+  challenge: true
+});
 
+app.get('/admin/queues', staticAuth);
 app.use('/admin/queues', serverAdapter.getRouter());
 
 // Svelte App
