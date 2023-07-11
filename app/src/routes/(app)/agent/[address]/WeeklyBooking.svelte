@@ -4,24 +4,24 @@
   import spacetime from 'spacetime';
   import { Line } from 'svelte-chartjs';
 
-  import type { TalentDocument } from '$lib/ORM/models/talent';
+  import type { CreatorDocument } from '$lib/models/creator';
 
-  export let talents: TalentDocument[];
+  export let creators: CreatorDocument[];
 
   const now = spacetime.now();
   let labels = [] as string[];
-  let talentData = [] as number[];
+  let creatorData = [] as number[];
 
-  if (talents) {
-    talents.forEach(async (talent: TalentDocument) => {
+  if (creators) {
+    creators.forEach(async (creator: CreatorDocument) => {
       const range = {
         start: now.startOf('month').epoch,
         end: now.endOf('month').epoch
       };
-      const stats = await talent.getStatsByRange(range);
+      const stats = await creator.getStatsByRange(range);
       if (stats.totalEarnings > 0) {
-        talentData = talentData.concat(stats.totalEarnings);
-        labels = labels.concat(talent.user.name);
+        creatorData = creatorData.concat(stats.totalEarnings);
+        labels = labels.concat(creator.user.name);
       }
     });
   }
@@ -78,9 +78,9 @@
 <div class="bg-primary text-primary-content card">
   <div class="text-center card-body items-center">
     <div class="text-2xl card-title capitalize">Weekly Bookings</div>
-    {#if talents && talents.length > 0}
-      {#if talentData.length > 0}
-        {#key talentData}
+    {#if creators && creators.length > 0}
+      {#if creatorData.length > 0}
+        {#key creatorData}
           <Line {data} {options} />
         {/key}
       {:else}
@@ -89,7 +89,7 @@
         </div>
       {/if}
     {:else}
-      <h3 class="text-xl">No talents found</h3>
+      <h3 class="text-xl">No creators found</h3>
     {/if}
   </div>
 </div>

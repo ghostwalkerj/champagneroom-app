@@ -5,9 +5,9 @@ import urlJoin from 'url-join';
 import { PUBLIC_CHANGESET_PATH } from '$env/static/public';
 
 import type { AgentDocumentType } from '$lib/models/agent';
+import type { CreatorDocumentType } from '$lib/models/creator';
 import type { ShowDocumentType } from '$lib/models/show';
 import type { ShowEventDocumentType } from '$lib/models/showEvent';
-import type { TalentDocumentType } from '$lib/models/talent';
 import type { TicketDocumentType } from '$lib/models/ticket';
 
 export const agentStore = (agent: AgentDocumentType) => {
@@ -86,6 +86,17 @@ const abstractStore = <T>({
   };
 };
 
+export const creatorStore = (creator: CreatorDocumentType) => {
+  return abstractStore({
+    doc: creator,
+    changesetPath: urlJoin(
+      PUBLIC_CHANGESET_PATH,
+      'creator',
+      creator.user.address
+    )
+  });
+};
+
 export const nameStore = writable<string>('');
 
 export const showEventStore = (show: ShowDocumentType) => {
@@ -125,13 +136,6 @@ export const showStore = (show: ShowDocumentType) => {
     doc: show,
     changesetPath: urlJoin(PUBLIC_CHANGESET_PATH, 'show', show._id.toString()),
     cancelOn: showCancel
-  });
-};
-
-export const talentStore = (talent: TalentDocumentType) => {
-  return abstractStore({
-    doc: talent,
-    changesetPath: urlJoin(PUBLIC_CHANGESET_PATH, 'talent', talent.user.address)
   });
 };
 

@@ -36,7 +36,7 @@
               >White Paper</a
             >
           </li>
-          <li><a>Sign Up</a></li>
+          <li><a href="signup">Sign Up</a></li>
           <li><a href={PUBLIC_AGENT_PATH}>Agent Login</a></li>
         </ul>
       </div>

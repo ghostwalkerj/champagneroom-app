@@ -53,18 +53,18 @@ export const generateTalent = async (agent: AgentDocumentType) => {
   });
   const profileImageUrl =
     profileImageUrls[Math.floor(Math.random() * profileImageUrls.length)];
-  const talent = await agent.createTalent({
+  const creator = await agent.createCreator({
     name,
     agentCommission: 10,
     profileImageUrl
   });
   const count = Math.floor(Math.random() * 100) + 1;
-  generateShows(talent, count);
-  await talent.updateStats();
-  return talent;
+  generateShows(creator, count);
+  await creator.updateStats();
+  return creator;
 };
 
-const generateShows = (talent: TalentDocument, count: number) => {
+const generateShows = (creator: TalentDocument, count: number) => {
   const shows: ShowDocumentType[] = [];
 
   // Create completedCalls
@@ -94,10 +94,10 @@ const generateShows = (talent: TalentDocument, count: number) => {
     //   initiatedAmount: amount,
     //   fundingAddress: '0x251281e1516e6E0A145d28a41EE63BfcDd9E18Bf',
     //   callId: uuidv4(),
-    //   talent: talent._id,
-    //   talentInfo: {
-    //     name: talent.name,
-    //     profileImageUrl: talent.profileImageUrl,
+    //   creator: creator._id,
+    //   creatorInfo: {
+    //     name: creator.name,
+    //     profileImageUrl: creator.profileImageUrl,
     //     stats: {
     //       ratingAvg: Math.floor(Math.random() * 5) + 1,
     //       numCompletedCalls: i,
@@ -107,11 +107,11 @@ const generateShows = (talent: TalentDocument, count: number) => {
     //   createdAt: new Date().getTime(),
     //   updatedAt: new Date().getTime(),
     //   entityType: LinkString,
-    //   agent: talent.agent,
+    //   agent: creator.agent,
     // } as LinkDocType;
     // links.push(_link);
   }
 
-  const database = talent.collection.database;
+  const database = creator.collection.database;
   //db.links.bulkInsert(links);
 };

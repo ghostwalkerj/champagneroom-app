@@ -12,10 +12,10 @@ import type {
   SaleType
 } from '$lib/models/common';
 import { CancelReason, RefundReason } from '$lib/models/common';
+import { Creator } from '$lib/models/creator';
 import type { ShowType } from '$lib/models/show';
 import { SaveState, Show, ShowStatus } from '$lib/models/show';
 import { createShowEvent } from '$lib/models/showEvent';
-import { Talent } from '$lib/models/talent';
 import { Ticket, TicketStatus } from '$lib/models/ticket';
 import type { TransactionType } from '$lib/models/transaction';
 import { Transaction, TransactionReasonType } from '$lib/models/transaction';
@@ -231,7 +231,7 @@ const refundShow = async (show: ShowType, showQueue: ShowQueueType) => {
       ) {
         const refundTransaction = (await Transaction.create({
           ticket: ticket._id,
-          talent: ticket.talent,
+          creator: ticket.creator,
           agent: ticket.agent,
           show: ticket.show,
           reason: TransactionReasonType.TICKET_REFUND,
@@ -377,10 +377,10 @@ const finalizeShow = async (show: ShowType, showQueue: ShowQueueType) => {
     }
   }
   // Calculate sales stats
-  const talentSession = await Talent.startSession();
-  await talentSession.withTransaction(async () => {
+  const creatorSession = await Creator.startSession();
+  await creatorSession.withTransaction(async () => {
     const showFilter = {
-      talent: show.talent,
+      creator: show.creator,
       'showState.status': ShowStatus.FINALIZED
     };
 
@@ -405,8 +405,8 @@ const finalizeShow = async (show: ShowType, showQueue: ShowQueueType) => {
     const totalRefunded = aggregate[0]['totalRefunded'] as number;
     const totalRevenue = aggregate[0]['totalRevenue'] as number;
 
-    await Talent.findByIdAndUpdate(
-      { _id: show.talent },
+    await Creator.findByIdAndUpdate(
+      { _id: show.creator },
       {
         'salesStats.totalSales': totalSales,
         'salesStats.numberOfCompletedShows': numberOfCompletedShows,
@@ -414,7 +414,7 @@ const finalizeShow = async (show: ShowType, showQueue: ShowQueueType) => {
         'salesStats.totalRevenue': totalRevenue
       }
     );
-    talentSession.endSession();
+    creatorSession.endSession();
   });
 };
 
@@ -656,11 +656,11 @@ const ticketFinalized = async (show: ShowType, ticketId: string) => {
     showSession!.endSession();
   });
 
-  // aggregate show feedback into talent
-  const talentSession = await Talent.startSession();
-  await talentSession.withTransaction(async () => {
+  // aggregate show feedback into creator
+  const creatorSession = await Creator.startSession();
+  await creatorSession.withTransaction(async () => {
     const showFilter = {
-      talent: show.talent,
+      creator: show.creator,
       'showState.feedbackStats.numberOfReviews': { $gt: 0 }
     };
 
@@ -679,14 +679,14 @@ const ticketFinalized = async (show: ShowType, ticketId: string) => {
     const averageRating = aggregate[0]['averageRating'] as number;
     const numberOfReviews = aggregate[0]['numberOfReviews'] as number;
 
-    await Talent.findByIdAndUpdate(
-      { _id: show.talent },
+    await Creator.findByIdAndUpdate(
+      { _id: show.creator },
       {
         'feedbackStats.averageRating': averageRating,
         'feedbackStats.numberOfReviews': numberOfReviews
       }
     );
-    talentSession.endSession();
+    creatorSession.endSession();
   });
 };
 

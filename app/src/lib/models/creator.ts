@@ -48,7 +48,7 @@ const salesSchema = new Schema({
   }
 });
 
-const talentSchema = new Schema(
+const creatorSchema = new Schema(
   {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     _id: { type: Schema.Types.ObjectId, required: true, auto: true },
@@ -84,10 +84,10 @@ const talentSchema = new Schema(
   { timestamps: true }
 );
 
-export const Talent = models?.Talent
-  ? (models?.Talent as Model<TalentDocumentType>)
-  : mongoose.model<TalentDocumentType>('Talent', talentSchema);
+export const Creator = models?.Creator
+  ? (models?.Creator as Model<CreatorDocumentType>)
+  : mongoose.model<CreatorDocumentType>('Creator', creatorSchema);
 
-export type TalentDocumentType = InferSchemaType<typeof talentSchema>;
+export type CreatorDocumentType = InferSchemaType<typeof creatorSchema>;
 
-export type TalentType = InstanceType<typeof Talent>;
+export type CreatorType = InstanceType<typeof Creator>;

@@ -1,25 +1,27 @@
-import { Talent } from '$lib/models/talent';
+import { Creator } from '$lib/models/creator';
 
 import type { RequestHandler } from './$types';
 
 export const GET = (async ({ params, url }) => {
-  const talentKey = params.key;
-  if (talentKey === null) {
-    return new Response('Talent key not found', { status: 404 });
+  const creatorKey = params.key;
+  if (creatorKey === null) {
+    return new Response('Creator key not found', { status: 404 });
   }
   const isFirstFetch = url.searchParams.has('isFirstFetch')
     ? url.searchParams.get('isFirstFetch') === 'true'
     : false;
 
   if (isFirstFetch) {
-    const talent = await Talent.findOne({ 'user.address': talentKey }).exec();
-    if (talent !== undefined) {
-      return new Response(JSON.stringify(talent));
+    const creator = await Creator.findOne({
+      'user.address': creatorKey
+    }).exec();
+    if (creator !== undefined) {
+      return new Response(JSON.stringify(creator));
     }
   }
 
-  const pipeline = [{ $match: { 'fullDocument.user.address': talentKey } }];
-  const changeStream = Talent.watch(pipeline, {
+  const pipeline = [{ $match: { 'fullDocument.user.address': creatorKey } }];
+  const changeStream = Creator.watch(pipeline, {
     fullDocument: 'updateLookup'
   });
   const next = await changeStream.next();

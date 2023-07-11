@@ -20,7 +20,7 @@
     : '';
   $: showStatus = show.showState.status;
   $: customerName = ticket.customerName;
-  $: talentName = show.talentInfo.name;
+  $: creatorName = show.creatorInfo.name;
   $: showName = show.name;
   $: showDuration = durationFormatter(show.duration);
   $: ticketPrice = currencyFormatter.format(ticket.price);
@@ -45,7 +45,7 @@
         </div>
         <div class="flex flex-col">
           <div>
-            {talentName}
+            {creatorName}
           </div>
           <div>{showName}</div>
 

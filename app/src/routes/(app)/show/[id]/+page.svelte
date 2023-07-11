@@ -21,16 +21,16 @@
   let isBuyingTicket = false;
   let showUnSub: Unsubscriber;
 
-  $: loading = false;
+  $: isLoading = false;
   $: profileImage = getProfileImage(displayName, PUBLIC_PROFILE_IMAGE_PATH);
   $: canBuyTicket =
     show.showState.status === ShowStatus.BOX_OFFICE_OPEN || isBuyingTicket;
   const onSubmit = () => {
     isBuyingTicket = true;
-    loading = true;
+    isLoading = true;
     return async ({ result }) => {
       if (result.type === 'failure') {
-        loading = false;
+        isLoading = false;
         isBuyingTicket = false;
       }
       await applyAction(result);
@@ -124,7 +124,7 @@
                 </div>
 
                 <div class="py-4 text-center">
-                  {#if loading}
+                  {#if isLoading}
                     <button
                       class="btn btn-secondary loading"
                       type="submit"
@@ -134,7 +134,7 @@
                     <button
                       class="btn btn-secondary"
                       type="submit"
-                      disabled={loading}>Reserve</button
+                      disabled={isLoading}>Reserve</button
                     >
                   {/if}
                 </div>

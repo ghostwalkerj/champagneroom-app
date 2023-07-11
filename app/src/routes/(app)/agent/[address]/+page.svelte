@@ -7,12 +7,12 @@
   import { invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
   import {
-    PUBLIC_DEFAULT_COMMISSION,
-    PUBLIC_TALENT_PATH
+    PUBLIC_CREATOR_PATH,
+    PUBLIC_DEFAULT_COMMISSION
   } from '$env/static/public';
 
   import type { AgentDocumentType } from '$lib/models/agent';
-  import type { TalentDocumentType } from '$lib/models/talent';
+  import type { CreatorDocumentType } from '$lib/models/creator';
 
   import { currencyFormatter } from '$lib/constants';
   import { womensNames } from '$lib/util/womensNames';
@@ -20,29 +20,29 @@
   import { nameStore } from '$stores';
 
   import AgentWallet from './AgentWallet.svelte';
-  import TopTalent from './TopTalent.svelte';
+  import TopCreator from './TopCreator.svelte';
 
   import type { PageData } from './$types';
 
   export let data: PageData;
   const agent = data.agent as AgentDocumentType;
-  let talents = data.talents as TalentDocumentType[];
+  let creators = data.creators as CreatorDocumentType[];
 
   let activeRow = 0;
-  let activeTab = 'Talents' as 'Talents' | 'Dashboard';
-  $: canAddTalent = false;
-  let talentNameElement: HTMLTableCellElement;
-  let talentAddressElement: HTMLTableCellElement;
-  let talentCommissionElement: HTMLTableCellElement;
+  let activeTab = 'Creators' as 'Creators' | 'Dashboard';
+  $: canAddCreator = false;
+  let creatorNameElement: HTMLTableCellElement;
+  let creatorAddressElement: HTMLTableCellElement;
+  let creatorCommissionElement: HTMLTableCellElement;
   let commission = PUBLIC_DEFAULT_COMMISSION;
-  let talentName = uniqueNamesGenerator({
+  let creatorName = uniqueNamesGenerator({
     dictionaries: [womensNames]
   });
   let isChangeUrl = false;
 
   nameStore.set(agent.user.name);
 
-  const updateTalent = async (
+  const updateCreator = async (
     index: number,
     {
       name,
@@ -50,46 +50,46 @@
       active
     }: { name?: string; commission?: number; active?: boolean }
   ) => {
-    const talent = talents[index];
+    const creator = creators[index];
     let formData = new FormData();
-    formData.append('talentId', talent._id.toString());
-    formData.append('name', name || talent.user.name);
+    formData.append('creatorId', creator._id.toString());
+    formData.append('name', name || creator.user.name);
     formData.append(
       'commission',
-      commission ? commission.toString() : talent.agentCommission.toString()
+      commission ? commission.toString() : creator.agentCommission.toString()
     );
     formData.append(
       'active',
-      active ? active.toString() : talent.user.active.toString()
+      active ? active.toString() : creator.user.active.toString()
     );
 
-    await fetch('?/update_talent', {
+    await fetch('?/update_creator', {
       method: 'POST',
       body: formData
     });
   };
 
   const updateName = (name: string) => {
-    talents[activeRow].user.name = name;
-    updateTalent(activeRow, { name });
+    creators[activeRow].user.name = name;
+    updateCreator(activeRow, { name });
   };
 
   const updateCommission = (commission: number) => {
-    talents[activeRow].agentCommission = commission;
-    updateTalent(activeRow, { commission });
+    creators[activeRow].agentCommission = commission;
+    updateCreator(activeRow, { commission });
   };
 
   const updateActive = (active: string) => {
-    talents[activeRow].user.active = active == 'true' ? true : false;
-    updateTalent(activeRow, { active: talents[activeRow].user.active });
+    creators[activeRow].user.active = active == 'true' ? true : false;
+    updateCreator(activeRow, { active: creators[activeRow].user.active });
   };
 
   const changeUrl = async () => {
     const index = activeRow;
-    const talentId = talents[index]._id.toString();
+    const creatorId = creators[index]._id.toString();
     let formData = new FormData();
-    formData.append('talentId', talentId);
-    const response = await fetch('?/change_talent_key', {
+    formData.append('creatorId', creatorId);
+    const response = await fetch('?/change_creator_key', {
       method: 'POST',
       body: formData
     });
@@ -97,7 +97,7 @@
     const respData = JSON.parse(resp.data);
     const addressIndex = respData[0]['address'];
     if (addressIndex) {
-      talents[index].user.address = respData[addressIndex];
+      creators[index].user.address = respData[addressIndex];
     }
     isChangeUrl = false;
   };
@@ -105,23 +105,23 @@
   const onSubmit = ({}) => {
     return async ({ result }) => {
       if (result?.type === 'success') {
-        canAddTalent = false;
+        canAddCreator = false;
         await invalidateAll();
-        talentName = uniqueNamesGenerator({
+        creatorName = uniqueNamesGenerator({
           dictionaries: [womensNames]
         });
 
         commission = PUBLIC_DEFAULT_COMMISSION;
-        talents = $page.data.talents;
+        creators = $page.data.creators;
       } else {
         if (result.data.badName) {
-          talentNameElement.focus();
+          creatorNameElement.focus();
         }
         if (result.data.badAddress) {
-          talentAddressElement.focus();
+          creatorAddressElement.focus();
         }
         if (result.data.badCommission) {
-          talentCommissionElement.focus();
+          creatorCommissionElement.focus();
         }
       }
     };
@@ -134,9 +134,9 @@
     <input type="checkbox" id="changeUrl-show-modal" class="modal-toggle" />
     <div class="modal modal-open">
       <div class="modal-box">
-        <h3 class="font-bold text-lg">Change Talent URL</h3>
+        <h3 class="font-bold text-lg">Change Creator URL</h3>
         <p class="py-4">
-          Changing the Talent's Unique URL will disable the current URL and
+          Changing the Creator's Unique URL will disable the current URL and
           create a new one.
         </p>
         <div class="modal-action">
@@ -164,10 +164,10 @@
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <a
               class="tab"
-              class:tab-active={activeTab === 'Talents'}
+              class:tab-active={activeTab === 'Creators'}
               on:click={() => {
-                activeTab = 'Talents';
-              }}>Talents</a
+                activeTab = 'Creators';
+              }}>Creators</a
             >
 
             <!-- svelte-ignore a11y-missing-attribute -->
@@ -186,11 +186,11 @@
         <div class="h-screen">
           <div class="relative">
             <div
-              class:invisible={activeTab !== 'Talents'}
+              class:invisible={activeTab !== 'Creators'}
               class="absolute top-4 left-0 bg-neutral w-full rounded-lg"
             >
               <div class="overflow-x-auto reo">
-                {#key talents}
+                {#key creators}
                   <table class="table table-pin-rows">
                     <thead>
                       <tr>
@@ -198,7 +198,7 @@
                           ><button
                             class="btn btn-circle btn-xs"
                             on:click={() => {
-                              canAddTalent = !canAddTalent;
+                              canAddCreator = !canAddCreator;
                             }}
                           >
                             <iconify-icon
@@ -220,12 +220,12 @@
                       </tr>
                     </thead>
                     <tbody>
-                      {#if canAddTalent}
+                      {#if canAddCreator}
                         <tr>
                           <td>
                             <form
                               method="post"
-                              action="?/create_talent"
+                              action="?/create_creator"
                               use:enhance={onSubmit}
                             >
                               <input
@@ -236,7 +236,7 @@
                               <input
                                 type="hidden"
                                 name="name"
-                                value={talentName}
+                                value={creatorName}
                               />
 
                               <input
@@ -252,20 +252,20 @@
                           </td>
                           <td
                             contenteditable="true"
-                            bind:this={talentNameElement}
-                            bind:innerText={talentName}
+                            bind:this={creatorNameElement}
+                            bind:innerText={creatorName}
                           />
 
                           <td
                             contenteditable="true"
-                            bind:this={talentCommissionElement}
+                            bind:this={creatorCommissionElement}
                             bind:innerText={commission}
                           />
                           <td>True</td>
                           <td />
                         </tr>
                       {/if}
-                      {#each talents as talent, index}
+                      {#each creators as creator, index}
                         <tr
                           class:bg-base-300={activeRow === index}
                           on:click={() => (activeRow = index)}
@@ -275,13 +275,13 @@
                             contenteditable="true"
                             on:blur={(event) => {
                               updateName(event.target?.textContent);
-                            }}>{talent.user.name}</td
+                            }}>{creator.user.name}</td
                           >
                           <td
                             contenteditable="true"
                             on:blur={(event) => {
                               updateCommission(event.target?.textContent);
-                            }}>{talent.agentCommission}</td
+                            }}>{creator.agentCommission}</td
                           >
                           <td>
                             <select
@@ -290,7 +290,7 @@
                                 updateActive(event.target?.value);
                               }}
                             >
-                              {#if talent.user.active}
+                              {#if creator.user.active}
                                 <option value="true" selected>True</option>
                                 <option value="false">False</option>
                               {:else}
@@ -302,11 +302,11 @@
                           <td
                             ><a
                               href={urlJoin(
-                                PUBLIC_TALENT_PATH,
-                                talent.user.address
+                                PUBLIC_CREATOR_PATH,
+                                creator.user.address
                               )}
                               target="_blank"
-                              class="link link-primary">Talent Url</a
+                              class="link link-primary">Creator Url</a
                             >
                           </td>
                           <td>
@@ -320,28 +320,28 @@
 
                           <td
                             >{currencyFormatter.format(
-                              talent.salesStats.totalSales
+                              creator.salesStats.totalSales
                             )}</td
                           >
                           <td
                             >{currencyFormatter.format(
-                              talent.salesStats.totalRevenue
+                              creator.salesStats.totalRevenue
                             )}</td
                           >
                           <td
                             >{currencyFormatter.format(
-                              talent.salesStats.totalRefunded
+                              creator.salesStats.totalRefunded
                             )}</td
                           >
-                          <td>{talent.feedbackStats.numberOfReviews}</td>
+                          <td>{creator.feedbackStats.numberOfReviews}</td>
                           <td
                             class="tooltip"
-                            data-tip={talent.feedbackStats.averageRating.toFixed(
+                            data-tip={creator.feedbackStats.averageRating.toFixed(
                               2
                             )}
                           >
                             <StarRating
-                              rating={talent.feedbackStats.averageRating}
+                              rating={creator.feedbackStats.averageRating}
                             />
                           </td>
                         </tr>
@@ -379,7 +379,7 @@
                   <div class="md:col-start-3 md:col-span-1">
                     <div class="bg-primary text-primary-content card">
                       <div class="text-center card-body items-center">
-                        <TopTalent {talents} />
+                        <TopCreator {creators} />
                       </div>
                     </div>
                   </div>

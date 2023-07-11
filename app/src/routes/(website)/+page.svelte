@@ -20,7 +20,7 @@
           <div class="h-xl w-xl">
             <img
               class="motion-safe:animate-fadeIn mx-auto rounded-lg opacity-45 justify-center -space-x-20 justify-center w-m h-m"
-              src="{PUBLIC_STATIC_URL}/assets/ladyblue.png"
+              src="{PUBLIC_STATIC_URL}/assets/ladypink.png"
               alt="Lady Blue"
             />
           </div>
@@ -32,7 +32,7 @@
           <div class="h-xl w-xl">
             <img
               class="motion-safe:animate-fadeIn mx-auto rounded-lg opacity-45 justify-center -space-x-20 justify-center w-m h-m"
-              src="{PUBLIC_STATIC_URL}/assets/ladypink.png"
+              src="{PUBLIC_STATIC_URL}/assets/ladyblue.png"
               alt="Lady Pink"
             />
           </div>
@@ -44,7 +44,7 @@
           and have 1:1 interactions with them.
         </div>
         <div>
-          It's completely anonymous, and you can pay with crypto. No signup
+          It's completely anonymous, and you pay with crypto. No signup
           required!
         </div>
         <div>

@@ -10,10 +10,10 @@ import {
   JITSI_JWT_SECRET,
   JWT_EXPIRY
 } from '$env/static/private';
-import { PUBLIC_JITSI_DOMAIN, PUBLIC_TALENT_PATH } from '$env/static/public';
+import { PUBLIC_JITSI_DOMAIN, PUBLIC_CREATOR_PATH } from '$env/static/public';
 
+import { Creator } from '$lib/models/creator';
 import { Show } from '$lib/models/show';
-import { Talent } from '$lib/models/talent';
 
 import { ShowMachineEventString } from '$lib/machines/showMachine';
 
@@ -59,17 +59,17 @@ export const load: PageServerLoad = async ({ params, locals }) => {
     throw error(404, 'Key not found');
   }
 
-  const talent = await Talent.findOne({
+  const creator = await Creator.findOne({
     'user.address': key,
     'user.active': true
   })
     .orFail(() => {
-      throw error(404, 'Talent not found');
+      throw error(404, 'Creator not found');
     })
     .exec();
 
   const show = await Show.findOne({
-    talent: talent._id,
+    creator: creator._id,
     'showState.current': true
   })
     .orFail(() => {
@@ -86,8 +86,8 @@ export const load: PageServerLoad = async ({ params, locals }) => {
   const showState = showService.getSnapshot();
 
   if (!showState.can({ type: ShowMachineEventString.SHOW_STARTED })) {
-    const talentUrl = urlJoin(PUBLIC_TALENT_PATH, key);
-    throw redirect(302, talentUrl);
+    const creatorUrl = urlJoin(PUBLIC_CREATOR_PATH, key);
+    throw redirect(302, creatorUrl);
   }
 
   if (!showState.matches('started'))
@@ -105,7 +105,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
       moderator: true,
       context: {
         user: {
-          name: talent.user.name,
+          name: creator.user.name,
           affiliation: 'owner',
           lobby_bypass: true
         }
@@ -115,7 +115,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
   );
 
   return {
-    talent: talent.toObject({ flattenObjectIds: true }),
+    creator: creator.toObject({ flattenObjectIds: true }),
     show: show.toObject({ flattenObjectIds: true }),
     jitsiToken
   };

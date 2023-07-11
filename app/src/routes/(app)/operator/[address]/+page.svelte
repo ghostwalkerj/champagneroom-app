@@ -264,7 +264,7 @@
                   <thead>
                     <tr>
                       <th />
-                      <th>Talent</th>
+                      <th>Creator</th>
                       <th>Amount</th>
                       <th>Show Start</th>
                       <th>Show End</th>
@@ -280,7 +280,7 @@
                         on:click={() => (activeDisputeRow = index)}
                       >
                         <td>{index + 1}</td>
-                        <td>{ticket.show.talentInfo.name}</td>
+                        <td>{ticket.show.creatorInfo.name}</td>
                         <td>{currencyFormatter.format(ticket.price)}</td>
                         <td
                           >{spacetime(

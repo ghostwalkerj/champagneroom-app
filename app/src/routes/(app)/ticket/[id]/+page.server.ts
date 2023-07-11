@@ -6,10 +6,10 @@ import urlJoin from 'url-join';
 import { PUBLIC_PIN_PATH } from '$env/static/public';
 
 import type {
-    CancelType,
-    DisputeReason,
-    DisputeType,
-    FeedbackType
+  CancelType,
+  DisputeReason,
+  DisputeType,
+  FeedbackType
 } from '$lib/models/common';
 import { CancelReason } from '$lib/models/common';
 import { Show } from '$lib/models/show';
@@ -22,8 +22,8 @@ import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 import { ActorType } from '$lib/constants';
 import { verifyPin } from '$lib/util/pin';
 import {
-    getTicketMachineService,
-    getTicketMachineServiceFromId
+  getTicketMachineService,
+  getTicketMachineServiceFromId
 } from '$lib/util/util.server';
 
 import type { Actions, PageServerLoad } from './$types';
@@ -70,7 +70,7 @@ export const actions: Actions = {
       ticket: ticket._id,
       show: show._id,
       agent: show.agent,
-      talent: show.talent
+      creator: show.creator
     }).then((transaction) => {
       ticketService.send({
         type: TicketMachineEventString.PAYMENT_RECEIVED,

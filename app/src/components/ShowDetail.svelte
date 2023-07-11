@@ -71,10 +71,10 @@
           class="absolute top-4 right-4 text-lg text-primary ring-2 ring-primary bg-base-200 p-2 ring-inset rounded-xl"
         >
           <div class="">
-            {show.talentInfo.name}
+            {show.creatorInfo.name}
           </div>
           <div>
-            <StarRating rating={show.talentInfo.averageRating} />
+            <StarRating rating={show.creatorInfo.averageRating} />
           </div>
         </div>
       {/if}

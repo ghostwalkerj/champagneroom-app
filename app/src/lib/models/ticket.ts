@@ -93,7 +93,7 @@ const ticketSchema = new Schema(
       validator: (v: string) => validator.isNumeric(v, { no_symbols: true })
     },
     agent: { type: Schema.Types.ObjectId, ref: 'Agent', required: true },
-    talent: { type: Schema.Types.ObjectId, ref: 'Talent', required: true }
+    creator: { type: Schema.Types.ObjectId, ref: 'Creator', required: true }
   },
   { timestamps: true }
 );

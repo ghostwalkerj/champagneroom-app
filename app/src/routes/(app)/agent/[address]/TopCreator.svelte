@@ -4,20 +4,20 @@
   import spacetime from 'spacetime';
   import { Doughnut } from 'svelte-chartjs';
 
-  import type { TalentDocumentType } from '$lib/models/talent';
+  import type { CreatorDocumentType } from '$lib/models/creator';
 
   import { currencyFormatter } from '$lib/constants';
 
-  export let talents: TalentDocumentType[];
+  export let creators: CreatorDocumentType[];
 
   const now = spacetime.now();
   let labels = [] as string[];
-  let talentData = [] as number[];
+  let creatorData = [] as number[];
 
-  if (talents) {
-    for (const talent of talents) {
-      talentData = [...talentData, talent.salesStats.totalRevenue];
-      labels = [...labels, talent.user.name];
+  if (creators) {
+    for (const creator of creators) {
+      creatorData = [...creatorData, creator.salesStats.totalRevenue];
+      labels = [...labels, creator.user.name];
     }
   }
 
@@ -41,7 +41,7 @@
     labels,
     datasets: [
       {
-        data: talentData,
+        data: creatorData,
         backgroundColor: ['#2D1B69', '#58C7F3', '#F3CC30', '#20134E'],
         borderWidth: 0
       }
@@ -53,11 +53,11 @@
 <div class="bg-primary text-primary-content card">
   <div class="text-center card-body items-center">
     <div class="text-2xl card-title capitalize">
-      Top Talent - {now.monthName()}
+      Top Creator - {now.monthName()}
     </div>
-    {#if talents && talents.length > 0}
-      {#if talentData.length > 0}
-        {#key talentData}
+    {#if creators && creators.length > 0}
+      {#if creatorData.length > 0}
+        {#key creatorData}
           <Doughnut {data} {options} />
         {/key}
       {:else}
@@ -66,7 +66,7 @@
         </div>
       {/if}
     {:else}
-      <h3 class="text-xl">No talents found</h3>
+      <h3 class="text-xl">No creators found</h3>
     {/if}
   </div>
 </div>

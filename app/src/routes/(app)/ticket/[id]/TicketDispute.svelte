@@ -38,7 +38,7 @@
         </div>
         <div class="flex flex-col">
           <div>
-            {show.talentInfo.name}
+            {show.creatorInfo.name}
           </div>
           <div>{show.name}</div>
 
@@ -51,7 +51,7 @@
         </div>
         <div
           class="relative bg-cover bg-no-repeat bg-center rounded-xl h-32 w-48"
-          style="background-image: url('{show.talentInfo.profileImageUrl}')"
+          style="background-image: url('{show.creatorInfo.profileImageUrl}')"
         />
       </div>
       <div class="w-full flex">

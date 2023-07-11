@@ -11,14 +11,14 @@ import {
 } from '$env/static/public';
 
 import { Agent } from '$lib/models/agent';
-import { Talent } from '$lib/models/talent';
+import { Creator } from '$lib/models/creator';
 
 import { womensNames } from '$lib/util/womensNames';
 
 import type { Actions, PageServerLoad } from './$types';
 
 export const actions: Actions = {
-  create_talent: async ({ request }) => {
+  create_creator: async ({ request }) => {
     const data = await request.formData();
     const agentId = data.get('agentId') as string;
     let name = data.get('name') as string;
@@ -38,7 +38,7 @@ export const actions: Actions = {
     }
 
     try {
-      Talent.create({
+      Creator.create({
         user: {
           name,
           auth: false,
@@ -56,16 +56,16 @@ export const actions: Actions = {
       success: true
     };
   },
-  update_talent: async ({ request }) => {
+  update_creator: async ({ request }) => {
     const data = await request.formData();
-    const talentId = data.get('talentId') as string;
+    const creatorId = data.get('creatorId') as string;
     const name = data.get('name') as string;
     const commission = data.get('commission') as string;
     const active = data.get('active') as string;
 
     // Validation
-    if (talentId === null) {
-      return fail(400, { talentId, missingTalentId: true });
+    if (creatorId === null) {
+      return fail(400, { creatorId, missingCreatorId: true });
     }
     if (Number.isNaN(+commission) || +commission < 0 || +commission > 100) {
       return fail(400, { commission, badCommission: true });
@@ -76,9 +76,9 @@ export const actions: Actions = {
     }
 
     try {
-      await Talent.findOneAndUpdate(
+      await Creator.findOneAndUpdate(
         {
-          _id: talentId
+          _id: creatorId
         },
         {
           'user.name': name,
@@ -94,21 +94,21 @@ export const actions: Actions = {
       success: true
     };
   },
-  change_talent_key: async ({ request }) => {
+  change_creator_key: async ({ request }) => {
     const data = await request.formData();
-    const talentId = data.get('talentId') as string;
+    const creatorId = data.get('creatorId') as string;
 
     // Validation
-    if (talentId === null) {
-      return fail(400, { talentId, missingTalentId: true });
+    if (creatorId === null) {
+      return fail(400, { creatorId, missingCreatorId: true });
     }
 
     const address = nanoid(30);
 
     try {
-      await Talent.findOneAndUpdate(
+      await Creator.findOneAndUpdate(
         {
-          _id: talentId
+          _id: creatorId
         },
         {
           'user.address': address
@@ -149,14 +149,14 @@ export const load: PageServerLoad = async ({ params, url, cookies }) => {
     })
     .exec();
 
-  const talents = await Talent.find({ agent: agent._id }).sort({
+  const creators = await Creator.find({ agent: agent._id }).sort({
     'user.name': 1
   });
 
   return {
     agent: agent.toObject({ flattenObjectIds: true }),
-    talents: talents.map((talent) =>
-      talent.toObject({ flattenObjectIds: true })
+    creators: creators.map((creator) =>
+      creator.toObject({ flattenObjectIds: true })
     )
   };
 };

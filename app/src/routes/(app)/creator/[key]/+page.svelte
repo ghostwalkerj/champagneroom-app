@@ -15,9 +15,9 @@
   } from '$env/static/public';
 
   import { CancelReason } from '$lib/models/common';
+  import type { CreatorDocumentType } from '$lib/models/creator';
   import type { ShowDocumentType } from '$lib/models/show';
   import type { ShowEventDocumentType } from '$lib/models/showEvent';
-  import type { TalentDocumentType } from '$lib/models/talent';
 
   import type { ShowMachineServiceType } from '$lib/machines/showMachine';
   import {
@@ -29,11 +29,11 @@
   import { createEventText } from '$lib/util/eventUtil';
 
   import ShowDetail from '$components/ShowDetail.svelte';
-  import { nameStore, showEventStore, showStore, talentStore } from '$stores';
+  import { creatorStore, nameStore, showEventStore, showStore } from '$stores';
 
+  import CreatorActivity from './CreatorActivity.svelte';
+  import CreatorWallet from './CreatorWallet.svelte';
   import ProfilePhoto from './ProfilePhoto.svelte';
-  import TalentActivity from './TalentActivity.svelte';
-  import TalentWallet from './TalentWallet.svelte';
 
   import type { ActionData, PageData } from './$types';
 
@@ -42,13 +42,15 @@
 
   const showTimePath = urlJoin($page.url.href, PUBLIC_SHOWTIME_PATH);
 
-  let talent = data.talent as TalentDocumentType;
+  let creator = data.creator as CreatorDocumentType;
   let currentShow = data.currentShow as ShowDocumentType | undefined;
   let completedShows = data.completedShows as ShowDocumentType[];
-  let showName = talent ? possessive(talent.user.name, 'en') + ' Show' : 'Show';
+  let showName = creator
+    ? possessive(creator.user.name, 'en') + ' Show'
+    : 'Show';
 
   $: showDuration = 60;
-  $: talentName = talent ? talent.user.name : 'Talent';
+  $: creatorName = creator ? creator.user.name : 'Creator';
   $: statusText = currentShow
     ? currentShow.showState.status
     : 'No Current Show';
@@ -60,12 +62,12 @@
   $: loading = false;
   $: showStopped = false;
 
-  let talentUnSub: Unsubscriber;
+  let creatorUnSub: Unsubscriber;
   let showEventUnSub: Unsubscriber;
   let showUnSub: Unsubscriber;
   let showMachineService: ShowMachineServiceType;
 
-  nameStore.set(talent.user.name);
+  nameStore.set(creator.user.name);
 
   const noCurrentShow = () => {
     canCreateShow = true;
@@ -120,8 +122,8 @@
       type: 'CANCELLATION INITIATED',
       cancel: {
         cancelledAt: new Date(),
-        cancelledBy: ActorType.TALENT,
-        reason: CancelReason.TALENT_CANCELLED
+        cancelledBy: ActorType.CREATOR,
+        reason: CancelReason.CREATOR_CANCELLED
       }
     });
     canStartShow = state.can(ShowMachineEventString.SHOW_STARTED);
@@ -132,24 +134,24 @@
   };
 
   onMount(() => {
-    talentUnSub = talentStore(talent).subscribe((_talent) => {
-      if (_talent) {
-        talent = _talent;
-        talentName = _talent.user.name;
+    creatorUnSub = creatorStore(creator).subscribe((_creator) => {
+      if (_creator) {
+        creator = _creator;
+        creatorName = _creator.user.name;
       }
     });
     currentShow ? useNewShow(currentShow) : noCurrentShow();
   });
 
   onDestroy(() => {
-    talentUnSub?.();
+    creatorUnSub?.();
     showEventUnSub?.();
     showUnSub?.();
   });
 
   const updateProfileImage = async (url: string) => {
-    if (url && talent) {
-      talent.profileImageUrl = url;
+    if (url && creator) {
+      creator.profileImageUrl = url;
       let formData = new FormData();
       formData.append('url', url);
       await fetch('?/update_profile_image', {
@@ -336,7 +338,7 @@
                   <input
                     type="hidden"
                     name="coverImageUrl"
-                    value={talent.profileImageUrl}
+                    value={creator.profileImageUrl}
                   />
                   <div class="form-control md:w-1/5">
                     <!-- svelte-ignore a11y-label-has-associated-control -->
@@ -431,10 +433,10 @@
         <div class="lg:col-start-3 lg:col-span-1">
           <div class="bg-primary text-primary-content card">
             <div class="text-center card-body items-center p-3">
-              <h2 class="text-xl card-title">{talentName}</h2>
+              <h2 class="text-xl card-title">{creatorName}</h2>
               <div>
                 <ProfilePhoto
-                  profileImage={talent.profileImageUrl ||
+                  profileImage={creator.profileImageUrl ||
                     PUBLIC_DEFAULT_PROFILE_IMAGE}
                   callBack={(value) => {
                     updateProfileImage(value);
@@ -443,9 +445,9 @@
               </div>
               <div
                 class="tooltip"
-                data-tip={talent.feedbackStats.averageRating.toFixed(2)}
+                data-tip={creator.feedbackStats.averageRating.toFixed(2)}
               >
-                <StarRating rating={talent.feedbackStats.averageRating} />
+                <StarRating rating={creator.feedbackStats.averageRating} />
               </div>
             </div>
           </div>
@@ -454,13 +456,13 @@
 
       <!-- Wallet -->
       <div>
-        <TalentWallet />
+        <CreatorWallet />
       </div>
 
       <!-- Activity Feed -->
       <div>
         <div class="lg:col-start-3 lg:col-span-1">
-          <TalentActivity {completedShows} />
+          <CreatorActivity {completedShows} />
         </div>
       </div>
     </div>

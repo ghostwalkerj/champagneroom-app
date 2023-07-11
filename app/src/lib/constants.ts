@@ -1,6 +1,6 @@
 export enum ActorType {
   AGENT = 'AGENT',
-  TALENT = 'TALENT',
+  CREATOR = 'CREATOR',
   CUSTOMER = 'CUSTOMER',
   TIMER = 'TIMER',
   UNKNOWN = 'UNKNOWN',
@@ -9,7 +9,7 @@ export enum ActorType {
 
 export enum EntityType {
   AGENT = 'AGENT',
-  TALENT = 'TALENT',
+  CREATOR = 'CREATOR',
   SHOW = 'SHOW',
   TICKET = 'TICKET',
   USER = 'USER'
@@ -20,7 +20,7 @@ export enum TokenRoles {
   ADMIN = 'ADMIN',
   PUBLIC = 'PUBLIC',
   AGENT = 'AGENT',
-  TALENT = 'TALENT'
+  CREATOR = 'CREATOR'
 }
 
 export const currencyFormatter = new Intl.NumberFormat('en-US', {

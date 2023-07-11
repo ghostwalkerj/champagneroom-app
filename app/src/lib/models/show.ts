@@ -257,9 +257,9 @@ const showSchema = new Schema(
   {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     _id: { type: Schema.Types.ObjectId, required: true, auto: true },
-    talent: {
+    creator: {
       type: Schema.Types.ObjectId,
-      ref: 'Talent',
+      ref: 'Creator',
       required: true,
       index: true
     },
@@ -298,7 +298,7 @@ const showSchema = new Schema(
       }
     },
     price: { type: Number, required: true, min: 1 },
-    talentInfo: {
+    creatorInfo: {
       type: {
         name: { type: String, required: true },
         profileImageUrl: { type: String, required: true },

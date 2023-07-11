@@ -11,13 +11,13 @@ import { Ticket } from '$lib/models/ticket';
 
 import { ShowMachineEventString } from '$lib/machines/showMachine';
 
-
 import { EntityType } from '$lib/constants';
 import { mensNames } from '$lib/util/mensNames';
 import { createPinHash } from '$lib/util/pin';
 import { getShowMachineServiceFromId } from '$lib/util/util.server';
 
 import type { Actions, PageServerLoad } from './$types';
+import type { ShowQueueType } from '$lib/workers/showWorker';
 
 export const actions: Actions = {
   reserve_ticket: async ({ params, cookies, request, url, locals }) => {
@@ -58,7 +58,7 @@ export const actions: Actions = {
     const ticket = await Ticket.create({
       show: show._id,
       agent: show.agent,
-      talent: show.talent,
+      creator: show.creator,
       price: show.price,
       paymentAddress: '0x0000000000000000000000000000000000000000',
       customerName: name,

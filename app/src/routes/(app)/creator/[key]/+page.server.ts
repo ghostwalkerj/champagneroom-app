@@ -4,9 +4,9 @@ import type IORedis from 'ioredis';
 
 import type { CancelType } from '$lib/models/common';
 import { CancelReason } from '$lib/models/common';
+import type { CreatorType } from '$lib/models/creator';
+import { Creator } from '$lib/models/creator';
 import { Show, ShowStatus } from '$lib/models/show';
-import type { TalentType } from '$lib/models/talent';
-import { Talent } from '$lib/models/talent';
 
 import type { ShowMachineEventType } from '$lib/machines/showMachine';
 import { ShowMachineEventString } from '$lib/machines/showMachine';
@@ -29,14 +29,14 @@ export const actions: Actions = {
     if (!url) {
       return fail(400, { url, missingUrl: true });
     }
-    const talent = await Talent.findOneAndUpdate(
+    const creator = await Creator.findOneAndUpdate(
       { 'user.address': key },
       { profileImageUrl: url }
     ).exec();
 
     return {
       success: true,
-      talent: talent?.toObject({ flattenObjectIds: true })
+      creator: creator?.toObject({ flattenObjectIds: true })
     };
   },
   create_show: async ({ params, request }) => {
@@ -59,19 +59,19 @@ export const actions: Actions = {
       return fail(400, { price, invalidPrice: true });
     }
 
-    const talent = (await Talent.findOne({ 'user.address': key })
+    const creator = (await Creator.findOne({ 'user.address': key })
       .orFail(() => {
-        throw error(404, 'Talent not found');
+        throw error(404, 'Creator not found');
       })
-      .exec()) as TalentType;
+      .exec()) as CreatorType;
 
     const show = await Show.create({
       price: +price,
       name,
       duration: +duration,
       capacity: +capacity,
-      talent: talent._id,
-      agent: talent.agent,
+      creator: creator._id,
+      agent: creator.agent,
       coverImageUrl,
       showState: {
         status: ShowStatus.BOX_OFFICE_OPEN,
@@ -79,11 +79,11 @@ export const actions: Actions = {
           ticketsAvailable: +capacity
         }
       },
-      talentInfo: {
-        name: talent.user.name,
-        profileImageUrl: talent.profileImageUrl,
-        averageRating: talent.feedbackStats.averageRating,
-        numberOfReviews: talent.feedbackStats.numberOfReviews
+      creatorInfo: {
+        name: creator.user.name,
+        profileImageUrl: creator.profileImageUrl,
+        averageRating: creator.feedbackStats.averageRating,
+        numberOfReviews: creator.feedbackStats.numberOfReviews
       }
     });
 
@@ -115,8 +115,8 @@ export const actions: Actions = {
 
     const cancel = {
       cancelledInState: JSON.stringify(showMachineState.value),
-      reason: CancelReason.TALENT_CANCELLED,
-      cancelledBy: ActorType.TALENT
+      reason: CancelReason.CREATOR_CANCELLED,
+      cancelledBy: ActorType.CREATOR
     } as CancelType;
 
     const cancelEvent = {
@@ -174,22 +174,22 @@ export const load: PageServerLoad = async ({ params }) => {
     throw error(404, 'Key not found');
   }
 
-  const talent = await Talent.findOne({
+  const creator = await Creator.findOne({
     'user.address': key,
     'user.active': true
   })
     .orFail(() => {
-      throw error(404, 'Talent not found');
+      throw error(404, 'Creator not found');
     })
     .exec();
 
   const currentShow = await Show.findOne({
-    talent: talent._id,
+    creator: creator._id,
     'showState.current': true
   }).exec();
 
   const completedShows = await Show.find({
-    talent: talent._id,
+    creator: creator._id,
     'showState.status': ShowStatus.FINALIZED
   })
     .sort({ 'showState.finalize.finalizedAt': -1 })
@@ -197,7 +197,7 @@ export const load: PageServerLoad = async ({ params }) => {
     .exec();
 
   return {
-    talent: talent.toObject({ flattenObjectIds: true }),
+    creator: creator.toObject({ flattenObjectIds: true }),
     currentShow: currentShow
       ? currentShow.toObject({ flattenObjectIds: true })
       : undefined,

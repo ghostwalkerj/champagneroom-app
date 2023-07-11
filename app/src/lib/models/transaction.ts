@@ -25,7 +25,7 @@ const transactionSchema = new Schema(
       validator: (v: string) => validator.isNumeric(v)
     },
     ticket: { type: Schema.Types.ObjectId, ref: 'Ticket' },
-    talent: { type: Schema.Types.ObjectId, ref: 'Talent' },
+    creator: { type: Schema.Types.ObjectId, ref: 'Creator' },
     agent: { type: Schema.Types.ObjectId, ref: 'Agent' },
     show: { type: Schema.Types.ObjectId, ref: 'Show' }
   },
