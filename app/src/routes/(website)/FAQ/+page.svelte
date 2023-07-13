@@ -185,7 +185,7 @@
                 </li>
                 <li>
                   Currently, shows are one-on-one, but we plan to expand to
-                  one-to-many shows
+                  one-to-many.
                 </li>
                 <li>
                   The creator will be able to customize their own Champagne
