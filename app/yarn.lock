@@ -1704,9 +1704,9 @@
     rollup "^3.7.0"
 
 "@sveltejs/kit@^1.18.0":
-  version "1.22.1"
-  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-1.22.1.tgz#1429ae67f4cfe725adc25dad47e2271a39a0bab5"
-  integrity sha512-idFhKVEHuCKbTETvuo3V7UShqSYX9JMKVJXP546dOTkh5ZRejo5XtKtsB5TCSwNBa0TH8hIV44/bnylaFhM1Vg==
+  version "1.22.3"
+  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-1.22.3.tgz#2330eaa7db3e5ee592fd42a4d68cff9d12e9fe28"
+  integrity sha512-IpHD5wvuoOIHYaHQUBJ1zERD2Iz+fB/rBXhXjl8InKw6X4VKE9BSus+ttHhE7Ke+Ie9ecfilzX8BnWE3FeQyng==
   dependencies:
     "@sveltejs/vite-plugin-svelte" "^2.4.1"
     "@types/cookie" "^0.5.1"
@@ -1722,14 +1722,15 @@
     undici "~5.22.0"
 
 "@sveltejs/package@^2.0.2":
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/@sveltejs/package/-/package-2.1.0.tgz#971e9dcab9061c490a50de6f4782cd8391e587ce"
-  integrity sha512-c6PLH9G2YLQ48kqrS2XX422BrLNABBstSiapamchVJaQnOTXyJmUR8KmoCCySnzVy3PiYL6jg12UnoPmjW3SwA==
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@sveltejs/package/-/package-2.2.0.tgz#4557a957d8420f62b1c1e7b6916a983a91fb07e1"
+  integrity sha512-TXbrzsk+T5WNcSzrU41D8P32vU5guo96lVS11/R+rpLhZBH5sORh0Qp6r68Jg4O5vcdS3JLwpwcpe8VFbT/QeA==
   dependencies:
     chokidar "^3.5.3"
     kleur "^4.1.5"
     sade "^1.8.1"
-    svelte2tsx "~0.6.0"
+    semver "^7.5.3"
+    svelte2tsx "~0.6.19"
 
 "@sveltejs/vite-plugin-svelte-inspector@^1.0.3":
   version "1.0.3"
@@ -2036,9 +2037,9 @@
   integrity sha512-iiUgKzV9AuaEkZqkOLDIvlQiL6ltuZd9tGcW3gwpnX8JbuiuhFlEGmmFXEXkN50Cvq7Os88IY2v0dkDqXYWVgA==
 
 "@types/node@*":
-  version "20.4.0"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.4.0.tgz#01d637d1891e419bc85763b46f42809cd2d5addb"
-  integrity sha512-jfT7iTf/4kOQ9S7CHV9BIyRaQqHu67mOjsIQBC3BKZvzvUB6zLxEwJ6sBE3ozcvP8kF6Uk5PXN0Q+c0dfhGX0g==
+  version "20.4.2"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.4.2.tgz#129cc9ae69f93824f92fac653eebfb4812ab4af9"
+  integrity sha512-Dd0BYtWgnWJKwO1jkmTrzofjK2QXXcai0dmtzvIBhcA+RsG5h8R3xlyta0kGOZRNfL9GuRtb1knmPEhQrePCEw==
 
 "@types/node@>=13.7.0":
   version "20.3.3"
@@ -2833,9 +2834,9 @@
   integrity sha512-K1undnK70vLLauqdE8bq/l98isTF2FDhcP0UPpXVSjkSWe3xhAn5eRXk5jfA1E5ycNm84Ws/rQFUD7ue11nciw==
 
 "@xstate/svelte@^2.0.1":
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/@xstate/svelte/-/svelte-2.0.1.tgz#17bf2831c903120db65ef5bf93ae7a037759e810"
-  integrity sha512-A4QSCt4EpbyzbPIPGCRLoRn50VUq6gXcmJPIwgBaCTsTRsPsp8KSvltDqS2msBKEDr4FHWXEXOC4QVGDWFL5dg==
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@xstate/svelte/-/svelte-2.1.0.tgz#f955b07f4acd02fdbb7b0d86544091995e73f6b4"
+  integrity sha512-cot553w2v4MdmDLkRBLhEjGO5LlnlPcpZ9RT7jFqpn+h0rpmjtkva6zjIZddPrxEOM6DVHDwzYbpDe+BErElQg==
 
 "@zxing/text-encoding@0.9.0":
   version "0.9.0"
@@ -6603,9 +6604,9 @@ mongoose-field-encryption@^6.1.0:
   integrity sha512-SkrdFsQZ3xDU9B/KnPAHlTFA1DOIt3M+yeCVcAI7ej7WL8vTQ1py/36vODkHLpGriLUXYtczo+wIYyiPqMpixQ==
 
 mongoose@^7.2.2:
-  version "7.3.2"
-  resolved "https://registry.yarnpkg.com/mongoose/-/mongoose-7.3.2.tgz#0dcc720fbc684d21d391e5e8a8edad2df7236313"
-  integrity sha512-Z86m5ASwYYFyT++wPQTtuTl5Jh052w6G1IM8LxPu/6iuqxQo6nUOaEoGZfMy0ovw3Dyw3415Jue3pYXkRqPkfA==
+  version "7.3.4"
+  resolved "https://registry.yarnpkg.com/mongoose/-/mongoose-7.3.4.tgz#d26934d62575cc01c8cbb70252c14dc8cc30ef49"
+  integrity sha512-luvv4PKFiFYaHNn5wGIRrMML3Vvoa8lkdhcLE1S/6gY9s9CUOdEu9olbDrkhvnwRQ20j1SrQFO5JEApW0xwL3w==
   dependencies:
     bson "^5.3.0"
     kareem "2.5.1"
@@ -7275,7 +7276,7 @@ postcss-value-parser@^4.0.0, postcss-value-parser@^4.2.0:
   resolved "https://registry.yarnpkg.com/postcss-value-parser/-/postcss-value-parser-4.2.0.tgz#723c09920836ba6d3e5af019f92bc0971c02e514"
   integrity sha512-1NNCs6uurfkVbeXG4S8JFT9t19m45ICnif8zWLd5oPSZ50QnwMfK+H3jv408d4jw/7Bttv5axS5IiHoLaVNHeQ==
 
-postcss@^8, postcss@^8.4.23, postcss@^8.4.24:
+postcss@^8, postcss@^8.4.23, postcss@^8.4.25:
   version "8.4.25"
   resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.4.25.tgz#4a133f5e379eda7f61e906c3b1aaa9b81292726f"
   integrity sha512-7taJ/8t2av0Z+sQEvNzCkpDynl0tX3uJMCODi6nT3PfASC7dYCWV9aQ+uiCf+KBD4SEFcu+GvJdGdwzQ6OSjCw==
@@ -8414,10 +8415,10 @@ svelte-table@^0.5.11:
   resolved "https://registry.yarnpkg.com/svelte-table/-/svelte-table-0.5.11.tgz#65b6da5dc8f63033daed8e703e853286483ec1f3"
   integrity sha512-hgmZaOAI7+iNXJgR9fEJ4umCeY5a9fIOzkYPexqcHYbw3voQquM+SfFd4lhmJOj5O5ui8PiB8JQnnDLBaKrAtw==
 
-svelte2tsx@~0.6.0:
-  version "0.6.16"
-  resolved "https://registry.yarnpkg.com/svelte2tsx/-/svelte2tsx-0.6.16.tgz#c21a5db0a3ef4885d87c0f037a5284f68e39ada2"
-  integrity sha512-AX2iYEvQdd4tq5BokRdOOA0N/nD37ZnhXAomrAG9EEGl2cjkvoQUwe1Aluo6FSzA684WJjhxW+1ZXmveCmvDrA==
+svelte2tsx@~0.6.19:
+  version "0.6.19"
+  resolved "https://registry.yarnpkg.com/svelte2tsx/-/svelte2tsx-0.6.19.tgz#0c1fe8432643dd2962d373243e3b8b39b559e9b2"
+  integrity sha512-h3b5OtcO8zyVL/RiB2zsDwCopeo/UH+887uyhgb2mjnewOFwiTxu+4IGuVwrrlyuh2onM2ktfUemNrNmQwXONQ==
   dependencies:
     dedent-js "^1.0.1"
     pascal-case "^3.1.1"
@@ -8873,12 +8874,12 @@ vite-plugin-environment@^1.1.3:
   integrity sha512-9LBhB0lx+2lXVBEWxFZC+WO7PKEyE/ykJ7EPWCq95NEcCpblxamTbs5Dm3DLBGzwODpJMEnzQywJU8fw6XGGGA==
 
 vite@^4.3.8:
-  version "4.4.2"
-  resolved "https://registry.yarnpkg.com/vite/-/vite-4.4.2.tgz#acd47de771c498aec80e4900f30133d9529b278a"
-  integrity sha512-zUcsJN+UvdSyHhYa277UHhiJ3iq4hUBwHavOpsNUGsTgjBeoBlK8eDt+iT09pBq0h9/knhG/SPrZiM7cGmg7NA==
+  version "4.4.3"
+  resolved "https://registry.yarnpkg.com/vite/-/vite-4.4.3.tgz#dfaf86f4cba3058bf2724e2e2c88254fb0f21a5a"
+  integrity sha512-IMnXQXXWgLi5brBQx/4WzDxdzW0X3pjO4nqFJAuNvwKtxzAmPzFE1wszW3VDpAGQJm3RZkm/brzRdyGsnwgJIA==
   dependencies:
     esbuild "^0.18.10"
-    postcss "^8.4.24"
+    postcss "^8.4.25"
     rollup "^3.25.2"
   optionalDependencies:
     fsevents "~2.3.2"
@@ -9095,9 +9096,9 @@ xhr2-cookies@1.1.0:
     cookiejar "^2.1.1"
 
 xstate@^4.37.2:
-  version "4.38.0"
-  resolved "https://registry.yarnpkg.com/xstate/-/xstate-4.38.0.tgz#94c4316bea8e9e7a2974c7c501e5306f6e17ac19"
-  integrity sha512-oFjw2YZPyu6HeO0JWCSqfhAALsjFPURsrD2FUFN3u213dWwYU68RFuLtSHco+cEUhpQFW+hRG3PNYgq8HatudQ==
+  version "4.38.1"
+  resolved "https://registry.yarnpkg.com/xstate/-/xstate-4.38.1.tgz#9be54c2dfc44d1d566c697393921edaf6d3c9998"
+  integrity sha512-1gBUcFWBj/rv/pRcP2Bedl5sNRGX2d36CaOx9z7fE9uSiHaOEHIWzLg1B853q2xdUHUA9pEiWKjLZ3can4SJaQ==
 
 xtend@^4.0.0, xtend@^4.0.1:
   version "4.0.2"
