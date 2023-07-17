@@ -95,7 +95,8 @@
       </li>
       <!-- svelte-ignore a11y-missing-attribute -->
       <a
-        class="font-SpaceGrotesk flex items-center font-semibold text-base capitalize no-underline leading-normal tracking-wide text-white bg-gradient-to-r from-[#28e0b27a] to-[#28e0b2b5] border border-[#28e0b2] rounded-[8px] shadow-[0px 0px 100px 0px rgba(38, 226, 179, 0.44)] px-3 py-3 mt-2 ml-3 hover:text-black"
+        class="font-['SpaceGrotesk'] flex items-center btn mt-2 ml-2 btn-outline btn-primary"
+        href="/agent"
       >
         Open App
       </a>

@@ -1,9 +1,11 @@
 <script lang="ts">
-  import About from '$components/About.svelte';
-  import Earn from '$components/Earn.svelte';
-  import Findus from '$components/Findus.svelte';
-  import Play from '$components/Play.svelte';
-  import Tokenomics from '$components/Tokenomics.svelte';
+  import { PUBLIC_STATIC_URL } from '$env/static/public';
+
+  import About from './About.svelte';
+  import Earn from './Earn.svelte';
+  import Findus from './Findus.svelte';
+  import Play from './Play.svelte';
+  import Tokenomics from './Tokenomics.svelte';
 </script>
 
 <div data-aos="fade-in" />
@@ -16,32 +18,43 @@
       <h2
         class=" text-[#d0dce8] text-center font-medium leading-none text-[48px] sm:text-left"
       >
-        The Best Auto-Staking &amp; Auto-Compounding Protocol in Crypto
+        A new way to watch adult content creators live
       </h2>
       <ul
-        class="mt-20 text-[#d0dce8de] text-[25px] font-medium text-lg list-disc list-inside"
+        class="mt-10 text-[#d0dce8de] text-[25px] font-medium text-lg list-disc list-inside"
       >
-        <li class="mt-2">Highest Fixed APY – 102,483%</li>
+        <li class="mt-2">Completely Anonymous</li>
         <li class="mt-2">
-          First Automatic Staking and Compounding in Your Wallet!
+          No Downloads, No Signup, and No Personal Information Required!
         </li>
-        <li class="mt-2">Get Rewards Every 30 Minutes / 48 Times Daily!</li>
+        <li class="mt-2">Protected by a Full Escrow Service</li>
       </ul>
-      <div class="flex flex-col md:flex-row mt-10 sm:block">
+      <div class="flex flex-col md:flex-row mt-10 sm:block space-x-6">
         <button
-          class="relative z-0 inline-block px-5 py-4 w-48 border border-[#28e0b28c] rounded-xl bg-[#28e0b28c] text-white text-center text-base font-semibold transition-all duration-300 ease-in-out font-space-grotesk mt-4 hover:border-[#206b58] hover:bg-[#28e0b2] m-auto md:mr-4"
+          class="relative z-0 btn btn-primary transition-all duration-300 ease-in-out font-space-grotesk"
         >
-          Buy $Titano
+          Read the FAQ
         </button>
         <button
-          class="relative z-0 inline-block px-5 py-4 w-48 border border-[#ff4fb487] rounded-xl bg-[#ff4fb487] text-white text-center text-base font-semibold transition-all duration-300 ease-in-out font-space-[grotesk] mt-4 hover:border-[#9e326f] hover:bg-[#ff4fb4] m-auto sm:ml-28"
+          class="relative z-0 btn btn-secondary transition-all duration-300 ease-in-out font-space-grotesk"
         >
-          White Paper
+          Checkout the White Paper
         </button>
       </div>
     </div>
     <div class="w-full mt-5 sm:w-1/3 sm:mt-0">
-      <img alt="abc" src="/orbit.gif" class="gif rounded-[75px]" />
+      <video
+        autoplay
+        loop
+        controls
+        muted
+        class="opacity-80 rounded-xl overflow-hidden"
+      >
+        <source
+          src="{PUBLIC_STATIC_URL}/assets/champagnevideo.mp4"
+          type="video/mp4"
+        />
+      </video>
     </div>
   </div>
 </div>

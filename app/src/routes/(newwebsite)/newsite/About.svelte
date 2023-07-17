@@ -25,7 +25,6 @@
             class="font-space-grotesk text-base text-center mx-auto flex pl-10 pr-10 pt-2 pb-2 font-semibold text-shadow-black text-black border-none bg-gradient-to-r from-teal-400 to-teal-400 rounded-lg shadow-lg mt-5"
           >
             Open App{''}
-            {''}{' '}
           </button>
         </div>
         <div class="w-full m-auto sm:w-1/2">
