@@ -14,14 +14,28 @@
 			var global = window;
 		</script>
 		<script> window.process = window.process || { env: { NODE_DEBUG: undefined, DEBUG: undefined } }; window.global = window; </script>
+		<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
 
 		%sveltekit.head%
 
 	</head>
 
-	<body>
-		<div>%sveltekit.body%</div>
-
+	<body data-sveltekit-preload-data="hover">
+		<script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+		<script>
+			AOS.init({
+				disable: function () {
+					var maxWidth = 800;
+					return window.innerWidth < maxWidth;
+				},
+			});
+		</script>
+		<script>
+			AOS.init({ disable: "mobile" });
+			AOS.init();
+		</script>
+		<div style="display: contents">%sveltekit.body%</div>
 	</body>
+
 
 </html>

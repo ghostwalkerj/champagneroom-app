@@ -8,8 +8,8 @@ import walletConnectModule from '@web3-onboard/walletconnect';
 import { derived, writable } from 'svelte/store';
 
 import {
-    PUBLIC_INFURA_API_KEY,
-    PUBLIC_WALLET_CONNECT_PROJECT_ID
+  PUBLIC_INFURA_API_KEY,
+  PUBLIC_WALLET_CONNECT_PROJECT_ID
 } from '$env/static/public';
 
 // Wallets

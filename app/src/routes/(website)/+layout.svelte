@@ -1,6 +1,5 @@
 <script lang="ts">
   import 'iconify-icon';
-  import '../../app.css';
 
   import { PUBLIC_AGENT_PATH, PUBLIC_STATIC_URL } from '$env/static/public';
 </script>
