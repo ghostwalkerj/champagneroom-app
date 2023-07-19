@@ -42,7 +42,7 @@
             <img
               alt="show-screenshot"
               src="{PUBLIC_STATIC_URL}/assets/show-screenshot.png"
-              class=" rounded-xl overflow-hidden h-auto max-w-full shadow-[0px_0px_17px_6px_#e779c1]"
+              class=" rounded-md overflow-hidden h-auto max-w-full shadow-[0px_0px_17px_6px_#e779c1]"
             />
           </div>
         </div>

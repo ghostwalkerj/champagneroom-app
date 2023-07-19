@@ -5,7 +5,7 @@
   import FAQ from './FAQ.svelte';
   import FindUs from './FindUs.svelte';
   import GetStarted from './GetStarted.svelte';
-  import Tokenomics from './Tokenomics.svelte';
+  import Tokenomics from './SignUp.svelte';
 </script>
 
 <div data-aos="fade-in" />

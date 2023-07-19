@@ -25,7 +25,7 @@
 </div>
 
 <div
-  class="absolute mt-2 mt-2 mx-auto opacity-20 rounded-lg opacity-10 justify-center justify-center w-screen h-screen"
+  class="absolute mt-2 mx-auto opacity-20 rounded-lg justify-center w-screen h-screen"
   style="background-image: url('{PUBLIC_STATIC_URL}/assets/crbubbles.png')"
 />
 <div class="py-10">
@@ -41,7 +41,7 @@
         >
           <div class="h-xl w-xl">
             <img
-              class="motion-safe:animate-fadeIn mx-auto rounded-lg opacity-45 justify-center -space-x-20 justify-center w-m h-m"
+              class="motion-safe:animate-fadeIn mx-auto rounded-lg opacity-45 -space-x-20 justify-center w-m h-m"
               src="{PUBLIC_STATIC_URL}/assets/ladyblue.png"
               alt="Lady Blue"
             />
@@ -53,7 +53,7 @@
         >
           <div class="h-xl w-xl">
             <img
-              class="motion-safe:animate-fadeIn mx-auto rounded-lg opacity-45 justify-center -space-x-20 justify-center w-m h-m"
+              class="motion-safe:animate-fadeIn mx-auto rounded-lg opacity-45 justify-center -space-x-20 w-m h-m"
               src="{PUBLIC_STATIC_URL}/assets/ladypink.png"
               alt="Lady Pink"
             />

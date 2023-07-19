@@ -1,8 +1,30 @@
-<div id="Tokenomics" class="container mx-auto px-4 sm:px-20">
+<script lang="ts">
+  import { applyAction, enhance } from '$app/forms';
+  import { PUBLIC_STATIC_URL } from '$env/static/public';
+
+  import type { ActionData } from './$types';
+
+  export let form: ActionData;
+
+  let isSubmitted = false;
+
+  const onSubmit = () => {
+    return async ({ result }) => {
+      if (result.type === 'failure') {
+        isSubmitted = false;
+      } else if (result.type === 'success') {
+        isSubmitted = true;
+      }
+      await applyAction(result);
+    };
+  };
+</script>
+
+<div id="SignUp" class="container mx-auto mt-20">
   <h2
     class="font-serif text-[#d0dce8] font-semibold text-[41px] text-center mt-36"
   >
-    Tokenomics
+    Express Your Interest
   </h2>
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-36">
     <div
