@@ -11,12 +11,10 @@
 <div data-aos="fade-in" />
 
 <div class="container mx-auto" data-aos="fade-in" id="page1">
-  <div
-    class="block mt-20 grid-cols-1 px-4 py-10 md:grid-cols-2 sm:flex sm:px-20 am:py-36"
-  >
-    <div class="w-full mx-0 sm:mx-8 sm:w-2/3">
+  <div class="flex flex-col lg:flex-row mt-20 items-center">
+    <div class="w-full mx-0">
       <h2
-        class=" text-[#d0dce8] text-center font-medium leading-none text-[48px] sm:text-left"
+        class=" text-[#d0dce8] text-center font-medium leading-none text-[48px] lg:text-left"
       >
         A new way to watch adult content creators live
       </h2>
@@ -30,24 +28,24 @@
         <li class="mt-2">Protected by a Full Escrow Service</li>
       </ul>
       <div
-        class="flex flex-col md:flex-row mt-10 space-x-0 md:space-y-0 space-y-6 md:space-x-6"
+        class="flex flex-col md:flex-row mt-10 space-x-0 md:space-y-0 space-y-6 md:space-x-6 place-content-center lg:place-content-start"
       >
         <a
           href="#FAQ"
-          class="w-full md:w-auto btn btn-primary transition-all duration-300 ease-in-out font-space-grotesk"
+          class="w-full md:w-auto btn btn-primary transition-all duration-300 ease-in-out font-['SpaceGrotesk']"
         >
           Read the FAQ
         </a>
         <a
           href="{PUBLIC_STATIC_URL}/assets/champagne-room-white-paper.pdf"
-          class="w-full md:w-auto btn btn-secondary transition-all duration-300 ease-in-out font-space-grotesk m-0"
+          class="w-full md:w-auto btn btn-secondary transition-all duration-300 ease-in-out font-['SpaceGrotesk'] m-0"
           target="_blank"
         >
           Checkout the White Paper
         </a>
       </div>
     </div>
-    <div class="w-full mt-5 sm:w-1/2 sm:mt-0">
+    <div class="w-full mt-10 lg:ml-10">
       <video
         autoplay
         loop

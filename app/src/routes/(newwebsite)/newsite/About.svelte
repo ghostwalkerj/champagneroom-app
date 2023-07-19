@@ -4,28 +4,28 @@
 
 <div id="About" data-aos="fade-right">
   <div class="container mx-auto">
-    <div class=" mt-20">
+    <div class="mt-20">
       <h2 class="font-serif font-semibold text-[41px] text-center">
         The Champagne Room
       </h2>
-      <div class="block sm:flex mt-10">
-        <div class="w-full sm:w-1/2 mt-3 flex place-content-center">
-          <div class="w-full sm:w-2/3" data-aos="flip-right">
-            <img
-              src="{PUBLIC_STATIC_URL}/assets/creator4.png"
-              alt="Creator"
-              class="rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1]"
-            />
-          </div>
+      <div
+        class="flex flex-col lg:flex-row mt-10 items-center place-content-center"
+      >
+        <div class="w-full mb-10 m-0 lg:m-10" data-aos="flip-right">
+          <img
+            src="{PUBLIC_STATIC_URL}/assets/creator4.png"
+            alt="Creator"
+            class="rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1] max-w-lg h-auto"
+          />
         </div>
-        <div class="w-full m-auto sm:w-1/2">
+        <div class="w-full m-auto">
           <span
-            class="text-info font-space-grotesk text-lg font-normal capitalize ml-5 tracking-wider text-center flex"
+            class="text-info font-['SpaceGrotesk'] text-lg font-normal capitalize ml-5 tracking-wider text-center flex"
           >
             ABOUT
           </span>
           <p
-            class="text-gray-300 leading-10 font-space-grotesk text-lg font-normal mt-5 mr-0 ml-5 sm:mr-20"
+            class="text-gray-300 leading-10 font-['SpaceGrotesk'] text-lg font-normal mt-5 mr-0 ml-5 sm:mr-20"
           >
             Welcome to Champagne Room, the cutting-edge web 3.0 platform
             revolutionizing NSFW experiences. Our platform enables fans to
@@ -35,7 +35,7 @@
             security that both parties can rely on.
           </p>
           <p
-            class="text-gray-300 leading-10 font-space-grotesk text-lg font-normal mt-5 mr-0 ml-5 sm:mr-20"
+            class="text-gray-300 leading-10 font-['SpaceGrotesk'] text-lg font-normal mt-5 mr-0 ml-5 sm:mr-20"
           >
             Experience a whole new level of NSFW entertainment on Champagne
             Room. Our platform offers a range of features including creator
@@ -45,7 +45,7 @@
             connection with their preferred creators.
           </p>
           <p
-            class="text-gray-300 leading-10 font-space-grotesk text-lg font-normal mt-5 mr-0 ml-5 sm:mr-20"
+            class="text-gray-300 leading-10 font-['SpaceGrotesk'] text-lg font-normal mt-5 mr-0 ml-5 sm:mr-20"
           >
             Discover the future of NSFW interaction with Champagne Room. Our
             platform combines cutting-edge technology, secure crypto
@@ -58,10 +58,10 @@
         </div>
       </div>
 
-      <div class="mt-10">
-        <div class="p-10 sm:pad">
+      <div class="mt-5 lg:mt-10">
+        <div class="p-6 sm:pad">
           <h2
-            class="text-[#d0dce8] text-[45px] font-semibold font-serif mx-0 sm:mx-20"
+            class="text-[#d0dce8] text-[45px] font-semibold font-serif mx-0 lg:mx-10"
           >
             We have specifically built Champagne Room with a focus on anonymity,
             safety, and privacy for both our users and creators.

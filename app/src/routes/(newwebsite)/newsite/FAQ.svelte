@@ -2,10 +2,10 @@
   import { PUBLIC_STATIC_URL } from '$env/static/public';
 </script>
 
-<div data-aos="fade-In" class="container mx-auto pb-24 relative" id="FAQ">
-  <div class="absolute -top-28 grid grid-cols-2">
+<div data-aos="fade-In" class="container mx-auto relative" id="FAQ">
+  <div class="absolute -top-20 grid grid-cols-2">
     <div
-      class="image opacity-20 max-width-l hidden md:flex animate-pulse transition-timing-function mt-20 mb-10"
+      class="image opacity-20 max-width-l hidden md:flex animate-pulse transition-timing-function"
     >
       <div class="h-xl w-xl">
         <img
@@ -17,7 +17,7 @@
     </div>
 
     <div
-      class="image opacity-20 hidden md:flex animate-pulse transition-timing-function mt-20 mb-10"
+      class="image opacity-20 hidden md:flex animate-pulse transition-timing-function"
     >
       <div class="h-xl w-xl">
         <img

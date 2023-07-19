@@ -79,7 +79,7 @@
           </div>
           <div class="">
             <button
-              class="font-['SpaceGrotesk'] font-semibold text-base capitalize font-normal no-underline leading-normal tracking-wide text-white bg-gradient-to-r from-[#28e0b27a] to-[#28e0b2b5] border border-[#28e0b2] rounded-[8px] shadow-[0px 0px 100px 0px rgba(38, 226, 179, 0.44)] px-3 py-3 ml-6 float-on-hover hover:text-black"
+              class="font-['SpaceGrotesk'] text-base capitalize font-normal no-underline leading-normal tracking-wide text-white bg-gradient-to-r from-[#28e0b27a] to-[#28e0b2b5] border border-[#28e0b2] rounded-[8px] shadow-[0px 0px 100px 0px rgba(38, 226, 179, 0.44)] px-3 py-3 ml-6 float-on-hover hover:text-black"
             >
               Open App
             </button>

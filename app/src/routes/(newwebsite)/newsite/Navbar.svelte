@@ -13,13 +13,14 @@
   <div class="navbar-center hidden py-2 ml-72 lg:flex">
     <ul class="menu menu-horizontal px-4">
       <li>
-        <a class="btn btn-ghost font-space-grotesk mt-2 pt-4 ml-3" href="#home"
-          >Home</a
+        <a
+          class="btn btn-ghost font-['SpaceGrotesk'] mt-2 pt-4 ml-3"
+          href="#home">Home</a
         >
       </li>
       <li>
         <a
-          class="btn btn-ghost font-space-grotesk mt-2 pt-4 ml-3"
+          class="btn btn-ghost font-['SpaceGrotesk'] mt-2 pt-4 ml-3"
           href="#About"
         >
           About
@@ -27,21 +28,24 @@
       </li>
       <li>
         <a
-          class="btn btn-ghost font-space-grotesk mt-2 pt-4 ml-3"
+          class="btn btn-ghost font-['SpaceGrotesk'] mt-2 pt-4 ml-3"
           href="#GetStarted"
         >
           Get Started
         </a>
       </li>
       <li>
-        <a class="btn btn-ghost font-space-grotesk mt-2 pt-4 ml-3" href="#FAQ">
+        <a
+          class="btn btn-ghost font-['SpaceGrotesk'] mt-2 pt-4 ml-3"
+          href="#FAQ"
+        >
           FAQ
         </a>
       </li>
 
       <li>
         <a
-          class="btn btn-ghost font-space-grotesk mt-2 pt-4 ml-3"
+          class="btn btn-ghost font-['SpaceGrotesk'] mt-2 pt-4 ml-3"
           href="#SignUp"
         >
           Sign Up
@@ -50,7 +54,7 @@
 
       <li>
         <a
-          class="btn btn-ghost font-space-grotesk mt-2 pt-4 ml-3"
+          class="btn btn-ghost font-['SpaceGrotesk'] mt-2 pt-4 ml-3"
           href="#ContactUs"
         >
           Community
