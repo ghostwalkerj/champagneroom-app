@@ -1,61 +1,25 @@
+<script lang="ts">
+  import { PUBLIC_STATIC_URL } from '$env/static/public';
+</script>
+
 <div class="navbar">
   <div class="navbar-start justify-between w-full sm:">
-    <div class="dropdown">
-      <!-- svelte-ignore a11y-label-has-associated-control -->
-      <label tabIndex={0} class="btn btn-ghost lg:hidden">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-5 w-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M4 6h16M4 12h8m-8 6h16"
-          />
-        </svg>
-      </label>
-      <ul
-        tabIndex={0}
-        class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
-      >
-        <li>
-          <a>Item 1</a>
-        </li>
-        <li>
-          <a>Parent</a>
-          <ul class="p-2">
-            <li>
-              <a>Submenu 1</a>
-            </li>
-            <li>
-              <a>Submenu 2</a>
-            </li>
-          </ul>
-        </li>
-        <li>
-          <a>Item 3</a>
-        </li>
-      </ul>
-    </div>
-    <img alt="abc" src="/logo.png" class="ml-0 sm:ml-28 w-32" />
+    <img
+      alt="abc"
+      src="{PUBLIC_STATIC_URL}/assets/cr_logo.png"
+      class="ml-0 sm:ml-28 w-32"
+    />
   </div>
   <div class="navbar-center hidden py-2 ml-72 lg:flex">
     <ul class="menu menu-horizontal px-4">
       <li>
-        <a
-          class="whitenav text-[#d0dce8] font-space-grotesk font-semibold text-base capitalize mt-3 ml-3 hover:text-[#54f6cd]"
-          href="#home"
+        <a class="btn btn-ghost font-space-grotesk mt-2 pt-4 ml-3" href="#home"
+          >Home</a
         >
-          Home
-        </a>
       </li>
       <li>
         <a
-          class="whitenav text-[#d0dce8] font-space-grotesk font-semibold text-base capitalize mt-3 ml-3 hover:text-[#54f6cd]"
+          class="btn btn-ghost font-space-grotesk mt-2 pt-4 ml-3"
           href="#About"
         >
           About
@@ -63,39 +27,37 @@
       </li>
       <li>
         <a
-          class="whitenav text-[#d0dce8] font-space-grotesk font-semibold text-base capitalize mt-3 ml-3 hover:text-[#54f6cd]"
-          href="#Play"
+          class="btn btn-ghost font-space-grotesk mt-2 pt-4 ml-3"
+          href="#GetStarted"
         >
-          P.L.A.Y
+          Get Started
         </a>
       </li>
       <li>
-        <a
-          class="whitenav text-[#d0dce8] font-space-grotesk font-semibold text-base capitalize mt-3 ml-3 hover:text-[#54f6cd]"
-          href="#Tokenomics"
-        >
-          Tokenomics
+        <a class="btn btn-ghost font-space-grotesk mt-2 pt-4 ml-3" href="#FAQ">
+          FAQ
         </a>
       </li>
+
       <li>
         <a
-          class="whitenav text-[#d0dce8] font-space-grotesk font-semibold text-base capitalize mt-3 ml-3 hover:text-[#54f6cd]"
-          href="#Findus"
+          class="btn btn-ghost font-space-grotesk mt-2 pt-4 ml-3"
+          href="#SignUp"
         >
-          Find Us On
+          Sign Up
         </a>
       </li>
+
       <li>
         <a
-          class="whitenav text-[#d0dce8] font-space-grotesk font-semibold text-base capitalize mt-3 ml-3 hover:text-[#54f6cd]"
-          href="#"
+          class="btn btn-ghost font-space-grotesk mt-2 pt-4 ml-3"
+          href="#ContactUs"
         >
-          Roadmap
+          Community
         </a>
       </li>
-      <!-- svelte-ignore a11y-missing-attribute -->
       <a
-        class="font-['SpaceGrotesk'] flex items-center btn mt-2 ml-2 btn-outline btn-primary"
+        class="font-['SpaceGrotesk'] flex items-center btn mt-2 ml-6 btn-outline btn-primary"
         href="/agent"
       >
         Open App

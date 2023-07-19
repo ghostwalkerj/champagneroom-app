@@ -2,9 +2,9 @@
   import { PUBLIC_STATIC_URL } from '$env/static/public';
 
   import About from './About.svelte';
-  import Earn from './Earn.svelte';
-  import Findus from './Findus.svelte';
-  import Play from './Play.svelte';
+  import FAQ from './FAQ.svelte';
+  import FindUs from './FindUs.svelte';
+  import GetStarted from './GetStarted.svelte';
   import Tokenomics from './Tokenomics.svelte';
 </script>
 
@@ -29,26 +29,31 @@
         </li>
         <li class="mt-2">Protected by a Full Escrow Service</li>
       </ul>
-      <div class="flex flex-col md:flex-row mt-10 sm:block space-x-6">
-        <button
-          class="relative z-0 btn btn-primary transition-all duration-300 ease-in-out font-space-grotesk"
+      <div
+        class="flex flex-col md:flex-row mt-10 space-x-0 md:space-y-0 space-y-6 md:space-x-6"
+      >
+        <a
+          href="#FAQ"
+          class="w-full md:w-auto btn btn-primary transition-all duration-300 ease-in-out font-space-grotesk"
         >
           Read the FAQ
-        </button>
-        <button
-          class="relative z-0 btn btn-secondary transition-all duration-300 ease-in-out font-space-grotesk"
+        </a>
+        <a
+          href="{PUBLIC_STATIC_URL}/assets/champagne-room-white-paper.pdf"
+          class="w-full md:w-auto btn btn-secondary transition-all duration-300 ease-in-out font-space-grotesk m-0"
+          target="_blank"
         >
           Checkout the White Paper
-        </button>
+        </a>
       </div>
     </div>
-    <div class="w-full mt-5 sm:w-1/3 sm:mt-0">
+    <div class="w-full mt-5 sm:w-1/2 sm:mt-0">
       <video
         autoplay
         loop
         controls
         muted
-        class="opacity-80 rounded-xl overflow-hidden"
+        class="opacity-80 rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1]"
       >
         <source
           src="{PUBLIC_STATIC_URL}/assets/champagnevideo.mp4"
@@ -59,7 +64,7 @@
   </div>
 </div>
 <About />
-<Play />
-<Earn />
+<GetStarted />
+<FAQ />
 <Tokenomics />
-<Findus />
+<FindUs />

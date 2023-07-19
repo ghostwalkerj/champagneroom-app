@@ -4,7 +4,6 @@ import type { Account, WalletState } from '@web3-onboard/core/dist/types';
 import frameModule from '@web3-onboard/frame';
 import injectedModule from '@web3-onboard/injected-wallets';
 import trezorModule from '@web3-onboard/trezor';
-import walletConnectModule from '@web3-onboard/walletconnect';
 import { derived, writable } from 'svelte/store';
 
 import {
@@ -32,9 +31,8 @@ const wcV2InitOptions = {
    */
   requiredChains: [1]
 };
-const walletConnect = walletConnectModule(wcV2InitOptions);
 
-const wallets = [injected, coinbaseWalletSdk, frame, trezor, walletConnect];
+const wallets = [injected, coinbaseWalletSdk, frame, trezor];
 
 const appMetadata = {
   name: 'Champagne Room',
