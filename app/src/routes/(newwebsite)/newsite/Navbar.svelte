@@ -2,71 +2,73 @@
   import { PUBLIC_STATIC_URL } from '$env/static/public';
 </script>
 
-<div class="navbar">
-  <div class="navbar-start justify-between w-full sm:">
+<div class="flex w-screen">
+  <div class="navbar-start m-auto w-screen lg:max-w-[400px]">
     <img
       alt="abc"
-      src="{PUBLIC_STATIC_URL}/assets/cr_logo.png"
-      class="ml-0 sm:ml-28 w-32"
+      src="{PUBLIC_STATIC_URL}/assets/logo-horizontal-tr.png"
+      class="lg:ml-10 mr-2 w-auto my-auto mt-1"
     />
   </div>
-  <div class="navbar-center hidden py-2 ml-72 lg:flex">
-    <ul class="menu menu-horizontal px-4">
-      <li>
-        <a
-          class="btn btn-ghost font-['SpaceGrotesk'] mt-2 pt-4 ml-3"
-          href="#home">Home</a
-        >
-      </li>
-      <li>
-        <a
-          class="btn btn-ghost font-['SpaceGrotesk'] mt-2 pt-4 ml-3"
-          href="#About"
-        >
-          About
-        </a>
-      </li>
-      <li>
-        <a
-          class="btn btn-ghost font-['SpaceGrotesk'] mt-2 pt-4 ml-3"
-          href="#GetStarted"
-        >
-          Get Started
-        </a>
-      </li>
-      <li>
-        <a
-          class="btn btn-ghost font-['SpaceGrotesk'] mt-2 pt-4 ml-3"
-          href="#FAQ"
-        >
-          FAQ
-        </a>
-      </li>
+  <div class="hidden lg:w-full lg:flex grow ml-10">
+    <div class="navbar-center py-2 lg:flex w-full justify-end">
+      <ul class="menu menu-horizontal px-4 mt-2 mr-10 min-w-full justify-end">
+        <li>
+          <a
+            class="btn btn-ghost font-['SpaceGrotesk'] mt-2 pt-4 ml-3"
+            href="#home">Home</a
+          >
+        </li>
+        <li>
+          <a
+            class="btn btn-ghost font-['SpaceGrotesk'] mt-2 pt-4 ml-3"
+            href="#About"
+          >
+            About
+          </a>
+        </li>
+        <li>
+          <a
+            class="btn btn-ghost font-['SpaceGrotesk'] mt-2 pt-4 ml-3"
+            href="#GetStarted"
+          >
+            Get Started
+          </a>
+        </li>
+        <li>
+          <a
+            class="btn btn-ghost font-['SpaceGrotesk'] mt-2 pt-4 ml-3"
+            href="#FAQ"
+          >
+            FAQ
+          </a>
+        </li>
 
-      <li>
-        <a
-          class="btn btn-ghost font-['SpaceGrotesk'] mt-2 pt-4 ml-3"
-          href="#SignUp"
-        >
-          Sign Up
-        </a>
-      </li>
+        <li>
+          <a
+            class="btn btn-ghost font-['SpaceGrotesk'] mt-2 pt-4 ml-3"
+            href="#SignUp"
+          >
+            Sign Up
+          </a>
+        </li>
 
-      <li>
+        <li>
+          <a
+            class="btn btn-ghost font-['SpaceGrotesk'] mt-2 pt-4 ml-3"
+            href="#ContactUs"
+          >
+            Community
+          </a>
+        </li>
         <a
-          class="btn btn-ghost font-['SpaceGrotesk'] mt-2 pt-4 ml-3"
-          href="#ContactUs"
+          class="font-['SpaceGrotesk'] flex items-center btn mt-2 ml-6 btn-outline btn-primary"
+          href="/agent"
         >
-          Community
+          Open App
         </a>
-      </li>
-      <a
-        class="font-['SpaceGrotesk'] flex items-center btn mt-2 ml-6 btn-outline btn-primary"
-        href="/agent"
-      >
-        Open App
-      </a>
-    </ul>
+      </ul>
+    </div>
+    <div class="navbar-end hidden sm:block" />
   </div>
-  <div class="navbar-end hidden sm:block" />
 </div>
