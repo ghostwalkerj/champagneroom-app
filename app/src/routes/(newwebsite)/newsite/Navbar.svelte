@@ -18,12 +18,6 @@
         <li>
           <a
             class="btn btn-ghost font-['SpaceGrotesk'] mt-2 pt-4 ml-3"
-            href="#home">Home</a
-          >
-        </li>
-        <li>
-          <a
-            class="btn btn-ghost font-['SpaceGrotesk'] mt-2 pt-4 ml-3"
             href="#About"
           >
             About
@@ -55,14 +49,6 @@
           </a>
         </li>
 
-        <li>
-          <a
-            class="btn btn-ghost font-['SpaceGrotesk'] mt-2 pt-4 ml-3"
-            href="#Community"
-          >
-            Community
-          </a>
-        </li>
         <a
           class="font-['SpaceGrotesk'] flex items-center btn mt-2 ml-6 btn-outline btn-primary"
           href="/agent"
