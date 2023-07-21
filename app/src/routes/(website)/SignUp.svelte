@@ -55,7 +55,7 @@
                 method="post"
                 action="?/show_interest"
                 use:enhance={onSubmit}
-                class="flex flex-col gap-4 h-full place-content-center"
+                class="flex flex-col gap-4 h-full place-content-center z-10"
               >
                 <select
                   class="select font-['SpaceGrotesk'] select-primary w-full max-w-xs bg-black"
