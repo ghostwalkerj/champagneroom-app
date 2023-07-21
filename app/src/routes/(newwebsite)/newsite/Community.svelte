@@ -1,14 +1,14 @@
 <div class="mx-auto">
   <div
-    class="container finduscont mt-36 mx-auto"
-    id="Findus"
+    class="container finduscont mt-20 mx-auto"
+    id="Community"
     data-aos="fade-In"
   >
     <div class="row">
       <h2
         class="col-md-12 font-serif text-[#d0dce8] font-semibold text-[41px] text-center"
       >
-        Find us on
+        Community
       </h2>
     </div>
     <div class="grid grid-cols-2 mx-0 gap-0 md:grid-cols-4 sm:gap-4 sm:mx-20">

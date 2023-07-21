@@ -58,7 +58,7 @@
         <li>
           <a
             class="btn btn-ghost font-['SpaceGrotesk'] mt-2 pt-4 ml-3"
-            href="#ContactUs"
+            href="#Community"
           >
             Community
           </a>

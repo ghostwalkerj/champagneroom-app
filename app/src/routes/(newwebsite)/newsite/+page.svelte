@@ -3,7 +3,6 @@
 
   import About from './About.svelte';
   import FAQ from './FAQ.svelte';
-  import FindUs from './FindUs.svelte';
   import GetStarted from './GetStarted.svelte';
   import SignUp from './SignUp.svelte';
 
@@ -67,4 +66,3 @@
 <GetStarted />
 <FAQ />
 <SignUp {form} />
-<FindUs />
