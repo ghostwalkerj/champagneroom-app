@@ -14,7 +14,7 @@
         >
           Easy, Safe, Private
         </span>
-        <div class="flex flex-col lg:flex-row">
+        <div class="flex flex-col lg:flex-row place-content-between">
           <div class="pb-6">
             <span class="font-serif font-semibold text-[41px] text-center">
               Champagne Room Show
@@ -38,11 +38,11 @@
             </ul>
           </div>
 
-          <div class="p-4 flex place-content-center">
+          <div class="p-4 flex w-full place-content-center">
             <img
               alt="show-screenshot"
               src="{PUBLIC_STATIC_URL}/assets/show-screenshot.png"
-              class=" rounded-md overflow-hidden h-auto max-w-full shadow-[0px_0px_17px_6px_#e779c1]"
+              class=" rounded-md overflow-hidden shadow-[0px_0px_17px_6px_#e779c1]"
             />
           </div>
         </div>
