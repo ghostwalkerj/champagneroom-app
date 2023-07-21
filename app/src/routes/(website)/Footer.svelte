@@ -7,10 +7,12 @@
 <div>
   <div class="container mx-auto">
     <footer class="w-full py-4 flex-shrink-0" data-aos="fade-In">
-      <div class="container flex csss py-4">
-        <div class="flex justify-evenly w-full mx-auto">
+      <div class="w-full flex flex-col lg:flex-row py-4">
+        <div
+          class="flex flex-col 2sx:flex-row mx-auto 2sx:space-x-4 whitespace-nowrap w-full text-center 2sx:place-content-evenly"
+        >
           <div class="">
-            <h5 class="text-info mb-3">Social</h5>
+            <h5 class="text-info sm:mb-3">Social</h5>
             <ul class="list-unstyled text-[#d0dce8]">
               <li class="spa" />
               <li class="spa">
@@ -36,7 +38,7 @@
             </ul>
           </div>
           <div class="">
-            <h5 class="text-info mb-3">Products</h5>
+            <h5 class="text-info sm:mb-3">Products</h5>
             <ul class="list-unstyled text-[#d0dce8]">
               <li class="spa">
                 <a href="#">For Agents</a>
@@ -47,7 +49,7 @@
             </ul>
           </div>
           <div class="">
-            <h5 class="text-info mb-3">Learn</h5>
+            <h5 class="text-info sm:mb-3">Learn</h5>
             <ul class="list-unstyled text-[#d0dce8]">
               <li class="spa">
                 <a href="#">Documentation</a>
@@ -60,8 +62,10 @@
               </li>
             </ul>
           </div>
+        </div>
+        <div class="p-4 mr-10 flex justify-center">
           <a
-            class="font-['SpaceGrotesk'] flex items-center btn mt-2 ml-6 btn-outline btn-primary"
+            class="font-['SpaceGrotesk'] btn mt-2 ml-6 btn-outline btn-primary whitespace-nowrap"
             href="/agent"
           >
             Open App

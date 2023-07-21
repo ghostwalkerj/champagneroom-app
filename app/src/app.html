@@ -23,17 +23,9 @@
 	<body data-sveltekit-preload-data="hover">
 		<script src="https://unpkg.com/aos@next/dist/aos.js"></script>
 		<script>
-			AOS.init({
-				disable: function () {
-					var maxWidth = 800;
-					return window.innerWidth < maxWidth;
-				},
-			});
-		</script>
-		<script>
-			AOS.init({ disable: "mobile" });
 			AOS.init();
 		</script>
+
 		<div style="display: contents">%sveltekit.body%</div>
 	</body>
 

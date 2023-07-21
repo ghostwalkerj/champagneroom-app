@@ -27,21 +27,25 @@
         <li class="mt-2">Protected by a Full Escrow Service</li>
       </ul>
       <div
-        class="flex flex-col md:flex-row mt-10 space-x-0 md:space-y-0 space-y-6 md:space-x-6 place-content-center lg:place-content-start"
+        class="flex flex-col 2sx:flex-row mt-10 space-x-0 2sx:space-y-0 space-y-6 2sx:space-x-6 place-content-center lg:place-content-start"
       >
-        <a
-          href="#FAQ"
-          class="w-full md:w-auto btn btn-primary transition-all duration-300 ease-in-out font-['SpaceGrotesk']"
-        >
-          Read the FAQ
-        </a>
-        <a
-          href="{PUBLIC_STATIC_URL}/assets/champagne-room-white-paper.pdf"
-          class="w-full md:w-auto btn btn-secondary transition-all duration-300 ease-in-out font-['SpaceGrotesk'] m-0"
-          target="_blank"
-        >
-          Checkout the White Paper
-        </a>
+        <div>
+          <a
+            href="#FAQ"
+            class=" md:w-auto btn btn-primary transition-all duration-300 ease-in-out font-['SpaceGrotesk']"
+          >
+            Read the FAQ
+          </a>
+        </div>
+        <div>
+          <a
+            href="{PUBLIC_STATIC_URL}/assets/champagne-room-white-paper.pdf"
+            class=" md:w-auto btn btn-secondary transition-all duration-300 ease-in-out font-['SpaceGrotesk'] m-0"
+            target="_blank"
+          >
+            Checkout the White Paper
+          </a>
+        </div>
       </div>
     </div>
     <div class="w-full p-10">

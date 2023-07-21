@@ -58,7 +58,7 @@
                 class="flex flex-col gap-4 h-full place-content-center"
               >
                 <select
-                  class="select select-primary w-full max-w-xs bg-black"
+                  class="select font-['SpaceGrotesk'] select-primary w-full max-w-xs bg-black"
                   name="interest"
                 >
                   <option disabled selected>I am interested in</option>
@@ -77,12 +77,16 @@
                   type="text"
                   placeholder="Email"
                   name="email"
-                  class="input input-bordered input-primary w-[300px] bg-black"
+                  class="input font-['SpaceGrotesk'] input-bordered input-primary w-[300px] bg-black"
                 />
                 {#if form?.badEmail}<div class="shadow-lg alert alert-error">
                     Email is Required
                   </div>{/if}
-                <button class="btn btn-primary w-32">Submit</button>
+                <div class="w-full text-center">
+                  <button class="btn btn-primary w-32 font-['SpaceGrotesk']"
+                    >Submit</button
+                  >
+                </div>
               </form>
             {/if}
           </div>
