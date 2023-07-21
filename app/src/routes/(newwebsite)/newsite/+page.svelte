@@ -5,26 +5,26 @@
   import FAQ from './FAQ.svelte';
   import FindUs from './FindUs.svelte';
   import GetStarted from './GetStarted.svelte';
-  import Tokenomics from './SignUp.svelte';
+  import SignUp from './SignUp.svelte';
+
+  import type { ActionData } from './$types';
+
+  export let form: ActionData;
 </script>
 
-<div data-aos="fade-in" />
-
-<div class="container mx-auto" data-aos="fade-in" id="page1">
-  <div class="flex flex-col lg:flex-row mt-20 items-center">
-    <div class="w-full mx-0">
+<div class="flex mt-20 w-screen" data-aos="fade-in" id="page1">
+  <div class="flex flex-col lg:flex-row items-center">
+    <div class="w-full p-10">
       <h2
         class=" text-[#d0dce8] text-center font-medium leading-none text-[48px] lg:text-left"
       >
         A new way to watch adult content creators live
       </h2>
       <ul
-        class="mt-10 text-[#d0dce8de] text-[25px] font-medium text-lg list-disc list-inside"
+        class=" text-[#d0dce8de] text-[25px] font-medium text-lg list-disc list-inside"
       >
         <li class="mt-2">Completely Anonymous</li>
-        <li class="mt-2">
-          No Downloads, No Signup, and No Personal Information Required!
-        </li>
+        <li class="mt-2">No Downloads, No Signup, No Personal Information</li>
         <li class="mt-2">Protected by a Full Escrow Service</li>
       </ul>
       <div
@@ -45,24 +45,26 @@
         </a>
       </div>
     </div>
-    <div class="w-full mt-10 lg:ml-10">
-      <video
-        autoplay
-        loop
-        controls
-        muted
-        class="opacity-80 rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1]"
-      >
-        <source
-          src="{PUBLIC_STATIC_URL}/assets/champagnevideo.mp4"
-          type="video/mp4"
-        />
-      </video>
+    <div class="w-full p-10">
+      <div class="w-auto">
+        <video
+          autoplay
+          loop
+          controls
+          muted
+          class="opacity-80 rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1]"
+        >
+          <source
+            src="{PUBLIC_STATIC_URL}/assets/champagnevideo.mp4"
+            type="video/mp4"
+          />
+        </video>
+      </div>
     </div>
   </div>
 </div>
 <About />
 <GetStarted />
 <FAQ />
-<Tokenomics />
+<SignUp {form} />
 <FindUs />

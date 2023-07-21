@@ -3,14 +3,16 @@
 </script>
 
 <div class="flex w-screen">
-  <div class="navbar-start m-auto w-screen lg:max-w-[400px]">
-    <img
-      alt="abc"
-      src="{PUBLIC_STATIC_URL}/assets/logo-horizontal-tr.png"
-      class="lg:ml-10 mr-2 w-auto my-auto mt-1"
-    />
+  <div class="w-1/2">
+    <div class="m-auto w-screen lg:max-w-[400px]">
+      <img
+        alt="abc"
+        src="{PUBLIC_STATIC_URL}/assets/logo-horizontal-tr.png"
+        class="lg:ml-10 mr-2 w-auto my-auto mt-1"
+      />
+    </div>
   </div>
-  <div class="hidden lg:w-full lg:flex grow ml-10">
+  <div class="hidden lg:w-full lg:flex ml-10">
     <div class="navbar-center py-2 lg:flex w-full justify-end">
       <ul class="menu menu-horizontal px-4 mt-2 mr-10 min-w-full justify-end">
         <li>
