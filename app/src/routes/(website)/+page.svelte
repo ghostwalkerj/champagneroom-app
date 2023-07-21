@@ -1,73 +1,68 @@
 <script lang="ts">
   import { PUBLIC_STATIC_URL } from '$env/static/public';
+
+  import About from './About.svelte';
+  import FAQ from './FAQ.svelte';
+  import GetStarted from './GetStarted.svelte';
+  import SignUp from './SignUp.svelte';
+
+  import type { ActionData } from './$types';
+
+  export let form: ActionData;
 </script>
 
-<div
-  class="absolute mt-2 mx-auto opacity-20 rounded-lg justify-center w-screen h-screen"
-  style="background-image: url('{PUBLIC_STATIC_URL}/assets/crbubbles.png')"
-/>
-<div class="py-10">
-  <!-- Page header -->
-
-  <div
-    class="mx-auto px-4 sm:px-6 md:flex md:space-x-5 md:items-center md:justify-between lg:px-8"
-  >
-    <div class="flex flex-col space-x-5 items-center w-full">
-      <div class="fixed top-10 grid grid-cols-2">
-        <div
-          class="image opacity-20 max-width-l hidden md:flex animate-pulse transition-timing-function mt-20 mb-10"
+<div class="flex mt-20 w-screen" data-aos="fade-in" id="page1">
+  <div class="flex flex-col lg:flex-row items-center">
+    <div class="w-full p-10">
+      <h2
+        class=" text-[#d0dce8] text-center font-medium leading-none text-[48px] lg:text-left"
+      >
+        A new way to watch adult content creators live
+      </h2>
+      <ul
+        class=" text-[#d0dce8de] text-[25px] font-medium text-lg list-disc list-inside"
+      >
+        <li class="mt-2">Completely Anonymous</li>
+        <li class="mt-2">No Downloads, No Signup, No Personal Information</li>
+        <li class="mt-2">Protected by a Full Escrow Service</li>
+      </ul>
+      <div
+        class="flex flex-col md:flex-row mt-10 space-x-0 md:space-y-0 space-y-6 md:space-x-6 place-content-center lg:place-content-start"
+      >
+        <a
+          href="#FAQ"
+          class="w-full md:w-auto btn btn-primary transition-all duration-300 ease-in-out font-['SpaceGrotesk']"
         >
-          <div class="h-xl w-xl">
-            <img
-              class="motion-safe:animate-fadeIn mx-auto rounded-lg opacity-45 justify-center -space-x-20 w-m h-m"
-              src="{PUBLIC_STATIC_URL}/assets/ladypink.png"
-              alt="Lady Blue"
-            />
-          </div>
-        </div>
-
-        <div
-          class="image opacity-20 hidden md:flex animate-pulse transition-timing-function mt-20 mb-10"
+          Read the FAQ
+        </a>
+        <a
+          href="{PUBLIC_STATIC_URL}/assets/champagne-room-white-paper.pdf"
+          class="w-full md:w-auto btn btn-secondary transition-all duration-300 ease-in-out font-['SpaceGrotesk'] m-0"
+          target="_blank"
         >
-          <div class="h-xl w-xl">
-            <img
-              class="motion-safe:animate-fadeIn mx-auto rounded-lg opacity-45 justify-center -space-x-20 w-m h-m"
-              src="{PUBLIC_STATIC_URL}/assets/ladyblue.png"
-              alt="Lady Pink"
-            />
-          </div>
-        </div>
+          Checkout the White Paper
+        </a>
       </div>
-      <div class="text-center text-2xl max-w-xl flex flex-col gap-10">
-        <div>
-          The Champagne Room is a new way to watch adult content creators live,
-          and have 1:1 interactions with them.
-        </div>
-        <div>
-          It's completely anonymous, and you pay with crypto. No signup
-          required!
-        </div>
-        <div>
-          We're the first ever full escrow service to protect all parties
-          involved in your transaction. We even have a feedback and dispute
-          service that helps make sure both parties are happy with the
-          experience they have had.
-        </div>
-        <div>No downloads, no signup, no personal information required.</div>
-      </div>
-      <div class="p-10 mx-auto">
-        <div
-          class="max-w-2xl bg-none rounded-xl overflow-hidden
-        justify-center shadow-lg border-4 border-primary"
+    </div>
+    <div class="w-full p-10">
+      <div class="w-auto">
+        <video
+          autoplay
+          loop
+          controls
+          muted
+          class="opacity-80 rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1]"
         >
-          <video autoplay loop controls muted class="opacity-80">
-            <source
-              src="{PUBLIC_STATIC_URL}/assets/champagnevideo.mp4"
-              type="video/mp4"
-            />
-          </video>
-        </div>
+          <source
+            src="{PUBLIC_STATIC_URL}/assets/champagnevideo.mp4"
+            type="video/mp4"
+          />
+        </video>
       </div>
     </div>
   </div>
 </div>
+<About />
+<GetStarted />
+<FAQ />
+<SignUp {form} />
