@@ -6,7 +6,7 @@
   <div class="w-1/2">
     <div class="m-auto w-screen lg:max-w-[400px]">
       <img
-        alt="abc"
+        alt="logo"
         src="{PUBLIC_STATIC_URL}/assets/logo-horizontal-tr.png"
         class="lg:ml-10 mr-2 w-auto my-auto mt-1"
       />

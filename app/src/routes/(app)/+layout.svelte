@@ -33,11 +33,11 @@
     <div class="flex w-screen">
       <div class="w-1/3 flex">
         <!-- svelte-ignore a11y-missing-attribute -->
-        <a class="text-xl btn btn-ghost normal-case" href="/">
+        <a class="text-xl normal-case" href="/">
           <img
-            src="{PUBLIC_STATIC_URL}/assets/logo.png"
+            src="{PUBLIC_STATIC_URL}/assets/logo-tr.png"
             alt="Logo"
-            width="48"
+            width="260"
           /></a
         >
       </div>
