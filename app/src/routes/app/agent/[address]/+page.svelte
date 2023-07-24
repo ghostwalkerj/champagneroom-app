@@ -150,7 +150,7 @@
   {/if}
 
   <div class="min-h-full">
-    <main class="p-10">
+    <main class="px-10 pt-2">
       <!-- Page header -->
       {#key agent}
         <div

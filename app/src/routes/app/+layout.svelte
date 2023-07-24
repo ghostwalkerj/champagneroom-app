@@ -33,7 +33,7 @@
 >
   <div class="navbar">
     <div class="flex w-screen">
-      <div class="w-1/3 flex ml-20">
+      <div class="w-0 md:w-1/3 flex md:ml-20">
         <!-- svelte-ignore a11y-missing-attribute -->
         <a class="text-xl normal-case" href="/">
           <img
@@ -43,16 +43,19 @@
           /></a
         >
       </div>
-      <div>
-        <div
-          class=" font-bold text-2xl lg:text-3xl xl:text-4xl grid grid-cols-1 md:flex text-info mx-6"
-        >
-          <div class="whitespace-nowrap text-center">Welcome to &nbsp;</div>
-          <div class="whitespace-nowrap text-center">the Champagne Room</div>
+      <div class="w-full text-center">
+        <div class="font-bold mb-2 text-info">
+          <div class="neon-container">
+            <div
+              class="text-center text-lg md:text-2xl lg:text-3xl neon-text whitespace-nowrap"
+            >
+              Welcome to the Champagne Room
+            </div>
+          </div>
         </div>
         <div class="text-center text-xl text-accent">{$nameStore}</div>
       </div>
-      <div class="w-1/3 text-right mr-20">
+      <div class="md:w-1/3 text-right lg:mr-20">
         <ConnectButton />
       </div>
     </div>
@@ -68,3 +71,39 @@
     <p>Build Time: {buildTime}</p>
   </div>
 </footer>
+
+<style>
+  /* Styles for the neon effect */
+  @keyframes flicker {
+    0%,
+    19.999%,
+    22%,
+    62.999%,
+    64%,
+    64.999%,
+    70%,
+    100% {
+      opacity: 1;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.7),
+        0 0 20px rgba(255, 255, 255, 0.7), 0 0 30px rgba(255, 255, 255, 0.7);
+    }
+    20%,
+    21.999%,
+    63%,
+    63.999%,
+    65%,
+    69.999% {
+      opacity: 0.4;
+      text-shadow: none;
+    }
+  }
+
+  .neon-container {
+    display: inline-block; /* Ensures that the container only takes up the space it needs */
+  }
+
+  .neon-text {
+    color: #07ffff; /* Your primary text color (pink) */
+    animation: flicker 3s infinite; /* Adjust the animation duration as needed */
+  }
+</style>

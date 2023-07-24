@@ -5,18 +5,18 @@
   <div class="text-center card-body items-center">
     <h2 class="text-2xl card-title text-info">My Wallet</h2>
 
-    <div class="bg-primary text-primary-content stats stats-vertical">
+    <div class="bg-neutral text-primary-content stats stats-vertical">
       <div class="stat">
-        <div class="stat-title text-accent">Account balance</div>
-        <div class="stat-value">$89,400</div>
+        <div class="stat-title text-primary">Account balance</div>
+        <div class="stat-value text-info">$89,400</div>
         <div class="stat-actions">
           <button class="btn btn-sm btn-success">Add funds</button>
         </div>
       </div>
 
       <div class="stat">
-        <div class="stat-title text-accent">Current balance</div>
-        <div class="stat-value">$89,400</div>
+        <div class="stat-title text-primary">Current balance</div>
+        <div class="stat-value text-info">$89,400</div>
         <div class="stat-actions">
           <button class="btn btn-sm">Withdrawal</button>
           <button class="btn btn-sm">deposit</button>
