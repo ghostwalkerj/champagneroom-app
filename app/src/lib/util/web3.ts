@@ -8,6 +8,7 @@ import { derived, writable } from 'svelte/store';
 
 import {
   PUBLIC_INFURA_API_KEY,
+  PUBLIC_STATIC_URL,
   PUBLIC_WALLET_CONNECT_PROJECT_ID
 } from '$env/static/public';
 
@@ -37,8 +38,8 @@ const wallets = [injected, coinbaseWalletSdk, frame, trezor];
 const appMetadata = {
   name: 'Champagne Room',
   description: 'Living Large in the Champagne Room',
-  icon: 'https://champagneroom.app/logo.png',
-  logo: 'https://champagneroom.app/logo.png',
+  icon: `${PUBLIC_STATIC_URL}/assets/logo-tr.png`,
+  logo: `${PUBLIC_STATIC_URL}/assets/logo-horizontal-tr.png`,
   recommendedInjectedWallets: [
     { name: 'Coinbase', url: 'https://wallet.coinbase.com/' },
     { name: 'MetaMask', url: 'https://metamask.io' }

@@ -28,14 +28,16 @@
   }
 </script>
 
-<div class="min-h-screen flex flex-col">
-  <div class="bg-gradient-to-r from-indigo-900 navbar">
+<div
+  class="min-h-screen flex flex-col font-[SpaceGrotesk] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#0F001A] to-[#000000]"
+>
+  <div class="navbar">
     <div class="flex w-screen">
-      <div class="w-1/3 flex">
+      <div class="w-1/3 flex ml-20">
         <!-- svelte-ignore a11y-missing-attribute -->
-        <a class="text-xl btn normal-case" href="/">
+        <a class="text-xl normal-case" href="/">
           <img
-            src="{PUBLIC_STATIC_URL}/assets/logo-tr.png"
+            src="{PUBLIC_STATIC_URL}/assets/logo-horizontal-tr.png"
             alt="Logo"
             width="260"
           /></a
@@ -43,20 +45,20 @@
       </div>
       <div>
         <div
-          class=" font-bold text-2xl lg:text-3xl xl:text-4xl grid grid-cols-1 md:flex"
+          class=" font-bold text-2xl lg:text-3xl xl:text-4xl grid grid-cols-1 md:flex text-info mx-6"
         >
           <div class="whitespace-nowrap text-center">Welcome to &nbsp;</div>
           <div class="whitespace-nowrap text-center">the Champagne Room</div>
         </div>
-        <div class="text-center text-xl">{$nameStore}</div>
+        <div class="text-center text-xl text-accent">{$nameStore}</div>
       </div>
-      <div class="w-1/3 text-right">
+      <div class="w-1/3 text-right mr-20">
         <ConnectButton />
       </div>
     </div>
   </div>
 
-  <div class="bg-gradient-to-r from-indigo-900 min-h-screen">
+  <div class="min-h-screen">
     <slot />
   </div>
 </div>

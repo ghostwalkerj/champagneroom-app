@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+// @ts-ignore
+
 module.exports = {
   content: ["./src/**/*.{html,js,svelte,ts}"],
   theme: {
@@ -25,7 +27,6 @@ module.exports = {
   },
   plugins: [
     require("daisyui"),
-    require("tailwindcss-font-inter"),
     require("@tailwindcss/typography"),
   ],
   daisyui: {
@@ -37,24 +38,16 @@ module.exports = {
     themes: [
       {
         cryptoJesus: {
-          ...require("daisyui/src/theming/themes")["[data-theme=synthwave]"],
-          fontFamily: "Inter",
-          "base-100": "#150050",
-          "base-200": "#20134e",
-          "base-300": "#140a2e",
-          "base-content": "#f9f7fd",
-          "--border-color": "var(--b3)",
-          "--rounded-box": "1rem",
-          "--rounded-btn": "0.5rem",
-          "--rounded-badge": "1.9rem",
-          "--animation-btn": "0.25s",
-          "--animation-input": ".2s",
-          "--btn-text-case": "uppercase",
-          "--btn-focus-scale": "0.95",
-          "--navbar-padding": ".5rem",
-          "--border-btn": "1px",
-          "--tab-border": "1px",
-          "--tab-radius": "0.5rem",
+
+          "primary": "#e779c1",
+          "secondary": "#07FFFF",
+          "accent": "#f3cc30",
+          "neutral": "#2A0134",
+          "base-100": "#000000",
+          "info": "#07FFFF",
+          "success": "#53c0f3",
+          "warning": "#F06400",
+          "error": "#E24056",
         },
       },
     ],

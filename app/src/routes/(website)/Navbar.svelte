@@ -51,7 +51,7 @@
 
         <a
           class="font-['SpaceGrotesk'] flex items-center btn mt-2 ml-6 btn-outline btn-primary whitespace-nowrap"
-          href="/agent"
+          href="/app"
         >
           Open App
         </a>
