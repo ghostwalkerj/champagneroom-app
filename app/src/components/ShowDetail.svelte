@@ -89,9 +89,11 @@
 
       {#if options.showStats}
         <div
-          class="flex flex-col flex-wrap lg:flex-row w-full place-content-evenly"
+          class="flex flex-col flex-wrap lg:flex-nowrap md:flex-row w-full place-content-evenly space-x-2"
         >
-          <div class="stats stats-horizontal stats-shadow text-center m-2">
+          <div
+            class="stats stats-horizontal stats-shadow text-center mb-2 border-2 border-primary"
+          >
             <div class="stat">
               <div class="stat-title">Duration</div>
               <div class="text-primary stat-value">
@@ -112,7 +114,9 @@
             </div>
           </div>
           {#if options.showSalesStats}
-            <div class="stats stats-horizontal stats-shadow text-center m-2">
+            <div
+              class="stats stats-horizontal stats-shadow text-center mb-2 border-2 border-primary"
+            >
               <div class="stat">
                 <div class="stat-title">Reserved</div>
                 <div class="text-primary stat-value">
