@@ -45,12 +45,12 @@
       </div>
       <div class="w-full text-center">
         <div class="font-bold mb-2 text-info">
-          <div class="neon-container">
-            <div
-              class="text-center text-lg md:text-2xl lg:text-3xl neon-text whitespace-nowrap"
-            >
-              Welcome to the Champagne Room
-            </div>
+          <div
+            class="text-center text-lg md:text-2xl lg:text-3xl whitespace-nowrap flex flex-row justify-center"
+          >
+            <div class="neon-text">Welcome to the&nbsp;</div>
+            <div class="neon-flicker">C</div>
+            <div class="neon-text">hampagne Room</div>
           </div>
         </div>
         <div class="text-center text-xl text-accent">{$nameStore}</div>
@@ -98,12 +98,14 @@
     }
   }
 
-  .neon-container {
-    display: inline-block; /* Ensures that the container only takes up the space it needs */
-  }
-
   .neon-text {
     color: #07ffff; /* Your primary text color (pink) */
-    animation: flicker 3s infinite; /* Adjust the animation duration as needed */
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.7),
+      0 0 20px rgba(255, 255, 255, 0.7), 0 0 30px rgba(255, 255, 255, 0.7);
+  }
+
+  .neon-flicker {
+    color: #07ffff; /* Your primary text color (pink) */
+    animation: flicker 6s infinite; /* Adjust the animation duration as needed */
   }
 </style>
