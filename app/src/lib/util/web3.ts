@@ -66,12 +66,12 @@ const onboard = Onboard({
   accountCenter: {
     desktop: {
       enabled: true,
-      position: 'topRight',
+      position: 'bottomRight',
       minimal: true
     },
     mobile: {
       enabled: true,
-      position: 'topRight'
+      position: 'bottomRight'
     }
   }
 });
