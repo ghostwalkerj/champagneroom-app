@@ -23,7 +23,7 @@
 <div id="SignUp" class="container mx-auto px-4 sm:px-20">
   <div class="container mx-auto">
     <div class="mt-20">
-      <h2 class="font-serif font-semibold text-[41px] text-center">
+      <h2 class="font-bold text-primary text-[41px] text-center">
         Express Your Interest
       </h2>
       <div class="flex flex-col lg:flex-row mt-10">

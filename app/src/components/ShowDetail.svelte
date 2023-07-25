@@ -92,7 +92,7 @@
           class="flex flex-col flex-wrap lg:flex-nowrap md:flex-row w-full place-content-evenly space-x-2"
         >
           <div
-            class="stats stats-horizontal stats-shadow text-center mb-2 border-2 border-primary"
+            class="stats stats-horizontal stats-shadow text-center mb-2 border-2 border-primary bg-black"
           >
             <div class="stat">
               <div class="stat-title">Duration</div>
@@ -115,7 +115,7 @@
           </div>
           {#if options.showSalesStats}
             <div
-              class="stats stats-horizontal stats-shadow text-center mb-2 border-2 border-primary"
+              class="stats stats-horizontal stats-shadow text-center mb-2 border-2 border-primary bg-black"
             >
               <div class="stat">
                 <div class="stat-title">Reserved</div>

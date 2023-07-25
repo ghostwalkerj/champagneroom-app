@@ -40,14 +40,14 @@ module.exports = {
         cryptoJesus: {
 
           "primary": "#e779c1",
-          "secondary": "#07FFFF",
-          "accent": "#f3cc30",
-          "neutral": "#2A0134",
-          "base-100": "#000000",
-          "info": "#07FFFF",
-          "success": "#53c0f3",
-          "warning": "#F06400",
-          "error": "#E24056",
+          "secondary": "#00FFFF",     // Baby Blue
+          "accent": "#FFD500",        // Yellow
+          "neutral": "#5C6BC0",       // Dark Blue (You can change this to another color if you prefer)
+          "base-100": "#1a1a1a",      // Dark Base
+          "info": "#00FFFF",          // Baby Blue (same as secondary)
+          "success": "#53c0f3",       // A shade of blue
+          "warning": "#F06400",       // Orange
+          "error": "#E24056"
         },
       },
     ],

@@ -3,9 +3,7 @@
   import Navbar from './Navbar.svelte';
 </script>
 
-<div
-  class="bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#0F001A] to-[#000000]"
->
+<div class="bg-gradient-to-r from-indigo-600 to-[#000000] font-robotto">
   <Navbar />
   <slot />
   <Footer />

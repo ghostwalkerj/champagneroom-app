@@ -4,7 +4,7 @@
 
 <div
   class="bg-contain mt-20 rounded-xl overflow-hidden"
-  style="background-image: url('{PUBLIC_STATIC_URL}/assets/bubbles.jpg') "
+  style="background-image: url('{PUBLIC_STATIC_URL}/assets/bubbles.png') "
 >
   <div id="GetStarted" class="container mx-auto">
     <div class="flex flex-col lg:flex-row items-center">
@@ -16,7 +16,9 @@
         </span>
         <div class="flex flex-col lg:flex-row place-content-between">
           <div class="pb-6">
-            <span class="font-serif font-semibold text-[41px] text-center">
+            <span
+              class="font-serif font-bold text-info text-[41px] text-center"
+            >
               Champagne Room Show
             </span>
 

@@ -28,9 +28,7 @@
   }
 </script>
 
-<div
-  class="min-h-screen flex flex-col font-[SpaceGrotesk] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#0F001A] to-[#000000]"
->
+<div class="bg-gradient-to-r from-indigo-600 to-[#000000]">
   <div class="navbar">
     <div class="flex w-screen">
       <div class="w-0 md:w-1/3 flex md:ml-20">

@@ -50,7 +50,7 @@
         </li>
 
         <a
-          class="font-['SpaceGrotesk'] flex items-center btn mt-2 ml-6 btn-outline btn-primary whitespace-nowrap"
+          class="font-['SpaceGrotesk'] flex items-center btn mt-2 ml-6 btn-outline btn-primary whitespace-nowrap shadow-[0px_0px_17px_6px_#e779c1]"
           href="/app"
         >
           Open App

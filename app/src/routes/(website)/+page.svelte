@@ -15,16 +15,17 @@
   <div class="flex flex-col lg:flex-row items-center">
     <div class="w-full p-10">
       <h2
-        class=" text-[#d0dce8] text-center font-medium leading-none text-[48px] lg:text-left"
+        class="text-info text-center font-medium leading-none text-[48px] lg:text-left mb-6"
       >
-        A new way to watch adult content creators live
+        A New Way to Discretely View NSFW Creators Live
       </h2>
       <ul
         class=" text-[#d0dce8de] text-[25px] font-medium text-lg list-disc list-inside"
       >
-        <li class="mt-2">Completely Anonymous</li>
+        <li class="mt-2">Watch Completely Anonymous</li>
         <li class="mt-2">No Downloads, No Signup, No Personal Information</li>
         <li class="mt-2">Protected by a Full Escrow Service</li>
+        <li class="mt-2">Get paid instantly as a Creator</li>
       </ul>
       <div
         class="flex flex-col 2sx:flex-row mt-10 space-x-0 2sx:space-y-0 space-y-6 2sx:space-x-6 place-content-center lg:place-content-start"

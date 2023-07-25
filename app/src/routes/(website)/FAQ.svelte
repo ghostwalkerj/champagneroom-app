@@ -28,13 +28,9 @@
       </div>
     </div>
   </div>
-  <h2
-    class="font-serif text-[#d0dce8] font-semibold text-[41px] text-center mt-36"
-  >
-    FAQ
-  </h2>
+  <h2 class="font-bold text-primary text-[41px] text-center mt-36">FAQ</h2>
 
-  <div class="block sm:flex sm:flex-row mt-20 gap-10 mx-10">
+  <div class="block sm:flex sm:flex-row mt-10 gap-10 mx-10">
     <div class="w-full sm:w-1/2">
       <div class="collapse collapse-arrow">
         <input type="radio" name="faq-accordion" />
