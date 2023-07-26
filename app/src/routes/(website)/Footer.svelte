@@ -5,7 +5,7 @@
 </script>
 
 <div>
-  <div class="container mx-auto">
+  <div class="container mx-auto font-Roboto">
     <footer class="w-full py-4 flex-shrink-0" data-aos="fade-In">
       <div class="w-full flex flex-col lg:flex-row py-4">
         <div
@@ -42,7 +42,7 @@
           </div>
           <div class="">
             <h5 class="text-info sm:mb-3">Learn</h5>
-            <ul class="list-unstyled text-[#d0dce8]">
+            <ul class="list-unstyled text-[#d0dce8] font-Roboto">
               <li class="spa">
                 <a
                   href="{PUBLIC_STATIC_URL}/assets/champagne-room-white-paper.pdf"
@@ -54,7 +54,7 @@
         </div>
         <div class="p-4 mr-10 flex justify-center">
           <a
-            class="font-['SpaceGrotesk'] btn mt-2 ml-6 btn-outline btn-primary whitespace-nowrap shadow-[0px_0px_17px_6px_#e779c1]"
+            class="font-SpaceGrotesk btn mt-2 ml-6 btn-outline btn-primary whitespace-nowrap shadow-[0px_0px_17px_6px_#e779c1]"
             href="/agent"
           >
             Open App

@@ -9,6 +9,10 @@ module.exports = {
         "-100": "-1",
       },
     },
+    fontFamily: {
+      'SpaceGrotesk': ['Space Grotesk', 'sans-serif'],
+      'Roboto': ['Roboto', 'sans-serif'],
+    },
     screens: {
       "2sx": "300px",
       sx: "400px",

@@ -74,6 +74,8 @@
   "type": "module",
   "dependencies": {
     "@bull-board/express": "^5.6.1",
+    "@fontsource/roboto": "^5.0.5",
+    "@fontsource/space-grotesk": "^5.0.5",
     "@web3-onboard/coinbase": "^2.2.5",
     "@web3-onboard/core": "^2.20.4",
     "@web3-onboard/frame": "^2.0.1",
