@@ -55,7 +55,7 @@
         <div class="p-4 mr-10 flex justify-center">
           <a
             class="font-SpaceGrotesk btn mt-2 ml-6 btn-outline btn-primary whitespace-nowrap shadow-[0px_0px_17px_6px_#e779c1]"
-            href="/agent"
+            href="/app"
           >
             Open App
           </a>
