@@ -6,14 +6,14 @@
 
 <div>
   <div class="container mx-auto font-Roboto">
-    <footer class="w-full py-4 flex-shrink-0" data-aos="fade-In">
+    <footer class="w-full py-4 flex-shrink-0 mt-20" data-aos="fade-In">
       <div class="w-full flex flex-col lg:flex-row py-4">
         <div
           class="flex flex-col 2sx:flex-row mx-auto 2sx:space-x-4 whitespace-nowrap w-full text-center 2sx:place-content-evenly"
         >
           <div class="">
             <h5 class="text-info sm:mb-3">Social</h5>
-            <ul class="list-unstyled text-[#d0dce8]">
+            <ul class="list-unstyled">
               <li class="spa">
                 <a href="https://discord.gg/VgB7bWScVa" target="_blank">
                   <iconify-icon icon="line-md:discord-twotone" />
@@ -31,7 +31,7 @@
           </div>
           <div class="">
             <h5 class="text-info sm:mb-3">Services</h5>
-            <ul class="list-unstyled text-[#d0dce8]">
+            <ul class="list-unstyled">
               <li class="spa">
                 <a href="#">Creators</a>
               </li>
@@ -42,7 +42,7 @@
           </div>
           <div class="">
             <h5 class="text-info sm:mb-3">Learn</h5>
-            <ul class="list-unstyled text-[#d0dce8] font-Roboto">
+            <ul class="list-unstyled font-Roboto">
               <li class="spa">
                 <a
                   href="{PUBLIC_STATIC_URL}/assets/champagne-room-white-paper.pdf"

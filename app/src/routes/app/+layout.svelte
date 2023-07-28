@@ -28,7 +28,7 @@
   }
 </script>
 
-<div class="bg-gradient-to-r from-indigo-600 to-[#000000] font-SpaceGrotesk">
+<div class="bg-gradient-to-r from-indigo-900 to-[#000000]">
   <div class="navbar">
     <div class="flex w-screen">
       <div class="w-0 md:w-1/3 flex md:ml-20">

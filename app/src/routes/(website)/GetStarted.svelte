@@ -2,10 +2,11 @@
   import { PUBLIC_STATIC_URL } from '$env/static/public';
 </script>
 
-<div
-  class="bg-contain mt-20 rounded-xl overflow-hidden"
-  style="background-image: url('{PUBLIC_STATIC_URL}/assets/bubbles.png') "
->
+<div class="relative mt-40">
+  <div
+    class="bg-containrounded-xl overflow-hidden absolute top-0 left-0 w-full h-full opacity-30"
+    style="background-image: url('{PUBLIC_STATIC_URL}/assets/crbubbles.png') "
+  />
   <div id="GetStarted" class="container mx-auto">
     <div class="flex flex-col lg:flex-row items-center">
       <div class="w-full" data-aos="fade-right">
@@ -22,17 +23,15 @@
               Champagne Room Show
             </span>
 
-            <h1
-              class="text-lg text-gray-300 font-normal leading-relaxed font-Roboto"
-            >
+            <h1 class="text-lg font-normal leading-relaxed font-Roboto">
               When you're ready to experience a live one-on-one show, simply ask
               your creator to provide you with a Champagne Room Show link.
             </h1>
             <ul
-              class="text-left text-gray-300 list-disc
+              class="text-left list-disc
           list-inside ml-10 mt-10 text-lg font-Roboto"
             >
-              <li>Click the unique URL to view show information</li>
+              <li>Click the unique Link to view show information</li>
               <li>
                 On the show page, see the price, timing, and creator reviews
               </li>

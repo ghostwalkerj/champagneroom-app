@@ -52,29 +52,29 @@
   dependencies:
     regenerator-runtime "^0.13.11"
 
-"@bull-board/api@5.7.0":
-  version "5.7.0"
-  resolved "https://registry.yarnpkg.com/@bull-board/api/-/api-5.7.0.tgz#4bdbf9e8c1688f88b4eafb8f7d221636b2773bd2"
-  integrity sha512-sDQqe4RjO8bsgtRizfK8Y74YHax4D1Yjbhqd9Wwj8fokdVh6SvtY+oKdfp0qGszX5B5gR+uPZFk3WsBhQKN1Vg==
+"@bull-board/api@5.7.1":
+  version "5.7.1"
+  resolved "https://registry.yarnpkg.com/@bull-board/api/-/api-5.7.1.tgz#a8afb6198eec7153f5f96250be1716693796e43c"
+  integrity sha512-OP89E4yWOo41CMt4PoDQ46yTq4aQhxwuenKB6uITmbXAkqnWWKtxmC1vcYoK0PHFLUbeban2lJYLhkEeLMBLJA==
   dependencies:
     redis-info "^3.0.8"
 
 "@bull-board/express@^5.6.1":
-  version "5.7.0"
-  resolved "https://registry.yarnpkg.com/@bull-board/express/-/express-5.7.0.tgz#3790d254814a328d522ff7917bf9dea374acab07"
-  integrity sha512-WdAPJKHNqI2LAMx6Tk67MtIfAVzkDW5uFEAN50frPL+r5rkiDmpooMsjvb/7p7UdgTt8qJDotCoFjeJ6DzkXQw==
+  version "5.7.1"
+  resolved "https://registry.yarnpkg.com/@bull-board/express/-/express-5.7.1.tgz#413e8742400ff4edb9fa8164ece9838eabb25426"
+  integrity sha512-8sWi9dTFF8SCoWvpnRkKYPIJiiOKGGy4PHdmnrID0H3KdU/Z0xziyk7EB9bx5J0aiVAL+SFvawWkJKjLxOzBeQ==
   dependencies:
-    "@bull-board/api" "5.7.0"
-    "@bull-board/ui" "5.7.0"
+    "@bull-board/api" "5.7.1"
+    "@bull-board/ui" "5.7.1"
     ejs "3.1.7"
     express "4.17.3"
 
-"@bull-board/ui@5.7.0":
-  version "5.7.0"
-  resolved "https://registry.yarnpkg.com/@bull-board/ui/-/ui-5.7.0.tgz#51a04c9632b900808635efaffaefae4f57e9a72b"
-  integrity sha512-0ph/BIX29zcxjT5qk55DrG1KmWfZQX7b2nAaLOPX872gXgPZyvV8fawM52o0nRaTEnmGdmAi9FiR0FwISEZtWg==
+"@bull-board/ui@5.7.1":
+  version "5.7.1"
+  resolved "https://registry.yarnpkg.com/@bull-board/ui/-/ui-5.7.1.tgz#ee32719423cbc219ebbf69d74582b4993519adc8"
+  integrity sha512-J3hV10kY0GdqadoVB2I1hgyLcLX0N4AyU96hxb9Q9c/wSKVt5N8GAij5PLiQs2UE53eMrj1s/6m7qRSgw8EALA==
   dependencies:
-    "@bull-board/api" "5.7.0"
+    "@bull-board/api" "5.7.1"
 
 "@coinbase/wallet-sdk@^3.7.1":
   version "3.7.1"
@@ -2872,9 +2872,9 @@ chalk@^4.0.0, chalk@^4.0.2:
     supports-color "^7.1.0"
 
 chart.js@^4.3.0:
-  version "4.3.1"
-  resolved "https://registry.yarnpkg.com/chart.js/-/chart.js-4.3.1.tgz#b83ea014ff9f45e43bfd98ef2bdaba2a9aed8a16"
-  integrity sha512-QHuISG3hTJ0ftq0I0f5jqH9mNVO9bqG8P+zvMOVslgKajQVvFEX7QAhYNJ+QEmw+uYTwo8XpTimaB82oeTWjxw==
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/chart.js/-/chart.js-4.3.2.tgz#904ebe0376eb368a659a92d2050df47336847e4c"
+  integrity sha512-pvQNyFOY1QmbmIr8oDORL16/FFivfxj8V26VFpFilMo4cNvkV5WXLJetDio365pd9gKUHGdirUTbqJfw8tr+Dg==
   dependencies:
     "@kurkle/color" "^0.3.0"
 
@@ -3162,9 +3162,9 @@ d@1, d@^1.0.1:
     type "^1.0.1"
 
 daisyui@^3.1.5:
-  version "3.4.0"
-  resolved "https://registry.yarnpkg.com/daisyui/-/daisyui-3.4.0.tgz#c178c1985f0692988cda0eb40bdef42395e580ac"
-  integrity sha512-s9EvNxnw/ubCIopKul+3ddASzZG+jMOmZgLJ0BFOVnxFQy6HJ5+EbMx5yY7Ef0cA6qjeUMl88SwhE94WLSLtHQ==
+  version "3.5.0"
+  resolved "https://registry.yarnpkg.com/daisyui/-/daisyui-3.5.0.tgz#eec347c9f18f76daa932000624eb0e4bf71e64e0"
+  integrity sha512-wSaeXwaYdMv4yURv9wj7kKQQN9Jyumfh/skIpZfCNkCb2jLf/so+iNKSM8l4rDN0TRvB5OccMlAvsf2UAtk2gg==
   dependencies:
     colord "^2.9"
     css-selector-tokenizer "^0.8"
@@ -3535,9 +3535,9 @@ escape-string-regexp@^4.0.0:
   integrity sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA==
 
 eslint-config-prettier@^8.8.0:
-  version "8.8.0"
-  resolved "https://registry.yarnpkg.com/eslint-config-prettier/-/eslint-config-prettier-8.8.0.tgz#bfda738d412adc917fd7b038857110efe98c9348"
-  integrity sha512-wLbQiFre3tdGgpDv67NQKnJuTlcUVYHas3k+DZCc2U2BadthoEY4B7hLPvAxaqdyOGCzuLfii2fqGph10va7oA==
+  version "8.9.0"
+  resolved "https://registry.yarnpkg.com/eslint-config-prettier/-/eslint-config-prettier-8.9.0.tgz#094b6254b2804b0544f7cee535f802b6d29ee10b"
+  integrity sha512-+sbni7NfVXnOpnRadUA8S28AUlsZt9GjgFvABIRL9Hkn8KqNzOp+7Lw4QWtrwn20KzU3wqu1QoOj2m+7rKRqkA==
 
 eslint-plugin-prettier@^4.2.1:
   version "4.2.1"
@@ -7899,9 +7899,9 @@ xhr2-cookies@1.1.0:
     cookiejar "^2.1.1"
 
 xstate@^4.37.2:
-  version "4.38.1"
-  resolved "https://registry.yarnpkg.com/xstate/-/xstate-4.38.1.tgz#9be54c2dfc44d1d566c697393921edaf6d3c9998"
-  integrity sha512-1gBUcFWBj/rv/pRcP2Bedl5sNRGX2d36CaOx9z7fE9uSiHaOEHIWzLg1B853q2xdUHUA9pEiWKjLZ3can4SJaQ==
+  version "4.38.2"
+  resolved "https://registry.yarnpkg.com/xstate/-/xstate-4.38.2.tgz#1b74544fc9c8c6c713ba77f81c6017e65aa89804"
+  integrity sha512-Fba/DwEPDLneHT3tbJ9F3zafbQXszOlyCJyQqqdzmtlY/cwE2th462KK48yaANf98jHlP6lJvxfNtN0LFKXPQg==
 
 xtend@^4.0.0, xtend@^4.0.1:
   version "4.0.2"

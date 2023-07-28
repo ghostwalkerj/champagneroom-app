@@ -22,9 +22,9 @@
 
 <div id="SignUp" class="container mx-auto px-4 sm:px-20">
   <div class="container mx-auto">
-    <div class="mt-20">
+    <div class="mt-40">
       <h2 class="font-bold text-primary text-[41px] text-center font-Roboto">
-        Express Your Interest
+        Sign up to Join Us
       </h2>
       <div class="flex flex-col lg:flex-row mt-10">
         <div
@@ -39,7 +39,7 @@
         </div>
         <div class="w-full flex flex-col place-content-center">
           <div
-            class="text-info font-Roboto text-2xl font-bold capitalize m-5 tracking-wider text-center"
+            class="text-info font-Roboto text-4xl font-bold capitalize m-5 tracking-wider text-center"
           >
             Thank you for your interest in Champagne Room!
           </div>

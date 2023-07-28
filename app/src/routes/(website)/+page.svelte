@@ -20,7 +20,7 @@
         A New Way to Discretely View NSFW Creators Live
       </h2>
       <ul
-        class=" text-[#d0dce8de] text-[25px] font-medium text-lg list-disc list-inside font-Roboto"
+        class="  text-[25px] font-medium text-lg list-disc list-inside font-Roboto"
       >
         <li class="mt-2">Watch Completely Anonymous</li>
         <li class="mt-2">No Downloads, No Signup, No Personal Information</li>
