@@ -28,7 +28,7 @@
   }
 </script>
 
-<div class="bg-gradient-to-r from-[#0C082E] to-[#0C092E]">
+<div class="bg-gradient-to-r from-[#0C082E] to-[#0C092E] font-Roboto">
   <div class="navbar">
     <div class="flex w-screen">
       <div class="w-0 md:w-1/3 flex md:ml-20">

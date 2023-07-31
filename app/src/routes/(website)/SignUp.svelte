@@ -23,7 +23,7 @@
 <div id="SignUp" class="container mx-auto px-4 sm:px-20">
   <div class="container mx-auto">
     <div class="mt-40">
-      <h2 class="font-bold text-primary text-[41px] text-center font-Roboto">
+      <h2 class="font-bold text-primary text-[41px] text-center">
         Sign up to Join Us
       </h2>
       <div class="flex flex-col lg:flex-row mt-10">
@@ -39,7 +39,7 @@
         </div>
         <div class="w-full flex flex-col place-content-center">
           <div
-            class="text-info font-Roboto text-4xl font-bold capitalize m-5 tracking-wider text-center"
+            class="text-info text-4xl font-bold capitalize m-5 tracking-wider text-center"
           >
             Thank you for your interest in Champagne Room!
           </div>
@@ -58,7 +58,7 @@
                 class="flex flex-col gap-4 h-full place-content-center z-10"
               >
                 <select
-                  class="select font-SpaceGrotesk select-primary w-full max-w-xs bg-transparent"
+                  class="select select-primary w-full max-w-xs bg-transparent"
                   name="interest"
                 >
                   <option disabled selected>I am interested in</option>
@@ -77,14 +77,13 @@
                   type="text"
                   placeholder="Email"
                   name="email"
-                  class="input font-SpaceGrotesk input-bordered input-primary w-[300px] bg-transparent"
+                  class="input input-bordered input-primary w-[300px] bg-transparent"
                 />
                 {#if form?.badEmail}<div class="shadow-lg alert alert-error">
                     Email is Required
                   </div>{/if}
                 <div class="w-full text-center">
-                  <button
-                    class="btn btn-outline btn-primary w-32 font-SpaceGrotesk"
+                  <button class="btn btn-outline btn-primary w-32"
                     >Submit</button
                   >
                 </div>

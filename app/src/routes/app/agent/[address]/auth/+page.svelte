@@ -57,7 +57,7 @@
   });
 </script>
 
-<div class="min-h-screen-md bg-base-100 hero">
+<div class="min-h-screen-md bg-base hero">
   <div class="text-center hero-content">
     <div class="max-w-md">
       <h1 class="font-bold text-5xl">Welcome to Champagne Room</h1>

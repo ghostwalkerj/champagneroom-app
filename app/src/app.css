@@ -1,3 +1,18 @@
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
+
+@layer components {
+  .btn {
+    font-family: 'Space Grotesk';
+  }
+  .select {
+    font-family: 'Space Grotesk';
+  }
+  .input {
+    font-family: 'Space Grotesk';
+  }
+  .tab {
+    font-family: 'Space Grotesk';
+  }
+}

@@ -5,7 +5,7 @@
 </script>
 
 <div>
-  <div class="container mx-auto font-Roboto">
+  <div class="container mx-auto">
     <footer class="w-full py-4 flex-shrink-0 mt-20" data-aos="fade-In">
       <div class="w-full flex flex-col lg:flex-row py-4">
         <div
@@ -42,7 +42,7 @@
           </div>
           <div class="">
             <h5 class="text-info sm:mb-3">Learn</h5>
-            <ul class="list-unstyled font-Roboto">
+            <ul class="list-unstyled">
               <li class="spa">
                 <a
                   href="{PUBLIC_STATIC_URL}/assets/champagne-room-white-paper.pdf"
@@ -54,7 +54,7 @@
         </div>
         <div class="p-4 mr-10 flex justify-center">
           <a
-            class="font-SpaceGrotesk btn mt-2 ml-6 btn-outline btn-primary whitespace-nowrap shadow-[0px_0px_17px_6px_#e779c1]"
+            class=" btn mt-2 ml-6 btn-outline btn-primary whitespace-nowrap shadow-[0px_0px_17px_6px_#e779c1]"
             href="/app"
           >
             Open App

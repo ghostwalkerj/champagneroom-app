@@ -16,33 +16,27 @@
     <div class="navbar-center py-2 lg:flex w-full justify-end">
       <ul class="menu menu-horizontal px-4 mt-2 mr-10 min-w-full justify-end">
         <li>
-          <a
-            class="btn btn-outline btn-secondary font-SpaceGrotesk mt-2 pt-4 ml-3"
-            href="#About"
-          >
+          <a class="btn btn-outline btn-secondary mt-2 pt-4 ml-3" href="#About">
             About
           </a>
         </li>
         <li>
           <a
-            class="btn btn-outline btn-secondary font-SpaceGrotesk mt-2 pt-4 ml-3"
+            class="btn btn-outline btn-secondary mt-2 pt-4 ml-3"
             href="#GetStarted"
           >
             Get Started
           </a>
         </li>
         <li>
-          <a
-            class="btn btn-outline btn-secondary font-SpaceGrotesk mt-2 pt-4 ml-3"
-            href="#FAQ"
-          >
+          <a class="btn btn-outline btn-secondary mt-2 pt-4 ml-3" href="#FAQ">
             FAQ
           </a>
         </li>
 
         <li>
           <a
-            class="btn btn-outline btn-secondary font-SpaceGrotesk mt-2 pt-4 ml-3"
+            class="btn btn-outline btn-secondary mt-2 pt-4 ml-3"
             href="#SignUp"
           >
             Sign Up
@@ -50,7 +44,7 @@
         </li>
 
         <a
-          class="font-SpaceGrotesk flex items-center btn mt-2 ml-6 btn-outline btn-primary whitespace-nowrap shadow-[0px_0px_17px_6px_#e779c1]"
+          class=" flex items-center btn mt-2 ml-6 btn-outline btn-primary whitespace-nowrap shadow-[0px_0px_17px_6px_#e779c1]"
           href="/app"
         >
           Open App

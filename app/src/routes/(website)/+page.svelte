@@ -15,13 +15,11 @@
   <div class="flex flex-col lg:flex-row items-center">
     <div class="w-full p-10">
       <h2
-        class="text-info text-center font-medium leading-none text-[41px] lg:text-left mb-6 font-Roboto"
+        class="text-info text-center font-medium leading-none text-[41px] lg:text-left mb-6"
       >
         A New Way to Discretely View NSFW Creators Live
       </h2>
-      <ul
-        class="  text-[25px] font-medium text-lg list-disc list-inside font-Roboto"
-      >
+      <ul class="  text-[25px] font-medium text-lg list-disc list-inside">
         <li class="mt-2">Watch Completely Anonymous</li>
         <li class="mt-2">No Downloads, No Signup, No Personal Information</li>
         <li class="mt-2">Protected by a Full Escrow Service</li>
@@ -33,7 +31,7 @@
         <div>
           <a
             href="#FAQ"
-            class=" md:w-auto btn btn-primary transition-all duration-300 ease-in-out font-SpaceGrotesk"
+            class=" md:w-auto btn btn-primary transition-all duration-300 ease-in-out"
           >
             Read the FAQ
           </a>
@@ -41,7 +39,7 @@
         <div>
           <a
             href="{PUBLIC_STATIC_URL}/assets/champagne-room-white-paper.pdf"
-            class=" md:w-auto btn btn-secondary transition-all duration-300 ease-in-out m-0 font-SpaceGrotesk"
+            class=" md:w-auto btn btn-secondary transition-all duration-300 ease-in-out m-0"
             target="_blank"
           >
             Checkout the White Paper

@@ -11,25 +11,23 @@
     <div class="flex flex-col lg:flex-row items-center">
       <div class="w-full" data-aos="fade-right">
         <span
-          class="text-info font-Roboto text-lg font-normal capitalize tracking-wider text-center flex"
+          class="text-info text-lg font-normal capitalize tracking-wider text-center flex"
         >
           Easy, Safe, Private
         </span>
         <div class="flex flex-col lg:flex-row place-content-between">
           <div class="pb-6">
-            <span
-              class="font-Roboto font-bold text-info text-[41px] text-center"
-            >
+            <span class=" font-bold text-info text-[41px] text-center">
               Champagne Room Show
             </span>
 
-            <h1 class="text-lg font-normal leading-relaxed font-Roboto">
+            <h1 class="text-lg font-normal leading-relaxed">
               When you're ready to experience a live one-on-one show, simply ask
               your creator to provide you with a Champagne Room Show link.
             </h1>
             <ul
               class="text-left list-disc
-          list-inside ml-10 mt-10 text-lg font-Roboto"
+          list-inside ml-10 mt-10 text-lg"
             >
               <li>Click the unique Link to view show information</li>
               <li>

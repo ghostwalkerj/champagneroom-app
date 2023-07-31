@@ -5,7 +5,7 @@
 <div id="About" data-aos="fade-right">
   <div class="container mx-auto">
     <div class="mt-40">
-      <h2 class="text-primary font-bold text-[41px] text-center font-Roboto">
+      <h2 class="text-primary font-bold text-[41px] text-center">
         The Champagne Room
       </h2>
       <div
@@ -23,54 +23,40 @@
         </div>
         <div class="w-full m-auto">
           <span
-            class="text-info font-Roboto text-lg font-normal capitalize ml-5 tracking-wider text-center flex"
+            class="text-info text-lg font-normal capitalize ml-5 tracking-wider text-center flex"
           >
             ABOUT
           </span>
-          <p
-            class="leading-10 font-Roboto text-lg font-normal mt-5 mr-0 ml-5 sm:mr-20"
-          >
+          <p class="leading-10 text-lg font-normal mt-5 mr-0 ml-5 sm:mr-20">
             Welcome to Champagne Room, the cutting-edge web 3.0 platform
             revolutionizing NSFW experiences. Our platform enables fans to
             engage in secure, one-on-one calls with their favorite creators,
             scheduled conveniently to their preference.
           </p>
-          <p
-            class=" leading-10 font-Roboto text-lg font-normal mt-5 mr-0 ml-5 sm:mr-20"
-          >
+          <p class=" leading-10 text-lg font-normal mt-5 mr-0 ml-5 sm:mr-20">
             By settling transactions in cryptocurrency, Champagne Room ensures a
             level of privacy and security that both parties can rely on.
           </p>
-          <p
-            class="leading-10 font-Roboto text-lg font-normal mt-5 mr-0 ml-5 sm:mr-20"
-          >
+          <p class="leading-10 text-lg font-normal mt-5 mr-0 ml-5 sm:mr-20">
             Experience a whole new level of NSFW entertainment on Champagne
             Room. Our platform offers a range of features including creator
             NFTs, exclusive content sharing, and immersive calls for the most
             devoted fans.
           </p>
-          <p
-            class="leading-10 font-Roboto text-lg font-normal mt-5 mr-0 ml-5 sm:mr-20"
-          >
+          <p class="leading-10 text-lg font-normal mt-5 mr-0 ml-5 sm:mr-20">
             Through crypto subscriptions, dedicated followers gain access to
             unique and intimate experiences, further enhancing their connection
             with their preferred creators.
           </p>
-          <p
-            class="leading-10 font-Roboto text-lg font-normal mt-5 mr-0 ml-5 sm:mr-20"
-          >
+          <p class="leading-10 text-lg font-normal mt-5 mr-0 ml-5 sm:mr-20">
             Discover the future of NSFW interaction with Champagne Room.
           </p>
-          <p
-            class=" leading-10 text-lg font-normal font-Roboto mt-5 mr-0 ml-5 sm:mr-20"
-          >
+          <p class=" leading-10 text-lg font-normal mt-5 mr-0 ml-5 sm:mr-20">
             Our platform combines cutting-edge technology, secure crypto
             transactions, and a seamless user experience to redefine the way
             fans connect with their favorite creators.
           </p>
-          <p
-            class=" leading-10 text-lg font-normal mt-5 mr-0 ml-5 sm:mr-20 font-Roboto"
-          >
+          <p class=" leading-10 text-lg font-normal mt-5 mr-0 ml-5 sm:mr-20">
             Join us on this exciting journey as we reshape the landscape of
             adult entertainment, providing a safe and private space for genuine
             connections to thrive.
@@ -80,9 +66,7 @@
 
       <div class="mt-5 lg:mt-10">
         <div class="p-6 sm:pad">
-          <h2
-            class=" text-[41px] font-bold mx-0 lg:mx-10 text-primary font-Roboto"
-          >
+          <h2 class=" text-[41px] font-bold mx-0 lg:mx-10 text-primary">
             We have specifically built Champagne Room with a focus on anonymity,
             safety, and privacy for both our users and creators.
           </h2>

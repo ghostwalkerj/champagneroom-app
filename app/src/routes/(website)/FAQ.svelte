@@ -28,20 +28,18 @@
       </div>
     </div>
   </div>
-  <h2 class="font-bold text-primary text-[41px] text-center mt-36 font-Roboto">
-    FAQ
-  </h2>
+  <h2 class="font-bold text-primary text-[41px] text-center mt-36">FAQ</h2>
 
   <div class="block sm:flex sm:flex-row mt-10 gap-10 mx-10">
     <div class="w-full sm:w-1/2">
       <div class="collapse collapse-arrow">
         <input type="radio" name="faq-accordion" />
-        <div class="collapse-title text-xl font-medium font-Roboto">
+        <div class="collapse-title text-xl font-medium">
           What is Champagne Room?
         </div>
         <div class="collapse-content text-info">
           <div class="flex flex-col gap-2">
-            <div class="font-Roboto">
+            <div class="">
               Champagne Room is a platform that provides a private and secure
               space where anyone can pay for a live, one-on-one video show with
               a performer of their choice. Just like a real Champagne Room,
@@ -55,11 +53,9 @@
       </div>
       <div class="collapse collapse-arrow">
         <input type="radio" name="faq-accordion" />
-        <div class="collapse-title text-xl font-medium font-Roboto">
-          How does it work?
-        </div>
+        <div class="collapse-title text-xl font-medium">How does it work?</div>
         <div class="collapse-content text-info">
-          <ol class="list-decimal ml-4 font-Roboto">
+          <ol class="list-decimal ml-4">
             <li>
               Once you and the creator agree to a video performance, the creator
               will generate a unique, one-time link that will be shared with
@@ -92,16 +88,16 @@
       </div>
       <div class="collapse collapse-arrow">
         <input type="radio" name="faq-accordion" />
-        <div class="collapse-title text-xl font-medium font-Roboto">
+        <div class="collapse-title text-xl font-medium">
           How are my transactions protected?
         </div>
-        <div class="collapse-content text-info font-Roboto">
+        <div class="collapse-content text-info">
           <div>
             When you make a payment, it does not go directly to the creator;
             instead, it is held in escrow. The escrow is only released after the
             show ends and you have the chance to provide feedback.
           </div>
-          <ul class="list-disc ml-4 font-Roboto">
+          <ul class="list-disc ml-4">
             <li>If the creator cancels the show, you will receive a refund.</li>
             <li>
               If the creator fails to start the show, you will receive a refund.
@@ -117,10 +113,8 @@
     <div class="w-full sm:w-1/2">
       <div class="collapse collapse-arrow">
         <input type="radio" name="faq-accordion" />
-        <div class="collapse-title text-xl font-medium font-Roboto">
-          Is it anonymous?
-        </div>
-        <div class="collapse-content text-info font-Roboto">
+        <div class="collapse-title text-xl font-medium">Is it anonymous?</div>
+        <div class="collapse-content text-info">
           <div>
             We do not collect any data from our users, including email addresses
             or credit card information. When purchasing a ticket, you can enter
@@ -137,11 +131,11 @@
       </div>
       <div class="collapse collapse-arrow">
         <input type="radio" name="faq-accordion" />
-        <div class="collapse-title text-xl font-medium font-Roboto">
+        <div class="collapse-title text-xl font-medium">
           How is it different from other platforms like Only Fans?
         </div>
         <div class="collapse-content text-info">
-          <ul class="list-disc ml-4 font-Roboto">
+          <ul class="list-disc ml-4">
             <li>
               Firstly, unlike OnlyFans, we do not use credit cards; we use
               cryptocurrency for transactions. This means that credit card
@@ -161,11 +155,11 @@
       </div>
       <div class="collapse collapse-arrow">
         <input type="radio" name="faq-accordion" />
-        <div class="collapse-title text-xl font-medium font-Roboto">
+        <div class="collapse-title text-xl font-medium">
           What is the road map and future of Champagne Room?
         </div>
         <div class="collapse-content text-info">
-          <ul class="list-disc ml-4 font-Roboto">
+          <ul class="list-disc ml-4">
             <li>
               As we receive feedback from our users, we will enhance Champagne
               Room's features.

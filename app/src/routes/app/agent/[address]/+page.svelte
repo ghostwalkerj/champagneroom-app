@@ -161,7 +161,7 @@
           </div>
           <div class="divider" />
           <!-- Tabs -->
-          <div class="tabs tabs-boxed">
+          <div class="tabs tabs-boxed w-fit">
             <!-- svelte-ignore a11y-missing-attribute -->
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <a
@@ -189,7 +189,7 @@
           <div class="relative">
             {#if activeTab === 'Creators'}
               <div
-                class="mt-4 bg-neutral w-full rounded-lg z-0 overflow-hidden border-2 border-secondary"
+                class="mt-4 bg-base w-full rounded-lg z-0 overflow-hidden border-2 border-secondary"
               >
                 <div class="overflow-x-auto">
                   {#key creators}
