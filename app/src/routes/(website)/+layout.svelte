@@ -3,7 +3,7 @@
   import Navbar from './Navbar.svelte';
 </script>
 
-<div class="bg-gradient-to-r from-indigo-900 to-[#000000]">
+<div class="bg-gradient-to-r from-[#0C082E] to-[#0C092E]">
   <Navbar />
   <slot />
   <Footer />
