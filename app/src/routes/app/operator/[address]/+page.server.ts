@@ -3,13 +3,19 @@ import { fail, redirect } from '@sveltejs/kit';
 import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 import jwt from 'jsonwebtoken';
+import { nanoid } from 'nanoid';
+import { uniqueNamesGenerator } from 'unique-names-generator';
 import urlJoin from 'url-join';
 
 import { JWT_PRIVATE_KEY } from '$env/static/private';
-import { PUBLIC_OPERATOR_PATH } from '$env/static/public';
+import {
+  PUBLIC_DEFAULT_PROFILE_IMAGE,
+  PUBLIC_OPERATOR_PATH
+} from '$env/static/public';
 
 import { Agent } from '$lib/models/agent';
 import type { DisputeDecision } from '$lib/models/common';
+import { Creator } from '$lib/models/creator';
 import { Operator } from '$lib/models/operator';
 import { Show, type ShowType } from '$lib/models/show';
 import { Ticket, TicketStatus } from '$lib/models/ticket';
@@ -19,6 +25,7 @@ import { ShowMachineEventString } from '$lib/machines/showMachine';
 import type { ShowQueueType } from '$lib/workers/showWorker';
 
 import { EntityType } from '$lib/constants';
+import { womensNames } from '$lib/util/womensNames';
 
 import type { PageServerLoad } from './$types';
 
@@ -32,12 +39,12 @@ export const actions: Actions = {
     address = address?.trim();
 
     if (name === null || name.length <= 3) {
-      return fail(400, { name, badName: true });
+      return fail(400, { name, badAgentName: true });
     }
 
     if (address === null) {
       console.log('bad address', address);
-      return fail(400, { address, badAddress: true });
+      return fail(400, { address, badAgentAddress: true });
     }
 
     try {
@@ -47,12 +54,93 @@ export const actions: Actions = {
       });
 
       return {
-        agent: agent?.toObject({ flattenObjectIds: true })
+        agent: agent?.toObject({ flattenObjectIds: true }),
+        success: true,
+        agentCreated: true
       };
     } catch (error_) {
       console.log('err', error_);
-      return fail(400, { address, badAddress: true });
+      return fail(400, { address, badAgentAddress: true });
     }
+  },
+  create_creator: async ({ request }) => {
+    const data = await request.formData();
+    const agentId = data.get('agentId') as string;
+    let name = data.get('name') as string;
+    const commission = data.get('commission') as string;
+
+    // Validation
+    if (agentId === null) {
+      return fail(400, { agentId, missingAgentId: true });
+    }
+    if (!name || name.length < 3 || name.length > 50) {
+      name = uniqueNamesGenerator({
+        dictionaries: [womensNames]
+      });
+    }
+    if (Number.isNaN(+commission) || +commission < 0 || +commission > 100) {
+      return fail(400, { commission, badCommission: true });
+    }
+
+    try {
+      const creator = await Creator.create({
+        user: {
+          name,
+          auth: false,
+          address: nanoid(30)
+        },
+        agentCommission: +commission,
+        agent: agentId,
+        profileImageUrl: PUBLIC_DEFAULT_PROFILE_IMAGE
+      });
+      return {
+        success: true,
+        creatorCreated: true,
+        creator: creator?.toObject({ flattenObjectIds: true })
+      };
+    } catch (error) {
+      return fail(400, { err: error });
+    }
+  },
+  update_creator: async ({ request }) => {
+    const data = await request.formData();
+    const creatorId = data.get('creatorId') as string;
+    const name = data.get('name') as string;
+    const commission = data.get('commission') as string;
+    const active = data.get('active') as string;
+    const agentId = data.get('agentId') as string;
+
+    // Validation
+    if (creatorId === null) {
+      return fail(400, { creatorId, missingCreatorId: true });
+    }
+    if (Number.isNaN(+commission) || +commission < 0 || +commission > 100) {
+      return fail(400, { commission, badCommission: true });
+    }
+
+    if (active !== 'true' && active !== 'false') {
+      return fail(400, { active, badActive: true });
+    }
+
+    try {
+      await Creator.findOneAndUpdate(
+        {
+          _id: creatorId
+        },
+        {
+          'user.name': name,
+          agentCommission: +commission,
+          'user.active': active === 'true',
+          agent: agentId
+        }
+      );
+    } catch (error) {
+      return fail(400, { err: error });
+    }
+
+    return {
+      success: true
+    };
   },
   decide_dispute: async ({ request, locals }: RequestEvent) => {
     const data = await request.formData();
@@ -120,6 +208,7 @@ export const load: PageServerLoad = async ({ params, url, cookies }) => {
   //   });
   // }
   const agents = await Agent.find().sort({ 'user.name': 1 });
+  const creators = await Creator.find().sort({ 'user.name': 1 });
 
   Show.init();
 
@@ -130,6 +219,9 @@ export const load: PageServerLoad = async ({ params, url, cookies }) => {
   return {
     operator: operator.toObject({ flattenObjectIds: true }),
     agents: agents.map((agent) => agent.toObject({ flattenObjectIds: true })),
+    creators: creators.map((creator) =>
+      creator.toObject({ flattenObjectIds: true })
+    ),
     disputedTickets: disputedTickets.map((ticket) =>
       ticket.toObject({ flattenObjectIds: true })
     )

@@ -1,33 +1,29 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import type { UserConfig } from 'vite';
 import EnvironmentPlugin from 'vite-plugin-environment';
-import nodePolyfills from 'rollup-plugin-polyfill-node';
-import inject from '@rollup/plugin-inject'
+import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
 const MODE = process.env.NODE_ENV;
-const development = MODE === 'development';
 const config: UserConfig = {
   mode: 'development',
   plugins: [
     sveltekit(),
-    development &&
+    EnvironmentPlugin(['MONGO_DB_FIELD_SECRET']),
     nodePolyfills({
-      include: ['node_modules/**/*.js', new RegExp('node_modules/.vite/.*js'), 'http', 'crypto']
-    }), EnvironmentPlugin(['MONGO_DB_FIELD_SECRET']),
+      protocolImports: true,
+    }),
 
   ],
   resolve: {
     alias: {
-      crypto: 'crypto-browserify',
-      stream: 'stream-browserify',
-      assert: 'assert'
+  
     }
   },
   build: {
     chunkSizeWarningLimit: 16000,
     rollupOptions: {
       external: ['@web3-onboard/*'],
-      plugins: [nodePolyfills({ include: ['crypto', 'http'] }), inject({ Buffer: ['Buffer', 'Buffer'] })]
+ 
     },
     commonjsOptions: {
       transformMixedEsModules: true

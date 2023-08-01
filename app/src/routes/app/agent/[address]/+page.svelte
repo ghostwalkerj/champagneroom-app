@@ -129,7 +129,7 @@
 </script>
 
 {#if agent}
-  <!-- Modal for Restarting or Ending Show -->
+  <!-- Modal for Changing Creator URL -->
   {#if isChangeUrl}
     <input type="checkbox" id="changeUrl-show-modal" class="modal-toggle" />
     <div class="modal modal-open">
@@ -156,7 +156,7 @@
         <div
           class="bg-base border-2 border-secondary rounded-lg mx-auto py-4 px-4 sm:px-6 lg:px-8"
         >
-          <div class="font-semibold text-secondary text-lg leading-6">
+          <div class="font-semibold text-primary text-lg leading-6">
             Agent Dashboard
           </div>
           <div class="divider" />

@@ -9,7 +9,6 @@ import {
   REDIS_PORT,
   REDIS_USERNAME
 } from '$env/static/private';
-process.setMaxListeners(0);
 
 await mongoose.connect(MONGO_DB_ENDPOINT);
 const redisConnection = new IORedis({
