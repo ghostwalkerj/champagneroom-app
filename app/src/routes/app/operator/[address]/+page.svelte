@@ -47,6 +47,7 @@
 
   let agentNameElement: HTMLTableCellElement;
   let agentAddressElement: HTMLTableCellElement;
+  let creatorAgentElement: HTMLSelectElement;
   let agentName =
     'Agent ' +
     uniqueNamesGenerator({
@@ -125,7 +126,7 @@
       'active',
       active ? active.toString() : creator.user.active.toString()
     );
-    formData.append('agent', agentId || creator.agent.toString());
+    formData.append('agentId', agentId || creator.agent.toString());
 
     await fetch('?/update_creator', {
       method: 'POST',
@@ -165,6 +166,7 @@
     return async ({ result }) => {
       if (result?.type === 'success') {
         canAddAgent = false;
+        canAddCreator = false;
         await invalidateAll();
         if (result.data.agentCreated) {
           agentName =
@@ -192,6 +194,9 @@
         }
         if (result.data.badCommission) {
           creatorCommissionElement.focus();
+        }
+        if (result.data.missingAgentId) {
+          creatorAgentElement.focus();
         }
       }
     };
@@ -510,7 +515,11 @@
                               <select
                                 class="select select-bordered select-xs max-w-xs"
                                 bind:value={selectedAgentId}
+                                bind:this={creatorAgentElement}
                               >
+                                <option disabled value="0" selected
+                                  >Select Agent</option
+                                >
                                 {#each agents as agent}
                                   <option value={agent._id.toString()}
                                     >{agent.user.name}</option
@@ -553,7 +562,7 @@
                                   >{agentName}</option
                                 >
                                 {#each agents as agent}
-                                  {#if agent._id !== agentId}
+                                  {#if agent._id.toString() !== agentId.toString()}
                                     <option value={agent._id.toString()}
                                       >{agent.user.name}</option
                                     >

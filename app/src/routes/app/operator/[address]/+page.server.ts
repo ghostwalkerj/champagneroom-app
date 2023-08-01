@@ -3,6 +3,7 @@ import { fail, redirect } from '@sveltejs/kit';
 import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 import jwt from 'jsonwebtoken';
+import { ObjectId } from 'mongodb';
 import { nanoid } from 'nanoid';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 import urlJoin from 'url-join';
@@ -70,7 +71,7 @@ export const actions: Actions = {
     const commission = data.get('commission') as string;
 
     // Validation
-    if (agentId === null) {
+    if (agentId === null || agentId === '0') {
       return fail(400, { agentId, missingAgentId: true });
     }
     if (!name || name.length < 3 || name.length > 50) {
@@ -90,7 +91,7 @@ export const actions: Actions = {
           address: nanoid(30)
         },
         agentCommission: +commission,
-        agent: agentId,
+        agent: new ObjectId(agentId),
         profileImageUrl: PUBLIC_DEFAULT_PROFILE_IMAGE
       });
       return {
@@ -131,7 +132,7 @@ export const actions: Actions = {
           'user.name': name,
           agentCommission: +commission,
           'user.active': active === 'true',
-          agent: agentId
+          agent: new ObjectId(agentId)
         }
       );
     } catch (error) {
