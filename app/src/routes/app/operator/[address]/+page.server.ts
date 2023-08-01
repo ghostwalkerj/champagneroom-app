@@ -143,6 +143,32 @@ export const actions: Actions = {
       success: true
     };
   },
+  change_creator_key: async ({ request }) => {
+    const data = await request.formData();
+    const creatorId = data.get('creatorId') as string;
+
+    // Validation
+    if (creatorId === null) {
+      return fail(400, { creatorId, missingCreatorId: true });
+    }
+
+    const address = nanoid(30);
+
+    try {
+      await Creator.findOneAndUpdate(
+        {
+          _id: creatorId
+        },
+        {
+          'user.address': address
+        }
+      );
+    } catch (error) {
+      return fail(400, { err: error });
+    }
+
+    return { success: true, address };
+  },
   decide_dispute: async ({ request, locals }: RequestEvent) => {
     const data = await request.formData();
     const ticketId = data.get('ticketId') as string;
