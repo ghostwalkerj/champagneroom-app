@@ -23,7 +23,7 @@ const config: UserConfig = {
     chunkSizeWarningLimit: 16000,
     rollupOptions: {
       external: ['@web3-onboard/*'],
- 
+      
     },
     commonjsOptions: {
       transformMixedEsModules: true
@@ -45,9 +45,8 @@ const config: UserConfig = {
     esbuildOptions: {
       // Node.js global to browser globalThis
       define: {
-        global: 'globalThis'
+        global: 'globalThis',
       },
-      
     }
 
   },

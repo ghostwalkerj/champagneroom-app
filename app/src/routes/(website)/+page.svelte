@@ -5,6 +5,7 @@
   import FAQ from './FAQ.svelte';
   import GetStarted from './GetStarted.svelte';
   import SignUp from './SignUp.svelte';
+  import Token from './Token.svelte';
 
   import type { ActionData } from './$types';
 
@@ -68,4 +69,5 @@
 <About />
 <GetStarted />
 <FAQ />
+<Token />
 <SignUp {form} />

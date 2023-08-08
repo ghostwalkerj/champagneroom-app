@@ -33,6 +33,11 @@
             FAQ
           </a>
         </li>
+        <li>
+          <a class="btn btn-outline btn-secondary mt-2 pt-4 ml-3" href="#token">
+            TOKEN
+          </a>
+        </li>
 
         <li>
           <a
