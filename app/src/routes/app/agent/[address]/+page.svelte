@@ -307,7 +307,7 @@
                                   PUBLIC_CREATOR_PATH,
                                   creator.user.address
                                 )}
-                                target="_blank"
+                                target="_creator"
                                 class="link link-primary">Creator Url</a
                               >
                             </td>

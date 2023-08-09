@@ -1,5 +1,5 @@
 import type { Actions } from '@sveltejs/kit';
-import { error } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import { recover } from 'web3-eth-accounts';
 
@@ -8,6 +8,7 @@ import {
   JWT_EXPIRY,
   JWT_PRIVATE_KEY
 } from '$env/static/private';
+import { PUBLIC_AUTH_PATH } from '$env/static/public';
 
 import { Agent } from '$lib/models/agent';
 import type { UserType } from '$lib/models/common';
@@ -43,6 +44,7 @@ export const actions: Actions = {
     const role = data.get('role') as string;
     const tokenName = data.get('tokenName') as string;
     const message = data.get('message') as string;
+    const returnPath = data.get('returnPath') as string;
 
     if (!address) {
       throw error(404, 'Bad address');
@@ -54,6 +56,18 @@ export const actions: Actions = {
 
     if (!role) {
       throw error(400, 'Missing Role');
+    }
+
+    if (!tokenName) {
+      throw error(400, 'Missing Token Name');
+    }
+
+    if (!message) {
+      throw error(400, 'Missing Message');
+    }
+
+    if (!returnPath) {
+      throw error(400, 'Missing Return Path');
     }
 
     // Verify Auth
@@ -106,14 +120,24 @@ export const actions: Actions = {
       sameSite: 'lax',
       maxAge: exp
     });
+    throw redirect(302, returnPath);
   },
   unique_key_auth: async ({ cookies, request }) => {
     const data = await request.formData();
     const address = data.get('address') as string;
     const tokenName = data.get('tokenName') as string;
+    const returnPath = data.get('returnPath') as string;
 
     if (!address) {
       throw error(404, 'Bad address');
+    }
+
+    if (!tokenName) {
+      throw error(400, 'Missing Token Name');
+    }
+
+    if (!returnPath) {
+      throw error(400, 'Missing Return Path');
     }
 
     const exp = Math.floor(Date.now() / 1000) + +JWT_EXPIRY;
@@ -132,6 +156,7 @@ export const actions: Actions = {
       sameSite: 'lax',
       maxAge: exp
     });
+    throw redirect(302, returnPath);
   }
 };
 
@@ -140,13 +165,13 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
   const tokenName = cookies.get('tokenName');
   const role = cookies.get('role');
 
+  cookies.delete('address', { path: PUBLIC_AUTH_PATH });
+  cookies.delete('tokenName', { path: PUBLIC_AUTH_PATH });
+  cookies.delete('role', { path: PUBLIC_AUTH_PATH });
+
   if (!address || !tokenName || !role) {
     throw error(400, 'Missing Cookie');
   }
-
-  cookies.delete('address', { path: url.pathname });
-  cookies.delete('tokenName', { path: url.pathname });
-  cookies.delete('role', { path: url.pathname });
 
   let user: UserType | undefined;
 

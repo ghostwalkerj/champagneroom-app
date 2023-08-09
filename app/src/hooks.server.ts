@@ -61,18 +61,18 @@ export const handle = (async ({ event, resolve }) => {
 
     if (!authToken) {
       needAuth(role, tokenName, address, cookies);
-      throw redirect(307, authUrl);
+      throw redirect(302, authUrl);
     }
 
     try {
       const decode = jwt.verify(authToken, JWT_PRIVATE_KEY) as JwtPayload;
       if (!decode.address || decode.address !== address) {
         needAuth(role, tokenName, address, cookies);
-        throw redirect(307, authUrl);
+        throw redirect(302, authUrl);
       }
     } catch {
       needAuth(role, tokenName, address, cookies);
-      throw redirect(307, authUrl);
+      throw redirect(302, authUrl);
     }
   }
 
@@ -89,4 +89,5 @@ export const needAuth = (
   cookies.set('role', role, { path: authUrl });
   cookies.set('tokenName', tokenName, { path: authUrl });
   cookies.set('address', address, { path: authUrl });
+  cookies.delete(tokenName, { path: '/' });
 };
