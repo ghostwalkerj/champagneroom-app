@@ -1,16 +1,15 @@
 import { fail, redirect } from '@sveltejs/kit';
-import jwt from 'jsonwebtoken';
 import { nanoid } from 'nanoid';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 import urlJoin from 'url-join';
 
-import { JWT_PRIVATE_KEY } from '$env/static/private';
 import {
   PUBLIC_AGENT_PATH,
   PUBLIC_DEFAULT_PROFILE_IMAGE
 } from '$env/static/public';
 
 import { Agent } from '$lib/models/agent';
+import { AuthType } from '$lib/models/common';
 import { Creator } from '$lib/models/creator';
 
 import { womensNames } from '$lib/util/womensNames';
@@ -41,7 +40,7 @@ export const actions: Actions = {
       Creator.create({
         user: {
           name,
-          auth: false,
+          authType: AuthType.UNIQUE_KEY,
           address: nanoid(30)
         },
         agentCommission: +commission,
@@ -128,19 +127,6 @@ export const load: PageServerLoad = async ({ params, url, cookies }) => {
 
   if (address === null) {
     throw redirect(307, agentUrl);
-  }
-
-  const authUrl = urlJoin(agentUrl, address, 'auth');
-
-  const authToken = cookies.get('agentAuthToken');
-  if (!authToken) {
-    throw redirect(307, authUrl);
-  }
-
-  try {
-    jwt.verify(authToken, JWT_PRIVATE_KEY);
-  } catch {
-    throw redirect(307, authUrl);
   }
 
   const agent = await Agent.findOne({ 'user.address': address })

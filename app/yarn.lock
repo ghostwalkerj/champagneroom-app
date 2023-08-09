@@ -52,29 +52,29 @@
   dependencies:
     regenerator-runtime "^0.13.11"
 
-"@bull-board/api@5.7.1":
-  version "5.7.1"
-  resolved "https://registry.yarnpkg.com/@bull-board/api/-/api-5.7.1.tgz#a8afb6198eec7153f5f96250be1716693796e43c"
-  integrity sha512-OP89E4yWOo41CMt4PoDQ46yTq4aQhxwuenKB6uITmbXAkqnWWKtxmC1vcYoK0PHFLUbeban2lJYLhkEeLMBLJA==
+"@bull-board/api@5.7.2":
+  version "5.7.2"
+  resolved "https://registry.yarnpkg.com/@bull-board/api/-/api-5.7.2.tgz#3222ebbbbb57658f2529300ba511de7fdb186088"
+  integrity sha512-sYAa2Cdjlh5Rz5VntMcdtZ3ng0CswUyxprBUx6VyLI7L1vreaguQYVVsDG1kWw7ylKwL3PcYYI0+xe2rCKsbSg==
   dependencies:
     redis-info "^3.0.8"
 
 "@bull-board/express@^5.6.1":
-  version "5.7.1"
-  resolved "https://registry.yarnpkg.com/@bull-board/express/-/express-5.7.1.tgz#413e8742400ff4edb9fa8164ece9838eabb25426"
-  integrity sha512-8sWi9dTFF8SCoWvpnRkKYPIJiiOKGGy4PHdmnrID0H3KdU/Z0xziyk7EB9bx5J0aiVAL+SFvawWkJKjLxOzBeQ==
+  version "5.7.2"
+  resolved "https://registry.yarnpkg.com/@bull-board/express/-/express-5.7.2.tgz#776a9599590665510652df624ea76bdd5c68033b"
+  integrity sha512-PBDcxeppFJIasBFPtf1+l8+h7mmqPfGnKZkMGU0sZoXlsPJZwv96XJTpuHPHk1GcmENhFVB9Wa4KK+WhrOfOqg==
   dependencies:
-    "@bull-board/api" "5.7.1"
-    "@bull-board/ui" "5.7.1"
+    "@bull-board/api" "5.7.2"
+    "@bull-board/ui" "5.7.2"
     ejs "3.1.7"
     express "4.17.3"
 
-"@bull-board/ui@5.7.1":
-  version "5.7.1"
-  resolved "https://registry.yarnpkg.com/@bull-board/ui/-/ui-5.7.1.tgz#ee32719423cbc219ebbf69d74582b4993519adc8"
-  integrity sha512-J3hV10kY0GdqadoVB2I1hgyLcLX0N4AyU96hxb9Q9c/wSKVt5N8GAij5PLiQs2UE53eMrj1s/6m7qRSgw8EALA==
+"@bull-board/ui@5.7.2":
+  version "5.7.2"
+  resolved "https://registry.yarnpkg.com/@bull-board/ui/-/ui-5.7.2.tgz#93a8d77099b185013770d64c1f4d96e8dd411761"
+  integrity sha512-ICHVkISEJq/hf6DcZOJaH9CsnVOcTOM7tzadZkFF1GdPLMJ/y4oZYnu1dQwsnTXWoy2O/EtKhYQJiZ+LVDB3Fw==
   dependencies:
-    "@bull-board/api" "5.7.1"
+    "@bull-board/api" "5.7.2"
 
 "@coinbase/wallet-sdk@^3.7.1":
   version "3.7.1"

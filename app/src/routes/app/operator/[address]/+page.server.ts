@@ -15,7 +15,7 @@ import {
 } from '$env/static/public';
 
 import { Agent } from '$lib/models/agent';
-import type { DisputeDecision } from '$lib/models/common';
+import { AuthType, type DisputeDecision } from '$lib/models/common';
 import { Creator } from '$lib/models/creator';
 import { Operator } from '$lib/models/operator';
 import { Show, type ShowType } from '$lib/models/show';
@@ -51,7 +51,8 @@ export const actions: Actions = {
     try {
       const agent = await Agent.create({
         'user.address': address.toLowerCase(),
-        'user.name': name
+        'user.name': name,
+        'user.authType': AuthType.SIGNING
       });
 
       return {
@@ -87,7 +88,7 @@ export const actions: Actions = {
       const creator = await Creator.create({
         user: {
           name,
-          auth: false,
+          authType: AuthType.UNIQUE_KEY,
           address: nanoid(30)
         },
         agentCommission: +commission,
@@ -206,18 +207,6 @@ export const load: PageServerLoad = async ({ params, url, cookies }) => {
 
   if (address === null) {
     throw redirect(307, operatorUrl);
-  }
-  const authUrl = urlJoin(operatorUrl, address, 'auth');
-
-  const authToken = cookies.get('operatorAuthToken');
-  if (!authToken) {
-    throw redirect(307, authUrl);
-  }
-
-  try {
-    jwt.verify(authToken, JWT_PRIVATE_KEY);
-  } catch {
-    throw redirect(307, authUrl);
   }
 
   const operator = await Operator.findOne({ 'user.address': address })

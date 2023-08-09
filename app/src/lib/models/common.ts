@@ -3,6 +3,13 @@ import validator from 'validator';
 
 import { ActorType } from '$lib/constants';
 
+export enum AuthType {
+  SIGNING = 'SIGNING',
+  UNIQUE_KEY = 'UNIQUE KEY',
+  PASSWORD = 'PASSWORD',
+  NONE = 'NONE'
+}
+
 export enum CancelReason {
   CREATOR_NO_SHOW = 'CREATOR NO SHOW',
   CUSTOMER_NO_SHOW = 'CUSTOMER NO SHOW',
@@ -130,10 +137,11 @@ export const userSchema = new Schema(
       trim: true
     },
 
-    auth: {
-      type: Boolean,
-      default: true,
-      index: true
+    authType: {
+      type: String,
+      enum: AuthType,
+      required: true,
+      default: AuthType.SIGNING
     },
 
     active: {
@@ -161,3 +169,4 @@ export type FeedbackType = InferSchemaType<typeof feedbackSchema>;
 export type FinalizeType = InferSchemaType<typeof finalizeSchema>;
 export type RefundType = InferSchemaType<typeof refundSchema>;
 export type SaleType = InferSchemaType<typeof saleSchema>;
+export type UserType = InferSchemaType<typeof userSchema>;

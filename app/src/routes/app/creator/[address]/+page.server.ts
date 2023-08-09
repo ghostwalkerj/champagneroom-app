@@ -20,9 +20,9 @@ import type { Actions, PageServerLoad, RequestEvent } from './$types';
 
 export const actions: Actions = {
   update_profile_image: async ({ params, request }: RequestEvent) => {
-    const key = params.key;
-    if (key === null) {
-      throw error(404, 'Key not found');
+    const address = params.address;
+    if (address === null) {
+      throw error(404, 'Address not found');
     }
     const data = await request.formData();
     const url = data.get('url') as string;
@@ -30,7 +30,7 @@ export const actions: Actions = {
       return fail(400, { url, missingUrl: true });
     }
     const creator = await Creator.findOneAndUpdate(
-      { 'user.address': key },
+      { 'user.address': address },
       { profileImageUrl: url }
     ).exec();
 
@@ -46,7 +46,7 @@ export const actions: Actions = {
     const duration = data.get('duration') as string;
     const capacity = data.get('capacity') as string;
     const coverImageUrl = data.get('coverImageUrl') as string;
-    const key = params.key;
+    const address = params.address;
 
     if (!name || name.length < 3 || name.length > 50) {
       return fail(400, { name, badName: true });
@@ -59,7 +59,7 @@ export const actions: Actions = {
       return fail(400, { price, invalidPrice: true });
     }
 
-    const creator = (await Creator.findOne({ 'user.address': key })
+    const creator = (await Creator.findOne({ 'user.address': address })
       .orFail(() => {
         throw error(404, 'Creator not found');
       })
@@ -94,11 +94,11 @@ export const actions: Actions = {
     };
   },
   cancel_show: async ({ request, params, locals }) => {
-    const key = params.key;
+    const address = params.address;
     const data = await request.formData();
     const showId = data.get('showId') as string;
-    if (key === null) {
-      throw error(404, 'Key not found');
+    if (address === null) {
+      throw error(404, 'Address not found');
     }
 
     if (showId === null) {
@@ -168,14 +168,14 @@ export const actions: Actions = {
   }
 };
 export const load: PageServerLoad = async ({ params }) => {
-  const key = params.key;
+  const address = params.address;
 
-  if (key === null) {
-    throw error(404, 'Key not found');
+  if (address === null) {
+    throw error(404, 'Address not found');
   }
 
   const creator = await Creator.findOne({
-    'user.address': key,
+    'user.address': address,
     'user.active': true
   })
     .orFail(() => {

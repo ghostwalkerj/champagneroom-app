@@ -12,7 +12,10 @@ export enum EntityType {
   CREATOR = 'CREATOR',
   SHOW = 'SHOW',
   TICKET = 'TICKET',
-  USER = 'USER'
+  USER = 'USER',
+  OPERATOR = 'OPERATOR',
+  OTHER = 'OTHER',
+  NONE = 'NONE'
 }
 
 /* eslint-disable @typescript-eslint/naming-convention */
