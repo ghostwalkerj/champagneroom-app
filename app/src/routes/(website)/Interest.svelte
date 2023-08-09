@@ -39,9 +39,9 @@
         </div>
         <div class="w-full flex flex-col place-content-center">
           <div
-            class="text-info text-4xl font-bold capitalize m-5 tracking-wider text-center"
+            class="text-info text-4xl font-bold capitalize m-5 mt-20 tracking-wider text-center"
           >
-            Thank you for your interest in Champagne Room!
+            Thank you for the interest in Champagne Room!
           </div>
           <div data-aos="fade-down" class="h-full flex place-content-center">
             {#if isSubmitted}

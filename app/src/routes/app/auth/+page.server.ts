@@ -8,7 +8,10 @@ import {
   JWT_EXPIRY,
   JWT_PRIVATE_KEY
 } from '$env/static/private';
-import { PUBLIC_AUTH_PATH } from '$env/static/public';
+import {
+  PUBLIC_AUTH_PATH,
+  PUBLIC_CREATOR_SIGNUP_PATH
+} from '$env/static/public';
 
 import { Agent } from '$lib/models/agent';
 import type { UserType } from '$lib/models/common';
@@ -205,10 +208,14 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
   }
 
   if (user === undefined) {
-    throw error(400, 'Invalid User');
+    const redir =
+      role === EntityType.CREATOR
+        ? redirect(302, PUBLIC_CREATOR_SIGNUP_PATH)
+        : error(400, 'Invalid User');
+    throw redir;
   }
 
-  const message = AUTH_SIGNING_MESSAGE + user.nonce;
+  const message = role + ' : ' + AUTH_SIGNING_MESSAGE + user!.nonce;
   return {
     message,
     address,
