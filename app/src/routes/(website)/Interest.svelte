@@ -20,11 +20,11 @@
   };
 </script>
 
-<div id="SignUp" class="container mx-auto px-4 sm:px-20">
+<div id="Interest" class="container mx-auto px-4 sm:px-20">
   <div class="container mx-auto">
     <div class="mt-40">
       <h2 class="font-bold text-primary text-[41px] text-center">
-        Sign up to Join Us
+        Interested in Joining Us?
       </h2>
       <div class="flex flex-col lg:flex-row mt-10">
         <div

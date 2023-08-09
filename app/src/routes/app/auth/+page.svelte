@@ -122,6 +122,7 @@
                 params: [message, walletAddress]
               });
               await setSigningAuth(message, signature, returnPath);
+              goto(returnPath);
             } catch (error) {
               console.log(error);
               goto(defaultReturn);
