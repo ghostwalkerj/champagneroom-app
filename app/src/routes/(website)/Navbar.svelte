@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { PUBLIC_STATIC_URL } from '$env/static/public';
+  import { PUBLIC_OPEN_APP_PATH, PUBLIC_STATIC_URL } from '$env/static/public';
 </script>
 
 <div class="flex flex-col lg:flex-row w-screen">
-  <div class="m-auto w-screen max-w-[600px] mb-6 lg:max-w-[280px]">
+  <div class="m-auto w-screen max-w-[600px] lg:max-w-[280px]">
     <img
       alt="logo"
       src="{PUBLIC_STATIC_URL}/assets/logo-horizontal-tr.png"
@@ -54,7 +54,7 @@
 
         <a
           class=" flex items-center btn ml-6 btn-outline btn-primary whitespace-nowrap shadow-[0px_0px_17px_6px_#e779c1]"
-          href="/app"
+          href={PUBLIC_OPEN_APP_PATH}
         >
           Open App
         </a>
@@ -62,12 +62,13 @@
     </div>
     <div class="navbar-end hidden sm:block" />
   </div>
-  <div class="lg:hidden flex w-full mt-4 place-content-center">
+  <div class="lg:hidden flex w-full mt-6 mb-4 place-content-center">
     <a
       class="btn btn-outline btn-primary whitespace-nowrap shadow-[0px_0px_17px_6px_#e779c1]"
-      href="/app"
+      href={PUBLIC_OPEN_APP_PATH}
     >
       Open App
     </a>
   </div>
 </div>
+<div class="divider m-0" />

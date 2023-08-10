@@ -163,7 +163,7 @@ export const actions: Actions = {
   }
 };
 
-export const load: PageServerLoad = async ({ cookies, url }) => {
+export const load: PageServerLoad = async ({ cookies }) => {
   const address = cookies.get('address');
   const tokenName = cookies.get('tokenName');
   const role = cookies.get('role');

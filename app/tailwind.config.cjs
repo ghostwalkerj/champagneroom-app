@@ -43,9 +43,9 @@ module.exports = {
       {
         cryptoJesus: {
 
-          "primary": "#e779c1",
+          "primary": "#FF00FF",
           "secondary": "#00FFFF",     // Baby Blue
-          "accent": "#FFD500",        // Yellow
+          "accent": "#FFFF00",        // Yellow
           "neutral": "#5C6BC0",       // Dark Blue (You can change this to another color if you prefer)
           "base-100": "#1a1a1a",      // Dark Base
           "info": "#00FFFF",          // Baby Blue (same as secondary)

@@ -1,7 +1,7 @@
 <script lang="ts">
   import 'iconify-icon';
 
-  import { PUBLIC_STATIC_URL } from '$env/static/public';
+  import { PUBLIC_OPEN_APP_PATH, PUBLIC_STATIC_URL } from '$env/static/public';
 </script>
 
 <div>
@@ -55,7 +55,7 @@
         <div class="p-4 mr-10 flex justify-center">
           <a
             class=" btn mt-2 ml-6 btn-outline btn-primary whitespace-nowrap shadow-[0px_0px_17px_6px_#e779c1]"
-            href="/app"
+            href={PUBLIC_OPEN_APP_PATH}
           >
             Open App
           </a>

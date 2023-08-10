@@ -219,7 +219,7 @@
   {/if}
 
   <div
-    class="p-4 flex-col gap-3 min-w-full md:min-w-min max-w-7xl md:grid md:grid-cols-4"
+    class="p-4 flex flex-col gap-3 min-w-full md:min-w-min max-w-7xl md:grid md:grid-cols-4"
   >
     <!-- 1st column -->
     <div class="flex-1 space-y-3 md:col-start-1 md:col-span-3">
