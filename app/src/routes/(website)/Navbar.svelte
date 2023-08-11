@@ -46,9 +46,9 @@
         <li>
           <a
             class="btn btn-sm btn-outline btn-secondary mt-2 ml-3"
-            href="#Interest"
+            href="#Contact"
           >
-            Show Interest
+            Contact
           </a>
         </li>
 

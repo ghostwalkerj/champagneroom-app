@@ -2,9 +2,9 @@
   import { PUBLIC_STATIC_URL } from '$env/static/public';
 
   import About from './About.svelte';
+  import Contact from './Contact.svelte';
   import FAQ from './FAQ.svelte';
   import GetStarted from './GetStarted.svelte';
-  import Interest from './Interest.svelte';
   import Token from './Token.svelte';
 
   import type { ActionData } from './$types';
@@ -70,4 +70,4 @@
 <GetStarted />
 <FAQ />
 <Token />
-<Interest {form} />
+<Contact {form} />

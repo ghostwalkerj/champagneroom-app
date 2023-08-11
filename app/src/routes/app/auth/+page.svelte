@@ -68,7 +68,7 @@
     });
   };
 
-  let returnPath = '/app';
+  let returnPath = '/';
   switch (role) {
     case EntityType.CREATOR: {
       returnPath = urlJoin(PUBLIC_CREATOR_PATH, address);
@@ -138,18 +138,18 @@
   });
 </script>
 
-<div class="min-h-screen-md bg-base hero">
-  <div class="text-center hero-content">
-    <div class="max-w-md">
-      <h1 class="font-bold text-5xl">Welcome to Champagne Room</h1>
-      {#if hasNoWallet}
-        <p class="pt-6">Please connect a wallet to continue.</p>
-        <ConnectButton />
-      {:else if hasAddressMismatch}
-        <p class="pt-6">
-          Please connect a wallet with the address {address} to continue.
-        </p>
-      {/if}
+<div class="w-screen bg-base flex flex-col p-6 text-center">
+  <div class="font-bold text-5xl text-primary w-full">
+    Crypto Wallet Authentication
+  </div>
+  {#if hasNoWallet}
+    <div class="py-6 w-full">Please connect a wallet to continue</div>
+  {:else if hasAddressMismatch}
+    <div class="py-6">
+      Please connect a wallet with the address {address} to continue
     </div>
+  {/if}
+  <div>
+    <ConnectButton />
   </div>
 </div>

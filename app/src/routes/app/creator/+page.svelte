@@ -8,26 +8,38 @@
 
   import { selectedAccount } from '$lib/util/web3';
 
+  import ConnectButton from '$components/header/ConnectButton.svelte';
+
+  let hasNoWallet = false;
+
   onMount(() => {
     const creatorBasePath = urlJoin(
       window.location.origin,
       PUBLIC_CREATOR_PATH
     );
 
-    if (!$selectedAccount && $page.url.href !== creatorBasePath) {
-      goto(creatorBasePath);
-    }
     selectedAccount.subscribe(async (account) => {
       if (account) {
+        hasNoWallet = false;
         const creatorFullPath = urlJoin(creatorBasePath, account.address);
         if ($page.url.href === creatorBasePath) {
           goto(creatorFullPath);
-        } else if (!$page.url.href.startsWith(creatorFullPath)) {
-          goto(creatorBasePath);
         }
       } else {
-        goto(creatorBasePath);
+        hasNoWallet = true;
       }
     });
   });
 </script>
+
+<div class="w-screen bg-base flex flex-col p-6 text-center">
+  <div class="font-bold text-5xl text-primary w-full">
+    Crypto Wallet Authentication
+  </div>
+  {#if hasNoWallet}
+    <div class="py-6 w-full">Please connect a wallet to continue</div>
+  {/if}
+  <div>
+    <ConnectButton />
+  </div>
+</div>

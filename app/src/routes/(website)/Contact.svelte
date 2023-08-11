@@ -20,12 +20,10 @@
   };
 </script>
 
-<div id="Interest" class="container mx-auto px-4 sm:px-20">
+<div id="Contact" class="container mx-auto px-4 sm:px-20">
   <div class="container mx-auto">
     <div class="mt-40">
-      <h2 class="font-bold text-primary text-[41px] text-center">
-        Interested in Joining Us?
-      </h2>
+      <h2 class="font-bold text-primary text-[41px] text-center">Contact Us</h2>
       <div class="flex flex-col lg:flex-row mt-10">
         <div
           class="w-full mb-10 m-0 lg:m-10 flex place-content-center"

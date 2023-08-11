@@ -215,7 +215,7 @@ export const load: PageServerLoad = async ({ cookies }) => {
     throw redir;
   }
 
-  const message = role + ' : ' + AUTH_SIGNING_MESSAGE + user!.nonce;
+  const message = role + ': ' + AUTH_SIGNING_MESSAGE + ' ' + user!.nonce;
   return {
     message,
     address,
