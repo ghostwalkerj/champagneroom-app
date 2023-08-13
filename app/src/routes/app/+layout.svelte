@@ -44,11 +44,11 @@
       <div class="w-full text-center">
         <div class="font-bold mb-2 text-info">
           <div
-            class="text-center text-lg md:text-2xl lg:text-3xl whitespace-nowrap flex flex-row justify-center"
+            class="text-center text-lg md:text-2xl lg:text-3xl whitespace-nowrap flex flex-row justify-center font-CaviarDreams"
           >
             <div class="neon-text">Welcome to the&nbsp;</div>
             <div class="neon-flicker">C</div>
-            <div class="neon-text">hampagne Room</div>
+            <div class="neon-text">HAMPAGNE ROOM</div>
           </div>
         </div>
         <div class="text-center text-xl text-accent">{$nameStore}</div>
