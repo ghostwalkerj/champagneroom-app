@@ -74,7 +74,7 @@
   }
 </script>
 
-<div class="flex flex-col items-center">
+<div class="flex flex-col items-center h-[200px]">
   <div class="p-4">
     <div
       class="bg-cover relative bg-no-repeat bg-center rounded-full w-32 h-32"
@@ -96,7 +96,7 @@
             /></svg
           >
         </div>
-        <div class="self-center">
+        <div class="self-center text-center">
           <p>Click or Drag & Drop Image</p>
         </div>
       </div>
@@ -108,7 +108,7 @@
   {#if !update}
     <div class="justify-center card-actions last:my-2">
       <button
-        class="btn btn-xs btn-secondary md:btn-sm"
+        class="btn btn-xs btn-secondary btn-outline md:btn-sm"
         on:click={() => {
           setUpdate(true);
         }}
@@ -120,7 +120,7 @@
     <div class="justify-center card-actions last:my-2">
       {#if !uploadReady}
         <label
-          class="custom-file-upload btn btn-xs btn-secondary"
+          class="custom-file-upload btn btn-xs btn-outline btn-secondary"
           use:filedrop={options}
           on:filedrop={onChange}
         >
@@ -128,7 +128,10 @@
           Select Image
         </label>
       {:else}
-        <button class="btn btn-xs btn-secondary" on:click={() => upload()}>
+        <button
+          class="btn btn-xs btn-outline btn-secondary"
+          on:click={() => upload()}
+        >
           Upload</button
         >
       {/if}

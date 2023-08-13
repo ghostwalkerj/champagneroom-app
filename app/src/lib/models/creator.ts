@@ -73,7 +73,7 @@ const creatorSchema = new Schema(
         message: '{VALUE} is not an integer value'
       }
     },
-    agent: { type: Schema.Types.ObjectId, ref: 'Agent'},
+    agent: { type: Schema.Types.ObjectId, ref: 'Agent' },
     feedbackStats: {
       type: feedbackSchema,
       required: true,

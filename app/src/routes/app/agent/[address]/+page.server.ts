@@ -24,9 +24,6 @@ export const actions: Actions = {
     const commission = data.get('commission') as string;
 
     // Validation
-    if (agentId === null) {
-      return fail(400, { agentId, missingAgentId: true });
-    }
     if (!name || name.length < 3 || name.length > 50) {
       name = uniqueNamesGenerator({
         dictionaries: [womensNames]

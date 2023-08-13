@@ -31,9 +31,9 @@
   import ShowDetail from '$components/ShowDetail.svelte';
   import { creatorStore, nameStore, showEventStore, showStore } from '$stores';
 
+  import ProfilePhoto from '../ProfilePhoto.svelte';
   import CreatorActivity from './CreatorActivity.svelte';
   import CreatorWallet from './CreatorWallet.svelte';
-  import ProfilePhoto from './ProfilePhoto.svelte';
 
   import type { ActionData, PageData } from './$types';
 
