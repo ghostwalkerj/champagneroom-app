@@ -3,8 +3,8 @@
 </script>
 
 <div id="token" class="container mx-auto mt-60">
-  <h2 class="text-primary font-bold text-[41px] text-center">
-    Champagne Room Token
+  <h2 class="text-primary font-bold text-[41px] text-center font-CaviarDreams">
+    CHAMPAGNE ROOM Token
   </h2>
 </div>
 
@@ -12,7 +12,7 @@
   <div class="flex flex-col lg:flex-row items-center">
     <div class="w-full p-10">
       <h2
-        class="text-info text-center font-medium leading-none text-[41px] lg:text-left mb-6"
+        class="text-info text-center font-bold leading-none text-[41px] lg:text-left mb-6 font-CaviarDreams"
       >
         CRT Tokenomics
       </h2>

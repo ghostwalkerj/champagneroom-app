@@ -139,7 +139,7 @@
 </script>
 
 <div class="w-screen bg-base flex flex-col p-6 text-center">
-  <div class="font-bold text-5xl text-primary w-full">
+  <div class="font-bold text-5xl text-primary w-full font-CaviarDreams">
     Crypto Wallet Authentication
   </div>
   {#if hasNoWallet}

@@ -23,8 +23,8 @@
               </li>
               <li class="spa">
                 <a href="https://twitter.com/_Champagne_Room" target="_blank">
-                  <iconify-icon icon="line-md:twitter-twotone" />
-                  <span class="icon-list-text">Twitter</span>
+                  <iconify-icon icon="simple-icons:x" />
+                  <span class="icon-list-text">(Twitter)</span>
                 </a>
               </li>
             </ul>

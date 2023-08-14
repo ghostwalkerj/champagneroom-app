@@ -51,7 +51,9 @@
             <div class="neon-text">HAMPAGNE ROOM</div>
           </div>
         </div>
-        <div class="text-center text-xl text-accent">{$nameStore}</div>
+        <div class="text-center text-xl text-accent font-CaviarDreams">
+          {$nameStore}
+        </div>
       </div>
       <div class="md:w-1/3 text-right lg:mr-20">
         <ConnectButton />

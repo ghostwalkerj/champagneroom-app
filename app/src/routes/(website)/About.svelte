@@ -5,8 +5,10 @@
 <div id="About" data-aos="fade-right">
   <div class="container mx-auto">
     <div class="mt-40">
-      <h2 class="text-primary font-bold text-[41px] text-center">
-        The Champagne Room
+      <h2
+        class="text-primary font-bold text-[41px] text-center font-CaviarDreams"
+      >
+        The CHAMPAGNE ROOM
       </h2>
       <div
         class="flex flex-col lg:flex-row mt-10 items-center place-content-center"
@@ -23,7 +25,7 @@
         </div>
         <div class="w-full m-auto">
           <span
-            class="text-info text-lg font-normal capitalize ml-5 tracking-wider text-center flex"
+            class="text-info text-lg font-bold capitalize ml-5 tracking-wider text-center flex font-CaviarDreams"
           >
             ABOUT
           </span>
@@ -66,8 +68,10 @@
 
       <div class="mt-5 lg:mt-10">
         <div class="p-6 sm:pad">
-          <h2 class=" text-[41px] font-bold mx-0 lg:mx-10 text-primary">
-            We have specifically built Champagne Room with a focus on anonymity,
+          <h2
+            class=" text-[41px] font-bold mx-0 lg:mx-10 text-primary font-CaviarDreams"
+          >
+            We have specifically built CHAMPAGNE ROOM with a focus on anonymity,
             safety, and privacy for both our users and creators.
           </h2>
         </div>

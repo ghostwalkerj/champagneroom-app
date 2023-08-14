@@ -2,10 +2,12 @@
   import type { WalletState } from '@web3-onboard/core';
   import { onMount } from 'svelte';
   import { uniqueNamesGenerator } from 'unique-names-generator';
+  import urlJoin from 'url-join';
 
   import { enhance } from '$app/forms';
   import { goto } from '$app/navigation';
   import {
+    PUBLIC_CREATOR_PATH,
     PUBLIC_DEFAULT_PROFILE_IMAGE,
     PUBLIC_STATIC_URL
   } from '$env/static/public';
@@ -15,10 +17,12 @@
 
   import ProfilePhoto from '../ProfilePhoto.svelte';
 
-  import type { ActionData } from './$types';
+  import type { ActionData, PageData } from './$types';
 
+  export let data: PageData;
   export let form: ActionData;
 
+  const message = data.message;
   let walletAddress = '';
   let wallet: WalletState | undefined;
 
@@ -49,6 +53,27 @@
       }
     });
   });
+
+  const onSubmit = async ({ formData }) => {
+    formData.append('profileImageUrl', profileImageUrl);
+    formData.append('walletAddress', walletAddress);
+    formData.append('message', message);
+
+    if (wallet) {
+      const signature = await wallet.provider.request({
+        method: 'personal_sign',
+        params: [message, walletAddress]
+      });
+      formData.append('signature', signature);
+    }
+
+    return async ({ result }) => {
+      if (result?.type === 'success') {
+        const creatorURL = urlJoin(PUBLIC_CREATOR_PATH, walletAddress);
+        goto(creatorURL);
+      }
+    };
+  };
 </script>
 
 <div class="flex place-content-center w-full">
@@ -165,7 +190,7 @@
       <form
         method="POST"
         action="?/create_creator"
-        use:enhance
+        use:enhance={({ formData }) => onSubmit({ formData })}
         class="flex flex-col place-content-center w-full"
       >
         <div class="w-full flex place-content-center">
@@ -191,12 +216,7 @@
                 placeholder={exampleName}
                 class="input input-bordered input-primary w-full max-w-xs input-sm"
               />
-              <input
-                type="hidden"
-                name="profileImageUrl"
-                value={profileImageUrl}
-              />
-              <input type="hidden" name="walletAddress" value={walletAddress} />
+
               <!-- svelte-ignore a11y-label-has-associated-control -->
               {#if form?.badName}
                 <label class="label">

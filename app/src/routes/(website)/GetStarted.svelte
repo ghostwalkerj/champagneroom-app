@@ -11,14 +11,16 @@
     <div class="flex flex-col lg:flex-row items-center">
       <div class="w-full" data-aos="fade-right">
         <span
-          class="text-info text-lg font-normal capitalize tracking-wider text-center flex"
+          class="text-info text-lg font-normal capitalize tracking-wider text-center flex font-CaviarDreams"
         >
           Easy, Safe, Private
         </span>
         <div class="flex flex-col lg:flex-row place-content-between">
           <div class="pb-6">
-            <span class=" font-bold text-info text-[41px] text-center">
-              Champagne Room Show
+            <span
+              class=" font-bold text-info text-[41px] text-center font-CaviarDreams"
+            >
+              CHAMPAGNE ROOM Show
             </span>
 
             <h1 class="text-lg font-normal leading-relaxed">

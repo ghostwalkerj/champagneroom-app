@@ -2,16 +2,14 @@ import type { Actions, RequestEvent } from '@sveltejs/kit';
 import { fail, redirect } from '@sveltejs/kit';
 import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
-import jwt from 'jsonwebtoken';
 import { ObjectId } from 'mongodb';
 import { nanoid } from 'nanoid';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 import urlJoin from 'url-join';
 
-import { JWT_PRIVATE_KEY } from '$env/static/private';
 import {
-  PUBLIC_DEFAULT_PROFILE_IMAGE,
-  PUBLIC_OPERATOR_PATH
+    PUBLIC_DEFAULT_PROFILE_IMAGE,
+    PUBLIC_OPERATOR_PATH
 } from '$env/static/public';
 
 import { Agent } from '$lib/models/agent';
