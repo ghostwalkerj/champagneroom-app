@@ -3,23 +3,21 @@
 </script>
 
 <div id="About" data-aos="fade-right">
-  <div class="pt-52">
+  <div class="pt-52 mx-auto">
     <h2
-      class="text-primary font-bold text-[41px] text-center font-CaviarDreams"
+      class="text-primary font-bold text-[41px] text-center font-CaviarDreams mb-10"
     >
       ABOUT
     </h2>
-    <div
-      class="flex flex-col lg:flex-row mt-10 items-center place-content-center"
-    >
+    <div class="flex flex-col lg:flex-row items-center place-content-center">
       <div
-        class="w-full mb-10 m-0 lg:m-10 flex place-content-center"
+        class="w-full m-3 p-6 flex place-content-center"
         data-aos="flip-right"
       >
         <img
           src="{PUBLIC_STATIC_URL}/assets/creator4.png"
           alt="Creator"
-          class="rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1] max-w-md h-auto"
+          class="rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1]"
         />
       </div>
       <div class="w-full m-auto">

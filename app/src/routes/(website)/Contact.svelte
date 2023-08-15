@@ -24,11 +24,11 @@
   <div class="container mx-auto">
     <div class="pt-52">
       <h2
-        class="font-bold text-primary text-[41px] text-center font-CaviarDreams"
+        class="font-bold text-primary text-[41px] text-center font-CaviarDreams mb-10"
       >
         Contact Us
       </h2>
-      <div class="flex flex-col lg:flex-row mt-10">
+      <div class="flex flex-col lg:flex-row">
         <div
           class="w-full mb-10 m-0 lg:m-10 flex place-content-center"
           data-aos="flip-right"
@@ -36,7 +36,7 @@
           <img
             src="{PUBLIC_STATIC_URL}/assets/creator3.png"
             alt="Creator"
-            class="rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1] max-w-md h-auto"
+            class="rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1] h-auto"
           />
         </div>
         <div class="w-full flex flex-col place-content-center">

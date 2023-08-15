@@ -3,13 +3,15 @@
 </script>
 
 <div id="Token" class="container mx-auto pt-52">
-  <h2 class="text-primary font-bold text-[41px] text-center font-CaviarDreams">
+  <h2
+    class="text-primary font-bold text-[41px] text-center font-CaviarDreams mb-10"
+  >
     CHAMPAGNE ROOM Token
   </h2>
 </div>
 
-<div class="flex mt-10 w-screen" data-aos="fade-in" id="page1">
-  <div class="flex flex-col lg:flex-row items-center">
+<div class="flex w-screen" data-aos="fade-in" id="page1">
+  <div class="mx-auto flex flex-col lg:flex-row items-center">
     <div class="w-full p-10">
       <h2
         class="text-info text-center font-bold leading-none text-[41px] lg:text-left mb-6 font-CaviarDreams"
@@ -26,9 +28,6 @@
         CRT is a small cap utility token with a total fixed supply of 100
         million tokens.
       </ul>
-      <div
-        class="flex flex-col 2sx:flex-row mt-10 space-x-0 2sx:space-y-0 space-y-6 2sx:space-x-6 place-content-center lg:place-content-start"
-      />
     </div>
     <div class="w-full p-10">
       <div class="w-auto">

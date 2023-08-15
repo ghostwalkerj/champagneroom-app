@@ -9,16 +9,16 @@
   <div class="container mx-auto">
     <div class="pt-52">
       <h2
-        class="text-primary font-bold text-[41px] text-center font-CaviarDreams"
+        class="text-primary font-bold text-[41px] text-center font-CaviarDreams mb-10"
       >
         Become a Creator
       </h2>
-      <div class="flex flex-col lg:flex-row mt-20">
-        <div class="w-full flex place-content-center p-6" data-aos="flip-right">
+      <div class="flex flex-col lg:flex-row p-4">
+        <div class="p-10 flex place-content-center" data-aos="flip-right">
           <img
             src="{PUBLIC_STATIC_URL}/assets/creator.png"
             alt="Creator"
-            class="rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1] max-w-md h-auto"
+            class="rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1] h-fit"
           />
         </div>
         <div class="w-full">
