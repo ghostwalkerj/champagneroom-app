@@ -91,7 +91,9 @@
           class="h-16"
         />
       </div>
-      <div class="font-medium text-primary text-3xl text-center">
+      <div
+        class="font-medium text-primary text-3xl text-center font-CaviarDreams"
+      >
         Sign Up as a Creator
       </div>
       <div class="font-medium text-primary text-sm text-center">

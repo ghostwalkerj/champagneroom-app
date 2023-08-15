@@ -2,14 +2,14 @@
   import { PUBLIC_STATIC_URL } from '$env/static/public';
 </script>
 
-<div class="relative mt-40">
+<div class="relative mt-52">
   <div
     class="bg-containrounded-xl overflow-hidden absolute top-0 left-0 w-full h-full opacity-30"
     style="background-image: url('{PUBLIC_STATIC_URL}/assets/crbubbles.png') "
   />
-  <div id="GetStarted" class="container mx-auto">
+  <div id="TheShow" class="container mx-auto">
     <div class="flex flex-col lg:flex-row items-center">
-      <div class="w-full" data-aos="fade-right">
+      <div class="w-full ml-6" data-aos="fade-right">
         <span
           class="text-info text-lg font-normal capitalize tracking-wider text-center flex font-CaviarDreams"
         >
@@ -18,7 +18,7 @@
         <div class="flex flex-col lg:flex-row place-content-between">
           <div class="pb-6">
             <span
-              class=" font-bold text-info text-[41px] text-center font-CaviarDreams"
+              class="font-bold text-info text-[41px] text-center font-CaviarDreams"
             >
               CHAMPAGNE ROOM Show
             </span>
@@ -29,9 +29,9 @@
             </h1>
             <ul
               class="text-left list-disc
-          list-inside ml-10 mt-10 text-lg"
+          list-inside ml-3 mt-3 text-lg"
             >
-              <li>Click the unique Link to view show information</li>
+              <li>Click the unique Link to view the Show information</li>
               <li>
                 On the show page, see the price, timing, and creator reviews
               </li>

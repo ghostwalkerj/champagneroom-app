@@ -1,7 +1,12 @@
 <script lang="ts">
   import 'iconify-icon';
 
-  import { PUBLIC_OPEN_APP_PATH, PUBLIC_STATIC_URL } from '$env/static/public';
+  import {
+    PUBLIC_AGENT_PATH,
+    PUBLIC_CREATOR_PATH,
+    PUBLIC_OPEN_APP_PATH,
+    PUBLIC_STATIC_URL
+  } from '$env/static/public';
 </script>
 
 <div>
@@ -33,10 +38,10 @@
             <h5 class="text-info sm:mb-3">Services</h5>
             <ul class="list-unstyled">
               <li class="spa">
-                <a href="#">Creators</a>
+                <a href={PUBLIC_CREATOR_PATH}>Creators</a>
               </li>
               <li class="spa">
-                <a href="#">Management</a>
+                <a href={PUBLIC_AGENT_PATH}>Management</a>
               </li>
             </ul>
           </div>

@@ -3,8 +3,9 @@
 
   import About from './About.svelte';
   import Contact from './Contact.svelte';
+  import Creators from './Creators.svelte';
   import FAQ from './FAQ.svelte';
-  import GetStarted from './GetStarted.svelte';
+  import TheShow from './TheShow.svelte';
   import Token from './Token.svelte';
 
   import type { ActionData } from './$types';
@@ -67,7 +68,10 @@
   </div>
 </div>
 <About />
-<GetStarted />
+<TheShow />
+
 <FAQ />
+<Creators />
+
 <Token />
 <Contact {form} />

@@ -4,11 +4,11 @@
 
 <div id="About" data-aos="fade-right">
   <div class="container mx-auto">
-    <div class="mt-40">
+    <div class="mt-52">
       <h2
         class="text-primary font-bold text-[41px] text-center font-CaviarDreams"
       >
-        The CHAMPAGNE ROOM
+        ABOUT
       </h2>
       <div
         class="flex flex-col lg:flex-row mt-10 items-center place-content-center"
@@ -24,11 +24,6 @@
           />
         </div>
         <div class="w-full m-auto">
-          <span
-            class="text-info text-lg font-bold capitalize ml-5 tracking-wider text-center flex font-CaviarDreams"
-          >
-            ABOUT
-          </span>
           <p class="leading-10 text-lg font-normal mt-5 mr-0 ml-5 sm:mr-20">
             Welcome to Champagne Room, the cutting-edge web 3.0 platform
             revolutionizing NSFW experiences. Our platform enables fans to

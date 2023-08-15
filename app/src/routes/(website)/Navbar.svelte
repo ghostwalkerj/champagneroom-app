@@ -24,14 +24,22 @@
         <li>
           <a
             class="btn btn-sm btn-outline btn-secondary mt-2 ml-3"
-            href="#GetStarted"
+            href="#TheShow"
           >
-            Get Started
+            Show
           </a>
         </li>
         <li>
           <a class="btn btn-sm btn-outline btn-secondary mt-2 ml-3" href="#FAQ">
             FAQ
+          </a>
+        </li>
+        <li>
+          <a
+            class="btn btn-sm btn-outline btn-secondary mt-2 ml-3"
+            href="#Creators"
+          >
+            Creators
           </a>
         </li>
         <li>
@@ -52,12 +60,14 @@
           </a>
         </li>
 
-        <a
-          class=" flex items-center btn ml-6 btn-outline btn-primary whitespace-nowrap shadow-[0px_0px_17px_6px_#e779c1]"
-          href={PUBLIC_OPEN_APP_PATH}
-        >
-          Open App
-        </a>
+        <li>
+          <a
+            class="  btn btn-outline btn-primary whitespace-nowrap shadow-[0px_0px_17px_6px_#e779c1] btn-sm mt-2 ml-3"
+            href={PUBLIC_OPEN_APP_PATH}
+          >
+            Open App
+          </a>
+        </li>
       </ul>
     </div>
     <div class="navbar-end hidden sm:block" />
