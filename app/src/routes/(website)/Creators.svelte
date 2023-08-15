@@ -14,7 +14,7 @@
         Become a Creator
       </h2>
       <div class="flex flex-col lg:flex-row mt-20">
-        <div class="w-full flex place-content-center" data-aos="flip-right">
+        <div class="w-full flex place-content-center p-6" data-aos="flip-right">
           <img
             src="{PUBLIC_STATIC_URL}/assets/creator.png"
             alt="Creator"

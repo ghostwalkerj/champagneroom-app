@@ -3,7 +3,7 @@
 </script>
 
 <div id="About" data-aos="fade-right">
-  <div class=" pt-52">
+  <div class="pt-52">
     <h2
       class="text-primary font-bold text-[41px] text-center font-CaviarDreams"
     >

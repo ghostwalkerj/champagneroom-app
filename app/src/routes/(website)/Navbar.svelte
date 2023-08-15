@@ -2,6 +2,24 @@
   import { PUBLIC_OPEN_APP_PATH, PUBLIC_STATIC_URL } from '$env/static/public';
 </script>
 
+<div class="sticky -mb-12 lg:mr-0 lg:hidden top-0 z-30">
+  <details class="dropdown">
+    <summary class="btn btn-xs btn-outline btn-secondary"
+      ><iconify-icon icon="mdi:hamburger-menu" /></summary
+    >
+    <ul
+      class="p-2 shadow menu dropdown-content z-[1] rounded-box w-52 text-info bg-base-100"
+    >
+      <li><a href="#About">About</a></li>
+      <li><a href="#TheShow">Show</a></li>
+      <li><a href="#FAQ">FAQ</a></li>
+      <li><a href="#Creators">Creators</a></li>
+      <li><a href="#Token">Token</a></li>
+      <li><a href="#Contact">Contact</a></li>
+    </ul>
+  </details>
+</div>
+
 <div
   class=" lg:sticky lg:top-0 lg:z-50 bg-gradient-to-r from-[#0C082E] to-[#0C092E]"
 >
@@ -53,7 +71,7 @@
           <li>
             <a
               class="btn btn-sm btn-outline btn-secondary mt-2 ml-3"
-              href="#token"
+              href="#Token"
             >
               TOKEN
             </a>
@@ -70,7 +88,7 @@
 
           <li>
             <a
-              class="  btn btn-outline btn-primary whitespace-nowrap shadow-[0px_0px_17px_6px_#e779c1] btn-sm mt-2 ml-3"
+              class="btn btn-outline btn-primary whitespace-nowrap shadow-[0px_0px_17px_6px_#e779c1] btn-sm mt-2 ml-3"
               href={PUBLIC_OPEN_APP_PATH}
             >
               Open App

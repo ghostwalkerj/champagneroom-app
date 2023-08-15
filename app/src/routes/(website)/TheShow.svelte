@@ -8,7 +8,7 @@
       class="bg-containrounded-xl overflow-hidden absolute top-0 left-0 w-full h-full opacity-30"
       style="background-image: url('{PUBLIC_STATIC_URL}/assets/crbubbles.png') "
     />
-    <div class="flex flex-col lg:flex-row items-center">
+    <div class="flex flex-col lg:flex-row items-center ml-5">
       <div class="w-full ml-6" data-aos="fade-right">
         <span
           class="text-info text-lg font-normal capitalize tracking-wider text-center flex font-CaviarDreams"

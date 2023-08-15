@@ -2,7 +2,7 @@
   import { PUBLIC_STATIC_URL } from '$env/static/public';
 </script>
 
-<div id="token" class="container mx-auto pt-52">
+<div id="Token" class="container mx-auto pt-52">
   <h2 class="text-primary font-bold text-[41px] text-center font-CaviarDreams">
     CHAMPAGNE ROOM Token
   </h2>
