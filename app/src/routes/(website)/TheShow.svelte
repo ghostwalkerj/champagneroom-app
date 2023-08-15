@@ -2,12 +2,12 @@
   import { PUBLIC_STATIC_URL } from '$env/static/public';
 </script>
 
-<div class="relative mt-52">
-  <div
-    class="bg-containrounded-xl overflow-hidden absolute top-0 left-0 w-full h-full opacity-30"
-    style="background-image: url('{PUBLIC_STATIC_URL}/assets/crbubbles.png') "
-  />
-  <div id="TheShow" class="container mx-auto">
+<div id="TheShow" class="container pt-52">
+  <div class="relative">
+    <div
+      class="bg-containrounded-xl overflow-hidden absolute top-0 left-0 w-full h-full opacity-30"
+      style="background-image: url('{PUBLIC_STATIC_URL}/assets/crbubbles.png') "
+    />
     <div class="flex flex-col lg:flex-row items-center">
       <div class="w-full ml-6" data-aos="fade-right">
         <span
@@ -31,13 +31,20 @@
               class="text-left list-disc
           list-inside ml-3 mt-3 text-lg"
             >
-              <li>Click the unique Link to view the Show information</li>
               <li>
-                On the show page, see the price, timing, and creator reviews
+                Click the exclusive link to access detailed show information.
               </li>
-              <li>Reserve and pay for tickets with crypto</li>
-              <li>Enjoy the show in your private VIP Champagne Room</li>
-              <li>Provide feedback on your experience</li>
+              <li>
+                Explore the show page to discover pricing, timings, and reviews
+                from other fans.
+              </li>
+              <li>
+                Securely reserve and pay for tickets using cryptocurrency.
+              </li>
+              <li>
+                Indulge in the show within your own private VIP Champagne Room.
+              </li>
+              <li>Share your valuable feedback about your experience.</li>
             </ul>
           </div>
 

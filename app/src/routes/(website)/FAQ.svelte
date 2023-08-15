@@ -2,8 +2,8 @@
   import { PUBLIC_STATIC_URL } from '$env/static/public';
 </script>
 
-<div data-aos="fade-In" class="container mx-auto mt-56 relative" id="FAQ">
-  <div class="absolute -top-20 grid grid-cols-2">
+<div data-aos="fade-In" class="container mx-auto relative pt-52" id="FAQ">
+  <div class="absolute top-60 grid grid-cols-2">
     <div
       class="image opacity-20 max-width-l hidden md:flex animate-pulse transition-timing-function"
     >

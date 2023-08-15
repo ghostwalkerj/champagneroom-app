@@ -15,7 +15,7 @@
 
 <div class="flex mt-20 w-screen" data-aos="fade-in" id="page1">
   <div class="flex flex-col lg:flex-row items-center">
-    <div class="w-full p-10">
+    <div class="w-full px-14">
       <h2
         class="text-info text-center font-bold leading-none text-[41px] lg:text-left mb-6 font-CaviarDreams"
       >

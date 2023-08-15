@@ -22,7 +22,7 @@
 
 <div id="Contact" class="container mx-auto px-4 sm:px-20">
   <div class="container mx-auto">
-    <div class="mt-52">
+    <div class="pt-52">
       <h2
         class="font-bold text-primary text-[41px] text-center font-CaviarDreams"
       >
