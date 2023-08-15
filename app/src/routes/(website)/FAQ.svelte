@@ -29,7 +29,7 @@
     </div>
   </div>
   <h2
-    class="font-bold text-primary text-[41px] text-center mt-36 font-CaviarDreams"
+    class="font-bold text-primary text-[41px] text-center mt-24 font-CaviarDreams"
   >
     FAQ
   </h2>

@@ -13,7 +13,7 @@
   export let form: ActionData;
 </script>
 
-<div class="flex mt-20 w-screen" data-aos="fade-in" id="page1">
+<div class="flex mt-20 w-screen" data-aos="fade-in" id="topPage">
   <div class="flex flex-col lg:flex-row items-center">
     <div class="w-full px-14">
       <h2

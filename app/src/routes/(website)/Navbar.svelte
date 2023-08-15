@@ -10,12 +10,14 @@
     <ul
       class="p-2 shadow menu dropdown-content z-[1] rounded-box w-52 text-info bg-base-100"
     >
+      <li><a href={PUBLIC_OPEN_APP_PATH}>Open App</a></li>
       <li><a href="#About">About</a></li>
       <li><a href="#TheShow">Show</a></li>
       <li><a href="#FAQ">FAQ</a></li>
       <li><a href="#Creators">Creators</a></li>
       <li><a href="#Token">Token</a></li>
       <li><a href="#Contact">Contact</a></li>
+      <li><a href="/">Back to Top</a></li>
     </ul>
   </details>
 </div>
