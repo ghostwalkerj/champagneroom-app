@@ -7,28 +7,33 @@
 
 <div id="Creators" data-aos="zoom-in-right">
   <div class="container mx-auto">
-    <div class="pt-52">
+    <div class="pt-10 lg:pt-52">
       <h2
-        class="text-primary font-bold text-[41px] text-center font-CaviarDreams mb-10"
+        class="text-primary font-bold text-[41px] text-center font-CaviarDreams lg:mb-10"
       >
         Become a Creator
       </h2>
-      <div class="flex flex-col lg:flex-row p-4">
-        <div class="p-10 flex place-content-center" data-aos="flip-right">
+      <div
+        class="flex flex-col lg:flex-row p-4 items-center place-content-center lg:px-10"
+      >
+        <div
+          class="w-full m-3 p-4 flex place-content-center"
+          data-aos="flip-right"
+        >
           <img
             src="{PUBLIC_STATIC_URL}/assets/creator.png"
             alt="Creator"
-            class="rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1] h-fit"
+            class="rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1]"
           />
         </div>
         <div class="w-full">
           <span
-            class="text-info text-lg font-bold capitalize ml-5 tracking-wider text-center flex font-CaviarDreams"
+            class="text-info text-lg font-bold capitalize lg:ml-5 lg:tracking-wider text-center flex font-CaviarDreams"
           >
             Benefits
           </span>
           <ul
-            class="text-left list-disc ml-5
+            class="text-left list-disc lg:ml-5
           list-inside text-lg"
           >
             <li>Get paid quickly in your local money.</li>
@@ -48,12 +53,12 @@
             </li>
           </ul>
           <span
-            class="text-info text-lg font-bold capitalize ml-5 tracking-wider text-center flex font-CaviarDreams mt-5"
+            class="text-info text-lg font-bold capitalize lg:ml-5 tracking-wider text-center flex font-CaviarDreams mt-5"
           >
             Get Started Now
           </span>
           <ul
-            class="text-left list-disc ml-5
+            class="text-left list-disc lg:ml-5
           list-inside text-lg"
           >
             <li>

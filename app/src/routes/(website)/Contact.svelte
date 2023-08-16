@@ -22,7 +22,7 @@
 
 <div id="Contact" class="container mx-auto px-4 sm:px-20">
   <div class="container mx-auto">
-    <div class="pt-52">
+    <div class="pt-10 lg:pt-52">
       <h2
         class="font-bold text-primary text-[41px] text-center font-CaviarDreams mb-10"
       >
@@ -30,7 +30,7 @@
       </h2>
       <div class="flex flex-col lg:flex-row">
         <div
-          class="w-full mb-10 m-0 lg:m-10 flex place-content-center"
+          class="w-full lg:mb-10 m-0 lg:m-10 flex place-content-center"
           data-aos="flip-right"
         >
           <img
@@ -41,7 +41,7 @@
         </div>
         <div class="w-full flex flex-col place-content-center">
           <div
-            class="text-info text-4xl font-bold capitalize m-5 mt-20 tracking-wider text-center font-CaviarDreams"
+            class="text-info text-4xl font-bold capitalize m-5 mt-10 lg:mt-20 tracking-wider text-center font-CaviarDreams"
           >
             Thank you for the interest in CHAMPAGNE ROOM!
           </div>

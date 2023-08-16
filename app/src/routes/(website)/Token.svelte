@@ -2,7 +2,7 @@
   import { PUBLIC_STATIC_URL } from '$env/static/public';
 </script>
 
-<div id="Token" class="container mx-auto pt-52">
+<div id="Token" class="container mx-auto pt-10 lg:pt-52">
   <h2
     class="text-primary font-bold text-[41px] text-center font-CaviarDreams mb-10"
   >
@@ -12,9 +12,9 @@
 
 <div class="flex w-screen" data-aos="fade-in" id="page1">
   <div class="mx-auto flex flex-col lg:flex-row items-center">
-    <div class="w-full p-10">
+    <div class="w-full px-4 lg:px-20">
       <h2
-        class="text-info text-center font-bold leading-none text-[41px] lg:text-left mb-6 font-CaviarDreams"
+        class="text-info text-center font-bold leading-none text-3xl lg:text-[41px] lg:text-left mb-6 font-CaviarDreams"
       >
         CRT Tokenomics
       </h2>
@@ -29,7 +29,7 @@
         million tokens.
       </ul>
     </div>
-    <div class="w-full p-10">
+    <div class="w-full p-10 pr-16">
       <div class="w-auto">
         <video
           autoplay

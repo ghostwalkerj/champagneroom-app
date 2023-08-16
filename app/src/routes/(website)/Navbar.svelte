@@ -2,13 +2,22 @@
   import { PUBLIC_OPEN_APP_PATH, PUBLIC_STATIC_URL } from '$env/static/public';
 </script>
 
-<div class="sticky -mb-12 lg:mr-0 lg:hidden top-0 z-30">
-  <details class="dropdown">
-    <summary class="btn btn-xs btn-outline btn-secondary"
-      ><iconify-icon icon="mdi:hamburger-menu" /></summary
+<div
+  class="sticky -mb-12 lg:mr-0 lg:hidden top-2 z-30 pr-2 w-screen flex justify-end"
+>
+  <!-- svelte-ignore a11y-label-has-associated-control -->
+  <div class="dropdown dropdown-bottom dropdown-end">
+    <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+    <label
+      tabindex="0"
+      class="btn btn-xs btn-outline btn-secondary m-1 bg-indigo"
+      ><iconify-icon icon="mdi:hamburger-menu" /></label
     >
+
+    <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
     <ul
-      class="p-2 shadow menu dropdown-content z-[1] rounded-box w-52 text-info bg-base-100"
+      tabindex="0"
+      class="dropdown-content z-[1] menu p-2 shadow text-secondary bg-base-100 rounded-box w-52"
     >
       <li><a href={PUBLIC_OPEN_APP_PATH}>Open App</a></li>
       <li><a href="#About">About</a></li>
@@ -19,14 +28,14 @@
       <li><a href="#Contact">Contact</a></li>
       <li><a href="/">Back to Top</a></li>
     </ul>
-  </details>
+  </div>
 </div>
 
 <div
   class=" lg:sticky lg:top-0 lg:z-50 bg-gradient-to-r from-[#0C082E] to-[#0C092E]"
 >
   <div class="flex flex-col lg:flex-row w-screen">
-    <div class="m-auto w-screen max-w-[600px] lg:max-w-[280px]">
+    <div class=" w-screen max-w-[600px] lg:max-w-[280px]">
       <a href="/">
         <img
           alt="logo"
@@ -109,5 +118,5 @@
       </a>
     </div>
   </div>
-  <div class="divider m-0" />
+  <div class="divider m-0 -mt-2" />
 </div>

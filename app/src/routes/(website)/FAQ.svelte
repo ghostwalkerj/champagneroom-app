@@ -2,7 +2,11 @@
   import { PUBLIC_STATIC_URL } from '$env/static/public';
 </script>
 
-<div data-aos="fade-In" class="container mx-auto relative pt-52" id="FAQ">
+<div
+  data-aos="fade-In"
+  class="container mx-auto relative pt-10 lg:pt-52"
+  id="FAQ"
+>
   <div class="absolute top-28 grid grid-cols-2">
     <div
       class="image opacity-20 max-width-l hidden md:flex animate-pulse transition-timing-function"
@@ -29,12 +33,12 @@
     </div>
   </div>
   <h2
-    class="font-bold text-primary text-[41px] text-center font-CaviarDreams mb-10"
+    class="font-bold text-primary text-[41px] text-center font-CaviarDreams lg:mb-10"
   >
     FAQ
   </h2>
 
-  <div class="block sm:flex sm:flex-row gap-10 mx-10">
+  <div class="block sm:flex sm:flex-row gap-4 lg:mx-10">
     <div class="w-full sm:w-1/2">
       <div class="collapse collapse-arrow">
         <input type="radio" name="faq-accordion" />

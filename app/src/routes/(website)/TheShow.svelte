@@ -2,33 +2,33 @@
   import { PUBLIC_STATIC_URL } from '$env/static/public';
 </script>
 
-<div id="TheShow" class="flex flex-col pt-52 w-full mx-auto">
+<div id="TheShow" class="flex flex-col pt-10 lg:pt-52 w-full mx-auto">
   <h2
-    class="text-primary font-bold text-[41px] text-center font-CaviarDreams mb-10"
+    class="text-primary font-bold text-[41px] text-center font-CaviarDreams lg:mb-10"
   >
     The CHAMPAGNE ROOM Show
   </h2>
-  <div class="relative">
+  <div class="relative px-4 lg:px-10">
     <div
       class="bg-containrounded-xl overflow-hidden absolute top-0 left-0 w-full h-full opacity-30"
       style="background-image: url('{PUBLIC_STATIC_URL}/assets/crbubbles.png') "
     />
     <div class="flex flex-col lg:flex-row w-full">
-      <div class="w-full p-6" data-aos="fade-right">
+      <div class="w-full p-4 lg:p-6" data-aos="fade-right">
         <span
           class="text-info text-lg font-bold capitalize tracking-wider text-center flex font-CaviarDreams"
         >
           Easy, Safe, Private
         </span>
         <div class="flex flex-col lg:flex-row">
-          <div class="w-full p-6">
-            <h1 class="text-lg font-normal leading-relaxed">
+          <div class="w-full lg:p-6">
+            <h1 class="text-lg mb-4 font-normal leading-relaxed">
               When you're ready to experience a live one-on-one show, simply ask
               your creator to provide you with a Champagne Room Show link.
             </h1>
             <ul
               class="text-left list-disc
-          list-inside ml-3 mt-3 text-lg"
+          list-inside lg:mt-3 text-lg space-y-4"
             >
               <li>
                 Click the exclusive link to access detailed show information.
@@ -47,7 +47,7 @@
             </ul>
           </div>
 
-          <div class="p-4 flex w-full place-content-center">
+          <div class="p-4 mt-4 lg:mt-0 flex w-full place-content-center">
             <img
               alt="show-screenshot"
               src="{PUBLIC_STATIC_URL}/assets/show-screenshot.png"

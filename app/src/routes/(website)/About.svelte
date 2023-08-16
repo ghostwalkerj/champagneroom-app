@@ -3,13 +3,15 @@
 </script>
 
 <div id="About" data-aos="fade-right">
-  <div class="pt-52 mx-auto">
+  <div class="pt-10 lg:pt-52 mx-auto">
     <h2
-      class="text-primary font-bold text-[41px] text-center font-CaviarDreams mb-10"
+      class="text-primary font-bold text-[41px] text-center font-CaviarDreams lg:mb-10"
     >
       ABOUT
     </h2>
-    <div class="flex flex-col lg:flex-row items-center place-content-center">
+    <div
+      class="flex flex-col lg:flex-row items-center place-content-center px-6"
+    >
       <div
         class="w-full m-3 p-6 flex place-content-center"
         data-aos="flip-right"
@@ -61,7 +63,7 @@
     <div class="mt-5 lg:mt-10">
       <div class="p-6 sm:pad">
         <h2
-          class=" text-[41px] font-bold mx-0 lg:mx-10 text-primary font-CaviarDreams"
+          class="text-3xl lg:text-[41px] font-bold mx-0 lg:mx-10 text-primary font-CaviarDreams"
         >
           We have specifically built CHAMPAGNE ROOM with a focus on anonymity,
           safety, and privacy for both our users and creators.
