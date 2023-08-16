@@ -3,7 +3,7 @@
 </script>
 
 <div
-  class="sticky -mb-12 lg:mr-0 lg:hidden top-2 z-30 pr-2 w-screen flex justify-end"
+  class="sticky -mb-12 lg:mr-0 lg:hidden top-0 z-30 pr-2 w-screen flex justify-end"
 >
   <!-- svelte-ignore a11y-label-has-associated-control -->
   <div class="dropdown dropdown-bottom dropdown-end">
@@ -34,8 +34,8 @@
 <div
   class=" lg:sticky lg:top-0 lg:z-50 bg-gradient-to-r from-[#0C082E] to-[#0C092E]"
 >
-  <div class="flex flex-col lg:flex-row w-screen">
-    <div class=" w-screen max-w-[600px] lg:max-w-[280px]">
+  <div class="flex flex-col lg:flex-row w-screen items-center ">
+    <div class=" max-w-[600px] lg:max-w-[280px]">
       <a href="/">
         <img
           alt="logo"
