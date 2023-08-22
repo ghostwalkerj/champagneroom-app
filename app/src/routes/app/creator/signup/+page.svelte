@@ -15,6 +15,8 @@
   import { defaultWallet } from '$lib/util/web3';
   import { womensNames } from '$lib/util/womensNames';
 
+  import ConnectButton from '$components/header/ConnectButton.svelte';
+
   import ProfilePhoto from '../ProfilePhoto.svelte';
 
   import type { ActionData, PageData } from './$types';
@@ -172,7 +174,7 @@
 
           <div class="modal-action place-content-center gap-10">
             <!-- if there is a button in form, it will close the modal -->
-
+            <ConnectButton />
             <button
               class="btn btn-secondary btn-outline"
               on:click={() => goto('/')}>Cancel</button
