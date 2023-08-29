@@ -25,3 +25,4 @@ app/src/lib/machines/ticketMachine.typegen.d.ts
 **/.yarn/**
 **.d.ts
 **/dist/**
+app/src/lib/util/bitcart/**

@@ -25,13 +25,7 @@ const trezor = trezorModule({
 
 const wcV2InitOptions = {
   version: 2 as const,
-  /**
-   * Project ID associated with [WalletConnect account](https://cloud.walletconnect.com)
-   */
   projectId: PUBLIC_WALLET_CONNECT_PROJECT_ID,
-  /**
-   * Chains required to be supported by all wallets connecting to your DApp
-   */
   requiredChains: [1]
 };
 const walletConnect = walletConnectModule(wcV2InitOptions);
