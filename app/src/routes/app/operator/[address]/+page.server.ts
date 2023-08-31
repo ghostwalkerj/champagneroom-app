@@ -8,8 +8,8 @@ import { uniqueNamesGenerator } from 'unique-names-generator';
 import urlJoin from 'url-join';
 
 import {
-    PUBLIC_DEFAULT_PROFILE_IMAGE,
-    PUBLIC_OPERATOR_PATH
+  PUBLIC_DEFAULT_PROFILE_IMAGE,
+  PUBLIC_OPERATOR_PATH
 } from '$env/static/public';
 
 import { Agent } from '$lib/models/agent';

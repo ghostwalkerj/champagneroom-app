@@ -14,6 +14,7 @@
     "svelte.config.js",
     ".eslintrc.cjs",
     "ambient.d.ts",
+    "orval.config.ts",
     "./types/**/$types.d.ts",
     "./src/**/*.js",
     "./src/**/*.ts",
