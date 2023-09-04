@@ -6,7 +6,10 @@
   import { applyAction, enhance } from '$app/forms';
   import { goto, invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
-  import { PUBLIC_SHOWTIME_PATH } from '$env/static/public';
+  import {
+    PUBLIC_BITCART_MODAL_URL,
+    PUBLIC_SHOWTIME_PATH
+  } from '$env/static/public';
 
   import { CancelReason, DisputeReason } from '$lib/models/common';
   import { type ShowDocumentType, ShowStatus } from '$lib/models/show';
@@ -133,7 +136,15 @@
       loading = false;
     };
   };
+
+  const showInvoice = () => {
+    window.bitcart.showInvoice(ticket.invoiceId);
+  };
 </script>
+
+<svelte:head>
+  <script async src={PUBLIC_BITCART_MODAL_URL}></script>
+</svelte:head>
 
 {#if ticket}
   <div class="mt-6 flex items-center">
@@ -164,7 +175,7 @@
                 </div>
               </div>
             {:else}
-              <form
+              <!-- <form
                 method="post"
                 action="?/buy_ticket"
                 name="buyTicket"
@@ -177,7 +188,16 @@
                     disabled={loading}>Send Payment</button
                   >
                 </div>
-              </form>
+              </form> -->
+              <div class="w-full flex justify-center">
+                <button
+                  class="btn btn-secondary"
+                  on:click={() => {
+                    showInvoice();
+                  }}
+                  disabled={loading}>Send Payment</button
+                >
+              </div>
             {/if}
           </div>
         {:else if canWatchShow && hasShowStarted}

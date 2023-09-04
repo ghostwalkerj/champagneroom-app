@@ -97,7 +97,7 @@ export const actions: Actions = {
       {
         price: ticket.price,
         store_id: BITCART_STORE_ID,
-        expiration: +PUBLIC_PAYMENT_PERIOD / 60,
+        expiration: +PUBLIC_PAYMENT_PERIOD / 60 / 1000,
         order_id: ticket._id.toString()
       },
       {

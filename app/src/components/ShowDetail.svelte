@@ -57,7 +57,7 @@
 
 {#if show}
   <div
-    class="flex flex-col h-full justify-end relative p-4 bg-base-200 rounded-xl min-h-[700px] bg-cover"
+    class="flex flex-col h-full justify-end relative p-4 bg-base-200 rounded-xl min-h-[620px] bg-cover"
     style="background-image: url('{show.coverImageUrl}')"
   >
     <div class="flex flex-col">
