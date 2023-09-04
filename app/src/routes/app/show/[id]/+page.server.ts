@@ -4,7 +4,8 @@ import type IORedis from 'ioredis';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 import urlJoin from 'url-join';
 
-import { PUBLIC_TICKET_PATH } from '$env/static/public';
+import { BITCART_STORE_ID } from '$env/static/private';
+import { PUBLIC_PAYMENT_PERIOD, PUBLIC_TICKET_PATH } from '$env/static/public';
 
 import { Show } from '$lib/models/show';
 import { Ticket } from '$lib/models/ticket';
@@ -13,8 +14,10 @@ import { ShowMachineEventString } from '$lib/machines/showMachine';
 
 import type { ShowQueueType } from '$lib/workers/showWorker';
 
+import { createInvoiceInvoicesPost } from '$lib/bitcart';
 import { EntityType } from '$lib/constants';
 import { mensNames } from '$lib/util/mensNames';
+import { createAuthToken } from '$lib/util/payment';
 import { createPinHash } from '$lib/util/pin';
 import { getShowMachineServiceFromId } from '$lib/util/util.server';
 
@@ -54,14 +57,13 @@ export const actions: Actions = {
       connection: redisConnection
     }) as ShowQueueType;
 
-    const showService = await getShowMachineServiceFromId(showId, showQueue);
+    const showService = await getShowMachineServiceFromId(showId);
 
     const ticket = await Ticket.create({
       show: show._id,
       agent: show.agent,
       creator: show.creator,
       price: show.price,
-      paymentAddress: '0x0000000000000000000000000000000000000000',
       customerName: name,
       pin
     });
@@ -80,6 +82,39 @@ export const actions: Actions = {
     ) {
       return error(501, 'Show cannot Reserve Ticket'); // TODO: This should be atomic
     }
+
+    // Create invoice in Bitcart
+    const token = await createAuthToken();
+
+    const invoice = await createInvoiceInvoicesPost(
+      {
+        price: ticket.price,
+        store_id: BITCART_STORE_ID,
+        expiration: +PUBLIC_PAYMENT_PERIOD / 60,
+        order_id: ticket._id.toString()
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    if (!invoice || !invoice.data) {
+      return error(501, 'Invoice cannot be created');
+    }
+
+    // Update ticket with invoice
+    ticket.invoiceId = invoice.data.id;
+    const payment = invoice.data.payments
+      ? invoice.data.payments[0]
+      : undefined;
+
+    if (payment && payment['payment_address']) {
+      ticket.paymentAddress = payment['payment_address'];
+    }
+    await ticket.save();
 
     showQueue.add(ShowMachineEventString.TICKET_RESERVED, {
       showId: show._id.toString(),

@@ -68,7 +68,6 @@ const ticketSchema = new Schema(
     paymentAddress: {
       type: String,
       maxLength: 50,
-      required: true,
       validator: (v: string) => validator.isEthereumAddress(v)
     },
     price: { type: Number, required: true },
@@ -78,6 +77,7 @@ const ticketSchema = new Schema(
       index: true,
       required: true
     },
+    invoiceId: { type: String },
     ticketState: {
       type: ticketStateSchema,
       required: true,
@@ -86,11 +86,7 @@ const ticketSchema = new Schema(
     customerName: { type: String, required: true, trim: true },
     pin: {
       type: String,
-      required: true,
-      minLength: 8,
-      maxLength: 8,
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      validator: (v: string) => validator.isNumeric(v, { no_symbols: true })
+      required: true
     },
     agent: { type: Schema.Types.ObjectId, ref: 'Agent', required: true },
     creator: { type: Schema.Types.ObjectId, ref: 'Creator', required: true }
