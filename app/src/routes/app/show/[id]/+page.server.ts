@@ -4,8 +4,12 @@ import type IORedis from 'ioredis';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 import urlJoin from 'url-join';
 
-import { BITCART_STORE_ID } from '$env/static/private';
-import { PUBLIC_PAYMENT_PERIOD, PUBLIC_TICKET_PATH } from '$env/static/public';
+import {
+  BITCART_EMAIL,
+  BITCART_PASSWORD,
+  BITCART_STORE_ID
+} from '$env/static/private';
+import { PUBLIC_BITCART_URL, PUBLIC_PAYMENT_PERIOD, PUBLIC_TICKET_PATH } from '$env/static/public';
 
 import { Show } from '$lib/models/show';
 import { Ticket } from '$lib/models/ticket';
@@ -84,8 +88,11 @@ export const actions: Actions = {
     }
 
     // Create invoice in Bitcart
-    const token = await createAuthToken();
-
+    const token = await createAuthToken(
+      BITCART_EMAIL,
+      BITCART_PASSWORD,
+      PUBLIC_BITCART_URL
+    );
     const invoice = await createInvoiceInvoicesPost(
       {
         price: ticket.price,

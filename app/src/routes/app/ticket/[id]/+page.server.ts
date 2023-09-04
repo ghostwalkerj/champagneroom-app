@@ -108,9 +108,9 @@ export const actions: Actions = {
     } as TicketMachineEventType;
 
     if (state.can(cancelEvent)) {
-      //TODO: make real transaction
       ticketService.send(cancelEvent);
     }
+
     return {
       success: true,
       ticketCancelled: true

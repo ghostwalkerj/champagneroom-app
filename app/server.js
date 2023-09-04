@@ -9,6 +9,7 @@ import parseArgv from 'tiny-parse-argv';
 import { handler } from './build/handler';
 import { EntityType } from './dist/constants';
 import { getShowWorker } from './dist/workers/showWorker';
+import { createAuthToken } from './dist/util/payment';
 import packageFile from './package.json' assert { type: 'json' };
 import IORedis from 'ioredis';
 import mongoose from 'mongoose';
@@ -44,6 +45,12 @@ mongoose.connect(mongoDBEndpoint);
 
 const showQueue = new Queue(EntityType.SHOW, { connection: redisConnection });
 
+const paymentAuthToken = await createAuthToken(
+  process.env.BITCART_EMAIL || '',
+  process.env.BITCART_PASSWORD || '',
+  process.env.PUBLIC_BITCART_URL || ''
+);
+
 // Workers
 if (startWorker) {
   // @ts-ignore
@@ -51,6 +58,7 @@ if (startWorker) {
     // @ts-ignore
     showQueue,
     redisConnection,
+    paymentAuthToken,
     escrowPeriod: +(process.env.PUBLIC_ESCROW_PERIOD || 36_000_000),
     gracePeriod: +(process.env.PUBLIC_GRACE_PERIOD || 600_000)
   });

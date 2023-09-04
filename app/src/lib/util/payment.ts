@@ -1,17 +1,19 @@
 import axios from 'axios';
 
-import { BITCART_EMAIL, BITCART_PASSWORD } from '$env/static/private';
-import { PUBLIC_BITCART_URL } from '$env/static/public';
-
 import { createTokenTokenPost } from '$lib/bitcart';
-axios.defaults.baseURL = PUBLIC_BITCART_URL;
 
 const permissions = ['full_control'];
 
-export const createAuthToken = async () => {
+export const createAuthToken = async (
+  email: string,
+  password: string,
+  baseURL: string
+) => {
+  axios.defaults.baseURL = baseURL;
+
   const resp = await createTokenTokenPost({
-    email: BITCART_EMAIL,
-    password: BITCART_PASSWORD,
+    email,
+    password,
     permissions
   });
 

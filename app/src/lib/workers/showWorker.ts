@@ -25,6 +25,7 @@ import {
 import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
 import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 
+import { deleteInvoiceInvoicesModelIdDelete } from '$lib/bitcart';
 import { ActorType, EntityType } from '$lib/constants';
 import {
   getTicketMachineService,
@@ -34,12 +35,14 @@ import {
 export const getShowWorker = ({
   showQueue,
   redisConnection,
+  paymentAuthToken,
   escrowPeriod = 3_600_000,
   gracePeriod = 3_600_000,
   paymentPeriod = 3_600_000
 }: {
   showQueue: ShowQueueType;
   redisConnection: IORedis;
+  paymentAuthToken: string;
   escrowPeriod: number;
   gracePeriod: number;
   paymentPeriod: number;
@@ -116,7 +119,12 @@ export const getShowWorker = ({
           break;
         }
         case ShowMachineEventString.TICKET_CANCELLED: {
-          ticketCancelled(show, job.data.ticketId, job.data.customerName);
+          ticketCancelled(
+            show,
+            job.data.ticketId,
+            paymentAuthToken,
+            job.data.customerName
+          );
           break;
         }
         case ShowMachineEventString.TICKET_FINALIZED: {
@@ -569,6 +577,7 @@ const ticketRefunded = async (show: ShowType, refund: RefundType) => {
 const ticketCancelled = async (
   show: ShowType,
   ticketId: string,
+  paymentAuthToken: string,
   customerName: string
 ) => {
   const showService = createShowMachineService({
@@ -591,6 +600,19 @@ const ticketCancelled = async (
     ticketId,
     customerName
   });
+
+  // Cancel invoice in Bitcart
+  const ticket = await Ticket.findById(ticketId, 'invoiceId').exec();
+
+  if (ticket && ticket.invoiceId) {
+    // Delete invoice in Bitcart
+    deleteInvoiceInvoicesModelIdDelete(ticket.invoiceId, {
+      headers: {
+        Authorization: `Bearer ${paymentAuthToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+  }
 };
 
 // Calculate feedback stats
