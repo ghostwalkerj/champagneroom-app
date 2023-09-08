@@ -9,7 +9,11 @@ import {
   BITCART_PASSWORD,
   BITCART_STORE_ID
 } from '$env/static/private';
-import { PUBLIC_BITCART_URL, PUBLIC_PAYMENT_PERIOD, PUBLIC_TICKET_PATH } from '$env/static/public';
+import {
+  PUBLIC_BITCART_URL,
+  PUBLIC_PAYMENT_PERIOD,
+  PUBLIC_TICKET_PATH
+} from '$env/static/public';
 
 import { Show } from '$lib/models/show';
 import { Ticket } from '$lib/models/ticket';

@@ -612,17 +612,17 @@
                             </td>
 
                             <td
-                              >{currencyFormatter.format(
+                              >{currencyFormatter().format(
                                 creator.salesStats.totalSales
                               )}</td
                             >
                             <td
-                              >{currencyFormatter.format(
+                              >{currencyFormatter().format(
                                 creator.salesStats.totalRevenue
                               )}</td
                             >
                             <td
-                              >{currencyFormatter.format(
+                              >{currencyFormatter().format(
                                 creator.salesStats.totalRefunded
                               )}</td
                             >
@@ -686,7 +686,7 @@
                         >
                           <td>{index + 1}</td>
                           <td>{ticket.show.creatorInfo.name}</td>
-                          <td>{currencyFormatter.format(ticket.price)}</td>
+                          <td>{currencyFormatter().format(ticket.price)}</td>
                           <td
                             >{spacetime(
                               ticket.show.showState.runtime.startDate

@@ -33,15 +33,15 @@
   $: waterMarkText = showStatus;
   $: name = show.name;
   $: duration = durationFormatter(show.duration);
-  $: price = currencyFormatter.format(show.price);
+  $: price = currencyFormatter().format(show.price);
   $: ticketsAvailable = show.showState.salesStats.ticketsAvailable;
   $: ticketsReserved = show.showState.salesStats.ticketsReserved;
   $: ticketsSold = show.showState.salesStats.ticketsSold;
   $: ticketsRefunded = show.showState.salesStats.ticketsRefunded;
-  $: totalRefunded = currencyFormatter.format(
+  $: totalRefunded = currencyFormatter().format(
     show.showState.salesStats.totalRefunded
   );
-  $: totalSales = currencyFormatter.format(
+  $: totalSales = currencyFormatter().format(
     show.showState.salesStats.totalSales
   );
 

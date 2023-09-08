@@ -46,7 +46,7 @@
             {durationFormatter(show.duration)}
           </div>
           <div class="">
-            {currencyFormatter.format(show.price)}
+            {currencyFormatter().format(show.price)}
           </div>
         </div>
         <div

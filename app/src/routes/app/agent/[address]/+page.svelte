@@ -321,17 +321,17 @@
                             </td>
 
                             <td
-                              >{currencyFormatter.format(
+                              >{currencyFormatter().format(
                                 creator.salesStats.totalSales
                               )}</td
                             >
                             <td
-                              >{currencyFormatter.format(
+                              >{currencyFormatter().format(
                                 creator.salesStats.totalRevenue
                               )}</td
                             >
                             <td
-                              >{currencyFormatter.format(
+                              >{currencyFormatter().format(
                                 creator.salesStats.totalRefunded
                               )}</td
                             >

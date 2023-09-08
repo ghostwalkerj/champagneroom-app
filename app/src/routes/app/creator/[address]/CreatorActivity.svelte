@@ -33,7 +33,7 @@
                   {/if}
                 </div>
                 <div class="text-sm text-gray-200">
-                  {currencyFormatter.format(show.price)}
+                  {currencyFormatter().format(show.price)}
                 </div>
               </div>
               <div class="flex flex-row w-full">

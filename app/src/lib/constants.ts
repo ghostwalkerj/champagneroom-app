@@ -26,16 +26,20 @@ export enum TokenRoles {
   CREATOR = 'CREATOR'
 }
 
-export const currencyFormatter = new Intl.NumberFormat('en-US', {
-  style: 'currency',
-  currency: 'USD',
-  maximumFractionDigits: 0
-});
+export const currencyFormatter = (currency = 'USD') => {
+  const formatter = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency,
+    maximumFractionDigits: 0
+  });
+
+  return formatter;
+};
 
 export const durationFormatter = (duration: number): string => {
   const hours = Math.floor(duration / 60);
   const minutes = duration % 60;
-  const hoursString = hours > 0 ? `${hours}h ` : '';
+  const hoursString = hours > 0 ? `${hours}hr ` : '';
   const minuteString = minutes > 0 ? `${minutes}m` : '';
   return `${hoursString} ${minuteString}`.trim();
 };

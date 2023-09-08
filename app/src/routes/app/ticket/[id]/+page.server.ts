@@ -1,9 +1,11 @@
 import { error, fail, redirect } from '@sveltejs/kit';
+import type { AxiosResponse } from 'axios';
 import type IORedis from 'ioredis';
 import { Types } from 'mongoose';
 import urlJoin from 'url-join';
 
-import { PUBLIC_PIN_PATH } from '$env/static/public';
+import { BITCART_EMAIL, BITCART_PASSWORD } from '$env/static/private';
+import { PUBLIC_BITCART_URL, PUBLIC_PIN_PATH } from '$env/static/public';
 
 import type {
   CancelType,
@@ -19,7 +21,10 @@ import { Transaction, TransactionReasonType } from '$lib/models/transaction';
 import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
 import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 
+import { getInvoiceByIdInvoicesModelIdGet } from '$lib/bitcart';
+import type { DisplayInvoice } from '$lib/bitcart/models';
 import { ActorType } from '$lib/constants';
+import { createAuthToken } from '$lib/util/payment';
 import { verifyPin } from '$lib/util/pin';
 import {
   getTicketMachineService,
@@ -219,18 +224,36 @@ export const load: PageServerLoad = async ({ params, cookies, url }) => {
     })
     .exec();
 
+  if (!verifyPin(ticketId, ticket.pin, pinHash)) {
+    throw redirect(302, redirectUrl);
+  }
+
   const show = await Show.findById(ticket.show)
     .orFail(() => {
       throw error(404, 'Show not found');
     })
     .exec();
 
-  if (!verifyPin(ticketId, ticket.pin, pinHash)) {
-    throw redirect(302, redirectUrl);
-  }
+  // Get invoice associated with ticket
+  const token = await createAuthToken(
+    BITCART_EMAIL,
+    BITCART_PASSWORD,
+    PUBLIC_BITCART_URL
+  );
+
+  const invoice =
+    (ticket.invoiceId &&
+      ((await getInvoiceByIdInvoicesModelIdGet(ticket.invoiceId, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      })) as AxiosResponse<DisplayInvoice>)) ||
+    undefined;
 
   return {
     ticket: ticket.toObject({ flattenObjectIds: true }),
-    show: show.toObject({ flattenObjectIds: true })
+    show: show.toObject({ flattenObjectIds: true }),
+    invoice: invoice?.data
   };
 };

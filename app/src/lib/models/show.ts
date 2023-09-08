@@ -298,6 +298,7 @@ const showSchema = new Schema(
       }
     },
     price: { type: Number, required: true, min: 1 },
+    currency: { type: String, required: true, default: 'USD' },
     creatorInfo: {
       type: {
         name: { type: String, required: true },

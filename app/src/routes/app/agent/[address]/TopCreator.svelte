@@ -30,7 +30,7 @@
       legend: { display: true, position: 'bottom' as const },
       datalabels: {
         formatter: function (value: number | bigint) {
-          return currencyFormatter.format(value);
+          return currencyFormatter().format(value);
         }
         //anchor: 'end'
       }

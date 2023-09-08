@@ -31,6 +31,9 @@
 
   let ticket = data.ticket as TicketDocumentType;
   let show = data.show as ShowDocumentType;
+  let invoice = data.invoice;
+
+  console.log('invoice', invoice);
 
   const showTimePath = urlJoin($page.url.href, PUBLIC_SHOWTIME_PATH);
   const reasons = Object.values(DisputeReason);
