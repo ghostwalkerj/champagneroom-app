@@ -155,7 +155,7 @@
       <!-- Page header -->
       <div class="pb-4 text-center relative">
         {#key ticket.ticketState || show.showState}
-          <TicketDetail {ticket} {show} />
+          <TicketDetail {ticket} {show} {invoice} />
         {/key}
         {#if isWaitingForShow}
           <div

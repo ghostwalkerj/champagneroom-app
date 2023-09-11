@@ -251,6 +251,10 @@ export const load: PageServerLoad = async ({ params, cookies, url }) => {
       })) as AxiosResponse<DisplayInvoice>)) ||
     undefined;
 
+  if (!invoice) {
+    throw error(404, 'Invoice not found');
+  }
+
   return {
     ticket: ticket.toObject({ flattenObjectIds: true }),
     show: show.toObject({ flattenObjectIds: true }),
