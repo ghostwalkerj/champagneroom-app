@@ -2,7 +2,7 @@
   import { PUBLIC_STATIC_URL } from '$env/static/public';
 
   import type { ShowDocumentType } from '$lib/models/show';
-  import type { TicketDocumentType } from '$lib/models/ticket';
+  import { type TicketDocumentType, TicketStatus } from '$lib/models/ticket';
 
   import type { DisplayInvoice } from '$lib/bitcart/models';
   import { currencyFormatter, durationFormatter } from '$lib/constants';
@@ -58,9 +58,17 @@
       <div
         class="col-span-2 relative flex flex-col p-4 text-info font-bold text-sm"
       >
+        {#if ticketStatus === TicketStatus.CANCELLED}
+          <div
+            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-2xl whitespace-nowrap font-extrabold text-primary ring-2 ring-primary bg-base-200 p-2 ring-inset rounded-xl z-20 opacity-70 -rotate-[20deg]"
+          >
+            Cancelled
+          </div>
+        {/if}
+
         <div
           class="bg-center bg-cover h-28 opacity-10 absolute inset-0 top-2"
-          style="background-image: url('{PUBLIC_STATIC_URL}/assets/logo-horizontal-tr.png') "
+          style="background-image: url('{PUBLIC_STATIC_URL}/assets/logo-horizontal-tr.png') z-0"
         />
         <div>Ticket Reserved for: {customerName}</div>
         <div class="capitalize">Payment Status: {invoiceStatus}</div>
@@ -68,7 +76,7 @@
         <div class="tooltip tooltip-primary" data-tip={copied}>
           <!-- svelte-ignore a11y-click-events-have-key-events -->
           <div
-            class="z-20"
+            class="z-10"
             on:click={() => {
               copied = 'Copied';
               navigator.clipboard.writeText(ticketPaymentAddress);
