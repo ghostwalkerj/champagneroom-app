@@ -21,7 +21,8 @@ import type { TransactionDocumentType } from '$lib/models/transaction';
 
 import type { ShowJobDataType } from '$lib/workers/showWorker';
 
-import { ActorType } from '$lib/constants';
+import type { DisplayInvoice } from '$lib/bitcart/models';
+import { ActorType, InvoiceStatus } from '$lib/constants';
 
 import { ShowMachineEventString } from './showMachine';
 
@@ -37,7 +38,9 @@ export enum TicketMachineEventString {
   SHOW_CANCELLED = 'SHOW CANCELLED',
   TICKET_FINALIZED = 'TICKET FINALIZED',
   DISPUTE_RESOLVED = 'DISPUTE RESOLVED',
-  TICKET_REDEEMED = 'TICKET REDEEMED'
+  TICKET_REDEEMED = 'TICKET REDEEMED',
+  TICKET_RESERVATION_TIMEOUT = 'TICKET RESERVATION TIMEOUT',
+  INVOICE_STATUS_CHANGED = 'INVOICE STATUS CHANGED'
 }
 type TicketMachineEventType =
   | {
@@ -65,6 +68,9 @@ type TicketMachineEventType =
       type: 'TICKET REDEEMED';
     }
   | {
+      type: 'TICKET RESERVATION TIMEOUT';
+    }
+  | {
       type: 'SHOW JOINED';
     }
   | {
@@ -84,6 +90,11 @@ type TicketMachineEventType =
   | {
       type: 'DISPUTE RESOLVED';
       decision: DisputeDecision;
+    }
+  | {
+      type: 'INVOICE STATUS CHANGED';
+      invoice: DisplayInvoice;
+      status: InvoiceStatus;
     };
 
 const createTicketMachine = ({
@@ -319,6 +330,9 @@ const createTicketMachine = ({
         'SHOW ENDED': {
           target: '#ticketMachine.ended',
           actions: ['endShow']
+        },
+        'INVOICE STATUS CHANGED': {
+          actions: ['invoiceStatusChanged']
         }
       }
     },
@@ -570,9 +584,29 @@ const createTicketMachine = ({
               status: TicketStatus.MISSED_SHOW
             }
           };
-        })
-      },
+        }),
 
+        invoiceStatusChanged: (context, event) => {
+          const invoice = event.invoice;
+          const status = event.status;
+
+          switch (status) {
+            case InvoiceStatus.PENDING:
+            case InvoiceStatus.COMPLETE:
+            case InvoiceStatus.IN_PROGRESS:
+            case InvoiceStatus.INVALID:
+            case InvoiceStatus.EXPIRED:
+            case InvoiceStatus.FAILED: {
+              console.log('invoice', invoice);
+              console.log('status', status);
+              break;
+            }
+            default: {
+              throw new Error('Invalid invoice status');
+            }
+          }
+        }
+      },
       guards: {
         canCancel: (context) => {
           const canCancel =

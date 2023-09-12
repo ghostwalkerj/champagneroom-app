@@ -549,13 +549,14 @@ const ticketReserved = async (
     customerName
   });
 
-  showQueue.add(
-    ShowMachineEventString.TICKET_RESERVATION_TIMEOUT,
-    {
-      showId: show._id.toString()
-    },
-    { delay: paymentPeriod }
-  );
+  // Let the payment system kick off this event.
+  // showQueue.add(
+  //   ShowMachineEventString.TICKET_RESERVATION_TIMEOUT,
+  //   {
+  //     showId: show._id.toString()
+  //   },
+  //   { delay: paymentPeriod }
+  // );
 };
 
 const ticketRefunded = async (show: ShowType, refund: RefundType) => {

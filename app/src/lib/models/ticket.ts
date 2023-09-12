@@ -79,7 +79,7 @@ const ticketSchema = new Schema(
       index: true,
       required: true
     },
-    invoiceId: { type: String },
+    invoiceId: { type: String, index: true },
     ticketState: {
       type: ticketStateSchema,
       required: true,

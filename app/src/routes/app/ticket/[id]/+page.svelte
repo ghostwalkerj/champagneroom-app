@@ -12,7 +12,7 @@
   } from '$env/static/public';
 
   import { CancelReason, DisputeReason } from '$lib/models/common';
-  import { type ShowDocumentType, ShowStatus } from '$lib/models/show';
+  import { ShowStatus, type ShowDocumentType } from '$lib/models/show';
   import type { TicketDocumentType } from '$lib/models/ticket';
 
   import type { TicketMachineServiceType } from '$lib/machines/ticketMachine';
