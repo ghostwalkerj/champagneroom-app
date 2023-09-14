@@ -12,7 +12,7 @@ const showeventSchema = new Schema(
     type: { type: String, required: true },
     show: { type: Schema.Types.ObjectId, ref: 'Show', required: true },
     creator: { type: Schema.Types.ObjectId, ref: 'Creator', required: true },
-    agent: { type: Schema.Types.ObjectId, ref: 'Agent', required: true },
+    agent: { type: Schema.Types.ObjectId, ref: 'Agent'},
     ticket: { type: Schema.Types.ObjectId, ref: 'Ticket' },
     transaction: { type: Schema.Types.ObjectId, ref: 'Transaction' },
     ticketInfo: {

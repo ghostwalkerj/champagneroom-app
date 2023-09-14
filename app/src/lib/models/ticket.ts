@@ -90,7 +90,7 @@ const ticketSchema = new Schema(
       type: String,
       required: true
     },
-    agent: { type: Schema.Types.ObjectId, ref: 'Agent', required: true },
+    agent: { type: Schema.Types.ObjectId, ref: 'Agent' },
     creator: { type: Schema.Types.ObjectId, ref: 'Creator', required: true }
   },
   { timestamps: true }

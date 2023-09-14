@@ -263,7 +263,7 @@ const showSchema = new Schema(
       required: true,
       index: true
     },
-    agent: { type: Schema.Types.ObjectId, ref: 'Agent', required: true },
+    agent: { type: Schema.Types.ObjectId, ref: 'Agent' },
     roomId: {
       type: String,
       required: true,
