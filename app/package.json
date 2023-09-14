@@ -16,7 +16,7 @@
     "dev": "vite dev",
     "build": "vite build",
     "build:digitalOcean": "yarn install --production=false && rimraf dist && yarn build && yarn install --production --frozen-lockfile",
-    "start": " node --experimental-specifier-resolution=node server.js ",
+    "start": " node --experimental-specifier-resolution=node server.js --worker ",
     "package": "svelte-package",
     "preview": "vite preview",
     "test": "playwright test",

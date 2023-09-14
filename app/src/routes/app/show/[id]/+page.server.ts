@@ -11,6 +11,7 @@ import {
 } from '$env/static/private';
 import {
   PUBLIC_BITCART_URL,
+  PUBLIC_PAYMENT_NOTIFICATION_PATH,
   PUBLIC_PAYMENT_PERIOD,
   PUBLIC_TICKET_PATH
 } from '$env/static/public';
@@ -97,12 +98,14 @@ export const actions: Actions = {
       BITCART_PASSWORD,
       PUBLIC_BITCART_URL
     );
+
     const invoice = await createInvoiceInvoicesPost(
       {
         price: ticket.price,
         store_id: BITCART_STORE_ID,
         expiration: +PUBLIC_PAYMENT_PERIOD / 60 / 1000,
-        order_id: ticket._id.toString()
+        order_id: ticket._id.toString(),
+        notification_url: urlJoin(url.origin, PUBLIC_PAYMENT_NOTIFICATION_PATH)
       },
       {
         headers: {

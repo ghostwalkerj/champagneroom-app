@@ -1,0 +1,28 @@
+# Our Node base image
+FROM node:18.16.0
+
+# Set the Node environment to development to ensure all packages are installed
+ENV NODE_ENV development
+
+# Change our current working directory
+WORKDIR /usr/src/app
+
+# Copy over `package.json` and lock files to optimize the build process
+COPY ["package.json", "package-lock.json*", "npm-shrinkwrap.json*", "yarn.lock", "./"]
+
+# Copy over rest of the project files
+COPY . .
+
+# yarn build
+RUN set -ex; \
+  yarn install --frozen-lockfile --development; \
+  yarn cache clean; \
+  yarn package \
+  yarn run build
+
+
+# Expose port 3000 for the SvelteKit app and 24678 for Vite's HMR
+EXPOSE 3000
+
+# Run `yarn start`
+CMD ["yarn", "start"]

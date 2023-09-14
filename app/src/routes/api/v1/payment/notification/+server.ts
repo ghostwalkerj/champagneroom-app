@@ -17,9 +17,9 @@ import { getTicketMachineServiceFromId } from '$lib/util/util.server';
 import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
-  const body = await request.formData();
-  const invoiceId = body.get('id') as string;
-  const status = body.get('status') as string;
+  const body = await request.json();
+  const invoiceId = body['id'] as string;
+  const status = body['status'] as string;
 
   if (!invoiceId || !status) {
     return new Response(undefined, { status: 400 });

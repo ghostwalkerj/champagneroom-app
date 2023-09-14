@@ -12,7 +12,7 @@
   } from '$env/static/public';
 
   import { CancelReason, DisputeReason } from '$lib/models/common';
-  import { ShowStatus, type ShowDocumentType } from '$lib/models/show';
+  import { type ShowDocumentType, ShowStatus } from '$lib/models/show';
   import type { TicketDocumentType } from '$lib/models/ticket';
 
   import type { TicketMachineServiceType } from '$lib/machines/ticketMachine';
@@ -32,8 +32,6 @@
   let ticket = data.ticket as TicketDocumentType;
   let show = data.show as ShowDocumentType;
   let invoice = data.invoice;
-
-  console.log('invoice', invoice);
 
   const showTimePath = urlJoin($page.url.href, PUBLIC_SHOWTIME_PATH);
   const reasons = Object.values(DisputeReason);

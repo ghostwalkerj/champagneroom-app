@@ -91,29 +91,29 @@
   dependencies:
     regenerator-runtime "^0.13.11"
 
-"@bull-board/api@5.8.1":
-  version "5.8.1"
-  resolved "https://registry.yarnpkg.com/@bull-board/api/-/api-5.8.1.tgz#be9df7da5263843f71d5cc5c7c0ff680f064094d"
-  integrity sha512-50cx5+43+EsVzxV0/R4Na71hRCbLennCodFMxr3Fve1m99gjNiIFV4B94FGW001wfm09AU1QruD/SfdkWvdeqA==
+"@bull-board/api@5.8.2":
+  version "5.8.2"
+  resolved "https://registry.yarnpkg.com/@bull-board/api/-/api-5.8.2.tgz#eabdf9041ad12bcd2c507121a2c7a77315b67c95"
+  integrity sha512-GeQ7xOCYDKoCLpol3LePq8GOjj/Dcv2JW1xyGxSK5ZD8GUTJOhGGx09XKm26DfstPcDfQlvZX/pddRsCRm4JHA==
   dependencies:
     redis-info "^3.0.8"
 
 "@bull-board/express@^5.6.1":
-  version "5.8.1"
-  resolved "https://registry.yarnpkg.com/@bull-board/express/-/express-5.8.1.tgz#90f49fe36298040c6cf0b92964ae0c6ec6b739b5"
-  integrity sha512-0Hk07AqiFvPDT5DQpeHN9btSXencjWtIapRiCBOo6QtTybwiyZjc8wcd1Io05O1tAYFNw7cMT5sW+mDU8PhkOg==
+  version "5.8.2"
+  resolved "https://registry.yarnpkg.com/@bull-board/express/-/express-5.8.2.tgz#2c86b14d07e3c0179e8ae21356b9cd8b6378ee6b"
+  integrity sha512-oAaGadrISurm8y+XpHneZFZq5DL2OkiU4k8E9NY3REEFSZHpRIfGe4wQ0MiBUwWhbniKyhis6s58E7HUWBBdig==
   dependencies:
-    "@bull-board/api" "5.8.1"
-    "@bull-board/ui" "5.8.1"
+    "@bull-board/api" "5.8.2"
+    "@bull-board/ui" "5.8.2"
     ejs "3.1.7"
     express "4.17.3"
 
-"@bull-board/ui@5.8.1":
-  version "5.8.1"
-  resolved "https://registry.yarnpkg.com/@bull-board/ui/-/ui-5.8.1.tgz#95f7a76b000a7f9a289f5c3249b8d3eea40e1d3b"
-  integrity sha512-SO/TAMLJU4Mbiq0nm5IRHaUfYYYoiVjvfLxLhlw9D+pL2OdIhDte1ZLGR1yXNGNv44Kl4bsQ2uYOe98mQHW5Pw==
+"@bull-board/ui@5.8.2":
+  version "5.8.2"
+  resolved "https://registry.yarnpkg.com/@bull-board/ui/-/ui-5.8.2.tgz#29b3442db59a3ff509efae55fbb9514dd30ecc6c"
+  integrity sha512-UN6CLI3qeXFZIzPS0aUXfuwlO2swchz2CBxfDXaqYJo5BbLK9ovZxhiV2dHXY3f/L494bMFIFVxHBoQo8XRLzg==
   dependencies:
-    "@bull-board/api" "5.8.1"
+    "@bull-board/api" "5.8.2"
 
 "@coinbase/wallet-sdk@^3.7.1":
   version "3.7.1"
@@ -1655,9 +1655,9 @@
     lodash.uniq "^4.5.0"
 
 "@polka/url@^1.0.0-next.20":
-  version "1.0.0-next.21"
-  resolved "https://registry.yarnpkg.com/@polka/url/-/url-1.0.0-next.21.tgz#5de5a2385a35309427f6011992b544514d559aa1"
-  integrity sha512-a5Sab1C4/icpTZVzZc5Ghpz88yQtGOyNqYXcZgOssB2uuAr+wF/MvN6bgtW32q7HHrvBki+BsZ0OuNv6EV3K9g==
+  version "1.0.0-next.23"
+  resolved "https://registry.yarnpkg.com/@polka/url/-/url-1.0.0-next.23.tgz#498e41218ab3b6a1419c735e5c6ae2c5ed609b6c"
+  integrity sha512-C16M+IYz0rgRhWZdCmK+h58JMv8vijAA61gmz2rspCSwKwzBebpdcsiUmwrtJRdphuY30i6BSLEOP8ppbNLyLg==
 
 "@protobufjs/aspromise@^1.1.1", "@protobufjs/aspromise@^1.1.2":
   version "1.1.2"
@@ -2286,9 +2286,9 @@
     rollup "^3.7.0"
 
 "@sveltejs/kit@^1.18.0":
-  version "1.24.1"
-  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-1.24.1.tgz#ec9aa74ebde06b24db9ad629a62771fbd3b1c747"
-  integrity sha512-u2FO0q62Se9UZ0g9kXaWYi+54vTK70BKaPScOcx6jLMRou4CUZgDTNKnRhsbJgPMgaLkOH0j3o/fKlZ6jBfgSg==
+  version "1.25.0"
+  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-1.25.0.tgz#b04894d45526c4170cb21769042d0188ffd4bc72"
+  integrity sha512-+VqMWJJYtcLoF8hYkdqY2qs/MPaawrMwA/gNBJW2o2UrcuYdNiy0ZZnjQQuPD33df/VcAulnoeyzF5ZtaajFEw==
   dependencies:
     "@sveltejs/vite-plugin-svelte" "^2.4.1"
     "@types/cookie" "^0.5.1"
@@ -4781,9 +4781,9 @@ d@1, d@^1.0.1:
     type "^1.0.1"
 
 daisyui@^3.1.5:
-  version "3.7.3"
-  resolved "https://registry.yarnpkg.com/daisyui/-/daisyui-3.7.3.tgz#247cfefa0112c31679af9035eff65e1bd866f062"
-  integrity sha512-gKlz3RwfaukZxf8nQZsDAZ7quUSi7F8HjGGB34tkHruvfQB9cgVDQsmqUqSQtkAJYvzbrg/3dLUa9+5jF4iC1A==
+  version "3.7.4"
+  resolved "https://registry.yarnpkg.com/daisyui/-/daisyui-3.7.4.tgz#5027d7be3d12cdd93c2aa911edac26abd1c3e12b"
+  integrity sha512-hAgTomIK8RDQ/RLH9Z2NxZiNVAO40w08FlhgYS/8CTFF+wggeHeNJ0qNBHWAJJzhjD8UU2u4PZ4nc4r9rwfTLw==
   dependencies:
     colord "^2.9"
     css-selector-tokenizer "^0.8"
@@ -7356,9 +7356,9 @@ jayson@^4.1.0:
     ws "^7.4.5"
 
 jiti@^1.18.2:
-  version "1.19.3"
-  resolved "https://registry.yarnpkg.com/jiti/-/jiti-1.19.3.tgz#ef554f76465b3c2b222dc077834a71f0d4a37569"
-  integrity sha512-5eEbBDQT/jF1xg6l36P+mWGGoH9Spuy0PCdSr2dtWRDGC6ph/w9ZCL4lmESW8f8F7MwT3XKescfP0wnZWAKL9w==
+  version "1.20.0"
+  resolved "https://registry.yarnpkg.com/jiti/-/jiti-1.20.0.tgz#2d823b5852ee8963585c8dd8b7992ffc1ae83b42"
+  integrity sha512-3TV69ZbrvV6U5DfQimop50jE9Dl6J8O1ja1dvBbMba/sZ3YBEQqJ2VZRoQPVnhlzjNtU1vaXRZVrVjU4qtm8yA==
 
 joi@17.9.1:
   version "17.9.1"

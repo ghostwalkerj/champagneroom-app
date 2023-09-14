@@ -57,7 +57,7 @@
 
 {#if show}
   <div
-    class="flex flex-col h-full justify-end relative p-4 bg-base-200 rounded-xl min-h-[620px] bg-cover"
+    class="flex flex-col h-full justify-end relative p-4 bg-base-200 rounded-xl min-h-[620px] bg-cover font-CaviarDreams"
     style="background-image: url('{show.coverImageUrl}')"
   >
     <div class="flex flex-col">
@@ -81,7 +81,7 @@
 
       {#if options.showWaterMark && waterMarkText}
         <div
-          class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-5xl md:text-6xl -rotate-45 whitespace-nowrap font-extrabold text-primary ring-2 ring-primary bg-base-200 p-2 ring-inset rounded-xl font-CaviarDreams"
+          class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-5xl md:text-6xl -rotate-45 whitespace-nowrap font-extrabold text-primary ring-2 ring-primary bg-base-200 p-2 ring-inset rounded-xl"
         >
           {waterMarkText}
         </div>

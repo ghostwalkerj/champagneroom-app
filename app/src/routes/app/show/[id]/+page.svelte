@@ -57,7 +57,9 @@
       {#if canBuyTicket}
         <input type="checkbox" id="buy-ticket" class="modal-toggle" />
         <div class="modal">
-          <div class="modal-box relative">
+          <div
+            class="modal-box relative bg-gradient-to-r from-[#0C082E] to-[#0C092E]"
+          >
             <label
               for="buy-ticket"
               class="btn btn-sm btn-circle absolute right-2 top-2">✕</label
@@ -73,6 +75,7 @@
                 method="post"
                 action="?/reserve_ticket"
                 use:enhance={onSubmit}
+                class="font-Roboto"
               >
                 <div class="max-w-xs w-full py-2 form-control">
                   <!-- svelte-ignore a11y-label-has-associated-control -->

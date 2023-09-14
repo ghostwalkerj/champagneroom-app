@@ -7,13 +7,15 @@ import { nanoid } from 'nanoid';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 import { raise } from 'xstate/lib/actions';
 
-import type {
-  CancelType,
-  DisputeDecision,
-  DisputeType,
-  FeedbackType,
-  FinalizeType,
-  RefundReason
+import type { CancelType } from '$lib/models/common';
+import {
+  CancelReason,
+  type CancelType,
+  type DisputeDecision,
+  type DisputeType,
+  type FeedbackType,
+  type FinalizeType,
+  type RefundReason
 } from '$lib/models/common';
 import type { TicketDocumentType, TicketStateType } from '$lib/models/ticket';
 import { TicketStatus } from '$lib/models/ticket';
@@ -590,17 +592,46 @@ const createTicketMachine = ({
           const invoice = event.invoice;
           const status = event.status;
 
+          const cancel = {
+            _id: new Types.ObjectId(),
+            cancelledBy: ActorType.CUSTOMER,
+            cancelledInState: context.ticketState.status,
+            cancelledAt: new Date()
+          } as CancelType;
+
           switch (status) {
             case InvoiceStatus.PENDING:
             case InvoiceStatus.COMPLETE:
             case InvoiceStatus.IN_PROGRESS:
-            case InvoiceStatus.INVALID:
-            case InvoiceStatus.EXPIRED:
             case InvoiceStatus.FAILED: {
-              console.log('invoice', invoice);
-              console.log('status', status);
+              cancel.reason = CancelReason.TICKET_PAYMENT_FAILED;
+              const cancelEvent = {
+                type: 'CANCELLATION INITIATED',
+                cancel
+              } as TicketMachineEventType;
+              raise(cancelEvent);
               break;
             }
+            case InvoiceStatus.INVALID: {
+              cancel.reason = CancelReason.TICKET_PAYMENT_INVALID;
+              const cancelEvent = {
+                type: 'CANCELLATION INITIATED',
+                cancel
+              } as TicketMachineEventType;
+              raise(cancelEvent);
+              break;
+            }
+            case InvoiceStatus.EXPIRED: {
+              cancel.reason = CancelReason.TICKET_PAYMENT_TIMEOUT;
+              const cancelEvent = {
+                type: 'CANCELLATION INITIATED',
+                cancel
+              } as TicketMachineEventType;
+              console.log('cancelEvent', cancelEvent);
+              raise(cancelEvent);
+              break;
+            }
+
             default: {
               throw new Error('Invalid invoice status');
             }
