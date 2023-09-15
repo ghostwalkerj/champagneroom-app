@@ -68,7 +68,7 @@
       </div>
       {#if options.showRating}
         <div
-          class="absolute top-4 right-4 text-lg text-primary ring-2 ring-primary bg-base-200 p-2 ring-inset rounded-xl"
+          class="absolute top-4 right-4 text-lg text-primary ring-2 ring-primary bg-base-200 p-2 ring-inset rounded-xl text-center"
         >
           <div class="">
             {show.creatorInfo.name}

@@ -2,12 +2,13 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import type { UserConfig } from 'vite';
 import EnvironmentPlugin from 'vite-plugin-environment';
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
+import mkcert from'vite-plugin-mkcert'
 
-const MODE = process.env.NODE_ENV;
 const config: UserConfig = {
   mode: 'development',
   plugins: [
     sveltekit(),
+    mkcert(),
     EnvironmentPlugin(['MONGO_DB_FIELD_SECRET']),
     nodePolyfills({
       protocolImports: true,
@@ -30,6 +31,7 @@ const config: UserConfig = {
     }
   },
   server: {
+    https: false,
     fs: {
       // Allow serving files from one level up to the project root
       allow: ['..'],
