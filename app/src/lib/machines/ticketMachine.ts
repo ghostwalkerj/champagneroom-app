@@ -4,10 +4,9 @@
 import type { Queue } from 'bullmq';
 import { Types } from 'mongoose';
 import { nanoid } from 'nanoid';
-import { assign, createMachine, interpret, type StateFrom } from 'xstate';
-import { raise } from 'xstate/lib/actions';
+import { assign, createMachine, interpret, send, type StateFrom } from 'xstate';
+import { raise, sendTo } from 'xstate/lib/actions';
 
-import type { CancelType } from '$lib/models/common';
 import {
   CancelReason,
   type CancelType,
@@ -438,6 +437,7 @@ const createTicketMachine = ({
         },
 
         initiateCancellation: assign((context, event) => {
+          console.log('initiateCancellation', event);
           return {
             ticketState: {
               ...context.ticketState,
@@ -599,6 +599,8 @@ const createTicketMachine = ({
             cancelledAt: new Date()
           } as CancelType;
 
+          console.log('invoiceStatusChanged', status);
+
           switch (status) {
             case InvoiceStatus.PENDING:
             case InvoiceStatus.COMPLETE:
@@ -609,7 +611,7 @@ const createTicketMachine = ({
                 type: 'CANCELLATION INITIATED',
                 cancel
               } as TicketMachineEventType;
-              raise(cancelEvent);
+              send(cancelEvent);
               break;
             }
             case InvoiceStatus.INVALID: {
@@ -618,7 +620,7 @@ const createTicketMachine = ({
                 type: 'CANCELLATION INITIATED',
                 cancel
               } as TicketMachineEventType;
-              raise(cancelEvent);
+              send(cancelEvent);
               break;
             }
             case InvoiceStatus.EXPIRED: {
@@ -627,8 +629,11 @@ const createTicketMachine = ({
                 type: 'CANCELLATION INITIATED',
                 cancel
               } as TicketMachineEventType;
-              console.log('cancelEvent', cancelEvent);
-              raise(cancelEvent);
+
+              console.log('Raise expired', cancelEvent);
+
+              send(cancelEvent);
+
               break;
             }
 

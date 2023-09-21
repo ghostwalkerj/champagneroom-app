@@ -92,7 +92,7 @@ export type ShowMachineEventType =
     }
   | {
       type: 'TICKET FINALIZED';
-      ticketId: string;R
+      ticketId: string;
     }
   | {
       type: 'REFUND INITIATED';
