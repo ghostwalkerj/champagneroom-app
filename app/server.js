@@ -9,6 +9,7 @@ import parseArgv from 'tiny-parse-argv';
 import { handler } from './build/handler';
 import { EntityType } from './dist/constants';
 import { getShowWorker } from './dist/workers/showWorker';
+import { getPaymentWorker } from './dist/workers/paymentWorker';
 import { createAuthToken } from './dist/util/payment';
 import packageFile from './package.json' assert { type: 'json' };
 import IORedis from 'ioredis';
@@ -44,6 +45,9 @@ const mongoDBEndpoint =
 mongoose.connect(mongoDBEndpoint);
 
 const showQueue = new Queue(EntityType.SHOW, { connection: redisConnection });
+const paymentQueue = new Queue(EntityType.PAYMENT, {
+  connection: redisConnection
+});
 
 const paymentAuthToken = await createAuthToken(
   process.env.BITCART_EMAIL || '',
@@ -53,7 +57,6 @@ const paymentAuthToken = await createAuthToken(
 
 // Workers
 if (startWorker) {
-  // @ts-ignore
   const showWorker = getShowWorker({
     // @ts-ignore
     showQueue,
@@ -63,13 +66,17 @@ if (startWorker) {
     gracePeriod: +(process.env.PUBLIC_GRACE_PERIOD || 600_000)
   });
   showWorker.run();
+
+  const paymentWorker = getPaymentWorker({ redisConnection, paymentAuthToken });
+
+  paymentWorker.run();
 }
 
 // Bull Dashboard
 const serverAdapter = new ExpressAdapter();
 serverAdapter.setBasePath('/admin/queues');
 createBullBoard({
-  queues: [new BullMQAdapter(showQueue)],
+  queues: [new BullMQAdapter(showQueue), new BullMQAdapter(paymentQueue)],
   serverAdapter: serverAdapter
 });
 const staticAuth = basicAuth({

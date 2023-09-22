@@ -23,7 +23,6 @@ enum ShowMachineEventString {
   REFUND_INITIATED = 'REFUND INITIATED',
   TICKET_REFUNDED = 'TICKET REFUNDED',
   TICKET_RESERVED = 'TICKET RESERVED',
-  TICKET_RESERVATION_TIMEOUT = 'TICKET RESERVATION TIMEOUT',
   TICKET_CANCELLED = 'TICKET CANCELLED',
   TICKET_SOLD = 'TICKET SOLD',
   SHOW_STARTED = 'SHOW STARTED',
@@ -109,10 +108,6 @@ export type ShowMachineEventType =
       type: 'TICKET RESERVED';
       ticketId: string;
       customerName: string;
-    }
-  | {
-      type: 'TICKET RESERVATION TIMEOUT';
-      ticketId: string;
     }
   | {
       type: 'TICKET CANCELLED';
@@ -345,9 +340,7 @@ const createShowMachine = ({
                 actions: ['reserveTicket']
               }
             ],
-            'TICKET RESERVATION TIMEOUT': {
-              actions: ['timeoutReservation']
-            },
+
             'TICKET CANCELLED': {
               actions: ['cancelTicket']
             },
@@ -373,12 +366,6 @@ const createShowMachine = ({
               target: 'started',
               actions: ['startShow']
             },
-            'TICKET RESERVATION TIMEOUT': [
-              {
-                target: 'boxOfficeOpen',
-                actions: ['openBoxOffice', 'timeoutReservation']
-              }
-            ],
             'TICKET CANCELLED': [
               {
                 target: 'boxOfficeOpen',
@@ -681,26 +668,6 @@ const createShowMachine = ({
               salesStats: {
                 ...st.salesStats,
                 ticketsFinalized: st.salesStats.ticketsFinalized + 1
-              }
-            }
-          };
-        }),
-
-        timeoutReservation: assign((context, event) => {
-          const st = context.showState;
-          const index = st.reservations.indexOf(
-            new Types.ObjectId(event.ticketId)
-          );
-          if (index > -1) {
-            st.reservations.splice(index, 1);
-          }
-          return {
-            showState: {
-              ...st,
-              salesStats: {
-                ...st.salesStats,
-                ticketsAvailable: st.salesStats.ticketsAvailable + 1,
-                ticketsReserved: st.salesStats.ticketsReserved - 1
               }
             }
           };

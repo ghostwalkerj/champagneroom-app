@@ -9,7 +9,7 @@ import type {
   RefundType,
   SaleType
 } from '$lib/models/common';
-import { CancelReason, RefundReason } from '$lib/models/common';
+import { RefundReason } from '$lib/models/common';
 import { Creator } from '$lib/models/creator';
 import type { ShowType } from '$lib/models/show';
 import { SaveState, Show, ShowStatus } from '$lib/models/show';
@@ -25,7 +25,6 @@ import {
 import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
 import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 
-import { deleteInvoiceInvoicesModelIdDelete } from '$lib/bitcart';
 import { ActorType, EntityType } from '$lib/constants';
 import {
   getTicketMachineService,
@@ -35,17 +34,13 @@ import {
 export const getShowWorker = ({
   showQueue,
   redisConnection,
-  paymentAuthToken,
   escrowPeriod = 3_600_000,
-  gracePeriod = 3_600_000,
-  paymentPeriod = 3_600_000
+  gracePeriod = 3_600_000
 }: {
   showQueue: ShowQueueType;
   redisConnection: IORedis;
-  paymentAuthToken: string;
   escrowPeriod: number;
   gracePeriod: number;
-  paymentPeriod: number;
 }) => {
   return new Worker(
     EntityType.SHOW,
@@ -105,13 +100,7 @@ export const getShowWorker = ({
           break;
         }
         case ShowMachineEventString.TICKET_RESERVED: {
-          ticketReserved(
-            show,
-            job.data.ticketId,
-            job.data.customerName,
-            paymentPeriod,
-            showQueue
-          );
+          ticketReserved(show, job.data.ticketId, job.data.customerName);
           break;
         }
         case ShowMachineEventString.TICKET_REFUNDED: {
@@ -119,12 +108,7 @@ export const getShowWorker = ({
           break;
         }
         case ShowMachineEventString.TICKET_CANCELLED: {
-          ticketCancelled(
-            show,
-            job.data.ticketId,
-            paymentAuthToken,
-            job.data.customerName
-          );
+          ticketCancelled(show, job.data.ticketId, job.data.customerName);
           break;
         }
         case ShowMachineEventString.TICKET_FINALIZED: {
@@ -144,10 +128,7 @@ export const getShowWorker = ({
           );
           break;
         }
-        case ShowMachineEventString.TICKET_RESERVATION_TIMEOUT: {
-          ticketReservationTimeout(job.data.ticketId, showQueue);
-          break;
-        }
+
         default: {
           break;
         }
@@ -524,9 +505,7 @@ const ticketRedeemed = async (show: ShowType, ticketId: string) => {
 const ticketReserved = async (
   show: ShowType,
   ticketId: string,
-  customerName: string,
-  paymentPeriod: number,
-  showQueue: ShowQueueType
+  customerName: string
 ) => {
   const showService = createShowMachineService({
     showDocument: show,
@@ -548,15 +527,6 @@ const ticketReserved = async (
     ticketId,
     customerName
   });
-
-  // Let the payment system kick off this event.
-  // showQueue.add(
-  //   ShowMachineEventString.TICKET_RESERVATION_TIMEOUT,
-  //   {
-  //     showId: show._id.toString()
-  //   },
-  //   { delay: paymentPeriod }
-  // );
 };
 
 const ticketRefunded = async (show: ShowType, refund: RefundType) => {
@@ -578,7 +548,6 @@ const ticketRefunded = async (show: ShowType, refund: RefundType) => {
 const ticketCancelled = async (
   show: ShowType,
   ticketId: string,
-  paymentAuthToken: string,
   customerName: string
 ) => {
   const showService = createShowMachineService({
@@ -601,19 +570,6 @@ const ticketCancelled = async (
     ticketId,
     customerName
   });
-
-  // Cancel invoice in Bitcart
-  const ticket = await Ticket.findById(ticketId, 'invoiceId').exec();
-
-  if (ticket && ticket.invoiceId) {
-    // Delete invoice in Bitcart
-    deleteInvoiceInvoicesModelIdDelete(ticket.invoiceId, {
-      headers: {
-        Authorization: `Bearer ${paymentAuthToken}`,
-        'Content-Type': 'application/json'
-      }
-    });
-  }
 };
 
 // Calculate feedback stats
@@ -725,30 +681,6 @@ const ticketDisputed = async (show: ShowType, dispute: DisputeType) => {
     type: ShowMachineEventString.TICKET_DISPUTED,
     dispute
   });
-};
-
-const ticketReservationTimeout = async (
-  ticketId: string,
-  showQueue: ShowQueueType
-) => {
-  const ticketService = await getTicketMachineServiceFromId(
-    ticketId,
-    showQueue
-  );
-
-  const ticketState = ticketService.getSnapshot();
-
-  if (ticketState.matches('reserved.waiting4Payment')) {
-    const cancel = {
-      cancelledInState: JSON.stringify(ticketState.value),
-      reason: CancelReason.TICKET_PAYMENT_TIMEOUT,
-      cancelledBy: ActorType.TIMER
-    } as CancelType;
-    ticketService.send({
-      type: TicketMachineEventString.CANCELLATION_INITIATED,
-      cancel
-    });
-  }
 };
 
 const ticketDisputeResolved = async (

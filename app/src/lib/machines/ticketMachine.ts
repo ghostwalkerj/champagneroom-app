@@ -4,17 +4,16 @@
 import type { Queue } from 'bullmq';
 import { Types } from 'mongoose';
 import { nanoid } from 'nanoid';
-import { assign, createMachine, interpret, send, type StateFrom } from 'xstate';
-import { raise, sendTo } from 'xstate/lib/actions';
+import { assign, createMachine, interpret, type StateFrom } from 'xstate';
+import { raise } from 'xstate/lib/actions';
 
-import {
-  CancelReason,
-  type CancelType,
-  type DisputeDecision,
-  type DisputeType,
-  type FeedbackType,
-  type FinalizeType,
-  type RefundReason
+import type {
+  CancelType,
+  DisputeDecision,
+  DisputeType,
+  FeedbackType,
+  FinalizeType,
+  RefundReason
 } from '$lib/models/common';
 import type { TicketDocumentType, TicketStateType } from '$lib/models/ticket';
 import { TicketStatus } from '$lib/models/ticket';
@@ -22,8 +21,7 @@ import type { TransactionDocumentType } from '$lib/models/transaction';
 
 import type { ShowJobDataType } from '$lib/workers/showWorker';
 
-import type { DisplayInvoice } from '$lib/bitcart/models';
-import { ActorType, InvoiceStatus } from '$lib/constants';
+import { ActorType } from '$lib/constants';
 
 import { ShowMachineEventString } from './showMachine';
 
@@ -39,9 +37,7 @@ export enum TicketMachineEventString {
   SHOW_CANCELLED = 'SHOW CANCELLED',
   TICKET_FINALIZED = 'TICKET FINALIZED',
   DISPUTE_RESOLVED = 'DISPUTE RESOLVED',
-  TICKET_REDEEMED = 'TICKET REDEEMED',
-  TICKET_RESERVATION_TIMEOUT = 'TICKET RESERVATION TIMEOUT',
-  INVOICE_STATUS_CHANGED = 'INVOICE STATUS CHANGED'
+  TICKET_REDEEMED = 'TICKET REDEEMED'
 }
 type TicketMachineEventType =
   | {
@@ -69,9 +65,6 @@ type TicketMachineEventType =
       type: 'TICKET REDEEMED';
     }
   | {
-      type: 'TICKET RESERVATION TIMEOUT';
-    }
-  | {
       type: 'SHOW JOINED';
     }
   | {
@@ -91,11 +84,6 @@ type TicketMachineEventType =
   | {
       type: 'DISPUTE RESOLVED';
       decision: DisputeDecision;
-    }
-  | {
-      type: 'INVOICE STATUS CHANGED';
-      invoice: DisplayInvoice;
-      status: InvoiceStatus;
     };
 
 const createTicketMachine = ({
@@ -331,9 +319,6 @@ const createTicketMachine = ({
         'SHOW ENDED': {
           target: '#ticketMachine.ended',
           actions: ['endShow']
-        },
-        'INVOICE STATUS CHANGED': {
-          actions: ['invoiceStatusChanged']
         }
       }
     },
@@ -437,7 +422,6 @@ const createTicketMachine = ({
         },
 
         initiateCancellation: assign((context, event) => {
-          console.log('initiateCancellation', event);
           return {
             ticketState: {
               ...context.ticketState,
@@ -586,62 +570,7 @@ const createTicketMachine = ({
               status: TicketStatus.MISSED_SHOW
             }
           };
-        }),
-
-        invoiceStatusChanged: (context, event) => {
-          const invoice = event.invoice;
-          const status = event.status;
-
-          const cancel = {
-            _id: new Types.ObjectId(),
-            cancelledBy: ActorType.CUSTOMER,
-            cancelledInState: context.ticketState.status,
-            cancelledAt: new Date()
-          } as CancelType;
-
-          console.log('invoiceStatusChanged', status);
-
-          switch (status) {
-            case InvoiceStatus.PENDING:
-            case InvoiceStatus.COMPLETE:
-            case InvoiceStatus.IN_PROGRESS:
-            case InvoiceStatus.FAILED: {
-              cancel.reason = CancelReason.TICKET_PAYMENT_FAILED;
-              const cancelEvent = {
-                type: 'CANCELLATION INITIATED',
-                cancel
-              } as TicketMachineEventType;
-              send(cancelEvent);
-              break;
-            }
-            case InvoiceStatus.INVALID: {
-              cancel.reason = CancelReason.TICKET_PAYMENT_INVALID;
-              const cancelEvent = {
-                type: 'CANCELLATION INITIATED',
-                cancel
-              } as TicketMachineEventType;
-              send(cancelEvent);
-              break;
-            }
-            case InvoiceStatus.EXPIRED: {
-              cancel.reason = CancelReason.TICKET_PAYMENT_TIMEOUT;
-              const cancelEvent = {
-                type: 'CANCELLATION INITIATED',
-                cancel
-              } as TicketMachineEventType;
-
-              console.log('Raise expired', cancelEvent);
-
-              send(cancelEvent);
-
-              break;
-            }
-
-            default: {
-              throw new Error('Invalid invoice status');
-            }
-          }
-        }
+        })
       },
       guards: {
         canCancel: (context) => {

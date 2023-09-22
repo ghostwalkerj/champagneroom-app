@@ -14,6 +14,7 @@ export enum EntityType {
   TICKET = 'TICKET',
   USER = 'USER',
   OPERATOR = 'OPERATOR',
+  PAYMENT = 'PAYMENT',
   OTHER = 'OTHER',
   NONE = 'NONE'
 }
