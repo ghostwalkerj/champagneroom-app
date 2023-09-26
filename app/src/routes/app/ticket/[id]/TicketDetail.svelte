@@ -32,7 +32,7 @@
   // Invoice
   const invoiceStatus = invoice.status;
   const invoiceTimeLeft = invoice.time_left;
-  const sentAmount = invoice.sent_amount;
+  const sentAmount = ticket.ticketState.totalPaid;
 </script>
 
 <div class="flex justify-center font-CaviarDreams">
@@ -91,7 +91,11 @@
             )}...{ticketPaymentAddress?.slice(-4)}
           </div>
         </div>
-        <div>Sent Amount: {sentAmount}</div>
+        <div>
+          Sent Amount: {currencyFormatter(currency).format(
+            ticket.ticketState.totalPaid
+          )}
+        </div>
       </div>
       <div class="relative border-l-2 border-dashed">
         <div
