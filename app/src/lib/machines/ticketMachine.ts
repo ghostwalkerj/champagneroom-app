@@ -460,13 +460,13 @@ const createTicketMachine = ({
             transactions: [],
             amount: 0
           };
-          sale.amount += +event.transaction.value;
+          sale.amount += +event.transaction.total;
           sale.transactions.push(event.transaction._id);
           return {
             ticketState: {
               ...context.ticketState,
               totalPaid:
-                context.ticketState.totalPaid + +event.transaction.value,
+                context.ticketState.totalPaid + +event.transaction.total,
               sale
             }
           };
@@ -481,13 +481,13 @@ const createTicketMachine = ({
             amount: 0,
             reason: event.reason
           };
-          refund.amount += +event.transaction.value;
+          refund.amount += +event.transaction.total;
           refund.transactions.push(event.transaction._id);
           return {
             ticketState: {
               ...context.ticketState,
               totalRefunded:
-                context.ticketState.totalRefunded + +event.transaction.value,
+                context.ticketState.totalRefunded + +event.transaction.total,
               refund
             }
           };
@@ -596,7 +596,7 @@ const createTicketMachine = ({
           context.ticketState.status === TicketStatus.MISSED_SHOW,
         fullyPaid: (context, event) => {
           const value =
-            event.type === 'PAYMENT RECEIVED' ? event.transaction?.value : 0;
+            event.type === 'PAYMENT RECEIVED' ? event.transaction?.total : 0;
           return (
             context.ticketState.totalPaid + +value >=
             context.ticketDocument.price
@@ -610,7 +610,7 @@ const createTicketMachine = ({
         },
         fullyRefunded: (context, event) => {
           const value =
-            event.type === 'REFUND RECEIVED' ? event.transaction?.value : 0;
+            event.type === 'REFUND RECEIVED' ? event.transaction?.total : 0;
           return (
             context.ticketState.totalRefunded + +value >=
             context.ticketState.totalPaid

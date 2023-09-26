@@ -5,12 +5,15 @@ import type IORedis from 'ioredis';
 import { Types } from 'mongoose';
 
 import { CancelReason, type CancelType } from '$lib/models/common';
+import { Ticket } from '$lib/models/ticket';
+import { Transaction, TransactionReasonType } from '$lib/models/transaction';
 
 import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 
 import { getInvoiceByIdInvoicesModelIdGet } from '$lib/bitcart';
 import type { DisplayInvoice } from '$lib/bitcart/models';
 import { ActorType, EntityType, InvoiceStatus } from '$lib/constants';
+import type { PaymentType } from '$lib/util/payment';
 import { getTicketMachineServiceFromId } from '$lib/util/util.server';
 
 export const getPaymentWorker = ({
@@ -75,6 +78,57 @@ export const getPaymentWorker = ({
             });
           };
           expiredInvoice(invoice);
+          break;
+        }
+        case InvoiceStatus.COMPLETE: {
+          const completedInvoice = async (invoice: DisplayInvoice) => {
+            const ticketId = invoice.order_id;
+            if (!ticketId) {
+              return;
+            }
+
+            const ticketService = await getTicketMachineServiceFromId(
+              ticketId,
+              redisConnection
+            );
+
+            const ticket = await Ticket.findById(ticketId);
+            const payments = invoice.payments;
+
+            // loop through payments and create transactions
+            let index = 0;
+            for (const payment of payments as PaymentType[]) {
+              const hash =
+                invoice.tx_hashes && invoice.tx_hashes[index]
+                  ? invoice.tx_hashes[index]
+                  : '';
+              const transaction = new Transaction({
+                ticket: ticketId,
+                creator: ticket?.creator,
+                agent: ticket?.agent,
+                show: ticket?.show,
+                hash,
+                from: payment.user_address,
+                to: payment.payment_address,
+                reason: TransactionReasonType.TICKET_PAYMENT,
+                amount: payment.amount,
+                rate: payment.rate,
+                currency: payment.currency,
+                confirmations: payment.confirmations,
+                total: (+payment.amount * +payment.rate).toFixed(2)
+              });
+              console.log('transaction', transaction);
+
+              await Transaction.create(transaction);
+
+              ticketService.send({
+                type: TicketMachineEventString.PAYMENT_RECEIVED,
+                transaction
+              });
+              index++;
+            }
+          };
+          completedInvoice(invoice);
           break;
         }
 

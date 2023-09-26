@@ -69,7 +69,7 @@ export const actions: Actions = {
       hash: '0xeba2df809e7a612a0a0d444ccfa5c839624bdc00dd29e3340d46df3870f8a30e',
       from: '0x5B38Da6a701c568545dCfcB03FcB875f56beddC4',
       to: '0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2',
-      value: ticket.price.toString(),
+      amount: ticket.price.toString(),
       block: 123,
       reason: TransactionReasonType.TICKET_PAYMENT,
       ticket: ticket._id,

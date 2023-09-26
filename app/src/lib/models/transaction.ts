@@ -15,15 +15,26 @@ const transactionSchema = new Schema(
     // eslint-disable-next-line @typescript-eslint/naming-convention
     _id: { type: Schema.Types.ObjectId, required: true, auto: true },
     hash: { type: String },
-    block: { type: Number },
     from: { type: String },
     to: { type: String },
+    confirmations: { type: Number },
     reason: { type: String, enum: TransactionReasonType },
-    value: {
+    amount: {
       type: String,
       required: true,
       validator: (v: string) => validator.isNumeric(v)
     },
+    rate: {
+      type: String,
+      required: true,
+      validator: (v: string) => validator.isNumeric(v)
+    },
+    total: {
+      type: String,
+      required: true,
+      validator: (v: string) => validator.isNumeric(v)
+    },
+    currency: { type: String, required: true },
     ticket: { type: Schema.Types.ObjectId, ref: 'Ticket' },
     creator: { type: Schema.Types.ObjectId, ref: 'Creator' },
     agent: { type: Schema.Types.ObjectId, ref: 'Agent' },

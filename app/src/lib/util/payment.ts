@@ -25,3 +25,17 @@ export const createAuthToken = async (
 
   return accessToken;
 };
+
+// Bitcart API types
+export type PaymentType = {
+  created: string;
+  lightning: boolean;
+  currency: string;
+  amount: string;
+  rate: string;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  payment_address: string;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  user_address: string;
+  confirmations: number;
+};
