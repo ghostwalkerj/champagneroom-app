@@ -73,7 +73,7 @@
           <div
             class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-2xl whitespace-nowrap font-extrabold text-primary ring-2 ring-primary bg-base-200 p-2 ring-inset rounded-xl z-20 opacity-70 -rotate-[20deg]"
           >
-            Cancelled
+            Ticket Cancelled
           </div>
         {/if}
 
@@ -82,10 +82,20 @@
           style="background-image: url('{PUBLIC_STATIC_URL}/assets/logo-horizontal-tr.png') z-0"
         />
         <div>Ticket Reserved for: {customerName}</div>
-        <div class="capitalize">Payment Status: {invoiceStatus}</div>
-        <div>Time Left to Pay: {durationFormatter(invoiceTimeLeft)}</div>
+        {#if ticketStatus !== TicketStatus.CANCELLED}
+          <div class="capitalize">Payment Status: {invoiceStatus}</div>
+          <div class:text-warning={invoiceTimeLeft < 600}>
+            Time Left to Pay: {invoiceTimeLeft
+              ? durationFormatter(invoiceTimeLeft)
+              : 'None'}
+          </div>
+        {:else}
+          <div class="capitalize">Payment Status: {ticketStatus}</div>
+          <div>Time Left to Pay: None</div>
+        {/if}
         <div class="tooltip tooltip-primary" data-tip={copied}>
           <!-- svelte-ignore a11y-click-events-have-key-events -->
+
           <div
             class="z-10"
             on:click={() => {

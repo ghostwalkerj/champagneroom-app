@@ -21,9 +21,13 @@ import { Transaction, TransactionReasonType } from '$lib/models/transaction';
 import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
 import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 
-import { getInvoiceByIdInvoicesModelIdGet } from '$lib/bitcart';
+import {
+  deleteInvoiceInvoicesModelIdDelete,
+  getInvoiceByIdInvoicesModelIdGet,
+  modifyInvoiceInvoicesModelIdPatch
+} from '$lib/bitcart';
 import type { DisplayInvoice } from '$lib/bitcart/models';
-import { ActorType } from '$lib/constants';
+import { ActorType, InvoiceStatus } from '$lib/constants';
 import { createAuthToken } from '$lib/util/payment';
 import { verifyPin } from '$lib/util/pin';
 import {
@@ -98,6 +102,7 @@ export const actions: Actions = {
       redisConnection
     );
     const state = ticketService.getSnapshot();
+    const invoiceId = state.context.ticketDocument.invoiceId;
 
     const cancel = {
       _id: new Types.ObjectId(),
@@ -114,6 +119,32 @@ export const actions: Actions = {
 
     if (state.can(cancelEvent)) {
       ticketService.send(cancelEvent);
+    }
+
+    // Cancel the invoice attached to the ticket
+    const token = await createAuthToken(
+      BITCART_EMAIL,
+      BITCART_PASSWORD,
+      PUBLIC_BITCART_URL
+    );
+
+    try {
+      invoiceId &&
+        (await modifyInvoiceInvoicesModelIdPatch(
+          invoiceId,
+          {
+            status: InvoiceStatus.INVALID,
+            exception_status: 'Cancelled by customer'
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          }
+        ));
+    } catch (error_) {
+      console.error(error_);
     }
 
     return {
