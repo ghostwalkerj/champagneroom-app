@@ -344,7 +344,7 @@
                     <!-- svelte-ignore a11y-label-has-associated-control -->
                     <label class="label">
                       <span class="label-text whitespace-nowrap"
-                        >Duration ({durationFormatter(showDuration)})</span
+                        >Duration ({durationFormatter(showDuration * 60)})</span
                       >
                     </label>
                     <input

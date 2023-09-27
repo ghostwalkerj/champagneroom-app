@@ -47,11 +47,14 @@ export const currencyFormatter = (currency = 'USD') => {
 };
 
 export const durationFormatter = (duration: number): string => {
-  const hours = Math.floor(duration / 60);
-  const minutes = duration % 60;
+  const hours = Math.floor(duration / 3600);
+  const minutes = Math.floor((duration % 3600) / 60);
+  const seconds = duration % 60;
   const hoursString = hours > 0 ? `${hours}hr ` : '';
   const minuteString = minutes > 0 ? `${minutes}m` : '';
-  return `${hoursString} ${minuteString}`.trim();
+  const secondString = seconds > 0 ? `${seconds}s` : '';
+
+  return `${hoursString} ${minuteString} ${secondString}`.trim();
 };
 
 export const jitsiInterfaceConfigOverwrite = {

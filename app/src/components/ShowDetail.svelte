@@ -32,7 +32,7 @@
   $: showStatus = show.showState.status;
   $: waterMarkText = showStatus;
   $: name = show.name;
-  $: duration = durationFormatter(show.duration);
+  $: duration = durationFormatter(show.duration * 60);
   $: price = currencyFormatter().format(show.price);
   $: ticketsAvailable = show.showState.salesStats.ticketsAvailable;
   $: ticketsReserved = show.showState.salesStats.ticketsReserved;

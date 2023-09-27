@@ -50,6 +50,8 @@
 
   nameStore.set(ticket.customerName);
 
+  const showPaymentWindow = () => {};
+
   const useTicketMachine = (ticketMachineService: TicketMachineServiceType) => {
     const state = ticketMachineService.getSnapshot();
     shouldPay = state.matches('reserved.waiting4Payment');
@@ -182,7 +184,9 @@
               <div class="w-full flex justify-center">
                 <button
                   class="btn btn-secondary"
-                  on:click={() => {}}
+                  on:click={() => {
+                    showPaymentWindow();
+                  }}
                   disabled={loading}>Send Payment</button
                 >
               </div>

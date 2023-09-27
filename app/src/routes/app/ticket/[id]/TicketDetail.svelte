@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
+
   import { PUBLIC_STATIC_URL } from '$env/static/public';
 
   import type { ShowDocumentType } from '$lib/models/show';
@@ -15,7 +17,7 @@
   const creatorName = show.creatorInfo.name;
   const showName = show.name;
   const showCoverImageUrl = show.coverImageUrl;
-  const showDuration = durationFormatter(show.duration);
+  const showDuration = durationFormatter(show.duration * 60);
   let copied: 'Copy' | 'Copied' = 'Copy';
 
   // Ticket
@@ -31,8 +33,17 @@
 
   // Invoice
   const invoiceStatus = invoice.status;
-  const invoiceTimeLeft = invoice.time_left;
-  const sentAmount = ticket.ticketState.totalPaid;
+  $: invoiceTimeLeft = invoice.time_left;
+
+  const timer = setInterval(() => {
+    if (invoiceTimeLeft > 0) {
+      invoiceTimeLeft--;
+    }
+  }, 1000);
+
+  onMount(() => {
+    return () => clearInterval(timer);
+  });
 </script>
 
 <div class="flex justify-center font-CaviarDreams">
@@ -72,7 +83,7 @@
         />
         <div>Ticket Reserved for: {customerName}</div>
         <div class="capitalize">Payment Status: {invoiceStatus}</div>
-        <div>Time Left to Pay: {invoiceTimeLeft}</div>
+        <div>Time Left to Pay: {durationFormatter(invoiceTimeLeft)}</div>
         <div class="tooltip tooltip-primary" data-tip={copied}>
           <!-- svelte-ignore a11y-click-events-have-key-events -->
           <div

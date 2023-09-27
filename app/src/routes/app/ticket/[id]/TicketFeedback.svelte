@@ -43,7 +43,7 @@
           <div>{show.name}</div>
 
           <div class="">
-            {durationFormatter(show.duration)}
+            {durationFormatter(show.duration * 60)}
           </div>
           <div class="">
             {currencyFormatter().format(show.price)}
