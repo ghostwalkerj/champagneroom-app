@@ -37,5 +37,7 @@ export type PaymentType = {
   payment_address: string;
   // eslint-disable-next-line @typescript-eslint/naming-convention
   user_address: string;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  payment_url: string;
   confirmations: number;
 };

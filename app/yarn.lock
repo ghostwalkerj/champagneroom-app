@@ -9316,7 +9316,7 @@ qrcode@1.4.4:
     pngjs "^3.3.0"
     yargs "^13.2.4"
 
-qrcode@1.5.3:
+qrcode@1.5.3, qrcode@^1.5.1:
   version "1.5.3"
   resolved "https://registry.yarnpkg.com/qrcode/-/qrcode-1.5.3.tgz#03afa80912c0dccf12bc93f615a535aad1066170"
   integrity sha512-puyri6ApkEHYiVl4CFzo1tDkAZ+ATcnbJrJ6RiBM1Fhctdn/ix9MTE3hRph33omisEbC/2fcfemsseiKgBPKZg==
@@ -10475,6 +10475,13 @@ svelte-proxied-store@^1.1.5:
   version "1.1.5"
   resolved "https://registry.yarnpkg.com/svelte-proxied-store/-/svelte-proxied-store-1.1.5.tgz#c7db6b70073501cab785cf27193bd7c0b6005eb6"
   integrity sha512-1hJyVy5AJigC8l2RLs9xIa7qdm10P/7juzAS/gW8zSPEs9XxT30i3XLMYxmd7NKjwqrOYo01dOfMQdz8eGgEOw==
+
+svelte-qrcode-image@^1.0.0-rc.2:
+  version "1.0.0-rc.2"
+  resolved "https://registry.yarnpkg.com/svelte-qrcode-image/-/svelte-qrcode-image-1.0.0-rc.2.tgz#c25cd8970a57c9aff1176a8688e44159e3684153"
+  integrity sha512-1rV14JOOWyyOAVVXxGlbBwgFvJK6aOUIqB1MvI7fQrGgBn+vb425BlVCvvEwfgMju0lCXVRPU22i5TpbD/NN2A==
+  dependencies:
+    qrcode "^1.5.1"
 
 svelte-star-rating@^2.0.1:
   version "2.0.1"

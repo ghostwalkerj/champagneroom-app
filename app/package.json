@@ -113,6 +113,7 @@
     "spacetime": "^7.4.3",
     "svelte-chartjs": "^3.1.2",
     "svelte-proxied-store": "^1.1.5",
+    "svelte-qrcode-image": "^1.0.0-rc.2",
     "svelte-star-rating": "^2.0.1",
     "svelte-table": "^0.5.11",
     "timeago.js": "^4.0.2",

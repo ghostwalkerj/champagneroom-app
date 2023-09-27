@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
+  import { QRCodeImage } from 'svelte-qrcode-image';
   import urlJoin from 'url-join';
 
   import { applyAction, enhance } from '$app/forms';
@@ -16,6 +17,7 @@
   import { createTicketMachineService } from '$lib/machines/ticketMachine';
 
   import { ActorType } from '$lib/constants';
+  import type { PaymentType } from '$lib/util/payment';
 
   import { nameStore, showStore, ticketStore } from '$stores';
 
@@ -28,7 +30,11 @@
 
   let ticket = data.ticket as TicketDocumentType;
   let show = data.show as ShowDocumentType;
-  let invoice = data.invoice;
+  const invoice = data.invoice;
+  const currentPayment = invoice?.payments?.[
+    invoice?.payments?.length - 1
+  ] as PaymentType;
+
   let paymentModal: HTMLDialogElement;
 
   const showTimePath = urlJoin($page.url.href, PUBLIC_SHOWTIME_PATH);
@@ -139,7 +145,11 @@
 
 <dialog bind:this={paymentModal} class="modal">
   <div class="modal-box">
-    <h3 class="font-bold text-lg">Hello!</h3>
+    {#if currentPayment}
+      <div class="container">
+        <QRCodeImage text={currentPayment['payment_url']} />
+      </div>
+    {/if}
     <p class="py-4">Press ESC key or click the button below to close</p>
     <div class="modal-action">
       <form method="dialog">
