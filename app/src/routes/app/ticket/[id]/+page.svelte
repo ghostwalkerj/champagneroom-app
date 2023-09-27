@@ -29,6 +29,7 @@
   let ticket = data.ticket as TicketDocumentType;
   let show = data.show as ShowDocumentType;
   let invoice = data.invoice;
+  let paymentModal: HTMLDialogElement;
 
   const showTimePath = urlJoin($page.url.href, PUBLIC_SHOWTIME_PATH);
   const reasons = Object.values(DisputeReason);
@@ -49,8 +50,6 @@
   $: loading = false;
 
   nameStore.set(ticket.customerName);
-
-  const showPaymentWindow = () => {};
 
   const useTicketMachine = (ticketMachineService: TicketMachineServiceType) => {
     const state = ticketMachineService.getSnapshot();
@@ -138,6 +137,19 @@
   };
 </script>
 
+<dialog bind:this={paymentModal} class="modal">
+  <div class="modal-box">
+    <h3 class="font-bold text-lg">Hello!</h3>
+    <p class="py-4">Press ESC key or click the button below to close</p>
+    <div class="modal-action">
+      <form method="dialog">
+        <!-- if there is a button in form, it will close the modal -->
+        <button class="btn">Close</button>
+      </form>
+    </div>
+  </div>
+</dialog>
+
 {#if ticket}
   <div class="mt-6 flex items-center">
     <div class="min-w-full">
@@ -184,9 +196,7 @@
               <div class="w-full flex justify-center">
                 <button
                   class="btn btn-secondary"
-                  on:click={() => {
-                    showPaymentWindow();
-                  }}
+                  on:click={() => paymentModal.showModal()}
                   disabled={loading}>Send Payment</button
                 >
               </div>

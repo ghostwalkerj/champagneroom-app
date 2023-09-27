@@ -13,7 +13,6 @@
   export let ticket: TicketDocumentType;
 
   // Show
-  const showStatus = show.showState.status;
   const creatorName = show.creatorInfo.name;
   const showName = show.name;
   const showCoverImageUrl = show.coverImageUrl;
@@ -124,10 +123,7 @@
         >
           {creatorName}
         </div>
-        <!-- <div
-          class="grid grid-flow-row bg-center bg-contain w-full h-32 opacity-70 animate-pulse"
-          style="background-image: url('{PUBLIC_STATIC_URL}/assets/bottlesnlegs-black.jpg');  "
-        /> -->
+
         <div class="m-auto font-bold absolute inset-0 text-info">
           <div class="text-xl p-2">
             {showName}
