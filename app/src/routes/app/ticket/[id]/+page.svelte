@@ -144,13 +144,67 @@
 </script>
 
 <dialog bind:this={paymentModal} class="modal">
-  <div class="modal-box">
+  <div
+    class="modal-box font-SpaceGrotesk bg-gradient-to-r from-[#0C082E] to-[#0C092E] text-info"
+  >
     {#if currentPayment}
-      <div class="container">
-        <QRCodeImage text={currentPayment['payment_url']} />
+      <div>
+        <div class="flex flex-col">
+          <div class="text-2xl text-center font-bold m-4">Send Payment</div>
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
+          <div
+            class="z-10 tooltip tooltip-primary"
+            id="payment-amount"
+            data-tip="Copy"
+            on:click={() => {
+              navigator.clipboard.writeText(currentPayment['amount']);
+            }}
+          >
+            <div class="text-center">
+              Amount: {currentPayment['amount']}
+              {currentPayment['currency'].toLocaleUpperCase()}
+            </div>
+          </div>
+
+          <div class="text-center">Rate: {currentPayment['rate_str']}</div>
+          <div class="tooltip tooltip-primary" data-tip="Copy">
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <div
+              class="z-10"
+              on:click={() => {
+                navigator.clipboard.writeText(
+                  currentPayment['payment_address']
+                );
+              }}
+            >
+              Payment Address: {currentPayment['payment_address']?.slice(
+                0,
+                6
+              )}...{currentPayment['payment_address']?.slice(-4)}
+            </div>
+          </div>
+
+          <div class="tooltip tooltip-primary" data-tip="Copy">
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <div
+              class="z-10"
+              on:click={() => {
+                navigator.clipboard.writeText(currentPayment['payment_url']);
+              }}
+            >
+              Payment URL: {currentPayment['payment_url']?.slice(
+                0,
+                6
+              )}...{currentPayment['payment_url']?.slice(-4)}
+            </div>
+          </div>
+
+          <div class="flex place-content-center mt-10">
+            <QRCodeImage text={currentPayment['payment_url']} />
+          </div>
+        </div>
       </div>
     {/if}
-    <p class="py-4">Press ESC key or click the button below to close</p>
     <div class="modal-action">
       <form method="dialog">
         <!-- if there is a button in form, it will close the modal -->
