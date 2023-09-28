@@ -22,6 +22,7 @@
   import { nameStore, showStore, ticketStore } from '$stores';
 
   import TicketDetail from './TicketDetail.svelte';
+  import TicketInvoice from './TicketInvoice.svelte';
 
   import type { ActionData, PageData } from './$types';
 
@@ -143,77 +144,6 @@
   };
 </script>
 
-<dialog bind:this={paymentModal} class="modal">
-  <div
-    class="modal-box font-SpaceGrotesk bg-gradient-to-r from-[#0C082E] to-[#0C092E] text-info"
-  >
-    {#if currentPayment}
-      <div>
-        <div class="flex flex-col">
-          <div class="text-2xl text-center font-bold m-4">Send Payment</div>
-          <!-- svelte-ignore a11y-click-events-have-key-events -->
-          <div
-            class="z-10 tooltip tooltip-primary"
-            id="payment-amount"
-            data-tip="Copy"
-            on:click={() => {
-              navigator.clipboard.writeText(currentPayment['amount']);
-            }}
-          >
-            <div class="text-center">
-              Amount: {currentPayment['amount']}
-              {currentPayment['currency'].toLocaleUpperCase()}
-            </div>
-          </div>
-
-          <div class="text-center">Rate: {currentPayment['rate_str']}</div>
-          <div class="tooltip tooltip-primary" data-tip="Copy">
-            <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <div
-              class="z-10"
-              on:click={() => {
-                navigator.clipboard.writeText(
-                  currentPayment['payment_address']
-                );
-              }}
-            >
-              Payment Address: {currentPayment['payment_address']?.slice(
-                0,
-                6
-              )}...{currentPayment['payment_address']?.slice(-4)}
-            </div>
-          </div>
-
-          <div class="tooltip tooltip-primary" data-tip="Copy">
-            <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <div
-              class="z-10"
-              on:click={() => {
-                navigator.clipboard.writeText(currentPayment['payment_url']);
-              }}
-            >
-              Payment URL: {currentPayment['payment_url']?.slice(
-                0,
-                6
-              )}...{currentPayment['payment_url']?.slice(-4)}
-            </div>
-          </div>
-
-          <div class="flex place-content-center mt-10">
-            <QRCodeImage text={currentPayment['payment_url']} />
-          </div>
-        </div>
-      </div>
-    {/if}
-    <div class="modal-action">
-      <form method="dialog">
-        <!-- if there is a button in form, it will close the modal -->
-        <button class="btn">Close</button>
-      </form>
-    </div>
-  </div>
-</dialog>
-
 {#if ticket}
   <div class="mt-6 flex items-center">
     <div class="min-w-full">
@@ -233,39 +163,7 @@
 
       {#if !isTicketDone}
         {#if shouldPay}
-          <div>
-            {#if isShowPaymentLoading}
-              <div class="p-4">
-                <div class="w-full flex justify-center">
-                  <button class="btn btn-secondary loading" disabled={true}
-                    >Sending Payment</button
-                  >
-                </div>
-              </div>
-            {:else}
-              <!-- <form
-                method="post"
-                action="?/buy_ticket"
-                name="buyTicket"
-                use:enhance={({ form }) => onSubmit(form)}
-              >
-                <div class="w-full flex justify-center">
-                  <button
-                    class="btn btn-secondary"
-                    type="submit"
-                    disabled={loading}>Send Payment</button
-                  >
-                </div>
-              </form> -->
-              <div class="w-full flex justify-center">
-                <button
-                  class="btn btn-secondary"
-                  on:click={() => paymentModal.showModal()}
-                  disabled={loading}>Send Payment</button
-                >
-              </div>
-            {/if}
-          </div>
+          <TicketInvoice {invoice} {ticket} />
         {:else if canWatchShow && hasShowStarted}
           <div class="p-4">
             <div class="w-full flex justify-center">

@@ -1,14 +1,10 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-
   import { PUBLIC_STATIC_URL } from '$env/static/public';
 
   import type { ShowDocumentType } from '$lib/models/show';
   import { type TicketDocumentType, TicketStatus } from '$lib/models/ticket';
 
-  import type { DisplayInvoice } from '$lib/bitcart/models';
   import { currencyFormatter, durationFormatter } from '$lib/constants';
-  export let invoice: DisplayInvoice;
   export let show: ShowDocumentType;
   export let ticket: TicketDocumentType;
 
@@ -17,7 +13,6 @@
   const showName = show.name;
   const showCoverImageUrl = show.coverImageUrl;
   const showDuration = durationFormatter(show.duration * 60);
-  let copied: 'Copy' | 'Copied' = 'Copy';
 
   // Ticket
   $: ticketStatus = ticket
@@ -26,31 +21,18 @@
       : ticket.ticketState.status
     : '';
   const currency = ticket.currency || 'USD';
-  const ticketPaymentAddress = ticket.paymentAddress || '';
   const customerName = ticket.customerName;
   const ticketPrice = currencyFormatter(currency).format(ticket.price);
-
-  // Invoice
-  const invoiceStatus = invoice.status;
-  $: invoiceTimeLeft = invoice.time_left;
-
-  const timer = setInterval(() => {
-    if (invoiceTimeLeft > 0) {
-      invoiceTimeLeft--;
-    }
-  }, 1000);
-
-  onMount(() => {
-    return () => clearInterval(timer);
-  });
 </script>
 
 <div class="flex justify-center font-CaviarDreams">
-  <div class="flex flex-col w-full max-w-2xl rounded-xl bg-black overflow-auto">
-    <div class="group grid grid-cols-4">
+  <div
+    class="flex flex-col w-full max-w-2xl rounded-xl bg-black overflow-auto h-32"
+  >
+    <div class="group grid grid-cols-4 h-full">
       <div class="relative">
         <div
-          class="grid grid-flow-row bg-center bg-cover w-full h-32 opacity-70"
+          class="grid grid-flow-row bg-center bg-cover w-full h-full opacity-70"
           style="background-image: url('{showCoverImageUrl}');  "
         />
         <div class="absolute inset-0">
@@ -66,7 +48,7 @@
         </div>
       </div>
       <div
-        class="col-span-2 relative flex flex-col p-4 text-info font-bold text-sm"
+        class="col-span-2 relative flex flex-col p-4 text-info font-bold text-sm h-full place-content-center"
       >
         {#if ticketStatus === TicketStatus.CANCELLED}
           <div
@@ -81,41 +63,7 @@
           style="background-image: url('{PUBLIC_STATIC_URL}/assets/logo-horizontal-tr.png') z-0"
         />
         <div>Ticket Reserved for: {customerName}</div>
-        {#if ticketStatus !== TicketStatus.CANCELLED}
-          <div class="capitalize">Payment Status: {invoiceStatus}</div>
-          <div class:text-warning={invoiceTimeLeft < 600}>
-            Time Left to Pay: {invoiceTimeLeft
-              ? durationFormatter(invoiceTimeLeft)
-              : 'None'}
-          </div>
-        {:else}
-          <div class="capitalize">Payment Status: {ticketStatus}</div>
-          <div>Time Left to Pay: None</div>
-        {/if}
-        <div class="tooltip tooltip-primary" data-tip={copied}>
-          <!-- svelte-ignore a11y-click-events-have-key-events -->
-
-          <div
-            class="z-10"
-            on:click={() => {
-              copied = 'Copied';
-              navigator.clipboard.writeText(ticketPaymentAddress);
-            }}
-            on:mouseleave={() => {
-              copied = 'Copy';
-            }}
-          >
-            Payment Address: {ticketPaymentAddress?.slice(
-              0,
-              6
-            )}...{ticketPaymentAddress?.slice(-4)}
-          </div>
-        </div>
-        <div>
-          Sent Amount: {currencyFormatter(currency).format(
-            ticket.ticketState.totalPaid
-          )}
-        </div>
+        <div class="capitalize">Payment Status: {ticketStatus}</div>
       </div>
       <div class="relative border-l-2 border-dashed">
         <div
