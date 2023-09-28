@@ -1,5 +1,7 @@
 <script lang="ts">
-  import { PUBLIC_STATIC_URL } from '$env/static/public';
+  import urlJoin from 'url-join';
+
+  import { PUBLIC_SHOW_PATH, PUBLIC_STATIC_URL } from '$env/static/public';
 
   import type { ShowDocumentType } from '$lib/models/show';
   import { type TicketDocumentType, TicketStatus } from '$lib/models/ticket';
@@ -13,6 +15,7 @@
   const showName = show.name;
   const showCoverImageUrl = show.coverImageUrl;
   const showDuration = durationFormatter(show.duration * 60);
+  const showUrl = urlJoin(PUBLIC_SHOW_PATH, show._id);
 
   // Ticket
   $: ticketStatus = ticket
@@ -73,9 +76,7 @@
         </div>
 
         <div class="m-auto font-bold absolute inset-0 text-info">
-          <div class="text-xl p-2">
-            {showName}
-          </div>
+          <div class="text-xl p-2"><a href={showUrl}>{showName}</a></div>
 
           <div class="text-sm">
             Duration: {showDuration}
