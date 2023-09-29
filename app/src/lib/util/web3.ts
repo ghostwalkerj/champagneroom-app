@@ -62,6 +62,12 @@ const chains = [
     token: 'ETH',
     label: 'Ethereum Mainnet',
     rpcUrl: `https://mainnet.infura.io/v3/${PUBLIC_INFURA_API_KEY}`
+  },
+  {
+    id: 11_155_111,
+    token: 'SepoliaETH',
+    label: 'Ethereum Sepolia',
+    rpcUrl: `https://sepolia.infura.io/v3/${PUBLIC_INFURA_API_KEY}`
   }
 ];
 
@@ -101,6 +107,8 @@ wallets$.subscribe((wallets) => {
 export const connect = async () => {
   await onboard.connectWallet();
 };
+
+export const currentState = onboard.state.get();
 
 export const defaultWallet = derived(_defaultWallet, ($defaultWallet) => {
   return $defaultWallet;

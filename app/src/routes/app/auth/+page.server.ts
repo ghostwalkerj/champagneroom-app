@@ -4,13 +4,13 @@ import jwt from 'jsonwebtoken';
 import { recover } from 'web3-eth-accounts';
 
 import {
-    AUTH_SIGNING_MESSAGE,
-    JWT_EXPIRY,
-    JWT_PRIVATE_KEY
+  AUTH_SIGNING_MESSAGE,
+  JWT_EXPIRY,
+  JWT_PRIVATE_KEY
 } from '$env/static/private';
 import {
-    PUBLIC_AUTH_PATH,
-    PUBLIC_CREATOR_SIGNUP_PATH
+  PUBLIC_AUTH_PATH,
+  PUBLIC_CREATOR_SIGNUP_PATH
 } from '$env/static/public';
 
 import { Agent } from '$lib/models/agent';

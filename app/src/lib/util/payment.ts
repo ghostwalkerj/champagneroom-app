@@ -40,4 +40,6 @@ export type PaymentType = {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   payment_url: string;
   confirmations: number;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  chain_id: number;
 };

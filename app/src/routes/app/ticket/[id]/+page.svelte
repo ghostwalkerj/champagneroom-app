@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
-  import { QRCodeImage } from 'svelte-qrcode-image';
   import urlJoin from 'url-join';
 
   import { applyAction, enhance } from '$app/forms';
@@ -18,6 +17,7 @@
 
   import { ActorType } from '$lib/constants';
   import type { PaymentType } from '$lib/util/payment';
+  import { connect, defaultWallet, selectedAccount } from '$lib/util/web3';
 
   import { nameStore, showStore, ticketStore } from '$stores';
 
@@ -32,11 +32,10 @@
   let ticket = data.ticket as TicketDocumentType;
   let show = data.show as ShowDocumentType;
   const invoice = data.invoice;
+
   const currentPayment = invoice?.payments?.[
     invoice?.payments?.length - 1
   ] as PaymentType;
-
-  let paymentModal: HTMLDialogElement;
 
   const showTimePath = urlJoin($page.url.href, PUBLIC_SHOWTIME_PATH);
   const reasons = Object.values(DisputeReason);
@@ -51,12 +50,32 @@
   let isWaitingForShow = false;
   let showUnSub: Unsubscriber;
   let ticketUnSub: Unsubscriber;
-  let isShowPaymentLoading = false;
   let isShowCancelLoading = false;
   $: hasShowStarted = false;
   $: loading = false;
 
   nameStore.set(ticket.customerName);
+
+  const walletPay = async () => {
+    if ($selectedAccount) {
+      console.log('walletPay', $defaultWallet);
+      // Make sure to use correct chain id
+      const chain = $defaultWallet?.chains.find(
+        (chain) => +chain.id === currentPayment.chain_id
+      );
+      if (!chain) {
+        throw new Error('Chain not found');
+      }
+      // Initiate payment
+      const provider = $defaultWallet?.provider;
+      if (!provider) {
+        throw new Error('Provider not found');
+      }
+
+    } else {
+      await connect();
+    }
+  };
 
   const useTicketMachine = (ticketMachineService: TicketMachineServiceType) => {
     const state = ticketMachineService.getSnapshot();
@@ -117,9 +136,7 @@
   });
 
   const onSubmit = (form: HTMLFormElement) => {
-    if (form.name === 'buyTicket') {
-      isShowPaymentLoading = true;
-    } else if (form.name === 'cancelTicket') {
+    if (form.name === 'cancelTicket') {
       isShowCancelLoading = true;
     }
     loading = true;
@@ -168,7 +185,15 @@
 
         <div class="flex gap-6 place-content-center m-3">
           {#if shouldPay}
-            <button class="btn btn-secondary">Pay Invoice</button>
+            {#if !$selectedAccount}
+              <button class="btn btn-secondary" on:click={connect}
+                >Connect Wallet</button
+              >
+            {:else}
+              <button class="btn btn-secondary" on:click={walletPay}
+                >Pay with Wallet</button
+              >
+            {/if}
           {/if}
           {#if canWatchShow && hasShowStarted}
             <div class="w-full flex justify-center">
