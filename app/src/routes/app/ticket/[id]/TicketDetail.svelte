@@ -4,7 +4,7 @@
   import { PUBLIC_SHOW_PATH, PUBLIC_STATIC_URL } from '$env/static/public';
 
   import type { ShowDocumentType } from '$lib/models/show';
-  import { TicketStatus, type TicketDocumentType } from '$lib/models/ticket';
+  import { type TicketDocumentType, TicketStatus } from '$lib/models/ticket';
 
   import { currencyFormatter, durationFormatter } from '$lib/constants';
   export let show: ShowDocumentType;

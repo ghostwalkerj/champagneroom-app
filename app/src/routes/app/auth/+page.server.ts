@@ -1,7 +1,7 @@
 import type { Actions } from '@sveltejs/kit';
 import { error, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
-import { recover } from 'web3-eth-accounts';
+import * as web3 from 'web3';
 
 import {
   AUTH_SIGNING_MESSAGE,
@@ -28,7 +28,7 @@ const verifySignature = (
   signature: string
 ) => {
   try {
-    const signerAddr = recover(message, signature);
+    const signerAddr = web3.eth.accounts.recover(message, signature);
     if (signerAddr.toLowerCase() !== address.toLowerCase()) {
       return false;
     }

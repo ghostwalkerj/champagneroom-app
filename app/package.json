@@ -123,7 +123,7 @@
     "url-join": "^5.0.0",
     "uuidv4": "^6.2.13",
     "validator": "^13.9.0",
-    "web3-eth-accounts": "^4.0.1",
+    "web3": "^4.1.2",
     "web3.storage": "^4.5.4",
     "xstate": "^4.37.2"
   },

@@ -1,5 +1,5 @@
 import { error, fail } from '@sveltejs/kit';
-import { recover } from 'web3-eth-accounts';
+import * as web3 from 'web3';
 
 import { AUTH_SIGNING_MESSAGE } from '$env/static/private';
 
@@ -16,7 +16,7 @@ const verifySignature = (
   signature: string
 ) => {
   try {
-    const signerAddr = recover(message, signature);
+    const signerAddr = web3.eth.accounts.recover(message, signature);
     if (signerAddr.toLowerCase() !== address.toLowerCase()) {
       return false;
     }

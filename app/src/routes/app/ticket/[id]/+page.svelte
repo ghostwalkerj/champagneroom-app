@@ -2,6 +2,7 @@
   import { onDestroy, onMount } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
   import urlJoin from 'url-join';
+  import web3 from 'web3';
 
   import { applyAction, enhance } from '$app/forms';
   import { goto, invalidateAll } from '$app/navigation';
@@ -58,7 +59,6 @@
 
   const walletPay = async () => {
     if ($selectedAccount) {
-      console.log('walletPay', $defaultWallet);
       // Make sure to use correct chain id
       const chain = $defaultWallet?.chains.find(
         (chain) => +chain.id === currentPayment.chain_id
@@ -67,11 +67,31 @@
         throw new Error('Chain not found');
       }
       // Initiate payment
-      const provider = $defaultWallet?.provider;
+      if (!$defaultWallet?.provider) {
+        throw new Error('Provider not found');
+      }
+
+      const eth = new web3($defaultWallet.provider);
+      const provider = eth.currentProvider;
       if (!provider) {
         throw new Error('Provider not found');
       }
 
+      const parameters = [
+        {
+          from: $selectedAccount.address,
+          to: currentPayment.payment_address,
+          value: Number.parseInt(
+            web3.utils.toWei(currentPayment.amount.toString(), 'ether')
+          ).toString(16),
+          chainId: currentPayment.chain_id
+        }
+      ];
+      const transactionHash = await provider.request({
+        method: 'eth_sendTransaction',
+        params: parameters
+      });
+      console.log('transactionHash', transactionHash);
     } else {
       await connect();
     }
@@ -171,7 +191,7 @@
         {/key}
         {#if isWaitingForShow}
           <div
-            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-4xl -rotate-12 whitespace-nowrap font-extrabold text-primary ring-2 ring-primary bg-base-200/50 p-2 ring-inset rounded-xl"
+            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-4xl -rotate-6 whitespace-nowrap font-extrabold text-primary ring-2 ring-primary bg-base-200/50 p-2 ring-inset rounded-xl"
           >
             Waiting for Show to Start
           </div>
