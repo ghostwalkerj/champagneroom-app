@@ -5,15 +5,15 @@ import { uniqueNamesGenerator } from 'unique-names-generator';
 import urlJoin from 'url-join';
 
 import {
-    BITCART_EMAIL,
-    BITCART_PASSWORD,
-    BITCART_STORE_ID
+  BITCART_EMAIL,
+  BITCART_PASSWORD,
+  BITCART_STORE_ID
 } from '$env/static/private';
 import {
-    PUBLIC_BITCART_NOTIFICATION_PATH,
-    PUBLIC_BITCART_URL,
-    PUBLIC_PAYMENT_PERIOD,
-    PUBLIC_TICKET_PATH
+  PUBLIC_BITCART_NOTIFICATION_PATH,
+  PUBLIC_BITCART_URL,
+  PUBLIC_PAYMENT_PERIOD,
+  PUBLIC_TICKET_PATH
 } from '$env/static/public';
 
 import { Show } from '$lib/models/show';
@@ -105,7 +105,8 @@ export const actions: Actions = {
         store_id: BITCART_STORE_ID,
         expiration: +PUBLIC_PAYMENT_PERIOD / 60 / 1000,
         order_id: ticket._id.toString(),
-        notification_url: urlJoin(PUBLIC_BITCART_NOTIFICATION_PATH)
+        notification_url: urlJoin(PUBLIC_BITCART_NOTIFICATION_PATH),
+        paid_currency: 'ETH'
       },
       {
         headers: {

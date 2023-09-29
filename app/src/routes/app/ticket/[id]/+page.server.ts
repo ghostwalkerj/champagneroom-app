@@ -16,79 +16,24 @@ import type {
 import { CancelReason } from '$lib/models/common';
 import { Show } from '$lib/models/show';
 import { Ticket } from '$lib/models/ticket';
-import { Transaction, TransactionReasonType } from '$lib/models/transaction';
 
 import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
 import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 
 import {
-  deleteInvoiceInvoicesModelIdDelete,
   getInvoiceByIdInvoicesModelIdGet,
-  modifyInvoiceInvoicesModelIdPatch
+  modifyInvoiceInvoicesModelIdPatch,
+  updatePaymentDetailsInvoicesModelIdDetailsPatch
 } from '$lib/bitcart';
 import type { DisplayInvoice } from '$lib/bitcart/models';
 import { ActorType, InvoiceStatus } from '$lib/constants';
 import { createAuthToken } from '$lib/util/payment';
 import { verifyPin } from '$lib/util/pin';
-import {
-  getTicketMachineService,
-  getTicketMachineServiceFromId
-} from '$lib/util/util.server';
+import { getTicketMachineServiceFromId } from '$lib/util/util.server';
 
 import type { Actions, PageServerLoad } from './$types';
 
-const getTicketService = async (ticketId: string, redisConnection: IORedis) => {
-  const ticket = await Ticket.findById(ticketId)
-    .orFail(() => {
-      throw error(404, 'Ticket not found');
-    })
-    .exec();
-
-  const show = await Show.findById(ticket.show)
-    .orFail(() => {
-      throw error(404, 'Show not found');
-    })
-    .exec();
-
-  const ticketService = getTicketMachineService(ticket, redisConnection);
-  return { ticket, show, ticketService };
-};
-
 export const actions: Actions = {
-  buy_ticket: async ({ params, locals }) => {
-    const ticketId = params.id;
-    if (ticketId === null) {
-      throw error(404, 'Ticket not found');
-    }
-
-    const redisConnection = locals.redisConnection as IORedis;
-
-    const { ticket, show, ticketService } = await getTicketService(
-      ticketId,
-      redisConnection
-    );
-
-    Transaction.create({
-      //TODO: add transaction data
-      hash: '0xeba2df809e7a612a0a0d444ccfa5c839624bdc00dd29e3340d46df3870f8a30e',
-      from: '0x5B38Da6a701c568545dCfcB03FcB875f56beddC4',
-      to: '0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2',
-      amount: ticket.price.toString(),
-      block: 123,
-      reason: TransactionReasonType.TICKET_PAYMENT,
-      ticket: ticket._id,
-      show: show._id,
-      agent: show.agent,
-      creator: show.creator
-    }).then((transaction) => {
-      ticketService.send({
-        type: TicketMachineEventString.PAYMENT_RECEIVED,
-        transaction
-      });
-    });
-
-    return { success: true, ticketBought: true };
-  },
   cancel_ticket: async ({ params, locals }) => {
     const ticketId = params.id;
     if (ticketId === null) {
@@ -144,7 +89,7 @@ export const actions: Actions = {
           }
         ));
     } catch (error_) {
-      console.error(error_);
+      console.error('Update invoice error', error_);
     }
 
     return {
@@ -234,6 +179,49 @@ export const actions: Actions = {
     }
 
     return { success: true, reason, explanation };
+  },
+  update_payment: async ({ request }) => {
+    const data = await request.formData();
+    const address = data.get('address') as string;
+    const id = data.get('id') as string;
+    const paymentId = data.get('paymentId') as string;
+
+    if (!address) {
+      return fail(400, { address, missingAddress: true });
+    }
+
+    if (!id) {
+      return fail(400, { id, missingId: true });
+    }
+
+    if (!paymentId) {
+      return fail(400, { paymentId, missingPaymentId: true });
+    }
+
+    // Create invoice in Bitcart
+    const token = await createAuthToken(
+      BITCART_EMAIL,
+      BITCART_PASSWORD,
+      PUBLIC_BITCART_URL
+    );
+
+    try {
+      await updatePaymentDetailsInvoicesModelIdDetailsPatch(
+        id,
+        {
+          id: paymentId,
+          address
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+    } catch (error_) {
+      console.error(error_);
+    }
   }
 };
 

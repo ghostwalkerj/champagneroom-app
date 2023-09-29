@@ -50,7 +50,7 @@
 <div class="mt-4 h-full">
   <div class="flex flex-row justify-center h-full">
     <!-- Page header -->
-    <div class="pb-4 text-center w-full max-w-2xl">
+    <div class="pb-4 text-center w-full max-w-xl">
       {#key show.showState}
         <ShowDetail {show} />
       {/key}

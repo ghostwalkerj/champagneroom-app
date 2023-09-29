@@ -57,6 +57,8 @@
 
   nameStore.set(ticket.customerName);
 
+  console.log(invoice);
+
   const walletPay = async () => {
     if ($selectedAccount) {
       // Make sure to use correct chain id
@@ -66,7 +68,7 @@
       if (!chain) {
         throw new Error('Chain not found');
       }
-      // Initiate payment
+
       if (!$defaultWallet?.provider) {
         throw new Error('Provider not found');
       }
@@ -76,6 +78,16 @@
       if (!provider) {
         throw new Error('Provider not found');
       }
+
+      // Initiate payment by adding address to the invoice
+      let formData = new FormData();
+      formData.append('address', $selectedAccount.address);
+      formData.append('id', invoice.id!);
+      formData.append('paymentId', currentPayment.id!);
+      await fetch($page.url.href + '?/update_payment', {
+        method: 'POST',
+        body: formData
+      });
 
       const parameters = [
         {
