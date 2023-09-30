@@ -5,7 +5,7 @@
   import { type TicketDocumentType, TicketStatus } from '$lib/models/ticket';
 
   import type { DisplayInvoice } from '$lib/bitcart/models';
-  import { durationFormatter } from '$lib/constants';
+  import { currencyFormatter, durationFormatter } from '$lib/constants';
   import type { PaymentType } from '$lib/util/payment';
 
   export let invoice: DisplayInvoice;
@@ -35,7 +35,11 @@
 
 <div class="flex justify-center font-CaviarDreams text-info text-center">
   <div class="flex flex-col w-full max-w-2xl rounded-xl bg-black overflow-auto">
-    <div class="text-2xl font-bold m-4">Invoice</div>
+    <div class="text-2xl font-bold mt-4">Invoice</div>
+    <div class="text-sm mb-4">
+      ( {currencyFormatter().format(ticket.price)}
+      {ticket.currency} equivalent )
+    </div>
     <div class="grid grid-cols-2">
       {#if ticketStatus !== TicketStatus.CANCELLED}
         <div class:text-warning={invoiceTimeLeft < 600}>
@@ -105,8 +109,14 @@
         </div>
       </div>
     </div>
-    <div class="flex place-content-center m-10">
+    <div class="flex place-content-center m-6">
       <QRCodeImage text={currentPayment['payment_url']} />
+    </div>
+    <div class="pb-6">
+      Please pay with your connected wallet before <span class="font-bold"
+        >Time Left to Pay</span
+      >
+      runs out
     </div>
   </div>
 </div>

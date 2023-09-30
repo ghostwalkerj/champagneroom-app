@@ -57,8 +57,6 @@
 
   nameStore.set(ticket.customerName);
 
-  console.log(invoice);
-
   const walletPay = async () => {
     if ($selectedAccount) {
       // Make sure to use correct chain id
@@ -210,11 +208,9 @@
         {/if}
       </div>
 
-      {#if !isTicketDone}
-        {#if shouldPay}
-          <TicketInvoice {invoice} {ticket} />
-        {/if}
+      <TicketInvoice {invoice} {ticket} />
 
+      {#if !isTicketDone}
         <div class="flex gap-6 place-content-center m-3">
           {#if shouldPay}
             {#if !$selectedAccount}

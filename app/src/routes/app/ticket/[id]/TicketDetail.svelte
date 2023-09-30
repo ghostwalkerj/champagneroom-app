@@ -15,7 +15,7 @@
   const showName = show.name;
   const showCoverImageUrl = show.coverImageUrl;
   const showDuration = durationFormatter(show.duration * 60);
-  const showUrl = urlJoin(PUBLIC_SHOW_PATH, show._id);
+  const showUrl = urlJoin(PUBLIC_SHOW_PATH, show._id.toString());
 
   // Ticket
   $: ticketStatus = ticket
@@ -66,7 +66,11 @@
           style="background-image: url('{PUBLIC_STATIC_URL}/assets/logo-horizontal-tr.png') z-0"
         />
         <div>Ticket Reserved for: {customerName}</div>
-        <div class="capitalize">Payment Status: {ticketStatus}</div>
+        <div class="capitalize">Ticket Status: {ticketStatus}</div>
+        <div class="text-sm">
+          Price: {ticketPrice}
+          {currency}
+        </div>
       </div>
       <div class="relative border-l-2 border-dashed">
         <div
