@@ -10,7 +10,7 @@ import {
   BITCART_STORE_ID
 } from '$env/static/private';
 import {
-  PUBLIC_BITCART_NOTIFICATION_PATH,
+  PUBLIC_BITCART_INVOICE_NOTIFICATION_PATH,
   PUBLIC_BITCART_URL,
   PUBLIC_PAYMENT_PERIOD,
   PUBLIC_TICKET_PATH
@@ -105,7 +105,7 @@ export const actions: Actions = {
         store_id: BITCART_STORE_ID,
         expiration: +PUBLIC_PAYMENT_PERIOD / 60 / 1000,
         order_id: ticket._id.toString(),
-        notification_url: urlJoin(PUBLIC_BITCART_NOTIFICATION_PATH),
+        notification_url: urlJoin(PUBLIC_BITCART_INVOICE_NOTIFICATION_PATH),
         paid_currency: 'ETH'
       },
       {

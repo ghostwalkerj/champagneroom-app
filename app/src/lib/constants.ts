@@ -14,11 +14,10 @@ export enum EntityType {
   TICKET = 'TICKET',
   USER = 'USER',
   OPERATOR = 'OPERATOR',
-  PAYMENT = 'PAYMENT',
+  INVOICE = 'INVOICE',
   OTHER = 'OTHER',
   NONE = 'NONE'
 }
-
 
 /* eslint-disable @typescript-eslint/naming-convention */
 export enum TokenRoles {

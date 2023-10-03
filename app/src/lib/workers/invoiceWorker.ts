@@ -16,7 +16,7 @@ import { ActorType, EntityType } from '$lib/constants';
 import { InvoiceStatus, type PaymentType } from '$lib/util/payment';
 import { getTicketMachineServiceFromId } from '$lib/util/util.server';
 
-export const getPaymentWorker = ({
+export const getInvoiceWorker = ({
   redisConnection,
   paymentAuthToken
 }: {
@@ -24,8 +24,8 @@ export const getPaymentWorker = ({
   paymentAuthToken: string;
 }) => {
   return new Worker(
-    EntityType.PAYMENT,
-    async (job: Job<PaymentJobDataType, any, string>) => {
+    EntityType.INVOICE,
+    async (job: Job<InvoiceJobDataType, any, string>) => {
       const invoiceId = job.data.invoiceId;
       const status = job.name as InvoiceStatus;
 
@@ -141,9 +141,9 @@ export const getPaymentWorker = ({
   );
 };
 
-export type PaymentJobDataType = {
+export type InvoiceJobDataType = {
   invoiceId: string;
   [key: string]: any;
 };
 
-export type PaymentQueueType = Queue<PaymentJobDataType, any, string>;
+export type InvoiceQueueType = Queue<InvoiceJobDataType, any, string>;

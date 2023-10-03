@@ -9,7 +9,7 @@ import parseArgv from 'tiny-parse-argv';
 import { handler } from './build/handler';
 import { EntityType } from './dist/constants';
 import { getShowWorker } from './dist/workers/showWorker';
-import { getPaymentWorker } from './dist/workers/paymentWorker';
+import { getInvoiceWorker } from './dist/workers/invoiceWorker';
 import { createAuthToken } from './dist/util/payment';
 import packageFile from './package.json' assert { type: 'json' };
 import IORedis from 'ioredis';
@@ -34,6 +34,7 @@ const redisOptions = {
     password: process.env.REDIS_PASSWORD || '',
     username: process.env.REDIS_USERNAME || '',
     enableReadyCheck: false,
+    // eslint-disable-next-line unicorn/no-null
     maxRetriesPerRequest: null
   }
 };
@@ -45,7 +46,7 @@ const mongoDBEndpoint =
 mongoose.connect(mongoDBEndpoint);
 
 const showQueue = new Queue(EntityType.SHOW, { connection: redisConnection });
-const paymentQueue = new Queue(EntityType.PAYMENT, {
+const invoiceQueue = new Queue(EntityType.INVOICE, {
   connection: redisConnection
 });
 
@@ -67,16 +68,16 @@ if (startWorker) {
   });
   showWorker.run();
 
-  const paymentWorker = getPaymentWorker({ redisConnection, paymentAuthToken });
+  const invoiceWorker = getInvoiceWorker({ redisConnection, paymentAuthToken });
 
-  paymentWorker.run();
+  invoiceWorker.run();
 }
 
 // Bull Dashboard
 const serverAdapter = new ExpressAdapter();
 serverAdapter.setBasePath('/admin/queues');
 createBullBoard({
-  queues: [new BullMQAdapter(showQueue), new BullMQAdapter(paymentQueue)],
+  queues: [new BullMQAdapter(showQueue), new BullMQAdapter(invoiceQueue)],
   serverAdapter: serverAdapter
 });
 const staticAuth = basicAuth({
