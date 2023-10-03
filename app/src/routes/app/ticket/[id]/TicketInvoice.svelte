@@ -20,12 +20,26 @@
     invoice?.payments?.length - 1
   ] as PaymentType;
 
-  const invoiceState =
-    invoiceStatus === InvoiceStatus.EXPIRED
-      ? 'Invoice Expired'
-      : invoiceStatus === InvoiceStatus.COMPLETE
-      ? 'Invoice Paid'
-      : 'Please pay with your connected wallet before Time Left to Pay runs out';
+  let invoiceState = invoiceStatus;
+
+  switch (invoiceStatus) {
+    case InvoiceStatus.EXPIRED: {
+      invoiceState = 'Invoice Expired';
+      break;
+    }
+    case InvoiceStatus.COMPLETE: {
+      invoiceState = 'Invoice Paid';
+      break;
+    }
+    case InvoiceStatus.INVALID: {
+      invoiceState = 'Invoice Invalid';
+      break;
+    }
+    default: {
+      invoiceState =
+        'Please pay with your connected wallet before Time Left to Pay runs out';
+    }
+  }
 
   // Invoice
   $: invoiceTimeLeft = invoice.time_left;
@@ -44,9 +58,9 @@
 <div
   class="relative flex justify-center font-CaviarDreams text-info text-center"
 >
-  {#if invoiceStatus === InvoiceStatus.EXPIRED || invoiceStatus === InvoiceStatus.COMPLETE}
+  {#if invoiceStatus === InvoiceStatus.EXPIRED || invoiceStatus === InvoiceStatus.COMPLETE || invoiceStatus === InvoiceStatus.INVALID}
     <div
-      class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-6xl whitespace-nowrap font-extrabold text-primary ring-2 ring-primary bg-base-200 p-2 rounded-xl z-20 opacity-70 -rotate-[20deg] capitalize"
+      class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-6xl whitespace-nowrap font-extrabold text-primary ring-2 ring-primary p-2 rounded-xl z-20 -rotate-[20deg] capitalize"
     >
       {invoiceState}
     </div>

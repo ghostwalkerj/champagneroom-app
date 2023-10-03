@@ -5,13 +5,16 @@
   import web3 from 'web3';
 
   import { applyAction, enhance } from '$app/forms';
-  import { goto, invalidateAll } from '$app/navigation';
+  import { goto, invalidate, invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
-  import { PUBLIC_SHOWTIME_PATH } from '$env/static/public';
+  import {
+    PUBLIC_INVOICE_PATH,
+    PUBLIC_SHOWTIME_PATH
+  } from '$env/static/public';
 
   import { CancelReason, DisputeReason } from '$lib/models/common';
   import { type ShowDocumentType, ShowStatus } from '$lib/models/show';
-  import type { TicketDocumentType } from '$lib/models/ticket';
+  import { type TicketDocumentType, TicketStatus } from '$lib/models/ticket';
 
   import type { TicketMachineServiceType } from '$lib/machines/ticketMachine';
   import { createTicketMachineService } from '$lib/machines/ticketMachine';
@@ -32,16 +35,18 @@
 
   let ticket = data.ticket as TicketDocumentType;
   let show = data.show as ShowDocumentType;
-  const invoice = data.invoice;
+  let invoice = data.invoice;
 
   const currentPayment = invoice?.payments?.[
     invoice?.payments?.length - 1
   ] as PaymentType;
 
   const showTimePath = urlJoin($page.url.href, PUBLIC_SHOWTIME_PATH);
+  const invoicePath = urlJoin(PUBLIC_INVOICE_PATH, invoice.id!);
   const reasons = Object.values(DisputeReason);
 
   let shouldPay = false;
+  let hasPaymentSent = false;
   $: canWatchShow = false;
   let canCancelTicket = false;
   let isTicketDone = false;
@@ -77,17 +82,6 @@
         throw new Error('Provider not found');
       }
 
-      // Initiate payment by adding address to the invoice
-      let formData = new FormData();
-      formData.append('address', $selectedAccount.address);
-      formData.append('id', invoice.id!);
-      formData.append('paymentId', currentPayment.id!);
-      formData.append('ticketId', ticket._id.toString());
-      await fetch($page.url.href + '?/update_payment', {
-        method: 'POST',
-        body: formData
-      });
-
       const parameters = [
         {
           from: $selectedAccount.address,
@@ -98,11 +92,26 @@
           chainId: currentPayment.chain_id
         }
       ];
-      const transactionHash = await provider.request({
-        method: 'eth_sendTransaction',
-        params: parameters
-      });
-      console.log('transactionHash', transactionHash);
+
+      try {
+        await provider.request({
+          method: 'eth_sendTransaction',
+          params: parameters
+        });
+
+        // Initiate payment by adding address to the invoice
+        let formData = new FormData();
+        formData.append('address', $selectedAccount.address);
+        formData.append('id', invoice.id!);
+        formData.append('paymentId', currentPayment.id!);
+        formData.append('ticketId', ticket._id.toString());
+        await fetch($page.url.href + '?/initiate_payment', {
+          method: 'POST',
+          body: formData
+        });
+      } catch (error) {
+        console.log(error);
+      }
     } else {
       await connect();
     }
@@ -112,6 +121,7 @@
     const state = ticketMachineService.getSnapshot();
     shouldPay = state.matches('reserved.waiting4Payment');
     canWatchShow = state.matches('waiting4Show') || state.matches('redeemed');
+    hasPaymentSent = state.matches('reserved.initiatedPayment');
     canCancelTicket = state.can({
       type: 'CANCELLATION INITIATED',
       cancel: {
@@ -140,6 +150,20 @@
     hasMissedShow = state.matches('ended.missedShow');
     isWaitingForShow = state.matches('waiting4Show') && !hasShowStarted;
     isTicketDone = state.done ?? false;
+
+    // if the ticket state changes, reload the invoice
+    if (state.changed) {
+      fetch(invoicePath, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }).then(async (response) => {
+        if (response.ok) {
+          invoice = await response.json();
+        }
+      });
+    }
   };
 
   onMount(() => {
@@ -207,7 +231,18 @@
         {/if}
       </div>
 
-      <TicketInvoice {invoice} {ticket} />
+      <div class="relative">
+        {#key invoice}
+          <TicketInvoice {invoice} {ticket} />
+        {/key}
+        {#if hasPaymentSent}
+          <div
+            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl -rotate-45 whitespace-nowrap font-extrabold text-primary ring-2 ring-primary bg-base-200/50 p-2 ring-inset rounded-xl"
+          >
+            Waiting for Payment Confirmations
+          </div>
+        {/if}
+      </div>
 
       {#if !isTicketDone}
         <div class="flex gap-6 place-content-center m-3">
@@ -246,7 +281,7 @@
                 method="post"
                 action="?/cancel_ticket"
                 name="cancelTicket"
-                use:enhance={({ form }) => onSubmit(form)}
+                use:enhance={({ formElement }) => onSubmit(formElement)}
               >
                 <div class="w-full flex justify-center">
                   <button

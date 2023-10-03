@@ -180,7 +180,7 @@ export const actions: Actions = {
 
     return { success: true, reason, explanation };
   },
-  update_payment: async ({ request, locals }) => {
+  initiate_payment: async ({ request, locals }) => {
     const data = await request.formData();
     const address = data.get('address') as string;
     const id = data.get('id') as string;
