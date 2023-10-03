@@ -132,7 +132,7 @@ const createTicketMachine = ({
               cond: 'ticketHasPayment'
             },
             {
-              target: '#ticketMachine.waiting4Show',
+              target: '#ticketMachine.reserved.waiting4Show',
               cond: 'ticketFullyPaid'
             },
             {
@@ -185,7 +185,7 @@ const createTicketMachine = ({
             ],
             'PAYMENT RECEIVED': [
               {
-                target: '#ticketMachine.waiting4Show',
+                target: '#ticketMachine.reserved.waiting4Show',
                 cond: 'fullyPaid',
                 actions: ['receivePayment', 'setFullyPaid', 'sendTicketSold']
               },
@@ -206,7 +206,15 @@ const createTicketMachine = ({
             },
             initiatedPayment: {},
             receivedPayment: {},
-
+            waiting4Show: {
+              on: {
+                'TICKET REDEEMED': {
+                  target: '#ticketMachine.redeemed',
+                  cond: 'canWatchShow',
+                  actions: ['redeemTicket', 'sendTicketRedeemed']
+                }
+              }
+            },
             initiatedCancellation: {
               initial: 'waiting4Refund',
               states: {
@@ -232,15 +240,7 @@ const createTicketMachine = ({
             }
           }
         },
-        waiting4Show: {
-          on: {
-            'TICKET REDEEMED': {
-              target: '#ticketMachine.redeemed',
-              cond: 'canWatchShow',
-              actions: ['redeemTicket', 'sendTicketRedeemed']
-            }
-          }
-        },
+
         redeemed: {
           on: {
             'SHOW LEFT': { actions: ['sendLeftShow'] },
@@ -612,7 +612,9 @@ const createTicketMachine = ({
       guards: {
         canCancel: (context) => {
           const canCancel =
-            context.ticketState.totalPaid <= context.ticketState.totalRefunded;
+            context.ticketState.totalPaid <=
+              context.ticketState.totalRefunded &&
+            context.ticketState.status !== TicketStatus.FULLY_PAID;
           return canCancel;
         },
         ticketCancelled: (context) =>
@@ -669,7 +671,7 @@ const createTicketMachine = ({
 
 export { TicketMachineEventType };
 
-  export { createTicketMachine };
+export { createTicketMachine };
 
 export const createTicketMachineService = ({
   ticketDocument,

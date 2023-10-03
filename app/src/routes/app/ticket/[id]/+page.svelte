@@ -5,7 +5,7 @@
   import web3 from 'web3';
 
   import { applyAction, enhance } from '$app/forms';
-  import { goto, invalidate, invalidateAll } from '$app/navigation';
+  import { goto, invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
   import {
     PUBLIC_INVOICE_PATH,
@@ -14,7 +14,7 @@
 
   import { CancelReason, DisputeReason } from '$lib/models/common';
   import { type ShowDocumentType, ShowStatus } from '$lib/models/show';
-  import { type TicketDocumentType, TicketStatus } from '$lib/models/ticket';
+  import type { TicketDocumentType } from '$lib/models/ticket';
 
   import type { TicketMachineServiceType } from '$lib/machines/ticketMachine';
   import { createTicketMachineService } from '$lib/machines/ticketMachine';
@@ -120,7 +120,8 @@
   const useTicketMachine = (ticketMachineService: TicketMachineServiceType) => {
     const state = ticketMachineService.getSnapshot();
     shouldPay = state.matches('reserved.waiting4Payment');
-    canWatchShow = state.matches('waiting4Show') || state.matches('redeemed');
+    canWatchShow =
+      state.matches('reserved.waiting4Show') || state.matches('redeemed');
     hasPaymentSent = state.matches('reserved.initiatedPayment');
     canCancelTicket = state.can({
       type: 'CANCELLATION INITIATED',
@@ -148,7 +149,8 @@
       }
     });
     hasMissedShow = state.matches('ended.missedShow');
-    isWaitingForShow = state.matches('waiting4Show') && !hasShowStarted;
+    isWaitingForShow =
+      state.matches('reserved.waiting4Show') && !hasShowStarted;
     isTicketDone = state.done ?? false;
 
     // if the ticket state changes, reload the invoice

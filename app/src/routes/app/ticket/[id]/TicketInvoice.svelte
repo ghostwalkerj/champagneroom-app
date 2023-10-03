@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { QRCodeImage } from 'svelte-qrcode-image';
 
-  import { type TicketDocumentType, TicketStatus } from '$lib/models/ticket';
+  import { TicketStatus, type TicketDocumentType } from '$lib/models/ticket';
 
   import type { DisplayInvoice } from '$lib/bitcart/models';
   import { currencyFormatter, durationFormatter } from '$lib/constants';
