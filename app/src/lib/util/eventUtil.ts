@@ -10,7 +10,7 @@ export const createEventText = (showEvent: ShowEventDocumentType) => {
 
   switch (showEvent.type) {
     case 'TICKET SOLD': {
-      eventText += ' bought a ticket!';
+      eventText += ' paid in full!';
       break;
     }
 
