@@ -19,14 +19,6 @@ export enum EntityType {
   NONE = 'NONE'
 }
 
-export enum InvoiceStatus {
-  PENDING = 'Pending',
-  COMPLETE = 'complete',
-  INVALID = 'invalid',
-  EXPIRED = 'expired',
-  IN_PROGRESS = 'In progress',
-  FAILED = 'Failed'
-}
 
 /* eslint-disable @typescript-eslint/naming-convention */
 export enum TokenRoles {

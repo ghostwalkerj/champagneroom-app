@@ -82,6 +82,7 @@
       formData.append('address', $selectedAccount.address);
       formData.append('id', invoice.id!);
       formData.append('paymentId', currentPayment.id!);
+      formData.append('ticketId', ticket._id.toString());
       await fetch($page.url.href + '?/update_payment', {
         method: 'POST',
         body: formData
@@ -110,8 +111,7 @@
   const useTicketMachine = (ticketMachineService: TicketMachineServiceType) => {
     const state = ticketMachineService.getSnapshot();
     shouldPay = state.matches('reserved.waiting4Payment');
-    canWatchShow =
-      state.matches('reserved.waiting4Show') || state.matches('redeemed');
+    canWatchShow = state.matches('waiting4Show') || state.matches('redeemed');
     canCancelTicket = state.can({
       type: 'CANCELLATION INITIATED',
       cancel: {
@@ -138,8 +138,7 @@
       }
     });
     hasMissedShow = state.matches('ended.missedShow');
-    isWaitingForShow =
-      state.matches('reserved.waiting4Show') && !hasShowStarted;
+    isWaitingForShow = state.matches('waiting4Show') && !hasShowStarted;
     isTicketDone = state.done ?? false;
   };
 

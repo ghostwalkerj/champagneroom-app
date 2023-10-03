@@ -4,6 +4,16 @@ import { createTokenTokenPost } from '$lib/bitcart';
 
 const permissions = ['full_control'];
 
+// Bitcart API types
+export enum InvoiceStatus {
+  PENDING = 'Pending',
+  COMPLETE = 'complete',
+  INVALID = 'invalid',
+  EXPIRED = 'expired',
+  IN_PROGRESS = 'In progress',
+  FAILED = 'Failed'
+}
+
 export const createAuthToken = async (
   email: string,
   password: string,
@@ -26,7 +36,6 @@ export const createAuthToken = async (
   return accessToken;
 };
 
-// Bitcart API types
 export type PaymentType = {
   created: string;
   lightning: boolean;

@@ -26,8 +26,8 @@ import {
   updatePaymentDetailsInvoicesModelIdDetailsPatch
 } from '$lib/bitcart';
 import type { DisplayInvoice } from '$lib/bitcart/models';
-import { ActorType, InvoiceStatus } from '$lib/constants';
-import { createAuthToken } from '$lib/util/payment';
+import { ActorType } from '$lib/constants';
+import { createAuthToken, InvoiceStatus } from '$lib/util/payment';
 import { verifyPin } from '$lib/util/pin';
 import { getTicketMachineServiceFromId } from '$lib/util/util.server';
 
@@ -180,11 +180,12 @@ export const actions: Actions = {
 
     return { success: true, reason, explanation };
   },
-  update_payment: async ({ request }) => {
+  update_payment: async ({ request, locals }) => {
     const data = await request.formData();
     const address = data.get('address') as string;
     const id = data.get('id') as string;
     const paymentId = data.get('paymentId') as string;
+    const ticketId = data.get('ticketId') as string;
 
     if (!address) {
       return fail(400, { address, missingAddress: true });
@@ -204,9 +205,8 @@ export const actions: Actions = {
       BITCART_PASSWORD,
       PUBLIC_BITCART_URL
     );
-
     try {
-      await updatePaymentDetailsInvoicesModelIdDetailsPatch(
+      updatePaymentDetailsInvoicesModelIdDetailsPatch(
         id,
         {
           id: paymentId,
@@ -222,6 +222,17 @@ export const actions: Actions = {
     } catch (error_) {
       console.error(error_);
     }
+
+    // Alert Ticket to incoming transaction
+    const redisConnection = locals.redisConnection as IORedis;
+    const ticketService = await getTicketMachineServiceFromId(
+      ticketId,
+      redisConnection
+    );
+
+    ticketService.send({
+      type: TicketMachineEventString.PAYMENT_INITIATED
+    });
   }
 };
 

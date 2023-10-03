@@ -28,6 +28,7 @@ import { ShowMachineEventString } from './showMachine';
 export enum TicketMachineEventString {
   CANCELLATION_INITIATED = 'CANCELLATION INITIATED',
   REFUND_RECEIVED = 'REFUND RECEIVED',
+  PAYMENT_INITIATED = 'PAYMENT INITIATED',
   PAYMENT_RECEIVED = 'PAYMENT RECEIVED',
   FEEDBACK_RECEIVED = 'FEEDBACK RECEIVED',
   DISPUTE_INITIATED = 'DISPUTE INITIATED',
@@ -84,7 +85,8 @@ type TicketMachineEventType =
   | {
       type: 'DISPUTE RESOLVED';
       decision: DisputeDecision;
-    };
+    }
+  | { type: 'PAYMENT INITIATED' };
 
 const createTicketMachine = ({
   ticketDocument,
@@ -122,6 +124,18 @@ const createTicketMachine = ({
               cond: 'ticketReserved'
             },
             {
+              target: '#ticketMachine.reserved.initiatedPayment',
+              cond: 'ticketHasPaymentInitiated'
+            },
+            {
+              target: '#ticketMachine.reserved.receivedPayment',
+              cond: 'ticketHasPayment'
+            },
+            {
+              target: '#ticketMachine.waiting4Show',
+              cond: 'ticketFullyPaid'
+            },
+            {
               target: 'cancelled',
               cond: 'ticketCancelled'
             },
@@ -153,51 +167,46 @@ const createTicketMachine = ({
         },
         reserved: {
           initial: 'waiting4Payment',
+          on: {
+            'CANCELLATION INITIATED': [
+              {
+                target: '#ticketMachine.cancelled',
+                cond: 'canCancel',
+                actions: [
+                  'initiateCancellation',
+                  'cancelTicket',
+                  'sendTicketCancelled'
+                ]
+              },
+              {
+                target: '#ticketMachine.reserved.initiatedCancellation',
+                actions: ['initiateCancellation']
+              }
+            ],
+            'PAYMENT RECEIVED': [
+              {
+                target: '#ticketMachine.waiting4Show',
+                cond: 'fullyPaid',
+                actions: ['receivePayment', 'setFullyPaid', 'sendTicketSold']
+              },
+              {
+                target: '#ticketMachine.reserved.receivedPayment',
+                actions: ['receivePayment']
+              }
+            ]
+          },
           states: {
             waiting4Payment: {
-              always: [
-                {
-                  target: 'waiting4Show',
-                  cond: 'fullyPaid'
-                }
-              ],
               on: {
-                'PAYMENT RECEIVED': [
-                  {
-                    target: 'waiting4Show',
-                    cond: 'fullyPaid',
-                    actions: ['receivePayment', 'sendTicketSold']
-                  },
-                  {
-                    actions: ['receivePayment']
-                  }
-                ],
-                'CANCELLATION INITIATED': [
-                  {
-                    target: '#ticketMachine.cancelled',
-                    cond: 'canCancel',
-                    actions: [
-                      'initiateCancellation',
-                      'cancelTicket',
-                      'sendTicketCancelled'
-                    ]
-                  },
-                  {
-                    target: 'initiatedCancellation',
-                    actions: ['initiateCancellation']
-                  }
-                ]
-              }
-            },
-            waiting4Show: {
-              on: {
-                'TICKET REDEEMED': {
-                  target: '#ticketMachine.redeemed',
-                  cond: 'canWatchShow',
-                  actions: ['redeemTicket', 'sendTicketRedeemed']
+                'PAYMENT INITIATED': {
+                  target: 'initiatedPayment',
+                  actions: ['initiatePayment']
                 }
               }
             },
+            initiatedPayment: {},
+            receivedPayment: {},
+
             initiatedCancellation: {
               initial: 'waiting4Refund',
               states: {
@@ -220,6 +229,15 @@ const createTicketMachine = ({
                   }
                 }
               }
+            }
+          }
+        },
+        waiting4Show: {
+          on: {
+            'TICKET REDEEMED': {
+              target: '#ticketMachine.redeemed',
+              cond: 'canWatchShow',
+              actions: ['redeemTicket', 'sendTicketRedeemed']
             }
           }
         },
@@ -389,6 +407,7 @@ const createTicketMachine = ({
             }
           );
         },
+
         sendTicketFinalized: (context) => {
           ticketMachineOptions?.showQueue?.add(
             ShowMachineEventString.TICKET_FINALIZED,
@@ -427,6 +446,24 @@ const createTicketMachine = ({
               ...context.ticketState,
               status: TicketStatus.CANCELLATION_INITIATED,
               cancel: event.cancel
+            }
+          };
+        }),
+
+        initiatePayment: assign((context) => {
+          return {
+            ticketState: {
+              ...context.ticketState,
+              status: TicketStatus.PAYMENT_INITIATED
+            }
+          };
+        }),
+
+        setFullyPaid: assign((context) => {
+          return {
+            ticketState: {
+              ...context.ticketState,
+              status: TicketStatus.FULLY_PAID
             }
           };
         }),
@@ -590,6 +627,12 @@ const createTicketMachine = ({
           context.ticketState.status === TicketStatus.RESERVED,
         ticketRedeemed: (context) =>
           context.ticketState.status === TicketStatus.REDEEMED,
+        ticketHasPaymentInitiated: (context) =>
+          context.ticketState.status === TicketStatus.PAYMENT_INITIATED,
+        ticketHasPayment: (context) =>
+          context.ticketState.status === TicketStatus.PAYMENT_RECEIVED,
+        ticketFullyPaid: (context) =>
+          context.ticketState.status === TicketStatus.FULLY_PAID,
         ticketInCancellationInitiated: (context) =>
           context.ticketState.status === TicketStatus.CANCELLATION_INITIATED,
         ticketMissedShow: (context) =>

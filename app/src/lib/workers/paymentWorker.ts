@@ -12,8 +12,8 @@ import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 
 import { getInvoiceByIdInvoicesModelIdGet } from '$lib/bitcart';
 import type { DisplayInvoice } from '$lib/bitcart/models';
-import { ActorType, EntityType, InvoiceStatus } from '$lib/constants';
-import type { PaymentType } from '$lib/util/payment';
+import { ActorType, EntityType } from '$lib/constants';
+import { InvoiceStatus, type PaymentType } from '$lib/util/payment';
 import { getTicketMachineServiceFromId } from '$lib/util/util.server';
 
 export const getPaymentWorker = ({
