@@ -2,23 +2,25 @@ import type { AxiosResponse } from 'axios';
 import type { Job, Queue } from 'bullmq';
 import { Worker } from 'bullmq';
 import type IORedis from 'ioredis';
-import { Types } from 'mongoose';
 
-import { CancelReason, type CancelType } from '$lib/models/common';
-
-import { TicketMachineEventString } from '$lib/machines/ticketMachine';
-
+import {
+  getInvoiceByIdInvoicesModelIdGet,
+  refundInvoiceInvoicesModelIdRefundsPost
+} from '$lib/bitcart';
 import type { DisplayInvoice } from '$lib/bitcart/models';
-import { ActorType, EntityType } from '$lib/constants';
-import { PayoutType } from '$lib/util/payment';
-import { getTicketMachineServiceFromId } from '$lib/util/util.server';
+import { EntityType } from '$lib/constants';
+import { InvoiceStatus, PayoutType } from '$lib/util/payment';
 
 export const getPayoutWorker = ({
+  payoutQueue,
   redisConnection,
-  paymentAuthToken
+  paymentAuthToken,
+  paymentPeriod = 6_000_000 / 60 / 1000
 }: {
+  payoutQueue: PayoutQueueType;
   redisConnection: IORedis;
   paymentAuthToken: string;
+  paymentPeriod: number;
 }) => {
   return new Worker(
     EntityType.PAYOUT,
@@ -32,28 +34,59 @@ export const getPayoutWorker = ({
             return;
           }
 
-          const issueRefund = async (invoice: DisplayInvoice) => {
-            const ticketService = await getTicketMachineServiceFromId(
-              ticketId,
-              redisConnection
+          const invoiceId = job.data.invoiceId;
+          if (!invoiceId) {
+            return;
+          }
+
+          const response = (await getInvoiceByIdInvoicesModelIdGet(invoiceId, {
+            headers: {
+              Authorization: `Bearer ${paymentAuthToken}`,
+              'Content-Type': 'application/json'
+            }
+          })) as AxiosResponse<DisplayInvoice>;
+          const invoice = response.data as DisplayInvoice;
+          console.log('invoice', invoice);
+
+          // Possible there is unconfirmed payments.  If so, queue it up again and wait for timeout.
+          if (
+            invoice.status === InvoiceStatus.IN_PROGRESS ||
+            invoice.status === InvoiceStatus.PENDING
+          ) {
+            payoutQueue.add(
+              PayoutType.REFUND,
+              {
+                ticketId,
+                invoiceId
+              },
+              { delay: paymentPeriod }
             );
+            return;
+          }
 
-            const ticketState = ticketService.getSnapshot();
-
-            const cancel = {
-              _id: new Types.ObjectId(),
-              cancelledBy: ActorType.TIMER,
-              cancelledInState: JSON.stringify(ticketState.value),
-              cancelledAt: new Date(),
-              reason: CancelReason.TICKET_PAYMENT_TIMEOUT
-            } as CancelType;
-
-            ticketService.send({
-              type: TicketMachineEventString.CANCELLATION_INITIATED,
-              cancel
-            });
+          const issueRefund = async () => {
+            try {
+              const refund = await refundInvoiceInvoicesModelIdRefundsPost(
+                invoiceId,
+                {
+                  amount: 0.005_997_07,
+                  currency: invoice.paid_currency || '',
+                  admin_host: 'https://bitcart1.pcall.app/admin',
+                  send_email: false
+                },
+                {
+                  headers: {
+                    Authorization: `Bearer ${paymentAuthToken}`,
+                    'Content-Type': 'application/json'
+                  }
+                }
+              );
+              console.log('refund', refund);
+            } catch (error_) {
+              console.error(error_);
+            }
           };
-          issueRefund(invoice);
+          issueRefund();
           break;
         }
 

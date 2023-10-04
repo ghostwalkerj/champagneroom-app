@@ -6,7 +6,7 @@ import { Types } from 'mongoose';
 import urlJoin from 'url-join';
 
 import { BITCART_EMAIL, BITCART_PASSWORD } from '$env/static/private';
-import { PUBLIC_BITCART_URL, PUBLIC_PIN_PATH } from '$env/static/public';
+import { PUBLIC_BITCART_API_URL, PUBLIC_PIN_PATH } from '$env/static/public';
 
 import type {
   CancelType,
@@ -21,7 +21,7 @@ import { Ticket } from '$lib/models/ticket';
 import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
 import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 
-import type { PayoutQueueType } from '$lib/workers/PayoutWorker';
+import type { PayoutQueueType } from '$lib/workers/payoutWorker';
 
 import { getInvoiceByIdInvoicesModelIdGet } from '$lib/bitcart';
 import type { DisplayInvoice } from '$lib/bitcart/models';
@@ -222,6 +222,8 @@ export const actions: Actions = {
     ticketService.send({
       type: TicketMachineEventString.PAYMENT_INITIATED
     });
+
+    return { success: true };
   }
 };
 
@@ -257,7 +259,7 @@ export const load: PageServerLoad = async ({ params, cookies, url }) => {
   const token = await createAuthToken(
     BITCART_EMAIL,
     BITCART_PASSWORD,
-    PUBLIC_BITCART_URL
+    PUBLIC_BITCART_API_URL
   );
 
   const invoice =

@@ -17,7 +17,11 @@ import {
 } from '$lib/bitcart';
 import type { DisplayInvoice } from '$lib/bitcart/models';
 import { ActorType, EntityType } from '$lib/constants';
-import { InvoiceJobType, InvoiceStatus, type PaymentType } from '$lib/util/payment';
+import {
+  InvoiceJobType,
+  InvoiceStatus,
+  type PaymentType
+} from '$lib/util/payment';
 import { getTicketMachineServiceFromId } from '$lib/util/util.server';
 
 export const getInvoiceWorker = ({

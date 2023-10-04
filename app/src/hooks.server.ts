@@ -1,6 +1,5 @@
 import type { Cookies, Handle } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
-import axios from 'axios';
 import IORedis from 'ioredis';
 import type { JwtPayload } from 'jsonwebtoken';
 import jwt from 'jsonwebtoken';
@@ -17,14 +16,12 @@ import {
 import {
   PUBLIC_AGENT_PATH,
   PUBLIC_AUTH_PATH,
-  PUBLIC_BITCART_URL,
   PUBLIC_CREATOR_PATH,
   PUBLIC_OPERATOR_PATH
 } from '$env/static/public';
 
 import { EntityType } from '$lib/constants';
 const authUrl = PUBLIC_AUTH_PATH;
-
 
 await mongoose.connect(MONGO_DB_ENDPOINT);
 const redisConnection = new IORedis({

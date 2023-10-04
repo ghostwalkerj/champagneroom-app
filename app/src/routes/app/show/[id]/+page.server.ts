@@ -10,8 +10,8 @@ import {
   BITCART_STORE_ID
 } from '$env/static/private';
 import {
+  PUBLIC_BITCART_API_URL,
   PUBLIC_BITCART_INVOICE_NOTIFICATION_PATH,
-  PUBLIC_BITCART_URL,
   PUBLIC_PAYMENT_PERIOD,
   PUBLIC_TICKET_PATH
 } from '$env/static/public';
@@ -96,7 +96,7 @@ export const actions: Actions = {
     const token = await createAuthToken(
       BITCART_EMAIL,
       BITCART_PASSWORD,
-      PUBLIC_BITCART_URL
+      PUBLIC_BITCART_API_URL
     );
 
     const invoice = await createInvoiceInvoicesPost(

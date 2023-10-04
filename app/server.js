@@ -57,7 +57,7 @@ const payoutQueue = new Queue(EntityType.PAYOUT, {
 const paymentAuthToken = await createAuthToken(
   process.env.BITCART_EMAIL || '',
   process.env.BITCART_PASSWORD || '',
-  process.env.PUBLIC_BITCART_URL || ''
+  process.env.PUBLIC_BITCART_API_URL || ''
 );
 
 // Workers
@@ -76,8 +76,10 @@ if (startWorker) {
   invoiceWorker.run();
 
   const paymentWorker = getPayoutWorker({
+    payoutQueue,
     redisConnection,
-    paymentAuthToken
+    paymentAuthToken,
+    paymentPeriod: +(process.env.PUBLIC_PAYMENT_PERIOD || 6_000_000) / 60 / 1000
   });
   paymentWorker.run();
 }
