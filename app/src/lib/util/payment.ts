@@ -4,6 +4,12 @@ import { createTokenTokenPost } from '$lib/bitcart';
 
 const permissions = ['full_control'];
 
+export enum InvoiceJobType {
+  UPDATE = 'UPDATE',
+  INITIATE_PAYMENT = 'INITIATE_PAYMENT',
+  CANCEL = 'CANCEL'
+}
+
 // Bitcart API types
 export enum InvoiceStatus {
   PENDING = 'Pending',
@@ -12,6 +18,11 @@ export enum InvoiceStatus {
   EXPIRED = 'expired',
   IN_PROGRESS = 'In progress',
   FAILED = 'Failed'
+}
+
+export enum PayoutType {
+  REFUND = 'REFUND',
+  PAYMENT = 'PAYMENT'
 }
 
 export const createAuthToken = async (

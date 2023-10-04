@@ -1,5 +1,6 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { AxiosResponse } from 'axios';
+import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 import { Types } from 'mongoose';
 import urlJoin from 'url-join';
@@ -20,14 +21,12 @@ import { Ticket } from '$lib/models/ticket';
 import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
 import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 
-import {
-  getInvoiceByIdInvoicesModelIdGet,
-  modifyInvoiceInvoicesModelIdPatch,
-  updatePaymentDetailsInvoicesModelIdDetailsPatch
-} from '$lib/bitcart';
+import type { PayoutQueueType } from '$lib/workers/PayoutWorker';
+
+import { getInvoiceByIdInvoicesModelIdGet } from '$lib/bitcart';
 import type { DisplayInvoice } from '$lib/bitcart/models';
-import { ActorType } from '$lib/constants';
-import { createAuthToken, InvoiceStatus } from '$lib/util/payment';
+import { ActorType, EntityType } from '$lib/constants';
+import { createAuthToken, InvoiceJobType, PayoutType } from '$lib/util/payment';
 import { verifyPin } from '$lib/util/pin';
 import { getTicketMachineServiceFromId } from '$lib/util/util.server';
 
@@ -48,7 +47,6 @@ export const actions: Actions = {
     );
     const state = ticketService.getSnapshot();
     const invoiceId = state.context.ticketDocument.invoiceId;
-
     const cancel = {
       _id: new Types.ObjectId(),
       cancelledBy: ActorType.CUSTOMER,
@@ -63,33 +61,33 @@ export const actions: Actions = {
     } as TicketMachineEventType;
 
     if (state.can(cancelEvent)) {
-      ticketService.send(cancelEvent);
-    }
+      const redisConnection = locals.redisConnection as IORedis;
 
-    // Cancel the invoice attached to the ticket
-    const token = await createAuthToken(
-      BITCART_EMAIL,
-      BITCART_PASSWORD,
-      PUBLIC_BITCART_URL
-    );
+      // Cancel the invoice attached to the ticket if no payment has been made
+      if (state.matches('reserved.waiting4Payment')) {
+        const invoiceQueue = new Queue(EntityType.INVOICE, {
+          connection: redisConnection
+        });
+        invoiceQueue.add(InvoiceJobType.CANCEL, {
+          invoiceId
+        });
+      }
 
-    try {
-      invoiceId &&
-        (await modifyInvoiceInvoicesModelIdPatch(
+      // If a payment as been made or in progress, then issue a refund
+      else if (
+        state.matches('reserved.receivedPayment') ||
+        state.matches('reserved.initiatedPayment') ||
+        state.matches('reserved.waiting4Show')
+      ) {
+        const payoutQueue = new Queue(EntityType.PAYOUT, {
+          connection: redisConnection
+        }) as PayoutQueueType;
+        payoutQueue.add(PayoutType.REFUND, {
           invoiceId,
-          {
-            status: InvoiceStatus.INVALID,
-            exception_status: 'Cancelled by customer'
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            }
-          }
-        ));
-    } catch (error_) {
-      console.error('Update invoice error', error_);
+          ticketId
+        });
+      }
+      ticketService.send(cancelEvent);
     }
 
     return {
@@ -97,6 +95,7 @@ export const actions: Actions = {
       ticketCancelled: true
     };
   },
+
   leave_feedback: async ({ params, request, locals }) => {
     const ticketId = params.id;
     if (ticketId === null) {
@@ -136,6 +135,7 @@ export const actions: Actions = {
 
     return { success: true, rating, review };
   },
+
   initiate_dispute: async ({ params, request, locals }) => {
     const ticketId = params.id;
     if (ticketId === null) {
@@ -180,6 +180,7 @@ export const actions: Actions = {
 
     return { success: true, reason, explanation };
   },
+
   initiate_payment: async ({ request, locals }) => {
     const data = await request.formData();
     const address = data.get('address') as string;
@@ -199,32 +200,20 @@ export const actions: Actions = {
       return fail(400, { paymentId, missingPaymentId: true });
     }
 
-    // Create invoice in Bitcart
-    const token = await createAuthToken(
-      BITCART_EMAIL,
-      BITCART_PASSWORD,
-      PUBLIC_BITCART_URL
-    );
-    try {
-      updatePaymentDetailsInvoicesModelIdDetailsPatch(
-        id,
-        {
-          id: paymentId,
-          address
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-    } catch (error_) {
-      console.error(error_);
-    }
+    // Tell bitcart payment is coming
+    const redisConnection = locals.redisConnection as IORedis;
+
+    const invoiceQueue = new Queue(EntityType.INVOICE, {
+      connection: redisConnection
+    });
+
+    invoiceQueue.add(InvoiceJobType.INITIATE_PAYMENT, {
+      invoiceId: id,
+      paymentId,
+      address
+    });
 
     // Alert Ticket to incoming transaction
-    const redisConnection = locals.redisConnection as IORedis;
     const ticketService = await getTicketMachineServiceFromId(
       ticketId,
       redisConnection

@@ -89,7 +89,7 @@ export const actions: Actions = {
         customerName: name
       })
     ) {
-      return error(501, 'Show cannot Reserve Ticket'); // TODO: This should be atomic
+      return error(501, 'Show cannot Reserve Ticket');
     }
 
     // Create invoice in Bitcart
@@ -105,8 +105,7 @@ export const actions: Actions = {
         store_id: BITCART_STORE_ID,
         expiration: +PUBLIC_PAYMENT_PERIOD / 60 / 1000,
         order_id: ticket._id.toString(),
-        notification_url: urlJoin(PUBLIC_BITCART_INVOICE_NOTIFICATION_PATH),
-        paid_currency: 'ETH'
+        notification_url: urlJoin(PUBLIC_BITCART_INVOICE_NOTIFICATION_PATH)
       },
       {
         headers: {
@@ -124,7 +123,7 @@ export const actions: Actions = {
     ticket.invoiceId = invoice.data.id;
 
     const payment = invoice.data.payments
-      ? invoice.data.payments[0]
+      ? invoice.data.payments[0] // Use the first wallet
       : undefined;
 
     if (payment && payment['payment_address']) {

@@ -13,7 +13,7 @@
   } from '$env/static/public';
 
   import { CancelReason, DisputeReason } from '$lib/models/common';
-  import { type ShowDocumentType, ShowStatus } from '$lib/models/show';
+  import { ShowStatus, type ShowDocumentType } from '$lib/models/show';
   import type { TicketDocumentType } from '$lib/models/ticket';
 
   import type { TicketMachineServiceType } from '$lib/machines/ticketMachine';
@@ -289,8 +289,14 @@
                   <button
                     class="btn btn-secondary"
                     type="submit"
-                    disabled={loading}>Cancel Ticket</button
+                    disabled={loading}
                   >
+                    {#if ticket.ticketState.totalPaid > 0}
+                      Request Refund
+                    {:else}
+                      Cancel Ticket
+                    {/if}
+                  </button>
                 </div>
               </form>
             {/if}

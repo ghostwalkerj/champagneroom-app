@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
+import { on } from 'node:events';
+
 import type { Queue } from 'bullmq';
 import { Types } from 'mongoose';
 import { nanoid } from 'nanoid';
@@ -108,7 +110,7 @@ const createTicketMachine = ({
         id: nanoid()
       },
       // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-      tsTypes: {} as import('./ticketMachine.typegen').Typegen0,
+      tsTypes: {} as import('./ticketMachine.typegen.d.ts').Typegen0,
       schema: {
         events: {} as TicketMachineEventType
       },
@@ -168,21 +170,10 @@ const createTicketMachine = ({
         reserved: {
           initial: 'waiting4Payment',
           on: {
-            'CANCELLATION INITIATED': [
-              {
-                target: '#ticketMachine.cancelled',
-                cond: 'canCancel',
-                actions: [
-                  'initiateCancellation',
-                  'cancelTicket',
-                  'sendTicketCancelled'
-                ]
-              },
-              {
-                target: '#ticketMachine.reserved.initiatedCancellation',
-                actions: ['initiateCancellation']
-              }
-            ],
+            'CANCELLATION INITIATED': {
+              target: '#ticketMachine.reserved.initiatedCancellation',
+              actions: ['initiateCancellation']
+            },
             'PAYMENT RECEIVED': [
               {
                 target: '#ticketMachine.reserved.waiting4Show',
@@ -198,6 +189,22 @@ const createTicketMachine = ({
           states: {
             waiting4Payment: {
               on: {
+                'SHOW CANCELLED': {
+                  target: '#ticketMachine.cancelled',
+                  actions: [
+                    'initiateCancellation',
+                    'cancelTicket',
+                    'sendTicketCancelled'
+                  ]
+                },
+                'CANCELLATION INITIATED': {
+                  target: '#ticketMachine.cancelled',
+                  actions: [
+                    'initiateCancellation',
+                    'cancelTicket',
+                    'sendTicketCancelled'
+                  ]
+                },
                 'PAYMENT INITIATED': {
                   target: 'initiatedPayment',
                   actions: ['initiatePayment']
@@ -240,7 +247,6 @@ const createTicketMachine = ({
             }
           }
         },
-
         redeemed: {
           on: {
             'SHOW LEFT': { actions: ['sendLeftShow'] },
@@ -323,17 +329,10 @@ const createTicketMachine = ({
         }
       },
       on: {
-        'SHOW CANCELLED': [
-          {
-            target: '#ticketMachine.cancelled',
-            cond: 'canCancel',
-            actions: ['initiateCancellation', 'cancelTicket']
-          },
-          {
-            target: '#ticketMachine.reserved.initiatedCancellation',
-            actions: ['initiateCancellation']
-          }
-        ],
+        'SHOW CANCELLED': {
+          target: '#ticketMachine.reserved.initiatedCancellation',
+          actions: ['initiateCancellation']
+        },
         'SHOW ENDED': {
           target: '#ticketMachine.ended',
           actions: ['endShow']
@@ -610,13 +609,6 @@ const createTicketMachine = ({
         })
       },
       guards: {
-        canCancel: (context) => {
-          const canCancel =
-            context.ticketState.totalPaid <=
-              context.ticketState.totalRefunded &&
-            context.ticketState.status !== TicketStatus.FULLY_PAID;
-          return canCancel;
-        },
         ticketCancelled: (context) =>
           context.ticketState.status === TicketStatus.CANCELLED,
         ticketFinalized: (context) =>

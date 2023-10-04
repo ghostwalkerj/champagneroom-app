@@ -10,6 +10,7 @@ import { handler } from './build/handler';
 import { EntityType } from './dist/constants';
 import { getShowWorker } from './dist/workers/showWorker';
 import { getInvoiceWorker } from './dist/workers/invoiceWorker';
+import { getPayoutWorker } from './dist/workers/payoutWorker';
 import { createAuthToken } from './dist/util/payment';
 import packageFile from './package.json' assert { type: 'json' };
 import IORedis from 'ioredis';
@@ -49,6 +50,9 @@ const showQueue = new Queue(EntityType.SHOW, { connection: redisConnection });
 const invoiceQueue = new Queue(EntityType.INVOICE, {
   connection: redisConnection
 });
+const payoutQueue = new Queue(EntityType.PAYOUT, {
+  connection: redisConnection
+});
 
 const paymentAuthToken = await createAuthToken(
   process.env.BITCART_EMAIL || '',
@@ -69,15 +73,24 @@ if (startWorker) {
   showWorker.run();
 
   const invoiceWorker = getInvoiceWorker({ redisConnection, paymentAuthToken });
-
   invoiceWorker.run();
+
+  const paymentWorker = getPayoutWorker({
+    redisConnection,
+    paymentAuthToken
+  });
+  paymentWorker.run();
 }
 
 // Bull Dashboard
 const serverAdapter = new ExpressAdapter();
 serverAdapter.setBasePath('/admin/queues');
 createBullBoard({
-  queues: [new BullMQAdapter(showQueue), new BullMQAdapter(invoiceQueue)],
+  queues: [
+    new BullMQAdapter(showQueue),
+    new BullMQAdapter(invoiceQueue),
+    new BullMQAdapter(payoutQueue)
+  ],
   serverAdapter: serverAdapter
 });
 const staticAuth = basicAuth({

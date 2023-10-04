@@ -15,6 +15,7 @@ export enum EntityType {
   USER = 'USER',
   OPERATOR = 'OPERATOR',
   INVOICE = 'INVOICE',
+  PAYOUT = 'PAYOUT',
   OTHER = 'OTHER',
   NONE = 'NONE'
 }

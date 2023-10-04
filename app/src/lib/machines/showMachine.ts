@@ -195,7 +195,7 @@ const createShowMachine = ({
         errorMessage: undefined as string | undefined,
         id: nanoid()
       },
-      tsTypes: {} as import('./showMachine.typegen').Typegen0,
+      tsTypes: {} as import('./showMachine.typegen.d.ts').Typegen0,
       schema: {
         events: {} as ShowMachineEventType
       },
