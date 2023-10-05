@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { createTokenTokenPost } from '../ext/bitcart';
+import { createTokenTokenPost } from '$ext/bitcart';
 
 const permissions = ['full_control'];
 
@@ -17,12 +17,13 @@ export enum InvoiceStatus {
   INVALID = 'invalid',
   EXPIRED = 'expired',
   IN_PROGRESS = 'In progress',
-  FAILED = 'Failed'
+  FAILED = 'Failed',
+  REFUNDED = 'refunded'
 }
 
-export enum PayoutType {
-  REFUND = 'REFUND',
-  PAYMENT = 'PAYMENT'
+export enum PayoutJobType {
+  CREATE_REFUND = 'CREATE_REFUND',
+  PAYOUT_UPDATE = 'PAYOUT_UPDATE'
 }
 
 export const createAuthToken = async (

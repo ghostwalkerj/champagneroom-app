@@ -191,6 +191,10 @@ export const getInvoiceWorker = ({
               break;
             }
 
+            case InvoiceStatus.REFUNDED: {
+              console.log('Invoice Refunded');
+            }
+
             default: {
               break;
             }

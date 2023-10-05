@@ -13,7 +13,7 @@ import {
 } from '$lib/ext/bitcart';
 import type { DisplayInvoice } from '$lib/ext/bitcart/models';
 import type { PaymentType } from '$lib/util/payment';
-import { InvoiceStatus, PayoutType } from '$lib/util/payment';
+import { InvoiceStatus, PayoutJobType } from '$lib/util/payment';
 
 export const getPayoutWorker = ({
   payoutQueue,
@@ -31,10 +31,10 @@ export const getPayoutWorker = ({
   return new Worker(
     EntityType.PAYOUT,
     async (job: Job<PayoutJobDataType, any, string>) => {
-      const payoutType = job.name as PayoutType;
+      const payoutType = job.name as PayoutJobType;
 
       switch (payoutType) {
-        case PayoutType.REFUND: {
+        case PayoutJobType.CREATE_REFUND: {
           const invoiceId = job.data.invoiceId;
           if (!invoiceId) {
             return;
@@ -54,7 +54,7 @@ export const getPayoutWorker = ({
             invoice.status === InvoiceStatus.PENDING
           ) {
             payoutQueue.add(
-              PayoutType.REFUND,
+              PayoutJobType.CREATE_REFUND,
               {
                 invoiceId
               },
@@ -152,6 +152,11 @@ export const getPayoutWorker = ({
           break;
         }
 
+        case PayoutJobType.PAYOUT_UPDATE: {
+          console.log('Payout update');
+          console.log('Status', job.data.status);
+        }
+
         default: {
           break;
         }
@@ -165,4 +170,4 @@ export type PayoutJobDataType = {
   [key: string]: any;
 };
 
-export type PayoutQueueType = Queue<PayoutJobDataType, any, PayoutType>;
+export type PayoutQueueType = Queue<PayoutJobDataType, any, PayoutJobType>;

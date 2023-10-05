@@ -2,24 +2,25 @@ import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 
 import { EntityType } from '$lib/constants';
+import { PayoutJobType } from '$lib/util/payment';
 
 import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
   const body = await request.json();
-  const invoiceId = body['id'] as string;
+  const payoutId = body['id'] as string;
   const status = body['status'] as string;
   const redisConnection = locals.redisConnection as IORedis;
 
-  if (!invoiceId || !status) {
+  if (!payoutId || !status) {
     return new Response(undefined, { status: 400 });
   }
 
-  const invoiceQueue = new Queue(EntityType.INVOICE, {
+  const invoiceQueue = new Queue(EntityType.PAYOUT, {
     connection: redisConnection
   });
 
-  invoiceQueue.add(status, { invoiceId });
+  invoiceQueue.add(PayoutJobType.PAYOUT_UPDATE, { payoutId, status });
 
   return new Response(undefined, { status: 200 });
 };

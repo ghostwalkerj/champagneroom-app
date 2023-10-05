@@ -24,7 +24,11 @@ import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 import type { PayoutQueueType } from '$lib/workers/payoutWorker';
 
 import { ActorType, EntityType } from '$lib/constants';
-import { createAuthToken, InvoiceJobType, PayoutType } from '$lib/util/payment';
+import {
+  createAuthToken,
+  InvoiceJobType,
+  PayoutJobType
+} from '$lib/util/payment';
 import { verifyPin } from '$lib/util/pin';
 import { getTicketMachineServiceFromId } from '$lib/util/util.server';
 
@@ -83,7 +87,7 @@ export const actions: Actions = {
         const payoutQueue = new Queue(EntityType.PAYOUT, {
           connection: redisConnection
         }) as PayoutQueueType;
-        payoutQueue.add(PayoutType.REFUND, {
+        payoutQueue.add(PayoutJobType.CREATE_REFUND, {
           invoiceId
         });
       }
