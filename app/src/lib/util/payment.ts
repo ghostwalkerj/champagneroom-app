@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { createTokenTokenPost } from '$lib/bitcart';
+import { createTokenTokenPost } from '../ext/bitcart';
 
 const permissions = ['full_control'];
 

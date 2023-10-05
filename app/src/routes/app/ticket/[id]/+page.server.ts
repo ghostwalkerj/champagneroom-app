@@ -23,12 +23,13 @@ import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 
 import type { PayoutQueueType } from '$lib/workers/payoutWorker';
 
-import { getInvoiceByIdInvoicesModelIdGet } from '$lib/bitcart';
-import type { DisplayInvoice } from '$lib/bitcart/models';
 import { ActorType, EntityType } from '$lib/constants';
 import { createAuthToken, InvoiceJobType, PayoutType } from '$lib/util/payment';
 import { verifyPin } from '$lib/util/pin';
 import { getTicketMachineServiceFromId } from '$lib/util/util.server';
+
+import { getInvoiceByIdInvoicesModelIdGet } from '../../../../lib/ext/bitcart';
+import type { DisplayInvoice } from '../../../../lib/ext/bitcart/models';
 
 import type { Actions, PageServerLoad } from './$types';
 
@@ -83,8 +84,7 @@ export const actions: Actions = {
           connection: redisConnection
         }) as PayoutQueueType;
         payoutQueue.add(PayoutType.REFUND, {
-          invoiceId,
-          ticketId
+          invoiceId
         });
       }
       ticketService.send(cancelEvent);

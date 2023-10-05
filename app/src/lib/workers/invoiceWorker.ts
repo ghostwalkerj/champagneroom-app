@@ -10,13 +10,13 @@ import { Transaction, TransactionReasonType } from '$lib/models/transaction';
 
 import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 
+import { ActorType, EntityType } from '$lib/constants';
 import {
   getInvoiceByIdInvoicesModelIdGet,
   modifyInvoiceInvoicesModelIdPatch,
   updatePaymentDetailsInvoicesModelIdDetailsPatch
-} from '$lib/bitcart';
-import type { DisplayInvoice } from '$lib/bitcart/models';
-import { ActorType, EntityType } from '$lib/constants';
+} from '$lib/ext/bitcart';
+import type { DisplayInvoice } from '$lib/ext/bitcart/models';
 import {
   InvoiceJobType,
   InvoiceStatus,

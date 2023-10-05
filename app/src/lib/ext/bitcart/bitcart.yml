@@ -1,0 +1,6801 @@
+openapi: 3.0.2
+info:
+  title: BitcartCC
+  description: 'BitcartCC Merchants API'
+  version: 0.7.4.1
+servers:
+  - url: https://bitcart1.pcall.app/api
+paths:
+  /users/stats:
+    get:
+      summary: 'Get Stats'
+      operationId: get_stats_users_stats_get
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+      security:
+        - Bearer: [full_control]
+  /users/me:
+    get:
+      summary: 'Get Me'
+      operationId: get_me_users_me_get
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/DisplayUser' } }
+            }
+      security:
+        - Bearer: []
+  /users/me/settings:
+    post:
+      summary: 'Set Settings'
+      operationId: set_settings_users_me_settings_post
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/UserPreferences' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/User' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [full_control]
+  /users/reset_password:
+    post:
+      summary: 'Reset Password'
+      operationId: reset_password_users_reset_password_post
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/ResetPasswordData' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+  '/users/reset_password/finalize/{code}':
+    post:
+      summary: 'Finalize Password Reset'
+      operationId: finalize_password_reset_users_reset_password_finalize__code__post
+      parameters:
+        - required: true
+          schema: { title: Code, type: string }
+          name: code
+          in: path
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/ResetPasswordFinalize' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+  /users/verify:
+    post:
+      summary: 'Send Verification Email'
+      operationId: send_verification_email_users_verify_post
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/VerifyEmailData' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - BearerOptional: [token_management]
+  '/users/verify/finalize/{code}':
+    post:
+      summary: 'Finalize Email Verification'
+      operationId: finalize_email_verification_users_verify_finalize__code__post
+      parameters:
+        - required: true
+          schema: { title: Code, type: string }
+          name: code
+          in: path
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+  /users/password:
+    post:
+      summary: 'Change Password'
+      operationId: change_password_users_password_post
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/ChangePassword' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [token_management]
+  /users/2fa/totp/verify:
+    post:
+      summary: 'Verify Totp'
+      operationId: verify_totp_users_2fa_totp_verify_post
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/VerifyTOTP' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [token_management]
+  /users/2fa/disable:
+    post:
+      summary: 'Disable Totp'
+      operationId: disable_totp_users_2fa_disable_post
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+      security:
+        - Bearer: [token_management]
+  /users/2fa/fido2/register/begin:
+    post:
+      summary: 'Register Fido2'
+      operationId: register_fido2_users_2fa_fido2_register_begin_post
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/LoginFIDOData' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [token_management]
+  /users/2fa/fido2/register/complete:
+    post:
+      summary: 'Fido2 Complete Registration'
+      operationId: fido2_complete_registration_users_2fa_fido2_register_complete_post
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+      security:
+        - Bearer: [token_management]
+  '/users/2fa/fido2/{device_id}':
+    delete:
+      summary: 'Fido2 Delete Device'
+      operationId: fido2_delete_device_users_2fa_fido2__device_id__delete
+      parameters:
+        - required: true
+          schema: { title: 'Device Id', type: string }
+          name: device_id
+          in: path
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [token_management]
+  /users/count:
+    get:
+      summary: 'Get Number Of Users'
+      operationId: Get_number_of_Users_users_count_get
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                {
+                  schema:
+                    {
+                      title: 'Response Get Number Of Users Users Count Get',
+                      type: integer
+                    }
+                }
+            }
+      security:
+        - Bearer: [server_management]
+  '/users/{model_id}':
+    get:
+      summary: 'Get User By Id'
+      operationId: Get_User_by_id_users__model_id__get
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/DisplayUser' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [server_management]
+    delete:
+      summary: 'Delete User'
+      operationId: Delete_User_users__model_id__delete
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/DisplayUser' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [server_management]
+    patch:
+      summary: 'Modify User'
+      operationId: Modify_User_users__model_id__patch
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/OptionalUser' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/DisplayUser' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [server_management]
+  /users:
+    get:
+      summary: 'Get Users'
+      operationId: Get_Users_users_get
+      parameters:
+        - required: false
+          schema: { title: Offset, minimum: 0, type: integer, default: 0 }
+          name: offset
+          in: query
+        - required: false
+          schema:
+            {
+              title: Limit,
+              maximum: 1000,
+              minimum: -1,
+              type: integer,
+              default: 5
+            }
+          name: limit
+          in: query
+        - required: false
+          schema: { title: Query, type: string, default: '' }
+          name: query
+          in: query
+        - required: false
+          schema: { title: Multiple, type: boolean, default: false }
+          name: multiple
+          in: query
+        - required: false
+          schema: { title: Sort, type: string, default: '' }
+          name: sort
+          in: query
+        - required: false
+          schema: { title: Desc, type: boolean, default: true }
+          name: desc
+          in: query
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                {
+                  schema:
+                    {
+                      $ref: '#/components/schemas/PaginationResponse_DisplayUser'
+                    }
+                }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [server_management]
+    post:
+      summary: 'Create User'
+      operationId: Create_User_users_post
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/CreateUser' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/CreateUserWithToken' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - BearerOptional: []
+  /users/batch:
+    post:
+      summary: 'Batch Actions On Users'
+      operationId: Batch_actions_on_Users_users_batch_post
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/BatchSettings' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: []
+  /wallets/history/all:
+    get:
+      summary: 'All Wallet History'
+      operationId: all_wallet_history_wallets_history_all_get
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                {
+                  schema:
+                    {
+                      title: 'Response All Wallet History Wallets History All Get',
+                      type: array,
+                      items: { $ref: '#/components/schemas/TxResponse' }
+                    }
+                }
+            }
+      security:
+        - Bearer: [wallet_management]
+  '/wallets/history/{model_id}':
+    get:
+      summary: 'Wallet History'
+      operationId: wallet_history_wallets_history__model_id__get
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                {
+                  schema:
+                    {
+                      title: 'Response Wallet History Wallets History  Model Id  Get',
+                      type: array,
+                      items: { $ref: '#/components/schemas/TxResponse' }
+                    }
+                }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [wallet_management]
+  /wallets/balance:
+    get:
+      summary: 'Get Balances'
+      operationId: get_balances_wallets_balance_get
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                {
+                  schema:
+                    {
+                      title: 'Response Get Balances Wallets Balance Get',
+                      type: string
+                    }
+                }
+            }
+      security:
+        - Bearer: [wallet_management]
+  '/wallets/{model_id}/balance':
+    get:
+      summary: 'Get Wallet Balance'
+      operationId: get_wallet_balance_wallets__model_id__balance_get
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/BalanceResponse' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [wallet_management]
+  '/wallets/{model_id}/checkln':
+    get:
+      summary: 'Check Wallet Lightning'
+      operationId: check_wallet_lightning_wallets__model_id__checkln_get
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [wallet_management]
+  '/wallets/{model_id}/channels':
+    get:
+      summary: 'Get Wallet Channels'
+      operationId: get_wallet_channels_wallets__model_id__channels_get
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [wallet_management]
+  '/wallets/{model_id}/channels/open':
+    post:
+      summary: 'Open Wallet Channel'
+      operationId: open_wallet_channel_wallets__model_id__channels_open_post
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/OpenChannelScheme' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [wallet_management]
+  '/wallets/{model_id}/channels/close':
+    post:
+      summary: 'Close Wallet Channel'
+      operationId: close_wallet_channel_wallets__model_id__channels_close_post
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/CloseChannelScheme' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [wallet_management]
+  '/wallets/{model_id}/lnpay':
+    post:
+      summary: 'Wallet Lnpay'
+      operationId: wallet_lnpay_wallets__model_id__lnpay_post
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/LNPayScheme' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [wallet_management]
+  /wallets/schema:
+    get:
+      summary: 'Get Wallets Schema'
+      operationId: get_wallets_schema_wallets_schema_get
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+  /wallets/create:
+    post:
+      summary: 'Create Wallet'
+      operationId: create_wallet_wallets_create_post
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/CreateWalletData' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [wallet_management]
+  '/wallets/{model_id}/rate':
+    get:
+      summary: 'Get Wallet Rate'
+      operationId: get_wallet_rate_wallets__model_id__rate_get
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+        - required: false
+          schema: { title: Currency, type: string, default: USD }
+          name: currency
+          in: query
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+  /wallets/count:
+    get:
+      summary: 'Get Number Of Wallets'
+      operationId: Get_number_of_Wallets_wallets_count_get
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                {
+                  schema:
+                    {
+                      title: 'Response Get Number Of Wallets Wallets Count Get',
+                      type: integer
+                    }
+                }
+            }
+      security:
+        - Bearer: [wallet_management]
+  '/wallets/{model_id}':
+    get:
+      summary: 'Get Wallet By Id'
+      operationId: Get_Wallet_by_id_wallets__model_id__get
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/Wallet' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [wallet_management]
+    delete:
+      summary: 'Delete Wallet'
+      operationId: Delete_Wallet_wallets__model_id__delete
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/Wallet' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [wallet_management]
+    patch:
+      summary: 'Modify Wallet'
+      operationId: Modify_Wallet_wallets__model_id__patch
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/OptionalCreateWallet' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/Wallet' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [wallet_management]
+  /wallets:
+    get:
+      summary: 'Get Wallets'
+      operationId: Get_Wallets_wallets_get
+      parameters:
+        - required: false
+          schema: { title: Offset, minimum: 0, type: integer, default: 0 }
+          name: offset
+          in: query
+        - required: false
+          schema:
+            {
+              title: Limit,
+              maximum: 1000,
+              minimum: -1,
+              type: integer,
+              default: 5
+            }
+          name: limit
+          in: query
+        - required: false
+          schema: { title: Query, type: string, default: '' }
+          name: query
+          in: query
+        - required: false
+          schema: { title: Multiple, type: boolean, default: false }
+          name: multiple
+          in: query
+        - required: false
+          schema: { title: Sort, type: string, default: '' }
+          name: sort
+          in: query
+        - required: false
+          schema: { title: Desc, type: boolean, default: true }
+          name: desc
+          in: query
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                {
+                  schema:
+                    { $ref: '#/components/schemas/PaginationResponse_Wallet' }
+                }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [wallet_management]
+    post:
+      summary: 'Create Wallet'
+      operationId: Create_Wallet_wallets_post
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/CreateWallet' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/Wallet' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [wallet_management]
+  /wallets/batch:
+    post:
+      summary: 'Batch Actions On Wallets'
+      operationId: Batch_actions_on_Wallets_wallets_batch_post
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/BatchSettings' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [wallet_management]
+  '/stores/{model_id}/ping':
+    get:
+      summary: 'Ping Email'
+      operationId: ping_email_stores__model_id__ping_get
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [store_management]
+  '/stores/{model_id}/checkout_settings':
+    patch:
+      summary: 'Set Store Checkout Settings'
+      operationId: set_store_checkout_settings_stores__model_id__checkout_settings_patch
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/StoreCheckoutSettings' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/Store' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [store_management]
+  '/stores/{model_id}/rate_rules':
+    patch:
+      summary: 'Set Store Rate Rules'
+      operationId: set_store_rate_rules_stores__model_id__rate_rules_patch
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      requestBody:
+        content:
+          application/json:
+            { schema: { title: Rules, type: string, default: '' } }
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [store_management]
+  '/stores/{model_id}/rates':
+    get:
+      summary: 'Get Store Rates'
+      operationId: get_store_rates_stores__model_id__rates_get
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+        - required: true
+          schema: { title: Currencies, type: string }
+          name: currencies
+          in: query
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/RatesResponse' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+  '/stores/{model_id}/theme_settings':
+    patch:
+      summary: 'Set Store Theme Settings'
+      operationId: set_store_theme_settings_stores__model_id__theme_settings_patch
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/StoreThemeSettings' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/Store' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [store_management]
+  '/stores/{model_id}/plugin_settings':
+    patch:
+      summary: 'Set Store Plugin Settings'
+      operationId: set_store_plugin_settings_stores__model_id__plugin_settings_patch
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/StorePluginSettings' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/Store' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [store_management]
+  /stores/count:
+    get:
+      summary: 'Get Number Of Stores'
+      operationId: Get_number_of_Stores_stores_count_get
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                {
+                  schema:
+                    {
+                      title: 'Response Get Number Of Stores Stores Count Get',
+                      type: integer
+                    }
+                }
+            }
+      security:
+        - Bearer: [store_management]
+  '/stores/{model_id}':
+    get:
+      summary: 'Get Store By Id'
+      operationId: Get_Store_by_id_stores__model_id__get
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - BearerOptional: [store_management]
+    delete:
+      summary: 'Delete Store'
+      operationId: Delete_Store_stores__model_id__delete
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/Store' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [store_management]
+    patch:
+      summary: 'Modify Store'
+      operationId: Modify_Store_stores__model_id__patch
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/OptionalStore' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/Store' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [store_management]
+  /stores:
+    get:
+      summary: 'Get Stores'
+      operationId: Get_Stores_stores_get
+      parameters:
+        - required: false
+          schema: { title: Offset, minimum: 0, type: integer, default: 0 }
+          name: offset
+          in: query
+        - required: false
+          schema:
+            {
+              title: Limit,
+              maximum: 1000,
+              minimum: -1,
+              type: integer,
+              default: 5
+            }
+          name: limit
+          in: query
+        - required: false
+          schema: { title: Query, type: string, default: '' }
+          name: query
+          in: query
+        - required: false
+          schema: { title: Multiple, type: boolean, default: false }
+          name: multiple
+          in: query
+        - required: false
+          schema: { title: Sort, type: string, default: '' }
+          name: sort
+          in: query
+        - required: false
+          schema: { title: Desc, type: boolean, default: true }
+          name: desc
+          in: query
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                {
+                  schema:
+                    { $ref: '#/components/schemas/PaginationResponse_Store' }
+                }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [store_management]
+    post:
+      summary: 'Create Store'
+      operationId: Create_Store_stores_post
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/CreateStore' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/Store' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [store_management]
+  /stores/batch:
+    post:
+      summary: 'Batch Actions On Stores'
+      operationId: Batch_actions_on_Stores_stores_batch_post
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/BatchSettings' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [store_management]
+  '/stores/{store_id}/integrations/shopify/{order_id}':
+    get:
+      summary: 'Get Or Create Shopify Invoice'
+      operationId: get_or_create_shopify_invoice_stores__store_id__integrations_shopify__order_id__get
+      parameters:
+        - required: true
+          schema: { title: 'Store Id', type: string }
+          name: store_id
+          in: path
+        - required: true
+          schema: { title: 'Order Id', type: string }
+          name: order_id
+          in: path
+        - required: true
+          schema: { title: Amount, type: number }
+          name: amount
+          in: query
+        - required: false
+          schema: { title: 'Check Only', type: boolean, default: false }
+          name: check_only
+          in: query
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+  /discounts/count:
+    get:
+      summary: 'Get Number Of Discounts'
+      operationId: Get_number_of_Discounts_discounts_count_get
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                {
+                  schema:
+                    {
+                      title: 'Response Get Number Of Discounts Discounts Count Get',
+                      type: integer
+                    }
+                }
+            }
+      security:
+        - Bearer: [discount_management]
+  '/discounts/{model_id}':
+    get:
+      summary: 'Get Discount By Id'
+      operationId: Get_Discount_by_id_discounts__model_id__get
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/Discount' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [discount_management]
+    delete:
+      summary: 'Delete Discount'
+      operationId: Delete_Discount_discounts__model_id__delete
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/Discount' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [discount_management]
+    patch:
+      summary: 'Modify Discount'
+      operationId: Modify_Discount_discounts__model_id__patch
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/OptionalDiscount' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/Discount' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [discount_management]
+  /discounts:
+    get:
+      summary: 'Get Discounts'
+      operationId: Get_Discounts_discounts_get
+      parameters:
+        - required: false
+          schema: { title: Offset, minimum: 0, type: integer, default: 0 }
+          name: offset
+          in: query
+        - required: false
+          schema:
+            {
+              title: Limit,
+              maximum: 1000,
+              minimum: -1,
+              type: integer,
+              default: 5
+            }
+          name: limit
+          in: query
+        - required: false
+          schema: { title: Query, type: string, default: '' }
+          name: query
+          in: query
+        - required: false
+          schema: { title: Multiple, type: boolean, default: false }
+          name: multiple
+          in: query
+        - required: false
+          schema: { title: Sort, type: string, default: '' }
+          name: sort
+          in: query
+        - required: false
+          schema: { title: Desc, type: boolean, default: true }
+          name: desc
+          in: query
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                {
+                  schema:
+                    { $ref: '#/components/schemas/PaginationResponse_Discount' }
+                }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [discount_management]
+    post:
+      summary: 'Create Discount'
+      operationId: Create_Discount_discounts_post
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/CreateDiscount' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/Discount' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [discount_management]
+  /discounts/batch:
+    post:
+      summary: 'Batch Actions On Discounts'
+      operationId: Batch_actions_on_Discounts_discounts_batch_post
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/BatchSettings' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [discount_management]
+  /notifications/list:
+    get:
+      summary: 'Get Notifications'
+      operationId: get_notifications_notifications_list_get
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+  /notifications/schema:
+    get:
+      summary: 'Get Notifications Schema'
+      operationId: get_notifications_schema_notifications_schema_get
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+  /notifications/count:
+    get:
+      summary: 'Get Number Of Notifications'
+      operationId: Get_number_of_Notifications_notifications_count_get
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                {
+                  schema:
+                    {
+                      title: 'Response Get Number Of Notifications Notifications Count Get',
+                      type: integer
+                    }
+                }
+            }
+      security:
+        - Bearer: [notification_management]
+  '/notifications/{model_id}':
+    get:
+      summary: 'Get Notification By Id'
+      operationId: Get_Notification_by_id_notifications__model_id__get
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/Notification' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [notification_management]
+    delete:
+      summary: 'Delete Notification'
+      operationId: Delete_Notification_notifications__model_id__delete
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/Notification' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [notification_management]
+    patch:
+      summary: 'Modify Notification'
+      operationId: Modify_Notification_notifications__model_id__patch
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/OptionalNotification' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/Notification' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [notification_management]
+  /notifications:
+    get:
+      summary: 'Get Notifications'
+      operationId: Get_Notifications_notifications_get
+      parameters:
+        - required: false
+          schema: { title: Offset, minimum: 0, type: integer, default: 0 }
+          name: offset
+          in: query
+        - required: false
+          schema:
+            {
+              title: Limit,
+              maximum: 1000,
+              minimum: -1,
+              type: integer,
+              default: 5
+            }
+          name: limit
+          in: query
+        - required: false
+          schema: { title: Query, type: string, default: '' }
+          name: query
+          in: query
+        - required: false
+          schema: { title: Multiple, type: boolean, default: false }
+          name: multiple
+          in: query
+        - required: false
+          schema: { title: Sort, type: string, default: '' }
+          name: sort
+          in: query
+        - required: false
+          schema: { title: Desc, type: boolean, default: true }
+          name: desc
+          in: query
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                {
+                  schema:
+                    {
+                      $ref: '#/components/schemas/PaginationResponse_Notification'
+                    }
+                }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [notification_management]
+    post:
+      summary: 'Create Notification'
+      operationId: Create_Notification_notifications_post
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/CreateNotification' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/Notification' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [notification_management]
+  /notifications/batch:
+    post:
+      summary: 'Batch Actions On Notifications'
+      operationId: Batch_actions_on_Notifications_notifications_batch_post
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/BatchSettings' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [notification_management]
+  /templates/list:
+    get:
+      summary: 'Get Template List'
+      operationId: get_template_list_templates_list_get
+      parameters:
+        - required: false
+          schema: { title: 'Applicable To', type: string }
+          name: applicable_to
+          in: query
+        - required: false
+          schema: { title: 'Show All', type: boolean, default: false }
+          name: show_all
+          in: query
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+  /templates/count:
+    get:
+      summary: 'Get Number Of Templates'
+      operationId: Get_number_of_Templates_templates_count_get
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                {
+                  schema:
+                    {
+                      title: 'Response Get Number Of Templates Templates Count Get',
+                      type: integer
+                    }
+                }
+            }
+      security:
+        - Bearer: [template_management]
+  '/templates/{model_id}':
+    get:
+      summary: 'Get Template By Id'
+      operationId: Get_Template_by_id_templates__model_id__get
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/Template' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [template_management]
+    delete:
+      summary: 'Delete Template'
+      operationId: Delete_Template_templates__model_id__delete
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/Template' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [template_management]
+    patch:
+      summary: 'Modify Template'
+      operationId: Modify_Template_templates__model_id__patch
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/OptionalTemplate' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/Template' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [template_management]
+  /templates:
+    get:
+      summary: 'Get Templates'
+      operationId: Get_Templates_templates_get
+      parameters:
+        - required: false
+          schema: { title: Offset, minimum: 0, type: integer, default: 0 }
+          name: offset
+          in: query
+        - required: false
+          schema:
+            {
+              title: Limit,
+              maximum: 1000,
+              minimum: -1,
+              type: integer,
+              default: 5
+            }
+          name: limit
+          in: query
+        - required: false
+          schema: { title: Query, type: string, default: '' }
+          name: query
+          in: query
+        - required: false
+          schema: { title: Multiple, type: boolean, default: false }
+          name: multiple
+          in: query
+        - required: false
+          schema: { title: Sort, type: string, default: '' }
+          name: sort
+          in: query
+        - required: false
+          schema: { title: Desc, type: boolean, default: true }
+          name: desc
+          in: query
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                {
+                  schema:
+                    { $ref: '#/components/schemas/PaginationResponse_Template' }
+                }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [template_management]
+    post:
+      summary: 'Create Template'
+      operationId: Create_Template_templates_post
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/CreateTemplate' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/Template' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [template_management]
+  /templates/batch:
+    post:
+      summary: 'Batch Actions On Templates'
+      operationId: Batch_actions_on_Templates_templates_batch_post
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/BatchSettings' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [template_management]
+  /products/maxprice:
+    get:
+      summary: 'Get Max Product Price'
+      operationId: get_max_product_price_products_maxprice_get
+      parameters:
+        - required: true
+          schema: { title: Store, type: string }
+          name: store
+          in: query
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+  /products/categories:
+    get:
+      summary: Categories
+      operationId: categories_products_categories_get
+      parameters:
+        - required: true
+          schema: { title: Store, type: string }
+          name: store
+          in: query
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+  /products/count:
+    get:
+      summary: 'Get Number Of Products'
+      operationId: Get_number_of_Products_products_count_get
+      parameters:
+        - required: false
+          schema: { title: Store, type: string }
+          name: store
+          in: query
+        - required: false
+          schema: { title: Category, type: string, default: '' }
+          name: category
+          in: query
+        - required: false
+          schema: { title: 'Min Price', type: number }
+          name: min_price
+          in: query
+        - required: false
+          schema: { title: 'Max Price', type: number }
+          name: max_price
+          in: query
+        - required: false
+          schema: { title: Sale, type: boolean, default: false }
+          name: sale
+          in: query
+        - required: false
+          schema: { title: Offset, minimum: 0, type: integer, default: 0 }
+          name: offset
+          in: query
+        - required: false
+          schema:
+            {
+              title: Limit,
+              maximum: 1000,
+              minimum: -1,
+              type: integer,
+              default: 5
+            }
+          name: limit
+          in: query
+        - required: false
+          schema: { title: Query, type: string, default: '' }
+          name: query
+          in: query
+        - required: false
+          schema: { title: Multiple, type: boolean, default: false }
+          name: multiple
+          in: query
+        - required: false
+          schema: { title: Sort, type: string, default: '' }
+          name: sort
+          in: query
+        - required: false
+          schema: { title: Desc, type: boolean, default: true }
+          name: desc
+          in: query
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                {
+                  schema:
+                    {
+                      title: 'Response Get Number Of Products Products Count Get',
+                      type: integer
+                    }
+                }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - BearerOptional: [product_management]
+  '/products/{model_id}':
+    get:
+      summary: 'Get Product By Id'
+      operationId: Get_Product_by_id_products__model_id__get
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+        - required: false
+          schema: { title: Store, type: string }
+          name: store
+          in: query
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/Product' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+    delete:
+      summary: 'Delete Product'
+      operationId: Delete_Product_products__model_id__delete
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/Product' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [product_management]
+    patch:
+      summary: 'Modify Product'
+      operationId: Modify_Product_products__model_id__patch
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      requestBody:
+        content:
+          multipart/form-data:
+            {
+              schema:
+                {
+                  $ref: '#/components/schemas/Body_Modify_Product_products__model_id__patch'
+                }
+            }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/Product' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [product_management]
+  /products:
+    get:
+      summary: 'Get Products'
+      operationId: Get_Products_products_get
+      parameters:
+        - required: false
+          schema: { title: Store, type: string }
+          name: store
+          in: query
+        - required: false
+          schema: { title: Category, type: string, default: '' }
+          name: category
+          in: query
+        - required: false
+          schema: { title: 'Min Price', type: number }
+          name: min_price
+          in: query
+        - required: false
+          schema: { title: 'Max Price', type: number }
+          name: max_price
+          in: query
+        - required: false
+          schema: { title: Sale, type: boolean, default: false }
+          name: sale
+          in: query
+        - required: false
+          schema: { title: Offset, minimum: 0, type: integer, default: 0 }
+          name: offset
+          in: query
+        - required: false
+          schema:
+            {
+              title: Limit,
+              maximum: 1000,
+              minimum: -1,
+              type: integer,
+              default: 5
+            }
+          name: limit
+          in: query
+        - required: false
+          schema: { title: Query, type: string, default: '' }
+          name: query
+          in: query
+        - required: false
+          schema: { title: Multiple, type: boolean, default: false }
+          name: multiple
+          in: query
+        - required: false
+          schema: { title: Sort, type: string, default: '' }
+          name: sort
+          in: query
+        - required: false
+          schema: { title: Desc, type: boolean, default: true }
+          name: desc
+          in: query
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                {
+                  schema:
+                    { $ref: '#/components/schemas/PaginationResponse_Product' }
+                }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - BearerOptional: [product_management]
+    post:
+      summary: 'Create Product'
+      operationId: Create_Product_products_post
+      requestBody:
+        content:
+          multipart/form-data:
+            {
+              schema:
+                {
+                  $ref: '#/components/schemas/Body_Create_Product_products_post'
+                }
+            }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/Product' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [product_management]
+  /products/batch:
+    post:
+      summary: 'Batch Actions On Products'
+      operationId: Batch_actions_on_Products_products_batch_post
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/BatchSettings' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [product_management]
+  '/invoices/order_id/{order_id}':
+    post:
+      summary: 'Get Or Create Invoice By Order Id'
+      operationId: get_or_create_invoice_by_order_id_invoices_order_id__order_id__post
+      parameters:
+        - required: true
+          schema: { title: 'Order Id', type: string }
+          name: order_id
+          in: path
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/CreateInvoice' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/DisplayInvoice' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - BearerOptional: [invoice_management]
+  /invoices/export:
+    get:
+      summary: 'Export Invoices'
+      operationId: export_invoices_invoices_export_get
+      parameters:
+        - required: false
+          schema: { title: 'Export Format', type: string, default: json }
+          name: export_format
+          in: query
+        - required: false
+          schema: { title: 'Add Payments', type: boolean, default: false }
+          name: add_payments
+          in: query
+        - required: false
+          schema: { title: 'All Users', type: boolean, default: false }
+          name: all_users
+          in: query
+        - required: false
+          schema: { title: Offset, minimum: 0, type: integer, default: 0 }
+          name: offset
+          in: query
+        - required: false
+          schema:
+            {
+              title: Limit,
+              maximum: 1000,
+              minimum: -1,
+              type: integer,
+              default: 5
+            }
+          name: limit
+          in: query
+        - required: false
+          schema: { title: Query, type: string, default: '' }
+          name: query
+          in: query
+        - required: false
+          schema: { title: Multiple, type: boolean, default: false }
+          name: multiple
+          in: query
+        - required: false
+          schema: { title: Sort, type: string, default: '' }
+          name: sort
+          in: query
+        - required: false
+          schema: { title: Desc, type: boolean, default: true }
+          name: desc
+          in: query
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [invoice_management]
+  '/invoices/{model_id}/customer':
+    patch:
+      summary: 'Update Invoice'
+      operationId: update_invoice_invoices__model_id__customer_patch
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/CustomerUpdateData' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/DisplayInvoice' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+  '/invoices/{model_id}/details':
+    patch:
+      summary: 'Update Payment Details'
+      operationId: update_payment_details_invoices__model_id__details_patch
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/MethodUpdateData' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+  '/invoices/{model_id}/refunds':
+    post:
+      summary: 'Refund Invoice'
+      operationId: refund_invoice_invoices__model_id__refunds_post
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/RefundData' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/Refund' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [invoice_management, payout_management]
+  '/invoices/refunds/{refund_id}':
+    get:
+      summary: 'Get Refund'
+      operationId: get_refund_invoices_refunds__refund_id__get
+      parameters:
+        - required: true
+          schema: { title: 'Refund Id', type: string }
+          name: refund_id
+          in: path
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/Refund' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+  '/invoices/refunds/{refund_id}/submit':
+    post:
+      summary: 'Submit Refund'
+      operationId: submit_refund_invoices_refunds__refund_id__submit_post
+      parameters:
+        - required: true
+          schema: { title: 'Refund Id', type: string }
+          name: refund_id
+          in: path
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/SubmitRefundData' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/Refund' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+  /invoices/count:
+    get:
+      summary: 'Get Number Of Invoices'
+      operationId: Get_number_of_Invoices_invoices_count_get
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                {
+                  schema:
+                    {
+                      title: 'Response Get Number Of Invoices Invoices Count Get',
+                      type: integer
+                    }
+                }
+            }
+      security:
+        - Bearer: [invoice_management]
+  '/invoices/{model_id}':
+    get:
+      summary: 'Get Invoice By Id'
+      operationId: Get_Invoice_by_id_invoices__model_id__get
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/DisplayInvoice' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+    delete:
+      summary: 'Delete Invoice'
+      operationId: Delete_Invoice_invoices__model_id__delete
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/DisplayInvoice' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [invoice_management]
+    patch:
+      summary: 'Modify Invoice'
+      operationId: Modify_Invoice_invoices__model_id__patch
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/OptionalInvoice' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/DisplayInvoice' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [invoice_management]
+  /invoices:
+    get:
+      summary: 'Get Invoices'
+      operationId: Get_Invoices_invoices_get
+      parameters:
+        - required: false
+          schema: { title: Offset, minimum: 0, type: integer, default: 0 }
+          name: offset
+          in: query
+        - required: false
+          schema:
+            {
+              title: Limit,
+              maximum: 1000,
+              minimum: -1,
+              type: integer,
+              default: 5
+            }
+          name: limit
+          in: query
+        - required: false
+          schema: { title: Query, type: string, default: '' }
+          name: query
+          in: query
+        - required: false
+          schema: { title: Multiple, type: boolean, default: false }
+          name: multiple
+          in: query
+        - required: false
+          schema: { title: Sort, type: string, default: '' }
+          name: sort
+          in: query
+        - required: false
+          schema: { title: Desc, type: boolean, default: true }
+          name: desc
+          in: query
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                {
+                  schema:
+                    {
+                      $ref: '#/components/schemas/PaginationResponse_DisplayInvoice'
+                    }
+                }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [invoice_management]
+    post:
+      summary: 'Create Invoice'
+      operationId: Create_Invoice_invoices_post
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/CreateInvoice' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/DisplayInvoice' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - BearerOptional: [invoice_management]
+  /invoices/batch:
+    post:
+      summary: 'Batch Actions On Invoices'
+      operationId: Batch_actions_on_Invoices_invoices_batch_post
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/BatchSettings' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [invoice_management]
+  /payouts/count:
+    get:
+      summary: 'Get Number Of Payouts'
+      operationId: Get_number_of_Payouts_payouts_count_get
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                {
+                  schema:
+                    {
+                      title: 'Response Get Number Of Payouts Payouts Count Get',
+                      type: integer
+                    }
+                }
+            }
+      security:
+        - Bearer: [payout_management]
+  '/payouts/{model_id}':
+    get:
+      summary: 'Get Payout By Id'
+      operationId: Get_Payout_by_id_payouts__model_id__get
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/DisplayPayout' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [payout_management]
+    delete:
+      summary: 'Delete Payout'
+      operationId: Delete_Payout_payouts__model_id__delete
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/DisplayPayout' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [payout_management]
+    patch:
+      summary: 'Modify Payout'
+      operationId: Modify_Payout_payouts__model_id__patch
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/OptionalPayout' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/DisplayPayout' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [payout_management]
+  /payouts:
+    get:
+      summary: 'Get Payouts'
+      operationId: Get_Payouts_payouts_get
+      parameters:
+        - required: false
+          schema: { title: Offset, minimum: 0, type: integer, default: 0 }
+          name: offset
+          in: query
+        - required: false
+          schema:
+            {
+              title: Limit,
+              maximum: 1000,
+              minimum: -1,
+              type: integer,
+              default: 5
+            }
+          name: limit
+          in: query
+        - required: false
+          schema: { title: Query, type: string, default: '' }
+          name: query
+          in: query
+        - required: false
+          schema: { title: Multiple, type: boolean, default: false }
+          name: multiple
+          in: query
+        - required: false
+          schema: { title: Sort, type: string, default: '' }
+          name: sort
+          in: query
+        - required: false
+          schema: { title: Desc, type: boolean, default: true }
+          name: desc
+          in: query
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                {
+                  schema:
+                    {
+                      $ref: '#/components/schemas/PaginationResponse_DisplayPayout'
+                    }
+                }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [payout_management]
+    post:
+      summary: 'Create Payout'
+      operationId: Create_Payout_payouts_post
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/CreatePayout' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/DisplayPayout' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [payout_management]
+  /payouts/batch:
+    post:
+      summary: 'Batch Actions On Payouts'
+      operationId: Batch_actions_on_Payouts_payouts_batch_post
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/BatchSettings' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [payout_management]
+  /token:
+    get:
+      summary: 'Get Tokens'
+      operationId: get_tokens_token_get
+      parameters:
+        - required: false
+          schema: { title: 'App Id', type: string }
+          name: app_id
+          in: query
+        - required: false
+          schema: { title: 'Redirect Url', type: string }
+          name: redirect_url
+          in: query
+        - required: false
+          schema: { title: Permissions, type: array, items: { type: string } }
+          name: permissions
+          in: query
+        - required: false
+          schema: { title: Offset, minimum: 0, type: integer, default: 0 }
+          name: offset
+          in: query
+        - required: false
+          schema:
+            {
+              title: Limit,
+              maximum: 1000,
+              minimum: -1,
+              type: integer,
+              default: 5
+            }
+          name: limit
+          in: query
+        - required: false
+          schema: { title: Query, type: string, default: '' }
+          name: query
+          in: query
+        - required: false
+          schema: { title: Multiple, type: boolean, default: false }
+          name: multiple
+          in: query
+        - required: false
+          schema: { title: Sort, type: string, default: '' }
+          name: sort
+          in: query
+        - required: false
+          schema: { title: Desc, type: boolean, default: true }
+          name: desc
+          in: query
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                {
+                  schema:
+                    { $ref: '#/components/schemas/PaginationResponse_Token' }
+                }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [token_management]
+    post:
+      summary: 'Create Token'
+      operationId: create_token_token_post
+      requestBody:
+        content:
+          application/json:
+            {
+              schema:
+                {
+                  title: 'Token Data',
+                  allOf:
+                    [{ $ref: '#/components/schemas/HTTPCreateLoginToken' }],
+                  default:
+                    {
+                      metadata: {},
+                      created: '2023-08-29T03:20:56.181215+00:00',
+                      app_id: '',
+                      redirect_url: '',
+                      permissions: [],
+                      email: '',
+                      password: '',
+                      captcha_code: '',
+                      strict: true
+                    }
+                }
+            }
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - BearerOptional: []
+  /token/current:
+    get:
+      summary: 'Get Current Token'
+      operationId: get_current_token_token_current_get
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/Token' } }
+            }
+      security:
+        - Bearer: []
+  /token/count:
+    get:
+      summary: 'Get Token Count'
+      operationId: get_token_count_token_count_get
+      parameters:
+        - required: false
+          schema: { title: 'App Id', type: string }
+          name: app_id
+          in: query
+        - required: false
+          schema: { title: 'Redirect Url', type: string }
+          name: redirect_url
+          in: query
+        - required: false
+          schema: { title: Permissions, type: array, items: { type: string } }
+          name: permissions
+          in: query
+        - required: false
+          schema: { title: Offset, minimum: 0, type: integer, default: 0 }
+          name: offset
+          in: query
+        - required: false
+          schema:
+            {
+              title: Limit,
+              maximum: 1000,
+              minimum: -1,
+              type: integer,
+              default: 5
+            }
+          name: limit
+          in: query
+        - required: false
+          schema: { title: Query, type: string, default: '' }
+          name: query
+          in: query
+        - required: false
+          schema: { title: Multiple, type: boolean, default: false }
+          name: multiple
+          in: query
+        - required: false
+          schema: { title: Sort, type: string, default: '' }
+          name: sort
+          in: query
+        - required: false
+          schema: { title: Desc, type: boolean, default: true }
+          name: desc
+          in: query
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                {
+                  schema:
+                    {
+                      title: 'Response Get Token Count Token Count Get',
+                      type: integer
+                    }
+                }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [token_management]
+  '/token/{model_id}':
+    delete:
+      summary: 'Delete Token'
+      operationId: delete_token_token__model_id__delete
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/Token' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [token_management]
+    patch:
+      summary: 'Patch Token'
+      operationId: patch_token_token__model_id__patch
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/EditToken' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/Token' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [token_management]
+  /token/batch:
+    post:
+      summary: 'Batch Action'
+      operationId: batch_action_token_batch_post
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/BatchSettings' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [token_management]
+  /token/oauth2:
+    post:
+      summary: 'Create Oauth2 Token'
+      operationId: create_oauth2_token_token_oauth2_post
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            {
+              schema:
+                {
+                  $ref: '#/components/schemas/Body_create_oauth2_token_token_oauth2_post'
+                }
+            }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - BearerOptional: []
+  /token/2fa/totp:
+    post:
+      summary: 'Create Token Totp Auth'
+      operationId: create_token_totp_auth_token_2fa_totp_post
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/TOTPAuth' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+  /token/2fa/fido2/begin:
+    post:
+      summary: 'Create Token Fido2 Begin'
+      operationId: create_token_fido2_begin_token_2fa_fido2_begin_post
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/FIDO2Auth' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+  /token/2fa/fido2/complete:
+    post:
+      summary: 'Create Token Fido2 Complete'
+      operationId: create_token_fido2_complete_token_2fa_fido2_complete_post
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+  /manage/restart:
+    post:
+      summary: 'Restart Server'
+      operationId: restart_server_manage_restart_post
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+      security:
+        - Bearer: [server_management]
+  /manage/update:
+    post:
+      summary: 'Update Server'
+      operationId: update_server_manage_update_post
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+      security:
+        - Bearer: [server_management]
+  /manage/cleanup/images:
+    post:
+      summary: 'Cleanup Images'
+      operationId: cleanup_images_manage_cleanup_images_post
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+      security:
+        - Bearer: [server_management]
+  /manage/cleanup/logs:
+    post:
+      summary: 'Cleanup Logs'
+      operationId: cleanup_logs_manage_cleanup_logs_post
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+      security:
+        - Bearer: [server_management]
+  /manage/cleanup:
+    post:
+      summary: 'Cleanup Server'
+      operationId: cleanup_server_manage_cleanup_post
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+      security:
+        - Bearer: [server_management]
+  /manage/daemons:
+    get:
+      summary: 'Get Daemons'
+      operationId: get_daemons_manage_daemons_get
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+      security:
+        - Bearer: [server_management]
+  /manage/policies:
+    get:
+      summary: 'Get Policies'
+      operationId: get_policies_manage_policies_get
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+      security:
+        - BearerOptional: [server_management]
+    post:
+      summary: 'Set Policies'
+      operationId: set_policies_manage_policies_post
+      requestBody:
+        content:
+          application/json: { schema: { $ref: '#/components/schemas/Policy' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/Policy' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [server_management]
+  /manage/stores:
+    get:
+      summary: 'Get Store Policies'
+      operationId: get_store_policies_manage_stores_get
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/GlobalStorePolicy' } }
+            }
+    post:
+      summary: 'Set Store Policies'
+      operationId: set_store_policies_manage_stores_post
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/GlobalStorePolicy' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/GlobalStorePolicy' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [server_management]
+  /manage/logs:
+    get:
+      summary: 'Get Logs List'
+      operationId: get_logs_list_manage_logs_get
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+      security:
+        - Bearer: [server_management]
+  '/manage/logs/{log}':
+    get:
+      summary: 'Get Log Contents'
+      operationId: get_log_contents_manage_logs__log__get
+      parameters:
+        - required: true
+          schema: { title: Log, type: string }
+          name: log
+          in: path
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [server_management]
+    delete:
+      summary: 'Delete Log'
+      operationId: delete_log_manage_logs__log__delete
+      parameters:
+        - required: true
+          schema: { title: Log, type: string }
+          name: log
+          in: path
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [server_management]
+  /manage/backups:
+    get:
+      summary: 'Get Backup Policies'
+      operationId: get_backup_policies_manage_backups_get
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/BackupsPolicy' } }
+            }
+      security:
+        - Bearer: [server_management]
+    post:
+      summary: 'Set Backup Policies'
+      operationId: set_backup_policies_manage_backups_post
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/BackupsPolicy' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/BackupsPolicy' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [server_management]
+  /manage/backups/providers:
+    get:
+      summary: 'Get Backup Providers'
+      operationId: get_backup_providers_manage_backups_providers_get
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+  /manage/backups/frequencies:
+    get:
+      summary: 'Get Backup Frequencies'
+      operationId: get_backup_frequencies_manage_backups_frequencies_get
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+  /manage/backups/backup:
+    post:
+      summary: 'Perform Backup'
+      operationId: perform_backup_manage_backups_backup_post
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+      security:
+        - Bearer: [server_management]
+  '/manage/backups/download/{file_id}':
+    get:
+      summary: 'Download Backup'
+      operationId: download_backup_manage_backups_download__file_id__get
+      parameters:
+        - required: true
+          schema: { title: 'File Id', type: string }
+          name: file_id
+          in: path
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [server_management]
+  /manage/backups/restore:
+    post:
+      summary: 'Restore Backup'
+      operationId: restore_backup_manage_backups_restore_post
+      requestBody:
+        content:
+          multipart/form-data:
+            {
+              schema:
+                {
+                  $ref: '#/components/schemas/Body_restore_backup_manage_backups_restore_post'
+                }
+            }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [server_management]
+  /manage/syncinfo:
+    get:
+      summary: 'Get Syncinfo'
+      operationId: get_syncinfo_manage_syncinfo_get
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+      security:
+        - Bearer: [server_management]
+  /manage/testping:
+    get:
+      summary: 'Test Email Ping'
+      operationId: test_email_ping_manage_testping_get
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+      security:
+        - Bearer: [server_management]
+  /cryptos:
+    get:
+      summary: 'Get Cryptos'
+      operationId: get_cryptos_cryptos_get
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+  /cryptos/supported:
+    get:
+      summary: 'Get Supported Cryptos'
+      operationId: get_supported_cryptos_cryptos_supported_get
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+  /cryptos/rate:
+    get:
+      summary: Rate
+      operationId: rate_cryptos_rate_get
+      parameters:
+        - required: false
+          schema: { title: Currency, type: string, default: btc }
+          name: currency
+          in: query
+        - required: false
+          schema: { title: 'Fiat Currency', type: string, default: USD }
+          name: fiat_currency
+          in: query
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+  /cryptos/fiatlist:
+    get:
+      summary: 'Get Fiatlist'
+      operationId: get_fiatlist_cryptos_fiatlist_get
+      parameters:
+        - required: false
+          schema: { title: Query, type: string }
+          name: query
+          in: query
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+  '/cryptos/tokens/{currency}':
+    get:
+      summary: 'Get Tokens'
+      operationId: get_tokens_cryptos_tokens__currency__get
+      parameters:
+        - required: true
+          schema: { title: Currency, type: string }
+          name: currency
+          in: path
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+  '/cryptos/tokens/{currency}/abi':
+    get:
+      summary: 'Get Tokens Abi'
+      operationId: get_tokens_abi_cryptos_tokens__currency__abi_get
+      parameters:
+        - required: true
+          schema: { title: Currency, type: string }
+          name: currency
+          in: path
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+  '/cryptos/explorer/{currency}':
+    get:
+      summary: 'Get Default Explorer'
+      operationId: get_default_explorer_cryptos_explorer__currency__get
+      parameters:
+        - required: true
+          schema: { title: Currency, type: string }
+          name: currency
+          in: path
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+  '/cryptos/rpc/{currency}':
+    get:
+      summary: 'Get Default Rpc'
+      operationId: get_default_rpc_cryptos_rpc__currency__get
+      parameters:
+        - required: true
+          schema: { title: Currency, type: string }
+          name: currency
+          in: path
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+  /configurator/deploy:
+    post:
+      summary: 'Generate Deployment'
+      operationId: generate_deployment_configurator_deploy_post
+      requestBody:
+        content:
+          application/json:
+            {
+              schema:
+                { $ref: '#/components/schemas/ConfiguratorDeploySettings' }
+            }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+  '/configurator/deploy-result/{deploy_id}':
+    get:
+      summary: 'Get Deploy Result'
+      operationId: get_deploy_result_configurator_deploy_result__deploy_id__get
+      parameters:
+        - required: true
+          schema: { title: 'Deploy Id', type: string }
+          name: deploy_id
+          in: path
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+  /configurator/server-settings:
+    post:
+      summary: 'Get Server Settings'
+      operationId: get_server_settings_configurator_server_settings_post
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/SSHSettings' } }
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - BearerOptional: [server_management]
+  /configurator/dns-resolve:
+    get:
+      summary: 'Check Dns Entry'
+      operationId: check_dns_entry_configurator_dns_resolve_get
+      parameters:
+        - required: true
+          schema: { title: Name, type: string }
+          name: name
+          in: query
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+  /tor/services:
+    get:
+      summary: 'Get Services'
+      operationId: get_services_tor_services_get
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+      security:
+        - BearerOptional: [server_management]
+  /update/check:
+    get:
+      summary: 'Check Updates'
+      operationId: check_updates_update_check_get
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+  '/files/handle/{model_id}':
+    get:
+      summary: 'Handle File'
+      operationId: handle_file_files_handle__model_id__get
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+  /files/count:
+    get:
+      summary: 'Get Number Of Files'
+      operationId: Get_number_of_Files_files_count_get
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                {
+                  schema:
+                    {
+                      title: 'Response Get Number Of Files Files Count Get',
+                      type: integer
+                    }
+                }
+            }
+      security:
+        - Bearer: [file_management]
+  '/files/{model_id}':
+    get:
+      summary: 'Get File By Id'
+      operationId: Get_File_by_id_files__model_id__get
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/File' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [file_management]
+    delete:
+      summary: 'Delete File'
+      operationId: Delete_File_files__model_id__delete
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/File' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [file_management]
+    patch:
+      summary: 'Modify File'
+      operationId: Modify_File_files__model_id__patch
+      parameters:
+        - required: true
+          schema: { title: 'Model Id', type: string }
+          name: model_id
+          in: path
+      requestBody:
+        content:
+          multipart/form-data:
+            {
+              schema:
+                {
+                  $ref: '#/components/schemas/Body_Modify_File_files__model_id__patch'
+                }
+            }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/File' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [file_management]
+  /files:
+    get:
+      summary: 'Get Files'
+      operationId: Get_Files_files_get
+      parameters:
+        - required: false
+          schema: { title: Offset, minimum: 0, type: integer, default: 0 }
+          name: offset
+          in: query
+        - required: false
+          schema:
+            {
+              title: Limit,
+              maximum: 1000,
+              minimum: -1,
+              type: integer,
+              default: 5
+            }
+          name: limit
+          in: query
+        - required: false
+          schema: { title: Query, type: string, default: '' }
+          name: query
+          in: query
+        - required: false
+          schema: { title: Multiple, type: boolean, default: false }
+          name: multiple
+          in: query
+        - required: false
+          schema: { title: Sort, type: string, default: '' }
+          name: sort
+          in: query
+        - required: false
+          schema: { title: Desc, type: boolean, default: true }
+          name: desc
+          in: query
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                {
+                  schema:
+                    { $ref: '#/components/schemas/PaginationResponse_File' }
+                }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [file_management]
+    post:
+      summary: 'Create File'
+      operationId: Create_File_files_post
+      requestBody:
+        content:
+          multipart/form-data:
+            {
+              schema:
+                { $ref: '#/components/schemas/Body_Create_File_files_post' }
+            }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/File' } }
+            }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [file_management]
+  /files/batch:
+    post:
+      summary: 'Batch Actions On Files'
+      operationId: Batch_actions_on_Files_files_batch_post
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/BatchSettings' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [file_management]
+  /plugins:
+    get:
+      summary: 'Get Plugins'
+      operationId: get_plugins_plugins_get
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+      security:
+        - Bearer: [server_management]
+  /plugins/install:
+    post:
+      summary: 'Install Plugin'
+      operationId: install_plugin_plugins_install_post
+      requestBody:
+        content:
+          multipart/form-data:
+            {
+              schema:
+                {
+                  $ref: '#/components/schemas/Body_install_plugin_plugins_install_post'
+                }
+            }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [server_management]
+  /plugins/uninstall:
+    post:
+      summary: 'Uninstall Plugin'
+      operationId: uninstall_plugin_plugins_uninstall_post
+      requestBody:
+        content:
+          application/json:
+            { schema: { $ref: '#/components/schemas/UninstallPluginData' } }
+        required: true
+      responses:
+        '200':
+          description: 'Successful Response'
+          content: { application/json: { schema: {} } }
+        '422':
+          description: 'Validation Error'
+          content:
+            {
+              application/json:
+                { schema: { $ref: '#/components/schemas/HTTPValidationError' } }
+            }
+      security:
+        - Bearer: [server_management]
+components:
+  schemas:
+    BackupsPolicy:
+      title: BackupsPolicy
+      type: object
+      properties:
+        provider:
+          title: Provider
+          type: string
+          default: local
+        scheduled:
+          title: Scheduled
+          type: boolean
+          default: false
+        frequency:
+          title: Frequency
+          type: string
+          default: weekly
+        environment_variables:
+          title: 'Environment Variables'
+          type: object
+          additionalProperties: { type: string }
+          default: {}
+    BalanceResponse:
+      title: BalanceResponse
+      required:
+        - confirmed
+        - unconfirmed
+        - unmatured
+        - lightning
+      type: object
+      properties:
+        confirmed:
+          title: Confirmed
+          type: string
+        unconfirmed:
+          title: Unconfirmed
+          type: string
+        unmatured:
+          title: Unmatured
+          type: string
+        lightning:
+          title: Lightning
+          type: string
+    BatchSettings:
+      title: BatchSettings
+      required:
+        - ids
+        - command
+      type: object
+      properties:
+        ids:
+          title: Ids
+          type: array
+          items: { type: string }
+        command:
+          title: Command
+          type: string
+        options:
+          title: Options
+          type: object
+          default: {}
+    Body_Create_File_files_post:
+      title: Body_Create_File_files_post
+      required:
+        - file
+      type: object
+      properties:
+        file:
+          title: File
+          type: string
+          format: binary
+    Body_Create_Product_products_post:
+      title: Body_Create_Product_products_post
+      required:
+        - data
+      type: object
+      properties:
+        data:
+          title: Data
+          type: string
+        image:
+          title: Image
+          type: string
+          format: binary
+    Body_Modify_File_files__model_id__patch:
+      title: Body_Modify_File_files__model_id__patch
+      required:
+        - file
+      type: object
+      properties:
+        file:
+          title: File
+          type: string
+          format: binary
+    Body_Modify_Product_products__model_id__patch:
+      title: Body_Modify_Product_products__model_id__patch
+      required:
+        - data
+      type: object
+      properties:
+        data:
+          title: Data
+          type: string
+        image:
+          title: Image
+          type: string
+          format: binary
+    Body_create_oauth2_token_token_oauth2_post:
+      title: Body_create_oauth2_token_token_oauth2_post
+      required:
+        - username
+        - password
+      type: object
+      properties:
+        grant_type:
+          title: 'Grant Type'
+          pattern: password
+          type: string
+        username:
+          title: Username
+          type: string
+        password:
+          title: Password
+          type: string
+        scope:
+          title: Scope
+          type: string
+          default: ''
+        client_id:
+          title: 'Client Id'
+          type: string
+        client_secret:
+          title: 'Client Secret'
+          type: string
+    Body_install_plugin_plugins_install_post:
+      title: Body_install_plugin_plugins_install_post
+      required:
+        - plugin
+      type: object
+      properties:
+        plugin:
+          title: Plugin
+          type: string
+          format: binary
+    Body_restore_backup_manage_backups_restore_post:
+      title: Body_restore_backup_manage_backups_restore_post
+      required:
+        - backup
+      type: object
+      properties:
+        backup:
+          title: Backup
+          type: string
+          format: binary
+    ChangePassword:
+      title: ChangePassword
+      required:
+        - old_password
+        - password
+      type: object
+      properties:
+        old_password:
+          title: 'Old Password'
+          type: string
+        password:
+          title: Password
+          type: string
+        logout_all:
+          title: 'Logout All'
+          type: boolean
+          default: false
+    CloseChannelScheme:
+      title: CloseChannelScheme
+      required:
+        - channel_point
+      type: object
+      properties:
+        channel_point:
+          title: 'Channel Point'
+          type: string
+        force:
+          title: Force
+          type: boolean
+          default: false
+    ConfiguratorAdvancedSettings:
+      title: ConfiguratorAdvancedSettings
+      type: object
+      properties:
+        installation_pack:
+          title: 'Installation Pack'
+          type: string
+          default: all
+        bitcart_docker_repository:
+          title: 'Bitcart Docker Repository'
+          type: string
+          default: ''
+        additional_components:
+          title: 'Additional Components'
+          type: array
+          items: { type: string }
+          default: []
+    ConfiguratorCoinDescription:
+      title: ConfiguratorCoinDescription
+      type: object
+      properties:
+        enabled:
+          title: Enabled
+          type: boolean
+          default: true
+        network:
+          title: Network
+          type: string
+          default: mainnet
+        lightning:
+          title: Lightning
+          type: boolean
+          default: false
+    ConfiguratorDeploySettings:
+      title: ConfiguratorDeploySettings
+      required:
+        - mode
+      type: object
+      properties:
+        domain_settings:
+          title: 'Domain Settings'
+          allOf: [{ $ref: '#/components/schemas/ConfiguratorDomainSettings' }]
+          default: { domain: '', https: true }
+        coins:
+          title: Coins
+          type: object
+          additionalProperties:
+            { $ref: '#/components/schemas/ConfiguratorCoinDescription' }
+          default: {}
+        additional_services:
+          title: 'Additional Services'
+          type: array
+          items: { type: string }
+          default: []
+        advanced_settings:
+          title: 'Advanced Settings'
+          allOf: [{ $ref: '#/components/schemas/ConfiguratorAdvancedSettings' }]
+          default:
+            {
+              installation_pack: all,
+              bitcart_docker_repository: '',
+              additional_components: []
+            }
+        mode:
+          title: Mode
+          type: string
+        ssh_settings:
+          title: 'Ssh Settings'
+          allOf: [{ $ref: '#/components/schemas/ConfiguratorSSHSettings' }]
+          default: {}
+    ConfiguratorDomainSettings:
+      title: ConfiguratorDomainSettings
+      type: object
+      properties:
+        domain:
+          title: Domain
+          type: string
+          default: ''
+        https:
+          title: Https
+          type: boolean
+          default: true
+    ConfiguratorSSHSettings:
+      title: ConfiguratorSSHSettings
+      type: object
+      properties:
+        host:
+          title: Host
+          type: string
+        username:
+          title: Username
+          type: string
+        password:
+          title: Password
+          type: string
+        root_password:
+          title: 'Root Password'
+          type: string
+    CreateDiscount:
+      title: CreateDiscount
+      required:
+        - name
+        - percent
+        - end_date
+      type: object
+      properties:
+        metadata:
+          title: Metadata
+          type: object
+          default: {}
+        created:
+          title: Created
+          type: string
+          format: date-time
+        name:
+          title: Name
+          type: string
+        percent:
+          title: Percent
+          type: integer
+        end_date:
+          title: 'End Date'
+          type: string
+          format: date-time
+        description:
+          title: Description
+          type: string
+          default: ''
+        promocode:
+          title: Promocode
+          type: string
+          default: ''
+        currencies:
+          title: Currencies
+          type: string
+          default: ''
+    CreateInvoice:
+      title: CreateInvoice
+      required:
+        - price
+        - store_id
+      type: object
+      properties:
+        metadata:
+          title: Metadata
+          type: object
+          default: {}
+        created:
+          title: Created
+          type: string
+          format: date-time
+        price:
+          title: Price
+          type: number
+        store_id:
+          title: 'Store Id'
+          type: string
+        currency:
+          title: Currency
+          type: string
+          default: ''
+        paid_currency:
+          title: 'Paid Currency'
+          type: string
+          default: ''
+        sent_amount:
+          title: 'Sent Amount'
+          type: number
+          default: 0
+        order_id:
+          title: 'Order Id'
+          type: string
+          default: ''
+        notification_url:
+          title: 'Notification Url'
+          type: string
+          default: ''
+        redirect_url:
+          title: 'Redirect Url'
+          type: string
+          default: ''
+        buyer_email:
+          title: 'Buyer Email'
+          type: string
+          format: email
+          default: ''
+        promocode:
+          title: Promocode
+          type: string
+          default: ''
+        shipping_address:
+          title: 'Shipping Address'
+          type: string
+          default: ''
+        notes:
+          title: Notes
+          type: string
+          default: ''
+        discount:
+          title: Discount
+          type: string
+        status:
+          title: Status
+          type: string
+        exception_status:
+          title: 'Exception Status'
+          type: string
+        products:
+          title: Products
+          anyOf:
+            [
+              { type: array, items: { type: string } },
+              { type: object, additionalProperties: { type: integer } }
+            ]
+          default: {}
+        tx_hashes:
+          title: 'Tx Hashes'
+          type: array
+          items: { type: string }
+          default: []
+        expiration:
+          title: Expiration
+          type: integer
+    CreateNotification:
+      title: CreateNotification
+      required:
+        - name
+        - provider
+        - data
+      type: object
+      properties:
+        metadata:
+          title: Metadata
+          type: object
+          default: {}
+        created:
+          title: Created
+          type: string
+          format: date-time
+        name:
+          title: Name
+          type: string
+        provider:
+          title: Provider
+          type: string
+        data:
+          title: Data
+          type: object
+    CreatePayout:
+      title: CreatePayout
+      required:
+        - amount
+        - destination
+        - store_id
+        - wallet_id
+      type: object
+      properties:
+        metadata:
+          title: Metadata
+          type: object
+          default: {}
+        created:
+          title: Created
+          type: string
+          format: date-time
+        amount:
+          title: Amount
+          type: number
+        destination:
+          title: Destination
+          type: string
+        store_id:
+          title: 'Store Id'
+          type: string
+        wallet_id:
+          title: 'Wallet Id'
+          type: string
+        currency:
+          title: Currency
+          type: string
+          default: ''
+        notification_url:
+          title: 'Notification Url'
+          type: string
+          default: ''
+        max_fee:
+          title: 'Max Fee'
+          type: number
+        status:
+          title: Status
+          type: string
+    CreateStore:
+      title: CreateStore
+      required:
+        - name
+        - wallets
+      type: object
+      properties:
+        metadata:
+          title: Metadata
+          type: object
+          default: {}
+        created:
+          title: Created
+          type: string
+          format: date-time
+        name:
+          title: Name
+          type: string
+        default_currency:
+          title: 'Default Currency'
+          type: string
+          default: USD
+        email:
+          title: Email
+          type: string
+          format: email
+          default: ''
+        checkout_settings:
+          title: 'Checkout Settings'
+          allOf: [{ $ref: '#/components/schemas/StoreCheckoutSettings' }]
+          default:
+            {
+              expiration: 15,
+              transaction_speed: 0,
+              underpaid_percentage: 0,
+              custom_logo_link: '',
+              recommended_fee_target_blocks: 1,
+              show_recommended_fee: true,
+              use_dark_mode: false,
+              use_html_templates: false,
+              email_required: true,
+              ask_address: false,
+              randomize_wallet_selection: false,
+              allow_anonymous_invoice_creation: true,
+              include_network_fee: false,
+              rate_rules: '',
+              pos_screen_enabled: true
+            }
+        theme_settings:
+          title: 'Theme Settings'
+          allOf: [{ $ref: '#/components/schemas/StoreThemeSettings' }]
+          default: { store_theme_url: '', checkout_theme_url: '' }
+        email_host:
+          title: 'Email Host'
+          type: string
+          default: ''
+        email_port:
+          title: 'Email Port'
+          type: integer
+          default: 25
+        email_user:
+          title: 'Email User'
+          type: string
+          default: ''
+        email_password:
+          title: 'Email Password'
+          type: string
+          default: ''
+        email_use_ssl:
+          title: 'Email Use Ssl'
+          type: boolean
+          default: true
+        wallets:
+          title: Wallets
+          type: array
+          items: { type: string }
+        notifications:
+          title: Notifications
+          type: array
+          items: { type: string }
+          default: []
+        templates:
+          title: Templates
+          type: object
+          additionalProperties: { type: string }
+          default: {}
+        plugin_settings:
+          title: 'Plugin Settings'
+          allOf: [{ $ref: '#/components/schemas/StorePluginSettings' }]
+          default: { shopify: { shop_name: '', api_key: '', api_secret: '' } }
+    CreateTemplate:
+      title: CreateTemplate
+      required:
+        - name
+        - text
+      type: object
+      properties:
+        metadata:
+          title: Metadata
+          type: object
+          default: {}
+        created:
+          title: Created
+          type: string
+          format: date-time
+        name:
+          title: Name
+          type: string
+        text:
+          title: Text
+          type: string
+    CreateUser:
+      title: CreateUser
+      required:
+        - email
+        - password
+      type: object
+      properties:
+        metadata:
+          title: Metadata
+          type: object
+          default: {}
+        created:
+          title: Created
+          type: string
+          format: date-time
+        email:
+          title: Email
+          type: string
+          format: email
+        is_superuser:
+          title: 'Is Superuser'
+          type: boolean
+          default: false
+        settings:
+          title: Settings
+          allOf: [{ $ref: '#/components/schemas/UserPreferences' }]
+          default: { balance_currency: USD, fetch_balance: true }
+        password:
+          title: Password
+          type: string
+        captcha_code:
+          title: 'Captcha Code'
+          type: string
+          default: ''
+        verify_url:
+          title: 'Verify Url'
+          type: string
+          default: ''
+    CreateUserWithToken:
+      title: CreateUserWithToken
+      required:
+        - email
+        - is_verified
+        - is_enabled
+        - totp_key
+        - totp_url
+        - tfa_enabled
+        - fido2_devices
+        - token
+      type: object
+      properties:
+        metadata:
+          title: Metadata
+          type: object
+          default: {}
+        created:
+          title: Created
+          type: string
+          format: date-time
+        email:
+          title: Email
+          type: string
+          format: email
+        is_superuser:
+          title: 'Is Superuser'
+          type: boolean
+          default: false
+        settings:
+          title: Settings
+          allOf: [{ $ref: '#/components/schemas/UserPreferences' }]
+          default: { balance_currency: USD, fetch_balance: true }
+        id:
+          title: Id
+          type: string
+        is_verified:
+          title: 'Is Verified'
+          type: boolean
+        is_enabled:
+          title: 'Is Enabled'
+          type: boolean
+        totp_key:
+          title: 'Totp Key'
+          type: string
+        totp_url:
+          title: 'Totp Url'
+          type: string
+        tfa_enabled:
+          title: 'Tfa Enabled'
+          type: boolean
+        fido2_devices:
+          title: 'Fido2 Devices'
+          type: array
+          items: {}
+        token:
+          title: Token
+          type: string
+    CreateWallet:
+      title: CreateWallet
+      required:
+        - name
+      type: object
+      properties:
+        metadata:
+          title: Metadata
+          type: object
+          default: {}
+        created:
+          title: Created
+          type: string
+          format: date-time
+        name:
+          title: Name
+          type: string
+        xpub:
+          title: Xpub
+          type: string
+          default: ''
+        currency:
+          title: Currency
+          type: string
+          default: btc
+        lightning_enabled:
+          title: 'Lightning Enabled'
+          type: boolean
+          default: false
+        label:
+          title: Label
+          type: string
+          default: ''
+        hint:
+          title: Hint
+          type: string
+          default: ''
+        contract:
+          title: Contract
+          type: string
+          default: ''
+        additional_xpub_data:
+          title: 'Additional Xpub Data'
+          type: object
+          default: {}
+    CreateWalletData:
+      title: CreateWalletData
+      required:
+        - currency
+        - hot_wallet
+      type: object
+      properties:
+        currency:
+          title: Currency
+          type: string
+        hot_wallet:
+          title: 'Hot Wallet'
+          type: boolean
+    CustomerUpdateData:
+      title: CustomerUpdateData
+      type: object
+      properties:
+        buyer_email:
+          title: 'Buyer Email'
+          type: string
+          format: email
+          default: ''
+        shipping_address:
+          title: 'Shipping Address'
+          type: string
+          default: ''
+        notes:
+          title: Notes
+          type: string
+          default: ''
+    Discount:
+      title: Discount
+      required:
+        - name
+        - percent
+        - end_date
+        - user_id
+      type: object
+      properties:
+        metadata:
+          title: Metadata
+          type: object
+          default: {}
+        created:
+          title: Created
+          type: string
+          format: date-time
+        name:
+          title: Name
+          type: string
+        percent:
+          title: Percent
+          type: integer
+        end_date:
+          title: 'End Date'
+          type: string
+          format: date-time
+        description:
+          title: Description
+          type: string
+          default: ''
+        promocode:
+          title: Promocode
+          type: string
+          default: ''
+        currencies:
+          title: Currencies
+          type: string
+          default: ''
+        id:
+          title: Id
+          type: string
+        user_id:
+          title: 'User Id'
+          type: string
+    DisplayInvoice:
+      title: DisplayInvoice
+      required:
+        - price
+        - sent_amount
+        - expiration
+        - user_id
+        - time_left
+        - expiration_seconds
+        - product_names
+      type: object
+      properties:
+        metadata:
+          title: Metadata
+          type: object
+          default: {}
+        created:
+          title: Created
+          type: string
+          format: date-time
+        price:
+          title: Price
+          type: string
+        store_id:
+          title: 'Store Id'
+          type: string
+        currency:
+          title: Currency
+          type: string
+          default: USD
+        paid_currency:
+          title: 'Paid Currency'
+          type: string
+          default: ''
+        sent_amount:
+          title: 'Sent Amount'
+          type: string
+        order_id:
+          title: 'Order Id'
+          type: string
+          default: ''
+        notification_url:
+          title: 'Notification Url'
+          type: string
+          default: ''
+        redirect_url:
+          title: 'Redirect Url'
+          type: string
+          default: ''
+        buyer_email:
+          title: 'Buyer Email'
+          type: string
+          format: email
+          default: ''
+        promocode:
+          title: Promocode
+          type: string
+          default: ''
+        shipping_address:
+          title: 'Shipping Address'
+          type: string
+          default: ''
+        notes:
+          title: Notes
+          type: string
+          default: ''
+        discount:
+          title: Discount
+          type: string
+        status:
+          title: Status
+          type: string
+        exception_status:
+          title: 'Exception Status'
+          type: string
+        products:
+          title: Products
+          anyOf:
+            [
+              { type: array, items: { type: string } },
+              { type: object, additionalProperties: { type: integer } }
+            ]
+          default: {}
+        tx_hashes:
+          title: 'Tx Hashes'
+          type: array
+          items: { type: string }
+          default: []
+        expiration:
+          title: Expiration
+          type: integer
+        id:
+          title: Id
+          type: string
+        user_id:
+          title: 'User Id'
+          type: string
+        time_left:
+          title: 'Time Left'
+          type: integer
+        expiration_seconds:
+          title: 'Expiration Seconds'
+          type: integer
+        product_names:
+          title: 'Product Names'
+          type: object
+        payments:
+          title: Payments
+          type: array
+          items: {}
+          default: []
+        refund_id:
+          title: 'Refund Id'
+          type: string
+    DisplayPayout:
+      title: DisplayPayout
+      required:
+        - amount
+        - destination
+        - user_id
+      type: object
+      properties:
+        metadata:
+          title: Metadata
+          type: object
+          default: {}
+        created:
+          title: Created
+          type: string
+          format: date-time
+        amount:
+          title: Amount
+          type: string
+        destination:
+          title: Destination
+          type: string
+        store_id:
+          title: 'Store Id'
+          type: string
+        wallet_id:
+          title: 'Wallet Id'
+          type: string
+        currency:
+          title: Currency
+          type: string
+          default: USD
+        notification_url:
+          title: 'Notification Url'
+          type: string
+          default: ''
+        max_fee:
+          title: 'Max Fee'
+          type: number
+        status:
+          title: Status
+          type: string
+        id:
+          title: Id
+          type: string
+        user_id:
+          title: 'User Id'
+          type: string
+        tx_hash:
+          title: 'Tx Hash'
+          type: string
+        used_fee:
+          title: 'Used Fee'
+          type: number
+        wallet_currency:
+          title: 'Wallet Currency'
+          type: string
+    DisplayUser:
+      title: DisplayUser
+      required:
+        - email
+        - is_verified
+        - is_enabled
+        - totp_key
+        - totp_url
+        - tfa_enabled
+        - fido2_devices
+      type: object
+      properties:
+        metadata:
+          title: Metadata
+          type: object
+          default: {}
+        created:
+          title: Created
+          type: string
+          format: date-time
+        email:
+          title: Email
+          type: string
+          format: email
+        is_superuser:
+          title: 'Is Superuser'
+          type: boolean
+          default: false
+        settings:
+          title: Settings
+          allOf: [{ $ref: '#/components/schemas/UserPreferences' }]
+          default: { balance_currency: USD, fetch_balance: true }
+        id:
+          title: Id
+          type: string
+        is_verified:
+          title: 'Is Verified'
+          type: boolean
+        is_enabled:
+          title: 'Is Enabled'
+          type: boolean
+        totp_key:
+          title: 'Totp Key'
+          type: string
+        totp_url:
+          title: 'Totp Url'
+          type: string
+        tfa_enabled:
+          title: 'Tfa Enabled'
+          type: boolean
+        fido2_devices:
+          title: 'Fido2 Devices'
+          type: array
+          items: {}
+    EditToken:
+      title: EditToken
+      type: object
+      properties:
+        redirect_url:
+          title: 'Redirect Url'
+          type: string
+          default: ''
+    FIDO2Auth:
+      title: FIDO2Auth
+      required:
+        - token
+        - auth_host
+      type: object
+      properties:
+        token:
+          title: Token
+          type: string
+        auth_host:
+          title: 'Auth Host'
+          type: string
+    File:
+      title: File
+      required:
+        - id
+        - filename
+        - user_id
+      type: object
+      properties:
+        metadata:
+          title: Metadata
+          type: object
+          default: {}
+        created:
+          title: Created
+          type: string
+          format: date-time
+        id:
+          title: Id
+          type: string
+        filename:
+          title: Filename
+          type: string
+        user_id:
+          title: 'User Id'
+          type: string
+    GlobalStorePolicy:
+      title: GlobalStorePolicy
+      type: object
+      properties:
+        pos_id:
+          title: 'Pos Id'
+          type: string
+          default: ''
+    HTTPCreateLoginToken:
+      title: HTTPCreateLoginToken
+      type: object
+      properties:
+        metadata:
+          title: Metadata
+          type: object
+          default: {}
+        created:
+          title: Created
+          type: string
+          format: date-time
+        app_id:
+          title: 'App Id'
+          type: string
+          default: ''
+        redirect_url:
+          title: 'Redirect Url'
+          type: string
+          default: ''
+        permissions:
+          title: Permissions
+          type: array
+          items: { type: string }
+          default: []
+        email:
+          title: Email
+          type: string
+          format: email
+          default: ''
+        password:
+          title: Password
+          type: string
+          default: ''
+        captcha_code:
+          title: 'Captcha Code'
+          type: string
+          default: ''
+        strict:
+          title: Strict
+          type: boolean
+          default: true
+    HTTPValidationError:
+      title: HTTPValidationError
+      type: object
+      properties:
+        detail:
+          title: Detail
+          type: array
+          items: { $ref: '#/components/schemas/ValidationError' }
+    LNPayScheme:
+      title: LNPayScheme
+      required:
+        - invoice
+      type: object
+      properties:
+        invoice:
+          title: Invoice
+          type: string
+    LoginFIDOData:
+      title: LoginFIDOData
+      required:
+        - auth_host
+      type: object
+      properties:
+        auth_host:
+          title: 'Auth Host'
+          type: string
+    MethodUpdateData:
+      title: MethodUpdateData
+      required:
+        - id
+        - address
+      type: object
+      properties:
+        id:
+          title: Id
+          type: string
+        address:
+          title: Address
+          type: string
+    Notification:
+      title: Notification
+      required:
+        - name
+        - provider
+        - data
+        - user_id
+      type: object
+      properties:
+        metadata:
+          title: Metadata
+          type: object
+          default: {}
+        created:
+          title: Created
+          type: string
+          format: date-time
+        name:
+          title: Name
+          type: string
+        provider:
+          title: Provider
+          type: string
+        data:
+          title: Data
+          type: object
+        id:
+          title: Id
+          type: string
+        user_id:
+          title: 'User Id'
+          type: string
+    OpenChannelScheme:
+      title: OpenChannelScheme
+      required:
+        - node_id
+        - amount
+      type: object
+      properties:
+        node_id:
+          title: 'Node Id'
+          type: string
+        amount:
+          title: Amount
+          type: number
+    OptionalCreateWallet:
+      title: OptionalCreateWallet
+      type: object
+      properties:
+        metadata:
+          title: Metadata
+          type: object
+          default: {}
+        created:
+          title: Created
+          type: string
+          format: date-time
+        name:
+          title: Name
+          type: string
+        xpub:
+          title: Xpub
+          type: string
+          default: ''
+        currency:
+          title: Currency
+          type: string
+          default: btc
+        lightning_enabled:
+          title: 'Lightning Enabled'
+          type: boolean
+          default: false
+        label:
+          title: Label
+          type: string
+          default: ''
+        hint:
+          title: Hint
+          type: string
+          default: ''
+        contract:
+          title: Contract
+          type: string
+          default: ''
+        additional_xpub_data:
+          title: 'Additional Xpub Data'
+          type: object
+          default: {}
+    OptionalDiscount:
+      title: OptionalDiscount
+      type: object
+      properties:
+        metadata:
+          title: Metadata
+          type: object
+          default: {}
+        created:
+          title: Created
+          type: string
+          format: date-time
+        name:
+          title: Name
+          type: string
+        percent:
+          title: Percent
+          type: integer
+        end_date:
+          title: 'End Date'
+          type: string
+          format: date-time
+        description:
+          title: Description
+          type: string
+          default: ''
+        promocode:
+          title: Promocode
+          type: string
+          default: ''
+        currencies:
+          title: Currencies
+          type: string
+          default: ''
+        id:
+          title: Id
+          type: string
+        user_id:
+          title: 'User Id'
+          type: string
+    OptionalInvoice:
+      title: OptionalInvoice
+      type: object
+      properties:
+        metadata:
+          title: Metadata
+          type: object
+          default: {}
+        created:
+          title: Created
+          type: string
+          format: date-time
+        price:
+          title: Price
+          type: string
+        store_id:
+          title: 'Store Id'
+          type: string
+        currency:
+          title: Currency
+          type: string
+          default: USD
+        paid_currency:
+          title: 'Paid Currency'
+          type: string
+          default: ''
+        sent_amount:
+          title: 'Sent Amount'
+          type: string
+        order_id:
+          title: 'Order Id'
+          type: string
+          default: ''
+        notification_url:
+          title: 'Notification Url'
+          type: string
+          default: ''
+        redirect_url:
+          title: 'Redirect Url'
+          type: string
+          default: ''
+        buyer_email:
+          title: 'Buyer Email'
+          type: string
+          format: email
+          default: ''
+        promocode:
+          title: Promocode
+          type: string
+          default: ''
+        shipping_address:
+          title: 'Shipping Address'
+          type: string
+          default: ''
+        notes:
+          title: Notes
+          type: string
+          default: ''
+        discount:
+          title: Discount
+          type: string
+        status:
+          title: Status
+          type: string
+        exception_status:
+          title: 'Exception Status'
+          type: string
+        products:
+          title: Products
+          anyOf:
+            [
+              { type: array, items: { type: string } },
+              { type: object, additionalProperties: { type: integer } }
+            ]
+          default: {}
+        tx_hashes:
+          title: 'Tx Hashes'
+          type: array
+          items: { type: string }
+          default: []
+        expiration:
+          title: Expiration
+          type: integer
+        id:
+          title: Id
+          type: string
+        user_id:
+          title: 'User Id'
+          type: string
+    OptionalNotification:
+      title: OptionalNotification
+      type: object
+      properties:
+        metadata:
+          title: Metadata
+          type: object
+          default: {}
+        created:
+          title: Created
+          type: string
+          format: date-time
+        name:
+          title: Name
+          type: string
+        provider:
+          title: Provider
+          type: string
+        data:
+          title: Data
+          type: object
+        id:
+          title: Id
+          type: string
+        user_id:
+          title: 'User Id'
+          type: string
+    OptionalPayout:
+      title: OptionalPayout
+      type: object
+      properties:
+        metadata:
+          title: Metadata
+          type: object
+          default: {}
+        created:
+          title: Created
+          type: string
+          format: date-time
+        amount:
+          title: Amount
+          type: string
+        destination:
+          title: Destination
+          type: string
+        store_id:
+          title: 'Store Id'
+          type: string
+        wallet_id:
+          title: 'Wallet Id'
+          type: string
+        currency:
+          title: Currency
+          type: string
+          default: USD
+        notification_url:
+          title: 'Notification Url'
+          type: string
+          default: ''
+        max_fee:
+          title: 'Max Fee'
+          type: number
+        status:
+          title: Status
+          type: string
+        id:
+          title: Id
+          type: string
+        user_id:
+          title: 'User Id'
+          type: string
+        tx_hash:
+          title: 'Tx Hash'
+          type: string
+        used_fee:
+          title: 'Used Fee'
+          type: number
+    OptionalStore:
+      title: OptionalStore
+      type: object
+      properties:
+        metadata:
+          title: Metadata
+          type: object
+          default: {}
+        created:
+          title: Created
+          type: string
+          format: date-time
+        name:
+          title: Name
+          type: string
+        default_currency:
+          title: 'Default Currency'
+          type: string
+          default: USD
+        email:
+          title: Email
+          type: string
+          format: email
+          default: ''
+        checkout_settings:
+          title: 'Checkout Settings'
+          allOf: [{ $ref: '#/components/schemas/StoreCheckoutSettings' }]
+          default:
+            {
+              expiration: 15,
+              transaction_speed: 0,
+              underpaid_percentage: 0,
+              custom_logo_link: '',
+              recommended_fee_target_blocks: 1,
+              show_recommended_fee: true,
+              use_dark_mode: false,
+              use_html_templates: false,
+              email_required: true,
+              ask_address: false,
+              randomize_wallet_selection: false,
+              allow_anonymous_invoice_creation: true,
+              include_network_fee: false,
+              rate_rules: '',
+              pos_screen_enabled: true
+            }
+        theme_settings:
+          title: 'Theme Settings'
+          allOf: [{ $ref: '#/components/schemas/StoreThemeSettings' }]
+          default: { store_theme_url: '', checkout_theme_url: '' }
+        email_host:
+          title: 'Email Host'
+          type: string
+          default: ''
+        email_port:
+          title: 'Email Port'
+          type: integer
+          default: 25
+        email_user:
+          title: 'Email User'
+          type: string
+          default: ''
+        email_password:
+          title: 'Email Password'
+          type: string
+          default: ''
+        email_use_ssl:
+          title: 'Email Use Ssl'
+          type: boolean
+          default: true
+        wallets:
+          title: Wallets
+          type: array
+          items: { type: string }
+        notifications:
+          title: Notifications
+          type: array
+          items: { type: string }
+          default: []
+        templates:
+          title: Templates
+          type: object
+          additionalProperties: { type: string }
+          default: {}
+        plugin_settings:
+          title: 'Plugin Settings'
+          allOf: [{ $ref: '#/components/schemas/StorePluginSettings' }]
+          default: { shopify: { shop_name: '', api_key: '', api_secret: '' } }
+        id:
+          title: Id
+          type: string
+        user_id:
+          title: 'User Id'
+          type: string
+        currency_data:
+          title: 'Currency Data'
+          type: object
+    OptionalTemplate:
+      title: OptionalTemplate
+      type: object
+      properties:
+        metadata:
+          title: Metadata
+          type: object
+          default: {}
+        created:
+          title: Created
+          type: string
+          format: date-time
+        name:
+          title: Name
+          type: string
+        text:
+          title: Text
+          type: string
+        id:
+          title: Id
+          type: string
+        user_id:
+          title: 'User Id'
+          type: string
+    OptionalUser:
+      title: OptionalUser
+      type: object
+      properties:
+        metadata:
+          title: Metadata
+          type: object
+          default: {}
+        created:
+          title: Created
+          type: string
+          format: date-time
+        email:
+          title: Email
+          type: string
+          format: email
+        is_superuser:
+          title: 'Is Superuser'
+          type: boolean
+          default: false
+        settings:
+          title: Settings
+          allOf: [{ $ref: '#/components/schemas/UserPreferences' }]
+          default: { balance_currency: USD, fetch_balance: true }
+        id:
+          title: Id
+          type: string
+        password:
+          title: Password
+          type: string
+        is_verified:
+          title: 'Is Verified'
+          type: boolean
+          default: false
+        is_enabled:
+          title: 'Is Enabled'
+          type: boolean
+          default: true
+    PaginationResponse_Discount:
+      title: PaginationResponse_Discount
+      required:
+        - count
+        - result
+      type: object
+      properties:
+        count:
+          title: Count
+          type: integer
+        next:
+          title: Next
+          type: string
+        previous:
+          title: Previous
+          type: string
+        result:
+          title: Result
+          type: array
+          items: { $ref: '#/components/schemas/Discount' }
+    PaginationResponse_DisplayInvoice:
+      title: PaginationResponse_DisplayInvoice
+      required:
+        - count
+        - result
+      type: object
+      properties:
+        count:
+          title: Count
+          type: integer
+        next:
+          title: Next
+          type: string
+        previous:
+          title: Previous
+          type: string
+        result:
+          title: Result
+          type: array
+          items: { $ref: '#/components/schemas/DisplayInvoice' }
+    PaginationResponse_DisplayPayout:
+      title: PaginationResponse_DisplayPayout
+      required:
+        - count
+        - result
+      type: object
+      properties:
+        count:
+          title: Count
+          type: integer
+        next:
+          title: Next
+          type: string
+        previous:
+          title: Previous
+          type: string
+        result:
+          title: Result
+          type: array
+          items: { $ref: '#/components/schemas/DisplayPayout' }
+    PaginationResponse_DisplayUser:
+      title: PaginationResponse_DisplayUser
+      required:
+        - count
+        - result
+      type: object
+      properties:
+        count:
+          title: Count
+          type: integer
+        next:
+          title: Next
+          type: string
+        previous:
+          title: Previous
+          type: string
+        result:
+          title: Result
+          type: array
+          items: { $ref: '#/components/schemas/DisplayUser' }
+    PaginationResponse_File:
+      title: PaginationResponse_File
+      required:
+        - count
+        - result
+      type: object
+      properties:
+        count:
+          title: Count
+          type: integer
+        next:
+          title: Next
+          type: string
+        previous:
+          title: Previous
+          type: string
+        result:
+          title: Result
+          type: array
+          items: { $ref: '#/components/schemas/File' }
+    PaginationResponse_Notification:
+      title: PaginationResponse_Notification
+      required:
+        - count
+        - result
+      type: object
+      properties:
+        count:
+          title: Count
+          type: integer
+        next:
+          title: Next
+          type: string
+        previous:
+          title: Previous
+          type: string
+        result:
+          title: Result
+          type: array
+          items: { $ref: '#/components/schemas/Notification' }
+    PaginationResponse_Product:
+      title: PaginationResponse_Product
+      required:
+        - count
+        - result
+      type: object
+      properties:
+        count:
+          title: Count
+          type: integer
+        next:
+          title: Next
+          type: string
+        previous:
+          title: Previous
+          type: string
+        result:
+          title: Result
+          type: array
+          items: { $ref: '#/components/schemas/Product' }
+    PaginationResponse_Store:
+      title: PaginationResponse_Store
+      required:
+        - count
+        - result
+      type: object
+      properties:
+        count:
+          title: Count
+          type: integer
+        next:
+          title: Next
+          type: string
+        previous:
+          title: Previous
+          type: string
+        result:
+          title: Result
+          type: array
+          items: { $ref: '#/components/schemas/Store' }
+    PaginationResponse_Template:
+      title: PaginationResponse_Template
+      required:
+        - count
+        - result
+      type: object
+      properties:
+        count:
+          title: Count
+          type: integer
+        next:
+          title: Next
+          type: string
+        previous:
+          title: Previous
+          type: string
+        result:
+          title: Result
+          type: array
+          items: { $ref: '#/components/schemas/Template' }
+    PaginationResponse_Token:
+      title: PaginationResponse_Token
+      required:
+        - count
+        - result
+      type: object
+      properties:
+        count:
+          title: Count
+          type: integer
+        next:
+          title: Next
+          type: string
+        previous:
+          title: Previous
+          type: string
+        result:
+          title: Result
+          type: array
+          items: { $ref: '#/components/schemas/Token' }
+    PaginationResponse_Wallet:
+      title: PaginationResponse_Wallet
+      required:
+        - count
+        - result
+      type: object
+      properties:
+        count:
+          title: Count
+          type: integer
+        next:
+          title: Next
+          type: string
+        previous:
+          title: Previous
+          type: string
+        result:
+          title: Result
+          type: array
+          items: { $ref: '#/components/schemas/Wallet' }
+    Policy:
+      title: Policy
+      type: object
+      properties:
+        disable_registration:
+          title: 'Disable Registration'
+          type: boolean
+          default: false
+        require_verified_email:
+          title: 'Require Verified Email'
+          type: boolean
+          default: false
+        allow_file_uploads:
+          title: 'Allow File Uploads'
+          type: boolean
+          default: true
+        discourage_index:
+          title: 'Discourage Index'
+          type: boolean
+          default: false
+        check_updates:
+          title: 'Check Updates'
+          type: boolean
+          default: true
+        staging_updates:
+          title: 'Staging Updates'
+          type: boolean
+          default: false
+        allow_anonymous_configurator:
+          title: 'Allow Anonymous Configurator'
+          type: boolean
+          default: true
+        captcha_sitekey:
+          title: 'Captcha Sitekey'
+          type: string
+          default: ''
+        captcha_secretkey:
+          title: 'Captcha Secretkey'
+          type: string
+          default: ''
+        admin_theme_url:
+          title: 'Admin Theme Url'
+          type: string
+          default: ''
+        enable_captcha:
+          title: 'Enable Captcha'
+          type: boolean
+          default: false
+        explorer_urls:
+          title: 'Explorer Urls'
+          type: object
+          additionalProperties: { type: string }
+          default: {}
+        rpc_urls:
+          title: 'Rpc Urls'
+          type: object
+          additionalProperties: { type: string }
+          default: {}
+        email_settings:
+          title: 'Email Settings'
+          type: object
+          default: {}
+    Product:
+      title: Product
+      required:
+        - price
+        - quantity
+        - name
+        - user_id
+      type: object
+      properties:
+        metadata:
+          title: Metadata
+          type: object
+          default: {}
+        created:
+          title: Created
+          type: string
+          format: date-time
+        status:
+          title: Status
+          type: string
+          default: active
+        price:
+          title: Price
+          type: string
+        quantity:
+          title: Quantity
+          type: integer
+        name:
+          title: Name
+          type: string
+        download_url:
+          title: 'Download Url'
+          type: string
+          default: ''
+        description:
+          title: Description
+          type: string
+          default: ''
+        category:
+          title: Category
+          type: string
+          default: ''
+        image:
+          title: Image
+          type: string
+          default: ''
+        store_id:
+          title: 'Store Id'
+          type: string
+        discounts:
+          title: Discounts
+          type: array
+          items: { type: string }
+          default: []
+        templates:
+          title: Templates
+          type: object
+          additionalProperties: { type: string }
+          default: {}
+        id:
+          title: Id
+          type: string
+        user_id:
+          title: 'User Id'
+          type: string
+    RateResult:
+      title: RateResult
+      required:
+        - message
+      type: object
+      properties:
+        rate:
+          title: Rate
+          type: number
+        message:
+          title: Message
+          type: string
+    RatesResponse:
+      title: RatesResponse
+      required:
+        - rates
+      type: object
+      properties:
+        rates:
+          title: Rates
+          type: array
+          items: { $ref: '#/components/schemas/RateResult' }
+    Refund:
+      title: Refund
+      required:
+        - amount
+        - currency
+        - wallet_id
+        - invoice_id
+        - id
+        - user_id
+      type: object
+      properties:
+        metadata:
+          title: Metadata
+          type: object
+          default: {}
+        created:
+          title: Created
+          type: string
+          format: date-time
+        amount:
+          title: Amount
+          type: number
+        currency:
+          title: Currency
+          type: string
+        wallet_id:
+          title: 'Wallet Id'
+          type: string
+        invoice_id:
+          title: 'Invoice Id'
+          type: string
+        id:
+          title: Id
+          type: string
+        destination:
+          title: Destination
+          type: string
+        user_id:
+          title: 'User Id'
+          type: string
+        wallet_currency:
+          title: 'Wallet Currency'
+          type: string
+        payout_status:
+          title: 'Payout Status'
+          type: string
+        tx_hash:
+          title: 'Tx Hash'
+          type: string
+    RefundData:
+      title: RefundData
+      required:
+        - amount
+        - currency
+        - admin_host
+      type: object
+      properties:
+        amount:
+          title: Amount
+          type: number
+        currency:
+          title: Currency
+          type: string
+        admin_host:
+          title: 'Admin Host'
+          type: string
+        send_email:
+          title: 'Send Email'
+          type: boolean
+          default: true
+    ResetPasswordData:
+      title: ResetPasswordData
+      required:
+        - email
+        - next_url
+      type: object
+      properties:
+        email:
+          title: Email
+          type: string
+          format: email
+        next_url:
+          title: 'Next Url'
+          type: string
+        captcha_code:
+          title: 'Captcha Code'
+          type: string
+          default: ''
+    ResetPasswordFinalize:
+      title: ResetPasswordFinalize
+      required:
+        - password
+      type: object
+      properties:
+        password:
+          title: Password
+          type: string
+        logout_all:
+          title: 'Logout All'
+          type: boolean
+          default: true
+    SSHSettings:
+      title: SSHSettings
+      type: object
+      properties:
+        host:
+          title: Host
+          type: string
+        port:
+          title: Port
+          type: integer
+          default: 22
+        username:
+          title: Username
+          type: string
+        password:
+          title: Password
+          type: string
+        key_file:
+          title: 'Key File'
+          type: string
+        key_file_password:
+          title: 'Key File Password'
+          type: string
+        authorized_keys_file:
+          title: 'Authorized Keys File'
+          type: string
+        bash_profile_script:
+          title: 'Bash Profile Script'
+          type: string
+    Store:
+      title: Store
+      required:
+        - name
+        - wallets
+        - user_id
+        - currency_data
+      type: object
+      properties:
+        metadata:
+          title: Metadata
+          type: object
+          default: {}
+        created:
+          title: Created
+          type: string
+          format: date-time
+        name:
+          title: Name
+          type: string
+        default_currency:
+          title: 'Default Currency'
+          type: string
+          default: USD
+        email:
+          title: Email
+          type: string
+          format: email
+          default: ''
+        checkout_settings:
+          title: 'Checkout Settings'
+          allOf: [{ $ref: '#/components/schemas/StoreCheckoutSettings' }]
+          default:
+            {
+              expiration: 15,
+              transaction_speed: 0,
+              underpaid_percentage: 0,
+              custom_logo_link: '',
+              recommended_fee_target_blocks: 1,
+              show_recommended_fee: true,
+              use_dark_mode: false,
+              use_html_templates: false,
+              email_required: true,
+              ask_address: false,
+              randomize_wallet_selection: false,
+              allow_anonymous_invoice_creation: true,
+              include_network_fee: false,
+              rate_rules: '',
+              pos_screen_enabled: true
+            }
+        theme_settings:
+          title: 'Theme Settings'
+          allOf: [{ $ref: '#/components/schemas/StoreThemeSettings' }]
+          default: { store_theme_url: '', checkout_theme_url: '' }
+        email_host:
+          title: 'Email Host'
+          type: string
+          default: ''
+        email_port:
+          title: 'Email Port'
+          type: integer
+          default: 25
+        email_user:
+          title: 'Email User'
+          type: string
+          default: ''
+        email_password:
+          title: 'Email Password'
+          type: string
+          default: ''
+        email_use_ssl:
+          title: 'Email Use Ssl'
+          type: boolean
+          default: true
+        wallets:
+          title: Wallets
+          type: array
+          items: { type: string }
+        notifications:
+          title: Notifications
+          type: array
+          items: { type: string }
+          default: []
+        templates:
+          title: Templates
+          type: object
+          additionalProperties: { type: string }
+          default: {}
+        plugin_settings:
+          title: 'Plugin Settings'
+          allOf: [{ $ref: '#/components/schemas/StorePluginSettings' }]
+          default: { shopify: { shop_name: '', api_key: '', api_secret: '' } }
+        id:
+          title: Id
+          type: string
+        user_id:
+          title: 'User Id'
+          type: string
+        currency_data:
+          title: 'Currency Data'
+          type: object
+    StoreCheckoutSettings:
+      title: StoreCheckoutSettings
+      type: object
+      properties:
+        expiration:
+          title: Expiration
+          type: integer
+          default: 15
+        transaction_speed:
+          title: 'Transaction Speed'
+          type: integer
+          default: 0
+        underpaid_percentage:
+          title: 'Underpaid Percentage'
+          type: number
+          default: 0
+        custom_logo_link:
+          title: 'Custom Logo Link'
+          type: string
+          default: ''
+        recommended_fee_target_blocks:
+          title: 'Recommended Fee Target Blocks'
+          type: integer
+          default: 1
+        show_recommended_fee:
+          title: 'Show Recommended Fee'
+          type: boolean
+          default: true
+        use_dark_mode:
+          title: 'Use Dark Mode'
+          type: boolean
+          default: false
+        use_html_templates:
+          title: 'Use Html Templates'
+          type: boolean
+          default: false
+        email_required:
+          title: 'Email Required'
+          type: boolean
+          default: true
+        ask_address:
+          title: 'Ask Address'
+          type: boolean
+          default: false
+        randomize_wallet_selection:
+          title: 'Randomize Wallet Selection'
+          type: boolean
+          default: false
+        allow_anonymous_invoice_creation:
+          title: 'Allow Anonymous Invoice Creation'
+          type: boolean
+          default: true
+        include_network_fee:
+          title: 'Include Network Fee'
+          type: boolean
+          default: false
+        rate_rules:
+          title: 'Rate Rules'
+          type: string
+          default: ''
+        pos_screen_enabled:
+          title: 'Pos Screen Enabled'
+          type: boolean
+          default: true
+    StorePluginSettings:
+      title: StorePluginSettings
+      type: object
+      properties:
+        shopify:
+          title: Shopify
+          allOf: [{ $ref: '#/components/schemas/StoreShopifySettings' }]
+          default: { shop_name: '', api_key: '', api_secret: '' }
+    StoreShopifySettings:
+      title: StoreShopifySettings
+      type: object
+      properties:
+        shop_name:
+          title: 'Shop Name'
+          type: string
+          default: ''
+        api_key:
+          title: 'Api Key'
+          type: string
+          default: ''
+        api_secret:
+          title: 'Api Secret'
+          type: string
+          default: ''
+    StoreThemeSettings:
+      title: StoreThemeSettings
+      type: object
+      properties:
+        store_theme_url:
+          title: 'Store Theme Url'
+          type: string
+          default: ''
+        checkout_theme_url:
+          title: 'Checkout Theme Url'
+          type: string
+          default: ''
+    SubmitRefundData:
+      title: SubmitRefundData
+      required:
+        - destination
+      type: object
+      properties:
+        destination:
+          title: Destination
+          type: string
+    TOTPAuth:
+      title: TOTPAuth
+      required:
+        - code
+        - token
+      type: object
+      properties:
+        code:
+          title: Code
+          type: string
+        token:
+          title: Token
+          type: string
+    Template:
+      title: Template
+      required:
+        - name
+        - text
+        - user_id
+      type: object
+      properties:
+        metadata:
+          title: Metadata
+          type: object
+          default: {}
+        created:
+          title: Created
+          type: string
+          format: date-time
+        name:
+          title: Name
+          type: string
+        text:
+          title: Text
+          type: string
+        id:
+          title: Id
+          type: string
+        user_id:
+          title: 'User Id'
+          type: string
+    Token:
+      title: Token
+      required:
+        - user_id
+        - id
+      type: object
+      properties:
+        metadata:
+          title: Metadata
+          type: object
+          default: {}
+        created:
+          title: Created
+          type: string
+          format: date-time
+        app_id:
+          title: 'App Id'
+          type: string
+          default: ''
+        redirect_url:
+          title: 'Redirect Url'
+          type: string
+          default: ''
+        permissions:
+          title: Permissions
+          type: array
+          items: { type: string }
+          default: []
+        user_id:
+          title: 'User Id'
+          type: string
+        id:
+          title: Id
+          type: string
+    TxResponse:
+      title: TxResponse
+      required:
+        - txid
+        - amount
+      type: object
+      properties:
+        date:
+          title: Date
+          type: string
+          format: date-time
+        txid:
+          title: Txid
+          type: string
+        amount:
+          title: Amount
+          type: string
+    UninstallPluginData:
+      title: UninstallPluginData
+      required:
+        - author
+        - name
+      type: object
+      properties:
+        author:
+          title: Author
+          type: string
+        name:
+          title: Name
+          type: string
+    User:
+      title: User
+      required:
+        - email
+      type: object
+      properties:
+        metadata:
+          title: Metadata
+          type: object
+          default: {}
+        created:
+          title: Created
+          type: string
+          format: date-time
+        email:
+          title: Email
+          type: string
+          format: email
+        is_superuser:
+          title: 'Is Superuser'
+          type: boolean
+          default: false
+        settings:
+          title: Settings
+          allOf: [{ $ref: '#/components/schemas/UserPreferences' }]
+          default: { balance_currency: USD, fetch_balance: true }
+        id:
+          title: Id
+          type: string
+        password:
+          title: Password
+          type: string
+        is_verified:
+          title: 'Is Verified'
+          type: boolean
+          default: false
+        is_enabled:
+          title: 'Is Enabled'
+          type: boolean
+          default: true
+    UserPreferences:
+      title: UserPreferences
+      type: object
+      properties:
+        balance_currency:
+          title: 'Balance Currency'
+          type: string
+          default: USD
+        fetch_balance:
+          title: 'Fetch Balance'
+          type: boolean
+          default: true
+    ValidationError:
+      title: ValidationError
+      required:
+        - loc
+        - msg
+        - type
+      type: object
+      properties:
+        loc:
+          title: Location
+          type: array
+          items: { anyOf: [{ type: string }, { type: integer }] }
+        msg:
+          title: Message
+          type: string
+        type:
+          title: 'Error Type'
+          type: string
+    VerifyEmailData:
+      title: VerifyEmailData
+      required:
+        - email
+        - next_url
+      type: object
+      properties:
+        email:
+          title: Email
+          type: string
+          format: email
+        next_url:
+          title: 'Next Url'
+          type: string
+        captcha_code:
+          title: 'Captcha Code'
+          type: string
+          default: ''
+    VerifyTOTP:
+      title: VerifyTOTP
+      required:
+        - code
+      type: object
+      properties:
+        code:
+          title: Code
+          type: string
+    Wallet:
+      title: Wallet
+      required:
+        - name
+        - user_id
+        - balance
+        - xpub_name
+      type: object
+      properties:
+        metadata:
+          title: Metadata
+          type: object
+          default: {}
+        created:
+          title: Created
+          type: string
+          format: date-time
+        name:
+          title: Name
+          type: string
+        xpub:
+          title: Xpub
+          type: string
+          default: ''
+        currency:
+          title: Currency
+          type: string
+          default: btc
+        lightning_enabled:
+          title: 'Lightning Enabled'
+          type: boolean
+          default: false
+        label:
+          title: Label
+          type: string
+          default: ''
+        hint:
+          title: Hint
+          type: string
+          default: ''
+        contract:
+          title: Contract
+          type: string
+          default: ''
+        additional_xpub_data:
+          title: 'Additional Xpub Data'
+          type: object
+          default: {}
+        id:
+          title: Id
+          type: string
+        user_id:
+          title: 'User Id'
+          type: string
+        error:
+          title: Error
+          type: boolean
+          default: false
+        balance:
+          title: Balance
+          type: string
+        xpub_name:
+          title: 'Xpub Name'
+          type: string
+  securitySchemes:
+    Bearer:
+      type: oauth2
+      description: "Token authorization. Get a token by sending a POST request to `/token` endpoint (JSON-mode, preferred)\nor `/token/oauth2` OAuth2-compatible endpoint.\nEnsure to use only those permissions that your app actually needs. `full_control` gives access to all permissions of a user\nTo authorize, send an `Authorization` header with value of `Bearer <token>` (replace `<token>` with your token)\n"
+      flows:
+        password:
+          scopes:
+            {
+              server_management: 'Edit server settings',
+              token_management: 'Create, list or edit tokens',
+              wallet_management: 'Create, list or edit wallets',
+              store_management: 'Create, list or edit stores',
+              discount_management: 'Create, list or edit discounts',
+              product_management: 'Create, list or edit products',
+              invoice_management: 'Create, list or edit invoices',
+              payout_management: 'Create, list or edit payouts',
+              notification_management: 'Create, list or edit notification providers',
+              template_management: 'Create, list or edit templates',
+              file_management: 'Create, list or edit files',
+              full_control: 'Full control over what current user has'
+            }
+          tokenUrl: /token/oauth2
+    BearerOptional:
+      type: oauth2
+      description: 'Same as Bearer, but not required. Logic for unauthorized users depends on current endpoint'
+      flows:
+        password:
+          scopes:
+            {
+              server_management: 'Edit server settings',
+              token_management: 'Create, list or edit tokens',
+              wallet_management: 'Create, list or edit wallets',
+              store_management: 'Create, list or edit stores',
+              discount_management: 'Create, list or edit discounts',
+              product_management: 'Create, list or edit products',
+              invoice_management: 'Create, list or edit invoices',
+              payout_management: 'Create, list or edit payouts',
+              notification_management: 'Create, list or edit notification providers',
+              template_management: 'Create, list or edit templates',
+              file_management: 'Create, list or edit files',
+              full_control: 'Full control over what current user has'
+            }
+          tokenUrl: /token/oauth2

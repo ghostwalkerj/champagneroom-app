@@ -25,6 +25,12 @@
       "$stores": [
         "./src/stores"
       ],
+      "$ext": [
+        "./src/lib/ext"
+      ],
+      "$ext/*": [
+        "./src/lib/ext/*"
+      ],
     },
   }
 }

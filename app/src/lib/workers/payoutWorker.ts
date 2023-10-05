@@ -3,24 +3,30 @@ import type { Job, Queue } from 'bullmq';
 import { Worker } from 'bullmq';
 import type IORedis from 'ioredis';
 
-import {
-  getInvoiceByIdInvoicesModelIdGet,
-  refundInvoiceInvoicesModelIdRefundsPost
-} from '$lib/bitcart';
-import type { DisplayInvoice } from '$lib/bitcart/models';
 import { EntityType } from '$lib/constants';
+import {
+  batchActionsOnPayoutsPayoutsBatchPost,
+  getInvoiceByIdInvoicesModelIdGet,
+  modifyPayoutPayoutsModelIdPatch,
+  refundInvoiceInvoicesModelIdRefundsPost,
+  submitRefundInvoicesRefundsRefundIdSubmitPost
+} from '$lib/ext/bitcart';
+import type { DisplayInvoice } from '$lib/ext/bitcart/models';
+import type { PaymentType } from '$lib/util/payment';
 import { InvoiceStatus, PayoutType } from '$lib/util/payment';
 
 export const getPayoutWorker = ({
   payoutQueue,
   redisConnection,
   paymentAuthToken,
-  paymentPeriod = 6_000_000 / 60 / 1000
+  paymentPeriod = 6_000_000 / 60 / 1000,
+  paymentNotificationUrl = ''
 }: {
   payoutQueue: PayoutQueueType;
   redisConnection: IORedis;
   paymentAuthToken: string;
   paymentPeriod: number;
+  paymentNotificationUrl: string;
 }) => {
   return new Worker(
     EntityType.PAYOUT,
@@ -29,11 +35,6 @@ export const getPayoutWorker = ({
 
       switch (payoutType) {
         case PayoutType.REFUND: {
-          const ticketId = job.data.ticketId;
-          if (!ticketId) {
-            return;
-          }
-
           const invoiceId = job.data.invoiceId;
           if (!invoiceId) {
             return;
@@ -46,7 +47,6 @@ export const getPayoutWorker = ({
             }
           })) as AxiosResponse<DisplayInvoice>;
           const invoice = response.data as DisplayInvoice;
-          console.log('invoice', invoice);
 
           // Possible there is unconfirmed payments.  If so, queue it up again and wait for timeout.
           if (
@@ -56,7 +56,6 @@ export const getPayoutWorker = ({
             payoutQueue.add(
               PayoutType.REFUND,
               {
-                ticketId,
                 invoiceId
               },
               { delay: paymentPeriod }
@@ -66,12 +65,14 @@ export const getPayoutWorker = ({
 
           const issueRefund = async () => {
             try {
-              const refund = await refundInvoiceInvoicesModelIdRefundsPost(
+              const payment = invoice.payments?.[0] as PaymentType;
+              const returnAddress = payment.user_address; // Just send the return as lump sum to first address
+              let response = await refundInvoiceInvoicesModelIdRefundsPost(
                 invoiceId,
                 {
-                  amount: 0.005_997_07,
+                  amount: +invoice.sent_amount || 0,
                   currency: invoice.paid_currency || '',
-                  admin_host: 'https://bitcart1.pcall.app/admin',
+                  admin_host: '',
                   send_email: false
                 },
                 {
@@ -81,7 +82,68 @@ export const getPayoutWorker = ({
                   }
                 }
               );
-              console.log('refund', refund);
+              let refund = response.data;
+
+              // Set refund address from the original invoice
+              response = await submitRefundInvoicesRefundsRefundIdSubmitPost(
+                refund.id,
+                { destination: returnAddress },
+                {
+                  headers: {
+                    Authorization: `Bearer ${paymentAuthToken}`,
+                    'Content-Type': 'application/json'
+                  }
+                }
+              );
+
+              refund = response.data;
+
+              if (!refund.payout_id) {
+                throw new Error('No payout ID returned from Bitcart API');
+              }
+
+              // Set the notification URL for the payout
+              response = await modifyPayoutPayoutsModelIdPatch(
+                refund.payout_id,
+                {
+                  notification_url: paymentNotificationUrl
+                },
+                {
+                  headers: {
+                    Authorization: `Bearer ${paymentAuthToken}`,
+                    'Content-Type': 'application/json'
+                  }
+                }
+              );
+
+              // Approve the payout
+              response = await batchActionsOnPayoutsPayoutsBatchPost(
+                {
+                  ids: [refund.payout_id],
+                  command: 'approve'
+                },
+                {
+                  headers: {
+                    Authorization: `Bearer ${paymentAuthToken}`,
+                    'Content-Type': 'application/json'
+                  }
+                }
+              );
+
+              // Send the payout
+              // Approve the payout
+              response = await batchActionsOnPayoutsPayoutsBatchPost(
+                {
+                  ids: [refund.payout_id],
+                  command: 'send'
+                },
+                {
+                  headers: {
+                    Authorization: `Bearer ${paymentAuthToken}`,
+                    'Content-Type': 'application/json'
+                  }
+                }
+              );
             } catch (error_) {
               console.error(error_);
             }

@@ -4,9 +4,10 @@ import type { AxiosResponse } from 'axios';
 import { BITCART_EMAIL, BITCART_PASSWORD } from '$env/static/private';
 import { PUBLIC_BITCART_API_URL } from '$env/static/public';
 
-import { getInvoiceByIdInvoicesModelIdGet } from '$lib/bitcart';
-import type { DisplayInvoice } from '$lib/bitcart/models';
 import { createAuthToken } from '$lib/util/payment';
+
+import { getInvoiceByIdInvoicesModelIdGet } from '../../../../../../lib/ext/bitcart';
+import type { DisplayInvoice } from '../../../../../../lib/ext/bitcart/models';
 
 import type { RequestHandler } from './$types';
 

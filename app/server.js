@@ -79,7 +79,10 @@ if (startWorker) {
     payoutQueue,
     redisConnection,
     paymentAuthToken,
-    paymentPeriod: +(process.env.PUBLIC_PAYMENT_PERIOD || 6_000_000) / 60 / 1000
+    paymentPeriod:
+      +(process.env.PUBLIC_PAYMENT_PERIOD || 6_000_000) / 60 / 1000,
+    paymentNotificationUrl:
+      process.env.PUBLIC_BITCART_PAYOUT_NOTIFICATION_PATH || ''
   });
   paymentWorker.run();
 }
