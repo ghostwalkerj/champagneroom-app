@@ -15,8 +15,9 @@ import type {
   DisputeType,
   FeedbackType,
   FinalizeType,
-  RefundReason
+  RefundType
 } from '$lib/models/common';
+import { RefundReason } from '$lib/models/common';
 import type { TicketDocumentType, TicketStateType } from '$lib/models/ticket';
 import { TicketStatus } from '$lib/models/ticket';
 import type { TransactionDocumentType } from '$lib/models/transaction';
@@ -28,7 +29,7 @@ import { ActorType } from '$lib/constants';
 import { ShowMachineEventString } from './showMachine';
 
 export enum TicketMachineEventString {
-  CANCELLATION_INITIATED = 'CANCELLATION INITIATED',
+  CANCELLATION_REQUESTED = 'CANCELLATION REQUESTED',
   REFUND_RECEIVED = 'REFUND RECEIVED',
   PAYMENT_INITIATED = 'PAYMENT INITIATED',
   PAYMENT_RECEIVED = 'PAYMENT RECEIVED',
@@ -44,13 +45,20 @@ export enum TicketMachineEventString {
 }
 type TicketMachineEventType =
   | {
-      type: 'CANCELLATION INITIATED';
+      type: 'CANCELLATION REQUESTED';
       cancel: CancelType;
     }
   | {
       type: 'REFUND RECEIVED';
       transaction: TransactionDocumentType;
-      reason: RefundReason;
+    }
+  | {
+      type: 'REFUND REQUESTED';
+      refund: RefundType;
+    }
+  | {
+      type: 'REFUND INITATED';
+      refund: RefundType;
     }
   | {
       type: 'PAYMENT RECEIVED';
@@ -117,7 +125,6 @@ const createTicketMachine = ({
       predictableActionArguments: true,
       id: 'ticketMachine',
       initial: 'ticketLoaded',
-
       states: {
         ticketLoaded: {
           always: [
@@ -138,6 +145,14 @@ const createTicketMachine = ({
               cond: 'ticketFullyPaid'
             },
             {
+              target: '#ticketMachine.reserved.refundRequested',
+              cond: 'ticketHasRefundRequested'
+            },
+            {
+              target: '#ticketMachine.reserved.waiting4Refund',
+              cond: 'ticketIsWaitingForRefund'
+            },
+            {
               target: 'cancelled',
               cond: 'ticketCancelled'
             },
@@ -148,10 +163,6 @@ const createTicketMachine = ({
             {
               target: 'redeemed',
               cond: 'ticketRedeemed'
-            },
-            {
-              target: '#ticketMachine.reserved.initiatedCancellation',
-              cond: 'ticketInCancellationInitiated'
             },
             {
               target: '#ticketMachine.ended.inEscrow',
@@ -170,40 +181,21 @@ const createTicketMachine = ({
         reserved: {
           initial: 'waiting4Payment',
           on: {
-            'CANCELLATION INITIATED': {
-              target: '#ticketMachine.reserved.initiatedCancellation',
-              actions: ['initiateCancellation']
-            },
-            'PAYMENT RECEIVED': [
-              {
-                target: '#ticketMachine.reserved.waiting4Show',
-                cond: 'fullyPaid',
-                actions: ['receivePayment', 'setFullyPaid', 'sendTicketSold']
-              },
-              {
-                target: '#ticketMachine.reserved.receivedPayment',
-                actions: ['receivePayment']
-              }
-            ]
+            'SHOW CANCELLED': {
+              target: '#ticketMachine.reserved.waiting4Refund',
+              actions: ['refundCancelledShow']
+            }
           },
           states: {
             waiting4Payment: {
               on: {
                 'SHOW CANCELLED': {
                   target: '#ticketMachine.cancelled',
-                  actions: [
-                    'initiateCancellation',
-                    'cancelTicket',
-                    'sendTicketCancelled'
-                  ]
+                  actions: ['cancelTicket', 'sendTicketCancelled']
                 },
-                'CANCELLATION INITIATED': {
+                'CANCELLATION REQUESTED': {
                   target: '#ticketMachine.cancelled',
-                  actions: [
-                    'initiateCancellation',
-                    'cancelTicket',
-                    'sendTicketCancelled'
-                  ]
+                  actions: ['cancelTicket', 'sendTicketCancelled']
                 },
                 'PAYMENT INITIATED': {
                   target: 'initiatedPayment',
@@ -211,38 +203,85 @@ const createTicketMachine = ({
                 }
               }
             },
-            initiatedPayment: {},
-            receivedPayment: {},
+            initiatedPayment: {
+              on: {
+                'PAYMENT RECEIVED': [
+                  {
+                    target: '#ticketMachine.reserved.waiting4Show',
+                    cond: 'fullyPaid',
+                    actions: [
+                      'receivePayment',
+                      'setFullyPaid',
+                      'sendTicketSold'
+                    ]
+                  },
+                  {
+                    target: '#ticketMachine.reserved.receivedPayment',
+                    actions: ['receivePayment']
+                  }
+                ]
+              }
+            },
+            receivedPayment: {
+              // under paid
+              on: {
+                'PAYMENT RECEIVED': [
+                  {
+                    target: '#ticketMachine.reserved.waiting4Show',
+                    cond: 'fullyPaid',
+                    actions: [
+                      'receivePayment',
+                      'setFullyPaid',
+                      'sendTicketSold'
+                    ]
+                  },
+                  {
+                    actions: ['receivePayment']
+                  }
+                ],
+                'REFUND REQUESTED': {
+                  target: 'refundRequested',
+                  actions: ['requestRefund']
+                }
+              }
+            },
             waiting4Show: {
               on: {
                 'TICKET REDEEMED': {
                   target: '#ticketMachine.redeemed',
                   cond: 'canWatchShow',
                   actions: ['redeemTicket', 'sendTicketRedeemed']
+                },
+                'REFUND REQUESTED': {
+                  target: 'refundRequested',
+                  actions: ['requestRefund']
                 }
               }
             },
-            initiatedCancellation: {
-              initial: 'waiting4Refund',
-              states: {
-                waiting4Refund: {
-                  on: {
-                    'REFUND RECEIVED': [
-                      {
-                        target: '#ticketMachine.cancelled',
-                        cond: 'fullyRefunded',
-                        actions: [
-                          'receiveRefund',
-                          'cancelTicket',
-                          'sendTicketRefunded'
-                        ]
-                      },
-                      {
-                        actions: ['receiveRefund']
-                      }
-                    ]
-                  }
+            refundRequested: {
+              on: {
+                'REFUND INITATED': {
+                  target: 'waiting4Refund',
+                  actions: ['initiateRefund']
                 }
+              }
+            },
+            waiting4Refund: {
+              on: {
+                'REFUND RECEIVED': [
+                  {
+                    target: '#ticketMachine.cancelled',
+                    cond: 'fullyRefunded',
+                    actions: [
+                      'receiveRefund',
+                      'cancelTicket',
+                      'sendTicketRefunded'
+                    ]
+                  },
+                  {
+                    actions: ['receiveRefund']
+                  }
+                ]
               }
             }
           }
@@ -329,10 +368,6 @@ const createTicketMachine = ({
         }
       },
       on: {
-        'SHOW CANCELLED': {
-          target: '#ticketMachine.reserved.initiatedCancellation',
-          actions: ['initiateCancellation']
-        },
         'SHOW ENDED': {
           target: '#ticketMachine.ended',
           actions: ['endShow']
@@ -439,12 +474,23 @@ const createTicketMachine = ({
           );
         },
 
-        initiateCancellation: assign((context, event) => {
+        refundCancelledShow: assign((context, event) => {
+          const state = context.ticketState;
+          const refund = {
+            _id: new Types.ObjectId(),
+            requestedAt: new Date(),
+            transactions: [] as Types.ObjectId[],
+            amountRefunded: 0,
+            requestedAmount: state.totalPaid,
+            approvedAmount: state.totalPaid,
+            reason: RefundReason.SHOW_CANCELLED
+          };
           return {
             ticketState: {
               ...context.ticketState,
-              status: TicketStatus.CANCELLATION_INITIATED,
-              cancel: event.cancel
+              status: TicketStatus.REFUND_REQUESTED,
+              cancel: event.cancel,
+              refund
             }
           };
         }),
@@ -507,17 +553,34 @@ const createTicketMachine = ({
             }
           };
         }),
-
+        requestRefund: assign((context, event) => {
+          return {
+            ticketState: {
+              ...context.ticketState,
+              status: TicketStatus.REFUND_REQUESTED,
+              refund: event.refund
+            }
+          };
+        }),
+        initiateRefund: assign((context, event) => {
+          return {
+            ticketState: {
+              ...context.ticketState,
+              status: TicketStatus.WAITING_FOR_REFUND,
+              refund: event.refund
+            }
+          };
+        }),
         receiveRefund: assign((context, event) => {
           const state = context.ticketState;
           const refund = state.refund || {
             _id: new Types.ObjectId(),
-            refundedAt: new Date(),
-            transactions: [],
-            amount: 0,
-            reason: event.reason
+            requestedAt: new Date(),
+            transactions: [] as Types.ObjectId[],
+            amountRefunded: 0,
+            reason: RefundReason.UNKNOWN
           };
-          refund.amount += +event.transaction.total;
+          refund.amountRefunded += +event.transaction.total;
           refund.transactions.push(event.transaction._id);
           return {
             ticketState: {
@@ -627,8 +690,10 @@ const createTicketMachine = ({
           context.ticketState.status === TicketStatus.PAYMENT_RECEIVED,
         ticketFullyPaid: (context) =>
           context.ticketState.status === TicketStatus.FULLY_PAID,
-        ticketInCancellationInitiated: (context) =>
-          context.ticketState.status === TicketStatus.CANCELLATION_INITIATED,
+        ticketHasRefundRequested: (context) =>
+          context.ticketState.status === TicketStatus.REFUND_REQUESTED,
+        ticketIsWaitingForRefund: (context) =>
+          context.ticketState.status === TicketStatus.WAITING_FOR_REFUND,
         ticketMissedShow: (context) =>
           context.ticketState.status === TicketStatus.MISSED_SHOW,
         fullyPaid: (context, event) => {
@@ -646,15 +711,17 @@ const createTicketMachine = ({
           );
         },
         fullyRefunded: (context, event) => {
+          const refundApproved =
+            context.ticketState.refund?.approvedAmount || 0;
           const value =
             event.type === 'REFUND RECEIVED' ? event.transaction?.total : 0;
-          return (
-            context.ticketState.totalRefunded + +value >=
-            context.ticketState.totalPaid
-          );
+          return context.ticketState.totalRefunded + +value >= refundApproved;
         },
         canWatchShow: (context) => {
-          return context.ticketState.totalPaid >= context.ticketDocument.price;
+          return (
+            context.ticketState.status === TicketStatus.REDEEMED ||
+            context.ticketState.status === TicketStatus.FULLY_PAID
+          );
         }
       }
     }

@@ -1,4 +1,4 @@
-import { Schema, type InferSchemaType } from 'mongoose';
+import { type InferSchemaType, Schema } from 'mongoose';
 import validator from 'validator';
 
 import { ActorType } from '$lib/constants';
@@ -37,8 +37,9 @@ export enum DisputeReason {
 
 export enum RefundReason {
   SHOW_CANCELLED = 'SHOW CANCELLED',
-  TICKET_CANCELLED = 'TICKET CANCELLED',
-  DISPUTE_DECISION = 'DISPUTE DECISION'
+  CUSTOMER_CANCELLED = 'CUSTOMER CANCELLED',
+  DISPUTE_DECISION = 'DISPUTE DECISION',
+  UNKNOWN = 'UNKNOWN'
 }
 
 export const cancelSchema = new Schema({
@@ -96,11 +97,18 @@ export const finalizeSchema = new Schema({
 export const refundSchema = new Schema({
   // eslint-disable-next-line @typescript-eslint/naming-convention
   _id: { type: Schema.Types.ObjectId, auto: true },
-  refundedAt: { type: Date, default: new Date() },
+  requestedAt: { type: Date, default: new Date() },
   transactions: [
-    { type: Schema.Types.ObjectId, ref: 'Transaction', required: true }
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'Transaction',
+      required: true,
+      default: []
+    }
   ],
-  amount: { type: Number, required: true, default: 0 },
+  requestedAmount: { type: Number },
+  approvedAmount: { type: Number },
+  amountRefunded: { type: Number, required: true, default: 0 },
   reason: { type: String, enum: RefundReason, required: true }
 });
 
@@ -109,7 +117,12 @@ export const saleSchema = new Schema({
   _id: { type: Schema.Types.ObjectId, auto: true },
   soldAt: { type: Date, default: new Date() },
   transactions: [
-    { type: Schema.Types.ObjectId, ref: 'Transaction', required: true }
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'Transaction',
+      required: true,
+      default: []
+    }
   ],
   amount: { type: Number, required: true, default: 0 }
 });
