@@ -2,42 +2,45 @@
   import { onMount } from 'svelte';
   import { QRCodeImage } from 'svelte-qrcode-image';
 
-  import { TicketStatus, type TicketDocumentType } from '$lib/models/ticket';
+  import { type TicketDocumentType, TicketStatus } from '$lib/models/ticket';
 
-  import type { DisplayInvoice } from '$lib/bitcart/models';
   import { currencyFormatter, durationFormatter } from '$lib/constants';
   import type { PaymentType } from '$lib/util/payment';
   import { InvoiceStatus } from '$lib/util/payment';
+
+  import type { DisplayInvoice } from '$ext/bitcart/models';
 
   export let invoice: DisplayInvoice;
   export let ticket: TicketDocumentType;
 
   const ticketStatus = ticket.ticketState.status;
-  const invoiceStatus = invoice.status;
   let invoiceTimeLeft = invoice.time_left;
 
   const currentPayment = invoice?.payments?.[
     invoice?.payments?.length - 1
   ] as PaymentType;
 
-  let invoiceState = invoiceStatus;
+  let invoiceStatus = '';
 
-  switch (invoiceStatus) {
+  switch (invoice.status) {
     case InvoiceStatus.EXPIRED: {
-      invoiceState = 'Invoice Expired';
+      invoiceStatus = 'Invoice Expired';
       break;
     }
     case InvoiceStatus.COMPLETE: {
-      invoiceState = 'Invoice Paid';
+      invoiceStatus = 'Invoice Paid';
       break;
     }
     case InvoiceStatus.INVALID: {
-      invoiceState = 'Invoice Invalid';
+      invoiceStatus = 'Invoice Invalid';
+      break;
+    }
+    case InvoiceStatus.REFUNDED: {
+      invoiceStatus = 'Invoice Refunded';
       break;
     }
     default: {
-      invoiceState =
-        'Please pay with your connected wallet before Time Left to Pay runs out';
+      invoiceStatus = '';
     }
   }
 
@@ -58,11 +61,11 @@
 <div
   class="relative flex justify-center font-CaviarDreams text-info text-center"
 >
-  {#if invoiceStatus === InvoiceStatus.EXPIRED || invoiceStatus === InvoiceStatus.COMPLETE || invoiceStatus === InvoiceStatus.INVALID}
+  {#if invoice.status === InvoiceStatus.EXPIRED || invoice.status === InvoiceStatus.COMPLETE || invoice.status === InvoiceStatus.INVALID || invoice.status === InvoiceStatus.REFUNDED}
     <div
       class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-6xl whitespace-nowrap font-extrabold text-primary ring-2 ring-primary p-2 rounded-xl z-20 -rotate-[20deg] capitalize"
     >
-      {invoiceState}
+      {invoiceStatus}
     </div>
   {/if}
 
@@ -73,7 +76,7 @@
       {ticket.currency} equivalent )
     </div>
     <div class="grid grid-cols-2">
-      {#if ticketStatus !== TicketStatus.CANCELLED && invoiceStatus !== InvoiceStatus.COMPLETE}
+      {#if ticketStatus !== TicketStatus.CANCELLED && invoice.status !== InvoiceStatus.COMPLETE && invoice.status !== InvoiceStatus.INVALID && invoice.status !== InvoiceStatus.REFUNDED}
         <div class:text-warning={invoiceTimeLeft < 600}>
           <span class="font-bold">Time Left to Pay: </span>{invoiceTimeLeft
             ? durationFormatter(invoiceTimeLeft)

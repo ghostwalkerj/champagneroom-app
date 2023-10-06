@@ -13,7 +13,7 @@
   } from '$env/static/public';
 
   import { CancelReason, DisputeReason } from '$lib/models/common';
-  import { ShowStatus, type ShowDocumentType } from '$lib/models/show';
+  import { type ShowDocumentType, ShowStatus } from '$lib/models/show';
   import type { TicketDocumentType } from '$lib/models/ticket';
 
   import type { TicketMachineServiceType } from '$lib/machines/ticketMachine';
@@ -123,14 +123,7 @@
     canWatchShow =
       state.matches('reserved.waiting4Show') || state.matches('redeemed');
     hasPaymentSent = state.matches('reserved.initiatedPayment');
-    canCancelTicket = state.can({
-      type: 'CANCELLATION INITIATED',
-      cancel: {
-        cancelledAt: new Date(),
-        cancelledBy: ActorType.CUSTOMER,
-        reason: CancelReason.CUSTOMER_CANCELLED
-      }
-    });
+    canCancelTicket = state.matches('reserved.waiting4Show');
     canLeaveFeedback = state.can({
       type: 'FEEDBACK RECEIVED',
       feedback: {
