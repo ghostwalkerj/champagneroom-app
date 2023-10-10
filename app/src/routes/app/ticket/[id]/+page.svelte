@@ -123,7 +123,9 @@
     canWatchShow =
       state.matches('reserved.waiting4Show') || state.matches('redeemed');
     hasPaymentSent = state.matches('reserved.initiatedPayment');
-    canCancelTicket = state.matches('reserved.waiting4Show');
+    canCancelTicket =
+      state.matches('reserved.waiting4Show') ||
+      state.matches('reserved.waiting4Payment');
     canLeaveFeedback = state.can({
       type: 'FEEDBACK RECEIVED',
       feedback: {

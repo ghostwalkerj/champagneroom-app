@@ -2,6 +2,10 @@ import type { AxiosResponse } from 'axios';
 import type { Job, Queue } from 'bullmq';
 import { Worker } from 'bullmq';
 import type IORedis from 'ioredis';
+import { Types } from 'mongoose';
+
+import { CancelReason } from '$lib/models/common';
+import { Ticket } from '$lib/models/ticket';
 
 import { EntityType } from '$lib/constants';
 import {
@@ -13,7 +17,7 @@ import {
 } from '$lib/ext/bitcart';
 import type { DisplayInvoice } from '$lib/ext/bitcart/models';
 import type { PaymentType } from '$lib/util/payment';
-import { InvoiceStatus, PayoutJobType } from '$lib/util/payment';
+import { InvoiceStatus, PayoutJobType, PayoutStatus } from '$lib/util/payment';
 
 export const getPayoutWorker = ({
   payoutQueue,
@@ -37,6 +41,11 @@ export const getPayoutWorker = ({
         case PayoutJobType.CREATE_REFUND: {
           const invoiceId = job.data.invoiceId;
           if (!invoiceId) {
+            return;
+          }
+
+          const ticketId = job.data.ticketId;
+          if (!ticketId) {
             return;
           }
 
@@ -67,6 +76,23 @@ export const getPayoutWorker = ({
             try {
               const payment = invoice.payments?.[0] as PaymentType;
               const returnAddress = payment.user_address; // Just send the return as lump sum to first address
+
+              // create ticket refund
+              const ticket = await Ticket.findById(ticketId);
+              if (!ticket) {
+                throw new Error('Ticket not found');
+              }
+
+              const ticketRefund = ticket.ticketState.refund ?? {
+                _id: new Types.ObjectId(),
+                requestedAt: new Date(),
+                reason: CancelReason.CUSTOMER_CANCELLED,
+                currency: ticket.currency,
+                requestedAmounts: ticket.ticketState.totalPaid,
+                transactions: [],
+                amountRefunded: 0
+              };
+
               let response = await refundInvoiceInvoicesModelIdRefundsPost(
                 invoiceId,
                 {
@@ -155,6 +181,17 @@ export const getPayoutWorker = ({
         case PayoutJobType.PAYOUT_UPDATE: {
           console.log('Payout update');
           console.log('Status', job.data.status);
+
+          switch (job.data.status) {
+            case PayoutStatus.SENT: {
+              // update ticket with refund status if this is a refund
+              break;
+            }
+
+            default: {
+              break;
+            }
+          }
         }
 
         default: {

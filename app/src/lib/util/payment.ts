@@ -26,6 +26,15 @@ export enum PayoutJobType {
   PAYOUT_UPDATE = 'PAYOUT_UPDATE'
 }
 
+export enum PayoutStatus {
+  PENDING = 'pending',
+  APPROVED = 'approved',
+  CANCELLED = 'cancelled',
+  FAILED = 'failed',
+  SENT = 'sent',
+  COMPLETE = 'complete'
+}
+
 export const createAuthToken = async (
   email: string,
   password: string,

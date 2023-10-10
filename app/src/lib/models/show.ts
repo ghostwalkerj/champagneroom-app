@@ -4,7 +4,13 @@ import { fieldEncryption } from 'mongoose-field-encryption';
 import { nanoid } from 'nanoid';
 
 import type { refundSchema, saleSchema } from './common';
-import { cancelSchema, escrowSchema, finalizeSchema } from './common';
+import {
+  cancelSchema,
+  CurrencyType,
+  escrowSchema,
+  finalizeSchema,
+  moneySchema
+} from './common';
 
 const { Schema, models } = pkg;
 export const SaveState = (show: ShowType, newState: ShowStateType) => {
@@ -103,28 +109,32 @@ const salesStatsSchema = new Schema({
     }
   },
   totalSales: {
-    type: Number,
-    default: 0,
-    validate: {
-      validator: Number.isInteger,
-      message: '{VALUE} is not an integer value'
-    }
+    type: Map,
+    required: true,
+    of: Number,
+    default: new Map<CurrencyType, number>()
   },
   totalRefunded: {
-    type: Number,
-    default: 0,
-    validate: {
-      validator: Number.isInteger,
-      message: '{VALUE} is not an integer value'
-    }
+    type: Map,
+    required: true,
+    of: Number,
+    default: new Map<CurrencyType, number>()
   },
   totalRevenue: {
-    type: Number,
-    default: 0,
-    validate: {
-      validator: Number.isInteger,
-      message: '{VALUE} is not an integer value'
-    }
+    type: Map,
+    required: true,
+    of: Number,
+    default: new Map<CurrencyType, number>()
+  },
+  totalRevenueInShowCurrency: {
+    type: moneySchema,
+    required: true,
+    default: { amount: 0, currency: CurrencyType.USD }
+  },
+  totalRefundedInShowCurrency: {
+    type: moneySchema,
+    required: true,
+    default: { amount: 0, currency: CurrencyType.USD }
   }
 });
 
@@ -297,8 +307,11 @@ const showSchema = new Schema(
         message: '{VALUE} is not an integer value'
       }
     },
-    price: { type: Number, required: true, min: 1 },
-    currency: { type: String, required: true, default: 'USD' },
+    price: {
+      type: moneySchema,
+      required: true,
+      default: { amount: 0, currency: CurrencyType.USD }
+    },
     creatorInfo: {
       type: {
         name: { type: String, required: true },

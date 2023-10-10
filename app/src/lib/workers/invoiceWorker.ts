@@ -2,10 +2,12 @@ import type { AxiosResponse } from 'axios';
 import type { Job, Queue } from 'bullmq';
 import { Worker } from 'bullmq';
 import type IORedis from 'ioredis';
-import { Types } from 'mongoose';
+import { connection, Types } from 'mongoose';
 
 import { CancelReason, type CancelType } from '$lib/models/common';
+import type { TicketDocumentType, TicketType } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
+import type { TransactionType } from '$lib/models/transaction';
 import { Transaction, TransactionReasonType } from '$lib/models/transaction';
 
 import { TicketMachineEventString } from '$lib/machines/ticketMachine';
@@ -13,16 +15,21 @@ import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 import { ActorType, EntityType } from '$lib/constants';
 import {
   getInvoiceByIdInvoicesModelIdGet,
+  getPayoutByIdPayoutsModelIdGet,
+  getRefundInvoicesRefundsRefundIdGet,
   modifyInvoiceInvoicesModelIdPatch,
   updatePaymentDetailsInvoicesModelIdDetailsPatch
 } from '$lib/ext/bitcart';
-import type { DisplayInvoice } from '$lib/ext/bitcart/models';
+import type { DisplayInvoice, DisplayPayout } from '$lib/ext/bitcart/models';
 import {
   InvoiceJobType,
   InvoiceStatus,
   type PaymentType
 } from '$lib/util/payment';
-import { getTicketMachineServiceFromId } from '$lib/util/util.server';
+import {
+  getTicketMachineService,
+  getTicketMachineServiceFromId
+} from '$lib/util/util.server';
 
 export const getInvoiceWorker = ({
   redisConnection,
@@ -132,7 +139,7 @@ export const getInvoiceWorker = ({
                 } as CancelType;
 
                 ticketService.send({
-                  type: TicketMachineEventString.CANCELLATION_INITIATED,
+                  type: TicketMachineEventString.CANCELLATION_REQUESTED,
                   cancel
                 });
               };
@@ -175,8 +182,7 @@ export const getInvoiceWorker = ({
                     currency: payment.currency,
                     confirmations: payment.confirmations,
                     total: (+payment.amount * +payment.rate).toFixed(2)
-                  });
-                  console.log('transaction', transaction);
+                  }) as TransactionType;
 
                   await Transaction.create(transaction);
 
@@ -193,6 +199,77 @@ export const getInvoiceWorker = ({
 
             case InvoiceStatus.REFUNDED: {
               console.log('Invoice Refunded');
+              // Get the refund, payout, and ticket
+              // Create a return transaction
+              const refundedInvoice = async (invoice: DisplayInvoice) => {
+                try {
+                  const refundId = invoice.refund_id;
+                  if (!refundId) {
+                    return;
+                  }
+
+                  const ticketId = invoice.order_id;
+                  if (!ticketId) {
+                    return;
+                  }
+
+                  const ticket = (await Ticket.findById(
+                    ticketId
+                  )) as TicketType;
+
+                  let response = await getRefundInvoicesRefundsRefundIdGet(
+                    refundId,
+                    {
+                      headers: {
+                        Authorization: `Bearer ${paymentAuthToken}`,
+                        'Content-Type': 'application/json'
+                      }
+                    }
+                  );
+                  const refund = response.data;
+
+                  const payoutId = refund.payout_id;
+                  if (!payoutId) {
+                    return;
+                  }
+
+                  response = await getPayoutByIdPayoutsModelIdGet(payoutId, {
+                    headers: {
+                      Authorization: `Bearer ${paymentAuthToken}`,
+                      'Content-Type': 'application/json'
+                    }
+                  });
+                  const payout = response.data as unknown as DisplayPayout;
+
+                  if (!payout) {
+                    return;
+                  }
+
+                  // Create transaction for ticket and send to ticket machine
+                  const transaction = new Transaction({
+                    ticket: ticketId,
+                    creator: ticket?.creator,
+                    agent: ticket?.agent,
+                    show: ticket?.show,
+                    payout: payout.tx_hash,
+                    from: ticket.paymentAddress,
+                    to: payout.destination,
+                    reason: TransactionReasonType.TICKET_REFUND,
+                    amount: payout.amount,
+                    currency: payout.currency
+                  });
+
+                  const ticketService = getTicketMachineService(
+                    ticket,
+                    redisConnection
+                  );
+
+
+                } catch (error_) {
+                  console.error(error_);
+                }
+              };
+              refundedInvoice(invoice);
             }
 
             default: {

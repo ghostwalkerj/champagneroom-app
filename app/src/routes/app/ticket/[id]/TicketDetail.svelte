@@ -4,7 +4,7 @@
   import { PUBLIC_SHOW_PATH, PUBLIC_STATIC_URL } from '$env/static/public';
 
   import type { ShowDocumentType } from '$lib/models/show';
-  import { TicketStatus, type TicketDocumentType } from '$lib/models/ticket';
+  import { type TicketDocumentType, TicketStatus } from '$lib/models/ticket';
 
   import { currencyFormatter, durationFormatter } from '$lib/constants';
   export let show: ShowDocumentType;
@@ -19,13 +19,13 @@
 
   // Ticket
   $: ticketStatus = ticket
-    ? ticket.ticketState.totalPaid >= ticket.price
+    ? ticket.ticketState.totalPaid.amount >= ticket.price.amount
       ? 'Paid' + ' ' + ticket.ticketState.status
       : ticket.ticketState.status
     : '';
-  const currency = ticket.currency || 'USD';
+  const currency = ticket.price.currency || 'USD';
   const customerName = ticket.customerName;
-  const ticketPrice = currencyFormatter(currency).format(ticket.price);
+  const ticketPrice = currencyFormatter(currency).format(ticket.price.amount);
 </script>
 
 <div class="flex justify-center font-CaviarDreams">

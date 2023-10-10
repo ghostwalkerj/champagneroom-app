@@ -1,6 +1,7 @@
 import type { InferSchemaType, Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
 
+import type { CurrencyType } from './common';
 import { userSchema } from './common';
 
 const { Schema, models } = pkg;
@@ -23,10 +24,10 @@ const feedbackSchema = new Schema({
 
 const salesSchema = new Schema({
   totalSales: {
-    type: Number,
-    default: 0,
-    min: 0,
-    required: true
+    type: Map,
+    required: true,
+    of: Number,
+    default: new Map<CurrencyType, number>()
   },
   numberOfCompletedShows: {
     type: Number,
@@ -41,10 +42,10 @@ const salesSchema = new Schema({
     required: true
   },
   totalRevenue: {
-    type: Number,
-    default: 0,
-    min: 0,
-    required: true
+    type: Map,
+    required: true,
+    of: Number,
+    default: new Map<CurrencyType, number>()
   }
 });
 

@@ -21,6 +21,11 @@ export enum CancelReason {
   TICKET_PAYMENT_INVALID = 'TICKET PAYMENT INVALID'
 }
 
+export enum CurrencyType {
+  USD = 'USD',
+  ETH = 'ETH'
+}
+
 export enum DisputeDecision {
   NO_REFUND = 'NO REFUND',
   FULL_REFUND = 'FULL REFUND',
@@ -94,6 +99,17 @@ export const finalizeSchema = new Schema({
   finalizedBy: { type: String, enum: ActorType, required: true }
 });
 
+export const moneySchema = new Schema({
+  amount: { type: Number, required: true },
+  currency: {
+    type: String,
+    enum: CurrencyType,
+    required: true,
+    default: CurrencyType.USD
+  },
+  rate: { type: Number, default: 0 }
+});
+
 export const refundSchema = new Schema({
   // eslint-disable-next-line @typescript-eslint/naming-convention
   _id: { type: Schema.Types.ObjectId, auto: true },
@@ -106,9 +122,29 @@ export const refundSchema = new Schema({
       default: []
     }
   ],
-  requestedAmount: { type: Number },
-  approvedAmount: { type: Number },
-  amountRefunded: { type: Number, required: true, default: 0 },
+  requestedAmounts: {
+    type: Map,
+    required: true,
+    of: Number,
+    default: new Map<CurrencyType, number>()
+  },
+  approvedAmounts: {
+    type: Map,
+    required: true,
+    of: Number,
+    default: new Map<CurrencyType, number>()
+  },
+  totals: {
+    type: Map,
+    required: true,
+    of: Number,
+    default: new Map<CurrencyType, number>()
+  },
+  totalRefundedInShowCurrency: {
+    type: moneySchema,
+    required: true,
+    default: { amount: 0, currency: 'USD' }
+  },
   reason: { type: String, enum: RefundReason, required: true }
 });
 
@@ -124,7 +160,17 @@ export const saleSchema = new Schema({
       default: []
     }
   ],
-  amount: { type: Number, required: true, default: 0 }
+  totals: {
+    type: Map,
+    required: true,
+    of: Number,
+    default: new Map<CurrencyType, number>()
+  },
+  totalPaidInShowCurrency: {
+    type: moneySchema,
+    required: true,
+    default: { amount: 0, currency: 'USD' }
+  }
 });
 
 export const userSchema = new Schema(
@@ -178,10 +224,14 @@ export const userSchema = new Schema(
 );
 
 export type CancelType = InferSchemaType<typeof cancelSchema>;
+
 export type DisputeType = InferSchemaType<typeof disputeSchema>;
 export type EscrowType = InferSchemaType<typeof escrowSchema>;
 export type FeedbackType = InferSchemaType<typeof feedbackSchema>;
 export type FinalizeType = InferSchemaType<typeof finalizeSchema>;
+
+export type MoneyType = InferSchemaType<typeof moneySchema>;
 export type RefundType = InferSchemaType<typeof refundSchema>;
 export type SaleType = InferSchemaType<typeof saleSchema>;
+
 export type UserType = InferSchemaType<typeof userSchema>;

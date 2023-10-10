@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
-import { on } from 'node:events';
-
 import type { Queue } from 'bullmq';
 import { Types } from 'mongoose';
 import { nanoid } from 'nanoid';
@@ -11,10 +9,12 @@ import { raise } from 'xstate/lib/actions';
 
 import type {
   CancelType,
+  CurrencyType,
   DisputeDecision,
   DisputeType,
   FeedbackType,
   FinalizeType,
+  MoneyType,
   RefundType
 } from '$lib/models/common';
 import { RefundReason } from '$lib/models/common';
@@ -41,7 +41,8 @@ export enum TicketMachineEventString {
   SHOW_CANCELLED = 'SHOW CANCELLED',
   TICKET_FINALIZED = 'TICKET FINALIZED',
   DISPUTE_RESOLVED = 'DISPUTE RESOLVED',
-  TICKET_REDEEMED = 'TICKET REDEEMED'
+  TICKET_REDEEMED = 'TICKET REDEEMED',
+  REFUND_REQUESTED = 'REFUND REQUESTED'
 }
 type TicketMachineEventType =
   | {
@@ -57,7 +58,7 @@ type TicketMachineEventType =
       refund: RefundType;
     }
   | {
-      type: 'REFUND INITATED';
+      type: 'REFUND INITIATED';
       refund: RefundType;
     }
   | {
@@ -260,7 +261,7 @@ const createTicketMachine = ({
             },
             refundRequested: {
               on: {
-                'REFUND INITATED': {
+                'REFUND INITIATED': {
                   target: 'waiting4Refund',
                   actions: ['initiateRefund']
                 }
@@ -480,10 +481,18 @@ const createTicketMachine = ({
             _id: new Types.ObjectId(),
             requestedAt: new Date(),
             transactions: [] as Types.ObjectId[],
-            amountRefunded: 0,
-            requestedAmount: state.totalPaid,
-            approvedAmount: state.totalPaid,
-            reason: RefundReason.SHOW_CANCELLED
+            actualAmounts: new Map<CurrencyType, number>(),
+            requestedAmounts:
+              state.sale?.totals || new Map<CurrencyType, number>(),
+            approvedAmounts:
+              state.sale?.totals || new Map<CurrencyType, number>(),
+            reason: RefundReason.SHOW_CANCELLED,
+            totals: new Map<CurrencyType, number>(),
+            totalRefundedInShowCurrency: {
+              amount: 0,
+              currency: context.ticketDocument.price.currency,
+              rate: 1
+            }
           };
           return {
             ticketState: {
@@ -539,20 +548,36 @@ const createTicketMachine = ({
           const sale = context.ticketState.sale || {
             _id: new Types.ObjectId(),
             soldAt: new Date(),
-            transactions: [],
-            amount: 0
+            transactions: [] as Types.ObjectId[],
+            totals: new Map<CurrencyType, number>()
           };
-          sale.amount += +event.transaction.total;
+          const payment = {
+            amount: +event.transaction.amount,
+            currency: event.transaction.currency.toUpperCase() as CurrencyType,
+            rate: +(event.transaction.rate || 0)
+          };
+
           sale.transactions.push(event.transaction._id);
+          const total = sale.totals.get(payment.currency) || 0 + payment.amount;
+          sale.totals.set(payment.currency, total);
+
+          const showAmount =
+            context.ticketState.sale?.totalPaidInShowCurrency.amount ||
+            0 + payment.amount * payment.rate;
+          const totalPaidInShowCurrency = {
+            amount: showAmount,
+            currency: payment.currency,
+            rate: 1
+          };
+
           return {
             ticketState: {
               ...context.ticketState,
-              totalPaid:
-                context.ticketState.totalPaid + +event.transaction.total,
-              sale
+              totalPaidInShowCurrency
             }
           };
         }),
+
         requestRefund: assign((context, event) => {
           return {
             ticketState: {
@@ -562,6 +587,7 @@ const createTicketMachine = ({
             }
           };
         }),
+
         initiateRefund: assign((context, event) => {
           return {
             ticketState: {
@@ -571,23 +597,48 @@ const createTicketMachine = ({
             }
           };
         }),
+
         receiveRefund: assign((context, event) => {
           const state = context.ticketState;
+          const currency = event.transaction.currency.toUpperCase();
+          const payment = {
+            amount: +event.transaction.amount,
+            currency: event.transaction.currency.toUpperCase() as CurrencyType,
+            rate: +(event.transaction.rate || 0)
+          } as MoneyType;
           const refund = state.refund || {
             _id: new Types.ObjectId(),
             requestedAt: new Date(),
             transactions: [] as Types.ObjectId[],
-            amountRefunded: 0,
-            reason: RefundReason.UNKNOWN
+            requestedAmounts: new Map<CurrencyType, number>(),
+            approvedAmounts: new Map<CurrencyType, number>(),
+            reason: RefundReason.UNKNOWN,
+            totals: new Map<CurrencyType, number>(),
+            totalRefundedInShowCurrency: {
+              amount: 0,
+              currency: context.ticketDocument.price.currency,
+              rate: 1
+            }
           };
-          refund.amountRefunded += +event.transaction.total;
-          refund.transactions.push(event.transaction._id);
+
+          const total =
+            refund.totals.get(payment.currency) || 0 + payment.amount;
+          refund.totals.set(payment.currency, total);
+
+          const showAmount =
+            refund.totalRefundedInShowCurrency.amount +
+            payment.amount * payment.rate;
+          const totalRefundedInShowCurrency = {
+            amount: showAmount,
+            currency: context.ticketDocument.price.currency,
+            rate: 1
+          };
+
           return {
             ticketState: {
               ...context.ticketState,
-              totalRefunded:
-                context.ticketState.totalRefunded + +event.transaction.total,
-              refund
+              refund,
+              totalRefundedInShowCurrency
             }
           };
         }),
@@ -697,11 +748,14 @@ const createTicketMachine = ({
         ticketMissedShow: (context) =>
           context.ticketState.status === TicketStatus.MISSED_SHOW,
         fullyPaid: (context, event) => {
-          const value =
-            event.type === 'PAYMENT RECEIVED' ? event.transaction?.total : 0;
+          const amount =
+            event.type === 'PAYMENT RECEIVED' ? +event.transaction?.amount : 0;
+          const totalPaid = amount * +(event.transaction?.rate || 0);
+
           return (
-            context.ticketState.totalPaid + +value >=
-            context.ticketDocument.price
+            (context.ticketState.sale?.totalPaidInShowCurrency.amount || 0) +
+              totalPaid >=
+            context.ticketDocument.price.amount
           );
         },
         showMissed: (context) => {
@@ -711,11 +765,23 @@ const createTicketMachine = ({
           );
         },
         fullyRefunded: (context, event) => {
-          const refundApproved =
-            context.ticketState.refund?.approvedAmount || 0;
-          const value =
-            event.type === 'REFUND RECEIVED' ? event.transaction?.total : 0;
-          return context.ticketState.totalRefunded + +value >= refundApproved;
+          const refund = context.ticketState.refund;
+          if (refund === undefined) return false;
+          const currency = event.transaction.currency.toUpperCase();
+          const refundApproved = refund.approvedAmounts.get(currency) || 0;
+          if (refundApproved === 0) return false;
+          const amount =
+            event.type === 'REFUND RECEIVED' ? +event.transaction?.amount : 0;
+          const totalRefundedAmount = refund.totals.get(currency) || 0 + amount;
+          for (const [_currency, amount] of refund.approvedAmounts) {
+            if (_currency === currency) continue;
+            if (refund.totals.get(_currency) || 0 < amount) return false;
+          }
+
+          const refundedInTransactionCurrency =
+            totalRefundedAmount >= refundApproved;
+
+          return refundedInTransactionCurrency;
         },
         canWatchShow: (context) => {
           return (

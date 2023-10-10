@@ -585,22 +585,15 @@ const createShowMachine = ({
           const st = context.showState;
           const refund = event.refund;
 
-          const ticketsRefunded = st.salesStats.ticketsRefunded + 1;
-          const ticketsSold = st.salesStats.ticketsSold - 1;
-          const totalRefunded = st.salesStats.totalRefunded + refund.amount;
-          const totalRevenue = st.salesStats.totalRevenue - refund.amount;
+          st.salesStats.ticketsRefunded += 1;
+          st.salesStats.ticketsSold -= 1;
+          st.salesStats.totalRefunded.amount + refund.actualAmounts.amount;
+          st.salesStats.totalRevenue.amount - refund.actualAmounts.amount;
           st.refunds.push(refund._id!);
 
           return {
             showState: {
-              ...st,
-              salesStats: {
-                ...st.salesStats,
-                ticketsRefunded,
-                totalRefunded,
-                ticketsSold,
-                totalRevenue
-              }
+              ...st
             }
           };
         }),
@@ -676,21 +669,14 @@ const createShowMachine = ({
         sellTicket: assign((context, event) => {
           const st = context.showState;
           const sale = event.sale;
-          const ticketsSold = st.salesStats.ticketsSold + 1;
-          const ticketsReserved = st.salesStats.ticketsReserved - 1;
-          const totalSales = st.salesStats.totalSales + sale.amount;
-          const totalRevenue = st.salesStats.totalRevenue + sale.amount;
+          st.salesStats.ticketsSold += 1;
+          st.salesStats.ticketsReserved = -1;
+          st.salesStats.totalSales.amount + sale.totals.amount;
+          st.salesStats.totalRevenue.amount + sale.totals.amount;
           st.sales.push(sale._id!);
           return {
             showState: {
-              ...st,
-              salesStats: {
-                ...st.salesStats,
-                ticketsSold,
-                totalSales,
-                ticketsReserved,
-                totalRevenue
-              }
+              ...st
             }
           };
         }),

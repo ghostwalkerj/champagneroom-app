@@ -9,6 +9,7 @@ import {
   escrowSchema,
   feedbackSchema,
   finalizeSchema,
+  moneySchema,
   refundSchema,
   saleSchema
 } from './common';
@@ -51,8 +52,7 @@ const ticketStateSchema = new Schema(
       index: true
     },
     activeState: { type: Boolean, default: true, index: true },
-    totalPaid: { type: Number, default: 0 },
-    totalRefunded: { type: Number, default: 0 },
+
     cancel: cancelSchema,
     redemption: redemptionSchema,
     escrow: escrowSchema,
@@ -74,9 +74,10 @@ const ticketSchema = new Schema(
       maxLength: 50,
       validator: (v: string) => validator.isEthereumAddress(v)
     },
-    price: { type: Number, required: true },
-    currency: { type: String, required: true, default: 'USD' },
-
+    price: {
+      type: moneySchema,
+      required: true
+    },
     show: {
       type: Schema.Types.ObjectId,
       ref: 'Show',

@@ -102,7 +102,8 @@ export const actions: Actions = {
 
     const invoice = await createInvoiceInvoicesPost(
       {
-        price: ticket.price,
+        price: ticket.price.amount,
+        currency: ticket.price.currency,
         store_id: BITCART_STORE_ID,
         expiration: +PUBLIC_PAYMENT_PERIOD / 60 / 1000,
         order_id: ticket._id.toString(),

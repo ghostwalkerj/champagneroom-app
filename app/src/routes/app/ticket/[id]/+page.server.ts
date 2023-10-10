@@ -12,10 +12,12 @@ import type {
   CancelType,
   DisputeReason,
   DisputeType,
-  FeedbackType
+  FeedbackType,
+  RefundType
 } from '$lib/models/common';
 import { CancelReason } from '$lib/models/common';
 import { Show } from '$lib/models/show';
+import type { TicketType } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
 
 import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
@@ -30,7 +32,10 @@ import {
   PayoutJobType
 } from '$lib/util/payment';
 import { verifyPin } from '$lib/util/pin';
-import { getTicketMachineServiceFromId } from '$lib/util/util.server';
+import {
+  getTicketMachineService,
+  getTicketMachineServiceFromId
+} from '$lib/util/util.server';
 
 import { getInvoiceByIdInvoicesModelIdGet } from '../../../../lib/ext/bitcart';
 import type { DisplayInvoice } from '../../../../lib/ext/bitcart/models';
@@ -45,53 +50,66 @@ export const actions: Actions = {
     }
 
     const redisConnection = locals.redisConnection as IORedis;
+    const ticket = (await Ticket.findById(ticketId)) as TicketType;
 
-    const ticketService = await getTicketMachineServiceFromId(
-      ticketId,
-      redisConnection
-    );
+    const ticketService = getTicketMachineService(ticket, redisConnection);
     const state = ticketService.getSnapshot();
     const invoiceId = state.context.ticketDocument.invoiceId;
-    const cancel = {
-      _id: new Types.ObjectId(),
-      cancelledBy: ActorType.CUSTOMER,
-      cancelledInState: JSON.stringify(state.value),
-      reason: CancelReason.CUSTOMER_CANCELLED,
-      cancelledAt: new Date()
-    } as CancelType;
 
-    const cancelEvent = {
-      type: 'CANCELLATION INITIATED',
-      cancel
-    } as TicketMachineEventType;
+    // Cancel the invoice attached to the ticket if no payment has been made
+    if (state.matches('reserved.waiting4Payment')) {
+      const cancel = {
+        _id: new Types.ObjectId(),
+        cancelledBy: ActorType.CUSTOMER,
+        cancelledInState: JSON.stringify(state.value),
+        reason: CancelReason.CUSTOMER_CANCELLED,
+        cancelledAt: new Date()
+      } as CancelType;
 
-    if (state.can(cancelEvent)) {
-      const redisConnection = locals.redisConnection as IORedis;
+      const cancelEvent = {
+        type: 'CANCELLATION REQUESTED',
+        cancel
+      } as TicketMachineEventType;
 
-      // Cancel the invoice attached to the ticket if no payment has been made
-      if (state.matches('reserved.waiting4Payment')) {
-        const invoiceQueue = new Queue(EntityType.INVOICE, {
-          connection: redisConnection
-        });
-        invoiceQueue.add(InvoiceJobType.CANCEL, {
-          invoiceId
-        });
-      }
-
-      // If a payment as been made or in progress, then issue a refund
-      else if (
-        state.matches('reserved.receivedPayment') ||
-        state.matches('reserved.initiatedPayment') ||
-        state.matches('reserved.waiting4Show')
-      ) {
-        const payoutQueue = new Queue(EntityType.PAYOUT, {
-          connection: redisConnection
-        }) as PayoutQueueType;
-        payoutQueue.add(PayoutJobType.CREATE_REFUND, {
-          invoiceId
-        });
-      }
       ticketService.send(cancelEvent);
+
+      const invoiceQueue = new Queue(EntityType.INVOICE, {
+        connection: redisConnection
+      });
+      invoiceQueue.add(InvoiceJobType.CANCEL, {
+        invoiceId
+      });
+    }
+
+    // If a payment as been made or in progress, then issue a refund
+    else if (
+      state.matches('reserved.receivedPayment') ||
+      state.matches('reserved.waiting4Show')
+    ) {
+      // Create refund object
+      const refund = {
+        _id: new Types.ObjectId(),
+        requestedAt: new Date(),
+        reason: CancelReason.CUSTOMER_CANCELLED,
+        currency: ticket.currency,
+        requestedAmounts: ticket.ticketState.totalPaid,
+        transactions: [],
+        amountRefunded: 0
+      } as RefundType;
+
+      // Send refund event
+      ticketService.send({
+        type: TicketMachineEventString.REFUND_REQUESTED,
+        refund
+      });
+
+      const payoutQueue = new Queue(EntityType.PAYOUT, {
+        connection: redisConnection
+      }) as PayoutQueueType;
+      payoutQueue.add(PayoutJobType.CREATE_REFUND, {
+        invoiceId,
+        ticketId
+      });
     }
 
     return {

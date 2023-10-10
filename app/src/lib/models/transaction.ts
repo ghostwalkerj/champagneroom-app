@@ -26,12 +26,6 @@ const transactionSchema = new Schema(
     },
     rate: {
       type: String,
-      required: true,
-      validator: (v: string) => validator.isNumeric(v)
-    },
-    total: {
-      type: String,
-      required: true,
       validator: (v: string) => validator.isNumeric(v)
     },
     currency: { type: String, required: true },

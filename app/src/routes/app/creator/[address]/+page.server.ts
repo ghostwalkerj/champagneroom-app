@@ -66,7 +66,10 @@ export const actions: Actions = {
       .exec()) as CreatorType;
 
     const show = await Show.create({
-      price: +price,
+      price: {
+        amount: +price,
+        currency: 'USD'
+      },
       name,
       duration: +duration,
       capacity: +capacity,

@@ -33,16 +33,16 @@
   $: waterMarkText = showStatus;
   $: name = show.name;
   $: duration = durationFormatter(show.duration * 60);
-  $: price = currencyFormatter().format(show.price);
+  $: price = currencyFormatter().format(show.price.amount);
   $: ticketsAvailable = show.showState.salesStats.ticketsAvailable;
   $: ticketsReserved = show.showState.salesStats.ticketsReserved;
   $: ticketsSold = show.showState.salesStats.ticketsSold;
   $: ticketsRefunded = show.showState.salesStats.ticketsRefunded;
   $: totalRefunded = currencyFormatter().format(
-    show.showState.salesStats.totalRefunded
+    show.showState.salesStats.totalRefunded.amount
   );
   $: totalSales = currencyFormatter().format(
-    show.showState.salesStats.totalSales
+    show.showState.salesStats.totalSales.amount
   );
 
   const copyShowUrl = () => {
