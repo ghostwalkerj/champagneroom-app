@@ -166,7 +166,7 @@ export const saleSchema = new Schema({
     of: Number,
     default: new Map<CurrencyType, number>()
   },
-  totalPaidInShowCurrency: {
+  totalSalesInShowCurrency: {
     type: moneySchema,
     required: true,
     default: { amount: 0, currency: 'USD' }

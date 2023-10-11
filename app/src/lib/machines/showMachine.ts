@@ -39,7 +39,7 @@ enum ShowMachineEventString {
 
 export { ShowMachineEventString };
 
-export { createShowMachine };
+  export { createShowMachine };
 
 export const createShowMachineService = ({
   showDocument,
@@ -584,16 +584,23 @@ const createShowMachine = ({
         refundTicket: assign((context, event) => {
           const st = context.showState;
           const refund = event.refund;
+          const salesStats = st.salesStats;
 
-          st.salesStats.ticketsRefunded += 1;
-          st.salesStats.ticketsSold -= 1;
-          st.salesStats.totalRefunded.amount + refund.actualAmounts.amount;
-          st.salesStats.totalRevenue.amount - refund.actualAmounts.amount;
+          salesStats.ticketsRefunded += 1;
+          salesStats.ticketsSold -= 1;
+
+          salesStats.totalRefundedInShowCurrency.amount +
+            refund.totalRefundedInShowCurrency.amount;
+          salesStats.totalRevenueInShowCurrency.amount -
+            refund.totalRefundedInShowCurrency.amount;
           st.refunds.push(refund._id!);
 
           return {
             showState: {
-              ...st
+              ...st,
+              salesStats: {
+                ...salesStats
+              }
             }
           };
         }),
@@ -671,8 +678,10 @@ const createShowMachine = ({
           const sale = event.sale;
           st.salesStats.ticketsSold += 1;
           st.salesStats.ticketsReserved = -1;
-          st.salesStats.totalSales.amount + sale.totals.amount;
-          st.salesStats.totalRevenue.amount + sale.totals.amount;
+          st.salesStats.totalSalesInShowCurrency.amount +
+            sale.totalSalesInShowCurrency.amount;
+          st.salesStats.totalRevenueInShowCurrency.amount +
+            sale.totalSalesInShowCurrency.amount;
           st.sales.push(sale._id!);
           return {
             showState: {

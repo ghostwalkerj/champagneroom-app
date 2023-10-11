@@ -42,7 +42,8 @@ export enum TicketMachineEventString {
   TICKET_FINALIZED = 'TICKET FINALIZED',
   DISPUTE_RESOLVED = 'DISPUTE RESOLVED',
   TICKET_REDEEMED = 'TICKET REDEEMED',
-  REFUND_REQUESTED = 'REFUND REQUESTED'
+  REFUND_REQUESTED = 'REFUND REQUESTED',
+  REFUND_INITIATED = 'REFUND INITIATED'
 }
 type TicketMachineEventType =
   | {
@@ -562,7 +563,7 @@ const createTicketMachine = ({
           sale.totals.set(payment.currency, total);
 
           const showAmount =
-            context.ticketState.sale?.totalPaidInShowCurrency.amount ||
+            context.ticketState.sale?.totalSalesInShowCurrency.amount ||
             0 + payment.amount * payment.rate;
           const totalPaidInShowCurrency = {
             amount: showAmount,
@@ -603,7 +604,7 @@ const createTicketMachine = ({
           const currency = event.transaction.currency.toUpperCase();
           const payment = {
             amount: +event.transaction.amount,
-            currency: event.transaction.currency.toUpperCase() as CurrencyType,
+            currency,
             rate: +(event.transaction.rate || 0)
           } as MoneyType;
           const refund = state.refund || {
@@ -753,7 +754,7 @@ const createTicketMachine = ({
           const totalPaid = amount * +(event.transaction?.rate || 0);
 
           return (
-            (context.ticketState.sale?.totalPaidInShowCurrency.amount || 0) +
+            (context.ticketState.sale?.totalSalesInShowCurrency.amount || 0) +
               totalPaid >=
             context.ticketDocument.price.amount
           );

@@ -5,8 +5,8 @@
  * BitcartCC Merchants API
  * OpenAPI spec version: 0.7.4.1
  */
-import type { CreateNotificationMetadata } from './createNotificationMetadata';
 import type { CreateNotificationData } from './createNotificationData';
+import type { CreateNotificationMetadata } from './createNotificationMetadata';
 
 export interface CreateNotification {
   metadata?: CreateNotificationMetadata;

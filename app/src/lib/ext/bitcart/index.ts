@@ -280,6 +280,21 @@ export const checkWalletLightningWalletsModelIdChecklnGet = <
 };
 
 /**
+ * @summary Check Dns Entry
+ */
+export const checkDnsEntryConfiguratorDnsResolveGet = <
+  TData = AxiosResponse<unknown>
+>(
+  parameters: CheckDnsEntryConfiguratorDnsResolveGetParameters,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.get('/configurator/dns-resolve', {
+    ...options,
+    params: { ...parameters, ...options?.params }
+  });
+};
+
+/**
  * @summary Cleanup Images
  */
 export const cleanupImagesManageCleanupImagesPost = <
@@ -325,6 +340,18 @@ export const closeWalletChannelWalletsModelIdChannelsClosePost = <
     closeChannelScheme,
     options
   );
+};
+
+/**
+ * @summary Batch Actions On Files
+ */
+export const batchActionsOnFilesFilesBatchPost = <
+  TData = AxiosResponse<unknown>
+>(
+  batchSettings: BatchSettings,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.post('/files/batch', batchSettings, options);
 };
 
 /**
@@ -441,18 +468,12 @@ export const createStoreStoresPost = <TData = AxiosResponse<Store>>(
 };
 
 /**
- * @summary Check Dns Entry
+ * @summary Check Updates
  */
-export const checkDnsEntryConfiguratorDnsResolveGet = <
-  TData = AxiosResponse<unknown>
->(
-  parameters: CheckDnsEntryConfiguratorDnsResolveGetParameters,
+export const checkUpdatesUpdateCheckGet = <TData = AxiosResponse<unknown>>(
   options?: AxiosRequestConfig
 ): Promise<TData> => {
-  return axios.get('/configurator/dns-resolve', {
-    ...options,
-    params: { ...parameters, ...options?.params }
-  });
+  return axios.get('/update/check', options);
 };
 
 /**
@@ -499,15 +520,16 @@ export const createTokenTokenPost = <TData = AxiosResponse<unknown>>(
 };
 
 /**
- * @summary Batch Actions On Files
+ * @summary Create File
  */
-export const batchActionsOnFilesFilesBatchPost = <
-  TData = AxiosResponse<unknown>
->(
-  batchSettings: BatchSettings,
+export const createFileFilesPost = <TData = AxiosResponse<File>>(
+  bodyCreateFileFilesPost: BodyCreateFileFilesPost,
   options?: AxiosRequestConfig
 ): Promise<TData> => {
-  return axios.post('/files/batch', batchSettings, options);
+  const formData = new FormData();
+  formData.append('file', bodyCreateFileFilesPost.file);
+
+  return axios.post('/files', formData, options);
 };
 
 /**
@@ -565,6 +587,16 @@ export const deleteDiscountDiscountsModelIdDelete = <
 };
 
 /**
+ * @summary Delete File
+ */
+export const deleteFileFilesModelIdDelete = <TData = AxiosResponse<File>>(
+  modelId: string,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.delete(`/files/${modelId}`, options);
+};
+
+/**
  * @summary Delete Invoice
  */
 export const deleteInvoiceInvoicesModelIdDelete = <
@@ -584,15 +616,6 @@ export const deleteLogManageLogsLogDelete = <TData = AxiosResponse<unknown>>(
   options?: AxiosRequestConfig
 ): Promise<TData> => {
   return axios.delete(`/manage/logs/${log}`, options);
-};
-
-/**
- * @summary Check Updates
- */
-export const checkUpdatesUpdateCheckGet = <TData = AxiosResponse<unknown>>(
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get('/update/check', options);
 };
 
 /**
@@ -642,19 +665,6 @@ export const deleteStoreStoresModelIdDelete = <TData = AxiosResponse<Store>>(
 };
 
 /**
- * @summary Create File
- */
-export const createFileFilesPost = <TData = AxiosResponse<File>>(
-  bodyCreateFileFilesPost: BodyCreateFileFilesPost,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  const formData = new FormData();
-  formData.append('file', bodyCreateFileFilesPost.file);
-
-  return axios.post('/files', formData, options);
-};
-
-/**
  * @summary Delete Template
  */
 export const deleteTemplateTemplatesModelIdDelete = <
@@ -686,16 +696,6 @@ export const deleteUserUsersModelIdDelete = <
   options?: AxiosRequestConfig
 ): Promise<TData> => {
   return axios.delete(`/users/${modelId}`, options);
-};
-
-/**
- * @summary Delete File
- */
-export const deleteFileFilesModelIdDelete = <TData = AxiosResponse<File>>(
-  modelId: string,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.delete(`/files/${modelId}`, options);
 };
 
 /**
@@ -1129,24 +1129,6 @@ export const getNumberOfInvoicesInvoicesCountGet = <
 };
 
 /**
- * @summary Get Number Of Stores
- */
-export const getNumberOfStoresStoresCountGet = <TData = AxiosResponse<number>>(
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get('/stores/count', options);
-};
-
-/**
- * @summary Get Number Of Users
- */
-export const getNumberOfUsersUsersCountGet = <TData = AxiosResponse<number>>(
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get('/users/count', options);
-};
-
-/**
  * @summary Get Number Of Notifications
  */
 export const getNumberOfNotificationsNotificationsCountGet = <
@@ -1169,17 +1151,6 @@ export const getNumberOfPayoutsPayoutsCountGet = <
 };
 
 /**
- * @summary Get Number Of Wallets
- */
-export const getNumberOfWalletsWalletsCountGet = <
-  TData = AxiosResponse<number>
->(
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get('/wallets/count', options);
-};
-
-/**
  * @summary Get Number Of Products
  */
 export const getNumberOfProductsProductsCountGet = <
@@ -1195,12 +1166,12 @@ export const getNumberOfProductsProductsCountGet = <
 };
 
 /**
- * @summary Get Stats
+ * @summary Get Number Of Stores
  */
-export const getStatsUsersStatsGet = <TData = AxiosResponse<unknown>>(
+export const getNumberOfStoresStoresCountGet = <TData = AxiosResponse<number>>(
   options?: AxiosRequestConfig
 ): Promise<TData> => {
-  return axios.get('/users/stats', options);
+  return axios.get('/stores/count', options);
 };
 
 /**
@@ -1215,13 +1186,23 @@ export const getNumberOfTemplatesTemplatesCountGet = <
 };
 
 /**
- * @summary Get Store By Id
+ * @summary Get Number Of Users
  */
-export const getStoreByIdStoresModelIdGet = <TData = AxiosResponse<unknown>>(
-  modelId: string,
+export const getNumberOfUsersUsersCountGet = <TData = AxiosResponse<number>>(
   options?: AxiosRequestConfig
 ): Promise<TData> => {
-  return axios.get(`/stores/${modelId}`, options);
+  return axios.get('/users/count', options);
+};
+
+/**
+ * @summary Get Number Of Wallets
+ */
+export const getNumberOfWalletsWalletsCountGet = <
+  TData = AxiosResponse<number>
+>(
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.get('/wallets/count', options);
 };
 
 /**
@@ -1235,47 +1216,6 @@ export const getOrCreateInvoiceByOrderIdInvoicesOrderIdOrderIdPost = <
   options?: AxiosRequestConfig
 ): Promise<TData> => {
   return axios.post(`/invoices/order_id/${orderId}`, createInvoice, options);
-};
-
-/**
- * @summary Get Store Rates
- */
-export const getStoreRatesStoresModelIdRatesGet = <
-  TData = AxiosResponse<RatesResponse>
->(
-  modelId: string,
-  parameters: GetStoreRatesStoresModelIdRatesGetParameters,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get(`/stores/${modelId}/rates`, {
-    ...options,
-    params: { ...parameters, ...options?.params }
-  });
-};
-
-/**
- * @summary Get Stores
- */
-export const getStoresStoresGet = <
-  TData = AxiosResponse<PaginationResponseStore>
->(
-  parameters?: GetStoresGetParameters,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get('/stores', {
-    ...options,
-    params: { ...parameters, ...options?.params }
-  });
-};
-
-/**
- * @summary Get User By Id
- */
-export const getUserByIdUsersModelIdGet = <TData = AxiosResponse<DisplayUser>>(
-  modelId: string,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get(`/users/${modelId}`, options);
 };
 
 /**
@@ -1293,21 +1233,6 @@ export const getOrCreateShopifyInvoiceStoresStoreIdIntegrationsShopifyOrderIdGet
       params: { ...parameters, ...options?.params }
     });
   };
-
-/**
- * @summary Get Users
- */
-export const getUsersUsersGet = <
-  TData = AxiosResponse<PaginationResponseDisplayUser>
->(
-  parameters?: GetUsersGetParameters,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get('/users', {
-    ...options,
-    params: { ...parameters, ...options?.params }
-  });
-};
 
 /**
  * @summary Get Payout By Id
@@ -1337,15 +1262,12 @@ export const getPayoutsPayoutsGet = <
 };
 
 /**
- * @summary Get Wallet Balance
+ * @summary Get Stats
  */
-export const getWalletBalanceWalletsModelIdBalanceGet = <
-  TData = AxiosResponse<BalanceResponse>
->(
-  modelId: string,
+export const getStatsUsersStatsGet = <TData = AxiosResponse<unknown>>(
   options?: AxiosRequestConfig
 ): Promise<TData> => {
-  return axios.get(`/wallets/${modelId}/balance`, options);
+  return axios.get('/users/stats', options);
 };
 
 /**
@@ -1355,6 +1277,16 @@ export const getPluginsPluginsGet = <TData = AxiosResponse<unknown>>(
   options?: AxiosRequestConfig
 ): Promise<TData> => {
   return axios.get('/plugins', options);
+};
+
+/**
+ * @summary Get Store By Id
+ */
+export const getStoreByIdStoresModelIdGet = <TData = AxiosResponse<unknown>>(
+  modelId: string,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.get(`/stores/${modelId}`, options);
 };
 
 /**
@@ -1383,13 +1315,19 @@ export const getProductByIdProductsModelIdGet = <
 };
 
 /**
- * @summary Get Wallet By Id
+ * @summary Get Store Rates
  */
-export const getWalletByIdWalletsModelIdGet = <TData = AxiosResponse<Wallet>>(
+export const getStoreRatesStoresModelIdRatesGet = <
+  TData = AxiosResponse<RatesResponse>
+>(
   modelId: string,
+  parameters: GetStoreRatesStoresModelIdRatesGetParameters,
   options?: AxiosRequestConfig
 ): Promise<TData> => {
-  return axios.get(`/wallets/${modelId}`, options);
+  return axios.get(`/stores/${modelId}/rates`, {
+    ...options,
+    params: { ...parameters, ...options?.params }
+  });
 };
 
 /**
@@ -1408,6 +1346,21 @@ export const getProductsProductsGet = <
 };
 
 /**
+ * @summary Get Stores
+ */
+export const getStoresStoresGet = <
+  TData = AxiosResponse<PaginationResponseStore>
+>(
+  parameters?: GetStoresGetParameters,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.get('/stores', {
+    ...options,
+    params: { ...parameters, ...options?.params }
+  });
+};
+
+/**
  * @summary Get Refund
  */
 export const getRefundInvoicesRefundsRefundIdGet = <
@@ -1417,18 +1370,6 @@ export const getRefundInvoicesRefundsRefundIdGet = <
   options?: AxiosRequestConfig
 ): Promise<TData> => {
   return axios.get(`/invoices/refunds/${refundId}`, options);
-};
-
-/**
- * @summary Get Wallet Channels
- */
-export const getWalletChannelsWalletsModelIdChannelsGet = <
-  TData = AxiosResponse<unknown>
->(
-  modelId: string,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get(`/wallets/${modelId}/channels`, options);
 };
 
 /**
@@ -1444,12 +1385,37 @@ export const getServerSettingsConfiguratorServerSettingsPost = <
 };
 
 /**
+ * @summary Get User By Id
+ */
+export const getUserByIdUsersModelIdGet = <TData = AxiosResponse<DisplayUser>>(
+  modelId: string,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.get(`/users/${modelId}`, options);
+};
+
+/**
  * @summary Get Services
  */
 export const getServicesTorServicesGet = <TData = AxiosResponse<unknown>>(
   options?: AxiosRequestConfig
 ): Promise<TData> => {
   return axios.get('/tor/services', options);
+};
+
+/**
+ * @summary Get Users
+ */
+export const getUsersUsersGet = <
+  TData = AxiosResponse<PaginationResponseDisplayUser>
+>(
+  parameters?: GetUsersGetParameters,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.get('/users', {
+    ...options,
+    params: { ...parameters, ...options?.params }
+  });
 };
 
 /**
@@ -1464,18 +1430,6 @@ export const getStorePoliciesManageStoresGet = <
 };
 
 /**
- * @summary Register Fido2
- */
-export const registerFido2Users2faFido2RegisterBeginPost = <
-  TData = AxiosResponse<unknown>
->(
-  loginFIDOData: LoginFIDOData,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.post('/users/2fa/fido2/register/begin', loginFIDOData, options);
-};
-
-/**
  * @summary Get Supported Cryptos
  */
 export const getSupportedCryptosCryptosSupportedGet = <
@@ -1484,6 +1438,18 @@ export const getSupportedCryptosCryptosSupportedGet = <
   options?: AxiosRequestConfig
 ): Promise<TData> => {
   return axios.get('/cryptos/supported', options);
+};
+
+/**
+ * @summary Get Wallet Balance
+ */
+export const getWalletBalanceWalletsModelIdBalanceGet = <
+  TData = AxiosResponse<BalanceResponse>
+>(
+  modelId: string,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.get(`/wallets/${modelId}/balance`, options);
 };
 
 /**
@@ -1508,18 +1474,6 @@ export const getTemplateByIdTemplatesModelIdGet = <
 };
 
 /**
- * @summary Reset Password
- */
-export const resetPasswordUsersResetPasswordPost = <
-  TData = AxiosResponse<unknown>
->(
-  resetPasswordData: ResetPasswordData,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.post('/users/reset_password', resetPasswordData, options);
-};
-
-/**
  * @summary Get Template List
  */
 export const getTemplateListTemplatesListGet = <TData = AxiosResponse<unknown>>(
@@ -1533,15 +1487,13 @@ export const getTemplateListTemplatesListGet = <TData = AxiosResponse<unknown>>(
 };
 
 /**
- * @summary Send Verification Email
+ * @summary Get Wallet By Id
  */
-export const sendVerificationEmailUsersVerifyPost = <
-  TData = AxiosResponse<unknown>
->(
-  verifyEmailData: VerifyEmailData,
+export const getWalletByIdWalletsModelIdGet = <TData = AxiosResponse<Wallet>>(
+  modelId: string,
   options?: AxiosRequestConfig
 ): Promise<TData> => {
-  return axios.post('/users/verify', verifyEmailData, options);
+  return axios.get(`/wallets/${modelId}`, options);
 };
 
 /**
@@ -1560,6 +1512,18 @@ export const getTemplatesTemplatesGet = <
 };
 
 /**
+ * @summary Get Wallet Channels
+ */
+export const getWalletChannelsWalletsModelIdChannelsGet = <
+  TData = AxiosResponse<unknown>
+>(
+  modelId: string,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.get(`/wallets/${modelId}/channels`, options);
+};
+
+/**
  * @summary Get Token Count
  */
 export const getTokenCountTokenCountGet = <TData = AxiosResponse<number>>(
@@ -1570,16 +1534,6 @@ export const getTokenCountTokenCountGet = <TData = AxiosResponse<number>>(
     ...options,
     params: { ...parameters, ...options?.params }
   });
-};
-
-/**
- * @summary Set Settings
- */
-export const setSettingsUsersMeSettingsPost = <TData = AxiosResponse<User>>(
-  userPreferences: UserPreferences,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.post('/users/me/settings', userPreferences, options);
 };
 
 /**
@@ -1607,18 +1561,6 @@ export const getTokensCryptosTokensCurrencyGet = <
 };
 
 /**
- * @summary Verify Totp
- */
-export const verifyTotpUsers2faTotpVerifyPost = <
-  TData = AxiosResponse<unknown>
->(
-  verifyTOTP: VerifyTOTP,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.post('/users/2fa/totp/verify', verifyTOTP, options);
-};
-
-/**
  * @summary Get Tokens
  */
 export const getTokensTokenGet = <
@@ -1631,6 +1573,18 @@ export const getTokensTokenGet = <
     ...options,
     params: { ...parameters, ...options?.params }
   });
+};
+
+/**
+ * @summary Register Fido2
+ */
+export const registerFido2Users2faFido2RegisterBeginPost = <
+  TData = AxiosResponse<unknown>
+>(
+  loginFIDOData: LoginFIDOData,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.post('/users/2fa/fido2/register/begin', loginFIDOData, options);
 };
 
 /**
@@ -1650,6 +1604,18 @@ export const getWalletRateWalletsModelIdRateGet = <
 };
 
 /**
+ * @summary Reset Password
+ */
+export const resetPasswordUsersResetPasswordPost = <
+  TData = AxiosResponse<unknown>
+>(
+  resetPasswordData: ResetPasswordData,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.post('/users/reset_password', resetPasswordData, options);
+};
+
+/**
  * @summary Get Wallets Schema
  */
 export const getWalletsSchemaWalletsSchemaGet = <
@@ -1658,6 +1624,18 @@ export const getWalletsSchemaWalletsSchemaGet = <
   options?: AxiosRequestConfig
 ): Promise<TData> => {
   return axios.get('/wallets/schema', options);
+};
+
+/**
+ * @summary Send Verification Email
+ */
+export const sendVerificationEmailUsersVerifyPost = <
+  TData = AxiosResponse<unknown>
+>(
+  verifyEmailData: VerifyEmailData,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.post('/users/verify', verifyEmailData, options);
 };
 
 /**
@@ -1699,6 +1677,16 @@ export const installPluginPluginsInstallPost = <TData = AxiosResponse<unknown>>(
 };
 
 /**
+ * @summary Set Settings
+ */
+export const setSettingsUsersMeSettingsPost = <TData = AxiosResponse<User>>(
+  userPreferences: UserPreferences,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.post('/users/me/settings', userPreferences, options);
+};
+
+/**
  * @summary Modify Discount
  */
 export const modifyDiscountDiscountsModelIdPatch = <
@@ -1726,6 +1714,18 @@ export const modifyFileFilesModelIdPatch = <TData = AxiosResponse<File>>(
 };
 
 /**
+ * @summary Verify Totp
+ */
+export const verifyTotpUsers2faTotpVerifyPost = <
+  TData = AxiosResponse<unknown>
+>(
+  verifyTOTP: VerifyTOTP,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.post('/users/2fa/totp/verify', verifyTOTP, options);
+};
+
+/**
  * @summary Modify Invoice
  */
 export const modifyInvoiceInvoicesModelIdPatch = <
@@ -1736,17 +1736,6 @@ export const modifyInvoiceInvoicesModelIdPatch = <
   options?: AxiosRequestConfig
 ): Promise<TData> => {
   return axios.patch(`/invoices/${modelId}`, optionalInvoice, options);
-};
-
-/**
- * @summary Modify User
- */
-export const modifyUserUsersModelIdPatch = <TData = AxiosResponse<DisplayUser>>(
-  modelId: string,
-  optionalUser: OptionalUser,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.patch(`/users/${modelId}`, optionalUser, options);
 };
 
 /**
@@ -1777,23 +1766,6 @@ export const modifyPayoutPayoutsModelIdPatch = <
   options?: AxiosRequestConfig
 ): Promise<TData> => {
   return axios.patch(`/payouts/${modelId}`, optionalPayout, options);
-};
-
-/**
- * @summary Open Wallet Channel
- */
-export const openWalletChannelWalletsModelIdChannelsOpenPost = <
-  TData = AxiosResponse<unknown>
->(
-  modelId: string,
-  openChannelScheme: OpenChannelScheme,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.post(
-    `/wallets/${modelId}/channels/open`,
-    openChannelScheme,
-    options
-  );
 };
 
 /**
@@ -1840,15 +1812,14 @@ export const modifyTemplateTemplatesModelIdPatch = <
 };
 
 /**
- * @summary Wallet History
+ * @summary Modify User
  */
-export const walletHistoryWalletsHistoryModelIdGet = <
-  TData = AxiosResponse<TxResponse[]>
->(
+export const modifyUserUsersModelIdPatch = <TData = AxiosResponse<DisplayUser>>(
   modelId: string,
+  optionalUser: OptionalUser,
   options?: AxiosRequestConfig
 ): Promise<TData> => {
-  return axios.get(`/wallets/history/${modelId}`, options);
+  return axios.patch(`/users/${modelId}`, optionalUser, options);
 };
 
 /**
@@ -1860,6 +1831,23 @@ export const modifyWalletWalletsModelIdPatch = <TData = AxiosResponse<Wallet>>(
   options?: AxiosRequestConfig
 ): Promise<TData> => {
   return axios.patch(`/wallets/${modelId}`, optionalCreateWallet, options);
+};
+
+/**
+ * @summary Open Wallet Channel
+ */
+export const openWalletChannelWalletsModelIdChannelsOpenPost = <
+  TData = AxiosResponse<unknown>
+>(
+  modelId: string,
+  openChannelScheme: OpenChannelScheme,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.post(
+    `/wallets/${modelId}/channels/open`,
+    openChannelScheme,
+    options
+  );
 };
 
 /**
@@ -1930,19 +1918,6 @@ export const restartServerManageRestartPost = <TData = AxiosResponse<unknown>>(
 };
 
 /**
- * @summary Wallet Lnpay
- */
-export const walletLnpayWalletsModelIdLnpayPost = <
-  TData = AxiosResponse<unknown>
->(
-  modelId: string,
-  lNPayScheme: LNPayScheme,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.post(`/wallets/${modelId}/lnpay`, lNPayScheme, options);
-};
-
-/**
  * @summary Restore Backup
  */
 export const restoreBackupManageBackupsRestorePost = <
@@ -1955,6 +1930,18 @@ export const restoreBackupManageBackupsRestorePost = <
   formData.append('backup', bodyRestoreBackupManageBackupsRestorePost.backup);
 
   return axios.post('/manage/backups/restore', formData, options);
+};
+
+/**
+ * @summary Wallet History
+ */
+export const walletHistoryWalletsHistoryModelIdGet = <
+  TData = AxiosResponse<TxResponse[]>
+>(
+  modelId: string,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.get(`/wallets/history/${modelId}`, options);
 };
 
 /**
@@ -2095,6 +2082,19 @@ export const uninstallPluginPluginsUninstallPost = <
   options?: AxiosRequestConfig
 ): Promise<TData> => {
   return axios.post('/plugins/uninstall', uninstallPluginData, options);
+};
+
+/**
+ * @summary Wallet Lnpay
+ */
+export const walletLnpayWalletsModelIdLnpayPost = <
+  TData = AxiosResponse<unknown>
+>(
+  modelId: string,
+  lNPayScheme: LNPayScheme,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.post(`/wallets/${modelId}/lnpay`, lNPayScheme, options);
 };
 
 /**

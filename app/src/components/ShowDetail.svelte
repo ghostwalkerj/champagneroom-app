@@ -34,15 +34,16 @@
   $: name = show.name;
   $: duration = durationFormatter(show.duration * 60);
   $: price = currencyFormatter().format(show.price.amount);
-  $: ticketsAvailable = show.showState.salesStats.ticketsAvailable;
-  $: ticketsReserved = show.showState.salesStats.ticketsReserved;
-  $: ticketsSold = show.showState.salesStats.ticketsSold;
-  $: ticketsRefunded = show.showState.salesStats.ticketsRefunded;
-  $: totalRefunded = currencyFormatter().format(
-    show.showState.salesStats.totalRefunded.amount
+  const salesStats = show.showState.salesStats;
+  $: ticketsAvailable = salesStats.ticketsAvailable;
+  $: ticketsReserved = salesStats.ticketsReserved;
+  $: ticketsSold = salesStats.ticketsSold;
+  $: ticketsRefunded = salesStats.ticketsRefunded;
+  $: totalRefunded = currencyFormatter(show.price.currency).format(
+    salesStats.totalSalesInShowCurrency.amount
   );
-  $: totalSales = currencyFormatter().format(
-    show.showState.salesStats.totalSales.amount
+  $: totalSales = currencyFormatter(show.price.currency).format(
+    salesStats.totalRevenueInShowCurrency.amount
   );
 
   const copyShowUrl = () => {

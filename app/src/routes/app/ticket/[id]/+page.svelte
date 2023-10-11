@@ -12,7 +12,7 @@
     PUBLIC_SHOWTIME_PATH
   } from '$env/static/public';
 
-  import { CancelReason, DisputeReason } from '$lib/models/common';
+  import { DisputeReason } from '$lib/models/common';
   import { type ShowDocumentType, ShowStatus } from '$lib/models/show';
   import type { TicketDocumentType } from '$lib/models/ticket';
 
@@ -286,7 +286,7 @@
                     type="submit"
                     disabled={loading}
                   >
-                    {#if ticket.ticketState.totalPaid > 0}
+                    {#if ticket.ticketState.sale && ticket.ticketState.sale.totalSalesInShowCurrency.amount > 0}
                       Request Refund
                     {:else}
                       Cancel Ticket

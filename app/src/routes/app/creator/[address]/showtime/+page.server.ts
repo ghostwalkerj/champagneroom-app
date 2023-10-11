@@ -53,7 +53,7 @@ export const actions: Actions = {
 };
 
 export const load: PageServerLoad = async ({ params, locals }) => {
-  const key = params.key;
+  const key = params.address;
 
   if (key === null) {
     throw error(404, 'Key not found');

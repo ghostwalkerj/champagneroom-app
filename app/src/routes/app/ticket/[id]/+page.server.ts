@@ -37,8 +37,8 @@ import {
   getTicketMachineServiceFromId
 } from '$lib/util/util.server';
 
-import { getInvoiceByIdInvoicesModelIdGet } from '../../../../lib/ext/bitcart';
-import type { DisplayInvoice } from '../../../../lib/ext/bitcart/models';
+import { getInvoiceByIdInvoicesModelIdGet } from '$ext/bitcart';
+import type { DisplayInvoice } from '$ext/bitcart/models';
 
 import type { Actions, PageServerLoad } from './$types';
 
@@ -86,22 +86,35 @@ export const actions: Actions = {
       state.matches('reserved.receivedPayment') ||
       state.matches('reserved.waiting4Show')
     ) {
+      // Check what payments were made from sales
+      const sales = ticket.ticketState.sale;
+      if (!sales) {
+        throw error(404, 'No sales found');
+      }
+
       // Create refund object
       const refund = {
         _id: new Types.ObjectId(),
         requestedAt: new Date(),
         reason: CancelReason.CUSTOMER_CANCELLED,
-        currency: ticket.currency,
-        requestedAmounts: ticket.ticketState.totalPaid,
         transactions: [],
-        amountRefunded: 0
+        requestedAmounts: sales.totals,
+        approvedAmounts: new Map<string, number>(),
+        totals: new Map<string, number>(),
+        totalRefundedInShowCurrency: {
+          amount: 0,
+          currency: 'USD',
+          rate: 1
+        }
       } as RefundType;
 
-      // Send refund event
-      ticketService.send({
-        type: TicketMachineEventString.REFUND_REQUESTED,
-        refund
-      });
+      // Refund the same amount as sent, not equivalent to show currency
+      // ie, show currency is USD, but payment was made in ETH
+      ticketService // Send refund event
+        .send({
+          type: TicketMachineEventString.REFUND_REQUESTED,
+          refund
+        });
 
       const payoutQueue = new Queue(EntityType.PAYOUT, {
         connection: redisConnection

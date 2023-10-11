@@ -2,10 +2,11 @@ import type { AxiosResponse } from 'axios';
 import type { Job, Queue } from 'bullmq';
 import { Worker } from 'bullmq';
 import type IORedis from 'ioredis';
-import { Types } from 'mongoose';
 
-import { CancelReason } from '$lib/models/common';
+import { CurrencyType } from '$lib/models/common';
 import { Ticket } from '$lib/models/ticket';
+
+import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 
 import { EntityType } from '$lib/constants';
 import {
@@ -18,6 +19,7 @@ import {
 import type { DisplayInvoice } from '$lib/ext/bitcart/models';
 import type { PaymentType } from '$lib/util/payment';
 import { InvoiceStatus, PayoutJobType, PayoutStatus } from '$lib/util/payment';
+import { getTicketMachineService } from '$lib/util/util.server';
 
 export const getPayoutWorker = ({
   payoutQueue,
@@ -83,15 +85,28 @@ export const getPayoutWorker = ({
                 throw new Error('Ticket not found');
               }
 
-              const ticketRefund = ticket.ticketState.refund ?? {
-                _id: new Types.ObjectId(),
-                requestedAt: new Date(),
-                reason: CancelReason.CUSTOMER_CANCELLED,
-                currency: ticket.currency,
-                requestedAmounts: ticket.ticketState.totalPaid,
-                transactions: [],
-                amountRefunded: 0
-              };
+              // Tell the ticketMachine REFUND INITIATED
+              const ticketRefund = ticket.ticketState.refund;
+              if (!ticketRefund) {
+                throw new Error('Ticket refund not found');
+              }
+
+              const currency = (invoice.paid_currency?.toUpperCase() ||
+                CurrencyType.ETH) as CurrencyType;
+
+              const approvedAmounts = new Map<CurrencyType, number>();
+              approvedAmounts.set(currency, +invoice.sent_amount);
+
+              ticketRefund.approvedAmounts = approvedAmounts;
+
+              const ticketService = getTicketMachineService(
+                ticket,
+                redisConnection
+              );
+              ticketService.send({
+                type: TicketMachineEventString.REFUND_INITIATED,
+                refund: ticketRefund
+              });
 
               let response = await refundInvoiceInvoicesModelIdRefundsPost(
                 invoiceId,
@@ -157,7 +172,6 @@ export const getPayoutWorker = ({
               );
 
               // Send the payout
-              // Approve the payout
               response = await batchActionsOnPayoutsPayoutsBatchPost(
                 {
                   ids: [refund.payout_id],

@@ -131,6 +131,11 @@ const salesStatsSchema = new Schema({
     required: true,
     default: { amount: 0, currency: CurrencyType.USD }
   },
+  totalSalesInShowCurrency: {
+    type: moneySchema,
+    required: true,
+    default: { amount: 0, currency: CurrencyType.USD }
+  },
   totalRefundedInShowCurrency: {
     type: moneySchema,
     required: true,

@@ -3,7 +3,7 @@ import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 
 import type { CancelType } from '$lib/models/common';
-import { CancelReason } from '$lib/models/common';
+import { CancelReason, CurrencyType } from '$lib/models/common';
 import type { CreatorType } from '$lib/models/creator';
 import { Creator } from '$lib/models/creator';
 import { Show, ShowStatus } from '$lib/models/show';
@@ -68,7 +68,7 @@ export const actions: Actions = {
     const show = await Show.create({
       price: {
         amount: +price,
-        currency: 'USD'
+        currency: CurrencyType.USD
       },
       name,
       duration: +duration,

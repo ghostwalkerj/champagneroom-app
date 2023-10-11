@@ -2,10 +2,10 @@ import type { AxiosResponse } from 'axios';
 import type { Job, Queue } from 'bullmq';
 import { Worker } from 'bullmq';
 import type IORedis from 'ioredis';
-import { connection, Types } from 'mongoose';
+import { Types } from 'mongoose';
 
 import { CancelReason, type CancelType } from '$lib/models/common';
-import type { TicketDocumentType, TicketType } from '$lib/models/ticket';
+import type { TicketType } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
 import type { TransactionType } from '$lib/models/transaction';
 import { Transaction, TransactionReasonType } from '$lib/models/transaction';
@@ -264,7 +264,10 @@ export const getInvoiceWorker = ({
                     redisConnection
                   );
 
-
+                  ticketService.send({
+                    type: TicketMachineEventString.REFUND_RECEIVED,
+                    transaction
+                  });
                 } catch (error_) {
                   console.error(error_);
                 }
