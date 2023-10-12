@@ -677,7 +677,7 @@ const createShowMachine = ({
           const st = context.showState;
           const sale = event.sale;
           st.salesStats.ticketsSold += 1;
-          st.salesStats.ticketsReserved = -1;
+          st.salesStats.ticketsReserved -= 1;
           st.salesStats.totalSalesInShowCurrency.amount +
             sale.totalSalesInShowCurrency.amount;
           st.salesStats.totalRevenueInShowCurrency.amount +
