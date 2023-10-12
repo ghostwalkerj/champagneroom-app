@@ -377,7 +377,8 @@ const createShowMachine = ({
             },
             'TICKET REFUNDED': [
               {
-                actions: ['refundTicket']
+                actions: ['openBoxOffice', 'refundTicket'],
+                target: 'boxOfficeOpen'
               }
             ],
             'CANCELLATION INITIATED': [
@@ -588,6 +589,7 @@ const createShowMachine = ({
 
           salesStats.ticketsRefunded += 1;
           salesStats.ticketsSold -= 1;
+          salesStats.ticketsAvailable += 1;
 
           st.refunds.push(refund._id!);
 
@@ -649,7 +651,7 @@ const createShowMachine = ({
               ...st,
               salesStats: {
                 ...st.salesStats,
-                ticketsRedeemed: st.salesStats.ticketsReserved + 1
+                ticketsRedeemed: st.salesStats.ticketsRedeemed + 1
               }
             }
           };
