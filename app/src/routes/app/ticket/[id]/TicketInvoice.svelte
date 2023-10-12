@@ -150,6 +150,8 @@
     <div class="pb-6">
       {#if invoice.status === InvoiceStatus.EXPIRED}
         <span class="font-bold">Invoice Expired</span>
+      {:else if invoice.status === InvoiceStatus.REFUNDED}
+        <span class="font-bold">Invoice Refunded</span>
       {:else if invoice.status === InvoiceStatus.COMPLETE}
         Invoice Paid
       {:else}

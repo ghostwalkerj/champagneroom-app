@@ -198,7 +198,6 @@ export const getInvoiceWorker = ({
             }
 
             case InvoiceStatus.REFUNDED: {
-              console.log('Invoice Refunded');
               // Get the refund, payout, and ticket
               // Create a return transaction
               const refundedInvoice = async (invoice: DisplayInvoice) => {
