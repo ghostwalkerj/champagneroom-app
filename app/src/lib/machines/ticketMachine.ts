@@ -769,15 +769,15 @@ const createTicketMachine = ({
           const totalRefundedAmount = refund.totals[currency] || 0 + amount;
 
           // Check to see if all other currencies have been refunded
-          for (const key in Object.keys(refund.approvedAmounts)) {
+          for (const [key, value] of Object.entries(refund.approvedAmounts)) {
             if (key === currency) continue;
             if (
               !refund.approvedAmounts[key] ||
               refund.approvedAmounts[key] === 0
             )
               return false;
-            if (refund.totals[key] || 0 < refund.approvedAmounts[key])
-              return false;
+
+            if ((refund.totals[key] || 0) < value) return false;
           }
 
           const refundedInTransactionCurrency =

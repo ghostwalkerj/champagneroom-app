@@ -39,6 +39,7 @@ export enum PayoutStatus {
 
 export const calcTotal = (payments: Map<string, MoneyType[]>) => {
   let total = 0;
+
   for (const key in Object.keys(payments)) {
     const paymentArray = payments[key] as [MoneyType];
     total += paymentArray.reduce((accumulator, current) => {
