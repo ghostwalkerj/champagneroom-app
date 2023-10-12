@@ -435,13 +435,14 @@ const createTicketMachine = ({
           );
         },
 
-        sendTicketCancelled: (context) => {
+        sendTicketCancelled: (context, event) => {
           ticketMachineOptions?.showQueue?.add(
             ShowMachineEventString.TICKET_CANCELLED,
             {
               showId: context.ticketDocument.show.toString(),
               ticketId: context.ticketDocument._id.toString(),
-              customerName: context.ticketDocument.customerName
+              customerName: context.ticketDocument.customerName,
+              cancel: event.cancel
             }
           );
         },

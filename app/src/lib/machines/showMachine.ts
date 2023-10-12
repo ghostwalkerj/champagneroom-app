@@ -113,6 +113,7 @@ export type ShowMachineEventType =
       type: 'TICKET CANCELLED';
       ticketId: string;
       customerName: string;
+      cancel: CancelType;
     }
   | {
       type: 'TICKET SOLD';
@@ -615,7 +616,7 @@ const createShowMachine = ({
 
         cancelTicket: assign((context, event) => {
           const st = context.showState;
-          st.cancellations.push(new Types.ObjectId(event.ticketId));
+          st.cancellations.push(new Types.ObjectId(event.cancel._id));
           return {
             showState: {
               ...st,
