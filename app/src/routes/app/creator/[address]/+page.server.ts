@@ -68,7 +68,8 @@ export const actions: Actions = {
     const show = await Show.create({
       price: {
         amount: +price,
-        currency: CurrencyType.USD
+        currency: CurrencyType.USD,
+        rate: 1
       },
       name,
       duration: +duration,

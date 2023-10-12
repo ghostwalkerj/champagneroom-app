@@ -19,7 +19,9 @@
 
   // Ticket
   $: ticketStatus = ticket
-    ? ticket.ticketState.totalPaid.amount >= ticket.price.amount
+    ? ticket.ticketState.sale &&
+      ticket.ticketState.sale.totalSalesInShowCurrency.amount >=
+        ticket.price.amount
       ? 'Paid' + ' ' + ticket.ticketState.status
       : ticket.ticketState.status
     : '';

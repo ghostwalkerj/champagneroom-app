@@ -9,14 +9,15 @@ import { raise } from 'xstate/lib/actions';
 
 import type {
   CancelType,
-  CurrencyType,
   DisputeDecision,
   DisputeType,
   FeedbackType,
   FinalizeType,
   MoneyType,
-  RefundType
+  RefundType,
+  SaleType
 } from '$lib/models/common';
+import { CurrencyType } from '$lib/models/common';
 import { RefundReason } from '$lib/models/common';
 import type { TicketDocumentType, TicketStateType } from '$lib/models/ticket';
 import { TicketStatus } from '$lib/models/ticket';
@@ -225,6 +226,11 @@ const createTicketMachine = ({
               }
             },
             receivedPayment: {
+              always: {
+                target: '#ticketMachine.reserved.waiting4Show',
+                cond: 'fullyPaid',
+                actions: ['setFullyPaid', 'sendTicketSold']
+              },
               // under paid
               on: {
                 'PAYMENT RECEIVED': [
@@ -482,13 +488,11 @@ const createTicketMachine = ({
             _id: new Types.ObjectId(),
             requestedAt: new Date(),
             transactions: [] as Types.ObjectId[],
-            actualAmounts: new Map<CurrencyType, number>(),
-            requestedAmounts:
-              state.sale?.totals || new Map<CurrencyType, number>(),
-            approvedAmounts:
-              state.sale?.totals || new Map<CurrencyType, number>(),
+            actualAmounts: {} as Map<string, number>,
+            requestedAmounts: state.sale?.totals || ({} as Map<string, number>),
+            approvedAmounts: state.sale?.totals || ({} as Map<string, number>),
             reason: RefundReason.SHOW_CANCELLED,
-            totals: new Map<CurrencyType, number>(),
+            totals: {} as Map<string, number>,
             totalRefundedInShowCurrency: {
               amount: 0,
               currency: context.ticketDocument.price.currency,
@@ -506,10 +510,29 @@ const createTicketMachine = ({
         }),
 
         initiatePayment: assign((context) => {
+          const sale = {
+            _id: new Types.ObjectId(),
+            soldAt: new Date(),
+            transactions: [] as Types.ObjectId[],
+            totals: new Map<string, number>(),
+            totalSalesInShowCurrency: {
+              amount: 0,
+              currency: context.ticketDocument.price.currency,
+              rate: 1
+            }
+          } as SaleType;
+
+          const keys = Object.keys(CurrencyType);
+          for (const key of keys) {
+            const currency = key as CurrencyType;
+            sale.totals.set(currency, 0);
+          }
+
           return {
             ticketState: {
               ...context.ticketState,
-              status: TicketStatus.PAYMENT_INITIATED
+              status: TicketStatus.PAYMENT_INITIATED,
+              sale
             }
           };
         }),
@@ -546,12 +569,8 @@ const createTicketMachine = ({
         }),
 
         receivePayment: assign((context, event) => {
-          const sale = context.ticketState.sale || {
-            _id: new Types.ObjectId(),
-            soldAt: new Date(),
-            transactions: [] as Types.ObjectId[],
-            totals: new Map<CurrencyType, number>()
-          };
+          const sale = context.ticketState.sale;
+          if (!sale) return {};
           const payment = {
             amount: +event.transaction.amount,
             currency: event.transaction.currency.toUpperCase() as CurrencyType,
@@ -559,22 +578,26 @@ const createTicketMachine = ({
           };
 
           sale.transactions.push(event.transaction._id);
-          const total = sale.totals.get(payment.currency) || 0 + payment.amount;
-          sale.totals.set(payment.currency, total);
+          const totals = sale.totals;
+
+          const total = (totals[payment.currency] || 0) + payment.amount;
+          sale.totals[payment.currency] = total;
 
           const showAmount =
-            context.ticketState.sale?.totalSalesInShowCurrency.amount ||
-            0 + payment.amount * payment.rate;
+            (context.ticketState.sale?.totalSalesInShowCurrency.amount || 0) +
+            payment.amount * payment.rate;
           const totalPaidInShowCurrency = {
-            amount: showAmount,
-            currency: payment.currency,
+            amount: +showAmount.toFixed(2),
+            currency: context.ticketDocument.price.currency,
             rate: 1
           };
+
+          sale.totalSalesInShowCurrency = totalPaidInShowCurrency;
 
           return {
             ticketState: {
               ...context.ticketState,
-              totalPaidInShowCurrency
+              status: TicketStatus.PAYMENT_RECEIVED
             }
           };
         }),
@@ -611,10 +634,10 @@ const createTicketMachine = ({
             _id: new Types.ObjectId(),
             requestedAt: new Date(),
             transactions: [] as Types.ObjectId[],
-            requestedAmounts: new Map<CurrencyType, number>(),
-            approvedAmounts: new Map<CurrencyType, number>(),
+            requestedAmounts: new Map<string, number>(),
+            approvedAmounts: new Map<string, number>(),
             reason: RefundReason.UNKNOWN,
-            totals: new Map<CurrencyType, number>(),
+            totals: new Map<string, number>(),
             totalRefundedInShowCurrency: {
               amount: 0,
               currency: context.ticketDocument.price.currency,
@@ -622,9 +645,8 @@ const createTicketMachine = ({
             }
           };
 
-          const total =
-            refund.totals.get(payment.currency) || 0 + payment.amount;
-          refund.totals.set(payment.currency, total);
+          const total = refund.totals[payment.currency] || 0 + payment.amount;
+          refund.totals[payment.currency] = total;
 
           const showAmount =
             refund.totalRefundedInShowCurrency.amount +
@@ -751,7 +773,9 @@ const createTicketMachine = ({
         fullyPaid: (context, event) => {
           const amount =
             event.type === 'PAYMENT RECEIVED' ? +event.transaction?.amount : 0;
-          const totalPaid = amount * +(event.transaction?.rate || 0);
+          const totalPaid = +(amount * +(event.transaction?.rate || 0)).toFixed(
+            0
+          );
 
           return (
             (context.ticketState.sale?.totalSalesInShowCurrency.amount || 0) +
@@ -769,14 +793,14 @@ const createTicketMachine = ({
           const refund = context.ticketState.refund;
           if (refund === undefined) return false;
           const currency = event.transaction.currency.toUpperCase();
-          const refundApproved = refund.approvedAmounts.get(currency) || 0;
+          const refundApproved = refund.approvedAmounts[currency] || 0;
           if (refundApproved === 0) return false;
           const amount =
             event.type === 'REFUND RECEIVED' ? +event.transaction?.amount : 0;
-          const totalRefundedAmount = refund.totals.get(currency) || 0 + amount;
+          const totalRefundedAmount = refund.totals[currency] || 0 + amount;
           for (const [_currency, amount] of refund.approvedAmounts) {
             if (_currency === currency) continue;
-            if (refund.totals.get(_currency) || 0 < amount) return false;
+            if (refund.totals[_currency] || 0 < amount) return false;
           }
 
           const refundedInTransactionCurrency =

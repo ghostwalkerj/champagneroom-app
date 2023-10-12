@@ -126,19 +126,19 @@ export const refundSchema = new Schema({
     type: Map,
     required: true,
     of: Number,
-    default: new Map<CurrencyType, number>()
+    default: () => new Map<string, number>()
   },
   approvedAmounts: {
     type: Map,
     required: true,
     of: Number,
-    default: new Map<CurrencyType, number>()
+    default: () => new Map<string, number>()
   },
   totals: {
     type: Map,
     required: true,
     of: Number,
-    default: new Map<CurrencyType, number>()
+    default: () => new Map<string, number>()
   },
   totalRefundedInShowCurrency: {
     type: moneySchema,
@@ -162,9 +162,9 @@ export const saleSchema = new Schema({
   ],
   totals: {
     type: Map,
-    required: true,
     of: Number,
-    default: new Map<CurrencyType, number>()
+    required: true,
+    default: () => new Map<string, number>()
   },
   totalSalesInShowCurrency: {
     type: moneySchema,

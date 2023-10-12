@@ -72,8 +72,8 @@
   <div class="flex flex-col w-full max-w-2xl rounded-xl bg-black overflow-auto">
     <div class="text-2xl font-bold mt-4">Invoice</div>
     <div class="text-sm mb-4">
-      ( {currencyFormatter().format(ticket.price)}
-      {ticket.currency} equivalent )
+      ( {currencyFormatter(ticket.price.currency).format(ticket.price.amount)}
+      {ticket.price.currency} equivalent )
     </div>
     <div class="grid grid-cols-2">
       {#if ticketStatus !== TicketStatus.CANCELLED && invoice.status !== InvoiceStatus.COMPLETE && invoice.status !== InvoiceStatus.INVALID && invoice.status !== InvoiceStatus.REFUNDED}

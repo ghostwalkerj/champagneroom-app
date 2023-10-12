@@ -112,19 +112,19 @@ const salesStatsSchema = new Schema({
     type: Map,
     required: true,
     of: Number,
-    default: new Map<CurrencyType, number>()
+    default: () => new Map<string, number>()
   },
   totalRefunded: {
     type: Map,
     required: true,
     of: Number,
-    default: new Map<CurrencyType, number>()
+    default: () => new Map<string, number>()
   },
   totalRevenue: {
     type: Map,
     required: true,
     of: Number,
-    default: new Map<CurrencyType, number>()
+    default: () => new Map<string, number>()
   },
   totalRevenueInShowCurrency: {
     type: moneySchema,
@@ -315,7 +315,7 @@ const showSchema = new Schema(
     price: {
       type: moneySchema,
       required: true,
-      default: { amount: 0, currency: CurrencyType.USD }
+      default: { amount: 0, currency: CurrencyType.USD, rate: 1 }
     },
     creatorInfo: {
       type: {

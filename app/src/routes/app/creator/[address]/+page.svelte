@@ -317,7 +317,7 @@
                           class="text-gray-500 sm:text-sm"
                           id="price-currency"
                         >
-                          USDC
+                          USD
                         </span>
                       </div>
                     </div>
