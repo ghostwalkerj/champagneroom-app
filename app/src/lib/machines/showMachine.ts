@@ -39,7 +39,7 @@ enum ShowMachineEventString {
 
 export { ShowMachineEventString };
 
-  export { createShowMachine };
+export { createShowMachine };
 
 export const createShowMachineService = ({
   showDocument,

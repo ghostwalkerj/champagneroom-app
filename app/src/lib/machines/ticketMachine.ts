@@ -226,11 +226,6 @@ const createTicketMachine = ({
               }
             },
             receivedPayment: {
-              always: {
-                target: '#ticketMachine.reserved.waiting4Show',
-                cond: 'fullyPaid',
-                actions: ['setFullyPaid', 'sendTicketSold']
-              },
               // under paid
               on: {
                 'PAYMENT RECEIVED': [
