@@ -49,6 +49,7 @@
   let hasPaymentSent = false;
   $: canWatchShow = false;
   let canCancelTicket = false;
+  let canRequestRefund = false;
   let isTicketDone = false;
   let canLeaveFeedback = false;
   let canDispute = false;
@@ -133,6 +134,7 @@
         rating: 5
       }
     });
+    canRequestRefund = state.matches('reserved.waiting4Show');
     canDispute = state.can({
       type: 'DISPUTE INITIATED',
       dispute: {
@@ -286,7 +288,7 @@
                     type="submit"
                     disabled={loading}
                   >
-                    {#if ticket.ticketState.sale && ticket.ticketState.sale.totalSalesInShowCurrency.amount > 0}
+                    {#if canRequestRefund}
                       Request Refund
                     {:else}
                       Cancel Ticket

@@ -17,7 +17,7 @@ import type {
   RefundType,
   SaleType
 } from '$lib/models/common';
-import { CurrencyType } from '$lib/models/common';
+import type { CurrencyType } from '$lib/models/common';
 import { RefundReason } from '$lib/models/common';
 import type { TicketDocumentType, TicketStateType } from '$lib/models/ticket';
 import { TicketStatus } from '$lib/models/ticket';
@@ -26,6 +26,7 @@ import type { TransactionDocumentType } from '$lib/models/transaction';
 import type { ShowJobDataType } from '$lib/workers/showWorker';
 
 import { ActorType } from '$lib/constants';
+import { calcTotal } from '$lib/util/payment';
 
 import { ShowMachineEventString } from './showMachine';
 
@@ -488,12 +489,8 @@ const createTicketMachine = ({
             approvedAmounts: state.sale?.totals || ({} as Map<string, number>),
             reason: RefundReason.SHOW_CANCELLED,
             totals: {} as Map<string, number>,
-            totalRefundedInShowCurrency: {
-              amount: 0,
-              currency: context.ticketDocument.price.currency,
-              rate: 1
-            }
-          };
+            payouts: {} as any
+          } as RefundType;
           return {
             ticketState: {
               ...context.ticketState,
@@ -509,19 +506,8 @@ const createTicketMachine = ({
             _id: new Types.ObjectId(),
             soldAt: new Date(),
             transactions: [] as Types.ObjectId[],
-            totals: new Map<string, number>(),
-            totalSalesInShowCurrency: {
-              amount: 0,
-              currency: context.ticketDocument.price.currency,
-              rate: 1
-            }
+            totals: new Map<string, number>()
           } as SaleType;
-
-          const keys = Object.keys(CurrencyType);
-          for (const key of keys) {
-            const currency = key as CurrencyType;
-            sale.totals.set(currency, 0);
-          }
 
           return {
             ticketState: {
@@ -578,16 +564,15 @@ const createTicketMachine = ({
           const total = (totals[payment.currency] || 0) + payment.amount;
           sale.totals[payment.currency] = total;
 
-          const showAmount =
-            (context.ticketState.sale?.totalSalesInShowCurrency.amount || 0) +
-            payment.amount * payment.rate;
-          const totalPaidInShowCurrency = {
-            amount: +showAmount.toFixed(2),
-            currency: context.ticketDocument.price.currency,
-            rate: 1
-          };
+          const payments = sale.payments[payment.currency] || [];
 
-          sale.totalSalesInShowCurrency = totalPaidInShowCurrency;
+          payments.push({
+            amount: +event.transaction.amount,
+            currency: event.transaction.currency.toUpperCase() as CurrencyType,
+            rate: +(event.transaction.rate || 0)
+          });
+
+          sale.payments[payment.currency] = payments;
 
           return {
             ticketState: {
@@ -625,38 +610,27 @@ const createTicketMachine = ({
             currency,
             rate: +(event.transaction.rate || 0)
           } as MoneyType;
-          const refund = state.refund || {
-            _id: new Types.ObjectId(),
-            requestedAt: new Date(),
-            transactions: [] as Types.ObjectId[],
-            requestedAmounts: new Map<string, number>(),
-            approvedAmounts: new Map<string, number>(),
-            reason: RefundReason.UNKNOWN,
-            totals: new Map<string, number>(),
-            totalRefundedInShowCurrency: {
-              amount: 0,
-              currency: context.ticketDocument.price.currency,
-              rate: 1
-            }
-          };
+          const refund = state.refund;
+          if (!refund) return {};
 
           const total = refund.totals[payment.currency] || 0 + payment.amount;
           refund.totals[payment.currency] = total;
+          refund.transactions.push(event.transaction._id);
 
-          const showAmount =
-            refund.totalRefundedInShowCurrency.amount +
-            payment.amount * payment.rate;
-          const totalRefundedInShowCurrency = {
-            amount: showAmount,
-            currency: context.ticketDocument.price.currency,
-            rate: 1
-          };
+          const payouts = refund.payouts[payment.currency] || [];
+
+          payouts.push({
+            amount: +event.transaction.amount,
+            currency: event.transaction.currency.toUpperCase() as CurrencyType,
+            rate: +(event.transaction.rate || 0)
+          });
+
+          refund.payouts[payment.currency] = payouts;
 
           return {
             ticketState: {
               ...context.ticketState,
-              refund,
-              totalRefundedInShowCurrency
+              refund
             }
           };
         }),
@@ -768,15 +742,15 @@ const createTicketMachine = ({
         fullyPaid: (context, event) => {
           const amount =
             event.type === 'PAYMENT RECEIVED' ? +event.transaction?.amount : 0;
-          const totalPaid = +(amount * +(event.transaction?.rate || 0)).toFixed(
-            0
-          );
+          let total = +(amount * +(event.transaction?.rate || 0)).toFixed(0);
 
-          return (
-            (context.ticketState.sale?.totalSalesInShowCurrency.amount || 0) +
-              totalPaid >=
-            context.ticketDocument.price.amount
-          );
+          // Check total payments with rates at time of transaction.
+          const payouts = (context.ticketState.sale?.payments ||
+            new Map<string, MoneyType[]>()) as Map<string, MoneyType[]>;
+          total += calcTotal(payouts);
+          console.log('total', total);
+
+          return total >= context.ticketDocument.price.amount;
         },
         showMissed: (context) => {
           return (
@@ -793,9 +767,17 @@ const createTicketMachine = ({
           const amount =
             event.type === 'REFUND RECEIVED' ? +event.transaction?.amount : 0;
           const totalRefundedAmount = refund.totals[currency] || 0 + amount;
-          for (const [_currency, amount] of refund.approvedAmounts) {
-            if (_currency === currency) continue;
-            if (refund.totals[_currency] || 0 < amount) return false;
+
+          // Check to see if all other currencies have been refunded
+          for (const key in Object.keys(refund.approvedAmounts)) {
+            if (key === currency) continue;
+            if (
+              !refund.approvedAmounts[key] ||
+              refund.approvedAmounts[key] === 0
+            )
+              return false;
+            if (refund.totals[key] || 0 < refund.approvedAmounts[key])
+              return false;
           }
 
           const refundedInTransactionCurrency =

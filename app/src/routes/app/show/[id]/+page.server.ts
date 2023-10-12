@@ -167,7 +167,7 @@ export const load: PageServerLoad = async ({ params }) => {
   });
 
   return {
-    show: show.toObject({ flattenObjectIds: true }),
+    show: show.toObject({ flattenObjectIds: true , flattenMaps: true}),
     displayName
   };
 };

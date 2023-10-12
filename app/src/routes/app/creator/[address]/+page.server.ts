@@ -36,7 +36,7 @@ export const actions: Actions = {
 
     return {
       success: true,
-      creator: creator?.toObject({ flattenObjectIds: true })
+      creator: creator?.toObject({ flattenObjectIds: true, flattenMaps: true })
     };
   },
   create_show: async ({ params, request }) => {
@@ -94,7 +94,7 @@ export const actions: Actions = {
     return {
       success: true,
       showCreated: true,
-      show: show.toObject({ flattenObjectIds: true })
+      show: show.toObject({ flattenObjectIds: true, flattenMaps: true })
     };
   },
   cancel_show: async ({ request, params, locals }) => {
@@ -200,13 +200,15 @@ export const load: PageServerLoad = async ({ params }) => {
     .limit(10)
     .exec();
 
+  // return the rate of exchange for UI from bitcart
+
   return {
-    creator: creator.toObject({ flattenObjectIds: true }),
+    creator: creator.toObject({ flattenObjectIds: true, flattenMaps: true }),
     currentShow: currentShow
-      ? currentShow.toObject({ flattenObjectIds: true })
+      ? currentShow.toObject({ flattenObjectIds: true, flattenMaps: true })
       : undefined,
     completedShows: completedShows.map((show) =>
-      show.toObject({ flattenObjectIds: true })
+      show.toObject({ flattenObjectIds: true, flattenMaps: true })
     )
   };
 };

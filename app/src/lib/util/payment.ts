@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+import type { MoneyType } from '$lib/models/common';
+
 import { createTokenTokenPost } from '$ext/bitcart';
 
 const permissions = ['full_control'];
@@ -34,6 +36,17 @@ export enum PayoutStatus {
   SENT = 'sent',
   COMPLETE = 'complete'
 }
+
+export const calcTotal = (payments: Map<string, MoneyType[]>) => {
+  let total = 0;
+  for (const key in Object.keys(payments)) {
+    const paymentArray = payments[key] as [MoneyType];
+    total += paymentArray.reduce((accumulator, current) => {
+      return accumulator + current.amount * current.rate;
+    }, 0);
+  }
+  return total;
+};
 
 export const createAuthToken = async (
   email: string,

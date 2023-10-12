@@ -589,10 +589,6 @@ const createShowMachine = ({
           salesStats.ticketsRefunded += 1;
           salesStats.ticketsSold -= 1;
 
-          salesStats.totalRefundedInShowCurrency.amount +
-            refund.totalRefundedInShowCurrency.amount;
-          salesStats.totalRevenueInShowCurrency.amount -
-            refund.totalRefundedInShowCurrency.amount;
           st.refunds.push(refund._id!);
 
           return {
@@ -678,10 +674,7 @@ const createShowMachine = ({
           const sale = event.sale;
           st.salesStats.ticketsSold += 1;
           st.salesStats.ticketsReserved -= 1;
-          st.salesStats.totalSalesInShowCurrency.amount +
-            sale.totalSalesInShowCurrency.amount;
-          st.salesStats.totalRevenueInShowCurrency.amount +
-            sale.totalSalesInShowCurrency.amount;
+
           st.sales.push(sale._id!);
           return {
             showState: {

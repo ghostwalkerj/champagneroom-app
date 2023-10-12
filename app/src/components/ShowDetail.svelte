@@ -23,6 +23,7 @@
     showWaterMark: true
   };
   export let options: ShowDetailOptions = defaultOptions;
+
   export let show: ShowDocumentType;
 
   options = {
@@ -40,10 +41,10 @@
   $: ticketsSold = salesStats.ticketsSold;
   $: ticketsRefunded = salesStats.ticketsRefunded;
   $: totalRefunded = currencyFormatter(show.price.currency).format(
-    salesStats.totalSalesInShowCurrency.amount
+    ticketsRefunded * show.price.amount
   );
   $: totalSales = currencyFormatter(show.price.currency).format(
-    salesStats.totalRevenueInShowCurrency.amount
+    ticketsSold * show.price.amount
   );
 
   const copyShowUrl = () => {

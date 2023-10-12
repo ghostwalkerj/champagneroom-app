@@ -137,9 +137,9 @@ export const load: PageServerLoad = async ({ params, url }) => {
   });
 
   return {
-    agent: agent.toObject({ flattenObjectIds: true }),
+    agent: agent.toObject({ flattenObjectIds: true, flattenMaps: true }),
     creators: creators.map((creator) =>
-      creator.toObject({ flattenObjectIds: true })
+      creator.toObject({ flattenObjectIds: true, flattenMaps: true })
     )
   };
 };

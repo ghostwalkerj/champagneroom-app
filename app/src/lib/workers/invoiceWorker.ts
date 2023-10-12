@@ -259,6 +259,8 @@ export const getInvoiceWorker = ({
                     currency: payout.currency
                   });
 
+                  await Transaction.create(transaction);
+
                   const ticketService = getTicketMachineService(
                     ticket,
                     redisConnection

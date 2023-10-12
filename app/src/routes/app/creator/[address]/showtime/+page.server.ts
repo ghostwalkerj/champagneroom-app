@@ -115,8 +115,8 @@ export const load: PageServerLoad = async ({ params, locals }) => {
   );
 
   return {
-    creator: creator.toObject({ flattenObjectIds: true }),
-    show: show.toObject({ flattenObjectIds: true }),
+    creator: creator.toObject({ flattenObjectIds: true, flattenMaps: true }),
+    show: show.toObject({ flattenObjectIds: true, flattenMaps: true }),
     jitsiToken
   };
 };

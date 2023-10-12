@@ -148,9 +148,9 @@
       <QRCodeImage text={currentPayment['payment_url']} />
     </div>
     <div class="pb-6">
-      {#if invoiceStatus === InvoiceStatus.EXPIRED}
+      {#if invoice.status === InvoiceStatus.EXPIRED}
         <span class="font-bold">Invoice Expired</span>
-      {:else if invoiceStatus === InvoiceStatus.COMPLETE}
+      {:else if invoice.status === InvoiceStatus.COMPLETE}
         Invoice Paid
       {:else}
         Please pay with your connected wallet before <span class="font-bold"

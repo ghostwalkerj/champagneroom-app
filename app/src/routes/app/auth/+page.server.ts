@@ -182,14 +182,20 @@ export const load: PageServerLoad = async ({ cookies }) => {
     case EntityType.AGENT: {
       const agent = await Agent.findOne({ 'user.address': address }).exec();
       if (agent) {
-        user = agent.toObject({ flattenObjectIds: true }).user;
+        user = agent.toObject({
+          flattenObjectIds: true,
+          flattenMaps: true
+        }).user;
       }
       break;
     }
     case EntityType.CREATOR: {
       const creator = await Creator.findOne({ 'user.address': address }).exec();
       if (creator) {
-        user = creator.toObject({ flattenObjectIds: true }).user;
+        user = creator.toObject({
+          flattenObjectIds: true,
+          flattenMaps: true
+        }).user;
       }
       break;
     }
@@ -198,7 +204,10 @@ export const load: PageServerLoad = async ({ cookies }) => {
         'user.address': address
       }).exec();
       if (operator) {
-        user = operator.toObject({ flattenObjectIds: true }).user;
+        user = operator.toObject({
+          flattenObjectIds: true,
+          flattenMaps: true
+        }).user;
       }
       break;
     }

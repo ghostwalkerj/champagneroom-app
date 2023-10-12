@@ -64,7 +64,7 @@ export const actions: Actions = {
       });
       return {
         success: true,
-        creator: creator.toObject({ flattenObjectIds: true })
+        creator: creator.toObject({ flattenObjectIds: true, flattenMaps: true })
       };
     } catch (error) {
       return fail(400, { err: JSON.stringify(error) });

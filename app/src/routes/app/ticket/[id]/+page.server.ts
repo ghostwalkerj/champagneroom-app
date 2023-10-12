@@ -101,11 +101,7 @@ export const actions: Actions = {
         requestedAmounts: sales.totals,
         approvedAmounts: new Map<string, number>(),
         totals: new Map<string, number>(),
-        totalRefundedInShowCurrency: {
-          amount: 0,
-          currency: 'USD',
-          rate: 1
-        }
+        payouts: {} as any
       } as RefundType;
 
       // Refund the same amount as sent, not equivalent to show currency
@@ -312,8 +308,8 @@ export const load: PageServerLoad = async ({ params, cookies, url }) => {
   }
 
   return {
-    ticket: ticket.toObject({ flattenObjectIds: true }),
-    show: show.toObject({ flattenObjectIds: true }),
+    ticket: ticket.toObject({ flattenObjectIds: true, flattenMaps: true }),
+    show: show.toObject({ flattenObjectIds: true, flattenMaps: true }),
     invoice: invoice?.data
   };
 };

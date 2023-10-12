@@ -118,6 +118,6 @@ export const load: PageServerLoad = async ({ params, cookies, locals }) => {
     ticket: ticket.toObject({
       flattenObjectIds: true
     }),
-    show: show.toObject({ flattenObjectIds: true })
+    show: show.toObject({ flattenObjectIds: true, flattenMaps: true })
   };
 };

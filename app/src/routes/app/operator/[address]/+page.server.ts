@@ -54,7 +54,7 @@ export const actions: Actions = {
       });
 
       return {
-        agent: agent?.toObject({ flattenObjectIds: true }),
+        agent: agent?.toObject({ flattenObjectIds: true, flattenMaps: true }),
         success: true,
         agentCreated: true
       };
@@ -96,7 +96,10 @@ export const actions: Actions = {
       return {
         success: true,
         creatorCreated: true,
-        creator: creator?.toObject({ flattenObjectIds: true })
+        creator: creator?.toObject({
+          flattenObjectIds: true,
+          flattenMaps: true
+        })
       };
     } catch (error) {
       return fail(400, { err: error });
@@ -231,13 +234,15 @@ export const load: PageServerLoad = async ({ params, url, cookies }) => {
   }).populate<{ show: ShowType }>('show');
 
   return {
-    operator: operator.toObject({ flattenObjectIds: true }),
-    agents: agents.map((agent) => agent.toObject({ flattenObjectIds: true })),
+    operator: operator.toObject({ flattenObjectIds: true, flattenMaps: true }),
+    agents: agents.map((agent) =>
+      agent.toObject({ flattenObjectIds: true, flattenMaps: true })
+    ),
     creators: creators.map((creator) =>
-      creator.toObject({ flattenObjectIds: true })
+      creator.toObject({ flattenObjectIds: true, flattenMaps: true })
     ),
     disputedTickets: disputedTickets.map((ticket) =>
-      ticket.toObject({ flattenObjectIds: true })
+      ticket.toObject({ flattenObjectIds: true, flattenMaps: true })
     )
   };
 };
