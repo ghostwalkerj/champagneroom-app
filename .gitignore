@@ -27,3 +27,4 @@ app/src/lib/machines/ticketMachine.typegen.d.ts
 **/dist/**
 app/src/lib/bitcart/**
 app/src/routes/app/payment/+page.server.ts
+app/.favorites.json

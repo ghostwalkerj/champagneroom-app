@@ -65,6 +65,7 @@ if (startWorker) {
   const showWorker = getShowWorker({
     // @ts-ignore
     showQueue,
+    payoutQueue,
     redisConnection,
     paymentAuthToken,
     escrowPeriod: +(process.env.PUBLIC_ESCROW_PERIOD || 36_000_000),
@@ -76,6 +77,7 @@ if (startWorker) {
   invoiceWorker.run();
 
   const paymentWorker = getPayoutWorker({
+    // @ts-ignore
     payoutQueue,
     redisConnection,
     paymentAuthToken,

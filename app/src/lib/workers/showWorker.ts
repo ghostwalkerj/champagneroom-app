@@ -9,14 +9,11 @@ import type {
   RefundType,
   SaleType
 } from '$lib/models/common';
-import { RefundReason } from '$lib/models/common';
 import { Creator } from '$lib/models/creator';
 import type { ShowType } from '$lib/models/show';
 import { SaveState, Show, ShowStatus } from '$lib/models/show';
 import { createShowEvent } from '$lib/models/showEvent';
 import { Ticket, TicketStatus } from '$lib/models/ticket';
-import type { TransactionType } from '$lib/models/transaction';
-import { Transaction, TransactionReasonType } from '$lib/models/transaction';
 
 import {
   createShowMachineService,
@@ -26,18 +23,23 @@ import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
 import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 
 import { ActorType, EntityType } from '$lib/constants';
+import { PayoutJobType } from '$lib/util/payment';
 import {
   getTicketMachineService,
   getTicketMachineServiceFromId
 } from '$lib/util/util.server';
 
+import type { PayoutQueueType } from './payoutWorker';
+
 export const getShowWorker = ({
   showQueue,
+  payoutQueue,
   redisConnection,
   escrowPeriod = 3_600_000,
   gracePeriod = 3_600_000
 }: {
   showQueue: ShowQueueType;
+  payoutQueue: PayoutQueueType;
   redisConnection: IORedis;
   escrowPeriod: number;
   gracePeriod: number;
@@ -57,7 +59,7 @@ export const getShowWorker = ({
           break;
         }
         case ShowMachineEventString.REFUND_INITIATED: {
-          refundShow(show, showQueue);
+          refundShow(show, showQueue, payoutQueue);
           break;
         }
         case ShowMachineEventString.SHOW_STARTED: {
@@ -108,7 +110,12 @@ export const getShowWorker = ({
           break;
         }
         case ShowMachineEventString.TICKET_CANCELLED: {
-          ticketCancelled(show, job.data.ticketId, job.data.customerName);
+          ticketCancelled(
+            show,
+            job.data.ticketId,
+            job.data.customerName,
+            job.data.cancel
+          );
           break;
         }
         case ShowMachineEventString.TICKET_FINALIZED: {
@@ -180,6 +187,7 @@ const cancelShow = async (
     ticketService.send(cancelEvent);
     ticketService.stop();
   }
+
   const showState = showService.getSnapshot();
   if (showState.matches('initiatedCancellation.waiting2Refund')) {
     showService.send(ShowMachineEventString.REFUND_INITIATED);
@@ -190,7 +198,11 @@ const cancelShow = async (
   showService.stop();
 };
 
-const refundShow = async (show: ShowType, showQueue: ShowQueueType) => {
+const refundShow = async (
+  show: ShowType,
+  showQueue: ShowQueueType,
+  payoutQueue: PayoutQueueType
+) => {
   const showService = createShowMachineService({
     showDocument: show,
     showMachineOptions: {
@@ -202,33 +214,20 @@ const refundShow = async (show: ShowType, showQueue: ShowQueueType) => {
 
   // Check if show needs to send refunds
   const showState = showService.getSnapshot();
-  if (showState.matches('initiatedCancellation.initiatedRefund')) {
+  console.log('showState', showState.value);
+  if (showState.matches('initiatedCancellation.waiting2Refund')) {
     const tickets = await Ticket.find({
       show: show._id,
-      // eslint-disable-next-line @typescript-eslint/naming-convention
       'ticketState.activeState': true
     });
     for (const ticket of tickets) {
       // send refunds
-      //TODO: Send real transactions
       const ticketService = getTicketMachineService(ticket, showQueue);
       const ticketState = ticketService.getSnapshot();
-      if (ticketState.matches('reserved.waiting4Refund')) {
-        const refundTransaction = (await Transaction.create({
-          ticket: ticket._id,
-          creator: ticket.creator,
-          agent: ticket.agent,
-          show: ticket.show,
-          reason: TransactionReasonType.TICKET_REFUND,
-          hash: '0xeba2df809e7a612a0a0d444ccfa5c839624bdc00dd29e3340d46df3870f8a30e',
-          from: '0x5B38Da6a701c568545dCfcB03FcB875f56beddC4',
-          to: '0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2',
-          amount: 0
-        })) as TransactionType;
-
-        ticketService.send({
-          type: TicketMachineEventString.REFUND_RECEIVED,
-          transaction: refundTransaction
+      if (ticketState.matches('reserved.refundRequested')) {
+        payoutQueue.add(PayoutJobType.CREATE_REFUND, {
+          invoiceId: ticket.invoiceId,
+          ticketId: ticket._id.toString()
         });
         ticketService.stop();
       }
@@ -545,7 +544,8 @@ const ticketRefunded = async (show: ShowType, refund: RefundType) => {
 const ticketCancelled = async (
   show: ShowType,
   ticketId: string,
-  customerName: string
+  customerName: string,
+  cancel: CancelType
 ) => {
   const showService = createShowMachineService({
     showDocument: show,
@@ -565,7 +565,8 @@ const ticketCancelled = async (
   showService.send({
     type: ShowMachineEventString.TICKET_CANCELLED,
     ticketId,
-    customerName
+    customerName,
+    cancel
   });
 };
 

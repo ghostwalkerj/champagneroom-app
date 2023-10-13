@@ -18,7 +18,7 @@ import {
 } from '$lib/ext/bitcart';
 import type { DisplayInvoice } from '$lib/ext/bitcart/models';
 import type { PaymentType } from '$lib/util/payment';
-import { InvoiceStatus, PayoutJobType, PayoutStatus } from '$lib/util/payment';
+import { PayoutJobType, PayoutStatus } from '$lib/util/payment';
 import { getTicketMachineService } from '$lib/util/util.server';
 
 export const getPayoutWorker = ({
@@ -38,6 +38,7 @@ export const getPayoutWorker = ({
     EntityType.PAYOUT,
     async (job: Job<PayoutJobDataType, any, string>) => {
       const payoutType = job.name as PayoutJobType;
+      // create ticket refund
 
       switch (payoutType) {
         case PayoutJobType.CREATE_REFUND: {
@@ -51,6 +52,18 @@ export const getPayoutWorker = ({
             return;
           }
 
+          const ticket = await Ticket.findById(ticketId);
+          if (!ticket) {
+            return;
+          }
+
+          const ticketService = getTicketMachineService(
+            ticket,
+            redisConnection
+          );
+
+          const ticketState = ticketService.getSnapshot();
+
           const response = (await getInvoiceByIdInvoicesModelIdGet(invoiceId, {
             headers: {
               Authorization: `Bearer ${paymentAuthToken}`,
@@ -60,10 +73,7 @@ export const getPayoutWorker = ({
           const invoice = response.data as DisplayInvoice;
 
           // Possible there is unconfirmed payments.  If so, queue it up again and wait for timeout.
-          if (
-            invoice.status === InvoiceStatus.IN_PROGRESS ||
-            invoice.status === InvoiceStatus.PENDING
-          ) {
+          if (ticketState.matches('reserved.initiatedPayment')) {
             payoutQueue.add(
               PayoutJobType.CREATE_REFUND,
               {
@@ -74,16 +84,14 @@ export const getPayoutWorker = ({
             return;
           }
 
+          if (!ticketState.matches('reserved.refundRequested')) {
+            return;
+          }
+
           const issueRefund = async () => {
             try {
               const payment = invoice.payments?.[0] as PaymentType;
               const returnAddress = payment.user_address; // Just send the return as lump sum to first address
-
-              // create ticket refund
-              const ticket = await Ticket.findById(ticketId);
-              if (!ticket) {
-                throw new Error('Ticket not found');
-              }
 
               // Tell the ticketMachine REFUND INITIATED
               const ticketRefund = ticket.ticketState.refund;
@@ -99,10 +107,6 @@ export const getPayoutWorker = ({
 
               ticketRefund.approvedAmounts = approvedAmounts;
 
-              const ticketService = getTicketMachineService(
-                ticket,
-                redisConnection
-              );
               ticketService.send({
                 type: TicketMachineEventString.REFUND_INITIATED,
                 refund: ticketRefund

@@ -186,8 +186,8 @@ const createTicketMachine = ({
           initial: 'waiting4Payment',
           on: {
             'SHOW CANCELLED': {
-              target: '#ticketMachine.reserved.waiting4Refund',
-              actions: ['refundCancelledShow']
+              target: '#ticketMachine.reserved.refundRequested',
+              actions: ['requestRefundCancelledShow']
             }
           },
           states: {
@@ -479,7 +479,7 @@ const createTicketMachine = ({
           );
         },
 
-        refundCancelledShow: assign((context, event) => {
+        requestRefundCancelledShow: assign((context, event) => {
           const state = context.ticketState;
           const refund = {
             _id: new Types.ObjectId(),
@@ -749,7 +749,6 @@ const createTicketMachine = ({
           const payouts = (context.ticketState.sale?.payments ||
             new Map<string, MoneyType[]>()) as Map<string, MoneyType[]>;
           total += calcTotal(payouts);
-          console.log('total', total);
 
           return total >= context.ticketDocument.price.amount;
         },
