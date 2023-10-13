@@ -126,8 +126,9 @@
       state.matches('reserved.waiting4Show') || state.matches('redeemed');
     hasPaymentSent = state.matches('reserved.initiatedPayment');
     canCancelTicket =
-      state.matches('reserved.waiting4Show') ||
-      state.matches('reserved.waiting4Payment');
+      (state.matches('reserved.waiting4Show') ||
+        state.matches('reserved.waiting4Payment')) &&
+      !hasShowStarted;
     canLeaveFeedback = state.can({
       type: 'FEEDBACK RECEIVED',
       feedback: {
@@ -135,7 +136,8 @@
         rating: 5
       }
     });
-    canRequestRefund = state.matches('reserved.waiting4Show');
+    canRequestRefund =
+      state.matches('reserved.waiting4Show') && !hasShowStarted;
     canDispute = state.can({
       type: 'DISPUTE INITIATED',
       dispute: {
@@ -408,9 +410,7 @@
             </div>
           {/if}
           {#if canLeaveFeedback && canDispute}
-            <div class="w-full flex justify-center">
-              <div class="divider w-36">OR</div>
-            </div>
+            <div class="divider w-36 pt-6">OR</div>
           {/if}
           {#if canDispute}
             <input type="checkbox" id="initiate-dispute" class="modal-toggle" />

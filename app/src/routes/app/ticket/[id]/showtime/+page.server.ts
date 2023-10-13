@@ -116,7 +116,8 @@ export const load: PageServerLoad = async ({ params, cookies, locals }) => {
   return {
     jitsiToken,
     ticket: ticket.toObject({
-      flattenObjectIds: true
+      flattenObjectIds: true,
+      flattenMaps: true
     }),
     show: show.toObject({ flattenObjectIds: true, flattenMaps: true })
   };

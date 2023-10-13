@@ -61,6 +61,7 @@
   $: canStartShow = false;
   $: loading = false;
   $: showStopped = false;
+  $: showCancelled = false;
 
   let creatorUnSub: Unsubscriber;
   let showEventUnSub: Unsubscriber;
@@ -118,6 +119,10 @@
   const useShowMachine = (showMachineService: ShowMachineServiceType) => {
     const state = showMachineService.getSnapshot();
     showStopped = state.matches('stopped');
+    showCancelled = state.matches('cancelled');
+    if (showCancelled) {
+      noCurrentShow();
+    }
     canCancelShow = state.can({
       type: 'CANCELLATION INITIATED',
       cancel: {
@@ -174,7 +179,6 @@
         currentShow = result.data.show as ShowDocumentType;
         useNewShow(currentShow);
       } else if (result.data.showCancelled) {
-        noCurrentShow();
         statusText = 'Cancelled';
       } else if (result.data.inEscrow) {
         noCurrentShow();
