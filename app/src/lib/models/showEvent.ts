@@ -46,7 +46,7 @@ export const createShowEvent = ({
   ShowEvent.create({
     show: show._id,
     type,
-    ticket: ticketId,
+    ticketId,
     transaction: transaction?._id,
     agent: show.agent,
     creator: show.creator,

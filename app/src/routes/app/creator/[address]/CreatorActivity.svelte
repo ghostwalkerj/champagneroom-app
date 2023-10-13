@@ -12,7 +12,9 @@
 <div class="bg-primary text-primary-content card">
   <div class="text-left card-body items-center">
     <h2 class="text-2xl card-title">Activity</h2>
-    <h2 class="text-lg card-title">{completedShows.length} Completed Shows</h2>
+    <h2 class="text-lg card-title">
+      {completedShows.length} Completed Show{#if completedShows.length > 1}s{/if}
+    </h2>
 
     <ul class="w-full">
       {#each completedShows.slice(0, 9) as show}
@@ -33,7 +35,9 @@
                   {/if}
                 </div>
                 <div class="text-sm text-gray-200">
-                  {currencyFormatter().format(show.price)}
+                  {currencyFormatter(show.price.currency).format(
+                    show.price.amount
+                  )}
                 </div>
               </div>
               <div class="flex flex-row w-full">

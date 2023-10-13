@@ -40,12 +40,6 @@ const salesSchema = new Schema({
     min: 0,
     required: true
   },
-  totalRevenue: {
-    type: Map,
-    required: true,
-    of: Number,
-    default: () => new Map<string, number>()
-  }
 });
 
 const creatorSchema = new Schema(

@@ -14,6 +14,7 @@ import type {
 import { DisputeDecision } from '$lib/models/common';
 import type { ShowDocumentType } from '$lib/models/show';
 import { ShowStatus } from '$lib/models/show';
+import type { TicketType } from '$lib/models/ticket.js';
 import type { TransactionDocumentType } from '$lib/models/transaction';
 
 import { ActorType } from '$lib/constants';
@@ -61,9 +62,12 @@ export const createShowMachineService = ({
 
   if (showMachineOptions?.saveShowEventCallback) {
     showService.onEvent((event) => {
-      const ticketId = ('ticketId' in event ? event.ticketId : undefined) as
-        | string
-        | undefined;
+      let ticketId: string | undefined;
+      if ('ticket' in event) {
+        const ticket = event.ticket as TicketType;
+        ticketId = ticket._id.toString();
+      }
+
       const transaction = (
         'transaction' in event ? event.transaction : undefined
       ) as TransactionDocumentType | undefined;
@@ -91,33 +95,34 @@ export type ShowMachineEventType =
     }
   | {
       type: 'TICKET FINALIZED';
-      ticketId: string;
+      ticket: TicketType;
     }
   | {
       type: 'REFUND INITIATED';
     }
   | {
       type: 'TICKET REFUNDED';
+      ticket: TicketType;
       refund: RefundType;
     }
   | {
       type: 'TICKET REDEEMED';
-      ticketId: string;
+      ticket: TicketType;
     }
   | {
       type: 'TICKET RESERVED';
-      ticketId: string;
+      ticket: TicketType;
       customerName: string;
     }
   | {
       type: 'TICKET CANCELLED';
-      ticketId: string;
+      ticket: TicketType;
       customerName: string;
       cancel: CancelType;
     }
   | {
       type: 'TICKET SOLD';
-      ticketId: string;
+      ticket: TicketType;
       sale: SaleType;
       customerName: string;
     }
@@ -136,21 +141,22 @@ export type ShowMachineEventType =
     }
   | {
       type: 'CUSTOMER JOINED';
-      ticketId: string;
+      ticket: TicketType;
       customerName: string;
     }
   | {
       type: 'CUSTOMER LEFT';
-      ticketId: string;
+      ticket: TicketType;
       customerName: string;
     }
   | {
       type: 'TICKET DISPUTED';
       dispute: DisputeType;
+      ticket: TicketType;
     }
   | {
       type: 'DISPUTE RESOLVED';
-      ticketId: string;
+      ticket: TicketType;
       decision: DisputeDecision;
     };
 
@@ -586,11 +592,19 @@ const createShowMachine = ({
         refundTicket: assign((context, event) => {
           const st = context.showState;
           const refund = event.refund;
+          const totals = refund.totals;
           const salesStats = st.salesStats;
 
           salesStats.ticketsRefunded += 1;
           salesStats.ticketsSold -= 1;
           salesStats.ticketsAvailable += 1;
+
+          for (const [key, value] of Object.entries(totals)) {
+            if (!salesStats.totalRefunded[key]) {
+              salesStats.totalRefunded[key] = 0;
+            }
+            salesStats.totalRefunded[key] += value;
+          }
 
           st.refunds.push(refund._id!);
 
@@ -631,7 +645,7 @@ const createShowMachine = ({
 
         reserveTicket: assign((context, event) => {
           const st = context.showState;
-          st.reservations.push(new Types.ObjectId(event.ticketId));
+          st.reservations.push(new Types.ObjectId(event.ticket._id.toString()));
           return {
             showState: {
               ...st,
@@ -646,7 +660,7 @@ const createShowMachine = ({
 
         redeemTicket: assign((context, event) => {
           const st = context.showState;
-          st.redemptions.push(new Types.ObjectId(event.ticketId));
+          st.redemptions.push(new Types.ObjectId(event.ticket._id.toString()));
           return {
             showState: {
               ...st,
@@ -660,14 +674,23 @@ const createShowMachine = ({
 
         finalizeTicket: assign((context, event) => {
           const st = context.showState;
-          st.finalizations.push(new Types.ObjectId(event.ticketId));
+          const salesStats = st.salesStats;
+          const totals = event.ticket.ticketState.sale
+            ? event.ticket.ticketState.sale.totals
+            : {};
+
+          for (const [key, value] of Object.entries(totals)) {
+            if (!salesStats.totalSales[key]) {
+              salesStats.totalSales[key] = 0;
+            }
+            salesStats.totalSales[key] += value;
+          }
+          st.finalizations.push(
+            new Types.ObjectId(event.ticket._id.toString())
+          );
           return {
             showState: {
-              ...st,
-              salesStats: {
-                ...st.salesStats,
-                ticketsFinalized: st.salesStats.ticketsFinalized + 1
-              }
+              ...st
             }
           };
         }),

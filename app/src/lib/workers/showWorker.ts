@@ -13,6 +13,7 @@ import { Creator } from '$lib/models/creator';
 import type { ShowType } from '$lib/models/show';
 import { SaveState, Show, ShowStatus } from '$lib/models/show';
 import { createShowEvent } from '$lib/models/showEvent';
+import type { TicketType } from '$lib/models/ticket';
 import { Ticket, TicketStatus } from '$lib/models/ticket';
 
 import {
@@ -106,7 +107,7 @@ export const getShowWorker = ({
           break;
         }
         case ShowMachineEventString.TICKET_REFUNDED: {
-          ticketRefunded(show, job.data.refund);
+          ticketRefunded(show, job.data.refund, job.data.ticketId);
           break;
         }
         case ShowMachineEventString.TICKET_CANCELLED: {
@@ -123,7 +124,7 @@ export const getShowWorker = ({
           break;
         }
         case ShowMachineEventString.TICKET_DISPUTED: {
-          ticketDisputed(show, job.data.dispute);
+          ticketDisputed(show, job.data.dispute, job.data.ticketId);
           break;
         }
         case ShowMachineEventString.DISPUTE_RESOLVED: {
@@ -370,8 +371,7 @@ const finalizeShow = async (show: ShowType, showQueue: ShowQueueType) => {
       _id: undefined,
       totalSales: { $sum: '$showState.salesStats.totalSales' },
       numberOfCompletedShows: { $sum: 1 },
-      totalRefunded: { $sum: '$showState.salesStats.totalRefunded' },
-      totalRevenue: { $sum: '$showState.salesStats.totalRevenue' }
+      totalRefunded: { $sum: '$showState.salesStats.totalRefunded' }
     };
 
     const aggregate = await Show.aggregate().match(showFilter).group(groupBy);
@@ -385,15 +385,13 @@ const finalizeShow = async (show: ShowType, showQueue: ShowQueueType) => {
       'numberOfCompletedShows'
     ] as number;
     const totalRefunded = aggregate[0]['totalRefunded'] as number;
-    const totalRevenue = aggregate[0]['totalRevenue'] as number;
 
     await Creator.findByIdAndUpdate(
       { _id: show.creator },
       {
         'salesStats.totalSales': totalSales,
         'salesStats.numberOfCompletedShows': numberOfCompletedShows,
-        'salesStats.totalRefunded': totalRefunded,
-        'salesStats.totalRevenue': totalRevenue
+        'salesStats.totalRefunded': totalRefunded
       }
     );
     creatorSession.endSession();
@@ -420,9 +418,10 @@ const customerJoined = async (
         })
     }
   });
+  const ticket = (await Ticket.findById(ticketId).exec()) as TicketType;
   showService.send({
     type: ShowMachineEventString.CUSTOMER_JOINED,
-    ticketId,
+    ticket,
     customerName
   });
 };
@@ -446,9 +445,10 @@ const customerLeft = async (
         })
     }
   });
+  const ticket = (await Ticket.findById(ticketId).exec()) as TicketType;
   showService.send({
     type: ShowMachineEventString.CUSTOMER_LEFT,
-    ticketId,
+    ticket,
     customerName
   });
 };
@@ -473,9 +473,11 @@ const ticketSold = async (
         })
     }
   });
+  const ticket = (await Ticket.findById(ticketId).exec()) as TicketType;
+
   showService.send({
     type: ShowMachineEventString.TICKET_SOLD,
-    ticketId,
+    ticket,
     sale,
     customerName
   });
@@ -491,9 +493,11 @@ const ticketRedeemed = async (show: ShowType, ticketId: string) => {
     }
   });
 
+  const ticket = (await Ticket.findById(ticketId).exec()) as TicketType;
+
   showService.send({
     type: ShowMachineEventString.TICKET_REDEEMED,
-    ticketId
+    ticket
   });
 };
 
@@ -517,14 +521,20 @@ const ticketReserved = async (
     }
   });
 
+  const ticket = (await Ticket.findById(ticketId).exec()) as TicketType;
+
   showService.send({
     type: ShowMachineEventString.TICKET_RESERVED,
-    ticketId,
+    ticket,
     customerName
   });
 };
 
-const ticketRefunded = async (show: ShowType, refund: RefundType) => {
+const ticketRefunded = async (
+  show: ShowType,
+  refund: RefundType,
+  ticketId: string
+) => {
   const showService = createShowMachineService({
     showDocument: show,
     showMachineOptions: {
@@ -534,9 +544,12 @@ const ticketRefunded = async (show: ShowType, refund: RefundType) => {
     }
   });
 
+  const ticket = (await Ticket.findById(ticketId).exec()) as TicketType;
+
   showService.send({
     type: ShowMachineEventString.TICKET_REFUNDED,
-    refund
+    refund,
+    ticket
   });
 };
 
@@ -561,9 +574,11 @@ const ticketCancelled = async (
     }
   });
 
+  const ticket = (await Ticket.findById(ticketId).exec()) as TicketType;
+
   showService.send({
     type: ShowMachineEventString.TICKET_CANCELLED,
-    ticketId,
+    ticket,
     customerName,
     cancel
   });
@@ -581,15 +596,17 @@ const ticketFinalized = async (show: ShowType, ticketId: string) => {
   });
   const showState = showService.getSnapshot();
 
+  const ticket = (await Ticket.findById(ticketId).exec()) as TicketType;
+
   if (
     showState.can({
       type: ShowMachineEventString.TICKET_FINALIZED,
-      ticketId
+      ticket
     })
   ) {
     showService.send({
       type: ShowMachineEventString.TICKET_FINALIZED,
-      ticketId
+      ticket
     });
   }
   const showSession = await Show.startSession();
@@ -664,7 +681,11 @@ const ticketFinalized = async (show: ShowType, ticketId: string) => {
   });
 };
 
-const ticketDisputed = async (show: ShowType, dispute: DisputeType) => {
+const ticketDisputed = async (
+  show: ShowType,
+  dispute: DisputeType,
+  ticketId: string
+) => {
   const showService = createShowMachineService({
     showDocument: show,
     showMachineOptions: {
@@ -674,9 +695,12 @@ const ticketDisputed = async (show: ShowType, dispute: DisputeType) => {
     }
   });
 
+  const ticket = (await Ticket.findById(ticketId).exec()) as TicketType;
+
   showService.send({
     type: ShowMachineEventString.TICKET_DISPUTED,
-    dispute
+    dispute,
+    ticket
   });
 };
 
@@ -696,16 +720,15 @@ const ticketDisputeResolved = async (
     }
   });
 
+  const ticket = (await Ticket.findById(ticketId).exec()) as TicketType;
+
   showService.send({
     type: ShowMachineEventString.DISPUTE_RESOLVED,
-    ticketId,
+    ticket,
     decision
   });
 
-  const ticketService = await getTicketMachineServiceFromId(
-    ticketId,
-    showQueue
-  );
+  const ticketService = getTicketMachineService(ticket, showQueue);
 
   ticketService.send({
     type: TicketMachineEventString.DISPUTE_RESOLVED,

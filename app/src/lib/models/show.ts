@@ -119,12 +119,6 @@ const salesStatsSchema = new Schema({
     required: true,
     of: Number,
     default: () => new Map<string, number>()
-  },
-  totalRevenue: {
-    type: Map,
-    required: true,
-    of: Number,
-    default: () => new Map<string, number>()
   }
 });
 

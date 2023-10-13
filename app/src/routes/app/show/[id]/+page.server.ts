@@ -86,7 +86,7 @@ export const actions: Actions = {
     if (
       !showState.can({
         type: ShowMachineEventString.TICKET_RESERVED,
-        ticketId: ticket._id.toString(),
+        ticket,
         customerName: name
       })
     ) {
@@ -167,7 +167,7 @@ export const load: PageServerLoad = async ({ params }) => {
   });
 
   return {
-    show: show.toObject({ flattenObjectIds: true , flattenMaps: true}),
+    show: show.toObject({ flattenObjectIds: true, flattenMaps: true }),
     displayName
   };
 };
