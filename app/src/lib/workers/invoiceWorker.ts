@@ -61,35 +61,6 @@ export const getInvoiceWorker = ({
       }
 
       switch (jobType) {
-        case InvoiceJobType.INITIATE_PAYMENT: {
-          // Create Invoice in Bitcart
-          const paymentId = job.data.paymentId;
-          const address = job.data.address;
-
-          if (!paymentId || !address) {
-            return;
-          }
-
-          try {
-            updatePaymentDetailsInvoicesModelIdDetailsPatch(
-              invoiceId,
-              {
-                id: paymentId,
-                address
-              },
-              {
-                headers: {
-                  Authorization: `Bearer ${paymentAuthToken}`,
-                  'Content-Type': 'application/json'
-                }
-              }
-            );
-          } catch (error_) {
-            console.error(error_);
-          }
-          break;
-        }
-
         case InvoiceJobType.CANCEL: {
           try {
             invoiceId &&

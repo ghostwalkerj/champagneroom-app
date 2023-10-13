@@ -103,9 +103,10 @@
         // Initiate payment by adding address to the invoice
         let formData = new FormData();
         formData.append('address', $selectedAccount.address);
-        formData.append('id', invoice.id!);
+        formData.append('invoiceId', invoice.id!);
         formData.append('paymentId', currentPayment.id!);
         formData.append('ticketId', ticket._id.toString());
+
         await fetch($page.url.href + '?/initiate_payment', {
           method: 'POST',
           body: formData

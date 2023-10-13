@@ -214,7 +214,6 @@ const refundShow = async (
 
   // Check if show needs to send refunds
   const showState = showService.getSnapshot();
-  console.log('showState', showState.value);
   if (showState.matches('initiatedCancellation.waiting2Refund')) {
     const tickets = await Ticket.find({
       show: show._id,

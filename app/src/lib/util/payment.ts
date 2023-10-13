@@ -8,7 +8,6 @@ const permissions = ['full_control'];
 
 export enum InvoiceJobType {
   UPDATE = 'UPDATE',
-  INITIATE_PAYMENT = 'INITIATE_PAYMENT',
   CANCEL = 'CANCEL'
 }
 

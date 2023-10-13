@@ -37,7 +37,10 @@ import {
   getTicketMachineServiceFromId
 } from '$lib/util/util.server';
 
-import { getInvoiceByIdInvoicesModelIdGet } from '$ext/bitcart';
+import {
+  getInvoiceByIdInvoicesModelIdGet,
+  updatePaymentDetailsInvoicesModelIdDetailsPatch
+} from '$ext/bitcart';
 import type { DisplayInvoice } from '$ext/bitcart/models';
 
 import type { Actions, PageServerLoad } from './$types';
@@ -215,7 +218,7 @@ export const actions: Actions = {
   initiate_payment: async ({ request, locals }) => {
     const data = await request.formData();
     const address = data.get('address') as string;
-    const id = data.get('id') as string;
+    const invoiceId = data.get('invoiceId') as string;
     const paymentId = data.get('paymentId') as string;
     const ticketId = data.get('ticketId') as string;
 
@@ -223,26 +226,40 @@ export const actions: Actions = {
       return fail(400, { address, missingAddress: true });
     }
 
-    if (!id) {
-      return fail(400, { id, missingId: true });
+    if (!invoiceId) {
+      return fail(400, { invoiceId, missingInvoiceId: true });
     }
 
     if (!paymentId) {
       return fail(400, { paymentId, missingPaymentId: true });
     }
 
-    // Tell bitcart payment is coming
     const redisConnection = locals.redisConnection as IORedis;
 
-    const invoiceQueue = new Queue(EntityType.INVOICE, {
-      connection: redisConnection
-    });
+    // Tell bitcart payment is coming
+    const token = await createAuthToken(
+      BITCART_EMAIL,
+      BITCART_PASSWORD,
+      PUBLIC_BITCART_API_URL
+    );
 
-    invoiceQueue.add(InvoiceJobType.INITIATE_PAYMENT, {
-      invoiceId: id,
-      paymentId,
-      address
-    });
+    try {
+      updatePaymentDetailsInvoicesModelIdDetailsPatch(
+        invoiceId,
+        {
+          id: paymentId,
+          address
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+    } catch (error_) {
+      console.error(error_);
+    }
 
     // Alert Ticket to incoming transaction
     const ticketService = await getTicketMachineServiceFromId(
