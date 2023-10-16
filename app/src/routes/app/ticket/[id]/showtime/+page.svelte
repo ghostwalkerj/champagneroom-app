@@ -53,9 +53,9 @@
     };
   }
 
-  const profileImage = urlJoin(
-    $page.url.origin,
-    getProfileImage(ticket.customerName, PUBLIC_PROFILE_IMAGE_PATH)
+  const profileImage = getProfileImage(
+    ticket.customerName,
+    PUBLIC_PROFILE_IMAGE_PATH
   );
   onMount(() => {
     const options = {

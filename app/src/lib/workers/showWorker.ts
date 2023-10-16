@@ -235,6 +235,7 @@ const refundShow = async (
   }
   showService.stop();
 };
+
 const startShow = async (show: ShowType) => {
   const showService = createShowMachineService({
     showDocument: show,
@@ -359,6 +360,85 @@ const finalizeShow = async (show: ShowType, showQueue: ShowQueueType) => {
       });
     }
   }
+
+  // Calculate sales stats for show
+  const showSession = await Show.startSession();
+
+  await showSession.withTransaction(async () => {
+    // aggregate all ticket stats
+    // sales and refunds
+    const ticketFilter = {
+      show: show._id
+    };
+
+    const projectSales = {
+      totalSales: {
+        $objectToArray: '$ticketState.sale.totals'
+      }
+    };
+
+    const unwindSales = {
+      path: '$totalSales'
+    };
+
+    const groupBySales = {
+      _id: '$totalSales.k',
+      totalSales: { $sum: '$totalSales.v' }
+    };
+
+    const projectRefunds = {
+      totalRefunds: {
+        $objectToArray: '$ticketState.refund.totals'
+      }
+    };
+
+    const unwindRefunds = {
+      path: '$totalRefunds'
+    };
+
+    const groupByRefunds = {
+      _id: '$totalRefunds.k',
+      totalRefunds: { $sum: '$totalRefunds.v' }
+    };
+
+    const aggregateSalesAndRefunds = await Ticket.aggregate()
+      .match(ticketFilter)
+      .facet({
+        sales: [
+          { $project: projectSales },
+          { $unwind: unwindSales },
+          { $group: groupBySales }
+        ],
+        refunds: [
+          { $project: projectRefunds },
+          { $unwind: unwindRefunds },
+          { $group: groupByRefunds }
+        ]
+      });
+
+    const totalRevenue = new Map<string, number>();
+    for (const sale of aggregateSalesAndRefunds[0].sales) {
+      totalRevenue.set(sale['_id'], sale['totalSales']);
+    }
+
+    const totalRefunds = new Map<string, number>();
+    for (const refund of aggregateSalesAndRefunds[0].refunds) {
+      totalRefunds.set(refund['_id'], refund['totalRefunds']);
+    }
+
+    const totalSales = show.showState.salesStats.ticketsSold * +show.price;
+
+    await Show.findByIdAndUpdate(
+      { _id: show._id },
+      {
+        'salesStats.totalSales': totalSales,
+        'salesStats.totalRevenue': totalRevenue,
+        'salesStats.totalRefunds': totalRefunds
+      }
+    );
+    showSession.endSession();
+  });
+
   // Calculate sales stats
   const creatorSession = await Creator.startSession();
   await creatorSession.withTransaction(async () => {
@@ -367,31 +447,81 @@ const finalizeShow = async (show: ShowType, showQueue: ShowQueueType) => {
       'showState.status': ShowStatus.FINALIZED
     };
 
-    const groupBy = {
-      _id: undefined,
-      totalSales: { $sum: '$showState.salesStats.totalSales' },
-      numberOfCompletedShows: { $sum: 1 },
-      totalRefunded: { $sum: '$showState.salesStats.totalRefunded' }
+    const projectSales = {
+      totalSales: {
+        $objectToArray: '$showState.sale.totals'
+      }
     };
 
-    const aggregate = await Show.aggregate().match(showFilter).group(groupBy);
+    const unwindSales = {
+      path: '$totalSales'
+    };
 
-    if (aggregate.length === 0) {
-      return;
+    const groupBySales = {
+      _id: '$totalSales.k',
+      totalSales: { $sum: '$totalSales.v' }
+    };
+
+    const projectRefunds = {
+      totalRefunds: {
+        $objectToArray: '$showState.refund.totals'
+      }
+    };
+
+    const unwindRefunds = {
+      path: '$totalRefunds'
+    };
+
+    const groupByRefunds = {
+      _id: '$totalRefunds.k',
+      totalRefunds: { $sum: '$totalRefunds.v' }
+    };
+
+    const aggregateSalesAndRefunds = await Ticket.aggregate()
+      .match(showFilter)
+      .facet({
+        numberOfCompletedShows: [
+          {
+            $group: {
+              _id: '$show',
+              count: { $sum: 1 }
+            }
+          }
+        ],
+        sales: [
+          { $project: projectSales },
+          { $unwind: unwindSales },
+          { $group: groupBySales }
+        ],
+        refunds: [
+          { $project: projectRefunds },
+          { $unwind: unwindRefunds },
+          { $group: groupByRefunds }
+        ]
+      });
+
+    const totalRevenue = new Map<string, number>();
+    for (const sale of aggregateSalesAndRefunds[0].sales) {
+      totalRevenue.set(sale['_id'], sale['totalSales']);
     }
 
-    const totalSales = aggregate[0]['totalSales'] as number;
-    const numberOfCompletedShows = aggregate[0][
-      'numberOfCompletedShows'
-    ] as number;
-    const totalRefunded = aggregate[0]['totalRefunded'] as number;
+    const totalRefunds = new Map<string, number>();
+    for (const refund of aggregateSalesAndRefunds[0].refunds) {
+      totalRefunds.set(refund['_id'], refund['totalRefunds']);
+    }
+
+    const totalSales = show.showState.salesStats.ticketsSold * +show.price;
+
+    const numberOfCompletedShows =
+      aggregateSalesAndRefunds[0].numberOfCompletedShows[0].count;
 
     await Creator.findByIdAndUpdate(
       { _id: show.creator },
       {
         'salesStats.totalSales': totalSales,
         'salesStats.numberOfCompletedShows': numberOfCompletedShows,
-        'salesStats.totalRefunded': totalRefunded
+        'salesStats.totalRefunds': totalRefunds,
+        'salesStats.totalRevenue': totalRevenue
       }
     );
     creatorSession.endSession();

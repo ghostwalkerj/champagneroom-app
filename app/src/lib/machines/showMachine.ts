@@ -592,19 +592,11 @@ const createShowMachine = ({
         refundTicket: assign((context, event) => {
           const st = context.showState;
           const refund = event.refund;
-          const totals = refund.totals;
           const salesStats = st.salesStats;
 
           salesStats.ticketsRefunded += 1;
           salesStats.ticketsSold -= 1;
           salesStats.ticketsAvailable += 1;
-
-          for (const [key, value] of Object.entries(totals)) {
-            if (!salesStats.totalRefunded[key]) {
-              salesStats.totalRefunded[key] = 0;
-            }
-            salesStats.totalRefunded[key] += value;
-          }
 
           st.refunds.push(refund._id!);
 
@@ -674,17 +666,6 @@ const createShowMachine = ({
 
         finalizeTicket: assign((context, event) => {
           const st = context.showState;
-          const salesStats = st.salesStats;
-          const totals = event.ticket.ticketState.sale
-            ? event.ticket.ticketState.sale.totals
-            : {};
-
-          for (const [key, value] of Object.entries(totals)) {
-            if (!salesStats.totalSales[key]) {
-              salesStats.totalSales[key] = 0;
-            }
-            salesStats.totalSales[key] += value;
-          }
           st.finalizations.push(
             new Types.ObjectId(event.ticket._id.toString())
           );

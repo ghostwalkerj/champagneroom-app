@@ -766,7 +766,7 @@ const createTicketMachine = ({
           if (refundApproved === 0) return false;
           const amount =
             event.type === 'REFUND RECEIVED' ? +event.transaction?.amount : 0;
-          const totalRefundedAmount = refund.totals[currency] || 0 + amount;
+          const totalRefundsAmount = refund.totals[currency] || 0 + amount;
 
           // Check to see if all other currencies have been refunded
           for (const [key, value] of Object.entries(refund.approvedAmounts)) {
@@ -781,7 +781,7 @@ const createTicketMachine = ({
           }
 
           const refundedInTransactionCurrency =
-            totalRefundedAmount >= refundApproved;
+            totalRefundsAmount >= refundApproved;
 
           return refundedInTransactionCurrency;
         },

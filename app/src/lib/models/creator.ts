@@ -34,12 +34,12 @@ const salesSchema = new Schema({
     min: 0,
     required: true
   },
-  totalRefunded: {
+  totalRefunds: {
     type: Number,
     default: 0,
     min: 0,
     required: true
-  },
+  }
 });
 
 const creatorSchema = new Schema(

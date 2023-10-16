@@ -48,7 +48,7 @@
   let shouldPay = false;
   let hasPaymentSent = false;
   $: canWatchShow = false;
-  let canCancelTicket = false;
+  $: canCancelTicket = false;
   let canRequestRefund = false;
   let isTicketDone = false;
   let canLeaveFeedback = false;
