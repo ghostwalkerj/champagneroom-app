@@ -1,6 +1,7 @@
 import type { Job, Queue } from 'bullmq';
 import { Worker } from 'bullmq';
 import type IORedis from 'ioredis';
+import { t } from 'xstate';
 
 import type {
   CancelType,
@@ -452,95 +453,121 @@ const finalizeShow = async (show: ShowType, showQueue: ShowQueueType) => {
   });
 
   // Calculate sales stats
-  // const creatorSession = await Creator.startSession();
-  // await creatorSession.withTransaction(async () => {
-  //   const showFilter = {
-  //     creator: show.creator,
-  //     'showState.status': ShowStatus.FINALIZED
-  //   };
+  const creatorSession = await Creator.startSession();
+  await creatorSession.withTransaction(async () => {
+    const showFilter = {
+      creator: show.creator,
+      'showState.status': ShowStatus.FINALIZED
+    };
 
-  //   const projectSales = {
-  //     totalSales: {
-  //       $objectToArray: '$showState.sale.totals'
-  //     }
-  //   };
+    const projectSales = {
+      totalSales: {
+        $objectToArray: '$showState.salesStats.totalSales'
+      }
+    };
 
-  //   const unwindSales = {
-  //     path: '$totalSales'
-  //   };
+    const unwindSales = {
+      path: '$totalSales'
+    };
 
-  //   const groupBySales = {
-  //     _id: '$totalSales.k',
-  //     totalSales: { $sum: '$totalSales.v' }
-  //   };
+    const groupBySales = {
+      _id: '$totalSales.k',
+      totalSales: { $sum: '$totalSales.v' }
+    };
 
-  //   const projectRefunds = {
-  //     totalRefunds: {
-  //       $objectToArray: '$showState.refund.totals'
-  //     }
-  //   };
+    const projectRefunds = {
+      totalRefunds: {
+        $objectToArray: '$showState.salesStats.totalRefunds'
+      }
+    };
 
-  //   const unwindRefunds = {
-  //     path: '$totalRefunds'
-  //   };
+    const unwindRefunds = {
+      path: '$totalRefunds'
+    };
 
-  //   const groupByRefunds = {
-  //     _id: '$totalRefunds.k',
-  //     totalRefunds: { $sum: '$totalRefunds.v' }
-  //   };
+    const groupByRefunds = {
+      _id: '$totalRefunds.k',
+      totalRefunds: { $sum: '$totalRefunds.v' }
+    };
 
-  //   const aggregateSalesAndRefunds = await Show.aggregate()
-  //     .match(showFilter)
-  //     .facet({
-  //       numberOfCompletedShows: [
-  //         {
-  //           $group: {
-  //             _id: '$show',
-  //             count: { $sum: 1 }
-  //           }
-  //         }
-  //       ],
-  //       sales: [
-  //         { $project: projectSales },
-  //         { $unwind: unwindSales },
-  //         { $group: groupBySales }
-  //       ],
-  //       refunds: [
-  //         { $project: projectRefunds },
-  //         { $unwind: unwindRefunds },
-  //         { $group: groupByRefunds }
-  //       ]
-  //     });
+    const projectTicketAmount = {
+      ticketSalesAmounts: '$showState.salesStats.ticketSalesAmount'
+    };
 
-  //   if (aggregateSalesAndRefunds.length === 0) {
-  //     return;
-  //   }
+    const groupByTicketAmount = {
+      _id: '$ticketSalesAmounts.currency',
+      total: { $sum: '$ticketSalesAmounts.amount' }
+    };
 
-  //   console.log(aggregateSalesAndRefunds);
+    const aggregateSalesAndRefunds = await Show.aggregate()
+      .match(showFilter)
+      .facet({
+        numberOfCompletedShows: [
+          {
+            $group: {
+              _id: '$show',
+              count: { $sum: 1 }
+            }
+          }
+        ],
+        sales: [
+          { $project: projectSales },
+          { $unwind: unwindSales },
+          { $group: groupBySales }
+        ],
+        refunds: [
+          { $project: projectRefunds },
+          { $unwind: unwindRefunds },
+          { $group: groupByRefunds }
+        ],
+        ticketAmounts: [
+          { $project: projectTicketAmount },
+          { $group: groupByTicketAmount }
+        ]
+      });
 
-  //   const totalRevenue = new Map<string, number>();
-  //   for (const sale of aggregateSalesAndRefunds[0].sales) {
-  //     totalRevenue.set(sale['_id'], sale['totalSales']);
-  //   }
+    if (aggregateSalesAndRefunds.length === 0) {
+      return;
+    }
 
-  //   const totalRefunds = new Map<string, number>();
-  //   for (const refund of aggregateSalesAndRefunds[0].refunds) {
-  //     totalRefunds.set(refund['_id'], refund['totalRefunds']);
-  //   }
+    const totalSales = new Map<string, number>();
+    const totalRevenue = new Map<string, number>();
 
-  //   const numberOfCompletedShows =
-  //     aggregateSalesAndRefunds[0].numberOfCompletedShows[0].count;
+    for (const sale of aggregateSalesAndRefunds[0].sales) {
+      totalSales.set(sale['_id'], sale['totalSales']);
+      totalRevenue.set(sale['_id'], sale['totalSales']);
+    }
 
-  //   await Creator.findByIdAndUpdate(
-  //     { _id: show.creator },
-  //     {
-  //       'salesStats.numberOfCompletedShows': numberOfCompletedShows,
-  //       'salesStats.totalRefunds': totalRefunds,
-  //       'salesStats.totalRevenue': totalRevenue
-  //     }
-  //   );
-  //   creatorSession.endSession();
-  // });
+    const totalRefunds = new Map<string, number>();
+
+    for (const refund of aggregateSalesAndRefunds[0].refunds) {
+      totalRefunds.set(refund['_id'], refund['totalRefunds']);
+      const revenue = totalRevenue.get(refund['_id']);
+      if (revenue) {
+        totalRevenue.set(refund['_id'], revenue - refund['totalRefunds']);
+      }
+    }
+
+    const totalTicketSalesAmounts = new Map<string, number>();
+    for (const ticketAmount of aggregateSalesAndRefunds[0].ticketAmounts) {
+      totalTicketSalesAmounts.set(ticketAmount['_id'], ticketAmount['total']);
+    }
+
+    const numberOfCompletedShows =
+      aggregateSalesAndRefunds[0].numberOfCompletedShows[0].count;
+
+    await Creator.findByIdAndUpdate(
+      { _id: show.creator },
+      {
+        'salesStats.numberOfCompletedShows': numberOfCompletedShows,
+        'salesStats.totalRefunds': totalRefunds,
+        'salesStats.totalRevenue': totalRevenue,
+        'salesStats.totalSales': totalSales,
+        'salesStats.totalTicketSalesAmounts': totalTicketSalesAmounts
+      }
+    );
+    creatorSession.endSession();
+  });
 };
 
 // Ticket Events

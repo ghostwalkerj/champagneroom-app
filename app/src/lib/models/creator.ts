@@ -1,7 +1,7 @@
 import type { InferSchemaType, Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
 
-import { userSchema } from './common';
+import { CurrencyType, moneySchema, userSchema } from './common';
 
 const { Schema, models } = pkg;
 
@@ -34,11 +34,23 @@ const salesSchema = new Schema({
     min: 0,
     required: true
   },
+  totalTicketSalesAmounts: {
+    type: Map,
+    required: true,
+    of: Number,
+    default: () => new Map<string, number>()
+  },
+  totalSales: {
+    type: Map,
+    required: true,
+    of: Number,
+    default: () => new Map<string, number>()
+  },
   totalRefunds: {
-    type: Number,
-    default: 0,
-    min: 0,
-    required: true
+    type: Map,
+    required: true,
+    of: Number,
+    default: () => new Map<string, number>()
   }
 });
 
