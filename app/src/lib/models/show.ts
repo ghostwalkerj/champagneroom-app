@@ -108,10 +108,16 @@ const salesStatsSchema = new Schema({
       message: '{VALUE} is not an integer value'
     }
   },
-  totalSales: {
+  ticketSalesAmount: {
     type: moneySchema,
     required: true,
     default: { amount: 0, currency: CurrencyType.USD, rate: 1 }
+  },
+  totalSales: {
+    type: Map,
+    required: true,
+    of: Number,
+    default: () => new Map<string, number>()
   },
   totalRevenue: {
     type: Map,

@@ -416,116 +416,131 @@ const finalizeShow = async (show: ShowType, showQueue: ShowQueueType) => {
         ]
       });
 
+    const totalSales = new Map<string, number>();
     const totalRevenue = new Map<string, number>();
     for (const sale of aggregateSalesAndRefunds[0].sales) {
+      totalSales.set(sale['_id'], sale['totalSales']);
       totalRevenue.set(sale['_id'], sale['totalSales']);
     }
 
     const totalRefunds = new Map<string, number>();
     for (const refund of aggregateSalesAndRefunds[0].refunds) {
       totalRefunds.set(refund['_id'], refund['totalRefunds']);
+      const revenue = totalRevenue.get(refund['_id']);
+      if (revenue) {
+        totalRevenue.set(refund['_id'], revenue - refund['totalRefunds']);
+      }
     }
 
-    const totalSales = show.showState.salesStats.ticketsSold * +show.price;
+    const ticketSalesAmount =
+      show.showState.salesStats.ticketsSold * show.price.amount;
 
     await Show.findByIdAndUpdate(
       { _id: show._id },
       {
-        'salesStats.totalSales': totalSales,
-        'salesStats.totalRevenue': totalRevenue,
-        'salesStats.totalRefunds': totalRefunds
+        'showState.salesStats.ticketSalesAmount': {
+          amount: ticketSalesAmount,
+          currency: show.price.currency,
+          rate: show.price.rate
+        },
+        'showState.salesStats.totalSales': totalSales,
+        'showState.salesStats.totalRefunds': totalRefunds,
+        'showState.salesStats.totalRevenue': totalRevenue
       }
     );
     showSession.endSession();
   });
 
   // Calculate sales stats
-  const creatorSession = await Creator.startSession();
-  await creatorSession.withTransaction(async () => {
-    const showFilter = {
-      creator: show.creator,
-      'showState.status': ShowStatus.FINALIZED
-    };
+  // const creatorSession = await Creator.startSession();
+  // await creatorSession.withTransaction(async () => {
+  //   const showFilter = {
+  //     creator: show.creator,
+  //     'showState.status': ShowStatus.FINALIZED
+  //   };
 
-    const projectSales = {
-      totalSales: {
-        $objectToArray: '$showState.sale.totals'
-      }
-    };
+  //   const projectSales = {
+  //     totalSales: {
+  //       $objectToArray: '$showState.sale.totals'
+  //     }
+  //   };
 
-    const unwindSales = {
-      path: '$totalSales'
-    };
+  //   const unwindSales = {
+  //     path: '$totalSales'
+  //   };
 
-    const groupBySales = {
-      _id: '$totalSales.k',
-      totalSales: { $sum: '$totalSales.v' }
-    };
+  //   const groupBySales = {
+  //     _id: '$totalSales.k',
+  //     totalSales: { $sum: '$totalSales.v' }
+  //   };
 
-    const projectRefunds = {
-      totalRefunds: {
-        $objectToArray: '$showState.refund.totals'
-      }
-    };
+  //   const projectRefunds = {
+  //     totalRefunds: {
+  //       $objectToArray: '$showState.refund.totals'
+  //     }
+  //   };
 
-    const unwindRefunds = {
-      path: '$totalRefunds'
-    };
+  //   const unwindRefunds = {
+  //     path: '$totalRefunds'
+  //   };
 
-    const groupByRefunds = {
-      _id: '$totalRefunds.k',
-      totalRefunds: { $sum: '$totalRefunds.v' }
-    };
+  //   const groupByRefunds = {
+  //     _id: '$totalRefunds.k',
+  //     totalRefunds: { $sum: '$totalRefunds.v' }
+  //   };
 
-    const aggregateSalesAndRefunds = await Ticket.aggregate()
-      .match(showFilter)
-      .facet({
-        numberOfCompletedShows: [
-          {
-            $group: {
-              _id: '$show',
-              count: { $sum: 1 }
-            }
-          }
-        ],
-        sales: [
-          { $project: projectSales },
-          { $unwind: unwindSales },
-          { $group: groupBySales }
-        ],
-        refunds: [
-          { $project: projectRefunds },
-          { $unwind: unwindRefunds },
-          { $group: groupByRefunds }
-        ]
-      });
+  //   const aggregateSalesAndRefunds = await Show.aggregate()
+  //     .match(showFilter)
+  //     .facet({
+  //       numberOfCompletedShows: [
+  //         {
+  //           $group: {
+  //             _id: '$show',
+  //             count: { $sum: 1 }
+  //           }
+  //         }
+  //       ],
+  //       sales: [
+  //         { $project: projectSales },
+  //         { $unwind: unwindSales },
+  //         { $group: groupBySales }
+  //       ],
+  //       refunds: [
+  //         { $project: projectRefunds },
+  //         { $unwind: unwindRefunds },
+  //         { $group: groupByRefunds }
+  //       ]
+  //     });
 
-    const totalRevenue = new Map<string, number>();
-    for (const sale of aggregateSalesAndRefunds[0].sales) {
-      totalRevenue.set(sale['_id'], sale['totalSales']);
-    }
+  //   if (aggregateSalesAndRefunds.length === 0) {
+  //     return;
+  //   }
 
-    const totalRefunds = new Map<string, number>();
-    for (const refund of aggregateSalesAndRefunds[0].refunds) {
-      totalRefunds.set(refund['_id'], refund['totalRefunds']);
-    }
+  //   console.log(aggregateSalesAndRefunds);
 
-    const totalSales = show.showState.salesStats.ticketsSold * +show.price;
+  //   const totalRevenue = new Map<string, number>();
+  //   for (const sale of aggregateSalesAndRefunds[0].sales) {
+  //     totalRevenue.set(sale['_id'], sale['totalSales']);
+  //   }
 
-    const numberOfCompletedShows =
-      aggregateSalesAndRefunds[0].numberOfCompletedShows[0].count;
+  //   const totalRefunds = new Map<string, number>();
+  //   for (const refund of aggregateSalesAndRefunds[0].refunds) {
+  //     totalRefunds.set(refund['_id'], refund['totalRefunds']);
+  //   }
 
-    await Creator.findByIdAndUpdate(
-      { _id: show.creator },
-      {
-        'salesStats.totalSales': totalSales,
-        'salesStats.numberOfCompletedShows': numberOfCompletedShows,
-        'salesStats.totalRefunds': totalRefunds,
-        'salesStats.totalRevenue': totalRevenue
-      }
-    );
-    creatorSession.endSession();
-  });
+  //   const numberOfCompletedShows =
+  //     aggregateSalesAndRefunds[0].numberOfCompletedShows[0].count;
+
+  //   await Creator.findByIdAndUpdate(
+  //     { _id: show.creator },
+  //     {
+  //       'salesStats.numberOfCompletedShows': numberOfCompletedShows,
+  //       'salesStats.totalRefunds': totalRefunds,
+  //       'salesStats.totalRevenue': totalRevenue
+  //     }
+  //   );
+  //   creatorSession.endSession();
+  // });
 };
 
 // Ticket Events

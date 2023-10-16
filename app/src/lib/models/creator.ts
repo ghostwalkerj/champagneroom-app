@@ -22,7 +22,7 @@ const feedbackSchema = new Schema({
 });
 
 const salesSchema = new Schema({
-  totalSales: {
+  totalRevenue: {
     type: Map,
     required: true,
     of: Number,

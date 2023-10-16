@@ -613,7 +613,7 @@
 
                             <td
                               >{currencyFormatter().format(
-                                creator.salesStats.totalSales
+                                creator.salesStats.totalRevenue
                               )}</td
                             >
                             <td
