@@ -7,6 +7,7 @@ import { CancelReason, CurrencyType } from '$lib/models/common';
 import type { CreatorType } from '$lib/models/creator';
 import { Creator } from '$lib/models/creator';
 import { Show, ShowStatus } from '$lib/models/show';
+import { Wallet } from '$lib/models/wallet';
 
 import type { ShowMachineEventType } from '$lib/machines/showMachine';
 import { ShowMachineEventString } from '$lib/machines/showMachine';
@@ -199,6 +200,12 @@ export const load: PageServerLoad = async ({ params }) => {
     .limit(10)
     .exec();
 
+  const wallet = await Wallet.findOne({ _id: creator.user.wallet })
+    .orFail(() => {
+      throw error(404, 'Creator wallet not found');
+    })
+    .exec();
+
   // return the rate of exchange for UI from bitcart
 
   return {
@@ -208,6 +215,7 @@ export const load: PageServerLoad = async ({ params }) => {
       : undefined,
     completedShows: completedShows.map((show) =>
       show.toObject({ flattenObjectIds: true, flattenMaps: true })
-    )
+    ),
+    wallet: wallet.toObject({ flattenObjectIds: true, flattenMaps: true })
   };
 };

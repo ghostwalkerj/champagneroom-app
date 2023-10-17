@@ -164,8 +164,14 @@ export const userSchema = new Schema(
   {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     _id: { type: Schema.Types.ObjectId, required: true, auto: true },
+    wallet: {
+      type: Schema.Types.ObjectId,
+      ref: 'Wallet',
+      required: true,
+      index: true
+    },
 
-    walletAddress: {
+    address: {
       type: String,
       maxLength: 50,
       validator: (v: string) => validator.isEthereumAddress(v),
@@ -195,15 +201,6 @@ export const userSchema = new Schema(
     active: {
       type: Boolean,
       default: true,
-      index: true
-    },
-
-    address: {
-      type: String,
-      required: true,
-      maxLength: 50,
-      minLength: 30,
-      unique: true,
       index: true
     }
   },

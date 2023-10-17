@@ -559,13 +559,11 @@ const createTicketMachine = ({
             rate: +(event.transaction.rate || 0),
             transaction: event.transaction._id
           };
-          console.log('payment', payment);
           const totals = sale.totals;
           const total = (totals[payment.currency] || 0) + payment.amount;
           sale.totals[payment.currency] = total;
           const payments = sale.payments[payment.currency] || [];
           payments.push(payment);
-          console.dir(payments);
           sale.payments[payment.currency] = payments;
 
           return {

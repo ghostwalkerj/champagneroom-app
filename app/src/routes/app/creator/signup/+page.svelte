@@ -58,7 +58,7 @@
 
   const onSubmit = async ({ formData }) => {
     formData.append('profileImageUrl', profileImageUrl);
-    formData.append('walletAddress', walletAddress);
+    formData.append('address', walletAddress);
     formData.append('message', message);
 
     if (wallet) {

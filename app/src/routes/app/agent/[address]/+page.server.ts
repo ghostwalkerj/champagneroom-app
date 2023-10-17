@@ -11,6 +11,7 @@ import {
 import { Agent } from '$lib/models/agent';
 import { AuthType } from '$lib/models/common';
 import { Creator } from '$lib/models/creator';
+import { Wallet } from '$lib/models/wallet';
 
 import { womensNames } from '$lib/util/womensNames';
 
@@ -34,12 +35,15 @@ export const actions: Actions = {
     }
 
     try {
+      const wallet = new Wallet();
+      wallet.save();
       Creator.create({
         user: {
           name,
           authType: AuthType.UNIQUE_KEY,
           address: nanoid(30)
         },
+        wallet: wallet._id,
         agentCommission: +commission,
         agent: agentId,
         profileImageUrl: PUBLIC_DEFAULT_PROFILE_IMAGE

@@ -5,6 +5,7 @@ import { AUTH_SIGNING_MESSAGE } from '$env/static/private';
 
 import { AuthType } from '$lib/models/common';
 import { Creator } from '$lib/models/creator';
+import { Wallet } from '$lib/models/wallet';
 
 import { EntityType } from '$lib/constants';
 
@@ -37,7 +38,7 @@ export const actions: Actions = {
     const data = await request.formData();
     const name = data.get('name') as string;
     const profileImageUrl = data.get('profileImageUrl') as string;
-    const walletAddress = data.get('walletAddress') as string;
+    const address = data.get('address') as string;
     const message = data.get('message') as string;
     const signature = data.get('signature') as string;
 
@@ -47,17 +48,19 @@ export const actions: Actions = {
     }
 
     // Verify Auth
-    if (!verifySignature(message, walletAddress, signature)) {
+    if (!verifySignature(message, address, signature)) {
       throw error(400, 'Invalid Signature');
     }
 
     try {
+      const wallet = new Wallet();
+      wallet.save();
       const creator = await Creator.create({
         user: {
           name,
           authType: AuthType.SIGNING,
-          address: walletAddress.toLocaleLowerCase(),
-          walletAddress: walletAddress.toLocaleLowerCase()
+          address: address.toLocaleLowerCase(),
+          wallet: wallet._id
         },
         agentCommission: 0,
         profileImageUrl
@@ -67,6 +70,7 @@ export const actions: Actions = {
         creator: creator.toObject({ flattenObjectIds: true, flattenMaps: true })
       };
     } catch (error) {
+      console.log('err', error);
       return fail(400, { err: JSON.stringify(error) });
     }
   }

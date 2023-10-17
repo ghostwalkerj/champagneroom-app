@@ -18,6 +18,7 @@ import { Creator } from '$lib/models/creator';
 import { Operator } from '$lib/models/operator';
 import { Show, type ShowType } from '$lib/models/show';
 import { Ticket, TicketStatus } from '$lib/models/ticket';
+import { Wallet } from '$lib/models/wallet';
 
 import { ShowMachineEventString } from '$lib/machines/showMachine';
 
@@ -47,10 +48,13 @@ export const actions: Actions = {
     }
 
     try {
+      const wallet = new Wallet();
+      wallet.save();
       const agent = await Agent.create({
         'user.address': address.toLowerCase(),
         'user.name': name,
-        'user.authType': AuthType.SIGNING
+        'user.authType': AuthType.SIGNING,
+        'user.wallet': wallet._id
       });
 
       return {
@@ -70,9 +74,6 @@ export const actions: Actions = {
     const commission = data.get('commission') as string;
 
     // Validation
-    if (agentId === null || agentId === '0') {
-      return fail(400, { agentId, missingAgentId: true });
-    }
     if (!name || name.length < 3 || name.length > 50) {
       name = uniqueNamesGenerator({
         dictionaries: [womensNames]
@@ -83,11 +84,14 @@ export const actions: Actions = {
     }
 
     try {
+      const wallet = new Wallet();
+      wallet.save();
       const creator = await Creator.create({
         user: {
           name,
           authType: AuthType.UNIQUE_KEY,
-          address: nanoid(30)
+          address: nanoid(30),
+          wallet: wallet._id
         },
         agentCommission: +commission,
         agent: new ObjectId(agentId),

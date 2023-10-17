@@ -18,6 +18,7 @@
   import type { CreatorDocumentType } from '$lib/models/creator';
   import type { ShowDocumentType } from '$lib/models/show';
   import type { ShowEventDocumentType } from '$lib/models/showEvent';
+  import type { WalletDocumentType } from '$lib/models/wallet';
 
   import type { ShowMachineServiceType } from '$lib/machines/showMachine';
   import {
@@ -45,6 +46,7 @@
   let creator = data.creator as CreatorDocumentType;
   let currentShow = data.currentShow as ShowDocumentType | undefined;
   let completedShows = data.completedShows as ShowDocumentType[];
+  let wallet = data.wallet as WalletDocumentType;
   let showName = creator
     ? possessive(creator.user.name, 'en') + ' Show'
     : 'Show';
@@ -460,7 +462,7 @@
 
       <!-- Wallet -->
       <div>
-        <CreatorWallet />
+        <CreatorWallet {wallet} />
       </div>
 
       <!-- Activity Feed -->

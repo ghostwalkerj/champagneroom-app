@@ -782,7 +782,8 @@ const ticketFinalized = async (show: ShowType, ticketId: string) => {
     // aggregate ticket feedback into show
     const ticketFilter = {
       show: show._id,
-      'ticketState.status': TicketStatus.FINALIZED
+      'ticketState.status': TicketStatus.FINALIZED,
+      'ticketState.feedback': { $exists: true }
     };
 
     const groupBy = {
