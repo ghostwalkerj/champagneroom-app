@@ -1,7 +1,7 @@
 import type { InferSchemaType, Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
 
-import { CurrencyType, moneySchema, userSchema } from './common';
+import { userSchema } from './common';
 
 const { Schema, models } = pkg;
 

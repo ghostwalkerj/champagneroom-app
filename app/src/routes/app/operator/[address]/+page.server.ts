@@ -202,7 +202,7 @@ export const actions: Actions = {
   }
 };
 
-export const load: PageServerLoad = async ({ params, url, cookies }) => {
+export const load: PageServerLoad = async ({ params, url }) => {
   const address = params.address;
   const operatorUrl = urlJoin(url.origin, PUBLIC_OPERATOR_PATH);
 

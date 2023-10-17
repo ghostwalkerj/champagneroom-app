@@ -111,7 +111,7 @@ const salesStatsSchema = new Schema({
   ticketSalesAmount: {
     type: moneySchema,
     required: true,
-    default: { amount: 0, currency: CurrencyType.USD, rate: 1 }
+    default: { amount: 0, currency: CurrencyType.USD }
   },
   totalSales: {
     type: Map,
@@ -305,7 +305,7 @@ const showSchema = new Schema(
     price: {
       type: moneySchema,
       required: true,
-      default: { amount: 0, currency: CurrencyType.USD, rate: 1 }
+      default: { amount: 0, currency: CurrencyType.USD }
     },
     creatorInfo: {
       type: {

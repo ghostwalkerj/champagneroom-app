@@ -126,7 +126,11 @@
       'active',
       active ? active.toString() : creator.user.active.toString()
     );
-    formData.append('agentId', agentId || creator.agent.toString());
+    if (agentId) {
+      formData.append('agentId', agentId);
+    } else {
+      formData.append('agentId', '');
+    }
 
     await fetch('?/update_creator', {
       method: 'POST',

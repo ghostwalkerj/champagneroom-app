@@ -17,8 +17,7 @@ import {
   getInvoiceByIdInvoicesModelIdGet,
   getPayoutByIdPayoutsModelIdGet,
   getRefundInvoicesRefundsRefundIdGet,
-  modifyInvoiceInvoicesModelIdPatch,
-  updatePaymentDetailsInvoicesModelIdDetailsPatch
+  modifyInvoiceInvoicesModelIdPatch
 } from '$lib/ext/bitcart';
 import type { DisplayInvoice, DisplayPayout } from '$lib/ext/bitcart/models';
 import {
@@ -150,7 +149,7 @@ export const getInvoiceWorker = ({
                     reason: TransactionReasonType.TICKET_PAYMENT,
                     amount: payment.amount,
                     rate: payment.rate,
-                    currency: payment.currency,
+                    currency: payment.currency.toUpperCase(),
                     confirmations: payment.confirmations,
                     total: (+payment.amount * +payment.rate).toFixed(2)
                   }) as TransactionType;
@@ -226,7 +225,7 @@ export const getInvoiceWorker = ({
                     to: payout.destination,
                     reason: TransactionReasonType.TICKET_REFUND,
                     amount: payout.amount,
-                    currency: payout.currency
+                    currency: payout.currency?.toUpperCase()
                   });
 
                   await Transaction.create(transaction);

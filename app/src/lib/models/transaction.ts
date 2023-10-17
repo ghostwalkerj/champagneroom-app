@@ -2,6 +2,8 @@ import type { InferSchemaType, Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
 import validator from 'validator';
 
+import { CurrencyType } from './common';
+
 enum TransactionReasonType {
   TICKET_PAYMENT = 'TICKET PAYMENT',
   TICKET_REFUND = 'TICKET REFUND',
@@ -28,7 +30,11 @@ const transactionSchema = new Schema(
       type: String,
       validator: (v: string) => validator.isNumeric(v)
     },
-    currency: { type: String, required: true },
+    currency: {
+      type: String,
+      enum: CurrencyType,
+      required: true
+    },
     ticket: { type: Schema.Types.ObjectId, ref: 'Ticket' },
     creator: { type: Schema.Types.ObjectId, ref: 'Creator' },
     agent: { type: Schema.Types.ObjectId, ref: 'Agent' },
@@ -40,7 +46,19 @@ const transactionSchema = new Schema(
 export const Transaction = models?.Transaction
   ? (models?.Transaction as Model<TransactionDocumentType>)
   : mongoose.model<TransactionDocumentType>('Transaction', transactionSchema);
+
 export { TransactionReasonType };
+
+export const transactionSummary = new Schema({
+  amount: { type: Number, required: true },
+  currency: {
+    type: String,
+    enum: CurrencyType,
+    required: true
+  },
+  rate: { type: Number, default: 0 },
+  transaction: { type: Schema.Types.ObjectId, ref: 'Transaction' }
+});
 
 export type TransactionDocumentType = InferSchemaType<typeof transactionSchema>;
 export type TransactionType = InstanceType<typeof Transaction>;

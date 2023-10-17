@@ -13,11 +13,8 @@
     ticket.customerName,
     PUBLIC_PROFILE_IMAGE_PATH
   );
-  $: ticketStatus = ticket
-    ? ticket.ticketState.totalPaid >= ticket.price
-      ? 'Paid' + ' ' + ticket.ticketState.status
-      : ticket.ticketState.status
-    : '';
+  $: ticketStatus = ticket.ticketState.status;
+
   $: showStatus = show ? show.showState.status : '';
 </script>
 
@@ -46,7 +43,7 @@
             {durationFormatter(show.duration * 60)}
           </div>
           <div class="">
-            {currencyFormatter().format(show.price)}
+            {currencyFormatter(show.price.currency).format(show.price.amount)}
           </div>
         </div>
         <div

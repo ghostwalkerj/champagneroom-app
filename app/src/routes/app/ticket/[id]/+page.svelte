@@ -49,7 +49,7 @@
   let hasPaymentSent = false;
   $: canWatchShow = false;
   $: canCancelTicket = false;
-  let canRequestRefund = false;
+  $: canRequestRefund = false;
   let isTicketDone = false;
   let canLeaveFeedback = false;
   let canDispute = false;

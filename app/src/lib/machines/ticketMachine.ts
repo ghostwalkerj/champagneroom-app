@@ -506,8 +506,8 @@ const createTicketMachine = ({
           const sale = {
             _id: new Types.ObjectId(),
             soldAt: new Date(),
-            transactions: [] as Types.ObjectId[],
-            totals: new Map<string, number>()
+            totals: new Map<string, number>(),
+            payments: new Map<string, any>()
           } as SaleType;
 
           return {
@@ -556,23 +556,16 @@ const createTicketMachine = ({
           const payment = {
             amount: +event.transaction.amount,
             currency: event.transaction.currency.toUpperCase() as CurrencyType,
-            rate: +(event.transaction.rate || 0)
+            rate: +(event.transaction.rate || 0),
+            transaction: event.transaction._id
           };
-
-          sale.transactions.push(event.transaction._id);
+          console.log('payment', payment);
           const totals = sale.totals;
-
           const total = (totals[payment.currency] || 0) + payment.amount;
           sale.totals[payment.currency] = total;
-
           const payments = sale.payments[payment.currency] || [];
-
-          payments.push({
-            amount: +event.transaction.amount,
-            currency: event.transaction.currency.toUpperCase() as CurrencyType,
-            rate: +(event.transaction.rate || 0)
-          });
-
+          payments.push(payment);
+          console.dir(payments);
           sale.payments[payment.currency] = payments;
 
           return {
@@ -606,27 +599,23 @@ const createTicketMachine = ({
         receiveRefund: assign((context, event) => {
           const state = context.ticketState;
           const currency = event.transaction.currency.toUpperCase();
-          const payment = {
+          const payout = {
             amount: +event.transaction.amount,
             currency,
-            rate: +(event.transaction.rate || 0)
-          } as MoneyType;
+            rate: +(event.transaction.rate || 0),
+            transaction: event.transaction._id
+          };
           const refund = state.refund;
           if (!refund) return {};
 
-          const total = refund.totals[payment.currency] || 0 + payment.amount;
-          refund.totals[payment.currency] = total;
-          refund.transactions.push(event.transaction._id);
+          const total = refund.totals[payout.currency] || 0 + payout.amount;
+          refund.totals[payout.currency] = total;
 
-          const payouts = refund.payouts[payment.currency] || [];
+          const payouts = refund.payouts[payout.currency] || [];
 
-          payouts.push({
-            amount: +event.transaction.amount,
-            currency: event.transaction.currency.toUpperCase() as CurrencyType,
-            rate: +(event.transaction.rate || 0)
-          });
+          payouts.push(payout);
 
-          refund.payouts[payment.currency] = payouts;
+          refund.payouts[payout.currency] = payouts;
 
           return {
             ticketState: {

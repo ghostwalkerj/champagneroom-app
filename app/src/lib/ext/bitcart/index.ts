@@ -209,6 +209,18 @@ export const batchActionsOnStoresStoresBatchPost = <
 };
 
 /**
+ * @summary Batch Actions On Files
+ */
+export const batchActionsOnFilesFilesBatchPost = <
+  TData = AxiosResponse<unknown>
+>(
+  batchSettings: BatchSettings,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.post('/files/batch', batchSettings, options);
+};
+
+/**
  * @summary Batch Actions On Templates
  */
 export const batchActionsOnTemplatesTemplatesBatchPost = <
@@ -268,18 +280,6 @@ export const changePasswordUsersPasswordPost = <TData = AxiosResponse<unknown>>(
 };
 
 /**
- * @summary Check Wallet Lightning
- */
-export const checkWalletLightningWalletsModelIdChecklnGet = <
-  TData = AxiosResponse<unknown>
->(
-  modelId: string,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get(`/wallets/${modelId}/checkln`, options);
-};
-
-/**
  * @summary Check Dns Entry
  */
 export const checkDnsEntryConfiguratorDnsResolveGet = <
@@ -292,6 +292,27 @@ export const checkDnsEntryConfiguratorDnsResolveGet = <
     ...options,
     params: { ...parameters, ...options?.params }
   });
+};
+
+/**
+ * @summary Check Wallet Lightning
+ */
+export const checkWalletLightningWalletsModelIdChecklnGet = <
+  TData = AxiosResponse<unknown>
+>(
+  modelId: string,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.get(`/wallets/${modelId}/checkln`, options);
+};
+
+/**
+ * @summary Check Updates
+ */
+export const checkUpdatesUpdateCheckGet = <TData = AxiosResponse<unknown>>(
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.get('/update/check', options);
 };
 
 /**
@@ -343,18 +364,6 @@ export const closeWalletChannelWalletsModelIdChannelsClosePost = <
 };
 
 /**
- * @summary Batch Actions On Files
- */
-export const batchActionsOnFilesFilesBatchPost = <
-  TData = AxiosResponse<unknown>
->(
-  batchSettings: BatchSettings,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.post('/files/batch', batchSettings, options);
-};
-
-/**
  * @summary Create Discount
  */
 export const createDiscountDiscountsPost = <TData = AxiosResponse<Discount>>(
@@ -362,6 +371,19 @@ export const createDiscountDiscountsPost = <TData = AxiosResponse<Discount>>(
   options?: AxiosRequestConfig
 ): Promise<TData> => {
   return axios.post('/discounts', createDiscount, options);
+};
+
+/**
+ * @summary Create File
+ */
+export const createFileFilesPost = <TData = AxiosResponse<File>>(
+  bodyCreateFileFilesPost: BodyCreateFileFilesPost,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  const formData = new FormData();
+  formData.append('file', bodyCreateFileFilesPost.file);
+
+  return axios.post('/files', formData, options);
 };
 
 /**
@@ -468,15 +490,6 @@ export const createStoreStoresPost = <TData = AxiosResponse<Store>>(
 };
 
 /**
- * @summary Check Updates
- */
-export const checkUpdatesUpdateCheckGet = <TData = AxiosResponse<unknown>>(
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get('/update/check', options);
-};
-
-/**
  * @summary Create Template
  */
 export const createTemplateTemplatesPost = <TData = AxiosResponse<Template>>(
@@ -517,19 +530,6 @@ export const createTokenTokenPost = <TData = AxiosResponse<unknown>>(
   options?: AxiosRequestConfig
 ): Promise<TData> => {
   return axios.post('/token', hTTPCreateLoginToken, options);
-};
-
-/**
- * @summary Create File
- */
-export const createFileFilesPost = <TData = AxiosResponse<File>>(
-  bodyCreateFileFilesPost: BodyCreateFileFilesPost,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  const formData = new FormData();
-  formData.append('file', bodyCreateFileFilesPost.file);
-
-  return axios.post('/files', formData, options);
 };
 
 /**
@@ -1262,31 +1262,12 @@ export const getPayoutsPayoutsGet = <
 };
 
 /**
- * @summary Get Stats
- */
-export const getStatsUsersStatsGet = <TData = AxiosResponse<unknown>>(
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get('/users/stats', options);
-};
-
-/**
  * @summary Get Plugins
  */
 export const getPluginsPluginsGet = <TData = AxiosResponse<unknown>>(
   options?: AxiosRequestConfig
 ): Promise<TData> => {
   return axios.get('/plugins', options);
-};
-
-/**
- * @summary Get Store By Id
- */
-export const getStoreByIdStoresModelIdGet = <TData = AxiosResponse<unknown>>(
-  modelId: string,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get(`/stores/${modelId}`, options);
 };
 
 /**
@@ -1315,22 +1296,6 @@ export const getProductByIdProductsModelIdGet = <
 };
 
 /**
- * @summary Get Store Rates
- */
-export const getStoreRatesStoresModelIdRatesGet = <
-  TData = AxiosResponse<RatesResponse>
->(
-  modelId: string,
-  parameters: GetStoreRatesStoresModelIdRatesGetParameters,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get(`/stores/${modelId}/rates`, {
-    ...options,
-    params: { ...parameters, ...options?.params }
-  });
-};
-
-/**
  * @summary Get Products
  */
 export const getProductsProductsGet = <
@@ -1340,21 +1305,6 @@ export const getProductsProductsGet = <
   options?: AxiosRequestConfig
 ): Promise<TData> => {
   return axios.get('/products', {
-    ...options,
-    params: { ...parameters, ...options?.params }
-  });
-};
-
-/**
- * @summary Get Stores
- */
-export const getStoresStoresGet = <
-  TData = AxiosResponse<PaginationResponseStore>
->(
-  parameters?: GetStoresGetParameters,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get('/stores', {
     ...options,
     params: { ...parameters, ...options?.params }
   });
@@ -1385,16 +1335,6 @@ export const getServerSettingsConfiguratorServerSettingsPost = <
 };
 
 /**
- * @summary Get User By Id
- */
-export const getUserByIdUsersModelIdGet = <TData = AxiosResponse<DisplayUser>>(
-  modelId: string,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get(`/users/${modelId}`, options);
-};
-
-/**
  * @summary Get Services
  */
 export const getServicesTorServicesGet = <TData = AxiosResponse<unknown>>(
@@ -1404,18 +1344,22 @@ export const getServicesTorServicesGet = <TData = AxiosResponse<unknown>>(
 };
 
 /**
- * @summary Get Users
+ * @summary Get Stats
  */
-export const getUsersUsersGet = <
-  TData = AxiosResponse<PaginationResponseDisplayUser>
->(
-  parameters?: GetUsersGetParameters,
+export const getStatsUsersStatsGet = <TData = AxiosResponse<unknown>>(
   options?: AxiosRequestConfig
 ): Promise<TData> => {
-  return axios.get('/users', {
-    ...options,
-    params: { ...parameters, ...options?.params }
-  });
+  return axios.get('/users/stats', options);
+};
+
+/**
+ * @summary Get Store By Id
+ */
+export const getStoreByIdStoresModelIdGet = <TData = AxiosResponse<unknown>>(
+  modelId: string,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.get(`/stores/${modelId}`, options);
 };
 
 /**
@@ -1430,6 +1374,37 @@ export const getStorePoliciesManageStoresGet = <
 };
 
 /**
+ * @summary Get Store Rates
+ */
+export const getStoreRatesStoresModelIdRatesGet = <
+  TData = AxiosResponse<RatesResponse>
+>(
+  modelId: string,
+  parameters: GetStoreRatesStoresModelIdRatesGetParameters,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.get(`/stores/${modelId}/rates`, {
+    ...options,
+    params: { ...parameters, ...options?.params }
+  });
+};
+
+/**
+ * @summary Get Stores
+ */
+export const getStoresStoresGet = <
+  TData = AxiosResponse<PaginationResponseStore>
+>(
+  parameters?: GetStoresGetParameters,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.get('/stores', {
+    ...options,
+    params: { ...parameters, ...options?.params }
+  });
+};
+
+/**
  * @summary Get Supported Cryptos
  */
 export const getSupportedCryptosCryptosSupportedGet = <
@@ -1438,18 +1413,6 @@ export const getSupportedCryptosCryptosSupportedGet = <
   options?: AxiosRequestConfig
 ): Promise<TData> => {
   return axios.get('/cryptos/supported', options);
-};
-
-/**
- * @summary Get Wallet Balance
- */
-export const getWalletBalanceWalletsModelIdBalanceGet = <
-  TData = AxiosResponse<BalanceResponse>
->(
-  modelId: string,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get(`/wallets/${modelId}/balance`, options);
 };
 
 /**
@@ -1487,16 +1450,6 @@ export const getTemplateListTemplatesListGet = <TData = AxiosResponse<unknown>>(
 };
 
 /**
- * @summary Get Wallet By Id
- */
-export const getWalletByIdWalletsModelIdGet = <TData = AxiosResponse<Wallet>>(
-  modelId: string,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get(`/wallets/${modelId}`, options);
-};
-
-/**
  * @summary Get Templates
  */
 export const getTemplatesTemplatesGet = <
@@ -1509,18 +1462,6 @@ export const getTemplatesTemplatesGet = <
     ...options,
     params: { ...parameters, ...options?.params }
   });
-};
-
-/**
- * @summary Get Wallet Channels
- */
-export const getWalletChannelsWalletsModelIdChannelsGet = <
-  TData = AxiosResponse<unknown>
->(
-  modelId: string,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get(`/wallets/${modelId}/channels`, options);
 };
 
 /**
@@ -1537,6 +1478,16 @@ export const getTokenCountTokenCountGet = <TData = AxiosResponse<number>>(
 };
 
 /**
+ * @summary Get User By Id
+ */
+export const getUserByIdUsersModelIdGet = <TData = AxiosResponse<DisplayUser>>(
+  modelId: string,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.get(`/users/${modelId}`, options);
+};
+
+/**
  * @summary Get Tokens Abi
  */
 export const getTokensAbiCryptosTokensCurrencyAbiGet = <
@@ -1546,6 +1497,21 @@ export const getTokensAbiCryptosTokensCurrencyAbiGet = <
   options?: AxiosRequestConfig
 ): Promise<TData> => {
   return axios.get(`/cryptos/tokens/${currency}/abi`, options);
+};
+
+/**
+ * @summary Get Users
+ */
+export const getUsersUsersGet = <
+  TData = AxiosResponse<PaginationResponseDisplayUser>
+>(
+  parameters?: GetUsersGetParameters,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.get('/users', {
+    ...options,
+    params: { ...parameters, ...options?.params }
+  });
 };
 
 /**
@@ -1576,15 +1542,37 @@ export const getTokensTokenGet = <
 };
 
 /**
- * @summary Register Fido2
+ * @summary Get Wallet Balance
  */
-export const registerFido2Users2faFido2RegisterBeginPost = <
-  TData = AxiosResponse<unknown>
+export const getWalletBalanceWalletsModelIdBalanceGet = <
+  TData = AxiosResponse<BalanceResponse>
 >(
-  loginFIDOData: LoginFIDOData,
+  modelId: string,
   options?: AxiosRequestConfig
 ): Promise<TData> => {
-  return axios.post('/users/2fa/fido2/register/begin', loginFIDOData, options);
+  return axios.get(`/wallets/${modelId}/balance`, options);
+};
+
+/**
+ * @summary Get Wallet By Id
+ */
+export const getWalletByIdWalletsModelIdGet = <TData = AxiosResponse<Wallet>>(
+  modelId: string,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.get(`/wallets/${modelId}`, options);
+};
+
+/**
+ * @summary Get Wallet Channels
+ */
+export const getWalletChannelsWalletsModelIdChannelsGet = <
+  TData = AxiosResponse<unknown>
+>(
+  modelId: string,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.get(`/wallets/${modelId}/channels`, options);
 };
 
 /**
@@ -1604,18 +1592,6 @@ export const getWalletRateWalletsModelIdRateGet = <
 };
 
 /**
- * @summary Reset Password
- */
-export const resetPasswordUsersResetPasswordPost = <
-  TData = AxiosResponse<unknown>
->(
-  resetPasswordData: ResetPasswordData,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.post('/users/reset_password', resetPasswordData, options);
-};
-
-/**
  * @summary Get Wallets Schema
  */
 export const getWalletsSchemaWalletsSchemaGet = <
@@ -1624,18 +1600,6 @@ export const getWalletsSchemaWalletsSchemaGet = <
   options?: AxiosRequestConfig
 ): Promise<TData> => {
   return axios.get('/wallets/schema', options);
-};
-
-/**
- * @summary Send Verification Email
- */
-export const sendVerificationEmailUsersVerifyPost = <
-  TData = AxiosResponse<unknown>
->(
-  verifyEmailData: VerifyEmailData,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.post('/users/verify', verifyEmailData, options);
 };
 
 /**
@@ -1677,16 +1641,6 @@ export const installPluginPluginsInstallPost = <TData = AxiosResponse<unknown>>(
 };
 
 /**
- * @summary Set Settings
- */
-export const setSettingsUsersMeSettingsPost = <TData = AxiosResponse<User>>(
-  userPreferences: UserPreferences,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.post('/users/me/settings', userPreferences, options);
-};
-
-/**
  * @summary Modify Discount
  */
 export const modifyDiscountDiscountsModelIdPatch = <
@@ -1714,18 +1668,6 @@ export const modifyFileFilesModelIdPatch = <TData = AxiosResponse<File>>(
 };
 
 /**
- * @summary Verify Totp
- */
-export const verifyTotpUsers2faTotpVerifyPost = <
-  TData = AxiosResponse<unknown>
->(
-  verifyTOTP: VerifyTOTP,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.post('/users/2fa/totp/verify', verifyTOTP, options);
-};
-
-/**
  * @summary Modify Invoice
  */
 export const modifyInvoiceInvoicesModelIdPatch = <
@@ -1736,6 +1678,18 @@ export const modifyInvoiceInvoicesModelIdPatch = <
   options?: AxiosRequestConfig
 ): Promise<TData> => {
   return axios.patch(`/invoices/${modelId}`, optionalInvoice, options);
+};
+
+/**
+ * @summary Register Fido2
+ */
+export const registerFido2Users2faFido2RegisterBeginPost = <
+  TData = AxiosResponse<unknown>
+>(
+  loginFIDOData: LoginFIDOData,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.post('/users/2fa/fido2/register/begin', loginFIDOData, options);
 };
 
 /**
@@ -1753,6 +1707,18 @@ export const modifyNotificationNotificationsModelIdPatch = <
     optionalNotification,
     options
   );
+};
+
+/**
+ * @summary Reset Password
+ */
+export const resetPasswordUsersResetPasswordPost = <
+  TData = AxiosResponse<unknown>
+>(
+  resetPasswordData: ResetPasswordData,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.post('/users/reset_password', resetPasswordData, options);
 };
 
 /**
@@ -1788,6 +1754,18 @@ export const modifyProductProductsModelIdPatch = <
 };
 
 /**
+ * @summary Send Verification Email
+ */
+export const sendVerificationEmailUsersVerifyPost = <
+  TData = AxiosResponse<unknown>
+>(
+  verifyEmailData: VerifyEmailData,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.post('/users/verify', verifyEmailData, options);
+};
+
+/**
  * @summary Modify Store
  */
 export const modifyStoreStoresModelIdPatch = <TData = AxiosResponse<Store>>(
@@ -1809,6 +1787,16 @@ export const modifyTemplateTemplatesModelIdPatch = <
   options?: AxiosRequestConfig
 ): Promise<TData> => {
   return axios.patch(`/templates/${modelId}`, optionalTemplate, options);
+};
+
+/**
+ * @summary Set Settings
+ */
+export const setSettingsUsersMeSettingsPost = <TData = AxiosResponse<User>>(
+  userPreferences: UserPreferences,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.post('/users/me/settings', userPreferences, options);
 };
 
 /**
@@ -1848,6 +1836,18 @@ export const openWalletChannelWalletsModelIdChannelsOpenPost = <
     openChannelScheme,
     options
   );
+};
+
+/**
+ * @summary Verify Totp
+ */
+export const verifyTotpUsers2faTotpVerifyPost = <
+  TData = AxiosResponse<unknown>
+>(
+  verifyTOTP: VerifyTOTP,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.post('/users/2fa/totp/verify', verifyTOTP, options);
 };
 
 /**
@@ -1930,18 +1930,6 @@ export const restoreBackupManageBackupsRestorePost = <
   formData.append('backup', bodyRestoreBackupManageBackupsRestorePost.backup);
 
   return axios.post('/manage/backups/restore', formData, options);
-};
-
-/**
- * @summary Wallet History
- */
-export const walletHistoryWalletsHistoryModelIdGet = <
-  TData = AxiosResponse<TxResponse[]>
->(
-  modelId: string,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get(`/wallets/history/${modelId}`, options);
 };
 
 /**
@@ -2085,19 +2073,6 @@ export const uninstallPluginPluginsUninstallPost = <
 };
 
 /**
- * @summary Wallet Lnpay
- */
-export const walletLnpayWalletsModelIdLnpayPost = <
-  TData = AxiosResponse<unknown>
->(
-  modelId: string,
-  lNPayScheme: LNPayScheme,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.post(`/wallets/${modelId}/lnpay`, lNPayScheme, options);
-};
-
-/**
  * @summary Update Invoice
  */
 export const updateInvoiceInvoicesModelIdCustomerPatch = <
@@ -2112,6 +2087,18 @@ export const updateInvoiceInvoicesModelIdCustomerPatch = <
     customerUpdateData,
     options
   );
+};
+
+/**
+ * @summary Wallet History
+ */
+export const walletHistoryWalletsHistoryModelIdGet = <
+  TData = AxiosResponse<TxResponse[]>
+>(
+  modelId: string,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.get(`/wallets/history/${modelId}`, options);
 };
 
 /**
@@ -2134,6 +2121,19 @@ export const updateServerManageUpdatePost = <TData = AxiosResponse<unknown>>(
   options?: AxiosRequestConfig
 ): Promise<TData> => {
   return axios.post('/manage/update', undefined, options);
+};
+
+/**
+ * @summary Wallet Lnpay
+ */
+export const walletLnpayWalletsModelIdLnpayPost = <
+  TData = AxiosResponse<unknown>
+>(
+  modelId: string,
+  lNPayScheme: LNPayScheme,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.post(`/wallets/${modelId}/lnpay`, lNPayScheme, options);
 };
 
 export type AllWalletHistoryWalletsHistoryAllGetResult = AxiosResponse<

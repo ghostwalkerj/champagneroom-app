@@ -3,6 +3,8 @@ import validator from 'validator';
 
 import { ActorType } from '$lib/constants';
 
+import { transactionSummary } from './transaction';
+
 export enum AuthType {
   SIGNING = 'SIGNING',
   UNIQUE_KEY = 'UNIQUE KEY',
@@ -106,22 +108,13 @@ export const moneySchema = new Schema({
     enum: CurrencyType,
     required: true,
     default: CurrencyType.USD
-  },
-  rate: { type: Number, default: 0 }
+  }
 });
 
 export const refundSchema = new Schema({
   // eslint-disable-next-line @typescript-eslint/naming-convention
   _id: { type: Schema.Types.ObjectId, auto: true },
   requestedAt: { type: Date, default: new Date() },
-  transactions: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: 'Transaction',
-      required: true,
-      default: []
-    }
-  ],
   requestedAmounts: {
     type: Map,
     required: true,
@@ -142,7 +135,7 @@ export const refundSchema = new Schema({
   },
   payouts: {
     type: Map,
-    of: [moneySchema],
+    of: [transactionSummary],
     default: () => [],
     required: true
   },
@@ -153,18 +146,10 @@ export const saleSchema = new Schema({
   // eslint-disable-next-line @typescript-eslint/naming-convention
   _id: { type: Schema.Types.ObjectId, auto: true },
   soldAt: { type: Date, default: new Date() },
-  transactions: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: 'Transaction',
-      required: true,
-      default: []
-    }
-  ],
   payments: {
     type: Map,
-    of: [moneySchema],
-    default: () => new Map<string, [number, CurrencyType]>(),
+    of: [transactionSummary],
+    default: () => [],
     required: true
   },
   totals: {

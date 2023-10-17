@@ -1,7 +1,6 @@
 import type { Job, Queue } from 'bullmq';
 import { Worker } from 'bullmq';
 import type IORedis from 'ioredis';
-import { t } from 'xstate';
 
 import type {
   CancelType,
@@ -26,10 +25,7 @@ import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 
 import { ActorType, EntityType } from '$lib/constants';
 import { PayoutJobType } from '$lib/util/payment';
-import {
-  getTicketMachineService,
-  getTicketMachineServiceFromId
-} from '$lib/util/util.server';
+import { getTicketMachineService } from '$lib/util/util.server';
 
 import type { PayoutQueueType } from './payoutWorker';
 
@@ -441,8 +437,7 @@ const finalizeShow = async (show: ShowType, showQueue: ShowQueueType) => {
       {
         'showState.salesStats.ticketSalesAmount': {
           amount: ticketSalesAmount,
-          currency: show.price.currency,
-          rate: show.price.rate
+          currency: show.price.currency
         },
         'showState.salesStats.totalSales': totalSales,
         'showState.salesStats.totalRefunds': totalRefunds,
