@@ -70,6 +70,23 @@ export const disputeSchema = new Schema({
   resolved: { type: Boolean, default: false }
 });
 
+export const earningsSchema = new Schema({
+  earnedAt: { type: Date, default: new Date() },
+  amount: { type: Number, required: true },
+  currency: {
+    type: String,
+    enum: CurrencyType,
+    required: true,
+    default: CurrencyType.ETH
+  },
+  show: {
+    type: Schema.Types.ObjectId,
+    ref: 'Show',
+    index: true,
+    required: true
+  }
+});
+
 export const escrowSchema = new Schema({
   // eslint-disable-next-line @typescript-eslint/naming-convention
   _id: { type: Schema.Types.ObjectId, auto: true },
@@ -167,8 +184,7 @@ export const userSchema = new Schema(
     wallet: {
       type: Schema.Types.ObjectId,
       ref: 'Wallet',
-      required: true,
-      index: true
+      required: true
     },
 
     address: {
@@ -210,12 +226,14 @@ export const userSchema = new Schema(
 export type CancelType = InferSchemaType<typeof cancelSchema>;
 
 export type DisputeType = InferSchemaType<typeof disputeSchema>;
+export type EarningsType = InferSchemaType<typeof earningsSchema>;
 export type EscrowType = InferSchemaType<typeof escrowSchema>;
 export type FeedbackType = InferSchemaType<typeof feedbackSchema>;
-export type FinalizeType = InferSchemaType<typeof finalizeSchema>;
 
+export type FinalizeType = InferSchemaType<typeof finalizeSchema>;
 export type MoneyType = InferSchemaType<typeof moneySchema>;
 export type RefundType = InferSchemaType<typeof refundSchema>;
+
 export type SaleType = InferSchemaType<typeof saleSchema>;
 
 export type UserType = InferSchemaType<typeof userSchema>;

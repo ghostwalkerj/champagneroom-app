@@ -1,11 +1,13 @@
 import type { Job, Queue } from 'bullmq';
 import { Worker } from 'bullmq';
 import type IORedis from 'ioredis';
+import type { Types } from 'mongoose';
 
 import type {
   CancelType,
   DisputeDecision,
   DisputeType,
+  EarningsType,
   RefundType,
   SaleType
 } from '$lib/models/common';
@@ -15,6 +17,7 @@ import { SaveState, Show, ShowStatus } from '$lib/models/show';
 import { createShowEvent } from '$lib/models/showEvent';
 import type { TicketType } from '$lib/models/ticket';
 import { Ticket, TicketStatus } from '$lib/models/ticket';
+import { Wallet } from '$lib/models/wallet';
 
 import {
   createShowMachineService,
@@ -323,6 +326,8 @@ const finalizeShow = async (show: ShowType, showQueue: ShowQueueType) => {
     }
   });
 
+  let showRevenue = new Map<string, number>();
+
   const showState = showService.getSnapshot();
   const finalize = {
     finalizedAt: new Date(),
@@ -444,6 +449,7 @@ const finalizeShow = async (show: ShowType, showQueue: ShowQueueType) => {
         'showState.salesStats.totalRevenue': totalRevenue
       }
     );
+    showRevenue = new Map(totalRevenue);
     showSession.endSession();
   });
 
@@ -563,6 +569,55 @@ const finalizeShow = async (show: ShowType, showQueue: ShowQueueType) => {
     );
     creatorSession.endSession();
   });
+
+  // Update wallet with finalized show totals
+  const creatorWallet = await Creator.findById(show.creator)
+    .select('user.wallet')
+    .exec();
+
+  const walletId = creatorWallet?.user.wallet;
+  if (!walletId) {
+    console.log('No wallet to payout');
+    return;
+  }
+
+  const wallet = await Wallet.findOne({
+    _id: walletId,
+    earnings: {
+      $not: {
+        $elemMatch: { show: show._id }
+      }
+    }
+  })
+    .select('currency')
+    .exec();
+
+  if (!wallet) {
+    console.log('No wallet to payout or Show already paid out');
+    return;
+  }
+
+  const amount = showRevenue.get(wallet.currency);
+
+  if (!amount) {
+    console.log('No revenue to add to wallet');
+    return;
+  }
+
+  const earning = {
+    earnedAt: new Date(),
+    show: show._id,
+    amount,
+    currency: wallet.currency
+  } as EarningsType;
+
+  Wallet.findByIdAndUpdate(
+    { _id: walletId },
+    {
+      $inc: { balance: amount },
+      $push: { earnings: earning }
+    }
+  );
 };
 
 // Ticket Events

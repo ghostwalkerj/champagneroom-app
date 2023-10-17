@@ -14,7 +14,7 @@
       <div class="stat">
         <div class="stat-title">Current balance</div>
         <div class="stat-value">
-          {currencyFormatter(wallet.currency).format(wallet.balance)}
+          {wallet.balance}{wallet.currency}
         </div>
         <div class="stat-actions">
           <button class="btn btn-sm">Withdraw</button>

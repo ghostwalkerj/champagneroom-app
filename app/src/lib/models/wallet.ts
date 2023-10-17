@@ -1,7 +1,7 @@
 import type { InferSchemaType, Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
 
-import { CurrencyType } from './common';
+import { CurrencyType, earningsSchema } from './common';
 import { transactionSummary } from './transaction';
 
 const { Schema, models } = pkg;
@@ -20,15 +20,13 @@ const walletSchema = new mongoose.Schema(
       required: true,
       default: 0
     },
-    payments: {
-      type: Map,
-      of: [transactionSummary],
+    earnings: {
+      type: [earningsSchema],
       default: () => [],
       required: true
     },
     payouts: {
-      type: Map,
-      of: [transactionSummary],
+      type: [transactionSummary],
       default: () => [],
       required: true
     }

@@ -653,6 +653,7 @@ const createShowMachine = ({
         redeemTicket: assign((context, event) => {
           const st = context.showState;
           st.redemptions.push(new Types.ObjectId(event.ticket._id.toString()));
+          st.salesStats.ticketsRedeemed += 1;
           return {
             showState: {
               ...st,
@@ -669,6 +670,7 @@ const createShowMachine = ({
           st.finalizations.push(
             new Types.ObjectId(event.ticket._id.toString())
           );
+          st.salesStats.ticketsFinalized += 1;
           return {
             showState: {
               ...st
