@@ -169,7 +169,7 @@
   };
 
   onMount(() => {
-    if (ticket.ticketState.activeState) {
+    if (ticket.ticketState.active) {
       ticketUnSub = ticketStore(ticket).subscribe((ticketDocument) => {
         ticket = ticketDocument;
         useTicketMachine(

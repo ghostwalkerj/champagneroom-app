@@ -175,7 +175,7 @@ const cancelShow = async (
   const tickets = await Ticket.find({
     show: show._id,
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    'ticketState.activeState': true
+    'ticketState.active': true
   });
   for (const ticket of tickets) {
     // send cancel show to all tickets
@@ -218,7 +218,7 @@ const refundShow = async (
   if (showState.matches('initiatedCancellation.waiting2Refund')) {
     const tickets = await Ticket.find({
       show: show._id,
-      'ticketState.activeState': true
+      'ticketState.active': true
     });
     for (const ticket of tickets) {
       // send refunds
@@ -303,7 +303,7 @@ const endShow = async (
     const tickets = await Ticket.find({
       show: show._id,
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      'ticketState.activeState': true
+      'ticketState.active': true
     });
     for (const ticket of tickets) {
       // send show is over
@@ -349,7 +349,7 @@ const finalizeShow = async (show: ShowType, showQueue: ShowQueueType) => {
   const tickets = await Ticket.find({
     show: show._id,
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    'ticketState.activeState': true
+    'ticketState.active': true
   });
   for (const ticket of tickets) {
     const ticketService = getTicketMachineService(ticket, showQueue);
@@ -614,7 +614,7 @@ const finalizeShow = async (show: ShowType, showQueue: ShowQueueType) => {
   Wallet.findByIdAndUpdate(
     { _id: walletId },
     {
-      $inc: { balance: amount },
+      $inc: [{ balance: amount }, { availableBalance: amount }],
       $push: { earnings: earning }
     }
   );

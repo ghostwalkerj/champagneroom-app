@@ -1,25 +1,52 @@
 <script lang="ts">
+  import { onDestroy, onMount } from 'svelte';
+  import type { Unsubscriber } from 'svelte/store';
+
   import { CurrencyType } from '$lib/models/common';
   import type { WalletDocumentType } from '$lib/models/wallet';
 
   import { currencyFormatter } from '$lib/constants';
 
+  import { walletStore } from '$stores';
+
   export let exchangeRate = 0;
   export let wallet: WalletDocumentType;
 
   const hasTransactions = wallet.earnings.length + wallet.payouts.length > 0;
+  const hasAvailableBalance = wallet.availableBalance > 0;
   let transactionModal: HTMLDialogElement;
+  let walletUnSub: Unsubscriber;
+
+  $: earnings = wallet.earnings;
+  $: payouts = wallet.payouts;
+  $: availableBalance = wallet.availableBalance;
+
+  onMount(() => {
+    if (wallet.active) {
+      walletUnSub = walletStore(wallet).subscribe((_wallet) => {
+        console.log('wallet', _wallet);
+        wallet = _wallet;
+        earnings = wallet.earnings;
+        payouts = wallet.payouts;
+        availableBalance = wallet.availableBalance;
+      });
+    }
+  });
+
+  onDestroy(() => {
+    walletUnSub?.();
+  });
 </script>
 
 {#if hasTransactions}
   <dialog id="transaction_modal" class="modal" bind:this={transactionModal}>
     <div class="modal-box text-center">
       <h3 class="font-bold text-lg">Recent Transactions</h3>
-      {#if wallet.earnings.length > 0}
+      {#if earnings.length > 0}
         <div>
           <h4 class="font-bold text-md mt-6">Earnings</h4>
           <ul class="list-none">
-            {#each wallet.earnings as earning}
+            {#each earnings as earning}
               <li class="flex justify-between">
                 <span>{new Date(earning.earnedAt).toLocaleDateString()}</span>
 
@@ -33,11 +60,11 @@
           </ul>
         </div>
       {/if}
-      {#if wallet.payouts.length > 0}
+      {#if payouts.length > 0}
         <div>
           <h4 class="font-bold text-md mt-6">Payouts</h4>
           <ul class="list-none">
-            {#each wallet.payouts as payout}
+            {#each payouts as payout}
               <li class="flex justify-between">
                 <span>{new Date(payout.createdAt).toLocaleDateString()}</span>
 
@@ -69,11 +96,11 @@
       <div class="stat">
         <div class="stat-title text-info">Current balance</div>
         <div class="stat-value text-2xl">
-          {currencyFormatter(wallet.currency).format(wallet.balance)}
+          {currencyFormatter(wallet.currency).format(availableBalance)}
           {#if exchangeRate > 0}
             <div class="text-sm text-primary-content">
               ({currencyFormatter(CurrencyType.USD, 2).format(
-                wallet.balance * exchangeRate
+                availableBalance * exchangeRate
               )})
             </div>
           {/if}
@@ -84,7 +111,9 @@
             disabled={!hasTransactions}
             on:click={() => transactionModal.show()}>Transactions</button
           >
-          <button class="btn btn-sm">Withdraw</button>
+          <button class="btn btn-sm" disabled={!hasAvailableBalance}
+            >Withdraw</button
+          >
         </div>
       </div>
     </div>

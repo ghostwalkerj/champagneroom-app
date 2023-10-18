@@ -614,7 +614,7 @@ const createShowMachine = ({
           return {
             showState: {
               ...context.showState,
-              activeState: false,
+              active: false,
               current: false
             }
           };

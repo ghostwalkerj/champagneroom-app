@@ -20,6 +20,11 @@ const walletSchema = new mongoose.Schema(
       required: true,
       default: 0
     },
+    availableBalance: {
+      type: Number,
+      required: true,
+      default: 0
+    },
     earnings: {
       type: [earningsSchema],
       default: () => [],
@@ -29,7 +34,8 @@ const walletSchema = new mongoose.Schema(
       type: [transactionSummary],
       default: () => [],
       required: true
-    }
+    },
+    active: { type: Boolean, default: true, index: true }
   },
   { timestamps: true }
 );

@@ -9,11 +9,16 @@ import type { CreatorDocumentType } from '$lib/models/creator';
 import type { ShowDocumentType } from '$lib/models/show';
 import type { ShowEventDocumentType } from '$lib/models/showEvent';
 import type { TicketDocumentType } from '$lib/models/ticket';
+import type { WalletDocumentType } from '$lib/models/wallet';
 
 export const agentStore = (agent: AgentDocumentType) => {
   return abstractStore({
     doc: agent,
-    changesetPath: urlJoin(PUBLIC_CHANGESET_PATH, 'agent', agent.user.address)
+    changesetPath: urlJoin(
+      PUBLIC_CHANGESET_PATH,
+      'agent',
+      agent.user.address || ''
+    )
   });
 };
 
@@ -87,20 +92,17 @@ const abstractStore = <T>({
 };
 
 export const creatorStore = (creator: CreatorDocumentType) => {
+  const address = creator.user.address || '';
   return abstractStore({
     doc: creator,
-    changesetPath: urlJoin(
-      PUBLIC_CHANGESET_PATH,
-      'creator',
-      creator.user.address
-    )
+    changesetPath: urlJoin(PUBLIC_CHANGESET_PATH, 'creator', address)
   });
 };
 
 export const nameStore = writable<string>('');
 
 export const showEventStore = (show: ShowDocumentType) => {
-  const showCancel = (show: ShowDocumentType) => !show.showState.activeState;
+  const showCancel = (show: ShowDocumentType) => !show.showState.active;
   const showStore = writable<ShowDocumentType>(show);
   const showEventStore = derived<typeof showStore, ShowEventDocumentType>(
     showStore,
@@ -130,7 +132,7 @@ export const showEventStore = (show: ShowDocumentType) => {
 };
 
 export const showStore = (show: ShowDocumentType) => {
-  const showCancel = (show: ShowDocumentType) => !show.showState.activeState;
+  const showCancel = (show: ShowDocumentType) => !show.showState.active;
 
   return abstractStore({
     doc: show,
@@ -141,7 +143,7 @@ export const showStore = (show: ShowDocumentType) => {
 
 export const ticketStore = (ticket: TicketDocumentType) => {
   const ticketCancel = (ticket: TicketDocumentType) =>
-    !ticket.ticketState.activeState;
+    !ticket.ticketState.active;
   return abstractStore({
     doc: ticket,
     changesetPath: urlJoin(
@@ -150,5 +152,19 @@ export const ticketStore = (ticket: TicketDocumentType) => {
       ticket._id.toString()
     ),
     cancelOn: ticketCancel
+  });
+};
+
+export const walletStore = (wallet: WalletDocumentType) => {
+  const walletCancel = (wallet: WalletDocumentType) => !wallet.active;
+
+  return abstractStore({
+    doc: wallet,
+    changesetPath: urlJoin(
+      PUBLIC_CHANGESET_PATH,
+      'wallet',
+      wallet._id.toString()
+    ),
+    cancelOn: walletCancel
   });
 };

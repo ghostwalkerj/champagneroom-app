@@ -51,7 +51,7 @@ const ticketStateSchema = new Schema(
       default: TicketStatus.RESERVED,
       index: true
     },
-    activeState: { type: Boolean, default: true, index: true },
+    active: { type: Boolean, default: true, index: true },
 
     cancel: cancelSchema,
     redemption: redemptionSchema,

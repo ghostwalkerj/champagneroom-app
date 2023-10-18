@@ -688,7 +688,7 @@ const createTicketMachine = ({
           return {
             ticketState: {
               ...context.ticketState,
-              activeState: false
+              active: false
             }
           };
         }),
