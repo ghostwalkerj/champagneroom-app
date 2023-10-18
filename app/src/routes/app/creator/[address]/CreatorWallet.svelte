@@ -13,9 +13,44 @@
 
 {#if hasTransactions}
   <dialog id="transaction_modal" class="modal" bind:this={transactionModal}>
-    <div class="modal-box">
+    <div class="modal-box text-center">
       <h3 class="font-bold text-lg">Recent Transactions</h3>
-      <p class="py-4">Press ESC key or click the button below to close</p>
+      {#if wallet.earnings.length > 0}
+        <div>
+          <h4 class="font-bold text-md mt-6">Earnings</h4>
+          <ul class="list-none">
+            {#each wallet.earnings as earning}
+              <li class="flex justify-between">
+                <span>{new Date(earning.earnedAt).toLocaleDateString()}</span>
+
+                <span
+                  >{currencyFormatter(wallet.currency).format(
+                    earning.amount
+                  )}</span
+                >
+              </li>
+            {/each}
+          </ul>
+        </div>
+      {/if}
+      {#if wallet.payouts.length > 0}
+        <div>
+          <h4 class="font-bold text-md mt-6">Payouts</h4>
+          <ul class="list-none">
+            {#each wallet.payouts as payout}
+              <li class="flex justify-between">
+                <span>{new Date(payout.createdAt).toLocaleDateString()}</span>
+
+                <span
+                  >{currencyFormatter(wallet.currency).format(
+                    payout.amount
+                  )}</span
+                >
+              </li>
+            {/each}
+          </ul>
+        </div>
+      {/if}
       <div class="modal-action">
         <form method="dialog">
           <!-- if there is a button in form, it will close the modal -->

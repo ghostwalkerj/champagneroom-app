@@ -50,6 +50,7 @@ export const Transaction = models?.Transaction
 export { TransactionReasonType };
 
 export const transactionSummary = new Schema({
+  createdAt: { type: Date, default: new Date() },
   amount: { type: Number, required: true },
   currency: {
     type: String,
