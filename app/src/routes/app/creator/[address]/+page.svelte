@@ -37,16 +37,17 @@
   import CreatorWallet from './CreatorWallet.svelte';
 
   import type { ActionData, PageData } from './$types';
-
   export let data: PageData;
   export let form: ActionData;
-
-  const showTimePath = urlJoin($page.url.href, PUBLIC_SHOWTIME_PATH);
 
   let creator = data.creator as CreatorDocumentType;
   let currentShow = data.currentShow as ShowDocumentType | undefined;
   let completedShows = data.completedShows as ShowDocumentType[];
   let wallet = data.wallet as WalletDocumentType;
+  let exchangeRate = +data.exchangeRate || 0;
+
+  const showTimePath = urlJoin($page.url.href, PUBLIC_SHOWTIME_PATH);
+
   let showName = creator
     ? possessive(creator.user.name, 'en') + ' Show'
     : 'Show';
@@ -462,7 +463,7 @@
 
       <!-- Wallet -->
       <div>
-        <CreatorWallet {wallet} />
+        <CreatorWallet {wallet} {exchangeRate} />
       </div>
 
       <!-- Activity Feed -->

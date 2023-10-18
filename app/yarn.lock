@@ -96,29 +96,29 @@
   dependencies:
     regenerator-runtime "^0.14.0"
 
-"@bull-board/api@5.8.4":
-  version "5.8.4"
-  resolved "https://registry.yarnpkg.com/@bull-board/api/-/api-5.8.4.tgz#602380bdf031f4c2ba8180c346e42bcecd2df419"
-  integrity sha512-uuB2ziEpMc6FrkqqRAqyqSh+yKx1ukTvxlgDenOimuLAiHlcPfhNLgYuYv3qzqWVaZdvUCLhiNqAvOdURoKT5A==
+"@bull-board/api@5.9.1":
+  version "5.9.1"
+  resolved "https://registry.yarnpkg.com/@bull-board/api/-/api-5.9.1.tgz#c75768b50d08f6e6b16b935e12af7f774398db30"
+  integrity sha512-xZzPYNw9Dp46It4vvZv3tmFScmUu/UT/jWQxYK9cvbkJRXh15rsZrbbR+/phUqou0NxRQGiHoFSZ1y5D107dIA==
   dependencies:
     redis-info "^3.0.8"
 
 "@bull-board/express@^5.6.1":
-  version "5.8.4"
-  resolved "https://registry.yarnpkg.com/@bull-board/express/-/express-5.8.4.tgz#933cfb7c7476ee3103cdaca180bddbde84ffeb47"
-  integrity sha512-eYmgC/u/zYs8Uhr3MFRsxWLH7f89ext5c6J/73GIQaEo+/j3j3cFngvXn+SR+7yB1/j+waOt/4mjlnLUWg9uZQ==
+  version "5.9.1"
+  resolved "https://registry.yarnpkg.com/@bull-board/express/-/express-5.9.1.tgz#1fb55f707dd192a6164ced89a1336537f2547bb0"
+  integrity sha512-LxBmstUY0dzjgxeDlgMhZiaD3EDKk4SG/PG3Mx6nsgYu205Brp0a54QKxJ61W1SeTYBsAJxGIg8PxYBkQa75+w==
   dependencies:
-    "@bull-board/api" "5.8.4"
-    "@bull-board/ui" "5.8.4"
+    "@bull-board/api" "5.9.1"
+    "@bull-board/ui" "5.9.1"
     ejs "3.1.7"
     express "4.17.3"
 
-"@bull-board/ui@5.8.4":
-  version "5.8.4"
-  resolved "https://registry.yarnpkg.com/@bull-board/ui/-/ui-5.8.4.tgz#2a8b56783bd9f7fcab8540ae2d861a46e1c0686a"
-  integrity sha512-OBCwelyO5aptZUanZOSiHCK46Y3dNsCXMj4XXF8rNKx0sg/BMZMZzINjlpsCkgNNM5Lxl51OM1eYLjzZREvaAQ==
+"@bull-board/ui@5.9.1":
+  version "5.9.1"
+  resolved "https://registry.yarnpkg.com/@bull-board/ui/-/ui-5.9.1.tgz#46b00abc551f6f04e611b698d209bfbc6ed0bad2"
+  integrity sha512-lL93KVRTpLSl73KUFBw7sXOcCrqddGBbpiMKWEbViXxObIq68yFuhRrcfR7JeTSocLF5GsnqSVdSiNCZHmdNpw==
   dependencies:
-    "@bull-board/api" "5.8.4"
+    "@bull-board/api" "5.9.1"
 
 "@coinbase/wallet-sdk@^3.7.2":
   version "3.7.2"
@@ -1360,9 +1360,9 @@
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
 "@jridgewell/trace-mapping@^0.3.9":
-  version "0.3.19"
-  resolved "https://registry.yarnpkg.com/@jridgewell/trace-mapping/-/trace-mapping-0.3.19.tgz#f8a3249862f91be48d3127c3cfe992f79b4b8811"
-  integrity sha512-kf37QtfW+Hwx/buWGMPcR60iF9ziHa6r/CZJIHbmcm4+0qrXiVdxegAH0F6yddEVQ7zdkjcGCgCzUu+BcbhQxw==
+  version "0.3.20"
+  resolved "https://registry.yarnpkg.com/@jridgewell/trace-mapping/-/trace-mapping-0.3.20.tgz#72e45707cf240fa6b081d0366f8265b0cd10197f"
+  integrity sha512-R8LcPeWZol2zR8mmH3JeKQ6QRCFb7XgUhV9ZlGhHLGyg4wpPiPZNQOOWhFZhxKw8u//yTbNGI42Bx/3paXEQ+Q==
   dependencies:
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
@@ -4965,9 +4965,9 @@ d@1, d@^1.0.1:
     type "^1.0.1"
 
 daisyui@^3.1.5:
-  version "3.9.2"
-  resolved "https://registry.yarnpkg.com/daisyui/-/daisyui-3.9.2.tgz#73c83d46ff86186568b211be2d231f4aee5a9ecc"
-  integrity sha512-yJZ1QjHUaL+r9BkquTdzNHb7KIgAJVFh0zbOXql2Wu0r7zx5qZNLxclhjN0WLoIpY+o2h/8lqXg7ijj8oTigOw==
+  version "3.9.3"
+  resolved "https://registry.yarnpkg.com/daisyui/-/daisyui-3.9.3.tgz#d8cd193feb57460d56a5fdf9e15063fd667842ec"
+  integrity sha512-8li177QCu6dqlEOzE3h/dAV1y9Movbjx5bzJIO/hNqMNZtJkbHM0trjTzbDejV7N57eNGdjBvAGtxZYKzS4jow==
   dependencies:
     colord "^2.9"
     css-selector-tokenizer "^0.8"
@@ -8324,9 +8324,9 @@ mongoose-field-encryption@^6.1.0:
   integrity sha512-6x7+BEYCQ6SyqRY4ORJ+YnpL/jwa82XDyG9kC70eVJJTTsUxzOk1n5QXm1yTTYplrgwDzo0Ek0v9rLikUF8VQw==
 
 mongoose@^7.2.2:
-  version "7.6.2"
-  resolved "https://registry.yarnpkg.com/mongoose/-/mongoose-7.6.2.tgz#c55c8c41352a6e5223bd7b60aa2715331e1d2b65"
-  integrity sha512-OVx6RWbfNOzBbfTvXoOkgZmaizdXDU/B/KbBjietXQoInSg/OSULjOavXJzL51XWFkbefqkOvbeE07DfvW6FkQ==
+  version "7.6.3"
+  resolved "https://registry.yarnpkg.com/mongoose/-/mongoose-7.6.3.tgz#b06507dd164ad4426013eeb266d54aa1e5178092"
+  integrity sha512-moYP2qWCOdWRDeBxqB/zYwQmQnTBsF5DoolX5uPyI218BkiA1ujGY27P0NTd4oWIX+LLkZPw0LDzlc/7oh1plg==
   dependencies:
     bson "^5.5.0"
     kareem "2.5.1"
@@ -9668,10 +9668,10 @@ resolve-from@^4.0.0:
   resolved "https://registry.yarnpkg.com/resolve-from/-/resolve-from-4.0.0.tgz#4abcd852ad32dd7baabfe9b40e00a36db5f392e6"
   integrity sha512-pb/MYmXstAkysRFx8piNI1tGFNQIFA3vkE3Gq4EuA1dF6gHp/+vgZqsCGJapvy8N3Q+4o7FwvquPJcnZ7RYy4g==
 
-resolve@^1.1.7, resolve@^1.17.0, resolve@^1.22.2:
-  version "1.22.6"
-  resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.22.6.tgz#dd209739eca3aef739c626fea1b4f3c506195362"
-  integrity sha512-njhxM7mV12JfufShqGy3Rz8j11RPdLy4xi15UurGJeoHLfJpVXKdh3ueuOqbYUcDZnffr6X739JBo5LzyahEsw==
+resolve@^1.1.7, resolve@^1.22.2:
+  version "1.22.8"
+  resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.22.8.tgz#b6c87a9f2aa06dfab52e3d70ac8cde321fa5a48d"
+  integrity sha512-oKWePCxqpd6FlLvGV1VU0x7bkPmmCNolxzjMf4NczoDnQcIWrAF+cPtZn5i6n+RfD2d9i0tzpKnG6Yk168yIyw==
   dependencies:
     is-core-module "^2.13.0"
     path-parse "^1.0.7"
@@ -9683,6 +9683,15 @@ resolve@^1.10.0, resolve@^1.22.1:
   integrity sha512-Sb+mjNHOULsBv818T40qSPeRiuWLyaGMa5ewydRLFimneixmVy2zdivRl+AF6jaYPC8ERxGDmFSiqui6SfPd+g==
   dependencies:
     is-core-module "^2.11.0"
+    path-parse "^1.0.7"
+    supports-preserve-symlinks-flag "^1.0.0"
+
+resolve@^1.17.0:
+  version "1.22.6"
+  resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.22.6.tgz#dd209739eca3aef739c626fea1b4f3c506195362"
+  integrity sha512-njhxM7mV12JfufShqGy3Rz8j11RPdLy4xi15UurGJeoHLfJpVXKdh3ueuOqbYUcDZnffr6X739JBo5LzyahEsw==
+  dependencies:
+    is-core-module "^2.13.0"
     path-parse "^1.0.7"
     supports-preserve-symlinks-flag "^1.0.0"
 
@@ -11632,7 +11641,12 @@ yaml@^1.10.0, yaml@^1.10.2:
   resolved "https://registry.yarnpkg.com/yaml/-/yaml-1.10.2.tgz#2301c5ffbf12b467de8da2333a459e29e7920e4b"
   integrity sha512-r3vXyErRCYJ7wg28yvBY5VSoAF8ZvlcW9/BwUzEtUsjvX/DKs24dIkuwjtuprwJJHsbyUbLApepYTR1BN4uHrg==
 
-yaml@^2.1.1, yaml@^2.2.1:
+yaml@^2.1.1:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/yaml/-/yaml-2.3.3.tgz#01f6d18ef036446340007db8e016810e5d64aad9"
+  integrity sha512-zw0VAJxgeZ6+++/su5AFoqBbZbrEakwu+X0M5HmcwUiBL7AzcuPKjj5we4xfQLp78LkEMpD0cOnUhmgOVy3KdQ==
+
+yaml@^2.2.1:
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/yaml/-/yaml-2.3.2.tgz#f522db4313c671a0ca963a75670f1c12ea909144"
   integrity sha512-N/lyzTPaJasoDmfV7YTrYCI0G/3ivm/9wdG0aHuheKowWQwGTsK0Eoiw6utmzAnI6pkJa0DUVygvp3spqqEKXg==

@@ -1,3 +1,5 @@
+import { CurrencyType } from './models/common';
+
 export enum ActorType {
   AGENT = 'AGENT',
   CREATOR = 'CREATOR',
@@ -28,11 +30,17 @@ export enum TokenRoles {
   CREATOR = 'CREATOR'
 }
 
-export const currencyFormatter = (currency = 'USD') => {
+export const currencyFormatter = (
+  currency = CurrencyType.USD.toString(),
+  _minimumFractionDigits?: number
+) => {
+  const minimumFractionDigits =
+    _minimumFractionDigits || currency === CurrencyType.USD ? 0 : 8;
   const formatter = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency,
-    maximumFractionDigits: 0
+    currencyDisplay: 'symbol',
+    minimumFractionDigits
   });
 
   return formatter;

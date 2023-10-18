@@ -1,6 +1,10 @@
 import { error, fail } from '@sveltejs/kit';
+import type { AxiosResponse } from 'axios';
 import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
+
+import { BITCART_EMAIL, BITCART_PASSWORD } from '$env/static/private';
+import { PUBLIC_BITCART_API_URL } from '$env/static/public';
 
 import type { CancelType } from '$lib/models/common';
 import { CancelReason, CurrencyType } from '$lib/models/common';
@@ -15,6 +19,8 @@ import { ShowMachineEventString } from '$lib/machines/showMachine';
 import type { ShowQueueType } from '$lib/workers/showWorker';
 
 import { ActorType, EntityType } from '$lib/constants';
+import { rateCryptosRateGet } from '$lib/ext/bitcart';
+import { createAuthToken } from '$lib/util/payment';
 import { getShowMachineServiceFromId } from '$lib/util/util.server';
 
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
@@ -207,6 +213,25 @@ export const load: PageServerLoad = async ({ params }) => {
     .exec();
 
   // return the rate of exchange for UI from bitcart
+  const token = await createAuthToken(
+    BITCART_EMAIL,
+    BITCART_PASSWORD,
+    PUBLIC_BITCART_API_URL
+  );
+
+  const exchangeRate =
+    ((await rateCryptosRateGet(
+      {
+        currency: wallet.currency,
+        fiat_currency: CurrencyType.USD
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    )) as AxiosResponse<string>) || undefined;
 
   return {
     creator: creator.toObject({ flattenObjectIds: true, flattenMaps: true }),
@@ -216,6 +241,7 @@ export const load: PageServerLoad = async ({ params }) => {
     completedShows: completedShows.map((show) =>
       show.toObject({ flattenObjectIds: true, flattenMaps: true })
     ),
-    wallet: wallet.toObject({ flattenObjectIds: true, flattenMaps: true })
+    wallet: wallet.toObject({ flattenObjectIds: true, flattenMaps: true }),
+    exchangeRate: exchangeRate?.data
   };
 };
