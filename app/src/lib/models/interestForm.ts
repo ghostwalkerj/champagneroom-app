@@ -18,15 +18,15 @@ const interestFormSchema = new Schema(
   { timestamps: true }
 );
 
+export type InterestFormDocumentType = InferSchemaType<
+  typeof interestFormSchema
+>;
+
+export type InterestFormType = InstanceType<typeof InterestForm>;
+
 export const InterestForm = models?.InterestForm
   ? (models?.InterestForm as Model<InterestFormDocumentType>)
   : mongoose.model<InterestFormDocumentType>(
       'InterestForm',
       interestFormSchema
     );
-
-export type InterestFormDocumentType = InferSchemaType<
-  typeof interestFormSchema
->;
-
-export type InterestFormType = InstanceType<typeof InterestForm>;

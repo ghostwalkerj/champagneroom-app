@@ -36,7 +36,8 @@ module.exports = {
           'error',
           {
             sortDir: 'asc',
-            sortExportKindFirst: 'value'
+            ignoreCase: false,
+            sortExportKindFirst: 'type'
           }
         ],
         'simple-import-sort/imports': [

@@ -1,7 +1,6 @@
 import type { Job, Queue } from 'bullmq';
 import { Worker } from 'bullmq';
 import type IORedis from 'ioredis';
-import type { Types } from 'mongoose';
 
 import type {
   CancelType,
@@ -12,7 +11,7 @@ import type {
   SaleType
 } from '$lib/models/common';
 import { Creator } from '$lib/models/creator';
-import type { ShowType } from '$lib/models/show';
+import type { ShowDocumentType, ShowType } from '$lib/models/show';
 import { SaveState, Show, ShowStatus } from '$lib/models/show';
 import { createShowEvent } from '$lib/models/showEvent';
 import type { TicketType } from '$lib/models/ticket';
@@ -25,12 +24,23 @@ import {
 } from '$lib/machines/showMachine';
 import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
 import { TicketMachineEventString } from '$lib/machines/ticketMachine';
+import { WalletMachineEventString } from '$lib/machines/walletMachine';
 
 import { ActorType, EntityType } from '$lib/constants';
 import { PayoutJobType } from '$lib/util/payment';
-import { getTicketMachineService } from '$lib/util/util.server';
+import {
+  getTicketMachineService,
+  getWalletMachineServiceFromId
+} from '$lib/util/util.server';
 
 import type { PayoutQueueType } from './payoutWorker';
+
+export type ShowJobDataType = {
+  showId: string;
+  [key: string]: any;
+};
+
+export type ShowQueueType = Queue<ShowJobDataType, any, ShowMachineEventString>;
 
 export const getShowWorker = ({
   showQueue,
@@ -145,13 +155,6 @@ export const getShowWorker = ({
     { autorun: false, connection: redisConnection }
   );
 };
-
-export type ShowJobDataType = {
-  showId: string;
-  [key: string]: any;
-};
-
-export type ShowQueueType = Queue<ShowJobDataType, any, ShowMachineEventString>;
 
 const cancelShow = async (
   show: ShowType,
@@ -326,6 +329,8 @@ const finalizeShow = async (show: ShowType, showQueue: ShowQueueType) => {
     }
   });
 
+  let updatedShow = show;
+
   let showRevenue = new Map<string, number>();
 
   const showState = showService.getSnapshot();
@@ -437,7 +442,7 @@ const finalizeShow = async (show: ShowType, showQueue: ShowQueueType) => {
     const ticketSalesAmount =
       show.showState.salesStats.ticketsSold * show.price.amount;
 
-    await Show.findByIdAndUpdate(
+    updatedShow = (await Show.findByIdAndUpdate(
       { _id: show._id },
       {
         'showState.salesStats.ticketSalesAmount': {
@@ -447,8 +452,11 @@ const finalizeShow = async (show: ShowType, showQueue: ShowQueueType) => {
         'showState.salesStats.totalSales': totalSales,
         'showState.salesStats.totalRefunds': totalRefunds,
         'showState.salesStats.totalRevenue': totalRevenue
+      },
+      {
+        returnDocument: 'after'
       }
-    );
+    )) as ShowType;
     showRevenue = new Map(totalRevenue);
     showSession.endSession();
   });
@@ -581,43 +589,54 @@ const finalizeShow = async (show: ShowType, showQueue: ShowQueueType) => {
     return;
   }
 
-  const wallet = await Wallet.findOne({
-    _id: walletId,
-    earnings: {
-      $not: {
-        $elemMatch: { show: show._id }
-      }
-    }
-  })
-    .select('currency')
-    .exec();
-
-  if (!wallet) {
-    console.log('No wallet to payout or Show already paid out');
-    return;
-  }
-
-  const amount = showRevenue.get(wallet.currency);
-
-  if (!amount) {
-    console.log('No revenue to add to wallet');
-    return;
-  }
-
-  const earning = {
-    earnedAt: new Date(),
-    show: show._id,
-    amount,
-    currency: wallet.currency
-  } as EarningsType;
-
-  Wallet.findByIdAndUpdate(
-    { _id: walletId },
-    {
-      $inc: [{ balance: amount }, { availableBalance: amount }],
-      $push: { earnings: earning }
-    }
+  const walletService = await getWalletMachineServiceFromId(
+    walletId.toString()
   );
+
+  walletService.send({
+    type: WalletMachineEventString.SHOW_EARNINGS_POSTED,
+    show: updatedShow
+  });
+
+  walletService.stop();
+
+  // const wallet = await Wallet.findOne({
+  //   _id: walletId,
+  //   earnings: {
+  //     $not: {
+  //       $elemMatch: { show: show._id }
+  //     }
+  //   }
+  // })
+  //   .select('currency')
+  //   .exec();
+
+  // if (!wallet) {
+  //   console.log('No wallet to payout or Show already paid out');
+  //   return;
+  // }
+
+  // const amount = showRevenue.get(wallet.currency);
+
+  // if (!amount) {
+  //   console.log('No revenue to add to wallet');
+  //   return;
+  // }
+
+  // const earning = {
+  //   earnedAt: new Date(),
+  //   show: show._id,
+  //   amount,
+  //   currency: wallet.currency
+  // } as EarningsType;
+
+  // Wallet.findByIdAndUpdate(
+  //   { _id: walletId },
+  //   {
+  //     $inc: [{ balance: amount }, { availableBalance: amount }],
+  //     $push: { earnings: earning }
+  //   }
+  // );
 };
 
 // Ticket Events

@@ -43,12 +43,16 @@ const transactionSchema = new Schema(
   { timestamps: true }
 );
 
+export type TransactionDocumentType = InferSchemaType<typeof transactionSchema>;
+
+export type TransactionSummaryType = InferSchemaType<typeof transactionSummary>;
+
+export type TransactionType = InstanceType<typeof Transaction>;
+
 export const Transaction = models?.Transaction
   ? (models?.Transaction as Model<TransactionDocumentType>)
   : mongoose.model<TransactionDocumentType>('Transaction', transactionSchema);
-
 export { TransactionReasonType };
-
 export const transactionSummary = new Schema({
   createdAt: { type: Date, default: new Date() },
   amount: { type: Number, required: true },
@@ -60,6 +64,3 @@ export const transactionSummary = new Schema({
   rate: { type: Number, default: 0 },
   transaction: { type: Schema.Types.ObjectId, ref: 'Transaction' }
 });
-
-export type TransactionDocumentType = InferSchemaType<typeof transactionSchema>;
-export type TransactionType = InstanceType<typeof Transaction>;

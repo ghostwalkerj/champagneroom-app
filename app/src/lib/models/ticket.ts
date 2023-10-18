@@ -32,12 +32,7 @@ enum TicketStatus {
 }
 
 const { Schema, models } = pkg;
-export const SaveState = (ticket: TicketType, newState: TicketStateType) => {
-  Ticket.updateOne(
-    { _id: ticket._id },
-    { $set: { showState: newState } }
-  ).exec();
-};
+export type TicketDocumentType = InferSchemaType<typeof ticketSchema>;
 
 const redemptionSchema = new Schema({
   redeemedAt: { type: Date, default: Date.now }
@@ -106,14 +101,19 @@ ticketSchema.plugin(fieldEncryption, {
   secret: process.env.MONGO_DB_FIELD_SECRET
 });
 
+export type TicketStateType = InferSchemaType<typeof ticketStateSchema>;
+
+export type TicketType = InstanceType<typeof Ticket>;
+
+export const SaveState = (ticket: TicketType, newState: TicketStateType) => {
+  Ticket.updateOne(
+    { _id: ticket._id },
+    { $set: { showState: newState } }
+  ).exec();
+};
+
 export const Ticket = models?.Ticket
   ? (models.Ticket as Model<TicketDocumentType>)
   : mongoose.model<TicketDocumentType>('Ticket', ticketSchema);
 
 export { TicketStatus };
-
-export type TicketDocumentType = InferSchemaType<typeof ticketSchema>;
-
-export type TicketStateType = InferSchemaType<typeof ticketStateSchema>;
-
-export type TicketType = InstanceType<typeof Ticket>;

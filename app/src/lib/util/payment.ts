@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import type { MoneyType } from '$lib/models/common';
+import type { TransactionSummaryType } from '$lib/models/transaction';
 
 import { createTokenTokenPost } from '$ext/bitcart';
 
@@ -24,7 +24,8 @@ export enum InvoiceStatus {
 
 export enum PayoutJobType {
   CREATE_REFUND = 'CREATE_REFUND',
-  PAYOUT_UPDATE = 'PAYOUT_UPDATE'
+  PAYOUT_UPDATE = 'PAYOUT_UPDATE',
+  CREATE_PAYOUT = 'CREATE_PAYOUT'
 }
 
 export enum PayoutStatus {
@@ -36,11 +37,11 @@ export enum PayoutStatus {
   COMPLETE = 'complete'
 }
 
-export const calcTotal = (payments: Map<string, MoneyType[]>) => {
+export const calcTotal = (payments: Map<string, TransactionSummaryType[]>) => {
   let total = 0;
 
   for (const key in Object.keys(payments)) {
-    const paymentArray = payments[key] as [MoneyType];
+    const paymentArray = payments[key] as [TransactionSummaryType];
     total += paymentArray.reduce((accumulator, current) => {
       return accumulator + current.amount * current.rate;
     }, 0);

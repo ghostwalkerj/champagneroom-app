@@ -90,10 +90,10 @@ const creatorSchema = new Schema(
   { timestamps: true }
 );
 
-export const Creator = models?.Creator
-  ? (models?.Creator as Model<CreatorDocumentType>)
-  : mongoose.model<CreatorDocumentType>('Creator', creatorSchema);
-
 export type CreatorDocumentType = InferSchemaType<typeof creatorSchema>;
 
 export type CreatorType = InstanceType<typeof Creator>;
+
+export const Creator = models?.Creator
+  ? (models?.Creator as Model<CreatorDocumentType>)
+  : mongoose.model<CreatorDocumentType>('Creator', creatorSchema);

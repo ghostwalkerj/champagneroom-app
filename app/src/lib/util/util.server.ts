@@ -9,9 +9,12 @@ import {
   type TicketStateType,
   type TicketType
 } from '$lib/models/ticket';
+import type { WalletType } from '$lib/models/wallet';
+import { SaveState as WalletSaveState } from '$lib/models/wallet';
 
 import { createShowMachineService } from '$lib/machines/showMachine';
 import { createTicketMachineService } from '$lib/machines/ticketMachine';
+import { createWalletMachineService } from '$lib/machines/walletMachine';
 
 import type { ShowQueueType } from '$lib/workers/showWorker';
 
@@ -76,4 +79,24 @@ export const getTicketMachineServiceFromId = async (
     .exec();
 
   return getTicketMachineService(ticket, connection);
+};
+
+export const getWalletMachineService = (wallet: WalletType) => {
+  return createWalletMachineService({
+    wallet,
+    walletMachineOptions: {
+      saveStateCallback: async (wallet) => WalletSaveState(wallet)
+    }
+  });
+};
+
+export const getWalletMachineServiceFromId = async (walletId: string) => {
+  const show = await mongoose
+    .model('Wallet')
+    .findById(walletId)
+    .orFail(() => {
+      throw new Error('Wallet not found');
+    })
+    .exec();
+  return getWalletMachineService(show);
 };

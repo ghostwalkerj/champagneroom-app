@@ -16,6 +16,7 @@ import { Wallet } from '$lib/models/wallet';
 import type { ShowMachineEventType } from '$lib/machines/showMachine';
 import { ShowMachineEventString } from '$lib/machines/showMachine';
 
+import type { PayoutQueueType } from '$lib/workers/payoutWorker';
 import type { ShowQueueType } from '$lib/workers/showWorker';
 
 import { ActorType, EntityType } from '$lib/constants';
@@ -174,6 +175,53 @@ export const actions: Actions = {
     return {
       success: true,
       inEscrow: isInEscrow
+    };
+  },
+  request_payout: async ({ params, request, locals }) => {
+    const address = params.address;
+    const data = await request.formData();
+    const amount = data.get('amount') as string;
+    const destination = data.get('destination') as string;
+
+    if (address === null) {
+      throw error(404, 'Address not found');
+    }
+    if (!amount) {
+      return fail(400, { amount, missingAmount: true });
+    }
+    if (Number.isNaN(+amount) || +amount < 1 || +amount > 10_000) {
+      return fail(400, { amount, invalidAmount: true });
+    }
+    if (!destination) {
+      return fail(400, { destination, missingDestination: true });
+    }
+
+    const redisConnection = locals.redisConnection as IORedis;
+    const payoutQueue = new Queue(EntityType.PAYOUT, {
+      connection: redisConnection
+    }) as PayoutQueueType;
+
+    const creator = await Creator.findOne({
+      'user.address': address,
+      'user.active': true
+    })
+      .orFail(() => {
+        throw error(404, 'Creator not found');
+      })
+      .exec();
+
+    const wallet = await Wallet.findOne({ _id: creator.user.wallet });
+
+    if (!wallet) {
+      throw error(404, 'Wallet not found');
+    }
+
+    if (wallet.availableBalance < +amount) {
+      return fail(400, { amount, insufficientBalance: true });
+    }
+
+    return {
+      success: true
     };
   }
 };

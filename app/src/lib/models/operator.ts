@@ -18,10 +18,10 @@ const OperatorSchema = new Schema(
   { timestamps: true }
 );
 
-export const Operator = models?.Operator
-  ? (models.Operator as Model<OperatorDocumentType>)
-  : mongoose.model<OperatorDocumentType>('Operator', OperatorSchema);
-
 export type OperatorDocumentType = InferSchemaType<typeof OperatorSchema>;
 
 export type OperatorType = InstanceType<typeof Operator>;
+
+export const Operator = models?.Operator
+  ? (models.Operator as Model<OperatorDocumentType>)
+  : mongoose.model<OperatorDocumentType>('Operator', OperatorSchema);

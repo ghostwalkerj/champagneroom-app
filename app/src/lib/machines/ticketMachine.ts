@@ -13,7 +13,6 @@ import type {
   DisputeType,
   FeedbackType,
   FinalizeType,
-  MoneyType,
   RefundType,
   SaleType
 } from '$lib/models/common';
@@ -21,7 +20,10 @@ import type { CurrencyType } from '$lib/models/common';
 import { RefundReason } from '$lib/models/common';
 import type { TicketDocumentType, TicketStateType } from '$lib/models/ticket';
 import { TicketStatus } from '$lib/models/ticket';
-import type { TransactionDocumentType } from '$lib/models/transaction';
+import type {
+  TransactionDocumentType,
+  TransactionSummaryType
+} from '$lib/models/transaction';
 
 import type { ShowJobDataType } from '$lib/workers/showWorker';
 
@@ -734,7 +736,10 @@ const createTicketMachine = ({
 
           // Check total payments with rates at time of transaction.
           const payouts = (context.ticketState.sale?.payments ||
-            new Map<string, MoneyType[]>()) as Map<string, MoneyType[]>;
+            new Map<string, TransactionSummaryType[]>()) as Map<
+            string,
+            TransactionSummaryType[]
+          >;
           total += calcTotal(payouts);
 
           return total >= context.ticketDocument.price.amount;

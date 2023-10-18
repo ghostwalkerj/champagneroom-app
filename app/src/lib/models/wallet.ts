@@ -1,14 +1,26 @@
 import type { InferSchemaType, Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
 
-import { CurrencyType, earningsSchema } from './common';
-import { transactionSummary } from './transaction';
+import { CurrencyType, earningsSchema, payoutSchema } from './common';
 
 const { Schema, models } = pkg;
+
+export type WalletDocumentType = InferSchemaType<typeof walletSchema>;
+
+enum WalletStatus {
+  AVAILABLE = 'AVAILABLE',
+  PAYOUT_IN_PROGRESS = 'PAYOUT_IN_PROGRESS'
+}
 
 const walletSchema = new mongoose.Schema(
   {
     _id: { type: Schema.Types.ObjectId, required: true, auto: true },
+    status: {
+      type: String,
+      enum: WalletStatus,
+      required: true,
+      default: WalletStatus.AVAILABLE
+    },
     currency: {
       type: String,
       enum: CurrencyType,
@@ -31,7 +43,7 @@ const walletSchema = new mongoose.Schema(
       required: true
     },
     payouts: {
-      type: [transactionSummary],
+      type: [payoutSchema],
       default: () => [],
       required: true
     },
@@ -40,10 +52,14 @@ const walletSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+export type WalletType = InstanceType<typeof Wallet>;
+
+export const SaveState = (wallet: WalletDocumentType) => {
+  Wallet.updateOne({ _id: wallet._id }, { $set: { ...wallet } }).exec();
+};
+
 export const Wallet = models?.Wallet
   ? (models.Wallet as Model<WalletDocumentType>)
   : mongoose.model<WalletDocumentType>('Wallet', walletSchema);
 
-export type WalletDocumentType = InferSchemaType<typeof walletSchema>;
-
-export type WalletType = InstanceType<typeof Wallet>;
+export { WalletStatus };

@@ -12,8 +12,8 @@
   export let exchangeRate = 0;
   export let wallet: WalletDocumentType;
 
-  const hasTransactions = wallet.earnings.length + wallet.payouts.length > 0;
-  const hasAvailableBalance = wallet.availableBalance > 0;
+  $: hasTransactions = wallet.earnings.length + wallet.payouts.length > 0;
+  $: hasAvailableBalance = wallet.availableBalance > 0;
   let transactionModal: HTMLDialogElement;
   let walletUnSub: Unsubscriber;
 
@@ -24,11 +24,12 @@
   onMount(() => {
     if (wallet.active) {
       walletUnSub = walletStore(wallet).subscribe((_wallet) => {
-        console.log('wallet', _wallet);
         wallet = _wallet;
         earnings = wallet.earnings;
         payouts = wallet.payouts;
         availableBalance = wallet.availableBalance;
+        hasAvailableBalance = wallet.availableBalance > 0;
+        hasTransactions = wallet.earnings.length + wallet.payouts.length > 0;
       });
     }
   });
@@ -66,7 +67,7 @@
           <ul class="list-none">
             {#each payouts as payout}
               <li class="flex justify-between">
-                <span>{new Date(payout.createdAt).toLocaleDateString()}</span>
+                <span>{new Date(payout.payoutAt).toLocaleDateString()}</span>
 
                 <span
                   >{currencyFormatter(wallet.currency).format(
