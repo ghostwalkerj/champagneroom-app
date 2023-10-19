@@ -59,8 +59,6 @@ export const getPayoutWorker = ({
     EntityType.PAYOUT,
     async (job: Job<PayoutJobDataType, any, string>) => {
       const payoutType = job.name as PayoutJobType;
-      // create ticket refund
-
       switch (payoutType) {
         case PayoutJobType.CREATE_REFUND: {
           const invoiceId = job.data.invoiceId;
@@ -305,10 +303,16 @@ export const getPayoutWorker = ({
               return;
             }
             const bcWalletResponse = await getWalletByIdWalletsModelIdGet(
-              walletId
+              bcWalletId,
+              {
+                headers: {
+                  Authorization: `Bearer ${paymentAuthToken}`,
+                  'Content-Type': 'application/json'
+                }
+              }
             );
             if (!bcWalletResponse.data) {
-              console.error('No wallet found for ID:', walletId);
+              console.error('No wallet found for ID:', bcWalletId);
               return;
             }
             const bcWallet = bcWalletResponse.data as BTWallet;
@@ -329,14 +333,22 @@ export const getPayoutWorker = ({
             }
 
             // Create the payout
-            const bcPayoutResponse = await createPayoutPayoutsPost({
-              amount,
-              destination,
-              store_id: bitcartStoreId,
-              wallet_id: bcWalletId,
-              currency: wallet.currency,
-              notification_url: paymentNotificationUrl
-            });
+            const bcPayoutResponse = await createPayoutPayoutsPost(
+              {
+                amount,
+                destination,
+                store_id: bitcartStoreId,
+                wallet_id: bcWalletId,
+                currency: wallet.currency,
+                notification_url: paymentNotificationUrl
+              },
+              {
+                headers: {
+                  Authorization: `Bearer ${paymentAuthToken}`,
+                  'Content-Type': 'application/json'
+                }
+              }
+            );
             if (!bcPayoutResponse.data) {
               console.error('No payout created');
               return;

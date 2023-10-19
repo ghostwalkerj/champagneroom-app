@@ -5,8 +5,12 @@ import type IORedis from 'ioredis';
 import { Types } from 'mongoose';
 import urlJoin from 'url-join';
 
-import { BITCART_EMAIL, BITCART_PASSWORD } from '$env/static/private';
-import { PUBLIC_BITCART_API_URL, PUBLIC_PIN_PATH } from '$env/static/public';
+import {
+  BITCART_API_URL,
+  BITCART_EMAIL,
+  BITCART_PASSWORD
+} from '$env/static/private';
+import { PUBLIC_PIN_PATH } from '$env/static/public';
 
 import type {
   CancelType,
@@ -27,9 +31,9 @@ import type { PayoutQueueType } from '$lib/workers/payoutWorker';
 
 import { ActorType, EntityType } from '$lib/constants';
 import {
+  createAuthToken,
   InvoiceJobType,
-  PayoutJobType,
-  createAuthToken
+  PayoutJobType
 } from '$lib/util/payment';
 import { verifyPin } from '$lib/util/pin';
 import {
@@ -240,7 +244,7 @@ export const actions: Actions = {
     const token = await createAuthToken(
       BITCART_EMAIL,
       BITCART_PASSWORD,
-      PUBLIC_BITCART_API_URL
+      BITCART_API_URL
     );
 
     try {
@@ -307,7 +311,7 @@ export const load: PageServerLoad = async ({ params, cookies, url }) => {
   const token = await createAuthToken(
     BITCART_EMAIL,
     BITCART_PASSWORD,
-    PUBLIC_BITCART_API_URL
+    BITCART_API_URL
   );
 
   const invoice =

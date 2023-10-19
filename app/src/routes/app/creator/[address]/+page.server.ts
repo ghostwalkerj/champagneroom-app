@@ -4,7 +4,7 @@ import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 
 import { BITCART_EMAIL, BITCART_PASSWORD } from '$env/static/private';
-import { PUBLIC_BITCART_API_URL } from '$env/static/public';
+import { BITCART_API_URL } from '$env/static/private';
 
 import type { CancelType } from '$lib/models/common';
 import { CancelReason, CurrencyType } from '$lib/models/common';
@@ -262,7 +262,7 @@ export const load: PageServerLoad = async ({ params }) => {
   const token = await createAuthToken(
     BITCART_EMAIL,
     BITCART_PASSWORD,
-    PUBLIC_BITCART_API_URL
+    BITCART_API_URL
   );
 
   const exchangeRate =

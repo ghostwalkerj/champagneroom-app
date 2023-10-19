@@ -5,16 +5,13 @@ import { uniqueNamesGenerator } from 'unique-names-generator';
 import urlJoin from 'url-join';
 
 import {
+  BITCART_API_URL,
   BITCART_EMAIL,
+  BITCART_INVOICE_NOTIFICATION_PATH,
   BITCART_PASSWORD,
   BITCART_STORE_ID
 } from '$env/static/private';
-import {
-  PUBLIC_BITCART_API_URL,
-  PUBLIC_BITCART_INVOICE_NOTIFICATION_PATH,
-  PUBLIC_PAYMENT_PERIOD,
-  PUBLIC_TICKET_PATH
-} from '$env/static/public';
+import { PUBLIC_PAYMENT_PERIOD, PUBLIC_TICKET_PATH } from '$env/static/public';
 
 import { Show } from '$lib/models/show';
 import { Ticket } from '$lib/models/ticket';
@@ -29,7 +26,7 @@ import { createAuthToken } from '$lib/util/payment';
 import { createPinHash } from '$lib/util/pin';
 import { getShowMachineServiceFromId } from '$lib/util/util.server';
 
-import { createInvoiceInvoicesPost } from '../../../../lib/ext/bitcart';
+import { createInvoiceInvoicesPost } from '$ext/bitcart';
 
 import type { Actions, PageServerLoad } from './$types';
 
@@ -97,7 +94,7 @@ export const actions: Actions = {
     const token = await createAuthToken(
       BITCART_EMAIL,
       BITCART_PASSWORD,
-      PUBLIC_BITCART_API_URL
+      BITCART_API_URL
     );
 
     const invoice = await createInvoiceInvoicesPost(
@@ -107,7 +104,7 @@ export const actions: Actions = {
         store_id: BITCART_STORE_ID,
         expiration: +PUBLIC_PAYMENT_PERIOD / 60 / 1000,
         order_id: ticket._id.toString(),
-        notification_url: urlJoin(PUBLIC_BITCART_INVOICE_NOTIFICATION_PATH)
+        notification_url: urlJoin(BITCART_INVOICE_NOTIFICATION_PATH)
       },
       {
         headers: {

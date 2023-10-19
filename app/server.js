@@ -57,7 +57,7 @@ const payoutQueue = new Queue(EntityType.PAYOUT, {
 const paymentAuthToken = await createAuthToken(
   process.env.BITCART_EMAIL || '',
   process.env.BITCART_PASSWORD || '',
-  process.env.PUBLIC_BITCART_API_URL || ''
+  process.env.BITCART_API_URL || ''
 );
 
 // Workers
@@ -84,9 +84,8 @@ if (startWorker) {
     paymentAuthToken,
     paymentPeriod:
       +(process.env.PUBLIC_PAYMENT_PERIOD || 6_000_000) / 60 / 1000,
-    paymentNotificationUrl:
-      process.env.PUBLIC_BITCART_PAYOUT_NOTIFICATION_PATH || '',
-    bitcartStoreId: process.env.PUBLIC_BITCART_STORE_ID || ''
+    paymentNotificationUrl: process.env.BITCART_PAYOUT_NOTIFICATION_PATH || '',
+    bitcartStoreId: process.env.BITCART_STORE_ID || ''
   });
   paymentWorker.run();
 }

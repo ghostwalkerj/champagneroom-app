@@ -2,12 +2,12 @@ import { error } from '@sveltejs/kit';
 import type { AxiosResponse } from 'axios';
 
 import { BITCART_EMAIL, BITCART_PASSWORD } from '$env/static/private';
-import { PUBLIC_BITCART_API_URL } from '$env/static/public';
+import { BITCART_API_URL } from '$env/static/private';
 
 import { createAuthToken } from '$lib/util/payment';
 
-import { getInvoiceByIdInvoicesModelIdGet } from '../../../../../../lib/ext/bitcart';
-import type { DisplayInvoice } from '../../../../../../lib/ext/bitcart/models';
+import { getInvoiceByIdInvoicesModelIdGet } from '$ext/bitcart';
+import type { DisplayInvoice } from '$ext/bitcart/models';
 
 import type { RequestHandler } from './$types';
 
@@ -21,7 +21,7 @@ export const GET = (async ({ params }) => {
   const token = await createAuthToken(
     BITCART_EMAIL,
     BITCART_PASSWORD,
-    PUBLIC_BITCART_API_URL
+    BITCART_API_URL
   );
 
   const invoice =
