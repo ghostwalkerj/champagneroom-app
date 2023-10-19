@@ -38,56 +38,6 @@ enum ShowMachineEventString {
   TICKET_REDEEMED = 'TICKET REDEEMED'
 }
 
-export { ShowMachineEventString };
-
-export { createShowMachine };
-
-export const createShowMachineService = ({
-  showDocument,
-  showMachineOptions
-}: {
-  showDocument: ShowDocumentType;
-  showMachineOptions?: ShowMachineOptions;
-}) => {
-  const showMachine = createShowMachine({ showDocument, showMachineOptions });
-  showMachine;
-  const showService = interpret(showMachine).start();
-
-  if (showMachineOptions?.saveStateCallback) {
-    showService.onChange((context) => {
-      showMachineOptions.saveStateCallback &&
-        showMachineOptions.saveStateCallback(context.showState);
-    });
-  }
-
-  if (showMachineOptions?.saveShowEventCallback) {
-    showService.onEvent((event) => {
-      let ticketId: string | undefined;
-      if ('ticket' in event) {
-        const ticket = event.ticket as TicketType;
-        ticketId = ticket._id.toString();
-      }
-
-      const transaction = (
-        'transaction' in event ? event.transaction : undefined
-      ) as TransactionDocumentType | undefined;
-      const ticketInfo = ('customerName' in event ? event : undefined) as
-        | { customerName: string }
-        | undefined;
-
-      showMachineOptions.saveShowEventCallback &&
-        showMachineOptions.saveShowEventCallback({
-          type: event.type,
-          ticketId,
-          transaction,
-          ticketInfo
-        });
-    });
-  }
-
-  return showService;
-};
-
 export type ShowMachineEventType =
   | {
       type: 'CANCELLATION INITIATED';
@@ -180,6 +130,12 @@ export type ShowMachineOptions = {
 export type ShowMachineServiceType = ReturnType<
   typeof createShowMachineService
 >;
+
+export type ShowMachineStateType = StateFrom<typeof createShowMachine>;
+
+export type ShowMachineType = ReturnType<typeof createShowMachine>;
+
+export type ShowStateType = ShowDocumentType['showState'];
 
 const createShowMachine = ({
   showDocument,
@@ -776,6 +732,49 @@ const createShowMachine = ({
   );
 };
 
-export type ShowMachineStateType = StateFrom<typeof createShowMachine>;
-export type ShowMachineType = ReturnType<typeof createShowMachine>;
-export type ShowStateType = ShowDocumentType['showState'];
+export { createShowMachine, ShowMachineEventString };
+export const createShowMachineService = ({
+  showDocument,
+  showMachineOptions
+}: {
+  showDocument: ShowDocumentType;
+  showMachineOptions?: ShowMachineOptions;
+}) => {
+  const showMachine = createShowMachine({ showDocument, showMachineOptions });
+  showMachine;
+  const showService = interpret(showMachine).start();
+
+  if (showMachineOptions?.saveStateCallback) {
+    showService.onChange((context) => {
+      showMachineOptions.saveStateCallback &&
+        showMachineOptions.saveStateCallback(context.showState);
+    });
+  }
+
+  if (showMachineOptions?.saveShowEventCallback) {
+    showService.onEvent((event) => {
+      let ticketId: string | undefined;
+      if ('ticket' in event) {
+        const ticket = event.ticket as TicketType;
+        ticketId = ticket._id.toString();
+      }
+
+      const transaction = (
+        'transaction' in event ? event.transaction : undefined
+      ) as TransactionDocumentType | undefined;
+      const ticketInfo = ('customerName' in event ? event : undefined) as
+        | { customerName: string }
+        | undefined;
+
+      showMachineOptions.saveShowEventCallback &&
+        showMachineOptions.saveShowEventCallback({
+          type: event.type,
+          ticketId,
+          transaction,
+          ticketInfo
+        });
+    });
+  }
+
+  return showService;
+};

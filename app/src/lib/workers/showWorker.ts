@@ -6,17 +6,15 @@ import type {
   CancelType,
   DisputeDecision,
   DisputeType,
-  EarningsType,
   RefundType,
   SaleType
 } from '$lib/models/common';
 import { Creator } from '$lib/models/creator';
-import type { ShowDocumentType, ShowType } from '$lib/models/show';
+import type { ShowType } from '$lib/models/show';
 import { SaveState, Show, ShowStatus } from '$lib/models/show';
 import { createShowEvent } from '$lib/models/showEvent';
 import type { TicketType } from '$lib/models/ticket';
 import { Ticket, TicketStatus } from '$lib/models/ticket';
-import { Wallet } from '$lib/models/wallet';
 
 import {
   createShowMachineService,

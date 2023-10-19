@@ -10,7 +10,7 @@ import {
   type TicketType
 } from '$lib/models/ticket';
 import type { WalletType } from '$lib/models/wallet';
-import { SaveState as WalletSaveState } from '$lib/models/wallet';
+import { atomicUpdateCallback } from '$lib/models/wallet';
 
 import { createShowMachineService } from '$lib/machines/showMachine';
 import { createTicketMachineService } from '$lib/machines/ticketMachine';
@@ -85,7 +85,7 @@ export const getWalletMachineService = (wallet: WalletType) => {
   return createWalletMachineService({
     wallet,
     walletMachineOptions: {
-      saveStateCallback: async (wallet) => WalletSaveState(wallet)
+      atomicUpdateCallback
     }
   });
 };

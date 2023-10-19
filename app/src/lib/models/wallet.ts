@@ -37,6 +37,11 @@ const walletSchema = new mongoose.Schema(
       required: true,
       default: 0
     },
+    onHoldBalance: {
+      type: Number,
+      required: true,
+      default: 0
+    },
     earnings: {
       type: [earningsSchema],
       default: () => [],
@@ -54,12 +59,14 @@ const walletSchema = new mongoose.Schema(
 
 export type WalletType = InstanceType<typeof Wallet>;
 
-export const SaveState = (wallet: WalletDocumentType) => {
-  Wallet.updateOne({ _id: wallet._id }, { $set: { ...wallet } }).exec();
-};
-
 export const Wallet = models?.Wallet
   ? (models.Wallet as Model<WalletDocumentType>)
   : mongoose.model<WalletDocumentType>('Wallet', walletSchema);
 
 export { WalletStatus };
+
+export const atomicUpdateCallback = async (query: object, update: object) => {
+  return (await Wallet.findOneAndUpdate(query, update, {
+    returnDocument: 'after'
+  }).exec()) as WalletDocumentType;
+};

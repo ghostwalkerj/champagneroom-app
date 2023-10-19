@@ -9,6 +9,7 @@ import { raise } from 'xstate/lib/actions';
 
 import type {
   CancelType,
+  CurrencyType,
   DisputeDecision,
   DisputeType,
   FeedbackType,
@@ -16,7 +17,6 @@ import type {
   RefundType,
   SaleType
 } from '$lib/models/common';
-import type { CurrencyType } from '$lib/models/common';
 import { RefundReason } from '$lib/models/common';
 import type { TicketDocumentType, TicketStateType } from '$lib/models/ticket';
 import { TicketStatus } from '$lib/models/ticket';
@@ -790,7 +790,7 @@ const createTicketMachine = ({
 
 export { TicketMachineEventType };
 
-export { createTicketMachine };
+  export { createTicketMachine };
 
 export const createTicketMachineService = ({
   ticketDocument,
