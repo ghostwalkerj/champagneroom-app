@@ -110,11 +110,15 @@ const createWalletMachine = ({
             if (options?.atomicUpdateCallback) {
               options.atomicUpdateCallback(
                 {
-                  id: wallet._id.toString(),
-                  'earnings.show': { $ne: show._id }
+                  _id: wallet._id,
+                  earnings: {
+                    $not: {
+                      $elemMatch: { show: show._id }
+                    }
+                  }
                 },
                 {
-                  $inc: [{ balance: amount }, { availableBalance: amount }],
+                  $inc: { balance: amount, availableBalance: amount },
                   $push: {
                     earnings: earning
                   }
