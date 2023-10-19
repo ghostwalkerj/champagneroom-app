@@ -19,7 +19,17 @@ export type WalletMachineEventType =
   | {
       type: 'PAYOUT REQUESTED';
       payout: PayoutType;
-    };
+    }
+  | {
+      type: 'PAYOUT APPROVED';
+      payout: PayoutType;
+    }
+  | {
+      type: 'PAYOUT FAILED';
+      payout: PayoutType;
+    }
+  | { type: 'PAYOUT CANCELLED'; payout: PayoutType }
+  | { type: 'PAYOUT DENIED'; payout: PayoutType };
 
 export type WalletMachineOptions = {
   atomicUpdateCallback?: (
@@ -139,6 +149,32 @@ const createWalletMachine = ({
           const payout = event.payout;
           wallet.status = WalletStatus.PAYOUT_IN_PROGRESS;
           wallet.payouts.push(payout);
+          wallet.availableBalance -= payout.amount;
+          wallet.onHoldBalance += payout.amount;
+          if (options?.atomicUpdateCallback) {
+            options.atomicUpdateCallback(
+              {
+                _id: wallet._id,
+                payout: {
+                  $not: {
+                    $elemMatch: { payoutId: payout.payoutId }
+                  }
+                }
+              },
+              {
+                $inc: {
+                  availableBalance: -payout.amount,
+                  onHoldBalance: payout.amount
+                },
+                $push: {
+                  payouts: payout
+                },
+                $set: {
+                  status: WalletStatus.PAYOUT_IN_PROGRESS
+                }
+              }
+            );
+          }
           return {
             wallet
           };

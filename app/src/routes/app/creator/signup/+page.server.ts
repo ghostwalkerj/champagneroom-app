@@ -60,7 +60,8 @@ export const actions: Actions = {
           name,
           authType: AuthType.SIGNING,
           address: address.toLocaleLowerCase(),
-          wallet: wallet._id
+          wallet: wallet._id,
+          payoutAddress: address.toLocaleLowerCase()
         },
         agentCommission: 0,
         profileImageUrl

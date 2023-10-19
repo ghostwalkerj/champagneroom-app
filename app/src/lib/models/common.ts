@@ -149,14 +149,15 @@ export const moneySchema = new Schema({
 export const payoutSchema = new Schema({
   payoutAt: { type: Date, default: new Date() },
   amount: { type: Number, required: true },
+  destination: { type: String, required: true },
   currency: {
     type: String,
     enum: CurrencyType,
     required: true,
     default: CurrencyType.ETH
   },
-  payoutId: { type: String, required: true },
-  status: { type: String, enum: PayoutStatus, required: true },
+  payoutId: { type: String },
+  payoutStatus: { type: String, enum: PayoutStatus },
   transaction: { type: Schema.Types.ObjectId, ref: 'Transaction' }
 });
 
@@ -219,6 +220,12 @@ export const userSchema = new Schema(
     },
 
     address: {
+      type: String,
+      maxLength: 50,
+      lowerCase: true
+    },
+
+    payoutAddress: {
       type: String,
       maxLength: 50,
       validator: (v: string) => validator.isEthereumAddress(v),

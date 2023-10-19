@@ -11,7 +11,7 @@ import { CancelReason, CurrencyType } from '$lib/models/common';
 import type { CreatorType } from '$lib/models/creator';
 import { Creator } from '$lib/models/creator';
 import { Show, ShowStatus } from '$lib/models/show';
-import { Wallet } from '$lib/models/wallet';
+import { Wallet, WalletStatus } from '$lib/models/wallet';
 
 import type { ShowMachineEventType } from '$lib/machines/showMachine';
 import { ShowMachineEventString } from '$lib/machines/showMachine';
@@ -177,7 +177,7 @@ export const actions: Actions = {
       inEscrow: isInEscrow
     };
   },
-  request_payout: async ({ params, request, locals }) => {
+  request_payout: async ({ request, locals }) => {
     const data = await request.formData();
     const amount = data.get('amount') as string;
     const destination = data.get('destination') as string;
@@ -186,7 +186,7 @@ export const actions: Actions = {
     if (!amount) {
       return fail(400, { amount, missingAmount: true });
     }
-    if (Number.isNaN(+amount) || +amount < 1 || +amount > 10_000) {
+    if (Number.isNaN(+amount) || +amount < 0) {
       return fail(400, { amount, invalidAmount: true });
     }
     if (!destination) {
@@ -201,6 +201,10 @@ export const actions: Actions = {
 
     if (wallet.availableBalance < +amount) {
       return fail(400, { amount, insufficientBalance: true });
+    }
+
+    if (wallet.status === WalletStatus.PAYOUT_IN_PROGRESS) {
+      return fail(400, { amount, payoutInProgress: true });
     }
 
     const redisConnection = locals.redisConnection as IORedis;

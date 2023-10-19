@@ -329,8 +329,6 @@ const finalizeShow = async (show: ShowType, showQueue: ShowQueueType) => {
 
   let updatedShow = show;
 
-  let showRevenue = new Map<string, number>();
-
   const showState = showService.getSnapshot();
   const finalize = {
     finalizedAt: new Date(),
@@ -455,7 +453,6 @@ const finalizeShow = async (show: ShowType, showQueue: ShowQueueType) => {
         returnDocument: 'after'
       }
     )) as ShowType;
-    showRevenue = new Map(totalRevenue);
     showSession.endSession();
   });
 

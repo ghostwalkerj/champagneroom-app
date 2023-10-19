@@ -3,23 +3,36 @@ import type { Job, Queue } from 'bullmq';
 import { Worker } from 'bullmq';
 import type IORedis from 'ioredis';
 
+import type { PayoutType } from '$lib/models/common';
 import { CurrencyType } from '$lib/models/common';
 import { Ticket } from '$lib/models/ticket';
+import { Wallet } from '$lib/models/wallet';
 
 import { TicketMachineEventString } from '$lib/machines/ticketMachine';
+import { WalletMachineEventString } from '$lib/machines/walletMachine';
 
 import { EntityType } from '$lib/constants';
 import {
   batchActionsOnPayoutsPayoutsBatchPost,
+  createPayoutPayoutsPost,
   getInvoiceByIdInvoicesModelIdGet,
+  getStoreByIdStoresModelIdGet,
+  getWalletByIdWalletsModelIdGet,
   modifyPayoutPayoutsModelIdPatch,
   refundInvoiceInvoicesModelIdRefundsPost,
   submitRefundInvoicesRefundsRefundIdSubmitPost
 } from '$lib/ext/bitcart';
-import type { DisplayInvoice } from '$lib/ext/bitcart/models';
+import type {
+  DisplayInvoice,
+  Store,
+  Wallet as BTWallet
+} from '$lib/ext/bitcart/models';
 import type { PaymentType } from '$lib/util/payment';
 import { PayoutJobType, PayoutStatus } from '$lib/util/payment';
-import { getTicketMachineService } from '$lib/util/util.server';
+import {
+  getTicketMachineService,
+  getWalletMachineService
+} from '$lib/util/util.server';
 
 export type PayoutJobDataType = {
   [key: string]: any;
@@ -32,13 +45,15 @@ export const getPayoutWorker = ({
   redisConnection,
   paymentAuthToken,
   paymentPeriod = 6_000_000 / 60 / 1000,
-  paymentNotificationUrl = ''
+  paymentNotificationUrl = '',
+  bitcartStoreId
 }: {
   payoutQueue: PayoutQueueType;
   redisConnection: IORedis;
   paymentAuthToken: string;
   paymentPeriod: number;
   paymentNotificationUrl: string;
+  bitcartStoreId: string;
 }) => {
   return new Worker(
     EntityType.PAYOUT,
@@ -216,6 +231,129 @@ export const getPayoutWorker = ({
               break;
             }
           }
+        }
+
+        case PayoutJobType.CREATE_PAYOUT: {
+          console.log('Create payout');
+          const walletId = job.data.walletId;
+          if (!walletId) {
+            console.error('No wallet ID');
+            return;
+          }
+          const destination = job.data.destination as string;
+          if (!destination) {
+            console.error('No destination');
+            return;
+          }
+          const amount = job.data.amount as number;
+          if (!amount) {
+            console.error('No amount');
+            return;
+          }
+
+          const wallet = await Wallet.findById(walletId);
+          if (!wallet) {
+            console.error('No wallet');
+            return;
+          }
+
+          const walletService = getWalletMachineService(wallet);
+          const walletState = walletService.getSnapshot();
+          const payout = {
+            amount,
+            destination,
+            currency: wallet.currency
+          } as PayoutType;
+
+          if (
+            !walletState.can({
+              type: WalletMachineEventString.PAYOUT_REQUESTED,
+              payout
+            })
+          ) {
+            console.error('Cannot request payout');
+            return;
+          }
+
+          // Ok, create the payout in bitcart
+          // Get the store
+          if (!bitcartStoreId || bitcartStoreId === '') {
+            console.error('No bitcart store ID');
+            return;
+          }
+
+          try {
+            const response = await getStoreByIdStoresModelIdGet(
+              bitcartStoreId,
+              {
+                headers: {
+                  Authorization: `Bearer ${paymentAuthToken}`,
+                  'Content-Type': 'application/json'
+                }
+              }
+            );
+            if (!response.data) {
+              console.error('No store found for ID:', bitcartStoreId);
+              return;
+            }
+            const store = response.data as Store;
+
+            // Get the wallet, just use the first one for now
+            const bcWalletId = store.wallets[0];
+            if (!bcWalletId) {
+              console.error('No wallet found for store ID:', bitcartStoreId);
+              return;
+            }
+            const bcWalletResponse = await getWalletByIdWalletsModelIdGet(
+              walletId
+            );
+            if (!bcWalletResponse.data) {
+              console.error('No wallet found for ID:', walletId);
+              return;
+            }
+            const bcWallet = bcWalletResponse.data as BTWallet;
+
+            // Checks
+            if (bcWallet.currency?.toUpperCase() !== wallet.currency) {
+              console.error(
+                'Wallet currency does not match expected currency:',
+                bcWallet.currency,
+                wallet.currency
+              );
+              return;
+            }
+
+            if (+bcWallet.balance < amount) {
+              console.error('Insufficient funds in wallet:', walletId);
+              return;
+            }
+
+            // Create the payout
+            const bcPayoutResponse = await createPayoutPayoutsPost({
+              amount,
+              destination,
+              store_id: bitcartStoreId,
+              wallet_id: bcWalletId,
+              currency: wallet.currency,
+              notification_url: paymentNotificationUrl
+            });
+            if (!bcPayoutResponse.data) {
+              console.error('No payout created');
+              return;
+            }
+
+            const bcPayout = bcPayoutResponse.data;
+            payout.payoutId = bcPayout.id;
+            payout.payoutStatus = bcPayout.status;
+
+            walletService.send({
+              type: WalletMachineEventString.PAYOUT_REQUESTED,
+              payout
+            });
+          } catch (error_) {
+            console.error(error_);
+          }
+          break;
         }
 
         default: {
