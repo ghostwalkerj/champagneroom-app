@@ -30,6 +30,13 @@ import {
   getTicketMachineServiceFromId
 } from '$lib/util/util.server';
 
+export type InvoiceJobDataType = {
+  invoiceId: string;
+  [key: string]: any;
+};
+
+export type InvoiceQueueType = Queue<InvoiceJobDataType, any, string>;
+
 export const getInvoiceWorker = ({
   redisConnection,
   paymentAuthToken
@@ -256,10 +263,3 @@ export const getInvoiceWorker = ({
     { autorun: false, connection: redisConnection }
   );
 };
-
-export type InvoiceJobDataType = {
-  invoiceId: string;
-  [key: string]: any;
-};
-
-export type InvoiceQueueType = Queue<InvoiceJobDataType, any, string>;

@@ -597,44 +597,6 @@ const finalizeShow = async (show: ShowType, showQueue: ShowQueueType) => {
   });
 
   walletService.stop();
-
-  // const wallet = await Wallet.findOne({
-  //   _id: walletId,
-  //   earnings: {
-  //     $not: {
-  //       $elemMatch: { show: show._id }
-  //     }
-  //   }
-  // })
-  //   .select('currency')
-  //   .exec();
-
-  // if (!wallet) {
-  //   console.log('No wallet to payout or Show already paid out');
-  //   return;
-  // }
-
-  // const amount = showRevenue.get(wallet.currency);
-
-  // if (!amount) {
-  //   console.log('No revenue to add to wallet');
-  //   return;
-  // }
-
-  // const earning = {
-  //   earnedAt: new Date(),
-  //   show: show._id,
-  //   amount,
-  //   currency: wallet.currency
-  // } as EarningsType;
-
-  // Wallet.findByIdAndUpdate(
-  //   { _id: walletId },
-  //   {
-  //     $inc: [{ balance: amount }, { availableBalance: amount }],
-  //     $push: { earnings: earning }
-  //   }
-  // );
 };
 
 // Ticket Events

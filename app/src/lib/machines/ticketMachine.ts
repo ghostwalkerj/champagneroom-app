@@ -32,23 +32,12 @@ import { calcTotal } from '$lib/util/payment';
 
 import { ShowMachineEventString } from './showMachine';
 
-export enum TicketMachineEventString {
-  CANCELLATION_REQUESTED = 'CANCELLATION REQUESTED',
-  REFUND_RECEIVED = 'REFUND RECEIVED',
-  PAYMENT_INITIATED = 'PAYMENT INITIATED',
-  PAYMENT_RECEIVED = 'PAYMENT RECEIVED',
-  FEEDBACK_RECEIVED = 'FEEDBACK RECEIVED',
-  DISPUTE_INITIATED = 'DISPUTE INITIATED',
-  SHOW_JOINED = 'SHOW JOINED',
-  SHOW_LEFT = 'SHOW LEFT',
-  SHOW_ENDED = 'SHOW ENDED',
-  SHOW_CANCELLED = 'SHOW CANCELLED',
-  TICKET_FINALIZED = 'TICKET FINALIZED',
-  DISPUTE_RESOLVED = 'DISPUTE RESOLVED',
-  TICKET_REDEEMED = 'TICKET REDEEMED',
-  REFUND_REQUESTED = 'REFUND REQUESTED',
-  REFUND_INITIATED = 'REFUND INITIATED'
-}
+export type TicketMachineOptions = {
+  saveStateCallback?: (state: TicketStateType) => void;
+  gracePeriod?: number;
+  escrowPeriod?: number;
+  showQueue?: Queue<ShowJobDataType, any, string>;
+};
 type TicketMachineEventType =
   | {
       type: 'CANCELLATION REQUESTED';
@@ -788,9 +777,37 @@ const createTicketMachine = ({
   );
 };
 
+export type TicketMachineServiceType = ReturnType<
+  typeof createTicketMachineService
+>;
+
+export type TicketMachineStateType = StateFrom<
+  ReturnType<typeof createTicketMachine>
+>;
+
+export type TicketMachineType = ReturnType<typeof createTicketMachine>;
+
+export enum TicketMachineEventString {
+  CANCELLATION_REQUESTED = 'CANCELLATION REQUESTED',
+  REFUND_RECEIVED = 'REFUND RECEIVED',
+  PAYMENT_INITIATED = 'PAYMENT INITIATED',
+  PAYMENT_RECEIVED = 'PAYMENT RECEIVED',
+  FEEDBACK_RECEIVED = 'FEEDBACK RECEIVED',
+  DISPUTE_INITIATED = 'DISPUTE INITIATED',
+  SHOW_JOINED = 'SHOW JOINED',
+  SHOW_LEFT = 'SHOW LEFT',
+  SHOW_ENDED = 'SHOW ENDED',
+  SHOW_CANCELLED = 'SHOW CANCELLED',
+  TICKET_FINALIZED = 'TICKET FINALIZED',
+  DISPUTE_RESOLVED = 'DISPUTE RESOLVED',
+  TICKET_REDEEMED = 'TICKET REDEEMED',
+  REFUND_REQUESTED = 'REFUND REQUESTED',
+  REFUND_INITIATED = 'REFUND INITIATED'
+}
+
 export { TicketMachineEventType };
 
-  export { createTicketMachine };
+export { createTicketMachine };
 
 export const createTicketMachineService = ({
   ticketDocument,
@@ -814,20 +831,3 @@ export const createTicketMachineService = ({
 
   return ticketService;
 };
-
-export type TicketMachineOptions = {
-  saveStateCallback?: (state: TicketStateType) => void;
-  gracePeriod?: number;
-  escrowPeriod?: number;
-  showQueue?: Queue<ShowJobDataType, any, string>;
-};
-
-export type TicketMachineServiceType = ReturnType<
-  typeof createTicketMachineService
->;
-
-export type TicketMachineStateType = StateFrom<
-  ReturnType<typeof createTicketMachine>
->;
-
-export type TicketMachineType = ReturnType<typeof createTicketMachine>;

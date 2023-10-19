@@ -21,7 +21,7 @@ import type { ShowQueueType } from '$lib/workers/showWorker';
 
 import { ActorType, EntityType } from '$lib/constants';
 import { rateCryptosRateGet } from '$lib/ext/bitcart';
-import { createAuthToken } from '$lib/util/payment';
+import { createAuthToken, PayoutJobType } from '$lib/util/payment';
 import { getShowMachineServiceFromId } from '$lib/util/util.server';
 
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
@@ -178,14 +178,11 @@ export const actions: Actions = {
     };
   },
   request_payout: async ({ params, request, locals }) => {
-    const address = params.address;
     const data = await request.formData();
     const amount = data.get('amount') as string;
     const destination = data.get('destination') as string;
+    const walletId = data.get('walletId') as string;
 
-    if (address === null) {
-      throw error(404, 'Address not found');
-    }
     if (!amount) {
       return fail(400, { amount, missingAmount: true });
     }
@@ -196,21 +193,7 @@ export const actions: Actions = {
       return fail(400, { destination, missingDestination: true });
     }
 
-    const redisConnection = locals.redisConnection as IORedis;
-    const payoutQueue = new Queue(EntityType.PAYOUT, {
-      connection: redisConnection
-    }) as PayoutQueueType;
-
-    const creator = await Creator.findOne({
-      'user.address': address,
-      'user.active': true
-    })
-      .orFail(() => {
-        throw error(404, 'Creator not found');
-      })
-      .exec();
-
-    const wallet = await Wallet.findOne({ _id: creator.user.wallet });
+    const wallet = await Wallet.findOne({ _id: walletId });
 
     if (!wallet) {
       throw error(404, 'Wallet not found');
@@ -219,6 +202,17 @@ export const actions: Actions = {
     if (wallet.availableBalance < +amount) {
       return fail(400, { amount, insufficientBalance: true });
     }
+
+    const redisConnection = locals.redisConnection as IORedis;
+    const payoutQueue = new Queue(EntityType.PAYOUT, {
+      connection: redisConnection
+    }) as PayoutQueueType;
+
+    payoutQueue.add(PayoutJobType.CREATE_PAYOUT, {
+      walletId,
+      amount: +amount,
+      destination
+    });
 
     return {
       success: true

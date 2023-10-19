@@ -21,6 +21,12 @@ import type { PaymentType } from '$lib/util/payment';
 import { PayoutJobType, PayoutStatus } from '$lib/util/payment';
 import { getTicketMachineService } from '$lib/util/util.server';
 
+export type PayoutJobDataType = {
+  [key: string]: any;
+};
+
+export type PayoutQueueType = Queue<PayoutJobDataType, any, PayoutJobType>;
+
 export const getPayoutWorker = ({
   payoutQueue,
   redisConnection,
@@ -220,9 +226,3 @@ export const getPayoutWorker = ({
     { autorun: false, connection: redisConnection }
   );
 };
-
-export type PayoutJobDataType = {
-  [key: string]: any;
-};
-
-export type PayoutQueueType = Queue<PayoutJobDataType, any, PayoutJobType>;

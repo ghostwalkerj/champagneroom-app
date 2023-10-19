@@ -6,12 +6,30 @@ import { createTokenTokenPost } from '$ext/bitcart';
 
 const permissions = ['full_control'];
 
+export type PaymentType = {
+  created: string;
+  lightning: boolean;
+  currency: string;
+  amount: string;
+  rate: string;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  payment_address: string;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  user_address: string;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  payment_url: string;
+  confirmations: number;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  chain_id: number;
+  id: string;
+};
+
+// Bitcart API types
 export enum InvoiceJobType {
   UPDATE = 'UPDATE',
   CANCEL = 'CANCEL'
 }
 
-// Bitcart API types
 export enum InvoiceStatus {
   PENDING = 'Pending',
   COMPLETE = 'complete',
@@ -69,22 +87,4 @@ export const createAuthToken = async (
     throw new Error('No access token returned from Bitcart API');
 
   return accessToken;
-};
-
-export type PaymentType = {
-  created: string;
-  lightning: boolean;
-  currency: string;
-  amount: string;
-  rate: string;
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  payment_address: string;
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  user_address: string;
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  payment_url: string;
-  confirmations: number;
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  chain_id: number;
-  id: string;
 };

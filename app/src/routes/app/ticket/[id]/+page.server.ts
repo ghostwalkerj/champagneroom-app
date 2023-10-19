@@ -27,9 +27,9 @@ import type { PayoutQueueType } from '$lib/workers/payoutWorker';
 
 import { ActorType, EntityType } from '$lib/constants';
 import {
-  createAuthToken,
   InvoiceJobType,
-  PayoutJobType
+  PayoutJobType,
+  createAuthToken
 } from '$lib/util/payment';
 import { verifyPin } from '$lib/util/pin';
 import {
