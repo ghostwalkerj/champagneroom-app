@@ -8,11 +8,11 @@ import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
   const body = await request.json();
-  const payoutId = body['id'] as string;
+  const bcPayoutId = body['id'] as string;
   const status = body['status'] as string;
   const redisConnection = locals.redisConnection as IORedis;
 
-  if (!payoutId || !status) {
+  if (!bcPayoutId || !status) {
     return new Response(undefined, { status: 400 });
   }
 
@@ -20,7 +20,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     connection: redisConnection
   });
 
-  payoutQueue.add(PayoutJobType.PAYOUT_UPDATE, { payoutId, status });
-
+  payoutQueue.add(PayoutJobType.PAYOUT_UPDATE, { bcPayoutId, status });
   return new Response(undefined, { status: 200 });
 };

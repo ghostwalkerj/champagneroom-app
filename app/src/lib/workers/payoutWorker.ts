@@ -230,8 +230,8 @@ export const getPayoutWorker = ({
         }
 
         case PayoutJobType.PAYOUT_UPDATE: {
-          const payoutId = job.data.payoutId;
-          if (!payoutId) {
+          const bcPayoutId = job.data.bcPayoutId;
+          if (!bcPayoutId) {
             console.error('No payout ID');
             return;
           }
@@ -243,7 +243,7 @@ export const getPayoutWorker = ({
 
           // Get the payout
 
-          const response = await getPayoutByIdPayoutsModelIdGet(payoutId, {
+          const response = await getPayoutByIdPayoutsModelIdGet(bcPayoutId, {
             headers: {
               Authorization: `Bearer ${paymentAuthToken}`,
               'Content-Type': 'application/json'
@@ -251,21 +251,20 @@ export const getPayoutWorker = ({
           });
 
           if (!response.data) {
-            console.error('No payout found for ID:', payoutId);
+            console.error('No payout found for ID:', bcPayoutId);
             return;
           }
 
           const bcPayout = response.data as DisplayPayout;
-
+          if (!bcPayout) {
+            console.error('No payout');
+            return;
+          }
           switch (status) {
             case PayoutStatus.SENT: {
               // Tell the walletMachine PAYOUT SENT
               const reason = bcPayout.metadata?.payoutReason as PayoutReason;
               if (reason === PayoutReason.CREATOR_PAYOUT) {
-                if (!bcPayout) {
-                  console.error('No payout');
-                  return;
-                }
                 const walletId = bcPayout.metadata?.walletId as string;
                 if (!walletId) {
                   console.error('No wallet ID');
@@ -316,7 +315,26 @@ export const getPayoutWorker = ({
             }
 
             case PayoutStatus.COMPLETE: {
-              break;
+              const reason = bcPayout.metadata?.payoutReason as PayoutReason;
+              if (reason === PayoutReason.CREATOR_PAYOUT) {
+                const walletId = bcPayout.metadata?.walletId as string;
+                if (!walletId) {
+                  console.error('No wallet ID');
+                  return;
+                }
+                const wallet = await Wallet.findById(walletId);
+                if (!wallet) {
+                  console.error('No wallet found for ID:', walletId);
+                  return;
+                }
+                const walletService = getWalletMachineService(wallet);
+
+                walletService.send({
+                  type: WalletMachineEventString.PAYOUT_COMPLETE,
+                  bcPayoutId
+                });
+                break;
+              }
             }
 
             default: {

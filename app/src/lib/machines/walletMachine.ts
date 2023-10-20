@@ -14,7 +14,8 @@ enum WalletMachineEventString {
   PAYOUT_REQUESTED = 'PAYOUT REQUESTED',
   PAYOUT_SENT = 'PAYOUT SENT',
   PAYOUT_FAILED = 'PAYOUT FAILED',
-  PAYOUT_CANCELLED = 'PAYOUT CANCELLED'
+  PAYOUT_CANCELLED = 'PAYOUT CANCELLED',
+  PAYOUT_COMPLETE = 'PAYOUT COMPLETE'
 }
 
 export type WalletMachineEventType =
@@ -35,7 +36,7 @@ export type WalletMachineEventType =
       payout: PayoutType;
     }
   | { type: 'PAYOUT CANCELLED'; payout: PayoutType }
-  | { type: 'PAYOUT COMPLETE'; payout: PayoutType };
+  | { type: 'PAYOUT COMPLETE'; bcPayoutId: string };
 
 export type WalletMachineOptions = {
   atomicUpdateCallback?: (
@@ -117,6 +118,11 @@ const createWalletMachine = ({
               target: 'available'
             }
           }
+        }
+      },
+      on: {
+        'PAYOUT COMPLETE': {
+          actions: 'payoutComplete'
         }
       }
     },
@@ -239,6 +245,44 @@ const createWalletMachine = ({
                   status: WalletStatus.AVAILABLE,
                   'payouts.$[payout].transaction': transaction._id,
                   'payouts.$[payout].payoutStatus': PayoutStatus.SENT
+                }
+              },
+              {
+                arrayFilters: [{ 'payout.bcPayoutId': bcPayoutId }]
+              }
+            );
+          }
+          return {
+            wallet
+          };
+        }),
+
+        payoutComplete: assign((context, event) => {
+          const wallet = context.wallet;
+          const bcPayoutId = event.bcPayoutId;
+          const payout = wallet.payouts.find(
+            (payout) =>
+              payout.bcPayoutId === bcPayoutId &&
+              payout.payoutStatus === PayoutStatus.SENT
+          );
+          if (!payout) {
+            throw new Error('Payout not found');
+          }
+          payout.payoutStatus = PayoutStatus.COMPLETE;
+          if (options?.atomicUpdateCallback) {
+            options.atomicUpdateCallback(
+              {
+                _id: wallet._id,
+                payouts: {
+                  $elemMatch: {
+                    bcPayoutId: payout.bcPayoutId,
+                    payoutStatus: PayoutStatus.SENT
+                  }
+                }
+              },
+              {
+                $set: {
+                  'payouts.$[payout].payoutStatus': PayoutStatus.COMPLETE
                 }
               },
               {
