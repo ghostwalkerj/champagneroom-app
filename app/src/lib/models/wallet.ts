@@ -65,8 +65,15 @@ export const Wallet = models?.Wallet
 
 export { WalletStatus };
 
-export const atomicUpdateCallback = async (query: object, update: object) => {
-  return (await Wallet.findOneAndUpdate(query, update, {
-    returnDocument: 'after'
-  }).exec()) as WalletDocumentType;
+export const atomicUpdateCallback = async (
+  query: object,
+  update: object,
+  options: object = {}
+) => {
+  options['returnDocument'] = 'after';
+  return (await Wallet.findOneAndUpdate(
+    query,
+    update,
+    options
+  ).exec()) as WalletDocumentType;
 };

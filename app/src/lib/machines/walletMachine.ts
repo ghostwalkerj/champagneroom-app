@@ -4,11 +4,17 @@ import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 
 import type { EarningsType, PayoutType } from '$lib/models/common.js';
 import type { ShowDocumentType } from '$lib/models/show.js';
+import type { TransactionDocumentType } from '$lib/models/transaction.js';
 import { type WalletDocumentType, WalletStatus } from '$lib/models/wallet.js';
+
+import { PayoutStatus } from '$lib/util/payment.js';
 
 enum WalletMachineEventString {
   SHOW_EARNINGS_POSTED = 'SHOW EARNINGS POSTED',
-  PAYOUT_REQUESTED = 'PAYOUT REQUESTED'
+  PAYOUT_REQUESTED = 'PAYOUT REQUESTED',
+  PAYOUT_SENT = 'PAYOUT SENT',
+  PAYOUT_FAILED = 'PAYOUT FAILED',
+  PAYOUT_CANCELLED = 'PAYOUT CANCELLED'
 }
 
 export type WalletMachineEventType =
@@ -21,20 +27,21 @@ export type WalletMachineEventType =
       payout: PayoutType;
     }
   | {
-      type: 'PAYOUT APPROVED';
-      payout: PayoutType;
+      type: 'PAYOUT SENT';
+      transaction: TransactionDocumentType;
     }
   | {
       type: 'PAYOUT FAILED';
       payout: PayoutType;
     }
   | { type: 'PAYOUT CANCELLED'; payout: PayoutType }
-  | { type: 'PAYOUT DENIED'; payout: PayoutType };
+  | { type: 'PAYOUT COMPLETE'; payout: PayoutType };
 
 export type WalletMachineOptions = {
   atomicUpdateCallback?: (
     query: object,
-    update: object
+    update: object,
+    options?: object
   ) => Promise<WalletDocumentType>;
 };
 
@@ -95,7 +102,22 @@ const createWalletMachine = ({
             }
           }
         },
-        payoutRequested: {}
+        payoutRequested: {
+          on: {
+            'PAYOUT SENT': {
+              actions: 'payoutSent',
+              target: 'available'
+            },
+            'PAYOUT FAILED': {
+              actions: 'payoutFailed',
+              target: 'available'
+            },
+            'PAYOUT CANCELLED': {
+              actions: 'payoutCancelled',
+              target: 'available'
+            }
+          }
+        }
       }
     },
     {
@@ -155,9 +177,9 @@ const createWalletMachine = ({
             options.atomicUpdateCallback(
               {
                 _id: wallet._id,
-                payout: {
+                payouts: {
                   $not: {
-                    $elemMatch: { payoutId: payout.payoutId }
+                    $elemMatch: { payoutId: payout.bcPayoutId }
                   }
                 }
               },
@@ -175,6 +197,127 @@ const createWalletMachine = ({
               }
             );
           }
+          return {
+            wallet
+          };
+        }),
+
+        payoutSent: assign((context, event) => {
+          const wallet = context.wallet;
+          const transaction = event.transaction;
+          const bcPayoutId = transaction.bcPayoutId;
+          const payout = wallet.payouts.find(
+            (payout) =>
+              payout.bcPayoutId === bcPayoutId &&
+              payout.payoutStatus === PayoutStatus.PENDING
+          );
+          if (!payout) {
+            throw new Error('Payout not found');
+          }
+          payout.transaction = transaction._id;
+          payout.payoutStatus = PayoutStatus.SENT;
+          wallet.status = WalletStatus.AVAILABLE;
+          wallet.balance -= payout.amount;
+          wallet.onHoldBalance -= payout.amount;
+          if (options?.atomicUpdateCallback) {
+            options.atomicUpdateCallback(
+              {
+                _id: wallet._id,
+                payouts: {
+                  $elemMatch: {
+                    bcPayoutId: payout.bcPayoutId,
+                    payoutStatus: PayoutStatus.PENDING
+                  }
+                }
+              },
+              {
+                $inc: {
+                  balance: -payout.amount,
+                  onHoldBalance: -payout.amount
+                },
+                $set: {
+                  status: WalletStatus.AVAILABLE,
+                  'payouts.$[payout].transaction': transaction._id,
+                  'payouts.$[payout].payoutStatus': PayoutStatus.SENT
+                }
+              },
+              {
+                arrayFilters: [{ 'payout.bcPayoutId': bcPayoutId }]
+              }
+            );
+          }
+          return {
+            wallet
+          };
+        }),
+
+        payoutCancelled: assign((context, event) => {
+          const wallet = context.wallet;
+          const payout = event.payout;
+          // wallet.status = WalletStatus.PAYOUT_IN_PROGRESS;
+          // wallet.payouts.push(payout);
+          // wallet.availableBalance -= payout.amount;
+          // wallet.onHoldBalance += payout.amount;
+          // if (options?.atomicUpdateCallback) {
+          //   options.atomicUpdateCallback(
+          //     {
+          //       _id: wallet._id,
+          //       payout: {
+          //         $not: {
+          //           $elemMatch: { payoutId: payout.payoutId }
+          //         }
+          //       }
+          //     },
+          //     {
+          //       $inc: {
+          //         availableBalance: -payout.amount,
+          //         onHoldBalance: payout.amount
+          //       },
+          //       $push: {
+          //         payouts: payout
+          //       },
+          //       $set: {
+          //         status: WalletStatus.PAYOUT_IN_PROGRESS
+          //       }
+          //     }
+          //   );
+          // }
+          return {
+            wallet
+          };
+        }),
+
+        payoutFailed: assign((context, event) => {
+          const wallet = context.wallet;
+          const payout = event.payout;
+          // wallet.status = WalletStatus.PAYOUT_IN_PROGRESS;
+          // wallet.payouts.push(payout);
+          // wallet.availableBalance -= payout.amount;
+          // wallet.onHoldBalance += payout.amount;
+          // if (options?.atomicUpdateCallback) {
+          //   options.atomicUpdateCallback(
+          //     {
+          //       _id: wallet._id,
+          //       payout: {
+          //         $not: {
+          //           $elemMatch: { payoutId: payout.payoutId }
+          //         }
+          //       }
+          //     },
+          //     {
+          //       $inc: {
+          //         availableBalance: -payout.amount,
+          //         onHoldBalance: payout.amount
+          //       },
+          //       $push: {
+          //         payouts: payout
+          //       },
+          //       $set: {
+          //         status: WalletStatus.PAYOUT_IN_PROGRESS
+          //       }
+          //     }
+          //   );
+          // }
           return {
             wallet
           };

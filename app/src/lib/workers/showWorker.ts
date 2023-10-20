@@ -227,7 +227,7 @@ const refundShow = async (
       const ticketState = ticketService.getSnapshot();
       if (ticketState.matches('reserved.refundRequested')) {
         payoutQueue.add(PayoutJobType.CREATE_REFUND, {
-          invoiceId: ticket.invoiceId,
+          bcInvoiceId: ticket.bcInvoiceId,
           ticketId: ticket._id.toString()
         });
         ticketService.stop();

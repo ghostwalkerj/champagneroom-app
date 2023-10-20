@@ -119,7 +119,7 @@ export const actions: Actions = {
     }
 
     // Update ticket with invoice
-    ticket.invoiceId = invoice.data.id;
+    ticket.bcInvoiceId = invoice.data.id;
 
     const payment = invoice.data.payments
       ? invoice.data.payments[0] // Use the first wallet

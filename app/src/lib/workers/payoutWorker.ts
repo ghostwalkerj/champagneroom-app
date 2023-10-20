@@ -5,7 +5,13 @@ import type IORedis from 'ioredis';
 
 import type { PayoutType } from '$lib/models/common';
 import { CurrencyType } from '$lib/models/common';
+import { Creator } from '$lib/models/creator';
 import { Ticket } from '$lib/models/ticket';
+import {
+  Transaction,
+  TransactionReasonType,
+  type TransactionType
+} from '$lib/models/transaction';
 import { Wallet } from '$lib/models/wallet';
 
 import { TicketMachineEventString } from '$lib/machines/ticketMachine';
@@ -48,7 +54,7 @@ export const getPayoutWorker = ({
   paymentAuthToken,
   paymentPeriod = 6_000_000 / 60 / 1000,
   payoutNotificationUrl = '',
-  bitcartStoreId
+  bitcartStoreId: bcStoreId
 }: {
   payoutQueue: PayoutQueueType;
   redisConnection: IORedis;
@@ -63,8 +69,8 @@ export const getPayoutWorker = ({
       const payoutType = job.name as PayoutJobType;
       switch (payoutType) {
         case PayoutJobType.CREATE_REFUND: {
-          const invoiceId = job.data.invoiceId;
-          if (!invoiceId) {
+          const bcInvoiceId = job.data.bcInvoiceId;
+          if (!bcInvoiceId) {
             return;
           }
 
@@ -85,12 +91,15 @@ export const getPayoutWorker = ({
 
           const ticketState = ticketService.getSnapshot();
 
-          const response = (await getInvoiceByIdInvoicesModelIdGet(invoiceId, {
-            headers: {
-              Authorization: `Bearer ${paymentAuthToken}`,
-              'Content-Type': 'application/json'
+          const response = (await getInvoiceByIdInvoicesModelIdGet(
+            bcInvoiceId,
+            {
+              headers: {
+                Authorization: `Bearer ${paymentAuthToken}`,
+                'Content-Type': 'application/json'
+              }
             }
-          })) as AxiosResponse<DisplayInvoice>;
+          )) as AxiosResponse<DisplayInvoice>;
           const invoice = response.data as DisplayInvoice;
 
           // Possible there is unconfirmed payments.  If so, queue it up again and wait for timeout.
@@ -98,7 +107,7 @@ export const getPayoutWorker = ({
             payoutQueue.add(
               PayoutJobType.CREATE_REFUND,
               {
-                invoiceId
+                bcInvoiceId
               },
               { delay: paymentPeriod }
             );
@@ -134,7 +143,7 @@ export const getPayoutWorker = ({
               });
 
               let response = await refundInvoiceInvoicesModelIdRefundsPost(
-                invoiceId,
+                bcInvoiceId,
                 {
                   amount: +invoice.sent_amount || 0,
                   currency: invoice.paid_currency || '',
@@ -148,11 +157,11 @@ export const getPayoutWorker = ({
                   }
                 }
               );
-              let refund = response.data;
+              let bcRefund = response.data;
 
               // Set refund address from the original invoice
               response = await submitRefundInvoicesRefundsRefundIdSubmitPost(
-                refund.id,
+                bcRefund.id,
                 { destination: returnAddress },
                 {
                   headers: {
@@ -162,15 +171,15 @@ export const getPayoutWorker = ({
                 }
               );
 
-              refund = response.data;
+              bcRefund = response.data;
 
-              if (!refund.payout_id) {
+              if (!bcRefund.payout_id) {
                 throw new Error('No payout ID returned from Bitcart API');
               }
 
               // Set the notification URL for the payout
               response = await modifyPayoutPayoutsModelIdPatch(
-                refund.payout_id,
+                bcRefund.payout_id,
                 {
                   notification_url: payoutNotificationUrl,
                   metadata: {
@@ -188,7 +197,7 @@ export const getPayoutWorker = ({
               // Approve the payout
               response = await batchActionsOnPayoutsPayoutsBatchPost(
                 {
-                  ids: [refund.payout_id],
+                  ids: [bcRefund.payout_id],
                   command: 'approve'
                 },
                 {
@@ -202,7 +211,7 @@ export const getPayoutWorker = ({
               // Send the payout
               response = await batchActionsOnPayoutsPayoutsBatchPost(
                 {
-                  ids: [refund.payout_id],
+                  ids: [bcRefund.payout_id],
                   command: 'send'
                 },
                 {
@@ -246,11 +255,67 @@ export const getPayoutWorker = ({
             return;
           }
 
-          const payout = response.data as DisplayPayout;
+          const bcPayout = response.data as DisplayPayout;
 
           switch (status) {
             case PayoutStatus.SENT: {
+              // Tell the walletMachine PAYOUT SENT
+              const reason = bcPayout.metadata?.payoutReason as PayoutReason;
+              if (reason === PayoutReason.CREATOR_PAYOUT) {
+                if (!bcPayout) {
+                  console.error('No payout');
+                  return;
+                }
+                const walletId = bcPayout.metadata?.walletId as string;
+                if (!walletId) {
+                  console.error('No wallet ID');
+                  return;
+                }
+                const wallet = await Wallet.findById(walletId);
+                if (!wallet) {
+                  console.error('No wallet found for ID:', walletId);
+                  return;
+                }
+                const walletService = getWalletMachineService(wallet);
+                const walletState = walletService.getSnapshot();
+                const creator = await Creator.findOne({
+                  'user.wallet': walletId
+                }).lean();
+                if (!creator) {
+                  console.error('No creator found for wallet ID:', walletId);
+                  return;
+                }
 
+                const transaction = (await Transaction.create({
+                  creator: creator._id,
+                  agent: creator.agent,
+                  hash: bcPayout.tx_hash,
+                  to: bcPayout.destination,
+                  reason: TransactionReasonType.CREATOR_PAYOUT,
+                  amount: bcPayout.amount,
+                  currency: wallet.currency,
+                  bcPayoutId: bcPayout.id
+                })) as TransactionType;
+
+                if (
+                  !walletState.can({
+                    type: WalletMachineEventString.PAYOUT_SENT,
+                    transaction
+                  })
+                ) {
+                  console.error('Cannot send payout:', wallet.status);
+                  return;
+                }
+
+                walletService.send({
+                  type: WalletMachineEventString.PAYOUT_SENT,
+                  transaction
+                });
+              }
+              break;
+            }
+
+            case PayoutStatus.COMPLETE: {
               break;
             }
 
@@ -305,23 +370,20 @@ export const getPayoutWorker = ({
 
           // Ok, create the payout in bitcart
           // Get the store
-          if (!bitcartStoreId || bitcartStoreId === '') {
+          if (!bcStoreId || bcStoreId === '') {
             console.error('No bitcart store ID');
             return;
           }
 
           try {
-            const response = await getStoreByIdStoresModelIdGet(
-              bitcartStoreId,
-              {
-                headers: {
-                  Authorization: `Bearer ${paymentAuthToken}`,
-                  'Content-Type': 'application/json'
-                }
+            const response = await getStoreByIdStoresModelIdGet(bcStoreId, {
+              headers: {
+                Authorization: `Bearer ${paymentAuthToken}`,
+                'Content-Type': 'application/json'
               }
-            );
+            });
             if (!response.data) {
-              console.error('No store found for ID:', bitcartStoreId);
+              console.error('No store found for ID:', bcStoreId);
               return;
             }
             const store = response.data as Store;
@@ -329,7 +391,7 @@ export const getPayoutWorker = ({
             // Get the wallet, just use the first one for now
             const bcWalletId = store.wallets[0];
             if (!bcWalletId) {
-              console.error('No wallet found for store ID:', bitcartStoreId);
+              console.error('No wallet found for store ID:', bcStoreId);
               return;
             }
             const bcWalletResponse = await getWalletByIdWalletsModelIdGet(
@@ -367,7 +429,7 @@ export const getPayoutWorker = ({
               {
                 amount,
                 destination,
-                store_id: bitcartStoreId,
+                store_id: bcStoreId,
                 wallet_id: bcWalletId,
                 currency: wallet.currency,
                 notification_url: payoutNotificationUrl,
@@ -389,7 +451,7 @@ export const getPayoutWorker = ({
             }
 
             const bcPayout = bcPayoutResponse.data;
-            payout.payoutId = bcPayout.id;
+            payout.bcPayoutId = bcPayout.id;
             payout.payoutStatus = bcPayout.status;
 
             walletService.send({

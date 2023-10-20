@@ -12,8 +12,8 @@ import type { DisplayInvoice } from '$ext/bitcart/models';
 import type { RequestHandler } from './$types';
 
 export const GET = (async ({ params }) => {
-  const invoiceId = params.id;
-  if (!invoiceId) {
+  const bcInvoiceId = params.id;
+  if (!bcInvoiceId) {
     return new Response(undefined, { status: 400 });
   }
 
@@ -25,8 +25,8 @@ export const GET = (async ({ params }) => {
   );
 
   const invoice =
-    (invoiceId &&
-      ((await getInvoiceByIdInvoicesModelIdGet(invoiceId, {
+    (bcInvoiceId &&
+      ((await getInvoiceByIdInvoicesModelIdGet(bcInvoiceId, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'

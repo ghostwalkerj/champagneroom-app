@@ -31,7 +31,7 @@ import {
 } from '$lib/util/util.server';
 
 export type InvoiceJobDataType = {
-  invoiceId: string;
+  bcInvoiceId: string;
   [key: string]: any;
 };
 
@@ -47,13 +47,13 @@ export const getInvoiceWorker = ({
   return new Worker(
     EntityType.INVOICE,
     async (job: Job<InvoiceJobDataType, any, InvoiceJobType>) => {
-      const invoiceId = job.data.invoiceId;
+      const bcInvoiceId = job.data.bcInvoiceId;
       const jobType = job.name as InvoiceJobType;
 
       const invoice =
-        (invoiceId &&
+        (bcInvoiceId &&
           (
-            (await getInvoiceByIdInvoicesModelIdGet(invoiceId, {
+            (await getInvoiceByIdInvoicesModelIdGet(bcInvoiceId, {
               headers: {
                 Authorization: `Bearer ${paymentAuthToken}`,
                 'Content-Type': 'application/json'
@@ -69,9 +69,9 @@ export const getInvoiceWorker = ({
       switch (jobType) {
         case InvoiceJobType.CANCEL: {
           try {
-            invoiceId &&
+            bcInvoiceId &&
               (await modifyInvoiceInvoicesModelIdPatch(
-                invoiceId,
+                bcInvoiceId,
                 {
                   status: InvoiceStatus.INVALID,
                   exception_status: 'Cancelled by customer'
@@ -222,7 +222,7 @@ export const getInvoiceWorker = ({
                   }
 
                   // Create transaction for ticket and send to ticket machine
-                  const transaction = new Transaction({
+                  const transaction = await Transaction.create({
                     ticket: ticketId,
                     creator: ticket?.creator,
                     agent: ticket?.agent,
@@ -234,8 +234,6 @@ export const getInvoiceWorker = ({
                     amount: payout.amount,
                     currency: payout.currency?.toUpperCase()
                   });
-
-                  await Transaction.create(transaction);
 
                   const ticketService = getTicketMachineService(
                     ticket,

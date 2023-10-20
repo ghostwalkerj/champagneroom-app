@@ -61,7 +61,7 @@ export const actions: Actions = {
 
     const ticketService = getTicketMachineService(ticket, redisConnection);
     const state = ticketService.getSnapshot();
-    const invoiceId = state.context.ticketDocument.invoiceId;
+    const bcInvoiceId = state.context.ticketDocument.bcInvoiceId;
 
     // Cancel the invoice attached to the ticket if no payment has been made
     if (state.matches('reserved.waiting4Payment')) {
@@ -84,7 +84,7 @@ export const actions: Actions = {
         connection: redisConnection
       });
       invoiceQueue.add(InvoiceJobType.CANCEL, {
-        invoiceId
+        bcInvoiceId
       });
     }
 
@@ -123,7 +123,7 @@ export const actions: Actions = {
         connection: redisConnection
       }) as PayoutQueueType;
       payoutQueue.add(PayoutJobType.CREATE_REFUND, {
-        invoiceId,
+        bcInvoiceId,
         ticketId
       });
     }
@@ -222,7 +222,7 @@ export const actions: Actions = {
   initiate_payment: async ({ request, locals }) => {
     const data = await request.formData();
     const address = data.get('address') as string;
-    const invoiceId = data.get('invoiceId') as string;
+    const bcInvoiceId = data.get('bcInvoiceId') as string;
     const paymentId = data.get('paymentId') as string;
     const ticketId = data.get('ticketId') as string;
 
@@ -230,8 +230,8 @@ export const actions: Actions = {
       return fail(400, { address, missingAddress: true });
     }
 
-    if (!invoiceId) {
-      return fail(400, { invoiceId, missingInvoiceId: true });
+    if (!bcInvoiceId) {
+      return fail(400, { bcInvoiceId, missingInvoiceId: true });
     }
 
     if (!paymentId) {
@@ -249,7 +249,7 @@ export const actions: Actions = {
 
     try {
       updatePaymentDetailsInvoicesModelIdDetailsPatch(
-        invoiceId,
+        bcInvoiceId,
         {
           id: paymentId,
           address
@@ -315,8 +315,8 @@ export const load: PageServerLoad = async ({ params, cookies, url }) => {
   );
 
   const invoice =
-    (ticket.invoiceId &&
-      ((await getInvoiceByIdInvoicesModelIdGet(ticket.invoiceId, {
+    (ticket.bcInvoiceId &&
+      ((await getInvoiceByIdInvoicesModelIdGet(ticket.bcInvoiceId, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'

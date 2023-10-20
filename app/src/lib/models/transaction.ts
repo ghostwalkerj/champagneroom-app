@@ -7,7 +7,8 @@ import { CurrencyType } from './common';
 enum TransactionReasonType {
   TICKET_PAYMENT = 'TICKET PAYMENT',
   TICKET_REFUND = 'TICKET REFUND',
-  DISPUTE_RESOLUTION = 'DISPUTE RESOLUTION'
+  DISPUTE_RESOLUTION = 'DISPUTE RESOLUTION',
+  CREATOR_PAYOUT = 'CREATOR PAYOUT'
 }
 
 const { Schema, models } = pkg;
@@ -38,7 +39,8 @@ const transactionSchema = new Schema(
     ticket: { type: Schema.Types.ObjectId, ref: 'Ticket' },
     creator: { type: Schema.Types.ObjectId, ref: 'Creator' },
     agent: { type: Schema.Types.ObjectId, ref: 'Agent' },
-    show: { type: Schema.Types.ObjectId, ref: 'Show' }
+    show: { type: Schema.Types.ObjectId, ref: 'Show' },
+    bcPayoutId: { type: String }
   },
   { timestamps: true }
 );

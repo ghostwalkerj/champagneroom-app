@@ -156,7 +156,7 @@ export const payoutSchema = new Schema({
     required: true,
     default: CurrencyType.ETH
   },
-  payoutId: { type: String },
+  bcPayoutId: { type: String, index: true },
   payoutStatus: { type: String, enum: PayoutStatus },
   transaction: { type: Schema.Types.ObjectId, ref: 'Transaction' }
 });
@@ -216,7 +216,8 @@ export const userSchema = new Schema(
     wallet: {
       type: Schema.Types.ObjectId,
       ref: 'Wallet',
-      required: true
+      required: true,
+      index: true
     },
 
     address: {

@@ -103,7 +103,7 @@
         // Initiate payment by adding address to the invoice
         let formData = new FormData();
         formData.append('address', $selectedAccount.address);
-        formData.append('invoiceId', invoice.id!);
+        formData.append('bcInvoiceId', invoice.id!);
         formData.append('paymentId', currentPayment.id!);
         formData.append('ticketId', ticket._id.toString());
 
