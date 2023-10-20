@@ -16,6 +16,7 @@ import {
   batchActionsOnPayoutsPayoutsBatchPost,
   createPayoutPayoutsPost,
   getInvoiceByIdInvoicesModelIdGet,
+  getPayoutByIdPayoutsModelIdGet,
   getStoreByIdStoresModelIdGet,
   getWalletByIdWalletsModelIdGet,
   modifyPayoutPayoutsModelIdPatch,
@@ -24,11 +25,12 @@ import {
 } from '$lib/ext/bitcart';
 import type {
   DisplayInvoice,
+  DisplayPayout,
   Store,
   Wallet as BTWallet
 } from '$lib/ext/bitcart/models';
 import type { PaymentType } from '$lib/util/payment';
-import { PayoutJobType, PayoutStatus } from '$lib/util/payment';
+import { PayoutJobType, PayoutReason, PayoutStatus } from '$lib/util/payment';
 import {
   getTicketMachineService,
   getWalletMachineService
@@ -45,14 +47,14 @@ export const getPayoutWorker = ({
   redisConnection,
   paymentAuthToken,
   paymentPeriod = 6_000_000 / 60 / 1000,
-  paymentNotificationUrl = '',
+  payoutNotificationUrl = '',
   bitcartStoreId
 }: {
   payoutQueue: PayoutQueueType;
   redisConnection: IORedis;
   paymentAuthToken: string;
   paymentPeriod: number;
-  paymentNotificationUrl: string;
+  payoutNotificationUrl: string;
   bitcartStoreId: string;
 }) => {
   return new Worker(
@@ -170,7 +172,10 @@ export const getPayoutWorker = ({
               response = await modifyPayoutPayoutsModelIdPatch(
                 refund.payout_id,
                 {
-                  notification_url: paymentNotificationUrl
+                  notification_url: payoutNotificationUrl,
+                  metadata: {
+                    payoutReason: PayoutReason.REFUND
+                  }
                 },
                 {
                   headers: {
@@ -216,12 +221,36 @@ export const getPayoutWorker = ({
         }
 
         case PayoutJobType.PAYOUT_UPDATE: {
-          console.log('Payout update');
-          console.log('Status', job.data.status);
+          const payoutId = job.data.payoutId;
+          if (!payoutId) {
+            console.error('No payout ID');
+            return;
+          }
+          const status = job.data.status as string;
+          if (!status) {
+            console.error('No status');
+            return;
+          }
 
-          switch (job.data.status) {
+          // Get the payout
+
+          const response = await getPayoutByIdPayoutsModelIdGet(payoutId, {
+            headers: {
+              Authorization: `Bearer ${paymentAuthToken}`,
+              'Content-Type': 'application/json'
+            }
+          });
+
+          if (!response.data) {
+            console.error('No payout found for ID:', payoutId);
+            return;
+          }
+
+          const payout = response.data as DisplayPayout;
+
+          switch (status) {
             case PayoutStatus.SENT: {
-              // update ticket with refund status if this is a refund
+
               break;
             }
 
@@ -229,13 +258,14 @@ export const getPayoutWorker = ({
               break;
             }
           }
+          break;
         }
 
         case PayoutJobType.CREATE_PAYOUT: {
-          console.log('Create payout');
           const walletId = job.data.walletId;
+          const payoutReason = job.data.payoutReason as PayoutReason;
           if (!walletId) {
-            console.error('No wallet ID');
+            console.error('No wallet Id');
             return;
           }
           const destination = job.data.destination as string;
@@ -269,7 +299,7 @@ export const getPayoutWorker = ({
               payout
             })
           ) {
-            console.error('Cannot request payout');
+            console.error('Cannot request payout:', wallet.status);
             return;
           }
 
@@ -340,7 +370,11 @@ export const getPayoutWorker = ({
                 store_id: bitcartStoreId,
                 wallet_id: bcWalletId,
                 currency: wallet.currency,
-                notification_url: paymentNotificationUrl
+                notification_url: payoutNotificationUrl,
+                metadata: {
+                  walletId,
+                  payoutReason
+                }
               },
               {
                 headers: {

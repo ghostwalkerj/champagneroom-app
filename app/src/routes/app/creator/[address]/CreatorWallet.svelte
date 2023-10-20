@@ -58,8 +58,8 @@
 
 {#if hasTransactions}
   <dialog id="transaction_modal" class="modal" bind:this={transactionModal}>
-    <div class="modal-box text-center">
-      <h3 class="font-bold text-lg">Recent Transactions</h3>
+    <div class="modal-box">
+      <h3 class="font-bold text-lg text-center">Recent Transactions</h3>
       {#if earnings.length > 0}
         <div>
           <h4 class="font-bold text-md mt-6">Earnings</h4>
@@ -85,7 +85,7 @@
             {#each payouts as payout}
               <li class="flex justify-between">
                 <span>{new Date(payout.payoutAt).toLocaleDateString()}</span>
-
+                <span>{payout.payoutStatus}</span>
                 <span
                   >{currencyFormatter(wallet.currency).format(
                     payout.amount
@@ -170,10 +170,10 @@
 <div class="bg-primary h-full text-primary-content w-full card">
   <div class="text-center card-body items-center p-3">
     <h2 class="text-2xl card-title">My Wallet</h2>
-
+    <div class="text-accent lowercase">({wallet.status})</div>
     <div class="bg-primary text-primary-content stats">
       <div class="stat">
-        <div class="stat-title text-info">Available balance</div>
+        <div class="stat-title text-info">Available Balance</div>
         <div class="stat-value text-2xl">
           {currencyFormatter(wallet.currency).format(availableBalance)}
           {#if exchangeRate > 0}

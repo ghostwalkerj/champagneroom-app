@@ -41,9 +41,14 @@ export enum InvoiceStatus {
 }
 
 export enum PayoutJobType {
-  CREATE_REFUND = 'CREATE_REFUND',
-  PAYOUT_UPDATE = 'PAYOUT_UPDATE',
-  CREATE_PAYOUT = 'CREATE_PAYOUT'
+  CREATE_REFUND = 'CREATE REFUND',
+  PAYOUT_UPDATE = 'PAYOUT UPDATE',
+  CREATE_PAYOUT = 'CREATE PAYOUT'
+}
+
+export enum PayoutReason {
+  REFUND = 'REFUND',
+  CREATOR_PAYOUT = 'CREATOR PAYOUT'
 }
 
 export enum PayoutStatus {

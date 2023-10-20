@@ -16,11 +16,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     return new Response(undefined, { status: 400 });
   }
 
-  const invoiceQueue = new Queue(EntityType.PAYOUT, {
+  const payoutQueue = new Queue(EntityType.PAYOUT, {
     connection: redisConnection
   });
 
-  invoiceQueue.add(PayoutJobType.PAYOUT_UPDATE, { payoutId, status });
+  payoutQueue.add(PayoutJobType.PAYOUT_UPDATE, { payoutId, status });
 
   return new Response(undefined, { status: 200 });
 };

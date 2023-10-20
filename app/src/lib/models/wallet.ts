@@ -9,7 +9,7 @@ export type WalletDocumentType = InferSchemaType<typeof walletSchema>;
 
 enum WalletStatus {
   AVAILABLE = 'AVAILABLE',
-  PAYOUT_IN_PROGRESS = 'PAYOUT_IN_PROGRESS'
+  PAYOUT_IN_PROGRESS = 'PAYOUT IN PROGRESS'
 }
 
 const walletSchema = new mongoose.Schema(

@@ -77,17 +77,17 @@ if (startWorker) {
   const invoiceWorker = getInvoiceWorker({ redisConnection, paymentAuthToken });
   invoiceWorker.run();
 
-  const paymentWorker = getPayoutWorker({
+  const payoutWorker = getPayoutWorker({
     // @ts-ignore
     payoutQueue,
     redisConnection,
     paymentAuthToken,
     paymentPeriod:
       +(process.env.PUBLIC_PAYMENT_PERIOD || 6_000_000) / 60 / 1000,
-    paymentNotificationUrl: process.env.BITCART_PAYOUT_NOTIFICATION_PATH || '',
+    payoutNotificationUrl: process.env.BITCART_PAYOUT_NOTIFICATION_PATH || '',
     bitcartStoreId: process.env.BITCART_STORE_ID || ''
   });
-  paymentWorker.run();
+  payoutWorker.run();
 }
 
 // Bull Dashboard

@@ -21,7 +21,11 @@ import type { ShowQueueType } from '$lib/workers/showWorker';
 
 import { ActorType, EntityType } from '$lib/constants';
 import { rateCryptosRateGet } from '$lib/ext/bitcart';
-import { createAuthToken, PayoutJobType } from '$lib/util/payment';
+import {
+  createAuthToken,
+  PayoutJobType,
+  PayoutReason
+} from '$lib/util/payment';
 import { getShowMachineServiceFromId } from '$lib/util/util.server';
 
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
@@ -215,7 +219,8 @@ export const actions: Actions = {
     payoutQueue.add(PayoutJobType.CREATE_PAYOUT, {
       walletId,
       amount: +amount,
-      destination
+      destination,
+      payoutReason: PayoutReason.CREATOR_PAYOUT
     });
 
     return {
