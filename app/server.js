@@ -20,6 +20,7 @@ import basicAuth from 'express-basic-auth';
 
 const buildNumber = generate(packageFile.version);
 const buildTime = format(buildNumber);
+const bullMQPath = process.env.BULLMQ_ADMIN_PATH || '/admin/queues';
 
 const startWorker = parseArgv(process.argv).worker || false;
 const app = express();
@@ -92,7 +93,7 @@ if (startWorker) {
 
 // Bull Dashboard
 const serverAdapter = new ExpressAdapter();
-serverAdapter.setBasePath('/admin/queues');
+serverAdapter.setBasePath(bullMQPath);
 createBullBoard({
   queues: [
     new BullMQAdapter(showQueue),
@@ -103,13 +104,13 @@ createBullBoard({
 });
 const staticAuth = basicAuth({
   users: {
-    admin: 'Credibly-Displease5-Harddisk'
+    admin: process.env.BULLMQ_ADMIN_PASSWORD || ''
   },
   challenge: true
 });
 
-app.get('/admin/queues', staticAuth);
-app.use('/admin/queues', serverAdapter.getRouter());
+app.get(bullMQPath, staticAuth);
+app.use(bullMQPath, serverAdapter.getRouter());
 
 // Svelte App
 app.use(cors(corsOptions), handler);
