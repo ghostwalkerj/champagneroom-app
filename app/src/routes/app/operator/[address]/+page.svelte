@@ -543,7 +543,8 @@
                         {/if}
                         {#each creators as creator, index}
                           {@const agentId = creator.agent}
-                          {@const agentName = getAgentName(agentId)}
+                          {@const agentName =
+                            (agentId && getAgentName(agentId)) || 'None'}
                           <tr
                             class:bg-base-300={activeCreatorRow === index}
                             on:click={() => (activeCreatorRow = index)}
@@ -556,23 +557,25 @@
                               }}>{creator.user.name}</td
                             >
                             <td>
-                              <select
-                                class="select select-bordered select-xs max-w-xs"
-                                on:change={(event) => {
-                                  updateCreatorAgent(event.target?.value);
-                                }}
-                              >
-                                <option value={agentId.toString()} selected
-                                  >{agentName}</option
+                              {#if agentId}
+                                <select
+                                  class="select select-bordered select-xs max-w-xs"
+                                  on:change={(event) => {
+                                    updateCreatorAgent(event.target?.value);
+                                  }}
                                 >
-                                {#each agents as agent}
-                                  {#if agent._id.toString() !== agentId.toString()}
-                                    <option value={agent._id.toString()}
-                                      >{agent.user.name}</option
-                                    >
-                                  {/if}
-                                {/each}
-                              </select>
+                                  <option value={agentId.toString()} selected
+                                    >{agentName}</option
+                                  >
+                                  {#each agents as agent}
+                                    {#if agent._id.toString() !== agentId.toString()}
+                                      <option value={agent._id.toString()}
+                                        >{agent.user.name}</option
+                                      >
+                                    {/if}
+                                  {/each}
+                                </select>
+                              {/if}
                             </td>
                             <td
                               contenteditable="true"

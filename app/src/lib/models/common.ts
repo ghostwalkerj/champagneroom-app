@@ -223,7 +223,9 @@ export const userSchema = new Schema(
     address: {
       type: String,
       maxLength: 50,
-      lowerCase: true
+      lowerCase: true,
+      required: true,
+      index: true
     },
 
     payoutAddress: {

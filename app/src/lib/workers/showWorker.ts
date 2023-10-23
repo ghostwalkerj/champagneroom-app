@@ -1,11 +1,15 @@
+import { type } from 'node:os';
+
 import type { Job, Queue } from 'bullmq';
 import { Worker } from 'bullmq';
 import type IORedis from 'ioredis';
+import type { finalize } from 'rxjs';
 
 import type {
   CancelType,
   DisputeDecision,
   DisputeType,
+  FinalizeType,
   RefundType,
   SaleType
 } from '$lib/models/common';
@@ -84,7 +88,7 @@ export const getShowWorker = ({
           break;
         }
         case ShowMachineEventString.SHOW_FINALIZED: {
-          finalizeShow(show, showQueue);
+          finalizeShow(show, job.data.finalize, showQueue);
           break;
         }
 
@@ -128,7 +132,7 @@ export const getShowWorker = ({
           break;
         }
         case ShowMachineEventString.TICKET_FINALIZED: {
-          ticketFinalized(show, job.data.ticketId);
+          ticketFinalized(show, job.data.ticketId, showQueue);
           break;
         }
         case ShowMachineEventString.TICKET_DISPUTED: {
@@ -292,10 +296,15 @@ const endShow = async (
   const showState = showService.getSnapshot();
   if (showState.matches('stopped')) {
     showService.send(ShowMachineEventString.SHOW_ENDED);
+    const finalize = {
+      finalizedAt: new Date(),
+      finalizedBy: ActorType.TIMER
+    };
     showQueue.add(
       ShowMachineEventString.SHOW_FINALIZED,
       {
-        showId: show._id.toString()
+        showId: show._id.toString(),
+        finalize
       },
       { delay: escrowPeriod }
     );
@@ -316,7 +325,11 @@ const endShow = async (
   showService.stop();
 };
 
-const finalizeShow = async (show: ShowType, showQueue: ShowQueueType) => {
+const finalizeShow = async (
+  show: ShowType,
+  finalize: FinalizeType,
+  showQueue: ShowQueueType
+) => {
   // Finalize show if not already finalized
   const showService = createShowMachineService({
     showDocument: show,
@@ -330,21 +343,19 @@ const finalizeShow = async (show: ShowType, showQueue: ShowQueueType) => {
   let updatedShow = show;
 
   const showState = showService.getSnapshot();
-  const finalize = {
-    finalizedAt: new Date(),
-    finalizedBy: ActorType.TIMER
-  };
+
   if (
-    showState.can({
+    !showState.can({
       type: ShowMachineEventString.SHOW_FINALIZED,
       finalize
     })
-  ) {
-    showService.send({
-      type: ShowMachineEventString.SHOW_FINALIZED,
-      finalize
-    });
-  }
+  )
+    return;
+
+  showService.send({
+    type: ShowMachineEventString.SHOW_FINALIZED,
+    finalize
+  });
 
   // Finalize all the tickets, feedback or not
   const tickets = await Ticket.find({
@@ -783,7 +794,11 @@ const ticketCancelled = async (
 };
 
 // Calculate feedback stats
-const ticketFinalized = async (show: ShowType, ticketId: string) => {
+const ticketFinalized = async (
+  show: ShowType,
+  ticketId: string,
+  showQueue: ShowQueueType
+) => {
   const showService = createShowMachineService({
     showDocument: show,
     showMachineOptions: {
@@ -792,7 +807,7 @@ const ticketFinalized = async (show: ShowType, ticketId: string) => {
         createShowEvent({ show, type, ticketId, transaction })
     }
   });
-  const showState = showService.getSnapshot();
+  let showState = showService.getSnapshot();
 
   const ticket = (await Ticket.findById(ticketId).exec()) as TicketType;
 
@@ -878,6 +893,24 @@ const ticketFinalized = async (show: ShowType, ticketId: string) => {
     );
     creatorSession.endSession();
   });
+
+  const finalize = {
+    finalizedAt: new Date(),
+    finalizedBy: ActorType.CUSTOMER
+  };
+  // try to finalize show
+  showState = showService.getSnapshot();
+  if (
+    showState.can({
+      type: ShowMachineEventString.SHOW_FINALIZED,
+      finalize
+    })
+  ) {
+    showQueue.add(ShowMachineEventString.SHOW_FINALIZED, {
+      showId: show._id.toString(),
+      finalize
+    });
+  }
 };
 
 const ticketDisputed = async (

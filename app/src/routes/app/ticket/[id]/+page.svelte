@@ -95,7 +95,7 @@
       ];
 
       try {
-        await provider.request({
+        provider.request({
           method: 'eth_sendTransaction',
           params: parameters
         });
@@ -271,7 +271,7 @@
             </div>
           {/if}
 
-          {#if canCancelTicket}
+          {#if canCancelTicket && !hasShowStarted}
             {#if isShowCancelLoading}
               <div class="w-full flex justify-center">
                 <button class="btn btn-secondary loading" disabled={true}
@@ -291,7 +291,7 @@
                     type="submit"
                     disabled={loading}
                   >
-                    {#if canRequestRefund}
+                    {#if canRequestRefund && !hasShowStarted}
                       Request Refund
                     {:else}
                       Cancel Ticket

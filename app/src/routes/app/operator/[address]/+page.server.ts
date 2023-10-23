@@ -221,17 +221,17 @@ export const load: PageServerLoad = async ({ params, url }) => {
     .exec();
 
   // if (!operator) {
+  //   const wallet = new Wallet();
   //   operator = await Operator.create({
   //     user: {
   //       address,
   //       name: 'Big Daddy',
+  //       wallet: wallet._id
   //     }
   //   });
   // }
   const agents = await Agent.find().sort({ 'user.name': 1 });
   const creators = await Creator.find().sort({ 'user.name': 1 });
-
-  Show.init();
 
   const disputedTickets = await Ticket.find({
     'ticketState.status': TicketStatus.IN_DISPUTE

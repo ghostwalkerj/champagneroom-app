@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
+import type { on } from 'node:events';
+
 import { Types } from 'mongoose';
 import { nanoid } from 'nanoid';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
@@ -215,24 +217,9 @@ const createShowMachine = ({
         ended: {
           initial: 'inEscrow',
           on: {
-            'TICKET FINALIZED': [
-              {
-                actions: [
-                  'finalizeTicket',
-                  raise({
-                    type: 'SHOW FINALIZED',
-                    finalize: {
-                      finalizedAt: new Date(),
-                      finalizedBy: ActorType.CUSTOMER
-                    }
-                  })
-                ],
-                cond: 'canFinalize'
-              },
-              {
-                actions: ['finalizeTicket']
-              }
-            ],
+            'TICKET FINALIZED': {
+              actions: ['finalizeTicket']
+            },
             'TICKET DISPUTED': {
               target: 'ended.inDispute',
               actions: ['receiveDispute']
@@ -243,7 +230,8 @@ const createShowMachine = ({
               on: {
                 'SHOW FINALIZED': {
                   target: '#showMachine.finalized',
-                  actions: ['finalizeShow']
+                  actions: ['finalizeShow'],
+                  cond: 'canFinalize'
                 }
               }
             },
@@ -707,16 +695,14 @@ const createShowMachine = ({
           const refunded = event.type === 'TICKET REFUNDED' ? 1 : 0;
           return context.showState.salesStats.ticketsSold - refunded === 0;
         },
-        canFinalize: (context, event) => {
+        canFinalize: (context) => {
           let startTime = 0;
           const startedAt = context.showState.escrow?.startedAt;
           if (startedAt) {
             startTime = new Date(startedAt).getTime();
           }
-          const finalized = event.type === 'TICKET FINALIZED' ? 1 : 0;
           const hasUnfinalizedTickets =
             context.showState.salesStats.ticketsSold -
-              finalized -
               context.showState.salesStats.ticketsFinalized >
             0;
           const escrowTime = 0 + ESCROW_PERIOD + startTime;
