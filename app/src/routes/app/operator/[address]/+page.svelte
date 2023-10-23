@@ -471,7 +471,7 @@
                           <th>Active</th>
                           <th>URL</th>
                           <th>Change URL</th>
-                          <th>Sales</th>
+                          <th>Ticket Sales</th>
                           <th>Revenue</th>
                           <th>Refunds</th>
                           <th>Reviews</th>
@@ -575,6 +575,8 @@
                                     {/if}
                                   {/each}
                                 </select>
+                              {:else}
+                                None
                               {/if}
                             </td>
                             <td
@@ -618,21 +620,21 @@
                               </button>
                             </td>
 
-                            <td
-                              >{currencyFormatter().format(
-                                creator.salesStats.totalRevenue
-                              )}</td
-                            >
-                            <td
-                              >{currencyFormatter().format(
-                                creator.salesStats.totalRevenue
-                              )}</td
-                            >
-                            <td
-                              >{currencyFormatter().format(
-                                creator.salesStats.totalRefunded
-                              )}</td
-                            >
+                            <td>
+                              {#each Object.entries(creator.salesStats.totalTicketSalesAmounts) as [currency, amount]}
+                                {currencyFormatter(currency).format(amount)}
+                              {/each}
+                            </td>
+                            <td>
+                              {#each Object.entries(creator.salesStats.totalRevenue) as [currency, amount]}
+                                {currencyFormatter(currency).format(amount)}
+                              {/each}
+                            </td>
+                            <td>
+                              {#each Object.entries(creator.salesStats.totalRefunds) as [currency, amount]}
+                                {currencyFormatter(currency).format(amount)}
+                              {/each}
+                            </td>
                             <td>{creator.feedbackStats.numberOfReviews}</td>
                             <td
                               class="tooltip"

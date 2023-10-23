@@ -16,7 +16,7 @@ import { Agent } from '$lib/models/agent';
 import { AuthType, type DisputeDecision } from '$lib/models/common';
 import { Creator } from '$lib/models/creator';
 import { Operator } from '$lib/models/operator';
-import { Show, type ShowType } from '$lib/models/show';
+import type { ShowType } from '$lib/models/show';
 import { Ticket, TicketStatus } from '$lib/models/ticket';
 import { Wallet } from '$lib/models/wallet';
 
