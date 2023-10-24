@@ -10,14 +10,13 @@ import { raise } from 'xstate/lib/actions';
 import type {
   CancelType,
   CurrencyType,
-  DisputeDecision,
   DisputeType,
   FeedbackType,
   FinalizeType,
   RefundType,
   SaleType
 } from '$lib/models/common';
-import { RefundReason } from '$lib/models/common';
+import { DisputeDecision, RefundReason } from '$lib/models/common';
 import type { TicketDocumentType, TicketStateType } from '$lib/models/ticket';
 import { TicketStatus } from '$lib/models/ticket';
 import type {
@@ -66,6 +65,7 @@ type TicketMachineEventType =
   | {
       type: 'DISPUTE INITIATED';
       dispute: DisputeType;
+      refund: RefundType;
     }
   | {
       type: 'TICKET REDEEMED';
@@ -88,8 +88,9 @@ type TicketMachineEventType =
       finalize: FinalizeType;
     }
   | {
-      type: 'DISPUTE RESOLVED';
+      type: 'DISPUTE DECIDED';
       decision: DisputeDecision;
+      refund?: RefundType;
     }
   | { type: 'PAYMENT INITIATED' };
 
@@ -336,17 +337,32 @@ const createTicketMachine = ({
             },
             inDispute: {
               on: {
-                'DISPUTE RESOLVED': {
+                'DISPUTE DECIDED': [
+                  {
+                    actions: [
+                      'decideDispute',
+                      raise({
+                        type: 'TICKET FINALIZED',
+                        finalize: {
+                          finalizedAt: new Date(),
+                          finalizedBy: ActorType.ARBITRATOR
+                        }
+                      })
+                    ],
+                    cond: 'noDisputeRefund'
+                  },
+                  { actions: 'decideDispute' }
+                ],
+                'REFUND RECEIVED': {
                   actions: [
-                    'resolveDispute',
+                    'receiveRefund',
                     raise({
                       type: 'TICKET FINALIZED',
                       finalize: {
                         finalizedAt: new Date(),
                         finalizedBy: ActorType.ARBITRATOR
                       }
-                    }),
-                    'sendDisputeResolved'
+                    })
                   ]
                 }
               }
@@ -455,17 +471,6 @@ const createTicketMachine = ({
               showId: context.ticketDocument.show.toString(),
               ticketId: context.ticketDocument._id.toString(),
               dispute: context.ticketState.dispute
-            }
-          );
-        },
-
-        sendDisputeResolved: (context) => {
-          ticketMachineOptions?.showQueue?.add(
-            ShowMachineEventString.DISPUTE_RESOLVED,
-            {
-              showId: context.ticketDocument.show.toString(),
-              ticketId: context.ticketDocument._id.toString(),
-              decision: context.ticketState.dispute!.decision
             }
           );
         },
@@ -624,11 +629,14 @@ const createTicketMachine = ({
         }),
 
         initiateDispute: assign((context, event) => {
+          if (!context.ticketState.sale) return {};
+
           return {
             ticketState: {
               ...context.ticketState,
               status: TicketStatus.IN_DISPUTE,
-              dispute: event.dispute
+              dispute: event.dispute,
+              refund: event.refund
             }
           };
         }),
@@ -659,7 +667,7 @@ const createTicketMachine = ({
           return {};
         }),
 
-        resolveDispute: assign((context, event) => {
+        decideDispute: assign((context, event) => {
           if (!context.ticketState.dispute) return {};
           const dispute = {
             ...context.ticketState.dispute,
@@ -667,10 +675,12 @@ const createTicketMachine = ({
             endedAt: new Date(),
             resolved: true
           };
+          const refund = event.refund;
           return {
             ticketState: {
               ...context.ticketState,
-              dispute
+              dispute,
+              refund
             }
           };
         }),
@@ -771,6 +781,12 @@ const createTicketMachine = ({
             context.ticketState.status === TicketStatus.REDEEMED ||
             context.ticketState.status === TicketStatus.FULLY_PAID
           );
+        },
+        noDisputeRefund: (context, event) => {
+          const decision =
+            context.ticketState.dispute?.decision || event.decision;
+          if (!decision) return false;
+          return decision === DisputeDecision.NO_REFUND;
         }
       }
     }
@@ -799,7 +815,7 @@ export enum TicketMachineEventString {
   SHOW_ENDED = 'SHOW ENDED',
   SHOW_CANCELLED = 'SHOW CANCELLED',
   TICKET_FINALIZED = 'TICKET FINALIZED',
-  DISPUTE_RESOLVED = 'DISPUTE RESOLVED',
+  DISPUTE_DECIDED = 'DISPUTE DECIDED',
   TICKET_REDEEMED = 'TICKET REDEEMED',
   REFUND_REQUESTED = 'REFUND REQUESTED',
   REFUND_INITIATED = 'REFUND INITIATED'

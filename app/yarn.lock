@@ -2415,9 +2415,9 @@
     rollup "^3.7.0"
 
 "@sveltejs/kit@^1.18.0":
-  version "1.26.0"
-  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-1.26.0.tgz#af4764860bde3722f31d3281fa473c9d1201ddc6"
-  integrity sha512-CV/AlTziC05yrz7UjVqEd0pH6+2dnrbmcnHGr2d3jXtmOgzNnlDkXtX8g3BfJ6nntsPD+0jtS2PzhvRHblRz4A==
+  version "1.27.0"
+  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-1.27.0.tgz#aec182a10e61e079a322ad26d9b5bd610919a7a9"
+  integrity sha512-a1wPIq2uO3RsTmV+KbA4venOgCJDbfHTXFe+g7eJR3N8l46DSuulUONJ1qnk2EnZWYC1Uj3Wbp3US0WFocIzXg==
   dependencies:
     "@sveltejs/vite-plugin-svelte" "^2.4.1"
     "@types/cookie" "^0.5.1"
@@ -11004,9 +11004,9 @@ undici-types@~5.25.1:
   integrity sha512-Ga1jfYwRn7+cP9v8auvEXN1rX3sWqlayd4HP7OKk4mZWylEmu3KzXDUGrQUN6Ol7qo1gPvB2e5gX6udnyEPgdA==
 
 undici@~5.26.2:
-  version "5.26.3"
-  resolved "https://registry.yarnpkg.com/undici/-/undici-5.26.3.tgz#ab3527b3d5bb25b12f898dfd22165d472dd71b79"
-  integrity sha512-H7n2zmKEWgOllKkIUkLvFmsJQj062lSm3uA4EYApG8gLuiOM0/go9bIoC3HVaSnfg4xunowDE2i9p8drkXuvDw==
+  version "5.26.5"
+  resolved "https://registry.yarnpkg.com/undici/-/undici-5.26.5.tgz#f6dc8c565e3cad8c4475b187f51a13e505092838"
+  integrity sha512-cSb4bPFd5qgR7qr2jYAi0hlX9n5YKK2ONKkLFkxl+v/9BvC0sOpZjBHDBSXc5lWAf5ty9oZdRXytBIHzgUcerw==
   dependencies:
     "@fastify/busboy" "^2.0.0"
 
@@ -11628,9 +11628,9 @@ xhr2-cookies@1.1.0:
     cookiejar "^2.1.1"
 
 xstate@^4.37.2:
-  version "4.38.2"
-  resolved "https://registry.yarnpkg.com/xstate/-/xstate-4.38.2.tgz#1b74544fc9c8c6c713ba77f81c6017e65aa89804"
-  integrity sha512-Fba/DwEPDLneHT3tbJ9F3zafbQXszOlyCJyQqqdzmtlY/cwE2th462KK48yaANf98jHlP6lJvxfNtN0LFKXPQg==
+  version "4.38.3"
+  resolved "https://registry.yarnpkg.com/xstate/-/xstate-4.38.3.tgz#4e15e7ad3aa0ca1eea2010548a5379966d8f1075"
+  integrity sha512-SH7nAaaPQx57dx6qvfcIgqKRXIh4L0A1iYEqim4s1u7c9VoCgzZc+63FY90AKU4ZzOC2cfJzTnpO4zK7fCUzzw==
 
 xtend@^4.0.1, xtend@^4.0.2:
   version "4.0.2"

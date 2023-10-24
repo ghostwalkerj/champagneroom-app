@@ -6,6 +6,7 @@ import type IORedis from 'ioredis';
 import type { PayoutType } from '$lib/models/common';
 import { CurrencyType } from '$lib/models/common';
 import { Creator } from '$lib/models/creator';
+import type { TicketType } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
 import {
   Transaction,
@@ -68,20 +69,20 @@ export const getPayoutWorker = ({
     async (job: Job<PayoutJobDataType, any, string>) => {
       const payoutType = job.name as PayoutJobType;
       switch (payoutType) {
-        case PayoutJobType.CREATE_REFUND: {
+        case PayoutJobType.REFUND_SHOW: {
           const bcInvoiceId = job.data.bcInvoiceId;
           if (!bcInvoiceId) {
-            return;
+            return 'No invoice ID';
           }
 
           const ticketId = job.data.ticketId;
           if (!ticketId) {
-            return;
+            return 'No ticket ID';
           }
 
           const ticket = await Ticket.findById(ticketId);
           if (!ticket) {
-            return;
+            return 'No ticket found';
           }
 
           const ticketService = getTicketMachineService(
@@ -105,17 +106,17 @@ export const getPayoutWorker = ({
           // Possible there is unconfirmed payments.  If so, queue it up again and wait for timeout.
           if (ticketState.matches('reserved.initiatedPayment')) {
             payoutQueue.add(
-              PayoutJobType.CREATE_REFUND,
+              PayoutJobType.REFUND_SHOW,
               {
                 bcInvoiceId
               },
               { delay: paymentPeriod }
             );
-            return;
+            return 'Unconfirmed payment';
           }
 
           if (!ticketState.matches('reserved.refundRequested')) {
-            return;
+            return 'Not in refund requested state';
           }
 
           const issueRefund = async () => {
@@ -126,7 +127,8 @@ export const getPayoutWorker = ({
               // Tell the ticketMachine REFUND INITIATED
               const ticketRefund = ticket.ticketState.refund;
               if (!ticketRefund) {
-                throw new Error('Ticket refund not found');
+                console.error('Ticket refund not found');
+                return 'Ticket refund not found';
               }
 
               const currency = (invoice.paid_currency?.toUpperCase() ||
@@ -174,7 +176,8 @@ export const getPayoutWorker = ({
               bcRefund = response.data;
 
               if (!bcRefund.payout_id) {
-                throw new Error('No payout ID returned from Bitcart API');
+                console.error('No payout ID returned from Bitcart API');
+                return 'No payout ID returned from Bitcart API';
               }
 
               // Set the notification URL for the payout
@@ -183,7 +186,7 @@ export const getPayoutWorker = ({
                 {
                   notification_url: payoutNotificationUrl,
                   metadata: {
-                    payoutReason: PayoutReason.REFUND
+                    payoutReason: PayoutReason.SHOW_REFUND
                   }
                 },
                 {
@@ -223,22 +226,166 @@ export const getPayoutWorker = ({
               );
             } catch (error_) {
               console.error(error_);
+              return 'Refund error';
             }
           };
           issueRefund();
-          break;
+          return 'success';
+        }
+        case PayoutJobType.DISPUTE_PAYOUT: {
+          const ticketId = job.data.ticketId;
+          if (!ticketId) {
+            return 'No ticket ID';
+          }
+
+          const ticket = (await Ticket.findById(ticketId)) as TicketType;
+          if (!ticket) {
+            return 'No ticket found';
+          }
+
+          const bcInvoiceId = ticket.bcInvoiceId;
+          if (!bcInvoiceId) {
+            return 'No invoice ID';
+          }
+
+          const ticketService = getTicketMachineService(
+            ticket,
+            redisConnection
+          );
+
+          const ticketState = ticketService.getSnapshot();
+
+          const response = (await getInvoiceByIdInvoicesModelIdGet(
+            bcInvoiceId,
+            {
+              headers: {
+                Authorization: `Bearer ${paymentAuthToken}`,
+                'Content-Type': 'application/json'
+              }
+            }
+          )) as AxiosResponse<DisplayInvoice>;
+          const invoice = response.data as DisplayInvoice;
+
+          if (!ticketState.matches('ended.inDispute')) {
+            return 'Ticket not in Dispute state';
+          }
+
+          const issueAward = async () => {
+            try {
+              const payment = invoice.payments?.[0] as PaymentType;
+              const currency = (invoice.paid_currency?.toUpperCase() ||
+                CurrencyType.ETH) as CurrencyType;
+
+              const returnAddress = payment.user_address; // Just send the return as lump sum to first address
+              if (!ticket.ticketState.refund) {
+                console.error('No refund found');
+                return 'No refund found';
+              }
+              const amount =
+                ticket.ticketState.refund.approvedAmounts.get(currency);
+              if (!amount) {
+                console.error('No approved amount');
+                return 'No approved amount';
+              }
+
+              let response = await refundInvoiceInvoicesModelIdRefundsPost(
+                bcInvoiceId,
+                {
+                  amount,
+                  currency,
+                  admin_host: '',
+                  send_email: false
+                },
+                {
+                  headers: {
+                    Authorization: `Bearer ${paymentAuthToken}`,
+                    'Content-Type': 'application/json'
+                  }
+                }
+              );
+              let bcRefund = response.data;
+
+              // Set refund address from the original invoice
+              response = await submitRefundInvoicesRefundsRefundIdSubmitPost(
+                bcRefund.id,
+                { destination: returnAddress },
+                {
+                  headers: {
+                    Authorization: `Bearer ${paymentAuthToken}`,
+                    'Content-Type': 'application/json'
+                  }
+                }
+              );
+
+              bcRefund = response.data;
+              if (!bcRefund.payout_id) {
+                console.error('No payout ID returned from Bitcart API');
+                return 'No payout ID returned from Bitcart API';
+              }
+
+              // Set the notification URL for the payout
+              response = await modifyPayoutPayoutsModelIdPatch(
+                bcRefund.payout_id,
+                {
+                  notification_url: payoutNotificationUrl,
+                  metadata: {
+                    payoutReason: PayoutReason.DISPUTE
+                  }
+                },
+                {
+                  headers: {
+                    Authorization: `Bearer ${paymentAuthToken}`,
+                    'Content-Type': 'application/json'
+                  }
+                }
+              );
+
+              // Approve the payout
+              response = await batchActionsOnPayoutsPayoutsBatchPost(
+                {
+                  ids: [bcRefund.payout_id],
+                  command: 'approve'
+                },
+                {
+                  headers: {
+                    Authorization: `Bearer ${paymentAuthToken}`,
+                    'Content-Type': 'application/json'
+                  }
+                }
+              );
+
+              // Send the payout
+              response = await batchActionsOnPayoutsPayoutsBatchPost(
+                {
+                  ids: [bcRefund.payout_id],
+                  command: 'send'
+                },
+                {
+                  headers: {
+                    Authorization: `Bearer ${paymentAuthToken}`,
+                    'Content-Type': 'application/json'
+                  }
+                }
+              );
+            } catch (error_) {
+              console.error(error_);
+              return 'Refund error';
+            }
+          };
+          issueAward();
+          return 'success';
         }
 
         case PayoutJobType.PAYOUT_UPDATE: {
           const bcPayoutId = job.data.bcPayoutId;
           if (!bcPayoutId) {
             console.error('No payout ID');
-            return;
+            return 'No payout ID';
           }
           const status = job.data.status as string;
           if (!status) {
             console.error('No status');
-            return;
+            return 'No status';
           }
 
           // Get the payout
@@ -252,96 +399,105 @@ export const getPayoutWorker = ({
 
           if (!response.data) {
             console.error('No payout found for ID:', bcPayoutId);
-            return;
+            return 'No payout found for ID:' + bcPayoutId;
           }
 
           const bcPayout = response.data as DisplayPayout;
           if (!bcPayout) {
             console.error('No payout');
-            return;
+            return 'No payout';
           }
           switch (status) {
             case PayoutStatus.SENT: {
               // Tell the walletMachine PAYOUT SENT
               const reason = bcPayout.metadata?.payoutReason as PayoutReason;
-              if (reason === PayoutReason.CREATOR_PAYOUT) {
-                const walletId = bcPayout.metadata?.walletId as string;
-                if (!walletId) {
-                  console.error('No wallet ID');
-                  return;
-                }
-                const wallet = await Wallet.findById(walletId);
-                if (!wallet) {
-                  console.error('No wallet found for ID:', walletId);
-                  return;
-                }
-                const walletService = getWalletMachineService(wallet);
-                const walletState = walletService.getSnapshot();
-                const creator = await Creator.findOne({
-                  'user.wallet': walletId
-                }).lean();
-                if (!creator) {
-                  console.error('No creator found for wallet ID:', walletId);
-                  return;
-                }
 
-                const transaction = (await Transaction.create({
-                  creator: creator._id,
-                  agent: creator.agent,
-                  hash: bcPayout.tx_hash,
-                  to: bcPayout.destination,
-                  reason: TransactionReasonType.CREATOR_PAYOUT,
-                  amount: bcPayout.amount,
-                  currency: wallet.currency,
-                  bcPayoutId: bcPayout.id
-                })) as TransactionType;
+              switch (reason) {
+                case PayoutReason.CREATOR_PAYOUT: {
+                  {
+                    const walletId = bcPayout.metadata?.walletId as string;
+                    if (!walletId) {
+                      console.error('No wallet ID');
+                      return 'No wallet ID';
+                    }
+                    const wallet = await Wallet.findById(walletId);
+                    if (!wallet) {
+                      console.error('No wallet found for ID:', walletId);
+                      return 'No wallet found for ID:' + walletId;
+                    }
+                    const walletService = getWalletMachineService(wallet);
+                    const walletState = walletService.getSnapshot();
+                    const creator = await Creator.findOne({
+                      'user.wallet': walletId
+                    }).lean();
+                    if (!creator) {
+                      console.error(
+                        'No creator found for wallet ID:',
+                        walletId
+                      );
+                      return 'No creator found for wallet ID:' + walletId;
+                    }
 
-                if (
-                  !walletState.can({
-                    type: WalletMachineEventString.PAYOUT_SENT,
-                    transaction
-                  })
-                ) {
-                  console.error('Cannot send payout:', wallet.status);
-                  return;
+                    const transaction = (await Transaction.create({
+                      creator: creator._id,
+                      agent: creator.agent,
+                      hash: bcPayout.tx_hash,
+                      to: bcPayout.destination,
+                      reason: TransactionReasonType.CREATOR_PAYOUT,
+                      amount: bcPayout.amount,
+                      currency: wallet.currency,
+                      bcPayoutId: bcPayout.id
+                    })) as TransactionType;
+
+                    if (
+                      !walletState.can({
+                        type: WalletMachineEventString.PAYOUT_SENT,
+                        transaction
+                      })
+                    ) {
+                      console.error('Cannot send payout:', wallet.status);
+                      return 'Cannot send payout:' + wallet.status;
+                    }
+
+                    walletService.send({
+                      type: WalletMachineEventString.PAYOUT_SENT,
+                      transaction
+                    });
+                  }
+                  return 'success';
                 }
-
-                walletService.send({
-                  type: WalletMachineEventString.PAYOUT_SENT,
-                  transaction
-                });
               }
-              break;
             }
 
             case PayoutStatus.COMPLETE: {
               const reason = bcPayout.metadata?.payoutReason as PayoutReason;
-              if (reason === PayoutReason.CREATOR_PAYOUT) {
-                const walletId = bcPayout.metadata?.walletId as string;
-                if (!walletId) {
-                  console.error('No wallet ID');
-                  return;
-                }
-                const wallet = await Wallet.findById(walletId);
-                if (!wallet) {
-                  console.error('No wallet found for ID:', walletId);
-                  return;
-                }
-                const walletService = getWalletMachineService(wallet);
+              switch (reason) {
+                case PayoutReason.CREATOR_PAYOUT: {
+                  const walletId = bcPayout.metadata?.walletId as string;
+                  if (!walletId) {
+                    console.error('No wallet ID');
+                    return 'No wallet ID';
+                  }
+                  const wallet = await Wallet.findById(walletId);
+                  if (!wallet) {
+                    console.error('No wallet found for ID:', walletId);
+                    return 'No wallet found for ID:' + walletId;
+                  }
+                  const walletService = getWalletMachineService(wallet);
 
-                walletService.send({
-                  type: WalletMachineEventString.PAYOUT_COMPLETE,
-                  bcPayoutId
-                });
-                break;
+                  walletService.send({
+                    type: WalletMachineEventString.PAYOUT_COMPLETE,
+                    bcPayoutId
+                  });
+                  return 'success';
+                }
               }
             }
 
             default: {
-              break;
+              return 'success';
             }
           }
-          break;
         }
 
         case PayoutJobType.CREATE_PAYOUT: {
@@ -349,23 +505,23 @@ export const getPayoutWorker = ({
           const payoutReason = job.data.payoutReason as PayoutReason;
           if (!walletId) {
             console.error('No wallet Id');
-            return;
+            return 'No wallet Id';
           }
           const destination = job.data.destination as string;
           if (!destination) {
             console.error('No destination');
-            return;
+            return 'No destination';
           }
           const amount = job.data.amount as number;
           if (!amount) {
             console.error('No amount');
-            return;
+            return 'No amount';
           }
 
           const wallet = await Wallet.findById(walletId);
           if (!wallet) {
             console.error('No wallet');
-            return;
+            return 'No wallet';
           }
 
           const walletService = getWalletMachineService(wallet);
@@ -383,14 +539,14 @@ export const getPayoutWorker = ({
             })
           ) {
             console.error('Cannot request payout:', wallet.status);
-            return;
+            return 'Cannot request payout:' + wallet.status;
           }
 
           // Ok, create the payout in bitcart
           // Get the store
           if (!bcStoreId || bcStoreId === '') {
             console.error('No bitcart store ID');
-            return;
+            return 'No bitcart store ID';
           }
 
           try {
@@ -402,7 +558,7 @@ export const getPayoutWorker = ({
             });
             if (!response.data) {
               console.error('No store found for ID:', bcStoreId);
-              return;
+              return 'No store found for ID:' + bcStoreId;
             }
             const store = response.data as Store;
 
@@ -410,7 +566,7 @@ export const getPayoutWorker = ({
             const bcWalletId = store.wallets[0];
             if (!bcWalletId) {
               console.error('No wallet found for store ID:', bcStoreId);
-              return;
+              return 'No wallet found for store ID:' + bcStoreId;
             }
             const bcWalletResponse = await getWalletByIdWalletsModelIdGet(
               bcWalletId,
@@ -423,7 +579,7 @@ export const getPayoutWorker = ({
             );
             if (!bcWalletResponse.data) {
               console.error('No wallet found for ID:', bcWalletId);
-              return;
+              return 'No wallet found for ID:' + bcWalletId;
             }
             const bcWallet = bcWalletResponse.data as BTWallet;
 
@@ -434,12 +590,16 @@ export const getPayoutWorker = ({
                 bcWallet.currency,
                 wallet.currency
               );
-              return;
+              return (
+                'Wallet currency does not match expected currency:' +
+                bcWallet.currency +
+                wallet.currency
+              );
             }
 
             if (+bcWallet.balance < amount) {
               console.error('Insufficient funds in wallet:', walletId);
-              return;
+              return 'Insufficient funds in wallet:' + walletId;
             }
 
             // Create the payout
@@ -465,7 +625,7 @@ export const getPayoutWorker = ({
             );
             if (!bcPayoutResponse.data) {
               console.error('No payout created');
-              return;
+              return 'No payout created';
             }
 
             const bcPayout = bcPayoutResponse.data;
@@ -478,12 +638,13 @@ export const getPayoutWorker = ({
             });
           } catch (error_) {
             console.error(error_);
+            return 'Payout error';
           }
-          break;
+          return 'success';
         }
 
         default: {
-          break;
+          return 'success';
         }
       }
     },

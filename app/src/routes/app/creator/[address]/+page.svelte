@@ -214,7 +214,9 @@
         <div class="modal-action">
           <button
             class="btn"
-            on:click={() => goto(showTimePath)}
+            on:click={() => {
+              goto(showTimePath);
+            }}
             disabled={!canStartShow}>Restart Show</button
           >
           <form method="post" action="?/end_show" use:enhance={onSubmit}>

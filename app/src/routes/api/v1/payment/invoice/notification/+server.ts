@@ -20,7 +20,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     connection: redisConnection
   });
 
-  invoiceQueue.add(InvoiceJobType.UPDATE, { bcInvoiceId });
+  invoiceQueue.add(InvoiceJobType.UPDATE, { bcInvoiceId, status });
 
   return new Response(undefined, { status: 200 });
 };

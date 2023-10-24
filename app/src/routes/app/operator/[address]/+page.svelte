@@ -695,7 +695,11 @@
                         >
                           <td>{index + 1}</td>
                           <td>{ticket.show.creatorInfo.name}</td>
-                          <td>{currencyFormatter().format(ticket.price)}</td>
+                          <td
+                            >{currencyFormatter(ticket.price.currency).format(
+                              ticket.price.amount
+                            )}</td
+                          >
                           <td
                             >{spacetime(
                               ticket.show.showState.runtime.startDate

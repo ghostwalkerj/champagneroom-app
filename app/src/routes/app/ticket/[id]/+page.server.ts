@@ -2,6 +2,7 @@ import { error, fail, redirect } from '@sveltejs/kit';
 import type { AxiosResponse } from 'axios';
 import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
+import { ObjectId } from 'mongodb';
 import { Types } from 'mongoose';
 import urlJoin from 'url-join';
 
@@ -19,7 +20,7 @@ import type {
   FeedbackType,
   RefundType
 } from '$lib/models/common';
-import { CancelReason } from '$lib/models/common';
+import { CancelReason, RefundReason } from '$lib/models/common';
 import { Show } from '$lib/models/show';
 import type { TicketType } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
@@ -122,7 +123,7 @@ export const actions: Actions = {
       const payoutQueue = new Queue(EntityType.PAYOUT, {
         connection: redisConnection
       }) as PayoutQueueType;
-      payoutQueue.add(PayoutJobType.CREATE_REFUND, {
+      payoutQueue.add(PayoutJobType.REFUND_SHOW, {
         bcInvoiceId,
         ticketId
       });
@@ -193,10 +194,8 @@ export const actions: Actions = {
     }
 
     const redisConnection = locals.redisConnection as IORedis;
-    const ticketService = await getTicketMachineServiceFromId(
-      ticketId,
-      redisConnection
-    );
+    const ticket = (await Ticket.findById(ticketId)) as TicketType;
+    const ticketService = getTicketMachineService(ticket, redisConnection);
 
     const state = ticketService.getSnapshot();
     const dispute = {
@@ -207,12 +206,31 @@ export const actions: Actions = {
       startedAt: new Date()
     } as DisputeType;
 
+    const refund = {
+      requestedAmounts: ticket.ticketState.sale
+        ? ticket.ticketState.sale.totals
+        : ({} as Map<string, number>),
+      approvedAmounts: {} as Map<string, number>,
+      _id: new Types.ObjectId(),
+      requestedAt: new Date(),
+      transactions: [] as Types.ObjectId[],
+      actualAmounts: {} as Map<string, number>,
+      reason: RefundReason.DISPUTE_DECISION,
+      totals: {} as Map<string, number>,
+      payouts: {} as any
+    } as RefundType;
+
     if (
-      state.can({ type: TicketMachineEventString.DISPUTE_INITIATED, dispute })
+      state.can({
+        type: TicketMachineEventString.DISPUTE_INITIATED,
+        dispute,
+        refund
+      })
     ) {
       ticketService.send({
         type: TicketMachineEventString.DISPUTE_INITIATED,
-        dispute
+        dispute,
+        refund
       });
     }
 

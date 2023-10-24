@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import type { on } from 'node:events';
 
 import { Types } from 'mongoose';
 import { nanoid } from 'nanoid';
@@ -36,7 +35,7 @@ enum ShowMachineEventString {
   CUSTOMER_LEFT = 'CUSTOMER LEFT',
   TICKET_FINALIZED = 'TICKET FINALIZED',
   TICKET_DISPUTED = 'TICKET DISPUTED',
-  DISPUTE_RESOLVED = 'DISPUTE RESOLVED',
+  DISPUTE_DECIDED = 'DISPUTE DECIDED',
   TICKET_REDEEMED = 'TICKET REDEEMED'
 }
 
@@ -107,7 +106,7 @@ export type ShowMachineEventType =
       ticket: TicketType;
     }
   | {
-      type: 'DISPUTE RESOLVED';
+      type: 'DISPUTE DECIDED';
       ticket: TicketType;
       decision: DisputeDecision;
     };
@@ -237,7 +236,7 @@ const createShowMachine = ({
             },
             inDispute: {
               on: {
-                'DISPUTE RESOLVED': [
+                'DISPUTE DECIDED': [
                   {
                     actions: [
                       'receiveResolution',

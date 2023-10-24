@@ -20,6 +20,7 @@ import {
   modifyInvoiceInvoicesModelIdPatch
 } from '$lib/ext/bitcart';
 import type { DisplayInvoice, DisplayPayout } from '$lib/ext/bitcart/models';
+import { PayoutReason } from '$lib/util/payment';
 import {
   InvoiceJobType,
   InvoiceStatus,
@@ -63,7 +64,7 @@ export const getInvoiceWorker = ({
         undefined;
 
       if (!invoice) {
-        return;
+        return 'No invoice found';
       }
 
       switch (jobType) {
@@ -84,7 +85,8 @@ export const getInvoiceWorker = ({
                 }
               ));
           } catch (error_) {
-            console.error('Update invoice error', error_);
+            console.error(error_);
+            return 'Update invoice error';
           }
 
           break;
@@ -127,7 +129,7 @@ export const getInvoiceWorker = ({
               const completedInvoice = async (invoice: DisplayInvoice) => {
                 const ticketId = invoice.order_id;
                 if (!ticketId) {
-                  return;
+                  return 'No ticket id';
                 }
 
                 const ticketService = await getTicketMachineServiceFromId(
@@ -171,7 +173,7 @@ export const getInvoiceWorker = ({
                 }
               };
               completedInvoice(invoice);
-              break;
+              return 'success';
             }
 
             case InvoiceStatus.REFUNDED: {
@@ -181,12 +183,12 @@ export const getInvoiceWorker = ({
                 try {
                   const refundId = invoice.refund_id;
                   if (!refundId) {
-                    return;
+                    return 'No refund id';
                   }
 
                   const ticketId = invoice.order_id;
                   if (!ticketId) {
-                    return;
+                    return 'No ticket id';
                   }
 
                   const ticket = (await Ticket.findById(
@@ -206,7 +208,7 @@ export const getInvoiceWorker = ({
 
                   const payoutId = refund.payout_id;
                   if (!payoutId) {
-                    return;
+                    return 'No payout id';
                   }
 
                   response = await getPayoutByIdPayoutsModelIdGet(payoutId, {
@@ -215,10 +217,17 @@ export const getInvoiceWorker = ({
                       'Content-Type': 'application/json'
                     }
                   });
-                  const payout = response.data as unknown as DisplayPayout;
+                  const bcPayout = response.data as unknown as DisplayPayout;
 
-                  if (!payout) {
-                    return;
+                  if (!bcPayout) {
+                    return 'No payout';
+                  }
+
+                  const reason = bcPayout.metadata
+                    ?.payoutReason as PayoutReason;
+
+                  if (!reason) {
+                    return 'No payout reason';
                   }
 
                   // Create transaction for ticket and send to ticket machine
@@ -227,12 +236,15 @@ export const getInvoiceWorker = ({
                     creator: ticket?.creator,
                     agent: ticket?.agent,
                     show: ticket?.show,
-                    payout: payout.tx_hash,
+                    payout: bcPayout.tx_hash,
                     from: ticket.paymentAddress,
-                    to: payout.destination,
-                    reason: TransactionReasonType.TICKET_REFUND,
-                    amount: payout.amount,
-                    currency: payout.currency?.toUpperCase()
+                    to: bcPayout.destination,
+                    reason:
+                      reason === PayoutReason.SHOW_REFUND
+                        ? TransactionReasonType.TICKET_REFUND
+                        : TransactionReasonType.DISPUTE_RESOLUTION,
+                    amount: bcPayout.amount,
+                    currency: bcPayout.currency?.toUpperCase()
                   });
 
                   const ticketService = getTicketMachineService(
@@ -246,9 +258,11 @@ export const getInvoiceWorker = ({
                   });
                 } catch (error_) {
                   console.error(error_);
+                  return 'Refund error';
                 }
               };
               refundedInvoice(invoice);
+              return 'success';
             }
 
             default: {

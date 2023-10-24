@@ -198,11 +198,15 @@ export const actions: Actions = {
       connection: redisConnection
     }) as ShowQueueType;
 
-    showQueue.add(ShowMachineEventString.DISPUTE_RESOLVED, {
+    showQueue.add(ShowMachineEventString.DISPUTE_DECIDED, {
       showId,
       ticketId,
       decision
     });
+
+    return {
+      success: true
+    };
   }
 };
 
@@ -234,7 +238,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
   const creators = await Creator.find().sort({ 'user.name': 1 });
 
   const disputedTickets = await Ticket.find({
-    'ticketState.status': TicketStatus.IN_DISPUTE
+    'ticketState.dispute.resolved': false
   }).populate<{ show: ShowType }>('show');
 
   return {

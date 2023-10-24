@@ -95,7 +95,7 @@
       ];
 
       try {
-        provider.request({
+        const response = await provider.request({
           method: 'eth_sendTransaction',
           params: parameters
         });
@@ -428,7 +428,7 @@
                   <form
                     method="post"
                     action="?/initiate_dispute"
-                    use:enhance={({ form }) => onSubmit(form)}
+                    use:enhance={({ formElement }) => onSubmit(formElement)}
                   >
                     <div class="max-w-xs w-full py-2 form-control">
                       <!-- svelte-ignore a11y-label-has-associated-control -->

@@ -90,7 +90,7 @@ export const disputeSchema = new Schema({
   disputedBy: { type: String, enum: ActorType, required: true },
   explanation: { type: String, required: true },
   decision: { type: String, enum: DisputeDecision },
-  resolved: { type: Boolean, default: false }
+  resolved: { type: Boolean, default: false, index: true }
 });
 export const earningsSchema = new Schema({
   earnedAt: { type: Date, default: new Date() },

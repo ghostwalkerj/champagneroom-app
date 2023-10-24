@@ -1,18 +1,15 @@
-import { type } from 'node:os';
-
 import type { Job, Queue } from 'bullmq';
 import { Worker } from 'bullmq';
 import type IORedis from 'ioredis';
-import type { finalize } from 'rxjs';
 
 import type {
   CancelType,
-  DisputeDecision,
   DisputeType,
   FinalizeType,
   RefundType,
   SaleType
 } from '$lib/models/common';
+import { DisputeDecision } from '$lib/models/common';
 import { Creator } from '$lib/models/creator';
 import type { ShowType } from '$lib/models/show';
 import { SaveState, Show, ShowStatus } from '$lib/models/show';
@@ -63,90 +60,75 @@ export const getShowWorker = ({
       const show = (await Show.findById(job.data.showId).exec()) as ShowType;
 
       if (!show) {
-        return;
+        return 'No show found';
       }
 
       switch (job.name) {
         case ShowMachineEventString.CANCELLATION_INITIATED: {
-          cancelShow(show, job.data.cancel, showQueue);
-          break;
+          return cancelShow(show, job.data.cancel, showQueue);
         }
         case ShowMachineEventString.REFUND_INITIATED: {
-          refundShow(show, showQueue, payoutQueue);
-          break;
+          return refundShow(show, showQueue, payoutQueue);
         }
         case ShowMachineEventString.SHOW_STARTED: {
-          startShow(show);
-          break;
+          return startShow(show);
         }
         case ShowMachineEventString.SHOW_ENDED: {
-          endShow(show, escrowPeriod, showQueue);
-          break;
+          return endShow(show, escrowPeriod, showQueue);
         }
         case ShowMachineEventString.SHOW_STOPPED: {
-          stopShow(show, gracePeriod, showQueue);
-          break;
+          return stopShow(show, gracePeriod, showQueue);
         }
         case ShowMachineEventString.SHOW_FINALIZED: {
-          finalizeShow(show, job.data.finalize, showQueue);
-          break;
+          return finalizeShow(show, job.data.finalize, showQueue);
         }
 
         // From Ticket Machine
         case ShowMachineEventString.CUSTOMER_JOINED: {
-          customerJoined(show, job.data.ticketId, job.data.customerName);
-          break;
+          return customerJoined(show, job.data.ticketId, job.data.customerName);
         }
         case ShowMachineEventString.CUSTOMER_LEFT: {
-          customerLeft(show, job.data.ticketId, job.data.customerName);
-          break;
+          return customerLeft(show, job.data.ticketId, job.data.customerName);
         }
         case ShowMachineEventString.TICKET_SOLD: {
-          ticketSold(
+          return ticketSold(
             show,
             job.data.ticketId,
             job.data.sale,
             job.data.customerName
           );
-          break;
         }
         case ShowMachineEventString.TICKET_REDEEMED: {
-          ticketRedeemed(show, job.data.ticketId);
-          break;
+          return ticketRedeemed(show, job.data.ticketId);
         }
         case ShowMachineEventString.TICKET_RESERVED: {
-          ticketReserved(show, job.data.ticketId, job.data.customerName);
-          break;
+          return ticketReserved(show, job.data.ticketId, job.data.customerName);
         }
         case ShowMachineEventString.TICKET_REFUNDED: {
-          ticketRefunded(show, job.data.refund, job.data.ticketId);
-          break;
+          return ticketRefunded(show, job.data.refund, job.data.ticketId);
         }
         case ShowMachineEventString.TICKET_CANCELLED: {
-          ticketCancelled(
+          return ticketCancelled(
             show,
             job.data.ticketId,
             job.data.customerName,
             job.data.cancel
           );
-          break;
         }
         case ShowMachineEventString.TICKET_FINALIZED: {
-          ticketFinalized(show, job.data.ticketId, showQueue);
-          break;
+          return ticketFinalized(show, job.data.ticketId, showQueue);
         }
         case ShowMachineEventString.TICKET_DISPUTED: {
-          ticketDisputed(show, job.data.dispute, job.data.ticketId);
-          break;
+          return ticketDisputed(show, job.data.dispute, job.data.ticketId);
         }
-        case ShowMachineEventString.DISPUTE_RESOLVED: {
-          ticketDisputeResolved(
+        case ShowMachineEventString.DISPUTE_DECIDED: {
+          return ticketDisputeResolved(
             show,
             job.data.ticketId,
             job.data.decision,
-            showQueue
+            showQueue,
+            payoutQueue
           );
-          break;
         }
 
         default: {
@@ -202,6 +184,7 @@ const cancelShow = async (
     });
   }
   showService.stop();
+  return 'success';
 };
 
 const refundShow = async (
@@ -230,7 +213,7 @@ const refundShow = async (
       const ticketService = getTicketMachineService(ticket, showQueue);
       const ticketState = ticketService.getSnapshot();
       if (ticketState.matches('reserved.refundRequested')) {
-        payoutQueue.add(PayoutJobType.CREATE_REFUND, {
+        payoutQueue.add(PayoutJobType.REFUND_SHOW, {
           bcInvoiceId: ticket.bcInvoiceId,
           ticketId: ticket._id.toString()
         });
@@ -239,6 +222,7 @@ const refundShow = async (
     }
   }
   showService.stop();
+  return 'success';
 };
 
 const startShow = async (show: ShowType) => {
@@ -251,6 +235,7 @@ const startShow = async (show: ShowType) => {
     }
   });
   showService.send(ShowMachineEventString.SHOW_STARTED);
+  return 'success';
 };
 
 const stopShow = async (
@@ -276,6 +261,7 @@ const stopShow = async (
     },
     { delay: gracePeriod }
   );
+  return 'success';
 };
 
 // End show, alert ticket
@@ -323,6 +309,7 @@ const endShow = async (
     }
   }
   showService.stop();
+  return 'success';
 };
 
 const finalizeShow = async (
@@ -542,7 +529,7 @@ const finalizeShow = async (
       });
 
     if (aggregateSalesAndRefunds.length === 0) {
-      return;
+      return 'No sales and refunds';
     }
 
     const totalSales = new Map<string, number>();
@@ -592,7 +579,7 @@ const finalizeShow = async (
   const walletId = creatorWallet?.user.wallet;
   if (!walletId) {
     console.log('No wallet to payout');
-    return;
+    return 'No wallet to payout';
   }
 
   const walletService = await getWalletMachineServiceFromId(
@@ -605,6 +592,7 @@ const finalizeShow = async (
   });
 
   walletService.stop();
+  return 'success';
 };
 
 // Ticket Events
@@ -633,6 +621,7 @@ const customerJoined = async (
     ticket,
     customerName
   });
+  return 'success';
 };
 
 const customerLeft = async (
@@ -660,6 +649,7 @@ const customerLeft = async (
     ticket,
     customerName
   });
+  return 'success';
 };
 
 const ticketSold = async (
@@ -690,6 +680,7 @@ const ticketSold = async (
     sale,
     customerName
   });
+  return 'success';
 };
 
 const ticketRedeemed = async (show: ShowType, ticketId: string) => {
@@ -708,6 +699,7 @@ const ticketRedeemed = async (show: ShowType, ticketId: string) => {
     type: ShowMachineEventString.TICKET_REDEEMED,
     ticket
   });
+  return 'success';
 };
 
 const ticketReserved = async (
@@ -737,6 +729,7 @@ const ticketReserved = async (
     ticket,
     customerName
   });
+  return 'success';
 };
 
 const ticketRefunded = async (
@@ -760,6 +753,7 @@ const ticketRefunded = async (
     refund,
     ticket
   });
+  return 'success';
 };
 
 const ticketCancelled = async (
@@ -791,6 +785,7 @@ const ticketCancelled = async (
     customerName,
     cancel
   });
+  return 'success';
 };
 
 // Calculate feedback stats
@@ -844,7 +839,7 @@ const ticketFinalized = async (
       .group(groupBy);
 
     if (aggregate.length === 0) {
-      return;
+      return 'No feedback';
     }
 
     const averageRating = aggregate[0]['averageRating'] as number;
@@ -878,7 +873,7 @@ const ticketFinalized = async (
     const aggregate = await Show.aggregate().match(showFilter).group(groupBy);
 
     if (aggregate.length === 0) {
-      return;
+      return 'No feedback';
     }
 
     const averageRating = aggregate[0]['averageRating'] as number;
@@ -911,6 +906,7 @@ const ticketFinalized = async (
       finalize
     });
   }
+  return 'success';
 };
 
 const ticketDisputed = async (
@@ -934,13 +930,15 @@ const ticketDisputed = async (
     dispute,
     ticket
   });
+  return 'success';
 };
 
 const ticketDisputeResolved = async (
   show: ShowType,
   ticketId: string,
   decision: DisputeDecision,
-  showQueue: ShowQueueType
+  showQueue: ShowQueueType,
+  payoutQueue: PayoutQueueType
 ) => {
   console.log('ticketDisputeResolved', ticketId, decision);
   const showService = createShowMachineService({
@@ -955,15 +953,50 @@ const ticketDisputeResolved = async (
   const ticket = (await Ticket.findById(ticketId).exec()) as TicketType;
 
   showService.send({
-    type: ShowMachineEventString.DISPUTE_RESOLVED,
+    type: ShowMachineEventString.DISPUTE_DECIDED,
     ticket,
     decision
   });
 
   const ticketService = getTicketMachineService(ticket, showQueue);
 
-  ticketService.send({
-    type: TicketMachineEventString.DISPUTE_RESOLVED,
-    decision
-  });
+  if (decision === DisputeDecision.NO_REFUND) {
+    ticketService.send({
+      type: TicketMachineEventString.DISPUTE_DECIDED,
+      decision
+    });
+  }
+
+  // initiate refund if decided in favor of customer
+  if (
+    decision === DisputeDecision.FULL_REFUND ||
+    decision === DisputeDecision.PARTIAL_REFUND
+  ) {
+    if (!ticket.ticketState.sale) {
+      return 'No sale to refund';
+    }
+
+    const refund = ticket.ticketState.refund;
+    if (!refund) {
+      return 'No refund for dispute';
+    }
+
+    refund.approvedAmounts = new Map<string, number>(refund.requestedAmounts);
+
+    if (decision === DisputeDecision.PARTIAL_REFUND) {
+      for (const [key, value] of refund.requestedAmounts.entries()) {
+        refund.approvedAmounts.set(key, value / 2);
+      }
+    }
+    ticketService.send({
+      type: TicketMachineEventString.DISPUTE_DECIDED,
+      decision,
+      refund
+    });
+
+    payoutQueue.add(PayoutJobType.DISPUTE_PAYOUT, {
+      ticketId: ticket._id.toString()
+    });
+    return 'success';
+  }
 };
