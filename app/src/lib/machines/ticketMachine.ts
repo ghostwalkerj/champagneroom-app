@@ -171,6 +171,10 @@ const createTicketMachine = ({
             {
               target: '#ticketMachine.ended.missedShow',
               cond: 'ticketMissedShow'
+            },
+            {
+              target: '#ticketMachine.ended.inDispute.waiting4DisputeRefund',
+              cond: 'ticketInDisputeRefund'
             }
           ]
         },
@@ -336,34 +340,46 @@ const createTicketMachine = ({
               }
             },
             inDispute: {
-              on: {
-                'DISPUTE DECIDED': [
-                  {
-                    actions: [
-                      'decideDispute',
-                      raise({
-                        type: 'TICKET FINALIZED',
-                        finalize: {
-                          finalizedAt: new Date(),
-                          finalizedBy: ActorType.ARBITRATOR
-                        }
-                      })
-                    ],
-                    cond: 'noDisputeRefund'
-                  },
-                  { actions: 'decideDispute' }
-                ],
-                'REFUND RECEIVED': {
-                  actions: [
-                    'receiveRefund',
-                    raise({
-                      type: 'TICKET FINALIZED',
-                      finalize: {
-                        finalizedAt: new Date(),
-                        finalizedBy: ActorType.ARBITRATOR
+              initial: 'waiting4Decision',
+              states: {
+                waiting4Decision: {
+                  on: {
+                    'DISPUTE DECIDED': [
+                      {
+                        actions: [
+                          'decideDispute',
+                          raise({
+                            type: 'TICKET FINALIZED',
+                            finalize: {
+                              finalizedAt: new Date(),
+                              finalizedBy: ActorType.ARBITRATOR
+                            }
+                          })
+                        ],
+                        cond: 'noDisputeRefund'
+                      },
+                      {
+                        actions: 'decideDispute',
+                        target: 'waiting4DisputeRefund'
                       }
-                    })
-                  ]
+                    ]
+                  }
+                },
+                waiting4DisputeRefund: {
+                  on: {
+                    'REFUND RECEIVED': {
+                      actions: [
+                        'receiveRefund',
+                        raise({
+                          type: 'TICKET FINALIZED',
+                          finalize: {
+                            finalizedAt: new Date(),
+                            finalizedBy: ActorType.ARBITRATOR
+                          }
+                        })
+                      ]
+                    }
+                  }
                 }
               }
             },
@@ -680,7 +696,8 @@ const createTicketMachine = ({
             ticketState: {
               ...context.ticketState,
               dispute,
-              refund
+              refund,
+              status: TicketStatus.WAITING_FOR_DISPUTE_REFUND
             }
           };
         }),
@@ -728,6 +745,9 @@ const createTicketMachine = ({
           context.ticketState.status === TicketStatus.WAITING_FOR_REFUND,
         ticketMissedShow: (context) =>
           context.ticketState.status === TicketStatus.MISSED_SHOW,
+        ticketInDisputeRefund: (context) =>
+          context.ticketState.status ===
+          TicketStatus.WAITING_FOR_DISPUTE_REFUND,
         fullyPaid: (context, event) => {
           const amount =
             event.type === 'PAYMENT RECEIVED' ? +event.transaction?.amount : 0;

@@ -179,15 +179,17 @@ export const getInvoiceWorker = ({
             case InvoiceStatus.REFUNDED: {
               // Get the refund, payout, and ticket
               // Create a return transaction
-              const refundedInvoice = async (invoice: DisplayInvoice) => {
+              const refundInvoice = async (invoice: DisplayInvoice) => {
                 try {
                   const refundId = invoice.refund_id;
                   if (!refundId) {
+                    console.error('No refund id');
                     return 'No refund id';
                   }
 
                   const ticketId = invoice.order_id;
                   if (!ticketId) {
+                    console.error('No ticket id');
                     return 'No ticket id';
                   }
 
@@ -205,9 +207,11 @@ export const getInvoiceWorker = ({
                     }
                   );
                   const refund = response.data;
+                  console.log(refund);
 
                   const payoutId = refund.payout_id;
                   if (!payoutId) {
+                    console.error('No payout id');
                     return 'No payout id';
                   }
 
@@ -220,6 +224,7 @@ export const getInvoiceWorker = ({
                   const bcPayout = response.data as unknown as DisplayPayout;
 
                   if (!bcPayout) {
+                    console.error('No payout');
                     return 'No payout';
                   }
 
@@ -227,6 +232,7 @@ export const getInvoiceWorker = ({
                     ?.payoutReason as PayoutReason;
 
                   if (!reason) {
+                    console.error('No payout reason');
                     return 'No payout reason';
                   }
 
@@ -261,7 +267,7 @@ export const getInvoiceWorker = ({
                   return 'Refund error';
                 }
               };
-              refundedInvoice(invoice);
+              refundInvoice(invoice);
               return 'success';
             }
 

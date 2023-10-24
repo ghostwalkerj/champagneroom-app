@@ -1,6 +1,7 @@
 import type { Job, Queue } from 'bullmq';
 import { Worker } from 'bullmq';
 import type IORedis from 'ioredis';
+import { waitFor } from 'xstate/lib/waitFor';
 
 import type {
   CancelType,
@@ -993,6 +994,12 @@ const ticketDisputeResolved = async (
       decision,
       refund
     });
+
+    const waitState = await waitFor(ticketService, (state) =>
+      state.matches('ended.inDispute.waiting4DisputeRefund')
+    );
+    console.log('waitState', waitState.value);
+    console.log('waitState', waitState.context.ticketState.refund);
 
     payoutQueue.add(PayoutJobType.DISPUTE_PAYOUT, {
       ticketId: ticket._id.toString()

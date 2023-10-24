@@ -2,7 +2,6 @@ import { error, fail, redirect } from '@sveltejs/kit';
 import type { AxiosResponse } from 'axios';
 import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
-import { ObjectId } from 'mongodb';
 import { Types } from 'mongoose';
 import urlJoin from 'url-join';
 

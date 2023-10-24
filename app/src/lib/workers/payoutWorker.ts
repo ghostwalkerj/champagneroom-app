@@ -281,6 +281,7 @@ export const getPayoutWorker = ({
                 console.error('No refund found');
                 return 'No refund found';
               }
+              console.log('refund', ticket.ticketState.refund);
               const amount =
                 ticket.ticketState.refund.approvedAmounts.get(currency);
               if (!amount) {
