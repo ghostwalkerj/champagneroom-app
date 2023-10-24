@@ -17,21 +17,21 @@ const config: UserConfig = {
   ],
   resolve: {
     alias: {
-  
+
     }
   },
   build: {
     chunkSizeWarningLimit: 16000,
     rollupOptions: {
       external: ['@web3-onboard/*'],
-      
+
     },
     commonjsOptions: {
       transformMixedEsModules: true
     }
   },
   server: {
-    https: false,
+    https: true,
     fs: {
       // Allow serving files from one level up to the project root
       allow: ['..'],

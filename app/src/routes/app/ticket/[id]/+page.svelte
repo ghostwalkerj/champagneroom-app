@@ -12,7 +12,8 @@
     PUBLIC_SHOWTIME_PATH
   } from '$env/static/public';
 
-  import { DisputeReason } from '$lib/models/common';
+  import type { RefundType } from '$lib/models/common';
+  import { DisputeReason, RefundReason } from '$lib/models/common';
   import { type ShowDocumentType, ShowStatus } from '$lib/models/show';
   import type { TicketDocumentType } from '$lib/models/ticket';
 
@@ -146,7 +147,17 @@
         reason: DisputeReason.ENDED_EARLY,
         explanation: 'The show ended early',
         resolved: false
-      }
+      },
+      refund: {
+        requestedAmounts: {} as Map<string, number>,
+        approvedAmounts: {} as Map<string, number>,
+        requestedAt: new Date(),
+        transactions: [],
+        actualAmounts: {} as Map<string, number>,
+        reason: RefundReason.DISPUTE_DECISION,
+        totals: {} as Map<string, number>,
+        payouts: {} as any
+      } as RefundType
     });
     hasMissedShow = state.matches('ended.missedShow');
     isWaitingForShow =
