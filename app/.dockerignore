@@ -1,2 +1,6 @@
-#.dockerignore 
+#.dockerignore
 .vscode
+.env
+.env.dev
+buikd
+.yarn

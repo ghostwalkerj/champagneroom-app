@@ -2,7 +2,6 @@ import { createBullBoard } from '@bull-board/api';
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
 import { ExpressAdapter } from '@bull-board/express';
 import { format, generate } from 'build-number-generator';
-import cors from 'cors';
 import 'dotenv/config';
 import express from 'express';
 import parseArgv from 'tiny-parse-argv';
@@ -24,10 +23,6 @@ const bullMQPath = process.env.BULLMQ_ADMIN_PATH || '/admin/queues';
 
 const startWorker = parseArgv(process.argv).worker || false;
 const app = express();
-const corsOptions = {
-  origin: '*',
-  optionsSuccessStatus: 200
-};
 
 const redisOptions = {
   connection: {
@@ -112,8 +107,14 @@ const staticAuth = basicAuth({
 app.get(bullMQPath, staticAuth);
 app.use(bullMQPath, serverAdapter.getRouter());
 
+// health check
+// eslint-disable-next-line unicorn/prevent-abbreviations
+app.get('/health', (_, res) => {
+  res.send('OK');
+});
+
 // Svelte App
-app.use(cors(corsOptions), handler);
+app.use(handler);
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log('pCall server running on:', port);

@@ -89,5 +89,4 @@ export const needAuth = (
   cookies.set('role', role, { path: authUrl });
   cookies.set('tokenName', tokenName, { path: authUrl });
   cookies.set('address', address, { path: authUrl });
-  cookies.delete(tokenName, { path: '/' });
 };
