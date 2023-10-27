@@ -22,13 +22,7 @@ export enum EntityType {
   NONE = 'NONE'
 }
 
-/* eslint-disable @typescript-eslint/naming-convention */
-export enum TokenRoles {
-  ADMIN = 'ADMIN',
-  PUBLIC = 'PUBLIC',
-  AGENT = 'AGENT',
-  CREATOR = 'CREATOR'
-}
+
 
 export const currencyFormatter = (
   currency = CurrencyType.USD.toString(),

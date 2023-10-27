@@ -3,12 +3,11 @@ import type { AxiosResponse } from 'axios';
 import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 
-import { BITCART_EMAIL, BITCART_PASSWORD } from '$env/static/private';
-import { BITCART_API_URL } from '$env/static/private';
+import { BITCART_API_URL, BITCART_EMAIL, BITCART_PASSWORD } from '$env/static/private';
 
 import type { CancelType } from '$lib/models/common';
 import { CancelReason, CurrencyType } from '$lib/models/common';
-import type { CreatorType } from '$lib/models/creator';
+import type { CreatorDocument } from '$lib/models/creator';
 import { Creator } from '$lib/models/creator';
 import { Show, ShowStatus } from '$lib/models/show';
 import { Wallet, WalletStatus } from '$lib/models/wallet';
@@ -21,12 +20,8 @@ import type { ShowQueueType } from '$lib/workers/showWorker';
 
 import { ActorType, EntityType } from '$lib/constants';
 import { rateCryptosRateGet } from '$lib/ext/bitcart';
-import {
-  createAuthToken,
-  PayoutJobType,
-  PayoutReason
-} from '$lib/util/payment';
-import { getShowMachineServiceFromId } from '$lib/util/util.server';
+import { PayoutJobType, PayoutReason, createAuthToken } from '$lib/payment';
+import { getShowMachineServiceFromId } from '$lib/server/machinesUtil';
 
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
 
@@ -75,7 +70,7 @@ export const actions: Actions = {
       .orFail(() => {
         throw error(404, 'Creator not found');
       })
-      .exec()) as CreatorType;
+      .exec()) as CreatorDocument;
 
     const show = await Show.create({
       price: {

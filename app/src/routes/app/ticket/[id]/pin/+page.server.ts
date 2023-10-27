@@ -5,7 +5,7 @@ import { PUBLIC_TICKET_PATH } from '$env/static/public';
 
 import { Ticket } from '$lib/models/ticket';
 
-import { createPinHash, verifyPin } from '$lib/util/pin';
+import { createPinHash, verifyPin } from '$lib/pin';
 
 import type { Actions, PageServerLoad } from './$types';
 

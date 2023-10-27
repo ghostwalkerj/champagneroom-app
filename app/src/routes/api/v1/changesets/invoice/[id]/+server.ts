@@ -1,10 +1,9 @@
 import { error } from '@sveltejs/kit';
 import type { AxiosResponse } from 'axios';
 
-import { BITCART_EMAIL, BITCART_PASSWORD } from '$env/static/private';
-import { BITCART_API_URL } from '$env/static/private';
+import { BITCART_API_URL, BITCART_EMAIL, BITCART_PASSWORD } from '$env/static/private';
 
-import { createAuthToken } from '$lib/util/payment';
+import { createAuthToken } from '$lib/payment';
 
 import { getInvoiceByIdInvoicesModelIdGet } from '$ext/bitcart';
 import type { DisplayInvoice } from '$ext/bitcart/models';

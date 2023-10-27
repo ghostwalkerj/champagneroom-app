@@ -1,7 +1,8 @@
 import type { InferSchemaType, Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
+import mongooseAutoPopulate from 'mongoose-autopopulate';
 
-import { userSchema } from './common';
+import type { UserDocumentType } from './user';
 
 const { Schema, models } = pkg;
 
@@ -60,9 +61,11 @@ const creatorSchema = new Schema(
     _id: { type: Schema.Types.ObjectId, required: true, auto: true },
 
     user: {
-      type: userSchema,
+      type: Schema.Types.ObjectId,
+      ref: 'User',
       required: true,
-      index: true
+      unique: true,
+      autopopulate: true
     },
     profileImageUrl: {
       type: String,
@@ -90,9 +93,13 @@ const creatorSchema = new Schema(
   { timestamps: true }
 );
 
-export type CreatorDocumentType = InferSchemaType<typeof creatorSchema>;
+creatorSchema.plugin(mongooseAutoPopulate);
 
-export type CreatorType = InstanceType<typeof Creator>;
+export type CreatorDocument = InstanceType<typeof Creator>;
+
+export type CreatorDocumentType = InferSchemaType<typeof creatorSchema> & {
+  user: UserDocumentType;
+};
 
 export const Creator = models?.Creator
   ? (models?.Creator as Model<CreatorDocumentType>)

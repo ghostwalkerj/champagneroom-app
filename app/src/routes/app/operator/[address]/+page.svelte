@@ -17,10 +17,10 @@
   import { DisputeDecision } from '$lib/models/common';
   import type { CreatorDocumentType } from '$lib/models/creator';
   import type { OperatorDocumentType } from '$lib/models/operator';
-  import type { ShowType } from '$lib/models/show';
+  import type { ShowDocument } from '$lib/models/show';
 
   import { currencyFormatter } from '$lib/constants';
-  import { womensNames } from '$lib/util/womensNames';
+  import { womensNames } from '$lib/womensNames';
 
   import { nameStore } from '$stores';
 
@@ -66,7 +66,7 @@
   const decideDispute = async (decision: DisputeDecision) => {
     const index = activeDisputeRow;
     const ticket = disputedTickets[index];
-    const show = ticket.show as unknown as ShowType;
+    const show = ticket.show as unknown as ShowDocument;
 
     let formData = new FormData();
     formData.append('ticketId', ticket._id.toString());
@@ -82,12 +82,12 @@
     isDecideDispute = false;
   };
 
-  const changeCreatorUrl = async () => {
+  const changeUserAddress = async () => {
     const index = activeCreatorRow;
-    const creatorId = creators[index]._id.toString();
+    const userId = creators[index].user._id.toString();
     let formData = new FormData();
-    formData.append('creatorId', creatorId);
-    const response = await fetch('?/change_creator_key', {
+    formData.append('userId', userId);
+    const response = await fetch('?/change_user_address', {
       method: 'POST',
       body: formData
     });
@@ -250,7 +250,7 @@
           <button class="btn" on:click={() => (isChangeCreatorUrl = false)}
             >Cancel</button
           >
-          <button class="btn" on:click={changeCreatorUrl}>Change</button>
+          <button class="btn" on:click={changeUserAddress}>Change</button>
         </div>
       </div>
     </div>
@@ -689,44 +689,42 @@
                     </thead>
                     <tbody>
                       {#each disputedTickets as ticket, index}
-                        <tr
-                          class:bg-base-300={activeDisputeRow === index}
-                          on:click={() => (activeDisputeRow = index)}
-                        >
-                          <td>{index + 1}</td>
-                          <td>{ticket.show.creatorInfo.name}</td>
-                          <td
-                            >{currencyFormatter(ticket.price.currency).format(
-                              ticket.price.amount
-                            )}</td
+                        {@const runtime = ticket.show.showState.runtime}
+                        {#if runtime}
+                          <tr
+                            class:bg-base-300={activeDisputeRow === index}
+                            on:click={() => (activeDisputeRow = index)}
                           >
-                          <td
-                            >{spacetime(
-                              ticket.show.showState.runtime.startDate
-                            ).format('nice')}</td
-                          >
-                          <td
-                            >{spacetime(
-                              ticket.show.showState.runtime.endDate
-                            ).format('nice')}</td
-                          >
-                          <td
-                            >{spacetime(
-                              ticket.show.showState.runtime.startDate
-                            ).diff(ticket.show.showState.runtime.endDate)
-                              .minutes}
-                            min</td
-                          >
-                          <td>{ticket.ticketState.dispute?.reason}</td>
-                          <td>{ticket.ticketState.dispute?.explanation}</td>
-                          <td
-                            ><button
-                              class="btn btn-primary btn-xs"
-                              on:click={() => (isDecideDispute = true)}
-                              >Decide</button
-                            ></td
-                          >
-                        </tr>
+                            <td>{index + 1}</td>
+                            <td>{ticket.show.creatorInfo.name}</td>
+                            <td
+                              >{currencyFormatter(ticket.price.currency).format(
+                                ticket.price.amount
+                              )}</td
+                            >
+                            <td
+                              >{spacetime(runtime.startDate || '').format(
+                                'nice'
+                              )}</td
+                            >
+                            <td>{spacetime(runtime.endDate).format('nice')}</td>
+                            <td
+                              >{spacetime(runtime.startDate).diff(
+                                runtime.endDate ?? spacetime.now()
+                              ).minutes}
+                              min</td
+                            >
+                            <td>{ticket.ticketState.dispute?.reason}</td>
+                            <td>{ticket.ticketState.dispute?.explanation}</td>
+                            <td
+                              ><button
+                                class="btn btn-primary btn-xs"
+                                on:click={() => (isDecideDispute = true)}
+                                >Decide</button
+                              ></td
+                            >
+                          </tr>
+                        {/if}
                       {/each}
                     </tbody>
                   </table>

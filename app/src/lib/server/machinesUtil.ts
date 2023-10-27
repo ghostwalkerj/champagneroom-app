@@ -2,14 +2,14 @@ import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 import mongoose, { Error } from 'mongoose';
 
-import { SaveState, type ShowType } from '$lib/models/show';
+import { SaveState, type ShowDocument } from '$lib/models/show';
 import { createShowEvent } from '$lib/models/showEvent';
 import {
-  Ticket,
-  type TicketStateType,
-  type TicketType
+    Ticket,
+    type TicketDocument,
+    type TicketStateType
 } from '$lib/models/ticket';
-import type { WalletType } from '$lib/models/wallet';
+import type { WalletDocument } from '$lib/models/wallet';
 import { atomicUpdateCallback } from '$lib/models/wallet';
 
 import { createShowMachineService } from '$lib/machines/showMachine';
@@ -20,7 +20,7 @@ import type { ShowQueueType } from '$lib/workers/showWorker';
 
 import { EntityType } from '$lib/constants';
 
-export const getShowMachineService = (show: ShowType) => {
+export const getShowMachineService = (show: ShowDocument) => {
   return createShowMachineService({
     showDocument: show,
     showMachineOptions: {
@@ -47,7 +47,7 @@ export const getShowMachineServiceFromId = async (showId: string) => {
 };
 
 export const getTicketMachineService = (
-  ticket: TicketType,
+  ticket: TicketDocument,
   connection: ShowQueueType | IORedis
 ) => {
   const ticketMachineOptions = {
@@ -81,7 +81,7 @@ export const getTicketMachineServiceFromId = async (
   return getTicketMachineService(ticket, connection);
 };
 
-export const getWalletMachineService = (wallet: WalletType) => {
+export const getWalletMachineService = (wallet: WalletDocument) => {
   return createWalletMachineService({
     wallet,
     walletMachineOptions: {

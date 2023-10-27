@@ -8,26 +8,26 @@ import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 import { raise } from 'xstate/lib/actions';
 
 import type {
-  CancelType,
-  CurrencyType,
-  DisputeType,
-  FeedbackType,
-  FinalizeType,
-  RefundType,
-  SaleType
+    CancelType,
+    CurrencyType,
+    DisputeType,
+    FeedbackType,
+    FinalizeType,
+    RefundType,
+    SaleType
 } from '$lib/models/common';
 import { DisputeDecision, RefundReason } from '$lib/models/common';
 import type { TicketDocumentType, TicketStateType } from '$lib/models/ticket';
 import { TicketStatus } from '$lib/models/ticket';
 import type {
-  TransactionDocumentType,
-  TransactionSummaryType
+    TransactionDocumentType,
+    TransactionSummaryType
 } from '$lib/models/transaction';
 
 import type { ShowJobDataType } from '$lib/workers/showWorker';
 
 import { ActorType } from '$lib/constants';
-import { calcTotal } from '$lib/util/payment';
+import { calcTotal } from '$lib/payment';
 
 import { ShowMachineEventString } from './showMachine';
 
@@ -843,7 +843,7 @@ export enum TicketMachineEventString {
 
 export { TicketMachineEventType };
 
-export { createTicketMachine };
+    export { createTicketMachine };
 
 export const createTicketMachineService = ({
   ticketDocument,

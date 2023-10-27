@@ -12,8 +12,8 @@
     PUBLIC_STATIC_URL
   } from '$env/static/public';
 
-  import { defaultWallet } from '$lib/util/web3';
-  import { womensNames } from '$lib/util/womensNames';
+  import { defaultWallet } from '$lib/web3';
+  import { womensNames } from '$lib/womensNames';
 
   import ConnectButton from '$components/header/ConnectButton.svelte';
 

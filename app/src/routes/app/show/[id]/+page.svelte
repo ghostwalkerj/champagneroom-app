@@ -7,7 +7,7 @@
 
   import { ShowStatus } from '$lib/models/show';
 
-  import getProfileImage from '$lib/util/profilePhoto';
+  import getProfileImage from '$lib/profilePhoto';
 
   import ShowDetail from '$components/ShowDetail.svelte';
   import { showStore } from '$stores';

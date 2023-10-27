@@ -6,7 +6,7 @@
   import { page } from '$app/stores';
   import { PUBLIC_OPERATOR_PATH } from '$env/static/public';
 
-  import { selectedAccount } from '$lib/util/web3';
+  import { selectedAccount } from '$lib/web3';
 
   onMount(() => {
     const operatorBasePath = urlJoin(

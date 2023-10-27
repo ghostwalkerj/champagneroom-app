@@ -5,7 +5,7 @@
   import type { TicketDocumentType } from '$lib/models/ticket';
 
   import { currencyFormatter, durationFormatter } from '$lib/constants';
-  import getProfileImage from '$lib/util/profilePhoto';
+  import getProfileImage from '$lib/profilePhoto';
   export let show: ShowDocumentType;
   export let ticket: TicketDocumentType;
 

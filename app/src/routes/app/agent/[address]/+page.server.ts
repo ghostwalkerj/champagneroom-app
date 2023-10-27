@@ -4,16 +4,16 @@ import { uniqueNamesGenerator } from 'unique-names-generator';
 import urlJoin from 'url-join';
 
 import {
-  PUBLIC_AGENT_PATH,
-  PUBLIC_DEFAULT_PROFILE_IMAGE
+    PUBLIC_AGENT_PATH,
+    PUBLIC_DEFAULT_PROFILE_IMAGE
 } from '$env/static/public';
 
 import { Agent } from '$lib/models/agent';
-import { AuthType } from '$lib/models/common';
 import { Creator } from '$lib/models/creator';
+import { AuthType } from '$lib/models/user';
 import { Wallet } from '$lib/models/wallet';
 
-import { womensNames } from '$lib/util/womensNames';
+import { womensNames } from '$lib/womensNames';
 
 import type { Actions, PageServerLoad } from './$types';
 

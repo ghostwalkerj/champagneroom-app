@@ -4,15 +4,16 @@ import { fieldEncryption } from 'mongoose-field-encryption';
 import validator from 'validator';
 
 import {
-  cancelSchema,
-  disputeSchema,
-  escrowSchema,
-  feedbackSchema,
-  finalizeSchema,
-  moneySchema,
-  refundSchema,
-  saleSchema
+    cancelSchema,
+    disputeSchema,
+    escrowSchema,
+    feedbackSchema,
+    finalizeSchema,
+    moneySchema,
+    refundSchema,
+    saleSchema
 } from './common';
+import type { ShowDocumentType } from './show';
 
 enum TicketStatus {
   RESERVED = 'RESERVED',
@@ -33,7 +34,7 @@ enum TicketStatus {
 }
 
 const { Schema, models } = pkg;
-export type TicketDocumentType = InferSchemaType<typeof ticketSchema>;
+export type TicketDocument = InstanceType<typeof Ticket>;
 
 const redemptionSchema = new Schema({
   redeemedAt: { type: Date, default: Date.now }
@@ -102,11 +103,16 @@ ticketSchema.plugin(fieldEncryption, {
   secret: process.env.MONGO_DB_FIELD_SECRET
 });
 
+export type TicketDocumentType = InferSchemaType<typeof ticketSchema> & {
+  show: ShowDocumentType;
+};
+
 export type TicketStateType = InferSchemaType<typeof ticketStateSchema>;
 
-export type TicketType = InstanceType<typeof Ticket>;
-
-export const SaveState = (ticket: TicketType, newState: TicketStateType) => {
+export const SaveState = (
+  ticket: TicketDocument,
+  newState: TicketStateType
+) => {
   Ticket.updateOne(
     { _id: ticket._id },
     { $set: { showState: newState } }

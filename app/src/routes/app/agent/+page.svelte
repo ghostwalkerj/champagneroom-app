@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  import { defaultWallet } from '$lib/util/web3';
+  import { defaultWallet } from '$lib/web3';
 
   import ConnectButton from '$components/header/ConnectButton.svelte';
 

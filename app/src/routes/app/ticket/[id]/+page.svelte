@@ -14,15 +14,15 @@
 
   import type { RefundType } from '$lib/models/common';
   import { DisputeReason, RefundReason } from '$lib/models/common';
-  import { type ShowDocumentType, ShowStatus } from '$lib/models/show';
+  import { ShowStatus, type ShowDocumentType } from '$lib/models/show';
   import type { TicketDocumentType } from '$lib/models/ticket';
 
   import type { TicketMachineServiceType } from '$lib/machines/ticketMachine';
   import { createTicketMachineService } from '$lib/machines/ticketMachine';
 
   import { ActorType } from '$lib/constants';
-  import type { PaymentType } from '$lib/util/payment';
-  import { connect, defaultWallet, selectedAccount } from '$lib/util/web3';
+  import type { PaymentType } from '$lib/payment';
+  import { connect, defaultWallet, selectedAccount } from '$lib/web3';
 
   import { nameStore, showStore, ticketStore } from '$stores';
 

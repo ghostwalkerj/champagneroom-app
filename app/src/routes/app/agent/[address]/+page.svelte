@@ -15,7 +15,7 @@
   import type { CreatorDocumentType } from '$lib/models/creator';
 
   import { currencyFormatter } from '$lib/constants';
-  import { womensNames } from '$lib/util/womensNames';
+  import { womensNames } from '$lib/womensNames';
 
   import { nameStore } from '$stores';
 

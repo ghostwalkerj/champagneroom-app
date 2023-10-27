@@ -6,16 +6,16 @@ import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 import { raise } from 'xstate/lib/actions';
 
 import type {
-  CancelType,
-  DisputeType,
-  FinalizeType,
-  RefundType,
-  SaleType
+    CancelType,
+    DisputeType,
+    FinalizeType,
+    RefundType,
+    SaleType
 } from '$lib/models/common';
 import { DisputeDecision } from '$lib/models/common';
 import type { ShowDocumentType } from '$lib/models/show';
 import { ShowStatus } from '$lib/models/show';
-import type { TicketType } from '$lib/models/ticket.js';
+import type { TicketDocument } from '$lib/models/ticket.js';
 import type { TransactionDocumentType } from '$lib/models/transaction';
 
 import { ActorType } from '$lib/constants';
@@ -46,34 +46,34 @@ export type ShowMachineEventType =
     }
   | {
       type: 'TICKET FINALIZED';
-      ticket: TicketType;
+      ticket: TicketDocument;
     }
   | {
       type: 'REFUND INITIATED';
     }
   | {
       type: 'TICKET REFUNDED';
-      ticket: TicketType;
+      ticket: TicketDocument;
       refund: RefundType;
     }
   | {
       type: 'TICKET REDEEMED';
-      ticket: TicketType;
+      ticket: TicketDocument;
     }
   | {
       type: 'TICKET RESERVED';
-      ticket: TicketType;
+      ticket: TicketDocument;
       customerName: string;
     }
   | {
       type: 'TICKET CANCELLED';
-      ticket: TicketType;
+      ticket: TicketDocument;
       customerName: string;
       cancel: CancelType;
     }
   | {
       type: 'TICKET SOLD';
-      ticket: TicketType;
+      ticket: TicketDocument;
       sale: SaleType;
       customerName: string;
     }
@@ -92,22 +92,22 @@ export type ShowMachineEventType =
     }
   | {
       type: 'CUSTOMER JOINED';
-      ticket: TicketType;
+      ticket: TicketDocument;
       customerName: string;
     }
   | {
       type: 'CUSTOMER LEFT';
-      ticket: TicketType;
+      ticket: TicketDocument;
       customerName: string;
     }
   | {
       type: 'TICKET DISPUTED';
       dispute: DisputeType;
-      ticket: TicketType;
+      ticket: TicketDocument;
     }
   | {
       type: 'DISPUTE DECIDED';
-      ticket: TicketType;
+      ticket: TicketDocument;
       decision: DisputeDecision;
     };
 
@@ -717,7 +717,7 @@ const createShowMachine = ({
   );
 };
 
-export { ShowMachineEventString, createShowMachine };
+export { createShowMachine, ShowMachineEventString };
 export const createShowMachineService = ({
   showDocument,
   showMachineOptions
@@ -740,7 +740,7 @@ export const createShowMachineService = ({
     showService.onEvent((event) => {
       let ticketId: string | undefined;
       if ('ticket' in event) {
-        const ticket = event.ticket as TicketType;
+        const ticket = event.ticket as TicketDocument;
         ticketId = ticket._id.toString();
       }
 

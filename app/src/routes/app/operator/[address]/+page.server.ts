@@ -13,11 +13,13 @@ import {
 } from '$env/static/public';
 
 import { Agent } from '$lib/models/agent';
-import { AuthType, type DisputeDecision } from '$lib/models/common';
+import type { DisputeDecision } from '$lib/models/common';
 import { Creator } from '$lib/models/creator';
+import type { OperatorDocument } from '$lib/models/operator';
 import { Operator } from '$lib/models/operator';
-import type { ShowType } from '$lib/models/show';
+import type { ShowDocument } from '$lib/models/show';
 import { Ticket } from '$lib/models/ticket';
+import { AuthType, User } from '$lib/models/user';
 import { Wallet } from '$lib/models/wallet';
 
 import { ShowMachineEventString } from '$lib/machines/showMachine';
@@ -25,7 +27,7 @@ import { ShowMachineEventString } from '$lib/machines/showMachine';
 import type { ShowQueueType } from '$lib/workers/showWorker';
 
 import { EntityType } from '$lib/constants';
-import { womensNames } from '$lib/util/womensNames';
+import { womensNames } from '$lib/womensNames';
 
 import type { PageServerLoad } from './$types';
 
@@ -50,11 +52,15 @@ export const actions: Actions = {
     try {
       const wallet = new Wallet();
       wallet.save();
+      const user = await User.create({
+        name,
+        authType: AuthType.SIGNING,
+        address: address.toLowerCase(),
+        wallet: wallet._id,
+        roles: [EntityType.AGENT]
+      });
       const agent = await Agent.create({
-        'user.address': address.toLowerCase(),
-        'user.name': name,
-        'user.authType': AuthType.SIGNING,
-        'user.wallet': wallet._id
+        user: user._id
       });
 
       return {
@@ -86,13 +92,15 @@ export const actions: Actions = {
     try {
       const wallet = new Wallet();
       wallet.save();
+      const user = await User.create({
+        name,
+        authType: AuthType.UNIQUE_KEY,
+        address: nanoid(30),
+        wallet: wallet._id,
+        roles: [EntityType.CREATOR]
+      });
       const creator = await Creator.create({
-        user: {
-          name,
-          authType: AuthType.UNIQUE_KEY,
-          address: nanoid(30),
-          wallet: wallet._id
-        },
+        user: user._id,
         agentCommission: +commission,
         agent: new ObjectId(agentId),
         profileImageUrl: PUBLIC_DEFAULT_PROFILE_IMAGE
@@ -112,6 +120,7 @@ export const actions: Actions = {
   update_creator: async ({ request }) => {
     const data = await request.formData();
     const creatorId = data.get('creatorId') as string;
+    const userId = data.get('userId') as string;
     const name = data.get('name') as string;
     const commission = data.get('commission') as string;
     const active = data.get('active') as string;
@@ -124,6 +133,9 @@ export const actions: Actions = {
     if (Number.isNaN(+commission) || +commission < 0 || +commission > 100) {
       return fail(400, { commission, badCommission: true });
     }
+    if (!userId) {
+      return fail(400, { userId, badUserId: true });
+    }
 
     if (active !== 'true' && active !== 'false') {
       return fail(400, { active, badActive: true });
@@ -135,10 +147,17 @@ export const actions: Actions = {
           _id: creatorId
         },
         {
-          'user.name': name,
           agentCommission: +commission,
-          'user.active': active === 'true',
           agent: new ObjectId(agentId)
+        }
+      );
+      await User.findOneAndUpdate(
+        {
+          _id: userId
+        },
+        {
+          name,
+          active: active === 'true'
         }
       );
     } catch (error) {
@@ -149,24 +168,24 @@ export const actions: Actions = {
       success: true
     };
   },
-  change_creator_key: async ({ request }) => {
+  changer_user_address: async ({ request }) => {
     const data = await request.formData();
-    const creatorId = data.get('creatorId') as string;
+    const userId = data.get('userId') as string;
 
     // Validation
-    if (creatorId === null) {
-      return fail(400, { creatorId, missingCreatorId: true });
+    if (userId === null) {
+      return fail(400, { userId, missingCreatorId: true });
     }
 
     const address = nanoid(30);
 
     try {
-      await Creator.findOneAndUpdate(
+      await User.findOneAndUpdate(
         {
-          _id: creatorId
+          _id: userId
         },
         {
-          'user.address': address
+          address: address
         }
       );
     } catch (error) {
@@ -210,7 +229,7 @@ export const actions: Actions = {
   }
 };
 
-export const load: PageServerLoad = async ({ params, url }) => {
+export const load: PageServerLoad = async ({ params, url, locals }) => {
   const address = params.address;
   const operatorUrl = urlJoin(url.origin, PUBLIC_OPERATOR_PATH);
 
@@ -218,28 +237,16 @@ export const load: PageServerLoad = async ({ params, url }) => {
     throw redirect(307, operatorUrl);
   }
 
-  const operator = await Operator.findOne({ 'user.address': address })
-    .orFail(() => {
-      throw redirect(307, operatorUrl);
-    })
-    .exec();
-
-  // if (!operator) {
-  //   const wallet = new Wallet();
-  //   operator = await Operator.create({
-  //     user: {
-  //       address,
-  //       name: 'Big Daddy',
-  //       wallet: wallet._id
-  //     }
-  //   });
-  // }
+  const operator = locals.operator as OperatorDocument;
+  if (!operator) {
+    throw redirect(307, operatorUrl);
+  }
   const agents = await Agent.find().sort({ 'user.name': 1 });
   const creators = await Creator.find().sort({ 'user.name': 1 });
 
   const disputedTickets = await Ticket.find({
     'ticketState.dispute.resolved': false
-  }).populate<{ show: ShowType }>('show');
+  }).populate<{ show: ShowDocument }>('show');
 
   return {
     operator: operator.toObject({ flattenObjectIds: true, flattenMaps: true }),

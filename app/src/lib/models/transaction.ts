@@ -45,11 +45,11 @@ const transactionSchema = new Schema(
   { timestamps: true }
 );
 
+export type TransactionDocument = InstanceType<typeof Transaction>;
+
 export type TransactionDocumentType = InferSchemaType<typeof transactionSchema>;
 
 export type TransactionSummaryType = InferSchemaType<typeof transactionSummary>;
-
-export type TransactionType = InstanceType<typeof Transaction>;
 
 export const Transaction = models?.Transaction
   ? (models?.Transaction as Model<TransactionDocumentType>)

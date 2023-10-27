@@ -5,7 +5,7 @@ import { CurrencyType, earningsSchema, payoutSchema } from './common';
 
 const { Schema, models } = pkg;
 
-export type WalletDocumentType = InferSchemaType<typeof walletSchema>;
+export type WalletDocument = InstanceType<typeof Wallet>;
 
 enum WalletStatus {
   AVAILABLE = 'AVAILABLE',
@@ -57,7 +57,7 @@ const walletSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export type WalletType = InstanceType<typeof Wallet>;
+export type WalletDocumentType = InferSchemaType<typeof walletSchema>;
 
 export const Wallet = models?.Wallet
   ? (models.Wallet as Model<WalletDocumentType>)

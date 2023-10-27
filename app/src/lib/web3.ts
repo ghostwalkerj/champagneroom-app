@@ -9,9 +9,9 @@ import walletConnectModule from '@web3-onboard/walletconnect';
 import { derived, writable } from 'svelte/store';
 
 import {
-  PUBLIC_INFURA_API_KEY,
-  PUBLIC_STATIC_URL,
-  PUBLIC_WALLET_CONNECT_PROJECT_ID
+    PUBLIC_INFURA_API_KEY,
+    PUBLIC_STATIC_URL,
+    PUBLIC_WALLET_CONNECT_PROJECT_ID
 } from '$env/static/public';
 
 // Wallets
@@ -26,7 +26,8 @@ const trezor = trezorModule({
 const wcV2InitOptions = {
   version: 2 as const,
   projectId: PUBLIC_WALLET_CONNECT_PROJECT_ID,
-  requiredChains: [1]
+  requiredChains: [1],
+  dappUrl: 'https://champagneroom.app'
 };
 const walletConnect = walletConnectModule(wcV2InitOptions);
 

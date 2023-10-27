@@ -1,8 +1,7 @@
-import { type InferSchemaType, Schema } from 'mongoose';
-import validator from 'validator';
+import { Schema, type InferSchemaType } from 'mongoose';
 
 import { ActorType } from '$lib/constants';
-import { PayoutStatus } from '$lib/util/payment';
+import { PayoutStatus } from '$lib/payment';
 
 import { transactionSummary } from './transaction';
 
@@ -25,15 +24,6 @@ export type PayoutType = InferSchemaType<typeof payoutSchema>;
 export type RefundType = InferSchemaType<typeof refundSchema>;
 
 export type SaleType = InferSchemaType<typeof saleSchema>;
-
-export type UserType = InferSchemaType<typeof userSchema>;
-
-export enum AuthType {
-  SIGNING = 'SIGNING',
-  UNIQUE_KEY = 'UNIQUE KEY',
-  PASSWORD = 'PASSWORD',
-  NONE = 'NONE'
-}
 
 export enum CancelReason {
   CREATOR_NO_SHOW = 'CREATOR NO SHOW',
@@ -137,6 +127,7 @@ export const finalizeSchema = new Schema({
   finalizedAt: { type: Date, default: new Date() },
   finalizedBy: { type: String, enum: ActorType, required: true }
 });
+
 export const moneySchema = new Schema({
   amount: { type: Number, required: true },
   currency: {
@@ -146,6 +137,7 @@ export const moneySchema = new Schema({
     default: CurrencyType.USD
   }
 });
+
 export const payoutSchema = new Schema({
   payoutAt: { type: Date, default: new Date() },
   amount: { type: Number, required: true },
@@ -209,57 +201,3 @@ export const saleSchema = new Schema({
     default: () => new Map<string, number>()
   }
 });
-export const userSchema = new Schema(
-  {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    _id: { type: Schema.Types.ObjectId, required: true, auto: true },
-    wallet: {
-      type: Schema.Types.ObjectId,
-      ref: 'Wallet',
-      required: true,
-      index: true
-    },
-
-    address: {
-      type: String,
-      maxLength: 50,
-      lowerCase: true,
-      required: true,
-      index: true
-    },
-
-    payoutAddress: {
-      type: String,
-      maxLength: 50,
-      validator: (v: string) => validator.isEthereumAddress(v),
-      lowerCase: true
-    },
-
-    nonce: {
-      type: Number,
-      default: () => Math.floor(Math.random() * 1_000_000)
-    },
-
-    name: {
-      type: String,
-      maxLength: 50,
-      minLength: [3, 'Name is too short'],
-      required: true,
-      trim: true
-    },
-
-    authType: {
-      type: String,
-      enum: AuthType,
-      required: true,
-      default: AuthType.SIGNING
-    },
-
-    active: {
-      type: Boolean,
-      default: true,
-      index: true
-    }
-  },
-  { timestamps: true }
-);

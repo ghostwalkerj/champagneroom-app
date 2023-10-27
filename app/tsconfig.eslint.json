@@ -18,6 +18,7 @@
     "./types/**/$types.d.ts",
     "./src/**/*.js",
     "./src/**/*.ts",
+    "./scripts/**/*.js",
     "./src/**/*.svelte",
     "./tests/**/*.js",
     "./tests/**/*.ts",

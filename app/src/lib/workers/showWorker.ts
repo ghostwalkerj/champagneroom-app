@@ -12,10 +12,10 @@ import type {
 } from '$lib/models/common';
 import { DisputeDecision } from '$lib/models/common';
 import { Creator } from '$lib/models/creator';
-import type { ShowType } from '$lib/models/show';
+import type { ShowDocument } from '$lib/models/show';
 import { SaveState, Show, ShowStatus } from '$lib/models/show';
 import { createShowEvent } from '$lib/models/showEvent';
-import type { TicketType } from '$lib/models/ticket';
+import type { TicketDocument } from '$lib/models/ticket';
 import { Ticket, TicketStatus } from '$lib/models/ticket';
 
 import {
@@ -27,11 +27,11 @@ import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 import { WalletMachineEventString } from '$lib/machines/walletMachine';
 
 import { ActorType, EntityType } from '$lib/constants';
-import { PayoutJobType } from '$lib/util/payment';
+import { PayoutJobType } from '$lib/payment';
 import {
   getTicketMachineService,
   getWalletMachineServiceFromId
-} from '$lib/util/util.server';
+} from '$lib/server/machinesUtil';
 
 import type { PayoutQueueType } from './payoutWorker';
 
@@ -58,7 +58,9 @@ export const getShowWorker = ({
   return new Worker(
     EntityType.SHOW,
     async (job: Job<ShowJobDataType, any, ShowMachineEventString>) => {
-      const show = (await Show.findById(job.data.showId).exec()) as ShowType;
+      const show = (await Show.findById(
+        job.data.showId
+      ).exec()) as ShowDocument;
 
       if (!show) {
         return 'No show found';
@@ -142,7 +144,7 @@ export const getShowWorker = ({
 };
 
 const cancelShow = async (
-  show: ShowType,
+  show: ShowDocument,
   cancel: CancelType,
   showQueue: ShowQueueType
 ) => {
@@ -189,7 +191,7 @@ const cancelShow = async (
 };
 
 const refundShow = async (
-  show: ShowType,
+  show: ShowDocument,
   showQueue: ShowQueueType,
   payoutQueue: PayoutQueueType
 ) => {
@@ -226,7 +228,7 @@ const refundShow = async (
   return 'success';
 };
 
-const startShow = async (show: ShowType) => {
+const startShow = async (show: ShowDocument) => {
   const showService = createShowMachineService({
     showDocument: show,
     showMachineOptions: {
@@ -240,7 +242,7 @@ const startShow = async (show: ShowType) => {
 };
 
 const stopShow = async (
-  show: ShowType,
+  show: ShowDocument,
   gracePeriod: number,
   showQueue: ShowQueueType
 ) => {
@@ -267,7 +269,7 @@ const stopShow = async (
 
 // End show, alert ticket
 const endShow = async (
-  show: ShowType,
+  show: ShowDocument,
   escrowPeriod: number,
   showQueue: ShowQueueType
 ) => {
@@ -314,7 +316,7 @@ const endShow = async (
 };
 
 const finalizeShow = async (
-  show: ShowType,
+  show: ShowDocument,
   finalize: FinalizeType,
   showQueue: ShowQueueType
 ) => {
@@ -451,7 +453,7 @@ const finalizeShow = async (
       {
         returnDocument: 'after'
       }
-    )) as ShowType;
+    )) as ShowDocument;
     showSession.endSession();
   });
 
@@ -598,7 +600,7 @@ const finalizeShow = async (
 
 // Ticket Events
 const customerJoined = async (
-  show: ShowType,
+  show: ShowDocument,
   ticketId: string,
   customerName: string
 ) => {
@@ -616,7 +618,7 @@ const customerJoined = async (
         })
     }
   });
-  const ticket = (await Ticket.findById(ticketId).exec()) as TicketType;
+  const ticket = (await Ticket.findById(ticketId).exec()) as TicketDocument;
   showService.send({
     type: ShowMachineEventString.CUSTOMER_JOINED,
     ticket,
@@ -626,7 +628,7 @@ const customerJoined = async (
 };
 
 const customerLeft = async (
-  show: ShowType,
+  show: ShowDocument,
   ticketId: string,
   customerName: string
 ) => {
@@ -644,7 +646,7 @@ const customerLeft = async (
         })
     }
   });
-  const ticket = (await Ticket.findById(ticketId).exec()) as TicketType;
+  const ticket = (await Ticket.findById(ticketId).exec()) as TicketDocument;
   showService.send({
     type: ShowMachineEventString.CUSTOMER_LEFT,
     ticket,
@@ -654,7 +656,7 @@ const customerLeft = async (
 };
 
 const ticketSold = async (
-  show: ShowType,
+  show: ShowDocument,
   ticketId: string,
   sale: SaleType,
   customerName: string
@@ -673,7 +675,7 @@ const ticketSold = async (
         })
     }
   });
-  const ticket = (await Ticket.findById(ticketId).exec()) as TicketType;
+  const ticket = (await Ticket.findById(ticketId).exec()) as TicketDocument;
 
   showService.send({
     type: ShowMachineEventString.TICKET_SOLD,
@@ -684,7 +686,7 @@ const ticketSold = async (
   return 'success';
 };
 
-const ticketRedeemed = async (show: ShowType, ticketId: string) => {
+const ticketRedeemed = async (show: ShowDocument, ticketId: string) => {
   const showService = createShowMachineService({
     showDocument: show,
     showMachineOptions: {
@@ -694,7 +696,7 @@ const ticketRedeemed = async (show: ShowType, ticketId: string) => {
     }
   });
 
-  const ticket = (await Ticket.findById(ticketId).exec()) as TicketType;
+  const ticket = (await Ticket.findById(ticketId).exec()) as TicketDocument;
 
   showService.send({
     type: ShowMachineEventString.TICKET_REDEEMED,
@@ -704,7 +706,7 @@ const ticketRedeemed = async (show: ShowType, ticketId: string) => {
 };
 
 const ticketReserved = async (
-  show: ShowType,
+  show: ShowDocument,
   ticketId: string,
   customerName: string
 ) => {
@@ -723,7 +725,7 @@ const ticketReserved = async (
     }
   });
 
-  const ticket = (await Ticket.findById(ticketId).exec()) as TicketType;
+  const ticket = (await Ticket.findById(ticketId).exec()) as TicketDocument;
 
   showService.send({
     type: ShowMachineEventString.TICKET_RESERVED,
@@ -734,7 +736,7 @@ const ticketReserved = async (
 };
 
 const ticketRefunded = async (
-  show: ShowType,
+  show: ShowDocument,
   refund: RefundType,
   ticketId: string
 ) => {
@@ -747,7 +749,7 @@ const ticketRefunded = async (
     }
   });
 
-  const ticket = (await Ticket.findById(ticketId).exec()) as TicketType;
+  const ticket = (await Ticket.findById(ticketId).exec()) as TicketDocument;
 
   showService.send({
     type: ShowMachineEventString.TICKET_REFUNDED,
@@ -758,7 +760,7 @@ const ticketRefunded = async (
 };
 
 const ticketCancelled = async (
-  show: ShowType,
+  show: ShowDocument,
   ticketId: string,
   customerName: string,
   cancel: CancelType
@@ -778,7 +780,7 @@ const ticketCancelled = async (
     }
   });
 
-  const ticket = (await Ticket.findById(ticketId).exec()) as TicketType;
+  const ticket = (await Ticket.findById(ticketId).exec()) as TicketDocument;
 
   showService.send({
     type: ShowMachineEventString.TICKET_CANCELLED,
@@ -791,7 +793,7 @@ const ticketCancelled = async (
 
 // Calculate feedback stats
 const ticketFinalized = async (
-  show: ShowType,
+  show: ShowDocument,
   ticketId: string,
   showQueue: ShowQueueType
 ) => {
@@ -805,7 +807,7 @@ const ticketFinalized = async (
   });
   let showState = showService.getSnapshot();
 
-  const ticket = (await Ticket.findById(ticketId).exec()) as TicketType;
+  const ticket = (await Ticket.findById(ticketId).exec()) as TicketDocument;
 
   if (
     showState.can({
@@ -911,7 +913,7 @@ const ticketFinalized = async (
 };
 
 const ticketDisputed = async (
-  show: ShowType,
+  show: ShowDocument,
   dispute: DisputeType,
   ticketId: string
 ) => {
@@ -924,7 +926,7 @@ const ticketDisputed = async (
     }
   });
 
-  const ticket = (await Ticket.findById(ticketId).exec()) as TicketType;
+  const ticket = (await Ticket.findById(ticketId).exec()) as TicketDocument;
 
   showService.send({
     type: ShowMachineEventString.TICKET_DISPUTED,
@@ -935,7 +937,7 @@ const ticketDisputed = async (
 };
 
 const ticketDisputeResolved = async (
-  show: ShowType,
+  show: ShowDocument,
   ticketId: string,
   decision: DisputeDecision,
   showQueue: ShowQueueType,
@@ -951,7 +953,7 @@ const ticketDisputeResolved = async (
     }
   });
 
-  const ticket = (await Ticket.findById(ticketId).exec()) as TicketType;
+  const ticket = (await Ticket.findById(ticketId).exec()) as TicketDocument;
 
   showService.send({
     type: ShowMachineEventString.DISPUTE_DECIDED,

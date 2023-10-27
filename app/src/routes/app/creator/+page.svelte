@@ -6,7 +6,7 @@
   import { page } from '$app/stores';
   import { PUBLIC_CREATOR_PATH } from '$env/static/public';
 
-  import { selectedAccount } from '$lib/util/web3';
+  import { selectedAccount } from '$lib/web3';
 
   import ConnectButton from '$components/header/ConnectButton.svelte';
 

@@ -6,9 +6,9 @@ import jwt from 'jsonwebtoken';
 import urlJoin from 'url-join';
 
 import {
-  JITSI_APP_ID,
-  JITSI_JWT_SECRET,
-  JWT_EXPIRY
+    JITSI_APP_ID,
+    JITSI_JWT_SECRET,
+    JWT_EXPIRY
 } from '$env/static/private';
 import { PUBLIC_CREATOR_PATH, PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
@@ -21,9 +21,9 @@ import type { ShowQueueType } from '$lib/workers/showWorker';
 
 import { EntityType } from '$lib/constants';
 import {
-  getShowMachineService,
-  getShowMachineServiceFromId
-} from '$lib/util/util.server';
+    getShowMachineService,
+    getShowMachineServiceFromId
+} from '$lib/server/machinesUtil';
 
 import type { PageServerLoad } from './$types';
 

@@ -10,7 +10,7 @@ import { EntityType } from './dist/constants';
 import { getShowWorker } from './dist/workers/showWorker';
 import { getInvoiceWorker } from './dist/workers/invoiceWorker';
 import { getPayoutWorker } from './dist/workers/payoutWorker';
-import { createAuthToken } from './dist/util/payment';
+import { createAuthToken } from './dist/payment';
 import packageFile from './package.json' assert { type: 'json' };
 import IORedis from 'ioredis';
 import mongoose from 'mongoose';

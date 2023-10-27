@@ -6,12 +6,12 @@ import type IORedis from 'ioredis';
 import type { PayoutType } from '$lib/models/common';
 import { CurrencyType } from '$lib/models/common';
 import { Creator } from '$lib/models/creator';
-import type { TicketType } from '$lib/models/ticket';
+import type { TicketDocument } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
 import {
   Transaction,
-  TransactionReasonType,
-  type TransactionType
+  type TransactionDocument,
+  TransactionReasonType
 } from '$lib/models/transaction';
 import { Wallet } from '$lib/models/wallet';
 
@@ -36,12 +36,12 @@ import type {
   Store,
   Wallet as BTWallet
 } from '$lib/ext/bitcart/models';
-import type { PaymentType } from '$lib/util/payment';
-import { PayoutJobType, PayoutReason, PayoutStatus } from '$lib/util/payment';
+import type { PaymentType } from '$lib/payment';
+import { PayoutJobType, PayoutReason, PayoutStatus } from '$lib/payment';
 import {
   getTicketMachineService,
   getWalletMachineService
-} from '$lib/util/util.server';
+} from '$lib/server/machinesUtil';
 
 export type PayoutJobDataType = {
   [key: string]: any;
@@ -238,7 +238,7 @@ export const getPayoutWorker = ({
             return 'No ticket ID';
           }
 
-          const ticket = (await Ticket.findById(ticketId)) as TicketType;
+          const ticket = (await Ticket.findById(ticketId)) as TicketDocument;
           if (!ticket) {
             return 'No ticket found';
           }
@@ -448,7 +448,7 @@ export const getPayoutWorker = ({
                       amount: bcPayout.amount,
                       currency: wallet.currency,
                       bcPayoutId: bcPayout.id
-                    })) as TransactionType;
+                    })) as TransactionDocument;
 
                     if (
                       !walletState.can({

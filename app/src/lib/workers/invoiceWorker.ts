@@ -5,9 +5,9 @@ import type IORedis from 'ioredis';
 import { Types } from 'mongoose';
 
 import { CancelReason, type CancelType } from '$lib/models/common';
-import type { TicketType } from '$lib/models/ticket';
+import type { TicketDocument } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
-import type { TransactionType } from '$lib/models/transaction';
+import type { TransactionDocument } from '$lib/models/transaction';
 import { Transaction, TransactionReasonType } from '$lib/models/transaction';
 
 import { TicketMachineEventString } from '$lib/machines/ticketMachine';
@@ -20,16 +20,12 @@ import {
   modifyInvoiceInvoicesModelIdPatch
 } from '$lib/ext/bitcart';
 import type { DisplayInvoice, DisplayPayout } from '$lib/ext/bitcart/models';
-import { PayoutReason } from '$lib/util/payment';
-import {
-  InvoiceJobType,
-  InvoiceStatus,
-  type PaymentType
-} from '$lib/util/payment';
+import { PayoutReason } from '$lib/payment';
+import { InvoiceJobType, InvoiceStatus, type PaymentType } from '$lib/payment';
 import {
   getTicketMachineService,
   getTicketMachineServiceFromId
-} from '$lib/util/util.server';
+} from '$lib/server/machinesUtil';
 
 export type InvoiceJobDataType = {
   bcInvoiceId: string;
@@ -161,7 +157,7 @@ export const getInvoiceWorker = ({
                     currency: payment.currency.toUpperCase(),
                     confirmations: payment.confirmations,
                     total: (+payment.amount * +payment.rate).toFixed(2)
-                  }) as TransactionType;
+                  }) as TransactionDocument;
 
                   await Transaction.create(transaction);
 
@@ -195,7 +191,7 @@ export const getInvoiceWorker = ({
 
                   const ticket = (await Ticket.findById(
                     ticketId
-                  )) as TicketType;
+                  )) as TicketDocument;
 
                   let response = await getRefundInvoicesRefundsRefundIdGet(
                     refundId,

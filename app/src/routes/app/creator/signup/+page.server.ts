@@ -3,8 +3,8 @@ import * as web3 from 'web3';
 
 import { AUTH_SIGNING_MESSAGE } from '$env/static/private';
 
-import { AuthType } from '$lib/models/common';
 import { Creator } from '$lib/models/creator';
+import { AuthType, User } from '$lib/models/user';
 import { Wallet } from '$lib/models/wallet';
 
 import { EntityType } from '$lib/constants';
@@ -55,14 +55,18 @@ export const actions: Actions = {
     try {
       const wallet = new Wallet();
       wallet.save();
+
+      const user = await User.create({
+        name,
+        authType: AuthType.SIGNING,
+        address: address.toLocaleLowerCase(),
+        wallet: wallet._id,
+        payoutAddress: address.toLocaleLowerCase(),
+        roles: [EntityType.CREATOR]
+      });
+
       const creator = await Creator.create({
-        user: {
-          name,
-          authType: AuthType.SIGNING,
-          address: address.toLocaleLowerCase(),
-          wallet: wallet._id,
-          payoutAddress: address.toLocaleLowerCase()
-        },
+        user: user._id,
         agentCommission: 0,
         profileImageUrl
       });

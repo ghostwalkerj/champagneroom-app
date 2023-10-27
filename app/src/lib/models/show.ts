@@ -5,15 +5,15 @@ import { nanoid } from 'nanoid';
 
 import type { refundSchema, saleSchema } from './common';
 import {
-  cancelSchema,
-  CurrencyType,
-  escrowSchema,
-  finalizeSchema,
-  moneySchema
+    CurrencyType,
+    cancelSchema,
+    escrowSchema,
+    finalizeSchema,
+    moneySchema
 } from './common';
 
 const { Schema, models } = pkg;
-export type ShowDocumentType = InferSchemaType<typeof showSchema>;
+export type ShowDocument = InstanceType<typeof Show>;
 
 enum ShowStatus {
   CREATED = 'CREATED',
@@ -324,15 +324,15 @@ showSchema.plugin(fieldEncryption, {
   secret: process.env.MONGO_DB_FIELD_SECRET
 });
 
+export type ShowDocumentType = InferSchemaType<typeof showSchema>;
+
 export type ShowRefundType = InferSchemaType<typeof refundSchema>;
 
 export type ShowSaleType = InferSchemaType<typeof saleSchema>;
 
 export type ShowStateType = InferSchemaType<typeof showStateSchema>;
 
-export type ShowType = InstanceType<typeof Show>;
-
-export const SaveState = (show: ShowType, newState: ShowStateType) => {
+export const SaveState = (show: ShowDocument, newState: ShowStateType) => {
   Show.updateOne({ _id: show._id }, { $set: { showState: newState } }).exec();
 };
 

@@ -12,11 +12,11 @@
     PUBLIC_TICKET_PATH
   } from '$env/static/public';
 
-  import { type ShowDocumentType, ShowStatus } from '$lib/models/show';
+  import { ShowStatus, type ShowDocumentType } from '$lib/models/show';
   import type { TicketDocumentType } from '$lib/models/ticket';
 
   import { jitsiInterfaceConfigOverwrite } from '$lib/constants';
-  import getProfileImage from '$lib/util/profilePhoto';
+  import getProfileImage from '$lib/profilePhoto';
 
   import { showStore } from '$stores';
 

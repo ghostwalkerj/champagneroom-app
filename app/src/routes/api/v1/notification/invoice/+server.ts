@@ -2,9 +2,9 @@ import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 
 import { EntityType } from '$lib/constants';
-import { InvoiceJobType } from '$lib/util/payment';
+import { InvoiceJobType } from '$lib/payment';
 
-import type { RequestHandler } from './$types';
+import type { RequestHandler } from './notification/$types';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
   const body = await request.json();

@@ -5,9 +5,9 @@ import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 import type { EarningsType, PayoutType } from '$lib/models/common.js';
 import type { ShowDocumentType } from '$lib/models/show.js';
 import type { TransactionDocumentType } from '$lib/models/transaction.js';
-import { type WalletDocumentType, WalletStatus } from '$lib/models/wallet.js';
+import { WalletStatus, type WalletDocumentType } from '$lib/models/wallet.js';
 
-import { PayoutStatus } from '$lib/util/payment.js';
+import { PayoutStatus } from '$lib/payment.js';
 
 enum WalletMachineEventString {
   SHOW_EARNINGS_POSTED = 'SHOW EARNINGS POSTED',
