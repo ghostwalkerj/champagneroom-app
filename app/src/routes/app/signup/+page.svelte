@@ -16,8 +16,7 @@
   import { womensNames } from '$lib/womensNames';
 
   import ConnectButton from '$components/header/ConnectButton.svelte';
-
-  import ProfilePhoto from '../ProfilePhoto.svelte';
+  import ProfilePhoto from '$components/ProfilePhoto.svelte';
 
   import type { ActionData, PageData } from './$types';
 
@@ -25,6 +24,7 @@
   export let form: ActionData;
 
   const message = data.message;
+  const user = data.user;
   let walletAddress = '';
   let wallet: WalletState | undefined;
 
@@ -33,9 +33,11 @@
   let signupModel: HTMLDialogElement;
   let profileImageUrl = PUBLIC_DEFAULT_PROFILE_IMAGE;
 
-  let exampleName = uniqueNamesGenerator({
-    dictionaries: [womensNames]
-  });
+  let exampleName = user
+    ? user.name
+    : uniqueNamesGenerator({
+        dictionaries: [womensNames]
+      });
 
   const updateProfileImage = async (url: string) => {
     if (url) {

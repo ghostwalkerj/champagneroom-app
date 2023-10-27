@@ -1,8 +1,5 @@
 <script lang="ts">
-  import {
-    PUBLIC_CREATOR_SIGNUP_PATH,
-    PUBLIC_STATIC_URL
-  } from '$env/static/public';
+  import { PUBLIC_SIGNUP_PATH, PUBLIC_STATIC_URL } from '$env/static/public';
 </script>
 
 <div id="Creators" data-aos="zoom-in-right">
@@ -78,7 +75,7 @@
             </li>
             <li>
               Visit the <a
-                href={PUBLIC_CREATOR_SIGNUP_PATH}
+                href={PUBLIC_SIGNUP_PATH}
                 target="_blank"
                 class="link link-primary"
               >

@@ -4,6 +4,7 @@ import * as web3 from 'web3';
 import { AUTH_SIGNING_MESSAGE } from '$env/static/private';
 
 import { Creator } from '$lib/models/creator';
+import type { UserDocument } from '$lib/models/user';
 import { AuthType, User } from '$lib/models/user';
 import { Wallet } from '$lib/models/wallet';
 
@@ -52,40 +53,55 @@ export const actions: Actions = {
       throw error(400, 'Invalid Signature');
     }
 
-    try {
-      const wallet = new Wallet();
-      wallet.save();
-
-      const user = await User.create({
-        name,
-        authType: AuthType.SIGNING,
-        address: address.toLocaleLowerCase(),
-        wallet: wallet._id,
-        payoutAddress: address.toLocaleLowerCase(),
-        roles: [EntityType.CREATOR]
-      });
-
-      const creator = await Creator.create({
-        user: user._id,
-        agentCommission: 0,
-        profileImageUrl
-      });
+    // Check if existing user, if so, add the role
+    const user = await User.findOne({ address: address.toLowerCase() });
+    if (user) {
+      user.roles.push(EntityType.CREATOR);
+      await user.save();
       return {
         success: true,
-        creator: creator.toObject({ flattenObjectIds: true, flattenMaps: true })
+        creator: user.toObject({ flattenObjectIds: true, flattenMaps: true })
       };
-    } catch (error) {
-      console.log('err', error);
-      return fail(400, { err: JSON.stringify(error) });
+    } else {
+      try {
+        const wallet = new Wallet();
+        wallet.save();
+
+        const user = await User.create({
+          name,
+          authType: AuthType.SIGNING,
+          address: address.toLocaleLowerCase(),
+          wallet: wallet._id,
+          payoutAddress: address.toLocaleLowerCase(),
+          roles: [EntityType.CREATOR]
+        });
+
+        const creator = await Creator.create({
+          user: user._id,
+          agentCommission: 0,
+          profileImageUrl
+        });
+        return {
+          success: true,
+          creator: creator.toObject({
+            flattenObjectIds: true,
+            flattenMaps: true
+          })
+        };
+      } catch (error) {
+        console.log('err', error);
+        return fail(400, { err: JSON.stringify(error) });
+      }
     }
   }
 };
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ locals }) => {
+  const user = locals.user as UserDocument | undefined;
   const nonce = Math.floor(Math.random() * 1_000_000);
-  const message =
-    EntityType.CREATOR + ': ' + AUTH_SIGNING_MESSAGE + ' ' + nonce;
+  const message = AUTH_SIGNING_MESSAGE + ' ' + nonce;
   return {
-    message
+    message,
+    user: user?.toObject({ flattenObjectIds: true, flattenMaps: true })
   };
 };

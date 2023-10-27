@@ -1,6 +1,7 @@
 import type { Actions } from '@sveltejs/kit';
 import { error, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
+import { max } from 'rxjs';
 
 import {
   AUTH_SIGNING_MESSAGE,
@@ -8,17 +9,33 @@ import {
   JWT_EXPIRY,
   JWT_PRIVATE_KEY
 } from '$env/static/private';
-import { PUBLIC_CREATOR_SIGNUP_PATH } from '$env/static/public';
+import { PUBLIC_SIGNUP_PATH } from '$env/static/public';
 
 import { AuthType, User } from '$lib/models/user';
 
-import { verifySignature } from '$lib/auth';
+import { verifySignature } from '$lib/server/auth';
 
 import type { PageServerLoad } from './$types';
 
 const tokenName = AUTH_TOKEN_NAME || 'token';
 
 export const actions: Actions = {
+  get_signing_message: async ({ request }) => {
+    const data = await request.formData();
+    const address = data.get('address') as string;
+    if (!address) {
+      throw error(404, 'Bad address');
+    }
+
+    const user = await User.findOne({ address }).select('nonce').exec();
+    if (!user) {
+      throw redirect(302, PUBLIC_SIGNUP_PATH);
+    }
+    const message = AUTH_SIGNING_MESSAGE + ' ' + user.nonce;
+    return {
+      message
+    };
+  },
   signing_auth: async ({ cookies, request }) => {
     const data = await request.formData();
     const signature = data.get('signature') as string;
@@ -51,7 +68,7 @@ export const actions: Actions = {
     const nonce = Math.floor(Math.random() * 1_000_000);
     User.updateOne({ address }, { $set: { nonce } }).exec();
 
-    const exp = Math.floor(Date.now() / 1000) + +JWT_EXPIRY;
+    const exp = +JWT_EXPIRY;
 
     const authToken = jwt.sign(
       {
@@ -64,8 +81,9 @@ export const actions: Actions = {
     cookies.set(tokenName, authToken, {
       path: '/',
       httpOnly: true,
-      sameSite: 'lax',
-      maxAge: exp
+      sameSite: 'strict',
+      maxAge: exp,
+      expires: new Date(exp)
     });
     throw redirect(302, returnPath);
   },
@@ -95,8 +113,10 @@ export const actions: Actions = {
     cookies.set(tokenName, authToken, {
       path: '/',
       httpOnly: true,
-      sameSite: 'lax',
-      maxAge: exp
+      sameSite: 'strict',
+      secure: true,
+      maxAge: exp,
+      expires: new Date(exp)
     });
     throw redirect(302, returnPath);
   }
@@ -105,21 +125,21 @@ export const actions: Actions = {
 export const load: PageServerLoad = async ({ cookies }) => {
   const address = cookies.get('address');
   const returnPath = cookies.get('returnPath');
-  if (!address || !returnPath) {
-    throw error(400, 'Missing Cookie');
-  }
+
+  let authType = AuthType.SIGNING;
+  let message = '';
 
   const user = await User.findOne({ address }).exec();
 
-  if (!user) {
-    throw redirect(302, PUBLIC_CREATOR_SIGNUP_PATH);
+  if (user) {
+    authType = user.authType as AuthType;
+    message = AUTH_SIGNING_MESSAGE + ' ' + user.nonce;
   }
 
-  const message = AUTH_SIGNING_MESSAGE + ' ' + user.nonce;
   return {
     message,
     address,
     returnPath,
-    authType: user.authType
+    authType
   };
 };

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
 
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
@@ -14,10 +14,10 @@
 
   export let data: PageData;
 
-  const { message, address, returnPath, authType } = data;
+  let { message, address, returnPath, authType } = data;
 
-  const defaultReturn = '/app';
-  let hasNoWallet = false;
+  const redirectPath = (returnPath || '/app') as string;
+  $: hasNoWallet = false;
   let hasAddressMismatch = false;
   let isUniqueKeyAuth = false;
   let isSigningAuth = false;
@@ -29,7 +29,7 @@
   ) => {
     let formData = new FormData();
     formData.append('signature', signature);
-    formData.append('address', address);
+    formData.append('address', address!);
     formData.append('message', message);
     formData.append('returnPath', returnPath);
 
@@ -42,7 +42,7 @@
 
   const setUniqueKeyAuth = async (returnPath: string) => {
     let formData = new FormData();
-    formData.append('address', address);
+    formData.append('address', address!);
     formData.append('returnPath', returnPath);
 
     await fetch($page.url.href + '?/unique_key_auth', {
@@ -66,38 +66,47 @@
 
   onMount(async () => {
     if (isUniqueKeyAuth) {
-      await setUniqueKeyAuth(returnPath);
-      goto(returnPath);
+      await setUniqueKeyAuth(redirectPath);
+      goto(redirectPath);
     }
+
     // Signing Auth Flow
     // Check if wallet is connected
     // If not, ask to connect
     // If connected, check if wallet address matches
     // If not, ask to connect wallet with correct address
     if (isSigningAuth) {
+      let walletAddress = '';
       defaultWallet.subscribe(async (wallet) => {
-        if (wallet) {
-          hasNoWallet = false;
-          const walletAddress = wallet.accounts[0].address;
-          if (walletAddress.toLowerCase() === address.toLowerCase()) {
-            hasAddressMismatch = false;
-            try {
-              const signature = await wallet.provider.request({
-                method: 'personal_sign',
-                params: [message, walletAddress]
-              });
-              await setSigningAuth(message, signature, returnPath);
-              console.log('returnPath:', returnPath);
-              goto(returnPath);
-            } catch (error) {
-              console.log(error);
-              goto(defaultReturn);
-            }
-          } else {
-            hasAddressMismatch = true;
+        hasNoWallet = wallet === undefined;
+        if (wallet && walletAddress !== wallet.accounts[0].address) {
+          walletAddress = wallet.accounts[0].address;
+          hasAddressMismatch =
+            address !== undefined &&
+            walletAddress.toLowerCase() !== address.toLowerCase();
+          if (!address) {
+            // This means they came to auth page without an address field
+            // Need to check the backed for a user with this address
+            // Then create message
+            let formData = new FormData();
+            formData.append('address', walletAddress);
+            const response = await fetch('?/get_signing_message', {
+              method: 'POST',
+              body: formData
+            });
+            const data = await response.json();
+            // eslint-disable-next-line unicorn/consistent-destructuring
+            message = data.message;
+            address = walletAddress;
           }
-        } else {
-          hasNoWallet = true;
+
+          const signature = await wallet.provider.request({
+            method: 'personal_sign',
+            params: [message, walletAddress]
+          });
+          await setSigningAuth(message, signature, redirectPath);
+          console.log('returnPath:', returnPath);
+          goto(redirectPath);
         }
       });
     }
