@@ -14,7 +14,7 @@
 
   import type { RefundType } from '$lib/models/common';
   import { DisputeReason, RefundReason } from '$lib/models/common';
-  import { ShowStatus, type ShowDocumentType } from '$lib/models/show';
+  import { type ShowDocumentType, ShowStatus } from '$lib/models/show';
   import type { TicketDocumentType } from '$lib/models/ticket';
 
   import type { TicketMachineServiceType } from '$lib/machines/ticketMachine';
@@ -96,7 +96,7 @@
       ];
 
       try {
-        const response = await provider.request({
+        await provider.request({
           method: 'eth_sendTransaction',
           params: parameters
         });

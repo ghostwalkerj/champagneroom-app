@@ -57,10 +57,17 @@ export const actions: Actions = {
     const user = await User.findOne({ address: address.toLowerCase() });
     if (user) {
       user.roles.push(EntityType.CREATOR);
+      user.name = name;
       await user.save();
+
+      const creator = await Creator.findOneAndUpdate(
+        { user: user._id },
+        { profileImageUrl },
+        { upsert: true, new: true }
+      );
       return {
         success: true,
-        creator: user.toObject({ flattenObjectIds: true, flattenMaps: true })
+        creator: creator.toObject({ flattenObjectIds: true, flattenMaps: true })
       };
     } else {
       try {

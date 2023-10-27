@@ -1,9 +1,9 @@
 import type { Actions } from '@sveltejs/kit';
 import { error, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
-import { max } from 'rxjs';
 
 import {
+  AUTH_MAX_AGE,
   AUTH_SIGNING_MESSAGE,
   AUTH_TOKEN_NAME,
   JWT_EXPIRY,
@@ -29,11 +29,13 @@ export const actions: Actions = {
 
     const user = await User.findOne({ address }).select('nonce').exec();
     if (!user) {
+      console.error('User not found');
       throw redirect(302, PUBLIC_SIGNUP_PATH);
     }
     const message = AUTH_SIGNING_MESSAGE + ' ' + user.nonce;
     return {
-      message
+      success: true,
+      message: message
     };
   },
   signing_auth: async ({ cookies, request }) => {
@@ -67,14 +69,11 @@ export const actions: Actions = {
     // Update User Nonce
     const nonce = Math.floor(Math.random() * 1_000_000);
     User.updateOne({ address }, { $set: { nonce } }).exec();
-
-    const exp = +JWT_EXPIRY;
-
     const authToken = jwt.sign(
       {
         address,
         authType: AuthType.SIGNING,
-        exp
+        exp: Math.floor(Date.now() / 1000) + +JWT_EXPIRY
       },
       JWT_PRIVATE_KEY
     );
@@ -82,8 +81,8 @@ export const actions: Actions = {
       path: '/',
       httpOnly: true,
       sameSite: 'strict',
-      maxAge: exp,
-      expires: new Date(exp)
+      maxAge: +AUTH_MAX_AGE,
+      expires: new Date(Date.now() + +AUTH_MAX_AGE)
     });
     throw redirect(302, returnPath);
   },
@@ -100,12 +99,10 @@ export const actions: Actions = {
       throw error(400, 'Missing Return Path');
     }
 
-    const exp = Math.floor(Date.now() / 1000) + +JWT_EXPIRY;
-
     const authToken = jwt.sign(
       {
         address,
-        exp,
+        exp: Math.floor(Date.now() / 1000) + +JWT_EXPIRY,
         authType: AuthType.UNIQUE_KEY
       },
       JWT_PRIVATE_KEY
@@ -115,8 +112,8 @@ export const actions: Actions = {
       httpOnly: true,
       sameSite: 'strict',
       secure: true,
-      maxAge: exp,
-      expires: new Date(exp)
+      maxAge: +AUTH_MAX_AGE,
+      expires: new Date(Date.now() + +AUTH_MAX_AGE)
     });
     throw redirect(302, returnPath);
   }

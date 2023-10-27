@@ -1,6 +1,8 @@
 <script lang="ts">
-  import { onMount, tick } from 'svelte';
+  import type { ActionResult } from '@sveltejs/kit';
+  import { onMount } from 'svelte';
 
+  import { deserialize } from '$app/forms';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
@@ -16,7 +18,7 @@
 
   let { message, address, returnPath, authType } = data;
 
-  const redirectPath = (returnPath || '/app') as string;
+  const redirectPath = returnPath ?? '/';
   $: hasNoWallet = false;
   let hasAddressMismatch = false;
   let isUniqueKeyAuth = false;
@@ -94,9 +96,11 @@
               method: 'POST',
               body: formData
             });
-            const data = await response.json();
+            const result: ActionResult = deserialize(await response.text());
+
             // eslint-disable-next-line unicorn/consistent-destructuring
-            message = data.message;
+            message = result.data.message;
+            console.log('message:', message);
             address = walletAddress;
           }
 
@@ -105,7 +109,6 @@
             params: [message, walletAddress]
           });
           await setSigningAuth(message, signature, redirectPath);
-          console.log('returnPath:', returnPath);
           goto(redirectPath);
         }
       });

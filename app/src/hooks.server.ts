@@ -32,7 +32,6 @@ import { User, UserRole } from '$lib/models/user';
 import { APP_PATH, PATH_WHITELIST, verifyPath } from '$lib/server/auth';
 
 const authUrl = PUBLIC_AUTH_PATH;
-const signupUrl = PUBLIC_SIGNUP_PATH;
 
 await mongoose.connect(MONGO_DB_ENDPOINT);
 const redisConnection = new IORedis({
@@ -49,7 +48,10 @@ export const handle = (async ({ event, resolve }) => {
   const address = event.params.address as string;
   const cookies = event.cookies;
   const locals = event.locals;
-  const returnPath = event.url.href;
+  let returnPath = requestedPath;
+  if (returnPath === authUrl) {
+    returnPath = '/';
+  }
 
   locals.redisConnection = redisConnection;
 
@@ -68,11 +70,18 @@ export const handle = (async ({ event, resolve }) => {
     }
 
     try {
-      const allowedPaths = PATH_WHITELIST;
+      const allowedPaths = [...PATH_WHITELIST];
 
       // If authenticated, check if user is allowed to access the requested path and set user in locals
       if (authToken) {
-        const decode = jwt.verify(authToken, JWT_PRIVATE_KEY) as JwtPayload;
+        let decode: JwtPayload;
+        try {
+          decode = jwt.verify(authToken, JWT_PRIVATE_KEY) as JwtPayload;
+        } catch (error) {
+          console.error('Invalid token:', error);
+          cookies.delete(tokenName, { path: '/' });
+          throw redirect(302, authUrl);
+        }
         if (decode.address) {
           // Check if user is allowed to access the requested path
           const user = await User.findOne({ address: decode.address });
@@ -125,8 +134,8 @@ export const handle = (async ({ event, resolve }) => {
         throw redirect(302, authUrl);
       }
     } catch (error) {
-      console.error(error);
-      throw redirect(302, signupUrl);
+      console.error('Error:', error);
+      throw error;
     }
   }
 
