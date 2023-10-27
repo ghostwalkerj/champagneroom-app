@@ -5,9 +5,9 @@ import mongoose, { Error } from 'mongoose';
 import { SaveState, type ShowDocument } from '$lib/models/show';
 import { createShowEvent } from '$lib/models/showEvent';
 import {
-    Ticket,
-    type TicketDocument,
-    type TicketStateType
+  Ticket,
+  type TicketDocument,
+  type TicketStateType
 } from '$lib/models/ticket';
 import type { WalletDocument } from '$lib/models/wallet';
 import { atomicUpdateCallback } from '$lib/models/wallet';

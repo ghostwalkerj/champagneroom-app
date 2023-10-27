@@ -4,7 +4,7 @@ import type IORedis from 'ioredis';
 import { EntityType } from '$lib/constants';
 import { PayoutJobType } from '$lib/payment';
 
-import type { RequestHandler } from './notification/$types';
+import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
   const body = await request.json();

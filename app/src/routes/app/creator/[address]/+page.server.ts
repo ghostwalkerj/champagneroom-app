@@ -3,7 +3,11 @@ import type { AxiosResponse } from 'axios';
 import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 
-import { BITCART_API_URL, BITCART_EMAIL, BITCART_PASSWORD } from '$env/static/private';
+import {
+  BITCART_API_URL,
+  BITCART_EMAIL,
+  BITCART_PASSWORD
+} from '$env/static/private';
 
 import type { CancelType } from '$lib/models/common';
 import { CancelReason, CurrencyType } from '$lib/models/common';
@@ -223,21 +227,11 @@ export const actions: Actions = {
     };
   }
 };
-export const load: PageServerLoad = async ({ params }) => {
-  const address = params.address;
-
-  if (address === null) {
-    throw error(404, 'Address not found');
+export const load: PageServerLoad = async ({ locals }) => {
+  const creator = locals.creator as CreatorDocument;
+  if (!creator) {
+    throw error(404, 'Creator not found');
   }
-
-  const creator = await Creator.findOne({
-    'user.address': address,
-    'user.active': true
-  })
-    .orFail(() => {
-      throw error(404, 'Creator not found');
-    })
-    .exec();
 
   const currentShow = await Show.findOne({
     creator: creator._id,

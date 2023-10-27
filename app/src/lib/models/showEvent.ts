@@ -26,9 +26,9 @@ const showeventSchema = new Schema(
 
 showeventSchema.index({ createdAt: -1 });
 
-export type ShowEventDocumentType = InferSchemaType<typeof showeventSchema>;
-
 export type ShowEventDocument = InstanceType<typeof ShowEvent>;
+
+export type ShowEventDocumentType = InferSchemaType<typeof showeventSchema>;
 
 export const ShowEvent = models?.ShowEvent
   ? (models.ShowEvent as Model<ShowEventDocumentType>)

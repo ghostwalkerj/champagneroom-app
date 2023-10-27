@@ -20,8 +20,7 @@ import {
   PUBLIC_AGENT_PATH,
   PUBLIC_AUTH_PATH,
   PUBLIC_CREATOR_PATH,
-  PUBLIC_OPERATOR_PATH,
-  PUBLIC_SIGNUP_PATH
+  PUBLIC_OPERATOR_PATH
 } from '$env/static/public';
 
 import { Agent } from '$lib/models/agent';

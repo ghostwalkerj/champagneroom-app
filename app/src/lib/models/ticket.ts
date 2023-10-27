@@ -4,14 +4,14 @@ import { fieldEncryption } from 'mongoose-field-encryption';
 import validator from 'validator';
 
 import {
-    cancelSchema,
-    disputeSchema,
-    escrowSchema,
-    feedbackSchema,
-    finalizeSchema,
-    moneySchema,
-    refundSchema,
-    saleSchema
+  cancelSchema,
+  disputeSchema,
+  escrowSchema,
+  feedbackSchema,
+  finalizeSchema,
+  moneySchema,
+  refundSchema,
+  saleSchema
 } from './common';
 import type { ShowDocumentType } from './show';
 

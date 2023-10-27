@@ -6,11 +6,11 @@ import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 import { raise } from 'xstate/lib/actions';
 
 import type {
-    CancelType,
-    DisputeType,
-    FinalizeType,
-    RefundType,
-    SaleType
+  CancelType,
+  DisputeType,
+  FinalizeType,
+  RefundType,
+  SaleType
 } from '$lib/models/common';
 import { DisputeDecision } from '$lib/models/common';
 import type { ShowDocumentType } from '$lib/models/show';
