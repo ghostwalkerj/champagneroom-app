@@ -20,7 +20,8 @@ import {
   PUBLIC_AGENT_PATH,
   PUBLIC_AUTH_PATH,
   PUBLIC_CREATOR_PATH,
-  PUBLIC_OPERATOR_PATH
+  PUBLIC_OPERATOR_PATH,
+  PUBLIC_SIGNUP_PATH
 } from '$env/static/public';
 
 import { Agent } from '$lib/models/agent';
@@ -31,6 +32,7 @@ import { User, UserRole } from '$lib/models/user';
 import { APP_PATH, PATH_WHITELIST, verifyPath } from '$lib/server/auth';
 
 const authUrl = PUBLIC_AUTH_PATH;
+const signUpUrl = PUBLIC_SIGNUP_PATH;
 
 await mongoose.connect(MONGO_DB_ENDPOINT);
 const redisConnection = new IORedis({
@@ -44,13 +46,9 @@ const redisConnection = new IORedis({
 
 export const handle = (async ({ event, resolve }) => {
   const requestedPath = event.url.pathname;
-  const address = event.params.address as string;
   const cookies = event.cookies;
   const locals = event.locals;
-  let returnPath = requestedPath;
-  if (returnPath === authUrl) {
-    returnPath = '/';
-  }
+  const returnPath = requestedPath;
 
   locals.redisConnection = redisConnection;
 
@@ -58,19 +56,18 @@ export const handle = (async ({ event, resolve }) => {
   if (requestedPath.startsWith(APP_PATH)) {
     const tokenName = AUTH_TOKEN_NAME || 'token';
     const authToken = cookies.get(tokenName);
-    cookies.set('returnPath', returnPath, { path: authUrl });
+    const allowedPaths = [...PATH_WHITELIST];
 
-    if (address) {
-      // Check if valid session exists
-      const setAuthCookie = () => {
-        cookies.set('address', address, { path: authUrl });
-      };
-      setAuthCookie();
+    if (requestedPath !== authUrl) {
+      cookies.set('returnPath', returnPath, { path: authUrl });
+    }
+
+    if (requestedPath === authUrl) {
+      cookies.delete(tokenName, { path: '/' });
+      authToken === undefined;
     }
 
     try {
-      const allowedPaths = [...PATH_WHITELIST];
-
       // If authenticated, check if user is allowed to access the requested path and set user in locals
       if (authToken) {
         let decode: JwtPayload;
@@ -86,7 +83,7 @@ export const handle = (async ({ event, resolve }) => {
           const user = await User.findOne({ address: decode.address });
           if (!user) {
             console.error('No user');
-            throw 'No user';
+            throw redirect(302, signUpUrl);
           }
           locals.user = user;
 
@@ -97,7 +94,7 @@ export const handle = (async ({ event, resolve }) => {
                 const agent = await Agent.findOne({ user: user._id });
                 if (!agent) {
                   console.error('No agent');
-                  throw 'No agent';
+                  throw redirect(302, signUpUrl);
                 }
                 locals.agent = agent;
                 break;
@@ -107,7 +104,7 @@ export const handle = (async ({ event, resolve }) => {
                 const creator = await Creator.findOne({ user: user._id });
                 if (!creator) {
                   console.error('No creator');
-                  throw 'No creator';
+                  throw redirect(302, signUpUrl);
                 }
                 locals.creator = creator;
                 break;
@@ -117,7 +114,7 @@ export const handle = (async ({ event, resolve }) => {
                 const operator = await Operator.findOne({ user: user._id });
                 if (!operator) {
                   console.error('No operator');
-                  throw 'No operator';
+                  throw redirect(302, signUpUrl);
                 }
                 locals.operator = operator;
                 break;

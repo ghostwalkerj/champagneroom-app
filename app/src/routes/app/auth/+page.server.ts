@@ -1,4 +1,3 @@
-import type { Actions } from '@sveltejs/kit';
 import { error, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 
@@ -15,7 +14,7 @@ import { AuthType, User } from '$lib/models/user';
 
 import { verifySignature } from '$lib/server/auth';
 
-import type { PageServerLoad } from './$types';
+import type { Actions, PageServerLoad } from './$types';
 
 const tokenName = AUTH_TOKEN_NAME || 'token';
 
@@ -35,7 +34,7 @@ export const actions: Actions = {
     const message = AUTH_SIGNING_MESSAGE + ' ' + user.nonce;
     return {
       success: true,
-      message: message
+      message
     };
   },
   signing_auth: async ({ cookies, request }) => {
@@ -117,7 +116,7 @@ export const actions: Actions = {
     });
     throw redirect(302, returnPath);
   }
-};
+} satisfies Actions;
 
 export const load: PageServerLoad = async ({ cookies }) => {
   const address = cookies.get('address');

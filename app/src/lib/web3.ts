@@ -9,9 +9,10 @@ import walletConnectModule from '@web3-onboard/walletconnect';
 import { derived, writable } from 'svelte/store';
 
 import {
-    PUBLIC_INFURA_API_KEY,
-    PUBLIC_STATIC_URL,
-    PUBLIC_WALLET_CONNECT_PROJECT_ID
+  PUBLIC_INFURA_API_KEY,
+  PUBLIC_STATIC_URL,
+  PUBLIC_WALLET_CONNECT_PROJECT_ID,
+  PUBLIC_WEBSITE_URL
 } from '$env/static/public';
 
 // Wallets
@@ -20,14 +21,14 @@ const coinbaseWalletSdk = coinbaseWalletModule({ darkMode: true });
 const frame = frameModule();
 const trezor = trezorModule({
   email: 'admin@champagneroom.app',
-  appUrl: 'https://champagneroom.app'
+  appUrl: PUBLIC_WEBSITE_URL
 });
 
 const wcV2InitOptions = {
   version: 2 as const,
   projectId: PUBLIC_WALLET_CONNECT_PROJECT_ID,
   requiredChains: [1],
-  dappUrl: 'https://champagneroom.app'
+  dappUrl: PUBLIC_WEBSITE_URL
 };
 const walletConnect = walletConnectModule(wcV2InitOptions);
 

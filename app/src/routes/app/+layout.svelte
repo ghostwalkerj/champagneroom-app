@@ -2,30 +2,59 @@
   import 'iconify-icon';
 
   import { format, generate } from 'build-number-generator';
+  import { onMount } from 'svelte';
 
-  import { browser } from '$app/environment';
-  import { PUBLIC_STATIC_URL } from '$env/static/public';
+  import { goto } from '$app/navigation';
+  import { PUBLIC_AUTH_PATH, PUBLIC_STATIC_URL } from '$env/static/public';
+
+  import { selectedAccount } from '$lib/web3';
 
   import ConnectButton from '$components/header/ConnectButton.svelte';
   import { nameStore } from '$stores';
 
   import { version } from '../../../package.json';
 
+  import type { LayoutData } from './$types';
+
+  export let data: LayoutData;
+
+  const isAuthenticated = data.isAuthenticated;
   const buildNumber = generate(version);
   const buildTime = format(buildNumber);
+  let lastAddress: string | undefined;
+  const authUrl = PUBLIC_AUTH_PATH;
 
-  if (browser) {
-    (function () {
-      window.ybug_settings = { id: 'vmjfcvd23zharamd1bb8' };
-      var ybug = document.createElement('script');
-      ybug.type = 'text/javascript';
-      ybug.async = true;
-      ybug.src =
-        'https://widget.ybug.io/button/' + window.ybug_settings.id + '.js';
-      var s = document.querySelectorAll('script')[0];
-      s.parentNode.insertBefore(ybug, s);
-    })();
-  }
+  onMount(() => {
+    selectedAccount.subscribe((account) => {
+      if (account && lastAddress && account.address !== lastAddress) {
+        lastAddress = account.address;
+        console.log('address changed');
+        isAuthenticated && goto(authUrl);
+      }
+      if (account && !lastAddress) {
+        lastAddress = account.address;
+      }
+      if (!account && lastAddress) {
+        lastAddress = undefined;
+        console.log('address changed');
+
+        isAuthenticated && goto(authUrl);
+      }
+    });
+  });
+
+  // if (browser) {
+  //   (function () {
+  //     window.ybug_settings = { id: 'vmjfcvd23zharamd1bb8' };
+  //     var ybug = document.createElement('script');
+  //     ybug.type = 'text/javascript';
+  //     ybug.async = true;
+  //     ybug.src =
+  //       'https://widget.ybug.io/button/' + window.ybug_settings.id + '.js';
+  //     var s = document.querySelectorAll('script')[0];
+  //     s.parentNode.insertBefore(ybug, s);
+  //   })();
+  // }
 </script>
 
 <div class="bg-gradient-to-r from-[#0C082E] to-[#0C092E] font-Roboto">

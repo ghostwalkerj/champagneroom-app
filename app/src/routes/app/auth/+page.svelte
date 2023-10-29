@@ -5,6 +5,7 @@
   import { deserialize } from '$app/forms';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
+  import { PUBLIC_WEBSITE_URL } from '$env/static/public';
 
   import { AuthType } from '$lib/models/user';
 
@@ -18,9 +19,8 @@
 
   let { message, address, returnPath, authType } = data;
 
-  const redirectPath = returnPath ?? '/';
+  const redirectPath = returnPath ?? PUBLIC_WEBSITE_URL;
   $: hasNoWallet = false;
-  let hasAddressMismatch = false;
   let isUniqueKeyAuth = false;
   let isSigningAuth = false;
 
@@ -83,33 +83,40 @@
         hasNoWallet = wallet === undefined;
         if (wallet && walletAddress !== wallet.accounts[0].address) {
           walletAddress = wallet.accounts[0].address;
-          hasAddressMismatch =
-            address !== undefined &&
-            walletAddress.toLowerCase() !== address.toLowerCase();
-          if (!address) {
-            // This means they came to auth page without an address field
-            // Need to check the backed for a user with this address
-            // Then create message
-            let formData = new FormData();
-            formData.append('address', walletAddress);
-            const response = await fetch('?/get_signing_message', {
-              method: 'POST',
-              body: formData
-            });
-            const result: ActionResult = deserialize(await response.text());
-
-            // eslint-disable-next-line unicorn/consistent-destructuring
-            message = result.data.message;
-            console.log('message:', message);
-            address = walletAddress;
-          }
-
-          const signature = await wallet.provider.request({
-            method: 'personal_sign',
-            params: [message, walletAddress]
+          let formData = new FormData();
+          formData.append('address', walletAddress);
+          const response = await fetch('?/get_signing_message', {
+            method: 'POST',
+            body: formData
           });
-          await setSigningAuth(message, signature, redirectPath);
-          goto(redirectPath);
+          const result: ActionResult = deserialize(await response.text());
+
+          switch (result.type) {
+            case 'success': {
+              if (result.data) {
+                message = result.data.message;
+                address = walletAddress;
+
+                const signature = await wallet.provider.request({
+                  method: 'personal_sign',
+                  params: [message, walletAddress]
+                });
+                await setSigningAuth(message, signature, redirectPath);
+                goto(redirectPath);
+              }
+              break;
+            }
+            case 'error': {
+              break;
+            }
+            case 'redirect': {
+              goto(result.location);
+              break;
+            }
+            default: {
+              break;
+            }
+          }
         }
       });
     }
@@ -122,10 +129,6 @@
   </div>
   {#if hasNoWallet}
     <div class="py-6 w-full">Please connect a wallet to continue</div>
-  {:else if hasAddressMismatch}
-    <div class="py-6">
-      Please connect a wallet with the address {address} to continue
-    </div>
   {/if}
   <div>
     <ConnectButton />

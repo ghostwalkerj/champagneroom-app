@@ -5,11 +5,10 @@ import type IORedis from 'ioredis';
 import { ObjectId } from 'mongodb';
 import { nanoid } from 'nanoid';
 import { uniqueNamesGenerator } from 'unique-names-generator';
-import urlJoin from 'url-join';
 
 import {
   PUBLIC_DEFAULT_PROFILE_IMAGE,
-  PUBLIC_OPERATOR_PATH
+  PUBLIC_WEBSITE_URL
 } from '$env/static/public';
 
 import { Agent } from '$lib/models/agent';
@@ -29,6 +28,7 @@ import { EntityType } from '$lib/constants';
 import { womensNames } from '$lib/womensNames';
 
 import type { PageServerLoad } from './$types';
+const websiteUrl = PUBLIC_WEBSITE_URL;
 
 export const actions: Actions = {
   create_agent: async ({ request }: RequestEvent) => {
@@ -228,17 +228,10 @@ export const actions: Actions = {
   }
 };
 
-export const load: PageServerLoad = async ({ params, url, locals }) => {
-  const address = params.address;
-  const operatorUrl = urlJoin(url.origin, PUBLIC_OPERATOR_PATH);
-
-  if (address === null) {
-    throw redirect(307, operatorUrl);
-  }
-
+export const load: PageServerLoad = async ({ locals }) => {
   const operator = locals.operator as OperatorDocument;
   if (!operator) {
-    throw redirect(307, operatorUrl);
+    throw redirect(307, websiteUrl);
   }
   const agents = await Agent.find().sort({ 'user.name': 1 });
   const creators = await Creator.find().sort({ 'user.name': 1 });
