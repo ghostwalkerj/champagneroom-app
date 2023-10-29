@@ -1,14 +1,9 @@
-import { fail, redirect } from '@sveltejs/kit';
+import { error, fail } from '@sveltejs/kit';
 import { nanoid } from 'nanoid';
 import { uniqueNamesGenerator } from 'unique-names-generator';
-import urlJoin from 'url-join';
 
-import {
-    PUBLIC_AGENT_PATH,
-    PUBLIC_DEFAULT_PROFILE_IMAGE
-} from '$env/static/public';
+import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
 
-import { Agent } from '$lib/models/agent';
 import { Creator } from '$lib/models/creator';
 import { AuthType } from '$lib/models/user';
 import { Wallet } from '$lib/models/wallet';
@@ -122,19 +117,11 @@ export const actions: Actions = {
   }
 };
 
-export const load: PageServerLoad = async ({ params, url }) => {
-  const address = params.address;
-  const agentUrl = urlJoin(url.origin, PUBLIC_AGENT_PATH);
-
-  if (address === null) {
-    throw redirect(307, agentUrl);
+export const load: PageServerLoad = async ({ locals }) => {
+  const agent = locals.agent;
+  if (!agent) {
+    throw error(404, 'Agent not found');
   }
-
-  const agent = await Agent.findOne({ 'user.address': address })
-    .orFail(() => {
-      throw redirect(307, agentUrl);
-    })
-    .exec();
 
   const creators = await Creator.find({ agent: agent._id }).sort({
     'user.name': 1
