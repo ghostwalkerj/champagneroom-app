@@ -22,8 +22,6 @@ export enum EntityType {
   NONE = 'NONE'
 }
 
-
-
 export const currencyFormatter = (
   currency = CurrencyType.USD.toString(),
   _minimumFractionDigits?: number

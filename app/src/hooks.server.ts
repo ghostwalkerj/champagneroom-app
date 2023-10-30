@@ -29,7 +29,12 @@ import { Creator } from '$lib/models/creator';
 import { Operator } from '$lib/models/operator';
 import { AuthType, User, UserRole } from '$lib/models/user';
 
-import { APP_PATH, PATH_WHITELIST, verifyPath } from '$lib/server/auth';
+import {
+  APP_PATH,
+  decryptFromCookie,
+  encrypt4Cookie,
+  verifyPath
+} from '$lib/server/auth';
 
 const authUrl = PUBLIC_AUTH_PATH;
 const signUpUrl = PUBLIC_SIGNUP_PATH;
@@ -56,19 +61,24 @@ export const handle = (async ({ event, resolve }) => {
   if (requestedPath.startsWith(APP_PATH)) {
     const tokenName = AUTH_TOKEN_NAME || 'token';
     const authToken = cookies.get(tokenName);
-    const allowedPaths = [...PATH_WHITELIST];
+    const allowedPaths = [] as string[];
 
     if (requestedPath === authUrl) {
       cookies.delete(tokenName, { path: '/' });
       authToken === undefined;
     } else {
-      cookies.set('returnPath', returnPath, { path: authUrl });
+      const encReturnPath = encrypt4Cookie(returnPath);
+
+      encReturnPath &&
+        cookies.set('returnPath', encReturnPath, { path: authUrl });
+
+      const clearAuthToken = decryptFromCookie(authToken);
 
       // If authenticated, check if user is allowed to access the requested path and set user in locals
-      if (authToken) {
+      if (clearAuthToken) {
         let decode: JwtPayload;
         try {
-          decode = jwt.verify(authToken, JWT_PRIVATE_KEY) as JwtPayload;
+          decode = jwt.verify(clearAuthToken, JWT_PRIVATE_KEY) as JwtPayload;
         } catch (error) {
           console.error('Invalid token:', error);
           cookies.delete(tokenName, { path: '/' });

@@ -5,16 +5,21 @@ import { uniqueNamesGenerator } from 'unique-names-generator';
 import urlJoin from 'url-join';
 
 import {
-    BITCART_API_URL,
-    BITCART_EMAIL,
-    BITCART_INVOICE_NOTIFICATION_PATH,
-    BITCART_PASSWORD,
-    BITCART_STORE_ID
+  BITCART_API_URL,
+  BITCART_EMAIL,
+  BITCART_INVOICE_NOTIFICATION_PATH,
+  BITCART_PASSWORD,
+  BITCART_STORE_ID
 } from '$env/static/private';
-import { PUBLIC_PAYMENT_PERIOD, PUBLIC_TICKET_PATH } from '$env/static/public';
+import {
+  PUBLIC_AUTH_PATH,
+  PUBLIC_PAYMENT_PERIOD,
+  PUBLIC_TICKET_PATH
+} from '$env/static/public';
 
 import { Show } from '$lib/models/show';
 import { Ticket } from '$lib/models/ticket';
+import { AuthType, User, UserRole } from '$lib/models/user';
 
 import { ShowMachineEventString } from '$lib/machines/showMachine';
 
@@ -24,6 +29,7 @@ import { EntityType } from '$lib/constants';
 import { mensNames } from '$lib/mensNames';
 import { createAuthToken } from '$lib/payment';
 import { createPinHash } from '$lib/pin';
+import { encrypt4Cookie } from '$lib/server/auth';
 import { getShowMachineServiceFromId } from '$lib/server/machinesUtil';
 
 import { createInvoiceInvoicesPost } from '$ext/bitcart';
@@ -66,13 +72,19 @@ export const actions: Actions = {
 
     const showService = await getShowMachineServiceFromId(showId);
 
+    const user = await User.create({
+      name,
+      roles: [UserRole.TICKET_HOLDER],
+      authType: AuthType.PIN,
+      password: pin
+    });
+
     const ticket = await Ticket.create({
+      user: user._id,
       show: show._id,
       agent: show.agent,
       creator: show.creator,
-      price: show.price,
-      customerName: name,
-      pin
+      price: show.price
     });
     if (!ticket) {
       return error(501, 'Show cannot Reserve Ticket');
@@ -136,8 +148,13 @@ export const actions: Actions = {
       customerName: name
     });
 
-    const hash = createPinHash(ticket._id.toString(), pin);
-    cookies.set('pin', hash, { path: '/' });
+    const ticketId = encrypt4Cookie(ticket._id.toString());
+    const encryptedPin = encrypt4Cookie(pin);
+    if (!ticketId || !encryptedPin) {
+      return error(501, 'Show cannot Reserve Ticket');
+    }
+    cookies.set('pin', encryptedPin, { path: PUBLIC_AUTH_PATH });
+    cookies.set('ticketId', ticketId, { path: PUBLIC_AUTH_PATH });
     const redirectUrl = urlJoin(
       url.origin,
       PUBLIC_TICKET_PATH,

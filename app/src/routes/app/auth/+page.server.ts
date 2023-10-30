@@ -11,7 +11,13 @@ import {
 
 import { AuthType, User, UserRole } from '$lib/models/user';
 
-import { getSecretSlug, verifySignature } from '$lib/server/auth';
+import { EntityType } from '$lib/constants';
+import {
+  decryptFromCookie,
+  encrypt4Cookie,
+  getSecretSlug,
+  verifySignature
+} from '$lib/server/auth';
 
 import type { Actions, PageServerLoad } from './$types';
 
@@ -78,14 +84,16 @@ export const actions: Actions = {
     );
 
     cookies.delete('returnPath', { path: '/' });
+    const encAuthToken = encrypt4Cookie(authToken);
 
-    cookies.set(tokenName, authToken, {
-      path: '/',
-      httpOnly: true,
-      sameSite: 'strict',
-      maxAge: +AUTH_MAX_AGE,
-      expires: new Date(Date.now() + +AUTH_MAX_AGE)
-    });
+    encAuthToken &&
+      cookies.set(tokenName, encAuthToken, {
+        path: '/',
+        httpOnly: true,
+        sameSite: 'strict',
+        maxAge: +AUTH_MAX_AGE,
+        expires: new Date(Date.now() + +AUTH_MAX_AGE)
+      });
     throw redirect(302, returnPath);
   },
   password_secret_auth: async ({ cookies, request }) => {
@@ -126,30 +134,48 @@ export const actions: Actions = {
     );
 
     cookies.delete('returnPath', { path: '/' });
-    cookies.set(tokenName, authToken, {
-      path: '/',
-      httpOnly: true,
-      sameSite: 'strict',
-      secure: true,
-      maxAge: +AUTH_MAX_AGE,
-      expires: new Date(Date.now() + +AUTH_MAX_AGE)
-    });
+
+    const encAuthToken = encrypt4Cookie(authToken);
+
+    encAuthToken &&
+      cookies.set(tokenName, authToken, {
+        path: '/',
+        httpOnly: true,
+        sameSite: 'strict',
+        secure: true,
+        maxAge: +AUTH_MAX_AGE,
+        expires: new Date(Date.now() + +AUTH_MAX_AGE)
+      });
     return { success: true };
   }
 } satisfies Actions;
 
 export const load: PageServerLoad = async ({ cookies }) => {
   const returnPath = cookies.get('returnPath');
-  const { slug, secret } = getSecretSlug(returnPath);
+  const clearReturnPath = decryptFromCookie(returnPath);
+  const { slug, secret } = getSecretSlug(clearReturnPath);
 
-  if (!returnPath) {
+  if (!clearReturnPath) {
     throw error(400, 'Missing Return Path');
   }
+  let authType = AuthType.NONE;
 
-  const authType = secret ? AuthType.PASSWORD_SECRET : AuthType.SIGNING;
+  switch (slug) {
+    case EntityType.CREATOR.toLocaleLowerCase(): {
+      authType = AuthType.PASSWORD_SECRET;
+      break;
+    }
+    case EntityType.TICKET.toLocaleLowerCase(): {
+      authType = AuthType.PIN;
+      break;
+    }
+    default: {
+      authType = AuthType.SIGNING;
+    }
+  }
 
   return {
-    returnPath,
+    returnPath: clearReturnPath,
     authType,
     slug,
     secret
