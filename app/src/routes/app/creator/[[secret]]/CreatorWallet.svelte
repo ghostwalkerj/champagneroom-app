@@ -5,13 +5,13 @@
   import { applyAction, enhance } from '$app/forms';
 
   import { CurrencyType } from '$lib/models/common';
-  import { type WalletDocumentType, WalletStatus } from '$lib/models/wallet';
+  import { WalletStatus, type WalletDocumentType } from '$lib/models/wallet';
 
   import { currencyFormatter } from '$lib/constants';
 
   import { walletStore } from '$stores';
 
-  import type { ActionData } from './$types';
+  import type { ActionData } from '../$types';
 
   export let destination = '';
   export let exchangeRate = 0;

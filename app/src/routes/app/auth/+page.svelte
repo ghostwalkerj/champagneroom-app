@@ -20,7 +20,7 @@
 
   const redirectPath = returnPath ?? PUBLIC_WEBSITE_URL;
   $: hasNoWallet = false;
-  let isUniqueKeyAuth = false;
+  let isPasswordSecret = false;
   let isSigningAuth = false;
 
   const setSigningAuth = async (
@@ -35,7 +35,7 @@
     formData.append('message', message);
     formData.append('returnPath', returnPath);
 
-    await fetch('?/signing_auth', {
+    const resp = await fetch('?/signing_auth', {
       method: 'POST',
       body: formData,
       redirect: 'follow'
@@ -46,18 +46,33 @@
     let formData = new FormData();
     formData.append('secret', secret!);
     formData.append('slug', slug!);
-    formData.append('returnPath', returnPath);
 
-    await fetch('?/password_secret_auth', {
+    const response = await fetch('?/password_secret_auth', {
       method: 'POST',
       body: formData,
       redirect: 'follow'
     });
+
+    const result: ActionResult = deserialize(await response.text());
+    switch (result.type) {
+      case 'error': {
+        goto('/');
+        break;
+      }
+      case 'redirect': {
+        goto(result.location);
+        break;
+      }
+      case 'success': {
+        goto(returnPath);
+        break;
+      }
+    }
   };
 
   switch (authType) {
     case AuthType.PASSWORD_SECRET: {
-      isUniqueKeyAuth = true;
+      isPasswordSecret = true;
       break;
     }
 
@@ -68,9 +83,8 @@
   }
 
   onMount(async () => {
-    if (isUniqueKeyAuth) {
-      await setPasswordAuth(redirectPath);
-      goto(redirectPath);
+    if (isPasswordSecret) {
+      setPasswordAuth(redirectPath);
     }
 
     // Signing Auth Flow

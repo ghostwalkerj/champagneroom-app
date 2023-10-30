@@ -87,10 +87,12 @@ const ticketSchema = new Schema(
       required: true,
       default: () => ({})
     },
-    customerName: { type: String, required: true, trim: true },
-    pin: {
-      type: String,
-      required: true
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+      unique: true,
+      autopopulate: true
     },
     agent: { type: Schema.Types.ObjectId, ref: 'Agent' },
     creator: { type: Schema.Types.ObjectId, ref: 'Creator', required: true }

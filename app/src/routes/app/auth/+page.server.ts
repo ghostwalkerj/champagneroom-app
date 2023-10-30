@@ -1,6 +1,5 @@
 import { error, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
-import mongoose from 'mongoose';
 
 import {
   AUTH_MAX_AGE,
@@ -9,11 +8,10 @@ import {
   JWT_EXPIRY,
   JWT_PRIVATE_KEY
 } from '$env/static/private';
-import { PUBLIC_SIGNUP_PATH } from '$env/static/public';
 
 import { AuthType, User, UserRole } from '$lib/models/user';
 
-import { getSecretSlug, SECRET_PATHS, verifySignature } from '$lib/server/auth';
+import { getSecretSlug, verifySignature } from '$lib/server/auth';
 
 import type { Actions, PageServerLoad } from './$types';
 
@@ -30,7 +28,7 @@ export const actions: Actions = {
     const user = await User.findOne({ address }).select('nonce').exec();
     if (!user) {
       console.error('User not found');
-      throw redirect(302, PUBLIC_SIGNUP_PATH);
+      throw error(404, 'User not found');
     }
     const message = AUTH_SIGNING_MESSAGE + ' ' + user.nonce;
     return {
@@ -78,6 +76,9 @@ export const actions: Actions = {
       },
       JWT_PRIVATE_KEY
     );
+
+    cookies.delete('returnPath', { path: '/' });
+
     cookies.set(tokenName, authToken, {
       path: '/',
       httpOnly: true,
@@ -91,7 +92,6 @@ export const actions: Actions = {
     const data = await request.formData();
     const secret = data.get('secret') as string;
     const slug = data.get('slug') as string;
-    const returnPath = data.get('returnPath') as string;
 
     if (!secret) {
       console.error('No secret');
@@ -101,11 +101,6 @@ export const actions: Actions = {
     if (!slug) {
       console.error('No slug');
       throw error(404, 'Bad slug');
-    }
-
-    if (!returnPath) {
-      console.error('No returnPath');
-      throw error(400, 'Missing Return Path');
     }
 
     // verify the user exists and has password auth
@@ -129,6 +124,8 @@ export const actions: Actions = {
       },
       JWT_PRIVATE_KEY
     );
+
+    cookies.delete('returnPath', { path: '/' });
     cookies.set(tokenName, authToken, {
       path: '/',
       httpOnly: true,
@@ -137,7 +134,7 @@ export const actions: Actions = {
       maxAge: +AUTH_MAX_AGE,
       expires: new Date(Date.now() + +AUTH_MAX_AGE)
     });
-    throw redirect(302, returnPath);
+    return { success: true };
   }
 } satisfies Actions;
 
@@ -145,14 +142,9 @@ export const load: PageServerLoad = async ({ cookies }) => {
   const returnPath = cookies.get('returnPath');
   const { slug, secret } = getSecretSlug(returnPath);
 
-  console.log('slug', slug);
-  console.log('secret', secret);
-
   if (!returnPath) {
     throw error(400, 'Missing Return Path');
   }
-
-  cookies.delete('returnPath', { path: '/' });
 
   const authType = secret ? AuthType.PASSWORD_SECRET : AuthType.SIGNING;
 

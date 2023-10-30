@@ -4,9 +4,9 @@ import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 
 import {
-  BITCART_API_URL,
-  BITCART_EMAIL,
-  BITCART_PASSWORD
+    BITCART_API_URL,
+    BITCART_EMAIL,
+    BITCART_PASSWORD
 } from '$env/static/private';
 
 import type { CancelType } from '$lib/models/common';
@@ -24,10 +24,10 @@ import type { ShowQueueType } from '$lib/workers/showWorker';
 
 import { ActorType, EntityType } from '$lib/constants';
 import { rateCryptosRateGet } from '$lib/ext/bitcart';
-import { createAuthToken, PayoutJobType, PayoutReason } from '$lib/payment';
+import { PayoutJobType, PayoutReason, createAuthToken } from '$lib/payment';
 import { getShowMachineServiceFromId } from '$lib/server/machinesUtil';
 
-import type { Actions, PageServerLoad, RequestEvent } from './$types';
+import type { Actions, PageServerLoad, RequestEvent } from './[address]/$types';
 
 export const actions: Actions = {
   update_profile_image: async ({ params, request }: RequestEvent) => {

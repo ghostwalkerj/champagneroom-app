@@ -63,68 +63,68 @@ export const handle = (async ({ event, resolve }) => {
       authToken === undefined;
     } else {
       cookies.set('returnPath', returnPath, { path: authUrl });
-    }
 
-    // If authenticated, check if user is allowed to access the requested path and set user in locals
-    if (authToken) {
-      let decode: JwtPayload;
-      try {
-        decode = jwt.verify(authToken, JWT_PRIVATE_KEY) as JwtPayload;
-      } catch (error) {
-        console.error('Invalid token:', error);
-        cookies.delete(tokenName, { path: '/' });
-        throw redirect(302, authUrl);
-      }
-      const selector = decode.selector;
-
-      if (selector) {
-        const query = {};
-        query[selector] = decode[selector];
-
-        // Check if user is allowed to access the requested path
-        const user = await User.findOne(query);
-        if (!user) {
-          console.error('No user');
-          throw redirect(302, signUpUrl);
+      // If authenticated, check if user is allowed to access the requested path and set user in locals
+      if (authToken) {
+        let decode: JwtPayload;
+        try {
+          decode = jwt.verify(authToken, JWT_PRIVATE_KEY) as JwtPayload;
+        } catch (error) {
+          console.error('Invalid token:', error);
+          cookies.delete(tokenName, { path: '/' });
+          throw redirect(302, authUrl);
         }
-        locals.user = user;
+        const selector = decode.selector;
 
-        // load any associated roles
-        for (const role of user.roles) {
-          switch (role) {
-            case UserRole.AGENT: {
-              allowedPaths.push(PUBLIC_AGENT_PATH);
-              const agent = await Agent.findOne({ user: user._id });
-              if (!agent) {
-                console.error('No agent');
-                throw redirect(302, signUpUrl);
+        if (selector) {
+          const query = {};
+          query[selector] = decode[selector];
+
+          // Check if user is allowed to access the requested path
+          const user = await User.findOne(query);
+          if (!user) {
+            console.error('No user');
+            throw redirect(302, signUpUrl);
+          }
+          locals.user = user;
+
+          // load any associated roles
+          for (const role of user.roles) {
+            switch (role) {
+              case UserRole.AGENT: {
+                allowedPaths.push(PUBLIC_AGENT_PATH);
+                const agent = await Agent.findOne({ user: user._id });
+                if (!agent) {
+                  console.error('No agent');
+                  throw redirect(302, signUpUrl);
+                }
+                locals.agent = agent;
+                break;
               }
-              locals.agent = agent;
-              break;
-            }
-            case UserRole.CREATOR: {
-              let path = PUBLIC_CREATOR_PATH;
-              if (user.authType === AuthType.PASSWORD_SECRET) {
-                path = `${path}/${user[selector]}`;
+              case UserRole.CREATOR: {
+                let path = PUBLIC_CREATOR_PATH;
+                if (user.authType === AuthType.PASSWORD_SECRET) {
+                  path = `${path}/${user[selector]}`;
+                }
+                allowedPaths.push(path);
+                const creator = await Creator.findOne({ user: user._id });
+                if (!creator) {
+                  console.error('No creator');
+                  throw redirect(302, signUpUrl);
+                }
+                locals.creator = creator;
+                break;
               }
-              allowedPaths.push(path);
-              const creator = await Creator.findOne({ user: user._id });
-              if (!creator) {
-                console.error('No creator');
-                throw redirect(302, signUpUrl);
+              case UserRole.OPERATOR: {
+                allowedPaths.push(PUBLIC_OPERATOR_PATH);
+                const operator = await Operator.findOne({ user: user._id });
+                if (!operator) {
+                  console.error('No operator');
+                  throw redirect(302, signUpUrl);
+                }
+                locals.operator = operator;
+                break;
               }
-              locals.creator = creator;
-              break;
-            }
-            case UserRole.OPERATOR: {
-              allowedPaths.push(PUBLIC_OPERATOR_PATH);
-              const operator = await Operator.findOne({ user: user._id });
-              if (!operator) {
-                console.error('No operator');
-                throw redirect(302, signUpUrl);
-              }
-              locals.operator = operator;
-              break;
             }
           }
         }

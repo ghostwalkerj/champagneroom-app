@@ -1,9 +1,6 @@
-import crypto from 'node:crypto';
-
 import bcrypt from 'bcryptjs';
 import type { InferSchemaType, Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
-import { encrypt, fieldEncryption } from 'mongoose-field-encryption';
 import { nanoid } from 'nanoid';
 import validator from 'validator';
 

@@ -9,8 +9,8 @@ import { uniqueNamesGenerator } from 'unique-names-generator';
 
 import { AUTH_SALT } from '$env/static/private';
 import {
-  PUBLIC_DEFAULT_PROFILE_IMAGE,
-  PUBLIC_WEBSITE_URL
+    PUBLIC_DEFAULT_PROFILE_IMAGE,
+    PUBLIC_WEBSITE_URL
 } from '$env/static/public';
 
 import { Agent } from '$lib/models/agent';
