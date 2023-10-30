@@ -105,7 +105,7 @@ export const actions: Actions = {
 
       const user = await User.create({
         name,
-        authType: AuthType.PASSWORD_KEY,
+        authType: AuthType.PASSWORD_SECRET,
         secret,
         wallet: wallet._id,
         roles: [EntityType.CREATOR],

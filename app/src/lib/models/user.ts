@@ -1,7 +1,9 @@
+import crypto from 'node:crypto';
+
 import bcrypt from 'bcryptjs';
 import type { InferSchemaType, Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
-import { fieldEncryption } from 'mongoose-field-encryption';
+import { encrypt, fieldEncryption } from 'mongoose-field-encryption';
 import { nanoid } from 'nanoid';
 import validator from 'validator';
 
@@ -12,7 +14,7 @@ export type UserDocument = InstanceType<typeof User>;
 export type UserDocumentType = InferSchemaType<typeof userSchema>;
 export enum AuthType {
   SIGNING = 'SIGNING',
-  PASSWORD_KEY = 'PASSWORD_KEY',
+  PASSWORD_SECRET = 'PASSWORD_SECRET',
   PIN = 'PIN',
   NONE = 'NONE'
 }
@@ -44,7 +46,10 @@ export const userSchema = new Schema(
       maxLength: 50,
       lowerCase: true,
       index: true,
-      unique: true
+      unique: true,
+      required: true,
+      minLength: [21, 'Address is too short'],
+      default: () => nanoid(21)
     },
 
     roles: {
@@ -69,7 +74,6 @@ export const userSchema = new Schema(
       type: String,
       maxLength: 50,
       minLength: [21, 'Secret is too short'],
-      trim: true,
       default: () => nanoid(21),
       unique: true,
       index: true
@@ -106,11 +110,15 @@ export const userSchema = new Schema(
   { timestamps: true }
 );
 
-userSchema.plugin(fieldEncryption, {
-  fields: ['secret'],
-  secret: process.env.MONGO_DB_FIELD_SECRET,
-  saltGenerator: (secret: string) => secret.slice(0, 16)
-});
+// const saltGenerator = (secret: string) => secret.slice(0, 16);
+// const hash = (secret) =>
+//   crypto.createHash('sha256').update(secret).digest('hex').slice(0, 32);
+
+// userSchema.plugin(fieldEncryption, {
+//   fields: ['secret'],
+//   secret: process.env.MONGO_DB_FIELD_SECRET,
+//   saltGenerator
+// });
 
 userSchema.pre('save', function (next) {
   if (this.password && this.isModified('password')) {
@@ -130,6 +138,14 @@ userSchema.methods.comparePassword = function (password: string, salt: string) {
   const saltedPassword = `${password}${salt}`;
   return bcrypt.compare(saltedPassword, this.password);
 };
+
+// userSchema.statics.encryptField = function (secret: string) {
+//   return encrypt(
+//     secret,
+//     hash(process.env.MONGO_DB_FIELD_SECRET),
+//     saltGenerator
+//   );
+// };
 
 const User = models?.User
   ? (models.User as Model<UserDocumentType>)

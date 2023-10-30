@@ -27,7 +27,7 @@ import {
 import { Agent } from '$lib/models/agent';
 import { Creator } from '$lib/models/creator';
 import { Operator } from '$lib/models/operator';
-import { User, UserRole } from '$lib/models/user';
+import { AuthType, User, UserRole } from '$lib/models/user';
 
 import { APP_PATH, PATH_WHITELIST, verifyPath } from '$lib/server/auth';
 
@@ -75,9 +75,14 @@ export const handle = (async ({ event, resolve }) => {
         cookies.delete(tokenName, { path: '/' });
         throw redirect(302, authUrl);
       }
-      if (decode.address) {
+      const selector = decode.selector;
+
+      if (selector) {
+        const query = {};
+        query[selector] = decode[selector];
+
         // Check if user is allowed to access the requested path
-        const user = await User.findOne({ address: decode.address });
+        const user = await User.findOne(query);
         if (!user) {
           console.error('No user');
           throw redirect(302, signUpUrl);
@@ -98,7 +103,11 @@ export const handle = (async ({ event, resolve }) => {
               break;
             }
             case UserRole.CREATOR: {
-              allowedPaths.push(PUBLIC_CREATOR_PATH);
+              let path = PUBLIC_CREATOR_PATH;
+              if (user.authType === AuthType.PASSWORD_SECRET) {
+                path = `${path}/${user[selector]}`;
+              }
+              allowedPaths.push(path);
               const creator = await Creator.findOne({ user: user._id });
               if (!creator) {
                 console.error('No creator');

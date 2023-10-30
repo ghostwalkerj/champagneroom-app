@@ -16,7 +16,7 @@
 
   export let data: PageData;
 
-  let { returnPath, authType, key } = data;
+  let { returnPath, authType, secret, slug } = data;
 
   const redirectPath = returnPath ?? PUBLIC_WEBSITE_URL;
   $: hasNoWallet = false;
@@ -42,12 +42,13 @@
     });
   };
 
-  const setUniquePasswordKeyAuth = async (returnPath: string) => {
+  const setPasswordAuth = async (returnPath: string) => {
     let formData = new FormData();
-    formData.append('key', key!);
+    formData.append('secret', secret!);
+    formData.append('slug', slug!);
     formData.append('returnPath', returnPath);
 
-    await fetch('?/unique_key_auth', {
+    await fetch('?/password_secret_auth', {
       method: 'POST',
       body: formData,
       redirect: 'follow'
@@ -55,7 +56,7 @@
   };
 
   switch (authType) {
-    case AuthType.PASSWORD_KEY: {
+    case AuthType.PASSWORD_SECRET: {
       isUniqueKeyAuth = true;
       break;
     }
@@ -68,7 +69,7 @@
 
   onMount(async () => {
     if (isUniqueKeyAuth) {
-      await setUniquePasswordKeyAuth(redirectPath);
+      await setPasswordAuth(redirectPath);
       goto(redirectPath);
     }
 

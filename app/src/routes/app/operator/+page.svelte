@@ -231,11 +231,7 @@
             target="_blank"
             class="link link-primary"
           >
-            {urlJoin(
-              $page.url.href,
-              PUBLIC_CREATOR_PATH,
-              newCreator.user.secret
-            )}</a
+            {urlJoin(PUBLIC_CREATOR_PATH, newCreator.user.secret)}</a
           >
         </div>
       </div>
