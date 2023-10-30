@@ -1,28 +1,24 @@
-import { error, fail, redirect } from '@sveltejs/kit';
+import { error, fail } from '@sveltejs/kit';
 import type { AxiosResponse } from 'axios';
 import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 import { Types } from 'mongoose';
-import urlJoin from 'url-join';
 
 import {
-    BITCART_API_URL,
-    BITCART_EMAIL,
-    BITCART_PASSWORD
+  BITCART_API_URL,
+  BITCART_EMAIL,
+  BITCART_PASSWORD
 } from '$env/static/private';
-import { PUBLIC_PIN_PATH } from '$env/static/public';
 
 import type {
-    CancelType,
-    DisputeReason,
-    DisputeType,
-    FeedbackType,
-    RefundType
+  CancelType,
+  DisputeReason,
+  DisputeType,
+  FeedbackType,
+  RefundType
 } from '$lib/models/common';
 import { CancelReason, RefundReason } from '$lib/models/common';
 import { Show } from '$lib/models/show';
-import type { TicketDocument } from '$lib/models/ticket';
-import { Ticket } from '$lib/models/ticket';
 
 import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
 import { TicketMachineEventString } from '$lib/machines/ticketMachine';
@@ -30,30 +26,28 @@ import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 import type { PayoutQueueType } from '$lib/workers/payoutWorker';
 
 import { ActorType, EntityType } from '$lib/constants';
-import { InvoiceJobType, PayoutJobType, createAuthToken } from '$lib/payment';
-import { verifyPin } from '$lib/pin';
+import { createAuthToken, InvoiceJobType, PayoutJobType } from '$lib/payment';
 import {
-    getTicketMachineService,
-    getTicketMachineServiceFromId
+  getTicketMachineService,
+  getTicketMachineServiceFromId
 } from '$lib/server/machinesUtil';
 
 import {
-    getInvoiceByIdInvoicesModelIdGet,
-    updatePaymentDetailsInvoicesModelIdDetailsPatch
+  getInvoiceByIdInvoicesModelIdGet,
+  updatePaymentDetailsInvoicesModelIdDetailsPatch
 } from '$ext/bitcart';
 import type { DisplayInvoice } from '$ext/bitcart/models';
 
 import type { Actions, PageServerLoad } from './$types';
 
 export const actions: Actions = {
-  cancel_ticket: async ({ params, locals }) => {
-    const ticketId = params.id;
-    if (ticketId === null) {
+  cancel_ticket: async ({ locals }) => {
+    const ticket = locals.ticket;
+    if (!ticket) {
       throw error(404, 'Ticket not found');
     }
 
     const redisConnection = locals.redisConnection as IORedis;
-    const ticket = (await Ticket.findById(ticketId)) as TicketDocument;
 
     const ticketService = getTicketMachineService(ticket, redisConnection);
     const state = ticketService.getSnapshot();
@@ -120,7 +114,7 @@ export const actions: Actions = {
       }) as PayoutQueueType;
       payoutQueue.add(PayoutJobType.REFUND_SHOW, {
         bcInvoiceId,
-        ticketId
+        ticketId: ticket._id
       });
     }
 
@@ -130,10 +124,10 @@ export const actions: Actions = {
     };
   },
 
-  leave_feedback: async ({ params, request, locals }) => {
-    const ticketId = params.id;
-    if (ticketId === null) {
-      throw error(404, 'TicketId not found');
+  leave_feedback: async ({ request, locals }) => {
+    const ticket = locals.ticket;
+    if (!ticket) {
+      throw error(404, 'Ticket not found');
     }
 
     const data = await request.formData();
@@ -146,10 +140,7 @@ export const actions: Actions = {
 
     const redisConnection = locals.redisConnection as IORedis;
 
-    const ticketService = await getTicketMachineServiceFromId(
-      ticketId,
-      redisConnection
-    );
+    const ticketService = getTicketMachineService(ticket, redisConnection);
 
     const state = ticketService.getSnapshot();
     const feedback = {
@@ -170,9 +161,9 @@ export const actions: Actions = {
     return { success: true, rating, review };
   },
 
-  initiate_dispute: async ({ params, request, locals }) => {
-    const ticketId = params.id;
-    if (ticketId === null) {
+  initiate_dispute: async ({ request, locals }) => {
+    const ticket = locals.ticket;
+    if (!ticket) {
       throw error(404, 'Ticket not found');
     }
 
@@ -189,7 +180,6 @@ export const actions: Actions = {
     }
 
     const redisConnection = locals.redisConnection as IORedis;
-    const ticket = (await Ticket.findById(ticketId)) as TicketDocument;
     const ticketService = getTicketMachineService(ticket, redisConnection);
 
     const state = ticketService.getSnapshot();
@@ -292,28 +282,12 @@ export const actions: Actions = {
   }
 };
 
-export const load: PageServerLoad = async ({ params, cookies, url }) => {
-  const ticketId = params.id;
-  const pinHash = cookies.get('pin');
-  const redirectUrl = urlJoin(url.href, PUBLIC_PIN_PATH);
+export const load: PageServerLoad = async ({ locals }) => {
+  const ticket = locals.ticket;
 
-  if (!pinHash) {
-    throw redirect(302, redirectUrl);
+  if (!ticket) {
+    throw error(404, 'Ticket not found');
   }
-  if (ticketId === null) {
-    throw error(404, 'Bad ticket id');
-  }
-
-  const ticket = await Ticket.findById(ticketId)
-    .orFail(() => {
-      throw error(404, 'Ticket not found');
-    })
-    .exec();
-
-  if (!verifyPin(ticketId, ticket.pin, pinHash)) {
-    throw redirect(302, redirectUrl);
-  }
-
   const show = await Show.findById(ticket.show)
     .orFail(() => {
       throw error(404, 'Show not found');

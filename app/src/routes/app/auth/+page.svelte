@@ -20,8 +20,6 @@
 
   const redirectPath = returnPath ?? PUBLIC_WEBSITE_URL;
   $: hasNoWallet = false;
-  let isPasswordSecret = false;
-  let isSigningAuth = false;
 
   const setSigningAuth = async (
     message: string,
@@ -70,69 +68,93 @@
     }
   };
 
-  switch (authType) {
-    case AuthType.PASSWORD_SECRET: {
-      isPasswordSecret = true;
-      break;
-    }
+  const setPinAuth = async (returnPath: string) => {
+    const response = await fetch('?/pin_auth', {
+      method: 'POST',
+      body: new FormData(),
+      redirect: 'follow'
+    });
 
-    case AuthType.SIGNING: {
-      isSigningAuth = true;
-      break;
+    const result: ActionResult = deserialize(await response.text());
+    switch (result.type) {
+      case 'error': {
+        goto('/');
+        break;
+      }
+      case 'redirect': {
+        goto(result.location);
+        break;
+      }
+      case 'success': {
+        goto(returnPath);
+        break;
+      }
     }
-  }
+  };
 
   onMount(async () => {
-    if (isPasswordSecret) {
-      setPasswordAuth(redirectPath);
-    }
+    switch (authType) {
+      case AuthType.PASSWORD_SECRET: {
+        setPasswordAuth(redirectPath);
+        break;
+      }
 
-    // Signing Auth Flow
-    // Check if wallet is connected
-    // If not, ask to connect
-    // If connected, check if wallet address matches
-    // If not, ask to connect wallet with correct address
-    if (isSigningAuth) {
-      let walletAddress = '';
-      defaultWallet.subscribe(async (wallet) => {
-        hasNoWallet = wallet === undefined;
-        if (wallet && walletAddress !== wallet.accounts[0].address) {
-          walletAddress = wallet.accounts[0].address;
-          let formData = new FormData();
-          formData.append('address', walletAddress);
-          const response = await fetch('?/get_signing_message', {
-            method: 'POST',
-            body: formData
-          });
-          const result: ActionResult = deserialize(await response.text());
+      case AuthType.SIGNING: {
+        let walletAddress = '';
+        defaultWallet.subscribe(async (wallet) => {
+          hasNoWallet = wallet === undefined;
+          if (wallet && walletAddress !== wallet.accounts[0].address) {
+            walletAddress = wallet.accounts[0].address;
+            let formData = new FormData();
+            formData.append('address', walletAddress);
+            const response = await fetch('?/get_signing_message', {
+              method: 'POST',
+              body: formData
+            });
+            const result: ActionResult = deserialize(await response.text());
 
-          switch (result.type) {
-            case 'success': {
-              if (result.data) {
-                const message = result.data.message;
-                const address = walletAddress;
-                const signature = (await wallet.provider.request({
-                  method: 'personal_sign',
-                  params: [message, walletAddress]
-                })) as string;
-                await setSigningAuth(message, signature, redirectPath, address);
-                goto(redirectPath);
+            switch (result.type) {
+              case 'success': {
+                if (result.data) {
+                  const message = result.data.message;
+                  const address = walletAddress;
+                  const signature = (await wallet.provider.request({
+                    method: 'personal_sign',
+                    params: [message, walletAddress]
+                  })) as string;
+                  await setSigningAuth(
+                    message,
+                    signature,
+                    redirectPath,
+                    address
+                  );
+                  goto(redirectPath);
+                }
+                break;
               }
-              break;
-            }
-            case 'error': {
-              break;
-            }
-            case 'redirect': {
-              goto(result.location);
-              break;
-            }
-            default: {
-              break;
+              case 'error': {
+                break;
+              }
+              case 'redirect': {
+                goto(result.location);
+                break;
+              }
+              default: {
+                break;
+              }
             }
           }
-        }
-      });
+        });
+        break;
+      }
+
+      case AuthType.PIN: {
+        setPinAuth(redirectPath);
+        break;
+      }
+      default: {
+        break;
+      }
     }
   });
 </script>

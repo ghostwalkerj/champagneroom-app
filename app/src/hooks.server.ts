@@ -21,12 +21,14 @@ import {
   PUBLIC_AUTH_PATH,
   PUBLIC_CREATOR_PATH,
   PUBLIC_OPERATOR_PATH,
-  PUBLIC_SIGNUP_PATH
+  PUBLIC_SIGNUP_PATH,
+  PUBLIC_TICKET_PATH
 } from '$env/static/public';
 
 import { Agent } from '$lib/models/agent';
 import { Creator } from '$lib/models/creator';
 import { Operator } from '$lib/models/operator';
+import { Ticket } from '$lib/models/ticket';
 import { AuthType, User, UserRole } from '$lib/models/user';
 
 import {
@@ -134,6 +136,18 @@ export const handle = (async ({ event, resolve }) => {
                 }
                 locals.operator = operator;
                 break;
+              }
+              case UserRole.TICKET_HOLDER: {
+                const ticket = await Ticket.findOne({
+                  user: user._id
+                });
+                if (!ticket) {
+                  console.error('No ticket');
+                  throw redirect(302, signUpUrl);
+                }
+                locals.ticket = ticket;
+                const ticketPath = `${PUBLIC_TICKET_PATH}/${ticket._id}`;
+                allowedPaths.push(ticketPath);
               }
             }
           }

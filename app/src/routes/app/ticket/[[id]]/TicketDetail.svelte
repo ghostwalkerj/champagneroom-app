@@ -4,7 +4,8 @@
   import { PUBLIC_SHOW_PATH, PUBLIC_STATIC_URL } from '$env/static/public';
 
   import type { ShowDocumentType } from '$lib/models/show';
-  import { TicketStatus, type TicketDocumentType } from '$lib/models/ticket';
+  import { type TicketDocumentType, TicketStatus } from '$lib/models/ticket';
+  import type { UserDocument } from '$lib/models/user';
 
   import { currencyFormatter, durationFormatter } from '$lib/constants';
   export let show: ShowDocumentType;
@@ -16,6 +17,7 @@
   const showCoverImageUrl = show.coverImageUrl;
   const showDuration = durationFormatter(show.duration * 60);
   const showUrl = urlJoin(PUBLIC_SHOW_PATH, show._id.toString());
+  const user = ticket.user as unknown as UserDocument;
 
   // Ticket
   $: ticketStatus = ticket
@@ -24,7 +26,7 @@
       : ticket.ticketState.status
     : '';
   const currency = ticket.price.currency || 'USD';
-  const customerName = ticket.customerName;
+  const customerName = user.name;
   const ticketPrice = currencyFormatter(currency).format(ticket.price.amount);
 </script>
 

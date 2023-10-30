@@ -14,8 +14,9 @@
 
   import type { RefundType } from '$lib/models/common';
   import { DisputeReason, RefundReason } from '$lib/models/common';
-  import { ShowStatus, type ShowDocumentType } from '$lib/models/show';
+  import { type ShowDocumentType, ShowStatus } from '$lib/models/show';
   import type { TicketDocumentType } from '$lib/models/ticket';
+  import type { UserDocument } from '$lib/models/user';
 
   import type { TicketMachineServiceType } from '$lib/machines/ticketMachine';
   import { createTicketMachineService } from '$lib/machines/ticketMachine';
@@ -37,6 +38,8 @@
   let ticket = data.ticket as TicketDocumentType;
   let show = data.show as ShowDocumentType;
   let invoice = data.invoice;
+
+  let user = ticket.user as unknown as UserDocument;
 
   const currentPayment = invoice?.payments?.[
     invoice?.payments?.length - 1
@@ -62,7 +65,7 @@
   $: hasShowStarted = false;
   $: loading = false;
 
-  nameStore.set(ticket.customerName);
+  nameStore.set(user.name);
 
   const walletPay = async () => {
     if ($selectedAccount) {

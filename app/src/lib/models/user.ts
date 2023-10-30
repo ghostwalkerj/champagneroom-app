@@ -130,9 +130,8 @@ userSchema.pre('save', function (next) {
   }
 });
 
-userSchema.methods.comparePassword = function (password: string, salt: string) {
-  const saltedPassword = `${password}${salt}`;
-  return bcrypt.compare(saltedPassword, this.password);
+userSchema.methods.comparePassword = function (password: string) {
+  return bcrypt.compare(password, this.password);
 };
 
 // userSchema.statics.encryptField = function (secret: string) {

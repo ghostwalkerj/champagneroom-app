@@ -1,5 +1,6 @@
 import type { InferSchemaType, Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
+import mongooseAutoPopulate from 'mongoose-autopopulate';
 import { fieldEncryption } from 'mongoose-field-encryption';
 import validator from 'validator';
 
@@ -104,6 +105,8 @@ ticketSchema.plugin(fieldEncryption, {
   fields: ['pin'],
   secret: process.env.MONGO_DB_FIELD_SECRET
 });
+
+ticketSchema.plugin(mongooseAutoPopulate);
 
 export type TicketDocumentType = InferSchemaType<typeof ticketSchema> & {
   show: ShowDocumentType;

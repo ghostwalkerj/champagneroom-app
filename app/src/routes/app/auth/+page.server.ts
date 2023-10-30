@@ -1,4 +1,4 @@
-import { error, redirect } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 
 import {
@@ -8,6 +8,7 @@ import {
   JWT_EXPIRY,
   JWT_PRIVATE_KEY
 } from '$env/static/private';
+import { PUBLIC_AUTH_PATH } from '$env/static/public';
 
 import { AuthType, User, UserRole } from '$lib/models/user';
 
@@ -47,7 +48,6 @@ export const actions: Actions = {
     const signature = data.get('signature') as string;
     const address = data.get('address') as string;
     const message = data.get('message') as string;
-    const returnPath = data.get('returnPath') as string;
 
     if (!address) {
       throw error(404, 'Bad address');
@@ -59,10 +59,6 @@ export const actions: Actions = {
 
     if (!message) {
       throw error(400, 'Missing Message');
-    }
-
-    if (!returnPath) {
-      throw error(400, 'Missing Return Path');
     }
 
     // Verify Auth
@@ -83,7 +79,6 @@ export const actions: Actions = {
       JWT_PRIVATE_KEY
     );
 
-    cookies.delete('returnPath', { path: '/' });
     const encAuthToken = encrypt4Cookie(authToken);
 
     encAuthToken &&
@@ -94,7 +89,7 @@ export const actions: Actions = {
         maxAge: +AUTH_MAX_AGE,
         expires: new Date(Date.now() + +AUTH_MAX_AGE)
       });
-    throw redirect(302, returnPath);
+    return { success: true };
   },
   password_secret_auth: async ({ cookies, request }) => {
     const data = await request.formData();
@@ -133,8 +128,6 @@ export const actions: Actions = {
       JWT_PRIVATE_KEY
     );
 
-    cookies.delete('returnPath', { path: '/' });
-
     const encAuthToken = encrypt4Cookie(authToken);
 
     encAuthToken &&
@@ -146,6 +139,63 @@ export const actions: Actions = {
         maxAge: +AUTH_MAX_AGE,
         expires: new Date(Date.now() + +AUTH_MAX_AGE)
       });
+    return { success: true };
+  },
+  pin_auth: async ({ cookies }) => {
+    const pin = cookies.get('pin');
+    const userId = cookies.get('userId') as string;
+
+    if (!pin) {
+      console.error('No pin');
+      throw error(404, 'Bad pin');
+    }
+
+    if (!userId) {
+      console.error('No userId');
+      throw error(404, 'Bad userId');
+    }
+
+    const clearPin = decryptFromCookie(pin);
+    const clearUserId = decryptFromCookie(userId);
+
+    const user = await User.findOne({
+      _id: clearUserId
+    });
+    if (!user) {
+      console.error('User not found');
+      throw error(404, 'Bad user');
+    }
+
+    if (clearPin && clearUserId) {
+      const goodPin = user.comparePassword(clearPin);
+      if (!goodPin) {
+        console.error('Bad pin');
+        throw error(404, 'Bad pin');
+      }
+      const authToken = jwt.sign(
+        {
+          selector: '_id',
+          password: clearPin,
+          _id: clearUserId,
+          exp: Math.floor(Date.now() / 1000) + +JWT_EXPIRY,
+          authType: AuthType.PIN
+        },
+        JWT_PRIVATE_KEY
+      );
+
+      const encAuthToken = encrypt4Cookie(authToken);
+      cookies.delete('pin', { path: PUBLIC_AUTH_PATH });
+      cookies.delete('userId', { path: PUBLIC_AUTH_PATH });
+
+      encAuthToken &&
+        cookies.set(tokenName, encAuthToken, {
+          path: '/',
+          httpOnly: true,
+          sameSite: 'strict',
+          maxAge: +AUTH_MAX_AGE,
+          expires: new Date(Date.now() + +AUTH_MAX_AGE)
+        });
+    }
     return { success: true };
   }
 } satisfies Actions;
@@ -173,6 +223,8 @@ export const load: PageServerLoad = async ({ cookies }) => {
       authType = AuthType.SIGNING;
     }
   }
+
+  cookies.delete('returnPath', { path: PUBLIC_AUTH_PATH });
 
   return {
     returnPath: clearReturnPath,

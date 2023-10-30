@@ -28,7 +28,6 @@ import type { ShowQueueType } from '$lib/workers/showWorker';
 import { EntityType } from '$lib/constants';
 import { mensNames } from '$lib/mensNames';
 import { createAuthToken } from '$lib/payment';
-import { createPinHash } from '$lib/pin';
 import { encrypt4Cookie } from '$lib/server/auth';
 import { getShowMachineServiceFromId } from '$lib/server/machinesUtil';
 
@@ -148,13 +147,13 @@ export const actions: Actions = {
       customerName: name
     });
 
-    const ticketId = encrypt4Cookie(ticket._id.toString());
+    const userId = encrypt4Cookie(user._id.toString());
     const encryptedPin = encrypt4Cookie(pin);
-    if (!ticketId || !encryptedPin) {
+    if (!userId || !encryptedPin) {
       return error(501, 'Show cannot Reserve Ticket');
     }
     cookies.set('pin', encryptedPin, { path: PUBLIC_AUTH_PATH });
-    cookies.set('ticketId', ticketId, { path: PUBLIC_AUTH_PATH });
+    cookies.set('userId', userId, { path: PUBLIC_AUTH_PATH });
     const redirectUrl = urlJoin(
       url.origin,
       PUBLIC_TICKET_PATH,
