@@ -4,7 +4,6 @@
 
   import { deserialize } from '$app/forms';
   import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
   import { PUBLIC_WEBSITE_URL } from '$env/static/public';
 
   import { AuthType } from '$lib/models/user';
@@ -17,7 +16,7 @@
 
   export let data: PageData;
 
-  let { message, address, returnPath, authType, key } = data;
+  let { returnPath, authType, key } = data;
 
   const redirectPath = returnPath ?? PUBLIC_WEBSITE_URL;
   $: hasNoWallet = false;
@@ -27,15 +26,16 @@
   const setSigningAuth = async (
     message: string,
     signature: string,
-    returnPath: string
+    returnPath: string,
+    address: string
   ) => {
     let formData = new FormData();
     formData.append('signature', signature);
-    formData.append('address', address!);
+    formData.append('address', address);
     formData.append('message', message);
     formData.append('returnPath', returnPath);
 
-    await fetch($page.url.href + '?/signing_auth', {
+    await fetch('?/signing_auth', {
       method: 'POST',
       body: formData,
       redirect: 'follow'
@@ -47,7 +47,7 @@
     formData.append('key', key!);
     formData.append('returnPath', returnPath);
 
-    await fetch($page.url.href + '?/unique_key_auth', {
+    await fetch('?/unique_key_auth', {
       method: 'POST',
       body: formData,
       redirect: 'follow'
@@ -94,14 +94,13 @@
           switch (result.type) {
             case 'success': {
               if (result.data) {
-                message = result.data.message;
-                address = walletAddress;
-
-                const signature = await wallet.provider.request({
+                const message = result.data.message;
+                const address = walletAddress;
+                const signature = (await wallet.provider.request({
                   method: 'personal_sign',
                   params: [message, walletAddress]
-                });
-                await setSigningAuth(message, signature, redirectPath);
+                })) as string;
+                await setSigningAuth(message, signature, redirectPath, address);
                 goto(redirectPath);
               }
               break;

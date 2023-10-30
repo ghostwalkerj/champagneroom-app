@@ -119,23 +119,12 @@ export const actions: Actions = {
 } satisfies Actions;
 
 export const load: PageServerLoad = async ({ cookies }) => {
-  const address = cookies.get('address');
   const returnPath = cookies.get('returnPath');
   const key = cookies.get('key');
 
-  let authType = AuthType.SIGNING;
-  let message = '';
-
-  const user = await User.findOne({ address }).exec();
-
-  if (user) {
-    authType = user.authType as AuthType;
-    message = AUTH_SIGNING_MESSAGE + ' ' + user.nonce;
-  }
+  const authType = AuthType.SIGNING;
 
   return {
-    message,
-    address,
     returnPath,
     authType,
     key
