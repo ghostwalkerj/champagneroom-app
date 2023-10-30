@@ -1,11 +1,12 @@
 <script lang="ts">
+  import type { ActionResult } from '@sveltejs/kit';
   import { ObjectId } from 'mongodb';
   import spacetime from 'spacetime';
   import StarRating from 'svelte-star-rating';
   import { uniqueNamesGenerator } from 'unique-names-generator';
   import urlJoin from 'url-join';
 
-  import { enhance } from '$app/forms';
+  import { deserialize, enhance } from '$app/forms';
   import { invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
   import {
@@ -87,21 +88,20 @@
     isDecideDispute = false;
   };
 
-  const changeCreatorSecret = async () => {
+  const changeUserSecret = async () => {
     const index = activeCreatorRow;
     const userId = creators[index].user._id.toString();
     let formData = new FormData();
     formData.append('userId', userId);
-    const response = await fetch('?/change_user_address', {
+    const response = await fetch('?/change_user_secret', {
       method: 'POST',
       body: formData
     });
-    const resp = await response.json();
-    const respData = JSON.parse(resp.data);
-    const addressIndex = respData[0]['address'];
-    if (addressIndex) {
-      creators[index].user.address = respData[addressIndex];
+    const result: ActionResult = deserialize(await response.text());
+    if (result.type === 'success' && result.data) {
+      creators[index].user.secret = result.data.secret;
     }
+
     isChangeCreatorSecret = false;
   };
 
@@ -225,7 +225,7 @@
       </div>
       <div class="text-center mt-4">
         and secret URL:
-        <div class="text-center font-bold text-lg text-sm">
+        <div class="text-center font-bold text-sm">
           <a
             href={urlJoin(PUBLIC_CREATOR_PATH, newCreator.user.secret)}
             target="_blank"
@@ -284,16 +284,16 @@
     <input type="checkbox" id="changeUrl-show-modal" class="modal-toggle" />
     <div class="modal modal-open">
       <div class="modal-box">
-        <h3 class="font-bold text-lg">Change Creator URL</h3>
+        <h3 class="font-bold text-lg">Change Secret URL</h3>
         <p class="py-4">
-          Changing the Creator's Unique URL will disable the current URL and
+          Changing the Creator's Secret URL will disable the current URL and
           create a new one.
         </p>
         <div class="modal-action">
           <button class="btn" on:click={() => (isChangeCreatorSecret = false)}
             >Cancel</button
           >
-          <button class="btn" on:click={changeCreatorSecret}>Change</button>
+          <button class="btn" on:click={changeUserSecret}>Change</button>
         </div>
       </div>
     </div>

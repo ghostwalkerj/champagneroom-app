@@ -1,13 +1,16 @@
 import { error, fail } from '@sveltejs/kit';
 import { nanoid } from 'nanoid';
+import { generateSillyPassword } from 'silly-password-generator';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 
+import { AUTH_SALT } from '$env/static/private';
 import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
 
 import { Creator } from '$lib/models/creator';
-import { AuthType } from '$lib/models/user';
+import { AuthType, User } from '$lib/models/user';
 import { Wallet } from '$lib/models/wallet';
 
+import { EntityType } from '$lib/constants';
 import { womensNames } from '$lib/womensNames';
 
 import type { Actions, PageServerLoad } from './$types';
@@ -30,26 +33,43 @@ export const actions: Actions = {
     }
 
     try {
+      const password = generateSillyPassword({
+        wordCount: 2
+      });
+      const secret = nanoid();
+
       const wallet = new Wallet();
-      wallet.save();
-      Creator.create({
-        user: {
-          name,
-          authType: AuthType.PASSWORD_KEY,
-          address: nanoid(30)
-        },
+      await wallet.save();
+
+      const user = await User.create({
+        name,
+        authType: AuthType.PASSWORD_KEY,
+        secret,
         wallet: wallet._id,
+        roles: [EntityType.CREATOR],
+        password: `${password}${AUTH_SALT}`
+      });
+      const creator = await Creator.create({
+        user: user._id,
         agentCommission: +commission,
         agent: agentId,
         profileImageUrl: PUBLIC_DEFAULT_PROFILE_IMAGE
       });
-    } catch (error) {
+      return {
+        success: true,
+        creator: creator?.toObject({
+          flattenObjectIds: true,
+          flattenMaps: true
+        }),
+        password
+      };
+    } catch (error: unknown) {
+      console.error('err', error);
+      if (error instanceof Error) {
+        return fail(400, { err: error.toString() });
+      }
       return fail(400, { err: error });
     }
-
-    return {
-      success: true
-    };
   },
   update_creator: async ({ request }) => {
     const data = await request.formData();
@@ -89,31 +109,24 @@ export const actions: Actions = {
       success: true
     };
   },
-  change_creator_key: async ({ request }) => {
+  change_user_secret: async ({ request }) => {
     const data = await request.formData();
-    const creatorId = data.get('creatorId') as string;
+    const userId = data.get('userId') as string;
 
     // Validation
-    if (creatorId === null) {
-      return fail(400, { creatorId, missingCreatorId: true });
+    if (userId === null) {
+      return fail(400, { userId, missingUserId: true });
     }
 
-    const address = nanoid(30);
+    const secret = nanoid();
+    await User.findOneAndUpdate(
+      { _id: userId },
+      {
+        $set: { secret, __enc_message: false }
+      }
+    );
 
-    try {
-      await Creator.findOneAndUpdate(
-        {
-          _id: creatorId
-        },
-        {
-          'user.address': address
-        }
-      );
-    } catch (error) {
-      return fail(400, { err: error });
-    }
-
-    return { success: true, address };
+    return { success: true, secret };
   }
 };
 

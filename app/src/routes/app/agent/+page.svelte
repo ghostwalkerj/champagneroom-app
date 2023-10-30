@@ -1,9 +1,10 @@
 <script lang="ts">
+  import type { ActionResult } from '@sveltejs/kit';
   import StarRating from 'svelte-star-rating';
   import { uniqueNamesGenerator } from 'unique-names-generator';
   import urlJoin from 'url-join';
 
-  import { enhance } from '$app/forms';
+  import { deserialize, enhance } from '$app/forms';
   import { invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
   import {
@@ -13,6 +14,7 @@
 
   import type { AgentDocumentType } from '$lib/models/agent';
   import type { CreatorDocumentType } from '$lib/models/creator';
+  import { AuthType } from '$lib/models/user';
 
   import { currencyFormatter } from '$lib/constants';
   import { womensNames } from '$lib/womensNames';
@@ -28,6 +30,9 @@
   const agent = data.agent as AgentDocumentType;
   let creators = data.creators as CreatorDocumentType[];
 
+  let newCreatorModal: HTMLDialogElement;
+  let newCreator: CreatorDocumentType | undefined;
+  let newPassword: string | undefined;
   let activeRow = 0;
   let activeTab = 'Creators' as 'Creators' | 'Dashboard';
   $: canAddCreator = false;
@@ -38,7 +43,7 @@
   let creatorName = uniqueNamesGenerator({
     dictionaries: [womensNames]
   });
-  let isChangeUrl = false;
+  let isChangeCreatorSecret = false;
 
   nameStore.set(agent.user.name);
 
@@ -84,22 +89,22 @@
     updateCreator(activeRow, { active: creators[activeRow].user.active });
   };
 
-  const changeUrl = async () => {
+  const changeCreatorSecret = async () => {
     const index = activeRow;
-    const creatorId = creators[index]._id.toString();
+    const userId = creators[index].user._id.toString();
     let formData = new FormData();
-    formData.append('creatorId', creatorId);
-    const response = await fetch('?/change_creator_key', {
+    formData.append('userId', userId);
+    const response = await fetch('?/change_user_secret', {
       method: 'POST',
       body: formData
     });
-    const resp = await response.json();
-    const respData = JSON.parse(resp.data);
-    const addressIndex = respData[0]['address'];
-    if (addressIndex) {
-      creators[index].user.address = respData[addressIndex];
+
+    const result: ActionResult = deserialize(await response.text());
+    if (result.type === 'success' && result.data) {
+      creators[index].user.secret = result.data.secret;
     }
-    isChangeUrl = false;
+
+    isChangeCreatorSecret = false;
   };
 
   const onSubmit = ({}) => {
@@ -113,6 +118,9 @@
 
         commission = PUBLIC_DEFAULT_COMMISSION;
         creators = $page.data.creators;
+        newCreator = result.data.creator;
+        newPassword = result.data.password;
+        newCreatorModal.showModal();
       } else {
         if (result.data.badName) {
           creatorNameElement.focus();
@@ -128,22 +136,57 @@
   };
 </script>
 
+<dialog id="new_creator_modal" class="modal" bind:this={newCreatorModal}>
+  <div class="modal-box">
+    {#if newCreator}
+      <h3 class="font-bold text-lg text-center mb-6">New Creator</h3>
+      <div class="text-center">
+        {newCreator.user.name} has been created with the following password:
+        <div class="text-center font-bold text-lg">{newPassword}</div>
+      </div>
+      <div class="text-center mt-4">
+        and secret URL:
+        <div class="text-center font-bold text-sm">
+          <a
+            href={urlJoin(PUBLIC_CREATOR_PATH, newCreator.user.secret)}
+            target="_blank"
+            class="link link-primary"
+          >
+            {urlJoin(
+              $page.url.href,
+              PUBLIC_CREATOR_PATH,
+              newCreator.user.secret
+            )}</a
+          >
+        </div>
+      </div>
+
+      <div class="modal-action">
+        <form method="dialog">
+          <!-- if there is a button in form, it will close the modal -->
+          <button class="btn">Close</button>
+        </form>
+      </div>
+    {/if}
+  </div>
+</dialog>
+
 {#if agent}
   <!-- Modal for Changing Creator URL -->
-  {#if isChangeUrl}
+  {#if isChangeCreatorSecret}
     <input type="checkbox" id="changeUrl-show-modal" class="modal-toggle" />
     <div class="modal modal-open">
       <div class="modal-box">
         <h3 class="font-bold text-lg">Change Creator URL</h3>
         <p class="py-4">
-          Changing the Creator's Unique URL will disable the current URL and
+          Changing the Creator's Secret URL will disable the current URL and
           create a new one.
         </p>
         <div class="modal-action">
-          <button class="btn" on:click={() => (isChangeUrl = false)}
+          <button class="btn" on:click={() => (isChangeCreatorSecret = false)}
             >Cancel</button
           >
-          <button class="btn" on:click={changeUrl}>Change</button>
+          <button class="btn" on:click={changeCreatorSecret}>Change</button>
         </div>
       </div>
     </div>
@@ -300,22 +343,28 @@
                                 {/if}
                               </select>
                             </td>
+
                             <td
-                              ><a
-                                href={urlJoin(
-                                  PUBLIC_CREATOR_PATH,
-                                  creator.user.secret
-                                )}
-                                target="_creator"
-                                class="link link-primary">Secret Url</a
-                              >
-                              <button
-                                class="btn btn-xs btn-outline btn-primary"
-                                on:click={() => (isChangeUrl = true)}
-                              >
-                                Change Secret
-                              </button>
+                              >{#if creator.user.authType !== AuthType.SIGNING}<a
+                                  href={urlJoin(
+                                    PUBLIC_CREATOR_PATH,
+                                    creator.user.secret
+                                  )}
+                                  target="_blank"
+                                  class="link link-primary">Secret Url</a
+                                >
+                                <button
+                                  class="btn btn-xs btn-outline btn-primary ml-4"
+                                  on:click={() =>
+                                    (isChangeCreatorSecret = true)}
+                                >
+                                  Change
+                                </button>
+                              {:else}
+                                N/A
+                              {/if}
                             </td>
+
                             <td>
                               {#each Object.entries(creator.salesStats.totalTicketSalesAmounts) as [currency, amount]}
                                 {currencyFormatter(currency).format(amount)}

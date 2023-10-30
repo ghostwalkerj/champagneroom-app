@@ -43,7 +43,6 @@ export const userSchema = new Schema(
       type: String,
       maxLength: 50,
       lowerCase: true,
-      required: true,
       index: true,
       unique: true
     },

@@ -97,7 +97,7 @@ export const actions: Actions = {
     try {
       const wallet = new Wallet();
       const secret = nanoid();
-      wallet.save();
+      await wallet.save();
 
       const password = generateSillyPassword({
         wordCount: 2
@@ -107,7 +107,6 @@ export const actions: Actions = {
         name,
         authType: AuthType.PASSWORD_KEY,
         secret,
-        address: secret,
         wallet: wallet._id,
         roles: [EntityType.CREATOR],
         password: `${password}${AUTH_SALT}`
@@ -128,7 +127,7 @@ export const actions: Actions = {
         password
       };
     } catch (error: unknown) {
-      console.log('err', error);
+      console.error('err', error);
       if (error instanceof Error) {
         return fail(400, { err: error.toString() });
       }
@@ -186,32 +185,26 @@ export const actions: Actions = {
       success: true
     };
   },
-  changer_user_address: async ({ request }) => {
+  change_user_secret: async ({ request }) => {
     const data = await request.formData();
     const userId = data.get('userId') as string;
 
     // Validation
     if (userId === null) {
-      return fail(400, { userId, missingCreatorId: true });
+      return fail(400, { userId, missingUserId: true });
     }
 
-    const address = nanoid(30);
+    const secret = nanoid();
+    await User.findOneAndUpdate(
+      { _id: userId },
+      {
+        $set: { secret, __enc_message: false }
+      }
+    );
 
-    try {
-      await User.findOneAndUpdate(
-        {
-          _id: userId
-        },
-        {
-          address: address
-        }
-      );
-    } catch (error) {
-      return fail(400, { err: error });
-    }
-
-    return { success: true, address };
+    return { success: true, secret };
   },
+
   decide_dispute: async ({ request, locals }: RequestEvent) => {
     const data = await request.formData();
     const ticketId = data.get('ticketId') as string;
