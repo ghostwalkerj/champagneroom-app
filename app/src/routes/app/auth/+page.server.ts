@@ -123,6 +123,7 @@ export const actions: Actions = {
       {
         selector: 'secret',
         secret,
+        slug,
         exp: Math.floor(Date.now() / 1000) + +JWT_EXPIRY,
         authType: AuthType.PASSWORD_SECRET
       },
@@ -144,11 +145,14 @@ export const load: PageServerLoad = async ({ cookies }) => {
   const returnPath = cookies.get('returnPath');
   const { slug, secret } = getSecretSlug(returnPath);
 
+  console.log('slug', slug);
+  console.log('secret', secret);
+
   if (!returnPath) {
     throw error(400, 'Missing Return Path');
   }
 
-  console.log('returnPath', returnPath);
+  cookies.delete('returnPath', { path: '/' });
 
   const authType = secret ? AuthType.PASSWORD_SECRET : AuthType.SIGNING;
 

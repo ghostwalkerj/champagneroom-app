@@ -26,8 +26,11 @@ export const getSecretSlug = (requestedPath: string | undefined) => {
     SECRET_PATHS.some((path) => requestedPath.startsWith(path))
   ) {
     const pathParts = requestedPath.split('/');
-    secret = pathParts.at(-1);
-    slug = pathParts.at(-2);
+    console.log('pathParts', pathParts);
+    if (pathParts.length > 3) {
+      secret = pathParts.at(-1);
+      slug = pathParts.at(-2);
+    }
   }
   return { secret, slug };
 };
