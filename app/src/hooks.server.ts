@@ -69,11 +69,6 @@ export const handle = (async ({ event, resolve }) => {
       cookies.delete(tokenName, { path: '/' });
       authToken === undefined;
     } else {
-      const encReturnPath = encrypt4Cookie(returnPath);
-
-      encReturnPath &&
-        cookies.set('returnPath', encReturnPath, { path: authUrl });
-
       const clearAuthToken = decryptFromCookie(authToken);
 
       // If authenticated, check if user is allowed to access the requested path and set user in locals
@@ -158,6 +153,11 @@ export const handle = (async ({ event, resolve }) => {
       console.log('Allowed');
     } else {
       console.error('Not allowed');
+      const encReturnPath = encrypt4Cookie(returnPath);
+
+      encReturnPath &&
+        cookies.set('returnPath', encReturnPath, { path: authUrl });
+
       throw redirect(302, authUrl);
     }
   }
