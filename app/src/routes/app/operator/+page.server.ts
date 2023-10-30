@@ -4,8 +4,10 @@ import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 import { ObjectId } from 'mongodb';
 import { nanoid } from 'nanoid';
+import { generateSillyPassword } from 'silly-password-generator';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 
+import { AUTH_SALT } from '$env/static/private';
 import {
   PUBLIC_DEFAULT_PROFILE_IMAGE,
   PUBLIC_WEBSITE_URL
@@ -87,23 +89,33 @@ export const actions: Actions = {
     if (Number.isNaN(+commission) || +commission < 0 || +commission > 100) {
       return fail(400, { commission, badCommission: true });
     }
+    console.log('agentId', agentId);
+
+    const agent =
+      agentId && agentId !== '0' ? new ObjectId(agentId) : undefined;
 
     try {
       const wallet = new Wallet();
       const secret = nanoid();
       wallet.save();
+
+      const password = generateSillyPassword({
+        wordCount: 2
+      });
+
       const user = await User.create({
         name,
         authType: AuthType.PASSWORD_KEY,
         secret,
         address: secret,
         wallet: wallet._id,
-        roles: [EntityType.CREATOR]
+        roles: [EntityType.CREATOR],
+        password: `${password}${AUTH_SALT}`
       });
       const creator = await Creator.create({
         user: user._id,
         agentCommission: +commission,
-        agent: new ObjectId(agentId),
+        agent,
         profileImageUrl: PUBLIC_DEFAULT_PROFILE_IMAGE
       });
       return {
@@ -112,9 +124,14 @@ export const actions: Actions = {
         creator: creator?.toObject({
           flattenObjectIds: true,
           flattenMaps: true
-        })
+        }),
+        password
       };
-    } catch (error) {
+    } catch (error: unknown) {
+      console.log('err', error);
+      if (error instanceof Error) {
+        return fail(400, { err: error.toString() });
+      }
       return fail(400, { err: error });
     }
   },

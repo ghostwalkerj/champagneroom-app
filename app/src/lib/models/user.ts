@@ -109,7 +109,8 @@ export const userSchema = new Schema(
 
 userSchema.plugin(fieldEncryption, {
   fields: ['secret'],
-  secret: process.env.MONGO_DB_FIELD_SECRET
+  secret: process.env.MONGO_DB_FIELD_SECRET,
+  saltGenerator: (secret: string) => secret.slice(0, 16)
 });
 
 userSchema.pre('save', function (next) {
@@ -126,8 +127,9 @@ userSchema.pre('save', function (next) {
   }
 });
 
-userSchema.methods.comparePassword = function (password: string) {
-  return bcrypt.compare(password, this.password);
+userSchema.methods.comparePassword = function (password: string, salt: string) {
+  const saltedPassword = `${password}${salt}`;
+  return bcrypt.compare(saltedPassword, this.password);
 };
 
 const User = models?.User

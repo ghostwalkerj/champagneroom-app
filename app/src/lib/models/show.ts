@@ -321,7 +321,8 @@ const showSchema = new Schema(
 
 showSchema.plugin(fieldEncryption, {
   fields: ['roomId'],
-  secret: process.env.MONGO_DB_FIELD_SECRET
+  secret: process.env.MONGO_DB_FIELD_SECRET,
+  saltGenerator: (secret: string) => secret.slice(0, 16)
 });
 
 export type ShowDocumentType = InferSchemaType<typeof showSchema>;

@@ -5,7 +5,7 @@
   import { applyAction, enhance } from '$app/forms';
 
   import { CurrencyType } from '$lib/models/common';
-  import { WalletStatus, type WalletDocumentType } from '$lib/models/wallet';
+  import { type WalletDocumentType, WalletStatus } from '$lib/models/wallet';
 
   import { currencyFormatter } from '$lib/constants';
 

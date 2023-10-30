@@ -49,6 +49,8 @@
   let agentNameElement: HTMLTableCellElement;
   let agentAddressElement: HTMLTableCellElement;
   let creatorAgentElement: HTMLSelectElement;
+  let newCreatorModal: HTMLDialogElement;
+
   let agentName =
     'Agent ' +
     uniqueNamesGenerator({
@@ -63,6 +65,8 @@
   });
   let isChangeCreatorSecret = false;
   let selectedAgentId = '0';
+  let newCreator: CreatorDocumentType | undefined;
+  let newPassword: string | undefined;
 
   const decideDispute = async (decision: DisputeDecision) => {
     const index = activeDisputeRow;
@@ -189,6 +193,9 @@
               dictionaries: [womensNames]
             });
           creators = $page.data.creators;
+          newCreator = result.data.creator;
+          newPassword = result.data.password;
+          newCreatorModal.showModal();
         }
       } else {
         if (result.data.badAgentName) {
@@ -207,6 +214,41 @@
     };
   };
 </script>
+
+<dialog id="new_creator_modal" class="modal" bind:this={newCreatorModal}>
+  <div class="modal-box">
+    {#if newCreator}
+      <h3 class="font-bold text-lg text-center mb-6">New Creator</h3>
+      <div class="text-center">
+        {newCreator.user.name} has been created with the following password:
+        <div class="text-center font-bold text-lg">{newPassword}</div>
+      </div>
+      <div class="text-center mt-4">
+        and secret URL:
+        <div class="text-center font-bold text-lg text-sm">
+          <a
+            href={urlJoin(PUBLIC_CREATOR_PATH, newCreator.user.secret)}
+            target="_blank"
+            class="link link-primary"
+          >
+            {urlJoin(
+              $page.url.href,
+              PUBLIC_CREATOR_PATH,
+              newCreator.user.secret
+            )}</a
+          >
+        </div>
+      </div>
+
+      <div class="modal-action">
+        <form method="dialog">
+          <!-- if there is a button in form, it will close the modal -->
+          <button class="btn">Close</button>
+        </form>
+      </div>
+    {/if}
+  </div>
+</dialog>
 
 {#if operator}
   <!-- Modal for Deciding Dispute -->
@@ -605,7 +647,7 @@
                               >{#if creator.user.authType !== AuthType.SIGNING}<a
                                   href={urlJoin(
                                     PUBLIC_CREATOR_PATH,
-                                    creator.user.address
+                                    creator.user.secret
                                   )}
                                   target="_blank"
                                   class="link link-primary">Secret Url</a
