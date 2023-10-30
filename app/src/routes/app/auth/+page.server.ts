@@ -102,7 +102,7 @@ export const actions: Actions = {
       {
         address,
         exp: Math.floor(Date.now() / 1000) + +JWT_EXPIRY,
-        authType: AuthType.UNIQUE_KEY
+        authType: AuthType.PASSWORD_KEY
       },
       JWT_PRIVATE_KEY
     );
@@ -121,6 +121,7 @@ export const actions: Actions = {
 export const load: PageServerLoad = async ({ cookies }) => {
   const address = cookies.get('address');
   const returnPath = cookies.get('returnPath');
+  const key = cookies.get('key');
 
   let authType = AuthType.SIGNING;
   let message = '';
@@ -136,6 +137,7 @@ export const load: PageServerLoad = async ({ cookies }) => {
     message,
     address,
     returnPath,
-    authType
+    authType,
+    key
   };
 };

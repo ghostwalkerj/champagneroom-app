@@ -90,11 +90,13 @@ export const actions: Actions = {
 
     try {
       const wallet = new Wallet();
+      const secret = nanoid();
       wallet.save();
       const user = await User.create({
         name,
-        authType: AuthType.UNIQUE_KEY,
-        address: nanoid(30),
+        authType: AuthType.PASSWORD_KEY,
+        secret,
+        address: secret,
         wallet: wallet._id,
         roles: [EntityType.CREATOR]
       });

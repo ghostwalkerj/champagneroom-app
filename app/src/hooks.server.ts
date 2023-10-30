@@ -1,5 +1,4 @@
 import console from 'node:console';
-import { resolve } from 'node:dns';
 
 import type { Handle } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';

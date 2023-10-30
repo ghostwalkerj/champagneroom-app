@@ -18,6 +18,7 @@
   import type { CreatorDocumentType } from '$lib/models/creator';
   import type { OperatorDocumentType } from '$lib/models/operator';
   import type { ShowDocument } from '$lib/models/show';
+  import { AuthType } from '$lib/models/user';
 
   import { currencyFormatter } from '$lib/constants';
   import { womensNames } from '$lib/womensNames';
@@ -60,7 +61,7 @@
   let creatorName = uniqueNamesGenerator({
     dictionaries: [womensNames]
   });
-  let isChangeCreatorUrl = false;
+  let isChangeCreatorSecret = false;
   let selectedAgentId = '0';
 
   const decideDispute = async (decision: DisputeDecision) => {
@@ -82,7 +83,7 @@
     isDecideDispute = false;
   };
 
-  const changeUserAddress = async () => {
+  const changeCreatorSecret = async () => {
     const index = activeCreatorRow;
     const userId = creators[index].user._id.toString();
     let formData = new FormData();
@@ -97,7 +98,7 @@
     if (addressIndex) {
       creators[index].user.address = respData[addressIndex];
     }
-    isChangeCreatorUrl = false;
+    isChangeCreatorSecret = false;
   };
 
   const updateCreator = async (
@@ -237,7 +238,7 @@
     </div>
   {/if}
 
-  {#if isChangeCreatorUrl}
+  {#if isChangeCreatorSecret}
     <input type="checkbox" id="changeUrl-show-modal" class="modal-toggle" />
     <div class="modal modal-open">
       <div class="modal-box">
@@ -247,10 +248,10 @@
           create a new one.
         </p>
         <div class="modal-action">
-          <button class="btn" on:click={() => (isChangeCreatorUrl = false)}
+          <button class="btn" on:click={() => (isChangeCreatorSecret = false)}
             >Cancel</button
           >
-          <button class="btn" on:click={changeUserAddress}>Change</button>
+          <button class="btn" on:click={changeCreatorSecret}>Change</button>
         </div>
       </div>
     </div>
@@ -469,8 +470,7 @@
                           <th>Agent</th>
                           <th>Comm %</th>
                           <th>Active</th>
-                          <th>URL</th>
-                          <th>Change URL</th>
+                          <th>Secret</th>
                           <th>Ticket Sales</th>
                           <th>Revenue</th>
                           <th>Refunds</th>
@@ -602,22 +602,24 @@
                               </select>
                             </td>
                             <td
-                              ><a
-                                href={urlJoin(
-                                  PUBLIC_CREATOR_PATH,
-                                  creator.user.address
-                                )}
-                                target="_blank"
-                                class="link link-primary">Creator Url</a
-                              >
-                            </td>
-                            <td>
-                              <button
-                                class="btn btn-xs btn-outline btn-primary"
-                                on:click={() => (isChangeCreatorUrl = true)}
-                              >
-                                Change
-                              </button>
+                              >{#if creator.user.authType !== AuthType.SIGNING}<a
+                                  href={urlJoin(
+                                    PUBLIC_CREATOR_PATH,
+                                    creator.user.address
+                                  )}
+                                  target="_blank"
+                                  class="link link-primary">Secret Url</a
+                                >
+                                <button
+                                  class="btn btn-xs btn-outline btn-primary ml-4"
+                                  on:click={() =>
+                                    (isChangeCreatorSecret = true)}
+                                >
+                                  Change
+                                </button>
+                              {:else}
+                                N/A
+                              {/if}
                             </td>
 
                             <td>
@@ -656,8 +658,7 @@
                           <th>Agent</th>
                           <th>Comm %</th>
                           <th>Active</th>
-                          <th>URL</th>
-                          <th>Change URL</th>
+                          <th>Secret</th>
                           <th>Sales</th>
                           <th>Revenue</th>
                           <th>Refunds</th>

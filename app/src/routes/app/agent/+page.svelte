@@ -53,7 +53,7 @@
     const creator = creators[index];
     let formData = new FormData();
     formData.append('creatorId', creator._id.toString());
-    formData.append('name', name || creator.user.name);
+    formData.append('name', name || '');
     formData.append(
       'commission',
       commission ? commission.toString() : creator.agentCommission.toString()
@@ -212,8 +212,7 @@
                           <th>Name</th>
                           <th>Comm %</th>
                           <th>Active</th>
-                          <th>URL</th>
-                          <th>Change URL</th>
+                          <th>Secret</th>
                           <th>Sales</th>
                           <th>Revenue</th>
                           <th>Refunds</th>
@@ -305,36 +304,33 @@
                               ><a
                                 href={urlJoin(
                                   PUBLIC_CREATOR_PATH,
-                                  creator.user.address
+                                  creator.user.secret
                                 )}
                                 target="_creator"
-                                class="link link-primary">Creator Url</a
+                                class="link link-primary">Secret Url</a
                               >
-                            </td>
-                            <td>
                               <button
                                 class="btn btn-xs btn-outline btn-primary"
                                 on:click={() => (isChangeUrl = true)}
                               >
-                                Change
+                                Change Secret
                               </button>
                             </td>
-
-                            <td
-                              >{currencyFormatter().format(
-                                creator.salesStats.totalRevenue
-                              )}</td
-                            >
-                            <td
-                              >{currencyFormatter().format(
-                                creator.salesStats.totalRevenue
-                              )}</td
-                            >
-                            <td
-                              >{currencyFormatter().format(
-                                creator.salesStats.totalRefunded
-                              )}</td
-                            >
+                            <td>
+                              {#each Object.entries(creator.salesStats.totalTicketSalesAmounts) as [currency, amount]}
+                                {currencyFormatter(currency).format(amount)}
+                              {/each}
+                            </td>
+                            <td>
+                              {#each Object.entries(creator.salesStats.totalRevenue) as [currency, amount]}
+                                {currencyFormatter(currency).format(amount)}
+                              {/each}
+                            </td>
+                            <td>
+                              {#each Object.entries(creator.salesStats.totalRefunds) as [currency, amount]}
+                                {currencyFormatter(currency).format(amount)}
+                              {/each}
+                            </td>
                             <td>{creator.feedbackStats.numberOfReviews}</td>
                             <td
                               class="tooltip"
@@ -355,8 +351,7 @@
                           <th>Name</th>
                           <th>Comm %</th>
                           <th>Active</th>
-                          <th>URL</th>
-                          <th>Change URL</th>
+                          <th>Secret</th>
                           <th>Sales</th>
                           <th>Revenue</th>
                           <th>Refunds</th>

@@ -35,7 +35,7 @@ export const actions: Actions = {
       Creator.create({
         user: {
           name,
-          authType: AuthType.UNIQUE_KEY,
+          authType: AuthType.PASSWORD_KEY,
           address: nanoid(30)
         },
         wallet: wallet._id,

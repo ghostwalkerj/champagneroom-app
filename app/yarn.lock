@@ -2646,6 +2646,11 @@
     lodash "^4.17.15"
     ts-essentials "^7.0.1"
 
+"@types/bcryptjs@^2.4.5":
+  version "2.4.5"
+  resolved "https://registry.yarnpkg.com/@types/bcryptjs/-/bcryptjs-2.4.5.tgz#15473cc012f825b3435b189376f645bdd2fc9f11"
+  integrity sha512-tOF6TivOIvq+TWQm78335CMdyVJhpBG3NUdWQDAp95ax4E2rSKbws/ELHLk5EBoucwx/tHt3/hhLOHwWJgVrSw==
+
 "@types/bn.js@5.1.1":
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/@types/bn.js/-/bn.js-5.1.1.tgz#b51e1b55920a4ca26e9285ff79936bbdec910682"
@@ -4077,6 +4082,11 @@ bchaddrjs@^0.5.2:
     buffer "^6.0.3"
     cashaddrjs "0.4.4"
     stream-browserify "^3.0.0"
+
+bcryptjs@^2.4.3:
+  version "2.4.3"
+  resolved "https://registry.yarnpkg.com/bcryptjs/-/bcryptjs-2.4.3.tgz#9ab5627b93e60621ff7cdac5da9733027df1d0cb"
+  integrity sha512-V/Hy/X9Vt7f3BbPJEi8BdVFMByHi+jNXrYkW3huaybV/kQ0KJg0Y6PkEMbn+zeT+i+SiKZ/HMqJGIIt4LZDqNQ==
 
 bech32@1.1.4:
   version "1.1.4"

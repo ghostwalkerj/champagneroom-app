@@ -1,6 +1,10 @@
+import bcrypt from 'bcryptjs';
 import type { InferSchemaType, Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
+import { fieldEncryption } from 'mongoose-field-encryption';
+import { nanoid } from 'nanoid';
 import validator from 'validator';
+
 const { Schema, models } = pkg;
 
 export type UserDocument = InstanceType<typeof User>;
@@ -8,8 +12,8 @@ export type UserDocument = InstanceType<typeof User>;
 export type UserDocumentType = InferSchemaType<typeof userSchema>;
 export enum AuthType {
   SIGNING = 'SIGNING',
-  UNIQUE_KEY = 'UNIQUE KEY',
-  PASSWORD = 'PASSWORD',
+  PASSWORD_KEY = 'PASSWORD_KEY',
+  PIN = 'PIN',
   NONE = 'NONE'
 }
 
@@ -20,7 +24,8 @@ export enum UserRole {
   PUBLIC = 'PUBLIC',
   AGENT = 'AGENT',
   CREATOR = 'CREATOR',
-  EXTERNAL = 'EXTERNAL'
+  EXTERNAL = 'EXTERNAL',
+  TICKET_HOLDER = 'TICKET_HOLDER'
 }
 
 export const userSchema = new Schema(
@@ -61,12 +66,29 @@ export const userSchema = new Schema(
       default: () => Math.floor(Math.random() * 1_000_000)
     },
 
+    secret: {
+      type: String,
+      maxLength: 50,
+      minLength: [21, 'Secret is too short'],
+      trim: true,
+      default: () => nanoid(21),
+      unique: true,
+      index: true
+    },
+
+    password: {
+      type: String,
+      maxLength: 50,
+      minLength: [8, 'Password is too short'],
+      trim: true
+    },
+
     name: {
       type: String,
       maxLength: 50,
       minLength: [3, 'Name is too short'],
-      required: true,
-      trim: true
+      trim: true,
+      required: true
     },
 
     authType: {
@@ -84,6 +106,29 @@ export const userSchema = new Schema(
   },
   { timestamps: true }
 );
+
+userSchema.plugin(fieldEncryption, {
+  fields: ['secret'],
+  secret: process.env.MONGO_DB_FIELD_SECRET
+});
+
+userSchema.pre('save', function (next) {
+  if (this.password && this.isModified('password')) {
+    bcrypt.hash(this.password, 10, (error, hash) => {
+      if (error) {
+        next(error);
+      }
+      this.password = hash;
+      next();
+    });
+  } else {
+    next();
+  }
+});
+
+userSchema.methods.comparePassword = function (password: string) {
+  return bcrypt.compare(password, this.password);
+};
 
 const User = models?.User
   ? (models.User as Model<UserDocumentType>)
