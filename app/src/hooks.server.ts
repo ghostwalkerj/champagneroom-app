@@ -1,3 +1,5 @@
+import console from 'node:console';
+
 import type { Handle } from '@sveltejs/kit';
 import { error, redirect } from '@sveltejs/kit';
 import IORedis from 'ioredis';
@@ -17,13 +19,12 @@ import {
 } from '$env/static/private';
 import {
   PUBLIC_AGENT_PATH,
-  PUBLIC_API_PATH,
-  PUBLIC_APP_PATH,
   PUBLIC_AUTH_PATH,
   PUBLIC_CHANGESET_PATH,
   PUBLIC_CREATOR_PATH,
   PUBLIC_IMAGE_UPDATE_PATH,
   PUBLIC_INVOICE_PATH,
+  PUBLIC_OPERATOR_PATH,
   PUBLIC_SIGNUP_PATH,
   PUBLIC_TICKET_PATH
 } from '$env/static/public';
@@ -33,11 +34,12 @@ import { Creator } from '$lib/models/creator';
 import { Operator } from '$lib/models/operator';
 import { Show } from '$lib/models/show';
 import { Ticket } from '$lib/models/ticket';
-import { AuthType, User, UserRole } from '$lib/models/user';
+import { User, UserRole } from '$lib/models/user';
 
+import { AuthType } from '$lib/constants';
 import {
-  decryptFromCookie,
-  encrypt4Cookie,
+  authDecrypt,
+  authEncrypt,
   isAppPathMatch,
   isProtectedMatch,
   isWhitelistMatch
@@ -73,7 +75,7 @@ export const handle = (async ({ event, resolve }) => {
     if (requestedPath === authUrl) {
       cookies.delete(tokenName, { path: '/' });
     } else {
-      const authToken = decryptFromCookie(encryptedToken);
+      const authToken = authDecrypt(encryptedToken);
 
       // If authenticated, check if user is allowed to access the requested path and set user in locals
       if (authToken) {
@@ -115,7 +117,7 @@ export const handle = (async ({ event, resolve }) => {
 
               case UserRole.CREATOR: {
                 let path = PUBLIC_CREATOR_PATH;
-                if (user.authType === AuthType.PASSWORD_SECRET) {
+                if (user.authType === AuthType.PATH_PASSWORD) {
                   path = `${path}/${user[selector]}`;
                 }
                 const creator = await Creator.findOne({ user: user._id });
@@ -166,7 +168,7 @@ export const handle = (async ({ event, resolve }) => {
               }
 
               case UserRole.OPERATOR: {
-                allowedPaths.push(PUBLIC_APP_PATH, PUBLIC_API_PATH); // super user
+                allowedPaths.push(PUBLIC_OPERATOR_PATH); // super user
                 const operator = await Operator.findOne({ user: user._id });
                 if (!operator) {
                   console.error('No operator');
@@ -216,9 +218,10 @@ export const handle = (async ({ event, resolve }) => {
       console.log(requestedPath, ': Allowed');
     } else {
       console.log(requestedPath, ': Not Allowed');
+      console.log('allowedPaths', allowedPaths);
       // Redirect for auth if in app
       if (isAppPathMatch(requestedPath)) {
-        const encReturnPath = encrypt4Cookie(returnPath);
+        const encReturnPath = authEncrypt(returnPath);
         encReturnPath &&
           cookies.set('returnPath', encReturnPath, { path: authUrl });
         throw redirect(302, authUrl);

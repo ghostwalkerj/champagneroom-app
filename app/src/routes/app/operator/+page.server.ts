@@ -19,14 +19,14 @@ import { Creator } from '$lib/models/creator';
 import type { OperatorDocument } from '$lib/models/operator';
 import type { ShowDocument } from '$lib/models/show';
 import { Ticket } from '$lib/models/ticket';
-import { AuthType, User } from '$lib/models/user';
+import { User } from '$lib/models/user';
 import { Wallet } from '$lib/models/wallet';
 
 import { ShowMachineEventString } from '$lib/machines/showMachine';
 
 import type { ShowQueueType } from '$lib/workers/showWorker';
 
-import { EntityType } from '$lib/constants';
+import { AuthType, EntityType } from '$lib/constants';
 import { womensNames } from '$lib/womensNames';
 
 import type { PageServerLoad } from './$types';
@@ -105,7 +105,7 @@ export const actions: Actions = {
 
       const user = await User.create({
         name,
-        authType: AuthType.PASSWORD_SECRET,
+        authType: AuthType.PATH_PASSWORD,
         secret,
         wallet: wallet._id,
         roles: [EntityType.CREATOR],

@@ -19,9 +19,8 @@
   import type { CreatorDocumentType } from '$lib/models/creator';
   import type { OperatorDocumentType } from '$lib/models/operator';
   import type { ShowDocument } from '$lib/models/show';
-  import { AuthType } from '$lib/models/user';
 
-  import { currencyFormatter } from '$lib/constants';
+  import { AuthType, currencyFormatter } from '$lib/constants';
   import { womensNames } from '$lib/womensNames';
 
   import { nameStore } from '$stores';

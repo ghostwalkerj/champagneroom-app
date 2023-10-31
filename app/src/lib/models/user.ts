@@ -1,3 +1,4 @@
+import { AuthType } from '$lib/constants';
 import bcrypt from 'bcryptjs';
 import type { InferSchemaType, Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
@@ -11,12 +12,6 @@ export type UserDocument = InstanceType<typeof User>;
 export type UserDocumentType = InferSchemaType<typeof userSchema> & {
   comparePassword: (password: string) => Promise<boolean>;
 };
-export enum AuthType {
-  SIGNING = 'SIGNING',
-  PASSWORD_SECRET = 'PASSWORD_SECRET',
-  PIN = 'PIN',
-  NONE = 'NONE'
-}
 
 export { User };
 
@@ -26,7 +21,7 @@ export enum UserRole {
   AGENT = 'AGENT',
   CREATOR = 'CREATOR',
   EXTERNAL = 'EXTERNAL',
-  TICKET_HOLDER = 'TICKET_HOLDER'
+  TICKET_HOLDER = 'TICKET HOLDER'
 }
 
 export const userSchema = new Schema(

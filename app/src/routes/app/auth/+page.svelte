@@ -6,13 +6,12 @@
   import { goto } from '$app/navigation';
   import { PUBLIC_WEBSITE_URL } from '$env/static/public';
 
-  import { AuthType } from '$lib/models/user';
-
   import { defaultWallet } from '$lib/web3';
 
   import ConnectButton from '$components/header/ConnectButton.svelte';
 
   import type { PageData } from './$types';
+  import { AuthType } from '$lib/constants';
 
   export let data: PageData;
 
@@ -85,7 +84,7 @@
 
   onMount(async () => {
     switch (authType) {
-      case AuthType.PASSWORD_SECRET: {
+      case AuthType.PATH_PASSWORD: {
         setPasswordAuth();
         break;
       }

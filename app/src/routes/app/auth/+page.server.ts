@@ -10,11 +10,12 @@ import {
 } from '$env/static/private';
 import { PUBLIC_AUTH_PATH } from '$env/static/public';
 
-import { AuthType, User } from '$lib/models/user';
+import { User } from '$lib/models/user';
 
+import { AuthType } from '$lib/constants';
 import {
-  decryptFromCookie,
-  encrypt4Cookie,
+  authDecrypt,
+  authEncrypt,
   isPasswordMatch,
   isPinMatch,
   isSecretMatch,
@@ -93,7 +94,7 @@ export const actions: Actions = {
       JWT_PRIVATE_KEY
     );
 
-    const encAuthToken = encrypt4Cookie(authToken);
+    const encAuthToken = authEncrypt(authToken);
 
     encAuthToken &&
       cookies.set(tokenName, encAuthToken, {
@@ -117,7 +118,7 @@ export const actions: Actions = {
     // Check if user exists
     const exists = await User.exists({
       secret: slug,
-      authType: AuthType.PASSWORD_SECRET
+      authType: AuthType.PATH_PASSWORD
     }).exec();
 
     if (!exists) {
@@ -131,12 +132,12 @@ export const actions: Actions = {
         secret: slug,
         _id: exists._id,
         exp: Math.floor(Date.now() / 1000) + +JWT_EXPIRY,
-        authType: AuthType.PASSWORD_SECRET
+        authType: AuthType.PATH_PASSWORD
       },
       JWT_PRIVATE_KEY
     );
 
-    const encAuthToken = encrypt4Cookie(authToken);
+    const encAuthToken = authEncrypt(authToken);
 
     encAuthToken &&
       cookies.set(tokenName, encAuthToken, {
@@ -163,8 +164,8 @@ export const actions: Actions = {
       throw error(404, 'Bad userId');
     }
 
-    const clearPin = decryptFromCookie(pin);
-    const clearUserId = decryptFromCookie(userId);
+    const clearPin = authDecrypt(pin);
+    const clearUserId = authDecrypt(userId);
 
     const user = await User.findOne({
       _id: clearUserId
@@ -191,7 +192,7 @@ export const actions: Actions = {
         JWT_PRIVATE_KEY
       );
 
-      const encAuthToken = encrypt4Cookie(authToken);
+      const encAuthToken = authEncrypt(authToken);
       cookies.delete('pin', { path: PUBLIC_AUTH_PATH });
       cookies.delete('userId', { path: PUBLIC_AUTH_PATH });
 
@@ -210,7 +211,7 @@ export const actions: Actions = {
 
 export const load: PageServerLoad = async ({ cookies }) => {
   const returnPath = cookies.get('returnPath');
-  const clearReturnPath = decryptFromCookie(returnPath);
+  const clearReturnPath = authDecrypt(returnPath);
   let slug = '';
 
   if (!clearReturnPath) {
@@ -223,7 +224,7 @@ export const load: PageServerLoad = async ({ cookies }) => {
     authType = AuthType.PIN;
   } else if (isPasswordMatch(clearReturnPath)) {
     console.log('Password match');
-    authType = AuthType.PASSWORD_SECRET;
+    authType = AuthType.PATH_PASSWORD;
   }
   if (isSecretMatch(clearReturnPath)) {
     const pathParts = clearReturnPath.split('/');

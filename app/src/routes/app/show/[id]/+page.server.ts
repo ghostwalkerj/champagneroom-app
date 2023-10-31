@@ -19,19 +19,22 @@ import {
 
 import { Show } from '$lib/models/show';
 import { Ticket } from '$lib/models/ticket';
-import { AuthType, User, UserRole } from '$lib/models/user';
+import { User, UserRole } from '$lib/models/user';
 
 import { ShowMachineEventString } from '$lib/machines/showMachine';
 
 import type { ShowQueueType } from '$lib/workers/showWorker';
 
-import { EntityType } from '$lib/constants';
+import { AuthType, EntityType } from '$lib/constants';
 import { mensNames } from '$lib/mensNames';
 import { createAuthToken } from '$lib/payment';
-import { encrypt4Cookie } from '$lib/server/auth';
+import { authEncrypt } from '$lib/server/auth';
 import { getShowMachineServiceFromId } from '$lib/server/machinesUtil';
 
-import { createInvoiceInvoicesPost } from '$ext/bitcart';
+import {
+  createInvoiceInvoicesPost,
+  modifyInvoiceInvoicesModelIdPatch
+} from '$ext/bitcart';
 
 import type { Actions, PageServerLoad } from './$types';
 
@@ -108,14 +111,13 @@ export const actions: Actions = {
       BITCART_API_URL
     );
 
-    const invoice = await createInvoiceInvoicesPost(
+    let response = await createInvoiceInvoicesPost(
       {
         price: ticket.price.amount,
         currency: ticket.price.currency,
         store_id: BITCART_STORE_ID,
         expiration: +PUBLIC_PAYMENT_PERIOD / 60 / 1000,
-        order_id: ticket._id.toString(),
-        notification_url: urlJoin(BITCART_INVOICE_NOTIFICATION_PATH)
+        order_id: ticket._id.toString()
       },
       {
         headers: {
@@ -125,15 +127,31 @@ export const actions: Actions = {
       }
     );
 
-    if (!invoice || !invoice.data) {
+    if (!response || !response.data) {
       return error(501, 'Invoice cannot be created');
     }
 
-    // Update ticket with invoice
-    ticket.bcInvoiceId = invoice.data.id;
+    // Update the notification url
+    const invoice = response.data;
+    const encryptedInvoiceId = authEncrypt(invoice.id) ?? '';
 
-    const payment = invoice.data.payments
-      ? invoice.data.payments[0] // Use the first wallet
+    invoice.notification_url = urlJoin(
+      BITCART_INVOICE_NOTIFICATION_PATH,
+      encryptedInvoiceId
+    );
+
+    response = await modifyInvoiceInvoicesModelIdPatch(invoice.id!, invoice, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    // Update ticket with invoice
+    ticket.bcInvoiceId = invoice.id;
+
+    const payment = invoice.payments
+      ? invoice.payments[0] // Use the first wallet
       : undefined;
 
     if (payment && payment['payment_address']) {
@@ -147,8 +165,8 @@ export const actions: Actions = {
       customerName: name
     });
 
-    const userId = encrypt4Cookie(user._id.toString());
-    const encryptedPin = encrypt4Cookie(pin);
+    const userId = authEncrypt(user._id.toString());
+    const encryptedPin = authEncrypt(pin);
     if (!userId || !encryptedPin) {
       return error(501, 'Show cannot Reserve Ticket');
     }

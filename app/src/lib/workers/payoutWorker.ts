@@ -2,6 +2,7 @@ import type { AxiosResponse } from 'axios';
 import type { Job, Queue } from 'bullmq';
 import { Worker } from 'bullmq';
 import type IORedis from 'ioredis';
+import urlJoin from 'url-join';
 
 import type { PayoutType } from '$lib/models/common';
 import { CurrencyType } from '$lib/models/common';
@@ -38,6 +39,7 @@ import type {
 } from '$lib/ext/bitcart/models';
 import type { PaymentType } from '$lib/payment';
 import { PayoutJobType, PayoutReason, PayoutStatus } from '$lib/payment';
+import { authEncrypt } from '$lib/server/auth';
 import {
   getTicketMachineService,
   getWalletMachineService
@@ -181,6 +183,7 @@ export const getPayoutWorker = ({
               }
 
               // Set the notification URL for the payout
+
               response = await modifyPayoutPayoutsModelIdPatch(
                 bcRefund.payout_id,
                 {
@@ -325,10 +328,20 @@ export const getPayoutWorker = ({
               }
 
               // Set the notification URL for the payout
+              const encryptedPayoutId = authEncrypt(bcRefund.payout_id) ?? '';
+              let notificationUrl = '';
+
+              if (payoutNotificationUrl && payoutNotificationUrl !== '') {
+                notificationUrl = urlJoin(
+                  payoutNotificationUrl,
+                  encryptedPayoutId
+                );
+              }
+
               response = await modifyPayoutPayoutsModelIdPatch(
                 bcRefund.payout_id,
                 {
-                  notification_url: payoutNotificationUrl,
+                  notification_url: notificationUrl,
                   metadata: {
                     payoutReason: PayoutReason.DISPUTE
                   }

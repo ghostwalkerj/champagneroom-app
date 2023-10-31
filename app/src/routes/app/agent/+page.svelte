@@ -14,9 +14,8 @@
 
   import type { AgentDocumentType } from '$lib/models/agent';
   import type { CreatorDocumentType } from '$lib/models/creator';
-  import { AuthType } from '$lib/models/user';
 
-  import { currencyFormatter } from '$lib/constants';
+  import { AuthType, currencyFormatter } from '$lib/constants';
   import { womensNames } from '$lib/womensNames';
 
   import { nameStore } from '$stores';

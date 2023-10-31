@@ -5,10 +5,10 @@ import { AUTH_SIGNING_MESSAGE } from '$env/static/private';
 
 import { Creator } from '$lib/models/creator';
 import type { UserDocument } from '$lib/models/user';
-import { AuthType, User } from '$lib/models/user';
+import { User } from '$lib/models/user';
 import { Wallet } from '$lib/models/wallet';
 
-import { EntityType } from '$lib/constants';
+import { AuthType, EntityType } from '$lib/constants';
 
 import type { Actions, PageServerLoad } from './$types';
 

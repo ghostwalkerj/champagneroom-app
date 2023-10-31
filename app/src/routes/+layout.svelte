@@ -5,6 +5,7 @@
   import '@fontsource/roboto/700.css';
   import '@fontsource/space-grotesk';
   import '../app.css';
+  import 'iconify-icon';
 </script>
 
 <slot />

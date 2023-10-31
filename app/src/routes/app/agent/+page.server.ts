@@ -7,10 +7,10 @@ import { AUTH_SALT } from '$env/static/private';
 import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
 
 import { Creator } from '$lib/models/creator';
-import { AuthType, User } from '$lib/models/user';
+import { User } from '$lib/models/user';
 import { Wallet } from '$lib/models/wallet';
 
-import { EntityType } from '$lib/constants';
+import { AuthType, EntityType } from '$lib/constants';
 import { womensNames } from '$lib/womensNames';
 
 import type { Actions, PageServerLoad } from './$types';
@@ -43,7 +43,7 @@ export const actions: Actions = {
 
       const user = await User.create({
         name,
-        authType: AuthType.PASSWORD_SECRET,
+        authType: AuthType.PATH_PASSWORD,
         secret,
         wallet: wallet._id,
         roles: [EntityType.CREATOR],

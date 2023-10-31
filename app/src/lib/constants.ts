@@ -9,6 +9,15 @@ export enum ActorType {
   ARBITRATOR = 'ARBITRATOR'
 }
 
+export enum AuthType {
+  SIGNING = 'SIGNING',
+  PATH_PASSWORD = 'PATH PASSWORD',
+  PIN = 'PIN',
+  NONE = 'NONE',
+  PATH = 'PATH',
+  TOKEN = 'TOKEN'
+}
+
 export enum EntityType {
   AGENT = 'AGENT',
   CREATOR = 'CREATOR',

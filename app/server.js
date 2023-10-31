@@ -40,7 +40,8 @@ const redisConnection = new IORedis(redisOptions.connection);
 
 const mongoDBEndpoint =
   process.env.MONGO_DB_ENDPOINT || 'mongodb://localhost:27017';
-mongoose.connect(mongoDBEndpoint);
+
+await mongoose.connect(mongoDBEndpoint);
 
 const showQueue = new Queue(EntityType.SHOW, { connection: redisConnection });
 const invoiceQueue = new Queue(EntityType.INVOICE, {
