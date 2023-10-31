@@ -2,7 +2,7 @@
   import { PUBLIC_STATIC_URL } from '$env/static/public';
 </script>
 
-<div id="About" data-aos="fade-right">
+<div id="About">
   <div class="pt-10 lg:pt-52 mx-auto">
     <h2
       class="text-primary font-bold text-[41px] text-center font-CaviarDreams lg:mb-10"
@@ -12,10 +12,7 @@
     <div
       class="flex flex-col lg:flex-row items-center place-content-center px-6"
     >
-      <div
-        class="w-full m-3 p-6 flex place-content-center"
-        data-aos="flip-right"
-      >
+      <div class="w-full m-3 p-6 flex place-content-center">
         <img
           src="{PUBLIC_STATIC_URL}/assets/creator4.png"
           alt="Creator"

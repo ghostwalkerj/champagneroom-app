@@ -14,7 +14,7 @@
       style="background-image: url('{PUBLIC_STATIC_URL}/assets/crbubbles.png') "
     />
     <div class="flex flex-col lg:flex-row w-full">
-      <div class="w-full p-4 lg:p-6" data-aos="fade-right">
+      <div class="w-full p-4 lg:p-6">
         <span
           class="text-info text-lg font-bold capitalize tracking-wider text-center flex font-CaviarDreams"
         >

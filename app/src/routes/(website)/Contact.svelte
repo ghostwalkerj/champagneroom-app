@@ -29,10 +29,7 @@
         Contact Us
       </h2>
       <div class="flex flex-col lg:flex-row">
-        <div
-          class="w-full lg:mb-10 m-0 lg:m-10 flex place-content-center"
-          data-aos="flip-right"
-        >
+        <div class="w-full lg:mb-10 m-0 lg:m-10 flex place-content-center">
           <img
             src="{PUBLIC_STATIC_URL}/assets/creator3.png"
             alt="Creator"
@@ -45,7 +42,7 @@
           >
             Thank you for the interest in CHAMPAGNE ROOM!
           </div>
-          <div data-aos="fade-down" class="h-full flex place-content-center">
+          <div class="h-full flex place-content-center">
             {#if isSubmitted}
               <div class="h-full flex flex-col place-content-center">
                 <div class="alert alert-success">

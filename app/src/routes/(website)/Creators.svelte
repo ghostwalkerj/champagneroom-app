@@ -2,7 +2,7 @@
   import { PUBLIC_SIGNUP_PATH, PUBLIC_STATIC_URL } from '$env/static/public';
 </script>
 
-<div id="Creators" data-aos="zoom-in-right">
+<div id="Creators">
   <div class="container mx-auto">
     <div class="pt-10 lg:pt-52">
       <h2
@@ -13,10 +13,7 @@
       <div
         class="flex flex-col lg:flex-row p-4 items-center place-content-center lg:px-10"
       >
-        <div
-          class="w-full m-3 p-4 flex place-content-center"
-          data-aos="flip-right"
-        >
+        <div class="w-full m-3 p-4 flex place-content-center lg:pr-28">
           <img
             src="{PUBLIC_STATIC_URL}/assets/creator.png"
             alt="Creator"

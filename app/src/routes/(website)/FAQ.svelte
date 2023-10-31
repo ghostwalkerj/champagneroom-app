@@ -3,7 +3,6 @@
 </script>
 
 <div
-  data-aos="fade-In"
   class="container mx-auto relative pt-10 lg:pt-52"
   id="FAQ"
 >

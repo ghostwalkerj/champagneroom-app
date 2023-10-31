@@ -10,7 +10,7 @@
   </h2>
 </div>
 
-<div class="flex w-screen" data-aos="fade-in" id="page1">
+<div class="flex w-screen" id="page1">
   <div class="mx-auto flex flex-col lg:flex-row items-center">
     <div class="w-full px-4 lg:px-20">
       <h2
