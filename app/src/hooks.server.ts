@@ -32,10 +32,10 @@ import { Ticket } from '$lib/models/ticket';
 import { AuthType, User, UserRole } from '$lib/models/user';
 
 import {
-  APP_PATH,
   decryptFromCookie,
   encrypt4Cookie,
-  verifyPath
+  isProtectedMatch,
+  isWhitelistMatch
 } from '$lib/server/auth';
 
 const authUrl = PUBLIC_AUTH_PATH;
@@ -59,23 +59,22 @@ export const handle = (async ({ event, resolve }) => {
 
   locals.redisConnection = redisConnection;
 
-  // Auth stuff only run in APP_PATH
-  if (requestedPath.startsWith(APP_PATH)) {
+  // Auth run in protected path
+  if (isProtectedMatch(requestedPath)) {
     const tokenName = AUTH_TOKEN_NAME || 'token';
-    const authToken = cookies.get(tokenName);
+    const encryptedToken = cookies.get(tokenName);
     const allowedPaths = [] as string[];
 
     if (requestedPath === authUrl) {
       cookies.delete(tokenName, { path: '/' });
-      authToken === undefined;
     } else {
-      const clearAuthToken = decryptFromCookie(authToken);
+      const authToken = decryptFromCookie(encryptedToken);
 
       // If authenticated, check if user is allowed to access the requested path and set user in locals
-      if (clearAuthToken) {
+      if (authToken) {
         let decode: JwtPayload;
         try {
-          decode = jwt.verify(clearAuthToken, JWT_PRIVATE_KEY) as JwtPayload;
+          decode = jwt.verify(authToken, JWT_PRIVATE_KEY) as JwtPayload;
         } catch (error) {
           console.error('Invalid token:', error);
           cookies.delete(tokenName, { path: '/' });
@@ -149,15 +148,16 @@ export const handle = (async ({ event, resolve }) => {
         }
       }
     }
-    if (verifyPath(requestedPath, allowedPaths)) {
-      console.log('Allowed');
+    if (
+      isWhitelistMatch(requestedPath) ||
+      allowedPaths.includes(requestedPath)
+    ) {
+      console.log(requestedPath, ': Allowed');
     } else {
-      console.error('Not allowed');
+      console.log(requestedPath, ': Not Allowed');
       const encReturnPath = encrypt4Cookie(returnPath);
-
       encReturnPath &&
         cookies.set('returnPath', encReturnPath, { path: authUrl });
-
       throw redirect(302, authUrl);
     }
   }

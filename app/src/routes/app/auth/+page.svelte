@@ -16,33 +16,50 @@
 
   export let data: PageData;
 
-  let { returnPath, authType, secret, slug } = data;
+  let { returnPath, authType, slug } = data;
 
   const redirectPath = returnPath ?? PUBLIC_WEBSITE_URL;
   $: hasNoWallet = false;
 
+  const applyAction = (result: ActionResult) => {
+    switch (result.type) {
+      case 'error': {
+        goto('/');
+        break;
+      }
+      case 'redirect': {
+        goto(result.location);
+        break;
+      }
+      case 'success': {
+        goto(returnPath);
+        break;
+      }
+    }
+  };
+
   const setSigningAuth = async (
     message: string,
     signature: string,
-    returnPath: string,
     address: string
   ) => {
     let formData = new FormData();
     formData.append('signature', signature);
     formData.append('address', address);
     formData.append('message', message);
-    formData.append('returnPath', returnPath);
 
-    const resp = await fetch('?/signing_auth', {
+    const response = await fetch('?/signing_auth', {
       method: 'POST',
       body: formData,
       redirect: 'follow'
     });
+
+    const result: ActionResult = deserialize(await response.text());
+    applyAction(result);
   };
 
-  const setPasswordAuth = async (returnPath: string) => {
+  const setPasswordAuth = async () => {
     let formData = new FormData();
-    formData.append('secret', secret!);
     formData.append('slug', slug!);
 
     const response = await fetch('?/password_secret_auth', {
@@ -52,23 +69,10 @@
     });
 
     const result: ActionResult = deserialize(await response.text());
-    switch (result.type) {
-      case 'error': {
-        goto('/');
-        break;
-      }
-      case 'redirect': {
-        goto(result.location);
-        break;
-      }
-      case 'success': {
-        goto(returnPath);
-        break;
-      }
-    }
+    applyAction(result);
   };
 
-  const setPinAuth = async (returnPath: string) => {
+  const setPinAuth = async () => {
     const response = await fetch('?/pin_auth', {
       method: 'POST',
       body: new FormData(),
@@ -76,26 +80,13 @@
     });
 
     const result: ActionResult = deserialize(await response.text());
-    switch (result.type) {
-      case 'error': {
-        goto('/');
-        break;
-      }
-      case 'redirect': {
-        goto(result.location);
-        break;
-      }
-      case 'success': {
-        goto(returnPath);
-        break;
-      }
-    }
+    applyAction(result);
   };
 
   onMount(async () => {
     switch (authType) {
       case AuthType.PASSWORD_SECRET: {
-        setPasswordAuth(redirectPath);
+        setPasswordAuth();
         break;
       }
 
@@ -122,12 +113,7 @@
                     method: 'personal_sign',
                     params: [message, walletAddress]
                   })) as string;
-                  await setSigningAuth(
-                    message,
-                    signature,
-                    redirectPath,
-                    address
-                  );
+                  await setSigningAuth(message, signature, address);
                   goto(redirectPath);
                 }
                 break;
@@ -149,7 +135,7 @@
       }
 
       case AuthType.PIN: {
-        setPinAuth(redirectPath);
+        setPinAuth();
         break;
       }
       default: {

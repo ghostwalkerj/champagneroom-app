@@ -8,7 +8,9 @@ const { Schema, models } = pkg;
 
 export type UserDocument = InstanceType<typeof User>;
 
-export type UserDocumentType = InferSchemaType<typeof userSchema>;
+export type UserDocumentType = InferSchemaType<typeof userSchema> & {
+  comparePassword: (password: string) => Promise<boolean>;
+};
 export enum AuthType {
   SIGNING = 'SIGNING',
   PASSWORD_SECRET = 'PASSWORD_SECRET',

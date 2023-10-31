@@ -1,10 +1,12 @@
 import crypto from 'node:crypto';
 
+import outmatch from 'outmatch';
 import * as web3 from 'web3';
-import wcmatch from 'wildcard-match';
 
 import { AUTH_SALT } from '$env/static/private';
 import {
+  PUBLIC_API_PATH,
+  PUBLIC_APP_PATH,
   PUBLIC_AUTH_PATH,
   PUBLIC_CREATOR_PATH,
   PUBLIC_SHOW_PATH,
@@ -12,17 +14,22 @@ import {
   PUBLIC_TICKET_PATH
 } from '$env/static/public';
 
-export { PUBLIC_APP_PATH as APP_PATH } from '$env/static/public';
+const PASSWORD_PATHS = [PUBLIC_CREATOR_PATH + '/[A-Za-z0-9_-]*'];
 
-export const PATH_WHITELIST = [
+const PIN_PATHS = [PUBLIC_TICKET_PATH + '/[A-Za-z0-9_-]*'];
+
+//const PROTECTED_PATHS = [PUBLIC_APP_PATH + '/**', PUBLIC_API_PATH + '/**'];
+const PROTECTED_PATHS = [PUBLIC_APP_PATH + '/**'];
+
+const WHITELIST_PATHS = [
   PUBLIC_SHOW_PATH + '/**',
   PUBLIC_AUTH_PATH,
   PUBLIC_SIGNUP_PATH
 ];
 
-export const SECRET_PATHS = [PUBLIC_CREATOR_PATH, PUBLIC_TICKET_PATH];
-
-const isWhitelistMatch = wcmatch(PATH_WHITELIST);
+const TICKET_PATHS = [PUBLIC_TICKET_PATH + '/[A-Za-z0-9_-]*'];
+const CREATOR_PATHS = [PUBLIC_CREATOR_PATH + '/[A-Za-z0-9_-]*'];
+const SECRET_PATHS = [...PASSWORD_PATHS, ...PIN_PATHS];
 
 export const decryptFromCookie = (cookie: string | undefined) => {
   if (!cookie) {
@@ -71,31 +78,13 @@ export const encrypt4Cookie = (cookie: string) => {
   }
 };
 
-export const getSecretSlug = (requestedPath: string | undefined) => {
-  let secret: string | undefined;
-  let slug: string | undefined;
-  if (
-    requestedPath &&
-    SECRET_PATHS.some((path) => requestedPath.startsWith(path))
-  ) {
-    const pathParts = requestedPath.split('/');
-    if (pathParts.length > 3) {
-      secret = pathParts.at(-1);
-      slug = pathParts.at(-2);
-    }
-  }
-  return { secret, slug };
-};
-
-export const verifyPath = (requestedPath: string, allowedPaths: string[]) => {
-  // If the requested path is not in the whitelist, return false
-  console.log('requestedPath', requestedPath);
-  console.log('allowedPaths', allowedPaths);
-  console.log('isWhitelistMatch', isWhitelistMatch(requestedPath));
-  return (
-    isWhitelistMatch(requestedPath) || allowedPaths.includes(requestedPath)
-  );
-};
+export const isCreatorMatch = outmatch(CREATOR_PATHS);
+export const isPasswordMatch = outmatch(PASSWORD_PATHS);
+export const isPinMatch = outmatch(PIN_PATHS);
+export const isProtectedMatch = outmatch(PROTECTED_PATHS);
+export const isSecretMatch = outmatch(SECRET_PATHS);
+export const isTicketMatch = outmatch(TICKET_PATHS);
+export const isWhitelistMatch = outmatch(WHITELIST_PATHS);
 
 export const verifySignature = (
   message: string,

@@ -3,16 +3,14 @@ import { error, redirect } from '@sveltejs/kit';
 import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 import jwt from 'jsonwebtoken';
-import urlJoin from 'url-join';
 
 import {
-    JITSI_APP_ID,
-    JITSI_JWT_SECRET,
-    JWT_EXPIRY
+  JITSI_APP_ID,
+  JITSI_JWT_SECRET,
+  JWT_EXPIRY
 } from '$env/static/private';
 import { PUBLIC_CREATOR_PATH, PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
-import { Creator } from '$lib/models/creator';
 import { Show } from '$lib/models/show';
 
 import { ShowMachineEventString } from '$lib/machines/showMachine';
@@ -21,8 +19,8 @@ import type { ShowQueueType } from '$lib/workers/showWorker';
 
 import { EntityType } from '$lib/constants';
 import {
-    getShowMachineService,
-    getShowMachineServiceFromId
+  getShowMachineService,
+  getShowMachineServiceFromId
 } from '$lib/server/machinesUtil';
 
 import type { PageServerLoad } from './$types';
@@ -52,22 +50,11 @@ export const actions: Actions = {
   }
 };
 
-export const load: PageServerLoad = async ({ params, locals }) => {
-  const key = params.address;
-
-  if (key === null) {
-    throw error(404, 'Key not found');
+export const load: PageServerLoad = async ({ locals }) => {
+  const creator = locals.creator;
+  if (!creator) {
+    throw redirect(302, PUBLIC_CREATOR_PATH);
   }
-
-  const creator = await Creator.findOne({
-    'user.address': key,
-    'user.active': true
-  })
-    .orFail(() => {
-      throw error(404, 'Creator not found');
-    })
-    .exec();
-
   const show = await Show.findOne({
     creator: creator._id,
     'showState.current': true
@@ -86,8 +73,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
   const showState = showService.getSnapshot();
 
   if (!showState.can({ type: ShowMachineEventString.SHOW_STARTED })) {
-    const creatorUrl = urlJoin(PUBLIC_CREATOR_PATH, key);
-    throw redirect(302, creatorUrl);
+    throw redirect(302, PUBLIC_CREATOR_PATH);
   }
 
   if (!showState.matches('started'))

@@ -9,75 +9,45 @@ import {
   JITSI_JWT_SECRET,
   JWT_EXPIRY
 } from '$env/static/private';
-import {
-  PUBLIC_JITSI_DOMAIN,
-  PUBLIC_PIN_PATH,
-  PUBLIC_TICKET_PATH
-} from '$env/static/public';
+import { PUBLIC_JITSI_DOMAIN, PUBLIC_TICKET_PATH } from '$env/static/public';
 
 import { Show } from '$lib/models/show';
-import { Ticket } from '$lib/models/ticket';
 
 import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 
-import { verifyPin } from '$lib/pin';
 import { getTicketMachineService } from '$lib/server/machinesUtil';
 
 import type { PageServerLoad } from './$types';
 
 export const actions: Actions = {
-  leave_show: async ({ params, cookies, locals }) => {
-    const ticketId = params.id as string;
-    const pinHash = cookies.get('pin');
-
-    if (ticketId === null) {
-      throw error(404, 'Bad ticket id');
+  leave_show: async ({ locals }) => {
+    const ticket = locals.ticket;
+    if (!ticket) {
+      throw error(404, 'Ticket not found');
     }
+    const redisConnection = locals.redisConnection as IORedis;
+    const ticketService = getTicketMachineService(ticket, redisConnection);
+    ticketService.send(TicketMachineEventString.SHOW_LEFT);
 
-    const ticket = await Ticket.findById(ticketId)
-      .orFail(() => {
-        throw error(404, 'Ticket not found');
-      })
-      .exec();
-
-    if (pinHash && verifyPin(ticketId, ticket.pin, pinHash)) {
-      const redisConnection = locals.redisConnection as IORedis;
-      const ticketService = getTicketMachineService(ticket, redisConnection);
-      ticketService.send(TicketMachineEventString.SHOW_LEFT);
-    }
     return { success: true };
   }
 };
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-export const load: PageServerLoad = async ({ params, cookies, locals }) => {
-  const ticketId = params.id;
-  const pinHash = cookies.get('pin');
-  const ticketUrl = urlJoin(PUBLIC_TICKET_PATH, ticketId);
-  const pinUrl = urlJoin(ticketUrl, PUBLIC_PIN_PATH);
-
-  if (!pinHash) {
-    throw redirect(302, pinUrl);
+export const load: PageServerLoad = async ({ locals }) => {
+  const ticket = locals.ticket;
+  const user = locals.user;
+  if (!user) {
+    throw error(401, 'Unauthorized');
   }
-  if (ticketId === null) {
-    throw error(404, 'Bad ticket id');
+  if (!ticket) {
+    throw error(404, 'Ticket not found');
   }
-
-  const ticket = await Ticket.findById(ticketId)
-    .orFail(() => {
-      throw error(404, 'Ticket not found');
-    })
-    .exec();
-
   const show = await Show.findById(ticket.show)
     .orFail(() => {
       throw error(404, 'Show not found');
     })
     .exec();
-  // Check if pin is correct
-  if (!verifyPin(ticketId, ticket.pin, pinHash)) {
-    throw redirect(302, pinUrl);
-  }
 
   const redisConnection = locals.redisConnection as IORedis;
 
@@ -90,6 +60,8 @@ export const load: PageServerLoad = async ({ params, cookies, locals }) => {
 
   // Check if can watch the show
   else if (!ticketMachineState.can(TicketMachineEventString.SHOW_JOINED)) {
+    const ticketUrl = urlJoin(PUBLIC_TICKET_PATH, ticket._id.toString());
+
     throw redirect(302, ticketUrl);
   }
 
@@ -104,7 +76,7 @@ export const load: PageServerLoad = async ({ params, cookies, locals }) => {
       room: show.roomId,
       context: {
         user: {
-          name: ticket.customerName,
+          name: user.name,
           affiliation: 'member',
           lobby_bypass: false
         }

@@ -15,6 +15,7 @@ import {
   saleSchema
 } from './common';
 import type { ShowDocumentType } from './show';
+import type { UserDocumentType } from './user';
 
 enum TicketStatus {
   RESERVED = 'RESERVED',
@@ -110,6 +111,8 @@ ticketSchema.plugin(mongooseAutoPopulate);
 
 export type TicketDocumentType = InferSchemaType<typeof ticketSchema> & {
   show: ShowDocumentType;
+} & {
+  user: UserDocumentType;
 };
 
 export type TicketStateType = InferSchemaType<typeof ticketStateSchema>;

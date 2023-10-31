@@ -110,6 +110,7 @@
     "mongoose-field-encryption": "^7.0.1",
     "nanoid": "^4.0.2",
     "npm-font-caviar-dreams": "^1.0.1",
+    "outmatch": "^0.7.0",
     "readable-stream": "^4.4.0",
     "rxjs": "^7.8.1",
     "set-cookie-parser": "^2.6.0",
@@ -129,7 +130,6 @@
     "validator": "^13.9.0",
     "web3": "^4.1.2",
     "web3.storage": "^4.5.4",
-    "wildcard-match": "^5.1.2",
     "xstate": "^4.37.2"
   },
   "packageManager": "yarn@1.22.19"

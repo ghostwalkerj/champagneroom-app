@@ -10,13 +10,14 @@ import {
 } from '$env/static/private';
 import { PUBLIC_AUTH_PATH } from '$env/static/public';
 
-import { AuthType, User, UserRole } from '$lib/models/user';
+import { AuthType, User } from '$lib/models/user';
 
-import { EntityType } from '$lib/constants';
 import {
   decryptFromCookie,
   encrypt4Cookie,
-  getSecretSlug,
+  isPasswordMatch,
+  isPinMatch,
+  isSecretMatch,
   verifySignature
 } from '$lib/server/auth';
 
@@ -32,7 +33,9 @@ export const actions: Actions = {
       throw error(404, 'Bad address');
     }
 
-    const user = await User.findOne({ address }).select('nonce').exec();
+    const user = await User.findOne({ address, authType: AuthType.SIGNING })
+      .select('nonce')
+      .exec();
     if (!user) {
       console.error('User not found');
       throw error(404, 'User not found');
@@ -66,13 +69,24 @@ export const actions: Actions = {
       throw error(400, 'Invalid Signature');
     }
 
+    // Check if user exists
+    const exists = await User.exists({
+      address,
+      authType: AuthType.SIGNING
+    }).exec();
+
+    if (!exists) {
+      console.error('User not found');
+      throw error(404, 'User not found');
+    }
+
     // Update User Nonce
     const nonce = Math.floor(Math.random() * 1_000_000);
     User.updateOne({ address }, { $set: { nonce } }).exec();
     const authToken = jwt.sign(
       {
-        address,
-        selector: 'address',
+        selector: '_id',
+        _id: exists._id,
         authType: AuthType.SIGNING,
         exp: Math.floor(Date.now() / 1000) + +JWT_EXPIRY
       },
@@ -93,35 +107,29 @@ export const actions: Actions = {
   },
   password_secret_auth: async ({ cookies, request }) => {
     const data = await request.formData();
-    const secret = data.get('secret') as string;
     const slug = data.get('slug') as string;
-
-    if (!secret) {
-      console.error('No secret');
-      throw error(404, 'Bad secret');
-    }
 
     if (!slug) {
       console.error('No slug');
       throw error(404, 'Bad slug');
     }
 
-    // verify the user exists and has password auth
-    if (slug === UserRole.CREATOR.toLocaleLowerCase()) {
-      const user = await User.findOne({
-        secret
-      });
-      if (!user) {
-        console.error('User not found');
-        throw error(404, 'Bad slug');
-      }
+    // Check if user exists
+    const exists = await User.exists({
+      secret: slug,
+      authType: AuthType.PASSWORD_SECRET
+    }).exec();
+
+    if (!exists) {
+      console.error('User not found');
+      throw error(404, 'User not found');
     }
 
     const authToken = jwt.sign(
       {
         selector: 'secret',
-        secret,
-        slug,
+        secret: slug,
+        _id: exists._id,
         exp: Math.floor(Date.now() / 1000) + +JWT_EXPIRY,
         authType: AuthType.PASSWORD_SECRET
       },
@@ -131,7 +139,7 @@ export const actions: Actions = {
     const encAuthToken = encrypt4Cookie(authToken);
 
     encAuthToken &&
-      cookies.set(tokenName, authToken, {
+      cookies.set(tokenName, encAuthToken, {
         path: '/',
         httpOnly: true,
         sameSite: 'strict',
@@ -203,24 +211,24 @@ export const actions: Actions = {
 export const load: PageServerLoad = async ({ cookies }) => {
   const returnPath = cookies.get('returnPath');
   const clearReturnPath = decryptFromCookie(returnPath);
-  const { slug, secret } = getSecretSlug(clearReturnPath);
+  let slug = '';
 
   if (!clearReturnPath) {
     throw error(400, 'Missing Return Path');
   }
-  let authType = AuthType.NONE;
+  let authType = AuthType.SIGNING;
 
-  switch (slug) {
-    case EntityType.CREATOR.toLocaleLowerCase(): {
-      authType = AuthType.PASSWORD_SECRET;
-      break;
-    }
-    case EntityType.TICKET.toLocaleLowerCase(): {
-      authType = AuthType.PIN;
-      break;
-    }
-    default: {
-      authType = AuthType.SIGNING;
+  if (isPinMatch(clearReturnPath)) {
+    console.log('Pin match');
+    authType = AuthType.PIN;
+  } else if (isPasswordMatch(clearReturnPath)) {
+    console.log('Password match');
+    authType = AuthType.PASSWORD_SECRET;
+  }
+  if (isSecretMatch(clearReturnPath)) {
+    const pathParts = clearReturnPath.split('/');
+    if (pathParts.length > 3) {
+      slug = pathParts.at(-1) || '';
     }
   }
 
@@ -229,7 +237,6 @@ export const load: PageServerLoad = async ({ cookies }) => {
   return {
     returnPath: clearReturnPath,
     authType,
-    slug,
-    secret
+    slug
   };
 };
