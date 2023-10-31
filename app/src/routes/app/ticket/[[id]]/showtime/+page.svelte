@@ -54,7 +54,7 @@
   }
 
   const profileImage = getProfileImage(
-    ticket.customerName,
+    ticket.user.name,
     PUBLIC_PROFILE_IMAGE_PATH
   );
   onMount(() => {
@@ -65,7 +65,7 @@
       height: '100%',
       parentNode: videoCallElement,
       userInfo: {
-        displayName: ticket.customerName
+        displayName: ticket.user.name
       },
       interfaceConfigOverwrite: jitsiInterfaceConfigOverwrite,
       configOverwrite: {

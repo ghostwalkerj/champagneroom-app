@@ -8,20 +8,20 @@ import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 import { raise } from 'xstate/lib/actions';
 
 import type {
-    CancelType,
-    CurrencyType,
-    DisputeType,
-    FeedbackType,
-    FinalizeType,
-    RefundType,
-    SaleType
+  CancelType,
+  CurrencyType,
+  DisputeType,
+  FeedbackType,
+  FinalizeType,
+  RefundType,
+  SaleType
 } from '$lib/models/common';
 import { DisputeDecision, RefundReason } from '$lib/models/common';
 import type { TicketDocumentType, TicketStateType } from '$lib/models/ticket';
 import { TicketStatus } from '$lib/models/ticket';
 import type {
-    TransactionDocumentType,
-    TransactionSummaryType
+  TransactionDocumentType,
+  TransactionSummaryType
 } from '$lib/models/transaction';
 
 import type { ShowJobDataType } from '$lib/workers/showWorker';
@@ -409,7 +409,7 @@ const createTicketMachine = ({
             {
               showId: context.ticketDocument.show.toString(),
               ticketId: context.ticketDocument._id.toString(),
-              customerName: context.ticketDocument.customerName
+              customerName: context.ticketDocument.user.name
             }
           );
         },
@@ -420,7 +420,7 @@ const createTicketMachine = ({
             {
               showId: context.ticketDocument.show.toString(),
               ticketId: context.ticketDocument._id.toString(),
-              customerName: context.ticketDocument.customerName
+              customerName: context.ticketDocument.user.name
             }
           );
         },
@@ -432,7 +432,7 @@ const createTicketMachine = ({
               showId: context.ticketDocument.show.toString(),
               ticketId: context.ticketDocument._id.toString(),
               sale: context.ticketState.sale,
-              customerName: context.ticketDocument.customerName
+              customerName: context.ticketDocument.user.name
             }
           );
         },
@@ -464,7 +464,7 @@ const createTicketMachine = ({
             {
               showId: context.ticketDocument.show.toString(),
               ticketId: context.ticketDocument._id.toString(),
-              customerName: context.ticketDocument.customerName,
+              customerName: context.ticketDocument.user.name,
               cancel: event.cancel
             }
           );
@@ -843,7 +843,7 @@ export enum TicketMachineEventString {
 
 export { TicketMachineEventType };
 
-    export { createTicketMachine };
+export { createTicketMachine };
 
 export const createTicketMachineService = ({
   ticketDocument,

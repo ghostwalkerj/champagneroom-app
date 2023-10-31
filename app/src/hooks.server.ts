@@ -1,6 +1,3 @@
-import console from 'node:console';
-import { resolve } from 'node:dns';
-
 import type { Handle } from '@sveltejs/kit';
 import { error, redirect } from '@sveltejs/kit';
 import IORedis from 'ioredis';
@@ -20,10 +17,11 @@ import {
 } from '$env/static/private';
 import {
   PUBLIC_AGENT_PATH,
+  PUBLIC_API_PATH,
+  PUBLIC_APP_PATH,
   PUBLIC_AUTH_PATH,
   PUBLIC_CHANGESET_PATH,
   PUBLIC_CREATOR_PATH,
-  PUBLIC_OPERATOR_PATH,
   PUBLIC_SIGNUP_PATH,
   PUBLIC_TICKET_PATH
 } from '$env/static/public';
@@ -164,7 +162,7 @@ export const handle = (async ({ event, resolve }) => {
                 break;
               }
               case UserRole.OPERATOR: {
-                allowedPaths.push(PUBLIC_OPERATOR_PATH);
+                allowedPaths.push(PUBLIC_APP_PATH, PUBLIC_API_PATH); // super user
                 const operator = await Operator.findOne({ user: user._id });
                 if (!operator) {
                   console.error('No operator');
@@ -183,7 +181,18 @@ export const handle = (async ({ event, resolve }) => {
                 }
                 locals.ticket = ticket;
                 const ticketPath = `${PUBLIC_TICKET_PATH}/${ticket._id}`;
-                allowedPaths.push(ticketPath);
+
+                // Allow API paths for ticket holders
+                allowedPaths.push(
+                  ticketPath,
+                  urlJoin(
+                    PUBLIC_CHANGESET_PATH,
+                    'ticket',
+                    ticket._id.toString()
+                  ),
+                  urlJoin(PUBLIC_CHANGESET_PATH, 'show', ticket.show.toString())
+                );
+                break;
               }
             }
           }
