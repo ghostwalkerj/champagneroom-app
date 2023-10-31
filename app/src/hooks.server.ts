@@ -22,6 +22,8 @@ import {
   PUBLIC_AUTH_PATH,
   PUBLIC_CHANGESET_PATH,
   PUBLIC_CREATOR_PATH,
+  PUBLIC_IMAGE_UPDATE_PATH,
+  PUBLIC_INVOICE_PATH,
   PUBLIC_SIGNUP_PATH,
   PUBLIC_TICKET_PATH
 } from '$env/static/public';
@@ -110,12 +112,12 @@ export const handle = (async ({ event, resolve }) => {
                 locals.agent = agent;
                 break;
               }
+
               case UserRole.CREATOR: {
                 let path = PUBLIC_CREATOR_PATH;
                 if (user.authType === AuthType.PASSWORD_SECRET) {
                   path = `${path}/${user[selector]}`;
                 }
-                allowedPaths.push(path);
                 const creator = await Creator.findOne({ user: user._id });
                 if (!creator) {
                   console.error('No creator');
@@ -125,11 +127,13 @@ export const handle = (async ({ event, resolve }) => {
 
                 // Allow API paths for creators
                 allowedPaths.push(
+                  path,
                   urlJoin(
                     PUBLIC_CHANGESET_PATH,
                     'creator',
                     creator._id.toString()
-                  )
+                  ),
+                  PUBLIC_IMAGE_UPDATE_PATH // photos!
                 );
 
                 // Current Shows can be watched
@@ -158,9 +162,9 @@ export const handle = (async ({ event, resolve }) => {
                     )
                   );
                 }
-
                 break;
               }
+
               case UserRole.OPERATOR: {
                 allowedPaths.push(PUBLIC_APP_PATH, PUBLIC_API_PATH); // super user
                 const operator = await Operator.findOne({ user: user._id });
@@ -171,6 +175,7 @@ export const handle = (async ({ event, resolve }) => {
                 locals.operator = operator;
                 break;
               }
+
               case UserRole.TICKET_HOLDER: {
                 const ticket = await Ticket.findOne({
                   user: user._id
@@ -192,6 +197,11 @@ export const handle = (async ({ event, resolve }) => {
                   ),
                   urlJoin(PUBLIC_CHANGESET_PATH, 'show', ticket.show.toString())
                 );
+                if (ticket.bcInvoiceId) {
+                  allowedPaths.push(
+                    urlJoin(PUBLIC_INVOICE_PATH, ticket.bcInvoiceId.toString())
+                  );
+                }
                 break;
               }
             }

@@ -1,7 +1,11 @@
 import { error } from '@sveltejs/kit';
 import type { AxiosResponse } from 'axios';
 
-import { BITCART_API_URL, BITCART_EMAIL, BITCART_PASSWORD } from '$env/static/private';
+import {
+  BITCART_API_URL,
+  BITCART_EMAIL,
+  BITCART_PASSWORD
+} from '$env/static/private';
 
 import { createAuthToken } from '$lib/payment';
 
