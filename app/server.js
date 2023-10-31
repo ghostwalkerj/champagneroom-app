@@ -16,6 +16,7 @@ import IORedis from 'ioredis';
 import mongoose from 'mongoose';
 import { Queue } from 'bullmq';
 import basicAuth from 'express-basic-auth';
+import urlJoin from 'url-join';
 
 const buildNumber = generate(packageFile.version);
 const buildTime = format(buildNumber);
@@ -40,8 +41,6 @@ const redisConnection = new IORedis(redisOptions.connection);
 
 const mongoDBEndpoint =
   process.env.MONGO_DB_ENDPOINT || 'mongodb://localhost:27017';
-
-await mongoose.connect(mongoDBEndpoint);
 
 const showQueue = new Queue(EntityType.SHOW, { connection: redisConnection });
 const invoiceQueue = new Queue(EntityType.INVOICE, {
@@ -81,8 +80,12 @@ if (startWorker) {
     paymentAuthToken,
     paymentPeriod:
       +(process.env.PUBLIC_PAYMENT_PERIOD || 6_000_000) / 60 / 1000,
-    payoutNotificationUrl: process.env.BITCART_PAYOUT_NOTIFICATION_PATH || '',
-    bitcartStoreId: process.env.BITCART_STORE_ID || ''
+    payoutNotificationUrl: urlJoin(
+      process.env.ORIGIN || '',
+      process.env.BITCART_PAYOUT_NOTIFICATION_PATH || ''
+    ),
+    bitcartStoreId: process.env.BITCART_STORE_ID || '',
+    authSalt: process.env.AUTH_SALT || ''
   });
   payoutWorker.run();
 }
@@ -117,6 +120,14 @@ app.get('/health', (_, res) => {
 // Svelte App
 app.use(handler);
 const port = process.env.PORT || 3000;
+
+if (mongoose.connection.readyState === 0) {
+  // eslint-disable-next-line unicorn/prefer-top-level-await
+  mongoose.connect(mongoDBEndpoint);
+}
+mongoose.connection.on('connected', () => {
+  console.log('Mongoose connected:', mongoose.connection.name);
+});
 app.listen(port, () => {
   console.log('pCall server running on:', port);
   console.log('Workers running:', startWorker);

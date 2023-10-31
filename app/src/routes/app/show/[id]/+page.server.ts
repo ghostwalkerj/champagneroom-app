@@ -5,11 +5,13 @@ import { uniqueNamesGenerator } from 'unique-names-generator';
 import urlJoin from 'url-join';
 
 import {
+  AUTH_SALT,
   BITCART_API_URL,
   BITCART_EMAIL,
   BITCART_INVOICE_NOTIFICATION_PATH,
   BITCART_PASSWORD,
-  BITCART_STORE_ID
+  BITCART_STORE_ID,
+  ORIGIN
 } from '$env/static/private';
 import {
   PUBLIC_AUTH_PATH,
@@ -26,9 +28,9 @@ import { ShowMachineEventString } from '$lib/machines/showMachine';
 import type { ShowQueueType } from '$lib/workers/showWorker';
 
 import { AuthType, EntityType } from '$lib/constants';
+import { authEncrypt } from '$lib/crypt';
 import { mensNames } from '$lib/mensNames';
 import { createAuthToken } from '$lib/payment';
-import { authEncrypt } from '$lib/server/auth';
 import { getShowMachineServiceFromId } from '$lib/server/machinesUtil';
 
 import {
@@ -133,9 +135,10 @@ export const actions: Actions = {
 
     // Update the notification url
     const invoice = response.data;
-    const encryptedInvoiceId = authEncrypt(invoice.id) ?? '';
+    const encryptedInvoiceId = authEncrypt(invoice.id, AUTH_SALT) ?? '';
 
     invoice.notification_url = urlJoin(
+      ORIGIN,
       BITCART_INVOICE_NOTIFICATION_PATH,
       encryptedInvoiceId
     );
@@ -165,8 +168,8 @@ export const actions: Actions = {
       customerName: name
     });
 
-    const userId = authEncrypt(user._id.toString());
-    const encryptedPin = authEncrypt(pin);
+    const userId = authEncrypt(user._id.toString(), AUTH_SALT);
+    const encryptedPin = authEncrypt(pin, AUTH_SALT);
     if (!userId || !encryptedPin) {
       return error(501, 'Show cannot Reserve Ticket');
     }

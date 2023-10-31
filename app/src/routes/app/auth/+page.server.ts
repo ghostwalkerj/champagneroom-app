@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 
 import {
   AUTH_MAX_AGE,
+  AUTH_SALT,
   AUTH_SIGNING_MESSAGE,
   AUTH_TOKEN_NAME,
   JWT_EXPIRY,
@@ -13,9 +14,8 @@ import { PUBLIC_AUTH_PATH } from '$env/static/public';
 import { User } from '$lib/models/user';
 
 import { AuthType } from '$lib/constants';
+import { authDecrypt, authEncrypt } from '$lib/crypt';
 import {
-  authDecrypt,
-  authEncrypt,
   isPasswordMatch,
   isPinMatch,
   isSecretMatch,
@@ -83,7 +83,7 @@ export const actions: Actions = {
 
     // Update User Nonce
     const nonce = Math.floor(Math.random() * 1_000_000);
-    User.updateOne({ address }, { $set: { nonce } }).exec();
+    User.updateOne({ _id: exists._id }, { $set: { nonce } }).exec();
     const authToken = jwt.sign(
       {
         selector: '_id',
@@ -94,7 +94,7 @@ export const actions: Actions = {
       JWT_PRIVATE_KEY
     );
 
-    const encAuthToken = authEncrypt(authToken);
+    const encAuthToken = authEncrypt(authToken, AUTH_SALT);
 
     encAuthToken &&
       cookies.set(tokenName, encAuthToken, {
@@ -137,7 +137,7 @@ export const actions: Actions = {
       JWT_PRIVATE_KEY
     );
 
-    const encAuthToken = authEncrypt(authToken);
+    const encAuthToken = authEncrypt(authToken, AUTH_SALT);
 
     encAuthToken &&
       cookies.set(tokenName, encAuthToken, {
@@ -164,8 +164,8 @@ export const actions: Actions = {
       throw error(404, 'Bad userId');
     }
 
-    const clearPin = authDecrypt(pin);
-    const clearUserId = authDecrypt(userId);
+    const clearPin = authDecrypt(pin, AUTH_SALT);
+    const clearUserId = authDecrypt(userId, AUTH_SALT);
 
     const user = await User.findOne({
       _id: clearUserId
@@ -192,7 +192,7 @@ export const actions: Actions = {
         JWT_PRIVATE_KEY
       );
 
-      const encAuthToken = authEncrypt(authToken);
+      const encAuthToken = authEncrypt(authToken, AUTH_SALT);
       cookies.delete('pin', { path: PUBLIC_AUTH_PATH });
       cookies.delete('userId', { path: PUBLIC_AUTH_PATH });
 
@@ -211,7 +211,7 @@ export const actions: Actions = {
 
 export const load: PageServerLoad = async ({ cookies }) => {
   const returnPath = cookies.get('returnPath');
-  const clearReturnPath = authDecrypt(returnPath);
+  const clearReturnPath = authDecrypt(returnPath, AUTH_SALT);
   let slug = '';
 
   if (!clearReturnPath) {

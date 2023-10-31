@@ -1,9 +1,11 @@
 import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 
+import { AUTH_SALT } from '$env/static/private';
+
 import { EntityType } from '$lib/constants';
+import { authDecrypt } from '$lib/crypt';
 import { InvoiceJobType } from '$lib/payment';
-import { authDecrypt } from '$lib/server/auth';
 
 import type { RequestHandler } from './$types';
 
@@ -13,7 +15,7 @@ export const POST: RequestHandler = async ({ request, locals, params }) => {
   const bcInvoiceId = body['id'] as string;
   const status = body['status'] as string;
   const redisConnection = locals.redisConnection as IORedis;
-  const token = authDecrypt(encryptedToken);
+  const token = authDecrypt(encryptedToken, AUTH_SALT);
 
   if (!token || token !== bcInvoiceId) {
     return new Response(undefined, { status: 200 });

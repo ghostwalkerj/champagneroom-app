@@ -9,6 +9,7 @@ import mongoose from 'mongoose';
 import urlJoin from 'url-join';
 
 import {
+  AUTH_SALT,
   AUTH_TOKEN_NAME,
   JWT_PRIVATE_KEY,
   MONGO_DB_ENDPOINT,
@@ -37,9 +38,8 @@ import { Ticket } from '$lib/models/ticket';
 import { User, UserRole } from '$lib/models/user';
 
 import { AuthType } from '$lib/constants';
+import { authDecrypt, authEncrypt } from '$lib/crypt';
 import {
-  authDecrypt,
-  authEncrypt,
   isAppPathMatch,
   isProtectedMatch,
   isWhitelistMatch
@@ -48,7 +48,7 @@ import {
 const authUrl = PUBLIC_AUTH_PATH;
 const signUpUrl = PUBLIC_SIGNUP_PATH;
 
-await mongoose.connect(MONGO_DB_ENDPOINT);
+if (mongoose.connection.readyState === 0) mongoose.connect(MONGO_DB_ENDPOINT);
 const redisConnection = new IORedis({
   host: REDIS_HOST,
   port: +REDIS_PORT,
@@ -75,7 +75,7 @@ export const handle = (async ({ event, resolve }) => {
     if (requestedPath === authUrl) {
       cookies.delete(tokenName, { path: '/' });
     } else {
-      const authToken = authDecrypt(encryptedToken);
+      const authToken = authDecrypt(encryptedToken, AUTH_SALT);
 
       // If authenticated, check if user is allowed to access the requested path and set user in locals
       if (authToken) {
@@ -97,7 +97,8 @@ export const handle = (async ({ event, resolve }) => {
           const user = await User.findOne(query);
           if (!user) {
             console.error('No user');
-            throw redirect(302, signUpUrl);
+            console.log('query', query);
+            throw error(500, 'No user');
           }
           locals.user = user;
 
@@ -109,7 +110,7 @@ export const handle = (async ({ event, resolve }) => {
                 const agent = await Agent.findOne({ user: user._id });
                 if (!agent) {
                   console.error('No agent');
-                  throw redirect(302, signUpUrl);
+                  throw error(500, 'No agent');
                 }
                 locals.agent = agent;
                 break;
@@ -123,7 +124,7 @@ export const handle = (async ({ event, resolve }) => {
                 const creator = await Creator.findOne({ user: user._id });
                 if (!creator) {
                   console.error('No creator');
-                  throw redirect(302, signUpUrl);
+                  throw error(500, 'No creator');
                 }
                 locals.creator = creator;
 
@@ -172,7 +173,7 @@ export const handle = (async ({ event, resolve }) => {
                 const operator = await Operator.findOne({ user: user._id });
                 if (!operator) {
                   console.error('No operator');
-                  throw redirect(302, signUpUrl);
+                  throw error(500, 'No operator');
                 }
                 locals.operator = operator;
                 break;
@@ -184,7 +185,7 @@ export const handle = (async ({ event, resolve }) => {
                 });
                 if (!ticket) {
                   console.error('No ticket');
-                  throw redirect(302, signUpUrl);
+                  throw error(500, 'No ticket');
                 }
                 locals.ticket = ticket;
                 const ticketPath = `${PUBLIC_TICKET_PATH}/${ticket._id}`;
@@ -221,7 +222,7 @@ export const handle = (async ({ event, resolve }) => {
       console.log('allowedPaths', allowedPaths);
       // Redirect for auth if in app
       if (isAppPathMatch(requestedPath)) {
-        const encReturnPath = authEncrypt(returnPath);
+        const encReturnPath = authEncrypt(returnPath, AUTH_SALT);
         encReturnPath &&
           cookies.set('returnPath', encReturnPath, { path: authUrl });
         throw redirect(302, authUrl);

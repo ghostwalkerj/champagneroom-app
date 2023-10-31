@@ -20,6 +20,7 @@ import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 import { WalletMachineEventString } from '$lib/machines/walletMachine';
 
 import { EntityType } from '$lib/constants';
+import { authEncrypt } from '$lib/crypt';
 import {
   batchActionsOnPayoutsPayoutsBatchPost,
   createPayoutPayoutsPost,
@@ -39,7 +40,6 @@ import type {
 } from '$lib/ext/bitcart/models';
 import type { PaymentType } from '$lib/payment';
 import { PayoutJobType, PayoutReason, PayoutStatus } from '$lib/payment';
-import { authEncrypt } from '$lib/server/auth';
 import {
   getTicketMachineService,
   getWalletMachineService
@@ -57,14 +57,16 @@ export const getPayoutWorker = ({
   paymentAuthToken,
   paymentPeriod = 6_000_000 / 60 / 1000,
   payoutNotificationUrl = '',
-  bitcartStoreId: bcStoreId
+  bcStoreId,
+  authSalt = ''
 }: {
   payoutQueue: PayoutQueueType;
   redisConnection: IORedis;
   paymentAuthToken: string;
   paymentPeriod: number;
   payoutNotificationUrl: string;
-  bitcartStoreId: string;
+  bcStoreId: string;
+  authSalt: string;
 }) => {
   return new Worker(
     EntityType.PAYOUT,
@@ -328,7 +330,8 @@ export const getPayoutWorker = ({
               }
 
               // Set the notification URL for the payout
-              const encryptedPayoutId = authEncrypt(bcRefund.payout_id) ?? '';
+              const encryptedPayoutId =
+                authEncrypt(bcRefund.payout_id, authSalt) ?? '';
               let notificationUrl = '';
 
               if (payoutNotificationUrl && payoutNotificationUrl !== '') {
