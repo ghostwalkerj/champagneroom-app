@@ -1,4 +1,5 @@
 import console from 'node:console';
+import { resolve } from 'node:dns';
 
 import type { Handle } from '@sveltejs/kit';
 import { error, redirect } from '@sveltejs/kit';
@@ -6,6 +7,7 @@ import IORedis from 'ioredis';
 import type { JwtPayload } from 'jsonwebtoken';
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
+import urlJoin from 'url-join';
 
 import {
   AUTH_TOKEN_NAME,
@@ -19,6 +21,7 @@ import {
 import {
   PUBLIC_AGENT_PATH,
   PUBLIC_AUTH_PATH,
+  PUBLIC_CHANGESET_PATH,
   PUBLIC_CREATOR_PATH,
   PUBLIC_OPERATOR_PATH,
   PUBLIC_SIGNUP_PATH,
@@ -28,6 +31,7 @@ import {
 import { Agent } from '$lib/models/agent';
 import { Creator } from '$lib/models/creator';
 import { Operator } from '$lib/models/operator';
+import { Show } from '$lib/models/show';
 import { Ticket } from '$lib/models/ticket';
 import { AuthType, User, UserRole } from '$lib/models/user';
 
@@ -120,6 +124,43 @@ export const handle = (async ({ event, resolve }) => {
                   throw redirect(302, signUpUrl);
                 }
                 locals.creator = creator;
+
+                // Allow API paths for creators
+                allowedPaths.push(
+                  urlJoin(
+                    PUBLIC_CHANGESET_PATH,
+                    'creator',
+                    creator._id.toString()
+                  )
+                );
+
+                // Current Shows can be watched
+                const show = await Show.exists({
+                  creator: creator._id,
+                  'showState.current': true
+                }).exec();
+                if (show) {
+                  allowedPaths.push(
+                    urlJoin(PUBLIC_CHANGESET_PATH, 'show', show._id.toString()),
+                    urlJoin(
+                      PUBLIC_CHANGESET_PATH,
+                      'showEvent',
+                      show._id.toString()
+                    )
+                  );
+                }
+
+                // Wallet
+                if (user.wallet) {
+                  allowedPaths.push(
+                    urlJoin(
+                      PUBLIC_CHANGESET_PATH,
+                      'wallet',
+                      user.wallet.toString()
+                    )
+                  );
+                }
+
                 break;
               }
               case UserRole.OPERATOR: {

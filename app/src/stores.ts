@@ -17,7 +17,7 @@ export const agentStore = (agent: AgentDocumentType) => {
     changesetPath: urlJoin(
       PUBLIC_CHANGESET_PATH,
       'agent',
-      agent.user.address || ''
+      agent._id.toString() || ''
     )
   });
 };
@@ -92,10 +92,13 @@ const abstractStore = <T>({
 };
 
 export const creatorStore = (creator: CreatorDocumentType) => {
-  const address = creator.user.address || '';
   return abstractStore({
     doc: creator,
-    changesetPath: urlJoin(PUBLIC_CHANGESET_PATH, 'creator', address)
+    changesetPath: urlJoin(
+      PUBLIC_CHANGESET_PATH,
+      'creator',
+      creator._id.toString()
+    )
   });
 };
 
