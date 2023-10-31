@@ -1,7 +1,7 @@
 import console from 'node:console';
 
 import type { Handle } from '@sveltejs/kit';
-import { redirect } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import IORedis from 'ioredis';
 import type { JwtPayload } from 'jsonwebtoken';
 import jwt from 'jsonwebtoken';
@@ -34,6 +34,7 @@ import { AuthType, User, UserRole } from '$lib/models/user';
 import {
   decryptFromCookie,
   encrypt4Cookie,
+  isAppPathMatch,
   isProtectedMatch,
   isWhitelistMatch
 } from '$lib/server/auth';
@@ -155,10 +156,15 @@ export const handle = (async ({ event, resolve }) => {
       console.log(requestedPath, ': Allowed');
     } else {
       console.log(requestedPath, ': Not Allowed');
-      const encReturnPath = encrypt4Cookie(returnPath);
-      encReturnPath &&
-        cookies.set('returnPath', encReturnPath, { path: authUrl });
-      throw redirect(302, authUrl);
+      // Redirect for auth if in app
+      if (isAppPathMatch(requestedPath)) {
+        const encReturnPath = encrypt4Cookie(returnPath);
+        encReturnPath &&
+          cookies.set('returnPath', encReturnPath, { path: authUrl });
+        throw redirect(302, authUrl);
+      } else {
+        throw error(403, 'Forbidden');
+      }
     }
   }
 

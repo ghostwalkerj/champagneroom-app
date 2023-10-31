@@ -18,14 +18,17 @@ const PASSWORD_PATHS = [PUBLIC_CREATOR_PATH + '/[A-Za-z0-9_-]*'];
 
 const PIN_PATHS = [PUBLIC_TICKET_PATH + '/[A-Za-z0-9_-]*'];
 
-//const PROTECTED_PATHS = [PUBLIC_APP_PATH + '/**', PUBLIC_API_PATH + '/**'];
-const PROTECTED_PATHS = [PUBLIC_APP_PATH + '/**'];
+const PROTECTED_PATHS = [PUBLIC_APP_PATH + '/**', PUBLIC_API_PATH + '/**'];
+//const PROTECTED_PATHS = [PUBLIC_APP_PATH + '/**'];
 
 const WHITELIST_PATHS = [
   PUBLIC_SHOW_PATH + '/**',
   PUBLIC_AUTH_PATH,
   PUBLIC_SIGNUP_PATH
 ];
+
+const APP_PATHS = [PUBLIC_APP_PATH + '/**'];
+const API_PATHS = [PUBLIC_API_PATH + '/**'];
 
 const TICKET_PATHS = [PUBLIC_TICKET_PATH + '/[A-Za-z0-9_-]*'];
 const CREATOR_PATHS = [PUBLIC_CREATOR_PATH + '/[A-Za-z0-9_-]*'];
@@ -78,6 +81,8 @@ export const encrypt4Cookie = (cookie: string) => {
   }
 };
 
+export const isAPIPathMatch = outmatch(API_PATHS);
+export const isAppPathMatch = outmatch(APP_PATHS);
 export const isCreatorMatch = outmatch(CREATOR_PATHS);
 export const isPasswordMatch = outmatch(PASSWORD_PATHS);
 export const isPinMatch = outmatch(PIN_PATHS);
