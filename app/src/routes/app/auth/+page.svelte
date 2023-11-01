@@ -5,6 +5,7 @@
 
   import { deserialize } from '$app/forms';
   import { goto } from '$app/navigation';
+  import { navigating, page } from '$app/stores';
   import { PUBLIC_WEBSITE_URL } from '$env/static/public';
 
   import { AuthType } from '$lib/constants';
@@ -16,7 +17,7 @@
 
   export let data: PageData;
 
-  let { returnPath, authType, slug } = data;
+  let { returnPath, authType, parseId } = data;
 
   const redirectPath = returnPath ?? PUBLIC_WEBSITE_URL;
   $: hasNoWallet = false;
@@ -65,7 +66,7 @@
 
   const setPasswordAuth = async () => {
     let formData = new FormData();
-    formData.append('slug', slug!);
+    formData.append('parseId', parseId!);
 
     const response = await fetch('?/password_secret_auth', {
       method: 'POST',

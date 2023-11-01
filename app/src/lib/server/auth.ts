@@ -16,11 +16,17 @@ import {
   PUBLIC_TICKET_PATH
 } from '$env/static/public';
 
-const idString = '/{!' + PUBLIC_SHOWTIME_PATH + '[A-Za-z0-9_-]*}';
+const idString = '/[A-Za-z0-9_-]*';
 
-const PASSWORD_PATHS = [PUBLIC_CREATOR_PATH + idString];
-
-const PIN_PATHS = [PUBLIC_TICKET_PATH + idString];
+const PASSWORD_PATHS = [
+  PUBLIC_CREATOR_PATH + idString,
+  PUBLIC_CREATOR_PATH + idString + PUBLIC_SHOWTIME_PATH,
+  '!' + PUBLIC_CREATOR_PATH + PUBLIC_SHOWTIME_PATH
+];
+const PIN_PATHS = [
+  PUBLIC_TICKET_PATH + idString,
+  PUBLIC_TICKET_PATH + idString + PUBLIC_SHOWTIME_PATH
+];
 
 const PROTECTED_PATHS = [PUBLIC_APP_PATH + '/**', PUBLIC_API_PATH + '/**'];
 
@@ -40,8 +46,8 @@ const NOTIFICATION_PATHS = [
 const APP_PATHS = [PUBLIC_APP_PATH + '/**'];
 const API_PATHS = [PUBLIC_API_PATH + '/**'];
 
-const TICKET_PATHS = [PUBLIC_TICKET_PATH + idString];
-const CREATOR_PATHS = [PUBLIC_CREATOR_PATH + idString];
+const TICKET_PATHS = [PUBLIC_TICKET_PATH + '/**'];
+const CREATOR_PATHS = [PUBLIC_CREATOR_PATH, PUBLIC_CREATOR_PATH + '/**'];
 const SECRET_PATHS = [...PASSWORD_PATHS, ...PIN_PATHS];
 
 export const isAPIPathMatch = outmatch(API_PATHS);

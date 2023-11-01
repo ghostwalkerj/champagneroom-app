@@ -108,16 +108,16 @@ export const actions: Actions = {
   },
   password_secret_auth: async ({ cookies, request }) => {
     const data = await request.formData();
-    const slug = data.get('slug') as string;
+    const parseId = data.get('parseId') as string;
 
-    if (!slug) {
-      console.error('No slug');
-      throw error(404, 'Bad slug');
+    if (!parseId) {
+      console.error('No parseId');
+      throw error(404, 'Bad parseId');
     }
 
     // Check if user exists
     const exists = await User.exists({
-      secret: slug,
+      secret: parseId,
       authType: AuthType.PATH_PASSWORD
     }).exec();
 
@@ -129,7 +129,7 @@ export const actions: Actions = {
     const authToken = jwt.sign(
       {
         selector: 'secret',
-        secret: slug,
+        secret: parseId,
         _id: exists._id,
         exp: Math.floor(Date.now() / 1000) + +JWT_EXPIRY,
         authType: AuthType.PATH_PASSWORD
@@ -215,7 +215,7 @@ export const load: PageServerLoad = async ({ url }) => {
     throw error(400, 'Missing Return Path');
   }
 
-  let slug = '';
+  let parseId = '';
 
   if (!returnPath) {
     throw error(400, 'Missing Return Path');
@@ -231,14 +231,15 @@ export const load: PageServerLoad = async ({ url }) => {
   }
   if (isSecretMatch(returnPath)) {
     const pathParts = returnPath.split('/');
-    if (pathParts.length > 3) {
-      slug = pathParts.at(-1) || '';
+    console.log(pathParts);
+    if (pathParts.length >= 4) {
+      parseId = pathParts.at(3) || '';
     }
   }
 
   return {
     returnPath,
     authType,
-    slug
+    parseId
   };
 };

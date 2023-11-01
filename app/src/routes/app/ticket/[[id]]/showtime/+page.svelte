@@ -12,7 +12,7 @@
     PUBLIC_TICKET_PATH
   } from '$env/static/public';
 
-  import { ShowStatus, type ShowDocumentType } from '$lib/models/show';
+  import { type ShowDocumentType, ShowStatus } from '$lib/models/show';
   import type { TicketDocumentType } from '$lib/models/ticket';
 
   import { jitsiInterfaceConfigOverwrite } from '$lib/constants';
@@ -31,11 +31,7 @@
   let jitsiToken = data.jitsiToken as string;
   let showUnSub: Unsubscriber;
 
-  let returnUrl = urlJoin(
-    $page.url.origin,
-    PUBLIC_TICKET_PATH,
-    ticket._id.toString()
-  );
+  let returnUrl = $page.params.returnUrl;
   let videoCallElement: HTMLDivElement;
 
   if (browser) {

@@ -46,7 +46,11 @@
   let wallet = data.wallet as WalletDocumentType;
   let exchangeRate = +data.exchangeRate || 0;
 
-  const showTimePath = urlJoin($page.url.href, PUBLIC_SHOWTIME_PATH);
+  const showTimePath = urlJoin(
+    $page.url.href,
+    PUBLIC_SHOWTIME_PATH,
+    '?returnPath=' + $page.url.href
+  );
 
   let showName = creator
     ? possessive(creator.user.name, 'en') + ' Show'

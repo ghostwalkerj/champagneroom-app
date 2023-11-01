@@ -1,11 +1,10 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
-  import urlJoin from 'url-join';
 
   import { browser } from '$app/environment';
   import { goto } from '$app/navigation';
-  import { navigating, page } from '$app/stores';
-  import { PUBLIC_CREATOR_PATH, PUBLIC_JITSI_DOMAIN } from '$env/static/public';
+  import { page } from '$app/stores';
+  import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
   import type { CreatorDocumentType } from '$lib/models/creator';
   import type { ShowDocumentType } from '$lib/models/show';
@@ -21,9 +20,9 @@
   let jitsiToken = data.jitsiToken;
 
   let videoCallElement: HTMLDivElement;
-  let returnUrl = $navigating?.from?.url;
   let api: any;
   let participantName = '';
+  const returnUrl = $page.params.returnUrl;
 
   const stopShow = async () => {
     let formData = new FormData();
