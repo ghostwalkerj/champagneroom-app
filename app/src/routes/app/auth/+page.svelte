@@ -149,13 +149,13 @@
     <div class="font-bold text-5xl text-primary w-full font-CaviarDreams">
       Crypto Wallet Authentication
     </div>
+    <div class="py-6 w-full">
+      Please sign the message in your wallet to verify your identity
+    </div>
     {#if hasNoWallet}
       <div class="py-6 w-full">Please connect a wallet to continue</div>
     {/if}
     {#if signingRejected}
-      <div class="py-6 w-full">
-        Please sign the message in your wallet to verify your identity
-      </div>
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <div>
         <div class="btn btn-primary" on:click={signMessage}>Sign Message</div>

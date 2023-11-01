@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
+VERSION=patch
 DOCKER_DEFAULT_PLATFORM=linux/amd64
 BUILDKIT_PROGRESS=plain
+
+cd ../
+npm version $VERSION
 docker system prune -af
 yarn build
 yarn package
