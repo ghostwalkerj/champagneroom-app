@@ -26,7 +26,7 @@ import {
   PUBLIC_IMAGE_UPDATE_PATH,
   PUBLIC_INVOICE_PATH,
   PUBLIC_OPERATOR_PATH,
-  PUBLIC_SIGNUP_PATH,
+  PUBLIC_SHOWTIME_PATH,
   PUBLIC_TICKET_PATH
 } from '$env/static/public';
 
@@ -34,11 +34,11 @@ import { Agent } from '$lib/models/agent';
 import { Creator } from '$lib/models/creator';
 import { Operator } from '$lib/models/operator';
 import { Show } from '$lib/models/show';
-import { Ticket } from '$lib/models/ticket';
+import { Ticket, TicketStatus } from '$lib/models/ticket';
 import { User, UserRole } from '$lib/models/user';
 
 import { AuthType } from '$lib/constants';
-import { authDecrypt, authEncrypt } from '$lib/crypt';
+import { authDecrypt } from '$lib/crypt';
 import {
   isAppPathMatch,
   isProtectedMatch,
@@ -135,7 +135,8 @@ export const handle = (async ({ event, resolve }) => {
                     'creator',
                     creator._id.toString()
                   ),
-                  PUBLIC_IMAGE_UPDATE_PATH // photos!
+                  PUBLIC_IMAGE_UPDATE_PATH, // photos!
+                  urlJoin(path, PUBLIC_SHOWTIME_PATH) // shows
                 );
 
                 // Current Shows can be watched
@@ -204,6 +205,12 @@ export const handle = (async ({ event, resolve }) => {
                     urlJoin(PUBLIC_INVOICE_PATH, ticket.bcInvoiceId.toString())
                   );
                 }
+                if (
+                  ticket.ticketState.status === TicketStatus.FULLY_PAID ||
+                  ticket.ticketState.status === TicketStatus.REDEEMED
+                ) {
+                  allowedPaths.push(urlJoin(ticketPath, PUBLIC_SHOWTIME_PATH));
+                }
                 break;
               }
             }
@@ -211,6 +218,8 @@ export const handle = (async ({ event, resolve }) => {
         }
       }
     }
+    console.log('allowedPaths', allowedPaths);
+
     if (
       isWhitelistMatch(requestedPath) ||
       allowedPaths.includes(requestedPath)
@@ -218,15 +227,16 @@ export const handle = (async ({ event, resolve }) => {
       console.log(requestedPath, ': Allowed');
     } else {
       console.log(requestedPath, ': Not Allowed');
-      console.log('allowedPaths', allowedPaths);
       // Redirect for auth if in app
-      const error = isAppPathMatch(requestedPath)
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      const _error = isAppPathMatch(requestedPath)
         ? redirect(302, urlJoin(authUrl, '?returnPath=', returnPath))
         : error(403, 'Forbidden');
-      throw error;
+      throw _error;
     }
   }
 
   const response = await resolve(event);
+
   return response;
 }) satisfies Handle;

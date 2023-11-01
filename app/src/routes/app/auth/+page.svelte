@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { ActionResult } from '@sveltejs/kit';
+  import type { WalletState } from '@web3-onboard/core';
   import { onMount } from 'svelte';
 
   import { deserialize } from '$app/forms';
@@ -20,7 +21,8 @@
   const redirectPath = returnPath ?? PUBLIC_WEBSITE_URL;
   $: hasNoWallet = false;
   $: signingRejected = false;
-  let wallet;
+  let wallet: WalletState;
+
   let walletAddress = '';
   let message = '';
 
@@ -105,7 +107,7 @@
           params: [message, walletAddress]
         })) as string;
         await setSigningAuth(message, signature, walletAddress);
-        goto(redirectPath);
+        goto(redirectPath, { replaceState: true });
       }
     } catch {
       signingRejected = true;

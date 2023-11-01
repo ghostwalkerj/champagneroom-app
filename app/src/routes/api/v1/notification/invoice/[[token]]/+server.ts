@@ -18,6 +18,7 @@ export const POST: RequestHandler = async ({ request, locals, params }) => {
   const token = authDecrypt(encryptedToken, AUTH_SALT);
 
   if (!token || token !== bcInvoiceId) {
+    console.error('Invalid token for invoice notification');
     return new Response(undefined, { status: 200 });
   }
 

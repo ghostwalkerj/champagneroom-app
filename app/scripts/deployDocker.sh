@@ -8,4 +8,6 @@ ssh  "root@${SERVER_IP}" \
   && docker run --init -d --name live-container -p 3000:3000 registry.digitalocean.com/champagne/pcall \
   && docker system prune -af" # remove unused images to free up space
 
+doctl registry g start -f --include-untagged-manifests
 echo "Successfully deployed, hooray!"
+

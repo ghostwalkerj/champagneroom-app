@@ -9,6 +9,7 @@ import {
   BITCART_API_URL,
   BITCART_EMAIL,
   BITCART_INVOICE_NOTIFICATION_PATH,
+  BITCART_NOTIFICATION_HOST,
   BITCART_PASSWORD,
   BITCART_STORE_ID,
   ORIGIN
@@ -138,7 +139,7 @@ export const actions: Actions = {
     const encryptedInvoiceId = authEncrypt(invoice.id, AUTH_SALT) ?? '';
 
     invoice.notification_url = urlJoin(
-      ORIGIN,
+      BITCART_NOTIFICATION_HOST,
       BITCART_INVOICE_NOTIFICATION_PATH,
       encryptedInvoiceId
     );

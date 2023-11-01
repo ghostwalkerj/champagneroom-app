@@ -81,7 +81,7 @@ if (startWorker) {
     paymentPeriod:
       +(process.env.PUBLIC_PAYMENT_PERIOD || 6_000_000) / 60 / 1000,
     payoutNotificationUrl: urlJoin(
-      process.env.ORIGIN || '',
+      process.env.BITCART_NOTIFICATION_HOST || '',
       process.env.BITCART_PAYOUT_NOTIFICATION_PATH || ''
     ),
     bitcartStoreId: process.env.BITCART_STORE_ID || '',
