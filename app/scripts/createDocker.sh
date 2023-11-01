@@ -4,7 +4,7 @@ DOCKER_DEFAULT_PLATFORM=linux/amd64
 BUILDKIT_PROGRESS=plain
 
 cd ../
-npm version $VERSION
+yarn version $VERSION
 docker system prune -af
 yarn build
 yarn package
