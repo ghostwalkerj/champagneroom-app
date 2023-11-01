@@ -1,6 +1,6 @@
 {
   "name": "champagneroom",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "license": "UNLICENSED",
   "files": [
     "dist"
@@ -59,6 +59,7 @@
     "install-peers": "^1.0.4",
     "nodemon": "^2.0.22",
     "orval": "^6.17.0",
+    "package-version-git-tag": "^3.0.0",
     "postcss": "^8.4.23",
     "prettier": "^2.8.8",
     "prettier-plugin-svelte": "^2.10.1",
