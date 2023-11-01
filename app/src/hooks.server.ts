@@ -46,7 +46,6 @@ import {
 } from '$lib/server/auth';
 
 const authUrl = PUBLIC_AUTH_PATH;
-const signUpUrl = PUBLIC_SIGNUP_PATH;
 
 if (mongoose.connection.readyState === 0) mongoose.connect(MONGO_DB_ENDPOINT);
 const redisConnection = new IORedis({
@@ -221,14 +220,10 @@ export const handle = (async ({ event, resolve }) => {
       console.log(requestedPath, ': Not Allowed');
       console.log('allowedPaths', allowedPaths);
       // Redirect for auth if in app
-      if (isAppPathMatch(requestedPath)) {
-        const encReturnPath = authEncrypt(returnPath, AUTH_SALT);
-        encReturnPath &&
-          cookies.set('returnPath', encReturnPath, { path: authUrl });
-        throw redirect(302, authUrl);
-      } else {
-        throw error(403, 'Forbidden');
-      }
+      const error = isAppPathMatch(requestedPath)
+        ? redirect(302, urlJoin(authUrl, '?returnPath=', returnPath))
+        : error(403, 'Forbidden');
+      throw error;
     }
   }
 

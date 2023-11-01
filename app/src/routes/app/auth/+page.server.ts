@@ -209,34 +209,35 @@ export const actions: Actions = {
   }
 } satisfies Actions;
 
-export const load: PageServerLoad = async ({ cookies }) => {
-  const returnPath = cookies.get('returnPath');
-  const clearReturnPath = authDecrypt(returnPath, AUTH_SALT);
+export const load: PageServerLoad = async ({ url }) => {
+  const returnPath = url.searchParams.get('returnPath');
+  if (!returnPath) {
+    throw error(400, 'Missing Return Path');
+  }
+
   let slug = '';
 
-  if (!clearReturnPath) {
+  if (!returnPath) {
     throw error(400, 'Missing Return Path');
   }
   let authType = AuthType.SIGNING;
 
-  if (isPinMatch(clearReturnPath)) {
+  if (isPinMatch(returnPath)) {
     console.log('Pin match');
     authType = AuthType.PIN;
-  } else if (isPasswordMatch(clearReturnPath)) {
+  } else if (isPasswordMatch(returnPath)) {
     console.log('Password match');
     authType = AuthType.PATH_PASSWORD;
   }
-  if (isSecretMatch(clearReturnPath)) {
-    const pathParts = clearReturnPath.split('/');
+  if (isSecretMatch(returnPath)) {
+    const pathParts = returnPath.split('/');
     if (pathParts.length > 3) {
       slug = pathParts.at(-1) || '';
     }
   }
 
-  cookies.delete('returnPath', { path: PUBLIC_AUTH_PATH });
-
   return {
-    returnPath: clearReturnPath,
+    returnPath,
     authType,
     slug
   };

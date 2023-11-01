@@ -74,7 +74,8 @@
         localSubject: currentShow?.name,
         filmstrip: {
           enabled: false
-        }
+        },
+        disabledNotifications: ['dialog.sessTerminated']
       }
     };
 

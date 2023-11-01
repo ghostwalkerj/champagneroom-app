@@ -9,10 +9,9 @@
   export let show: ShowDocumentType;
   export let ticket: TicketDocumentType;
 
-  $: profileImage = getProfileImage(
-    ticket.customerName,
-    PUBLIC_PROFILE_IMAGE_PATH
-  );
+  const customerName = ticket.user.name;
+
+  $: profileImage = getProfileImage(customerName, PUBLIC_PROFILE_IMAGE_PATH);
   $: ticketStatus = ticket.ticketState.status;
 
   $: showStatus = show ? show.showState.status : '';
@@ -30,7 +29,7 @@
             style="background-image: url('{profileImage}')"
           />
           <div class="pt-2">
-            {ticket.customerName}
+            {customerName}
           </div>
         </div>
         <div class="flex flex-col">
