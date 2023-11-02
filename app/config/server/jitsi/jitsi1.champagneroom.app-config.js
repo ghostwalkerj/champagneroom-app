@@ -30,31 +30,31 @@ var config = {
 
     hosts: {
         // XMPP domain.
-        domain: 'jitsi1.pcall.app',
+        domain: 'jitsi1.champagneroom.app',
 
         // When using authentication, domain for guest users.
         // anonymousdomain: 'guest.example.com',
 
         // Domain for authenticated users. Defaults to <domain>.
-        // authdomain: 'jitsi1.pcall.app',
+        // authdomain: 'jitsi1.champagneroom.app',
 
         // Focus component domain. Defaults to focus.<domain>.
-        // focus: 'focus.jitsi1.pcall.app',
+        // focus: 'focus.jitsi1.champagneroom.app',
 
         // XMPP MUC domain. FIXME: use XEP-0030 to discover it.
-        muc: 'conference.' + subdomain + 'jitsi1.pcall.app',
+        muc: 'conference.' + subdomain + 'jitsi1.champagneroom.app',
     },
 
     // BOSH URL. FIXME: use XEP-0156 to discover it.
-    bosh: 'https://jitsi1.pcall.app/' + subdir + 'http-bind',
+    bosh: 'https://jitsi1.champagneroom.app/' + subdir + 'http-bind',
 
     // Websocket URL (XMPP)
-    // websocket: 'wss://jitsi1.pcall.app/' + subdir + 'xmpp-websocket',
+    // websocket: 'wss://jitsi1.champagneroom.app/' + subdir + 'xmpp-websocket',
 
     // The real JID of focus participant - can be overridden here
     // Do not change username - FIXME: Make focus username configurable
     // https://github.com/jitsi/jitsi-meet/issues/7376
-    // focusUserJid: 'focus@auth.jitsi1.pcall.app',
+    // focusUserJid: 'focus@auth.jitsi1.champagneroom.app',
 
     // Options related to the bridge (colibri) data channel
     bridgeChannel: {
@@ -302,9 +302,9 @@ var config = {
     //     appKey: '<APP_KEY>', // Specify your app key here.
     //     // A URL to redirect the user to, after authenticating
     //     // by default uses:
-    //     // 'https://jitsi1.pcall.app/static/oauth.html'
+    //     // 'https://jitsi1.champagneroom.app/static/oauth.html'
     //     redirectURI:
-    //          'https://jitsi1.pcall.app/subfolder/static/oauth.html',
+    //          'https://jitsi1.champagneroom.app/subfolder/static/oauth.html',
     // },
 
     // recordingService: {
@@ -950,7 +950,7 @@ var config = {
         // The STUN servers that will be used in the peer to peer connections
         stunServers: [
 
-            // { urls: 'stun:jitsi1.pcall.app:3478' },
+            // { urls: 'stun:jitsi1.champagneroom.app:3478' },
             { urls: 'stun:meet-jit-si-turnrelay.jitsi.net:443' },
         ],
     },
@@ -1116,7 +1116,7 @@ var config = {
     //     disabled: false,
 
     //     // whether to hide the logo on the deep linking pages.
-    //     hideLogo: false, 
+    //     hideLogo: false,
 
     //     // The ios deeplinking config.
     //     ios: {
@@ -1304,7 +1304,7 @@ var config = {
     // The URL of the moderated rooms microservice, if available. If it
     // is present, a link to the service will be rendered on the welcome page,
     // otherwise the app doesn't render it.
-    // moderatedRoomServiceUrl: 'https://moderated.jitsi1.pcall.app',
+    // moderatedRoomServiceUrl: 'https://moderated.jitsi1.champagneroom.app',
 
     // If true, tile view will not be enabled automatically when the participants count threshold is reached.
     // disableTileView: true,
@@ -1575,8 +1575,8 @@ var config = {
     // },
 
     // Application logo url
-    defaultLogoUrl: 'https://pcall.app/logo.png',
-    JITSI_WATERMARK_LINK: 'https://pcall.app/help',
+    defaultLogoUrl: 'https://champagneroom.app/logo.png',
+    JITSI_WATERMARK_LINK: 'https://champagneroom.app/help',
 
     // Settings for the Excalidraw whiteboard integration.
     // whiteboard: {

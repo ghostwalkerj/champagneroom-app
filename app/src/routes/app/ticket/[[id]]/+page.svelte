@@ -46,9 +46,9 @@
   ] as PaymentType;
 
   const showTimePath = urlJoin(
-    $page.url.href,
+    $page.url.pathname,
     PUBLIC_SHOWTIME_PATH,
-    '?returnPath=' + $page.url.href
+    '?returnPath=' + $page.url.pathname
   );
   const invoicePath = urlJoin(PUBLIC_INVOICE_PATH, invoice.id!);
   const reasons = Object.values(DisputeReason);

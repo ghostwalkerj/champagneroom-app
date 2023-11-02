@@ -47,9 +47,9 @@
   let exchangeRate = +data.exchangeRate || 0;
 
   const showTimePath = urlJoin(
-    $page.url.href,
+    $page.url.pathname,
     PUBLIC_SHOWTIME_PATH,
-    '?returnPath=' + $page.url.href
+    '?returnPath=' + $page.url.pathname
   );
 
   let showName = creator

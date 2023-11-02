@@ -1,13 +1,13 @@
 plugin_paths = { "/usr/share/jitsi-meet/prosody-plugins/" }
 
 -- domain mapper options, must at least have domain base set to use the mapper
-muc_mapper_domain_base = "jitsi1.pcall.app";
+muc_mapper_domain_base = "jitsi1.champagneroom.app";
 
 external_service_secret = "krHpmlpefup2MnN9";
 external_services = {
-     { type = "stun", host = "jitsi1.pcall.app", port = 3478 },
-     { type = "turn", host = "jitsi1.pcall.app", port = 3478, transport = "udp", secret = true, ttl = 86400, algorithm = "turn" },
-     { type = "turns", host = "jitsi1.pcall.app", port = 5349, transport = "tcp", secret = true, ttl = 86400, algorithm = "turn" }
+     { type = "stun", host = "jitsi1.champagneroom.app", port = 3478 },
+     { type = "turn", host = "jitsi1.champagneroom.app", port = 3478, transport = "udp", secret = true, ttl = 86400, algorithm = "turn" },
+     { type = "turns", host = "jitsi1.champagneroom.app", port = 5349, transport = "tcp", secret = true, ttl = 86400, algorithm = "turn" }
 };
 
 cross_domain_bosh = false;
@@ -31,28 +31,28 @@ ssl = {
 }
 
 unlimited_jids = {
-    "focus@auth.jitsi1.pcall.app",
-    "jvb@auth.jitsi1.pcall.app"
+    "focus@auth.jitsi1.champagneroom.app",
+    "jvb@auth.jitsi1.champagneroom.app"
 }
 
-VirtualHost "jitsi1.pcall.app"
+VirtualHost "jitsi1.champagneroom.app"
     authentication = "token" -- do not delete me
     -- Properties below are modified by jitsi-meet-tokens package config
     -- and authentication above is switched to "token"
-    app_id="pcall-app"
+    app_id="champagneroom-app"
     app_secret="Fidgety-Storable5-Stock-Species-Debug"
     -- Assign this host a certificate for TLS, otherwise it would use the one
     -- set in the global section (if any).
     -- Note that old-style SSL on port 5223 only supports one certificate, and will always
     -- use the global one.
     ssl = {
-        key = "/etc/prosody/certs/jitsi1.pcall.app.key";
-        certificate = "/etc/prosody/certs/jitsi1.pcall.app.crt";
+        key = "/etc/prosody/certs/jitsi1.champagneroom.app.key";
+        certificate = "/etc/prosody/certs/jitsi1.champagneroom.app.crt";
     }
-    av_moderation_component = "avmoderation.jitsi1.pcall.app"
-    speakerstats_component = "speakerstats.jitsi1.pcall.app"
-    conference_duration_component = "conferenceduration.jitsi1.pcall.app"
-    end_conference_component = "endconference.jitsi1.pcall.app"
+    av_moderation_component = "avmoderation.jitsi1.champagneroom.app"
+    speakerstats_component = "speakerstats.jitsi1.champagneroom.app"
+    conference_duration_component = "conferenceduration.jitsi1.champagneroom.app"
+    end_conference_component = "endconference.jitsi1.champagneroom.app"
     -- we need bosh
     modules_enabled = {
         "bosh";
@@ -66,16 +66,16 @@ VirtualHost "jitsi1.pcall.app"
         "muc_breakout_rooms";
         "av_moderation";
         "room_metadata";
-	"persistent_lobby";
+	    "persistent_lobby";
     }
     c2s_require_encryption = false
-    lobby_muc = "lobby.jitsi1.pcall.app"
-    breakout_rooms_muc = "breakout.jitsi1.pcall.app"
-    room_metadata_component = "metadata.jitsi1.pcall.app"
-    main_muc = "conference.jitsi1.pcall.app"
-    -- muc_lobby_whitelist = { "recorder.jitsi1.pcall.app" } -- Here we can whitelist jibri to enter lobby enabled rooms
+    lobby_muc = "lobby.jitsi1.champagneroom.app"
+    breakout_rooms_muc = "breakout.jitsi1.champagneroom.app"
+    room_metadata_component = "metadata.jitsi1.champagneroom.app"
+    main_muc = "conference.jitsi1.champagneroom.app"
+    -- muc_lobby_whitelist = { "recorder.jitsi1.champagneroom.app" } -- Here we can whitelist jibri to enter lobby enabled rooms
 
-Component "conference.jitsi1.pcall.app" "muc"
+Component "conference.jitsi1.champagneroom.app" "muc"
     restrict_room_creation = true
     storage = "memory"
     modules_enabled = {
@@ -86,21 +86,21 @@ Component "conference.jitsi1.pcall.app" "muc"
         "token_verification";
         "muc_rate_limit";
         "muc_password_whitelist";
-	"lobby_autostart";
-	"token_affiliation";
+	    "lobby_autostart";
+	    "token_affiliation";
         "token_lobby_bypass";
 
     }
-    admins = { "focus@auth.jitsi1.pcall.app" }
+    admins = { "focus@auth.jitsi1.champagneroom.app" }
     muc_password_whitelist = {
-        "focus@auth.jitsi1.pcall.app"
+        "focus@auth.jitsi1.champagneroom.app"
     }
     muc_room_locking = false
     muc_room_default_public_jids = true
     party_check_timeout = 3600000
 
 
-Component "breakout.jitsi1.pcall.app" "muc"
+Component "breakout.jitsi1.champagneroom.app" "muc"
     restrict_room_creation = true
     storage = "memory"
     modules_enabled = {
@@ -110,25 +110,26 @@ Component "breakout.jitsi1.pcall.app" "muc"
         "muc_rate_limit";
         "polls";
     }
-    admins = { "focus@auth.jitsi1.pcall.app" }
+    admins = { "focus@auth.jitsi1.champagneroom.app" }
     muc_room_locking = false
     muc_room_default_public_jids = true
 
+
 -- internal muc component
-Component "internal.auth.jitsi1.pcall.app" "muc"
+Component "internal.auth.jitsi1.champagneroom.app" "muc"
     storage = "memory"
     modules_enabled = {
         "muc_hide_all";
         "ping";
     }
-    admins = { "focus@auth.jitsi1.pcall.app", "jvb@auth.jitsi1.pcall.app" }
+    admins = { "focus@auth.jitsi1.champagneroom.app", "jvb@auth.jitsi1.champagneroom.app" }
     muc_room_locking = false
     muc_room_default_public_jids = true
 
-VirtualHost "auth.jitsi1.pcall.app"
+VirtualHost "auth.jitsi1.champagneroom.app"
     ssl = {
-        key = "/etc/prosody/certs/auth.jitsi1.pcall.app.key";
-        certificate = "/etc/prosody/certs/auth.jitsi1.pcall.app.crt";
+        key = "/etc/prosody/certs/auth.jitsi1.champagneroom.app.key";
+        certificate = "/etc/prosody/certs/auth.jitsi1.champagneroom.app.crt";
     }
     modules_enabled = {
         "limits_exception";
@@ -136,22 +137,22 @@ VirtualHost "auth.jitsi1.pcall.app"
     authentication = "internal_hashed"
 
 -- Proxy to jicofo's user JID, so that it doesn't have to register as a component.
-Component "focus.jitsi1.pcall.app" "client_proxy"
-    target_address = "focus@auth.jitsi1.pcall.app"
+Component "focus.jitsi1.champagneroom.app" "client_proxy"
+    target_address = "focus@auth.jitsi1.champagneroom.app"
 
-Component "speakerstats.jitsi1.pcall.app" "speakerstats_component"
-    muc_component = "conference.jitsi1.pcall.app"
+Component "speakerstats.jitsi1.champagneroom.app" "speakerstats_component"
+    muc_component = "conference.jitsi1.champagneroom.app"
 
-Component "conferenceduration.jitsi1.pcall.app" "conference_duration_component"
-    muc_component = "conference.jitsi1.pcall.app"
+Component "conferenceduration.jitsi1.champagneroom.app" "conference_duration_component"
+    muc_component = "conference.jitsi1.champagneroom.app"
 
-Component "endconference.jitsi1.pcall.app" "end_conference"
-    muc_component = "conference.jitsi1.pcall.app"
+Component "endconference.jitsi1.champagneroom.app" "end_conference"
+    muc_component = "conference.jitsi1.champagneroom.app"
 
-Component "avmoderation.jitsi1.pcall.app" "av_moderation_component"
-    muc_component = "conference.jitsi1.pcall.app"
+Component "avmoderation.jitsi1.champagneroom.app" "av_moderation_component"
+    muc_component = "conference.jitsi1.champagneroom.app"
 
-Component "lobby.jitsi1.pcall.app" "muc"
+Component "lobby.jitsi1.champagneroom.app" "muc"
     storage = "memory"
     restrict_room_creation = true
     muc_room_locking = false
@@ -162,6 +163,6 @@ Component "lobby.jitsi1.pcall.app" "muc"
         "polls";
     }
 
-Component "metadata.jitsi1.pcall.app" "room_metadata_component"
-    muc_component = "conference.jitsi1.pcall.app"
-    breakout_rooms_component = "breakout.jitsi1.pcall.app"
+Component "metadata.jitsi1.champagneroom.app" "room_metadata_component"
+    muc_component = "conference.jitsi1.champagneroom.app"
+    breakout_rooms_component = "breakout.jitsi1.champagneroom.app"
