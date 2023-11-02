@@ -10,7 +10,7 @@
     "build",
   ],
   "include": [
-    "server.js",
+    "server.ts",
     "svelte.config.js",
     ".eslintrc.cjs",
     "ambient.d.ts",

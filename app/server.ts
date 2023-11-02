@@ -1,22 +1,24 @@
+import 'dotenv/config';
+
 import { createBullBoard } from '@bull-board/api';
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
 import { ExpressAdapter } from '@bull-board/express';
 import { format, generate } from 'build-number-generator';
-import 'dotenv/config';
+import { Queue } from 'bullmq';
 import express from 'express';
-import parseArgv from 'tiny-parse-argv';
-import { handler } from './build/handler';
-import { EntityType } from './dist/constants';
-import { getShowWorker } from './dist/workers/showWorker';
-import { getInvoiceWorker } from './dist/workers/invoiceWorker';
-import { getPayoutWorker } from './dist/workers/payoutWorker';
-import { createAuthToken } from './dist/payment';
-import packageFile from './package.json' assert { type: 'json' };
+import basicAuth from 'express-basic-auth';
 import IORedis from 'ioredis';
 import mongoose from 'mongoose';
-import { Queue } from 'bullmq';
-import basicAuth from 'express-basic-auth';
+import parseArgv from 'tiny-parse-argv';
 import urlJoin from 'url-join';
+
+import { handler } from './build/handler';
+import { EntityType } from './dist/constants';
+import { createAuthToken } from './dist/payment';
+import { getInvoiceWorker } from './dist/workers/invoiceWorker';
+import { getPayoutWorker } from './dist/workers/payoutWorker';
+import { getShowWorker } from './dist/workers/showWorker';
+import packageFile from './package.json' assert { type: 'json' };
 
 const buildNumber = generate(packageFile.version);
 const buildTime = format(buildNumber);

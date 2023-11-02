@@ -4,8 +4,8 @@ DOCKER_DEFAULT_PLATFORM=linux/amd64
 BUILDKIT_PROGRESS=plain
 
 cd ../
-yarn version --$VERSION
-docker system prune -af
+#yarn version --$VERSION
+docker system prune -f
 yarn build
 yarn package
 docker-compose --env-file .env.stage -f docker-compose.stage.yml build
