@@ -2,12 +2,10 @@
   import type { WalletState } from '@web3-onboard/core';
   import { onMount } from 'svelte';
   import { uniqueNamesGenerator } from 'unique-names-generator';
-  import urlJoin from 'url-join';
 
   import { enhance } from '$app/forms';
   import { goto } from '$app/navigation';
   import {
-    PUBLIC_CREATOR_PATH,
     PUBLIC_DEFAULT_PROFILE_IMAGE,
     PUBLIC_STATIC_URL
   } from '$env/static/public';
@@ -73,8 +71,7 @@
 
     return async ({ result }) => {
       if (result?.type === 'success') {
-        const creatorURL = urlJoin(PUBLIC_CREATOR_PATH, walletAddress);
-        goto(creatorURL);
+        goto(result.data.returnPath);
       }
     };
   };

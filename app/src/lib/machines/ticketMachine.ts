@@ -843,7 +843,7 @@ export enum TicketMachineEventString {
 
 export { TicketMachineEventType };
 
-export { createTicketMachine };
+  export { createTicketMachine };
 
 export const createTicketMachineService = ({
   ticketDocument,

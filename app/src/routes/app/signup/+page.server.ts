@@ -2,6 +2,7 @@ import { error, fail } from '@sveltejs/kit';
 import * as web3 from 'web3';
 
 import { AUTH_SIGNING_MESSAGE } from '$env/static/private';
+import { PUBLIC_CREATOR_PATH } from '$env/static/public';
 
 import { Creator } from '$lib/models/creator';
 import type { UserDocument } from '$lib/models/user';
@@ -43,6 +44,8 @@ export const actions: Actions = {
     const message = data.get('message') as string;
     const signature = data.get('signature') as string;
 
+    const returnPath = PUBLIC_CREATOR_PATH;
+
     // Validation
     if (!name || name.length < 3 || name.length > 50) {
       return fail(400, { name, badName: true });
@@ -56,18 +59,20 @@ export const actions: Actions = {
     // Check if existing user, if so, add the role
     const user = await User.findOne({ address: address.toLowerCase() });
     if (user) {
-      user.roles.push(EntityType.CREATOR);
-      user.name = name;
-      await user.save();
+      if (!user.roles.includes(EntityType.CREATOR)) {
+        user.roles.push(EntityType.CREATOR);
+        user.name = name;
+        await user.save();
 
-      const creator = await Creator.findOneAndUpdate(
-        { user: user._id },
-        { profileImageUrl },
-        { upsert: true, new: true }
-      );
+        await Creator.create({
+          user: user._id,
+          agentCommission: 0,
+          profileImageUrl
+        });
+      }
       return {
         success: true,
-        creator: creator.toObject({ flattenObjectIds: true, flattenMaps: true })
+        returnPath
       };
     } else {
       try {
@@ -83,17 +88,14 @@ export const actions: Actions = {
           roles: [EntityType.CREATOR]
         });
 
-        const creator = await Creator.create({
+        await Creator.create({
           user: user._id,
           agentCommission: 0,
           profileImageUrl
         });
         return {
           success: true,
-          creator: creator.toObject({
-            flattenObjectIds: true,
-            flattenMaps: true
-          })
+          returnPath
         };
       } catch (error) {
         console.log('err', error);

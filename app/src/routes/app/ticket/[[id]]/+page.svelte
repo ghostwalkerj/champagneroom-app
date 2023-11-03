@@ -14,7 +14,7 @@
 
   import type { RefundType } from '$lib/models/common';
   import { DisputeReason, RefundReason } from '$lib/models/common';
-  import { type ShowDocumentType, ShowStatus } from '$lib/models/show';
+  import { ShowStatus, type ShowDocumentType } from '$lib/models/show';
   import type { TicketDocumentType } from '$lib/models/ticket';
   import type { UserDocument } from '$lib/models/user';
 
@@ -58,6 +58,7 @@
   $: canWatchShow = false;
   $: canCancelTicket = false;
   $: canRequestRefund = false;
+  $: isShowInEscrow = false;
   let isTicketDone = false;
   let canLeaveFeedback = false;
   let canDispute = false;
@@ -199,6 +200,7 @@
       showUnSub = showStore(show).subscribe((showDocument) => {
         show = showDocument;
         hasShowStarted = show.showState.status === ShowStatus.LIVE;
+        isShowInEscrow = show.showState.status === ShowStatus.IN_ESCROW;
       });
     }
   });
