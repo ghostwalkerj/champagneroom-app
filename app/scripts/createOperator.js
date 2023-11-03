@@ -1,8 +1,9 @@
 import mongoose from 'mongoose';
 import parseArgv from 'tiny-parse-argv';
 import { Wallet } from '../dist/models/wallet.js';
-import { AuthType, User, UserRole } from '../dist/models/user.js';
+import { User, UserRole } from '../dist/models/user.js';
 import { Operator } from '../dist/models/operator.js';
+import { AuthType } from '../dist/constants.js';
 
 const arguments_ = parseArgv(process.argv);
 const address = arguments_.address;
