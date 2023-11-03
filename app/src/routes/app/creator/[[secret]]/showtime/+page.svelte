@@ -15,8 +15,9 @@
 
   export let data: PageData;
 
-  let creatorObject = data.creator as CreatorDocumentType;
+  let creator = data.creator as CreatorDocumentType;
   $: currentShow = data.show as ShowDocumentType;
+  let user = data.user;
   let jitsiToken = data.jitsiToken;
 
   let videoCallElement: HTMLDivElement;
@@ -62,7 +63,7 @@
       height: '100%',
       parentNode: videoCallElement,
       userInfo: {
-        displayName: creatorObject.user.name
+        displayName: user.name
       },
       interfaceConfigOverwrite: jitsiInterfaceConfigOverwrite,
       configOverwrite: {
@@ -76,7 +77,7 @@
 
     // @ts-ignore
     api = new JitsiMeetExternalAPI(PUBLIC_JITSI_DOMAIN, options);
-    api.executeCommand('avatarUrl', creatorObject.profileImageUrl);
+    api.executeCommand('avatarUrl', creator.profileImageUrl);
     api.executeCommand('subject', currentShow?.name);
     api.addListener('participantJoined', participantJoined);
     api.addListener('knockingParticipant', participantKnocked);

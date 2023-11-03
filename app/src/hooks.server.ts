@@ -24,7 +24,6 @@ import {
   PUBLIC_CHANGESET_PATH,
   PUBLIC_CREATOR_PATH,
   PUBLIC_IMAGE_UPDATE_PATH,
-  PUBLIC_INVOICE_PATH,
   PUBLIC_OPERATOR_PATH,
   PUBLIC_SHOWTIME_PATH,
   PUBLIC_TICKET_PATH
@@ -200,11 +199,7 @@ export const handle = (async ({ event, resolve }) => {
                   ),
                   urlJoin(PUBLIC_CHANGESET_PATH, 'show', ticket.show.toString())
                 );
-                if (ticket.bcInvoiceId) {
-                  allowedPaths.push(
-                    urlJoin(PUBLIC_INVOICE_PATH, ticket.bcInvoiceId.toString())
-                  );
-                }
+
                 if (
                   ticket.ticketState.status === TicketStatus.FULLY_PAID ||
                   ticket.ticketState.status === TicketStatus.REDEEMED

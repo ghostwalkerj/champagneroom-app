@@ -10,6 +10,7 @@
   import { currencyFormatter, durationFormatter } from '$lib/constants';
   export let show: ShowDocumentType;
   export let ticket: TicketDocumentType;
+  export let user: UserDocument;
 
   // Show
   const creatorName = show.creatorInfo.name;
@@ -17,7 +18,6 @@
   const showCoverImageUrl = show.coverImageUrl;
   const showDuration = durationFormatter(show.duration * 60);
   const showUrl = urlJoin(PUBLIC_SHOW_PATH, show._id.toString());
-  const user = ticket.user as unknown as UserDocument;
 
   // Ticket
   $: ticketStatus = ticket

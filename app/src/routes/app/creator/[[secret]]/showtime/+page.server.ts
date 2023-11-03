@@ -52,7 +52,11 @@ export const actions: Actions = {
 
 export const load: PageServerLoad = async ({ locals }) => {
   const creator = locals.creator;
+  const user = locals.user;
   if (!creator) {
+    throw redirect(302, PUBLIC_CREATOR_PATH);
+  }
+  if (!user) {
     throw redirect(302, PUBLIC_CREATOR_PATH);
   }
   const show = await Show.findOne({
@@ -103,6 +107,7 @@ export const load: PageServerLoad = async ({ locals }) => {
   return {
     creator: creator.toObject({ flattenObjectIds: true, flattenMaps: true }),
     show: show.toObject({ flattenObjectIds: true, flattenMaps: true }),
+    user: user.toObject({ flattenObjectIds: true, flattenMaps: true }),
     jitsiToken
   };
 };

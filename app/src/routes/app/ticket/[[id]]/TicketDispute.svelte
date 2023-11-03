@@ -3,13 +3,15 @@
 
   import type { ShowDocumentType } from '$lib/models/show';
   import type { TicketDocumentType } from '$lib/models/ticket';
+  import type { UserDocument } from '$lib/models/user';
 
   import { currencyFormatter, durationFormatter } from '$lib/constants';
   import getProfileImage from '$lib/profilePhoto';
   export let show: ShowDocumentType;
   export let ticket: TicketDocumentType;
+  export let user: UserDocument;
 
-  const customerName = ticket.user.name;
+  const customerName = user.name;
 
   $: profileImage = getProfileImage(customerName, PUBLIC_PROFILE_IMAGE_PATH);
   $: ticketStatus = ticket.ticketState.status;

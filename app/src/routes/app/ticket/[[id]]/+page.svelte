@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onDestroy, onMount } from 'svelte';
+  import { onDestroy, onMount, tick } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
   import urlJoin from 'url-join';
   import web3 from 'web3';
@@ -7,14 +7,11 @@
   import { applyAction, enhance } from '$app/forms';
   import { goto, invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
-  import {
-    PUBLIC_INVOICE_PATH,
-    PUBLIC_SHOWTIME_PATH
-  } from '$env/static/public';
+  import { PUBLIC_SHOWTIME_PATH } from '$env/static/public';
 
   import type { RefundType } from '$lib/models/common';
   import { DisputeReason, RefundReason } from '$lib/models/common';
-  import { ShowStatus, type ShowDocumentType } from '$lib/models/show';
+  import { type ShowDocumentType, ShowStatus } from '$lib/models/show';
   import type { TicketDocumentType } from '$lib/models/ticket';
   import type { UserDocument } from '$lib/models/user';
 
@@ -50,7 +47,6 @@
     PUBLIC_SHOWTIME_PATH,
     '?returnPath=' + $page.url.pathname
   );
-  const invoicePath = urlJoin(PUBLIC_INVOICE_PATH, invoice.id!);
   const reasons = Object.values(DisputeReason);
 
   let shouldPay = false;
@@ -128,7 +124,9 @@
     }
   };
 
-  const useTicketMachine = (ticketMachineService: TicketMachineServiceType) => {
+  const useTicketMachine = async (
+    ticketMachineService: TicketMachineServiceType
+  ) => {
     const state = ticketMachineService.getSnapshot();
     shouldPay = state.matches('reserved.waiting4Payment');
     canWatchShow =
@@ -174,16 +172,8 @@
 
     // if the ticket state changes, reload the invoice
     if (state.changed) {
-      fetch(invoicePath, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }).then(async (response) => {
-        if (response.ok) {
-          invoice = await response.json();
-        }
-      });
+      await invalidateAll();
+      invoice = $page.data.invoice;
     }
   };
 
@@ -242,7 +232,7 @@
       <!-- Page header -->
       <div class="pb-4 text-center relative">
         {#key ticket.ticketState || show.showState}
-          <TicketDetail {ticket} {show} />
+          <TicketDetail {ticket} {show} {user} />
         {/key}
         {#if isWaitingForShow}
           <div
@@ -253,18 +243,20 @@
         {/if}
       </div>
 
-      <div class="relative">
-        {#key invoice}
-          <TicketInvoice {invoice} {ticket} />
-        {/key}
-        {#if hasPaymentSent}
-          <div
-            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl -rotate-45 whitespace-nowrap font-extrabold text-primary ring-2 ring-primary bg-base-200/50 p-2 ring-inset rounded-xl"
-          >
-            Waiting for Payment Confirmations
-          </div>
-        {/if}
-      </div>
+      {#if !isTicketDone && !isShowInEscrow}
+        <div class="relative">
+          {#key invoice}
+            <TicketInvoice {invoice} {ticket} />
+          {/key}
+          {#if hasPaymentSent}
+            <div
+              class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl -rotate-45 whitespace-nowrap font-extrabold text-primary ring-2 ring-primary bg-base-200/50 p-2 ring-inset rounded-xl"
+            >
+              Waiting for Payment Confirmations
+            </div>
+          {/if}
+        </div>
+      {/if}
 
       {#if !isTicketDone}
         <div class="flex gap-6 place-content-center m-3">

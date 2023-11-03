@@ -91,6 +91,7 @@ export const load: PageServerLoad = async ({ locals }) => {
       flattenObjectIds: true,
       flattenMaps: true
     }),
-    show: show.toObject({ flattenObjectIds: true, flattenMaps: true })
+    show: show.toObject({ flattenObjectIds: true, flattenMaps: true }),
+    user: user.toObject({ flattenObjectIds: true, flattenMaps: true })
   };
 };

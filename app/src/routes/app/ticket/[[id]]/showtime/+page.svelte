@@ -1,19 +1,17 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
-  import urlJoin from 'url-join';
 
   import { browser } from '$app/environment';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import {
     PUBLIC_JITSI_DOMAIN,
-    PUBLIC_PROFILE_IMAGE_PATH,
-    PUBLIC_TICKET_PATH
+    PUBLIC_PROFILE_IMAGE_PATH
   } from '$env/static/public';
 
   import { type ShowDocumentType, ShowStatus } from '$lib/models/show';
-  import type { TicketDocumentType } from '$lib/models/ticket';
+  import type { UserDocument } from '$lib/models/user';
 
   import { jitsiInterfaceConfigOverwrite } from '$lib/constants';
   import getProfileImage from '$lib/profilePhoto';
@@ -24,8 +22,8 @@
 
   export let data: PageData;
 
-  let ticket = data.ticket as TicketDocumentType;
   let show = data.show as ShowDocumentType;
+  let user = data.user as UserDocument;
 
   // @ts-ignore
   let jitsiToken = data.jitsiToken as string;
@@ -49,10 +47,7 @@
     };
   }
 
-  const profileImage = getProfileImage(
-    ticket.user.name,
-    PUBLIC_PROFILE_IMAGE_PATH
-  );
+  const profileImage = getProfileImage(user.name, PUBLIC_PROFILE_IMAGE_PATH);
   onMount(() => {
     const options = {
       roomName: show.roomId,
@@ -61,7 +56,7 @@
       height: '100%',
       parentNode: videoCallElement,
       userInfo: {
-        displayName: ticket.user.name
+        displayName: user.name
       },
       interfaceConfigOverwrite: jitsiInterfaceConfigOverwrite,
       configOverwrite: {

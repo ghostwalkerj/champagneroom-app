@@ -10,4 +10,6 @@ ssh  "root@${SERVER_IP}" \
 
 doctl registry g start -f --include-untagged-manifests
 echo "Successfully deployed, hooray!"
+node --print 'require("./package.json").version'
+
 
