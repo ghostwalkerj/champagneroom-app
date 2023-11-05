@@ -717,7 +717,7 @@ const createShowMachine = ({
   );
 };
 
-export { createShowMachine, ShowMachineEventString };
+export { ShowMachineEventString, createShowMachine };
 export const createShowMachineService = ({
   showDocument,
   showMachineOptions

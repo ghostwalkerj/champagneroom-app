@@ -16,7 +16,7 @@
 
   import { CancelReason } from '$lib/models/common';
   import type { CreatorDocumentType } from '$lib/models/creator';
-  import type { ShowDocumentType } from '$lib/models/show';
+  import type { ShowDocument, ShowDocumentType } from '$lib/models/show';
   import type {
     ShowEventDocument,
     ShowEventDocumentType
@@ -104,42 +104,40 @@
     if (show && show.showState.current) {
       currentShow = show;
       canCreateShow = false;
-      canCancelShow = true;
       statusText = show.showState.status;
+      eventText = createEventText(currentEvent);
+      showMachineService = createShowMachineService({
+        showDocument: currentShow
+      });
+      useShowMachine(showMachineService);
       showEventUnSub?.();
+      showEventUnSub = notifyInsert({
+        id: show._id.toString(),
+        type: 'ShowEvent',
+        relatedType: 'Show',
+        callback: () => {
+          invalidateAll().then(() => {
+            currentEvent = $page.data.currentEvent;
+            eventText = createEventText(currentEvent);
+          });
+        },
+        cancelOn: () => !show.showState.current
+      });
       showUnSub?.();
       showUnSub = notifyUpdate({
         id: show._id.toString(),
         type: 'Show',
         callback: () => {
           invalidateAll().then(() => {
-            const show = $page.data.currentShow;
-            if (show && show.showState.current) {
-              currentShow = show;
-              showMachineService?.stop();
-              showMachineService = createShowMachineService({
-                showDocument: show
-              });
-              useShowMachine(showMachineService);
-              showEventUnSub = notifyInsert({
-                id: show._id.toString(),
-                type: 'ShowEvent',
-                relatedType: 'Show',
-                callback: () => {
-                  invalidateAll().then(() => {
-                    currentEvent = $page.data.currentEvent;
-                    eventText = createEventText(currentEvent);
-                  });
-                },
-                cancelOn: () => !show.showState.current
-              });
-            } else {
-              noCurrentShow();
-            }
+            const show = $page.data.currentShow as ShowDocumentType;
+            currentEvent = $page.data.currentEvent;
+            useNewShow(show);
           });
         },
         cancelOn: () => !show.showState.current
       });
+    } else {
+      noCurrentShow();
     }
   };
 
