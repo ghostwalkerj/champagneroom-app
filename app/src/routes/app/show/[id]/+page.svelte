@@ -1,16 +1,18 @@
 <script lang="ts">
+  import { onDestroy, onMount } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
 
   import { applyAction, enhance } from '$app/forms';
+  import { page } from '$app/stores';
   import { PUBLIC_PROFILE_IMAGE_PATH } from '$env/static/public';
 
   import { ShowStatus } from '$lib/models/show';
 
+  import { notifyUpdate } from '$lib/notify';
   import getProfileImage from '$lib/profilePhoto';
 
   import ShowDetail from '$components/ShowDetail.svelte';
 
-  //import { showStore } from '$stores';
   import type { ActionData, PageData } from './$types';
 
   export let data: PageData;
@@ -35,15 +37,20 @@
       await applyAction(result);
     };
   };
-  // onMount(() => {
-  //   showUnSub = showStore(show).subscribe((_show) => {
-  //     show = _show;
-  //   });
-  // });
+  onMount(() => {
+    showUnSub = notifyUpdate({
+      id: show._id.toString(),
+      type: 'Show',
+      callback: () => {
+        show = $page.data.show;
+      },
+      cancelOn: () => !show.showState.current
+    });
+  });
 
-  // onDestroy(() => {
-  //   showUnSub?.();
-  // });
+  onDestroy(() => {
+    showUnSub?.();
+  });
 </script>
 
 <div class="mt-4 h-full">

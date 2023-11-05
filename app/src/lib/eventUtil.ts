@@ -1,8 +1,16 @@
 import * as timeago from 'timeago.js';
 
-import type { ShowEventDocumentType } from '$lib/models/showEvent';
+import type {
+  ShowEventDocument,
+  ShowEventDocumentType
+} from '$lib/models/showEvent';
 
-export const createEventText = (showEvent: ShowEventDocumentType) => {
+export const createEventText = (
+  showEvent: ShowEventDocumentType | ShowEventDocument | undefined
+) => {
+  if (showEvent === undefined) {
+    return 'No Events';
+  }
   let eventText =
     timeago.format(showEvent.createdAt) +
       ' ' +

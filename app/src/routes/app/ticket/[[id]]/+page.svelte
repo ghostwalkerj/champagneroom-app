@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onDestroy, onMount, tick } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
   import urlJoin from 'url-join';
   import web3 from 'web3';
@@ -19,10 +19,11 @@
   import { createTicketMachineService } from '$lib/machines/ticketMachine';
 
   import { ActorType } from '$lib/constants';
+  import { notifyUpdate } from '$lib/notify';
   import type { PaymentType } from '$lib/payment';
   import { connect, defaultWallet, selectedAccount } from '$lib/web3';
 
-  import { nameStore, showStore, ticketStore } from '$stores';
+  import { nameStore } from '$stores';
 
   import TicketDetail from './TicketDetail.svelte';
   import TicketInvoice from './TicketInvoice.svelte';
@@ -179,18 +180,34 @@
 
   onMount(() => {
     if (ticket.ticketState.active) {
-      ticketUnSub = ticketStore(ticket).subscribe((ticketDocument) => {
-        ticket = ticketDocument;
-        useTicketMachine(
-          createTicketMachineService({
-            ticketDocument: ticket
-          })
-        );
+      useTicketMachine(
+        createTicketMachineService({
+          ticketDocument: ticket
+        })
+      );
+      ticketUnSub = notifyUpdate({
+        id: ticket._id.toString(),
+        type: 'Ticket',
+        callback: () => {
+          ticket = $page.data.ticket;
+          useTicketMachine(
+            createTicketMachineService({
+              ticketDocument: ticket
+            })
+          );
+        },
+        cancelOn: () => !ticket.ticketState.active
       });
-      showUnSub = showStore(show).subscribe((showDocument) => {
-        show = showDocument;
-        hasShowStarted = show.showState.status === ShowStatus.LIVE;
-        isShowInEscrow = show.showState.status === ShowStatus.IN_ESCROW;
+
+      showUnSub = notifyUpdate({
+        id: show._id.toString(),
+        type: 'Show',
+        callback: () => {
+          show = $page.data.show;
+          hasShowStarted = show.showState.status === ShowStatus.LIVE;
+          isShowInEscrow = show.showState.status === ShowStatus.IN_ESCROW;
+        },
+        cancelOn: () => !show.showState.current
       });
     }
   });

@@ -6,7 +6,7 @@
   import urlJoin from 'url-join';
 
   import { applyAction, enhance } from '$app/forms';
-  import { goto } from '$app/navigation';
+  import { goto, invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
   import {
     PUBLIC_DEFAULT_PROFILE_IMAGE,
@@ -17,7 +17,10 @@
   import { CancelReason } from '$lib/models/common';
   import type { CreatorDocumentType } from '$lib/models/creator';
   import type { ShowDocumentType } from '$lib/models/show';
-  import type { ShowEventDocumentType } from '$lib/models/showEvent';
+  import type {
+    ShowEventDocument,
+    ShowEventDocumentType
+  } from '$lib/models/showEvent';
   import type { WalletDocumentType } from '$lib/models/wallet';
 
   import type { ShowMachineServiceType } from '$lib/machines/showMachine';
@@ -28,10 +31,11 @@
 
   import { ActorType, durationFormatter } from '$lib/constants';
   import { createEventText } from '$lib/eventUtil';
+  import { notifyInsert, notifyUpdate } from '$lib/notify';
 
   import ProfilePhoto from '$components/ProfilePhoto.svelte';
   import ShowDetail from '$components/ShowDetail.svelte';
-  import { creatorStore, nameStore, showEventStore, showStore } from '$stores';
+  import { nameStore } from '$stores';
 
   import CreatorActivity from './CreatorActivity.svelte';
   import CreatorWallet from './CreatorWallet.svelte';
@@ -42,6 +46,7 @@
 
   let creator = data.creator as CreatorDocumentType;
   let currentShow = data.currentShow as ShowDocumentType | undefined;
+  let currentEvent = data.currentEvent as ShowEventDocument | undefined;
   let completedShows = data.completedShows as ShowDocumentType[];
   let wallet = data.wallet as WalletDocumentType;
   let exchangeRate = +data.exchangeRate || 0;
@@ -61,7 +66,7 @@
   $: statusText = currentShow
     ? currentShow.showState.status
     : 'No Current Show';
-  $: eventText = 'No Events';
+  $: eventText = createEventText(currentEvent);
 
   $: canCreateShow = false;
   $: canCancelShow = false;
@@ -73,6 +78,7 @@
   let creatorUnSub: Unsubscriber;
   let showEventUnSub: Unsubscriber;
   let showUnSub: Unsubscriber;
+  let walletUnSub: Unsubscriber;
   let showMachineService: ShowMachineServiceType;
   const destination = creator.user.payoutAddress;
 
@@ -102,24 +108,37 @@
       statusText = show.showState.status;
       showEventUnSub?.();
       showUnSub?.();
-      showUnSub = showStore(show).subscribe((_show) => {
-        if (_show && _show.showState.current) {
-          currentShow = _show;
-          showMachineService?.stop();
-          showMachineService = createShowMachineService({
-            showDocument: _show
-          });
-          useShowMachine(showMachineService);
-          showEventUnSub = showEventStore(show).subscribe(
-            (_showEvent: ShowEventDocumentType) => {
-              if (_showEvent) {
-                eventText = createEventText(_showEvent);
-              }
+      showUnSub = notifyUpdate({
+        id: show._id.toString(),
+        type: 'Show',
+        callback: () => {
+          invalidateAll().then(() => {
+            const show = $page.data.currentShow;
+            if (show && show.showState.current) {
+              currentShow = show;
+              showMachineService?.stop();
+              showMachineService = createShowMachineService({
+                showDocument: show
+              });
+              useShowMachine(showMachineService);
+              showEventUnSub = notifyInsert({
+                id: show._id.toString(),
+                type: 'ShowEvent',
+                relatedType: 'Show',
+                callback: () => {
+                  invalidateAll().then(() => {
+                    currentEvent = $page.data.currentEvent;
+                    eventText = createEventText(currentEvent);
+                  });
+                },
+                cancelOn: () => !show.showState.current
+              });
+            } else {
+              noCurrentShow();
             }
-          );
-        } else {
-          noCurrentShow();
-        }
+          });
+        },
+        cancelOn: () => !show.showState.current
       });
     }
   };
@@ -147,19 +166,34 @@
   };
 
   onMount(() => {
-    creatorUnSub = creatorStore(creator).subscribe((_creator) => {
-      if (_creator) {
-        creator = _creator;
-        creatorName = _creator.user.name;
-      }
+    creatorUnSub = notifyUpdate({
+      id: creator._id.toString(),
+      type: 'Creator',
+      callback: () => {
+        invalidateAll().then(() => {
+          creator = $page.data.creator;
+        });
+      },
+      cancelOn: () => !creator.user.active
     });
     currentShow ? useNewShow(currentShow) : noCurrentShow();
+    walletUnSub = notifyUpdate({
+      id: wallet._id.toString(),
+      type: 'Wallet',
+      callback: () => {
+        invalidateAll().then(() => {
+          wallet = $page.data.wallet;
+        });
+      },
+      cancelOn: () => !wallet.active
+    });
   });
 
   onDestroy(() => {
     creatorUnSub?.();
     showEventUnSub?.();
     showUnSub?.();
+    walletUnSub?.();
   });
 
   const updateProfileImage = async (url: string) => {

@@ -14,9 +14,8 @@
   import type { UserDocument } from '$lib/models/user';
 
   import { jitsiInterfaceConfigOverwrite } from '$lib/constants';
+  import { notifyUpdate } from '$lib/notify';
   import getProfileImage from '$lib/profilePhoto';
-
-  import { showStore } from '$stores';
 
   import type { PageData } from './$types';
 
@@ -31,6 +30,8 @@
 
   let returnUrl = $page.params.returnUrl;
   let videoCallElement: HTMLDivElement;
+
+  $: isTimeToLeave = false;
 
   if (browser) {
     onDestroy(() => {
@@ -74,14 +75,20 @@
       }
     });
 
-    showUnSub = showStore(show).subscribe((_show) => {
-      const isTimeToLeave =
-        _show.showState.status !== ShowStatus.LIVE &&
-        _show.showState.status !== ShowStatus.STOPPED;
-      if (isTimeToLeave) {
-        api.executeCommand('hangup');
-        goto(returnUrl);
-      }
+    showUnSub = notifyUpdate({
+      id: show._id.toString(),
+      type: 'Show',
+      callback: () => {
+        show = $page.data.show;
+        isTimeToLeave =
+          show.showState.status !== ShowStatus.LIVE &&
+          show.showState.status !== ShowStatus.STOPPED;
+        if (isTimeToLeave) {
+          api.executeCommand('hangup');
+          goto(returnUrl);
+        }
+      },
+      cancelOn: () => isTimeToLeave
     });
   });
 </script>

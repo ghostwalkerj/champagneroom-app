@@ -12,7 +12,6 @@ import {
   BITCART_NOTIFICATION_HOST,
   BITCART_PASSWORD,
   BITCART_STORE_ID,
-  ORIGIN
 } from '$env/static/private';
 import {
   PUBLIC_AUTH_PATH,

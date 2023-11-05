@@ -13,6 +13,7 @@ import type { CancelType } from '$lib/models/common';
 import { CancelReason, CurrencyType } from '$lib/models/common';
 import type { CreatorDocument } from '$lib/models/creator';
 import { Show, ShowStatus } from '$lib/models/show';
+import { ShowEvent } from '$lib/models/showEvent';
 import { Wallet, WalletStatus } from '$lib/models/wallet';
 
 import type { ShowMachineEventType } from '$lib/machines/showMachine';
@@ -222,6 +223,14 @@ export const load: PageServerLoad = async ({ locals }) => {
     'showState.current': true
   }).exec();
 
+  const currentEvent =
+    currentShow &&
+    (await ShowEvent.findOne(
+      { show: currentShow._id },
+      {},
+      { sort: { createdAt: -1 } }
+    ));
+
   const completedShows = await Show.find({
     creator: creator._id,
     'showState.status': ShowStatus.FINALIZED
@@ -261,6 +270,12 @@ export const load: PageServerLoad = async ({ locals }) => {
     creator: creator.toObject({ flattenObjectIds: true, flattenMaps: true }),
     currentShow: currentShow
       ? currentShow.toObject({ flattenObjectIds: true, flattenMaps: true })
+      : undefined,
+    currentEvent: currentEvent
+      ? currentEvent.toObject({
+          flattenObjectIds: true,
+          flattenMaps: true
+        })
       : undefined,
     completedShows: completedShows.map((show) =>
       show.toObject({ flattenObjectIds: true, flattenMaps: true })

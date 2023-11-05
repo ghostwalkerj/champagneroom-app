@@ -21,9 +21,10 @@ import {
 import {
   PUBLIC_AGENT_PATH,
   PUBLIC_AUTH_PATH,
-  PUBLIC_CHANGESET_PATH,
   PUBLIC_CREATOR_PATH,
   PUBLIC_IMAGE_UPDATE_PATH,
+  PUBLIC_NOTIFY_INSERT_PATH,
+  PUBLIC_NOTIFY_UPDATE_PATH,
   PUBLIC_OPERATOR_PATH,
   PUBLIC_SHOWTIME_PATH,
   PUBLIC_TICKET_PATH
@@ -129,11 +130,7 @@ export const handle = (async ({ event, resolve }) => {
                 // Allow API paths for creators
                 allowedPaths.push(
                   path,
-                  urlJoin(
-                    PUBLIC_CHANGESET_PATH,
-                    'creator',
-                    creator._id.toString()
-                  ),
+                  urlJoin(PUBLIC_NOTIFY_UPDATE_PATH, creator._id.toString()),
                   PUBLIC_IMAGE_UPDATE_PATH, // photos!
                   urlJoin(path, PUBLIC_SHOWTIME_PATH) // shows
                 );
@@ -145,23 +142,15 @@ export const handle = (async ({ event, resolve }) => {
                 }).exec();
                 if (show) {
                   allowedPaths.push(
-                    urlJoin(PUBLIC_CHANGESET_PATH, 'show', show._id.toString()),
-                    urlJoin(
-                      PUBLIC_CHANGESET_PATH,
-                      'showEvent',
-                      show._id.toString()
-                    )
+                    urlJoin(PUBLIC_NOTIFY_UPDATE_PATH, show._id.toString()),
+                    urlJoin(PUBLIC_NOTIFY_INSERT_PATH, show._id.toString())
                   );
                 }
 
                 // Wallet
                 if (user.wallet) {
                   allowedPaths.push(
-                    urlJoin(
-                      PUBLIC_CHANGESET_PATH,
-                      'wallet',
-                      user.wallet.toString()
-                    )
+                    urlJoin(PUBLIC_NOTIFY_UPDATE_PATH, user.wallet.toString())
                   );
                 }
                 break;
@@ -192,12 +181,8 @@ export const handle = (async ({ event, resolve }) => {
                 // Allow API paths for ticket holders
                 allowedPaths.push(
                   ticketPath,
-                  urlJoin(
-                    PUBLIC_CHANGESET_PATH,
-                    'ticket',
-                    ticket._id.toString()
-                  ),
-                  urlJoin(PUBLIC_CHANGESET_PATH, 'show', ticket.show.toString())
+                  urlJoin(PUBLIC_NOTIFY_UPDATE_PATH, ticket._id.toString()),
+                  urlJoin(PUBLIC_NOTIFY_UPDATE_PATH, ticket.show.toString())
                 );
 
                 if (

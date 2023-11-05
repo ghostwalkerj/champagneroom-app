@@ -1,15 +1,10 @@
 <script lang="ts">
-  import { onDestroy, onMount } from 'svelte';
-  import type { Unsubscriber } from 'svelte/store';
-
   import { applyAction, enhance } from '$app/forms';
 
   import { CurrencyType } from '$lib/models/common';
-  import { type WalletDocumentType, WalletStatus } from '$lib/models/wallet';
+  import type { WalletDocumentType } from '$lib/models/wallet';
 
   import { currencyFormatter } from '$lib/constants';
-
-  import { walletStore } from '$stores';
 
   import type { ActionData } from '../$types';
 
@@ -22,30 +17,11 @@
   $: hasAvailableBalance = wallet.availableBalance > 0;
   let transactionModal: HTMLDialogElement;
   let withdrawModal: HTMLDialogElement;
-  let walletUnSub: Unsubscriber;
 
   $: earnings = wallet.earnings;
   $: payouts = wallet.payouts;
   $: availableBalance = wallet.availableBalance;
 
-  onMount(() => {
-    if (wallet.active) {
-      walletUnSub = walletStore(wallet).subscribe((_wallet) => {
-        wallet = _wallet;
-        earnings = wallet.earnings;
-        payouts = wallet.payouts;
-        availableBalance = wallet.availableBalance;
-        hasAvailableBalance =
-          wallet.availableBalance > 0 &&
-          wallet.status === WalletStatus.AVAILABLE;
-        hasTransactions = wallet.earnings.length + wallet.payouts.length > 0;
-      });
-    }
-  });
-
-  onDestroy(() => {
-    walletUnSub?.();
-  });
   const onSubmit = () => {
     return async ({ result }) => {
       if (result.type === 'success') {
