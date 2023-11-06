@@ -62,6 +62,7 @@
 
     const result: ActionResult = deserialize(await response.text());
     applyAction(result);
+    goto(redirectPath, { replaceState: true });
   };
 
   const setPasswordAuth = async () => {
@@ -76,6 +77,7 @@
 
     const result: ActionResult = deserialize(await response.text());
     applyAction(result);
+    goto(redirectPath, { replaceState: true });
   };
 
   const setPinAuth = async () => {
@@ -87,6 +89,7 @@
 
     const result: ActionResult = deserialize(await response.text());
     applyAction(result);
+    goto(redirectPath, { replaceState: true });
   };
 
   const signMessage = async () => {
@@ -108,7 +111,6 @@
           params: [message, walletAddress]
         })) as string;
         await setSigningAuth(message, signature, walletAddress);
-        goto(redirectPath, { replaceState: true });
       }
     } catch {
       signingRejected = true;

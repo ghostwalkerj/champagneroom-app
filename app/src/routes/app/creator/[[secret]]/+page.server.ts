@@ -12,8 +12,10 @@ import {
 import type { CancelType } from '$lib/models/common';
 import { CancelReason, CurrencyType } from '$lib/models/common';
 import type { CreatorDocument } from '$lib/models/creator';
+import type { ShowDocument, ShowDocumentType } from '$lib/models/show';
 import { Show, ShowStatus } from '$lib/models/show';
 import { ShowEvent } from '$lib/models/showEvent';
+import type { WalletDocument } from '$lib/models/wallet';
 import { Wallet, WalletStatus } from '$lib/models/wallet';
 
 import type { ShowMachineEventType } from '$lib/machines/showMachine';
@@ -25,7 +27,10 @@ import type { ShowQueueType } from '$lib/workers/showWorker';
 import { ActorType, EntityType } from '$lib/constants';
 import { rateCryptosRateGet } from '$lib/ext/bitcart';
 import { createAuthToken, PayoutJobType, PayoutReason } from '$lib/payment';
-import { getShowMachineServiceFromId } from '$lib/server/machinesUtil';
+import {
+  getShowMachineService,
+  getShowMachineServiceFromId
+} from '$lib/server/machinesUtil';
 
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
 
@@ -97,20 +102,17 @@ export const actions: Actions = {
       show: show.toObject({ flattenObjectIds: true, flattenMaps: true })
     };
   },
-  cancel_show: async ({ request, locals }) => {
-    const data = await request.formData();
-    const showId = data.get('showId') as string;
-
-    if (showId === null) {
-      throw error(404, 'Show ID not found');
-    }
-
+  cancel_show: async ({ locals }) => {
     const redisConnection = locals.redisConnection as IORedis;
+    const show = locals.currentShow as ShowDocument;
+    if (!show) {
+      throw error(404, 'Show not found');
+    }
     const showQueue = new Queue(EntityType.SHOW, {
       connection: redisConnection
     }) as ShowQueueType;
 
-    const showService = await getShowMachineServiceFromId(showId);
+    const showService = getShowMachineService(show);
     const showMachineState = showService.getSnapshot();
 
     const cancel = {
@@ -126,7 +128,7 @@ export const actions: Actions = {
 
     if (showMachineState.can(cancelEvent)) {
       showQueue.add(ShowMachineEventString.CANCELLATION_INITIATED, {
-        showId,
+        showId: show._id.toString(),
         cancel
       });
     }
@@ -218,10 +220,7 @@ export const load: PageServerLoad = async ({ locals }) => {
     throw error(404, 'Creator not found');
   }
 
-  const currentShow = await Show.findOne({
-    creator: creator._id,
-    'showState.current': true
-  }).exec();
+  const currentShow = locals.currentShow as ShowDocument;
 
   const currentEvent =
     currentShow &&
@@ -239,11 +238,7 @@ export const load: PageServerLoad = async ({ locals }) => {
     .limit(10)
     .exec();
 
-  const wallet = await Wallet.findOne({ _id: creator.user.wallet })
-    .orFail(() => {
-      throw error(404, 'Creator wallet not found');
-    })
-    .exec();
+  const wallet = locals.wallet as WalletDocument;
 
   // return the rate of exchange for UI from bitcart
   const token = await createAuthToken(

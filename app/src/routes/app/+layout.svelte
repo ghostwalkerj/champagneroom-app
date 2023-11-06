@@ -42,19 +42,6 @@
       }
     });
   });
-
-  // if (browser) {
-  //   (function () {
-  //     window.ybug_settings = { id: 'vmjfcvd23zharamd1bb8' };
-  //     var ybug = document.createElement('script');
-  //     ybug.type = 'text/javascript';
-  //     ybug.async = true;
-  //     ybug.src =
-  //       'https://widget.ybug.io/button/' + window.ybug_settings.id + '.js';
-  //     var s = document.querySelectorAll('script')[0];
-  //     s.parentNode.insertBefore(ybug, s);
-  //   })();
-  // }
 </script>
 
 <div class="bg-gradient-to-r from-[#0C082E] to-[#0C092E] font-Roboto">

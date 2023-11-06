@@ -19,14 +19,8 @@ import {
   REDIS_USERNAME
 } from '$env/static/private';
 import {
-  PUBLIC_AGENT_PATH,
   PUBLIC_AUTH_PATH,
   PUBLIC_CREATOR_PATH,
-  PUBLIC_IMAGE_UPDATE_PATH,
-  PUBLIC_NOTIFY_INSERT_PATH,
-  PUBLIC_NOTIFY_UPDATE_PATH,
-  PUBLIC_OPERATOR_PATH,
-  PUBLIC_SHOWTIME_PATH,
   PUBLIC_TICKET_PATH
 } from '$env/static/public';
 
@@ -34,14 +28,21 @@ import { Agent } from '$lib/models/agent';
 import { Creator } from '$lib/models/creator';
 import { Operator } from '$lib/models/operator';
 import { Show } from '$lib/models/show';
-import { Ticket, TicketStatus } from '$lib/models/ticket';
+import { Ticket } from '$lib/models/ticket';
+import type { UserDocument } from '$lib/models/user';
 import { User, UserRole } from '$lib/models/user';
+import type { WalletDocument } from '$lib/models/wallet';
 
-import { AuthType } from '$lib/constants';
 import { authDecrypt } from '$lib/crypt';
 import {
-  isAppPathMatch,
+  isAgentMatch,
+  isCreatorMatch,
+  isNotificationMatch,
+  isOperatorMatch,
+  isPinMatch,
   isProtectedMatch,
+  isRequestAuthMatch,
+  isSecretMatch,
   isWhitelistMatch
 } from '$lib/server/auth';
 
@@ -57,166 +58,161 @@ const redisConnection = new IORedis({
   maxRetriesPerRequest: undefined
 });
 
+const setLocals = async (decode: JwtPayload, locals: App.Locals) => {
+  const selector = decode.selector;
+  if (selector) {
+    const query = {};
+    query[selector] = decode[selector];
+
+    // Check if user is allowed to access the requested path
+    const user = (await User.findOne(query).populate<{
+      wallet: WalletDocument;
+    }>('wallet')) as UserDocument & { wallet: WalletDocument };
+    if (!user) {
+      console.error('No user');
+      console.log('query', query);
+      throw error(500, 'No user');
+    }
+    locals.user = user;
+    locals.wallet = user.wallet;
+
+    // load any associated roles
+    for (const role of user.roles) {
+      switch (role) {
+        case UserRole.AGENT: {
+          const agent = await Agent.findOne({ user: user._id });
+          if (!agent) {
+            console.error('No agent');
+            throw error(500, 'No agent');
+          }
+          locals.agent = agent;
+          break;
+        }
+
+        case UserRole.CREATOR: {
+          const creator = await Creator.findOne({ user: user._id });
+          if (!creator) {
+            console.error('No creator');
+            throw error(500, 'No creator');
+          }
+          locals.creator = creator;
+
+          // Current Shows can be watched
+          const show = await Show.findOne({
+            creator: creator._id,
+            'showState.current': true
+          }).exec();
+          if (show) locals.currentShow = show;
+          break;
+        }
+
+        case UserRole.OPERATOR: {
+          const operator = await Operator.findOne({ user: user._id });
+          if (!operator) {
+            console.error('No operator');
+            throw error(500, 'No operator');
+          }
+          locals.operator = operator;
+          break;
+        }
+
+        case UserRole.TICKET_HOLDER: {
+          const ticket = await Ticket.findOne({
+            user: user._id
+          });
+          if (!ticket) {
+            console.error('No ticket');
+            throw error(500, 'No ticket');
+          }
+          locals.ticket = ticket;
+          break;
+        }
+      }
+    }
+  }
+
+  return locals;
+};
+
+const allowedPath = (path: string, locals: App.Locals, selector?: string) => {
+  if (isWhitelistMatch(path)) return true;
+
+  if (!locals.user) return false;
+
+  const slug =
+    selector === undefined ? undefined : locals.user[selector].toString();
+
+  if (
+    isSecretMatch(path) &&
+    path === `${PUBLIC_CREATOR_PATH}/${slug}` &&
+    locals.creator
+  )
+    return true;
+
+  if (
+    isPinMatch(path) &&
+    locals.ticket !== undefined &&
+    path.includes(`${PUBLIC_TICKET_PATH}/${locals.ticket._id.toString()}`)
+  ) {
+    return true;
+  }
+
+  if (isOperatorMatch(path) && locals.operator) return true;
+  if (isAgentMatch(path) && locals.agent) return true;
+  if (isCreatorMatch(path) && locals.creator) return true;
+
+  if (isNotificationMatch(path)) {
+    const allowedIds: string[] = [];
+    if (locals.creator) allowedIds.push(locals.creator._id.toString());
+    if (locals.ticket)
+      allowedIds.push(
+        locals.ticket._id.toString(),
+        locals.ticket.show.toString()
+      );
+    if (locals.wallet) allowedIds.push(locals.wallet._id.toString());
+    if (locals.agent) allowedIds.push(locals.agent._id.toString());
+    if (locals.operator) allowedIds.push(locals.operator._id.toString());
+    if (locals.currentShow) allowedIds.push(locals.currentShow._id.toString());
+
+    if (allowedIds.some((id) => path.includes(id))) return true;
+  }
+  return false;
+};
+
 export const handle = (async ({ event, resolve }) => {
   const requestedPath = event.url.pathname;
   const cookies = event.cookies;
   const locals = event.locals;
-  const returnPath = requestedPath;
 
   locals.redisConnection = redisConnection;
+  const tokenName = AUTH_TOKEN_NAME || 'token';
+  const encryptedToken = cookies.get(tokenName);
+  const authToken = authDecrypt(encryptedToken, AUTH_SALT);
+  let selector: string | undefined;
 
-  // Auth run in protected path
-  if (isProtectedMatch(requestedPath)) {
-    const tokenName = AUTH_TOKEN_NAME || 'token';
-    const encryptedToken = cookies.get(tokenName);
-    const allowedPaths = [] as string[];
-
-    if (requestedPath === authUrl) {
+  // Set locals
+  if (authToken) {
+    let decode: JwtPayload;
+    try {
+      decode = jwt.verify(authToken, JWT_PRIVATE_KEY) as JwtPayload;
+      selector = decode.selector;
+      await setLocals(decode, locals);
+    } catch (error) {
+      console.error('Invalid token:', error);
       cookies.delete(tokenName, { path: '/' });
-    } else {
-      const authToken = authDecrypt(encryptedToken, AUTH_SALT);
-
-      // If authenticated, check if user is allowed to access the requested path and set user in locals
-      if (authToken) {
-        let decode: JwtPayload;
-        try {
-          decode = jwt.verify(authToken, JWT_PRIVATE_KEY) as JwtPayload;
-        } catch (error) {
-          console.error('Invalid token:', error);
-          cookies.delete(tokenName, { path: '/' });
-          throw redirect(302, authUrl);
-        }
-        const selector = decode.selector;
-
-        if (selector) {
-          const query = {};
-          query[selector] = decode[selector];
-
-          // Check if user is allowed to access the requested path
-          const user = await User.findOne(query);
-          if (!user) {
-            console.error('No user');
-            console.log('query', query);
-            throw error(500, 'No user');
-          }
-          locals.user = user;
-
-          // load any associated roles
-          for (const role of user.roles) {
-            switch (role) {
-              case UserRole.AGENT: {
-                allowedPaths.push(PUBLIC_AGENT_PATH);
-                const agent = await Agent.findOne({ user: user._id });
-                if (!agent) {
-                  console.error('No agent');
-                  throw error(500, 'No agent');
-                }
-                locals.agent = agent;
-                break;
-              }
-
-              case UserRole.CREATOR: {
-                let path = PUBLIC_CREATOR_PATH;
-                if (user.authType === AuthType.PATH_PASSWORD) {
-                  path = `${path}/${user[selector]}`;
-                }
-                const creator = await Creator.findOne({ user: user._id });
-                if (!creator) {
-                  console.error('No creator');
-                  throw error(500, 'No creator');
-                }
-                locals.creator = creator;
-
-                // Allow API paths for creators
-                allowedPaths.push(
-                  path,
-                  urlJoin(PUBLIC_NOTIFY_UPDATE_PATH, creator._id.toString()),
-                  PUBLIC_IMAGE_UPDATE_PATH, // photos!
-                  urlJoin(path, PUBLIC_SHOWTIME_PATH) // shows
-                );
-
-                // Current Shows can be watched
-                const show = await Show.exists({
-                  creator: creator._id,
-                  'showState.current': true
-                }).exec();
-                if (show) {
-                  allowedPaths.push(
-                    urlJoin(PUBLIC_NOTIFY_UPDATE_PATH, show._id.toString()),
-                    urlJoin(PUBLIC_NOTIFY_INSERT_PATH, show._id.toString())
-                  );
-                }
-
-                // Wallet
-                if (user.wallet) {
-                  allowedPaths.push(
-                    urlJoin(PUBLIC_NOTIFY_UPDATE_PATH, user.wallet.toString())
-                  );
-                }
-                break;
-              }
-
-              case UserRole.OPERATOR: {
-                allowedPaths.push(PUBLIC_OPERATOR_PATH); // super user
-                const operator = await Operator.findOne({ user: user._id });
-                if (!operator) {
-                  console.error('No operator');
-                  throw error(500, 'No operator');
-                }
-                locals.operator = operator;
-                break;
-              }
-
-              case UserRole.TICKET_HOLDER: {
-                const ticket = await Ticket.findOne({
-                  user: user._id
-                });
-                if (!ticket) {
-                  console.error('No ticket');
-                  throw error(500, 'No ticket');
-                }
-                locals.ticket = ticket;
-                const ticketPath = `${PUBLIC_TICKET_PATH}/${ticket._id}`;
-
-                // Allow API paths for ticket holders
-                allowedPaths.push(
-                  ticketPath,
-                  urlJoin(PUBLIC_NOTIFY_UPDATE_PATH, ticket._id.toString()),
-                  urlJoin(PUBLIC_NOTIFY_UPDATE_PATH, ticket.show.toString())
-                );
-
-                if (
-                  ticket.ticketState.status === TicketStatus.FULLY_PAID ||
-                  ticket.ticketState.status === TicketStatus.REDEEMED
-                ) {
-                  allowedPaths.push(urlJoin(ticketPath, PUBLIC_SHOWTIME_PATH));
-                }
-                break;
-              }
-            }
-          }
-        }
-      }
-    }
-    console.log('allowedPaths', allowedPaths);
-
-    if (
-      isWhitelistMatch(requestedPath) ||
-      allowedPaths.includes(requestedPath)
-    ) {
-      console.log(requestedPath, ': Allowed');
-    } else {
-      console.log(requestedPath, ': Not Allowed');
-      // Redirect for auth if in app
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      const _error = isAppPathMatch(requestedPath)
-        ? redirect(302, urlJoin(authUrl, '?returnPath=', returnPath))
-        : error(403, 'Forbidden');
-      throw _error;
+      throw redirect(302, authUrl);
     }
   }
-
-  const response = await resolve(event);
-
-  return response;
+  if (
+    isProtectedMatch(requestedPath) &&
+    !allowedPath(requestedPath, locals, selector)
+  ) {
+    if (isRequestAuthMatch(requestedPath)) {
+      throw redirect(302, urlJoin(authUrl, '?returnPath=', requestedPath));
+    }
+    throw error(403, 'Forbidden');
+  } else {
+    const response = await resolve(event);
+    return response;
+  }
 }) satisfies Handle;

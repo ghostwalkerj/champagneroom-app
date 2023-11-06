@@ -439,7 +439,6 @@
         {#if canCancelShow}
           <!-- Cancel Form-->
           <form method="post" action="?/cancel_show" use:enhance={onSubmit}>
-            <input type="hidden" name="showId" value={currentShow?._id} />
             <div class="bg-primary text-primary-content card">
               <div class="text-center card-body items-center p-3">
                 <div class="text-2xl card-title">Cancel Your Show</div>

@@ -5,8 +5,8 @@ import { nanoid } from 'nanoid';
 
 import type { refundSchema, saleSchema } from './common';
 import {
-  CurrencyType,
   cancelSchema,
+  CurrencyType,
   escrowSchema,
   finalizeSchema,
   moneySchema

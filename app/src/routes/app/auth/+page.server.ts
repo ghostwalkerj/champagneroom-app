@@ -9,7 +9,6 @@ import {
   JWT_EXPIRY,
   JWT_PRIVATE_KEY
 } from '$env/static/private';
-import { PUBLIC_AUTH_PATH } from '$env/static/public';
 
 import { User } from '$lib/models/user';
 
@@ -193,8 +192,6 @@ export const actions: Actions = {
       );
 
       const encAuthToken = authEncrypt(authToken, AUTH_SALT);
-      cookies.delete('pin', { path: PUBLIC_AUTH_PATH });
-      cookies.delete('userId', { path: PUBLIC_AUTH_PATH });
 
       encAuthToken &&
         cookies.set(tokenName, encAuthToken, {
@@ -209,7 +206,7 @@ export const actions: Actions = {
   }
 } satisfies Actions;
 
-export const load: PageServerLoad = async ({ url }) => {
+export const load: PageServerLoad = async ({ url, locals }) => {
   const returnPath = url.searchParams.get('returnPath');
   if (!returnPath) {
     throw error(400, 'Missing Return Path');
