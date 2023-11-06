@@ -199,7 +199,7 @@ export const handle = (async ({ event, resolve }) => {
     } catch (error) {
       console.error('Invalid token:', error);
       cookies.delete(tokenName, { path: '/' });
-      throw redirect(302, authUrl);
+      throw redirect(302, urlJoin(authUrl, '?returnPath=', requestedPath));
     }
   }
   if (
