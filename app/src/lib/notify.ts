@@ -10,13 +10,11 @@ export const notifyInsert = ({
   type,
   id,
   callback,
-  cancelOn,
   relatedType
 }: {
   type: string;
   id: string;
   callback: () => void;
-  cancelOn?: () => boolean;
   relatedType?: string;
 }) => {
   const abortDocument = new AbortController();
@@ -39,9 +37,6 @@ export const notifyInsert = ({
       } else {
         try {
           callback();
-          if (cancelOn) {
-            shouldLoop = !cancelOn();
-          }
         } catch (error) {
           console.error(error);
           shouldLoop = false;
@@ -58,13 +53,11 @@ export const notifyInsert = ({
 export const notifyUpdate = ({
   type,
   id,
-  callback,
-  cancelOn
+  callback
 }: {
   type: string;
   id: string;
   callback: () => void;
-  cancelOn?: () => boolean;
 }) => {
   const abortDocument = new AbortController();
   const signal = abortDocument.signal;
@@ -82,9 +75,6 @@ export const notifyUpdate = ({
       } else {
         try {
           callback();
-          if (cancelOn) {
-            shouldLoop = !cancelOn();
-          }
         } catch (error) {
           console.error(error);
           shouldLoop = false;

@@ -87,8 +87,7 @@
           api.executeCommand('hangup');
           goto(returnUrl);
         }
-      },
-      cancelOn: () => isTimeToLeave
+      }
     });
   });
 </script>

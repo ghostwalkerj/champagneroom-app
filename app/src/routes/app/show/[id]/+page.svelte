@@ -43,8 +43,7 @@
       type: 'Show',
       callback: () => {
         show = $page.data.show;
-      },
-      cancelOn: () => !show.showState.current
+      }
     });
   });
 

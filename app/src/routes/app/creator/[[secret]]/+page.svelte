@@ -16,11 +16,8 @@
 
   import { CancelReason } from '$lib/models/common';
   import type { CreatorDocumentType } from '$lib/models/creator';
-  import type { ShowDocument, ShowDocumentType } from '$lib/models/show';
-  import type {
-    ShowEventDocument,
-    ShowEventDocumentType
-  } from '$lib/models/showEvent';
+  import type { ShowDocumentType } from '$lib/models/show';
+  import type { ShowEventDocument } from '$lib/models/showEvent';
   import type { WalletDocumentType } from '$lib/models/wallet';
 
   import type { ShowMachineServiceType } from '$lib/machines/showMachine';
@@ -120,8 +117,7 @@
             currentEvent = $page.data.currentEvent;
             eventText = createEventText(currentEvent);
           });
-        },
-        cancelOn: () => !show.showState.current
+        }
       });
       showUnSub?.();
       showUnSub = notifyUpdate({
@@ -133,8 +129,7 @@
             currentEvent = $page.data.currentEvent;
             useNewShow(show);
           });
-        },
-        cancelOn: () => !show.showState.current
+        }
       });
     } else {
       noCurrentShow();
@@ -171,8 +166,7 @@
         invalidateAll().then(() => {
           creator = $page.data.creator;
         });
-      },
-      cancelOn: () => !creator.user.active
+      }
     });
     currentShow ? useNewShow(currentShow) : noCurrentShow();
     walletUnSub = notifyUpdate({
@@ -182,8 +176,7 @@
         invalidateAll().then(() => {
           wallet = $page.data.wallet;
         });
-      },
-      cancelOn: () => !wallet.active
+      }
     });
   });
 

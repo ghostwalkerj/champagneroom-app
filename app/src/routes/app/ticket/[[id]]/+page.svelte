@@ -3,6 +3,7 @@
   import type { Unsubscriber } from 'svelte/store';
   import urlJoin from 'url-join';
   import web3 from 'web3';
+  import { t } from 'xstate';
 
   import { applyAction, enhance } from '$app/forms';
   import { goto, invalidateAll } from '$app/navigation';
@@ -50,13 +51,13 @@
   );
   const reasons = Object.values(DisputeReason);
 
-  let shouldPay = false;
+  $: shouldPay = false;
   let hasPaymentSent = false;
   $: canWatchShow = false;
   $: canCancelTicket = false;
   $: canRequestRefund = false;
   $: isShowInEscrow = false;
-  let isTicketDone = false;
+  $: isTicketDone = true;
   let canLeaveFeedback = false;
   let canDispute = false;
   let hasMissedShow = false;
@@ -170,16 +171,15 @@
     isWaitingForShow =
       state.matches('reserved.waiting4Show') && !hasShowStarted;
     isTicketDone = state.done ?? false;
-
-    // if the ticket state changes, reload the invoice
-    if (state.changed) {
-      await invalidateAll();
-      invoice = $page.data.invoice;
+    if (state.done) {
+      showUnSub?.();
+      ticketUnSub?.();
     }
   };
 
   onMount(() => {
     if (ticket.ticketState.active) {
+      isTicketDone = false;
       useTicketMachine(
         createTicketMachineService({
           ticketDocument: ticket
@@ -188,17 +188,17 @@
       ticketUnSub = notifyUpdate({
         id: ticket._id.toString(),
         type: 'Ticket',
-        callback: () => {
+        callback: async () => {
+          await invalidateAll();
           ticket = $page.data.ticket;
+          invoice = $page.data.invoice;
           useTicketMachine(
             createTicketMachineService({
               ticketDocument: ticket
             })
           );
-        },
-        cancelOn: () => !ticket.ticketState.active
+        }
       });
-
       showUnSub = notifyUpdate({
         id: show._id.toString(),
         type: 'Show',
@@ -206,8 +206,7 @@
           show = $page.data.show;
           hasShowStarted = show.showState.status === ShowStatus.LIVE;
           isShowInEscrow = show.showState.status === ShowStatus.IN_ESCROW;
-        },
-        cancelOn: () => !show.showState.current
+        }
       });
     }
   });
@@ -225,17 +224,6 @@
     return async ({ result }) => {
       if (result.type === 'failure') {
         loading = false;
-      }
-      if (result.data.ticketCancelled) {
-        invalidateAll();
-        ticket = $page.data.ticket;
-        show = $page.data.show;
-        useTicketMachine(
-          createTicketMachineService({
-            ticketDocument: ticket
-          })
-        );
-        showUnSub?.();
       }
       await applyAction(result);
       loading = false;
@@ -260,6 +248,7 @@
         {/if}
       </div>
 
+      <!-- Invoice -->
       {#if !isTicketDone && !isShowInEscrow}
         <div class="relative">
           {#key invoice}
@@ -277,7 +266,7 @@
 
       {#if !isTicketDone}
         <div class="flex gap-6 place-content-center m-3">
-          {#if shouldPay}
+          {#if shouldPay && !isShowCancelLoading}
             {#if !$selectedAccount}
               <button class="btn btn-secondary" on:click={connect}
                 >Connect Wallet</button
