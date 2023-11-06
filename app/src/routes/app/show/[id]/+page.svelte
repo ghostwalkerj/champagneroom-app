@@ -3,12 +3,10 @@
   import type { Unsubscriber } from 'svelte/store';
 
   import { applyAction, enhance } from '$app/forms';
-  import { page } from '$app/stores';
   import { PUBLIC_PROFILE_IMAGE_PATH } from '$env/static/public';
 
   import { ShowStatus } from '$lib/models/show';
 
-  import { notifyUpdate } from '$lib/notify';
   import getProfileImage from '$lib/profilePhoto';
 
   import ShowDetail from '$components/ShowDetail.svelte';
@@ -20,7 +18,7 @@
   let show = data.show;
   let displayName = data.displayName;
   let isBuyingTicket = false;
-  let showUnSub: Unsubscriber;
+  //let showUnSub: Unsubscriber;
 
   $: isLoading = false;
   $: profileImage = getProfileImage(displayName, PUBLIC_PROFILE_IMAGE_PATH);
@@ -38,17 +36,17 @@
     };
   };
   onMount(() => {
-    showUnSub = notifyUpdate({
-      id: show._id.toString(),
-      type: 'Show',
-      callback: () => {
-        show = $page.data.show;
-      }
-    });
+    // showUnSub = notifyUpdate({
+    //   id: show._id.toString(),
+    //   type: 'Show',
+    //   callback: () => {
+    //     show = $page.data.show;
+    //   }
+    // });
   });
 
   onDestroy(() => {
-    showUnSub?.();
+    //showUnSub?.();
   });
 </script>
 
