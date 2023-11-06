@@ -39,10 +39,10 @@ import {
   isCreatorMatch,
   isNotificationMatch,
   isOperatorMatch,
+  isPasswordMatch,
   isPinMatch,
   isProtectedMatch,
   isRequestAuthMatch,
-  isSecretMatch,
   isWhitelistMatch
 } from '$lib/server/auth';
 
@@ -142,25 +142,24 @@ const allowedPath = (path: string, locals: App.Locals, selector?: string) => {
   const slug =
     selector === undefined ? undefined : locals.user[selector].toString();
 
-  if (
-    isSecretMatch(path) &&
-    path === `${PUBLIC_CREATOR_PATH}/${slug}` &&
-    locals.creator
-  )
-    return true;
-
-  if (
-    isPinMatch(path) &&
-    locals.ticket !== undefined &&
-    path.includes(`${PUBLIC_TICKET_PATH}/${locals.ticket._id.toString()}`)
-  ) {
-    return true;
+  // If the user is a creator, they can access their own page
+  if (isPasswordMatch(path)) {
+    return locals.creator && path === `${PUBLIC_CREATOR_PATH}/${slug}`;
   }
 
+  // If the user is a ticket holder, they can access their own ticket
+  if (isPinMatch(path)) {
+    return (
+      locals.ticket &&
+      path === `${PUBLIC_TICKET_PATH}/${locals.ticket._id.toString()}`
+    );
+  }
+  // If the user is an agent, operator, creator they can access their own page
   if (isOperatorMatch(path) && locals.operator) return true;
   if (isAgentMatch(path) && locals.agent) return true;
   if (isCreatorMatch(path) && locals.creator) return true;
 
+  // Notifications can be accessed by the creator, ticket holder, agent, operator
   if (isNotificationMatch(path)) {
     const allowedIds: string[] = [];
     if (locals.creator) allowedIds.push(locals.creator._id.toString());

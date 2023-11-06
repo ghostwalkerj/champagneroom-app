@@ -89,7 +89,6 @@ export const actions: Actions = {
     if (Number.isNaN(+commission) || +commission < 0 || +commission > 100) {
       return fail(400, { commission, badCommission: true });
     }
-    console.log('agentId', agentId);
 
     const agent =
       agentId && agentId !== '0' ? new ObjectId(agentId) : undefined;
