@@ -5,8 +5,7 @@
 
   import { deserialize } from '$app/forms';
   import { goto } from '$app/navigation';
-  import { navigating, page } from '$app/stores';
-  import { PUBLIC_WEBSITE_URL } from '$env/static/public';
+  import { PUBLIC_SIGNUP_PATH } from '$env/static/public';
 
   import { AuthType } from '$lib/constants';
   import { defaultWallet } from '$lib/web3';
@@ -19,9 +18,9 @@
 
   let { returnPath, authType, parseId } = data;
 
-  const redirectPath = returnPath ?? PUBLIC_WEBSITE_URL;
   $: hasNoWallet = false;
   $: signingRejected = false;
+  $: noUser = false;
   let wallet: WalletState;
 
   let walletAddress = '';
@@ -38,7 +37,13 @@
         break;
       }
       case 'success': {
-        goto(returnPath);
+        goto(returnPath, { replaceState: true });
+        break;
+      }
+      case 'failure': {
+        if (result.data && result.data.userNotFound) {
+          noUser = true;
+        }
         break;
       }
     }
@@ -62,7 +67,6 @@
 
     const result: ActionResult = deserialize(await response.text());
     applyAction(result);
-    goto(redirectPath, { replaceState: true });
   };
 
   const setPasswordAuth = async () => {
@@ -77,7 +81,6 @@
 
     const result: ActionResult = deserialize(await response.text());
     applyAction(result);
-    goto(redirectPath, { replaceState: true });
   };
 
   const setPinAuth = async () => {
@@ -89,7 +92,6 @@
 
     const result: ActionResult = deserialize(await response.text());
     applyAction(result);
-    goto(redirectPath, { replaceState: true });
   };
 
   const signMessage = async () => {
@@ -105,16 +107,23 @@
 
       if (result.type === 'success' && result.data) {
         message = result.data.message;
-
         const signature = (await wallet.provider.request({
           method: 'personal_sign',
           params: [message, walletAddress]
         })) as string;
-        await setSigningAuth(message, signature, walletAddress);
+        try {
+          await setSigningAuth(message, signature, walletAddress);
+        } catch {
+          signingRejected = true;
+        }
+      } else if (
+        result.type === 'failure' &&
+        result.data &&
+        result.data.userNotFound
+      ) {
+        noUser = true;
       }
-    } catch {
-      signingRejected = true;
-    }
+    } catch {}
   };
 
   onMount(async () => {
@@ -139,6 +148,7 @@
         setPinAuth();
         break;
       }
+
       default: {
         break;
       }
@@ -146,8 +156,31 @@
   });
 </script>
 
-<div class="w-screen bg-base flex flex-col p-6 text-center">
-  {#if authType === AuthType.SIGNING}
+<div class="w-screen bg-base flex flex-col p-6 text-center items-center">
+  {#if noUser && authType === AuthType.SIGNING}
+    <div class="card w-96 bg-neutral text-neutral-content m-10">
+      <div class="card-body items-center text-center">
+        <h2 class="card-title">Would you like to Sign Up?</h2>
+        <p>
+          Address: {walletAddress?.slice(0, 6)}...{walletAddress.slice(-4)} not found.
+        </p>
+        <div class="card-actions justify-end">
+          <button
+            class="btn btn-primary"
+            on:click={() => {
+              goto(PUBLIC_SIGNUP_PATH);
+            }}>Signup</button
+          >
+          <button
+            class="btn btn-ghost"
+            on:click={() => {
+              goto('/');
+            }}>Cancel</button
+          >
+        </div>
+      </div>
+    </div>
+  {:else if authType === AuthType.SIGNING}
     <div class="font-bold text-5xl text-primary w-full font-CaviarDreams">
       Crypto Wallet Authentication
     </div>

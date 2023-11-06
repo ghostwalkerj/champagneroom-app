@@ -1,4 +1,4 @@
-import { error } from '@sveltejs/kit';
+import { error, fail } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 
 import {
@@ -30,7 +30,7 @@ export const actions: Actions = {
     const data = await request.formData();
     const address = data.get('address') as string;
     if (!address) {
-      throw error(404, 'Bad address');
+      return fail(400, { missingAddress: true });
     }
 
     const user = await User.findOne({ address, authType: AuthType.SIGNING })
@@ -38,7 +38,9 @@ export const actions: Actions = {
       .exec();
     if (!user) {
       console.error('User not found');
-      throw error(404, 'User not found');
+      return fail(404, {
+        userNotFound: true
+      });
     }
     const message = AUTH_SIGNING_MESSAGE + ' ' + user.nonce;
     return {
@@ -53,20 +55,20 @@ export const actions: Actions = {
     const message = data.get('message') as string;
 
     if (!address) {
-      throw error(404, 'Bad address');
+      return fail(400, { missingAddress: true });
     }
 
     if (!signature) {
-      throw error(400, 'Missing Signature');
+      return fail(400, { missingSignature: true });
     }
 
     if (!message) {
-      throw error(400, 'Missing Message');
+      return fail(400, { missingMessage: true });
     }
 
     // Verify Auth
     if (!verifySignature(message, address, signature)) {
-      throw error(400, 'Invalid Signature');
+      return fail(400, { badSignature: true });
     }
 
     // Check if user exists
@@ -77,7 +79,9 @@ export const actions: Actions = {
 
     if (!exists) {
       console.error('User not found');
-      throw error(404, 'User not found');
+      return fail(404, {
+        userNotFound: true
+      });
     }
 
     // Update User Nonce
@@ -111,7 +115,7 @@ export const actions: Actions = {
 
     if (!parseId) {
       console.error('No parseId');
-      throw error(404, 'Bad parseId');
+      return fail(400, { missingParseId: true });
     }
 
     // Check if user exists
@@ -122,7 +126,9 @@ export const actions: Actions = {
 
     if (!exists) {
       console.error('User not found');
-      throw error(404, 'User not found');
+      return fail(404, {
+        userNotFound: true
+      });
     }
 
     const authToken = jwt.sign(
@@ -155,12 +161,12 @@ export const actions: Actions = {
 
     if (!pin) {
       console.error('No pin');
-      throw error(404, 'Bad pin');
+      return fail(400, { badPin: true });
     }
 
     if (!userId) {
       console.error('No userId');
-      throw error(404, 'Bad userId');
+      return fail(400, { badUserId: true });
     }
 
     const clearPin = authDecrypt(pin, AUTH_SALT);
@@ -171,14 +177,16 @@ export const actions: Actions = {
     });
     if (!user) {
       console.error('User not found');
-      throw error(404, 'Bad user');
+      return fail(404, {
+        userNotFound: true
+      });
     }
 
     if (clearPin && clearUserId) {
       const goodPin = user.comparePassword(clearPin);
       if (!goodPin) {
         console.error('Bad pin');
-        throw error(404, 'Bad pin');
+        return fail(400, { badPin: true });
       }
       const authToken = jwt.sign(
         {
@@ -206,7 +214,7 @@ export const actions: Actions = {
   }
 } satisfies Actions;
 
-export const load: PageServerLoad = async ({ url, locals }) => {
+export const load: PageServerLoad = async ({ url }) => {
   const returnPath = url.searchParams.get('returnPath');
   if (!returnPath) {
     throw error(400, 'Missing Return Path');
