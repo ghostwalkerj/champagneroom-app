@@ -1,12 +1,11 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
-  import type { Unsubscriber } from 'svelte/store';
 
   import { applyAction, enhance } from '$app/forms';
-  import { PUBLIC_PROFILE_IMAGE_PATH } from '$env/static/public';
 
   import { ShowStatus } from '$lib/models/show';
 
+  import Config from '$lib/config';
   import getProfileImage from '$lib/profilePhoto';
 
   import ShowDetail from '$components/ShowDetail.svelte';
@@ -21,7 +20,7 @@
   //let showUnSub: Unsubscriber;
 
   $: isLoading = false;
-  $: profileImage = getProfileImage(displayName, PUBLIC_PROFILE_IMAGE_PATH);
+  $: profileImage = getProfileImage(displayName, Config.UI.profileImagePath);
   $: canBuyTicket =
     show.showState.status === ShowStatus.BOX_OFFICE_OPEN || isBuyingTicket;
   const onSubmit = () => {

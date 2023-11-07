@@ -8,10 +8,6 @@ import { generateSillyPassword } from 'silly-password-generator';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 
 import { AUTH_SALT } from '$env/static/private';
-import {
-  PUBLIC_DEFAULT_PROFILE_IMAGE,
-  PUBLIC_WEBSITE_URL
-} from '$env/static/public';
 
 import { Agent } from '$lib/models/agent';
 import type { DisputeDecision } from '$lib/models/common';
@@ -26,11 +22,12 @@ import { ShowMachineEventString } from '$lib/machines/showMachine';
 
 import type { ShowQueueType } from '$lib/workers/showWorker';
 
+import Config from '$lib/config';
 import { AuthType, EntityType } from '$lib/constants';
 import { womensNames } from '$lib/womensNames';
 
 import type { PageServerLoad } from './$types';
-const websiteUrl = PUBLIC_WEBSITE_URL;
+const websiteUrl = Config.Path.websiteUrl;
 
 export const actions: Actions = {
   create_agent: async ({ request }: RequestEvent) => {
@@ -114,7 +111,7 @@ export const actions: Actions = {
         user: user._id,
         agentCommission: +commission,
         agent,
-        profileImageUrl: PUBLIC_DEFAULT_PROFILE_IMAGE
+        profileImageUrl: Config.UI.defaultProfileImage
       });
       return {
         success: true,

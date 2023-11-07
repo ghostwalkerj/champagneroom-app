@@ -5,14 +5,12 @@
   import { browser } from '$app/environment';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import {
-    PUBLIC_JITSI_DOMAIN,
-    PUBLIC_PROFILE_IMAGE_PATH
-  } from '$env/static/public';
+  import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
   import { type ShowDocumentType, ShowStatus } from '$lib/models/show';
   import type { UserDocument } from '$lib/models/user';
 
+  import Config from '$lib/config';
   import { jitsiInterfaceConfigOverwrite } from '$lib/constants';
   import { notifyUpdate } from '$lib/notify';
   import getProfileImage from '$lib/profilePhoto';
@@ -48,7 +46,7 @@
     };
   }
 
-  const profileImage = getProfileImage(user.name, PUBLIC_PROFILE_IMAGE_PATH);
+  const profileImage = getProfileImage(user.name, Config.UI.profileImagePath);
   onMount(() => {
     const options = {
       roomName: show.roomId,

@@ -4,7 +4,8 @@
   import urlJoin from 'url-join';
 
   import { page } from '$app/stores';
-  import { PUBLIC_IMAGE_UPDATE_PATH } from '$env/static/public';
+
+  import Config from '$lib/config';
 
   export let callBack: (argument0: string) => void;
   export let profileImage: string;
@@ -61,7 +62,7 @@
     progressVisibility = 'visible';
     let formData = new FormData();
     formData.append('file', file);
-    const uploadUrl = urlJoin($page.url.origin, PUBLIC_IMAGE_UPDATE_PATH);
+    const uploadUrl = urlJoin($page.url.origin, Config.Path.imageUpload);
     const response = await fetch(uploadUrl, {
       method: 'POST',
       body: formData

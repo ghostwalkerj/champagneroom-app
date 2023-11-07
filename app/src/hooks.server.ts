@@ -18,11 +18,6 @@ import {
   REDIS_PORT,
   REDIS_USERNAME
 } from '$env/static/private';
-import {
-  PUBLIC_AUTH_PATH,
-  PUBLIC_CREATOR_PATH,
-  PUBLIC_TICKET_PATH
-} from '$env/static/public';
 
 import { Agent } from '$lib/models/agent';
 import { Creator } from '$lib/models/creator';
@@ -33,6 +28,7 @@ import type { UserDocument } from '$lib/models/user';
 import { User, UserRole } from '$lib/models/user';
 import type { WalletDocument } from '$lib/models/wallet';
 
+import Config from '$lib/config';
 import { authDecrypt } from '$lib/crypt';
 import {
   isAgentMatch,
@@ -46,7 +42,7 @@ import {
   isWhitelistMatch
 } from '$lib/server/auth';
 
-const authUrl = PUBLIC_AUTH_PATH;
+const authUrl = Config.Path.auth;
 
 if (mongoose.connection.readyState === 0) mongoose.connect(MONGO_DB_ENDPOINT);
 const redisConnection = new IORedis({
@@ -144,14 +140,14 @@ const allowedPath = (path: string, locals: App.Locals, selector?: string) => {
 
   // If the user is a creator, they can access their own page
   if (isPasswordMatch(path)) {
-    return locals.creator && path === `${PUBLIC_CREATOR_PATH}/${slug}`;
+    return locals.creator && path === `${Config.Path.creator}/${slug}`;
   }
 
   // If the user is a ticket holder, they can access their own ticket
   if (isPinMatch(path)) {
     return (
       locals.ticket &&
-      path === `${PUBLIC_TICKET_PATH}/${locals.ticket._id.toString()}`
+      path === `${Config.Path.ticket}/${locals.ticket._id.toString()}`
     );
   }
   // If the user is an agent, operator, creator they can access their own page

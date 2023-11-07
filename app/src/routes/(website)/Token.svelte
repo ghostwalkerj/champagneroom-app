@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { PUBLIC_STATIC_URL } from '$env/static/public';
+  import Config from '$lib/config';
 </script>
 
 <div id="Token" class="container mx-auto pt-10 lg:pt-52">
@@ -39,7 +39,7 @@
           class="opacity-80 rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1]"
         >
           <source
-            src="{PUBLIC_STATIC_URL}/assets/champagneroomtoken.mp4"
+            src="{Config.Path.staticUrl}/assets/champagneroomtoken.mp4"
             type="video/mp4"
           />
         </video>

@@ -5,8 +5,8 @@
 
   import { deserialize } from '$app/forms';
   import { goto } from '$app/navigation';
-  import { PUBLIC_SIGNUP_PATH } from '$env/static/public';
 
+  import Config from '$lib/config';
   import { AuthType } from '$lib/constants';
   import { defaultWallet } from '$lib/web3';
 
@@ -168,7 +168,7 @@
           <button
             class="btn btn-primary"
             on:click={() => {
-              goto(PUBLIC_SIGNUP_PATH);
+              goto(Config.Path.signup, { replaceState: true });
             }}>Signup</button
           >
           <button

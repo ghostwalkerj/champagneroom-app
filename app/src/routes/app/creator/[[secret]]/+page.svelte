@@ -8,11 +8,6 @@
   import { applyAction, enhance } from '$app/forms';
   import { goto, invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
-  import {
-    PUBLIC_DEFAULT_PROFILE_IMAGE,
-    PUBLIC_SHOW_PATH,
-    PUBLIC_SHOWTIME_PATH
-  } from '$env/static/public';
 
   import { CancelReason } from '$lib/models/common';
   import type { CreatorDocumentType } from '$lib/models/creator';
@@ -26,6 +21,7 @@
     ShowMachineEventString
   } from '$lib/machines/showMachine';
 
+  import Config from '$lib/config';
   import { ActorType, durationFormatter } from '$lib/constants';
   import { createEventText } from '$lib/eventUtil';
   import { notifyInsert, notifyUpdate } from '$lib/notify';
@@ -50,7 +46,7 @@
 
   const showTimePath = urlJoin(
     $page.url.pathname,
-    PUBLIC_SHOWTIME_PATH,
+    Config.Path.showTime,
     '?returnPath=' + $page.url.pathname
   );
 
@@ -205,7 +201,7 @@
       if (result.data.showCreated) {
         const showUrl = urlJoin(
           window.location.origin,
-          PUBLIC_SHOW_PATH,
+          Config.Path.show,
           result.data.show!._id.toString()
         );
         navigator.clipboard.writeText(showUrl);
@@ -475,7 +471,7 @@
               <div>
                 <ProfilePhoto
                   profileImage={creator.profileImageUrl ||
-                    PUBLIC_DEFAULT_PROFILE_IMAGE}
+                    Config.UI.defaultProfileImage}
                   callBack={(value) => {
                     updateProfileImage(value);
                   }}

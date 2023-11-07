@@ -5,7 +5,6 @@
   import { onMount } from 'svelte';
 
   import { goto } from '$app/navigation';
-  import { PUBLIC_AUTH_PATH, PUBLIC_STATIC_URL } from '$env/static/public';
 
   import { selectedAccount } from '$lib/web3';
 
@@ -15,6 +14,7 @@
   import { version } from '../../../package.json';
 
   import type { LayoutData } from './$types';
+  import Config from '$lib/config';
 
   export let data: LayoutData;
 
@@ -22,7 +22,7 @@
   const buildNumber = generate(version);
   const buildTime = format(buildNumber);
   let lastAddress: string | undefined;
-  const authUrl = PUBLIC_AUTH_PATH;
+  const authUrl = Config.Path.authUrl;
 
   onMount(() => {
     selectedAccount.subscribe((account) => {
@@ -51,7 +51,7 @@
         <!-- svelte-ignore a11y-missing-attribute -->
         <a class="text-xl normal-case" href="/">
           <img
-            src="{PUBLIC_STATIC_URL}/assets/logo-horizontal-tr.png"
+            src="{Config.Path.staticUrl}/assets/logo-horizontal-tr.png"
             alt="Logo"
             width="260"
           /></a

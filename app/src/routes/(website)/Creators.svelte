@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { PUBLIC_SIGNUP_PATH, PUBLIC_STATIC_URL } from '$env/static/public';
+  import Config from '$lib/config';
 </script>
 
 <div id="Creators">
@@ -15,7 +15,7 @@
       >
         <div class="w-full m-3 p-4 flex place-content-center lg:pr-28">
           <img
-            src="{PUBLIC_STATIC_URL}/assets/creator.png"
+            src="{Config.Path.staticUrl}/assets/creator.png"
             alt="Creator"
             class="rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1]"
           />
@@ -72,7 +72,7 @@
             </li>
             <li>
               Visit the <a
-                href={PUBLIC_SIGNUP_PATH}
+                href={Config.Path.signup}
                 target="_blank"
                 class="link link-primary"
               >

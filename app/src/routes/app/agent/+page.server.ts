@@ -4,12 +4,12 @@ import { generateSillyPassword } from 'silly-password-generator';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 
 import { AUTH_SALT } from '$env/static/private';
-import { PUBLIC_DEFAULT_PROFILE_IMAGE } from '$env/static/public';
 
 import { Creator } from '$lib/models/creator';
 import { User } from '$lib/models/user';
 import { Wallet } from '$lib/models/wallet';
 
+import Config from '$lib/config';
 import { AuthType, EntityType } from '$lib/constants';
 import { womensNames } from '$lib/womensNames';
 
@@ -53,7 +53,7 @@ export const actions: Actions = {
         user: user._id,
         agentCommission: +commission,
         agent: agentId,
-        profileImageUrl: PUBLIC_DEFAULT_PROFILE_IMAGE
+        profileImageUrl: Config.UI.defaultProfileImage
       });
       return {
         success: true,

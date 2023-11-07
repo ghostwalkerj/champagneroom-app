@@ -2,13 +2,13 @@ import { error, fail } from '@sveltejs/kit';
 import * as web3 from 'web3';
 
 import { AUTH_SIGNING_MESSAGE } from '$env/static/private';
-import { PUBLIC_CREATOR_PATH } from '$env/static/public';
 
 import { Creator } from '$lib/models/creator';
 import type { UserDocument } from '$lib/models/user';
 import { User } from '$lib/models/user';
 import { Wallet } from '$lib/models/wallet';
 
+import Config from '$lib/config';
 import { AuthType, EntityType } from '$lib/constants';
 
 import type { Actions, PageServerLoad } from './$types';
@@ -44,7 +44,7 @@ export const actions: Actions = {
     const message = data.get('message') as string;
     const signature = data.get('signature') as string;
 
-    const returnPath = PUBLIC_CREATOR_PATH;
+    const returnPath = Config.Path.creator;
 
     // Validation
     if (!name || name.length < 3 || name.length > 50) {

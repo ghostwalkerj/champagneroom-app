@@ -9,12 +9,13 @@ import {
   JITSI_JWT_SECRET,
   JWT_EXPIRY
 } from '$env/static/private';
-import { PUBLIC_JITSI_DOMAIN, PUBLIC_TICKET_PATH } from '$env/static/public';
+import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
 import { Show } from '$lib/models/show';
 
 import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 
+import Config from '$lib/config';
 import { getTicketMachineService } from '$lib/server/machinesUtil';
 
 import type { PageServerLoad } from './$types';
@@ -60,7 +61,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
   // Check if can watch the show
   else if (!ticketMachineState.can(TicketMachineEventString.SHOW_JOINED)) {
-    const ticketUrl = urlJoin(PUBLIC_TICKET_PATH, ticket._id.toString());
+    const ticketUrl = urlJoin(Config.Path.ticket, ticket._id.toString());
 
     throw redirect(302, ticketUrl);
   }

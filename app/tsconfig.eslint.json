@@ -11,6 +11,7 @@
   ],
   "include": [
     "server.ts",
+    "config.ts",
     "svelte.config.js",
     ".eslintrc.cjs",
     "ambient.d.ts",

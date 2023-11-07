@@ -3,12 +3,10 @@
   import type { Unsubscriber } from 'svelte/store';
   import urlJoin from 'url-join';
   import web3 from 'web3';
-  import { t } from 'xstate';
 
   import { applyAction, enhance } from '$app/forms';
   import { goto, invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
-  import { PUBLIC_SHOWTIME_PATH } from '$env/static/public';
 
   import type { RefundType } from '$lib/models/common';
   import { DisputeReason, RefundReason } from '$lib/models/common';
@@ -30,6 +28,7 @@
   import TicketInvoice from './TicketInvoice.svelte';
 
   import type { ActionData, PageData } from './$types';
+  import Config from '$lib/config';
 
   export let data: PageData;
   export let form: ActionData;
@@ -46,7 +45,7 @@
 
   const showTimePath = urlJoin(
     $page.url.pathname,
-    PUBLIC_SHOWTIME_PATH,
+    Config.Path.showTime,
     '?returnPath=' + $page.url.pathname
   );
   const reasons = Object.values(DisputeReason);

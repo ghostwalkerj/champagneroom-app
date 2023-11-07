@@ -1,10 +1,9 @@
 <script lang="ts">
-  import { PUBLIC_PROFILE_IMAGE_PATH } from '$env/static/public';
-
   import type { ShowDocumentType } from '$lib/models/show';
   import type { TicketDocumentType } from '$lib/models/ticket';
   import type { UserDocument } from '$lib/models/user';
 
+  import Config from '$lib/config';
   import { currencyFormatter, durationFormatter } from '$lib/constants';
   import getProfileImage from '$lib/profilePhoto';
   export let show: ShowDocumentType;
@@ -13,7 +12,7 @@
 
   const customerName = user.name;
 
-  $: profileImage = getProfileImage(customerName, PUBLIC_PROFILE_IMAGE_PATH);
+  $: profileImage = getProfileImage(customerName, Config.UI.profileImagePath);
   $: ticketStatus = ticket.ticketState.status;
 
   $: showStatus = show ? show.showState.status : '';

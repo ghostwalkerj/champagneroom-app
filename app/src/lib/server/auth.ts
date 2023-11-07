@@ -5,38 +5,26 @@ import {
   BITCART_INVOICE_NOTIFICATION_PATH,
   BITCART_PAYOUT_NOTIFICATION_PATH
 } from '$env/static/private';
-import {
-  PUBLIC_AGENT_PATH,
-  PUBLIC_API_PATH,
-  PUBLIC_APP_PATH,
-  PUBLIC_AUTH_PATH,
-  PUBLIC_CREATOR_PATH,
-  PUBLIC_NOTIFY_INSERT_PATH,
-  PUBLIC_NOTIFY_UPDATE_PATH,
-  PUBLIC_OPERATOR_PATH,
-  PUBLIC_SHOW_PATH,
-  PUBLIC_SHOWTIME_PATH,
-  PUBLIC_SIGNUP_PATH,
-  PUBLIC_TICKET_PATH
-} from '$env/static/public';
+
+import Config from '$lib/config';
 
 const idString = '/[A-Za-z0-9_-]*';
 
 const PASSWORD_PATHS = [
-  PUBLIC_CREATOR_PATH + idString,
-  PUBLIC_CREATOR_PATH + idString + PUBLIC_SHOWTIME_PATH,
-  '!' + PUBLIC_CREATOR_PATH + PUBLIC_SHOWTIME_PATH
+  Config.Path.creator + idString,
+  Config.Path.creator + idString + Config.Path.showTime,
+  '!' + Config.Path.creator + Config.Path.showTime
 ];
 const PIN_PATHS = [
-  PUBLIC_TICKET_PATH + idString,
-  PUBLIC_TICKET_PATH + idString + PUBLIC_SHOWTIME_PATH
+  Config.Path.ticket + idString,
+  Config.Path.ticket + idString + Config.Path.showTime
 ];
 
-const PROTECTED_PATHS = [PUBLIC_APP_PATH + '/**', PUBLIC_API_PATH + '/**'];
+const PROTECTED_PATHS = [Config.Path.app + '/**', Config.Path.api + '/**'];
 
 const NOTIFICATION_PATHS = [
-  PUBLIC_NOTIFY_UPDATE_PATH + idString,
-  PUBLIC_NOTIFY_INSERT_PATH + idString
+  Config.Path.notifyUpdate + idString,
+  Config.Path.notifyInsert + idString
 ];
 
 const WEBHOOK_PATHS = [
@@ -45,22 +33,22 @@ const WEBHOOK_PATHS = [
 ];
 
 const WHITELIST_PATHS = [
-  PUBLIC_SHOW_PATH + '/**',
-  PUBLIC_AUTH_PATH,
-  PUBLIC_SIGNUP_PATH,
+  Config.Path.show + '/**',
+  Config.Path.auth,
+  Config.Path.signup,
   ...WEBHOOK_PATHS
 ];
 
-const APP_PATHS = [PUBLIC_APP_PATH + '/**'];
-const API_PATHS = [PUBLIC_API_PATH + '/**'];
+const APP_PATHS = [Config.Path.app + '/**'];
+const API_PATHS = [Config.Path.api + '/**'];
 
-const TICKET_PATHS = [PUBLIC_TICKET_PATH + '/**'];
-const CREATOR_PATHS = [PUBLIC_CREATOR_PATH, PUBLIC_CREATOR_PATH + '/**'];
+const TICKET_PATHS = [Config.Path.ticket + '/**'];
+const CREATOR_PATHS = [Config.Path.creator, Config.Path.creator + '/**'];
 const SECRET_PATHS = [...PASSWORD_PATHS, ...PIN_PATHS];
-const AGENT_PATHS = [PUBLIC_AGENT_PATH];
-const OPERATOR_PATHS = [PUBLIC_OPERATOR_PATH];
+const AGENT_PATHS = [Config.Path.agent];
+const OPERATOR_PATHS = [Config.Path.operator];
 
-const SIGN_PATHS = [...AGENT_PATHS, ...OPERATOR_PATHS, PUBLIC_CREATOR_PATH];
+const SIGN_PATHS = [...AGENT_PATHS, ...OPERATOR_PATHS, Config.Path.creator];
 
 const REQUEST_AUTH_PATHS = [...SIGN_PATHS, ...PASSWORD_PATHS, ...PIN_PATHS];
 

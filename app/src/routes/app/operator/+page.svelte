@@ -9,10 +9,6 @@
   import { deserialize, enhance } from '$app/forms';
   import { invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
-  import {
-    PUBLIC_CREATOR_PATH,
-    PUBLIC_DEFAULT_COMMISSION
-  } from '$env/static/public';
 
   import type { AgentDocumentType } from '$lib/models/agent';
   import { DisputeDecision } from '$lib/models/common';
@@ -20,6 +16,7 @@
   import type { OperatorDocumentType } from '$lib/models/operator';
   import type { ShowDocument } from '$lib/models/show';
 
+  import Config from '$lib/config';
   import { AuthType, currencyFormatter } from '$lib/constants';
   import { womensNames } from '$lib/womensNames';
 
@@ -59,7 +56,7 @@
   let agentAddress = '';
   let creatorNameElement: HTMLTableCellElement;
   let creatorCommissionElement: HTMLTableCellElement;
-  let commission = PUBLIC_DEFAULT_COMMISSION;
+  let commission = Config.UI.defaultCommission;
   let creatorName = uniqueNamesGenerator({
     dictionaries: [womensNames]
   });
@@ -226,11 +223,11 @@
         and secret URL:
         <div class="text-center font-bold text-sm">
           <a
-            href={urlJoin(PUBLIC_CREATOR_PATH, newCreator.user.secret)}
+            href={urlJoin(Config.Path.creator, newCreator.user.secret)}
             target="_blank"
             class="link link-primary"
           >
-            {urlJoin(PUBLIC_CREATOR_PATH, newCreator.user.secret)}</a
+            {urlJoin(Config.Path.creator, newCreator.user.secret)}</a
           >
         </div>
       </div>
@@ -641,7 +638,7 @@
                             <td
                               >{#if creator.user.authType !== AuthType.SIGNING}<a
                                   href={urlJoin(
-                                    PUBLIC_CREATOR_PATH,
+                                    Config.Path.creator,
                                     creator.user.secret
                                   )}
                                   target="_blank"

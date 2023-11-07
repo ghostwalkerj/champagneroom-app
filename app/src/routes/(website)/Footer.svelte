@@ -1,11 +1,7 @@
 <script lang="ts">
   import 'iconify-icon';
 
-  import {
-    PUBLIC_AGENT_PATH,
-    PUBLIC_CREATOR_PATH,
-    PUBLIC_STATIC_URL
-  } from '$env/static/public';
+  import Config from '$lib/config';
 </script>
 
 <footer class="w-full flex-shrink-0 mt-20">
@@ -35,10 +31,10 @@
         <h5 class="text-info sm:mb-3">Services</h5>
         <ul class="list-unstyled">
           <li class="spa">
-            <a href={PUBLIC_CREATOR_PATH}>Creators</a>
+            <a href={Config.Path.creator}>Creators</a>
           </li>
           <li class="spa">
-            <a href={PUBLIC_AGENT_PATH}>Management</a>
+            <a href={Config.Path.agent}>Management</a>
           </li>
         </ul>
       </div>
@@ -46,7 +42,9 @@
         <h5 class="text-info sm:mb-3">Learn</h5>
         <ul class="list-unstyled">
           <li class="spa">
-            <a href="{PUBLIC_STATIC_URL}/assets/champagne-room-white-paper.pdf"
+            <a
+              href="{Config.Path
+                .staticUrl}/assets/champagne-room-white-paper.pdf"
               >White Paper</a
             >
           </li>

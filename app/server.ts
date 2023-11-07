@@ -10,7 +10,6 @@ import basicAuth from 'express-basic-auth';
 import IORedis from 'ioredis';
 import mongoose from 'mongoose';
 import parseArgv from 'tiny-parse-argv';
-import urlJoin from 'url-join';
 
 import { handler } from './build/handler';
 import { EntityType } from './dist/constants';
@@ -66,9 +65,7 @@ if (startWorker) {
     // @ts-ignore
     payoutQueue,
     redisConnection,
-    paymentAuthToken,
-    escrowPeriod: +(process.env.PUBLIC_ESCROW_PERIOD || 36_000_000),
-    gracePeriod: +(process.env.PUBLIC_GRACE_PERIOD || 600_000)
+    paymentAuthToken
   });
   showWorker.run();
 
@@ -79,15 +76,7 @@ if (startWorker) {
     // @ts-ignore
     payoutQueue,
     redisConnection,
-    paymentAuthToken,
-    paymentPeriod:
-      +(process.env.PUBLIC_PAYMENT_PERIOD || 6_000_000) / 60 / 1000,
-    payoutNotificationUrl: urlJoin(
-      process.env.BITCART_NOTIFICATION_HOST || '',
-      process.env.BITCART_PAYOUT_NOTIFICATION_PATH || ''
-    ),
-    bitcartStoreId: process.env.BITCART_STORE_ID || '',
-    authSalt: process.env.AUTH_SALT || ''
+    paymentAuthToken
   });
   payoutWorker.run();
 }

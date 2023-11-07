@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { PUBLIC_OPEN_APP_PATH, PUBLIC_STATIC_URL } from '$env/static/public';
+  import Config from '$lib/config';
 </script>
 
 <div
@@ -19,7 +19,7 @@
       tabindex="0"
       class="dropdown-content z-[1] menu p-2 shadow text-secondary bg-base-100 rounded-box w-52"
     >
-      <li><a href={PUBLIC_OPEN_APP_PATH}>Open App</a></li>
+      <li><a href={Config.Path.openApp}>Open App</a></li>
       <li><a href="#About">About</a></li>
       <li><a href="#TheShow">Show</a></li>
       <li><a href="#FAQ">FAQ</a></li>
@@ -39,7 +39,7 @@
       <a href="/">
         <img
           alt="logo"
-          src="{PUBLIC_STATIC_URL}/assets/logo-horizontal-tr.png"
+          src="{Config.Path.staticUrl}/assets/logo-horizontal-tr.png"
           class="lg:ml-10 mr-2 w-auto my-auto mt-1"
         />
       </a>
@@ -100,7 +100,7 @@
           <li>
             <a
               class="btn btn-outline btn-primary whitespace-nowrap shadow-[0px_0px_17px_6px_#e779c1] btn-sm mt-2 ml-3"
-              href={PUBLIC_OPEN_APP_PATH}
+              href={Config.Path.openApp}
             >
               Open App
             </a>
@@ -112,7 +112,7 @@
     <div class="lg:hidden flex w-full mt-6 mb-4 place-content-center">
       <a
         class="btn btn-outline btn-primary whitespace-nowrap shadow-[0px_0px_17px_6px_#e779c1]"
-        href={PUBLIC_OPEN_APP_PATH}
+        href={Config.Path.openApp}
       >
         Open App
       </a>

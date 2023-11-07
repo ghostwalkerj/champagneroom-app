@@ -26,6 +26,7 @@ import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
 import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 import { WalletMachineEventString } from '$lib/machines/walletMachine';
 
+import Config from '$lib/config';
 import { ActorType, EntityType } from '$lib/constants';
 import { PayoutJobType } from '$lib/payment';
 import {
@@ -45,15 +46,11 @@ export type ShowQueueType = Queue<ShowJobDataType, any, ShowMachineEventString>;
 export const getShowWorker = ({
   showQueue,
   payoutQueue,
-  redisConnection,
-  escrowPeriod = 3_600_000,
-  gracePeriod = 3_600_000
+  redisConnection
 }: {
   showQueue: ShowQueueType;
   payoutQueue: PayoutQueueType;
   redisConnection: IORedis;
-  escrowPeriod: number;
-  gracePeriod: number;
 }) => {
   return new Worker(
     EntityType.SHOW,
@@ -77,10 +74,10 @@ export const getShowWorker = ({
           return startShow(show);
         }
         case ShowMachineEventString.SHOW_ENDED: {
-          return endShow(show, escrowPeriod, showQueue);
+          return endShow(show, showQueue);
         }
         case ShowMachineEventString.SHOW_STOPPED: {
-          return stopShow(show, gracePeriod, showQueue);
+          return stopShow(show, showQueue);
         }
         case ShowMachineEventString.SHOW_FINALIZED: {
           return finalizeShow(show, job.data.finalize, showQueue);
@@ -241,11 +238,7 @@ const startShow = async (show: ShowDocument) => {
   return 'success';
 };
 
-const stopShow = async (
-  show: ShowDocument,
-  gracePeriod: number,
-  showQueue: ShowQueueType
-) => {
+const stopShow = async (show: ShowDocument, showQueue: ShowQueueType) => {
   const showService = createShowMachineService({
     showDocument: show,
     showMachineOptions: {
@@ -262,17 +255,13 @@ const stopShow = async (
     {
       showId: show._id.toString()
     },
-    { delay: gracePeriod }
+    { delay: Config.TIMER.gracePeriod }
   );
   return 'success';
 };
 
 // End show, alert ticket
-const endShow = async (
-  show: ShowDocument,
-  escrowPeriod: number,
-  showQueue: ShowQueueType
-) => {
+const endShow = async (show: ShowDocument, showQueue: ShowQueueType) => {
   const showService = createShowMachineService({
     showDocument: show,
     showMachineOptions: {
@@ -295,7 +284,7 @@ const endShow = async (
         showId: show._id.toString(),
         finalize
       },
-      { delay: escrowPeriod }
+      { delay: Config.TIMER.escrowPeriod }
     );
 
     // Tell ticket holders the show is over folks

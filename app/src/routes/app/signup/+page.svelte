@@ -5,11 +5,8 @@
 
   import { enhance } from '$app/forms';
   import { goto } from '$app/navigation';
-  import {
-    PUBLIC_DEFAULT_PROFILE_IMAGE,
-    PUBLIC_STATIC_URL
-  } from '$env/static/public';
 
+  import Config from '$lib/config';
   import { defaultWallet } from '$lib/web3';
   import { womensNames } from '$lib/womensNames';
 
@@ -29,7 +26,7 @@
   let introModel: HTMLDialogElement;
   let addressModel: HTMLDialogElement;
   let signupModel: HTMLDialogElement;
-  let profileImageUrl = PUBLIC_DEFAULT_PROFILE_IMAGE;
+  let profileImageUrl = Config.UI.defaultProfileImage;
 
   let exampleName = user
     ? user.name
@@ -87,7 +84,7 @@
     >
       <div class="w-full flex place-content-center">
         <img
-          src="{PUBLIC_STATIC_URL}/assets/bottlesnlegs.png"
+          src="{Config.Path.staticUrl}/assets/bottlesnlegs.png"
           alt="Logo"
           class="h-16"
         />
@@ -128,7 +125,7 @@
           <div class="w-full flex flex-col place-content-center">
             <div class="w-full flex place-content-center">
               <img
-                src="{PUBLIC_STATIC_URL}/assets/bottlesnlegs.png"
+                src="{Config.Path.staticUrl}/assets/bottlesnlegs.png"
                 alt="Logo"
                 class="h-16"
               />
@@ -162,7 +159,7 @@
         <div>
           <div class="w-full flex place-content-center">
             <img
-              src="{PUBLIC_STATIC_URL}/assets/bottlesnlegs.png"
+              src="{Config.Path.staticUrl}/assets/bottlesnlegs.png"
               alt="Logo"
               class="h-16"
             />
@@ -198,7 +195,7 @@
       >
         <div class="w-full flex place-content-center">
           <img
-            src="{PUBLIC_STATIC_URL}/assets/bottlesnlegs.png"
+            src="{Config.Path.staticUrl}/assets/bottlesnlegs.png"
             alt="Logo"
             class="h-16"
           />

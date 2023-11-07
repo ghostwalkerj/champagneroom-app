@@ -1,6 +1,7 @@
 <script lang="ts">
   import { applyAction, enhance } from '$app/forms';
-  import { PUBLIC_STATIC_URL } from '$env/static/public';
+
+  import Config from '$lib/config';
 
   import type { ActionData } from './$types';
 
@@ -31,7 +32,7 @@
       <div class="flex flex-col lg:flex-row">
         <div class="w-full lg:mb-10 m-0 lg:m-10 flex place-content-center">
           <img
-            src="{PUBLIC_STATIC_URL}/assets/creator3.png"
+            src="{Config.Path.staticUrl}/assets/creator3.png"
             alt="Creator"
             class="rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1] h-auto"
           />

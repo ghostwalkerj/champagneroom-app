@@ -14,5 +14,13 @@
         "workspaceRoot": "/Users/joseph/Dev/pcall/app",
         "workspacePath": ".env",
         "id": "RwlQY8VG7kTA1Uvr"
+    },
+    {
+        "type": "Directory",
+        "name": "/Users/joseph/Dev/pcall/app/config",
+        "parent_id": null,
+        "workspaceRoot": "/Users/joseph/Dev/pcall/app",
+        "workspacePath": "config",
+        "id": "VaycelkTZ3pHIGrs"
     }
 ]

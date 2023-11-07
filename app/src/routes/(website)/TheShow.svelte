@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { PUBLIC_STATIC_URL } from '$env/static/public';
+  import Config from '$lib/config';
 </script>
 
 <div id="TheShow" class="flex flex-col pt-10 lg:pt-52 w-full mx-auto">
@@ -11,7 +11,8 @@
   <div class="relative px-4 lg:px-10">
     <div
       class="bg-containrounded-xl overflow-hidden absolute top-0 left-0 w-full h-full opacity-30"
-      style="background-image: url('{PUBLIC_STATIC_URL}/assets/crbubbles.png') "
+      style="background-image: url('{Config.Path
+        .staticUrl}/assets/crbubbles.png') "
     />
     <div class="flex flex-col lg:flex-row w-full">
       <div class="w-full p-4 lg:p-6">
@@ -50,7 +51,7 @@
           <div class="p-4 mt-4 lg:mt-0 flex w-full place-content-center">
             <img
               alt="show-screenshot"
-              src="{PUBLIC_STATIC_URL}/assets/show-screenshot.png"
+              src="{Config.Path.staticUrl}/assets/show-screenshot.png"
               class="rounded-md overflow-hidden shadow-[0px_0px_17px_6px_#e779c1]"
             />
           </div>

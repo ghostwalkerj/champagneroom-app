@@ -1,11 +1,8 @@
 <script lang="ts">
-  import { PUBLIC_STATIC_URL } from '$env/static/public';
+  import Config from '$lib/config';
 </script>
 
-<div
-  class="container mx-auto relative pt-10 lg:pt-52"
-  id="FAQ"
->
+<div class="container mx-auto relative pt-10 lg:pt-52" id="FAQ">
   <div class="absolute top-28 grid grid-cols-2">
     <div
       class="image opacity-20 max-width-l hidden md:flex animate-pulse transition-timing-function"
@@ -13,7 +10,7 @@
       <div class="h-xl w-xl">
         <img
           class="motion-safe:animate-fadeIn mx-auto rounded-lg opacity-45 justify-center -space-x-20 w-m h-m"
-          src="{PUBLIC_STATIC_URL}/assets/ladyblue.png"
+          src="{Config.Path.staticUrl}/assets/ladyblue.png"
           alt="Lady Blue"
         />
       </div>
@@ -25,7 +22,7 @@
       <div class="h-xl w-xl">
         <img
           class="motion-safe:animate-fadeIn mx-auto rounded-lg opacity-45 justify-center -space-x-20 w-m h-m"
-          src="{PUBLIC_STATIC_URL}/assets/ladypink.png"
+          src="{Config.Path.staticUrl}/assets/ladypink.png"
           alt="Lady Pink"
         />
       </div>

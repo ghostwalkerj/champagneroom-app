@@ -1,10 +1,7 @@
 import to from 'await-to-js';
 import urlJoin from 'url-join';
 
-import {
-  PUBLIC_NOTIFY_INSERT_PATH,
-  PUBLIC_NOTIFY_UPDATE_PATH
-} from '$env/static/public';
+import Config from './config';
 
 export const notifyInsert = ({
   type,
@@ -23,7 +20,7 @@ export const notifyInsert = ({
   const queryString = relatedType
     ? typeQuery + '&relatedType=' + relatedType
     : typeQuery;
-  const path = urlJoin(PUBLIC_NOTIFY_INSERT_PATH, id, queryString);
+  const path = urlJoin(Config.Path.notifyInsert, id, queryString);
   const waitFor = async () => {
     let shouldLoop = true;
     while (shouldLoop) {
@@ -61,7 +58,7 @@ export const notifyUpdate = ({
 }) => {
   const abortDocument = new AbortController();
   const signal = abortDocument.signal;
-  const path = urlJoin(PUBLIC_NOTIFY_UPDATE_PATH, id, '?type=' + type);
+  const path = urlJoin(Config.Path.notifyUpdate, id, '?type=' + type);
   const waitFor = async () => {
     let shouldLoop = true;
     while (shouldLoop) {

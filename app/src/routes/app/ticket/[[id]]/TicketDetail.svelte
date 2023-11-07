@@ -1,12 +1,11 @@
 <script lang="ts">
   import urlJoin from 'url-join';
 
-  import { PUBLIC_SHOW_PATH, PUBLIC_STATIC_URL } from '$env/static/public';
-
   import type { ShowDocumentType } from '$lib/models/show';
   import { type TicketDocumentType, TicketStatus } from '$lib/models/ticket';
   import type { UserDocument } from '$lib/models/user';
 
+  import Config from '$lib/config';
   import { currencyFormatter, durationFormatter } from '$lib/constants';
   export let show: ShowDocumentType;
   export let ticket: TicketDocumentType;
@@ -17,7 +16,7 @@
   const showName = show.name;
   const showCoverImageUrl = show.coverImageUrl;
   const showDuration = durationFormatter(show.duration * 60);
-  const showUrl = urlJoin(PUBLIC_SHOW_PATH, show._id.toString());
+  const showUrl = urlJoin(Config.Path.show, show._id.toString());
 
   // Ticket
   $: ticketStatus = ticket
@@ -65,7 +64,8 @@
 
         <div
           class="bg-center bg-cover h-28 opacity-10 absolute inset-0 top-2"
-          style="background-image: url('{PUBLIC_STATIC_URL}/assets/logo-horizontal-tr.png') z-0"
+          style="background-image: url('{Config.Path
+            .staticUrl}/assets/logo-horizontal-tr.png') z-0"
         />
         <div>Ticket Reserved for: {customerName}</div>
         <div class="capitalize">Ticket Status: {ticketStatus}</div>

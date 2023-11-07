@@ -9,7 +9,7 @@ import {
   JITSI_JWT_SECRET,
   JWT_EXPIRY
 } from '$env/static/private';
-import { PUBLIC_CREATOR_PATH, PUBLIC_JITSI_DOMAIN } from '$env/static/public';
+import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
 import { Show } from '$lib/models/show';
 
@@ -17,6 +17,7 @@ import { ShowMachineEventString } from '$lib/machines/showMachine';
 
 import type { ShowQueueType } from '$lib/workers/showWorker';
 
+import Config from '$lib/config';
 import { EntityType } from '$lib/constants';
 import {
   getShowMachineService,
@@ -54,10 +55,10 @@ export const load: PageServerLoad = async ({ locals }) => {
   const creator = locals.creator;
   const user = locals.user;
   if (!creator) {
-    throw redirect(302, PUBLIC_CREATOR_PATH);
+    throw redirect(302, Config.Path.creator);
   }
   if (!user) {
-    throw redirect(302, PUBLIC_CREATOR_PATH);
+    throw redirect(302, Config.Path.creator);
   }
   const show = await Show.findOne({
     creator: creator._id,
@@ -77,7 +78,7 @@ export const load: PageServerLoad = async ({ locals }) => {
   const showState = showService.getSnapshot();
 
   if (!showState.can({ type: ShowMachineEventString.SHOW_STARTED })) {
-    throw redirect(302, PUBLIC_CREATOR_PATH);
+    throw redirect(302, Config.Path.creator);
   }
 
   if (!showState.matches('started'))

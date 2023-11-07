@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { PUBLIC_STATIC_URL } from '$env/static/public';
+  import Config from '$lib/config';
 </script>
 
 <div id="About">
@@ -14,7 +14,7 @@
     >
       <div class="w-full m-3 p-6 flex place-content-center">
         <img
-          src="{PUBLIC_STATIC_URL}/assets/creator4.png"
+          src="{Config.Path.staticUrl}/assets/creator4.png"
           alt="Creator"
           class="rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1]"
         />

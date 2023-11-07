@@ -1,7 +1,7 @@
 <script lang="ts">
   import Saos from 'saos';
 
-  import { PUBLIC_STATIC_URL } from '$env/static/public';
+  import Config from '$lib/config';
 
   import About from './About.svelte';
   import Contact from './Contact.svelte';
@@ -53,7 +53,8 @@
           </div>
           <div>
             <a
-              href="{PUBLIC_STATIC_URL}/assets/champagne-room-white-paper.pdf"
+              href="{Config.Path
+                .staticUrl}/assets/champagne-room-white-paper.pdf"
               class=" md:w-auto btn btn-secondary transition-all duration-300 ease-in-out m-0"
               target="_blank"
             >
@@ -72,7 +73,7 @@
             class="opacity-80 rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1]"
           >
             <source
-              src="{PUBLIC_STATIC_URL}/assets/champagnevideo.mp4"
+              src="{Config.Path.staticUrl}/assets/champagnevideo.mp4"
               type="video/mp4"
             />
           </video>

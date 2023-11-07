@@ -10,10 +10,10 @@ import { derived, writable } from 'svelte/store';
 
 import {
   PUBLIC_INFURA_API_KEY,
-  PUBLIC_STATIC_URL,
-  PUBLIC_WALLET_CONNECT_PROJECT_ID,
-  PUBLIC_WEBSITE_URL
+  PUBLIC_WALLET_CONNECT_PROJECT_ID
 } from '$env/static/public';
+
+import Config from '$lib/config';
 
 // Wallets
 const injected = injectedModule();
@@ -21,14 +21,14 @@ const coinbaseWalletSdk = coinbaseWalletModule({ darkMode: true });
 const frame = frameModule();
 const trezor = trezorModule({
   email: 'admin@champagneroom.app',
-  appUrl: PUBLIC_WEBSITE_URL
+  appUrl: Config.Path.websiteUrl
 });
 
 const wcV2InitOptions = {
   version: 2 as const,
   projectId: PUBLIC_WALLET_CONNECT_PROJECT_ID,
   requiredChains: [1],
-  dappUrl: PUBLIC_WEBSITE_URL
+  dappUrl: Config.Path.websiteUrl
 };
 const walletConnect = walletConnectModule(wcV2InitOptions);
 
@@ -50,8 +50,8 @@ const wallets = [
 const appMetadata = {
   name: 'Champagne Room',
   description: 'Living Large in the Champagne Room',
-  icon: `${PUBLIC_STATIC_URL}/assets/logo-tr.png`,
-  logo: `${PUBLIC_STATIC_URL}/assets/logo-horizontal-tr.png`,
+  icon: `${Config.Path.staticUrl}/assets/logo-tr.png`,
+  logo: `${Config.Path.staticUrl}/assets/logo-horizontal-tr.png`,
   recommendedInjectedWallets: [
     { name: 'Coinbase', url: 'https://wallet.coinbase.com/' },
     { name: 'MetaMask', url: 'https://metamask.io' }

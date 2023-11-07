@@ -13,11 +13,6 @@ import {
   BITCART_PASSWORD,
   BITCART_STORE_ID
 } from '$env/static/private';
-import {
-  PUBLIC_AUTH_PATH,
-  PUBLIC_PAYMENT_PERIOD,
-  PUBLIC_TICKET_PATH
-} from '$env/static/public';
 
 import { Show } from '$lib/models/show';
 import { Ticket } from '$lib/models/ticket';
@@ -27,6 +22,7 @@ import { ShowMachineEventString } from '$lib/machines/showMachine';
 
 import type { ShowQueueType } from '$lib/workers/showWorker';
 
+import Config from '$lib/config';
 import { AuthType, EntityType } from '$lib/constants';
 import { authEncrypt } from '$lib/crypt';
 import { mensNames } from '$lib/mensNames';
@@ -118,7 +114,7 @@ export const actions: Actions = {
         price: ticket.price.amount,
         currency: ticket.price.currency,
         store_id: BITCART_STORE_ID,
-        expiration: +PUBLIC_PAYMENT_PERIOD / 60 / 1000,
+        expiration: Config.TIMER.paymentPeriod / 60 / 1000,
         order_id: ticket._id.toString()
       },
       {
@@ -173,11 +169,11 @@ export const actions: Actions = {
     if (!userId || !encryptedPin) {
       return error(501, 'Show cannot Reserve Ticket');
     }
-    cookies.set('pin', encryptedPin, { path: PUBLIC_AUTH_PATH });
-    cookies.set('userId', userId, { path: PUBLIC_AUTH_PATH });
+    cookies.set('pin', encryptedPin, { path: Config.Path.auth });
+    cookies.set('userId', userId, { path: Config.Path.auth });
     const redirectUrl = urlJoin(
       url.origin,
-      PUBLIC_TICKET_PATH,
+      Config.Path.ticket,
       ticket._id.toString()
     );
     throw redirect(302, redirectUrl);

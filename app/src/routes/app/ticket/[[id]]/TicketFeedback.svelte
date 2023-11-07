@@ -1,17 +1,16 @@
 <script lang="ts">
-  import { PUBLIC_PROFILE_IMAGE_PATH } from '$env/static/public';
-
   import type { ShowDocumentType } from '$lib/models/show';
   import type { TicketDocumentType } from '$lib/models/ticket';
 
+  import config from '$lib/config';
   import { currencyFormatter, durationFormatter } from '$lib/constants';
   import getProfileImage from '$lib/profilePhoto';
   export let show: ShowDocumentType;
   export let ticket: TicketDocumentType;
 
   $: profileImage = getProfileImage(
-    ticket.customerName,
-    PUBLIC_PROFILE_IMAGE_PATH
+    ticket.user.name,
+    config.UI.profileImagePath
   );
   $: ticketStatus = ticket
     ? ticket.ticketState.totalPaid >= ticket.price
@@ -33,7 +32,7 @@
             style="background-image: url('{profileImage}')"
           />
           <div class="pt-2">
-            {ticket.customerName}
+            {ticket.user.name}
           </div>
         </div>
         <div class="flex flex-col">

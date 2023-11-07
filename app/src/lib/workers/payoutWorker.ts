@@ -19,6 +19,7 @@ import { Wallet } from '$lib/models/wallet';
 import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 import { WalletMachineEventString } from '$lib/machines/walletMachine';
 
+import Config from '$lib/config';
 import { EntityType } from '$lib/constants';
 import { authEncrypt } from '$lib/crypt';
 import {
@@ -49,24 +50,20 @@ export type PayoutJobDataType = {
   [key: string]: any;
 };
 
+const authSalt = process.env.AUTH_SALT || '';
+const bcStoreId = process.env.BITCART_STORE_ID || '';
+const payoutNotificationUrl = process.env.PAYOUT_NOTIFICATION_URL || '';
+
 export type PayoutQueueType = Queue<PayoutJobDataType, any, PayoutJobType>;
 
 export const getPayoutWorker = ({
   payoutQueue,
   redisConnection,
-  paymentAuthToken,
-  paymentPeriod = 6_000_000 / 60 / 1000,
-  payoutNotificationUrl = '',
-  bcStoreId,
-  authSalt = ''
+  paymentAuthToken
 }: {
   payoutQueue: PayoutQueueType;
   redisConnection: IORedis;
   paymentAuthToken: string;
-  paymentPeriod: number;
-  payoutNotificationUrl: string;
-  bcStoreId: string;
-  authSalt: string;
 }) => {
   return new Worker(
     EntityType.PAYOUT,
@@ -114,7 +111,7 @@ export const getPayoutWorker = ({
               {
                 bcInvoiceId
               },
-              { delay: paymentPeriod }
+              { delay: Config.TIMER.paymentPeriod }
             );
             return 'Unconfirmed payment';
           }

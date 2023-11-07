@@ -2,10 +2,9 @@
   import StarRating from 'svelte-star-rating';
   import urlJoin from 'url-join';
 
-  import { PUBLIC_SHOW_PATH } from '$env/static/public';
-
   import type { ShowDocumentType } from '$lib/models/show';
 
+  import Config from '$lib/config';
   import { currencyFormatter, durationFormatter } from '$lib/constants';
 
   type ShowDetailOptions = {
@@ -50,7 +49,7 @@
   const copyShowUrl = () => {
     const showUrl = urlJoin(
       window.location.origin,
-      PUBLIC_SHOW_PATH,
+      Config.Path.show,
       show._id.toString()
     );
     navigator.clipboard.writeText(showUrl);
