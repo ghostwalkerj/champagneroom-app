@@ -6,6 +6,7 @@
 
   import { goto } from '$app/navigation';
 
+  import Config from '$lib/config';
   import { selectedAccount } from '$lib/web3';
 
   import ConnectButton from '$components/header/ConnectButton.svelte';
@@ -14,7 +15,6 @@
   import { version } from '../../../package.json';
 
   import type { LayoutData } from './$types';
-  import Config from '$lib/config';
 
   export let data: LayoutData;
 
@@ -22,7 +22,7 @@
   const buildNumber = generate(version);
   const buildTime = format(buildNumber);
   let lastAddress: string | undefined;
-  const authUrl = Config.Path.authUrl;
+  const authUrl = Config.Path.auth;
 
   onMount(() => {
     selectedAccount.subscribe((account) => {

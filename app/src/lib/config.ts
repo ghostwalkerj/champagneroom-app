@@ -14,7 +14,7 @@ const Config = {
     notifyInsert: '/api/v1/notify/insert',
     staticUrl: 'https://static.champagneroom.app',
     app: '/app',
-    openApp: '/app/creator',
+    openApp: '/app',
     websiteUrl: 'https://champagneroom.app',
     api: '/api/v1'
   },

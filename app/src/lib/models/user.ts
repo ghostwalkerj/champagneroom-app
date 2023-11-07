@@ -1,9 +1,10 @@
-import { AuthType } from '$lib/constants';
 import bcrypt from 'bcryptjs';
 import type { InferSchemaType, Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
 import { nanoid } from 'nanoid';
 import validator from 'validator';
+
+import { AuthType } from '$lib/constants';
 
 const { Schema, models } = pkg;
 

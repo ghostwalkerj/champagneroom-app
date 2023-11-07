@@ -20,7 +20,12 @@ const PIN_PATHS = [
   Config.Path.ticket + idString + Config.Path.showTime
 ];
 
-const PROTECTED_PATHS = [Config.Path.app + '/**', Config.Path.api + '/**'];
+const PROTECTED_PATHS = [
+  Config.Path.app + '/**',
+  Config.Path.api + '/**',
+  Config.Path.app,
+  Config.Path.api
+];
 
 const NOTIFICATION_PATHS = [
   Config.Path.notifyUpdate + idString,
@@ -39,9 +44,6 @@ const WHITELIST_PATHS = [
   ...WEBHOOK_PATHS
 ];
 
-const APP_PATHS = [Config.Path.app + '/**'];
-const API_PATHS = [Config.Path.api + '/**'];
-
 const TICKET_PATHS = [Config.Path.ticket + '/**'];
 const CREATOR_PATHS = [Config.Path.creator, Config.Path.creator + '/**'];
 const SECRET_PATHS = [...PASSWORD_PATHS, ...PIN_PATHS];
@@ -50,11 +52,14 @@ const OPERATOR_PATHS = [Config.Path.operator];
 
 const SIGN_PATHS = [...AGENT_PATHS, ...OPERATOR_PATHS, Config.Path.creator];
 
-const REQUEST_AUTH_PATHS = [...SIGN_PATHS, ...PASSWORD_PATHS, ...PIN_PATHS];
+const REQUEST_AUTH_PATHS = [
+  ...SIGN_PATHS,
+  ...PASSWORD_PATHS,
+  ...PIN_PATHS,
+  Config.Path.app
+];
 
-export const isAPIPathMatch = outmatch(API_PATHS);
 export const isAgentMatch = outmatch(AGENT_PATHS);
-export const isAppPathMatch = outmatch(APP_PATHS);
 export const isCreatorMatch = outmatch(CREATOR_PATHS);
 export const isNotificationMatch = outmatch(NOTIFICATION_PATHS);
 export const isOperatorMatch = outmatch(OPERATOR_PATHS);

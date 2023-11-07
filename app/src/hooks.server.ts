@@ -24,9 +24,8 @@ import { Creator } from '$lib/models/creator';
 import { Operator } from '$lib/models/operator';
 import { Show } from '$lib/models/show';
 import { Ticket } from '$lib/models/ticket';
-import type { UserDocument } from '$lib/models/user';
 import { User, UserRole } from '$lib/models/user';
-import type { WalletDocument } from '$lib/models/wallet';
+import { Wallet, type WalletDocument } from '$lib/models/wallet';
 
 import Config from '$lib/config';
 import { authDecrypt } from '$lib/crypt';
@@ -61,16 +60,15 @@ const setLocals = async (decode: JwtPayload, locals: App.Locals) => {
     query[selector] = decode[selector];
 
     // Check if user is allowed to access the requested path
-    const user = (await User.findOne(query).populate<{
-      wallet: WalletDocument;
-    }>('wallet')) as UserDocument & { wallet: WalletDocument };
+    const user = await User.findOne(query);
     if (!user) {
       console.error('No user');
       console.log('query', query);
       throw error(500, 'No user');
     }
     locals.user = user;
-    locals.wallet = user.wallet;
+    const wallet = await Wallet.findById(user.wallet);
+    locals.wallet = wallet as WalletDocument;
 
     // load any associated roles
     for (const role of user.roles) {
@@ -154,6 +152,7 @@ const allowedPath = (path: string, locals: App.Locals, selector?: string) => {
   if (isOperatorMatch(path) && locals.operator) return true;
   if (isAgentMatch(path) && locals.agent) return true;
   if (isCreatorMatch(path) && locals.creator) return true;
+  if (path === Config.Path.app && locals.user) return true;
 
   // Notifications can be accessed by the creator, ticket holder, agent, operator
   if (isNotificationMatch(path)) {
