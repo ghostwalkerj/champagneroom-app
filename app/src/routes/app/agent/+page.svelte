@@ -15,8 +15,6 @@
   import { AuthType, currencyFormatter } from '$lib/constants';
   import { womensNames } from '$lib/womensNames';
 
-  import { nameStore } from '$stores';
-
   import AgentWallet from './AgentWallet.svelte';
   import TopCreator from './TopCreator.svelte';
 
@@ -35,13 +33,11 @@
   let creatorNameElement: HTMLTableCellElement;
   let creatorAddressElement: HTMLTableCellElement;
   let creatorCommissionElement: HTMLTableCellElement;
-  let commission = Config.UI.defaultCommission;
+  let commission = Config.UI.defaultCommission.toString();
   let creatorName = uniqueNamesGenerator({
     dictionaries: [womensNames]
   });
   let isChangeCreatorSecret = false;
-
-  nameStore.set(agent.user.name);
 
   const updateCreator = async (
     index: number,
@@ -112,7 +108,7 @@
           dictionaries: [womensNames]
         });
 
-        commission = Config.UI.defaultCommission;
+        commission = Config.UI.defaultCommission.toString();
         creators = $page.data.creators;
         newCreator = result.data.creator;
         newPassword = result.data.password;

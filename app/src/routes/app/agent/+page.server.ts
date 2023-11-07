@@ -132,6 +132,7 @@ export const actions: Actions = {
 
 export const load: PageServerLoad = async ({ locals }) => {
   const agent = locals.agent;
+  const user = locals.user;
   if (!agent) {
     throw error(404, 'Agent not found');
   }
@@ -142,6 +143,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
   return {
     agent: agent.toObject({ flattenObjectIds: true, flattenMaps: true }),
+    user: user.toObject({ flattenObjectIds: true, flattenMaps: true }),
     creators: creators.map((creator) =>
       creator.toObject({ flattenObjectIds: true, flattenMaps: true })
     )

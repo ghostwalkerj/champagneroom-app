@@ -5,12 +5,13 @@
   import { onMount } from 'svelte';
 
   import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
 
   import Config from '$lib/config';
+  import { AuthType } from '$lib/constants';
   import { selectedAccount } from '$lib/web3';
 
   import ConnectButton from '$components/header/ConnectButton.svelte';
-  import { nameStore } from '$stores';
 
   import { version } from '../../../package.json';
 
@@ -67,12 +68,24 @@
             <div class="neon-text">HAMPAGNE ROOM</div>
           </div>
         </div>
-        <div class="text-center text-xl text-accent font-CaviarDreams">
-          {$nameStore}
-        </div>
+        {#if $page.data.user}
+          <div class="text-center text-xl text-accent font-CaviarDreams">
+            {$page.data.user.name}
+          </div>
+        {/if}
       </div>
       <div class="md:w-1/3 text-right lg:mr-20">
         <ConnectButton />
+        {#if $page.data.user && $page.data.user.authType === AuthType.SIGNING}
+          <button
+            class="btn btn-primary"
+            on:click={() => {
+              goto(Config.Path.auth + '?signOut', { replaceState: true });
+            }}
+          >
+            Sign Out
+          </button>
+        {/if}
       </div>
     </div>
   </div>

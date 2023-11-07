@@ -284,6 +284,7 @@ export const actions: Actions = {
 
 export const load: PageServerLoad = async ({ locals }) => {
   const ticket = locals.ticket;
+  const user = locals.user;
 
   if (!ticket) {
     throw error(404, 'Ticket not found');
@@ -317,6 +318,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
   return {
     ticket: ticket.toObject({ flattenObjectIds: true, flattenMaps: true }),
+    user: user?.toObject({ flattenObjectIds: true, flattenMaps: true }),
     show: show.toObject({ flattenObjectIds: true, flattenMaps: true }),
     invoice: invoice?.data
   };

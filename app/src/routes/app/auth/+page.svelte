@@ -16,7 +16,7 @@
 
   export let data: PageData;
 
-  let { returnPath, authType, parseId } = data;
+  let { returnPath, authType, parseId, signOut } = data;
 
   $: hasNoWallet = false;
   $: signingRejected = false;
@@ -37,7 +37,7 @@
         break;
       }
       case 'success': {
-        goto(returnPath, { replaceState: true });
+        goto(returnPath!, { replaceState: true });
         break;
       }
       case 'failure': {
@@ -127,6 +127,9 @@
   };
 
   onMount(async () => {
+    if (signOut) {
+      return;
+    }
     switch (authType) {
       case AuthType.PATH_PASSWORD: {
         setPasswordAuth();
@@ -157,7 +160,14 @@
 </script>
 
 <div class="w-screen bg-base flex flex-col p-6 text-center items-center">
-  {#if noUser && authType === AuthType.SIGNING}
+  {#if signOut}
+    <div class="font-bold text-5xl text-primary w-full font-CaviarDreams">
+      You have been signed out
+    </div>
+    <div class="m-10">
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+    </div>
+  {:else if noUser && authType === AuthType.SIGNING}
     <div class="card w-96 bg-neutral text-neutral-content m-10">
       <div class="card-body items-center text-center">
         <h2 class="card-title">Would you like to Sign Up?</h2>

@@ -15,6 +15,7 @@ import { Creator } from '$lib/models/creator';
 import type { OperatorDocument } from '$lib/models/operator';
 import type { ShowDocument } from '$lib/models/show';
 import { Ticket } from '$lib/models/ticket';
+import type { UserDocument } from '$lib/models/user';
 import { User } from '$lib/models/user';
 import { Wallet } from '$lib/models/wallet';
 
@@ -238,6 +239,7 @@ export const actions: Actions = {
 
 export const load: PageServerLoad = async ({ locals }) => {
   const operator = locals.operator as OperatorDocument;
+  const user = locals.user as UserDocument;
   if (!operator) {
     throw redirect(307, websiteUrl);
   }
@@ -250,6 +252,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
   return {
     operator: operator.toObject({ flattenObjectIds: true, flattenMaps: true }),
+    user: user.toObject({ flattenObjectIds: true, flattenMaps: true }),
     agents: agents.map((agent) =>
       agent.toObject({ flattenObjectIds: true, flattenMaps: true })
     ),

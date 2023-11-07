@@ -28,7 +28,6 @@
 
   import ProfilePhoto from '$components/ProfilePhoto.svelte';
   import ShowDetail from '$components/ShowDetail.svelte';
-  import { nameStore } from '$stores';
 
   import CreatorActivity from './CreatorActivity.svelte';
   import CreatorWallet from './CreatorWallet.svelte';
@@ -75,7 +74,6 @@
   let showMachineService: ShowMachineServiceType;
   const destination = creator.user.payoutAddress;
 
-  nameStore.set(creator.user.name);
 
   const noCurrentShow = () => {
     canCreateShow = true;

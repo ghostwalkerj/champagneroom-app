@@ -1,4 +1,5 @@
-import { error, fail } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
+import to from 'await-to-js';
 import jwt from 'jsonwebtoken';
 
 import {
@@ -214,8 +215,14 @@ export const actions: Actions = {
   }
 } satisfies Actions;
 
-export const load: PageServerLoad = async ({ url }) => {
+export const load: PageServerLoad = async ({ url, cookies }) => {
   const returnPath = url.searchParams.get('returnPath');
+  const shouldSignOut = url.searchParams.has('signOut');
+
+  if (shouldSignOut) {
+    cookies.delete(tokenName, { path: '/' });
+    return { signOut: true };
+  }
   if (!returnPath) {
     throw error(400, 'Missing Return Path');
   }
@@ -228,15 +235,12 @@ export const load: PageServerLoad = async ({ url }) => {
   let authType = AuthType.SIGNING;
 
   if (isPinMatch(returnPath)) {
-    console.log('Pin match');
     authType = AuthType.PIN;
   } else if (isPasswordMatch(returnPath)) {
-    console.log('Password match');
     authType = AuthType.PATH_PASSWORD;
   }
   if (isSecretMatch(returnPath)) {
     const pathParts = returnPath.split('/');
-    console.log(pathParts);
     if (pathParts.length >= 4) {
       parseId = pathParts.at(3) || '';
     }
@@ -245,6 +249,7 @@ export const load: PageServerLoad = async ({ url }) => {
   return {
     returnPath,
     authType,
-    parseId
+    parseId,
+    signOut: false
   };
 };

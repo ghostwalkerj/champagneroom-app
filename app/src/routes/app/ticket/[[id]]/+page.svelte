@@ -17,18 +17,16 @@
   import type { TicketMachineServiceType } from '$lib/machines/ticketMachine';
   import { createTicketMachineService } from '$lib/machines/ticketMachine';
 
+  import Config from '$lib/config';
   import { ActorType } from '$lib/constants';
   import { notifyUpdate } from '$lib/notify';
   import type { PaymentType } from '$lib/payment';
   import { connect, defaultWallet, selectedAccount } from '$lib/web3';
 
-  import { nameStore } from '$stores';
-
   import TicketDetail from './TicketDetail.svelte';
   import TicketInvoice from './TicketInvoice.svelte';
 
   import type { ActionData, PageData } from './$types';
-  import Config from '$lib/config';
 
   export let data: PageData;
   export let form: ActionData;
@@ -66,8 +64,6 @@
   let isShowCancelLoading = false;
   $: hasShowStarted = false;
   $: loading = false;
-
-  nameStore.set(user.name);
 
   const walletPay = async () => {
     if ($selectedAccount) {

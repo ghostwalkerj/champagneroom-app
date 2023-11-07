@@ -216,6 +216,7 @@ export const actions: Actions = {
 };
 export const load: PageServerLoad = async ({ locals }) => {
   const creator = locals.creator as CreatorDocument;
+  const user = locals.user;
   if (!creator) {
     throw error(404, 'Creator not found');
   }
@@ -263,6 +264,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
   return {
     creator: creator.toObject({ flattenObjectIds: true, flattenMaps: true }),
+    user: user?.toObject({ flattenObjectIds: true, flattenMaps: true }),
     currentShow: currentShow
       ? currentShow.toObject({ flattenObjectIds: true, flattenMaps: true })
       : undefined,

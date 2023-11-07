@@ -20,8 +20,6 @@
   import { AuthType, currencyFormatter } from '$lib/constants';
   import { womensNames } from '$lib/womensNames';
 
-  import { nameStore } from '$stores';
-
   import type { PageData } from './$types';
 
   export let data: PageData;
@@ -30,8 +28,6 @@
   let creators = data.creators as CreatorDocumentType[];
 
   const disputedTickets = data.disputedTickets;
-
-  nameStore.set(operator.user.name);
 
   $: canAddAgent = false;
   $: canAddCreator = false;
