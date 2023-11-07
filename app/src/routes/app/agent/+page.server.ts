@@ -3,7 +3,7 @@ import { nanoid } from 'nanoid';
 import { generateSillyPassword } from 'silly-password-generator';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 
-import { AUTH_SALT } from '$env/static/private';
+import {  PASSWORD_SALT } from '$env/static/private';
 
 import { Creator } from '$lib/models/creator';
 import { User } from '$lib/models/user';
@@ -47,7 +47,7 @@ export const actions: Actions = {
         secret,
         wallet: wallet._id,
         roles: [EntityType.CREATOR],
-        password: `${password}${AUTH_SALT}`
+        password: `${password}${PASSWORD_SALT}`
       });
       const creator = await Creator.create({
         user: user._id,
@@ -143,7 +143,9 @@ export const load: PageServerLoad = async ({ locals }) => {
 
   return {
     agent: agent.toObject({ flattenObjectIds: true, flattenMaps: true }),
-    user: user.toObject({ flattenObjectIds: true, flattenMaps: true }),
+    user: user
+      ? user.toObject({ flattenObjectIds: true, flattenMaps: true })
+      : undefined,
     creators: creators.map((creator) =>
       creator.toObject({ flattenObjectIds: true, flattenMaps: true })
     )

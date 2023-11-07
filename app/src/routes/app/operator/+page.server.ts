@@ -7,7 +7,7 @@ import { nanoid } from 'nanoid';
 import { generateSillyPassword } from 'silly-password-generator';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 
-import { AUTH_SALT } from '$env/static/private';
+import { PASSWORD_SALT } from '$env/static/private';
 
 import { Agent } from '$lib/models/agent';
 import type { DisputeDecision } from '$lib/models/common';
@@ -106,7 +106,7 @@ export const actions: Actions = {
         secret,
         wallet: wallet._id,
         roles: [EntityType.CREATOR],
-        password: `${password}${AUTH_SALT}`
+        password: `${password}${PASSWORD_SALT}`
       });
       const creator = await Creator.create({
         user: user._id,

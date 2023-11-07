@@ -6,17 +6,17 @@ import { uniqueNamesGenerator } from 'unique-names-generator';
 import urlJoin from 'url-join';
 
 import {
-    AUTH_MAX_AGE,
-    AUTH_SALT,
-    AUTH_TOKEN_NAME,
-    BITCART_API_URL,
-    BITCART_EMAIL,
-    BITCART_INVOICE_NOTIFICATION_PATH,
-    BITCART_NOTIFICATION_HOST,
-    BITCART_PASSWORD,
-    BITCART_STORE_ID,
-    JWT_EXPIRY,
-    JWT_PRIVATE_KEY
+  AUTH_MAX_AGE,
+  AUTH_SALT,
+  AUTH_TOKEN_NAME,
+  BITCART_API_URL,
+  BITCART_EMAIL,
+  BITCART_INVOICE_NOTIFICATION_PATH,
+  BITCART_NOTIFICATION_URL,
+  BITCART_PASSWORD,
+  BITCART_STORE_ID,
+  JWT_EXPIRY,
+  JWT_PRIVATE_KEY
 } from '$env/static/private';
 
 import { Show } from '$lib/models/show';
@@ -35,8 +35,8 @@ import { createAuthToken } from '$lib/payment';
 import { getShowMachineServiceFromId } from '$lib/server/machinesUtil';
 
 import {
-    createInvoiceInvoicesPost,
-    modifyInvoiceInvoicesModelIdPatch
+  createInvoiceInvoicesPost,
+  modifyInvoiceInvoicesModelIdPatch
 } from '$ext/bitcart';
 
 import type { Actions, PageServerLoad } from './$types';
@@ -141,7 +141,7 @@ export const actions: Actions = {
     const encryptedInvoiceId = authEncrypt(invoice.id, AUTH_SALT) ?? '';
 
     invoice.notification_url = urlJoin(
-      BITCART_NOTIFICATION_HOST,
+      BITCART_NOTIFICATION_URL,
       BITCART_INVOICE_NOTIFICATION_PATH,
       encryptedInvoiceId
     );
