@@ -12,4 +12,4 @@ yarn package
 docker-compose --env-file .env.stage -f docker-compose.stage.yml build
 docker tag pcall registry.digitalocean.com/champagne/pcall
 docker push registry.digitalocean.com/champagne/pcall
-copy .env.dev .env
+cp .env.dev .env

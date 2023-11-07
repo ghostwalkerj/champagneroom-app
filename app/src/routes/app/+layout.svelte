@@ -3,8 +3,9 @@
 
   import { format, generate } from 'build-number-generator';
   import { onMount } from 'svelte';
+  import { compute_rest_props } from 'svelte/internal';
 
-  import { goto } from '$app/navigation';
+  import { goto, invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
 
   import Config from '$lib/config';
@@ -30,14 +31,20 @@
     selectedAccount.subscribe((account) => {
       if (account && lastAddress && account.address !== lastAddress) {
         lastAddress = account.address;
-        isAuthenticated && authType === AuthType.SIGNING && goto(signOut);
+        if (isAuthenticated && authType === AuthType.SIGNING) {
+          invalidateAll();
+          goto(signOut);
+        }
       }
       if (account && !lastAddress) {
         lastAddress = account.address;
       }
       if (!account && lastAddress) {
         lastAddress = undefined;
-        isAuthenticated && authType === AuthType.SIGNING && goto(signOut);
+        if (isAuthenticated && authType === AuthType.SIGNING) {
+          invalidateAll();
+          goto(signOut);
+        }
       }
     });
   });

@@ -162,9 +162,11 @@
   {:else if noUser && authType === AuthType.SIGNING}
     <div class="card w-96 bg-neutral text-neutral-content m-10">
       <div class="card-body items-center text-center">
-        <h2 class="card-title">Would you like to Sign Up?</h2>
+        <h2 class="card-title">
+          Address: {walletAddress?.slice(0, 6)}...{walletAddress.slice(-4)} not found
+        </h2>
         <p>
-          Address: {walletAddress?.slice(0, 6)}...{walletAddress.slice(-4)} not found.
+          This address is not registered with us. Please signup to continue.
         </p>
         <div class="card-actions justify-end">
           <button
