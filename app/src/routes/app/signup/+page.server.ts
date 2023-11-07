@@ -6,6 +6,7 @@ import { AUTH_SIGNING_MESSAGE } from '$env/static/private';
 import { Creator } from '$lib/models/creator';
 import type { UserDocument } from '$lib/models/user';
 import { User } from '$lib/models/user';
+import type { WalletDocument } from '$lib/models/wallet';
 import { Wallet } from '$lib/models/wallet';
 
 import Config from '$lib/config';
@@ -53,13 +54,15 @@ export const actions: Actions = {
 
     // Verify Auth
     if (!verifySignature(message, address, signature)) {
-      throw error(400, 'Invalid Signature');
+      return fail(400, { invalidSignature: true });
     }
 
     // Check if existing user, if so, add the role
     const user = await User.findOne({ address: address.toLowerCase() });
     if (user) {
-      if (!user.roles.includes(EntityType.CREATOR)) {
+      if (user.roles.includes(EntityType.CREATOR)) {
+        return fail(400, { alreadyCreator: true });
+      } else {
         user.roles.push(EntityType.CREATOR);
         user.name = name;
         await user.save();
@@ -69,11 +72,12 @@ export const actions: Actions = {
           agentCommission: 0,
           profileImageUrl
         });
+
+        return {
+          success: true,
+          returnPath
+        };
       }
-      return {
-        success: true,
-        returnPath
-      };
     } else {
       try {
         const wallet = new Wallet();
@@ -112,5 +116,7 @@ export const load: PageServerLoad = async ({ locals }) => {
   return {
     message,
     user: user?.toObject({ flattenObjectIds: true, flattenMaps: true })
+      ? user.toObject({ flattenObjectIds: true, flattenMaps: true })
+      : undefined
   };
 };

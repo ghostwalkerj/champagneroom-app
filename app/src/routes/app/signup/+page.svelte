@@ -3,7 +3,7 @@
   import { onMount } from 'svelte';
   import { uniqueNamesGenerator } from 'unique-names-generator';
 
-  import { enhance } from '$app/forms';
+  import { applyAction, enhance } from '$app/forms';
   import { goto } from '$app/navigation';
 
   import Config from '$lib/config';
@@ -20,12 +20,14 @@
 
   const message = data.message;
   const user = data.user;
-  let walletAddress = '';
+
+  $: walletAddress = '';
   let wallet: WalletState | undefined;
 
   let introModel: HTMLDialogElement;
   let addressModel: HTMLDialogElement;
   let signupModel: HTMLDialogElement;
+  let existsModel: HTMLDialogElement;
   let profileImageUrl = Config.UI.defaultProfileImage;
 
   let exampleName = user
@@ -41,11 +43,21 @@
   };
 
   onMount(async () => {
-    introModel.showModal();
     defaultWallet.subscribe((_wallet) => {
       if (_wallet) {
         wallet = _wallet;
         walletAddress = _wallet.accounts[0].address;
+        introModel.close();
+        if (
+          user &&
+          user.address.toLowerCase() === walletAddress.toLowerCase()
+        ) {
+          existsModel.showModal();
+          addressModel.close();
+        } else {
+          existsModel.close();
+          addressModel.showModal();
+        }
       } else {
         walletAddress = '';
         wallet = undefined;
@@ -69,7 +81,12 @@
     return async ({ result }) => {
       if (result?.type === 'success') {
         goto(result.data.returnPath);
+      } else {
+        if (result?.data?.alreadyCreator) {
+          existsModel.showModal();
+        }
       }
+      applyAction(result);
     };
   };
 </script>
@@ -171,6 +188,45 @@
           <div class="modal-action place-content-center gap-10">
             <!-- if there is a button in form, it will close the modal -->
             <ConnectButton />
+            <button
+              class="btn btn-secondary btn-outline"
+              on:click={() => goto('/')}>Cancel</button
+            >
+          </div>
+        </div>
+      {/if}
+    </form>
+  </dialog>
+
+  <dialog id="exist_model" class="modal" bind:this={existsModel}>
+    <form
+      method="dialog"
+      class="modal-box bg-gradient-to-r from-[#0C082E] to-[#0C092E]
+"
+      action="?/null_action"
+    >
+      {#if wallet}
+        <div>
+          <div class="w-full flex flex-col place-content-center">
+            <div class="w-full flex place-content-center">
+              <img
+                src="{Config.Path.staticUrl}/assets/bottlesnlegs.png"
+                alt="Logo"
+                class="h-16"
+              />
+            </div>
+          </div>
+          <div class="font-medium text-primary text-2xl text-center">
+            This Address is already a Creator
+          </div>
+          <div class="mt-4 font-medium text-accent text-md text-center">
+            {walletAddress}
+          </div>
+          <div class="mt-4 font-medium text-secondary text-sm text-center">
+            To use a different address, change the account connected in your
+            wallet
+          </div>
+          <div class="modal-action place-content-center gap-10">
             <button
               class="btn btn-secondary btn-outline"
               on:click={() => goto('/')}>Cancel</button
