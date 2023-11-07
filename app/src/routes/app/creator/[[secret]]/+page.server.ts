@@ -26,7 +26,7 @@ import type { ShowQueueType } from '$lib/workers/showWorker';
 
 import { ActorType, EntityType } from '$lib/constants';
 import { rateCryptosRateGet } from '$lib/ext/bitcart';
-import { createAuthToken, PayoutJobType, PayoutReason } from '$lib/payment';
+import { PayoutJobType, PayoutReason, createAuthToken } from '$lib/payment';
 import {
   getShowMachineService,
   getShowMachineServiceFromId

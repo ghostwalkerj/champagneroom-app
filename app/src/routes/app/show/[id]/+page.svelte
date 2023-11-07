@@ -1,7 +1,8 @@
 <script lang="ts">
+  import type { ActionResult } from '@sveltejs/kit';
   import { onDestroy, onMount } from 'svelte';
 
-  import { applyAction, enhance } from '$app/forms';
+  import { applyAction, deserialize, enhance } from '$app/forms';
 
   import { ShowStatus } from '$lib/models/show';
 
@@ -23,6 +24,19 @@
   $: profileImage = getProfileImage(displayName, Config.UI.profileImagePath);
   $: canBuyTicket =
     show.showState.status === ShowStatus.BOX_OFFICE_OPEN || isBuyingTicket;
+  const setPinAuth = async (userId: string, pin: string) => {
+    const body = new FormData();
+    body.append('pin', pin);
+    body.append('userId', userId);
+    const response = await fetch('?/pin_auth', {
+      method: 'POST',
+      body,
+      redirect: 'follow'
+    });
+
+    const result: ActionResult = deserialize(await response.text());
+    applyAction(result);
+  };
   const onSubmit = () => {
     isBuyingTicket = true;
     isLoading = true;
@@ -32,6 +46,9 @@
         isBuyingTicket = false;
       }
       await applyAction(result);
+      if (result.type === 'success') {
+        await setPinAuth(result.data.userId, result.data.pin);
+      }
     };
   };
   onMount(() => {

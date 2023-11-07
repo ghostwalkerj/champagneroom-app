@@ -1,6 +1,8 @@
-import { error, fail, redirect } from '@sveltejs/kit';
-import to from 'await-to-js';
+
+import { error, fail } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
+import type { ObjectId } from 'mongoose';
+import { satisfies } from 'semver';
 
 import {
   AUTH_MAX_AGE,
@@ -11,10 +13,11 @@ import {
   JWT_PRIVATE_KEY
 } from '$env/static/private';
 
+import { Ticket } from '$lib/models/ticket';
 import { User } from '$lib/models/user';
 
 import { AuthType } from '$lib/constants';
-import { authDecrypt, authEncrypt } from '$lib/crypt';
+import { authEncrypt } from '$lib/crypt';
 import {
   isPasswordMatch,
   isPinMatch,
@@ -156,26 +159,47 @@ export const actions: Actions = {
       });
     return { success: true };
   },
-  pin_auth: async ({ cookies }) => {
-    const pin = cookies.get('pin');
-    const userId = cookies.get('userId') as string;
+  pin_auth: async ({ cookies, request }) => {
+    const data = await request.formData();
+    const pin = data.get('pin') as string;
+    const parseId = data.get('parseId') as string;
+    const type = data.get('type') as string;
 
     if (!pin) {
       console.error('No pin');
-      return fail(400, { badPin: true });
+      return fail(400, { missingPin: true });
     }
 
+    const isNumber = /^\d+$/.test(pin);
+    if (!isNumber) {
+      return fail(400, { pin, invalidPin: true });
+    }
+
+    let userId: ObjectId | undefined;
+
+    switch (type.toLowerCase()) {
+      case 'ticket': {
+        const ticket = await Ticket.findById(
+          parseId,
+          {},
+          { autopopulate: false }
+        )
+          .select('user')
+          .exec();
+        userId = ticket?.user as unknown as ObjectId;
+        break;
+      } // possible more models here
+
+      default: {
+        break;
+      }
+    }
     if (!userId) {
       console.error('No userId');
-      return fail(400, { badUserId: true });
+      return fail(400, { missingUserId: true });
     }
 
-    const clearPin = authDecrypt(pin, AUTH_SALT);
-    const clearUserId = authDecrypt(userId, AUTH_SALT);
-
-    const user = await User.findOne({
-      _id: clearUserId
-    });
+    const user = await User.findById(userId);
     if (!user) {
       console.error('User not found');
       return fail(404, {
@@ -183,34 +207,32 @@ export const actions: Actions = {
       });
     }
 
-    if (clearPin && clearUserId) {
-      const goodPin = user.comparePassword(clearPin);
-      if (!goodPin) {
-        console.error('Bad pin');
-        return fail(400, { badPin: true });
-      }
-      const authToken = jwt.sign(
-        {
-          selector: '_id',
-          password: clearPin,
-          _id: clearUserId,
-          exp: Math.floor(Date.now() / 1000) + +JWT_EXPIRY,
-          authType: AuthType.PIN
-        },
-        JWT_PRIVATE_KEY
-      );
-
-      const encAuthToken = authEncrypt(authToken, AUTH_SALT);
-
-      encAuthToken &&
-        cookies.set(tokenName, encAuthToken, {
-          path: '/',
-          httpOnly: true,
-          sameSite: 'strict',
-          maxAge: +AUTH_MAX_AGE,
-          expires: new Date(Date.now() + +AUTH_MAX_AGE)
-        });
+    const isGood = await user.comparePassword(pin);
+    if (!isGood) {
+      console.error('Bad pin');
+      return fail(400, { badPin: true });
     }
+    const authToken = jwt.sign(
+      {
+        selector: '_id',
+        _id: userId,
+        exp: Math.floor(Date.now() / 1000) + +JWT_EXPIRY,
+        authType: AuthType.PIN
+      },
+      JWT_PRIVATE_KEY
+    );
+
+    const encAuthToken = authEncrypt(authToken, AUTH_SALT);
+
+    encAuthToken &&
+      cookies.set(tokenName, encAuthToken, {
+        path: '/',
+        httpOnly: true,
+        sameSite: 'strict',
+        maxAge: +AUTH_MAX_AGE,
+        expires: new Date(Date.now() + +AUTH_MAX_AGE)
+      });
+
     return { success: true };
   }
 } satisfies Actions;
@@ -228,6 +250,7 @@ export const load: PageServerLoad = async ({ url, cookies }) => {
   }
 
   let parseId = '';
+  let type = '';
 
   if (!returnPath) {
     throw error(400, 'Missing Return Path');
@@ -243,6 +266,7 @@ export const load: PageServerLoad = async ({ url, cookies }) => {
     const pathParts = returnPath.split('/');
     if (pathParts.length >= 4) {
       parseId = pathParts.at(3) || '';
+      type = pathParts.at(2) || '';
     }
   }
 
@@ -250,6 +274,7 @@ export const load: PageServerLoad = async ({ url, cookies }) => {
     returnPath,
     authType,
     parseId,
+    type,
     signOut: false
   };
 };

@@ -7,7 +7,7 @@
   import { page } from '$app/stores';
   import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
-  import { type ShowDocumentType, ShowStatus } from '$lib/models/show';
+  import { ShowStatus, type ShowDocumentType } from '$lib/models/show';
   import type { UserDocument } from '$lib/models/user';
 
   import Config from '$lib/config';

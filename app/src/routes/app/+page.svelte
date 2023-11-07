@@ -4,7 +4,7 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
-  import { type UserDocument, UserRole } from '$lib/models/user';
+  import { UserRole, type UserDocument } from '$lib/models/user';
 
   import Config from '$lib/config';
 

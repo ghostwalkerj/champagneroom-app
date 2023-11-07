@@ -26,7 +26,7 @@ import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 import type { PayoutQueueType } from '$lib/workers/payoutWorker';
 
 import { ActorType, EntityType } from '$lib/constants';
-import { createAuthToken, InvoiceJobType, PayoutJobType } from '$lib/payment';
+import { InvoiceJobType, PayoutJobType, createAuthToken } from '$lib/payment';
 import {
   getTicketMachineService,
   getTicketMachineServiceFromId

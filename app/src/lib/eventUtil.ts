@@ -1,8 +1,8 @@
 import * as timeago from 'timeago.js';
 
 import type {
-  ShowEventDocument,
-  ShowEventDocumentType
+    ShowEventDocument,
+    ShowEventDocumentType
 } from '$lib/models/showEvent';
 
 export const createEventText = (

@@ -1,17 +1,22 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
+import jwt from 'jsonwebtoken';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 import urlJoin from 'url-join';
 
 import {
+  AUTH_MAX_AGE,
   AUTH_SALT,
+  AUTH_TOKEN_NAME,
   BITCART_API_URL,
   BITCART_EMAIL,
   BITCART_INVOICE_NOTIFICATION_PATH,
   BITCART_NOTIFICATION_HOST,
   BITCART_PASSWORD,
-  BITCART_STORE_ID
+  BITCART_STORE_ID,
+  JWT_EXPIRY,
+  JWT_PRIVATE_KEY
 } from '$env/static/private';
 
 import { Show } from '$lib/models/show';
@@ -35,6 +40,8 @@ import {
 } from '$ext/bitcart';
 
 import type { Actions, PageServerLoad } from './$types';
+
+const tokenName = AUTH_TOKEN_NAME || 'token';
 
 export const actions: Actions = {
   reserve_ticket: async ({ params, cookies, request, url, locals }) => {
@@ -164,18 +171,34 @@ export const actions: Actions = {
       customerName: name
     });
 
-    const userId = authEncrypt(user._id.toString(), AUTH_SALT);
-    const encryptedPin = authEncrypt(pin, AUTH_SALT);
-    if (!userId || !encryptedPin) {
-      return error(501, 'Show cannot Reserve Ticket');
-    }
-    cookies.set('pin', encryptedPin, { path: Config.Path.auth });
-    cookies.set('userId', userId, { path: Config.Path.auth });
     const redirectUrl = urlJoin(
       url.origin,
       Config.Path.ticket,
       ticket._id.toString()
     );
+
+    const authToken = jwt.sign(
+      {
+        selector: '_id',
+        password: pin,
+        _id: user._id.toString(),
+        exp: Math.floor(Date.now() / 1000) + +JWT_EXPIRY,
+        authType: AuthType.PIN
+      },
+      JWT_PRIVATE_KEY
+    );
+
+    const encAuthToken = authEncrypt(authToken, AUTH_SALT);
+
+    encAuthToken &&
+      cookies.set(tokenName, encAuthToken, {
+        path: '/',
+        httpOnly: true,
+        sameSite: 'strict',
+        maxAge: +AUTH_MAX_AGE,
+        expires: new Date(Date.now() + +AUTH_MAX_AGE)
+      });
+
     throw redirect(302, redirectUrl);
   }
 };

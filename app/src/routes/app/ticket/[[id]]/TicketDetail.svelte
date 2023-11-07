@@ -2,7 +2,7 @@
   import urlJoin from 'url-join';
 
   import type { ShowDocumentType } from '$lib/models/show';
-  import { type TicketDocumentType, TicketStatus } from '$lib/models/ticket';
+  import { TicketStatus, type TicketDocumentType } from '$lib/models/ticket';
   import type { UserDocument } from '$lib/models/user';
 
   import Config from '$lib/config';

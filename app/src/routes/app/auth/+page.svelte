@@ -3,7 +3,7 @@
   import type { WalletState } from '@web3-onboard/core';
   import { onMount } from 'svelte';
 
-  import { deserialize } from '$app/forms';
+  import { applyAction, deserialize, enhance } from '$app/forms';
   import { goto } from '$app/navigation';
 
   import Config from '$lib/config';
@@ -12,11 +12,12 @@
 
   import ConnectButton from '$components/header/ConnectButton.svelte';
 
-  import type { PageData } from './$types';
+  import type { ActionData, PageData } from './$types';
 
   export let data: PageData;
+  export let form: ActionData;
 
-  let { returnPath, authType, parseId, signOut } = data;
+  let { returnPath, authType, parseId, signOut, type } = data;
 
   $: hasNoWallet = false;
   $: signingRejected = false;
@@ -26,7 +27,14 @@
   let walletAddress = '';
   let message = '';
 
-  const applyAction = (result: ActionResult) => {
+  const onSubmit = () => {
+    return async ({ result }) => {
+      authAction(result);
+      applyAction(result);
+    };
+  };
+
+  const authAction = (result: ActionResult) => {
     switch (result.type) {
       case 'error': {
         goto('/');
@@ -66,7 +74,7 @@
     });
 
     const result: ActionResult = deserialize(await response.text());
-    applyAction(result);
+    authAction(result);
   };
 
   const setPasswordAuth = async () => {
@@ -80,18 +88,7 @@
     });
 
     const result: ActionResult = deserialize(await response.text());
-    applyAction(result);
-  };
-
-  const setPinAuth = async () => {
-    const response = await fetch('?/pin_auth', {
-      method: 'POST',
-      body: new FormData(),
-      redirect: 'follow'
-    });
-
-    const result: ActionResult = deserialize(await response.text());
-    applyAction(result);
+    authAction(result);
   };
 
   const signMessage = async () => {
@@ -144,11 +141,6 @@
             signMessage();
           }
         });
-        break;
-      }
-
-      case AuthType.PIN: {
-        setPinAuth();
         break;
       }
 
@@ -214,8 +206,60 @@
       Verifying Path
     </div>
   {:else if authType === AuthType.PIN}
-    <div class="font-bold text-5xl text-primary w-full font-CaviarDreams">
+    <!-- <div class="font-bold text-5xl text-primary w-full font-CaviarDreams">
       Verifying PIN
+    </div> -->
+
+    <div class="mt-6 flex items-center">
+      <div class="min-w-full">
+        <div class="flex justify-center">
+          <div
+            class="flex flex-col w-full p-4 max-w-fit gap-4 rounded-xl bg-base-200 overflow-auto"
+          >
+            <form method="post" action="?/pin_auth" use:enhance={onSubmit}>
+              <input type="hidden" name="parseId" value={parseId} />
+              <input type="hidden" name="type" value={type} />
+              <div class="max-w-xs w-full py-2 form-control">
+                <div class="max-w-xs w-full py-2 form-control">
+                  <label for="pin" class="label">
+                    <span class="label-text">8 Digit Pin</span></label
+                  >
+                  <div class="rounded-md shadow-sm mt-1 relative">
+                    <input
+                      name="pin"
+                      type="text"
+                      class="max-w-xs w-full py-2 pl-6 input input-bordered input-primary"
+                      value={form?.pin ?? ''}
+                      minlength="8"
+                      maxlength="8"
+                    />
+                    {#if form?.missingPin}<div
+                        class="shadow-lg alert alert-error"
+                      >
+                        Pin is required
+                      </div>{/if}
+                    {#if form?.invalidPin}<div
+                        class="shadow-lg alert alert-error"
+                      >
+                        Pin must be 8 digits
+                      </div>{/if}
+                    {#if form?.badPin}<div class="shadow-lg alert alert-error">
+                        Incorrect Pin
+                      </div>{/if}
+                    <div class="text-center text-sm p-1">
+                      You need a pin to see this ticket
+                    </div>
+                  </div>
+                </div>
+
+                <div class="py-4 text-center">
+                  <button class="btn btn-primary" type="submit">Submit</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
   {/if}
 </div>

@@ -5,11 +5,11 @@ import { nanoid } from 'nanoid';
 
 import type { refundSchema, saleSchema } from './common';
 import {
-  cancelSchema,
-  CurrencyType,
-  escrowSchema,
-  finalizeSchema,
-  moneySchema
+    CurrencyType,
+    cancelSchema,
+    escrowSchema,
+    finalizeSchema,
+    moneySchema
 } from './common';
 
 const { Schema, models } = pkg;

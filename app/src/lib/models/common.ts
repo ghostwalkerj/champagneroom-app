@@ -1,4 +1,4 @@
-import { type InferSchemaType, Schema } from 'mongoose';
+import { Schema, type InferSchemaType } from 'mongoose';
 
 import { ActorType } from '$lib/constants';
 import { PayoutStatus } from '$lib/payment';
