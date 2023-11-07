@@ -20,23 +20,24 @@
   export let data: LayoutData;
 
   const isAuthenticated = data.isAuthenticated;
+  const authType = data.authType;
   const buildNumber = generate(version);
   const buildTime = format(buildNumber);
   let lastAddress: string | undefined;
-  const authUrl = Config.Path.auth + '?signOut';
+  const signOut = Config.Path.auth + '?signOut';
 
   onMount(() => {
     selectedAccount.subscribe((account) => {
       if (account && lastAddress && account.address !== lastAddress) {
         lastAddress = account.address;
-        isAuthenticated && goto(authUrl);
+        isAuthenticated && authType === AuthType.SIGNING && goto(signOut);
       }
       if (account && !lastAddress) {
         lastAddress = account.address;
       }
       if (!account && lastAddress) {
         lastAddress = undefined;
-        isAuthenticated && goto(authUrl);
+        isAuthenticated && authType === AuthType.SIGNING && goto(signOut);
       }
     });
   });
