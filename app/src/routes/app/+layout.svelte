@@ -23,13 +23,12 @@
   const buildNumber = generate(version);
   const buildTime = format(buildNumber);
   let lastAddress: string | undefined;
-  const authUrl = Config.Path.auth;
+  const authUrl = Config.Path.auth + '?signOut';
 
   onMount(() => {
     selectedAccount.subscribe((account) => {
       if (account && lastAddress && account.address !== lastAddress) {
         lastAddress = account.address;
-        console.log('address changed');
         isAuthenticated && goto(authUrl);
       }
       if (account && !lastAddress) {
@@ -37,8 +36,6 @@
       }
       if (!account && lastAddress) {
         lastAddress = undefined;
-        console.log('address changed');
-
         isAuthenticated && goto(authUrl);
       }
     });

@@ -12,7 +12,7 @@ import {
 import type { CancelType } from '$lib/models/common';
 import { CancelReason, CurrencyType } from '$lib/models/common';
 import type { CreatorDocument } from '$lib/models/creator';
-import type { ShowDocument, ShowDocumentType } from '$lib/models/show';
+import type { ShowDocument } from '$lib/models/show';
 import { Show, ShowStatus } from '$lib/models/show';
 import { ShowEvent } from '$lib/models/showEvent';
 import type { WalletDocument } from '$lib/models/wallet';
