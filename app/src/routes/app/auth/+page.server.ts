@@ -1,8 +1,6 @@
-
 import { error, fail } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import type { ObjectId } from 'mongoose';
-import { satisfies } from 'semver';
 
 import {
   AUTH_MAX_AGE,

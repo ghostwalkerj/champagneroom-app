@@ -5,9 +5,9 @@ import jwt from 'jsonwebtoken';
 import urlJoin from 'url-join';
 
 import {
-  JITSI_APP_ID,
-  JITSI_JWT_SECRET,
-  JWT_EXPIRY
+    JITSI_APP_ID,
+    JITSI_JWT_SECRET,
+    JWT_EXPIRY
 } from '$env/static/private';
 import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 

@@ -120,7 +120,7 @@ mongoose.connection.on('connected', () => {
   console.log('Mongoose connected:', mongoose.connection.name);
 });
 app.listen(port, () => {
-  console.log('Champagne server running on:', port);
+  console.log('Champagne Server running on:', port);
   console.log('Workers running:', startWorker);
   console.log('Build number:', buildNumber);
   console.log('Build time:', buildTime);

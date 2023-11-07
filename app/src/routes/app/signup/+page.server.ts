@@ -1,4 +1,4 @@
-import { error, fail } from '@sveltejs/kit';
+import { fail } from '@sveltejs/kit';
 import * as web3 from 'web3';
 
 import { AUTH_SIGNING_MESSAGE } from '$env/static/private';
@@ -6,7 +6,6 @@ import { AUTH_SIGNING_MESSAGE } from '$env/static/private';
 import { Creator } from '$lib/models/creator';
 import type { UserDocument } from '$lib/models/user';
 import { User } from '$lib/models/user';
-import type { WalletDocument } from '$lib/models/wallet';
 import { Wallet } from '$lib/models/wallet';
 
 import Config from '$lib/config';

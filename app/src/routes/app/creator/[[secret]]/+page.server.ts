@@ -4,9 +4,9 @@ import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 
 import {
-  BITCART_API_URL,
-  BITCART_EMAIL,
-  BITCART_PASSWORD
+    BITCART_API_URL,
+    BITCART_EMAIL,
+    BITCART_PASSWORD
 } from '$env/static/private';
 
 import type { CancelType } from '$lib/models/common';
@@ -28,8 +28,8 @@ import { ActorType, EntityType } from '$lib/constants';
 import { rateCryptosRateGet } from '$lib/ext/bitcart';
 import { PayoutJobType, PayoutReason, createAuthToken } from '$lib/payment';
 import {
-  getShowMachineService,
-  getShowMachineServiceFromId
+    getShowMachineService,
+    getShowMachineServiceFromId
 } from '$lib/server/machinesUtil';
 
 import type { Actions, PageServerLoad, RequestEvent } from './$types';

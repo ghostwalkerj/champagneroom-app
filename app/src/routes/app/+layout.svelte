@@ -3,7 +3,6 @@
 
   import { format, generate } from 'build-number-generator';
   import { onMount } from 'svelte';
-  import { compute_rest_props } from 'svelte/internal';
 
   import { goto, invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';

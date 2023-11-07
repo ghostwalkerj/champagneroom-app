@@ -5,17 +5,17 @@ import type IORedis from 'ioredis';
 import { Types } from 'mongoose';
 
 import {
-  BITCART_API_URL,
-  BITCART_EMAIL,
-  BITCART_PASSWORD
+    BITCART_API_URL,
+    BITCART_EMAIL,
+    BITCART_PASSWORD
 } from '$env/static/private';
 
 import type {
-  CancelType,
-  DisputeReason,
-  DisputeType,
-  FeedbackType,
-  RefundType
+    CancelType,
+    DisputeReason,
+    DisputeType,
+    FeedbackType,
+    RefundType
 } from '$lib/models/common';
 import { CancelReason, RefundReason } from '$lib/models/common';
 import { Show } from '$lib/models/show';
@@ -28,13 +28,13 @@ import type { PayoutQueueType } from '$lib/workers/payoutWorker';
 import { ActorType, EntityType } from '$lib/constants';
 import { InvoiceJobType, PayoutJobType, createAuthToken } from '$lib/payment';
 import {
-  getTicketMachineService,
-  getTicketMachineServiceFromId
+    getTicketMachineService,
+    getTicketMachineServiceFromId
 } from '$lib/server/machinesUtil';
 
 import {
-  getInvoiceByIdInvoicesModelIdGet,
-  updatePaymentDetailsInvoicesModelIdDetailsPatch
+    getInvoiceByIdInvoicesModelIdGet,
+    updatePaymentDetailsInvoicesModelIdDetailsPatch
 } from '$ext/bitcart';
 import type { DisplayInvoice } from '$ext/bitcart/models';
 
