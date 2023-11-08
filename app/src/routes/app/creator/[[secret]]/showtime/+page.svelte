@@ -3,7 +3,6 @@
 
   import { browser } from '$app/environment';
   import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
   import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
   import type { CreatorDocumentType } from '$lib/models/creator';

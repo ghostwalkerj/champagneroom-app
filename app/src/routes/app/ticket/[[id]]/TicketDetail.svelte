@@ -2,7 +2,7 @@
   import urlJoin from 'url-join';
 
   import type { ShowDocumentType } from '$lib/models/show';
-  import { TicketStatus, type TicketDocumentType } from '$lib/models/ticket';
+  import { type TicketDocumentType, TicketStatus } from '$lib/models/ticket';
   import type { UserDocument } from '$lib/models/user';
 
   import Config from '$lib/config';
@@ -54,7 +54,7 @@
       <div
         class="col-span-2 relative flex flex-col p-4 text-info font-bold text-sm h-full place-content-center"
       >
-        {#if ticketStatus === TicketStatus.CANCELLED}
+        {#if ticket.ticketState.status === TicketStatus.CANCELLED}
           <div
             class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-2xl whitespace-nowrap font-extrabold text-primary ring-2 ring-primary bg-base-200 p-2 ring-inset rounded-xl z-20 opacity-70 -rotate-[20deg]"
           >
@@ -62,6 +62,13 @@
           </div>
         {/if}
 
+        {#if ticket.ticketState.status === TicketStatus.FINALIZED}
+          <div
+            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-2xl whitespace-nowrap font-extrabold text-primary ring-2 ring-primary bg-base-200 p-2 ring-inset rounded-xl z-20 opacity-70 -rotate-[20deg]"
+          >
+            Show's Over
+          </div>
+        {/if}
         <div
           class="bg-center bg-cover h-28 opacity-10 absolute inset-0 top-2"
           style="background-image: url('{Config.Path

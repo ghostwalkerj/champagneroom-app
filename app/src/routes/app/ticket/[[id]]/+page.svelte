@@ -10,7 +10,7 @@
 
   import type { RefundType } from '$lib/models/common';
   import { DisputeReason, RefundReason } from '$lib/models/common';
-  import { ShowStatus, type ShowDocumentType } from '$lib/models/show';
+  import { type ShowDocumentType, ShowStatus } from '$lib/models/show';
   import type { TicketDocumentType } from '$lib/models/ticket';
   import type { UserDocument } from '$lib/models/user';
 
@@ -173,6 +173,10 @@
   };
 
   onMount(() => {
+    if (show) {
+      hasShowStarted = show.showState.status === ShowStatus.LIVE;
+      isShowInEscrow = show.showState.status === ShowStatus.IN_ESCROW;
+    }
     if (ticket.ticketState.active) {
       isTicketDone = false;
       useTicketMachine(
