@@ -17,7 +17,7 @@
   export let data: PageData;
   export let form: ActionData;
 
-  let { returnPath, authType, parseId, signOut, type } = data;
+  let { returnPath, authType, parseId, shouldSignOut, type } = data;
 
   $: hasNoWallet = false;
   $: signingRejected = false;
@@ -124,15 +124,10 @@
   };
 
   onMount(async () => {
-    if (signOut) {
+    if (shouldSignOut) {
       return;
     }
     switch (authType) {
-      case AuthType.PATH_PASSWORD: {
-        setPasswordAuth();
-        break;
-      }
-
       case AuthType.SIGNING: {
         defaultWallet.subscribe(async (_wallet) => {
           hasNoWallet = _wallet === undefined;
@@ -152,7 +147,7 @@
 </script>
 
 <div class="w-screen bg-base flex flex-col p-6 text-center items-center">
-  {#if signOut}
+  {#if shouldSignOut}
     <div class="font-bold text-5xl text-primary w-full font-CaviarDreams">
       You have been signed out
     </div>
@@ -214,7 +209,11 @@
           <div
             class="flex flex-col w-full p-4 max-w-fit gap-4 rounded-xl bg-base-200 overflow-auto"
           >
-            <form method="post" action="?/signing_auth" use:enhance={onSubmit}>
+            <form
+              method="post"
+              action="?/password_secret_auth"
+              use:enhance={onSubmit}
+            >
               <input type="hidden" name="parseId" value={parseId} />
               <input type="hidden" name="type" value={type} />
               <div class="max-w-xs w-full py-2 form-control">

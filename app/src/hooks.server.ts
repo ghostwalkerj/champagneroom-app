@@ -138,7 +138,8 @@ const allowedPath = (path: string, locals: App.Locals, selector?: string) => {
 
   // If the user is a creator, they can access their own page
   if (isPasswordMatch(path)) {
-    return locals.creator && path === `${Config.Path.creator}/${slug}`;
+    const creatorUrl = `${Config.Path.creator}/${slug}`;
+    return locals.creator && path.startsWith(creatorUrl);
   }
 
   // If the user is a ticket holder, they can access their own ticket

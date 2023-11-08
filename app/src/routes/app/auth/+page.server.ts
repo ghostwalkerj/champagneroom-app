@@ -8,10 +8,12 @@ import {
   AUTH_SIGNING_MESSAGE,
   AUTH_TOKEN_NAME,
   JWT_EXPIRY,
-  JWT_PRIVATE_KEY
+  JWT_PRIVATE_KEY,
+  PASSWORD_SALT
 } from '$env/static/private';
 
 import { Ticket } from '$lib/models/ticket';
+import type { UserDocument } from '$lib/models/user';
 import { User } from '$lib/models/user';
 
 import { AuthType } from '$lib/constants';
@@ -114,30 +116,60 @@ export const actions: Actions = {
   password_secret_auth: async ({ cookies, request }) => {
     const data = await request.formData();
     const parseId = data.get('parseId') as string;
+    const type = data.get('type') as string;
+    const password = data.get('password') as string;
+
+    let selector = '';
 
     if (!parseId) {
       console.error('No parseId');
       return fail(400, { missingParseId: true });
     }
 
-    // Check if user exists
-    const exists = await User.exists({
-      secret: parseId,
-      authType: AuthType.PATH_PASSWORD
-    }).exec();
+    if (!password) {
+      console.error('No password');
+      return fail(400, { missingPassword: true });
+    }
 
-    if (!exists) {
-      console.error('User not found');
-      return fail(404, {
-        userNotFound: true
-      });
+    let user: UserDocument | undefined;
+    switch (type.toLowerCase()) {
+      case 'creator': {
+        selector = 'secret';
+
+        const query = {};
+        query[selector] = parseId;
+
+        user = (await User.findOne(query)) as UserDocument;
+        if (!user) {
+          console.error('No user');
+          console.log('query', query);
+          throw error(500, 'No user');
+        }
+        break;
+      } // possible more models here
+
+      default: {
+        user = undefined;
+        break;
+      }
+    }
+
+    if (!user) {
+      console.error('No user');
+      return fail(400, { missingUser: true });
+    }
+
+    const isGood = await user.comparePassword(`${password}${PASSWORD_SALT}`);
+    if (!isGood) {
+      console.error('Bad Password');
+      return fail(400, { badPassword: true });
     }
 
     const authToken = jwt.sign(
       {
         selector: 'secret',
         secret: parseId,
-        _id: exists._id,
+        _id: user._id.toString(),
         exp: Math.floor(Date.now() / 1000) + +JWT_EXPIRY,
         authType: AuthType.PATH_PASSWORD
       },
@@ -192,6 +224,7 @@ export const actions: Actions = {
         break;
       }
     }
+
     if (!userId) {
       console.error('No userId');
       return fail(400, { missingUserId: true });
@@ -210,10 +243,11 @@ export const actions: Actions = {
       console.error('Bad pin');
       return fail(400, { badPin: true });
     }
+
     const authToken = jwt.sign(
       {
         selector: '_id',
-        _id: userId,
+        _id: userId.toString(),
         exp: Math.floor(Date.now() / 1000) + +JWT_EXPIRY,
         authType: AuthType.PIN
       },
@@ -273,6 +307,6 @@ export const load: PageServerLoad = async ({ url, cookies }) => {
     authType,
     parseId,
     type,
-    signOut: false
+    shouldSignOut: false
   };
 };
