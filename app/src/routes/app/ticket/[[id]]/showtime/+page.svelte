@@ -3,7 +3,7 @@
   import type { Unsubscriber } from 'svelte/store';
 
   import { browser } from '$app/environment';
-  import { goto } from '$app/navigation';
+  import { goto, invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
   import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
@@ -77,10 +77,19 @@
       }
     });
 
+    isTimeToLeave =
+      show.showState.status !== ShowStatus.LIVE &&
+      show.showState.status !== ShowStatus.STOPPED;
+    if (isTimeToLeave) {
+      api.executeCommand('hangup');
+      leaveShow();
+      goto(returnPath);
+    }
     showUnSub = notifyUpdate({
       id: show._id.toString(),
       type: 'Show',
-      callback: () => {
+      callback: async () => {
+        await invalidateAll();
         show = $page.data.show;
         isTimeToLeave =
           show.showState.status !== ShowStatus.LIVE &&

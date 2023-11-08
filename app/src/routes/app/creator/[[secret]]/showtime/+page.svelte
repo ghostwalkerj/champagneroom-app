@@ -85,8 +85,9 @@
     api.addListener('knockingParticipant', participantKnocked);
     api.addListener('toolbarButtonClicked', (event: any) => {
       if (event?.key === 'leave-show') {
-        stopShow();
-        goto(returnPath);
+        stopShow().then(() => {
+          goto(returnPath);
+        });
       }
     });
   });

@@ -91,6 +91,7 @@
   }
 
   const useNewShow = (show: ShowDocumentType) => {
+    console.log('useNewShow', show);
     if (show && show.showState.current) {
       currentShow = show;
       canCreateShow = false;
@@ -237,13 +238,14 @@
           <button
             class="btn"
             on:click={() => {
+              loading = true;
               goto(showTimePath);
             }}
-            disabled={!canStartShow}>Restart Show</button
+            disabled={!canStartShow || loading}>Restart Show</button
           >
           <form method="post" action="?/end_show" use:enhance={onSubmit}>
             <input type="hidden" name="showId" value={currentShow?._id} />
-            <button class="btn">End Show</button>
+            <button class="btn" disabled={loading}>End Show</button>
           </form>
         </div>
       </div>
@@ -287,7 +289,11 @@
                 <button
                   class="btn"
                   type="submit"
-                  on:click={() => goto(showTimePath)}>Start Show</button
+                  disabled={loading}
+                  on:click={() => {
+                    loading = true;
+                    goto(showTimePath);
+                  }}>Start Show</button
                 >
               {/if}
             </div>

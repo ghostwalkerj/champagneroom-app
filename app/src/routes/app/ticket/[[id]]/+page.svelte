@@ -194,6 +194,7 @@
           await invalidateAll();
           ticket = $page.data.ticket;
           invoice = $page.data.invoice;
+          show = $page.data.show;
           useTicketMachine(
             createTicketMachineService({
               ticketDocument: ticket
@@ -204,8 +205,15 @@
       showUnSub = notifyUpdate({
         id: show._id.toString(),
         type: 'Show',
-        callback: () => {
+        callback: async () => {
+          await invalidateAll();
           show = $page.data.show;
+          ticket = $page.data.ticket;
+          useTicketMachine(
+            createTicketMachineService({
+              ticketDocument: ticket
+            })
+          );
           hasShowStarted = show.showState.status === ShowStatus.LIVE;
           isShowInEscrow = show.showState.status === ShowStatus.IN_ESCROW;
         }
@@ -287,6 +295,7 @@
                 class="btn btn-secondary"
                 disabled={loading}
                 on:click={() => {
+                  loading = true;
                   goto(showTimePath);
                 }}>Go to the Show</button
               >
