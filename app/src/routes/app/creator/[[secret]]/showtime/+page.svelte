@@ -17,21 +17,24 @@
 
   let creator = data.creator as CreatorDocumentType;
   $: currentShow = data.show as ShowDocumentType;
+  const returnPath = data.returnPath as string;
   let user = data.user;
   let jitsiToken = data.jitsiToken;
 
   let videoCallElement: HTMLDivElement;
   let api: any;
   let participantName = '';
-  const returnUrl = $page.params.returnUrl;
+  let isShowStopped = false;
 
   const stopShow = async () => {
+    if (isShowStopped) return;
     let formData = new FormData();
     formData.append('showId', currentShow?._id.toString());
-    fetch($page.url.href + '?/stop_show', {
+    fetch('?/stop_show', {
       method: 'POST',
       body: formData
     });
+    isShowStopped = true;
     api?.executeCommand('endConference');
   };
 
@@ -84,7 +87,7 @@
     api.addListener('toolbarButtonClicked', (event: any) => {
       if (event?.key === 'leave-show') {
         stopShow();
-        goto(returnUrl);
+        goto(returnPath);
       }
     });
   });

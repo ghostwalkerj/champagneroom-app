@@ -23,6 +23,7 @@ export const POST: RequestHandler = async ({ request, locals, params }) => {
   }
 
   if (!bcInvoiceId || !status) {
+    console.error('Missing bcInvoiceId or status');
     return new Response(undefined, { status: 400 });
   }
 

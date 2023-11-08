@@ -7,7 +7,7 @@
   import { page } from '$app/stores';
   import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
-  import { ShowStatus, type ShowDocumentType } from '$lib/models/show';
+  import { type ShowDocumentType, ShowStatus } from '$lib/models/show';
   import type { UserDocument } from '$lib/models/user';
 
   import Config from '$lib/config';
@@ -21,29 +21,32 @@
 
   let show = data.show as ShowDocumentType;
   let user = data.user as UserDocument;
+  const returnPath = data.returnPath as string;
 
   // @ts-ignore
   let jitsiToken = data.jitsiToken as string;
   let showUnSub: Unsubscriber;
 
-  let returnUrl = $page.params.returnUrl;
   let videoCallElement: HTMLDivElement;
 
   $: isTimeToLeave = false;
+  let hasLeftShow = false;
+
+  const leaveShow = () => {
+    if (hasLeftShow) return;
+    let formData = new FormData();
+    fetch('?/leave_show', {
+      method: 'POST',
+      body: formData
+    });
+    hasLeftShow = true;
+  };
 
   if (browser) {
     onDestroy(() => {
       leaveShow();
       showUnSub?.();
     });
-
-    const leaveShow = () => {
-      let formData = new FormData();
-      fetch($page.url.href + '?/leave_show', {
-        method: 'POST',
-        body: formData
-      });
-    };
   }
 
   const profileImage = getProfileImage(user.name, Config.UI.profileImagePath);
@@ -69,7 +72,8 @@
 
     api.addListener('toolbarButtonClicked', (event: any) => {
       if (event?.key === 'leave-show') {
-        goto(returnUrl);
+        leaveShow();
+        goto(returnPath);
       }
     });
 
@@ -83,7 +87,8 @@
           show.showState.status !== ShowStatus.STOPPED;
         if (isTimeToLeave) {
           api.executeCommand('hangup');
-          goto(returnUrl);
+          leaveShow();
+          goto(returnPath);
         }
       }
     });

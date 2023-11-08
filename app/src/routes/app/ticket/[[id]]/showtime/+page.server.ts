@@ -5,9 +5,9 @@ import jwt from 'jsonwebtoken';
 import urlJoin from 'url-join';
 
 import {
-    JITSI_APP_ID,
-    JITSI_JWT_SECRET,
-    JWT_EXPIRY
+  JITSI_APP_ID,
+  JITSI_JWT_SECRET,
+  JWT_EXPIRY
 } from '$env/static/private';
 import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
@@ -35,7 +35,9 @@ export const actions: Actions = {
 };
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async ({ locals, url }) => {
+  const returnPath = url.searchParams.get('returnPath');
+
   const ticket = locals.ticket;
   const user = locals.user;
   if (!user) {
@@ -93,6 +95,7 @@ export const load: PageServerLoad = async ({ locals }) => {
       flattenMaps: true
     }),
     show: show.toObject({ flattenObjectIds: true, flattenMaps: true }),
-    user: user.toObject({ flattenObjectIds: true, flattenMaps: true })
+    user: user.toObject({ flattenObjectIds: true, flattenMaps: true }),
+    returnPath
   };
 };

@@ -143,10 +143,9 @@ const allowedPath = (path: string, locals: App.Locals, selector?: string) => {
 
   // If the user is a ticket holder, they can access their own ticket
   if (isPinMatch(path)) {
-    return (
-      locals.ticket &&
-      path === `${Config.Path.ticket}/${locals.ticket._id.toString()}`
-    );
+    if (!locals.ticket) return false;
+    const ticketUrl = `${Config.Path.ticket}/${locals.ticket._id.toString()}`;
+    return path.startsWith(ticketUrl);
   }
   // If the user is an agent, operator, creator they can access their own page
   if (isOperatorMatch(path) && locals.operator) return true;

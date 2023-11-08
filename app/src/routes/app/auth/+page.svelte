@@ -204,8 +204,56 @@
       <ConnectButton />
     </div>
   {:else if authType === AuthType.PATH_PASSWORD}
-    <div class="font-bold text-5xl text-primary w-full font-CaviarDreams">
+    <!-- <div class="font-bold text-5xl text-primary w-full font-CaviarDreams">
       Verifying Path
+    </div> -->
+
+    <div class="mt-6 flex items-center">
+      <div class="min-w-full">
+        <div class="flex justify-center">
+          <div
+            class="flex flex-col w-full p-4 max-w-fit gap-4 rounded-xl bg-base-200 overflow-auto"
+          >
+            <form method="post" action="?/signing_auth" use:enhance={onSubmit}>
+              <input type="hidden" name="parseId" value={parseId} />
+              <input type="hidden" name="type" value={type} />
+              <div class="max-w-xs w-full py-2 form-control">
+                <div class="max-w-xs w-full py-2 form-control">
+                  <label for="pin" class="label">
+                    <span class="label-text">Password</span></label
+                  >
+                  <div class="rounded-md shadow-sm mt-1 relative">
+                    <input
+                      name="password"
+                      type="password"
+                      class="max-w-xs w-full py-2 pl-6 input input-bordered input-primary"
+                      value={''}
+                    />
+                    {#if form?.missingPassword}<div
+                        class="shadow-lg alert alert-error"
+                      >
+                        Password is required
+                      </div>{/if}
+
+                    {#if form?.badPassword}<div
+                        class="shadow-lg alert alert-error"
+                      >
+                        Incorrect Password
+                      </div>{/if}
+                    <div class="text-center text-sm p-1">
+                      Please enter your password
+                    </div>
+                  </div>
+                </div>
+
+                <div class="py-4 text-center">
+                  <button class="btn btn-primary" type="submit">Submit</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
   {:else if authType === AuthType.PIN}
     <!-- <div class="font-bold text-5xl text-primary w-full font-CaviarDreams">

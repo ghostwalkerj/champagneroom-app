@@ -1492,7 +1492,7 @@ var config = {
   ],
 
   // List of notifications to be disabled. Works in tandem with the above setting.
-  disabledNotifications: ['dialog.sessTerminated'],
+  // disabledNotifications: [],
 
   // Prevent the filmstrip from autohiding when screen width is under a certain threshold
   // disableFilmstripAutohiding: false,
@@ -1562,8 +1562,9 @@ var config = {
   // },
 
   // Application logo url
-  defaultLogoUrl: 'https://champagneroom.app/logo.png',
-  JITSI_WATERMARK_LINK: 'https://champagneroom.app/help'
+  defaultLogoUrl:
+    'https://static.champagneroom.app/assets/logo-horizontal-tr.png',
+  JITSI_WATERMARK_LINK: 'https://champagneroom.app'
 
   // Settings for the Excalidraw whiteboard integration.
   // whiteboard: {

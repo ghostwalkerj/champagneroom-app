@@ -5,9 +5,9 @@ import type IORedis from 'ioredis';
 import jwt from 'jsonwebtoken';
 
 import {
-    JITSI_APP_ID,
-    JITSI_JWT_SECRET,
-    JWT_EXPIRY
+  JITSI_APP_ID,
+  JITSI_JWT_SECRET,
+  JWT_EXPIRY
 } from '$env/static/private';
 import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
@@ -20,8 +20,8 @@ import type { ShowQueueType } from '$lib/workers/showWorker';
 import Config from '$lib/config';
 import { EntityType } from '$lib/constants';
 import {
-    getShowMachineService,
-    getShowMachineServiceFromId
+  getShowMachineService,
+  getShowMachineServiceFromId
 } from '$lib/server/machinesUtil';
 
 import type { PageServerLoad } from './$types';
@@ -51,7 +51,9 @@ export const actions: Actions = {
   }
 };
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async ({ locals, url }) => {
+  const returnPath = url.searchParams.get('returnPath');
+
   const creator = locals.creator;
   const user = locals.user;
   if (!creator) {
@@ -109,6 +111,7 @@ export const load: PageServerLoad = async ({ locals }) => {
     creator: creator.toObject({ flattenObjectIds: true, flattenMaps: true }),
     show: show.toObject({ flattenObjectIds: true, flattenMaps: true }),
     user: user.toObject({ flattenObjectIds: true, flattenMaps: true }),
-    jitsiToken
+    jitsiToken,
+    returnPath
   };
 };

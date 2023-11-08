@@ -3,7 +3,7 @@ import { nanoid } from 'nanoid';
 import { generateSillyPassword } from 'silly-password-generator';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 
-import {  PASSWORD_SALT } from '$env/static/private';
+import { PASSWORD_SALT } from '$env/static/private';
 
 import { Creator } from '$lib/models/creator';
 import { User } from '$lib/models/user';
