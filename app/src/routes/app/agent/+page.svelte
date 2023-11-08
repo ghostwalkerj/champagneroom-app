@@ -94,6 +94,9 @@
     const result: ActionResult = deserialize(await response.text());
     if (result.type === 'success' && result.data) {
       creators[index].user.secret = result.data.secret;
+      newCreator = creators[index];
+      newPassword = result.data.password;
+      newCreatorModal.showModal();
     }
 
     isChangeCreatorSecret = false;
@@ -133,7 +136,7 @@
     {#if newCreator}
       <h3 class="font-bold text-lg text-center mb-6">New Creator</h3>
       <div class="text-center">
-        {newCreator.user.name} has been created with the following password:
+        {newCreator.user.name} has the following password:
         <div class="text-center font-bold text-lg">{newPassword}</div>
       </div>
       <div class="text-center mt-4">

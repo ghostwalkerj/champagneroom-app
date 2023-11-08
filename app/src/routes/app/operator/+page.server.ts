@@ -186,20 +186,25 @@ export const actions: Actions = {
     const data = await request.formData();
     const userId = data.get('userId') as string;
 
+    const password = generateSillyPassword({
+      wordCount: 2
+    });
+
     // Validation
     if (userId === null) {
       return fail(400, { userId, missingUserId: true });
     }
 
     const secret = nanoid();
-    await User.findOneAndUpdate(
-      { _id: userId },
-      {
-        $set: { secret, __enc_message: false }
-      }
-    );
+    const user = await User.findById(userId);
+    if (!user) {
+      return fail(400, { userId, missingUserId: true });
+    }
+    user.secret = secret;
+    user.password = `${password}${PASSWORD_SALT}`;
+    user.save();
 
-    return { success: true, secret };
+    return { success: true, secret, password };
   },
 
   decide_dispute: async ({ request, locals }: RequestEvent) => {
