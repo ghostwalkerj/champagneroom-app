@@ -44,7 +44,7 @@ const WHITELIST_PATHS = [
   ...WEBHOOK_PATHS
 ];
 
-const TICKET_PATHS = [Config.Path.ticket + '/**'];
+const TICKET_PATHS = [Config.Path.ticket + '/**', Config.Path.ticket];
 const CREATOR_PATHS = [Config.Path.creator, Config.Path.creator + '/**'];
 const SECRET_PATHS = [...PASSWORD_PATHS, ...PIN_PATHS];
 const AGENT_PATHS = [Config.Path.agent];

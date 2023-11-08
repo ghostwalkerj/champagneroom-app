@@ -38,6 +38,7 @@ import {
   isPinMatch,
   isProtectedMatch,
   isRequestAuthMatch,
+  isTicketMatch,
   isWhitelistMatch
 } from '$lib/server/auth';
 
@@ -143,10 +144,8 @@ const allowedPath = (path: string, locals: App.Locals, selector?: string) => {
   }
 
   // If the user is a ticket holder, they can access their own ticket
-  if (isPinMatch(path)) {
-    if (!locals.ticket) return false;
-    const ticketUrl = `${Config.Path.ticket}/${locals.ticket._id.toString()}`;
-    return path.startsWith(ticketUrl);
+  if (isTicketMatch(path)) {
+    return locals.ticket !== undefined;
   }
   // If the user is an agent, operator, creator they can access their own page
   if (isOperatorMatch(path) && locals.operator) return true;

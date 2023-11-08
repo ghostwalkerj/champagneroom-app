@@ -66,6 +66,8 @@
   $: loading = false;
 
   const walletPay = async () => {
+    loading = true;
+
     if ($selectedAccount) {
       // Make sure to use correct chain id
       const chain = $defaultWallet?.chains.find(
@@ -119,6 +121,7 @@
     } else {
       await connect();
     }
+    loading = false;
   };
 
   const useTicketMachine = async (
@@ -271,8 +274,10 @@
                 >Connect Wallet</button
               >
             {:else}
-              <button class="btn btn-secondary" on:click={walletPay}
-                >Pay with Wallet</button
+              <button
+                class="btn btn-secondary"
+                on:click={walletPay}
+                disabled={loading}>Pay with Wallet</button
               >
             {/if}
           {/if}
