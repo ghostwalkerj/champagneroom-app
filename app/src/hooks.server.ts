@@ -35,7 +35,6 @@ import {
   isNotificationMatch,
   isOperatorMatch,
   isPasswordMatch,
-  isPinMatch,
   isProtectedMatch,
   isRequestAuthMatch,
   isTicketMatch,
@@ -97,7 +96,7 @@ const setLocals = async (decode: JwtPayload, locals: App.Locals) => {
             creator: creator._id,
             'showState.current': true
           }).exec();
-          if (show) locals.currentShow = show;
+          if (show) locals.show = show;
           break;
         }
 
@@ -165,7 +164,7 @@ const allowedPath = (path: string, locals: App.Locals, selector?: string) => {
     if (locals.wallet) allowedIds.push(locals.wallet._id.toString());
     if (locals.agent) allowedIds.push(locals.agent._id.toString());
     if (locals.operator) allowedIds.push(locals.operator._id.toString());
-    if (locals.currentShow) allowedIds.push(locals.currentShow._id.toString());
+    if (locals.show) allowedIds.push(locals.show._id.toString());
 
     if (allowedIds.some((id) => path.includes(id))) return true;
   }

@@ -20,12 +20,17 @@ declare global {
       agent?: AgentDocument;
       operator?: OperatorDocument;
       ticket?: TicketDocument;
-      currentShow?: ShowDocument;
+      show?: ShowDocument;
       wallet?: WalletDocument;
     }
-    // interface Platform {}
-    //interface Session {
-    //}
-    // eslint-disable-next-line @typescript-eslint/no-empty-interface
+    interface PageData {
+      user?: UserDocument;
+      creator?: CreatorDocument;
+      agent?: AgentDocument;
+      operator?: OperatorDocument;
+      ticket?: TicketDocument;
+      show?: ShowDocument;
+      wallet?: WalletDocument;
+    }
   }
 }

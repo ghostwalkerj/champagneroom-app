@@ -5,7 +5,7 @@
   import web3 from 'web3';
 
   import { applyAction, enhance } from '$app/forms';
-  import { goto, invalidateAll } from '$app/navigation';
+  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
   import type { RefundType } from '$lib/models/common';
@@ -19,9 +19,10 @@
 
   import Config from '$lib/config';
   import { ActorType } from '$lib/constants';
-  import { notifyUpdate } from '$lib/notify';
   import type { PaymentType } from '$lib/payment';
   import { connect, defaultWallet, selectedAccount } from '$lib/web3';
+
+  import { showStore, ticketStore } from '$stores';
 
   import TicketDetail from './TicketDetail.svelte';
   import TicketInvoice from './TicketInvoice.svelte';
@@ -187,28 +188,24 @@
           ticketDocument: ticket
         })
       );
-      ticketUnSub = notifyUpdate({
-        id: ticket._id.toString(),
-        type: 'Ticket',
-        callback: async () => {
-          await invalidateAll();
-          ticket = $page.data.ticket;
+      ticketUnSub = ticketStore(ticket).subscribe((_ticket) => {
+        if (_ticket) {
+          ticket = _ticket;
           invoice = $page.data.invoice;
-          show = $page.data.show;
+          show = $page.data.show as ShowDocumentType;
           useTicketMachine(
             createTicketMachineService({
-              ticketDocument: ticket
+              ticketDocument: _ticket
             })
           );
         }
       });
-      showUnSub = notifyUpdate({
-        id: show._id.toString(),
-        type: 'Show',
-        callback: async () => {
-          await invalidateAll();
-          show = $page.data.show;
-          ticket = $page.data.ticket;
+
+      showUnSub = showStore(show).subscribe((_show) => {
+        if (_show) {
+          show = _show;
+          invoice = $page.data.invoice;
+          ticket = $page.data.ticket as TicketDocumentType;
           useTicketMachine(
             createTicketMachineService({
               ticketDocument: ticket
@@ -522,8 +519,8 @@
             </div>
             <div class="p-4">
               <div class="w-full flex justify-center">
-                <label for="initiate-dispute" class="btn btn-secondary"
-                  >Initiate Dispute</label
+                <button class="btn btn-secondary" disabled={loading}
+                  >Initiate Dispute</button
                 >
               </div>
             </div>

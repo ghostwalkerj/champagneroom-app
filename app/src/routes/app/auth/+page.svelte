@@ -77,20 +77,6 @@
     authAction(result);
   };
 
-  const setPasswordAuth = async () => {
-    let formData = new FormData();
-    formData.append('parseId', parseId!);
-
-    const response = await fetch('?/password_secret_auth', {
-      method: 'POST',
-      body: formData,
-      redirect: 'follow'
-    });
-
-    const result: ActionResult = deserialize(await response.text());
-    authAction(result);
-  };
-
   const signMessage = async () => {
     try {
       walletAddress = wallet.accounts[0].address;

@@ -4,9 +4,9 @@ import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 
 import {
-    BITCART_API_URL,
-    BITCART_EMAIL,
-    BITCART_PASSWORD
+  BITCART_API_URL,
+  BITCART_EMAIL,
+  BITCART_PASSWORD
 } from '$env/static/private';
 
 import type { CancelType } from '$lib/models/common';
@@ -28,8 +28,8 @@ import { ActorType, EntityType } from '$lib/constants';
 import { rateCryptosRateGet } from '$lib/ext/bitcart';
 import { PayoutJobType, PayoutReason, createAuthToken } from '$lib/payment';
 import {
-    getShowMachineService,
-    getShowMachineServiceFromId
+  getShowMachineService,
+  getShowMachineServiceFromId
 } from '$lib/server/machinesUtil';
 
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
@@ -104,7 +104,7 @@ export const actions: Actions = {
   },
   cancel_show: async ({ locals }) => {
     const redisConnection = locals.redisConnection as IORedis;
-    const show = locals.currentShow as ShowDocument;
+    const show = locals.show as ShowDocument;
     if (!show) {
       throw error(404, 'Show not found');
     }
@@ -221,12 +221,12 @@ export const load: PageServerLoad = async ({ locals }) => {
     throw error(404, 'Creator not found');
   }
 
-  const currentShow = locals.currentShow as ShowDocument;
+  const show = locals.show as ShowDocument;
 
-  const currentEvent =
-    currentShow &&
+  const showEvent =
+    show &&
     (await ShowEvent.findOne(
-      { show: currentShow._id },
+      { show: show._id },
       {},
       { sort: { createdAt: -1 } }
     ));
@@ -265,11 +265,11 @@ export const load: PageServerLoad = async ({ locals }) => {
   return {
     creator: creator.toObject({ flattenObjectIds: true, flattenMaps: true }),
     user: user?.toObject({ flattenObjectIds: true, flattenMaps: true }),
-    currentShow: currentShow
-      ? currentShow.toObject({ flattenObjectIds: true, flattenMaps: true })
+    show: show
+      ? show.toObject({ flattenObjectIds: true, flattenMaps: true })
       : undefined,
-    currentEvent: currentEvent
-      ? currentEvent.toObject({
+    showEvent: showEvent
+      ? showEvent.toObject({
           flattenObjectIds: true,
           flattenMaps: true
         })

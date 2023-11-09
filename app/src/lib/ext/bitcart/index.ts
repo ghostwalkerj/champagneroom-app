@@ -9,110 +9,110 @@ import type { AxiosRequestConfig, AxiosResponse } from 'axios';
 import axios from 'axios';
 
 import type {
-    BackupsPolicy,
-    BalanceResponse,
-    BatchSettings,
-    BodyCreateFileFilesPost,
-    BodyCreateOauth2TokenTokenOauth2Post,
-    BodyCreateProductProductsPost,
-    BodyInstallPluginPluginsInstallPost,
-    BodyModifyFileFilesModelIdPatch,
-    BodyModifyProductProductsModelIdPatch,
-    BodyRestoreBackupManageBackupsRestorePost,
-    CategoriesProductsCategoriesGetParams as CategoriesProductsCategoriesGetParameters,
-    ChangePassword,
-    CheckDnsEntryConfiguratorDnsResolveGetParams as CheckDnsEntryConfiguratorDnsResolveGetParameters,
-    CloseChannelScheme,
-    ConfiguratorDeploySettings,
-    CreateDiscount,
-    CreateInvoice,
-    CreateNotification,
-    CreatePayout,
-    CreateStore,
-    CreateTemplate,
-    CreateUser,
-    CreateUserWithToken,
-    CreateWallet,
-    CreateWalletData,
-    CustomerUpdateData,
-    Discount,
-    DisplayInvoice,
-    DisplayPayout,
-    DisplayUser,
-    EditToken,
-    ExportInvoicesInvoicesExportGetParams as ExportInvoicesExportGetParameters,
-    FIDO2Auth,
-    File,
-    GetDiscountsDiscountsGetParams as GetDiscountsGetParameters,
-    GetFiatlistCryptosFiatlistGetParams as GetFiatlistCryptosFiatlistGetParameters,
-    GetFilesFilesGetParams as GetFilesGetParameters,
-    GetInvoicesInvoicesGetParams as GetInvoicesGetParameters,
-    GetMaxProductPriceProductsMaxpriceGetParams as GetMaxProductPriceProductsMaxpriceGetParameters,
-    GetNotificationsNotificationsGetParams as GetNotificationsGetParameters,
-    GetNumberOfProductsProductsCountGetParams as GetNumberOfProductsCountGetParameters,
-    GetOrCreateShopifyInvoiceStoresStoreIdIntegrationsShopifyOrderIdGetParams as GetOrCreateShopifyInvoiceStoresStoreIdIntegrationsShopifyOrderIdGetParameters,
-    GetPayoutsPayoutsGetParams as GetPayoutsGetParameters,
-    GetProductByIdProductsModelIdGetParams as GetProductByIdProductsModelIdGetParameters,
-    GetProductsProductsGetParams as GetProductsGetParameters,
-    GetStoreRatesStoresModelIdRatesGetParams as GetStoreRatesStoresModelIdRatesGetParameters,
-    GetStoresStoresGetParams as GetStoresGetParameters,
-    GetTemplateListTemplatesListGetParams as GetTemplateListTemplatesListGetParameters,
-    GetTemplatesTemplatesGetParams as GetTemplatesGetParameters,
-    GetTokenCountTokenCountGetParams as GetTokenCountTokenCountGetParameters,
-    GetTokensTokenGetParams as GetTokensTokenGetParameters,
-    GetUsersUsersGetParams as GetUsersGetParameters,
-    GetWalletRateWalletsModelIdRateGetParams as GetWalletRateWalletsModelIdRateGetParameters,
-    GetWalletsWalletsGetParams as GetWalletsGetParameters,
-    GlobalStorePolicy,
-    HTTPCreateLoginToken,
-    LNPayScheme,
-    LoginFIDOData,
-    MethodUpdateData,
-    Notification,
-    OpenChannelScheme,
-    OptionalCreateWallet,
-    OptionalDiscount,
-    OptionalInvoice,
-    OptionalNotification,
-    OptionalPayout,
-    OptionalStore,
-    OptionalTemplate,
-    OptionalUser,
-    PaginationResponseDiscount,
-    PaginationResponseDisplayInvoice,
-    PaginationResponseDisplayPayout,
-    PaginationResponseDisplayUser,
-    PaginationResponseFile,
-    PaginationResponseNotification,
-    PaginationResponseProduct,
-    PaginationResponseStore,
-    PaginationResponseTemplate,
-    PaginationResponseToken,
-    PaginationResponseWallet,
-    Policy,
-    Product,
-    RateCryptosRateGetParams as RateCryptosRateGetParameters,
-    RatesResponse,
-    Refund,
-    RefundData,
-    ResetPasswordData,
-    ResetPasswordFinalize,
-    SSHSettings,
-    Store,
-    StoreCheckoutSettings,
-    StorePluginSettings,
-    StoreThemeSettings,
-    SubmitRefundData,
-    Template,
-    Token,
-    TOTPAuth,
-    TxResponse,
-    UninstallPluginData,
-    User,
-    UserPreferences,
-    VerifyEmailData,
-    VerifyTOTP,
-    Wallet
+  BackupsPolicy,
+  BalanceResponse,
+  BatchSettings,
+  BodyCreateFileFilesPost,
+  BodyCreateOauth2TokenTokenOauth2Post,
+  BodyCreateProductProductsPost,
+  BodyInstallPluginPluginsInstallPost,
+  BodyModifyFileFilesModelIdPatch,
+  BodyModifyProductProductsModelIdPatch,
+  BodyRestoreBackupManageBackupsRestorePost,
+  CategoriesProductsCategoriesGetParams as CategoriesProductsCategoriesGetParameters,
+  ChangePassword,
+  CheckDnsEntryConfiguratorDnsResolveGetParams as CheckDnsEntryConfiguratorDnsResolveGetParameters,
+  CloseChannelScheme,
+  ConfiguratorDeploySettings,
+  CreateDiscount,
+  CreateInvoice,
+  CreateNotification,
+  CreatePayout,
+  CreateStore,
+  CreateTemplate,
+  CreateUser,
+  CreateUserWithToken,
+  CreateWallet,
+  CreateWalletData,
+  CustomerUpdateData,
+  Discount,
+  DisplayInvoice,
+  DisplayPayout,
+  DisplayUser,
+  EditToken,
+  ExportInvoicesInvoicesExportGetParams as ExportInvoicesExportGetParameters,
+  FIDO2Auth,
+  File,
+  GetDiscountsDiscountsGetParams as GetDiscountsGetParameters,
+  GetFiatlistCryptosFiatlistGetParams as GetFiatlistCryptosFiatlistGetParameters,
+  GetFilesFilesGetParams as GetFilesGetParameters,
+  GetInvoicesInvoicesGetParams as GetInvoicesGetParameters,
+  GetMaxProductPriceProductsMaxpriceGetParams as GetMaxProductPriceProductsMaxpriceGetParameters,
+  GetNotificationsNotificationsGetParams as GetNotificationsGetParameters,
+  GetNumberOfProductsProductsCountGetParams as GetNumberOfProductsCountGetParameters,
+  GetOrCreateShopifyInvoiceStoresStoreIdIntegrationsShopifyOrderIdGetParams as GetOrCreateShopifyInvoiceStoresStoreIdIntegrationsShopifyOrderIdGetParameters,
+  GetPayoutsPayoutsGetParams as GetPayoutsGetParameters,
+  GetProductByIdProductsModelIdGetParams as GetProductByIdProductsModelIdGetParameters,
+  GetProductsProductsGetParams as GetProductsGetParameters,
+  GetStoreRatesStoresModelIdRatesGetParams as GetStoreRatesStoresModelIdRatesGetParameters,
+  GetStoresStoresGetParams as GetStoresGetParameters,
+  GetTemplateListTemplatesListGetParams as GetTemplateListTemplatesListGetParameters,
+  GetTemplatesTemplatesGetParams as GetTemplatesGetParameters,
+  GetTokenCountTokenCountGetParams as GetTokenCountTokenCountGetParameters,
+  GetTokensTokenGetParams as GetTokensTokenGetParameters,
+  GetUsersUsersGetParams as GetUsersGetParameters,
+  GetWalletRateWalletsModelIdRateGetParams as GetWalletRateWalletsModelIdRateGetParameters,
+  GetWalletsWalletsGetParams as GetWalletsGetParameters,
+  GlobalStorePolicy,
+  HTTPCreateLoginToken,
+  LNPayScheme,
+  LoginFIDOData,
+  MethodUpdateData,
+  Notification,
+  OpenChannelScheme,
+  OptionalCreateWallet,
+  OptionalDiscount,
+  OptionalInvoice,
+  OptionalNotification,
+  OptionalPayout,
+  OptionalStore,
+  OptionalTemplate,
+  OptionalUser,
+  PaginationResponseDiscount,
+  PaginationResponseDisplayInvoice,
+  PaginationResponseDisplayPayout,
+  PaginationResponseDisplayUser,
+  PaginationResponseFile,
+  PaginationResponseNotification,
+  PaginationResponseProduct,
+  PaginationResponseStore,
+  PaginationResponseTemplate,
+  PaginationResponseToken,
+  PaginationResponseWallet,
+  Policy,
+  Product,
+  RateCryptosRateGetParams as RateCryptosRateGetParameters,
+  RatesResponse,
+  Refund,
+  RefundData,
+  ResetPasswordData,
+  ResetPasswordFinalize,
+  SSHSettings,
+  Store,
+  StoreCheckoutSettings,
+  StorePluginSettings,
+  StoreThemeSettings,
+  SubmitRefundData,
+  Template,
+  Token,
+  TOTPAuth,
+  TxResponse,
+  UninstallPluginData,
+  User,
+  UserPreferences,
+  VerifyEmailData,
+  VerifyTOTP,
+  Wallet
 } from './models';
 
 /**
@@ -146,6 +146,18 @@ export const batchActionsOnDiscountsDiscountsBatchPost = <
   options?: AxiosRequestConfig
 ): Promise<TData> => {
   return axios.post('/discounts/batch', batchSettings, options);
+};
+
+/**
+ * @summary Batch Actions On Files
+ */
+export const batchActionsOnFilesFilesBatchPost = <
+  TData = AxiosResponse<unknown>
+>(
+  batchSettings: BatchSettings,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.post('/files/batch', batchSettings, options);
 };
 
 /**
@@ -206,18 +218,6 @@ export const batchActionsOnStoresStoresBatchPost = <
   options?: AxiosRequestConfig
 ): Promise<TData> => {
   return axios.post('/stores/batch', batchSettings, options);
-};
-
-/**
- * @summary Batch Actions On Files
- */
-export const batchActionsOnFilesFilesBatchPost = <
-  TData = AxiosResponse<unknown>
->(
-  batchSettings: BatchSettings,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.post('/files/batch', batchSettings, options);
 };
 
 /**
@@ -295,6 +295,15 @@ export const checkDnsEntryConfiguratorDnsResolveGet = <
 };
 
 /**
+ * @summary Check Updates
+ */
+export const checkUpdatesUpdateCheckGet = <TData = AxiosResponse<unknown>>(
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.get('/update/check', options);
+};
+
+/**
  * @summary Check Wallet Lightning
  */
 export const checkWalletLightningWalletsModelIdChecklnGet = <
@@ -304,15 +313,6 @@ export const checkWalletLightningWalletsModelIdChecklnGet = <
   options?: AxiosRequestConfig
 ): Promise<TData> => {
   return axios.get(`/wallets/${modelId}/checkln`, options);
-};
-
-/**
- * @summary Check Updates
- */
-export const checkUpdatesUpdateCheckGet = <TData = AxiosResponse<unknown>>(
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get('/update/check', options);
 };
 
 /**
@@ -1478,16 +1478,6 @@ export const getTokenCountTokenCountGet = <TData = AxiosResponse<number>>(
 };
 
 /**
- * @summary Get User By Id
- */
-export const getUserByIdUsersModelIdGet = <TData = AxiosResponse<DisplayUser>>(
-  modelId: string,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get(`/users/${modelId}`, options);
-};
-
-/**
  * @summary Get Tokens Abi
  */
 export const getTokensAbiCryptosTokensCurrencyAbiGet = <
@@ -1497,21 +1487,6 @@ export const getTokensAbiCryptosTokensCurrencyAbiGet = <
   options?: AxiosRequestConfig
 ): Promise<TData> => {
   return axios.get(`/cryptos/tokens/${currency}/abi`, options);
-};
-
-/**
- * @summary Get Users
- */
-export const getUsersUsersGet = <
-  TData = AxiosResponse<PaginationResponseDisplayUser>
->(
-  parameters?: GetUsersGetParameters,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get('/users', {
-    ...options,
-    params: { ...parameters, ...options?.params }
-  });
 };
 
 /**
@@ -1536,6 +1511,31 @@ export const getTokensTokenGet = <
   options?: AxiosRequestConfig
 ): Promise<TData> => {
   return axios.get('/token', {
+    ...options,
+    params: { ...parameters, ...options?.params }
+  });
+};
+
+/**
+ * @summary Get User By Id
+ */
+export const getUserByIdUsersModelIdGet = <TData = AxiosResponse<DisplayUser>>(
+  modelId: string,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.get(`/users/${modelId}`, options);
+};
+
+/**
+ * @summary Get Users
+ */
+export const getUsersUsersGet = <
+  TData = AxiosResponse<PaginationResponseDisplayUser>
+>(
+  parameters?: GetUsersGetParameters,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.get('/users', {
     ...options,
     params: { ...parameters, ...options?.params }
   });
@@ -1681,18 +1681,6 @@ export const modifyInvoiceInvoicesModelIdPatch = <
 };
 
 /**
- * @summary Register Fido2
- */
-export const registerFido2Users2faFido2RegisterBeginPost = <
-  TData = AxiosResponse<unknown>
->(
-  loginFIDOData: LoginFIDOData,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.post('/users/2fa/fido2/register/begin', loginFIDOData, options);
-};
-
-/**
  * @summary Modify Notification
  */
 export const modifyNotificationNotificationsModelIdPatch = <
@@ -1707,18 +1695,6 @@ export const modifyNotificationNotificationsModelIdPatch = <
     optionalNotification,
     options
   );
-};
-
-/**
- * @summary Reset Password
- */
-export const resetPasswordUsersResetPasswordPost = <
-  TData = AxiosResponse<unknown>
->(
-  resetPasswordData: ResetPasswordData,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.post('/users/reset_password', resetPasswordData, options);
 };
 
 /**
@@ -1754,18 +1730,6 @@ export const modifyProductProductsModelIdPatch = <
 };
 
 /**
- * @summary Send Verification Email
- */
-export const sendVerificationEmailUsersVerifyPost = <
-  TData = AxiosResponse<unknown>
->(
-  verifyEmailData: VerifyEmailData,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.post('/users/verify', verifyEmailData, options);
-};
-
-/**
  * @summary Modify Store
  */
 export const modifyStoreStoresModelIdPatch = <TData = AxiosResponse<Store>>(
@@ -1787,16 +1751,6 @@ export const modifyTemplateTemplatesModelIdPatch = <
   options?: AxiosRequestConfig
 ): Promise<TData> => {
   return axios.patch(`/templates/${modelId}`, optionalTemplate, options);
-};
-
-/**
- * @summary Set Settings
- */
-export const setSettingsUsersMeSettingsPost = <TData = AxiosResponse<User>>(
-  userPreferences: UserPreferences,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.post('/users/me/settings', userPreferences, options);
 };
 
 /**
@@ -1822,6 +1776,18 @@ export const modifyWalletWalletsModelIdPatch = <TData = AxiosResponse<Wallet>>(
 };
 
 /**
+ * @summary Register Fido2
+ */
+export const registerFido2Users2faFido2RegisterBeginPost = <
+  TData = AxiosResponse<unknown>
+>(
+  loginFIDOData: LoginFIDOData,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.post('/users/2fa/fido2/register/begin', loginFIDOData, options);
+};
+
+/**
  * @summary Open Wallet Channel
  */
 export const openWalletChannelWalletsModelIdChannelsOpenPost = <
@@ -1839,18 +1805,6 @@ export const openWalletChannelWalletsModelIdChannelsOpenPost = <
 };
 
 /**
- * @summary Verify Totp
- */
-export const verifyTotpUsers2faTotpVerifyPost = <
-  TData = AxiosResponse<unknown>
->(
-  verifyTOTP: VerifyTOTP,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.post('/users/2fa/totp/verify', verifyTOTP, options);
-};
-
-/**
  * @summary Patch Token
  */
 export const patchTokenTokenModelIdPatch = <TData = AxiosResponse<Token>>(
@@ -1859,6 +1813,18 @@ export const patchTokenTokenModelIdPatch = <TData = AxiosResponse<Token>>(
   options?: AxiosRequestConfig
 ): Promise<TData> => {
   return axios.patch(`/token/${modelId}`, editToken, options);
+};
+
+/**
+ * @summary Reset Password
+ */
+export const resetPasswordUsersResetPasswordPost = <
+  TData = AxiosResponse<unknown>
+>(
+  resetPasswordData: ResetPasswordData,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.post('/users/reset_password', resetPasswordData, options);
 };
 
 /**
@@ -1880,6 +1846,18 @@ export const pingEmailStoresModelIdPingGet = <TData = AxiosResponse<unknown>>(
   options?: AxiosRequestConfig
 ): Promise<TData> => {
   return axios.get(`/stores/${modelId}/ping`, options);
+};
+
+/**
+ * @summary Send Verification Email
+ */
+export const sendVerificationEmailUsersVerifyPost = <
+  TData = AxiosResponse<unknown>
+>(
+  verifyEmailData: VerifyEmailData,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.post('/users/verify', verifyEmailData, options);
 };
 
 /**
@@ -1906,6 +1884,16 @@ export const refundInvoiceInvoicesModelIdRefundsPost = <
   options?: AxiosRequestConfig
 ): Promise<TData> => {
   return axios.post(`/invoices/${modelId}/refunds`, refundData, options);
+};
+
+/**
+ * @summary Set Settings
+ */
+export const setSettingsUsersMeSettingsPost = <TData = AxiosResponse<User>>(
+  userPreferences: UserPreferences,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.post('/users/me/settings', userPreferences, options);
 };
 
 /**
@@ -1989,6 +1977,18 @@ export const setStorePluginSettingsStoresModelIdPluginSettingsPatch = <
 };
 
 /**
+ * @summary Verify Totp
+ */
+export const verifyTotpUsers2faTotpVerifyPost = <
+  TData = AxiosResponse<unknown>
+>(
+  verifyTOTP: VerifyTOTP,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.post('/users/2fa/totp/verify', verifyTOTP, options);
+};
+
+/**
  * @summary Set Store Policies
  */
 export const setStorePoliciesManageStoresPost = <
@@ -2002,6 +2002,13 @@ export const setStorePoliciesManageStoresPost = <
 
 /**
  * @summary Set Store Rate Rules
+ */
+export type AllWalletHistoryWalletsHistoryAllGetResult = AxiosResponse<
+  TxResponse[]
+>;
+
+/**
+ * @summary Set Store Theme Settings
  */
 export const setStoreRateRulesStoresModelIdRateRulesPatch = <
   TData = AxiosResponse<unknown>
@@ -2018,7 +2025,12 @@ export const setStoreRateRulesStoresModelIdRateRulesPatch = <
 };
 
 /**
- * @summary Set Store Theme Settings
+ * @summary Submit Refund
+ */
+export type BatchActionTokenBatchPostResult = AxiosResponse<unknown>;
+
+/**
+ * @summary Test Email Ping
  */
 export const setStoreThemeSettingsStoresModelIdThemeSettingsPatch = <
   TData = AxiosResponse<Store>
@@ -2035,7 +2047,13 @@ export const setStoreThemeSettingsStoresModelIdThemeSettingsPatch = <
 };
 
 /**
- * @summary Submit Refund
+ * @summary Uninstall Plugin
+ */
+export type BatchActionsOnDiscountsDiscountsBatchPostResult =
+  AxiosResponse<unknown>;
+
+/**
+ * @summary Update Invoice
  */
 export const submitRefundInvoicesRefundsRefundIdSubmitPost = <
   TData = AxiosResponse<Refund>
@@ -2052,7 +2070,12 @@ export const submitRefundInvoicesRefundsRefundIdSubmitPost = <
 };
 
 /**
- * @summary Test Email Ping
+ * @summary Update Payment Details
+ */
+export type BatchActionsOnFilesFilesBatchPostResult = AxiosResponse<unknown>;
+
+/**
+ * @summary Update Server
  */
 export const testEmailPingManageTestpingGet = <TData = AxiosResponse<unknown>>(
   options?: AxiosRequestConfig
@@ -2061,7 +2084,13 @@ export const testEmailPingManageTestpingGet = <TData = AxiosResponse<unknown>>(
 };
 
 /**
- * @summary Uninstall Plugin
+ * @summary Wallet History
+ */
+export type BatchActionsOnInvoicesInvoicesBatchPostResult =
+  AxiosResponse<unknown>;
+
+/**
+ * @summary Wallet Lnpay
  */
 export const uninstallPluginPluginsUninstallPost = <
   TData = AxiosResponse<unknown>
@@ -2072,9 +2101,8 @@ export const uninstallPluginPluginsUninstallPost = <
   return axios.post('/plugins/uninstall', uninstallPluginData, options);
 };
 
-/**
- * @summary Update Invoice
- */
+export type BatchActionsOnNotificationsNotificationsBatchPostResult =
+  AxiosResponse<unknown>;
 export const updateInvoiceInvoicesModelIdCustomerPatch = <
   TData = AxiosResponse<DisplayInvoice>
 >(
@@ -2088,22 +2116,8 @@ export const updateInvoiceInvoicesModelIdCustomerPatch = <
     options
   );
 };
-
-/**
- * @summary Wallet History
- */
-export const walletHistoryWalletsHistoryModelIdGet = <
-  TData = AxiosResponse<TxResponse[]>
->(
-  modelId: string,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get(`/wallets/history/${modelId}`, options);
-};
-
-/**
- * @summary Update Payment Details
- */
+export type BatchActionsOnPayoutsPayoutsBatchPostResult =
+  AxiosResponse<unknown>;
 export const updatePaymentDetailsInvoicesModelIdDetailsPatch = <
   TData = AxiosResponse<unknown>
 >(
@@ -2113,19 +2127,25 @@ export const updatePaymentDetailsInvoicesModelIdDetailsPatch = <
 ): Promise<TData> => {
   return axios.patch(`/invoices/${modelId}/details`, methodUpdateData, options);
 };
-
-/**
- * @summary Update Server
- */
+export type BatchActionsOnProductsProductsBatchPostResult =
+  AxiosResponse<unknown>;
 export const updateServerManageUpdatePost = <TData = AxiosResponse<unknown>>(
   options?: AxiosRequestConfig
 ): Promise<TData> => {
   return axios.post('/manage/update', undefined, options);
 };
-
-/**
- * @summary Wallet Lnpay
- */
+export type BatchActionsOnStoresStoresBatchPostResult = AxiosResponse<unknown>;
+export const walletHistoryWalletsHistoryModelIdGet = <
+  TData = AxiosResponse<TxResponse[]>
+>(
+  modelId: string,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.get(`/wallets/history/${modelId}`, options);
+};
+export type BatchActionsOnTemplatesTemplatesBatchPostResult =
+  AxiosResponse<unknown>;
+export type BatchActionsOnUsersUsersBatchPostResult = AxiosResponse<unknown>;
 export const walletLnpayWalletsModelIdLnpayPost = <
   TData = AxiosResponse<unknown>
 >(
@@ -2135,26 +2155,6 @@ export const walletLnpayWalletsModelIdLnpayPost = <
 ): Promise<TData> => {
   return axios.post(`/wallets/${modelId}/lnpay`, lNPayScheme, options);
 };
-
-export type AllWalletHistoryWalletsHistoryAllGetResult = AxiosResponse<
-  TxResponse[]
->;
-export type BatchActionTokenBatchPostResult = AxiosResponse<unknown>;
-export type BatchActionsOnDiscountsDiscountsBatchPostResult =
-  AxiosResponse<unknown>;
-export type BatchActionsOnFilesFilesBatchPostResult = AxiosResponse<unknown>;
-export type BatchActionsOnInvoicesInvoicesBatchPostResult =
-  AxiosResponse<unknown>;
-export type BatchActionsOnNotificationsNotificationsBatchPostResult =
-  AxiosResponse<unknown>;
-export type BatchActionsOnPayoutsPayoutsBatchPostResult =
-  AxiosResponse<unknown>;
-export type BatchActionsOnProductsProductsBatchPostResult =
-  AxiosResponse<unknown>;
-export type BatchActionsOnStoresStoresBatchPostResult = AxiosResponse<unknown>;
-export type BatchActionsOnTemplatesTemplatesBatchPostResult =
-  AxiosResponse<unknown>;
-export type BatchActionsOnUsersUsersBatchPostResult = AxiosResponse<unknown>;
 export type BatchActionsOnWalletsWalletsBatchPostResult =
   AxiosResponse<unknown>;
 export type CategoriesProductsCategoriesGetResult = AxiosResponse<unknown>;

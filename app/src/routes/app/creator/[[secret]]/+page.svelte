@@ -1,12 +1,12 @@
 <script lang="ts">
   import { possessive } from 'i18n-possessive';
   import { onDestroy, onMount } from 'svelte';
-  import type { Unsubscriber } from 'svelte/store';
   import StarRating from 'svelte-star-rating';
+  import type { Unsubscriber } from 'svelte/store';
   import urlJoin from 'url-join';
 
   import { applyAction, enhance } from '$app/forms';
-  import { goto, invalidateAll } from '$app/navigation';
+  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
   import { CancelReason } from '$lib/models/common';
@@ -24,10 +24,15 @@
   import Config from '$lib/config';
   import { ActorType, durationFormatter } from '$lib/constants';
   import { createEventText } from '$lib/eventUtil';
-  import { notifyInsert, notifyUpdate } from '$lib/notify';
 
   import ProfilePhoto from '$components/ProfilePhoto.svelte';
   import ShowDetail from '$components/ShowDetail.svelte';
+  import {
+    creatorStore,
+    showEventStore,
+    showStore,
+    walletStore
+  } from '$stores';
 
   import CreatorActivity from './CreatorActivity.svelte';
   import CreatorWallet from './CreatorWallet.svelte';
@@ -37,8 +42,8 @@
   export let form: ActionData;
 
   let creator = data.creator as CreatorDocumentType;
-  let currentShow = data.currentShow as ShowDocumentType | undefined;
-  let currentEvent = data.currentEvent as ShowEventDocument | undefined;
+  let currentShow = data.show as ShowDocumentType | undefined;
+  let currentEvent = data.showEvent as ShowEventDocument | undefined;
   let completedShows = data.completedShows as ShowDocumentType[];
   let wallet = data.wallet as WalletDocumentType;
   let exchangeRate = +data.exchangeRate || 0;
@@ -91,7 +96,6 @@
   }
 
   const useNewShow = (show: ShowDocumentType) => {
-    console.log('useNewShow', show);
     if (show && show.showState.current) {
       currentShow = show;
       canCreateShow = false;
@@ -102,28 +106,14 @@
       });
       useShowMachine(showMachineService);
       showEventUnSub?.();
-      showEventUnSub = notifyInsert({
-        id: show._id.toString(),
-        type: 'ShowEvent',
-        relatedType: 'Show',
-        callback: () => {
-          invalidateAll().then(() => {
-            currentEvent = $page.data.currentEvent;
-            eventText = createEventText(currentEvent);
-          });
-        }
+      showEventUnSub = showEventStore(currentShow).subscribe((value) => {
+        currentEvent = value as ShowEventDocument;
+        eventText = createEventText(currentEvent);
       });
       showUnSub?.();
-      showUnSub = notifyUpdate({
-        id: show._id.toString(),
-        type: 'Show',
-        callback: () => {
-          invalidateAll().then(() => {
-            const show = $page.data.currentShow as ShowDocumentType;
-            currentEvent = $page.data.currentEvent;
-            useNewShow(show);
-          });
-        }
+      showUnSub = showStore(show).subscribe((value) => {
+        useNewShow(value);
+        currentEvent = $page.data.showEvent;
       });
     } else {
       noCurrentShow();
@@ -153,24 +143,12 @@
   };
 
   onMount(() => {
-    creatorUnSub = notifyUpdate({
-      id: creator._id.toString(),
-      type: 'Creator',
-      callback: () => {
-        invalidateAll().then(() => {
-          creator = $page.data.creator;
-        });
-      }
+    creatorUnSub = creatorStore(creator).subscribe((value) => {
+      creator = value;
     });
     currentShow ? useNewShow(currentShow) : noCurrentShow();
-    walletUnSub = notifyUpdate({
-      id: wallet._id.toString(),
-      type: 'Wallet',
-      callback: () => {
-        invalidateAll().then(() => {
-          wallet = $page.data.wallet;
-        });
-      }
+    walletUnSub = walletStore(wallet).subscribe((value) => {
+      wallet = value;
     });
   });
 
@@ -493,7 +471,9 @@
 
       <!-- Wallet -->
       <div>
-        <CreatorWallet {wallet} {exchangeRate} {form} {destination} />
+        {#key wallet}
+          <CreatorWallet {wallet} {exchangeRate} {form} {destination} />
+        {/key}
       </div>
 
       <!-- Activity Feed -->

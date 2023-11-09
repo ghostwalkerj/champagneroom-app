@@ -3,8 +3,7 @@
   import type { Unsubscriber } from 'svelte/store';
 
   import { browser } from '$app/environment';
-  import { goto, invalidateAll } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { goto } from '$app/navigation';
   import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
   import { type ShowDocumentType, ShowStatus } from '$lib/models/show';
@@ -12,8 +11,9 @@
 
   import Config from '$lib/config';
   import { jitsiInterfaceConfigOverwrite } from '$lib/constants';
-  import { notifyUpdate } from '$lib/notify';
   import getProfileImage from '$lib/profilePhoto';
+
+  import { showStore } from '$stores';
 
   import type { PageData } from './$types';
 
@@ -85,20 +85,15 @@
       leaveShow();
       goto(returnPath);
     }
-    showUnSub = notifyUpdate({
-      id: show._id.toString(),
-      type: 'Show',
-      callback: async () => {
-        await invalidateAll();
-        show = $page.data.show;
-        isTimeToLeave =
-          show.showState.status !== ShowStatus.LIVE &&
-          show.showState.status !== ShowStatus.STOPPED;
-        if (isTimeToLeave) {
-          api.executeCommand('hangup');
-          leaveShow();
-          goto(returnPath);
-        }
+    showUnSub = showStore(show).subscribe((_show) => {
+      show = _show;
+      isTimeToLeave =
+        show.showState.status !== ShowStatus.LIVE &&
+        show.showState.status !== ShowStatus.STOPPED;
+      if (isTimeToLeave) {
+        api.executeCommand('hangup');
+        leaveShow();
+        goto(returnPath);
       }
     });
   });
