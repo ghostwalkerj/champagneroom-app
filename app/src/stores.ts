@@ -115,17 +115,17 @@ const getInsertNotification = ({
   callback,
   signal,
   type,
-  relatedType
+  relatedField
 }: {
   id: string;
   callback: () => void;
   signal?: AbortSignal;
   type: EntityType;
-  relatedType?: EntityType;
+  relatedField?: string;
 }) => {
   const typeQuery = '?type=' + type;
-  const queryString = relatedType
-    ? typeQuery + '&relatedType=' + relatedType
+  const queryString = relatedField
+    ? typeQuery + '&relatedField=' + relatedField
     : typeQuery;
   const path = urlJoin(Config.Path.notifyInsert, id, queryString);
   const waitFor = async () => {
@@ -137,9 +137,11 @@ const getInsertNotification = ({
         })
       );
       if (error) {
+        console.error(error);
         shouldLoop = false;
       } else {
         try {
+          console.log('callback');
           callback();
         } catch (error) {
           console.error(error);
@@ -162,6 +164,7 @@ export const showEventStore = (show: ShowDocumentType) => {
         invalidateAll().then(() => {
           const updatedDocument = get(page).data
             .showEvent as ShowEventDocumentType;
+          console.log('updatedDocument', updatedDocument);
           set(updatedDocument);
         });
       };
@@ -170,7 +173,7 @@ export const showEventStore = (show: ShowDocumentType) => {
         callback,
         signal: showEventSignal,
         type: EntityType.SHOWEVENT,
-        relatedType: EntityType.SHOW
+        relatedField: EntityType.SHOW.toLowerCase()
       });
 
       return () => {

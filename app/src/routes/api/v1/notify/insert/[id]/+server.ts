@@ -11,12 +11,12 @@ export const GET = (async ({ params, url }) => {
     return new Response('Bad Request', { status: 400 });
   }
 
-  const relatedType = url.searchParams.get('relatedType');
+  const relatedField = url.searchParams.get('relatedField');
 
   const objectId = new mongoose.Types.ObjectId(id);
 
-  const matchField = relatedType
-    ? 'fullDocument.' + relatedType
+  const matchField = relatedField
+    ? 'fullDocument.' + relatedField
     : 'fullDocument.' + type;
 
   const pipeline = [

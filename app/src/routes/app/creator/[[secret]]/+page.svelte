@@ -1,8 +1,8 @@
 <script lang="ts">
   import { possessive } from 'i18n-possessive';
   import { onDestroy, onMount } from 'svelte';
-  import StarRating from 'svelte-star-rating';
   import type { Unsubscriber } from 'svelte/store';
+  import StarRating from 'svelte-star-rating';
   import urlJoin from 'url-join';
 
   import { applyAction, enhance } from '$app/forms';
@@ -12,7 +12,10 @@
   import { CancelReason } from '$lib/models/common';
   import type { CreatorDocumentType } from '$lib/models/creator';
   import type { ShowDocumentType } from '$lib/models/show';
-  import type { ShowEventDocument } from '$lib/models/showEvent';
+  import type {
+    ShowEventDocument,
+    ShowEventDocumentType
+  } from '$lib/models/showEvent';
   import type { WalletDocumentType } from '$lib/models/wallet';
 
   import type { ShowMachineServiceType } from '$lib/machines/showMachine';
@@ -106,17 +109,27 @@
       });
       useShowMachine(showMachineService);
       showEventUnSub?.();
-      showEventUnSub = showEventStore(currentShow).subscribe((value) => {
-        currentEvent = value as ShowEventDocument;
-        eventText = createEventText(currentEvent);
-      });
+
       showUnSub?.();
-      showUnSub = showStore(show).subscribe((value) => {
-        useNewShow(value);
-        currentEvent = $page.data.showEvent;
+      showUnSub = showStore(show).subscribe((_show) => {
+        if (_show && _show.showState.current) {
+          currentShow = _show;
+          showMachineService?.stop();
+          showMachineService = createShowMachineService({
+            showDocument: _show
+          });
+          useShowMachine(showMachineService);
+          showEventUnSub = showEventStore(show).subscribe(
+            (_showEvent: ShowEventDocumentType) => {
+              if (_showEvent) {
+                eventText = createEventText(_showEvent);
+              }
+            }
+          );
+        } else {
+          noCurrentShow();
+        }
       });
-    } else {
-      noCurrentShow();
     }
   };
 
