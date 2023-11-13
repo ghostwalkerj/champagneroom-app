@@ -38,11 +38,13 @@ const abstractUpdateStore = <T extends { _id: Types.ObjectId }>({
   const { subscribe, set } = writable<T>(doc, () => {
     const abortDocument = new AbortController();
     const signal = abortDocument.signal;
-    const callback = () => {
-      invalidateAll().then(() => {
-        const updatedDocument = get(page).data[type.toLocaleLowerCase()] as T;
-        set(updatedDocument);
-      });
+    let baseDocument = doc;
+    const callback = (document: Partial<T>) => {
+      baseDocument = {
+        ...baseDocument,
+        ...document
+      };
+      set(baseDocument);
     };
 
     getUpdateNotification({
@@ -75,14 +77,14 @@ export const creatorStore = (creator: CreatorDocumentType) => {
   });
 };
 
-const getUpdateNotification = ({
+const getUpdateNotification = <T>({
   id,
   callback,
   signal,
   type
 }: {
   id: string;
-  callback: () => void;
+  callback: (changeset: Partial<T>) => void;
   signal?: AbortSignal;
   type: EntityType;
 }) => {
@@ -90,7 +92,7 @@ const getUpdateNotification = ({
   const waitFor = async () => {
     let shouldLoop = true;
     while (shouldLoop) {
-      const [error] = await to(
+      const [error, response] = await to(
         fetch(path, {
           signal
         })
@@ -99,7 +101,8 @@ const getUpdateNotification = ({
         shouldLoop = false;
       } else {
         try {
-          callback();
+          const jsonResponse = await response.json();
+          callback(jsonResponse);
         } catch (error) {
           console.error(error);
           shouldLoop = false;

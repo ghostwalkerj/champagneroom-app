@@ -23,7 +23,7 @@ const config: UserConfig = {
   build: {
     chunkSizeWarningLimit: 16000,
     rollupOptions: {
-      external: ['@web3-onboard/*'],
+      external: ['@web3-onboard/*', 'snappy'],
 
     },
     commonjsOptions: {

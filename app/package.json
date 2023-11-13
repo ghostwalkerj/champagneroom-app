@@ -120,6 +120,7 @@
     "rxjs": "^7.8.1",
     "set-cookie-parser": "^2.6.0",
     "silly-password-generator": "^1.0.22",
+    "snappy": "^7.2.2",
     "spacetime": "^7.4.3",
     "svelte-chartjs": "^3.1.2",
     "svelte-proxied-store": "^1.1.5",

@@ -13,14 +13,14 @@ export const GET = (async ({ params, url }) => {
 
   const objectId = new mongoose.Types.ObjectId(id);
 
-  const pipeline = [{ $match: { 'fullDocument._id': objectId } }];
+  const pipeline = [{ $match: { 'documentKey._id': objectId } }];
 
   const changeStream = mongoose.model(type).watch(pipeline, {
-    fullDocument: 'updateLookup'
+    //fullDocument: 'updateLookup'
   });
 
-  await changeStream.next();
-
+  const next = await changeStream.next();
+  const updatedFields = next.updateDescription.updatedFields;
   changeStream.close();
-  return new Response('ok');
+  return new Response(String(JSON.stringify(updatedFields)));
 }) satisfies RequestHandler;
