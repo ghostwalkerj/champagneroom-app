@@ -23,13 +23,14 @@ import type { PageServerLoad } from './$types';
 export const actions: Actions = {
   leave_show: async ({ locals }) => {
     const ticket = locals.ticket;
+
     if (!ticket) {
       throw error(404, 'Ticket not found');
     }
     const redisConnection = locals.redisConnection as IORedis;
     const ticketService = getTicketMachineService(ticket, redisConnection);
     ticketService.send(TicketMachineEventString.SHOW_LEFT);
-
+    console.log('Ticket left show');
     return { success: true };
   }
 };

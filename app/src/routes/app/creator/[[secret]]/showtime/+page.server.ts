@@ -19,41 +19,36 @@ import type { ShowQueueType } from '$lib/workers/showWorker';
 
 import Config from '$lib/config';
 import { EntityType } from '$lib/constants';
-import {
-  getShowMachineService,
-  getShowMachineServiceFromId
-} from '$lib/server/machinesUtil';
+import { getShowMachineService } from '$lib/server/machinesUtil';
 
 import type { PageServerLoad } from './$types';
 
 export const actions: Actions = {
-  stop_show: async ({ request, locals }) => {
-    const data = await request.formData();
-
-    const showId = data.get('showId') as string;
-
+  leave_show: async ({ locals }) => {
     const redisConnection = locals.redisConnection as IORedis;
+    const show = locals.show;
+    if (!show) {
+      throw error(404, 'Show not found');
+    }
 
     const showQueue = new Queue(EntityType.SHOW, {
       connection: redisConnection
     }) as ShowQueueType;
 
-    const showService = await getShowMachineServiceFromId(showId);
+    const showService = getShowMachineService(show);
 
     const showState = showService.getSnapshot();
 
     if (showState.can({ type: ShowMachineEventString.SHOW_STOPPED })) {
       showQueue.add(ShowMachineEventString.SHOW_STOPPED, {
-        showId
+        showId: show._id.toString()
       });
     }
     return { success: true };
   }
 };
 
-export const load: PageServerLoad = async ({ locals, url }) => {
-  const returnPath = url.searchParams.get('returnPath');
-
+export const load: PageServerLoad = async ({ locals }) => {
   const creator = locals.creator;
   const user = locals.user;
   if (!creator) {
@@ -111,7 +106,6 @@ export const load: PageServerLoad = async ({ locals, url }) => {
     creator: creator.toObject({ flattenObjectIds: true, flattenMaps: true }),
     show: show.toObject({ flattenObjectIds: true, flattenMaps: true }),
     user: user.toObject({ flattenObjectIds: true, flattenMaps: true }),
-    jitsiToken,
-    returnPath
+    jitsiToken
   };
 };

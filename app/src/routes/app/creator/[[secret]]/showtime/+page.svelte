@@ -8,6 +8,7 @@
   import type { CreatorDocumentType } from '$lib/models/creator';
   import type { ShowDocumentType } from '$lib/models/show';
 
+  import Config from '$lib/config';
   import { jitsiInterfaceConfigOverwrite } from '$lib/constants';
 
   import type { PageData } from './$types';
@@ -16,32 +17,14 @@
 
   let creator = data.creator as CreatorDocumentType;
   $: currentShow = data.show as ShowDocumentType;
-  const returnPath = data.returnPath as string;
   let user = data.user;
   let jitsiToken = data.jitsiToken;
 
+  const returnPath = Config.Path.creator;
   let videoCallElement: HTMLDivElement;
   let api: any;
   let participantName = '';
-  let isShowStopped = false;
-
-  const stopShow = async () => {
-    if (isShowStopped) return;
-    let formData = new FormData();
-    formData.append('showId', currentShow?._id.toString());
-    fetch('?/stop_show', {
-      method: 'POST',
-      body: formData
-    });
-    isShowStopped = true;
-    api?.executeCommand('endConference');
-  };
-
-  if (browser) {
-    onDestroy(() => {
-      stopShow();
-    });
-  }
+  let hasLeftShow = false;
 
   const participantJoined = (event: any) => {
     console.log('participantJoined', event);
@@ -58,6 +41,21 @@
   };
 
   onMount(() => {
+    const postLeaveShow = async () => {
+      if (hasLeftShow) return;
+      let formData = new FormData();
+      await fetch('?/leave_show', {
+        method: 'POST',
+        body: formData
+      });
+      hasLeftShow = true;
+      goto(returnPath, { invalidateAll: true }).then(() => {
+        api?.executeCommand('endConference');
+        videoCallElement?.remove();
+        window.location.reload();
+      });
+    };
+
     const options = {
       roomName: currentShow?.roomId,
       jwt: jitsiToken,
@@ -83,12 +81,18 @@
     api.executeCommand('subject', currentShow?.name);
     api.addListener('participantJoined', participantJoined);
     api.addListener('knockingParticipant', participantKnocked);
-    api.addListener('toolbarButtonClicked', (event: any) => {
+    api.addListener('toolbarButtonClicked', async (event: any) => {
       if (event?.key === 'leave-show') {
-        stopShow().then(() => {
-          goto(returnPath);
-        });
+        await postLeaveShow();
       }
+    });
+
+    api.addListener('videoConferenceLeft', () => {
+      postLeaveShow();
+    });
+
+    onDestroy(() => {
+      postLeaveShow();
     });
   });
 </script>

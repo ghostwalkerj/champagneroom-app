@@ -1,12 +1,12 @@
 <script lang="ts">
+  import { addIcon } from 'iconify-icon';
   import { onDestroy, onMount } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
 
-  import { browser } from '$app/environment';
-  import { goto } from '$app/navigation';
+  import { beforeNavigate, goto } from '$app/navigation';
   import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
-  import { type ShowDocumentType, ShowStatus } from '$lib/models/show';
+  import type { ShowDocumentType } from '$lib/models/show';
   import type { UserDocument } from '$lib/models/user';
 
   import Config from '$lib/config';
@@ -21,7 +21,7 @@
 
   let show = data.show as ShowDocumentType;
   let user = data.user as UserDocument;
-  const returnPath = data.returnPath as string;
+  const returnPath = Config.Path.ticket;
 
   // @ts-ignore
   let jitsiToken = data.jitsiToken as string;
@@ -32,25 +32,22 @@
   $: isTimeToLeave = false;
   let hasLeftShow = false;
 
-  const leaveShow = () => {
-    if (hasLeftShow) return;
-    let formData = new FormData();
-    fetch('?/leave_show', {
-      method: 'POST',
-      body: formData
-    });
-    hasLeftShow = true;
-  };
-
-  if (browser) {
-    onDestroy(() => {
-      leaveShow();
-      showUnSub?.();
-    });
-  }
-
   const profileImage = getProfileImage(user.name, Config.UI.profileImagePath);
   onMount(() => {
+    const postLeaveShow = async () => {
+      if (hasLeftShow) return;
+      let formData = new FormData();
+      await fetch('?/leave_show', {
+        method: 'POST',
+        body: formData
+      });
+      hasLeftShow = true;
+      goto(returnPath, { invalidateAll: true }).then(() => {
+        videoCallElement?.remove();
+        api.executeCommand('hangup');
+        window.location.reload();
+      });
+    };
     const options = {
       roomName: show.roomId,
       jwt: jitsiToken,
@@ -62,7 +59,11 @@
       },
       interfaceConfigOverwrite: jitsiInterfaceConfigOverwrite,
       configOverwrite: {
-        localSubject: show.name
+        filmstrip: {
+          enabled: false
+        },
+        disabledNotifications: ['dialog.sessTerminated'],
+        localSubject: show?.name
       }
     };
 
@@ -70,31 +71,40 @@
     const api = new JitsiMeetExternalAPI(PUBLIC_JITSI_DOMAIN, options);
     api.executeCommand('avatarUrl', profileImage);
 
-    api.addListener('toolbarButtonClicked', (event: any) => {
+    api.addListener('toolbarButtonClicked', async (event: any) => {
       if (event?.key === 'leave-show') {
-        leaveShow();
-        goto(returnPath);
+        //api.executeCommand('hangup');
+        await postLeaveShow();
       }
     });
 
-    isTimeToLeave =
-      show.showState.status !== ShowStatus.LIVE &&
-      show.showState.status !== ShowStatus.STOPPED;
-    if (isTimeToLeave) {
-      api.executeCommand('hangup');
-      leaveShow();
-      goto(returnPath);
-    }
+    api.addListener('videoConferenceLeft', () => {
+      postLeaveShow();
+    });
+
+    onDestroy(() => {
+      postLeaveShow();
+      showUnSub?.();
+    });
+
+    // isTimeToLeave =
+    //   show.showState.status !== ShowStatus.LIVE &&
+    //   show.showState.status !== ShowStatus.STOPPED;
+    // if (isTimeToLeave) {
+    //   api.executeCommand('hangup');
+    //   leaveShow();
+    //   goto(returnPath);
+    // }
     showUnSub = showStore(show).subscribe((_show) => {
       show = _show;
-      isTimeToLeave =
-        show.showState.status !== ShowStatus.LIVE &&
-        show.showState.status !== ShowStatus.STOPPED;
-      if (isTimeToLeave) {
-        api.executeCommand('hangup');
-        leaveShow();
-        goto(returnPath);
-      }
+      // isTimeToLeave =
+      //   show.showState.status !== ShowStatus.LIVE &&
+      //   show.showState.status !== ShowStatus.STOPPED;
+      // if (isTimeToLeave) {
+      //   api.executeCommand('hangup');
+      //   leaveShow();
+      //   goto(returnPath);
+      // }
     });
   });
 </script>

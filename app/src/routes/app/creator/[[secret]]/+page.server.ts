@@ -134,7 +134,8 @@ export const actions: Actions = {
     }
 
     return {
-      success: true
+      success: true,
+      showCancelled: true
     };
   },
   end_show: async ({ request, locals }) => {

@@ -164,7 +164,9 @@
             </div>
           </div>
         </div>
-        <label for="buy-ticket" class="btn btn-secondary m-4">Buy Ticket</label>
+        <label for="buy-ticket" class="btn btn-secondary m-4"
+          >Reserve Ticket</label
+        >
       {/if}
     </div>
   </div>

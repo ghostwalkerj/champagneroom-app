@@ -42,11 +42,7 @@
     invoice?.payments?.length - 1
   ] as PaymentType;
 
-  const showTimePath = urlJoin(
-    $page.url.pathname,
-    Config.Path.showTime,
-    '?returnPath=' + $page.url.pathname
-  );
+  const showTimePath = urlJoin($page.url.pathname, Config.Path.showTime);
   const reasons = Object.values(DisputeReason);
 
   $: shouldPay = false;

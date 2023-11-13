@@ -6,7 +6,7 @@
   import urlJoin from 'url-join';
 
   import { applyAction, enhance } from '$app/forms';
-  import { goto } from '$app/navigation';
+  import { goto, invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
 
   import { CancelReason } from '$lib/models/common';
@@ -51,11 +51,7 @@
   let wallet = data.wallet as WalletDocumentType;
   let exchangeRate = +data.exchangeRate || 0;
 
-  const showTimePath = urlJoin(
-    $page.url.pathname,
-    Config.Path.showTime,
-    '?returnPath=' + $page.url.pathname
-  );
+  const showTimePath = urlJoin($page.url.pathname, Config.Path.showTime);
 
   let showName = creator
     ? possessive(creator.user.name, 'en') + ' Show'
@@ -83,6 +79,9 @@
   const destination = creator.user.payoutAddress;
 
   const noCurrentShow = () => {
+    showEventUnSub?.();
+    showUnSub?.();
+    showMachineService?.stop();
     canCreateShow = true;
     canCancelShow = false;
     canStartShow = false;
@@ -90,8 +89,6 @@
     eventText = 'No Events';
     currentShow = undefined;
     showStopped = false;
-    showEventUnSub?.();
-    showUnSub?.();
   };
 
   if (!currentShow) {
@@ -100,17 +97,26 @@
 
   const useNewShow = (show: ShowDocumentType) => {
     if (show && show.showState.current) {
+      showUnSub?.();
+      showEventUnSub?.();
       currentShow = show;
       canCreateShow = false;
       statusText = show.showState.status;
-      eventText = createEventText(currentEvent);
+
+      showMachineService?.stop();
       showMachineService = createShowMachineService({
         showDocument: currentShow
       });
       useShowMachine(showMachineService);
-      showEventUnSub?.();
 
-      showUnSub?.();
+      showEventUnSub = showEventStore(show).subscribe(
+        (_showEvent: ShowEventDocumentType) => {
+          if (_showEvent) {
+            eventText = createEventText(_showEvent);
+          }
+        }
+      );
+
       showUnSub = showStore(show).subscribe((_show) => {
         if (_show && _show.showState.current) {
           currentShow = _show;
@@ -119,13 +125,6 @@
             showDocument: _show
           });
           useShowMachine(showMachineService);
-          showEventUnSub = showEventStore(show).subscribe(
-            (_showEvent: ShowEventDocumentType) => {
-              if (_showEvent) {
-                eventText = createEventText(_showEvent);
-              }
-            }
-          );
         } else {
           noCurrentShow();
         }
@@ -198,6 +197,7 @@
         useNewShow(currentShow);
       } else if (result.data.showCancelled) {
         statusText = 'Cancelled';
+        noCurrentShow();
       } else if (result.data.inEscrow) {
         noCurrentShow();
         statusText = 'In Escrow';
