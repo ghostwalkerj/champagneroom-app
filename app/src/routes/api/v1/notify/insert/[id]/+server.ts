@@ -30,8 +30,8 @@ export const GET = (async ({ params, url }) => {
   const changeStream = mongoose.model(type).watch(pipeline, {
     showExpandedEvents: true
   });
-  await changeStream.next();
-
+  const next = await changeStream.next();
+  const document = next.fullDocument;
   changeStream.close();
-  return new Response('ok');
+  return new Response(String(JSON.stringify(document)));
 }) satisfies RequestHandler;

@@ -42,7 +42,7 @@
     invoice?.payments?.length - 1
   ] as PaymentType;
 
-  const showTimePath = urlJoin($page.url.pathname, Config.Path.showTime);
+  const showTimePath = urlJoin(Config.Path.ticket, Config.Path.showTime);
   const reasons = Object.values(DisputeReason);
 
   $: shouldPay = false;
@@ -172,6 +172,16 @@
     }
   };
 
+  const joinShow = async () => {
+    loading = true;
+    let formData = new FormData();
+    fetch('?/join_show', {
+      method: 'POST',
+      body: formData
+    });
+    await goto(showTimePath);
+  };
+
   onMount(() => {
     if (show) {
       hasShowStarted = show.showState.status === ShowStatus.LIVE;
@@ -289,7 +299,7 @@
                 disabled={loading}
                 on:click={() => {
                   loading = true;
-                  goto(showTimePath);
+                  joinShow();
                 }}>Go to the Show</button
               >
             </div>

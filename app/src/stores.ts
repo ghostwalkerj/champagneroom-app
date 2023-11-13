@@ -110,7 +110,7 @@ const getUpdateNotification = ({
   waitFor();
 };
 
-const getInsertNotification = ({
+const getInsertNotification = <T>({
   id,
   callback,
   signal,
@@ -118,7 +118,7 @@ const getInsertNotification = ({
   relatedField
 }: {
   id: string;
-  callback: () => void;
+  callback: (changeset: T) => void;
   signal?: AbortSignal;
   type: EntityType;
   relatedField?: string;
@@ -131,7 +131,7 @@ const getInsertNotification = ({
   const waitFor = async () => {
     let shouldLoop = true;
     while (shouldLoop) {
-      const [error] = await to(
+      const [error, response] = await to(
         fetch(path, {
           signal
         })
@@ -141,8 +141,8 @@ const getInsertNotification = ({
         shouldLoop = false;
       } else {
         try {
-          console.log('callback');
-          callback();
+          const jsonResponse = await response.json();
+          callback(jsonResponse);
         } catch (error) {
           console.error(error);
           shouldLoop = false;
@@ -160,15 +160,9 @@ export const showEventStore = (show: ShowDocumentType) => {
     ($show, set) => {
       const abortShowEvent = new AbortController();
       const showEventSignal = abortShowEvent.signal;
-      const callback = () => {
-        invalidateAll().then(() => {
-          const updatedDocument = get(page).data
-            .showEvent as ShowEventDocumentType;
-          console.log('updatedDocument', updatedDocument);
-          set(updatedDocument);
-        });
-      };
-      getInsertNotification({
+      const callback = set;
+
+      getInsertNotification<ShowEventDocumentType>({
         id: $show._id.toString(),
         callback,
         signal: showEventSignal,

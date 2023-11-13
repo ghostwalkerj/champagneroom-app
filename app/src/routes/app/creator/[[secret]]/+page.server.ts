@@ -14,6 +14,7 @@ import { CancelReason, CurrencyType } from '$lib/models/common';
 import type { CreatorDocument } from '$lib/models/creator';
 import type { ShowDocument } from '$lib/models/show';
 import { Show, ShowStatus } from '$lib/models/show';
+import type { ShowEventDocument } from '$lib/models/showEvent';
 import { ShowEvent } from '$lib/models/showEvent';
 import type { WalletDocument } from '$lib/models/wallet';
 import { Wallet, WalletStatus } from '$lib/models/wallet';
@@ -223,14 +224,16 @@ export const load: PageServerLoad = async ({ locals }) => {
   }
 
   const show = locals.show as ShowDocument;
+  let showEvent: ShowEventDocument | undefined;
 
-  const showEvent =
-    show &&
-    (await ShowEvent.findOne(
+  if (show) {
+    const se = await ShowEvent.find(
       { show: show._id },
       {},
       { sort: { createdAt: -1 } }
-    ));
+    ).limit(1);
+    if (se && se[0]) showEvent = se[0];
+  }
 
   const completedShows = await Show.find({
     creator: creator._id,

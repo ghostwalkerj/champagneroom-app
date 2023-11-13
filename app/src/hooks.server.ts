@@ -119,6 +119,13 @@ const setLocals = async (decode: JwtPayload, locals: App.Locals) => {
             throw error(500, 'No ticket');
           }
           locals.ticket = ticket;
+
+          const show = await Show.findById(ticket.show)
+            .orFail(() => {
+              throw error(500, 'Show not found');
+            })
+            .exec();
+          locals.show = show;
           break;
         }
       }

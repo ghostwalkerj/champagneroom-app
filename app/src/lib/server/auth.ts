@@ -56,7 +56,11 @@ const REQUEST_AUTH_PATHS = [
   ...SIGN_PATHS,
   ...PASSWORD_PATHS,
   ...PIN_PATHS,
-  Config.Path.app
+  Config.Path.app,
+  Config.Path.ticket,
+  Config.Path.creator,
+  Config.Path.operator,
+  Config.Path.agent
 ];
 
 export const isAgentMatch = outmatch(AGENT_PATHS);

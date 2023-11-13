@@ -10,7 +10,12 @@ const showeventSchema = new Schema(
     // eslint-disable-next-line @typescript-eslint/naming-convention
     _id: { type: Schema.Types.ObjectId, required: true, auto: true },
     type: { type: String, required: true },
-    show: { type: Schema.Types.ObjectId, ref: 'Show', required: true },
+    show: {
+      type: Schema.Types.ObjectId,
+      ref: 'Show',
+      required: true,
+      index: true
+    },
     creator: { type: Schema.Types.ObjectId, ref: 'Creator', required: true },
     agent: { type: Schema.Types.ObjectId, ref: 'Agent' },
     ticket: { type: Schema.Types.ObjectId, ref: 'Ticket' },
@@ -24,7 +29,7 @@ const showeventSchema = new Schema(
   { timestamps: true }
 );
 
-showeventSchema.index({ createdAt: -1 });
+showeventSchema.index({ show: 1, createdAt: -1 });
 
 export type ShowEventDocument = InstanceType<typeof ShowEvent>;
 

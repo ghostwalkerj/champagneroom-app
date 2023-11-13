@@ -44,6 +44,7 @@ export const actions: Actions = {
         showId: show._id.toString()
       });
     }
+    console.log('Creator left show');
     return { success: true };
   }
 };

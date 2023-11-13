@@ -43,15 +43,17 @@
   onMount(() => {
     const postLeaveShow = async () => {
       if (hasLeftShow) return;
+      hasLeftShow = true;
+
       let formData = new FormData();
       await fetch('?/leave_show', {
         method: 'POST',
         body: formData
       });
-      hasLeftShow = true;
-      goto(returnPath, { invalidateAll: true }).then(() => {
-        api?.executeCommand('endConference');
-        videoCallElement?.remove();
+      api?.executeCommand('endConference');
+      videoCallElement?.remove();
+
+      goto(returnPath).then(() => {
         window.location.reload();
       });
     };

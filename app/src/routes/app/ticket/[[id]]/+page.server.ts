@@ -279,6 +279,27 @@ export const actions: Actions = {
     });
 
     return { success: true };
+  },
+  join_show: async ({ locals }) => {
+    const ticket = locals.ticket;
+    if (!ticket) {
+      throw error(404, 'Ticket not found');
+    }
+
+    const redisConnection = locals.redisConnection as IORedis;
+
+    const ticketService = getTicketMachineService(ticket, redisConnection);
+
+    const state = ticketService.getSnapshot();
+
+    if (state.can(TicketMachineEventString.TICKET_REDEEMED)) {
+      ticketService.send(TicketMachineEventString.TICKET_REDEEMED);
+      ticketService.send(TicketMachineEventString.SHOW_JOINED);
+    } else if (state.can(TicketMachineEventString.SHOW_JOINED)) {
+      ticketService.send(TicketMachineEventString.SHOW_JOINED);
+    }
+
+    return { success: true };
   }
 };
 
@@ -289,12 +310,10 @@ export const load: PageServerLoad = async ({ locals }) => {
   if (!ticket) {
     throw error(404, 'Ticket not found');
   }
-  const show = await Show.findById(ticket.show)
-    .orFail(() => {
-      throw error(404, 'Show not found');
-    })
-    .exec();
-
+  const show = locals.show;
+  if (!show) {
+    throw error(404, 'Show not found');
+  }
   // Get invoice associated with ticket
   const token = await createAuthToken(
     BITCART_EMAIL,

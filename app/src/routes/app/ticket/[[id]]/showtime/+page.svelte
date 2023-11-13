@@ -6,7 +6,7 @@
   import { beforeNavigate, goto } from '$app/navigation';
   import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
-  import type { ShowDocumentType } from '$lib/models/show';
+  import { type ShowDocumentType, ShowStatus } from '$lib/models/show';
   import type { UserDocument } from '$lib/models/user';
 
   import Config from '$lib/config';
@@ -29,23 +29,24 @@
 
   let videoCallElement: HTMLDivElement;
 
-  $: isTimeToLeave = false;
   let hasLeftShow = false;
 
   const profileImage = getProfileImage(user.name, Config.UI.profileImagePath);
-  onMount(() => {
+  onMount(async () => {
     const postLeaveShow = async () => {
       if (hasLeftShow) return;
+      hasLeftShow = true;
+
       let formData = new FormData();
       await fetch('?/leave_show', {
         method: 'POST',
         body: formData
       });
-      hasLeftShow = true;
-      goto(returnPath, { invalidateAll: true }).then(() => {
-        videoCallElement?.remove();
-        api.executeCommand('hangup');
-        window.location.reload();
+      videoCallElement?.remove();
+      api.executeCommand('hangup');
+      showUnSub?.();
+      goto(returnPath).then(() => {
+        // window.location.reload();
       });
     };
     const options = {
@@ -82,29 +83,22 @@
       postLeaveShow();
     });
 
-    onDestroy(() => {
-      postLeaveShow();
-      showUnSub?.();
-    });
-
-    // isTimeToLeave =
+    // const isTimeToLeave =
     //   show.showState.status !== ShowStatus.LIVE &&
     //   show.showState.status !== ShowStatus.STOPPED;
     // if (isTimeToLeave) {
-    //   api.executeCommand('hangup');
-    //   leaveShow();
-    //   goto(returnPath);
+    //   await postLeaveShow();
     // }
-    showUnSub = showStore(show).subscribe((_show) => {
+
+    showUnSub = showStore(show).subscribe(async (_show) => {
+      if (!_show) return;
       show = _show;
-      // isTimeToLeave =
-      //   show.showState.status !== ShowStatus.LIVE &&
-      //   show.showState.status !== ShowStatus.STOPPED;
-      // if (isTimeToLeave) {
-      //   api.executeCommand('hangup');
-      //   leaveShow();
-      //   goto(returnPath);
-      // }
+      const isTimeToLeave =
+        show.showState.status !== ShowStatus.LIVE &&
+        show.showState.status !== ShowStatus.STOPPED;
+      if (isTimeToLeave) {
+        await postLeaveShow();
+      }
     });
   });
 </script>

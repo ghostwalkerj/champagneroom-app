@@ -47,29 +47,11 @@ export const load: PageServerLoad = async ({ locals, url }) => {
   if (!ticket) {
     throw error(404, 'Ticket not found');
   }
-  const show = await Show.findById(ticket.show)
-    .orFail(() => {
-      throw error(404, 'Show not found');
-    })
-    .exec();
 
-  const redisConnection = locals.redisConnection as IORedis;
-
-  const ticketService = getTicketMachineService(ticket, redisConnection);
-  const ticketMachineState = ticketService.getSnapshot();
-
-  if (ticketMachineState.can(TicketMachineEventString.TICKET_REDEEMED)) {
-    ticketService.send(TicketMachineEventString.TICKET_REDEEMED);
+  const show = locals.show;
+  if (!show) {
+    throw error(404, 'Show not found');
   }
-
-  // Check if can watch the show
-  else if (!ticketMachineState.can(TicketMachineEventString.SHOW_JOINED)) {
-    const ticketUrl = urlJoin(Config.Path.ticket, ticket._id.toString());
-
-    throw redirect(302, ticketUrl);
-  }
-
-  ticketService.send(TicketMachineEventString.SHOW_JOINED);
 
   const jitsiToken = jwt.sign(
     {
