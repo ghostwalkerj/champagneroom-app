@@ -1,8 +1,9 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import StarRating from 'svelte-star-rating';
   import urlJoin from 'url-join';
 
-  import type { ShowDocumentType } from '$lib/models/show';
+  import { type ShowDocumentType, ShowStatus } from '$lib/models/show';
 
   import Config from '$lib/config';
   import { currencyFormatter, durationFormatter } from '$lib/constants';
@@ -30,7 +31,7 @@
     ...options
   };
   $: showStatus = show.showState.status;
-  $: waterMarkText = showStatus;
+  $: waterMarkText = '';
   $: name = show.name;
   $: duration = durationFormatter(show.duration * 60);
   $: price = currencyFormatter().format(show.price.amount);
@@ -54,6 +55,26 @@
     );
     navigator.clipboard.writeText(showUrl);
   };
+
+  onMount(() => {
+    if (options.showWaterMark) {
+      switch (showStatus) {
+        case ShowStatus.BOX_OFFICE_CLOSED: {
+          waterMarkText = 'Sold Out';
+          break;
+        }
+        case ShowStatus.BOX_OFFICE_OPEN: {
+          waterMarkText = 'On Sale';
+          break;
+        }
+
+        default: {
+          waterMarkText = showStatus;
+          break;
+        }
+      }
+    }
+  });
 </script>
 
 {#if show}

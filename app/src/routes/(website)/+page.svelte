@@ -13,22 +13,17 @@
   import type { ActionData } from './$types';
 
   export let form: ActionData;
-
-  function handleObserver(x: CustomEvent<any>) {
-    console.info(x.detail.observing);
-  }
 </script>
 
 <Saos
-  animation={'puff-in-center 0.7s cubic-bezier(0.470, 0.000, 0.745, 0.715) both'}
-  animation_out={'slide-out-elliptic-top-bck 0.7s ease-in both'}
+  animation={'fade-in 1.8s cubic-bezier(0.390, 0.575, 0.565, 1.000) both'}
+  animation_out={'slide-out-fwd-center 0.7s cubic-bezier(0.550, 0.085, 0.680, 0.530) both'}
   top={250}
   bottom={250}
-  on:update={handleObserver}
 >
   <div class="flex mt-20 w-screen" id="topPage">
     <div class="flex flex-col lg:flex-row items-center">
-      <div class="w-full px-14">
+      <div class="w-full pl-20">
         <h2
           class="text-info text-center font-bold leading-none text-[41px] lg:text-left mb-6 font-CaviarDreams"
         >
@@ -63,21 +58,19 @@
           </div>
         </div>
       </div>
-      <div class="w-full p-10">
-        <div class="w-auto">
-          <video
-            autoplay
-            loop
-            controls
-            muted
-            class="opacity-80 rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1]"
-          >
-            <source
-              src="{Config.Path.staticUrl}/assets/champagnevideo.mp4"
-              type="video/mp4"
-            />
-          </video>
-        </div>
+      <div class="w-full px-20 py-10 lg:py-0">
+        <video
+          autoplay
+          loop
+          controls
+          muted
+          class="opacity-80 rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1]"
+        >
+          <source
+            src="{Config.Path.staticUrl}/assets/champagnevideo.mp4"
+            type="video/mp4"
+          />
+        </video>
       </div>
     </div>
   </div>
