@@ -1,9 +1,8 @@
 <script lang="ts">
-  import { addIcon } from 'iconify-icon';
   import { onDestroy, onMount } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
 
-  import { beforeNavigate, goto } from '$app/navigation';
+  import { goto } from '$app/navigation';
   import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
   import { type ShowDocumentType, ShowStatus } from '$lib/models/show';
@@ -44,6 +43,8 @@
       });
       videoCallElement?.remove();
       api.executeCommand('hangup');
+      api?.dispose();
+
       showUnSub?.();
       goto(returnPath).then(() => {
         // window.location.reload();
@@ -99,6 +100,10 @@
       if (isTimeToLeave) {
         await postLeaveShow();
       }
+    });
+
+    onDestroy(() => {
+      postLeaveShow();
     });
   });
 </script>

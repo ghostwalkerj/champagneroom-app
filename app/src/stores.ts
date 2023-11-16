@@ -2,11 +2,8 @@
 
 import to from 'await-to-js';
 import type { Types } from 'mongoose';
-import { derived, get, writable } from 'svelte/store';
+import { derived, writable } from 'svelte/store';
 import urlJoin from 'url-join';
-
-import { invalidateAll } from '$app/navigation';
-import { page } from '$app/stores';
 
 import type { AgentDocumentType } from '$lib/models/agent';
 import type { CreatorDocumentType } from '$lib/models/creator';
@@ -36,8 +33,6 @@ const abstractUpdateStore = <T extends { _id: Types.ObjectId }>({
   type: EntityType;
 }) => {
   const { subscribe, set } = writable<T>(doc, () => {
-    const abortDocument = new AbortController();
-    const signal = abortDocument.signal;
     let baseDocument = doc;
     const callback = (document: Partial<T>) => {
       baseDocument = {
@@ -47,15 +42,14 @@ const abstractUpdateStore = <T extends { _id: Types.ObjectId }>({
       set(baseDocument);
     };
 
-    getUpdateNotification({
+    const abortDocument = getUpdateNotification({
       id: doc._id.toString(),
       callback,
-      signal,
       type
     });
 
     return () => {
-      abortDocument.abort();
+      abortDocument?.abort();
     };
   });
   return {
@@ -80,18 +74,22 @@ export const creatorStore = (creator: CreatorDocumentType) => {
 const getUpdateNotification = <T>({
   id,
   callback,
-  signal,
   type
 }: {
   id: string;
   callback: (changeset: Partial<T>) => void;
-  signal?: AbortSignal;
   type: EntityType;
 }) => {
   const path = urlJoin(Config.Path.notifyUpdate, id, '?type=' + type);
-  const waitFor = async () => {
+  let abortDocument = new AbortController();
+  const waitFor = async (_abortDocument: AbortController | undefined) => {
     let shouldLoop = true;
     while (shouldLoop) {
+      if (_abortDocument) _abortDocument.abort();
+      _abortDocument = new AbortController();
+      abortDocument = _abortDocument;
+      const signal = _abortDocument.signal;
+
       const [error, response] = await to(
         fetch(path, {
           signal
@@ -110,19 +108,18 @@ const getUpdateNotification = <T>({
       }
     }
   };
-  waitFor();
+  waitFor(abortDocument);
+  return abortDocument;
 };
 
 const getInsertNotification = <T>({
   id,
   callback,
-  signal,
   type,
   relatedField
 }: {
   id: string;
   callback: (changeset: T) => void;
-  signal?: AbortSignal;
   type: EntityType;
   relatedField?: string;
 }) => {
@@ -131,7 +128,12 @@ const getInsertNotification = <T>({
     ? typeQuery + '&relatedField=' + relatedField
     : typeQuery;
   const path = urlJoin(Config.Path.notifyInsert, id, queryString);
-  const waitFor = async () => {
+  let abortDocument = new AbortController();
+  const waitFor = async (_abortDocument: AbortController | undefined) => {
+    if (_abortDocument) _abortDocument.abort();
+    _abortDocument = new AbortController();
+    abortDocument = _abortDocument;
+    const signal = _abortDocument.signal;
     let shouldLoop = true;
     while (shouldLoop) {
       const [error, response] = await to(
@@ -153,7 +155,8 @@ const getInsertNotification = <T>({
       }
     }
   };
-  waitFor();
+  waitFor(abortDocument);
+  return abortDocument;
 };
 
 export const showEventStore = (show: ShowDocumentType) => {
@@ -161,14 +164,12 @@ export const showEventStore = (show: ShowDocumentType) => {
   const showEventStore = derived<typeof showStore, ShowEventDocumentType>(
     showStore,
     ($show, set) => {
-      const abortShowEvent = new AbortController();
-      const showEventSignal = abortShowEvent.signal;
+      let abortShowEvent = new AbortController();
       const callback = set;
 
-      getInsertNotification<ShowEventDocumentType>({
+      abortShowEvent = getInsertNotification<ShowEventDocumentType>({
         id: $show._id.toString(),
         callback,
-        signal: showEventSignal,
         type: EntityType.SHOWEVENT,
         relatedField: EntityType.SHOW.toLowerCase()
       });

@@ -16,14 +16,14 @@
 </script>
 
 <Saos
-  animation={'fade-in 1.8s cubic-bezier(0.390, 0.575, 0.565, 1.000) both'}
+  animation={'fade-in 5s cubic-bezier(0.390, 0.575, 0.565, 1.000) both'}
   animation_out={'slide-out-fwd-center 0.7s cubic-bezier(0.550, 0.085, 0.680, 0.530) both'}
   top={250}
   bottom={250}
 >
-  <div class="flex mt-20 w-screen" id="topPage">
+  <div class="flex mt-20 w-screen items-center" id="topPage">
     <div class="flex flex-col lg:flex-row items-center">
-      <div class="w-full pl-20">
+      <div class="w-full pl-5 lg:pl-20">
         <h2
           class="text-info text-center font-bold leading-none text-[41px] lg:text-left mb-6 font-CaviarDreams"
         >
@@ -53,12 +53,12 @@
               class=" md:w-auto btn btn-secondary transition-all duration-300 ease-in-out m-0"
               target="_blank"
             >
-              Checkout the White Paper
+              White Paper
             </a>
           </div>
         </div>
       </div>
-      <div class="w-full px-20 py-10 lg:py-0">
+      <div class="w-full p-5 py-10 lg:p-10">
         <video
           autoplay
           loop

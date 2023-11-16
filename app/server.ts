@@ -1,5 +1,7 @@
 import 'dotenv/config';
 
+import { EventEmitter } from 'node:events';
+
 import { createBullBoard } from '@bull-board/api';
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
 import { ExpressAdapter } from '@bull-board/express';
@@ -115,13 +117,60 @@ const port = process.env.PORT || 3000;
 if (mongoose.connection.readyState === 0) {
   // eslint-disable-next-line unicorn/prefer-top-level-await
   mongoose.connect(mongoDBEndpoint);
+
+  mongoose.connection.on('connected', () => {
+    console.log('Mongoose connected:', mongoose.connection.name);
+  });
 }
-mongoose.connection.on('connected', () => {
-  console.log('Mongoose connected:', mongoose.connection.name);
-});
+
+const originalAddListener = EventEmitter.prototype.addListener;
+
+const addListener = function (type) {
+  Reflect.apply(originalAddListener, this, arguments);
+
+  const numberListeners = this.listeners(type).length;
+  const max = typeof this._maxListeners === 'number' ? this._maxListeners : 10;
+
+  if (max !== 0 && numberListeners > max) {
+    const error = new Error(
+      'Too many listeners of type "' +
+        type +
+        '" added to EventEmitter. Max is ' +
+        max +
+        " and we've added " +
+        numberListeners +
+        '.'
+    );
+    console.error(error);
+    throw error;
+  }
+
+  return this;
+};
+
+EventEmitter.prototype.addListener = addListener;
+EventEmitter.prototype.on = addListener;
+
+function logMemoryUsage() {
+  const formatMemoryUsage = (data: number) =>
+    `${Math.round((data / 1024 / 1024) * 100) / 100} MB`;
+  const memoryData = process.memoryUsage();
+  process.stdout.write(
+    `Memory usage: rss: ${formatMemoryUsage(
+      memoryData.rss
+    )}, heapTotal: ${formatMemoryUsage(
+      memoryData.heapTotal
+    )}, heapUsed: ${formatMemoryUsage(
+      memoryData.heapUsed
+    )}, external: ${formatMemoryUsage(memoryData.external)}` + '\n'
+  );
+}
+
 app.listen(port, () => {
   console.log('Champagne Server running on:', port);
   console.log('Workers running:', startWorker);
   console.log('Build number:', buildNumber);
   console.log('Build time:', buildTime);
+  logMemoryUsage();
+  setInterval(logMemoryUsage, 50_000);
 });

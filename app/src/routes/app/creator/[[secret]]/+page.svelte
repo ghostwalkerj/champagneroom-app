@@ -6,7 +6,7 @@
   import urlJoin from 'url-join';
 
   import { applyAction, enhance } from '$app/forms';
-  import { goto, invalidateAll } from '$app/navigation';
+  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
   import { CancelReason } from '$lib/models/common';

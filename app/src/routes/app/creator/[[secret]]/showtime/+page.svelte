@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
 
-  import { browser } from '$app/environment';
   import { goto } from '$app/navigation';
   import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
@@ -51,6 +50,7 @@
         body: formData
       });
       api?.executeCommand('endConference');
+      api?.dispose();
       videoCallElement?.remove();
 
       goto(returnPath).then(() => {
