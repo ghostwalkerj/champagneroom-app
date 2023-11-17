@@ -297,7 +297,10 @@ const endShow = async (show: ShowDocument, showQueue: ShowQueueType) => {
     for (const ticket of tickets) {
       // send show is over
       const ticketService = getTicketMachineService(ticket, showQueue);
-      ticketService.send(TicketMachineEventString.SHOW_ENDED);
+      const ticketState = ticketService.getSnapshot();
+      if (ticketState.can(TicketMachineEventString.SHOW_ENDED)) {
+        ticketService.send(TicketMachineEventString.SHOW_ENDED);
+      }
       ticketService.stop();
     }
   }
@@ -330,7 +333,7 @@ const finalizeShow = async (
       finalize
     })
   )
-    return;
+    return 'Show already finalized';
 
   showService.send({
     type: ShowMachineEventString.SHOW_FINALIZED,
@@ -788,7 +791,7 @@ const ticketCancelled = async (
       cancel
     })
   )
-    return;
+    return 'Ticket already cancelled';
 
   showService.send({
     type: ShowMachineEventString.TICKET_CANCELLED,

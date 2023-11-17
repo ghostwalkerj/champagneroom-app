@@ -64,7 +64,7 @@
           break;
         }
         case ShowStatus.BOX_OFFICE_OPEN: {
-          waterMarkText = 'On Sale';
+          waterMarkText = 'Tickets Available';
           break;
         }
 

@@ -29,27 +29,40 @@
   let videoCallElement: HTMLDivElement;
 
   let hasLeftShow = false;
+  let api: any;
 
   const profileImage = getProfileImage(user.name, Config.UI.profileImagePath);
+
+  const postLeaveShow = async () => {
+    if (hasLeftShow) return;
+    hasLeftShow = true;
+
+    let formData = new FormData();
+    await fetch('?/leave_show', {
+      method: 'POST',
+      body: formData
+    });
+    videoCallElement?.remove();
+    api?.executeCommand('hangup');
+    api?.dispose();
+
+    showUnSub?.();
+    goto(returnPath).then(() => {
+      // window.location.reload();
+    });
+  };
+  onDestroy(() => {
+    postLeaveShow();
+  });
+
   onMount(async () => {
-    const postLeaveShow = async () => {
-      if (hasLeftShow) return;
-      hasLeftShow = true;
+    const isTimeToLeave =
+      show.showState.status !== ShowStatus.LIVE &&
+      show.showState.status !== ShowStatus.STOPPED;
+    if (isTimeToLeave) {
+      await postLeaveShow();
+    }
 
-      let formData = new FormData();
-      await fetch('?/leave_show', {
-        method: 'POST',
-        body: formData
-      });
-      videoCallElement?.remove();
-      api.executeCommand('hangup');
-      api?.dispose();
-
-      showUnSub?.();
-      goto(returnPath).then(() => {
-        // window.location.reload();
-      });
-    };
     const options = {
       roomName: show.roomId,
       jwt: jitsiToken,
@@ -70,7 +83,7 @@
     };
 
     // @ts-ignore
-    const api = new JitsiMeetExternalAPI(PUBLIC_JITSI_DOMAIN, options);
+    api = new JitsiMeetExternalAPI(PUBLIC_JITSI_DOMAIN, options);
     api.executeCommand('avatarUrl', profileImage);
 
     api.addListener('toolbarButtonClicked', async (event: any) => {
@@ -84,13 +97,7 @@
       postLeaveShow();
     });
 
-    // const isTimeToLeave =
-    //   show.showState.status !== ShowStatus.LIVE &&
-    //   show.showState.status !== ShowStatus.STOPPED;
-    // if (isTimeToLeave) {
-    //   await postLeaveShow();
-    // }
-
+    showUnSub?.();
     showUnSub = showStore(show).subscribe(async (_show) => {
       if (!_show) return;
       show = _show;
@@ -100,10 +107,6 @@
       if (isTimeToLeave) {
         await postLeaveShow();
       }
-    });
-
-    onDestroy(() => {
-      postLeaveShow();
     });
   });
 </script>

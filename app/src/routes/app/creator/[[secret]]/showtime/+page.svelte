@@ -39,25 +39,28 @@
     console.log('participantName', participantName);
   };
 
+  const postLeaveShow = async () => {
+    if (hasLeftShow) return;
+    hasLeftShow = true;
+
+    let formData = new FormData();
+    await fetch('?/leave_show', {
+      method: 'POST',
+      body: formData
+    });
+    api?.dispose();
+    videoCallElement?.remove();
+
+    goto(returnPath).then(() => {
+      //window.location.reload();
+    });
+  };
+
+  onDestroy(() => {
+    postLeaveShow();
+  });
+
   onMount(() => {
-    const postLeaveShow = async () => {
-      if (hasLeftShow) return;
-      hasLeftShow = true;
-
-      let formData = new FormData();
-      await fetch('?/leave_show', {
-        method: 'POST',
-        body: formData
-      });
-      api?.executeCommand('endConference');
-      api?.dispose();
-      videoCallElement?.remove();
-
-      goto(returnPath).then(() => {
-        window.location.reload();
-      });
-    };
-
     const options = {
       roomName: currentShow?.roomId,
       jwt: jitsiToken,
@@ -90,10 +93,6 @@
     });
 
     api.addListener('videoConferenceLeft', () => {
-      postLeaveShow();
-    });
-
-    onDestroy(() => {
       postLeaveShow();
     });
   });

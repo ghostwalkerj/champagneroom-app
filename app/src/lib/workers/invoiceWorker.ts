@@ -3,6 +3,7 @@ import type { Job, Queue } from 'bullmq';
 import { Worker } from 'bullmq';
 import type IORedis from 'ioredis';
 import { Types } from 'mongoose';
+import { tick } from 'svelte';
 
 import { CancelReason, type CancelType } from '$lib/models/common';
 import type { TicketDocument } from '$lib/models/ticket';
@@ -84,7 +85,6 @@ export const getInvoiceWorker = ({
             console.error(error_);
             return 'Update invoice error';
           }
-
           break;
         }
 
@@ -95,7 +95,7 @@ export const getInvoiceWorker = ({
               const expiredInvoice = async (invoice: DisplayInvoice) => {
                 const ticketId = invoice.order_id;
                 if (!ticketId) {
-                  return;
+                  return 'No ticket id';
                 }
 
                 const ticketService = await getTicketMachineServiceFromId(
@@ -104,7 +104,6 @@ export const getInvoiceWorker = ({
                 );
 
                 const ticketState = ticketService.getSnapshot();
-
                 const cancel = {
                   _id: new Types.ObjectId(),
                   cancelledBy: ActorType.TIMER,
@@ -112,14 +111,21 @@ export const getInvoiceWorker = ({
                   cancelledAt: new Date(),
                   reason: CancelReason.TICKET_PAYMENT_TIMEOUT
                 } as CancelType;
-
-                ticketService.send({
-                  type: TicketMachineEventString.CANCELLATION_REQUESTED,
-                  cancel
-                });
+                if (
+                  ticketState.can({
+                    type: TicketMachineEventString.CANCELLATION_REQUESTED,
+                    cancel
+                  })
+                ) {
+                  ticketService.send({
+                    type: TicketMachineEventString.CANCELLATION_REQUESTED,
+                    cancel
+                  });
+                }
+                ticketService.stop();
+                return 'success';
               };
-              expiredInvoice(invoice);
-              break;
+              return expiredInvoice(invoice);
             }
             case InvoiceStatus.COMPLETE: {
               const completedInvoice = async (invoice: DisplayInvoice) => {
@@ -165,11 +171,13 @@ export const getInvoiceWorker = ({
                     type: TicketMachineEventString.PAYMENT_RECEIVED,
                     transaction
                   });
+
                   index++;
                 }
+                ticketService.stop();
+                return 'success';
               };
-              completedInvoice(invoice);
-              return 'success';
+              return completedInvoice(invoice);
             }
 
             case InvoiceStatus.REFUNDED: {
@@ -258,13 +266,14 @@ export const getInvoiceWorker = ({
                     type: TicketMachineEventString.REFUND_RECEIVED,
                     transaction
                   });
+                  ticketService.stop();
                 } catch (error_) {
                   console.error(error_);
                   return 'Refund error';
                 }
+                return 'success';
               };
-              refundInvoice(invoice);
-              return 'success';
+              return refundInvoice(invoice);
             }
 
             default: {
