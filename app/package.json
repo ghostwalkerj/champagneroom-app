@@ -109,6 +109,7 @@
     "ioredis": "^5.3.2",
     "joi": "^17.9.2",
     "jsonwebtoken": "^8.5.1",
+    "max-listeners-exceeded-warning": "^0.0.1",
     "mongodb": "^5.5.0",
     "mongoose": "^7.2.2",
     "mongoose-autopopulate": "^1.1.0",

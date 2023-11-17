@@ -44,6 +44,8 @@ export const actions: Actions = {
         showId: show._id.toString()
       });
     }
+    showQueue.close();
+    showService.stop();
     console.log('Creator left show');
     return { success: true };
   }
@@ -102,6 +104,9 @@ export const load: PageServerLoad = async ({ locals }) => {
     },
     JITSI_JWT_SECRET
   );
+
+  showQueue.close();
+  showService.stop();
 
   return {
     creator: creator.toObject({ flattenObjectIds: true, flattenMaps: true }),

@@ -1,7 +1,5 @@
 import 'dotenv/config';
 
-import { EventEmitter } from 'node:events';
-
 import { createBullBoard } from '@bull-board/api';
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
 import { ExpressAdapter } from '@bull-board/express';
@@ -10,6 +8,7 @@ import { Queue } from 'bullmq';
 import express from 'express';
 import basicAuth from 'express-basic-auth';
 import IORedis from 'ioredis';
+import maxListenersExceededWarning from 'max-listeners-exceeded-warning';
 import mongoose from 'mongoose';
 import parseArgv from 'tiny-parse-argv';
 
@@ -123,46 +122,20 @@ if (mongoose.connection.readyState === 0) {
   });
 }
 
-const originalAddListener = EventEmitter.prototype.addListener;
-
-const addListener = function (type) {
-  Reflect.apply(originalAddListener, this, arguments);
-
-  const numberListeners = this.listeners(type).length;
-  const max = typeof this._maxListeners === 'number' ? this._maxListeners : 10;
-
-  if (max !== 0 && numberListeners > max) {
-    const error = new Error(
-      'Too many listeners of type "' +
-        type +
-        '" added to EventEmitter. Max is ' +
-        max +
-        " and we've added " +
-        numberListeners +
-        '.'
-    );
-    console.error(error);
-    throw error;
-  }
-
-  return this;
-};
-
-EventEmitter.prototype.addListener = addListener;
-EventEmitter.prototype.on = addListener;
+maxListenersExceededWarning();
 
 function logMemoryUsage() {
   const formatMemoryUsage = (data: number) =>
     `${Math.round((data / 1024 / 1024) * 100) / 100} MB`;
   const memoryData = process.memoryUsage();
-  process.stdout.write(
+  console.log(
     `Memory usage: rss: ${formatMemoryUsage(
       memoryData.rss
     )}, heapTotal: ${formatMemoryUsage(
       memoryData.heapTotal
     )}, heapUsed: ${formatMemoryUsage(
       memoryData.heapUsed
-    )}, external: ${formatMemoryUsage(memoryData.external)}` + '\n'
+    )}, external: ${formatMemoryUsage(memoryData.external)}`
   );
 }
 

@@ -18,7 +18,6 @@ import type {
   RefundType
 } from '$lib/models/common';
 import { CancelReason, RefundReason } from '$lib/models/common';
-import { Show } from '$lib/models/show';
 
 import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
 import { TicketMachineEventString } from '$lib/machines/ticketMachine';
@@ -46,7 +45,6 @@ export const actions: Actions = {
     if (!ticket) {
       throw error(404, 'Ticket not found');
     }
-
     const redisConnection = locals.redisConnection as IORedis;
 
     const ticketService = getTicketMachineService(ticket, redisConnection);
@@ -76,6 +74,7 @@ export const actions: Actions = {
       invoiceQueue.add(InvoiceJobType.CANCEL, {
         bcInvoiceId
       });
+      invoiceQueue.close();
     }
 
     // If a payment as been made or in progress, then issue a refund
@@ -116,7 +115,10 @@ export const actions: Actions = {
         bcInvoiceId,
         ticketId: ticket._id
       });
+      payoutQueue.close();
     }
+
+    ticketService?.stop();
 
     return {
       success: true,
@@ -157,6 +159,8 @@ export const actions: Actions = {
         feedback
       });
     }
+
+    ticketService?.stop();
 
     return { success: true, rating, review };
   },
@@ -219,6 +223,8 @@ export const actions: Actions = {
       });
     }
 
+    ticketService?.stop();
+
     return { success: true, reason, explanation };
   },
 
@@ -278,6 +284,8 @@ export const actions: Actions = {
       type: TicketMachineEventString.PAYMENT_INITIATED
     });
 
+    ticketService?.stop();
+
     return { success: true };
   },
   join_show: async ({ locals }) => {
@@ -298,6 +306,8 @@ export const actions: Actions = {
     } else if (state.can(TicketMachineEventString.SHOW_JOINED)) {
       ticketService.send(TicketMachineEventString.SHOW_JOINED);
     }
+
+    ticketService?.stop();
 
     return { success: true };
   }

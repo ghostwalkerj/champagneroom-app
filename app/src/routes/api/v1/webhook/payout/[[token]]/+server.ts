@@ -30,5 +30,6 @@ export const POST: RequestHandler = async ({ request, locals, params }) => {
   });
 
   payoutQueue.add(PayoutJobType.PAYOUT_UPDATE, { bcPayoutId, status });
+  payoutQueue.close();
   return new Response(undefined, { status: 200 });
 };

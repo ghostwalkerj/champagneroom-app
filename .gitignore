@@ -20,3 +20,4 @@ app/src/lib/bitcart/**
 app/.favorites.json
 app/.VSCodeCounter/**
 Icon
+app/.clinic/**

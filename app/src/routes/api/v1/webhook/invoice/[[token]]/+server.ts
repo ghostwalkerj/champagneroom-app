@@ -33,5 +33,7 @@ export const POST: RequestHandler = async ({ request, locals, params }) => {
 
   invoiceQueue.add(InvoiceJobType.UPDATE, { bcInvoiceId, status });
 
+  invoiceQueue.close();
+
   return new Response(undefined, { status: 200 });
 };

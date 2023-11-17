@@ -171,11 +171,7 @@ export const actions: Actions = {
       customerName: name
     });
 
-    const redirectUrl = urlJoin(
-      url.origin,
-      Config.Path.ticket,
-      ticket._id.toString()
-    );
+    const redirectUrl = urlJoin(Config.Path.ticket, ticket._id.toString());
 
     const authToken = jwt.sign(
       {
@@ -198,6 +194,10 @@ export const actions: Actions = {
         maxAge: +AUTH_MAX_AGE,
         expires: new Date(Date.now() + +AUTH_MAX_AGE)
       });
+
+    showQueue.close();
+    showService.stop();
+
 
     throw redirect(302, redirectUrl);
   }

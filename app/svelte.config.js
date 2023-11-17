@@ -6,7 +6,7 @@ import preprocess from 'svelte-preprocess';
 const config = {
   kit: {
     adapter: adapter(),
-    csrf: { checkOrigin: true },
+    csrf: { checkOrigin: false },
     alias: {
       $components: './src/components',
       $lib: './src/lib',

@@ -134,6 +134,9 @@ export const actions: Actions = {
       });
     }
 
+    showQueue.close();
+    showService.stop();
+
     return {
       success: true,
       showCancelled: true
@@ -163,6 +166,9 @@ export const actions: Actions = {
       });
       isInEscrow = true;
     }
+
+    showQueue.close();
+    showService.stop();
 
     return {
       success: true,
@@ -210,6 +216,8 @@ export const actions: Actions = {
       destination,
       payoutReason: PayoutReason.CREATOR_PAYOUT
     });
+
+    payoutQueue.close();
 
     return {
       success: true

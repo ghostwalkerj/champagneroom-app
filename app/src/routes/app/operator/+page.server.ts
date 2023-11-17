@@ -236,6 +236,8 @@ export const actions: Actions = {
       decision
     });
 
+    showQueue.close();
+
     return {
       success: true
     };
