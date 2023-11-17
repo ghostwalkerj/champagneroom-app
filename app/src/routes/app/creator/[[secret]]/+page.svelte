@@ -102,7 +102,10 @@
       currentShow = show;
       canCreateShow = false;
       statusText = show.showState.status;
+      eventText = createEventText(currentEvent);
+      console.log('currentEvent', currentEvent);
 
+      console.log('eventText', eventText);
       showMachineService?.stop();
       showMachineService = createShowMachineService({
         showDocument: currentShow
@@ -113,6 +116,7 @@
         (_showEvent: ShowEventDocumentType) => {
           if (_showEvent) {
             eventText = createEventText(_showEvent);
+            currentEvent = _showEvent as ShowEventDocument;
           }
         }
       );

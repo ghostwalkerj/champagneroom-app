@@ -5,6 +5,8 @@ import type {
   ShowEventDocumentType
 } from '$lib/models/showEvent';
 
+import { ShowMachineEventString } from './machines/showMachine';
+
 export const createEventText = (
   showEvent: ShowEventDocumentType | ShowEventDocument | undefined
 ) => {
@@ -17,18 +19,38 @@ export const createEventText = (
       showEvent.ticketInfo?.customerName ?? 'someone';
 
   switch (showEvent.type) {
-    case 'TICKET SOLD': {
+    case ShowMachineEventString.TICKET_SOLD: {
       eventText += ' paid in full!';
       break;
     }
 
-    case 'TICKET RESERVED': {
+    case ShowMachineEventString.TICKET_RESERVED: {
       eventText += ' reserved a ticket!';
       break;
     }
 
-    case 'TICKET CANCELLED': {
-      eventText += ' cancelled';
+    case ShowMachineEventString.TICKET_CANCELLED: {
+      eventText += ' cancelled the ticket';
+      break;
+    }
+
+    case ShowMachineEventString.TICKET_REFUNDED: {
+      eventText += ' refunded';
+      break;
+    }
+
+    case ShowMachineEventString.TICKET_DISPUTED: {
+      eventText += ' disputed the ticket';
+      break;
+    }
+
+    case ShowMachineEventString.CUSTOMER_JOINED: {
+      eventText += ' joined the show';
+      break;
+    }
+
+    case ShowMachineEventString.CUSTOMER_LEFT: {
+      eventText += ' left the show';
       break;
     }
 

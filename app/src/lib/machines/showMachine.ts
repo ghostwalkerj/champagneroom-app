@@ -717,7 +717,7 @@ const createShowMachine = ({
   );
 };
 
-export { createShowMachine, ShowMachineEventString };
+export { ShowMachineEventString, createShowMachine };
 export const createShowMachineService = ({
   showDocument,
   showMachineOptions
@@ -738,6 +738,7 @@ export const createShowMachineService = ({
 
   if (showMachineOptions?.saveShowEventCallback) {
     showService.onEvent((event) => {
+      if (event.type === 'xstate.stop') return;
       let ticketId: string | undefined;
       if ('ticket' in event) {
         const ticket = event.ticket as TicketDocument;

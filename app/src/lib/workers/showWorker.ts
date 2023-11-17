@@ -257,6 +257,7 @@ const stopShow = async (show: ShowDocument, showQueue: ShowQueueType) => {
     },
     { delay: Config.TIMER.gracePeriod }
   );
+  showService.stop();
   return 'success';
 };
 
@@ -352,6 +353,7 @@ const finalizeShow = async (
         finalize
       });
     }
+    ticketService.stop();
   }
 
   // Calculate sales stats for show
@@ -560,6 +562,7 @@ const finalizeShow = async (
         'salesStats.totalTicketSalesAmounts': totalTicketSalesAmounts
       }
     );
+    showService.stop();
     creatorSession.endSession();
   });
 
@@ -613,6 +616,7 @@ const customerJoined = async (
     ticket,
     customerName
   });
+  showService.stop();
   return 'success';
 };
 
@@ -641,6 +645,7 @@ const customerLeft = async (
     ticket,
     customerName
   });
+  showService.stop();
   return 'success';
 };
 
@@ -672,6 +677,7 @@ const ticketSold = async (
     sale,
     customerName
   });
+  showService.stop();
   return 'success';
 };
 
@@ -691,6 +697,7 @@ const ticketRedeemed = async (show: ShowDocument, ticketId: string) => {
     type: ShowMachineEventString.TICKET_REDEEMED,
     ticket
   });
+  showService.stop();
   return 'success';
 };
 
@@ -721,6 +728,7 @@ const ticketReserved = async (
     ticket,
     customerName
   });
+  showService.stop();
   return 'success';
 };
 
@@ -771,12 +779,24 @@ const ticketCancelled = async (
 
   const ticket = (await Ticket.findById(ticketId).exec()) as TicketDocument;
 
+  const showState = showService.getSnapshot();
+  if (
+    !showState.can({
+      type: ShowMachineEventString.TICKET_CANCELLED,
+      ticket,
+      customerName,
+      cancel
+    })
+  )
+    return;
+
   showService.send({
     type: ShowMachineEventString.TICKET_CANCELLED,
     ticket,
     customerName,
     cancel
   });
+  showService.stop();
   return 'success';
 };
 
@@ -898,6 +918,7 @@ const ticketFinalized = async (
       finalize
     });
   }
+  showService.stop();
   return 'success';
 };
 
@@ -922,6 +943,7 @@ const ticketDisputed = async (
     dispute,
     ticket
   });
+  showService.stop();
   return 'success';
 };
 
@@ -995,6 +1017,8 @@ const ticketDisputeResolved = async (
     payoutQueue.add(PayoutJobType.DISPUTE_PAYOUT, {
       ticketId: ticket._id.toString()
     });
+    showService.stop();
+    ticketService.stop();
     return 'success';
   }
 };
