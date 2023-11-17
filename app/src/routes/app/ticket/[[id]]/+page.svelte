@@ -5,7 +5,7 @@
   import web3 from 'web3';
 
   import { applyAction, enhance } from '$app/forms';
-  import { goto } from '$app/navigation';
+  import { goto, invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
 
   import type { RefundType } from '$lib/models/common';
@@ -61,6 +61,7 @@
   let isShowCancelLoading = false;
   $: hasShowStarted = false;
   $: loading = false;
+  let ticketMachineService: TicketMachineServiceType;
 
   const walletPay = async () => {
     loading = true;
@@ -189,34 +190,30 @@
     }
     if (ticket.ticketState.active) {
       isTicketDone = false;
-      useTicketMachine(
-        createTicketMachineService({
-          ticketDocument: ticket
-        })
-      );
+      ticketMachineService?.stop();
+      ticketMachineService = createTicketMachineService({
+        ticketDocument: ticket
+      });
+      useTicketMachine(ticketMachineService);
       ticketUnSub = ticketStore(ticket).subscribe((_ticket) => {
         if (_ticket) {
           ticket = _ticket;
-          invoice = $page.data.invoice;
-          show = $page.data.show as ShowDocumentType;
-          useTicketMachine(
-            createTicketMachineService({
-              ticketDocument: _ticket
-            })
-          );
+          ticketMachineService?.stop();
+          ticketMachineService = createTicketMachineService({
+            ticketDocument: ticket
+          });
+          useTicketMachine(ticketMachineService);
+
+          invalidateAll().then(() => {
+            invoice = $page.data.invoice;
+          });
         }
       });
 
       showUnSub = showStore(show).subscribe((_show) => {
         if (_show) {
           show = _show;
-          invoice = $page.data.invoice;
-          ticket = $page.data.ticket as TicketDocumentType;
-          useTicketMachine(
-            createTicketMachineService({
-              ticketDocument: ticket
-            })
-          );
+
           hasShowStarted = show.showState.status === ShowStatus.LIVE;
           isShowInEscrow = show.showState.status === ShowStatus.IN_ESCROW;
         }

@@ -162,7 +162,7 @@ export const actions: Actions = {
 
     ticketService?.stop();
 
-    return { success: true, rating, review };
+    return { success: true, rating, review, feedbackReceived: true };
   },
 
   initiate_dispute: async ({ request, locals }) => {
@@ -225,7 +225,7 @@ export const actions: Actions = {
 
     ticketService?.stop();
 
-    return { success: true, reason, explanation };
+    return { success: true, reason, explanation, disputeInitiated: true };
   },
 
   initiate_payment: async ({ request, locals }) => {
@@ -286,7 +286,7 @@ export const actions: Actions = {
 
     ticketService?.stop();
 
-    return { success: true };
+    return { success: true, paymentInitiated: true };
   },
   join_show: async ({ locals }) => {
     const ticket = locals.ticket;

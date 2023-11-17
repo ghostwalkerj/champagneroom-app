@@ -1,8 +1,7 @@
 import type { Actions } from '@sveltejs/kit';
-import { error, redirect } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import type IORedis from 'ioredis';
 import jwt from 'jsonwebtoken';
-import urlJoin from 'url-join';
 
 import {
   JITSI_APP_ID,
@@ -11,11 +10,8 @@ import {
 } from '$env/static/private';
 import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
-import { Show } from '$lib/models/show';
-
 import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 
-import Config from '$lib/config';
 import { getTicketMachineService } from '$lib/server/machinesUtil';
 
 import type { PageServerLoad } from './$types';
@@ -31,6 +27,7 @@ export const actions: Actions = {
     const ticketService = getTicketMachineService(ticket, redisConnection);
     ticketService.send(TicketMachineEventString.SHOW_LEFT);
     console.log('Ticket left show');
+    ticketService?.stop();
     return { success: true };
   }
 };
