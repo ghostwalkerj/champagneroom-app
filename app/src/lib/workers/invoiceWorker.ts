@@ -277,7 +277,7 @@ export const getInvoiceWorker = ({
             }
 
             default: {
-              break;
+              return 'no op';
             }
           }
         }

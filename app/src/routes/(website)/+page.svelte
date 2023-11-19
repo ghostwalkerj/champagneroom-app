@@ -16,8 +16,8 @@
 </script>
 
 <Saos
-  animation={'fade-in 5s cubic-bezier(0.390, 0.575, 0.565, 1.000) both'}
-  animation_out={'slide-out-fwd-center 0.7s cubic-bezier(0.550, 0.085, 0.680, 0.530) both'}
+  animation="fade-in 5s cubic-bezier(0.390, 0.575, 0.565, 1.000) both"
+  animation_out="slide-out-fwd-center 0.7s cubic-bezier(0.550, 0.085, 0.680, 0.530) both"
   top={250}
   bottom={250}
 >
@@ -29,7 +29,9 @@
         >
           A New Way to Discretely View NSFW Creators Live
         </h2>
-        <ul class="  text-[25px] font-medium text-lg list-disc list-inside">
+        <ul
+          class="text-[25px] font-medium text-lg list-disc list-inside lg:pl-20"
+        >
           <li class="mt-2">Watch Completely Anonymous</li>
           <li class="mt-2">No Downloads, No Signup, No Personal Information</li>
           <li class="mt-2">Protected by a Full Escrow Service</li>
@@ -41,7 +43,7 @@
           <div>
             <a
               href="#FAQ"
-              class=" md:w-auto btn btn-primary transition-all duration-300 ease-in-out"
+              class="md:w-auto btn btn-primary transition-all duration-300 ease-in-out"
             >
               Read the FAQ
             </a>
@@ -50,7 +52,7 @@
             <a
               href="{Config.Path
                 .staticUrl}/assets/champagne-room-white-paper.pdf"
-              class=" md:w-auto btn btn-secondary transition-all duration-300 ease-in-out m-0"
+              class="md:w-auto btn btn-secondary transition-all duration-300 ease-in-out m-0"
               target="_blank"
             >
               White Paper
@@ -77,8 +79,8 @@
 </Saos>
 
 <Saos
-  animation={'fade-in 1.8s cubic-bezier(0.390, 0.575, 0.565, 1.000) both'}
-  animation_out={'slide-out-fwd-center 0.7s cubic-bezier(0.550, 0.085, 0.680, 0.530) both'}
+  animation="fade-in 1.8s cubic-bezier(0.390, 0.575, 0.565, 1.000) both"
+  animation_out="slide-out-fwd-center 0.7s cubic-bezier(0.550, 0.085, 0.680, 0.530) both"
   top={250}
   bottom={250}
 >
@@ -86,8 +88,8 @@
 </Saos>
 
 <Saos
-  animation={'fade-in 1.8s cubic-bezier(0.390, 0.575, 0.565, 1.000) both'}
-  animation_out={'slide-out-fwd-center 0.7s cubic-bezier(0.550, 0.085, 0.680, 0.530) both'}
+  animation="fade-in 1.8s cubic-bezier(0.390, 0.575, 0.565, 1.000) both"
+  animation_out="slide-out-fwd-center 0.7s cubic-bezier(0.550, 0.085, 0.680, 0.530) both"
   top={250}
   bottom={250}
 >
@@ -95,16 +97,17 @@
 </Saos>
 
 <Saos
-  animation={'fade-in 1.8s cubic-bezier(0.390, 0.575, 0.565, 1.000) both'}
-  animation_out={'slide-out-fwd-center 0.7s cubic-bezier(0.550, 0.085, 0.680, 0.530) both'}
+  animation="fade-in 1.8s cubic-bezier(0.390, 0.575, 0.565, 1.000) both"
+  animation_out="slide-out-fwd-center 0.7s cubic-bezier(0.550, 0.085, 0.680, 0.530) both"
   top={250}
   bottom={250}
 >
   <FAQ />
 </Saos>
+
 <Saos
-  animation={'fade-in 1.8s cubic-bezier(0.390, 0.575, 0.565, 1.000) both'}
-  animation_out={'slide-out-fwd-center 0.7s cubic-bezier(0.550, 0.085, 0.680, 0.530) both'}
+  animation="fade-in 1.8s cubic-bezier(0.390, 0.575, 0.565, 1.000) both"
+  animation_out="slide-out-fwd-center 0.7s cubic  -bezier(0.550, 0.085, 0.680, 0.530) both"
   top={250}
   bottom={250}
 >
@@ -114,8 +117,8 @@
 </Saos>
 
 <Saos
-  animation={'fade-in 1.8s cubic-bezier(0.390, 0.575, 0.565, 1.000) both'}
-  animation_out={'slide-out-fwd-center 0.7s cubic-bezier(0.550, 0.085, 0.680, 0.530) both'}
+  animation="fade-in 1.8s cubic-bezier(0.390, 0.575, 0.565, 1.000) both"
+  animation_out="slide-out-fwd-center 0.7s cubic-bezier(0.550, 0.085, 0.680, 0.530) both"
   top={250}
   bottom={250}
 >
@@ -123,8 +126,8 @@
 </Saos>
 
 <Saos
-  animation={'fade-in 1.8s cubic-bezier(0.390, 0.575, 0.565, 1.000) both'}
-  animation_out={'slide-out-fwd-center 0.7s cubic-bezier(0.550, 0.085, 0.680, 0.530) both'}
+  animation="fade-in 1.8s cubic-bezier(0.390, 0.575, 0.565, 1.000) both"
+  animation_out="slide-out-fwd-center 0.7s cubic-bezier(0.550, 0.085, 0.680, 0.530) both"
   top={250}
   bottom={250}
 >

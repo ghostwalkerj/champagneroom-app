@@ -2,40 +2,41 @@
   import Config from '$lib/config';
 </script>
 
-<div class="container mx-auto relative pt-10 lg:pt-52" id="FAQ">
-  <div class="absolute top-28 grid grid-cols-2">
+<div
+  class="container mx-auto px-4 sm:px-6 md:px-10 lg:px-20 relative pt-10 lg:pt-52"
+  id="FAQ"
+>
+  <div
+    class="absolute top-28 left-0 right-0 mx-auto grid grid-cols-1 md:grid-cols-2 gap-4"
+  >
     <div
-      class="image opacity-20 max-width-l hidden md:flex animate-pulse transition-timing-function"
+      class="image opacity-20 max-w-lg mx-auto md:flex animate-pulse transition-timing-function hidden"
     >
-      <div class="h-xl w-xl">
-        <img
-          class="motion-safe:animate-fadeIn mx-auto rounded-lg opacity-45 justify-center -space-x-20 w-m h-m"
-          src="{Config.Path.staticUrl}/assets/ladyblue.png"
-          alt="Lady Blue"
-        />
-      </div>
+      <img
+        class="motion-safe:animate-fadeIn mx-auto rounded-lg opacity-45 justify-center w-full h-auto"
+        src="{Config.Path.staticUrl}/assets/ladyblue.png"
+        alt="Lady Blue"
+      />
     </div>
 
     <div
-      class="image opacity-20 hidden md:flex animate-pulse transition-timing-function"
+      class="image opacity-20 max-w-lg mx-auto md:flex animate-pulse transition-timing-function hidden"
     >
-      <div class="h-xl w-xl">
-        <img
-          class="motion-safe:animate-fadeIn mx-auto rounded-lg opacity-45 justify-center -space-x-20 w-m h-m"
-          src="{Config.Path.staticUrl}/assets/ladypink.png"
-          alt="Lady Pink"
-        />
-      </div>
+      <img
+        class="motion-safe:animate-fadeIn mx-auto rounded-lg opacity-45 justify-center w-full h-auto"
+        src="{Config.Path.staticUrl}/assets/ladypink.png"
+        alt="Lady Pink"
+      />
     </div>
   </div>
   <h2
-    class="font-bold text-primary text-[41px] text-center font-CaviarDreams lg:mb-10"
+    class="font-bold text-primary text-2xl md:text-3xl lg:text-[41px] text-center font-CaviarDreams mb-10"
   >
     FAQ
   </h2>
 
-  <div class="block sm:flex sm:flex-row gap-4 lg:mx-10">
-    <div class="w-full sm:w-1/2">
+  <div class="flex flex-col md:flex-row gap-4">
+    <div class="w-full md:w-1/2">
       <div class="collapse collapse-arrow">
         <input type="radio" name="faq-accordion" />
         <div class="collapse-title text-xl font-medium">
@@ -114,7 +115,7 @@
         </div>
       </div>
     </div>
-    <div class="w-full sm:w-1/2">
+    <div class="w-full md:w-1/2">
       <div class="collapse collapse-arrow">
         <input type="radio" name="faq-accordion" />
         <div class="collapse-title text-xl font-medium">Is it anonymous?</div>

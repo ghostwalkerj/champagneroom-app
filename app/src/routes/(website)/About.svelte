@@ -5,51 +5,63 @@
 <div id="About">
   <div class="pt-10 lg:pt-52 mx-auto">
     <h2
-      class="text-primary font-bold text-[41px] text-center font-CaviarDreams lg:mb-10"
+      class="text-primary font-bold text-2xl md:text-3xl lg:text-[41px] text-center font-CaviarDreams lg:mb-10"
     >
       ABOUT
     </h2>
-    <div
-      class="flex flex-col lg:flex-row items-center place-content-center px-6"
-    >
-      <div class="w-full m-3 p-6 flex place-content-center">
+    <div class="flex flex-col lg:flex-row items-center justify-center px-6">
+      <div class="w-full m-3 p-6 flex justify-center">
         <img
           src="{Config.Path.staticUrl}/assets/creator4.png"
           alt="Creator"
-          class="rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1]"
+          class="rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1] max-w-xs md:max-w-sm lg:max-w-md"
         />
       </div>
       <div class="w-full m-auto">
-        <p class="leading-10 text-lg font-normal mt-5 mr-0 ml-5 sm:mr-20">
+        <p
+          class="text-base lg:text-lg leading-10 font-normal mt-5 mx-5 md:mx-10 lg:mr-20"
+        >
           Welcome to Champagne Room, the cutting-edge web 3.0 platform
           revolutionizing NSFW experiences. Our platform enables fans to engage
           in secure, one-on-one calls with their favorite creators, scheduled
           conveniently to their preference.
         </p>
-        <p class=" leading-10 text-lg font-normal mt-5 mr-0 ml-5 sm:mr-20">
+        <p
+          class="text-base lg:text-lg leading-10 font-normal mt-5 mx-5 md:mx-10 lg:mr-20"
+        >
           By settling transactions in cryptocurrency, Champagne Room ensures a
           level of privacy and security that both parties can rely on.
         </p>
-        <p class="leading-10 text-lg font-normal mt-5 mr-0 ml-5 sm:mr-20">
+        <p
+          class="text-base lg:text-lg leading-10 font-normal mt-5 mx-5 md:mx-10 lg:mr-20"
+        >
           Experience a whole new level of NSFW entertainment on Champagne Room.
           Our platform offers a range of features including creator NFTs,
           exclusive content sharing, and immersive calls for the most devoted
           fans.
         </p>
-        <p class="leading-10 text-lg font-normal mt-5 mr-0 ml-5 sm:mr-20">
+        <p
+          class="text-base lg:text-lg leading-10 font-normal mt-5 mx-5 md:mx-10 lg:mr-20"
+        >
           Through crypto subscriptions, dedicated followers gain access to
           unique and intimate experiences, further enhancing their connection
           with their preferred creators.
         </p>
-        <p class="leading-10 text-lg font-normal mt-5 mr-0 ml-5 sm:mr-20">
+        <p
+          class="text-base lg:text-lg leading-10 font-normal mt-5 mx-5 md:mx-10 lg:mr-20"
+        >
           Discover the future of NSFW interaction with Champagne Room.
         </p>
-        <p class=" leading-10 text-lg font-normal mt-5 mr-0 ml-5 sm:mr-20">
+        <p
+          class="text-base lg:text-lg leading-10 font-normal mt-5 mx-5 md:mx-10 lg:mr-20"
+        >
           Our platform combines cutting-edge technology, secure crypto
           transactions, and a seamless user experience to redefine the way fans
           connect with their favorite creators.
         </p>
-        <p class=" leading-10 text-lg font-normal mt-5 mr-0 ml-5 sm:mr-20">
+        <p
+          class="text-base lg:text-lg leading-10 font-normal mt-5 mx-5 md:mx-10 lg:mr-20"
+        >
           Join us on this exciting journey as we reshape the landscape of adult
           entertainment, providing a safe and private space for genuine
           connections to thrive.
@@ -58,9 +70,9 @@
     </div>
 
     <div class="mt-5 lg:mt-10">
-      <div class="p-6 sm:pad">
+      <div class="p-6">
         <h2
-          class="text-3xl lg:text-[41px] font-bold mx-0 lg:mx-10 text-primary font-CaviarDreams"
+          class="text-xl md:text-2xl lg:text-[41px] font-bold mx-0 lg:mx-10 text-primary font-CaviarDreams"
         >
           We have specifically built CHAMPAGNE ROOM with a focus on anonymity,
           safety, and privacy for both our users and creators.

@@ -4,18 +4,17 @@
   import Config from '$lib/config';
 </script>
 
-<footer class="w-full flex-shrink-0 mt-20">
-  <div class="w-full flex flex-col lg:flex-row pb-6">
+<footer class="w-full flex-shrink-0 mt-20 px-4 md:px-6 lg:px-10">
+  <div class="w-full flex flex-col lg:flex-row pb-6 justify-center">
     <div
-      class="flex flex-col 2sx:flex-row mx-auto 2sx:space-x-4 whitespace-nowrap w-full text-center 2sx:place-content-evenly"
+      class="flex flex-col md:flex-row mx-auto md:space-x-4 whitespace-nowrap w-full text-center md:justify-evenly"
     >
-      <div class="">
-        <h5 class="text-info sm:mb-3">Social</h5>
-        <ul class="list-unstyled">
+      <div class="mb-6 md:mb-0">
+        <h5 class="text-info mb-3">Social</h5>
+        <ul class="list-none">
           <li class="spa">
             <a href="https://discord.gg/VgB7bWScVa" target="_blank">
               <iconify-icon icon="line-md:discord-twotone" />
-
               <span class="icon-list-text">Discord</span>
             </a>
           </li>
@@ -27,9 +26,9 @@
           </li>
         </ul>
       </div>
-      <div class="">
-        <h5 class="text-info sm:mb-3">Services</h5>
-        <ul class="list-unstyled">
+      <div class="mb-6 md:mb-0">
+        <h5 class="text-info mb-3">Services</h5>
+        <ul class="list-none">
           <li class="spa">
             <a href={Config.Path.creator}>Creators</a>
           </li>
@@ -39,8 +38,8 @@
         </ul>
       </div>
       <div class="">
-        <h5 class="text-info sm:mb-3">Learn</h5>
-        <ul class="list-unstyled">
+        <h5 class="text-info mb-3">Learn</h5>
+        <ul class="list-none">
           <li class="spa">
             <a
               href="{Config.Path

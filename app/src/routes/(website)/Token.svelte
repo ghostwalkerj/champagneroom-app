@@ -4,7 +4,7 @@
 
 <div id="Token" class="container mx-auto pt-10 lg:pt-52">
   <h2
-    class="text-primary font-bold text-[41px] text-center font-CaviarDreams mb-10"
+    class="text-primary font-bold text-[32px] lg:text-[41px] text-center font-CaviarDreams mb-10"
   >
     CHAMPAGNE ROOM Token
   </h2>
@@ -18,25 +18,23 @@
       >
         CRT Tokenomics
       </h2>
-      <ul class=" text-[25px] font-medium text-lg list-disc list-inside">
-        CRT is a ECR-20 utility token, that will benefit the users of Champagne
-        Room by giving rebates when using the token in our ecosystem.<br /><br
-        />
-        As adoption for Champagne Room increases so does demand for CRT.
-        <br /><br />
-
-        CRT is a small cap utility token with a total fixed supply of 100
-        million tokens.
+      <ul class="text-lg lg:text-[25px] font-medium list-disc list-inside">
+        CRT is an ECR-20 utility token that benefits users of Champagne Room by
+        offering rebates when using the token in our ecosystem.<br /><br />
+        As adoption for Champagne Room increases, so does demand for CRT.<br
+        /><br />
+        CRT is a small cap utility token with a total fixed supply of 100 million
+        tokens.
       </ul>
     </div>
-    <div class="w-full p-10 pr-16">
+    <div class="w-full p-10 lg:pr-16">
       <div class="w-auto">
         <video
           autoplay
           loop
           controls
           muted
-          class="opacity-80 rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1]"
+          class="opacity-80 rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1] max-w-full h-auto"
         >
           <source
             src="{Config.Path.staticUrl}/assets/champagneroomtoken.mp4"
