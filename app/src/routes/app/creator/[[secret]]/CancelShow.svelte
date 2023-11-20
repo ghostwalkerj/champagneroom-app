@@ -22,13 +22,17 @@
 
 <form method="post" action="?/cancel_show" use:enhance={onSubmit}>
   <div class="bg-primary text-primary-content card">
-    <div class="text-center card-body items-center p-3">
-      <div class="text-2xl card-title">Cancel Your Show</div>
-      <div class="text xl">
+    <div
+      class="lg:flex lg:justify-center lg:items-center lg:text-left card-body p-3"
+    >
+      <div class="text-xl card-title">Cancel Your Show</div>
+      <div class="text">
         If you cancel this show any tickets sold will be refunded.
       </div>
 
-      <div class="flex flex-col text-white p-2 justify-center items-center">
+      <div
+        class="flex flex-col text-white p-2 justify-center items-center lg:flex-row lg:space-x-4"
+      >
         <div class="">
           <button class="btn btn-secondary" type="submit" disabled={isLoading}
             >Cancel Show</button

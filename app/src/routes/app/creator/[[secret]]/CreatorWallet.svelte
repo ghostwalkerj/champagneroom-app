@@ -84,60 +84,55 @@
 
 {#if hasAvailableBalance}
   <dialog id="withdraw_modal" class="modal" bind:this={withdrawModal}>
-    <div class="modal-box">
-      <h3 class="font-bold text-lg">Withdraw Funds into your Own Wallet</h3>
-      <div class="modal-action">
+    <div class="modal-box lg:w-2/3 py-4 px-6 text-center rounded-lg">
+      <h3 class="font-bold text-2xl mb-4">
+        Withdraw Funds into your Own Wallet
+      </h3>
+      <div class="modal-action justify-center">
         <form method="post" action="?/request_payout" use:enhance={onSubmit}>
-          <div class="">
-            <input
-              type="hidden"
-              name="walletId"
-              value={wallet._id.toString()}
-            />
-            <div class="label-text mb-2">Amount in {wallet.currency}</div>
+          <input type="hidden" name="walletId" value={wallet._id.toString()} />
 
-            <input
-              type="text"
-              name="amount"
-              class="w-full input input-bordered input-primary mb-6"
-              placeholder="0.000000000"
-              value={form?.amount ?? ''}
-            />
-            {#if form?.missingAmount || form?.invalidAmount}<div
-                class="shadow-md alert alert-error whitespace-nowrap mb-6"
-              >
-                Enter Amount to Transfer
-              </div>{/if}
-            {#if form?.insufficientBalance}<div
-                class="shadow-md alert alert-error whitespace-nowrap mb-6"
-              >
-                Insufficient Balance
-              </div>{/if}
-
-            <div class="label-text mb-2">Destination Address</div>
-
-            <input
-              type="text"
-              name="destination"
-              class="w-full input input-bordered input-primary mb-6"
-              placeholder="Address"
-              readonly={destination !== ''}
-              value={destination ?? form?.destination ?? ''}
-            />
-            {#if form?.missingDestination}<div
-                class="shadow-md alert alert-error whitespace-nowrap mb-6"
-              >
-                Enter a valid Destination Address
-              </div>{/if}
-            <div>
-              <button class="btn">Submit</button>
-
-              <button
-                class="btn"
-                on:click|preventDefault={() => withdrawModal.close()}
-                >Cancel</button
-              >
+          <div class="label-text mb-2">Amount in {wallet.currency}</div>
+          <input
+            type="text"
+            name="amount"
+            class="w-full input input-bordered input-primary mb-4 h-12 rounded-lg"
+            placeholder="0.000000000"
+            value={form?.amount ?? ''}
+          />
+          {#if form?.missingAmount || form?.invalidAmount}
+            <div class="shadow-md alert alert-error whitespace-nowrap mb-4">
+              Enter Amount to Transfer
             </div>
+          {/if}
+          {#if form?.insufficientBalance}
+            <div class="shadow-md alert alert-error whitespace-nowrap mb-4">
+              Insufficient Balance
+            </div>
+          {/if}
+
+          <div class="label-text mb-2">Destination Address</div>
+          <input
+            type="text"
+            name="destination"
+            class="w-full input input-bordered input-primary mb-4 h-12 rounded-lg"
+            placeholder="Address"
+            readonly={destination !== ''}
+            value={destination ?? form?.destination ?? ''}
+          />
+          {#if form?.missingDestination}
+            <div class="shadow-md alert alert-error whitespace-nowrap mb-4">
+              Enter a valid Destination Address
+            </div>
+          {/if}
+
+          <div class="flex flex-col lg:flex-row lg:justify-between lg:gap-4">
+            <button class="btn btn-primary mb-2 lg:mb-0">Submit</button>
+            <button
+              class="btn"
+              on:click|preventDefault={() => withdrawModal.close()}
+              >Cancel</button
+            >
           </div>
         </form>
       </div>

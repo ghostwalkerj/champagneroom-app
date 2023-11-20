@@ -5,7 +5,7 @@ import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 import type { EarningsType, PayoutType } from '$lib/models/common.js';
 import type { ShowDocumentType } from '$lib/models/show.js';
 import type { TransactionDocumentType } from '$lib/models/transaction.js';
-import { WalletStatus, type WalletDocumentType } from '$lib/models/wallet.js';
+import { type WalletDocumentType, WalletStatus } from '$lib/models/wallet.js';
 
 import { PayoutStatus } from '$lib/payment.js';
 
@@ -135,7 +135,7 @@ const createWalletMachine = ({
           const hasShow = earnings.findIndex(
             (earning) => earning.show._id.toString() === show._id.toString()
           );
-          if (hasShow === -1) {
+          if (earnings.length === 0 || hasShow === -1) {
             const amount =
               show.showState.salesStats.totalRevenue.get(wallet.currency) || 0;
             const earning = {

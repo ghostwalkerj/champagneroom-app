@@ -225,15 +225,16 @@
           {/key}
         {/if}
       </div>
-      <div class="pb-4">
-        {#if canCancelShow}
+
+      {#if canCancelShow}
+        <div class="lg:pb-4">
           <CancelShow {onShowCancelled} bind:isLoading />
-        {/if}
-      </div>
+        </div>
+      {/if}
     </div>
 
     <!--Next Column-->
-    <div class="space-y-3 md:col-start-4 md:col-span-1">
+    <div class="space-y-3 -mt-3 lg:mt-0 md:col-start-4 md:col-span-1">
       <!-- Photo -->
       <div>
         <div class="lg:col-start-3 lg:col-span-1">
@@ -276,5 +277,3 @@
     </div>
   </div>
 </div>
-
-<button on:click={() => showUnSub?.()}>Unsub</button>

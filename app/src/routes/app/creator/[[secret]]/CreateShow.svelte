@@ -50,7 +50,7 @@
     <div class="flex flex-col w-full">
       <form method="post" action="?/create_show" use:enhance={onSubmit}>
         <div
-          class="flex flex-col md:flex-row text-white p-2 justify-center items-center gap-4"
+          class="flex flex-col lg:flex-row text-white p-2 justify-center items-center gap-4"
         >
           <div class="form-control flex-grow">
             <!-- svelte-ignore a11y-label-has-associated-control -->
@@ -72,7 +72,7 @@
             {/if}
           </div>
 
-          <div class="form-control md:w-40">
+          <div class="form-control lg:w-40">
             <!-- svelte-ignore a11y-label-has-associated-control -->
             <label for="price" class="label">
               <span class="label-text">Ticket Price in USD</span></label
@@ -99,16 +99,16 @@
                 </span>
               </div>
             </div>
-            {#if form?.missingPrice}<div
-                class="shadow-lg alert alert-error whitespace-nowrap"
-              >
+            {#if form?.missingPrice}
+              <div class="shadow-lg alert alert-error whitespace-nowrap">
                 Price is required
-              </div>{/if}
-            {#if form?.invalidPrice}<div
-                class="shadow-lg alert alert-error whitespace-nowrap"
-              >
+              </div>
+            {/if}
+            {#if form?.invalidPrice}
+              <div class="shadow-lg alert alert-error whitespace-nowrap">
                 Invalid Price
-              </div>{/if}
+              </div>
+            {/if}
           </div>
 
           <input type="hidden" name="capacity" value="1" />
@@ -118,7 +118,7 @@
             name="coverImageUrl"
             value={creator.profileImageUrl}
           />
-          <div class="form-control md:w-1/5">
+          <div class="form-control lg:w-1/5">
             <!-- svelte-ignore a11y-label-has-associated-control -->
             <label class="label">
               <span class="label-text whitespace-nowrap"

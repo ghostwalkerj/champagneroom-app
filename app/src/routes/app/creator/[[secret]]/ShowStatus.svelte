@@ -30,10 +30,12 @@
   $: eventText = createEventText(showEvent);
 </script>
 
-<div class="md:col-start-3 md:col-span-1">
-  <div class="bg-primary text-primary-content card">
+<div class="flex flex-col lg:flex-row lg:col-start-3 lg:col-span-1">
+  <div class="bg-primary text-primary-content card w-full">
     <div class="text-center card-body -m-4 items-center">
-      <div class="flex w-full flex-row justify-between gap-2">
+      <!-- Flex container for responsive layout -->
+      <div class="flex flex-col lg:flex-row w-full justify-between gap-2">
+        <!-- Status and Event Text sections -->
         <div class="grow">
           <div class="alert alert-info shadow-lg p-3">
             <div class="flex gap-2">
@@ -46,14 +48,14 @@
           <div class="alert alert-info shadow-lg p-3">
             <div class="flex gap-2">
               <iconify-icon icon="mingcute:information-line" class="text-2xl" />
-
               <p class="capitalize">{eventText}</p>
             </div>
           </div>
         </div>
+        <!-- Start Show Button -->
         {#if canStartShow}
           <button
-            class="btn"
+            class="btn lg:w-auto"
             type="submit"
             disabled={isLoading}
             on:click={() => {
