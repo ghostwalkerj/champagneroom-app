@@ -12,7 +12,7 @@
   import { jitsiInterfaceConfigOverwrite } from '$lib/constants';
   import getProfileImage from '$lib/profilePhoto';
 
-  import { showStore } from '$stores';
+  import { ShowStore } from '$stores';
 
   import type { PageData } from './$types';
 
@@ -98,7 +98,7 @@
     });
 
     showUnSub?.();
-    showUnSub = showStore(show).subscribe(async (_show) => {
+    showUnSub = ShowStore(show).subscribe(async (_show) => {
       if (!_show) return;
       show = _show;
       const isTimeToLeave =

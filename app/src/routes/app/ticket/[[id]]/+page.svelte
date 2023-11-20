@@ -22,7 +22,7 @@
   import type { PaymentType } from '$lib/payment';
   import { connect, defaultWallet, selectedAccount } from '$lib/web3';
 
-  import { showStore, ticketStore } from '$stores';
+  import { ShowStore, TicketStore } from '$stores';
 
   import TicketDetail from './TicketDetail.svelte';
   import TicketInvoice from './TicketInvoice.svelte';
@@ -195,7 +195,7 @@
         ticketDocument: ticket
       });
       useTicketMachine(ticketMachineService);
-      ticketUnSub = ticketStore(ticket).subscribe((_ticket) => {
+      ticketUnSub = TicketStore(ticket).subscribe((_ticket) => {
         if (_ticket) {
           ticket = _ticket;
           ticketMachineService?.stop();
@@ -210,7 +210,7 @@
         }
       });
 
-      showUnSub = showStore(show).subscribe((_show) => {
+      showUnSub = ShowStore(show).subscribe((_show) => {
         if (_show) {
           show = _show;
 

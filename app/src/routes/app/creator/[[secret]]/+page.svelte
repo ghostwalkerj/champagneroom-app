@@ -12,10 +12,7 @@
   import { CancelReason } from '$lib/models/common';
   import type { CreatorDocumentType } from '$lib/models/creator';
   import type { ShowDocumentType } from '$lib/models/show';
-  import type {
-    ShowEventDocument,
-    ShowEventDocumentType
-  } from '$lib/models/showEvent';
+  import type { ShowEventDocument } from '$lib/models/showEvent';
   import type { WalletDocumentType } from '$lib/models/wallet';
 
   import type { ShowMachineServiceType } from '$lib/machines/showMachine';
@@ -26,19 +23,14 @@
 
   import Config from '$lib/config';
   import { ActorType, durationFormatter } from '$lib/constants';
-  import { createEventText } from '$lib/eventUtil';
 
   import ProfilePhoto from '$components/ProfilePhoto.svelte';
   import ShowDetail from '$components/ShowDetail.svelte';
-  import {
-    creatorStore,
-    showEventStore,
-    showStore,
-    walletStore
-  } from '$stores';
+  import { CreatorStore, ShowStore, WalletStore } from '$stores';
 
   import CreatorActivity from './CreatorActivity.svelte';
   import CreatorWallet from './CreatorWallet.svelte';
+  import ShowStatus from './ShowStatus.svelte';
 
   import type { ActionData, PageData } from './$types';
   export let data: PageData;
@@ -59,34 +51,26 @@
 
   $: showDuration = 60;
   $: creatorName = creator ? creator.user.name : 'Creator';
-  $: statusText = currentShow
-    ? currentShow.showState.status
-    : 'No Current Show';
-  $: eventText = createEventText(currentEvent);
 
   $: canCreateShow = false;
   $: canCancelShow = false;
   $: canStartShow = false;
-  $: loading = false;
+  $: isLoading = false;
   $: showStopped = false;
   $: showCancelled = false;
 
   let creatorUnSub: Unsubscriber;
-  let showEventUnSub: Unsubscriber;
   let showUnSub: Unsubscriber;
   let walletUnSub: Unsubscriber;
   let showMachineService: ShowMachineServiceType;
   const destination = creator.user.payoutAddress;
 
   const noCurrentShow = () => {
-    showEventUnSub?.();
     showUnSub?.();
     showMachineService?.stop();
     canCreateShow = true;
     canCancelShow = false;
     canStartShow = false;
-    statusText = 'No Current Show';
-    eventText = 'No Events';
     currentShow = undefined;
     showStopped = false;
   };
@@ -98,30 +82,16 @@
   const useNewShow = (show: ShowDocumentType) => {
     if (show && show.showState.current) {
       showUnSub?.();
-      showEventUnSub?.();
       currentShow = show;
       canCreateShow = false;
-      statusText = show.showState.status;
-      eventText = createEventText(currentEvent);
-      console.log('currentEvent', currentEvent);
 
-      console.log('eventText', eventText);
       showMachineService?.stop();
       showMachineService = createShowMachineService({
         showDocument: currentShow
       });
       useShowMachine(showMachineService);
 
-      showEventUnSub = showEventStore(show).subscribe(
-        (_showEvent: ShowEventDocumentType) => {
-          if (_showEvent) {
-            eventText = createEventText(_showEvent);
-            currentEvent = _showEvent as ShowEventDocument;
-          }
-        }
-      );
-
-      showUnSub = showStore(show).subscribe((_show) => {
+      showUnSub = ShowStore(show).subscribe((_show) => {
         if (_show && _show.showState.current) {
           currentShow = _show;
           showMachineService?.stop();
@@ -152,25 +122,23 @@
       }
     });
     canStartShow = state.can(ShowMachineEventString.SHOW_STARTED);
-    statusText = state.context.showState.status;
     if (state.done) {
       showMachineService.stop();
     }
   };
 
   onMount(() => {
-    creatorUnSub = creatorStore(creator).subscribe((value) => {
+    creatorUnSub = CreatorStore(creator).subscribe((value) => {
       creator = value;
     });
     currentShow ? useNewShow(currentShow) : noCurrentShow();
-    walletUnSub = walletStore(wallet).subscribe((value) => {
+    walletUnSub = WalletStore(wallet).subscribe((value) => {
       wallet = value;
     });
   });
 
   onDestroy(() => {
     creatorUnSub?.();
-    showEventUnSub?.();
     showUnSub?.();
     walletUnSub?.();
   });
@@ -188,29 +156,29 @@
   };
 
   const onSubmit = ({}) => {
-    loading = true;
+    isLoading = true;
     return async ({ result }) => {
-      if (result.data.showCreated) {
-        const showUrl = urlJoin(
-          window.location.origin,
-          Config.Path.show,
-          result.data.show!._id.toString()
-        );
-        navigator.clipboard.writeText(showUrl);
-        currentShow = result.data.show as ShowDocumentType;
-        useNewShow(currentShow);
-      } else if (result.data.showCancelled) {
-        statusText = 'Cancelled';
-        noCurrentShow();
-      } else if (result.data.inEscrow) {
-        noCurrentShow();
-        statusText = 'In Escrow';
-      } else if (result.data.refundInitiated) {
-        noCurrentShow();
-        statusText = 'Refund Initiated';
+      switch (true) {
+        case result.data.showCreated: {
+          const showUrl = urlJoin(
+            window.location.origin,
+            Config.Path.show,
+            result.data.show!._id.toString()
+          );
+          navigator.clipboard.writeText(showUrl);
+          currentShow = result.data.show as ShowDocumentType;
+          useNewShow(currentShow);
+          break;
+        }
+        case result.data.showCancelled:
+        case result.data.inEscrow:
+        case result.data.refundInitiated: {
+          noCurrentShow();
+          break;
+        }
       }
       await applyAction(result);
-      loading = false;
+      isLoading = false;
     };
   };
 </script>
@@ -233,14 +201,14 @@
           <button
             class="btn"
             on:click={() => {
-              loading = true;
+              isLoading = true;
               goto(showTimePath);
             }}
-            disabled={!canStartShow || loading}>Restart Show</button
+            disabled={!canStartShow || isLoading}>Restart Show</button
           >
           <form method="post" action="?/end_show" use:enhance={onSubmit}>
             <input type="hidden" name="showId" value={currentShow?._id} />
-            <button class="btn" disabled={loading}>End Show</button>
+            <button class="btn" disabled={isLoading}>End Show</button>
           </form>
         </div>
       </div>
@@ -253,48 +221,16 @@
     <!-- 1st column -->
     <div class="flex-1 space-y-3 md:col-start-1 md:col-span-3">
       <!-- Status -->
-      <div class="md:col-start-3 md:col-span-1">
-        <div class="bg-primary text-primary-content card">
-          <div class="text-center card-body -m-4 items-center">
-            <div class="flex w-full flex-row justify-between gap-2">
-              <div class="grow">
-                <div class="alert alert-info shadow-lg p-3">
-                  <div class="flex gap-2">
-                    <iconify-icon
-                      icon="mingcute:information-line"
-                      class="text-2xl"
-                    />
-                    <p class="capitalize">{statusText.toLowerCase()}</p>
-                  </div>
-                </div>
-              </div>
-              <div class="grow">
-                <div class="alert alert-info shadow-lg p-3">
-                  <div class="flex gap-2">
-                    <iconify-icon
-                      icon="mingcute:information-line"
-                      class="text-2xl"
-                    />
+      {#key currentShow && currentShow._id}
+        <ShowStatus
+          {canStartShow}
+          {isLoading}
+          show={currentShow}
+          {showTimePath}
+          showEvent={currentEvent}
+        />
+      {/key}
 
-                    <p class="capitalize">{eventText}</p>
-                  </div>
-                </div>
-              </div>
-              {#if canStartShow}
-                <button
-                  class="btn"
-                  type="submit"
-                  disabled={loading}
-                  on:click={() => {
-                    loading = true;
-                    goto(showTimePath);
-                  }}>Start Show</button
-                >
-              {/if}
-            </div>
-          </div>
-        </div>
-      </div>
       {#if canCreateShow}
         <div class="bg-primary text-primary-content card">
           <div class="text-center card-body items-center p-3">
@@ -406,7 +342,7 @@
                   <button
                     class="btn btn-secondary"
                     type="submit"
-                    disabled={loading}>Create Show</button
+                    disabled={isLoading}>Create Show</button
                   >
                 </div>
               </form>
@@ -447,7 +383,7 @@
                     <button
                       class="btn btn-secondary"
                       type="submit"
-                      disabled={loading}>Cancel Show</button
+                      disabled={isLoading}>Cancel Show</button
                     >
                   </div>
                 </div>

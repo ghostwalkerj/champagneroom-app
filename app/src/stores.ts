@@ -57,14 +57,14 @@ const abstractUpdateStore = <T extends { _id: Types.ObjectId }>({
   };
 };
 
-export const agentStore = (agent: AgentDocumentType) => {
+export const AgentStore = (agent: AgentDocumentType) => {
   return abstractUpdateStore<AgentDocumentType>({
     doc: agent,
     type: EntityType.AGENT
   });
 };
 
-export const creatorStore = (creator: CreatorDocumentType) => {
+export const CreatorStore = (creator: CreatorDocumentType) => {
   return abstractUpdateStore<CreatorDocumentType>({
     doc: creator,
     type: EntityType.CREATOR
@@ -159,7 +159,7 @@ const getInsertNotification = <T>({
   return abortDocument;
 };
 
-export const showEventStore = (show: ShowDocumentType) => {
+export const ShowEventStore = (show: ShowDocumentType) => {
   const showStore = writable<ShowDocumentType>(show);
   const showEventStore = derived<typeof showStore, ShowEventDocumentType>(
     showStore,
@@ -185,28 +185,28 @@ export const showEventStore = (show: ShowDocumentType) => {
   };
 };
 
-export const showStore = (show: ShowDocumentType) => {
+export const ShowStore = (show: ShowDocumentType) => {
   return abstractUpdateStore<ShowDocumentType>({
     doc: show,
     type: EntityType.SHOW
   });
 };
 
-export const ticketStore = (ticket: TicketDocumentType) => {
+export const TicketStore = (ticket: TicketDocumentType) => {
   return abstractUpdateStore<TicketDocumentType>({
     doc: ticket,
     type: EntityType.TICKET
   });
 };
 
-export const userStore = (user: UserDocumentType) => {
+export const UserStore = (user: UserDocumentType) => {
   return abstractUpdateStore<UserDocumentType>({
     doc: user,
     type: EntityType.USER
   });
 };
 
-export const walletStore = (wallet: WalletDocumentType) => {
+export const WalletStore = (wallet: WalletDocumentType) => {
   return abstractUpdateStore<WalletDocumentType>({
     doc: wallet,
     type: EntityType.WALLET
