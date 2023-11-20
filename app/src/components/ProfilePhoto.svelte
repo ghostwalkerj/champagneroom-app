@@ -75,16 +75,16 @@
   }
 </script>
 
-<div class="flex flex-col items-center h-[200px]">
+<div class="flex flex-col items-center lg:h-[200px]">
   <div class="p-4">
     <div
-      class="bg-cover relative bg-no-repeat bg-center rounded-full w-32 h-32"
+      class="bg-cover relative bg-no-repeat bg-center rounded-full lg:w-32 lg:h-32 w-24 h-24"
       style="background-image: url('{imageUrl}')"
     >
       <div
         use:filedrop={options}
         on:filedrop={onChange}
-        class="absolute inset-0 flex flex-col justify-center z-10 bg-gray-500 opacity-75 rounded-full h-32 items-center w-32 {uploadVisibility}"
+        class="absolute inset-0 flex flex-col justify-center z-10 bg-gray-500 opacity-75 rounded-full lg:h-32 lg:w-32 h-24 w-24 {uploadVisibility}"
       >
         <div class="self-center">
           <svg
@@ -92,10 +92,12 @@
             viewBox="0 0 32 32"
             width="32"
             height="32"
-            ><path fill="none" d="M0 0h24v24H0z" /><path
-              d="M1 14.5a6.496 6.496 0 0 1 3.064-5.519 8.001 8.001 0 0 1 15.872 0 6.5 6.5 0 0 1-2.936 12L7 21c-3.356-.274-6-3.078-6-6.5zm15.848 4.487a4.5 4.5 0 0 0 2.03-8.309l-.807-.503-.12-.942a6.001 6.001 0 0 0-11.903 0l-.12.942-.805.503a4.5 4.5 0 0 0 2.029 8.309l.173.013h9.35l.173-.013zM13 13v4h-2v-4H8l4-5 4 5h-3z"
-            /></svg
           >
+            <path fill="none" d="M0 0h24v24H0z" />
+            <path
+              d="M1 14.5a6.496 6.496 0 0 1 3.064-5.519 8.001 8.001 0 0 1 15.872 0 6.5 6.5 0 0 1-2.936 12L7 21c-3.356-.274-6-3.078-6-6.5zm15.848 4.487a4.5 4.5 0 0 0 2.03-8.309l-.807-.503-.12-.942a6.001 6.001 0 0 0-11.903 0l-.12.942-.805.503a4.5 4.5 0 0 0 2.029 8.309l.173.013h9.35l.173-.013zM13 13v4h-2v-4H8l4-5 4 5h-3z"
+            />
+          </svg>
         </div>
         <div class="self-center text-center">
           <p>Click or Drag & Drop Image</p>
@@ -109,7 +111,7 @@
   {#if !update}
     <div class="justify-center card-actions last:my-2">
       <button
-        class="btn btn-xs btn-secondary btn-outline md:btn-sm"
+        class="btn btn-xs btn-secondary btn-outline lg:btn-sm"
         on:click={() => {
           setUpdate(true);
         }}
@@ -133,12 +135,12 @@
           class="btn btn-xs btn-outline btn-secondary"
           on:click={() => upload()}
         >
-          Upload</button
-        >
+          Upload
+        </button>
       {/if}
       <button class="btn btn-xs btn-outline btn-secondary" on:click={resetForm}>
-        Cancel</button
-      >
+        Cancel
+      </button>
     </div>
   {/if}
 </div>

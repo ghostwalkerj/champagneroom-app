@@ -137,11 +137,13 @@
     <div class="font-bold text-5xl text-primary w-full font-CaviarDreams">
       You have been signed out
     </div>
-    <div class="m-10">
+    <div class="m-4 lg:m-10">
       <!-- svelte-ignore a11y-click-events-have-key-events -->
     </div>
   {:else if noUser && authType === AuthType.SIGNING}
-    <div class="card w-96 bg-neutral text-neutral-content m-10">
+    <div
+      class="card w-full lg:w-96 bg-neutral text-neutral-content m-4 lg:m-10"
+    >
       <div class="card-body items-center text-center">
         <h2 class="card-title">
           Address: {walletAddress?.slice(0, 6)}...{walletAddress.slice(-4)} not found
@@ -169,11 +171,13 @@
     <div class="font-bold text-5xl text-primary w-full font-CaviarDreams">
       Crypto Wallet Authentication
     </div>
-    <div class="py-6 w-full">
+    <div class="py-6 w-full lg:w-auto">
       Please sign the message in your wallet to verify your identity
     </div>
     {#if hasNoWallet}
-      <div class="py-6 w-full">Please connect a wallet to continue</div>
+      <div class="py-6 w-full lg:w-auto">
+        Please connect a wallet to continue
+      </div>
     {/if}
     {#if signingRejected}
       <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -190,7 +194,7 @@
     </div> -->
 
     <div class="mt-6 flex items-center">
-      <div class="min-w-full">
+      <div class="w-full">
         <div class="flex justify-center">
           <div
             class="flex flex-col w-full p-4 max-w-fit gap-4 rounded-xl bg-base-200 overflow-auto"
@@ -246,7 +250,7 @@
     </div> -->
 
     <div class="mt-6 flex items-center">
-      <div class="min-w-full">
+      <div class="w-full">
         <div class="flex justify-center">
           <div
             class="flex flex-col w-full p-4 max-w-fit gap-4 rounded-xl bg-base-200 overflow-auto"

@@ -50,22 +50,22 @@
 </script>
 
 <div class="bg-gradient-to-r from-[#0C082E] to-[#0C092E] font-Roboto">
-  <div class="navbar">
-    <div class="flex w-screen">
-      <div class="w-0 md:w-1/3 flex md:ml-20">
+  <div class="navbar w-screen">
+    <div class="flex flex-col lg:flex-row w-screen">
+      <div class="w-full lg:w-1/3 flex justify-center lg:ml-20">
         <!-- svelte-ignore a11y-missing-attribute -->
         <a class="text-xl normal-case" href="/">
           <img
             src="{Config.Path.staticUrl}/assets/logo-horizontal-tr.png"
             alt="Logo"
             width="260"
-          /></a
-        >
+          />
+        </a>
       </div>
-      <div class="w-full text-center">
+      <div class="w-full text-center lg:w-1/3">
         <div class="font-bold mb-2 text-info">
           <div
-            class="text-center text-lg md:text-2xl lg:text-3xl whitespace-nowrap flex flex-row justify-center font-CaviarDreams"
+            class="text-center text-lg lg:text-2xl xl:text-3xl whitespace-nowrap flex flex-row justify-center font-CaviarDreams"
           >
             <div class="neon-text">Welcome to the&nbsp;</div>
             <div class="neon-flicker">C</div>
@@ -78,7 +78,7 @@
           </div>
         {/if}
       </div>
-      <div class="md:w-1/3 text-right lg:mr-20">
+      <div class="w-full lg:w-1/3 text-right xl:mr-20">
         <ConnectButton />
         {#if $page.data.user && $page.data.user.authType === AuthType.SIGNING}
           <button

@@ -129,13 +129,15 @@
               >
                 Enter a valid Destination Address
               </div>{/if}
-            <button class="btn">Submit</button>
+            <div>
+              <button class="btn">Submit</button>
 
-            <button
-              class="btn"
-              on:click|preventDefault={() => withdrawModal.close()}
-              >Cancel</button
-            >
+              <button
+                class="btn"
+                on:click|preventDefault={() => withdrawModal.close()}
+                >Cancel</button
+              >
+            </div>
           </div>
         </form>
       </div>
@@ -143,14 +145,19 @@
   </dialog>
 {/if}
 
-<div class="bg-primary h-full text-primary-content w-full card">
+<div class="bg-primary h-full text-primary-content card">
   <div class="text-center card-body items-center p-3">
     <h2 class="text-2xl card-title">My Wallet</h2>
     <div class="text-accent lowercase">({wallet.status})</div>
-    <div class="bg-primary text-primary-content stats">
-      <div class="stat">
-        <div class="stat-title text-info">Available Balance</div>
-        <div class="stat-value text-2xl">
+
+    <!-- Common style for both MD and LG breakpoints -->
+    <div class="bg-primary text-primary-content stats flex">
+      <div class="flex flex-col p-2">
+        <!-- Adjusted styling for Available Balance -->
+        <div class="stat-title text-info text-lg lg:text-2xl">
+          Available Balance
+        </div>
+        <div class="stat-value text-xl lg:text-3xl">
           {currencyFormatter(wallet.currency).format(availableBalance)}
           {#if exchangeRate > 0}
             <div class="text-sm text-primary-content">
@@ -161,7 +168,10 @@
           {/if}
         </div>
 
-        <div class="stat-actions">
+        <!-- Adjusted styling for stat-actions -->
+        <div
+          class="stat-actions flex gap-2 mt-2 md:mt-4 lg:mt-6 md:flex-col lg:flex-row"
+        >
           <button
             class="btn btn-sm"
             disabled={!hasTransactions}
