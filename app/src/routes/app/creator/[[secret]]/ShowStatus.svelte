@@ -2,8 +2,6 @@
   import { onDestroy, onMount } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
 
-  import { goto } from '$app/navigation';
-
   import type { ShowDocumentType } from '$lib/models/show';
   import type { ShowEventDocumentType } from '$lib/models/showEvent';
 
@@ -13,9 +11,9 @@
 
   export let canStartShow: boolean;
   export let isLoading = false;
+  export let onGoToShow: () => void;
   export let show: ShowDocumentType | undefined;
   export let showEvent: ShowEventDocumentType | undefined;
-  export let showTimePath: string;
   let showEventUnSub: Unsubscriber | undefined;
 
   onMount(() => {
@@ -60,7 +58,7 @@
             disabled={isLoading}
             on:click={() => {
               isLoading = true;
-              goto(showTimePath);
+              onGoToShow();
             }}>Start Show</button
           >
         {/if}

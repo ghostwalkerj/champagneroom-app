@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { onDestroy, onMount } from 'svelte';
+  import { onDestroy, onMount, tick } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
   import urlJoin from 'url-join';
   import web3 from 'web3';
 
   import { applyAction, enhance } from '$app/forms';
-  import { goto, invalidateAll } from '$app/navigation';
+  import { goto, invalidateAll, onNavigate } from '$app/navigation';
   import { page } from '$app/stores';
 
   import type { RefundType } from '$lib/models/common';
@@ -195,6 +195,7 @@
         ticketDocument: ticket
       });
       useTicketMachine(ticketMachineService);
+      ticketUnSub?.();
       ticketUnSub = TicketStore(ticket).subscribe((_ticket) => {
         if (_ticket) {
           ticket = _ticket;
@@ -210,10 +211,10 @@
         }
       });
 
+      showUnSub?.();
       showUnSub = ShowStore(show).subscribe((_show) => {
         if (_show) {
           show = _show;
-
           hasShowStarted = show.showState.status === ShowStatus.LIVE;
           isShowInEscrow = show.showState.status === ShowStatus.IN_ESCROW;
         }
@@ -221,7 +222,8 @@
     }
   });
 
-  onDestroy(() => {
+  onNavigate(async () => {
+    await tick();
     showUnSub?.();
     ticketUnSub?.();
   });

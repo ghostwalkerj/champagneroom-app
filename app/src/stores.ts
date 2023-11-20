@@ -81,15 +81,11 @@ const getUpdateNotification = <T>({
   type: EntityType;
 }) => {
   const path = urlJoin(Config.Path.notifyUpdate, id, '?type=' + type);
-  let abortDocument = new AbortController();
-  const waitFor = async (_abortDocument: AbortController | undefined) => {
+  const abortDocument = new AbortController();
+  const waitFor = async () => {
     let shouldLoop = true;
     while (shouldLoop) {
-      if (_abortDocument) _abortDocument.abort();
-      _abortDocument = new AbortController();
-      abortDocument = _abortDocument;
-      const signal = _abortDocument.signal;
-
+      const signal = abortDocument.signal;
       const [error, response] = await to(
         fetch(path, {
           signal
@@ -97,6 +93,7 @@ const getUpdateNotification = <T>({
       );
       if (error) {
         shouldLoop = false;
+        console.error(error);
       } else {
         try {
           const jsonResponse = await response.json();
@@ -108,7 +105,7 @@ const getUpdateNotification = <T>({
       }
     }
   };
-  waitFor(abortDocument);
+  waitFor();
   return abortDocument;
 };
 
@@ -128,14 +125,12 @@ const getInsertNotification = <T>({
     ? typeQuery + '&relatedField=' + relatedField
     : typeQuery;
   const path = urlJoin(Config.Path.notifyInsert, id, queryString);
-  let abortDocument = new AbortController();
-  const waitFor = async (_abortDocument: AbortController | undefined) => {
-    if (_abortDocument) _abortDocument.abort();
-    _abortDocument = new AbortController();
-    abortDocument = _abortDocument;
-    const signal = _abortDocument.signal;
+  const abortDocument = new AbortController();
+  const waitFor = async () => {
     let shouldLoop = true;
     while (shouldLoop) {
+      const signal = abortDocument.signal;
+
       const [error, response] = await to(
         fetch(path, {
           signal
@@ -155,7 +150,7 @@ const getInsertNotification = <T>({
       }
     }
   };
-  waitFor(abortDocument);
+  waitFor();
   return abortDocument;
 };
 

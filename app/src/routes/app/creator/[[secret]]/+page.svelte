@@ -1,11 +1,10 @@
 <script lang="ts">
-  import { onDestroy, onMount } from 'svelte';
+  import { onDestroy, onMount, tick } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
   import StarRating from 'svelte-star-rating';
   import urlJoin from 'url-join';
 
-  import { applyAction, enhance } from '$app/forms';
-  import { goto } from '$app/navigation';
+  import { goto, invalidateAll, onNavigate } from '$app/navigation';
   import { page } from '$app/stores';
 
   import { CancelReason } from '$lib/models/common';
@@ -31,6 +30,7 @@
   import CreateShow from './CreateShow.svelte';
   import CreatorActivity from './CreatorActivity.svelte';
   import CreatorWallet from './CreatorWallet.svelte';
+  import EndShow from './EndShow.svelte';
   import ShowStatus from './ShowStatus.svelte';
 
   import type { ActionData, PageData } from './$types';
@@ -77,7 +77,6 @@
 
   const useNewShow = (show: ShowDocumentType) => {
     if (show && show.showState.current) {
-      showUnSub?.();
       currentShow = show;
       canCreateShow = false;
 
@@ -86,7 +85,7 @@
         showDocument: currentShow
       });
       useShowMachine(showMachineService);
-
+      showUnSub?.();
       showUnSub = ShowStore(show).subscribe((_show) => {
         if (_show && _show.showState.current) {
           currentShow = _show;
@@ -133,10 +132,15 @@
     });
   });
 
-  onDestroy(() => {
+  const unSubAll = () => {
     creatorUnSub?.();
     showUnSub?.();
     walletUnSub?.();
+  };
+
+  onNavigate(async () => {
+    await tick();
+    unSubAll();
   });
 
   const updateProfileImage = async (url: string) => {
@@ -152,6 +156,7 @@
   };
 
   const onShowCreated = (show: ShowDocumentType | undefined) => {
+    showUnSub?.();
     if (!show) return;
     currentShow = show as ShowDocumentType;
     useNewShow(currentShow);
@@ -161,19 +166,12 @@
     noCurrentShow();
   };
 
-  const onSubmit = ({}) => {
-    isLoading = true;
-    return async ({ result }) => {
-      switch (true) {
-        case result.data.refundInitiated:
-        case result.data.inEscrow: {
-          noCurrentShow();
-          break;
-        }
-      }
-      await applyAction(result);
-      isLoading = false;
-    };
+  const onGoToShow = () => {
+    goto(showTimePath);
+  };
+
+  const onShowEnded = () => {
+    noCurrentShow();
   };
 </script>
 
@@ -182,31 +180,15 @@
 
   <!-- Modal for Restarting or Ending Show -->
   {#if showStopped}
-    <input type="checkbox" id="restart-show-modal" class="modal-toggle" />
-    <div class="modal modal-open">
-      <div class="modal-box">
-        <h3 class="font-bold text-lg">You have Stopped the Show</h3>
-        <p class="py-4">
-          Are you sure you want to end the show? You will not be able to restart
-          later. Ticket holders will be able to give feedback once the show is
-          ended.
-        </p>
-        <div class="modal-action">
-          <button
-            class="btn"
-            on:click={() => {
-              isLoading = true;
-              goto(showTimePath);
-            }}
-            disabled={!canStartShow || isLoading}>Restart Show</button
-          >
-          <form method="post" action="?/end_show" use:enhance={onSubmit}>
-            <input type="hidden" name="showId" value={currentShow?._id} />
-            <button class="btn" disabled={isLoading}>End Show</button>
-          </form>
-        </div>
-      </div>
-    </div>
+    {#key currentShow && currentShow._id && canStartShow}
+      <EndShow
+        {onShowEnded}
+        {currentShow}
+        {onGoToShow}
+        bind:isLoading
+        {canStartShow}
+      />
+    {/key}
   {/if}
 
   <div
@@ -220,7 +202,7 @@
           {canStartShow}
           bind:isLoading
           show={currentShow}
-          {showTimePath}
+          {onGoToShow}
           showEvent={currentEvent}
         />
       {/key}
@@ -294,3 +276,5 @@
     </div>
   </div>
 </div>
+
+<button on:click={() => showUnSub?.()}>Unsub</button>

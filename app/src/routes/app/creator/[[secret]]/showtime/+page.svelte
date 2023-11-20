@@ -51,7 +51,9 @@
     api?.dispose();
     videoCallElement?.remove();
 
-    goto(returnPath).then(() => {
+    goto(returnPath, {
+      invalidateAll: true
+    }).then(() => {
       //window.location.reload();
     });
   };

@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { onDestroy, onMount } from 'svelte';
+  import { onDestroy, onMount, tick } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
 
-  import { goto } from '$app/navigation';
+  import { goto, onNavigate } from '$app/navigation';
   import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
   import { type ShowDocumentType, ShowStatus } from '$lib/models/show';
@@ -34,6 +34,7 @@
   const profileImage = getProfileImage(user.name, Config.UI.profileImagePath);
 
   const postLeaveShow = async () => {
+    showUnSub?.();
     if (hasLeftShow) return;
     hasLeftShow = true;
 
@@ -45,15 +46,10 @@
     videoCallElement?.remove();
     api?.executeCommand('hangup');
     api?.dispose();
-
-    showUnSub?.();
     goto(returnPath).then(() => {
       // window.location.reload();
     });
   };
-  onDestroy(() => {
-    postLeaveShow();
-  });
 
   onMount(async () => {
     const isTimeToLeave =
@@ -108,6 +104,11 @@
         await postLeaveShow();
       }
     });
+  });
+
+  onNavigate(async () => {
+    await tick();
+    postLeaveShow();
   });
 </script>
 
