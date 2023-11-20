@@ -27,6 +27,7 @@
   import ShowDetail from '$components/ShowDetail.svelte';
   import { CreatorStore, ShowStore, WalletStore } from '$stores';
 
+  import CancelShow from './CancelShow.svelte';
   import CreateShow from './CreateShow.svelte';
   import CreatorActivity from './CreatorActivity.svelte';
   import CreatorWallet from './CreatorWallet.svelte';
@@ -156,13 +157,16 @@
     useNewShow(currentShow);
   };
 
+  const onShowCancelled = () => {
+    noCurrentShow();
+  };
+
   const onSubmit = ({}) => {
     isLoading = true;
     return async ({ result }) => {
       switch (true) {
-        case result.data.showCancelled:
-        case result.data.inEscrow:
-        case result.data.refundInitiated: {
+        case result.data.refundInitiated:
+        case result.data.inEscrow: {
           noCurrentShow();
           break;
         }
@@ -241,29 +245,7 @@
       </div>
       <div class="pb-4">
         {#if canCancelShow}
-          <!-- Cancel Form-->
-          <form method="post" action="?/cancel_show" use:enhance={onSubmit}>
-            <div class="bg-primary text-primary-content card">
-              <div class="text-center card-body items-center p-3">
-                <div class="text-2xl card-title">Cancel Your Show</div>
-                <div class="text xl">
-                  If you cancel this show any tickets sold will be refunded.
-                </div>
-
-                <div
-                  class="flex flex-col text-white p-2 justify-center items-center"
-                >
-                  <div class="">
-                    <button
-                      class="btn btn-secondary"
-                      type="submit"
-                      disabled={isLoading}>Cancel Show</button
-                    >
-                  </div>
-                </div>
-              </div>
-            </div>
-          </form>
+          <CancelShow {onShowCancelled} bind:isLoading />
         {/if}
       </div>
     </div>
