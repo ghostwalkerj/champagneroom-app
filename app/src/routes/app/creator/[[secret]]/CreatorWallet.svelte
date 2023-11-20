@@ -141,18 +141,21 @@
 {/if}
 
 <div class="bg-primary h-full text-primary-content card">
-  <div class="text-center card-body items-center p-3">
-    <h2 class="text-2xl card-title">My Wallet</h2>
+  <div class="card-body text-center items-center p-3">
+    <h2 class="card-title text-2xl">My Wallet</h2>
     <div class="text-accent lowercase">({wallet.status})</div>
 
-    <!-- Common style for both MD and LG breakpoints -->
-    <div class="bg-primary text-primary-content stats flex">
-      <div class="flex flex-col p-2">
-        <!-- Adjusted styling for Available Balance -->
-        <div class="stat-title text-info text-lg lg:text-2xl">
+    <!-- Responsive container -->
+    <div
+      class="bg-primary text-primary-content flex flex-col lg:flex-row justify-around"
+    >
+      <!-- Flex container for content -->
+      <div class="flex flex-col items-center">
+        <!-- Available Balance -->
+        <div class="stat-title text-info text-lg lg:text-xl">
           Available Balance
         </div>
-        <div class="stat-value text-xl lg:text-3xl">
+        <div class="stat-value text-lg xl:text-xl">
           {currencyFormatter(wallet.currency).format(availableBalance)}
           {#if exchangeRate > 0}
             <div class="text-sm text-primary-content">
@@ -163,20 +166,24 @@
           {/if}
         </div>
 
-        <!-- Adjusted styling for stat-actions -->
+        <!-- Buttons with responsive spacing -->
         <div
-          class="stat-actions flex gap-2 mt-2 md:mt-4 lg:mt-6 md:flex-col lg:flex-row"
+          class="stat-actions flex gap-2 mt-2 lg:mt-4 xl:mt-6 flex-col lg:flex-row justify-center lg:justify-start"
         >
           <button
-            class="btn btn-sm"
+            class="btn btn-base lg:btn-sm"
             disabled={!hasTransactions}
-            on:click={() => transactionModal.show()}>Transactions</button
+            on:click={() => transactionModal.show()}
           >
+            Transactions
+          </button>
           <button
-            class="btn btn-sm"
+            class="btn btn-base lg:btn-sm"
             disabled={!hasAvailableBalance}
-            on:click={() => withdrawModal.show()}>Withdraw</button
+            on:click={() => withdrawModal.show()}
           >
+            Withdraw
+          </button>
         </div>
       </div>
     </div>
