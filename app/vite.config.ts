@@ -38,7 +38,7 @@ const config: UserConfig = {
     },
   },
   optimizeDeps: {
-    exclude: ['@ethersproject/hash', 'wrtc', 'http'],
+    exclude: ['@ethersproject/hash', 'wrtc', 'http' ],
     include: [
       '@web3-onboard/core',
       'js-sha3',

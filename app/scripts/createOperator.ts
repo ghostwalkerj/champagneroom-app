@@ -1,10 +1,9 @@
 import mongoose from 'mongoose';
 import parseArgv from 'tiny-parse-argv';
-import { Wallet } from '../dist/models/wallet.js';
-import { User, UserRole } from '../dist/models/user.js';
-import { Operator } from '../dist/models/operator.js';
-import { AuthType } from '../dist/constants.js';
-
+import { User, UserRole } from './src/lib/models/user';
+import { Operator } from './src/lib/models/operator';
+import { Wallet } from './src/lib/models/wallet';
+import { AuthType } from './src/lib/constants';
 const arguments_ = parseArgv(process.argv);
 const address = arguments_.address;
 if (!address) throw new Error('No address provided');
