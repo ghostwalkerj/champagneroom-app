@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
 
+  import { browser } from '$app/environment';
   import { goto } from '$app/navigation';
   import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
@@ -40,7 +41,7 @@
   };
 
   const postLeaveShow = async () => {
-    if (hasLeftShow) return;
+    if (hasLeftShow || !browser) return;
     hasLeftShow = true;
 
     let formData = new FormData();

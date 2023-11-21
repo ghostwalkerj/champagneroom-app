@@ -15,6 +15,7 @@
   import { ShowStore } from '$stores';
 
   import type { PageData } from './$types';
+  import { browser } from '$app/environment';
 
   export let data: PageData;
 
@@ -35,7 +36,8 @@
 
   const postLeaveShow = async () => {
     showUnSub?.();
-    if (hasLeftShow) return;
+    if (hasLeftShow || !browser) return;
+
     hasLeftShow = true;
 
     let formData = new FormData();

@@ -111,7 +111,7 @@
     "jsonwebtoken": "^8.5.1",
     "max-listeners-exceeded-warning": "^0.0.1",
     "mongodb": "^5.5.0",
-    "mongoose": "^7.2.2",
+    "mongoose": "^8.0.1",
     "mongoose-autopopulate": "^1.1.0",
     "mongoose-field-encryption": "^7.0.1",
     "nanoid": "^4.0.2",

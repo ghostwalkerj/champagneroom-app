@@ -570,13 +570,16 @@ const finalizeShow = async (
   });
 
   // Update wallet with finalized show totals
-  const creatorWallet = await Creator.findById(show.creator)
-    .select('user.wallet')
-    .exec();
+  const creator = await Creator.findById(show.creator).exec();
 
-  const walletId = creatorWallet?.user.wallet;
+  if (!creator) {
+    console.error('No creator found');
+    return 'No creator found';
+  }
+
+  const walletId = creator.user.wallet;
   if (!walletId) {
-    console.log('No wallet to payout');
+    console.error('No wallet to payout');
     return 'No wallet to payout';
   }
 

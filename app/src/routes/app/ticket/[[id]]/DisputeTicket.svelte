@@ -74,8 +74,6 @@
 </div>
 
 <!-- Button to Open Modal -->
-<div class="p-4 text-center">
-  <label for="initiate-dispute" class="btn btn-secondary"
-    >Initiate Dispute</label
-  >
+<div class="p-4 w-full flex justify-center">
+  <div class="btn btn-secondary">Initiate Dispute</div>
 </div>

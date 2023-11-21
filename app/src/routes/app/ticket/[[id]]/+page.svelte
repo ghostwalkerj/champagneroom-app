@@ -291,15 +291,21 @@
           {#if canCancelTicket && !hasShowStarted}
             <CancelTicket bind:isLoading />
           {/if}
-          {#if canLeaveFeedback}
-            <LeaveFeedback bind:isLoading {form} />
-          {/if}
-          {#if canLeaveFeedback && canDispute}
-            <div class="divider w-36 pt-6">OR</div>
-          {/if}
-          {#if canDispute}
-            <DisputeTicket bind:isLoading {form} />
-          {/if}
+          <div class="flex flex-col md:flex-row">
+            {#if canLeaveFeedback}
+              <LeaveFeedback bind:isLoading {form} />
+            {/if}
+            {#if canLeaveFeedback && canDispute}
+              <div
+                class="divider w-full md:w-3/4 md:p-6 font-SpaceGrotesk h-1/2"
+              >
+                OR
+              </div>
+            {/if}
+            {#if canDispute}
+              <DisputeTicket bind:isLoading {form} />
+            {/if}
+          </div>
         </div>
       {/if}
     </div>
