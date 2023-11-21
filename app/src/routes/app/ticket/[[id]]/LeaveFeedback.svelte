@@ -32,7 +32,43 @@
           <span class="label-text">Rating</span>
         </label>
         <div class="rating rating-lg">
-          <!-- Rating inputs remain the same -->
+          <input
+            type="radio"
+            name="rating"
+            class="rating-hidden"
+            value="0"
+            checked
+          />
+          <input
+            type="radio"
+            name="rating"
+            value="1"
+            class="mask mask-star-2 bg-primary"
+          />
+          <input
+            type="radio"
+            name="rating"
+            value="2"
+            class="mask mask-star-2 bg-primary"
+          />
+          <input
+            type="radio"
+            name="rating"
+            value="3"
+            class="mask mask-star-2 bg-primary"
+          />
+          <input
+            type="radio"
+            name="rating"
+            value="4"
+            class="mask mask-star-2 bg-primary"
+          />
+          <input
+            type="radio"
+            name="rating"
+            value="5"
+            class="mask mask-star-2 bg-primary"
+          />
         </div>
         {#if form?.missingRating}
           <div class="shadow-lg alert alert-error">Rating is Required</div>
