@@ -1,9 +1,10 @@
 <script lang="ts">
+  import spacetime from 'spacetime';
   import { onMount } from 'svelte';
-  import { QRCodeImage } from 'svelte-qrcode-image';
 
   import { type TicketDocumentType, TicketStatus } from '$lib/models/ticket';
 
+  import Config from '$lib/config';
   import { currencyFormatter, durationFormatter } from '$lib/constants';
   import type { PaymentType } from '$lib/payment';
   import { InvoiceStatus } from '$lib/payment';
@@ -21,6 +22,8 @@
   ] as PaymentType;
 
   let invoiceStatus = '';
+
+  const today = spacetime.now();
 
   switch (invoice.status) {
     case InvoiceStatus.EXPIRED: {
@@ -40,7 +43,7 @@
       break;
     }
     default: {
-      invoiceStatus = '';
+      invoiceStatus = 'Waiting for Payment';
     }
   }
 
@@ -59,97 +62,92 @@
 </script>
 
 <div
-  class="relative flex justify-center font-CaviarDreams text-info text-center"
+  class="relative flex flex-col w-full max-w-md md:max-w-2xl mx-auto bg-black shadow-lg rounded-xl overflow-hidden"
 >
+  <!-- Logo and Invoice Header -->
+  <div class="flex items-center justify-between bg-black p-4">
+    <img
+      src="{Config.Path.staticUrl}/assets/logo-square.png"
+      alt="Your Company Logo"
+      class="h-12"
+    />
+    <span
+      class="font-bold text-xl text-info absolute left-1/2 transform -translate-x-1/2"
+      >Invoice</span
+    >
+    <!-- Centered Title -->
+  </div>
+
+  <!-- Invoice Status Tag -->
   {#if invoice.status === InvoiceStatus.EXPIRED || invoice.status === InvoiceStatus.COMPLETE || invoice.status === InvoiceStatus.INVALID || invoice.status === InvoiceStatus.REFUNDED}
     <div
-      class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl lg:text-6xl whitespace-nowrap font-extrabold text-primary ring-2 ring-primary p-2 rounded-xl z-20 -rotate-[20deg] capitalize"
+      class="absolute top-4 right-4 text-xs lg:text-sm xl:text-base font-bold text-info p-1 lg:p-2 xl:p-3 bg-opacity-50 bg-gray-100 rounded-lg capitalize"
     >
       {invoiceStatus}
     </div>
   {/if}
 
-  <div
-    class="flex flex-col w-full max-w-sm md:max-w-xl lg:max-w-2xl rounded-xl bg-black overflow-auto"
-  >
-    <div class="text-xl lg:text-2xl font-bold mt-4">Invoice</div>
-    <div class="text-xs lg:text-sm mb-4">
-      ( {currencyFormatter(ticket.price.currency).format(ticket.price.amount)}
-      {ticket.price.currency} equivalent )
+  <!-- Invoice Content -->
+  <div class="p-4 text-info">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+      <div>
+        <span class="text-sm font-bold">Date: </span>
+        {today.format('{day-short} {date-ordinal}')}
+      </div>
+      <div class="text-sm lg:text-right">
+        ( {currencyFormatter(ticket.price.currency).format(ticket.price.amount)}
+        {ticket.price.currency} equivalent )
+      </div>
     </div>
-    <div class="grid grid-cols-2 gap-4">
-      {#if ticketStatus !== TicketStatus.CANCELLED && invoice.status !== InvoiceStatus.COMPLETE && invoice.status !== InvoiceStatus.INVALID && invoice.status !== InvoiceStatus.REFUNDED}
-        <div class:text-warning={invoiceTimeLeft < 600}>
-          <span class="font-bold">Time Left to Pay: </span>{invoiceTimeLeft
-            ? durationFormatter(invoiceTimeLeft)
-            : 'None'}
-        </div>
-      {:else}
-        <div><span class="font-bold">Time Left to Pay: </span>None</div>
-      {/if}
 
+    <!-- Payment Details Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+      <!-- Payment Status Section -->
       <div class="capitalize">
         <span class="font-bold">Payment Status: </span>
         {invoiceStatus}
       </div>
 
+      <!-- Amount Section -->
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <div
-        class="z-10 tooltip tooltip-primary"
+        class="tooltip tooltip-primary"
         id="payment-amount"
         data-tip="Copy"
         on:click={() => {
           navigator.clipboard.writeText(currentPayment['amount']);
         }}
       >
-        <div class="text-center">
+        <div class="text-left lg:text-right">
           <span class="font-bold">Amount: </span>
-
           {currentPayment['amount']}
           {currentPayment['currency'].toLocaleUpperCase()}
         </div>
       </div>
+    </div>
 
-      <div class="text-center">
+    <!-- Rate and Time Left Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+      <div>
         <span class="font-bold">Rate: </span>
         {currentPayment['rate_str']}
       </div>
-      <div class="tooltip tooltip-primary z-10" data-tip="Copy">
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <div
-          class="z-10"
-          on:click={() => {
-            navigator.clipboard.writeText(currentPayment['payment_address']);
-          }}
-        >
-          <span class="font-bold">Payment Address: </span>
 
-          {currentPayment['payment_address']?.slice(0, 6)}...{currentPayment[
-            'payment_address'
-          ]?.slice(-4)}
+      <!-- Time Left to Pay Section -->
+      {#if ticketStatus !== TicketStatus.CANCELLED && invoice.status !== InvoiceStatus.COMPLETE && invoice.status !== InvoiceStatus.INVALID && invoice.status !== InvoiceStatus.REFUNDED}
+        <div class="text-warning-500 lg:text-right">
+          <span class="font-bold">Time Left to Pay: </span>
+          {invoiceTimeLeft ? durationFormatter(invoiceTimeLeft) : 'None'}
         </div>
-      </div>
-
-      <div class="tooltip tooltip-primary" data-tip="Copy">
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <div
-          class="z-10"
-          on:click={() => {
-            navigator.clipboard.writeText(currentPayment['payment_url']);
-          }}
-        >
-          <span class="font-bold">Payment URL: </span>
-
-          {currentPayment['payment_url']?.slice(0, 6)}...{currentPayment[
-            'payment_url'
-          ]?.slice(-4)}
+      {:else}
+        <div class="lg:text-right">
+          <span class="font-bold">Time Left to Pay: </span>None
         </div>
-      </div>
+      {/if}
     </div>
-    <div class="flex place-content-center m-6">
-      <QRCodeImage text={currentPayment['payment_url']} />
-    </div>
-    <div class="pb-6">
+
+    <!-- Additional Invoice Information -->
+    <div class="text-center italic mb-4">
       {#if invoice.status === InvoiceStatus.EXPIRED}
         <span class="font-bold">Invoice Expired</span>
       {:else if invoice.status === InvoiceStatus.REFUNDED}
@@ -159,8 +157,7 @@
       {:else}
         Please pay with your connected wallet before <span class="font-bold"
           >Time Left to Pay</span
-        >
-        runs out
+        > runs out
       {/if}
     </div>
   </div>

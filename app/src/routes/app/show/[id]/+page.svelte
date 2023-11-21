@@ -84,7 +84,7 @@
               class="btn btn-sm btn-circle absolute right-2 top-2">✕</label
             >
             <div
-              class="grid grid-rows-1 lg:grid-rows-2 gap-4 grid-flow-col justify-center items-center"
+              class="grid grid-rows-1 gap-4 grid-flow-col justify-center items-center"
             >
               <div
                 class="bg-cover bg-no-repeat rounded-full h-24 w-24 lg:h-48 lg:w-48 row-span-2"
