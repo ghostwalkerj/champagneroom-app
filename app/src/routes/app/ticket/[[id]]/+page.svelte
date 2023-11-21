@@ -1,10 +1,9 @@
 <script lang="ts">
-  import { onDestroy, onMount, tick } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
   import urlJoin from 'url-join';
   import web3 from 'web3';
 
-  import { applyAction, enhance } from '$app/forms';
   import { goto, invalidateAll, onNavigate } from '$app/navigation';
   import { page } from '$app/stores';
 
@@ -24,6 +23,9 @@
 
   import { ShowStore, TicketStore } from '$stores';
 
+  import CancelTicket from './CancelTicket.svelte';
+  import DisputeTicket from './DisputeTicket.svelte';
+  import LeaveFeedback from './LeaveFeedback.svelte';
   import TicketDetail from './TicketDetail.svelte';
   import TicketInvoice from './TicketInvoice.svelte';
 
@@ -43,13 +45,11 @@
   ] as PaymentType;
 
   const showTimePath = urlJoin(Config.Path.ticket, Config.Path.showTime);
-  const reasons = Object.values(DisputeReason);
 
   $: shouldPay = false;
   let hasPaymentSent = false;
   $: canWatchShow = false;
   $: canCancelTicket = false;
-  $: canRequestRefund = false;
   $: isShowInEscrow = false;
   $: isTicketDone = true;
   let canLeaveFeedback = false;
@@ -60,11 +60,11 @@
   let ticketUnSub: Unsubscriber;
   let isShowCancelLoading = false;
   $: hasShowStarted = false;
-  $: loading = false;
+  $: isLoading = false;
   let ticketMachineService: TicketMachineServiceType;
 
   const walletPay = async () => {
-    loading = true;
+    isLoading = true;
 
     if ($selectedAccount) {
       // Make sure to use correct chain id
@@ -119,7 +119,7 @@
     } else {
       await connect();
     }
-    loading = false;
+    isLoading = false;
   };
 
   const useTicketMachine = async (
@@ -141,8 +141,7 @@
         rating: 5
       }
     });
-    canRequestRefund =
-      state.matches('reserved.waiting4Show') && !hasShowStarted;
+
     canDispute = state.can({
       type: 'DISPUTE INITIATED',
       dispute: {
@@ -174,7 +173,7 @@
   };
 
   const joinShow = async () => {
-    loading = true;
+    isLoading = true;
     let formData = new FormData();
     fetch('?/join_show', {
       method: 'POST',
@@ -227,25 +226,11 @@
     showUnSub?.();
     ticketUnSub?.();
   });
-
-  const onSubmit = (form: HTMLFormElement) => {
-    if (form.name === 'cancelTicket') {
-      isShowCancelLoading = true;
-    }
-    loading = true;
-    return async ({ result }) => {
-      if (result.type === 'failure') {
-        loading = false;
-      }
-      await applyAction(result);
-      loading = false;
-    };
-  };
 </script>
 
 {#if ticket}
-  <div class="mt-6 flex items-center">
-    <div class="min-w-full">
+  <div class="mt-6 flex flex-col lg:flex-row items-center justify-center">
+    <div class="w-full lg:max-w-4xl mx-auto">
       <!-- Page header -->
       <div class="pb-4 text-center relative">
         {#key ticket.ticketState || show.showState}
@@ -253,7 +238,7 @@
         {/key}
         {#if isWaitingForShow}
           <div
-            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-4xl -rotate-6 whitespace-nowrap font-extrabold text-primary ring-2 ring-primary bg-base-200/50 p-2 ring-inset rounded-xl"
+            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-2xl lg:text-4xl -rotate-6 whitespace-nowrap font-extrabold text-primary ring-2 ring-primary bg-base-200/50 p-2 ring-inset rounded-xl"
           >
             Waiting for Show to Start
           </div>
@@ -268,7 +253,7 @@
           {/key}
           {#if hasPaymentSent}
             <div
-              class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl -rotate-45 whitespace-nowrap font-extrabold text-primary ring-2 ring-primary bg-base-200/50 p-2 ring-inset rounded-xl"
+              class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-2xl lg:text-3xl -rotate-45 whitespace-nowrap font-extrabold text-primary ring-2 ring-primary bg-base-200/50 p-2 ring-inset rounded-xl"
             >
               Waiting for Payment Confirmations
             </div>
@@ -277,7 +262,7 @@
       {/if}
 
       {#if !isTicketDone}
-        <div class="flex gap-6 place-content-center m-3">
+        <div class="flex flex-wrap gap-6 justify-center m-3">
           {#if shouldPay && !isShowCancelLoading}
             {#if !$selectedAccount}
               <button class="btn btn-secondary" on:click={connect}
@@ -287,7 +272,7 @@
               <button
                 class="btn btn-secondary"
                 on:click={walletPay}
-                disabled={loading}>Pay with Wallet</button
+                disabled={isLoading}>Pay with Wallet</button
               >
             {/if}
           {/if}
@@ -295,240 +280,25 @@
             <div class="w-full flex justify-center">
               <button
                 class="btn btn-secondary"
-                disabled={loading}
+                disabled={isLoading}
                 on:click={() => {
-                  loading = true;
+                  isLoading = true;
                   joinShow();
                 }}>Go to the Show</button
               >
             </div>
           {/if}
-
           {#if canCancelTicket && !hasShowStarted}
-            {#if isShowCancelLoading}
-              <div class="w-full flex justify-center">
-                <button class="btn btn-secondary loading" disabled={true}
-                  >Cancelling</button
-                >
-              </div>
-            {:else}
-              <form
-                method="post"
-                action="?/cancel_ticket"
-                name="cancelTicket"
-                use:enhance={({ formElement }) => onSubmit(formElement)}
-              >
-                <div class="w-full flex justify-center">
-                  <button
-                    class="btn btn-secondary"
-                    type="submit"
-                    disabled={loading}
-                  >
-                    {#if canRequestRefund && !hasShowStarted}
-                      Request Refund
-                    {:else}
-                      Cancel Ticket
-                    {/if}
-                  </button>
-                </div>
-              </form>
-            {/if}
+            <CancelTicket bind:isLoading />
           {/if}
           {#if canLeaveFeedback}
-            <input type="checkbox" id="leave-feedback" class="modal-toggle" />
-            <div class="modal">
-              <div class="modal-box relative">
-                <div class="text-lg text-center">Leave Feedback</div>
-                <label
-                  for="leave-feedback"
-                  class="btn btn-sm btn-circle absolute right-2 top-2">✕</label
-                >
-                <div
-                  class="grid grid-rows-1 gap-4 grid-flow-col justify-center items-center w-full"
-                >
-                  <form
-                    method="post"
-                    action="?/leave_feedback"
-                    use:enhance={({ formElement }) => onSubmit(formElement)}
-                  >
-                    <div class=" w-full py-2 form-control">
-                      <!-- svelte-ignore a11y-label-has-associated-control -->
-                      <label for="rating" class="label">
-                        <span class="label-text">Rating</span></label
-                      >
-                      <div class="rating rating-lg">
-                        <input
-                          type="radio"
-                          name="rating"
-                          class="rating-hidden"
-                          value="0"
-                          checked
-                        />
-                        <input
-                          type="radio"
-                          name="rating"
-                          value="1"
-                          class="mask mask-star-2 bg-primary"
-                        />
-                        <input
-                          type="radio"
-                          name="rating"
-                          value="2"
-                          class="mask mask-star-2 bg-primary"
-                        />
-                        <input
-                          type="radio"
-                          name="rating"
-                          value="3"
-                          class="mask mask-star-2 bg-primary"
-                        />
-                        <input
-                          type="radio"
-                          name="rating"
-                          value="4"
-                          class="mask mask-star-2 bg-primary"
-                        />
-                        <input
-                          type="radio"
-                          name="rating"
-                          value="5"
-                          class="mask mask-star-2 bg-primary"
-                        />
-                      </div>
-                      {#if form?.missingRating}<div
-                          class="shadow-lg alert alert-error"
-                        >
-                          Rating is Required
-                        </div>{/if}
-                    </div>
-                    <div class="max-w-s w-full py-2 form-control">
-                      <!-- svelte-ignore a11y-label-has-associated-control -->
-                      <label for="review" class="label">
-                        <span class="label-text">Review</span></label
-                      >
-                      <div class="rounded-md shadow-sm mt-1 relative">
-                        <textarea
-                          name="review"
-                          class="textarea textarea-lg textarea-primary"
-                          value={form?.review ?? ''}
-                        />
-                      </div>
-                    </div>
-
-                    <div class="py-4 text-center">
-                      {#if loading}
-                        <button
-                          class="btn btn-secondary loading"
-                          type="submit"
-                          disabled={true}>Submitting</button
-                        >
-                      {:else}
-                        <button
-                          class="btn btn-secondary"
-                          type="submit"
-                          disabled={loading}>Submit</button
-                        >
-                      {/if}
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </div>
-            <div class="p-4">
-              <div class="w-full flex justify-center">
-                <label for="leave-feedback" class="btn btn-secondary"
-                  >Leave Feedback</label
-                >
-              </div>
-            </div>
+            <LeaveFeedback bind:isLoading {form} />
           {/if}
           {#if canLeaveFeedback && canDispute}
             <div class="divider w-36 pt-6">OR</div>
           {/if}
           {#if canDispute}
-            <input type="checkbox" id="initiate-dispute" class="modal-toggle" />
-            <div class="modal">
-              <div class="modal-box relative">
-                <div class="text-lg text-center">Initiate Dispute</div>
-
-                <label
-                  for="initiate-dispute"
-                  class="btn btn-sm btn-circle absolute right-2 top-2">✕</label
-                >
-                <div
-                  class="grid grid-rows-1 gap-4 grid-flow-col justify-center items-center"
-                >
-                  <form
-                    method="post"
-                    action="?/initiate_dispute"
-                    use:enhance={({ formElement }) => onSubmit(formElement)}
-                  >
-                    <div class="max-w-xs w-full py-2 form-control">
-                      <!-- svelte-ignore a11y-label-has-associated-control -->
-                      <label for="reason" class="label">
-                        <span class="label-text">Reason</span></label
-                      >
-                    </div>
-                    <select
-                      class="select select-primary w-full max-w-xs"
-                      name="reason"
-                    >
-                      <option disabled selected>Reason for the Dispute</option>
-
-                      {#each reasons as reason}
-                        <option>{reason}</option>
-                      {/each}
-                    </select>
-                    {#if form?.missingReason}<div
-                        class="shadow-lg alert alert-error"
-                      >
-                        Select a Reason
-                      </div>{/if}
-                    <div class="max-w-xs w-full py-2 form-control">
-                      <!-- svelte-ignore a11y-label-has-associated-control -->
-                      <label for="reaon" class="label">
-                        <span class="label-text">Explanation</span></label
-                      >
-                      <div class="rounded-md shadow-sm mt-1 relative">
-                        <textarea
-                          name="explanation"
-                          class="textarea textarea-primary textarea-lg"
-                          value={form?.explanation ?? ''}
-                        />
-                        {#if form?.missingExplanation}<div
-                            class="shadow-lg alert alert-error"
-                          >
-                            Provide an Explanation
-                          </div>{/if}
-                      </div>
-                    </div>
-
-                    <div class="py-4 text-center">
-                      {#if loading}
-                        <button
-                          class="btn btn-secondary loading"
-                          type="submit"
-                          disabled={true}>Submitting</button
-                        >
-                      {:else}
-                        <button
-                          class="btn btn-secondary"
-                          type="submit"
-                          disabled={loading}>Submit</button
-                        >
-                      {/if}
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </div>
-            <div class="p-4">
-              <div class="w-full flex justify-center">
-                <button class="btn btn-secondary" disabled={loading}
-                  >Initiate Dispute</button
-                >
-              </div>
-            </div>
+            <DisputeTicket bind:isLoading {form} />
           {/if}
         </div>
       {/if}

@@ -82,7 +82,7 @@
         <ConnectButton />
         {#if $page.data.user && $page.data.user.authType === AuthType.SIGNING}
           <button
-            class="btn btn-primary"
+            class="btn btn-xs btn-primary mr-4"
             on:click={() => {
               goto(Config.Path.auth + '?signOut', { replaceState: true });
             }}

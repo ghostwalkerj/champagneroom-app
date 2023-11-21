@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { QRCodeImage } from 'svelte-qrcode-image';
 
-  import { TicketStatus, type TicketDocumentType } from '$lib/models/ticket';
+  import { type TicketDocumentType, TicketStatus } from '$lib/models/ticket';
 
   import { currencyFormatter, durationFormatter } from '$lib/constants';
   import type { PaymentType } from '$lib/payment';
@@ -63,19 +63,21 @@
 >
   {#if invoice.status === InvoiceStatus.EXPIRED || invoice.status === InvoiceStatus.COMPLETE || invoice.status === InvoiceStatus.INVALID || invoice.status === InvoiceStatus.REFUNDED}
     <div
-      class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-6xl whitespace-nowrap font-extrabold text-primary ring-2 ring-primary p-2 rounded-xl z-20 -rotate-[20deg] capitalize"
+      class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl lg:text-6xl whitespace-nowrap font-extrabold text-primary ring-2 ring-primary p-2 rounded-xl z-20 -rotate-[20deg] capitalize"
     >
       {invoiceStatus}
     </div>
   {/if}
 
-  <div class="flex flex-col w-full max-w-2xl rounded-xl bg-black overflow-auto">
-    <div class="text-2xl font-bold mt-4">Invoice</div>
-    <div class="text-sm mb-4">
+  <div
+    class="flex flex-col w-full max-w-sm md:max-w-xl lg:max-w-2xl rounded-xl bg-black overflow-auto"
+  >
+    <div class="text-xl lg:text-2xl font-bold mt-4">Invoice</div>
+    <div class="text-xs lg:text-sm mb-4">
       ( {currencyFormatter(ticket.price.currency).format(ticket.price.amount)}
       {ticket.price.currency} equivalent )
     </div>
-    <div class="grid grid-cols-2">
+    <div class="grid grid-cols-2 gap-4">
       {#if ticketStatus !== TicketStatus.CANCELLED && invoice.status !== InvoiceStatus.COMPLETE && invoice.status !== InvoiceStatus.INVALID && invoice.status !== InvoiceStatus.REFUNDED}
         <div class:text-warning={invoiceTimeLeft < 600}>
           <span class="font-bold">Time Left to Pay: </span>{invoiceTimeLeft

@@ -67,9 +67,9 @@
 </script>
 
 <div class="mt-4 h-full">
-  <div class="flex flex-row justify-center h-full">
+  <div class="flex flex-col lg:flex-row justify-center h-full">
     <!-- Page header -->
-    <div class="pb-4 text-center w-full max-w-xl">
+    <div class="pb-4 text-center w-full lg:max-w-xl mx-auto">
       {#key show.showState}
         <ShowDetail {show} />
       {/key}
@@ -84,79 +84,62 @@
               class="btn btn-sm btn-circle absolute right-2 top-2">✕</label
             >
             <div
-              class="grid grid-rows-1 gap-4 grid-flow-col justify-center items-center"
+              class="grid grid-rows-1 lg:grid-rows-2 gap-4 grid-flow-col justify-center items-center"
             >
               <div
-                class="bg-cover bg-no-repeat rounded-full h-48 w-48 row-span-2"
+                class="bg-cover bg-no-repeat rounded-full h-24 w-24 lg:h-48 lg:w-48 row-span-2"
                 style="background-image: url('{profileImage}')"
               />
               <form
                 method="post"
                 action="?/reserve_ticket"
                 use:enhance={onSubmit}
-                class="font-Roboto"
+                class="font-Roboto w-full lg:max-w-xs"
               >
-                <div class="max-w-xs w-full py-2 form-control">
-                  <!-- svelte-ignore a11y-label-has-associated-control -->
+                <div class="py-2 form-control">
                   <label for="caller" class="label">
-                    <span class="label-text">Your Name</span></label
-                  >
-                  <div class="rounded-md shadow-sm mt-1 relative">
-                    <input
-                      name="name"
-                      type="text"
-                      class=" max-w-xs w-full py-2 pl-6 input input-bordered input-primary"
-                      bind:value={displayName}
-                    />
-                    {#if form?.missingName}<div
-                        class="shadow-lg alert alert-error"
-                      >
-                        Name is required
-                      </div>{/if}
-                  </div>
+                    <span class="label-text">Your Name</span>
+                  </label>
+                  <input
+                    name="name"
+                    type="text"
+                    class="input input-bordered input-primary"
+                    bind:value={displayName}
+                  />
+                  {#if form?.missingName}
+                    <div class="alert alert-error">Name is required</div>
+                  {/if}
                 </div>
-                <div class="max-w-xs w-full py-2 form-control">
-                  <!-- svelte-ignore a11y-label-has-associated-control -->
+                <div class="py-2 form-control">
                   <label for="pin" class="label">
-                    <span class="label-text">8 Digit Pin</span></label
-                  >
-                  <div class="rounded-md shadow-sm mt-1 relative">
-                    <input
-                      name="pin"
-                      type="text"
-                      class="max-w-xs w-full py-2 pl-6 input input-bordered input-primary"
-                      value={form?.pin ?? ''}
-                      minlength="8"
-                      maxlength="8"
-                    />
-                    {#if form?.missingPin}<div
-                        class="shadow-lg alert alert-error"
-                      >
-                        Pin is required
-                      </div>{/if}
-                    {#if form?.invalidPin}<div
-                        class="shadow-lg alert alert-error"
-                      >
-                        Pin must be 8 digits
-                      </div>{/if}
-                    <div class="text-center text-sm p-1">
-                      You need a pin to access the ticket later!
-                    </div>
+                    <span class="label-text">8 Digit Pin</span>
+                  </label>
+                  <input
+                    name="pin"
+                    type="text"
+                    class="input input-bordered input-primary"
+                    value={form?.pin ?? ''}
+                    minlength="8"
+                    maxlength="8"
+                  />
+                  {#if form?.missingPin}
+                    <div class="alert alert-error">Pin is required</div>
+                  {/if}
+                  {#if form?.invalidPin}
+                    <div class="alert alert-error">Pin must be 8 digits</div>
+                  {/if}
+                  <div class="text-center text-sm p-1">
+                    You need a pin to access the ticket later!
                   </div>
                 </div>
-
                 <div class="py-4 text-center">
                   {#if isLoading}
-                    <button
-                      class="btn btn-secondary loading"
-                      type="submit"
-                      disabled={true}>Reserving</button
+                    <button class="btn btn-secondary loading" disabled
+                      >Reserving</button
                     >
                   {:else}
-                    <button
-                      class="btn btn-secondary"
-                      type="submit"
-                      disabled={isLoading}>Reserve</button
+                    <button class="btn btn-secondary" disabled={isLoading}
+                      >Reserve</button
                     >
                   {/if}
                 </div>

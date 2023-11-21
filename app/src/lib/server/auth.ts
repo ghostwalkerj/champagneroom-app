@@ -45,7 +45,11 @@ const WHITELIST_PATHS = [
 ];
 
 const TICKET_PATHS = [Config.Path.ticket + '/**', Config.Path.ticket];
-const CREATOR_PATHS = [Config.Path.creator, Config.Path.creator + '/**'];
+const CREATOR_PATHS = [
+  Config.Path.creator,
+  Config.Path.creator + '/**',
+  Config.Path.imageUpload
+];
 const SECRET_PATHS = [...PASSWORD_PATHS, ...PIN_PATHS];
 const AGENT_PATHS = [Config.Path.agent];
 const OPERATOR_PATHS = [Config.Path.operator];

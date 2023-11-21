@@ -21,7 +21,7 @@
 </script>
 
 <form method="post" action="?/cancel_show" use:enhance={onSubmit}>
-  <div class="bg-primary text-primary-content card">
+  <div class="bg-primary text-primary-content card mb-3 lg:mb-0">
     <div
       class="lg:flex lg:justify-center lg:items-center lg:text-left card-body p-3"
     >

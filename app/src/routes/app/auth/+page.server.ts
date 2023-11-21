@@ -275,7 +275,7 @@ export const load: PageServerLoad = async ({ url, cookies }) => {
 
   if (shouldSignOut) {
     cookies.delete(tokenName, { path: '/' });
-    return { signOut: true };
+    return { shouldSignOut: true };
   }
   if (!returnPath) {
     throw error(400, 'Missing Return Path');
@@ -307,6 +307,6 @@ export const load: PageServerLoad = async ({ url, cookies }) => {
     authType,
     parseId,
     type,
-    shouldSignOut: false
+    shouldSignOut
   };
 };
