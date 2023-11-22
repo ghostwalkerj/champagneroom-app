@@ -4,11 +4,13 @@ import { error, fail } from '@sveltejs/kit';
 import { ObjectId } from 'mongodb';
 import { nanoid } from 'nanoid';
 import { generateSillyPassword } from 'silly-password-generator';
+import spacetime from 'spacetime';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 
 import { PASSWORD_SALT } from '$env/static/private';
 
 import { Creator } from '$lib/models/creator';
+import { Show } from '$lib/models/show';
 import { User } from '$lib/models/user';
 import { Wallet } from '$lib/models/wallet';
 
@@ -171,6 +173,37 @@ export const load: PageServerLoad = async ({ locals }) => {
     }
     return 0;
   });
+  const now = spacetime.now();
+  const range = {
+    start: now.startOf('month').epoch,
+    end: now.endOf('month').epoch
+  };
+
+  const showData = await Show.aggregate([
+    {
+      $match: {
+        'showState.finalize.finalizedAt': {
+          $gte: range.start,
+          $lte: range.end
+        },
+        agent: agent._id
+      }
+    },
+    {
+      $project: {
+        'showState.salesStats.ticketSalesAmount': 1,
+        creator: 1
+      }
+    },
+    {
+      $group: {
+        _id: '$creator',
+        amount: {
+          $sum: '$showState.salesStats.ticketSalesAmount.amount'
+        }
+      }
+    }
+  ]);
 
   return {
     agent: agent.toObject({ flattenObjectIds: true, flattenMaps: true }),
@@ -182,6 +215,11 @@ export const load: PageServerLoad = async ({ locals }) => {
     ),
     wallet: wallet
       ? wallet.toObject({ flattenObjectIds: true, flattenMaps: true })
-      : undefined
+      : undefined,
+    showData: showData.map((show) => ({
+      creator: show._id[0],
+      currency: show._id[1],
+      amount: show.amount
+    }))
   };
 };

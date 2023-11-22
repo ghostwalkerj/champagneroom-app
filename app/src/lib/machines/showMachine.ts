@@ -647,7 +647,7 @@ const createShowMachine = ({
                 endedAt: new Date()
               },
               status: ShowStatus.FINALIZED,
-              finalized: event.finalize
+              finalize: event.finalize
             }
           };
         })

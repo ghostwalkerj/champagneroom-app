@@ -325,6 +325,8 @@ showSchema.plugin(fieldEncryption, {
   saltGenerator: (secret: string) => secret.slice(0, 16)
 });
 
+showSchema.index({ agent: 1, 'showState.finalize.finalizedAt': -1 });
+
 export type ShowDocumentType = InferSchemaType<typeof showSchema>;
 
 export type ShowRefundType = InferSchemaType<typeof refundSchema>;

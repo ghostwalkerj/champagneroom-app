@@ -141,7 +141,7 @@
         <div class="text-center font-bold text-sm">
           <a
             href={urlJoin(
-              $page.url.href,
+              $page.url.origin,
               Config.Path.creator,
               newCreator.user.secret
             )}
@@ -149,7 +149,7 @@
             class="link link-primary"
           >
             {urlJoin(
-              $page.url.href,
+              $page.url.origin,
               Config.Path.creator,
               newCreator.user.secret
             )}</a
