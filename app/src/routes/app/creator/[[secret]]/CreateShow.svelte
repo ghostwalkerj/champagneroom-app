@@ -9,7 +9,7 @@
   import Config from '$lib/config';
   import { durationFormatter } from '$lib/constants';
 
-  import type { ActionData } from '../$types';
+  import type { ActionData } from './$types';
 
   $: showDuration = 60;
 

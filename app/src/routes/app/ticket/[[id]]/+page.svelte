@@ -236,7 +236,20 @@
         {#key ticket.ticketState || show.showState}
           <TicketDetail {ticket} {show} {user} />
         {/key}
-        {#if isWaitingForShow}
+        {#if canWatchShow && hasShowStarted}
+          <div
+            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-2xl lg:text-4xl -rotate-6 whitespace-nowrap font-extrabold text-primary ring-2 ring-primary bg-base-200/50 p-2 ring-inset rounded-xl"
+          >
+            <button
+              class="btn btn-secondary"
+              disabled={isLoading}
+              on:click={() => {
+                isLoading = true;
+                joinShow();
+              }}>Go to the Show</button
+            >
+          </div>
+        {:else if isWaitingForShow}
           <div
             class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-2xl lg:text-4xl -rotate-6 whitespace-nowrap font-extrabold text-primary ring-2 ring-primary bg-base-200/50 p-2 ring-inset rounded-xl"
           >

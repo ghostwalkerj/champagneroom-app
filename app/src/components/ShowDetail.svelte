@@ -184,8 +184,16 @@
     {#if options.showCopy}
       <div class="text-center mt-2 lg:mt-4">
         <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <div class="btn btn-primary text-xs lg:text-sm" on:click={copyShowUrl}>
-          Copy Show Link
+        <div
+          class="tooltip tooltip-secondary"
+          data-tip="Send this link to your fans"
+        >
+          <div
+            class="btn btn-primary text-xs lg:text-sm"
+            on:click={copyShowUrl}
+          >
+            Copy Show Link
+          </div>
         </div>
       </div>
     {/if}
