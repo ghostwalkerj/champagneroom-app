@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { onDestroy, onMount, tick } from 'svelte';
-  import type { Unsubscriber } from 'svelte/store';
+  import { onMount, tick } from 'svelte';
   import StarRating from 'svelte-star-rating';
+  import type { Unsubscriber } from 'svelte/store';
   import urlJoin from 'url-join';
 
-  import { goto, invalidateAll, onNavigate } from '$app/navigation';
+  import { goto, onNavigate } from '$app/navigation';
   import { page } from '$app/stores';
 
   import { CancelReason } from '$lib/models/common';
@@ -26,10 +26,10 @@
   import ShowDetail from '$components/ShowDetail.svelte';
   import { CreatorStore, ShowStore, WalletStore } from '$stores';
 
+  import WalletDetail from '$components/WalletDetail.svelte';
   import CancelShow from './CancelShow.svelte';
   import CreateShow from './CreateShow.svelte';
   import CreatorActivity from './CreatorActivity.svelte';
-  import CreatorWallet from './CreatorWallet.svelte';
   import EndShow from './EndShow.svelte';
   import ShowStatus from './ShowStatus.svelte';
 
@@ -264,7 +264,7 @@
       <!-- Wallet -->
       <div>
         {#key wallet}
-          <CreatorWallet {wallet} {exchangeRate} {form} {destination} />
+          <WalletDetail {wallet} {exchangeRate} {form} {destination} />
         {/key}
       </div>
 

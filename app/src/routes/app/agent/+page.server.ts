@@ -156,12 +156,20 @@ export const actions: Actions = {
 export const load: PageServerLoad = async ({ locals }) => {
   const agent = locals.agent;
   const user = locals.user;
+  const wallet = locals.wallet;
   if (!agent) {
     throw error(404, 'Agent not found');
   }
 
-  const creators = await Creator.find({ agent: agent._id }).sort({
-    'user.name': 1
+  let creators = await Creator.find({ agent: agent._id });
+  creators = creators.sort((a, b) => {
+    if (a.user.name < b.user.name) {
+      return -1;
+    }
+    if (a.user.name > b.user.name) {
+      return 1;
+    }
+    return 0;
   });
 
   return {
@@ -171,6 +179,9 @@ export const load: PageServerLoad = async ({ locals }) => {
       : undefined,
     creators: creators.map((creator) =>
       creator.toObject({ flattenObjectIds: true, flattenMaps: true })
-    )
+    ),
+    wallet: wallet
+      ? wallet.toObject({ flattenObjectIds: true, flattenMaps: true })
+      : undefined
   };
 };

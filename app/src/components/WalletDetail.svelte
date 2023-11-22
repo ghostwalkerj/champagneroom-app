@@ -5,8 +5,7 @@
   import type { WalletDocumentType } from '$lib/models/wallet';
 
   import { currencyFormatter } from '$lib/constants';
-
-  import type { ActionData } from '../$types';
+  import type { ActionData } from '../routes/app/$types';
 
   export let destination = '';
   export let exchangeRate = 0;

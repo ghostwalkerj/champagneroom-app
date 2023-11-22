@@ -9,23 +9,23 @@
   import { page } from '$app/stores';
 
   import type { AgentDocumentType } from '$lib/models/agent';
-  import type {
-    CreatorDocument,
-    CreatorDocumentType
-  } from '$lib/models/creator';
+  import type { CreatorDocumentType } from '$lib/models/creator';
 
   import Config from '$lib/config';
   import { AuthType, currencyFormatter } from '$lib/constants';
   import { womensNames } from '$lib/womensNames';
 
-  import AgentWallet from './AgentWallet.svelte';
   import TopCreator from './TopCreator.svelte';
 
-  import type { PageData } from './$types';
+  import type { ActionData, PageData } from './$types';
+  import WalletDetail from '$components/WalletDetail.svelte';
+  import type { WalletDocumentType } from '$lib/models/wallet';
 
   export let data: PageData;
   const agent = data.agent as AgentDocumentType;
   let creators = data.creators as CreatorDocumentType[];
+  let wallet = data.wallet as WalletDocumentType;
+  export let form: ActionData;
 
   let newCreatorModal: HTMLDialogElement;
   let newCreator: CreatorDocumentType | undefined;
@@ -432,8 +432,8 @@
                     class="space-y-3 md:col-start-4 md:col-span-1 m-4 md:ml-0"
                   >
                     <!-- Wallet -->
-                    <div class="h-full">
-                      <AgentWallet />
+                    <div class="">
+                      <WalletDetail {wallet} {form} />
                     </div>
                   </div>
                 </div>
