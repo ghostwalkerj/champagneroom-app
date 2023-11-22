@@ -9,7 +9,10 @@
   import { page } from '$app/stores';
 
   import type { AgentDocumentType } from '$lib/models/agent';
-  import type { CreatorDocumentType } from '$lib/models/creator';
+  import type {
+    CreatorDocument,
+    CreatorDocumentType
+  } from '$lib/models/creator';
 
   import Config from '$lib/config';
   import { AuthType, currencyFormatter } from '$lib/constants';
@@ -39,26 +42,12 @@
   });
   let isChangeCreatorSecret = false;
 
-  const updateCreator = async (
-    index: number,
-    {
-      name,
-      commission,
-      active
-    }: { name?: string; commission?: number; active?: boolean }
-  ) => {
-    const creator = creators[index];
+  const updateCreator = async (creator: CreatorDocumentType) => {
     let formData = new FormData();
     formData.append('creatorId', creator._id.toString());
-    formData.append('name', name || '');
-    formData.append(
-      'commission',
-      commission ? commission.toString() : creator.agentCommission.toString()
-    );
-    formData.append(
-      'active',
-      active ? active.toString() : creator.user.active.toString()
-    );
+    formData.append('name', creator.user.name || '');
+    formData.append('commission', creator.agentCommission.toString());
+    formData.append('active', creator.user.active.toString());
 
     await fetch('?/update_creator', {
       method: 'POST',
@@ -67,18 +56,26 @@
   };
 
   const updateName = (name: string) => {
-    creators[activeRow].user.name = name;
-    updateCreator(activeRow, { name });
+    if (name === creators[activeRow].user.name) return;
+    const index = activeRow;
+    creators[index].user.name = name;
+    updateCreator(creators[index]);
   };
 
   const updateCommission = (commission: number) => {
-    creators[activeRow].agentCommission = commission;
-    updateCreator(activeRow, { commission });
+    if (commission != creators[activeRow].agentCommission) {
+      const index = activeRow;
+
+      creators[index].agentCommission = commission;
+      updateCreator(creators[index]);
+    }
   };
 
   const updateActive = (active: string) => {
-    creators[activeRow].user.active = active == 'true' ? true : false;
-    updateCreator(activeRow, { active: creators[activeRow].user.active });
+    const index = activeRow;
+    if (creators[index].user.active.toString() === active) return;
+    creators[index].user.active = active == 'true' ? true : false;
+    updateCreator(creators[index]);
   };
 
   const changeCreatorSecret = async () => {
@@ -111,8 +108,8 @@
           dictionaries: [womensNames]
         });
 
-        commission = Config.UI.defaultCommission.toString();
         creators = $page.data.creators;
+        console.log('creators', creators);
         newCreator = result.data.creator;
         newPassword = result.data.password;
         newCreatorModal.showModal();

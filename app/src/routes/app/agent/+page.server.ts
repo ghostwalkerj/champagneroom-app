@@ -93,16 +93,29 @@ export const actions: Actions = {
       return fail(400, { active, badActive: true });
     }
 
-    console.log('commission', commission);
-    console.log('creatorId', creatorId);
-
     try {
-      await Creator.findOneAndUpdate(
+      const creator = await Creator.findOneAndUpdate(
         {
           _id: new ObjectId(creatorId)
         },
         {
           agentCommission: +commission
+        },
+        {
+          new: true
+        }
+      );
+      if (!creator) {
+        return fail(400, { creatorId, missingCreatorId: true });
+      }
+
+      await User.findOneAndUpdate(
+        {
+          _id: creator.user._id
+        },
+        {
+          name,
+          active: active === 'true'
         }
       );
     } catch (error) {
