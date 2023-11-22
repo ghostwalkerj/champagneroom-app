@@ -16,6 +16,7 @@
   $: hasAvailableBalance = wallet.availableBalance > 0;
   let transactionModal: HTMLDialogElement;
   let withdrawModal: HTMLDialogElement;
+  let amountElement: HTMLInputElement;
 
   $: earnings = wallet.earnings;
   $: payouts = wallet.payouts;
@@ -92,13 +93,23 @@
           <input type="hidden" name="walletId" value={wallet._id.toString()} />
 
           <div class="label-text mb-2">Amount in {wallet.currency}</div>
-          <input
-            type="text"
-            name="amount"
-            class="w-full input input-bordered input-primary mb-4 h-12 rounded-lg"
-            placeholder="0.000000000"
-            value={form?.amount ?? ''}
-          />
+          <div class="flex items-center gap-2">
+            <input
+              type="text"
+              name="amount"
+              bind:this={amountElement}
+              class="w-full input input-bordered input-primary mb-4 h-12 rounded-lg"
+              value={form?.amount ?? ''}
+            />
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <div
+              class="btn btn-xs mb-4"
+              on:click={() =>
+                (amountElement.value = availableBalance.toString())}
+            >
+              Max
+            </div>
+          </div>
           {#if form?.missingAmount || form?.invalidAmount}
             <div class="shadow-md alert alert-error whitespace-nowrap mb-4">
               Enter Amount to Transfer
