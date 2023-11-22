@@ -140,18 +140,29 @@
         <div class="text-center font-bold text-lg">{newPassword}</div>
       </div>
       <div class="text-center mt-4">
-        and secret URL:
+        and Secret URL:
         <div class="text-center font-bold text-sm">
           <a
-            href={urlJoin(Config.Path.creator, newCreator.user.secret)}
+            href={urlJoin(
+              $page.url.href,
+              Config.Path.creator,
+              newCreator.user.secret
+            )}
             target="_blank"
             class="link link-primary"
           >
-            {urlJoin(Config.Path.creator, newCreator.user.secret)}</a
+            {urlJoin(
+              $page.url.href,
+              Config.Path.creator,
+              newCreator.user.secret
+            )}</a
           >
         </div>
       </div>
 
+      <div class="text-center m-auto pt-6">
+        Share this information only with your Creator
+      </div>
       <div class="modal-action">
         <form method="dialog">
           <!-- if there is a button in form, it will close the modal -->

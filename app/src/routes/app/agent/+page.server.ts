@@ -1,4 +1,7 @@
+import console from 'node:console';
+
 import { error, fail } from '@sveltejs/kit';
+import { ObjectId } from 'mongodb';
 import { nanoid } from 'nanoid';
 import { generateSillyPassword } from 'silly-password-generator';
 import { uniqueNamesGenerator } from 'unique-names-generator';
@@ -90,18 +93,20 @@ export const actions: Actions = {
       return fail(400, { active, badActive: true });
     }
 
+    console.log('commission', commission);
+    console.log('creatorId', creatorId);
+
     try {
       await Creator.findOneAndUpdate(
         {
-          _id: creatorId
+          _id: new ObjectId(creatorId)
         },
         {
-          'user.name': name,
-          agentCommission: +commission,
-          'user.active': active === 'true'
+          agentCommission: +commission
         }
       );
     } catch (error) {
+      console.error('err', error);
       return fail(400, { err: error });
     }
 
