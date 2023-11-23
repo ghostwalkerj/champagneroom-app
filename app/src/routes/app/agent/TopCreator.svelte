@@ -37,6 +37,9 @@
     rotation: -90,
     animation: true,
     plugins: {
+      autocolors: {
+        mode: 'label'
+      },
       legend: { display: true, position: 'bottom' as const },
       datalabels: {
         formatter: function (value: number | bigint) {

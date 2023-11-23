@@ -62,6 +62,8 @@
 
   $: data = {
     type: 'line',
+    backgroundColor: ['#2D1B69', '#58C7F3', '#F3CC30', '#20134E'],
+
     labels: [
       'Sunday',
       'Monday',
