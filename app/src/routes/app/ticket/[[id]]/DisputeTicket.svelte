@@ -75,5 +75,7 @@
 
 <!-- Button to Open Modal -->
 <div class="p-4 w-full flex justify-center">
-  <div class="btn btn-secondary">Initiate Dispute</div>
+  <label for="initiate-dispute" class="btn btn-secondary"
+    >Initiate Dispute</label
+  >
 </div>

@@ -237,8 +237,6 @@ export const load: PageServerLoad = async ({ locals }) => {
     }
   ]);
 
-  console.log('weeklyData', weeklyData);
-
   return {
     agent: agent.toObject({ flattenObjectIds: true, flattenMaps: true }),
     user: user

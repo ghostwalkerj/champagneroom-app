@@ -93,7 +93,6 @@ export const actions: Actions = {
 
     try {
       const wallet = new Wallet();
-      const secret = nanoid();
       await wallet.save();
 
       const password = generateSillyPassword({
@@ -103,7 +102,6 @@ export const actions: Actions = {
       const user = await User.create({
         name,
         authType: AuthType.PATH_PASSWORD,
-        secret,
         wallet: wallet._id,
         roles: [EntityType.CREATOR],
         password: `${password}${PASSWORD_SALT}`
