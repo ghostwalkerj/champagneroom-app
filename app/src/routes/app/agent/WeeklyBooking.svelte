@@ -1,27 +1,34 @@
 <script lang="ts">
   import Chart from 'chart.js/auto';
   import ChartDataLabels from 'chartjs-plugin-datalabels';
-  import spacetime from 'spacetime';
   import { Line } from 'svelte-chartjs';
 
-  import type { CreatorDocument } from '$lib/models/creator';
+  import type { CreatorDocumentType } from '$lib/models/creator';
 
-  export let creators: CreatorDocument[];
-
-  const now = spacetime.now();
-  let labels = [] as string[];
-  let creatorData = [] as number[];
+  export let creators: CreatorDocumentType[];
+  export let weeklyData: {
+    creatorId: string;
+    dayOfWeek: number;
+    bookings: number;
+  }[];
+  let datasets = [] as { label: string; data: number[] }[];
 
   if (creators) {
-    creators.forEach(async (creator: CreatorDocument) => {
-      const range = {
-        start: now.startOf('month').epoch,
-        end: now.endOf('month').epoch
-      };
-      const stats = await creator.getStatsByRange(range);
-      if (stats.totalEarnings > 0) {
-        creatorData = creatorData.concat(stats.totalEarnings);
-        labels = labels.concat(creator.user.name);
+    weeklyData.forEach((data) => {
+      const name = creators.find(
+        (creator) => creator._id.toString() === data.creatorId
+      )?.user.name;
+      if (name) {
+        let dataRow = datasets.findIndex((dataset) => dataset.label === name);
+
+        if (dataRow === -1) {
+          dataRow = datasets.push({
+            label: name,
+            data: [0, 0, 0, 0, 0, 0, 0]
+          });
+        }
+        console;
+        datasets[dataRow - 1].data[data.dayOfWeek] = data.bookings;
       }
     });
   }
@@ -51,26 +58,15 @@
   $: data = {
     type: 'line',
     labels: [
+      'Sunday',
       'Monday',
       'Tuesday',
       'Wednesday',
       'Thursday',
       'Friday',
-      'Saturday',
-      'Sunday'
+      'Saturday'
     ],
-    datasets: [
-      {
-        label: 'Weekly Bookings',
-        data: [2, 3, 1, 2, 4, 5, 2],
-        borderWidth: 2,
-        pointBorderColor: '#E779C1',
-        pointBorderWidth: 1,
-        pointStyle: 'circle',
-        pointRadius: 10,
-        pointHoverRadius: 15
-      }
-    ]
+    datasets
   };
   Chart.register(ChartDataLabels);
 </script>
@@ -79,8 +75,8 @@
   <div class="text-center card-body items-center">
     <div class="text-2xl card-title capitalize">Weekly Bookings</div>
     {#if creators && creators.length > 0}
-      {#if creatorData.length > 0}
-        {#key creatorData}
+      {#if datasets.length > 0}
+        {#key datasets}
           <Line {data} {options} />
         {/key}
       {:else}

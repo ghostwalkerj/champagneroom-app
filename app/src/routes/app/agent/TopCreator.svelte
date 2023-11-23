@@ -1,23 +1,33 @@
 <script lang="ts">
   import Chart from 'chart.js/auto';
   import ChartDataLabels from 'chartjs-plugin-datalabels';
-  import spacetime from 'spacetime';
   import { Doughnut } from 'svelte-chartjs';
 
   import type { CreatorDocumentType } from '$lib/models/creator';
 
   import { currencyFormatter } from '$lib/constants';
+  import type { CurrencyType } from '$lib/models/common';
+  import spacetime from 'spacetime';
 
   export let creators: CreatorDocumentType[];
+  export let showData: {
+    creatorId: string;
+    amount: number;
+    currency: CurrencyType;
+  }[];
 
-  const now = spacetime.now();
+  let creatorData: number[] = [];
   let labels = [] as string[];
-  let creatorData = [] as number[];
+  const now = spacetime.now();
 
   if (creators) {
-    for (const creator of creators) {
-      creatorData = [...creatorData, creator.salesStats.totalRevenue];
-      labels = [...labels, creator.user.name];
+    for (const data of showData) {
+      const creator = creators.find(
+        (creator) => creator._id.toString() === data.creatorId
+      );
+      if (!creator) continue;
+      creatorData.push(data.amount);
+      labels.push(creator.user.name);
     }
   }
 
@@ -50,10 +60,10 @@
   Chart.register(ChartDataLabels);
 </script>
 
-<div class="bg-base-200 text-primary-content card w-auto">
+<div class="bg-primary text-primary-content card">
   <div class="text-center card-body items-center">
-    <div class="text-2xl card-title capitalize text-info">
-      Top Creator - {now.monthName()}
+    <div class="text-2xl card-title capitalize">
+      Top Creators - {now.monthName()}
     </div>
     {#if creators && creators.length > 0}
       {#if creatorData.length > 0}

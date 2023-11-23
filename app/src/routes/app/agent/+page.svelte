@@ -20,11 +20,23 @@
   import type { ActionData, PageData } from './$types';
   import WalletDetail from '$components/WalletDetail.svelte';
   import type { WalletDocumentType } from '$lib/models/wallet';
+  import type { CurrencyType } from '$lib/models/common';
+  import WeeklyBooking from './WeeklyBooking.svelte';
 
   export let data: PageData;
   const agent = data.agent as AgentDocumentType;
   let creators = data.creators as CreatorDocumentType[];
   let wallet = data.wallet as WalletDocumentType;
+  export let showData = data.showData as {
+    creatorId: string;
+    currency: CurrencyType;
+    amount: number;
+  }[];
+  export let weeklyData = data.weeklyData as {
+    creatorId: string;
+    dayOfWeek: number;
+    bookings: number;
+  }[];
   export let form: ActionData;
 
   let newCreatorModal: HTMLDialogElement;
@@ -413,28 +425,28 @@
               </div>
             {:else}
               <div
-                class="mt-4 bg-base w-full rounded-lg z-0 overflow-hidden border-2 border-secondary"
+                class="mt-4 bg-base w-full rounded-lg z-0 border-2 border-secondary"
               >
                 <div
                   class="flex-col min-w-full md:min-w-min md:grid md:grid-cols-3"
                 >
                   <!-- 1st column -->
-                  <div
-                    class="flex-1 m-4 space-y-3 md:col-start-1 md:col-span-3"
-                  >
+                  <div class="flex-1 m-4 space-y-3">
                     <!-- Status -->
-
-                    <TopCreator {creators} />
+                    <!-- Wallet -->
+                    <div class="min-w-fit">
+                      <WalletDetail {wallet} {form} />
+                    </div>
                   </div>
 
                   <!--Next Column-->
-                  <div
-                    class="space-y-3 md:col-start-4 md:col-span-1 m-4 md:ml-0"
-                  >
-                    <!-- Wallet -->
-                    <div class="">
-                      <WalletDetail {wallet} {form} />
-                    </div>
+                  <div class="space-y-3 md:col-span-1 m-4 md:ml-0">
+                    <TopCreator {creators} {showData} />
+                  </div>
+
+                  <!--Next Column-->
+                  <div class="space-y-3 md:col-span-1 m-4 md:ml-0">
+                    <WeeklyBooking {creators} {weeklyData} />
                   </div>
                 </div>
               </div>

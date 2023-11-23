@@ -9,6 +9,7 @@ import { uniqueNamesGenerator } from 'unique-names-generator';
 
 import { PASSWORD_SALT } from '$env/static/private';
 
+import type { CurrencyType } from '$lib/models/common';
 import { Creator } from '$lib/models/creator';
 import { Show } from '$lib/models/show';
 import { User } from '$lib/models/user';
@@ -174,17 +175,17 @@ export const load: PageServerLoad = async ({ locals }) => {
     return 0;
   });
   const now = spacetime.now();
-  const range = {
-    start: now.startOf('month').epoch,
-    end: now.endOf('month').epoch
+  const monthRange = {
+    start: now.startOf('month').iso(),
+    end: now.endOf('month').iso()
   };
 
   const showData = await Show.aggregate([
     {
       $match: {
         'showState.finalize.finalizedAt': {
-          $gte: range.start,
-          $lte: range.end
+          $gte: new Date(monthRange.start),
+          $lte: new Date(monthRange.end)
         },
         agent: agent._id
       }
@@ -197,13 +198,46 @@ export const load: PageServerLoad = async ({ locals }) => {
     },
     {
       $group: {
-        _id: '$creator',
+        _id: ['$creator', '$showState.salesStats.ticketSalesAmount.currency'],
         amount: {
           $sum: '$showState.salesStats.ticketSalesAmount.amount'
         }
       }
     }
   ]);
+
+  const weekRange = {
+    start: now.subtract(7, 'days').iso(),
+    end: now.iso()
+  };
+
+  const weeklyData = await Show.aggregate([
+    {
+      $match: {
+        'showState.finalize.finalizedAt': {
+          $gte: new Date(weekRange.start),
+          $lte: new Date(weekRange.end)
+        },
+        agent: agent._id
+      }
+    },
+    {
+      $project: {
+        creator: 1,
+        dayOfWeek: { $dayOfWeek: '$showState.finalize.finalizedAt' }
+      }
+    },
+    {
+      $group: {
+        _id: ['$creator', '$dayOfWeek'],
+        bookings: {
+          $sum: 1
+        }
+      }
+    }
+  ]);
+
+  console.log('weeklyData', weeklyData);
 
   return {
     agent: agent.toObject({ flattenObjectIds: true, flattenMaps: true }),
@@ -216,10 +250,25 @@ export const load: PageServerLoad = async ({ locals }) => {
     wallet: wallet
       ? wallet.toObject({ flattenObjectIds: true, flattenMaps: true })
       : undefined,
-    showData: showData.map((show) => ({
-      creator: show._id[0],
-      currency: show._id[1],
-      amount: show.amount
-    }))
+    showData: showData.map(
+      (show) =>
+        ({
+          creatorId: show._id[0].toString(),
+          currency: show._id[1],
+          amount: show.amount
+        } as { creatorId: string; currency: CurrencyType; amount: number })
+    ),
+    weeklyData: weeklyData.map(
+      (show) =>
+        ({
+          creatorId: show._id[0].toString(),
+          dayOfWeek: show._id[1],
+          bookings: show.bookings
+        } as {
+          creatorId: string;
+          dayOfWeek: number;
+          bookings: number;
+        })
+    )
   };
 };
