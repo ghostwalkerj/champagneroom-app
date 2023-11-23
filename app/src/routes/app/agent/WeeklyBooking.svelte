@@ -2,6 +2,7 @@
   import Chart from 'chart.js/auto';
   import ChartDataLabels from 'chartjs-plugin-datalabels';
   import { Line } from 'svelte-chartjs';
+  import autocolors from 'chartjs-plugin-autocolors';
 
   import type { CreatorDocumentType } from '$lib/models/creator';
 
@@ -27,13 +28,17 @@
             data: [0, 0, 0, 0, 0, 0, 0]
           });
         }
-        console;
         datasets[dataRow - 1].data[data.dayOfWeek] = data.bookings;
       }
     });
   }
 
   const options = {
+    plugins: {
+      autocolors: {
+        mode: 'label'
+      }
+    },
     elements: {
       line: {
         borderColor: '#58C7F3',
@@ -69,6 +74,7 @@
     datasets
   };
   Chart.register(ChartDataLabels);
+  Chart.register(autocolors);
 </script>
 
 <div class="bg-primary text-primary-content card">
