@@ -684,6 +684,8 @@ const createTicketMachine = ({
         }),
 
         decideDispute: assign((context, event) => {
+          const refund = event.refund;
+
           if (!context.ticketState.dispute) return {};
           const dispute = {
             ...context.ticketState.dispute,
@@ -691,7 +693,6 @@ const createTicketMachine = ({
             endedAt: new Date(),
             resolved: true
           };
-          const refund = event.refund;
           return {
             ticketState: {
               ...context.ticketState,

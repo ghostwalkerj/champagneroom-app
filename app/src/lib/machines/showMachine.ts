@@ -517,18 +517,18 @@ const createShowMachine = ({
         receiveResolution: assign((context, event) => {
           const st = context.showState;
           const refunded = event.decision === DisputeDecision.NO_REFUND ? 0 : 1;
-          return {
-            showState: {
-              ...st,
-              disputeStats: {
-                ...st.disputeStats,
-                totalDisputesPending: st.disputeStats.totalDisputesPending - 1,
-                totalDisputesResolved:
-                  st.disputeStats.totalDisputesResolved + 1,
-                totalDisputesRefunded:
-                  st.disputeStats.totalDisputesRefunded + refunded
-              }
+          const showState = {
+            ...st,
+            disputeStats: {
+              ...st.disputeStats,
+              totalDisputesPending: st.disputeStats.totalDisputesPending - 1,
+              totalDisputesResolved: st.disputeStats.totalDisputesResolved + 1,
+              totalDisputesRefunded:
+                st.disputeStats.totalDisputesRefunded + refunded
             }
+          };
+          return {
+            showState
           };
         }),
 
@@ -710,8 +710,12 @@ const createShowMachine = ({
           const escrowOver = escrowTime < Date.now();
           return escrowOver || (!hasDisputes && !hasUnfinalizedTickets);
         },
-        disputesResolved: (context) =>
-          context.showState.disputeStats.totalDisputesPending === 0
+        disputesResolved: (context, event) => {
+          const resolved = event.type === 'DISPUTE DECIDED' ? 1 : 0;
+          return (
+            context.showState.disputeStats.totalDisputesPending - resolved === 0
+          );
+        }
       }
     }
   );

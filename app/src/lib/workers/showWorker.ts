@@ -960,7 +960,6 @@ const ticketDisputeResolved = async (
   showQueue: ShowQueueType,
   payoutQueue: PayoutQueueType
 ) => {
-  console.log('ticketDisputeResolved', ticketId, decision);
   const showService = createShowMachineService({
     showDocument: show,
     showMachineOptions: {
@@ -974,8 +973,8 @@ const ticketDisputeResolved = async (
 
   showService.send({
     type: ShowMachineEventString.DISPUTE_DECIDED,
-    ticket,
-    decision
+    decision,
+    ticket
   });
 
   const ticketService = getTicketMachineService(ticket, showQueue);
@@ -1008,17 +1007,16 @@ const ticketDisputeResolved = async (
         refund.approvedAmounts.set(key, value / 2);
       }
     }
+
     ticketService.send({
       type: TicketMachineEventString.DISPUTE_DECIDED,
       decision,
       refund
     });
 
-    const waitState = await waitFor(ticketService, (state) =>
+    await waitFor(ticketService, (state) =>
       state.matches('ended.inDispute.waiting4DisputeRefund')
     );
-    console.log('waitState', waitState.value);
-    console.log('waitState', waitState.context.ticketState.refund);
 
     payoutQueue.add(PayoutJobType.DISPUTE_PAYOUT, {
       ticketId: ticket._id.toString()

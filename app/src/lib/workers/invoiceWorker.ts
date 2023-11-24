@@ -211,7 +211,6 @@ export const getInvoiceWorker = ({
                     }
                   );
                   const refund = response.data;
-                  console.log(refund);
 
                   const payoutId = refund.payout_id;
                   if (!payoutId) {

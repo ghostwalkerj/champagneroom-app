@@ -10,6 +10,6 @@ docker system prune -f
 yarn build
 yarn package
 docker-compose --env-file .env.stage -f docker-compose.stage.yml build
-docker tag pcall registry.digitalocean.com/champagne/pcall
-docker push registry.digitalocean.com/champagne/pcall
+docker tag pcall registry.digitalocean.com/champagneroom/pcall
+docker push registry.digitalocean.com/champagneroom/pcall
 cp .env.dev .env

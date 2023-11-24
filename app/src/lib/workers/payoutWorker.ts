@@ -7,7 +7,7 @@ import urlJoin from 'url-join';
 import type { PayoutType } from '$lib/models/common';
 import { CurrencyType } from '$lib/models/common';
 import { Creator } from '$lib/models/creator';
-import type { TicketDocument } from '$lib/models/ticket';
+import type { TicketDocument, TicketDocument } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
 import {
   Transaction,
@@ -71,56 +71,56 @@ export const getPayoutWorker = ({
       const payoutType = job.name as PayoutJobType;
       switch (payoutType) {
         case PayoutJobType.REFUND_SHOW: {
-          const bcInvoiceId = job.data.bcInvoiceId;
-          if (!bcInvoiceId) {
-            return 'No invoice ID';
-          }
-
-          const ticketId = job.data.ticketId;
-          if (!ticketId) {
-            return 'No ticket ID';
-          }
-
-          const ticket = await Ticket.findById(ticketId);
-          if (!ticket) {
-            return 'No ticket found';
-          }
-
-          const ticketService = getTicketMachineService(
-            ticket,
-            redisConnection
-          );
-
-          const ticketState = ticketService.getSnapshot();
-
-          const response = (await getInvoiceByIdInvoicesModelIdGet(
-            bcInvoiceId,
-            {
-              headers: {
-                Authorization: `Bearer ${paymentAuthToken}`,
-                'Content-Type': 'application/json'
-              }
-            }
-          )) as AxiosResponse<DisplayInvoice>;
-          const invoice = response.data as DisplayInvoice;
-
-          // Possible there is unconfirmed payments.  If so, queue it up again and wait for timeout.
-          if (ticketState.matches('reserved.initiatedPayment')) {
-            payoutQueue.add(
-              PayoutJobType.REFUND_SHOW,
-              {
-                bcInvoiceId
-              },
-              { delay: Config.TIMER.paymentPeriod }
-            );
-            return 'Unconfirmed payment';
-          }
-
-          if (!ticketState.matches('reserved.refundRequested')) {
-            return 'Not in refund requested state';
-          }
-
           const issueRefund = async () => {
+            const bcInvoiceId = job.data.bcInvoiceId;
+            if (!bcInvoiceId) {
+              return 'No invoice ID';
+            }
+
+            const ticketId = job.data.ticketId;
+            if (!ticketId) {
+              return 'No ticket ID';
+            }
+
+            const ticket = await Ticket.findById(ticketId);
+            if (!ticket) {
+              return 'No ticket found';
+            }
+
+            const ticketService = getTicketMachineService(
+              ticket,
+              redisConnection
+            );
+
+            const ticketState = ticketService.getSnapshot();
+
+            const response = (await getInvoiceByIdInvoicesModelIdGet(
+              bcInvoiceId,
+              {
+                headers: {
+                  Authorization: `Bearer ${paymentAuthToken}`,
+                  'Content-Type': 'application/json'
+                }
+              }
+            )) as AxiosResponse<DisplayInvoice>;
+            const invoice = response.data as DisplayInvoice;
+
+            // Possible there is unconfirmed payments.  If so, queue it up again and wait for timeout.
+            if (ticketState.matches('reserved.initiatedPayment')) {
+              payoutQueue.add(
+                PayoutJobType.REFUND_SHOW,
+                {
+                  bcInvoiceId
+                },
+                { delay: Config.TIMER.paymentPeriod }
+              );
+              return 'Unconfirmed payment';
+            }
+
+            if (!ticketState.matches('reserved.refundRequested')) {
+              return 'Not in refund requested state';
+            }
+
             try {
               const payment = invoice.payments?.[0] as PaymentType;
               const returnAddress = payment.user_address; // Just send the return as lump sum to first address
@@ -235,45 +235,46 @@ export const getPayoutWorker = ({
           return 'success';
         }
         case PayoutJobType.DISPUTE_PAYOUT: {
-          const ticketId = job.data.ticketId;
-          if (!ticketId) {
-            return 'No ticket ID';
-          }
-
-          const ticket = (await Ticket.findById(ticketId)) as TicketDocument;
-          if (!ticket) {
-            return 'No ticket found';
-          }
-
-          const bcInvoiceId = ticket.bcInvoiceId;
-          if (!bcInvoiceId) {
-            return 'No invoice ID';
-          }
-
-          const ticketService = getTicketMachineService(
-            ticket,
-            redisConnection
-          );
-
-          const ticketState = ticketService.getSnapshot();
-
-          const response = (await getInvoiceByIdInvoicesModelIdGet(
-            bcInvoiceId,
-            {
-              headers: {
-                Authorization: `Bearer ${paymentAuthToken}`,
-                'Content-Type': 'application/json'
-              }
-            }
-          )) as AxiosResponse<DisplayInvoice>;
-          const invoice = response.data as DisplayInvoice;
-
-          if (!ticketState.matches('ended.inDispute')) {
-            return 'Ticket not in Dispute state';
-          }
-
           const issueAward = async () => {
             try {
+              const ticketId = job.data.ticketId;
+              if (!ticketId) {
+                return 'No ticket ID';
+              }
+
+              const ticket = (await Ticket.findById(
+                ticketId
+              )) as TicketDocument;
+              if (!ticket) {
+                return 'No ticket found';
+              }
+
+              const bcInvoiceId = ticket.bcInvoiceId;
+              if (!bcInvoiceId) {
+                return 'No invoice ID';
+              }
+
+              const ticketService = getTicketMachineService(
+                ticket,
+                redisConnection
+              );
+
+              const ticketState = ticketService.getSnapshot();
+
+              let response = (await getInvoiceByIdInvoicesModelIdGet(
+                bcInvoiceId,
+                {
+                  headers: {
+                    Authorization: `Bearer ${paymentAuthToken}`,
+                    'Content-Type': 'application/json'
+                  }
+                }
+              )) as AxiosResponse<DisplayInvoice>;
+              const invoice = response.data as DisplayInvoice;
+
+              if (!ticketState.matches('ended.inDispute')) {
+                return 'Ticket not in Dispute state';
+              }
               const payment = invoice.payments?.[0] as PaymentType;
               const currency = (invoice.paid_currency?.toUpperCase() ||
                 CurrencyType.ETH) as CurrencyType;
@@ -283,7 +284,10 @@ export const getPayoutWorker = ({
                 console.error('No refund found');
                 return 'No refund found';
               }
-              console.log('refund', ticket.ticketState.refund);
+              console.log(
+                'ticket.ticketState.refund',
+                ticket.ticketState.refund
+              );
               const amount =
                 ticket.ticketState.refund.approvedAmounts.get(currency);
               if (!amount) {
@@ -291,7 +295,7 @@ export const getPayoutWorker = ({
                 return 'No approved amount';
               }
 
-              let response = await refundInvoiceInvoicesModelIdRefundsPost(
+              response = await refundInvoiceInvoicesModelIdRefundsPost(
                 bcInvoiceId,
                 {
                   amount,
@@ -307,10 +311,14 @@ export const getPayoutWorker = ({
                 }
               );
               let bcRefund = response.data;
+              if (!bcRefund) {
+                console.error('No refund created');
+                return 'No refund created';
+              }
 
               // Set refund address from the original invoice
               response = await submitRefundInvoicesRefundsRefundIdSubmitPost(
-                bcRefund.id,
+                bcRefund.id!,
                 { destination: returnAddress },
                 {
                   headers: {
