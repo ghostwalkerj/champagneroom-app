@@ -17,10 +17,10 @@
 
   import TopCreator from './TopCreator.svelte';
 
-  import type { ActionData, PageData } from './$types';
   import WalletDetail from '$components/WalletDetail.svelte';
-  import type { WalletDocumentType } from '$lib/models/wallet';
   import type { CurrencyType } from '$lib/models/common';
+  import type { WalletDocumentType } from '$lib/models/wallet';
+  import type { ActionData, PageData } from './$types';
   import WeeklyBooking from './WeeklyBooking.svelte';
 
   export let data: PageData;

@@ -2,12 +2,17 @@ import { error, fail } from '@sveltejs/kit';
 import type { AxiosResponse } from 'axios';
 import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
+import jwt from 'jsonwebtoken';
 
 import {
   BITCART_API_URL,
   BITCART_EMAIL,
-  BITCART_PASSWORD
+  BITCART_PASSWORD,
+  JITSI_APP_ID,
+  JITSI_JWT_SECRET,
+  JWT_EXPIRY
 } from '$env/static/private';
+import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
 import type { CancelType } from '$lib/models/common';
 import { CancelReason, CurrencyType } from '$lib/models/common';
@@ -28,10 +33,7 @@ import type { ShowQueueType } from '$lib/workers/showWorker';
 import { ActorType, EntityType } from '$lib/constants';
 import { rateCryptosRateGet } from '$lib/ext/bitcart';
 import { createAuthToken, PayoutJobType, PayoutReason } from '$lib/payment';
-import {
-  getShowMachineService,
-  getShowMachineServiceFromId
-} from '$lib/server/machinesUtil';
+import { getShowMachineService } from '$lib/server/machinesUtil';
 
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
 
@@ -71,7 +73,7 @@ export const actions: Actions = {
     }
     const creator = locals.creator as CreatorDocument;
 
-    const show = await Show.create({
+    const show = new Show({
       price: {
         amount: +price,
         currency: CurrencyType.USD,
@@ -96,6 +98,8 @@ export const actions: Actions = {
         numberOfReviews: creator.feedbackStats.numberOfReviews
       }
     });
+
+    show.save();
 
     return {
       success: true,
@@ -142,11 +146,10 @@ export const actions: Actions = {
       showCancelled: true
     };
   },
-  end_show: async ({ request, locals }) => {
-    const data = await request.formData();
-    const showId = data.get('showId') as string;
+  end_show: async ({ locals }) => {
+    const show = locals.show as ShowDocument;
 
-    if (showId === null) {
+    if (show === null) {
       throw error(404, 'Show ID not found');
     }
 
@@ -157,12 +160,12 @@ export const actions: Actions = {
       connection: redisConnection
     }) as ShowQueueType;
 
-    const showService = await getShowMachineServiceFromId(showId);
+    const showService = await getShowMachineService(show);
     const showState = showService.getSnapshot();
 
     if (showState.can({ type: ShowMachineEventString.SHOW_ENDED })) {
       showQueue.add(ShowMachineEventString.SHOW_ENDED, {
-        showId
+        showId: show._id.toString()
       });
       isInEscrow = true;
     }
@@ -222,6 +225,52 @@ export const actions: Actions = {
     return {
       success: true
     };
+  },
+  leave_show: async ({ locals }) => {
+    const redisConnection = locals.redisConnection as IORedis;
+    const show = locals.show;
+    if (!show) {
+      throw error(404, 'Show not found');
+    }
+
+    const showQueue = new Queue(EntityType.SHOW, {
+      connection: redisConnection
+    }) as ShowQueueType;
+
+    const showService = getShowMachineService(show);
+
+    const showState = showService.getSnapshot();
+
+    if (showState.can({ type: ShowMachineEventString.SHOW_STOPPED })) {
+      showQueue.add(ShowMachineEventString.SHOW_STOPPED, {
+        showId: show._id.toString()
+      });
+    }
+    showQueue.close();
+    showService.stop();
+    console.log('Creator left show');
+    return { success: true };
+  },
+  start_show: async ({ locals }) => {
+    const show = locals.show as ShowDocument;
+    if (!show) {
+      throw error(404, 'Show not found');
+    }
+    const redisConnection = locals.redisConnection as IORedis;
+    const showQueue = new Queue(EntityType.SHOW, {
+      connection: redisConnection
+    }) as ShowQueueType;
+
+    const showService = getShowMachineService(show);
+    const showState = showService.getSnapshot();
+
+    if (!showState.matches('started'))
+      showQueue.add(ShowMachineEventString.SHOW_STARTED, {
+        showId: show._id.toString()
+      });
+
+    showQueue.close();
+    showService.stop();
   }
 };
 export const load: PageServerLoad = async ({ locals }) => {
@@ -260,6 +309,29 @@ export const load: PageServerLoad = async ({ locals }) => {
     BITCART_API_URL
   );
 
+  let jitsiToken: string | undefined;
+
+  if (show) {
+    jitsiToken = jwt.sign(
+      {
+        aud: 'jitsi',
+        iss: JITSI_APP_ID,
+        exp: Math.floor(Date.now() / 1000) + +JWT_EXPIRY,
+        sub: PUBLIC_JITSI_DOMAIN,
+        room: show.roomId,
+        moderator: true,
+        context: {
+          user: {
+            name: creator.user.name,
+            affiliation: 'owner',
+            lobby_bypass: true
+          }
+        }
+      },
+      JITSI_JWT_SECRET
+    );
+  }
+
   const exchangeRate =
     ((await rateCryptosRateGet(
       {
@@ -290,6 +362,7 @@ export const load: PageServerLoad = async ({ locals }) => {
       show.toObject({ flattenObjectIds: true, flattenMaps: true })
     ),
     wallet: wallet.toObject({ flattenObjectIds: true, flattenMaps: true }),
-    exchangeRate: exchangeRate?.data
+    exchangeRate: exchangeRate?.data,
+    jitsiToken
   };
 };

@@ -3,13 +3,13 @@
 
   import type { ShowDocumentType } from '$lib/models/show';
   import { type TicketDocumentType, TicketStatus } from '$lib/models/ticket';
-  import type { UserDocument } from '$lib/models/user';
+  import type { UserDocumentType } from '$lib/models/user';
 
   import Config from '$lib/config';
   import { currencyFormatter, durationFormatter } from '$lib/constants';
   export let show: ShowDocumentType;
   export let ticket: TicketDocumentType;
-  export let user: UserDocument;
+  export let user: UserDocumentType;
 
   // Show
   const creatorName = show.creatorInfo.name;

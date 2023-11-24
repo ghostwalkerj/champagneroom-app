@@ -1,14 +1,11 @@
 import * as timeago from 'timeago.js';
 
-import type {
-  ShowEventDocument,
-  ShowEventDocumentType
-} from '$lib/models/showEvent';
+import type { ShowEventDocumentType } from '$lib/models/showEvent';
 
 import { ShowMachineEventString } from './machines/showMachine';
 
 export const createEventText = (
-  showEvent: ShowEventDocumentType | ShowEventDocument | undefined
+  showEvent: ShowEventDocumentType | undefined
 ) => {
   if (showEvent === undefined) {
     return 'No Events';

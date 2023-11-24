@@ -2,7 +2,6 @@
   import type { ObjectId } from 'mongodb';
 
   import { applyAction, enhance } from '$app/forms';
-  import { goto } from '$app/navigation';
 
   export let canStartShow: boolean;
 
@@ -45,7 +44,6 @@
         disabled={!canStartShow || isLoading}>Restart Show</button
       >
       <form method="post" action="?/end_show" use:enhance={onSubmit}>
-        <input type="hidden" name="showId" value={currentShow?._id} />
         <button class="btn" disabled={isLoading}>End Show</button>
       </form>
     </div>

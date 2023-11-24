@@ -1,22 +1,24 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
-  import urlJoin from 'url-join';
   import web3 from 'web3';
-
-  import { goto, invalidateAll, onNavigate } from '$app/navigation';
+  import { slide } from 'svelte/transition';
+  import { backIn } from 'svelte/easing';
+  import { invalidateAll, onNavigate } from '$app/navigation';
   import { page } from '$app/stores';
 
   import type { RefundType } from '$lib/models/common';
   import { DisputeReason, RefundReason } from '$lib/models/common';
-  import { type ShowDocumentType, ShowStatus } from '$lib/models/show';
+  import { ShowStatus, type ShowDocumentType } from '$lib/models/show';
   import type { TicketDocumentType } from '$lib/models/ticket';
-  import type { UserDocument } from '$lib/models/user';
+  import type { UserDocumentType } from '$lib/models/user';
 
   import type { TicketMachineServiceType } from '$lib/machines/ticketMachine';
-  import { createTicketMachineService } from '$lib/machines/ticketMachine';
+  import {
+    createTicketMachineService,
+    TicketMachineEventString
+  } from '$lib/machines/ticketMachine';
 
-  import Config from '$lib/config';
   import { ActorType } from '$lib/constants';
   import type { PaymentType } from '$lib/payment';
   import { connect, defaultWallet, selectedAccount } from '$lib/web3';
@@ -30,6 +32,7 @@
   import TicketInvoice from './TicketInvoice.svelte';
 
   import type { ActionData, PageData } from './$types';
+  import VideoMeeting from './VideoMeeting.svelte';
 
   export let data: PageData;
   export let form: ActionData;
@@ -37,14 +40,12 @@
   let ticket = data.ticket as TicketDocumentType;
   let show = data.show as ShowDocumentType;
   let invoice = data.invoice;
-
-  let user = ticket.user as unknown as UserDocument;
+  let user = data.user as UserDocumentType;
+  let jitsiToken = data.jitsiToken as string;
 
   const currentPayment = invoice?.payments?.[
     invoice?.payments?.length - 1
   ] as PaymentType;
-
-  const showTimePath = urlJoin(Config.Path.ticket, Config.Path.showTime);
 
   $: shouldPay = false;
   let hasPaymentSent = false;
@@ -52,6 +53,7 @@
   $: canCancelTicket = false;
   $: isShowInEscrow = false;
   $: isTicketDone = true;
+  $: showVideo = false;
   let canLeaveFeedback = false;
   let canDispute = false;
   let hasMissedShow = false;
@@ -61,6 +63,7 @@
   let isShowCancelLoading = false;
   $: hasShowStarted = false;
   $: isLoading = false;
+  $: leftShow = false;
   let ticketMachineService: TicketMachineServiceType;
 
   const walletPay = async () => {
@@ -164,7 +167,9 @@
     });
     hasMissedShow = state.matches('ended.missedShow');
     isWaitingForShow =
-      state.matches('reserved.waiting4Show') && !hasShowStarted;
+      state.can(TicketMachineEventString.SHOW_JOINED) ||
+      state.can(TicketMachineEventString.TICKET_REDEEMED);
+
     isTicketDone = state.done ?? false;
     if (state.done) {
       showUnSub?.();
@@ -179,15 +184,40 @@
       method: 'POST',
       body: formData
     });
-    await goto(showTimePath);
+    showVideo = true;
+    isLoading = false;
+  };
+
+  const leftShowCallback = () => {
+    showVideo = false;
+    leftShow = true;
+
+    let formData = new FormData();
+    fetch('?/leave_show', {
+      method: 'POST',
+      body: formData
+    });
   };
 
   onMount(() => {
+    // Connect to the show and redirect if it started
+    // @ts-ignore
     if (show) {
       hasShowStarted = show.showState.status === ShowStatus.LIVE;
       isShowInEscrow = show.showState.status === ShowStatus.IN_ESCROW;
     }
+
     if (ticket.ticketState.active) {
+      showUnSub?.();
+      showUnSub = ShowStore(show).subscribe((_show) => {
+        if (_show) {
+          show = _show;
+          hasShowStarted = show.showState.status === ShowStatus.LIVE;
+          isShowInEscrow = show.showState.status === ShowStatus.IN_ESCROW;
+          if (canWatchShow && hasShowStarted && !leftShow) joinShow();
+        }
+      });
+
       isTicketDone = false;
       ticketMachineService?.stop();
       ticketMachineService = createTicketMachineService({
@@ -209,15 +239,6 @@
           });
         }
       });
-
-      showUnSub?.();
-      showUnSub = ShowStore(show).subscribe((_show) => {
-        if (_show) {
-          show = _show;
-          hasShowStarted = show.showState.status === ShowStatus.LIVE;
-          isShowInEscrow = show.showState.status === ShowStatus.IN_ESCROW;
-        }
-      });
     }
   });
 
@@ -228,7 +249,9 @@
   });
 </script>
 
-{#if ticket}
+{#if showVideo}
+  <VideoMeeting bind:show {user} {jitsiToken} {leftShowCallback} />
+{:else if ticket}
   <div class="mt-6 flex flex-col lg:flex-row items-center justify-center">
     <div class="w-full lg:max-w-4xl mx-auto">
       <!-- Page header -->
@@ -244,7 +267,6 @@
               class="btn btn-secondary"
               disabled={isLoading}
               on:click={() => {
-                isLoading = true;
                 joinShow();
               }}>Go to the Show</button
             >
@@ -295,7 +317,6 @@
                 class="btn btn-secondary"
                 disabled={isLoading}
                 on:click={() => {
-                  isLoading = true;
                   joinShow();
                 }}>Go to the Show</button
               >

@@ -9,7 +9,6 @@ const Config = {
     signup: '/app/signup',
     operator: '/app/operator',
     imageUpload: '/api/v1/upload',
-    showTime: '/showtime',
     notifyUpdate: '/api/v1/notify/update',
     notifyInsert: '/api/v1/notify/insert',
     staticUrl: 'https://static.champagneroom.app',

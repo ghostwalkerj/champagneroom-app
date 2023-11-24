@@ -12,13 +12,9 @@ const idString = '/[A-Za-z0-9_-]*';
 
 const PASSWORD_PATHS = [
   Config.Path.creator + idString,
-  Config.Path.creator + idString + Config.Path.showTime,
-  '!' + Config.Path.creator + Config.Path.showTime
+  Config.Path.creator + idString
 ];
-const PIN_PATHS = [
-  Config.Path.ticket + idString,
-  Config.Path.ticket + idString + Config.Path.showTime
-];
+const PIN_PATHS = [Config.Path.ticket + idString];
 
 const PROTECTED_PATHS = [
   Config.Path.app + '/**',

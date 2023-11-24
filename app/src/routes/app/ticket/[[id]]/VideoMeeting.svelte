@@ -1,32 +1,24 @@
 <script lang="ts">
-  import { onDestroy, onMount, tick } from 'svelte';
-  import type { Unsubscriber } from 'svelte/store';
+  import { onMount, tick } from 'svelte';
 
-  import { goto, onNavigate } from '$app/navigation';
+  import { onNavigate } from '$app/navigation';
   import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
-  import { type ShowDocumentType, ShowStatus } from '$lib/models/show';
-  import type { UserDocument } from '$lib/models/user';
+  import type { UserDocumentType } from '$lib/models/user';
 
   import Config from '$lib/config';
   import { jitsiInterfaceConfigOverwrite } from '$lib/constants';
   import getProfileImage from '$lib/profilePhoto';
 
-  import { ShowStore } from '$stores';
-
-  import type { PageData } from './$types';
   import { browser } from '$app/environment';
+  import type { ShowDocumentType } from '$lib/models/show';
 
-  export let data: PageData;
-
-  let show = data.show as ShowDocumentType;
-  let user = data.user as UserDocument;
-  const returnPath = Config.Path.ticket;
+  export let show: ShowDocumentType;
+  export let user: UserDocumentType;
+  export let jitsiToken: string;
+  export let leftShowCallback: () => void;
 
   // @ts-ignore
-  let jitsiToken = data.jitsiToken as string;
-  let showUnSub: Unsubscriber;
-
   let videoCallElement: HTMLDivElement;
 
   let hasLeftShow = false;
@@ -35,32 +27,16 @@
   const profileImage = getProfileImage(user.name, Config.UI.profileImagePath);
 
   const postLeaveShow = async () => {
-    showUnSub?.();
+    leftShowCallback?.();
     if (hasLeftShow || !browser) return;
-
     hasLeftShow = true;
-
-    let formData = new FormData();
-    await fetch('?/leave_show', {
-      method: 'POST',
-      body: formData
-    });
     videoCallElement?.remove();
     api?.executeCommand('hangup');
     api?.dispose();
-    goto(returnPath).then(() => {
-      // window.location.reload();
-    });
+    leftShowCallback?.();
   };
 
   onMount(async () => {
-    const isTimeToLeave =
-      show.showState.status !== ShowStatus.LIVE &&
-      show.showState.status !== ShowStatus.STOPPED;
-    if (isTimeToLeave) {
-      await postLeaveShow();
-    }
-
     const options = {
       roomName: show.roomId,
       jwt: jitsiToken,
@@ -95,27 +71,21 @@
       postLeaveShow();
     });
 
-    showUnSub?.();
-    showUnSub = ShowStore(show).subscribe(async (_show) => {
-      if (!_show) return;
-      show = _show;
-      const isTimeToLeave =
-        show.showState.status !== ShowStatus.LIVE &&
-        show.showState.status !== ShowStatus.STOPPED;
-      if (isTimeToLeave) {
-        await postLeaveShow();
-      }
+    api.addListener('participantLeft', (event: any) => {
+      api.isP2pActive().then((isP2p: Boolean) => {
+        if (!isP2p) {
+          postLeaveShow();
+        }
+      });
     });
-  });
 
-  onNavigate(async () => {
-    await tick();
-    postLeaveShow();
+    onNavigate(async () => {
+      await tick();
+      postLeaveShow();
+    });
   });
 </script>
 
-<div
-  class="rounded-xl h-[calc(100vh-12px)] w-[calc(100vw-8px)] fixed top-0.5 m-1 overflow-hidden z-10"
->
-  <div bind:this={videoCallElement} class="h-full" />
+<div class="fixed top-0 h-screen w-screen z-20">
+  <div bind:this={videoCallElement} class="h-screen" />
 </div>

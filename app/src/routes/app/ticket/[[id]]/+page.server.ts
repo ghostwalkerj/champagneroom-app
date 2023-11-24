@@ -2,13 +2,18 @@ import { error, fail } from '@sveltejs/kit';
 import type { AxiosResponse } from 'axios';
 import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
+import jwt from 'jsonwebtoken';
 import { Types } from 'mongoose';
 
 import {
   BITCART_API_URL,
   BITCART_EMAIL,
-  BITCART_PASSWORD
+  BITCART_PASSWORD,
+  JITSI_APP_ID,
+  JITSI_JWT_SECRET,
+  JWT_EXPIRY
 } from '$env/static/private';
+import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
 import type {
   CancelType,
@@ -310,12 +315,28 @@ export const actions: Actions = {
     ticketService?.stop();
 
     return { success: true };
+  },
+  leave_show: async ({ locals }) => {
+    const ticket = locals.ticket;
+
+    if (!ticket) {
+      throw error(404, 'Ticket not found');
+    }
+    const redisConnection = locals.redisConnection as IORedis;
+    const ticketService = getTicketMachineService(ticket, redisConnection);
+    ticketService.send(TicketMachineEventString.SHOW_LEFT);
+    ticketService?.stop();
+    return { success: true };
   }
 };
 
 export const load: PageServerLoad = async ({ locals }) => {
   const ticket = locals.ticket;
   const user = locals.user;
+
+  if (!user) {
+    throw error(401, 'Unauthorized');
+  }
 
   if (!ticket) {
     throw error(404, 'Ticket not found');
@@ -345,7 +366,26 @@ export const load: PageServerLoad = async ({ locals }) => {
     throw error(404, 'Invoice not found');
   }
 
+  const jitsiToken = jwt.sign(
+    {
+      aud: 'jitsi',
+      iss: JITSI_APP_ID,
+      exp: Math.floor(Date.now() / 1000) + +JWT_EXPIRY,
+      sub: PUBLIC_JITSI_DOMAIN,
+      room: show.roomId,
+      context: {
+        user: {
+          name: user.name,
+          affiliation: 'member',
+          lobby_bypass: false
+        }
+      }
+    },
+    JITSI_JWT_SECRET
+  );
+
   return {
+    jitsiToken,
     ticket: ticket.toObject({ flattenObjectIds: true, flattenMaps: true }),
     user: user?.toObject({ flattenObjectIds: true, flattenMaps: true }),
     show: show.toObject({ flattenObjectIds: true, flattenMaps: true }),

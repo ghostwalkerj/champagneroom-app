@@ -2,15 +2,13 @@
   import { onMount, tick } from 'svelte';
   import StarRating from 'svelte-star-rating';
   import type { Unsubscriber } from 'svelte/store';
-  import urlJoin from 'url-join';
 
-  import { goto, onNavigate } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { invalidateAll, onNavigate } from '$app/navigation';
 
   import { CancelReason } from '$lib/models/common';
   import type { CreatorDocumentType } from '$lib/models/creator';
   import type { ShowDocumentType } from '$lib/models/show';
-  import type { ShowEventDocument } from '$lib/models/showEvent';
+  import { ShowEvent, type ShowEventDocument } from '$lib/models/showEvent';
   import type { WalletDocumentType } from '$lib/models/wallet';
 
   import type { ShowMachineServiceType } from '$lib/machines/showMachine';
@@ -34,6 +32,10 @@
   import ShowStatus from './ShowStatus.svelte';
 
   import type { ActionData, PageData } from './$types';
+  import VideoMeeting from './VideoMeeting.svelte';
+  import type { UserDocumentType } from '$lib/models/user';
+  import { page } from '$app/stores';
+  import type { Subscription } from 'xstate';
   export let data: PageData;
   export let form: ActionData;
 
@@ -43,9 +45,10 @@
   let completedShows = data.completedShows as ShowDocumentType[];
   let wallet = data.wallet as WalletDocumentType;
   let exchangeRate = +data.exchangeRate || 0;
+  let jitsiToken = data.jitsiToken as string;
+  let user = data.user as UserDocumentType;
 
-  const showTimePath = urlJoin($page.url.pathname, Config.Path.showTime);
-
+  $: showVideo = false;
   $: creatorName = creator ? creator.user.name : 'Creator';
 
   $: canCreateShow = false;
@@ -59,6 +62,7 @@
   let showUnSub: Unsubscriber;
   let walletUnSub: Unsubscriber;
   let showMachineService: ShowMachineServiceType;
+  let showMachineServiceUnSub: Subscription;
   const destination = creator.user.payoutAddress;
 
   const noCurrentShow = () => {
@@ -102,24 +106,28 @@
   };
 
   const useShowMachine = (showMachineService: ShowMachineServiceType) => {
-    const state = showMachineService.getSnapshot();
-    showStopped = state.matches('stopped');
-    showCancelled = state.matches('cancelled');
-    if (showCancelled) {
-      noCurrentShow();
-    }
-    canCancelShow = state.can({
-      type: 'CANCELLATION INITIATED',
-      cancel: {
-        cancelledAt: new Date(),
-        cancelledBy: ActorType.CREATOR,
-        reason: CancelReason.CREATOR_CANCELLED
+    showMachineServiceUnSub?.unsubscribe();
+    showMachineServiceUnSub = showMachineService.subscribe((state) => {
+      if (state.changed) {
+        showStopped = state.matches('stopped');
+        showCancelled = state.matches('cancelled');
+        if (showCancelled) {
+          noCurrentShow();
+        }
+        canCancelShow = state.can({
+          type: 'CANCELLATION INITIATED',
+          cancel: {
+            cancelledAt: new Date(),
+            cancelledBy: ActorType.CREATOR,
+            reason: CancelReason.CREATOR_CANCELLED
+          }
+        });
+        canStartShow = state.can(ShowMachineEventString.SHOW_STARTED);
+        if (state.done) {
+          showMachineService.stop();
+        }
       }
     });
-    canStartShow = state.can(ShowMachineEventString.SHOW_STARTED);
-    if (state.done) {
-      showMachineService.stop();
-    }
   };
 
   onMount(() => {
@@ -159,6 +167,8 @@
     showUnSub?.();
     if (!show) return;
     currentShow = show as ShowDocumentType;
+    invalidateAll();
+    currentEvent = $page.data.showEvent;
     useNewShow(currentShow);
   };
 
@@ -166,8 +176,27 @@
     noCurrentShow();
   };
 
-  const onGoToShow = () => {
-    goto(showTimePath);
+  const startShow = async () => {
+    await invalidateAll();
+    jitsiToken = $page.data.jitsiToken;
+    isLoading = true;
+    let formData = new FormData();
+    fetch('?/start_show', {
+      method: 'POST',
+      body: formData
+    });
+    showVideo = true;
+    isLoading = false;
+  };
+
+  const leftShowCallback = () => {
+    showVideo = false;
+
+    let formData = new FormData();
+    fetch('?/leave_show', {
+      method: 'POST',
+      body: formData
+    });
   };
 
   const onShowEnded = () => {
@@ -175,105 +204,115 @@
   };
 </script>
 
-<div class="flex place-content-center">
-  <!-- Page header -->
+{#if showVideo && currentShow}
+  <VideoMeeting
+    {creator}
+    {user}
+    {currentShow}
+    {leftShowCallback}
+    bind:jitsiToken
+  />
+{:else}
+  <div class="flex place-content-center">
+    <!-- Page header -->
 
-  <!-- Modal for Restarting or Ending Show -->
-  {#if showStopped}
-    {#key currentShow && currentShow._id && canStartShow}
-      <EndShow
-        {onShowEnded}
-        {currentShow}
-        {onGoToShow}
-        bind:isLoading
-        {canStartShow}
-      />
-    {/key}
-  {/if}
-
-  <div
-    class="p-4 flex flex-col gap-3 min-w-full md:min-w-min max-w-7xl md:grid md:grid-cols-4"
-  >
-    <!-- 1st column -->
-    <div class="flex-1 space-y-3 md:col-start-1 md:col-span-3">
-      <!-- Status -->
-      {#key currentShow && currentShow._id}
-        <ShowStatus
-          {canStartShow}
+    <!-- Modal for Restarting or Ending Show -->
+    {#if showStopped}
+      {#key currentShow && currentShow._id && canStartShow}
+        <EndShow
+          {onShowEnded}
+          {currentShow}
+          onGoToShow={startShow}
           bind:isLoading
-          show={currentShow}
-          {onGoToShow}
-          showEvent={currentEvent}
+          {canStartShow}
         />
       {/key}
+    {/if}
 
-      {#if canCreateShow}
-        <CreateShow bind:isLoading {creator} {onShowCreated} {form} />
-      {/if}
-      <div>
-        {#if currentShow}
-          {#key currentShow.showState}
-            <ShowDetail
-              show={currentShow}
-              options={{
-                showCopy: true,
-                showSalesStats: true,
-                showRating: true,
-                showWaterMark: false
-              }}
-            />
-          {/key}
+    <div
+      class="p-4 flex flex-col gap-3 min-w-full md:min-w-min max-w-7xl md:grid md:grid-cols-4"
+    >
+      <!-- 1st column -->
+      <div class="flex-1 space-y-3 md:col-start-1 md:col-span-3">
+        <!-- Status -->
+        {#key currentShow && currentShow._id}
+          <ShowStatus
+            {canStartShow}
+            bind:isLoading
+            show={currentShow}
+            onGoToShow={startShow}
+            showEvent={currentEvent}
+          />
+        {/key}
+
+        {#if canCreateShow}
+          <CreateShow bind:isLoading {creator} {onShowCreated} {form} />
+        {/if}
+        <div>
+          {#if currentShow}
+            {#key currentShow.showState}
+              <ShowDetail
+                show={currentShow}
+                options={{
+                  showCopy: true,
+                  showSalesStats: true,
+                  showRating: true,
+                  showWaterMark: false
+                }}
+              />
+            {/key}
+          {/if}
+        </div>
+
+        {#if canCancelShow}
+          <div class="lg:pb-4">
+            <CancelShow {onShowCancelled} bind:isLoading />
+          </div>
         {/if}
       </div>
 
-      {#if canCancelShow}
-        <div class="lg:pb-4">
-          <CancelShow {onShowCancelled} bind:isLoading />
-        </div>
-      {/if}
-    </div>
-
-    <!--Next Column-->
-    <div class="space-y-3 -mt-3 lg:mt-0 md:col-start-4 md:col-span-1">
-      <!-- Photo -->
-      <div>
-        <div class="lg:col-start-3 lg:col-span-1">
-          <div class="bg-primary text-primary-content card">
-            <div class="text-center card-body items-center p-3">
-              <h2 class="text-xl card-title">{creatorName}</h2>
-              <div>
-                <ProfilePhoto
-                  profileImage={creator.profileImageUrl ||
-                    Config.UI.defaultProfileImage}
-                  callBack={(value) => {
-                    updateProfileImage(value);
-                  }}
-                />
-              </div>
-              <div
-                class="tooltip"
-                data-tip={creator.feedbackStats.averageRating.toFixed(2)}
-              >
-                <StarRating rating={creator.feedbackStats.averageRating} />
+      <!--Next Column-->
+      <div class="space-y-3 -mt-3 lg:mt-0 md:col-start-4 md:col-span-1">
+        <!-- Photo -->
+        <div>
+          <div class="lg:col-start-3 lg:col-span-1">
+            <div class="bg-primary text-primary-content card">
+              <div class="text-center card-body items-center p-3">
+                <h2 class="text-xl card-title">{creatorName}</h2>
+                <div>
+                  <ProfilePhoto
+                    profileImage={creator.profileImageUrl ||
+                      Config.UI.defaultProfileImage}
+                    callBack={(value) => {
+                      updateProfileImage(value);
+                    }}
+                  />
+                </div>
+                <div
+                  class="tooltip"
+                  data-tip={creator.feedbackStats.averageRating.toFixed(2)}
+                >
+                  <StarRating rating={creator.feedbackStats.averageRating} />
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Wallet -->
-      <div>
-        {#key wallet}
-          <WalletDetail {wallet} {exchangeRate} {form} {destination} />
-        {/key}
-      </div>
+        <!-- Wallet -->
+        <div>
+          {#key wallet}
+            <WalletDetail {wallet} {exchangeRate} {form} {destination} />
+          {/key}
+        </div>
 
-      <!-- Activity Feed -->
-      <div>
-        <div class="lg:col-start-3 lg:col-span-1">
-          <CreatorActivity {completedShows} />
+        <!-- Activity Feed -->
+        <div>
+          <div class="lg:col-start-3 lg:col-span-1">
+            <CreatorActivity {completedShows} />
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
+{/if}

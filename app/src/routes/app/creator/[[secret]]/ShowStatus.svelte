@@ -18,8 +18,9 @@
 
   onMount(() => {
     if (show)
-      showEventUnSub = ShowEventStore(show).subscribe((showEvent) => {
-        if (showEvent) eventText = createEventText(showEvent);
+      showEventUnSub = ShowEventStore(show).subscribe((_showEvent) => {
+        showEvent = _showEvent;
+        eventText = createEventText(_showEvent);
       });
   });
   onDestroy(() => {
@@ -27,7 +28,7 @@
   });
 
   $: statusText = show ? show.showState.status : 'No Current Show';
-  $: eventText = createEventText(showEvent);
+  $: eventText = show ? createEventText(showEvent) : 'No Events';
 </script>
 
 <div class="flex flex-col lg:flex-row lg:col-start-3 lg:col-span-1">

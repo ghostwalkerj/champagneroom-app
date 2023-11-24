@@ -2,25 +2,21 @@
   import { onDestroy, onMount } from 'svelte';
 
   import { browser } from '$app/environment';
-  import { goto } from '$app/navigation';
   import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
   import type { CreatorDocumentType } from '$lib/models/creator';
   import type { ShowDocumentType } from '$lib/models/show';
 
-  import Config from '$lib/config';
   import { jitsiInterfaceConfigOverwrite } from '$lib/constants';
 
-  import type { PageData } from './$types';
+  import type { UserDocumentType } from '$lib/models/user';
 
-  export let data: PageData;
+  export let creator: CreatorDocumentType;
+  export let currentShow: ShowDocumentType;
+  export let user: UserDocumentType;
+  export let jitsiToken: string;
+  export let leftShowCallback: () => void;
 
-  let creator = data.creator as CreatorDocumentType;
-  $: currentShow = data.show as ShowDocumentType;
-  let user = data.user;
-  let jitsiToken = data.jitsiToken;
-
-  const returnPath = Config.Path.creator;
   let videoCallElement: HTMLDivElement;
   let api: any;
   let participantName = '';
@@ -43,20 +39,18 @@
   const postLeaveShow = async () => {
     if (hasLeftShow || !browser) return;
     hasLeftShow = true;
+    api?.executeCommand('endConference');
+    api?.executeCommand('hangup');
 
     let formData = new FormData();
     await fetch('?/leave_show', {
       method: 'POST',
       body: formData
     });
+
     api?.dispose();
     videoCallElement?.remove();
-
-    goto(returnPath, {
-      invalidateAll: true
-    }).then(() => {
-      //window.location.reload();
-    });
+    leftShowCallback?.();
   };
 
   onDestroy(() => {
@@ -101,8 +95,6 @@
   });
 </script>
 
-<div
-  class="rounded-xl h-[calc(100vh-12px)] w-[calc(100vw-8px)] fixed top-0.5 m-1 overflow-hidden z-10"
->
-  <div bind:this={videoCallElement} class="h-full" />
+<div class="fixed top-0 h-screen w-screen z-20">
+  <div bind:this={videoCallElement} class="h-screen" />
 </div>
