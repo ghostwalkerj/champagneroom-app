@@ -49,7 +49,9 @@
   });
 </script>
 
-<div class="bg-gradient-to-r from-[#0C082E] to-[#0C092E] font-Roboto">
+<div
+  class="bg-gradient-to-r from-[#0C082E] to-[#0C092E] font-Roboto flex flex-col min-h-screen"
+>
   <div class="navbar w-screen">
     <div class="flex flex-col lg:flex-row w-screen">
       <div class="w-full lg:w-1/3 flex justify-center lg:ml-20">
@@ -95,16 +97,19 @@
   </div>
   <div class="divider m-0" />
 
-  <div class="min-h-screen">
+  <div class="flex-1">
     <slot />
   </div>
+
+  <footer
+    class="footer footer-center p-4 bg-base-300 text-base-content sticky bottom-0"
+  >
+    <div>
+      <p>Build Number: {buildNumber}</p>
+      <p>Build Time: {buildTime}</p>
+    </div>
+  </footer>
 </div>
-<footer class="footer footer-center p-4 bg-base-300 text-base-content z-0">
-  <div>
-    <p>Build Number: {buildNumber}</p>
-    <p>Build Time: {buildTime}</p>
-  </div>
-</footer>
 
 <style>
   /* Styles for the neon effect */

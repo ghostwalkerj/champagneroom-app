@@ -1,12 +1,9 @@
 <script lang="ts">
-  import type { ObjectId } from 'mongodb';
-
   import { applyAction, enhance } from '$app/forms';
 
   export let canStartShow: boolean;
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  export let currentShow: { _id: ObjectId } | undefined;
   export let isLoading = false;
 
   export let onGoToShow: () => void;

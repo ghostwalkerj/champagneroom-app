@@ -94,7 +94,8 @@ export const actions: Actions = {
       price: show.price
     });
     if (!ticket) {
-      return error(501, 'Show cannot Reserve Ticket');
+      console.error('Ticket cannot be created');
+      throw error(501, 'Show cannot Reserve Ticket');
     }
 
     const showState = showService.getSnapshot();
@@ -106,7 +107,8 @@ export const actions: Actions = {
         customerName: name
       })
     ) {
-      return error(501, 'Show cannot Reserve Ticket');
+      console.error('Show cannot Reserve Ticket');
+      throw error(501, 'Show cannot Reserve Ticket');
     }
 
     // Create invoice in Bitcart
@@ -133,7 +135,8 @@ export const actions: Actions = {
     );
 
     if (!response || !response.data) {
-      return error(501, 'Invoice cannot be created');
+      console.error('Invoice cannot be created');
+      throw error(501, 'Invoice cannot be created');
     }
 
     // Update the notification url
@@ -197,7 +200,6 @@ export const actions: Actions = {
 
     showQueue.close();
     showService.stop();
-
 
     throw redirect(302, redirectUrl);
   }

@@ -66,91 +66,89 @@
   });
 </script>
 
-<div class="mt-4 h-full">
-  <div class="flex flex-col lg:flex-row justify-center h-full">
-    <!-- Page header -->
-    <div class="pb-4 text-center w-full lg:max-w-xl mx-auto">
-      {#key show.showState}
-        <ShowDetail {show} />
-      {/key}
-      {#if canBuyTicket}
-        <input type="checkbox" id="buy-ticket" class="modal-toggle" />
-        <div class="modal">
-          <div
-            class="modal-box relative bg-gradient-to-r from-[#0C082E] to-[#0C092E]"
+<div class="flex flex-col lg:flex-row justify-center mt-4">
+  <!-- Page header -->
+  <div class="pb-4 text-center w-full lg:max-w-xl mx-auto">
+    {#key show.showState}
+      <ShowDetail {show} />
+    {/key}
+    {#if canBuyTicket}
+      <input type="checkbox" id="buy-ticket" class="modal-toggle" />
+      <div class="modal">
+        <div
+          class="modal-box relative bg-gradient-to-r from-[#0C082E] to-[#0C092E]"
+        >
+          <label
+            for="buy-ticket"
+            class="btn btn-sm btn-circle absolute right-2 top-2">✕</label
           >
-            <label
-              for="buy-ticket"
-              class="btn btn-sm btn-circle absolute right-2 top-2">✕</label
-            >
+          <div
+            class="grid grid-rows-1 gap-4 grid-flow-col justify-center items-center"
+          >
             <div
-              class="grid grid-rows-1 gap-4 grid-flow-col justify-center items-center"
+              class="bg-cover bg-no-repeat rounded-full h-24 w-24 lg:h-48 lg:w-48 row-span-2"
+              style="background-image: url('{profileImage}')"
+            />
+            <form
+              method="post"
+              action="?/reserve_ticket"
+              use:enhance={onSubmit}
+              class="font-Roboto w-full lg:max-w-xs"
             >
-              <div
-                class="bg-cover bg-no-repeat rounded-full h-24 w-24 lg:h-48 lg:w-48 row-span-2"
-                style="background-image: url('{profileImage}')"
-              />
-              <form
-                method="post"
-                action="?/reserve_ticket"
-                use:enhance={onSubmit}
-                class="font-Roboto w-full lg:max-w-xs"
-              >
-                <div class="py-2 form-control">
-                  <label for="caller" class="label">
-                    <span class="label-text">Your Name</span>
-                  </label>
-                  <input
-                    name="name"
-                    type="text"
-                    class="input input-bordered input-primary"
-                    bind:value={displayName}
-                  />
-                  {#if form?.missingName}
-                    <div class="alert alert-error">Name is required</div>
-                  {/if}
+              <div class="py-2 form-control">
+                <label for="caller" class="label">
+                  <span class="label-text">Your Name</span>
+                </label>
+                <input
+                  name="name"
+                  type="text"
+                  class="input input-bordered input-primary"
+                  bind:value={displayName}
+                />
+                {#if form?.missingName}
+                  <div class="alert alert-error">Name is required</div>
+                {/if}
+              </div>
+              <div class="py-2 form-control">
+                <label for="pin" class="label">
+                  <span class="label-text">8 Digit Pin</span>
+                </label>
+                <input
+                  name="pin"
+                  type="text"
+                  class="input input-bordered input-primary"
+                  value={form?.pin ?? ''}
+                  minlength="8"
+                  maxlength="8"
+                />
+                {#if form?.missingPin}
+                  <div class="alert alert-error">Pin is required</div>
+                {/if}
+                {#if form?.invalidPin}
+                  <div class="alert alert-error">Pin must be 8 digits</div>
+                {/if}
+                <div class="text-center text-sm p-1">
+                  You need a pin to access the ticket later!
                 </div>
-                <div class="py-2 form-control">
-                  <label for="pin" class="label">
-                    <span class="label-text">8 Digit Pin</span>
-                  </label>
-                  <input
-                    name="pin"
-                    type="text"
-                    class="input input-bordered input-primary"
-                    value={form?.pin ?? ''}
-                    minlength="8"
-                    maxlength="8"
-                  />
-                  {#if form?.missingPin}
-                    <div class="alert alert-error">Pin is required</div>
-                  {/if}
-                  {#if form?.invalidPin}
-                    <div class="alert alert-error">Pin must be 8 digits</div>
-                  {/if}
-                  <div class="text-center text-sm p-1">
-                    You need a pin to access the ticket later!
-                  </div>
-                </div>
-                <div class="py-4 text-center">
-                  {#if isLoading}
-                    <button class="btn btn-secondary loading" disabled
-                      >Reserving</button
-                    >
-                  {:else}
-                    <button class="btn btn-secondary" disabled={isLoading}
-                      >Reserve</button
-                    >
-                  {/if}
-                </div>
-              </form>
-            </div>
+              </div>
+              <div class="py-4 text-center">
+                {#if isLoading}
+                  <button class="btn btn-secondary loading" disabled
+                    >Reserving</button
+                  >
+                {:else}
+                  <button class="btn btn-secondary" disabled={isLoading}
+                    >Reserve</button
+                  >
+                {/if}
+              </div>
+            </form>
           </div>
         </div>
-        <label for="buy-ticket" class="btn btn-secondary m-4"
-          >Reserve Ticket</label
-        >
-      {/if}
-    </div>
+      </div>
+      <label for="buy-ticket" class="btn btn-secondary m-4"
+        >Reserve Ticket</label
+      >
+    {/if}
   </div>
 </div>
