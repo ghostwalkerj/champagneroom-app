@@ -15,7 +15,7 @@
     }
   },
   "scripts": {
-    "dev": "vite dev",
+    "dev": "vite dev --host",
     "build": "vite build",
     "build:digitalOcean": "yarn install --production=false && rimraf dist && yarn build && yarn install --production --frozen-lockfile",
     "start": "tsx server.ts  --worker",

@@ -221,7 +221,6 @@
       {#key currentShow && currentShow._id && canStartShow}
         <EndShow
           {onShowEnded}
-          {currentShow}
           onGoToShow={startShow}
           bind:isLoading
           {canStartShow}

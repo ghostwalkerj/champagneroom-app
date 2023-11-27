@@ -17,7 +17,7 @@
   export let data: PageData;
   export let form: ActionData;
 
-  let { returnPath, authType, parseId, shouldSignOut, type } = data;
+  let { returnPath, authType, parseId, type } = data;
 
   $: hasNoWallet = false;
   $: signingRejected = false;
@@ -110,9 +110,6 @@
   };
 
   onMount(async () => {
-    if (shouldSignOut) {
-      return;
-    }
     switch (authType) {
       case AuthType.SIGNING: {
         defaultWallet.subscribe(async (_wallet) => {
@@ -133,14 +130,7 @@
 </script>
 
 <div class="w-screen bg-base flex flex-col p-6 text-center items-center">
-  {#if shouldSignOut}
-    <div class="font-bold text-5xl text-primary w-full font-CaviarDreams">
-      You have been signed out
-    </div>
-    <div class="m-4 lg:m-10">
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-    </div>
-  {:else if noUser && authType === AuthType.SIGNING}
+  {#if noUser && authType === AuthType.SIGNING}
     <div
       class="card w-full lg:w-96 bg-neutral text-neutral-content m-4 lg:m-10"
     >

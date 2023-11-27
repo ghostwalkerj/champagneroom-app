@@ -15,20 +15,28 @@
   export let show: ShowDocumentType | undefined;
   export let showEvent: ShowEventDocumentType | undefined;
   let showEventUnSub: Unsubscriber | undefined;
+  $: statusText = show ? show.showState.status : 'No Current Show';
+  $: eventText = 'No Events';
 
   onMount(() => {
-    if (show)
+    eventText = createEventText(showEvent);
+
+    if (show) {
+      showEventUnSub?.();
       showEventUnSub = ShowEventStore(show).subscribe((_showEvent) => {
-        showEvent = _showEvent;
-        eventText = createEventText(_showEvent);
+        if (_showEvent) {
+          showEvent = _showEvent;
+          eventText = createEventText(_showEvent);
+        }
       });
+    } else {
+      statusText = 'No Current Show';
+      eventText = 'No Events';
+    }
   });
   onDestroy(() => {
     showEventUnSub?.();
   });
-
-  $: statusText = show ? show.showState.status : 'No Current Show';
-  $: eventText = show ? createEventText(showEvent) : 'No Events';
 </script>
 
 <div class="flex flex-col lg:flex-row lg:col-start-3 lg:col-span-1">

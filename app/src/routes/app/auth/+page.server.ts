@@ -271,12 +271,6 @@ export const actions: Actions = {
 
 export const load: PageServerLoad = async ({ url, cookies }) => {
   const returnPath = url.searchParams.get('returnPath');
-  const shouldSignOut = url.searchParams.has('signOut');
-
-  if (shouldSignOut) {
-    cookies.delete(tokenName, { path: '/' });
-    return { shouldSignOut: true };
-  }
   if (!returnPath) {
     throw error(400, 'Missing Return Path');
   }
@@ -284,9 +278,6 @@ export const load: PageServerLoad = async ({ url, cookies }) => {
   let parseId = '';
   let type = '';
 
-  if (!returnPath) {
-    throw error(400, 'Missing Return Path');
-  }
   let authType = AuthType.SIGNING;
 
   if (isPinMatch(returnPath)) {
@@ -301,12 +292,10 @@ export const load: PageServerLoad = async ({ url, cookies }) => {
       type = pathParts.at(2) || '';
     }
   }
-
   return {
     returnPath,
     authType,
     parseId,
-    type,
-    shouldSignOut
+    type
   };
 };

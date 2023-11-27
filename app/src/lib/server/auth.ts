@@ -36,6 +36,7 @@ const WEBHOOK_PATHS = [
 const WHITELIST_PATHS = [
   Config.Path.show + '/**',
   Config.Path.auth,
+  Config.Path.signout,
   Config.Path.signup,
   ...WEBHOOK_PATHS
 ];

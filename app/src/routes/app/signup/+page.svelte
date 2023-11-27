@@ -47,7 +47,7 @@
       if (_wallet) {
         wallet = _wallet;
         walletAddress = _wallet.accounts[0].address;
-        introModel.close();
+        introModel?.close();
         if (
           user &&
           user.address.toLowerCase() === walletAddress.toLowerCase()
@@ -282,17 +282,6 @@
                 </label>
               {/if}
             </div>
-          </div>
-          <div class="font-medium text-secondary text-xl text-center mt-4">
-            Upload a Profile Photo
-          </div>
-          <div>
-            <ProfilePhoto
-              profileImage={profileImageUrl}
-              callBack={(value) => {
-                updateProfileImage(value);
-              }}
-            />
           </div>
         </div>
         <div class="modal-action place-content-center gap-10">

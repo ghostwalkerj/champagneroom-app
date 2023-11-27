@@ -4,7 +4,7 @@
   import { format, generate } from 'build-number-generator';
   import { onMount } from 'svelte';
 
-  import { goto, invalidateAll } from '$app/navigation';
+  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
   import Config from '$lib/config';
@@ -24,15 +24,16 @@
   const buildNumber = generate(version);
   const buildTime = format(buildNumber);
   let lastAddress: string | undefined;
-  const signOut = Config.Path.auth + '?signOut';
+  let signOut = Config.Path.signout;
 
   onMount(() => {
     selectedAccount.subscribe((account) => {
       if (account && lastAddress && account.address !== lastAddress) {
         lastAddress = account.address;
         if (isAuthenticated && authType === AuthType.SIGNING) {
-          invalidateAll();
-          goto(signOut);
+          goto(
+            signOut + '?returnPath=' + encodeURIComponent($page.url.pathname)
+          );
         }
       }
       if (account && !lastAddress) {
@@ -41,8 +42,9 @@
       if (!account && lastAddress) {
         lastAddress = undefined;
         if (isAuthenticated && authType === AuthType.SIGNING) {
-          invalidateAll();
-          goto(signOut);
+          goto(
+            signOut + '?returnPath=' + encodeURIComponent($page.url.pathname)
+          );
         }
       }
     });
@@ -82,11 +84,15 @@
       </div>
       <div class="w-full lg:w-1/3 text-right xl:mr-20">
         <ConnectButton />
-        {#if $page.data.user && $page.data.user.authType === AuthType.SIGNING}
+        {#if $page.data.user}
           <button
             class="btn btn-xs btn-primary mr-4"
             on:click={() => {
-              goto(Config.Path.auth + '?signOut', { replaceState: true });
+              goto(
+                signOut +
+                  '?returnPath=' +
+                  encodeURIComponent($page.url.pathname)
+              );
             }}
           >
             Sign Out
