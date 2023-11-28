@@ -187,8 +187,7 @@ export const handle = (async ({ event, resolve }) => {
   const authToken = authDecrypt(encryptedToken, AUTH_SALT);
   let selector: string | undefined;
 
-  const redirectPath =
-    requestedPath.charAt(0) === '/' ? requestedPath.slice(1) : requestedPath;
+  const redirectPath = encodeURIComponent(requestedPath);
 
   // Set locals
   if (authToken) {
@@ -200,10 +199,7 @@ export const handle = (async ({ event, resolve }) => {
     } catch (error) {
       console.error('Invalid token:', error);
       cookies.delete(tokenName, { path: '/' });
-      throw redirect(
-        302,
-        urlJoin(authUrl, '?returnPath=', encodeURIComponent(redirectPath))
-      );
+      throw redirect(302, urlJoin(authUrl, '?returnPath=' + redirectPath));
     }
   }
   if (
@@ -211,10 +207,7 @@ export const handle = (async ({ event, resolve }) => {
     !allowedPath(requestedPath, locals, selector)
   ) {
     if (isRequestAuthMatch(requestedPath)) {
-      throw redirect(
-        302,
-        urlJoin(authUrl, '?returnPath=', encodeURIComponent(redirectPath))
-      );
+      throw redirect(302, urlJoin(authUrl, '?returnPath=' + redirectPath));
     }
     throw error(403, 'Forbidden');
   } else {

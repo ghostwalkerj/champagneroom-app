@@ -110,73 +110,75 @@
       {/if}
 
       {#if options.showStats}
-        <div
-          class="flex flex-col flex-wrap lg:flex-nowrap md:flex-row w-full place-content-evenly space-x-1 lg:space-x-2"
-        >
+        <div class="w-full flex justify-center items-center">
           <div
-            class="stats stats-horizontal stats-shadow text-center mb-1 lg:mb-2 border border-primary bg-black"
+            class="flex flex-col md:flex-row w-full space-x-1 lg:space-x-2 max-w-sm min-w-fit md:max-w-full justify-center"
           >
-            <div class="stat">
-              <div class="stat-title text-xs lg:text-base">Duration</div>
-              <div class="text-primary stat-value text-sm lg:text-lg">
-                {duration}
-              </div>
-            </div>
-            <div class="stat">
-              <div class="stat-title text-xs lg:text-base">Price</div>
-              <div class="text-primary stat-value text-sm lg:text-lg">
-                {price}
-              </div>
-            </div>
-            <div class="stat">
-              <div class="stat-title text-xs lg:text-base">Available</div>
-              <div class="text-primary stat-value text-sm lg:text-lg">
-                {ticketsAvailable}
-              </div>
-            </div>
-          </div>
-          {#if options.showSalesStats}
             <div
               class="stats stats-horizontal stats-shadow text-center mb-1 lg:mb-2 border border-primary bg-black"
             >
               <div class="stat">
-                <div class="stat-title text-xs lg:text-base">Reserved</div>
+                <div class="stat-title text-xs lg:text-base">Duration</div>
                 <div class="text-primary stat-value text-sm lg:text-lg">
-                  {ticketsReserved}
+                  {duration}
                 </div>
               </div>
               <div class="stat">
-                <div class="stat-title text-xs lg:text-base">Sold</div>
+                <div class="stat-title text-xs lg:text-base">Price</div>
                 <div class="text-primary stat-value text-sm lg:text-lg">
-                  {ticketsSold}
+                  {price}
                 </div>
               </div>
-              {#if ticketsRefunded > 0}
-                <div class="stat">
-                  <div class="stat-title text-xs lg:text-base">Refunded</div>
-                  <div class="text-primary stat-value text-sm lg:text-lg">
-                    {ticketsRefunded}
-                  </div>
-                </div>
-              {/if}
-              {#if +totalRefunded > 0}
-                <div class="stat">
-                  <div class="stat-title text-xs lg:text-base">
-                    Refunded Amount
-                  </div>
-                  <div class="text-primary stat-value text-sm lg:text-lg">
-                    {totalRefunded}
-                  </div>
-                </div>
-              {/if}
               <div class="stat">
-                <div class="stat-title text-xs lg:text-base">Total Sales</div>
+                <div class="stat-title text-xs lg:text-base">Available</div>
                 <div class="text-primary stat-value text-sm lg:text-lg">
-                  {totalSales}
+                  {ticketsAvailable}
                 </div>
               </div>
             </div>
-          {/if}
+            {#if options.showSalesStats}
+              <div
+                class="stats stats-horizontal stats-shadow text-center mb-1 lg:mb-2 border border-primary bg-black"
+              >
+                <div class="stat">
+                  <div class="stat-title text-xs lg:text-base">Reserved</div>
+                  <div class="text-primary stat-value text-sm lg:text-lg">
+                    {ticketsReserved}
+                  </div>
+                </div>
+                <div class="stat">
+                  <div class="stat-title text-xs lg:text-base">Sold</div>
+                  <div class="text-primary stat-value text-sm lg:text-lg">
+                    {ticketsSold}
+                  </div>
+                </div>
+                {#if ticketsRefunded > 0}
+                  <div class="stat">
+                    <div class="stat-title text-xs lg:text-base">Refunded</div>
+                    <div class="text-primary stat-value text-sm lg:text-lg">
+                      {ticketsRefunded}
+                    </div>
+                  </div>
+                {/if}
+                {#if +totalRefunded > 0}
+                  <div class="stat">
+                    <div class="stat-title text-xs lg:text-base">
+                      Refunded Amount
+                    </div>
+                    <div class="text-primary stat-value text-sm lg:text-lg">
+                      {totalRefunded}
+                    </div>
+                  </div>
+                {/if}
+                <div class="stat">
+                  <div class="stat-title text-xs lg:text-base">Total Sales</div>
+                  <div class="text-primary stat-value text-sm lg:text-lg">
+                    {totalSales}
+                  </div>
+                </div>
+              </div>
+            {/if}
+          </div>
         </div>
       {/if}
     </div>

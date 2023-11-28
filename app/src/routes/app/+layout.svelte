@@ -52,7 +52,7 @@
 </script>
 
 <div
-  class="bg-gradient-to-r from-[#0C082E] to-[#0C092E] font-Roboto flex flex-col min-h-screen"
+  class="bg-gradient-to-r from-[#0C082E] to-[#0C092E] font-Roboto flex flex-col min-h-screen min-w-[320px]"
 >
   <div class="navbar w-screen">
     <div class="flex flex-col lg:flex-row w-screen">
