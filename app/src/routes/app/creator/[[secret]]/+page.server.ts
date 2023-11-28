@@ -32,7 +32,7 @@ import type { ShowQueueType } from '$lib/workers/showWorker';
 
 import { ActorType, EntityType } from '$lib/constants';
 import { rateCryptosRateGet } from '$lib/ext/bitcart';
-import { createAuthToken, PayoutJobType, PayoutReason } from '$lib/payment';
+import { PayoutJobType, PayoutReason, createAuthToken } from '$lib/payment';
 import { getShowMachineService } from '$lib/server/machinesUtil';
 
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
@@ -68,7 +68,7 @@ export const actions: Actions = {
     if (!price) {
       return fail(400, { price, missingPrice: true });
     }
-    if (Number.isNaN(+price) || +price < 1 || +price > 10_000) {
+    if (Number.isNaN(+price) || +price < 0 || +price > 10_000) {
       return fail(400, { price, invalidPrice: true });
     }
     const creator = locals.creator as CreatorDocument;

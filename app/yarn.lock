@@ -4331,9 +4331,9 @@ builtin-status-codes@^3.0.0:
   integrity sha512-HpGFw18DgFWlncDfjTa2rcQ4W88O1mC8e8yZ2AvQY5KDaktSTwo+KRf6nHK6FRI5FyRyb/5T6+TSxfP7QyGsmQ==
 
 bullmq@^4.14.0:
-  version "4.14.2"
-  resolved "https://registry.yarnpkg.com/bullmq/-/bullmq-4.14.2.tgz#75072817cf1173cb0a0a8ff4cfb952847af959bf"
-  integrity sha512-lzK4F6H61oH5S3Mg4JP4rnSxpQx00Qq7KQKt1oWjcQarka7TdN50CDsZGXg9z6kzvu26Pd3aiwTxwr4YvcEFgw==
+  version "4.14.3"
+  resolved "https://registry.yarnpkg.com/bullmq/-/bullmq-4.14.3.tgz#664e7abd18dcfbb42649c9bccbe60d7a46c88943"
+  integrity sha512-5ZiAshijX7W0ZdgtIA4siYe7XvZZRTdqFfJxXG4uT5nj5ux3urWktQ/BI/3XPIWlYaS3Vdpe/K+08k3MGoC6ow==
   dependencies:
     cron-parser "^4.6.0"
     glob "^8.0.3"
@@ -4787,9 +4787,9 @@ d@1, d@^1.0.1:
     type "^1.0.1"
 
 daisyui@^4.4.6:
-  version "4.4.9"
-  resolved "https://registry.yarnpkg.com/daisyui/-/daisyui-4.4.9.tgz#53ccbdd56da94dee9f4dc8b5482b712345a7523f"
-  integrity sha512-Wqk1f3rQbiDSMfzC/ZufQQi139dY4mCMZJ/hmYIIGpCi0MFndU0wJ575tEGzi2YrCZOagsWhbOeWE7DD/B5pVw==
+  version "4.4.10"
+  resolved "https://registry.yarnpkg.com/daisyui/-/daisyui-4.4.10.tgz#c70c695b4259a1b298930a7c8850297c81424b02"
+  integrity sha512-NGDsOLtCQ9UzfeOUlKn1lwneQte4UoINmAaDBcrMAbZviu/jWm7PSR9DqH3eE/AY/TpkImdAPVK+kGsZlpEFkQ==
   dependencies:
     css-selector-tokenizer "^0.8"
     culori "^3"
@@ -8011,9 +8011,9 @@ msgpackr-extract@^3.0.2:
     "@msgpackr-extract/msgpackr-extract-win32-x64" "3.0.2"
 
 msgpackr@^1.6.2:
-  version "1.9.9"
-  resolved "https://registry.yarnpkg.com/msgpackr/-/msgpackr-1.9.9.tgz#ec71e37beb8729280847f683cb0a340eb35ce70f"
-  integrity sha512-sbn6mioS2w0lq1O6PpGtsv6Gy8roWM+o3o4Sqjd6DudrL/nOugY+KyJUimoWzHnf9OkO0T6broHFnYE/R05t9A==
+  version "1.10.0"
+  resolved "https://registry.yarnpkg.com/msgpackr/-/msgpackr-1.10.0.tgz#adbca9c951f06647a808f76bc00a519cf6f7fbe4"
+  integrity sha512-rVQ5YAQDoZKZLX+h8tNq7FiHrPJoeGHViz3U4wIcykhAEpwF/nH2Vbk8dQxmpX5JavkI8C7pt4bnkJ02ZmRoUw==
   optionalDependencies:
     msgpackr-extract "^3.0.2"
 

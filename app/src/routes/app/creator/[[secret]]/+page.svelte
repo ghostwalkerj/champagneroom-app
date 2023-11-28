@@ -8,7 +8,7 @@
   import { CancelReason } from '$lib/models/common';
   import type { CreatorDocumentType } from '$lib/models/creator';
   import type { ShowDocumentType } from '$lib/models/show';
-  import { ShowEvent, type ShowEventDocument } from '$lib/models/showEvent';
+  import { type ShowEventDocument } from '$lib/models/showEvent';
   import type { WalletDocumentType } from '$lib/models/wallet';
 
   import type { ShowMachineServiceType } from '$lib/machines/showMachine';
@@ -31,11 +31,11 @@
   import EndShow from './EndShow.svelte';
   import ShowStatus from './ShowStatus.svelte';
 
+  import { page } from '$app/stores';
+  import type { UserDocumentType } from '$lib/models/user';
+  import type { Subscription } from 'xstate';
   import type { ActionData, PageData } from './$types';
   import VideoMeeting from './VideoMeeting.svelte';
-  import type { UserDocumentType } from '$lib/models/user';
-  import { page } from '$app/stores';
-  import type { Subscription } from 'xstate';
   export let data: PageData;
   export let form: ActionData;
 
@@ -72,6 +72,7 @@
     canCancelShow = false;
     canStartShow = false;
     currentShow = undefined;
+    currentEvent = undefined;
     showStopped = false;
   };
 

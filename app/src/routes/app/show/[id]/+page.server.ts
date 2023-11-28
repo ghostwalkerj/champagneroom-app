@@ -24,6 +24,7 @@ import { Ticket } from '$lib/models/ticket';
 import { User, UserRole } from '$lib/models/user';
 
 import { ShowMachineEventString } from '$lib/machines/showMachine';
+import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 
 import type { ShowQueueType } from '$lib/workers/showWorker';
 
@@ -31,8 +32,11 @@ import Config from '$lib/config';
 import { AuthType, EntityType } from '$lib/constants';
 import { authEncrypt } from '$lib/crypt';
 import { mensNames } from '$lib/mensNames';
-import { createAuthToken } from '$lib/payment';
-import { getShowMachineServiceFromId } from '$lib/server/machinesUtil';
+import { createAuthToken, InvoiceJobType, InvoiceStatus } from '$lib/payment';
+import {
+  getShowMachineServiceFromId,
+  getTicketMachineService
+} from '$lib/server/machinesUtil';
 
 import {
   createInvoiceInvoicesPost,
@@ -44,7 +48,7 @@ import type { Actions, PageServerLoad } from './$types';
 const tokenName = AUTH_TOKEN_NAME || 'token';
 
 export const actions: Actions = {
-  reserve_ticket: async ({ params, cookies, request, url, locals }) => {
+  reserve_ticket: async ({ params, cookies, request, locals }) => {
     const showId = params.id;
     if (showId === null) {
       return fail(404, { showId, missingShowId: true });
@@ -173,6 +177,50 @@ export const actions: Actions = {
       ticketId: ticket._id.toString(),
       customerName: name
     });
+
+    // If the ticket is free, skip the payment
+    if (ticket.price.amount === 0 && ticket.bcInvoiceId) {
+      const ticketService = getTicketMachineService(ticket, redisConnection);
+      ticketService.send({
+        type: TicketMachineEventString.PAYMENT_INITIATED
+      });
+
+      ticketService?.stop();
+
+      const token = await createAuthToken(
+        BITCART_EMAIL,
+        BITCART_PASSWORD,
+        BITCART_API_URL
+      );
+
+      // Alert the invoice is complete
+      try {
+        await modifyInvoiceInvoicesModelIdPatch(
+          ticket.bcInvoiceId,
+          {
+            status: InvoiceStatus.COMPLETE
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+      } catch (error_) {
+        console.error(error_);
+      }
+
+      const invoiceQueue = new Queue(EntityType.INVOICE, {
+        connection: redisConnection
+      });
+      invoiceQueue.add(InvoiceJobType.UPDATE, {
+        bcInvoiceId: ticket.bcInvoiceId,
+        status: InvoiceStatus.COMPLETE
+      });
+
+      invoiceQueue.close();
+    }
 
     const redirectUrl = urlJoin(Config.Path.ticket, ticket._id.toString());
 

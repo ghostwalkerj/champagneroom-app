@@ -181,18 +181,21 @@ const createTicketMachine = ({
         reserved: {
           initial: 'waiting4Payment',
           on: {
-            'SHOW CANCELLED': {
-              target: '#ticketMachine.reserved.refundRequested',
-              actions: ['requestRefundCancelledShow']
-            }
+            'SHOW CANCELLED': [
+              {
+                target: '#ticketMachine.reserved.refundRequested',
+                actions: ['requestRefundCancelledShow'],
+                cond: 'canBeRefunded'
+              },
+              {
+                target: '#ticketMachine.cancelled',
+                actions: ['cancelTicket', 'sendTicketCancelled']
+              }
+            ]
           },
           states: {
             waiting4Payment: {
               on: {
-                'SHOW CANCELLED': {
-                  target: '#ticketMachine.cancelled',
-                  actions: ['cancelTicket', 'sendTicketCancelled']
-                },
                 'CANCELLATION REQUESTED': {
                   target: '#ticketMachine.cancelled',
                   actions: ['cancelTicket', 'sendTicketCancelled']
@@ -252,10 +255,21 @@ const createTicketMachine = ({
                   cond: 'canWatchShow',
                   actions: ['redeemTicket', 'sendTicketRedeemed']
                 },
-                'REFUND REQUESTED': {
-                  target: 'refundRequested',
-                  actions: ['requestRefund']
-                }
+                'REFUND REQUESTED': [
+                  {
+                    target: 'refundRequested',
+                    actions: ['requestRefund'],
+                    cond: 'canBeRefunded'
+                  },
+                  {
+                    target: '#ticketMachine.cancelled',
+                    actions: [
+                      'requestRefund',
+                      'cancelTicket',
+                      'sendTicketRefunded'
+                    ]
+                  }
+                ]
               }
             },
             refundRequested: {
@@ -408,8 +422,7 @@ const createTicketMachine = ({
             ShowMachineEventString.CUSTOMER_JOINED,
             {
               showId: context.ticketDocument.show.toString(),
-              ticketId: context.ticketDocument._id.toString(),
-              customerName: context.ticketDocument.user.name
+              ticketId: context.ticketDocument._id.toString()
             }
           );
         },
@@ -419,8 +432,7 @@ const createTicketMachine = ({
             ShowMachineEventString.CUSTOMER_LEFT,
             {
               showId: context.ticketDocument.show.toString(),
-              ticketId: context.ticketDocument._id.toString(),
-              customerName: context.ticketDocument.user.name
+              ticketId: context.ticketDocument._id.toString()
             }
           );
         },
@@ -431,8 +443,7 @@ const createTicketMachine = ({
             {
               showId: context.ticketDocument.show.toString(),
               ticketId: context.ticketDocument._id.toString(),
-              sale: context.ticketState.sale,
-              customerName: context.ticketDocument.user.name
+              sale: context.ticketState.sale
             }
           );
         },
@@ -803,6 +814,14 @@ const createTicketMachine = ({
             context.ticketState.status === TicketStatus.FULLY_PAID
           );
         },
+        canBeRefunded: (context) => {
+          return (
+            context.ticketDocument.price.amount !== 0 &&
+            (!context.ticketState.sale ||
+              context.ticketState.sale?.payments.size !== 0)
+          );
+        },
+
         noDisputeRefund: (context, event) => {
           const decision =
             context.ticketState.dispute?.decision || event.decision;

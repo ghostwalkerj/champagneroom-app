@@ -63,19 +63,16 @@ export type ShowMachineEventType =
   | {
       type: 'TICKET RESERVED';
       ticket: TicketDocument;
-      customerName: string;
     }
   | {
       type: 'TICKET CANCELLED';
       ticket: TicketDocument;
-      customerName: string;
       cancel: CancelType;
     }
   | {
       type: 'TICKET SOLD';
       ticket: TicketDocument;
       sale: SaleType;
-      customerName: string;
     }
   | {
       type: 'SHOW STARTED';
@@ -93,12 +90,10 @@ export type ShowMachineEventType =
   | {
       type: 'CUSTOMER JOINED';
       ticket: TicketDocument;
-      customerName: string;
     }
   | {
       type: 'CUSTOMER LEFT';
       ticket: TicketDocument;
-      customerName: string;
     }
   | {
       type: 'TICKET DISPUTED';
@@ -655,9 +650,10 @@ const createShowMachine = ({
 
       guards: {
         canCancel: (context) =>
+          context.showDocument.price.amount === 0 ||
           context.showState.salesStats.ticketsSold -
             context.showState.salesStats.ticketsRefunded ===
-          0,
+            0,
         showCancelled: (context) =>
           context.showState.status === ShowStatus.CANCELLED,
         showFinalized: (context) =>
@@ -744,17 +740,19 @@ export const createShowMachineService = ({
     showService.onEvent((event) => {
       if (event.type === 'xstate.stop') return;
       let ticketId: string | undefined;
+      let customerName = 'someone';
       if ('ticket' in event) {
         const ticket = event.ticket as TicketDocument;
         ticketId = ticket._id.toString();
+        customerName = ticket.user.name;
+      } else if ('customerName' in event) {
+        customerName = event.customerName as string;
       }
 
       const transaction = (
         'transaction' in event ? event.transaction : undefined
       ) as TransactionDocumentType | undefined;
-      const ticketInfo = ('customerName' in event ? event : undefined) as
-        | { customerName: string }
-        | undefined;
+      const ticketInfo = { customerName };
 
       showMachineOptions.saveShowEventCallback &&
         showMachineOptions.saveShowEventCallback({

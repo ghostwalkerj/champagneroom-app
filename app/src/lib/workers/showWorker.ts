@@ -597,59 +597,60 @@ const finalizeShow = async (
 };
 
 // Ticket Events
-const customerJoined = async (
-  show: ShowDocument,
-  ticketId: string,
-  customerName: string
-) => {
+const customerJoined = async (show: ShowDocument, ticketId: string) => {
   const showService = createShowMachineService({
     showDocument: show,
     showMachineOptions: {
       saveStateCallback: async (showState) => SaveState(show, showState),
-      saveShowEventCallback: async ({ type, transaction }) =>
+      saveShowEventCallback: async ({
+        type,
+        ticketId,
+        transaction,
+        ticketInfo
+      }) =>
         createShowEvent({
           show,
           type,
           ticketId,
           transaction,
-          ticketInfo: { customerName }
+          ticketInfo
         })
     }
   });
+
   const ticket = (await Ticket.findById(ticketId).exec()) as TicketDocument;
   showService.send({
     type: ShowMachineEventString.CUSTOMER_JOINED,
-    ticket,
-    customerName
+    ticket
   });
   showService.stop();
   return 'success';
 };
 
-const customerLeft = async (
-  show: ShowDocument,
-  ticketId: string,
-  customerName: string
-) => {
+const customerLeft = async (show: ShowDocument, ticketId: string) => {
   const showService = createShowMachineService({
     showDocument: show,
     showMachineOptions: {
       saveStateCallback: async (showState) => SaveState(show, showState),
-      saveShowEventCallback: async ({ type, transaction }) =>
+      saveShowEventCallback: async ({
+        type,
+        ticketId,
+        transaction,
+        ticketInfo
+      }) =>
         createShowEvent({
           show,
           type,
           ticketId,
           transaction,
-          ticketInfo: { customerName }
+          ticketInfo
         })
     }
   });
   const ticket = (await Ticket.findById(ticketId).exec()) as TicketDocument;
   showService.send({
     type: ShowMachineEventString.CUSTOMER_LEFT,
-    ticket,
-    customerName
+    ticket
   });
   showService.stop();
   return 'success';
@@ -658,20 +659,24 @@ const customerLeft = async (
 const ticketSold = async (
   show: ShowDocument,
   ticketId: string,
-  sale: SaleType,
-  customerName: string
+  sale: SaleType
 ) => {
   const showService = createShowMachineService({
     showDocument: show,
     showMachineOptions: {
       saveStateCallback: async (showState) => SaveState(show, showState),
-      saveShowEventCallback: async ({ type, transaction }) =>
+      saveShowEventCallback: async ({
+        type,
+        ticketId,
+        transaction,
+        ticketInfo
+      }) =>
         createShowEvent({
           show,
           type,
           ticketId,
           transaction,
-          ticketInfo: { customerName }
+          ticketInfo
         })
     }
   });
@@ -680,8 +685,7 @@ const ticketSold = async (
   showService.send({
     type: ShowMachineEventString.TICKET_SOLD,
     ticket,
-    sale,
-    customerName
+    sale
   });
   showService.stop();
   return 'success';
@@ -692,8 +696,19 @@ const ticketRedeemed = async (show: ShowDocument, ticketId: string) => {
     showDocument: show,
     showMachineOptions: {
       saveStateCallback: async (showState) => SaveState(show, showState),
-      saveShowEventCallback: async ({ type, ticketId, transaction }) =>
-        createShowEvent({ show, type, ticketId, transaction })
+      saveShowEventCallback: async ({
+        type,
+        ticketId,
+        transaction,
+        ticketInfo
+      }) =>
+        createShowEvent({
+          show,
+          type,
+          ticketId,
+          transaction,
+          ticketInfo
+        })
     }
   });
 
@@ -707,22 +722,23 @@ const ticketRedeemed = async (show: ShowDocument, ticketId: string) => {
   return 'success';
 };
 
-const ticketReserved = async (
-  show: ShowDocument,
-  ticketId: string,
-  customerName: string
-) => {
+const ticketReserved = async (show: ShowDocument, ticketId: string) => {
   const showService = createShowMachineService({
     showDocument: show,
     showMachineOptions: {
       saveStateCallback: async (showState) => SaveState(show, showState),
-      saveShowEventCallback: async ({ type, transaction }) =>
+      saveShowEventCallback: async ({
+        type,
+        ticketId,
+        transaction,
+        ticketInfo
+      }) =>
         createShowEvent({
           show,
           type,
           ticketId,
           transaction,
-          ticketInfo: { customerName }
+          ticketInfo
         })
     }
   });
@@ -731,8 +747,7 @@ const ticketReserved = async (
 
   showService.send({
     type: ShowMachineEventString.TICKET_RESERVED,
-    ticket,
-    customerName
+    ticket
   });
   showService.stop();
   return 'success';
@@ -747,8 +762,19 @@ const ticketRefunded = async (
     showDocument: show,
     showMachineOptions: {
       saveStateCallback: async (showState) => SaveState(show, showState),
-      saveShowEventCallback: async ({ type, ticketId, transaction }) =>
-        createShowEvent({ show, type, ticketId, transaction })
+      saveShowEventCallback: async ({
+        type,
+        ticketId,
+        transaction,
+        ticketInfo
+      }) =>
+        createShowEvent({
+          show,
+          type,
+          ticketId,
+          transaction,
+          ticketInfo
+        })
     }
   });
 
@@ -772,13 +798,18 @@ const ticketCancelled = async (
     showDocument: show,
     showMachineOptions: {
       saveStateCallback: async (showState) => SaveState(show, showState),
-      saveShowEventCallback: async ({ type, transaction }) =>
+      saveShowEventCallback: async ({
+        type,
+        ticketId,
+        transaction,
+        ticketInfo
+      }) =>
         createShowEvent({
           show,
           type,
           ticketId,
           transaction,
-          ticketInfo: { customerName }
+          ticketInfo
         })
     }
   });
@@ -790,7 +821,6 @@ const ticketCancelled = async (
     !showState.can({
       type: ShowMachineEventString.TICKET_CANCELLED,
       ticket,
-      customerName,
       cancel
     })
   )
@@ -799,7 +829,6 @@ const ticketCancelled = async (
   showService.send({
     type: ShowMachineEventString.TICKET_CANCELLED,
     ticket,
-    customerName,
     cancel
   });
   showService.stop();
@@ -816,8 +845,19 @@ const ticketFinalized = async (
     showDocument: show,
     showMachineOptions: {
       saveStateCallback: async (showState) => SaveState(show, showState),
-      saveShowEventCallback: async ({ type, ticketId, transaction }) =>
-        createShowEvent({ show, type, ticketId, transaction })
+      saveShowEventCallback: async ({
+        type,
+        ticketId,
+        transaction,
+        ticketInfo
+      }) =>
+        createShowEvent({
+          show,
+          type,
+          ticketId,
+          transaction,
+          ticketInfo
+        })
     }
   });
   let showState = showService.getSnapshot();
@@ -937,8 +977,19 @@ const ticketDisputed = async (
     showDocument: show,
     showMachineOptions: {
       saveStateCallback: async (showState) => SaveState(show, showState),
-      saveShowEventCallback: async ({ type, ticketId, transaction }) =>
-        createShowEvent({ show, type, ticketId, transaction })
+      saveShowEventCallback: async ({
+        type,
+        ticketId,
+        transaction,
+        ticketInfo
+      }) =>
+        createShowEvent({
+          show,
+          type,
+          ticketId,
+          transaction,
+          ticketInfo
+        })
     }
   });
 
@@ -964,8 +1015,19 @@ const ticketDisputeResolved = async (
     showDocument: show,
     showMachineOptions: {
       saveStateCallback: async (showState) => SaveState(show, showState),
-      saveShowEventCallback: async ({ type, ticketId, transaction }) =>
-        createShowEvent({ show, type, ticketId, transaction })
+      saveShowEventCallback: async ({
+        type,
+        ticketId,
+        transaction,
+        ticketInfo
+      }) =>
+        createShowEvent({
+          show,
+          type,
+          ticketId,
+          transaction,
+          ticketInfo
+        })
     }
   });
 

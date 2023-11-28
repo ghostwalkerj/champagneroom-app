@@ -3,7 +3,6 @@ import type { Job, Queue } from 'bullmq';
 import { Worker } from 'bullmq';
 import type IORedis from 'ioredis';
 import { Types } from 'mongoose';
-import { tick } from 'svelte';
 
 import { CancelReason, type CancelType } from '$lib/models/common';
 import type { TicketDocument } from '$lib/models/ticket';

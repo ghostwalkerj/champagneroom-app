@@ -2,11 +2,10 @@
   import { goto } from '$app/navigation';
   import urlJoin from 'url-join';
 
-  import type { ActionData, PageData } from './$types';
+  import type { PageData } from './$types';
   import Config from '$lib/config';
 
   export let data: PageData;
-  export let form: ActionData;
 
   let { returnPath } = data;
   const authPath = urlJoin(

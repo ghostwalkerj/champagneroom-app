@@ -1,16 +1,14 @@
 <script lang="ts">
+  import { invalidateAll, onNavigate } from '$app/navigation';
+  import { page } from '$app/stores';
   import { onMount, tick } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
   import web3 from 'web3';
-  import { slide } from 'svelte/transition';
-  import { backIn } from 'svelte/easing';
-  import { invalidateAll, onNavigate } from '$app/navigation';
-  import { page } from '$app/stores';
 
   import type { RefundType } from '$lib/models/common';
   import { DisputeReason, RefundReason } from '$lib/models/common';
   import { ShowStatus, type ShowDocumentType } from '$lib/models/show';
-  import type { TicketDocumentType } from '$lib/models/ticket';
+  import { TicketStatus, type TicketDocumentType } from '$lib/models/ticket';
   import type { UserDocumentType } from '$lib/models/user';
 
   import type { TicketMachineServiceType } from '$lib/machines/ticketMachine';
@@ -20,7 +18,7 @@
   } from '$lib/machines/ticketMachine';
 
   import { ActorType } from '$lib/constants';
-  import type { PaymentType } from '$lib/payment';
+  import { InvoiceStatus, type PaymentType } from '$lib/payment';
   import { connect, defaultWallet, selectedAccount } from '$lib/web3';
 
   import { ShowStore, TicketStore } from '$stores';
@@ -108,9 +106,7 @@
         // Initiate payment by adding address to the invoice
         let formData = new FormData();
         formData.append('address', $selectedAccount.address);
-        formData.append('bcInvoiceId', invoice.id!);
         formData.append('paymentId', currentPayment.id!);
-        formData.append('ticketId', ticket._id.toString());
 
         await fetch($page.url.href + '?/initiate_payment', {
           method: 'POST',
@@ -132,7 +128,9 @@
     shouldPay = state.matches('reserved.waiting4Payment');
     canWatchShow =
       state.matches('reserved.waiting4Show') || state.matches('redeemed');
-    hasPaymentSent = state.matches('reserved.initiatedPayment');
+    hasPaymentSent =
+      state.matches('reserved.initiatedPayment') &&
+      invoice.status !== InvoiceStatus.COMPLETE;
     canCancelTicket =
       (state.matches('reserved.waiting4Show') ||
         state.matches('reserved.waiting4Payment')) &&
@@ -236,6 +234,17 @@
 
           invalidateAll().then(() => {
             invoice = $page.data.invoice;
+            if (
+              invoice.status === InvoiceStatus.COMPLETE &&
+              ticket.ticketState.status === TicketStatus.PAYMENT_INITIATED
+            ) {
+              ticket = $page.data.ticket as TicketDocumentType;
+              ticketMachineService?.stop();
+              ticketMachineService = createTicketMachineService({
+                ticketDocument: ticket
+              });
+              useTicketMachine(ticketMachineService);
+            }
           });
         }
       });

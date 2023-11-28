@@ -22,6 +22,10 @@
     eventText = createEventText(showEvent);
 
     if (show) {
+      if (showEvent && showEvent.show !== show._id) {
+        showEvent = undefined;
+        eventText = 'No Events';
+      }
       showEventUnSub?.();
       showEventUnSub = ShowEventStore(show).subscribe((_showEvent) => {
         if (_showEvent) {
@@ -31,7 +35,6 @@
       });
     } else {
       statusText = 'No Current Show';
-      eventText = 'No Events';
     }
   });
   onDestroy(() => {

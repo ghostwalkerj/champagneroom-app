@@ -30,11 +30,8 @@ import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 import type { PayoutQueueType } from '$lib/workers/payoutWorker';
 
 import { ActorType, EntityType } from '$lib/constants';
-import { createAuthToken, InvoiceJobType, PayoutJobType } from '$lib/payment';
-import {
-  getTicketMachineService,
-  getTicketMachineServiceFromId
-} from '$lib/server/machinesUtil';
+import { InvoiceJobType, PayoutJobType, createAuthToken } from '$lib/payment';
+import { getTicketMachineService } from '$lib/server/machinesUtil';
 
 import {
   getInvoiceByIdInvoicesModelIdGet,
@@ -83,10 +80,7 @@ export const actions: Actions = {
     }
 
     // If a payment as been made or in progress, then issue a refund
-    else if (
-      state.matches('reserved.receivedPayment') ||
-      state.matches('reserved.waiting4Show')
-    ) {
+    else if (state.matches('reserved.waiting4Show')) {
       // Check what payments were made from sales
       const sales = ticket.ticketState.sale;
       if (!sales) {
@@ -236,16 +230,19 @@ export const actions: Actions = {
   initiate_payment: async ({ request, locals }) => {
     const data = await request.formData();
     const address = data.get('address') as string;
-    const bcInvoiceId = data.get('bcInvoiceId') as string;
     const paymentId = data.get('paymentId') as string;
-    const ticketId = data.get('ticketId') as string;
+    const ticket = locals.ticket;
+
+    if (!ticket) {
+      throw error(404, 'Ticket not found');
+    }
+
+    if (!ticket.bcInvoiceId) {
+      throw error(404, 'Invoice not found');
+    }
 
     if (!address) {
       return fail(400, { address, missingAddress: true });
-    }
-
-    if (!bcInvoiceId) {
-      return fail(400, { bcInvoiceId, missingInvoiceId: true });
     }
 
     if (!paymentId) {
@@ -263,7 +260,7 @@ export const actions: Actions = {
 
     try {
       updatePaymentDetailsInvoicesModelIdDetailsPatch(
-        bcInvoiceId,
+        ticket.bcInvoiceId,
         {
           id: paymentId,
           address
@@ -280,10 +277,7 @@ export const actions: Actions = {
     }
 
     // Alert Ticket to incoming transaction
-    const ticketService = await getTicketMachineServiceFromId(
-      ticketId,
-      redisConnection
-    );
+    const ticketService = getTicketMachineService(ticket, redisConnection);
 
     ticketService.send({
       type: TicketMachineEventString.PAYMENT_INITIATED
@@ -293,6 +287,7 @@ export const actions: Actions = {
 
     return { success: true, paymentInitiated: true };
   },
+
   join_show: async ({ locals }) => {
     const ticket = locals.ticket;
     if (!ticket) {

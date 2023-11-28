@@ -1,5 +1,3 @@
-import console from 'node:console';
-
 import type { Handle } from '@sveltejs/kit';
 import { error, redirect } from '@sveltejs/kit';
 import IORedis from 'ioredis';
@@ -189,6 +187,9 @@ export const handle = (async ({ event, resolve }) => {
   const authToken = authDecrypt(encryptedToken, AUTH_SALT);
   let selector: string | undefined;
 
+  const redirectPath =
+    requestedPath.charAt(0) === '/' ? requestedPath.slice(1) : requestedPath;
+
   // Set locals
   if (authToken) {
     let decode: JwtPayload;
@@ -199,7 +200,10 @@ export const handle = (async ({ event, resolve }) => {
     } catch (error) {
       console.error('Invalid token:', error);
       cookies.delete(tokenName, { path: '/' });
-      throw redirect(302, urlJoin(authUrl, '?returnPath=', requestedPath));
+      throw redirect(
+        302,
+        urlJoin(authUrl, '?returnPath=', encodeURIComponent(redirectPath))
+      );
     }
   }
   if (
@@ -207,7 +211,10 @@ export const handle = (async ({ event, resolve }) => {
     !allowedPath(requestedPath, locals, selector)
   ) {
     if (isRequestAuthMatch(requestedPath)) {
-      throw redirect(302, urlJoin(authUrl, '?returnPath=', requestedPath));
+      throw redirect(
+        302,
+        urlJoin(authUrl, '?returnPath=', encodeURIComponent(redirectPath))
+      );
     }
     throw error(403, 'Forbidden');
   } else {
