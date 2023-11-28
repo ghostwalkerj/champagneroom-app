@@ -16,8 +16,8 @@
 
   let options = {
     fileLimit: 1,
-    maxSize: 1_048_576,
-    accept: ['image/png', 'image/jpeg'],
+    maxSize: 4_194_304,
+    accept: ['image/*'],
     multiple: false
   };
 
