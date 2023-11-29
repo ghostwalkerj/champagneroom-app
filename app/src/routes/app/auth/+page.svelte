@@ -1,18 +1,17 @@
 <script lang="ts">
   import type { ActionResult } from '@sveltejs/kit';
   import type { WalletState } from '@web3-onboard/core';
-  import { onMount } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
 
   import { applyAction, deserialize, enhance } from '$app/forms';
   import { goto } from '$app/navigation';
 
   import Config from '$lib/config';
   import { AuthType } from '$lib/constants';
-  import { defaultWallet } from '$lib/web3';
-
-  import ConnectButton from '$components/header/ConnectButton.svelte';
+  import { defaultWallet, selectedAccount } from '$lib/web3';
 
   import type { ActionData, PageData } from './$types';
+  import type { Unsubscriber } from 'svelte/store';
 
   export let data: PageData;
   export let form: ActionData;
@@ -23,6 +22,8 @@
   $: signingRejected = false;
   $: noUser = false;
   let wallet: WalletState;
+  let walletUnsub: Unsubscriber;
+  let accountUnsub: Unsubscriber;
 
   let walletAddress = '';
   let message = '';
@@ -79,7 +80,7 @@
 
   const signMessage = async () => {
     try {
-      walletAddress = wallet.accounts[0].address;
+      noUser = false;
       let formData = new FormData();
       formData.append('address', walletAddress);
       const response = await fetch('?/get_signing_message', {
@@ -96,9 +97,7 @@
         })) as string;
         try {
           await setSigningAuth(message, signature, walletAddress);
-        } catch {
-          signingRejected = true;
-        }
+        } catch {}
       } else if (
         result.type === 'failure' &&
         result.data &&
@@ -106,17 +105,26 @@
       ) {
         noUser = true;
       }
-    } catch {}
+    } catch {
+      signingRejected = true;
+    }
   };
 
   onMount(async () => {
     switch (authType) {
       case AuthType.SIGNING: {
-        defaultWallet.subscribe(async (_wallet) => {
+        walletUnsub = defaultWallet.subscribe(async (_wallet) => {
           hasNoWallet = _wallet === undefined;
-          if (_wallet && walletAddress !== _wallet.accounts[0].address) {
+          if (_wallet) {
             wallet = _wallet;
-            signMessage();
+          }
+        });
+        accountUnsub = selectedAccount.subscribe((account) => {
+          if (account) {
+            if (walletAddress !== account.address) {
+              walletAddress = account.address;
+              signMessage();
+            }
           }
         });
         break;
@@ -127,58 +135,80 @@
       }
     }
   });
+
+  onDestroy(() => {
+    walletUnsub?.();
+    accountUnsub?.();
+  });
 </script>
 
-<div class="w-screen bg-base flex flex-col p-6 text-center items-center">
-  {#if noUser && authType === AuthType.SIGNING}
+<div class="w-screen bg-base flex flex-col text-center items-center">
+  {#if authType === AuthType.SIGNING}
     <div
-      class="card w-full lg:w-96 bg-neutral text-neutral-content m-4 lg:m-10"
+      class="bg-gradient-to-r from-[#0C082E] to-[#0C092E] font-Roboto flex flex-col items-center justify-center min-w-[320px] pt-6 gap-6"
     >
-      <div class="card-body items-center text-center">
-        <h2 class="card-title">
-          Address: {walletAddress?.slice(0, 6)}...{walletAddress.slice(-4)} not found
-        </h2>
-        <p>
-          This address is not registered with us. Please signup to continue.
-        </p>
-        <div class="card-actions justify-end">
-          <button
-            class="btn btn-primary"
-            on:click={() => {
-              goto(Config.Path.signup, { replaceState: true });
-            }}>Signup</button
-          >
-          <button
-            class="btn btn-ghost"
-            on:click={() => {
-              goto('/');
-            }}>Cancel</button
-          >
+      <div
+        class="text-4xl font-bold text-primary w-full max-w-lg mx-auto text-center"
+      >
+        Crypto Wallet Authentication
+      </div>
+
+      {#if noUser}
+        <div class="card w-full lg:w-96 bg-info text-neutral-content lg:mt-10">
+          <div class="card-body items-center text-center">
+            <h2 class="card-title">
+              Address: {walletAddress?.slice(0, 6)}...{walletAddress.slice(-4)} not
+              found
+            </h2>
+            <p>This address is not registered. Please signup to continue.</p>
+          </div>
         </div>
+      {:else}
+        <div
+          class="text-md text-neutral w-full max-w-md mx-auto text-center mb-4"
+        >
+          Please sign the message in your wallet to verify your identity
+        </div>
+
+        {#if hasNoWallet}
+          <div class="py-6 w-full lg:w-auto">
+            Please connect a wallet to continue
+          </div>
+        {/if}
+        {#if signingRejected}
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
+          <div>
+            <div class="btn btn-primary" on:click={signMessage}>
+              Sign Message
+            </div>
+          </div>
+        {/if}
+      {/if}
+      <div class="w-full max-w-md">
+        <div class="divider" />
+      </div>
+      <div class="text-neutral mb-4">Not a user?</div>
+      <div
+        class="text-4xl font-bold text-primary w-full max-w-md mx-auto text-center mb-4"
+      >
+        Sign Up to Earn Now
+      </div>
+      <div
+        class="flex flex-col md:flex-row justify-center items-center gap-4 w-full max-w-md"
+      >
+        <button
+          class="btn btn-warning"
+          on:click={() => {
+            goto(Config.Path.creatorSignup);
+          }}>Become a Creator</button
+        >
+        <div class="divider">OR</div>
+        <button class="btn btn-success" disabled={true}>Become an Agent</button>
       </div>
     </div>
-  {:else if authType === AuthType.SIGNING}
-    <div class="font-bold text-5xl text-primary w-full font-CaviarDreams">
-      Crypto Wallet Authentication
-    </div>
-    <div class="py-6 w-full lg:w-auto">
-      Please sign the message in your wallet to verify your identity
-    </div>
-    {#if hasNoWallet}
-      <div class="py-6 w-full lg:w-auto">
-        Please connect a wallet to continue
-      </div>
-    {/if}
-    {#if signingRejected}
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <div>
-        <div class="btn btn-primary" on:click={signMessage}>Sign Message</div>
-      </div>
-    {/if}
-    <div>
-      <ConnectButton />
-    </div>
-  {:else if authType === AuthType.PATH_PASSWORD}
+  {/if}
+
+  {#if authType === AuthType.PATH_PASSWORD}
     <!-- <div class="font-bold text-5xl text-primary w-full font-CaviarDreams">
       Verifying Path
     </div> -->

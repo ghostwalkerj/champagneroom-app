@@ -7,6 +7,8 @@ const Config = {
     agent: '/app/agent',
     creator: '/app/creator',
     signup: '/app/signup',
+    agentSignup: '/app/signup/agent',
+    creatorSignup: '/app/signup/creator',
     signout: '/app/signout',
     operator: '/app/operator',
     imageUpload: '/api/v1/upload',
