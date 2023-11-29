@@ -15,68 +15,62 @@
   export let form: ActionData;
 </script>
 
-<Saos
-  animation="fade-in 5s cubic-bezier(0.390, 0.575, 0.565, 1.000) both"
-  animation_out="slide-out-fwd-center 0.7s cubic-bezier(0.550, 0.085, 0.680, 0.530) both"
-  top={250}
-  bottom={250}
->
-  <div class="flex mt-20 w-screen items-center" id="topPage">
-    <div class="flex flex-col lg:flex-row items-center">
-      <div class="w-full pl-5 lg:pl-20">
-        <h2
-          class="text-info text-center font-bold leading-none text-[41px] lg:text-left mb-6 font-CaviarDreams"
-        >
-          A New Way to Discretely View NSFW Creators Live
-        </h2>
-        <ul
-          class="text-[25px] font-medium text-lg list-disc list-inside lg:pl-10"
-        >
-          <li class="mt-2">Watch Completely Anonymous</li>
-          <li class="mt-2">No Downloads, No Signup, No Personal Information</li>
-          <li class="mt-2">Protected by a Full Escrow Service</li>
-          <li class="mt-2">Get paid instantly as a Creator</li>
-        </ul>
-        <div
-          class="flex flex-col 2sx:flex-row mt-10 space-x-0 2sx:space-y-0 space-y-6 2sx:space-x-6 place-content-center lg:place-content-start"
-        >
-          <div>
-            <a
-              href="#FAQ"
-              class="md:w-auto btn btn-primary transition-all duration-300 ease-in-out"
-            >
-              Read the FAQ
-            </a>
-          </div>
-          <div>
-            <a
-              href="{Config.Path
-                .staticUrl}/assets/champagne-room-white-paper.pdf"
-              class="md:w-auto btn btn-secondary transition-all duration-300 ease-in-out m-0"
-              target="_blank"
-            >
-              White Paper
-            </a>
-          </div>
+<div class="flex mt-20 w-screen items-center" id="topPage">
+  <div
+    class="flex flex-col lg:flex-row items-center lg:space-x-4 space-y-4 lg:pr-20"
+  >
+    <div class="w-full pl-5 lg:pl-20">
+      <h2
+        class="text-info text-center font-bold leading-none text-[41px] lg:text-left mb-6 font-CaviarDreams px-6"
+      >
+        A New Way to Discretely View NSFW Creators Live
+      </h2>
+      <ul
+        class="text-[25px] font-medium text-lg list-disc list-inside lg:pl-10"
+      >
+        <li class="mt-2">Watch Completely Anonymous</li>
+        <li class="mt-2">No Downloads, No Signup, No Personal Information</li>
+        <li class="mt-2">Protected by a Full Escrow Service</li>
+        <li class="mt-2">Get paid instantly as a Creator</li>
+      </ul>
+      <div
+        class="flex flex-col 2sx:flex-row mt-10 space-x-0 2sx:space-y-0 space-y-6 2sx:space-x-6 place-content-center lg:place-content-start"
+      >
+        <div>
+          <a
+            href="#FAQ"
+            class="md:w-auto btn btn-primary transition-all duration-300 ease-in-out"
+          >
+            Read the FAQ
+          </a>
+        </div>
+        <div>
+          <a
+            href="{Config.Path.staticUrl}/assets/champagne-room-white-paper.pdf"
+            class="md:w-auto btn btn-secondary transition-all duration-300 ease-in-out m-0"
+            target="_blank"
+          >
+            White Paper
+          </a>
         </div>
       </div>
-      <div class="w-full p-5 py-10 lg:p-10">
-        <video
-          autoplay
-          loop
-          controls
-          muted
-          class="opacity-80 rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1]"
-        >
-          <source
-            src="{Config.Path.staticUrl}/assets/champagnevideo.mp4"
-            type="video/mp4"
-          />
-        </video>
-      </div>
+    </div>
+    <div class="w-full max-w-3xl lg:max-w-max p-10">
+      <video
+        autoplay
+        loop
+        controls
+        muted
+        class="opacity-80 rounded-xl shadow-[0px_0px_17px_6px_#e779c1]"
+      >
+        <source
+          src="{Config.Path.staticUrl}/assets/champagnevideo.mp4"
+          type="video/mp4"
+        />
+      </video>
     </div>
   </div>
-</Saos>
+</div>
 
 <Saos
   animation="fade-in 1.8s cubic-bezier(0.390, 0.575, 0.565, 1.000) both"

@@ -22,7 +22,7 @@
           Easy, Safe, Private
         </span>
         <div class="flex flex-col lg:flex-row">
-          <div class="w-full lg:w-1/2 lg:p-6">
+          <div class="w-full lg:w-1/2 lg:p-6 font-medium">
             <h1 class="text-lg mb-4 leading-relaxed">
               When you're ready to experience a live one-on-one show, simply ask
               your creator to provide you with a Champagne Room Show link.

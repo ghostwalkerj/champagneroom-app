@@ -30,7 +30,7 @@
     </div>
   </div>
   <h2
-    class="font-bold text-primary text-2xl md:text-3xl lg:text-[41px] text-center font-CaviarDreams mb-10"
+    class="font-bold text-primary text-[32px] lg:text-[41px] text-center font-CaviarDreams mb-10"
   >
     FAQ
   </h2>

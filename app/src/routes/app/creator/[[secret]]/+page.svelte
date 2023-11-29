@@ -8,7 +8,7 @@
   import { CancelReason } from '$lib/models/common';
   import type { CreatorDocumentType } from '$lib/models/creator';
   import type { ShowDocumentType } from '$lib/models/show';
-  import { type ShowEventDocument } from '$lib/models/showEvent';
+  import type { ShowEventDocument } from '$lib/models/showEvent';
   import type { WalletDocumentType } from '$lib/models/wallet';
 
   import type { ShowMachineServiceType } from '$lib/machines/showMachine';

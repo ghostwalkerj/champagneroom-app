@@ -5,19 +5,19 @@
 <div id="Creators" class="container mx-auto px-4 sm:px-6 md:px-10">
   <div class="pt-20">
     <h2
-      class="text-primary font-bold text-2xl md:text-3xl lg:text-[41px] text-center font-CaviarDreams mb-10"
+      class="text-primary font-bold text-[32px] lg:text-[41px] text-center font-CaviarDreams mb-10"
     >
       Become a Creator
     </h2>
     <div class="flex flex-col lg:flex-row items-center justify-center">
-      <div class="w-full lg:w-1/2 mb-10 flex justify-center p-4">
+      <div class="w-full lg:w-1/2 my-10 flex justify-center p-4">
         <img
           src="{Config.Path.staticUrl}/assets/creator.png"
           alt="Creator"
           class="rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1] max-w-xs md:max-w-sm lg:max-w-md"
         />
       </div>
-      <div class="w-full lg:w-1/2">
+      <div class="w-full lg:w-1/2 font-medium">
         <h2
           class="text-info text-center font-bold text-3xl lg:text-[41px] mb-6 font-CaviarDreams"
         >
