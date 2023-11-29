@@ -2,8 +2,8 @@
   import Config from '$lib/config';
 </script>
 
-<div id="Creators" class="container mx-auto px-4 sm:px-6 md:px-10 lg:px-20">
-  <div class="pt-10 lg:pt-52">
+<div id="Creators" class="container mx-auto px-4 sm:px-6 md:px-10">
+  <div class="pt-20">
     <h2
       class="text-primary font-bold text-2xl md:text-3xl lg:text-[41px] text-center font-CaviarDreams mb-10"
     >
@@ -18,12 +18,12 @@
         />
       </div>
       <div class="w-full lg:w-1/2">
-        <span
-          class="text-info text-lg md:text-xl font-bold capitalize text-center block font-CaviarDreams mb-4"
+        <h2
+          class="text-info text-center font-bold text-3xl lg:text-[41px] mb-6 font-CaviarDreams"
         >
           Benefits
-        </span>
-        <ul class="text-base md:text-lg list-disc mx-5 md:mx-10">
+        </h2>
+        <ul class="text-lg font-medium list-disc mx-5 md:mx-10 space-y-4">
           <li>Get paid quickly in your local currency.</li>
           <li>
             Easily handle payments without worrying about issues and
@@ -44,7 +44,7 @@
           class="text-info text-lg md:text-xl font-bold capitalize text-center block font-CaviarDreams mt-5 mb-4"
           href={Config.Path.creatorSignup}
         >
-          Get Started Now
+          Sign Up as a Creator
         </a>
         <ul class="text-base md:text-lg list-disc mx-5 md:mx-10">
           <!-- List items here -->

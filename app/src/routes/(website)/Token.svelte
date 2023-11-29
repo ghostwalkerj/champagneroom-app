@@ -2,7 +2,7 @@
   import Config from '$lib/config';
 </script>
 
-<div id="Token" class="container mx-auto pt-10 lg:pt-52">
+<div id="Token" class="container mx-auto pt-20">
   <h2
     class="text-primary font-bold text-[32px] lg:text-[41px] text-center font-CaviarDreams mb-10"
   >
@@ -18,7 +18,7 @@
       >
         CRT Tokenomics
       </h2>
-      <ul class="text-lg lg:text-[25px] font-medium list-disc list-inside">
+      <ul class="text-lg font-medium list-disc list-inside">
         CRT is an ECR-20 utility token that benefits users of Champagne Room by
         offering rebates when using the token in our ecosystem.<br /><br />
         As adoption for Champagne Room increases, so does demand for CRT.<br

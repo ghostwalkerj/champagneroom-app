@@ -3,7 +3,7 @@
 </script>
 
 <div
-  class="container mx-auto px-4 sm:px-6 md:px-10 lg:px-20 relative pt-10 lg:pt-52"
+  class="container mx-auto px-4 sm:px-6 md:px-10 lg:px-20 relative pt-20"
   id="FAQ"
 >
   <div

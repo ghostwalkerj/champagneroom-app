@@ -112,13 +112,16 @@
   };
 
   function randomizeCardPositions() {
-    const cards = document.querySelectorAll('.card');
-    let positions = [];
+    const cards = document.querySelectorAll('.card') as unknown as [
+      HTMLElement
+    ];
+    let positions: { x: number; y: number; width: number; height: number }[] =
+      [];
 
     cards.forEach((card, index) => {
-      let x,
-        y,
-        overlap,
+      let x: number,
+        y: number,
+        overlap: boolean,
         attempts = 0;
       do {
         overlap = false;
@@ -189,7 +192,7 @@
   <div>
     <div class="absolute top-auto left-auto max-w-md">
       <div
-        class="card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-105 transition-transform duration-300 hidden"
+        class="card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
       >
         <h2 class="text-xl text-secondary text-center">
           Get Paid Quickly in Your Local Currency
@@ -202,7 +205,7 @@
     </div>
     <div class="absolute top-auto left-auto max-w-md">
       <div
-        class="card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-105 transition-transform duration-300 hidden"
+        class="card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
       >
         <h2 class="text-xl text-secondary text-center">
           Hassle-Free Payment Handling
@@ -216,7 +219,7 @@
 
     <div class="absolute top-auto left-auto max-w-md">
       <div
-        class="card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-105 transition-transform duration-300 hidden"
+        class="card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
       >
         <h2 class="text-xl text-secondary text-center">
           Privacy is Our Priority
@@ -230,7 +233,7 @@
 
     <div class="absolute top-auto left-auto max-w-md">
       <div
-        class="card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-105 transition-transform duration-300 hidden"
+        class="card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
       >
         <h2 class="text-xl text-secondary text-center">
           Earn More with Fan Tips
@@ -244,7 +247,7 @@
 
     <div class="absolute top-auto left-auto max-w-md">
       <div
-        class="card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-105 transition-transform duration-300 hidden"
+        class="card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
       >
         <h2 class="text-xl text-secondary text-center">
           Exclusive Marketplace for Custom Content
@@ -258,7 +261,7 @@
 
     <div class="absolute top-auto left-auto max-w-md">
       <div
-        class="card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-105 transition-transform duration-300 hidden"
+        class="card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
       >
         <h2 class="text-xl text-secondary text-center">
           Global Reach, Local Comfort
@@ -272,7 +275,7 @@
 
     <div class="absolute top-auto left-auto max-w-md">
       <div
-        class="card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-105 transition-transform duration-300 hidden"
+        class="card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
       >
         <h2 class="text-xl text-secondary text-center">
           Premium Prices for International Customers
@@ -286,7 +289,7 @@
 
     <div class="absolute top-auto left-auto max-w-md">
       <div
-        class="card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-105 transition-transform duration-300 hidden"
+        class="card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
       >
         <h2 class="text-xl text-secondary text-center">
           Concierge Service at Your Fingertips
@@ -300,7 +303,7 @@
 
     <div class="absolute top-auto left-auto max-w-md visible">
       <div
-        class="card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-105 transition-transform duration-300 hidden"
+        class="card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
       >
         <h2 class="text-xl text-secondary text-center">Join Us Now</h2>
         <div class="text-primary card-body">

@@ -21,9 +21,9 @@
 </script>
 
 <div id="Contact" class="container mx-auto px-4 sm:px-6 md:px-10 lg:px-20">
-  <div class="pt-10 lg:pt-52">
+  <div class="pt-20">
     <h2
-      class="font-bold text-primary text-2xl md:text-3xl lg:text-[41px] text-center font-CaviarDreams mb-10"
+      class="font-bold text-primary text-2xl md:text-3xl lg:text-[41px] text-center font-CaviarDreams mb-20"
     >
       Contact Us
     </h2>

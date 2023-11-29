@@ -2,7 +2,7 @@
   import Config from '$lib/config';
 </script>
 
-<div id="TheShow" class="flex flex-col pt-10 lg:pt-52 w-full mx-auto">
+<div id="TheShow" class="flex flex-col pt-20 w-full mx-auto">
   <h2
     class="text-primary font-bold text-[32px] lg:text-[41px] text-center font-CaviarDreams lg:mb-10"
   >
@@ -23,7 +23,7 @@
         </span>
         <div class="flex flex-col lg:flex-row">
           <div class="w-full lg:w-1/2 lg:p-6">
-            <h1 class="text-lg mb-4 font-normal leading-relaxed">
+            <h1 class="text-lg mb-4 leading-relaxed">
               When you're ready to experience a live one-on-one show, simply ask
               your creator to provide you with a Champagne Room Show link.
             </h1>
