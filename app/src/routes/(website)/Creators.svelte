@@ -24,7 +24,7 @@
           Benefits
         </span>
         <ul class="text-base md:text-lg list-disc mx-5 md:mx-10">
-          <li>Get paid quickly in your local money.</li>
+          <li>Get paid quickly in your local currency.</li>
           <li>
             Easily handle payments without worrying about issues and
             restrictions.
@@ -40,11 +40,12 @@
             location.
           </li>
         </ul>
-        <span
+        <a
           class="text-info text-lg md:text-xl font-bold capitalize text-center block font-CaviarDreams mt-5 mb-4"
+          href={Config.Path.creatorSignup}
         >
           Get Started Now
-        </span>
+        </a>
         <ul class="text-base md:text-lg list-disc mx-5 md:mx-10">
           <!-- List items here -->
         </ul>
