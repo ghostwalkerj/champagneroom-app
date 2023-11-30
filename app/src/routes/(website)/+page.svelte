@@ -62,6 +62,8 @@
         controls
         muted
         class="opacity-80 rounded-xl shadow-[0px_0px_17px_6px_#e779c1]"
+        width="800px"
+        height="450px"
       >
         <source
           src="{Config.Path.staticUrl}/assets/champagnevideo.mp4"

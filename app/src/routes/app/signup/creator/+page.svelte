@@ -14,6 +14,7 @@
 
   import type { ActionData, PageData } from '../$types';
   import type { Unsubscriber } from 'svelte/store';
+  import Creators from '../../../(website)/Creators.svelte';
 
   export let data: PageData;
   export let form: ActionData;
@@ -26,7 +27,6 @@
   let walletUnsub: Unsubscriber;
   let accountUnsub: Unsubscriber;
 
-  let introModel: HTMLDialogElement;
   let addressModel: HTMLDialogElement;
   let signupModel: HTMLDialogElement;
   let existsModel: HTMLDialogElement;
@@ -41,35 +41,32 @@
         dictionaries: [womensNames]
       });
 
-  const updateProfileImage = async (url: string) => {
-    if (url) {
-      profileImageUrl = url;
+  let isLoading = true;
+
+  const useWallet = async () => {
+    if (wallet) {
+      if (user && user.address.toLowerCase() === walletAddress.toLowerCase()) {
+        existsModel?.showModal();
+        addressModel?.close();
+      } else {
+        existsModel?.close();
+        addressModel?.showModal();
+      }
+    } else {
+      walletAddress = '';
+      wallet = undefined;
     }
   };
 
-  let isLoading = true;
-
   onMount(async () => {
     isLoading = false;
+    useWallet();
 
     randomizeCardPositions();
     walletUnsub = defaultWallet.subscribe((_wallet) => {
       if (_wallet) {
         wallet = _wallet;
-        introModel?.close();
-        if (
-          user &&
-          user.address.toLowerCase() === walletAddress.toLowerCase()
-        ) {
-          existsModel?.showModal();
-          addressModel?.close();
-        } else {
-          existsModel?.close();
-          addressModel?.showModal();
-        }
-      } else {
-        walletAddress = '';
-        wallet = undefined;
+        useWallet();
       }
     });
     accountUnsub = selectedAccount.subscribe((account) => {
@@ -411,9 +408,15 @@
         </div>
         <div class="modal-action place-content-center gap-10">
           <button
+            class="btn btn-primary btn-outline"
+            on:click={() => {
+              existsModel.close();
+              goto(Config.Path.creator);
+            }}>Sign In</button
+          >
+          <button
             class="btn btn-secondary btn-outline"
             on:click={() => {
-              addressModel.showModal();
               existsModel.close();
             }}>Cancel</button
           >

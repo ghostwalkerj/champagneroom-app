@@ -27,6 +27,8 @@
       <li><a href="#Creators">Creators</a></li>
       <li><a href="#Token">Token</a></li>
       <li><a href="#Contact">Contact</a></li>
+      <li><a href={Config.Path.creatorSignup}>Sign Up</a></li>
+
       <li><a href="/">Back to Top</a></li>
     </ul>
   </div>
@@ -83,6 +85,12 @@
             <a
               class="btn btn-sm btn-outline btn-secondary mt-2 ml-3"
               href="#Contact">Contact</a
+            >
+          </li>
+          <li>
+            <a
+              class="btn btn-sm btn-outline btn-secondary mt-2 ml-3"
+              href={Config.Path.creatorSignup}>Sign Up</a
             >
           </li>
           <li>
