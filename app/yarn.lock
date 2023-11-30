@@ -2893,9 +2893,9 @@
   integrity sha512-J8xLz7q2OFulZ2cyGTLE1TbbZcjpno7FaN6zdJNrgAdrJ+DZzh/uFR6YrTb4C+nXakvud8Q4+rbhoIWlYQbUFQ==
 
 "@types/node@^18.16.15":
-  version "18.18.14"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.18.14.tgz#26771c647f2842af57eb96191cd615d845164295"
-  integrity sha512-iSOeNeXYNYNLLOMDSVPvIFojclvMZ/HDY2dU17kUlcsOsSQETbWIslJbYLZgA+ox8g2XQwSHKTkght1a5X26lQ==
+  version "18.19.0"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.19.0.tgz#e86ce256c46661016fa83360bf8738eb4efdc88c"
+  integrity sha512-667KNhaD7U29mT5wf+TZUnrzPrlL2GNQ5N0BMjO2oNULhBxX0/FKCkm6JMu0Jh7Z+1LwUlR21ekd7KhIboNFNw==
   dependencies:
     undici-types "~5.26.4"
 
@@ -5031,9 +5031,9 @@ d@1, d@^1.0.1:
     type "^1.0.1"
 
 daisyui@^4.4.6:
-  version "4.4.14"
-  resolved "https://registry.yarnpkg.com/daisyui/-/daisyui-4.4.14.tgz#b1e7774becab8d2f67fa84ecff93ebd9a329eb46"
-  integrity sha512-1g37QzzDFM0QLQe+qRBswkGKyaGijk84t01UMg1ytkFhQxru3zeMh5nWcpC9KnqzKgnITkpSebpGqq4gP8zRrg==
+  version "4.4.17"
+  resolved "https://registry.yarnpkg.com/daisyui/-/daisyui-4.4.17.tgz#60d21e62e02388efdb9789e486deb69e65f7b6e5"
+  integrity sha512-vcxLKoWiqPjEtcBkSayi9sDW1kWgWRdy1GjSu3zNtMiCsXwqDpCzNkdijuY9RuJ/2tBCtnwxhBv72Yizfi7KAQ==
   dependencies:
     css-selector-tokenizer "^0.8"
     culori "^3"

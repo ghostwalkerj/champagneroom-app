@@ -182,10 +182,13 @@
 <div
   class="flex place-content-center w-full flex-col text-base-100 text-center"
 >
-  <h1 class="text-3xl font-bold m-10 text-primary">
+  <h1 class="text-3xl font-bold mt-10 text-primary">
     Join Our Creator Community and Thrive Globally
   </h1>
 
+  {#if !wallet}
+    <div class="text-primary font-bold mt-2">You Need a Crypto Wallet</div>
+  {/if}
   <div>
     <div class="absolute top-auto left-auto max-w-md">
       <div
