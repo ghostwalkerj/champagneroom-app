@@ -59,7 +59,8 @@ export const actions: Actions = {
         roles: [EntityType.AGENT]
       });
       const agent = await Agent.create({
-        user: user._id
+        user: user._id,
+        defaultCommission: Config.UI.defaultCommission
       });
 
       return {

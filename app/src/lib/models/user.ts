@@ -111,7 +111,7 @@ export const userSchema = new Schema(
       maxLength: 50,
       minLength: [8, 'Referral code is too short'],
       trim: true,
-      default: () => nanoid(21),
+      default: () => nanoid(10),
       index: true
     }
   },
