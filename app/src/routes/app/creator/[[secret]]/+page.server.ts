@@ -21,6 +21,7 @@ import type { ShowDocument } from '$lib/models/show';
 import { Show, ShowStatus } from '$lib/models/show';
 import type { ShowEventDocument } from '$lib/models/showEvent';
 import { ShowEvent } from '$lib/models/showEvent';
+import type { UserDocument } from '$lib/models/user';
 import type { WalletDocument } from '$lib/models/wallet';
 import { Wallet, WalletStatus } from '$lib/models/wallet';
 
@@ -32,7 +33,7 @@ import type { ShowQueueType } from '$lib/workers/showWorker';
 
 import { ActorType, EntityType } from '$lib/constants';
 import { rateCryptosRateGet } from '$lib/ext/bitcart';
-import { PayoutJobType, PayoutReason, createAuthToken } from '$lib/payment';
+import { createAuthToken, PayoutJobType, PayoutReason } from '$lib/payment';
 import { getShowMachineService } from '$lib/server/machinesUtil';
 
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
@@ -44,9 +45,11 @@ export const actions: Actions = {
     if (!url) {
       return fail(400, { url, missingUrl: true });
     }
+    const user = locals.user as UserDocument;
     const creator = locals.creator as CreatorDocument;
-    creator.profileImageUrl = url;
-    await creator.save();
+    user.profileImageUrl = url;
+    await user.save();
+    creator.user.profileImageUrl = url;
 
     return {
       success: true,
@@ -93,7 +96,7 @@ export const actions: Actions = {
       },
       creatorInfo: {
         name: creator.user.name,
-        profileImageUrl: creator.profileImageUrl,
+        profileImageUrl: creator.user.profileImageUrl,
         averageRating: creator.feedbackStats.averageRating,
         numberOfReviews: creator.feedbackStats.numberOfReviews
       }

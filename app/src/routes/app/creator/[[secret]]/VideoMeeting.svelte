@@ -79,7 +79,7 @@
 
     // @ts-ignore
     api = new JitsiMeetExternalAPI(PUBLIC_JITSI_DOMAIN, options);
-    api.executeCommand('avatarUrl', creator.profileImageUrl);
+    api.executeCommand('avatarUrl', creator.user.profileImageUrl);
     api.executeCommand('subject', currentShow?.name);
     api.addListener('participantJoined', participantJoined);
     api.addListener('knockingParticipant', participantKnocked);

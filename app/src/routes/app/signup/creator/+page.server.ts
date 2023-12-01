@@ -68,8 +68,7 @@ export const actions: Actions = {
 
         await Creator.create({
           user: user._id,
-          agentCommission: 0,
-          profileImageUrl
+          agentCommission: 0
         });
 
         return {
@@ -88,13 +87,13 @@ export const actions: Actions = {
           address: address.toLocaleLowerCase(),
           wallet: wallet._id,
           payoutAddress: address.toLocaleLowerCase(),
-          roles: [EntityType.CREATOR]
+          roles: [EntityType.CREATOR],
+          profileImageUrl
         });
 
         await Creator.create({
           user: user._id,
-          agentCommission: 0,
-          profileImageUrl
+          agentCommission: 0
         });
         return {
           success: true,

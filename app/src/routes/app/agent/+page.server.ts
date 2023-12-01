@@ -9,9 +9,11 @@ import { uniqueNamesGenerator } from 'unique-names-generator';
 
 import { PASSWORD_SALT } from '$env/static/private';
 
+import type { AgentDocument } from '$lib/models/agent';
 import type { CurrencyType } from '$lib/models/common';
 import { Creator } from '$lib/models/creator';
 import { Show } from '$lib/models/show';
+import type { UserDocument } from '$lib/models/user';
 import { User } from '$lib/models/user';
 import { Wallet } from '$lib/models/wallet';
 
@@ -22,6 +24,23 @@ import { womensNames } from '$lib/womensNames';
 import type { Actions, PageServerLoad } from './$types';
 
 export const actions: Actions = {
+  update_profile_image: async ({ locals, request }) => {
+    const data = await request.formData();
+    const url = data.get('url') as string;
+    if (!url) {
+      return fail(400, { url, missingUrl: true });
+    }
+    const user = locals.user as UserDocument;
+    const agent = locals.agent as AgentDocument;
+    user.profileImageUrl = url;
+    await user.save();
+    agent.user.profileImageUrl = url;
+
+    return {
+      success: true,
+      agent: agent?.toObject({ flattenObjectIds: true, flattenMaps: true })
+    };
+  },
   create_creator: async ({ request }) => {
     const data = await request.formData();
     const agentId = data.get('agentId') as string;

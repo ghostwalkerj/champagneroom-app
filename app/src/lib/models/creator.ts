@@ -67,10 +67,7 @@ const creatorSchema = new Schema(
       unique: true,
       autopopulate: true
     },
-    profileImageUrl: {
-      type: String,
-      required: true
-    },
+
     agentCommission: {
       type: Number,
       default: 0,

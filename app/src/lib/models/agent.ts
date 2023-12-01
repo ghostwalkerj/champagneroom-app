@@ -15,7 +15,8 @@ const agentSchema = new Schema(
       required: true,
       unique: true,
       autopopulate: true
-    }
+    },
+    defaultCommission: { type: Number, required: true, default: 0 }
   },
   { timestamps: true }
 );

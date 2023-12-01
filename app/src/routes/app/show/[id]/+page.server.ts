@@ -56,6 +56,7 @@ export const actions: Actions = {
     const data = await request.formData();
     const name = data.get('name') as string;
     const pin = data.get('pin') as string;
+    const profileImage = data.get('profileImage') as string;
 
     if (!name) {
       return fail(400, { name, missingName: true });
@@ -87,7 +88,8 @@ export const actions: Actions = {
       name,
       roles: [UserRole.TICKET_HOLDER],
       authType: AuthType.PIN,
-      password: pin
+      password: pin,
+      profileImageUrl: profileImage
     });
 
     const ticket = await Ticket.create({
@@ -107,8 +109,7 @@ export const actions: Actions = {
     if (
       !showState.can({
         type: ShowMachineEventString.TICKET_RESERVED,
-        ticket,
-        customerName: name
+        ticket
       })
     ) {
       console.error('Show cannot Reserve Ticket');

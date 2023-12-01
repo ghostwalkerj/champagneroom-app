@@ -10,10 +10,11 @@
   import { durationFormatter } from '$lib/constants';
 
   import type { ActionData } from './$types';
+  import type { CreatorDocument } from '$lib/models/creator';
 
   $: showDuration = 60;
 
-  export let creator: { profileImageUrl: string; user: { name: string } };
+  export let creator: CreatorDocument;
   export let form: ActionData;
   export let isLoading = false;
   // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -116,7 +117,7 @@
           <input
             type="hidden"
             name="coverImageUrl"
-            value={creator.profileImageUrl}
+            value={creator.user.profileImageUrl}
           />
           <div class="form-control lg:w-1/5">
             <!-- svelte-ignore a11y-label-has-associated-control -->

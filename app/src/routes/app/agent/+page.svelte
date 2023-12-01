@@ -22,9 +22,10 @@
   import type { WalletDocumentType } from '$lib/models/wallet';
   import type { ActionData, PageData } from './$types';
   import WeeklyBooking from './WeeklyBooking.svelte';
+  import AgentDetail from './AgentDetail.svelte';
 
   export let data: PageData;
-  const agent = data.agent as AgentDocumentType;
+  let agent = data.agent as AgentDocumentType;
   let creators = data.creators as CreatorDocumentType[];
   let wallet = data.wallet as WalletDocumentType;
   export let showData = data.showData as {
@@ -43,7 +44,7 @@
   let newCreator: CreatorDocumentType | undefined;
   let newPassword: string | undefined;
   let activeRow = 0;
-  let activeTab = 'Creators' as 'Creators' | 'Dashboard';
+  let activeTab = 'Dashboard' as 'Creators' | 'Dashboard';
   $: canAddCreator = false;
   let creatorNameElement: HTMLTableCellElement;
   let creatorAddressElement: HTMLTableCellElement;
@@ -220,20 +221,19 @@
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <a
               class="tab"
-              class:tab-active={activeTab === 'Creators'}
-              on:click={() => {
-                activeTab = 'Creators';
-              }}>Creators</a
-            >
-
-            <!-- svelte-ignore a11y-missing-attribute -->
-            <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <a
-              class="tab"
               class:tab-active={activeTab == 'Dashboard'}
               on:click={() => {
                 activeTab = 'Dashboard';
               }}>Dashboard</a
+            >
+            <!-- svelte-ignore a11y-missing-attribute -->
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <a
+              class="tab"
+              class:tab-active={activeTab === 'Creators'}
+              on:click={() => {
+                activeTab = 'Creators';
+              }}>Creators</a
             >
           </div>
         </div>
@@ -428,11 +428,14 @@
                 class="mt-4 bg-base w-full rounded-lg z-0 border-2 border-secondary"
               >
                 <div
-                  class="flex-col min-w-full md:min-w-min md:grid md:grid-cols-3"
+                  class="flex-col min-w-full md:min-w-min md:grid md:grid-cols-5"
                 >
                   <!-- 1st column -->
                   <div class="flex-1 m-4 space-y-3">
-                    <!-- Status -->
+                    <!-- Profile -->
+                    <div class="min-w-fit">
+                      <AgentDetail {agent} />
+                    </div>
                     <!-- Wallet -->
                     <div class="min-w-fit">
                       <WalletDetail {wallet} {form} />
@@ -440,12 +443,12 @@
                   </div>
 
                   <!--Next Column-->
-                  <div class="space-y-3 md:col-span-1 m-4 md:ml-0">
+                  <div class="space-y-3 m-4 md:ml-0 md:col-span-2">
                     <TopCreator {creators} {showData} />
                   </div>
 
                   <!--Next Column-->
-                  <div class="space-y-3 md:col-span-1 m-4 md:ml-0">
+                  <div class="space-y-3 md:col-span-2 m-4 md:ml-0">
                     <WeeklyBooking {creators} {weeklyData} />
                   </div>
                 </div>

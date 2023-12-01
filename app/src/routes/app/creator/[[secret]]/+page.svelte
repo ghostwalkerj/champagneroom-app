@@ -1,6 +1,5 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
-  import StarRating from 'svelte-star-rating';
   import type { Unsubscriber } from 'svelte/store';
 
   import { invalidateAll, onNavigate } from '$app/navigation';
@@ -36,6 +35,7 @@
   import type { Subscription } from 'xstate';
   import type { ActionData, PageData } from './$types';
   import VideoMeeting from './VideoMeeting.svelte';
+  import CreatorDetail from './CreatorDetail.svelte';
   export let data: PageData;
   export let form: ActionData;
 
@@ -152,18 +152,6 @@
     unSubAll();
   });
 
-  const updateProfileImage = async (url: string) => {
-    if (url && creator) {
-      creator.profileImageUrl = url;
-      let formData = new FormData();
-      formData.append('url', url);
-      await fetch('?/update_profile_image', {
-        method: 'POST',
-        body: formData
-      });
-    }
-  };
-
   const onShowCreated = (show: ShowDocumentType | undefined) => {
     showUnSub?.();
     if (!show) return;
@@ -274,30 +262,7 @@
       <!--Next Column-->
       <div class="space-y-3 -mt-3 lg:mt-0 md:col-start-4 md:col-span-1">
         <!-- Photo -->
-        <div>
-          <div class="lg:col-start-3 lg:col-span-1">
-            <div class="bg-primary text-primary-content card">
-              <div class="text-center card-body items-center p-3">
-                <h2 class="text-xl card-title">{creatorName}</h2>
-                <div>
-                  <ProfilePhoto
-                    profileImage={creator.profileImageUrl ||
-                      Config.UI.defaultProfileImage}
-                    callBack={(value) => {
-                      updateProfileImage(value);
-                    }}
-                  />
-                </div>
-                <div
-                  class="tooltip"
-                  data-tip={creator.feedbackStats.averageRating.toFixed(2)}
-                >
-                  <StarRating rating={creator.feedbackStats.averageRating} />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <CreatorDetail bind:creator />
 
         <!-- Wallet -->
         <div>

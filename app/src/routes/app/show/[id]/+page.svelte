@@ -95,6 +95,7 @@
               use:enhance={onSubmit}
               class="font-Roboto w-full lg:max-w-xs"
             >
+              <input type="hidden" name="profileImage" value={profileImage} />
               <div class="py-2 form-control">
                 <label for="caller" class="label">
                   <span class="label-text">Your Name</span>

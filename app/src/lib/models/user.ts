@@ -99,6 +99,20 @@ export const userSchema = new Schema(
       type: Boolean,
       default: true,
       index: true
+    },
+
+    profileImageUrl: {
+      type: String,
+      required: true
+    },
+
+    referralCode: {
+      type: String,
+      maxLength: 50,
+      minLength: [8, 'Referral code is too short'],
+      trim: true,
+      default: () => nanoid(21),
+      index: true
     }
   },
   { timestamps: true }

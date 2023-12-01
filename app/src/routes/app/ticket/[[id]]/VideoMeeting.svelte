@@ -6,9 +6,7 @@
 
   import type { UserDocumentType } from '$lib/models/user';
 
-  import Config from '$lib/config';
   import { jitsiInterfaceConfigOverwrite } from '$lib/constants';
-  import getProfileImage from '$lib/profilePhoto';
 
   import { browser } from '$app/environment';
   import type { ShowDocumentType } from '$lib/models/show';
@@ -23,8 +21,6 @@
 
   let hasLeftShow = false;
   let api: any;
-
-  const profileImage = getProfileImage(user.name, Config.UI.profileImagePath);
 
   const postLeaveShow = async () => {
     leftShowCallback?.();
@@ -58,7 +54,7 @@
 
     // @ts-ignore
     api = new JitsiMeetExternalAPI(PUBLIC_JITSI_DOMAIN, options);
-    api.executeCommand('avatarUrl', profileImage);
+    api.executeCommand('avatarUrl', user.profileImageUrl);
 
     api.addListener('toolbarButtonClicked', async (event: any) => {
       if (event?.key === 'leave-show') {
