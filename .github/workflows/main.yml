@@ -1,7 +1,3 @@
-    - uses: naiw1023/notify-telegram@v0.0.2
-      if: always()
-      with:
-        chat: ${{ secrets.chat }} # user id or channel name secret
-        token: ${{ secrets.token }} # token secret
-        status: ${{ job.status }} # do not modify this line
-        message: "Custom Message"
+              - name: Telegram Notify
+                uses: appleboy/telegram-action@v0.1.1
+            
