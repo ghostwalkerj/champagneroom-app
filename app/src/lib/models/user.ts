@@ -12,6 +12,9 @@ export type UserDocument = InstanceType<typeof User>;
 
 export type UserDocumentType = InferSchemaType<typeof userSchema> & {
   comparePassword: (password: string) => Promise<boolean>;
+  isCreator: () => boolean;
+  isAgent: () => boolean;
+  isOperator: () => boolean;
 };
 
 export { User };
@@ -144,6 +147,18 @@ userSchema.pre('save', function (next) {
 
 userSchema.methods.comparePassword = function (password: string) {
   return bcrypt.compare(password, this.password);
+};
+
+userSchema.methods.isCreator = function () {
+  return this.roles.includes(UserRole.CREATOR);
+};
+
+userSchema.methods.isAgent = function () {
+  return this.roles.includes(UserRole.AGENT);
+};
+
+userSchema.methods.isOperator = function () {
+  return this.roles.includes(UserRole.OPERATOR);
 };
 
 // userSchema.statics.encryptField = function (secret: string) {

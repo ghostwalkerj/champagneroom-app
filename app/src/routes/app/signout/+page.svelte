@@ -2,8 +2,8 @@
   import { goto } from '$app/navigation';
   import urlJoin from 'url-join';
 
-  import type { PageData } from './$types';
   import Config from '$lib/config';
+  import type { PageData } from './$types';
 
   export let data: PageData;
 

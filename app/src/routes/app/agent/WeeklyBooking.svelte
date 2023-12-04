@@ -1,8 +1,8 @@
 <script lang="ts">
   import Chart from 'chart.js/auto';
+  import autocolors from 'chartjs-plugin-autocolors';
   import ChartDataLabels from 'chartjs-plugin-datalabels';
   import { Line } from 'svelte-chartjs';
-  import autocolors from 'chartjs-plugin-autocolors';
 
   import type { CreatorDocumentType } from '$lib/models/creator';
 

@@ -20,7 +20,7 @@
 
   const message = data.message;
   const user = data.user;
-  const isCreator = data.isCreator;
+  const isAgent = data.isAgent;
 
   $: walletAddress = '';
   let wallet: WalletState | undefined;
@@ -41,14 +41,12 @@
         dictionaries: [womensNames]
       });
 
-  let isLoading = true;
-
   const useWallet = async () => {
     if (wallet) {
       if (
         user &&
         user.address.toLowerCase() === walletAddress.toLowerCase() &&
-        isCreator
+        isAgent
       ) {
         existsModel?.showModal();
         addressModel?.close();
@@ -63,10 +61,8 @@
   };
 
   onMount(async () => {
-    isLoading = false;
     useWallet();
 
-    randomizeCardPositions();
     walletUnsub = defaultWallet.subscribe((_wallet) => {
       if (_wallet) {
         wallet = _wallet;
@@ -102,7 +98,7 @@
       if (result?.type === 'success') {
         goto(result.data.returnPath);
       } else {
-        if (result?.data?.alreadyCreator) {
+        if (result?.data?.alreadyAgent) {
           existsModel.showModal();
           addressModel?.close();
           signupModel?.close();
@@ -111,212 +107,19 @@
       applyAction(result);
     };
   };
-
-  function randomizeCardPositions() {
-    const cards = document.querySelectorAll('.card') as unknown as [
-      HTMLElement
-    ];
-    let positions: { x: number; y: number; width: number; height: number }[] =
-      [];
-
-    cards.forEach((card, index) => {
-      let x: number,
-        y: number,
-        overlap: boolean,
-        attempts = 0;
-      do {
-        overlap = false;
-        // Adjust random position to consider card dimensions
-        x = Math.random() * (innerWidth - card.offsetWidth - 500);
-        y = Math.random() * (700 - card.offsetHeight);
-
-        // Enhanced overlap check
-        positions.forEach((pos) => {
-          if (
-            x < pos.x + pos.width &&
-            x + card.offsetWidth > pos.x &&
-            y < pos.y + pos.height &&
-            y + card.offsetHeight > pos.y
-          ) {
-            overlap = true;
-          }
-        });
-
-        // Boundary check for viewport
-        if (
-          x < 0 ||
-          y + card.offsetHeight > innerHeight ||
-          x + card.offsetWidth > innerWidth
-        ) {
-          overlap = true;
-        }
-
-        attempts++;
-        if (attempts > 50) {
-          // Adjust position for offscreen cards
-          x =
-            index > 0 ? positions[index - 1].x + positions[index - 1].width : 0;
-          y = index > 0 ? positions[index - 1].y : 0;
-          if (x + card.offsetWidth > innerWidth) {
-            x = 0;
-            y += card.offsetHeight;
-          }
-          break;
-        }
-      } while (overlap);
-
-      // Apply the adjusted position
-      card.style.left = `${x}px`;
-      card.style.top = `${y}px`;
-      card.style.display = 'flex';
-
-      // Store the new position
-      positions.push({
-        x,
-        y,
-        width: card.offsetWidth,
-        height: card.offsetHeight
-      });
-    });
-  }
 </script>
-
-<svelte:window bind:innerWidth bind:innerHeight />
 
 <div
   class="flex place-content-center w-full flex-col text-base-100 text-center"
 >
   <h1 class="text-3xl font-bold mt-10 text-primary">
-    Join Our Creator Community and Thrive Globally
+    Become an Agent and Earn with Your Creators
   </h1>
 
   {#if !wallet}
     <div class="text-primary font-bold mt-2">You Need a Crypto Wallet</div>
   {/if}
-  <div>
-    <div class="absolute top-auto left-auto max-w-md">
-      <div
-        class="card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
-      >
-        <h2 class="text-xl text-secondary text-center">
-          Get Paid Quickly in Your Local Currency
-        </h2>
-        <div class="text-primary card-body">
-          Experience the ease of receiving payments swiftly and securely, right
-          in your local currency. No more exchange rate headaches or delays.
-        </div>
-      </div>
-    </div>
-    <div class="absolute top-auto left-auto max-w-md">
-      <div
-        class="card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
-      >
-        <h2 class="text-xl text-secondary text-center">
-          Hassle-Free Payment Handling
-        </h2>
-        <div class="text-primary card-body">
-          Our streamlined payment system means you focus on creating, not on
-          payment issues. We handle the complexities, you enjoy the rewards.
-        </div>
-      </div>
-    </div>
-
-    <div class="absolute top-auto left-auto max-w-md">
-      <div
-        class="card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
-      >
-        <h2 class="text-xl text-secondary text-center">
-          Privacy is Our Priority
-        </h2>
-        <div class="text-primary card-body">
-          Your safety matters. With us, your personal details stay private. No
-          need to share names or phone numbers.
-        </div>
-      </div>
-    </div>
-
-    <div class="absolute top-auto left-auto max-w-md">
-      <div
-        class="card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
-      >
-        <h2 class="text-xl text-secondary text-center">
-          Earn More with Fan Tips
-        </h2>
-        <div class="text-primary card-body">
-          Connect with your audience in a meaningful way. Receive appreciation
-          through tips directly from your fans.
-        </div>
-      </div>
-    </div>
-
-    <div class="absolute top-auto left-auto max-w-md">
-      <div
-        class="card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
-      >
-        <h2 class="text-xl text-secondary text-center">
-          Exclusive Marketplace for Custom Content
-        </h2>
-        <div class="text-primary card-body">
-          Unlock the potential of your creativity. Sell unique, custom content
-          directly to your followers and boost your earnings.
-        </div>
-      </div>
-    </div>
-
-    <div class="absolute top-auto left-auto max-w-md">
-      <div
-        class="card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
-      >
-        <h2 class="text-xl text-secondary text-center">
-          Global Reach, Local Comfort
-        </h2>
-        <div class="text-primary card-body">
-          Wherever you are, connect with affluent customers from around the
-          world. Your location is no longer a barrier to your success.
-        </div>
-      </div>
-    </div>
-
-    <div class="absolute top-auto left-auto max-w-md">
-      <div
-        class="card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
-      >
-        <h2 class="text-xl text-secondary text-center">
-          Premium Prices for International Customers
-        </h2>
-        <div class="text-primary card-body">
-          Maximize your earnings by setting competitive rates for international
-          clients. Benefit from a wider, more lucrative market.
-        </div>
-      </div>
-    </div>
-
-    <div class="absolute top-auto left-auto max-w-md">
-      <div
-        class="card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
-      >
-        <h2 class="text-xl text-secondary text-center">
-          Concierge Service at Your Fingertips
-        </h2>
-        <div class="text-primary card-body">
-          Need assistance? Our concierge service is here to help you navigate
-          and optimize your creator experience with ease.
-        </div>
-      </div>
-    </div>
-
-    <div class="absolute top-auto left-auto max-w-md visible">
-      <div
-        class="card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
-      >
-        <h2 class="text-xl text-secondary text-center">Join Us Now</h2>
-        <div class="text-primary card-body">
-          Ready to take your creative journey to the next level? Sign up today
-          and be part of a community that values and empowers creators like you.
-        </div>
-      </div>
-    </div>
-  </div>
+  <div />
 </div>
 <dialog id="address_modal" class="modal" bind:this={addressModel}>
   <form
@@ -404,7 +207,7 @@
           </div>
         </div>
         <div class="font-medium text-primary text-2xl text-center">
-          Creator already exists
+          Agent already exists
         </div>
         <div class="mt-4 font-medium text-accent text-md text-center">
           {walletAddress}
@@ -418,7 +221,7 @@
             class="btn btn-primary btn-outline"
             on:click={() => {
               existsModel.close();
-              goto(Config.Path.creator);
+              goto(Config.Path.agent);
             }}>Sign In</button
           >
           <button
@@ -441,7 +244,7 @@
   >
     <form
       method="POST"
-      action="?/create_creator"
+      action="?/create_agent"
       use:enhance={({ formData }) => onSubmit({ formData })}
       class="flex flex-col place-content-center w-full"
     >
@@ -453,11 +256,11 @@
         />
       </div>
       <div class="font-medium text-primary text-3xl text-center">
-        Sign Up as a Creator
+        Sign Up as an Agent
       </div>
       <div class="w-full flex flex-col place-content-center mt-4">
         <div class="font-medium text-secondary text-xl text-center">
-          Enter your Stage Name
+          Agent Name
         </div>
         <div class="w-full flex place-content-center">
           <div class="form-control max-w-xs p-4">
@@ -480,6 +283,27 @@
           </div>
         </div>
       </div>
+      <div class="font-medium text-secondary text-xl text-center">
+        Default Commission
+      </div>
+      <div class="w-full flex place-content-center">
+        <div class="form-control max-w-xs p-4">
+          <input
+            type="text"
+            name="defaultCommission"
+            placeholder={Config.UI.defaultCommission.toString()}
+            class="input input-bordered input-primary w-full max-w-xs input-sm"
+          />
+
+          <!-- svelte-ignore a11y-label-has-associated-control -->
+          {#if form?.badCommission}
+            <label class="label">
+              <span class="label-text-alt text-error">Between 0 and 100</span>
+            </label>
+          {/if}
+        </div>
+      </div>
+
       <div class="modal-action place-content-center gap-10">
         <button class="btn btn-primary btn-outline" type="submit"
           >Sign Up</button

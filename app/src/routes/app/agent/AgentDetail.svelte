@@ -1,12 +1,12 @@
 <script lang="ts">
-  import type { AgentDocumentType } from '$lib/models/agent';
-  import Config from '$lib/config';
-  import ProfilePhoto from '$components/ProfilePhoto.svelte';
-  import urlJoin from 'url-join';
-  import { page } from '$app/stores';
-  import type { ActionResult } from '@sveltejs/kit';
   import { deserialize } from '$app/forms';
   import { invalidateAll } from '$app/navigation';
+  import { page } from '$app/stores';
+  import ProfilePhoto from '$components/ProfilePhoto.svelte';
+  import Config from '$lib/config';
+  import type { AgentDocumentType } from '$lib/models/agent';
+  import type { ActionResult } from '@sveltejs/kit';
+  import urlJoin from 'url-join';
 
   export let agent: AgentDocumentType;
 
