@@ -25,7 +25,7 @@ export const authDecrypt = (text: string | undefined, authSalt: string) => {
     const decryptedText = Buffer.concat([decrypted, decipher.final()]);
     return decryptedText.toString();
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
 
@@ -46,6 +46,6 @@ export const authEncrypt = (text: string | undefined, authSalt: string) => {
     encrypted = Buffer.concat([encrypted, cipher.final()]);
     return iv.toString('hex') + ':' + encrypted.toString('hex');
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };

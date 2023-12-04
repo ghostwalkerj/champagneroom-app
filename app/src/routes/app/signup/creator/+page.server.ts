@@ -25,7 +25,7 @@ const verifySignature = (
     }
     return true;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -100,7 +100,7 @@ export const actions: Actions = {
           returnPath
         };
       } catch (error) {
-        console.log('err', error);
+        console.error('err', error);
         return fail(400, { err: JSON.stringify(error) });
       }
     }

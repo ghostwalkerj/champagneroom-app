@@ -44,7 +44,7 @@ export const actions: Actions = {
     }
 
     if (address === null) {
-      console.log('bad address', address);
+      console.error('bad address', address);
       return fail(400, { address, badAgentAddress: true });
     }
 
@@ -69,7 +69,7 @@ export const actions: Actions = {
         agentCreated: true
       };
     } catch (error_) {
-      console.log('err', error_);
+      console.error('err', error_);
       return fail(400, { address, badAgentAddress: true });
     }
   },

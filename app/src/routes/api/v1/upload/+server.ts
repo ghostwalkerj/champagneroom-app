@@ -24,7 +24,7 @@ export const POST: RequestHandler = async ({ request }) => {
         }
       }
     } catch (error) {
-      console.log('error', error);
+      console.error('error', error);
     }
     return json({ url });
   } else {
