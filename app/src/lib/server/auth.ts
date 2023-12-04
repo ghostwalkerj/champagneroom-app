@@ -38,6 +38,7 @@ const WHITELIST_PATHS = [
   Config.Path.auth,
   Config.Path.signout,
   Config.Path.signup + '/**',
+  Config.Path.signup,
   ...WEBHOOK_PATHS
 ];
 

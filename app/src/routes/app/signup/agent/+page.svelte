@@ -32,9 +32,6 @@
   let existsModel: HTMLDialogElement;
   let profileImageUrl = Config.UI.defaultProfileImage;
 
-  $: innerWidth = 0;
-  $: innerHeight = 0;
-
   let exampleName = user
     ? user.name
     : uniqueNamesGenerator({
