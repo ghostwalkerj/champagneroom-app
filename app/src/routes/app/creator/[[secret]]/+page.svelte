@@ -16,10 +16,8 @@
     ShowMachineEventString
   } from '$lib/machines/showMachine';
 
-  import Config from '$lib/config';
   import { ActorType } from '$lib/constants';
 
-  import ProfilePhoto from '$components/ProfilePhoto.svelte';
   import ShowDetail from '$components/ShowDetail.svelte';
   import { CreatorStore, ShowStore, WalletStore } from '$stores';
 
@@ -34,8 +32,8 @@
   import type { UserDocumentType } from '$lib/models/user';
   import type { Subscription } from 'xstate';
   import type { ActionData, PageData } from './$types';
-  import VideoMeeting from './VideoMeeting.svelte';
   import CreatorDetail from './CreatorDetail.svelte';
+  import VideoMeeting from './VideoMeeting.svelte';
   export let data: PageData;
   export let form: ActionData;
 

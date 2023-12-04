@@ -5,7 +5,7 @@
   import { goto } from '$app/navigation';
 
   import type { TicketDocument } from '$lib/models/ticket';
-  import { type UserDocument, UserRole } from '$lib/models/user';
+  import { UserRole, type UserDocument } from '$lib/models/user';
 
   import Config from '$lib/config';
 

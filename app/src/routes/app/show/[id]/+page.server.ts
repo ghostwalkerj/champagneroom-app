@@ -32,7 +32,7 @@ import Config from '$lib/config';
 import { AuthType, EntityType } from '$lib/constants';
 import { authEncrypt } from '$lib/crypt';
 import { mensNames } from '$lib/mensNames';
-import { createAuthToken, InvoiceJobType, InvoiceStatus } from '$lib/payment';
+import { InvoiceJobType, InvoiceStatus, createAuthToken } from '$lib/payment';
 import {
   getShowMachineServiceFromId,
   getTicketMachineService

@@ -21,8 +21,8 @@
   import type { CurrencyType } from '$lib/models/common';
   import type { WalletDocumentType } from '$lib/models/wallet';
   import type { ActionData, PageData } from './$types';
-  import WeeklyBooking from './WeeklyBooking.svelte';
   import AgentDetail from './AgentDetail.svelte';
+  import WeeklyBooking from './WeeklyBooking.svelte';
 
   export let data: PageData;
   let agent = data.agent as AgentDocumentType;
@@ -49,7 +49,9 @@
   let creatorNameElement: HTMLTableCellElement;
   let creatorAddressElement: HTMLTableCellElement;
   let creatorCommissionElement: HTMLTableCellElement;
-  let commission = Config.UI.defaultCommission.toString();
+  let commission =
+    agent.defaultCommission.toString() ||
+    Config.UI.defaultCommission.toString();
   let creatorName = uniqueNamesGenerator({
     dictionaries: [womensNames]
   });

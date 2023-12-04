@@ -2,7 +2,7 @@
   import spacetime from 'spacetime';
   import { onMount } from 'svelte';
 
-  import { type TicketDocumentType, TicketStatus } from '$lib/models/ticket';
+  import { TicketStatus, type TicketDocumentType } from '$lib/models/ticket';
 
   import Config from '$lib/config';
   import { currencyFormatter, durationFormatter } from '$lib/constants';

@@ -9,8 +9,8 @@
   import Config from '$lib/config';
   import { durationFormatter } from '$lib/constants';
 
-  import type { ActionData } from './$types';
   import type { CreatorDocument } from '$lib/models/creator';
+  import type { ActionData } from './$types';
 
   $: showDuration = 60;
 

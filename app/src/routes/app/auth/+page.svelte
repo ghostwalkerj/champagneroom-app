@@ -10,8 +10,8 @@
   import { AuthType } from '$lib/constants';
   import { defaultWallet, selectedAccount } from '$lib/web3';
 
-  import type { ActionData, PageData } from './$types';
   import type { Unsubscriber } from 'svelte/store';
+  import type { ActionData, PageData } from './$types';
 
   export let data: PageData;
   export let form: ActionData;
