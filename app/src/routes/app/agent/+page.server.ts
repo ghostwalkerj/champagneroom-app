@@ -172,6 +172,42 @@ export const actions: Actions = {
     user.save();
 
     return { success: true, secret, password };
+  },
+  update_agent: async ({ request, locals }) => {
+    const data = await request.formData();
+    const name = data.get('name') as string;
+    const defaultCommission = data.get('defaultCommission') as string;
+    const user = locals.user as UserDocument;
+    const agent = locals.agent as AgentDocument;
+
+    // Validation
+    if (
+      Number.isNaN(+defaultCommission) ||
+      +defaultCommission < 0 ||
+      +defaultCommission > 100
+    ) {
+      return fail(400, { defaultCommission, badCommission: true });
+    }
+
+    user.name = name;
+    user.save();
+
+    agent.defaultCommission = +defaultCommission;
+    agent.save();
+
+    return {
+      success: true
+    };
+  },
+  update_referral_code: async ({ locals }) => {
+    const user = locals.user as UserDocument;
+    user.referralCode = nanoid(10);
+    user.save();
+
+    return {
+      success: true,
+      referralCode: user.referralCode
+    };
   }
 };
 
