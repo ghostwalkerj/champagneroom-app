@@ -2,6 +2,7 @@ app/server/data
 app/.yarnclean
 app/build.out.txt
 app/.env.local
+app/.env
 app/node_modules
 app/.svelte-kit/
 app/build/
