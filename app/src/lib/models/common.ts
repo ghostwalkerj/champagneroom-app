@@ -55,6 +55,12 @@ export enum DisputeReason {
   SHOW_NEVER_STARTED = 'SHOW NEVER STARTED'
 }
 
+export enum EarningsSource {
+  SHOW_PERFORMANCE = 'SHOW PERFORMANCE',
+  COMMISSION = 'COMMISSION',
+  REFERRAL = 'REFERRAL'
+}
+
 export enum RefundReason {
   SHOW_CANCELLED = 'SHOW CANCELLED',
   CUSTOMER_CANCELLED = 'CUSTOMER CANCELLED',
@@ -82,6 +88,7 @@ export const disputeSchema = new Schema({
   decision: { type: String, enum: DisputeDecision },
   resolved: { type: Boolean, default: false, index: true }
 });
+
 export const earningsSchema = new Schema({
   earnedAt: { type: Date, default: new Date() },
   amount: { type: Number, required: true },
@@ -91,6 +98,13 @@ export const earningsSchema = new Schema({
     required: true,
     default: CurrencyType.ETH
   },
+  earningsSource: {
+    type: String,
+    enum: EarningsSource,
+    required: true,
+    default: EarningsSource.SHOW_PERFORMANCE
+  },
+  earningPercentage: { type: Number, required: true, default: 100 },
   show: {
     type: Schema.Types.ObjectId,
     ref: 'Show',
@@ -98,12 +112,14 @@ export const earningsSchema = new Schema({
     required: true
   }
 });
+
 export const escrowSchema = new Schema({
   // eslint-disable-next-line @typescript-eslint/naming-convention
   _id: { type: Schema.Types.ObjectId, auto: true },
   startedAt: { type: Date, default: new Date() },
   endedAt: { type: Date }
 });
+
 export const feedbackSchema = new Schema({
   // eslint-disable-next-line @typescript-eslint/naming-convention
   _id: { type: Schema.Types.ObjectId, auto: true },

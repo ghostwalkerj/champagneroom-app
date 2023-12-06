@@ -68,7 +68,7 @@ const creatorSchema = new Schema(
       autopopulate: true
     },
 
-    agentCommission: {
+    commissionRate: {
       type: Number,
       default: 0,
       min: 0,

@@ -68,7 +68,7 @@ export const actions: Actions = {
 
         await Creator.create({
           user: user._id,
-          agentCommission: 0
+          commissionRate: 0
         });
 
         return {
@@ -93,7 +93,7 @@ export const actions: Actions = {
 
         await Creator.create({
           user: user._id,
-          agentCommission: 0
+          commissionRate: 0
         });
         return {
           success: true,

@@ -50,8 +50,8 @@
   let creatorAddressElement: HTMLTableCellElement;
   let creatorCommissionElement: HTMLTableCellElement;
   let commission =
-    agent.defaultCommission.toString() ||
-    Config.UI.defaultCommission.toString();
+    agent.defaultCommissionRate.toString() ||
+    Config.UI.defaultCommissionRate.toString();
   let creatorName = uniqueNamesGenerator({
     dictionaries: [womensNames]
   });
@@ -61,7 +61,7 @@
     let formData = new FormData();
     formData.append('creatorId', creator._id.toString());
     formData.append('name', creator.user.name || '');
-    formData.append('commission', creator.agentCommission.toString());
+    formData.append('commission', creator.commissionRate.toString());
     formData.append('active', creator.user.active.toString());
 
     await fetch('?/update_creator', {
@@ -78,10 +78,10 @@
   };
 
   const updateCommission = (commission: number) => {
-    if (commission != creators[activeRow].agentCommission) {
+    if (commission != creators[activeRow].commissionRate) {
       const index = activeRow;
 
-      creators[index].agentCommission = commission;
+      creators[index].commissionRate = commission;
       updateCreator(creators[index]);
     }
   };
@@ -338,7 +338,7 @@
                               contenteditable="true"
                               on:blur={(event) => {
                                 updateCommission(event.target?.textContent);
-                              }}>{creator.agentCommission}</td
+                              }}>{creator.commissionRate}</td
                             >
                             <td>
                               <select

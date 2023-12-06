@@ -15,7 +15,7 @@ import type {
 import { DisputeDecision } from '$lib/models/common';
 import type { ShowDocumentType } from '$lib/models/show';
 import { ShowStatus } from '$lib/models/show';
-import type { TicketDocument } from '$lib/models/ticket.js';
+import type { TicketDocument } from '$lib/models/ticket';
 import type { TransactionDocumentType } from '$lib/models/transaction';
 
 import { ActorType } from '$lib/constants';

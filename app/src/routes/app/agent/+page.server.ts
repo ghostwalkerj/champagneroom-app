@@ -76,7 +76,7 @@ export const actions: Actions = {
       });
       const creator = await Creator.create({
         user: user._id,
-        agentCommission: +commission,
+        commissionRate: +commission,
         agent: agentId,
         profileImageUrl: Config.UI.defaultProfileImage
       });
@@ -121,7 +121,7 @@ export const actions: Actions = {
           _id: new ObjectId(creatorId)
         },
         {
-          agentCommission: +commission
+          commissionRate: +commission
         },
         {
           new: true
@@ -176,23 +176,23 @@ export const actions: Actions = {
   update_agent: async ({ request, locals }) => {
     const data = await request.formData();
     const name = data.get('name') as string;
-    const defaultCommission = data.get('defaultCommission') as string;
+    const defaultCommissionRate = data.get('defaultCommissionRate') as string;
     const user = locals.user as UserDocument;
     const agent = locals.agent as AgentDocument;
 
     // Validation
     if (
-      Number.isNaN(+defaultCommission) ||
-      +defaultCommission < 0 ||
-      +defaultCommission > 100
+      Number.isNaN(+defaultCommissionRate) ||
+      +defaultCommissionRate < 0 ||
+      +defaultCommissionRate > 100
     ) {
-      return fail(400, { defaultCommission, badCommission: true });
+      return fail(400, { defaultCommissionRate, badCommission: true });
     }
 
     user.name = name;
     user.save();
 
-    agent.defaultCommission = +defaultCommission;
+    agent.defaultCommissionRate = +defaultCommissionRate;
     agent.save();
 
     return {

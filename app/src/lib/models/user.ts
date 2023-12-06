@@ -35,7 +35,8 @@ export const userSchema = new Schema(
     wallet: {
       type: Schema.Types.ObjectId,
       ref: 'Wallet',
-      index: true
+      index: true,
+      required: true
     },
 
     address: {

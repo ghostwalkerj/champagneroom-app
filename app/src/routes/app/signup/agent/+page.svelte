@@ -287,8 +287,8 @@
         <div class="form-control max-w-xs p-4">
           <input
             type="text"
-            name="defaultCommission"
-            placeholder={Config.UI.defaultCommission.toString()}
+            name="defaultCommissionRate"
+            placeholder={Config.UI.defaultCommissionRate.toString()}
             class="input input-bordered input-primary w-full max-w-xs input-sm"
           />
 
