@@ -1,114 +1,137 @@
 <script lang="ts">
   import Config from '$lib/config';
+  import {page} from '$app/stores';
+
+  const links = [
+    { name: 'About', href: '#About' },
+    { name: 'The Show', href: '#TheShow' },
+    { name: 'FAQ', href: '#FAQ' },
+    { name: 'Creators', href: '#Creators' },
+    { name: 'Token', href: '#Token' },
+    { name: 'Contact', href: '#Contact' },
+    { name: 'Open App', href: Config.Path.openApp },
+    { name: 'Sign Up', href: Config.Path.signup },
+  ];
+
+  function closeNav(){
+    const drawer = document.getElementById('rigthDrawer') as HTMLInputElement;
+    drawer.checked = false;
+  }
+  
 </script>
 
-<!-- Mobile Dropdown Menu -->
-<div class="sticky top-0 z-30 w-screen flex justify-end -mb-12 lg:hidden pr-3">
-  <div class="dropdown dropdown-bottom dropdown-end">
-    <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
-    <!-- svelte-ignore a11y-label-has-associated-control -->
-    <label
-      tabindex="0"
-      class="btn btn-xs btn-outline btn-secondary m-1 bg-indigo"
-      aria-haspopup="true"
-      aria-expanded="false"
-    >
-      <iconify-icon icon="mdi:hamburger-menu" />
-    </label>
-    <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
-    <ul
-      tabindex="0"
-      class="dropdown-content menu p-2 shadow bg-base-100 rounded-box text-secondary z-10 w-52"
-    >
-      <li><a href={Config.Path.openApp}>Open App</a></li>
-      <li><a href="#About">About</a></li>
-      <li><a href="#TheShow">Show</a></li>
-      <li><a href="#FAQ">FAQ</a></li>
-      <li><a href="#Creators">Creators</a></li>
-      <li><a href="#Token">Token</a></li>
-      <li><a href="#Contact">Contact</a></li>
-      <li><a href={Config.Path.signup}>Sign Up</a></li>
 
-      <li><a href="/">Back to Top</a></li>
-    </ul>
-  </div>
-</div>
 
 <!-- Desktop Navbar -->
-<div
-  class="lg:sticky lg:top-0 lg:z-50 bg-gradient-to-r from-[#0C082E] to-[#0C092E]"
->
-  <div class="flex flex-col lg:flex-row items-center w-screen">
-    <div class="max-w-[600px] lg:max-w-[280px]">
-      <a href="/">
+
+  <div class="flex justify-between items-center bg-base-100">
+
+      <a href="/" class="w-[180px] lg:w-[280px]">
         <img
           alt="logo"
           src="{Config.Path.staticUrl}/assets/logo-horizontal-tr.png"
-          class="w-auto my-auto mt-1 lg:ml-10 mr-2"
+          class=""
         />
       </a>
-    </div>
-    <div class="hidden lg:flex w-full ml-10">
-      <div class="navbar-center py-2 lg:flex w-full justify-end">
-        <ul class="menu menu-horizontal px-4 mt-2 mr-10 min-w-full justify-end">
+
+
+      <!-- Desktop links with full items -->
+    <ul class="hidden lg:flex items-center gap-4 p-4">
+          {#each links as link}
+            <li>
+              {#if link.name == "Sign Up"}
+                <a
+                  class="btn btn-ghost bg-gradient-to-r from-primary to-pink-500 text-black whitespace-nowrap hover:shadow-[0px_0px_17px_6px_#e779c1]"
+                  href={link.href}>{link.name}</a
+                >
+              {:else if link.name == "Open App"}
+              <a
+                class="btn flex flex-nowrap hover:text-primary bg-[#e779c122]"
+                class:text-primary={link.href == $page.url.hash}
+                href={link.href}>
+                <span class="block whitespace-nowrap">{link.name}</span>
+                <img src="/icons/champagne bottles_01.png" alt="champagne icon" class="block h-8">
+                </a
+              >
+              {:else}
+              <a
+                class="btn btn-ghost whitespace-nowrap hover:text-primary hover:bg-[#e779c122]"
+                class:text-primary={link.href == $page.url.hash}
+                href={link.href}>{link.name}</a
+              >
+              {/if}
+            </li>
+          {/each}
+    </ul>
+
+    <!-- Mobile navbar -->
+    <div class="lg:hidden flex items-center">
+      <ul class="hidden sm:flex items-center gap-2 p-2">
+        {#each links as link}
           <li>
+            {#if link.name == "Sign Up"}
+              <a
+                class="btn btn-ghost bg-gradient-to-r from-primary to-pink-500 text-black whitespace-nowrap hover:shadow-[0px_0px_17px_6px_#e779c1]"
+                href={link.href}>{link.name}</a
+              >
+            {:else if link.name == "Open App"}
             <a
-              class="btn btn-sm btn-outline btn-secondary mt-2 ml-3"
-              href="#About">About</a
+              class="btn flex flex-nowrap hover:text-primary bg-[#e779c122]"
+              class:text-primary={link.href == $page.url.hash}
+              href={link.href}>
+              <span class="block whitespace-nowrap">{link.name}</span>
+              <img src="/icons/champagne bottles_01.png" alt="champagne icon" class="block h-8">
+              </a
             >
+            {/if}
           </li>
-          <li>
-            <a
-              class="btn btn-sm btn-outline btn-secondary mt-2 ml-3"
-              href="#TheShow">Show</a
-            >
-          </li>
-          <li>
-            <a
-              class="btn btn-sm btn-outline btn-secondary mt-2 ml-3"
-              href="#FAQ">FAQ</a
-            >
-          </li>
-          <li>
-            <a
-              class="btn btn-sm btn-outline btn-secondary mt-2 ml-3"
-              href="#Creators">Creators</a
-            >
-          </li>
-          <li>
-            <a
-              class="btn btn-sm btn-outline btn-secondary mt-2 ml-3"
-              href="#Token">Token</a
-            >
-          </li>
-          <li>
-            <a
-              class="btn btn-sm btn-outline btn-secondary mt-2 ml-3"
-              href="#Contact">Contact</a
-            >
-          </li>
-          <li>
-            <a
-              class="btn btn-sm btn-outline btn-secondary mt-2 ml-3"
-              href={Config.Path.signup}>Sign Up</a
-            >
-          </li>
-          <li>
-            <a
-              class="btn btn-outline btn-primary whitespace-nowrap shadow-[0px_0px_17px_6px_#e779c1] btn-sm mt-2 ml-3"
-              href={Config.Path.openApp}>Open App</a
-            >
-          </li>
-        </ul>
-      </div>
-    </div>
-    <!-- Mobile App Button -->
-    <div class="lg:hidden flex w-full mt-6 mb-4 place-content-center">
-      <a
-        class="btn btn-outline btn-primary whitespace-nowrap shadow-[0px_0px_17px_6px_#e779c1]"
-        href={Config.Path.openApp}>Open App</a
-      >
-    </div>
+        {/each}
+    </ul>
+      <label for="rigthDrawer" aria-label="open sidebar" class="btn btn-square btn-ghost mr-2">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-6 h-6 stroke-current"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+    </label>
+
   </div>
-  <div class="divider m-0 -mt-2" />
+
+  </div>
+
+
+  <!-- Drawer content-->
+<div class="drawer drawer-end z-50">
+  <input id="rigthDrawer" type="checkbox" class="drawer-toggle" />
+  <div class="drawer-content">
+    <!-- Page content here -->
+    
+  </div> 
+  <div class="drawer-side">
+    <label for="rigthDrawer" aria-label="close sidebar" class="drawer-overlay"></label>
+    <ul class="p-4 w-80 min-h-full bg-base-100 gap-4 flex flex-col">
+      {#each links.toReversed() as link}
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <li on:click={closeNav}>
+          {#if link.name == "Sign Up"}
+            <a
+              class="btn btn-ghost btn-block bg-gradient-to-r from-primary to-pink-500 text-black whitespace-nowrap hover:shadow-[0px_0px_17px_6px_#e779c1]"
+              href={link.href}>{link.name}</a
+            >
+          {:else if link.name == "Open App"}
+          <a
+            class="btn flex flex-nowrap hover:text-primary bg-[#e779c122]"
+            class:text-primary={link.href == $page.url.hash}
+            href={link.href}>
+            <span class="block whitespace-nowrap">{link.name}</span>
+            <img src="/icons/champagne bottles_01.png" alt="champagne icon" class="block h-8">
+            </a
+          >
+          {:else}
+          <a
+            class="btn btn-ghost btn-block whitespace-nowrap hover:text-primary hover:bg-[#e779c122]"
+            class:text-primary={link.href == $page.url.hash}
+            href={link.href}>{link.name}</a
+          >
+          {/if}
+        </li>
+      {/each}
+</ul>
+  </div>
 </div>
