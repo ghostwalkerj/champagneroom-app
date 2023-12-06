@@ -15,11 +15,11 @@
   export let form: ActionData;
 </script>
 
-<div class="flex mt-20 w-screen items-center" id="topPage">
+<div class="flex mt-20 justify-center  items-center" id="topPage">
   <div
-    class="flex flex-col lg:flex-row items-center lg:space-x-4 space-y-4 lg:pr-20"
+    class="flex flex-col lg:flex-row items-center space-y-4"
   >
-    <div class="w-full pl-5 lg:pl-20">
+    <div class="w-full pl-5">
       <h2
         class="text-info text-center font-bold leading-none text-[41px] lg:text-left mb-6 font-CaviarDreams px-6"
       >
