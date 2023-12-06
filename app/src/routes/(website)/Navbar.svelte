@@ -1,6 +1,6 @@
 <script lang="ts">
   import Config from '$lib/config';
-  import {page} from '$app/stores';
+  import { page } from '$app/stores';
 
   const links = [
     { name: 'About', href: '#About' },
@@ -10,128 +10,150 @@
     { name: 'Token', href: '#Token' },
     { name: 'Contact', href: '#Contact' },
     { name: 'Open App', href: Config.Path.openApp },
-    { name: 'Sign Up', href: Config.Path.signup },
+    { name: 'Sign Up', href: Config.Path.signup }
   ];
 
-  function closeNav(){
+  function closeNav() {
     const drawer = document.getElementById('rigthDrawer') as HTMLInputElement;
     drawer.checked = false;
   }
-  
 </script>
-
-
 
 <!-- Desktop Navbar -->
 
-  <div class="flex justify-between items-center bg-base-100">
+<div class="flex justify-between items-center">
+  <a href="/" class="w-[180px] lg:w-[280px]">
+    <img
+      alt="logo"
+      src="{Config.Path.staticUrl}/assets/logo-horizontal-tr.png"
+      class=""
+    />
+  </a>
 
-      <a href="/" class="w-[180px] lg:w-[280px]">
-        <img
-          alt="logo"
-          src="{Config.Path.staticUrl}/assets/logo-horizontal-tr.png"
-          class=""
-        />
-      </a>
+  <!-- Desktop links with full items -->
+  <ul class="hidden lg:flex items-center gap-4 p-4">
+    {#each links as link}
+      <li>
+        {#if link.name == 'Sign Up'}
+          <a
+            class="btn btn-ghost bg-gradient-to-r from-primary to-pink-500 text-black whitespace-nowrap hover:shadow-[0px_0px_17px_6px_#e779c1]"
+            href={link.href}>{link.name}</a
+          >
+        {:else if link.name == 'Open App'}
+          <a
+            class="btn flex flex-nowrap hover:text-primary bg-[#e779c122]"
+            class:text-primary={link.href == $page.url.hash}
+            href={link.href}
+          >
+            <span class="block whitespace-nowrap">{link.name}</span>
+            <img
+              src="/icons/champagne bottles_01.png"
+              alt="champagne icon"
+              class="block h-8"
+            />
+          </a>
+        {:else}
+          <a
+            class="btn btn-ghost whitespace-nowrap hover:text-primary hover:bg-[#e779c122]"
+            class:text-primary={link.href == $page.url.hash}
+            href={link.href}>{link.name}</a
+          >
+        {/if}
+      </li>
+    {/each}
+  </ul>
 
-
-      <!-- Desktop links with full items -->
-    <ul class="hidden lg:flex items-center gap-4 p-4">
-          {#each links as link}
-            <li>
-              {#if link.name == "Sign Up"}
-                <a
-                  class="btn btn-ghost bg-gradient-to-r from-primary to-pink-500 text-black whitespace-nowrap hover:shadow-[0px_0px_17px_6px_#e779c1]"
-                  href={link.href}>{link.name}</a
-                >
-              {:else if link.name == "Open App"}
-              <a
-                class="btn flex flex-nowrap hover:text-primary bg-[#e779c122]"
-                class:text-primary={link.href == $page.url.hash}
-                href={link.href}>
-                <span class="block whitespace-nowrap">{link.name}</span>
-                <img src="/icons/champagne bottles_01.png" alt="champagne icon" class="block h-8">
-                </a
-              >
-              {:else}
-              <a
-                class="btn btn-ghost whitespace-nowrap hover:text-primary hover:bg-[#e779c122]"
-                class:text-primary={link.href == $page.url.hash}
-                href={link.href}>{link.name}</a
-              >
-              {/if}
-            </li>
-          {/each}
-    </ul>
-
-    <!-- Mobile navbar -->
-    <div class="lg:hidden flex items-center">
-      <ul class="hidden sm:flex items-center gap-2 p-2">
-        {#each links as link}
-          <li>
-            {#if link.name == "Sign Up"}
-              <a
-                class="btn btn-ghost bg-gradient-to-r from-primary to-pink-500 text-black whitespace-nowrap hover:shadow-[0px_0px_17px_6px_#e779c1]"
-                href={link.href}>{link.name}</a
-              >
-            {:else if link.name == "Open App"}
+  <!-- Mobile navbar -->
+  <div class="lg:hidden flex items-center">
+    <ul class="hidden sm:flex items-center gap-2 p-2">
+      {#each links as link}
+        <li>
+          {#if link.name == 'Sign Up'}
+            <a
+              class="btn btn-ghost bg-gradient-to-r from-primary to-pink-500 text-black whitespace-nowrap hover:shadow-[0px_0px_17px_6px_#e779c1]"
+              href={link.href}>{link.name}</a
+            >
+          {:else if link.name == 'Open App'}
             <a
               class="btn flex flex-nowrap hover:text-primary bg-[#e779c122]"
               class:text-primary={link.href == $page.url.hash}
-              href={link.href}>
-              <span class="block whitespace-nowrap">{link.name}</span>
-              <img src="/icons/champagne bottles_01.png" alt="champagne icon" class="block h-8">
-              </a
+              href={link.href}
             >
-            {/if}
-          </li>
-        {/each}
+              <span class="block whitespace-nowrap">{link.name}</span>
+              <img
+                src="/icons/champagne bottles_01.png"
+                alt="champagne icon"
+                class="block h-8"
+              />
+            </a>
+          {/if}
+        </li>
+      {/each}
     </ul>
-      <label for="rigthDrawer" aria-label="open sidebar" class="btn btn-square btn-ghost mr-2">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-6 h-6 stroke-current"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+    <label
+      for="rigthDrawer"
+      aria-label="open sidebar"
+      class="btn btn-square btn-ghost mr-2"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        class="inline-block w-6 h-6 stroke-current"
+        ><path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M4 6h16M4 12h16M4 18h16"
+        /></svg
+      >
     </label>
-
   </div>
+</div>
 
-  </div>
-
-
-  <!-- Drawer content-->
+<!-- Drawer content-->
 <div class="drawer drawer-end z-50">
   <input id="rigthDrawer" type="checkbox" class="drawer-toggle" />
   <div class="drawer-content">
     <!-- Page content here -->
-    
-  </div> 
+  </div>
   <div class="drawer-side">
-    <label for="rigthDrawer" aria-label="close sidebar" class="drawer-overlay"></label>
+    <label
+      for="rigthDrawer"
+      aria-label="close sidebar"
+      class="drawer-overlay"
+    />
     <ul class="p-4 w-80 min-h-full bg-base-100 gap-4 flex flex-col">
       {#each links.toReversed() as link}
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <li on:click={closeNav}>
-          {#if link.name == "Sign Up"}
+          {#if link.name == 'Sign Up'}
             <a
               class="btn btn-ghost btn-block bg-gradient-to-r from-primary to-pink-500 text-black whitespace-nowrap hover:shadow-[0px_0px_17px_6px_#e779c1]"
               href={link.href}>{link.name}</a
             >
-          {:else if link.name == "Open App"}
-          <a
-            class="btn flex flex-nowrap hover:text-primary bg-[#e779c122]"
-            class:text-primary={link.href == $page.url.hash}
-            href={link.href}>
-            <span class="block whitespace-nowrap">{link.name}</span>
-            <img src="/icons/champagne bottles_01.png" alt="champagne icon" class="block h-8">
-            </a
-          >
+          {:else if link.name == 'Open App'}
+            <a
+              class="btn flex flex-nowrap hover:text-primary bg-[#e779c122]"
+              class:text-primary={link.href == $page.url.hash}
+              href={link.href}
+            >
+              <span class="block whitespace-nowrap">{link.name}</span>
+              <img
+                src="/icons/champagne bottles_01.png"
+                alt="champagne icon"
+                class="block h-8"
+              />
+            </a>
           {:else}
-          <a
-            class="btn btn-ghost btn-block whitespace-nowrap hover:text-primary hover:bg-[#e779c122]"
-            class:text-primary={link.href == $page.url.hash}
-            href={link.href}>{link.name}</a
-          >
+            <a
+              class="btn btn-ghost btn-block whitespace-nowrap hover:text-primary hover:bg-[#e779c122]"
+              class:text-primary={link.href == $page.url.hash}
+              href={link.href}>{link.name}</a
+            >
           {/if}
         </li>
       {/each}
-</ul>
+    </ul>
   </div>
 </div>
