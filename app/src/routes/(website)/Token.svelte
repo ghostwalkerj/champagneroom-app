@@ -10,9 +10,9 @@
   </h2>
 </div>
 
-<div class="flex w-screen" id="page1">
+<div class="flex gap-4" id="page1">
   <div class="mx-auto flex flex-col lg:flex-row items-center">
-    <div class="w-full px-4 lg:px-20">
+    <div class="w-full px-4">
       <h2
         class="text-info text-center font-bold leading-none text-3xl lg:text-[41px] lg:text-left mb-6 font-CaviarDreams"
       >
@@ -27,14 +27,14 @@
         tokens.
       </ul>
     </div>
-    <div class="w-full p-10 lg:pr-16">
-      <div class="w-auto">
+    <div class="p-6">
+      <div class="">
         <video
           autoplay
           loop
           controls
           muted
-          class="opacity-80 rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1] max-w-full h-auto"
+          class="opacity-80 rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1]"
         >
           <source
             src="{Config.Path.staticUrl}/assets/champagneroomtoken.mp4"
