@@ -1,6 +1,6 @@
 {
   "name": "champagneroom",
-  "version": "1.0.81",
+  "version": "1.0.82",
   "license": "UNLICENSED",
   "files": [
     "dist"
@@ -127,7 +127,6 @@
     "svelte-qrcode-image": "^1.0.0-rc.2",
     "svelte-star-rating": "^2.0.1",
     "svelte-table": "^0.5.11",
-    "timeago": "^1.6.7",
     "timeago.js": "^4.0.2",
     "tiny-parse-argv": "^2.2.0",
     "ua-parser-js": "^1.0.35",
