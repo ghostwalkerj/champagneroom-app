@@ -460,7 +460,7 @@
           Enter your Stage Name
         </div>
         <div class="w-full flex place-content-center">
-          <div class="form-control max-w-xs p-4">
+          <div class="daisy-form-control max-w-xs p-4">
             <!-- svelte-ignore a11y-label-has-associated-control -->
             <input
               type="text"

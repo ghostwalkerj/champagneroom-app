@@ -193,7 +193,7 @@
       id="changeUrl-show-modal"
       class="daisy-modal-toggle"
     />
-    <div class="daisy-modal modal-open">
+    <div class="daisy-modal daisy-modal-open">
       <div class="daisy-modal-box">
         <h3 class="font-bold text-lg">Change Creator URL</h3>
         <p class="py-4">

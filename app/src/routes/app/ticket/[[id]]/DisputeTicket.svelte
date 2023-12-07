@@ -33,7 +33,7 @@
       class="daisy-btn daisy-btn-sm daisy-btn-circle absolute right-2 top-2"
       >✕</label
     >
-    <h3 class="text-lg text-center font-semibold mb-4">Initiate Dispute</h3>
+    <h3 class="text-lg lg:text-xl font-bold text-center">Initiate Dispute</h3>
 
     <!-- Form -->
     <form
@@ -43,11 +43,14 @@
       class="space-y-4"
     >
       <!-- Reason for Dispute Dropdown -->
-      <div class="form-control">
+      <div class="daisy-form-control">
         <label for="reason" class="daisy-label">
           <span class="daisy-label-text">Reason</span>
         </label>
-        <select class="daisy-select daisy-select-bordered w-full" name="reason">
+        <select
+          class="daisy-select daisy-select-bordered daisy-select-primary w-full"
+          name="reason"
+        >
           <option disabled selected>Reason for the Dispute</option>
           {#each reasons as reason}
             <option>{reason}</option>
@@ -61,11 +64,14 @@
         </div>{/if}
 
       <!-- Explanation Textarea -->
-      <div class="form-control">
+      <div class="daisy-form-control">
         <label for="explanation" class="daisy-label">
           <span class="daisy-label-text">Explanation</span>
         </label>
-        <textarea name="explanation" class="textarea textarea-bordered h-24" />
+        <textarea
+          name="explanation"
+          class="daisy-textarea daisy-textarea-bordered daisy-textarea-primary h-24"
+        />
       </div>
 
       <!-- Submit Button -->

@@ -230,8 +230,8 @@
             >
               <input type="hidden" name="parseId" value={parseId} />
               <input type="hidden" name="type" value={type} />
-              <div class="max-w-xs w-full py-2 form-control">
-                <div class="max-w-xs w-full py-2 form-control">
+              <div class="max-w-xs w-full py-2 daisy-form-control">
+                <div class="max-w-xs w-full py-2 daisy-form-control">
                   <label for="pin" class="daisy-label">
                     <span class="daisy-label-text">Password</span></label
                   >
@@ -284,8 +284,8 @@
             <form method="post" action="?/pin_auth" use:enhance={onSubmit}>
               <input type="hidden" name="parseId" value={parseId} />
               <input type="hidden" name="type" value={type} />
-              <div class="max-w-xs w-full py-2 form-control">
-                <div class="max-w-xs w-full py-2 form-control">
+              <div class="max-w-xs w-full py-2 daisy-form-control">
+                <div class="max-w-xs w-full py-2 daisy-form-control">
                   <label for="pin" class="daisy-label">
                     <span class="daisy-label-text">8 Digit Pin</span></label
                   >

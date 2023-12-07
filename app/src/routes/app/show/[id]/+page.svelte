@@ -97,7 +97,7 @@
               class="font-Roboto w-full lg:max-w-xs"
             >
               <input type="hidden" name="profileImage" value={profileImage} />
-              <div class="py-2 form-control">
+              <div class="py-2 daisy-form-control">
                 <label for="caller" class="daisy-label">
                   <span class="daisy-label-text">Your Name</span>
                 </label>
@@ -113,7 +113,7 @@
                   </div>
                 {/if}
               </div>
-              <div class="py-2 form-control">
+              <div class="py-2 daisy-form-control">
                 <label for="pin" class="daisy-label">
                   <span class="daisy-label-text">8 Digit Pin</span>
                 </label>

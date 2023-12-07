@@ -23,7 +23,7 @@
 </script>
 
 <input type="checkbox" id="restart-show-modal" class="daisy-modal-toggle" />
-<div class="daisy-modal modal-open">
+<div class="daisy-modal daisy-modal-open">
   <div class="daisy-modal-box">
     <h3 class="font-bold text-lg">You have Stopped the Show</h3>
     <p class="py-4">

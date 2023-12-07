@@ -53,7 +53,7 @@
         <div
           class="flex flex-col lg:flex-row text-white p-2 justify-center items-center gap-4"
         >
-          <div class="form-control flex-grow">
+          <div class="daisy-form-control flex-grow">
             <!-- svelte-ignore a11y-label-has-associated-control -->
             <label class="daisy-label">
               <span class="daisy-label-text">Title</span>
@@ -73,7 +73,7 @@
             {/if}
           </div>
 
-          <div class="form-control lg:w-40">
+          <div class="daisy-form-control lg:w-40">
             <!-- svelte-ignore a11y-label-has-associated-control -->
             <label for="price" class="daisy-label">
               <span class="daisy-label-text">Ticket Price in USD</span></label
@@ -123,7 +123,7 @@
             name="coverImageUrl"
             value={creator.user.profileImageUrl}
           />
-          <div class="form-control lg:w-1/5">
+          <div class="daisy-form-control lg:w-1/5">
             <!-- svelte-ignore a11y-label-has-associated-control -->
             <label class="daisy-label">
               <span class="daisy-label-text whitespace-nowrap"

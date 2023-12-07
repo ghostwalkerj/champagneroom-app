@@ -28,11 +28,11 @@
     >
     <h3 class="text-lg lg:text-xl font-bold text-center">Leave Feedback</h3>
     <form method="post" action="?/leave_feedback" use:enhance={onSubmit}>
-      <div class="py-2 form-control">
+      <div class="py-2 daisy-form-control">
         <label for="rating" class="daisy-label">
           <span class="daisy-label-text">Rating</span>
         </label>
-        <div class="daisy-rating rating-lg">
+        <div class="daisy-rating daisy-rating-lg">
           <input
             type="radio"
             name="rating"
@@ -77,14 +77,14 @@
           </div>
         {/if}
       </div>
-      <div class="w-full py-2 form-control">
+      <div class="w-full py-2 daisy-form-control">
         <label for="review" class="daisy-label">
           <span class="daisy-label-text">Review</span></label
         >
         <div class="rounded-md shadow-sm mt-1 relative">
           <textarea
             name="review"
-            class="textarea textarea-lg textarea-primary w-full"
+            class="daisy-textarea daiy-textarea-lg daisy-textarea-primary w-full"
             value={form?.review ?? ''}
           />
         </div>

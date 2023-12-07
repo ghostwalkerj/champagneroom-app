@@ -249,20 +249,22 @@
       id="changeUrl-show-modal"
       class="daisy-modal-toggle"
     />
-    <div class="daisy-modal modal-open">
+    <div class="daisy-modal daisy-modal-open">
       <div class="daisy-modal-box">
-        <h3 class="font-bold text-lg">Dispute Decision</h3>
-        <select
-          class="daisy-select daisy-select-primary w-full max-w-xs"
-          name="decision"
-          bind:value={decision}
-        >
-          <option disabled selected>Decision</option>
+        <h3 class="text-lg lg:text-xl font-bold">Dispute Decision</h3>
+        <div class="py-2 daisy-form-control">
+          <select
+            class="daisy-select daisy-select-primary w-full max-w-xs"
+            name="decision"
+            bind:value={decision}
+          >
+            <option disabled selected>Decision</option>
 
-          {#each decisions as decision}
-            <option>{decision}</option>
-          {/each}
-        </select>
+            {#each decisions as decision}
+              <option>{decision}</option>
+            {/each}
+          </select>
+        </div>
         <div class="daisy-modal-action">
           <button class="daisy-btn" on:click={() => (isDecideDispute = false)}
             >Cancel</button
@@ -281,7 +283,7 @@
       id="changeUrl-show-modal"
       class="daisy-modal-toggle"
     />
-    <div class="daisy-modal modal-open">
+    <div class="daisy-modal daisy-modal-open">
       <div class="daisy-modal-box">
         <h3 class="font-bold text-lg">Change Secret URL</h3>
         <p class="py-4">
