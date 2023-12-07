@@ -56,18 +56,21 @@
         nameDiv.innerText = agent.user.name;
         return;
       }
-      const defaultCommission = parseInt(commissionDiv.textContent);
+      const defaultCommissionRate = parseInt(commissionDiv.textContent);
       if (
-        isNaN(defaultCommission) ||
-        defaultCommission < 0 ||
-        defaultCommission > 100
+        isNaN(defaultCommissionRate) ||
+        defaultCommissionRate < 0 ||
+        defaultCommissionRate > 100
       ) {
-        commissionDiv.innerText = agent.defaultCommission.toString();
+        commissionDiv.innerText = agent.defaultCommissionRate.toString();
         return;
       }
       let formData = new FormData();
       formData.append('name', nameDiv.innerText);
-      formData.append('defaultCommission', defaultCommission.toString());
+      formData.append(
+        'defaultCommissionRate',
+        defaultCommissionRate.toString()
+      );
       const response = await fetch('?/update_agent', {
         method: 'POST',
         body: formData
@@ -75,7 +78,7 @@
       const result: ActionResult = deserialize(await response.text());
       if (result.type === 'success') {
         agent.user.name = nameDiv.innerText;
-        agent.defaultCommission = defaultCommission;
+        agent.defaultCommissionRate = defaultCommissionRate;
         invalidateAll();
       }
     }
@@ -109,7 +112,7 @@
               on:blur={updateAgent}
               bind:this={commissionDiv}
             >
-              {agent.defaultCommission}
+              {agent.defaultCommissionRate}
             </div>
             <div>%</div>
           </div>

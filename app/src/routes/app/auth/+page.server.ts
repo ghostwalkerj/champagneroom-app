@@ -142,7 +142,6 @@ export const actions: Actions = {
         user = (await User.findOne(query)) as UserDocument;
         if (!user) {
           console.error('No user');
-          console.log('query', query);
           throw error(500, 'No user');
         }
         break;

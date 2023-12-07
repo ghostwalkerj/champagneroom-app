@@ -52,7 +52,7 @@
   let agentAddress = '';
   let creatorNameElement: HTMLTableCellElement;
   let creatorCommissionElement: HTMLTableCellElement;
-  let commission = Config.UI.defaultCommission;
+  let commission = Config.UI.defaultCommissionRate;
   let creatorName = uniqueNamesGenerator({
     dictionaries: [womensNames]
   });
@@ -120,7 +120,7 @@
     formData.append('name', name || creator.user.name);
     formData.append(
       'commission',
-      commission ? commission.toString() : creator.agentCommission.toString()
+      commission ? commission.toString() : creator.commissionRate.toString()
     );
     formData.append(
       'active',
@@ -144,7 +144,7 @@
   };
 
   const updateCommission = (commission: number) => {
-    creators[activeCreatorRow].agentCommission = commission;
+    creators[activeCreatorRow].commissionRate = commission;
     updateCreator(activeCreatorRow, { commission });
   };
 
@@ -627,7 +627,7 @@
                               contenteditable="true"
                               on:blur={(event) => {
                                 updateCommission(event.target?.textContent);
-                              }}>{creator.agentCommission}</td
+                              }}>{creator.commissionRate}</td
                             >
                             <td>
                               <select

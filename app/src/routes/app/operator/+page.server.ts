@@ -60,7 +60,7 @@ export const actions: Actions = {
       });
       const agent = await Agent.create({
         user: user._id,
-        defaultCommission: Config.UI.defaultCommission
+        defaultCommissionRate: Config.UI.defaultCommissionRate
       });
 
       return {
@@ -109,7 +109,7 @@ export const actions: Actions = {
       });
       const creator = await Creator.create({
         user: user._id,
-        agentCommission: +commission,
+        commissionRate: +commission,
         agent,
         profileImageUrl: Config.UI.defaultProfileImage
       });
@@ -160,7 +160,7 @@ export const actions: Actions = {
           _id: creatorId
         },
         {
-          agentCommission: +commission,
+          commissionRate: +commission,
           agent: new ObjectId(agentId)
         }
       );

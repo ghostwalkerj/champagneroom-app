@@ -24,7 +24,7 @@ const Config = {
   UI: {
     defaultProfileImage: 'https://static.champagneroom.app/profile/default.png',
     profileImagePath: 'https://static.champagneroom.app/profile',
-    defaultCommission: 10
+    defaultCommissionRate: 10
   },
   TIMER: {
     gracePeriod: 600_000,

@@ -2,26 +2,25 @@ import { Types } from 'mongoose';
 import { nanoid } from 'nanoid';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 
-import type { EarningsType, PayoutType } from '$lib/models/common.js';
-import type { ShowDocumentType } from '$lib/models/show.js';
-import type { TransactionDocumentType } from '$lib/models/transaction.js';
-import { type WalletDocumentType, WalletStatus } from '$lib/models/wallet.js';
+import type { EarningsType, PayoutType } from '$lib/models/common';
+import { EarningsSource } from '$lib/models/common';
+import type { CreatorDocumentType } from '$lib/models/creator';
+import type { ShowDocumentType } from '$lib/models/show';
+import type { TransactionDocumentType } from '$lib/models/transaction';
+import { type WalletDocumentType, WalletStatus } from '$lib/models/wallet';
 
-import { PayoutStatus } from '$lib/payment.js';
-
-enum WalletMachineEventString {
-  SHOW_EARNINGS_POSTED = 'SHOW EARNINGS POSTED',
-  PAYOUT_REQUESTED = 'PAYOUT REQUESTED',
-  PAYOUT_SENT = 'PAYOUT SENT',
-  PAYOUT_FAILED = 'PAYOUT FAILED',
-  PAYOUT_CANCELLED = 'PAYOUT CANCELLED',
-  PAYOUT_COMPLETE = 'PAYOUT COMPLETE'
-}
+import { PayoutStatus } from '$lib/payment';
 
 export type WalletMachineEventType =
   | {
       type: 'SHOW EARNINGS POSTED';
       show: ShowDocumentType;
+      creator: CreatorDocumentType;
+    }
+  | {
+      type: 'SHOW COMMISSION POSTED';
+      show: ShowDocumentType;
+      creator: CreatorDocumentType;
     }
   | {
       type: 'PAYOUT REQUESTED';
@@ -54,7 +53,15 @@ export type WalletMachineStateType = StateFrom<typeof createWalletMachine>;
 
 export type WalletMachineType = ReturnType<typeof createWalletMachine>;
 
-export { WalletMachineEventString };
+export enum WalletMachineEventString {
+  SHOW_EARNINGS_POSTED = 'SHOW EARNINGS POSTED',
+  SHOW_COMMISSION_POSTED = 'SHOW COMMISSION POSTED',
+  PAYOUT_REQUESTED = 'PAYOUT REQUESTED',
+  PAYOUT_SENT = 'PAYOUT SENT',
+  PAYOUT_FAILED = 'PAYOUT FAILED',
+  PAYOUT_CANCELLED = 'PAYOUT CANCELLED',
+  PAYOUT_COMPLETE = 'PAYOUT COMPLETE'
+}
 
 const createWalletMachine = ({
   wallet,
@@ -97,6 +104,9 @@ const createWalletMachine = ({
             'SHOW EARNINGS POSTED': {
               actions: 'showEarningsPosted'
             },
+            'SHOW COMMISSION POSTED': {
+              actions: 'showCommissionPosted'
+            },
             'PAYOUT REQUESTED': {
               actions: 'payoutRequested',
               target: 'payoutRequested'
@@ -128,22 +138,75 @@ const createWalletMachine = ({
     },
     {
       actions: {
-        showEarningsPosted: assign((context, event) => {
+        showCommissionPosted: assign((context, event) => {
           const wallet = context.wallet;
           const show = event.show;
           const earnings = wallet.earnings;
+          const commissionRate = event.creator.commissionRate;
           const hasShow = earnings.findIndex(
             (earning) => earning.show._id.toString() === show._id.toString()
           );
           if (earnings.length === 0 || hasShow === -1) {
             const amount =
-              show.showState.salesStats.totalRevenue.get(wallet.currency) || 0;
+              (show.showState.salesStats.totalRevenue.get(wallet.currency) ||
+                0) *
+              (commissionRate / 100);
             const earning = {
               earnedAt: new Date(),
               show: show._id,
               amount,
               currency: wallet.currency,
-              _id: new Types.ObjectId()
+              earningsSource: EarningsSource.COMMISSION,
+              earningPercentage: commissionRate
+            } as EarningsType;
+            if (options?.atomicUpdateCallback) {
+              options.atomicUpdateCallback(
+                {
+                  _id: wallet._id,
+                  earnings: {
+                    $not: {
+                      $elemMatch: { show: show._id }
+                    }
+                  }
+                },
+                {
+                  $inc: { balance: amount, availableBalance: amount },
+                  $push: {
+                    earnings: earning
+                  }
+                }
+              );
+            }
+            wallet.earnings.push(earning);
+            wallet.balance += amount;
+            wallet.availableBalance += amount;
+          }
+          return {
+            wallet
+          };
+        }),
+
+        showEarningsPosted: assign((context, event) => {
+          const wallet = context.wallet;
+          const creator = event.creator;
+          const show = event.show;
+          const earnings = wallet.earnings;
+          const takeHome = 100 - creator.commissionRate;
+          const hasShow = earnings.findIndex(
+            (earning) => earning.show._id.toString() === show._id.toString()
+          );
+          if (earnings.length === 0 || hasShow === -1) {
+            const amount =
+              (show.showState.salesStats.totalRevenue.get(wallet.currency) ||
+                0) *
+              (takeHome / 100);
+            const earning = {
+              earnedAt: new Date(),
+              show: show._id,
+              amount,
+              currency: wallet.currency,
+              earningsSource: EarningsSource.SHOW_PERFORMANCE,
+              earningPercentage: takeHome
             } as EarningsType;
             if (options?.atomicUpdateCallback) {
               options.atomicUpdateCallback(

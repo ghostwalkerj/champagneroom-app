@@ -61,7 +61,6 @@ const setLocals = async (decode: JwtPayload, locals: App.Locals) => {
     const user = await User.findOne(query);
     if (!user) {
       console.error('No user');
-      console.log('query', query);
       throw error(500, 'No user');
     }
     locals.user = user;

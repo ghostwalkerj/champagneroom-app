@@ -44,7 +44,7 @@ export const actions: Actions = {
     const address = data.get('address') as string;
     const message = data.get('message') as string;
     const signature = data.get('signature') as string;
-    const defaultCommission = data.get('defaultCommission') as string;
+    const defaultCommissionRate = data.get('defaultCommissionRate') as string;
 
     const returnPath = Config.Path.agent;
 
@@ -59,10 +59,10 @@ export const actions: Actions = {
     }
 
     if (
-      !defaultCommission ||
-      Number.isNaN(Number(defaultCommission)) ||
-      Number(defaultCommission) < 0 ||
-      Number(defaultCommission) > 100
+      !defaultCommissionRate ||
+      Number.isNaN(Number(defaultCommissionRate)) ||
+      Number(defaultCommissionRate) < 0 ||
+      Number(defaultCommissionRate) > 100
     ) {
       return fail(400, { badCommission: true });
     }
@@ -80,7 +80,7 @@ export const actions: Actions = {
 
         await Agent.create({
           user: user._id,
-          defaultCommission: Number(defaultCommission)
+          defaultCommissionRate: Number(defaultCommissionRate)
         });
 
         return {
@@ -105,7 +105,7 @@ export const actions: Actions = {
 
         await Agent.create({
           user: user._id,
-          defaultCommission: Number(defaultCommission)
+          defaultCommissionRate: Number(defaultCommissionRate)
         });
         return {
           success: true,

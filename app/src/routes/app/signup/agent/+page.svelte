@@ -288,7 +288,7 @@
           <input
             type="text"
             name="defaultCommission"
-            placeholder={Config.UI.defaultCommission.toString()}
+            placeholder={Config.UI.defaultCommissionRate.toString()}
             class="daisy-input daisy-input-bordered daisy-input-primary w-full max-w-xs daisy-input-sm"
           />
 

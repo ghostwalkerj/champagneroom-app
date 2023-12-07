@@ -23,22 +23,27 @@
   import type { ActionData, PageData } from './$types';
   import AgentDetail from './AgentDetail.svelte';
   import WeeklyBooking from './WeeklyBooking.svelte';
+  import type { Unsubscriber } from 'svelte/store';
+  import { onDestroy, onMount } from 'svelte';
+  import { AgentStore } from '$stores';
 
   export let data: PageData;
   let agent = data.agent as AgentDocumentType;
   let creators = data.creators as CreatorDocumentType[];
   let wallet = data.wallet as WalletDocumentType;
-  export let showData = data.showData as {
+  let showData = data.showData as {
     creatorId: string;
     currency: CurrencyType;
     amount: number;
   }[];
-  export let weeklyData = data.weeklyData as {
+  let weeklyData = data.weeklyData as {
     creatorId: string;
     dayOfWeek: number;
     bookings: number;
   }[];
-  export let form: ActionData;
+  let exchangeRate = +data.exchangeRate || 0;
+
+  let form: ActionData;
 
   let newCreatorModal: HTMLDialogElement;
   let newCreator: CreatorDocumentType | undefined;
@@ -49,19 +54,33 @@
   let creatorNameElement: HTMLTableCellElement;
   let creatorAddressElement: HTMLTableCellElement;
   let creatorCommissionElement: HTMLTableCellElement;
-  let commission =
-    agent.defaultCommission.toString() ||
-    Config.UI.defaultCommission.toString();
+  $: commission =
+    agent.defaultCommissionRate.toString() ||
+    Config.UI.defaultCommissionRate.toString();
   let creatorName = uniqueNamesGenerator({
     dictionaries: [womensNames]
   });
   let isChangeCreatorSecret = false;
+  let agentUnSub: Unsubscriber;
+
+  onMount(() => {
+    agentUnSub = AgentStore(agent).subscribe((_agent) => {
+      if (_agent) {
+        agent = _agent;
+        commission = agent.defaultCommissionRate.toString();
+      }
+    });
+  });
+
+  onDestroy(() => {
+    agentUnSub?.();
+  });
 
   const updateCreator = async (creator: CreatorDocumentType) => {
     let formData = new FormData();
     formData.append('creatorId', creator._id.toString());
     formData.append('name', creator.user.name || '');
-    formData.append('commission', creator.agentCommission.toString());
+    formData.append('commission', creator.commissionRate.toString());
     formData.append('active', creator.user.active.toString());
 
     await fetch('?/update_creator', {
@@ -78,10 +97,10 @@
   };
 
   const updateCommission = (commission: number) => {
-    if (commission != creators[activeRow].agentCommission) {
+    if (commission != creators[activeRow].commissionRate) {
       const index = activeRow;
 
-      creators[index].agentCommission = commission;
+      creators[index].commissionRate = commission;
       updateCreator(creators[index]);
     }
   };
@@ -124,7 +143,6 @@
         });
 
         creators = $page.data.creators;
-        console.log('creators', creators);
         newCreator = result.data.creator;
         newPassword = result.data.password;
         newCreatorModal.showModal();
@@ -345,7 +363,7 @@
                               contenteditable="true"
                               on:blur={(event) => {
                                 updateCommission(event.target?.textContent);
-                              }}>{creator.agentCommission}</td
+                              }}>{creator.commissionRate}</td
                             >
                             <td>
                               <select
@@ -448,7 +466,7 @@
                     </div>
                     <!-- Wallet -->
                     <div class="min-w-fit">
-                      <WalletDetail {wallet} {form} />
+                      <WalletDetail {wallet} {form} {exchangeRate} />
                     </div>
                   </div>
 

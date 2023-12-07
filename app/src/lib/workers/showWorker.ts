@@ -3,6 +3,7 @@ import { Worker } from 'bullmq';
 import type IORedis from 'ioredis';
 import { waitFor } from 'xstate/lib/waitFor';
 
+import { Agent } from '$lib/models/agent';
 import type {
   CancelType,
   DisputeType,
@@ -17,6 +18,7 @@ import { SaveState, Show, ShowStatus } from '$lib/models/show';
 import { createShowEvent } from '$lib/models/showEvent';
 import type { TicketDocument } from '$lib/models/ticket';
 import { Ticket, TicketStatus } from '$lib/models/ticket';
+import { Wallet } from '$lib/models/wallet';
 
 import {
   createShowMachineService,
@@ -85,24 +87,19 @@ export const getShowWorker = ({
 
         // From Ticket Machine
         case ShowMachineEventString.CUSTOMER_JOINED: {
-          return customerJoined(show, job.data.ticketId, job.data.customerName);
+          return customerJoined(show, job.data.ticketId);
         }
         case ShowMachineEventString.CUSTOMER_LEFT: {
-          return customerLeft(show, job.data.ticketId, job.data.customerName);
+          return customerLeft(show, job.data.ticketId);
         }
         case ShowMachineEventString.TICKET_SOLD: {
-          return ticketSold(
-            show,
-            job.data.ticketId,
-            job.data.sale,
-            job.data.customerName
-          );
+          return ticketSold(show, job.data.ticketId, job.data.sale);
         }
         case ShowMachineEventString.TICKET_REDEEMED: {
           return ticketRedeemed(show, job.data.ticketId);
         }
         case ShowMachineEventString.TICKET_RESERVED: {
-          return ticketReserved(show, job.data.ticketId, job.data.customerName);
+          return ticketReserved(show, job.data.ticketId);
         }
         case ShowMachineEventString.TICKET_REFUNDED: {
           return ticketRefunded(show, job.data.refund, job.data.ticketId);
@@ -589,10 +586,28 @@ const finalizeShow = async (
 
   walletService.send({
     type: WalletMachineEventString.SHOW_EARNINGS_POSTED,
-    show: updatedShow
+    show: updatedShow,
+    creator
   });
 
   walletService.stop();
+
+  //Send commission to agent
+  if (creator.agent && creator.commissionRate > 0) {
+    const agent = await Agent.findById(creator.agent).exec();
+    if (agent && agent.user.wallet) {
+      const walletService = await getWalletMachineServiceFromId(
+        agent.user.wallet.toString()
+      );
+      walletService.send({
+        type: WalletMachineEventString.SHOW_COMMISSION_POSTED,
+        show: updatedShow,
+        creator
+      });
+      walletService.stop();
+    }
+  }
+
   return 'success';
 };
 

@@ -79,7 +79,7 @@ export const userSchema = new Schema(
 
     password: {
       type: String,
-      maxLength: 50,
+      maxLength: 80,
       minLength: [8, 'Password is too short'],
       trim: true
     },
