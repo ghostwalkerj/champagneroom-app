@@ -14,7 +14,7 @@
 
   $: showDuration = 60;
 
-  export let creator: CreatorDocument;
+  export let creator: CreatorDocumentType;
   export let form: ActionData;
   export let isLoading = false;
   // eslint-disable-next-line @typescript-eslint/no-empty-function

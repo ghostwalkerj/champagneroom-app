@@ -23,6 +23,9 @@
   import type { ActionData, PageData } from './$types';
   import AgentDetail from './AgentDetail.svelte';
   import WeeklyBooking from './WeeklyBooking.svelte';
+  import type { Unsubscriber } from 'svelte/store';
+  import { onDestroy, onMount } from 'svelte';
+  import { AgentStore } from '$stores';
 
   export let data: PageData;
   let agent = data.agent as AgentDocumentType;
@@ -49,13 +52,27 @@
   let creatorNameElement: HTMLTableCellElement;
   let creatorAddressElement: HTMLTableCellElement;
   let creatorCommissionElement: HTMLTableCellElement;
-  let commission =
+  $: commission =
     agent.defaultCommissionRate.toString() ||
     Config.UI.defaultCommissionRate.toString();
   let creatorName = uniqueNamesGenerator({
     dictionaries: [womensNames]
   });
   let isChangeCreatorSecret = false;
+  let agentUnSub: Unsubscriber;
+
+  onMount(() => {
+    agentUnSub = AgentStore(agent).subscribe((_agent) => {
+      if (_agent) {
+        agent = _agent;
+        commission = agent.defaultCommissionRate.toString();
+      }
+    });
+  });
+
+  onDestroy(() => {
+    agentUnSub?.();
+  });
 
   const updateCreator = async (creator: CreatorDocumentType) => {
     let formData = new FormData();
@@ -124,7 +141,6 @@
         });
 
         creators = $page.data.creators;
-        console.log('creators', creators);
         newCreator = result.data.creator;
         newPassword = result.data.password;
         newCreatorModal.showModal();

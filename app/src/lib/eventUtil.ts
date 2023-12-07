@@ -1,4 +1,4 @@
-import * as timeago from 'timeago';
+import * as timeago from 'timeago.js';
 
 import type { ShowEventDocumentType } from '$lib/models/showEvent';
 

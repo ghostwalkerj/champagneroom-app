@@ -4,6 +4,7 @@ import { default as mongoose, default as pkg } from 'mongoose';
 import { nanoid } from 'nanoid';
 import validator from 'validator';
 
+import Config from '$lib/config';
 import { AuthType } from '$lib/constants';
 
 const { Schema, models } = pkg;
@@ -79,7 +80,7 @@ export const userSchema = new Schema(
 
     password: {
       type: String,
-      maxLength: 50,
+      maxLength: 80,
       minLength: [8, 'Password is too short'],
       trim: true
     },
@@ -107,7 +108,8 @@ export const userSchema = new Schema(
 
     profileImageUrl: {
       type: String,
-      required: true
+      required: true,
+      default: Config.UI.defaultProfileImage
     },
 
     referralCode: {
