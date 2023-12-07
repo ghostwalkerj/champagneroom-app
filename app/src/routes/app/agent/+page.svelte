@@ -178,7 +178,7 @@
       <div class="daisy-modal-action">
         <form method="dialog">
           <!-- if there is a button in form, it will close the modal -->
-          <button class="btn">Close</button>
+          <button class="daisy-btn">Close</button>
         </form>
       </div>
     {/if}
@@ -201,10 +201,13 @@
           create a new one.
         </p>
         <div class="daisy-modal-action">
-          <button class="btn" on:click={() => (isChangeCreatorSecret = false)}
-            >Cancel</button
+          <button
+            class="daisy-btn"
+            on:click={() => (isChangeCreatorSecret = false)}>Cancel</button
           >
-          <button class="btn" on:click={changeCreatorSecret}>Change</button>
+          <button class="daisy-btn" on:click={changeCreatorSecret}
+            >Change</button
+          >
         </div>
       </div>
     </div>
@@ -227,7 +230,7 @@
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <a
               class="daisy-tab"
-              class:tab-active={activeTab == 'Dashboard'}
+              class:daisy-tab-active={activeTab == 'Dashboard'}
               on:click={() => {
                 activeTab = 'Dashboard';
               }}>Dashboard</a
@@ -236,7 +239,7 @@
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <a
               class="daisy-tab"
-              class:tab-active={activeTab === 'Creators'}
+              class:daisy-tab-active={activeTab === 'Creators'}
               on:click={() => {
                 activeTab = 'Creators';
               }}>Creators</a
@@ -400,7 +403,7 @@
                             </td>
                             <td>{creator.feedbackStats.numberOfReviews}</td>
                             <td
-                              class="tooltip"
+                              class=" daisy-tooltip"
                               data-tip={creator.feedbackStats.averageRating.toFixed(
                                 2
                               )}

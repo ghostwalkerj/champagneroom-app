@@ -135,7 +135,7 @@
               min="15"
               max="120"
               bind:value={showDuration}
-              class="range"
+              class="daisy-range"
               step="15"
               name="duration"
             />

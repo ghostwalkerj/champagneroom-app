@@ -234,7 +234,7 @@
       <div class="daisy-modal-action">
         <form method="dialog">
           <!-- if there is a button in form, it will close the modal -->
-          <button class="btn">Close</button>
+          <button class="daisy-btn">Close</button>
         </form>
       </div>
     {/if}
@@ -264,10 +264,10 @@
           {/each}
         </select>
         <div class="daisy-modal-action">
-          <button class="btn" on:click={() => (isDecideDispute = false)}
+          <button class="daisy-btn" on:click={() => (isDecideDispute = false)}
             >Cancel</button
           >
-          <button class="btn" on:click={() => decideDispute(decision)}
+          <button class="daisy-btn" on:click={() => decideDispute(decision)}
             >Finalize</button
           >
         </div>
@@ -289,10 +289,11 @@
           create a new one.
         </p>
         <div class="daisy-modal-action">
-          <button class="btn" on:click={() => (isChangeCreatorSecret = false)}
-            >Cancel</button
+          <button
+            class="daisy-btn"
+            on:click={() => (isChangeCreatorSecret = false)}>Cancel</button
           >
-          <button class="btn" on:click={changeUserSecret}>Change</button>
+          <button class="daisy-btn" on:click={changeUserSecret}>Change</button>
         </div>
       </div>
     </div>
@@ -315,7 +316,7 @@
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <a
               class="daisy-tab"
-              class:tab-active={activeTab === 'Admin'}
+              class:daisy-tab-active={activeTab === 'Admin'}
               on:click={() => {
                 activeTab = 'Admin';
               }}>Admin</a
@@ -325,7 +326,7 @@
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <a
               class="daisy-tab"
-              class:tab-active={activeTab === 'Agents'}
+              class:daisy-tab-active={activeTab === 'Agents'}
               on:click={() => {
                 activeTab = 'Agents';
               }}>Agents</a
@@ -335,7 +336,7 @@
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <a
               class="daisy-tab"
-              class:tab-active={activeTab === 'Creators'}
+              class:daisy-tab-active={activeTab === 'Creators'}
               on:click={() => {
                 activeTab = 'Creators';
               }}>Creators</a
@@ -345,7 +346,7 @@
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <a
               class="daisy-tab"
-              class:tab-active={activeTab == 'Disputes'}
+              class:daisy-tab-active={activeTab == 'Disputes'}
               on:click={() => {
                 activeTab = 'Disputes';
               }}>Disputes</a
@@ -681,7 +682,7 @@
                             </td>
                             <td>{creator.feedbackStats.numberOfReviews}</td>
                             <td
-                              class="tooltip"
+                              class="daisy-tooltip"
                               data-tip={creator.feedbackStats.averageRating.toFixed(
                                 2
                               )}

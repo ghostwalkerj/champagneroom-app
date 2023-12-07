@@ -34,7 +34,7 @@
           />
         </div>
         <div
-          class="tooltip"
+          class="daisy-tooltip"
           data-tip={creator.feedbackStats.averageRating.toFixed(2)}
         >
           <StarRating rating={creator.feedbackStats.averageRating} />

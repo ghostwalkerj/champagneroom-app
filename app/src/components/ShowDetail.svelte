@@ -201,7 +201,7 @@
       <div class="text-center mt-2 lg:mt-4">
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <div
-          class="tooltip tooltip-secondary"
+          class="daisy-tooltip daisy-tooltip-secondary"
           data-tip="Send this link to your fans"
         >
           <div

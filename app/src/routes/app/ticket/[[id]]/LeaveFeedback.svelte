@@ -32,11 +32,11 @@
         <label for="rating" class="label">
           <span class="label-text">Rating</span>
         </label>
-        <div class="rating rating-lg">
+        <div class="daisy-rating rating-lg">
           <input
             type="radio"
             name="rating"
-            class="rating-hidden"
+            class="daisy-rating-hidden"
             value="0"
             checked
           />
@@ -44,31 +44,31 @@
             type="radio"
             name="rating"
             value="1"
-            class="mask mask-star-2 bg-primary"
+            class="daisy-mask daisy-mask-star-2 bg-primary"
           />
           <input
             type="radio"
             name="rating"
             value="2"
-            class="mask mask-star-2 bg-primary"
+            class="daisy-mask daisy-mask-star-2 bg-primary"
           />
           <input
             type="radio"
             name="rating"
             value="3"
-            class="mask mask-star-2 bg-primary"
+            class="daisy-mask daisy-mask-star-2 bg-primary"
           />
           <input
             type="radio"
             name="rating"
             value="4"
-            class="mask mask-star-2 bg-primary"
+            class="daisy-mask daisy-mask-star-2 bg-primary"
           />
           <input
             type="radio"
             name="rating"
             value="5"
-            class="mask mask-star-2 bg-primary"
+            class="daisy-mask daisy-mask-star-2 bg-primary"
           />
         </div>
         {#if form?.missingRating}
@@ -93,7 +93,7 @@
       <div class="py-4 text-center">
         {#if isLoading}
           <button
-            class="daisy-btn daisy-btn-secondary loading"
+            class="daisy-btn daisy-btn-secondary daisy-loading"
             type="submit"
             disabled={true}>Submitting</button
           >

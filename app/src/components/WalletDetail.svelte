@@ -79,7 +79,7 @@
       <div class="daisy-modal-action">
         <form method="dialog">
           <!-- if there is a button in form, it will close the modal -->
-          <button class="btn">Close</button>
+          <button class="daisy-btn">Close</button>
         </form>
       </div>
     </div>
@@ -151,7 +151,7 @@
               >Submit</button
             >
             <button
-              class="btn"
+              class="daisy-btn"
               on:click|preventDefault={() => withdrawModal.close()}
               >Cancel</button
             >

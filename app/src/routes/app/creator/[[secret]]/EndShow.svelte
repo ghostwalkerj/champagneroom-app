@@ -33,7 +33,7 @@
     </p>
     <div class="daisy-modal-action">
       <button
-        class="btn"
+        class="daisy-btn"
         on:click={() => {
           isLoading = true;
           onGoToShow();
@@ -41,7 +41,7 @@
         disabled={!canStartShow || isLoading}>Restart Show</button
       >
       <form method="post" action="?/end_show" use:enhance={onSubmit}>
-        <button class="btn" disabled={isLoading}>End Show</button>
+        <button class="daisy-btn" disabled={isLoading}>End Show</button>
       </form>
     </div>
   </div>

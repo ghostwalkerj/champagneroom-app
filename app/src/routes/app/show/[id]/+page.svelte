@@ -141,8 +141,9 @@
               </div>
               <div class="py-4 text-center">
                 {#if isLoading}
-                  <button class="daisy-btn daisy-btn-secondary loading" disabled
-                    >Reserving</button
+                  <button
+                    class="daisy-btn daisy-btn-secondary daisy-loading"
+                    disabled>Reserving</button
                   >
                 {:else}
                   <button

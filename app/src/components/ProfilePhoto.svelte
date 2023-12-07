@@ -123,7 +123,7 @@
     <div class="justify-center daisy-card-actions last:my-2">
       {#if !uploadReady}
         <label
-          class="custom-file-upload btn daisy-btn-xs daisy-btn-outline daisy-btn-secondary"
+          class="custom-file-upload daisy-btn daisy-btn-xs daisy-btn-outline daisy-btn-secondary"
           use:filedrop={options}
           on:filedrop={onChange}
         >
