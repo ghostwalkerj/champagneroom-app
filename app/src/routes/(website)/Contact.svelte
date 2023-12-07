@@ -67,7 +67,7 @@
               <option>Other</option>
             </select>
             {#if form?.missingInterest}
-              <div class="shadow-lg alert alert-error">
+              <div class="shadow-lg daisy-alert daisy-alert-error">
                 Interest is required
               </div>
             {/if}

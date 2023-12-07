@@ -52,8 +52,8 @@
               alt="show-screenshot"
               src="{Config.Path.staticUrl}/assets/show-screenshot.png"
               class="rounded-md overflow-hidden shadow-[0px_0px_17px_6px_#e779c1] max-w-full h-auto"
-              width={1280}
-              height={840}
+              width={550}
+              height={550}
             />
           </div>
         </div>
