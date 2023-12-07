@@ -183,7 +183,7 @@
             <div class="text-sm text-primary-content">
               ({currencyFormatter(CurrencyType.USD, 2).format(
                 availableBalance * exchangeRate
-              )})
+              )} USD)
             </div>
           {/if}
         </div>

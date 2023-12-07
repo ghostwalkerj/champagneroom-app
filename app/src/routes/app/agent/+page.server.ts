@@ -1,16 +1,26 @@
 import console from 'node:console';
 
 import { error, fail } from '@sveltejs/kit';
+import type { AxiosResponse } from 'axios';
 import { ObjectId } from 'mongodb';
 import { nanoid } from 'nanoid';
 import { generateSillyPassword } from 'silly-password-generator';
 import spacetime from 'spacetime';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 
-import { PASSWORD_SALT } from '$env/static/private';
+import {
+  BITCART_API_URL,
+  BITCART_EMAIL,
+  BITCART_PASSWORD,
+  JITSI_APP_ID,
+  JITSI_JWT_SECRET,
+  JWT_EXPIRY,
+  PASSWORD_SALT
+} from '$env/static/private';
+import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
 import type { AgentDocument } from '$lib/models/agent';
-import type { CurrencyType } from '$lib/models/common';
+import { CurrencyType } from '$lib/models/common';
 import { Creator } from '$lib/models/creator';
 import { Show } from '$lib/models/show';
 import type { UserDocument } from '$lib/models/user';
@@ -19,6 +29,8 @@ import { Wallet } from '$lib/models/wallet';
 
 import Config from '$lib/config';
 import { AuthType, EntityType } from '$lib/constants';
+import { rateCryptosRateGet } from '$lib/ext/bitcart';
+import { createAuthToken } from '$lib/payment';
 import { womensNames } from '$lib/womensNames';
 
 import type { Actions, PageServerLoad } from './$types';
@@ -292,6 +304,30 @@ export const load: PageServerLoad = async ({ locals }) => {
     }
   ]);
 
+  let exchangeRate = { data: {} };
+
+  if (wallet) {
+    const token = await createAuthToken(
+      BITCART_EMAIL,
+      BITCART_PASSWORD,
+      BITCART_API_URL
+    );
+
+    exchangeRate =
+      ((await rateCryptosRateGet(
+        {
+          currency: wallet.currency,
+          fiat_currency: CurrencyType.USD
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      )) as AxiosResponse<string>) || undefined;
+  }
+
   return {
     agent: agent.toObject({ flattenObjectIds: true, flattenMaps: true }),
     user: user
@@ -303,6 +339,7 @@ export const load: PageServerLoad = async ({ locals }) => {
     wallet: wallet
       ? wallet.toObject({ flattenObjectIds: true, flattenMaps: true })
       : undefined,
+    exchangeRate: exchangeRate?.data,
     showData: showData.map(
       (show) =>
         ({

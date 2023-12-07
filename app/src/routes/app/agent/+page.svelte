@@ -31,17 +31,19 @@
   let agent = data.agent as AgentDocumentType;
   let creators = data.creators as CreatorDocumentType[];
   let wallet = data.wallet as WalletDocumentType;
-  export let showData = data.showData as {
+  let showData = data.showData as {
     creatorId: string;
     currency: CurrencyType;
     amount: number;
   }[];
-  export let weeklyData = data.weeklyData as {
+  let weeklyData = data.weeklyData as {
     creatorId: string;
     dayOfWeek: number;
     bookings: number;
   }[];
-  export let form: ActionData;
+  let exchangeRate = +data.exchangeRate || 0;
+
+  let form: ActionData;
 
   let newCreatorModal: HTMLDialogElement;
   let newCreator: CreatorDocumentType | undefined;
@@ -464,7 +466,7 @@
                     </div>
                     <!-- Wallet -->
                     <div class="min-w-fit">
-                      <WalletDetail {wallet} {form} />
+                      <WalletDetail {wallet} {form} {exchangeRate} />
                     </div>
                   </div>
 

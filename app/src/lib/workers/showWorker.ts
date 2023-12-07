@@ -595,7 +595,7 @@ const finalizeShow = async (
   //Send commission to agent
   if (creator.agent && creator.commissionRate > 0) {
     const agent = await Agent.findById(creator.agent).exec();
-    if (agent) {
+    if (agent && agent.user.wallet) {
       const walletService = await getWalletMachineServiceFromId(
         agent.user.wallet.toString()
       );
