@@ -44,8 +44,8 @@
     >
       <!-- Reason for Dispute Dropdown -->
       <div class="form-control">
-        <label for="reason" class="label">
-          <span class="label-text">Reason</span>
+        <label for="reason" class="daisy-label">
+          <span class="daisy-label-text">Reason</span>
         </label>
         <select class="daisy-select daisy-select-bordered w-full" name="reason">
           <option disabled selected>Reason for the Dispute</option>
@@ -62,8 +62,8 @@
 
       <!-- Explanation Textarea -->
       <div class="form-control">
-        <label for="explanation" class="label">
-          <span class="label-text">Explanation</span>
+        <label for="explanation" class="daisy-label">
+          <span class="daisy-label-text">Explanation</span>
         </label>
         <textarea name="explanation" class="textarea textarea-bordered h-24" />
       </div>

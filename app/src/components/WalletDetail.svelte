@@ -96,7 +96,7 @@
         <form method="post" action="?/request_payout" use:enhance={onSubmit}>
           <input type="hidden" name="walletId" value={wallet._id.toString()} />
 
-          <div class="label-text mb-2">Amount in {wallet.currency}</div>
+          <div class="daisy-label-text mb-2">Amount in {wallet.currency}</div>
           <div class="flex items-center gap-2">
             <input
               type="text"
@@ -129,7 +129,7 @@
             </div>
           {/if}
 
-          <div class="label-text mb-2">Destination Address</div>
+          <div class="daisy-label-text mb-2">Destination Address</div>
           <input
             type="text"
             name="destination"

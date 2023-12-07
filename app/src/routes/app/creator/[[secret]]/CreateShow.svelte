@@ -55,8 +55,8 @@
         >
           <div class="form-control flex-grow">
             <!-- svelte-ignore a11y-label-has-associated-control -->
-            <label class="label">
-              <span class="label-text">Title</span>
+            <label class="daisy-label">
+              <span class="daisy-label-text">Title</span>
             </label>
             <input
               type="text"
@@ -75,8 +75,8 @@
 
           <div class="form-control lg:w-40">
             <!-- svelte-ignore a11y-label-has-associated-control -->
-            <label for="price" class="label">
-              <span class="label-text">Ticket Price in USD</span></label
+            <label for="price" class="daisy-label">
+              <span class="daisy-label-text">Ticket Price in USD</span></label
             >
             <div class="rounded-md shadow-sm relative">
               <div
@@ -125,8 +125,8 @@
           />
           <div class="form-control lg:w-1/5">
             <!-- svelte-ignore a11y-label-has-associated-control -->
-            <label class="label">
-              <span class="label-text whitespace-nowrap"
+            <label class="daisy-label">
+              <span class="daisy-label-text whitespace-nowrap"
                 >Duration ({durationFormatter(showDuration * 60)})</span
               >
             </label>

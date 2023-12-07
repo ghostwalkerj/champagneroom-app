@@ -271,8 +271,8 @@
 
             <!-- svelte-ignore a11y-label-has-associated-control -->
             {#if form?.badName}
-              <label class="label">
-                <span class="label-text-alt text-error"
+              <label class="daisy-label">
+                <span class="daisy-label-text-alt text-error"
                   >Between 3 and 50 characters</span
                 >
               </label>
@@ -294,8 +294,10 @@
 
           <!-- svelte-ignore a11y-label-has-associated-control -->
           {#if form?.badCommission}
-            <label class="label">
-              <span class="label-text-alt text-error">Between 0 and 100</span>
+            <label class="daisy-label">
+              <span class="daisy-label-text-alt text-error"
+                >Between 0 and 100</span
+              >
             </label>
           {/if}
         </div>

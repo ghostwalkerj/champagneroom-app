@@ -29,8 +29,8 @@
     <h3 class="text-lg lg:text-xl font-bold text-center">Leave Feedback</h3>
     <form method="post" action="?/leave_feedback" use:enhance={onSubmit}>
       <div class="py-2 form-control">
-        <label for="rating" class="label">
-          <span class="label-text">Rating</span>
+        <label for="rating" class="daisy-label">
+          <span class="daisy-label-text">Rating</span>
         </label>
         <div class="daisy-rating rating-lg">
           <input
@@ -78,8 +78,8 @@
         {/if}
       </div>
       <div class="w-full py-2 form-control">
-        <label for="review" class="label">
-          <span class="label-text">Review</span></label
+        <label for="review" class="daisy-label">
+          <span class="daisy-label-text">Review</span></label
         >
         <div class="rounded-md shadow-sm mt-1 relative">
           <textarea

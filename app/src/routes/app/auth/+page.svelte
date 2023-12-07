@@ -232,8 +232,8 @@
               <input type="hidden" name="type" value={type} />
               <div class="max-w-xs w-full py-2 form-control">
                 <div class="max-w-xs w-full py-2 form-control">
-                  <label for="pin" class="label">
-                    <span class="label-text">Password</span></label
+                  <label for="pin" class="daisy-label">
+                    <span class="daisy-label-text">Password</span></label
                   >
                   <div class="rounded-md shadow-sm mt-1 relative">
                     <input
@@ -286,8 +286,8 @@
               <input type="hidden" name="type" value={type} />
               <div class="max-w-xs w-full py-2 form-control">
                 <div class="max-w-xs w-full py-2 form-control">
-                  <label for="pin" class="label">
-                    <span class="label-text">8 Digit Pin</span></label
+                  <label for="pin" class="daisy-label">
+                    <span class="daisy-label-text">8 Digit Pin</span></label
                   >
                   <div class="rounded-md shadow-sm mt-1 relative">
                     <input

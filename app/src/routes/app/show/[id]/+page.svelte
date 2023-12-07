@@ -98,8 +98,8 @@
             >
               <input type="hidden" name="profileImage" value={profileImage} />
               <div class="py-2 form-control">
-                <label for="caller" class="label">
-                  <span class="label-text">Your Name</span>
+                <label for="caller" class="daisy-label">
+                  <span class="daisy-label-text">Your Name</span>
                 </label>
                 <input
                   name="name"
@@ -114,8 +114,8 @@
                 {/if}
               </div>
               <div class="py-2 form-control">
-                <label for="pin" class="label">
-                  <span class="label-text">8 Digit Pin</span>
+                <label for="pin" class="daisy-label">
+                  <span class="daisy-label-text">8 Digit Pin</span>
                 </label>
                 <input
                   name="pin"
