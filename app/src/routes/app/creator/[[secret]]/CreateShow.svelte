@@ -61,7 +61,7 @@
             <input
               type="text"
               name="name"
-              class="input input-bordered input-primary"
+              class="daisy-input daisy-input-bordered daisy-input-primary"
               bind:value={showName}
               minlength="3"
               maxlength="50"
@@ -87,7 +87,7 @@
               <input
                 type="text"
                 name="price"
-                class="w-full py-2 pl-6 input input-bordered input-primary"
+                class="w-full py-2 pl-6 input daisy-input-bordered daisy-input-primary"
                 placeholder="0.00"
                 aria-describedby="price-currency"
                 value={form?.price ?? ''}
@@ -150,7 +150,7 @@
 
         <div class="py-2">
           <button
-            class="daisy-btn btn-secondary"
+            class="daisy-btn daisy-btn-secondary"
             type="submit"
             disabled={isLoading}>Create Show</button
           >

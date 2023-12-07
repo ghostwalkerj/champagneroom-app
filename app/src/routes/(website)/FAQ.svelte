@@ -37,12 +37,12 @@
 
   <div class="flex flex-col md:flex-row gap-4">
     <div class="w-full md:w-1/2">
-      <div class="collapse collapse-arrow">
+      <div class="daisy-collapse daisy-collapse-arrow">
         <input type="radio" name="faq-accordion" />
-        <div class="collapse-title text-xl font-medium">
+        <div class="daisy-collapse-title text-xl font-medium">
           What is Champagne Room?
         </div>
-        <div class="collapse-content text-info">
+        <div class="daisy-collapse-content text-info">
           <div class="flex flex-col gap-2">
             <div class="">
               Champagne Room is a platform that provides a private and secure
@@ -56,10 +56,12 @@
           </div>
         </div>
       </div>
-      <div class="collapse collapse-arrow">
+      <div class="daisy-collapse daisy-collapse-arrow">
         <input type="radio" name="faq-accordion" />
-        <div class="collapse-title text-xl font-medium">How does it work?</div>
-        <div class="collapse-content text-info">
+        <div class="daisy-collapse-title text-xl font-medium">
+          How does it work?
+        </div>
+        <div class="daisy-collapse-content text-info">
           <ol class="list-decimal ml-4">
             <li>
               Once you and the creator agree to a video performance, the creator
@@ -91,12 +93,12 @@
           </ol>
         </div>
       </div>
-      <div class="collapse collapse-arrow">
+      <div class="daisy-collapse daisy-collapse-arrow">
         <input type="radio" name="faq-accordion" />
-        <div class="collapse-title text-xl font-medium">
+        <div class="daisy-collapse-title text-xl font-medium">
           How are my transactions protected?
         </div>
-        <div class="collapse-content text-info">
+        <div class="daisy-collapse-content text-info">
           <div>
             When you make a payment, it does not go directly to the creator;
             instead, it is held in escrow. The escrow is only released after the
@@ -116,10 +118,12 @@
       </div>
     </div>
     <div class="w-full md:w-1/2">
-      <div class="collapse collapse-arrow">
+      <div class="daisy-collapse daisy-collapse-arrow">
         <input type="radio" name="faq-accordion" />
-        <div class="collapse-title text-xl font-medium">Is it anonymous?</div>
-        <div class="collapse-content text-info">
+        <div class="daisy-collapse-title text-xl font-medium">
+          Is it anonymous?
+        </div>
+        <div class="daisy-collapse-content text-info">
           <div>
             We do not collect any data from our users, including email addresses
             or credit card information. When purchasing a ticket, you can enter
@@ -134,12 +138,12 @@
           </div>
         </div>
       </div>
-      <div class="collapse collapse-arrow">
+      <div class="daisy-collapse daisy-collapse-arrow">
         <input type="radio" name="faq-accordion" />
-        <div class="collapse-title text-xl font-medium">
+        <div class="daisy-collapse-title text-xl font-medium">
           How is it different from other platforms like Only Fans?
         </div>
-        <div class="collapse-content text-info">
+        <div class="daisy-collapse-content text-info">
           <ul class="list-disc ml-4">
             <li>
               Firstly, unlike OnlyFans, we do not use credit cards; we use
@@ -158,12 +162,12 @@
           </ul>
         </div>
       </div>
-      <div class="collapse collapse-arrow">
+      <div class="daisy-collapse daisy-collapse-arrow">
         <input type="radio" name="faq-accordion" />
-        <div class="collapse-title text-xl font-medium">
+        <div class="daisy-collapse-title text-xl font-medium">
           What is the road map and future of Champagne Room?
         </div>
-        <div class="collapse-content text-info">
+        <div class="daisy-collapse-content text-info">
           <ul class="list-disc ml-4">
             <li>
               As we receive feedback from our users, we will enhance Champagne

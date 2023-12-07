@@ -23,7 +23,8 @@
   <div class="modal-box relative lg:max-w-2xl lg:mx-auto">
     <label
       for="leave-feedback"
-      class="daisy-btn btn-sm btn-circle absolute right-2 top-2">✕</label
+      class="daisy-btn daisy-btn-sm daisy-btn-circle absolute right-2 top-2"
+      >✕</label
     >
     <h3 class="text-lg lg:text-xl font-bold text-center">Leave Feedback</h3>
     <form method="post" action="?/leave_feedback" use:enhance={onSubmit}>
@@ -90,13 +91,13 @@
       <div class="py-4 text-center">
         {#if isLoading}
           <button
-            class="daisy-btn btn-secondary loading"
+            class="daisy-btn daisy-btn-secondary loading"
             type="submit"
             disabled={true}>Submitting</button
           >
         {:else}
           <button
-            class="daisy-btn btn-secondary"
+            class="daisy-btn daisy-btn-secondary"
             type="submit"
             disabled={isLoading}>Submit</button
           >
@@ -106,7 +107,7 @@
   </div>
 </div>
 <div class="p-4 w-full flex justify-center">
-  <label for="leave-feedback" class="daisy-btn btn-secondary"
+  <label for="leave-feedback" class="daisy-btn daisy-btn-secondary"
     >Leave Feedback</label
   >
 </div>

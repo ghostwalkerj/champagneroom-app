@@ -80,7 +80,8 @@
         >
           <label
             for="buy-ticket"
-            class="daisy-btn btn-sm btn-circle absolute right-2 top-2">✕</label
+            class="daisy-btn daisy-btn-sm daisy-btn-circle absolute right-2 top-2"
+            >✕</label
           >
           <div
             class="grid grid-rows-1 gap-4 grid-flow-col justify-center items-center"
@@ -103,7 +104,7 @@
                 <input
                   name="name"
                   type="text"
-                  class="input input-bordered input-primary"
+                  class="daisy-input daisy-input-bordered daisy-input-primary"
                   bind:value={displayName}
                 />
                 {#if form?.missingName}
@@ -117,7 +118,7 @@
                 <input
                   name="pin"
                   type="text"
-                  class="input input-bordered input-primary"
+                  class="daisy-input daisy-input-bordered daisy-input-primary"
                   value={form?.pin ?? ''}
                   minlength="8"
                   maxlength="8"
@@ -134,12 +135,13 @@
               </div>
               <div class="py-4 text-center">
                 {#if isLoading}
-                  <button class="daisy-btn btn-secondary loading" disabled
+                  <button class="daisy-btn daisy-btn-secondary loading" disabled
                     >Reserving</button
                   >
                 {:else}
-                  <button class="daisy-btn btn-secondary" disabled={isLoading}
-                    >Reserve</button
+                  <button
+                    class="daisy-btn daisy-btn-secondary"
+                    disabled={isLoading}>Reserve</button
                   >
                 {/if}
               </div>
@@ -147,7 +149,7 @@
           </div>
         </div>
       </div>
-      <label for="buy-ticket" class="daisy-btn btn-secondary m-4"
+      <label for="buy-ticket" class="daisy-btn daisy-btn-secondary m-4"
         >Reserve Ticket</label
       >
     {/if}

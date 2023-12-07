@@ -128,7 +128,7 @@
               <a class="link" href={referralUrl}> {referralCode}</a>
             </div>
             <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <div class="daisy-btn btn-xs" on:click={updateReferralCode}>
+            <div class="daisy-btn daisy-btn-xs" on:click={updateReferralCode}>
               Change
             </div>
           </div>

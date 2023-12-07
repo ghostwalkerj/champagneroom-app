@@ -178,7 +178,7 @@
         {#if signingRejected}
           <!-- svelte-ignore a11y-click-events-have-key-events -->
           <div>
-            <div class="daisy-btn btn-primary" on:click={signMessage}>
+            <div class="daisy-btn daisy-btn-primary" on:click={signMessage}>
               Sign Message
             </div>
           </div>
@@ -197,13 +197,13 @@
         class="flex flex-col md:flex-row justify-center items-center gap-4 w-full max-w-md"
       >
         <button
-          class="daisy-btn btn-warning"
+          class="daisy-btn daisy-btn-warning"
           on:click={() => {
             goto(Config.Path.creatorSignup);
           }}>Become a Creator</button
         >
         <div class="divider">OR</div>
-        <button class="daisy-btn btn-success" disabled={true}
+        <button class="daisy-btn daisy-btn-success" disabled={true}
           >Become an Agent</button
         >
       </div>
@@ -237,7 +237,7 @@
                     <input
                       name="password"
                       type="password"
-                      class="max-w-xs w-full py-2 pl-6 input input-bordered input-primary"
+                      class="max-w-xs w-full py-2 pl-6 input daisy-input-bordered daisy-input-primary"
                       value={''}
                     />
                     {#if form?.missingPassword}<div
@@ -258,7 +258,7 @@
                 </div>
 
                 <div class="py-4 text-center">
-                  <button class="daisy-btn btn-primary" type="submit"
+                  <button class="daisy-btn daisy-btn-primary" type="submit"
                     >Submit</button
                   >
                 </div>
@@ -291,7 +291,7 @@
                     <input
                       name="pin"
                       type="text"
-                      class="max-w-xs w-full py-2 pl-6 input input-bordered input-primary"
+                      class="max-w-xs w-full py-2 pl-6 input daisy-input-bordered daisy-input-primary"
                       value={form?.pin ?? ''}
                       minlength="8"
                       maxlength="8"
@@ -316,7 +316,7 @@
                 </div>
 
                 <div class="py-4 text-center">
-                  <button class="daisy-btn btn-primary" type="submit"
+                  <button class="daisy-btn daisy-btn-primary" type="submit"
                     >Submit</button
                   >
                 </div>

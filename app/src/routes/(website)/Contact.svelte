@@ -53,7 +53,7 @@
             class="flex flex-col gap-4 items-center justify-center w-full max-w-sm"
           >
             <select
-              class="select select-primary w-[300px] bg-transparent"
+              class="daisy-select daisy-select-primary w-[300px] bg-transparent"
               name="interest"
             >
               <option disabled selected>I am interested in</option>
@@ -72,13 +72,13 @@
               type="text"
               placeholder="Email"
               name="email"
-              class="input input-bordered input-primary w-[300px] bg-transparent"
+              class="daisy-input daisy-input-bordered daisy-input-primary w-[300px] bg-transparent"
             />
             {#if form?.badEmail}
               <div class="shadow-lg alert alert-error">Email is Required</div>
             {/if}
             <div class="w-full text-center">
-              <button class="daisy-btn btn-outline btn-primary w-32"
+              <button class="daisy-btn daisy-btn-outline daisy-btn-primary w-32"
                 >Submit</button
               >
             </div>

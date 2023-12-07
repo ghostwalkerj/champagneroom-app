@@ -98,12 +98,12 @@
               type="text"
               name="amount"
               bind:this={amountElement}
-              class="w-full input input-bordered input-primary mb-4 h-12 rounded-lg"
+              class="w-full input daisy-input-bordered daisy-input-primary mb-4 h-12 rounded-lg"
               value={form?.amount ?? ''}
             />
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <div
-              class="daisy-btn btn-xs mb-4"
+              class="daisy-btn daisy-btn-xs mb-4"
               on:click={() =>
                 (amountElement.value = availableBalance.toString())}
             >
@@ -125,7 +125,7 @@
           <input
             type="text"
             name="destination"
-            class="w-full input input-bordered input-primary mb-4 h-12 rounded-lg"
+            class="w-full input daisy-input-bordered daisy-input-primary mb-4 h-12 rounded-lg"
             placeholder="Address"
             readonly={destination !== ''}
             value={destination ?? form?.destination ?? ''}
@@ -137,7 +137,9 @@
           {/if}
 
           <div class="flex flex-col lg:flex-row lg:justify-between lg:gap-4">
-            <button class="daisy-btn btn-primary mb-2 lg:mb-0">Submit</button>
+            <button class="daisy-btn daisy-btn-primary mb-2 lg:mb-0"
+              >Submit</button
+            >
             <button
               class="btn"
               on:click|preventDefault={() => withdrawModal.close()}
@@ -181,14 +183,14 @@
           class="stat-actions flex gap-2 mt-2 lg:mt-4 xl:mt-6 flex-col lg:flex-row justify-center lg:justify-start"
         >
           <button
-            class="daisy-btn btn-base lg:btn-sm"
+            class="daisy-btn daisy-btn-base lg:btn-sm"
             disabled={!hasTransactions}
             on:click={() => transactionModal.show()}
           >
             Transactions
           </button>
           <button
-            class="daisy-btn btn-base lg:btn-sm"
+            class="daisy-btn daisy-btn-base lg:btn-sm"
             disabled={!hasAvailableBalance}
             on:click={() => withdrawModal.show()}
           >

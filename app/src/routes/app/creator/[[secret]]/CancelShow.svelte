@@ -35,7 +35,7 @@
       >
         <div class="">
           <button
-            class="daisy-btn btn-secondary"
+            class="daisy-btn daisy-btn-secondary"
             type="submit"
             disabled={isLoading}>Cancel Show</button
           >

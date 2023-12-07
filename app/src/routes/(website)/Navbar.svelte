@@ -36,7 +36,7 @@
       <li>
         {#if link.name == 'Sign Up'}
           <a
-            class="daisy-btn btn-ghost bg-gradient-to-r from-primary to-pink-500 text-black whitespace-nowrap hover:shadow-[0px_0px_17px_6px_#e779c1]"
+            class="daisy-btn daisy-btn-ghost bg-gradient-to-r from-primary to-pink-500 text-black whitespace-nowrap hover:shadow-[0px_0px_17px_6px_#e779c1]"
             href={link.href}>{link.name}</a
           >
         {:else if link.name == 'Open App'}
@@ -54,7 +54,7 @@
           </a>
         {:else}
           <a
-            class="daisy-btn btn-ghost whitespace-nowrap hover:text-primary hover:bg-[#e779c122]"
+            class="daisy-btn daisy-btn-ghost whitespace-nowrap hover:text-primary hover:bg-[#e779c122]"
             class:text-primary={link.href == $page.url.hash}
             href={link.href}>{link.name}</a
           >
@@ -70,7 +70,7 @@
         <li>
           {#if link.name == 'Sign Up'}
             <a
-              class="daisy-btn btn-ghost bg-gradient-to-r from-primary to-pink-500 text-black whitespace-nowrap hover:shadow-[0px_0px_17px_6px_#e779c1]"
+              class="daisy-btn daisy-btn-ghost bg-gradient-to-r from-primary to-pink-500 text-black whitespace-nowrap hover:shadow-[0px_0px_17px_6px_#e779c1]"
               href={link.href}>{link.name}</a
             >
           {:else if link.name == 'Open App'}
@@ -93,7 +93,7 @@
     <label
       for="rigthDrawer"
       aria-label="open sidebar"
-      class="daisy-btn btn-square btn-ghost mr-2"
+      class="daisy-btn daisy-btn-square daisy-btn-ghost mr-2"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -112,12 +112,12 @@
 </div>
 
 <!-- Drawer content-->
-<div class="drawer drawer-end z-50">
-  <input id="rigthDrawer" type="checkbox" class="drawer-toggle" />
-  <div class="drawer-content">
+<div class="daisy-drawer daisy-drawer-end z-50">
+  <input id="rigthDrawer" type="checkbox" class="daisy-drawer-toggle" />
+  <div class="daisy-drawer-content">
     <!-- Page content here -->
   </div>
-  <div class="drawer-side">
+  <div class="daisy-drawer-side">
     <label
       for="rigthDrawer"
       aria-label="close sidebar"
@@ -129,7 +129,7 @@
         <li on:click={closeNav}>
           {#if link.name == 'Sign Up'}
             <a
-              class="daisy-btn btn-ghost btn-block bg-gradient-to-r from-primary to-pink-500 text-black whitespace-nowrap hover:shadow-[0px_0px_17px_6px_#e779c1]"
+              class="daisy-btn daisy-btn-ghost daisy-btn-block bg-gradient-to-r from-primary to-pink-500 text-black whitespace-nowrap hover:shadow-[0px_0px_17px_6px_#e779c1]"
               href={link.href}>{link.name}</a
             >
           {:else if link.name == 'Open App'}
@@ -147,7 +147,7 @@
             </a>
           {:else}
             <a
-              class="daisy-btn btn-ghost btn-block whitespace-nowrap hover:text-primary hover:bg-[#e779c122]"
+              class="daisy-btn daisy-btn-ghost daisy-btn-block whitespace-nowrap hover:text-primary hover:bg-[#e779c122]"
               class:text-primary={link.href == $page.url.hash}
               href={link.href}>{link.name}</a
             >

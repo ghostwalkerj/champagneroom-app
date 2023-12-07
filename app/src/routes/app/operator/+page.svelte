@@ -249,7 +249,7 @@
       <div class="modal-box">
         <h3 class="font-bold text-lg">Dispute Decision</h3>
         <select
-          class="select select-primary w-full max-w-xs"
+          class=" daisy-select daisy-select-primary w-full max-w-xs"
           name="decision"
           bind:value={decision}
         >
@@ -382,7 +382,7 @@
                         <tr>
                           <th
                             ><button
-                              class="daisy-btn btn-circle btn-xs"
+                              class="daisy-btn daisy-btn-circle daisy-btn-xs"
                               on:click={() => {
                                 canAddAgent = !canAddAgent;
                               }}
@@ -418,7 +418,7 @@
                                   name="address"
                                   value={agentAddress}
                                 /><button
-                                  class="daisy-btn btn-xs btn-ghost p-0"
+                                  class="daisy-btn daisy-btn-xs daisy-btn-ghost p-0"
                                   type="submit">Add</button
                                 >
                               </form>
@@ -453,7 +453,7 @@
                             <td contenteditable="true">{agent.user.address}</td>
                             <td>
                               <select
-                                class="select select-bordered select-xs max-w-xs"
+                                class=" daisy-select daisy-select-bordered daisy-select-xs max-w-xs"
                               >
                                 {#if agent.user.active}
                                   <option value="true" selected>True</option>
@@ -466,7 +466,7 @@
                             </td>
                             <td
                               ><button
-                                class="daisy-btn btn-primary btn-xs"
+                                class="daisy-btn daisy-btn-primary daisy-btn-xs"
                                 on:click={() => {}}>Impersonate</button
                               ></td
                             >
@@ -488,7 +488,7 @@
                         <tr>
                           <th
                             ><button
-                              class="daisy-btn btn-circle btn-xs"
+                              class="daisy-btn daisy-btn-circle daisy-btn-xs"
                               on:click={() => {
                                 canAddCreator = !canAddCreator;
                               }}
@@ -538,7 +538,7 @@
                                   value={commission}
                                 />
                                 <button
-                                  class="daisy-btn btn-xs btn-ghost p-0"
+                                  class="daisy-btn daisy-btn-xs daisy-btn-ghost p-0"
                                   type="submit">Add</button
                                 >
                               </form>
@@ -550,12 +550,12 @@
                             />
                             <td>
                               <select
-                                class="select select-bordered select-xs max-w-xs"
+                                class=" daisy-select daisy-select-bordered daisy-select-xs max-w-xs"
                                 bind:value={selectedAgentId}
                                 bind:this={creatorAgentElement}
                               >
-                                <option disabled value="0" selected
-                                  >Select Agent</option
+                                <option disabled value="0" selected>
+                                  daisy-select Agent</option
                                 >
                                 {#each agents as agent}
                                   <option value={agent._id.toString()}
@@ -592,7 +592,7 @@
                             <td>
                               {#if agentId}
                                 <select
-                                  class="select select-bordered select-xs max-w-xs"
+                                  class=" daisy-select daisy-select-bordered daisy-select-xs max-w-xs"
                                   on:change={(event) => {
                                     updateCreatorAgent(event.target?.value);
                                   }}
@@ -620,7 +620,7 @@
                             >
                             <td>
                               <select
-                                class="select select-bordered select-xs max-w-xs"
+                                class=" daisy-select daisy-select-bordered daisy-select-xs max-w-xs"
                                 on:change={(event) => {
                                   updateCreatorActive(event.target?.value);
                                 }}
@@ -644,7 +644,7 @@
                                   class="link link-primary">Secret Url</a
                                 >
                                 <button
-                                  class="daisy-btn btn-xs btn-outline btn-primary ml-4"
+                                  class="daisy-btn daisy-btn-xs daisy-btn-outline daisy-btn-primary ml-4"
                                   on:click={() =>
                                     (isChangeCreatorSecret = true)}
                                 >
@@ -752,7 +752,7 @@
                             <td>{ticket.ticketState.dispute?.explanation}</td>
                             <td
                               ><button
-                                class="daisy-btn btn-primary btn-xs"
+                                class="daisy-btn daisy-btn-primary daisy-btn-xs"
                                 on:click={() => (isDecideDispute = true)}
                                 >Decide</button
                               ></td

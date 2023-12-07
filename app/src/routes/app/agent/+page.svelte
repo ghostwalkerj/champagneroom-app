@@ -254,7 +254,7 @@
                         <tr>
                           <th
                             ><button
-                              class="daisy-btn btn-circle btn-xs"
+                              class="daisy-btn daisy-btn-circle daisy-btn-xs"
                               on:click={() => {
                                 canAddCreator = !canAddCreator;
                               }}
@@ -302,7 +302,7 @@
                                   value={commission}
                                 />
                                 <button
-                                  class="daisy-btn btn-xs btn-ghost p-0"
+                                  class="daisy-btn daisy-btn-xs daisy-btn-ghost p-0"
                                   type="submit">Add</button
                                 >
                               </form>
@@ -342,7 +342,7 @@
                             >
                             <td>
                               <select
-                                class="select select-bordered select-xs max-w-xs"
+                                class=" daisy-select daisy-select-bordered daisy-select-xs max-w-xs"
                                 on:change={(event) => {
                                   updateActive(event.target?.value);
                                 }}
@@ -367,7 +367,7 @@
                                   class="link link-primary">Secret Url</a
                                 >
                                 <button
-                                  class="daisy-btn btn-xs btn-outline btn-primary ml-4"
+                                  class="daisy-btn daisy-btn-xs daisy-btn-outline daisy-btn-primary ml-4"
                                   on:click={() =>
                                     (isChangeCreatorSecret = true)}
                                 >

@@ -21,7 +21,7 @@
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   {#if returnPath !== undefined}
     <div
-      class="m-4 lg:m-10 btn btn-outline btn-primary"
+      class="m-4 lg:m-10 btn daisy-btn-outline daisy-btn-primary"
       on:click={() => {
         goto(authPath);
       }}

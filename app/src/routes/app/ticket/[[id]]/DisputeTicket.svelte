@@ -30,7 +30,8 @@
   <div class="modal-box">
     <label
       for="initiate-dispute"
-      class="daisy-btn btn-sm btn-circle absolute right-2 top-2">✕</label
+      class="daisy-btn daisy-btn-sm daisy-btn-circle absolute right-2 top-2"
+      >✕</label
     >
     <h3 class="text-lg text-center font-semibold mb-4">Initiate Dispute</h3>
 
@@ -46,7 +47,7 @@
         <label for="reason" class="label">
           <span class="label-text">Reason</span>
         </label>
-        <select class="select select-bordered w-full" name="reason">
+        < daisy-select class=" daisy-select daisy-select-bordered w-full" name="reason">
           <option disabled selected>Reason for the Dispute</option>
           {#each reasons as reason}
             <option>{reason}</option>
@@ -54,7 +55,7 @@
         </select>
       </div>
       {#if form?.missingReason}<div class="shadow-lg alert alert-error">
-          Select a Reason
+           daisy-select a Reason
         </div>{/if}
 
       <!-- Explanation Textarea -->
@@ -67,7 +68,8 @@
 
       <!-- Submit Button -->
       <div class="text-center">
-        <button type="submit" class="daisy-btn btn-primary">Submit</button>
+        <button type="submit" class="daisy-btn daisy-btn-primary">Submit</button
+        >
       </div>
     </form>
   </div>
@@ -75,7 +77,7 @@
 
 <!-- Button to Open Modal -->
 <div class="p-4 w-full flex justify-center">
-  <label for="initiate-dispute" class="daisy-btn btn-secondary"
+  <label for="initiate-dispute" class="daisy-btn daisy-btn-secondary"
     >Initiate Dispute</label
   >
 </div>

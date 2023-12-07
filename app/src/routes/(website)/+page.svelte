@@ -15,10 +15,8 @@
   export let form: ActionData;
 </script>
 
-<div class="flex mt-20 justify-center  items-center" id="topPage">
-  <div
-    class="flex flex-col lg:flex-row items-center space-y-4"
-  >
+<div class="flex mt-20 justify-center items-center" id="topPage">
+  <div class="flex flex-col lg:flex-row items-center space-y-4">
     <div class="w-full pl-5">
       <h2
         class="text-info text-center font-bold leading-none text-[41px] lg:text-left mb-6 font-CaviarDreams px-6"
@@ -39,7 +37,7 @@
         <div>
           <a
             href="#FAQ"
-            class="md:w-auto btn btn-primary transition-all duration-300 ease-in-out"
+            class="md:w-auto daisy-btn daisy-btn-primary transition-all duration-300 ease-in-out"
           >
             Read the FAQ
           </a>
@@ -47,7 +45,7 @@
         <div>
           <a
             href="{Config.Path.staticUrl}/assets/champagne-room-white-paper.pdf"
-            class="md:w-auto btn btn-secondary transition-all duration-300 ease-in-out m-0"
+            class="md:w-auto daisy-btn daisy-btn-secondary transition-all duration-300 ease-in-out m-0"
             target="_blank"
           >
             White Paper

@@ -348,14 +348,14 @@
         </div>
         <div class="modal-action place-content-center gap-10">
           <button
-            class="daisy-btn btn-primary btn-outline"
+            class="daisy-btn daisy-btn-primary daisy-btn-outline"
             on:click={() => {
               addressModel.close();
               signupModel.showModal();
             }}>Continue</button
           >
           <button
-            class="daisy-btn btn-secondary btn-outline"
+            class="daisy-btn daisy-btn-secondary daisy-btn-outline"
             on:click={() => addressModel.close()}>Cancel</button
           >
         </div>
@@ -376,7 +376,7 @@
         <div class="modal-action place-content-center gap-10">
           <ConnectButton />
           <button
-            class="daisy-btn btn-secondary btn-outline"
+            class="daisy-btn daisy-btn-secondary daisy-btn-outline"
             on:click={() => addressModel.close()}>Cancel</button
           >
         </div>
@@ -415,14 +415,14 @@
         </div>
         <div class="modal-action place-content-center gap-10">
           <button
-            class="daisy-btn btn-primary btn-outline"
+            class="daisy-btn daisy-btn-primary daisy-btn-outline"
             on:click={() => {
               existsModel.close();
               goto(Config.Path.creator);
             }}>Sign In</button
           >
           <button
-            class="daisy-btn btn-secondary btn-outline"
+            class="daisy-btn daisy-btn-secondary daisy-btn-outline"
             on:click={() => {
               existsModel.close();
             }}>Cancel</button
@@ -466,7 +466,7 @@
               type="text"
               name="name"
               placeholder={exampleName}
-              class="input input-bordered input-primary w-full max-w-xs input-sm"
+              class="daisy-input daisy-input-bordered daisy-input-primary w-full max-w-xs daisy-input-sm"
             />
 
             <!-- svelte-ignore a11y-label-has-associated-control -->
@@ -481,12 +481,13 @@
         </div>
       </div>
       <div class="modal-action place-content-center gap-10">
-        <button class="daisy-btn btn-primary btn-outline" type="submit"
-          >Sign Up</button
+        <button
+          class="daisy-btn daisy-btn-primary daisy-btn-outline"
+          type="submit">Sign Up</button
         >
 
         <button
-          class="daisy-btn btn-secondary btn-outline"
+          class="daisy-btn daisy-btn-secondary daisy-btn-outline"
           on:click|preventDefault={() => {
             signupModel.close();
             addressModel.showModal();
