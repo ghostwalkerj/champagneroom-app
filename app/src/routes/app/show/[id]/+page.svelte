@@ -73,14 +73,15 @@
       <ShowDetail {show} />
     {/key}
     {#if canBuyTicket}
-      <input type="checkbox" id="buy-ticket" class="modal-toggle" />
-      <div class="modal">
+      <input type="checkbox" id="buy-ticket" class="daisy-modal-toggle" />
+      <div class="daisy-modal">
         <div
-          class="modal-box relative bg-gradient-to-r from-[#0C082E] to-[#0C092E]"
+          class="daisy-modal-box relative bg-gradient-to-r from-[#0C082E] to-[#0C092E]"
         >
           <label
             for="buy-ticket"
-            class="btn btn-sm btn-circle absolute right-2 top-2">✕</label
+            class="daisy-btn daisy-btn-sm daisy-btn-circle absolute right-2 top-2"
+            >✕</label
           >
           <div
             class="grid grid-rows-1 gap-4 grid-flow-col justify-center items-center"
@@ -96,37 +97,43 @@
               class="font-Roboto w-full lg:max-w-xs"
             >
               <input type="hidden" name="profileImage" value={profileImage} />
-              <div class="py-2 form-control">
-                <label for="caller" class="label">
-                  <span class="label-text">Your Name</span>
+              <div class="py-2 daisy-form-control">
+                <label for="caller" class="daisy-label">
+                  <span class="daisy-label-text">Your Name</span>
                 </label>
                 <input
                   name="name"
                   type="text"
-                  class="input input-bordered input-primary"
+                  class="daisy-input daisy-input-bordered daisy-input-primary"
                   bind:value={displayName}
                 />
                 {#if form?.missingName}
-                  <div class="alert alert-error">Name is required</div>
+                  <div class="daisy-alert daisy-alert-error">
+                    Name is required
+                  </div>
                 {/if}
               </div>
-              <div class="py-2 form-control">
-                <label for="pin" class="label">
-                  <span class="label-text">8 Digit Pin</span>
+              <div class="py-2 daisy-form-control">
+                <label for="pin" class="daisy-label">
+                  <span class="daisy-label-text">8 Digit Pin</span>
                 </label>
                 <input
                   name="pin"
                   type="text"
-                  class="input input-bordered input-primary"
+                  class="daisy-input daisy-input-bordered daisy-input-primary"
                   value={form?.pin ?? ''}
                   minlength="8"
                   maxlength="8"
                 />
                 {#if form?.missingPin}
-                  <div class="alert alert-error">Pin is required</div>
+                  <div class="daisy-alert daisy-alert-error">
+                    Pin is required
+                  </div>
                 {/if}
                 {#if form?.invalidPin}
-                  <div class="alert alert-error">Pin must be 8 digits</div>
+                  <div class="daisy-alert daisy-alert-error">
+                    Pin must be 8 digits
+                  </div>
                 {/if}
                 <div class="text-center text-sm p-1">
                   You need a pin to access the ticket later!
@@ -134,12 +141,14 @@
               </div>
               <div class="py-4 text-center">
                 {#if isLoading}
-                  <button class="btn btn-secondary loading" disabled
-                    >Reserving</button
+                  <button
+                    class="daisy-btn daisy-btn-secondary daisy-loading"
+                    disabled>Reserving</button
                   >
                 {:else}
-                  <button class="btn btn-secondary" disabled={isLoading}
-                    >Reserve</button
+                  <button
+                    class="daisy-btn daisy-btn-secondary"
+                    disabled={isLoading}>Reserve</button
                   >
                 {/if}
               </div>
@@ -147,7 +156,7 @@
           </div>
         </div>
       </div>
-      <label for="buy-ticket" class="btn btn-secondary m-4"
+      <label for="buy-ticket" class="daisy-btn daisy-btn-secondary m-4"
         >Reserve Ticket</label
       >
     {/if}

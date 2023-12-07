@@ -38,8 +38,9 @@ module.exports = {
     },
   },
   plugins: [
-    require("daisyui"),
     require("@tailwindcss/typography"),
+    require("daisyui"),
+
     // @ts-ignore
     plugin(function ({ matchUtilities, theme }) {
       matchUtilities(
@@ -58,6 +59,7 @@ module.exports = {
     utils: true,
     logs: false,
     rtl: false,
+    prefix: 'daisy-',
     themes: [
       {
         cryptoJesus: {
@@ -69,7 +71,8 @@ module.exports = {
           "info": "#00FFFF",          // Baby Blue (same as secondary)
           "success": "#53c0f3",       // A shade of blue
           "warning": "#F06400",       // Orange
-          "error": "#E24056"
+          "error": "#E24056",
+
         },
       },
     ],

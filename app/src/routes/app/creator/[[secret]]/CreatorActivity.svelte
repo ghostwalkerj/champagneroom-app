@@ -9,10 +9,10 @@
   export let completedShows: ShowDocumentType[];
 </script>
 
-<div class="bg-primary text-primary-content card">
-  <div class="text-left card-body items-center">
-    <h2 class="text-2xl card-title">Activity</h2>
-    <h2 class="text-lg card-title">
+<div class="bg-primary text-primary-content daisy-card">
+  <div class="text-left daisy-card-body items-center">
+    <h2 class="text-2xl daisy-card-title">Activity</h2>
+    <h2 class="text-lg daisy-card-title">
       {completedShows.length} Completed Show{#if completedShows.length > 1}s{/if}
     </h2>
 

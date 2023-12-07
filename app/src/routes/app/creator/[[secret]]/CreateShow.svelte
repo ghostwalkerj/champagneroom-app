@@ -9,12 +9,12 @@
   import Config from '$lib/config';
   import { durationFormatter } from '$lib/constants';
 
-  import type { CreatorDocument } from '$lib/models/creator';
+  import type { CreatorDocumentType } from '$lib/models/creator';
   import type { ActionData } from './$types';
 
   $: showDuration = 60;
 
-  export let creator: CreatorDocument;
+  export let creator: CreatorDocumentType;
   export let form: ActionData;
   export let isLoading = false;
   // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -45,38 +45,38 @@
   };
 </script>
 
-<div class="bg-primary text-primary-content card">
-  <div class="text-center card-body items-center p-3">
-    <h2 class="text-2xl card-title">Create a New Show</h2>
+<div class="bg-primary text-primary-content daisy-card">
+  <div class="text-center daisy-card-body items-center p-3">
+    <h2 class="text-2xl daisy-card-title">Create a New Show</h2>
     <div class="flex flex-col w-full">
       <form method="post" action="?/create_show" use:enhance={onSubmit}>
         <div
           class="flex flex-col lg:flex-row text-white p-2 justify-center items-center gap-4"
         >
-          <div class="form-control flex-grow">
+          <div class="daisy-form-control flex-grow">
             <!-- svelte-ignore a11y-label-has-associated-control -->
-            <label class="label">
-              <span class="label-text">Title</span>
+            <label class="daisy-label">
+              <span class="daisy-label-text">Title</span>
             </label>
             <input
               type="text"
               name="name"
-              class="input input-bordered input-primary"
+              class="daisy-input daisy-input-bordered daisy-input-primary"
               bind:value={showName}
               minlength="3"
               maxlength="50"
             />
             {#if form?.badName}
-              <div class="shadow-lg alert alert-error">
+              <div class="shadow-lg daisy-alert daisy-alert-error">
                 Show Name should be between 3 and 50 characters
               </div>
             {/if}
           </div>
 
-          <div class="form-control lg:w-40">
+          <div class="daisy-form-control lg:w-40">
             <!-- svelte-ignore a11y-label-has-associated-control -->
-            <label for="price" class="label">
-              <span class="label-text">Ticket Price in USD</span></label
+            <label for="price" class="daisy-label">
+              <span class="daisy-label-text">Ticket Price in USD</span></label
             >
             <div class="rounded-md shadow-sm relative">
               <div
@@ -87,7 +87,7 @@
               <input
                 type="text"
                 name="price"
-                class="w-full py-2 pl-6 input input-bordered input-primary"
+                class="w-full py-2 pl-6 daisy-input daisy-input-bordered daisy-input-primary"
                 placeholder="0.00"
                 aria-describedby="price-currency"
                 value={form?.price ?? ''}
@@ -101,12 +101,16 @@
               </div>
             </div>
             {#if form?.missingPrice}
-              <div class="shadow-lg alert alert-error whitespace-nowrap">
+              <div
+                class="shadow-lg daisy-alert daisy-alert-error whitespace-nowrap"
+              >
                 Price is required
               </div>
             {/if}
             {#if form?.invalidPrice}
-              <div class="shadow-lg alert alert-error whitespace-nowrap">
+              <div
+                class="shadow-lg daisy-alert daisy-alert-error whitespace-nowrap"
+              >
                 Invalid Price
               </div>
             {/if}
@@ -119,10 +123,10 @@
             name="coverImageUrl"
             value={creator.user.profileImageUrl}
           />
-          <div class="form-control lg:w-1/5">
+          <div class="daisy-form-control lg:w-1/5">
             <!-- svelte-ignore a11y-label-has-associated-control -->
-            <label class="label">
-              <span class="label-text whitespace-nowrap"
+            <label class="daisy-label">
+              <span class="daisy-label-text whitespace-nowrap"
                 >Duration ({durationFormatter(showDuration * 60)})</span
               >
             </label>
@@ -131,7 +135,7 @@
               min="15"
               max="120"
               bind:value={showDuration}
-              class="range"
+              class="daisy-range"
               step="15"
               name="duration"
             />
@@ -149,8 +153,10 @@
         </div>
 
         <div class="py-2">
-          <button class="btn btn-secondary" type="submit" disabled={isLoading}
-            >Create Show</button
+          <button
+            class="daisy-btn daisy-btn-secondary"
+            type="submit"
+            disabled={isLoading}>Create Show</button
           >
         </div>
       </form>

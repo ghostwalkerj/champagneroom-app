@@ -143,8 +143,8 @@
   };
 </script>
 
-<dialog id="new_creator_modal" class="modal" bind:this={newCreatorModal}>
-  <div class="modal-box">
+<dialog id="new_creator_modal" class="daisy-modal" bind:this={newCreatorModal}>
+  <div class="daisy-modal-box">
     {#if newCreator}
       <h3 class="font-bold text-lg text-center mb-6">New Creator</h3>
       <div class="text-center">
@@ -161,7 +161,7 @@
               newCreator.user.secret
             )}
             target="_blank"
-            class="link link-primary"
+            class="daisy-link daisy-link-primary"
           >
             {urlJoin(
               $page.url.origin,
@@ -175,10 +175,10 @@
       <div class="text-center m-auto pt-6">
         Share this information only with your Creator
       </div>
-      <div class="modal-action">
+      <div class="daisy-modal-action">
         <form method="dialog">
           <!-- if there is a button in form, it will close the modal -->
-          <button class="btn">Close</button>
+          <button class="daisy-btn">Close</button>
         </form>
       </div>
     {/if}
@@ -188,19 +188,26 @@
 {#if agent}
   <!-- Modal for Changing Creator URL -->
   {#if isChangeCreatorSecret}
-    <input type="checkbox" id="changeUrl-show-modal" class="modal-toggle" />
-    <div class="modal modal-open">
-      <div class="modal-box">
+    <input
+      type="checkbox"
+      id="changeUrl-show-modal"
+      class="daisy-modal-toggle"
+    />
+    <div class="daisy-modal daisy-modal-open">
+      <div class="daisy-modal-box">
         <h3 class="font-bold text-lg">Change Creator URL</h3>
         <p class="py-4">
           Changing the Creator's Secret URL will disable the current URL and
           create a new one.
         </p>
-        <div class="modal-action">
-          <button class="btn" on:click={() => (isChangeCreatorSecret = false)}
-            >Cancel</button
+        <div class="daisy-modal-action">
+          <button
+            class="daisy-btn"
+            on:click={() => (isChangeCreatorSecret = false)}>Cancel</button
           >
-          <button class="btn" on:click={changeCreatorSecret}>Change</button>
+          <button class="daisy-btn" on:click={changeCreatorSecret}
+            >Change</button
+          >
         </div>
       </div>
     </div>
@@ -216,14 +223,14 @@
           <div class="font-semibold text-primary text-lg leading-6">
             Agent Dashboard
           </div>
-          <div class="divider" />
+          <div class="daisy-divider" />
           <!-- Tabs -->
-          <div class="tabs tabs-boxed w-fit">
+          <div class="daisy-tabs daisy-tabs-boxed w-fit">
             <!-- svelte-ignore a11y-missing-attribute -->
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <a
-              class="tab"
-              class:tab-active={activeTab == 'Dashboard'}
+              class="daisy-tab"
+              class:daisy-tab-active={activeTab == 'Dashboard'}
               on:click={() => {
                 activeTab = 'Dashboard';
               }}>Dashboard</a
@@ -231,8 +238,8 @@
             <!-- svelte-ignore a11y-missing-attribute -->
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <a
-              class="tab"
-              class:tab-active={activeTab === 'Creators'}
+              class="daisy-tab"
+              class:daisy-tab-active={activeTab === 'Creators'}
               on:click={() => {
                 activeTab = 'Creators';
               }}>Creators</a
@@ -249,12 +256,12 @@
               >
                 <div class="overflow-x-auto">
                   {#key creators}
-                    <table class="table table-pin-rows">
+                    <table class="daisy-table daisy-table-pin-rows">
                       <thead>
                         <tr>
                           <th
                             ><button
-                              class="btn btn-circle btn-xs"
+                              class="daisy-btn daisy-btn-circle daisy-btn-xs"
                               on:click={() => {
                                 canAddCreator = !canAddCreator;
                               }}
@@ -302,7 +309,7 @@
                                   value={commission}
                                 />
                                 <button
-                                  class="btn btn-xs btn-ghost p-0"
+                                  class="daisy-btn daisy-btn-xs daisy-btn-ghost p-0"
                                   type="submit">Add</button
                                 >
                               </form>
@@ -342,7 +349,7 @@
                             >
                             <td>
                               <select
-                                class="select select-bordered select-xs max-w-xs"
+                                class="daisy-select daisy-select-bordered daisy-select-xs max-w-xs"
                                 on:change={(event) => {
                                   updateActive(event.target?.value);
                                 }}
@@ -364,10 +371,11 @@
                                     creator.user.secret
                                   )}
                                   target="_blank"
-                                  class="link link-primary">Secret Url</a
+                                  class="daisy-link daisy-link-primary"
+                                  >Secret Url</a
                                 >
                                 <button
-                                  class="btn btn-xs btn-outline btn-primary ml-4"
+                                  class="daisy-btn daisy-btn-xs daisy-btn-outline daisy-btn-primary ml-4"
                                   on:click={() =>
                                     (isChangeCreatorSecret = true)}
                                 >
@@ -395,7 +403,7 @@
                             </td>
                             <td>{creator.feedbackStats.numberOfReviews}</td>
                             <td
-                              class="tooltip"
+                              class=" daisy-tooltip"
                               data-tip={creator.feedbackStats.averageRating.toFixed(
                                 2
                               )}

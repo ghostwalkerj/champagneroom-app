@@ -210,8 +210,8 @@
   };
 </script>
 
-<dialog id="new_creator_modal" class="modal" bind:this={newCreatorModal}>
-  <div class="modal-box">
+<dialog id="new_creator_modal" class="daisy-modal" bind:this={newCreatorModal}>
+  <div class="daisy-modal-box">
     {#if newCreator}
       <h3 class="font-bold text-lg text-center mb-6">Creator</h3>
       <div class="text-center">
@@ -224,17 +224,17 @@
           <a
             href={urlJoin(Config.Path.creator, newCreator.user.secret)}
             target="_blank"
-            class="link link-primary"
+            class="daisy-link daisy-link-primary"
           >
             {urlJoin(Config.Path.creator, newCreator.user.secret)}</a
           >
         </div>
       </div>
 
-      <div class="modal-action">
+      <div class="daisy-modal-action">
         <form method="dialog">
           <!-- if there is a button in form, it will close the modal -->
-          <button class="btn">Close</button>
+          <button class="daisy-btn">Close</button>
         </form>
       </div>
     {/if}
@@ -244,26 +244,32 @@
 {#if operator}
   <!-- Modal for Deciding Dispute -->
   {#if isDecideDispute}
-    <input type="checkbox" id="changeUrl-show-modal" class="modal-toggle" />
-    <div class="modal modal-open">
-      <div class="modal-box">
-        <h3 class="font-bold text-lg">Dispute Decision</h3>
-        <select
-          class="select select-primary w-full max-w-xs"
-          name="decision"
-          bind:value={decision}
-        >
-          <option disabled selected>Decision</option>
+    <input
+      type="checkbox"
+      id="changeUrl-show-modal"
+      class="daisy-modal-toggle"
+    />
+    <div class="daisy-modal daisy-modal-open">
+      <div class="daisy-modal-box">
+        <h3 class="text-lg lg:text-xl font-bold">Dispute Decision</h3>
+        <div class="py-2 daisy-form-control">
+          <select
+            class="daisy-select daisy-select-primary w-full max-w-xs"
+            name="decision"
+            bind:value={decision}
+          >
+            <option disabled selected>Decision</option>
 
-          {#each decisions as decision}
-            <option>{decision}</option>
-          {/each}
-        </select>
-        <div class="modal-action">
-          <button class="btn" on:click={() => (isDecideDispute = false)}
+            {#each decisions as decision}
+              <option>{decision}</option>
+            {/each}
+          </select>
+        </div>
+        <div class="daisy-modal-action">
+          <button class="daisy-btn" on:click={() => (isDecideDispute = false)}
             >Cancel</button
           >
-          <button class="btn" on:click={() => decideDispute(decision)}
+          <button class="daisy-btn" on:click={() => decideDispute(decision)}
             >Finalize</button
           >
         </div>
@@ -272,19 +278,24 @@
   {/if}
 
   {#if isChangeCreatorSecret}
-    <input type="checkbox" id="changeUrl-show-modal" class="modal-toggle" />
-    <div class="modal modal-open">
-      <div class="modal-box">
+    <input
+      type="checkbox"
+      id="changeUrl-show-modal"
+      class="daisy-modal-toggle"
+    />
+    <div class="daisy-modal daisy-modal-open">
+      <div class="daisy-modal-box">
         <h3 class="font-bold text-lg">Change Secret URL</h3>
         <p class="py-4">
           Changing the Creator's Secret URL will disable the current URL and
           create a new one.
         </p>
-        <div class="modal-action">
-          <button class="btn" on:click={() => (isChangeCreatorSecret = false)}
-            >Cancel</button
+        <div class="daisy-modal-action">
+          <button
+            class="daisy-btn"
+            on:click={() => (isChangeCreatorSecret = false)}>Cancel</button
           >
-          <button class="btn" on:click={changeUserSecret}>Change</button>
+          <button class="daisy-btn" on:click={changeUserSecret}>Change</button>
         </div>
       </div>
     </div>
@@ -300,14 +311,14 @@
           <div class="font-semibold text-primary text-lg leading-6">
             Operator Dashboard
           </div>
-          <div class="divider" />
+          <div class="daisy-divider" />
           <!-- Tabs -->
-          <div class="tabs tabs-boxed w-fit">
+          <div class="daisy-tabs daisy-tabs-boxed w-fit">
             <!-- svelte-ignore a11y-missing-attribute -->
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <a
-              class="tab"
-              class:tab-active={activeTab === 'Admin'}
+              class="daisy-tab"
+              class:daisy-tab-active={activeTab === 'Admin'}
               on:click={() => {
                 activeTab = 'Admin';
               }}>Admin</a
@@ -316,8 +327,8 @@
             <!-- svelte-ignore a11y-missing-attribute -->
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <a
-              class="tab"
-              class:tab-active={activeTab === 'Agents'}
+              class="daisy-tab"
+              class:daisy-tab-active={activeTab === 'Agents'}
               on:click={() => {
                 activeTab = 'Agents';
               }}>Agents</a
@@ -326,8 +337,8 @@
             <!-- svelte-ignore a11y-missing-attribute -->
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <a
-              class="tab"
-              class:tab-active={activeTab === 'Creators'}
+              class="daisy-tab"
+              class:daisy-tab-active={activeTab === 'Creators'}
               on:click={() => {
                 activeTab = 'Creators';
               }}>Creators</a
@@ -336,8 +347,8 @@
             <!-- svelte-ignore a11y-missing-attribute -->
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <a
-              class="tab"
-              class:tab-active={activeTab == 'Disputes'}
+              class="daisy-tab"
+              class:daisy-tab-active={activeTab == 'Disputes'}
               on:click={() => {
                 activeTab = 'Disputes';
               }}>Disputes</a
@@ -354,7 +365,7 @@
               >
                 <div class="mx-auto p-4 ml-2">
                   <ul
-                    class="menu menu-vertical lg:menu-horizontal bg-base-200 rounded-box"
+                    class="daisy-menu daisy-menu-vertical lg:daisy-menu-horizontal bg-base-200 rounded-box"
                   >
                     <li>
                       <!--  eslint-disable-next-line svelte/valid-compile,
@@ -377,12 +388,12 @@
               >
                 <div class="overflow-x-auto reo">
                   {#key agents}
-                    <table class="table">
+                    <table class="daisy-table">
                       <thead>
                         <tr>
                           <th
                             ><button
-                              class="btn btn-circle btn-xs"
+                              class="daisy-btn daisy-btn-circle daisy-btn-xs"
                               on:click={() => {
                                 canAddAgent = !canAddAgent;
                               }}
@@ -418,7 +429,7 @@
                                   name="address"
                                   value={agentAddress}
                                 /><button
-                                  class="btn btn-xs btn-ghost p-0"
+                                  class="daisy-btn daisy-btn-xs daisy-btn-ghost p-0"
                                   type="submit">Add</button
                                 >
                               </form>
@@ -453,7 +464,7 @@
                             <td contenteditable="true">{agent.user.address}</td>
                             <td>
                               <select
-                                class="select select-bordered select-xs max-w-xs"
+                                class="daisy-select daisy-select-bordered daisy-select-xs max-w-xs"
                               >
                                 {#if agent.user.active}
                                   <option value="true" selected>True</option>
@@ -466,7 +477,7 @@
                             </td>
                             <td
                               ><button
-                                class="btn btn-primary btn-xs"
+                                class="daisy-btn daisy-btn-primary daisy-btn-xs"
                                 on:click={() => {}}>Impersonate</button
                               ></td
                             >
@@ -483,12 +494,12 @@
               >
                 <div class="overflow-x-auto">
                   {#key creators}
-                    <table class="table table-pin-rows">
+                    <table class="daisy-table daisy-table-pin-rows">
                       <thead>
                         <tr>
                           <th
                             ><button
-                              class="btn btn-circle btn-xs"
+                              class="daisy-btn daisy-btn-circle daisy-btn-xs"
                               on:click={() => {
                                 canAddCreator = !canAddCreator;
                               }}
@@ -538,7 +549,7 @@
                                   value={commission}
                                 />
                                 <button
-                                  class="btn btn-xs btn-ghost p-0"
+                                  class="daisy-btn daisy-btn-xs daisy-btn-ghost p-0"
                                   type="submit">Add</button
                                 >
                               </form>
@@ -550,12 +561,12 @@
                             />
                             <td>
                               <select
-                                class="select select-bordered select-xs max-w-xs"
+                                class=" daisy-select daisy-select-bordered daisy-select-xs max-w-xs"
                                 bind:value={selectedAgentId}
                                 bind:this={creatorAgentElement}
                               >
-                                <option disabled value="0" selected
-                                  >Select Agent</option
+                                <option disabled value="0" selected>
+                                  Select Agent</option
                                 >
                                 {#each agents as agent}
                                   <option value={agent._id.toString()}
@@ -592,7 +603,7 @@
                             <td>
                               {#if agentId}
                                 <select
-                                  class="select select-bordered select-xs max-w-xs"
+                                  class="daisy-select daisy-select-bordered daisy-select-xs max-w-xs"
                                   on:change={(event) => {
                                     updateCreatorAgent(event.target?.value);
                                   }}
@@ -620,7 +631,7 @@
                             >
                             <td>
                               <select
-                                class="select select-bordered select-xs max-w-xs"
+                                class="daisy-select daisy-select-bordered daisy-select-xs max-w-xs"
                                 on:change={(event) => {
                                   updateCreatorActive(event.target?.value);
                                 }}
@@ -641,10 +652,11 @@
                                     creator.user.secret
                                   )}
                                   target="_blank"
-                                  class="link link-primary">Secret Url</a
+                                  class="daisy-link daisy-link-primary"
+                                  >Secret Url</a
                                 >
                                 <button
-                                  class="btn btn-xs btn-outline btn-primary ml-4"
+                                  class="daisy-btn daisy-btn-xs daisy-btn-outline daisy-btn-primary ml-4"
                                   on:click={() =>
                                     (isChangeCreatorSecret = true)}
                                 >
@@ -672,7 +684,7 @@
                             </td>
                             <td>{creator.feedbackStats.numberOfReviews}</td>
                             <td
-                              class="tooltip"
+                              class="daisy-tooltip"
                               data-tip={creator.feedbackStats.averageRating.toFixed(
                                 2
                               )}
@@ -708,7 +720,7 @@
                 class="mt-4 bg-base w-full rounded-lg z-0 overflow-hidden border-2 border-secondary"
               >
                 <div class="overflow-x-auto">
-                  <table class="table">
+                  <table class="daisy-table">
                     <thead>
                       <tr>
                         <th />
@@ -752,7 +764,7 @@
                             <td>{ticket.ticketState.dispute?.explanation}</td>
                             <td
                               ><button
-                                class="btn btn-primary btn-xs"
+                                class="daisy-btn daisy-btn-primary daisy-btn-xs"
                                 on:click={() => (isDecideDispute = true)}
                                 >Decide</button
                               ></td

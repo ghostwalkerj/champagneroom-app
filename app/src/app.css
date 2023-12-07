@@ -4,7 +4,7 @@
 @import '../node_modules/npm-font-caviar-dreams/caviar-dreams';
 
 @layer components {
-  .btn {
+  .daisy-btn {
     font-family: 'Space Grotesk';
   }
   .select {

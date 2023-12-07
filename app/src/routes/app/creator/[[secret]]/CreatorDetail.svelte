@@ -21,9 +21,9 @@
 
 <div>
   <div class="lg:col-start-3 lg:col-span-1">
-    <div class="bg-primary text-primary-content card">
-      <div class="text-center card-body items-center p-3">
-        <h2 class="text-xl card-title">{creator.user.name}</h2>
+    <div class="bg-primary text-primary-content daisy-card">
+      <div class="text-center daisy-card-body items-center p-3">
+        <h2 class="text-xl daisy-card-title">{creator.user.name}</h2>
         <div>
           <ProfilePhoto
             profileImage={creator.user.profileImageUrl ||
@@ -34,7 +34,7 @@
           />
         </div>
         <div
-          class="tooltip"
+          class="daisy-tooltip"
           data-tip={creator.feedbackStats.averageRating.toFixed(2)}
         >
           <StarRating rating={creator.feedbackStats.averageRating} />

@@ -109,9 +109,9 @@
     />
   </div>
   {#if !update}
-    <div class="justify-center card-actions last:my-2">
+    <div class="justify-center daisy-card-actions last:my-2">
       <button
-        class="btn btn-xs btn-secondary btn-outline lg:btn-sm"
+        class="daisy-btn daisy-btn-xs daisy-btn-secondary daisy-btn-outline lg:btn-sm"
         on:click={() => {
           setUpdate(true);
         }}
@@ -120,10 +120,10 @@
       </button>
     </div>
   {:else}
-    <div class="justify-center card-actions last:my-2">
+    <div class="justify-center daisy-card-actions last:my-2">
       {#if !uploadReady}
         <label
-          class="custom-file-upload btn btn-xs btn-outline btn-secondary"
+          class="custom-file-upload daisy-btn daisy-btn-xs daisy-btn-outline daisy-btn-secondary"
           use:filedrop={options}
           on:filedrop={onChange}
         >
@@ -132,13 +132,16 @@
         </label>
       {:else}
         <button
-          class="btn btn-xs btn-outline btn-secondary"
+          class="daisy-btn daisy-btn-xs daisy-btn-outline daisy-btn-secondary"
           on:click={() => upload()}
         >
           Upload
         </button>
       {/if}
-      <button class="btn btn-xs btn-outline btn-secondary" on:click={resetForm}>
+      <button
+        class="daisy-btn daisy-btn-xs daisy-btn-outline daisy-btn-secondary"
+        on:click={resetForm}
+      >
         Cancel
       </button>
     </div>

@@ -3,7 +3,8 @@
 </script>
 
 {#if !$selectedAccount}
-  <button class="btn btn-outline btn-primary" on:click={connect}
-    >Connect Wallet</button
+  <button
+    class="daisy-btn daisy-btn-outline daisy-btn-primary"
+    on:click={connect}>Connect Wallet</button
   >
 {/if}

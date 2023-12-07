@@ -154,9 +154,11 @@
       </div>
 
       {#if noUser}
-        <div class="card w-full lg:w-96 bg-info text-neutral-content lg:mt-10">
-          <div class="card-body items-center text-center">
-            <h2 class="card-title">
+        <div
+          class="daisy-card w-full lg:w-96 bg-info text-neutral-content lg:mt-10"
+        >
+          <div class="daisy-card-body items-center text-center">
+            <h2 class="daisy-card-title">
               Address: {walletAddress?.slice(0, 6)}...{walletAddress.slice(-4)} not
               found
             </h2>
@@ -178,14 +180,14 @@
         {#if signingRejected}
           <!-- svelte-ignore a11y-click-events-have-key-events -->
           <div>
-            <div class="btn btn-primary" on:click={signMessage}>
+            <div class="daisy-btn daisy-btn-primary" on:click={signMessage}>
               Sign Message
             </div>
           </div>
         {/if}
       {/if}
       <div class="w-full max-w-md">
-        <div class="divider" />
+        <div class="daisy-divider" />
       </div>
       <div class="text-neutral mb-4">Not a user?</div>
       <div
@@ -197,13 +199,15 @@
         class="flex flex-col md:flex-row justify-center items-center gap-4 w-full max-w-md"
       >
         <button
-          class="btn btn-warning"
+          class="daisy-btn daisy-btn-warning"
           on:click={() => {
             goto(Config.Path.creatorSignup);
           }}>Become a Creator</button
         >
-        <div class="divider">OR</div>
-        <button class="btn btn-success" disabled={true}>Become an Agent</button>
+        <div class="daisy-divider">OR</div>
+        <button class="daisy-btn daisy-btn-success" disabled={true}
+          >Become an Agent</button
+        >
       </div>
     </div>
   {/if}
@@ -226,26 +230,26 @@
             >
               <input type="hidden" name="parseId" value={parseId} />
               <input type="hidden" name="type" value={type} />
-              <div class="max-w-xs w-full py-2 form-control">
-                <div class="max-w-xs w-full py-2 form-control">
-                  <label for="pin" class="label">
-                    <span class="label-text">Password</span></label
+              <div class="max-w-xs w-full py-2 daisy-form-control">
+                <div class="max-w-xs w-full py-2 daisy-form-control">
+                  <label for="pin" class="daisy-label">
+                    <span class="daisy-label-text">Password</span></label
                   >
                   <div class="rounded-md shadow-sm mt-1 relative">
                     <input
                       name="password"
                       type="password"
-                      class="max-w-xs w-full py-2 pl-6 input input-bordered input-primary"
+                      class="max-w-xs w-full py-2 pl-6 daisy-input daisy-input-bordered daisy-input-primary"
                       value={''}
                     />
                     {#if form?.missingPassword}<div
-                        class="shadow-lg alert alert-error"
+                        class="shadow-lg daisy-alert daisy-alert-error"
                       >
                         Password is required
                       </div>{/if}
 
                     {#if form?.badPassword}<div
-                        class="shadow-lg alert alert-error"
+                        class="shadow-lg daisy-alert daisy-alert-error"
                       >
                         Incorrect Password
                       </div>{/if}
@@ -256,7 +260,9 @@
                 </div>
 
                 <div class="py-4 text-center">
-                  <button class="btn btn-primary" type="submit">Submit</button>
+                  <button class="daisy-btn daisy-btn-primary" type="submit"
+                    >Submit</button
+                  >
                 </div>
               </div>
             </form>
@@ -278,31 +284,33 @@
             <form method="post" action="?/pin_auth" use:enhance={onSubmit}>
               <input type="hidden" name="parseId" value={parseId} />
               <input type="hidden" name="type" value={type} />
-              <div class="max-w-xs w-full py-2 form-control">
-                <div class="max-w-xs w-full py-2 form-control">
-                  <label for="pin" class="label">
-                    <span class="label-text">8 Digit Pin</span></label
+              <div class="max-w-xs w-full py-2 daisy-form-control">
+                <div class="max-w-xs w-full py-2 daisy-form-control">
+                  <label for="pin" class="daisy-label">
+                    <span class="daisy-label-text">8 Digit Pin</span></label
                   >
                   <div class="rounded-md shadow-sm mt-1 relative">
                     <input
                       name="pin"
                       type="text"
-                      class="max-w-xs w-full py-2 pl-6 input input-bordered input-primary"
+                      class="max-w-xs w-full py-2 pl-6 daisy-input daisy-input-bordered daisy-input-primary"
                       value={form?.pin ?? ''}
                       minlength="8"
                       maxlength="8"
                     />
                     {#if form?.missingPin}<div
-                        class="shadow-lg alert alert-error"
+                        class="shadow-lg daisy-alert daisy-alert-error"
                       >
                         Pin is required
                       </div>{/if}
                     {#if form?.invalidPin}<div
-                        class="shadow-lg alert alert-error"
+                        class="shadow-lg daisy-alert daisy-alert-error"
                       >
                         Pin must be 8 digits
                       </div>{/if}
-                    {#if form?.badPin}<div class="shadow-lg alert alert-error">
+                    {#if form?.badPin}<div
+                        class="shadow-lg daisy-alert daisy-alert-error"
+                      >
                         Incorrect Pin
                       </div>{/if}
                     <div class="text-center text-sm p-1">
@@ -312,7 +320,9 @@
                 </div>
 
                 <div class="py-4 text-center">
-                  <button class="btn btn-primary" type="submit">Submit</button>
+                  <button class="daisy-btn daisy-btn-primary" type="submit"
+                    >Submit</button
+                  >
                 </div>
               </div>
             </form>
