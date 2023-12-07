@@ -2,7 +2,7 @@
   import Config from '$lib/config';
 </script>
 
-<div id="Creators" class="container px-4 sm:px-6 md:px-10">
+<div id="Creators" class="container mx-auto px-4 sm:px-6 md:px-10">
   <div class="pt-20">
     <h2
       class="text-primary font-bold text-[32px] lg:text-[41px] text-center font-CaviarDreams mb-10"

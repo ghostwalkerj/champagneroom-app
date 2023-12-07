@@ -1,8 +1,9 @@
 <script lang="ts">
   import Config from '$lib/config';
+  import { Image } from '@unpic/svelte';
 </script>
 
-<div id="Token" class="container pt-20">
+<div id="Token" class="container mx-auto pt-20">
   <h2
     class="text-primary font-bold text-[32px] lg:text-[41px] text-center font-CaviarDreams mb-10"
   >
@@ -27,12 +28,13 @@
         tokens.
       </ul>
     </div>
-    <div class="p-6">
-      <div class="">
-        <img
+    <div class="pt-10 p-6">
+      <div class="max-w-4xl">
+        <Image
+          class="opacity-80 rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1]"
           src="{Config.Path.staticUrl}/assets/champagneroomtoken.gif"
-          alt="Tokenomics"
-          class="rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1] max-w-xs md:max-w-sm lg:max-w-md"
+          width="960px"
+          height="540px"
         />
       </div>
     </div>
