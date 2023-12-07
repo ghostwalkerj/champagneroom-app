@@ -16,7 +16,7 @@
       Become a Creator
     </div>
 
-    <div class="divider divider-vertical text-primary">OR</div>
+    <div class="daisy-divider daisy-divider-vertical text-primary">OR</div>
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div
       class="daisy-btn daisy-btn-secondary w-fit"

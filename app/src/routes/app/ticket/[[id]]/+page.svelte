@@ -340,7 +340,7 @@
             {/if}
             {#if canLeaveFeedback && canDispute}
               <div
-                class="divider w-full md:w-3/4 md:p-6 font-SpaceGrotesk h-1/2"
+                class="daisy-divider w-full md:w-3/4 md:p-6 font-SpaceGrotesk h-1/2"
               >
                 OR
               </div>

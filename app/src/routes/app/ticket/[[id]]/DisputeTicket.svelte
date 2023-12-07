@@ -47,7 +47,7 @@
         <label for="reason" class="label">
           <span class="label-text">Reason</span>
         </label>
-        < daisy-select class=" daisy-select daisy-select-bordered w-full" name="reason">
+        <select class="daisy-select daisy-select-bordered w-full" name="reason">
           <option disabled selected>Reason for the Dispute</option>
           {#each reasons as reason}
             <option>{reason}</option>
@@ -55,7 +55,7 @@
         </select>
       </div>
       {#if form?.missingReason}<div class="shadow-lg alert alert-error">
-           daisy-select a Reason
+          Select a Reason
         </div>{/if}
 
       <!-- Explanation Textarea -->

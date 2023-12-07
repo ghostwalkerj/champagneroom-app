@@ -54,7 +54,7 @@
 <div
   class="bg-gradient-to-r from-[#0C082E] to-[#0C092E] font-Roboto flex flex-col min-h-screen min-w-[320px]"
 >
-  <div class="navbar w-screen">
+  <div class="daisy-navbar w-screen">
     <div class="flex flex-col lg:flex-row w-screen">
       <div class="w-full lg:w-1/3 flex justify-center lg:ml-20">
         <!-- svelte-ignore a11y-missing-attribute -->
@@ -101,7 +101,7 @@
       </div>
     </div>
   </div>
-  <div class="divider m-0" />
+  <div class="daisy-divider m-0" />
 
   <div class="flex-1">
     <slot />

@@ -128,7 +128,7 @@
           on:filedrop={onChange}
         >
           <input type="file" class="hidden" />
-          daisy-select Image
+          Select Image
         </label>
       {:else}
         <button

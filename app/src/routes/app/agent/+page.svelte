@@ -216,13 +216,13 @@
           <div class="font-semibold text-primary text-lg leading-6">
             Agent Dashboard
           </div>
-          <div class="divider" />
+          <div class="daisy-divider" />
           <!-- Tabs -->
-          <div class="tabs tabs-boxed w-fit">
+          <div class="daisy-tabs daisy-tabs-boxed w-fit">
             <!-- svelte-ignore a11y-missing-attribute -->
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <a
-              class="tab"
+              class="daisy-tab"
               class:tab-active={activeTab == 'Dashboard'}
               on:click={() => {
                 activeTab = 'Dashboard';
@@ -231,7 +231,7 @@
             <!-- svelte-ignore a11y-missing-attribute -->
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <a
-              class="tab"
+              class="daisy-tab"
               class:tab-active={activeTab === 'Creators'}
               on:click={() => {
                 activeTab = 'Creators';
@@ -342,7 +342,7 @@
                             >
                             <td>
                               <select
-                                class=" daisy-select daisy-select-bordered daisy-select-xs max-w-xs"
+                                class="daisy-select daisy-select-bordered daisy-select-xs max-w-xs"
                                 on:change={(event) => {
                                   updateActive(event.target?.value);
                                 }}

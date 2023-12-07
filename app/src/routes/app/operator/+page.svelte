@@ -249,7 +249,7 @@
       <div class="modal-box">
         <h3 class="font-bold text-lg">Dispute Decision</h3>
         <select
-          class=" daisy-select daisy-select-primary w-full max-w-xs"
+          class="daisy-select daisy-select-primary w-full max-w-xs"
           name="decision"
           bind:value={decision}
         >
@@ -300,13 +300,13 @@
           <div class="font-semibold text-primary text-lg leading-6">
             Operator Dashboard
           </div>
-          <div class="divider" />
+          <div class="daisy-divider" />
           <!-- Tabs -->
-          <div class="tabs tabs-boxed w-fit">
+          <div class="daisy-tabs daisy-tabs-boxed w-fit">
             <!-- svelte-ignore a11y-missing-attribute -->
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <a
-              class="tab"
+              class="daisy-tab"
               class:tab-active={activeTab === 'Admin'}
               on:click={() => {
                 activeTab = 'Admin';
@@ -316,7 +316,7 @@
             <!-- svelte-ignore a11y-missing-attribute -->
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <a
-              class="tab"
+              class="daisy-tab"
               class:tab-active={activeTab === 'Agents'}
               on:click={() => {
                 activeTab = 'Agents';
@@ -326,7 +326,7 @@
             <!-- svelte-ignore a11y-missing-attribute -->
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <a
-              class="tab"
+              class="daisy-tab"
               class:tab-active={activeTab === 'Creators'}
               on:click={() => {
                 activeTab = 'Creators';
@@ -336,7 +336,7 @@
             <!-- svelte-ignore a11y-missing-attribute -->
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <a
-              class="tab"
+              class="daisy-tab"
               class:tab-active={activeTab == 'Disputes'}
               on:click={() => {
                 activeTab = 'Disputes';
@@ -354,7 +354,7 @@
               >
                 <div class="mx-auto p-4 ml-2">
                   <ul
-                    class="menu menu-vertical lg:menu-horizontal bg-base-200 rounded-box"
+                    class="daisy-menu daisy-menu-vertical lg:daisy-menu-horizontal bg-base-200 rounded-box"
                   >
                     <li>
                       <!--  eslint-disable-next-line svelte/valid-compile,
@@ -453,7 +453,7 @@
                             <td contenteditable="true">{agent.user.address}</td>
                             <td>
                               <select
-                                class=" daisy-select daisy-select-bordered daisy-select-xs max-w-xs"
+                                class="daisy-select daisy-select-bordered daisy-select-xs max-w-xs"
                               >
                                 {#if agent.user.active}
                                   <option value="true" selected>True</option>
@@ -555,7 +555,7 @@
                                 bind:this={creatorAgentElement}
                               >
                                 <option disabled value="0" selected>
-                                  daisy-select Agent</option
+                                  Select Agent</option
                                 >
                                 {#each agents as agent}
                                   <option value={agent._id.toString()}
@@ -592,7 +592,7 @@
                             <td>
                               {#if agentId}
                                 <select
-                                  class=" daisy-select daisy-select-bordered daisy-select-xs max-w-xs"
+                                  class="daisy-select daisy-select-bordered daisy-select-xs max-w-xs"
                                   on:change={(event) => {
                                     updateCreatorAgent(event.target?.value);
                                   }}
@@ -620,7 +620,7 @@
                             >
                             <td>
                               <select
-                                class=" daisy-select daisy-select-bordered daisy-select-xs max-w-xs"
+                                class="daisy-select daisy-select-bordered daisy-select-xs max-w-xs"
                                 on:change={(event) => {
                                   updateCreatorActive(event.target?.value);
                                 }}

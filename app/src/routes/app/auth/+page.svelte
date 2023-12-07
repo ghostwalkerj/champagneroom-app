@@ -185,7 +185,7 @@
         {/if}
       {/if}
       <div class="w-full max-w-md">
-        <div class="divider" />
+        <div class="daisy-divider" />
       </div>
       <div class="text-neutral mb-4">Not a user?</div>
       <div
@@ -202,7 +202,7 @@
             goto(Config.Path.creatorSignup);
           }}>Become a Creator</button
         >
-        <div class="divider">OR</div>
+        <div class="daisy-divider">OR</div>
         <button class="daisy-btn daisy-btn-success" disabled={true}
           >Become an Agent</button
         >
