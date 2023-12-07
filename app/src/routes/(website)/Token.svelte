@@ -2,7 +2,7 @@
   import Config from '$lib/config';
 </script>
 
-<div id="Token" class="container mx-auto pt-20">
+<div id="Token" class="container pt-20">
   <h2
     class="text-primary font-bold text-[32px] lg:text-[41px] text-center font-CaviarDreams mb-10"
   >
@@ -29,18 +29,11 @@
     </div>
     <div class="p-6">
       <div class="">
-        <video
-          autoplay
-          loop
-          controls
-          muted
-          class="opacity-80 rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1]"
-        >
-          <source
-            src="{Config.Path.staticUrl}/assets/champagneroomtoken.mp4"
-            type="video/mp4"
-          />
-        </video>
+        <img
+          src="{Config.Path.staticUrl}/assets/champagneroomtoken.gif"
+          alt="Tokenomics"
+          class="rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1] max-w-xs md:max-w-sm lg:max-w-md"
+        />
       </div>
     </div>
   </div>
