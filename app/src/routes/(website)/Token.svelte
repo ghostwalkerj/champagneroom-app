@@ -33,8 +33,8 @@
         <Image
           class="opacity-80 rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1]"
           src="{Config.Path.staticUrl}/assets/champagneroomtoken.gif"
-          width="960px"
-          height="540px"
+          width={960}
+          height={540}
         />
       </div>
     </div>
