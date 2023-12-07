@@ -126,7 +126,7 @@
         attempts = 0;
       do {
         overlap = false;
-        // Adjust random position to consider card dimensions
+        // Adjust random position to consider daisy-card dimensions
         x = Math.random() * (innerWidth - card.offsetWidth - 500);
         y = Math.random() * (700 - card.offsetHeight);
 
@@ -196,12 +196,12 @@
   <div>
     <div class="absolute top-auto left-auto max-w-md">
       <div
-        class="card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
+        class="daisy-card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
       >
         <h2 class="text-xl text-secondary text-center">
           Get Paid Quickly in Your Local Currency
         </h2>
-        <div class="text-primary card-body">
+        <div class="text-primary daisy-card-body">
           Experience the ease of receiving payments swiftly and securely, right
           in your local currency. No more exchange rate headaches or delays.
         </div>
@@ -209,12 +209,12 @@
     </div>
     <div class="absolute top-auto left-auto max-w-md">
       <div
-        class="card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
+        class="daisy-card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
       >
         <h2 class="text-xl text-secondary text-center">
           Hassle-Free Payment Handling
         </h2>
-        <div class="text-primary card-body">
+        <div class="text-primary daisy-card-body">
           Our streamlined payment system means you focus on creating, not on
           payment issues. We handle the complexities, you enjoy the rewards.
         </div>
@@ -223,12 +223,12 @@
 
     <div class="absolute top-auto left-auto max-w-md">
       <div
-        class="card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
+        class="daisy-card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
       >
         <h2 class="text-xl text-secondary text-center">
           Privacy is Our Priority
         </h2>
-        <div class="text-primary card-body">
+        <div class="text-primary daisy-card-body">
           Your safety matters. With us, your personal details stay private. No
           need to share names or phone numbers.
         </div>
@@ -237,12 +237,12 @@
 
     <div class="absolute top-auto left-auto max-w-md">
       <div
-        class="card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
+        class="daisy-card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
       >
         <h2 class="text-xl text-secondary text-center">
           Earn More with Fan Tips
         </h2>
-        <div class="text-primary card-body">
+        <div class="text-primary daisy-card-body">
           Connect with your audience in a meaningful way. Receive appreciation
           through tips directly from your fans.
         </div>
@@ -251,12 +251,12 @@
 
     <div class="absolute top-auto left-auto max-w-md">
       <div
-        class="card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
+        class="daisy-card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
       >
         <h2 class="text-xl text-secondary text-center">
           Exclusive Marketplace for Custom Content
         </h2>
-        <div class="text-primary card-body">
+        <div class="text-primary daisy-card-body">
           Unlock the potential of your creativity. Sell unique, custom content
           directly to your followers and boost your earnings.
         </div>
@@ -265,12 +265,12 @@
 
     <div class="absolute top-auto left-auto max-w-md">
       <div
-        class="card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
+        class="daisy-card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
       >
         <h2 class="text-xl text-secondary text-center">
           Global Reach, Local Comfort
         </h2>
-        <div class="text-primary card-body">
+        <div class="text-primary daisy-card-body">
           Wherever you are, connect with affluent customers from around the
           world. Your location is no longer a barrier to your success.
         </div>
@@ -279,12 +279,12 @@
 
     <div class="absolute top-auto left-auto max-w-md">
       <div
-        class="card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
+        class="daisy-card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
       >
         <h2 class="text-xl text-secondary text-center">
           Premium Prices for International Customers
         </h2>
-        <div class="text-primary card-body">
+        <div class="text-primary daisy-card-body">
           Maximize your earnings by setting competitive rates for international
           clients. Benefit from a wider, more lucrative market.
         </div>
@@ -293,12 +293,12 @@
 
     <div class="absolute top-auto left-auto max-w-md">
       <div
-        class="card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
+        class="daisy-card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
       >
         <h2 class="text-xl text-secondary text-center">
           Concierge Service at Your Fingertips
         </h2>
-        <div class="text-primary card-body">
+        <div class="text-primary daisy-card-body">
           Need assistance? Our concierge service is here to help you navigate
           and optimize your creator experience with ease.
         </div>
@@ -307,10 +307,10 @@
 
     <div class="absolute top-auto left-auto max-w-md visible">
       <div
-        class="card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
+        class="daisy-card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
       >
         <h2 class="text-xl text-secondary text-center">Join Us Now</h2>
-        <div class="text-primary card-body">
+        <div class="text-primary daisy-card-body">
           Ready to take your creative journey to the next level? Sign up today
           and be part of a community that values and empowers creators like you.
         </div>
@@ -318,10 +318,10 @@
     </div>
   </div>
 </div>
-<dialog id="address_modal" class="modal" bind:this={addressModel}>
+<dialog id="address_modal" class="daisy-modal" bind:this={addressModel}>
   <form
     method="dialog"
-    class="modal-box bg-gradient-to-r from-[#0C082E] to-[#0C092E]
+    class="daisy-modal-box bg-gradient-to-r from-[#0C082E] to-[#0C092E]
 "
     action="?/null_action"
   >
@@ -346,7 +346,7 @@
           To use a different address, change the account connected in your
           wallet
         </div>
-        <div class="modal-action place-content-center gap-10">
+        <div class="daisy-modal-action place-content-center gap-10">
           <button
             class="daisy-btn daisy-btn-primary daisy-btn-outline"
             on:click={() => {
@@ -373,7 +373,7 @@
           Before you can sign up, connect your wallet
         </div>
 
-        <div class="modal-action place-content-center gap-10">
+        <div class="daisy-modal-action place-content-center gap-10">
           <ConnectButton />
           <button
             class="daisy-btn daisy-btn-secondary daisy-btn-outline"
@@ -385,10 +385,10 @@
   </form>
 </dialog>
 
-<dialog id="exist_model" class="modal" bind:this={existsModel}>
+<dialog id="exist_model" class="daisy-modal" bind:this={existsModel}>
   <form
     method="dialog"
-    class="modal-box bg-gradient-to-r from-[#0C082E] to-[#0C092E]
+    class="daisy-modal-box bg-gradient-to-r from-[#0C082E] to-[#0C092E]
 "
     action="?/null_action"
   >
@@ -413,7 +413,7 @@
           To use a different address, change the account connected in your
           wallet
         </div>
-        <div class="modal-action place-content-center gap-10">
+        <div class="daisy-modal-action place-content-center gap-10">
           <button
             class="daisy-btn daisy-btn-primary daisy-btn-outline"
             on:click={() => {
@@ -433,10 +433,10 @@
   </form>
 </dialog>
 
-<dialog id="signup_model" class="modal" bind:this={signupModel}>
+<dialog id="signup_model" class="daisy-modal" bind:this={signupModel}>
   <form
     method="dialog"
-    class="modal-box bg-gradient-to-r from-[#0C082E] to-[#0C092E]"
+    class="daisy-modal-box bg-gradient-to-r from-[#0C082E] to-[#0C092E]"
     action="?/null_action"
   >
     <form
@@ -480,7 +480,7 @@
           </div>
         </div>
       </div>
-      <div class="modal-action place-content-center gap-10">
+      <div class="daisy-modal-action place-content-center gap-10">
         <button
           class="daisy-btn daisy-btn-primary daisy-btn-outline"
           type="submit">Sign Up</button

@@ -73,10 +73,10 @@
       <ShowDetail {show} />
     {/key}
     {#if canBuyTicket}
-      <input type="checkbox" id="buy-ticket" class="modal-toggle" />
-      <div class="modal">
+      <input type="checkbox" id="buy-ticket" class="daisy-modal-toggle" />
+      <div class="daisy-modal">
         <div
-          class="modal-box relative bg-gradient-to-r from-[#0C082E] to-[#0C092E]"
+          class="daisy-modal-box relative bg-gradient-to-r from-[#0C082E] to-[#0C092E]"
         >
           <label
             for="buy-ticket"
@@ -108,7 +108,9 @@
                   bind:value={displayName}
                 />
                 {#if form?.missingName}
-                  <div class="alert alert-error">Name is required</div>
+                  <div class="daisy-alert daisy-alert-error">
+                    Name is required
+                  </div>
                 {/if}
               </div>
               <div class="py-2 form-control">
@@ -124,10 +126,14 @@
                   maxlength="8"
                 />
                 {#if form?.missingPin}
-                  <div class="alert alert-error">Pin is required</div>
+                  <div class="daisy-alert daisy-alert-error">
+                    Pin is required
+                  </div>
                 {/if}
                 {#if form?.invalidPin}
-                  <div class="alert alert-error">Pin must be 8 digits</div>
+                  <div class="daisy-alert daisy-alert-error">
+                    Pin must be 8 digits
+                  </div>
                 {/if}
                 <div class="text-center text-sm p-1">
                   You need a pin to access the ticket later!

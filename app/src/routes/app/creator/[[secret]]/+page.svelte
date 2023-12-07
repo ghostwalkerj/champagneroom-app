@@ -47,7 +47,6 @@
   let user = data.user as UserDocumentType;
 
   $: showVideo = false;
-  $: creatorName = creator ? creator.user.name : 'Creator';
 
   $: canCreateShow = false;
   $: canCancelShow = false;

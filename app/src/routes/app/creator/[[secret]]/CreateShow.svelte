@@ -9,12 +9,12 @@
   import Config from '$lib/config';
   import { durationFormatter } from '$lib/constants';
 
-  import type { CreatorDocument } from '$lib/models/creator';
+  import type { CreatorDocumentType } from '$lib/models/creator';
   import type { ActionData } from './$types';
 
   $: showDuration = 60;
 
-  export let creator: CreatorDocument;
+  export let creator: CreatorDocumentType;
   export let form: ActionData;
   export let isLoading = false;
   // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -45,9 +45,9 @@
   };
 </script>
 
-<div class="bg-primary text-primary-content card">
-  <div class="text-center card-body items-center p-3">
-    <h2 class="text-2xl card-title">Create a New Show</h2>
+<div class="bg-primary text-primary-content daisy-card">
+  <div class="text-center daisy-card-body items-center p-3">
+    <h2 class="text-2xl daisy-card-title">Create a New Show</h2>
     <div class="flex flex-col w-full">
       <form method="post" action="?/create_show" use:enhance={onSubmit}>
         <div
@@ -67,7 +67,7 @@
               maxlength="50"
             />
             {#if form?.badName}
-              <div class="shadow-lg alert alert-error">
+              <div class="shadow-lg daisy-alert daisy-alert-error">
                 Show Name should be between 3 and 50 characters
               </div>
             {/if}
@@ -87,7 +87,7 @@
               <input
                 type="text"
                 name="price"
-                class="w-full py-2 pl-6 input daisy-input-bordered daisy-input-primary"
+                class="w-full py-2 pl-6 daisy-input daisy-input-bordered daisy-input-primary"
                 placeholder="0.00"
                 aria-describedby="price-currency"
                 value={form?.price ?? ''}
@@ -101,12 +101,16 @@
               </div>
             </div>
             {#if form?.missingPrice}
-              <div class="shadow-lg alert alert-error whitespace-nowrap">
+              <div
+                class="shadow-lg daisy-alert daisy-alert-error whitespace-nowrap"
+              >
                 Price is required
               </div>
             {/if}
             {#if form?.invalidPrice}
-              <div class="shadow-lg alert alert-error whitespace-nowrap">
+              <div
+                class="shadow-lg daisy-alert daisy-alert-error whitespace-nowrap"
+              >
                 Invalid Price
               </div>
             {/if}

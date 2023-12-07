@@ -63,9 +63,9 @@
   Chart.register(ChartDataLabels);
 </script>
 
-<div class="bg-primary text-primary-content card">
-  <div class="text-center card-body items-center">
-    <div class="text-2xl card-title capitalize">
+<div class="bg-primary text-primary-content daisy-cardy-card">
+  <div class="text-center daisy-card-body items-center">
+    <div class="text-2xl daisy-card-title capitalize">
       Top Creators - {now.monthName()}
     </div>
     {#if creators && creators.length > 0}

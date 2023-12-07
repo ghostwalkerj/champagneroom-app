@@ -18,9 +18,9 @@
   };
 </script>
 
-<input type="checkbox" id="leave-feedback" class="modal-toggle" />
-<div class="modal">
-  <div class="modal-box relative lg:max-w-2xl lg:mx-auto">
+<input type="checkbox" id="leave-feedback" class="daisy-modal-toggle" />
+<div class="daisy-modal">
+  <div class="daisy-modal-box relative lg:max-w-2xl lg:mx-auto">
     <label
       for="leave-feedback"
       class="daisy-btn daisy-btn-sm daisy-btn-circle absolute right-2 top-2"
@@ -72,7 +72,9 @@
           />
         </div>
         {#if form?.missingRating}
-          <div class="shadow-lg alert alert-error">Rating is Required</div>
+          <div class="shadow-lg daisy-alert daisy-alert-error">
+            Rating is Required
+          </div>
         {/if}
       </div>
       <div class="w-full py-2 form-control">

@@ -33,8 +33,12 @@
 </script>
 
 {#if hasTransactions}
-  <dialog id="transaction_modal" class="modal" bind:this={transactionModal}>
-    <div class="modal-box">
+  <dialog
+    id="transaction_modal"
+    class="daisy-modal"
+    bind:this={transactionModal}
+  >
+    <div class="daisy-modal-box">
       <h3 class="font-bold text-lg text-center">Recent Transactions</h3>
       {#if earnings.length > 0}
         <div>
@@ -72,7 +76,7 @@
           </ul>
         </div>
       {/if}
-      <div class="modal-action">
+      <div class="daisy-modal-action">
         <form method="dialog">
           <!-- if there is a button in form, it will close the modal -->
           <button class="btn">Close</button>
@@ -83,12 +87,12 @@
 {/if}
 
 {#if hasAvailableBalance}
-  <dialog id="withdraw_modal" class="modal" bind:this={withdrawModal}>
-    <div class="modal-box lg:w-2/3 py-4 px-6 text-center rounded-lg">
+  <dialog id="withdraw_modal" class="daisy-modal" bind:this={withdrawModal}>
+    <div class="daisy-modal-box lg:w-2/3 py-4 px-6 text-center rounded-lg">
       <h3 class="font-bold text-2xl mb-4">
         Withdraw Funds into your Own Wallet
       </h3>
-      <div class="modal-action justify-center">
+      <div class="daisy-modal-action justify-center">
         <form method="post" action="?/request_payout" use:enhance={onSubmit}>
           <input type="hidden" name="walletId" value={wallet._id.toString()} />
 
@@ -98,7 +102,7 @@
               type="text"
               name="amount"
               bind:this={amountElement}
-              class="w-full input daisy-input-bordered daisy-input-primary mb-4 h-12 rounded-lg"
+              class="w-full daisy-input daisy-input-bordered daisy-input-primary mb-4 h-12 rounded-lg"
               value={form?.amount ?? ''}
             />
             <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -111,12 +115,16 @@
             </div>
           </div>
           {#if form?.missingAmount || form?.invalidAmount}
-            <div class="shadow-md alert alert-error whitespace-nowrap mb-4">
+            <div
+              class="shadow-md daisy-alert daisy-alert-error whitespace-nowrap mb-4"
+            >
               Enter Amount to Transfer
             </div>
           {/if}
           {#if form?.insufficientBalance}
-            <div class="shadow-md alert alert-error whitespace-nowrap mb-4">
+            <div
+              class="shadow-md daisy-alert daisy-alert-error whitespace-nowrap mb-4"
+            >
               Insufficient Balance
             </div>
           {/if}
@@ -125,13 +133,15 @@
           <input
             type="text"
             name="destination"
-            class="w-full input daisy-input-bordered daisy-input-primary mb-4 h-12 rounded-lg"
+            class="w-full daisy-input daisy-input-bordered daisy-input-primary mb-4 h-12 rounded-lg"
             placeholder="Address"
             readonly={destination !== ''}
             value={destination ?? form?.destination ?? ''}
           />
           {#if form?.missingDestination}
-            <div class="shadow-md alert alert-error whitespace-nowrap mb-4">
+            <div
+              class="shadow-md daisy-alert daisy-alert-error whitespace-nowrap mb-4"
+            >
               Enter a valid Destination Address
             </div>
           {/if}
@@ -152,9 +162,9 @@
   </dialog>
 {/if}
 
-<div class="bg-primary h-full text-primary-content card">
-  <div class="card-body text-center items-center p-3">
-    <h2 class="card-title text-2xl">My Wallet</h2>
+<div class="bg-primary h-full text-primary-content daisy-card">
+  <div class="daisy-card-body text-center items-center p-3">
+    <h2 class="daisy-card-title text-2xl">My Wallet</h2>
     <div class="text-accent lowercase">({wallet.status})</div>
 
     <!-- Responsive container -->
@@ -164,10 +174,10 @@
       <!-- Flex container for content -->
       <div class="flex flex-col items-center">
         <!-- Available Balance -->
-        <div class="stat-title text-info text-lg lg:text-xl">
+        <div class="daisy-stat-title text-info text-lg lg:text-xl">
           Available Balance
         </div>
-        <div class="stat-value text-lg xl:text-xl">
+        <div class="daisy-stat-value text-lg xl:text-xl">
           {currencyFormatter(wallet.currency).format(availableBalance)}
           {#if exchangeRate > 0}
             <div class="text-sm text-primary-content">
@@ -180,7 +190,7 @@
 
         <!-- Buttons with responsive spacing -->
         <div
-          class="stat-actions flex gap-2 mt-2 lg:mt-4 xl:mt-6 flex-col lg:flex-row justify-center lg:justify-start"
+          class="daisy-stat-actions flex gap-2 mt-2 lg:mt-4 xl:mt-6 flex-col lg:flex-row justify-center lg:justify-start"
         >
           <button
             class="daisy-btn daisy-btn-base lg:btn-sm"

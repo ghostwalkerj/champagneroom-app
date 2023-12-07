@@ -154,9 +154,11 @@
       </div>
 
       {#if noUser}
-        <div class="card w-full lg:w-96 bg-info text-neutral-content lg:mt-10">
-          <div class="card-body items-center text-center">
-            <h2 class="card-title">
+        <div
+          class="daisy-card w-full lg:w-96 bg-info text-neutral-content lg:mt-10"
+        >
+          <div class="daisy-card-body items-center text-center">
+            <h2 class="daisy-card-title">
               Address: {walletAddress?.slice(0, 6)}...{walletAddress.slice(-4)} not
               found
             </h2>
@@ -237,17 +239,17 @@
                     <input
                       name="password"
                       type="password"
-                      class="max-w-xs w-full py-2 pl-6 input daisy-input-bordered daisy-input-primary"
+                      class="max-w-xs w-full py-2 pl-6 daisy-input daisy-input-bordered daisy-input-primary"
                       value={''}
                     />
                     {#if form?.missingPassword}<div
-                        class="shadow-lg alert alert-error"
+                        class="shadow-lg daisy-alert daisy-alert-error"
                       >
                         Password is required
                       </div>{/if}
 
                     {#if form?.badPassword}<div
-                        class="shadow-lg alert alert-error"
+                        class="shadow-lg daisy-alert daisy-alert-error"
                       >
                         Incorrect Password
                       </div>{/if}
@@ -291,22 +293,24 @@
                     <input
                       name="pin"
                       type="text"
-                      class="max-w-xs w-full py-2 pl-6 input daisy-input-bordered daisy-input-primary"
+                      class="max-w-xs w-full py-2 pl-6 daisy-input daisy-input-bordered daisy-input-primary"
                       value={form?.pin ?? ''}
                       minlength="8"
                       maxlength="8"
                     />
                     {#if form?.missingPin}<div
-                        class="shadow-lg alert alert-error"
+                        class="shadow-lg daisy-alert daisy-alert-error"
                       >
                         Pin is required
                       </div>{/if}
                     {#if form?.invalidPin}<div
-                        class="shadow-lg alert alert-error"
+                        class="shadow-lg daisy-alert daisy-alert-error"
                       >
                         Pin must be 8 digits
                       </div>{/if}
-                    {#if form?.badPin}<div class="shadow-lg alert alert-error">
+                    {#if form?.badPin}<div
+                        class="shadow-lg daisy-alert daisy-alert-error"
+                      >
                         Incorrect Pin
                       </div>{/if}
                     <div class="text-center text-sm p-1">

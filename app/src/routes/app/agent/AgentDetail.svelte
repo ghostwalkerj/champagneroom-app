@@ -91,8 +91,8 @@
 
 <div>
   <div class="lg:col-start-3 lg:col-span-1">
-    <div class="bg-primary text-primary-content card">
-      <div class="text-center card-body items-center p-3">
+    <div class="bg-primary text-primary-content daisy-card">
+      <div class="text-center daisy-card-body items-center p-3">
         <div class="flex flex-col gap-4">
           <div
             class="text-2xl font-bold w-full text-center"
@@ -125,7 +125,7 @@
           <div>
             <div class="font-bold pr-1">Referral Url:</div>
             <div>
-              <a class="link" href={referralUrl}> {referralCode}</a>
+              <a class="daisy-link" href={referralUrl}> {referralCode}</a>
             </div>
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <div class="daisy-btn daisy-btn-xs" on:click={updateReferralCode}>

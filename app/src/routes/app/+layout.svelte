@@ -108,7 +108,7 @@
   </div>
 
   <footer
-    class="footer footer-center p-4 bg-base-300 text-base-content sticky bottom-0"
+    class="daisy-footer daisy-footer-center p-4 bg-base-300 text-base-content sticky bottom-0"
   >
     <div>
       <p>Build Number: {buildNumber}</p>

@@ -23,11 +23,11 @@
 </script>
 
 <!-- Checkbox to toggle modal -->
-<input type="checkbox" id="initiate-dispute" class="modal-toggle" />
+<input type="checkbox" id="initiate-dispute" class="daisy-modal-toggle" />
 
 <!-- Modal -->
-<div class="modal">
-  <div class="modal-box">
+<div class="daisy-modal">
+  <div class="daisy-modal-box">
     <label
       for="initiate-dispute"
       class="daisy-btn daisy-btn-sm daisy-btn-circle absolute right-2 top-2"
@@ -54,7 +54,9 @@
           {/each}
         </select>
       </div>
-      {#if form?.missingReason}<div class="shadow-lg alert alert-error">
+      {#if form?.missingReason}<div
+          class="shadow-lg daisy-alert daisy-alert-error"
+        >
           Select a Reason
         </div>{/if}
 

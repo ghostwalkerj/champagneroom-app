@@ -143,8 +143,8 @@
   };
 </script>
 
-<dialog id="new_creator_modal" class="modal" bind:this={newCreatorModal}>
-  <div class="modal-box">
+<dialog id="new_creator_modal" class="daisy-modal" bind:this={newCreatorModal}>
+  <div class="daisy-modal-box">
     {#if newCreator}
       <h3 class="font-bold text-lg text-center mb-6">New Creator</h3>
       <div class="text-center">
@@ -161,7 +161,7 @@
               newCreator.user.secret
             )}
             target="_blank"
-            class="link link-primary"
+            class="daisy-link daisy-link-primary"
           >
             {urlJoin(
               $page.url.origin,
@@ -175,7 +175,7 @@
       <div class="text-center m-auto pt-6">
         Share this information only with your Creator
       </div>
-      <div class="modal-action">
+      <div class="daisy-modal-action">
         <form method="dialog">
           <!-- if there is a button in form, it will close the modal -->
           <button class="btn">Close</button>
@@ -188,15 +188,19 @@
 {#if agent}
   <!-- Modal for Changing Creator URL -->
   {#if isChangeCreatorSecret}
-    <input type="checkbox" id="changeUrl-show-modal" class="modal-toggle" />
-    <div class="modal modal-open">
-      <div class="modal-box">
+    <input
+      type="checkbox"
+      id="changeUrl-show-modal"
+      class="daisy-modal-toggle"
+    />
+    <div class="daisy-modal modal-open">
+      <div class="daisy-modal-box">
         <h3 class="font-bold text-lg">Change Creator URL</h3>
         <p class="py-4">
           Changing the Creator's Secret URL will disable the current URL and
           create a new one.
         </p>
-        <div class="modal-action">
+        <div class="daisy-modal-action">
           <button class="btn" on:click={() => (isChangeCreatorSecret = false)}
             >Cancel</button
           >
@@ -249,7 +253,7 @@
               >
                 <div class="overflow-x-auto">
                   {#key creators}
-                    <table class="table table-pin-rows">
+                    <table class="daisy-table daisy-table-pin-rows">
                       <thead>
                         <tr>
                           <th
@@ -364,7 +368,8 @@
                                     creator.user.secret
                                   )}
                                   target="_blank"
-                                  class="link link-primary">Secret Url</a
+                                  class="daisy-link daisy-link-primary"
+                                  >Secret Url</a
                                 >
                                 <button
                                   class="daisy-btn daisy-btn-xs daisy-btn-outline daisy-btn-primary ml-4"

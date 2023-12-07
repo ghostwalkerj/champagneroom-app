@@ -21,11 +21,11 @@
 </script>
 
 <form method="post" action="?/cancel_show" use:enhance={onSubmit}>
-  <div class="bg-primary text-primary-content card mb-3 lg:mb-0">
+  <div class="bg-primary text-primary-content daisy-card mb-3 lg:mb-0">
     <div
-      class="lg:flex lg:justify-center lg:items-center lg:text-left card-body p-3"
+      class="lg:flex lg:justify-center lg:items-center lg:text-left daisy-card-body p-3"
     >
-      <div class="text-xl card-title">Cancel Your Show</div>
+      <div class="text-xl daisy-card-title">Cancel Your Show</div>
       <div class="text">
         If you cancel this show any tickets sold will be refunded.
       </div>

@@ -42,7 +42,7 @@
           Thank you for the interest in CHAMPAGNE ROOM!
         </div>
         {#if isSubmitted}
-          <div class="alert alert-success">
+          <div class="daisy-alert daisy-alert-success">
             Your interest has been submitted
           </div>
         {:else}
@@ -64,7 +64,7 @@
               <option>Other</option>
             </select>
             {#if form?.missingInterest}
-              <div class="shadow-lg alert alert-error">
+              <div class="shadow-lg daisy-alert daisy-alert-error">
                 Interest is required
               </div>
             {/if}
@@ -75,7 +75,9 @@
               class="daisy-input daisy-input-bordered daisy-input-primary w-[300px] bg-transparent"
             />
             {#if form?.badEmail}
-              <div class="shadow-lg alert alert-error">Email is Required</div>
+              <div class="shadow-lg daisy-alert daisy-alert-error">
+                Email is Required
+              </div>
             {/if}
             <div class="w-full text-center">
               <button class="daisy-btn daisy-btn-outline daisy-btn-primary w-32"

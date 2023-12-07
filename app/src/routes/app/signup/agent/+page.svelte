@@ -118,10 +118,10 @@
   {/if}
   <div />
 </div>
-<dialog id="address_modal" class="modal" bind:this={addressModel}>
+<dialog id="address_modal" class="daisy-modal" bind:this={addressModel}>
   <form
     method="dialog"
-    class="modal-box bg-gradient-to-r from-[#0C082E] to-[#0C092E]
+    class="daisy-modal-box bg-gradient-to-r from-[#0C082E] to-[#0C092E]
 "
     action="?/null_action"
   >
@@ -146,7 +146,7 @@
           To use a different address, change the account connected in your
           wallet
         </div>
-        <div class="modal-action place-content-center gap-10">
+        <div class="daisy-modal-action place-content-center gap-10">
           <button
             class="daisy-btn daisy-btn-primary daisy-btn-outline"
             on:click={() => {
@@ -173,7 +173,7 @@
           Before you can sign up, connect your wallet
         </div>
 
-        <div class="modal-action place-content-center gap-10">
+        <div class="daisy-modal-action place-content-center gap-10">
           <ConnectButton />
           <button
             class="daisy-btn daisy-btn-secondary daisy-btn-outline"
@@ -185,10 +185,10 @@
   </form>
 </dialog>
 
-<dialog id="exist_model" class="modal" bind:this={existsModel}>
+<dialog id="exist_model" class="daisy-modal" bind:this={existsModel}>
   <form
     method="dialog"
-    class="modal-box bg-gradient-to-r from-[#0C082E] to-[#0C092E]
+    class="daisy-modal-box bg-gradient-to-r from-[#0C082E] to-[#0C092E]
 "
     action="?/null_action"
   >
@@ -213,7 +213,7 @@
           To use a different address, change the account connected in your
           wallet
         </div>
-        <div class="modal-action place-content-center gap-10">
+        <div class="daisy-modal-action place-content-center gap-10">
           <button
             class="daisy-btn daisy-btn-primary daisy-btn-outline"
             on:click={() => {
@@ -233,10 +233,10 @@
   </form>
 </dialog>
 
-<dialog id="signup_model" class="modal" bind:this={signupModel}>
+<dialog id="signup_model" class="daisy-modal" bind:this={signupModel}>
   <form
     method="dialog"
-    class="modal-box bg-gradient-to-r from-[#0C082E] to-[#0C092E]"
+    class="daisy-modal-box bg-gradient-to-r from-[#0C082E] to-[#0C092E]"
     action="?/null_action"
   >
     <form
@@ -301,7 +301,7 @@
         </div>
       </div>
 
-      <div class="modal-action place-content-center gap-10">
+      <div class="daisy-modal-action place-content-center gap-10">
         <button
           class="daisy-btn daisy-btn-primary daisy-btn-outline"
           type="submit">Sign Up</button
