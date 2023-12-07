@@ -118,10 +118,10 @@
   {/if}
   <div />
 </div>
-<dialog id="address_modal" class="modal" bind:this={addressModel}>
+<dialog id="address_modal" class="daisy-modal" bind:this={addressModel}>
   <form
     method="dialog"
-    class="modal-box bg-gradient-to-r from-[#0C082E] to-[#0C092E]
+    class="daisy-modal-box bg-gradient-to-r from-[#0C082E] to-[#0C092E]
 "
     action="?/null_action"
   >
@@ -146,16 +146,16 @@
           To use a different address, change the account connected in your
           wallet
         </div>
-        <div class="modal-action place-content-center gap-10">
+        <div class="daisy-modal-action place-content-center gap-10">
           <button
-            class="btn btn-primary btn-outline"
+            class="daisy-btn daisy-btn-primary daisy-btn-outline"
             on:click={() => {
               addressModel.close();
               signupModel.showModal();
             }}>Continue</button
           >
           <button
-            class="btn btn-secondary btn-outline"
+            class="daisy-btn daisy-btn-secondary daisy-btn-outline"
             on:click={() => addressModel.close()}>Cancel</button
           >
         </div>
@@ -173,10 +173,10 @@
           Before you can sign up, connect your wallet
         </div>
 
-        <div class="modal-action place-content-center gap-10">
+        <div class="daisy-modal-action place-content-center gap-10">
           <ConnectButton />
           <button
-            class="btn btn-secondary btn-outline"
+            class="daisy-btn daisy-btn-secondary daisy-btn-outline"
             on:click={() => addressModel.close()}>Cancel</button
           >
         </div>
@@ -185,10 +185,10 @@
   </form>
 </dialog>
 
-<dialog id="exist_model" class="modal" bind:this={existsModel}>
+<dialog id="exist_model" class="daisy-modal" bind:this={existsModel}>
   <form
     method="dialog"
-    class="modal-box bg-gradient-to-r from-[#0C082E] to-[#0C092E]
+    class="daisy-modal-box bg-gradient-to-r from-[#0C082E] to-[#0C092E]
 "
     action="?/null_action"
   >
@@ -213,16 +213,16 @@
           To use a different address, change the account connected in your
           wallet
         </div>
-        <div class="modal-action place-content-center gap-10">
+        <div class="daisy-modal-action place-content-center gap-10">
           <button
-            class="btn btn-primary btn-outline"
+            class="daisy-btn daisy-btn-primary daisy-btn-outline"
             on:click={() => {
               existsModel.close();
               goto(Config.Path.agent);
             }}>Sign In</button
           >
           <button
-            class="btn btn-secondary btn-outline"
+            class="daisy-btn daisy-btn-secondary daisy-btn-outline"
             on:click={() => {
               existsModel.close();
             }}>Cancel</button
@@ -233,10 +233,10 @@
   </form>
 </dialog>
 
-<dialog id="signup_model" class="modal" bind:this={signupModel}>
+<dialog id="signup_model" class="daisy-modal" bind:this={signupModel}>
   <form
     method="dialog"
-    class="modal-box bg-gradient-to-r from-[#0C082E] to-[#0C092E]"
+    class="daisy-modal-box bg-gradient-to-r from-[#0C082E] to-[#0C092E]"
     action="?/null_action"
   >
     <form
@@ -260,19 +260,19 @@
           Agent Name
         </div>
         <div class="w-full flex place-content-center">
-          <div class="form-control max-w-xs p-4">
+          <div class="daisy-form-control max-w-xs p-4">
             <!-- svelte-ignore a11y-label-has-associated-control -->
             <input
               type="text"
               name="name"
               placeholder={exampleName}
-              class="input input-bordered input-primary w-full max-w-xs input-sm"
+              class="daisy-input daisy-input-bordered daisy-input-primary w-full max-w-xs daisy-input-sm"
             />
 
             <!-- svelte-ignore a11y-label-has-associated-control -->
             {#if form?.badName}
-              <label class="label">
-                <span class="label-text-alt text-error"
+              <label class="daisy-label">
+                <span class="daisy-label-text-alt text-error"
                   >Between 3 and 50 characters</span
                 >
               </label>
@@ -284,30 +284,33 @@
         Default Commission
       </div>
       <div class="w-full flex place-content-center">
-        <div class="form-control max-w-xs p-4">
+        <div class="daisy-form-control max-w-xs p-4">
           <input
             type="text"
-            name="defaultCommissionRate"
+            name="defaultCommission"
             placeholder={Config.UI.defaultCommissionRate.toString()}
-            class="input input-bordered input-primary w-full max-w-xs input-sm"
+            class="daisy-input daisy-input-bordered daisy-input-primary w-full max-w-xs daisy-input-sm"
           />
 
           <!-- svelte-ignore a11y-label-has-associated-control -->
           {#if form?.badCommission}
-            <label class="label">
-              <span class="label-text-alt text-error">Between 0 and 100</span>
+            <label class="daisy-label">
+              <span class="daisy-label-text-alt text-error"
+                >Between 0 and 100</span
+              >
             </label>
           {/if}
         </div>
       </div>
 
-      <div class="modal-action place-content-center gap-10">
-        <button class="btn btn-primary btn-outline" type="submit"
-          >Sign Up</button
+      <div class="daisy-modal-action place-content-center gap-10">
+        <button
+          class="daisy-btn daisy-btn-primary daisy-btn-outline"
+          type="submit">Sign Up</button
         >
 
         <button
-          class="btn btn-secondary btn-outline"
+          class="daisy-btn daisy-btn-secondary daisy-btn-outline"
           on:click|preventDefault={() => {
             signupModel.close();
             addressModel.showModal();

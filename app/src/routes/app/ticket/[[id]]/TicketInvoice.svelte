@@ -111,7 +111,7 @@
       <!-- Amount Section -->
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <div
-        class="tooltip tooltip-primary"
+        class="daisy-tooltip daisy-tooltip-primary"
         id="payment-amount"
         data-tip="Copy"
         on:click={() => {

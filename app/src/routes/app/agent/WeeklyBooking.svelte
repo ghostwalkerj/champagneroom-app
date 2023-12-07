@@ -79,9 +79,9 @@
   Chart.register(autocolors);
 </script>
 
-<div class="bg-primary text-primary-content card">
-  <div class="text-center card-body items-center">
-    <div class="text-2xl card-title capitalize">Weekly Bookings</div>
+<div class="bg-primary text-primary-content daisy-card">
+  <div class="text-center daisy-card-body items-center">
+    <div class="text-2xl daisy-card-title capitalize">Weekly Bookings</div>
     {#if creators && creators.length > 0}
       {#if datasets.length > 0}
         {#key datasets}

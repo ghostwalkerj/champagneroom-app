@@ -54,7 +54,7 @@
 <div
   class="bg-gradient-to-r from-[#0C082E] to-[#0C092E] font-Roboto flex flex-col min-h-screen min-w-[320px]"
 >
-  <div class="navbar w-screen">
+  <div class="daisy-navbar w-screen">
     <div class="flex flex-col lg:flex-row w-screen">
       <div class="w-full lg:w-1/3 flex justify-center lg:ml-20">
         <!-- svelte-ignore a11y-missing-attribute -->
@@ -86,7 +86,7 @@
         <ConnectButton />
         {#if $page.data.user}
           <button
-            class="btn btn-xs btn-primary mr-4"
+            class="daisy-btn daisy-btn-xs daisy-btn-primary mr-4"
             on:click={() => {
               goto(
                 signOut +
@@ -101,14 +101,14 @@
       </div>
     </div>
   </div>
-  <div class="divider m-0" />
+  <div class="daisy-divider m-0" />
 
   <div class="flex-1">
     <slot />
   </div>
 
   <footer
-    class="footer footer-center p-4 bg-base-300 text-base-content sticky bottom-0"
+    class="daisy-footer daisy-footer-center p-4 bg-base-300 text-base-content sticky bottom-0"
   >
     <div>
       <p>Build Number: {buildNumber}</p>
