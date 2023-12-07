@@ -103,7 +103,7 @@
             />
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <div
-              class="btn btn-xs mb-4"
+              class="daisy-btn btn-xs mb-4"
               on:click={() =>
                 (amountElement.value = availableBalance.toString())}
             >
@@ -137,7 +137,7 @@
           {/if}
 
           <div class="flex flex-col lg:flex-row lg:justify-between lg:gap-4">
-            <button class="btn btn-primary mb-2 lg:mb-0">Submit</button>
+            <button class="daisy-btn btn-primary mb-2 lg:mb-0">Submit</button>
             <button
               class="btn"
               on:click|preventDefault={() => withdrawModal.close()}
@@ -181,14 +181,14 @@
           class="stat-actions flex gap-2 mt-2 lg:mt-4 xl:mt-6 flex-col lg:flex-row justify-center lg:justify-start"
         >
           <button
-            class="btn btn-base lg:btn-sm"
+            class="daisy-btn btn-base lg:btn-sm"
             disabled={!hasTransactions}
             on:click={() => transactionModal.show()}
           >
             Transactions
           </button>
           <button
-            class="btn btn-base lg:btn-sm"
+            class="daisy-btn btn-base lg:btn-sm"
             disabled={!hasAvailableBalance}
             on:click={() => withdrawModal.show()}
           >

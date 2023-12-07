@@ -178,7 +178,7 @@
         {#if signingRejected}
           <!-- svelte-ignore a11y-click-events-have-key-events -->
           <div>
-            <div class="btn btn-primary" on:click={signMessage}>
+            <div class="daisy-btn btn-primary" on:click={signMessage}>
               Sign Message
             </div>
           </div>
@@ -197,13 +197,15 @@
         class="flex flex-col md:flex-row justify-center items-center gap-4 w-full max-w-md"
       >
         <button
-          class="btn btn-warning"
+          class="daisy-btn btn-warning"
           on:click={() => {
             goto(Config.Path.creatorSignup);
           }}>Become a Creator</button
         >
         <div class="divider">OR</div>
-        <button class="btn btn-success" disabled={true}>Become an Agent</button>
+        <button class="daisy-btn btn-success" disabled={true}
+          >Become an Agent</button
+        >
       </div>
     </div>
   {/if}
@@ -256,7 +258,9 @@
                 </div>
 
                 <div class="py-4 text-center">
-                  <button class="btn btn-primary" type="submit">Submit</button>
+                  <button class="daisy-btn btn-primary" type="submit"
+                    >Submit</button
+                  >
                 </div>
               </div>
             </form>
@@ -312,7 +316,9 @@
                 </div>
 
                 <div class="py-4 text-center">
-                  <button class="btn btn-primary" type="submit">Submit</button>
+                  <button class="daisy-btn btn-primary" type="submit"
+                    >Submit</button
+                  >
                 </div>
               </div>
             </form>

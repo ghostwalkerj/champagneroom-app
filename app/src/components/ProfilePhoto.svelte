@@ -111,7 +111,7 @@
   {#if !update}
     <div class="justify-center card-actions last:my-2">
       <button
-        class="btn btn-xs btn-secondary btn-outline lg:btn-sm"
+        class="daisy-btn btn-xs btn-secondary btn-outline lg:btn-sm"
         on:click={() => {
           setUpdate(true);
         }}
@@ -132,13 +132,16 @@
         </label>
       {:else}
         <button
-          class="btn btn-xs btn-outline btn-secondary"
+          class="daisy-btn btn-xs btn-outline btn-secondary"
           on:click={() => upload()}
         >
           Upload
         </button>
       {/if}
-      <button class="btn btn-xs btn-outline btn-secondary" on:click={resetForm}>
+      <button
+        class="daisy-btn btn-xs btn-outline btn-secondary"
+        on:click={resetForm}
+      >
         Cancel
       </button>
     </div>

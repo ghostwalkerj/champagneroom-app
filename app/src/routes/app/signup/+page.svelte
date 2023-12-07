@@ -10,7 +10,7 @@
   >
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div
-      class="btn btn-primary w-fit"
+      class="daisy-btn btn-primary w-fit"
       on:click={() => goto(Config.Path.creatorSignup)}
     >
       Become a Creator
@@ -19,7 +19,7 @@
     <div class="divider divider-vertical text-primary">OR</div>
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div
-      class="btn btn-secondary w-fit"
+      class="daisy-btn btn-secondary w-fit"
       on:click={() => goto(Config.Path.agentSignup)}
     >
       Become an Agent

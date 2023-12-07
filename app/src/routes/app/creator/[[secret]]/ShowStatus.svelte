@@ -67,7 +67,7 @@
         <!-- Start Show Button -->
         {#if canStartShow}
           <button
-            class="btn lg:w-auto"
+            class="daisy-btn lg:w-auto"
             type="submit"
             disabled={isLoading}
             on:click={() => {

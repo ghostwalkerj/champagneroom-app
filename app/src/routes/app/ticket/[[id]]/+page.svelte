@@ -273,7 +273,7 @@
             class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-2xl lg:text-4xl -rotate-6 whitespace-nowrap font-extrabold text-primary ring-2 ring-primary bg-base-200/50 p-2 ring-inset rounded-xl"
           >
             <button
-              class="btn btn-secondary"
+              class="daisy-btn btn-secondary"
               disabled={isLoading}
               on:click={() => {
                 joinShow();
@@ -309,12 +309,12 @@
         <div class="flex flex-wrap gap-6 justify-center m-3">
           {#if shouldPay && !isShowCancelLoading}
             {#if !$selectedAccount}
-              <button class="btn btn-secondary" on:click={connect}
+              <button class="daisy-btn btn-secondary" on:click={connect}
                 >Connect Wallet</button
               >
             {:else}
               <button
-                class="btn btn-secondary"
+                class="daisy-btn btn-secondary"
                 on:click={walletPay}
                 disabled={isLoading}>Pay with Wallet</button
               >
@@ -323,7 +323,7 @@
           {#if canWatchShow && hasShowStarted}
             <div class="w-full flex justify-center">
               <button
-                class="btn btn-secondary"
+                class="daisy-btn btn-secondary"
                 disabled={isLoading}
                 on:click={() => {
                   joinShow();

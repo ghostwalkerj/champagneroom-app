@@ -78,7 +78,9 @@
               <div class="shadow-lg alert alert-error">Email is Required</div>
             {/if}
             <div class="w-full text-center">
-              <button class="btn btn-outline btn-primary w-32">Submit</button>
+              <button class="daisy-btn btn-outline btn-primary w-32"
+                >Submit</button
+              >
             </div>
           </form>
         {/if}

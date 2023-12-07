@@ -34,8 +34,10 @@
         class="flex flex-col text-white p-2 justify-center items-center lg:flex-row lg:space-x-4"
       >
         <div class="">
-          <button class="btn btn-secondary" type="submit" disabled={isLoading}
-            >Cancel Show</button
+          <button
+            class="daisy-btn btn-secondary"
+            type="submit"
+            disabled={isLoading}>Cancel Show</button
           >
         </div>
       </div>

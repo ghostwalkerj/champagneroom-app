@@ -22,7 +22,8 @@
 
 {#if isShowCancelLoading}
   <div class="flex justify-center w-full px-4 lg:px-8">
-    <button class="btn btn-secondary loading" disabled={true}>Cancelling</button
+    <button class="daisy-btn btn-secondary loading" disabled={true}
+      >Cancelling</button
     >
   </div>
 {:else}
@@ -33,7 +34,11 @@
     use:enhance={({ formElement }) => onSubmit(formElement)}
   >
     <div class="flex justify-center w-full px-4 lg:px-8">
-      <button class="btn btn-secondary" type="submit" disabled={isLoading}>
+      <button
+        class="daisy-btn btn-secondary"
+        type="submit"
+        disabled={isLoading}
+      >
         Cancel Ticket
       </button>
     </div>

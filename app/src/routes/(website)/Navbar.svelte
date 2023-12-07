@@ -36,12 +36,12 @@
       <li>
         {#if link.name == 'Sign Up'}
           <a
-            class="btn btn-ghost bg-gradient-to-r from-primary to-pink-500 text-black whitespace-nowrap hover:shadow-[0px_0px_17px_6px_#e779c1]"
+            class="daisy-btn btn-ghost bg-gradient-to-r from-primary to-pink-500 text-black whitespace-nowrap hover:shadow-[0px_0px_17px_6px_#e779c1]"
             href={link.href}>{link.name}</a
           >
         {:else if link.name == 'Open App'}
           <a
-            class="btn flex flex-nowrap hover:text-primary bg-[#e779c122]"
+            class="daisy-btn flex flex-nowrap hover:text-primary bg-[#e779c122]"
             class:text-primary={link.href == $page.url.hash}
             href={link.href}
           >
@@ -54,7 +54,7 @@
           </a>
         {:else}
           <a
-            class="btn btn-ghost whitespace-nowrap hover:text-primary hover:bg-[#e779c122]"
+            class="daisy-btn btn-ghost whitespace-nowrap hover:text-primary hover:bg-[#e779c122]"
             class:text-primary={link.href == $page.url.hash}
             href={link.href}>{link.name}</a
           >
@@ -70,12 +70,12 @@
         <li>
           {#if link.name == 'Sign Up'}
             <a
-              class="btn btn-ghost bg-gradient-to-r from-primary to-pink-500 text-black whitespace-nowrap hover:shadow-[0px_0px_17px_6px_#e779c1]"
+              class="daisy-btn btn-ghost bg-gradient-to-r from-primary to-pink-500 text-black whitespace-nowrap hover:shadow-[0px_0px_17px_6px_#e779c1]"
               href={link.href}>{link.name}</a
             >
           {:else if link.name == 'Open App'}
             <a
-              class="btn flex flex-nowrap hover:text-primary bg-[#e779c122]"
+              class="daisy-btn flex flex-nowrap hover:text-primary bg-[#e779c122]"
               class:text-primary={link.href == $page.url.hash}
               href={link.href}
             >
@@ -93,7 +93,7 @@
     <label
       for="rigthDrawer"
       aria-label="open sidebar"
-      class="btn btn-square btn-ghost mr-2"
+      class="daisy-btn btn-square btn-ghost mr-2"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -129,12 +129,12 @@
         <li on:click={closeNav}>
           {#if link.name == 'Sign Up'}
             <a
-              class="btn btn-ghost btn-block bg-gradient-to-r from-primary to-pink-500 text-black whitespace-nowrap hover:shadow-[0px_0px_17px_6px_#e779c1]"
+              class="daisy-btn btn-ghost btn-block bg-gradient-to-r from-primary to-pink-500 text-black whitespace-nowrap hover:shadow-[0px_0px_17px_6px_#e779c1]"
               href={link.href}>{link.name}</a
             >
           {:else if link.name == 'Open App'}
             <a
-              class="btn flex flex-nowrap hover:text-primary bg-[#e779c122]"
+              class="daisy-btn flex flex-nowrap hover:text-primary bg-[#e779c122]"
               class:text-primary={link.href == $page.url.hash}
               href={link.href}
             >
@@ -147,7 +147,7 @@
             </a>
           {:else}
             <a
-              class="btn btn-ghost btn-block whitespace-nowrap hover:text-primary hover:bg-[#e779c122]"
+              class="daisy-btn btn-ghost btn-block whitespace-nowrap hover:text-primary hover:bg-[#e779c122]"
               class:text-primary={link.href == $page.url.hash}
               href={link.href}>{link.name}</a
             >

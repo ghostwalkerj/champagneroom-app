@@ -149,8 +149,10 @@
         </div>
 
         <div class="py-2">
-          <button class="btn btn-secondary" type="submit" disabled={isLoading}
-            >Create Show</button
+          <button
+            class="daisy-btn btn-secondary"
+            type="submit"
+            disabled={isLoading}>Create Show</button
           >
         </div>
       </form>

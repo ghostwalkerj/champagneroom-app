@@ -191,7 +191,7 @@
           data-tip="Send this link to your fans"
         >
           <div
-            class="btn btn-primary text-xs lg:text-sm"
+            class="daisy-btn btn-primary text-xs lg:text-sm"
             on:click={copyShowUrl}
           >
             Copy Show Link

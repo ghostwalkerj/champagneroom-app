@@ -58,6 +58,7 @@ module.exports = {
     utils: true,
     logs: false,
     rtl: false,
+    prefix: 'daisy-',
     themes: [
       {
         cryptoJesus: {

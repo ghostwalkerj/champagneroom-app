@@ -148,14 +148,14 @@
         </div>
         <div class="modal-action place-content-center gap-10">
           <button
-            class="btn btn-primary btn-outline"
+            class="daisy-btn btn-primary btn-outline"
             on:click={() => {
               addressModel.close();
               signupModel.showModal();
             }}>Continue</button
           >
           <button
-            class="btn btn-secondary btn-outline"
+            class="daisy-btn btn-secondary btn-outline"
             on:click={() => addressModel.close()}>Cancel</button
           >
         </div>
@@ -176,7 +176,7 @@
         <div class="modal-action place-content-center gap-10">
           <ConnectButton />
           <button
-            class="btn btn-secondary btn-outline"
+            class="daisy-btn btn-secondary btn-outline"
             on:click={() => addressModel.close()}>Cancel</button
           >
         </div>
@@ -215,14 +215,14 @@
         </div>
         <div class="modal-action place-content-center gap-10">
           <button
-            class="btn btn-primary btn-outline"
+            class="daisy-btn btn-primary btn-outline"
             on:click={() => {
               existsModel.close();
               goto(Config.Path.agent);
             }}>Sign In</button
           >
           <button
-            class="btn btn-secondary btn-outline"
+            class="daisy-btn btn-secondary btn-outline"
             on:click={() => {
               existsModel.close();
             }}>Cancel</button
@@ -302,12 +302,12 @@
       </div>
 
       <div class="modal-action place-content-center gap-10">
-        <button class="btn btn-primary btn-outline" type="submit"
+        <button class="daisy-btn btn-primary btn-outline" type="submit"
           >Sign Up</button
         >
 
         <button
-          class="btn btn-secondary btn-outline"
+          class="daisy-btn btn-secondary btn-outline"
           on:click|preventDefault={() => {
             signupModel.close();
             addressModel.showModal();

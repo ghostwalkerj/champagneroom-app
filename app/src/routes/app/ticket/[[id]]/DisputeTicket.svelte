@@ -30,7 +30,7 @@
   <div class="modal-box">
     <label
       for="initiate-dispute"
-      class="btn btn-sm btn-circle absolute right-2 top-2">✕</label
+      class="daisy-btn btn-sm btn-circle absolute right-2 top-2">✕</label
     >
     <h3 class="text-lg text-center font-semibold mb-4">Initiate Dispute</h3>
 
@@ -67,7 +67,7 @@
 
       <!-- Submit Button -->
       <div class="text-center">
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="daisy-btn btn-primary">Submit</button>
       </div>
     </form>
   </div>
@@ -75,7 +75,7 @@
 
 <!-- Button to Open Modal -->
 <div class="p-4 w-full flex justify-center">
-  <label for="initiate-dispute" class="btn btn-secondary"
+  <label for="initiate-dispute" class="daisy-btn btn-secondary"
     >Initiate Dispute</label
   >
 </div>

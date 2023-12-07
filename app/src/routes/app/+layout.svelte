@@ -86,7 +86,7 @@
         <ConnectButton />
         {#if $page.data.user}
           <button
-            class="btn btn-xs btn-primary mr-4"
+            class="daisy-btn btn-xs btn-primary mr-4"
             on:click={() => {
               goto(
                 signOut +

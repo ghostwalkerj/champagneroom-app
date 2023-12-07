@@ -80,7 +80,7 @@
         >
           <label
             for="buy-ticket"
-            class="btn btn-sm btn-circle absolute right-2 top-2">✕</label
+            class="daisy-btn btn-sm btn-circle absolute right-2 top-2">✕</label
           >
           <div
             class="grid grid-rows-1 gap-4 grid-flow-col justify-center items-center"
@@ -134,11 +134,11 @@
               </div>
               <div class="py-4 text-center">
                 {#if isLoading}
-                  <button class="btn btn-secondary loading" disabled
+                  <button class="daisy-btn btn-secondary loading" disabled
                     >Reserving</button
                   >
                 {:else}
-                  <button class="btn btn-secondary" disabled={isLoading}
+                  <button class="daisy-btn btn-secondary" disabled={isLoading}
                     >Reserve</button
                   >
                 {/if}
@@ -147,7 +147,7 @@
           </div>
         </div>
       </div>
-      <label for="buy-ticket" class="btn btn-secondary m-4"
+      <label for="buy-ticket" class="daisy-btn btn-secondary m-4"
         >Reserve Ticket</label
       >
     {/if}
