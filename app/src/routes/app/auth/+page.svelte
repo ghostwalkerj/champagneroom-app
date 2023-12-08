@@ -12,6 +12,7 @@
 
   import type { Unsubscriber } from 'svelte/store';
   import type { ActionData, PageData } from './$types';
+  import NeonBlur from '$components/NeonBlur.svelte';
 
   export let data: PageData;
   export let form: ActionData;
@@ -140,25 +141,27 @@
     walletUnsub?.();
     accountUnsub?.();
   });
+
 </script>
 
-<div class="w-screen bg-base flex flex-col text-center items-center">
+<div class="w-screen  flex flex-col text-center items-center">
+  
   {#if authType === AuthType.SIGNING}
     <div
-      class="bg-gradient-to-r from-[#0C082E] to-[#0C092E] font-Roboto flex flex-col items-center justify-center min-w-[320px] pt-6 gap-6"
+      class="bg-surface-800 p-6 rounded-lg font-Roboto flex flex-col items-center justify-center min-w-[320px] gap-4"
     >
       <div
-        class="text-4xl font-bold text-primary w-full max-w-lg mx-auto text-center"
+        class="text-4xl font-bold w-full max-w-lg mx-auto text-center"
       >
         Crypto Wallet Authentication
       </div>
 
       {#if noUser}
         <div
-          class="daisy-card w-full lg:w-96 bg-info text-neutral-content lg:mt-10"
+          class="w-full lg:w-96 border border-surface-600 p-4 lg:mt-10 rounded-lg"
         >
-          <div class="daisy-card-body items-center text-center">
-            <h2 class="daisy-card-title">
+          <div class="items-center text-center">
+            <h2 class="font-semibold text-xl">
               Address: {walletAddress?.slice(0, 6)}...{walletAddress.slice(-4)} not
               found
             </h2>
@@ -186,118 +189,97 @@
           </div>
         {/if}
       {/if}
-      <div class="w-full max-w-md">
-        <div class="daisy-divider" />
-      </div>
-      <div class="text-neutral mb-4">Not a user?</div>
-      <div
-        class="text-4xl font-bold text-primary w-full max-w-md mx-auto text-center mb-4"
-      >
-        Sign Up to Earn Now
+      <div class="w-full max-w-md border-t border-surface-600 mt-2">
       </div>
       <div
-        class="flex flex-col md:flex-row justify-center items-center gap-4 w-full max-w-md"
+        class="text-xl font-bold  w-full max-w-md mx-auto text-center mb-4"
       >
-        <button
-          class="daisy-btn daisy-btn-warning"
-          on:click={() => {
-            goto(Config.Path.creatorSignup);
-          }}>Become a Creator</button
-        >
-        <div class="daisy-divider">OR</div>
-        <button class="daisy-btn daisy-btn-success" disabled={true}
-          >Become an Agent</button
-        >
+      Not a user? Sign Up to Earn Now
       </div>
+      <NeonBlur>
+        <a
+          href={Config.Path.signup}
+          class="relative btn btn-lg variant-filled rounded-lg"
+        >
+          Sign Up
+        </a>
+      </NeonBlur>
     </div>
-  {/if}
 
-  {#if authType === AuthType.PATH_PASSWORD}
+
+  {:else if authType === AuthType.PATH_PASSWORD}
     <!-- <div class="font-bold text-5xl text-primary w-full font-CaviarDreams">
       Verifying Path
     </div> -->
 
-    <div class="mt-6 flex items-center">
-      <div class="w-full">
-        <div class="flex justify-center">
-          <div
-            class="flex flex-col w-full p-4 max-w-fit gap-4 rounded-xl bg-base-200 overflow-auto"
-          >
+
             <form
               method="post"
               action="?/password_secret_auth"
               use:enhance={onSubmit}
+              class="bg-surface-800 p-6 rounded-lg flex flex-col  min-w-[320px] gap-4"
             >
               <input type="hidden" name="parseId" value={parseId} />
               <input type="hidden" name="type" value={type} />
-              <div class="max-w-xs w-full py-2 daisy-form-control">
-                <div class="max-w-xs w-full py-2 daisy-form-control">
-                  <label for="pin" class="daisy-label">
-                    <span class="daisy-label-text">Password</span></label
-                  >
-                  <div class="rounded-md shadow-sm mt-1 relative">
-                    <input
-                      name="password"
-                      type="password"
-                      class="max-w-xs w-full py-2 pl-6 daisy-input daisy-input-bordered daisy-input-primary"
-                      value={''}
-                    />
+                  
+                  <label class="label text-left font-semibold">
+                    <span>Password</span>
+                    <input class="input variant-form-material bg-surface-700" name="password" type="password" />
+                  </label>
+
+                  <div >                   
                     {#if form?.missingPassword}<div
                         class="shadow-lg daisy-alert daisy-alert-error"
                       >
                         Password is required
-                      </div>{/if}
+                      </div>
+                      {/if}
 
                     {#if form?.badPassword}<div
                         class="shadow-lg daisy-alert daisy-alert-error"
                       >
                         Incorrect Password
-                      </div>{/if}
-                    <div class="text-center text-sm p-1">
+                      </div>
+                      {/if}
+
+                    <div class="text-sm text-left">
                       Please enter your password
                     </div>
-                  </div>
-                </div>
 
-                <div class="py-4 text-center">
-                  <button class="daisy-btn daisy-btn-primary" type="submit"
+                  </div>
+              
+                <div class="text-center">
+                  <button class="btn variant-filled-primary" type="submit"
                     >Submit</button
                   >
-                </div>
-              </div>
+
             </form>
-          </div>
-        </div>
-      </div>
-    </div>
+
   {:else if authType === AuthType.PIN}
     <!-- <div class="font-bold text-5xl text-primary w-full font-CaviarDreams">
       Verifying PIN
     </div> -->
 
-    <div class="mt-6 flex items-center">
-      <div class="w-full">
-        <div class="flex justify-center">
-          <div
-            class="flex flex-col w-full p-4 max-w-fit gap-4 rounded-xl bg-base-200 overflow-auto"
-          >
-            <form method="post" action="?/pin_auth" use:enhance={onSubmit}>
+
+            <form method="post" action="?/pin_auth" use:enhance={onSubmit}
+              class="bg-surface-800 p-6 rounded-lg flex flex-col  min-w-[320px] gap-4"
+            >
               <input type="hidden" name="parseId" value={parseId} />
               <input type="hidden" name="type" value={type} />
-              <div class="max-w-xs w-full py-2 daisy-form-control">
-                <div class="max-w-xs w-full py-2 daisy-form-control">
-                  <label for="pin" class="daisy-label">
-                    <span class="daisy-label-text">8 Digit Pin</span></label
-                  >
-                  <div class="rounded-md shadow-sm mt-1 relative">
+
+                  <label for="pin" class="label text-left">
+                    <span class="font-semibold">8 Digit Pin</span>
                     <input
                       name="pin"
                       type="text"
-                      class="max-w-xs w-full py-2 pl-6 daisy-input daisy-input-bordered daisy-input-primary"
+                      class="input variant-form-material bg-surface-700"
                       value={form?.pin ?? ''}
                       minlength="8"
                       maxlength="8"
                     />
+                    </label
+                  >
+                    
                     {#if form?.missingPin}<div
                         class="shadow-lg daisy-alert daisy-alert-error"
                       >
@@ -313,22 +295,17 @@
                       >
                         Incorrect Pin
                       </div>{/if}
-                    <div class="text-center text-sm p-1">
+                    <div class="text-left text-sm">
                       You need a pin to see this ticket
                     </div>
-                  </div>
-                </div>
+              
 
-                <div class="py-4 text-center">
-                  <button class="daisy-btn daisy-btn-primary" type="submit"
+                <div class="text-center">
+                  <button class="btn variant-filled-primary" type="submit"
                     >Submit</button
                   >
                 </div>
-              </div>
             </form>
-          </div>
-        </div>
-      </div>
-    </div>
+
   {/if}
 </div>

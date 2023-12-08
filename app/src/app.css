@@ -17,3 +17,7 @@
     font-family: 'Space Grotesk';
   }
 }
+
+.bg-image {
+  @apply bg-cover max-w-sm w-full hover:scale-105 transition ease-in-out delay-150 shadow-sm hover:shadow-xl;
+}
