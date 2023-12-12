@@ -54,7 +54,7 @@
 
 
 <div
-  class="bg-surface-900 font-Roboto flex flex-col min-h-screen min-w-[320px]"
+  class="bg-surface-900 flex flex-col min-h-screen min-w-[320px]"
 >
   
 <nav class="flex justify-between items-center px-4">
