@@ -10,15 +10,15 @@ import { PermissionType } from '$lib/permissions';
 
 const { Schema, models } = pkg;
 
-export type UserDocument = InstanceType<typeof User>;
-
-export type UserDocumentType = InferSchemaType<typeof userSchema> & {
+export type UserDocument = InstanceType<typeof User> & {
   comparePassword: (password: string) => Promise<boolean>;
   isCreator: () => boolean;
   isAgent: () => boolean;
   isOperator: () => boolean;
   hasPermission: (permission: PermissionType) => boolean;
 };
+
+export type UserDocumentType = InferSchemaType<typeof userSchema>;
 
 export { User };
 

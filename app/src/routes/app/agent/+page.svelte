@@ -26,10 +26,13 @@
   import type { ActionData, PageData } from './$types';
   import AgentDetail from './AgentDetail.svelte';
   import WeeklyBooking from './WeeklyBooking.svelte';
+  import { PermissionType } from '$lib/permissions';
+  import type { UserDocumentType } from '$lib/models/user';
 
   export let data: PageData;
   let agent = data.agent as AgentDocumentType;
   let creators = data.creators as CreatorDocumentType[];
+  let user = data.user as UserDocumentType;
   let wallet = data.wallet as WalletDocumentType;
   let showData = data.showData as {
     creatorId: string;
@@ -62,6 +65,9 @@
   });
   let isChangeCreatorSecret = false;
   let agentUnSub: Unsubscriber;
+  const canImpersonate = user.permissions.includes(
+    PermissionType.IMPERSONATE_CREATOR
+  );
 
   onMount(() => {
     agentUnSub = AgentStore(agent).subscribe((_agent) => {
@@ -398,6 +404,12 @@
                                     (isChangeCreatorSecret = true)}
                                 >
                                   Change
+                                </button>
+                                <button
+                                  class="daisy-btn daisy-btn-xs daisy-btn-outline daisy-btn-primary ml-4"
+                                  disabled={!canImpersonate}
+                                >
+                                  Impersonate
                                 </button>
                               {:else}
                                 N/A

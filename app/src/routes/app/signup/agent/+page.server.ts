@@ -67,7 +67,9 @@ export const actions: Actions = {
     }
 
     // Check if existing user, if so, add the role
-    const user = await User.findOne({ address: address.toLowerCase() });
+    const user = (await User.findOne({
+      address: address.toLowerCase()
+    })) as UserDocument;
     if (user) {
       if (user.isAgent()) {
         return fail(400, { alreadyAgent: true });
