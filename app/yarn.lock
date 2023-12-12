@@ -2178,6 +2178,18 @@
   resolved "https://registry.yarnpkg.com/@sinclair/typebox/-/typebox-0.27.8.tgz#6667fac16c436b5434a387a34dedb013198f6e6e"
   integrity sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==
 
+"@skeletonlabs/skeleton@^2.6.0":
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/@skeletonlabs/skeleton/-/skeleton-2.6.0.tgz#95b87681be2f64e8004bb623f7bd617a6a8da4bb"
+  integrity sha512-4+Fa7b5qGwKGTnQS5S3+XQQ8CQHfL6GIofPJc1ibhT/idi/4whotq0UAvgzdeAILFhvey5jlS9InqXDQFDXdyA==
+  dependencies:
+    esm-env "1.0.0"
+
+"@skeletonlabs/tw-plugin@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@skeletonlabs/tw-plugin/-/tw-plugin-0.3.0.tgz#60936f40a38e47d0e3c96bf35a29f9409c9f08c8"
+  integrity sha512-0tBlZSHk791jvDTC41FlIafa8ZmaODjvOwmghcbla96Fbv9dI1u9+OJ2ScSxzy7xI6qjuQ80Uhw9kn53MMYi4Q==
+
 "@solana/buffer-layout@^4.0.0":
   version "4.0.1"
   resolved "https://registry.npmjs.org/@solana/buffer-layout/-/buffer-layout-4.0.1.tgz"
@@ -2608,6 +2620,13 @@
     svelte-hmr "^0.15.3"
     vitefu "^0.2.4"
 
+"@tailwindcss/forms@^0.5.7":
+  version "0.5.7"
+  resolved "https://registry.yarnpkg.com/@tailwindcss/forms/-/forms-0.5.7.tgz#db5421f062a757b5f828bc9286ba626c6685e821"
+  integrity sha512-QE7X69iQI+ZXwldE+rzasvbJiyV/ju1FGHH0Qn2W3FKbuYtqp8LKcy6iSw79fVUT5/Vvf+0XgLCeYVG+UV6hOw==
+  dependencies:
+    mini-svg-data-uri "^1.2.3"
+
 "@tailwindcss/typography@^0.5.9":
   version "0.5.10"
   resolved "https://registry.npmjs.org/@tailwindcss/typography/-/typography-0.5.10.tgz"
@@ -2977,10 +2996,10 @@
   resolved "https://registry.npmjs.org/@types/node/-/node-12.20.55.tgz"
   integrity sha512-J8xLz7q2OFulZ2cyGTLE1TbbZcjpno7FaN6zdJNrgAdrJ+DZzh/uFR6YrTb4C+nXakvud8Q4+rbhoIWlYQbUFQ==
 
-"@types/node@^18.16.15":
-  version "18.19.3"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.19.3.tgz#e4723c4cb385641d61b983f6fe0b716abd5f8fc0"
-  integrity sha512-k5fggr14DwAytoA/t8rPrIz++lXK7/DqckthCmoZOKNsEbJkId4Z//BqgApXBUGrGddrigYa1oqheo/7YmW4rg==
+"@types/node@^20.10.4":
+  version "20.10.4"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.10.4.tgz#b246fd84d55d5b1b71bf51f964bd514409347198"
+  integrity sha512-D08YG6rr8X90YB56tSIuBaddy/UXAA9RKJoFvrsnogAum/0pmjkgi4+2nx96A330FmioegBWmEYQ+syqCFaveg==
   dependencies:
     undici-types "~5.26.4"
 
@@ -5922,7 +5941,7 @@ eslint@^8.41.0:
     strip-ansi "^6.0.1"
     text-table "^0.2.0"
 
-esm-env@^1.0.0:
+esm-env@1.0.0, esm-env@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/esm-env/-/esm-env-1.0.0.tgz#b124b40b180711690a4cb9b00d16573391950413"
   integrity sha512-Cf6VksWPsTuW01vU9Mk/3vRue91Zevka5SjyNf3nEpokFRuqt/KjUQoGAwq9qMmhpLTHmXzSIrFRw8zxWzmFBA==
@@ -8306,6 +8325,11 @@ min-indent@^1.0.0:
   version "1.0.1"
   resolved "https://registry.npmjs.org/min-indent/-/min-indent-1.0.1.tgz"
   integrity sha512-I9jwMn07Sy/IwOj3zVkVik2JTvgpaykDZEigL6Rx6N9LbMywwUSMtxET+7lVoDLLd3O3IXwJwvuuns8UB/HeAg==
+
+mini-svg-data-uri@^1.2.3:
+  version "1.4.4"
+  resolved "https://registry.yarnpkg.com/mini-svg-data-uri/-/mini-svg-data-uri-1.4.4.tgz#8ab0aabcdf8c29ad5693ca595af19dd2ead09939"
+  integrity sha512-r9deDe9p5FJUPZAk3A59wGH7Ii9YrjjWw0jmw/liSbHl2CHiyXj6FcDXDu2K3TjVAXqiJdaw3xxwlZZr9E6nHg==
 
 minimalistic-assert@^1.0.0, minimalistic-assert@^1.0.1:
   version "1.0.1"
