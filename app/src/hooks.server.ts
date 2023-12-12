@@ -22,10 +22,11 @@ import { Creator } from '$lib/models/creator';
 import { Operator } from '$lib/models/operator';
 import { Show } from '$lib/models/show';
 import { Ticket } from '$lib/models/ticket';
-import { User, UserRole } from '$lib/models/user';
+import { User } from '$lib/models/user';
 import { Wallet, type WalletDocument } from '$lib/models/wallet';
 
 import Config from '$lib/config';
+import { UserRole } from '$lib/constants';
 import { authDecrypt } from '$lib/crypt';
 import {
   isAgentMatch,
@@ -39,7 +40,7 @@ import {
   isWhitelistMatch
 } from '$lib/server/auth';
 
-const authUrl = Config.Path.auth;
+const authUrl = Config.PATH.auth;
 
 if (mongoose.connection.readyState === 0) mongoose.connect(MONGO_DB_ENDPOINT);
 const redisConnection = new IORedis({
@@ -142,7 +143,7 @@ const allowedPath = (path: string, locals: App.Locals, selector?: string) => {
 
   // If the user is a creator, they can access their own page
   if (isPasswordMatch(path)) {
-    const creatorUrl = `${Config.Path.creator}/${slug}`;
+    const creatorUrl = `${Config.PATH.creator}/${slug}`;
     return locals.creator && path.startsWith(creatorUrl);
   }
 
@@ -154,7 +155,7 @@ const allowedPath = (path: string, locals: App.Locals, selector?: string) => {
   if (isOperatorMatch(path) && locals.operator) return true;
   if (isAgentMatch(path) && locals.agent) return true;
   if (isCreatorMatch(path) && locals.creator) return true;
-  if (path === Config.Path.app && locals.user) return true;
+  if (path === Config.PATH.app && locals.user) return true;
 
   // Notifications can be accessed by the creator, ticket holder, agent, operator
   if (isNotificationMatch(path)) {

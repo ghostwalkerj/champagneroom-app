@@ -44,7 +44,7 @@ export const actions: Actions = {
     const message = data.get('message') as string;
     const signature = data.get('signature') as string;
 
-    const returnPath = Config.Path.creator;
+    const returnPath = Config.PATH.creator;
 
     // Validation
     if (!name || name.length < 3 || name.length > 50) {

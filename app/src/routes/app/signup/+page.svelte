@@ -11,7 +11,7 @@
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div
       class="daisy-btn daisy-btn-primary w-fit"
-      on:click={() => goto(Config.Path.creatorSignup)}
+      on:click={() => goto(Config.PATH.creatorSignup)}
     >
       Become a Creator
     </div>
@@ -20,7 +20,7 @@
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div
       class="daisy-btn daisy-btn-secondary w-fit"
-      on:click={() => goto(Config.Path.agentSignup)}
+      on:click={() => goto(Config.PATH.agentSignup)}
     >
       Become an Agent
     </div>

@@ -2559,9 +2559,9 @@
     rollup "^3.7.0"
 
 "@sveltejs/kit@^1.27.6":
-  version "1.27.7"
-  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-1.27.7.tgz#9d31f4d9057a5460cc071088d61d2b599b360469"
-  integrity sha512-AzXYDoYt42clCBwLF9GTHsXyg2DFR31Ncyt8yxu8Aw4tgB433V+w+hcr1RTfAN9zKW2J2PY9FMQ8FoX/4Vw8CA==
+  version "1.29.0"
+  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-1.29.0.tgz#ea32c81edf9f9bae696b502ac1f1caf4ce20a898"
+  integrity sha512-O+DvB67Ouha0pVKh0nRxr8QwZcls8h4knLoS6Sk1DhRLAuQzuM0FNnPNIhMHL1iP1LFeXd3P+bk+h2V07WSF5w==
   dependencies:
     "@sveltejs/vite-plugin-svelte" "^2.5.0"
     "@types/cookie" "^0.5.1"
@@ -10319,9 +10319,9 @@ sourcemap-codec@^1.3.0, sourcemap-codec@^1.4.8:
   integrity sha512-9NykojV5Uih4lgo5So5dtw+f0JgJX30KCNI8gwhz2J9A15wD0Ml6tjHKwf6fTSa6fAdVBdZeNOs9eJ71qCk8vA==
 
 spacetime@^7.4.8:
-  version "7.4.8"
-  resolved "https://registry.yarnpkg.com/spacetime/-/spacetime-7.4.8.tgz#10a904e639d3c4e2549dda761f08ceed12adfb35"
-  integrity sha512-kQxyLfY1g+JH5+YwdYqsD4LtLxdcbkjlLnTCI9AaPUt3Ul8mr4BAQZk9gxza8eF9hlME55lIAgx49ShqBPsx/A==
+  version "7.5.0"
+  resolved "https://registry.yarnpkg.com/spacetime/-/spacetime-7.5.0.tgz#38eb3129d7535221cc5e32ddca61dfd5c17c54b6"
+  integrity sha512-FJ8EqkHf3W69s1/fDZVKQwVSrP7fd8oPdEIkgrXw2Mdcq9NeimrflEQFkCLQI84NVHHPTdwMq8L2sD39tIBJPg==
 
 sparse-array@^1.3.1:
   version "1.3.2"

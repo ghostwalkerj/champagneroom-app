@@ -24,7 +24,7 @@
   const buildNumber = generate(version);
   const buildTime = format(buildNumber);
   let lastAddress: string | undefined;
-  let signOut = Config.Path.signout;
+  let signOut = Config.PATH.signout;
 
   onMount(() => {
     selectedAccount.subscribe((account) => {
@@ -60,7 +60,7 @@
         <!-- svelte-ignore a11y-missing-attribute -->
         <a class="text-xl normal-case" href="/">
           <img
-            src="{Config.Path.staticUrl}/assets/logo-horizontal-tr.png"
+            src="{Config.PATH.staticUrl}/assets/logo-horizontal-tr.png"
             alt="Logo"
             width="260"
           />

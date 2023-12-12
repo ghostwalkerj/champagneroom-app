@@ -201,7 +201,7 @@
         <button
           class="daisy-btn daisy-btn-warning"
           on:click={() => {
-            goto(Config.Path.creatorSignup);
+            goto(Config.PATH.creatorSignup);
           }}>Become a Creator</button
         >
         <div class="daisy-divider">OR</div>

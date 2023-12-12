@@ -1,9 +1,10 @@
 import mongoose from 'mongoose';
 import parseArgv from 'tiny-parse-argv';
-import { User, UserRole } from './src/lib/models/user';
-import { Operator } from './src/lib/models/operator';
-import { Wallet } from './src/lib/models/wallet';
-import { AuthType } from './src/lib/constants';
+import { User } from '../src/lib/models/user';
+import { Operator } from '../src/lib/models/operator';
+import { Wallet } from '../src/lib/models/wallet';
+import { AuthType, UserRole } from '../src/lib/constants';
+import Config from '../src/lib/config';
 const arguments_ = parseArgv(process.argv);
 const address = arguments_.address;
 if (!address) throw new Error('No address provided');
@@ -20,7 +21,8 @@ const user = await User.create({
   payoutAddress: address,
   authType: AuthType.SIGNING,
   name: 'Operator',
-  roles: [UserRole.OPERATOR]
+  roles: [UserRole.OPERATOR],
+  permissions: Config.DEFAULT_PERMISSIONS[UserRole.OPERATOR]
 });
 
 const operator = await Operator.create({

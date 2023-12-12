@@ -20,12 +20,12 @@
   import WalletDetail from '$components/WalletDetail.svelte';
   import type { CurrencyType } from '$lib/models/common';
   import type { WalletDocumentType } from '$lib/models/wallet';
+  import { AgentStore } from '$stores';
+  import { onDestroy, onMount } from 'svelte';
+  import type { Unsubscriber } from 'svelte/store';
   import type { ActionData, PageData } from './$types';
   import AgentDetail from './AgentDetail.svelte';
   import WeeklyBooking from './WeeklyBooking.svelte';
-  import type { Unsubscriber } from 'svelte/store';
-  import { onDestroy, onMount } from 'svelte';
-  import { AgentStore } from '$stores';
 
   export let data: PageData;
   let agent = data.agent as AgentDocumentType;
@@ -175,7 +175,7 @@
           <a
             href={urlJoin(
               $page.url.origin,
-              Config.Path.creator,
+              Config.PATH.creator,
               newCreator.user.secret
             )}
             target="_blank"
@@ -183,7 +183,7 @@
           >
             {urlJoin(
               $page.url.origin,
-              Config.Path.creator,
+              Config.PATH.creator,
               newCreator.user.secret
             )}</a
           >
@@ -385,7 +385,7 @@
                             <td
                               >{#if creator.user.authType !== AuthType.SIGNING}<a
                                   href={urlJoin(
-                                    Config.Path.creator,
+                                    Config.PATH.creator,
                                     creator.user.secret
                                   )}
                                   target="_blank"

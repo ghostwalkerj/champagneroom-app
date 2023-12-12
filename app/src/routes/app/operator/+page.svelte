@@ -222,11 +222,11 @@
         and secret URL:
         <div class="text-center font-bold text-sm">
           <a
-            href={urlJoin(Config.Path.creator, newCreator.user.secret)}
+            href={urlJoin(Config.PATH.creator, newCreator.user.secret)}
             target="_blank"
             class="daisy-link daisy-link-primary"
           >
-            {urlJoin(Config.Path.creator, newCreator.user.secret)}</a
+            {urlJoin(Config.PATH.creator, newCreator.user.secret)}</a
           >
         </div>
       </div>
@@ -648,7 +648,7 @@
                             <td
                               >{#if creator.user.authType !== AuthType.SIGNING}<a
                                   href={urlJoin(
-                                    Config.Path.creator,
+                                    Config.PATH.creator,
                                     creator.user.secret
                                   )}
                                   target="_blank"

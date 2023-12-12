@@ -1,5 +1,25 @@
+import { UserRole } from './constants';
+import { PermissionType } from './permissions';
+
+export const defaultPermissions = {
+  [UserRole.OPERATOR]: [PermissionType.FULL],
+  [UserRole.AGENT]: [
+    PermissionType.IMPERSONATE_CREATOR,
+    PermissionType.CREATE_CREATOR,
+    PermissionType.CREATE_PAYOUT,
+    PermissionType.UPDATE_PROFILE
+  ],
+  [UserRole.CREATOR]: [
+    PermissionType.CREATE_SHOW,
+    PermissionType.UPDATE_PROFILE,
+    PermissionType.CANCEL_SHOW,
+    PermissionType.CREATE_PAYOUT
+  ],
+  [UserRole.TICKET_HOLDER]: [PermissionType.CREATE_TICKET]
+};
+
 const Config = {
-  Path: {
+  PATH: {
     show: '/app/show',
     ticket: '/app/ticket',
     pin: '/pin',
@@ -30,7 +50,8 @@ const Config = {
     gracePeriod: 600_000,
     escrowPeriod: 360_000,
     paymentPeriod: 6_000_000
-  }
+  },
+  DEFAULT_PERMISSIONS: defaultPermissions
 };
 
 export default Config;

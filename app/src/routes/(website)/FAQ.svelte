@@ -14,7 +14,7 @@
     >
       <img
         class="motion-safe:animate-fadeIn mx-auto rounded-lg opacity-45 justify-center w-full h-auto"
-        src="{Config.Path.staticUrl}/assets/ladyblue.png"
+        src="{Config.PATH.staticUrl}/assets/ladyblue.png"
         alt="Lady Blue"
       />
     </div>
@@ -24,7 +24,7 @@
     >
       <img
         class="motion-safe:animate-fadeIn mx-auto rounded-lg opacity-45 justify-center w-full h-auto"
-        src="{Config.Path.staticUrl}/assets/ladypink.png"
+        src="{Config.PATH.staticUrl}/assets/ladypink.png"
         alt="Lady Pink"
       />
     </div>

@@ -130,7 +130,7 @@
         <div class="w-full flex flex-col place-content-center">
           <div class="w-full flex place-content-center">
             <img
-              src="{Config.Path.staticUrl}/assets/bottlesnlegs.png"
+              src="{Config.PATH.staticUrl}/assets/bottlesnlegs.png"
               alt="Logo"
               class="h-16"
             />
@@ -164,7 +164,7 @@
       <div>
         <div class="w-full flex place-content-center">
           <img
-            src="{Config.Path.staticUrl}/assets/bottlesnlegs.png"
+            src="{Config.PATH.staticUrl}/assets/bottlesnlegs.png"
             alt="Logo"
             class="h-16"
           />
@@ -197,7 +197,7 @@
         <div class="w-full flex flex-col place-content-center">
           <div class="w-full flex place-content-center">
             <img
-              src="{Config.Path.staticUrl}/assets/bottlesnlegs.png"
+              src="{Config.PATH.staticUrl}/assets/bottlesnlegs.png"
               alt="Logo"
               class="h-16"
             />
@@ -218,7 +218,7 @@
             class="daisy-btn daisy-btn-primary daisy-btn-outline"
             on:click={() => {
               existsModel.close();
-              goto(Config.Path.agent);
+              goto(Config.PATH.agent);
             }}>Sign In</button
           >
           <button
@@ -247,7 +247,7 @@
     >
       <div class="w-full flex place-content-center">
         <img
-          src="{Config.Path.staticUrl}/assets/bottlesnlegs.png"
+          src="{Config.PATH.staticUrl}/assets/bottlesnlegs.png"
           alt="Logo"
           class="h-16"
         />

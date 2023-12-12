@@ -4,7 +4,6 @@ import * as web3 from 'web3';
 import { AUTH_SIGNING_MESSAGE } from '$env/static/private';
 
 import { Agent } from '$lib/models/agent';
-import { Creator } from '$lib/models/creator';
 import type { UserDocument } from '$lib/models/user';
 import { User } from '$lib/models/user';
 import { Wallet } from '$lib/models/wallet';
@@ -46,7 +45,7 @@ export const actions: Actions = {
     const signature = data.get('signature') as string;
     const defaultCommissionRate = data.get('defaultCommissionRate') as string;
 
-    const returnPath = Config.Path.agent;
+    const returnPath = Config.PATH.agent;
 
     // Validation
     if (!name || name.length < 3 || name.length > 50) {

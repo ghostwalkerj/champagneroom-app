@@ -13,7 +13,7 @@
     <div class="flex flex-col lg:flex-row items-center justify-center px-6">
       <div class="w-full m-3 p-6 flex justify-center">
         <Image
-          src="{Config.Path.staticUrl}/assets/creator4.png"
+          src="{Config.PATH.staticUrl}/assets/creator4.png"
           alt="Creator"
           class="rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1] max-w-xs md:max-w-sm lg:max-w-md"
           height={680}

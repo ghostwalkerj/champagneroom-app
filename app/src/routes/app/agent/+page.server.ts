@@ -12,12 +12,8 @@ import {
   BITCART_API_URL,
   BITCART_EMAIL,
   BITCART_PASSWORD,
-  JITSI_APP_ID,
-  JITSI_JWT_SECRET,
-  JWT_EXPIRY,
   PASSWORD_SALT
 } from '$env/static/private';
-import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
 import type { AgentDocument } from '$lib/models/agent';
 import { CurrencyType } from '$lib/models/common';

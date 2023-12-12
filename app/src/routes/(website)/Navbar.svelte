@@ -9,8 +9,8 @@
     { name: 'Creators', href: '#Creators' },
     { name: 'Token', href: '#Token' },
     { name: 'Contact', href: '#Contact' },
-    { name: 'Open App', href: Config.Path.openApp },
-    { name: 'Sign Up', href: Config.Path.signup }
+    { name: 'Open App', href: Config.PATH.openApp },
+    { name: 'Sign Up', href: Config.PATH.signup }
   ];
 
   function closeNav() {
@@ -25,7 +25,7 @@
   <a href="/" class="w-[180px] lg:w-[280px]">
     <img
       alt="logo"
-      src="{Config.Path.staticUrl}/assets/logo-horizontal-tr.png"
+      src="{Config.PATH.staticUrl}/assets/logo-horizontal-tr.png"
       class=""
     />
   </a>
