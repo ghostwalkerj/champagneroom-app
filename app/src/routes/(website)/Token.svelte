@@ -1,5 +1,6 @@
 <script lang="ts">
   import Config from '$lib/config';
+  import { Image } from '@unpic/svelte';
 </script>
 
 <div id="Token" class="container mx-auto pt-20">
@@ -27,20 +28,14 @@
         tokens.
       </ul>
     </div>
-    <div class="p-6">
-      <div class="">
-        <video
-          autoplay
-          loop
-          controls
-          muted
+    <div class="pt-10 p-6">
+      <div class="max-w-4xl">
+        <Image
           class="opacity-80 rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1]"
-        >
-          <source
-            src="{Config.Path.staticUrl}/assets/champagneroomtoken.mp4"
-            type="video/mp4"
-          />
-        </video>
+          src="{Config.Path.staticUrl}/assets/champagneroomtoken.gif"
+          width={960}
+          height={540}
+        />
       </div>
     </div>
   </div>

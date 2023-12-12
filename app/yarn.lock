@@ -3227,6 +3227,22 @@
   resolved "https://registry.yarnpkg.com/@ungap/structured-clone/-/structured-clone-1.2.0.tgz#756641adb587851b5ccb3e095daf27ae581c8406"
   integrity sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==
 
+"@unpic/core@^0.0.41":
+  version "0.0.41"
+  resolved "https://registry.yarnpkg.com/@unpic/core/-/core-0.0.41.tgz#b04b934d7e331bda597359932fd2e779474f75df"
+  integrity sha512-mfxJYYIuOHRD78bzKwIFiAqD4BqgVXXOyy85LEo29I7hiMyPlPKMAw+bnIktQg3zre0wbqIYXHSi1un91tc/Yw==
+  dependencies:
+    unpic "^3.15.0"
+
+"@unpic/svelte@^0.0.42":
+  version "0.0.42"
+  resolved "https://registry.yarnpkg.com/@unpic/svelte/-/svelte-0.0.42.tgz#1f45e831b9d1d379eced94aeea0fc8c27702c602"
+  integrity sha512-mpvjhAOd8smKoMlooU7xV+jvPPpgRZ4xCHRV5I0VDd5sis7lsV/GQMs3/DDu7adCbIBQO9SIvA5ZNYzVV9uAnA==
+  dependencies:
+    "@unpic/core" "^0.0.41"
+    style-object-to-css-string "1.0.1"
+    unpic "^3.15.0"
+
 "@vitejs/plugin-basic-ssl@^0.1.2":
   version "0.1.2"
   resolved "https://registry.npmjs.org/@vitejs/plugin-basic-ssl/-/plugin-basic-ssl-0.1.2.tgz"
@@ -4695,9 +4711,9 @@ builtin-status-codes@^3.0.0:
   integrity sha512-HpGFw18DgFWlncDfjTa2rcQ4W88O1mC8e8yZ2AvQY5KDaktSTwo+KRf6nHK6FRI5FyRyb/5T6+TSxfP7QyGsmQ==
 
 bullmq@^4.14.0:
-  version "4.15.1"
-  resolved "https://registry.yarnpkg.com/bullmq/-/bullmq-4.15.1.tgz#940fbb466fce1ec8aa8dd8a94f26b9fa395df870"
-  integrity sha512-88F+dGaZCMEz6V/FvP6Oq77d2/7QyYvPcXxkrXt3GXsq+EEwGVfwaxxubm0LXIR9y/YD7PCHzRR5C7ME3FaMJA==
+  version "4.15.2"
+  resolved "https://registry.yarnpkg.com/bullmq/-/bullmq-4.15.2.tgz#8366be3d181bbb12bec574df45226ecb741dd4c5"
+  integrity sha512-VzmeiTP2ze7R3d/prOkwkoPyVxWm0N+Aj2lYQqljbWX7QqZgCaZCMiDVj97YpxFExdHDGKnmRPIS/ANY86GX2g==
   dependencies:
     cron-parser "^4.6.0"
     glob "^8.0.3"
@@ -10540,6 +10556,11 @@ sturdy-websocket@^0.1.12:
   dependencies:
     lodash.defaults "^4.2.0"
 
+style-object-to-css-string@1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/style-object-to-css-string/-/style-object-to-css-string-1.0.1.tgz#ef47ed3e47417189b3ea19604a3599f9310d743a"
+  integrity sha512-ci7tySCofUqq86WziXoEsIE/aGZ2rkw7mmz6Afklhbmk7i05Z1d8hSUaJMUWUOJPbsvK+7TW5ulklZm55/S44Q==
+
 sucrase@^3.32.0:
   version "3.34.0"
   resolved "https://registry.yarnpkg.com/sucrase/-/sucrase-3.34.0.tgz#1e0e2d8fcf07f8b9c3569067d92fbd8690fb576f"
@@ -11136,6 +11157,11 @@ universalify@^2.0.0:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/universalify/-/universalify-2.0.1.tgz#168efc2180964e6386d061e094df61afe239b18d"
   integrity sha512-gptHNQghINnc/vTGIk0SOFGFNXw7JVrlRUtConJRlvaw6DuX0wO5Jeko9sWrMBhh+PsYAZ7oXAiOnf/UKogyiw==
+
+unpic@^3.15.0:
+  version "3.15.0"
+  resolved "https://registry.yarnpkg.com/unpic/-/unpic-3.15.0.tgz#38a15cecdbe729ddd273b313290dfd2fdfabbebf"
+  integrity sha512-LgpCLS5qaZR9p3ALtBQSeh5HkP1o0kViI3DSaWaeMZeIUOZ5hGPmLPoGsduXI+y1up3ISoNIV5YvYori+3VNLA==
 
 unpipe@1.0.0, unpipe@~1.0.0:
   version "1.0.0"

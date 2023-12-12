@@ -1,6 +1,6 @@
 {
   "name": "champagneroom",
-  "version": "1.0.82",
+  "version": "1.0.86",
   "license": "UNLICENSED",
   "files": [
     "dist"
@@ -86,6 +86,7 @@
     "@bull-board/express": "^5.9.1",
     "@fontsource/roboto": "^5.0.5",
     "@fontsource/space-grotesk": "^5.0.5",
+    "@unpic/svelte": "^0.0.42",
     "@web3-onboard/coinbase": "^2.2.5",
     "@web3-onboard/core": "^2.21.0",
     "@web3-onboard/frame": "^2.0.1",

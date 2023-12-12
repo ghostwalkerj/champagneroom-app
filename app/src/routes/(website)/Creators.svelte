@@ -1,5 +1,6 @@
 <script lang="ts">
   import Config from '$lib/config';
+  import { Image } from '@unpic/svelte';
 </script>
 
 <div id="Creators" class="container mx-auto px-4 sm:px-6 md:px-10">
@@ -11,10 +12,12 @@
     </h2>
     <div class="flex flex-col lg:flex-row items-center justify-center">
       <div class="w-full lg:w-1/2 my-10 flex justify-center p-4">
-        <img
+        <Image
           src="{Config.Path.staticUrl}/assets/creator.png"
           alt="Creator"
           class="rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1] max-w-xs md:max-w-sm lg:max-w-md"
+          height={823}
+          width={629}
         />
       </div>
       <div class="w-full lg:w-1/2 font-medium">

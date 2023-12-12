@@ -1,5 +1,6 @@
 <script lang="ts">
   import { applyAction, enhance } from '$app/forms';
+  import { Image } from '@unpic/svelte';
 
   import Config from '$lib/config';
 
@@ -29,10 +30,12 @@
     </h2>
     <div class="flex flex-col lg:flex-row gap-10">
       <div class="w-full lg:w-1/2 mb-10 flex justify-center px-4">
-        <img
+        <Image
           src="{Config.Path.staticUrl}/assets/creator3.png"
           alt="Creator"
           class="rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1] h-auto max-w-xs md:max-w-sm lg:max-w-md"
+          height={823}
+          width={658}
         />
       </div>
       <div class="w-full lg:w-1/2 flex flex-col justify-center items-center">

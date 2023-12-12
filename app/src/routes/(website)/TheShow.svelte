@@ -1,5 +1,6 @@
 <script lang="ts">
   import Config from '$lib/config';
+  import { Image } from '@unpic/svelte';
 </script>
 
 <div id="TheShow" class="flex flex-col pt-20 w-full mx-auto">
@@ -47,10 +48,12 @@
             </ul>
           </div>
           <div class="p-4 mt-4 lg:mt-0 lg:w-1/2 flex place-content-center">
-            <img
+            <Image
               alt="show-screenshot"
               src="{Config.Path.staticUrl}/assets/show-screenshot.png"
               class="rounded-md overflow-hidden shadow-[0px_0px_17px_6px_#e779c1] max-w-full h-auto"
+              width={550}
+              height={550}
             />
           </div>
         </div>
