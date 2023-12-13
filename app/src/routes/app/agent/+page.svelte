@@ -373,7 +373,7 @@
                             >
                             <td>
                               <select
-                                class="daisy-select daisy-select-bordered daisy-select-xs max-w-xs"
+                                class="daisy-select daisy-select-bordered daisy-select-sm text-xs"
                                 on:change={(event) => {
                                   updateActive(event.target?.value);
                                 }}

@@ -11,7 +11,7 @@ import { Wallet } from '$lib/models/wallet';
 import Config from '$lib/config';
 import { AuthType, EntityType } from '$lib/constants';
 
-import type { Actions, PageServerLoad } from '../$types';
+import type { Actions, PageServerLoad } from './$types';
 
 const verifySignature = (
   message: string,
