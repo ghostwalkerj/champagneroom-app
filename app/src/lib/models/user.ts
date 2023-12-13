@@ -112,6 +112,7 @@ export const userSchema = new Schema(
       default: () => nanoid(10),
       index: true
     },
+
     permissions: {
       type: [String],
       enum: PermissionType,
