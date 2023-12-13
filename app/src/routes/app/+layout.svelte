@@ -70,13 +70,15 @@
       {#if $selectedAccount}
       <div class=" flex items-center gap-2">
           <span class="bg-primary h-3 w-3 rounded-full"></span>
+          {#if !$page.data.user?.name}
           <span>Wallet Connected</span>
+          {/if}
           {#if $page.data.user}
           <div class="text-xl">
-            | {$page.data.user.name}
+             {$page.data.user.name}
           </div>
         {/if}
-          <a class="btn variant-outline" href={Config.Path.signout + '?returnPath=/'}>Signout</a>
+          <a class="btn variant-outline" href={Config.Path.signout + '?returnPath=' + $page.url.pathname}>Signout</a>
           
       </div>
      
