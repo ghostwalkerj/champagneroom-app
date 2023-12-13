@@ -111,7 +111,7 @@
   {#if !update}
     <div class="justify-center daisy-card-actions last:my-2">
       <button
-        class="daisy-btn daisy-btn-xs daisy-btn-secondary daisy-btn-outline lg:btn-sm"
+        class="daisy-btn daisy-btn-xs daisy-btn-secondary daisy-btn-outline lg:daisy-btn-sm"
         on:click={() => {
           setUpdate(true);
         }}

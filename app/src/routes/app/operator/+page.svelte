@@ -464,7 +464,7 @@
                             <td contenteditable="true">{agent.user.address}</td>
                             <td>
                               <select
-                                class="daisy-select daisy-select-bordered daisy-select-xs max-w-xs"
+                                class="daisy-select daisy-select-bordered daisy-select-sm text-xs"
                               >
                                 {#if agent.user.active}
                                   <option value="true" selected>True</option>
@@ -561,7 +561,8 @@
                             />
                             <td>
                               <select
-                                class=" daisy-select daisy-select-bordered daisy-select-xs max-w-xs"
+                                <select
+                                class="daisy-select daisy-select-bordered daisy-select-sm text-xs"
                                 bind:value={selectedAgentId}
                                 bind:this={creatorAgentElement}
                               >
@@ -603,7 +604,7 @@
                             <td>
                               {#if agentId}
                                 <select
-                                  class="daisy-select daisy-select-bordered daisy-select-xs max-w-xs"
+                                  class="daisy-select daisy-select-bordered daisy-select-sm text-xs"
                                   on:change={(event) => {
                                     updateCreatorAgent(event.target?.value);
                                   }}
@@ -631,7 +632,7 @@
                             >
                             <td>
                               <select
-                                class="daisy-select daisy-select-bordered daisy-select-xs max-w-xs"
+                                class="daisy-select daisy-select-bordered daisy-select-sm text-xs"
                                 on:change={(event) => {
                                   updateCreatorActive(event.target?.value);
                                 }}
