@@ -38,7 +38,7 @@
         referralCode = agent.user.referralCode;
         referralUrl = urlJoin(
           $page.url.origin,
-          Config.Path.referralSignup,
+          Config.PATH.referralSignup,
           referralCode
         );
         navigator.clipboard.writeText(referralUrl);
@@ -87,7 +87,7 @@
   $: referralCode = agent.user.referralCode;
   $: referralUrl = urlJoin(
     $page.url.origin,
-    Config.Path.referralSignup,
+    Config.PATH.referralSignup,
     referralCode
   );
 </script>

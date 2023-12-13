@@ -13,9 +13,9 @@
 
       <div class="flex sm:flex-row flex-col gap-4 justify-evenly p-4 h-full">
         <a
-          href={Config.Path.creatorSignup}
+          href={Config.PATH.creatorSignup}
           class="min-w-xs bg-image group h-full rounded-lg overflow-hidden"
-          style="background-image: url({Config.Path
+          style="background-image: url({Config.PATH
             .staticUrl}/assets/creator2.png)"
         >
           <div
@@ -39,9 +39,9 @@
         </a>
 
         <a
-          href={Config.Path.agentSignup}
+          href={Config.PATH.agentSignup}
           class="min-w-xs bg-image group h-full rounded-lg overflow-hidden"
-          style="background-image: url({Config.Path
+          style="background-image: url({Config.PATH
             .staticUrl}/assets/agent2.png)"
         >
           <div

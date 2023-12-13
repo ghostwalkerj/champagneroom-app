@@ -28,7 +28,7 @@ import { AuthType, EntityType } from '$lib/constants';
 import { womensNames } from '$lib/womensNames';
 
 import type { PageServerLoad } from './$types';
-const websiteUrl = Config.Path.websiteUrl;
+const websiteUrl = Config.PATH.websiteUrl;
 
 export const actions: Actions = {
   create_agent: async ({ request }: RequestEvent) => {

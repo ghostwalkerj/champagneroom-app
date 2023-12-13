@@ -5,10 +5,11 @@
   import { goto } from '$app/navigation';
 
   import type { TicketDocument } from '$lib/models/ticket';
-  import { UserRole, type UserDocument } from '$lib/models/user';
+  import type { UserDocument } from '$lib/models/user';
 
   import Config from '$lib/config';
 
+  import { UserRole } from '$lib/constants';
   import type { PageData } from './$types';
   export let data: PageData;
 
@@ -17,15 +18,15 @@
     const ticket = data.ticket as TicketDocument;
 
     if (user.roles.includes(UserRole.OPERATOR)) {
-      goto(Config.Path.operator);
+      goto(Config.PATH.operator);
     } else if (user.roles.includes(UserRole.AGENT)) {
-      goto(Config.Path.agent);
+      goto(Config.PATH.agent);
     } else if (user.roles.includes(UserRole.CREATOR)) {
-      goto(Config.Path.creator);
+      goto(Config.PATH.creator);
     } else if (user.roles.includes(UserRole.TICKET_HOLDER) && ticket) {
-      goto(urlJoin(Config.Path.ticket, ticket._id.toString()));
+      goto(urlJoin(Config.PATH.ticket, ticket._id.toString()));
     } else {
-      goto(Config.Path.websiteUrl);
+      goto(Config.PATH.websiteUrl);
     }
   });
 </script>

@@ -24,7 +24,7 @@
   const buildNumber = generate(version);
   const buildTime = format(buildNumber);
   let lastAddress: string | undefined;
-  let signOut = Config.Path.signout;
+  let signOut = Config.PATH.signout;
 
   onMount(() => {
     selectedAccount.subscribe((account) => {
@@ -51,16 +51,11 @@
   });
 </script>
 
-
-
-<div
-  class="bg-surface-900 flex flex-col min-h-screen min-w-[320px]"
->
-  
-<nav class="flex justify-between items-center px-4">
-  <a class="display-inline" href="/">
+<div class="bg-surface-900 flex flex-col min-h-screen min-w-[320px]">
+  <nav class="flex justify-between items-center px-4">
+    <a class="display-inline" href="/">
       <img
-        src="{Config.Path.staticUrl}/assets/logo-horizontal-tr.png"
+        src="{Config.PATH.staticUrl}/assets/logo-horizontal-tr.png"
         alt="Logo"
         width="300"
       />
@@ -68,24 +63,24 @@
 
     <div class="text-xl font-semibold">
       {#if $selectedAccount}
-      <div class=" flex items-center gap-2">
-          <span class="bg-primary h-3 w-3 rounded-full"></span>
+        <div class=" flex items-center gap-2">
+          <span class="bg-primary h-3 w-3 rounded-full" />
           <span>Wallet Connected</span>
           {#if $page.data.user}
-          <div class="text-xl">
-            | {$page.data.user.name}
-          </div>
-        {/if}
-          <a class="btn variant-outline" href={Config.Path.signout + '?returnPath=/'}>Signout</a>
-          
-      </div>
-     
-      
+            <div class="text-xl">
+              | {$page.data.user.name}
+            </div>
+          {/if}
+          <a
+            class="btn variant-outline"
+            href={Config.PATH.signout + '?returnPath=/'}>Signout</a
+          >
+        </div>
       {:else}
         <p>Connect your wallet to begin</p>
       {/if}
     </div>
-</nav>
+  </nav>
 
   <div class="flex-1">
     <slot />
@@ -100,4 +95,3 @@
     </div>
   </footer>
 </div>
-

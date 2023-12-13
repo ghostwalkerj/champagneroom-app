@@ -44,7 +44,7 @@
         </div>
         <div>
           <a
-            href="{Config.Path.staticUrl}/assets/champagne-room-white-paper.pdf"
+            href="{Config.PATH.staticUrl}/assets/champagne-room-white-paper.pdf"
             class="md:w-auto daisy-btn daisy-btn-secondary transition-all duration-300 ease-in-out m-0"
             target="_blank"
           >
@@ -64,7 +64,7 @@
         height="450px"
       >
         <source
-          src="{Config.Path.staticUrl}/assets/champagnevideo.mp4"
+          src="{Config.PATH.staticUrl}/assets/champagnevideo.mp4"
           type="video/mp4"
         />
       </video>

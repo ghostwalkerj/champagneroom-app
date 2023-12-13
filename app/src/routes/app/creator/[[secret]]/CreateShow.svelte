@@ -31,7 +31,7 @@
         case result.data.showCreated: {
           const showUrl = urlJoin(
             window.location.origin,
-            Config.Path.show,
+            Config.PATH.show,
             result.data.show!._id.toString()
           );
           navigator.clipboard.writeText(showUrl);

@@ -31,6 +31,15 @@ export enum EntityType {
   NONE = 'NONE'
 }
 
+export enum UserRole {
+  OPERATOR = 'OPERATOR',
+  PUBLIC = 'PUBLIC',
+  AGENT = 'AGENT',
+  CREATOR = 'CREATOR',
+  EXTERNAL = 'EXTERNAL',
+  TICKET_HOLDER = 'TICKET HOLDER'
+}
+
 export const currencyFormatter = (
   currency = CurrencyType.USD.toString(),
   _minimumFractionDigits?: number

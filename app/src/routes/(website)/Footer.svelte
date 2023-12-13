@@ -30,10 +30,10 @@
         <h5 class="text-info mb-3">Services</h5>
         <ul class="list-none">
           <li class="spa">
-            <a href={Config.Path.creator}>Creators</a>
+            <a href={Config.PATH.creator}>Creators</a>
           </li>
           <li class="spa">
-            <a href={Config.Path.agent}>Management</a>
+            <a href={Config.PATH.agent}>Management</a>
           </li>
         </ul>
       </div>
@@ -42,7 +42,7 @@
         <ul class="list-none">
           <li class="spa">
             <a
-              href="{Config.Path
+              href="{Config.PATH
                 .staticUrl}/assets/champagne-room-white-paper.pdf"
               >White Paper</a
             >

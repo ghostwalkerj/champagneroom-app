@@ -62,7 +62,7 @@
     progressVisibility = 'visible';
     let formData = new FormData();
     formData.append('file', file);
-    const uploadUrl = urlJoin($page.url.origin, Config.Path.imageUpload);
+    const uploadUrl = urlJoin($page.url.origin, Config.PATH.imageUpload);
     const response = await fetch(uploadUrl, {
       method: 'POST',
       body: formData
