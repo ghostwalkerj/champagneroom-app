@@ -4,21 +4,21 @@
 
   import { applyAction, enhance } from '$app/forms';
 
-  import type { ShowDocumentType } from '$lib/models/show';
+  import type { ShowDocument } from '$lib/models/show';
 
   import Config from '$lib/config';
   import { durationFormatter } from '$lib/constants';
 
-  import type { CreatorDocumentType } from '$lib/models/creator';
+  import type { CreatorDocument } from '$lib/models/creator';
   import type { ActionData } from './$types';
 
   $: showDuration = 60;
 
-  export let creator: CreatorDocumentType;
+  export let creator: CreatorDocument;
   export let form: ActionData;
   export let isLoading = false;
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  export let onShowCreated: (show: ShowDocumentType) => void;
+  export let onShowCreated: (show: ShowDocument) => void;
 
   let showName = creator
     ? possessive(creator.user.name, 'en') + ' Show'

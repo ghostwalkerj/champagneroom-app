@@ -229,7 +229,7 @@ export const actions: Actions = {
       return fail(400, { missingUserId: true });
     }
 
-    const user = await User.findById(userId);
+    const user = (await User.findById(userId)) as UserDocument;
     if (!user) {
       console.error('User not found');
       return fail(404, {

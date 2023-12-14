@@ -4,6 +4,7 @@ import IORedis from 'ioredis';
 import type { JwtPayload } from 'jsonwebtoken';
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
+import { setup } from 'mongoose-zod';
 import urlJoin from 'url-join';
 
 import {
@@ -52,6 +53,8 @@ const redisConnection = new IORedis({
   enableReadyCheck: false,
   maxRetriesPerRequest: undefined
 });
+
+setup();
 
 const setLocals = async (decode: JwtPayload, locals: App.Locals) => {
   const selector = decode.selector;

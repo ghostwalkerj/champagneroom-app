@@ -13,10 +13,10 @@ const { models } = pkg;
 
 const showEventZodSchema = z
   .object({
-    _id: mongooseZodCustomType('ObjectId')
-      .default(() => new mongoose.Types.ObjectId())
-      .mongooseTypeOptions({ _id: true })
-      .optional(),
+    _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+      _id: true,
+      auto: true
+    }),
     type: z.string(),
     show: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
       ref: 'Show'
@@ -41,7 +41,7 @@ const showEventZodSchema = z
       })
       .optional()
   })
-  .merge(genTimestampsSchema('createdAt', 'updatedAt'))
+  .merge(genTimestampsSchema())
   .strict()
   .mongoose({
     schemaOptions: {

@@ -2039,7 +2039,7 @@
 
 "@rollup/plugin-inject@^5.0.3":
   version "5.0.5"
-  resolved "https://registry.npmjs.org/@rollup/plugin-inject/-/plugin-inject-5.0.5.tgz"
+  resolved "https://registry.yarnpkg.com/@rollup/plugin-inject/-/plugin-inject-5.0.5.tgz#616f3a73fe075765f91c5bec90176608bed277a3"
   integrity sha512-2+DEJbNBoPROPkgTDNe8/1YXWcqxbN5DTjASVIOx8HS+pITXushyNiBV56RB08zuptzz8gT3YfkqriTBVycepg==
   dependencies:
     "@rollup/pluginutils" "^5.0.1"
@@ -8727,7 +8727,7 @@ node-releases@^2.0.13:
 
 node-stdlib-browser@^1.2.0:
   version "1.2.0"
-  resolved "https://registry.npmjs.org/node-stdlib-browser/-/node-stdlib-browser-1.2.0.tgz"
+  resolved "https://registry.yarnpkg.com/node-stdlib-browser/-/node-stdlib-browser-1.2.0.tgz#5ddcfdf4063b88fb282979a1aa6ddab9728d5e4c"
   integrity sha512-VSjFxUhRhkyed8AtLwSCkMrJRfQ3e2lGtG3sP6FEgaLKBBbxM/dLfjRe1+iLhjvyLFW3tBQ8+c0pcOtXGbAZJg==
   dependencies:
     assert "^2.0.0"
@@ -11372,13 +11372,12 @@ vite-plugin-mkcert@^1.16.0:
     debug "^4.3.4"
     picocolors "^1.0.0"
 
-vite-plugin-node-polyfills@^0.9.0:
-  version "0.9.0"
-  resolved "https://registry.npmjs.org/vite-plugin-node-polyfills/-/vite-plugin-node-polyfills-0.9.0.tgz"
-  integrity sha512-+i+WPUuIBhJy+ODfxx6S6FTl28URCxUszbl/IL4GwrZvbqqY/8VDIp+zpjMS8Us/a7GwN4Iaqr/fVIBtkNQojQ==
+vite-plugin-node-stdlib-browser@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/vite-plugin-node-stdlib-browser/-/vite-plugin-node-stdlib-browser-0.2.1.tgz#6a598b3e1fecde6cdabe9c80a29adaeebc53463b"
+  integrity sha512-6u2i613Dkqj5KaTNIrnZvE6y3/awWAp0S5TjucTvGxdhetftB1Mgvblc+nwYzlw6sntPlac8UOC7ttXNh+LZKA==
   dependencies:
     "@rollup/plugin-inject" "^5.0.3"
-    node-stdlib-browser "^1.2.0"
 
 "vite@^3.0.0 || ^4.0.0 || ^5.0.0-0", "vite@^3.1.0 || ^4.0.0 || ^5.0.0-0":
   version "5.0.6"

@@ -22,10 +22,10 @@ enum WalletStatus {
 
 const walletZodSchema = z
   .object({
-    _id: mongooseZodCustomType('ObjectId')
-      .default(() => new mongoose.Types.ObjectId())
-      .mongooseTypeOptions({ _id: true })
-      .optional(),
+    _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+      _id: true,
+      auto: true
+    }),
     status: z.nativeEnum(WalletStatus).default(WalletStatus.AVAILABLE),
     currency: z.nativeEnum(CurrencyType).default(CurrencyType.ETH),
     balance: z.number().default(0),
@@ -35,7 +35,7 @@ const walletZodSchema = z
     payouts: z.array(payoutZodSchema).default([]),
     active: z.boolean().default(true).mongooseTypeOptions({ index: true })
   })
-  .merge(genTimestampsSchema('createdAt', 'updatedAt'))
+  .merge(genTimestampsSchema())
   .strict()
   .mongoose({
     schemaOptions: {

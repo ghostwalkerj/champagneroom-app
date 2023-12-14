@@ -16,10 +16,10 @@ export type InterestFormType = InstanceType<typeof InterestForm>;
 
 const interestFormZodSchema = z
   .object({
-    _id: mongooseZodCustomType('ObjectId')
-      .default(() => new mongoose.Types.ObjectId())
-      .mongooseTypeOptions({ _id: true })
-      .optional(),
+    _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+      _id: true,
+      auto: true
+    }),
     interest: z.string(),
     email: z.string().refine((value) => validator.isEmail(value), {
       message: 'Invalid email format'

@@ -8,7 +8,6 @@ import {
   z
 } from 'mongoose-zod';
 import { nanoid } from 'nanoid';
-import { merge } from 'rxjs';
 
 import { CurrencyType } from '$lib/constants';
 
@@ -177,10 +176,10 @@ const showStateZodSchema = z
 
 const showZodSchema = z
   .object({
-    _id: mongooseZodCustomType('ObjectId')
-      .default(() => new mongoose.Types.ObjectId())
-      .mongooseTypeOptions({ _id: true })
-      .optional(),
+    _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+      _id: true,
+      auto: true
+    }),
     creator: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
       ref: 'Creator'
     }),
@@ -203,7 +202,7 @@ const showZodSchema = z
     creatorInfo: creatorInfoZodSchema,
     showState: showStateZodSchema.default({})
   })
-  .merge(genTimestampsSchema('createdAt', 'updatedAt'))
+  .merge(genTimestampsSchema())
   .strict()
   .mongoose({
     schemaOptions: {
