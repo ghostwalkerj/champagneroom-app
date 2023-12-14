@@ -30,7 +30,7 @@ import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 import type { PayoutQueueType } from '$lib/workers/payoutWorker';
 
 import { ActorType, EntityType } from '$lib/constants';
-import { InvoiceJobType, PayoutJobType, createAuthToken } from '$lib/payment';
+import { createAuthToken, InvoiceJobType, PayoutJobType } from '$lib/payment';
 import { getTicketMachineService } from '$lib/server/machinesUtil';
 
 import {

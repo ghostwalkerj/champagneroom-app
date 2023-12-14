@@ -22,6 +22,7 @@ import { Creator } from '$lib/models/creator';
 import { Operator } from '$lib/models/operator';
 import { Show } from '$lib/models/show';
 import { Ticket } from '$lib/models/ticket';
+import type { UserDocument } from '$lib/models/user';
 import { User } from '$lib/models/user';
 import { Wallet, type WalletDocument } from '$lib/models/wallet';
 
@@ -59,7 +60,7 @@ const setLocals = async (decode: JwtPayload, locals: App.Locals) => {
     query[selector] = decode[selector];
 
     // Check if user is allowed to access the requested path
-    const user = await User.findOne(query);
+    const user = (await User.findOne(query)) as UserDocument;
     if (!user) {
       console.error('No user');
       throw error(500, 'No user');

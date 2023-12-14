@@ -1,18 +1,26 @@
-import type { InferSchemaType, Model } from 'mongoose';
+import type { Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
 import { fieldEncryption } from 'mongoose-field-encryption';
-import { nanoid } from 'nanoid';
-
-import type { refundSchema, saleSchema } from './common';
 import {
-  cancelSchema,
-  CurrencyType,
-  escrowSchema,
-  finalizeSchema,
-  moneySchema
+  genTimestampsSchema,
+  mongooseZodCustomType,
+  toMongooseSchema,
+  z
+} from 'mongoose-zod';
+import { nanoid } from 'nanoid';
+import { merge } from 'rxjs';
+
+import { CurrencyType } from '$lib/constants';
+
+import type { refundZodSchema, saleZodSchema } from './common';
+import {
+  cancelZodSchema,
+  escrowZodSchema,
+  finalizeZodSchema,
+  moneyZodSchema
 } from './common';
 
-const { Schema, models } = pkg;
+const { models } = pkg;
 export type ShowDocument = InstanceType<typeof Show>;
 
 enum ShowStatus {
@@ -29,315 +37,187 @@ enum ShowStatus {
   IN_DISPUTE = 'IN DISPUTE'
 }
 
-const runtimeSchema = new Schema({
-  startDate: { type: Date, required: true, default: new Date() },
-  endDate: { type: Date }
+export type ShowDocumentType = z.infer<typeof showZodSchema>;
+
+const disputeStatsZodSchema = z
+  .object({
+    totalDisputes: z.number().positive().default(0),
+    totalDisputesRefunded: z.number().positive().default(0),
+    totalDisputesResolved: z.number().positive().default(0),
+    totalDisputesPending: z.number().positive().default(0)
+  })
+  .strict();
+
+const feedbackStatsZodSchema = z
+  .object({
+    numberOfReviews: z.number().positive().default(0),
+    averageRating: z.number().positive().default(0),
+    comments: z.array(z.string().trim()).default([])
+  })
+  .strict();
+
+const salesStatsZodSchema = z
+  .object({
+    ticketsAvailable: z.number().positive().default(0),
+    ticketsSold: z.number().positive().default(0),
+    ticketsReserved: z.number().positive().default(0),
+    ticketsRefunded: z.number().positive().default(0),
+    ticketsFinalized: z.number().positive().default(0),
+    ticketsRedeemed: z.number().positive().default(0),
+    ticketSalesAmount: moneyZodSchema.default({
+      amount: 0,
+      currency: CurrencyType.USD
+    }),
+    totalSales: z
+      .map(z.string(), z.number())
+      .default(() => new Map<string, number>()),
+    totalRevenue: z
+      .map(z.string(), z.number())
+      .default(() => new Map<string, number>()),
+    totalRefunds: z
+      .map(z.string(), z.number())
+      .default(() => new Map<string, number>())
+  })
+  .strict();
+
+const runtimeZodSchema = z
+  .object({
+    startDate: z.date().default(() => new Date()),
+    endDate: z.date().optional()
+  })
+  .strict();
+
+export type ShowRefundType = z.infer<typeof refundZodSchema>;
+
+export type ShowSaleType = z.infer<typeof saleZodSchema>;
+
+export type ShowStateType = z.infer<typeof showStateZodSchema>;
+
+export const SaveState = (show: ShowDocument, newState: ShowStateType) => {
+  Show.updateOne({ _id: show._id }, { $set: { showState: newState } }).exec();
+};
+
+const creatorInfoZodSchema = z.object({
+  name: z.string().trim(),
+  profileImageUrl: z.string().trim(),
+  averageRating: z.number().positive().max(5).default(0),
+  numberOfReviews: z.number().positive().default(0)
 });
 
-const disputeStatsSchema = new Schema({
-  totalDisputes: {
-    type: Number,
-    required: true,
-    default: 0
-  },
-  totalDisputesRefunded: {
-    type: Number,
-    required: true,
-    default: 0
-  },
-  totalDisputesResolved: {
-    type: Number,
-    required: true,
-    default: 0
-  },
-  totalDisputesPending: {
-    type: Number,
-    required: true,
-    default: 0
-  }
-});
-
-const salesStatsSchema = new Schema({
-  ticketsAvailable: {
-    type: Number,
-    required: true,
-    validate: {
-      validator: Number.isInteger,
-      message: '{VALUE} is not an integer value'
-    }
-  },
-  ticketsSold: {
-    type: Number,
-    default: 0,
-    validate: {
-      validator: Number.isInteger,
-      message: '{VALUE} is not an integer value'
-    }
-  },
-  ticketsReserved: {
-    type: Number,
-    default: 0,
-    validate: {
-      validator: Number.isInteger,
-      message: '{VALUE} is not an integer value'
-    }
-  },
-  ticketsRefunded: {
-    type: Number,
-    default: 0,
-    validate: {
-      validator: Number.isInteger,
-      message: '{VALUE} is not an integer value'
-    }
-  },
-  ticketsFinalized: {
-    type: Number,
-    default: 0,
-    validate: {
-      validator: Number.isInteger,
-      message: '{VALUE} is not an integer value'
-    }
-  },
-  ticketsRedeemed: {
-    type: Number,
-    default: 0,
-    validate: {
-      validator: Number.isInteger,
-      message: '{VALUE} is not an integer value'
-    }
-  },
-  ticketSalesAmount: {
-    type: moneySchema,
-    required: true,
-    default: { amount: 0, currency: CurrencyType.USD }
-  },
-  totalSales: {
-    type: Map,
-    required: true,
-    of: Number,
-    default: () => new Map<string, number>()
-  },
-  totalRevenue: {
-    type: Map,
-    required: true,
-    of: Number,
-    default: () => new Map<string, number>()
-  },
-  totalRefunds: {
-    type: Map,
-    required: true,
-    of: Number,
-    default: () => new Map<string, number>()
-  }
-});
-
-const feedbackStatsSchema = new Schema({
-  numberOfReviews: {
-    type: Number,
-    required: true,
-    default: 0
-  },
-  averageRating: {
-    type: Number,
-    required: true,
-    default: 0
-  },
-  comments: {
-    type: [String],
-    default: () => []
-  }
-});
-
-const showStateSchema = new Schema(
-  {
-    status: {
-      type: String,
-      enum: ShowStatus,
-      required: true,
-      default: ShowStatus.CREATED
-    },
-    active: { type: Boolean, default: true, index: true },
-    salesStats: {
-      type: salesStatsSchema,
-      required: true,
-      default: () => ({})
-    },
-    feedbackStats: {
-      type: feedbackStatsSchema,
-      required: true,
-      default: () => ({})
-    },
-    disputeStats: {
-      type: disputeStatsSchema,
-      required: true,
-      default: () => ({})
-    },
-    cancel: cancelSchema,
-    finalize: finalizeSchema,
-    escrow: escrowSchema,
-    runtime: runtimeSchema,
-    refunds: {
-      type: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: 'Ticket.ticketState.refund'
-        }
-      ],
-      required: true,
-      default: () => []
-    },
-    sales: {
-      type: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: 'Ticket.ticketState.sale'
-        }
-      ],
-      required: true,
-      default: () => []
-    },
-    disputes: {
-      type: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: 'Ticket.ticketState.dispute'
-        }
-      ],
-      required: true,
-      default: () => []
-    },
-    reservations: {
-      type: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: 'Ticket'
-        }
-      ],
-      required: true,
-      default: () => []
-    },
-    redemptions: {
-      type: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: 'Ticket'
-        }
-      ],
-      required: true,
-      default: () => []
-    },
-    finalizations: {
-      type: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: 'Ticket'
-        }
-      ],
-      required: true,
-      default: () => []
-    },
-    cancellations: {
-      type: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: 'Ticket'
-        }
-      ],
-      required: true,
-      default: () => []
-    },
-    current: {
-      type: Boolean,
-      required: true,
-      default: true,
-      index: true
-    }
-  },
-  { timestamps: true }
-);
-
-const showSchema = new Schema(
-  {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    _id: { type: Schema.Types.ObjectId, required: true, auto: true },
-    creator: {
-      type: Schema.Types.ObjectId,
-      ref: 'Creator',
-      required: true,
-      index: true
-    },
-    agent: { type: Schema.Types.ObjectId, ref: 'Agent' },
-    roomId: {
-      type: String,
-      required: true,
-      unique: true,
-      default: () => nanoid()
-    },
-    coverImageUrl: { type: String, trim: true },
-    duration: {
-      type: Number,
-      required: true,
-      min: [0, 'Duration must be over 0'],
-      max: [180, 'Duration must be under 180 minutes'],
-      validate: {
-        validator: Number.isInteger,
-        message: '{VALUE} is not an integer value'
-      }
-    },
-    name: {
-      type: String,
-      required: true,
-      trim: true,
-      minLength: [3, 'Name must be at least 3 characters'],
-      maxLength: [50, 'Name must be under 50 characters']
-    },
-    capacity: {
-      type: Number,
-      required: true,
-      min: 1,
-      validate: {
-        validator: Number.isInteger,
-        message: '{VALUE} is not an integer value'
-      }
-    },
-    price: {
-      type: moneySchema,
-      required: true,
-      default: { amount: 0, currency: CurrencyType.USD }
-    },
-    creatorInfo: {
-      type: {
-        name: { type: String, required: true },
-        profileImageUrl: { type: String, required: true },
-        averageRating: { type: Number, required: true, default: 0 },
-        numberOfReviews: { type: Number, required: true, default: 0 }
+const showStateZodSchema = z
+  .object({
+    status: z.nativeEnum(ShowStatus).default(ShowStatus.CREATED),
+    active: z.boolean().default(true).mongooseTypeOptions({ index: true }),
+    salesStats: salesStatsZodSchema.default({
+      ticketsAvailable: 0,
+      ticketsSold: 0,
+      ticketsReserved: 0,
+      ticketsRefunded: 0,
+      ticketsFinalized: 0,
+      ticketsRedeemed: 0,
+      ticketSalesAmount: {
+        amount: 0,
+        currency: CurrencyType.USD
       },
-      required: true
-    },
-    showState: { type: showStateSchema, required: true, default: () => ({}) }
-  },
-  { timestamps: true }
-);
+      totalSales: new Map<string, number>(),
+      totalRevenue: new Map<string, number>(),
+      totalRefunds: new Map<string, number>()
+    }),
+    feedbackStats: feedbackStatsZodSchema.default({}),
+    disputeStats: disputeStatsZodSchema.default({}),
+    cancel: cancelZodSchema.optional(),
+    finalize: finalizeZodSchema.optional(),
+    escrow: escrowZodSchema.optional(),
+    runtime: runtimeZodSchema.optional(),
+    refunds: z
+      .array(mongooseZodCustomType('ObjectId'))
+      .mongooseTypeOptions({
+        ref: 'Ticket.ticketState.refund'
+      })
+      .default([]),
+    sales: z
+      .array(mongooseZodCustomType('ObjectId'))
+      .mongooseTypeOptions({
+        ref: 'Ticket.ticketState.sale'
+      })
+      .default([]),
+    disputes: z
+      .array(mongooseZodCustomType('ObjectId'))
+      .mongooseTypeOptions({
+        ref: 'Ticket.ticketState.dispute'
+      })
+      .default([]),
+    reservations: z
+      .array(mongooseZodCustomType('ObjectId'))
+      .mongooseTypeOptions({
+        ref: 'Ticket'
+      })
+      .default([]),
+    redemptions: z
+      .array(mongooseZodCustomType('ObjectId'))
+      .mongooseTypeOptions({
+        ref: 'Ticket'
+      })
+      .default([]),
+    finalizations: z
+      .array(mongooseZodCustomType('ObjectId'))
+      .mongooseTypeOptions({
+        ref: 'Ticket'
+      })
+      .default([]),
+    cancellations: z
+      .array(mongooseZodCustomType('ObjectId'))
+      .mongooseTypeOptions({
+        ref: 'Ticket'
+      })
+      .default([]),
+    current: z.boolean().default(true).mongooseTypeOptions({ index: true })
+  })
+  .strict();
 
+const showZodSchema = z
+  .object({
+    _id: mongooseZodCustomType('ObjectId')
+      .default(() => new mongoose.Types.ObjectId())
+      .mongooseTypeOptions({ _id: true })
+      .optional(),
+    creator: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+      ref: 'Creator'
+    }),
+    agent: mongooseZodCustomType('ObjectId').optional().mongooseTypeOptions({
+      ref: 'Agent'
+    }),
+    roomId: z.string().default(nanoid),
+    coverImageUrl: z.string().trim().optional(),
+    duration: z
+      .number()
+      .min(0, { message: 'Duration must be over 0' })
+      .max(180, { message: 'Duration must be under 180 minutes' }),
+    name: z
+      .string()
+      .min(3, { message: 'Name must be at least 3 characters' })
+      .max(50, { message: 'Name must be under 50 characters' })
+      .trim(),
+    capacity: z.number().min(1),
+    price: moneyZodSchema.default({ amount: 0, currency: CurrencyType.USD }),
+    creatorInfo: creatorInfoZodSchema,
+    showState: showStateZodSchema.default({})
+  })
+  .merge(genTimestampsSchema('createdAt', 'updatedAt'))
+  .strict()
+  .mongoose({
+    schemaOptions: {
+      collection: 'shows'
+    }
+  });
+
+const showSchema = toMongooseSchema(showZodSchema);
+showSchema.index({ agent: 1, 'showState.finalize.finalizedAt': -1 });
 showSchema.plugin(fieldEncryption, {
   fields: ['roomId'],
   secret: process.env.MONGO_DB_FIELD_SECRET,
   saltGenerator: (secret: string) => secret.slice(0, 16)
 });
-
-showSchema.index({ agent: 1, 'showState.finalize.finalizedAt': -1 });
-
-export type ShowDocumentType = InferSchemaType<typeof showSchema>;
-
-export type ShowRefundType = InferSchemaType<typeof refundSchema>;
-
-export type ShowSaleType = InferSchemaType<typeof saleSchema>;
-
-export type ShowStateType = InferSchemaType<typeof showStateSchema>;
-
-export const SaveState = (show: ShowDocument, newState: ShowStateType) => {
-  Show.updateOne({ _id: show._id }, { $set: { showState: newState } }).exec();
-};
 
 export const Show = models?.Show
   ? (models.Show as Model<ShowDocumentType>)

@@ -1,5 +1,3 @@
-import { CurrencyType } from './models/common';
-
 export enum ActorType {
   AGENT = 'AGENT',
   CREATOR = 'CREATOR',
@@ -16,6 +14,11 @@ export enum AuthType {
   NONE = 'NONE',
   PATH = 'PATH',
   TOKEN = 'TOKEN'
+}
+
+export enum CurrencyType {
+  USD = 'USD',
+  ETH = 'ETH'
 }
 
 export enum EntityType {
