@@ -5,10 +5,10 @@
   import { invalidateAll, onNavigate } from '$app/navigation';
 
   import { CancelReason } from '$lib/models/common';
-  import type { CreatorDocumentType } from '$lib/models/creator';
-  import type { ShowDocumentType } from '$lib/models/show';
+  import type { CreatorDocument } from '$lib/models/creator';
+  import type { ShowDocument } from '$lib/models/show';
   import type { ShowEventDocument } from '$lib/models/showEvent';
-  import type { WalletDocumentType } from '$lib/models/wallet';
+  import type { WalletDocument } from '$lib/models/wallet';
 
   import type { ShowMachineServiceType } from '$lib/machines/showMachine';
   import {
@@ -29,7 +29,7 @@
   import ShowStatus from './ShowStatus.svelte';
 
   import { page } from '$app/stores';
-  import type { UserDocumentType } from '$lib/models/user';
+  import type { UserDocument } from '$lib/models/user';
   import type { Subscription } from 'xstate';
   import type { ActionData, PageData } from './$types';
   import CreatorDetail from './CreatorDetail.svelte';
@@ -37,14 +37,14 @@
   export let data: PageData;
   export let form: ActionData;
 
-  let creator = data.creator as CreatorDocumentType;
-  let currentShow = data.show as ShowDocumentType | undefined;
+  let creator = data.creator as CreatorDocument;
+  let currentShow = data.show as ShowDocument | undefined;
   let currentEvent = data.showEvent as ShowEventDocument | undefined;
-  let completedShows = data.completedShows as ShowDocumentType[];
-  let wallet = data.wallet as WalletDocumentType;
+  let completedShows = data.completedShows as ShowDocument[];
+  let wallet = data.wallet as WalletDocument;
   let exchangeRate = +data.exchangeRate || 0;
   let jitsiToken = data.jitsiToken as string;
-  let user = data.user as UserDocumentType;
+  let user = data.user as UserDocument;
 
   $: showVideo = false;
 
@@ -77,7 +77,7 @@
     noCurrentShow();
   }
 
-  const useNewShow = (show: ShowDocumentType) => {
+  const useNewShow = (show: ShowDocument) => {
     if (show && show.showState.current) {
       currentShow = show;
       canCreateShow = false;
@@ -149,10 +149,10 @@
     unSubAll();
   });
 
-  const onShowCreated = (show: ShowDocumentType | undefined) => {
+  const onShowCreated = (show: ShowDocument | undefined) => {
     showUnSub?.();
     if (!show) return;
-    currentShow = show as ShowDocumentType;
+    currentShow = show as ShowDocument;
     invalidateAll();
     currentEvent = $page.data.showEvent;
     useNewShow(currentShow);

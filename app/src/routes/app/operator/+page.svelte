@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { ActionResult } from '@sveltejs/kit';
-  import { ObjectId } from 'mongodb';
   import spacetime from 'spacetime';
   import StarRating from 'svelte-star-rating';
   import { uniqueNamesGenerator } from 'unique-names-generator';
@@ -10,10 +9,9 @@
   import { invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
 
-  import type { AgentDocumentType } from '$lib/models/agent';
   import { DisputeDecision } from '$lib/models/common';
-  import type { CreatorDocumentType } from '$lib/models/creator';
-  import type { OperatorDocumentType } from '$lib/models/operator';
+  import type { CreatorDocument } from '$lib/models/creator';
+  import type { OperatorDocument } from '$lib/models/operator';
   import type { ShowDocument } from '$lib/models/show';
 
   import Config from '$lib/config';
@@ -21,13 +19,15 @@
   import { womensNames } from '$lib/womensNames';
 
   import type { PageData } from './$types';
+  import type { AgentDocument } from '$lib/models/agent';
+  import type { TicketDocument } from '$lib/models/ticket';
+  import { ObjectId } from 'mongodb';
 
   export let data: PageData;
-  const operator = data.operator as OperatorDocumentType;
-  let agents = data.agents as AgentDocumentType[];
-  let creators = data.creators as CreatorDocumentType[];
-
-  const disputedTickets = data.disputedTickets;
+  let operator = data.operator as OperatorDocument;
+  let agents = data.agents as AgentDocument[];
+  let creators = data.creators as CreatorDocument[];
+  let disputedTickets = data.disputedTickets as TicketDocument[];
 
   $: canAddAgent = false;
   $: canAddCreator = false;
@@ -52,13 +52,13 @@
   let agentAddress = '';
   let creatorNameElement: HTMLTableCellElement;
   let creatorCommissionElement: HTMLTableCellElement;
-  let commission = Config.UI.defaultCommissionRate;
+  let commission = Config.UI.defaultCommissionRate.toString();
   let creatorName = uniqueNamesGenerator({
     dictionaries: [womensNames]
   });
   let isChangeCreatorSecret = false;
   let selectedAgentId = '0';
-  let newCreator: CreatorDocumentType | undefined;
+  let newCreator: CreatorDocument | undefined;
   let newPassword: string | undefined;
 
   const decideDispute = async (decision: DisputeDecision) => {
@@ -76,7 +76,6 @@
     });
 
     disputedTickets.splice(index, 1);
-
     isDecideDispute = false;
   };
 
@@ -561,7 +560,6 @@
                             />
                             <td>
                               <select
-                                <select
                                 class="daisy-select daisy-select-bordered daisy-select-sm text-xs"
                                 bind:value={selectedAgentId}
                                 bind:this={creatorAgentElement}

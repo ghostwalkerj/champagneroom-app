@@ -14,10 +14,10 @@ const { models } = pkg;
 
 const agentZodSchema = z
   .object({
-    _id: mongooseZodCustomType('ObjectId')
-      .default(() => new mongoose.Types.ObjectId())
-      .mongooseTypeOptions({ _id: true })
-      .optional(),
+    _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+      _id: true,
+      auto: true
+    }),
     user: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
       autopopulate: true,
       ref: 'User',
@@ -25,7 +25,7 @@ const agentZodSchema = z
     }),
     defaultCommissionRate: z.number().min(0).max(100).default(0)
   })
-  .merge(genTimestampsSchema('createdAt', 'updatedAt'))
+  // .merge(genTimestampsSchema())
   .strict()
   .mongoose({
     schemaOptions: {
@@ -34,7 +34,6 @@ const agentZodSchema = z
   });
 
 const agentSchema = toMongooseSchema(agentZodSchema);
-
 agentSchema.plugin(mongooseAutoPopulate);
 
 export type AgentDocument = InstanceType<typeof Agent> & {

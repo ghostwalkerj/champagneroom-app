@@ -14,10 +14,10 @@ const { models } = pkg;
 
 const operatorZodSchema = z
   .object({
-    _id: mongooseZodCustomType('ObjectId')
-      .default(() => new mongoose.Types.ObjectId())
-      .mongooseTypeOptions({ _id: true })
-      .optional(),
+    _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+      _id: true,
+      auto: true
+    }),
     user: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
       autopopulate: true,
       ref: 'User',
@@ -33,7 +33,6 @@ const operatorZodSchema = z
   });
 
 const operatorSchema = toMongooseSchema(operatorZodSchema);
-
 operatorSchema.plugin(mongooseAutoPopulate);
 
 export type OperatorDocument = InstanceType<typeof Operator> & {

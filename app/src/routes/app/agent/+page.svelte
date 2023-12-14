@@ -8,9 +8,6 @@
   import { invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
 
-  import type { AgentDocumentType } from '$lib/models/agent';
-  import type { CreatorDocumentType } from '$lib/models/creator';
-
   import Config from '$lib/config';
   import { AuthType, currencyFormatter } from '$lib/constants';
   import { womensNames } from '$lib/womensNames';
@@ -18,9 +15,7 @@
   import TopCreator from './TopCreator.svelte';
 
   import WalletDetail from '$components/WalletDetail.svelte';
-  import { CurrencyType } from '$lib/constants';
-  import type { UserDocumentType } from '$lib/models/user';
-  import type { WalletDocumentType } from '$lib/models/wallet';
+  import type { CurrencyType } from '$lib/constants';
   import { PermissionType } from '$lib/permissions';
   import { AgentStore } from '$stores';
   import { onDestroy, onMount } from 'svelte';
@@ -28,12 +23,16 @@
   import type { ActionData, PageData } from './$types';
   import AgentDetail from './AgentDetail.svelte';
   import WeeklyBooking from './WeeklyBooking.svelte';
+  import type { AgentDocument } from '$lib/models/agent';
+  import type { CreatorDocument } from '$lib/models/creator';
+  import type { UserDocument } from '$lib/models/user';
+  import type { WalletDocument } from '$lib/models/wallet';
 
   export let data: PageData;
-  let agent = data.agent as AgentDocumentType;
-  let creators = data.creators as CreatorDocumentType[];
-  let user = data.user as UserDocumentType;
-  let wallet = data.wallet as WalletDocumentType;
+  let agent = data.agent as AgentDocument;
+  let creators = data.creators as CreatorDocument[];
+  let user = data.user as UserDocument;
+  let wallet = data.wallet as WalletDocument;
   let showData = data.showData as {
     creatorId: string;
     currency: CurrencyType;
@@ -49,7 +48,7 @@
   let form: ActionData;
 
   let newCreatorModal: HTMLDialogElement;
-  let newCreator: CreatorDocumentType | undefined;
+  let newCreator: CreatorDocument | undefined;
   let newPassword: string | undefined;
   let activeRow = 0;
   let activeTab = 'Dashboard' as 'Creators' | 'Dashboard';
@@ -82,7 +81,7 @@
     agentUnSub?.();
   });
 
-  const updateCreator = async (creator: CreatorDocumentType) => {
+  const updateCreator = async (creator: CreatorDocument) => {
     let formData = new FormData();
     formData.append('creatorId', creator._id.toString());
     formData.append('name', creator.user.name || '');
@@ -182,7 +181,7 @@
             href={urlJoin(
               $page.url.origin,
               Config.PATH.creator,
-              newCreator.user.secret
+              newCreator.user.secret || ''
             )}
             target="_blank"
             class="daisy-link daisy-link-primary"
@@ -190,7 +189,7 @@
             {urlJoin(
               $page.url.origin,
               Config.PATH.creator,
-              newCreator.user.secret
+              newCreator.user.secret || ''
             )}</a
           >
         </div>
@@ -392,7 +391,7 @@
                               >{#if creator.user.authType !== AuthType.SIGNING}<a
                                   href={urlJoin(
                                     Config.PATH.creator,
-                                    creator.user.secret
+                                    creator.user.secret || ''
                                   )}
                                   target="_blank"
                                   class="daisy-link daisy-link-primary"
@@ -433,7 +432,7 @@
                             </td>
                             <td>{creator.feedbackStats.numberOfReviews}</td>
                             <td
-                              class=" daisy-tooltip"
+                              class="daisy-tooltip"
                               data-tip={creator.feedbackStats.averageRating.toFixed(
                                 2
                               )}

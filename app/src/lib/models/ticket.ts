@@ -49,12 +49,6 @@ const redemptionZodSchema = z
   })
   .strict();
 
-export type TicketDocument = InstanceType<typeof Ticket> & {
-  show: ShowDocumentType;
-} & {
-  user: UserDocumentType;
-};
-
 const ticketStateZodSchema = z
   .object({
     status: z.nativeEnum(TicketStatus).default(TicketStatus.RESERVED),
@@ -72,10 +66,10 @@ const ticketStateZodSchema = z
 
 const ticketZodSchema = z
   .object({
-    _id: mongooseZodCustomType('ObjectId')
-      .default(() => new mongoose.Types.ObjectId())
-      .mongooseTypeOptions({ _id: true })
-      .optional(),
+    _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+      _id: true,
+      auto: true
+    }),
     paymentAddress: z
       .string()
       .max(50)
@@ -102,7 +96,7 @@ const ticketZodSchema = z
       ref: 'Creator'
     })
   })
-  .merge(genTimestampsSchema('createdAt', 'updatedAt'))
+  .merge(genTimestampsSchema())
   .strict()
   .mongoose({
     schemaOptions: {
@@ -113,6 +107,12 @@ const ticketZodSchema = z
 const ticketSchema = toMongooseSchema(ticketZodSchema);
 
 ticketSchema.plugin(mongooseAutoPopulate);
+
+export type TicketDocument = InstanceType<typeof Ticket> & {
+  show: ShowDocumentType;
+} & {
+  user: UserDocumentType;
+};
 
 export type TicketDocumentType = z.infer<typeof ticketZodSchema>;
 

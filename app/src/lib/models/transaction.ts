@@ -29,10 +29,10 @@ const { models } = pkg;
 
 const transactionZodSchema = z
   .object({
-    _id: mongooseZodCustomType('ObjectId')
-      .default(() => new mongoose.Types.ObjectId())
-      .mongooseTypeOptions({ _id: true })
-      .optional(),
+    _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+      _id: true,
+      auto: true
+    }),
     hash: z.string().trim().optional(),
     from: z.string().trim().optional(),
     to: z.string().trim().optional(),
@@ -62,7 +62,7 @@ const transactionZodSchema = z
     }),
     bcPayoutId: z.string().trim().optional()
   })
-  .merge(genTimestampsSchema('createdAt', 'updatedAt'))
+  .merge(genTimestampsSchema())
   .strict()
   .mongoose({
     schemaOptions: {

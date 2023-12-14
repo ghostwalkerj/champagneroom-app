@@ -39,10 +39,10 @@ const feedbackZodSchema = z
 
 const creatorZodSchema = z
   .object({
-    _id: mongooseZodCustomType('ObjectId')
-      .default(() => new mongoose.Types.ObjectId())
-      .mongooseTypeOptions({ _id: true })
-      .optional(),
+    _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+      _id: true,
+      auto: true
+    }),
     user: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
       autopopulate: true,
       ref: 'User',
@@ -55,7 +55,7 @@ const creatorZodSchema = z
     feedbackStats: feedbackZodSchema.default({}),
     salesStats: salesZodSchema.default({})
   })
-  .merge(genTimestampsSchema('createdAt', 'updatedAt'))
+  .merge(genTimestampsSchema())
   .strict()
   .mongoose({
     schemaOptions: {
@@ -64,6 +64,7 @@ const creatorZodSchema = z
   });
 
 const creatorSchema = toMongooseSchema(creatorZodSchema);
+creatorSchema.plugin(mongooseAutoPopulate);
 
 export type CreatorDocument = InstanceType<typeof Creator> & {
   user: UserDocumentType;
@@ -73,5 +74,3 @@ export type CreatorDocumentType = z.infer<typeof creatorZodSchema>;
 export const Creator = models?.Creator
   ? (models?.Creator as Model<CreatorDocumentType>)
   : mongoose.model<CreatorDocumentType>('Creator', creatorSchema);
-
-creatorSchema.plugin(mongooseAutoPopulate);

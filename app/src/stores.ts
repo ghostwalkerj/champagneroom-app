@@ -5,13 +5,13 @@ import type { Types } from 'mongoose';
 import { derived, writable } from 'svelte/store';
 import urlJoin from 'url-join';
 
-import type { AgentDocumentType } from '$lib/models/agent';
-import type { CreatorDocumentType } from '$lib/models/creator';
-import type { ShowDocumentType } from '$lib/models/show';
-import type { ShowEventDocumentType } from '$lib/models/showEvent';
-import type { TicketDocumentType } from '$lib/models/ticket';
-import type { UserDocumentType } from '$lib/models/user';
-import type { WalletDocumentType } from '$lib/models/wallet';
+import type { AgentDocument } from '$lib/models/agent';
+import type { CreatorDocument } from '$lib/models/creator';
+import type { ShowDocument } from '$lib/models/show';
+import type { ShowEventDocument } from '$lib/models/showEvent';
+import type { TicketDocument } from '$lib/models/ticket';
+import type { UserDocument } from '$lib/models/user';
+import type { WalletDocument } from '$lib/models/wallet';
 
 import Config from '$lib/config';
 
@@ -57,15 +57,15 @@ const abstractUpdateStore = <T extends { _id: Types.ObjectId }>({
   };
 };
 
-export const AgentStore = (agent: AgentDocumentType) => {
-  return abstractUpdateStore<AgentDocumentType>({
+export const AgentStore = (agent: AgentDocument) => {
+  return abstractUpdateStore<AgentDocument>({
     doc: agent,
     type: EntityType.AGENT
   });
 };
 
-export const CreatorStore = (creator: CreatorDocumentType) => {
-  return abstractUpdateStore<CreatorDocumentType>({
+export const CreatorStore = (creator: CreatorDocument) => {
+  return abstractUpdateStore<CreatorDocument>({
     doc: creator,
     type: EntityType.CREATOR
   });
@@ -154,15 +154,15 @@ const getInsertNotification = <T>({
   return abortDocument;
 };
 
-export const ShowEventStore = (show: ShowDocumentType) => {
-  const showStore = writable<ShowDocumentType>(show);
-  const showEventStore = derived<typeof showStore, ShowEventDocumentType>(
+export const ShowEventStore = (show: ShowDocument) => {
+  const showStore = writable<ShowDocument>(show);
+  const showEventStore = derived<typeof showStore, ShowEventDocument>(
     showStore,
     ($show, set) => {
       let abortShowEvent = new AbortController();
       const callback = set;
 
-      abortShowEvent = getInsertNotification<ShowEventDocumentType>({
+      abortShowEvent = getInsertNotification<ShowEventDocument>({
         id: $show._id.toString(),
         callback,
         type: EntityType.SHOWEVENT,
@@ -180,29 +180,29 @@ export const ShowEventStore = (show: ShowDocumentType) => {
   };
 };
 
-export const ShowStore = (show: ShowDocumentType) => {
-  return abstractUpdateStore<ShowDocumentType>({
+export const ShowStore = (show: ShowDocument) => {
+  return abstractUpdateStore<ShowDocument>({
     doc: show,
     type: EntityType.SHOW
   });
 };
 
-export const TicketStore = (ticket: TicketDocumentType) => {
-  return abstractUpdateStore<TicketDocumentType>({
+export const TicketStore = (ticket: TicketDocument) => {
+  return abstractUpdateStore<TicketDocument>({
     doc: ticket,
     type: EntityType.TICKET
   });
 };
 
-export const UserStore = (user: UserDocumentType) => {
-  return abstractUpdateStore<UserDocumentType>({
+export const UserStore = (user: UserDocument) => {
+  return abstractUpdateStore<UserDocument>({
     doc: user,
     type: EntityType.USER
   });
 };
 
-export const WalletStore = (wallet: WalletDocumentType) => {
-  return abstractUpdateStore<WalletDocumentType>({
+export const WalletStore = (wallet: WalletDocument) => {
+  return abstractUpdateStore<WalletDocument>({
     doc: wallet,
     type: EntityType.WALLET
   });

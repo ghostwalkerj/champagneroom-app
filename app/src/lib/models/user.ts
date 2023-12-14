@@ -30,10 +30,10 @@ export { User };
 
 const userZodSchema = z
   .object({
-    _id: mongooseZodCustomType('ObjectId')
-      .default(() => new mongoose.Types.ObjectId())
-      .mongooseTypeOptions({ _id: true })
-      .optional(),
+    _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+      _id: true,
+      auto: true
+    }),
     wallet: mongooseZodCustomType('ObjectId').optional().mongooseTypeOptions({
       ref: 'Wallet'
     }),
@@ -43,7 +43,9 @@ const userZodSchema = z
       .trim()
       .refine((value) => validator.isEthereumAddress(value), {
         message: 'Invalid Ethereum address'
-      }),
+      })
+      .optional()
+      .mongooseTypeOptions({ index: true }),
     roles: z.array(z.nativeEnum(UserRole)),
     payoutAddress: z
       .string()
@@ -62,7 +64,8 @@ const userZodSchema = z
       .string()
       .max(50)
       .min(21, 'Secret is too short')
-      .default(() => nanoid(21)),
+      .default(() => nanoid(21))
+      .optional(),
     password: z
       .string()
       .max(80)
@@ -80,7 +83,7 @@ const userZodSchema = z
       .default(() => nanoid(10)),
     permissions: z.array(z.nativeEnum(PermissionType)).default([])
   })
-  .merge(genTimestampsSchema('createdAt', 'updatedAt'))
+  .merge(genTimestampsSchema())
   .strict()
   .mongoose({
     schemaOptions: {
@@ -89,6 +92,10 @@ const userZodSchema = z
   });
 
 export const userSchema = toMongooseSchema(userZodSchema);
+userSchema.index(
+  { address: 1 },
+  { unique: true, partialFilterExpression: { address: { $exists: true } } }
+);
 
 // const saltGenerator = (secret: string) => secret.slice(0, 16);
 // const hash = (secret) =>
