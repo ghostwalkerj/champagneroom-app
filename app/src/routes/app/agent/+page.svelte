@@ -18,16 +18,16 @@
   import TopCreator from './TopCreator.svelte';
 
   import WalletDetail from '$components/WalletDetail.svelte';
-  import type { CurrencyType } from '$lib/models/common';
+  import { CurrencyType } from '$lib/constants';
+  import type { UserDocumentType } from '$lib/models/user';
   import type { WalletDocumentType } from '$lib/models/wallet';
+  import { PermissionType } from '$lib/permissions';
   import { AgentStore } from '$stores';
   import { onDestroy, onMount } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
   import type { ActionData, PageData } from './$types';
   import AgentDetail from './AgentDetail.svelte';
   import WeeklyBooking from './WeeklyBooking.svelte';
-  import { PermissionType } from '$lib/permissions';
-  import type { UserDocumentType } from '$lib/models/user';
 
   export let data: PageData;
   let agent = data.agent as AgentDocumentType;

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { applyAction, enhance } from '$app/forms';
 
-  import { CurrencyType } from '$lib/models/common';
+  import { CurrencyType } from '$lib/constants';
   import type { WalletDocumentType } from '$lib/models/wallet';
 
   import { currencyFormatter } from '$lib/constants';

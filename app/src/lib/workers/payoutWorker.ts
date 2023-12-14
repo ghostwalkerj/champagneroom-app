@@ -5,14 +5,13 @@ import type IORedis from 'ioredis';
 import urlJoin from 'url-join';
 
 import type { PayoutType } from '$lib/models/common';
-import { CurrencyType } from '$lib/models/common';
 import { Creator } from '$lib/models/creator';
-import type { TicketDocument, TicketDocument } from '$lib/models/ticket';
+import type { TicketDocument } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
 import {
   Transaction,
-  type TransactionDocument,
-  TransactionReasonType
+  TransactionReasonType,
+  type TransactionDocument
 } from '$lib/models/transaction';
 import { Wallet } from '$lib/models/wallet';
 
@@ -20,7 +19,7 @@ import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 import { WalletMachineEventString } from '$lib/machines/walletMachine';
 
 import Config from '$lib/config';
-import { EntityType } from '$lib/constants';
+import { CurrencyType, EntityType } from '$lib/constants';
 import { authEncrypt } from '$lib/crypt';
 import {
   batchActionsOnPayoutsPayoutsBatchPost,
@@ -34,10 +33,10 @@ import {
   submitRefundInvoicesRefundsRefundIdSubmitPost
 } from '$lib/ext/bitcart';
 import type {
+  Wallet as BTWallet,
   DisplayInvoice,
   DisplayPayout,
-  Store,
-  Wallet as BTWallet
+  Store
 } from '$lib/ext/bitcart/models';
 import type { PaymentType } from '$lib/payment';
 import { PayoutJobType, PayoutReason, PayoutStatus } from '$lib/payment';

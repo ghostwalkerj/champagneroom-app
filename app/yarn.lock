@@ -2571,9 +2571,9 @@
     rollup "^3.7.0"
 
 "@sveltejs/kit@^1.27.6":
-  version "1.29.1"
-  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-1.29.1.tgz#91114790ec7b3e18f0869940323216de31192e88"
-  integrity sha512-zbHS6hy2OZLWTmkTktx7jpPaE5Qg9tk3li+wh06ISSLEYeiPrLlPMuhzmI2gM5d6ParNfDx7YCiPTeRr23IpMw==
+  version "1.30.3"
+  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-1.30.3.tgz#3e1d57283352bcc6900592171139f1ff97d4e85f"
+  integrity sha512-0DzVXfU4h+tChFvoc8C61IqErCyskD4ydSIDjpKS2lYlEzIYrtYrY7juSqACFxqcvZAnOEXvSY+zZ8br0+ZMMg==
   dependencies:
     "@sveltejs/vite-plugin-svelte" "^2.5.0"
     "@types/cookie" "^0.5.1"
@@ -8435,6 +8435,11 @@ mongoose-field-encryption@^7.0.1:
   resolved "https://registry.yarnpkg.com/mongoose-field-encryption/-/mongoose-field-encryption-7.0.1.tgz#6d5bfcbbc7a5bfae3e0b7e4afaaae58c649a10b1"
   integrity sha512-PWNn1EkmtF8Sjguioe/TpW+6CWmNQwcQpKD3UAUVM1JtPmb4jOA7WqIQVJZCsnQuOqhBfCcpVvOJdOTvB6Q9dQ==
 
+mongoose-zod@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/mongoose-zod/-/mongoose-zod-0.1.1.tgz#f56fd77ec4ae573b6d1d571cf953bdd40857ad78"
+  integrity sha512-hBKAI5fonNPP/6DD0Dm0CpBY/0qQc/K2Jj1jxkzEea53QFCiW/AFMIo/vILKHcGYW7y1n29HZ2x0ywPBYJjDxg==
+
 mongoose@^7.6.3:
   version "7.6.7"
   resolved "https://registry.yarnpkg.com/mongoose/-/mongoose-7.6.7.tgz#1ca9650e6a5e0222d3e4b8e45a6b530d5dd21996"
@@ -11925,7 +11930,7 @@ yocto-queue@^1.0.0:
   resolved "https://registry.yarnpkg.com/yocto-queue/-/yocto-queue-1.0.0.tgz#7f816433fb2cbc511ec8bf7d263c3b58a1a3c251"
   integrity sha512-9bnSc/HEW2uRy67wc+T8UwauLuPJVn28jb+GtJY16iiKWyvmYJRXVT4UamsAEGQfPohgr2q4Tq0sQbQlxTfi1g==
 
-zod@^3.21.4:
+zod@^3.21.4, zod@^3.22.4:
   version "3.22.4"
   resolved "https://registry.yarnpkg.com/zod/-/zod-3.22.4.tgz#f31c3a9386f61b1f228af56faa9255e845cf3fff"
   integrity sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==

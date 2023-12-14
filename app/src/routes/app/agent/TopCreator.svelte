@@ -6,7 +6,6 @@
   import type { CreatorDocumentType } from '$lib/models/creator';
 
   import { currencyFormatter } from '$lib/constants';
-  import type { CurrencyType } from '$lib/models/common';
   import spacetime from 'spacetime';
 
   export let creators: CreatorDocumentType[];

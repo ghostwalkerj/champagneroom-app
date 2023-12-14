@@ -1,6 +1,12 @@
 import bcrypt from 'bcryptjs';
-import type { InferSchemaType, Model } from 'mongoose';
+import type { Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
+import {
+  genTimestampsSchema,
+  mongooseZodCustomType,
+  toMongooseSchema,
+  z
+} from 'mongoose-zod';
 import { nanoid } from 'nanoid';
 import validator from 'validator';
 
@@ -8,7 +14,7 @@ import Config from '$lib/config';
 import { AuthType, UserRole } from '$lib/constants';
 import { PermissionType } from '$lib/permissions';
 
-const { Schema, models } = pkg;
+const { models } = pkg;
 
 export type UserDocument = InstanceType<typeof User> & {
   comparePassword: (password: string) => Promise<boolean>;
@@ -18,110 +24,71 @@ export type UserDocument = InstanceType<typeof User> & {
   hasPermission: (permission: PermissionType) => boolean;
 };
 
-export type UserDocumentType = InferSchemaType<typeof userSchema>;
+export type UserDocumentType = z.infer<typeof userZodSchema>;
 
 export { User };
 
-export const userSchema = new Schema(
-  {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    _id: { type: Schema.Types.ObjectId, required: true, auto: true },
-    wallet: {
-      type: Schema.Types.ObjectId,
-      ref: 'Wallet',
-      index: true
-    },
-
-    address: {
-      type: String,
-      maxLength: 50,
-      lowerCase: true,
-      index: true,
-      unique: true,
-      required: true,
-      minLength: [21, 'Address is too short'],
-      default: () => nanoid(21)
-    },
-
-    roles: {
-      type: [String],
-      enum: UserRole,
-      required: true
-    },
-
-    payoutAddress: {
-      type: String,
-      maxLength: 50,
-      validator: (v: string) => validator.isEthereumAddress(v),
-      lowerCase: true
-    },
-
-    nonce: {
-      type: Number,
-      default: () => Math.floor(Math.random() * 1_000_000)
-    },
-
-    secret: {
-      type: String,
-      maxLength: 50,
-      minLength: [21, 'Secret is too short'],
-      default: () => nanoid(21),
-      unique: true,
-      index: true
-    },
-
-    password: {
-      type: String,
-      maxLength: 80,
-      minLength: [8, 'Password is too short'],
-      trim: true
-    },
-
-    name: {
-      type: String,
-      maxLength: 50,
-      minLength: [3, 'Name is too short'],
-      trim: true,
-      required: true
-    },
-
-    authType: {
-      type: String,
-      enum: AuthType,
-      required: true,
-      default: AuthType.SIGNING
-    },
-
-    active: {
-      type: Boolean,
-      default: true,
-      index: true
-    },
-
-    profileImageUrl: {
-      type: String,
-      required: true,
-      default: Config.UI.defaultProfileImage
-    },
-
-    referralCode: {
-      type: String,
-      maxLength: 50,
-      minLength: [8, 'Referral code is too short'],
-      trim: true,
-      default: () => nanoid(10),
-      index: true
-    },
-
-    permissions: {
-      type: [String],
-      enum: PermissionType,
-      required: true,
-      default: []
+const userZodSchema = z
+  .object({
+    _id: mongooseZodCustomType('ObjectId')
+      .default(() => new mongoose.Types.ObjectId())
+      .mongooseTypeOptions({ _id: true })
+      .optional(),
+    wallet: mongooseZodCustomType('ObjectId').optional().mongooseTypeOptions({
+      ref: 'Wallet'
+    }),
+    address: z
+      .string()
+      .toLowerCase()
+      .trim()
+      .refine((value) => validator.isEthereumAddress(value), {
+        message: 'Invalid Ethereum address'
+      }),
+    roles: z.array(z.nativeEnum(UserRole)),
+    payoutAddress: z
+      .string()
+      .toLowerCase()
+      .trim()
+      .refine(
+        (value) => validator.isEthereumAddress(value),
+        'Invalid Ethereum address'
+      )
+      .optional(),
+    nonce: z
+      .number()
+      .positive()
+      .default(() => Math.floor(Math.random() * 1_000_000)),
+    secret: z
+      .string()
+      .max(50)
+      .min(21, 'Secret is too short')
+      .default(() => nanoid(21)),
+    password: z
+      .string()
+      .max(80)
+      .min(8, 'Password is too short')
+      .trim()
+      .optional(),
+    name: z.string().max(50).min(3, 'Name is too short').trim(),
+    authType: z.nativeEnum(AuthType).default(AuthType.SIGNING),
+    active: z.boolean().default(true).mongooseTypeOptions({ index: true }),
+    profileImageUrl: z.string().default(Config.UI.defaultProfileImage),
+    referralCode: z
+      .string()
+      .max(50)
+      .min(8, 'Referral code is too short')
+      .default(() => nanoid(10)),
+    permissions: z.array(z.nativeEnum(PermissionType)).default([])
+  })
+  .merge(genTimestampsSchema('createdAt', 'updatedAt'))
+  .strict()
+  .mongoose({
+    schemaOptions: {
+      collection: 'users'
     }
-  },
-  { timestamps: true }
-);
+  });
+
+export const userSchema = toMongooseSchema(userZodSchema);
 
 // const saltGenerator = (secret: string) => secret.slice(0, 16);
 // const hash = (secret) =>

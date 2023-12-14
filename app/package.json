@@ -79,7 +79,8 @@
     "vite": "^4.5.0",
     "vite-plugin-environment": "^1.1.3",
     "vite-plugin-mkcert": "^1.16.0",
-    "vite-plugin-node-polyfills": "^0.9.0"
+    "vite-plugin-node-polyfills": "^0.9.0",
+    "zod": "^3.22.4"
   },
   "type": "module",
   "dependencies": {
@@ -118,6 +119,7 @@
     "mongoose": "^7.6.3",
     "mongoose-autopopulate": "^1.1.0",
     "mongoose-field-encryption": "^7.0.1",
+    "mongoose-zod": "^0.1.1",
     "nanoid": "^5.0.3",
     "npm-font-caviar-dreams": "^1.0.1",
     "outmatch": "^0.7.0",

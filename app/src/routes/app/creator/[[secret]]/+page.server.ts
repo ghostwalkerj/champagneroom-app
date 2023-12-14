@@ -15,7 +15,7 @@ import {
 import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
 import type { CancelType } from '$lib/models/common';
-import { CancelReason, CurrencyType } from '$lib/models/common';
+import { CancelReason } from '$lib/models/common';
 import type { CreatorDocument } from '$lib/models/creator';
 import type { ShowDocument } from '$lib/models/show';
 import { Show, ShowStatus } from '$lib/models/show';
@@ -31,7 +31,7 @@ import { ShowMachineEventString } from '$lib/machines/showMachine';
 import type { PayoutQueueType } from '$lib/workers/payoutWorker';
 import type { ShowQueueType } from '$lib/workers/showWorker';
 
-import { ActorType, EntityType } from '$lib/constants';
+import { ActorType, CurrencyType, EntityType } from '$lib/constants';
 import { rateCryptosRateGet } from '$lib/ext/bitcart';
 import { PayoutJobType, PayoutReason, createAuthToken } from '$lib/payment';
 import { getShowMachineService } from '$lib/server/machinesUtil';

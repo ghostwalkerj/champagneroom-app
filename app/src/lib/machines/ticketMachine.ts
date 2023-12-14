@@ -9,7 +9,6 @@ import { raise } from 'xstate/lib/actions';
 
 import type {
   CancelType,
-  CurrencyType,
   DisputeType,
   FeedbackType,
   FinalizeType,
@@ -26,6 +25,7 @@ import type {
 
 import type { ShowJobDataType } from '$lib/workers/showWorker';
 
+import type { CurrencyType } from '$lib/constants';
 import { ActorType } from '$lib/constants';
 import { calcTotal } from '$lib/payment';
 

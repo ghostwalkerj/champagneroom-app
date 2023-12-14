@@ -1,29 +1,31 @@
-import { type InferSchemaType, Schema } from 'mongoose';
+import mongoose from 'mongoose';
+import { mongooseZodCustomType, z } from 'mongoose-zod';
+import validator from 'validator';
 
-import { ActorType } from '$lib/constants';
+import { ActorType, CurrencyType } from '$lib/constants';
 import { PayoutStatus } from '$lib/payment';
 
-import { transactionSummary } from './transaction';
+import { transactionSummaryZodSchema } from './transaction';
 
-export type CancelType = InferSchemaType<typeof cancelSchema>;
+export type CancelType = z.infer<typeof cancelZodSchema>;
 
-export type DisputeType = InferSchemaType<typeof disputeSchema>;
+export type DisputeType = z.infer<typeof disputeZodSchema>;
 
-export type EarningsType = InferSchemaType<typeof earningsSchema>;
+export type EarningsType = z.infer<typeof earningsZodSchema>;
 
-export type EscrowType = InferSchemaType<typeof escrowSchema>;
+export type EscrowType = z.infer<typeof escrowZodSchema>;
 
-export type FeedbackType = InferSchemaType<typeof feedbackSchema>;
+export type FeedbackType = z.infer<typeof feedbackZodSchema>;
 
-export type FinalizeType = InferSchemaType<typeof finalizeSchema>;
+export type FinalizeType = z.infer<typeof finalizeZodSchema>;
 
-export type MoneyType = InferSchemaType<typeof moneySchema>;
+export type MoneyType = z.infer<typeof moneyZodSchema>;
 
-export type PayoutType = InferSchemaType<typeof payoutSchema>;
+export type PayoutType = z.infer<typeof payoutZodSchema>;
 
-export type RefundType = InferSchemaType<typeof refundSchema>;
+export type RefundType = z.infer<typeof refundZodSchema>;
 
-export type SaleType = InferSchemaType<typeof saleSchema>;
+export type SaleType = z.infer<typeof saleZodSchema>;
 
 export enum CancelReason {
   CREATOR_NO_SHOW = 'CREATOR NO SHOW',
@@ -34,11 +36,6 @@ export enum CancelReason {
   TICKET_PAYMENT_TIMEOUT = 'TICKET PAYMENT TIMEOUT',
   TICKET_PAYMENT_FAILED = 'TICKET PAYMENT FAILED',
   TICKET_PAYMENT_INVALID = 'TICKET PAYMENT INVALID'
-}
-
-export enum CurrencyType {
-  USD = 'USD',
-  ETH = 'ETH'
 }
 
 export enum DisputeDecision {
@@ -68,152 +65,110 @@ export enum RefundReason {
   UNKNOWN = 'UNKNOWN'
 }
 
-export const cancelSchema = new Schema({
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  _id: { type: Schema.Types.ObjectId, auto: true },
-  cancelledAt: { type: Date, default: new Date() },
-  cancelledInState: { type: String },
-  cancelledBy: { type: String, enum: ActorType, required: true },
-  reason: { type: String, enum: CancelReason, required: true }
+export const cancelZodSchema = z.object({
+  _id: mongooseZodCustomType('ObjectId')
+    .default(() => new mongoose.Types.ObjectId())
+    .mongooseTypeOptions({ _id: true, index: true, unique: true })
+    .optional(),
+  cancelledAt: z.date().default(() => new Date()),
+  cancelledInState: z.string().optional(),
+  cancelledBy: z.nativeEnum(ActorType),
+  reason: z.nativeEnum(CancelReason)
 });
 
-export const disputeSchema = new Schema({
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  _id: { type: Schema.Types.ObjectId, auto: true },
-  startedAt: { type: Date, default: new Date() },
-  endedAt: { type: Date },
-  reason: { type: String, enum: DisputeReason, required: true },
-  disputedBy: { type: String, enum: ActorType, required: true },
-  explanation: { type: String, required: true },
-  decision: { type: String, enum: DisputeDecision },
-  resolved: { type: Boolean, default: false, index: true }
+export const disputeZodSchema = z.object({
+  _id: mongooseZodCustomType('ObjectId')
+    .default(() => new mongoose.Types.ObjectId())
+    .mongooseTypeOptions({ _id: true, index: true, unique: true })
+    .optional(),
+  startedAt: z.date().default(() => new Date()),
+  endedAt: z.date().optional(),
+  reason: z.nativeEnum(DisputeReason),
+  disputedBy: z.nativeEnum(ActorType),
+  explanation: z.string().min(10).max(500),
+  decision: z.nativeEnum(DisputeDecision).optional(),
+  resolved: z.boolean().default(false)
 });
 
-export const earningsSchema = new Schema({
-  earnedAt: { type: Date, default: new Date() },
-  amount: { type: Number, required: true },
-  currency: {
-    type: String,
-    enum: CurrencyType,
-    required: true,
-    default: CurrencyType.ETH
-  },
-  earningsSource: {
-    type: String,
-    enum: EarningsSource,
-    required: true,
-    default: EarningsSource.SHOW_PERFORMANCE
-  },
-  earningPercentage: { type: Number, required: true, default: 100 },
-  show: {
-    type: Schema.Types.ObjectId,
-    ref: 'Show',
-    index: true,
-    required: true
-  }
+export const earningsZodSchema = z.object({
+  earnedAt: z.date().default(() => new Date()),
+  amount: z.number().min(0),
+  currency: z.nativeEnum(CurrencyType).default(CurrencyType.ETH),
+  earningsSource: z
+    .nativeEnum(EarningsSource)
+    .default(EarningsSource.SHOW_PERFORMANCE),
+  earningPercentage: z.number().min(0).max(100).default(100),
+  show: mongooseZodCustomType('ObjectId').mongooseTypeOptions({ ref: 'Show' })
 });
 
-export const escrowSchema = new Schema({
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  _id: { type: Schema.Types.ObjectId, auto: true },
-  startedAt: { type: Date, default: new Date() },
-  endedAt: { type: Date }
+export const escrowZodSchema = z.object({
+  _id: mongooseZodCustomType('ObjectId')
+    .default(() => new mongoose.Types.ObjectId())
+    .mongooseTypeOptions({ _id: true, index: true, unique: true })
+    .optional(),
+  startedAt: z.date().default(() => new Date()),
+  endedAt: z.date().optional()
 });
 
-export const feedbackSchema = new Schema({
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  _id: { type: Schema.Types.ObjectId, auto: true },
-  rating: {
-    type: Number,
-    required: true,
-    min: 1,
-    max: 5,
-    validate: {
-      validator: Number.isInteger,
-      message: '{VALUE} is not an integer value'
-    }
-  },
-  review: { type: String },
-  createdAt: { type: Date, default: new Date() }
+export const feedbackZodSchema = z.object({
+  _id: mongooseZodCustomType('ObjectId')
+    .default(() => new mongoose.Types.ObjectId())
+    .mongooseTypeOptions({ _id: true, index: true, unique: true })
+    .optional(),
+  rating: z.number().min(1).max(5),
+  review: z.string().min(10).max(500).optional(),
+  createdAt: z.date().default(() => new Date())
 });
 
-export const finalizeSchema = new Schema({
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  _id: { type: Schema.Types.ObjectId, auto: true },
-  finalizedAt: { type: Date, default: new Date() },
-  finalizedBy: { type: String, enum: ActorType, required: true }
+export const finalizeZodSchema = z.object({
+  _id: mongooseZodCustomType('ObjectId')
+    .default(() => new mongoose.Types.ObjectId())
+    .mongooseTypeOptions({ _id: true, index: true, unique: true })
+    .optional(),
+  finalizedAt: z.date().default(() => new Date()),
+  finalizedBy: z.nativeEnum(ActorType)
 });
 
-export const moneySchema = new Schema({
-  amount: { type: Number, required: true },
-  currency: {
-    type: String,
-    enum: CurrencyType,
-    required: true,
-    default: CurrencyType.USD
-  }
+export const moneyZodSchema = z.object({
+  amount: z.number().min(0),
+  currency: z.nativeEnum(CurrencyType).default(CurrencyType.USD)
 });
 
-export const payoutSchema = new Schema({
-  payoutAt: { type: Date, default: new Date() },
-  amount: { type: Number, required: true },
-  destination: { type: String, required: true },
-  currency: {
-    type: String,
-    enum: CurrencyType,
-    required: true,
-    default: CurrencyType.ETH
-  },
-  bcPayoutId: { type: String, index: true },
-  payoutStatus: { type: String, enum: PayoutStatus },
-  transaction: { type: Schema.Types.ObjectId, ref: 'Transaction' }
+export const payoutZodSchema = z.object({
+  payoutAt: z.date().default(() => new Date()),
+  amount: z.number().min(0),
+  destination: z
+    .string()
+    .refine((value) => validator.isEthereumAddress(value), {
+      message: 'Invalid Ethereum address'
+    }),
+  currency: z.nativeEnum(CurrencyType).default(CurrencyType.ETH),
+  bcPayoutId: z.string().optional(),
+  payoutStatus: z.nativeEnum(PayoutStatus).optional(),
+  transaction: mongooseZodCustomType('ObjectId')
+    .optional()
+    .mongooseTypeOptions({ ref: 'Transaction' })
 });
 
-export const refundSchema = new Schema({
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  _id: { type: Schema.Types.ObjectId, auto: true },
-  requestedAt: { type: Date, default: new Date() },
-  requestedAmounts: {
-    type: Map,
-    required: true,
-    of: Number,
-    default: () => new Map<string, number>()
-  },
-  approvedAmounts: {
-    type: Map,
-    required: true,
-    of: Number,
-    default: () => new Map<string, number>()
-  },
-  totals: {
-    type: Map,
-    required: true,
-    of: Number,
-    default: () => new Map<string, number>()
-  },
-  payouts: {
-    type: Map,
-    of: [transactionSummary],
-    default: () => [],
-    required: true
-  },
-  reason: { type: String, enum: RefundReason, required: true }
+export const refundZodSchema = z.object({
+  _id: mongooseZodCustomType('ObjectId')
+    .default(() => new mongoose.Types.ObjectId())
+    .mongooseTypeOptions({ _id: true, index: true, unique: true })
+    .optional(),
+  requestedAt: z.date().default(() => new Date()),
+  requestedAmounts: z.map(z.string(), z.number()).default(() => new Map()),
+  approvedAmounts: z.map(z.string(), z.number()).default(() => new Map()),
+  totals: z.map(z.string(), z.number()).default(() => new Map()),
+  payouts: z.array(transactionSummaryZodSchema),
+  reason: z.nativeEnum(RefundReason)
 });
 
-export const saleSchema = new Schema({
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  _id: { type: Schema.Types.ObjectId, auto: true },
-  soldAt: { type: Date, default: new Date() },
-  payments: {
-    type: Map,
-    of: [transactionSummary],
-    default: () => [],
-    required: true
-  },
-  totals: {
-    type: Map,
-    of: Number,
-    required: true,
-    default: () => new Map<string, number>()
-  }
+export const saleZodSchema = z.object({
+  _id: mongooseZodCustomType('ObjectId')
+    .default(() => new mongoose.Types.ObjectId())
+    .mongooseTypeOptions({ _id: true, index: true, unique: true })
+    .optional(),
+  soldAt: z.date().default(() => new Date()),
+  payments: z.array(transactionSummaryZodSchema),
+  totals: z.map(z.string(), z.number()).default(() => new Map())
 });

@@ -15,8 +15,8 @@ import {
   PASSWORD_SALT
 } from '$env/static/private';
 
+import { CurrencyType } from '$lib/constants';
 import type { AgentDocument } from '$lib/models/agent';
-import { CurrencyType } from '$lib/models/common';
 import { Creator } from '$lib/models/creator';
 import { Show } from '$lib/models/show';
 import type { UserDocument } from '$lib/models/user';
