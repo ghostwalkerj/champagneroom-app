@@ -21,7 +21,7 @@ import {
 
 import { Show } from '$lib/models/show';
 import { Ticket } from '$lib/models/ticket';
-import { User, UserRole } from '$lib/models/user';
+import { User } from '$lib/models/user';
 
 import { ShowMachineEventString } from '$lib/machines/showMachine';
 import { TicketMachineEventString } from '$lib/machines/ticketMachine';
@@ -29,7 +29,7 @@ import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 import type { ShowQueueType } from '$lib/workers/showWorker';
 
 import Config from '$lib/config';
-import { AuthType, EntityType } from '$lib/constants';
+import { AuthType, EntityType, UserRole } from '$lib/constants';
 import { authEncrypt } from '$lib/crypt';
 import { mensNames } from '$lib/mensNames';
 import { InvoiceJobType, InvoiceStatus, createAuthToken } from '$lib/payment';
@@ -268,7 +268,7 @@ export const actions: Actions = {
       invoiceQueue.close();
     }
 
-    const redirectUrl = urlJoin(Config.Path.ticket, ticket._id.toString());
+    const redirectUrl = urlJoin(Config.PATH.ticket, ticket._id.toString());
 
     const authToken = jwt.sign(
       {

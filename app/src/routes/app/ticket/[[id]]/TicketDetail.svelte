@@ -16,7 +16,7 @@
   const showName = show.name;
   const showCoverImageUrl = show.coverImageUrl;
   const showDuration = durationFormatter(show.duration * 60);
-  const showUrl = urlJoin(Config.Path.show, show._id.toString());
+  const showUrl = urlJoin(Config.PATH.show, show._id.toString());
 
   // Ticket
   $: ticketStatus = ticket
@@ -82,7 +82,7 @@
         <!-- Background Logo -->
         <div
           class="bg-center bg-cover opacity-10 absolute inset-0 top-2"
-          style="background-image: url('{Config.Path
+          style="background-image: url('{Config.PATH
             .staticUrl}/assets/logo-horizontal-tr.png'); z-index: 0;"
         />
 

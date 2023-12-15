@@ -12,7 +12,7 @@
   <div class="relative px-4 lg:px-10">
     <div
       class="bg-contain rounded-xl overflow-hidden absolute top-0 left-0 w-full h-full opacity-30"
-      style="background-image: url('{Config.Path
+      style="background-image: url('{Config.PATH
         .staticUrl}/assets/crbubbles.png')"
     />
     <div class="flex flex-col lg:flex-row w-full">
@@ -50,7 +50,7 @@
           <div class="p-4 mt-4 lg:mt-0 lg:w-1/2 flex place-content-center">
             <Image
               alt="show-screenshot"
-              src="{Config.Path.staticUrl}/assets/show-screenshot.png"
+              src="{Config.PATH.staticUrl}/assets/show-screenshot.png"
               class="rounded-md overflow-hidden shadow-[0px_0px_17px_6px_#e779c1] max-w-full h-auto"
               width={550}
               height={550}

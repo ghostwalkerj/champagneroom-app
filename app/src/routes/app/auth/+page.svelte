@@ -141,18 +141,14 @@
     walletUnsub?.();
     accountUnsub?.();
   });
-
 </script>
 
-<div class="w-screen  flex flex-col text-center items-center">
-  
+<div class="w-screen flex flex-col text-center items-center">
   {#if authType === AuthType.SIGNING}
     <div
       class="bg-surface-800 p-6 rounded-lg font-Roboto flex flex-col items-center justify-center min-w-[320px] gap-4"
     >
-      <div
-        class="text-4xl font-bold w-full max-w-lg mx-auto text-center"
-      >
+      <div class="text-4xl font-bold w-full max-w-lg mx-auto text-center">
         Crypto Wallet Authentication
       </div>
 
@@ -189,123 +185,108 @@
           </div>
         {/if}
       {/if}
-      <div class="w-full max-w-md border-t border-surface-600 mt-2">
-      </div>
-      <div
-        class="text-xl font-bold  w-full max-w-md mx-auto text-center mb-4"
-      >
-      Not a user? Sign Up to Earn Now
+      <div class="w-full max-w-md border-t border-surface-600 mt-2" />
+      <div class="text-xl font-bold w-full max-w-md mx-auto text-center mb-4">
+        Not a user? Sign Up to Earn Now
       </div>
       <NeonBlur>
         <a
-          href={Config.Path.signup}
+          href={Config.PATH.signup}
           class="relative btn btn-lg variant-filled rounded-lg"
         >
           Sign Up
         </a>
       </NeonBlur>
     </div>
-
-
   {:else if authType === AuthType.PATH_PASSWORD}
     <!-- <div class="font-bold text-5xl text-primary w-full font-CaviarDreams">
       Verifying Path
     </div> -->
 
+    <form
+      method="post"
+      action="?/password_secret_auth"
+      use:enhance={onSubmit}
+      class="bg-surface-800 p-6 rounded-lg flex flex-col min-w-[320px] gap-4"
+    >
+      <input type="hidden" name="parseId" value={parseId} />
+      <input type="hidden" name="type" value={type} />
 
-            <form
-              method="post"
-              action="?/password_secret_auth"
-              use:enhance={onSubmit}
-              class="bg-surface-800 p-6 rounded-lg flex flex-col  min-w-[320px] gap-4"
-            >
-              <input type="hidden" name="parseId" value={parseId} />
-              <input type="hidden" name="type" value={type} />
-                  
-                  <label class="label text-left font-semibold">
-                    <span>Password</span>
-                    <input class="input variant-form-material bg-surface-700" name="password" type="password" />
-                  </label>
+      <label class="label text-left font-semibold">
+        <span>Password</span>
+        <input
+          class="input variant-form-material bg-surface-700"
+          name="password"
+          type="password"
+        />
+      </label>
 
-                  <div >                   
-                    {#if form?.missingPassword}<div
-                        class="shadow-lg daisy-alert daisy-alert-error"
-                      >
-                        Password is required
-                      </div>
-                      {/if}
+      <div>
+        {#if form?.missingPassword}<div
+            class="shadow-lg daisy-alert daisy-alert-error"
+          >
+            Password is required
+          </div>
+        {/if}
 
-                    {#if form?.badPassword}<div
-                        class="shadow-lg daisy-alert daisy-alert-error"
-                      >
-                        Incorrect Password
-                      </div>
-                      {/if}
+        {#if form?.badPassword}<div
+            class="shadow-lg daisy-alert daisy-alert-error"
+          >
+            Incorrect Password
+          </div>
+        {/if}
 
-                    <div class="text-sm text-left">
-                      Please enter your password
-                    </div>
+        <div class="text-sm text-left">Please enter your password</div>
+      </div>
 
-                  </div>
-              
-                <div class="text-center">
-                  <button class="btn variant-filled-primary" type="submit"
-                    >Submit</button
-                  >
-
-            </form>
-
+      <div class="text-center">
+        <button class="btn variant-filled-primary" type="submit">Submit</button>
+      </div>
+    </form>
   {:else if authType === AuthType.PIN}
     <!-- <div class="font-bold text-5xl text-primary w-full font-CaviarDreams">
       Verifying PIN
     </div> -->
 
+    <form
+      method="post"
+      action="?/pin_auth"
+      use:enhance={onSubmit}
+      class="bg-surface-800 p-6 rounded-lg flex flex-col min-w-[320px] gap-4"
+    >
+      <input type="hidden" name="parseId" value={parseId} />
+      <input type="hidden" name="type" value={type} />
 
-            <form method="post" action="?/pin_auth" use:enhance={onSubmit}
-              class="bg-surface-800 p-6 rounded-lg flex flex-col  min-w-[320px] gap-4"
-            >
-              <input type="hidden" name="parseId" value={parseId} />
-              <input type="hidden" name="type" value={type} />
+      <label for="pin" class="label text-left">
+        <span class="font-semibold">8 Digit Pin</span>
+        <input
+          name="pin"
+          type="text"
+          class="input variant-form-material bg-surface-700"
+          value={form?.pin ?? ''}
+          minlength="8"
+          maxlength="8"
+        />
+      </label>
 
-                  <label for="pin" class="label text-left">
-                    <span class="font-semibold">8 Digit Pin</span>
-                    <input
-                      name="pin"
-                      type="text"
-                      class="input variant-form-material bg-surface-700"
-                      value={form?.pin ?? ''}
-                      minlength="8"
-                      maxlength="8"
-                    />
-                    </label
-                  >
-                    
-                    {#if form?.missingPin}<div
-                        class="shadow-lg daisy-alert daisy-alert-error"
-                      >
-                        Pin is required
-                      </div>{/if}
-                    {#if form?.invalidPin}<div
-                        class="shadow-lg daisy-alert daisy-alert-error"
-                      >
-                        Pin must be 8 digits
-                      </div>{/if}
-                    {#if form?.badPin}<div
-                        class="shadow-lg daisy-alert daisy-alert-error"
-                      >
-                        Incorrect Pin
-                      </div>{/if}
-                    <div class="text-left text-sm">
-                      You need a pin to see this ticket
-                    </div>
-              
+      {#if form?.missingPin}<div
+          class="shadow-lg daisy-alert daisy-alert-error"
+        >
+          Pin is required
+        </div>{/if}
+      {#if form?.invalidPin}<div
+          class="shadow-lg daisy-alert daisy-alert-error"
+        >
+          Pin must be 8 digits
+        </div>{/if}
+      {#if form?.badPin}<div class="shadow-lg daisy-alert daisy-alert-error">
+          Incorrect Pin
+        </div>{/if}
+      <div class="text-left text-sm">You need a pin to see this ticket</div>
 
-                <div class="text-center">
-                  <button class="btn variant-filled-primary" type="submit"
-                    >Submit</button
-                  >
-                </div>
-            </form>
-
+      <div class="text-center">
+        <button class="btn variant-filled-primary" type="submit">Submit</button>
+      </div>
+    </form>
   {/if}
 </div>

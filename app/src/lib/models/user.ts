@@ -5,29 +5,22 @@ import { nanoid } from 'nanoid';
 import validator from 'validator';
 
 import Config from '$lib/config';
-import { AuthType } from '$lib/constants';
+import { AuthType, UserRole } from '$lib/constants';
+import { PermissionType } from '$lib/permissions';
 
 const { Schema, models } = pkg;
 
-export type UserDocument = InstanceType<typeof User>;
-
-export type UserDocumentType = InferSchemaType<typeof userSchema> & {
+export type UserDocument = InstanceType<typeof User> & {
   comparePassword: (password: string) => Promise<boolean>;
   isCreator: () => boolean;
   isAgent: () => boolean;
   isOperator: () => boolean;
+  hasPermission: (permission: PermissionType) => boolean;
 };
 
-export { User };
+export type UserDocumentType = InferSchemaType<typeof userSchema>;
 
-export enum UserRole {
-  OPERATOR = 'OPERATOR',
-  PUBLIC = 'PUBLIC',
-  AGENT = 'AGENT',
-  CREATOR = 'CREATOR',
-  EXTERNAL = 'EXTERNAL',
-  TICKET_HOLDER = 'TICKET HOLDER'
-}
+export { User };
 
 export const userSchema = new Schema(
   {
@@ -118,6 +111,13 @@ export const userSchema = new Schema(
       trim: true,
       default: () => nanoid(10),
       index: true
+    },
+
+    permissions: {
+      type: [String],
+      enum: PermissionType,
+      required: true,
+      default: []
     }
   },
   { timestamps: true }
@@ -151,16 +151,22 @@ userSchema.methods.comparePassword = function (password: string) {
   return bcrypt.compare(password, this.password);
 };
 
-userSchema.methods.isCreator = function () {
+userSchema.methods.isCreator = function (): boolean {
   return this.roles.includes(UserRole.CREATOR);
 };
 
-userSchema.methods.isAgent = function () {
+userSchema.methods.isAgent = function (): boolean {
   return this.roles.includes(UserRole.AGENT);
 };
 
-userSchema.methods.isOperator = function () {
+userSchema.methods.isOperator = function (): boolean {
   return this.roles.includes(UserRole.OPERATOR);
+};
+
+userSchema.methods.hasPermission = function (
+  permission: PermissionType
+): boolean {
+  return this.permissions.includes(permission);
 };
 
 // userSchema.statics.encryptField = function (secret: string) {

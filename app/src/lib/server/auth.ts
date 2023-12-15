@@ -11,21 +11,21 @@ import Config from '$lib/config';
 const idString = '/[A-Za-z0-9_-]*';
 
 const PASSWORD_PATHS = [
-  Config.Path.creator + idString,
-  Config.Path.creator + idString
+  Config.PATH.creator + idString,
+  Config.PATH.creator + idString
 ];
-const PIN_PATHS = [Config.Path.ticket + idString];
+const PIN_PATHS = [Config.PATH.ticket + idString];
 
 const PROTECTED_PATHS = [
-  Config.Path.app + '/**',
-  Config.Path.api + '/**',
-  Config.Path.app,
-  Config.Path.api
+  Config.PATH.app + '/**',
+  Config.PATH.api + '/**',
+  Config.PATH.app,
+  Config.PATH.api
 ];
 
 const NOTIFICATION_PATHS = [
-  Config.Path.notifyUpdate + idString,
-  Config.Path.notifyInsert + idString
+  Config.PATH.notifyUpdate + idString,
+  Config.PATH.notifyInsert + idString
 ];
 
 const WEBHOOK_PATHS = [
@@ -34,35 +34,35 @@ const WEBHOOK_PATHS = [
 ];
 
 const WHITELIST_PATHS = [
-  Config.Path.show + '/**',
-  Config.Path.auth,
-  Config.Path.signout,
-  Config.Path.signup + '/**',
-  Config.Path.signup,
+  Config.PATH.show + '/**',
+  Config.PATH.auth,
+  Config.PATH.signout,
+  Config.PATH.signup + '/**',
+  Config.PATH.signup,
   ...WEBHOOK_PATHS
 ];
 
-const TICKET_PATHS = [Config.Path.ticket + '/**', Config.Path.ticket];
+const TICKET_PATHS = [Config.PATH.ticket + '/**', Config.PATH.ticket];
 const CREATOR_PATHS = [
-  Config.Path.creator,
-  Config.Path.creator + '/**',
-  Config.Path.imageUpload
+  Config.PATH.creator,
+  Config.PATH.creator + '/**',
+  Config.PATH.imageUpload
 ];
 const SECRET_PATHS = [...PASSWORD_PATHS, ...PIN_PATHS];
-const AGENT_PATHS = [Config.Path.agent];
-const OPERATOR_PATHS = [Config.Path.operator];
+const AGENT_PATHS = [Config.PATH.agent];
+const OPERATOR_PATHS = [Config.PATH.operator];
 
-const SIGN_PATHS = [...AGENT_PATHS, ...OPERATOR_PATHS, Config.Path.creator];
+const SIGN_PATHS = [...AGENT_PATHS, ...OPERATOR_PATHS, Config.PATH.creator];
 
 const REQUEST_AUTH_PATHS = [
   ...SIGN_PATHS,
   ...PASSWORD_PATHS,
   ...PIN_PATHS,
-  Config.Path.app,
-  Config.Path.ticket,
-  Config.Path.creator,
-  Config.Path.operator,
-  Config.Path.agent
+  Config.PATH.app,
+  Config.PATH.ticket,
+  Config.PATH.creator,
+  Config.PATH.operator,
+  Config.PATH.agent
 ];
 
 export const isAgentMatch = outmatch(AGENT_PATHS);

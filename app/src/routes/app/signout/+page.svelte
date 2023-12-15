@@ -10,7 +10,7 @@
 
   let { returnPath } = data;
   const authPath = urlJoin(
-    Config.Path.auth,
+    Config.PATH.auth,
     '?returnPath=' + encodeURIComponent(returnPath!)
   );
 </script>

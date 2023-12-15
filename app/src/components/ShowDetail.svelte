@@ -50,7 +50,7 @@
   const copyShowUrl = () => {
     const showUrl = urlJoin(
       window.location.origin,
-      Config.Path.show,
+      Config.PATH.show,
       show._id.toString()
     );
     navigator.clipboard.writeText(showUrl);

@@ -21,14 +21,14 @@ const coinbaseWalletSdk = coinbaseWalletModule({ darkMode: true });
 const frame = frameModule();
 const trezor = trezorModule({
   email: 'admin@champagneroom.app',
-  appUrl: Config.Path.websiteUrl
+  appUrl: Config.PATH.websiteUrl
 });
 
 const wcV2InitOptions = {
   version: 2 as const,
   projectId: PUBLIC_WALLET_CONNECT_PROJECT_ID,
   requiredChains: [1],
-  dappUrl: Config.Path.websiteUrl
+  dappUrl: Config.PATH.websiteUrl
 };
 const walletConnect = walletConnectModule(wcV2InitOptions);
 
@@ -50,8 +50,8 @@ const wallets = [
 const appMetadata = {
   name: 'Champagne Room',
   description: 'Living Large in the Champagne Room',
-  icon: `${Config.Path.staticUrl}/assets/logo-tr.png`,
-  logo: `${Config.Path.staticUrl}/assets/logo-horizontal-tr.png`,
+  icon: `${Config.PATH.staticUrl}/assets/logo-tr.png`,
+  logo: `${Config.PATH.staticUrl}/assets/logo-horizontal-tr.png`,
   recommendedInjectedWallets: [
     { name: 'Coinbase', url: 'https://wallet.coinbase.com/' },
     { name: 'MetaMask', url: 'https://metamask.io' }

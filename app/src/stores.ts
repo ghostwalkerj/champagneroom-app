@@ -80,7 +80,7 @@ const getUpdateNotification = <T>({
   callback: (changeset: Partial<T>) => void;
   type: EntityType;
 }) => {
-  const path = urlJoin(Config.Path.notifyUpdate, id, '?type=' + type);
+  const path = urlJoin(Config.PATH.notifyUpdate, id, '?type=' + type);
   const abortDocument = new AbortController();
   const waitFor = async () => {
     let shouldLoop = true;
@@ -124,7 +124,7 @@ const getInsertNotification = <T>({
   const queryString = relatedField
     ? typeQuery + '&relatedField=' + relatedField
     : typeQuery;
-  const path = urlJoin(Config.Path.notifyInsert, id, queryString);
+  const path = urlJoin(Config.PATH.notifyInsert, id, queryString);
   const abortDocument = new AbortController();
   const waitFor = async () => {
     let shouldLoop = true;

@@ -67,7 +67,7 @@
   <!-- Logo and Invoice Header -->
   <div class="flex items-center justify-between bg-black p-4">
     <img
-      src="{Config.Path.staticUrl}/assets/logo-square.png"
+      src="{Config.PATH.staticUrl}/assets/logo-square.png"
       alt="Your Company Logo"
       class="h-12"
     />
