@@ -8,7 +8,7 @@ import {
   z
 } from 'mongoose-zod';
 
-import type { UserDocumentType } from './user';
+import type { UserDocument } from './user';
 
 const { models } = pkg;
 
@@ -16,7 +16,8 @@ const operatorZodSchema = z
   .object({
     _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
       _id: true,
-      auto: true
+      auto: true,
+      get: (value) => value?.toString()
     }),
     user: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
       autopopulate: true,
@@ -36,7 +37,7 @@ const operatorSchema = toMongooseSchema(operatorZodSchema);
 operatorSchema.plugin(mongooseAutoPopulate);
 
 export type OperatorDocument = InstanceType<typeof Operator> & {
-  user: UserDocumentType;
+  user: UserDocument;
 };
 
 export type OperatorDocumentType = z.infer<typeof operatorZodSchema>;

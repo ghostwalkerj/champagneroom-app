@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, tick } from 'svelte';
+  import { onDestroy, onMount, tick } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
 
   import { invalidateAll, onNavigate } from '$app/navigation';
@@ -34,6 +34,7 @@
   import type { ActionData, PageData } from './$types';
   import CreatorDetail from './CreatorDetail.svelte';
   import VideoMeeting from './VideoMeeting.svelte';
+  import mongoose from 'mongoose';
   export let data: PageData;
   export let form: ActionData;
 
@@ -60,7 +61,7 @@
   let walletUnSub: Unsubscriber;
   let showMachineService: ShowMachineServiceType;
   let showMachineServiceUnSub: Subscription;
-  const destination = creator.user.payoutAddress;
+  const destination = user.payoutAddress;
 
   const noCurrentShow = () => {
     showUnSub?.();
@@ -144,9 +145,10 @@
     walletUnSub?.();
   };
 
-  onNavigate(async () => {
-    await tick();
+  onDestroy(() => {
     unSubAll();
+    showMachineServiceUnSub?.unsubscribe();
+    showMachineService?.stop();
   });
 
   const onShowCreated = (show: ShowDocument | undefined) => {

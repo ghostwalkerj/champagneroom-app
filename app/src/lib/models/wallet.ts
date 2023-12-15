@@ -24,7 +24,8 @@ const walletZodSchema = z
   .object({
     _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
       _id: true,
-      auto: true
+      auto: true,
+      get: (value) => value?.toString()
     }),
     status: z.nativeEnum(WalletStatus).default(WalletStatus.AVAILABLE),
     currency: z.nativeEnum(CurrencyType).default(CurrencyType.ETH),

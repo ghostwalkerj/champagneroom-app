@@ -53,7 +53,7 @@ export const actions: Actions = {
 
     return {
       success: true,
-      creator: creator?.toObject({ flattenObjectIds: true, flattenMaps: true })
+      creator: creator?.toJSON({ flattenMaps: true })
     };
   },
   create_show: async ({ locals, request }) => {
@@ -107,7 +107,7 @@ export const actions: Actions = {
     return {
       success: true,
       showCreated: true,
-      show: show.toObject({ flattenObjectIds: true, flattenMaps: true })
+      show: show.toJSON({ flattenMaps: true })
     };
   },
   cancel_show: async ({ locals }) => {
@@ -295,13 +295,13 @@ export const load: PageServerLoad = async ({ locals }) => {
     if (se && se[0]) showEvent = se[0];
   }
 
-  const completedShows = await Show.find({
+  const completedShows = (await Show.find({
     creator: creator._id,
     'showState.status': ShowStatus.FINALIZED
   })
     .sort({ 'showState.finalize.finalizedAt': -1 })
     .limit(10)
-    .exec();
+    .exec()) as ShowDocument[];
 
   const wallet = locals.wallet as WalletDocument;
 
@@ -350,21 +350,18 @@ export const load: PageServerLoad = async ({ locals }) => {
     )) as AxiosResponse<string>) || undefined;
 
   return {
-    creator: creator.toObject({ flattenObjectIds: true, flattenMaps: true }),
-    user: user?.toObject({ flattenObjectIds: true, flattenMaps: true }),
-    show: show
-      ? show.toObject({ flattenObjectIds: true, flattenMaps: true })
-      : undefined,
+    creator: creator.toJSON({ flattenMaps: true }),
+    user: user?.toJSON({ flattenMaps: true }),
+    show: show ? show.toJSON({ flattenMaps: true }) : undefined,
     showEvent: showEvent
-      ? showEvent.toObject({
-          flattenObjectIds: true,
+      ? showEvent.toJSON({
           flattenMaps: true
         })
       : undefined,
     completedShows: completedShows.map((show) =>
-      show.toObject({ flattenObjectIds: true, flattenMaps: true })
+      show.toJSON({ flattenMaps: true })
     ),
-    wallet: wallet.toObject({ flattenObjectIds: true, flattenMaps: true }),
+    wallet: wallet.toJSON({ flattenMaps: true }),
     exchangeRate: exchangeRate?.data,
     jitsiToken
   };

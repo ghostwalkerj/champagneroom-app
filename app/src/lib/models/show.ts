@@ -40,29 +40,29 @@ export type ShowDocumentType = z.infer<typeof showZodSchema>;
 
 const disputeStatsZodSchema = z
   .object({
-    totalDisputes: z.number().positive().default(0),
-    totalDisputesRefunded: z.number().positive().default(0),
-    totalDisputesResolved: z.number().positive().default(0),
-    totalDisputesPending: z.number().positive().default(0)
+    totalDisputes: z.number().min(0).default(0),
+    totalDisputesRefunded: z.number().min(0).default(0),
+    totalDisputesResolved: z.number().min(0).default(0),
+    totalDisputesPending: z.number().min(0).default(0)
   })
   .strict();
 
 const feedbackStatsZodSchema = z
   .object({
-    numberOfReviews: z.number().positive().default(0),
-    averageRating: z.number().positive().default(0),
+    numberOfReviews: z.number().min(0).default(0),
+    averageRating: z.number().min(0).default(0),
     comments: z.array(z.string().trim()).default([])
   })
   .strict();
 
 const salesStatsZodSchema = z
   .object({
-    ticketsAvailable: z.number().positive().default(0),
-    ticketsSold: z.number().positive().default(0),
-    ticketsReserved: z.number().positive().default(0),
-    ticketsRefunded: z.number().positive().default(0),
-    ticketsFinalized: z.number().positive().default(0),
-    ticketsRedeemed: z.number().positive().default(0),
+    ticketsAvailable: z.number().min(0).default(0),
+    ticketsSold: z.number().min(0).default(0),
+    ticketsReserved: z.number().min(0).default(0),
+    ticketsRefunded: z.number().min(0).default(0),
+    ticketsFinalized: z.number().min(0).default(0),
+    ticketsRedeemed: z.number().min(0).default(0),
     ticketSalesAmount: moneyZodSchema.default({
       amount: 0,
       currency: CurrencyType.USD
@@ -99,8 +99,8 @@ export const SaveState = (show: ShowDocument, newState: ShowStateType) => {
 const creatorInfoZodSchema = z.object({
   name: z.string().trim(),
   profileImageUrl: z.string().trim(),
-  averageRating: z.number().positive().max(5).default(0),
-  numberOfReviews: z.number().positive().default(0)
+  averageRating: z.number().min(0).max(5).default(0),
+  numberOfReviews: z.number().min(0).default(0)
 });
 
 const showStateZodSchema = z
@@ -131,43 +131,50 @@ const showStateZodSchema = z
     refunds: z
       .array(mongooseZodCustomType('ObjectId'))
       .mongooseTypeOptions({
-        ref: 'Ticket.ticketState.refund'
+        ref: 'Ticket.ticketState.refund',
+        get: (value) => value?.toString()
       })
       .default([]),
     sales: z
       .array(mongooseZodCustomType('ObjectId'))
       .mongooseTypeOptions({
-        ref: 'Ticket.ticketState.sale'
+        ref: 'Ticket.ticketState.sale',
+        get: (value) => value?.toString()
       })
       .default([]),
     disputes: z
       .array(mongooseZodCustomType('ObjectId'))
       .mongooseTypeOptions({
-        ref: 'Ticket.ticketState.dispute'
+        ref: 'Ticket.ticketState.dispute',
+        get: (value) => value?.toString()
       })
       .default([]),
     reservations: z
       .array(mongooseZodCustomType('ObjectId'))
       .mongooseTypeOptions({
-        ref: 'Ticket'
+        ref: 'Ticket',
+        get: (value) => value?.toString()
       })
       .default([]),
     redemptions: z
       .array(mongooseZodCustomType('ObjectId'))
       .mongooseTypeOptions({
-        ref: 'Ticket'
+        ref: 'Ticket',
+        get: (value) => value?.toString()
       })
       .default([]),
     finalizations: z
       .array(mongooseZodCustomType('ObjectId'))
       .mongooseTypeOptions({
-        ref: 'Ticket'
+        ref: 'Ticket',
+        get: (value) => value?.toString()
       })
       .default([]),
     cancellations: z
       .array(mongooseZodCustomType('ObjectId'))
       .mongooseTypeOptions({
-        ref: 'Ticket'
+        ref: 'Ticket',
+        get: (value) => value?.toString()
       })
       .default([]),
     current: z.boolean().default(true).mongooseTypeOptions({ index: true })
@@ -178,14 +185,19 @@ const showZodSchema = z
   .object({
     _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
       _id: true,
-      auto: true
+      auto: true,
+      get: (value) => value?.toString()
     }),
     creator: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
-      ref: 'Creator'
+      ref: 'Creator',
+      get: (value) => value?.toString()
     }),
-    agent: mongooseZodCustomType('ObjectId').optional().mongooseTypeOptions({
-      ref: 'Agent'
-    }),
+    agent: mongooseZodCustomType('ObjectId')
+      .optional()
+      .mongooseTypeOptions({
+        ref: 'Agent',
+        get: (value) => value?.toString()
+      }),
     roomId: z.string().default(nanoid),
     coverImageUrl: z.string().trim().optional(),
     duration: z

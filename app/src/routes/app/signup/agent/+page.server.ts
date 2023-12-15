@@ -128,8 +128,8 @@ export const load: PageServerLoad = async ({ locals }) => {
   const message = AUTH_SIGNING_MESSAGE + ' ' + nonce;
   return {
     message,
-    user: user?.toObject({ flattenObjectIds: true, flattenMaps: true })
-      ? user.toObject({ flattenObjectIds: true, flattenMaps: true })
+    user: user?.toJSON({ flattenMaps: true })
+      ? user.toJSON({ flattenMaps: true })
       : undefined,
     isAgent
   };

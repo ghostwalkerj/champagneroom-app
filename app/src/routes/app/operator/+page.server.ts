@@ -64,7 +64,7 @@ export const actions: Actions = {
       });
 
       return {
-        agent: agent?.toObject({ flattenObjectIds: true, flattenMaps: true }),
+        agent: agent?.toJSON({ flattenMaps: true })
         success: true,
         agentCreated: true
       };
@@ -257,16 +257,16 @@ export const load: PageServerLoad = async ({ locals }) => {
   }).populate<{ show: ShowDocument }>('show');
 
   return {
-    operator: operator.toObject({ flattenObjectIds: true, flattenMaps: true }),
-    user: user.toObject({ flattenObjectIds: true, flattenMaps: true }),
+    operator: operator.toJSON({ flattenMaps: true })
+    user: user.toJSON({ flattenMaps: true })
     agents: agents.map((agent) =>
-      agent.toObject({ flattenObjectIds: true, flattenMaps: true })
+      agent.toJSON({ flattenMaps: true })
     ),
     creators: creators.map((creator) =>
-      creator.toObject({ flattenObjectIds: true, flattenMaps: true })
+      creator.toJSON({ flattenMaps: true })
     ),
     disputedTickets: disputedTickets.map((ticket) =>
-      ticket.toObject({ flattenObjectIds: true, flattenMaps: true })
+      ticket.toJSON({ flattenMaps: true })
     )
   };
 };
