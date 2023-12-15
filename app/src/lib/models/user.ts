@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import type { Model } from 'mongoose';
+import type { Model, UpdateQuery } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
 import {
   genTimestampsSchema,
@@ -32,11 +32,15 @@ const userZodSchema = z
   .object({
     _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
       _id: true,
-      auto: true
+      auto: true,
+      get: (value) => value?.toString()
     }),
-    wallet: mongooseZodCustomType('ObjectId').optional().mongooseTypeOptions({
-      ref: 'Wallet'
-    }),
+    wallet: mongooseZodCustomType('ObjectId')
+      .optional()
+      .mongooseTypeOptions({
+        ref: 'Wallet',
+        get: (value) => value?.toString()
+      }),
     address: z
       .string()
       .toLowerCase()
@@ -58,7 +62,7 @@ const userZodSchema = z
       .optional(),
     nonce: z
       .number()
-      .positive()
+      .min(0)
       .default(() => Math.floor(Math.random() * 1_000_000)),
     secret: z
       .string()
@@ -106,6 +110,15 @@ userSchema.index(
 //   secret: process.env.MONGO_DB_FIELD_SECRET,
 //   saltGenerator
 // });
+
+userSchema.pre('updateOne', async function (this: UpdateQuery<UserDocument>) {
+  const update = { ...this.getUpdate() };
+  // Only run this function if password was modified
+  if (update.password) {
+    update.password = await bcrypt.hash(update.password, 10);
+    this.setUpdate(update);
+  }
+});
 
 userSchema.pre('save', function (next) {
   if (this.password && this.isModified('password')) {

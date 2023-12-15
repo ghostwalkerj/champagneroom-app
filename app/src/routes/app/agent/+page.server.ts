@@ -47,7 +47,7 @@ export const actions: Actions = {
 
     return {
       success: true,
-      agent: agent?.toObject({ flattenObjectIds: true, flattenMaps: true })
+      agent: agent?.toJSON({ flattenMaps: true })
     };
   },
   create_creator: async ({ request }) => {
@@ -336,16 +336,10 @@ export const load: PageServerLoad = async ({ locals }) => {
   }
 
   return {
-    agent: agent.toObject({ flattenObjectIds: true, flattenMaps: true }),
-    user: user
-      ? user.toObject({ flattenObjectIds: true, flattenMaps: true })
-      : undefined,
-    creators: creators.map((creator) =>
-      creator.toObject({ flattenObjectIds: true, flattenMaps: true })
-    ),
-    wallet: wallet
-      ? wallet.toObject({ flattenObjectIds: true, flattenMaps: true })
-      : undefined,
+    agent: agent.toJSON({ flattenMaps: true }),
+    user: user ? user.toJSON({ flattenMaps: true }) : undefined,
+    creators: creators.map((creator) => creator.toJSON({ flattenMaps: true })),
+    wallet: wallet ? wallet.toJSON({ flattenMaps: true }) : undefined,
     exchangeRate: exchangeRate?.data,
     showData: showData.map(
       (show) =>

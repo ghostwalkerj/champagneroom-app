@@ -8,25 +8,17 @@ import {
   z
 } from 'mongoose-zod';
 
-import type { UserDocumentType } from './user';
+import type { UserDocument } from './user';
 
 const { models } = pkg;
 
 const salesZodSchema = z
   .object({
-    totalRevenue: z
-      .map(z.string(), z.number())
-      .default(() => new Map<string, number>()),
+    totalRevenue: z.record(z.number()).default({}),
     numberOfCompletedShows: z.number().min(0).default(0),
-    totalTicketSalesAmounts: z
-      .map(z.string(), z.number())
-      .default(() => new Map<string, number>()),
-    totalSales: z
-      .map(z.string(), z.number())
-      .default(() => new Map<string, number>()),
-    totalRefunds: z
-      .map(z.string(), z.number())
-      .default(() => new Map<string, number>())
+    totalTicketSalesAmounts: z.record(z.number()).default({}),
+    totalSales: z.record(z.number()).default({}),
+    totalRefunds: z.record(z.number()).default({})
   })
   .strict();
 
@@ -41,7 +33,8 @@ const creatorZodSchema = z
   .object({
     _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
       _id: true,
-      auto: true
+      auto: true,
+      get: (value) => value?.toString()
     }),
     user: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
       autopopulate: true,
@@ -49,11 +42,23 @@ const creatorZodSchema = z
       required: true
     }),
     commissionRate: z.number().min(0).max(100).default(0),
-    agent: mongooseZodCustomType('ObjectId').optional().mongooseTypeOptions({
-      ref: 'Agent'
+    agent: mongooseZodCustomType('ObjectId')
+      .optional()
+      .mongooseTypeOptions({
+        ref: 'Agent',
+        get: (value) => value?.toString()
+      }),
+    feedbackStats: feedbackZodSchema.default({
+      averageRating: 0,
+      numberOfReviews: 0
     }),
-    feedbackStats: feedbackZodSchema.default({}),
-    salesStats: salesZodSchema.default({})
+    salesStats: salesZodSchema.default({
+      numberOfCompletedShows: 0,
+      totalRefunds: {},
+      totalRevenue: {},
+      totalSales: {},
+      totalTicketSalesAmounts: {}
+    })
   })
   .merge(genTimestampsSchema())
   .strict()
@@ -67,7 +72,7 @@ const creatorSchema = toMongooseSchema(creatorZodSchema);
 creatorSchema.plugin(mongooseAutoPopulate);
 
 export type CreatorDocument = InstanceType<typeof Creator> & {
-  user: UserDocumentType;
+  user: UserDocument;
 };
 
 export type CreatorDocumentType = z.infer<typeof creatorZodSchema>;

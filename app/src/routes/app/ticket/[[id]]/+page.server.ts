@@ -381,9 +381,9 @@ export const load: PageServerLoad = async ({ locals }) => {
 
   return {
     jitsiToken,
-    ticket: ticket.toObject({ flattenObjectIds: true, flattenMaps: true }),
-    user: user?.toObject({ flattenObjectIds: true, flattenMaps: true }),
-    show: show.toObject({ flattenObjectIds: true, flattenMaps: true }),
+    ticket: ticket.toJSON({ flattenMaps: true })
+    user: user?.toJSON({ flattenMaps: true })
+    show: show.toJSON({ flattenMaps: true })
     invoice: invoice?.data
   };
 };

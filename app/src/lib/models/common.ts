@@ -66,10 +66,6 @@ export enum RefundReason {
 }
 
 export const cancelZodSchema = z.object({
-  _id: mongooseZodCustomType('ObjectId')
-    .default(() => new mongoose.Types.ObjectId())
-    .mongooseTypeOptions({ _id: true, index: true, unique: true })
-    .optional(),
   cancelledAt: z.date().default(() => new Date()),
   cancelledInState: z.string().optional(),
   cancelledBy: z.nativeEnum(ActorType),
@@ -79,7 +75,12 @@ export const cancelZodSchema = z.object({
 export const disputeZodSchema = z.object({
   _id: mongooseZodCustomType('ObjectId')
     .default(() => new mongoose.Types.ObjectId())
-    .mongooseTypeOptions({ _id: true, index: true, unique: true })
+    .mongooseTypeOptions({
+      _id: true,
+      index: true,
+      unique: true,
+      get: (value) => value?.toString()
+    })
     .optional(),
   startedAt: z.date().default(() => new Date()),
   endedAt: z.date().optional(),
@@ -98,33 +99,24 @@ export const earningsZodSchema = z.object({
     .nativeEnum(EarningsSource)
     .default(EarningsSource.SHOW_PERFORMANCE),
   earningPercentage: z.number().min(0).max(100).default(100),
-  show: mongooseZodCustomType('ObjectId').mongooseTypeOptions({ ref: 'Show' })
+  show: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+    ref: 'Show',
+    get: (value) => value?.toString()
+  })
 });
 
 export const escrowZodSchema = z.object({
-  _id: mongooseZodCustomType('ObjectId')
-    .default(() => new mongoose.Types.ObjectId())
-    .mongooseTypeOptions({ _id: true, index: true, unique: true })
-    .optional(),
   startedAt: z.date().default(() => new Date()),
   endedAt: z.date().optional()
 });
 
 export const feedbackZodSchema = z.object({
-  _id: mongooseZodCustomType('ObjectId')
-    .default(() => new mongoose.Types.ObjectId())
-    .mongooseTypeOptions({ _id: true, index: true, unique: true })
-    .optional(),
   rating: z.number().min(1).max(5),
   review: z.string().min(10).max(500).optional(),
   createdAt: z.date().default(() => new Date())
 });
 
 export const finalizeZodSchema = z.object({
-  _id: mongooseZodCustomType('ObjectId')
-    .default(() => new mongoose.Types.ObjectId())
-    .mongooseTypeOptions({ _id: true, index: true, unique: true })
-    .optional(),
   finalizedAt: z.date().default(() => new Date()),
   finalizedBy: z.nativeEnum(ActorType)
 });
@@ -147,13 +139,21 @@ export const payoutZodSchema = z.object({
   payoutStatus: z.nativeEnum(PayoutStatus).optional(),
   transaction: mongooseZodCustomType('ObjectId')
     .optional()
-    .mongooseTypeOptions({ ref: 'Transaction' })
+    .mongooseTypeOptions({
+      ref: 'Transaction',
+      get: (value) => value?.toString()
+    })
 });
 
 export const refundZodSchema = z.object({
   _id: mongooseZodCustomType('ObjectId')
     .default(() => new mongoose.Types.ObjectId())
-    .mongooseTypeOptions({ _id: true, index: true, unique: true })
+    .mongooseTypeOptions({
+      _id: true,
+      index: true,
+      unique: true,
+      get: (value) => value?.toString()
+    })
     .optional(),
   requestedAt: z.date().default(() => new Date()),
   requestedAmounts: z.map(z.string(), z.number()).default(() => new Map()),
@@ -166,7 +166,12 @@ export const refundZodSchema = z.object({
 export const saleZodSchema = z.object({
   _id: mongooseZodCustomType('ObjectId')
     .default(() => new mongoose.Types.ObjectId())
-    .mongooseTypeOptions({ _id: true, index: true, unique: true })
+    .mongooseTypeOptions({
+      _id: true,
+      index: true,
+      unique: true,
+      get: (value) => value?.toString()
+    })
     .optional(),
   soldAt: z.date().default(() => new Date()),
   payments: z.array(transactionSummaryZodSchema),

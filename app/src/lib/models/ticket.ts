@@ -1,14 +1,12 @@
 import type { Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
 import mongooseAutoPopulate from 'mongoose-autopopulate';
-import { fieldEncryption } from 'mongoose-field-encryption';
 import {
   genTimestampsSchema,
   mongooseZodCustomType,
   toMongooseSchema,
   z
 } from 'mongoose-zod';
-import { merge } from 'rxjs';
 import validator from 'validator';
 
 import {
@@ -68,7 +66,8 @@ const ticketZodSchema = z
   .object({
     _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
       _id: true,
-      auto: true
+      auto: true,
+      get: (value) => value?.toString()
     }),
     paymentAddress: z
       .string()
@@ -89,11 +88,15 @@ const ticketZodSchema = z
       ref: 'User',
       required: true
     }),
-    agent: mongooseZodCustomType('ObjectId').optional().mongooseTypeOptions({
-      ref: 'Agent'
-    }),
+    agent: mongooseZodCustomType('ObjectId')
+      .optional()
+      .mongooseTypeOptions({
+        ref: 'Agent',
+        get: (value) => value?.toString()
+      }),
     creator: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
-      ref: 'Creator'
+      ref: 'Creator',
+      get: (value) => value?.toString()
     })
   })
   .merge(genTimestampsSchema())

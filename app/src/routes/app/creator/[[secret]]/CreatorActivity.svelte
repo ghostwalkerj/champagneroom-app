@@ -6,7 +6,7 @@
   import { ShowStatus } from '$lib/models/show';
 
   import { currencyFormatter } from '$lib/constants';
-  export let completedShows: ShowDocumentType[];
+  export let completedShows: ShowDocumentType[] = [];
 </script>
 
 <div class="bg-primary text-primary-content daisy-card">
