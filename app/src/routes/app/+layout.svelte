@@ -94,12 +94,12 @@
   </div>
 
   <footer
-    class="daisy-footer daisy-footer-center p-2 bg-base-300 text-base-content sticky bottom-0"
+    class="w-fit bg-surface-800 p-2 text-base-content sticky bottom-0"
   >
-    <div class="flex">
-      <p>Build Number: {buildNumber}</p>
-      <p>Build Time: {buildTime}</p>
-    </div>
+
+      <p>Build Number: {buildNumber} | </p>
+      <p> Build Time: {buildTime}</p>
+
   </footer>
 </div>
 

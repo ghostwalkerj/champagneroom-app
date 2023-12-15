@@ -45,7 +45,56 @@ import {
 
 import type { Actions, PageServerLoad } from './$types';
 
+import { z } from 'zod';
+import { superValidate, message } from 'sveltekit-superforms/server';
+
 const tokenName = AUTH_TOKEN_NAME || 'token';
+
+const schema = z.object({
+  profileImage: z.string().optional(),
+  // 3 char min, 50 char max
+  name: z.string().min(3).max(50),
+  // 8 digit, number pin
+  pin: z
+    .string()
+    .min(8, 'PIN must have 8 characters')
+    .max(8, 'PIN must have 8 characters')
+    .regex(/^\d+$/, 'PIN must be a numeric')
+});
+
+export const load: PageServerLoad = async (event) => {
+  const showId = event.params.id;
+  if (showId === null) {
+    throw error(404, 'Champagne Show not found');
+  }
+
+  const show = await Show.findById(showId)
+    .orFail(() => {
+      throw error(404, 'Show not found');
+    })
+    .exec();
+
+  const displayName = uniqueNamesGenerator({
+    dictionaries: [mensNames]
+  });
+
+  const form = await superValidate(
+    {
+      name: displayName,
+      pin: ''
+    },
+    schema,
+    {
+      errors: false
+    }
+  );
+
+  return {
+    show: show.toObject({ flattenObjectIds: true, flattenMaps: true }),
+    displayName,
+    form
+  };
+};
 
 export const actions: Actions = {
   reserve_ticket: async ({ params, cookies, request, locals }) => {
@@ -53,23 +102,19 @@ export const actions: Actions = {
     if (showId === null) {
       return fail(404, { showId, missingShowId: true });
     }
-    const data = await request.formData();
-    const name = data.get('name') as string;
-    const pin = data.get('pin') as string;
-    const profileImage = data.get('profileImage') as string;
 
-    if (!name) {
-      return fail(400, { name, missingName: true });
+    const form = await superValidate(request, schema);
+    console.log('POST', form);
+
+    // Convenient validation check:
+    if (!form.valid) {
+      // Again, return { form } and things will just work.
+      return fail(400, { form });
     }
 
-    if (!pin) {
-      return fail(400, { pin, missingPin: true });
-    }
-
-    const isNumber = /^\d+$/.test(pin);
-    if (!isNumber) {
-      return fail(400, { pin, invalidPin: true });
-    }
+    const name = form.data.name as string;
+    const pin = form.data.pin as string;
+    const profileImage = form.data.profileImage as string;
 
     const show = await Show.findById(showId)
       .orFail(() => {
@@ -101,7 +146,7 @@ export const actions: Actions = {
     });
     if (!ticket) {
       console.error('Ticket cannot be created');
-      throw error(501, 'Show cannot Reserve Ticket');
+      return message(form, 'Show cannot reserve ticket', { status: 501 });
     }
 
     const showState = showService.getSnapshot();
@@ -113,7 +158,7 @@ export const actions: Actions = {
       })
     ) {
       console.error('Show cannot Reserve Ticket');
-      throw error(501, 'Show cannot Reserve Ticket');
+      return message(form, 'Show cannot reserve ticket', { status: 501 });
     }
 
     // Create invoice in Bitcart
@@ -141,7 +186,7 @@ export const actions: Actions = {
 
     if (!response || !response.data) {
       console.error('Invoice cannot be created');
-      throw error(501, 'Invoice cannot be created');
+      return message(form, 'Invoice cannot be created', { status: 501 });
     }
 
     // Update the notification url
@@ -252,26 +297,4 @@ export const actions: Actions = {
 
     throw redirect(302, redirectUrl);
   }
-};
-
-export const load: PageServerLoad = async ({ params }) => {
-  const showId = params.id;
-  if (showId === null) {
-    throw error(404, 'Champagne Show not found');
-  }
-
-  const show = await Show.findById(showId)
-    .orFail(() => {
-      throw error(404, 'Show not found');
-    })
-    .exec();
-
-  const displayName = uniqueNamesGenerator({
-    dictionaries: [mensNames]
-  });
-
-  return {
-    show: show.toObject({ flattenObjectIds: true, flattenMaps: true }),
-    displayName
-  };
 };

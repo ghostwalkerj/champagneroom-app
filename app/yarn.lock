@@ -10693,6 +10693,11 @@ svelte@^3.49.0, svelte@^3.59.1:
   resolved "https://registry.npmjs.org/svelte/-/svelte-3.59.2.tgz"
   integrity sha512-vzSyuGr3eEoAtT/A6bmajosJZIUWySzY2CzB3w2pgPvnkUjGqlDnsNnA0PMO+mMAhuyMul6C2uuZzY6ELSkzyA==
 
+sveltekit-superforms@^1.11.0:
+  version "1.11.0"
+  resolved "https://registry.yarnpkg.com/sveltekit-superforms/-/sveltekit-superforms-1.11.0.tgz#c08c4fe83254cb6efbad81da0a5ff1b798c2515b"
+  integrity sha512-43hhy34Eb57erD2b+3Z6A97NBQHQ+ePXmGxeOqOATd7OeI1Vo/fw+vd5yGE9w/ql8DGDUqW1LKb4D3rJXdxSYg==
+
 swagger2openapi@^7.0.8:
   version "7.0.8"
   resolved "https://registry.yarnpkg.com/swagger2openapi/-/swagger2openapi-7.0.8.tgz#12c88d5de776cb1cbba758994930f40ad0afac59"
@@ -11925,7 +11930,7 @@ yocto-queue@^1.0.0:
   resolved "https://registry.yarnpkg.com/yocto-queue/-/yocto-queue-1.0.0.tgz#7f816433fb2cbc511ec8bf7d263c3b58a1a3c251"
   integrity sha512-9bnSc/HEW2uRy67wc+T8UwauLuPJVn28jb+GtJY16iiKWyvmYJRXVT4UamsAEGQfPohgr2q4Tq0sQbQlxTfi1g==
 
-zod@^3.21.4:
+zod@^3.21.4, zod@^3.22.4:
   version "3.22.4"
   resolved "https://registry.yarnpkg.com/zod/-/zod-3.22.4.tgz#f31c3a9386f61b1f228af56faa9255e845cf3fff"
   integrity sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==
