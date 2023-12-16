@@ -666,20 +666,32 @@
                               {/if}
                             </td>
 
-                            <td>
-                              {#each Object.entries(creator.salesStats.totalTicketSalesAmounts) as [currency, amount]}
-                                {currencyFormatter(currency).format(amount)}
-                              {/each}
+                            <td
+                              >{#if creator.salesStats.totalTicketSalesAmounts}
+                                {#each Object.entries(creator.salesStats.totalTicketSalesAmounts) as [currency, amount]}
+                                  {currencyFormatter(currency).format(amount)}
+                                {/each}
+                              {:else}
+                                0
+                              {/if}
                             </td>
                             <td>
-                              {#each Object.entries(creator.salesStats.totalRevenue) as [currency, amount]}
-                                {currencyFormatter(currency).format(amount)}
-                              {/each}
+                              {#if creator.salesStats.totalRevenue}
+                                {#each Object.entries(creator.salesStats.totalRevenue) as [currency, amount]}
+                                  {currencyFormatter(currency).format(amount)}
+                                {/each}
+                              {:else}
+                                0
+                              {/if}
                             </td>
                             <td>
-                              {#each Object.entries(creator.salesStats.totalRefunds) as [currency, amount]}
-                                {currencyFormatter(currency).format(amount)}
-                              {/each}
+                              {#if creator.salesStats.totalRefunds}
+                                {#each Object.entries(creator.salesStats.totalRefunds) as [currency, amount]}
+                                  {currencyFormatter(currency).format(amount)}
+                                {/each}
+                              {:else}
+                                0
+                              {/if}
                             </td>
                             <td>{creator.feedbackStats.numberOfReviews}</td>
                             <td

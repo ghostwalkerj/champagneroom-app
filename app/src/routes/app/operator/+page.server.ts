@@ -255,6 +255,8 @@ export const load: PageServerLoad = async ({ locals }) => {
     'ticketState.dispute.resolved': false
   }).populate<{ show: ShowDocument }>('show');
 
+  console.log('disputedTickets', disputedTickets);
+
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const _disputedTickets = disputedTickets.map((ticket) =>
     JSON.parse(JSON.stringify(ticket.toJSON({ flattenMaps: true })))
