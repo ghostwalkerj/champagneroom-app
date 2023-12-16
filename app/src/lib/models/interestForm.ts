@@ -1,5 +1,5 @@
 import type { Model } from 'mongoose';
-import mongoose, { default as pkg } from 'mongoose';
+import { default as pkg } from 'mongoose';
 import {
   genTimestampsSchema,
   mongooseZodCustomType,

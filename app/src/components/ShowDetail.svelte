@@ -3,7 +3,7 @@
   import StarRating from 'svelte-star-rating';
   import urlJoin from 'url-join';
 
-  import { type ShowDocumentType, ShowStatus } from '$lib/models/show';
+  import { type ShowDocument, ShowStatus } from '$lib/models/show';
 
   import Config from '$lib/config';
   import { currencyFormatter, durationFormatter } from '$lib/constants';
@@ -24,7 +24,7 @@
   };
   export let options: ShowDetailOptions = defaultOptions;
 
-  export let show: ShowDocumentType;
+  export let show: ShowDocument;
 
   options = {
     ...defaultOptions,

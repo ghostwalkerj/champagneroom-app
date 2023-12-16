@@ -66,6 +66,15 @@ export enum RefundReason {
 }
 
 export const cancelZodSchema = z.object({
+  _id: mongooseZodCustomType('ObjectId')
+    .default(() => new mongoose.Types.ObjectId())
+    .mongooseTypeOptions({
+      _id: true,
+      index: true,
+      unique: true,
+      get: (value) => value?.toString()
+    })
+    .optional(),
   cancelledAt: z.date().default(() => new Date()),
   cancelledInState: z.string().optional(),
   cancelledBy: z.nativeEnum(ActorType),
@@ -156,9 +165,9 @@ export const refundZodSchema = z.object({
     })
     .optional(),
   requestedAt: z.date().default(() => new Date()),
-  requestedAmounts: z.map(z.string(), z.number()).default(() => new Map()),
-  approvedAmounts: z.map(z.string(), z.number()).default(() => new Map()),
-  totals: z.map(z.string(), z.number()).default(() => new Map()),
+  requestedAmounts: z.record(z.number()).default({}),
+  approvedAmounts: z.record(z.number()).default({}),
+  totals: z.record(z.number()).default({}),
   payouts: z.array(transactionSummaryZodSchema),
   reason: z.nativeEnum(RefundReason)
 });
@@ -175,5 +184,5 @@ export const saleZodSchema = z.object({
     .optional(),
   soldAt: z.date().default(() => new Date()),
   payments: z.array(transactionSummaryZodSchema),
-  totals: z.map(z.string(), z.number()).default(() => new Map())
+  totals: z.record(z.number()).default({})
 });

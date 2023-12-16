@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { onDestroy, onMount, tick } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
 
-  import { invalidateAll, onNavigate } from '$app/navigation';
+  import { invalidateAll } from '$app/navigation';
 
   import { CancelReason } from '$lib/models/common';
   import type { CreatorDocument } from '$lib/models/creator';
@@ -34,7 +34,6 @@
   import type { ActionData, PageData } from './$types';
   import CreatorDetail from './CreatorDetail.svelte';
   import VideoMeeting from './VideoMeeting.svelte';
-  import mongoose from 'mongoose';
   export let data: PageData;
   export let form: ActionData;
 
@@ -192,7 +191,7 @@
   };
 </script>
 
-{#if showVideo && currentShow}
+{#if showVideo && currentShow && jitsiToken}
   <VideoMeeting
     {creator}
     {user}

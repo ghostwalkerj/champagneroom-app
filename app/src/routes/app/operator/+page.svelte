@@ -18,10 +18,10 @@
   import { AuthType, currencyFormatter } from '$lib/constants';
   import { womensNames } from '$lib/womensNames';
 
-  import type { PageData } from './$types';
   import type { AgentDocument } from '$lib/models/agent';
   import type { TicketDocument } from '$lib/models/ticket';
-  import { ObjectId } from 'mongodb';
+  import type { Types } from 'mongoose';
+  import type { PageData } from './$types';
 
   export let data: PageData;
   let operator = data.operator as OperatorDocument;
@@ -110,7 +110,7 @@
       name?: string;
       commission?: number;
       active?: boolean;
-      agentId?: string;
+      agentId?: Types.ObjectId;
     }
   ) => {
     const creator = creators[index];
@@ -126,7 +126,7 @@
       active ? active.toString() : creator.user.active.toString()
     );
     if (agentId) {
-      formData.append('agentId', agentId);
+      formData.append('agentId', agentId.toString());
     } else {
       formData.append('agentId', '');
     }
@@ -154,14 +154,15 @@
     });
   };
 
-  const updateCreatorAgent = (agentId: string) => {
-    const agent = new ObjectId(agentId);
-    creators[activeCreatorRow].agent = agent;
+  const updateCreatorAgent = (agentId: Types.ObjectId) => {
+    creators[activeCreatorRow].agent = agentId;
     updateCreator(activeCreatorRow, { agentId });
   };
 
-  const getAgentName = (agentId: ObjectId) => {
-    const agent = agents.find((agent) => agent._id == agentId);
+  const getAgentName = (agentId: Types.ObjectId) => {
+    const agent = agents.find(
+      (agent) => agent._id.toString() === agentId.toString()
+    );
     return agent?.user.name;
   };
 
@@ -221,11 +222,11 @@
         and secret URL:
         <div class="text-center font-bold text-sm">
           <a
-            href={urlJoin(Config.PATH.creator, newCreator.user.secret)}
+            href={urlJoin(Config.PATH.creator, newCreator.user.secret || '')}
             target="_blank"
             class="daisy-link daisy-link-primary"
           >
-            {urlJoin(Config.PATH.creator, newCreator.user.secret)}</a
+            {urlJoin(Config.PATH.creator, newCreator.user.secret || '')}</a
           >
         </div>
       </div>
@@ -612,7 +613,7 @@
                                   >
                                   {#each agents as agent}
                                     {#if agent._id.toString() !== agentId.toString()}
-                                      <option value={agent._id.toString()}
+                                      <option value={agent._id}
                                         >{agent.user.name}</option
                                       >
                                     {/if}
@@ -648,7 +649,7 @@
                               >{#if creator.user.authType !== AuthType.SIGNING}<a
                                   href={urlJoin(
                                     Config.PATH.creator,
-                                    creator.user.secret
+                                    creator.user.secret || ''
                                   )}
                                   target="_blank"
                                   class="daisy-link daisy-link-primary"

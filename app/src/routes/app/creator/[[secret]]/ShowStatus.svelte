@@ -2,18 +2,18 @@
   import { onDestroy, onMount } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
 
-  import type { ShowDocumentType } from '$lib/models/show';
-  import type { ShowEventDocumentType } from '$lib/models/showEvent';
+  import type { ShowDocument } from '$lib/models/show';
+  import type { ShowEventDocument } from '$lib/models/showEvent';
 
   import { createEventText } from '$lib/eventUtil';
 
   import { ShowEventStore } from '$stores';
 
   export let canStartShow: boolean;
-  export let isLoading = false;
+  export let isLoading: boolean = false;
   export let onGoToShow: () => void;
-  export let show: ShowDocumentType | undefined;
-  export let showEvent: ShowEventDocumentType | undefined;
+  export let show: ShowDocument | undefined;
+  export let showEvent: ShowEventDocument | undefined;
   let showEventUnSub: Unsubscriber | undefined;
   $: statusText = show ? show.showState.status : 'No Current Show';
   $: eventText = 'No Events';

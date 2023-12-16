@@ -56,6 +56,7 @@ if (mongoose.connection.readyState === 0)
   await mongoose.connect(MONGO_DB_ENDPOINT);
 
 mongoose.set('toJSON', { getters: true });
+mongoose.set('strictQuery', true);
 
 const redisConnection = new IORedis({
   host: REDIS_HOST,

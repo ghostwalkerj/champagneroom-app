@@ -13,10 +13,13 @@ import type {
   SaleType
 } from '$lib/models/common';
 import { DisputeDecision } from '$lib/models/common';
-import type { ShowDocumentType } from '$lib/models/show';
+import type { ShowDocument, ShowDocumentType } from '$lib/models/show';
 import { ShowStatus } from '$lib/models/show';
 import type { TicketDocument } from '$lib/models/ticket';
-import type { TransactionDocumentType } from '$lib/models/transaction';
+import type {
+  TransactionDocument,
+  TransactionDocumentType
+} from '$lib/models/transaction';
 
 import { ActorType } from '$lib/constants';
 
@@ -116,7 +119,7 @@ export type ShowMachineOptions = {
   }: {
     type: string;
     ticketId?: string;
-    transaction?: TransactionDocumentType;
+    transaction?: TransactionDocument;
     ticketInfo?: { customerName: string };
   }) => void;
   gracePeriod?: number;
@@ -131,13 +134,13 @@ export type ShowMachineStateType = StateFrom<typeof createShowMachine>;
 
 export type ShowMachineType = ReturnType<typeof createShowMachine>;
 
-export type ShowStateType = ShowDocumentType['showState'];
+export type ShowStateType = ShowDocument['showState'];
 
 const createShowMachine = ({
   showDocument,
   showMachineOptions
 }: {
-  showDocument: ShowDocumentType;
+  showDocument: ShowDocument;
   showMachineOptions?: ShowMachineOptions;
 }) => {
   const GRACE_PERIOD = showMachineOptions?.gracePeriod || 3_600_000;
@@ -722,7 +725,7 @@ export const createShowMachineService = ({
   showDocument,
   showMachineOptions
 }: {
-  showDocument: ShowDocumentType;
+  showDocument: ShowDocument;
   showMachineOptions?: ShowMachineOptions;
 }) => {
   const showMachine = createShowMachine({ showDocument, showMachineOptions });
@@ -751,7 +754,7 @@ export const createShowMachineService = ({
 
       const transaction = (
         'transaction' in event ? event.transaction : undefined
-      ) as TransactionDocumentType | undefined;
+      ) as TransactionDocument | undefined;
       const ticketInfo = { customerName };
 
       showMachineOptions.saveShowEventCallback &&

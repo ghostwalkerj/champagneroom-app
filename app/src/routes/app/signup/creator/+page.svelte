@@ -41,12 +41,11 @@
         dictionaries: [womensNames]
       });
 
-  let isLoading = true;
-
   const useWallet = async () => {
     if (wallet) {
       if (
         user &&
+        user.address &&
         user.address.toLowerCase() === walletAddress.toLowerCase() &&
         isCreator
       ) {
@@ -63,7 +62,6 @@
   };
 
   onMount(async () => {
-    isLoading = false;
     useWallet();
 
     randomizeCardPositions();

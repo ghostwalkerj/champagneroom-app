@@ -7,9 +7,8 @@
 
   import type { RefundType } from '$lib/models/common';
   import { DisputeReason, RefundReason } from '$lib/models/common';
-  import { ShowStatus, type ShowDocumentType } from '$lib/models/show';
-  import { TicketStatus, type TicketDocumentType } from '$lib/models/ticket';
-  import type { UserDocumentType } from '$lib/models/user';
+  import { ShowStatus, type ShowDocument } from '$lib/models/show';
+  import type { UserDocument } from '$lib/models/user';
 
   import type { TicketMachineServiceType } from '$lib/machines/ticketMachine';
   import {
@@ -31,14 +30,15 @@
 
   import type { ActionData, PageData } from './$types';
   import VideoMeeting from './VideoMeeting.svelte';
+  import { TicketStatus, type TicketDocument } from '$lib/models/ticket';
 
   export let data: PageData;
   export let form: ActionData;
 
-  let ticket = data.ticket as TicketDocumentType;
-  let show = data.show as ShowDocumentType;
+  let ticket = data.ticket as TicketDocument;
+  let show = data.show as ShowDocument;
   let invoice = data.invoice;
-  let user = data.user as UserDocumentType;
+  let user = data.user as UserDocument;
   let jitsiToken = data.jitsiToken as string;
 
   const currentPayment = invoice?.payments?.[
@@ -238,7 +238,7 @@
               invoice.status === InvoiceStatus.COMPLETE &&
               ticket.ticketState.status === TicketStatus.PAYMENT_INITIATED
             ) {
-              ticket = $page.data.ticket as TicketDocumentType;
+              ticket = $page.data.ticket as TicketDocument;
               ticketMachineService?.stop();
               ticketMachineService = createTicketMachineService({
                 ticketDocument: ticket

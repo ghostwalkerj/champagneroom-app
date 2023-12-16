@@ -42,6 +42,7 @@
     if (wallet) {
       if (
         user &&
+        user.address &&
         user.address.toLowerCase() === walletAddress.toLowerCase() &&
         isAgent
       ) {

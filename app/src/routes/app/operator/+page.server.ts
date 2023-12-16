@@ -64,7 +64,7 @@ export const actions: Actions = {
       });
 
       return {
-        agent: agent?.toJSON({ flattenMaps: true })
+        agent: agent?.toJSON({ flattenMaps: true }),
         success: true,
         agentCreated: true
       };
@@ -116,8 +116,7 @@ export const actions: Actions = {
       return {
         success: true,
         creatorCreated: true,
-        creator: creator?.toObject({
-          flattenObjectIds: true,
+        creator: creator?.toJSON({
           flattenMaps: true
         }),
         password
@@ -256,17 +255,16 @@ export const load: PageServerLoad = async ({ locals }) => {
     'ticketState.dispute.resolved': false
   }).populate<{ show: ShowDocument }>('show');
 
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  const _disputedTickets = disputedTickets.map((ticket) =>
+    JSON.parse(JSON.stringify(ticket.toJSON({ flattenMaps: true })))
+  );
+
   return {
-    operator: operator.toJSON({ flattenMaps: true })
-    user: user.toJSON({ flattenMaps: true })
-    agents: agents.map((agent) =>
-      agent.toJSON({ flattenMaps: true })
-    ),
-    creators: creators.map((creator) =>
-      creator.toJSON({ flattenMaps: true })
-    ),
-    disputedTickets: disputedTickets.map((ticket) =>
-      ticket.toJSON({ flattenMaps: true })
-    )
+    operator: operator.toJSON({ flattenMaps: true }),
+    user: user.toJSON({ flattenMaps: true }),
+    agents: agents.map((agent) => agent.toJSON({ flattenMaps: true })),
+    creators: creators.map((creator) => creator.toJSON({ flattenMaps: true })),
+    disputedTickets: _disputedTickets
   };
 };

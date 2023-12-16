@@ -78,7 +78,7 @@ const userZodSchema = z
       .optional(),
     name: z.string().max(50).min(3, 'Name is too short').trim(),
     authType: z.nativeEnum(AuthType).default(AuthType.SIGNING),
-    active: z.boolean().default(true).mongooseTypeOptions({ index: true }),
+    active: z.boolean().default(true),
     profileImageUrl: z.string().default(Config.UI.defaultProfileImage),
     referralCode: z
       .string()
