@@ -28,9 +28,9 @@
   import TicketDetail from './TicketDetail.svelte';
   import TicketInvoice from './TicketInvoice.svelte';
 
+  import { TicketStatus, type TicketDocument } from '$lib/models/ticket';
   import type { ActionData, PageData } from './$types';
   import VideoMeeting from './VideoMeeting.svelte';
-  import { TicketStatus, type TicketDocument } from '$lib/models/ticket';
 
   export let data: PageData;
   export let form: ActionData;

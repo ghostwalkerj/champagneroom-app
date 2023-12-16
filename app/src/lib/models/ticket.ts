@@ -19,8 +19,8 @@ import {
   refundZodSchema,
   saleZodSchema
 } from './common';
-import type { ShowDocument, ShowDocumentType } from './show';
-import type { UserDocument, UserDocumentType } from './user';
+import type { ShowDocument } from './show';
+import type { UserDocument } from './user';
 
 enum TicketStatus {
   RESERVED = 'RESERVED',
@@ -135,4 +135,4 @@ export const Ticket = models?.Ticket
   ? (models.Ticket as Model<TicketDocumentType>)
   : mongoose.model<TicketDocumentType>('Ticket', ticketSchema);
 
-export { TicketStatus };
+export { TicketStatus, redemptionZodSchema };

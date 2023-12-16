@@ -10,8 +10,8 @@ import type { TicketDocument } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
 import {
   Transaction,
-  TransactionReasonType,
-  type TransactionDocument
+  type TransactionDocument,
+  TransactionReasonType
 } from '$lib/models/transaction';
 import { Wallet } from '$lib/models/wallet';
 
@@ -33,10 +33,10 @@ import {
   submitRefundInvoicesRefundsRefundIdSubmitPost
 } from '$lib/ext/bitcart';
 import type {
-  Wallet as BTWallet,
   DisplayInvoice,
   DisplayPayout,
-  Store
+  Store,
+  Wallet as BTWallet
 } from '$lib/ext/bitcart/models';
 import type { PaymentType } from '$lib/payment';
 import { PayoutJobType, PayoutReason, PayoutStatus } from '$lib/payment';

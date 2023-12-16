@@ -225,4 +225,9 @@ export const Show = models?.Show
   ? (models.Show as Model<ShowDocumentType>)
   : mongoose.model<ShowDocumentType>('Show', showSchema);
 
-export { ShowStatus };
+export {
+  ShowStatus,
+  disputeStatsZodSchema,
+  runtimeZodSchema,
+  salesStatsZodSchema
+};

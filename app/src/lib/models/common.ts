@@ -2,7 +2,15 @@ import mongoose from 'mongoose';
 import { mongooseZodCustomType, z } from 'mongoose-zod';
 import validator from 'validator';
 
-import { ActorType, CurrencyType } from '$lib/constants';
+import {
+  ActorType,
+  CancelReason,
+  CurrencyType,
+  DisputeDecision,
+  DisputeReason,
+  EarningsSource,
+  RefundReason
+} from '$lib/constants';
 import { PayoutStatus } from '$lib/payment';
 
 import { transactionSummaryZodSchema } from './transaction';
@@ -26,44 +34,6 @@ export type PayoutType = z.infer<typeof payoutZodSchema>;
 export type RefundType = z.infer<typeof refundZodSchema>;
 
 export type SaleType = z.infer<typeof saleZodSchema>;
-
-export enum CancelReason {
-  CREATOR_NO_SHOW = 'CREATOR NO SHOW',
-  CUSTOMER_NO_SHOW = 'CUSTOMER NO SHOW',
-  SHOW_RESCHEDULED = 'SHOW RESCHEDULED',
-  CUSTOMER_CANCELLED = 'CUSTOMER CANCELLED',
-  CREATOR_CANCELLED = 'CREATOR CANCELLED',
-  TICKET_PAYMENT_TIMEOUT = 'TICKET PAYMENT TIMEOUT',
-  TICKET_PAYMENT_FAILED = 'TICKET PAYMENT FAILED',
-  TICKET_PAYMENT_INVALID = 'TICKET PAYMENT INVALID'
-}
-
-export enum DisputeDecision {
-  NO_REFUND = 'NO REFUND',
-  FULL_REFUND = 'FULL REFUND',
-  PARTIAL_REFUND = 'PARTIAL REFUND'
-}
-
-export enum DisputeReason {
-  ATTEMPTED_SCAM = 'ATTEMPTED SCAM',
-  ENDED_EARLY = 'ENDED EARLY',
-  LOW_QUALITY = 'LOW QUALITY',
-  CREATOR_NO_SHOW = 'CREATOR NO SHOW',
-  SHOW_NEVER_STARTED = 'SHOW NEVER STARTED'
-}
-
-export enum EarningsSource {
-  SHOW_PERFORMANCE = 'SHOW PERFORMANCE',
-  COMMISSION = 'COMMISSION',
-  REFERRAL = 'REFERRAL'
-}
-
-export enum RefundReason {
-  SHOW_CANCELLED = 'SHOW CANCELLED',
-  CUSTOMER_CANCELLED = 'CUSTOMER CANCELLED',
-  DISPUTE_DECISION = 'DISPUTE DECISION',
-  UNKNOWN = 'UNKNOWN'
-}
 
 export const cancelZodSchema = z.object({
   _id: mongooseZodCustomType('ObjectId')

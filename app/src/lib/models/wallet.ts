@@ -63,7 +63,7 @@ export const atomicUpdateCallback = async (
     query,
     update,
     options
-  ).exec()) as WalletDocumentType;
+  ).exec()) as WalletDocument;
 };
 
 export { walletSchema };
