@@ -4,7 +4,6 @@
 
   import { invalidateAll } from '$app/navigation';
 
-  import { CancelReason } from '$lib/models/common';
   import type { CreatorDocument } from '$lib/models/creator';
   import type { ShowDocument } from '$lib/models/show';
   import type { ShowEventDocument } from '$lib/models/showEvent';
@@ -16,7 +15,7 @@
     ShowMachineEventString
   } from '$lib/machines/showMachine';
 
-  import { ActorType } from '$lib/constants';
+  import { ActorType, CancelReason } from '$lib/constants';
 
   import ShowDetail from '$components/ShowDetail.svelte';
   import { CreatorStore, ShowStore, WalletStore } from '$stores';

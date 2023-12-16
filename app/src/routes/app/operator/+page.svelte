@@ -9,13 +9,12 @@
   import { invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
 
-  import { DisputeDecision } from '$lib/models/common';
   import type { CreatorDocument } from '$lib/models/creator';
   import type { OperatorDocument } from '$lib/models/operator';
   import type { ShowDocument } from '$lib/models/show';
 
   import Config from '$lib/config';
-  import { AuthType, currencyFormatter } from '$lib/constants';
+  import { AuthType, DisputeDecision, currencyFormatter } from '$lib/constants';
   import { womensNames } from '$lib/womensNames';
 
   import type { AgentDocument } from '$lib/models/agent';

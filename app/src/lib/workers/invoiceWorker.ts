@@ -20,8 +20,12 @@ import {
   modifyInvoiceInvoicesModelIdPatch
 } from '$lib/ext/bitcart';
 import type { DisplayInvoice, DisplayPayout } from '$lib/ext/bitcart/models';
-import { PayoutReason } from '$lib/payment';
-import { InvoiceJobType, InvoiceStatus, type PaymentType } from '$lib/payment';
+import {
+  InvoiceJobType,
+  InvoiceStatus,
+  type PaymentType,
+  PayoutReason
+} from '$lib/payment';
 import {
   getTicketMachineService,
   getTicketMachineServiceFromId

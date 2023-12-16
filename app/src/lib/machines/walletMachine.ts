@@ -1,14 +1,18 @@
 import { nanoid } from 'nanoid';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 
-import type { EarningsType, PayoutType } from '$lib/models/common';
-import { EarningsSource } from '$lib/models/common';
+import {
+  type EarningsType,
+  earningsZodSchema,
+  type PayoutType
+} from '$lib/models/common';
 import type { CreatorDocument } from '$lib/models/creator';
 import type { ShowDocument } from '$lib/models/show';
 import type { TransactionDocument } from '$lib/models/transaction';
 import type { WalletDocumentType } from '$lib/models/wallet';
 import { type WalletDocument, WalletStatus } from '$lib/models/wallet';
 
+import { EarningsSource } from '$lib/constants.js';
 import { PayoutStatus } from '$lib/payment';
 
 export type WalletMachineEventType =
@@ -148,8 +152,7 @@ const createWalletMachine = ({
           );
           if (earnings.length === 0 || hasShow === -1) {
             const amount =
-              (show.showState.salesStats.totalRevenue.get(wallet.currency) ||
-                0) *
+              (show.showState.salesStats.totalRevenue[wallet.currency] || 0) *
               (commissionRate / 100);
             const earning = {
               earnedAt: new Date(),
@@ -197,17 +200,16 @@ const createWalletMachine = ({
           );
           if (earnings.length === 0 || hasShow === -1) {
             const amount =
-              (show.showState.salesStats.totalRevenue.get(wallet.currency) ||
-                0) *
+              (show.showState.salesStats.totalRevenue[wallet.currency] || 0) *
               (takeHome / 100);
-            const earning = {
+            const earning = earningsZodSchema.parse({
               earnedAt: new Date(),
               show: show._id,
               amount,
               currency: wallet.currency,
               earningsSource: EarningsSource.SHOW_PERFORMANCE,
               earningPercentage: takeHome
-            } as EarningsType;
+            });
             if (options?.atomicUpdateCallback) {
               options.atomicUpdateCallback(
                 {

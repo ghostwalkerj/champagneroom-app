@@ -20,6 +20,7 @@ import {
 } from '$env/static/private';
 
 import { Show } from '$lib/models/show';
+import type { TicketDocument } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
 import { User } from '$lib/models/user';
 
@@ -32,7 +33,7 @@ import Config from '$lib/config';
 import { AuthType, EntityType, UserRole } from '$lib/constants';
 import { authEncrypt } from '$lib/crypt';
 import { mensNames } from '$lib/mensNames';
-import { InvoiceJobType, InvoiceStatus, createAuthToken } from '$lib/payment';
+import { createAuthToken, InvoiceJobType, InvoiceStatus } from '$lib/payment';
 import {
   getShowMachineServiceFromId,
   getTicketMachineService
@@ -92,13 +93,13 @@ export const actions: Actions = {
       profileImageUrl: profileImage
     });
 
-    const ticket = await Ticket.create({
+    const ticket = (await Ticket.create({
       user: user._id,
       show: show._id,
       agent: show.agent,
       creator: show.creator,
       price: show.price
-    });
+    })) as TicketDocument;
     if (!ticket) {
       console.error('Ticket cannot be created');
       throw error(501, 'Show cannot Reserve Ticket');

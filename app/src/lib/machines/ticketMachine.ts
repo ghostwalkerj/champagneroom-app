@@ -2,31 +2,35 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import type { Queue } from 'bullmq';
-import { Types } from 'mongoose';
 import { nanoid } from 'nanoid';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 import { raise } from 'xstate/lib/actions';
 
-import type {
-  CancelType,
-  DisputeType,
-  FeedbackType,
-  FinalizeType,
-  RefundType,
-  SaleType
+import {
+  type CancelType,
+  type DisputeType,
+  disputeZodSchema,
+  escrowZodSchema,
+  type FeedbackType,
+  type FinalizeType,
+  finalizeZodSchema,
+  type RefundType,
+  refundZodSchema,
+  type SaleType,
+  saleZodSchema
 } from '$lib/models/common';
-import { DisputeDecision, RefundReason } from '$lib/models/common';
 import type { TicketDocument, TicketStateType } from '$lib/models/ticket';
-import { TicketStatus } from '$lib/models/ticket';
-import type {
-  TransactionDocument,
-  TransactionSummaryType
+import { redemptionZodSchema, TicketStatus } from '$lib/models/ticket';
+import {
+  type TransactionDocument,
+  type TransactionSummaryType,
+  transactionSummaryZodSchema
 } from '$lib/models/transaction';
 
 import type { ShowJobDataType } from '$lib/workers/showWorker';
 
 import type { CurrencyType } from '$lib/constants';
-import { ActorType } from '$lib/constants';
+import { ActorType, DisputeDecision, RefundReason } from '$lib/constants';
 import { calcTotal } from '$lib/payment';
 
 import { ShowMachineEventString } from './showMachine';
@@ -340,10 +344,9 @@ const createTicketMachine = ({
                     'receiveFeedback',
                     raise({
                       type: 'TICKET FINALIZED',
-                      finalize: {
-                        finalizedAt: new Date(),
+                      finalize: finalizeZodSchema.parse({
                         finalizedBy: ActorType.CUSTOMER
-                      }
+                      })
                     })
                   ]
                 },
@@ -364,10 +367,9 @@ const createTicketMachine = ({
                           'decideDispute',
                           raise({
                             type: 'TICKET FINALIZED',
-                            finalize: {
-                              finalizedAt: new Date(),
+                            finalize: finalizeZodSchema.parse({
                               finalizedBy: ActorType.ARBITRATOR
-                            }
+                            })
                           })
                         ],
                         cond: 'noDisputeRefund'
@@ -386,10 +388,9 @@ const createTicketMachine = ({
                         'receiveRefund',
                         raise({
                           type: 'TICKET FINALIZED',
-                          finalize: {
-                            finalizedAt: new Date(),
+                          finalize: finalizeZodSchema.parse({
                             finalizedBy: ActorType.ARBITRATOR
-                          }
+                          })
                         })
                       ]
                     }
@@ -504,17 +505,11 @@ const createTicketMachine = ({
 
         requestRefundCancelledShow: assign((context, event) => {
           const state = context.ticketState;
-          const refund = {
-            _id: new Types.ObjectId(),
-            requestedAt: new Date(),
-            transactions: [] as Types.ObjectId[],
-            actualAmounts: {} as Map<string, number>,
-            requestedAmounts: state.sale?.totals || ({} as Map<string, number>),
-            approvedAmounts: state.sale?.totals || ({} as Map<string, number>),
-            reason: RefundReason.SHOW_CANCELLED,
-            totals: {} as Map<string, number>,
-            payouts: {} as any
-          } as RefundType;
+          const refund = refundZodSchema.parse({
+            requestedAmounts: state.sale?.totals,
+            approvedAmounts: state.sale?.totals,
+            reason: RefundReason.SHOW_CANCELLED
+          });
           return {
             ticketState: {
               ...context.ticketState,
@@ -526,13 +521,7 @@ const createTicketMachine = ({
         }),
 
         initiatePayment: assign((context) => {
-          const sale = {
-            _id: new Types.ObjectId(),
-            soldAt: new Date(),
-            totals: new Map<string, number>(),
-            payments: [] as TransactionSummaryType[]
-          } as SaleType;
-
+          const sale = saleZodSchema.parse({}) as SaleType;
           return {
             ticketState: {
               ...context.ticketState,
@@ -557,9 +546,7 @@ const createTicketMachine = ({
             ticketState: {
               ...context.ticketState,
               status: TicketStatus.REDEEMED,
-              redemption: {
-                redeemedAt: new Date()
-              }
+              redemption: redemptionZodSchema.parse({})
             }
           };
         }),
@@ -576,12 +563,12 @@ const createTicketMachine = ({
         receivePayment: assign((context, event) => {
           const sale = context.ticketState.sale;
           if (!sale) return {};
-          const payment = {
+          const payment = transactionSummaryZodSchema.parse({
             amount: +event.transaction.amount,
             currency: event.transaction.currency.toUpperCase() as CurrencyType,
             rate: +(event.transaction.rate || 0),
             transaction: event.transaction._id
-          };
+          });
           const totals = sale.totals;
           const total = (totals[payment.currency] || 0) + payment.amount;
           sale.totals[payment.currency] = total;
@@ -620,12 +607,12 @@ const createTicketMachine = ({
         receiveRefund: assign((context, event) => {
           const state = context.ticketState;
           const currency = event.transaction.currency.toUpperCase();
-          const payout = {
+          const payout = transactionSummaryZodSchema.parse({
             amount: +event.transaction.amount,
             currency,
             rate: +(event.transaction.rate || 0),
             transaction: event.transaction._id
-          };
+          });
           const refund = state.refund;
           if (!refund) return {};
 
@@ -673,9 +660,7 @@ const createTicketMachine = ({
             ticketState: {
               ...context.ticketState,
               status: TicketStatus.IN_ESCROW,
-              escrow: {
-                startedAt: new Date()
-              }
+              escrow: escrowZodSchema.parse({})
             }
           };
         }),
@@ -698,12 +683,12 @@ const createTicketMachine = ({
           const refund = event.refund;
 
           if (!context.ticketState.dispute) return {};
-          const dispute = {
+          const dispute = disputeZodSchema.parse({
             ...context.ticketState.dispute,
             decision: event.decision,
             endedAt: new Date(),
             resolved: true
-          };
+          });
           return {
             ticketState: {
               ...context.ticketState,

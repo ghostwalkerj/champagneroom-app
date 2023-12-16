@@ -18,7 +18,6 @@ import { SaveState, Show, ShowStatus } from '$lib/models/show';
 import { createShowEvent } from '$lib/models/showEvent';
 import type { TicketDocument } from '$lib/models/ticket';
 import { Ticket, TicketStatus } from '$lib/models/ticket';
-import { Wallet } from '$lib/models/wallet';
 
 import {
   createShowMachineService,
