@@ -30,7 +30,7 @@ import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 import type { PayoutQueueType } from '$lib/workers/payoutWorker';
 
 import { ActorType, EntityType } from '$lib/constants';
-import { createAuthToken, InvoiceJobType, PayoutJobType } from '$lib/payment';
+import { InvoiceJobType, PayoutJobType, createAuthToken } from '$lib/payment';
 import { getTicketMachineService } from '$lib/server/machinesUtil';
 
 import {
@@ -381,9 +381,9 @@ export const load: PageServerLoad = async ({ locals }) => {
 
   return {
     jitsiToken,
-    ticket: ticket.toJSON({ flattenMaps: true })
-    user: user?.toJSON({ flattenMaps: true })
-    show: show.toJSON({ flattenMaps: true })
+    ticket: ticket.toJSON({ flattenMaps: true }),
+    user: user?.toJSON({ flattenMaps: true }),
+    show: show.toJSON({ flattenMaps: true }),
     invoice: invoice?.data
   };
 };

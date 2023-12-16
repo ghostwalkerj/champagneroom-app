@@ -67,15 +67,9 @@ const salesStatsZodSchema = z
       amount: 0,
       currency: CurrencyType.USD
     }),
-    totalSales: z
-      .map(z.string(), z.number())
-      .default(() => new Map<string, number>()),
-    totalRevenue: z
-      .map(z.string(), z.number())
-      .default(() => new Map<string, number>()),
-    totalRefunds: z
-      .map(z.string(), z.number())
-      .default(() => new Map<string, number>())
+    totalSales: z.record(z.number()).default({}),
+    totalRevenue: z.record(z.number()).default({}),
+    totalRefunds: z.record(z.number()).default({})
   })
   .strict();
 
@@ -106,7 +100,7 @@ const creatorInfoZodSchema = z.object({
 const showStateZodSchema = z
   .object({
     status: z.nativeEnum(ShowStatus).default(ShowStatus.CREATED),
-    active: z.boolean().default(true).mongooseTypeOptions({ index: true }),
+    active: z.boolean().default(true),
     salesStats: salesStatsZodSchema.default({
       ticketsAvailable: 0,
       ticketsSold: 0,
@@ -117,10 +111,7 @@ const showStateZodSchema = z
       ticketSalesAmount: {
         amount: 0,
         currency: CurrencyType.USD
-      },
-      totalSales: new Map<string, number>(),
-      totalRevenue: new Map<string, number>(),
-      totalRefunds: new Map<string, number>()
+      }
     }),
     feedbackStats: feedbackStatsZodSchema.default({}),
     disputeStats: disputeStatsZodSchema.default({}),
@@ -177,7 +168,7 @@ const showStateZodSchema = z
         get: (value) => value?.toString()
       })
       .default([]),
-    current: z.boolean().default(true).mongooseTypeOptions({ index: true })
+    current: z.boolean().default(true)
   })
   .strict();
 

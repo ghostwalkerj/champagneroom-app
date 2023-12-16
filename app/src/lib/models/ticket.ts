@@ -19,8 +19,8 @@ import {
   refundZodSchema,
   saleZodSchema
 } from './common';
-import type { ShowDocumentType } from './show';
-import type { UserDocumentType } from './user';
+import type { ShowDocument, ShowDocumentType } from './show';
+import type { UserDocument, UserDocumentType } from './user';
 
 enum TicketStatus {
   RESERVED = 'RESERVED',
@@ -50,7 +50,7 @@ const redemptionZodSchema = z
 const ticketStateZodSchema = z
   .object({
     status: z.nativeEnum(TicketStatus).default(TicketStatus.RESERVED),
-    active: z.boolean().default(true).mongooseTypeOptions({ index: true }),
+    active: z.boolean().default(true),
     cancel: cancelZodSchema.optional(),
     redemption: redemptionZodSchema.optional(),
     escrow: escrowZodSchema.optional(),
@@ -112,9 +112,9 @@ const ticketSchema = toMongooseSchema(ticketZodSchema);
 ticketSchema.plugin(mongooseAutoPopulate);
 
 export type TicketDocument = InstanceType<typeof Ticket> & {
-  show: ShowDocumentType;
+  show: ShowDocument;
 } & {
-  user: UserDocumentType;
+  user: UserDocument;
 };
 
 export type TicketDocumentType = z.infer<typeof ticketZodSchema>;

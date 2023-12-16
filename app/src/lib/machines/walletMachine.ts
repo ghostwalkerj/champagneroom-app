@@ -1,26 +1,26 @@
-import { Types } from 'mongoose';
 import { nanoid } from 'nanoid';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 
 import type { EarningsType, PayoutType } from '$lib/models/common';
 import { EarningsSource } from '$lib/models/common';
-import type { CreatorDocumentType } from '$lib/models/creator';
-import type { ShowDocumentType } from '$lib/models/show';
-import type { TransactionDocumentType } from '$lib/models/transaction';
-import { type WalletDocumentType, WalletStatus } from '$lib/models/wallet';
+import type { CreatorDocument } from '$lib/models/creator';
+import type { ShowDocument } from '$lib/models/show';
+import type { TransactionDocument } from '$lib/models/transaction';
+import type { WalletDocumentType } from '$lib/models/wallet';
+import { type WalletDocument, WalletStatus } from '$lib/models/wallet';
 
 import { PayoutStatus } from '$lib/payment';
 
 export type WalletMachineEventType =
   | {
       type: 'SHOW EARNINGS POSTED';
-      show: ShowDocumentType;
-      creator: CreatorDocumentType;
+      show: ShowDocument;
+      creator: CreatorDocument;
     }
   | {
       type: 'SHOW COMMISSION POSTED';
-      show: ShowDocumentType;
-      creator: CreatorDocumentType;
+      show: ShowDocument;
+      creator: CreatorDocument;
     }
   | {
       type: 'PAYOUT REQUESTED';
@@ -28,7 +28,7 @@ export type WalletMachineEventType =
     }
   | {
       type: 'PAYOUT SENT';
-      transaction: TransactionDocumentType;
+      transaction: TransactionDocument;
     }
   | {
       type: 'PAYOUT FAILED';
@@ -42,14 +42,14 @@ export type WalletMachineOptions = {
     query: object,
     update: object,
     options?: object
-  ) => Promise<WalletDocumentType>;
+  ) => Promise<WalletDocument>;
 };
 
-export type WalletMachineServiceType = ReturnType<
+export type WalletMachineService = ReturnType<
   typeof createWalletMachineService
 >;
 
-export type WalletMachineStateType = StateFrom<typeof createWalletMachine>;
+export type WalletMachineState = StateFrom<typeof createWalletMachine>;
 
 export type WalletMachineType = ReturnType<typeof createWalletMachine>;
 

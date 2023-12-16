@@ -16,7 +16,7 @@
 
   export let creator: CreatorDocument;
   export let form: ActionData;
-  export let isLoading = false;
+  export let isLoading = false as boolean;
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   export let onShowCreated: (show: ShowDocument) => void;
 

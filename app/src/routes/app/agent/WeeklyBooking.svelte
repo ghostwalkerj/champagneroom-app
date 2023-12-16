@@ -4,9 +4,9 @@
   import ChartDataLabels from 'chartjs-plugin-datalabels';
   import { Line } from 'svelte-chartjs';
 
-  import type { CreatorDocumentType } from '$lib/models/creator';
+  import type { CreatorDocument } from '$lib/models/creator';
 
-  export let creators: CreatorDocumentType[];
+  export let creators: CreatorDocument[];
   export let weeklyData: {
     creatorId: string;
     dayOfWeek: number;

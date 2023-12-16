@@ -25,8 +25,7 @@ import type { WalletDocument } from '$lib/models/wallet';
 import { Wallet } from '$lib/models/wallet';
 
 import Config from '$lib/config';
-import { CurrencyType } from '$lib/constants';
-import { AuthType, EntityType } from '$lib/constants';
+import { AuthType, CurrencyType, EntityType } from '$lib/constants';
 import { rateCryptosRateGet } from '$lib/ext/bitcart';
 import { createAuthToken } from '$lib/payment';
 import { womensNames } from '$lib/womensNames';
@@ -90,8 +89,7 @@ export const actions: Actions = {
       })) as CreatorDocument;
       return {
         success: true,
-        creator: creator?.toObject({
-          flattenObjectIds: true,
+        creator: creator?.toJSON({
           flattenMaps: true
         }),
         password

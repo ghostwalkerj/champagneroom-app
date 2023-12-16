@@ -271,7 +271,7 @@ export const load: PageServerLoad = async ({ params }) => {
   });
 
   return {
-    show: show.toJSON({ flattenMaps: true })
+    show: show.toJSON({ flattenMaps: true }),
     displayName
   };
 };

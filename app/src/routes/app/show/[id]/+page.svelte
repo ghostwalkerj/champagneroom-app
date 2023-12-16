@@ -4,7 +4,7 @@
 
   import { applyAction, deserialize, enhance } from '$app/forms';
 
-  import { ShowStatus } from '$lib/models/show';
+    import { ShowStatus, type ShowDocument } from '$lib/models/show';
 
   import Config from '$lib/config';
   import getProfileImage from '$lib/profilePhoto';
@@ -15,7 +15,7 @@
 
   export let data: PageData;
   export let form: ActionData;
-  let show = data.show;
+  let show = data.show as ShowDocument;
   let displayName = data.displayName;
   let isBuyingTicket = false;
   //let showUnSub: Unsubscriber;
