@@ -101,7 +101,7 @@ export const finalizeZodSchema = z.object({
 });
 
 export const moneyZodSchema = z.object({
-  amount: z.number().min(0),
+  amount: z.number().min(0).default(0),
   currency: z.nativeEnum(CurrencyType).default(CurrencyType.USD)
 });
 

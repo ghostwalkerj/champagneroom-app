@@ -193,8 +193,8 @@ const showZodSchema = z
       .min(3, { message: 'Name must be at least 3 characters' })
       .max(50, { message: 'Name must be under 50 characters' })
       .trim(),
-    capacity: z.number().min(1),
-    price: moneyZodSchema.default({ amount: 0, currency: CurrencyType.USD }),
+    capacity: z.number().min(1).default(1),
+    price: moneyZodSchema.default({}),
     creatorInfo: creatorInfoZodSchema,
     showState: showStateZodSchema.default({})
   })
