@@ -36,5 +36,6 @@ export interface DisplayInvoice {
   expiration_seconds: number;
   product_names: DisplayInvoiceProductNames;
   payments?: unknown[];
+  payout_id?: string;
   refund_id?: string;
 }

@@ -81,7 +81,7 @@ export const getPayoutWorker = ({
               return 'No ticket ID';
             }
 
-            const ticket = await Ticket.findById(ticketId);
+            const ticket = (await Ticket.findById(ticketId)) as TicketDocument;
             if (!ticket) {
               return 'No ticket found';
             }
@@ -134,10 +134,7 @@ export const getPayoutWorker = ({
               const currency = (invoice.paid_currency?.toUpperCase() ||
                 CurrencyType.ETH) as CurrencyType;
 
-              const approvedAmounts = new Map<CurrencyType, number>();
-              approvedAmounts.set(currency, +invoice.sent_amount);
-
-              ticketRefund.approvedAmounts = approvedAmounts;
+              ticketRefund.approvedAmounts[currency] = +invoice.sent_amount;
 
               ticketService.send({
                 type: TicketMachineEventString.REFUND_INITIATED,
@@ -288,7 +285,7 @@ export const getPayoutWorker = ({
                 ticket.ticketState.refund
               );
               const amount =
-                ticket.ticketState.refund.approvedAmounts.get(currency);
+                ticket.ticketState.refund.approvedAmounts[currency];
               if (!amount) {
                 console.error('No approved amount');
                 return 'No approved amount';
@@ -651,7 +648,7 @@ export const getPayoutWorker = ({
 
             const bcPayout = bcPayoutResponse.data;
             payout.bcPayoutId = bcPayout.id;
-            payout.payoutStatus = bcPayout.status;
+            payout.payoutStatus = bcPayout.status as PayoutStatus;
 
             walletService.send({
               type: WalletMachineEventString.PAYOUT_REQUESTED,

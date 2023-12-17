@@ -5,8 +5,8 @@
   import type { Unsubscriber } from 'svelte/store';
   import web3 from 'web3';
 
-  import type { RefundType } from '$lib/models/common';
-  import { DisputeReason, RefundReason } from '$lib/models/common';
+  import { refundZodSchema, disputeZodSchema } from '$lib/models/common';
+  import { DisputeReason, RefundReason } from '$lib/constants';
   import { ShowStatus, type ShowDocument } from '$lib/models/show';
   import type { UserDocument } from '$lib/models/user';
 
@@ -145,23 +145,13 @@
 
     canDispute = state.can({
       type: 'DISPUTE INITIATED',
-      dispute: {
-        startedAt: new Date(),
+      dispute: disputeZodSchema.parse({
         disputedBy: ActorType.CUSTOMER,
-        reason: DisputeReason.ENDED_EARLY,
-        explanation: 'The show ended early',
-        resolved: false
-      },
-      refund: {
-        requestedAmounts: {} as Map<string, number>,
-        approvedAmounts: {} as Map<string, number>,
-        requestedAt: new Date(),
-        transactions: [],
-        actualAmounts: {} as Map<string, number>,
-        reason: RefundReason.DISPUTE_DECISION,
-        totals: {} as Map<string, number>,
-        payouts: {} as any
-      } as RefundType
+        reason: DisputeReason.ENDED_EARLY
+      }),
+      refund: refundZodSchema.parse({
+        reason: RefundReason.DISPUTE_DECISION
+      })
     });
     hasMissedShow = state.matches('ended.missedShow');
     isWaitingForShow =
