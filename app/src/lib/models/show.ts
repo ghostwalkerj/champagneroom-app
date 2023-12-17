@@ -1,5 +1,4 @@
-import type { Model } from 'mongoose';
-import { default as mongoose, default as pkg } from 'mongoose';
+import { default as pkg } from 'mongoose';
 import { fieldEncryption } from 'mongoose-field-encryption';
 import {
   genTimestampsSchema,
@@ -19,7 +18,6 @@ import {
   moneyZodSchema
 } from './common';
 
-const { models } = pkg;
 export type ShowDocument = InstanceType<typeof Show>;
 
 enum ShowStatus {
@@ -216,9 +214,7 @@ showSchema.plugin(fieldEncryption, {
   saltGenerator: (secret: string) => secret.slice(0, 16)
 });
 
-export const Show = models?.Show
-  ? (models.Show as Model<ShowDocumentType>)
-  : mongoose.model<ShowDocumentType>('Show', showSchema);
+export const Show = pkg.models.Show ?? pkg.model('Show', showSchema);
 
 export {
   ShowStatus,
