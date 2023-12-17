@@ -3,6 +3,7 @@ import { Worker } from 'bullmq';
 import type IORedis from 'ioredis';
 import { waitFor } from 'xstate/lib/waitFor';
 
+import type { AgentDocument } from '$lib/models/agent';
 import { Agent } from '$lib/models/agent';
 import type {
   CancelType,
@@ -11,7 +12,7 @@ import type {
   RefundType,
   SaleType
 } from '$lib/models/common';
-import { DisputeDecision } from '$lib/models/common';
+import type { CreatorDocument } from '$lib/models/creator';
 import { Creator } from '$lib/models/creator';
 import type { ShowDocument } from '$lib/models/show';
 import { SaveState, Show, ShowStatus } from '$lib/models/show';
@@ -28,7 +29,7 @@ import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 import { WalletMachineEventString } from '$lib/machines/walletMachine';
 
 import Config from '$lib/config';
-import { ActorType, EntityType } from '$lib/constants';
+import { ActorType, DisputeDecision, EntityType } from '$lib/constants';
 import { PayoutJobType } from '$lib/payment';
 import {
   getTicketMachineService,
@@ -155,11 +156,11 @@ const cancelShow = async (
     cancel
   });
 
-  const tickets = await Ticket.find({
+  const tickets = (await Ticket.find({
     show: show._id,
     // eslint-disable-next-line @typescript-eslint/naming-convention
     'ticketState.active': true
-  });
+  })) as TicketDocument[];
   for (const ticket of tickets) {
     // send cancel show to all tickets
     const ticketService = getTicketMachineService(ticket, showQueue);
@@ -200,10 +201,10 @@ const refundShow = async (
   // Check if show needs to send refunds
   const showState = showService.getSnapshot();
   if (showState.matches('initiatedCancellation.waiting2Refund')) {
-    const tickets = await Ticket.find({
+    const tickets = (await Ticket.find({
       show: show._id,
       'ticketState.active': true
-    });
+    })) as TicketDocument[];
     for (const ticket of tickets) {
       // send refunds
       const ticketService = getTicketMachineService(ticket, showQueue);
@@ -285,11 +286,11 @@ const endShow = async (show: ShowDocument, showQueue: ShowQueueType) => {
     );
 
     // Tell ticket holders the show is over folks
-    const tickets = await Ticket.find({
+    const tickets = (await Ticket.find({
       show: show._id,
       // eslint-disable-next-line @typescript-eslint/naming-convention
       'ticketState.active': true
-    });
+    })) as TicketDocument[];
     for (const ticket of tickets) {
       // send show is over
       const ticketService = getTicketMachineService(ticket, showQueue);
@@ -337,11 +338,11 @@ const finalizeShow = async (
   });
 
   // Finalize all the tickets, feedback or not
-  const tickets = await Ticket.find({
+  const tickets = (await Ticket.find({
     show: show._id,
     // eslint-disable-next-line @typescript-eslint/naming-convention
     'ticketState.active': true
-  });
+  })) as TicketDocument[];
   for (const ticket of tickets) {
     const ticketService = getTicketMachineService(ticket, showQueue);
     const ticketState = ticketService.getSnapshot();
@@ -566,7 +567,9 @@ const finalizeShow = async (
   });
 
   // Update wallet with finalized show totals
-  const creator = await Creator.findById(show.creator).exec();
+  const creator = (await Creator.findById(
+    show.creator
+  ).exec()) as CreatorDocument;
 
   if (!creator) {
     console.error('No creator found');
@@ -593,7 +596,7 @@ const finalizeShow = async (
 
   //Send commission to agent
   if (creator.agent && creator.commissionRate > 0) {
-    const agent = await Agent.findById(creator.agent).exec();
+    const agent = (await Agent.findById(creator.agent).exec()) as AgentDocument;
     if (agent && agent.user.wallet) {
       const walletService = await getWalletMachineServiceFromId(
         agent.user.wallet.toString()
@@ -1076,11 +1079,12 @@ const ticketDisputeResolved = async (
       return 'No refund for dispute';
     }
 
-    refund.approvedAmounts = new Map<string, number>(refund.requestedAmounts);
+    refund.approvedAmounts = JSON.parse(JSON.stringify(refund.approvedAmounts));
 
     if (decision === DisputeDecision.PARTIAL_REFUND) {
-      for (const [key, value] of refund.requestedAmounts.entries()) {
-        refund.approvedAmounts.set(key, value / 2);
+      for (const key in refund.requestedAmounts) {
+        const value = refund.requestedAmounts[key];
+        refund.approvedAmounts[key] = value / 2;
       }
     }
 

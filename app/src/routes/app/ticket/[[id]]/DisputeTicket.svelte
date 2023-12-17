@@ -1,7 +1,7 @@
 <script lang="ts">
   import { applyAction, enhance } from '$app/forms';
 
-  import { DisputeReason } from '$lib/models/common';
+  import { DisputeReason } from '$lib/constants';
 
   import type { ActionData } from './$types';
 

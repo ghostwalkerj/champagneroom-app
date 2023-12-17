@@ -2,9 +2,8 @@ import type { AxiosResponse } from 'axios';
 import type { Job, Queue } from 'bullmq';
 import { Worker } from 'bullmq';
 import type IORedis from 'ioredis';
-import { Types } from 'mongoose';
 
-import { CancelReason, type CancelType } from '$lib/models/common';
+import { cancelZodSchema } from '$lib/models/common';
 import type { TicketDocument } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
 import type { TransactionDocument } from '$lib/models/transaction';
@@ -12,7 +11,7 @@ import { Transaction, TransactionReasonType } from '$lib/models/transaction';
 
 import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 
-import { ActorType, EntityType } from '$lib/constants';
+import { ActorType, CancelReason, EntityType } from '$lib/constants';
 import {
   getInvoiceByIdInvoicesModelIdGet,
   getPayoutByIdPayoutsModelIdGet,
@@ -107,13 +106,11 @@ export const getInvoiceWorker = ({
                 );
 
                 const ticketState = ticketService.getSnapshot();
-                const cancel = {
-                  _id: new Types.ObjectId(),
+                const cancel = cancelZodSchema.parse({
                   cancelledBy: ActorType.TIMER,
                   cancelledInState: JSON.stringify(ticketState.value),
-                  cancelledAt: new Date(),
                   reason: CancelReason.TICKET_PAYMENT_TIMEOUT
-                } as CancelType;
+                });
                 if (
                   ticketState.can({
                     type: TicketMachineEventString.CANCELLATION_REQUESTED,
