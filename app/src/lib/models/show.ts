@@ -36,47 +36,39 @@ enum ShowStatus {
 
 export type ShowDocumentType = z.infer<typeof showZodSchema>;
 
-const disputeStatsZodSchema = z
-  .object({
-    totalDisputes: z.number().min(0).default(0),
-    totalDisputesRefunded: z.number().min(0).default(0),
-    totalDisputesResolved: z.number().min(0).default(0),
-    totalDisputesPending: z.number().min(0).default(0)
-  })
-  .strict();
+const disputeStatsZodSchema = z.object({
+  totalDisputes: z.number().min(0).default(0),
+  totalDisputesRefunded: z.number().min(0).default(0),
+  totalDisputesResolved: z.number().min(0).default(0),
+  totalDisputesPending: z.number().min(0).default(0)
+});
 
-const feedbackStatsZodSchema = z
-  .object({
-    numberOfReviews: z.number().min(0).default(0),
-    averageRating: z.number().min(0).max(5).default(0),
-    comments: z.array(z.string().trim()).default([])
-  })
-  .strict();
+const feedbackStatsZodSchema = z.object({
+  numberOfReviews: z.number().min(0).default(0),
+  averageRating: z.number().min(0).max(5).default(0),
+  comments: z.array(z.string().trim()).default([])
+});
 
-const salesStatsZodSchema = z
-  .object({
-    ticketsAvailable: z.number().min(0).default(0),
-    ticketsSold: z.number().min(0).default(0),
-    ticketsReserved: z.number().min(0).default(0),
-    ticketsRefunded: z.number().min(0).default(0),
-    ticketsFinalized: z.number().min(0).default(0),
-    ticketsRedeemed: z.number().min(0).default(0),
-    ticketSalesAmount: moneyZodSchema.default({
-      amount: 0,
-      currency: CurrencyType.USD
-    }),
-    totalSales: z.record(z.number().min(0)).default({}),
-    totalRevenue: z.record(z.number().min(0)).default({}),
-    totalRefunds: z.record(z.number().min(0)).default({})
-  })
-  .strict();
+const salesStatsZodSchema = z.object({
+  ticketsAvailable: z.number().min(0).default(0),
+  ticketsSold: z.number().min(0).default(0),
+  ticketsReserved: z.number().min(0).default(0),
+  ticketsRefunded: z.number().min(0).default(0),
+  ticketsFinalized: z.number().min(0).default(0),
+  ticketsRedeemed: z.number().min(0).default(0),
+  ticketSalesAmount: moneyZodSchema.default({
+    amount: 0,
+    currency: CurrencyType.USD
+  }),
+  totalSales: z.record(z.number().min(0)).default({}),
+  totalRevenue: z.record(z.number().min(0)).default({}),
+  totalRefunds: z.record(z.number().min(0)).default({})
+});
 
-const runtimeZodSchema = z
-  .object({
-    startDate: z.date().default(() => new Date()),
-    endDate: z.date().optional()
-  })
-  .strict();
+const runtimeZodSchema = z.object({
+  startDate: z.date().default(() => new Date()),
+  endDate: z.date().optional()
+});
 
 export type ShowRefundType = z.infer<typeof refundZodSchema>;
 
@@ -95,75 +87,73 @@ const creatorInfoZodSchema = z.object({
   numberOfReviews: z.number().min(0).default(0)
 });
 
-const showStateZodSchema = z
-  .object({
-    status: z.nativeEnum(ShowStatus).default(ShowStatus.CREATED),
-    active: z.boolean().default(true),
-    salesStats: salesStatsZodSchema.default({}),
-    feedbackStats: feedbackStatsZodSchema.default({}),
-    disputeStats: disputeStatsZodSchema.default({}),
-    cancel: cancelZodSchema.optional(),
-    finalize: finalizeZodSchema.optional(),
-    escrow: escrowZodSchema.optional(),
-    runtime: runtimeZodSchema.optional(),
-    refunds: z
-      .array(
-        mongooseZodCustomType('ObjectId').mongooseTypeOptions({
-          ref: 'Ticket.ticketState.refund',
-          get: (value) => value?.toString()
-        })
-      )
-      .default([]),
-    sales: z
-      .array(
-        mongooseZodCustomType('ObjectId').mongooseTypeOptions({
-          ref: 'Ticket.ticketState.sale',
-          get: (value) => value?.toString()
-        })
-      )
-      .default([]),
-    disputes: z
-      .array(
-        mongooseZodCustomType('ObjectId').mongooseTypeOptions({
-          ref: 'Ticket.ticketState.dispute',
-          get: (value) => value?.toString()
-        })
-      )
-      .default([]),
-    reservations: z
-      .array(
-        mongooseZodCustomType('ObjectId').mongooseTypeOptions({
-          ref: 'Ticket',
-          get: (value) => value?.toString()
-        })
-      )
-      .default([]),
-    redemptions: z
-      .array(
-        mongooseZodCustomType('ObjectId').mongooseTypeOptions({
-          ref: 'Ticket',
-          get: (value) => value?.toString()
-        })
-      )
-      .default([]),
-    finalizations: z
-      .array(
-        mongooseZodCustomType('ObjectId').mongooseTypeOptions({
-          ref: 'Ticket',
-          get: (value) => value?.toString()
-        })
-      )
-      .default([]),
-    cancellations: z
-      .array(mongooseZodCustomType('ObjectId'))
-      .mongooseTypeOptions({
+const showStateZodSchema = z.object({
+  status: z.nativeEnum(ShowStatus).default(ShowStatus.CREATED),
+  active: z.boolean().default(true),
+  salesStats: salesStatsZodSchema.default({}),
+  feedbackStats: feedbackStatsZodSchema.default({}),
+  disputeStats: disputeStatsZodSchema.default({}),
+  cancel: cancelZodSchema.optional(),
+  finalize: finalizeZodSchema.optional(),
+  escrow: escrowZodSchema.optional(),
+  runtime: runtimeZodSchema.optional(),
+  refunds: z
+    .array(
+      mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+        ref: 'Ticket.ticketState.refund',
+        get: (value) => value?.toString()
+      })
+    )
+    .default([]),
+  sales: z
+    .array(
+      mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+        ref: 'Ticket.ticketState.sale',
+        get: (value) => value?.toString()
+      })
+    )
+    .default([]),
+  disputes: z
+    .array(
+      mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+        ref: 'Ticket.ticketState.dispute',
+        get: (value) => value?.toString()
+      })
+    )
+    .default([]),
+  reservations: z
+    .array(
+      mongooseZodCustomType('ObjectId').mongooseTypeOptions({
         ref: 'Ticket',
         get: (value) => value?.toString()
       })
-      .default([]),
-    current: z.boolean().default(true)
-  })
-  .strict();
+    )
+    .default([]),
+  redemptions: z
+    .array(
+      mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+        ref: 'Ticket',
+        get: (value) => value?.toString()
+      })
+    )
+    .default([]),
+  finalizations: z
+    .array(
+      mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+        ref: 'Ticket',
+        get: (value) => value?.toString()
+      })
+    )
+    .default([]),
+  cancellations: z
+    .array(mongooseZodCustomType('ObjectId'))
+    .mongooseTypeOptions({
+      ref: 'Ticket',
+      get: (value) => value?.toString()
+    })
+    .default([]),
+  current: z.boolean().default(true)
+});
 
 const showZodSchema = z
   .object({
@@ -199,7 +189,6 @@ const showZodSchema = z
     showState: showStateZodSchema.default({})
   })
   .merge(genTimestampsSchema())
-  .strict()
   .mongoose({
     schemaOptions: {
       collection: 'shows'
