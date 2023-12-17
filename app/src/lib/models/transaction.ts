@@ -76,7 +76,6 @@ const transactionZodSchema = z
     bcPayoutId: z.string().trim().optional()
   })
   .merge(genTimestampsSchema())
-  .strict()
   .mongoose({
     schemaOptions: {
       collection: 'transactions'
