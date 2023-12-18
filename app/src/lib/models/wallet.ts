@@ -4,6 +4,7 @@ import {
   genTimestampsSchema,
   mongooseZodCustomType,
   toMongooseSchema,
+  toZodMongooseSchema,
   z
 } from 'mongoose-zod';
 
@@ -20,29 +21,30 @@ enum WalletStatus {
   PAYOUT_IN_PROGRESS = 'PAYOUT IN PROGRESS'
 }
 
-const walletZodSchema = z
-  .object({
-    _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
-      _id: true,
-      auto: true,
-      get: (value) => value?.toString()
-    }),
-    status: z.nativeEnum(WalletStatus).default(WalletStatus.AVAILABLE),
-    currency: z.nativeEnum(CurrencyType).default(CurrencyType.ETH),
-    balance: z.number().default(0),
-    availableBalance: z.number().default(0),
-    onHoldBalance: z.number().default(0),
-    earnings: z.array(earningsZodSchema).default([]),
-    payouts: z.array(payoutZodSchema).default([]),
-    active: z.boolean().default(true)
-  })
-  .merge(genTimestampsSchema())
-  .strict()
-  .mongoose({
+const walletZodSchema = toZodMongooseSchema(
+  z
+    .object({
+      _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+        _id: true,
+        auto: true,
+        get: (value) => value?.toString()
+      }),
+      status: z.nativeEnum(WalletStatus).default(WalletStatus.AVAILABLE),
+      currency: z.nativeEnum(CurrencyType).default(CurrencyType.ETH),
+      balance: z.number().default(0),
+      availableBalance: z.number().default(0),
+      onHoldBalance: z.number().default(0),
+      earnings: z.array(earningsZodSchema).default([]),
+      payouts: z.array(payoutZodSchema).default([]),
+      active: z.boolean().default(true)
+    })
+    .merge(genTimestampsSchema()),
+  {
     schemaOptions: {
       collection: 'wallets'
     }
-  });
+  }
+);
 const walletSchema = toMongooseSchema(walletZodSchema);
 
 export type WalletDocumentType = z.infer<typeof walletZodSchema>;

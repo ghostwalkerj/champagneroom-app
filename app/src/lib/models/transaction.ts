@@ -6,6 +6,7 @@ import {
   toMongooseSchema,
   z
 } from 'mongoose-zod';
+import { toZodMongooseSchema } from 'mongoose-zod';
 import validator from 'validator';
 
 import { CurrencyType } from '$lib/constants';
@@ -27,60 +28,62 @@ export type TransactionSummaryType = z.infer<
 
 const { models } = pkg;
 
-const transactionZodSchema = z
-  .object({
-    _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
-      _id: true,
-      auto: true,
-      get: (value) => value?.toString()
-    }),
-    hash: z.string().trim().optional(),
-    from: z.string().trim().optional(),
-    to: z.string().trim().optional(),
-    confirmations: z.number().min(0).optional(),
-    reason: z.nativeEnum(TransactionReasonType).optional(),
-    amount: z.string().refine((value) => validator.isNumeric(value), {
-      message: 'Amount must be numeric'
-    }),
-    rate: z
-      .string()
-      .optional()
-      .refine((value = '') => validator.isNumeric(value), {
-        message: 'Rate must be numeric'
-      }),
-    currency: z.nativeEnum(CurrencyType),
-    ticket: mongooseZodCustomType('ObjectId')
-      .optional()
-      .mongooseTypeOptions({
-        ref: 'Ticket',
+const transactionZodSchema = toZodMongooseSchema(
+  z
+    .object({
+      _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+        _id: true,
+        auto: true,
         get: (value) => value?.toString()
       }),
-    creator: mongooseZodCustomType('ObjectId')
-      .optional()
-      .mongooseTypeOptions({
-        ref: 'Creator',
-        get: (value) => value?.toString()
+      hash: z.string().trim().optional(),
+      from: z.string().trim().optional(),
+      to: z.string().trim().optional(),
+      confirmations: z.number().min(0).optional(),
+      reason: z.nativeEnum(TransactionReasonType).optional(),
+      amount: z.string().refine((value) => validator.isNumeric(value), {
+        message: 'Amount must be numeric'
       }),
-    agent: mongooseZodCustomType('ObjectId')
-      .optional()
-      .mongooseTypeOptions({
-        ref: 'Agent',
-        get: (value) => value?.toString()
-      }),
-    show: mongooseZodCustomType('ObjectId')
-      .optional()
-      .mongooseTypeOptions({
-        ref: 'Show',
-        get: (value) => value?.toString()
-      }),
-    bcPayoutId: z.string().trim().optional()
-  })
-  .merge(genTimestampsSchema())
-  .mongoose({
+      rate: z
+        .string()
+        .optional()
+        .refine((value = '') => validator.isNumeric(value), {
+          message: 'Rate must be numeric'
+        }),
+      currency: z.nativeEnum(CurrencyType),
+      ticket: mongooseZodCustomType('ObjectId')
+        .optional()
+        .mongooseTypeOptions({
+          ref: 'Ticket',
+          get: (value) => value?.toString()
+        }),
+      creator: mongooseZodCustomType('ObjectId')
+        .optional()
+        .mongooseTypeOptions({
+          ref: 'Creator',
+          get: (value) => value?.toString()
+        }),
+      agent: mongooseZodCustomType('ObjectId')
+        .optional()
+        .mongooseTypeOptions({
+          ref: 'Agent',
+          get: (value) => value?.toString()
+        }),
+      show: mongooseZodCustomType('ObjectId')
+        .optional()
+        .mongooseTypeOptions({
+          ref: 'Show',
+          get: (value) => value?.toString()
+        }),
+      bcPayoutId: z.string().trim().optional()
+    })
+    .merge(genTimestampsSchema()),
+  {
     schemaOptions: {
       collection: 'transactions'
     }
-  });
+  }
+);
 
 const transactionSchema = toMongooseSchema(transactionZodSchema);
 

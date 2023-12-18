@@ -4,6 +4,7 @@ import {
   genTimestampsSchema,
   mongooseZodCustomType,
   toMongooseSchema,
+  toZodMongooseSchema,
   z
 } from 'mongoose-zod';
 import validator from 'validator';
@@ -14,25 +15,25 @@ export type InterestFormDocumentType = z.infer<typeof interestFormZodSchema>;
 
 export type InterestFormType = InstanceType<typeof InterestForm>;
 
-const interestFormZodSchema = z
-  .object({
-    _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
-      _id: true,
-      auto: true
-    }),
-    interest: z.string(),
-    email: z.string().refine((value) => validator.isEmail(value), {
-      message: 'Invalid email format'
+const interestFormZodSchema = toZodMongooseSchema(
+  z
+    .object({
+      _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+        _id: true,
+        auto: true
+      }),
+      interest: z.string(),
+      email: z.string().refine((value) => validator.isEmail(value), {
+        message: 'Invalid email format'
+      })
     })
-  })
-  .merge(genTimestampsSchema('createdAt', 'updatedAt'))
-  .strict()
-  .mongoose({
+    .merge(genTimestampsSchema()),
+  {
     schemaOptions: {
       collection: 'interestforms'
     }
-  });
-
+  }
+);
 const interestFormSchema = toMongooseSchema(interestFormZodSchema);
 
 export const InterestForm = models?.InterestForm

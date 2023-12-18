@@ -49,6 +49,7 @@
       dictionaries: [womensNames]
     });
   let agentAddress = '';
+  let creatorNameElement: HTMLTableCellElement;
   let creatorCommissionElement: HTMLTableCellElement;
   let commission = Config.UI.defaultCommissionRate.toString();
   let creatorName = uniqueNamesGenerator({

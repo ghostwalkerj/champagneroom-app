@@ -5,9 +5,11 @@ import {
   genTimestampsSchema,
   mongooseZodCustomType,
   toMongooseSchema,
+  toZodMongooseSchema,
   z
 } from 'mongoose-zod';
 import { nanoid } from 'nanoid';
+import { from } from 'rxjs';
 import validator from 'validator';
 
 import Config from '$lib/config';
@@ -28,72 +30,71 @@ export type UserDocumentType = z.infer<typeof userZodSchema>;
 
 export { User };
 
-const userZodSchema = z
-  .object({
-    _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
-      _id: true,
-      auto: true,
-      get: (value) => value?.toString()
-    }),
-    wallet: mongooseZodCustomType('ObjectId')
-      .optional()
-      .mongooseTypeOptions({
-        ref: 'Wallet',
+const userZodSchema = toZodMongooseSchema(
+  z
+    .object({
+      _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+        _id: true,
+        auto: true,
         get: (value) => value?.toString()
       }),
-    address: z
-      .string()
-      .toLowerCase()
-      .trim()
-      .refine((value) => validator.isEthereumAddress(value), {
-        message: 'Invalid Ethereum address'
-      })
-      .optional()
-      .mongooseTypeOptions({ index: true }),
-    roles: z.array(z.nativeEnum(UserRole)),
-    payoutAddress: z
-      .string()
-      .toLowerCase()
-      .trim()
-      .refine(
-        (value) => validator.isEthereumAddress(value),
-        'Invalid Ethereum address'
-      )
-      .optional(),
-    nonce: z
-      .number()
-      .min(0)
-      .default(() => Math.floor(Math.random() * 1_000_000)),
-    secret: z
-      .string()
-      .max(50)
-      .min(21, 'Secret is too short')
-      .default(() => nanoid(21))
-      .optional(),
-    password: z
-      .string()
-      .max(80)
-      .min(8, 'Password is too short')
-      .trim()
-      .optional(),
-    name: z.string().max(50).min(3, 'Name is too short').trim(),
-    authType: z.nativeEnum(AuthType).default(AuthType.SIGNING),
-    active: z.boolean().default(true),
-    profileImageUrl: z.string().default(Config.UI.defaultProfileImage),
-    referralCode: z
-      .string()
-      .max(50)
-      .min(8, 'Referral code is too short')
-      .default(() => nanoid(10)),
-    permissions: z.array(z.nativeEnum(PermissionType)).default([])
-  })
-  .merge(genTimestampsSchema())
-  .strict()
-  .mongoose({
+      wallet: mongooseZodCustomType('ObjectId')
+        .optional()
+        .mongooseTypeOptions({
+          ref: 'Wallet',
+          get: (value) => value?.toString()
+        }),
+      address: z
+        .string()
+        .trim()
+        .refine((value: string) => validator.isEthereumAddress(value), {
+          message: 'Invalid Ethereum address'
+        })
+        .optional()
+        .mongooseTypeOptions({ index: true }),
+      roles: z.array(z.nativeEnum(UserRole)),
+      payoutAddress: z
+        .string()
+        .trim()
+        .refine(
+          (value: string) => validator.isEthereumAddress(value),
+          'Invalid Ethereum address'
+        )
+        .optional(),
+      nonce: z
+        .number()
+        .min(0)
+        .default(() => Math.floor(Math.random() * 1_000_000)),
+      secret: z
+        .string()
+        .max(50)
+        .min(21, 'Secret is too short')
+        .default(() => nanoid(21))
+        .optional(),
+      password: z
+        .string()
+        .max(80)
+        .min(8, 'Password is too short')
+        .trim()
+        .optional(),
+      name: z.string().max(50).min(3, 'Name is too short').trim(),
+      authType: z.nativeEnum(AuthType).default(AuthType.SIGNING),
+      active: z.boolean().default(true),
+      profileImageUrl: z.string().default(Config.UI.defaultProfileImage),
+      referralCode: z
+        .string()
+        .max(50)
+        .min(8, 'Referral code is too short')
+        .default(() => nanoid(10)),
+      permissions: z.array(z.nativeEnum(PermissionType)).default([])
+    })
+    .merge(genTimestampsSchema()),
+  {
     schemaOptions: {
       collection: 'users'
     }
-  });
+  }
+);
 
 export const userSchema = toMongooseSchema(userZodSchema);
 userSchema.index(
