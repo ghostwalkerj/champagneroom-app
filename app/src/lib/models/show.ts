@@ -9,7 +9,7 @@ import {
 import { toZodMongooseSchema } from 'mongoose-zod';
 import { nanoid } from 'nanoid';
 
-import { CurrencyType } from '$lib/constants';
+import { CurrencyType, ShowStatus } from '$lib/constants';
 
 import type { refundZodSchema, saleZodSchema } from './common';
 import {
@@ -20,20 +20,6 @@ import {
 } from './common';
 
 export type ShowDocument = InstanceType<typeof Show>;
-
-enum ShowStatus {
-  CREATED = 'CREATED',
-  BOX_OFFICE_OPEN = 'BOX OFFICE OPEN',
-  BOX_OFFICE_CLOSED = 'BOX OFFICE CLOSED',
-  CANCELLED = 'CANCELLED',
-  FINALIZED = 'FINALIZED',
-  CANCELLATION_INITIATED = 'CANCELLATION INITIATED',
-  REFUND_INITIATED = 'REFUND INITIATED',
-  LIVE = 'LIVE',
-  STOPPED = 'STOPPED',
-  IN_ESCROW = 'IN ESCROW',
-  IN_DISPUTE = 'IN DISPUTE'
-}
 
 export type ShowDocumentType = z.infer<typeof showZodSchema>;
 
@@ -169,11 +155,11 @@ const showZodSchema = toZodMongooseSchema(
         get: (value) => value?.toString()
       }),
       agent: mongooseZodCustomType('ObjectId')
-        .optional()
         .mongooseTypeOptions({
           ref: 'Agent',
           get: (value) => value?.toString()
-        }),
+        })
+        .optional(),
       roomId: z.string().default(nanoid),
       coverImageUrl: z.string().trim().optional(),
       duration: z
@@ -199,18 +185,15 @@ const showZodSchema = toZodMongooseSchema(
 );
 
 const showSchema = toMongooseSchema(showZodSchema);
-showSchema.index({ agent: 1, 'showState.finalize.finalizedAt': -1 });
-showSchema.plugin(fieldEncryption, {
-  fields: ['roomId'],
-  secret: process.env.MONGO_DB_FIELD_SECRET,
-  saltGenerator: (secret: string) => secret.slice(0, 16)
-});
+// showSchema.index({ agent: 1, 'showState.finalize.finalizedAt': -1 });
+// showSchema.plugin(fieldEncryption, {
+//   fields: ['roomId'],
+//   secret: process.env.MONGO_DB_FIELD_SECRET,
+//   saltGenerator: (secret: string) => secret.slice(0, 16)
+// });
 
 export const Show = pkg.models.Show ?? pkg.model('Show', showSchema);
 
-export {
-  ShowStatus,
-  disputeStatsZodSchema,
-  runtimeZodSchema,
-  salesStatsZodSchema
-};
+export { ShowStatus } from '$lib/constants';
+
+export { disputeStatsZodSchema, runtimeZodSchema, salesStatsZodSchema };

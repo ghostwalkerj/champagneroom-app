@@ -25,25 +25,6 @@ import type { TransactionDocument } from '$lib/models/transaction';
 
 import { ActorType, DisputeDecision } from '$lib/constants';
 
-enum ShowMachineEventString {
-  CANCELLATION_INITIATED = 'CANCELLATION INITIATED',
-  REFUND_INITIATED = 'REFUND INITIATED',
-  TICKET_REFUNDED = 'TICKET REFUNDED',
-  TICKET_RESERVED = 'TICKET RESERVED',
-  TICKET_CANCELLED = 'TICKET CANCELLED',
-  TICKET_SOLD = 'TICKET SOLD',
-  SHOW_STARTED = 'SHOW STARTED',
-  SHOW_STOPPED = 'SHOW STOPPED',
-  SHOW_FINALIZED = 'SHOW FINALIZED',
-  SHOW_ENDED = 'SHOW ENDED',
-  CUSTOMER_JOINED = 'CUSTOMER JOINED',
-  CUSTOMER_LEFT = 'CUSTOMER LEFT',
-  TICKET_FINALIZED = 'TICKET FINALIZED',
-  TICKET_DISPUTED = 'TICKET DISPUTED',
-  DISPUTE_DECIDED = 'DISPUTE DECIDED',
-  TICKET_REDEEMED = 'TICKET REDEEMED'
-}
-
 export type ShowMachineEventType =
   | {
       type: 'CANCELLATION INITIATED';
@@ -713,7 +694,7 @@ const createShowMachine = ({
   );
 };
 
-export { ShowMachineEventString, createShowMachine };
+export { createShowMachine };
 export const createShowMachineService = ({
   showDocument,
   showMachineOptions

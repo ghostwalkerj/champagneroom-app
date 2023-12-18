@@ -2,7 +2,7 @@ import * as timeago from 'timeago.js';
 
 import type { ShowEventDocumentType } from '$lib/models/showEvent';
 
-import { ShowMachineEventString } from './machines/showMachine';
+import { ShowMachineEventString } from '$lib/constants';
 
 export const createEventText = (
   showEvent: ShowEventDocumentType | undefined
