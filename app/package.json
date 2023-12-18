@@ -123,7 +123,7 @@
     "jsonwebtoken": "^8.5.1",
     "max-listeners-exceeded-warning": "^0.0.1",
     "module": "^1.2.5",
-    "mongodb": "^5.7.0",
+    "mongodb": "^6.3.0",
     "mongoose": "^6.6.5",
     "mongoose-autopopulate": "^1.1.0",
     "mongoose-field-encryption": "^6.3.0",
