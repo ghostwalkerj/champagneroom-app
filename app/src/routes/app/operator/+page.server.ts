@@ -10,7 +10,6 @@ import { uniqueNamesGenerator } from 'unique-names-generator';
 import { PASSWORD_SALT } from '$env/static/private';
 
 import { Agent } from '$lib/models/agent';
-import type { DisputeDecision } from '$lib/models/common';
 import { Creator } from '$lib/models/creator';
 import type { OperatorDocument } from '$lib/models/operator';
 import type { ShowDocument } from '$lib/models/show';
@@ -19,12 +18,15 @@ import type { UserDocument } from '$lib/models/user';
 import { User } from '$lib/models/user';
 import { Wallet } from '$lib/models/wallet';
 
-import { ShowMachineEventString } from '$lib/machines/showMachine';
-
 import type { ShowQueueType } from '$lib/workers/showWorker';
 
 import Config from '$lib/config';
-import { AuthType, EntityType } from '$lib/constants';
+import {
+  AuthType,
+  DisputeDecision,
+  EntityType,
+  ShowMachineEventString
+} from '$lib/constants';
 import { womensNames } from '$lib/womensNames';
 
 import type { PageServerLoad } from './$types';

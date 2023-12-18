@@ -6,34 +6,34 @@ import { nanoid } from 'nanoid';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 import { raise } from 'xstate/lib/actions';
 
+import type { FeedbackType, TransactionSummaryType } from '$lib/models/common';
 import {
   type CancelType,
   type DisputeType,
   disputeZodSchema,
   escrowZodSchema,
-  type FeedbackType,
   type FinalizeType,
   finalizeZodSchema,
   type RefundType,
   refundZodSchema,
   type SaleType,
-  saleZodSchema
+  saleZodSchema,
+  transactionSummaryZodSchema
 } from '$lib/models/common';
 import type { TicketDocument, TicketStateType } from '$lib/models/ticket';
 import { redemptionZodSchema, TicketStatus } from '$lib/models/ticket';
-import {
-  type TransactionDocument,
-  type TransactionSummaryType,
-  transactionSummaryZodSchema
-} from '$lib/models/transaction';
+import type { TransactionDocument } from '$lib/models/transaction';
 
 import type { ShowJobDataType } from '$lib/workers/showWorker';
 
 import type { CurrencyType } from '$lib/constants';
-import { ActorType, DisputeDecision, RefundReason } from '$lib/constants';
+import {
+  ActorType,
+  DisputeDecision,
+  RefundReason,
+  ShowMachineEventString
+} from '$lib/constants';
 import { calcTotal } from '$lib/payment';
-
-import { ShowMachineEventString } from './showMachine';
 
 export type TicketMachineOptions = {
   saveStateCallback?: (state: TicketStateType) => void;

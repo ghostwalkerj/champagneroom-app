@@ -9,26 +9,10 @@ import {
   z
 } from 'mongoose-zod';
 
+import { feedbackStatsZodSchema, salesStatsZodSchema } from './common';
 import type { UserDocument } from './user';
 
 const { models } = pkg;
-
-const salesZodSchema = z
-  .object({
-    totalRevenue: z.record(z.number()).default({}),
-    numberOfCompletedShows: z.number().min(0).default(0),
-    totalTicketSalesAmounts: z.record(z.number()).default({}),
-    totalSales: z.record(z.number()).default({}),
-    totalRefunds: z.record(z.number()).default({})
-  })
-  .strict();
-
-const feedbackZodSchema = z
-  .object({
-    averageRating: z.number().min(0).max(5).default(0),
-    numberOfReviews: z.number().min(0).default(0)
-  })
-  .strict();
 
 const creatorZodSchema = toZodMongooseSchema(
   z
@@ -50,11 +34,8 @@ const creatorZodSchema = toZodMongooseSchema(
           ref: 'Agent',
           get: (value) => value?.toString()
         }),
-      feedbackStats: feedbackZodSchema.default({
-        averageRating: 0,
-        numberOfReviews: 0
-      }),
-      salesStats: salesZodSchema.default({
+      feedbackStats: feedbackStatsZodSchema.default({}),
+      salesStats: salesStatsZodSchema.default({
         numberOfCompletedShows: 0,
         totalRefunds: {},
         totalRevenue: {},

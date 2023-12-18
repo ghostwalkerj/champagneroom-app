@@ -6,8 +6,8 @@
   import web3 from 'web3';
 
   import { refundZodSchema, disputeZodSchema } from '$lib/models/common';
-  import { DisputeReason, RefundReason } from '$lib/constants';
-  import { ShowStatus, type ShowDocument } from '$lib/models/show';
+  import { DisputeReason, RefundReason, ShowStatus } from '$lib/constants';
+  import type { ShowDocument } from '$lib/models/show';
   import type { UserDocument } from '$lib/models/user';
 
   import type { TicketMachineServiceType } from '$lib/machines/ticketMachine';

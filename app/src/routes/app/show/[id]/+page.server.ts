@@ -24,13 +24,17 @@ import type { TicketDocument } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
 import { User } from '$lib/models/user';
 
-import { ShowMachineEventString } from '$lib/machines/showMachine';
 import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 
 import type { ShowQueueType } from '$lib/workers/showWorker';
 
 import Config from '$lib/config';
-import { AuthType, EntityType, UserRole } from '$lib/constants';
+import {
+  AuthType,
+  EntityType,
+  ShowMachineEventString,
+  UserRole
+} from '$lib/constants';
 import { authEncrypt } from '$lib/crypt';
 import { mensNames } from '$lib/mensNames';
 import { createAuthToken, InvoiceJobType, InvoiceStatus } from '$lib/payment';

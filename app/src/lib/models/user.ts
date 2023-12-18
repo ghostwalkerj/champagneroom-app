@@ -9,7 +9,6 @@ import {
   z
 } from 'mongoose-zod';
 import { nanoid } from 'nanoid';
-import { from } from 'rxjs';
 import validator from 'validator';
 
 import Config from '$lib/config';

@@ -3,9 +3,8 @@
   import StarRating from 'svelte-star-rating';
 
   import type { ShowDocument } from '$lib/models/show';
-  import { ShowStatus } from '$lib/models/show';
 
-  import { currencyFormatter } from '$lib/constants';
+  import { ShowStatus, currencyFormatter } from '$lib/constants';
   export let completedShows: ShowDocument[] = [];
 </script>
 

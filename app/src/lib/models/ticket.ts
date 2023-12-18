@@ -10,11 +10,13 @@ import {
 } from 'mongoose-zod';
 import validator from 'validator';
 
+import { TicketStatus } from '$lib/constants';
+
 import {
   cancelZodSchema,
   disputeZodSchema,
   escrowZodSchema,
-  feedbackZodSchema,
+  feedbackStatsZodSchema,
   finalizeZodSchema,
   moneyZodSchema,
   refundZodSchema,
@@ -22,7 +24,6 @@ import {
 } from './common';
 import type { ShowDocument } from './show';
 import type { UserDocument } from './user';
-import { TicketStatus } from '$lib/constants';
 
 const { models } = pkg;
 const redemptionZodSchema = z
@@ -39,7 +40,7 @@ const ticketStateZodSchema = z.object({
   escrow: escrowZodSchema.optional(),
   dispute: disputeZodSchema.optional(),
   finalize: finalizeZodSchema.optional(),
-  feedback: feedbackZodSchema.optional(),
+  feedback: feedbackStatsZodSchema.optional(),
   refund: refundZodSchema.optional(),
   sale: saleZodSchema.optional()
 });
@@ -118,4 +119,6 @@ export const Ticket = models?.Ticket
   ? (models.Ticket as Model<TicketDocumentType>)
   : mongoose.model<TicketDocumentType>('Ticket', ticketSchema);
 
-export { TicketStatus, redemptionZodSchema };
+export { TicketStatus } from '$lib/constants';
+
+export { redemptionZodSchema };

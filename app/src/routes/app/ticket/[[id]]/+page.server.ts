@@ -17,6 +17,7 @@ import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 import {
   cancelZodSchema,
   disputeZodSchema,
+  feedbackStatsZodSchema,
   feedbackZodSchema,
   refundZodSchema
 } from '$lib/models/common';
