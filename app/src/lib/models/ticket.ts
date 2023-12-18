@@ -22,24 +22,7 @@ import {
 } from './common';
 import type { ShowDocument } from './show';
 import type { UserDocument } from './user';
-
-enum TicketStatus {
-  RESERVED = 'RESERVED',
-  REFUND_REQUESTED = 'REFUND REQUESTED',
-  PAYMENT_INITIATED = 'PAYMENT INITIATED',
-  PAYMENT_RECEIVED = 'PAYMENT RECEIVED',
-  WAITING_FOR_REFUND = 'WAITING FOR REFUND',
-  FULLY_PAID = 'FULLY PAID',
-  CANCELLED = 'CANCELLED',
-  FINALIZED = 'FINALIZED',
-  REDEEMED = 'REDEEMED',
-  IN_ESCROW = 'IN ESCROW',
-  IN_DISPUTE = 'IN DISPUTE',
-  REFUNDED = 'REFUNDED',
-  MISSED_SHOW = 'MISSED SHOW',
-  SHOW_CANCELLED = 'SHOW CANCELLED',
-  WAITING_FOR_DISPUTE_REFUND = 'WAITING FOR DISPUTE REFUND'
-}
+import { TicketStatus } from '$lib/constants';
 
 const { models } = pkg;
 const redemptionZodSchema = z

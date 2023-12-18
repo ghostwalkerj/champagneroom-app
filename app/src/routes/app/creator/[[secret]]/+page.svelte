@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
-
+  import {} from 'mongoose-zod';
   import { invalidateAll } from '$app/navigation';
 
   import type { CreatorDocument } from '$lib/models/creator';
@@ -10,12 +10,13 @@
   import type { WalletDocument } from '$lib/models/wallet';
 
   import type { ShowMachineServiceType } from '$lib/machines/showMachine';
-  import {
-    createShowMachineService,
-    ShowMachineEventString
-  } from '$lib/machines/showMachine';
+  import { createShowMachineService } from '$lib/machines/showMachine';
 
-  import { ActorType, CancelReason } from '$lib/constants';
+  import {
+    ActorType,
+    CancelReason,
+    ShowMachineEventString
+  } from '$lib/constants';
 
   import ShowDetail from '$components/ShowDetail.svelte';
   import { CreatorStore, ShowStore, WalletStore } from '$stores';

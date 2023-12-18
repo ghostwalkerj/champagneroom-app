@@ -25,7 +25,6 @@ import type { WalletDocument } from '$lib/models/wallet';
 import { Wallet, WalletStatus } from '$lib/models/wallet';
 
 import type { ShowMachineEventType } from '$lib/machines/showMachine';
-import { ShowMachineEventString } from '$lib/machines/showMachine';
 
 import type { PayoutQueueType } from '$lib/workers/payoutWorker';
 import type { ShowQueueType } from '$lib/workers/showWorker';
@@ -36,6 +35,7 @@ import {
   CurrencyType,
   EntityType
 } from '$lib/constants';
+import { ShowMachineEventString } from '$lib/constants';
 import { rateCryptosRateGet } from '$lib/ext/bitcart';
 import { createAuthToken, PayoutJobType, PayoutReason } from '$lib/payment';
 import { getShowMachineService } from '$lib/server/machinesUtil';
