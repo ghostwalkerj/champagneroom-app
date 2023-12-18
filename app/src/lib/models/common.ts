@@ -1,4 +1,3 @@
-import mongoose from 'mongoose';
 import { mongooseZodCustomType, z } from 'mongoose-zod';
 import validator from 'validator';
 
@@ -12,8 +11,6 @@ import {
   RefundReason
 } from '$lib/constants';
 import { PayoutStatus } from '$lib/payment';
-
-import { transactionSummaryZodSchema } from './transaction';
 
 export type CancelType = z.infer<typeof cancelZodSchema>;
 
@@ -35,13 +32,17 @@ export type RefundType = z.infer<typeof refundZodSchema>;
 
 export type SaleType = z.infer<typeof saleZodSchema>;
 
+export type TransactionSummaryType = z.infer<
+  typeof transactionSummaryZodSchema
+>;
+
 export const cancelZodSchema = z.object({
   _id: mongooseZodCustomType('ObjectId')
-    .default(() => new mongoose.Types.ObjectId())
     .mongooseTypeOptions({
       _id: true,
       index: true,
       unique: true,
+      auto: true,
       get: (value) => value?.toString()
     })
     .optional(),
@@ -51,14 +52,28 @@ export const cancelZodSchema = z.object({
   reason: z.nativeEnum(CancelReason)
 });
 
+export const creatorInfoZodSchema = z.object({
+  name: z.string().trim(),
+  profileImageUrl: z.string().trim(),
+  averageRating: z.number().min(0).max(5).default(0),
+  numberOfReviews: z.number().min(0).default(0)
+});
+
+export const disputeStatsZodSchema = z.object({
+  totalDisputes: z.number().min(0).default(0),
+  totalDisputesRefunded: z.number().min(0).default(0),
+  totalDisputesResolved: z.number().min(0).default(0),
+  totalDisputesPending: z.number().min(0).default(0)
+});
+
 export const disputeZodSchema = z.object({
   _id: mongooseZodCustomType('ObjectId')
-    .default(() => new mongoose.Types.ObjectId())
     .mongooseTypeOptions({
       _id: true,
       index: true,
       unique: true,
-      get: (value) => value?.toString()
+      get: (value) => value?.toString(),
+      auto: true
     })
     .optional(),
   startedAt: z.date().default(() => new Date()),
@@ -89,6 +104,12 @@ export const escrowZodSchema = z.object({
   endedAt: z.date().optional()
 });
 
+export const feedbackStatsZodSchema = z.object({
+  numberOfReviews: z.number().min(0).default(0),
+  averageRating: z.number().min(0).max(5).default(0),
+  comments: z.array(z.string().trim()).default([])
+});
+
 export const feedbackZodSchema = z.object({
   rating: z.number().min(1).max(5),
   review: z.string().min(10).max(500).optional(),
@@ -98,6 +119,19 @@ export const feedbackZodSchema = z.object({
 export const finalizeZodSchema = z.object({
   finalizedAt: z.date().default(() => new Date()),
   finalizedBy: z.nativeEnum(ActorType)
+});
+
+const transactionSummaryZodSchema = z.object({
+  createdAt: z.date().default(() => new Date()),
+  amount: z.number().min(0),
+  currency: z.nativeEnum(CurrencyType),
+  rate: z.number().min(0).default(0),
+  transaction: mongooseZodCustomType('ObjectId')
+    .optional()
+    .mongooseTypeOptions({
+      ref: 'Transaction',
+      get: (value) => value?.toString()
+    })
 });
 
 export const moneyZodSchema = z.object({
@@ -126,11 +160,11 @@ export const payoutZodSchema = z.object({
 
 export const refundZodSchema = z.object({
   _id: mongooseZodCustomType('ObjectId')
-    .default(() => new mongoose.Types.ObjectId())
     .mongooseTypeOptions({
       _id: true,
       index: true,
       unique: true,
+      auto: true,
       get: (value) => value?.toString()
     })
     .optional(),
@@ -142,13 +176,18 @@ export const refundZodSchema = z.object({
   reason: z.nativeEnum(RefundReason)
 });
 
+export const runtimeZodSchema = z.object({
+  startDate: z.date().default(() => new Date()),
+  endDate: z.date().optional()
+});
+
 export const saleZodSchema = z.object({
   _id: mongooseZodCustomType('ObjectId')
-    .default(() => new mongoose.Types.ObjectId())
     .mongooseTypeOptions({
       _id: true,
       index: true,
       unique: true,
+      auto: true,
       get: (value) => value?.toString()
     })
     .optional(),
@@ -156,3 +195,31 @@ export const saleZodSchema = z.object({
   payments: z.array(transactionSummaryZodSchema),
   totals: z.record(z.number()).default({})
 });
+
+export const salesStatsZodSchema = z
+  .object({
+    totalRevenue: z.record(z.number()).default({}),
+    numberOfCompletedShows: z.number().min(0).default(0),
+    totalTicketSalesAmounts: z.record(z.number()).default({}),
+    totalSales: z.record(z.number()).default({}),
+    totalRefunds: z.record(z.number()).default({})
+  })
+  .strict();
+
+export const ticketSalesStatsZodSchema = z.object({
+  ticketsAvailable: z.number().min(0).default(0),
+  ticketsSold: z.number().min(0).default(0),
+  ticketsReserved: z.number().min(0).default(0),
+  ticketsRefunded: z.number().min(0).default(0),
+  ticketsFinalized: z.number().min(0).default(0),
+  ticketsRedeemed: z.number().min(0).default(0),
+  ticketSalesAmount: moneyZodSchema.default({
+    amount: 0,
+    currency: CurrencyType.USD
+  }),
+  totalSales: z.record(z.number().min(0)).default({}),
+  totalRevenue: z.record(z.number().min(0)).default({}),
+  totalRefunds: z.record(z.number().min(0)).default({})
+});
+
+export { transactionSummaryZodSchema };

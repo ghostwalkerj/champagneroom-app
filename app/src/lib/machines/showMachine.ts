@@ -6,24 +6,21 @@ import { raise } from 'xstate/lib/actions';
 
 import {
   type CancelType,
+  disputeStatsZodSchema,
   type DisputeType,
   escrowZodSchema,
   type FinalizeType,
   finalizeZodSchema,
   type RefundType,
+  runtimeZodSchema,
+  salesStatsZodSchema,
   type SaleType
 } from '$lib/models/common';
 import type { ShowDocument } from '$lib/models/show';
-import {
-  disputeStatsZodSchema,
-  runtimeZodSchema,
-  salesStatsZodSchema,
-  ShowStatus
-} from '$lib/models/show';
 import type { TicketDocument } from '$lib/models/ticket';
 import type { TransactionDocument } from '$lib/models/transaction';
 
-import { ActorType, DisputeDecision } from '$lib/constants';
+import { ActorType, DisputeDecision, ShowStatus } from '$lib/constants';
 
 export type ShowMachineEventType =
   | {

@@ -17,7 +17,7 @@ import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 import type { CancelType } from '$lib/models/common';
 import type { CreatorDocument } from '$lib/models/creator';
 import type { ShowDocument } from '$lib/models/show';
-import { Show, ShowStatus } from '$lib/models/show';
+import { Show } from '$lib/models/show';
 import type { ShowEventDocument } from '$lib/models/showEvent';
 import { ShowEvent } from '$lib/models/showEvent';
 import type { UserDocument } from '$lib/models/user';
@@ -33,7 +33,8 @@ import {
   ActorType,
   CancelReason,
   CurrencyType,
-  EntityType
+  EntityType,
+  ShowStatus
 } from '$lib/constants';
 import { ShowMachineEventString } from '$lib/constants';
 import { rateCryptosRateGet } from '$lib/ext/bitcart';

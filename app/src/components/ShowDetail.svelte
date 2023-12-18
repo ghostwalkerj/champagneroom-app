@@ -3,10 +3,14 @@
   import StarRating from 'svelte-star-rating';
   import urlJoin from 'url-join';
 
-  import { ShowStatus, type ShowDocument } from '$lib/models/show';
+  import type { ShowDocument } from '$lib/models/show';
 
   import Config from '$lib/config';
-  import { currencyFormatter, durationFormatter } from '$lib/constants';
+  import {
+    ShowStatus,
+    currencyFormatter,
+    durationFormatter
+  } from '$lib/constants';
 
   type ShowDetailOptions = {
     showCopy?: boolean;

@@ -9,22 +9,11 @@ import {
 import { toZodMongooseSchema } from 'mongoose-zod';
 import validator from 'validator';
 
-import { CurrencyType } from '$lib/constants';
-
-enum TransactionReasonType {
-  TICKET_PAYMENT = 'TICKET PAYMENT',
-  TICKET_REFUND = 'TICKET REFUND',
-  DISPUTE_RESOLUTION = 'DISPUTE RESOLUTION',
-  CREATOR_PAYOUT = 'CREATOR PAYOUT'
-}
+import { CurrencyType, TransactionReason } from '$lib/constants';
 
 export type TransactionDocument = InstanceType<typeof Transaction>;
 
 export type TransactionDocumentType = z.infer<typeof transactionZodSchema>;
-
-export type TransactionSummaryType = z.infer<
-  typeof transactionSummaryZodSchema
->;
 
 const { models } = pkg;
 
@@ -40,7 +29,7 @@ const transactionZodSchema = toZodMongooseSchema(
       from: z.string().trim().optional(),
       to: z.string().trim().optional(),
       confirmations: z.number().min(0).optional(),
-      reason: z.nativeEnum(TransactionReasonType).optional(),
+      reason: z.nativeEnum(TransactionReason).optional(),
       amount: z.string().refine((value) => validator.isNumeric(value), {
         message: 'Amount must be numeric'
       }),
@@ -91,17 +80,4 @@ export const Transaction = models?.Transaction
   ? (models?.Transaction as Model<TransactionDocumentType>)
   : mongoose.model<TransactionDocumentType>('Transaction', transactionSchema);
 
-export { TransactionReasonType };
-
-export const transactionSummaryZodSchema = z.object({
-  createdAt: z.date().default(() => new Date()),
-  amount: z.number().min(0),
-  currency: z.nativeEnum(CurrencyType),
-  rate: z.number().min(0).default(0),
-  transaction: mongooseZodCustomType('ObjectId')
-    .optional()
-    .mongooseTypeOptions({
-      ref: 'Transaction',
-      get: (value) => value?.toString()
-    })
-});
+export { TransactionReason as TransactionReasonType } from '$lib/constants';

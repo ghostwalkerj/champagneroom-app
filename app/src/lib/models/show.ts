@@ -9,70 +9,21 @@ import {
 import { toZodMongooseSchema } from 'mongoose-zod';
 import { nanoid } from 'nanoid';
 
-import { CurrencyType, ShowStatus } from '$lib/constants';
+import { ShowStatus } from '$lib/constants';
 
-import type { refundZodSchema, saleZodSchema } from './common';
 import {
   cancelZodSchema,
+  creatorInfoZodSchema,
+  disputeStatsZodSchema,
   escrowZodSchema,
+  feedbackStatsZodSchema,
   finalizeZodSchema,
-  moneyZodSchema
+  moneyZodSchema,
+  runtimeZodSchema,
+  salesStatsZodSchema
 } from './common';
 
 export type ShowDocument = InstanceType<typeof Show>;
-
-export type ShowDocumentType = z.infer<typeof showZodSchema>;
-
-const disputeStatsZodSchema = z.object({
-  totalDisputes: z.number().min(0).default(0),
-  totalDisputesRefunded: z.number().min(0).default(0),
-  totalDisputesResolved: z.number().min(0).default(0),
-  totalDisputesPending: z.number().min(0).default(0)
-});
-
-const feedbackStatsZodSchema = z.object({
-  numberOfReviews: z.number().min(0).default(0),
-  averageRating: z.number().min(0).max(5).default(0),
-  comments: z.array(z.string().trim()).default([])
-});
-
-const salesStatsZodSchema = z.object({
-  ticketsAvailable: z.number().min(0).default(0),
-  ticketsSold: z.number().min(0).default(0),
-  ticketsReserved: z.number().min(0).default(0),
-  ticketsRefunded: z.number().min(0).default(0),
-  ticketsFinalized: z.number().min(0).default(0),
-  ticketsRedeemed: z.number().min(0).default(0),
-  ticketSalesAmount: moneyZodSchema.default({
-    amount: 0,
-    currency: CurrencyType.USD
-  }),
-  totalSales: z.record(z.number().min(0)).default({}),
-  totalRevenue: z.record(z.number().min(0)).default({}),
-  totalRefunds: z.record(z.number().min(0)).default({})
-});
-
-const runtimeZodSchema = z.object({
-  startDate: z.date().default(() => new Date()),
-  endDate: z.date().optional()
-});
-
-export type ShowRefundType = z.infer<typeof refundZodSchema>;
-
-export type ShowSaleType = z.infer<typeof saleZodSchema>;
-
-export type ShowStateType = z.infer<typeof showStateZodSchema>;
-
-export const SaveState = (show: ShowDocument, newState: ShowStateType) => {
-  Show.updateOne({ _id: show._id }, { $set: { showState: newState } }).exec();
-};
-
-const creatorInfoZodSchema = z.object({
-  name: z.string().trim(),
-  profileImageUrl: z.string().trim(),
-  averageRating: z.number().min(0).max(5).default(0),
-  numberOfReviews: z.number().min(0).default(0)
-});
 
 const showStateZodSchema = z.object({
   status: z.nativeEnum(ShowStatus).default(ShowStatus.CREATED),
@@ -185,15 +136,21 @@ const showZodSchema = toZodMongooseSchema(
 );
 
 const showSchema = toMongooseSchema(showZodSchema);
+
+export type ShowStateType = z.infer<typeof showStateZodSchema>;
+
+export const SaveState = (show: ShowDocument, newState: ShowStateType) => {
+  Show.updateOne({ _id: show._id }, { $set: { showState: newState } }).exec();
+};
+
+type ShowDocumentType = z.infer<typeof showZodSchema>;
+
 // showSchema.index({ agent: 1, 'showState.finalize.finalizedAt': -1 });
 // showSchema.plugin(fieldEncryption, {
 //   fields: ['roomId'],
 //   secret: process.env.MONGO_DB_FIELD_SECRET,
 //   saltGenerator: (secret: string) => secret.slice(0, 16)
 // });
-
 export const Show = pkg.models.Show ?? pkg.model('Show', showSchema);
 
-export { ShowStatus } from '$lib/constants';
-
-export { disputeStatsZodSchema, runtimeZodSchema, salesStatsZodSchema };
+export { ShowDocumentType };
