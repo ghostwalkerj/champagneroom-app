@@ -6,6 +6,7 @@ import {
   toMongooseSchema,
   z
 } from 'mongoose-zod';
+import { toZodMongooseSchema } from 'mongoose-zod';
 import { nanoid } from 'nanoid';
 
 import { CurrencyType } from '$lib/constants';
@@ -155,45 +156,47 @@ const showStateZodSchema = z.object({
   current: z.boolean().default(true)
 });
 
-const showZodSchema = z
-  .object({
-    _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
-      _id: true,
-      auto: true,
-      get: (value) => value?.toString()
-    }),
-    creator: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
-      ref: 'Creator',
-      get: (value) => value?.toString()
-    }),
-    agent: mongooseZodCustomType('ObjectId')
-      .optional()
-      .mongooseTypeOptions({
-        ref: 'Agent',
+const showZodSchema = toZodMongooseSchema(
+  z
+    .object({
+      _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+        _id: true,
+        auto: true,
         get: (value) => value?.toString()
       }),
-    roomId: z.string().default(nanoid),
-    coverImageUrl: z.string().trim().optional(),
-    duration: z
-      .number()
-      .min(0, { message: 'Duration must be over 0' })
-      .max(180, { message: 'Duration must be under 180 minutes' }),
-    name: z
-      .string()
-      .min(3, { message: 'Name must be at least 3 characters' })
-      .max(50, { message: 'Name must be under 50 characters' })
-      .trim(),
-    capacity: z.number().min(1).default(1),
-    price: moneyZodSchema.default({}),
-    creatorInfo: creatorInfoZodSchema,
-    showState: showStateZodSchema.default({})
-  })
-  .merge(genTimestampsSchema())
-  .mongoose({
+      creator: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+        ref: 'Creator',
+        get: (value) => value?.toString()
+      }),
+      agent: mongooseZodCustomType('ObjectId')
+        .optional()
+        .mongooseTypeOptions({
+          ref: 'Agent',
+          get: (value) => value?.toString()
+        }),
+      roomId: z.string().default(nanoid),
+      coverImageUrl: z.string().trim().optional(),
+      duration: z
+        .number()
+        .min(0, { message: 'Duration must be over 0' })
+        .max(180, { message: 'Duration must be under 180 minutes' }),
+      name: z
+        .string()
+        .min(3, { message: 'Name must be at least 3 characters' })
+        .max(50, { message: 'Name must be under 50 characters' })
+        .trim(),
+      capacity: z.number().min(1).default(1),
+      price: moneyZodSchema.default({}),
+      creatorInfo: creatorInfoZodSchema,
+      showState: showStateZodSchema.default({})
+    })
+    .merge(genTimestampsSchema()),
+  {
     schemaOptions: {
       collection: 'shows'
     }
-  });
+  }
+);
 
 const showSchema = toMongooseSchema(showZodSchema);
 showSchema.index({ agent: 1, 'showState.finalize.finalizedAt': -1 });
