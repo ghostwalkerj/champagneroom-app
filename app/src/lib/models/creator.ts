@@ -5,6 +5,7 @@ import {
   genTimestampsSchema,
   mongooseZodCustomType,
   toMongooseSchema,
+  toZodMongooseSchema,
   z
 } from 'mongoose-zod';
 
@@ -29,45 +30,45 @@ const feedbackZodSchema = z
   })
   .strict();
 
-const creatorZodSchema = z
-  .object({
-    _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
-      _id: true,
-      auto: true,
-      get: (value) => value?.toString()
-    }),
-    user: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
-      autopopulate: true,
-      ref: 'User',
-      required: true
-    }),
-    commissionRate: z.number().min(0).max(100).default(0),
-    agent: mongooseZodCustomType('ObjectId')
-      .optional()
-      .mongooseTypeOptions({
-        ref: 'Agent',
+const creatorZodSchema = toZodMongooseSchema(
+  z
+    .object({
+      _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+        _id: true,
+        auto: true,
         get: (value) => value?.toString()
       }),
-    feedbackStats: feedbackZodSchema.default({
-      averageRating: 0,
-      numberOfReviews: 0
-    }),
-    salesStats: salesZodSchema.default({
-      numberOfCompletedShows: 0,
-      totalRefunds: {},
-      totalRevenue: {},
-      totalSales: {},
-      totalTicketSalesAmounts: {}
+      user: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+        autopopulate: true,
+        ref: 'User',
+        required: true
+      }),
+      commissionRate: z.number().min(0).max(100).default(0),
+      agent: mongooseZodCustomType('ObjectId')
+        .optional()
+        .mongooseTypeOptions({
+          ref: 'Agent',
+          get: (value) => value?.toString()
+        }),
+      feedbackStats: feedbackZodSchema.default({
+        averageRating: 0,
+        numberOfReviews: 0
+      }),
+      salesStats: salesZodSchema.default({
+        numberOfCompletedShows: 0,
+        totalRefunds: {},
+        totalRevenue: {},
+        totalSales: {},
+        totalTicketSalesAmounts: {}
+      })
     })
-  })
-  .merge(genTimestampsSchema())
-  .strict()
-  .mongoose({
+    .merge(genTimestampsSchema()),
+  {
     schemaOptions: {
       collection: 'creators'
     }
-  });
-
+  }
+);
 const creatorSchema = toMongooseSchema(creatorZodSchema);
 creatorSchema.plugin(mongooseAutoPopulate);
 

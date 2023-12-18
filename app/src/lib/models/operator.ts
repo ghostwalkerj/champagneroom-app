@@ -5,6 +5,7 @@ import {
   genTimestampsSchema,
   mongooseZodCustomType,
   toMongooseSchema,
+  toZodMongooseSchema,
   z
 } from 'mongoose-zod';
 
@@ -12,26 +13,27 @@ import type { UserDocument } from './user';
 
 const { models } = pkg;
 
-const operatorZodSchema = z
-  .object({
-    _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
-      _id: true,
-      auto: true,
-      get: (value) => value?.toString()
-    }),
-    user: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
-      autopopulate: true,
-      ref: 'User',
-      required: true
+const operatorZodSchema = toZodMongooseSchema(
+  z
+    .object({
+      _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+        _id: true,
+        auto: true,
+        get: (value) => value?.toString()
+      }),
+      user: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+        autopopulate: true,
+        ref: 'User',
+        required: true
+      })
     })
-  })
-  .merge(genTimestampsSchema('createdAt', 'updatedAt'))
-  .strict()
-  .mongoose({
+    .merge(genTimestampsSchema('createdAt', 'updatedAt')),
+  {
     schemaOptions: {
       collection: 'operators'
     }
-  });
+  }
+);
 
 const operatorSchema = toMongooseSchema(operatorZodSchema);
 operatorSchema.plugin(mongooseAutoPopulate);

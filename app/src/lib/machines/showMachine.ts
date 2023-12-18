@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
-import { Types } from 'mongoose';
 import { nanoid } from 'nanoid';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 import { raise } from 'xstate/lib/actions';
@@ -559,7 +558,7 @@ const createShowMachine = ({
 
         cancelTicket: assign((context, event) => {
           const st = context.showState;
-          st.cancellations.push(new Types.ObjectId(event.cancel._id));
+          st.cancellations.push(event.cancel._id);
           return {
             showState: {
               ...st,
@@ -574,7 +573,7 @@ const createShowMachine = ({
 
         reserveTicket: assign((context, event) => {
           const st = context.showState;
-          st.reservations.push(new Types.ObjectId(event.ticket._id.toString()));
+          st.reservations.push(event.ticket._id);
           return {
             showState: {
               ...st,
@@ -589,7 +588,7 @@ const createShowMachine = ({
 
         redeemTicket: assign((context, event) => {
           const st = context.showState;
-          st.redemptions.push(new Types.ObjectId(event.ticket._id.toString()));
+          st.redemptions.push(event.ticket._id);
           st.salesStats.ticketsRedeemed += 1;
           return {
             showState: {
@@ -604,9 +603,7 @@ const createShowMachine = ({
 
         finalizeTicket: assign((context, event) => {
           const st = context.showState;
-          st.finalizations.push(
-            new Types.ObjectId(event.ticket._id.toString())
-          );
+          st.finalizations.push(event.ticket._id);
           st.salesStats.ticketsFinalized += 1;
           return {
             showState: {
