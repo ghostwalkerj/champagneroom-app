@@ -171,7 +171,7 @@ export const showSalesStatsZodSchema = z.object({
 
 export const ticketFeedbackZodSchema = z.object({
   rating: z.number().min(1).max(5),
-  review: z.string().min(10).max(500).optional(),
+  review: z.string().min(0).max(500).optional(),
   createdAt: z.coerce.date().default(() => new Date())
 });
 

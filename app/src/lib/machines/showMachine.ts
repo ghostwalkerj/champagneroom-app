@@ -438,7 +438,7 @@ const createShowMachine = ({
               ...context.showState,
               status: ShowStatus.STOPPED,
               runtime: runtimeZodSchema.parse({
-                startDate,
+                ...context.showState.runtime,
                 endDate: new Date()
               })
             }
