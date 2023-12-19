@@ -38,6 +38,12 @@ const transactionZodSchema = toZodMongooseSchema(
         .refine((value = '') => validator.isNumeric(value), {
           message: 'Rate must be numeric'
         }),
+      total: z
+        .string()
+        .refine((value) => validator.isNumeric(value), {
+          message: 'Total must be numeric'
+        })
+        .optional(),
       currency: z.nativeEnum(CurrencyType),
       ticket: mongooseZodCustomType('ObjectId').optional().mongooseTypeOptions({
         ref: 'Ticket'

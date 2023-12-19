@@ -17,13 +17,12 @@ import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 import {
   cancelZodSchema,
   disputeZodSchema,
-  feedbackStatsZodSchema,
   refundZodSchema,
-  ticketFeedbackZodSchema
+  ticketFeedbackZodSchema,
+  TicketMachineEventString
 } from '$lib/models/common';
 
 import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
-import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 
 import type { PayoutQueueType } from '$lib/workers/payoutWorker';
 

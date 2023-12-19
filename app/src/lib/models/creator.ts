@@ -9,7 +9,7 @@ import {
   z
 } from 'mongoose-zod';
 
-import { feedbackStatsZodSchema, salesStatsZodSchema } from './common';
+import { creatorSalesStatsZodSchema, feedbackStatsZodSchema } from './common';
 import type { UserDocument } from './user';
 
 const { models } = pkg;
@@ -31,7 +31,7 @@ const creatorZodSchema = toZodMongooseSchema(
         ref: 'Agent'
       }),
       feedbackStats: feedbackStatsZodSchema.default({}),
-      salesStats: salesStatsZodSchema.default({
+      salesStats: creatorSalesStatsZodSchema.default({
         numberOfCompletedShows: 0,
         totalRefunds: {},
         totalRevenue: {},

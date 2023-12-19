@@ -4,7 +4,7 @@ import { Worker } from 'bullmq';
 import type IORedis from 'ioredis';
 import urlJoin from 'url-join';
 
-import type { PayoutType } from '$lib/models/common';
+import { TicketMachineEventString, type PayoutType } from '$lib/models/common';
 import { Creator } from '$lib/models/creator';
 import type { TicketDocument } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
@@ -14,9 +14,6 @@ import {
   TransactionReasonType
 } from '$lib/models/transaction';
 import { Wallet } from '$lib/models/wallet';
-
-import { TicketMachineEventString } from '$lib/machines/ticketMachine';
-import { WalletMachineEventString } from '$lib/machines/walletMachine';
 
 import Config from '$lib/config';
 import { CurrencyType, EntityType } from '$lib/constants';

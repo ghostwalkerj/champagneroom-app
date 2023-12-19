@@ -29,15 +29,13 @@ const showEventZodSchema = toZodMongooseSchema(
       agent: mongooseZodCustomType('ObjectId').optional().mongooseTypeOptions({
         ref: 'Agent'
       }),
-      ticket: mongooseZodCustomType('ObjectId')
-        .optional()
-        .mongooseTypeOptions({
-          ref: 'Ticket',
-        }),
+      ticket: mongooseZodCustomType('ObjectId').optional().mongooseTypeOptions({
+        ref: 'Ticket'
+      }),
       transaction: mongooseZodCustomType('ObjectId')
         .optional()
         .mongooseTypeOptions({
-          ref: 'Transaction',
+          ref: 'Transaction'
         }),
       ticketInfo: z
         .object({
@@ -80,7 +78,7 @@ export const createShowEvent = ({
   ShowEvent.create({
     show: show._id,
     type,
-    ticketId,
+    ticket: ticketId,
     transaction: transaction?._id,
     agent: show.agent,
     creator: show.creator,

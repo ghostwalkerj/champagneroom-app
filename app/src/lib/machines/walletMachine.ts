@@ -57,16 +57,6 @@ export type WalletMachineState = StateFrom<typeof createWalletMachine>;
 
 export type WalletMachineType = ReturnType<typeof createWalletMachine>;
 
-export enum WalletMachineEventString {
-  SHOW_EARNINGS_POSTED = 'SHOW EARNINGS POSTED',
-  SHOW_COMMISSION_POSTED = 'SHOW COMMISSION POSTED',
-  PAYOUT_REQUESTED = 'PAYOUT REQUESTED',
-  PAYOUT_SENT = 'PAYOUT SENT',
-  PAYOUT_FAILED = 'PAYOUT FAILED',
-  PAYOUT_CANCELLED = 'PAYOUT CANCELLED',
-  PAYOUT_COMPLETE = 'PAYOUT COMPLETE'
-}
-
 const createWalletMachine = ({
   wallet,
   options
