@@ -82,96 +82,92 @@
 </script>
 
 {#if show}
-<div class="grid md:grid-cols-2 bg-surface-800 rounded">
-
-  <div class="relative">
-    <img src={show.coverImageUrl} alt="show" class="w-full max-w-xl m-auto rounded-l">
-    {#if options.showWaterMark && waterMarkText}
+  <div class="grid md:grid-cols-2 bg-surface-800 rounded">
+    <div class="relative">
+      <img
+        src={show.coverImageUrl}
+        alt="show"
+        class="w-full max-w-xl m-auto rounded-l"
+      />
+      {#if options.showWaterMark && waterMarkText}
         <p
           class="absolute p-2 font-SpaceGrotesk font-extrabold text-black text-xl bg-primary/70 w-full whitespace-nowrap top-0 rounded-tl"
         >
           {waterMarkText}
-  </p>
+        </p>
       {/if}
-  </div>
-
-  <div class="flex flex-col justify-evenly">
-    <div class="p-4 pb-0 flex flex-col items-center gap-2">
-      <h1 class="text-4xl font-extrabold uppercase">{name}</h1>
-      {#if options.showRating}
-    <StarRating rating={show.creatorInfo.averageRating} />
-    {/if}
     </div>
 
-    <slot />
-
-    {#if options.showCopy}
-      <div>
-        <button class="btn font-semibold variant-filled-primary mb-1" on:click={copyShowUrl}>Copy Show Link</button>
-        <p>Share whith your fans</p>  
+    <div class="flex flex-col justify-evenly">
+      <div class="p-4 pb-0 flex flex-col items-center gap-2">
+        <h1 class="text-4xl font-extrabold uppercase">{name}</h1>
+        {#if options.showRating}
+          <StarRating rating={show.creatorInfo.averageRating} />
+        {/if}
       </div>
+
+      <slot />
+
+      {#if options.showCopy}
+        <div>
+          <button
+            class="btn font-semibold variant-filled-primary mb-1"
+            on:click={copyShowUrl}>Copy Show Link</button
+          >
+          <p>Share with your fans</p>
+        </div>
       {/if}
 
-    {#if options.showStats}
-      <div class="grid grid-cols-3 p-2 text-xl font-semibold">
-       
-        <div>
-          <p>Duration</p>
-          <p>{duration}</p>
-        </div>
+      {#if options.showStats}
+        <div class="grid grid-cols-3 p-2 text-xl font-semibold">
+          <div>
+            <p>Duration</p>
+            <p>{duration}</p>
+          </div>
 
-        <div>
-          <p>Price</p>
-          <p>{price}</p>
-        </div>
+          <div>
+            <p>Price</p>
+            <p>{price}</p>
+          </div>
 
-        <div>
-          <p>Available</p>
-          <p>{ticketsAvailable}</p>
+          <div>
+            <p>Available</p>
+            <p>{ticketsAvailable}</p>
+          </div>
         </div>
-
-      </div>
-    {/if}
+      {/if}
     </div>
-
   </div>
 
-  
-    {#if options.showSalesStats}
-    <div class="flex sm:flex-row rounded-b flex-col justify-between border-t border-surface-600 py-2 bg-surface-700  font-semibold divide-x divide-surface-500 text-center
-     [&>div]:w-full [&>div]:whitespace-nowrap [&>div]:p-2 [&>div]:flex [&>div]:sm:flex-col [&>div]:gap-2">
-
+  {#if options.showSalesStats}
+    <div
+      class="flex sm:flex-row rounded-b flex-col justify-between border-t border-surface-600 py-2 bg-surface-700 font-semibold divide-x divide-surface-500 text-center
+     [&>div]:w-full [&>div]:whitespace-nowrap [&>div]:p-2 [&>div]:flex [&>div]:sm:flex-col [&>div]:gap-2"
+    >
       <div>
         <p>Reserved</p>
-        <p >{ticketsReserved}</p>
+        <p>{ticketsReserved}</p>
       </div>
 
-      <div >
+      <div>
         <p>Sold</p>
         <p>{ticketsSold}</p>
       </div>
-
 
       <div>
         <p>Refunded</p>
         <p>{ticketsRefunded}</p>
       </div>
 
-
-          <div>
-            <p>Refunded Amount</p>
-            <p>{totalRefunded}</p>
-          </div>
-
+      <div>
+        <p>Refunded Amount</p>
+        <p>{totalRefunded}</p>
+      </div>
 
       <div>
         <p>Total Sales</p>
         <p>{totalSales}</p>
       </div>
-
     </div>
-    {/if}
-
+  {/if}
 {/if}
-
-
