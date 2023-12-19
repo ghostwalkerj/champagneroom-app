@@ -18,8 +18,7 @@ const agentZodSchema = toZodMongooseSchema(
     .object({
       _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
         _id: true,
-        auto: true,
-        get: (value) => value?.toString()
+        auto: true
       }),
       user: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
         autopopulate: true,

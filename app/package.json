@@ -124,7 +124,7 @@
     "max-listeners-exceeded-warning": "^0.0.1",
     "module": "^1.2.5",
     "mongodb": "^6.3.0",
-    "mongoose": "^6.6.5",
+    "mongoose": "7.6.7",
     "mongoose-autopopulate": "^1.1.0",
     "mongoose-field-encryption": "^6.3.0",
     "mongoose-zod": "^0.1.1",
@@ -151,6 +151,12 @@
     "web3.storage": "^4.5.4",
     "xstate": "^4.38.3"
   },
-  "peerDependencies": {},
+  "peerDependencies": {
+    "mongoose": "6.x",
+    "mongoose-lean-defaults": "2.x",
+    "mongoose-lean-getters": ">=0.3 <1",
+    "mongoose-lean-virtuals": ">=0.9 <1",
+    "zod": "^3.x"
+  },
   "packageManager": "yarn@1.22.19"
 }

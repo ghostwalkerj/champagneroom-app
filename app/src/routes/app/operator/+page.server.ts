@@ -21,12 +21,8 @@ import { Wallet } from '$lib/models/wallet';
 import type { ShowQueueType } from '$lib/workers/showWorker';
 
 import Config from '$lib/config';
-import {
-  AuthType,
-  DisputeDecision,
-  EntityType,
-  ShowMachineEventString
-} from '$lib/constants';
+import type { DisputeDecision } from '$lib/constants';
+import { AuthType, EntityType, ShowMachineEventString } from '$lib/constants';
 import { womensNames } from '$lib/womensNames';
 
 import type { PageServerLoad } from './$types';
@@ -66,7 +62,7 @@ export const actions: Actions = {
       });
 
       return {
-        agent: agent?.toJSON({ flattenMaps: true }),
+        agent: agent?.toJSON({ flattenMaps: true, flattenObjectIds: true }),
         success: true,
         agentCreated: true
       };
@@ -259,14 +255,22 @@ export const load: PageServerLoad = async ({ locals }) => {
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const _disputedTickets = disputedTickets.map((ticket) =>
-    JSON.parse(JSON.stringify(ticket.toJSON({ flattenMaps: true })))
+    JSON.parse(
+      JSON.stringify(
+        ticket.toJSON({ flattenMaps: true, flattenObjectIds: true })
+      )
+    )
   );
 
   return {
-    operator: operator.toJSON({ flattenMaps: true }),
-    user: user.toJSON({ flattenMaps: true }),
-    agents: agents.map((agent) => agent.toJSON({ flattenMaps: true })),
-    creators: creators.map((creator) => creator.toJSON({ flattenMaps: true })),
+    operator: operator.toJSON({ flattenMaps: true, flattenObjectIds: true }),
+    user: user.toJSON({ flattenMaps: true, flattenObjectIds: true }),
+    agents: agents.map((agent) =>
+      agent.toJSON({ flattenMaps: true, flattenObjectIds: true })
+    ),
+    creators: creators.map((creator) =>
+      creator.toJSON({ flattenMaps: true, flattenObjectIds: true })
+    ),
     disputedTickets: _disputedTickets
   };
 };

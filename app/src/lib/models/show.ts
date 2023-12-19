@@ -20,7 +20,6 @@ import {
   finalizeZodSchema,
   moneyZodSchema,
   runtimeZodSchema,
-  salesStatsZodSchema,
   showSalesStatsZodSchema
 } from './common';
 
@@ -39,56 +38,49 @@ const showStateZodSchema = z.object({
   refunds: z
     .array(
       mongooseZodCustomType('ObjectId').mongooseTypeOptions({
-        ref: 'Ticket',
-        get: (value) => value?.toString()
+        ref: 'Ticket'
       })
     )
     .default([]),
   sales: z
     .array(
       mongooseZodCustomType('ObjectId').mongooseTypeOptions({
-        ref: 'Ticket',
-        get: (value) => value?.toString()
+        ref: 'Ticket'
       })
     )
     .default([]),
   disputes: z
     .array(
       mongooseZodCustomType('ObjectId').mongooseTypeOptions({
-        ref: 'Ticket',
-        get: (value) => value?.toString()
+        ref: 'Ticket'
       })
     )
     .default([]),
   reservations: z
     .array(
       mongooseZodCustomType('ObjectId').mongooseTypeOptions({
-        ref: 'Ticket',
-        get: (value) => value?.toString()
+        ref: 'Ticket'
       })
     )
     .default([]),
   redemptions: z
     .array(
       mongooseZodCustomType('ObjectId').mongooseTypeOptions({
-        ref: 'Ticket',
-        get: (value) => value?.toString()
+        ref: 'Ticket'
       })
     )
     .default([]),
   finalizations: z
     .array(
       mongooseZodCustomType('ObjectId').mongooseTypeOptions({
-        ref: 'Ticket',
-        get: (value) => value?.toString()
+        ref: 'Ticket'
       })
     )
     .default([]),
   cancellations: z
     .array(mongooseZodCustomType('ObjectId'))
     .mongooseTypeOptions({
-      ref: 'Ticket',
-      get: (value) => value?.toString()
+      ref: 'Ticket'
     })
     .default([]),
   current: z.boolean().default(true)
@@ -99,17 +91,14 @@ const showZodSchema = toZodMongooseSchema(
     .object({
       _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
         _id: true,
-        auto: true,
-        get: (value) => value?.toString()
+        auto: true
       }),
       creator: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
-        ref: 'Creator',
-        get: (value) => value?.toString()
+        ref: 'Creator'
       }),
       agent: mongooseZodCustomType('ObjectId')
         .mongooseTypeOptions({
-          ref: 'Agent',
-          get: (value) => value?.toString()
+          ref: 'Agent'
         })
         .optional(),
       roomId: z.string().default(nanoid),
@@ -132,12 +121,6 @@ const showZodSchema = toZodMongooseSchema(
   {
     schemaOptions: {
       collection: 'shows'
-    },
-    typeOptions: {
-      _id: {
-        auto: true,
-        get: (value) => value?.toString()
-      }
     }
   }
 );

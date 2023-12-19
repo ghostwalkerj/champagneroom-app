@@ -50,8 +50,7 @@ const ticketZodSchema = toZodMongooseSchema(
     .object({
       _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
         _id: true,
-        auto: true,
-        get: (value) => value?.toString()
+        auto: true
       }),
       paymentAddress: z
         .string()
@@ -72,15 +71,11 @@ const ticketZodSchema = toZodMongooseSchema(
         ref: 'User',
         required: true
       }),
-      agent: mongooseZodCustomType('ObjectId')
-        .optional()
-        .mongooseTypeOptions({
-          ref: 'Agent',
-          get: (value) => value?.toString()
-        }),
+      agent: mongooseZodCustomType('ObjectId').optional().mongooseTypeOptions({
+        ref: 'Agent'
+      }),
       creator: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
-        ref: 'Creator',
-        get: (value) => value?.toString()
+        ref: 'Creator'
       })
     })
     .merge(genTimestampsSchema()),

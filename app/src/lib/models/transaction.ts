@@ -22,8 +22,7 @@ const transactionZodSchema = toZodMongooseSchema(
     .object({
       _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
         _id: true,
-        auto: true,
-        get: (value) => value?.toString()
+        auto: true
       }),
       hash: z.string().trim().optional(),
       from: z.string().trim().optional(),
@@ -40,30 +39,20 @@ const transactionZodSchema = toZodMongooseSchema(
           message: 'Rate must be numeric'
         }),
       currency: z.nativeEnum(CurrencyType),
-      ticket: mongooseZodCustomType('ObjectId')
-        .optional()
-        .mongooseTypeOptions({
-          ref: 'Ticket',
-          get: (value) => value?.toString()
-        }),
+      ticket: mongooseZodCustomType('ObjectId').optional().mongooseTypeOptions({
+        ref: 'Ticket'
+      }),
       creator: mongooseZodCustomType('ObjectId')
         .optional()
         .mongooseTypeOptions({
-          ref: 'Creator',
-          get: (value) => value?.toString()
+          ref: 'Creator'
         }),
-      agent: mongooseZodCustomType('ObjectId')
-        .optional()
-        .mongooseTypeOptions({
-          ref: 'Agent',
-          get: (value) => value?.toString()
-        }),
-      show: mongooseZodCustomType('ObjectId')
-        .optional()
-        .mongooseTypeOptions({
-          ref: 'Show',
-          get: (value) => value?.toString()
-        }),
+      agent: mongooseZodCustomType('ObjectId').optional().mongooseTypeOptions({
+        ref: 'Agent'
+      }),
+      show: mongooseZodCustomType('ObjectId').optional().mongooseTypeOptions({
+        ref: 'Show'
+      }),
       bcPayoutId: z.string().trim().optional()
     })
     .merge(genTimestampsSchema()),
