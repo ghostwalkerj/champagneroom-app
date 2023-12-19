@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-import type { TransactionSummaryType } from '$lib/models/transaction';
-
 import { createTokenTokenPost } from '$ext/bitcart';
+
+import type { TransactionSummaryType } from './models/common';
 
 const permissions = ['full_control'];
 

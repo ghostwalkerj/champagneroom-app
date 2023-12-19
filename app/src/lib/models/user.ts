@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import type { Model, UpdateQuery } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
+import { fieldEncryption } from 'mongoose-field-encryption';
 import {
   genTimestampsSchema,
   mongooseZodCustomType,
@@ -14,7 +15,6 @@ import validator from 'validator';
 import Config from '$lib/config';
 import { AuthType, UserRole } from '$lib/constants';
 import { PermissionType } from '$lib/permissions';
-import { fieldEncryption } from 'mongoose-field-encryption';
 
 const { models } = pkg;
 
@@ -61,12 +61,7 @@ const userZodSchema = toZodMongooseSchema(
         .number()
         .min(0)
         .default(() => Math.floor(Math.random() * 1_000_000)),
-      secret: z
-        .string()
-        .max(50)
-        .min(21, 'Secret is too short')
-        .default(() => nanoid(21))
-        .optional(),
+      secret: z.string().max(50).min(21, 'Secret is too short').optional(),
       password: z
         .string()
         .max(80)
@@ -97,16 +92,20 @@ userSchema.index(
   { address: 1 },
   { unique: true, partialFilterExpression: { address: { $exists: true } } }
 );
+userSchema.index(
+  { secret: 1 },
+  { unique: true, partialFilterExpression: { secret: { $exists: true } } }
+);
 
 // const saltGenerator = (secret: string) => secret.slice(0, 16);
 // const hash = (secret) =>
 //   crypto.createHash('sha256').update(secret).digest('hex').slice(0, 32);
 
-userSchema.plugin(fieldEncryption, {
-  fields: ['secret'],
-  secret: process.env.MONGO_DB_FIELD_SECRET,
-  saltGenerator: (secret: string) => secret.slice(0, 16)
-});
+// userSchema.plugin(fieldEncryption, {
+//   fields: ['secret'],
+//   secret: process.env.MONGO_DB_FIELD_SECRET,
+//   saltGenerator: (secret: string) => secret.slice(0, 16)
+// });
 
 userSchema.pre('updateOne', async function (this: UpdateQuery<UserDocument>) {
   const update = { ...this.getUpdate() };

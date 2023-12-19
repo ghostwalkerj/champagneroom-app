@@ -18,6 +18,7 @@ import {
   escrowZodSchema,
   finalizeZodSchema,
   moneyZodSchema,
+  redemptionZodSchema,
   refundZodSchema,
   ticketFeedbackZodSchema,
   ticketSaleZodSchema
@@ -26,11 +27,6 @@ import type { ShowDocument } from './show';
 import type { UserDocument } from './user';
 
 const { models } = pkg;
-const redemptionZodSchema = z
-  .object({
-    redeemedAt: z.date().default(() => new Date())
-  })
-  .strict();
 
 const ticketStateZodSchema = z.object({
   status: z.nativeEnum(TicketStatus).default(TicketStatus.RESERVED),

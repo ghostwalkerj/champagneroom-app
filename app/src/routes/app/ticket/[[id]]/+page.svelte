@@ -5,16 +5,22 @@
   import type { Unsubscriber } from 'svelte/store';
   import web3 from 'web3';
 
-  import { refundZodSchema, disputeZodSchema } from '$lib/models/common';
-  import { DisputeReason, RefundReason, ShowStatus } from '$lib/constants';
+  import {
+    refundZodSchema,
+    disputeZodSchema,
+    TicketMachineEventString
+  } from '$lib/models/common';
+  import {
+    DisputeReason,
+    RefundReason,
+    ShowStatus,
+    TicketStatus
+  } from '$lib/constants';
   import type { ShowDocument } from '$lib/models/show';
   import type { UserDocument } from '$lib/models/user';
 
   import type { TicketMachineServiceType } from '$lib/machines/ticketMachine';
-  import {
-    createTicketMachineService,
-    TicketMachineEventString
-  } from '$lib/machines/ticketMachine';
+  import { createTicketMachineService } from '$lib/machines/ticketMachine';
 
   import { ActorType } from '$lib/constants';
   import { InvoiceStatus, type PaymentType } from '$lib/payment';
@@ -28,7 +34,7 @@
   import TicketDetail from './TicketDetail.svelte';
   import TicketInvoice from './TicketInvoice.svelte';
 
-  import { TicketStatus, type TicketDocument } from '$lib/models/ticket';
+  import type { TicketDocument } from '$lib/models/ticket';
   import type { ActionData, PageData } from './$types';
   import VideoMeeting from './VideoMeeting.svelte';
 
