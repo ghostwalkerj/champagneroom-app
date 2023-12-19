@@ -129,6 +129,11 @@ const createShowMachine = ({
         ) as ShowStateType,
         errorMessage: undefined as string | undefined,
         id: nanoid()
+      } as {
+        showDocument: ShowDocument;
+        showState: ShowStateType;
+        errorMessage: string | undefined;
+        id: string;
       },
       tsTypes: {} as import('./showMachine.typegen.d.ts').Typegen0,
       schema: {
