@@ -4,8 +4,6 @@
 
   import { applyAction, deserialize, enhance } from '$app/forms';
 
-  import type { ShowDocument } from '$lib/models/show';
-
   import Config from '$lib/config';
   import getProfileImage from '$lib/profilePhoto';
 
