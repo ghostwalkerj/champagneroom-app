@@ -16,7 +16,7 @@ import {
   cancelZodSchema,
   disputeZodSchema,
   escrowZodSchema,
-  feedbackStatsZodSchema,
+  feedbackZodSchema,
   finalizeZodSchema,
   moneyZodSchema,
   refundZodSchema,
@@ -40,7 +40,7 @@ const ticketStateZodSchema = z.object({
   escrow: escrowZodSchema.optional(),
   dispute: disputeZodSchema.optional(),
   finalize: finalizeZodSchema.optional(),
-  feedback: feedbackStatsZodSchema.optional(),
+  feedback: feedbackZodSchema.optional(),
   refund: refundZodSchema.optional(),
   sale: saleZodSchema.optional()
 });

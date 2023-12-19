@@ -38,7 +38,7 @@ const showStateZodSchema = z.object({
   refunds: z
     .array(
       mongooseZodCustomType('ObjectId').mongooseTypeOptions({
-        ref: 'Ticket.ticketState.refund',
+        ref: 'Ticket',
         get: (value) => value?.toString()
       })
     )
@@ -46,7 +46,7 @@ const showStateZodSchema = z.object({
   sales: z
     .array(
       mongooseZodCustomType('ObjectId').mongooseTypeOptions({
-        ref: 'Ticket.ticketState.sale',
+        ref: 'Ticket',
         get: (value) => value?.toString()
       })
     )
@@ -54,7 +54,7 @@ const showStateZodSchema = z.object({
   disputes: z
     .array(
       mongooseZodCustomType('ObjectId').mongooseTypeOptions({
-        ref: 'Ticket.ticketState.dispute',
+        ref: 'Ticket',
         get: (value) => value?.toString()
       })
     )
@@ -131,6 +131,12 @@ const showZodSchema = toZodMongooseSchema(
   {
     schemaOptions: {
       collection: 'shows'
+    },
+    typeOptions: {
+      _id: {
+        auto: true,
+        get: (value) => value?.toString()
+      }
     }
   }
 );
@@ -145,12 +151,12 @@ export const SaveState = (show: ShowDocument, newState: ShowStateType) => {
 
 type ShowDocumentType = z.infer<typeof showZodSchema>;
 
-// showSchema.index({ agent: 1, 'showState.finalize.finalizedAt': -1 });
-// showSchema.plugin(fieldEncryption, {
-//   fields: ['roomId'],
-//   secret: process.env.MONGO_DB_FIELD_SECRET,
-//   saltGenerator: (secret: string) => secret.slice(0, 16)
-// });
+showSchema.index({ agent: 1, 'showState.finalize.finalizedAt': -1 });
+showSchema.plugin(fieldEncryption, {
+  fields: ['roomId'],
+  secret: process.env.MONGO_DB_FIELD_SECRET,
+  saltGenerator: (secret: string) => secret.slice(0, 16)
+});
 export const Show = pkg.models.Show ?? pkg.model('Show', showSchema);
 
 export { ShowDocumentType };

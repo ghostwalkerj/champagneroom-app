@@ -5,31 +5,28 @@ import { waitFor } from 'xstate/lib/waitFor';
 
 import type { AgentDocument } from '$lib/models/agent';
 import { Agent } from '$lib/models/agent';
-import type {
-  CancelType,
-  DisputeType,
-  FinalizeType,
-  RefundType,
-  SaleType
-} from '$lib/models/common';
+import type { CancelType, FinalizeType } from '$lib/models/common';
 import type { CreatorDocument } from '$lib/models/creator';
 import { Creator } from '$lib/models/creator';
 import type { ShowDocument } from '$lib/models/show';
-import { SaveState, Show, ShowStatus } from '$lib/models/show';
+import { SaveState, Show } from '$lib/models/show';
 import { createShowEvent } from '$lib/models/showEvent';
 import type { TicketDocument } from '$lib/models/ticket';
 import { Ticket, TicketStatus } from '$lib/models/ticket';
 
-import {
-  createShowMachineService,
-  ShowMachineEventString
-} from '$lib/machines/showMachine';
+import { createShowMachineService } from '$lib/machines/showMachine';
 import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
 import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 import { WalletMachineEventString } from '$lib/machines/walletMachine';
 
 import Config from '$lib/config';
-import { ActorType, DisputeDecision, EntityType } from '$lib/constants';
+import {
+  ActorType,
+  DisputeDecision,
+  EntityType,
+  ShowMachineEventString,
+  ShowStatus
+} from '$lib/constants';
 import { PayoutJobType } from '$lib/payment';
 import {
   getTicketMachineService,
@@ -93,7 +90,7 @@ export const getShowWorker = ({
           return customerLeft(show, job.data.ticketId);
         }
         case ShowMachineEventString.TICKET_SOLD: {
-          return ticketSold(show, job.data.ticketId, job.data.sale);
+          return ticketSold(show, job.data.ticketId);
         }
         case ShowMachineEventString.TICKET_REDEEMED: {
           return ticketRedeemed(show, job.data.ticketId);
@@ -102,21 +99,16 @@ export const getShowWorker = ({
           return ticketReserved(show, job.data.ticketId);
         }
         case ShowMachineEventString.TICKET_REFUNDED: {
-          return ticketRefunded(show, job.data.refund, job.data.ticketId);
+          return ticketRefunded(show, job.data.ticketId);
         }
         case ShowMachineEventString.TICKET_CANCELLED: {
-          return ticketCancelled(
-            show,
-            job.data.ticketId,
-            job.data.customerName,
-            job.data.cancel
-          );
+          return ticketCancelled(show, job.data.ticketId);
         }
         case ShowMachineEventString.TICKET_FINALIZED: {
           return ticketFinalized(show, job.data.ticketId, showQueue);
         }
         case ShowMachineEventString.TICKET_DISPUTED: {
-          return ticketDisputed(show, job.data.dispute, job.data.ticketId);
+          return ticketDisputed(show, job.data.ticketId);
         }
         case ShowMachineEventString.DISPUTE_DECIDED: {
           return ticketDisputeResolved(
@@ -673,11 +665,7 @@ const customerLeft = async (show: ShowDocument, ticketId: string) => {
   return 'success';
 };
 
-const ticketSold = async (
-  show: ShowDocument,
-  ticketId: string,
-  sale: SaleType
-) => {
+const ticketSold = async (show: ShowDocument, ticketId: string) => {
   const showService = createShowMachineService({
     showDocument: show,
     showMachineOptions: {
@@ -701,8 +689,7 @@ const ticketSold = async (
 
   showService.send({
     type: ShowMachineEventString.TICKET_SOLD,
-    ticket,
-    sale
+    ticket
   });
   showService.stop();
   return 'success';
@@ -770,11 +757,7 @@ const ticketReserved = async (show: ShowDocument, ticketId: string) => {
   return 'success';
 };
 
-const ticketRefunded = async (
-  show: ShowDocument,
-  refund: RefundType,
-  ticketId: string
-) => {
+const ticketRefunded = async (show: ShowDocument, ticketId: string) => {
   const showService = createShowMachineService({
     showDocument: show,
     showMachineOptions: {
@@ -799,18 +782,12 @@ const ticketRefunded = async (
 
   showService.send({
     type: ShowMachineEventString.TICKET_REFUNDED,
-    refund,
     ticket
   });
   return 'success';
 };
 
-const ticketCancelled = async (
-  show: ShowDocument,
-  ticketId: string,
-  customerName: string,
-  cancel: CancelType
-) => {
+const ticketCancelled = async (show: ShowDocument, ticketId: string) => {
   const showService = createShowMachineService({
     showDocument: show,
     showMachineOptions: {
@@ -837,16 +814,14 @@ const ticketCancelled = async (
   if (
     !showState.can({
       type: ShowMachineEventString.TICKET_CANCELLED,
-      ticket,
-      cancel
+      ticket
     })
   )
     return 'Ticket already cancelled';
 
   showService.send({
     type: ShowMachineEventString.TICKET_CANCELLED,
-    ticket,
-    cancel
+    ticket
   });
   showService.stop();
   return 'success';
@@ -985,11 +960,7 @@ const ticketFinalized = async (
   return 'success';
 };
 
-const ticketDisputed = async (
-  show: ShowDocument,
-  dispute: DisputeType,
-  ticketId: string
-) => {
+const ticketDisputed = async (show: ShowDocument, ticketId: string) => {
   const showService = createShowMachineService({
     showDocument: show,
     showMachineOptions: {
@@ -1014,7 +985,6 @@ const ticketDisputed = async (
 
   showService.send({
     type: ShowMachineEventString.TICKET_DISPUTED,
-    dispute,
     ticket
   });
   showService.stop();

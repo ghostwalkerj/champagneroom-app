@@ -21,7 +21,23 @@ enum WalletStatus {
   PAYOUT_IN_PROGRESS = 'PAYOUT IN PROGRESS'
 }
 
-const walletZodSchema = toZodMongooseSchema(
+const earningsZodMongooseSchema = toZodMongooseSchema(earningsZodSchema, {
+  typeOptions: {
+    show: {
+      ref: 'Show'
+    }
+  }
+});
+
+const payoutZodMongooseSchema = toZodMongooseSchema(payoutZodSchema, {
+  typeOptions: {
+    transaction: {
+      ref: 'Transaction'
+    }
+  }
+});
+
+const walletZodMongooseSchema = toZodMongooseSchema(
   z
     .object({
       _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
@@ -34,8 +50,8 @@ const walletZodSchema = toZodMongooseSchema(
       balance: z.number().default(0),
       availableBalance: z.number().default(0),
       onHoldBalance: z.number().default(0),
-      earnings: z.array(earningsZodSchema).default([]),
-      payouts: z.array(payoutZodSchema).default([]),
+      earnings: z.array(earningsZodMongooseSchema).default([]),
+      payouts: z.array(payoutZodMongooseSchema).default([]),
       active: z.boolean().default(true)
     })
     .merge(genTimestampsSchema()),
@@ -45,9 +61,9 @@ const walletZodSchema = toZodMongooseSchema(
     }
   }
 );
-const walletSchema = toMongooseSchema(walletZodSchema);
+const walletSchema = toMongooseSchema(walletZodMongooseSchema);
 
-export type WalletDocumentType = z.infer<typeof walletZodSchema>;
+export type WalletDocumentType = z.infer<typeof walletZodMongooseSchema>;
 
 export const Wallet = models?.Wallet
   ? (models.Wallet as Model<WalletDocumentType>)

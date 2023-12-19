@@ -7,14 +7,11 @@ import { raise } from 'xstate/lib/actions';
 import {
   type CancelType,
   disputeStatsZodSchema,
-  type DisputeType,
   escrowZodSchema,
   type FinalizeType,
   finalizeZodSchema,
-  type RefundType,
   runtimeZodSchema,
-  salesStatsZodSchema,
-  type SaleType
+  salesStatsZodSchema
 } from '$lib/models/common';
 import type { ShowDocument } from '$lib/models/show';
 import type { TicketDocument } from '$lib/models/ticket';
@@ -37,7 +34,6 @@ export type ShowMachineEventType =
   | {
       type: 'TICKET REFUNDED';
       ticket: TicketDocument;
-      refund: RefundType;
     }
   | {
       type: 'TICKET REDEEMED';
@@ -50,12 +46,10 @@ export type ShowMachineEventType =
   | {
       type: 'TICKET CANCELLED';
       ticket: TicketDocument;
-      cancel: CancelType;
     }
   | {
       type: 'TICKET SOLD';
       ticket: TicketDocument;
-      sale: SaleType;
     }
   | {
       type: 'SHOW STARTED';
@@ -80,7 +74,6 @@ export type ShowMachineEventType =
     }
   | {
       type: 'TICKET DISPUTED';
-      dispute: DisputeType;
       ticket: TicketDocument;
     }
   | {
@@ -476,7 +469,7 @@ const createShowMachine = ({
             showState: {
               ...st,
               status: ShowStatus.IN_DISPUTE,
-              disputes: [...st.disputes, event.dispute._id!],
+              disputes: [...st.disputes, event.ticket._id],
               disputeStats: disputeStatsZodSchema.parse({
                 ...st.disputeStats,
                 totalDisputes: st.disputeStats.totalDisputes + 1,
@@ -506,13 +499,12 @@ const createShowMachine = ({
 
         refundTicket: assign((context, event) => {
           const st = context.showState;
-          const refund = event.refund;
           const salesStats = st.salesStats;
 
           salesStats.ticketsRefunded += 1;
           salesStats.ticketsSold -= 1;
           salesStats.ticketsAvailable += 1;
-          st.refunds.push(refund._id!);
+          st.refunds.push(event.ticket._id);
 
           return {
             showState: {
@@ -536,7 +528,7 @@ const createShowMachine = ({
 
         cancelTicket: assign((context, event) => {
           const st = context.showState;
-          st.cancellations.push(event.cancel._id);
+          st.cancellations.push(event.ticket._id);
           return {
             showState: {
               ...st,
@@ -592,11 +584,10 @@ const createShowMachine = ({
 
         sellTicket: assign((context, event) => {
           const st = context.showState;
-          const sale = event.sale;
           st.salesStats.ticketsSold += 1;
           st.salesStats.ticketsReserved -= 1;
 
-          st.sales.push(sale._id!);
+          st.sales.push(event.ticket._id);
           return {
             showState: {
               ...st
