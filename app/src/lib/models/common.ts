@@ -36,6 +36,24 @@ export type TransactionSummaryType = z.infer<
   typeof transactionSummaryZodSchema
 >;
 
+export enum TicketMachineEventString {
+  CANCELLATION_REQUESTED = 'CANCELLATION REQUESTED',
+  REFUND_RECEIVED = 'REFUND RECEIVED',
+  PAYMENT_INITIATED = 'PAYMENT INITIATED',
+  PAYMENT_RECEIVED = 'PAYMENT RECEIVED',
+  FEEDBACK_RECEIVED = 'FEEDBACK RECEIVED',
+  DISPUTE_INITIATED = 'DISPUTE INITIATED',
+  SHOW_JOINED = 'SHOW JOINED',
+  SHOW_LEFT = 'SHOW LEFT',
+  SHOW_ENDED = 'SHOW ENDED',
+  SHOW_CANCELLED = 'SHOW CANCELLED',
+  TICKET_FINALIZED = 'TICKET FINALIZED',
+  DISPUTE_DECIDED = 'DISPUTE DECIDED',
+  TICKET_REDEEMED = 'TICKET REDEEMED',
+  REFUND_REQUESTED = 'REFUND REQUESTED',
+  REFUND_INITIATED = 'REFUND INITIATED'
+}
+
 export const cancelZodSchema = z.object({
   cancelledAt: z.date().default(() => new Date()),
   cancelledInState: z.string().optional(),
@@ -63,7 +81,7 @@ export const disputeZodSchema = z.object({
   endedAt: z.date().optional(),
   reason: z.nativeEnum(DisputeReason),
   disputedBy: z.nativeEnum(ActorType),
-  explanation: z.string().min(10).max(500),
+  explanation: z.string().min(10).max(500).optional(),
   decision: z.nativeEnum(DisputeDecision).optional(),
   resolved: z.boolean().default(false)
 });
@@ -95,17 +113,17 @@ export const finalizeZodSchema = z.object({
   finalizedBy: z.nativeEnum(ActorType)
 });
 
-export const moneyZodSchema = z.object({
-  amount: z.number().min(0).default(0),
-  currency: z.nativeEnum(CurrencyType).default(CurrencyType.USD)
-});
-
 const transactionSummaryZodSchema = z.object({
   createdAt: z.date().default(() => new Date()),
   amount: z.number().min(0),
   currency: z.nativeEnum(CurrencyType),
   rate: z.number().min(0).default(0),
   transaction: z.any().optional()
+});
+
+export const moneyZodSchema = z.object({
+  amount: z.number().min(0).default(0),
+  currency: z.nativeEnum(CurrencyType).default(CurrencyType.USD)
 });
 
 export const payoutZodSchema = z.object({
@@ -122,12 +140,18 @@ export const payoutZodSchema = z.object({
   transaction: z.any().optional()
 });
 
+export const redemptionZodSchema = z
+  .object({
+    redeemedAt: z.date().default(() => new Date())
+  })
+  .strict();
+
 export const refundZodSchema = z.object({
   requestedAt: z.date().default(() => new Date()),
   requestedAmounts: z.record(z.number()).default({}),
   approvedAmounts: z.record(z.number()).default({}),
   totals: z.record(z.number()).default({}),
-  payouts: z.array(transactionSummaryZodSchema),
+  payouts: z.array(transactionSummaryZodSchema).default([]),
   reason: z.nativeEnum(RefundReason)
 });
 
@@ -170,7 +194,7 @@ export const ticketFeedbackZodSchema = z.object({
 
 export const ticketSaleZodSchema = z.object({
   soldAt: z.date().default(() => new Date()),
-  payments: z.array(transactionSummaryZodSchema),
+  payments: z.array(transactionSummaryZodSchema).default([]),
   totals: z.record(z.number()).default({})
 });
 

@@ -14,6 +14,7 @@ import {
   escrowZodSchema,
   type FinalizeType,
   finalizeZodSchema,
+  redemptionZodSchema,
   type RefundType,
   refundZodSchema,
   type SaleType,
@@ -21,7 +22,6 @@ import {
   transactionSummaryZodSchema
 } from '$lib/models/common';
 import type { TicketDocument, TicketStateType } from '$lib/models/ticket';
-import { redemptionZodSchema, TicketStatus } from '$lib/models/ticket';
 import type { TransactionDocument } from '$lib/models/transaction';
 
 import type { ShowJobDataType } from '$lib/workers/showWorker';
@@ -31,7 +31,8 @@ import {
   ActorType,
   DisputeDecision,
   RefundReason,
-  ShowMachineEventString
+  ShowMachineEventString,
+  TicketStatus
 } from '$lib/constants';
 import { calcTotal } from '$lib/payment';
 
@@ -827,24 +828,6 @@ export type TicketMachineStateType = StateFrom<
 >;
 
 export type TicketMachineType = ReturnType<typeof createTicketMachine>;
-
-export enum TicketMachineEventString {
-  CANCELLATION_REQUESTED = 'CANCELLATION REQUESTED',
-  REFUND_RECEIVED = 'REFUND RECEIVED',
-  PAYMENT_INITIATED = 'PAYMENT INITIATED',
-  PAYMENT_RECEIVED = 'PAYMENT RECEIVED',
-  FEEDBACK_RECEIVED = 'FEEDBACK RECEIVED',
-  DISPUTE_INITIATED = 'DISPUTE INITIATED',
-  SHOW_JOINED = 'SHOW JOINED',
-  SHOW_LEFT = 'SHOW LEFT',
-  SHOW_ENDED = 'SHOW ENDED',
-  SHOW_CANCELLED = 'SHOW CANCELLED',
-  TICKET_FINALIZED = 'TICKET FINALIZED',
-  DISPUTE_DECIDED = 'DISPUTE DECIDED',
-  TICKET_REDEEMED = 'TICKET REDEEMED',
-  REFUND_REQUESTED = 'REFUND REQUESTED',
-  REFUND_INITIATED = 'REFUND INITIATED'
-}
 
 export { TicketMachineEventType };
 

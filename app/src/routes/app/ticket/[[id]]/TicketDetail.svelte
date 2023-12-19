@@ -2,11 +2,15 @@
   import urlJoin from 'url-join';
 
   import type { ShowDocumentType } from '$lib/models/show';
-  import { TicketStatus, type TicketDocumentType } from '$lib/models/ticket';
+  import type { TicketDocumentType } from '$lib/models/ticket';
   import type { UserDocumentType } from '$lib/models/user';
 
   import Config from '$lib/config';
-  import { currencyFormatter, durationFormatter } from '$lib/constants';
+  import {
+    TicketStatus,
+    currencyFormatter,
+    durationFormatter
+  } from '$lib/constants';
   export let show: ShowDocumentType;
   export let ticket: TicketDocumentType;
   export let user: UserDocumentType;
