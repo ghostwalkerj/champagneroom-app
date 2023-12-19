@@ -361,7 +361,8 @@ export const load: PageServerLoad = async ({ locals }) => {
       : undefined,
     showEvent: showEvent
       ? showEvent.toJSON({
-          flattenMaps: true
+          flattenMaps: true,
+          flattenObjectIds: true
         })
       : undefined,
     completedShows: completedShows.map((show) =>

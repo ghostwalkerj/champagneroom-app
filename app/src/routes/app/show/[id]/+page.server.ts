@@ -19,12 +19,11 @@ import {
   JWT_PRIVATE_KEY
 } from '$env/static/private';
 
+import { TicketMachineEventString } from '$lib/models/common';
 import { Show } from '$lib/models/show';
 import type { TicketDocument } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
 import { User } from '$lib/models/user';
-
-import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 
 import type { ShowQueueType } from '$lib/workers/showWorker';
 

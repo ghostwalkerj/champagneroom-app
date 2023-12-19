@@ -5,7 +5,12 @@ import { waitFor } from 'xstate/lib/waitFor';
 
 import type { AgentDocument } from '$lib/models/agent';
 import { Agent } from '$lib/models/agent';
-import type { CancelType, FinalizeType } from '$lib/models/common';
+import {
+  type CancelType,
+  type FinalizeType,
+  TicketMachineEventString,
+  WalletMachineEventString
+} from '$lib/models/common';
 import type { CreatorDocument } from '$lib/models/creator';
 import { Creator } from '$lib/models/creator';
 import type { ShowDocument } from '$lib/models/show';
@@ -16,8 +21,6 @@ import { Ticket, TicketStatus } from '$lib/models/ticket';
 
 import { createShowMachineService } from '$lib/machines/showMachine';
 import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
-import { TicketMachineEventString } from '$lib/machines/ticketMachine';
-import { WalletMachineEventString } from '$lib/machines/walletMachine';
 
 import Config from '$lib/config';
 import {

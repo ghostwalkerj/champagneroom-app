@@ -19,7 +19,6 @@
   import type { ShowDocument } from '$lib/models/show';
   import type { UserDocument } from '$lib/models/user';
 
-  import type { TicketMachineServiceType } from '$lib/machines/ticketMachine';
   import { createTicketMachineService } from '$lib/machines/ticketMachine';
 
   import { ActorType } from '$lib/constants';

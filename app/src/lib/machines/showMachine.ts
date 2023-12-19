@@ -11,7 +11,7 @@ import {
   type FinalizeType,
   finalizeZodSchema,
   runtimeZodSchema,
-  salesStatsZodSchema
+  showSalesStatsZodSchema
 } from '$lib/models/common';
 import type { ShowDocument } from '$lib/models/show';
 import type { TicketDocument } from '$lib/models/ticket';
@@ -445,7 +445,7 @@ const createShowMachine = ({
             showState: {
               ...context.showState,
               status: ShowStatus.CANCELLATION_INITIATED,
-              salesStats: salesStatsZodSchema.parse({
+              salesStats: showSalesStatsZodSchema.parse({
                 ...context.showState.salesStats,
                 ticketsAvailable: 0
               }),
@@ -509,7 +509,7 @@ const createShowMachine = ({
           return {
             showState: {
               ...st,
-              salesStats: salesStatsZodSchema.parse({
+              salesStats: showSalesStatsZodSchema.parse({
                 ...salesStats
               })
             }
@@ -532,7 +532,7 @@ const createShowMachine = ({
           return {
             showState: {
               ...st,
-              salesStats: salesStatsZodSchema.parse({
+              salesStats: showSalesStatsZodSchema.parse({
                 ...st.salesStats,
                 ticketsAvailable: st.salesStats.ticketsAvailable + 1,
                 ticketsReserved: st.salesStats.ticketsReserved - 1
@@ -547,7 +547,7 @@ const createShowMachine = ({
           return {
             showState: {
               ...st,
-              salesStats: salesStatsZodSchema.parse({
+              salesStats: showSalesStatsZodSchema.parse({
                 ...st.salesStats,
                 ticketsAvailable: st.salesStats.ticketsAvailable - 1,
                 ticketsReserved: st.salesStats.ticketsReserved + 1
@@ -563,7 +563,7 @@ const createShowMachine = ({
           return {
             showState: {
               ...st,
-              salesStats: salesStatsZodSchema.parse({
+              salesStats: showSalesStatsZodSchema.parse({
                 ...st.salesStats,
                 ticketsRedeemed: st.salesStats.ticketsRedeemed + 1
               })
