@@ -36,34 +36,6 @@ export type TransactionSummaryType = z.infer<
   typeof transactionSummaryZodSchema
 >;
 
-export enum TicketMachineEventString {
-  CANCELLATION_REQUESTED = 'CANCELLATION REQUESTED',
-  REFUND_RECEIVED = 'REFUND RECEIVED',
-  PAYMENT_INITIATED = 'PAYMENT INITIATED',
-  PAYMENT_RECEIVED = 'PAYMENT RECEIVED',
-  FEEDBACK_RECEIVED = 'FEEDBACK RECEIVED',
-  DISPUTE_INITIATED = 'DISPUTE INITIATED',
-  SHOW_JOINED = 'SHOW JOINED',
-  SHOW_LEFT = 'SHOW LEFT',
-  SHOW_ENDED = 'SHOW ENDED',
-  SHOW_CANCELLED = 'SHOW CANCELLED',
-  TICKET_FINALIZED = 'TICKET FINALIZED',
-  DISPUTE_DECIDED = 'DISPUTE DECIDED',
-  TICKET_REDEEMED = 'TICKET REDEEMED',
-  REFUND_REQUESTED = 'REFUND REQUESTED',
-  REFUND_INITIATED = 'REFUND INITIATED'
-}
-
-export enum WalletMachineEventString {
-  SHOW_EARNINGS_POSTED = 'SHOW EARNINGS POSTED',
-  SHOW_COMMISSION_POSTED = 'SHOW COMMISSION POSTED',
-  PAYOUT_REQUESTED = 'PAYOUT REQUESTED',
-  PAYOUT_SENT = 'PAYOUT SENT',
-  PAYOUT_FAILED = 'PAYOUT FAILED',
-  PAYOUT_CANCELLED = 'PAYOUT CANCELLED',
-  PAYOUT_COMPLETE = 'PAYOUT COMPLETE'
-}
-
 export const cancelZodSchema = z.object({
   cancelledAt: z.date().default(() => new Date()),
   cancelledInState: z.string().optional(),
@@ -78,13 +50,6 @@ export const creatorInfoZodSchema = z.object({
   numberOfReviews: z.number().min(0).default(0)
 });
 
-export const disputeStatsZodSchema = z.object({
-  totalDisputes: z.number().min(0).default(0),
-  totalDisputesRefunded: z.number().min(0).default(0),
-  totalDisputesResolved: z.number().min(0).default(0),
-  totalDisputesPending: z.number().min(0).default(0)
-});
-
 export const creatorSalesStatsZodSchema = z
   .object({
     totalRevenue: z.record(z.number()).default({}),
@@ -94,6 +59,13 @@ export const creatorSalesStatsZodSchema = z
     totalRefunds: z.record(z.number()).default({})
   })
   .strict();
+
+export const disputeStatsZodSchema = z.object({
+  totalDisputes: z.number().min(0).default(0),
+  totalDisputesRefunded: z.number().min(0).default(0),
+  totalDisputesResolved: z.number().min(0).default(0),
+  totalDisputesPending: z.number().min(0).default(0)
+});
 
 export const disputeZodSchema = z.object({
   _id: z.any().optional(),
@@ -154,7 +126,7 @@ export const payoutZodSchema = z.object({
     .refine((value) => validator.isEthereumAddress(value), {
       message: 'Invalid Ethereum address'
     }),
-  currency: z.nativeEnum(CurrencyType).default(CurrencyType.ETH),
+  payoutCurrency: z.nativeEnum(CurrencyType).default(CurrencyType.ETH),
   bcPayoutId: z.string().optional(),
   payoutStatus: z.nativeEnum(PayoutStatus).optional(),
   transaction: z.any().optional()
@@ -168,11 +140,12 @@ export const redemptionZodSchema = z
 
 export const refundZodSchema = z.object({
   requestedAt: z.date().default(() => new Date()),
-  requestedAmounts: z.record(z.number()).default({}),
-  approvedAmounts: z.record(z.number()).default({}),
-  totals: z.record(z.number()).default({}),
+  requestedAmount: z.number().min(0).default(0),
+  approvedAmount: z.number().min(0).default(0),
+  total: z.number().min(0).default(0),
   payouts: z.array(transactionSummaryZodSchema).default([]),
-  reason: z.nativeEnum(RefundReason)
+  reason: z.nativeEnum(RefundReason),
+  refundCurrency: z.nativeEnum(CurrencyType).default(CurrencyType.ETH)
 });
 
 export const runtimeZodSchema = z.object({
@@ -205,7 +178,8 @@ export const ticketFeedbackZodSchema = z.object({
 export const ticketSaleZodSchema = z.object({
   soldAt: z.date().default(() => new Date()),
   payments: z.array(transactionSummaryZodSchema).default([]),
-  totals: z.record(z.number()).default({})
+  total: z.number().min(0).default(0),
+  paymentCurrency: z.nativeEnum(CurrencyType).default(CurrencyType.ETH)
 });
 
 export { transactionSummaryZodSchema };

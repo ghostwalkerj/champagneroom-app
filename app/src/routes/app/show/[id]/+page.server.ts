@@ -19,7 +19,6 @@ import {
   JWT_PRIVATE_KEY
 } from '$env/static/private';
 
-import { TicketMachineEventString } from '$lib/models/common';
 import { Show } from '$lib/models/show';
 import type { TicketDocument } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
@@ -30,8 +29,10 @@ import type { ShowQueueType } from '$lib/workers/showWorker';
 import Config from '$lib/config';
 import {
   AuthType,
+  CurrencyType,
   EntityType,
   ShowMachineEventString,
+  TicketMachineEventString,
   UserRole
 } from '$lib/constants';
 import { authEncrypt } from '$lib/crypt';
@@ -187,7 +188,8 @@ export const actions: Actions = {
     if (ticket.price.amount === 0 && ticket.bcInvoiceId) {
       const ticketService = getTicketMachineService(ticket, redisConnection);
       ticketService.send({
-        type: TicketMachineEventString.PAYMENT_INITIATED
+        type: TicketMachineEventString.PAYMENT_INITIATED,
+        paymentCurrency: CurrencyType.NONE
       });
 
       ticketService?.stop();

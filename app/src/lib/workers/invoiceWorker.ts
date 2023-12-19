@@ -3,13 +3,18 @@ import type { Job, Queue } from 'bullmq';
 import { Worker } from 'bullmq';
 import type IORedis from 'ioredis';
 
-import { cancelZodSchema, TicketMachineEventString } from '$lib/models/common';
+import { cancelZodSchema } from '$lib/models/common';
 import type { TicketDocument } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
 import type { TransactionDocument } from '$lib/models/transaction';
 import { Transaction, TransactionReasonType } from '$lib/models/transaction';
 
-import { ActorType, CancelReason, EntityType } from '$lib/constants';
+import {
+  ActorType,
+  CancelReason,
+  EntityType,
+  TicketMachineEventString
+} from '$lib/constants';
 import {
   getInvoiceByIdInvoicesModelIdGet,
   getPayoutByIdPayoutsModelIdGet,

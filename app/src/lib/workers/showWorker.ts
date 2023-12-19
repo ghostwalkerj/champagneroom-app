@@ -5,12 +5,7 @@ import { waitFor } from 'xstate/lib/waitFor';
 
 import type { AgentDocument } from '$lib/models/agent';
 import { Agent } from '$lib/models/agent';
-import {
-  type CancelType,
-  type FinalizeType,
-  TicketMachineEventString,
-  WalletMachineEventString
-} from '$lib/models/common';
+import type { CancelType, FinalizeType } from '$lib/models/common';
 import type { CreatorDocument } from '$lib/models/creator';
 import { Creator } from '$lib/models/creator';
 import type { ShowDocument } from '$lib/models/show';
@@ -28,7 +23,9 @@ import {
   DisputeDecision,
   EntityType,
   ShowMachineEventString,
-  ShowStatus
+  ShowStatus,
+  TicketMachineEventString,
+  WalletMachineEventString
 } from '$lib/constants';
 import { PayoutJobType } from '$lib/payment';
 import {
@@ -1052,13 +1049,8 @@ const ticketDisputeResolved = async (
       return 'No refund for dispute';
     }
 
-    refund.approvedAmounts = JSON.parse(JSON.stringify(refund.approvedAmounts));
-
     if (decision === DisputeDecision.PARTIAL_REFUND) {
-      for (const key in refund.requestedAmounts) {
-        const value = refund.requestedAmounts[key];
-        refund.approvedAmounts[key] = value / 2;
-      }
+      refund.approvedAmount = refund.requestedAmount / 2;
     }
 
     ticketService.send({
