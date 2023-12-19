@@ -84,8 +84,7 @@ export const actions: Actions = {
     const show = new Show({
       price: {
         amount: +price,
-        currency: CurrencyType.USD,
-        rate: 1
+        currency: CurrencyType.USD
       },
       name,
       duration: +duration,

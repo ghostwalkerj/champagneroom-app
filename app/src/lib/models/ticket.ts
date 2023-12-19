@@ -16,11 +16,11 @@ import {
   cancelZodSchema,
   disputeZodSchema,
   escrowZodSchema,
-  feedbackZodSchema,
   finalizeZodSchema,
   moneyZodSchema,
   refundZodSchema,
-  saleZodSchema
+  ticketFeedbackZodSchema,
+  ticketSaleZodSchema
 } from './common';
 import type { ShowDocument } from './show';
 import type { UserDocument } from './user';
@@ -40,9 +40,9 @@ const ticketStateZodSchema = z.object({
   escrow: escrowZodSchema.optional(),
   dispute: disputeZodSchema.optional(),
   finalize: finalizeZodSchema.optional(),
-  feedback: feedbackZodSchema.optional(),
+  feedback: ticketFeedbackZodSchema.optional(),
   refund: refundZodSchema.optional(),
-  sale: saleZodSchema.optional()
+  sale: ticketSaleZodSchema.optional()
 });
 
 const ticketZodSchema = toZodMongooseSchema(

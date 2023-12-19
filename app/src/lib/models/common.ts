@@ -20,7 +20,7 @@ export type EarningsType = z.infer<typeof earningsZodSchema>;
 
 export type EscrowType = z.infer<typeof escrowZodSchema>;
 
-export type FeedbackType = z.infer<typeof feedbackZodSchema>;
+export type FeedbackType = z.infer<typeof ticketFeedbackZodSchema>;
 
 export type FinalizeType = z.infer<typeof finalizeZodSchema>;
 
@@ -30,7 +30,7 @@ export type PayoutType = z.infer<typeof payoutZodSchema>;
 
 export type RefundType = z.infer<typeof refundZodSchema>;
 
-export type SaleType = z.infer<typeof saleZodSchema>;
+export type SaleType = z.infer<typeof ticketSaleZodSchema>;
 
 export type TransactionSummaryType = z.infer<
   typeof transactionSummaryZodSchema
@@ -90,15 +90,14 @@ export const feedbackStatsZodSchema = z.object({
   comments: z.array(z.string().trim()).default([])
 });
 
-export const feedbackZodSchema = z.object({
-  rating: z.number().min(1).max(5),
-  review: z.string().min(10).max(500).optional(),
-  createdAt: z.date().default(() => new Date())
-});
-
 export const finalizeZodSchema = z.object({
   finalizedAt: z.date().default(() => new Date()),
   finalizedBy: z.nativeEnum(ActorType)
+});
+
+export const moneyZodSchema = z.object({
+  amount: z.number().min(0).default(0),
+  currency: z.nativeEnum(CurrencyType).default(CurrencyType.USD)
 });
 
 const transactionSummaryZodSchema = z.object({
@@ -107,11 +106,6 @@ const transactionSummaryZodSchema = z.object({
   currency: z.nativeEnum(CurrencyType),
   rate: z.number().min(0).default(0),
   transaction: z.any().optional()
-});
-
-export const moneyZodSchema = z.object({
-  amount: z.number().min(0).default(0),
-  currency: z.nativeEnum(CurrencyType).default(CurrencyType.USD)
 });
 
 export const payoutZodSchema = z.object({
@@ -142,12 +136,6 @@ export const runtimeZodSchema = z.object({
   endDate: z.date().optional()
 });
 
-export const saleZodSchema = z.object({
-  soldAt: z.date().default(() => new Date()),
-  payments: z.array(transactionSummaryZodSchema),
-  totals: z.record(z.number()).default({})
-});
-
 export const salesStatsZodSchema = z
   .object({
     totalRevenue: z.record(z.number()).default({}),
@@ -158,7 +146,7 @@ export const salesStatsZodSchema = z
   })
   .strict();
 
-export const ticketSalesStatsZodSchema = z.object({
+export const showSalesStatsZodSchema = z.object({
   ticketsAvailable: z.number().min(0).default(0),
   ticketsSold: z.number().min(0).default(0),
   ticketsReserved: z.number().min(0).default(0),
@@ -172,6 +160,18 @@ export const ticketSalesStatsZodSchema = z.object({
   totalSales: z.record(z.number().min(0)).default({}),
   totalRevenue: z.record(z.number().min(0)).default({}),
   totalRefunds: z.record(z.number().min(0)).default({})
+});
+
+export const ticketFeedbackZodSchema = z.object({
+  rating: z.number().min(1).max(5),
+  review: z.string().min(10).max(500).optional(),
+  createdAt: z.date().default(() => new Date())
+});
+
+export const ticketSaleZodSchema = z.object({
+  soldAt: z.date().default(() => new Date()),
+  payments: z.array(transactionSummaryZodSchema),
+  totals: z.record(z.number()).default({})
 });
 
 export { transactionSummaryZodSchema };

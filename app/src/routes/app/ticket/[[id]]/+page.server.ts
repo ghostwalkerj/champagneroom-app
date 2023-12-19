@@ -18,8 +18,8 @@ import {
   cancelZodSchema,
   disputeZodSchema,
   feedbackStatsZodSchema,
-  feedbackZodSchema,
-  refundZodSchema
+  refundZodSchema,
+  ticketFeedbackZodSchema
 } from '$lib/models/common';
 
 import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
@@ -136,7 +136,7 @@ export const actions: Actions = {
     const ticketService = getTicketMachineService(ticket, redisConnection);
 
     const state = ticketService.getSnapshot();
-    const feedback = feedbackZodSchema.parse({
+    const feedback = ticketFeedbackZodSchema.parse({
       rating: +rating,
       review
     });

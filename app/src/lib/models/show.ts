@@ -20,7 +20,8 @@ import {
   finalizeZodSchema,
   moneyZodSchema,
   runtimeZodSchema,
-  salesStatsZodSchema
+  salesStatsZodSchema,
+  showSalesStatsZodSchema
 } from './common';
 
 export type ShowDocument = InstanceType<typeof Show>;
@@ -28,7 +29,7 @@ export type ShowDocument = InstanceType<typeof Show>;
 const showStateZodSchema = z.object({
   status: z.nativeEnum(ShowStatus).default(ShowStatus.CREATED),
   active: z.boolean().default(true),
-  salesStats: salesStatsZodSchema.default({}),
+  salesStats: showSalesStatsZodSchema.default({}),
   feedbackStats: feedbackStatsZodSchema.default({}),
   disputeStats: disputeStatsZodSchema.default({}),
   cancel: cancelZodSchema.optional(),

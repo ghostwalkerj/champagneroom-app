@@ -24,7 +24,8 @@ enum WalletStatus {
 const earningsZodMongooseSchema = toZodMongooseSchema(earningsZodSchema, {
   typeOptions: {
     show: {
-      ref: 'Show'
+      ref: 'Show',
+      get: (value) => value?.toString()
     }
   }
 });
@@ -32,7 +33,8 @@ const earningsZodMongooseSchema = toZodMongooseSchema(earningsZodSchema, {
 const payoutZodMongooseSchema = toZodMongooseSchema(payoutZodSchema, {
   typeOptions: {
     transaction: {
-      ref: 'Transaction'
+      ref: 'Transaction',
+      get: (value) => value?.toString()
     }
   }
 });
