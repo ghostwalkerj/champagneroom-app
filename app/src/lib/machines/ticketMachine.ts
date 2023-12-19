@@ -97,7 +97,10 @@ type TicketMachineEventType =
       decision: DisputeDecision;
       refund?: RefundType;
     }
-  | { type: 'PAYMENT INITIATED' };
+  | {
+      type: 'PAYMENT INITIATED';
+      paymentCurrency: CurrencyType;
+    };
 
 const createTicketMachine = ({
   ticketDocument,
@@ -507,8 +510,8 @@ const createTicketMachine = ({
         requestRefundCancelledShow: assign((context, event) => {
           const state = context.ticketState;
           const refund = refundZodSchema.parse({
-            requestedAmounts: state.sale?.totals,
-            approvedAmounts: state.sale?.totals,
+            requestedAmounts: state.sale?.total,
+            approvedAmounts: state.sale?.total,
             reason: RefundReason.SHOW_CANCELLED
           });
           return {
@@ -521,8 +524,15 @@ const createTicketMachine = ({
           };
         }),
 
-        initiatePayment: assign((context) => {
-          const sale = ticketSaleZodSchema.parse({}) as SaleType;
+        initiatePayment: assign((context, event) => {
+          const paymentCurrency = event.paymentCurrency;
+          const sale = ticketSaleZodSchema.parse({
+            totals: {
+              [paymentCurrency]: 0
+            },
+            payments: [],
+            currency: paymentCurrency
+          }) as SaleType;
           return {
             ticketState: {
               ...context.ticketState,
@@ -570,12 +580,8 @@ const createTicketMachine = ({
             rate: +(event.transaction.rate || 0),
             transaction: event.transaction._id
           });
-          const totals = sale.totals;
-          const total = (totals[payment.currency] || 0) + payment.amount;
-          sale.totals[payment.currency] = total;
-          const payments = sale.payments[payment.currency] || [];
-          payments.push(payment);
-          sale.payments[payment.currency] = payments;
+          sale.total += payment.amount;
+          sale.payments.push(payment);
 
           return {
             ticketState: {
@@ -617,14 +623,8 @@ const createTicketMachine = ({
           const refund = state.refund;
           if (!refund) return {};
 
-          const total = refund.totals[payout.currency] || 0 + payout.amount;
-          refund.totals[payout.currency] = total;
-
-          const payouts = refund.payouts[payout.currency] || [];
-
-          payouts.push(payout);
-
-          refund.payouts[payout.currency] = payouts;
+          refund.total += payout.amount;
+          refund.payouts.push(payout);
 
           return {
             ticketState: {
@@ -771,23 +771,11 @@ const createTicketMachine = ({
           const refund = context.ticketState.refund;
           if (refund === undefined) return false;
           const currency = event.transaction.currency.toUpperCase();
-          const refundApproved = refund.approvedAmounts[currency] || 0;
+          const refundApproved = refund.approvedAmount || 0;
           if (refundApproved === 0) return false;
           const amount =
             event.type === 'REFUND RECEIVED' ? +event.transaction?.amount : 0;
-          const totalRefundsAmount = refund.totals[currency] || 0 + amount;
-
-          // Check to see if all other currencies have been refunded
-          for (const [key, value] of Object.entries(refund.approvedAmounts)) {
-            if (key === currency) continue;
-            if (
-              !refund.approvedAmounts[key] ||
-              refund.approvedAmounts[key] === 0
-            )
-              return false;
-
-            if ((refund.totals[key] || 0) < value) return false;
-          }
+          const totalRefundsAmount = refund.total || 0 + amount;
 
           const refundedInTransactionCurrency =
             totalRefundsAmount >= refundApproved;
@@ -804,7 +792,10 @@ const createTicketMachine = ({
           return (
             context.ticketDocument.price.amount !== 0 &&
             (!context.ticketState.sale ||
-              context.ticketState.sale?.payments.length !== 0)
+              !context.ticketState.sale?.payments ||
+              context.ticketState.sale?.payments[
+                context.ticketDocument.price.currency
+              ]?.length === 0)
           );
         },
 

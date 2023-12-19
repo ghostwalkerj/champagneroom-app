@@ -64,8 +64,7 @@ const ticketZodSchema = toZodMongooseSchema(
       ticketState: ticketStateZodSchema.default({}),
       user: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
         autopopulate: true,
-        ref: 'User',
-        required: true
+        ref: 'User'
       }),
       agent: mongooseZodCustomType('ObjectId').optional().mongooseTypeOptions({
         ref: 'Agent'
@@ -111,5 +110,3 @@ export const Ticket = models?.Ticket
   : mongoose.model<TicketDocumentType>('Ticket', ticketSchema);
 
 export { TicketStatus } from '$lib/constants';
-
-export { redemptionZodSchema };

@@ -5,21 +5,21 @@
   import type { Unsubscriber } from 'svelte/store';
   import web3 from 'web3';
 
-  import {
-    refundZodSchema,
-    disputeZodSchema,
-    TicketMachineEventString
-  } from '$lib/models/common';
+  import { refundZodSchema, disputeZodSchema } from '$lib/models/common';
   import {
     DisputeReason,
     RefundReason,
     ShowStatus,
+    TicketMachineEventString,
     TicketStatus
   } from '$lib/constants';
   import type { ShowDocument } from '$lib/models/show';
   import type { UserDocument } from '$lib/models/user';
 
-  import { createTicketMachineService } from '$lib/machines/ticketMachine';
+  import {
+    type TicketMachineServiceType,
+    createTicketMachineService
+  } from '$lib/machines/ticketMachine';
 
   import { ActorType } from '$lib/constants';
   import { InvoiceStatus, type PaymentType } from '$lib/payment';
@@ -112,6 +112,7 @@
         let formData = new FormData();
         formData.append('address', $selectedAccount.address);
         formData.append('paymentId', currentPayment.id!);
+        formData.append('paymentCurrency', currentPayment.currency);
 
         await fetch($page.url.href + '?/initiate_payment', {
           method: 'POST',

@@ -4,7 +4,7 @@ import { Worker } from 'bullmq';
 import type IORedis from 'ioredis';
 import urlJoin from 'url-join';
 
-import { TicketMachineEventString, type PayoutType } from '$lib/models/common';
+import type { PayoutType } from '$lib/models/common';
 import { Creator } from '$lib/models/creator';
 import type { TicketDocument } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
@@ -16,7 +16,12 @@ import {
 import { Wallet } from '$lib/models/wallet';
 
 import Config from '$lib/config';
-import { CurrencyType, EntityType } from '$lib/constants';
+import {
+  CurrencyType,
+  EntityType,
+  TicketMachineEventString,
+  WalletMachineEventString
+} from '$lib/constants';
 import { authEncrypt } from '$lib/crypt';
 import {
   batchActionsOnPayoutsPayoutsBatchPost,
@@ -128,10 +133,7 @@ export const getPayoutWorker = ({
                 return 'Ticket refund not found';
               }
 
-              const currency = (invoice.paid_currency?.toUpperCase() ||
-                CurrencyType.ETH) as CurrencyType;
-
-              ticketRefund.approvedAmounts[currency] = +invoice.sent_amount;
+              ticketRefund.approvedAmount = +invoice.sent_amount;
 
               ticketService.send({
                 type: TicketMachineEventString.REFUND_INITIATED,
@@ -281,8 +283,7 @@ export const getPayoutWorker = ({
                 'ticket.ticketState.refund',
                 ticket.ticketState.refund
               );
-              const amount =
-                ticket.ticketState.refund.approvedAmounts[currency];
+              const amount = ticket.ticketState.refund.approvedAmount;
               if (!amount) {
                 console.error('No approved amount');
                 return 'No approved amount';
@@ -544,7 +545,7 @@ export const getPayoutWorker = ({
           const payout = {
             amount,
             destination,
-            currency: wallet.currency
+            payoutCurrency: wallet.currency
           } as PayoutType;
 
           if (

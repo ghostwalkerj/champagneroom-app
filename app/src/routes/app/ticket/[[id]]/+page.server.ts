@@ -18,16 +18,19 @@ import {
   cancelZodSchema,
   disputeZodSchema,
   refundZodSchema,
-  ticketFeedbackZodSchema,
-  TicketMachineEventString
+  ticketFeedbackZodSchema
 } from '$lib/models/common';
 
 import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
 
 import type { PayoutQueueType } from '$lib/workers/payoutWorker';
 
-import type { DisputeReason } from '$lib/constants';
-import { CancelReason, RefundReason } from '$lib/constants';
+import type { CurrencyType, DisputeReason } from '$lib/constants';
+import {
+  CancelReason,
+  RefundReason,
+  TicketMachineEventString
+} from '$lib/constants';
 import { ActorType, EntityType } from '$lib/constants';
 import { createAuthToken, InvoiceJobType, PayoutJobType } from '$lib/payment';
 import { getTicketMachineService } from '$lib/server/machinesUtil';
@@ -87,7 +90,8 @@ export const actions: Actions = {
       // Create refund object
       const refund = refundZodSchema.parse({
         reason: CancelReason.CUSTOMER_CANCELLED,
-        requestedAmounts: sales.totals
+        requestedAmounts: sales.total,
+        refundCurrency: sales.paymentCurrency
       });
 
       // Refund the same amount as sent, not equivalent to show currency
@@ -182,9 +186,7 @@ export const actions: Actions = {
     });
 
     const refund = refundZodSchema.parse({
-      requestedAmounts: ticket.ticketState.sale
-        ? ticket.ticketState.sale.totals
-        : ({} as Map<string, number>),
+      requestedAmount: ticket.ticketState.sale?.total || 0,
       reason: RefundReason.DISPUTE_DECISION
     });
 
@@ -211,6 +213,7 @@ export const actions: Actions = {
     const data = await request.formData();
     const address = data.get('address') as string;
     const paymentId = data.get('paymentId') as string;
+    const paymentCurrency = data.get('paymentCurrency') as string;
     const ticket = locals.ticket;
 
     if (!ticket) {
@@ -260,7 +263,8 @@ export const actions: Actions = {
     const ticketService = getTicketMachineService(ticket, redisConnection);
 
     ticketService.send({
-      type: TicketMachineEventString.PAYMENT_INITIATED
+      type: TicketMachineEventString.PAYMENT_INITIATED,
+      paymentCurrency: paymentCurrency.toUpperCase() as CurrencyType
     });
 
     ticketService?.stop();
