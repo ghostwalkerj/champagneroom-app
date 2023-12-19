@@ -17,7 +17,7 @@ import {
   type RefundType,
   refundZodSchema,
   type SaleType,
-  saleZodSchema,
+  ticketSaleZodSchema,
   transactionSummaryZodSchema
 } from '$lib/models/common';
 import type { TicketDocument, TicketStateType } from '$lib/models/ticket';
@@ -521,7 +521,7 @@ const createTicketMachine = ({
         }),
 
         initiatePayment: assign((context) => {
-          const sale = saleZodSchema.parse({}) as SaleType;
+          const sale = ticketSaleZodSchema.parse({}) as SaleType;
           return {
             ticketState: {
               ...context.ticketState,
