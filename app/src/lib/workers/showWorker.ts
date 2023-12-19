@@ -5,7 +5,11 @@ import { waitFor } from 'xstate/lib/waitFor';
 
 import type { AgentDocument } from '$lib/models/agent';
 import { Agent } from '$lib/models/agent';
-import type { CancelType, FinalizeType } from '$lib/models/common';
+import {
+  type CancelType,
+  type FinalizeType,
+  finalizeZodSchema
+} from '$lib/models/common';
 import type { CreatorDocument } from '$lib/models/creator';
 import { Creator } from '$lib/models/creator';
 import type { ShowDocument } from '$lib/models/show';
@@ -264,10 +268,9 @@ const endShow = async (show: ShowDocument, showQueue: ShowQueueType) => {
   const showState = showService.getSnapshot();
   if (showState.matches('stopped')) {
     showService.send(ShowMachineEventString.SHOW_ENDED);
-    const finalize = {
-      finalizedAt: new Date(),
+    const finalize = finalizeZodSchema.parse({
       finalizedBy: ActorType.TIMER
-    };
+    });
     showQueue.add(
       ShowMachineEventString.SHOW_FINALIZED,
       {
@@ -359,63 +362,41 @@ const finalizeShow = async (
     };
 
     const projectSales = {
-      totalSales: {
-        $objectToArray: '$ticketState.sale.totals'
-      }
-    };
-
-    const unwindSales = {
-      path: '$totalSales'
+      totalSales: '$ticketState.sale.total'
     };
 
     const groupBySales = {
-      _id: '$totalSales.k',
-      totalSales: { $sum: '$totalSales.v' }
+      _id: '$ticketState.sale.currency',
+      totalSales: { $sum: '$totalSales' }
     };
 
     const projectRefunds = {
-      totalRefunds: {
-        $objectToArray: '$ticketState.refund.totals'
-      }
-    };
-
-    const unwindRefunds = {
-      path: '$totalRefunds'
+      totalRefunds: '$ticketState.refund.total'
     };
 
     const groupByRefunds = {
-      _id: '$totalRefunds.k',
-      totalRefunds: { $sum: '$totalRefunds.v' }
+      _id: '$ticketState.sale.currency',
+      totalRefunds: { $sum: '$totalRefunds' }
     };
 
     const aggregateSalesAndRefunds = await Ticket.aggregate()
       .match(ticketFilter)
       .facet({
-        sales: [
-          { $project: projectSales },
-          { $unwind: unwindSales },
-          { $group: groupBySales }
-        ],
-        refunds: [
-          { $project: projectRefunds },
-          { $unwind: unwindRefunds },
-          { $group: groupByRefunds }
-        ]
+        sales: [{ $project: projectSales }, { $group: groupBySales }],
+        refunds: [{ $project: projectRefunds }, { $group: groupByRefunds }]
       });
 
-    const totalSales = new Map<string, number>();
-    const totalRevenue = new Map<string, number>();
     for (const sale of aggregateSalesAndRefunds[0].sales) {
-      totalSales.set(sale['_id'], sale['totalSales']);
-      totalRevenue.set(sale['_id'], sale['totalSales']);
+      show.showState.sales.totalSales[sale['_id']] = sale['totalSales'];
+      show.showState.sales.totalRevenue[sale['_id']] = sale['totalSales'];
     }
 
-    const totalRefunds = new Map<string, number>();
     for (const refund of aggregateSalesAndRefunds[0].refunds) {
-      totalRefunds.set(refund['_id'], refund['totalRefunds']);
-      const revenue = totalRevenue.get(refund['_id']);
+      show.showState.sales.totalRefunds[refund['_id']] = refund['totalRefunds'];
+      const revenue = show.showState.sales.totalRevenue[refund['_id']];
       if (revenue) {
-        totalRevenue.set(refund['_id'], revenue - refund['totalRefunds']);
+        show.showState.sales.totalRevenue[refund['_id']] =
+          revenue - refund['totalRefunds'];
       }
     }
 
@@ -429,9 +410,11 @@ const finalizeShow = async (
           amount: ticketSalesAmount,
           currency: show.price.currency
         },
-        'showState.salesStats.totalSales': totalSales,
-        'showState.salesStats.totalRefunds': totalRefunds,
-        'showState.salesStats.totalRevenue': totalRevenue
+        'showState.salesStats.totalSales': show.showState.salesStats.totalSales,
+        'showState.salesStats.totalRefunds':
+          show.showState.salesStats.totalRefunds,
+        'showState.salesStats.totalRevenue':
+          show.showState.salesStats.totalRevenue
       },
       {
         returnDocument: 'after'
@@ -606,36 +589,6 @@ const finalizeShow = async (
 };
 
 // Ticket Events
-const customerJoined = async (show: ShowDocument, ticketId: string) => {
-  const showService = createShowMachineService({
-    showDocument: show,
-    showMachineOptions: {
-      saveStateCallback: async (showState) => SaveState(show, showState),
-      saveShowEventCallback: async ({
-        type,
-        ticketId,
-        transaction,
-        ticketInfo
-      }) =>
-        createShowEvent({
-          show,
-          type,
-          ticketId,
-          transaction,
-          ticketInfo
-        })
-    }
-  });
-
-  const ticket = (await Ticket.findById(ticketId).exec()) as TicketDocument;
-  showService.send({
-    type: ShowMachineEventString.CUSTOMER_JOINED,
-    ticket
-  });
-  showService.stop();
-  return 'success';
-};
-
 const customerLeft = async (show: ShowDocument, ticketId: string) => {
   const showService = createShowMachineService({
     showDocument: show,
@@ -896,14 +849,17 @@ const ticketFinalized = async (
     const numberOfReviews = aggregate[0]['numberOfReviews'] as number;
     const comments = aggregate[0]['comments'] as string[];
 
-    show.showState.feedbackStats = {
-      averageRating,
-      numberOfReviews,
-      comments
-    };
-
-    await show.save();
-    showSession!.endSession();
+    await Show.findByIdAndUpdate(
+      { _id: show._id },
+      {
+        'showState.feedbackStats': {
+          averageRating,
+          numberOfReviews,
+          comments
+        }
+      }
+    ),
+      showSession!.endSession();
   });
 
   // aggregate show feedback into creator
