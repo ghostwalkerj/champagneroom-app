@@ -24,8 +24,7 @@ enum WalletStatus {
 const earningsZodMongooseSchema = toZodMongooseSchema(earningsZodSchema, {
   typeOptions: {
     show: {
-      ref: 'Show',
-      get: (value) => value?.toString()
+      ref: 'Show'
     }
   }
 });
@@ -33,8 +32,7 @@ const earningsZodMongooseSchema = toZodMongooseSchema(earningsZodSchema, {
 const payoutZodMongooseSchema = toZodMongooseSchema(payoutZodSchema, {
   typeOptions: {
     transaction: {
-      ref: 'Transaction',
-      get: (value) => value?.toString()
+      ref: 'Transaction'
     }
   }
 });
@@ -44,8 +42,7 @@ const walletZodMongooseSchema = toZodMongooseSchema(
     .object({
       _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
         _id: true,
-        auto: true,
-        get: (value) => value?.toString()
+        auto: true
       }),
       status: z.nativeEnum(WalletStatus).default(WalletStatus.AVAILABLE),
       currency: z.nativeEnum(CurrencyType).default(CurrencyType.ETH),

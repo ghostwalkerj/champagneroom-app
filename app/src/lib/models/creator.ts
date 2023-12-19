@@ -19,8 +19,7 @@ const creatorZodSchema = toZodMongooseSchema(
     .object({
       _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
         _id: true,
-        auto: true,
-        get: (value) => value?.toString()
+        auto: true
       }),
       user: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
         autopopulate: true,
@@ -28,12 +27,9 @@ const creatorZodSchema = toZodMongooseSchema(
         required: true
       }),
       commissionRate: z.number().min(0).max(100).default(0),
-      agent: mongooseZodCustomType('ObjectId')
-        .optional()
-        .mongooseTypeOptions({
-          ref: 'Agent',
-          get: (value) => value?.toString()
-        }),
+      agent: mongooseZodCustomType('ObjectId').optional().mongooseTypeOptions({
+        ref: 'Agent'
+      }),
       feedbackStats: feedbackStatsZodSchema.default({}),
       salesStats: salesStatsZodSchema.default({
         numberOfCompletedShows: 0,

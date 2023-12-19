@@ -58,7 +58,7 @@ export const actions: Actions = {
 
     return {
       success: true,
-      creator: creator?.toJSON({ flattenMaps: true })
+      creator: creator?.toJSON({ flattenMaps: true, flattenObjectIds: true })
     };
   },
   create_show: async ({ locals, request }) => {
@@ -111,7 +111,7 @@ export const actions: Actions = {
     return {
       success: true,
       showCreated: true,
-      show: show.toJSON({ flattenMaps: true })
+      show: show.toJSON({ flattenMaps: true, flattenObjectIds: true })
     };
   },
   cancel_show: async ({ locals }) => {
@@ -354,18 +354,20 @@ export const load: PageServerLoad = async ({ locals }) => {
     )) as AxiosResponse<string>) || undefined;
 
   return {
-    creator: creator.toJSON({ flattenMaps: true }),
-    user: user?.toJSON({ flattenMaps: true }),
-    show: show ? show.toJSON({ flattenMaps: true }) : undefined,
+    creator: creator.toJSON({ flattenMaps: true, flattenObjectIds: true }),
+    user: user?.toJSON({ flattenMaps: true, flattenObjectIds: true }),
+    show: show
+      ? show.toJSON({ flattenMaps: true, flattenObjectIds: true })
+      : undefined,
     showEvent: showEvent
       ? showEvent.toJSON({
           flattenMaps: true
         })
       : undefined,
     completedShows: completedShows.map((show) =>
-      show.toJSON({ flattenMaps: true })
+      show.toJSON({ flattenMaps: true, flattenObjectIds: true })
     ),
-    wallet: wallet.toJSON({ flattenMaps: true }),
+    wallet: wallet.toJSON({ flattenMaps: true, flattenObjectIds: true }),
     exchangeRate: exchangeRate?.data,
     jitsiToken
   };

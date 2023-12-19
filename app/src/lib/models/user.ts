@@ -14,6 +14,7 @@ import validator from 'validator';
 import Config from '$lib/config';
 import { AuthType, UserRole } from '$lib/constants';
 import { PermissionType } from '$lib/permissions';
+import { fieldEncryption } from 'mongoose-field-encryption';
 
 const { models } = pkg;
 
@@ -34,15 +35,11 @@ const userZodSchema = toZodMongooseSchema(
     .object({
       _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
         _id: true,
-        auto: true,
-        get: (value) => value?.toString()
+        auto: true
       }),
-      wallet: mongooseZodCustomType('ObjectId')
-        .optional()
-        .mongooseTypeOptions({
-          ref: 'Wallet',
-          get: (value) => value?.toString()
-        }),
+      wallet: mongooseZodCustomType('ObjectId').optional().mongooseTypeOptions({
+        ref: 'Wallet'
+      }),
       address: z
         .string()
         .trim()
@@ -105,11 +102,11 @@ userSchema.index(
 // const hash = (secret) =>
 //   crypto.createHash('sha256').update(secret).digest('hex').slice(0, 32);
 
-// userSchema.plugin(fieldEncryption, {
-//   fields: ['secret'],
-//   secret: process.env.MONGO_DB_FIELD_SECRET,
-//   saltGenerator
-// });
+userSchema.plugin(fieldEncryption, {
+  fields: ['secret'],
+  secret: process.env.MONGO_DB_FIELD_SECRET,
+  saltGenerator: (secret: string) => secret.slice(0, 16)
+});
 
 userSchema.pre('updateOne', async function (this: UpdateQuery<UserDocument>) {
   const update = { ...this.getUpdate() };

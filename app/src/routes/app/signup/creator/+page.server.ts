@@ -114,7 +114,8 @@ export const load: PageServerLoad = async ({ locals }) => {
   const message = AUTH_SIGNING_MESSAGE + ' ' + nonce;
   return {
     message,
-    user: user?.toJSON({ flattenMaps: true }) ?? undefined,
+    user:
+      user?.toJSON({ flattenMaps: true, flattenObjectIds: true }) ?? undefined,
     isCreator
   };
 };

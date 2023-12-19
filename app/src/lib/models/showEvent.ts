@@ -17,35 +17,27 @@ const showEventZodSchema = toZodMongooseSchema(
     .object({
       _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
         _id: true,
-        auto: true,
-        get: (value) => value?.toString()
+        auto: true
       }),
       type: z.string(),
       show: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
-        ref: 'Show',
-        get: (value) => value?.toString()
+        ref: 'Show'
       }),
       creator: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
-        ref: 'Creator',
-        get: (value) => value?.toString()
+        ref: 'Creator'
       }),
-      agent: mongooseZodCustomType('ObjectId')
-        .optional()
-        .mongooseTypeOptions({
-          ref: 'Agent',
-          get: (value) => value?.toString()
-        }),
+      agent: mongooseZodCustomType('ObjectId').optional().mongooseTypeOptions({
+        ref: 'Agent'
+      }),
       ticket: mongooseZodCustomType('ObjectId')
         .optional()
         .mongooseTypeOptions({
           ref: 'Ticket',
-          get: (value) => value?.toString()
         }),
       transaction: mongooseZodCustomType('ObjectId')
         .optional()
         .mongooseTypeOptions({
           ref: 'Transaction',
-          get: (value) => value?.toString()
         }),
       ticketInfo: z
         .object({
