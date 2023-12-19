@@ -4,11 +4,11 @@
   import { page } from '$app/stores';
   import ProfilePhoto from '$components/ProfilePhoto.svelte';
   import Config from '$lib/config';
-  import type { AgentDocumentType } from '$lib/models/agent';
+  import type { AgentDocument } from '$lib/models/agent';
   import type { ActionResult } from '@sveltejs/kit';
   import urlJoin from 'url-join';
 
-  export let agent: AgentDocumentType;
+  export let agent: AgentDocument;
 
   let nameDiv: HTMLDivElement;
   let commissionDiv: HTMLDivElement;

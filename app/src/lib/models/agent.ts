@@ -1,33 +1,47 @@
-import type { InferSchemaType, Model } from 'mongoose';
+import type { Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
 import mongooseAutoPopulate from 'mongoose-autopopulate';
+import {
+  genTimestampsSchema,
+  mongooseZodCustomType,
+  toMongooseSchema,
+  toZodMongooseSchema,
+  z
+} from 'mongoose-zod';
 
-import type { UserDocumentType } from './user';
+import type { UserDocument } from './user';
 
-const { Schema, models } = pkg;
-const agentSchema = new Schema(
+const { models } = pkg;
+
+const agentZodSchema = toZodMongooseSchema(
+  z
+    .object({
+      _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+        _id: true,
+        auto: true
+      }),
+      user: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+        autopopulate: true,
+        ref: 'User',
+        required: true
+      }),
+      defaultCommissionRate: z.number().min(0).max(100).default(0)
+    })
+    .merge(genTimestampsSchema()),
   {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    _id: { type: Schema.Types.ObjectId, required: true, auto: true },
-    user: {
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-      required: true,
-      unique: true,
-      autopopulate: true
-    },
-    defaultCommissionRate: { type: Number, required: true, default: 0 }
-  },
-  { timestamps: true }
+    schemaOptions: {
+      collection: 'agents'
+    }
+  }
 );
-
+const agentSchema = toMongooseSchema(agentZodSchema);
 agentSchema.plugin(mongooseAutoPopulate);
 
-export type AgentDocument = InstanceType<typeof Agent>;
-
-export type AgentDocumentType = InferSchemaType<typeof agentSchema> & {
-  user: UserDocumentType;
+export type AgentDocument = InstanceType<typeof Agent> & {
+  user: UserDocument;
 };
+
+export type AgentDocumentType = z.infer<typeof agentZodSchema>;
 
 export const Agent = models?.Agent
   ? (models.Agent as Model<AgentDocumentType>)

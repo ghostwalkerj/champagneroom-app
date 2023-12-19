@@ -3,13 +3,12 @@
   import ChartDataLabels from 'chartjs-plugin-datalabels';
   import { Doughnut } from 'svelte-chartjs';
 
-  import type { CreatorDocumentType } from '$lib/models/creator';
+  import type { CreatorDocument } from '$lib/models/creator';
 
-  import { currencyFormatter } from '$lib/constants';
-  import type { CurrencyType } from '$lib/models/common';
+  import { CurrencyType, currencyFormatter } from '$lib/constants';
   import spacetime from 'spacetime';
 
-  export let creators: CreatorDocumentType[];
+  export let creators: CreatorDocument[];
   export let showData: {
     creatorId: string;
     amount: number;

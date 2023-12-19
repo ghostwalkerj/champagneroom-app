@@ -1,10 +1,10 @@
 <script lang="ts">
   import ProfilePhoto from '$components/ProfilePhoto.svelte';
   import Config from '$lib/config';
-  import type { CreatorDocumentType } from '$lib/models/creator';
+  import type { CreatorDocument } from '$lib/models/creator';
   import StarRating from 'svelte-star-rating';
 
-  export let creator: CreatorDocumentType;
+  export let creator: CreatorDocument;
 
   const updateProfileImage = async (url: string) => {
     if (url && creator) {

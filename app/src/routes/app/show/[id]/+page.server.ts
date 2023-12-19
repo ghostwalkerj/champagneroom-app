@@ -20,19 +20,24 @@ import {
 } from '$env/static/private';
 
 import { Show } from '$lib/models/show';
+import type { TicketDocument } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
 import { User } from '$lib/models/user';
-
-import { ShowMachineEventString } from '$lib/machines/showMachine';
-import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 
 import type { ShowQueueType } from '$lib/workers/showWorker';
 
 import Config from '$lib/config';
-import { AuthType, EntityType, UserRole } from '$lib/constants';
+import {
+  AuthType,
+  CurrencyType,
+  EntityType,
+  ShowMachineEventString,
+  TicketMachineEventString,
+  UserRole
+} from '$lib/constants';
 import { authEncrypt } from '$lib/crypt';
 import { mensNames } from '$lib/mensNames';
-import { InvoiceJobType, InvoiceStatus, createAuthToken } from '$lib/payment';
+import { createAuthToken, InvoiceJobType, InvoiceStatus } from '$lib/payment';
 import {
   getShowMachineServiceFromId,
   getTicketMachineService
@@ -92,13 +97,13 @@ export const actions: Actions = {
       profileImageUrl: profileImage
     });
 
-    const ticket = await Ticket.create({
+    const ticket = (await Ticket.create({
       user: user._id,
       show: show._id,
       agent: show.agent,
       creator: show.creator,
       price: show.price
-    });
+    })) as TicketDocument;
     if (!ticket) {
       console.error('Ticket cannot be created');
       throw error(501, 'Show cannot Reserve Ticket');
@@ -183,7 +188,8 @@ export const actions: Actions = {
     if (ticket.price.amount === 0 && ticket.bcInvoiceId) {
       const ticketService = getTicketMachineService(ticket, redisConnection);
       ticketService.send({
-        type: TicketMachineEventString.PAYMENT_INITIATED
+        type: TicketMachineEventString.PAYMENT_INITIATED,
+        paymentCurrency: CurrencyType.NONE
       });
 
       ticketService?.stop();
@@ -271,7 +277,7 @@ export const load: PageServerLoad = async ({ params }) => {
   });
 
   return {
-    show: show.toObject({ flattenObjectIds: true, flattenMaps: true }),
+    show: show.toJSON({ flattenMaps: true, flattenObjectIds: true }),
     displayName
   };
 };

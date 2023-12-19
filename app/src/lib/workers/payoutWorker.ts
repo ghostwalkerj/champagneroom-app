@@ -5,9 +5,8 @@ import type IORedis from 'ioredis';
 import urlJoin from 'url-join';
 
 import type { PayoutType } from '$lib/models/common';
-import { CurrencyType } from '$lib/models/common';
 import { Creator } from '$lib/models/creator';
-import type { TicketDocument, TicketDocument } from '$lib/models/ticket';
+import type { TicketDocument } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
 import {
   Transaction,
@@ -16,11 +15,13 @@ import {
 } from '$lib/models/transaction';
 import { Wallet } from '$lib/models/wallet';
 
-import { TicketMachineEventString } from '$lib/machines/ticketMachine';
-import { WalletMachineEventString } from '$lib/machines/walletMachine';
-
 import Config from '$lib/config';
-import { EntityType } from '$lib/constants';
+import {
+  CurrencyType,
+  EntityType,
+  TicketMachineEventString,
+  WalletMachineEventString
+} from '$lib/constants';
 import { authEncrypt } from '$lib/crypt';
 import {
   batchActionsOnPayoutsPayoutsBatchPost,
@@ -82,7 +83,7 @@ export const getPayoutWorker = ({
               return 'No ticket ID';
             }
 
-            const ticket = await Ticket.findById(ticketId);
+            const ticket = (await Ticket.findById(ticketId)) as TicketDocument;
             if (!ticket) {
               return 'No ticket found';
             }
@@ -132,13 +133,7 @@ export const getPayoutWorker = ({
                 return 'Ticket refund not found';
               }
 
-              const currency = (invoice.paid_currency?.toUpperCase() ||
-                CurrencyType.ETH) as CurrencyType;
-
-              const approvedAmounts = new Map<CurrencyType, number>();
-              approvedAmounts.set(currency, +invoice.sent_amount);
-
-              ticketRefund.approvedAmounts = approvedAmounts;
+              ticketRefund.approvedAmount = +invoice.sent_amount;
 
               ticketService.send({
                 type: TicketMachineEventString.REFUND_INITIATED,
@@ -288,8 +283,7 @@ export const getPayoutWorker = ({
                 'ticket.ticketState.refund',
                 ticket.ticketState.refund
               );
-              const amount =
-                ticket.ticketState.refund.approvedAmounts.get(currency);
+              const amount = ticket.ticketState.refund.approvedAmount;
               if (!amount) {
                 console.error('No approved amount');
                 return 'No approved amount';
@@ -551,7 +545,7 @@ export const getPayoutWorker = ({
           const payout = {
             amount,
             destination,
-            currency: wallet.currency
+            payoutCurrency: wallet.currency
           } as PayoutType;
 
           if (
@@ -652,7 +646,7 @@ export const getPayoutWorker = ({
 
             const bcPayout = bcPayoutResponse.data;
             payout.bcPayoutId = bcPayout.id;
-            payout.payoutStatus = bcPayout.status;
+            payout.payoutStatus = bcPayout.status as PayoutStatus;
 
             walletService.send({
               type: WalletMachineEventString.PAYOUT_REQUESTED,

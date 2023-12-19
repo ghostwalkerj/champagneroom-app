@@ -1,26 +1,30 @@
-import { Types } from 'mongoose';
 import { nanoid } from 'nanoid';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 
-import type { EarningsType, PayoutType } from '$lib/models/common';
-import { EarningsSource } from '$lib/models/common';
-import type { CreatorDocumentType } from '$lib/models/creator';
-import type { ShowDocumentType } from '$lib/models/show';
-import type { TransactionDocumentType } from '$lib/models/transaction';
-import { type WalletDocumentType, WalletStatus } from '$lib/models/wallet';
+import {
+  type EarningsType,
+  earningsZodSchema,
+  type PayoutType
+} from '$lib/models/common';
+import type { CreatorDocument } from '$lib/models/creator';
+import type { ShowDocument } from '$lib/models/show';
+import type { TransactionDocument } from '$lib/models/transaction';
+import type { WalletDocumentType } from '$lib/models/wallet';
+import { type WalletDocument, WalletStatus } from '$lib/models/wallet';
 
+import { EarningsSource } from '$lib/constants.js';
 import { PayoutStatus } from '$lib/payment';
 
 export type WalletMachineEventType =
   | {
       type: 'SHOW EARNINGS POSTED';
-      show: ShowDocumentType;
-      creator: CreatorDocumentType;
+      show: ShowDocument;
+      creator: CreatorDocument;
     }
   | {
       type: 'SHOW COMMISSION POSTED';
-      show: ShowDocumentType;
-      creator: CreatorDocumentType;
+      show: ShowDocument;
+      creator: CreatorDocument;
     }
   | {
       type: 'PAYOUT REQUESTED';
@@ -28,7 +32,7 @@ export type WalletMachineEventType =
     }
   | {
       type: 'PAYOUT SENT';
-      transaction: TransactionDocumentType;
+      transaction: TransactionDocument;
     }
   | {
       type: 'PAYOUT FAILED';
@@ -42,26 +46,16 @@ export type WalletMachineOptions = {
     query: object,
     update: object,
     options?: object
-  ) => Promise<WalletDocumentType>;
+  ) => Promise<WalletDocument>;
 };
 
-export type WalletMachineServiceType = ReturnType<
+export type WalletMachineService = ReturnType<
   typeof createWalletMachineService
 >;
 
-export type WalletMachineStateType = StateFrom<typeof createWalletMachine>;
+export type WalletMachineState = StateFrom<typeof createWalletMachine>;
 
 export type WalletMachineType = ReturnType<typeof createWalletMachine>;
-
-export enum WalletMachineEventString {
-  SHOW_EARNINGS_POSTED = 'SHOW EARNINGS POSTED',
-  SHOW_COMMISSION_POSTED = 'SHOW COMMISSION POSTED',
-  PAYOUT_REQUESTED = 'PAYOUT REQUESTED',
-  PAYOUT_SENT = 'PAYOUT SENT',
-  PAYOUT_FAILED = 'PAYOUT FAILED',
-  PAYOUT_CANCELLED = 'PAYOUT CANCELLED',
-  PAYOUT_COMPLETE = 'PAYOUT COMPLETE'
-}
 
 const createWalletMachine = ({
   wallet,
@@ -148,8 +142,7 @@ const createWalletMachine = ({
           );
           if (earnings.length === 0 || hasShow === -1) {
             const amount =
-              (show.showState.salesStats.totalRevenue.get(wallet.currency) ||
-                0) *
+              (show.showState.salesStats.totalRevenue[wallet.currency] || 0) *
               (commissionRate / 100);
             const earning = {
               earnedAt: new Date(),
@@ -197,17 +190,16 @@ const createWalletMachine = ({
           );
           if (earnings.length === 0 || hasShow === -1) {
             const amount =
-              (show.showState.salesStats.totalRevenue.get(wallet.currency) ||
-                0) *
+              (show.showState.salesStats.totalRevenue[wallet.currency] || 0) *
               (takeHome / 100);
-            const earning = {
+            const earning = earningsZodSchema.parse({
               earnedAt: new Date(),
               show: show._id,
               amount,
               currency: wallet.currency,
               earningsSource: EarningsSource.SHOW_PERFORMANCE,
               earningPercentage: takeHome
-            } as EarningsType;
+            });
             if (options?.atomicUpdateCallback) {
               options.atomicUpdateCallback(
                 {

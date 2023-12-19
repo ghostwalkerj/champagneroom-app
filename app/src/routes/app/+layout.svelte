@@ -11,8 +11,6 @@
   import { AuthType } from '$lib/constants';
   import { selectedAccount } from '$lib/web3';
 
-  import ConnectButton from '$components/header/ConnectButton.svelte';
-
   import { version } from '../../../package.json';
 
   import type { LayoutData } from './$types';

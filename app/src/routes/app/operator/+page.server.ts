@@ -10,7 +10,6 @@ import { uniqueNamesGenerator } from 'unique-names-generator';
 import { PASSWORD_SALT } from '$env/static/private';
 
 import { Agent } from '$lib/models/agent';
-import type { DisputeDecision } from '$lib/models/common';
 import { Creator } from '$lib/models/creator';
 import type { OperatorDocument } from '$lib/models/operator';
 import type { ShowDocument } from '$lib/models/show';
@@ -19,12 +18,11 @@ import type { UserDocument } from '$lib/models/user';
 import { User } from '$lib/models/user';
 import { Wallet } from '$lib/models/wallet';
 
-import { ShowMachineEventString } from '$lib/machines/showMachine';
-
 import type { ShowQueueType } from '$lib/workers/showWorker';
 
 import Config from '$lib/config';
-import { AuthType, EntityType } from '$lib/constants';
+import type { DisputeDecision } from '$lib/constants';
+import { AuthType, EntityType, ShowMachineEventString } from '$lib/constants';
 import { womensNames } from '$lib/womensNames';
 
 import type { PageServerLoad } from './$types';
@@ -64,7 +62,7 @@ export const actions: Actions = {
       });
 
       return {
-        agent: agent?.toObject({ flattenObjectIds: true, flattenMaps: true }),
+        agent: agent?.toJSON({ flattenMaps: true, flattenObjectIds: true }),
         success: true,
         agentCreated: true
       };
@@ -116,8 +114,7 @@ export const actions: Actions = {
       return {
         success: true,
         creatorCreated: true,
-        creator: creator?.toObject({
-          flattenObjectIds: true,
+        creator: creator?.toJSON({
           flattenMaps: true
         }),
         password
@@ -256,17 +253,24 @@ export const load: PageServerLoad = async ({ locals }) => {
     'ticketState.dispute.resolved': false
   }).populate<{ show: ShowDocument }>('show');
 
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  const _disputedTickets = disputedTickets.map((ticket) =>
+    JSON.parse(
+      JSON.stringify(
+        ticket.toJSON({ flattenMaps: true, flattenObjectIds: true })
+      )
+    )
+  );
+
   return {
-    operator: operator.toObject({ flattenObjectIds: true, flattenMaps: true }),
-    user: user.toObject({ flattenObjectIds: true, flattenMaps: true }),
+    operator: operator.toJSON({ flattenMaps: true, flattenObjectIds: true }),
+    user: user.toJSON({ flattenMaps: true, flattenObjectIds: true }),
     agents: agents.map((agent) =>
-      agent.toObject({ flattenObjectIds: true, flattenMaps: true })
+      agent.toJSON({ flattenMaps: true, flattenObjectIds: true })
     ),
     creators: creators.map((creator) =>
-      creator.toObject({ flattenObjectIds: true, flattenMaps: true })
+      creator.toJSON({ flattenMaps: true, flattenObjectIds: true })
     ),
-    disputedTickets: disputedTickets.map((ticket) =>
-      ticket.toObject({ flattenObjectIds: true, flattenMaps: true })
-    )
+    disputedTickets: _disputedTickets
   };
 };

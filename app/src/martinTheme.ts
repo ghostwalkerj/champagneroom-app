@@ -4,8 +4,10 @@ export const myCustomTheme: CustomThemeConfig = {
   name: 'my-custom-theme',
   properties: {
     // =~= Theme Properties =~=
-    '--theme-font-family-base': `Caviar Dreams, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace`,
-    '--theme-font-family-heading': `Caviar Dreams, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace`,
+    '--theme-font-family-base':
+      "Caviar Dreams, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
+    '--theme-font-family-heading':
+      "Caviar Dreams, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
     '--theme-font-color-base': '0 0 0',
     '--theme-font-color-dark': '255 255 255',
     '--theme-rounded-base': '4px',

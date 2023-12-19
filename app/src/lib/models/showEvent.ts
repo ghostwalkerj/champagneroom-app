@@ -1,39 +1,62 @@
-import type { InferSchemaType, Model } from 'mongoose';
+import type { Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
+import {
+  genTimestampsSchema,
+  mongooseZodCustomType,
+  toMongooseSchema,
+  toZodMongooseSchema,
+  z
+} from 'mongoose-zod';
 
 import type { ShowDocumentType } from './show';
 import type { TransactionDocumentType } from './transaction';
+const { models } = pkg;
 
-const { Schema, models } = pkg;
-const showeventSchema = new Schema(
+const showEventZodSchema = toZodMongooseSchema(
+  z
+    .object({
+      _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+        _id: true,
+        auto: true
+      }),
+      type: z.string(),
+      show: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+        ref: 'Show'
+      }),
+      creator: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+        ref: 'Creator'
+      }),
+      agent: mongooseZodCustomType('ObjectId').optional().mongooseTypeOptions({
+        ref: 'Agent'
+      }),
+      ticket: mongooseZodCustomType('ObjectId').optional().mongooseTypeOptions({
+        ref: 'Ticket'
+      }),
+      transaction: mongooseZodCustomType('ObjectId')
+        .optional()
+        .mongooseTypeOptions({
+          ref: 'Transaction'
+        }),
+      ticketInfo: z
+        .object({
+          customerName: z.string().trim().optional()
+        })
+        .optional()
+    })
+    .merge(genTimestampsSchema()),
   {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    _id: { type: Schema.Types.ObjectId, required: true, auto: true },
-    type: { type: String, required: true },
-    show: {
-      type: Schema.Types.ObjectId,
-      ref: 'Show',
-      required: true,
-      index: true
-    },
-    creator: { type: Schema.Types.ObjectId, ref: 'Creator', required: true },
-    agent: { type: Schema.Types.ObjectId, ref: 'Agent' },
-    ticket: { type: Schema.Types.ObjectId, ref: 'Ticket' },
-    transaction: { type: Schema.Types.ObjectId, ref: 'Transaction' },
-    ticketInfo: {
-      type: {
-        customerName: { type: String }
-      }
+    schemaOptions: {
+      collection: 'showevents'
     }
-  },
-  { timestamps: true }
+  }
 );
 
+const showeventSchema = toMongooseSchema(showEventZodSchema);
 showeventSchema.index({ show: 1, createdAt: -1 });
 
 export type ShowEventDocument = InstanceType<typeof ShowEvent>;
 
-export type ShowEventDocumentType = InferSchemaType<typeof showeventSchema>;
+export type ShowEventDocumentType = z.infer<typeof showEventZodSchema>;
 
 export const ShowEvent = models?.ShowEvent
   ? (models.ShowEvent as Model<ShowEventDocumentType>)
@@ -55,7 +78,7 @@ export const createShowEvent = ({
   ShowEvent.create({
     show: show._id,
     type,
-    ticketId,
+    ticket: ticketId,
     transaction: transaction?._id,
     agent: show.agent,
     creator: show.creator,
