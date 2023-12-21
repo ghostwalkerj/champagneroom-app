@@ -3347,7 +3347,7 @@
     "@walletconnect/utils" "2.9.1"
     events "^3.3.0"
 
-"@walletconnect/ethereum-provider@^2.10.5":
+"@walletconnect/ethereum-provider@^2.10.6":
   version "2.10.6"
   resolved "https://registry.yarnpkg.com/@walletconnect/ethereum-provider/-/ethereum-provider-2.10.6.tgz#53720771cc2d6accd452916a853ac927f26acbaa"
   integrity sha512-bBQ+yUfxLv8VxNttgNKY7nED35gSVayO/BnLHbNKvyV1gpvSCla5mWB9MsXuQs70MK0g+/qtgRVSrOtdSubaNQ==
@@ -3505,7 +3505,7 @@
     "@walletconnect/modal-core" "2.6.1"
     "@walletconnect/modal-ui" "2.6.1"
 
-"@walletconnect/modal@2.6.2", "@walletconnect/modal@^2.4.3":
+"@walletconnect/modal@^2.4.3":
   version "2.6.2"
   resolved "https://registry.yarnpkg.com/@walletconnect/modal/-/modal-2.6.2.tgz#4b534a836f5039eeb3268b80be7217a94dd12651"
   integrity sha512-eFopgKi8AjKf/0U4SemvcYw9zlLpx9njVN8sf6DAkowC2Md0gPU/UNEbH1Wwj407pEKnEds98pKWib1NN1ACoA==
@@ -3883,12 +3883,11 @@
     hdkey "^2.0.1"
 
 "@web3-onboard/walletconnect@^2.4.5":
-  version "2.5.1"
-  resolved "https://registry.yarnpkg.com/@web3-onboard/walletconnect/-/walletconnect-2.5.1.tgz#9d7d22a36a445838a0f29b2106db98f6fd1bc668"
-  integrity sha512-BwzZQmv2lbZmZ3+3kbRTga9QngUhCnJWzfeKw5MuYf1nnuFHigboghyF0x2gmCUMcpeEXBhwYu+nVs1AUhnDVA==
+  version "2.5.2"
+  resolved "https://registry.yarnpkg.com/@web3-onboard/walletconnect/-/walletconnect-2.5.2.tgz#799eb4bcbe9ec0abcb088392a02c32eeb1117a7e"
+  integrity sha512-BoRAaMzkgUzSRRH0YSeCJHdUybNsKydKCocgt/6PY8NZVvJBV3CDasYgVIeIwj+bYB6pWm9IIyFE6VN5/Gzxtg==
   dependencies:
-    "@walletconnect/ethereum-provider" "^2.10.5"
-    "@walletconnect/modal" "2.6.2"
+    "@walletconnect/ethereum-provider" "^2.10.6"
     "@web3-onboard/common" "^2.3.3"
     joi "17.9.1"
     rxjs "^7.5.2"
@@ -5262,9 +5261,9 @@ d@1, d@^1.0.1:
     type "^1.0.1"
 
 daisyui@^4.4.18:
-  version "4.4.20"
-  resolved "https://registry.yarnpkg.com/daisyui/-/daisyui-4.4.20.tgz#3f010eb3d1fc7b4b5824524d27a07adea6e4578d"
-  integrity sha512-AR2fuFVVLHVTdbkV+XWAqjtymEoxXksrsEMkdzPQo2wANtWjSXuODUzePNade64gJ0Y2CdQtiQkaZI7fWcp13g==
+  version "4.4.23"
+  resolved "https://registry.yarnpkg.com/daisyui/-/daisyui-4.4.23.tgz#f2ce1b5eb6c95422e72e5c954a2c0af6bfb65ef0"
+  integrity sha512-IFQRGoGoAke8chxPcDqQJFldVVd51JL7b4mRA3LqsLexW/6xicZzz9X3GXdGdnYsu8QPxZN4uzQZ5fwRNYXOSg==
   dependencies:
     css-selector-tokenizer "^0.8"
     culori "^3"
