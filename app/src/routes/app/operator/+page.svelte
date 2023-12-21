@@ -21,11 +21,14 @@
   import type { TicketDocument } from '$lib/models/ticket';
   import type { Types } from 'mongoose';
   import type { PageData } from './$types';
+  import type { UserDocument } from '$lib/models/user';
+  import { PermissionType } from '$lib/permissions';
 
   export let data: PageData;
   let operator = data.operator as OperatorDocument;
   let agents = data.agents as AgentDocument[];
   let creators = data.creators as CreatorDocument[];
+  let user = data.user as UserDocument;
   let disputedTickets = data.disputedTickets as TicketDocument[];
 
   $: canAddAgent = false;
@@ -59,6 +62,14 @@
   let selectedAgentId = '0';
   let newCreator: CreatorDocument | undefined;
   let newPassword: string | undefined;
+
+  const canImpersonateCreator = user.permissions.includes(
+    PermissionType.IMPERSONATE_CREATOR
+  );
+
+  const canImpersonateAgent = user.permissions.includes(
+    PermissionType.IMPERSONATE_AGENT
+  );
 
   const decideDispute = async (decision: DisputeDecision) => {
     const index = activeDisputeRow;
@@ -387,7 +398,7 @@
               >
                 <div class="overflow-x-auto reo">
                   {#key agents}
-                    <table class="daisy-table">
+                    <table class="daisy-table daisy-table-pin-rows">
                       <thead>
                         <tr>
                           <th
@@ -406,7 +417,9 @@
                           <th>Name</th>
                           <th>Address</th>
                           <th>Active</th>
-                          <th>Impersonate</th>
+                          {#if canImpersonateAgent}
+                            <th>Impersonate</th>
+                          {/if}
                         </tr>
                       </thead>
                       <tbody>
@@ -474,15 +487,28 @@
                                 {/if}
                               </select>
                             </td>
-                            <td
-                              ><button
-                                class="daisy-btn daisy-btn-primary daisy-btn-xs"
-                                on:click={() => {}}>Impersonate</button
-                              ></td
-                            >
+                            {#if canImpersonateAgent}
+                              <td
+                                ><button
+                                  class="daisy-btn daisy-btn-primary daisy-btn-xs"
+                                  on:click={() => {}}>Impersonate</button
+                                ></td
+                              >
+                            {/if}
                           </tr>
                         {/each}
                       </tbody>
+                      <tfoot>
+                        <tr>
+                          <th />
+                          <th>Name</th>
+                          <th>Address</th>
+                          <th>Active</th>
+                          {#if canImpersonateAgent}
+                            <th>Impersonate</th>
+                          {/if}
+                        </tr>
+                      </tfoot>
                     </table>
                   {/key}
                 </div>
@@ -514,6 +540,9 @@
                           <th>Comm %</th>
                           <th>Active</th>
                           <th>Secret</th>
+                          {#if canImpersonateCreator}
+                            <th>Impersonate</th>
+                          {/if}
                           <th>Ticket Sales</th>
                           <th>Revenue</th>
                           <th>Refunds</th>
@@ -666,6 +695,15 @@
                               {/if}
                             </td>
 
+                            {#if canImpersonateCreator}
+                              <td
+                                ><button
+                                  class="daisy-btn daisy-btn-primary daisy-btn-xs"
+                                  on:click={() => {}}>Impersonate</button
+                                ></td
+                              >
+                            {/if}
+
                             <td
                               >{#if creator.salesStats.totalTicketSalesAmounts}
                                 {#each Object.entries(creator.salesStats.totalTicketSalesAmounts) as [currency, amount]}
@@ -715,6 +753,9 @@
                           <th>Comm %</th>
                           <th>Active</th>
                           <th>Secret</th>
+                          {#if canImpersonateCreator}
+                            <th>Impersonate</th>
+                          {/if}
                           <th>Sales</th>
                           <th>Revenue</th>
                           <th>Refunds</th>
@@ -731,7 +772,7 @@
                 class="mt-4 bg-base w-full rounded-lg z-0 overflow-hidden border-2 border-secondary"
               >
                 <div class="overflow-x-auto">
-                  <table class="daisy-table">
+                  <table class="daisy-table daisy-table-pin-rows">
                     <thead>
                       <tr>
                         <th />

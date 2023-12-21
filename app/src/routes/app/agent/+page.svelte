@@ -299,6 +299,9 @@
                           <th>Comm %</th>
                           <th>Active</th>
                           <th>Secret</th>
+                          {#if canImpersonate}
+                            <th>Impersonate</th>
+                          {/if}
                           <th>Sales</th>
                           <th>Revenue</th>
                           <th>Refunds</th>
@@ -407,13 +410,15 @@
                               {:else}
                                 N/A
                               {/if}
+                            </td>
+                            {#if canImpersonate}
                               <button
                                 class="daisy-btn daisy-btn-xs daisy-btn-outline daisy-btn-primary ml-4"
                                 disabled={!canImpersonate}
                               >
                                 Impersonate
                               </button>
-                            </td>
+                            {/if}
 
                             <td
                               >{#if creator.salesStats.totalTicketSalesAmounts}
@@ -463,6 +468,9 @@
                           <th>Comm %</th>
                           <th>Active</th>
                           <th>Secret</th>
+                          {#if canImpersonate}
+                            <th>Impersonate</th>
+                          {/if}
                           <th>Sales</th>
                           <th>Revenue</th>
                           <th>Refunds</th>
