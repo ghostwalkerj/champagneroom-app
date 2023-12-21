@@ -299,14 +299,15 @@
                           <th>Comm %</th>
                           <th>Active</th>
                           <th>Secret</th>
-                          {#if canImpersonate}
-                            <th>Impersonate</th>
-                          {/if}
+
                           <th>Sales</th>
                           <th>Revenue</th>
                           <th>Refunds</th>
                           <th>Reviews</th>
                           <th>Rating</th>
+                          {#if canImpersonate}
+                            <th>Impersonate</th>
+                          {/if}
                         </tr>
                       </thead>
                       <tbody>
@@ -411,14 +412,6 @@
                                 N/A
                               {/if}
                             </td>
-                            {#if canImpersonate}
-                              <button
-                                class="daisy-btn daisy-btn-xs daisy-btn-outline daisy-btn-primary ml-4"
-                                disabled={!canImpersonate}
-                              >
-                                Impersonate
-                              </button>
-                            {/if}
 
                             <td
                               >{#if creator.salesStats.totalTicketSalesAmounts}
@@ -458,6 +451,14 @@
                                 rating={creator.feedbackStats.averageRating}
                               />
                             </td>
+                            {#if canImpersonate}
+                              <button
+                                class="daisy-btn daisy-btn-xs daisy-btn-outline daisy-btn-primary ml-4"
+                                disabled={!canImpersonate}
+                              >
+                                Impersonate
+                              </button>
+                            {/if}
                           </tr>
                         {/each}
                       </tbody>
@@ -468,14 +469,15 @@
                           <th>Comm %</th>
                           <th>Active</th>
                           <th>Secret</th>
-                          {#if canImpersonate}
-                            <th>Impersonate</th>
-                          {/if}
+
                           <th>Sales</th>
                           <th>Revenue</th>
                           <th>Refunds</th>
                           <th>Reviews</th>
                           <th>Rating</th>
+                          {#if canImpersonate}
+                            <th>Impersonate</th>
+                          {/if}
                         </tr>
                       </tfoot>
                     </table>

@@ -417,6 +417,7 @@
                           <th>Name</th>
                           <th>Address</th>
                           <th>Active</th>
+                          <th>Permissions</th>
                           {#if canImpersonateAgent}
                             <th>Impersonate</th>
                           {/if}
@@ -487,6 +488,11 @@
                                 {/if}
                               </select>
                             </td>
+                            <td>
+                              {#each agent.user.permissions as permission}
+                                <div class="text-xs">{permission}</div>
+                              {/each}
+                            </td>
                             {#if canImpersonateAgent}
                               <td
                                 ><button
@@ -504,6 +510,8 @@
                           <th>Name</th>
                           <th>Address</th>
                           <th>Active</th>
+                          <th>Permissions</th>
+
                           {#if canImpersonateAgent}
                             <th>Impersonate</th>
                           {/if}
@@ -540,14 +548,15 @@
                           <th>Comm %</th>
                           <th>Active</th>
                           <th>Secret</th>
-                          {#if canImpersonateCreator}
-                            <th>Impersonate</th>
-                          {/if}
+
                           <th>Ticket Sales</th>
                           <th>Revenue</th>
                           <th>Refunds</th>
                           <th>Reviews</th>
                           <th>Rating</th>
+                          {#if canImpersonateCreator}
+                            <th>Impersonate</th>
+                          {/if}
                         </tr>
                       </thead>
                       <tbody>
@@ -695,15 +704,6 @@
                               {/if}
                             </td>
 
-                            {#if canImpersonateCreator}
-                              <td
-                                ><button
-                                  class="daisy-btn daisy-btn-primary daisy-btn-xs"
-                                  on:click={() => {}}>Impersonate</button
-                                ></td
-                              >
-                            {/if}
-
                             <td
                               >{#if creator.salesStats.totalTicketSalesAmounts}
                                 {#each Object.entries(creator.salesStats.totalTicketSalesAmounts) as [currency, amount]}
@@ -742,6 +742,14 @@
                                 rating={creator.feedbackStats.averageRating}
                               />
                             </td>
+                            {#if canImpersonateCreator}
+                              <td
+                                ><button
+                                  class="daisy-btn daisy-btn-primary daisy-btn-xs"
+                                  on:click={() => {}}>Impersonate</button
+                                ></td
+                              >
+                            {/if}
                           </tr>
                         {/each}
                       </tbody>
@@ -753,14 +761,15 @@
                           <th>Comm %</th>
                           <th>Active</th>
                           <th>Secret</th>
-                          {#if canImpersonateCreator}
-                            <th>Impersonate</th>
-                          {/if}
+
                           <th>Sales</th>
                           <th>Revenue</th>
                           <th>Refunds</th>
                           <th>Reviews</th>
                           <th>Rating</th>
+                          {#if canImpersonateCreator}
+                            <th>Impersonate</th>
+                          {/if}
                         </tr>
                       </tfoot>
                     </table>
