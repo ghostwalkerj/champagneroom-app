@@ -1,43 +1,23 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
-import { Types } from 'mongoose';
 import { nanoid } from 'nanoid';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 import { raise } from 'xstate/lib/actions';
 
-import type {
-  CancelType,
-  DisputeType,
-  FinalizeType,
-  RefundType,
-  SaleType
+import {
+  type CancelType,
+  disputeStatsZodSchema,
+  escrowZodSchema,
+  type FinalizeType,
+  finalizeZodSchema,
+  runtimeZodSchema,
+  showSalesStatsZodSchema
 } from '$lib/models/common';
-import { DisputeDecision } from '$lib/models/common';
-import type { ShowDocumentType } from '$lib/models/show';
-import { ShowStatus } from '$lib/models/show';
+import type { ShowDocument } from '$lib/models/show';
 import type { TicketDocument } from '$lib/models/ticket';
-import type { TransactionDocumentType } from '$lib/models/transaction';
+import type { TransactionDocument } from '$lib/models/transaction';
 
-import { ActorType } from '$lib/constants';
-
-enum ShowMachineEventString {
-  CANCELLATION_INITIATED = 'CANCELLATION INITIATED',
-  REFUND_INITIATED = 'REFUND INITIATED',
-  TICKET_REFUNDED = 'TICKET REFUNDED',
-  TICKET_RESERVED = 'TICKET RESERVED',
-  TICKET_CANCELLED = 'TICKET CANCELLED',
-  TICKET_SOLD = 'TICKET SOLD',
-  SHOW_STARTED = 'SHOW STARTED',
-  SHOW_STOPPED = 'SHOW STOPPED',
-  SHOW_FINALIZED = 'SHOW FINALIZED',
-  SHOW_ENDED = 'SHOW ENDED',
-  CUSTOMER_JOINED = 'CUSTOMER JOINED',
-  CUSTOMER_LEFT = 'CUSTOMER LEFT',
-  TICKET_FINALIZED = 'TICKET FINALIZED',
-  TICKET_DISPUTED = 'TICKET DISPUTED',
-  DISPUTE_DECIDED = 'DISPUTE DECIDED',
-  TICKET_REDEEMED = 'TICKET REDEEMED'
-}
+import { ActorType, DisputeDecision, ShowStatus } from '$lib/constants';
 
 export type ShowMachineEventType =
   | {
@@ -54,7 +34,6 @@ export type ShowMachineEventType =
   | {
       type: 'TICKET REFUNDED';
       ticket: TicketDocument;
-      refund: RefundType;
     }
   | {
       type: 'TICKET REDEEMED';
@@ -67,12 +46,10 @@ export type ShowMachineEventType =
   | {
       type: 'TICKET CANCELLED';
       ticket: TicketDocument;
-      cancel: CancelType;
     }
   | {
       type: 'TICKET SOLD';
       ticket: TicketDocument;
-      sale: SaleType;
     }
   | {
       type: 'SHOW STARTED';
@@ -97,7 +74,6 @@ export type ShowMachineEventType =
     }
   | {
       type: 'TICKET DISPUTED';
-      dispute: DisputeType;
       ticket: TicketDocument;
     }
   | {
@@ -116,7 +92,7 @@ export type ShowMachineOptions = {
   }: {
     type: string;
     ticketId?: string;
-    transaction?: TransactionDocumentType;
+    transaction?: TransactionDocument;
     ticketInfo?: { customerName: string };
   }) => void;
   gracePeriod?: number;
@@ -131,13 +107,13 @@ export type ShowMachineStateType = StateFrom<typeof createShowMachine>;
 
 export type ShowMachineType = ReturnType<typeof createShowMachine>;
 
-export type ShowStateType = ShowDocumentType['showState'];
+export type ShowStateType = ShowDocument['showState'];
 
 const createShowMachine = ({
   showDocument,
   showMachineOptions
 }: {
-  showDocument: ShowDocumentType;
+  showDocument: ShowDocument;
   showMachineOptions?: ShowMachineOptions;
 }) => {
   const GRACE_PERIOD = showMachineOptions?.gracePeriod || 3_600_000;
@@ -153,6 +129,11 @@ const createShowMachine = ({
         ) as ShowStateType,
         errorMessage: undefined as string | undefined,
         id: nanoid()
+      } as {
+        showDocument: ShowDocument;
+        showState: ShowStateType;
+        errorMessage: string | undefined;
+        id: string;
       },
       tsTypes: {} as import('./showMachine.typegen.d.ts').Typegen0,
       schema: {
@@ -237,10 +218,9 @@ const createShowMachine = ({
                       'receiveResolution',
                       raise({
                         type: 'SHOW FINALIZED',
-                        finalize: {
-                          finalizedAt: new Date(),
+                        finalize: finalizeZodSchema.parse({
                           finalizedBy: ActorType.ARBITRATOR
-                        }
+                        })
                       })
                     ],
                     cond: 'canFinalize'
@@ -431,10 +411,7 @@ const createShowMachine = ({
             showState: {
               ...context.showState,
               status: ShowStatus.LIVE,
-              runtime: {
-                startDate: new Date(),
-                endDate: undefined
-              }
+              runtime: runtimeZodSchema.parse({})
             }
           };
         }),
@@ -444,9 +421,7 @@ const createShowMachine = ({
             showState: {
               ...context.showState,
               status: ShowStatus.IN_ESCROW,
-              escrow: {
-                startedAt: new Date()
-              },
+              escrow: escrowZodSchema.parse({}),
               current: false
             }
           };
@@ -462,10 +437,10 @@ const createShowMachine = ({
             showState: {
               ...context.showState,
               status: ShowStatus.STOPPED,
-              runtime: {
-                startDate,
+              runtime: runtimeZodSchema.parse({
+                ...context.showState.runtime,
                 endDate: new Date()
-              }
+              })
             }
           };
         }),
@@ -475,10 +450,10 @@ const createShowMachine = ({
             showState: {
               ...context.showState,
               status: ShowStatus.CANCELLATION_INITIATED,
-              salesStats: {
+              salesStats: showSalesStatsZodSchema.parse({
                 ...context.showState.salesStats,
                 ticketsAvailable: 0
-              },
+              }),
               cancel: event.cancel
             }
           };
@@ -499,12 +474,12 @@ const createShowMachine = ({
             showState: {
               ...st,
               status: ShowStatus.IN_DISPUTE,
-              disputes: [...st.disputes, event.dispute._id!],
-              disputeStats: {
+              disputes: [...st.disputes, event.ticket._id],
+              disputeStats: disputeStatsZodSchema.parse({
                 ...st.disputeStats,
                 totalDisputes: st.disputeStats.totalDisputes + 1,
                 totalDisputesPending: st.disputeStats.totalDisputesPending + 1
-              }
+              })
             }
           };
         }),
@@ -514,13 +489,13 @@ const createShowMachine = ({
           const refunded = event.decision === DisputeDecision.NO_REFUND ? 0 : 1;
           const showState = {
             ...st,
-            disputeStats: {
+            disputeStats: disputeStatsZodSchema.parse({
               ...st.disputeStats,
               totalDisputesPending: st.disputeStats.totalDisputesPending - 1,
               totalDisputesResolved: st.disputeStats.totalDisputesResolved + 1,
               totalDisputesRefunded:
                 st.disputeStats.totalDisputesRefunded + refunded
-            }
+            })
           };
           return {
             showState
@@ -529,21 +504,19 @@ const createShowMachine = ({
 
         refundTicket: assign((context, event) => {
           const st = context.showState;
-          const refund = event.refund;
           const salesStats = st.salesStats;
 
           salesStats.ticketsRefunded += 1;
           salesStats.ticketsSold -= 1;
           salesStats.ticketsAvailable += 1;
-
-          st.refunds.push(refund._id!);
+          st.refunds.push(event.ticket._id);
 
           return {
             showState: {
               ...st,
-              salesStats: {
+              salesStats: showSalesStatsZodSchema.parse({
                 ...salesStats
-              }
+              })
             }
           };
         }),
@@ -560,54 +533,52 @@ const createShowMachine = ({
 
         cancelTicket: assign((context, event) => {
           const st = context.showState;
-          st.cancellations.push(new Types.ObjectId(event.cancel._id));
+          st.cancellations.push(event.ticket._id);
           return {
             showState: {
               ...st,
-              salesStats: {
+              salesStats: showSalesStatsZodSchema.parse({
                 ...st.salesStats,
                 ticketsAvailable: st.salesStats.ticketsAvailable + 1,
                 ticketsReserved: st.salesStats.ticketsReserved - 1
-              }
+              })
             }
           };
         }),
 
         reserveTicket: assign((context, event) => {
           const st = context.showState;
-          st.reservations.push(new Types.ObjectId(event.ticket._id.toString()));
+          st.reservations.push(event.ticket._id);
           return {
             showState: {
               ...st,
-              salesStats: {
+              salesStats: showSalesStatsZodSchema.parse({
                 ...st.salesStats,
                 ticketsAvailable: st.salesStats.ticketsAvailable - 1,
                 ticketsReserved: st.salesStats.ticketsReserved + 1
-              }
+              })
             }
           };
         }),
 
         redeemTicket: assign((context, event) => {
           const st = context.showState;
-          st.redemptions.push(new Types.ObjectId(event.ticket._id.toString()));
+          st.redemptions.push(event.ticket._id);
           st.salesStats.ticketsRedeemed += 1;
           return {
             showState: {
               ...st,
-              salesStats: {
+              salesStats: showSalesStatsZodSchema.parse({
                 ...st.salesStats,
                 ticketsRedeemed: st.salesStats.ticketsRedeemed + 1
-              }
+              })
             }
           };
         }),
 
         finalizeTicket: assign((context, event) => {
           const st = context.showState;
-          st.finalizations.push(
-            new Types.ObjectId(event.ticket._id.toString())
-          );
+          st.finalizations.push(event.ticket._id);
           st.salesStats.ticketsFinalized += 1;
           return {
             showState: {
@@ -618,11 +589,10 @@ const createShowMachine = ({
 
         sellTicket: assign((context, event) => {
           const st = context.showState;
-          const sale = event.sale;
           st.salesStats.ticketsSold += 1;
           st.salesStats.ticketsReserved -= 1;
 
-          st.sales.push(sale._id!);
+          st.sales.push(event.ticket._id);
           return {
             showState: {
               ...st
@@ -637,10 +607,10 @@ const createShowMachine = ({
           return {
             showState: {
               ...context.showState,
-              escrow: {
+              escrow: escrowZodSchema.parse({
                 ...escrow,
                 endedAt: new Date()
-              },
+              }),
               status: ShowStatus.FINALIZED,
               finalize: event.finalize
             }
@@ -717,12 +687,12 @@ const createShowMachine = ({
   );
 };
 
-export { ShowMachineEventString, createShowMachine };
+export { createShowMachine };
 export const createShowMachineService = ({
   showDocument,
   showMachineOptions
 }: {
-  showDocument: ShowDocumentType;
+  showDocument: ShowDocument;
   showMachineOptions?: ShowMachineOptions;
 }) => {
   const showMachine = createShowMachine({ showDocument, showMachineOptions });
@@ -751,7 +721,7 @@ export const createShowMachineService = ({
 
       const transaction = (
         'transaction' in event ? event.transaction : undefined
-      ) as TransactionDocumentType | undefined;
+      ) as TransactionDocument | undefined;
       const ticketInfo = { customerName };
 
       showMachineOptions.saveShowEventCallback &&

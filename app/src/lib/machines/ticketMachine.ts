@@ -2,34 +2,39 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import type { Queue } from 'bullmq';
-import { Types } from 'mongoose';
 import { nanoid } from 'nanoid';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 import { raise } from 'xstate/lib/actions';
 
-import type {
-  CancelType,
-  CurrencyType,
-  DisputeType,
-  FeedbackType,
-  FinalizeType,
-  RefundType,
-  SaleType
+import type { FeedbackType, TransactionSummaryType } from '$lib/models/common';
+import {
+  type CancelType,
+  type DisputeType,
+  disputeZodSchema,
+  escrowZodSchema,
+  type FinalizeType,
+  finalizeZodSchema,
+  redemptionZodSchema,
+  type RefundType,
+  refundZodSchema,
+  type SaleType,
+  ticketSaleZodSchema,
+  transactionSummaryZodSchema
 } from '$lib/models/common';
-import { DisputeDecision, RefundReason } from '$lib/models/common';
-import type { TicketDocumentType, TicketStateType } from '$lib/models/ticket';
-import { TicketStatus } from '$lib/models/ticket';
-import type {
-  TransactionDocumentType,
-  TransactionSummaryType
-} from '$lib/models/transaction';
+import type { TicketDocument, TicketStateType } from '$lib/models/ticket';
+import type { TransactionDocument } from '$lib/models/transaction';
 
 import type { ShowJobDataType } from '$lib/workers/showWorker';
 
-import { ActorType } from '$lib/constants';
+import type { CurrencyType } from '$lib/constants';
+import {
+  ActorType,
+  DisputeDecision,
+  RefundReason,
+  ShowMachineEventString,
+  TicketStatus
+} from '$lib/constants';
 import { calcTotal } from '$lib/payment';
-
-import { ShowMachineEventString } from './showMachine';
 
 export type TicketMachineOptions = {
   saveStateCallback?: (state: TicketStateType) => void;
@@ -44,7 +49,7 @@ type TicketMachineEventType =
     }
   | {
       type: 'REFUND RECEIVED';
-      transaction: TransactionDocumentType;
+      transaction: TransactionDocument;
     }
   | {
       type: 'REFUND REQUESTED';
@@ -56,7 +61,7 @@ type TicketMachineEventType =
     }
   | {
       type: 'PAYMENT RECEIVED';
-      transaction: TransactionDocumentType;
+      transaction: TransactionDocument;
     }
   | {
       type: 'FEEDBACK RECEIVED';
@@ -92,13 +97,16 @@ type TicketMachineEventType =
       decision: DisputeDecision;
       refund?: RefundType;
     }
-  | { type: 'PAYMENT INITIATED' };
+  | {
+      type: 'PAYMENT INITIATED';
+      paymentCurrency: CurrencyType;
+    };
 
 const createTicketMachine = ({
   ticketDocument,
   ticketMachineOptions
 }: {
-  ticketDocument: TicketDocumentType;
+  ticketDocument: TicketDocument;
   ticketMachineOptions?: TicketMachineOptions;
 }) => {
   /** @xstate-layout N4IgpgJg5mDOIC5QBcCWBjA1mZBZAhugBaoB2YAxAMoASA8gOoAEAwgIIByLAogDK-cAIgG0ADAF1EoAA4B7WKjSzSUkAA9EAFgBMAGhABPRNoCM2zQDoAHCZObRVgOyaAnNqsuAvp-1osOAmIySlpGVk4efiFhE0kkEDkFJRV4jQQdfSMEEwBmF0cLAFYANjdtQtETYs0rYqtvXwxsPEIScgs-Zt5ZfAhICjE4mXlFVGVVNJzHQos7UWLi0ULzURcTZ0zEXNFLbRdC2tFHHM0qzRyGkE6A1uCOppxu3v6YoYSR5InEHMKZuYWlis1htDMYdjNKpoalZRDlio5HKJtJdri0gu1UU8+hABto3olRuNUogrHpQQhzG4LKZHNUctp5vkTCiHmi2mB7v5kFiXjl8R8xilQGltKZqcVfgdCvS3BVHJsEMUfhZXDlYZopSYdpoWVzAuzOV0etiBpp+UlBV8EFM-vYAct7MDNAqzAdqfs1vYEXZcrrmvq7pjjS9CubCUL1IhHGSstpSjMpnDnCVRKtkT4rqyAxjWTyccJimHPsSEMsFWq4yqrGqXOdYfNmRnUdmOUHnvnHEXLSWGSZxZKrNK9uUjgrRS4inkXE5HGtlm5in6buiOQAnOBgVcAN36oWY3A4gmiElUBOLwq2NgK6wZLhyHkKjisGXJJysFlh09K1cfn51TazW52nXWBNx3CALAAd3wUZSCgTQAAV8AMABbMBSGQCgELYABNXADwAFSYAAlbgeAASQANWPLsiQvbJYWKIpChqaZYQRGF5XJKxn1mJUjlycxim0RxG0aPUgLXDdt0gKCYLQODEOQtCMKw3D8I4IjSIo6iRFiU8BToyMEGOSw7RE4oTEfcpygVUkciKbYTGfeltkKJc2TuECwNk6DYPgpDUPQzD2C4PheDYAjyLoDgmHIjhyKiyKaIMi0jLSZyRNmaNVnvfYnxfLIqlEixZwOI48lsJwLgAiSVwsbyZIgvyFIC5TgooULIgiqKYrihKkoI6J9PiM9u3orVK1+ViKimJ9R3JMwsufOMdGqdZan-cT-UkhrpPAuT-KUoLVMGVLwytSamOmpxZo4hasmrd8qhyMxNAWWkdhq7blwNRqDpash4KoIhZEg6h6GYAApOh4pS0bDIjDKr2y288sfFa7PmUqtVTFx+Oc+YPJbPbQKaiwyFGfBkEgFh8FIdAwAAGyZ6nBUO1rNGIsAADMAFdSBxUiADEAFVDxIsjuCo+HhjSpHL3WVHcofAqY0vUVZl+WwrMfKzYWJ3b-tkym0Gp2n6cZlm2eUDmga53mBaF7gxYl7Tpd015zvPYy7DhaxCnyJw4xOUxihdON30ZUUKjOWpF1qnb6vXSAwDQnE9yYARhYIs6Eflq1ykRCw8g1VadjMeEFWcbRqVx8rVcHQ3k7AVP04hsIYbhkQT3zi6ewqGZzjYwp1hyV7nXJaoZmmOo7xOSonzEzM6r+1u+nbzODyPHvaIVxV1YpZw+0TGEpkHJ9n2bg0yG4WB0FXMGKGF7ghAAITYFgAGlJZ02X3gLiWU4DlTKImcDKQccYxxgOyg4aMJQ3AmHyNfO4t976P3BoIciVAEKiyGv1RK5Fkq729uNYywDSonDAecPYkDw7kncI+Sci94Q-Eyu5ROv1UGkDvg-J+UVv7cCIsLeKbBeDkQAFr-zGulLQuRKGaGoRA5Y9DYyWVEDjaYNlR52BKN4DMpBZB9HgPEZsklSGyIQAAWlUYgfYH57Cpicc4xwKCcxcjzBY-ehUtjlDMkcJYUJFHVAcG4qSZNwJeKtHUJi5laRWXgbZckxwmKVBrGsfI+wRJhNJj5Zq8l7aBRUsgKJJYEQQjYQcKYfspgKjcJYfGllqzOSsq9HJxt8lHRBmDUpE0fhmQ1Kcaos5KiijsucCwCxXqvWmtUdMP1PLAX2ibUgVMaYQDpgzZmrMfYyP3rkHiAcg7RiVDoKoLpCZFFKKYKEmToztOWRBU2qBzYbMttsm2pA7aKW5vzQWvTfZyhVK4Coz4mS2BdHCCcyxtB5VpAcJwDy26QABSKZyTF7xqmEh4H4cJbEIBcpMpUop3Bwq8JwxZHJ0DvJZiivuPs0UuAnDUDUr1ygShKIfUwqxZh2HODxIu30V5JwNDzMg+AmaoAAF50rlv3eidILD4wXNKFiiwzDQJ5YsesiwGT0iODktBfDIKouMHeSZlRiV2HxrUQo0CmHaoWMJcB2SKUkzIIIVAsBpB8xpqaxUSsJTwhYnixYs5yyLyrK9L6DJR6uoWSTFCXrQIQG6Sa+lZCMrTlrvSeyHhFHLFhOWao4olT5EshUI4719GeCAA */
@@ -340,10 +348,9 @@ const createTicketMachine = ({
                     'receiveFeedback',
                     raise({
                       type: 'TICKET FINALIZED',
-                      finalize: {
-                        finalizedAt: new Date(),
+                      finalize: finalizeZodSchema.parse({
                         finalizedBy: ActorType.CUSTOMER
-                      }
+                      })
                     })
                   ]
                 },
@@ -364,10 +371,9 @@ const createTicketMachine = ({
                           'decideDispute',
                           raise({
                             type: 'TICKET FINALIZED',
-                            finalize: {
-                              finalizedAt: new Date(),
+                            finalize: finalizeZodSchema.parse({
                               finalizedBy: ActorType.ARBITRATOR
-                            }
+                            })
                           })
                         ],
                         cond: 'noDisputeRefund'
@@ -386,10 +392,9 @@ const createTicketMachine = ({
                         'receiveRefund',
                         raise({
                           type: 'TICKET FINALIZED',
-                          finalize: {
-                            finalizedAt: new Date(),
+                          finalize: finalizeZodSchema.parse({
                             finalizedBy: ActorType.ARBITRATOR
-                          }
+                          })
                         })
                       ]
                     }
@@ -504,17 +509,11 @@ const createTicketMachine = ({
 
         requestRefundCancelledShow: assign((context, event) => {
           const state = context.ticketState;
-          const refund = {
-            _id: new Types.ObjectId(),
-            requestedAt: new Date(),
-            transactions: [] as Types.ObjectId[],
-            actualAmounts: {} as Map<string, number>,
-            requestedAmounts: state.sale?.totals || ({} as Map<string, number>),
-            approvedAmounts: state.sale?.totals || ({} as Map<string, number>),
-            reason: RefundReason.SHOW_CANCELLED,
-            totals: {} as Map<string, number>,
-            payouts: {} as any
-          } as RefundType;
+          const refund = refundZodSchema.parse({
+            requestedAmounts: state.sale?.total,
+            approvedAmounts: state.sale?.total,
+            reason: RefundReason.SHOW_CANCELLED
+          });
           return {
             ticketState: {
               ...context.ticketState,
@@ -525,14 +524,15 @@ const createTicketMachine = ({
           };
         }),
 
-        initiatePayment: assign((context) => {
-          const sale = {
-            _id: new Types.ObjectId(),
-            soldAt: new Date(),
-            totals: new Map<string, number>(),
-            payments: new Map<string, any>()
-          } as SaleType;
-
+        initiatePayment: assign((context, event) => {
+          const paymentCurrency = event.paymentCurrency;
+          const sale = ticketSaleZodSchema.parse({
+            totals: {
+              [paymentCurrency]: 0
+            },
+            payments: [],
+            currency: paymentCurrency
+          }) as SaleType;
           return {
             ticketState: {
               ...context.ticketState,
@@ -557,9 +557,7 @@ const createTicketMachine = ({
             ticketState: {
               ...context.ticketState,
               status: TicketStatus.REDEEMED,
-              redemption: {
-                redeemedAt: new Date()
-              }
+              redemption: redemptionZodSchema.parse({})
             }
           };
         }),
@@ -576,18 +574,14 @@ const createTicketMachine = ({
         receivePayment: assign((context, event) => {
           const sale = context.ticketState.sale;
           if (!sale) return {};
-          const payment = {
+          const payment = transactionSummaryZodSchema.parse({
             amount: +event.transaction.amount,
             currency: event.transaction.currency.toUpperCase() as CurrencyType,
             rate: +(event.transaction.rate || 0),
             transaction: event.transaction._id
-          };
-          const totals = sale.totals;
-          const total = (totals[payment.currency] || 0) + payment.amount;
-          sale.totals[payment.currency] = total;
-          const payments = sale.payments[payment.currency] || [];
-          payments.push(payment);
-          sale.payments[payment.currency] = payments;
+          });
+          sale.total += payment.amount;
+          sale.payments.push(payment);
 
           return {
             ticketState: {
@@ -620,23 +614,17 @@ const createTicketMachine = ({
         receiveRefund: assign((context, event) => {
           const state = context.ticketState;
           const currency = event.transaction.currency.toUpperCase();
-          const payout = {
+          const payout = transactionSummaryZodSchema.parse({
             amount: +event.transaction.amount,
             currency,
             rate: +(event.transaction.rate || 0),
             transaction: event.transaction._id
-          };
+          });
           const refund = state.refund;
           if (!refund) return {};
 
-          const total = refund.totals[payout.currency] || 0 + payout.amount;
-          refund.totals[payout.currency] = total;
-
-          const payouts = refund.payouts[payout.currency] || [];
-
-          payouts.push(payout);
-
-          refund.payouts[payout.currency] = payouts;
+          refund.total += payout.amount;
+          refund.payouts.push(payout);
 
           return {
             ticketState: {
@@ -673,9 +661,7 @@ const createTicketMachine = ({
             ticketState: {
               ...context.ticketState,
               status: TicketStatus.IN_ESCROW,
-              escrow: {
-                startedAt: new Date()
-              }
+              escrow: escrowZodSchema.parse({})
             }
           };
         }),
@@ -698,12 +684,12 @@ const createTicketMachine = ({
           const refund = event.refund;
 
           if (!context.ticketState.dispute) return {};
-          const dispute = {
+          const dispute = disputeZodSchema.parse({
             ...context.ticketState.dispute,
             decision: event.decision,
             endedAt: new Date(),
             resolved: true
-          };
+          });
           return {
             ticketState: {
               ...context.ticketState,
@@ -785,23 +771,11 @@ const createTicketMachine = ({
           const refund = context.ticketState.refund;
           if (refund === undefined) return false;
           const currency = event.transaction.currency.toUpperCase();
-          const refundApproved = refund.approvedAmounts[currency] || 0;
+          const refundApproved = refund.approvedAmount || 0;
           if (refundApproved === 0) return false;
           const amount =
             event.type === 'REFUND RECEIVED' ? +event.transaction?.amount : 0;
-          const totalRefundsAmount = refund.totals[currency] || 0 + amount;
-
-          // Check to see if all other currencies have been refunded
-          for (const [key, value] of Object.entries(refund.approvedAmounts)) {
-            if (key === currency) continue;
-            if (
-              !refund.approvedAmounts[key] ||
-              refund.approvedAmounts[key] === 0
-            )
-              return false;
-
-            if ((refund.totals[key] || 0) < value) return false;
-          }
+          const totalRefundsAmount = refund.total || 0 + amount;
 
           const refundedInTransactionCurrency =
             totalRefundsAmount >= refundApproved;
@@ -818,7 +792,10 @@ const createTicketMachine = ({
           return (
             context.ticketDocument.price.amount !== 0 &&
             (!context.ticketState.sale ||
-              context.ticketState.sale?.payments.size !== 0)
+              !context.ticketState.sale?.payments ||
+              context.ticketState.sale?.payments[
+                context.ticketDocument.price.currency
+              ]?.length === 0)
           );
         },
 
@@ -843,24 +820,6 @@ export type TicketMachineStateType = StateFrom<
 
 export type TicketMachineType = ReturnType<typeof createTicketMachine>;
 
-export enum TicketMachineEventString {
-  CANCELLATION_REQUESTED = 'CANCELLATION REQUESTED',
-  REFUND_RECEIVED = 'REFUND RECEIVED',
-  PAYMENT_INITIATED = 'PAYMENT INITIATED',
-  PAYMENT_RECEIVED = 'PAYMENT RECEIVED',
-  FEEDBACK_RECEIVED = 'FEEDBACK RECEIVED',
-  DISPUTE_INITIATED = 'DISPUTE INITIATED',
-  SHOW_JOINED = 'SHOW JOINED',
-  SHOW_LEFT = 'SHOW LEFT',
-  SHOW_ENDED = 'SHOW ENDED',
-  SHOW_CANCELLED = 'SHOW CANCELLED',
-  TICKET_FINALIZED = 'TICKET FINALIZED',
-  DISPUTE_DECIDED = 'DISPUTE DECIDED',
-  TICKET_REDEEMED = 'TICKET REDEEMED',
-  REFUND_REQUESTED = 'REFUND REQUESTED',
-  REFUND_INITIATED = 'REFUND INITIATED'
-}
-
 export { TicketMachineEventType };
 
 export { createTicketMachine };
@@ -869,7 +828,7 @@ export const createTicketMachineService = ({
   ticketDocument,
   ticketMachineOptions
 }: {
-  ticketDocument: TicketDocumentType;
+  ticketDocument: TicketDocument;
   ticketMachineOptions?: TicketMachineOptions;
 }) => {
   const ticketMachine = createTicketMachine({

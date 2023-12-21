@@ -9,7 +9,7 @@ import { User } from '$lib/models/user';
 import { Wallet } from '$lib/models/wallet';
 
 import Config from '$lib/config';
-import { AuthType, EntityType } from '$lib/constants';
+import { AuthType, EntityType, UserRole } from '$lib/constants';
 
 import type { Actions, PageServerLoad } from './$types';
 
@@ -59,10 +59,10 @@ export const actions: Actions = {
     // Check if existing user, if so, add the role
     const user = await User.findOne({ address: address.toLowerCase() });
     if (user) {
-      if (user.roles.includes(EntityType.CREATOR)) {
+      if (user.roles.includes(UserRole.CREATOR)) {
         return fail(400, { alreadyCreator: true });
       } else {
-        user.roles.push(EntityType.CREATOR);
+        user.roles.push(UserRole.CREATOR);
         user.name = name;
         await user.save();
 
@@ -115,8 +115,7 @@ export const load: PageServerLoad = async ({ locals }) => {
   return {
     message,
     user:
-      user?.toObject({ flattenObjectIds: true, flattenMaps: true }) ??
-      undefined,
+      user?.toJSON({ flattenMaps: true, flattenObjectIds: true }) ?? undefined,
     isCreator
   };
 };

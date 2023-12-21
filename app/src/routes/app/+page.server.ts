@@ -5,10 +5,10 @@ export const load: PageServerLoad = async ({ locals }) => {
   const ticket = locals.ticket;
   return {
     user: user
-      ? user.toObject({ flattenObjectIds: true, flattenMaps: true })
+      ? user.toJSON({ flattenMaps: true, flattenObjectIds: true })
       : undefined,
     ticket: ticket
-      ? ticket.toObject({ flattenObjectIds: true, flattenMaps: true })
+      ? ticket.toJSON({ flattenMaps: true, flattenObjectIds: true })
       : undefined
   };
 };

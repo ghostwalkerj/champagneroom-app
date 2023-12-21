@@ -10,6 +10,7 @@ import basicAuth from 'express-basic-auth';
 import IORedis from 'ioredis';
 import maxListenersExceededWarning from 'max-listeners-exceeded-warning';
 import mongoose from 'mongoose';
+import { setup } from 'mongoose-zod';
 import parseArgv from 'tiny-parse-argv';
 
 import { handler } from './build/handler';
@@ -121,6 +122,11 @@ if (mongoose.connection.readyState === 0) {
     console.log('Mongoose connected:', mongoose.connection.name);
   });
 }
+
+setup({
+  defaultToMongooseSchemaOptions: { unknownKeys: 'strip' }
+});
+mongoose.set('strictQuery', true);
 
 maxListenersExceededWarning();
 

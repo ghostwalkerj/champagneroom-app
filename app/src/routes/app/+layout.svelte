@@ -11,8 +11,6 @@
   import { AuthType } from '$lib/constants';
   import { selectedAccount } from '$lib/web3';
 
-  import ConnectButton from '$components/header/ConnectButton.svelte';
-
   import { version } from '../../../package.json';
 
   import type { LayoutData } from './$types';
@@ -65,15 +63,18 @@
       {#if $selectedAccount}
         <div class=" flex items-center gap-2">
           <span class="bg-primary h-3 w-3 rounded-full" />
-          <span>Wallet Connected</span>
+          {#if !$page.data.user?.name}
+            <span>Wallet Connected</span>
+          {/if}
           {#if $page.data.user}
             <div class="text-xl">
-              | {$page.data.user.name}
+              {$page.data.user.name}
             </div>
           {/if}
           <a
             class="btn variant-outline"
-            href={Config.PATH.signout + '?returnPath=/'}>Signout</a
+            href={Config.PATH.signout + '?returnPath=' + $page.url.pathname}
+            >Signout</a
           >
         </div>
       {:else}
@@ -82,16 +83,12 @@
     </div>
   </nav>
 
-  <div class="flex-1">
+  <div class="flex-1 flex flex-col items-center justify-center">
     <slot />
   </div>
 
-  <footer
-    class="daisy-footer daisy-footer-center p-2 bg-base-300 text-base-content sticky bottom-0"
-  >
-    <div class="flex">
-      <p>Build Number: {buildNumber}</p>
-      <p>Build Time: {buildTime}</p>
-    </div>
+  <footer class="w-fit bg-surface-800 p-2 text-base-content sticky bottom-0">
+    <p>Build Number: {buildNumber} |</p>
+    <p>Build Time: {buildTime}</p>
   </footer>
 </div>

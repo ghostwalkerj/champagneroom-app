@@ -3,21 +3,13 @@
 @import 'tailwindcss/utilities';
 @import '../node_modules/npm-font-caviar-dreams/caviar-dreams';
 
-@layer components {
-  .daisy-btn {
-    font-family: 'Space Grotesk';
-  }
-  .select {
-    font-family: 'Space Grotesk';
-  }
-  .input {
-    font-family: 'Space Grotesk';
-  }
-  .tab {
-    font-family: 'Space Grotesk';
-  }
-}
-
 .bg-image {
   @apply bg-cover bg-center max-w-sm w-full hover:scale-105 transition ease-in-out delay-150 shadow-sm hover:shadow-xl;
+}
+
+.btn,
+.input,
+.select,
+.tab {
+  @apply !font-SpaceGrotesk;
 }

@@ -16,15 +16,16 @@ import {
 } from '$env/static/private';
 
 import type { AgentDocument } from '$lib/models/agent';
-import { CurrencyType } from '$lib/models/common';
+import type { CreatorDocument } from '$lib/models/creator';
 import { Creator } from '$lib/models/creator';
 import { Show } from '$lib/models/show';
 import type { UserDocument } from '$lib/models/user';
 import { User } from '$lib/models/user';
+import type { WalletDocument } from '$lib/models/wallet';
 import { Wallet } from '$lib/models/wallet';
 
 import Config from '$lib/config';
-import { AuthType, EntityType } from '$lib/constants';
+import { AuthType, CurrencyType, EntityType } from '$lib/constants';
 import { rateCryptosRateGet } from '$lib/ext/bitcart';
 import { createAuthToken } from '$lib/payment';
 import { womensNames } from '$lib/womensNames';
@@ -40,13 +41,12 @@ export const actions: Actions = {
     }
     const user = locals.user as UserDocument;
     const agent = locals.agent as AgentDocument;
-    user.profileImageUrl = url;
-    await user.save();
+    user.updateOne({ profileImageUrl: url }).exec();
     agent.user.profileImageUrl = url;
 
     return {
       success: true,
-      agent: agent?.toObject({ flattenObjectIds: true, flattenMaps: true })
+      agent: agent?.toJSON({ flattenMaps: true, flattenObjectIds: true })
     };
   },
   create_creator: async ({ request }) => {
@@ -71,8 +71,7 @@ export const actions: Actions = {
       });
       const secret = nanoid();
 
-      const wallet = new Wallet();
-      await wallet.save();
+      const wallet = (await Wallet.create({})) as WalletDocument;
 
       const user = await User.create({
         name,
@@ -80,18 +79,17 @@ export const actions: Actions = {
         secret,
         wallet: wallet._id,
         roles: [EntityType.CREATOR],
-        password: `${password}${PASSWORD_SALT}`
-      });
-      const creator = await Creator.create({
-        user: user._id,
-        commissionRate: +commission,
-        agent: agentId,
+        password: `${password}${PASSWORD_SALT}`,
         profileImageUrl: Config.UI.defaultProfileImage
       });
+      const creator = (await Creator.create({
+        user: user._id,
+        commissionRate: +commission,
+        agent: agentId
+      })) as CreatorDocument;
       return {
         success: true,
-        creator: creator?.toObject({
-          flattenObjectIds: true,
+        creator: creator?.toJSON({
           flattenMaps: true
         }),
         password
@@ -175,9 +173,12 @@ export const actions: Actions = {
     if (!user) {
       return fail(400, { userId, missingUserId: true });
     }
-    user.secret = secret;
-    user.password = `${password}${PASSWORD_SALT}`;
-    user.save();
+    user
+      .updateOne({
+        secret,
+        password: `${password}${PASSWORD_SALT}`
+      })
+      .exec();
 
     return { success: true, secret, password };
   },
@@ -197,11 +198,17 @@ export const actions: Actions = {
       return fail(400, { defaultCommissionRate, badCommission: true });
     }
 
-    user.name = name;
-    user.save();
+    if (name !== user.name) {
+      user.updateOne({ name }).exec();
+    }
 
-    agent.defaultCommissionRate = +defaultCommissionRate;
-    agent.save();
+    if (agent.defaultCommissionRate !== +defaultCommissionRate) {
+      agent
+        .updateOne({
+          defaultCommissionRate: +defaultCommissionRate
+        })
+        .exec();
+    }
 
     return {
       success: true
@@ -210,7 +217,7 @@ export const actions: Actions = {
   update_referral_code: async ({ locals }) => {
     const user = locals.user as UserDocument;
     user.referralCode = nanoid(10);
-    user.save();
+    user.updateOne({ referralCode: user.referralCode }).exec();
 
     return {
       success: true,
@@ -227,7 +234,9 @@ export const load: PageServerLoad = async ({ locals }) => {
     throw error(404, 'Agent not found');
   }
 
-  let creators = await Creator.find({ agent: agent._id });
+  let creators = (await Creator.find({
+    agent: agent._id
+  })) as CreatorDocument[];
   creators = creators.sort((a, b) => {
     if (a.user.name < b.user.name) {
       return -1;
@@ -325,15 +334,15 @@ export const load: PageServerLoad = async ({ locals }) => {
   }
 
   return {
-    agent: agent.toObject({ flattenObjectIds: true, flattenMaps: true }),
+    agent: agent.toJSON({ flattenMaps: true, flattenObjectIds: true }),
     user: user
-      ? user.toObject({ flattenObjectIds: true, flattenMaps: true })
+      ? user.toJSON({ flattenMaps: true, flattenObjectIds: true })
       : undefined,
     creators: creators.map((creator) =>
-      creator.toObject({ flattenObjectIds: true, flattenMaps: true })
+      creator.toJSON({ flattenMaps: true, flattenObjectIds: true })
     ),
     wallet: wallet
-      ? wallet.toObject({ flattenObjectIds: true, flattenMaps: true })
+      ? wallet.toJSON({ flattenMaps: true, flattenObjectIds: true })
       : undefined,
     exchangeRate: exchangeRate?.data,
     showData: showData.map(

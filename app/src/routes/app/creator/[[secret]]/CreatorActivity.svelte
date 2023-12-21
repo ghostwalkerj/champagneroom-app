@@ -2,11 +2,10 @@
   import spacetime from 'spacetime';
   import StarRating from 'svelte-star-rating';
 
-  import type { ShowDocumentType } from '$lib/models/show';
-  import { ShowStatus } from '$lib/models/show';
+  import type { ShowDocument } from '$lib/models/show';
 
-  import { currencyFormatter } from '$lib/constants';
-  export let completedShows: ShowDocumentType[];
+  import { ShowStatus, currencyFormatter } from '$lib/constants';
+  export let completedShows: ShowDocument[] = [];
 </script>
 
 <div class="bg-primary text-primary-content daisy-card">

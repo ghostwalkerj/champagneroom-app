@@ -4,6 +4,7 @@ import IORedis from 'ioredis';
 import type { JwtPayload } from 'jsonwebtoken';
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
+import { setup } from 'mongoose-zod';
 import urlJoin from 'url-join';
 
 import {
@@ -17,11 +18,16 @@ import {
   REDIS_USERNAME
 } from '$env/static/private';
 
+import type { AgentDocument } from '$lib/models/agent';
 import { Agent } from '$lib/models/agent';
+import type { CreatorDocument } from '$lib/models/creator';
 import { Creator } from '$lib/models/creator';
+import type { OperatorDocument } from '$lib/models/operator';
 import { Operator } from '$lib/models/operator';
 import { Show } from '$lib/models/show';
+import type { TicketDocument } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
+import type { UserDocument } from '$lib/models/user';
 import { User } from '$lib/models/user';
 import { Wallet, type WalletDocument } from '$lib/models/wallet';
 
@@ -42,7 +48,15 @@ import {
 
 const authUrl = Config.PATH.auth;
 
-if (mongoose.connection.readyState === 0) mongoose.connect(MONGO_DB_ENDPOINT);
+setup({
+  defaultToMongooseSchemaOptions: { unknownKeys: 'strip' }
+});
+
+if (mongoose.connection.readyState === 0)
+  await mongoose.connect(MONGO_DB_ENDPOINT);
+
+mongoose.set('strictQuery', true);
+
 const redisConnection = new IORedis({
   host: REDIS_HOST,
   port: +REDIS_PORT,
@@ -59,7 +73,7 @@ const setLocals = async (decode: JwtPayload, locals: App.Locals) => {
     query[selector] = decode[selector];
 
     // Check if user is allowed to access the requested path
-    const user = await User.findOne(query);
+    const user = (await User.findOne(query)) as UserDocument;
     if (!user) {
       console.error('No user');
       throw error(500, 'No user');
@@ -72,7 +86,9 @@ const setLocals = async (decode: JwtPayload, locals: App.Locals) => {
     for (const role of user.roles) {
       switch (role) {
         case UserRole.AGENT: {
-          const agent = await Agent.findOne({ user: user._id });
+          const agent = (await Agent.findOne({
+            user: user._id
+          })) as AgentDocument;
           if (!agent) {
             console.error('No agent');
             throw error(500, 'No agent');
@@ -82,7 +98,9 @@ const setLocals = async (decode: JwtPayload, locals: App.Locals) => {
         }
 
         case UserRole.CREATOR: {
-          const creator = await Creator.findOne({ user: user._id });
+          const creator = (await Creator.findOne({
+            user: user._id
+          })) as CreatorDocument;
           if (!creator) {
             console.error('No creator');
             throw error(500, 'No creator');
@@ -99,7 +117,9 @@ const setLocals = async (decode: JwtPayload, locals: App.Locals) => {
         }
 
         case UserRole.OPERATOR: {
-          const operator = await Operator.findOne({ user: user._id });
+          const operator = (await Operator.findOne({
+            user: user._id
+          })) as OperatorDocument;
           if (!operator) {
             console.error('No operator');
             throw error(500, 'No operator');
@@ -109,9 +129,9 @@ const setLocals = async (decode: JwtPayload, locals: App.Locals) => {
         }
 
         case UserRole.TICKET_HOLDER: {
-          const ticket = await Ticket.findOne({
+          const ticket = (await Ticket.findOne({
             user: user._id
-          });
+          })) as TicketDocument;
           if (!ticket) {
             console.error('No ticket');
             throw error(500, 'No ticket');

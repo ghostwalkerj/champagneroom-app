@@ -3,7 +3,6 @@ import type { AxiosResponse } from 'axios';
 import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 import jwt from 'jsonwebtoken';
-import { Types } from 'mongoose';
 
 import {
   BITCART_API_URL,
@@ -15,22 +14,25 @@ import {
 } from '$env/static/private';
 import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
-import type {
-  CancelType,
-  DisputeReason,
-  DisputeType,
-  FeedbackType,
-  RefundType
+import {
+  cancelZodSchema,
+  disputeZodSchema,
+  refundZodSchema,
+  ticketFeedbackZodSchema
 } from '$lib/models/common';
-import { CancelReason, RefundReason } from '$lib/models/common';
 
 import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
-import { TicketMachineEventString } from '$lib/machines/ticketMachine';
 
 import type { PayoutQueueType } from '$lib/workers/payoutWorker';
 
+import type { CurrencyType, DisputeReason } from '$lib/constants';
+import {
+  CancelReason,
+  RefundReason,
+  TicketMachineEventString
+} from '$lib/constants';
 import { ActorType, EntityType } from '$lib/constants';
-import { InvoiceJobType, PayoutJobType, createAuthToken } from '$lib/payment';
+import { createAuthToken, InvoiceJobType, PayoutJobType } from '$lib/payment';
 import { getTicketMachineService } from '$lib/server/machinesUtil';
 
 import {
@@ -55,13 +57,11 @@ export const actions: Actions = {
 
     // Cancel the invoice attached to the ticket if no payment has been made
     if (state.matches('reserved.waiting4Payment')) {
-      const cancel = {
-        _id: new Types.ObjectId(),
+      const cancel = cancelZodSchema.parse({
         cancelledBy: ActorType.CUSTOMER,
         cancelledInState: JSON.stringify(state.value),
-        reason: CancelReason.CUSTOMER_CANCELLED,
-        cancelledAt: new Date()
-      } as CancelType;
+        reason: CancelReason.CUSTOMER_CANCELLED
+      });
 
       const cancelEvent = {
         type: 'CANCELLATION REQUESTED',
@@ -88,16 +88,11 @@ export const actions: Actions = {
       }
 
       // Create refund object
-      const refund = {
-        _id: new Types.ObjectId(),
-        requestedAt: new Date(),
+      const refund = refundZodSchema.parse({
         reason: CancelReason.CUSTOMER_CANCELLED,
-        transactions: [],
-        requestedAmounts: sales.totals,
-        approvedAmounts: new Map<string, number>(),
-        totals: new Map<string, number>(),
-        payouts: {} as any
-      } as RefundType;
+        requestedAmounts: sales.total,
+        refundCurrency: sales.paymentCurrency
+      });
 
       // Refund the same amount as sent, not equivalent to show currency
       // ie, show currency is USD, but payment was made in ETH
@@ -144,12 +139,10 @@ export const actions: Actions = {
     const ticketService = getTicketMachineService(ticket, redisConnection);
 
     const state = ticketService.getSnapshot();
-    const feedback = {
-      _id: new Types.ObjectId(),
+    const feedback = ticketFeedbackZodSchema.parse({
       rating: +rating,
       review
-    } as FeedbackType;
-
+    });
     if (
       state.can({ type: TicketMachineEventString.FEEDBACK_RECEIVED, feedback })
     ) {
@@ -186,27 +179,16 @@ export const actions: Actions = {
     const ticketService = getTicketMachineService(ticket, redisConnection);
 
     const state = ticketService.getSnapshot();
-    const dispute = {
-      _id: new Types.ObjectId(),
+    const dispute = disputeZodSchema.parse({
       disputedBy: ActorType.CUSTOMER,
       reason: reason as DisputeReason,
-      explanation,
-      startedAt: new Date()
-    } as DisputeType;
+      explanation
+    });
 
-    const refund = {
-      requestedAmounts: ticket.ticketState.sale
-        ? ticket.ticketState.sale.totals
-        : ({} as Map<string, number>),
-      approvedAmounts: {} as Map<string, number>,
-      _id: new Types.ObjectId(),
-      requestedAt: new Date(),
-      transactions: [] as Types.ObjectId[],
-      actualAmounts: {} as Map<string, number>,
-      reason: RefundReason.DISPUTE_DECISION,
-      totals: {} as Map<string, number>,
-      payouts: {} as any
-    } as RefundType;
+    const refund = refundZodSchema.parse({
+      requestedAmount: ticket.ticketState.sale?.total || 0,
+      reason: RefundReason.DISPUTE_DECISION
+    });
 
     if (
       state.can({
@@ -231,6 +213,7 @@ export const actions: Actions = {
     const data = await request.formData();
     const address = data.get('address') as string;
     const paymentId = data.get('paymentId') as string;
+    const paymentCurrency = data.get('paymentCurrency') as string;
     const ticket = locals.ticket;
 
     if (!ticket) {
@@ -280,7 +263,8 @@ export const actions: Actions = {
     const ticketService = getTicketMachineService(ticket, redisConnection);
 
     ticketService.send({
-      type: TicketMachineEventString.PAYMENT_INITIATED
+      type: TicketMachineEventString.PAYMENT_INITIATED,
+      paymentCurrency: paymentCurrency.toUpperCase() as CurrencyType
     });
 
     ticketService?.stop();
@@ -381,9 +365,9 @@ export const load: PageServerLoad = async ({ locals }) => {
 
   return {
     jitsiToken,
-    ticket: ticket.toObject({ flattenObjectIds: true, flattenMaps: true }),
-    user: user?.toObject({ flattenObjectIds: true, flattenMaps: true }),
-    show: show.toObject({ flattenObjectIds: true, flattenMaps: true }),
+    ticket: ticket.toJSON({ flattenMaps: true, flattenObjectIds: true }),
+    user: user?.toJSON({ flattenMaps: true, flattenObjectIds: true }),
+    show: show.toJSON({ flattenMaps: true, flattenObjectIds: true }),
     invoice: invoice?.data
   };
 };

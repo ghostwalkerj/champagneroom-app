@@ -1,33 +1,47 @@
-import type { InferSchemaType, Model } from 'mongoose';
+import type { Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
 import mongooseAutoPopulate from 'mongoose-autopopulate';
+import {
+  genTimestampsSchema,
+  mongooseZodCustomType,
+  toMongooseSchema,
+  toZodMongooseSchema,
+  z
+} from 'mongoose-zod';
 
-import type { UserDocumentType } from './user';
+import type { UserDocument } from './user';
 
-const { Schema, models } = pkg;
-const operatorSchema = new Schema(
+const { models } = pkg;
+
+const operatorZodSchema = toZodMongooseSchema(
+  z
+    .object({
+      _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+        _id: true,
+        auto: true
+      }),
+      user: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+        autopopulate: true,
+        ref: 'User',
+        required: true
+      })
+    })
+    .merge(genTimestampsSchema('createdAt', 'updatedAt')),
   {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    _id: { type: Schema.Types.ObjectId, required: true, auto: true },
-
-    user: {
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-      required: true,
-      unique: true,
-      autopopulate: true
+    schemaOptions: {
+      collection: 'operators'
     }
-  },
-  { timestamps: true }
+  }
 );
 
+const operatorSchema = toMongooseSchema(operatorZodSchema);
 operatorSchema.plugin(mongooseAutoPopulate);
 
-export type OperatorDocument = InstanceType<typeof Operator>;
-
-export type OperatorDocumentType = InferSchemaType<typeof operatorSchema> & {
-  user: UserDocumentType;
+export type OperatorDocument = InstanceType<typeof Operator> & {
+  user: UserDocument;
 };
+
+export type OperatorDocumentType = z.infer<typeof operatorZodSchema>;
 
 export const Operator = models?.Operator
   ? (models.Operator as Model<OperatorDocumentType>)

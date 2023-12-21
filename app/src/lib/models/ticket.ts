@@ -1,121 +1,99 @@
-import type { InferSchemaType, Model } from 'mongoose';
+import type { Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
 import mongooseAutoPopulate from 'mongoose-autopopulate';
-import { fieldEncryption } from 'mongoose-field-encryption';
+import {
+  genTimestampsSchema,
+  mongooseZodCustomType,
+  toMongooseSchema,
+  toZodMongooseSchema,
+  z
+} from 'mongoose-zod';
 import validator from 'validator';
 
+import { TicketStatus } from '$lib/constants';
+
 import {
-  cancelSchema,
-  disputeSchema,
-  escrowSchema,
-  feedbackSchema,
-  finalizeSchema,
-  moneySchema,
-  refundSchema,
-  saleSchema
+  cancelZodSchema,
+  disputeZodSchema,
+  escrowZodSchema,
+  finalizeZodSchema,
+  moneyZodSchema,
+  redemptionZodSchema,
+  refundZodSchema,
+  ticketFeedbackZodSchema,
+  ticketSaleZodSchema
 } from './common';
-import type { ShowDocumentType } from './show';
-import type { UserDocumentType } from './user';
+import type { ShowDocument } from './show';
+import type { UserDocument } from './user';
 
-enum TicketStatus {
-  RESERVED = 'RESERVED',
-  REFUND_REQUESTED = 'REFUND REQUESTED',
-  PAYMENT_INITIATED = 'PAYMENT INITIATED',
-  PAYMENT_RECEIVED = 'PAYMENT RECEIVED',
-  WAITING_FOR_REFUND = 'WAITING FOR REFUND',
-  FULLY_PAID = 'FULLY PAID',
-  CANCELLED = 'CANCELLED',
-  FINALIZED = 'FINALIZED',
-  REDEEMED = 'REDEEMED',
-  IN_ESCROW = 'IN ESCROW',
-  IN_DISPUTE = 'IN DISPUTE',
-  REFUNDED = 'REFUNDED',
-  MISSED_SHOW = 'MISSED SHOW',
-  SHOW_CANCELLED = 'SHOW CANCELLED',
-  WAITING_FOR_DISPUTE_REFUND = 'WAITING FOR DISPUTE REFUND'
-}
+const { models } = pkg;
 
-const { Schema, models } = pkg;
-export type TicketDocument = InstanceType<typeof Ticket>;
-
-const redemptionSchema = new Schema({
-  redeemedAt: { type: Date, default: Date.now }
+const ticketStateZodSchema = z.object({
+  status: z.nativeEnum(TicketStatus).default(TicketStatus.RESERVED),
+  active: z.boolean().default(true),
+  cancel: cancelZodSchema.optional(),
+  redemption: redemptionZodSchema.optional(),
+  escrow: escrowZodSchema.optional(),
+  dispute: disputeZodSchema.optional(),
+  finalize: finalizeZodSchema.optional(),
+  feedback: ticketFeedbackZodSchema.optional(),
+  refund: refundZodSchema.optional(),
+  sale: ticketSaleZodSchema.optional()
 });
 
-const ticketStateSchema = new Schema(
+const ticketZodSchema = toZodMongooseSchema(
+  z
+    .object({
+      _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+        _id: true,
+        auto: true
+      }),
+      paymentAddress: z
+        .string()
+        .max(50)
+        .trim()
+        .refine((value) => validator.isEthereumAddress(value), {
+          message: 'Invalid Ethereum address'
+        })
+        .optional(),
+      price: moneyZodSchema,
+      show: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+        ref: 'Show'
+      }),
+      bcInvoiceId: z.string().trim().optional(),
+      ticketState: ticketStateZodSchema.default({}),
+      user: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+        autopopulate: true,
+        ref: 'User'
+      }),
+      agent: mongooseZodCustomType('ObjectId').optional().mongooseTypeOptions({
+        ref: 'Agent'
+      }),
+      creator: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+        ref: 'Creator'
+      })
+    })
+    .merge(genTimestampsSchema()),
   {
-    status: {
-      type: String,
-      enum: TicketStatus,
-      default: TicketStatus.RESERVED,
-      index: true
-    },
-    active: { type: Boolean, default: true, index: true },
-
-    cancel: cancelSchema,
-    redemption: redemptionSchema,
-    escrow: escrowSchema,
-    dispute: disputeSchema,
-    finalize: finalizeSchema,
-    feedback: feedbackSchema,
-    refund: refundSchema,
-    sale: saleSchema
-  },
-  { timestamps: true }
+    schemaOptions: {
+      collection: 'tickets'
+    }
+  }
 );
 
-const ticketSchema = new Schema(
-  {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    _id: { type: Schema.Types.ObjectId, required: true, auto: true },
-    paymentAddress: {
-      type: String,
-      maxLength: 50,
-      validator: (v: string) => validator.isEthereumAddress(v)
-    },
-    price: {
-      type: moneySchema,
-      required: true
-    },
-    show: {
-      type: Schema.Types.ObjectId,
-      ref: 'Show',
-      index: true,
-      required: true
-    },
-    bcInvoiceId: { type: String, index: true },
-    ticketState: {
-      type: ticketStateSchema,
-      required: true,
-      default: () => ({})
-    },
-    user: {
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-      required: true,
-      unique: true,
-      autopopulate: true
-    },
-    agent: { type: Schema.Types.ObjectId, ref: 'Agent' },
-    creator: { type: Schema.Types.ObjectId, ref: 'Creator', required: true }
-  },
-  { timestamps: true }
-);
-
-ticketSchema.plugin(fieldEncryption, {
-  fields: ['pin'],
-  secret: process.env.MONGO_DB_FIELD_SECRET
-});
+const ticketSchema = toMongooseSchema(ticketZodSchema);
 
 ticketSchema.plugin(mongooseAutoPopulate);
 
-export type TicketDocumentType = InferSchemaType<typeof ticketSchema> & {
-  show: ShowDocumentType;
+export type TicketDocument = InstanceType<typeof Ticket> & {
+  show: ShowDocument;
 } & {
-  user: UserDocumentType;
+  user: UserDocument;
 };
 
-export type TicketStateType = InferSchemaType<typeof ticketStateSchema>;
+export type TicketDocumentType = z.infer<typeof ticketZodSchema>;
+
+export type TicketStateType = z.infer<typeof ticketStateZodSchema>;
 
 export const SaveState = (
   ticket: TicketDocument,
@@ -131,4 +109,4 @@ export const Ticket = models?.Ticket
   ? (models.Ticket as Model<TicketDocumentType>)
   : mongoose.model<TicketDocumentType>('Ticket', ticketSchema);
 
-export { TicketStatus };
+export { TicketStatus } from '$lib/constants';

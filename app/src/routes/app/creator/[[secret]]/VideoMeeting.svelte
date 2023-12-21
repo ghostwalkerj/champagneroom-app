@@ -4,15 +4,15 @@
   import { browser } from '$app/environment';
   import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
-  import type { CreatorDocumentType } from '$lib/models/creator';
-  import type { ShowDocumentType } from '$lib/models/show';
+  import type { CreatorDocument } from '$lib/models/creator';
+  import type { ShowDocument } from '$lib/models/show';
 
   import { jitsiInterfaceConfigOverwrite } from '$lib/constants';
 
   import type { UserDocumentType } from '$lib/models/user';
 
-  export let creator: CreatorDocumentType;
-  export let currentShow: ShowDocumentType;
+  export let creator: CreatorDocument;
+  export let currentShow: ShowDocument;
   export let user: UserDocumentType;
   export let jitsiToken: string;
   export let leftShowCallback: () => void;

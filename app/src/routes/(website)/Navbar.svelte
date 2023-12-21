@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Config from '$lib/config';
   import { page } from '$app/stores';
+  import Config from '$lib/config';
 
   const links = [
     { name: 'About', href: '#About' },

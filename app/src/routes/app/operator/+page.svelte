@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { ActionResult } from '@sveltejs/kit';
-  import { ObjectId } from 'mongodb';
   import spacetime from 'spacetime';
   import StarRating from 'svelte-star-rating';
   import { uniqueNamesGenerator } from 'unique-names-generator';
@@ -10,24 +9,24 @@
   import { invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
 
-  import type { AgentDocumentType } from '$lib/models/agent';
-  import { DisputeDecision } from '$lib/models/common';
-  import type { CreatorDocumentType } from '$lib/models/creator';
-  import type { OperatorDocumentType } from '$lib/models/operator';
+  import type { CreatorDocument } from '$lib/models/creator';
+  import type { OperatorDocument } from '$lib/models/operator';
   import type { ShowDocument } from '$lib/models/show';
 
   import Config from '$lib/config';
-  import { AuthType, currencyFormatter } from '$lib/constants';
+  import { AuthType, DisputeDecision, currencyFormatter } from '$lib/constants';
   import { womensNames } from '$lib/womensNames';
 
+  import type { AgentDocument } from '$lib/models/agent';
+  import type { TicketDocument } from '$lib/models/ticket';
+  import type { Types } from 'mongoose';
   import type { PageData } from './$types';
 
   export let data: PageData;
-  const operator = data.operator as OperatorDocumentType;
-  let agents = data.agents as AgentDocumentType[];
-  let creators = data.creators as CreatorDocumentType[];
-
-  const disputedTickets = data.disputedTickets;
+  let operator = data.operator as OperatorDocument;
+  let agents = data.agents as AgentDocument[];
+  let creators = data.creators as CreatorDocument[];
+  let disputedTickets = data.disputedTickets as TicketDocument[];
 
   $: canAddAgent = false;
   $: canAddCreator = false;
@@ -52,13 +51,13 @@
   let agentAddress = '';
   let creatorNameElement: HTMLTableCellElement;
   let creatorCommissionElement: HTMLTableCellElement;
-  let commission = Config.UI.defaultCommissionRate;
+  let commission = Config.UI.defaultCommissionRate.toString();
   let creatorName = uniqueNamesGenerator({
     dictionaries: [womensNames]
   });
   let isChangeCreatorSecret = false;
   let selectedAgentId = '0';
-  let newCreator: CreatorDocumentType | undefined;
+  let newCreator: CreatorDocument | undefined;
   let newPassword: string | undefined;
 
   const decideDispute = async (decision: DisputeDecision) => {
@@ -76,7 +75,6 @@
     });
 
     disputedTickets.splice(index, 1);
-
     isDecideDispute = false;
   };
 
@@ -111,7 +109,7 @@
       name?: string;
       commission?: number;
       active?: boolean;
-      agentId?: string;
+      agentId?: Types.ObjectId;
     }
   ) => {
     const creator = creators[index];
@@ -127,7 +125,7 @@
       active ? active.toString() : creator.user.active.toString()
     );
     if (agentId) {
-      formData.append('agentId', agentId);
+      formData.append('agentId', agentId.toString());
     } else {
       formData.append('agentId', '');
     }
@@ -155,14 +153,15 @@
     });
   };
 
-  const updateCreatorAgent = (agentId: string) => {
-    const agent = new ObjectId(agentId);
-    creators[activeCreatorRow].agent = agent;
+  const updateCreatorAgent = (agentId: Types.ObjectId) => {
+    creators[activeCreatorRow].agent = agentId;
     updateCreator(activeCreatorRow, { agentId });
   };
 
-  const getAgentName = (agentId: ObjectId) => {
-    const agent = agents.find((agent) => agent._id == agentId);
+  const getAgentName = (agentId: Types.ObjectId) => {
+    const agent = agents.find(
+      (agent) => agent._id.toString() === agentId.toString()
+    );
     return agent?.user.name;
   };
 
@@ -222,11 +221,11 @@
         and secret URL:
         <div class="text-center font-bold text-sm">
           <a
-            href={urlJoin(Config.PATH.creator, newCreator.user.secret)}
+            href={urlJoin(Config.PATH.creator, newCreator.user.secret || '')}
             target="_blank"
             class="daisy-link daisy-link-primary"
           >
-            {urlJoin(Config.PATH.creator, newCreator.user.secret)}</a
+            {urlJoin(Config.PATH.creator, newCreator.user.secret || '')}</a
           >
         </div>
       </div>
@@ -561,7 +560,6 @@
                             />
                             <td>
                               <select
-                                <select
                                 class="daisy-select daisy-select-bordered daisy-select-sm text-xs"
                                 bind:value={selectedAgentId}
                                 bind:this={creatorAgentElement}
@@ -614,7 +612,7 @@
                                   >
                                   {#each agents as agent}
                                     {#if agent._id.toString() !== agentId.toString()}
-                                      <option value={agent._id.toString()}
+                                      <option value={agent._id}
                                         >{agent.user.name}</option
                                       >
                                     {/if}
@@ -650,7 +648,7 @@
                               >{#if creator.user.authType !== AuthType.SIGNING}<a
                                   href={urlJoin(
                                     Config.PATH.creator,
-                                    creator.user.secret
+                                    creator.user.secret || ''
                                   )}
                                   target="_blank"
                                   class="daisy-link daisy-link-primary"
@@ -668,20 +666,32 @@
                               {/if}
                             </td>
 
-                            <td>
-                              {#each Object.entries(creator.salesStats.totalTicketSalesAmounts) as [currency, amount]}
-                                {currencyFormatter(currency).format(amount)}
-                              {/each}
+                            <td
+                              >{#if creator.salesStats.totalTicketSalesAmounts}
+                                {#each Object.entries(creator.salesStats.totalTicketSalesAmounts) as [currency, amount]}
+                                  {currencyFormatter(currency).format(amount)}
+                                {/each}
+                              {:else}
+                                0
+                              {/if}
                             </td>
                             <td>
-                              {#each Object.entries(creator.salesStats.totalRevenue) as [currency, amount]}
-                                {currencyFormatter(currency).format(amount)}
-                              {/each}
+                              {#if creator.salesStats.totalRevenue}
+                                {#each Object.entries(creator.salesStats.totalRevenue) as [currency, amount]}
+                                  {currencyFormatter(currency).format(amount)}
+                                {/each}
+                              {:else}
+                                0
+                              {/if}
                             </td>
                             <td>
-                              {#each Object.entries(creator.salesStats.totalRefunds) as [currency, amount]}
-                                {currencyFormatter(currency).format(amount)}
-                              {/each}
+                              {#if creator.salesStats.totalRefunds}
+                                {#each Object.entries(creator.salesStats.totalRefunds) as [currency, amount]}
+                                  {currencyFormatter(currency).format(amount)}
+                                {/each}
+                              {:else}
+                                0
+                              {/if}
                             </td>
                             <td>{creator.feedbackStats.numberOfReviews}</td>
                             <td

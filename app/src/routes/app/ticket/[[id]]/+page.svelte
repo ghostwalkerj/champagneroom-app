@@ -5,16 +5,20 @@
   import type { Unsubscriber } from 'svelte/store';
   import web3 from 'web3';
 
-  import type { RefundType } from '$lib/models/common';
-  import { DisputeReason, RefundReason } from '$lib/models/common';
-  import { ShowStatus, type ShowDocumentType } from '$lib/models/show';
-  import { TicketStatus, type TicketDocumentType } from '$lib/models/ticket';
-  import type { UserDocumentType } from '$lib/models/user';
-
-  import type { TicketMachineServiceType } from '$lib/machines/ticketMachine';
+  import { refundZodSchema, disputeZodSchema } from '$lib/models/common';
   import {
-    createTicketMachineService,
-    TicketMachineEventString
+    DisputeReason,
+    RefundReason,
+    ShowStatus,
+    TicketMachineEventString,
+    TicketStatus
+  } from '$lib/constants';
+  import type { ShowDocument } from '$lib/models/show';
+  import type { UserDocument } from '$lib/models/user';
+
+  import {
+    type TicketMachineServiceType,
+    createTicketMachineService
   } from '$lib/machines/ticketMachine';
 
   import { ActorType } from '$lib/constants';
@@ -29,16 +33,17 @@
   import TicketDetail from './TicketDetail.svelte';
   import TicketInvoice from './TicketInvoice.svelte';
 
+  import type { TicketDocument } from '$lib/models/ticket';
   import type { ActionData, PageData } from './$types';
   import VideoMeeting from './VideoMeeting.svelte';
 
   export let data: PageData;
   export let form: ActionData;
 
-  let ticket = data.ticket as TicketDocumentType;
-  let show = data.show as ShowDocumentType;
+  let ticket = data.ticket as TicketDocument;
+  let show = data.show as ShowDocument;
   let invoice = data.invoice;
-  let user = data.user as UserDocumentType;
+  let user = data.user as UserDocument;
   let jitsiToken = data.jitsiToken as string;
 
   const currentPayment = invoice?.payments?.[
@@ -107,6 +112,7 @@
         let formData = new FormData();
         formData.append('address', $selectedAccount.address);
         formData.append('paymentId', currentPayment.id!);
+        formData.append('paymentCurrency', currentPayment.currency);
 
         await fetch($page.url.href + '?/initiate_payment', {
           method: 'POST',
@@ -145,23 +151,13 @@
 
     canDispute = state.can({
       type: 'DISPUTE INITIATED',
-      dispute: {
-        startedAt: new Date(),
+      dispute: disputeZodSchema.parse({
         disputedBy: ActorType.CUSTOMER,
-        reason: DisputeReason.ENDED_EARLY,
-        explanation: 'The show ended early',
-        resolved: false
-      },
-      refund: {
-        requestedAmounts: {} as Map<string, number>,
-        approvedAmounts: {} as Map<string, number>,
-        requestedAt: new Date(),
-        transactions: [],
-        actualAmounts: {} as Map<string, number>,
-        reason: RefundReason.DISPUTE_DECISION,
-        totals: {} as Map<string, number>,
-        payouts: {} as any
-      } as RefundType
+        reason: DisputeReason.ENDED_EARLY
+      }),
+      refund: refundZodSchema.parse({
+        reason: RefundReason.DISPUTE_DECISION
+      })
     });
     hasMissedShow = state.matches('ended.missedShow');
     isWaitingForShow =
@@ -238,7 +234,7 @@
               invoice.status === InvoiceStatus.COMPLETE &&
               ticket.ticketState.status === TicketStatus.PAYMENT_INITIATED
             ) {
-              ticket = $page.data.ticket as TicketDocumentType;
+              ticket = $page.data.ticket as TicketDocument;
               ticketMachineService?.stop();
               ticketMachineService = createTicketMachineService({
                 ticketDocument: ticket

@@ -10,9 +10,9 @@
   import { AuthType } from '$lib/constants';
   import { defaultWallet, selectedAccount } from '$lib/web3';
 
+  import NeonBlur from '$components/NeonBlur.svelte';
   import type { Unsubscriber } from 'svelte/store';
   import type { ActionData, PageData } from './$types';
-  import NeonBlur from '$components/NeonBlur.svelte';
 
   export let data: PageData;
   export let form: ActionData;
