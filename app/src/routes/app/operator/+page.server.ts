@@ -115,7 +115,8 @@ export const actions: Actions = {
         success: true,
         creatorCreated: true,
         creator: creator?.toJSON({
-          flattenMaps: true
+          flattenMaps: true,
+          flattenObjectIds: true
         }),
         password
       };
