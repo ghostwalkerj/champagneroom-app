@@ -132,14 +132,13 @@
       'commission',
       commission ? commission.toString() : creator.commissionRate.toString()
     );
+    formData.append('userId', creator.user._id.toString());
     formData.append(
       'active',
       active ? active.toString() : creator.user.active.toString()
     );
     if (agentId) {
       formData.append('agentId', agentId.toString());
-    } else {
-      formData.append('agentId', '');
     }
 
     await fetch('?/update_creator', {
@@ -158,8 +157,8 @@
     updateCreator(activeCreatorRow, { commission });
   };
 
-  const updateCreatorActive = (active: string) => {
-    creators[activeCreatorRow].user.active = active == 'true' ? true : false;
+  const updateCreatorActive = (active: boolean) => {
+    creators[activeCreatorRow].user.active = active;
     updateCreator(activeCreatorRow, {
       active: creators[activeCreatorRow].user.active
     });
@@ -477,22 +476,18 @@
                             >
                             <td contenteditable="true">{agent.user.address}</td>
                             <td>
-                              <select
-                                class="daisy-select daisy-select-bordered daisy-select-sm text-xs"
-                              >
-                                {#if agent.user.active}
-                                  <option value="true" selected>True</option>
-                                  <option value="false">False</option>
-                                {:else}
-                                  <option value="true">True</option>
-                                  <option value="false" selected>False</option>
-                                {/if}
-                              </select>
+                              <input
+                                class="checkbox"
+                                type="checkbox"
+                                checked={agent.user.active}
+                              />
                             </td>
                             <td>
                               <div class="flex gap-2">
                                 {#each agent.user.permissions as permission}
-                                  <div class="chip variant-filled">
+                                  <div
+                                    class="chip variant-filled hover:variant-ringed"
+                                  >
                                     {permission}
                                   </div>
                                 {/each}
@@ -672,20 +667,14 @@
                               }}>{creator.commissionRate}</td
                             >
                             <td>
-                              <select
-                                class="daisy-select daisy-select-bordered daisy-select-sm text-xs"
+                              <input
+                                class="checkbox"
+                                type="checkbox"
+                                checked={creator.user.active}
                                 on:change={(event) => {
-                                  updateCreatorActive(event.target?.value);
+                                  updateCreatorActive(event.target?.checked);
                                 }}
-                              >
-                                {#if creator.user.active}
-                                  <option value="true" selected>True</option>
-                                  <option value="false">False</option>
-                                {:else}
-                                  <option value="true">True</option>
-                                  <option value="false" selected>False</option>
-                                {/if}
-                              </select>
+                              />
                             </td>
                             <td
                               >{#if creator.user.authType !== AuthType.SIGNING}<a

@@ -110,10 +110,9 @@
     }
   };
 
-  const updateActive = (active: string) => {
+  const updateActive = (active: boolean) => {
     const index = activeRow;
-    if (creators[index].user.active.toString() === active) return;
-    creators[index].user.active = active == 'true' ? true : false;
+    creators[index].user.active = active;
     updateCreator(creators[index]);
   };
 
@@ -375,20 +374,14 @@
                               }}>{creator.commissionRate}</td
                             >
                             <td>
-                              <select
-                                class="daisy-select daisy-select-bordered daisy-select-sm text-xs"
+                              <input
+                                class="checkbox"
+                                type="checkbox"
+                                checked={creator.user.active}
                                 on:change={(event) => {
-                                  updateActive(event.target?.value);
+                                  updateActive(event.target?.checked);
                                 }}
-                              >
-                                {#if creator.user.active}
-                                  <option value="true" selected>True</option>
-                                  <option value="false">False</option>
-                                {:else}
-                                  <option value="true">True</option>
-                                  <option value="false" selected>False</option>
-                                {/if}
-                              </select>
+                              />
                             </td>
 
                             <td

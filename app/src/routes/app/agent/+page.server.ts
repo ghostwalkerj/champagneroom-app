@@ -125,7 +125,7 @@ export const actions: Actions = {
     try {
       const creator = await Creator.findOneAndUpdate(
         {
-          _id: new ObjectId(creatorId)
+          _id: creatorId
         },
         {
           commissionRate: +commission
@@ -149,7 +149,9 @@ export const actions: Actions = {
       );
     } catch (error) {
       console.error('err', error);
-      return fail(400, { err: error });
+      if (error instanceof Error) {
+        return fail(400, { err: error.toString() });
+      }
     }
 
     return {

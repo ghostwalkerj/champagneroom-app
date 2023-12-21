@@ -139,16 +139,21 @@ export const actions: Actions = {
 
     // Validation
     if (creatorId === null) {
+      console.error('bad creatorId', creatorId);
       return fail(400, { creatorId, missingCreatorId: true });
     }
+
     if (Number.isNaN(+commission) || +commission < 0 || +commission > 100) {
+      console.error('bad commission', commission);
       return fail(400, { commission, badCommission: true });
     }
     if (!userId) {
+      console.error('bad userId', userId);
       return fail(400, { userId, badUserId: true });
     }
 
     if (active !== 'true' && active !== 'false') {
+      console.error('bad active', active);
       return fail(400, { active, badActive: true });
     }
 
@@ -159,7 +164,7 @@ export const actions: Actions = {
         },
         {
           commissionRate: +commission,
-          agent: new ObjectId(agentId)
+          agent: agentId ?? undefined
         }
       );
       await User.findOneAndUpdate(
@@ -172,6 +177,7 @@ export const actions: Actions = {
         }
       );
     } catch (error) {
+      console.error('err', error);
       return fail(400, { err: error });
     }
 
