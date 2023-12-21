@@ -23,6 +23,7 @@
   import type { PageData } from './$types';
   import type { UserDocument } from '$lib/models/user';
   import { PermissionType } from '$lib/permissions';
+  import { InputChip } from '@skeletonlabs/skeleton';
 
   export let data: PageData;
   let operator = data.operator as OperatorDocument;
@@ -489,9 +490,13 @@
                               </select>
                             </td>
                             <td>
-                              {#each agent.user.permissions as permission}
-                                <div class="text-xs">{permission}</div>
-                              {/each}
+                              <div class="flex gap-2">
+                                {#each agent.user.permissions as permission}
+                                  <div class="chip variant-filled">
+                                    {permission}
+                                  </div>
+                                {/each}
+                              </div>
                             </td>
                             {#if canImpersonateAgent}
                               <td
