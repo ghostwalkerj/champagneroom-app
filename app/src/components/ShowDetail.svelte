@@ -81,8 +81,9 @@
   });
 </script>
 
-{#if show}
-  <div class="grid md:grid-cols-2 bg-surface-800 rounded">
+<div class="!text-center shadow-lg">
+  {#if show}
+  <div class="grid !text-center md:grid-cols-2 bg-surface-800 ">
     <div class="relative">
       <img
         src={show.coverImageUrl}
@@ -141,7 +142,7 @@
 
   {#if options.showSalesStats}
     <div
-      class="flex sm:flex-row rounded-b flex-col justify-between border-t border-surface-600 py-2 bg-surface-700 font-semibold divide-x divide-surface-500 text-center
+      class="flex !text-center sm:flex-row rounded-b flex-col justify-between border-t border-surface-600 py-2 bg-surface-700 font-semibold divide-x divide-surface-500
      [&>div]:w-full [&>div]:whitespace-nowrap [&>div]:p-2 [&>div]:flex [&>div]:sm:flex-col [&>div]:gap-2"
     >
       <div>
@@ -171,3 +172,5 @@
     </div>
   {/if}
 {/if}
+</div>
+
