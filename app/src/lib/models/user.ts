@@ -45,8 +45,7 @@ const userZodSchema = toZodMongooseSchema(
         .refine((value: string) => validator.isEthereumAddress(value), {
           message: 'Invalid Ethereum address'
         })
-        .optional()
-        .mongooseTypeOptions({ index: true }),
+        .optional(),
       roles: z.array(z.nativeEnum(UserRole)),
       payoutAddress: z
         .string()
@@ -99,6 +98,11 @@ userSchema.index(
 userSchema.index(
   { secret: 1 },
   { unique: true, partialFilterExpression: { secret: { $exists: true } } }
+);
+
+userSchema.index(
+  { referralCode: 1 },
+  { unique: true, partialFilterExpression: { referralCode: { $exists: true } } }
 );
 
 // const saltGenerator = (secret: string) => secret.slice(0, 16);
