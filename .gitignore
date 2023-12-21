@@ -22,4 +22,4 @@ app/.favorites.json
 app/.VSCodeCounter/**
 Icon
 app/.clinic/**
-app/.nova/Configuration.json
+app/.nova/**

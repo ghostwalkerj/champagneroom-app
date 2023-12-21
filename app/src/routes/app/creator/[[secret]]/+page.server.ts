@@ -167,7 +167,7 @@ export const actions: Actions = {
       connection: redisConnection
     }) as ShowQueueType;
 
-    const showService = await getShowMachineService(show);
+    const showService = getShowMachineService(show);
     const showState = showService.getSnapshot();
 
     if (showState.can({ type: ShowMachineEventString.SHOW_ENDED })) {

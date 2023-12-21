@@ -85,6 +85,7 @@
   };
 
   $: referralCode = agent.user.referralCode;
+  $: referralCount = agent.user.referralCount || 0;
   $: referralUrl = urlJoin(
     $page.url.origin,
     Config.PATH.referralSignup,
@@ -137,7 +138,7 @@
           </div>
           <div class="flex w-full place-content-center">
             <div class="font-bold pr-1">Referral Count:</div>
-            <div>0</div>
+            <div>{referralCount}</div>
           </div>
         </div>
       </div>

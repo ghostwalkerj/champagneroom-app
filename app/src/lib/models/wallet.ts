@@ -37,29 +37,28 @@ const payoutZodMongooseSchema = toZodMongooseSchema(payoutZodSchema, {
   }
 });
 
-const walletZodMongooseSchema = toZodMongooseSchema(
-  z
-    .object({
-      _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
-        _id: true,
-        auto: true
-      }),
-      status: z.nativeEnum(WalletStatus).default(WalletStatus.AVAILABLE),
-      currency: z.nativeEnum(CurrencyType).default(CurrencyType.ETH),
-      balance: z.number().default(0),
-      availableBalance: z.number().default(0),
-      onHoldBalance: z.number().default(0),
-      earnings: z.array(earningsZodMongooseSchema).default([]),
-      payouts: z.array(payoutZodMongooseSchema).default([]),
-      active: z.boolean().default(true)
-    })
-    .merge(genTimestampsSchema()),
-  {
-    schemaOptions: {
-      collection: 'wallets'
-    }
+const walletZodSchema = z
+  .object({
+    _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+      _id: true,
+      auto: true
+    }),
+    status: z.nativeEnum(WalletStatus).default(WalletStatus.AVAILABLE),
+    currency: z.nativeEnum(CurrencyType).default(CurrencyType.ETH),
+    balance: z.number().default(0),
+    availableBalance: z.number().default(0),
+    onHoldBalance: z.number().default(0),
+    earnings: z.array(earningsZodMongooseSchema).default([]),
+    payouts: z.array(payoutZodMongooseSchema).default([]),
+    active: z.boolean().default(true)
+  })
+  .merge(genTimestampsSchema());
+
+const walletZodMongooseSchema = toZodMongooseSchema(walletZodSchema, {
+  schemaOptions: {
+    collection: 'wallets'
   }
-);
+});
 const walletSchema = toMongooseSchema(walletZodMongooseSchema);
 
 export type WalletDocumentType = z.infer<typeof walletZodMongooseSchema>;

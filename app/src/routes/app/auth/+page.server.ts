@@ -267,8 +267,7 @@ export const actions: Actions = {
     return { success: true };
   }
 } satisfies Actions;
-
-export const load: PageServerLoad = async ({ url, cookies }) => {
+export const load: PageServerLoad = async ({ url }) => {
   const returnPath = url.searchParams.get('returnPath');
   if (!returnPath) {
     throw error(400, 'Missing Return Path');

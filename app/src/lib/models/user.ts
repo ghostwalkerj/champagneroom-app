@@ -1,7 +1,6 @@
 import bcrypt from 'bcryptjs';
 import type { Model, UpdateQuery } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
-import { fieldEncryption } from 'mongoose-field-encryption';
 import {
   genTimestampsSchema,
   mongooseZodCustomType,
@@ -76,7 +75,12 @@ const userZodSchema = toZodMongooseSchema(
         .string()
         .max(50)
         .min(8, 'Referral code is too short')
-        .default(() => nanoid(10)),
+        .default(() => nanoid(10))
+        .mongooseTypeOptions({
+          index: true,
+          unique: true
+        }),
+      referralCount: z.number().default(0),
       permissions: z.array(z.nativeEnum(PermissionType)).default([])
     })
     .merge(genTimestampsSchema()),

@@ -27,7 +27,7 @@ const Config = {
     agent: '/app/agent',
     creator: '/app/creator',
     signup: '/app/signup',
-    referralSignup: '/app/signup/referral',
+    referralSignup: '/app/signup/creator/',
     agentSignup: '/app/signup/agent',
     creatorSignup: '/app/signup/creator',
     signout: '/app/signout',
