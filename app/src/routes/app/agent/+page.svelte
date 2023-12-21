@@ -404,15 +404,15 @@
                                 >
                                   Change
                                 </button>
-                                <button
-                                  class="daisy-btn daisy-btn-xs daisy-btn-outline daisy-btn-primary ml-4"
-                                  disabled={!canImpersonate}
-                                >
-                                  Impersonate
-                                </button>
                               {:else}
                                 N/A
                               {/if}
+                              <button
+                                class="daisy-btn daisy-btn-xs daisy-btn-outline daisy-btn-primary ml-4"
+                                disabled={!canImpersonate}
+                              >
+                                Impersonate
+                              </button>
                             </td>
 
                             <td
