@@ -9,14 +9,13 @@
 
   import ShowDetail from '$components/ShowDetail.svelte';
 
-  import type { ActionData, PageData } from './$types';
+  import type { PageData } from './$types';
   import NeonBlur from '$components/NeonBlur.svelte';
   import { getModalStore } from '@skeletonlabs/skeleton';
   import type { ModalSettings } from '@skeletonlabs/skeleton';
   import { ShowStatus } from '$lib/constants';
 
   export let data: PageData;
-  export let form: ActionData;
 
   const modalStore = getModalStore();
 
@@ -81,21 +80,19 @@
   };
 </script>
 
-
-  <!-- Page header -->
-  <div class="lg:max-w-4xl">
-    {#key show.showState}
-      <ShowDetail {show}>
-        {#if canBuyTicket}
-          <NeonBlur>
-            <button
-              on:click={() => modalStore.trigger(modal)}
-              class="btn btn-xl font-semibold rounded-lg bg-surface-700 variant-filled relative font-SpaceGrotesk"
-              >Reserve Ticket</button
-            >
-          </NeonBlur>
-        {/if}
-      </ShowDetail>
-    {/key}
-  </div>
-
+<!-- Page header -->
+<div class="lg:max-w-4xl">
+  {#key show.showState}
+    <ShowDetail {show}>
+      {#if canBuyTicket}
+        <NeonBlur>
+          <button
+            on:click={() => modalStore.trigger(modal)}
+            class="btn btn-xl font-semibold rounded-lg bg-surface-700 variant-filled relative font-SpaceGrotesk"
+            >Reserve Ticket</button
+          >
+        </NeonBlur>
+      {/if}
+    </ShowDetail>
+  {/key}
+</div>
