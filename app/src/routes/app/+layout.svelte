@@ -83,7 +83,7 @@
     </div>
   </nav>
 
-  <div class="flex-1">
+  <div class="flex-1 flex flex-col items-center justify-center">
     <slot />
   </div>
 
