@@ -37,8 +37,11 @@
 
   <div class="flex flex-col md:flex-row gap-4">
     <div class="w-full md:w-1/2">
-      <div class="daisy-collapse daisy-collapse-arrow">
-        <input type="radio" name="faq-accordion" />
+      <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+      <div
+        tabindex="0"
+        class="daisy-collapse daisy-collapse-arrow daisy-border"
+      >
         <div class="daisy-collapse-title text-xl font-medium">
           What is Champagne Room?
         </div>
@@ -56,8 +59,11 @@
           </div>
         </div>
       </div>
-      <div class="daisy-collapse daisy-collapse-arrow">
-        <input type="radio" name="faq-accordion" />
+      <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+      <div
+        tabindex="0"
+        class="daisy-collapse daisy-collapse-arrow daisy-border"
+      >
         <div class="daisy-collapse-title text-xl font-medium">
           How does it work?
         </div>
@@ -93,8 +99,11 @@
           </ol>
         </div>
       </div>
-      <div class="daisy-collapse daisy-collapse-arrow">
-        <input type="radio" name="faq-accordion" />
+      <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+      <div
+        tabindex="0"
+        class="daisy-collapse daisy-collapse-arrow daisy-border"
+      >
         <div class="daisy-collapse-title text-xl font-medium">
           How are my transactions protected?
         </div>
@@ -118,8 +127,11 @@
       </div>
     </div>
     <div class="w-full md:w-1/2">
-      <div class="daisy-collapse daisy-collapse-arrow">
-        <input type="radio" name="faq-accordion" />
+      <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+      <div
+        tabindex="0"
+        class="daisy-collapse daisy-collapse-arrow daisy-border"
+      >
         <div class="daisy-collapse-title text-xl font-medium">
           Is it anonymous?
         </div>
@@ -138,8 +150,11 @@
           </div>
         </div>
       </div>
-      <div class="daisy-collapse daisy-collapse-arrow">
-        <input type="radio" name="faq-accordion" />
+      <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+      <div
+        tabindex="0"
+        class="daisy-collapse daisy-collapse-arrow daisy-border"
+      >
         <div class="daisy-collapse-title text-xl font-medium">
           How is it different from other platforms like Only Fans?
         </div>
@@ -162,8 +177,11 @@
           </ul>
         </div>
       </div>
-      <div class="daisy-collapse daisy-collapse-arrow">
-        <input type="radio" name="faq-accordion" />
+      <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+      <div
+        tabindex="0"
+        class="daisy-collapse daisy-collapse-arrow daisy-border"
+      >
         <div class="daisy-collapse-title text-xl font-medium">
           What is the road map and future of Champagne Room?
         </div>
