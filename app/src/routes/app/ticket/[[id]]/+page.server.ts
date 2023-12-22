@@ -27,12 +27,17 @@ import type { PayoutQueueType } from '$lib/workers/payoutWorker';
 
 import type { CurrencyType, DisputeReason } from '$lib/constants';
 import {
+  ActorType,
   CancelReason,
+  EntityType,
   RefundReason,
   TicketMachineEventString
 } from '$lib/constants';
-import { ActorType, EntityType } from '$lib/constants';
-import { createAuthToken, InvoiceJobType, PayoutJobType } from '$lib/payment';
+import {
+  InvoiceJobType,
+  PayoutJobType,
+  createBitcartToken
+} from '$lib/payment';
 import { getTicketMachineService } from '$lib/server/machinesUtil';
 
 import {
@@ -235,7 +240,7 @@ export const actions: Actions = {
     const redisConnection = locals.redisConnection as IORedis;
 
     // Tell bitcart payment is coming
-    const token = await createAuthToken(
+    const token = await createBitcartToken(
       BITCART_EMAIL,
       BITCART_PASSWORD,
       BITCART_API_URL
@@ -325,7 +330,7 @@ export const load: PageServerLoad = async ({ locals }) => {
     throw error(404, 'Show not found');
   }
   // Get invoice associated with ticket
-  const token = await createAuthToken(
+  const token = await createBitcartToken(
     BITCART_EMAIL,
     BITCART_PASSWORD,
     BITCART_API_URL

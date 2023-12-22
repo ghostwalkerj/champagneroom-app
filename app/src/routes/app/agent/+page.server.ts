@@ -2,16 +2,20 @@ import console from 'node:console';
 
 import { error, fail } from '@sveltejs/kit';
 import type { AxiosResponse } from 'axios';
-import { ObjectId } from 'mongodb';
+import type { JwtPayload } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { nanoid } from 'nanoid';
 import { generateSillyPassword } from 'silly-password-generator';
 import spacetime from 'spacetime';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 
 import {
+  AUTH_SALT,
+  AUTH_TOKEN_NAME,
   BITCART_API_URL,
   BITCART_EMAIL,
   BITCART_PASSWORD,
+  JWT_PRIVATE_KEY,
   PASSWORD_SALT
 } from '$env/static/private';
 
@@ -27,12 +31,26 @@ import { Wallet } from '$lib/models/wallet';
 import Config from '$lib/config';
 import { AuthType, CurrencyType, EntityType } from '$lib/constants';
 import { rateCryptosRateGet } from '$lib/ext/bitcart';
-import { createAuthToken } from '$lib/payment';
+import { createBitcartToken } from '$lib/payment';
 import { womensNames } from '$lib/womensNames';
 
 import type { Actions, PageServerLoad } from './$types';
 
 export const actions: Actions = {
+  impersonateCreator: async ({ request, locals, cookies }) => {
+    const tokenName = AUTH_TOKEN_NAME || 'token';
+    const encryptedToken = cookies.get(tokenName);
+    const authToken = authDecrypt(encryptedToken, AUTH_SALT);
+
+    if (authToken) {
+      try {
+        jwt.verify(authToken, JWT_PRIVATE_KEY) as JwtPayload;
+      } catch (error) {
+        console.error('Invalid token:', error);
+        cookies.delete(tokenName, { path: '/' });
+      }
+    }
+  },
   update_profile_image: async ({ locals, request }) => {
     const data = await request.formData();
     const url = data.get('url') as string;
@@ -315,7 +333,7 @@ export const load: PageServerLoad = async ({ locals }) => {
   let exchangeRate = { data: {} };
 
   if (wallet) {
-    const token = await createAuthToken(
+    const token = await createBitcartToken(
       BITCART_EMAIL,
       BITCART_PASSWORD,
       BITCART_API_URL

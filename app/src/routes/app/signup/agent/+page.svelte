@@ -288,7 +288,7 @@
         <div class="daisy-form-control max-w-xs p-4">
           <input
             type="text"
-            name="defaultCommission"
+            name="defaultCommissionRate"
             placeholder={Config.UI.defaultCommissionRate.toString()}
             class="daisy-input daisy-input-bordered daisy-input-primary w-full max-w-xs daisy-input-sm"
           />

@@ -23,7 +23,6 @@
   import type { PageData } from './$types';
   import type { UserDocument } from '$lib/models/user';
   import { PermissionType } from '$lib/permissions';
-  import { InputChip } from '@skeletonlabs/skeleton';
 
   export let data: PageData;
   let operator = data.operator as OperatorDocument;
@@ -211,6 +210,9 @@
         }
         if (result.data.badCommission) {
           creatorCommissionElement.focus();
+        }
+        if (result.data.badCreatorName) {
+          creatorNameElement.focus();
         }
         if (result.data.missingAgentId) {
           creatorAgentElement.focus();

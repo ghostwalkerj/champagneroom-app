@@ -74,7 +74,7 @@ export const calcTotal = (payments: Map<string, TransactionSummaryType[]>) => {
   return total;
 };
 
-export const createAuthToken = async (
+export const createBitcartToken = async (
   email: string,
   password: string,
   baseURL: string

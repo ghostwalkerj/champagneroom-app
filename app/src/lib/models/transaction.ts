@@ -4,9 +4,9 @@ import {
   genTimestampsSchema,
   mongooseZodCustomType,
   toMongooseSchema,
+  toZodMongooseSchema,
   z
 } from 'mongoose-zod';
-import { toZodMongooseSchema } from 'mongoose-zod';
 import validator from 'validator';
 
 import { CurrencyType, TransactionReason } from '$lib/constants';

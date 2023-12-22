@@ -2,7 +2,6 @@ import type { Actions, RequestEvent } from '@sveltejs/kit';
 import { fail, redirect } from '@sveltejs/kit';
 import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
-import { ObjectId } from 'mongodb';
 import { nanoid } from 'nanoid';
 import { generateSillyPassword } from 'silly-password-generator';
 import { uniqueNamesGenerator } from 'unique-names-generator';
@@ -74,21 +73,18 @@ export const actions: Actions = {
   create_creator: async ({ request }) => {
     const data = await request.formData();
     const agentId = data.get('agentId') as string;
-    let name = data.get('name') as string;
+    const name = data.get('name') as string;
     const commission = data.get('commission') as string;
 
     // Validation
     if (!name || name.length < 3 || name.length > 50) {
-      name = uniqueNamesGenerator({
-        dictionaries: [womensNames]
-      });
+      return fail(400, { name, badCreatorName: true });
     }
     if (Number.isNaN(+commission) || +commission < 0 || +commission > 100) {
       return fail(400, { commission, badCommission: true });
     }
 
-    const agent =
-      agentId && agentId !== '0' ? new ObjectId(agentId) : undefined;
+    const agent = agentId && agentId !== '0' ? agentId : undefined;
 
     try {
       const wallet = new Wallet();

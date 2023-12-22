@@ -1,21 +1,21 @@
 <script lang="ts">
-	import type { SvelteComponent } from 'svelte';
-    import { superForm } from 'sveltekit-superforms/client';
+	import { applyAction, deserialize } from '$app/forms';
 	import { getModalStore } from '@skeletonlabs/skeleton';
-    import type { ActionResult } from '@sveltejs/kit';
-    import { applyAction, deserialize } from '$app/forms';
+	import type { ActionResult } from '@sveltejs/kit';
+	import type { SvelteComponent } from 'svelte';
+	import { superForm } from 'sveltekit-superforms/client';
 
 	// Props
 	/** Exposes parent props to this component. */
 	export let parent: SvelteComponent;
 
 	const modalStore = getModalStore();
- 
+
     const { form, errors, constraints, enhance, delayed, message } = superForm($modalStore[0].meta.form, {
         validationMethod: 'auto',
         onResult:({result}) => {
             if (result.type === 'success') { // VERIFY THIS IS CORRECT
-                console.log(result.data); 
+                console.log(result.data);
                 setPinAuth(result.data!.userId, result.data!.form.data.pin);
             }
         },
@@ -34,7 +34,7 @@
     const result: ActionResult = deserialize(await response.text());
     applyAction(result);
   };
-  
+
 </script>
 
 {#if $modalStore[0]}
@@ -61,7 +61,7 @@
                         {#if $errors.pin}<span class="text-error">{$errors.pin}</span>{/if}
                     </label>
                 </div>
-                
+
 
                 <footer class="text-right font-semibold">
                     <button class="btn variant-filled-surface" disabled={$delayed} type="button" on:click={parent.onClose}>{parent.buttonTextCancel}</button>
@@ -71,8 +71,8 @@
                 <p class="text-error mt-2">{$message}</p>
                 {/if}
                 </footer>
-                                
-            </div>	
+
+            </div>
 		</form>
 	</div>
 {/if}
