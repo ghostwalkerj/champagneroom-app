@@ -89,17 +89,15 @@
     isDecideDispute = false;
   };
 
-
   const impersonate = async (impersonateId: string) => {
     let formData = new FormData();
     formData.append('impersonateId', impersonateId);
-     const response = await fetch('?/impersonateUser', {
+    const response = await fetch('?/impersonateUser', {
       method: 'POST',
       body: formData
     });
     const result: ActionResult = deserialize(await response.text());
     applyAction(result);
-
   };
 
   const changeUserSecret = async () => {
@@ -159,6 +157,34 @@
     });
   };
 
+  const updateAgent = async (
+    index: number,
+    {
+      name,
+      address,
+      active
+    }: {
+      name?: string;
+      address?: string;
+      active?: boolean;
+    }
+  ) => {
+    const agent = agents[index];
+    let formData = new FormData();
+    formData.append('name', name || agent.user.name);
+    formData.append('address', address || agent.user.address || '');
+    formData.append('userId', agent.user._id.toString());
+    formData.append(
+      'active',
+      active ? active.toString() : agent.user.active.toString()
+    );
+
+    await fetch('?/update_agent', {
+      method: 'POST',
+      body: formData
+    });
+  };
+
   const updateCreatorName = (name: string) => {
     creators[activeCreatorRow].user.name = name;
     updateCreator(activeCreatorRow, { name });
@@ -172,7 +198,28 @@
   const updateCreatorActive = (active: boolean) => {
     creators[activeCreatorRow].user.active = active;
     updateCreator(activeCreatorRow, {
-      active: creators[activeCreatorRow].user.active
+      active
+    });
+  };
+
+  const updateAgentActive = (active: boolean) => {
+    agents[activeCreatorRow].user.active = active;
+    updateAgent(activeCreatorRow, {
+      active
+    });
+  };
+
+  const updateAgentName = (name: string) => {
+    agents[activeAgentRow].user.name = name;
+    updateAgent(activeAgentRow, {
+      name
+    });
+  };
+
+  const updateAgentAddress = (address: string) => {
+    agents[activeAgentRow].user.address = address;
+    updateAgent(activeAgentRow, {
+      address
     });
   };
 
@@ -486,15 +533,23 @@
                             <td
                               contenteditable="true"
                               on:blur={(event) => {
-                                console.log(event.target?.textContent);
+                                updateAgentName(event.target?.textContent);
                               }}>{agent.user.name}</td
                             >
-                            <td contenteditable="true">{agent.user.address}</td>
+                            <td
+                              contenteditable="true"
+                              on:blur={(event) => {
+                                updateAgentAddress(event.target?.textContent);
+                              }}>{agent.user.address}</td
+                            >
                             <td>
                               <input
                                 class="checkbox"
                                 type="checkbox"
                                 checked={agent.user.active}
+                                on:change={(event) => {
+                                  updateAgentActive(event.target?.checked);
+                                }}
                               />
                             </td>
                             <td>
@@ -509,14 +564,15 @@
                               </div>
                             </td>
                             {#if canImpersonateAgent}
-                              <td
-                                >    <button
-                                class="daisy-btn daisy-btn-xs daisy-btn-outline daisy-btn-primary"
-                                disabled={!canImpersonateAgent}
-                                on:click={() => impersonate(agent.user._id.toString())}
-                              >
-                                Impersonate
-                              </button></td
+                              <td>
+                                <button
+                                  class="daisy-btn daisy-btn-xs daisy-btn-outline daisy-btn-primary"
+                                  disabled={!canImpersonateAgent}
+                                  on:click={() =>
+                                    impersonate(agent.user._id.toString())}
+                                >
+                                  Impersonate
+                                </button></td
                               >
                             {/if}
                           </tr>
@@ -757,11 +813,12 @@
                             {#if canImpersonateCreator}
                               <td
                                 ><button
-                                class="daisy-btn daisy-btn-xs daisy-btn-outline daisy-btn-primary "
-                                disabled={!canImpersonateCreator}
-                                on:click={() => impersonate(creator.user._id.toString())}
-                              >Impersonate
-                              </button></td
+                                  class="daisy-btn daisy-btn-xs daisy-btn-outline daisy-btn-primary"
+                                  disabled={!canImpersonateCreator}
+                                  on:click={() =>
+                                    impersonate(creator.user._id.toString())}
+                                  >Impersonate
+                                </button></td
                               >
                             {/if}
                           </tr>

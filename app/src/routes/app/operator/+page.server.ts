@@ -202,6 +202,44 @@ export const actions: Actions = {
       success: true
     };
   },
+  update_agent: async ({ request }) => {
+    const data = await request.formData();
+    const userId = data.get('userId') as string;
+    const name = data.get('name') as string;
+    const active = data.get('active') as string;
+    const address = data.get('address') as string;
+
+    // Validation
+    if (!userId) {
+      console.error('bad userId', userId);
+      return fail(400, { userId, badUserId: true });
+    }
+
+    if (active !== 'true' && active !== 'false') {
+      console.error('bad active', active);
+      return fail(400, { active, badActive: true });
+    }
+
+    try {
+      await User.findOneAndUpdate(
+        {
+          _id: userId
+        },
+        {
+          name,
+          active: active === 'true',
+          address: address.toLowerCase()
+        }
+      );
+    } catch (error) {
+      console.error('err', error);
+      return fail(400, { err: error });
+    }
+
+    return {
+      success: true
+    };
+  },
   change_user_secret: async ({ request }) => {
     const data = await request.formData();
     const userId = data.get('userId') as string;
