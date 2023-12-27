@@ -905,6 +905,18 @@
                         {/if}
                       {/each}
                     </tbody>
+                          <tfoot>
+                      <tr>
+                        <th />
+                        <th>Creator</th>
+                        <th>Amount</th>
+                        <th>Show Start</th>
+                        <th>Show End</th>
+                        <th>Run Time</th>
+                        <th>Reason</th>
+                        <th>Explanation</th>
+                      </tr>
+                    </tfoot>
                   </table>
                 </div>
               </div>
