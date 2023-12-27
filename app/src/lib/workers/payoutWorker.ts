@@ -41,7 +41,7 @@ import type {
 } from '$lib/ext/bitcart/models';
 import type { PaymentType } from '$lib/payment';
 import { PayoutJobType, PayoutReason, PayoutStatus } from '$lib/payment';
-import { authEncrypt } from '$lib/server/crypt';
+import { authEncrypt } from '$lib/crypt';
 import {
   getTicketMachineService,
   getWalletMachineService

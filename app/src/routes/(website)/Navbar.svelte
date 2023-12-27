@@ -14,7 +14,7 @@
   ];
 
   function closeNav() {
-    const drawer = document.getElementById('rigthDrawer') as HTMLInputElement;
+    const drawer = document.getElementById('rightDrawer') as HTMLInputElement;
     drawer.checked = false;
   }
 </script>
@@ -91,7 +91,7 @@
       {/each}
     </ul>
     <label
-      for="rigthDrawer"
+      for="rightDrawer"
       aria-label="open sidebar"
       class="daisy-btn daisy-btn-square daisy-btn-ghost mr-2"
     >
@@ -113,13 +113,13 @@
 
 <!-- Drawer content-->
 <div class="daisy-drawer daisy-drawer-end z-50">
-  <input id="rigthDrawer" type="checkbox" class="daisy-drawer-toggle" />
+  <input id="rightDrawer" type="checkbox" class="daisy-drawer-toggle" />
   <div class="daisy-drawer-content">
     <!-- Page content here -->
   </div>
   <div class="daisy-drawer-side">
     <label
-      for="rigthDrawer"
+      for="rightDrawer"
       aria-label="close sidebar"
       class="drawer-overlay"
     />

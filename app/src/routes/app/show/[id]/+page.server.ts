@@ -33,13 +33,14 @@ import {
   TicketMachineEventString,
   UserRole
 } from '$lib/constants';
+import { authEncrypt } from '$lib/crypt';
 import { mensNames } from '$lib/mensNames';
 import {
   createBitcartToken,
   InvoiceJobType,
   InvoiceStatus
 } from '$lib/payment';
-import { authEncrypt, createAuthToken, setAuthToken } from '$lib/server/auth';
+import { createAuthToken, setAuthToken } from '$lib/server/auth';
 import {
   getShowMachineServiceFromId,
   getTicketMachineService

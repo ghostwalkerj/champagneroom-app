@@ -15,7 +15,7 @@ import parseArgv from 'tiny-parse-argv';
 
 import { handler } from './build/handler';
 import { EntityType } from './dist/constants';
-import { createAuthToken } from './dist/payment';
+import { createBitcartToken } from './dist/payment';
 import { getInvoiceWorker } from './dist/workers/invoiceWorker';
 import { getPayoutWorker } from './dist/workers/payoutWorker';
 import { getShowWorker } from './dist/workers/showWorker';
@@ -53,7 +53,7 @@ const payoutQueue = new Queue(EntityType.PAYOUT, {
   connection: redisConnection
 });
 
-const paymentAuthToken = await createAuthToken(
+const paymentAuthToken = await createBitcartToken(
   process.env.BITCART_EMAIL || '',
   process.env.BITCART_PASSWORD || '',
   process.env.BITCART_API_URL || ''

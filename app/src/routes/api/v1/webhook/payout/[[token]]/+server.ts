@@ -5,7 +5,7 @@ import { AUTH_SALT } from '$env/static/private';
 
 import { EntityType } from '$lib/constants';
 import { PayoutJobType } from '$lib/payment';
-import { authDecrypt } from '$lib/server/auth';
+import { authEncrypt } from '$lib/crypt';
 
 import type { RequestHandler } from './$types';
 

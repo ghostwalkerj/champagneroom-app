@@ -1,22 +1,17 @@
 import console from 'node:console';
-import { exists } from 'node:fs';
 
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { AxiosResponse } from 'axios';
-import type { JwtPayload } from 'jsonwebtoken';
-import jwt from 'jsonwebtoken';
 import { nanoid } from 'nanoid';
 import { generateSillyPassword } from 'silly-password-generator';
 import spacetime from 'spacetime';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 
 import {
-  AUTH_SALT,
   AUTH_TOKEN_NAME,
   BITCART_API_URL,
   BITCART_EMAIL,
   BITCART_PASSWORD,
-  JWT_PRIVATE_KEY,
   PASSWORD_SALT
 } from '$env/static/private';
 
