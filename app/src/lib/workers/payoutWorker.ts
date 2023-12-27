@@ -22,6 +22,7 @@ import {
   TicketMachineEventString,
   WalletMachineEventString
 } from '$lib/constants';
+import { authEncrypt } from '$lib/crypt';
 import {
   batchActionsOnPayoutsPayoutsBatchPost,
   createPayoutPayoutsPost,
@@ -41,7 +42,6 @@ import type {
 } from '$lib/ext/bitcart/models';
 import type { PaymentType } from '$lib/payment';
 import { PayoutJobType, PayoutReason, PayoutStatus } from '$lib/payment';
-import { authEncrypt } from '$lib/crypt';
 import {
   getTicketMachineService,
   getWalletMachineService

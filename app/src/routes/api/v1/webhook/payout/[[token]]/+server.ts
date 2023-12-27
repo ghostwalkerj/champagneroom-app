@@ -4,8 +4,8 @@ import type IORedis from 'ioredis';
 import { AUTH_SALT } from '$env/static/private';
 
 import { EntityType } from '$lib/constants';
+import { authDecrypt } from '$lib/crypt';
 import { PayoutJobType } from '$lib/payment';
-import { authEncrypt } from '$lib/crypt';
 
 import type { RequestHandler } from './$types';
 

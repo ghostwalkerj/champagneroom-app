@@ -15,6 +15,7 @@ import {
 
 import Config from '$lib/config';
 import type { AuthType } from '$lib/constants';
+import { authDecrypt, authEncrypt } from '$lib/crypt';
 
 const idString = '/[A-Za-z0-9_-]*';
 
