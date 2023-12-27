@@ -3,6 +3,7 @@
   import StarRating from 'svelte-star-rating';
   import { uniqueNamesGenerator } from 'unique-names-generator';
   import urlJoin from 'url-join';
+  import Icon from '@iconify/svelte';
 
   import { applyAction, deserialize, enhance } from '$app/forms';
   import { invalidateAll } from '$app/navigation';
@@ -301,7 +302,7 @@
                                 canAddCreator = !canAddCreator;
                               }}
                             >
-                              <iconify-icon
+                              <Icon
                                 icon="mingcute:add-circle-line"
                                 class="text-xl"
                               /></button

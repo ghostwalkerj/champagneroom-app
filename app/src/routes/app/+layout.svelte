@@ -1,5 +1,4 @@
 <script lang="ts">
-  import 'iconify-icon';
 
   import { format, generate } from 'build-number-generator';
   import { onMount } from 'svelte';

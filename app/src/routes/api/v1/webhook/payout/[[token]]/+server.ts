@@ -1,4 +1,3 @@
-import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 
 import { AUTH_SALT } from '$env/static/private';
@@ -8,6 +7,7 @@ import { authDecrypt } from '$lib/crypt';
 import { PayoutJobType } from '$lib/payment';
 
 import type { RequestHandler } from './$types';
+import { Queue } from 'bullmq';
 
 export const POST: RequestHandler = async ({ request, locals, params }) => {
   const body = await request.json();

@@ -36,6 +36,7 @@
     "ionic:serve": "npm run start"
   },
   "devDependencies": {
+    "@iconify/svelte": "^3.1.6",
     "@metamask/jazzicon": "^2.0.0",
     "@skeletonlabs/skeleton": "^2.6.0",
     "@skeletonlabs/tw-plugin": "^0.3.0",
@@ -118,7 +119,6 @@
     "express-basic-auth": "^1.2.1",
     "filedrop-svelte": "^0.1.2",
     "i18n-possessive": "^1.0.0",
-    "iconify-icon": "^1.0.7",
     "ioredis": "^5.3.2",
     "joi": "^17.9.2",
     "jsonwebtoken": "^8.5.1",

@@ -34,9 +34,9 @@ import {
   TicketMachineEventString
 } from '$lib/constants';
 import {
-  createBitcartToken,
   InvoiceJobType,
-  PayoutJobType
+  PayoutJobType,
+  createBitcartToken
 } from '$lib/payment';
 import { getTicketMachineService } from '$lib/server/machinesUtil';
 

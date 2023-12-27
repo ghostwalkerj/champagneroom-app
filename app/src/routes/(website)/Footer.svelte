@@ -1,5 +1,5 @@
 <script lang="ts">
-  import 'iconify-icon';
+import Icon from '@iconify/svelte';
 
   import Config from '$lib/config';
 </script>
@@ -14,13 +14,13 @@
         <ul class="list-none">
           <li class="spa">
             <a href="https://discord.gg/VgB7bWScVa" target="_blank">
-              <iconify-icon icon="line-md:discord-twotone" />
+              <Icon icon="line-md:discord-twotone" />
               <span class="icon-list-text">Discord</span>
             </a>
           </li>
           <li class="spa">
             <a href="https://twitter.com/_Champagne_Room" target="_blank">
-              <iconify-icon icon="simple-icons:x" />
+              <Icon icon="simple-icons:x" />
               <span class="icon-list-text">(Twitter)</span>
             </a>
           </li>

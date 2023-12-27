@@ -1,4 +1,4 @@
-<script lang="ts">
+a<script lang="ts">
   import { invalidateAll } from '$app/navigation';
   import { onDestroy, onMount } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';

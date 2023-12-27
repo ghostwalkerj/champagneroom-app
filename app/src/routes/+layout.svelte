@@ -7,7 +7,6 @@
   import '@fontsource/space-grotesk';
   import type { ModalComponent } from '@skeletonlabs/skeleton';
   import { Modal, initializeStores } from '@skeletonlabs/skeleton';
-  import 'iconify-icon';
   import '../app.css';
 
 initializeStores();

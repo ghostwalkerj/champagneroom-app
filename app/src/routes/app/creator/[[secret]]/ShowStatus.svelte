@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Icon from '@iconify/svelte';
   import { onDestroy, onMount } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
 
@@ -51,7 +52,7 @@
         <div class="grow">
           <div class="daisy-alert daisy-alert-info shadow-lg p-3">
             <div class="flex gap-2">
-              <iconify-icon icon="mingcute:information-line" class="text-2xl" />
+              <Icon icon="mingcute:information-line" class="text-2xl" />
               <p class="capitalize">{statusText.toLowerCase()}</p>
             </div>
           </div>
@@ -59,7 +60,7 @@
         <div class="grow">
           <div class="daisy-alert daisy-alert-info shadow-lg p-3">
             <div class="flex gap-2">
-              <iconify-icon icon="mingcute:information-line" class="text-2xl" />
+              <Icon icon="mingcute:information-line" class="text-2xl" />
               <p class="capitalize">{eventText}</p>
             </div>
           </div>

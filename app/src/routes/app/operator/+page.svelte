@@ -23,6 +23,7 @@
   import { PermissionType } from '$lib/permissions';
   import type { Types } from 'mongoose';
   import type { PageData } from './$types';
+  import Icon from '@iconify/svelte';
 
   export let data: PageData;
   let operator = data.operator as OperatorDocument;
@@ -444,7 +445,7 @@
                       svelte/valid-compile -->
                       <!-- svelte-ignore a11y-missing-attribute -->
                       <a class="font-SpaceGrotesk">
-                        <iconify-icon
+                        <Icon
                           icon="mdi:teleconference"
                           class="w-6 h-6 mt-2"
                         />
@@ -470,7 +471,7 @@
                                 canAddAgent = !canAddAgent;
                               }}
                             >
-                              <iconify-icon
+                              <Icon
                                 icon="mingcute:add-circle-line"
                                 class="text-xl"
                               /></button
@@ -611,7 +612,7 @@
                                 canAddCreator = !canAddCreator;
                               }}
                             >
-                              <iconify-icon
+                              <Icon
                                 icon="mingcute:add-circle-line"
                                 class="text-xl"
                               /></button

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { applyAction, deserialize } from '$app/forms';
+	import Icon from '@iconify/svelte';
 	import { getModalStore } from '@skeletonlabs/skeleton';
 	import type { ActionResult } from '@sveltejs/kit';
 	import type { SvelteComponent } from 'svelte';
@@ -65,7 +66,7 @@
 
                 <footer class="text-right font-semibold">
                     <button class="btn variant-filled-surface" disabled={$delayed} type="button" on:click={parent.onClose}>{parent.buttonTextCancel}</button>
-                    <button class="btn variant-filled-primary gap-2" disabled={$delayed} type="submit" >Submit Form {#if $delayed}<iconify-icon icon="eos-icons:loading"></iconify-icon>{/if}</button>
+                    <button class="btn variant-filled-primary gap-2" disabled={$delayed} type="submit" >Submit Form {#if $delayed}<Icon icon="eos-icons:loading"/>{/if}</button>
                     {#if $message}
                     <br>
                 <p class="text-error mt-2">{$message}</p>

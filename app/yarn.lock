@@ -1333,6 +1333,13 @@
     minimatch "^6.1.6"
     validator "^13.7.0"
 
+"@iconify/svelte@^3.1.6":
+  version "3.1.6"
+  resolved "https://registry.yarnpkg.com/@iconify/svelte/-/svelte-3.1.6.tgz#060821ecae5dd92e9c1f0420a674eda5bc060086"
+  integrity sha512-yLSrlkOx5J6xXU5GDLPBV/MdVBVEZhd36onfqSbxQobp1XBoWQbMPLNZyCAmTKCPnmzXSowGy79agl8FQ3kj6A==
+  dependencies:
+    "@iconify/types" "^2.0.0"
+
 "@iconify/types@^2.0.0":
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@iconify/types/-/types-2.0.0.tgz#ab0e9ea681d6c8a1214f30cd741fe3a20cc57f57"
@@ -7119,13 +7126,6 @@ i18n-possessive@^1.0.0:
   resolved "https://registry.yarnpkg.com/i18n-possessive/-/i18n-possessive-1.0.0.tgz#1f7ff22f5689842ca3535eb6c9008953c24972b4"
   integrity sha512-VbnbubpG6zWrq1VxAw2m2YMgzm+uBhVR01nluByx0yeh60zOWwk02yTIK5bWAlfxa8xH4FLTqO/ZMQ6gBk9cOg==
 
-iconify-icon@^1.0.7:
-  version "1.0.8"
-  resolved "https://registry.yarnpkg.com/iconify-icon/-/iconify-icon-1.0.8.tgz#ad7a36731dca0da0204e488ef0b9ebdad2a7d760"
-  integrity sha512-jvbUKHXf8EnGGArmhlP2IG8VqQLFFyTvTqb9LVL2TKTh7/eCCD1o2HHE9thpbJJb6B8hzhcFb6rOKhvo7reNKA==
-  dependencies:
-    "@iconify/types" "^2.0.0"
-
 iconv-lite@0.4.24:
   version "0.4.24"
   resolved "https://registry.yarnpkg.com/iconv-lite/-/iconv-lite-0.4.24.tgz#2022b4b25fbddc21d2f524974a474aafe733908b"
@@ -10276,9 +10276,9 @@ readable-stream@^3.1.1, readable-stream@^3.4.0, readable-stream@^3.5.0, readable
     util-deprecate "^1.0.1"
 
 readable-stream@^4.4.0:
-  version "4.5.1"
-  resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-4.5.1.tgz#3f2e4e66eab45606ac8f31597b9edb80c13b12ab"
-  integrity sha512-uQjbf34vmf/asGnOHQEw07Q4llgMACQZTWWa4MmICS0IKJoHbLwKCy71H3eR99Dw5iYejc6W+pqZZEeqRtUFAw==
+  version "4.5.2"
+  resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-4.5.2.tgz#9e7fc4c45099baeed934bff6eb97ba6cf2729e09"
+  integrity sha512-yjavECdqeZ3GLXNgRXgeQEdz9fvDDkNKyHnbHRFtOr7/LcfgBcmct7t/ET+HaCTqfh06OzoAxrkN/IfjJBVe+g==
   dependencies:
     abort-controller "^3.0.0"
     buffer "^6.0.3"

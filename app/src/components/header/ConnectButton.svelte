@@ -1,6 +1,7 @@
 <script lang="ts">
   import NeonBlur from '$components/NeonBlur.svelte';
   import { connect, selectedAccount } from '$lib/web3';
+  import Icon from '@iconify/svelte';
 </script>
 
 {#if !$selectedAccount}
@@ -9,7 +10,7 @@
       class="btn btn-xl rounded-lg variant-filled relative"
       on:click={connect}
     >
-      <iconify-icon
+      <Icon
         class="text-pink-600"
         icon="carbon:ibm-cloud-hyper-protect-crypto-services"
       />

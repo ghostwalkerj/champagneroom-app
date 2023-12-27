@@ -5,6 +5,7 @@
   import type { ShowDocument } from '$lib/models/show';
 
   import { ShowStatus, currencyFormatter } from '$lib/constants';
+  import Icon from '@iconify/svelte';
   export let completedShows: ShowDocument[] = [];
 </script>
 
@@ -19,7 +20,7 @@
       {#each completedShows.slice(0, 9) as show}
         <li>
           <div class="flex flex-row w-full my-2">
-            <iconify-icon
+            <Icon
               icon="mingcute:award-fill"
               class="text-xl text-primary-content"
             />

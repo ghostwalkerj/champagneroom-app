@@ -1,4 +1,4 @@
-<script lang="ts">
+ya<script lang="ts">
   import type { WalletState } from '@web3-onboard/core';
   import { onDestroy, onMount } from 'svelte';
   import { uniqueNamesGenerator } from 'unique-names-generator';
