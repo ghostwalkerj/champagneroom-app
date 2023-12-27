@@ -39,7 +39,7 @@ import {
   InvoiceJobType,
   InvoiceStatus
 } from '$lib/payment';
-import { authEncrypt, createAuthToken, setAuthCookie } from '$lib/server/auth';
+import { authEncrypt, createAuthToken, setAuthToken } from '$lib/server/auth';
 import {
   getShowMachineServiceFromId,
   getTicketMachineService
@@ -247,7 +247,7 @@ export const actions: Actions = {
       authType: AuthType.PIN
     });
 
-    encAuthToken && setAuthCookie(cookies, tokenName, encAuthToken);
+    encAuthToken && setAuthToken(cookies, tokenName, encAuthToken);
 
     showQueue.close();
     showService.stop();

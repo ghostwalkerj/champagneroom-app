@@ -71,11 +71,19 @@
               {$page.data.user.name}
             </div>
           {/if}
+          {#if $page.data.authType === AuthType.IMPERSONATION}
+               <a
+            class="btn variant-outline"
+            href={Config.PATH.revert}
+            >Revert </a
+          >
+          {:else}
           <a
             class="btn variant-outline"
             href={Config.PATH.signout + '?returnPath=' + $page.url.pathname}
             >Signout</a
           >
+          {/if}
         </div>
       {:else}
         <p>Connect your wallet to begin</p>

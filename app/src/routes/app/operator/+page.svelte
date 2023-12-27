@@ -5,7 +5,7 @@
   import { uniqueNamesGenerator } from 'unique-names-generator';
   import urlJoin from 'url-join';
 
-  import { deserialize, enhance } from '$app/forms';
+  import { applyAction, deserialize, enhance } from '$app/forms';
   import { invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
 
@@ -19,10 +19,10 @@
 
   import type { AgentDocument } from '$lib/models/agent';
   import type { TicketDocument } from '$lib/models/ticket';
-  import type { Types } from 'mongoose';
-  import type { PageData } from './$types';
   import type { UserDocument } from '$lib/models/user';
   import { PermissionType } from '$lib/permissions';
+  import type { Types } from 'mongoose';
+  import type { PageData } from './$types';
 
   export let data: PageData;
   let operator = data.operator as OperatorDocument;
@@ -87,6 +87,19 @@
 
     disputedTickets.splice(index, 1);
     isDecideDispute = false;
+  };
+
+
+  const impersonate = async (impersonateId: string) => {
+    let formData = new FormData();
+    formData.append('impersonateId', impersonateId);
+     const response = await fetch('?/impersonateUser', {
+      method: 'POST',
+      body: formData
+    });
+    const result: ActionResult = deserialize(await response.text());
+    applyAction(result);
+
   };
 
   const changeUserSecret = async () => {
@@ -497,10 +510,13 @@
                             </td>
                             {#if canImpersonateAgent}
                               <td
-                                ><button
-                                  class="daisy-btn daisy-btn-primary daisy-btn-xs"
-                                  on:click={() => {}}>Impersonate</button
-                                ></td
+                                >    <button
+                                class="daisy-btn daisy-btn-xs daisy-btn-outline daisy-btn-primary"
+                                disabled={!canImpersonateAgent}
+                                on:click={() => impersonate(agent.user._id.toString())}
+                              >
+                                Impersonate
+                              </button></td
                               >
                             {/if}
                           </tr>
@@ -741,9 +757,11 @@
                             {#if canImpersonateCreator}
                               <td
                                 ><button
-                                  class="daisy-btn daisy-btn-primary daisy-btn-xs"
-                                  on:click={() => {}}>Impersonate</button
-                                ></td
+                                class="daisy-btn daisy-btn-xs daisy-btn-outline daisy-btn-primary "
+                                disabled={!canImpersonateCreator}
+                                on:click={() => impersonate(creator.user._id.toString())}
+                              >Impersonate
+                              </button></td
                               >
                             {/if}
                           </tr>

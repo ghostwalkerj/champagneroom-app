@@ -148,6 +148,8 @@ const setLocals = async (decode: JwtPayload, locals: App.Locals) => {
     }
   }
 
+  if (decode.authType) locals.authType = decode.authType;
+
   return locals;
 };
 

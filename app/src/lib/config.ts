@@ -31,6 +31,7 @@ const Config = {
     agentSignup: '/app/signup/agent',
     creatorSignup: '/app/signup/creator',
     signout: '/app/signout',
+    revert: '/app/revert',
     operator: '/app/operator',
     imageUpload: '/api/v1/upload',
     notifyUpdate: '/api/v1/notify/update',

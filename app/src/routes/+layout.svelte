@@ -1,15 +1,14 @@
 <script lang="ts">
+  import ReserveShowForm from '$components/forms/ReserveShowForm.svelte';
   import '@fontsource/roboto';
   import '@fontsource/roboto/300.css';
   import '@fontsource/roboto/500.css';
   import '@fontsource/roboto/700.css';
   import '@fontsource/space-grotesk';
+  import type { ModalComponent } from '@skeletonlabs/skeleton';
+  import { Modal, initializeStores } from '@skeletonlabs/skeleton';
   import 'iconify-icon';
   import '../app.css';
-  import { Modal } from '@skeletonlabs/skeleton';
-  import type { ModalComponent } from '@skeletonlabs/skeleton';
-  import { initializeStores } from '@skeletonlabs/skeleton';
-  import ReserveShowForm from '$components/forms/ReserveShowForm.svelte';
 
 initializeStores();
 const modalRegistry: Record<string, ModalComponent> = {

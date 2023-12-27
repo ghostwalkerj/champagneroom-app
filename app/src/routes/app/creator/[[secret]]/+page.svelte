@@ -1,7 +1,7 @@
 <script lang="ts">
+  import { invalidateAll } from '$app/navigation';
   import { onDestroy, onMount } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
-  import { invalidateAll } from '$app/navigation';
 
   import type { CreatorDocument } from '$lib/models/creator';
   import type { ShowDocument } from '$lib/models/show';

@@ -47,6 +47,7 @@ const WHITELIST_PATHS = [
   Config.PATH.show + '/**',
   Config.PATH.auth,
   Config.PATH.signout,
+  Config.PATH.revert,
   Config.PATH.signup + '/**',
   Config.PATH.signup,
   ...WEBHOOK_PATHS
@@ -125,6 +126,13 @@ export const authEncrypt = (text: string | undefined, authSalt: string) => {
   }
 };
 
+export const backupAuthToken = (cookies: Cookies, tokenName: string) => {
+  const authToken = cookies.get(tokenName);
+  if (authToken) {
+    setAuthToken(cookies, `${tokenName}-tmp`, authToken);
+  }
+};
+
 export const createAuthToken = ({
   id,
   selector,
@@ -170,6 +178,7 @@ export const getAuthToken = (
   return decode;
 };
 
+//#region isMatch
 export const isAgentMatch = outmatch(AGENT_PATHS);
 export const isCreatorMatch = outmatch(CREATOR_PATHS);
 export const isNotificationMatch = outmatch(NOTIFICATION_PATHS);
@@ -180,12 +189,19 @@ export const isProtectedMatch = outmatch(PROTECTED_PATHS);
 export const isRequestAuthMatch = outmatch(REQUEST_AUTH_PATHS);
 export const isSecretMatch = outmatch(SECRET_PATHS);
 export const isTicketMatch = outmatch(TICKET_PATHS);
-
 export const isWebhookMatch = outmatch(WEBHOOK_PATHS);
-
 export const isWhitelistMatch = outmatch(WHITELIST_PATHS);
+//#endregion
 
-export const setAuthCookie = (
+export const restoreAuthToken = (cookies: Cookies, tokenName: string) => {
+  const authToken = cookies.get(`${tokenName}-tmp`);
+  if (authToken) {
+    setAuthToken(cookies, tokenName, authToken);
+    deleteAuthToken(cookies, `${tokenName}-tmp`);
+  }
+};
+
+export const setAuthToken = (
   cookies: Cookies,
   tokenName: string,
   authToken: string

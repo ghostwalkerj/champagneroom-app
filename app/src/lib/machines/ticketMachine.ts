@@ -770,7 +770,6 @@ const createTicketMachine = ({
         fullyRefunded: (context, event) => {
           const refund = context.ticketState.refund;
           if (refund === undefined) return false;
-          const currency = event.transaction.currency.toUpperCase();
           const refundApproved = refund.approvedAmount || 0;
           if (refundApproved === 0) return false;
           const amount =

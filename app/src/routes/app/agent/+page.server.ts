@@ -1,6 +1,7 @@
 import console from 'node:console';
+import { exists } from 'node:fs';
 
-import { error, fail } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import type { AxiosResponse } from 'axios';
 import type { JwtPayload } from 'jsonwebtoken';
 import jwt from 'jsonwebtoken';
@@ -32,24 +33,33 @@ import Config from '$lib/config';
 import { AuthType, CurrencyType, EntityType } from '$lib/constants';
 import { rateCryptosRateGet } from '$lib/ext/bitcart';
 import { createBitcartToken } from '$lib/payment';
+import {
+  backupAuthToken,
+  createAuthToken,
+  setAuthToken
+} from '$lib/server/auth';
 import { womensNames } from '$lib/womensNames';
 
 import type { Actions, PageServerLoad } from './$types';
 
 export const actions: Actions = {
-  impersonateCreator: async ({ request, locals, cookies }) => {
+  impersonateUser: async ({ request, cookies }) => {
+    const data = await request.formData();
+    const impersonateId = data.get('impersonateId') as string;
     const tokenName = AUTH_TOKEN_NAME || 'token';
-    const encryptedToken = cookies.get(tokenName);
-    const authToken = authDecrypt(encryptedToken, AUTH_SALT);
-
-    if (authToken) {
-      try {
-        jwt.verify(authToken, JWT_PRIVATE_KEY) as JwtPayload;
-      } catch (error) {
-        console.error('Invalid token:', error);
-        cookies.delete(tokenName, { path: '/' });
-      }
+    if (!impersonateId) {
+      return fail(400, { impersonateId, missingId: true });
     }
+
+    backupAuthToken(cookies, tokenName);
+    const encAuthToken = createAuthToken({
+      id: impersonateId,
+      selector: '_id',
+      authType: AuthType.IMPERSONATION
+    });
+
+    encAuthToken && setAuthToken(cookies, tokenName, encAuthToken);
+    throw redirect(303, Config.PATH.creator);
   },
   update_profile_image: async ({ locals, request }) => {
     const data = await request.formData();

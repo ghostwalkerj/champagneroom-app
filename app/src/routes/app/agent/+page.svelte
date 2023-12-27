@@ -4,7 +4,7 @@
   import { uniqueNamesGenerator } from 'unique-names-generator';
   import urlJoin from 'url-join';
 
-  import { deserialize, enhance } from '$app/forms';
+  import { applyAction, deserialize, enhance } from '$app/forms';
   import { invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
 
@@ -93,6 +93,19 @@
       body: formData
     });
   };
+
+  const impersonate = async (impersonateId: string) => {
+    let formData = new FormData();
+    formData.append('impersonateId', impersonateId);
+     const response = await fetch('?/impersonateUser', {
+      method: 'POST',
+      body: formData
+    });
+    const result: ActionResult = deserialize(await response.text());
+    applyAction(result);
+
+  };
+
 
   const updateName = (name: string) => {
     if (name === creators[activeRow].user.name) return;
@@ -445,12 +458,16 @@
                               />
                             </td>
                             {#if canImpersonate}
+                                                        <td>
+
                               <button
                                 class="daisy-btn daisy-btn-xs daisy-btn-outline daisy-btn-primary ml-4"
                                 disabled={!canImpersonate}
+                                on:click={() => impersonate(creator.user._id.toString())}
                               >
                                 Impersonate
                               </button>
+                            </td>
                             {/if}
                           </tr>
                         {/each}

@@ -17,7 +17,7 @@ import {
   isPasswordMatch,
   isPinMatch,
   isSecretMatch,
-  setAuthCookie,
+  setAuthToken,
   verifySignature
 } from '$lib/server/auth';
 
@@ -95,7 +95,7 @@ export const actions: Actions = {
       authType: AuthType.SIGNING
     });
 
-    encAuthToken && setAuthCookie(cookies, tokenName, encAuthToken);
+    encAuthToken && setAuthToken(cookies, tokenName, encAuthToken);
 
     return { success: true };
   },
@@ -156,7 +156,7 @@ export const actions: Actions = {
       authType: AuthType.PATH_PASSWORD,
       secret: parseId
     });
-    encAuthToken && setAuthCookie(cookies, tokenName, encAuthToken);
+    encAuthToken && setAuthToken(cookies, tokenName, encAuthToken);
     return { success: true };
   },
   pin_auth: async ({ cookies, request }) => {
@@ -220,7 +220,7 @@ export const actions: Actions = {
       authType: AuthType.PIN
     });
 
-    encAuthToken && setAuthCookie(cookies, tokenName, encAuthToken);
+    encAuthToken && setAuthToken(cookies, tokenName, encAuthToken);
 
     return { success: true };
   }

@@ -4,9 +4,8 @@ import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 import { nanoid } from 'nanoid';
 import { generateSillyPassword } from 'silly-password-generator';
-import { uniqueNamesGenerator } from 'unique-names-generator';
 
-import { PASSWORD_SALT } from '$env/static/private';
+import { AUTH_TOKEN_NAME, PASSWORD_SALT } from '$env/static/private';
 
 import { Agent } from '$lib/models/agent';
 import { Creator } from '$lib/models/creator';
@@ -22,12 +21,34 @@ import type { ShowQueueType } from '$lib/workers/showWorker';
 import Config from '$lib/config';
 import type { DisputeDecision } from '$lib/constants';
 import { AuthType, EntityType, ShowMachineEventString } from '$lib/constants';
-import { womensNames } from '$lib/womensNames';
+import {
+  backupAuthToken,
+  createAuthToken,
+  setAuthToken
+} from '$lib/server/auth';
 
 import type { PageServerLoad } from './$types';
 const websiteUrl = Config.PATH.websiteUrl;
 
 export const actions: Actions = {
+  impersonateUser: async ({ request, cookies }) => {
+    const data = await request.formData();
+    const impersonateId = data.get('impersonateId') as string;
+    const tokenName = AUTH_TOKEN_NAME || 'token';
+    if (!impersonateId) {
+      return fail(400, { impersonateId, missingId: true });
+    }
+
+    backupAuthToken(cookies, tokenName);
+    const encAuthToken = createAuthToken({
+      id: impersonateId,
+      selector: '_id',
+      authType: AuthType.IMPERSONATION
+    });
+
+    encAuthToken && setAuthToken(cookies, tokenName, encAuthToken);
+    throw redirect(303, Config.PATH.app);
+  },
   create_agent: async ({ request }: RequestEvent) => {
     const data = await request.formData();
     let name = data.get('name') as string;
