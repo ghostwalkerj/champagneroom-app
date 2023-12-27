@@ -14,13 +14,16 @@
 
   import type { Unsubscriber } from 'svelte/store';
   import type { ActionData, PageData } from './$types';
+  import type { AgentDocument } from '$lib/models/agent';
+  import type { UserDocument } from '$lib/models/user';
 
   export let data: PageData;
   export let form: ActionData;
 
   const message = data.message;
-  const user = data.user;
+  const user = data.user as UserDocument;
   const isCreator = data.isCreator;
+  const agent = data.agent as AgentDocument | undefined;
 
   $: walletAddress = '';
   let wallet: WalletState | undefined;
@@ -87,6 +90,9 @@
     formData.append('profileImageUrl', profileImageUrl);
     formData.append('address', walletAddress);
     formData.append('message', message);
+    if (agent) {
+      formData.append('agentId', agent._id);
+    }
 
     if (wallet) {
       const signature = await wallet.provider.request({

@@ -2546,9 +2546,9 @@
     undici "~5.26.2"
 
 "@sveltejs/package@^2.0.2":
-  version "2.2.4"
-  resolved "https://registry.yarnpkg.com/@sveltejs/package/-/package-2.2.4.tgz#af1c7d926380cdfa9d821a59ab082d7aa63332bb"
-  integrity sha512-Mu0YeLCEM76BM36rqtPSw1sMXW+GS2t0eGaiQ0/ZHWXgte03OIdkQogCKzSxCWXmj0qyY1udTB2oZDZ7MkGsRw==
+  version "2.2.5"
+  resolved "https://registry.yarnpkg.com/@sveltejs/package/-/package-2.2.5.tgz#379ee26fca196255936765a04df5f86d7213e79c"
+  integrity sha512-H0dFDrp7b/tr4zrUzOfqPKHG8y6ceNlGKPfSpp4ym1kTPWP79Mea5rvDlcmsbOS26FmHN/vttubalBdOCGA6qA==
   dependencies:
     chokidar "^3.5.3"
     kleur "^4.1.5"
@@ -4256,7 +4256,16 @@ await-to-js@^3.0.0:
   resolved "https://registry.yarnpkg.com/await-to-js/-/await-to-js-3.0.0.tgz#70929994185616f4675a91af6167eb61cc92868f"
   integrity sha512-zJAaP9zxTcvTHRlejau3ZOY4V7SRpiByf3/dxx2uyKxxor19tpmpV2QRsTKikckwhaPmr2dVpxxMr7jOCYVp5g==
 
-axios@^1.5.0, axios@^1.6.2:
+axios@^1.5.0:
+  version "1.6.3"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-1.6.3.tgz#7f50f23b3aa246eff43c54834272346c396613f4"
+  integrity sha512-fWyNdeawGam70jXSVlKl+SUNVcL6j6W79CuSIPfi6HnDUmSCH6gyUys/HrqHeA/wU0Az41rRgean494d0Jb+ww==
+  dependencies:
+    follow-redirects "^1.15.0"
+    form-data "^4.0.0"
+    proxy-from-env "^1.1.0"
+
+axios@^1.6.2:
   version "1.6.2"
   resolved "https://registry.yarnpkg.com/axios/-/axios-1.6.2.tgz#de67d42c755b571d3e698df1b6504cde9b0ee9f2"
   integrity sha512-7i24Ri4pmDRfJTR7LDBhsOTtcm+9kjX5WiY1X3wIisx6G9So3pfMkEiU7emUBe46oceVImccTEM3k6C5dbVW8A==
@@ -4695,9 +4704,9 @@ builtin-status-codes@^3.0.0:
   integrity sha512-HpGFw18DgFWlncDfjTa2rcQ4W88O1mC8e8yZ2AvQY5KDaktSTwo+KRf6nHK6FRI5FyRyb/5T6+TSxfP7QyGsmQ==
 
 bullmq@^4.14.0:
-  version "4.16.0"
-  resolved "https://registry.yarnpkg.com/bullmq/-/bullmq-4.16.0.tgz#6e43f232624805b4bf90ac80b10c49e081805a3e"
-  integrity sha512-PLP5MM+Gyu3unRPr54xVN3WpagLa/noJihiNzsia5GJW+MkcaYnNohj8vsoz8KdEtfE/zw0JRYU64HvdrcZP5Q==
+  version "4.17.0"
+  resolved "https://registry.yarnpkg.com/bullmq/-/bullmq-4.17.0.tgz#f8f61bea80fb72ab690c1e926de0464f3222f1ea"
+  integrity sha512-URnHgB01rlCP8RTpmW3kFnvv3vdd2aI1OcBMYQwnqODxGiJUlz9MibDVXE83mq7ee1eS1IvD9lMQqGszX6E5Pw==
   dependencies:
     cron-parser "^4.6.0"
     glob "^8.0.3"
@@ -5261,9 +5270,9 @@ d@1, d@^1.0.1:
     type "^1.0.1"
 
 daisyui@^4.4.18:
-  version "4.4.23"
-  resolved "https://registry.yarnpkg.com/daisyui/-/daisyui-4.4.23.tgz#f2ce1b5eb6c95422e72e5c954a2c0af6bfb65ef0"
-  integrity sha512-IFQRGoGoAke8chxPcDqQJFldVVd51JL7b4mRA3LqsLexW/6xicZzz9X3GXdGdnYsu8QPxZN4uzQZ5fwRNYXOSg==
+  version "4.4.24"
+  resolved "https://registry.yarnpkg.com/daisyui/-/daisyui-4.4.24.tgz#1554f6d7d6b0d0d842cf1ced09c7f6b3508bf157"
+  integrity sha512-u/B3484J08V7N0rIYymnC+SyxOjlYQL+2vyhHWV+/KC+VaUcbEF2Z3H06eCPgdTiZ0J+ml44aH7wBhIymPFQ+g==
   dependencies:
     css-selector-tokenizer "^0.8"
     culori "^3"
@@ -11404,9 +11413,9 @@ svelte@^3.49.0, svelte@^3.59.1:
   integrity sha512-vzSyuGr3eEoAtT/A6bmajosJZIUWySzY2CzB3w2pgPvnkUjGqlDnsNnA0PMO+mMAhuyMul6C2uuZzY6ELSkzyA==
 
 sveltekit-superforms@^1.12.0:
-  version "1.12.0"
-  resolved "https://registry.yarnpkg.com/sveltekit-superforms/-/sveltekit-superforms-1.12.0.tgz#540f43b813dea2dfea58d60ec2ce873260817097"
-  integrity sha512-yer9YKhfWsKsDIxXahFLuGuUel32gyi96qIdxTVFAOWXZM9ZaMEP7+FL2cMYRDg6Xqlrh5SQ9oQdkVYeLNG0eA==
+  version "1.13.1"
+  resolved "https://registry.yarnpkg.com/sveltekit-superforms/-/sveltekit-superforms-1.13.1.tgz#932a385c1ae294b9aad7dc680c5017fdf91eea11"
+  integrity sha512-aWHAV6t6+7g37IGFNLRtbRIoqfC3a56Hf4/tTUNFZfwO2mOQGfeMb49WWBLdZZTrFRPGngfNRUxQzeoO3GspnQ==
 
 swagger2openapi@^7.0.8:
   version "7.0.8"

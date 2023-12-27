@@ -1,17 +1,22 @@
 import console from 'node:console';
+import { exists } from 'node:fs';
 
-import { error, fail } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import type { AxiosResponse } from 'axios';
-import { ObjectId } from 'mongodb';
+import type { JwtPayload } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { nanoid } from 'nanoid';
 import { generateSillyPassword } from 'silly-password-generator';
 import spacetime from 'spacetime';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 
 import {
+  AUTH_SALT,
+  AUTH_TOKEN_NAME,
   BITCART_API_URL,
   BITCART_EMAIL,
   BITCART_PASSWORD,
+  JWT_PRIVATE_KEY,
   PASSWORD_SALT
 } from '$env/static/private';
 
@@ -27,12 +32,35 @@ import { Wallet } from '$lib/models/wallet';
 import Config from '$lib/config';
 import { AuthType, CurrencyType, EntityType } from '$lib/constants';
 import { rateCryptosRateGet } from '$lib/ext/bitcart';
-import { createAuthToken } from '$lib/payment';
+import { createBitcartToken } from '$lib/payment';
+import {
+  backupAuthToken,
+  createAuthToken,
+  setAuthToken
+} from '$lib/server/auth';
 import { womensNames } from '$lib/womensNames';
 
 import type { Actions, PageServerLoad } from './$types';
 
 export const actions: Actions = {
+  impersonateUser: async ({ request, cookies }) => {
+    const data = await request.formData();
+    const impersonateId = data.get('impersonateId') as string;
+    const tokenName = AUTH_TOKEN_NAME || 'token';
+    if (!impersonateId) {
+      return fail(400, { impersonateId, missingId: true });
+    }
+
+    backupAuthToken(cookies, tokenName);
+    const encAuthToken = createAuthToken({
+      id: impersonateId,
+      selector: '_id',
+      authType: AuthType.IMPERSONATION
+    });
+
+    encAuthToken && setAuthToken(cookies, tokenName, encAuthToken);
+    throw redirect(303, Config.PATH.creator);
+  },
   update_profile_image: async ({ locals, request }) => {
     const data = await request.formData();
     const url = data.get('url') as string;
@@ -125,7 +153,7 @@ export const actions: Actions = {
     try {
       const creator = await Creator.findOneAndUpdate(
         {
-          _id: new ObjectId(creatorId)
+          _id: creatorId
         },
         {
           commissionRate: +commission
@@ -149,7 +177,9 @@ export const actions: Actions = {
       );
     } catch (error) {
       console.error('err', error);
-      return fail(400, { err: error });
+      if (error instanceof Error) {
+        return fail(400, { err: error.toString() });
+      }
     }
 
     return {
@@ -313,7 +343,7 @@ export const load: PageServerLoad = async ({ locals }) => {
   let exchangeRate = { data: {} };
 
   if (wallet) {
-    const token = await createAuthToken(
+    const token = await createBitcartToken(
       BITCART_EMAIL,
       BITCART_PASSWORD,
       BITCART_API_URL

@@ -9,6 +9,8 @@ import type { TicketDocument } from '$lib/models/ticket';
 import type { UserDocument } from '$lib/models/user';
 import type { WalletDocument } from '$lib/models/wallet';
 
+import type { AuthType } from '$lib/constants';
+
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
 declare global {
@@ -22,6 +24,7 @@ declare global {
       ticket?: TicketDocument;
       show?: ShowDocument;
       wallet?: WalletDocument;
+      authType?: AuthType;
     }
     interface PageData {
       user?: UserDocument;

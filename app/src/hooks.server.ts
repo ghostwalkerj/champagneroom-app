@@ -2,15 +2,12 @@ import type { Handle } from '@sveltejs/kit';
 import { error, redirect } from '@sveltejs/kit';
 import IORedis from 'ioredis';
 import type { JwtPayload } from 'jsonwebtoken';
-import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import { setup } from 'mongoose-zod';
 import urlJoin from 'url-join';
 
 import {
-  AUTH_SALT,
   AUTH_TOKEN_NAME,
-  JWT_PRIVATE_KEY,
   MONGO_DB_ENDPOINT,
   REDIS_HOST,
   REDIS_PASSWORD,
@@ -33,8 +30,9 @@ import { Wallet, type WalletDocument } from '$lib/models/wallet';
 
 import Config from '$lib/config';
 import { UserRole } from '$lib/constants';
-import { authDecrypt } from '$lib/crypt';
 import {
+  deleteAuthToken,
+  getAuthToken,
   isAgentMatch,
   isCreatorMatch,
   isNotificationMatch,
@@ -150,6 +148,8 @@ const setLocals = async (decode: JwtPayload, locals: App.Locals) => {
     }
   }
 
+  if (decode.authType) locals.authType = decode.authType;
+
   return locals;
 };
 
@@ -203,25 +203,23 @@ export const handle = (async ({ event, resolve }) => {
 
   locals.redisConnection = redisConnection;
   const tokenName = AUTH_TOKEN_NAME || 'token';
-  const encryptedToken = cookies.get(tokenName);
-  const authToken = authDecrypt(encryptedToken, AUTH_SALT);
   let selector: string | undefined;
 
   const redirectPath = encodeURIComponent(requestedPath);
 
   // Set locals
-  if (authToken) {
-    let decode: JwtPayload;
-    try {
-      decode = jwt.verify(authToken, JWT_PRIVATE_KEY) as JwtPayload;
+  try {
+    const decode = getAuthToken(cookies, tokenName);
+    if (decode) {
       selector = decode.selector;
       await setLocals(decode, locals);
-    } catch (error) {
-      console.error('Invalid token:', error);
-      cookies.delete(tokenName, { path: '/' });
-      throw redirect(302, urlJoin(authUrl, '?returnPath=' + redirectPath));
     }
+  } catch (error) {
+    console.error('Invalid token:', error);
+    deleteAuthToken(cookies, tokenName);
+    throw redirect(302, urlJoin(authUrl, '?returnPath=' + redirectPath));
   }
+
   if (
     isProtectedMatch(requestedPath) &&
     !allowedPath(requestedPath, locals, selector)

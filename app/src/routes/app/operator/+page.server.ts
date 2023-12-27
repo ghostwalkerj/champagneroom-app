@@ -2,12 +2,10 @@ import type { Actions, RequestEvent } from '@sveltejs/kit';
 import { fail, redirect } from '@sveltejs/kit';
 import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
-import { ObjectId } from 'mongodb';
 import { nanoid } from 'nanoid';
 import { generateSillyPassword } from 'silly-password-generator';
-import { uniqueNamesGenerator } from 'unique-names-generator';
 
-import { PASSWORD_SALT } from '$env/static/private';
+import { AUTH_TOKEN_NAME, PASSWORD_SALT } from '$env/static/private';
 
 import { Agent } from '$lib/models/agent';
 import { Creator } from '$lib/models/creator';
@@ -23,12 +21,34 @@ import type { ShowQueueType } from '$lib/workers/showWorker';
 import Config from '$lib/config';
 import type { DisputeDecision } from '$lib/constants';
 import { AuthType, EntityType, ShowMachineEventString } from '$lib/constants';
-import { womensNames } from '$lib/womensNames';
+import {
+  backupAuthToken,
+  createAuthToken,
+  setAuthToken
+} from '$lib/server/auth';
 
 import type { PageServerLoad } from './$types';
 const websiteUrl = Config.PATH.websiteUrl;
 
 export const actions: Actions = {
+  impersonateUser: async ({ request, cookies }) => {
+    const data = await request.formData();
+    const impersonateId = data.get('impersonateId') as string;
+    const tokenName = AUTH_TOKEN_NAME || 'token';
+    if (!impersonateId) {
+      return fail(400, { impersonateId, missingId: true });
+    }
+
+    backupAuthToken(cookies, tokenName);
+    const encAuthToken = createAuthToken({
+      id: impersonateId,
+      selector: '_id',
+      authType: AuthType.IMPERSONATION
+    });
+
+    encAuthToken && setAuthToken(cookies, tokenName, encAuthToken);
+    throw redirect(303, Config.PATH.app);
+  },
   create_agent: async ({ request }: RequestEvent) => {
     const data = await request.formData();
     let name = data.get('name') as string;
@@ -74,21 +94,18 @@ export const actions: Actions = {
   create_creator: async ({ request }) => {
     const data = await request.formData();
     const agentId = data.get('agentId') as string;
-    let name = data.get('name') as string;
+    const name = data.get('name') as string;
     const commission = data.get('commission') as string;
 
     // Validation
     if (!name || name.length < 3 || name.length > 50) {
-      name = uniqueNamesGenerator({
-        dictionaries: [womensNames]
-      });
+      return fail(400, { name, badCreatorName: true });
     }
     if (Number.isNaN(+commission) || +commission < 0 || +commission > 100) {
       return fail(400, { commission, badCommission: true });
     }
 
-    const agent =
-      agentId && agentId !== '0' ? new ObjectId(agentId) : undefined;
+    const agent = agentId && agentId !== '0' ? agentId : undefined;
 
     try {
       const wallet = new Wallet();
@@ -139,16 +156,21 @@ export const actions: Actions = {
 
     // Validation
     if (creatorId === null) {
+      console.error('bad creatorId', creatorId);
       return fail(400, { creatorId, missingCreatorId: true });
     }
+
     if (Number.isNaN(+commission) || +commission < 0 || +commission > 100) {
+      console.error('bad commission', commission);
       return fail(400, { commission, badCommission: true });
     }
     if (!userId) {
+      console.error('bad userId', userId);
       return fail(400, { userId, badUserId: true });
     }
 
     if (active !== 'true' && active !== 'false') {
+      console.error('bad active', active);
       return fail(400, { active, badActive: true });
     }
 
@@ -159,7 +181,7 @@ export const actions: Actions = {
         },
         {
           commissionRate: +commission,
-          agent: new ObjectId(agentId)
+          agent: agentId ?? undefined
         }
       );
       await User.findOneAndUpdate(
@@ -172,6 +194,7 @@ export const actions: Actions = {
         }
       );
     } catch (error) {
+      console.error('err', error);
       return fail(400, { err: error });
     }
 

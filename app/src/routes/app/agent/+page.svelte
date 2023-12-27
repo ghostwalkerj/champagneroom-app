@@ -4,7 +4,7 @@
   import { uniqueNamesGenerator } from 'unique-names-generator';
   import urlJoin from 'url-join';
 
-  import { deserialize, enhance } from '$app/forms';
+  import { applyAction, deserialize, enhance } from '$app/forms';
   import { invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
 
@@ -94,6 +94,19 @@
     });
   };
 
+  const impersonate = async (impersonateId: string) => {
+    let formData = new FormData();
+    formData.append('impersonateId', impersonateId);
+     const response = await fetch('?/impersonateUser', {
+      method: 'POST',
+      body: formData
+    });
+    const result: ActionResult = deserialize(await response.text());
+    applyAction(result);
+
+  };
+
+
   const updateName = (name: string) => {
     if (name === creators[activeRow].user.name) return;
     const index = activeRow;
@@ -110,10 +123,9 @@
     }
   };
 
-  const updateActive = (active: string) => {
+  const updateActive = (active: boolean) => {
     const index = activeRow;
-    if (creators[index].user.active.toString() === active) return;
-    creators[index].user.active = active == 'true' ? true : false;
+    creators[index].user.active = active;
     updateCreator(creators[index]);
   };
 
@@ -299,11 +311,15 @@
                           <th>Comm %</th>
                           <th>Active</th>
                           <th>Secret</th>
+
                           <th>Sales</th>
                           <th>Revenue</th>
                           <th>Refunds</th>
                           <th>Reviews</th>
                           <th>Rating</th>
+                          {#if canImpersonate}
+                            <th>Impersonate</th>
+                          {/if}
                         </tr>
                       </thead>
                       <tbody>
@@ -371,20 +387,14 @@
                               }}>{creator.commissionRate}</td
                             >
                             <td>
-                              <select
-                                class="daisy-select daisy-select-bordered daisy-select-sm text-xs"
+                              <input
+                                class="checkbox"
+                                type="checkbox"
+                                checked={creator.user.active}
                                 on:change={(event) => {
-                                  updateActive(event.target?.value);
+                                  updateActive(event.target?.checked);
                                 }}
-                              >
-                                {#if creator.user.active}
-                                  <option value="true" selected>True</option>
-                                  <option value="false">False</option>
-                                {:else}
-                                  <option value="true">True</option>
-                                  <option value="false" selected>False</option>
-                                {/if}
-                              </select>
+                              />
                             </td>
 
                             <td
@@ -403,12 +413,6 @@
                                     (isChangeCreatorSecret = true)}
                                 >
                                   Change
-                                </button>
-                                <button
-                                  class="daisy-btn daisy-btn-xs daisy-btn-outline daisy-btn-primary ml-4"
-                                  disabled={!canImpersonate}
-                                >
-                                  Impersonate
                                 </button>
                               {:else}
                                 N/A
@@ -453,6 +457,18 @@
                                 rating={creator.feedbackStats.averageRating}
                               />
                             </td>
+                            {#if canImpersonate}
+                                                        <td>
+
+                              <button
+                                class="daisy-btn daisy-btn-xs daisy-btn-outline daisy-btn-primary ml-4"
+                                disabled={!canImpersonate}
+                                on:click={() => impersonate(creator.user._id.toString())}
+                              >
+                                Impersonate
+                              </button>
+                            </td>
+                            {/if}
                           </tr>
                         {/each}
                       </tbody>
@@ -463,11 +479,15 @@
                           <th>Comm %</th>
                           <th>Active</th>
                           <th>Secret</th>
+
                           <th>Sales</th>
                           <th>Revenue</th>
                           <th>Refunds</th>
                           <th>Reviews</th>
                           <th>Rating</th>
+                          {#if canImpersonate}
+                            <th>Impersonate</th>
+                          {/if}
                         </tr>
                       </tfoot>
                     </table>

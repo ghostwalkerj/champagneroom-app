@@ -1,14 +1,12 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
-import jwt from 'jsonwebtoken';
 import { message, superValidate } from 'sveltekit-superforms/server';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 import urlJoin from 'url-join';
 import { z } from 'zod';
 
 import {
-  AUTH_MAX_AGE,
   AUTH_SALT,
   AUTH_TOKEN_NAME,
   BITCART_API_URL,
@@ -16,9 +14,7 @@ import {
   BITCART_INVOICE_NOTIFICATION_PATH,
   BITCART_NOTIFICATION_URL,
   BITCART_PASSWORD,
-  BITCART_STORE_ID,
-  JWT_EXPIRY,
-  JWT_PRIVATE_KEY
+  BITCART_STORE_ID
 } from '$env/static/private';
 
 import { Show } from '$lib/models/show';
@@ -37,9 +33,13 @@ import {
   TicketMachineEventString,
   UserRole
 } from '$lib/constants';
-import { authEncrypt } from '$lib/crypt';
 import { mensNames } from '$lib/mensNames';
-import { createAuthToken, InvoiceJobType, InvoiceStatus } from '$lib/payment';
+import {
+  createBitcartToken,
+  InvoiceJobType,
+  InvoiceStatus
+} from '$lib/payment';
+import { authEncrypt, createAuthToken, setAuthToken } from '$lib/server/auth';
 import {
   getShowMachineServiceFromId,
   getTicketMachineService
@@ -132,7 +132,7 @@ export const actions: Actions = {
     }
 
     // Create invoice in Bitcart
-    const token = await createAuthToken(
+    const token = await createBitcartToken(
       BITCART_EMAIL,
       BITCART_PASSWORD,
       BITCART_API_URL
@@ -204,7 +204,7 @@ export const actions: Actions = {
 
       ticketService?.stop();
 
-      const token = await createAuthToken(
+      const token = await createBitcartToken(
         BITCART_EMAIL,
         BITCART_PASSWORD,
         BITCART_API_URL
@@ -241,27 +241,13 @@ export const actions: Actions = {
 
     const redirectUrl = urlJoin(Config.PATH.ticket, ticket._id.toString());
 
-    const authToken = jwt.sign(
-      {
-        selector: '_id',
-        password: pin,
-        _id: user._id.toString(),
-        exp: Math.floor(Date.now() / 1000) + +JWT_EXPIRY,
-        authType: AuthType.PIN
-      },
-      JWT_PRIVATE_KEY
-    );
+    const encAuthToken = createAuthToken({
+      id: user._id.toString(),
+      selector: '_id',
+      authType: AuthType.PIN
+    });
 
-    const encAuthToken = authEncrypt(authToken, AUTH_SALT);
-
-    encAuthToken &&
-      cookies.set(tokenName, encAuthToken, {
-        path: '/',
-        httpOnly: true,
-        sameSite: 'strict',
-        maxAge: +AUTH_MAX_AGE,
-        expires: new Date(Date.now() + +AUTH_MAX_AGE)
-      });
+    encAuthToken && setAuthToken(cookies, tokenName, encAuthToken);
 
     showQueue.close();
     showService.stop();

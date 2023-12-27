@@ -13,7 +13,8 @@ export enum AuthType {
   PIN = 'PIN',
   NONE = 'NONE',
   PATH = 'PATH',
-  TOKEN = 'TOKEN'
+  TOKEN = 'TOKEN',
+  IMPERSONATION = 'IMPERSONATION'
 }
 
 export enum CancelReason {

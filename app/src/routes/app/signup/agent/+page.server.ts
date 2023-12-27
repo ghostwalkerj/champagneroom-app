@@ -9,7 +9,7 @@ import { User } from '$lib/models/user';
 import { Wallet } from '$lib/models/wallet';
 
 import Config from '$lib/config';
-import { AuthType, EntityType } from '$lib/constants';
+import { AuthType, EntityType, UserRole } from '$lib/constants';
 
 import type { Actions, PageServerLoad } from './$types';
 
@@ -74,7 +74,7 @@ export const actions: Actions = {
       if (user.isAgent()) {
         return fail(400, { alreadyAgent: true });
       } else {
-        user.roles.push(EntityType.AGENT);
+        user.roles.push(UserRole.AGENT);
         user.name = name;
         user.profileImageUrl = user.profileImageUrl || profileImageUrl;
         await user.save();

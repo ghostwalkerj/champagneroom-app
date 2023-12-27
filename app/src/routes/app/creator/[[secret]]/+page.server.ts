@@ -34,11 +34,11 @@ import {
   CancelReason,
   CurrencyType,
   EntityType,
+  ShowMachineEventString,
   ShowStatus
 } from '$lib/constants';
-import { ShowMachineEventString } from '$lib/constants';
 import { rateCryptosRateGet } from '$lib/ext/bitcart';
-import { createAuthToken, PayoutJobType, PayoutReason } from '$lib/payment';
+import { createBitcartToken, PayoutJobType, PayoutReason } from '$lib/payment';
 import { getShowMachineService } from '$lib/server/machinesUtil';
 
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
@@ -167,7 +167,7 @@ export const actions: Actions = {
       connection: redisConnection
     }) as ShowQueueType;
 
-    const showService = await getShowMachineService(show);
+    const showService = getShowMachineService(show);
     const showState = showService.getSnapshot();
 
     if (showState.can({ type: ShowMachineEventString.SHOW_ENDED })) {
@@ -310,7 +310,7 @@ export const load: PageServerLoad = async ({ locals }) => {
   const wallet = locals.wallet as WalletDocument;
 
   // return the rate of exchange for UI from bitcart
-  const token = await createAuthToken(
+  const token = await createBitcartToken(
     BITCART_EMAIL,
     BITCART_PASSWORD,
     BITCART_API_URL

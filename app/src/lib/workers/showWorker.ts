@@ -589,6 +589,34 @@ const finalizeShow = async (
 };
 
 // Ticket Events
+const customerJoined = async (show: ShowDocument, ticketId: string) => {
+  const showService = createShowMachineService({
+    showDocument: show,
+    showMachineOptions: {
+      saveStateCallback: async (showState) => SaveState(show, showState),
+      saveShowEventCallback: async ({
+        type,
+        ticketId,
+        transaction,
+        ticketInfo
+      }) =>
+        createShowEvent({
+          show,
+          type,
+          ticketId,
+          transaction,
+          ticketInfo
+        })
+    }
+  });
+  const ticket = (await Ticket.findById(ticketId).exec()) as TicketDocument;
+  showService.send({
+    type: ShowMachineEventString.CUSTOMER_JOINED,
+    ticket
+  });
+  showService.stop();
+  return 'success';
+};
 const customerLeft = async (show: ShowDocument, ticketId: string) => {
   const showService = createShowMachineService({
     showDocument: show,

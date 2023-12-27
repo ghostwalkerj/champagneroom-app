@@ -5,7 +5,6 @@
   import type { Unsubscriber } from 'svelte/store';
   import web3 from 'web3';
 
-  import { refundZodSchema, disputeZodSchema } from '$lib/models/common';
   import {
     DisputeReason,
     RefundReason,
@@ -13,12 +12,13 @@
     TicketMachineEventString,
     TicketStatus
   } from '$lib/constants';
+  import { disputeZodSchema, refundZodSchema } from '$lib/models/common';
   import type { ShowDocument } from '$lib/models/show';
   import type { UserDocument } from '$lib/models/user';
 
   import {
-    type TicketMachineServiceType,
-    createTicketMachineService
+    createTicketMachineService,
+    type TicketMachineServiceType
   } from '$lib/machines/ticketMachine';
 
   import { ActorType } from '$lib/constants';

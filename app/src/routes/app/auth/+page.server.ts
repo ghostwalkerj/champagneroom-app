@@ -1,14 +1,9 @@
 import { error, fail } from '@sveltejs/kit';
-import jwt from 'jsonwebtoken';
 import type { ObjectId } from 'mongoose';
 
 import {
-  AUTH_MAX_AGE,
-  AUTH_SALT,
   AUTH_SIGNING_MESSAGE,
   AUTH_TOKEN_NAME,
-  JWT_EXPIRY,
-  JWT_PRIVATE_KEY,
   PASSWORD_SALT
 } from '$env/static/private';
 
@@ -17,11 +12,12 @@ import type { UserDocument } from '$lib/models/user';
 import { User } from '$lib/models/user';
 
 import { AuthType } from '$lib/constants';
-import { authEncrypt } from '$lib/crypt';
 import {
+  createAuthToken,
   isPasswordMatch,
   isPinMatch,
   isSecretMatch,
+  setAuthToken,
   verifySignature
 } from '$lib/server/auth';
 
@@ -91,26 +87,16 @@ export const actions: Actions = {
     // Update User Nonce
     const nonce = Math.floor(Math.random() * 1_000_000);
     User.updateOne({ _id: exists._id }, { $set: { nonce } }).exec();
-    const authToken = jwt.sign(
-      {
-        selector: '_id',
-        _id: exists._id,
-        authType: AuthType.SIGNING,
-        exp: Math.floor(Date.now() / 1000) + +JWT_EXPIRY
-      },
-      JWT_PRIVATE_KEY
-    );
 
-    const encAuthToken = authEncrypt(authToken, AUTH_SALT);
+    // Create Auth Token and set cookie
+    const encAuthToken = createAuthToken({
+      id: exists._id.toString(),
+      selector: '_id',
+      authType: AuthType.SIGNING
+    });
 
-    encAuthToken &&
-      cookies.set(tokenName, encAuthToken, {
-        path: '/',
-        httpOnly: true,
-        sameSite: 'strict',
-        maxAge: +AUTH_MAX_AGE,
-        expires: new Date(Date.now() + +AUTH_MAX_AGE)
-      });
+    encAuthToken && setAuthToken(cookies, tokenName, encAuthToken);
+
     return { success: true };
   },
   password_secret_auth: async ({ cookies, request }) => {
@@ -164,28 +150,13 @@ export const actions: Actions = {
       return fail(400, { badPassword: true });
     }
 
-    const authToken = jwt.sign(
-      {
-        selector: 'secret',
-        secret: parseId,
-        _id: user._id.toString(),
-        exp: Math.floor(Date.now() / 1000) + +JWT_EXPIRY,
-        authType: AuthType.PATH_PASSWORD
-      },
-      JWT_PRIVATE_KEY
-    );
-
-    const encAuthToken = authEncrypt(authToken, AUTH_SALT);
-
-    encAuthToken &&
-      cookies.set(tokenName, encAuthToken, {
-        path: '/',
-        httpOnly: true,
-        sameSite: 'strict',
-        secure: true,
-        maxAge: +AUTH_MAX_AGE,
-        expires: new Date(Date.now() + +AUTH_MAX_AGE)
-      });
+    const encAuthToken = createAuthToken({
+      id: user._id.toString(),
+      selector: 'secret',
+      authType: AuthType.PATH_PASSWORD,
+      secret: parseId
+    });
+    encAuthToken && setAuthToken(cookies, tokenName, encAuthToken);
     return { success: true };
   },
   pin_auth: async ({ cookies, request }) => {
@@ -243,32 +214,18 @@ export const actions: Actions = {
       return fail(400, { badPin: true });
     }
 
-    const authToken = jwt.sign(
-      {
-        selector: '_id',
-        _id: userId.toString(),
-        exp: Math.floor(Date.now() / 1000) + +JWT_EXPIRY,
-        authType: AuthType.PIN
-      },
-      JWT_PRIVATE_KEY
-    );
+    const encAuthToken = createAuthToken({
+      id: user._id.toString(),
+      selector: '_id',
+      authType: AuthType.PIN
+    });
 
-    const encAuthToken = authEncrypt(authToken, AUTH_SALT);
-
-    encAuthToken &&
-      cookies.set(tokenName, encAuthToken, {
-        path: '/',
-        httpOnly: true,
-        sameSite: 'strict',
-        maxAge: +AUTH_MAX_AGE,
-        expires: new Date(Date.now() + +AUTH_MAX_AGE)
-      });
+    encAuthToken && setAuthToken(cookies, tokenName, encAuthToken);
 
     return { success: true };
   }
 } satisfies Actions;
-
-export const load: PageServerLoad = async ({ url, cookies }) => {
+export const load: PageServerLoad = async ({ url }) => {
   const returnPath = url.searchParams.get('returnPath');
   if (!returnPath) {
     throw error(400, 'Missing Return Path');

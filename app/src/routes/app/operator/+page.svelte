@@ -5,7 +5,7 @@
   import { uniqueNamesGenerator } from 'unique-names-generator';
   import urlJoin from 'url-join';
 
-  import { deserialize, enhance } from '$app/forms';
+  import { applyAction, deserialize, enhance } from '$app/forms';
   import { invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
 
@@ -19,6 +19,8 @@
 
   import type { AgentDocument } from '$lib/models/agent';
   import type { TicketDocument } from '$lib/models/ticket';
+  import type { UserDocument } from '$lib/models/user';
+  import { PermissionType } from '$lib/permissions';
   import type { Types } from 'mongoose';
   import type { PageData } from './$types';
 
@@ -26,6 +28,7 @@
   let operator = data.operator as OperatorDocument;
   let agents = data.agents as AgentDocument[];
   let creators = data.creators as CreatorDocument[];
+  let user = data.user as UserDocument;
   let disputedTickets = data.disputedTickets as TicketDocument[];
 
   $: canAddAgent = false;
@@ -60,6 +63,14 @@
   let newCreator: CreatorDocument | undefined;
   let newPassword: string | undefined;
 
+  const canImpersonateCreator = user.permissions.includes(
+    PermissionType.IMPERSONATE_CREATOR
+  );
+
+  const canImpersonateAgent = user.permissions.includes(
+    PermissionType.IMPERSONATE_AGENT
+  );
+
   const decideDispute = async (decision: DisputeDecision) => {
     const index = activeDisputeRow;
     const ticket = disputedTickets[index];
@@ -76,6 +87,19 @@
 
     disputedTickets.splice(index, 1);
     isDecideDispute = false;
+  };
+
+
+  const impersonate = async (impersonateId: string) => {
+    let formData = new FormData();
+    formData.append('impersonateId', impersonateId);
+     const response = await fetch('?/impersonateUser', {
+      method: 'POST',
+      body: formData
+    });
+    const result: ActionResult = deserialize(await response.text());
+    applyAction(result);
+
   };
 
   const changeUserSecret = async () => {
@@ -120,14 +144,13 @@
       'commission',
       commission ? commission.toString() : creator.commissionRate.toString()
     );
+    formData.append('userId', creator.user._id.toString());
     formData.append(
       'active',
       active ? active.toString() : creator.user.active.toString()
     );
     if (agentId) {
       formData.append('agentId', agentId.toString());
-    } else {
-      formData.append('agentId', '');
     }
 
     await fetch('?/update_creator', {
@@ -146,8 +169,8 @@
     updateCreator(activeCreatorRow, { commission });
   };
 
-  const updateCreatorActive = (active: string) => {
-    creators[activeCreatorRow].user.active = active == 'true' ? true : false;
+  const updateCreatorActive = (active: boolean) => {
+    creators[activeCreatorRow].user.active = active;
     updateCreator(activeCreatorRow, {
       active: creators[activeCreatorRow].user.active
     });
@@ -200,6 +223,9 @@
         }
         if (result.data.badCommission) {
           creatorCommissionElement.focus();
+        }
+        if (result.data.badCreatorName) {
+          creatorNameElement.focus();
         }
         if (result.data.missingAgentId) {
           creatorAgentElement.focus();
@@ -387,7 +413,7 @@
               >
                 <div class="overflow-x-auto reo">
                   {#key agents}
-                    <table class="daisy-table">
+                    <table class="daisy-table daisy-table-pin-rows">
                       <thead>
                         <tr>
                           <th
@@ -406,7 +432,10 @@
                           <th>Name</th>
                           <th>Address</th>
                           <th>Active</th>
-                          <th>Impersonate</th>
+                          <th>Permissions</th>
+                          {#if canImpersonateAgent}
+                            <th>Impersonate</th>
+                          {/if}
                         </tr>
                       </thead>
                       <tbody>
@@ -462,27 +491,50 @@
                             >
                             <td contenteditable="true">{agent.user.address}</td>
                             <td>
-                              <select
-                                class="daisy-select daisy-select-bordered daisy-select-sm text-xs"
-                              >
-                                {#if agent.user.active}
-                                  <option value="true" selected>True</option>
-                                  <option value="false">False</option>
-                                {:else}
-                                  <option value="true">True</option>
-                                  <option value="false" selected>False</option>
-                                {/if}
-                              </select>
+                              <input
+                                class="checkbox"
+                                type="checkbox"
+                                checked={agent.user.active}
+                              />
                             </td>
-                            <td
-                              ><button
-                                class="daisy-btn daisy-btn-primary daisy-btn-xs"
-                                on:click={() => {}}>Impersonate</button
-                              ></td
-                            >
+                            <td>
+                              <div class="flex gap-2">
+                                {#each agent.user.permissions as permission}
+                                  <div
+                                    class="chip variant-filled hover:variant-ringed"
+                                  >
+                                    {permission}
+                                  </div>
+                                {/each}
+                              </div>
+                            </td>
+                            {#if canImpersonateAgent}
+                              <td
+                                >    <button
+                                class="daisy-btn daisy-btn-xs daisy-btn-outline daisy-btn-primary"
+                                disabled={!canImpersonateAgent}
+                                on:click={() => impersonate(agent.user._id.toString())}
+                              >
+                                Impersonate
+                              </button></td
+                              >
+                            {/if}
                           </tr>
                         {/each}
                       </tbody>
+                      <tfoot>
+                        <tr>
+                          <th />
+                          <th>Name</th>
+                          <th>Address</th>
+                          <th>Active</th>
+                          <th>Permissions</th>
+
+                          {#if canImpersonateAgent}
+                            <th>Impersonate</th>
+                          {/if}
+                        </tr>
+                      </tfoot>
                     </table>
                   {/key}
                 </div>
@@ -514,11 +566,15 @@
                           <th>Comm %</th>
                           <th>Active</th>
                           <th>Secret</th>
+
                           <th>Ticket Sales</th>
                           <th>Revenue</th>
                           <th>Refunds</th>
                           <th>Reviews</th>
                           <th>Rating</th>
+                          {#if canImpersonateCreator}
+                            <th>Impersonate</th>
+                          {/if}
                         </tr>
                       </thead>
                       <tbody>
@@ -629,20 +685,14 @@
                               }}>{creator.commissionRate}</td
                             >
                             <td>
-                              <select
-                                class="daisy-select daisy-select-bordered daisy-select-sm text-xs"
+                              <input
+                                class="checkbox"
+                                type="checkbox"
+                                checked={creator.user.active}
                                 on:change={(event) => {
-                                  updateCreatorActive(event.target?.value);
+                                  updateCreatorActive(event.target?.checked);
                                 }}
-                              >
-                                {#if creator.user.active}
-                                  <option value="true" selected>True</option>
-                                  <option value="false">False</option>
-                                {:else}
-                                  <option value="true">True</option>
-                                  <option value="false" selected>False</option>
-                                {/if}
-                              </select>
+                              />
                             </td>
                             <td
                               >{#if creator.user.authType !== AuthType.SIGNING}<a
@@ -704,6 +754,16 @@
                                 rating={creator.feedbackStats.averageRating}
                               />
                             </td>
+                            {#if canImpersonateCreator}
+                              <td
+                                ><button
+                                class="daisy-btn daisy-btn-xs daisy-btn-outline daisy-btn-primary "
+                                disabled={!canImpersonateCreator}
+                                on:click={() => impersonate(creator.user._id.toString())}
+                              >Impersonate
+                              </button></td
+                              >
+                            {/if}
                           </tr>
                         {/each}
                       </tbody>
@@ -715,11 +775,15 @@
                           <th>Comm %</th>
                           <th>Active</th>
                           <th>Secret</th>
+
                           <th>Sales</th>
                           <th>Revenue</th>
                           <th>Refunds</th>
                           <th>Reviews</th>
                           <th>Rating</th>
+                          {#if canImpersonateCreator}
+                            <th>Impersonate</th>
+                          {/if}
                         </tr>
                       </tfoot>
                     </table>
@@ -731,7 +795,7 @@
                 class="mt-4 bg-base w-full rounded-lg z-0 overflow-hidden border-2 border-secondary"
               >
                 <div class="overflow-x-auto">
-                  <table class="daisy-table">
+                  <table class="daisy-table daisy-table-pin-rows">
                     <thead>
                       <tr>
                         <th />
