@@ -1,4 +1,4 @@
-a<script lang="ts">
+<script lang="ts">
   import { invalidateAll } from '$app/navigation';
   import { onDestroy, onMount } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
@@ -199,6 +199,7 @@ a<script lang="ts">
     bind:jitsiToken
   />
 {:else}
+
   <div class="flex place-content-center">
     <!-- Page header -->
 

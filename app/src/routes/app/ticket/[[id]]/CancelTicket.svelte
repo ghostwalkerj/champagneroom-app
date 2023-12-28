@@ -1,4 +1,4 @@
-a<script lang="ts">
+<script lang="ts">
   import { applyAction, enhance } from '$app/forms';
 
   export let isLoading = false;
