@@ -24,5 +24,6 @@
     "./tests/**/*.js",
     "./tests/**/*.ts",
     "./tests/**/*.svelte",
+    "playwright.config.ts"
   ],
 }

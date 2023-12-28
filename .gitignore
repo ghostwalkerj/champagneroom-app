@@ -23,3 +23,7 @@ app/.VSCodeCounter/**
 Icon
 app/.clinic/**
 app/.nova/**
+app/tests-examples/**
+app/test-results/**
+app/playwright-report/**
+app/playwrite/.cache/**
