@@ -25,8 +25,8 @@ import type { DisplayInvoice, DisplayPayout } from '$lib/ext/bitcart/models';
 import {
   InvoiceJobType,
   InvoiceStatus,
-  PayoutReason,
-  type PaymentType
+  type PaymentType,
+  PayoutReason
 } from '$lib/payment';
 import {
   getTicketMachineService,

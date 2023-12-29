@@ -28,12 +28,11 @@
     "package": "svelte-package",
     "preview": "vite preview",
     "test": "playwright test",
+    "test:debug": "PWDEBUG=1 playwright test  --project=chromium",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
     "lint": "prettier --check --plugin-search-dir=. . && eslint .",
-    "format": "prettier --write --plugin-search-dir=. .",
-    "ionic:build": "npm run build",
-    "ionic:serve": "npm run start"
+    "format": "prettier --write --plugin-search-dir=. ."
   },
   "devDependencies": {
     "@iconify/svelte": "^3.1.6",
