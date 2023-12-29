@@ -5,9 +5,10 @@ on:
   pull_request:
     branches: [ main ]
 jobs:
-  test:
+  playwrite_tests:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    working-directory: ./app
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-node@v3
