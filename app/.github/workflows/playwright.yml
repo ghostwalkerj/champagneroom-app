@@ -1,7 +1,7 @@
 name: Playwright Tests
 on:
   push:
-    branches: [ main ]
+    branches: [ main, '52-setup-unit-testing-framework' ]
   pull_request:
     branches: [ main ]
 jobs:
