@@ -19,10 +19,13 @@
     "./types/**/$types.d.ts",
     "./src/**/*.js",
     "./src/**/*.ts",
+    "./e2e/**/*.ts",
     "./scripts/**/*.js",
     "./src/**/*.svelte",
     "./tests/**/*.js",
     "./tests/**/*.ts",
     "./tests/**/*.svelte",
+    "./tests-examples/demo-todo-app.spec.ts",
+    "playwright.config.ts"
   ],
 }
