@@ -24,7 +24,7 @@ jobs:
       run: yarn playwright install --with-deps
     - name: Install Project Dependencies 
       run: yarn; yarn build; yarn package
-    - name: Run Playwright tests
+    - name: Run Playwright Tests
       run: yarn test
     - uses: actions/upload-artifact@v3
       if: always()
