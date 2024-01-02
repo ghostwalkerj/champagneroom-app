@@ -1,10 +1,10 @@
 import { sveltekit } from '@sveltejs/kit/vite';
-import type { UserConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 import EnvironmentPlugin from 'vite-plugin-environment';
 import nodePolyfills from 'vite-plugin-node-stdlib-browser';
 import mkcert from 'vite-plugin-mkcert';
 
-const config: UserConfig = {
+export default defineConfig({
   mode: 'development',
   plugins: [
     sveltekit(),
@@ -14,6 +14,7 @@ const config: UserConfig = {
       protocolImports: true
     })
   ],
+
   resolve: {
     alias: {}
   },
@@ -42,7 +43,13 @@ const config: UserConfig = {
         global: 'globalThis'
       }
     }
+  },
+  test: {
+    // Jest like globals
+    globals: true,
+    environment: 'jsdom',
+    include: ['tests/unit/*.{test,spec}.ts'],
+    // Extend jest-dom matchers
+    setupFiles: ['./setupTests.js']
   }
-};
-
-export default config;
+});

@@ -32,5 +32,9 @@
         "./src/lib/ext/*"
       ],
     },
+    "types": [
+      "vitest/globals",
+      "@testing-library/jest-dom"
+    ]
   }
 }
