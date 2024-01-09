@@ -6,7 +6,6 @@
   import { FileDropzone, getModalStore } from '@skeletonlabs/skeleton';
   import { nanoid } from 'nanoid';
   import type { SvelteComponent } from 'svelte';
-  import type { SuperValidated } from 'sveltekit-superforms';
   import { superForm } from 'sveltekit-superforms/client';
   import urlJoin from 'url-join';
   export let parent: SvelteComponent;
@@ -14,14 +13,15 @@
   const modalStore = getModalStore();
 
   let images: FileList;
+  let roomForm = $modalStore[0].meta.form;
 
   const { form, errors, constraints, enhance, delayed, message } = superForm(
-    $modalStore[0].meta.form as SuperValidated<typeof roomZodSchema>,
+    roomForm,
     {
-      dataType: 'json',
       validators: roomZodSchema,
       validationMethod: 'auto',
       resetForm: true,
+      invalidateAll: true,
       onResult(event) {
         if (event.result.type === 'success') {
           modalStore.close();
@@ -51,6 +51,7 @@
     >
       <input type="hidden" name="coverImageUrl" value={$form.coverImageUrl} />
       <input type="hidden" name="active" value="true" />
+
       <FileDropzone
         name="files"
         padding="p-0"
