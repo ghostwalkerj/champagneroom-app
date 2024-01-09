@@ -48,7 +48,7 @@
   let jitsiToken = data.jitsiToken as string;
   let user = data.user as UserDocument;
   let room = data.room as RoomDocumentType;
-  const roomForm = data.roomForm as SuperValidated<typeof roomZodSchema>;
+  let roomForm = data.roomForm as SuperValidated<typeof roomZodSchema>;
 
   $: showVideo = false;
 
