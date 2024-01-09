@@ -1,7 +1,10 @@
 <script lang="ts">
+  import { page } from '$app/stores';
+  import Config from '$lib/config';
   import type { RoomDocumentType, roomZodSchema } from '$lib/models/room';
   import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
   import type { SuperValidated } from 'sveltekit-superforms';
+  import urlJoin from 'url-join';
 
   export let room: RoomDocumentType;
   export let roomForm: SuperValidated<typeof roomZodSchema>;
@@ -17,6 +20,8 @@
       form: roomForm
     }
   };
+
+  const roomUrl = urlJoin($page.url.origin, Config.PATH.room, room.uniqueUrl);
 </script>
 
 <div class="card px-6 pb-6 bg-primary rounded-xl text-center">
@@ -25,7 +30,16 @@
   </header>
 
   {#if room}
-    {room.name}
+    <div class="flex flex-col">
+      <div>
+        {room.name}
+      </div>
+      <div>
+        <a class="anchor text-primary-content font-semibold" href={roomUrl}>
+          {room.uniqueUrl}</a
+        >
+      </div>
+    </div>
     <button
       type="button"
       class="btn variant-filled-secondary mt-4"
