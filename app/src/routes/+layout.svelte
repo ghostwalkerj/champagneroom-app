@@ -4,6 +4,7 @@
   import WithdrawForm from '$components/forms/WithdrawForm.svelte';
   import TransactionsActivity from '$components/TransactionsActivity.svelte';
   import EndShowForm from '$components/forms/EndShowForm.svelte';
+  import CreateRoomForm from '$components/forms/CreateRoomForm.svelte';
   import '@fontsource/roboto';
   import '@fontsource/roboto/300.css';
   import '@fontsource/roboto/500.css';
