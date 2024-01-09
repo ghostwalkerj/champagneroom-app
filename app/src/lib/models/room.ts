@@ -4,11 +4,10 @@ import { z } from 'zod';
 export type RoomDocumentType = z.infer<typeof roomZodSchema>;
 
 export const roomZodSchema = z.object({
-  _id: z.any().optional(),
   name: z.string().trim().min(6).max(40),
   coverImageUrl: z.string().trim().optional(),
-  tagLine: z.string().min(6).max(40).optional(),
-  announcement: z.string().min(10).max(256).optional(),
+  tagLine: z.string().optional(),
+  announcement: z.string().trim().optional(),
   uniqueUrl: z
     .string()
     .trim()

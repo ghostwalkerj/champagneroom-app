@@ -248,7 +248,7 @@ export const actions: Actions = {
       });
 
       payoutQueue.close();
-    } catch (error) {
+    } catch {
       return message(form, 'Error requesting payout');
     }
 
@@ -463,6 +463,17 @@ export const load: PageServerLoad = async ({ locals }) => {
     requestPayoutSchema,
     { errors: false }
   );
+  const roomForm = room
+    ? await superValidate(
+        room.toJSON({
+          flattenMaps: true,
+          flattenObjectIds: true
+        }),
+        roomZodSchema
+      )
+    : ((await superValidate(roomZodSchema)) as SuperValidated<
+        typeof roomZodSchema
+      >);
 
   return {
     requestPayoutForm,
