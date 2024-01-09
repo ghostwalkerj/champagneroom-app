@@ -2,12 +2,9 @@
   import type { RoomDocumentType, roomZodSchema } from '$lib/models/room';
   import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
   import type { SuperValidated } from 'sveltekit-superforms';
-  import { superForm } from 'sveltekit-superforms/client';
 
   export let room: RoomDocumentType;
   export let roomForm: SuperValidated<typeof roomZodSchema>;
-
-  let form = superForm(roomForm);
 
   const modalStore = getModalStore();
 
@@ -17,7 +14,7 @@
     title: 'Create Room',
     meta: {
       action: '?/create_room',
-      form
+      form: roomForm
     }
   };
 </script>
@@ -29,6 +26,11 @@
 
   {#if room}
     {room.name}
+    <button
+      type="button"
+      class="btn variant-filled-secondary mt-4"
+      on:click={() => modalStore.trigger(roomModal)}>Update My Room</button
+    >
   {:else}
     <div class="text-info">No room found</div>
     <button
