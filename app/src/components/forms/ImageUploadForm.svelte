@@ -9,7 +9,7 @@
   import Icon from '@iconify/svelte';
 
   export let callBack: (argument0: string) => void;
-  export let profileImage: string;
+  export let imageUrl: string;
 
   let uploadVisibility = 'invisible';
   let progressVisibility = 'invisible';
@@ -23,7 +23,7 @@
   };
 
   $: update = false;
-  $: imageUrl = profileImage;
+  $: imageUrl = imageUrl;
   $: uploadReady = false;
 
   function onChange(event: CustomEvent) {
@@ -47,14 +47,14 @@
     update = value;
     uploadVisibility = value ? 'visible' : 'invisible';
     uploadReady = false;
-    imageUrl = profileImage;
+    imageUrl = imageUrl;
   }
 
   function resetForm() {
     update = false;
     uploadVisibility = 'invisible';
     uploadReady = false;
-    imageUrl = profileImage;
+    imageUrl = imageUrl;
     progressVisibility = 'invisible';
   }
 
@@ -69,8 +69,8 @@
       body: formData
     });
     const data = await response.json();
-    profileImage = data.url;
-    callBack(profileImage);
+    imageUrl = data.url;
+    callBack(imageUrl);
     progressVisibility = 'invisible';
     resetForm();
   }
@@ -88,7 +88,7 @@
         class="absolute inset-0 flex flex-col justify-center z-10 bg-gray-500 opacity-75 rounded-full lg:h-32 lg:w-32 h-24 w-24 {uploadVisibility}"
       >
         <div class="self-center">
-          <Icon icon="lets-icons:upload-light" class="h-12 w-12"/>
+          <Icon icon="lets-icons:upload-light" class="h-12 w-12" />
         </div>
         <div class="self-center text-center font-bold">
           <p>Click or Drag & Drop Image</p>

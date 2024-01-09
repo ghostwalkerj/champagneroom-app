@@ -33,6 +33,9 @@
   import type { ActionData, PageData } from './$types';
   import CreatorDetail from './CreatorDetail.svelte';
   import VideoMeeting from './VideoMeeting.svelte';
+  import RoomDetail from './RoomDetail.svelte';
+  import type { RoomDocumentType, roomZodSchema } from '$lib/models/room';
+  import type { SuperValidated } from 'sveltekit-superforms';
   export let data: PageData;
   export let form: ActionData;
 
@@ -44,6 +47,8 @@
   let exchangeRate = +data.exchangeRate || 0;
   let jitsiToken = data.jitsiToken as string;
   let user = data.user as UserDocument;
+  let room = data.room as RoomDocumentType;
+  const roomForm = data.roomForm as SuperValidated<typeof roomZodSchema>;
 
   $: showVideo = false;
 
@@ -199,7 +204,6 @@
     bind:jitsiToken
   />
 {:else}
-
   <div class="flex place-content-center">
     <!-- Page header -->
 
@@ -268,6 +272,11 @@
             <WalletDetail {wallet} {exchangeRate} {form} {destination} />
           {/key}
         </div>
+
+        <!-- Room -->
+        {#key room}
+          <RoomDetail {room} {roomForm} />
+        {/key}
 
         <!-- Activity Feed -->
         <div>

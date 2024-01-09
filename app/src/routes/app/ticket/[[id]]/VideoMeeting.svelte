@@ -34,7 +34,7 @@
 
   onMount(async () => {
     const options = {
-      roomName: show.roomId,
+      roomName: show.conferenceKey,
       jwt: jitsiToken,
       width: '100%',
       height: '100%',
