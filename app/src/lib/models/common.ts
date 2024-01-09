@@ -1,3 +1,4 @@
+import { nanoid } from 'nanoid';
 import validator from 'validator';
 import z from 'zod';
 

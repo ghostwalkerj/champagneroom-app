@@ -1,5 +1,5 @@
 <script lang="ts">
-  import ProfilePhoto from '$components/ProfilePhoto.svelte';
+  import ImageUploadForm from '$components/forms/ImageUploadForm.svelte';
   import Config from '$lib/config';
   import type { CreatorDocument } from '$lib/models/creator';
   import StarRating from 'svelte-star-rating';
@@ -23,8 +23,8 @@
     <div class="bg-custom rounded flex flex-col justify-center text-center items-center">
 
         <div>
-          <ProfilePhoto
-            profileImage={creator.user.profileImageUrl ||
+          <ImageUploadForm
+            imageUrl={creator.user.profileImageUrl ||
               Config.UI.defaultProfileImage}
             callBack={(value) => {
               updateProfileImage(value);

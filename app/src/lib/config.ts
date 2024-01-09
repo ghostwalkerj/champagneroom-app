@@ -26,6 +26,7 @@ const Config = {
     auth: '/app/auth',
     agent: '/app/agent',
     creator: '/app/creator',
+    room: '/app/room',
     signup: '/app/signup',
     referralSignup: '/app/signup/creator/',
     agentSignup: '/app/signup/agent',
