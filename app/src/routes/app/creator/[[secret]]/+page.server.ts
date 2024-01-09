@@ -3,6 +3,9 @@ import type { AxiosResponse } from 'axios';
 import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 import jwt from 'jsonwebtoken';
+import { ObjectId } from 'mongodb';
+import type { SuperValidated } from 'sveltekit-superforms';
+import { superValidate } from 'sveltekit-superforms/server';
 
 import {
   BITCART_API_URL,
@@ -15,7 +18,7 @@ import {
 import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
 import type { CancelType } from '$lib/models/common';
-import type { CreatorDocument } from '$lib/models/creator';
+import { Creator, type CreatorDocument } from '$lib/models/creator';
 import type { ShowDocument } from '$lib/models/show';
 import { Show } from '$lib/models/show';
 import type { ShowEventDocument } from '$lib/models/showEvent';
@@ -40,26 +43,13 @@ import {
 import { rateCryptosRateGet } from '$lib/ext/bitcart';
 import { createBitcartToken, PayoutJobType, PayoutReason } from '$lib/payment';
 import { getShowMachineService } from '$lib/server/machinesUtil';
+import {
+  Room,
+  type RoomDocument,
+  roomZodSchema
+} from '$lib/server/models/room';
 
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
-
-import { z } from 'zod';
-import { message, setError, superValidate } from 'sveltekit-superforms/server';
-
-const createShowSchema = z.object({
-  price: z.number().min(1).max(10000),
-  name: z.string().min(3).max(50),
-  duration: z.number().min(15).max(120).default(60),
-  capacity: z.number(),
-  coverImageUrl: z.string(),
-  walletId: z.string().min(16).max(64)
-});
-
-const requestPayoutSchema = z.object({
-  amount: z.number().min(0.0001),
-  destination: z.string().min(3),
-  walletId: z.string().min(16).max(64)
-});
 
 export const actions: Actions = {
   update_profile_image: async ({ locals, request }: RequestEvent) => {
@@ -80,19 +70,23 @@ export const actions: Actions = {
     };
   },
   create_show: async ({ locals, request }) => {
-    const form = await superValidate(request, createShowSchema);
-    console.log('POST', form);
+    const data = await request.formData();
+    const price = data.get('price') as string;
+    const name = data.get('name') as string;
+    const duration = data.get('duration') as string;
+    const capacity = data.get('capacity') as string;
+    const coverImageUrl = data.get('coverImageUrl') as string;
 
-    if (!form.valid) {
-      return fail(400, { form });
+    if (!name || name.length < 3 || name.length > 50) {
+      return fail(400, { name, badName: true });
     }
 
-    const price = form.data.price;
-    const name = form.data.name;
-    const duration = form.data.duration;
-    const capacity = form.data.capacity;
-    const coverImageUrl = form.data.coverImageUrl;
-
+    if (!price) {
+      return fail(400, { price, missingPrice: true });
+    }
+    if (Number.isNaN(+price) || +price < 0 || +price > 10_000) {
+      return fail(400, { price, invalidPrice: true });
+    }
     const creator = locals.creator as CreatorDocument;
 
     const show = new Show({
@@ -119,11 +113,9 @@ export const actions: Actions = {
         numberOfReviews: creator.feedbackStats.numberOfReviews
       }
     });
-
     show.save();
 
     return {
-      createShowForm: form,
       success: true,
       showCreated: true,
       show: show.toJSON({ flattenMaps: true, flattenObjectIds: true })
@@ -206,45 +198,47 @@ export const actions: Actions = {
     const destination = data.get('destination') as string;
     const walletId = data.get('walletId') as string;
 
-    const form = await superValidate(request, requestPayoutSchema);
-
-    if (!form.valid) {
-      return fail(400, { form });
+    if (!amount) {
+      return fail(400, { amount, missingAmount: true });
+    }
+    if (Number.isNaN(+amount) || +amount < 0) {
+      return fail(400, { amount, invalidAmount: true });
+    }
+    if (!destination) {
+      return fail(400, { destination, missingDestination: true });
     }
 
-    try {
-      const wallet = await Wallet.findOne({ _id: walletId });
+    const wallet = await Wallet.findOne({ _id: walletId });
 
-      if (!wallet) {
-        setError(form, 'walletId', 'Wallet not found');
-      }
-
-      if (wallet.availableBalance < +amount) {
-        setError(form, 'amount', 'Insufficient funds');
-      }
-
-      if (wallet.status === WalletStatus.PAYOUT_IN_PROGRESS) {
-        setError(form, 'destination', 'Payout in progress');
-      }
-
-      const redisConnection = locals.redisConnection as IORedis;
-      const payoutQueue = new Queue(EntityType.PAYOUT, {
-        connection: redisConnection
-      }) as PayoutQueueType;
-
-      payoutQueue.add(PayoutJobType.CREATE_PAYOUT, {
-        walletId,
-        amount: +amount,
-        destination,
-        payoutReason: PayoutReason.CREATOR_PAYOUT
-      });
-
-      payoutQueue.close();
-    } catch (error) {
-      return message(form, 'Error requesting payout');
+    if (!wallet) {
+      throw error(404, 'Wallet not found');
     }
 
-    return message(form, 'Payout requested successfully');
+    if (wallet.availableBalance < +amount) {
+      return fail(400, { amount, insufficientBalance: true });
+    }
+
+    if (wallet.status === WalletStatus.PAYOUT_IN_PROGRESS) {
+      return fail(400, { amount, payoutInProgress: true });
+    }
+
+    const redisConnection = locals.redisConnection as IORedis;
+    const payoutQueue = new Queue(EntityType.PAYOUT, {
+      connection: redisConnection
+    }) as PayoutQueueType;
+
+    payoutQueue.add(PayoutJobType.CREATE_PAYOUT, {
+      walletId,
+      amount: +amount,
+      destination,
+      payoutReason: PayoutReason.CREATOR_PAYOUT
+    });
+
+    payoutQueue.close();
+
+    return {
+      success: true
+    };
   },
   leave_show: async ({ locals }) => {
     const redisConnection = locals.redisConnection as IORedis;
@@ -291,6 +285,26 @@ export const actions: Actions = {
 
     showQueue.close();
     showService.stop();
+  },
+  create_room: async ({ request, locals }) => {
+    const creator = locals.creator as CreatorDocument;
+    const form = await superValidate(request, roomZodSchema);
+    // Convenient validation check:
+    if (!form.valid) {
+      // Again, return { form } and things will just work.
+      return fail(400, { form });
+    }
+    Room.init();
+    const room = (await Room.create(form.data)) as RoomDocument;
+    Creator.updateOne(
+      { _id: creator._id },
+      {
+        $set: {
+          room: room._id
+        }
+      }
+    ).exec();
+    return { form };
   }
 };
 export const load: PageServerLoad = async ({ locals }) => {
@@ -322,6 +336,11 @@ export const load: PageServerLoad = async ({ locals }) => {
 
   const wallet = locals.wallet as WalletDocument;
 
+  // Grab creators room if it exists
+  const room = creator.room
+    ? ((await Room.findOne({ _id: creator.room })) as RoomDocument)
+    : undefined;
+
   // return the rate of exchange for UI from bitcart
   const token = await createBitcartToken(
     BITCART_EMAIL,
@@ -338,7 +357,7 @@ export const load: PageServerLoad = async ({ locals }) => {
         iss: JITSI_APP_ID,
         exp: Math.floor(Date.now() / 1000) + +JWT_EXPIRY,
         sub: PUBLIC_JITSI_DOMAIN,
-        room: show.roomId,
+        room: show.conferenceKey,
         moderator: true,
         context: {
           user: {
@@ -366,22 +385,19 @@ export const load: PageServerLoad = async ({ locals }) => {
       }
     )) as AxiosResponse<string>) || undefined;
 
-  const createShowForm = await superValidate(createShowSchema);
-  const requestPayoutForm = await superValidate(
-    {
-      amount: 0,
-      destination:
-        user?.toJSON({ flattenMaps: true, flattenObjectIds: true }).address ||
-        '',
-      walletId: wallet._id.toString()
-    },
-    requestPayoutSchema,
-    { errors: false }
-  );
+  const roomForm = room
+    ? await superValidate(
+        room.toJSON({
+          flattenMaps: true,
+          flattenObjectIds: true
+        }),
+        roomZodSchema
+      )
+    : ((await superValidate(roomZodSchema)) as SuperValidated<
+        typeof roomZodSchema
+      >);
 
   return {
-    requestPayoutForm,
-    createShowForm,
     creator: creator.toJSON({ flattenMaps: true, flattenObjectIds: true }),
     user: user?.toJSON({ flattenMaps: true, flattenObjectIds: true }),
     show: show
@@ -398,6 +414,10 @@ export const load: PageServerLoad = async ({ locals }) => {
     ),
     wallet: wallet.toJSON({ flattenMaps: true, flattenObjectIds: true }),
     exchangeRate: exchangeRate?.data,
-    jitsiToken
+    jitsiToken,
+    room: room
+      ? room.toJSON({ flattenMaps: true, flattenObjectIds: true })
+      : undefined,
+    roomForm
   };
 };

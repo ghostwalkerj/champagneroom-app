@@ -50,7 +50,9 @@ const walletZodSchema = z
     onHoldBalance: z.number().default(0),
     earnings: z.array(earningsZodMongooseSchema).default([]),
     payouts: z.array(payoutZodMongooseSchema).default([]),
-    active: z.boolean().default(true)
+    active: z.boolean().default(true).mongooseTypeOptions({
+      index: true
+    })
   })
   .merge(genTimestampsSchema());
 

@@ -101,7 +101,7 @@ const showZodSchema = toZodMongooseSchema(
           ref: 'Agent'
         })
         .optional(),
-      roomId: z.string().default(nanoid),
+      conferenceKey: z.string().default(nanoid),
       coverImageUrl: z.string().trim().optional(),
       duration: z
         .number()
@@ -137,7 +137,7 @@ type ShowDocumentType = z.infer<typeof showZodSchema>;
 
 showSchema.index({ agent: 1, 'showState.finalize.finalizedAt': -1 });
 showSchema.plugin(fieldEncryption, {
-  fields: ['roomId'],
+  fields: ['conferenceKey'],
   secret: process.env.MONGO_DB_FIELD_SECRET,
   saltGenerator: (secret: string) => secret.slice(0, 16)
 });
