@@ -2,7 +2,6 @@
   import ImageUploadForm from '$components/forms/ImageUploadForm.svelte';
   import Config from '$lib/config';
   import type { CreatorDocument } from '$lib/models/creator';
-  import Icon from '@iconify/svelte';
   import StarRating from 'svelte-star-rating';
 
   export let creator: CreatorDocument;
@@ -20,25 +19,27 @@
   };
 </script>
 
-<div
-  class="bg-custom rounded pt-4 flex flex-col justify-center text-center items-center"
->
-  <h2 class="text-xl font-semibold flex gap-2 items-center">
-    <Icon class="text-secondary" icon="iconoir:profile-circle" />
-    Profile
-  </h2>
-  <div>
-    <ImageUploadForm
-      imageUrl={creator.user.profileImageUrl || Config.UI.defaultProfileImage}
-      callBack={(value) => {
-        updateProfileImage(value);
-      }}
-    />
-  </div>
-
-  <div class="flex gap-1">
-    <StarRating rating={creator.feedbackStats.averageRating} /> ({creator.feedbackStats.averageRating.toFixed(
-      2
-    )})
+<div>
+  <div class="lg:col-start-3 lg:col-span-1">
+    <div class="bg-primary text-primary-content daisy-card">
+      <div class="text-center daisy-card-body items-center p-3">
+        <h2 class="text-xl daisy-card-title">{creator.user.name}</h2>
+        <div>
+          <ImageUploadForm
+            imageUrl={creator.user.profileImageUrl ||
+              Config.UI.defaultProfileImage}
+            callBack={(value) => {
+              updateProfileImage(value);
+            }}
+          />
+        </div>
+        <div
+          class="daisy-tooltip"
+          data-tip={creator.feedbackStats.averageRating.toFixed(2)}
+        >
+          <StarRating rating={creator.feedbackStats.averageRating} />
+        </div>
+      </div>
+    </div>
   </div>
 </div>

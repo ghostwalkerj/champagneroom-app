@@ -5,8 +5,7 @@ import type IORedis from 'ioredis';
 import jwt from 'jsonwebtoken';
 import { ObjectId } from 'mongodb';
 import type { SuperValidated } from 'sveltekit-superforms';
-import { message, setError, superValidate } from 'sveltekit-superforms/server';
-import { z } from 'zod';
+import { superValidate } from 'sveltekit-superforms/server';
 
 import {
   BITCART_API_URL,
@@ -14,15 +13,12 @@ import {
   BITCART_PASSWORD,
   JITSI_APP_ID,
   JITSI_JWT_SECRET,
-  JWT_EXPIRY,
-  WEB3STORAGE_KEY,
-  WEB3STORAGE_PROOF
+  JWT_EXPIRY
 } from '$env/static/private';
 import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
 import type { CancelType } from '$lib/models/common';
 import { Creator, type CreatorDocument } from '$lib/models/creator';
-import type { RoomDocumentType } from '$lib/models/room';
 import type { ShowDocument } from '$lib/models/show';
 import { Show } from '$lib/models/show';
 import type { ShowEventDocument } from '$lib/models/showEvent';
@@ -52,24 +48,8 @@ import {
   type RoomDocument,
   roomZodSchema
 } from '$lib/server/models/room';
-import { web3Upload } from '$lib/server/upload';
 
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
-
-const createShowSchema = z.object({
-  price: z.number().min(1).max(10_000),
-  name: z.string().min(3).max(50),
-  duration: z.number().min(15).max(120).default(60),
-  capacity: z.number(),
-  coverImageUrl: z.string(),
-  walletId: z.string().min(16).max(64)
-});
-
-const requestPayoutSchema = z.object({
-  amount: z.number().min(0.0001),
-  destination: z.string().min(3),
-  walletId: z.string().min(16).max(64)
-});
 
 export const actions: Actions = {
   update_profile_image: async ({ locals, request }: RequestEvent) => {
@@ -90,19 +70,23 @@ export const actions: Actions = {
     };
   },
   create_show: async ({ locals, request }) => {
-    const form = await superValidate(request, createShowSchema);
-    console.log('POST', form);
+    const data = await request.formData();
+    const price = data.get('price') as string;
+    const name = data.get('name') as string;
+    const duration = data.get('duration') as string;
+    const capacity = data.get('capacity') as string;
+    const coverImageUrl = data.get('coverImageUrl') as string;
 
-    if (!form.valid) {
-      return fail(400, { form });
+    if (!name || name.length < 3 || name.length > 50) {
+      return fail(400, { name, badName: true });
     }
 
-    const price = form.data.price;
-    const name = form.data.name;
-    const duration = form.data.duration;
-    const capacity = form.data.capacity;
-    const coverImageUrl = form.data.coverImageUrl;
-
+    if (!price) {
+      return fail(400, { price, missingPrice: true });
+    }
+    if (Number.isNaN(+price) || +price < 0 || +price > 10_000) {
+      return fail(400, { price, invalidPrice: true });
+    }
     const creator = locals.creator as CreatorDocument;
 
     const show = new Show({
@@ -132,7 +116,6 @@ export const actions: Actions = {
     show.save();
 
     return {
-      createShowForm: form,
       success: true,
       showCreated: true,
       show: show.toJSON({ flattenMaps: true, flattenObjectIds: true })
@@ -215,45 +198,47 @@ export const actions: Actions = {
     const destination = data.get('destination') as string;
     const walletId = data.get('walletId') as string;
 
-    const form = await superValidate(request, requestPayoutSchema);
-
-    if (!form.valid) {
-      return fail(400, { form });
+    if (!amount) {
+      return fail(400, { amount, missingAmount: true });
+    }
+    if (Number.isNaN(+amount) || +amount < 0) {
+      return fail(400, { amount, invalidAmount: true });
+    }
+    if (!destination) {
+      return fail(400, { destination, missingDestination: true });
     }
 
-    try {
-      const wallet = await Wallet.findOne({ _id: walletId }).orFail();
+    const wallet = await Wallet.findOne({ _id: walletId });
 
-      if (!wallet) {
-        setError(form, 'walletId', 'Wallet not found');
-      }
-
-      if (wallet.availableBalance < +amount) {
-        setError(form, 'amount', 'Insufficient funds');
-      }
-
-      if (wallet.status === WalletStatus.PAYOUT_IN_PROGRESS) {
-        setError(form, 'destination', 'Payout in progress');
-      }
-
-      const redisConnection = locals.redisConnection as IORedis;
-      const payoutQueue = new Queue(EntityType.PAYOUT, {
-        connection: redisConnection
-      }) as PayoutQueueType;
-
-      payoutQueue.add(PayoutJobType.CREATE_PAYOUT, {
-        walletId,
-        amount: +amount,
-        destination,
-        payoutReason: PayoutReason.CREATOR_PAYOUT
-      });
-
-      payoutQueue.close();
-    } catch {
-      return message(form, 'Error requesting payout');
+    if (!wallet) {
+      throw error(404, 'Wallet not found');
     }
 
-    return message(form, 'Payout requested successfully');
+    if (wallet.availableBalance < +amount) {
+      return fail(400, { amount, insufficientBalance: true });
+    }
+
+    if (wallet.status === WalletStatus.PAYOUT_IN_PROGRESS) {
+      return fail(400, { amount, payoutInProgress: true });
+    }
+
+    const redisConnection = locals.redisConnection as IORedis;
+    const payoutQueue = new Queue(EntityType.PAYOUT, {
+      connection: redisConnection
+    }) as PayoutQueueType;
+
+    payoutQueue.add(PayoutJobType.CREATE_PAYOUT, {
+      walletId,
+      amount: +amount,
+      destination,
+      payoutReason: PayoutReason.CREATOR_PAYOUT
+    });
+
+    payoutQueue.close();
+
+    return {
+      success: true
+    };
   },
   leave_show: async ({ locals }) => {
     const redisConnection = locals.redisConnection as IORedis;
@@ -301,65 +286,25 @@ export const actions: Actions = {
     showQueue.close();
     showService.stop();
   },
-  upsert_room: async ({ request, locals }) => {
+  create_room: async ({ request, locals }) => {
     const creator = locals.creator as CreatorDocument;
-    const formData = await request.formData();
-
-    const form = await superValidate(formData, roomZodSchema);
-
-    const isUpdate = !form.data._id;
+    const form = await superValidate(request, roomZodSchema);
     // Convenient validation check:
     if (!form.valid) {
       // Again, return { form } and things will just work.
       return fail(400, { form });
     }
-    const image =
-      formData.get('images') && (formData.get('images') as unknown as [File]);
-
-    if (image instanceof File) {
-      // upload image to web3
-      const url = await web3Upload(WEB3STORAGE_KEY, WEB3STORAGE_PROOF, image);
-      form.data.coverImageUrl = url;
-    }
-
     Room.init();
-
-    try {
-      if (isUpdate) {
-        const room = (await Room.findOneAndUpdate(
-          { _id: form.data._id },
-          form.data,
-          { new: true }
-        )) as RoomDocument;
-        if (!room) {
-          throw error(404, 'Room not found');
+    const room = (await Room.create(form.data)) as RoomDocument;
+    Creator.updateOne(
+      { _id: creator._id },
+      {
+        $set: {
+          room: room._id
         }
-        return {
-          form,
-          room: room.toJSON({ flattenMaps: true, flattenObjectIds: true })
-        };
-      } else {
-        const room = (await Room.create({
-          ...form.data,
-          _id: new ObjectId()
-        })) as RoomDocument;
-        Creator.updateOne(
-          { _id: creator._id },
-          {
-            $set: {
-              room: room._id
-            }
-          }
-        ).exec();
-        return {
-          form,
-          room: room.toJSON({ flattenMaps: true, flattenObjectIds: true })
-        };
       }
-    } catch (error_) {
-      console.error(error_);
-      throw error(500, 'Error upserting room');
-    }
+    ).exec();
+    return { form };
   }
 };
 export const load: PageServerLoad = async ({ locals }) => {
@@ -392,9 +337,9 @@ export const load: PageServerLoad = async ({ locals }) => {
   const wallet = locals.wallet as WalletDocument;
 
   // Grab creators room if it exists
-  const room = (
-    creator.room ? await Room.findOne({ _id: creator.room }) : undefined
-  ) as RoomDocument | undefined;
+  const room = creator.room
+    ? ((await Room.findOne({ _id: creator.room })) as RoomDocument)
+    : undefined;
 
   // return the rate of exchange for UI from bitcart
   const token = await createBitcartToken(
@@ -452,22 +397,7 @@ export const load: PageServerLoad = async ({ locals }) => {
         typeof roomZodSchema
       >);
 
-  const createShowForm = await superValidate(createShowSchema);
-  const requestPayoutForm = await superValidate(
-    {
-      amount: 0,
-      destination:
-        user?.toJSON({ flattenMaps: true, flattenObjectIds: true }).address ||
-        '',
-      walletId: wallet._id.toString()
-    },
-    requestPayoutSchema,
-    { errors: false }
-  );
-
   return {
-    requestPayoutForm,
-    createShowForm,
     creator: creator.toJSON({ flattenMaps: true, flattenObjectIds: true }),
     user: user?.toJSON({ flattenMaps: true, flattenObjectIds: true }),
     show: show
