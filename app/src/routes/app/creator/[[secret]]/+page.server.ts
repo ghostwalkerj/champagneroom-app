@@ -49,6 +49,7 @@ import {
   type RoomDocument,
   roomZodSchema
 } from '$lib/server/models/room';
+import { web3Upload } from '$lib/server/upload';
 
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
 
@@ -303,7 +304,10 @@ export const actions: Actions = {
       formData.get('images') && (formData.get('images') as unknown as [File]);
 
     if (image instanceof File) {
-      // upload
+      // upload image to web3
+      const url = await web3Upload(image);
+      form.data.coverImageUrl = url;
+      console.log('url', url);
     }
 
     Room.init();
