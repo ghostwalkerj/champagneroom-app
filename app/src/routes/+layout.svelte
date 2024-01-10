@@ -1,6 +1,6 @@
 <script lang="ts">
   import ReserveShowForm from '$components/forms/ReserveShowForm.svelte';
-  import CreateRoomForm from '$components/forms/CreateRoomForm.svelte';
+  import CRUDRoomForm from '$components/forms/CRUDRoomForm.svelte';
   import '@fontsource/roboto';
   import '@fontsource/roboto/300.css';
   import '@fontsource/roboto/500.css';
@@ -10,13 +10,13 @@
   import { Modal, initializeStores } from '@skeletonlabs/skeleton';
   import '../app.css';
 
-initializeStores();
-const modalRegistry: Record<string, ModalComponent> = {
-	// Set a unique modal ID, then pass the component reference
-	ReserveShowForm: { ref: ReserveShowForm },
-  CreateRoomForm: { ref: CreateRoomForm },
-	// ...
-};
+  initializeStores();
+  const modalRegistry: Record<string, ModalComponent> = {
+    // Set a unique modal ID, then pass the component reference
+    ReserveShowForm: { ref: ReserveShowForm },
+    CRUDRoomForm: { ref: CRUDRoomForm }
+    // ...
+  };
 </script>
 
 <Modal components={modalRegistry} regionBackdrop="bg-black/50" />

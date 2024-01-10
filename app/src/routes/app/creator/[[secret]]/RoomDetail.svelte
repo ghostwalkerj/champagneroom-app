@@ -13,10 +13,10 @@
 
   const roomModal: ModalSettings = {
     type: 'component',
-    component: 'CreateRoomForm',
-    title: 'Create Room',
+    component: 'CRUDRoomForm',
+    title: 'Update Room',
     meta: {
-      action: '?/create_room',
+      action: '?/upsert_room',
       form: roomForm
     }
   };
@@ -43,7 +43,7 @@
     <button
       type="button"
       class="btn variant-filled-secondary mt-4"
-      on:click={() => modalStore.trigger(roomModal)}>Update My Room</button
+      on:click={() => modalStore.trigger(roomModal)}>Edit My Room</button
     >
   {:else}
     <div class="text-info">No room found</div>
