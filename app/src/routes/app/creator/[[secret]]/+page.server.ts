@@ -248,7 +248,7 @@ export const actions: Actions = {
       });
 
       payoutQueue.close();
-    } catch {
+    } catch (error) {
       return message(form, 'Error requesting payout');
     }
 
