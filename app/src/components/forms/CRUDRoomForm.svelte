@@ -9,7 +9,6 @@
   import { superForm } from 'sveltekit-superforms/client';
   import urlJoin from 'url-join';
   export let parent: SvelteComponent;
-  import SuperDebug from 'sveltekit-superforms/client/SuperDebug.svelte';
 
   const modalStore = getModalStore();
 
@@ -25,7 +24,6 @@
       invalidateAll: true,
       onResult(event) {
         if (event.result.type === 'success') {
-          console.log(event.result.data);
           modalStore.close();
         }
       }
