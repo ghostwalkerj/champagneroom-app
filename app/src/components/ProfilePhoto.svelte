@@ -77,7 +77,7 @@
 </script>
 
 <div class="flex flex-col items-center lg:h-[200px]">
-  <div class="p-4">
+  <div class="p-2">
     <div
       class="bg-cover relative bg-no-repeat bg-center rounded-full lg:w-32 lg:h-32 w-24 h-24"
       style="background-image: url('{imageUrl}')"
@@ -102,7 +102,7 @@
   {#if !update}
     <div class="justify-center daisy-card-actions last:my-2">
       <button
-        class="daisy-btn daisy-btn-xs daisy-btn-secondary daisy-btn-outline lg:daisy-btn-sm"
+        class="btn variant-soft-secondary neon-secondary"
         on:click={() => {
           setUpdate(true);
         }}
@@ -114,23 +114,23 @@
     <div class="justify-center daisy-card-actions last:my-2">
       {#if !uploadReady}
         <label
-          class="custom-file-upload daisy-btn daisy-btn-xs daisy-btn-outline daisy-btn-secondary"
+          class="custom-file-upload"
           use:filedrop={options}
           on:filedrop={onChange}
         >
           <input type="file" class="hidden" />
-          Select Image
+          <button class="btn btn-sm variant-soft-primary neon-primary">Select Image</button>
         </label>
       {:else}
         <button
-          class="daisy-btn daisy-btn-xs daisy-btn-outline daisy-btn-secondary"
+        class="btn btn-sm variant-soft-primary neon-primary"
           on:click={() => upload()}
         >
           Upload
         </button>
       {/if}
       <button
-        class="daisy-btn daisy-btn-xs daisy-btn-outline daisy-btn-secondary"
+      class="btn btn-sm variant-soft-error"
         on:click={resetForm}
       >
         Cancel

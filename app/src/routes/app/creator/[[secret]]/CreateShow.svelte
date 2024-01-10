@@ -12,8 +12,14 @@
   import type { CreatorDocument } from '$lib/models/creator';
   import type { ActionData } from './$types';
 
+  import { RangeSlider } from '@skeletonlabs/skeleton';
+  import { superForm } from 'sveltekit-superforms/client';
+
+  
+
   $: showDuration = 60;
 
+  export let createShowForm;
   export let creator: CreatorDocument;
   export let form: ActionData;
   export let isLoading = false as boolean;
@@ -43,123 +49,51 @@
       isLoading = false;
     };
   };
+
+  const { form: showForm, errors, constraints, delayed } = superForm(createShowForm, {
+    validationMethod: 'submit-only',
+
+  })
 </script>
 
-<div class="bg-primary text-primary-content daisy-card">
-  <div class="text-center daisy-card-body items-center p-3">
-    <h2 class="text-2xl daisy-card-title">Create a New Show</h2>
-    <div class="flex flex-col w-full">
-      <form method="post" action="?/create_show" use:enhance={onSubmit}>
-        <div
-          class="flex flex-col lg:flex-row text-white p-2 justify-center items-center gap-4"
-        >
-          <div class="daisy-form-control flex-grow">
-            <!-- svelte-ignore a11y-label-has-associated-control -->
-            <label class="daisy-label">
-              <span class="daisy-label-text">Title</span>
-            </label>
-            <input
-              type="text"
-              name="name"
-              class="daisy-input daisy-input-bordered daisy-input-primary"
-              bind:value={showName}
-              minlength="3"
-              maxlength="50"
-            />
-            {#if form?.badName}
-              <div class="shadow-lg daisy-alert daisy-alert-error">
-                Show Name should be between 3 and 50 characters
-              </div>
-            {/if}
-          </div>
+<form method="post" action="?/create_show" use:enhance={onSubmit} class="bg-custom rounded p-4 flex flex-col gap-4">
+  <h2 class="text-lg font-semibold">Create Show</h2>
 
-          <div class="daisy-form-control lg:w-40">
-            <!-- svelte-ignore a11y-label-has-associated-control -->
-            <label for="price" class="daisy-label">
-              <span class="daisy-label-text">Ticket Price in USD</span></label
-            >
-            <div class="rounded-md shadow-sm relative">
-              <div
-                class="flex pl-3 inset-y-0 left-0 absolute items-center pointer-events-none"
-              >
-                <span class="text-gray-500 sm:text-sm"> $ </span>
-              </div>
-              <input
-                type="text"
-                name="price"
-                class="w-full py-2 pl-6 daisy-input daisy-input-bordered daisy-input-primary"
-                placeholder="0.00"
-                aria-describedby="price-currency"
-                value={form?.price ?? ''}
-              />
-              <div
-                class="flex pr-3 inset-y-0 right-0 absolute items-center pointer-events-none"
-              >
-                <span class="text-gray-500 sm:text-sm" id="price-currency">
-                  USD
-                </span>
-              </div>
-            </div>
-            {#if form?.missingPrice}
-              <div
-                class="shadow-lg daisy-alert daisy-alert-error whitespace-nowrap"
-              >
-                Price is required
-              </div>
-            {/if}
-            {#if form?.invalidPrice}
-              <div
-                class="shadow-lg daisy-alert daisy-alert-error whitespace-nowrap"
-              >
-                Invalid Price
-              </div>
-            {/if}
-          </div>
+  <div class="grid lg:grid-cols-2 gap-4">
+  <label for="">
+    <span>Title</span>
+    <input type="text" name="name" bind:value={$showForm.name} {...$constraints.name} class="input variant-form-material bg-surface-700">
+    {#if $errors.name}<span class="text-error">{$errors.name}</span>{/if}
+  </label>
 
-          <input type="hidden" name="capacity" value="1" />
+  
+    <label for="">
+      <span>Ticket Price (In USD)</span>
+      <div class="input-group input-group-divider grid-cols-[auto_1fr] variant-form-material bg-surface-700">
+        <div class="input-group-shim text-surface-300 font-semibold">USD</div>
+        <input type="number"  name="price" bind:value={$showForm.price} {...$constraints.price}>
+      </div>
+      {#if $errors.price}<span class="text-error">{$errors.price}</span>{/if}
+    </label>
+
+  </div>
+
+    <RangeSlider name="duration" accent={"accent-primary"} bind:value={$showForm.duration} min={15} max={120} step={15} ticked>
+
+        <div class="">Duration: <strong>{durationFormatter($showForm.duration * 60)}</strong></div>
+
+    </RangeSlider>
+
+
+  <button class="btn variant-soft-primary !font-bold btn-lg text-xl neon-primary" disabled={!delayed}>Create Show</button>
+
+  <!--HIDDEN INPUTS-->
+  <input type="hidden" name="capacity" value="1" />
 
           <input
             type="hidden"
             name="coverImageUrl"
             value={creator.user.profileImageUrl}
           />
-          <div class="daisy-form-control lg:w-1/5">
-            <!-- svelte-ignore a11y-label-has-associated-control -->
-            <label class="daisy-label">
-              <span class="daisy-label-text whitespace-nowrap"
-                >Duration ({durationFormatter(showDuration * 60)})</span
-              >
-            </label>
-            <input
-              type="range"
-              min="15"
-              max="120"
-              bind:value={showDuration}
-              class="daisy-range"
-              step="15"
-              name="duration"
-            />
-            <div class="w-full flex justify-between text-xs px-2">
-              <span>|</span>
-              <span>|</span>
-              <span>|</span>
-              <span>|</span>
-              <span>|</span>
-              <span>|</span>
-              <span>|</span>
-              <span>|</span>
-            </div>
-          </div>
-        </div>
 
-        <div class="py-2">
-          <button
-            class="daisy-btn daisy-btn-secondary"
-            type="submit"
-            disabled={isLoading}>Create Show</button
-          >
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
+</form>

@@ -81,14 +81,14 @@
   });
 </script>
 
-<div class="!text-center shadow-lg">
+<div class="!text-center shadow-lg rounded">
   {#if show}
-  <div class="grid !text-center md:grid-cols-2 bg-surface-800 ">
+  <div class="grid !text-center md:grid-cols-2 bg-custom rounded-r">
     <div class="relative">
       <img
         src={show.coverImageUrl}
         alt="show"
-        class="w-full max-w-xl m-auto rounded-l"
+        class="w-full max-w-xl m-auto rounded-l max-h-fit"
       />
       {#if options.showWaterMark && waterMarkText}
         <p
@@ -99,7 +99,7 @@
       {/if}
     </div>
 
-    <div class="flex flex-col justify-evenly">
+    <div class="flex flex-col justify-evenly rounded-tr">
       <div class="p-4 pb-0 flex flex-col items-center gap-2">
         <h1 class="text-4xl font-extrabold uppercase">{name}</h1>
         {#if options.showRating}
@@ -112,7 +112,7 @@
       {#if options.showCopy}
         <div>
           <button
-            class="btn font-semibold variant-filled-primary mb-1"
+            class="btn btn-lg neon-primary font-semibold variant-soft-primary mb-1"
             on:click={copyShowUrl}>Copy Show Link</button
           >
           <p>Share with your fans</p>
@@ -142,7 +142,7 @@
 
   {#if options.showSalesStats}
     <div
-      class="flex !text-center sm:flex-row rounded-b flex-col justify-between border-t border-surface-600 py-2 bg-surface-700 font-semibold divide-x divide-surface-500
+      class="flex !text-center sm:flex-row rounded-b flex-col justify-between border-t border-surface-600  bg-custom font-semibold divide-x divide-surface-500
      [&>div]:w-full [&>div]:whitespace-nowrap [&>div]:p-2 [&>div]:flex [&>div]:sm:flex-col [&>div]:gap-2"
     >
       <div>

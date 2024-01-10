@@ -20,10 +20,16 @@
       isLoading = false;
     };
   };
+
+
 </script>
 
+<!--
+  THIS COMPONENT IS NO LONGER IN USE
+-->
+
 <input type="checkbox" id="restart-show-modal" class="daisy-modal-toggle" />
-<div class="daisy-modal daisy-modal-open">
+<div class="daisy-modal daisy-modal-open hidden">
   <div class="daisy-modal-box">
     <h3 class="font-bold text-lg">You have Stopped the Show</h3>
     <p class="py-4">
@@ -40,7 +46,7 @@
         }}
         disabled={!canStartShow || isLoading}>Restart Show</button
       >
-      <form method="post" action="?/end_show" use:enhance={onSubmit}>
+      <form method="post" id="endShow" action="?/end_show" use:enhance={onSubmit}>
         <button class="daisy-btn" disabled={isLoading}>End Show</button>
       </form>
     </div>

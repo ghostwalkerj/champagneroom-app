@@ -1,6 +1,7 @@
 <script lang="ts">
   import spacetime from 'spacetime';
   import StarRating from 'svelte-star-rating';
+  import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
 
   import type { ShowDocument } from '$lib/models/show';
 
@@ -9,57 +10,54 @@
   export let completedShows: ShowDocument[] = [];
 </script>
 
-<div class="bg-primary text-primary-content daisy-card">
-  <div class="text-left daisy-card-body items-center">
-    <h2 class="text-2xl daisy-card-title">Activity</h2>
-    <h2 class="text-lg daisy-card-title">
-      {completedShows.length} Completed Show{#if completedShows.length > 1}s{/if}
-    </h2>
+<div class="bg-custom rounded p-4 flex flex-col gap-4 text-center justify-center">
 
-    <ul class="w-full">
-      {#each completedShows.slice(0, 9) as show}
-        <li>
-          <div class="flex flex-row w-full my-2">
-            <Icon
-              icon="mingcute:award-fill"
-              class="text-xl text-primary-content"
-            />
+    <h2 class="text-xl font-semibold text-center flex gap-2 items-center justify-center">
+      <Icon icon="fluent:shifts-activity-20-filled" class=" neon-secondary text-2xl"/>
+      <span>Activity</span></h2>
+    <p class="">
+      {completedShows.length} Completed Show{#if completedShows.length > 1 || completedShows.length==0}s{/if}
+    </p>
 
-            <div class="flex flex-col w-full">
-              <div class="flex flex-row w-full place-content-between">
-                <div class="text-sm text-gray-200 whitespace-nowrap ml-3">
-                  {#if show.showState.status === ShowStatus.FINALIZED}
+    <Accordion autocollapse regionPanel="bg-surface-700">
+      {#each completedShows.slice(0, 9) as show, i}
+      <AccordionItem open={i==0}>
+        <svelte:fragment slot="lead">
+          {#if show.showState.status === ShowStatus.FINALIZED}
                     {spacetime(show.showState.finalize?.finalizedAt).format(
                       '{month-short} {date-pad}'
                     )}
-                  {/if}
-                </div>
-                <div class="text-sm text-gray-200">
-                  {currencyFormatter(show.price.currency).format(
-                    show.price.amount
-                  )}
-                </div>
-              </div>
-              <div class="flex flex-row w-full">
-                {#if show.showState.feedbackStats.averageRating > 0}
-                  <div class="ml-3 -mb-3">
-                    <StarRating
-                      rating={show.showState.feedbackStats.averageRating ?? 0}
-                    />
-                  </div>
-                {/if}
-              </div>
-              {#if show.showState.feedbackStats.comments.length > 0}
-                <div class="text-sm text-gray-200 ml-3">
-                  {#each show.showState.feedbackStats.comments as comment}
-                    {comment}
-                  {/each}
-                </div>
-              {/if}
-            </div>
+          {:else}
+          Pending
+          {/if}
+        </svelte:fragment>
+        <svelte:fragment slot="summary">
+          <div class="text-sm text-gray-200 text-right font-semibold">
+            {currencyFormatter(show.price.currency).format(
+              show.price.amount
+            )}
           </div>
-        </li>
+        </svelte:fragment>
+        <svelte:fragment slot="content">
+          <div class="flex gap-2 items-start">
+            <StarRating
+                      rating={show.showState.feedbackStats.averageRating ?? 0}
+                    /> ( {show.showState.feedbackStats.averageRating ?? 0})
+          </div>
+          {#if show.showState.feedbackStats.comments.length > 0}
+                <div class="text-sm text-left -mt-1 flex flex-col gap-1">
+                  <p class="font-semibold">Comments ({show.showState.feedbackStats.comments.length})</p>
+                  <div class="divide-y divide-surface-600">
+                    {#each show.showState.feedbackStats.comments as comment}
+                    <p class="py-2">{comment}</p>
+                  {/each}
+                  </div>
+                  
+                </div>
+              {:else} <p>No Comments</p> {/if}
+
+        </svelte:fragment>
+      </AccordionItem>
       {/each}
-    </ul>
-  </div>
+    </Accordion>
 </div>

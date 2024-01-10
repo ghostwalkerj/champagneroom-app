@@ -1,4 +1,4 @@
-n <script lang="ts">
+<script lang="ts">
   import { applyAction, enhance } from '$app/forms';
 
   export let isLoading = false;
@@ -20,27 +20,21 @@ n <script lang="ts">
   };
 </script>
 
-<form method="post" action="?/cancel_show" use:enhance={onSubmit}>
-  <div class="bg-primary text-primary-content daisy-card mb-3 lg:mb-0">
-    <div
-      class="lg:flex lg:justify-center lg:items-center lg:text-left daisy-card-body p-3"
-    >
-      <div class="text-xl daisy-card-title">Cancel Your Show</div>
-      <div class="text">
-        If you cancel this show any tickets sold will be refunded.
-      </div>
+<form method="post" action="?/cancel_show" use:enhance={onSubmit}
+  class="bg-custom rounded p-4 flex gap-4 justify-between"
+>
 
-      <div
-        class="flex flex-col text-white p-2 justify-center items-center lg:flex-row lg:space-x-4"
-      >
-        <div class="">
+<div><h2 class="text-xl font-semibold">Cancel Your Show</h2>
+  <p class="text">
+    If you cancel this show any tickets sold will be refunded.
+  </p></div>
+      
           <button
-            class="daisy-btn daisy-btn-secondary"
+            class="btn variant-soft-error"
             type="submit"
             disabled={isLoading}>Cancel Show</button
           >
-        </div>
-      </div>
-    </div>
-  </div>
+
 </form>
+
+
