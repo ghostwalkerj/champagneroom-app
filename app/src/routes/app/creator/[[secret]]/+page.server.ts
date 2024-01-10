@@ -460,8 +460,6 @@ export const load: PageServerLoad = async ({ locals }) => {
         typeof roomZodSchema
       >);
 
-  roomForm;
-
   return {
     requestPayoutForm,
     createShowForm,

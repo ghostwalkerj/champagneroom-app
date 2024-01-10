@@ -11,7 +11,7 @@
   export let exchangeRate = 0;
   export let form: ActionData;
   export let wallet: WalletDocumentType;
-  export let whitdrawForm: any;
+  export let withdrawFrom: any;
 
 
 const modalStore = getModalStore();
@@ -28,35 +28,34 @@ const modalStore = getModalStore();
     type: 'component',
     component: 'WithdrawForm',
     meta: {
-      form: whitdrawForm,
+      form: withDrawForm,
       wallet,
       exchangeRate,
       destination
     }
   };
 
-const transactionsModal: ModalSettings = {
+  const transactionsModal: ModalSettings = {
     type: 'component',
     component: 'TransactionsActivity',
     meta: {
-      earnings:earnings,
+      earnings: earnings,
       payouts: payouts
     }
   };
 </script>
 
 {#if wallet}
-    <div class="bg-custom p-4 rounded flex flex-col gap-4 justify-center items-center">
-
-      <div class="flex flex-col gap-0 items-center text-center">
-        <h2 class="text-xl font-semibold flex gap-2 items-center">
-          <Icon
-        class="text-secondary"
-        icon="carbon:wallet"
-      />
-          Wallet</h2>
-        <small class="lowercase text-base">Status: {wallet.status}</small>
-      </div>
+  <div
+    class="bg-custom p-4 rounded flex flex-col gap-4 justify-center items-center"
+  >
+    <div class="flex flex-col gap-0 items-center text-center">
+      <h2 class="text-xl font-semibold flex gap-2 items-center">
+        <Icon class="text-secondary" icon="carbon:wallet" />
+        Wallet
+      </h2>
+      <small class="lowercase text-base">Status: {wallet.status}</small>
+    </div>
 
       <div class="text-center">
         <p>Balance:
@@ -91,5 +90,3 @@ const transactionsModal: ModalSettings = {
           </div>
     </div>
 {/if}
-
-
