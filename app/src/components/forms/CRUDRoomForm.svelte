@@ -49,11 +49,11 @@
       use:enhance
       action={$modalStore[0].meta.action}
     >
-      <input type="hidden" name="coverImageUrl" value={$form.coverImageUrl} />
       <input type="hidden" name="active" value="true" />
+      <input type="hidden" name="_id" value={$form._id} />
 
       <FileDropzone
-        name="files"
+        name="images"
         padding="p-0"
         class="bg-surface-900 max-h-max overflow-hidden rounded-xl "
         bind:files={images}
@@ -94,7 +94,7 @@
               class="input variant-form-material"
               {...$constraints.tagLine}
               type="text"
-              name="tagline"
+              name="tagLine"
               bind:value={$form.tagLine}
               placeholder="Enter a tagline..."
             />

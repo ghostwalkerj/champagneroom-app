@@ -19,6 +19,7 @@ import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
 import type { CancelType } from '$lib/models/common';
 import { Creator, type CreatorDocument } from '$lib/models/creator';
+import type { RoomDocumentType } from '$lib/models/room';
 import type { ShowDocument } from '$lib/models/show';
 import { Show } from '$lib/models/show';
 import type { ShowEventDocument } from '$lib/models/showEvent';
@@ -286,24 +287,46 @@ export const actions: Actions = {
     showQueue.close();
     showService.stop();
   },
-  create_room: async ({ request, locals }) => {
+  upsert_room: async ({ request, locals }) => {
     const creator = locals.creator as CreatorDocument;
-    const form = await superValidate(request, roomZodSchema);
+    const formData = await request.formData();
+
+    const form = await superValidate(formData, roomZodSchema);
+
+    const isUpdate = !!form.data._id;
     // Convenient validation check:
     if (!form.valid) {
       // Again, return { form } and things will just work.
       return fail(400, { form });
     }
+    const image =
+      formData.get('images') && (formData.get('images') as unknown as [File]);
+
+    if (image instanceof File) {
+      // upload
+    }
+
     Room.init();
-    const room = (await Room.create(form.data)) as RoomDocument;
-    Creator.updateOne(
-      { _id: creator._id },
-      {
-        $set: {
-          room: room._id
-        }
+    if (isUpdate) {
+      const room = (await Room.findOneAndUpdate(
+        { _id: form.data._id },
+        form.data,
+        { new: true }
+      )) as RoomDocument;
+      if (!room) {
+        throw error(404, 'Room not found');
       }
-    ).exec();
+    } else {
+      const room = (await Room.create(form.data)) as RoomDocument;
+      Creator.updateOne(
+        { _id: creator._id },
+        {
+          $set: {
+            room: room._id
+          }
+        }
+      ).exec();
+    }
     return { form };
   }
 };
@@ -337,9 +360,9 @@ export const load: PageServerLoad = async ({ locals }) => {
   const wallet = locals.wallet as WalletDocument;
 
   // Grab creators room if it exists
-  const room = creator.room
-    ? ((await Room.findOne({ _id: creator.room })) as RoomDocument)
-    : undefined;
+  const room = (
+    creator.room ? await Room.findOne({ _id: creator.room }) : undefined
+  ) as RoomDocument | undefined;
 
   // return the rate of exchange for UI from bitcart
   const token = await createBitcartToken(
@@ -396,6 +419,8 @@ export const load: PageServerLoad = async ({ locals }) => {
     : ((await superValidate(roomZodSchema)) as SuperValidated<
         typeof roomZodSchema
       >);
+
+  roomForm;
 
   return {
     creator: creator.toJSON({ flattenMaps: true, flattenObjectIds: true }),
