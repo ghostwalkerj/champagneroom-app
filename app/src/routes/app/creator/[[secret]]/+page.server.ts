@@ -5,7 +5,8 @@ import type IORedis from 'ioredis';
 import jwt from 'jsonwebtoken';
 import { ObjectId } from 'mongodb';
 import type { SuperValidated } from 'sveltekit-superforms';
-import { superValidate } from 'sveltekit-superforms/server';
+import { message, setError, superValidate } from 'sveltekit-superforms/server';
+import { z } from 'zod';
 
 import {
   BITCART_API_URL,
@@ -54,6 +55,21 @@ import { web3Upload } from '$lib/server/upload';
 
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
 
+const createShowSchema = z.object({
+  price: z.number().min(1).max(10_000),
+  name: z.string().min(3).max(50),
+  duration: z.number().min(15).max(120).default(60),
+  capacity: z.number(),
+  coverImageUrl: z.string(),
+  walletId: z.string().min(16).max(64)
+});
+
+const requestPayoutSchema = z.object({
+  amount: z.number().min(0.0001),
+  destination: z.string().min(3),
+  walletId: z.string().min(16).max(64)
+});
+
 export const actions: Actions = {
   update_profile_image: async ({ locals, request }: RequestEvent) => {
     const data = await request.formData();
@@ -73,23 +89,19 @@ export const actions: Actions = {
     };
   },
   create_show: async ({ locals, request }) => {
-    const data = await request.formData();
-    const price = data.get('price') as string;
-    const name = data.get('name') as string;
-    const duration = data.get('duration') as string;
-    const capacity = data.get('capacity') as string;
-    const coverImageUrl = data.get('coverImageUrl') as string;
+    const form = await superValidate(request, createShowSchema);
+    console.log('POST', form);
 
-    if (!name || name.length < 3 || name.length > 50) {
-      return fail(400, { name, badName: true });
+    if (!form.valid) {
+      return fail(400, { form });
     }
 
-    if (!price) {
-      return fail(400, { price, missingPrice: true });
-    }
-    if (Number.isNaN(+price) || +price < 0 || +price > 10_000) {
-      return fail(400, { price, invalidPrice: true });
-    }
+    const price = form.data.price;
+    const name = form.data.name;
+    const duration = form.data.duration;
+    const capacity = form.data.capacity;
+    const coverImageUrl = form.data.coverImageUrl;
+
     const creator = locals.creator as CreatorDocument;
 
     const show = new Show({
@@ -119,6 +131,7 @@ export const actions: Actions = {
     show.save();
 
     return {
+      createShowForm: form,
       success: true,
       showCreated: true,
       show: show.toJSON({ flattenMaps: true, flattenObjectIds: true })
@@ -201,47 +214,45 @@ export const actions: Actions = {
     const destination = data.get('destination') as string;
     const walletId = data.get('walletId') as string;
 
-    if (!amount) {
-      return fail(400, { amount, missingAmount: true });
-    }
-    if (Number.isNaN(+amount) || +amount < 0) {
-      return fail(400, { amount, invalidAmount: true });
-    }
-    if (!destination) {
-      return fail(400, { destination, missingDestination: true });
+    const form = await superValidate(request, requestPayoutSchema);
+
+    if (!form.valid) {
+      return fail(400, { form });
     }
 
-    const wallet = await Wallet.findOne({ _id: walletId });
+    try {
+      const wallet = await Wallet.findOne({ _id: walletId });
 
-    if (!wallet) {
-      throw error(404, 'Wallet not found');
+      if (!wallet) {
+        setError(form, 'walletId', 'Wallet not found');
+      }
+
+      if (wallet.availableBalance < +amount) {
+        setError(form, 'amount', 'Insufficient funds');
+      }
+
+      if (wallet.status === WalletStatus.PAYOUT_IN_PROGRESS) {
+        setError(form, 'destination', 'Payout in progress');
+      }
+
+      const redisConnection = locals.redisConnection as IORedis;
+      const payoutQueue = new Queue(EntityType.PAYOUT, {
+        connection: redisConnection
+      }) as PayoutQueueType;
+
+      payoutQueue.add(PayoutJobType.CREATE_PAYOUT, {
+        walletId,
+        amount: +amount,
+        destination,
+        payoutReason: PayoutReason.CREATOR_PAYOUT
+      });
+
+      payoutQueue.close();
+    } catch {
+      return message(form, 'Error requesting payout');
     }
 
-    if (wallet.availableBalance < +amount) {
-      return fail(400, { amount, insufficientBalance: true });
-    }
-
-    if (wallet.status === WalletStatus.PAYOUT_IN_PROGRESS) {
-      return fail(400, { amount, payoutInProgress: true });
-    }
-
-    const redisConnection = locals.redisConnection as IORedis;
-    const payoutQueue = new Queue(EntityType.PAYOUT, {
-      connection: redisConnection
-    }) as PayoutQueueType;
-
-    payoutQueue.add(PayoutJobType.CREATE_PAYOUT, {
-      walletId,
-      amount: +amount,
-      destination,
-      payoutReason: PayoutReason.CREATOR_PAYOUT
-    });
-
-    payoutQueue.close();
-
-    return {
-      success: true
-    };
+    return message(form, 'Payout requested successfully');
   },
   leave_show: async ({ locals }) => {
     const redisConnection = locals.redisConnection as IORedis;
@@ -436,7 +447,22 @@ export const load: PageServerLoad = async ({ locals }) => {
 
   roomForm;
 
+  const createShowForm = await superValidate(createShowSchema);
+  const requestPayoutForm = await superValidate(
+    {
+      amount: 0,
+      destination:
+        user?.toJSON({ flattenMaps: true, flattenObjectIds: true }).address ||
+        '',
+      walletId: wallet._id.toString()
+    },
+    requestPayoutSchema,
+    { errors: false }
+  );
+
   return {
+    requestPayoutForm,
+    createShowForm,
     creator: creator.toJSON({ flattenMaps: true, flattenObjectIds: true }),
     user: user?.toJSON({ flattenMaps: true, flattenObjectIds: true }),
     show: show
