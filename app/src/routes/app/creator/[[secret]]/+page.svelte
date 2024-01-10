@@ -291,7 +291,7 @@
         </div>
 
         {#if canCancelShow}
-          <div class="lg:pb-4">
+          <div class="lg:pb-4 ">
             <CancelShow {onShowCancelled} bind:isLoading />
           </div>
         {/if}
