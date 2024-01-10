@@ -14,8 +14,8 @@
   );
 </script>
 
-<div class="w-screen bg-base flex flex-col gap-8 p-6 text-center items-center">
-  <div class="font-bold text-5xl w-full">You have been signed out</div>
+<div class="bg-surface-900/95  flex flex-col gap-8 p-6 text-center items-center rounded">
+  <div class="font-semibold text-3xl w-full">You have been signed out</div>
 
   {#if returnPath !== undefined}
     <NeonBlur>

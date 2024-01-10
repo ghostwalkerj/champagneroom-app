@@ -13,3 +13,78 @@
 .tab {
   @apply !font-SpaceGrotesk;
 }
+
+html,
+body {
+  @apply min-h-screen !bg-surface-900;
+}
+body {
+  background-image: radial-gradient(
+      at 50% 40%,
+      rgba(var(--color-secondary-900) / 0.33) 0px,
+      transparent 50%
+    ),
+    radial-gradient(
+      at 50% 60%,
+      rgba(var(--color-primary-500) / 0.33) 0px,
+      transparent 50%
+    );
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center; /* Centra la imagen en ambas direcciones */
+}
+
+.bg-custom {
+  background: rgba(var(--color-surface-800) / 0.97);
+  background-image: radial-gradient(
+      at 50% 40%,
+      rgba(var(--color-secondary-900) / 0.33) 0px,
+      transparent 50%
+    ),
+    radial-gradient(
+      at 50% 60%,
+      rgba(var(--color-primary-900) / 0.33) 0px,
+      transparent 50%
+    );
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center; /* Centra la imagen en ambas direcciones */
+}
+
+.neon-secondary {
+  /*   text-shadow: 0 0 5px #f562ff, 0 0 15px #f562ff, 0 0 25px #f562ff,
+    0 0 20px #f562ff, 0 0 30px #890092, 0 0 80px #890092, 0 0 80px #890092;
+  color: #fccaff; */
+  text-shadow: 0 0 5px rgb(var(--color-secondary-900)),
+    0 0 15px rgb(var(--color-secondary-800)),
+    0 0 20px rgb(var(--color-secondary-600)),
+    0 0 40px rgb(var(--color-secondary-700)),
+    0 0 60px rgb(var(--color-secondary-500)),
+    0 0 10px rgb(var(--color-secondary-500)),
+    0 0 98px rgb(var(--color-secondary-500));
+  color: rgb(var(--color-secondary-500));
+  text-align: center;
+  animation: blink 12s infinite;
+  -webkit-animation: blink 12s infinite;
+}
+
+.neon-primary {
+  /*   text-shadow: 0 0 5px #f562ff, 0 0 15px #f562ff, 0 0 25px #f562ff,
+    0 0 20px #f562ff, 0 0 30px #890092, 0 0 80px #890092, 0 0 80px #890092;
+  color: #fccaff; */
+  text-shadow: 0 0 5px rgb(var(--color-primary-900)),
+    0 0 15px rgb(var(--color-primary-800)),
+    0 0 20px rgb(var(--color-primary-600)),
+    0 0 40px rgb(var(--color-primary-700)),
+    0 0 60px rgb(var(--color-primary-500)),
+    0 0 10px rgb(var(--color-primary-500)),
+    0 0 98px rgb(var(--color-primary-500));
+  color: rgb(var(--color-primary-500));
+  text-align: center;
+  animation: blink 12s infinite;
+  -webkit-animation: blink 12s infinite;
+}
