@@ -22,6 +22,7 @@ import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
 import type { CancelType } from '$lib/models/common';
 import { Creator, type CreatorDocument } from '$lib/models/creator';
+import type { RoomDocumentType } from '$lib/models/room';
 import type { ShowDocument } from '$lib/models/show';
 import { Show } from '$lib/models/show';
 import type { ShowEventDocument } from '$lib/models/showEvent';
@@ -322,43 +323,27 @@ export const actions: Actions = {
     }
 
     Room.init();
-
-    try {
-      if (isUpdate) {
-        const room = (await Room.findOneAndUpdate(
-          { _id: form.data._id },
-          form.data,
-          { new: true }
-        )) as RoomDocument;
-        if (!room) {
-          throw error(404, 'Room not found');
-        }
-        return {
-          form,
-          room: room.toJSON({ flattenMaps: true, flattenObjectIds: true })
-        };
-      } else {
-        const room = (await Room.create({
-          ...form.data,
-          _id: new ObjectId()
-        })) as RoomDocument;
-        Creator.updateOne(
-          { _id: creator._id },
-          {
-            $set: {
-              room: room._id
-            }
-          }
-        ).exec();
-        return {
-          form,
-          room: room.toJSON({ flattenMaps: true, flattenObjectIds: true })
-        };
+    if (isUpdate) {
+      const room = (await Room.findOneAndUpdate(
+        { _id: form.data._id },
+        form.data,
+        { new: true }
+      )) as RoomDocument;
+      if (!room) {
+        throw error(404, 'Room not found');
       }
-    } catch (error_) {
-      console.error(error_);
-      throw error(500, 'Error upserting room');
+    } else {
+      const room = (await Room.create(form.data)) as RoomDocument;
+      Creator.updateOne(
+        { _id: creator._id },
+        {
+          $set: {
+            room: room._id
+          }
+        }
+      ).exec();
     }
+    return { form };
   }
 };
 export const load: PageServerLoad = async ({ locals }) => {
@@ -474,6 +459,8 @@ export const load: PageServerLoad = async ({ locals }) => {
     : ((await superValidate(roomZodSchema)) as SuperValidated<
         typeof roomZodSchema
       >);
+
+  roomForm;
 
   return {
     requestPayoutForm,
