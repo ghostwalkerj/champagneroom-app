@@ -26,13 +26,20 @@ const roomZodMongooseSchema = toZodMongooseSchema(
   {
     schemaOptions: {
       collection: 'rooms'
+    },
+    typeOptions: {
+      uniqueUrl: {
+        index: true,
+        unique: true
+      },
+      active: {
+        index: true
+      }
     }
   }
 );
 
 const roomMongooseSchema = toMongooseSchema(roomZodMongooseSchema);
-roomMongooseSchema.index({ uniqueUrl: 1 }, { unique: true });
-roomMongooseSchema.index({ active: 1 });
 // Define the Mongoose model for 'Room'
 export type RoomDocument = InstanceType<typeof Room>;
 
@@ -42,5 +49,7 @@ type RoomDocumentType = z.infer<typeof roomZodMongooseSchema>;
 export const Room = models?.Room
   ? (models?.Room as Model<RoomDocumentType>)
   : mongoose.model<RoomDocumentType>('Room', roomMongooseSchema);
+
+export { roomZodMongooseSchema };
 
 export { roomZodSchema } from '$lib/models/room';
