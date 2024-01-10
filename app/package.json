@@ -103,6 +103,9 @@
     "@bull-board/express": "^5.9.1",
     "@fontsource/roboto": "^5.0.5",
     "@fontsource/space-grotesk": "^5.0.5",
+    "@ipld/car": "^5.2.6",
+    "@ucanto/core": "^9.0.1",
+    "@ucanto/principal": "^9.0.0",
     "@unpic/svelte": "^0.0.42",
     "@web3-onboard/coinbase": "^2.2.5",
     "@web3-onboard/core": "^2.21.0",
@@ -111,6 +114,7 @@
     "@web3-onboard/ledger": "^2.5.2",
     "@web3-onboard/trezor": "^2.4.2",
     "@web3-onboard/walletconnect": "^2.4.5",
+    "@web3-storage/w3up-client": "^12.0.0",
     "@xstate/svelte": "^2.0.1",
     "async": "^3.2.4",
     "await-to-js": "^3.0.0",
@@ -156,7 +160,6 @@
     "url-join": "^5.0.0",
     "validator": "^13.9.0",
     "web3": "^4.1.2",
-    "web3.storage": "^4.5.4",
     "xstate": "^4.38.3"
   },
   "packageManager": "yarn@1.22.19"
