@@ -2,15 +2,15 @@ import { nanoid } from 'nanoid';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 
 import {
-  type EarningsType,
   earningsZodSchema,
+  type EarningsType,
   type PayoutType
 } from '$lib/models/common';
 import type { CreatorDocument } from '$lib/models/creator';
 import type { ShowDocument } from '$lib/models/show';
 import type { TransactionDocument } from '$lib/models/transaction';
 import type { WalletDocumentType } from '$lib/models/wallet';
-import { type WalletDocument, WalletStatus } from '$lib/models/wallet';
+import { WalletStatus, type WalletDocument } from '$lib/models/wallet';
 
 import { EarningsSource } from '$lib/constants.js';
 import { PayoutStatus } from '$lib/payment';

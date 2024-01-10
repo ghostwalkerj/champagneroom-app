@@ -8,18 +8,18 @@ import { raise } from 'xstate/lib/actions';
 
 import type { FeedbackType, TransactionSummaryType } from '$lib/models/common';
 import {
-  type CancelType,
-  type DisputeType,
   disputeZodSchema,
   escrowZodSchema,
-  type FinalizeType,
   finalizeZodSchema,
   redemptionZodSchema,
-  type RefundType,
   refundZodSchema,
-  type SaleType,
   ticketSaleZodSchema,
-  transactionSummaryZodSchema
+  transactionSummaryZodSchema,
+  type CancelType,
+  type DisputeType,
+  type FinalizeType,
+  type RefundType,
+  type SaleType
 } from '$lib/models/common';
 import type { TicketDocument, TicketStateType } from '$lib/models/ticket';
 import type { TransactionDocument } from '$lib/models/transaction';
