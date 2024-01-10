@@ -1,11 +1,11 @@
 import type { Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
-import { z } from 'mongoose-zod';
 import {
   genTimestampsSchema,
   mongooseZodCustomType,
   toMongooseSchema,
-  toZodMongooseSchema
+  toZodMongooseSchema,
+  z
 } from 'mongoose-zod';
 
 import { roomZodSchema } from '$lib/models/room';
