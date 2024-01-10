@@ -69,6 +69,7 @@
   let showMachineService: ShowMachineServiceType;
   let showMachineServiceUnSub: Subscription;
   const destination = user.payoutAddress;
+  const modalStore = getModalStore();
 
   const noCurrentShow = () => {
     showUnSub?.();
@@ -291,7 +292,7 @@
         </div>
 
         {#if canCancelShow}
-          <div class="lg:pb-4 ">
+          <div class="lg:pb-4">
             <CancelShow {onShowCancelled} bind:isLoading />
           </div>
         {/if}
