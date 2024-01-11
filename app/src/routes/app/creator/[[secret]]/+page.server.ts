@@ -13,13 +13,14 @@ import {
   BITCART_PASSWORD,
   JITSI_APP_ID,
   JITSI_JWT_SECRET,
-  JWT_EXPIRY
+  JWT_EXPIRY,
+  WEB3STORAGE_KEY,
+  WEB3STORAGE_PROOF
 } from '$env/static/private';
 import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
 import type { CancelType } from '$lib/models/common';
 import { Creator, type CreatorDocument } from '$lib/models/creator';
-import type { RoomDocumentType } from '$lib/models/room';
 import type { ShowDocument } from '$lib/models/show';
 import { Show } from '$lib/models/show';
 import type { ShowEventDocument } from '$lib/models/showEvent';
@@ -294,7 +295,7 @@ export const actions: Actions = {
 
     const form = await superValidate(formData, roomZodSchema);
 
-    const isUpdate = !!form.data._id;
+    const isUpdate = !form.data._id;
     // Convenient validation check:
     if (!form.valid) {
       // Again, return { form } and things will just work.
@@ -305,9 +306,8 @@ export const actions: Actions = {
 
     if (image instanceof File) {
       // upload image to web3
-      const url = await web3Upload(image);
+      const url = await web3Upload(WEB3STORAGE_KEY, WEB3STORAGE_PROOF, image);
       form.data.coverImageUrl = url;
-      console.log('url', url);
     }
 
     Room.init();
@@ -320,8 +320,15 @@ export const actions: Actions = {
       if (!room) {
         throw error(404, 'Room not found');
       }
+      return {
+        form,
+        room: room.toJSON({ flattenMaps: true, flattenObjectIds: true })
+      };
     } else {
-      const room = (await Room.create(form.data)) as RoomDocument;
+      const room = (await Room.create({
+        ...form.data,
+        _id: new ObjectId()
+      })) as RoomDocument;
       Creator.updateOne(
         { _id: creator._id },
         {
@@ -330,8 +337,11 @@ export const actions: Actions = {
           }
         }
       ).exec();
+      return {
+        form,
+        room: room.toJSON({ flattenMaps: true, flattenObjectIds: true })
+      };
     }
-    return { form };
   }
 };
 export const load: PageServerLoad = async ({ locals }) => {
