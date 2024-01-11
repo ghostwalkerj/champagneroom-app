@@ -24,6 +24,7 @@
       invalidateAll: true,
       onResult(event) {
         if (event.result.type === 'success') {
+          console.log(event.result.data);
           modalStore.close();
         }
       }
