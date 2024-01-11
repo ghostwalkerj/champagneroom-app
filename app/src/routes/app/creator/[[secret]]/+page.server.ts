@@ -307,7 +307,7 @@ export const actions: Actions = {
 
     const form = await superValidate(formData, roomZodSchema);
 
-    const isUpdate = !!form.data._id;
+    const isUpdate = !form.data._id;
     // Convenient validation check:
     if (!form.valid) {
       // Again, return { form } and things will just work.

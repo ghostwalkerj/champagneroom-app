@@ -17,11 +17,13 @@
     title: 'Update Room',
     meta: {
       action: '?/upsert_room',
-      form: roomForm
+      form: roomForm,
+      room
     }
   };
 
-  const roomUrl = urlJoin($page.url.origin, Config.PATH.room, room.uniqueUrl);
+  const roomUrl =
+    room && urlJoin($page.url.origin, Config.PATH.room, room.uniqueUrl);
 </script>
 
 <div class="card px-6 pb-6 bg-primary rounded-xl text-center">
