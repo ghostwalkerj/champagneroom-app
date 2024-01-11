@@ -19,11 +19,9 @@
   };
 </script>
 
-<div>
-  <div class="lg:col-start-3 lg:col-span-1">
-    <div class="bg-primary text-primary-content daisy-card">
-      <div class="text-center daisy-card-body items-center p-3">
-        <h2 class="text-xl daisy-card-title">{creator.user.name}</h2>
+
+    <div class="bg-custom rounded flex flex-col justify-center text-center items-center">
+
         <div>
           <ProfilePhoto
             profileImage={creator.user.profileImageUrl ||
@@ -33,13 +31,11 @@
             }}
           />
         </div>
-        <div
-          class="daisy-tooltip"
-          data-tip={creator.feedbackStats.averageRating.toFixed(2)}
-        >
-          <StarRating rating={creator.feedbackStats.averageRating} />
+
+        <div class="flex gap-1 mt-2">
+          <StarRating rating={creator.feedbackStats.averageRating} /> ({creator.feedbackStats.averageRating.toFixed(2)})
+        
         </div>
-      </div>
+
     </div>
-  </div>
-</div>
+

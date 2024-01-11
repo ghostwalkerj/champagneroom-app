@@ -48,8 +48,8 @@
   });
 </script>
 
-<div class="bg-surface-900 flex flex-col min-h-screen min-w-[320px]">
-  <nav class="flex justify-between items-center px-4">
+<div class=" flex flex-col min-h-screen min-w-[320px]">
+  <nav class="flex justify-between items-center px-4  shadow-surface-900 shadow-lg">
     <a class="display-inline" href="/">
       <img
         src="{Config.PATH.staticUrl}/assets/logo-horizontal-tr.png"
@@ -98,4 +98,9 @@
     <p>Build Number: {buildNumber} |</p>
     <p>Build Time: {buildTime}</p>
   </footer>
+</div>
+
+<div class="fixed h-screen flex flex-col text-3xl lg:text-7xl font-semibold justify-center items-center -z-10 top-0 w-full">
+  <h2 class="text-secondary neon-secondary">CHAMPAGNE</h2> 
+  <h2 class="text-primary neon-primary">R  O  O  M</h2>
 </div>

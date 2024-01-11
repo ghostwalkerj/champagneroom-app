@@ -33,6 +33,11 @@
   import type { ActionData, PageData } from './$types';
   import CreatorDetail from './CreatorDetail.svelte';
   import VideoMeeting from './VideoMeeting.svelte';
+  import { getModalStore } from '@skeletonlabs/skeleton';
+  import type { ModalSettings } from '@skeletonlabs/skeleton';
+
+  const modalStore = getModalStore();
+
   export let data: PageData;
   export let form: ActionData;
 
@@ -188,6 +193,30 @@
   const onShowEnded = () => {
     noCurrentShow();
   };
+
+ // --------- Modal for Restarting or Ending Show
+ const endShowModal: ModalSettings = {
+    type: 'component',
+    component: 'EndShowForm',
+    meta: {
+      isLoading,
+      canStartShow
+    },
+    response: (r: boolean | undefined) => {
+      console.log('response', r);
+      if (r) {
+        onShowEnded();
+      } else {
+        startShow();
+      }
+    } 
+};
+// Show Modal if showStopped is true
+$: if (showStopped) {
+    modalStore.trigger(endShowModal);
+}
+// --------- End Modal for Restarting or Ending Show
+
 </script>
 
 {#if showVideo && currentShow && jitsiToken}
@@ -204,7 +233,8 @@
     <!-- Page header -->
 
     <!-- Modal for Restarting or Ending Show -->
-    {#if showStopped}
+    <!-- This is no longer in use -->
+    <!-- {#if !showStopped}
       {#key currentShow && currentShow._id && canStartShow}
         <EndShow
           {onShowEnded}
@@ -213,7 +243,7 @@
           {canStartShow}
         />
       {/key}
-    {/if}
+    {/if} -->
 
     <div
       class="p-4 flex flex-col gap-3 min-w-full md:min-w-min max-w-7xl md:grid md:grid-cols-4"
@@ -232,12 +262,13 @@
         {/key}
 
         {#if canCreateShow}
-          <CreateShow bind:isLoading {creator} {onShowCreated} {form} />
+          <CreateShow bind:isLoading {creator} {onShowCreated} {form} createShowForm={data.createShowForm}/>
         {/if}
         <div>
           {#if currentShow}
             {#key currentShow.showState}
-              <ShowDetail
+              <div class="">
+                <ShowDetail
                 show={currentShow}
                 options={{
                   showCopy: true,
@@ -246,26 +277,27 @@
                   showWaterMark: false
                 }}
               />
+              </div>
             {/key}
           {/if}
         </div>
 
         {#if canCancelShow}
-          <div class="lg:pb-4">
+          <div class="lg:pb-4 ">
             <CancelShow {onShowCancelled} bind:isLoading />
           </div>
         {/if}
       </div>
 
       <!--Next Column-->
-      <div class="space-y-3 -mt-3 lg:mt-0 md:col-start-4 md:col-span-1">
+      <div class="space-y-3  md:col-start-4 md:col-span-1">
         <!-- Photo -->
         <CreatorDetail bind:creator />
 
         <!-- Wallet -->
         <div>
           {#key wallet}
-            <WalletDetail {wallet} {exchangeRate} {form} {destination} />
+            <WalletDetail {wallet} {exchangeRate} {form} {destination} whitdrawForm={data.requestPayoutForm} />
           {/key}
         </div>
 
