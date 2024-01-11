@@ -275,7 +275,7 @@
 
         <!-- Room -->
         {#key room}
-          <RoomDetail bind:room {roomForm} />
+          <RoomDetail {room} {roomForm} />
         {/key}
 
         <!-- Activity Feed -->
