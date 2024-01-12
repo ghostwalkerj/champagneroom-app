@@ -10,9 +10,16 @@
   import '@fontsource/roboto/700.css';
   import '@fontsource/space-grotesk';
   import type { ModalComponent } from '@skeletonlabs/skeleton';
-  import { Modal, initializeStores } from '@skeletonlabs/skeleton';
+  import { Modal, initializeStores, storePopup } from '@skeletonlabs/skeleton';
   import '../app.css';
-
+  import {
+    computePosition,
+    autoUpdate,
+    offset,
+    shift,
+    flip,
+    arrow
+  } from '@floating-ui/dom';
   initializeStores();
   const modalRegistry: Record<string, ModalComponent> = {
     // Set a unique modal ID, then pass the component reference
@@ -24,6 +31,8 @@
 
     // ...
   };
+
+  storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
 </script>
 
 <Modal components={modalRegistry} regionBackdrop="bg-black/50" />
