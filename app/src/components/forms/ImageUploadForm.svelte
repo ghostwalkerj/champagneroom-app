@@ -102,7 +102,7 @@
   {#if !update}
     <div class="justify-center daisy-card-actions last:my-2">
       <button
-        class="btn variant-soft-secondary neon-secondary"
+        class="btn variant-soft-secondary btn-sm neon-secondary"
         on:click={() => {
           setUpdate(true);
         }}
@@ -119,20 +119,19 @@
           on:filedrop={onChange}
         >
           <input type="file" class="hidden" />
-          <button class="btn btn-sm variant-soft-primary neon-primary">Select Image</button>
+          <button class="btn btn-sm variant-soft-primary neon-primary"
+            >Select Image</button
+          >
         </label>
       {:else}
         <button
-        class="btn btn-sm variant-soft-primary neon-primary"
+          class="btn btn-sm variant-soft-primary neon-primary"
           on:click={() => upload()}
         >
           Upload
         </button>
       {/if}
-      <button
-      class="btn btn-sm variant-soft-error"
-        on:click={resetForm}
-      >
+      <button class="btn btn-sm variant-soft-error" on:click={resetForm}>
         Cancel
       </button>
     </div>
