@@ -3,13 +3,15 @@
   import Config from '$lib/config';
   import type { RoomDocumentType, roomZodSchema } from '$lib/models/room';
   import {
-    Avatar,
     getModalStore,
-    type ModalSettings
+    popup,
+    type ModalSettings,
+    type PopupSettings
   } from '@skeletonlabs/skeleton';
   import type { SuperValidated } from 'sveltekit-superforms';
   import urlJoin from 'url-join';
   import Icon from '@iconify/svelte';
+  import { copy, type CopyDetail } from '@svelte-put/copy';
 
   export let room: RoomDocumentType;
   export let roomForm: SuperValidated<typeof roomZodSchema>;
@@ -26,6 +28,21 @@
       room
     }
   };
+
+  const popupHover: PopupSettings = {
+    event: 'hover',
+    target: 'popupHover',
+    placement: 'top'
+  };
+
+  let copied = '';
+  function handleCopied(e: CustomEvent<CopyDetail>) {
+    copied = e.detail.text;
+    navigator.clipboard.writeText(copied);
+    setTimeout(() => {
+      copied = '';
+    }, 2000);
+  }
 
   const roomUrl =
     room && urlJoin($page.url.origin, Config.PATH.room, room.uniqueUrl);
@@ -55,12 +72,20 @@
         />
       </div>
       <div>
-        URL: <a
-          class="anchor text-primary-content font-semibold"
-          href={roomUrl}
-        >
-          {room.uniqueUrl}</a
-        >
+        URL:
+        {#if copied}
+          <span class="text-success">Copied!</span>
+        {:else}
+          <button
+            class="anchor text-primary-content font-semibold"
+            use:copy={{ text: roomUrl }}
+            use:popup={popupHover}
+            on:copied={handleCopied}
+            on:click|preventDefault
+          >
+            {room.uniqueUrl}</button
+          >
+        {/if}
       </div>
     </div>
     <button
@@ -76,4 +101,10 @@
       on:click={() => modalStore.trigger(roomModal)}>Create My Room</button
     >
   {/if}
+</div>
+<div
+  class="neon-primary p-4 rounded bg-custom border-2 border-primary-content"
+  data-popup="popupHover"
+>
+  {roomUrl}
 </div>
