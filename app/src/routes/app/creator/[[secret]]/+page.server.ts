@@ -128,7 +128,6 @@ export const actions: Actions = {
         numberOfReviews: creator.feedbackStats.numberOfReviews
       }
     });
-
     show.save();
 
     return {
@@ -222,7 +221,7 @@ export const actions: Actions = {
     }
 
     try {
-      const wallet = await Wallet.findOne({ _id: walletId }).orFail();
+      const wallet = await Wallet.findOne({ _id: walletId });
 
       if (!wallet) {
         setError(form, 'walletId', 'Wallet not found');
@@ -316,7 +315,7 @@ export const actions: Actions = {
     const image =
       formData.get('images') && (formData.get('images') as unknown as [File]);
 
-    if (image instanceof File && image.size > 0) {
+    if (image instanceof File) {
       // upload image to web3
       const url = await web3Upload(WEB3STORAGE_KEY, WEB3STORAGE_PROOF, image);
       form.data.coverImageUrl = url;
@@ -326,10 +325,18 @@ export const actions: Actions = {
 
     try {
       if (isUpdate) {
-        Room.updateOne(
-          { _id: new ObjectId(form.data._id as string) },
-          form.data
-        ).exec();
+        const room = (await Room.findOneAndUpdate(
+          { _id: form.data._id },
+          form.data,
+          { new: true }
+        )) as RoomDocument;
+        if (!room) {
+          throw error(404, 'Room not found');
+        }
+        return {
+          form,
+          room: room.toJSON({ flattenMaps: true, flattenObjectIds: true })
+        };
       } else {
         const room = (await Room.create({
           ...form.data,
@@ -344,7 +351,8 @@ export const actions: Actions = {
           }
         ).exec();
         return {
-          form
+          form,
+          room: room.toJSON({ flattenMaps: true, flattenObjectIds: true })
         };
       }
     } catch (error_) {
@@ -361,7 +369,6 @@ export const load: PageServerLoad = async ({ locals }) => {
   }
 
   const show = locals.show as ShowDocument;
-  const room = locals.room as RoomDocument;
   let showEvent: ShowEventDocument | undefined;
 
   if (show) {
@@ -382,6 +389,11 @@ export const load: PageServerLoad = async ({ locals }) => {
     .exec()) as ShowDocument[];
 
   const wallet = locals.wallet as WalletDocument;
+
+  // Grab creators room if it exists
+  const room = (
+    creator.room ? await Room.findOne({ _id: creator.room }) : undefined
+  ) as RoomDocument | undefined;
 
   // return the rate of exchange for UI from bitcart
   const token = await createBitcartToken(
@@ -428,7 +440,13 @@ export const load: PageServerLoad = async ({ locals }) => {
     )) as AxiosResponse<string>) || undefined;
 
   const roomForm = room
-    ? await superValidate(room, roomZodSchema)
+    ? await superValidate(
+        room.toJSON({
+          flattenMaps: true,
+          flattenObjectIds: true
+        }),
+        roomZodSchema
+      )
     : ((await superValidate(roomZodSchema)) as SuperValidated<
         typeof roomZodSchema
       >);
@@ -449,7 +467,6 @@ export const load: PageServerLoad = async ({ locals }) => {
   return {
     requestPayoutForm,
     createShowForm,
-    roomForm,
     creator: creator.toJSON({ flattenMaps: true, flattenObjectIds: true }),
     user: user?.toJSON({ flattenMaps: true, flattenObjectIds: true }),
     show: show
@@ -466,6 +483,10 @@ export const load: PageServerLoad = async ({ locals }) => {
     ),
     wallet: wallet.toJSON({ flattenMaps: true, flattenObjectIds: true }),
     exchangeRate: exchangeRate?.data,
-    jitsiToken
+    jitsiToken,
+    room: room
+      ? room.toJSON({ flattenMaps: true, flattenObjectIds: true })
+      : undefined,
+    roomForm
   };
 };
