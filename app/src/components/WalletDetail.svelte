@@ -17,7 +17,7 @@
   export let withdrawForm: any;
 
   $: hasTransactions =
-    wallet && wallet.earnings.length + wallet.payouts.length > 0;
+    wallet && wallet.earnings.length && wallet.payouts.length > 0;
   $: hasAvailableBalance = wallet && wallet.availableBalance > 0;
 
   $: earnings = wallet?.earnings;

@@ -24,7 +24,6 @@
   import CancelShow from './CancelShow.svelte';
   import CreateShow from './CreateShow.svelte';
   import CreatorActivity from './CreatorActivity.svelte';
-  import EndShow from './EndShow.svelte';
   import ShowStatus from './ShowStatus.svelte';
 
   import { page } from '$app/stores';

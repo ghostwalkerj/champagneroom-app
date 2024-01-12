@@ -2,9 +2,14 @@
   import { page } from '$app/stores';
   import Config from '$lib/config';
   import type { RoomDocumentType, roomZodSchema } from '$lib/models/room';
-  import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
+  import {
+    Avatar,
+    getModalStore,
+    type ModalSettings
+  } from '@skeletonlabs/skeleton';
   import type { SuperValidated } from 'sveltekit-superforms';
   import urlJoin from 'url-join';
+  import Icon from '@iconify/svelte';
 
   export let room: RoomDocumentType;
   export let roomForm: SuperValidated<typeof roomZodSchema>;
@@ -26,32 +31,48 @@
     room && urlJoin($page.url.origin, Config.PATH.room, room.uniqueUrl);
 </script>
 
-<div class="card px-6 pb-6 bg-primary rounded-xl text-center">
-  <header class="card-header text-primary-content font-bold text-2xl p-3">
-    My Room
-  </header>
+<div
+  class="bg-custom p-4 rounded flex flex-col gap-4 justify-center items-center"
+>
+  <div class="flex flex-col gap-0 items-center text-center">
+    <h2 class="text-xl font-semibold flex gap-2 items-center">
+      <Icon class="text-secondary" icon="icon-park-outline:door-handle" />
+      Room
+    </h2>
+  </div>
 
   {#if room}
-    <div class="flex flex-col">
+    <div class="flex flex-col text-base text-center items-center">
       <div>
-        {room.name}
+        Name: <span class="font-semibold">{room.name}</span>
+      </div>
+      <div class="text-sm">"{room.tagLine}""</div>
+      <div class="overflow-hidden m-4 max-w-fit">
+        <!-- svelte-ignore a11y-missing-attribute -->
+        <img
+          src={room.coverImageUrl}
+          class="rounded-container-token max-w-full"
+        />
       </div>
       <div>
-        <a class="anchor text-primary-content font-semibold" href={roomUrl}>
+        URL: <a
+          class="anchor text-primary-content font-semibold"
+          href={roomUrl}
+        >
           {room.uniqueUrl}</a
         >
       </div>
     </div>
     <button
       type="button"
-      class="btn variant-filled-secondary mt-4"
+      class="btn variant-soft-secondary btn-sm neon-secondary"
       on:click={() => modalStore.trigger(roomModal)}>Edit My Room</button
     >
   {:else}
     <div class="text-info">No room found</div>
     <button
       type="button"
-      class="btn variant-filled-secondary mt-4"
+      class="btn variant-soft-secondary btn-sm neon-secondary"
       on:click={() => modalStore.trigger(roomModal)}>Create My Room</button
     >
   {/if}

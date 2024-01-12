@@ -322,36 +322,42 @@ export const actions: Actions = {
     }
 
     Room.init();
-    if (isUpdate) {
-      const room = (await Room.findOneAndUpdate(
-        { _id: form.data._id },
-        form.data,
-        { new: true }
-      )) as RoomDocument;
-      if (!room) {
-        throw error(404, 'Room not found');
-      }
-      return {
-        form,
-        room: room.toJSON({ flattenMaps: true, flattenObjectIds: true })
-      };
-    } else {
-      const room = (await Room.create({
-        ...form.data,
-        _id: new ObjectId()
-      })) as RoomDocument;
-      Creator.updateOne(
-        { _id: creator._id },
-        {
-          $set: {
-            room: room._id
-          }
+
+    try {
+      if (isUpdate) {
+        const room = (await Room.findOneAndUpdate(
+          { _id: form.data._id },
+          form.data,
+          { new: true }
+        )) as RoomDocument;
+        if (!room) {
+          throw error(404, 'Room not found');
         }
-      ).exec();
-      return {
-        form,
-        room: room.toJSON({ flattenMaps: true, flattenObjectIds: true })
-      };
+        return {
+          form,
+          room: room.toJSON({ flattenMaps: true, flattenObjectIds: true })
+        };
+      } else {
+        const room = (await Room.create({
+          ...form.data,
+          _id: new ObjectId()
+        })) as RoomDocument;
+        Creator.updateOne(
+          { _id: creator._id },
+          {
+            $set: {
+              room: room._id
+            }
+          }
+        ).exec();
+        return {
+          form,
+          room: room.toJSON({ flattenMaps: true, flattenObjectIds: true })
+        };
+      }
+    } catch (error_) {
+      console.error(error_);
+      throw error(500, 'Error upserting room');
     }
   }
 };
@@ -444,8 +450,6 @@ export const load: PageServerLoad = async ({ locals }) => {
     : ((await superValidate(roomZodSchema)) as SuperValidated<
         typeof roomZodSchema
       >);
-
-  roomForm;
 
   const createShowForm = await superValidate(createShowSchema);
   const requestPayoutForm = await superValidate(
