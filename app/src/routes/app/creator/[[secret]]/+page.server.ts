@@ -323,27 +323,43 @@ export const actions: Actions = {
     }
 
     Room.init();
-    if (isUpdate) {
-      const room = (await Room.findOneAndUpdate(
-        { _id: form.data._id },
-        form.data,
-        { new: true }
-      )) as RoomDocument;
-      if (!room) {
-        throw error(404, 'Room not found');
-      }
-    } else {
-      const room = (await Room.create(form.data)) as RoomDocument;
-      Creator.updateOne(
-        { _id: creator._id },
-        {
-          $set: {
-            room: room._id
-          }
+
+    try {
+      if (isUpdate) {
+        const room = (await Room.findOneAndUpdate(
+          { _id: form.data._id },
+          form.data,
+          { new: true }
+        )) as RoomDocument;
+        if (!room) {
+          throw error(404, 'Room not found');
         }
-      ).exec();
+        return {
+          form,
+          room: room.toJSON({ flattenMaps: true, flattenObjectIds: true })
+        };
+      } else {
+        const room = (await Room.create({
+          ...form.data,
+          _id: new ObjectId()
+        })) as RoomDocument;
+        Creator.updateOne(
+          { _id: creator._id },
+          {
+            $set: {
+              room: room._id
+            }
+          }
+        ).exec();
+        return {
+          form,
+          room: room.toJSON({ flattenMaps: true, flattenObjectIds: true })
+        };
+      }
+    } catch (error_) {
+      console.error(error_);
+      throw error(500, 'Error upserting room');
     }
-    return { form };
   }
 };
 export const load: PageServerLoad = async ({ locals }) => {
@@ -448,17 +464,6 @@ export const load: PageServerLoad = async ({ locals }) => {
     requestPayoutSchema,
     { errors: false }
   );
-  const roomForm = room
-    ? await superValidate(
-        room.toJSON({
-          flattenMaps: true,
-          flattenObjectIds: true
-        }),
-        roomZodSchema
-      )
-    : ((await superValidate(roomZodSchema)) as SuperValidated<
-        typeof roomZodSchema
-      >);
 
   return {
     requestPayoutForm,
