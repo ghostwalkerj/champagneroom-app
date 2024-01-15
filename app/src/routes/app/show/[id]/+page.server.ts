@@ -36,9 +36,9 @@ import {
 import { authEncrypt } from '$lib/crypt';
 import { mensNames } from '$lib/mensNames';
 import {
+  createBitcartToken,
   InvoiceJobType,
-  InvoiceStatus,
-  createBitcartToken
+  InvoiceStatus
 } from '$lib/payment';
 import { createAuthToken, setAuthToken } from '$lib/server/auth';
 import {

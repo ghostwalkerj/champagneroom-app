@@ -2,19 +2,19 @@
   import { page } from '$app/stores';
   import Config from '$lib/config';
   import type { RoomDocumentType, roomZodSchema } from '$lib/models/room';
+  import Icon from '@iconify/svelte';
   import {
     getModalStore,
     popup,
     type ModalSettings,
     type PopupSettings
   } from '@skeletonlabs/skeleton';
+  import { copy, type CopyDetail } from '@svelte-put/copy';
   import type { SuperValidated } from 'sveltekit-superforms';
   import urlJoin from 'url-join';
-  import Icon from '@iconify/svelte';
-  import { copy, type CopyDetail } from '@svelte-put/copy';
 
-  export let room: RoomDocumentType;
   export let roomForm: SuperValidated<typeof roomZodSchema>;
+  $: room = roomForm.data as RoomDocumentType;
 
   const modalStore = getModalStore();
 
@@ -24,8 +24,7 @@
     title: 'Update Room',
     meta: {
       action: '?/upsert_room',
-      form: roomForm,
-      room
+      form: roomForm
     }
   };
 
