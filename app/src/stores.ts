@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import to from 'await-to-js';
-import type { Types } from 'mongoose';
 import { derived, writable } from 'svelte/store';
 import urlJoin from 'url-join';
 
 import type { AgentDocument } from '$lib/models/agent';
 import type { CreatorDocument } from '$lib/models/creator';
+import type { RoomDocumentType } from '$lib/models/room';
 import type { ShowDocument } from '$lib/models/show';
 import type { ShowEventDocument } from '$lib/models/showEvent';
 import type { TicketDocument } from '$lib/models/ticket';
@@ -22,10 +22,11 @@ const enum EntityType {
   SHOWEVENT = 'ShowEvent',
   TICKET = 'Ticket',
   WALLET = 'Wallet',
-  USER = 'User'
+  USER = 'User',
+  ROOM = 'Room'
 }
 
-const abstractUpdateStore = <T extends { _id: Types.ObjectId }>({
+const abstractUpdateStore = <T extends { _id?: any }>({
   doc,
   type
 }: {
@@ -33,6 +34,9 @@ const abstractUpdateStore = <T extends { _id: Types.ObjectId }>({
   type: EntityType;
 }) => {
   const { subscribe, set } = writable<T>(doc, () => {
+    if (!doc._id) {
+      throw new Error('Doc must have an _id');
+    }
     let baseDocument = doc;
     const callback = (document: Partial<T>) => {
       baseDocument = {
@@ -152,6 +156,13 @@ const getInsertNotification = <T>({
   };
   waitFor();
   return abortDocument;
+};
+
+export const RoomStore = (room: RoomDocumentType) => {
+  return abstractUpdateStore<RoomDocumentType>({
+    doc: room,
+    type: EntityType.ROOM
+  });
 };
 
 export const ShowEventStore = (show: ShowDocument) => {

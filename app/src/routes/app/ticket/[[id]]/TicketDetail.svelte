@@ -1,4 +1,3 @@
-
 <script lang="ts">
   import urlJoin from 'url-join';
 

@@ -1,4 +1,4 @@
-ya<script lang="ts">
+<script lang="ts">
   import type { WalletState } from '@web3-onboard/core';
   import { onDestroy, onMount } from 'svelte';
   import { uniqueNamesGenerator } from 'unique-names-generator';
@@ -185,7 +185,7 @@ ya<script lang="ts">
   }
 </script>
 
-<svelte:window bind:innerWidth bind:innerHeight />
+ya<svelte:window bind:innerWidth bind:innerHeight />
 
 <div
   class="flex place-content-center w-full flex-col text-base-100 text-center"

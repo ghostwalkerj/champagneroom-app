@@ -9,7 +9,7 @@
   import { TabGroup, Tab } from '@skeletonlabs/skeleton';
   import { PayoutStatus } from '$lib/payment';
 
-  let parent: SvelteComponent;
+  export let parent: SvelteComponent;
   const modalStore = getModalStore();
 
   let earnings: EarningsType[] = $modalStore[0].meta.earnings;
@@ -48,14 +48,15 @@
     }
   }
 
-payouts = payouts.map((payout) => {
-        return {
-            ...payout,
-            finalAmount: currencyFormatter(payout.payoutCurrency).format(payout.amount),
-            finalEarnedAt: new Date(payout.payoutAt).toLocaleDateString(),
-            finalStatus: `<span class="badge
-            ${
-                getStatusClass(payout.payoutStatus!.toLowerCase())}
+  payouts = payouts.map((payout) => {
+    return {
+      ...payout,
+      finalAmount: currencyFormatter(payout.payoutCurrency).format(
+        payout.amount
+      ),
+      finalEarnedAt: new Date(payout.payoutAt).toLocaleDateString(),
+      finalStatus: `<span class="badge
+            ${getStatusClass(payout.payoutStatus!.toLowerCase())}
             ">${payout.payoutStatus}</span>`
     };
   });

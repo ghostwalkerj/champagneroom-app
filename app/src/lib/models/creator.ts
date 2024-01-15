@@ -31,6 +31,7 @@ const creatorZodSchema = toZodMongooseSchema(
         ref: 'User',
         required: true
       }),
+
       commissionRate: z.number().min(0).max(100).default(0),
       agent: mongooseZodCustomType('ObjectId').optional().mongooseTypeOptions({
         ref: 'Agent'

@@ -31,6 +31,12 @@
       "$ext/*": [
         "./src/lib/ext/*"
       ],
+      "$server": [
+        "./src/lib/server"
+      ],
+      "$server/*": [
+        "./src/lib/server/*"
+      ],
     },
     "types": [
       "vitest/globals",

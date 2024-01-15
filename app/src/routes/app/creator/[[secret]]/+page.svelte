@@ -27,21 +27,24 @@
   import ShowStatus from './ShowStatus.svelte';
 
   import { page } from '$app/stores';
+  import type { roomZodSchema } from '$lib/models/room';
   import type { UserDocument } from '$lib/models/user';
+  import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
+  import type { SuperValidated } from 'sveltekit-superforms';
   import type { Subscription } from 'xstate';
   import type { ActionData, PageData } from './$types';
   import CreatorDetail from './CreatorDetail.svelte';
+  import RoomDetail from './RoomDetail.svelte';
   import VideoMeeting from './VideoMeeting.svelte';
   import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
   import type { RoomDocumentType, roomZodSchema } from '$lib/models/room';
   import type { SuperValidated } from 'sveltekit-superforms';
   import RoomDetail from './RoomDetail.svelte';
 
-
   export let data: PageData;
   export let form: ActionData;
 
-  let creator = data.creator as CreatorDocument;
+  $: creator = data.creator as CreatorDocument;
   let currentShow = data.show as ShowDocument | undefined;
   let currentEvent = data.showEvent as ShowEventDocument | undefined;
   let completedShows = data.completedShows as ShowDocument[];
@@ -315,9 +318,7 @@
         </div>
 
         <!-- Room -->
-        {#key room}
-          <RoomDetail {room} {roomForm} />
-        {/key}
+        <RoomDetail {roomForm} />
 
         <!-- Activity Feed -->
         <div>

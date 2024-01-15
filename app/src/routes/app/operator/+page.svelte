@@ -21,9 +21,9 @@
   import type { TicketDocument } from '$lib/models/ticket';
   import type { UserDocument } from '$lib/models/user';
   import { PermissionType } from '$lib/permissions';
+  import Icon from '@iconify/svelte';
   import type { Types } from 'mongoose';
   import type { PageData } from './$types';
-  import Icon from '@iconify/svelte';
 
   export let data: PageData;
   let operator = data.operator as OperatorDocument;
@@ -445,10 +445,7 @@
                       svelte/valid-compile -->
                       <!-- svelte-ignore a11y-missing-attribute -->
                       <a class="font-SpaceGrotesk">
-                        <Icon
-                          icon="mdi:teleconference"
-                          class="w-6 h-6 mt-2"
-                        />
+                        <Icon icon="mdi:teleconference" class="w-6 h-6 mt-2" />
                         Create Conference</a
                       >
                     </li>
@@ -906,7 +903,7 @@
                         {/if}
                       {/each}
                     </tbody>
-                          <tfoot>
+                    <tfoot>
                       <tr>
                         <th />
                         <th>Creator</th>

@@ -44,6 +44,8 @@ import {
   isWhitelistMatch
 } from '$lib/server/auth';
 
+import { Room } from '$server/models/room';
+
 const authUrl = Config.PATH.auth;
 
 setup({
@@ -111,6 +113,12 @@ const setLocals = async (decode: JwtPayload, locals: App.Locals) => {
             'showState.current': true
           }).exec();
           if (show) locals.show = show;
+
+          // Room can be passed
+          if (creator) {
+            const room = await Room.findById(creator.room).exec();
+            if (room) locals.room = room;
+          }
           break;
         }
 
@@ -190,6 +198,7 @@ const allowedPath = (path: string, locals: App.Locals, selector?: string) => {
     if (locals.agent) allowedIds.push(locals.agent._id.toString());
     if (locals.operator) allowedIds.push(locals.operator._id.toString());
     if (locals.show) allowedIds.push(locals.show._id.toString());
+    if (locals.room) allowedIds.push(locals.room._id.toString());
 
     if (allowedIds.some((id) => path.includes(id))) return true;
   }

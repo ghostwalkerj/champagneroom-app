@@ -10,6 +10,7 @@ import type { UserDocument } from '$lib/models/user';
 import type { WalletDocument } from '$lib/models/wallet';
 
 import type { AuthType } from '$lib/constants';
+import type { RoomDocument } from '$lib/server/models/room';
 
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
@@ -25,6 +26,7 @@ declare global {
       show?: ShowDocument;
       wallet?: WalletDocument;
       authType?: AuthType;
+      room?: RoomDocument;
     }
     interface PageData {
       user?: UserDocument;
@@ -34,6 +36,7 @@ declare global {
       ticket?: TicketDocument;
       show?: ShowDocument;
       wallet?: WalletDocument;
+      room?: RoomDocument;
     }
   }
 }

@@ -1,5 +1,4 @@
 <script lang="ts">
-
   import { format, generate } from 'build-number-generator';
   import { onMount } from 'svelte';
 
@@ -49,7 +48,9 @@
 </script>
 
 <div class=" flex flex-col min-h-screen min-w-[320px]">
-  <nav class="flex justify-between items-center px-4  shadow-surface-900 shadow-lg">
+  <nav
+    class="flex justify-between items-center px-4 shadow-surface-900 shadow-lg"
+  >
     <a class="display-inline" href="/">
       <img
         src="{Config.PATH.staticUrl}/assets/logo-horizontal-tr.png"
@@ -71,17 +72,13 @@
             </div>
           {/if}
           {#if $page.data.authType === AuthType.IMPERSONATION}
-               <a
-            class="btn variant-outline"
-            href={Config.PATH.revert}
-            >Revert </a
-          >
+            <a class="btn variant-outline" href={Config.PATH.revert}>Revert </a>
           {:else}
-          <a
-            class="btn variant-outline"
-            href={Config.PATH.signout + '?returnPath=' + $page.url.pathname}
-            >Signout</a
-          >
+            <a
+              class="btn variant-outline"
+              href={Config.PATH.signout + '?returnPath=' + $page.url.pathname}
+              >Signout</a
+            >
           {/if}
         </div>
       {:else}
@@ -100,7 +97,9 @@
   </footer>
 </div>
 
-<div class="fixed h-screen flex flex-col text-3xl lg:text-7xl font-semibold justify-center items-center -z-10 top-0 w-full">
-  <h2 class="text-secondary neon-secondary">CHAMPAGNE</h2> 
-  <h2 class="text-primary neon-primary">R  O  O  M</h2>
+<div
+  class="fixed h-screen flex flex-col text-3xl lg:text-7xl font-semibold justify-center items-center -z-10 top-0 w-full"
+>
+  <h2 class="text-secondary neon-secondary">CHAMPAGNE</h2>
+  <h2 class="text-primary neon-primary">R O O M</h2>
 </div>

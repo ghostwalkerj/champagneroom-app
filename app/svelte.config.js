@@ -12,7 +12,8 @@ const config = {
       $lib: './src/lib',
       $stores: './src/stores',
       $util: './src/util',
-      $ext: './src/lib/ext'
+      $ext: './src/lib/ext',
+      $server: './src/lib/server'
     }
   },
   preprocess: [
