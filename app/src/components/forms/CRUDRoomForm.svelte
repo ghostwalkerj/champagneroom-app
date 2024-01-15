@@ -42,8 +42,6 @@
   $: roomUrl = urlJoin($page.url.origin, Config.PATH.room);
 </script>
 
-<SuperDebug data={$form} />
-
 {#if $modalStore[0]}
   <div class="bg-surface-900 max-w-3xl rounded">
     <form

@@ -54,7 +54,7 @@ const modalStore = getModalStore();
         <Icon class="text-secondary" icon="carbon:wallet" />
         Wallet
       </h2>
-      <small class="lowercase text-base">Status: {wallet.status}</small>
+      <small class=" text-base">Status: <span class="lowercase">{wallet.status}</span></small>
     </div>
 
       <div class="text-center">
