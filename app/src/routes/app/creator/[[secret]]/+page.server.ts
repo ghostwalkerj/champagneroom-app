@@ -3,6 +3,8 @@ import type { AxiosResponse } from 'axios';
 import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 import jwt from 'jsonwebtoken';
+import { message, setError, superValidate } from 'sveltekit-superforms/server';
+import { z } from 'zod';
 
 import {
   BITCART_API_URL,
@@ -43,11 +45,8 @@ import { getShowMachineService } from '$lib/server/machinesUtil';
 
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
 
-import { z } from 'zod';
-import { message, setError, superValidate } from 'sveltekit-superforms/server';
-
 const createShowSchema = z.object({
-  price: z.number().min(1).max(10000),
+  price: z.number().min(1).max(10_000),
   name: z.string().min(3).max(50),
   duration: z.number().min(15).max(120).default(60),
   capacity: z.number(),
@@ -213,7 +212,7 @@ export const actions: Actions = {
     }
 
     try {
-      const wallet = await Wallet.findOne({ _id: walletId });
+      const wallet = await Wallet.findOne({ _id: walletId }).orFail();
 
       if (!wallet) {
         setError(form, 'walletId', 'Wallet not found');
@@ -240,7 +239,7 @@ export const actions: Actions = {
       });
 
       payoutQueue.close();
-    } catch (error) {
+    } catch {
       return message(form, 'Error requesting payout');
     }
 
@@ -301,6 +300,7 @@ export const load: PageServerLoad = async ({ locals }) => {
   }
 
   const show = locals.show as ShowDocument;
+  const room = locals.room as RoomDocument;
   let showEvent: ShowEventDocument | undefined;
 
   if (show) {
