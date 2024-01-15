@@ -5,27 +5,31 @@
   import Icon from '@iconify/svelte';
   import { FileDropzone, getModalStore } from '@skeletonlabs/skeleton';
   import { nanoid } from 'nanoid';
-  import type { SvelteComponent } from 'svelte';
   import { superForm } from 'sveltekit-superforms/client';
   import urlJoin from 'url-join';
-  export let parent: SvelteComponent;
+  import type { SuperValidated } from 'sveltekit-superforms';
+  import type { SvelteComponent } from 'svelte';
   import SuperDebug from 'sveltekit-superforms/client/SuperDebug.svelte';
+  import { invalidateAll } from '$app/navigation';
 
   const modalStore = getModalStore();
+  $: thisModal = $modalStore[0];
 
   let images: FileList;
-  let roomForm = $modalStore[0].meta.form;
+  export let parent: SvelteComponent;
+
+  let roomForm = $modalStore[0].meta.form as SuperValidated<
+    typeof roomZodSchema
+  >;
 
   const { form, errors, constraints, enhance, delayed, message } = superForm(
     roomForm,
     {
       validators: roomZodSchema,
       validationMethod: 'auto',
-      resetForm: true,
       invalidateAll: true,
-      onResult(event) {
+      async onResult(event) {
         if (event.result.type === 'success') {
-          console.log(event.result.data);
           modalStore.close();
         }
       }
@@ -45,14 +49,14 @@
 
 <SuperDebug data={$form} />
 
-{#if $modalStore[0]}
+{#if thisModal}
   <div class="bg-surface-900 max-w-3xl rounded">
     <form
       class="grid sm:grid-cols-2"
       method="POST"
       enctype="multipart/form-data"
       use:enhance
-      action={$modalStore[0].meta.action}
+      action={thisModal.meta.action}
     >
       <input type="hidden" name="active" value="true" />
       <input type="hidden" name="_id" value={$form._id} />
@@ -118,7 +122,9 @@
               name="uniqueUrl"
               bind:value={$form.uniqueUrl}
             />
-            <div class="pt-1 text-sm">{urlJoin(roomUrl, $form.uniqueUrl)}</div>
+            <div class="pt-1 text-sm">
+              {urlJoin(roomUrl, $form.uniqueUrl)}
+            </div>
 
             {#if $errors.uniqueUrl}<span class="text-error"
                 >{$errors.uniqueUrl}</span

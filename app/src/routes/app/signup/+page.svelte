@@ -56,11 +56,8 @@
               />
             </h2>
             <p class="whitespace-nowrap">
-              <Icon
-                class="text-secondary -mb-1"
-                width="20"
-                icon="bi:coin"
-              /> Earn commissions from your creators
+              <Icon class="text-secondary -mb-1" width="20" icon="bi:coin" /> Earn
+              commissions from your creators
             </p>
           </div>
         </a>

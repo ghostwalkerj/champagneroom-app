@@ -1,33 +1,34 @@
 <script lang="ts">
+  import { invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
   import Config from '$lib/config';
   import type { RoomDocumentType, roomZodSchema } from '$lib/models/room';
+  import Icon from '@iconify/svelte';
   import {
     getModalStore,
     popup,
     type ModalSettings,
     type PopupSettings
   } from '@skeletonlabs/skeleton';
+  import { copy, type CopyDetail } from '@svelte-put/copy';
   import type { SuperValidated } from 'sveltekit-superforms';
   import urlJoin from 'url-join';
-  import Icon from '@iconify/svelte';
-  import { copy, type CopyDetail } from '@svelte-put/copy';
 
-  export let room: RoomDocumentType;
   export let roomForm: SuperValidated<typeof roomZodSchema>;
-
+  $: room = roomForm.data as RoomDocumentType;
   const modalStore = getModalStore();
 
-  const roomModal: ModalSettings = {
+  const roomModal = {
     type: 'component',
     component: 'CRUDRoomForm',
     title: 'Update Room',
+    invalidateAll: true,
+    resetForm: true,
     meta: {
       action: '?/upsert_room',
-      form: roomForm,
-      room
+      form: roomForm
     }
-  };
+  } as ModalSettings;
 
   const popupHover: PopupSettings = {
     event: 'hover',
@@ -46,6 +47,10 @@
 
   const roomUrl =
     room && urlJoin($page.url.origin, Config.PATH.room, room.uniqueUrl);
+
+  const openModal = async () => {
+    modalStore.trigger(roomModal);
+  };
 </script>
 
 {#if copied === ''}
@@ -100,14 +105,14 @@
     <button
       type="button"
       class="btn variant-soft-secondary btn-sm neon-secondary"
-      on:click={() => modalStore.trigger(roomModal)}>Edit My Room</button
+      on:click={() => openModal()}>Edit My Room</button
     >
   {:else}
     <div class="text-info">No room found</div>
     <button
       type="button"
       class="btn variant-soft-secondary btn-sm neon-secondary"
-      on:click={() => modalStore.trigger(roomModal)}>Create My Room</button
+      on:click={() => openModal()}>Create My Room</button
     >
   {/if}
 </div>

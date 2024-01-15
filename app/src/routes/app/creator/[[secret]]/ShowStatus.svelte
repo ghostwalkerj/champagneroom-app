@@ -43,8 +43,9 @@
   });
 </script>
 
-<div class="flex flex-col lg:flex-row justify-between bg-custom divide-y lg:divide-y-0 lg:divide-x divide-surface-500 rounded">
-
+<div
+  class="flex flex-col lg:flex-row justify-between bg-custom divide-y lg:divide-y-0 lg:divide-x divide-surface-500 rounded"
+>
   <div class="flex gap-2 p-4 flex-1">
     <Icon icon="mingcute:information-line" class="text-2xl text-secondary" />
     <p class="capitalize">{statusText.toLowerCase()}</p>
@@ -56,14 +57,14 @@
   </div>
 
   {#if canStartShow}
-          <button
-            class="btn flex-1 lg:rounded-l-none font-semibold variant-filled-primary text-black whitespace-nowrap hover:shadow-lg shadow-black"
-            type="submit"
-            disabled={isLoading}
-            on:click={() => {
-              isLoading = true;
-              onGoToShow();
-            }}>Start Show</button
-          >
-        {/if}
+    <button
+      class="btn flex-1 lg:rounded-l-none font-semibold variant-filled-primary text-black whitespace-nowrap hover:shadow-lg shadow-black"
+      type="submit"
+      disabled={isLoading}
+      on:click={() => {
+        isLoading = true;
+        onGoToShow();
+      }}>Start Show</button
+    >
+  {/if}
 </div>

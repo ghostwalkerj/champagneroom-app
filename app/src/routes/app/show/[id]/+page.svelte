@@ -21,8 +21,6 @@
   $: canBuyTicket =
     show.showState.status === ShowStatus.BOX_OFFICE_OPEN || isBuyingTicket;
 
-
-
   const modal: ModalSettings = {
     type: 'component',
     component: 'ReserveShowForm',

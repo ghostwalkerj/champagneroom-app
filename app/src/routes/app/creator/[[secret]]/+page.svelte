@@ -27,21 +27,20 @@
   import ShowStatus from './ShowStatus.svelte';
 
   import { page } from '$app/stores';
+  import type { RoomDocumentType, roomZodSchema } from '$lib/models/room';
   import type { UserDocument } from '$lib/models/user';
+  import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
+  import type { SuperValidated } from 'sveltekit-superforms';
   import type { Subscription } from 'xstate';
   import type { ActionData, PageData } from './$types';
   import CreatorDetail from './CreatorDetail.svelte';
-  import VideoMeeting from './VideoMeeting.svelte';
-  import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
-  import type { RoomDocumentType, roomZodSchema } from '$lib/models/room';
-  import type { SuperValidated } from 'sveltekit-superforms';
   import RoomDetail from './RoomDetail.svelte';
-
+  import VideoMeeting from './VideoMeeting.svelte';
 
   export let data: PageData;
   export let form: ActionData;
 
-  let creator = data.creator as CreatorDocument;
+  $: creator = data.creator as CreatorDocument;
   let currentShow = data.show as ShowDocument | undefined;
   let currentEvent = data.showEvent as ShowEventDocument | undefined;
   let completedShows = data.completedShows as ShowDocument[];
@@ -49,8 +48,7 @@
   let exchangeRate = +data.exchangeRate || 0;
   let jitsiToken = data.jitsiToken as string;
   let user = data.user as UserDocument;
-  let room = data.room as RoomDocumentType;
-  let roomForm = data.roomForm as SuperValidated<typeof roomZodSchema>;
+  $: roomForm = data.roomForm as SuperValidated<typeof roomZodSchema>;
 
   $: showVideo = false;
 
@@ -315,9 +313,7 @@
         </div>
 
         <!-- Room -->
-        {#key room}
-          <RoomDetail {room} {roomForm} />
-        {/key}
+        <RoomDetail {roomForm} />
 
         <!-- Activity Feed -->
         <div>

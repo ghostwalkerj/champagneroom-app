@@ -22,7 +22,6 @@ import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
 import type { CancelType } from '$lib/models/common';
 import { Creator, type CreatorDocument } from '$lib/models/creator';
-import type { RoomDocumentType } from '$lib/models/room';
 import type { ShowDocument } from '$lib/models/show';
 import { Show } from '$lib/models/show';
 import type { ShowEventDocument } from '$lib/models/showEvent';
@@ -326,18 +325,10 @@ export const actions: Actions = {
 
     try {
       if (isUpdate) {
-        const room = (await Room.findOneAndUpdate(
-          { _id: form.data._id },
-          form.data,
-          { new: true }
-        )) as RoomDocument;
-        if (!room) {
-          throw error(404, 'Room not found');
-        }
-        return {
-          form,
-          room: room.toJSON({ flattenMaps: true, flattenObjectIds: true })
-        };
+        Room.updateOne(
+          { _id: new ObjectId(form.data._id as string) },
+          form.data
+        ).exec();
       } else {
         const room = (await Room.create({
           ...form.data,
@@ -352,8 +343,7 @@ export const actions: Actions = {
           }
         ).exec();
         return {
-          form,
-          room: room.toJSON({ flattenMaps: true, flattenObjectIds: true })
+          form
         };
       }
     } catch (error_) {
@@ -390,11 +380,6 @@ export const load: PageServerLoad = async ({ locals }) => {
     .exec()) as ShowDocument[];
 
   const wallet = locals.wallet as WalletDocument;
-
-  // Grab creators room if it exists
-  const room = (
-    creator.room ? await Room.findOne({ _id: creator.room }) : undefined
-  ) as RoomDocument | undefined;
 
   // return the rate of exchange for UI from bitcart
   const token = await createBitcartToken(

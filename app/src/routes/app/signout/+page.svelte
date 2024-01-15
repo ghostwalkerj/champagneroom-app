@@ -14,7 +14,9 @@
   );
 </script>
 
-<div class="bg-surface-900/95  flex flex-col gap-8 p-6 text-center items-center rounded">
+<div
+  class="bg-surface-900/95 flex flex-col gap-8 p-6 text-center items-center rounded"
+>
   <div class="font-semibold text-3xl w-full">You have been signed out</div>
 
   {#if returnPath !== undefined}
