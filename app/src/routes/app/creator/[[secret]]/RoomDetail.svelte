@@ -48,6 +48,15 @@
     room && urlJoin($page.url.origin, Config.PATH.room, room.uniqueUrl);
 </script>
 
+{#if copied === ''}
+  <div
+    class="neon-primary p-4 rounded bg-custom border-2 border-primary-content"
+    data-popup="popupHover"
+  >
+    {roomUrl}
+  </div>
+{/if}
+
 <div
   class="bg-custom p-4 rounded flex flex-col gap-4 justify-center items-center"
 >
@@ -101,10 +110,4 @@
       on:click={() => modalStore.trigger(roomModal)}>Create My Room</button
     >
   {/if}
-</div>
-<div
-  class="neon-primary p-4 rounded bg-custom border-2 border-primary-content"
-  data-popup="popupHover"
->
-  {roomUrl}
 </div>
