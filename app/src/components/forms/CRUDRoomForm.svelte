@@ -35,6 +35,7 @@
   if ($form.uniqueUrl === undefined) {
     $form.uniqueUrl = nanoid(10).toLowerCase();
   }
+
   if ($form.coverImageUrl === undefined) {
     $form.coverImageUrl = Config.UI.defaultProfileImage;
   }
@@ -53,6 +54,7 @@
     >
       <input type="hidden" name="active" value="true" />
       <input type="hidden" name="_id" value={$form._id} />
+      <input type="hidden" name="coverImageUrl" value={$form.coverImageUrl} />
 
       <FileDropzone
         name="images"
