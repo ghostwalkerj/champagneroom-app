@@ -36,6 +36,10 @@
   import CreatorDetail from './CreatorDetail.svelte';
   import RoomDetail from './RoomDetail.svelte';
   import VideoMeeting from './VideoMeeting.svelte';
+  import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
+  import type { RoomDocumentType, roomZodSchema } from '$lib/models/room';
+  import type { SuperValidated } from 'sveltekit-superforms';
+  import RoomDetail from './RoomDetail.svelte';
 
   export let data: PageData;
   export let form: ActionData;
@@ -48,7 +52,8 @@
   let exchangeRate = +data.exchangeRate || 0;
   let jitsiToken = data.jitsiToken as string;
   let user = data.user as UserDocument;
-  $: roomForm = data.roomForm as SuperValidated<typeof roomZodSchema>;
+  let room = data.room as RoomDocumentType;
+  let roomForm = data.roomForm as SuperValidated<typeof roomZodSchema>;
 
   $: showVideo = false;
 

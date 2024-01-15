@@ -13,8 +13,7 @@
   export let wallet: WalletDocumentType;
   export let withdrawForm: any;
 
-
-const modalStore = getModalStore();
+  const modalStore = getModalStore();
 
   $: hasTransactions =
     wallet && wallet.earnings.length && wallet.payouts.length > 0;
@@ -57,36 +56,35 @@ const modalStore = getModalStore();
       <small class="lowercase text-base">Status: {wallet.status}</small>
     </div>
 
-      <div class="text-center">
-        <p>Balance:
-          {#if exchangeRate > 0}
-            <span class="font-semibold">
-              {currencyFormatter(CurrencyType.USD, 2).format(
-                availableBalance * exchangeRate
-              )} USD
-            </span>
-          {/if}
-        </p>
-        <p> {currencyFormatter(wallet.currency).format(availableBalance)}</p>
-      </div>
-
-      <div
-            class="flex gap-2"
-          >
-            <button
-              class="btn variant-soft-secondary btn-sm neon-secondary"
-              disabled={!hasTransactions}
-              on:click={() => modalStore.trigger(transactionsModal)}
-            >
-              Transactions
-            </button>
-            <button
-              class="btn variant-soft-secondary btn-sm neon-secondary"
-              disabled={!hasAvailableBalance}
-              on:click={() => modalStore.trigger(modal)}
-            >
-              Withdraw
-            </button>
-          </div>
+    <div class="text-center">
+      <p>
+        Balance:
+        {#if exchangeRate > 0}
+          <span class="font-semibold">
+            {currencyFormatter(CurrencyType.USD, 2).format(
+              availableBalance * exchangeRate
+            )} USD
+          </span>
+        {/if}
+      </p>
+      <p>{currencyFormatter(wallet.currency).format(availableBalance)}</p>
     </div>
+
+    <div class="flex gap-2">
+      <button
+        class="btn variant-soft-secondary btn-sm neon-secondary"
+        disabled={!hasTransactions}
+        on:click={() => modalStore.trigger(transactionsModal)}
+      >
+        Transactions
+      </button>
+      <button
+        class="btn variant-soft-secondary btn-sm neon-secondary"
+        disabled={!hasAvailableBalance}
+        on:click={() => modalStore.trigger(modal)}
+      >
+        Withdraw
+      </button>
+    </div>
+  </div>
 {/if}

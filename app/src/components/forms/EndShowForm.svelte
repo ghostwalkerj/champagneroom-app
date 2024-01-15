@@ -15,9 +15,7 @@
     isLoading = true;
     return async ({ result }) => {
       if (result.data.success) {
-
-            $modalStore[0].response!(true);
-
+        $modalStore[0].response!(true);
       }
       await applyAction(result);
       isLoading = false;
@@ -47,13 +45,14 @@
         on:click={() => {
           isLoading = true;
 
-            // @ts-ignore
-            $modalStore[0].response(false);
-
-          }}
-         disabled={!canStartShow || isLoading}>Restart Show</button>
-        <button class="btn variant-soft-primary" disabled={isLoading}>End Show</button>
+          // @ts-ignore
+          $modalStore[0].response(false);
+        }}
+        disabled={!canStartShow || isLoading}>Restart Show</button
+      >
+      <button class="btn variant-soft-primary" disabled={isLoading}
+        >End Show</button
+      >
     </form>
   </div>
 {/if}
-œ

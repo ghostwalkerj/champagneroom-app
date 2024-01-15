@@ -9,6 +9,7 @@
   import { TabGroup, Tab } from '@skeletonlabs/skeleton';
   import { PayoutStatus } from '$lib/payment';
 
+  export let parent: SvelteComponent;
   const modalStore = getModalStore();
 
   let earnings: EarningsType[] = $modalStore[0].meta.earnings;
