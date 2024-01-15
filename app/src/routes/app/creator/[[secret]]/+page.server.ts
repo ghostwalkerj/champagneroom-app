@@ -307,7 +307,7 @@ export const actions: Actions = {
 
     const form = await superValidate(formData, roomZodSchema);
 
-    const isUpdate = !form.data._id;
+    const isUpdate = !!form.data._id;
     // Convenient validation check:
     if (!form.valid) {
       // Again, return { form } and things will just work.
@@ -316,7 +316,10 @@ export const actions: Actions = {
     const image =
       formData.get('images') && (formData.get('images') as unknown as [File]);
 
-    if (image instanceof File) {
+    console.log('image', image);
+    console.log('form', form.data);
+
+    if (image instanceof File && image.size > 0) {
       // upload image to web3
       const url = await web3Upload(WEB3STORAGE_KEY, WEB3STORAGE_PROOF, image);
       form.data.coverImageUrl = url;
