@@ -32,13 +32,11 @@
   import type { ActionData, PageData } from './$types';
   import CreatorDetail from './CreatorDetail.svelte';
   import VideoMeeting from './VideoMeeting.svelte';
-  import { getModalStore } from '@skeletonlabs/skeleton';
-  import type { ModalSettings } from '@skeletonlabs/skeleton';
+  import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
   import type { RoomDocumentType, roomZodSchema } from '$lib/models/room';
   import type { SuperValidated } from 'sveltekit-superforms';
   import RoomDetail from './RoomDetail.svelte';
 
-  const modalStore = getModalStore();
 
   export let data: PageData;
   export let form: ActionData;

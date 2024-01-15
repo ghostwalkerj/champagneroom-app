@@ -222,7 +222,7 @@ export const actions: Actions = {
     }
 
     try {
-      const wallet = await Wallet.findOne({ _id: walletId });
+      const wallet = await Wallet.findOne({ _id: walletId }).orFail();
 
       if (!wallet) {
         setError(form, 'walletId', 'Wallet not found');

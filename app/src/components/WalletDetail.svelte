@@ -11,7 +11,7 @@
   export let exchangeRate = 0;
   export let form: ActionData;
   export let wallet: WalletDocumentType;
-  export let withdrawFrom: any;
+  export let withdrawForm: any;
 
 
 const modalStore = getModalStore();
@@ -28,7 +28,7 @@ const modalStore = getModalStore();
     type: 'component',
     component: 'WithdrawForm',
     meta: {
-      form: withDrawForm,
+      form: withdrawForm,
       wallet,
       exchangeRate,
       destination
