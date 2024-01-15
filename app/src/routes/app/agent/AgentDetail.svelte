@@ -2,7 +2,7 @@
   import { deserialize } from '$app/forms';
   import { invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
-  import ProfilePhoto from '$components/ProfilePhoto.svelte';
+  import ProfileImage from '$components/forms/ImageUploadForm.svelte';
   import Config from '$lib/config';
   import type { AgentDocument } from '$lib/models/agent';
   import type { ActionResult } from '@sveltejs/kit';
@@ -118,8 +118,8 @@
             <div>%</div>
           </div>
           <div>
-            <ProfilePhoto
-              profileImage={agent.user.profileImageUrl ||
+            <ProfileImage
+              imageUrl={agent.user.profileImageUrl ||
                 Config.UI.defaultProfileImage}
               callBack={(value) => {
                 updateProfileImage(value);

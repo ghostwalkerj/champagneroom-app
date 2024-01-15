@@ -34,9 +34,9 @@ import {
   TicketMachineEventString
 } from '$lib/constants';
 import {
+  createBitcartToken,
   InvoiceJobType,
-  PayoutJobType,
-  createBitcartToken
+  PayoutJobType
 } from '$lib/payment';
 import { getTicketMachineService } from '$lib/server/machinesUtil';
 
@@ -356,7 +356,7 @@ export const load: PageServerLoad = async ({ locals }) => {
       iss: JITSI_APP_ID,
       exp: Math.floor(Date.now() / 1000) + +JWT_EXPIRY,
       sub: PUBLIC_JITSI_DOMAIN,
-      room: show.roomId,
+      room: show.conferenceKey,
       context: {
         user: {
           name: user.name,

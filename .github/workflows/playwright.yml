@@ -22,7 +22,7 @@ jobs:
       run: npm install -g yarn && yarn
     - name: Install Playwright Browsers
       run: yarn playwright install --with-deps
-    - name: Install Project Dependencies 
+    - name: Install Project Dependencies
       run: yarn; yarn build; yarn package
     - name: Run Playwright Tests
       run: yarn test

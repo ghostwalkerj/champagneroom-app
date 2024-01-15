@@ -21,6 +21,11 @@ const creatorZodSchema = toZodMongooseSchema(
         _id: true,
         auto: true
       }),
+      room: mongooseZodCustomType('ObjectId')
+        .mongooseTypeOptions({
+          ref: 'Room'
+        })
+        .optional(),
       user: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
         autopopulate: true,
         ref: 'User',

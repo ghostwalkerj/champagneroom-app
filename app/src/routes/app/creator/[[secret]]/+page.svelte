@@ -24,7 +24,6 @@
   import CancelShow from './CancelShow.svelte';
   import CreateShow from './CreateShow.svelte';
   import CreatorActivity from './CreatorActivity.svelte';
-  import EndShow from './EndShow.svelte';
   import ShowStatus from './ShowStatus.svelte';
 
   import { page } from '$app/stores';
@@ -33,10 +32,11 @@
   import type { ActionData, PageData } from './$types';
   import CreatorDetail from './CreatorDetail.svelte';
   import VideoMeeting from './VideoMeeting.svelte';
-  import { getModalStore } from '@skeletonlabs/skeleton';
-  import type { ModalSettings } from '@skeletonlabs/skeleton';
+  import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
+  import type { RoomDocumentType, roomZodSchema } from '$lib/models/room';
+  import type { SuperValidated } from 'sveltekit-superforms';
+  import RoomDetail from './RoomDetail.svelte';
 
-  const modalStore = getModalStore();
 
   export let data: PageData;
   export let form: ActionData;
@@ -49,6 +49,8 @@
   let exchangeRate = +data.exchangeRate || 0;
   let jitsiToken = data.jitsiToken as string;
   let user = data.user as UserDocument;
+  let room = data.room as RoomDocumentType;
+  let roomForm = data.roomForm as SuperValidated<typeof roomZodSchema>;
 
   $: showVideo = false;
 
@@ -65,6 +67,7 @@
   let showMachineService: ShowMachineServiceType;
   let showMachineServiceUnSub: Subscription;
   const destination = user.payoutAddress;
+  const modalStore = getModalStore();
 
   const noCurrentShow = () => {
     showUnSub?.();
@@ -194,8 +197,8 @@
     noCurrentShow();
   };
 
- // --------- Modal for Restarting or Ending Show
- const endShowModal: ModalSettings = {
+  // --------- Modal for Restarting or Ending Show
+  const endShowModal: ModalSettings = {
     type: 'component',
     component: 'EndShowForm',
     meta: {
@@ -209,14 +212,13 @@
       } else {
         startShow();
       }
-    } 
-};
-// Show Modal if showStopped is true
-$: if (showStopped) {
+    }
+  };
+  // Show Modal if showStopped is true
+  $: if (showStopped) {
     modalStore.trigger(endShowModal);
-}
-// --------- End Modal for Restarting or Ending Show
-
+  }
+  // --------- End Modal for Restarting or Ending Show
 </script>
 
 {#if showVideo && currentShow && jitsiToken}
@@ -228,7 +230,6 @@ $: if (showStopped) {
     bind:jitsiToken
   />
 {:else}
-
   <div class="flex place-content-center">
     <!-- Page header -->
 
@@ -262,44 +263,61 @@ $: if (showStopped) {
         {/key}
 
         {#if canCreateShow}
-          <CreateShow bind:isLoading {creator} {onShowCreated} {form} createShowForm={data.createShowForm}/>
+          <CreateShow
+            bind:isLoading
+            {creator}
+            {onShowCreated}
+            {form}
+            createShowForm={data.createShowForm}
+          />
         {/if}
         <div>
           {#if currentShow}
             {#key currentShow.showState}
               <div class="">
                 <ShowDetail
-                show={currentShow}
-                options={{
-                  showCopy: true,
-                  showSalesStats: true,
-                  showRating: true,
-                  showWaterMark: false
-                }}
-              />
+                  show={currentShow}
+                  options={{
+                    showCopy: true,
+                    showSalesStats: true,
+                    showRating: true,
+                    showWaterMark: false
+                  }}
+                />
               </div>
             {/key}
           {/if}
         </div>
 
         {#if canCancelShow}
-          <div class="lg:pb-4 ">
+          <div class="lg:pb-4">
             <CancelShow {onShowCancelled} bind:isLoading />
           </div>
         {/if}
       </div>
 
       <!--Next Column-->
-      <div class="space-y-3  md:col-start-4 md:col-span-1">
+      <div class="space-y-3 md:col-start-4 md:col-span-1">
         <!-- Photo -->
         <CreatorDetail bind:creator />
 
         <!-- Wallet -->
         <div>
           {#key wallet}
-            <WalletDetail {wallet} {exchangeRate} {form} {destination} whitdrawForm={data.requestPayoutForm} />
+            <WalletDetail
+              {wallet}
+              {exchangeRate}
+              {form}
+              {destination}
+              withdrawForm={data.requestPayoutForm}
+            />
           {/key}
         </div>
+
+        <!-- Room -->
+        {#key room}
+          <RoomDetail {room} {roomForm} />
+        {/key}
 
         <!-- Activity Feed -->
         <div>

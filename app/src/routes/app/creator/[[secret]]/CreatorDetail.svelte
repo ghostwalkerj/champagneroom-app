@@ -1,7 +1,8 @@
 <script lang="ts">
-  import ProfilePhoto from '$components/ProfilePhoto.svelte';
+  import ImageUploadForm from '$components/forms/ImageUploadForm.svelte';
   import Config from '$lib/config';
   import type { CreatorDocument } from '$lib/models/creator';
+  import Icon from '@iconify/svelte';
   import StarRating from 'svelte-star-rating';
 
   export let creator: CreatorDocument;
@@ -19,23 +20,25 @@
   };
 </script>
 
+<div
+  class="bg-custom rounded pt-4 flex flex-col justify-center text-center items-center"
+>
+  <h2 class="text-xl font-semibold flex gap-2 items-center">
+    <Icon class="text-secondary" icon="iconoir:profile-circle" />
+    Profile
+  </h2>
+  <div>
+    <ImageUploadForm
+      imageUrl={creator.user.profileImageUrl || Config.UI.defaultProfileImage}
+      callBack={(value) => {
+        updateProfileImage(value);
+      }}
+    />
+  </div>
 
-    <div class="bg-custom rounded flex flex-col justify-center text-center items-center">
-
-        <div>
-          <ProfilePhoto
-            profileImage={creator.user.profileImageUrl ||
-              Config.UI.defaultProfileImage}
-            callBack={(value) => {
-              updateProfileImage(value);
-            }}
-          />
-        </div>
-
-        <div class="flex gap-1 mt-2">
-          <StarRating rating={creator.feedbackStats.averageRating} /> ({creator.feedbackStats.averageRating.toFixed(2)})
-        
-        </div>
-
-    </div>
-
+  <div class="flex gap-1">
+    <StarRating rating={creator.feedbackStats.averageRating} /> ({creator.feedbackStats.averageRating.toFixed(
+      2
+    )})
+  </div>
+</div>

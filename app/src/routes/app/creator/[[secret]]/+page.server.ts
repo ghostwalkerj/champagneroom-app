@@ -3,6 +3,10 @@ import type { AxiosResponse } from 'axios';
 import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 import jwt from 'jsonwebtoken';
+import { ObjectId } from 'mongodb';
+import type { SuperValidated } from 'sveltekit-superforms';
+import { message, setError, superValidate } from 'sveltekit-superforms/server';
+import { z } from 'zod';
 
 import {
   BITCART_API_URL,
@@ -10,12 +14,15 @@ import {
   BITCART_PASSWORD,
   JITSI_APP_ID,
   JITSI_JWT_SECRET,
-  JWT_EXPIRY
+  JWT_EXPIRY,
+  WEB3STORAGE_KEY,
+  WEB3STORAGE_PROOF
 } from '$env/static/private';
 import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
 import type { CancelType } from '$lib/models/common';
-import type { CreatorDocument } from '$lib/models/creator';
+import { Creator, type CreatorDocument } from '$lib/models/creator';
+import type { RoomDocumentType } from '$lib/models/room';
 import type { ShowDocument } from '$lib/models/show';
 import { Show } from '$lib/models/show';
 import type { ShowEventDocument } from '$lib/models/showEvent';
@@ -40,14 +47,17 @@ import {
 import { rateCryptosRateGet } from '$lib/ext/bitcart';
 import { createBitcartToken, PayoutJobType, PayoutReason } from '$lib/payment';
 import { getShowMachineService } from '$lib/server/machinesUtil';
+import {
+  Room,
+  type RoomDocument,
+  roomZodSchema
+} from '$lib/server/models/room';
+import { web3Upload } from '$lib/server/upload';
 
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
 
-import { z } from 'zod';
-import { message, setError, superValidate } from 'sveltekit-superforms/server';
-
 const createShowSchema = z.object({
-  price: z.number().min(1).max(10000),
+  price: z.number().min(1).max(10_000),
   name: z.string().min(3).max(50),
   duration: z.number().min(15).max(120).default(60),
   capacity: z.number(),
@@ -119,7 +129,6 @@ export const actions: Actions = {
         numberOfReviews: creator.feedbackStats.numberOfReviews
       }
     });
-
     show.save();
 
     return {
@@ -213,7 +222,7 @@ export const actions: Actions = {
     }
 
     try {
-      const wallet = await Wallet.findOne({ _id: walletId });
+      const wallet = await Wallet.findOne({ _id: walletId }).orFail();
 
       if (!wallet) {
         setError(form, 'walletId', 'Wallet not found');
@@ -240,7 +249,7 @@ export const actions: Actions = {
       });
 
       payoutQueue.close();
-    } catch (error) {
+    } catch {
       return message(form, 'Error requesting payout');
     }
 
@@ -291,6 +300,66 @@ export const actions: Actions = {
 
     showQueue.close();
     showService.stop();
+  },
+  upsert_room: async ({ request, locals }) => {
+    const creator = locals.creator as CreatorDocument;
+    const formData = await request.formData();
+
+    const form = await superValidate(formData, roomZodSchema);
+
+    const isUpdate = !form.data._id;
+    // Convenient validation check:
+    if (!form.valid) {
+      // Again, return { form } and things will just work.
+      return fail(400, { form });
+    }
+    const image =
+      formData.get('images') && (formData.get('images') as unknown as [File]);
+
+    if (image instanceof File) {
+      // upload image to web3
+      const url = await web3Upload(WEB3STORAGE_KEY, WEB3STORAGE_PROOF, image);
+      form.data.coverImageUrl = url;
+    }
+
+    Room.init();
+
+    try {
+      if (isUpdate) {
+        const room = (await Room.findOneAndUpdate(
+          { _id: form.data._id },
+          form.data,
+          { new: true }
+        )) as RoomDocument;
+        if (!room) {
+          throw error(404, 'Room not found');
+        }
+        return {
+          form,
+          room: room.toJSON({ flattenMaps: true, flattenObjectIds: true })
+        };
+      } else {
+        const room = (await Room.create({
+          ...form.data,
+          _id: new ObjectId()
+        })) as RoomDocument;
+        Creator.updateOne(
+          { _id: creator._id },
+          {
+            $set: {
+              room: room._id
+            }
+          }
+        ).exec();
+        return {
+          form,
+          room: room.toJSON({ flattenMaps: true, flattenObjectIds: true })
+        };
+      }
+    } catch (error_) {
+      console.error(error_);
+      throw error(500, 'Error upserting room');
+    }
   }
 };
 export const load: PageServerLoad = async ({ locals }) => {
@@ -322,6 +391,11 @@ export const load: PageServerLoad = async ({ locals }) => {
 
   const wallet = locals.wallet as WalletDocument;
 
+  // Grab creators room if it exists
+  const room = (
+    creator.room ? await Room.findOne({ _id: creator.room }) : undefined
+  ) as RoomDocument | undefined;
+
   // return the rate of exchange for UI from bitcart
   const token = await createBitcartToken(
     BITCART_EMAIL,
@@ -338,7 +412,7 @@ export const load: PageServerLoad = async ({ locals }) => {
         iss: JITSI_APP_ID,
         exp: Math.floor(Date.now() / 1000) + +JWT_EXPIRY,
         sub: PUBLIC_JITSI_DOMAIN,
-        room: show.roomId,
+        room: show.conferenceKey,
         moderator: true,
         context: {
           user: {
@@ -365,6 +439,18 @@ export const load: PageServerLoad = async ({ locals }) => {
         }
       }
     )) as AxiosResponse<string>) || undefined;
+
+  const roomForm = room
+    ? await superValidate(
+        room.toJSON({
+          flattenMaps: true,
+          flattenObjectIds: true
+        }),
+        roomZodSchema
+      )
+    : ((await superValidate(roomZodSchema)) as SuperValidated<
+        typeof roomZodSchema
+      >);
 
   const createShowForm = await superValidate(createShowSchema);
   const requestPayoutForm = await superValidate(
@@ -398,6 +484,10 @@ export const load: PageServerLoad = async ({ locals }) => {
     ),
     wallet: wallet.toJSON({ flattenMaps: true, flattenObjectIds: true }),
     exchangeRate: exchangeRate?.data,
-    jitsiToken
+    jitsiToken,
+    room: room
+      ? room.toJSON({ flattenMaps: true, flattenObjectIds: true })
+      : undefined,
+    roomForm
   };
 };

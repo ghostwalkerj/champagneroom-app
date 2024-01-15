@@ -59,7 +59,7 @@
 
   onMount(() => {
     const options = {
-      roomName: currentShow?.roomId,
+      roomName: currentShow?.name,
       jwt: jitsiToken,
       width: '100%',
       height: '100%',
