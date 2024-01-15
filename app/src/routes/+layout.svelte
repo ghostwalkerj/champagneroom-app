@@ -20,7 +20,7 @@
     WithdrawForm: { ref: WithdrawForm },
     TransactionsActivity: { ref: TransactionsActivity },
     EndShowForm: { ref: EndShowForm }
-    // ...
+    CRUDRoomForm: { ref: CRUDRoomForm }
   };
 </script>
 
