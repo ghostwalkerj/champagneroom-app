@@ -55,6 +55,7 @@ const modalStore = getModalStore();
         Wallet
       </h2>
       <small class=" text-base">Status: <span class="lowercase">{wallet.status}</span></small>
+
     </div>
 
       <div class="text-center">
