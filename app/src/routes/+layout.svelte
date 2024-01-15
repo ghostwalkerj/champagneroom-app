@@ -12,14 +12,23 @@
   import type { ModalComponent } from '@skeletonlabs/skeleton';
   import { Modal, initializeStores, storePopup } from '@skeletonlabs/skeleton';
   import '../app.css';
-
+  import {
+    computePosition,
+    autoUpdate,
+    offset,
+    shift,
+    flip,
+    arrow
+  } from '@floating-ui/dom';
   initializeStores();
+  storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
+
   const modalRegistry: Record<string, ModalComponent> = {
     // Set a unique modal ID, then pass the component reference
     ReserveShowForm: { ref: ReserveShowForm },
     WithdrawForm: { ref: WithdrawForm },
     TransactionsActivity: { ref: TransactionsActivity },
-    EndShowForm: { ref: EndShowForm }
+    EndShowForm: { ref: EndShowForm },
     CRUDRoomForm: { ref: CRUDRoomForm }
   };
 </script>

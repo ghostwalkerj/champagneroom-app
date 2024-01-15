@@ -9,8 +9,6 @@
   import urlJoin from 'url-join';
   import type { SuperValidated } from 'sveltekit-superforms';
   import type { SvelteComponent } from 'svelte';
-  import SuperDebug from 'sveltekit-superforms/client/SuperDebug.svelte';
-  import { invalidateAll } from '$app/navigation';
 
   const modalStore = getModalStore();
   $: thisModal = $modalStore[0];
@@ -46,8 +44,6 @@
 
   $: roomUrl = urlJoin($page.url.origin, Config.PATH.room);
 </script>
-
-<SuperDebug data={$form} />
 
 {#if thisModal}
   <div class="bg-surface-900 max-w-3xl rounded">
