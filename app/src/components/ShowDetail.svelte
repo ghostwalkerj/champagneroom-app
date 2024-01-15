@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import StarRating from 'svelte-star-rating';
   import urlJoin from 'url-join';
-
+  import { page } from '$app/stores';
   import type { ShowDocument } from '$lib/models/show';
 
   import Config from '$lib/config';
@@ -11,6 +11,8 @@
     currencyFormatter,
     durationFormatter
   } from '$lib/constants';
+  import { popup, type PopupSettings } from '@skeletonlabs/skeleton';
+  import { copy, type CopyDetail } from '@svelte-put/copy';
 
   type ShowDetailOptions = {
     showCopy?: boolean;
@@ -51,14 +53,26 @@
     ticketsSold * show.price.amount
   );
 
-  const copyShowUrl = () => {
-    const showUrl = urlJoin(
-      window.location.origin,
-      Config.PATH.show,
-      show._id.toString()
-    );
-    navigator.clipboard.writeText(showUrl);
+  const showPath = urlJoin(
+    $page.url.origin,
+    Config.PATH.show,
+    show._id.toString()
+  );
+
+  const showLinkToolTip: PopupSettings = {
+    event: 'hover',
+    target: 'copyShowHover',
+    placement: 'top'
   };
+
+  $: copied = '';
+  function copyShowLink(e: CustomEvent<CopyDetail>) {
+    copied = e.detail.text;
+    navigator.clipboard.writeText(copied);
+    setTimeout(() => {
+      copied = '';
+    }, 2000);
+  }
 
   onMount(() => {
     if (options.showWaterMark) {
@@ -81,96 +95,111 @@
   });
 </script>
 
+{#if copied === ''}
+  <div
+    class="neon-primary p-4 rounded bg-custom border-2 border-primary-content z-50"
+    data-popup="copyShowHover"
+  >
+    {showPath}
+  </div>
+{/if}
 <div class="!text-center shadow-lg rounded">
   {#if show}
-  <div class="grid !text-center md:grid-cols-2 bg-custom rounded-r">
-    <div class="relative">
-      <img
-        src={show.coverImageUrl}
-        alt="show"
-        class="w-full max-w-xl m-auto rounded-l max-h-fit"
-      />
-      {#if options.showWaterMark && waterMarkText}
-        <p
-          class="absolute p-2 font-SpaceGrotesk font-extrabold text-black text-xl bg-primary/70 w-full whitespace-nowrap top-0 rounded-tl"
-        >
-          {waterMarkText}
-        </p>
-      {/if}
-    </div>
-
-    <div class="flex flex-col justify-evenly rounded-tr">
-      <div class="p-4 pb-0 flex flex-col items-center gap-2">
-        <h1 class="text-4xl font-extrabold uppercase">{name}</h1>
-        {#if options.showRating}
-          <StarRating rating={show.creatorInfo.averageRating} />
+    <div class="grid !text-center md:grid-cols-2 bg-custom rounded-r">
+      <div class="relative">
+        <img
+          src={show.coverImageUrl}
+          alt="show"
+          class="w-full max-w-xl m-auto rounded-l max-h-fit"
+        />
+        {#if options.showWaterMark && waterMarkText}
+          <p
+            class="absolute p-2 font-SpaceGrotesk font-extrabold text-black text-xl bg-primary/70 w-full whitespace-nowrap top-0 rounded-tl"
+          >
+            {waterMarkText}
+          </p>
         {/if}
       </div>
 
-      <slot />
-
-      {#if options.showCopy}
-        <div>
-          <button
-            class="btn btn-lg neon-primary font-semibold variant-soft-primary mb-1"
-            on:click={copyShowUrl}>Copy Show Link</button
-          >
-          <p>Share with your fans</p>
+      <div class="flex flex-col justify-evenly rounded-tr">
+        <div class="p-4 pb-0 flex flex-col items-center gap-2">
+          <h1 class="text-4xl font-extrabold uppercase">{name}</h1>
+          {#if options.showRating}
+            <StarRating rating={show.creatorInfo.averageRating} />
+          {/if}
         </div>
-      {/if}
 
-      {#if options.showStats}
-        <div class="grid grid-cols-3 p-2 text-xl font-semibold">
-          <div>
-            <p>Duration</p>
-            <p>{duration}</p>
-          </div>
+        <slot />
 
+        {#if options.showCopy}
           <div>
-            <p>Price</p>
-            <p>{price}</p>
+            {#if copied}
+              <span class="text-success">Copied!</span>
+            {:else}
+              <button
+                class="btn btn-lg neon-primary font-semibold variant-soft-primary mb-1"
+                use:copy={{
+                  text: showPath
+                }}
+                use:popup={showLinkToolTip}
+                on:copied={copyShowLink}>Copy Show Link</button
+              >
+            {/if}
+            <p>Share with your fans</p>
           </div>
+        {/if}
 
-          <div>
-            <p>Available</p>
-            <p>{ticketsAvailable}</p>
+        {#if options.showStats}
+          <div class="grid grid-cols-3 p-2 text-xl font-semibold">
+            <div>
+              <p>Duration</p>
+              <p>{duration}</p>
+            </div>
+
+            <div>
+              <p>Price</p>
+              <p>{price}</p>
+            </div>
+
+            <div>
+              <p>Available</p>
+              <p>{ticketsAvailable}</p>
+            </div>
           </div>
-        </div>
-      {/if}
+        {/if}
+      </div>
     </div>
-  </div>
 
-  {#if options.showSalesStats}
-    <div
-      class="flex !text-center sm:flex-row rounded-b flex-col justify-between border-t border-surface-600  bg-custom font-semibold divide-x divide-surface-500
+    {#if options.showSalesStats}
+      <div
+        class="flex !text-center sm:flex-row rounded-b flex-col justify-between border-t border-surface-600 bg-custom font-semibold divide-x divide-surface-500
      [&>div]:w-full [&>div]:whitespace-nowrap [&>div]:p-2 [&>div]:flex [&>div]:sm:flex-col [&>div]:gap-2"
-    >
-      <div>
-        <p>Reserved</p>
-        <p>{ticketsReserved}</p>
-      </div>
+      >
+        <div>
+          <p>Reserved</p>
+          <p>{ticketsReserved}</p>
+        </div>
 
-      <div>
-        <p>Sold</p>
-        <p>{ticketsSold}</p>
-      </div>
+        <div>
+          <p>Sold</p>
+          <p>{ticketsSold}</p>
+        </div>
 
-      <div>
-        <p>Refunded</p>
-        <p>{ticketsRefunded}</p>
-      </div>
+        <div>
+          <p>Refunded</p>
+          <p>{ticketsRefunded}</p>
+        </div>
 
-      <div>
-        <p>Refunded Amount</p>
-        <p>{totalRefunded}</p>
-      </div>
+        <div>
+          <p>Refunded Amount</p>
+          <p>{totalRefunded}</p>
+        </div>
 
-      <div>
-        <p>Total Sales</p>
-        <p>{totalSales}</p>
+        <div>
+          <p>Total Sales</p>
+          <p>{totalSales}</p>
+        </div>
       </div>
-    </div>
+    {/if}
   {/if}
-{/if}
 </div>
-
