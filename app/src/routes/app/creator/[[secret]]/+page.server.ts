@@ -360,6 +360,7 @@ export const load: PageServerLoad = async ({ locals }) => {
   }
 
   const show = locals.show as ShowDocument;
+  const room = locals.room as RoomDocument;
   let showEvent: ShowEventDocument | undefined;
 
   if (show) {
