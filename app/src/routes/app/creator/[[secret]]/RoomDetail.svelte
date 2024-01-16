@@ -1,20 +1,15 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import Config from '$lib/config';
-  import type { RoomDocumentType, roomZodSchema } from '$lib/models/room';
+  import { roomZodSchema } from '$lib/models/room';
   import Icon from '@iconify/svelte';
-  import {
-    getModalStore,
-    popup,
-    type ModalSettings,
-    type PopupSettings
-  } from '@skeletonlabs/skeleton';
-  import { copy, type CopyDetail } from '@svelte-put/copy';
+  import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
   import type { SuperValidated } from 'sveltekit-superforms';
   import urlJoin from 'url-join';
+  import CopyText from '$components/forms/CopyText.svelte';
 
   export let roomForm: SuperValidated<typeof roomZodSchema>;
-  $: room = roomForm.data as RoomDocumentType;
+  $: room = roomZodSchema.parse(roomForm.data);
 
   const modalStore = getModalStore();
 
@@ -28,33 +23,12 @@
     }
   };
 
-  const popupHover: PopupSettings = {
-    event: 'hover',
-    target: 'popupHover',
-    placement: 'top'
-  };
-
-  let copied = '';
-  function handleCopied(e: CustomEvent<CopyDetail>) {
-    copied = e.detail.text;
-    navigator.clipboard.writeText(copied);
-    setTimeout(() => {
-      copied = '';
-    }, 2000);
-  }
-
-  const roomUrl =
-    room && urlJoin($page.url.origin, Config.PATH.room, room.uniqueUrl);
+  const roomUrl = urlJoin(
+    $page.url.origin,
+    Config.PATH.room,
+    roomForm.data.uniqueUrl
+  );
 </script>
-
-{#if copied === ''}
-  <div
-    class="neon-primary p-4 rounded bg-custom border-2 border-primary-content"
-    data-popup="popupHover"
-  >
-    {roomUrl}
-  </div>
-{/if}
 
 <div
   class="bg-custom p-4 rounded flex flex-col gap-4 justify-center items-center"
@@ -81,19 +55,12 @@
       </div>
       <div>
         URL:
-        {#if copied}
-          <span class="text-success">Copied!</span>
-        {:else}
-          <button
-            class="anchor text-primary-content font-semibold"
-            use:copy={{ text: roomUrl }}
-            use:popup={popupHover}
-            on:copied={handleCopied}
-            on:click|preventDefault
-          >
-            {room.uniqueUrl}</button
-          >
-        {/if}
+        <CopyText
+          copyValue={roomUrl}
+          class="anchor neon-primary font-semibold variant-soft-primary mb-1"
+        >
+          {room.uniqueUrl}</CopyText
+        >
       </div>
     </div>
     <button
