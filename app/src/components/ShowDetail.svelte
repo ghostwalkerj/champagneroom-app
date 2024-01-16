@@ -4,15 +4,13 @@
   import urlJoin from 'url-join';
   import { page } from '$app/stores';
   import type { ShowDocument } from '$lib/models/show';
-
+  import CopyText from '$components/forms/CopyText.svelte';
   import Config from '$lib/config';
   import {
     ShowStatus,
     currencyFormatter,
     durationFormatter
   } from '$lib/constants';
-  import { popup, type PopupSettings } from '@skeletonlabs/skeleton';
-  import { copy, type CopyDetail } from '@svelte-put/copy';
 
   type ShowDetailOptions = {
     showCopy?: boolean;
@@ -59,21 +57,6 @@
     show._id.toString()
   );
 
-  const showLinkToolTip: PopupSettings = {
-    event: 'hover',
-    target: 'copyShowHover',
-    placement: 'top'
-  };
-
-  $: copied = '';
-  function copyShowLink(e: CustomEvent<CopyDetail>) {
-    copied = e.detail.text;
-    navigator.clipboard.writeText(copied);
-    setTimeout(() => {
-      copied = '';
-    }, 2000);
-  }
-
   onMount(() => {
     if (options.showWaterMark) {
       switch (showStatus) {
@@ -95,14 +78,6 @@
   });
 </script>
 
-{#if copied === ''}
-  <div
-    class="neon-primary p-4 rounded bg-custom border-2 border-primary-content z-50"
-    data-popup="copyShowHover"
-  >
-    {showPath}
-  </div>
-{/if}
 <div class="!text-center shadow-lg rounded">
   {#if show}
     <div class="grid !text-center md:grid-cols-2 bg-custom rounded-r">
@@ -133,18 +108,12 @@
 
         {#if options.showCopy}
           <div>
-            {#if copied}
-              <span class="text-success">Copied!</span>
-            {:else}
-              <button
-                class="btn btn-lg neon-primary font-semibold variant-soft-primary mb-1"
-                use:copy={{
-                  text: showPath
-                }}
-                use:popup={showLinkToolTip}
-                on:copied={copyShowLink}>Copy Show Link</button
-              >
-            {/if}
+            <CopyText
+              copyValue={showPath}
+              class="btn btn-lg neon-primary font-semibold variant-soft-primary mb-1"
+              >Copy Show Link</CopyText
+            >
+
             <p>Share with your fans</p>
           </div>
         {/if}
