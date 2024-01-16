@@ -13,7 +13,8 @@ import {
   JWT_PRIVATE_KEY
 } from '$env/static/private';
 
-import Config from '$lib/config';
+import Config from '$lib/models/config';
+
 import type { AuthType } from '$lib/constants';
 import { authDecrypt, authEncrypt } from '$lib/crypt';
 
@@ -48,6 +49,8 @@ const WHITELIST_PATHS = [
   Config.PATH.signout,
   Config.PATH.revert,
   Config.PATH.signup + '/**',
+  Config.PATH.room,
+  Config.PATH.room + '/**',
   Config.PATH.signup,
   ...WEBHOOK_PATHS
 ];

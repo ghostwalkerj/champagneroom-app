@@ -2,7 +2,7 @@
   import { applyAction, enhance } from '$app/forms';
   import { Image } from '@unpic/svelte';
 
-  import Config from '$lib/config';
+  import Config from '$lib/models/config';
 
   import type { ActionData } from './$types';
 

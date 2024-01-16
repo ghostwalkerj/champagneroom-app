@@ -1,9 +1,9 @@
 <script lang="ts">
+  import type { WalletDocumentType } from '$lib/models/wallet';
+  import Icon from '@iconify/svelte';
   import { getModalStore } from '@skeletonlabs/skeleton';
   import type { SvelteComponent } from 'svelte';
   import { superForm } from 'sveltekit-superforms/client';
-  import type { WalletDocumentType } from '$lib/models/wallet';
-  import Icon from '@iconify/svelte';
 
   // Props
   /** Exposes parent props to this component. */

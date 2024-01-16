@@ -16,6 +16,7 @@ import {
 } from '$env/static/private';
 
 import type { AgentDocument } from '$lib/models/agent';
+import Config from '$lib/models/config';
 import type { CreatorDocument } from '$lib/models/creator';
 import { Creator } from '$lib/models/creator';
 import { Show } from '$lib/models/show';
@@ -24,7 +25,6 @@ import { User } from '$lib/models/user';
 import type { WalletDocument } from '$lib/models/wallet';
 import { Wallet } from '$lib/models/wallet';
 
-import Config from '$lib/config';
 import { AuthType, CurrencyType, EntityType } from '$lib/constants';
 import { rateCryptosRateGet } from '$lib/ext/bitcart';
 import { createBitcartToken } from '$lib/payment';

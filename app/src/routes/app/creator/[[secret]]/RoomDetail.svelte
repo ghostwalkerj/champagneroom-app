@@ -1,12 +1,12 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import Config from '$lib/config';
+  import CopyText from '$components/forms/CopyText.svelte';
+  import Config from '$lib/models/config';
   import { roomZodSchema } from '$lib/models/room';
   import Icon from '@iconify/svelte';
   import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
   import type { SuperValidated } from 'sveltekit-superforms';
   import urlJoin from 'url-join';
-  import CopyText from '$components/forms/CopyText.svelte';
 
   export let roomForm: SuperValidated<typeof roomZodSchema>;
   $: room = roomZodSchema.parse(roomForm.data);
@@ -23,7 +23,7 @@
     }
   };
 
-  const roomUrl = urlJoin(
+  $: roomUrl = urlJoin(
     $page.url.origin,
     Config.PATH.room,
     roomForm.data.uniqueUrl

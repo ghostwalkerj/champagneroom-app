@@ -9,7 +9,7 @@
   import { invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
 
-  import Config from '$lib/config';
+  import Config from '$lib/models/config';
   import { AuthType, currencyFormatter } from '$lib/constants';
   import { womensNames } from '$lib/womensNames';
 

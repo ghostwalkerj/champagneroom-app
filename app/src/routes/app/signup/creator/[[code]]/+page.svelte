@@ -6,7 +6,7 @@
   import { applyAction, enhance } from '$app/forms';
   import { goto } from '$app/navigation';
 
-  import Config from '$lib/config';
+  import Config from '$lib/models/config';
   import { defaultWallet, selectedAccount } from '$lib/web3';
   import { womensNames } from '$lib/womensNames';
 

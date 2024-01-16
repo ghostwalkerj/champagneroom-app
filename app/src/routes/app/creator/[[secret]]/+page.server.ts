@@ -321,6 +321,8 @@ export const actions: Actions = {
       form.data.coverImageUrl = url;
     }
 
+    form.data.uniqueUrl = encodeURIComponent(form.data.uniqueUrl);
+
     Room.init();
 
     try {

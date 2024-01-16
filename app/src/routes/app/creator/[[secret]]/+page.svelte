@@ -27,7 +27,7 @@
   import ShowStatus from './ShowStatus.svelte';
 
   import { page } from '$app/stores';
-  import type { RoomDocumentType, roomZodSchema } from '$lib/models/room';
+  import type { roomZodSchema } from '$lib/models/room';
   import type { UserDocument } from '$lib/models/user';
   import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
   import type { SuperValidated } from 'sveltekit-superforms';
@@ -48,7 +48,6 @@
   let exchangeRate = +data.exchangeRate || 0;
   let jitsiToken = data.jitsiToken as string;
   let user = data.user as UserDocument;
-  let room = data.room as RoomDocumentType;
   $: roomForm = data.roomForm as SuperValidated<typeof roomZodSchema>;
 
   $: showVideo = false;

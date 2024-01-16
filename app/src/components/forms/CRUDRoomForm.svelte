@@ -1,14 +1,18 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import Config from '$lib/config';
+  import Config from '$lib/models/config';
   import { roomZodSchema } from '$lib/models/room';
   import Icon from '@iconify/svelte';
   import { FileDropzone, getModalStore } from '@skeletonlabs/skeleton';
   import { nanoid } from 'nanoid';
-  import { superForm } from 'sveltekit-superforms/client';
-  import urlJoin from 'url-join';
-  import type { SuperValidated } from 'sveltekit-superforms';
   import type { SvelteComponent } from 'svelte';
+  import type { SuperValidated } from 'sveltekit-superforms';
+  import {
+    fieldProxy,
+    stringProxy,
+    superForm
+  } from 'sveltekit-superforms/client';
+  import urlJoin from 'url-join';
 
   const modalStore = getModalStore();
   $: thisModal = $modalStore[0];

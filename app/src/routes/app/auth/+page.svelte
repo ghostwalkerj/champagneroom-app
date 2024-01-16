@@ -6,7 +6,7 @@
   import { applyAction, deserialize, enhance } from '$app/forms';
   import { goto } from '$app/navigation';
 
-  import Config from '$lib/config';
+  import Config from '$lib/models/config';
   import { AuthType } from '$lib/constants';
   import { defaultWallet, selectedAccount } from '$lib/web3';
 

@@ -17,6 +17,7 @@ import {
 
 import type { AgentDocument } from '$lib/models/agent';
 import { Agent } from '$lib/models/agent';
+import Config from '$lib/models/config';
 import type { CreatorDocument } from '$lib/models/creator';
 import { Creator } from '$lib/models/creator';
 import type { OperatorDocument } from '$lib/models/operator';
@@ -28,7 +29,6 @@ import type { UserDocument } from '$lib/models/user';
 import { User } from '$lib/models/user';
 import { Wallet, type WalletDocument } from '$lib/models/wallet';
 
-import Config from '$lib/config';
 import { UserRole } from '$lib/constants';
 import {
   deleteAuthToken,

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Config from '$lib/config';
+  import Config from '$lib/models/config';
   import { Image } from '@unpic/svelte';
 </script>
 

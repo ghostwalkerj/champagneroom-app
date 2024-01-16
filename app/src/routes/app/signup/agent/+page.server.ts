@@ -4,11 +4,11 @@ import * as web3 from 'web3';
 import { AUTH_SIGNING_MESSAGE } from '$env/static/private';
 
 import { Agent } from '$lib/models/agent';
+import Config from '$lib/models/config';
 import type { UserDocument } from '$lib/models/user';
 import { User } from '$lib/models/user';
 import { Wallet } from '$lib/models/wallet';
 
-import Config from '$lib/config';
 import { AuthType, EntityType, UserRole } from '$lib/constants';
 
 import type { Actions, PageServerLoad } from './$types';

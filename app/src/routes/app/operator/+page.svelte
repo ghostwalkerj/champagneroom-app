@@ -13,7 +13,7 @@
   import type { OperatorDocument } from '$lib/models/operator';
   import type { ShowDocument } from '$lib/models/show';
 
-  import Config from '$lib/config';
+  import Config from '$lib/models/config';
   import { AuthType, DisputeDecision, currencyFormatter } from '$lib/constants';
   import { womensNames } from '$lib/womensNames';
 

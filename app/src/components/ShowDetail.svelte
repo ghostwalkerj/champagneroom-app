@@ -1,16 +1,16 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import StarRating from 'svelte-star-rating';
-  import urlJoin from 'url-join';
   import { page } from '$app/stores';
-  import type { ShowDocument } from '$lib/models/show';
   import CopyText from '$components/forms/CopyText.svelte';
-  import Config from '$lib/config';
+  import Config from '$lib/models/config';
   import {
     ShowStatus,
     currencyFormatter,
     durationFormatter
   } from '$lib/constants';
+  import type { ShowDocument } from '$lib/models/show';
+  import { onMount } from 'svelte';
+  import StarRating from 'svelte-star-rating';
+  import urlJoin from 'url-join';
 
   type ShowDetailOptions = {
     showCopy?: boolean;
