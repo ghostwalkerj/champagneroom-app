@@ -46,6 +46,7 @@
         Name: <span class="font-semibold">{room.name}</span>
       </div>
       <div class="text-sm">"{room.tagLine}""</div>
+      bannerImageUrl
       <div class="overflow-hidden m-4 max-w-fit">
         <!-- svelte-ignore a11y-missing-attribute -->
         <img
@@ -59,7 +60,7 @@
           copyValue={roomUrl}
           class="anchor neon-primary font-semibold variant-soft-primary mb-1"
         >
-          {room.uniqueUrl}</CopyText
+          {decodeURIComponent(room.uniqueUrl)}</CopyText
         >
       </div>
     </div>

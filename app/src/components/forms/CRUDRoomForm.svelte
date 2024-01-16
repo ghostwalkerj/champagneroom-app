@@ -42,8 +42,8 @@
     $form.uniqueUrl = nanoid(10).toLowerCase();
   }
 
-  if ($form.coverImageUrl === undefined) {
-    $form.coverImageUrl = Config.UI.defaultProfileImage;
+  if ($form.bannerImageUrl === undefined) {
+    $form.bannerImageUrl = Config.UI.defaultProfileImage;
   }
 
   $: roomUrl = urlJoin($page.url.origin, Config.PATH.room);
@@ -60,7 +60,7 @@
     >
       <input type="hidden" name="active" value="true" />
       <input type="hidden" name="_id" value={$form._id} />
-      <input type="hidden" name="coverImageUrl" value={$form.coverImageUrl} />
+      <input type="hidden" name="coverImageUrl" value={$form.bannerImageUrl} />
 
       <FileDropzone
         name="images"
@@ -70,13 +70,13 @@
         accept="image/*"
         on:change={() => {
           if (images.length > 0) {
-            $form.coverImageUrl = URL.createObjectURL(images[0]);
+            $form.bannerImageUrl = URL.createObjectURL(images[0]);
           }
         }}
       >
         <svelte:fragment slot="message">
           <div>
-            <img src={$form.coverImageUrl} alt="coverImageUrl" />
+            <img src={$form.bannerImageUrl} alt="coverImageUrl" />
           </div>
           <div class="label font-semibold p-4">Upload Room Cover Image</div>
         </svelte:fragment>

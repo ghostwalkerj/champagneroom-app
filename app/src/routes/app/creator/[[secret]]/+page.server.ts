@@ -318,7 +318,7 @@ export const actions: Actions = {
     if (image instanceof File && image.size > 0) {
       // upload image to web3
       const url = await web3Upload(WEB3STORAGE_KEY, WEB3STORAGE_PROOF, image);
-      form.data.coverImageUrl = url;
+      form.data.bannerImageUrl = url;
     }
 
     form.data.uniqueUrl = encodeURIComponent(form.data.uniqueUrl);
