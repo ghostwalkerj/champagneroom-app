@@ -1,5 +1,3 @@
-import console from 'node:console';
-
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { AxiosResponse } from 'axios';
 import { nanoid } from 'nanoid';

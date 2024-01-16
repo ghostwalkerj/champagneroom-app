@@ -1,5 +1,4 @@
 import { error, fail } from '@sveltejs/kit';
-import type { AxiosResponse } from 'axios';
 import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 import jwt from 'jsonwebtoken';
@@ -424,7 +423,7 @@ export const load: PageServerLoad = async ({ locals }) => {
   }
 
   const exchangeRate =
-    ((await rateCryptosRateGet(
+    (await rateCryptosRateGet(
       {
         currency: wallet.currency,
         fiat_currency: CurrencyType.USD
@@ -435,7 +434,7 @@ export const load: PageServerLoad = async ({ locals }) => {
           'Content-Type': 'application/json'
         }
       }
-    )) as AxiosResponse<string>) || undefined;
+    )) || undefined;
 
   const roomForm = room
     ? await superValidate(
