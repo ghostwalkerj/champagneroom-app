@@ -4,6 +4,16 @@ import preprocess from 'svelte-preprocess';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
+  onwarn: (
+    /** @type {{ code: string; }} */ warning,
+    /** @type {(arg0: any) => void} */ handler
+  ) => {
+    // suppress warnings on `vite dev` and `vite build`; but even without this, things still work
+    if (warning.code === 'a11y-click-events-have-key-events') return;
+    if (warning.code === 'a11y-no-static-element-interactions') return;
+    if (warning.code === 'a11y-no-noninteractive-element-interactions') return;
+    handler(warning);
+  },
   kit: {
     adapter: adapter(),
     csrf: { checkOrigin: true },

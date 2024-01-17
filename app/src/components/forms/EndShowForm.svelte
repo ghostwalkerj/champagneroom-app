@@ -1,6 +1,7 @@
 <script lang="ts">
   import { applyAction, enhance } from '$app/forms';
   import { getModalStore } from '@skeletonlabs/skeleton';
+  import type { ActionResult } from '@sveltejs/kit';
   import type { SvelteComponent } from 'svelte';
 
   const modalStore = getModalStore();
@@ -13,8 +14,8 @@
 
   const onSubmit = ({}) => {
     isLoading = true;
-    return async ({ result }) => {
-      if (result.data.success) {
+    return async ({ result }: { result: ActionResult }) => {
+      if (result.type ==='success') {
         $modalStore[0].response!(true);
       }
       await applyAction(result);

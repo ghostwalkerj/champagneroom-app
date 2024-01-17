@@ -9,9 +9,8 @@
 
   export let destination = '';
   export let exchangeRate = 0;
-  export let form: ActionData;
   export let wallet: WalletDocumentType;
-  export let withdrawForm: any;
+  export let withdrawForm: ActionData;
 
   const modalStore = getModalStore();
 

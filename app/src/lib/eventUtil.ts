@@ -7,13 +7,11 @@ import { ShowMachineEventString } from '$lib/constants';
 export const createEventText = (
   showEvent: ShowEventDocumentType | undefined
 ) => {
+  const name = showEvent?.ticketInfo?.customerName || 'someone';
   if (showEvent === undefined) {
     return 'No Events';
   }
-  let eventText =
-    timeago.format(showEvent.createdAt) +
-      ' ' +
-      showEvent.ticketInfo?.customerName ?? 'someone';
+  let eventText = timeago.format(showEvent.createdAt) + ' ' + name;
 
   switch (showEvent.type) {
     case ShowMachineEventString.TICKET_SOLD: {

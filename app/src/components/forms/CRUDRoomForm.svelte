@@ -7,11 +7,7 @@
   import { nanoid } from 'nanoid';
   import type { SvelteComponent } from 'svelte';
   import type { SuperValidated } from 'sveltekit-superforms';
-  import {
-    fieldProxy,
-    stringProxy,
-    superForm
-  } from 'sveltekit-superforms/client';
+  import { superForm } from 'sveltekit-superforms/client';
   import urlJoin from 'url-join';
 
   const modalStore = getModalStore();

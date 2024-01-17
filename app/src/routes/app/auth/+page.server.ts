@@ -122,7 +122,7 @@ export const actions: Actions = {
       case 'creator': {
         selector = 'secret';
 
-        const query = {};
+        const query: { [key: string]: string } = {};
         query[selector] = parseId;
 
         user = (await User.findOne(query)) as UserDocument;

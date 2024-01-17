@@ -11,6 +11,7 @@
 
   import type { CreatorDocument } from '$lib/models/creator';
   import type { ActionData } from './$types';
+  import type { ActionResult } from '@sveltejs/kit';
 
   import { RangeSlider } from '@skeletonlabs/skeleton';
   import { superForm } from 'sveltekit-superforms/client';
@@ -30,17 +31,19 @@
 
   const onSubmit = ({}) => {
     isLoading = true;
-    return async ({ result }) => {
-      switch (true) {
-        case result.data.showCreated: {
-          const showUrl = urlJoin(
-            window.location.origin,
-            Config.PATH.show,
-            result.data.show!._id.toString()
-          );
-          navigator.clipboard.writeText(showUrl);
-          onShowCreated(result.data.show);
-          break;
+    return async ({ result }: { result: ActionResult }) => {
+      if (result.type === 'success') {
+        switch (true) {
+          case result.data!.showCreated: {
+            const showUrl = urlJoin(
+              window.location.origin,
+              Config.PATH.show,
+              result.data!.show!._id.toString()
+            );
+            navigator.clipboard.writeText(showUrl);
+            onShowCreated(result.data!.show);
+            break;
+          }
         }
       }
       await applyAction(result);

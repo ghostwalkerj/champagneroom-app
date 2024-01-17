@@ -1,10 +1,10 @@
 import { CarReader } from '@ipld/car';
+import type { API } from '@ucanto/core';
 import { importDAG } from '@ucanto/core/delegation';
-import type { API } from '@ucanto/core/lib';
 import * as Signer from '@ucanto/principal/ed25519';
 import { StoreMemory } from '@web3-storage/access/stores/store-memory';
 import { create } from '@web3-storage/w3up-client';
-import type { SharedSpace } from '@web3-storage/w3up-client/dist/src/space';
+import type { SharedSpace } from '@web3-storage/w3up-client/space';
 
 import { WEB3STORAGE_DOMAIN } from '$env/static/private';
 

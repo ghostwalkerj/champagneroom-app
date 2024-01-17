@@ -14,6 +14,7 @@ import {
 } from '$env/static/public';
 
 import Config from '$lib/models/config';
+import { lastValueFrom } from 'rxjs';
 
 // Wallets
 const injected = injectedModule();
@@ -116,9 +117,10 @@ export const defaultWallet = derived(_defaultWallet, ($defaultWallet) => {
   return $defaultWallet;
 });
 
-export const disconnect = () => {
-  if (wallets$?.[0]?.label) {
-    onboard.disconnectWallet({ label: wallets$?.[0]?.label });
+export const disconnect = async () => {
+  const wallets = await lastValueFrom(wallets$);
+  if (wallets?.[0]?.label) {
+    onboard.disconnectWallet({ label: wallets[0].label });
     _selectedAccount.set(undefined);
     _defaultWallet.set(undefined);
   }

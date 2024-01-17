@@ -479,7 +479,7 @@ export const load: PageServerLoad = async ({ locals }) => {
       show.toJSON({ flattenMaps: true, flattenObjectIds: true })
     ),
     wallet: wallet.toJSON({ flattenMaps: true, flattenObjectIds: true }),
-    exchangeRate: exchangeRate?.data,
+    exchangeRate: exchangeRate?.data as string,
     jitsiToken,
     room: room
       ? room.toJSON({ flattenMaps: true, flattenObjectIds: true })

@@ -2,7 +2,7 @@
   import { popup, type PopupSettings } from '@skeletonlabs/skeleton';
   import { copy, type CopyDetail } from '@svelte-put/copy';
 
-  export let copyValue;
+  export let copyValue = '';
 
   const popupHover: PopupSettings = {
     event: 'hover',

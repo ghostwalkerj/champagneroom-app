@@ -34,11 +34,13 @@ import {
   UserRole
 } from '$lib/constants';
 import { authEncrypt } from '$lib/crypt';
+import type { DisplayInvoice } from '$lib/ext/bitcart/models';
 import { mensNames } from '$lib/mensNames';
 import {
   createBitcartToken,
   InvoiceJobType,
-  InvoiceStatus
+  InvoiceStatus,
+  type PaymentType
 } from '$lib/payment';
 import { createAuthToken, setAuthToken } from '$lib/server/auth';
 import {
@@ -161,7 +163,7 @@ export const actions: Actions = {
     }
 
     // Update the notification url
-    const invoice = response.data;
+    const invoice = response.data as DisplayInvoice;
     const encryptedInvoiceId = authEncrypt(invoice.id, AUTH_SALT) ?? '';
 
     invoice.notification_url = urlJoin(
@@ -181,11 +183,11 @@ export const actions: Actions = {
     ticket.bcInvoiceId = invoice.id;
 
     const payment = invoice.payments
-      ? invoice.payments[0] // Use the first wallet
+      ? (invoice.payments[0] as PaymentType) // Use the first wallet
       : undefined;
 
-    if (payment && payment['payment_address']) {
-      ticket.paymentAddress = payment['payment_address'];
+    if (payment && 'payment_address' in payment) {
+      ticket.paymentAddress = payment['payment_address'] as string;
     }
     await ticket.save();
 

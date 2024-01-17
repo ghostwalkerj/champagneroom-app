@@ -30,7 +30,7 @@
   let message = '';
 
   const onSubmit = () => {
-    return async ({ result }) => {
+    return async ({ result }: { result: ActionResult }) => {
       authAction(result);
       applyAction(result);
     };
@@ -177,8 +177,9 @@
           </div>
         {/if}
         {#if signingRejected}
-          <!-- svelte-ignore a11y-click-events-have-key-events -->
+          <!-- svelte-ignore a11y-no-static-element-interactions -->
           <div>
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
             <div class="daisy-btn daisy-btn-primary" on:click={signMessage}>
               Sign Message
             </div>

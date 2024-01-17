@@ -143,4 +143,4 @@ showSchema.plugin(fieldEncryption, {
 });
 export const Show = pkg.models.Show ?? pkg.model('Show', showSchema);
 
-export { ShowDocumentType };
+export { type ShowDocumentType };

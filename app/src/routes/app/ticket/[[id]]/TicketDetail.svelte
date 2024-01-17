@@ -47,6 +47,7 @@
     <div class="group grid grid-cols-2 md:grid-cols-5 h-full md:min-h-[200px]">
       <!-- Image Section: Take full width on mobile, 1/5th on medium and larger screens -->
       <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
       <div
         class="col-span-2 md:col-span-1 relative"
         on:click={toggleFullScreen}
@@ -114,6 +115,7 @@
   <!-- Full Screen Image Overlay -->
   {#if isFullScreen}
     <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
       class="fixed top-0 left-0 w-screen h-screen flex justify-center items-center bg-black bg-opacity-80 z-50"
       on:click={toggleFullScreen}

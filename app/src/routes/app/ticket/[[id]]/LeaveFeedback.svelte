@@ -1,5 +1,6 @@
 <script lang="ts">
   import { applyAction, enhance } from '$app/forms';
+  import type { ActionResult } from '@sveltejs/kit';
 
   import type { ActionData } from './$types';
 
@@ -8,7 +9,7 @@
 
   const onSubmit = () => {
     isLoading = true;
-    return async ({ result }) => {
+    return async ({ result }: { result: ActionResult }) => {
       if (result.type === 'failure') {
         isLoading = false;
       }

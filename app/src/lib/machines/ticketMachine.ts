@@ -8,18 +8,18 @@ import { raise } from 'xstate/lib/actions';
 
 import type { FeedbackType, TransactionSummaryType } from '$lib/models/common';
 import {
-  disputeZodSchema,
-  escrowZodSchema,
-  finalizeZodSchema,
-  redemptionZodSchema,
-  refundZodSchema,
-  ticketSaleZodSchema,
-  transactionSummaryZodSchema,
   type CancelType,
   type DisputeType,
+  disputeZodSchema,
+  escrowZodSchema,
   type FinalizeType,
+  finalizeZodSchema,
+  redemptionZodSchema,
   type RefundType,
-  type SaleType
+  refundZodSchema,
+  type SaleType,
+  ticketSaleZodSchema,
+  transactionSummaryZodSchema
 } from '$lib/models/common';
 import type { TicketDocument, TicketStateType } from '$lib/models/ticket';
 import type { TransactionDocument } from '$lib/models/transaction';
@@ -788,13 +788,14 @@ const createTicketMachine = ({
           );
         },
         canBeRefunded: (context) => {
+          const currency = context.ticketDocument.price.currency;
+
           return (
             context.ticketDocument.price.amount !== 0 &&
             (!context.ticketState.sale ||
               !context.ticketState.sale?.payments ||
-              context.ticketState.sale?.payments[
-                context.ticketDocument.price.currency
-              ]?.length === 0)
+              (context.ticketState.sale?.payments as any)[currency]?.length ===
+                0)
           );
         },
 
@@ -819,7 +820,7 @@ export type TicketMachineStateType = StateFrom<
 
 export type TicketMachineType = ReturnType<typeof createTicketMachine>;
 
-export { TicketMachineEventType };
+export { type TicketMachineEventType };
 
 export { createTicketMachine };
 

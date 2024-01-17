@@ -237,12 +237,12 @@
   };
 
   const onSubmit = ({}) => {
-    return async ({ result }) => {
+    return async ({ result }: { result: ActionResult }) => {
       if (result?.type === 'success') {
         canAddAgent = false;
         canAddCreator = false;
         await invalidateAll();
-        if (result.data.agentCreated) {
+        if (result.data!.agentCreated) {
           agentName =
             'Agent ' +
             uniqueNamesGenerator({
@@ -251,31 +251,31 @@
           agentAddress = '';
           agents = $page.data.agents;
         }
-        if (result.data.creatorCreated) {
+        if (result.data!.creatorCreated) {
           creatorName =
             'Creator ' +
             uniqueNamesGenerator({
               dictionaries: [womensNames]
             });
           creators = $page.data.creators;
-          newCreator = result.data.creator;
-          newPassword = result.data.password;
+          newCreator = result.data!.creator;
+          newPassword = result.data!.password;
           newCreatorModal.showModal();
         }
-      } else {
-        if (result.data.badAgentName) {
+      } else if (result?.type === 'failure') {
+        if (result.data!.badAgentName) {
           agentNameElement.focus();
         }
-        if (result.data.badAgentAddress) {
+        if (result.data!.badAgentAddress) {
           agentAddressElement.focus();
         }
-        if (result.data.badCommission) {
+        if (result.data!.badCommission) {
           creatorCommissionElement.focus();
         }
-        if (result.data.badCreatorName) {
+        if (result.data!.badCreatorName) {
           creatorNameElement.focus();
         }
-        if (result.data.missingAgentId) {
+        if (result.data!.missingAgentId) {
           creatorAgentElement.focus();
         }
       }
@@ -389,6 +389,7 @@
           <div class="daisy-tabs daisy-tabs-boxed w-fit">
             <!-- svelte-ignore a11y-missing-attribute -->
             <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
             <a
               class="daisy-tab"
               class:daisy-tab-active={activeTab === 'Admin'}
@@ -399,6 +400,8 @@
 
             <!-- svelte-ignore a11y-missing-attribute -->
             <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
+
             <a
               class="daisy-tab"
               class:daisy-tab-active={activeTab === 'Agents'}
@@ -409,6 +412,8 @@
 
             <!-- svelte-ignore a11y-missing-attribute -->
             <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
+
             <a
               class="daisy-tab"
               class:daisy-tab-active={activeTab === 'Creators'}
@@ -419,6 +424,8 @@
 
             <!-- svelte-ignore a11y-missing-attribute -->
             <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
+
             <a
               class="daisy-tab"
               class:daisy-tab-active={activeTab == 'Disputes'}

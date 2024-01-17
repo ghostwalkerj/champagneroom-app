@@ -305,7 +305,6 @@
             <WalletDetail
               {wallet}
               {exchangeRate}
-              {form}
               {destination}
               withdrawForm={data.requestPayoutForm}
             />

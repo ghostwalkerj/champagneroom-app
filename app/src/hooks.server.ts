@@ -67,9 +67,9 @@ const redisConnection = new IORedis({
 });
 
 const setLocals = async (decode: JwtPayload, locals: App.Locals) => {
-  const selector = decode.selector;
+  const selector = decode.selector as string;
   if (selector) {
-    const query = {};
+    const query: Record<string, unknown> = {};
     query[selector] = decode[selector];
 
     // Check if user is allowed to access the requested path
@@ -167,7 +167,9 @@ const allowedPath = (path: string, locals: App.Locals, selector?: string) => {
   if (!locals.user) return false;
 
   const slug =
-    selector === undefined ? undefined : locals.user[selector].toString();
+    selector === undefined
+      ? undefined
+      : locals.user[selector as keyof typeof locals.user]?.toString();
 
   // If the user is a creator, they can access their own page
   if (isPasswordMatch(path)) {

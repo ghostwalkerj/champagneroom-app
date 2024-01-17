@@ -50,7 +50,7 @@
       <div class="overflow-hidden m-4 max-w-fit">
         <!-- svelte-ignore a11y-missing-attribute -->
         <img
-          src={room.coverImageUrl}
+          src={room.bannerImageUrl}
           class="rounded-container-token max-w-full"
         />
       </div>
