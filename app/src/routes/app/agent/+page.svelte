@@ -104,14 +104,16 @@
     applyAction(result);
   };
 
-  const updateName = (name: string) => {
+  const updateName = (event: FocusEvent) => {
+    const name = (event.target as HTMLTableCellElement).innerText;
     if (name === creators[activeRow].user.name) return;
     const index = activeRow;
     creators[index].user.name = name;
     updateCreator(creators[index]);
   };
 
-  const updateCommission = (commission: number) => {
+  const updateCommission = (event: FocusEvent) => {
+    const commission = Number((event.target as HTMLTableCellElement).innerText);
     if (commission != creators[activeRow].commissionRate) {
       const index = activeRow;
 
@@ -120,7 +122,8 @@
     }
   };
 
-  const updateActive = (active: boolean) => {
+  const updateActive = (event: Event) => {
+    const active = (event.target as HTMLInputElement).checked;
     const index = activeRow;
     creators[index].user.active = active;
     updateCreator(creators[index]);
@@ -373,26 +376,20 @@
                             on:click={() => (activeRow = index)}
                           >
                             <td>{index + 1}</td>
-                            <td
-                              contenteditable="true"
-                              on:blur={(event) => {
-                                updateName(event.target?.textContent);
-                              }}>{creator.user.name}</td
+                            <td contenteditable="true" on:blur={updateName}
+                              >{creator.user.name}</td
                             >
                             <td
                               contenteditable="true"
-                              on:blur={(event) => {
-                                updateCommission(event.target?.textContent);
-                              }}>{creator.commissionRate}</td
+                              on:blur={updateCommission}
+                              >{creator.commissionRate}</td
                             >
                             <td>
                               <input
                                 class="checkbox"
                                 type="checkbox"
                                 checked={creator.user.active}
-                                on:change={(event) => {
-                                  updateActive(event.target?.checked);
-                                }}
+                                on:change={updateActive}
                               />
                             </td>
 

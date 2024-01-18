@@ -2,7 +2,7 @@ import { nanoid } from 'nanoid';
 import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 
 import {
-  earningsZodSchema,
+  earningsSchema,
   type EarningsType,
   type PayoutType
 } from '$lib/models/common';
@@ -10,7 +10,7 @@ import type { CreatorDocument } from '$lib/models/creator';
 import type { ShowDocument } from '$lib/models/show';
 import type { TransactionDocument } from '$lib/models/transaction';
 import type { WalletDocumentType } from '$lib/models/wallet';
-import { WalletStatus, type WalletDocument } from '$lib/models/wallet';
+import { type WalletDocument, WalletStatus } from '$lib/models/wallet';
 
 import { EarningsSource } from '$lib/constants.js';
 import { PayoutStatus } from '$lib/payment';
@@ -192,7 +192,7 @@ const createWalletMachine = ({
             const amount =
               (show.showState.salesStats.totalRevenue[wallet.currency] || 0) *
               (takeHome / 100);
-            const earning = earningsZodSchema.parse({
+            const earning = earningsSchema.parse({
               earnedAt: new Date(),
               show: show._id,
               amount,

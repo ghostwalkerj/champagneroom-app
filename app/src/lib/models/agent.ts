@@ -13,7 +13,7 @@ import type { UserDocument } from './user';
 
 const { models } = pkg;
 
-const agentZodSchema = toZodMongooseSchema(
+const agentSchema = toZodMongooseSchema(
   z
     .object({
       _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
@@ -34,15 +34,15 @@ const agentZodSchema = toZodMongooseSchema(
     }
   }
 );
-const agentSchema = toMongooseSchema(agentZodSchema);
-agentSchema.plugin(mongooseAutoPopulate);
+const agentMongooseSchema = toMongooseSchema(agentSchema);
+agentMongooseSchema.plugin(mongooseAutoPopulate);
 
 export type AgentDocument = InstanceType<typeof Agent> & {
   user: UserDocument;
 };
 
-export type AgentDocumentType = z.infer<typeof agentZodSchema>;
+export type AgentDocumentType = z.infer<typeof agentSchema>;
 
 export const Agent = models?.Agent
   ? (models.Agent as Model<AgentDocumentType>)
-  : mongoose.model<AgentDocumentType>('Agent', agentSchema);
+  : mongoose.model<AgentDocumentType>('Agent', agentMongooseSchema);

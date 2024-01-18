@@ -12,7 +12,7 @@
     TicketMachineEventString,
     TicketStatus
   } from '$lib/constants';
-  import { disputeZodSchema, refundZodSchema } from '$lib/models/common';
+  import { disputeSchema, refundSchema } from '$lib/models/common';
   import type { ShowDocument } from '$lib/models/show';
   import type { UserDocument } from '$lib/models/user';
 
@@ -151,11 +151,11 @@
 
     canDispute = state.can({
       type: 'DISPUTE INITIATED',
-      dispute: disputeZodSchema.parse({
+      dispute: disputeSchema.parse({
         disputedBy: ActorType.CUSTOMER,
         reason: DisputeReason.ENDED_EARLY
       }),
-      refund: refundZodSchema.parse({
+      refund: refundSchema.parse({
         reason: RefundReason.DISPUTE_DECISION
       })
     });

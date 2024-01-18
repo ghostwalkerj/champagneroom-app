@@ -12,7 +12,7 @@ import type { ShowDocumentType } from './show';
 import type { TransactionDocumentType } from './transaction';
 const { models } = pkg;
 
-const showEventZodSchema = toZodMongooseSchema(
+const showEventSchema = toZodMongooseSchema(
   z
     .object({
       _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
@@ -51,12 +51,12 @@ const showEventZodSchema = toZodMongooseSchema(
   }
 );
 
-const showeventSchema = toMongooseSchema(showEventZodSchema);
+const showeventSchema = toMongooseSchema(showEventSchema);
 showeventSchema.index({ show: 1, createdAt: -1 });
 
 export type ShowEventDocument = InstanceType<typeof ShowEvent>;
 
-export type ShowEventDocumentType = z.infer<typeof showEventZodSchema>;
+export type ShowEventDocumentType = z.infer<typeof showEventSchema>;
 
 export const ShowEvent = models?.ShowEvent
   ? (models.ShowEvent as Model<ShowEventDocumentType>)

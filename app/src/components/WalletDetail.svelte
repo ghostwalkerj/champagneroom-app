@@ -5,12 +5,10 @@
   import { currencyFormatter } from '$lib/constants';
   import Icon from '@iconify/svelte';
   import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
-  import type { ActionData } from '../routes/app/$types';
 
   export let destination = '';
   export let exchangeRate = 0;
   export let wallet: WalletDocumentType;
-  export let withdrawForm: ActionData;
 
   const modalStore = getModalStore();
 
@@ -21,6 +19,12 @@
   $: earnings = wallet?.earnings;
   $: payouts = wallet?.payouts;
   $: availableBalance = wallet?.availableBalance || 0;
+
+  const withdrawForm = {
+    walletId: wallet?._id,
+    amount: 0,
+    destination
+  };
 
   const modal: ModalSettings = {
     type: 'component',

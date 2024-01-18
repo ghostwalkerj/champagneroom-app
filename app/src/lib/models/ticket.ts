@@ -13,35 +13,35 @@ import validator from 'validator';
 import { TicketStatus } from '$lib/constants';
 
 import {
-  cancelZodSchema,
-  disputeZodSchema,
-  escrowZodSchema,
-  finalizeZodSchema,
-  moneyZodSchema,
-  redemptionZodSchema,
-  refundZodSchema,
-  ticketFeedbackZodSchema,
-  ticketSaleZodSchema
+  cancelSchema,
+  disputeSchema,
+  escrowSchema,
+  finalizeSchema,
+  moneySchema,
+  redemptionSchema,
+  refundSchema,
+  ticketFeedbackSchema,
+  ticketSaleSchema
 } from './common';
 import type { ShowDocument } from './show';
 import type { UserDocument } from './user';
 
 const { models } = pkg;
 
-const ticketStateZodSchema = z.object({
+const ticketStateSchema = z.object({
   status: z.nativeEnum(TicketStatus).default(TicketStatus.RESERVED),
   active: z.boolean().default(true),
-  cancel: cancelZodSchema.optional(),
-  redemption: redemptionZodSchema.optional(),
-  escrow: escrowZodSchema.optional(),
-  dispute: disputeZodSchema.optional(),
-  finalize: finalizeZodSchema.optional(),
-  feedback: ticketFeedbackZodSchema.optional(),
-  refund: refundZodSchema.optional(),
-  sale: ticketSaleZodSchema.optional()
+  cancel: cancelSchema.optional(),
+  redemption: redemptionSchema.optional(),
+  escrow: escrowSchema.optional(),
+  dispute: disputeSchema.optional(),
+  finalize: finalizeSchema.optional(),
+  feedback: ticketFeedbackSchema.optional(),
+  refund: refundSchema.optional(),
+  sale: ticketSaleSchema.optional()
 });
 
-const ticketZodSchema = toZodMongooseSchema(
+const ticketSchema = toZodMongooseSchema(
   z
     .object({
       _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
@@ -56,12 +56,12 @@ const ticketZodSchema = toZodMongooseSchema(
           message: 'Invalid Ethereum address'
         })
         .optional(),
-      price: moneyZodSchema,
+      price: moneySchema,
       show: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
         ref: 'Show'
       }),
       bcInvoiceId: z.string().trim().optional(),
-      ticketState: ticketStateZodSchema.default({}),
+      ticketState: ticketStateSchema.default({}),
       user: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
         autopopulate: true,
         ref: 'User'
@@ -81,9 +81,9 @@ const ticketZodSchema = toZodMongooseSchema(
   }
 );
 
-const ticketSchema = toMongooseSchema(ticketZodSchema);
+const ticketMongooseSchema = toMongooseSchema(ticketSchema);
 
-ticketSchema.plugin(mongooseAutoPopulate);
+ticketMongooseSchema.plugin(mongooseAutoPopulate);
 
 export type TicketDocument = InstanceType<typeof Ticket> & {
   show: ShowDocument;
@@ -91,9 +91,9 @@ export type TicketDocument = InstanceType<typeof Ticket> & {
   user: UserDocument;
 };
 
-export type TicketDocumentType = z.infer<typeof ticketZodSchema>;
+export type TicketDocumentType = z.infer<typeof ticketSchema>;
 
-export type TicketStateType = z.infer<typeof ticketStateZodSchema>;
+export type TicketStateType = z.infer<typeof ticketStateSchema>;
 
 export const SaveState = (
   ticket: TicketDocument,
@@ -107,6 +107,6 @@ export const SaveState = (
 
 export const Ticket = models?.Ticket
   ? (models.Ticket as Model<TicketDocumentType>)
-  : mongoose.model<TicketDocumentType>('Ticket', ticketSchema);
+  : mongoose.model<TicketDocumentType>('Ticket', ticketMongooseSchema);
 
 export { TicketStatus } from '$lib/constants';

@@ -10,7 +10,7 @@ import {
 
 import { CurrencyType } from '$lib/constants';
 
-import { earningsZodSchema, payoutZodSchema } from './common';
+import { earningsSchema, payoutSchema } from './common';
 
 const { models } = pkg;
 
@@ -21,7 +21,7 @@ enum WalletStatus {
   PAYOUT_IN_PROGRESS = 'PAYOUT IN PROGRESS'
 }
 
-const earningsZodMongooseSchema = toZodMongooseSchema(earningsZodSchema, {
+const earningsZodMongooseSchema = toZodMongooseSchema(earningsSchema, {
   typeOptions: {
     show: {
       ref: 'Show'
@@ -29,7 +29,7 @@ const earningsZodMongooseSchema = toZodMongooseSchema(earningsZodSchema, {
   }
 });
 
-const payoutZodMongooseSchema = toZodMongooseSchema(payoutZodSchema, {
+const payoutZodMongooseSchema = toZodMongooseSchema(payoutSchema, {
   typeOptions: {
     transaction: {
       ref: 'Transaction'
@@ -37,7 +37,7 @@ const payoutZodMongooseSchema = toZodMongooseSchema(payoutZodSchema, {
   }
 });
 
-const walletZodSchema = z
+const walletSchema = z
   .object({
     _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
       _id: true,
@@ -56,18 +56,18 @@ const walletZodSchema = z
   })
   .merge(genTimestampsSchema());
 
-const walletZodMongooseSchema = toZodMongooseSchema(walletZodSchema, {
+const walletZodMongooseSchema = toZodMongooseSchema(walletSchema, {
   schemaOptions: {
     collection: 'wallets'
   }
 });
-const walletSchema = toMongooseSchema(walletZodMongooseSchema);
+const walletMongooseSchema = toMongooseSchema(walletZodMongooseSchema);
 
 export type WalletDocumentType = z.infer<typeof walletZodMongooseSchema>;
 
 export const Wallet = models?.Wallet
   ? (models.Wallet as Model<WalletDocumentType>)
-  : mongoose.model<WalletDocumentType>('Wallet', walletSchema);
+  : mongoose.model<WalletDocumentType>('Wallet', walletMongooseSchema);
 
 export { WalletStatus };
 
@@ -84,4 +84,4 @@ export const atomicUpdateCallback = async (
   ).exec()) as WalletDocument;
 };
 
-export { walletSchema };
+export { walletMongooseSchema };

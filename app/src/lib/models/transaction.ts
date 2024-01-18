@@ -13,11 +13,13 @@ import { CurrencyType, TransactionReason } from '$lib/constants';
 
 export type TransactionDocument = InstanceType<typeof Transaction>;
 
-export type TransactionDocumentType = z.infer<typeof transactionZodSchema>;
+export type TransactionDocumentType = z.infer<
+  typeof transactionZodMongooseSchema
+>;
 
 const { models } = pkg;
 
-const transactionZodSchema = toZodMongooseSchema(
+const transactionZodMongooseSchema = toZodMongooseSchema(
   z
     .object({
       _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
@@ -69,10 +71,15 @@ const transactionZodSchema = toZodMongooseSchema(
   }
 );
 
-const transactionSchema = toMongooseSchema(transactionZodSchema);
+const transactionMongooseSchema = toMongooseSchema(
+  transactionZodMongooseSchema
+);
 
 export const Transaction = models?.Transaction
   ? (models?.Transaction as Model<TransactionDocumentType>)
-  : mongoose.model<TransactionDocumentType>('Transaction', transactionSchema);
+  : mongoose.model<TransactionDocumentType>(
+      'Transaction',
+      transactionMongooseSchema
+    );
 
 export { TransactionReason as TransactionReasonType } from '$lib/constants';

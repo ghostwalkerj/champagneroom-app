@@ -25,11 +25,11 @@ export type UserDocument = InstanceType<typeof User> & {
   hasPermission: (permission: PermissionType) => boolean;
 };
 
-export type UserDocumentType = z.infer<typeof userZodSchema>;
+export type UserDocumentType = z.infer<typeof userSchema>;
 
 export { User };
 
-const userZodSchema = toZodMongooseSchema(
+const userSchema = toZodMongooseSchema(
   z
     .object({
       _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
@@ -90,17 +90,17 @@ const userZodSchema = toZodMongooseSchema(
   }
 );
 
-export const userSchema = toMongooseSchema(userZodSchema);
-userSchema.index(
+export const userMongooseSchema = toMongooseSchema(userSchema);
+userMongooseSchema.index(
   { address: 1 },
   { unique: true, partialFilterExpression: { address: { $exists: true } } }
 );
-userSchema.index(
+userMongooseSchema.index(
   { secret: 1 },
   { unique: true, partialFilterExpression: { secret: { $exists: true } } }
 );
 
-userSchema.index(
+userMongooseSchema.index(
   { referralCode: 1 },
   { unique: true, partialFilterExpression: { referralCode: { $exists: true } } }
 );
@@ -115,16 +115,19 @@ userSchema.index(
 //   saltGenerator: (secret: string) => secret.slice(0, 16)
 // });
 
-userSchema.pre('updateOne', async function (this: UpdateQuery<UserDocument>) {
-  const update = { ...this.getUpdate() };
-  // Only run this function if password was modified
-  if (update.password) {
-    update.password = await bcrypt.hash(update.password, 10);
-    this.setUpdate(update);
+userMongooseSchema.pre(
+  'updateOne',
+  async function (this: UpdateQuery<UserDocument>) {
+    const update = { ...this.getUpdate() };
+    // Only run this function if password was modified
+    if (update.password) {
+      update.password = await bcrypt.hash(update.password, 10);
+      this.setUpdate(update);
+    }
   }
-});
-
-userSchema.pre('save', function (next) {
+);
+userMongooseSchema;
+userMongooseSchema.pre('save', function (next) {
   if (this.password && this.isModified('password')) {
     bcrypt.hash(this.password, 10, (error, hash) => {
       if (error) {
@@ -138,23 +141,23 @@ userSchema.pre('save', function (next) {
   }
 });
 
-userSchema.methods.comparePassword = function (password: string) {
+userMongooseSchema.methods.comparePassword = function (password: string) {
   return bcrypt.compare(password, this.password);
 };
 
-userSchema.methods.isCreator = function (): boolean {
+userMongooseSchema.methods.isCreator = function (): boolean {
   return this.roles.includes(UserRole.CREATOR);
 };
 
-userSchema.methods.isAgent = function (): boolean {
+userMongooseSchema.methods.isAgent = function (): boolean {
   return this.roles.includes(UserRole.AGENT);
 };
 
-userSchema.methods.isOperator = function (): boolean {
+userMongooseSchema.methods.isOperator = function (): boolean {
   return this.roles.includes(UserRole.OPERATOR);
 };
 
-userSchema.methods.hasPermission = function (
+userMongooseSchema.methods.hasPermission = function (
   permission: PermissionType
 ): boolean {
   return this.permissions.includes(permission);
@@ -170,4 +173,4 @@ userSchema.methods.hasPermission = function (
 
 const User = models?.User
   ? (models.User as Model<UserDocumentType>)
-  : mongoose.model<UserDocumentType>('User', userSchema);
+  : mongoose.model<UserDocumentType>('User', userMongooseSchema);

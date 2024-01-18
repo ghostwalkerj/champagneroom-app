@@ -9,12 +9,12 @@ import {
   z
 } from 'mongoose-zod';
 
-import { creatorSalesStatsZodSchema, feedbackStatsZodSchema } from './common';
+import { creatorSalesStatsSchema, feedbackStatsSchema } from './common';
 import type { UserDocument } from './user';
 
 const { models } = pkg;
 
-const creatorZodSchema = toZodMongooseSchema(
+const creatorSchema = toZodMongooseSchema(
   z
     .object({
       _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
@@ -37,8 +37,8 @@ const creatorZodSchema = toZodMongooseSchema(
       agent: mongooseZodCustomType('ObjectId').optional().mongooseTypeOptions({
         ref: 'Agent'
       }),
-      feedbackStats: feedbackStatsZodSchema.default({}),
-      salesStats: creatorSalesStatsZodSchema.default({
+      feedbackStats: feedbackStatsSchema.default({}),
+      salesStats: creatorSalesStatsSchema.default({
         numberOfCompletedShows: 0,
         totalRefunds: {},
         totalRevenue: {},
@@ -53,14 +53,14 @@ const creatorZodSchema = toZodMongooseSchema(
     }
   }
 );
-const creatorSchema = toMongooseSchema(creatorZodSchema);
-creatorSchema.plugin(mongooseAutoPopulate);
+const creatorMongooseSchema = toMongooseSchema(creatorSchema);
+creatorMongooseSchema.plugin(mongooseAutoPopulate);
 
 export type CreatorDocument = InstanceType<typeof Creator> & {
   user: UserDocument;
 };
 
-export type CreatorDocumentType = z.infer<typeof creatorZodSchema>;
+export type CreatorDocumentType = z.infer<typeof creatorSchema>;
 export const Creator = models?.Creator
   ? (models?.Creator as Model<CreatorDocumentType>)
-  : mongoose.model<CreatorDocumentType>('Creator', creatorSchema);
+  : mongoose.model<CreatorDocumentType>('Creator', creatorMongooseSchema);

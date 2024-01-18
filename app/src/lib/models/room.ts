@@ -25,7 +25,7 @@ const SocialMediaType = z.enum([
 ]);
 
 // Define the Mongoose model for 'Room'
-const roomZodSchema = z
+const roomSchema = z
   .object({
     _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
       _id: true,
@@ -57,7 +57,7 @@ const roomZodSchema = z
   })
   .merge(genTimestampsSchema());
 
-const roomZodMongooseSchema = toZodMongooseSchema(roomZodSchema, {
+const roomZodMongooseSchema = toZodMongooseSchema(roomSchema, {
   schemaOptions: {
     collection: 'rooms'
   },
@@ -72,11 +72,11 @@ const roomZodMongooseSchema = toZodMongooseSchema(roomZodSchema, {
   }
 });
 
-const roomCRUDSchema = roomZodSchema.extend({
-  _id: roomZodSchema.shape._id.optional()
+const roomCRUDSchema = roomSchema.extend({
+  _id: roomSchema.shape._id.optional()
 });
 
-type RoomDocumentType = z.infer<typeof roomZodSchema>;
+type RoomDocumentType = z.infer<typeof roomSchema>;
 
 const roomMongooseSchema = toMongooseSchema(roomZodMongooseSchema);
 
@@ -86,4 +86,4 @@ const Room = models?.Room
   : mongoose.model<RoomDocumentType>('Room', roomMongooseSchema);
 
 export type { RoomDocument, RoomDocumentType };
-export { Room, roomCRUDSchema, roomZodSchema };
+export { Room, roomCRUDSchema, roomSchema };

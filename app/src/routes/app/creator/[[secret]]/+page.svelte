@@ -298,12 +298,7 @@
         <!-- Wallet -->
         <div>
           {#key wallet}
-            <WalletDetail
-              {wallet}
-              {exchangeRate}
-              {destination}
-              withdrawForm={data.requestPayoutForm}
-            />
+            <WalletDetail {wallet} {exchangeRate} {destination} />
           {/key}
         </div>
 

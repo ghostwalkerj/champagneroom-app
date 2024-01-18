@@ -25,7 +25,7 @@ import {
   Room,
   roomCRUDSchema,
   type RoomDocument,
-  roomZodSchema
+  roomSchema
 } from '$lib/models/room';
 import { Show, showCRUDSchema, type ShowDocument } from '$lib/models/show';
 import { ShowEvent, type ShowEventDocument } from '$lib/models/showEvent';
@@ -423,11 +423,9 @@ export const load: PageServerLoad = async ({ locals }) => {
           flattenMaps: true,
           flattenObjectIds: true
         }),
-        roomZodSchema
+        roomSchema
       )
-    : ((await superValidate(roomZodSchema)) as SuperValidated<
-        typeof roomZodSchema
-      >);
+    : ((await superValidate(roomSchema)) as SuperValidated<typeof roomSchema>);
 
   const createShowForm = (await superValidate(
     showCRUDSchema

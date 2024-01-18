@@ -11,11 +11,11 @@ import validator from 'validator';
 
 const { models } = pkg;
 
-export type InterestFormDocumentType = z.infer<typeof interestFormZodSchema>;
+export type InterestFormDocumentType = z.infer<
+  typeof interestFormMongooseZodSchema
+>;
 
-export type InterestFormType = InstanceType<typeof InterestForm>;
-
-const interestFormZodSchema = toZodMongooseSchema(
+const interestFormMongooseZodSchema = toZodMongooseSchema(
   z
     .object({
       _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
@@ -34,8 +34,15 @@ const interestFormZodSchema = toZodMongooseSchema(
     }
   }
 );
-const interestFormSchema = toMongooseSchema(interestFormZodSchema);
+const interestFormMongooseSchema = toMongooseSchema(
+  interestFormMongooseZodSchema
+);
+
+export type InterestFormType = InstanceType<typeof InterestForm>;
 
 export const InterestForm = models?.InterestForm
   ? (models?.InterestForm as Model<InterestFormDocumentType>)
-  : pkg.model<InterestFormDocumentType>('InterestForm', interestFormSchema);
+  : pkg.model<InterestFormDocumentType>(
+      'InterestForm',
+      interestFormMongooseSchema
+    );

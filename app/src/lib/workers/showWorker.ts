@@ -7,8 +7,8 @@ import type { AgentDocument } from '$lib/models/agent';
 import { Agent } from '$lib/models/agent';
 import {
   type CancelType,
-  type FinalizeType,
-  finalizeZodSchema
+  finalizeSchema,
+  type FinalizeType
 } from '$lib/models/common';
 import type { CreatorDocument } from '$lib/models/creator';
 import { Creator } from '$lib/models/creator';
@@ -268,7 +268,7 @@ const endShow = async (show: ShowDocument, showQueue: ShowQueueType) => {
   const showState = showService.getSnapshot();
   if (showState.matches('stopped')) {
     showService.send(ShowMachineEventString.SHOW_ENDED);
-    const finalize = finalizeZodSchema.parse({
+    const finalize = finalizeSchema.parse({
       finalizedBy: ActorType.TIMER
     });
     showQueue.add(
