@@ -33,11 +33,7 @@ import {
   RefundReason,
   TicketMachineEventString
 } from '$lib/constants';
-import {
-  createBitcartToken,
-  InvoiceJobType,
-  PayoutJobType
-} from '$lib/payment';
+import { createBitcartToken, InvoiceJobType, PayoutJobType } from '$lib/payout';
 import { getTicketMachineService } from '$lib/server/machinesUtil';
 
 import {

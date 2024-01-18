@@ -40,8 +40,8 @@ import type {
   Store,
   Wallet as BTWallet
 } from '$lib/ext/bitcart/models';
-import type { PaymentType } from '$lib/payment';
-import { PayoutJobType, PayoutReason, PayoutStatus } from '$lib/payment';
+import type { PaymentType } from '$lib/payout';
+import { PayoutJobType, PayoutReason, PayoutStatus } from '$lib/payout';
 import {
   getTicketMachineService,
   getWalletMachineService

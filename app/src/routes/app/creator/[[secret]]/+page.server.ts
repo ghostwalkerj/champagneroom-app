@@ -47,7 +47,7 @@ import {
   ShowStatus
 } from '$lib/constants';
 import { rateCryptosRateGet } from '$lib/ext/bitcart';
-import { createBitcartToken, PayoutJobType, PayoutReason } from '$lib/payment';
+import { createBitcartToken, PayoutJobType, PayoutReason } from '$lib/payout';
 import { getShowMachineService } from '$lib/server/machinesUtil';
 import { web3Upload } from '$lib/server/upload';
 

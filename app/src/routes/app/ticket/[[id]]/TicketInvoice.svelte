@@ -10,8 +10,8 @@
     currencyFormatter,
     durationFormatter
   } from '$lib/constants';
-  import type { PaymentType } from '$lib/payment';
-  import { InvoiceStatus } from '$lib/payment';
+  import type { PaymentType } from '$lib/payout';
+  import { InvoiceStatus } from '$lib/payout';
 
   import type { DisplayInvoice } from '$ext/bitcart/models';
 

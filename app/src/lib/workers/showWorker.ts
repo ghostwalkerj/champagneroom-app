@@ -31,7 +31,7 @@ import {
   TicketMachineEventString,
   WalletMachineEventString
 } from '$lib/constants';
-import { PayoutJobType } from '$lib/payment';
+import { PayoutJobType } from '$lib/payout';
 import {
   getTicketMachineService,
   getWalletMachineServiceFromId

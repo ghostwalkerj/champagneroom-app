@@ -25,7 +25,7 @@ import { Wallet } from '$lib/models/wallet';
 import config from '$lib/config';
 import { AuthType, CurrencyType, EntityType } from '$lib/constants';
 import { rateCryptosRateGet } from '$lib/ext/bitcart';
-import { createBitcartToken } from '$lib/payment';
+import { createBitcartToken } from '$lib/payout';
 import {
   backupAuthToken,
   createAuthToken,

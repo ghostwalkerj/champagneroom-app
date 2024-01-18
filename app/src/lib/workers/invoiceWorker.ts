@@ -27,7 +27,7 @@ import {
   InvoiceStatus,
   type PaymentType,
   PayoutReason
-} from '$lib/payment';
+} from '$lib/payout';
 import {
   getTicketMachineService,
   getTicketMachineServiceFromId

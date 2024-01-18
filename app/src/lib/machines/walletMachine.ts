@@ -13,7 +13,7 @@ import type { WalletDocumentType } from '$lib/models/wallet';
 import { type WalletDocument, WalletStatus } from '$lib/models/wallet';
 
 import { EarningsSource } from '$lib/constants.js';
-import { PayoutStatus } from '$lib/payment';
+import { PayoutStatus } from '$lib/payout.js';
 
 export type WalletMachineEventType =
   | {

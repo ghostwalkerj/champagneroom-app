@@ -22,7 +22,7 @@
   } from '$lib/machines/ticketMachine';
 
   import { ActorType } from '$lib/constants';
-  import { InvoiceStatus, type PaymentType } from '$lib/payment';
+  import { InvoiceStatus, type PaymentType } from '$lib/payout';
   import { connect, defaultWallet, selectedAccount } from '$lib/web3';
 
   import { ShowStore, TicketStore } from '$stores';

@@ -34,7 +34,7 @@ import {
   ShowMachineEventString,
   TicketStatus
 } from '$lib/constants';
-import { calcTotal } from '$lib/payment';
+import { calcTotal } from '$lib/payout.js';
 
 export type TicketMachineOptions = {
   saveStateCallback?: (state: TicketStateType) => void;

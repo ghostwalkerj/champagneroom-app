@@ -41,7 +41,7 @@ import {
   InvoiceJobType,
   InvoiceStatus,
   type PaymentType
-} from '$lib/payment';
+} from '$lib/payout';
 import { createAuthToken, setAuthToken } from '$lib/server/auth';
 import {
   getShowMachineServiceFromId,

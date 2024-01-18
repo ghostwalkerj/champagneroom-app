@@ -1,7 +1,7 @@
 <script lang="ts">
   import { currencyFormatter } from '$lib/constants';
   import type { EarningsType, PayoutType } from '$lib/models/common';
-  import { PayoutStatus } from '$lib/payment';
+  import { PayoutStatus } from '$lib/payout';
   import type { TableSource } from '@skeletonlabs/skeleton';
   import {
     Tab,
