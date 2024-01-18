@@ -1,7 +1,7 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 import EnvironmentPlugin from 'vite-plugin-environment';
-import { nodePolyfills } from 'vite-plugin-node-polyfills';
+import nodePolyfills from 'vite-plugin-node-stdlib-browser';
 import mkcert from 'vite-plugin-mkcert';
 
 export default defineConfig({

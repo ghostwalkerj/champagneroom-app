@@ -1,6 +1,6 @@
 <script lang="ts">
   import ConnectButton from '$components/header/ConnectButton.svelte';
-  import Config from '$lib/models/config';
+  import Config from '$lib/config';
   import { selectedAccount } from '$lib/web3';
   import Icon from '@iconify/svelte';
 </script>

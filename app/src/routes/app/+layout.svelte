@@ -5,7 +5,7 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
-  import Config from '$lib/models/config';
+  import Config from '$lib/config';
   import { AuthType } from '$lib/constants';
   import { selectedAccount } from '$lib/web3';
 

@@ -102,7 +102,6 @@
     "mongoose-field-encryption": "^7.0.1",
     "mongoose-zod": "^0.1.1",
     "nanoid": "^5.0.3",
-    "node-stdlib-browser": "^1.2.0",
     "nodemon": "^3.0.3",
     "orval": "^6.17.0",
     "outmatch": "^0.7.0",
@@ -162,7 +161,8 @@
     "bullmq": "^5.1.2",
     "express": "^4.18.2",
     "express-basic-auth": "^1.2.1",
-    "npm-font-caviar-dreams": "^1.0.1"
+    "npm-font-caviar-dreams": "^1.0.1",
+    "vite-plugin-node-stdlib-browser": "^0.2.1"
   },
   "resolutions": {
     "svelte-i18n": "^4.0.0"

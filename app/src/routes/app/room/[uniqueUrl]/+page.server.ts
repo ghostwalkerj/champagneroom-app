@@ -1,8 +1,7 @@
 import { error } from '@sveltejs/kit';
 
 import { Creator } from '$lib/models/creator';
-
-import { Room } from '$lib/server/models/room';
+import { Room } from '$lib/models/room';
 
 import type { PageServerLoad } from './$types';
 

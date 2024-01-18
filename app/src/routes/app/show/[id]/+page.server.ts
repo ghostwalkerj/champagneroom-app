@@ -17,7 +17,6 @@ import {
   BITCART_STORE_ID
 } from '$env/static/private';
 
-import Config from '$lib/models/config';
 import { Show } from '$lib/models/show';
 import type { TicketDocument } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
@@ -25,6 +24,7 @@ import { User } from '$lib/models/user';
 
 import type { ShowQueueType } from '$lib/workers/showWorker';
 
+import Config from '$lib/config';
 import {
   AuthType,
   CurrencyType,

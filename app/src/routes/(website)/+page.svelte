@@ -1,7 +1,7 @@
 <script lang="ts">
   import Saos from 'saos';
 
-  import Config from '$lib/models/config';
+  import Config from '$lib/config';
 
   import About from './About.svelte';
   import Contact from './Contact.svelte';

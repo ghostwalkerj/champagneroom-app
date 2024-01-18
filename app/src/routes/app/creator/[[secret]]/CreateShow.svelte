@@ -4,7 +4,7 @@
 
   import type { ShowDocument, showZodSchema } from '$lib/models/show';
 
-  import Config from '$lib/models/config';
+  import Config from '$lib/config';
   import { durationFormatter } from '$lib/constants';
 
   import type { CreatorDocument } from '$lib/models/creator';
@@ -12,6 +12,7 @@
   import { RangeSlider } from '@skeletonlabs/skeleton';
   import { superForm } from 'sveltekit-superforms/client';
   import type { SuperValidated } from 'sveltekit-superforms';
+  import Icon from '@iconify/svelte';
 
   export let createShowForm: SuperValidated<typeof showZodSchema>;
   export let creator: CreatorDocument;
@@ -108,7 +109,11 @@
 
   <button
     class="btn variant-soft-primary !font-bold btn-lg text-xl neon-primary"
-    disabled={!delayed}>Create Show</button
+    disabled={$delayed}
+    type="submit"
+    >Submit {#if $delayed}
+      <Icon icon="eos-icons:loading" />{/if}
+    Create Show</button
   >
 
   <!--HIDDEN INPUTS-->

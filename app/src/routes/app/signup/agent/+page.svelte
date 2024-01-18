@@ -6,7 +6,7 @@
   import { applyAction, enhance } from '$app/forms';
   import { goto } from '$app/navigation';
 
-  import Config from '$lib/models/config';
+  import Config from '$lib/config';
   import { defaultWallet, selectedAccount } from '$lib/web3';
   import { womensNames } from '$lib/womensNames';
 
@@ -93,9 +93,8 @@
       formData.append('signature', signature);
     }
 
-    return async ({ result }: {result: ActionResult}) => {
-
-      if (result.type === 'success' ) {
+    return async ({ result }: { result: ActionResult }) => {
+      if (result.type === 'success') {
         goto(result.data!.returnPath);
       } else {
         if (result.type === 'failure' && result.data!.alreadyAgent) {

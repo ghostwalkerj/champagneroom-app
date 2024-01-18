@@ -7,7 +7,7 @@
   import type { TicketDocument } from '$lib/models/ticket';
   import type { UserDocument } from '$lib/models/user';
 
-  import Config from '$lib/models/config';
+  import Config from '$lib/config';
 
   import { UserRole } from '$lib/constants';
   import type { PageData } from './$types';

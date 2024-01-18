@@ -3,7 +3,7 @@
   import { invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
   import ProfileImage from '$components/forms/ImageUploadForm.svelte';
-  import Config from '$lib/models/config';
+  import Config from '$lib/config';
   import type { AgentDocument } from '$lib/models/agent';
   import type { ActionResult } from '@sveltejs/kit';
   import urlJoin from 'url-join';

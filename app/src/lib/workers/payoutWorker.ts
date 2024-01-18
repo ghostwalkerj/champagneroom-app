@@ -5,7 +5,6 @@ import type IORedis from 'ioredis';
 import urlJoin from 'url-join';
 
 import type { PayoutType } from '$lib/models/common';
-import Config from '$lib/models/config';
 import { Creator } from '$lib/models/creator';
 import type { TicketDocument } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
@@ -16,6 +15,7 @@ import {
 } from '$lib/models/transaction';
 import { Wallet } from '$lib/models/wallet';
 
+import Config from '$lib/config';
 import {
   CurrencyType,
   EntityType,

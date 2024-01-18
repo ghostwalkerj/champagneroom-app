@@ -10,7 +10,6 @@ import {
   type FinalizeType,
   finalizeZodSchema
 } from '$lib/models/common';
-import Config from '$lib/models/config';
 import type { CreatorDocument } from '$lib/models/creator';
 import { Creator } from '$lib/models/creator';
 import type { ShowDocument } from '$lib/models/show';
@@ -22,6 +21,7 @@ import { Ticket, TicketStatus } from '$lib/models/ticket';
 import { createShowMachineService } from '$lib/machines/showMachine';
 import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
 
+import Config from '$lib/config';
 import {
   ActorType,
   DisputeDecision,

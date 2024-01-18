@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import CopyText from '$components/forms/CopyText.svelte';
-  import Config from '$lib/models/config';
+  import Config from '$lib/config';
   import { roomZodSchema } from '$lib/models/room';
   import Icon from '@iconify/svelte';
   import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';

@@ -13,7 +13,7 @@ import {
   PUBLIC_WALLET_CONNECT_PROJECT_ID
 } from '$env/static/public';
 
-import Config from '$lib/models/config';
+import Config from '$lib/config';
 
 // Wallets
 const injected = injectedModule();

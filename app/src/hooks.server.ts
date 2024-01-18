@@ -1,5 +1,6 @@
 import type { Handle } from '@sveltejs/kit';
 import { error, redirect } from '@sveltejs/kit';
+// eslint-disable-next-line @typescript-eslint/naming-convention
 import IORedis from 'ioredis';
 import type { JwtPayload } from 'jsonwebtoken';
 import mongoose from 'mongoose';
@@ -17,11 +18,11 @@ import {
 
 import type { AgentDocument } from '$lib/models/agent';
 import { Agent } from '$lib/models/agent';
-import Config from '$lib/models/config';
 import type { CreatorDocument } from '$lib/models/creator';
 import { Creator } from '$lib/models/creator';
 import type { OperatorDocument } from '$lib/models/operator';
 import { Operator } from '$lib/models/operator';
+import { Room } from '$lib/models/room';
 import { Show } from '$lib/models/show';
 import type { TicketDocument } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
@@ -29,6 +30,8 @@ import type { UserDocument } from '$lib/models/user';
 import { User } from '$lib/models/user';
 import { Wallet, type WalletDocument } from '$lib/models/wallet';
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
+import Config from '$lib/config';
 import { UserRole } from '$lib/constants';
 import {
   deleteAuthToken,
@@ -43,8 +46,6 @@ import {
   isTicketMatch,
   isWhitelistMatch
 } from '$lib/server/auth';
-
-import { Room } from '$server/models/room';
 
 const authUrl = Config.PATH.auth;
 

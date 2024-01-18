@@ -21,14 +21,8 @@ import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
 import type { CancelType } from '$lib/models/common';
 import { Creator, type CreatorDocument } from '$lib/models/creator';
-import type {
-  ShowDocument,
-  showZodSchema,
-  showZodSchema
-} from '$lib/models/show';
-import { Show, showCRUDZodSchema } from '$lib/models/show';
-import type { ShowEventDocument } from '$lib/models/showEvent';
-import { ShowEvent } from '$lib/models/showEvent';
+import { Show, showCRUDSchema, type ShowDocument } from '$lib/models/show';
+import { ShowEvent, type ShowEventDocument } from '$lib/models/showEvent';
 import type { UserDocument } from '$lib/models/user';
 import type { WalletDocument } from '$lib/models/wallet';
 import { Wallet, WalletStatus } from '$lib/models/wallet';
@@ -49,14 +43,15 @@ import {
 import { rateCryptosRateGet } from '$lib/ext/bitcart';
 import { createBitcartToken, PayoutJobType, PayoutReason } from '$lib/payment';
 import { getShowMachineService } from '$lib/server/machinesUtil';
-import {
-  Room,
-  type RoomDocument,
-  roomZodSchema
-} from '$lib/server/models/room';
 import { web3Upload } from '$lib/server/upload';
 
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
+import {
+  roomCRUDSchema,
+  Room,
+  type RoomDocument,
+  roomZodSchema
+} from '$lib/models/room';
 
 const requestPayoutSchema = z.object({
   amount: z.number().min(0.0001),
@@ -85,8 +80,8 @@ export const actions: Actions = {
   create_show: async ({ locals, request }) => {
     const form = (await superValidate(
       request,
-      showCRUDZodSchema
-    )) as SuperValidated<typeof showCRUDZodSchema>;
+      showCRUDSchema
+    )) as SuperValidated<typeof showCRUDSchema>;
 
     if (!form.valid) {
       console.log(form.data);
@@ -112,10 +107,9 @@ export const actions: Actions = {
         averageRating: creator.feedbackStats.averageRating,
         numberOfReviews: creator.feedbackStats.numberOfReviews
       }
-    })) as RoomDocument;
+    })) as ShowDocument;
 
     return {
-      createShowForm: form,
       success: true,
       showCreated: true,
       show: show.toJSON({ flattenMaps: true, flattenObjectIds: true }),
@@ -289,7 +283,7 @@ export const actions: Actions = {
     const creator = locals.creator as CreatorDocument;
     const formData = await request.formData();
 
-    const form = await superValidate(formData, roomZodSchema);
+    const form = await superValidate(formData, roomCRUDSchema);
 
     const isUpdate = !!form.data._id;
     // Convenient validation check:
@@ -436,8 +430,8 @@ export const load: PageServerLoad = async ({ locals }) => {
       >);
 
   const createShowForm = (await superValidate(
-    showCRUDZodSchema
-  )) as SuperValidated<typeof showCRUDZodSchema>;
+    showCRUDSchema
+  )) as SuperValidated<typeof showCRUDSchema>;
   const requestPayoutForm = await superValidate(
     {
       amount: 0,

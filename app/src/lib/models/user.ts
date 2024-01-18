@@ -11,8 +11,7 @@ import {
 import { nanoid } from 'nanoid';
 import validator from 'validator';
 
-import Config from '$lib/models/config';
-
+import Config from '$lib/config';
 import { AuthType, UserRole } from '$lib/constants';
 import { PermissionType } from '$lib/permissions';
 

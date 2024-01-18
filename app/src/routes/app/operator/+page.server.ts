@@ -8,7 +8,6 @@ import { generateSillyPassword } from 'silly-password-generator';
 import { AUTH_TOKEN_NAME, PASSWORD_SALT } from '$env/static/private';
 
 import { Agent } from '$lib/models/agent';
-import Config from '$lib/models/config';
 import { Creator } from '$lib/models/creator';
 import type { OperatorDocument } from '$lib/models/operator';
 import type { ShowDocument } from '$lib/models/show';
@@ -19,6 +18,7 @@ import { Wallet } from '$lib/models/wallet';
 
 import type { ShowQueueType } from '$lib/workers/showWorker';
 
+import Config from '$lib/config';
 import type { DisputeDecision } from '$lib/constants';
 import { AuthType, EntityType, ShowMachineEventString } from '$lib/constants';
 import {

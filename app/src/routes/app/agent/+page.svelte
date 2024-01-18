@@ -9,7 +9,7 @@
   import { invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
 
-  import Config from '$lib/models/config';
+  import Config from '$lib/config';
   import { AuthType, currencyFormatter } from '$lib/constants';
   import { womensNames } from '$lib/womensNames';
 
@@ -45,7 +45,6 @@
     bookings: number;
   }[];
   let exchangeRate = +data.exchangeRate || 0;
-
 
   let newCreatorModal: HTMLDialogElement;
   let newCreator: CreatorDocument | undefined;
@@ -509,7 +508,7 @@
                     </div>
                     <!-- Wallet -->
                     <div class="min-w-fit">
-                      <WalletDetail {wallet}  {exchangeRate} />
+                      <WalletDetail {wallet} {exchangeRate} />
                     </div>
                   </div>
 

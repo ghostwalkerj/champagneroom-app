@@ -116,7 +116,7 @@ const showZodSchema = z
   })
   .merge(genTimestampsSchema());
 
-const showCRUDZodSchema = showZodSchema.extend({
+const showCRUDSchema = showZodSchema.extend({
   _id: showZodSchema.shape._id.optional(),
   creator: showZodSchema.shape.creator.optional()
 });
@@ -148,4 +148,4 @@ const SaveState = (show: ShowDocument, newState: ShowStateType) => {
 };
 
 export type { ShowDocument, ShowDocumentType, ShowStateType };
-export { SaveState, Show, showCRUDZodSchema, showZodSchema };
+export { SaveState, Show, showCRUDSchema, showZodSchema };

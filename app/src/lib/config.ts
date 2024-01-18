@@ -1,5 +1,5 @@
-import { UserRole } from '../constants';
-import { PermissionType } from '../permissions';
+import { UserRole } from './constants';
+import { PermissionType } from './permissions';
 
 export const defaultPermissions = {
   [UserRole.OPERATOR]: [PermissionType.FULL],

@@ -13,8 +13,7 @@ import {
   JWT_PRIVATE_KEY
 } from '$env/static/private';
 
-import Config from '$lib/models/config';
-
+import Config from '$lib/config';
 import type { AuthType } from '$lib/constants';
 import { authDecrypt, authEncrypt } from '$lib/crypt';
 

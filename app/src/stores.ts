@@ -5,7 +5,6 @@ import { derived, writable } from 'svelte/store';
 import urlJoin from 'url-join';
 
 import type { AgentDocument } from '$lib/models/agent';
-import Config from '$lib/models/config';
 import type { CreatorDocument } from '$lib/models/creator';
 import type { RoomDocumentType } from '$lib/models/room';
 import type { ShowDocument } from '$lib/models/show';
@@ -13,6 +12,8 @@ import type { ShowEventDocument } from '$lib/models/showEvent';
 import type { TicketDocument } from '$lib/models/ticket';
 import type { UserDocument } from '$lib/models/user';
 import type { WalletDocument } from '$lib/models/wallet';
+
+import Config from '$lib/config';
 
 const enum EntityType {
   AGENT = 'Agent',

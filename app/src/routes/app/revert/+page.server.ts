@@ -2,8 +2,7 @@ import { redirect } from '@sveltejs/kit';
 
 import { AUTH_TOKEN_NAME } from '$env/static/private';
 
-import Config from '$lib/models/config';
-
+import Config from '$lib/config';
 import { AuthType } from '$lib/constants';
 import { restoreAuthToken } from '$lib/server/auth';
 

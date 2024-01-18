@@ -261,7 +261,6 @@
 
         {#if canCreateShow}
           <CreateShow
-            bind:isLoading
             {creator}
             {onShowCreated}
             createShowForm={data.createShowForm}

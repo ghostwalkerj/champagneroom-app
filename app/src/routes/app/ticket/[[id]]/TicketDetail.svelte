@@ -5,7 +5,7 @@
   import type { TicketDocumentType } from '$lib/models/ticket';
   import type { UserDocumentType } from '$lib/models/user';
 
-  import Config from '$lib/models/config';
+  import Config from '$lib/config';
   import {
     TicketStatus,
     currencyFormatter,
