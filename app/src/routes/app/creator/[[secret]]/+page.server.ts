@@ -21,8 +21,12 @@ import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
 import type { CancelType } from '$lib/models/common';
 import { Creator, type CreatorDocument } from '$lib/models/creator';
-import type { ShowDocument } from '$lib/models/show';
-import { Show } from '$lib/models/show';
+import type {
+  ShowDocument,
+  showZodSchema,
+  showZodSchema
+} from '$lib/models/show';
+import { Show, showCRUDZodSchema } from '$lib/models/show';
 import type { ShowEventDocument } from '$lib/models/showEvent';
 import { ShowEvent } from '$lib/models/showEvent';
 import type { UserDocument } from '$lib/models/user';
@@ -54,15 +58,6 @@ import { web3Upload } from '$lib/server/upload';
 
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
 
-const createShowSchema = z.object({
-  price: z.number().min(1).max(10_000),
-  name: z.string().min(3).max(50),
-  duration: z.number().min(15).max(120).default(60),
-  capacity: z.number(),
-  coverImageUrl: z.string(),
-  walletId: z.string().min(16).max(64)
-});
-
 const requestPayoutSchema = z.object({
   amount: z.number().min(0.0001),
   destination: z.string().min(3),
@@ -88,36 +83,27 @@ export const actions: Actions = {
     };
   },
   create_show: async ({ locals, request }) => {
-    const form = await superValidate(request, createShowSchema);
-    console.log('POST', form);
+    const form = (await superValidate(
+      request,
+      showCRUDZodSchema
+    )) as SuperValidated<typeof showCRUDZodSchema>;
 
     if (!form.valid) {
+      console.log(form.data);
       return fail(400, { form });
     }
-
-    const price = form.data.price;
-    const name = form.data.name;
-    const duration = form.data.duration;
-    const capacity = form.data.capacity;
-    const coverImageUrl = form.data.coverImageUrl;
-
     const creator = locals.creator as CreatorDocument;
 
-    const show = new Show({
-      price: {
-        amount: +price,
-        currency: CurrencyType.USD
-      },
-      name,
-      duration: +duration,
-      capacity: +capacity,
+    const show = (await Show.create({
+      ...form.data,
       creator: creator._id,
+      _id: new ObjectId(),
       agent: creator.agent,
-      coverImageUrl,
+      coverImageUrl: creator.user.profileImageUrl,
       showState: {
         status: ShowStatus.BOX_OFFICE_OPEN,
         salesStats: {
-          ticketsAvailable: +capacity
+          ticketsAvailable: form.data.capacity
         }
       },
       creatorInfo: {
@@ -126,14 +112,14 @@ export const actions: Actions = {
         averageRating: creator.feedbackStats.averageRating,
         numberOfReviews: creator.feedbackStats.numberOfReviews
       }
-    });
-    show.save();
+    })) as RoomDocument;
 
     return {
       createShowForm: form,
       success: true,
       showCreated: true,
-      show: show.toJSON({ flattenMaps: true, flattenObjectIds: true })
+      show: show.toJSON({ flattenMaps: true, flattenObjectIds: true }),
+      form
     };
   },
   cancel_show: async ({ locals }) => {
@@ -339,6 +325,7 @@ export const actions: Actions = {
           room: room.toJSON({ flattenMaps: true, flattenObjectIds: true })
         };
       } else {
+        // insert new room
         const room = (await Room.create({
           ...form.data,
           _id: new ObjectId()
@@ -448,7 +435,9 @@ export const load: PageServerLoad = async ({ locals }) => {
         typeof roomZodSchema
       >);
 
-  const createShowForm = await superValidate(createShowSchema);
+  const createShowForm = (await superValidate(
+    showCRUDZodSchema
+  )) as SuperValidated<typeof showCRUDZodSchema>;
   const requestPayoutForm = await superValidate(
     {
       amount: 0,

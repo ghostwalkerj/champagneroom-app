@@ -32,13 +32,12 @@
   import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
   import type { SuperValidated } from 'sveltekit-superforms';
   import type { Subscription } from 'xstate';
-  import type { ActionData, PageData } from './$types';
+  import type { PageData } from './$types';
   import CreatorDetail from './CreatorDetail.svelte';
   import RoomDetail from './RoomDetail.svelte';
   import VideoMeeting from './VideoMeeting.svelte';
 
   export let data: PageData;
-  export let form: ActionData;
 
   $: creator = data.creator as CreatorDocument;
   let currentShow = data.show as ShowDocument | undefined;
@@ -265,7 +264,6 @@
             bind:isLoading
             {creator}
             {onShowCreated}
-            {form}
             createShowForm={data.createShowForm}
           />
         {/if}

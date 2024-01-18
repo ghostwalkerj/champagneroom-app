@@ -2,26 +2,19 @@
   import { possessive } from 'i18n-possessive';
   import urlJoin from 'url-join';
 
-  import { applyAction, enhance } from '$app/forms';
-
-  import type { ShowDocument } from '$lib/models/show';
+  import type { ShowDocument, showZodSchema } from '$lib/models/show';
 
   import Config from '$lib/models/config';
   import { durationFormatter } from '$lib/constants';
 
   import type { CreatorDocument } from '$lib/models/creator';
-  import type { ActionData } from './$types';
-  import type { ActionResult } from '@sveltejs/kit';
 
   import { RangeSlider } from '@skeletonlabs/skeleton';
   import { superForm } from 'sveltekit-superforms/client';
+  import type { SuperValidated } from 'sveltekit-superforms';
 
-  $: showDuration = 60;
-
-  export let createShowForm;
+  export let createShowForm: SuperValidated<typeof showZodSchema>;
   export let creator: CreatorDocument;
-  export let form: ActionData;
-  export let isLoading = false as boolean;
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   export let onShowCreated: (show: ShowDocument) => void;
 
@@ -29,9 +22,17 @@
     ? possessive(creator.user.name, 'en') + ' Show'
     : 'Show';
 
-  const onSubmit = ({}) => {
-    isLoading = true;
-    return async ({ result }: { result: ActionResult }) => {
+  const {
+    form: showForm,
+    errors,
+    constraints,
+    delayed,
+    enhance
+  } = superForm(createShowForm, {
+    validationMethod: 'submit-only',
+    dataType: 'json',
+    onResult({ result }) {
+      console.log(result);
       if (result.type === 'success') {
         switch (true) {
           case result.data!.showCreated: {
@@ -46,25 +47,14 @@
           }
         }
       }
-      await applyAction(result);
-      isLoading = false;
-    };
-  };
-
-  const {
-    form: showForm,
-    errors,
-    constraints,
-    delayed
-  } = superForm(createShowForm, {
-    validationMethod: 'submit-only'
+    }
   });
 </script>
 
 <form
   method="post"
   action="?/create_show"
-  use:enhance={onSubmit}
+  use:enhance
   class="bg-custom rounded p-4 flex flex-col gap-4"
 >
   <h2 class="text-lg font-semibold">Create Show</h2>
@@ -75,6 +65,7 @@
       <input
         type="text"
         name="name"
+        placeholder={showName}
         bind:value={$showForm.name}
         {...$constraints.name}
         class="input variant-form-material bg-surface-700"
@@ -91,11 +82,13 @@
         <input
           type="number"
           name="price"
-          bind:value={$showForm.price}
-          {...$constraints.price}
+          bind:value={$showForm.price.amount}
+          {...$constraints.price?.amount}
         />
       </div>
-      {#if $errors.price}<span class="text-error">{$errors.price}</span>{/if}
+      {#if $errors.price?.amount}<span class="text-error"
+          >{$errors.price.amount}</span
+        >{/if}
     </label>
   </div>
 
@@ -103,7 +96,7 @@
     name="duration"
     accent={'accent-primary'}
     bind:value={$showForm.duration}
-    min={15}
+    min={0}
     max={120}
     step={15}
     ticked
@@ -120,10 +113,4 @@
 
   <!--HIDDEN INPUTS-->
   <input type="hidden" name="capacity" value="1" />
-
-  <input
-    type="hidden"
-    name="coverImageUrl"
-    value={creator.user.profileImageUrl}
-  />
 </form>

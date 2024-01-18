@@ -12,6 +12,9 @@ const config = {
     if (warning.code === 'a11y-click-events-have-key-events') return;
     if (warning.code === 'a11y-no-static-element-interactions') return;
     if (warning.code === 'a11y-no-noninteractive-element-interactions') return;
+    // if (warning.code === 'CIRCULAR_DEPENDENCY') return;
+    // if(warning.code === 'THIS_IS_UNDEFINED') return;
+
     handler(warning);
   },
   kit: {
