@@ -4,7 +4,7 @@
   import type { Unsubscriber } from 'svelte/store';
 
   import type { CreatorDocument } from '$lib/models/creator';
-  import type { ShowDocument } from '$lib/models/show';
+  import type { showCRUDSchema, ShowDocument } from '$lib/models/show';
   import type { ShowEventDocument } from '$lib/models/showEvent';
   import type { WalletDocument } from '$lib/models/wallet';
 
@@ -27,15 +27,15 @@
   import ShowStatus from './ShowStatus.svelte';
 
   import { page } from '$app/stores';
-  import type { roomZodSchema } from '$lib/models/room';
   import type { UserDocument } from '$lib/models/user';
   import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
-  import type { SuperValidated } from 'sveltekit-superforms';
   import type { Subscription } from 'xstate';
   import type { PageData } from './$types';
   import CreatorDetail from './CreatorDetail.svelte';
   import RoomDetail from './RoomDetail.svelte';
   import VideoMeeting from './VideoMeeting.svelte';
+  import type { SuperValidated } from 'sveltekit-superforms';
+  import type { roomCRUDSchema } from '$lib/models/room';
 
   export let data: PageData;
 
@@ -47,7 +47,10 @@
   let exchangeRate = +data.exchangeRate || 0;
   let jitsiToken = data.jitsiToken as string;
   let user = data.user as UserDocument;
-  $: roomForm = data.roomForm as SuperValidated<typeof roomZodSchema>;
+  $: roomForm = data.roomForm as SuperValidated<typeof roomCRUDSchema>;
+  $: createShowForm = data.createShowForm as SuperValidated<
+    typeof showCRUDSchema
+  >;
 
   $: showVideo = false;
 
@@ -260,11 +263,7 @@
         {/key}
 
         {#if canCreateShow}
-          <CreateShow
-            {creator}
-            {onShowCreated}
-            createShowForm={data.createShowForm}
-          />
+          <CreateShow {creator} {onShowCreated} {createShowForm} />
         {/if}
         <div>
           {#if currentShow}

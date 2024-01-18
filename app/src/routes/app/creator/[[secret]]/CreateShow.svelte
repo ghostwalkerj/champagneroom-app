@@ -2,7 +2,7 @@
   import { possessive } from 'i18n-possessive';
   import urlJoin from 'url-join';
 
-  import type { ShowDocument, showZodSchema } from '$lib/models/show';
+  import type { ShowDocument, showCRUDSchema } from '$lib/models/show';
 
   import Config from '$lib/config';
   import { durationFormatter } from '$lib/constants';
@@ -11,10 +11,10 @@
 
   import { RangeSlider } from '@skeletonlabs/skeleton';
   import { superForm } from 'sveltekit-superforms/client';
-  import type { SuperValidated } from 'sveltekit-superforms';
   import Icon from '@iconify/svelte';
+  import type { SuperValidated } from 'sveltekit-superforms';
 
-  export let createShowForm: SuperValidated<typeof showZodSchema>;
+  export let createShowForm: SuperValidated<typeof showCRUDSchema>;
   export let creator: CreatorDocument;
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   export let onShowCreated: (show: ShowDocument) => void;

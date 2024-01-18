@@ -2,14 +2,15 @@
   import { page } from '$app/stores';
   import CopyText from '$components/forms/CopyText.svelte';
   import Config from '$lib/config';
-  import { roomZodSchema } from '$lib/models/room';
   import Icon from '@iconify/svelte';
   import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
   import type { SuperValidated } from 'sveltekit-superforms';
   import urlJoin from 'url-join';
+  import type { roomCRUDSchema } from '$lib/models/room';
 
-  export let roomForm: SuperValidated<typeof roomZodSchema>;
-  $: room = roomZodSchema.parse(roomForm.data);
+  export let roomForm: SuperValidated<typeof roomCRUDSchema>;
+
+  let room = roomForm.data;
 
   const modalStore = getModalStore();
 

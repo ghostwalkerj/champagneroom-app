@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import Config from '$lib/config';
-  import { roomZodSchema } from '$lib/models/room';
+  import type { roomCRUDSchema } from '$lib/models/room';
   import Icon from '@iconify/svelte';
   import { FileDropzone, getModalStore } from '@skeletonlabs/skeleton';
   import { nanoid } from 'nanoid';
@@ -17,15 +17,14 @@
   export let parent: SvelteComponent;
 
   let roomForm = $modalStore[0].meta.form as SuperValidated<
-    typeof roomZodSchema
+    typeof roomCRUDSchema
   >;
 
   const { form, errors, constraints, enhance, delayed, message } = superForm(
     roomForm,
     {
-      validators: roomZodSchema,
-      validationMethod: 'auto',
-      invalidateAll: true,
+      validationMethod: 'submit-only',
+
       async onResult(event) {
         if (event.result.type === 'success') {
           modalStore.close();

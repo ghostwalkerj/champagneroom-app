@@ -25,7 +25,7 @@
   import { AgentStore } from '$stores';
   import { onDestroy, onMount } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
-  import type { ActionData, PageData } from './$types';
+  import type { PageData } from './$types';
   import AgentDetail from './AgentDetail.svelte';
   import WeeklyBooking from './WeeklyBooking.svelte';
 
@@ -508,7 +508,7 @@
                     </div>
                     <!-- Wallet -->
                     <div class="min-w-fit">
-                      <WalletDetail {wallet} {exchangeRate} />
+                      <WalletDetail {wallet} {exchangeRate} {withdrawForm} />
                     </div>
                   </div>
 
