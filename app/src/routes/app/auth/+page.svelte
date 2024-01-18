@@ -6,7 +6,7 @@
   import { applyAction, deserialize, enhance } from '$app/forms';
   import { goto } from '$app/navigation';
 
-  import Config from '$lib/config';
+  import config from '$lib/config';
   import { AuthType } from '$lib/constants';
   import { defaultWallet, selectedAccount } from '$lib/web3';
 
@@ -192,7 +192,7 @@
       </div>
       <NeonBlur>
         <a
-          href={Config.PATH.signup}
+          href={config.PATH.signup}
           class="relative btn btn-lg variant-filled rounded-lg"
         >
           Sign Up

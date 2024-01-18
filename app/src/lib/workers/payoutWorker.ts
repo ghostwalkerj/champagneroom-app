@@ -15,7 +15,7 @@ import {
 } from '$lib/models/transaction';
 import { Wallet } from '$lib/models/wallet';
 
-import Config from '$lib/config';
+import config from '$lib/config';
 import {
   CurrencyType,
   EntityType,
@@ -113,7 +113,7 @@ export const getPayoutWorker = ({
                 {
                   bcInvoiceId
                 },
-                { delay: Config.TIMER.paymentPeriod }
+                { delay: config.TIMER.paymentPeriod }
               );
               return 'Unconfirmed payment';
             }

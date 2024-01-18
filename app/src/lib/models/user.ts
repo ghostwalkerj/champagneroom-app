@@ -11,7 +11,7 @@ import {
 import { nanoid } from 'nanoid';
 import validator from 'validator';
 
-import Config from '$lib/config';
+import config from '$lib/config';
 import { AuthType, UserRole } from '$lib/constants';
 import { PermissionType } from '$lib/permissions';
 
@@ -69,7 +69,7 @@ const userZodSchema = toZodMongooseSchema(
       name: z.string().max(50).min(3, 'Name is too short').trim(),
       authType: z.nativeEnum(AuthType).default(AuthType.SIGNING),
       active: z.boolean().default(true),
-      profileImageUrl: z.string().default(Config.UI.defaultProfileImage),
+      profileImageUrl: z.string().default(config.UI.defaultProfileImage),
       referralCode: z
         .string()
         .max(50)

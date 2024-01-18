@@ -21,7 +21,7 @@ import { Ticket, TicketStatus } from '$lib/models/ticket';
 import { createShowMachineService } from '$lib/machines/showMachine';
 import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
 
-import Config from '$lib/config';
+import config from '$lib/config';
 import {
   ActorType,
   DisputeDecision,
@@ -248,7 +248,7 @@ const stopShow = async (show: ShowDocument, showQueue: ShowQueueType) => {
     {
       showId: show._id.toString()
     },
-    { delay: Config.TIMER.gracePeriod }
+    { delay: config.TIMER.gracePeriod }
   );
   showService.stop();
   return 'success';
@@ -277,7 +277,7 @@ const endShow = async (show: ShowDocument, showQueue: ShowQueueType) => {
         showId: show._id.toString(),
         finalize
       },
-      { delay: Config.TIMER.escrowPeriod }
+      { delay: config.TIMER.escrowPeriod }
     );
 
     // Tell ticket holders the show is over folks

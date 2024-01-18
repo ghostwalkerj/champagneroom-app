@@ -6,7 +6,7 @@
   import { applyAction, enhance } from '$app/forms';
   import { goto } from '$app/navigation';
 
-  import Config from '$lib/config';
+  import config from '$lib/config';
   import { defaultWallet, selectedAccount } from '$lib/web3';
   import { womensNames } from '$lib/womensNames';
 
@@ -34,7 +34,7 @@
   let addressModel: HTMLDialogElement;
   let signupModel: HTMLDialogElement;
   let existsModel: HTMLDialogElement;
-  let profileImageUrl = Config.UI.defaultProfileImage;
+  let profileImageUrl = config.UI.defaultProfileImage;
 
   $: innerWidth = 0;
   $: innerHeight = 0;
@@ -335,7 +335,7 @@ ya<svelte:window bind:innerWidth bind:innerHeight />
         <div class="w-full flex flex-col place-content-center">
           <div class="w-full flex place-content-center">
             <img
-              src="{Config.PATH.staticUrl}/assets/bottlesnlegs.png"
+              src="{config.PATH.staticUrl}/assets/bottlesnlegs.png"
               alt="Logo"
               class="h-16"
             />
@@ -369,7 +369,7 @@ ya<svelte:window bind:innerWidth bind:innerHeight />
       <div>
         <div class="w-full flex place-content-center">
           <img
-            src="{Config.PATH.staticUrl}/assets/bottlesnlegs.png"
+            src="{config.PATH.staticUrl}/assets/bottlesnlegs.png"
             alt="Logo"
             class="h-16"
           />
@@ -402,7 +402,7 @@ ya<svelte:window bind:innerWidth bind:innerHeight />
         <div class="w-full flex flex-col place-content-center">
           <div class="w-full flex place-content-center">
             <img
-              src="{Config.PATH.staticUrl}/assets/bottlesnlegs.png"
+              src="{config.PATH.staticUrl}/assets/bottlesnlegs.png"
               alt="Logo"
               class="h-16"
             />
@@ -423,7 +423,7 @@ ya<svelte:window bind:innerWidth bind:innerHeight />
             class="daisy-btn daisy-btn-primary daisy-btn-outline"
             on:click={() => {
               existsModel.close();
-              goto(Config.PATH.creator);
+              goto(config.PATH.creator);
             }}>Sign In</button
           >
           <button
@@ -452,7 +452,7 @@ ya<svelte:window bind:innerWidth bind:innerHeight />
     >
       <div class="w-full flex place-content-center">
         <img
-          src="{Config.PATH.staticUrl}/assets/bottlesnlegs.png"
+          src="{config.PATH.staticUrl}/assets/bottlesnlegs.png"
           alt="Logo"
           class="h-16"
         />

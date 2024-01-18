@@ -10,7 +10,7 @@ import type { UserDocument } from '$lib/models/user';
 import { User } from '$lib/models/user';
 import { Wallet } from '$lib/models/wallet';
 
-import Config from '$lib/config';
+import config from '$lib/config';
 import { AuthType, EntityType, UserRole } from '$lib/constants';
 
 import type { Actions, PageServerLoad } from './$types';
@@ -47,7 +47,7 @@ export const actions: Actions = {
     const signature = data.get('signature') as string;
     const agentId = data.get('agentId') as string;
 
-    const returnPath = Config.PATH.creator;
+    const returnPath = config.PATH.creator;
 
     // Validation
     if (!name || name.length < 3 || name.length > 50) {

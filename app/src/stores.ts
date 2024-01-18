@@ -13,7 +13,7 @@ import type { TicketDocument } from '$lib/models/ticket';
 import type { UserDocument } from '$lib/models/user';
 import type { WalletDocument } from '$lib/models/wallet';
 
-import Config from '$lib/config';
+import config from '$lib/config';
 
 const enum EntityType {
   AGENT = 'Agent',
@@ -84,7 +84,7 @@ const getUpdateNotification = <T>({
   callback: (changeset: Partial<T>) => void;
   type: EntityType;
 }) => {
-  const path = urlJoin(Config.PATH.notifyUpdate, id, '?type=' + type);
+  const path = urlJoin(config.PATH.notifyUpdate, id, '?type=' + type);
   const abortDocument = new AbortController();
   const waitFor = async () => {
     let shouldLoop = true;
@@ -128,7 +128,7 @@ const getInsertNotification = <T>({
   const queryString = relatedField
     ? typeQuery + '&relatedField=' + relatedField
     : typeQuery;
-  const path = urlJoin(Config.PATH.notifyInsert, id, queryString);
+  const path = urlJoin(config.PATH.notifyInsert, id, queryString);
   const abortDocument = new AbortController();
   const waitFor = async () => {
     let shouldLoop = true;

@@ -7,7 +7,7 @@
   import type { TicketDocument } from '$lib/models/ticket';
   import type { UserDocument } from '$lib/models/user';
 
-  import Config from '$lib/config';
+  import config from '$lib/config';
 
   import { UserRole } from '$lib/constants';
   import type { PageData } from './$types';
@@ -18,15 +18,15 @@
     const ticket = data.ticket as TicketDocument;
 
     if (user.roles.includes(UserRole.OPERATOR)) {
-      goto(Config.PATH.operator);
+      goto(config.PATH.operator);
     } else if (user.roles.includes(UserRole.AGENT)) {
-      goto(Config.PATH.agent);
+      goto(config.PATH.agent);
     } else if (user.roles.includes(UserRole.CREATOR)) {
-      goto(Config.PATH.creator);
+      goto(config.PATH.creator);
     } else if (user.roles.includes(UserRole.TICKET_HOLDER) && ticket) {
-      goto(urlJoin(Config.PATH.ticket, ticket._id.toString()));
+      goto(urlJoin(config.PATH.ticket, ticket._id.toString()));
     } else {
-      goto(Config.PATH.websiteUrl);
+      goto(config.PATH.websiteUrl);
     }
   });
 </script>

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import CopyText from '$components/forms/CopyText.svelte';
-  import Config from '$lib/config';
+  import config from '$lib/config';
   import {
     ShowStatus,
     currencyFormatter,
@@ -53,7 +53,7 @@
 
   const showPath = urlJoin(
     $page.url.origin,
-    Config.PATH.show,
+    config.PATH.show,
     show._id.toString()
   );
 

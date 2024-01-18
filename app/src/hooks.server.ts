@@ -31,7 +31,7 @@ import { User } from '$lib/models/user';
 import { Wallet, type WalletDocument } from '$lib/models/wallet';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-import Config from '$lib/config';
+import config from '$lib/config';
 import { UserRole } from '$lib/constants';
 import {
   deleteAuthToken,
@@ -47,7 +47,7 @@ import {
   isWhitelistMatch
 } from '$lib/server/auth';
 
-const authUrl = Config.PATH.auth;
+const authUrl = config.PATH.auth;
 
 setup({
   defaultToMongooseSchemaOptions: { unknownKeys: 'strip' }
@@ -174,7 +174,7 @@ const allowedPath = (path: string, locals: App.Locals, selector?: string) => {
 
   // If the user is a creator, they can access their own page
   if (isPasswordMatch(path)) {
-    const creatorUrl = `${Config.PATH.creator}/${slug}`;
+    const creatorUrl = `${config.PATH.creator}/${slug}`;
     return locals.creator && path.startsWith(creatorUrl);
   }
 
@@ -186,7 +186,7 @@ const allowedPath = (path: string, locals: App.Locals, selector?: string) => {
   if (isOperatorMatch(path) && locals.operator) return true;
   if (isAgentMatch(path) && locals.agent) return true;
   if (isCreatorMatch(path) && locals.creator) return true;
-  if (path === Config.PATH.app && locals.user) return true;
+  if (path === config.PATH.app && locals.user) return true;
 
   // Notifications can be accessed by the creator, ticket holder, agent, operator
   if (isNotificationMatch(path)) {

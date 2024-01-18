@@ -18,7 +18,7 @@ export const defaultPermissions = {
   [UserRole.TICKET_HOLDER]: [PermissionType.CREATE_TICKET]
 };
 
-const Config = {
+const config = {
   PATH: {
     show: '/app/show',
     ticket: '/app/ticket',
@@ -56,4 +56,4 @@ const Config = {
   DEFAULT_PERMISSIONS: defaultPermissions
 };
 
-export default Config;
+export default config;

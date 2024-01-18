@@ -84,14 +84,19 @@ module.exports = {
         cases: {
           camelCase: true,
           pascalCase: true
-        }
+        },
+        ignore: ['FAQ.svelte', 'README.svelte']
       }
     ],
     '@typescript-eslint/naming-convention': [
       'error',
       {
         selector: 'default',
-        format: ['camelCase']
+        format: ['camelCase'],
+        filter: {
+          regex: '^(IORedis|Property-Name-Two)$',
+          match: false
+        }
       },
       {
         selector: 'variable',

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Config from '$lib/config';
+  import config from '$lib/config';
   import getProfileImage from '$lib/profilePhoto';
 
   import ShowDetail from '$components/ShowDetail.svelte';
@@ -26,7 +26,7 @@
     component: 'ReserveShowForm',
     meta: {
       action: '/app/show/' + data.show._id.toString() + '?/reserve_ticket',
-      profileImage: getProfileImage(displayName, Config.UI.profileImagePath),
+      profileImage: getProfileImage(displayName, config.UI.profileImagePath),
       form: data.form
     }
   };

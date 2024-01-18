@@ -2,7 +2,7 @@
   import { applyAction, enhance } from '$app/forms';
   import { Image } from '@unpic/svelte';
 
-  import Config from '$lib/config';
+  import config from '$lib/config';
 
   import type { ActionData } from './$types';
   import type { ActionResult } from '@sveltejs/kit';
@@ -32,7 +32,7 @@
     <div class="flex flex-col lg:flex-row gap-10">
       <div class="w-full lg:w-1/2 mb-10 flex justify-center px-4">
         <Image
-          src="{Config.PATH.staticUrl}/assets/creator3.png"
+          src="{config.PATH.staticUrl}/assets/creator3.png"
           alt="Creator"
           class="rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1] h-auto max-w-xs md:max-w-sm lg:max-w-md"
           height={823}

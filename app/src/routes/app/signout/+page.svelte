@@ -2,14 +2,14 @@
   import NeonBlur from '$components/NeonBlur.svelte';
   import urlJoin from 'url-join';
 
-  import Config from '$lib/config';
+  import config from '$lib/config';
   import type { PageData } from './$types';
 
   export let data: PageData;
 
   let { returnPath } = data;
   const authPath = urlJoin(
-    Config.PATH.auth,
+    config.PATH.auth,
     '?returnPath=' + encodeURIComponent(returnPath!)
   );
 </script>

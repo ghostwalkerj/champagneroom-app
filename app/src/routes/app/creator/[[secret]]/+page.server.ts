@@ -21,6 +21,12 @@ import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
 import type { CancelType } from '$lib/models/common';
 import { Creator, type CreatorDocument } from '$lib/models/creator';
+import {
+  Room,
+  roomCRUDSchema,
+  type RoomDocument,
+  roomZodSchema
+} from '$lib/models/room';
 import { Show, showCRUDSchema, type ShowDocument } from '$lib/models/show';
 import { ShowEvent, type ShowEventDocument } from '$lib/models/showEvent';
 import type { UserDocument } from '$lib/models/user';
@@ -46,12 +52,6 @@ import { getShowMachineService } from '$lib/server/machinesUtil';
 import { web3Upload } from '$lib/server/upload';
 
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
-import {
-  roomCRUDSchema,
-  Room,
-  type RoomDocument,
-  roomZodSchema
-} from '$lib/models/room';
 
 const requestPayoutSchema = z.object({
   amount: z.number().min(0.0001),

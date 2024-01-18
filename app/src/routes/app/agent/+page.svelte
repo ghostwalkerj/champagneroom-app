@@ -9,7 +9,7 @@
   import { invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
 
-  import Config from '$lib/config';
+  import config from '$lib/config';
   import { AuthType, currencyFormatter } from '$lib/constants';
   import { womensNames } from '$lib/womensNames';
 
@@ -57,7 +57,7 @@
   let creatorCommissionElement: HTMLTableCellElement;
   $: commission =
     agent.defaultCommissionRate.toString() ||
-    Config.UI.defaultCommissionRate.toString();
+    config.UI.defaultCommissionRate.toString();
   let creatorName = uniqueNamesGenerator({
     dictionaries: [womensNames]
   });
@@ -189,7 +189,7 @@
           <a
             href={urlJoin(
               $page.url.origin,
-              Config.PATH.creator,
+              config.PATH.creator,
               newCreator.user.secret || ''
             )}
             target="_blank"
@@ -197,7 +197,7 @@
           >
             {urlJoin(
               $page.url.origin,
-              Config.PATH.creator,
+              config.PATH.creator,
               newCreator.user.secret || ''
             )}</a
           >
@@ -399,7 +399,7 @@
                             <td
                               >{#if creator.user.authType !== AuthType.SIGNING}<a
                                   href={urlJoin(
-                                    Config.PATH.creator,
+                                    config.PATH.creator,
                                     creator.user.secret || ''
                                   )}
                                   target="_blank"

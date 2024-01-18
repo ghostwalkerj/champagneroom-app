@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import Config from '$lib/config';
+  import config from '$lib/config';
   import type { roomCRUDSchema } from '$lib/models/room';
   import Icon from '@iconify/svelte';
   import { FileDropzone, getModalStore } from '@skeletonlabs/skeleton';
@@ -38,10 +38,10 @@
   }
 
   if ($form.bannerImageUrl === undefined) {
-    $form.bannerImageUrl = Config.UI.defaultProfileImage;
+    $form.bannerImageUrl = config.UI.defaultProfileImage;
   }
 
-  $: roomUrl = urlJoin($page.url.origin, Config.PATH.room);
+  $: roomUrl = urlJoin($page.url.origin, config.PATH.room);
 </script>
 
 {#if thisModal}

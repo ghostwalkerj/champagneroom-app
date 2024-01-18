@@ -2,11 +2,7 @@
   import { applyAction, enhance } from '$app/forms';
   import { getModalStore } from '@skeletonlabs/skeleton';
   import type { ActionResult } from '@sveltejs/kit';
-  import type { SvelteComponent } from 'svelte';
-
   const modalStore = getModalStore();
-  let parent: SvelteComponent;
-
   let meta = $modalStore[0].meta;
 
   let canStartShow = meta.canStartShow;
@@ -15,7 +11,7 @@
   const onSubmit = ({}) => {
     isLoading = true;
     return async ({ result }: { result: ActionResult }) => {
-      if (result.type ==='success') {
+      if (result.type === 'success') {
         $modalStore[0].response!(true);
       }
       await applyAction(result);

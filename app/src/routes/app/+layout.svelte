@@ -5,7 +5,7 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
-  import Config from '$lib/config';
+  import config from '$lib/config';
   import { AuthType } from '$lib/constants';
   import { selectedAccount } from '$lib/web3';
 
@@ -20,7 +20,7 @@
   const buildNumber = generate(version);
   const buildTime = format(buildNumber);
   let lastAddress: string | undefined;
-  let signOut = Config.PATH.signout;
+  let signOut = config.PATH.signout;
 
   onMount(() => {
     selectedAccount.subscribe((account) => {
@@ -53,7 +53,7 @@
   >
     <a class="display-inline" href="/">
       <img
-        src="{Config.PATH.staticUrl}/assets/logo-horizontal-tr.png"
+        src="{config.PATH.staticUrl}/assets/logo-horizontal-tr.png"
         alt="Logo"
         width="300"
       />
@@ -72,11 +72,11 @@
             </div>
           {/if}
           {#if $page.data.authType === AuthType.IMPERSONATION}
-            <a class="btn variant-outline" href={Config.PATH.revert}>Revert </a>
+            <a class="btn variant-outline" href={config.PATH.revert}>Revert </a>
           {:else}
             <a
               class="btn variant-outline"
-              href={Config.PATH.signout + '?returnPath=' + $page.url.pathname}
+              href={config.PATH.signout + '?returnPath=' + $page.url.pathname}
               >Signout</a
             >
           {/if}

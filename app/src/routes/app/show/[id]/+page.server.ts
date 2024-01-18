@@ -24,7 +24,7 @@ import { User } from '$lib/models/user';
 
 import type { ShowQueueType } from '$lib/workers/showWorker';
 
-import Config from '$lib/config';
+import config from '$lib/config';
 import {
   AuthType,
   CurrencyType,
@@ -146,7 +146,7 @@ export const actions: Actions = {
         price: ticket.price.amount,
         currency: ticket.price.currency,
         store_id: BITCART_STORE_ID,
-        expiration: Config.TIMER.paymentPeriod / 60 / 1000,
+        expiration: config.TIMER.paymentPeriod / 60 / 1000,
         order_id: ticket._id.toString()
       },
       {
@@ -242,7 +242,7 @@ export const actions: Actions = {
       invoiceQueue.close();
     }
 
-    const redirectUrl = urlJoin(Config.PATH.ticket, ticket._id.toString());
+    const redirectUrl = urlJoin(config.PATH.ticket, ticket._id.toString());
 
     const encAuthToken = createAuthToken({
       id: user._id.toString(),

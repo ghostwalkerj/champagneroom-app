@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import Config from '$lib/config';
+  import config from '$lib/config';
 
   const links = [
     { name: 'About', href: '#About' },
@@ -9,8 +9,8 @@
     { name: 'Creators', href: '#Creators' },
     { name: 'Token', href: '#Token' },
     { name: 'Contact', href: '#Contact' },
-    { name: 'Open App', href: Config.PATH.openApp },
-    { name: 'Sign Up', href: Config.PATH.signup }
+    { name: 'Open App', href: config.PATH.openApp },
+    { name: 'Sign Up', href: config.PATH.signup }
   ];
 
   function closeNav() {
@@ -25,7 +25,7 @@
   <a href="/" class="w-[180px] lg:w-[280px]">
     <img
       alt="logo"
-      src="{Config.PATH.staticUrl}/assets/logo-horizontal-tr.png"
+      src="{config.PATH.staticUrl}/assets/logo-horizontal-tr.png"
       class=""
     />
   </a>

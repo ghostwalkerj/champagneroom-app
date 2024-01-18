@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import CopyText from '$components/forms/CopyText.svelte';
-  import Config from '$lib/config';
+  import config from '$lib/config';
   import Icon from '@iconify/svelte';
   import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
   import type { SuperValidated } from 'sveltekit-superforms';
@@ -26,7 +26,7 @@
 
   $: roomUrl = urlJoin(
     $page.url.origin,
-    Config.PATH.room,
+    config.PATH.room,
     roomForm.data.uniqueUrl
   );
 </script>
@@ -47,7 +47,6 @@
         Name: <span class="font-semibold">{room.name}</span>
       </div>
       <div class="text-sm">"{room.tagLine}""</div>
-      bannerImageUrl
       <div class="overflow-hidden m-4 max-w-fit">
         <!-- svelte-ignore a11y-missing-attribute -->
         <img

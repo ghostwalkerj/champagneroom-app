@@ -3,7 +3,7 @@
   import { invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
   import ProfileImage from '$components/forms/ImageUploadForm.svelte';
-  import Config from '$lib/config';
+  import config from '$lib/config';
   import type { AgentDocument } from '$lib/models/agent';
   import type { ActionResult } from '@sveltejs/kit';
   import urlJoin from 'url-join';
@@ -38,7 +38,7 @@
         referralCode = agent.user.referralCode;
         referralUrl = urlJoin(
           $page.url.origin,
-          Config.PATH.referralSignup,
+          config.PATH.referralSignup,
           referralCode
         );
         navigator.clipboard.writeText(referralUrl);
@@ -88,7 +88,7 @@
   $: referralCount = agent.user.referralCount || 0;
   $: referralUrl = urlJoin(
     $page.url.origin,
-    Config.PATH.referralSignup,
+    config.PATH.referralSignup,
     referralCode
   );
 </script>
@@ -120,7 +120,7 @@
           <div>
             <ProfileImage
               imageUrl={agent.user.profileImageUrl ||
-                Config.UI.defaultProfileImage}
+                config.UI.defaultProfileImage}
               callBack={(value) => {
                 updateProfileImage(value);
               }}

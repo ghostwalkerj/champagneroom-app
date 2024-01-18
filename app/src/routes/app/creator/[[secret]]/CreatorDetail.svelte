@@ -1,6 +1,6 @@
 <script lang="ts">
   import ImageUploadForm from '$components/forms/ImageUploadForm.svelte';
-  import Config from '$lib/config';
+  import config from '$lib/config';
   import type { CreatorDocument } from '$lib/models/creator';
   import Icon from '@iconify/svelte';
   import StarRating from 'svelte-star-rating';
@@ -29,7 +29,7 @@
   </h2>
   <div>
     <ImageUploadForm
-      imageUrl={creator.user.profileImageUrl || Config.UI.defaultProfileImage}
+      imageUrl={creator.user.profileImageUrl || config.UI.defaultProfileImage}
       callBack={(value) => {
         updateProfileImage(value);
       }}

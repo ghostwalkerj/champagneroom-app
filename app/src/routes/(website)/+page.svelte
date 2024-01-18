@@ -1,7 +1,7 @@
 <script lang="ts">
   import Saos from 'saos';
 
-  import Config from '$lib/config';
+  import config from '$lib/config';
 
   import About from './About.svelte';
   import Contact from './Contact.svelte';
@@ -44,7 +44,7 @@
         </div>
         <div>
           <a
-            href="{Config.PATH.staticUrl}/assets/champagne-room-white-paper.pdf"
+            href="{config.PATH.staticUrl}/assets/champagne-room-white-paper.pdf"
             class="md:w-auto daisy-btn daisy-btn-secondary transition-all duration-300 ease-in-out m-0"
             target="_blank"
           >
@@ -64,7 +64,7 @@
         height="450px"
       >
         <source
-          src="{Config.PATH.staticUrl}/assets/champagnevideo.mp4"
+          src="{config.PATH.staticUrl}/assets/champagnevideo.mp4"
           type="video/mp4"
         />
       </video>

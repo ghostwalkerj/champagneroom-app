@@ -4,7 +4,7 @@
 
   import type { ShowDocument, showCRUDSchema } from '$lib/models/show';
 
-  import Config from '$lib/config';
+  import config from '$lib/config';
   import { durationFormatter } from '$lib/constants';
 
   import type { CreatorDocument } from '$lib/models/creator';
@@ -39,7 +39,7 @@
           case result.data!.showCreated: {
             const showUrl = urlJoin(
               window.location.origin,
-              Config.PATH.show,
+              config.PATH.show,
               result.data!.show!._id.toString()
             );
             navigator.clipboard.writeText(showUrl);

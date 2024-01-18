@@ -22,7 +22,7 @@ import { User } from '$lib/models/user';
 import type { WalletDocument } from '$lib/models/wallet';
 import { Wallet } from '$lib/models/wallet';
 
-import Config from '$lib/config';
+import config from '$lib/config';
 import { AuthType, CurrencyType, EntityType } from '$lib/constants';
 import { rateCryptosRateGet } from '$lib/ext/bitcart';
 import { createBitcartToken } from '$lib/payment';
@@ -52,7 +52,7 @@ export const actions: Actions = {
     });
 
     encAuthToken && setAuthToken(cookies, tokenName, encAuthToken);
-    throw redirect(303, Config.PATH.creator);
+    throw redirect(303, config.PATH.creator);
   },
   update_profile_image: async ({ locals, request }) => {
     const data = await request.formData();
@@ -101,7 +101,7 @@ export const actions: Actions = {
         wallet: wallet._id,
         roles: [EntityType.CREATOR],
         password: `${password}${PASSWORD_SALT}`,
-        profileImageUrl: Config.UI.defaultProfileImage
+        profileImageUrl: config.UI.defaultProfileImage
       });
       const creator = (await Creator.create({
         user: user._id,

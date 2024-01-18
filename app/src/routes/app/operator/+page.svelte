@@ -13,7 +13,7 @@
   import type { OperatorDocument } from '$lib/models/operator';
   import type { ShowDocument } from '$lib/models/show';
 
-  import Config from '$lib/config';
+  import config from '$lib/config';
   import { AuthType, DisputeDecision, currencyFormatter } from '$lib/constants';
   import { womensNames } from '$lib/womensNames';
 
@@ -55,7 +55,7 @@
   let agentAddress = '';
   let creatorNameElement: HTMLTableCellElement;
   let creatorCommissionElement: HTMLTableCellElement;
-  let commission = Config.UI.defaultCommissionRate.toString();
+  let commission = config.UI.defaultCommissionRate.toString();
   let creatorName = uniqueNamesGenerator({
     dictionaries: [womensNames]
   });
@@ -295,11 +295,11 @@
         and secret URL:
         <div class="text-center font-bold text-sm">
           <a
-            href={urlJoin(Config.PATH.creator, newCreator.user.secret || '')}
+            href={urlJoin(config.PATH.creator, newCreator.user.secret || '')}
             target="_blank"
             class="daisy-link daisy-link-primary"
           >
-            {urlJoin(Config.PATH.creator, newCreator.user.secret || '')}</a
+            {urlJoin(config.PATH.creator, newCreator.user.secret || '')}</a
           >
         </div>
       </div>
@@ -758,7 +758,7 @@
                             <td
                               >{#if creator.user.authType !== AuthType.SIGNING}<a
                                   href={urlJoin(
-                                    Config.PATH.creator,
+                                    config.PATH.creator,
                                     creator.user.secret || ''
                                   )}
                                   target="_blank"
