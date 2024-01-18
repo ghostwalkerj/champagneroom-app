@@ -1,5 +1,6 @@
 <script lang="ts">
   import { applyAction, enhance } from '$app/forms';
+  import type { ActionResult } from '@sveltejs/kit';
 
   export let canStartShow: boolean;
 
@@ -12,16 +13,14 @@
 
   const onSubmit = ({}) => {
     isLoading = true;
-    return async ({ result }) => {
-      if (result.data.success) {
+    return async ({ result }: { result: ActionResult }) => {
+      if (result.type === 'success') {
         onShowEnded();
       }
       await applyAction(result);
       isLoading = false;
     };
   };
-
-
 </script>
 
 <!--
@@ -46,7 +45,12 @@
         }}
         disabled={!canStartShow || isLoading}>Restart Show</button
       >
-      <form method="post" id="endShow" action="?/end_show" use:enhance={onSubmit}>
+      <form
+        method="post"
+        id="endShow"
+        action="?/end_show"
+        use:enhance={onSubmit}
+      >
         <button class="daisy-btn" disabled={isLoading}>End Show</button>
       </form>
     </div>

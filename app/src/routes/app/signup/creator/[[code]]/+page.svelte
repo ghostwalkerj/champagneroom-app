@@ -6,7 +6,7 @@
   import { applyAction, enhance } from '$app/forms';
   import { goto } from '$app/navigation';
 
-  import Config from '$lib/config';
+  import Config from '$lib/models/config';
   import { defaultWallet, selectedAccount } from '$lib/web3';
   import { womensNames } from '$lib/womensNames';
 
@@ -16,6 +16,7 @@
   import type { UserDocument } from '$lib/models/user';
   import type { Unsubscriber } from 'svelte/store';
   import type { ActionData, PageData } from './$types';
+  import type { ActionResult } from '@sveltejs/kit';
 
   export let data: PageData;
   export let form: ActionData;
@@ -86,12 +87,12 @@
     accountUnsub?.();
   });
 
-  const onSubmit = async ({ formData }) => {
+  const onSubmit = async ({ formData }: { formData: FormData }) => {
     formData.append('profileImageUrl', profileImageUrl);
     formData.append('address', walletAddress);
     formData.append('message', message);
     if (agent) {
-      formData.append('agentId', agent._id);
+      formData.append('agentId', agent._id.toString());
     }
 
     if (wallet) {
@@ -102,11 +103,11 @@
       formData.append('signature', signature);
     }
 
-    return async ({ result }) => {
-      if (result?.type === 'success') {
-        goto(result.data.returnPath);
-      } else {
-        if (result?.data?.alreadyCreator) {
+    return async ({ result }: { result: ActionResult }) => {
+      if (result.type === 'success') {
+        goto(result.data!.returnPath);
+      } else if (result.type === 'failure') {
+        if (result.data!.alreadyCreator) {
           existsModel.showModal();
           addressModel?.close();
           signupModel?.close();

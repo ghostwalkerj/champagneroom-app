@@ -6,7 +6,7 @@
   import { applyAction, deserialize, enhance } from '$app/forms';
   import { goto } from '$app/navigation';
 
-  import Config from '$lib/config';
+  import Config from '$lib/models/config';
   import { AuthType } from '$lib/constants';
   import { defaultWallet, selectedAccount } from '$lib/web3';
 
@@ -30,7 +30,7 @@
   let message = '';
 
   const onSubmit = () => {
-    return async ({ result }) => {
+    return async ({ result }: { result: ActionResult }) => {
       authAction(result);
       applyAction(result);
     };
@@ -177,8 +177,9 @@
           </div>
         {/if}
         {#if signingRejected}
-          <!-- svelte-ignore a11y-click-events-have-key-events -->
+          <!-- svelte-ignore a11y-no-static-element-interactions -->
           <div>
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
             <div class="daisy-btn daisy-btn-primary" on:click={signMessage}>
               Sign Message
             </div>

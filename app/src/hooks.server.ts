@@ -17,6 +17,7 @@ import {
 
 import type { AgentDocument } from '$lib/models/agent';
 import { Agent } from '$lib/models/agent';
+import Config from '$lib/models/config';
 import type { CreatorDocument } from '$lib/models/creator';
 import { Creator } from '$lib/models/creator';
 import type { OperatorDocument } from '$lib/models/operator';
@@ -28,7 +29,6 @@ import type { UserDocument } from '$lib/models/user';
 import { User } from '$lib/models/user';
 import { Wallet, type WalletDocument } from '$lib/models/wallet';
 
-import Config from '$lib/config';
 import { UserRole } from '$lib/constants';
 import {
   deleteAuthToken,
@@ -67,9 +67,9 @@ const redisConnection = new IORedis({
 });
 
 const setLocals = async (decode: JwtPayload, locals: App.Locals) => {
-  const selector = decode.selector;
+  const selector = decode.selector as string;
   if (selector) {
-    const query = {};
+    const query: Record<string, unknown> = {};
     query[selector] = decode[selector];
 
     // Check if user is allowed to access the requested path
@@ -167,7 +167,9 @@ const allowedPath = (path: string, locals: App.Locals, selector?: string) => {
   if (!locals.user) return false;
 
   const slug =
-    selector === undefined ? undefined : locals.user[selector].toString();
+    selector === undefined
+      ? undefined
+      : locals.user[selector as keyof typeof locals.user]?.toString();
 
   // If the user is a creator, they can access their own page
   if (isPasswordMatch(path)) {

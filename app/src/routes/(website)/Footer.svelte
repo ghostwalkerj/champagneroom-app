@@ -1,7 +1,7 @@
 <script lang="ts">
-import Icon from '@iconify/svelte';
+  import Icon from '@iconify/svelte';
 
-  import Config from '$lib/config';
+  import Config from '$lib/models/config';
 </script>
 
 <footer class="w-full flex-shrink-0 mt-20 px-4 md:px-6 lg:px-10">

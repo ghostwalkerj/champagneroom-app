@@ -6,6 +6,7 @@
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
   class="cursor-pointer flex flex-col text-gray-300 w-16 items-center group hover:text-white"
   on:click={() => goto(path)}

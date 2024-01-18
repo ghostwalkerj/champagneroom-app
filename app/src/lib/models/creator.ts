@@ -23,7 +23,8 @@ const creatorZodSchema = toZodMongooseSchema(
       }),
       room: mongooseZodCustomType('ObjectId')
         .mongooseTypeOptions({
-          ref: 'Room'
+          ref: 'Room',
+          index: true
         })
         .optional(),
       user: mongooseZodCustomType('ObjectId').mongooseTypeOptions({

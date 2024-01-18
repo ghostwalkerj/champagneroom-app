@@ -1,43 +1,16 @@
 {
   "extends": "./.svelte-kit/tsconfig.json",
   "compilerOptions": {
-    "ignoreDeprecations": "5.0",
-    "resolveJsonModule": true,
     "allowJs": true,
-    "forceConsistentCasingInFileNames": true,
-    "isolatedModules": false,
+    "checkJs": true,
     "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
     "strict": true,
-    "noImplicitAny": false,
-    "paths": {
-      "$components": [
-        "./src/components"
-      ],
-      "$components/*": [
-        "./src/components/*"
-      ],
-      "$lib": [
-        "./src/lib"
-      ],
-      "$lib/*": [
-        "./src/lib/*"
-      ],
-      "$stores": [
-        "./src/stores"
-      ],
-      "$ext": [
-        "./src/lib/ext"
-      ],
-      "$ext/*": [
-        "./src/lib/ext/*"
-      ],
-      "$server": [
-        "./src/lib/server"
-      ],
-      "$server/*": [
-        "./src/lib/server/*"
-      ],
-    },
+    "ignoreDeprecations": "5.0",
+    "moduleResolution": "bundler",
     "types": [
       "vitest/globals",
       "@testing-library/jest-dom"

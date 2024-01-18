@@ -4,7 +4,7 @@
 
   import type { TicketDocumentType } from '$lib/models/ticket';
 
-  import Config from '$lib/config';
+  import Config from '$lib/models/config';
   import {
     TicketStatus,
     currencyFormatter,
@@ -114,6 +114,7 @@
 
       <!-- Amount Section -->
       <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
       <div
         class="daisy-tooltip daisy-tooltip-primary"
         id="payment-amount"
@@ -134,7 +135,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
       <div>
         <span class="font-bold">Rate: </span>
-        {currentPayment['rate_str']}
+        {currentPayment['rate']}
       </div>
 
       <!-- Time Left to Pay Section -->

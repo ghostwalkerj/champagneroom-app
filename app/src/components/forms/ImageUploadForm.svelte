@@ -5,7 +5,7 @@
 
   import { page } from '$app/stores';
 
-  import Config from '$lib/config';
+  import Config from '$lib/models/config';
   import Icon from '@iconify/svelte';
 
   export let callBack: (argument0: string) => void;

@@ -1,13 +1,16 @@
 <script lang="ts">
   import { currencyFormatter } from '$lib/constants';
-  import type { EarningsType } from '$lib/models/common';
-  import type { PayoutType } from '$lib/models/common';
-  import { getModalStore } from '@skeletonlabs/skeleton';
-  import type { SvelteComponent } from 'svelte';
-  import { Table, tableMapperValues } from '@skeletonlabs/skeleton';
-  import type { TableSource } from '@skeletonlabs/skeleton';
-  import { TabGroup, Tab } from '@skeletonlabs/skeleton';
+  import type { EarningsType, PayoutType } from '$lib/models/common';
   import { PayoutStatus } from '$lib/payment';
+  import type { TableSource } from '@skeletonlabs/skeleton';
+  import {
+    Tab,
+    TabGroup,
+    Table,
+    getModalStore,
+    tableMapperValues
+  } from '@skeletonlabs/skeleton';
+  import type { SvelteComponent } from 'svelte';
 
   export let parent: SvelteComponent;
   const modalStore = getModalStore();

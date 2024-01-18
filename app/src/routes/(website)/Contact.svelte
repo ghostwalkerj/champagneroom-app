@@ -2,15 +2,16 @@
   import { applyAction, enhance } from '$app/forms';
   import { Image } from '@unpic/svelte';
 
-  import Config from '$lib/config';
+  import Config from '$lib/models/config';
 
   import type { ActionData } from './$types';
+  import type { ActionResult } from '@sveltejs/kit';
 
   export let form: ActionData;
   let isSubmitted = false;
 
   const onSubmit = () => {
-    return async ({ result }) => {
+    return async ({ result }: { result: ActionResult }) => {
       if (result.type === 'failure') {
         isSubmitted = false;
       } else if (result.type === 'success') {

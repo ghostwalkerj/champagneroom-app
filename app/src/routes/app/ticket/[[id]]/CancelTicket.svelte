@@ -1,5 +1,6 @@
 <script lang="ts">
   import { applyAction, enhance } from '$app/forms';
+  import type { ActionResult } from '@sveltejs/kit';
 
   export let isLoading = false;
   let isShowCancelLoading = false;
@@ -9,7 +10,7 @@
       isShowCancelLoading = true;
     }
     isLoading = true;
-    return async ({ result }) => {
+    return async ({ result }: { result: ActionResult }) => {
       if (result.type === 'failure') {
         isLoading = false;
       }

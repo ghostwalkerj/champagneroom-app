@@ -3,7 +3,7 @@
   import { invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
   import ProfileImage from '$components/forms/ImageUploadForm.svelte';
-  import Config from '$lib/config';
+  import Config from '$lib/models/config';
   import type { AgentDocument } from '$lib/models/agent';
   import type { ActionResult } from '@sveltejs/kit';
   import urlJoin from 'url-join';
@@ -132,6 +132,7 @@
               <a class="daisy-link" href={referralUrl}> {referralCode}</a>
             </div>
             <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
             <div class="daisy-btn daisy-btn-xs" on:click={updateReferralCode}>
               Change
             </div>

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import Config from '$lib/config';
+  import Config from '$lib/models/config';
 
   const links = [
     { name: 'About', href: '#About' },
@@ -126,6 +126,7 @@
     <ul class="p-4 w-80 min-h-full bg-base-100 gap-4 flex flex-col">
       {#each links.toReversed() as link}
         <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
         <li on:click={closeNav}>
           {#if link.name == 'Sign Up'}
             <a

@@ -74,9 +74,9 @@ export { WalletStatus };
 export const atomicUpdateCallback = async (
   query: object,
   update: object,
-  options: object = {}
+  options: { returnDocument?: 'before' | 'after' } = {}
 ) => {
-  options['returnDocument'] = 'after';
+  options.returnDocument = 'after';
   return (await Wallet.findOneAndUpdate(
     query,
     update,

@@ -1,18 +1,19 @@
 import { sveltekit } from '@sveltejs/kit/vite';
-import { defineConfig } from 'vitest/config';
+import { defineConfig } from 'vite';
 import EnvironmentPlugin from 'vite-plugin-environment';
-import nodePolyfills from 'vite-plugin-node-stdlib-browser';
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import mkcert from 'vite-plugin-mkcert';
 
 export default defineConfig({
   mode: 'development',
+
   plugins: [
-    sveltekit(),
-    mkcert(),
-    EnvironmentPlugin(['MONGO_DB_FIELD_SECRET']),
     nodePolyfills({
       protocolImports: true
-    })
+    }),
+    sveltekit(),
+    mkcert(),
+    EnvironmentPlugin(['MONGO_DB_FIELD_SECRET'])
   ],
 
   resolve: {
@@ -28,7 +29,6 @@ export default defineConfig({
     }
   },
   server: {
-    https: true,
     fs: {
       // Allow serving files from one level up to the project root
       allow: ['..']

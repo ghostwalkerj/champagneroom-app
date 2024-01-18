@@ -27,18 +27,17 @@
   import ShowStatus from './ShowStatus.svelte';
 
   import { page } from '$app/stores';
-  import type { RoomDocumentType, roomZodSchema } from '$lib/models/room';
+  import type { roomZodSchema } from '$lib/models/room';
   import type { UserDocument } from '$lib/models/user';
   import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
   import type { SuperValidated } from 'sveltekit-superforms';
   import type { Subscription } from 'xstate';
-  import type { ActionData, PageData } from './$types';
+  import type { PageData } from './$types';
   import CreatorDetail from './CreatorDetail.svelte';
   import RoomDetail from './RoomDetail.svelte';
   import VideoMeeting from './VideoMeeting.svelte';
 
   export let data: PageData;
-  export let form: ActionData;
 
   $: creator = data.creator as CreatorDocument;
   let currentShow = data.show as ShowDocument | undefined;
@@ -48,7 +47,6 @@
   let exchangeRate = +data.exchangeRate || 0;
   let jitsiToken = data.jitsiToken as string;
   let user = data.user as UserDocument;
-  let room = data.room as RoomDocumentType;
   $: roomForm = data.roomForm as SuperValidated<typeof roomZodSchema>;
 
   $: showVideo = false;
@@ -266,7 +264,6 @@
             bind:isLoading
             {creator}
             {onShowCreated}
-            {form}
             createShowForm={data.createShowForm}
           />
         {/if}
@@ -306,7 +303,6 @@
             <WalletDetail
               {wallet}
               {exchangeRate}
-              {form}
               {destination}
               withdrawForm={data.requestPayoutForm}
             />

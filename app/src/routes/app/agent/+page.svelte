@@ -9,7 +9,7 @@
   import { invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
 
-  import Config from '$lib/config';
+  import Config from '$lib/models/config';
   import { AuthType, currencyFormatter } from '$lib/constants';
   import { womensNames } from '$lib/womensNames';
 
@@ -46,7 +46,6 @@
   }[];
   let exchangeRate = +data.exchangeRate || 0;
 
-  let form: ActionData;
 
   let newCreatorModal: HTMLDialogElement;
   let newCreator: CreatorDocument | undefined;
@@ -150,7 +149,7 @@
   };
 
   const onSubmit = ({}) => {
-    return async ({ result }) => {
+    return async ({ result }: { result: ActionResult }) => {
       if (result?.type === 'success') {
         canAddCreator = false;
         await invalidateAll();
@@ -159,17 +158,17 @@
         });
 
         creators = $page.data.creators;
-        newCreator = result.data.creator;
-        newPassword = result.data.password;
+        newCreator = result.data!.creator;
+        newPassword = result.data!.password;
         newCreatorModal.showModal();
-      } else {
-        if (result.data.badName) {
+      } else if (result?.type === 'failure') {
+        if (result.data!.badName) {
           creatorNameElement.focus();
         }
-        if (result.data.badAddress) {
+        if (result.data!.badAddress) {
           creatorAddressElement.focus();
         }
-        if (result.data.badCommission) {
+        if (result.data!.badCommission) {
           creatorCommissionElement.focus();
         }
       }
@@ -262,6 +261,7 @@
           <div class="daisy-tabs daisy-tabs-boxed w-fit">
             <!-- svelte-ignore a11y-missing-attribute -->
             <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
             <a
               class="daisy-tab"
               class:daisy-tab-active={activeTab == 'Dashboard'}
@@ -271,6 +271,7 @@
             >
             <!-- svelte-ignore a11y-missing-attribute -->
             <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
             <a
               class="daisy-tab"
               class:daisy-tab-active={activeTab === 'Creators'}
@@ -508,7 +509,7 @@
                     </div>
                     <!-- Wallet -->
                     <div class="min-w-fit">
-                      <WalletDetail {wallet} {form} {exchangeRate} />
+                      <WalletDetail {wallet}  {exchangeRate} />
                     </div>
                   </div>
 

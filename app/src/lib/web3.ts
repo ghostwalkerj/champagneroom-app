@@ -1,4 +1,3 @@
-import coinbaseWalletModule from '@web3-onboard/coinbase';
 import Onboard from '@web3-onboard/core';
 import type { Account, WalletState } from '@web3-onboard/core/dist/types';
 import frameModule from '@web3-onboard/frame';
@@ -6,6 +5,7 @@ import injectedModule from '@web3-onboard/injected-wallets';
 import ledgerModule from '@web3-onboard/ledger';
 import trezorModule from '@web3-onboard/trezor';
 import walletConnectModule from '@web3-onboard/walletconnect';
+import { lastValueFrom } from 'rxjs';
 import { derived, writable } from 'svelte/store';
 
 import {
@@ -13,11 +13,10 @@ import {
   PUBLIC_WALLET_CONNECT_PROJECT_ID
 } from '$env/static/public';
 
-import Config from '$lib/config';
+import Config from '$lib/models/config';
 
 // Wallets
 const injected = injectedModule();
-const coinbaseWalletSdk = coinbaseWalletModule({ darkMode: true });
 const frame = frameModule();
 const trezor = trezorModule({
   email: 'admin@champagneroom.app',
@@ -38,24 +37,14 @@ const ledger = ledgerModule({
   requiredChains: [1]
 });
 
-const wallets = [
-  injected,
-  walletConnect,
-  ledger,
-  coinbaseWalletSdk,
-  frame,
-  trezor
-];
+const wallets = [injected, walletConnect, ledger, frame, trezor];
 
 const appMetadata = {
   name: 'Champagne Room',
   description: 'Living Large in the Champagne Room',
   icon: `${Config.PATH.staticUrl}/assets/logo-tr.png`,
   logo: `${Config.PATH.staticUrl}/assets/logo-horizontal-tr.png`,
-  recommendedInjectedWallets: [
-    { name: 'Coinbase', url: 'https://wallet.coinbase.com/' },
-    { name: 'MetaMask', url: 'https://metamask.io' }
-  ]
+  recommendedInjectedWallets: [{ name: 'MetaMask', url: 'https://metamask.io' }]
 };
 
 const chains = [
@@ -116,9 +105,10 @@ export const defaultWallet = derived(_defaultWallet, ($defaultWallet) => {
   return $defaultWallet;
 });
 
-export const disconnect = () => {
-  if (wallets$?.[0]?.label) {
-    onboard.disconnectWallet({ label: wallets$?.[0]?.label });
+export const disconnect = async () => {
+  const wallets = await lastValueFrom(wallets$);
+  if (wallets?.[0]?.label) {
+    onboard.disconnectWallet({ label: wallets[0].label });
     _selectedAccount.set(undefined);
     _defaultWallet.set(undefined);
   }

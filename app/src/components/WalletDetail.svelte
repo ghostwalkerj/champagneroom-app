@@ -3,15 +3,14 @@
   import type { WalletDocumentType } from '$lib/models/wallet';
 
   import { currencyFormatter } from '$lib/constants';
-  import type { ActionData } from '../routes/app/$types';
-  import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
   import Icon from '@iconify/svelte';
+  import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
+  import type { ActionData } from '../routes/app/$types';
 
   export let destination = '';
   export let exchangeRate = 0;
-  export let form: ActionData;
   export let wallet: WalletDocumentType;
-  export let withdrawForm: any;
+  export let withdrawForm: ActionData;
 
   const modalStore = getModalStore();
 

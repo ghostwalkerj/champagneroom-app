@@ -65,8 +65,7 @@ export enum PayoutStatus {
 export const calcTotal = (payments: Map<string, TransactionSummaryType[]>) => {
   let total = 0;
 
-  for (const key in Object.keys(payments)) {
-    const paymentArray = payments[key] as [TransactionSummaryType];
+  for (const [key, paymentArray] of payments.entries()) {
     total += paymentArray.reduce((accumulator, current) => {
       return accumulator + current.amount * current.rate;
     }, 0);
@@ -89,7 +88,7 @@ export const createBitcartToken = async (
 
   if (!resp.data) throw new Error('No data returned from Bitcart API');
 
-  const accessToken = resp.data['access_token'];
+  const accessToken = (resp.data as any)['access_token'];
   if (!accessToken)
     throw new Error('No access token returned from Bitcart API');
 

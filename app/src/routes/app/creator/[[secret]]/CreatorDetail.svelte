@@ -1,6 +1,6 @@
 <script lang="ts">
   import ImageUploadForm from '$components/forms/ImageUploadForm.svelte';
-  import Config from '$lib/config';
+  import Config from '$lib/models/config';
   import type { CreatorDocument } from '$lib/models/creator';
   import Icon from '@iconify/svelte';
   import StarRating from 'svelte-star-rating';
