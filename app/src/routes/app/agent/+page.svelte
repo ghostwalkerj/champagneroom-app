@@ -28,6 +28,7 @@
   import type { PageData } from './$types';
   import AgentDetail from './AgentDetail.svelte';
   import WeeklyBooking from './WeeklyBooking.svelte';
+  import { TabGroup, Tab } from '@skeletonlabs/skeleton';
 
   export let data: PageData;
   $: agent = data.agent as AgentDocument;
@@ -65,6 +66,7 @@
   let isChangeCreatorSecret = false;
   let agentUnSub: Unsubscriber;
   $: canImpersonate = false;
+  let tabSet: number = 0;
 
   onMount(() => {
     canImpersonate = user.permissions.includes(
@@ -257,11 +259,29 @@
         <div
           class="bg-base border-2 border-secondary rounded-lg mx-auto py-4 px-4 sm:px-6 lg:px-8"
         >
-          <div class="font-semibold text-primary text-lg leading-6">
+          <h2 class="text-2xl font-semibold flex gap-2 items-center">
             Agent Dashboard
-          </div>
-          <div class="daisy-divider" />
+          </h2>
+          <hr class="!border-t-2 my-2" />
           <!-- Tabs -->
+          <TabGroup>
+            <Tab bind:group={tabSet} name="tab1" value={0}>
+              <svelte:fragment slot="lead">(icon)</svelte:fragment>
+              <span>(label 1)</span>
+            </Tab>
+            <Tab bind:group={tabSet} name="tab2" value={1}>(label 2)</Tab>
+            <Tab bind:group={tabSet} name="tab3" value={2}>(label 3)</Tab>
+            <!-- Tab Panels --->
+            <svelte:fragment slot="panel">
+              {#if tabSet === 0}
+                (tab panel 1 contents)
+              {:else if tabSet === 1}
+                (tab panel 2 contents)
+              {:else if tabSet === 2}
+                (tab panel 3 contents)
+              {/if}
+            </svelte:fragment>
+          </TabGroup>
           <div class="daisy-tabs daisy-tabs-boxed w-fit">
             <!-- svelte-ignore a11y-missing-attribute -->
             <!-- svelte-ignore a11y-click-events-have-key-events -->
