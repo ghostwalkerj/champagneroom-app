@@ -289,7 +289,6 @@ export const actions: Actions = {
 };
 
 export const load: PageServerLoad = async ({ locals }) => {
-  console.log('locals', locals);
   const agent = locals.agent;
   const user = locals.user;
   const wallet = locals.wallet;

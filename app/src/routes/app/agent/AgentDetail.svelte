@@ -5,6 +5,7 @@
   import ProfileImage from '$components/forms/ImageUploadForm.svelte';
   import config from '$lib/config';
   import type { AgentDocument } from '$lib/models/agent';
+  import Icon from '@iconify/svelte';
   import type { ActionResult } from '@sveltejs/kit';
   import urlJoin from 'url-join';
 
@@ -93,56 +94,66 @@
   );
 </script>
 
-<div>
-  <div class="lg:col-start-3 lg:col-span-1">
-    <div class="bg-primary text-primary-content daisy-card">
-      <div class="text-center daisy-card-body items-center p-3">
-        <div class="flex flex-col gap-4">
-          <div
-            class="text-2xl font-bold w-full text-center"
-            contenteditable="true"
-            on:blur={updateAgent}
-            bind:this={nameDiv}
-          >
-            {agent.user.name}
-          </div>
-          <div class="flex w-full place-content-center">
-            <div class="font-bold pr-1">Default Commission:</div>
-            <div
-              contenteditable="true"
-              on:blur={updateAgent}
-              bind:this={commissionDiv}
-            >
-              {agent.defaultCommissionRate}
-            </div>
-            <div>%</div>
-          </div>
-          <div>
-            <ProfileImage
-              imageUrl={agent.user.profileImageUrl ||
-                config.UI.defaultProfileImage}
-              callBack={(value) => {
-                updateProfileImage(value);
-              }}
-            />
-          </div>
-          <div>
-            <div class="font-bold pr-1">Referral Url:</div>
-            <div>
-              <a class="daisy-link" href={referralUrl}> {referralCode}</a>
-            </div>
-            <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <!-- svelte-ignore a11y-no-static-element-interactions -->
-            <div class="daisy-btn daisy-btn-xs" on:click={updateReferralCode}>
-              Change
-            </div>
-          </div>
-          <div class="flex w-full place-content-center">
-            <div class="font-bold pr-1">Referral Count:</div>
-            <div>{referralCount}</div>
-          </div>
-        </div>
+<div
+  class="bg-custom p-4 rounded flex flex-col gap-4 justify-center items-center"
+>
+  <div class="flex flex-col gap-0 items-center text-center">
+    <h2 class="text-xl font-semibold flex gap-2 items-center">
+      <Icon class="text-secondary" icon="iconoir:profile-circle" />
+      Profile
+    </h2>
+  </div>
+
+  <div class="text-center">
+    <div
+      class="text-2xl font-bold w-full text-center"
+      contenteditable="true"
+      on:blur={updateAgent}
+      bind:this={nameDiv}
+    >
+      {agent.user.name}
+    </div>
+    <div class="flex w-full place-content-center">
+      <div class="font-bold pr-1">Default Commission:</div>
+      <div
+        contenteditable="true"
+        on:blur={updateAgent}
+        bind:this={commissionDiv}
+      >
+        {agent.defaultCommissionRate}
       </div>
+      <div>%</div>
+    </div>
+    <div>
+      <ProfileImage
+        imageUrl={agent.user.profileImageUrl || config.UI.defaultProfileImage}
+        callBack={(value) => {
+          updateProfileImage(value);
+        }}
+      />
+    </div>
+    <div>
+      <div class="font-bold pr-1">Referral Url:</div>
+      <div>
+        <a
+          class="anchor neon-primary font-semibold variant-soft-primary mb-1"
+          href={referralUrl}
+        >
+          {referralCode}</a
+        >
+      </div>
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
+      <button
+        class="btn variant-soft-secondary neon-secondary btn-sm m-2"
+        on:click={updateReferralCode}
+      >
+        Change
+      </button>
+    </div>
+    <div class="flex w-full place-content-center">
+      <div class="font-bold pr-1">Referral Count:</div>
+      <div>{referralCount}</div>
     </div>
   </div>
 </div>
