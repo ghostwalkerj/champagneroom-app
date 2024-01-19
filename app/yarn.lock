@@ -2519,9 +2519,9 @@
     rollup "^4.9.5"
 
 "@sveltejs/kit@^2.3.4":
-  version "2.3.5"
-  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-2.3.5.tgz#33b3278e71ffb030b67363633e18d41a0f888008"
-  integrity sha512-Vu+ckGQu/t+pcuueryaHYacgoYsYq6KB1k1p4w1xDp1eQ2aYz3POcx3GSuqxWjJfOwMMM83xiuAnDWBKyOn1Tg==
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-2.4.0.tgz#7dc10874b2b5f5c496e62a38c32b8b8ec4c3e51d"
+  integrity sha512-SbkRO5l126eq6eshdrWpfcOc3pmxLw3Ff/qiSKlAo3ltaIIhEgbK1/4LP54dYyBkGYjcGBAmyncmpIO2QATtwA==
   dependencies:
     "@types/cookie" "^0.6.0"
     cookie "^0.6.0"

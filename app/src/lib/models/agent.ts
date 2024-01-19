@@ -13,36 +13,44 @@ import type { UserDocument } from './user';
 
 const { models } = pkg;
 
-const agentSchema = toZodMongooseSchema(
-  z
-    .object({
-      _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
-        _id: true,
-        auto: true
-      }),
-      user: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
-        autopopulate: true,
-        ref: 'User',
-        required: true
-      }),
-      defaultCommissionRate: z.number().min(0).max(100).default(0)
-    })
-    .merge(genTimestampsSchema()),
-  {
-    schemaOptions: {
-      collection: 'agents'
-    }
+const agentSchema = z
+  .object({
+    _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+      _id: true,
+      auto: true
+    }),
+    user: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+      autopopulate: true,
+      ref: 'User',
+      required: true
+    }),
+    defaultCommissionRate: z.number().min(0).max(100).default(0)
+  })
+  .merge(genTimestampsSchema());
+
+const agentZodMongooseSchema = toZodMongooseSchema(agentSchema, {
+  schemaOptions: {
+    collection: 'agents'
   }
-);
-const agentMongooseSchema = toMongooseSchema(agentSchema);
+});
+
+const agentCRUDSchema = agentSchema.extend({
+  _id: agentSchema.shape._id.optional()
+});
+
+const agentMongooseSchema = toMongooseSchema(agentZodMongooseSchema);
 agentMongooseSchema.plugin(mongooseAutoPopulate);
 
-export type AgentDocument = InstanceType<typeof Agent> & {
+type AgentDocument = InstanceType<typeof Agent> & {
   user: UserDocument;
 };
 
-export type AgentDocumentType = z.infer<typeof agentSchema>;
+type AgentDocumentType = z.infer<typeof agentZodMongooseSchema>;
 
-export const Agent = models?.Agent
+const Agent = models?.Agent
   ? (models.Agent as Model<AgentDocumentType>)
   : mongoose.model<AgentDocumentType>('Agent', agentMongooseSchema);
+
+export type { AgentDocument, AgentDocumentType };
+
+export { Agent, agentCRUDSchema, agentSchema };

@@ -5,7 +5,6 @@ import jwt from 'jsonwebtoken';
 import { ObjectId } from 'mongodb';
 import type { SuperValidated } from 'sveltekit-superforms';
 import { message, setError, superValidate } from 'sveltekit-superforms/server';
-import { z } from 'zod';
 
 import {
   BITCART_API_URL,
@@ -47,17 +46,16 @@ import {
   ShowStatus
 } from '$lib/constants';
 import { rateCryptosRateGet } from '$lib/ext/bitcart';
-import { createBitcartToken, PayoutJobType, PayoutReason } from '$lib/payout';
+import {
+  createBitcartToken,
+  PayoutJobType,
+  PayoutReason,
+  requestPayoutSchema
+} from '$lib/payout';
 import { getShowMachineService } from '$lib/server/machinesUtil';
 import { web3Upload } from '$lib/server/upload';
 
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
-
-const requestPayoutSchema = z.object({
-  amount: z.number().min(0.0001),
-  destination: z.string().min(3),
-  walletId: z.string().min(16).max(64)
-});
 
 export const actions: Actions = {
   update_profile_image: async ({ locals, request }: RequestEvent) => {
@@ -188,12 +186,9 @@ export const actions: Actions = {
     };
   },
   request_payout: async ({ request, locals }) => {
-    const data = await request.formData();
-    const amount = data.get('amount') as string;
-    const destination = data.get('destination') as string;
-    const walletId = data.get('walletId') as string;
-
     const form = await superValidate(request, requestPayoutSchema);
+
+    const { walletId, amount, destination, reason, jobType } = form.data;
 
     if (!form.valid) {
       return fail(400, { form });
@@ -211,7 +206,7 @@ export const actions: Actions = {
       }
 
       if (wallet.status === WalletStatus.PAYOUT_IN_PROGRESS) {
-        setError(form, 'destination', 'Payout in progress');
+        setError(form, 'Payout in progress');
       }
 
       const redisConnection = locals.redisConnection as IORedis;
@@ -219,11 +214,11 @@ export const actions: Actions = {
         connection: redisConnection
       }) as PayoutQueueType;
 
-      payoutQueue.add(PayoutJobType.CREATE_PAYOUT, {
+      payoutQueue.add(jobType, {
         walletId,
-        amount: +amount,
+        amount,
         destination,
-        payoutReason: PayoutReason.CREATOR_PAYOUT
+        payoutReason: reason
       });
 
       payoutQueue.close();
@@ -430,21 +425,22 @@ export const load: PageServerLoad = async ({ locals }) => {
   const createShowForm = (await superValidate(
     showCRUDSchema
   )) as SuperValidated<typeof showCRUDSchema>;
-  const requestPayoutForm = await superValidate(
+  const payoutForm = await superValidate(
     {
       amount: 0,
-      destination:
-        user?.toJSON({ flattenMaps: true, flattenObjectIds: true }).address ||
-        '',
-      walletId: wallet._id.toString()
+      destination: user?.address,
+      walletId: wallet._id.toString(),
+      reason: PayoutReason.CREATOR_PAYOUT,
+      jobType: PayoutJobType.CREATE_PAYOUT
     },
     requestPayoutSchema,
     { errors: false }
   );
 
   return {
-    requestPayoutForm,
+    payoutForm,
     createShowForm,
+    roomForm,
     creator: creator.toJSON({ flattenMaps: true, flattenObjectIds: true }),
     user: user?.toJSON({ flattenMaps: true, flattenObjectIds: true }),
     show: show
@@ -464,7 +460,6 @@ export const load: PageServerLoad = async ({ locals }) => {
     jitsiToken,
     room: room
       ? room.toJSON({ flattenMaps: true, flattenObjectIds: true })
-      : undefined,
-    roomForm
+      : undefined
   };
 };

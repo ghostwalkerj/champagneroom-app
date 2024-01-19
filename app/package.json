@@ -143,6 +143,7 @@
     "vite-plugin-node-polyfills": "^0.19.0",
     "vitest": "^1.2.0",
     "web3": "^4.1.2",
+    "web3-validator": "^2.0.4",
     "xstate": "^4.38.3",
     "zod": "^3.22.4"
   },

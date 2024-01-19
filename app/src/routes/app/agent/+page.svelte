@@ -505,7 +505,7 @@
                     </div>
                     <!-- Wallet -->
                     <div class="min-w-fit">
-                      <WalletDetail {wallet} {exchangeRate} {withdrawForm} />
+                      <WalletDetail {wallet} {exchangeRate} {PayoutForm} />
                     </div>
                   </div>
 

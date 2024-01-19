@@ -36,6 +36,7 @@
   import VideoMeeting from './VideoMeeting.svelte';
   import type { SuperValidated } from 'sveltekit-superforms';
   import type { roomCRUDSchema } from '$lib/models/room';
+  import type { requestPayoutSchema } from '$lib/payout';
 
   export let data: PageData;
 
@@ -51,6 +52,7 @@
   $: createShowForm = data.createShowForm as SuperValidated<
     typeof showCRUDSchema
   >;
+  $: payoutForm = data.payoutForm as SuperValidated<typeof requestPayoutSchema>;
 
   $: showVideo = false;
 
@@ -298,7 +300,7 @@
         <!-- Wallet -->
         <div>
           {#key wallet}
-            <WalletDetail {wallet} {exchangeRate} {destination} />
+            <WalletDetail {wallet} {exchangeRate} {payoutForm} />
           {/key}
         </div>
 

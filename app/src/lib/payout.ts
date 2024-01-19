@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { isAddress } from 'web3-validator';
+import { z } from 'zod';
 
 import { createTokenTokenPost } from '$ext/bitcart';
 
@@ -65,7 +67,7 @@ export enum PayoutStatus {
 export const calcTotal = (payments: Map<string, TransactionSummaryType[]>) => {
   let total = 0;
 
-  for (const [key, paymentArray] of payments.entries()) {
+  for (const [, paymentArray] of payments.entries()) {
     total += paymentArray.reduce((accumulator, current) => {
       return accumulator + current.amount * current.rate;
     }, 0);
@@ -94,3 +96,17 @@ export const createBitcartToken = async (
 
   return accessToken;
 };
+
+// Schemas
+export const requestPayoutSchema = z.object({
+  walletId: z.string(),
+  destination: z.custom<string>((data) => {
+    if (typeof data === 'string') {
+      return isAddress(data);
+    }
+    return false;
+  }, 'Invalid address'),
+  amount: z.number().positive(),
+  reason: z.nativeEnum(PayoutReason),
+  jobType: z.nativeEnum(PayoutJobType)
+});
