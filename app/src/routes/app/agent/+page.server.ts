@@ -1,8 +1,12 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { AxiosResponse } from 'axios';
+import { Queue } from 'bullmq';
+import type IORedis from 'ioredis';
 import { nanoid } from 'nanoid';
 import { generateSillyPassword } from 'silly-password-generator';
 import spacetime from 'spacetime';
+import type { SuperValidated } from 'sveltekit-superforms';
+import { message, superValidate } from 'sveltekit-superforms/server';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 
 import {
@@ -15,17 +19,24 @@ import {
 
 import type { AgentDocument } from '$lib/models/agent';
 import type { CreatorDocument } from '$lib/models/creator';
-import { Creator } from '$lib/models/creator';
+import { Creator, creatorCRUDSchema } from '$lib/models/creator';
 import { Show } from '$lib/models/show';
 import type { UserDocument } from '$lib/models/user';
 import { User } from '$lib/models/user';
 import type { WalletDocument } from '$lib/models/wallet';
 import { Wallet } from '$lib/models/wallet';
 
+import type { PayoutQueueType } from '$lib/workers/payoutWorker';
+
 import config from '$lib/config';
 import { AuthType, CurrencyType, EntityType } from '$lib/constants';
 import { rateCryptosRateGet } from '$lib/ext/bitcart';
-import { createBitcartToken } from '$lib/payout';
+import {
+  createBitcartToken,
+  PayoutJobType,
+  PayoutReason,
+  requestPayoutSchema
+} from '$lib/payout';
 import {
   backupAuthToken,
   createAuthToken,
@@ -36,6 +47,33 @@ import { womensNames } from '$lib/womensNames';
 import type { Actions, PageServerLoad } from './$types';
 
 export const actions: Actions = {
+  request_payout: async ({ request, locals }) => {
+    const form = await superValidate(request, requestPayoutSchema);
+    const { walletId, amount, destination, payoutReason, jobType } = form.data;
+
+    if (!form.valid) {
+      return fail(400, { form });
+    }
+
+    try {
+      const redisConnection = locals.redisConnection as IORedis;
+      const payoutQueue = new Queue(EntityType.PAYOUT, {
+        connection: redisConnection
+      }) as PayoutQueueType;
+
+      payoutQueue.add(jobType, {
+        walletId,
+        amount,
+        destination,
+        payoutReason
+      });
+
+      payoutQueue.close();
+    } catch {
+      return message(form, 'Error requesting payout');
+    }
+    return message(form, 'Payout requested successfully');
+  },
   impersonateUser: async ({ request, cookies }) => {
     const data = await request.formData();
     const impersonateId = data.get('impersonateId') as string;
@@ -251,6 +289,7 @@ export const actions: Actions = {
 };
 
 export const load: PageServerLoad = async ({ locals }) => {
+  console.log('locals', locals);
   const agent = locals.agent;
   const user = locals.user;
   const wallet = locals.wallet;
@@ -258,9 +297,14 @@ export const load: PageServerLoad = async ({ locals }) => {
     throw error(404, 'Agent not found');
   }
 
+  if (!user) {
+    throw error(404, 'User not found');
+  }
+
   let creators = (await Creator.find({
     agent: agent._id
   })) as CreatorDocument[];
+
   creators = creators.sort((a, b) => {
     if (a.user.name < b.user.name) {
       return -1;
@@ -270,7 +314,9 @@ export const load: PageServerLoad = async ({ locals }) => {
     }
     return 0;
   });
+
   const now = spacetime.now();
+
   const monthRange = {
     start: now.startOf('month').iso(),
     end: now.endOf('month').iso()
@@ -357,7 +403,25 @@ export const load: PageServerLoad = async ({ locals }) => {
       )) as AxiosResponse<string>) || undefined;
   }
 
+  const payoutForm = await superValidate(
+    {
+      amount: 0,
+      destination: user.address,
+      walletId: user.wallet!.toString(),
+      payoutReason: PayoutReason.AGENT_PAYOUT,
+      jobType: PayoutJobType.CREATE_PAYOUT
+    },
+    requestPayoutSchema,
+    { errors: false }
+  );
+
+  const creatorCRUDForm = (await superValidate(
+    creatorCRUDSchema
+  )) as SuperValidated<typeof creatorCRUDSchema>;
+
   return {
+    payoutForm,
+    creatorCRUDForm,
     agent: agent.toJSON({ flattenMaps: true, flattenObjectIds: true }),
     user: user
       ? user.toJSON({ flattenMaps: true, flattenObjectIds: true })

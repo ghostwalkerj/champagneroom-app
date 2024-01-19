@@ -14,53 +14,61 @@ import type { UserDocument } from './user';
 
 const { models } = pkg;
 
-const creatorSchema = toZodMongooseSchema(
-  z
-    .object({
-      _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
-        _id: true,
-        auto: true
-      }),
-      room: mongooseZodCustomType('ObjectId')
-        .mongooseTypeOptions({
-          ref: 'Room',
-          index: true
-        })
-        .optional(),
-      user: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
-        autopopulate: true,
-        ref: 'User',
-        required: true
-      }),
-
-      commissionRate: z.number().min(0).max(100).default(0),
-      agent: mongooseZodCustomType('ObjectId').optional().mongooseTypeOptions({
-        ref: 'Agent'
-      }),
-      feedbackStats: feedbackStatsSchema.default({}),
-      salesStats: creatorSalesStatsSchema.default({
-        numberOfCompletedShows: 0,
-        totalRefunds: {},
-        totalRevenue: {},
-        totalSales: {},
-        totalTicketSalesAmounts: {}
+const creatorSchema = z
+  .object({
+    _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+      _id: true,
+      auto: true
+    }),
+    room: mongooseZodCustomType('ObjectId')
+      .mongooseTypeOptions({
+        ref: 'Room',
+        index: true
       })
+      .optional(),
+    user: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+      autopopulate: true,
+      ref: 'User',
+      required: true
+    }),
+
+    commissionRate: z.number().min(0).max(100).default(0),
+    agent: mongooseZodCustomType('ObjectId').optional().mongooseTypeOptions({
+      ref: 'Agent'
+    }),
+    feedbackStats: feedbackStatsSchema.default({}),
+    salesStats: creatorSalesStatsSchema.default({
+      numberOfCompletedShows: 0,
+      totalRefunds: {},
+      totalRevenue: {},
+      totalSales: {},
+      totalTicketSalesAmounts: {}
     })
-    .merge(genTimestampsSchema()),
-  {
-    schemaOptions: {
-      collection: 'creators'
-    }
+  })
+  .merge(genTimestampsSchema());
+
+const creatorMongooseZodSchema = toZodMongooseSchema(creatorSchema, {
+  schemaOptions: {
+    collection: 'creators'
   }
-);
-const creatorMongooseSchema = toMongooseSchema(creatorSchema);
+});
+
+const creatorCRUDSchema = creatorSchema.extend({
+  _id: creatorSchema.shape._id.optional(),
+  user: creatorSchema.shape.user.optional()
+});
+
+const creatorMongooseSchema = toMongooseSchema(creatorMongooseZodSchema);
 creatorMongooseSchema.plugin(mongooseAutoPopulate);
 
-export type CreatorDocument = InstanceType<typeof Creator> & {
+type CreatorDocument = InstanceType<typeof Creator> & {
   user: UserDocument;
 };
 
-export type CreatorDocumentType = z.infer<typeof creatorSchema>;
-export const Creator = models?.Creator
+type CreatorDocumentType = z.infer<typeof creatorSchema>;
+const Creator = models?.Creator
   ? (models?.Creator as Model<CreatorDocumentType>)
   : mongoose.model<CreatorDocumentType>('Creator', creatorMongooseSchema);
+
+export type { CreatorDocument, CreatorDocumentType };
+export { Creator, creatorCRUDSchema, creatorSchema };

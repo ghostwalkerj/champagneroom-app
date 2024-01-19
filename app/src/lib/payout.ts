@@ -52,6 +52,7 @@ export enum PayoutJobType {
 export enum PayoutReason {
   SHOW_REFUND = 'SHOW REFUND',
   CREATOR_PAYOUT = 'CREATOR PAYOUT',
+  AGENT_PAYOUT = 'AGENT PAYOUT',
   DISPUTE = 'DISPUTE'
 }
 
@@ -107,6 +108,6 @@ export const requestPayoutSchema = z.object({
     return false;
   }, 'Invalid address'),
   amount: z.number().positive(),
-  reason: z.nativeEnum(PayoutReason),
+  payoutReason: z.nativeEnum(PayoutReason),
   jobType: z.nativeEnum(PayoutJobType)
 });

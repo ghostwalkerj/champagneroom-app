@@ -37,8 +37,18 @@
     <h2 class="font-semibold text-xl">Withdraw funds into your own wallet</h2>
 
     <input type="hidden" name="walletId" bind:value={$form.walletId} readonly />
-    <input type="hidden" name="currency" bind:value={$form.reason} readonly />
-    <input type="hidden" name="reason" bind:value={$form.reason} readonly />
+    <input
+      type="hidden"
+      name="currency"
+      bind:value={$form.payoutReason}
+      readonly
+    />
+    <input
+      type="hidden"
+      name="reason"
+      bind:value={$form.payoutReason}
+      readonly
+    />
 
     <label for="">
       <span>Amount in {wallet.currency}</span>

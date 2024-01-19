@@ -4,7 +4,7 @@ import type IORedis from 'ioredis';
 import jwt from 'jsonwebtoken';
 import { ObjectId } from 'mongodb';
 import type { SuperValidated } from 'sveltekit-superforms';
-import { message, setError, superValidate } from 'sveltekit-superforms/server';
+import { message, superValidate } from 'sveltekit-superforms/server';
 
 import {
   BITCART_API_URL,
@@ -30,7 +30,6 @@ import { Show, showCRUDSchema, type ShowDocument } from '$lib/models/show';
 import { ShowEvent, type ShowEventDocument } from '$lib/models/showEvent';
 import type { UserDocument } from '$lib/models/user';
 import type { WalletDocument } from '$lib/models/wallet';
-import { Wallet, WalletStatus } from '$lib/models/wallet';
 
 import type { ShowMachineEventType } from '$lib/machines/showMachine';
 
@@ -187,28 +186,13 @@ export const actions: Actions = {
   },
   request_payout: async ({ request, locals }) => {
     const form = await superValidate(request, requestPayoutSchema);
-
-    const { walletId, amount, destination, reason, jobType } = form.data;
+    const { walletId, amount, destination, payoutReason, jobType } = form.data;
 
     if (!form.valid) {
       return fail(400, { form });
     }
 
     try {
-      const wallet = await Wallet.findOne({ _id: walletId }).orFail();
-
-      if (!wallet) {
-        setError(form, 'walletId', 'Wallet not found');
-      }
-
-      if (wallet.availableBalance < +amount) {
-        setError(form, 'amount', 'Insufficient funds');
-      }
-
-      if (wallet.status === WalletStatus.PAYOUT_IN_PROGRESS) {
-        setError(form, 'Payout in progress');
-      }
-
       const redisConnection = locals.redisConnection as IORedis;
       const payoutQueue = new Queue(EntityType.PAYOUT, {
         connection: redisConnection
@@ -218,16 +202,16 @@ export const actions: Actions = {
         walletId,
         amount,
         destination,
-        payoutReason: reason
+        payoutReason
       });
 
       payoutQueue.close();
     } catch {
       return message(form, 'Error requesting payout');
     }
-
     return message(form, 'Payout requested successfully');
   },
+
   leave_show: async ({ locals }) => {
     const redisConnection = locals.redisConnection as IORedis;
     const show = locals.show;
@@ -425,12 +409,13 @@ export const load: PageServerLoad = async ({ locals }) => {
   const createShowForm = (await superValidate(
     showCRUDSchema
   )) as SuperValidated<typeof showCRUDSchema>;
+
   const payoutForm = await superValidate(
     {
       amount: 0,
       destination: user?.address,
       walletId: wallet._id.toString(),
-      reason: PayoutReason.CREATOR_PAYOUT,
+      payoutReason: PayoutReason.CREATOR_PAYOUT,
       jobType: PayoutJobType.CREATE_PAYOUT
     },
     requestPayoutSchema,

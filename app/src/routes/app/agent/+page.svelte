@@ -30,21 +30,22 @@
   import WeeklyBooking from './WeeklyBooking.svelte';
 
   export let data: PageData;
-  let agent = data.agent as AgentDocument;
-  let creators = data.creators as CreatorDocument[];
-  let user = data.user as UserDocument;
-  let wallet = data.wallet as WalletDocument;
-  let showData = data.showData as {
+  $: agent = data.agent as AgentDocument;
+  $: creators = data.creators as CreatorDocument[];
+  $: user = data.user as UserDocument;
+  $: wallet = data.wallet as WalletDocument;
+  $: showData = data.showData as {
     creatorId: string;
     currency: CurrencyType;
     amount: number;
   }[];
-  let weeklyData = data.weeklyData as {
+  $: weeklyData = data.weeklyData as {
     creatorId: string;
     dayOfWeek: number;
     bookings: number;
   }[];
-  let exchangeRate = +data.exchangeRate || 0;
+  $: exchangeRate = +data.exchangeRate || 0;
+  let payoutForm = data.payoutForm;
 
   let newCreatorModal: HTMLDialogElement;
   let newCreator: CreatorDocument | undefined;
@@ -63,11 +64,12 @@
   });
   let isChangeCreatorSecret = false;
   let agentUnSub: Unsubscriber;
-  const canImpersonate = user.permissions.includes(
-    PermissionType.IMPERSONATE_CREATOR
-  );
+  $: canImpersonate = false;
 
   onMount(() => {
+    canImpersonate = user.permissions.includes(
+      PermissionType.IMPERSONATE_CREATOR
+    );
     agentUnSub = AgentStore(agent).subscribe((_agent) => {
       if (_agent) {
         agent = _agent;
@@ -505,7 +507,7 @@
                     </div>
                     <!-- Wallet -->
                     <div class="min-w-fit">
-                      <WalletDetail {wallet} {exchangeRate} {PayoutForm} />
+                      <WalletDetail {wallet} {exchangeRate} {payoutForm} />
                     </div>
                   </div>
 
