@@ -71,7 +71,7 @@ export const actions: Actions = {
       } else {
         user.roles.push(UserRole.CREATOR);
         user.name = name;
-        await user.updateOne(
+        user.updateOne(
           {
             roles: user.roles,
             name
@@ -79,7 +79,7 @@ export const actions: Actions = {
           { runValidators: true }
         );
 
-        await Creator.create({
+        Creator.create({
           user: user._id,
           commissionRate: agent?.defaultCommissionRate ?? 0,
           agent: agent?._id ?? undefined
@@ -104,7 +104,7 @@ export const actions: Actions = {
           profileImageUrl
         });
 
-        await Creator.create({
+        Creator.create({
           user: user._id,
           commissionRate: agent?.defaultCommissionRate ?? 0,
           agent: agent?._id ?? undefined

@@ -77,9 +77,16 @@ export const actions: Actions = {
         user.roles.push(UserRole.AGENT);
         user.name = name;
         user.profileImageUrl = user.profileImageUrl || profileImageUrl;
-        await user.save();
+        user.updateOne(
+          {
+            roles: user.roles,
+            name: user.name,
+            profileImageUrl: user.profileImageUrl
+          },
+          { runValidators: true }
+        );
 
-        await Agent.create({
+        Agent.create({
           user: user._id,
           defaultCommissionRate: Number(defaultCommissionRate)
         });
