@@ -298,7 +298,7 @@
                           <tr class="table-row">
                             <th
                               ><button
-                                class="btn variant-soft-secondary btn-sm neon-secondary"
+                                class="btn-icon variant-filled btn-icon-sm"
                                 on:click={() => {
                                   canAddCreator = !canAddCreator;
                                 }}
@@ -417,7 +417,7 @@
                                     {currencyFormatter(currency).format(amount)}
                                   {/each}
                                 {:else}
-                                  0
+                                  {currencyFormatter().format(0)}
                                 {/if}
                               </td>
                               <td>
@@ -426,7 +426,7 @@
                                     {currencyFormatter(currency).format(amount)}
                                   {/each}
                                 {:else}
-                                  0
+                                  {currencyFormatter().format(0)}
                                 {/if}
                               </td>
                               <td>
@@ -435,7 +435,7 @@
                                     {currencyFormatter(currency).format(amount)}
                                   {/each}
                                 {:else}
-                                  0
+                                  {currencyFormatter().format(0)}
                                 {/if}
                               </td>
                               <td>{creator.feedbackStats.numberOfReviews}</td>

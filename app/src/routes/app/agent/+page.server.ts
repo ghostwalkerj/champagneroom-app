@@ -412,13 +412,8 @@ export const load: PageServerLoad = async ({ locals }) => {
     { errors: false }
   );
 
-  const creatorCRUDForm = (await superValidate(
-    creatorCRUDSchema
-  )) as SuperValidated<typeof creatorCRUDSchema>;
-
   return {
     payoutForm,
-    creatorCRUDForm,
     agent: agent.toJSON({ flattenMaps: true, flattenObjectIds: true }),
     user: user
       ? user.toJSON({ flattenMaps: true, flattenObjectIds: true })
