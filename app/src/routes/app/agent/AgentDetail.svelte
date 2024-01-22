@@ -95,7 +95,7 @@
 </script>
 
 <div
-  class="bg-custom p-4 rounded flex flex-col gap-4 justify-center items-center"
+  class="bg-custom p-4 rounded flex flex-col gap-4 justify-center items-center min-w-60"
 >
   <div class="flex flex-col gap-0 items-center text-center">
     <h2 class="text-xl font-semibold flex gap-2 items-center">

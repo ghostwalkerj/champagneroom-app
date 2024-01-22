@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { AxiosResponse } from 'axios';
 import { Queue } from 'bullmq';
@@ -8,6 +9,7 @@ import spacetime from 'spacetime';
 import type { SuperValidated } from 'sveltekit-superforms';
 import { message, superValidate } from 'sveltekit-superforms/server';
 import { uniqueNamesGenerator } from 'unique-names-generator';
+import type { a } from 'vitest/dist/suite-MFRDkZcV.js';
 
 import {
   AUTH_TOKEN_NAME,
@@ -29,7 +31,13 @@ import { Wallet } from '$lib/models/wallet';
 import type { PayoutQueueType } from '$lib/workers/payoutWorker';
 
 import config from '$lib/config';
-import { AuthType, CurrencyType, EntityType } from '$lib/constants';
+import {
+  AuthType,
+  currencyFormatter,
+  currencyFormatter,
+  CurrencyType,
+  EntityType
+} from '$lib/constants';
 import { rateCryptosRateGet } from '$lib/ext/bitcart';
 import {
   createBitcartToken,
@@ -300,19 +308,9 @@ export const load: PageServerLoad = async ({ locals }) => {
     throw error(404, 'User not found');
   }
 
-  let creators = (await Creator.find({
+  const creators = (await Creator.find({
     agent: agent._id
   })) as CreatorDocument[];
-
-  creators = creators.sort((a, b) => {
-    if (a.user.name < b.user.name) {
-      return -1;
-    }
-    if (a.user.name > b.user.name) {
-      return 1;
-    }
-    return 0;
-  });
 
   const now = spacetime.now();
 
