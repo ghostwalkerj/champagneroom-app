@@ -397,10 +397,10 @@
                                       creator.user.secret || ''
                                     )}
                                     target="_blank"
-                                    class="anchor">Secret Url</a
+                                    class="anchor mr-2">Secret Url</a
                                   >
                                   <button
-                                    class="btn variant-outline-secondary btn-sm neon-secondary"
+                                    class="btn variant-outline-secondary btn-sm text-secondary"
                                     on:click={() =>
                                       (isChangeCreatorSecret = true)}
                                   >
@@ -466,7 +466,7 @@
                               {#if canImpersonate}
                                 <td>
                                   <button
-                                    class="btn variant-outline-primary btn-sm neon-primary"
+                                    class="btn variant-outline-primary btn-sm text-primary"
                                     disabled={!canImpersonate}
                                     on:click={() =>
                                       impersonate(creator.user._id.toString())}

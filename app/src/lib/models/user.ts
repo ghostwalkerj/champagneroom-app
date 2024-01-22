@@ -17,7 +17,7 @@ import { PermissionType } from '$lib/permissions';
 
 const { models } = pkg;
 
-export type UserDocument = InstanceType<typeof User> & {
+type UserDocument = InstanceType<typeof User> & {
   comparePassword: (password: string) => Promise<boolean>;
   isCreator: () => boolean;
   isAgent: () => boolean;
@@ -25,72 +25,69 @@ export type UserDocument = InstanceType<typeof User> & {
   hasPermission: (permission: PermissionType) => boolean;
 };
 
-export type UserDocumentType = z.infer<typeof userSchema>;
+type UserDocumentType = z.infer<typeof userSchema>;
 
-export { User };
+const userSchema = z
+  .object({
+    _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+      _id: true,
+      auto: true
+    }),
+    wallet: mongooseZodCustomType('ObjectId').optional().mongooseTypeOptions({
+      ref: 'Wallet'
+    }),
+    address: z
+      .string()
+      .trim()
+      .refine((value: string) => validator.isEthereumAddress(value), {
+        message: 'Invalid Ethereum address'
+      })
+      .optional(),
+    roles: z.array(z.nativeEnum(UserRole)),
+    payoutAddress: z
+      .string()
+      .trim()
+      .refine(
+        (value: string) => validator.isEthereumAddress(value),
+        'Invalid Ethereum address'
+      )
+      .optional(),
+    nonce: z
+      .number()
+      .min(0)
+      .default(() => Math.floor(Math.random() * 1_000_000)),
+    secret: z.string().max(50).min(21, 'Secret is too short').optional(),
+    password: z
+      .string()
+      .max(80)
+      .min(8, 'Password is too short')
+      .trim()
+      .optional(),
+    name: z.string().max(50).min(3, 'Name is too short').trim(),
+    authType: z.nativeEnum(AuthType).default(AuthType.SIGNING),
+    active: z.boolean().default(true),
+    profileImageUrl: z.string().default(config.UI.defaultProfileImage),
+    referralCode: z
+      .string()
+      .max(50)
+      .min(8, 'Referral code is too short')
+      .default(() => nanoid(10))
+      .mongooseTypeOptions({
+        index: true,
+        unique: true
+      }),
+    referralCount: z.number().default(0),
+    permissions: z.array(z.nativeEnum(PermissionType)).default([])
+  })
+  .merge(genTimestampsSchema());
 
-const userSchema = toZodMongooseSchema(
-  z
-    .object({
-      _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
-        _id: true,
-        auto: true
-      }),
-      wallet: mongooseZodCustomType('ObjectId').optional().mongooseTypeOptions({
-        ref: 'Wallet'
-      }),
-      address: z
-        .string()
-        .trim()
-        .refine((value: string) => validator.isEthereumAddress(value), {
-          message: 'Invalid Ethereum address'
-        })
-        .optional(),
-      roles: z.array(z.nativeEnum(UserRole)),
-      payoutAddress: z
-        .string()
-        .trim()
-        .refine(
-          (value: string) => validator.isEthereumAddress(value),
-          'Invalid Ethereum address'
-        )
-        .optional(),
-      nonce: z
-        .number()
-        .min(0)
-        .default(() => Math.floor(Math.random() * 1_000_000)),
-      secret: z.string().max(50).min(21, 'Secret is too short').optional(),
-      password: z
-        .string()
-        .max(80)
-        .min(8, 'Password is too short')
-        .trim()
-        .optional(),
-      name: z.string().max(50).min(3, 'Name is too short').trim(),
-      authType: z.nativeEnum(AuthType).default(AuthType.SIGNING),
-      active: z.boolean().default(true),
-      profileImageUrl: z.string().default(config.UI.defaultProfileImage),
-      referralCode: z
-        .string()
-        .max(50)
-        .min(8, 'Referral code is too short')
-        .default(() => nanoid(10))
-        .mongooseTypeOptions({
-          index: true,
-          unique: true
-        }),
-      referralCount: z.number().default(0),
-      permissions: z.array(z.nativeEnum(PermissionType)).default([])
-    })
-    .merge(genTimestampsSchema()),
-  {
-    schemaOptions: {
-      collection: 'users'
-    }
+const userMongooseZodSchema = toZodMongooseSchema(userSchema, {
+  schemaOptions: {
+    collection: 'users'
   }
-);
+});
 
-export const userMongooseSchema = toMongooseSchema(userSchema);
+const userMongooseSchema = toMongooseSchema(userMongooseZodSchema);
 userMongooseSchema.index(
   { address: 1 },
   { unique: true, partialFilterExpression: { address: { $exists: true } } }
@@ -174,3 +171,10 @@ userMongooseSchema.methods.hasPermission = function (
 const User = models?.User
   ? (models.User as Model<UserDocumentType>)
   : mongoose.model<UserDocumentType>('User', userMongooseSchema);
+
+const userCRUDSchema = userSchema.extend({
+  _id: userSchema.shape._id.optional()
+});
+
+export type { UserDocument, UserDocumentType };
+export { User, userCRUDSchema, userSchema };

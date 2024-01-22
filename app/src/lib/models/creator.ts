@@ -10,7 +10,7 @@ import {
 } from 'mongoose-zod';
 
 import { creatorSalesStatsSchema, feedbackStatsSchema } from './common';
-import type { UserDocument } from './user';
+import { userCRUDSchema, type UserDocument } from './user';
 
 const { models } = pkg;
 
@@ -55,7 +55,7 @@ const creatorMongooseZodSchema = toZodMongooseSchema(creatorSchema, {
 
 const creatorCRUDSchema = creatorSchema.extend({
   _id: creatorSchema.shape._id.optional(),
-  user: creatorSchema.shape.user.optional()
+  user: userCRUDSchema.required()
 });
 
 const creatorMongooseSchema = toMongooseSchema(creatorMongooseZodSchema);

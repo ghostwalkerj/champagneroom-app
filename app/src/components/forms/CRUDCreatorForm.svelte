@@ -1,10 +1,7 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-  import config from '$lib/config';
-  import type { roomCRUDSchema } from '$lib/models/room';
+  import type { creatorCRUDSchema } from '$lib/models/creator';
   import Icon from '@iconify/svelte';
   import { FileDropzone, getModalStore } from '@skeletonlabs/skeleton';
-  import { nanoid } from 'nanoid';
   import type { SvelteComponent } from 'svelte';
   import type { SuperValidated } from 'sveltekit-superforms';
   import { superForm } from 'sveltekit-superforms/client';
@@ -16,12 +13,12 @@
   let images: FileList;
   export let parent: SvelteComponent;
 
-  let roomForm = $modalStore[0].meta.form as SuperValidated<
-    typeof roomCRUDSchema
+  let creatorForm = $modalStore[0].meta.form as SuperValidated<
+    typeof creatorCRUDSchema
   >;
 
   const { form, errors, constraints, enhance, delayed, message } = superForm(
-    roomForm,
+    creatorForm,
     {
       validationMethod: 'submit-only',
       async onResult(event) {
@@ -31,16 +28,6 @@
       }
     }
   );
-
-  if ($form.uniqueUrl === undefined) {
-    $form.uniqueUrl = nanoid(10).toLowerCase();
-  }
-
-  if ($form.bannerImageUrl === undefined) {
-    $form.bannerImageUrl = config.UI.defaultProfileImage;
-  }
-
-  $: roomUrl = urlJoin($page.url.origin, config.PATH.room);
 </script>
 
 {#if thisModal}
@@ -54,7 +41,6 @@
     >
       <input type="hidden" name="active" value="true" />
       <input type="hidden" name="_id" value={$form._id} />
-      <input type="hidden" name="coverImageUrl" value={$form.bannerImageUrl} />
 
       <FileDropzone
         name="images"
@@ -64,31 +50,32 @@
         accept="image/*"
         on:change={() => {
           if (images.length > 0) {
-            $form.bannerImageUrl = URL.createObjectURL(images[0]);
+            $form.user.profileImageUrl = URL.createObjectURL(images[0]);
           }
         }}
       >
         <svelte:fragment slot="message">
           <div>
-            <img src={$form.bannerImageUrl} alt="coverImageUrl" />
+            <img src={$form.user.profileImageUrl} alt="coverImageUrl" />
           </div>
-          <div class="label font-semibold p-4">Upload Room Cover Image</div>
+          <div class="label font-semibold p-4">Upload Profile Image</div>
         </svelte:fragment>
       </FileDropzone>
 
       <div class="p-4 flex flex-col gap-4 justify-between">
         <div class="flex flex-col gap-4">
           <label class="label">
-            <span class="font-semibold">Room Name</span>
+            <span class="font-semibold">Name</span>
             <input
               class="input variant-form-material"
-              {...$constraints.name}
+              {...$constraints.user?.name}
               type="text"
               placeholder="Enter name..."
               name="name"
-              bind:value={$form.name}
+              bind:value={$form.user.name}
             />
-            {#if $errors.name}<span class="text-error">{$errors.name}</span
+            {#if $errors.user?.name}<span class="text-error"
+                >{$errors.user.name}</span
               >{/if}
           </label>
 

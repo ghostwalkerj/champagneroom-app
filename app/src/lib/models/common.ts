@@ -59,7 +59,6 @@ export const creatorSalesStatsSchema = z
   .strict();
 
 export const disputeSchema = z.object({
-  _id: z.any().optional(),
   startedAt: z.coerce.date().default(() => new Date()),
   endedAt: z.coerce.date().optional(),
   reason: z.nativeEnum(DisputeReason),
