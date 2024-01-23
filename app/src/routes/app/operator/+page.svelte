@@ -22,8 +22,11 @@
   import type { UserDocument } from '$lib/models/user';
   import { PermissionType } from '$lib/permissions';
   import Icon from '@iconify/svelte';
-  import type { Types } from 'mongoose';
+  import { Types } from 'mongoose';
   import type { PageData } from './$types';
+  import { Ratings, Tab, TabGroup } from '@skeletonlabs/skeleton';
+  import type { ChangeEventHandler } from 'svelte/elements';
+  import CopyText from '$components/forms/CopyText.svelte';
 
   export let data: PageData;
   let operator = data.operator as OperatorDocument;
@@ -63,6 +66,7 @@
   let selectedAgentId = '0';
   let newCreator: CreatorDocument | undefined;
   let newPassword: string | undefined;
+  let tabSet: number = 0;
 
   const canImpersonateCreator = user.permissions.includes(
     PermissionType.IMPERSONATE_CREATOR
@@ -186,45 +190,61 @@
     });
   };
 
-  const updateCreatorName = (name: string) => {
+  const updateCreatorName = (event: FocusEvent) => {
+    const name = (event.target as HTMLTableCellElement).innerText;
+    if (name === creators[activeCreatorRow].user.name) return;
     creators[activeCreatorRow].user.name = name;
     updateCreator(activeCreatorRow, { name });
   };
 
-  const updateCommission = (commission: number) => {
+  const updateCommission = (event: FocusEvent) => {
+    const commission = Number((event.target as HTMLTableCellElement).innerText);
+    if (commission === creators[activeCreatorRow].commissionRate) return;
     creators[activeCreatorRow].commissionRate = commission;
     updateCreator(activeCreatorRow, { commission });
   };
 
-  const updateCreatorActive = (active: boolean) => {
+  const updateCreatorActive = (event: Event) => {
+    const active = (event.target as HTMLInputElement).checked;
+    if (active === creators[activeCreatorRow].user.active) return;
     creators[activeCreatorRow].user.active = active;
     updateCreator(activeCreatorRow, {
       active
     });
   };
 
-  const updateAgentActive = (active: boolean) => {
+  const updateAgentActive = (event: Event) => {
+    const active = (event.target as HTMLInputElement).checked;
+    if (active === agents[activeAgentRow].user.active) return;
     agents[activeCreatorRow].user.active = active;
-    updateAgent(activeCreatorRow, {
+    updateAgent(activeAgentRow, {
       active
     });
   };
 
-  const updateAgentName = (name: string) => {
+  const updateAgentName = (event: FocusEvent) => {
+    const name = (event.target as HTMLTableCellElement).innerText;
+    if (name === agents[activeAgentRow].user.name) return;
     agents[activeAgentRow].user.name = name;
     updateAgent(activeAgentRow, {
       name
     });
   };
 
-  const updateAgentAddress = (address: string) => {
+  const updateAgentAddress = (event: FocusEvent) => {
+    const address = (event.target as HTMLTableCellElement).innerText;
+    if (address === agents[activeAgentRow].user.address) return;
     agents[activeAgentRow].user.address = address;
     updateAgent(activeAgentRow, {
       address
     });
   };
 
-  const updateCreatorAgent = (agentId: Types.ObjectId) => {
+  const updateCreatorAgent = (event: Event) => {
+    const agentId = new Types.ObjectId(
+      (event.target as HTMLSelectElement).value
+    );
+    if (agentId === creators[activeCreatorRow].agent) return;
     creators[activeCreatorRow].agent = agentId;
     updateCreator(activeCreatorRow, { agentId });
   };
@@ -374,559 +394,502 @@
     </div>
   {/if}
 
-  <div class="">
-    <main class="p-10">
+  <div class="min-h-screen min-w-full">
+    <main class="px-10 pt-2">
       <!-- Page header -->
       {#key operator}
         <div
-          class="bg-base border-2 border-secondary rounded-lg mx-auto p-4 sm:px-6 lg:px-8"
+          class="bg-base border-2 border-secondary rounded-lg mx-auto py-4 px-4 sm:px-6 lg:px-8"
         >
-          <div class="font-semibold text-primary text-lg leading-6">
+          <h2 class="text-2xl font-semibold flex gap-2 items-center">
             Operator Dashboard
-          </div>
-          <div class="daisy-divider" />
+          </h2>
+          <hr class="!border-t-2 my-2" />
           <!-- Tabs -->
-          <div class="daisy-tabs daisy-tabs-boxed w-fit">
-            <!-- svelte-ignore a11y-missing-attribute -->
-            <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <!-- svelte-ignore a11y-no-static-element-interactions -->
-            <a
-              class="daisy-tab"
-              class:daisy-tab-active={activeTab === 'Admin'}
-              on:click={() => {
-                activeTab = 'Admin';
-              }}>Admin</a
-            >
-
-            <!-- svelte-ignore a11y-missing-attribute -->
-            <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <!-- svelte-ignore a11y-no-static-element-interactions -->
-
-            <a
-              class="daisy-tab"
-              class:daisy-tab-active={activeTab === 'Agents'}
-              on:click={() => {
-                activeTab = 'Agents';
-              }}>Agents</a
-            >
-
-            <!-- svelte-ignore a11y-missing-attribute -->
-            <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <!-- svelte-ignore a11y-no-static-element-interactions -->
-
-            <a
-              class="daisy-tab"
-              class:daisy-tab-active={activeTab === 'Creators'}
-              on:click={() => {
-                activeTab = 'Creators';
-              }}>Creators</a
-            >
-
-            <!-- svelte-ignore a11y-missing-attribute -->
-            <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <!-- svelte-ignore a11y-no-static-element-interactions -->
-
-            <a
-              class="daisy-tab"
-              class:daisy-tab-active={activeTab == 'Disputes'}
-              on:click={() => {
-                activeTab = 'Disputes';
-              }}>Disputes</a
-            >
-          </div>
-        </div>
-
-        <!-- Tables -->
-        <div class="min-h-screen">
-          <div class="relative">
-            {#if activeTab === 'Admin'}
-              <div
-                class="mt-4 bg-base w-full rounded-lg z-0 border-2 border-secondary"
-              >
-                <div class="mx-auto p-4 ml-2">
-                  <ul
-                    class="daisy-menu daisy-menu-vertical lg:daisy-menu-horizontal bg-base-200 rounded-box"
-                  >
-                    <li>
-                      <!--  eslint-disable-next-line svelte/valid-compile,
-                      svelte/valid-compile -->
-                      <!-- svelte-ignore a11y-missing-attribute -->
-                      <a class="font-SpaceGrotesk">
-                        <Icon icon="mdi:teleconference" class="w-6 h-6 mt-2" />
-                        Create Conference</a
-                      >
-                    </li>
-                  </ul>
-                </div>
+          <TabGroup>
+            <Tab bind:group={tabSet} name="Agents" value={0}>
+              <div class="flex gap-1 items-center">
+                <Icon icon="material-symbols-light:support-agent-rounded" />
+                Agents
               </div>
-            {:else if activeTab === 'Agents'}
-              <div
-                class="mt-4 bg-base w-full rounded-lg z-0 overflow-hidden border-2 border-secondary"
-              >
-                <div class="overflow-x-auto reo">
+            </Tab>
+            <Tab bind:group={tabSet} name="Creators" value={1}>
+              <div class="flex gap-1 items-center">
+                <Icon icon="mdi:dance-pole" />
+                Creators
+              </div></Tab
+            >
+            <Tab bind:group={tabSet} name="Disputes" value={2}>
+              <div class="flex gap-1 items-center">
+                <Icon icon="healthicons:justice-outline" />
+                Disputes
+              </div></Tab
+            >
+            <svelte:fragment slot="panel">
+              {#if tabSet === 0}
+                <div class="overflow-x-auto">
                   {#key agents}
-                    <table class="daisy-table daisy-table-pin-rows">
-                      <thead>
-                        <tr>
-                          <th
-                            ><button
-                              class="daisy-btn daisy-btn-circle daisy-btn-xs"
-                              on:click={() => {
-                                canAddAgent = !canAddAgent;
-                              }}
-                            >
-                              <Icon
-                                icon="mingcute:add-circle-line"
-                                class="text-xl"
-                              /></button
-                            >
-                          </th>
-                          <th>Name</th>
-                          <th>Address</th>
-                          <th>Active</th>
-                          <th>Permissions</th>
-                          {#if canImpersonateAgent}
-                            <th>Impersonate</th>
-                          {/if}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {#if canAddAgent}
-                          <tr>
-                            <td>
-                              <form
-                                method="post"
-                                action="?/create_agent"
-                                use:enhance={onSubmit}
-                              >
-                                <input
-                                  type="hidden"
-                                  name="name"
-                                  value={agentName}
-                                />
-                                <input
-                                  type="hidden"
-                                  name="address"
-                                  value={agentAddress}
-                                /><button
-                                  class="daisy-btn daisy-btn-xs daisy-btn-ghost p-0"
-                                  type="submit">Add</button
-                                >
-                              </form>
-                            </td>
-                            <td
-                              contenteditable="true"
-                              bind:this={agentNameElement}
-                              bind:innerText={agentName}
-                            />
-                            <td
-                              contenteditable="true"
-                              bind:this={agentAddressElement}
-                              bind:innerText={agentAddress}
-                            />
-
-                            <td>True</td>
-                            <td />
-                          </tr>
-                        {/if}
-                        {#each agents as agent, index}
-                          <tr
-                            class:bg-base-300={activeAgentRow === index}
-                            on:click={() => (activeAgentRow = index)}
-                          >
-                            <td>{index + 1}</td>
-                            <td
-                              contenteditable="true"
-                              on:blur={(event) => {
-                                updateAgentName(event.target?.textContent);
-                              }}>{agent.user.name}</td
-                            >
-                            <td
-                              contenteditable="true"
-                              on:blur={(event) => {
-                                updateAgentAddress(event.target?.textContent);
-                              }}>{agent.user.address}</td
-                            >
-                            <td>
-                              <input
-                                class="checkbox"
-                                type="checkbox"
-                                checked={agent.user.active}
-                                on:change={(event) => {
-                                  updateAgentActive(event.target?.checked);
+                    <div class="table-container">
+                      <table class="table table-interactive">
+                        <thead class="table-header">
+                          <tr class="table-row">
+                            <th
+                              ><button
+                                class="btn-icon variant-filled btn-icon-sm"
+                                on:click={() => {
+                                  canAddAgent = !canAddAgent;
                                 }}
-                              />
-                            </td>
-                            <td>
-                              <div class="flex gap-2">
-                                {#each agent.user.permissions as permission}
-                                  <div
-                                    class="chip variant-filled hover:variant-ringed"
-                                  >
-                                    {permission}
-                                  </div>
-                                {/each}
-                              </div>
-                            </td>
-                            {#if canImpersonateAgent}
-                              <td>
-                                <button
-                                  class="daisy-btn daisy-btn-xs daisy-btn-outline daisy-btn-primary"
-                                  disabled={!canImpersonateAgent}
-                                  on:click={() =>
-                                    impersonate(agent.user._id.toString())}
-                                >
-                                  Impersonate
-                                </button></td
                               >
+                                <Icon
+                                  icon="mingcute:add-circle-line"
+                                  class="text-xl"
+                                /></button
+                              >
+                            </th>
+                            <th>Name</th>
+                            <th>Address</th>
+                            <th>Active</th>
+                            <th>Permissions</th>
+                            {#if canImpersonateAgent}
+                              <th>Action</th>
                             {/if}
                           </tr>
-                        {/each}
-                      </tbody>
-                      <tfoot>
-                        <tr>
-                          <th />
-                          <th>Name</th>
-                          <th>Address</th>
-                          <th>Active</th>
-                          <th>Permissions</th>
+                        </thead>
+                        <tbody>
+                          {#if canAddAgent}
+                            <tr>
+                              <td>
+                                <form
+                                  method="post"
+                                  action="?/create_agent"
+                                  use:enhance={onSubmit}
+                                >
+                                  <input
+                                    type="hidden"
+                                    name="name"
+                                    value={agentName}
+                                  />
+                                  <input
+                                    type="hidden"
+                                    name="address"
+                                    value={agentAddress}
+                                  /><button
+                                    class="btn btn-sm variant-filled"
+                                    type="submit">Add</button
+                                  >
+                                </form>
+                              </td>
+                              <td
+                                contenteditable="true"
+                                bind:this={agentNameElement}
+                                bind:innerText={agentName}
+                              />
+                              <td
+                                contenteditable="true"
+                                bind:this={agentAddressElement}
+                                bind:innerText={agentAddress}
+                              />
 
-                          {#if canImpersonateAgent}
-                            <th>Impersonate</th>
+                              <td>True</td>
+                              <td />
+                            </tr>
                           {/if}
-                        </tr>
-                      </tfoot>
-                    </table>
+                          {#each agents as agent, index}
+                            <tr on:click={() => (activeAgentRow = index)}>
+                              <td>{index + 1}</td>
+                              <td
+                                contenteditable="true"
+                                on:blur={updateAgentName}>{agent.user.name}</td
+                              >
+                              <td
+                                contenteditable="true"
+                                on:blur={updateAgentAddress}
+                                >{agent.user.address}</td
+                              >
+                              <td>
+                                <input
+                                  class="checkbox"
+                                  type="checkbox"
+                                  checked={agent.user.active}
+                                  on:change={updateAgentActive}
+                                />
+                              </td>
+                              <td>
+                                <div class="flex gap-2">
+                                  {#each agent.user.permissions as permission}
+                                    <div
+                                      class="chip variant-filled-primary hover:variant-ringed"
+                                    >
+                                      {permission}
+                                    </div>
+                                  {/each}
+                                </div>
+                              </td>
+                              {#if canImpersonateAgent}
+                                <td>
+                                  <button
+                                    class="btn variant-outline-primary btn-sm text-primary"
+                                    disabled={!canImpersonateAgent}
+                                    on:click={() =>
+                                      impersonate(agent.user._id.toString())}
+                                  >
+                                    Impersonate
+                                  </button></td
+                                >
+                              {/if}
+                            </tr>
+                          {/each}
+                        </tbody>
+                        <!-- <tfoot>
+                          <tr>
+                            <th />
+                            <th>Name</th>
+                            <th>Address</th>
+                            <th>Active</th>
+                            <th>Permissions</th>
+
+                            {#if canImpersonateAgent}
+                              <th>Action</th>
+                            {/if}
+                          </tr>
+                        </tfoot> -->
+                      </table>
+                    </div>
                   {/key}
                 </div>
-              </div>
-            {:else if activeTab === 'Creators'}
-              <div
-                class="mt-4 bg-base w-full rounded-lg z-0 overflow-hidden border-2 border-secondary"
-              >
+              {:else if tabSet === 1}
                 <div class="overflow-x-auto">
                   {#key creators}
+                    <div class="table-container">
+                      <table class="table table-interactive">
+                        <thead class="table-header">
+                          <tr class="table-row">
+                            <th
+                              ><button
+                                class="btn-icon variant-filled btn-icon-sm"
+                                on:click={() => {
+                                  canAddCreator = !canAddCreator;
+                                }}
+                              >
+                                <Icon
+                                  icon="mingcute:add-circle-line"
+                                  class="text-xl"
+                                /></button
+                              >
+                            </th>
+                            <th>Name</th>
+                            <th>Agent</th>
+                            <th>Comm %</th>
+                            <th>Active</th>
+                            <th>Secret</th>
+
+                            <th>Ticket Sales</th>
+                            <th>Revenue</th>
+                            <th>Refunds</th>
+                            <th>Reviews</th>
+                            <th>Rating</th>
+                            {#if canImpersonateCreator}
+                              <th>Impersonate</th>
+                            {/if}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {#if canAddCreator}
+                            <tr>
+                              <td>
+                                <form
+                                  method="post"
+                                  action="?/create_creator"
+                                  use:enhance={onSubmit}
+                                >
+                                  <input
+                                    type="hidden"
+                                    name="name"
+                                    value={creatorName}
+                                  />
+
+                                  <input
+                                    type="hidden"
+                                    name="agentId"
+                                    value={selectedAgentId}
+                                  />
+
+                                  <input
+                                    type="hidden"
+                                    name="commission"
+                                    value={commission}
+                                  />
+                                  <button
+                                    class="btn btn-sm variant-filled"
+                                    type="submit">Add</button
+                                  >
+                                </form>
+                              </td>
+                              <td
+                                contenteditable="true"
+                                bind:this={creatorNameElement}
+                                bind:innerText={creatorName}
+                              />
+                              <td>
+                                <select
+                                  class="select"
+                                  bind:value={selectedAgentId}
+                                  bind:this={creatorAgentElement}
+                                >
+                                  <option disabled value="0" selected>
+                                    Select Agent</option
+                                  >
+                                  {#each agents as agent}
+                                    <option value={agent._id}
+                                      >{agent.user.name}</option
+                                    >
+                                  {/each}
+                                </select>
+                              </td>
+
+                              <td
+                                contenteditable="true"
+                                bind:this={creatorCommissionElement}
+                                bind:innerText={commission}
+                              />
+                              <td>True</td>
+                              <td />
+                            </tr>
+                          {/if}
+                          {#each creators as creator, index}
+                            {@const agentId = creator.agent}
+                            {@const agentName =
+                              (agentId && getAgentName(agentId)) || 'None'}
+                            <tr on:click={() => (activeCreatorRow = index)}>
+                              <td>{index + 1}</td>
+                              <td
+                                contenteditable="true"
+                                on:blur={updateCreatorName}
+                                >{creator.user.name}</td
+                              >
+                              <td>
+                                {#if agentId}
+                                  <select
+                                    class="select p-0 text-sm"
+                                    on:change={updateCreatorAgent}
+                                  >
+                                    <option value={agentId} selected
+                                      >{agentName}</option
+                                    >
+                                    {#each agents as agent}
+                                      {#if agent._id !== agentId}
+                                        <option value={agent._id}
+                                          >{agent.user.name}</option
+                                        >
+                                      {/if}
+                                    {/each}
+                                  </select>
+                                {:else}
+                                  None
+                                {/if}
+                              </td>
+                              <td
+                                contenteditable="true"
+                                on:blur={updateCommission}
+                                >{creator.commissionRate}</td
+                              >
+                              <td>
+                                <input
+                                  class="checkbox"
+                                  type="checkbox"
+                                  checked={creator.user.active}
+                                  on:change={updateCreatorActive}
+                                />
+                              </td>
+                              <td
+                                >{#if creator.user.authType !== AuthType.SIGNING}
+                                  <CopyText
+                                    copyValue={urlJoin(
+                                      $page.url.origin,
+                                      config.PATH.creator,
+                                      creator.user.secret || ''
+                                    )}
+                                    class="anchor mr-2">Secret Url</CopyText
+                                  >
+                                  <button
+                                    class="btn variant-outline-secondary btn-sm text-secondary"
+                                    on:click={() =>
+                                      (isChangeCreatorSecret = true)}
+                                  >
+                                    Change
+                                  </button>
+                                {:else}
+                                  N/A
+                                {/if}
+                              </td>
+
+                              <td
+                                >{#if creator.salesStats.totalTicketSalesAmounts}
+                                  {#each Object.entries(creator.salesStats.totalTicketSalesAmounts) as [currency, amount]}
+                                    {currencyFormatter(currency).format(amount)}
+                                  {/each}
+                                {:else}
+                                  {currencyFormatter().format(0)}
+                                {/if}
+                              </td>
+                              <td>
+                                {#if creator.salesStats.totalRevenue}
+                                  {#each Object.entries(creator.salesStats.totalRevenue) as [currency, amount]}
+                                    {currencyFormatter(currency).format(amount)}
+                                  {/each}
+                                {:else}
+                                  {currencyFormatter().format(0)}
+                                {/if}
+                              </td>
+                              <td>
+                                {#if creator.salesStats.totalRefunds}
+                                  {#each Object.entries(creator.salesStats.totalRefunds) as [currency, amount]}
+                                    {currencyFormatter(currency).format(amount)}
+                                  {/each}
+                                {:else}
+                                  {currencyFormatter().format(0)}
+                                {/if}
+                              </td>
+                              <td>{creator.feedbackStats.numberOfReviews}</td>
+                              <td>
+                                <Ratings
+                                  bind:value={creator.feedbackStats
+                                    .averageRating}
+                                  max={5}
+                                  justify="left"
+                                >
+                                  <svelte:fragment slot="empty"
+                                    ><Icon
+                                      icon="fluent:star-28-regular"
+                                    /></svelte:fragment
+                                  >
+                                  <svelte:fragment slot="half"
+                                    ><Icon
+                                      icon="fluent:star-half-28-regular"
+                                    /></svelte:fragment
+                                  >
+                                  <svelte:fragment slot="full"
+                                    ><Icon
+                                      icon="fluent:star-28-filled"
+                                    /></svelte:fragment
+                                  >
+                                </Ratings></td
+                              >
+                              {#if canImpersonateCreator}
+                                <td
+                                  ><button
+                                    class="btn variant-outline-primary btn-sm text-primary"
+                                    disabled={!canImpersonateCreator}
+                                    on:click={() =>
+                                      impersonate(creator.user._id.toString())}
+                                    >Impersonate
+                                  </button></td
+                                >
+                              {/if}
+                            </tr>
+                          {/each}
+                        </tbody>
+                        <!-- <tfoot>
+                          <tr>
+                            <th />
+                            <th>Name</th>
+                            <th>Agent</th>
+                            <th>Comm %</th>
+                            <th>Active</th>
+                            <th>Secret</th>
+
+                            <th>Sales</th>
+                            <th>Revenue</th>
+                            <th>Refunds</th>
+                            <th>Reviews</th>
+                            <th>Rating</th>
+                            {#if canImpersonateCreator}
+                              <th>Impersonate</th>
+                            {/if}
+                          </tr>
+                        </tfoot> -->
+                      </table>
+                    </div>
+                  {/key}
+                </div>
+              {:else}
+                <div
+                  class="mt-4 bg-base w-full rounded-lg z-0 overflow-hidden border-2 border-secondary"
+                >
+                  <div class="overflow-x-auto">
                     <table class="daisy-table daisy-table-pin-rows">
                       <thead>
                         <tr>
-                          <th
-                            ><button
-                              class="daisy-btn daisy-btn-circle daisy-btn-xs"
-                              on:click={() => {
-                                canAddCreator = !canAddCreator;
-                              }}
-                            >
-                              <Icon
-                                icon="mingcute:add-circle-line"
-                                class="text-xl"
-                              /></button
-                            >
-                          </th>
-                          <th>Name</th>
-                          <th>Agent</th>
-                          <th>Comm %</th>
-                          <th>Active</th>
-                          <th>Secret</th>
-
-                          <th>Ticket Sales</th>
-                          <th>Revenue</th>
-                          <th>Refunds</th>
-                          <th>Reviews</th>
-                          <th>Rating</th>
-                          {#if canImpersonateCreator}
-                            <th>Impersonate</th>
-                          {/if}
+                          <th />
+                          <th>Creator</th>
+                          <th>Amount</th>
+                          <th>Show Start</th>
+                          <th>Show End</th>
+                          <th>Run Time</th>
+                          <th>Reason</th>
+                          <th>Explanation</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {#if canAddCreator}
-                          <tr>
-                            <td>
-                              <form
-                                method="post"
-                                action="?/create_creator"
-                                use:enhance={onSubmit}
+                        {#each disputedTickets as ticket, index}
+                          {@const runtime = ticket.show.showState.runtime}
+                          {#if runtime}
+                            <tr
+                              class:bg-base-300={activeDisputeRow === index}
+                              on:click={() => (activeDisputeRow = index)}
+                            >
+                              <td>{index + 1}</td>
+                              <td>{ticket.show.creatorInfo.name}</td>
+                              <td
+                                >{currencyFormatter(
+                                  ticket.price.currency
+                                ).format(ticket.price.amount)}</td
                               >
-                                <input
-                                  type="hidden"
-                                  name="name"
-                                  value={creatorName}
-                                />
-
-                                <input
-                                  type="hidden"
-                                  name="agentId"
-                                  value={selectedAgentId}
-                                />
-
-                                <input
-                                  type="hidden"
-                                  name="commission"
-                                  value={commission}
-                                />
-                                <button
-                                  class="daisy-btn daisy-btn-xs daisy-btn-ghost p-0"
-                                  type="submit">Add</button
-                                >
-                              </form>
-                            </td>
-                            <td
-                              contenteditable="true"
-                              bind:this={creatorNameElement}
-                              bind:innerText={creatorName}
-                            />
-                            <td>
-                              <select
-                                class="daisy-select daisy-select-bordered daisy-select-sm text-xs"
-                                bind:value={selectedAgentId}
-                                bind:this={creatorAgentElement}
+                              <td
+                                >{spacetime(runtime.startDate || '').format(
+                                  'nice'
+                                )}</td
                               >
-                                <option disabled value="0" selected>
-                                  Select Agent</option
-                                >
-                                {#each agents as agent}
-                                  <option value={agent._id.toString()}
-                                    >{agent.user.name}</option
-                                  >
-                                {/each}
-                              </select>
-                            </td>
-
-                            <td
-                              contenteditable="true"
-                              bind:this={creatorCommissionElement}
-                              bind:innerText={commission}
-                            />
-                            <td>True</td>
-                            <td />
-                          </tr>
-                        {/if}
-                        {#each creators as creator, index}
-                          {@const agentId = creator.agent}
-                          {@const agentName =
-                            (agentId && getAgentName(agentId)) || 'None'}
-                          <tr
-                            class:bg-base-300={activeCreatorRow === index}
-                            on:click={() => (activeCreatorRow = index)}
-                          >
-                            <td>{index + 1}</td>
-                            <td
-                              contenteditable="true"
-                              on:blur={(event) => {
-                                updateCreatorName(event.target?.textContent);
-                              }}>{creator.user.name}</td
-                            >
-                            <td>
-                              {#if agentId}
-                                <select
-                                  class="daisy-select daisy-select-bordered daisy-select-sm text-xs"
-                                  on:change={(event) => {
-                                    updateCreatorAgent(event.target?.value);
-                                  }}
-                                >
-                                  <option value={agentId.toString()} selected
-                                    >{agentName}</option
-                                  >
-                                  {#each agents as agent}
-                                    {#if agent._id.toString() !== agentId.toString()}
-                                      <option value={agent._id}
-                                        >{agent.user.name}</option
-                                      >
-                                    {/if}
-                                  {/each}
-                                </select>
-                              {:else}
-                                None
-                              {/if}
-                            </td>
-                            <td
-                              contenteditable="true"
-                              on:blur={(event) => {
-                                updateCommission(event.target?.textContent);
-                              }}>{creator.commissionRate}</td
-                            >
-                            <td>
-                              <input
-                                class="checkbox"
-                                type="checkbox"
-                                checked={creator.user.active}
-                                on:change={(event) => {
-                                  updateCreatorActive(event.target?.checked);
-                                }}
-                              />
-                            </td>
-                            <td
-                              >{#if creator.user.authType !== AuthType.SIGNING}<a
-                                  href={urlJoin(
-                                    config.PATH.creator,
-                                    creator.user.secret || ''
-                                  )}
-                                  target="_blank"
-                                  class="daisy-link daisy-link-primary"
-                                  >Secret Url</a
-                                >
-                                <button
-                                  class="daisy-btn daisy-btn-xs daisy-btn-outline daisy-btn-primary ml-4"
-                                  on:click={() =>
-                                    (isChangeCreatorSecret = true)}
-                                >
-                                  Change
-                                </button>
-                              {:else}
-                                N/A
-                              {/if}
-                            </td>
-
-                            <td
-                              >{#if creator.salesStats.totalTicketSalesAmounts}
-                                {#each Object.entries(creator.salesStats.totalTicketSalesAmounts) as [currency, amount]}
-                                  {currencyFormatter(currency).format(amount)}
-                                {/each}
-                              {:else}
-                                0
-                              {/if}
-                            </td>
-                            <td>
-                              {#if creator.salesStats.totalRevenue}
-                                {#each Object.entries(creator.salesStats.totalRevenue) as [currency, amount]}
-                                  {currencyFormatter(currency).format(amount)}
-                                {/each}
-                              {:else}
-                                0
-                              {/if}
-                            </td>
-                            <td>
-                              {#if creator.salesStats.totalRefunds}
-                                {#each Object.entries(creator.salesStats.totalRefunds) as [currency, amount]}
-                                  {currencyFormatter(currency).format(amount)}
-                                {/each}
-                              {:else}
-                                0
-                              {/if}
-                            </td>
-                            <td>{creator.feedbackStats.numberOfReviews}</td>
-                            <td
-                              class="daisy-tooltip"
-                              data-tip={creator.feedbackStats.averageRating.toFixed(
-                                2
-                              )}
-                            >
-                              <StarRating
-                                rating={creator.feedbackStats.averageRating}
-                              />
-                            </td>
-                            {#if canImpersonateCreator}
+                              <td
+                                >{spacetime(runtime.endDate).format('nice')}</td
+                              >
+                              <td
+                                >{spacetime(runtime.startDate).diff(
+                                  runtime.endDate ?? spacetime.now()
+                                ).minutes}
+                                min</td
+                              >
+                              <td>{ticket.ticketState.dispute?.reason}</td>
+                              <td>{ticket.ticketState.dispute?.explanation}</td>
                               <td
                                 ><button
-                                  class="daisy-btn daisy-btn-xs daisy-btn-outline daisy-btn-primary"
-                                  disabled={!canImpersonateCreator}
-                                  on:click={() =>
-                                    impersonate(creator.user._id.toString())}
-                                  >Impersonate
-                                </button></td
+                                  class="daisy-btn daisy-btn-primary daisy-btn-xs"
+                                  on:click={() => (isDecideDispute = true)}
+                                  >Decide</button
+                                ></td
                               >
-                            {/if}
-                          </tr>
+                            </tr>
+                          {/if}
                         {/each}
                       </tbody>
                       <tfoot>
                         <tr>
                           <th />
-                          <th>Name</th>
-                          <th>Agent</th>
-                          <th>Comm %</th>
-                          <th>Active</th>
-                          <th>Secret</th>
-
-                          <th>Sales</th>
-                          <th>Revenue</th>
-                          <th>Refunds</th>
-                          <th>Reviews</th>
-                          <th>Rating</th>
-                          {#if canImpersonateCreator}
-                            <th>Impersonate</th>
-                          {/if}
+                          <th>Creator</th>
+                          <th>Amount</th>
+                          <th>Show Start</th>
+                          <th>Show End</th>
+                          <th>Run Time</th>
+                          <th>Reason</th>
+                          <th>Explanation</th>
                         </tr>
                       </tfoot>
                     </table>
-                  {/key}
+                  </div>
                 </div>
-              </div>
-            {:else}
-              <div
-                class="mt-4 bg-base w-full rounded-lg z-0 overflow-hidden border-2 border-secondary"
-              >
-                <div class="overflow-x-auto">
-                  <table class="daisy-table daisy-table-pin-rows">
-                    <thead>
-                      <tr>
-                        <th />
-                        <th>Creator</th>
-                        <th>Amount</th>
-                        <th>Show Start</th>
-                        <th>Show End</th>
-                        <th>Run Time</th>
-                        <th>Reason</th>
-                        <th>Explanation</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {#each disputedTickets as ticket, index}
-                        {@const runtime = ticket.show.showState.runtime}
-                        {#if runtime}
-                          <tr
-                            class:bg-base-300={activeDisputeRow === index}
-                            on:click={() => (activeDisputeRow = index)}
-                          >
-                            <td>{index + 1}</td>
-                            <td>{ticket.show.creatorInfo.name}</td>
-                            <td
-                              >{currencyFormatter(ticket.price.currency).format(
-                                ticket.price.amount
-                              )}</td
-                            >
-                            <td
-                              >{spacetime(runtime.startDate || '').format(
-                                'nice'
-                              )}</td
-                            >
-                            <td>{spacetime(runtime.endDate).format('nice')}</td>
-                            <td
-                              >{spacetime(runtime.startDate).diff(
-                                runtime.endDate ?? spacetime.now()
-                              ).minutes}
-                              min</td
-                            >
-                            <td>{ticket.ticketState.dispute?.reason}</td>
-                            <td>{ticket.ticketState.dispute?.explanation}</td>
-                            <td
-                              ><button
-                                class="daisy-btn daisy-btn-primary daisy-btn-xs"
-                                on:click={() => (isDecideDispute = true)}
-                                >Decide</button
-                              ></td
-                            >
-                          </tr>
-                        {/if}
-                      {/each}
-                    </tbody>
-                    <tfoot>
-                      <tr>
-                        <th />
-                        <th>Creator</th>
-                        <th>Amount</th>
-                        <th>Show Start</th>
-                        <th>Show End</th>
-                        <th>Run Time</th>
-                        <th>Reason</th>
-                        <th>Explanation</th>
-                      </tr>
-                    </tfoot>
-                  </table>
-                </div>
-              </div>
-            {/if}
-          </div>
+              {/if}
+            </svelte:fragment>
+          </TabGroup>
         </div>
       {/key}
     </main>

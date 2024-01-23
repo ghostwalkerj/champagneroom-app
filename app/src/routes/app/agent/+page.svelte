@@ -34,6 +34,7 @@
     type PopupSettings,
     popup
   } from '@skeletonlabs/skeleton';
+  import CopyText from '$components/forms/CopyText.svelte';
 
   export let data: PageData;
   $: agent = data.agent as AgentDocument;
@@ -71,12 +72,6 @@
   let agentUnSub: Unsubscriber;
   $: canImpersonate = false;
   let tabSet: number = 0;
-
-  const popupHover: PopupSettings = {
-    event: 'hover',
-    target: 'popupHover',
-    placement: 'top'
-  };
 
   onMount(() => {
     canImpersonate = user.permissions.includes(
@@ -262,7 +257,7 @@
     </div>
   {/if}
 
-  <div class="min-h-full min-w-full">
+  <div class="min-h-screen min-w-full">
     <main class="px-10 pt-2">
       <!-- Page header -->
       {#key agent}
@@ -350,7 +345,7 @@
                                     value={commission}
                                   />
                                   <button
-                                    class="daisy-btn daisy-btn-xs daisy-btn-ghost p-0"
+                                    class="btn btn-sm variant-filled"
                                     type="submit">Add</button
                                   >
                                 </form>
@@ -391,14 +386,16 @@
                               </td>
 
                               <td
-                                >{#if creator.user.authType !== AuthType.SIGNING}<a
-                                    href={urlJoin(
+                                >{#if creator.user.authType !== AuthType.SIGNING}
+                                  <CopyText
+                                    copyValue={urlJoin(
+                                      $page.url.origin,
                                       config.PATH.creator,
                                       creator.user.secret || ''
                                     )}
-                                    target="_blank"
-                                    class="anchor mr-2">Secret Url</a
+                                    class="anchor mr-2">Secret Url</CopyText
                                   >
+
                                   <button
                                     class="btn variant-outline-secondary btn-sm text-secondary"
                                     on:click={() =>
@@ -478,7 +475,7 @@
                             </tr>
                           {/each}
                         </tbody>
-                        <tfoot>
+                        <!-- <tfoot>
                           <tr>
                             <th />
                             <th>Name</th>
@@ -495,7 +492,7 @@
                               <th>Impersonate</th>
                             {/if}
                           </tr>
-                        </tfoot>
+                        </tfoot> -->
                       </table>
                     </div>
                   {/key}

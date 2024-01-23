@@ -6,10 +6,8 @@ import type IORedis from 'ioredis';
 import { nanoid } from 'nanoid';
 import { generateSillyPassword } from 'silly-password-generator';
 import spacetime from 'spacetime';
-import type { SuperValidated } from 'sveltekit-superforms';
 import { message, superValidate } from 'sveltekit-superforms/server';
 import { uniqueNamesGenerator } from 'unique-names-generator';
-import type { a } from 'vitest/dist/suite-MFRDkZcV.js';
 
 import {
   AUTH_TOKEN_NAME,
@@ -21,7 +19,7 @@ import {
 
 import type { AgentDocument } from '$lib/models/agent';
 import type { CreatorDocument } from '$lib/models/creator';
-import { Creator, creatorCRUDSchema } from '$lib/models/creator';
+import { Creator } from '$lib/models/creator';
 import { Show } from '$lib/models/show';
 import type { UserDocument } from '$lib/models/user';
 import { User } from '$lib/models/user';
@@ -31,13 +29,7 @@ import { Wallet } from '$lib/models/wallet';
 import type { PayoutQueueType } from '$lib/workers/payoutWorker';
 
 import config from '$lib/config';
-import {
-  AuthType,
-  currencyFormatter,
-  currencyFormatter,
-  CurrencyType,
-  EntityType
-} from '$lib/constants';
+import { AuthType, CurrencyType, EntityType } from '$lib/constants';
 import { rateCryptosRateGet } from '$lib/ext/bitcart';
 import {
   createBitcartToken,

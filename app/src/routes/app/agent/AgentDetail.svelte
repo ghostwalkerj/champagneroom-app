@@ -2,6 +2,7 @@
   import { deserialize } from '$app/forms';
   import { invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
+  import CopyText from '$components/forms/CopyText.svelte';
   import ProfileImage from '$components/forms/ImageUploadForm.svelte';
   import config from '$lib/config';
   import type { AgentDocument } from '$lib/models/agent';
@@ -135,12 +136,12 @@
     <div>
       <div class="font-bold pr-1">Referral Url:</div>
       <div>
-        <a
+        <CopyText
+          copyValue={referralUrl}
           class="anchor neon-primary font-semibold variant-soft-primary mb-1"
-          href={referralUrl}
         >
-          {referralCode}</a
-        >
+          {referralCode}
+        </CopyText>
       </div>
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <!-- svelte-ignore a11y-no-static-element-interactions -->
