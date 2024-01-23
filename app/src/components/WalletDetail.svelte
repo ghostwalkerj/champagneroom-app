@@ -67,7 +67,9 @@
           </span>
         {/if}
       </p>
-      <p>{currencyFormatter(wallet.currency).format(availableBalance)}</p>
+      <span class="font-semibold"
+        >{currencyFormatter(wallet.currency).format(availableBalance)}</span
+      >
     </div>
 
     <div class="flex gap-2">

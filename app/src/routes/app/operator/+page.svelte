@@ -1,7 +1,6 @@
 <script lang="ts">
   import type { ActionResult } from '@sveltejs/kit';
   import spacetime from 'spacetime';
-  import StarRating from 'svelte-star-rating';
   import { uniqueNamesGenerator } from 'unique-names-generator';
   import urlJoin from 'url-join';
 
@@ -17,16 +16,15 @@
   import { AuthType, DisputeDecision, currencyFormatter } from '$lib/constants';
   import { womensNames } from '$lib/womensNames';
 
+  import CopyText from '$components/forms/CopyText.svelte';
   import type { AgentDocument } from '$lib/models/agent';
   import type { TicketDocument } from '$lib/models/ticket';
   import type { UserDocument } from '$lib/models/user';
   import { PermissionType } from '$lib/permissions';
   import Icon from '@iconify/svelte';
+  import { Ratings, Tab, TabGroup } from '@skeletonlabs/skeleton';
   import { Types } from 'mongoose';
   import type { PageData } from './$types';
-  import { Ratings, Tab, TabGroup } from '@skeletonlabs/skeleton';
-  import type { ChangeEventHandler } from 'svelte/elements';
-  import CopyText from '$components/forms/CopyText.svelte';
 
   export let data: PageData;
   let operator = data.operator as OperatorDocument;
@@ -813,13 +811,11 @@
                   {/key}
                 </div>
               {:else}
-                <div
-                  class="mt-4 bg-base w-full rounded-lg z-0 overflow-hidden border-2 border-secondary"
-                >
-                  <div class="overflow-x-auto">
-                    <table class="daisy-table daisy-table-pin-rows">
-                      <thead>
-                        <tr>
+                <div class="overflow-x-auto">
+                  <div class="table-container">
+                    <table class="table table-interactive">
+                      <thead class="table-header">
+                        <tr class="table-row">
                           <th />
                           <th>Creator</th>
                           <th>Amount</th>
@@ -834,10 +830,7 @@
                         {#each disputedTickets as ticket, index}
                           {@const runtime = ticket.show.showState.runtime}
                           {#if runtime}
-                            <tr
-                              class:bg-base-300={activeDisputeRow === index}
-                              on:click={() => (activeDisputeRow = index)}
-                            >
+                            <tr on:click={() => (activeDisputeRow = index)}>
                               <td>{index + 1}</td>
                               <td>{ticket.show.creatorInfo.name}</td>
                               <td
@@ -863,7 +856,7 @@
                               <td>{ticket.ticketState.dispute?.explanation}</td>
                               <td
                                 ><button
-                                  class="daisy-btn daisy-btn-primary daisy-btn-xs"
+                                  class="btn btn-sm variant-filled"
                                   on:click={() => (isDecideDispute = true)}
                                   >Decide</button
                                 ></td
@@ -872,7 +865,7 @@
                           {/if}
                         {/each}
                       </tbody>
-                      <tfoot>
+                      <!-- <tfoot>
                         <tr>
                           <th />
                           <th>Creator</th>
@@ -883,7 +876,7 @@
                           <th>Reason</th>
                           <th>Explanation</th>
                         </tr>
-                      </tfoot>
+                      </tfoot> -->
                     </table>
                   </div>
                 </div>

@@ -1,7 +1,6 @@
 <script lang="ts">
-  import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
+  import { Accordion, AccordionItem, Ratings } from '@skeletonlabs/skeleton';
   import spacetime from 'spacetime';
-  import StarRating from 'svelte-star-rating';
 
   import type { ShowDocument } from '$lib/models/show';
 
@@ -44,10 +43,28 @@
           </div>
         </svelte:fragment>
         <svelte:fragment slot="content">
-          <div class="flex gap-2 items-start">
-            <StarRating
-              rating={show.showState.feedbackStats.averageRating ?? 0}
-            /> ( {show.showState.feedbackStats.averageRating ?? 0})
+          <div class="text-2xl flex w-full justify-center">
+            <Ratings
+              value={show.showState.feedbackStats.averageRating ?? 0}
+              max={5}
+              text="text-yellow-400"
+              spacing="m-0"
+              class="max-w-min m-2"
+            >
+              <svelte:fragment slot="empty">
+                <Icon icon="fluent:star-28-regular" />
+              </svelte:fragment>
+              <svelte:fragment slot="half"
+                ><Icon icon="fluent:star-half-28-regular" /></svelte:fragment
+              >
+              <svelte:fragment slot="full"
+                ><Icon icon="fluent:star-28-filled" /></svelte:fragment
+              >
+            </Ratings>
+            <span class="text-base mt-2">
+              ({show.showState.feedbackStats.averageRating.toFixed(2) ??
+                0})</span
+            >
           </div>
           {#if show.showState.feedbackStats.comments.length > 0}
             <div class="text-sm text-left -mt-1 flex flex-col gap-1">

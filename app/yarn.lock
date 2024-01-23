@@ -11507,11 +11507,6 @@ svelte-qrcode-image@^1.0.0-rc.2:
   dependencies:
     qrcode "^1.5.1"
 
-svelte-star-rating@^2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/svelte-star-rating/-/svelte-star-rating-2.0.1.tgz#f1a019eea5179e928550ac49b3c7bfebe149c130"
-  integrity sha512-bURPn91T+uBCi4XXdh2eE0k2sCILcJrfb8NfKOBfpVbOJYjTfWllBtSKQMoXRnXwRmgx/52HC87ziG1KTywkFg==
-
 svelte-table@^0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/svelte-table/-/svelte-table-0.6.1.tgz#0700a25eac21372b9c6d37d91e0e5b6ffe890609"

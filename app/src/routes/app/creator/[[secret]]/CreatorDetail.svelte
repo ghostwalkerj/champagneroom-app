@@ -3,7 +3,7 @@
   import config from '$lib/config';
   import type { CreatorDocument } from '$lib/models/creator';
   import Icon from '@iconify/svelte';
-  import StarRating from 'svelte-star-rating';
+  import { Ratings } from '@skeletonlabs/skeleton';
 
   export let creator: CreatorDocument;
 
@@ -35,10 +35,26 @@
       }}
     />
   </div>
-
-  <div class="flex gap-1">
-    <StarRating rating={creator.feedbackStats.averageRating} /> ({creator.feedbackStats.averageRating.toFixed(
-      2
-    )})
+  <div class="text-2xl flex w-full justify-center m-1">
+    <Ratings
+      value={creator.feedbackStats.averageRating ?? 0}
+      max={5}
+      text="text-yellow-400"
+      spacing="m-0"
+      class="max-w-min m-2"
+    >
+      <svelte:fragment slot="empty">
+        <Icon icon="fluent:star-28-regular" />
+      </svelte:fragment>
+      <svelte:fragment slot="half"
+        ><Icon icon="fluent:star-half-28-regular" /></svelte:fragment
+      >
+      <svelte:fragment slot="full"
+        ><Icon icon="fluent:star-28-filled" /></svelte:fragment
+      >
+    </Ratings>
+    <span class="text-base mt-2">
+      ({creator.feedbackStats.averageRating.toFixed(2) ?? 0})</span
+    >
   </div>
 </div>

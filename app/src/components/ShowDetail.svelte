@@ -8,8 +8,9 @@
     durationFormatter
   } from '$lib/constants';
   import type { ShowDocument } from '$lib/models/show';
+  import Icon from '@iconify/svelte';
+  import { Ratings } from '@skeletonlabs/skeleton';
   import { onMount } from 'svelte';
-  import StarRating from 'svelte-star-rating';
   import urlJoin from 'url-join';
 
   type ShowDetailOptions = {
@@ -99,8 +100,26 @@
       <div class="flex flex-col justify-evenly rounded-tr">
         <div class="p-4 pb-0 flex flex-col items-center gap-2">
           <h1 class="text-4xl font-extrabold uppercase">{name}</h1>
+
           {#if options.showRating}
-            <StarRating rating={show.creatorInfo.averageRating} />
+            <div class="text-2xl">
+              <Ratings
+                bind:value={show.creatorInfo.averageRating}
+                max={5}
+                text="text-yellow-400"
+                spacing="m-0"
+              >
+                <svelte:fragment slot="empty">
+                  <Icon icon="fluent:star-28-regular" />
+                </svelte:fragment>
+                <svelte:fragment slot="half"
+                  ><Icon icon="fluent:star-half-28-regular" /></svelte:fragment
+                >
+                <svelte:fragment slot="full"
+                  ><Icon icon="fluent:star-28-filled" /></svelte:fragment
+                >
+              </Ratings>
+            </div>
           {/if}
         </div>
 

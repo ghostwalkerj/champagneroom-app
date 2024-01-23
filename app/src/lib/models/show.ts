@@ -102,7 +102,7 @@ const showSchema = z
     coverImageUrl: z.string().trim().optional(),
     duration: z
       .number()
-      .min(0, { message: 'Duration must be a positive number' })
+      .min(5, { message: 'Duration must be at least 5 minutes' })
       .max(180, { message: 'Duration must be under 180 minutes' }),
     name: z
       .string()

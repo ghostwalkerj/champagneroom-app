@@ -1,7 +1,7 @@
 <script lang="ts">
   import Icon from '@iconify/svelte';
-  import type { ActionResult } from '@sveltejs/kit';
   import { Ratings } from '@skeletonlabs/skeleton';
+  import type { ActionResult } from '@sveltejs/kit';
   import { uniqueNamesGenerator } from 'unique-names-generator';
   import urlJoin from 'url-join';
 
@@ -16,6 +16,7 @@
   import TopCreator from './TopCreator.svelte';
 
   import WalletDetail from '$components/WalletDetail.svelte';
+  import CopyText from '$components/forms/CopyText.svelte';
   import type { CurrencyType } from '$lib/constants';
   import type { AgentDocument } from '$lib/models/agent';
   import type { CreatorDocument } from '$lib/models/creator';
@@ -23,18 +24,12 @@
   import type { WalletDocument } from '$lib/models/wallet';
   import { PermissionType } from '$lib/permissions';
   import { AgentStore } from '$stores';
+  import { Tab, TabGroup } from '@skeletonlabs/skeleton';
   import { onDestroy, onMount } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
   import type { PageData } from './$types';
   import AgentDetail from './AgentDetail.svelte';
   import WeeklyBooking from './WeeklyBooking.svelte';
-  import {
-    TabGroup,
-    Tab,
-    type PopupSettings,
-    popup
-  } from '@skeletonlabs/skeleton';
-  import CopyText from '$components/forms/CopyText.svelte';
 
   export let data: PageData;
   $: agent = data.agent as AgentDocument;
