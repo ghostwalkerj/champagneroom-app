@@ -6,7 +6,7 @@
   import type { ActionResult } from '@sveltejs/kit';
   import type { SvelteComponent } from 'svelte';
   import type { SuperValidated } from 'sveltekit-superforms';
-  import { arrayProxy, superForm } from 'sveltekit-superforms/client';
+  import { superForm } from 'sveltekit-superforms/client';
 
   // Props
   /** Exposes parent props to this component. */
@@ -19,28 +19,15 @@
     {
       validationMethod: 'auto',
       onResult: ({ result }) => {
-        if (result.type === 'success') {
+        if (result.type === 'success' || result.type === 'redirect') {
           // VERIFY THIS IS CORRECT
-          setPinAuth(result.data!.userId, result.data!.form.data.pin);
+          modalStore.close();
         }
       }
     }
   );
 
   const { form, errors, constraints, enhance, delayed, message } = theForm;
-  const setPinAuth = async (userId: string, pin: string) => {
-    const body = new FormData();
-    body.append('pin', pin);
-    body.append('userId', userId);
-    const response = await fetch('?/pin_auth', {
-      method: 'POST',
-      body,
-      redirect: 'follow'
-    });
-
-    const result: ActionResult = deserialize(await response.text());
-    applyAction(result);
-  };
 </script>
 
 {#if $modalStore[0]}

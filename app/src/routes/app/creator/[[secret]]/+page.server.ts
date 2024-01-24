@@ -1,5 +1,6 @@
 import { error, fail } from '@sveltejs/kit';
 import { Queue } from 'bullmq';
+import { possessive, possessive } from 'i18n-possessive';
 import type IORedis from 'ioredis';
 import jwt from 'jsonwebtoken';
 import { ObjectId } from 'mongodb';
@@ -406,8 +407,18 @@ export const load: PageServerLoad = async ({ locals }) => {
       )
     : ((await superValidate(roomSchema)) as SuperValidated<typeof roomSchema>);
 
+  const showName = creator
+    ? possessive(creator.user.name, 'en') + ' Show'
+    : 'Show';
+
   const createShowForm = (await superValidate(
-    showCRUDSchema
+    {
+      name: showName
+    },
+    showCRUDSchema,
+    {
+      errors: false
+    }
   )) as SuperValidated<typeof showCRUDSchema>;
 
   const payoutForm = await superValidate(

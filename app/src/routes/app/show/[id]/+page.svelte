@@ -40,7 +40,7 @@
         <NeonBlur>
           <button
             on:click={() => modalStore.trigger(modal)}
-            class="btn btn-xl font-semibold rounded-lg bg-surface-700 variant-filled relative font-SpaceGrotesk"
+            class="btn btn-xl font-semibold rounded-lg variant-filled bg-white relative"
             >Reserve Ticket</button
           >
         </NeonBlur>

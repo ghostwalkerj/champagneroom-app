@@ -16,7 +16,7 @@ import type { ShowDocument } from '$lib/models/show';
 import { SaveState, Show } from '$lib/models/show';
 import { createShowEvent } from '$lib/models/showEvent';
 import type { TicketDocument } from '$lib/models/ticket';
-import { Ticket, TicketStatus } from '$lib/models/ticket';
+import { Ticket } from '$lib/models/ticket';
 
 import { createShowMachineService } from '$lib/machines/showMachine';
 import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
@@ -29,6 +29,7 @@ import {
   ShowMachineEventString,
   ShowStatus,
   TicketMachineEventString,
+  TicketStatus,
   WalletMachineEventString
 } from '$lib/constants';
 import { PayoutJobType } from '$lib/payout';

@@ -7,21 +7,14 @@
   import config from '$lib/config';
   import { durationFormatter } from '$lib/constants';
 
-  import type { CreatorDocument } from '$lib/models/creator';
-
   import { RangeSlider } from '@skeletonlabs/skeleton';
   import { superForm } from 'sveltekit-superforms/client';
   import Icon from '@iconify/svelte';
   import type { SuperValidated } from 'sveltekit-superforms';
 
   export let createShowForm: SuperValidated<typeof showCRUDSchema>;
-  export let creator: CreatorDocument;
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   export let onShowCreated: (show: ShowDocument) => void;
-
-  let showName = creator
-    ? possessive(creator.user.name, 'en') + ' Show'
-    : 'Show';
 
   const {
     form: showForm,
@@ -66,7 +59,6 @@
       <input
         type="text"
         name="name"
-        placeholder={showName}
         bind:value={$showForm.name}
         {...$constraints.name}
         class="input variant-form-material bg-surface-700"
@@ -83,6 +75,7 @@
         <input
           type="number"
           name="price"
+          placeholder="10"
           bind:value={$showForm.price.amount}
           {...$constraints.price?.amount}
         />
@@ -97,7 +90,7 @@
     name="duration"
     accent={'accent-primary'}
     bind:value={$showForm.duration}
-    min={0}
+    min={5}
     max={120}
     step={15}
     ticked
@@ -111,7 +104,8 @@
     class="btn variant-soft-primary !font-bold btn-lg text-xl neon-primary"
     disabled={$delayed}
     type="submit"
-    >Submit {#if $delayed}
+  >
+    {#if $delayed}
       <Icon icon="eos-icons:loading" />{/if}
     Create Show</button
   >

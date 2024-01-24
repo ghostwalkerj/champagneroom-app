@@ -103,7 +103,8 @@ const showSchema = z
     duration: z
       .number()
       .min(5, { message: 'Duration must be at least 5 minutes' })
-      .max(180, { message: 'Duration must be under 180 minutes' }),
+      .max(180, { message: 'Duration must be under 180 minutes' })
+      .default(5),
     name: z
       .string()
       .min(3, { message: 'Name must be at least 3 characters' })

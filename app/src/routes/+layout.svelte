@@ -1,5 +1,5 @@
 <script lang="ts">
-  import ReserveShowForm from '$components/forms/ReserveShowForm.svelte';
+  import ReserveShowForm from '$components/forms/ReserveTicketForm.svelte';
   import CRUDRoomForm from '$components/forms/CRUDRoomForm.svelte';
   import PayoutForm from '$components/forms/PayoutForm.svelte';
   import TransactionsActivity from '$components/TransactionsActivity.svelte';

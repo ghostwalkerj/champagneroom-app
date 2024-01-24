@@ -16,7 +16,7 @@ import {
   BITCART_STORE_ID
 } from '$env/static/private';
 
-import { reserveTicketSchema, reserveTicketSchema } from '$lib/models/common';
+import { reserveTicketSchema } from '$lib/models/common';
 import { Show } from '$lib/models/show';
 import type { TicketDocument } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
