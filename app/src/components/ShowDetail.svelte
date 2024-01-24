@@ -102,7 +102,7 @@
           <h1 class="text-4xl font-extrabold uppercase">{name}</h1>
 
           {#if options.showRating}
-            <div class="text-2xl">
+            <div class="text-2xl mb-5 md:mb-0">
               <Ratings
                 bind:value={show.creatorInfo.averageRating}
                 max={5}

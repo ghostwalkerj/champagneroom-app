@@ -4,7 +4,6 @@ import type IORedis from 'ioredis';
 import { message, superValidate } from 'sveltekit-superforms/server';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 import urlJoin from 'url-join';
-import { z } from 'zod';
 
 import {
   AUTH_SALT,
@@ -17,6 +16,7 @@ import {
   BITCART_STORE_ID
 } from '$env/static/private';
 
+import { reserveTicketSchema, reserveTicketSchema } from '$lib/models/common';
 import { Show } from '$lib/models/show';
 import type { TicketDocument } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
@@ -57,18 +57,6 @@ import type { Actions, PageServerLoad } from './$types';
 
 const tokenName = AUTH_TOKEN_NAME || 'token';
 
-const schema = z.object({
-  profileImage: z.string().optional(),
-  // 3 char min, 50 char max
-  name: z.string().min(3).max(50),
-  // 8 digit, number pin
-  pin: z
-    .string()
-    .min(8, 'PIN must have 8 characters')
-    .max(8, 'PIN must have 8 characters')
-    .regex(/^\d+$/, 'PIN must be a numeric')
-});
-
 export const actions: Actions = {
   reserve_ticket: async ({ params, cookies, request, locals }) => {
     const showId = params.id;
@@ -76,8 +64,7 @@ export const actions: Actions = {
       return fail(404, { showId, missingShowId: true });
     }
 
-    const form = await superValidate(request, schema);
-    console.log('POST', form);
+    const form = await superValidate(request, reserveTicketSchema);
 
     // Convenient validation check:
     if (!form.valid) {
@@ -86,7 +73,7 @@ export const actions: Actions = {
     }
 
     const name = form.data.name as string;
-    const pin = form.data.pin as string;
+    const pin = form.data.pin as number[];
     const profileImage = form.data.profileImage as string;
 
     const show = await Show.findById(showId)
@@ -106,7 +93,7 @@ export const actions: Actions = {
       name,
       roles: [UserRole.TICKET_HOLDER],
       authType: AuthType.PIN,
-      password: pin,
+      password: pin.join(''),
       profileImageUrl: profileImage
     });
 
@@ -278,9 +265,9 @@ export const load: PageServerLoad = async (event) => {
   const form = await superValidate(
     {
       name: displayName,
-      pin: ''
+      pin: Array.from({ length: 8 }, () => Math.floor(Math.random() * 10))
     },
-    schema,
+    reserveTicketSchema,
     {
       errors: false
     }

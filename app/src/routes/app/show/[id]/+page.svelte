@@ -25,7 +25,7 @@
     type: 'component',
     component: 'ReserveShowForm',
     meta: {
-      action: '/app/show/' + data.show._id.toString() + '?/reserve_ticket',
+      action: '?/reserve_ticket',
       profileImage: getProfileImage(displayName, config.UI.profileImagePath),
       form: data.form
     }

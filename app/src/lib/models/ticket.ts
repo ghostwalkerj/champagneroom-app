@@ -108,5 +108,3 @@ export const SaveState = (
 export const Ticket = models?.Ticket
   ? (models.Ticket as Model<TicketDocumentType>)
   : mongoose.model<TicketDocumentType>('Ticket', ticketMongooseSchema);
-
-export { TicketStatus } from '$lib/constants';

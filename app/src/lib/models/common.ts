@@ -145,6 +145,24 @@ export const refundSchema = z.object({
   refundCurrency: z.nativeEnum(CurrencyType).default(CurrencyType.ETH)
 });
 
+export const reserveTicketSchema = z.object({
+  profileImage: z.string().optional(),
+  // 3 char min, 50 char max
+  name: z.string().min(3).max(50),
+  // 8 digit, number pin
+  pin: z
+    .array(
+      z
+        .number({
+          invalid_type_error: 'PIN must be numbers'
+        })
+        .int()
+        .nonnegative()
+        .lt(10)
+    )
+    .length(8, 'PIN must be 8 digits')
+});
+
 export const runtimeSchema = z.object({
   startDate: z.coerce.date().default(() => new Date()),
   endDate: z.coerce.date().optional()
@@ -179,4 +197,4 @@ export const ticketSaleSchema = z.object({
   paymentCurrency: z.nativeEnum(CurrencyType).default(CurrencyType.ETH)
 });
 
-export { transactionSummarySchema as transactionSummarySchema };
+export { transactionSummarySchema };
