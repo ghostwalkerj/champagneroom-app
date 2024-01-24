@@ -265,7 +265,7 @@
         {/key}
 
         {#if canCreateShow}
-          <CreateShow {creator} {onShowCreated} {createShowForm} />
+          <CreateShow {onShowCreated} {createShowForm} />
         {/if}
         <div>
           {#if currentShow}
