@@ -1,8 +1,10 @@
 <script lang="ts">
   import type { WalletDocumentType } from '$lib/models/wallet';
+  import type { requestPayoutSchema } from '$lib/payout';
   import Icon from '@iconify/svelte';
   import { getModalStore } from '@skeletonlabs/skeleton';
   import type { SvelteComponent } from 'svelte';
+  import type { SuperValidated } from 'sveltekit-superforms';
   import { superForm } from 'sveltekit-superforms/client';
 
   // Props
@@ -12,10 +14,9 @@
 
   let meta = $modalStore[0].meta;
   let wallet: WalletDocumentType = meta.wallet;
-  let availableBalance: number = meta.availableBalance || 0;
 
   const { form, errors, constraints, enhance, delayed, message } = superForm(
-    $modalStore[0].meta.form,
+    $modalStore[0].meta.form as SuperValidated<typeof requestPayoutSchema>,
     {
       validationMethod: 'auto',
       onError({ result }) {
@@ -36,6 +37,18 @@
     <h2 class="font-semibold text-xl">Withdraw funds into your own wallet</h2>
 
     <input type="hidden" name="walletId" bind:value={$form.walletId} readonly />
+    <input
+      type="hidden"
+      name="currency"
+      bind:value={$form.payoutReason}
+      readonly
+    />
+    <input
+      type="hidden"
+      name="reason"
+      bind:value={$form.payoutReason}
+      readonly
+    />
 
     <label for="">
       <span>Amount in {wallet.currency}</span>
@@ -53,8 +66,8 @@
         <button
           class="btn variant-soft-secondary"
           type="button"
-          on:click={() => ($form.amount = availableBalance)}
-          >Set Curent Balance</button
+          on:click={() => ($form.amount = wallet.availableBalance)}
+          >Set Current Balance</button
         >
       </div>
       {#if $errors.amount}<span class="text-error">{$errors.amount}</span>{/if}

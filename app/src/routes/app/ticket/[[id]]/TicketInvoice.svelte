@@ -4,14 +4,14 @@
 
   import type { TicketDocumentType } from '$lib/models/ticket';
 
-  import Config from '$lib/models/config';
+  import config from '$lib/config';
   import {
     TicketStatus,
     currencyFormatter,
     durationFormatter
   } from '$lib/constants';
-  import type { PaymentType } from '$lib/payment';
-  import { InvoiceStatus } from '$lib/payment';
+  import type { PaymentType } from '$lib/payout';
+  import { InvoiceStatus } from '$lib/payout';
 
   import type { DisplayInvoice } from '$ext/bitcart/models';
 
@@ -71,7 +71,7 @@
   <!-- Logo and Invoice Header -->
   <div class="flex items-center justify-between bg-black p-4">
     <img
-      src="{Config.PATH.staticUrl}/assets/logo-square.png"
+      src="{config.PATH.staticUrl}/assets/logo-square.png"
       alt="Your Company Logo"
       class="h-12"
     />

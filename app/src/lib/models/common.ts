@@ -10,47 +10,45 @@ import {
   EarningsSource,
   RefundReason
 } from '$lib/constants';
-import { PayoutStatus } from '$lib/payment';
+import { PayoutStatus } from '$lib/payout';
 
-export type CancelType = z.infer<typeof cancelZodSchema>;
+export type CancelType = z.infer<typeof cancelSchema>;
 
-export type DisputeType = z.infer<typeof disputeZodSchema>;
+export type DisputeType = z.infer<typeof disputeSchema>;
 
-export type EarningsType = z.infer<typeof earningsZodSchema>;
+export type EarningsType = z.infer<typeof earningsSchema>;
 
-export type EscrowType = z.infer<typeof escrowZodSchema>;
+export type EscrowType = z.infer<typeof escrowSchema>;
 
-export type FeedbackType = z.infer<typeof ticketFeedbackZodSchema>;
+export type FeedbackType = z.infer<typeof ticketFeedbackSchema>;
 
-export type FinalizeType = z.infer<typeof finalizeZodSchema>;
+export type FinalizeType = z.infer<typeof finalizeSchema>;
 
-export type MoneyType = z.infer<typeof moneyZodSchema>;
+export type MoneyType = z.infer<typeof moneySchema>;
 
-export type PayoutType = z.infer<typeof payoutZodSchema>;
+export type PayoutType = z.infer<typeof payoutSchema>;
 
-export type RefundType = z.infer<typeof refundZodSchema>;
+export type RefundType = z.infer<typeof refundSchema>;
 
-export type SaleType = z.infer<typeof ticketSaleZodSchema>;
+export type SaleType = z.infer<typeof ticketSaleSchema>;
 
-export type TransactionSummaryType = z.infer<
-  typeof transactionSummaryZodSchema
->;
+export type TransactionSummaryType = z.infer<typeof transactionSummarySchema>;
 
-export const cancelZodSchema = z.object({
+export const cancelSchema = z.object({
   cancelledAt: z.coerce.date().default(() => new Date()),
   cancelledInState: z.string().optional(),
   cancelledBy: z.nativeEnum(ActorType),
   reason: z.nativeEnum(CancelReason)
 });
 
-export const creatorInfoZodSchema = z.object({
+export const creatorInfoSchema = z.object({
   name: z.string().trim(),
   profileImageUrl: z.string().trim(),
   averageRating: z.number().min(0).max(5).default(0),
   numberOfReviews: z.number().min(0).default(0)
 });
 
-export const creatorSalesStatsZodSchema = z
+export const creatorSalesStatsSchema = z
   .object({
     totalRevenue: z.record(z.number()).default({}),
     numberOfCompletedShows: z.number().min(0).default(0),
@@ -60,15 +58,7 @@ export const creatorSalesStatsZodSchema = z
   })
   .strict();
 
-export const disputeStatsZodSchema = z.object({
-  totalDisputes: z.number().min(0).default(0),
-  totalDisputesRefunded: z.number().min(0).default(0),
-  totalDisputesResolved: z.number().min(0).default(0),
-  totalDisputesPending: z.number().min(0).default(0)
-});
-
-export const disputeZodSchema = z.object({
-  _id: z.any().optional(),
+export const disputeSchema = z.object({
   startedAt: z.coerce.date().default(() => new Date()),
   endedAt: z.coerce.date().optional(),
   reason: z.nativeEnum(DisputeReason),
@@ -78,7 +68,14 @@ export const disputeZodSchema = z.object({
   resolved: z.boolean().default(false)
 });
 
-export const earningsZodSchema = z.object({
+export const disputeStatsSchema = z.object({
+  totalDisputes: z.number().min(0).default(0),
+  totalDisputesRefunded: z.number().min(0).default(0),
+  totalDisputesResolved: z.number().min(0).default(0),
+  totalDisputesPending: z.number().min(0).default(0)
+});
+
+export const earningsSchema = z.object({
   earnedAt: z.coerce.date().default(() => new Date()),
   amount: z.number().min(0),
   currency: z.nativeEnum(CurrencyType).default(CurrencyType.ETH),
@@ -89,12 +86,12 @@ export const earningsZodSchema = z.object({
   show: z.any()
 });
 
-export const escrowZodSchema = z.object({
+export const escrowSchema = z.object({
   startedAt: z.coerce.date().default(() => new Date()),
   endedAt: z.coerce.date().optional()
 });
 
-const transactionSummaryZodSchema = z.object({
+const transactionSummarySchema = z.object({
   createdAt: z.coerce.date().default(() => new Date()),
   amount: z.number().min(0),
   currency: z.nativeEnum(CurrencyType),
@@ -102,23 +99,23 @@ const transactionSummaryZodSchema = z.object({
   transaction: z.any().optional()
 });
 
-export const feedbackStatsZodSchema = z.object({
+export const feedbackStatsSchema = z.object({
   numberOfReviews: z.number().min(0).default(0),
   averageRating: z.number().min(0).max(5).default(0),
   comments: z.array(z.string().trim()).default([])
 });
 
-export const finalizeZodSchema = z.object({
+export const finalizeSchema = z.object({
   finalizedAt: z.coerce.date().default(() => new Date()),
   finalizedBy: z.nativeEnum(ActorType)
 });
 
-export const moneyZodSchema = z.object({
+export const moneySchema = z.object({
   amount: z.number().min(0).default(0),
   currency: z.nativeEnum(CurrencyType).default(CurrencyType.USD)
 });
 
-export const payoutZodSchema = z.object({
+export const payoutSchema = z.object({
   payoutAt: z.coerce.date().default(() => new Date()),
   amount: z.number().min(0),
   destination: z
@@ -132,35 +129,53 @@ export const payoutZodSchema = z.object({
   transaction: z.any().optional()
 });
 
-export const redemptionZodSchema = z
+export const redemptionSchema = z
   .object({
     redeemedAt: z.coerce.date().default(() => new Date())
   })
   .strict();
 
-export const refundZodSchema = z.object({
+export const refundSchema = z.object({
   requestedAt: z.coerce.date().default(() => new Date()),
   requestedAmount: z.number().min(0).default(0),
   approvedAmount: z.number().min(0).default(0),
   total: z.number().min(0).default(0),
-  payouts: z.array(transactionSummaryZodSchema).default([]),
+  payouts: z.array(transactionSummarySchema).default([]),
   reason: z.nativeEnum(RefundReason),
   refundCurrency: z.nativeEnum(CurrencyType).default(CurrencyType.ETH)
 });
 
-export const runtimeZodSchema = z.object({
+export const reserveTicketSchema = z.object({
+  profileImage: z.string().optional(),
+  // 3 char min, 50 char max
+  name: z.string().min(3).max(50),
+  // 8 digit, number pin
+  pin: z
+    .array(
+      z
+        .number({
+          invalid_type_error: 'PIN must be numbers'
+        })
+        .int()
+        .nonnegative()
+        .lt(10)
+    )
+    .length(8, 'PIN must be 8 digits')
+});
+
+export const runtimeSchema = z.object({
   startDate: z.coerce.date().default(() => new Date()),
   endDate: z.coerce.date().optional()
 });
 
-export const showSalesStatsZodSchema = z.object({
+export const showSalesStatsSchema = z.object({
   ticketsAvailable: z.number().min(0).default(0),
   ticketsSold: z.number().min(0).default(0),
   ticketsReserved: z.number().min(0).default(0),
   ticketsRefunded: z.number().min(0).default(0),
   ticketsFinalized: z.number().min(0).default(0),
   ticketsRedeemed: z.number().min(0).default(0),
-  ticketSalesAmount: moneyZodSchema.default({
+  ticketSalesAmount: moneySchema.default({
     amount: 0,
     currency: CurrencyType.USD
   }),
@@ -169,17 +184,17 @@ export const showSalesStatsZodSchema = z.object({
   totalRefunds: z.record(z.number().min(0)).default({})
 });
 
-export const ticketFeedbackZodSchema = z.object({
+export const ticketFeedbackSchema = z.object({
   rating: z.number().min(1).max(5),
   review: z.string().min(0).max(500).optional(),
   createdAt: z.coerce.date().default(() => new Date())
 });
 
-export const ticketSaleZodSchema = z.object({
+export const ticketSaleSchema = z.object({
   soldAt: z.coerce.date().default(() => new Date()),
-  payments: z.array(transactionSummaryZodSchema).default([]),
+  payments: z.array(transactionSummarySchema).default([]),
   total: z.number().min(0).default(0),
   paymentCurrency: z.nativeEnum(CurrencyType).default(CurrencyType.ETH)
 });
 
-export { transactionSummaryZodSchema };
+export { transactionSummarySchema };

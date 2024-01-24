@@ -5,7 +5,6 @@ import { derived, writable } from 'svelte/store';
 import urlJoin from 'url-join';
 
 import type { AgentDocument } from '$lib/models/agent';
-import Config from '$lib/models/config';
 import type { CreatorDocument } from '$lib/models/creator';
 import type { RoomDocumentType } from '$lib/models/room';
 import type { ShowDocument } from '$lib/models/show';
@@ -13,6 +12,8 @@ import type { ShowEventDocument } from '$lib/models/showEvent';
 import type { TicketDocument } from '$lib/models/ticket';
 import type { UserDocument } from '$lib/models/user';
 import type { WalletDocument } from '$lib/models/wallet';
+
+import config from '$lib/config';
 
 const enum EntityType {
   AGENT = 'Agent',
@@ -83,7 +84,7 @@ const getUpdateNotification = <T>({
   callback: (changeset: Partial<T>) => void;
   type: EntityType;
 }) => {
-  const path = urlJoin(Config.PATH.notifyUpdate, id, '?type=' + type);
+  const path = urlJoin(config.PATH.notifyUpdate, id, '?type=' + type);
   const abortDocument = new AbortController();
   const waitFor = async () => {
     let shouldLoop = true;
@@ -127,7 +128,7 @@ const getInsertNotification = <T>({
   const queryString = relatedField
     ? typeQuery + '&relatedField=' + relatedField
     : typeQuery;
-  const path = urlJoin(Config.PATH.notifyInsert, id, queryString);
+  const path = urlJoin(config.PATH.notifyInsert, id, queryString);
   const abortDocument = new AbortController();
   const waitFor = async () => {
     let shouldLoop = true;

@@ -2,25 +2,19 @@
   import { possessive } from 'i18n-possessive';
   import urlJoin from 'url-join';
 
-  import type { ShowDocument, showZodSchema } from '$lib/models/show';
+  import type { ShowDocument, showCRUDSchema } from '$lib/models/show';
 
-  import Config from '$lib/models/config';
+  import config from '$lib/config';
   import { durationFormatter } from '$lib/constants';
-
-  import type { CreatorDocument } from '$lib/models/creator';
 
   import { RangeSlider } from '@skeletonlabs/skeleton';
   import { superForm } from 'sveltekit-superforms/client';
+  import Icon from '@iconify/svelte';
   import type { SuperValidated } from 'sveltekit-superforms';
 
-  export let createShowForm: SuperValidated<typeof showZodSchema>;
-  export let creator: CreatorDocument;
+  export let createShowForm: SuperValidated<typeof showCRUDSchema>;
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   export let onShowCreated: (show: ShowDocument) => void;
-
-  let showName = creator
-    ? possessive(creator.user.name, 'en') + ' Show'
-    : 'Show';
 
   const {
     form: showForm,
@@ -38,7 +32,7 @@
           case result.data!.showCreated: {
             const showUrl = urlJoin(
               window.location.origin,
-              Config.PATH.show,
+              config.PATH.show,
               result.data!.show!._id.toString()
             );
             navigator.clipboard.writeText(showUrl);
@@ -65,7 +59,6 @@
       <input
         type="text"
         name="name"
-        placeholder={showName}
         bind:value={$showForm.name}
         {...$constraints.name}
         class="input variant-form-material bg-surface-700"
@@ -82,6 +75,7 @@
         <input
           type="number"
           name="price"
+          placeholder="10"
           bind:value={$showForm.price.amount}
           {...$constraints.price?.amount}
         />
@@ -96,7 +90,7 @@
     name="duration"
     accent={'accent-primary'}
     bind:value={$showForm.duration}
-    min={0}
+    min={5}
     max={120}
     step={15}
     ticked
@@ -108,7 +102,12 @@
 
   <button
     class="btn variant-soft-primary !font-bold btn-lg text-xl neon-primary"
-    disabled={!delayed}>Create Show</button
+    disabled={$delayed}
+    type="submit"
+  >
+    {#if $delayed}
+      <Icon icon="eos-icons:loading" />{/if}
+    Create Show</button
   >
 
   <!--HIDDEN INPUTS-->

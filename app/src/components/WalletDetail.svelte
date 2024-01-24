@@ -5,12 +5,12 @@
   import { currencyFormatter } from '$lib/constants';
   import Icon from '@iconify/svelte';
   import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
-  import type { ActionData } from '../routes/app/$types';
+  import type { SuperValidated } from 'sveltekit-superforms';
+  import type { requestPayoutSchema } from '$lib/payout';
 
-  export let destination = '';
   export let exchangeRate = 0;
   export let wallet: WalletDocumentType;
-  export let withdrawForm: ActionData;
+  export let payoutForm: SuperValidated<typeof requestPayoutSchema>;
 
   const modalStore = getModalStore();
 
@@ -24,12 +24,10 @@
 
   const modal: ModalSettings = {
     type: 'component',
-    component: 'WithdrawForm',
+    component: 'PayoutForm',
     meta: {
-      form: withdrawForm,
-      wallet,
-      exchangeRate,
-      destination
+      form: payoutForm,
+      wallet
     }
   };
 
@@ -69,7 +67,9 @@
           </span>
         {/if}
       </p>
-      <p>{currencyFormatter(wallet.currency).format(availableBalance)}</p>
+      <span class="font-semibold"
+        >{currencyFormatter(wallet.currency).format(availableBalance)}</span
+      >
     </div>
 
     <div class="flex gap-2">

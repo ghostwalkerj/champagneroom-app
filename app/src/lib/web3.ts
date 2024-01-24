@@ -1,3 +1,4 @@
+import coinbaseWalletModule from '@web3-onboard/coinbase';
 import Onboard from '@web3-onboard/core';
 import type { Account, WalletState } from '@web3-onboard/core/dist/types';
 import frameModule from '@web3-onboard/frame';
@@ -13,21 +14,22 @@ import {
   PUBLIC_WALLET_CONNECT_PROJECT_ID
 } from '$env/static/public';
 
-import Config from '$lib/models/config';
+import config from '$lib/config';
 
 // Wallets
 const injected = injectedModule();
+const coinbaseWalletSdk = coinbaseWalletModule({ darkMode: true });
 const frame = frameModule();
 const trezor = trezorModule({
   email: 'admin@champagneroom.app',
-  appUrl: Config.PATH.websiteUrl
+  appUrl: config.PATH.websiteUrl
 });
 
 const wcV2InitOptions = {
   version: 2 as const,
   projectId: PUBLIC_WALLET_CONNECT_PROJECT_ID,
   requiredChains: [1],
-  dappUrl: Config.PATH.websiteUrl
+  dappUrl: config.PATH.websiteUrl
 };
 const walletConnect = walletConnectModule(wcV2InitOptions);
 
@@ -37,14 +39,24 @@ const ledger = ledgerModule({
   requiredChains: [1]
 });
 
-const wallets = [injected, walletConnect, ledger, frame, trezor];
+const wallets = [
+  injected,
+  walletConnect,
+  ledger,
+  coinbaseWalletSdk,
+  frame,
+  trezor
+];
 
 const appMetadata = {
   name: 'Champagne Room',
   description: 'Living Large in the Champagne Room',
-  icon: `${Config.PATH.staticUrl}/assets/logo-tr.png`,
-  logo: `${Config.PATH.staticUrl}/assets/logo-horizontal-tr.png`,
-  recommendedInjectedWallets: [{ name: 'MetaMask', url: 'https://metamask.io' }]
+  icon: `${config.PATH.staticUrl}/assets/logo-tr.png`,
+  logo: `${config.PATH.staticUrl}/assets/logo-horizontal-tr.png`,
+  recommendedInjectedWallets: [
+    { name: 'Coinbase', url: 'https://wallet.coinbase.com/' },
+    { name: 'MetaMask', url: 'https://metamask.io' }
+  ]
 };
 
 const chains = [

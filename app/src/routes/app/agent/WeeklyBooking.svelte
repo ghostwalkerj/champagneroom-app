@@ -5,6 +5,7 @@
   import { Line } from 'svelte-chartjs';
 
   import type { CreatorDocument } from '$lib/models/creator';
+  import Icon from '@iconify/svelte';
 
   export let creators: CreatorDocument[];
   export let weeklyData: {
@@ -79,9 +80,14 @@
   Chart.register(autocolors);
 </script>
 
-<div class="bg-primary text-primary-content daisy-card">
-  <div class="text-center daisy-card-body items-center">
-    <div class="text-2xl daisy-card-title capitalize">Weekly Bookings</div>
+<div
+  class="bg-custom p-4 rounded flex flex-col gap-4 justify-center items-center"
+>
+  <div class="flex flex-col gap-0 items-center text-center">
+    <h2 class="text-xl font-semibold flex gap-2 items-center">
+      <Icon class="text-secondary" icon="mdi:dance-pole" />
+      Weekly Bookings
+    </h2>
     {#if creators && creators.length > 0}
       {#if datasets.length > 0}
         {#key datasets}

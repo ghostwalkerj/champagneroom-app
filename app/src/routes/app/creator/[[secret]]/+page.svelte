@@ -4,7 +4,7 @@
   import type { Unsubscriber } from 'svelte/store';
 
   import type { CreatorDocument } from '$lib/models/creator';
-  import type { ShowDocument } from '$lib/models/show';
+  import type { showCRUDSchema, ShowDocument } from '$lib/models/show';
   import type { ShowEventDocument } from '$lib/models/showEvent';
   import type { WalletDocument } from '$lib/models/wallet';
 
@@ -27,15 +27,16 @@
   import ShowStatus from './ShowStatus.svelte';
 
   import { page } from '$app/stores';
-  import type { roomZodSchema } from '$lib/models/room';
   import type { UserDocument } from '$lib/models/user';
   import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
-  import type { SuperValidated } from 'sveltekit-superforms';
   import type { Subscription } from 'xstate';
   import type { PageData } from './$types';
   import CreatorDetail from './CreatorDetail.svelte';
   import RoomDetail from './RoomDetail.svelte';
   import VideoMeeting from './VideoMeeting.svelte';
+  import type { SuperValidated } from 'sveltekit-superforms';
+  import type { roomCRUDSchema } from '$lib/models/room';
+  import type { requestPayoutSchema } from '$lib/payout';
 
   export let data: PageData;
 
@@ -47,7 +48,11 @@
   let exchangeRate = +data.exchangeRate || 0;
   let jitsiToken = data.jitsiToken as string;
   let user = data.user as UserDocument;
-  $: roomForm = data.roomForm as SuperValidated<typeof roomZodSchema>;
+  $: roomForm = data.roomForm as SuperValidated<typeof roomCRUDSchema>;
+  $: createShowForm = data.createShowForm as SuperValidated<
+    typeof showCRUDSchema
+  >;
+  $: payoutForm = data.payoutForm as SuperValidated<typeof requestPayoutSchema>;
 
   $: showVideo = false;
 
@@ -260,12 +265,7 @@
         {/key}
 
         {#if canCreateShow}
-          <CreateShow
-            bind:isLoading
-            {creator}
-            {onShowCreated}
-            createShowForm={data.createShowForm}
-          />
+          <CreateShow {onShowCreated} {createShowForm} />
         {/if}
         <div>
           {#if currentShow}
@@ -300,12 +300,7 @@
         <!-- Wallet -->
         <div>
           {#key wallet}
-            <WalletDetail
-              {wallet}
-              {exchangeRate}
-              {destination}
-              withdrawForm={data.requestPayoutForm}
-            />
+            <WalletDetail {wallet} {exchangeRate} {payoutForm} />
           {/key}
         </div>
 

@@ -7,6 +7,7 @@
 
   import { CurrencyType, currencyFormatter } from '$lib/constants';
   import spacetime from 'spacetime';
+  import Icon from '@iconify/svelte';
 
   export let creators: CreatorDocument[];
   export let showData: {
@@ -62,11 +63,15 @@
   Chart.register(ChartDataLabels);
 </script>
 
-<div class="bg-primary text-primary-content daisy-card">
-  <div class="text-center daisy-card-body items-center">
-    <div class="text-2xl daisy-card-title capitalize">
-      Top Creators - {now.monthName()}
-    </div>
+<div
+  class="bg-custom p-4 rounded flex flex-col gap-4 justify-center items-center"
+>
+  <div class="flex flex-col gap-0 items-center text-center">
+    <h2 class="text-xl font-semibold flex gap-2 items-center">
+      <Icon class="text-secondary" icon="circum:trophy" />
+      Top Creators - {now.format('month')}
+    </h2>
+
     {#if creators && creators.length > 0}
       {#if creatorData.length > 0}
         {#key creatorData}

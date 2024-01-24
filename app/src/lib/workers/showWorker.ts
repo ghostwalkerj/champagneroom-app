@@ -7,21 +7,21 @@ import type { AgentDocument } from '$lib/models/agent';
 import { Agent } from '$lib/models/agent';
 import {
   type CancelType,
-  type FinalizeType,
-  finalizeZodSchema
+  finalizeSchema,
+  type FinalizeType
 } from '$lib/models/common';
-import Config from '$lib/models/config';
 import type { CreatorDocument } from '$lib/models/creator';
 import { Creator } from '$lib/models/creator';
 import type { ShowDocument } from '$lib/models/show';
 import { SaveState, Show } from '$lib/models/show';
 import { createShowEvent } from '$lib/models/showEvent';
 import type { TicketDocument } from '$lib/models/ticket';
-import { Ticket, TicketStatus } from '$lib/models/ticket';
+import { Ticket } from '$lib/models/ticket';
 
 import { createShowMachineService } from '$lib/machines/showMachine';
 import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
 
+import config from '$lib/config';
 import {
   ActorType,
   DisputeDecision,
@@ -29,9 +29,10 @@ import {
   ShowMachineEventString,
   ShowStatus,
   TicketMachineEventString,
+  TicketStatus,
   WalletMachineEventString
 } from '$lib/constants';
-import { PayoutJobType } from '$lib/payment';
+import { PayoutJobType } from '$lib/payout';
 import {
   getTicketMachineService,
   getWalletMachineServiceFromId
@@ -248,7 +249,7 @@ const stopShow = async (show: ShowDocument, showQueue: ShowQueueType) => {
     {
       showId: show._id.toString()
     },
-    { delay: Config.TIMER.gracePeriod }
+    { delay: config.TIMER.gracePeriod }
   );
   showService.stop();
   return 'success';
@@ -268,7 +269,7 @@ const endShow = async (show: ShowDocument, showQueue: ShowQueueType) => {
   const showState = showService.getSnapshot();
   if (showState.matches('stopped')) {
     showService.send(ShowMachineEventString.SHOW_ENDED);
-    const finalize = finalizeZodSchema.parse({
+    const finalize = finalizeSchema.parse({
       finalizedBy: ActorType.TIMER
     });
     showQueue.add(
@@ -277,7 +278,7 @@ const endShow = async (show: ShowDocument, showQueue: ShowQueueType) => {
         showId: show._id.toString(),
         finalize
       },
-      { delay: Config.TIMER.escrowPeriod }
+      { delay: config.TIMER.escrowPeriod }
     );
 
     // Tell ticket holders the show is over folks

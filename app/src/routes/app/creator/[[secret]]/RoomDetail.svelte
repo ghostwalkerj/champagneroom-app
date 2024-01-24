@@ -1,15 +1,16 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import CopyText from '$components/forms/CopyText.svelte';
-  import Config from '$lib/models/config';
-  import { roomZodSchema } from '$lib/models/room';
+  import config from '$lib/config';
   import Icon from '@iconify/svelte';
   import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
   import type { SuperValidated } from 'sveltekit-superforms';
   import urlJoin from 'url-join';
+  import type { roomCRUDSchema } from '$lib/models/room';
 
-  export let roomForm: SuperValidated<typeof roomZodSchema>;
-  $: room = roomZodSchema.parse(roomForm.data);
+  export let roomForm: SuperValidated<typeof roomCRUDSchema>;
+
+  let room = roomForm.data;
 
   const modalStore = getModalStore();
 
@@ -25,7 +26,7 @@
 
   $: roomUrl = urlJoin(
     $page.url.origin,
-    Config.PATH.room,
+    config.PATH.room,
     roomForm.data.uniqueUrl
   );
 </script>
@@ -46,7 +47,6 @@
         Name: <span class="font-semibold">{room.name}</span>
       </div>
       <div class="text-sm">"{room.tagLine}""</div>
-      bannerImageUrl
       <div class="overflow-hidden m-4 max-w-fit">
         <!-- svelte-ignore a11y-missing-attribute -->
         <img

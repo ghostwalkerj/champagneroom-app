@@ -5,7 +5,7 @@
 
   import { page } from '$app/stores';
 
-  import Config from '$lib/models/config';
+  import config from '$lib/config';
   import Icon from '@iconify/svelte';
 
   export let callBack: (argument0: string) => void;
@@ -63,7 +63,7 @@
     progressVisibility = 'visible';
     let formData = new FormData();
     formData.append('file', file);
-    const uploadUrl = urlJoin($page.url.origin, Config.PATH.imageUpload);
+    const uploadUrl = urlJoin($page.url.origin, config.PATH.imageUpload);
     const response = await fetch(uploadUrl, {
       method: 'POST',
       body: formData

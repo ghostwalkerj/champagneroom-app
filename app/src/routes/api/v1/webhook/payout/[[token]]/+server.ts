@@ -1,12 +1,12 @@
+import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 
 import { AUTH_SALT } from '$env/static/private';
 
 import { EntityType } from '$lib/constants';
 import { authDecrypt } from '$lib/crypt';
-import { PayoutJobType } from '$lib/payment';
+import { PayoutJobType } from '$lib/payout';
 
-import { Queue } from 'bullmq';
 import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request, locals, params }) => {

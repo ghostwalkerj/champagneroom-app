@@ -1,11 +1,11 @@
 import { error, fail } from '@sveltejs/kit';
 import { Queue } from 'bullmq';
+import { possessive, possessive } from 'i18n-possessive';
 import type IORedis from 'ioredis';
 import jwt from 'jsonwebtoken';
 import { ObjectId } from 'mongodb';
 import type { SuperValidated } from 'sveltekit-superforms';
-import { message, setError, superValidate } from 'sveltekit-superforms/server';
-import { z } from 'zod';
+import { message, superValidate } from 'sveltekit-superforms/server';
 
 import {
   BITCART_API_URL,
@@ -21,17 +21,16 @@ import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
 import type { CancelType } from '$lib/models/common';
 import { Creator, type CreatorDocument } from '$lib/models/creator';
-import type {
-  ShowDocument,
-  showZodSchema,
-  showZodSchema
-} from '$lib/models/show';
-import { Show, showCRUDZodSchema } from '$lib/models/show';
-import type { ShowEventDocument } from '$lib/models/showEvent';
-import { ShowEvent } from '$lib/models/showEvent';
+import {
+  Room,
+  roomCRUDSchema,
+  type RoomDocument,
+  roomSchema
+} from '$lib/models/room';
+import { Show, showCRUDSchema, type ShowDocument } from '$lib/models/show';
+import { ShowEvent, type ShowEventDocument } from '$lib/models/showEvent';
 import type { UserDocument } from '$lib/models/user';
 import type { WalletDocument } from '$lib/models/wallet';
-import { Wallet, WalletStatus } from '$lib/models/wallet';
 
 import type { ShowMachineEventType } from '$lib/machines/showMachine';
 
@@ -47,22 +46,16 @@ import {
   ShowStatus
 } from '$lib/constants';
 import { rateCryptosRateGet } from '$lib/ext/bitcart';
-import { createBitcartToken, PayoutJobType, PayoutReason } from '$lib/payment';
-import { getShowMachineService } from '$lib/server/machinesUtil';
 import {
-  Room,
-  type RoomDocument,
-  roomZodSchema
-} from '$lib/server/models/room';
+  createBitcartToken,
+  PayoutJobType,
+  PayoutReason,
+  requestPayoutSchema
+} from '$lib/payout';
+import { getShowMachineService } from '$lib/server/machinesUtil';
 import { web3Upload } from '$lib/server/upload';
 
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
-
-const requestPayoutSchema = z.object({
-  amount: z.number().min(0.0001),
-  destination: z.string().min(3),
-  walletId: z.string().min(16).max(64)
-});
 
 export const actions: Actions = {
   update_profile_image: async ({ locals, request }: RequestEvent) => {
@@ -85,8 +78,8 @@ export const actions: Actions = {
   create_show: async ({ locals, request }) => {
     const form = (await superValidate(
       request,
-      showCRUDZodSchema
-    )) as SuperValidated<typeof showCRUDZodSchema>;
+      showCRUDSchema
+    )) as SuperValidated<typeof showCRUDSchema>;
 
     if (!form.valid) {
       console.log(form.data);
@@ -112,10 +105,9 @@ export const actions: Actions = {
         averageRating: creator.feedbackStats.averageRating,
         numberOfReviews: creator.feedbackStats.numberOfReviews
       }
-    })) as RoomDocument;
+    })) as ShowDocument;
 
     return {
-      createShowForm: form,
       success: true,
       showCreated: true,
       show: show.toJSON({ flattenMaps: true, flattenObjectIds: true }),
@@ -194,51 +186,33 @@ export const actions: Actions = {
     };
   },
   request_payout: async ({ request, locals }) => {
-    const data = await request.formData();
-    const amount = data.get('amount') as string;
-    const destination = data.get('destination') as string;
-    const walletId = data.get('walletId') as string;
-
     const form = await superValidate(request, requestPayoutSchema);
+    const { walletId, amount, destination, payoutReason, jobType } = form.data;
 
     if (!form.valid) {
       return fail(400, { form });
     }
 
     try {
-      const wallet = await Wallet.findOne({ _id: walletId }).orFail();
-
-      if (!wallet) {
-        setError(form, 'walletId', 'Wallet not found');
-      }
-
-      if (wallet.availableBalance < +amount) {
-        setError(form, 'amount', 'Insufficient funds');
-      }
-
-      if (wallet.status === WalletStatus.PAYOUT_IN_PROGRESS) {
-        setError(form, 'destination', 'Payout in progress');
-      }
-
       const redisConnection = locals.redisConnection as IORedis;
       const payoutQueue = new Queue(EntityType.PAYOUT, {
         connection: redisConnection
       }) as PayoutQueueType;
 
-      payoutQueue.add(PayoutJobType.CREATE_PAYOUT, {
+      payoutQueue.add(jobType, {
         walletId,
-        amount: +amount,
+        amount,
         destination,
-        payoutReason: PayoutReason.CREATOR_PAYOUT
+        payoutReason
       });
 
       payoutQueue.close();
     } catch {
       return message(form, 'Error requesting payout');
     }
-
     return message(form, 'Payout requested successfully');
   },
+
   leave_show: async ({ locals }) => {
     const redisConnection = locals.redisConnection as IORedis;
     const show = locals.show;
@@ -289,7 +263,7 @@ export const actions: Actions = {
     const creator = locals.creator as CreatorDocument;
     const formData = await request.formData();
 
-    const form = await superValidate(formData, roomZodSchema);
+    const form = await superValidate(formData, roomCRUDSchema);
 
     const isUpdate = !!form.data._id;
     // Convenient validation check:
@@ -429,30 +403,40 @@ export const load: PageServerLoad = async ({ locals }) => {
           flattenMaps: true,
           flattenObjectIds: true
         }),
-        roomZodSchema
+        roomSchema
       )
-    : ((await superValidate(roomZodSchema)) as SuperValidated<
-        typeof roomZodSchema
-      >);
+    : ((await superValidate(roomSchema)) as SuperValidated<typeof roomSchema>);
+
+  const showName = creator
+    ? possessive(creator.user.name, 'en') + ' Show'
+    : 'Show';
 
   const createShowForm = (await superValidate(
-    showCRUDZodSchema
-  )) as SuperValidated<typeof showCRUDZodSchema>;
-  const requestPayoutForm = await superValidate(
+    {
+      name: showName
+    },
+    showCRUDSchema,
+    {
+      errors: false
+    }
+  )) as SuperValidated<typeof showCRUDSchema>;
+
+  const payoutForm = await superValidate(
     {
       amount: 0,
-      destination:
-        user?.toJSON({ flattenMaps: true, flattenObjectIds: true }).address ||
-        '',
-      walletId: wallet._id.toString()
+      destination: user?.address,
+      walletId: wallet._id.toString(),
+      payoutReason: PayoutReason.CREATOR_PAYOUT,
+      jobType: PayoutJobType.CREATE_PAYOUT
     },
     requestPayoutSchema,
     { errors: false }
   );
 
   return {
-    requestPayoutForm,
+    payoutForm,
     createShowForm,
+    roomForm,
     creator: creator.toJSON({ flattenMaps: true, flattenObjectIds: true }),
     user: user?.toJSON({ flattenMaps: true, flattenObjectIds: true }),
     show: show
@@ -472,7 +456,6 @@ export const load: PageServerLoad = async ({ locals }) => {
     jitsiToken,
     room: room
       ? room.toJSON({ flattenMaps: true, flattenObjectIds: true })
-      : undefined,
-    roomForm
+      : undefined
   };
 };

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Config from '$lib/models/config';
+  import config from '$lib/config';
   import getProfileImage from '$lib/profilePhoto';
 
   import ShowDetail from '$components/ShowDetail.svelte';
@@ -25,8 +25,8 @@
     type: 'component',
     component: 'ReserveShowForm',
     meta: {
-      action: '/app/show/' + data.show._id.toString() + '?/reserve_ticket',
-      profileImage: getProfileImage(displayName, Config.UI.profileImagePath),
+      action: '?/reserve_ticket',
+      profileImage: getProfileImage(displayName, config.UI.profileImagePath),
       form: data.form
     }
   };
@@ -40,7 +40,7 @@
         <NeonBlur>
           <button
             on:click={() => modalStore.trigger(modal)}
-            class="btn btn-xl font-semibold rounded-lg bg-surface-700 variant-filled relative font-SpaceGrotesk"
+            class="btn btn-xl font-semibold rounded-lg variant-filled bg-white relative"
             >Reserve Ticket</button
           >
         </NeonBlur>

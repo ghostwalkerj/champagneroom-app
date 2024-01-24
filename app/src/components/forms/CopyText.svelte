@@ -34,7 +34,7 @@
 {:else}
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <button
-    class={$$props.class}
+    class={$$props.class + ' [&>*]:pointer-events-none'}
     use:copy={{ text: copyValue }}
     use:popup={popupHover}
     on:copied={handleCopied}

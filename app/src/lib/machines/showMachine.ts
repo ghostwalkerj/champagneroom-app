@@ -5,13 +5,13 @@ import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 import { raise } from 'xstate/lib/actions';
 
 import {
-  disputeStatsZodSchema,
-  escrowZodSchema,
-  finalizeZodSchema,
-  runtimeZodSchema,
-  showSalesStatsZodSchema,
   type CancelType,
-  type FinalizeType
+  disputeStatsSchema,
+  escrowSchema,
+  finalizeSchema,
+  type FinalizeType,
+  runtimeSchema,
+  showSalesStatsSchema
 } from '$lib/models/common';
 import type { ShowDocument } from '$lib/models/show';
 import type { TicketDocument } from '$lib/models/ticket';
@@ -218,7 +218,7 @@ const createShowMachine = ({
                       'receiveResolution',
                       raise({
                         type: 'SHOW FINALIZED',
-                        finalize: finalizeZodSchema.parse({
+                        finalize: finalizeSchema.parse({
                           finalizedBy: ActorType.ARBITRATOR
                         })
                       })
@@ -411,7 +411,7 @@ const createShowMachine = ({
             showState: {
               ...context.showState,
               status: ShowStatus.LIVE,
-              runtime: runtimeZodSchema.parse({})
+              runtime: runtimeSchema.parse({})
             }
           };
         }),
@@ -421,7 +421,7 @@ const createShowMachine = ({
             showState: {
               ...context.showState,
               status: ShowStatus.IN_ESCROW,
-              escrow: escrowZodSchema.parse({}),
+              escrow: escrowSchema.parse({}),
               current: false
             }
           };
@@ -437,7 +437,7 @@ const createShowMachine = ({
             showState: {
               ...context.showState,
               status: ShowStatus.STOPPED,
-              runtime: runtimeZodSchema.parse({
+              runtime: runtimeSchema.parse({
                 ...context.showState.runtime,
                 endDate: new Date()
               })
@@ -450,7 +450,7 @@ const createShowMachine = ({
             showState: {
               ...context.showState,
               status: ShowStatus.CANCELLATION_INITIATED,
-              salesStats: showSalesStatsZodSchema.parse({
+              salesStats: showSalesStatsSchema.parse({
                 ...context.showState.salesStats,
                 ticketsAvailable: 0
               }),
@@ -475,7 +475,7 @@ const createShowMachine = ({
               ...st,
               status: ShowStatus.IN_DISPUTE,
               disputes: [...st.disputes, event.ticket._id],
-              disputeStats: disputeStatsZodSchema.parse({
+              disputeStats: disputeStatsSchema.parse({
                 ...st.disputeStats,
                 totalDisputes: st.disputeStats.totalDisputes + 1,
                 totalDisputesPending: st.disputeStats.totalDisputesPending + 1
@@ -489,7 +489,7 @@ const createShowMachine = ({
           const refunded = event.decision === DisputeDecision.NO_REFUND ? 0 : 1;
           const showState = {
             ...st,
-            disputeStats: disputeStatsZodSchema.parse({
+            disputeStats: disputeStatsSchema.parse({
               ...st.disputeStats,
               totalDisputesPending: st.disputeStats.totalDisputesPending - 1,
               totalDisputesResolved: st.disputeStats.totalDisputesResolved + 1,
@@ -514,7 +514,7 @@ const createShowMachine = ({
           return {
             showState: {
               ...st,
-              salesStats: showSalesStatsZodSchema.parse({
+              salesStats: showSalesStatsSchema.parse({
                 ...salesStats
               })
             }
@@ -537,7 +537,7 @@ const createShowMachine = ({
           return {
             showState: {
               ...st,
-              salesStats: showSalesStatsZodSchema.parse({
+              salesStats: showSalesStatsSchema.parse({
                 ...st.salesStats,
                 ticketsAvailable: st.salesStats.ticketsAvailable + 1,
                 ticketsReserved: st.salesStats.ticketsReserved - 1
@@ -552,7 +552,7 @@ const createShowMachine = ({
           return {
             showState: {
               ...st,
-              salesStats: showSalesStatsZodSchema.parse({
+              salesStats: showSalesStatsSchema.parse({
                 ...st.salesStats,
                 ticketsAvailable: st.salesStats.ticketsAvailable - 1,
                 ticketsReserved: st.salesStats.ticketsReserved + 1
@@ -568,7 +568,7 @@ const createShowMachine = ({
           return {
             showState: {
               ...st,
-              salesStats: showSalesStatsZodSchema.parse({
+              salesStats: showSalesStatsSchema.parse({
                 ...st.salesStats,
                 ticketsRedeemed: st.salesStats.ticketsRedeemed + 1
               })
@@ -607,7 +607,7 @@ const createShowMachine = ({
           return {
             showState: {
               ...context.showState,
-              escrow: escrowZodSchema.parse({
+              escrow: escrowSchema.parse({
                 ...escrow,
                 endedAt: new Date()
               }),

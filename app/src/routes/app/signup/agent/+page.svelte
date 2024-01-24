@@ -6,7 +6,7 @@
   import { applyAction, enhance } from '$app/forms';
   import { goto } from '$app/navigation';
 
-  import Config from '$lib/models/config';
+  import config from '$lib/config';
   import { defaultWallet, selectedAccount } from '$lib/web3';
   import { womensNames } from '$lib/womensNames';
 
@@ -31,7 +31,7 @@
   let addressModel: HTMLDialogElement;
   let signupModel: HTMLDialogElement;
   let existsModel: HTMLDialogElement;
-  let profileImageUrl = Config.UI.defaultProfileImage;
+  let profileImageUrl = config.UI.defaultProfileImage;
 
   let exampleName = user
     ? user.name
@@ -93,9 +93,8 @@
       formData.append('signature', signature);
     }
 
-    return async ({ result }: {result: ActionResult}) => {
-
-      if (result.type === 'success' ) {
+    return async ({ result }: { result: ActionResult }) => {
+      if (result.type === 'success') {
         goto(result.data!.returnPath);
       } else {
         if (result.type === 'failure' && result.data!.alreadyAgent) {
@@ -133,7 +132,7 @@
         <div class="w-full flex flex-col place-content-center">
           <div class="w-full flex place-content-center">
             <img
-              src="{Config.PATH.staticUrl}/assets/bottlesnlegs.png"
+              src="{config.PATH.staticUrl}/assets/bottlesnlegs.png"
               alt="Logo"
               class="h-16"
             />
@@ -167,7 +166,7 @@
       <div>
         <div class="w-full flex place-content-center">
           <img
-            src="{Config.PATH.staticUrl}/assets/bottlesnlegs.png"
+            src="{config.PATH.staticUrl}/assets/bottlesnlegs.png"
             alt="Logo"
             class="h-16"
           />
@@ -200,7 +199,7 @@
         <div class="w-full flex flex-col place-content-center">
           <div class="w-full flex place-content-center">
             <img
-              src="{Config.PATH.staticUrl}/assets/bottlesnlegs.png"
+              src="{config.PATH.staticUrl}/assets/bottlesnlegs.png"
               alt="Logo"
               class="h-16"
             />
@@ -221,7 +220,7 @@
             class="daisy-btn daisy-btn-primary daisy-btn-outline"
             on:click={() => {
               existsModel.close();
-              goto(Config.PATH.agent);
+              goto(config.PATH.agent);
             }}>Sign In</button
           >
           <button
@@ -250,7 +249,7 @@
     >
       <div class="w-full flex place-content-center">
         <img
-          src="{Config.PATH.staticUrl}/assets/bottlesnlegs.png"
+          src="{config.PATH.staticUrl}/assets/bottlesnlegs.png"
           alt="Logo"
           class="h-16"
         />
@@ -291,7 +290,7 @@
           <input
             type="text"
             name="defaultCommissionRate"
-            placeholder={Config.UI.defaultCommissionRate.toString()}
+            placeholder={config.UI.defaultCommissionRate.toString()}
             class="daisy-input daisy-input-bordered daisy-input-primary w-full max-w-xs daisy-input-sm"
           />
 

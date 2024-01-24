@@ -3,7 +3,7 @@ import type { Job, Queue } from 'bullmq';
 import { Worker } from 'bullmq';
 import type IORedis from 'ioredis';
 
-import { cancelZodSchema } from '$lib/models/common';
+import { cancelSchema } from '$lib/models/common';
 import type { TicketDocument } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
 import type { TransactionDocument } from '$lib/models/transaction';
@@ -25,9 +25,9 @@ import type { DisplayInvoice, DisplayPayout } from '$lib/ext/bitcart/models';
 import {
   InvoiceJobType,
   InvoiceStatus,
-  PayoutReason,
-  type PaymentType
-} from '$lib/payment';
+  type PaymentType,
+  PayoutReason
+} from '$lib/payout';
 import {
   getTicketMachineService,
   getTicketMachineServiceFromId
@@ -109,7 +109,7 @@ export const getInvoiceWorker = ({
                 );
 
                 const ticketState = ticketService.getSnapshot();
-                const cancel = cancelZodSchema.parse({
+                const cancel = cancelSchema.parse({
                   cancelledBy: ActorType.TIMER,
                   cancelledInState: JSON.stringify(ticketState.value),
                   reason: CancelReason.TICKET_PAYMENT_TIMEOUT

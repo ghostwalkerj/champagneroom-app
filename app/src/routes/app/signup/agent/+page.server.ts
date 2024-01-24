@@ -4,11 +4,11 @@ import * as web3 from 'web3';
 import { AUTH_SIGNING_MESSAGE } from '$env/static/private';
 
 import { Agent } from '$lib/models/agent';
-import Config from '$lib/models/config';
 import type { UserDocument } from '$lib/models/user';
 import { User } from '$lib/models/user';
 import { Wallet } from '$lib/models/wallet';
 
+import config from '$lib/config';
 import { AuthType, EntityType, UserRole } from '$lib/constants';
 
 import type { Actions, PageServerLoad } from './$types';
@@ -45,7 +45,7 @@ export const actions: Actions = {
     const signature = data.get('signature') as string;
     const defaultCommissionRate = data.get('defaultCommissionRate') as string;
 
-    const returnPath = Config.PATH.agent;
+    const returnPath = config.PATH.agent;
 
     // Validation
     if (!name || name.length < 3 || name.length > 50) {
@@ -77,9 +77,16 @@ export const actions: Actions = {
         user.roles.push(UserRole.AGENT);
         user.name = name;
         user.profileImageUrl = user.profileImageUrl || profileImageUrl;
-        await user.save();
+        user.updateOne(
+          {
+            roles: user.roles,
+            name: user.name,
+            profileImageUrl: user.profileImageUrl
+          },
+          { runValidators: true }
+        );
 
-        await Agent.create({
+        Agent.create({
           user: user._id,
           defaultCommissionRate: Number(defaultCommissionRate)
         });

@@ -1,9 +1,11 @@
 <script lang="ts">
   import { applyAction, deserialize } from '$app/forms';
+  import type { reserveTicketSchema } from '$lib/models/common';
   import Icon from '@iconify/svelte';
   import { getModalStore } from '@skeletonlabs/skeleton';
   import type { ActionResult } from '@sveltejs/kit';
   import type { SvelteComponent } from 'svelte';
+  import type { SuperValidated } from 'sveltekit-superforms';
   import { superForm } from 'sveltekit-superforms/client';
 
   // Props
@@ -12,33 +14,20 @@
 
   const modalStore = getModalStore();
 
-  const { form, errors, constraints, enhance, delayed, message } = superForm(
-    $modalStore[0].meta.form,
+  const theForm = superForm(
+    $modalStore[0].meta.form as SuperValidated<typeof reserveTicketSchema>,
     {
       validationMethod: 'auto',
       onResult: ({ result }) => {
-        if (result.type === 'success') {
+        if (result.type === 'success' || result.type === 'redirect') {
           // VERIFY THIS IS CORRECT
-          console.log(result.data);
-          setPinAuth(result.data!.userId, result.data!.form.data.pin);
+          modalStore.close();
         }
       }
     }
   );
 
-  const setPinAuth = async (userId: string, pin: string) => {
-    const body = new FormData();
-    body.append('pin', pin);
-    body.append('userId', userId);
-    const response = await fetch('?/pin_auth', {
-      method: 'POST',
-      body,
-      redirect: 'follow'
-    });
-
-    const result: ActionResult = deserialize(await response.text());
-    applyAction(result);
-  };
+  const { form, errors, constraints, enhance, delayed, message } = theForm;
 </script>
 
 {#if $modalStore[0]}
@@ -78,15 +67,26 @@
           </label>
           <label class="label">
             <span class="font-semibold">8 digit numeric PIN</span>
-            <input
-              class="input variant-form-material"
-              {...$constraints.pin}
-              type="number"
-              name="pin"
-              bind:value={$form.pin}
-            />
+            <div class="flex gap-1 text-center">
+              {#each $form.pin as _, i}
+                <span>
+                  <input
+                    name="pin"
+                    bind:value={$form.pin[i]}
+                    class="input variant-form-material"
+                    maxlength="1"
+                  />
+                </span>
+              {/each}
+            </div>
+
+            {#each $form.pin as _, i}
+              {#if $errors.pin && $errors.pin[i]}
+                <div class="text-error">{$errors.pin[i]}</div>
+              {/if}
+            {/each}
+
             <span>Save the PIN to access the ticket later!</span><br />
-            {#if $errors.pin}<span class="text-error">{$errors.pin}</span>{/if}
           </label>
         </div>
 
@@ -101,7 +101,7 @@
             class="btn variant-filled-primary gap-2"
             disabled={$delayed}
             type="submit"
-            >Submit Form {#if $delayed}<Icon
+            >Reserve {#if $delayed}<Icon
                 icon="eos-icons:loading"
               />{/if}</button
           >

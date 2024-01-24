@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Config from '$lib/models/config';
+  import config from '$lib/config';
   import { Image } from '@unpic/svelte';
 </script>
 
@@ -32,7 +32,7 @@
       <div class="max-w-4xl">
         <Image
           class="opacity-80 rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1]"
-          src="{Config.PATH.staticUrl}/assets/champagneroomtoken.gif"
+          src="{config.PATH.staticUrl}/assets/champagneroomtoken.gif"
           width={960}
           height={540}
         />

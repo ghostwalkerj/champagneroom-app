@@ -1,6 +1,6 @@
 <script lang="ts">
   import ConnectButton from '$components/header/ConnectButton.svelte';
-  import Config from '$lib/models/config';
+  import config from '$lib/config';
   import { selectedAccount } from '$lib/web3';
   import Icon from '@iconify/svelte';
 </script>
@@ -14,9 +14,9 @@
 
       <div class="flex sm:flex-row flex-col gap-4 justify-evenly p-4 h-full">
         <a
-          href={Config.PATH.creatorSignup}
+          href={config.PATH.creatorSignup}
           class="min-w-xs bg-image group h-full rounded-lg overflow-hidden"
-          style="background-image: url({Config.PATH
+          style="background-image: url({config.PATH
             .staticUrl}/assets/creator2.png)"
         >
           <div
@@ -40,9 +40,9 @@
         </a>
 
         <a
-          href={Config.PATH.agentSignup}
+          href={config.PATH.agentSignup}
           class="min-w-xs bg-image group h-full rounded-lg overflow-hidden"
-          style="background-image: url({Config.PATH
+          style="background-image: url({config.PATH
             .staticUrl}/assets/agent2.png)"
         >
           <div

@@ -13,29 +13,28 @@ import {
   JWT_PRIVATE_KEY
 } from '$env/static/private';
 
-import Config from '$lib/models/config';
-
+import config from '$lib/config';
 import type { AuthType } from '$lib/constants';
 import { authDecrypt, authEncrypt } from '$lib/crypt';
 
 const idString = '/[A-Za-z0-9_-]*';
 
 const PASSWORD_PATHS = [
-  Config.PATH.creator + idString,
-  Config.PATH.creator + idString
+  config.PATH.creator + idString,
+  config.PATH.creator + idString
 ];
-const PIN_PATHS = [Config.PATH.ticket + idString];
+const PIN_PATHS = [config.PATH.ticket + idString];
 
 const PROTECTED_PATHS = [
-  Config.PATH.app + '/**',
-  Config.PATH.api + '/**',
-  Config.PATH.app,
-  Config.PATH.api
+  config.PATH.app + '/**',
+  config.PATH.api + '/**',
+  config.PATH.app,
+  config.PATH.api
 ];
 
 const NOTIFICATION_PATHS = [
-  Config.PATH.notifyUpdate + idString,
-  Config.PATH.notifyInsert + idString
+  config.PATH.notifyUpdate + idString,
+  config.PATH.notifyInsert + idString
 ];
 
 const WEBHOOK_PATHS = [
@@ -44,38 +43,38 @@ const WEBHOOK_PATHS = [
 ];
 
 const WHITELIST_PATHS = [
-  Config.PATH.show + '/**',
-  Config.PATH.auth,
-  Config.PATH.signout,
-  Config.PATH.revert,
-  Config.PATH.signup + '/**',
-  Config.PATH.room,
-  Config.PATH.room + '/**',
-  Config.PATH.signup,
+  config.PATH.show + '/**',
+  config.PATH.auth,
+  config.PATH.signout,
+  config.PATH.revert,
+  config.PATH.signup + '/**',
+  config.PATH.room,
+  config.PATH.room + '/**',
+  config.PATH.signup,
   ...WEBHOOK_PATHS
 ];
 
-const TICKET_PATHS = [Config.PATH.ticket + '/**', Config.PATH.ticket];
+const TICKET_PATHS = [config.PATH.ticket + '/**', config.PATH.ticket];
 const CREATOR_PATHS = [
-  Config.PATH.creator,
-  Config.PATH.creator + '/**',
-  Config.PATH.imageUpload
+  config.PATH.creator,
+  config.PATH.creator + '/**',
+  config.PATH.imageUpload
 ];
 const SECRET_PATHS = [...PASSWORD_PATHS, ...PIN_PATHS];
-const AGENT_PATHS = [Config.PATH.agent];
-const OPERATOR_PATHS = [Config.PATH.operator];
+const AGENT_PATHS = [config.PATH.agent];
+const OPERATOR_PATHS = [config.PATH.operator];
 
-const SIGN_PATHS = [...AGENT_PATHS, ...OPERATOR_PATHS, Config.PATH.creator];
+const SIGN_PATHS = [...AGENT_PATHS, ...OPERATOR_PATHS, config.PATH.creator];
 
 const REQUEST_AUTH_PATHS = [
   ...SIGN_PATHS,
   ...PASSWORD_PATHS,
   ...PIN_PATHS,
-  Config.PATH.app,
-  Config.PATH.ticket,
-  Config.PATH.creator,
-  Config.PATH.operator,
-  Config.PATH.agent
+  config.PATH.app,
+  config.PATH.ticket,
+  config.PATH.creator,
+  config.PATH.operator,
+  config.PATH.agent
 ];
 
 export const backupAuthToken = (cookies: Cookies, tokenName: string) => {

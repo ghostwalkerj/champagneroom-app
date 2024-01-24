@@ -1,7 +1,7 @@
 <script lang="ts">
   import Icon from '@iconify/svelte';
 
-  import Config from '$lib/models/config';
+  import config from '$lib/config';
 </script>
 
 <footer class="w-full flex-shrink-0 mt-20 px-4 md:px-6 lg:px-10">
@@ -30,10 +30,10 @@
         <h5 class="text-info mb-3">Services</h5>
         <ul class="list-none">
           <li class="spa">
-            <a href={Config.PATH.creator}>Creators</a>
+            <a href={config.PATH.creator}>Creators</a>
           </li>
           <li class="spa">
-            <a href={Config.PATH.agent}>Management</a>
+            <a href={config.PATH.agent}>Management</a>
           </li>
         </ul>
       </div>
@@ -42,7 +42,7 @@
         <ul class="list-none">
           <li class="spa">
             <a
-              href="{Config.PATH
+              href="{config.PATH
                 .staticUrl}/assets/champagne-room-white-paper.pdf"
               >White Paper</a
             >

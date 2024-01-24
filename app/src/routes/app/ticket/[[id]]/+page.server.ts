@@ -15,10 +15,10 @@ import {
 import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
 import {
-  cancelZodSchema,
-  disputeZodSchema,
-  refundZodSchema,
-  ticketFeedbackZodSchema
+  cancelSchema,
+  disputeSchema,
+  refundSchema,
+  ticketFeedbackSchema
 } from '$lib/models/common';
 
 import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
@@ -33,11 +33,7 @@ import {
   RefundReason,
   TicketMachineEventString
 } from '$lib/constants';
-import {
-  InvoiceJobType,
-  PayoutJobType,
-  createBitcartToken
-} from '$lib/payment';
+import { createBitcartToken, InvoiceJobType, PayoutJobType } from '$lib/payout';
 import { getTicketMachineService } from '$lib/server/machinesUtil';
 
 import {
@@ -62,7 +58,7 @@ export const actions: Actions = {
 
     // Cancel the invoice attached to the ticket if no payment has been made
     if (state.matches('reserved.waiting4Payment')) {
-      const cancel = cancelZodSchema.parse({
+      const cancel = cancelSchema.parse({
         cancelledBy: ActorType.CUSTOMER,
         cancelledInState: JSON.stringify(state.value),
         reason: CancelReason.CUSTOMER_CANCELLED
@@ -93,7 +89,7 @@ export const actions: Actions = {
       }
 
       // Create refund object
-      const refund = refundZodSchema.parse({
+      const refund = refundSchema.parse({
         reason: CancelReason.CUSTOMER_CANCELLED,
         requestedAmounts: sales.total,
         refundCurrency: sales.paymentCurrency
@@ -144,7 +140,7 @@ export const actions: Actions = {
     const ticketService = getTicketMachineService(ticket, redisConnection);
 
     const state = ticketService.getSnapshot();
-    const feedback = ticketFeedbackZodSchema.parse({
+    const feedback = ticketFeedbackSchema.parse({
       rating: +rating,
       review
     });
@@ -184,13 +180,13 @@ export const actions: Actions = {
     const ticketService = getTicketMachineService(ticket, redisConnection);
 
     const state = ticketService.getSnapshot();
-    const dispute = disputeZodSchema.parse({
+    const dispute = disputeSchema.parse({
       disputedBy: ActorType.CUSTOMER,
       reason: reason as DisputeReason,
       explanation
     });
 
-    const refund = refundZodSchema.parse({
+    const refund = refundSchema.parse({
       requestedAmount: ticket.ticketState.sale?.total || 0,
       reason: RefundReason.DISPUTE_DECISION
     });

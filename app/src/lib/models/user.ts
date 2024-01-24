@@ -11,14 +11,13 @@ import {
 import { nanoid } from 'nanoid';
 import validator from 'validator';
 
-import Config from '$lib/models/config';
-
+import config from '$lib/config';
 import { AuthType, UserRole } from '$lib/constants';
 import { PermissionType } from '$lib/permissions';
 
 const { models } = pkg;
 
-export type UserDocument = InstanceType<typeof User> & {
+type UserDocument = InstanceType<typeof User> & {
   comparePassword: (password: string) => Promise<boolean>;
   isCreator: () => boolean;
   isAgent: () => boolean;
@@ -26,82 +25,79 @@ export type UserDocument = InstanceType<typeof User> & {
   hasPermission: (permission: PermissionType) => boolean;
 };
 
-export type UserDocumentType = z.infer<typeof userZodSchema>;
+type UserDocumentType = z.infer<typeof userSchema>;
 
-export { User };
+const userSchema = z
+  .object({
+    _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
+      _id: true,
+      auto: true
+    }),
+    wallet: mongooseZodCustomType('ObjectId').optional().mongooseTypeOptions({
+      ref: 'Wallet'
+    }),
+    address: z
+      .string()
+      .trim()
+      .refine((value: string) => validator.isEthereumAddress(value), {
+        message: 'Invalid Ethereum address'
+      })
+      .optional(),
+    roles: z.array(z.nativeEnum(UserRole)),
+    payoutAddress: z
+      .string()
+      .trim()
+      .refine(
+        (value: string) => validator.isEthereumAddress(value),
+        'Invalid Ethereum address'
+      )
+      .optional(),
+    nonce: z
+      .number()
+      .min(0)
+      .default(() => Math.floor(Math.random() * 1_000_000)),
+    secret: z.string().max(50).min(21, 'Secret is too short').optional(),
+    password: z
+      .string()
+      .max(80)
+      .min(8, 'Password is too short')
+      .trim()
+      .optional(),
+    name: z.string().max(50).min(3, 'Name is too short').trim(),
+    authType: z.nativeEnum(AuthType).default(AuthType.SIGNING),
+    active: z.boolean().default(true),
+    profileImageUrl: z.string().default(config.UI.defaultProfileImage),
+    referralCode: z
+      .string()
+      .max(50)
+      .min(8, 'Referral code is too short')
+      .default(() => nanoid(10))
+      .mongooseTypeOptions({
+        index: true,
+        unique: true
+      }),
+    referralCount: z.number().default(0),
+    permissions: z.array(z.nativeEnum(PermissionType)).default([])
+  })
+  .merge(genTimestampsSchema());
 
-const userZodSchema = toZodMongooseSchema(
-  z
-    .object({
-      _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
-        _id: true,
-        auto: true
-      }),
-      wallet: mongooseZodCustomType('ObjectId').optional().mongooseTypeOptions({
-        ref: 'Wallet'
-      }),
-      address: z
-        .string()
-        .trim()
-        .refine((value: string) => validator.isEthereumAddress(value), {
-          message: 'Invalid Ethereum address'
-        })
-        .optional(),
-      roles: z.array(z.nativeEnum(UserRole)),
-      payoutAddress: z
-        .string()
-        .trim()
-        .refine(
-          (value: string) => validator.isEthereumAddress(value),
-          'Invalid Ethereum address'
-        )
-        .optional(),
-      nonce: z
-        .number()
-        .min(0)
-        .default(() => Math.floor(Math.random() * 1_000_000)),
-      secret: z.string().max(50).min(21, 'Secret is too short').optional(),
-      password: z
-        .string()
-        .max(80)
-        .min(8, 'Password is too short')
-        .trim()
-        .optional(),
-      name: z.string().max(50).min(3, 'Name is too short').trim(),
-      authType: z.nativeEnum(AuthType).default(AuthType.SIGNING),
-      active: z.boolean().default(true),
-      profileImageUrl: z.string().default(Config.UI.defaultProfileImage),
-      referralCode: z
-        .string()
-        .max(50)
-        .min(8, 'Referral code is too short')
-        .default(() => nanoid(10))
-        .mongooseTypeOptions({
-          index: true,
-          unique: true
-        }),
-      referralCount: z.number().default(0),
-      permissions: z.array(z.nativeEnum(PermissionType)).default([])
-    })
-    .merge(genTimestampsSchema()),
-  {
-    schemaOptions: {
-      collection: 'users'
-    }
+const userMongooseZodSchema = toZodMongooseSchema(userSchema, {
+  schemaOptions: {
+    collection: 'users'
   }
-);
+});
 
-export const userSchema = toMongooseSchema(userZodSchema);
-userSchema.index(
+const userMongooseSchema = toMongooseSchema(userMongooseZodSchema);
+userMongooseSchema.index(
   { address: 1 },
   { unique: true, partialFilterExpression: { address: { $exists: true } } }
 );
-userSchema.index(
+userMongooseSchema.index(
   { secret: 1 },
   { unique: true, partialFilterExpression: { secret: { $exists: true } } }
 );
 
-userSchema.index(
+userMongooseSchema.index(
   { referralCode: 1 },
   { unique: true, partialFilterExpression: { referralCode: { $exists: true } } }
 );
@@ -116,16 +112,19 @@ userSchema.index(
 //   saltGenerator: (secret: string) => secret.slice(0, 16)
 // });
 
-userSchema.pre('updateOne', async function (this: UpdateQuery<UserDocument>) {
-  const update = { ...this.getUpdate() };
-  // Only run this function if password was modified
-  if (update.password) {
-    update.password = await bcrypt.hash(update.password, 10);
-    this.setUpdate(update);
+userMongooseSchema.pre(
+  'updateOne',
+  async function (this: UpdateQuery<UserDocument>) {
+    const update = { ...this.getUpdate() };
+    // Only run this function if password was modified
+    if (update.password) {
+      update.password = await bcrypt.hash(update.password, 10);
+      this.setUpdate(update);
+    }
   }
-});
-
-userSchema.pre('save', function (next) {
+);
+userMongooseSchema;
+userMongooseSchema.pre('save', function (next) {
   if (this.password && this.isModified('password')) {
     bcrypt.hash(this.password, 10, (error, hash) => {
       if (error) {
@@ -139,23 +138,23 @@ userSchema.pre('save', function (next) {
   }
 });
 
-userSchema.methods.comparePassword = function (password: string) {
+userMongooseSchema.methods.comparePassword = function (password: string) {
   return bcrypt.compare(password, this.password);
 };
 
-userSchema.methods.isCreator = function (): boolean {
+userMongooseSchema.methods.isCreator = function (): boolean {
   return this.roles.includes(UserRole.CREATOR);
 };
 
-userSchema.methods.isAgent = function (): boolean {
+userMongooseSchema.methods.isAgent = function (): boolean {
   return this.roles.includes(UserRole.AGENT);
 };
 
-userSchema.methods.isOperator = function (): boolean {
+userMongooseSchema.methods.isOperator = function (): boolean {
   return this.roles.includes(UserRole.OPERATOR);
 };
 
-userSchema.methods.hasPermission = function (
+userMongooseSchema.methods.hasPermission = function (
   permission: PermissionType
 ): boolean {
   return this.permissions.includes(permission);
@@ -171,4 +170,11 @@ userSchema.methods.hasPermission = function (
 
 const User = models?.User
   ? (models.User as Model<UserDocumentType>)
-  : mongoose.model<UserDocumentType>('User', userSchema);
+  : mongoose.model<UserDocumentType>('User', userMongooseSchema);
+
+const userCRUDSchema = userSchema.extend({
+  _id: userSchema.shape._id.optional()
+});
+
+export type { UserDocument, UserDocumentType };
+export { User, userCRUDSchema, userSchema };

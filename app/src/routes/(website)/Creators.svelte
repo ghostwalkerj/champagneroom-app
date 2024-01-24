@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Config from '$lib/models/config';
+  import config from '$lib/config';
   import { Image } from '@unpic/svelte';
 </script>
 
@@ -13,7 +13,7 @@
     <div class="flex flex-col lg:flex-row items-center justify-center">
       <div class="w-full lg:w-1/2 my-10 flex justify-center p-4">
         <Image
-          src="{Config.PATH.staticUrl}/assets/creator.png"
+          src="{config.PATH.staticUrl}/assets/creator.png"
           alt="Creator"
           class="rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1] max-w-xs md:max-w-sm lg:max-w-md"
           height={823}
@@ -45,7 +45,7 @@
         </ul>
         <a
           class="text-info text-lg md:text-xl font-bold capitalize text-center block font-CaviarDreams mt-5 mb-4"
-          href={Config.PATH.creatorSignup}
+          href={config.PATH.creatorSignup}
         >
           Sign Up as a Creator
         </a>

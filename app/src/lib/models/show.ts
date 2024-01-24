@@ -12,27 +12,27 @@ import { nanoid } from 'nanoid';
 import { ShowStatus } from '$lib/constants';
 
 import {
-  cancelZodSchema,
-  creatorInfoZodSchema,
-  disputeStatsZodSchema,
-  escrowZodSchema,
-  feedbackStatsZodSchema,
-  finalizeZodSchema,
-  moneyZodSchema,
-  runtimeZodSchema,
-  showSalesStatsZodSchema
+  cancelSchema,
+  creatorInfoSchema,
+  disputeStatsSchema,
+  escrowSchema,
+  feedbackStatsSchema,
+  finalizeSchema,
+  moneySchema,
+  runtimeSchema,
+  showSalesStatsSchema
 } from './common';
 
-const showStateZodSchema = z.object({
+const showStateSchema = z.object({
   status: z.nativeEnum(ShowStatus).default(ShowStatus.CREATED),
   active: z.boolean().default(true),
-  salesStats: showSalesStatsZodSchema.default({}),
-  feedbackStats: feedbackStatsZodSchema.default({}),
-  disputeStats: disputeStatsZodSchema.default({}),
-  cancel: cancelZodSchema.optional(),
-  finalize: finalizeZodSchema.optional(),
-  escrow: escrowZodSchema.optional(),
-  runtime: runtimeZodSchema.optional(),
+  salesStats: showSalesStatsSchema.default({}),
+  feedbackStats: feedbackStatsSchema.default({}),
+  disputeStats: disputeStatsSchema.default({}),
+  cancel: cancelSchema.optional(),
+  finalize: finalizeSchema.optional(),
+  escrow: escrowSchema.optional(),
+  runtime: runtimeSchema.optional(),
   refunds: z
     .array(
       mongooseZodCustomType('ObjectId').mongooseTypeOptions({
@@ -84,7 +84,7 @@ const showStateZodSchema = z.object({
   current: z.boolean().default(true)
 });
 
-const showZodSchema = z
+const showSchema = z
   .object({
     _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
       _id: true,
@@ -102,26 +102,27 @@ const showZodSchema = z
     coverImageUrl: z.string().trim().optional(),
     duration: z
       .number()
-      .min(0, { message: 'Duration must be a positive number' })
-      .max(180, { message: 'Duration must be under 180 minutes' }),
+      .min(5, { message: 'Duration must be at least 5 minutes' })
+      .max(180, { message: 'Duration must be under 180 minutes' })
+      .default(5),
     name: z
       .string()
       .min(3, { message: 'Name must be at least 3 characters' })
       .max(50, { message: 'Name must be under 50 characters' })
       .trim(),
     capacity: z.number().min(1).default(1),
-    price: moneyZodSchema.default({}),
-    creatorInfo: creatorInfoZodSchema,
-    showState: showStateZodSchema.default({})
+    price: moneySchema.default({}),
+    creatorInfo: creatorInfoSchema,
+    showState: showStateSchema.default({})
   })
   .merge(genTimestampsSchema());
 
-const showCRUDZodSchema = showZodSchema.extend({
-  _id: showZodSchema.shape._id.optional(),
-  creator: showZodSchema.shape.creator.optional()
+const showCRUDSchema = showSchema.extend({
+  _id: showSchema.shape._id.optional(),
+  creator: showSchema.shape.creator.optional()
 });
 
-const showZodMongooseSchema = toZodMongooseSchema(showZodSchema, {
+const showZodMongooseSchema = toZodMongooseSchema(showSchema, {
   schemaOptions: {
     collection: 'shows'
   }
@@ -132,9 +133,9 @@ const Show = pkg.models.Show ?? pkg.model('Show', showMongooseSchema);
 
 type ShowDocument = InstanceType<typeof Show>;
 
-type ShowStateType = z.infer<typeof showStateZodSchema>;
+type ShowStateType = z.infer<typeof showStateSchema>;
 
-type ShowDocumentType = z.infer<typeof showZodSchema>;
+type ShowDocumentType = z.infer<typeof showSchema>;
 
 showMongooseSchema.index({ agent: 1, 'showState.finalize.finalizedAt': -1 });
 showMongooseSchema.plugin(fieldEncryption, {
@@ -148,4 +149,4 @@ const SaveState = (show: ShowDocument, newState: ShowStateType) => {
 };
 
 export type { ShowDocument, ShowDocumentType, ShowStateType };
-export { SaveState, Show, showCRUDZodSchema, showZodSchema };
+export { SaveState, Show, showCRUDSchema, showSchema };

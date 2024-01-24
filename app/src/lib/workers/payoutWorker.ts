@@ -5,7 +5,6 @@ import type IORedis from 'ioredis';
 import urlJoin from 'url-join';
 
 import type { PayoutType } from '$lib/models/common';
-import Config from '$lib/models/config';
 import { Creator } from '$lib/models/creator';
 import type { TicketDocument } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
@@ -16,6 +15,7 @@ import {
 } from '$lib/models/transaction';
 import { Wallet } from '$lib/models/wallet';
 
+import config from '$lib/config';
 import {
   CurrencyType,
   EntityType,
@@ -40,8 +40,8 @@ import type {
   Store,
   Wallet as BTWallet
 } from '$lib/ext/bitcart/models';
-import type { PaymentType } from '$lib/payment';
-import { PayoutJobType, PayoutReason, PayoutStatus } from '$lib/payment';
+import type { PaymentType } from '$lib/payout';
+import { PayoutJobType, PayoutReason, PayoutStatus } from '$lib/payout';
 import {
   getTicketMachineService,
   getWalletMachineService
@@ -113,7 +113,7 @@ export const getPayoutWorker = ({
                 {
                   bcInvoiceId
                 },
-                { delay: Config.TIMER.paymentPeriod }
+                { delay: config.TIMER.paymentPeriod }
               );
               return 'Unconfirmed payment';
             }

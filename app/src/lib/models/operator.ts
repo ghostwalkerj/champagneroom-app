@@ -13,7 +13,7 @@ import type { UserDocument } from './user';
 
 const { models } = pkg;
 
-const operatorZodSchema = toZodMongooseSchema(
+const operatorSchema = toZodMongooseSchema(
   z
     .object({
       _id: mongooseZodCustomType('ObjectId').mongooseTypeOptions({
@@ -34,15 +34,15 @@ const operatorZodSchema = toZodMongooseSchema(
   }
 );
 
-const operatorSchema = toMongooseSchema(operatorZodSchema);
-operatorSchema.plugin(mongooseAutoPopulate);
+const operatorMongooseSchema = toMongooseSchema(operatorSchema);
+operatorMongooseSchema.plugin(mongooseAutoPopulate);
 
 export type OperatorDocument = InstanceType<typeof Operator> & {
   user: UserDocument;
 };
 
-export type OperatorDocumentType = z.infer<typeof operatorZodSchema>;
+export type OperatorDocumentType = z.infer<typeof operatorSchema>;
 
 export const Operator = models?.Operator
   ? (models.Operator as Model<OperatorDocumentType>)
-  : mongoose.model<OperatorDocumentType>('Operator', operatorSchema);
+  : mongoose.model<OperatorDocumentType>('Operator', operatorMongooseSchema);

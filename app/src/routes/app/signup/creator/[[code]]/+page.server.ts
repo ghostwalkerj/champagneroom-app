@@ -5,12 +5,12 @@ import { AUTH_SIGNING_MESSAGE } from '$env/static/private';
 
 import type { AgentDocument } from '$lib/models/agent';
 import { Agent } from '$lib/models/agent';
-import Config from '$lib/models/config';
 import { Creator } from '$lib/models/creator';
 import type { UserDocument } from '$lib/models/user';
 import { User } from '$lib/models/user';
 import { Wallet } from '$lib/models/wallet';
 
+import config from '$lib/config';
 import { AuthType, EntityType, UserRole } from '$lib/constants';
 
 import type { Actions, PageServerLoad } from './$types';
@@ -47,7 +47,7 @@ export const actions: Actions = {
     const signature = data.get('signature') as string;
     const agentId = data.get('agentId') as string;
 
-    const returnPath = Config.PATH.creator;
+    const returnPath = config.PATH.creator;
 
     // Validation
     if (!name || name.length < 3 || name.length > 50) {
@@ -71,7 +71,7 @@ export const actions: Actions = {
       } else {
         user.roles.push(UserRole.CREATOR);
         user.name = name;
-        await user.updateOne(
+        user.updateOne(
           {
             roles: user.roles,
             name
@@ -79,7 +79,7 @@ export const actions: Actions = {
           { runValidators: true }
         );
 
-        await Creator.create({
+        Creator.create({
           user: user._id,
           commissionRate: agent?.defaultCommissionRate ?? 0,
           agent: agent?._id ?? undefined
@@ -104,7 +104,7 @@ export const actions: Actions = {
           profileImageUrl
         });
 
-        await Creator.create({
+        Creator.create({
           user: user._id,
           commissionRate: agent?.defaultCommissionRate ?? 0,
           agent: agent?._id ?? undefined

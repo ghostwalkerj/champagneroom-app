@@ -8,7 +8,6 @@ import { generateSillyPassword } from 'silly-password-generator';
 import { AUTH_TOKEN_NAME, PASSWORD_SALT } from '$env/static/private';
 
 import { Agent } from '$lib/models/agent';
-import Config from '$lib/models/config';
 import { Creator } from '$lib/models/creator';
 import type { OperatorDocument } from '$lib/models/operator';
 import type { ShowDocument } from '$lib/models/show';
@@ -19,6 +18,7 @@ import { Wallet } from '$lib/models/wallet';
 
 import type { ShowQueueType } from '$lib/workers/showWorker';
 
+import config from '$lib/config';
 import type { DisputeDecision } from '$lib/constants';
 import { AuthType, EntityType, ShowMachineEventString } from '$lib/constants';
 import {
@@ -28,7 +28,7 @@ import {
 } from '$lib/server/auth';
 
 import type { PageServerLoad } from './$types';
-const websiteUrl = Config.PATH.websiteUrl;
+const websiteUrl = config.PATH.websiteUrl;
 
 export const actions: Actions = {
   impersonateUser: async ({ request, cookies }) => {
@@ -47,7 +47,7 @@ export const actions: Actions = {
     });
 
     encAuthToken && setAuthToken(cookies, tokenName, encAuthToken);
-    throw redirect(303, Config.PATH.app);
+    throw redirect(303, config.PATH.app);
   },
   create_agent: async ({ request }: RequestEvent) => {
     const data = await request.formData();
@@ -78,7 +78,7 @@ export const actions: Actions = {
       });
       const agent = await Agent.create({
         user: user._id,
-        defaultCommissionRate: Config.UI.defaultCommissionRate
+        defaultCommissionRate: config.UI.defaultCommissionRate
       });
 
       return {
@@ -126,7 +126,7 @@ export const actions: Actions = {
         user: user._id,
         commissionRate: +commission,
         agent,
-        profileImageUrl: Config.UI.defaultProfileImage
+        profileImageUrl: config.UI.defaultProfileImage
       });
       return {
         success: true,
