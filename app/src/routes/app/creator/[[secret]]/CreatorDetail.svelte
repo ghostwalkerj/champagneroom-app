@@ -1,5 +1,6 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
+  import ImageUploadForm from '$components/forms/ImageUploadForm.svelte';
 
   import type { CreatorDocument } from '$lib/models/creator';
   import Icon from '@iconify/svelte';
@@ -26,61 +27,9 @@
     <Icon class="text-secondary" icon="iconoir:profile-circle" />
     Profile
   </h2>
-  <div class="pt-6">
-    <form
-      method="POST"
-      enctype="multipart/form-data"
-      use:enhance
-      action="?/update_profile_image"
-    >
-      <div class="flex flex-col gap-3 items-center">
-        <FileDropzone
-          name="images"
-          bind:files={images}
-          bind:fileInput={fileDrop}
-          accept="image/*"
-          class="overflow-hidden max-w-32 max-h-32"
-          rounded="rounded-full"
-          on:change={onChange}
-        >
-          <svelte:fragment slot="message">
-            <img
-              src={profileImageUrl}
-              alt="profileImage"
-              class="bg-cover relative bg-no-repeat bg-center rounded-full max-w-32 max-h-32"
-            />
-          </svelte:fragment>
-        </FileDropzone>
-        {#if !changed}
-          <FileButton
-            name="imageButton"
-            bind:files={images}
-            fileInput={fileDrop}
-            button="btn variant-soft-secondary btn-sm neon-secondary"
-            >Change Image</FileButton
-          >
-        {:else}
-          <div class="flex gap-2">
-            <button
-              class="btn variant-soft-primary btn-sm neon-primary"
-              type="submit"
-            >
-              Save
-            </button>
-            <button
-              class="btn variant-soft-secondary btn-sm neon-secondary"
-              on:click={() => {
-                changed = false;
-                profileImageUrl = creator.user.profileImageUrl;
-              }}
-            >
-              Cancel
-            </button>
-          </div>
-        {/if}
-      </div>
-    </form>
-  </div>
+
+  <ImageUploadForm imageUrl={profileImageUrl} action="?/update_profile_image" />
+
   <div class="text-2xl flex w-full justify-center m-1">
     <Ratings
       value={creator.feedbackStats.averageRating ?? 0}

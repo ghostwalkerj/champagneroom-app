@@ -1,149 +1,96 @@
 <script lang="ts">
+  import { applyAction, enhance } from '$app/forms';
+
   // TODO:Add validation
-  import { filedrop } from 'filedrop-svelte';
-  import urlJoin from 'url-join';
+  import { FileButton, FileDropzone } from '@skeletonlabs/skeleton';
+  import type { ActionResult } from '@sveltejs/kit';
+  import { onMount } from 'svelte';
 
-  import { page } from '$app/stores';
-
-  import config from '$lib/config';
-  import Icon from '@iconify/svelte';
-  import { FileDropzone } from '@skeletonlabs/skeleton';
-
-  export let callBack: (argument0: string) => void;
   export let imageUrl: string;
-
-  let uploadVisibility = 'invisible';
-  let progressVisibility = 'invisible';
-  let file: File;
-
-  let options = {
-    fileLimit: 1,
-    maxSize: 4_194_304,
-    accept: ['image/*'],
-    multiple: false
-  };
+  export let action: string;
 
   let images: FileList;
+  let fileDrop: HTMLInputElement;
+  let originalImageUrl: string;
 
-  $: update = false;
-  $: imageUrl = imageUrl;
-  $: uploadReady = false;
-
-  function onChange(event: CustomEvent) {
-    const files = event.detail.files.accepted;
-    if (files.length > 0) {
-      file = files[0];
-      if (file) {
-        uploadVisibility = 'invisible';
-        uploadReady = true;
-        const reader = new FileReader();
-        reader.addEventListener('load', function () {
-          imageUrl = reader.result as string;
-        });
-        reader.readAsDataURL(file);
-        return;
-      }
-    }
-  }
-
-  function setUpdate(value: boolean) {
-    update = value;
-    uploadVisibility = value ? 'visible' : 'invisible';
-    uploadReady = false;
-    imageUrl = imageUrl;
-  }
+  $: isChanged = false;
 
   function resetForm() {
-    update = false;
-    uploadVisibility = 'invisible';
-    uploadReady = false;
-    imageUrl = imageUrl;
-    progressVisibility = 'invisible';
+    isChanged = false;
+    imageUrl = originalImageUrl;
   }
 
-  async function upload() {
-    uploadVisibility = 'invisible';
-    progressVisibility = 'visible';
-    let formData = new FormData();
-    formData.append('file', images[0]);
-    const uploadUrl = urlJoin($page.url.origin, config.PATH.imageUpload);
-    const response = await fetch(uploadUrl, {
-      method: 'POST',
-      body: formData
-    });
-    const data = await response.json();
-    imageUrl = data.url;
-    callBack(imageUrl);
-    progressVisibility = 'invisible';
-    resetForm();
-  }
+  onMount(() => {
+    originalImageUrl = imageUrl;
+  });
+
+  const onChange = () => {
+    if (images.length === 0) return;
+    isChanged = true;
+    imageUrl = URL.createObjectURL(images[0]);
+  };
+
+  const onSubmit = () => {
+    isChanged = false;
+    return async ({ result }: { result: ActionResult }) => {
+      if (result.type === 'success' && result.data) {
+        imageUrl = result.data.imageUrl;
+      }
+      await applyAction(result);
+    };
+  };
 </script>
 
-<div class="flex flex-col items-center lg:h-[200px]">
-  <div class="p-2">
-    <div
-      class="bg-cover relative bg-no-repeat bg-center rounded-full lg:w-32 lg:h-32 w-24 h-24"
-      style="background-image: url('{imageUrl}')"
-    >
+<div class="pt-4">
+  <form
+    method="POST"
+    enctype="multipart/form-data"
+    use:enhance={onSubmit}
+    {action}
+  >
+    <div class="flex flex-col gap-3 items-center">
       <FileDropzone
         name="images"
-        padding="p-0"
-        class="bg-surface-900 max-h-max overflow-hidden rounded-xl "
         bind:files={images}
+        bind:fileInput={fileDrop}
         accept="image/*"
-        on:change={() => {
-          if (images.length > 0) {
-            imageUrl = URL.createObjectURL(images[0]);
-          }
-        }}
+        class="overflow-hidden max-w-32 max-h-32"
+        rounded="rounded-full"
+        on:change={onChange}
       >
         <svelte:fragment slot="message">
-          <div>
-            <img src={imageUrl} alt="coverImageUrl" />
-          </div>
-          <div class="label font-semibold p-4">Click or Drag & Drop Image</div>
+          <img
+            src={imageUrl}
+            alt="profileImage"
+            class="bg-cover relative bg-no-repeat bg-center rounded-full max-w-32 max-h-32"
+          />
         </svelte:fragment>
       </FileDropzone>
-    </div>
-    <div
-      class="absolute m-4 inset-0 flex flex-col justify-center items-center z-10 bg-gray-500 opacity-75 rounded-xl {progressVisibility}"
-    />
-  </div>
-  {#if !update}
-    <div class="justify-center daisy-card-actions last:my-2">
-      <button
-        class="btn variant-soft-secondary btn-sm neon-secondary"
-        on:click={() => {
-          setUpdate(true);
-        }}
-      >
-        Change Photo
-      </button>
-    </div>
-  {:else}
-    <div class="justify-center daisy-card-actions last:my-2">
-      {#if !uploadReady}
-        <label
-          class="custom-file-upload"
-          use:filedrop={options}
-          on:filedrop={onChange}
+      {#if !isChanged}
+        <FileButton
+          name="imageButton"
+          bind:files={images}
+          fileInput={fileDrop}
+          on:change={onChange}
+          button="btn variant-soft-secondary btn-sm neon-secondary"
+          >Change Image</FileButton
         >
-          <input type="file" class="hidden" />
-          <button class="btn btn-sm variant-soft-primary neon-primary"
-            >Select Image</button
-          >
-        </label>
       {:else}
-        <button
-          class="btn btn-sm variant-soft-primary neon-primary"
-          on:click={() => upload()}
-        >
-          Upload
-        </button>
+        <div class="flex gap-2">
+          <button
+            class="btn variant-soft-primary btn-sm neon-primary"
+            type="submit"
+          >
+            Save
+          </button>
+          <button
+            class="btn variant-soft-secondary btn-sm neon-secondary"
+            on:click={resetForm}
+          >
+            Cancel
+          </button>
+        </div>
       {/if}
-      <button class="btn btn-sm variant-soft-error" on:click={resetForm}>
-        Cancel
-      </button>
     </div>
-  {/if}
+  </form>
 </div>

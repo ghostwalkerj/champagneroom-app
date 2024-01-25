@@ -60,7 +60,6 @@ import type { Actions, PageServerLoad, RequestEvent } from './$types';
 export const actions: Actions = {
   update_profile_image: async ({ locals, request }: RequestEvent) => {
     const data = await request.formData();
-    console.dir(data);
     const image =
       data.get('images') && (data.get('images') as unknown as [File]);
 
@@ -80,11 +79,12 @@ export const actions: Actions = {
           }
         }
       ).exec();
-    }
 
-    return {
-      success: true
-    };
+      return {
+        success: true,
+        imageUrl: url
+      };
+    }
   },
   create_show: async ({ locals, request }) => {
     const form = (await superValidate(
