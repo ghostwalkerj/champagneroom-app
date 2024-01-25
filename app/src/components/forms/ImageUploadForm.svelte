@@ -1,5 +1,6 @@
 <script lang="ts">
   import { applyAction, enhance } from '$app/forms';
+  import { Avatar } from '@skeletonlabs/skeleton';
 
   // TODO:Add validation
   import { FileButton, FileDropzone } from '@skeletonlabs/skeleton';
@@ -54,15 +55,17 @@
         bind:files={images}
         bind:fileInput={fileDrop}
         accept="image/*"
-        class="overflow-hidden max-w-32 max-h-32"
+        class="w-32 h-32 "
         rounded="rounded-full"
+        padding="p-0"
         on:change={onChange}
       >
         <svelte:fragment slot="message">
-          <img
+          <Avatar
             src={imageUrl}
             alt="profileImage"
-            class="bg-cover relative bg-no-repeat bg-center rounded-full max-w-32 max-h-32"
+            rounded="rounded-full"
+            width="full"
           />
         </svelte:fragment>
       </FileDropzone>
