@@ -91,7 +91,6 @@
     "eslint-plugin-sort-exports": "^0.8.0",
     "eslint-plugin-svelte": "^2.29.0",
     "eslint-plugin-unicorn": "^50.0.1",
-    "filedrop-svelte": "^0.1.2",
     "i18n-possessive": "^1.0.0",
     "ioredis": "^5.3.2",
     "jsonwebtoken": "^9.0.2",

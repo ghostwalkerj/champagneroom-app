@@ -1,6 +1,6 @@
 import { error, fail } from '@sveltejs/kit';
 import { Queue } from 'bullmq';
-import { possessive, possessive } from 'i18n-possessive';
+import { possessive } from 'i18n-possessive';
 import type IORedis from 'ioredis';
 import jwt from 'jsonwebtoken';
 import { ObjectId } from 'mongodb';

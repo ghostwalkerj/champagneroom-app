@@ -15,18 +15,6 @@
   let nameDiv: HTMLDivElement;
   let commissionDiv: HTMLDivElement;
 
-  const updateProfileImage = async (url: string) => {
-    if (url && agent) {
-      agent.user.profileImageUrl = url;
-      let formData = new FormData();
-      formData.append('url', url);
-      await fetch('?/update_profile_image', {
-        method: 'POST',
-        body: formData
-      });
-    }
-  };
-
   const updateReferralCode = async () => {
     if (agent) {
       const response = await fetch('?/update_referral_code', {
@@ -128,13 +116,11 @@
     <div>
       <ProfileImage
         imageUrl={agent.user.profileImageUrl || config.UI.defaultProfileImage}
-        callBack={(value) => {
-          updateProfileImage(value);
-        }}
+        action="?/update_profile_image"
       />
     </div>
     <div>
-      <div class="font-bold pr-1">Referral Url:</div>
+      <div class="font-bold pr-1 pt-2">Referral Url:</div>
       <div>
         <CopyText
           copyValue={referralUrl}

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { error, fail, redirect } from '@sveltejs/kit';
+import { error, fail, redirect, type RequestEvent } from '@sveltejs/kit';
 import type { AxiosResponse } from 'axios';
 import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
@@ -14,7 +14,9 @@ import {
   BITCART_API_URL,
   BITCART_EMAIL,
   BITCART_PASSWORD,
-  PASSWORD_SALT
+  PASSWORD_SALT,
+  WEB3STORAGE_KEY,
+  WEB3STORAGE_PROOF
 } from '$env/static/private';
 
 import type { AgentDocument } from '$lib/models/agent';
@@ -42,6 +44,7 @@ import {
   createAuthToken,
   setAuthToken
 } from '$lib/server/auth';
+import { web3Upload } from '$lib/server/upload';
 import { womensNames } from '$lib/womensNames';
 
 import type { Actions, PageServerLoad } from './$types';
@@ -92,22 +95,35 @@ export const actions: Actions = {
     encAuthToken && setAuthToken(cookies, tokenName, encAuthToken);
     throw redirect(303, config.PATH.creator);
   },
-  update_profile_image: async ({ locals, request }) => {
+  update_profile_image: async ({ locals, request }: RequestEvent) => {
     const data = await request.formData();
-    const url = data.get('url') as string;
-    if (!url) {
-      return fail(400, { url, missingUrl: true });
-    }
-    const user = locals.user as UserDocument;
-    const agent = locals.agent as AgentDocument;
-    user.updateOne({ profileImageUrl: url }).exec();
-    agent.user.profileImageUrl = url;
+    const image =
+      data.get('images') && (data.get('images') as unknown as [File]);
 
-    return {
-      success: true,
-      agent: agent?.toJSON({ flattenMaps: true, flattenObjectIds: true })
-    };
+    const user = locals.user as UserDocument;
+    if (!user) {
+      throw error(404, 'User not found');
+    }
+
+    if (image instanceof File && image.size > 0) {
+      // upload image to web3
+      const url = await web3Upload(WEB3STORAGE_KEY, WEB3STORAGE_PROOF, image);
+      User.updateOne(
+        { _id: user._id },
+        {
+          $set: {
+            profileImageUrl: url
+          }
+        }
+      ).exec();
+
+      return {
+        success: true,
+        imageUrl: url
+      };
+    }
   },
+
   create_creator: async ({ request }) => {
     const data = await request.formData();
     const agentId = data.get('agentId') as string;
