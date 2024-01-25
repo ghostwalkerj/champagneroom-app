@@ -1,6 +1,7 @@
 import { CarReader } from '@ipld/car';
 import type { API } from '@ucanto/core';
 import { importDAG } from '@ucanto/core/delegation';
+// eslint-disable-next-line @typescript-eslint/naming-convention
 import * as Signer from '@ucanto/principal/ed25519';
 import { StoreMemory } from '@web3-storage/access/stores/store-memory';
 import { create } from '@web3-storage/w3up-client';

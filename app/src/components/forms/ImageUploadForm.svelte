@@ -7,6 +7,7 @@
 
   import config from '$lib/config';
   import Icon from '@iconify/svelte';
+  import { FileDropzone } from '@skeletonlabs/skeleton';
 
   export let callBack: (argument0: string) => void;
   export let imageUrl: string;
@@ -21,6 +22,8 @@
     accept: ['image/*'],
     multiple: false
   };
+
+  let images: FileList;
 
   $: update = false;
   $: imageUrl = imageUrl;
@@ -62,7 +65,7 @@
     uploadVisibility = 'invisible';
     progressVisibility = 'visible';
     let formData = new FormData();
-    formData.append('file', file);
+    formData.append('file', images[0]);
     const uploadUrl = urlJoin($page.url.origin, config.PATH.imageUpload);
     const response = await fetch(uploadUrl, {
       method: 'POST',
@@ -82,18 +85,25 @@
       class="bg-cover relative bg-no-repeat bg-center rounded-full lg:w-32 lg:h-32 w-24 h-24"
       style="background-image: url('{imageUrl}')"
     >
-      <div
-        use:filedrop={options}
-        on:filedrop={onChange}
-        class="absolute inset-0 flex flex-col justify-center z-10 bg-gray-500 opacity-75 rounded-full lg:h-32 lg:w-32 h-24 w-24 {uploadVisibility}"
+      <FileDropzone
+        name="images"
+        padding="p-0"
+        class="bg-surface-900 max-h-max overflow-hidden rounded-xl "
+        bind:files={images}
+        accept="image/*"
+        on:change={() => {
+          if (images.length > 0) {
+            imageUrl = URL.createObjectURL(images[0]);
+          }
+        }}
       >
-        <div class="self-center">
-          <Icon icon="lets-icons:upload-light" class="h-12 w-12" />
-        </div>
-        <div class="self-center text-center font-bold">
-          <p>Click or Drag & Drop Image</p>
-        </div>
-      </div>
+        <svelte:fragment slot="message">
+          <div>
+            <img src={imageUrl} alt="coverImageUrl" />
+          </div>
+          <div class="label font-semibold p-4">Click or Drag & Drop Image</div>
+        </svelte:fragment>
+      </FileDropzone>
     </div>
     <div
       class="absolute m-4 inset-0 flex flex-col justify-center items-center z-10 bg-gray-500 opacity-75 rounded-xl {progressVisibility}"

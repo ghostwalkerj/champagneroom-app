@@ -108,7 +108,7 @@
           </label>
 
           <label class="label">
-            <span class="font-semibold">Unique Room Url </span>
+            <span class="font-semibold">Unique Room Url</span>
             <input
               class="input variant-form-material"
               {...$constraints.uniqueUrl}

@@ -29,7 +29,7 @@ import {
 } from '$lib/models/room';
 import { Show, showCRUDSchema, type ShowDocument } from '$lib/models/show';
 import { ShowEvent, type ShowEventDocument } from '$lib/models/showEvent';
-import type { UserDocument } from '$lib/models/user';
+import { User, type UserDocument } from '$lib/models/user';
 import type { WalletDocument } from '$lib/models/wallet';
 
 import type { ShowMachineEventType } from '$lib/machines/showMachine';
@@ -60,19 +60,30 @@ import type { Actions, PageServerLoad, RequestEvent } from './$types';
 export const actions: Actions = {
   update_profile_image: async ({ locals, request }: RequestEvent) => {
     const data = await request.formData();
-    const url = data.get('url') as string;
-    if (!url) {
-      return fail(400, { url, missingUrl: true });
-    }
+    console.dir(data);
+    const image =
+      data.get('images') && (data.get('images') as unknown as [File]);
+
     const user = locals.user as UserDocument;
-    const creator = locals.creator as CreatorDocument;
-    user.profileImageUrl = url;
-    await user.save();
-    creator.user.profileImageUrl = url;
+    if (!user) {
+      throw error(404, 'User not found');
+    }
+
+    if (image instanceof File && image.size > 0) {
+      // upload image to web3
+      const url = await web3Upload(WEB3STORAGE_KEY, WEB3STORAGE_PROOF, image);
+      User.updateOne(
+        { _id: user._id },
+        {
+          $set: {
+            profileImageUrl: url
+          }
+        }
+      ).exec();
+    }
 
     return {
-      success: true,
-      creator: creator?.toJSON({ flattenMaps: true, flattenObjectIds: true })
+      success: true
     };
   },
   create_show: async ({ locals, request }) => {

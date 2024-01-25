@@ -1,22 +1,21 @@
 <script lang="ts">
-  import ImageUploadForm from '$components/forms/ImageUploadForm.svelte';
-  import config from '$lib/config';
+  import { enhance } from '$app/forms';
+
   import type { CreatorDocument } from '$lib/models/creator';
   import Icon from '@iconify/svelte';
-  import { Ratings } from '@skeletonlabs/skeleton';
+  import { FileButton, FileDropzone, Ratings } from '@skeletonlabs/skeleton';
 
   export let creator: CreatorDocument;
 
-  const updateProfileImage = async (url: string) => {
-    if (url && creator) {
-      creator.user.profileImageUrl = url;
-      let formData = new FormData();
-      formData.append('url', url);
-      await fetch('?/update_profile_image', {
-        method: 'POST',
-        body: formData
-      });
-    }
+  let images: FileList;
+  let fileDrop: HTMLInputElement;
+  $: changed = false;
+  $: profileImageUrl = creator.user.profileImageUrl;
+
+  const onChange = () => {
+    if (images.length === 0) return;
+    changed = true;
+    profileImageUrl = URL.createObjectURL(images[0]);
   };
 </script>
 
@@ -27,13 +26,60 @@
     <Icon class="text-secondary" icon="iconoir:profile-circle" />
     Profile
   </h2>
-  <div>
-    <ImageUploadForm
-      imageUrl={creator.user.profileImageUrl || config.UI.defaultProfileImage}
-      callBack={(value) => {
-        updateProfileImage(value);
-      }}
-    />
+  <div class="pt-6">
+    <form
+      method="POST"
+      enctype="multipart/form-data"
+      use:enhance
+      action="?/update_profile_image"
+    >
+      <div class="flex flex-col gap-3 items-center">
+        <FileDropzone
+          name="images"
+          bind:files={images}
+          bind:fileInput={fileDrop}
+          accept="image/*"
+          class="overflow-hidden max-w-32 max-h-32"
+          rounded="rounded-full"
+          on:change={onChange}
+        >
+          <svelte:fragment slot="message">
+            <img
+              src={profileImageUrl}
+              alt="profileImage"
+              class="bg-cover relative bg-no-repeat bg-center rounded-full max-w-32 max-h-32"
+            />
+          </svelte:fragment>
+        </FileDropzone>
+        {#if !changed}
+          <FileButton
+            name="imageButton"
+            bind:files={images}
+            fileInput={fileDrop}
+            button="btn variant-soft-secondary btn-sm neon-secondary"
+            >Change Image</FileButton
+          >
+        {:else}
+          <div class="flex gap-2">
+            <button
+              class="btn variant-soft-primary btn-sm neon-primary"
+              type="submit"
+            >
+              Save
+            </button>
+            <button
+              class="btn variant-soft-secondary btn-sm neon-secondary"
+              on:click={() => {
+                changed = false;
+                profileImageUrl = creator.user.profileImageUrl;
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        {/if}
+      </div>
+    </form>
   </div>
   <div class="text-2xl flex w-full justify-center m-1">
     <Ratings
