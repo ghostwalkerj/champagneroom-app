@@ -28,8 +28,8 @@ module.exports = {
       }
     },
     fontFamily: {
-      SpaceGrotesk: ['Space Grotesk', 'sans-serif'],
       Roboto: ['Roboto', 'sans-serif'],
+      SpaceGrotesk: ['Space Grotesk', 'sans-serif'],
       CaviarDreams: ['Caviar Dreams', 'sans-serif']
     },
     screens: {
