@@ -8,9 +8,16 @@
   import '@fontsource/roboto/300.css';
   import '@fontsource/roboto/500.css';
   import '@fontsource/roboto/700.css';
+  import '@fontsource/roboto/900.css';
+
   import '@fontsource/space-grotesk';
   import type { ModalComponent } from '@skeletonlabs/skeleton';
-  import { Modal, initializeStores, storePopup } from '@skeletonlabs/skeleton';
+  import {
+    Drawer,
+    Modal,
+    initializeStores,
+    storePopup
+  } from '@skeletonlabs/skeleton';
   import '../app.css';
   import {
     computePosition,
@@ -34,5 +41,6 @@
 </script>
 
 <Modal components={modalRegistry} regionBackdrop="bg-black/50" />
+<Drawer />
 
 <slot />

@@ -47,7 +47,7 @@
   });
 </script>
 
-<div class=" flex flex-col min-h-screen min-w-[320px]">
+<div class="flex flex-col min-h-screen min-w-[320px]">
   <nav
     class="flex justify-between items-center px-4 shadow-surface-900 shadow-lg"
   >
