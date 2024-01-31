@@ -37,7 +37,7 @@
         <div>
           <a
             href="#FAQ"
-            class="md:w-auto daisy-btn daisy-btn-primary transition-all duration-300 ease-in-out"
+            class="md:w-auto btn variant-filled-primary transition-all duration-300 ease-in-out"
           >
             Read the FAQ
           </a>
@@ -45,7 +45,7 @@
         <div>
           <a
             href="{config.PATH.staticUrl}/assets/champagne-room-white-paper.pdf"
-            class="md:w-auto daisy-btn daisy-btn-secondary transition-all duration-300 ease-in-out m-0"
+            class="md:w-auto btn variant-filled-secondary transition-all duration-300 ease-in-out"
             target="_blank"
           >
             White Paper

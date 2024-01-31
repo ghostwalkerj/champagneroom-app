@@ -42,7 +42,7 @@
     "@ipld/car": "^5.2.6",
     "@metamask/jazzicon": "^2.0.0",
     "@playwright/test": "^1.28.1",
-    "@skeletonlabs/skeleton": "^2.6.0",
+    "@skeletonlabs/skeleton": "^2.8.0",
     "@skeletonlabs/tw-plugin": "^0.3.0",
     "@svelte-put/copy": "^3.0.0",
     "@sveltejs/adapter-auto": "^3.0.0",
