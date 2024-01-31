@@ -7,13 +7,21 @@
   @apply bg-cover bg-center max-w-sm w-full hover:scale-105 transition ease-in-out delay-150 shadow-sm hover:shadow-xl;
 }
 
-.btn,
-.input,
-.select,
-.tab {
-  @apply !font-SpaceGrotesk;
+.btn {
+  @apply font-Roboto font-semibold text-sm p-3.5 rounded-lg
 }
-
+.input {
+  @apply font-Roboto  text-sm p-3.5 rounded-lg
+}
+.select {
+  @apply font-Roboto  text-sm p-3.5 rounded-lg
+}
+.tab {
+  @apply !font-SpaceGrotesk
+}
+.accordion-panel {
+  @apply font-light text-base font-Roboto leading-loose
+}
 html,
 body {
   @apply min-h-screen !bg-surface-900;

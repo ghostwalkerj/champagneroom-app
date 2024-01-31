@@ -46,7 +46,7 @@
           Thank you for the interest in CHAMPAGNE ROOM!
         </div>
         {#if isSubmitted}
-          <div class="daisy-alert daisy-alert-success">
+          <div class="alert variant-filled-success">
             Your interest has been submitted
           </div>
         {:else}
@@ -56,10 +56,7 @@
             use:enhance={onSubmit}
             class="flex flex-col gap-4 items-center justify-center w-full max-w-sm"
           >
-            <select
-              class="daisy-select daisy-select-primary w-[300px] bg-transparent"
-              name="interest"
-            >
+            <select class="select w-[300px]" name="interest">
               <option disabled selected>I am interested in</option>
               <option>Agents</option>
               <option>Creators</option>
@@ -68,25 +65,19 @@
               <option>Other</option>
             </select>
             {#if form?.missingInterest}
-              <div class="shadow-lg daisy-alert daisy-alert-error">
-                Interest is required
-              </div>
+              <div class="alert variant-filled-error">Interest is required</div>
             {/if}
             <input
               type="text"
               placeholder="Email"
               name="email"
-              class="daisy-input daisy-input-bordered daisy-input-primary w-[300px] bg-transparent"
+              class="input w-[300px]"
             />
             {#if form?.badEmail}
-              <div class="shadow-lg daisy-alert daisy-alert-error">
-                Email is Required
-              </div>
+              <div class="alert variant-filled-error">Email is Required</div>
             {/if}
             <div class="w-full text-center">
-              <button class="daisy-btn daisy-btn-outline daisy-btn-primary w-32"
-                >Submit</button
-              >
+              <button class="btn variant-filled-primary w-32">Submit</button>
             </div>
           </form>
         {/if}

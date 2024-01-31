@@ -53,7 +53,7 @@
             >
           {:else if link.name == 'Open App'}
             <a
-              class="btn font-Roboto flex flex-nowrap rounded-lg p-3 py-2 variant-filled-surface"
+              class="btn flex flex-nowrap variant-filled-surface"
               class:text-primary={link.href == $page.url.hash}
               href={link.href}
             >
@@ -68,8 +68,7 @@
             <a
               class="btn whitespace-nowrap hover:text-primary hover:bg-[#e779c122] w-full text-sm"
               class:text-primary={link.href == $page.url.hash}
-              href={link.href}
-              ><span class="font-Roboto font-bold">{link.name}</span></a
+              href={link.href}>{link.name}</a
             >
           {/if}
         </li>
@@ -89,31 +88,30 @@
   </a>
 
   <!-- Desktop links with full items -->
-  <ul class="hidden lg:flex items-center gap-4 p-4 font-Roboto">
+  <ul class="hidden lg:flex items-center gap-4 p-4">
     {#each links as link}
       <li>
         {#if link.name == 'Sign Up'}
           <a
-            class="btn bg-gradient-to-br from-primary to-pink-500 text-black rounded-lg whitespace-nowrap hover:shadow-[0px_0px_17px_6px_#e779c1] py-3"
-            href={link.href}
-            ><span class="font-Roboto font-bold text-sm">{link.name}</span></a
+            class="btn bg-gradient-to-br from-primary to-pink-500 text-black whitespace-nowrap hover:shadow-[0px_0px_17px_6px_#e779c1]"
+            href={link.href}>{link.name}</a
           >
         {:else if link.name == 'Open App'}
           <a
-            class="btn font-Roboto flex flex-nowrap text-sm rounded-lg p-3 py-2 variant-filled-surface"
+            class="btn flex flex-nowrap variant-filled-surface"
             class:text-primary={link.href == $page.url.hash}
             href={link.href}
           >
-            <span class="block whitespace-nowrap">{link.name}</span>
+            {link.name}
             <img
               src="/icons/champagne bottles_01.png"
               alt="champagne icon"
-              class="block h-8"
+              class="block h-5"
             />
           </a>
         {:else}
           <a
-            class="btn font-Roboto whitespace-nowrap hover:text-primary hover:bg-[#e779c122] p-1"
+            class="btn whitespace-nowrap hover:text-primary hover:bg-[#e779c122] font-semibold"
             class:text-primary={link.href == $page.url.hash}
             href={link.href}>{link.name}</a
           >
@@ -130,20 +128,19 @@
           {#if link.name == 'Sign Up'}
             <a
               class="btn bg-gradient-to-br from-primary to-pink-500 text-black rounded-lg whitespace-nowrap hover:shadow-[0px_0px_17px_6px_#e779c1] py-3.5"
-              href={link.href}
-              ><span class="font-Roboto font-bold text-sm">{link.name}</span></a
+              href={link.href}>{link.name}</a
             >
           {:else if link.name == 'Open App'}
             <a
-              class="btn font-Roboto flex flex-nowrap text-sm rounded-lg p-3 py-2 variant-filled-surface"
+              class="btn flex flex-nowrap variant-filled-surface"
               class:text-primary={link.href == $page.url.hash}
               href={link.href}
             >
-              <span class="block whitespace-nowrap">{link.name}</span>
+              {link.name}
               <img
                 src="/icons/champagne bottles_01.png"
                 alt="champagne icon"
-                class="block h-8"
+                class="block h-5"
               />
             </a>
           {/if}
