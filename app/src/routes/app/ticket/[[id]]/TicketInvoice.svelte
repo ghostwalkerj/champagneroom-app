@@ -14,6 +14,7 @@
   import { InvoiceStatus } from '$lib/payout';
 
   import type { DisplayInvoice } from '$ext/bitcart/models';
+  import CopyText from '$components/CopyText.svelte';
 
   export let invoice: DisplayInvoice;
   export let ticket: TicketDocumentType;
@@ -113,21 +114,13 @@
       </div>
 
       <!-- Amount Section -->
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <!-- svelte-ignore a11y-no-static-element-interactions -->
-      <div
-        class="daisy-tooltip daisy-tooltip-primary"
-        id="payment-amount"
-        data-tip="Copy"
-        on:click={() => {
-          navigator.clipboard.writeText(currentPayment['amount']);
-        }}
-      >
-        <div class="text-left lg:text-right">
-          <span class="font-bold">Amount: </span>
-          {currentPayment['amount']}
-          {currentPayment['currency'].toLocaleUpperCase()}
-        </div>
+      <div class="text-left lg:text-right">
+        <span class="font-bold">Amount: </span>
+
+        <CopyText copyValue={currentPayment['amount']}>
+          {currentPayment['amount']}</CopyText
+        >
+        {currentPayment['currency'].toLocaleUpperCase()}
       </div>
     </div>
 

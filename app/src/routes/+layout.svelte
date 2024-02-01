@@ -1,9 +1,10 @@
 <script lang="ts">
-  import ReserveShowForm from '$components/forms/ReserveTicketForm.svelte';
-  import CRUDRoomForm from '$components/forms/CRUDRoomForm.svelte';
-  import PayoutForm from '$components/forms/PayoutForm.svelte';
+  import ReserveShowForm from '$components/modals/ReserveTicketForm.svelte';
+  import CRUDRoomForm from '$components/modals/CRUDRoomForm.svelte';
+  import PayoutForm from '$components/modals/PayoutForm.svelte';
   import TransactionsActivity from '$components/TransactionsActivity.svelte';
-  import EndShowForm from '$components/forms/EndShowForm.svelte';
+  import EndShowForm from '$components/modals/EndShowForm.svelte';
+  import CreatorSecret from '$components/modals/CreatorSecret.svelte';
   import '@fontsource/roboto';
   import '@fontsource/roboto/300.css';
   import '@fontsource/roboto/500.css';
@@ -36,7 +37,8 @@
     PayoutForm: { ref: PayoutForm },
     TransactionsActivity: { ref: TransactionsActivity },
     EndShowForm: { ref: EndShowForm },
-    CRUDRoomForm: { ref: CRUDRoomForm }
+    CRUDRoomForm: { ref: CRUDRoomForm },
+    CreatorSecret: { ref: CreatorSecret }
   };
 </script>
 

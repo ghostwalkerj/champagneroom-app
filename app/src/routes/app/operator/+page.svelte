@@ -16,7 +16,7 @@
   import { AuthType, DisputeDecision, currencyFormatter } from '$lib/constants';
   import { womensNames } from '$lib/womensNames';
 
-  import CopyText from '$components/forms/CopyText.svelte';
+  import CopyText from '$components/CopyText.svelte';
   import type { AgentDocument } from '$lib/models/agent';
   import type { TicketDocument } from '$lib/models/ticket';
   import type { UserDocument } from '$lib/models/user';

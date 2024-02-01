@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import CopyText from '$components/forms/CopyText.svelte';
+  import CopyText from '$components/CopyText.svelte';
   import config from '$lib/config';
   import {
     ShowStatus,

@@ -23,7 +23,7 @@
 
 {#if isShowCancelLoading}
   <div class="flex justify-center w-full px-4 lg:px-8">
-    <button class="daisy-btn daisy-btn-secondary loading" disabled={true}
+    <button class="btn variant-filled-secondary loading" disabled={true}
       >Cancelling</button
     >
   </div>
@@ -36,7 +36,7 @@
   >
     <div class="flex justify-center w-full px-4 lg:px-8">
       <button
-        class="daisy-btn daisy-btn-secondary"
+        class="btn variant-filled-secondary"
         type="submit"
         disabled={isLoading}
       >
