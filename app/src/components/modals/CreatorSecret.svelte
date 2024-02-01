@@ -2,6 +2,7 @@
   import { page } from '$app/stores';
   import CopyText from '$components/CopyText.svelte';
   import config from '$lib/config';
+  import Icon from '@iconify/svelte';
   import { getModalStore } from '@skeletonlabs/skeleton';
   import { onMount, type SvelteComponent } from 'svelte';
   import urlJoin from 'url-join';
@@ -35,7 +36,12 @@
 
 {#if thisModal && creator}
   <div class="w-modal bg-surface-900 p-4 rounded">
-    <h3 class="font-bold text-lg text-center mb-6">{creator.user.name}</h3>
+    <div class="flex place-content-center">
+      <Icon icon="mdi:check-circle" class="text-success" />
+      <span class="ml-2">Creator updated successfully</span>
+    </div>
+
+    <h3 class="font-bold text-lg text-center my-6">{creator.user.name}</h3>
     <div class="w-full flex place-content-center">
       <CopyText copyValue={copyText}>
         <div class="text-center">

@@ -64,11 +64,23 @@
   let creatorName = uniqueNamesGenerator({
     dictionaries: [womensNames]
   });
-  let isChangeCreatorSecret = false;
   let agentUnSub: Unsubscriber;
   $: canImpersonate = false;
   let tabSet: number = 0;
   const modalStore = getModalStore();
+
+  const changeSecretModal: ModalSettings = {
+    type: 'confirm',
+    // Data
+    title: 'Change Creator URL',
+    body: "Changing the Creator's Secret URL will disable the current URL and create a new one.",
+    // TRUE if confirm pressed, FALSE if cancel pressed
+    response: (r: boolean) => {
+      if (r) {
+        changeCreatorSecret();
+      }
+    }
+  };
 
   onMount(() => {
     canImpersonate = user.permissions.includes(
@@ -158,7 +170,6 @@
       };
       modalStore.trigger(creatorSecretModal);
     }
-    isChangeCreatorSecret = false;
   };
 
   const onSubmit = ({}) => {
@@ -195,33 +206,6 @@
 </script>
 
 {#if agent}
-  <!-- Modal for Changing Creator URL -->
-  {#if isChangeCreatorSecret}
-    <input
-      type="checkbox"
-      id="changeUrl-show-modal"
-      class="daisy-modal-toggle"
-    />
-    <div class="daisy-modal daisy-modal-open">
-      <div class="daisy-modal-box">
-        <h3 class="font-bold text-lg">Change Creator URL</h3>
-        <p class="py-4">
-          Changing the Creator's Secret URL will disable the current URL and
-          create a new one.
-        </p>
-        <div class="daisy-modal-action">
-          <button
-            class="daisy-btn"
-            on:click={() => (isChangeCreatorSecret = false)}>Cancel</button
-          >
-          <button class="daisy-btn" on:click={changeCreatorSecret}
-            >Change</button
-          >
-        </div>
-      </div>
-    </div>
-  {/if}
-
   <div class="min-h-screen min-w-full">
     <main class="px-10 pt-2">
       <!-- Page header -->
@@ -364,7 +348,7 @@
                                   <button
                                     class="btn variant-outline-secondary btn-sm text-secondary"
                                     on:click={() =>
-                                      (isChangeCreatorSecret = true)}
+                                      modalStore.trigger(changeSecretModal)}
                                   >
                                     Change
                                   </button>
