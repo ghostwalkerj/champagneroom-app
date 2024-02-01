@@ -8,13 +8,13 @@
 }
 
 .btn {
-  @apply font-Roboto font-semibold text-sm p-3.5 rounded-lg
+  @apply font-CaviarDreams font-semibold text-sm p-3.5 rounded-lg
 }
 .input {
-  @apply font-Roboto  text-sm p-3.5 rounded-lg
+  @apply font-CaviarDreams  text-sm p-3.5 rounded-lg
 }
 .select {
-  @apply font-Roboto  text-sm p-3.5 rounded-lg
+  @apply font-CaviarDreams text-sm p-3.5 rounded-lg
 }
 .tab {
   @apply !font-SpaceGrotesk

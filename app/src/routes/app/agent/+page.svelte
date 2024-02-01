@@ -1,6 +1,10 @@
 <script lang="ts">
   import Icon from '@iconify/svelte';
-  import { Ratings } from '@skeletonlabs/skeleton';
+  import {
+    Ratings,
+    type ModalSettings,
+    getModalStore
+  } from '@skeletonlabs/skeleton';
   import type { ActionResult } from '@sveltejs/kit';
   import { uniqueNamesGenerator } from 'unique-names-generator';
   import urlJoin from 'url-join';
@@ -16,7 +20,7 @@
   import TopCreator from './TopCreator.svelte';
 
   import WalletDetail from '$components/WalletDetail.svelte';
-  import CopyText from '$components/forms/CopyText.svelte';
+  import CopyText from '$components/CopyText.svelte';
   import type { CurrencyType } from '$lib/constants';
   import type { AgentDocument } from '$lib/models/agent';
   import type { CreatorDocument } from '$lib/models/creator';
@@ -49,9 +53,6 @@
   $: exchangeRate = +data.exchangeRate || 0;
   let payoutForm = data.payoutForm;
 
-  let newCreatorModal: HTMLDialogElement;
-  let newCreator: CreatorDocument | undefined;
-  let newPassword: string | undefined;
   let activeRow = 0;
   $: canAddCreator = false;
   let creatorNameElement: HTMLTableCellElement;
@@ -67,6 +68,7 @@
   let agentUnSub: Unsubscriber;
   $: canImpersonate = false;
   let tabSet: number = 0;
+  const modalStore = getModalStore();
 
   onMount(() => {
     canImpersonate = user.permissions.includes(
@@ -146,11 +148,16 @@
     const result: ActionResult = deserialize(await response.text());
     if (result.type === 'success' && result.data) {
       creators[index].user.secret = result.data.secret;
-      newCreator = creators[index];
-      newPassword = result.data.password;
-      newCreatorModal.showModal();
+      const creatorSecretModal: ModalSettings = {
+        type: 'component',
+        component: 'CreatorSecret',
+        meta: {
+          creator: creators[index],
+          password: result.data!.password
+        }
+      };
+      modalStore.trigger(creatorSecretModal);
     }
-
     isChangeCreatorSecret = false;
   };
 
@@ -163,10 +170,15 @@
           dictionaries: [womensNames]
         });
 
-        creators = $page.data.creators;
-        newCreator = result.data!.creator;
-        newPassword = result.data!.password;
-        newCreatorModal.showModal();
+        const creatorSecretModal: ModalSettings = {
+          type: 'component',
+          component: 'CreatorSecret',
+          meta: {
+            creator: result.data!.creator,
+            password: result.data!.password
+          }
+        };
+        modalStore.trigger(creatorSecretModal);
       } else if (result?.type === 'failure') {
         if (result.data!.badName) {
           creatorNameElement.focus();
@@ -181,48 +193,6 @@
     };
   };
 </script>
-
-<dialog id="new_creator_modal" class="daisy-modal" bind:this={newCreatorModal}>
-  <div class="daisy-modal-box">
-    {#if newCreator}
-      <h3 class="font-bold text-lg text-center mb-6">New Creator</h3>
-      <div class="text-center">
-        {newCreator.user.name} has the following password:
-        <div class="text-center font-bold text-lg">{newPassword}</div>
-      </div>
-      <div class="text-center mt-4">
-        and Secret URL:
-        <div class="text-center font-bold text-sm">
-          <a
-            href={urlJoin(
-              $page.url.origin,
-              config.PATH.creator,
-              newCreator.user.secret || ''
-            )}
-            target="_blank"
-            class="daisy-link daisy-link-primary"
-          >
-            {urlJoin(
-              $page.url.origin,
-              config.PATH.creator,
-              newCreator.user.secret || ''
-            )}</a
-          >
-        </div>
-      </div>
-
-      <div class="text-center m-auto pt-6">
-        Share this information only with your Creator
-      </div>
-      <div class="daisy-modal-action">
-        <form method="dialog">
-          <!-- if there is a button in form, it will close the modal -->
-          <button class="daisy-btn">Close</button>
-        </form>
-      </div>
-    {/if}
-  </div>
-</dialog>
 
 {#if agent}
   <!-- Modal for Changing Creator URL -->

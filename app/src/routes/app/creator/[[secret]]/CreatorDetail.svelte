@@ -1,6 +1,6 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
-  import ImageUploadForm from '$components/forms/ImageUploadForm.svelte';
+  import ImageUploadForm from '$components/ImageUploadForm.svelte';
 
   import type { CreatorDocument } from '$lib/models/creator';
   import Icon from '@iconify/svelte';

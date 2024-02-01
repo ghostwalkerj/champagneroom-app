@@ -11,9 +11,13 @@
   };
 
   $: copied = false;
-  function handleCopied(e: CustomEvent<CopyDetail>) {
+  async function handleCopied(e: CustomEvent<CopyDetail>) {
     copied = true;
-    navigator.clipboard.writeText(copyValue);
+    const clipboardItem = new ClipboardItem({
+      'text/plain': new Blob([copyValue], { type: 'text/plain' }),
+      'text/html': new Blob([copyValue], { type: 'text/html' })
+    });
+    await navigator.clipboard.write([clipboardItem]);
     setTimeout(() => {
       copied = false;
     }, 2000);
@@ -33,11 +37,14 @@
   <span class="text-success">Copied!</span>
 {:else}
   <!-- svelte-ignore a11y-click-events-have-key-events -->
-  <button
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <span
     class={$$props.class + ' [&>*]:pointer-events-none'}
     use:copy={{ text: copyValue }}
     use:popup={popupHover}
     on:copied={handleCopied}
-    on:click|preventDefault><slot /></button
+    on:click|preventDefault
   >
+    <slot />
+  </span>
 {/if}

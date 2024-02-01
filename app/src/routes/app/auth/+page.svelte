@@ -180,7 +180,7 @@
           <!-- svelte-ignore a11y-no-static-element-interactions -->
           <div>
             <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <div class="daisy-btn daisy-btn-primary" on:click={signMessage}>
+            <div class="btn variant-filled-primary" on:click={signMessage}>
               Sign Message
             </div>
           </div>
@@ -223,16 +223,12 @@
       </label>
 
       <div>
-        {#if form?.missingPassword}<div
-            class="shadow-lg daisy-alert daisy-alert-error"
-          >
+        {#if form?.missingPassword}<div class="alert variant-filled-error">
             Password is required
           </div>
         {/if}
 
-        {#if form?.badPassword}<div
-            class="shadow-lg daisy-alert daisy-alert-error"
-          >
+        {#if form?.badPassword}<div class="alert variant-filled-error">
             Incorrect Password
           </div>
         {/if}
@@ -270,17 +266,13 @@
         />
       </label>
 
-      {#if form?.missingPin}<div
-          class="shadow-lg daisy-alert daisy-alert-error"
-        >
+      {#if form?.missingPin}<div class="alert variant-filled-error">
           Pin is required
         </div>{/if}
-      {#if form?.invalidPin}<div
-          class="shadow-lg daisy-alert daisy-alert-error"
-        >
+      {#if form?.invalidPin}<div class="alert variant-filled-error">
           Pin must be 8 digits
         </div>{/if}
-      {#if form?.badPin}<div class="shadow-lg daisy-alert daisy-alert-error">
+      {#if form?.badPin}<div class="alert variant-filled-error">
           Incorrect Pin
         </div>{/if}
       <div class="text-left text-sm">You need a pin to see this ticket</div>

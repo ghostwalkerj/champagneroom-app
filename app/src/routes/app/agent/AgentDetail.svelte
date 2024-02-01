@@ -2,8 +2,8 @@
   import { deserialize } from '$app/forms';
   import { invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
-  import CopyText from '$components/forms/CopyText.svelte';
-  import ProfileImage from '$components/forms/ImageUploadForm.svelte';
+  import CopyText from '$components/CopyText.svelte';
+  import ProfileImage from '$components/ImageUploadForm.svelte';
   import config from '$lib/config';
   import type { AgentDocument } from '$lib/models/agent';
   import Icon from '@iconify/svelte';
