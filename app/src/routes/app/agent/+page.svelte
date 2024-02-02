@@ -2,8 +2,8 @@
   import Icon from '@iconify/svelte';
   import {
     Ratings,
-    type ModalSettings,
-    getModalStore
+    getModalStore,
+    type ModalSettings
   } from '@skeletonlabs/skeleton';
   import type { ActionResult } from '@sveltejs/kit';
   import { uniqueNamesGenerator } from 'unique-names-generator';
@@ -19,8 +19,8 @@
 
   import TopCreator from './TopCreator.svelte';
 
-  import WalletDetail from '$components/WalletDetail.svelte';
   import CopyText from '$components/CopyText.svelte';
+  import WalletDetail from '$components/WalletDetail.svelte';
   import type { CurrencyType } from '$lib/constants';
   import type { AgentDocument } from '$lib/models/agent';
   import type { CreatorDocument } from '$lib/models/creator';
