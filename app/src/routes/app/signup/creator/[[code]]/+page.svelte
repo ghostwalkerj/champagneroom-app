@@ -14,9 +14,9 @@
 
   import type { AgentDocument } from '$lib/models/agent';
   import type { UserDocument } from '$lib/models/user';
+  import type { ActionResult } from '@sveltejs/kit';
   import type { Unsubscriber } from 'svelte/store';
   import type { ActionData, PageData } from './$types';
-  import type { ActionResult } from '@sveltejs/kit';
 
   export let data: PageData;
   export let form: ActionData;

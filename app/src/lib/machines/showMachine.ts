@@ -5,13 +5,13 @@ import { assign, createMachine, interpret, type StateFrom } from 'xstate';
 import { raise } from 'xstate/lib/actions';
 
 import {
-  type CancelType,
   disputeStatsSchema,
   escrowSchema,
   finalizeSchema,
-  type FinalizeType,
   runtimeSchema,
-  showSalesStatsSchema
+  showSalesStatsSchema,
+  type CancelType,
+  type FinalizeType
 } from '$lib/models/common';
 import type { ShowDocument } from '$lib/models/show';
 import type { TicketDocument } from '$lib/models/ticket';

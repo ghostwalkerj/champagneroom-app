@@ -3,9 +3,9 @@
   import config from '$lib/config';
   import Icon from '@iconify/svelte';
   import {
+    Drawer,
     getDrawerStore,
-    type DrawerSettings,
-    Drawer
+    type DrawerSettings
   } from '@skeletonlabs/skeleton';
 
   const links = [

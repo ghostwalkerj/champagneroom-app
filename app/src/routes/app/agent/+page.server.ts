@@ -77,6 +77,7 @@ export const actions: Actions = {
     }
     return message(form, 'Payout requested successfully');
   },
+
   impersonateUser: async ({ request, cookies }) => {
     const data = await request.formData();
     const impersonateId = data.get('impersonateId') as string;
@@ -95,6 +96,7 @@ export const actions: Actions = {
     encAuthToken && setAuthToken(cookies, tokenName, encAuthToken);
     throw redirect(303, config.PATH.creator);
   },
+
   update_profile_image: async ({ locals, request }: RequestEvent) => {
     const data = await request.formData();
     const image =
@@ -178,6 +180,7 @@ export const actions: Actions = {
       return fail(400, { err: error });
     }
   },
+
   update_creator: async ({ request }) => {
     const data = await request.formData();
     const creatorId = data.get('creatorId') as string;
@@ -233,6 +236,7 @@ export const actions: Actions = {
       success: true
     };
   },
+
   change_user_secret: async ({ request }) => {
     const data = await request.formData();
     const userId = data.get('userId') as string;
@@ -251,15 +255,13 @@ export const actions: Actions = {
     if (!user) {
       return fail(400, { userId, missingUserId: true });
     }
-    user
-      .updateOne({
-        secret,
-        password: `${password}${PASSWORD_SALT}`
-      })
-      .exec();
+    user.secret = secret;
+    user.password = `${password}${PASSWORD_SALT}`;
+    user.updateOne();
 
     return { success: true, secret, password };
   },
+
   update_agent: async ({ request, locals }) => {
     const data = await request.formData();
     const name = data.get('name') as string;

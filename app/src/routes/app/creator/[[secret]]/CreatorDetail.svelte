@@ -1,10 +1,9 @@
 <script lang="ts">
-  import { enhance } from '$app/forms';
   import ImageUploadForm from '$components/ImageUploadForm.svelte';
 
   import type { CreatorDocument } from '$lib/models/creator';
   import Icon from '@iconify/svelte';
-  import { FileButton, FileDropzone, Ratings } from '@skeletonlabs/skeleton';
+  import { Ratings } from '@skeletonlabs/skeleton';
 
   export let creator: CreatorDocument;
 
