@@ -12,7 +12,6 @@
   } from '@skeletonlabs/skeleton';
   import type { SvelteComponent } from 'svelte';
 
-  export let parent: SvelteComponent;
   const modalStore = getModalStore();
 
   let earnings: EarningsType[] = $modalStore[0].meta.earnings;

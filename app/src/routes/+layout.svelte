@@ -5,6 +5,7 @@
   import TransactionsActivity from '$components/TransactionsActivity.svelte';
   import EndShowForm from '$components/modals/EndShowForm.svelte';
   import CreatorSecret from '$components/modals/CreatorSecret.svelte';
+  import DecideDispute from '$components/modals/DecideDispute.svelte';
   import '@fontsource/roboto';
   import '@fontsource/roboto/300.css';
   import '@fontsource/roboto/500.css';
@@ -38,7 +39,8 @@
     TransactionsActivity: { ref: TransactionsActivity },
     EndShowForm: { ref: EndShowForm },
     CRUDRoomForm: { ref: CRUDRoomForm },
-    CreatorSecret: { ref: CreatorSecret }
+    CreatorSecret: { ref: CreatorSecret },
+    DecideDispute: { ref: DecideDispute }
   };
 </script>
 

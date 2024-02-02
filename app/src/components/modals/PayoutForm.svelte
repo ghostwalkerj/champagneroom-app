@@ -19,7 +19,7 @@
     $modalStore[0].meta.form as SuperValidated<typeof requestPayoutSchema>,
     {
       validationMethod: 'auto',
-      onError({ result }) {
+      onError() {
         $message =
           'There was an error processing your request. Please try again later.';
       }
