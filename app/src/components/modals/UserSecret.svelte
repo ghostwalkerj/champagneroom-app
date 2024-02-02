@@ -11,37 +11,33 @@
 
   const modalStore = getModalStore();
   $: thisModal = $modalStore[0];
-  $: creator = thisModal && thisModal.meta.creator;
+  $: user = thisModal && thisModal.meta.user;
   $: password = thisModal && thisModal.meta.password;
   let copyText = '';
 
   onMount(() => {
-    if (thisModal && creator) {
+    if (thisModal && user) {
       copyText =
         'Name: ' +
-        creator.user.name +
+        user.name +
         '\n' +
         'Password: ' +
         password +
         '\n' +
         'Secret URL: ' +
-        urlJoin(
-          $page.url.origin,
-          config.PATH.creator,
-          creator.user.secret || ''
-        );
+        urlJoin($page.url.origin, config.PATH.creator, user.secret || '');
     }
   });
 </script>
 
-{#if thisModal && creator}
+{#if thisModal && user}
   <div class="w-modal bg-surface-900 p-4 rounded">
     <div class="flex place-content-center">
       <Icon icon="mdi:check-circle" class="text-success" />
-      <span class="ml-2">Creator updated successfully</span>
+      <span class="ml-2">Updated successfully</span>
     </div>
 
-    <h3 class="font-bold text-lg text-center my-6">{creator.user.name}</h3>
+    <h3 class="font-bold text-lg text-center my-6">{user.name}</h3>
     <div class="w-full flex place-content-center">
       <CopyText copyValue={copyText}>
         <div class="text-center">
@@ -55,7 +51,7 @@
               href={urlJoin(
                 $page.url.origin,
                 config.PATH.creator,
-                creator.user.secret || ''
+                user.secret || ''
               )}
               target="_blank"
               class="link"
@@ -63,7 +59,7 @@
               {urlJoin(
                 $page.url.origin,
                 config.PATH.creator,
-                creator.user.secret || ''
+                user.secret || ''
               )}</a
             >
           </div>

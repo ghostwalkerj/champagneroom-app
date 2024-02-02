@@ -270,7 +270,7 @@ export const actions: Actions = {
     }
     user.secret = secret;
     user.password = `${password}${PASSWORD_SALT}`;
-    user.save();
+    user.updateOne();
 
     return { success: true, secret, password };
   },

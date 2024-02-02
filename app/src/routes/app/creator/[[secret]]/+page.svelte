@@ -27,16 +27,16 @@
   import ShowStatus from './ShowStatus.svelte';
 
   import { page } from '$app/stores';
+  import type { roomCRUDSchema } from '$lib/models/room';
   import type { UserDocument } from '$lib/models/user';
+  import type { requestPayoutSchema } from '$lib/payout';
   import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
+  import type { SuperValidated } from 'sveltekit-superforms';
   import type { Subscription } from 'xstate';
   import type { PageData } from './$types';
   import CreatorDetail from './CreatorDetail.svelte';
   import RoomDetail from './RoomDetail.svelte';
   import VideoMeeting from './VideoMeeting.svelte';
-  import type { SuperValidated } from 'sveltekit-superforms';
-  import type { roomCRUDSchema } from '$lib/models/room';
-  import type { requestPayoutSchema } from '$lib/payout';
 
   export let data: PageData;
 

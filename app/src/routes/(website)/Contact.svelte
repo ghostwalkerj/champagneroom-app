@@ -4,8 +4,8 @@
 
   import config from '$lib/config';
 
-  import type { ActionData } from './$types';
   import type { ActionResult } from '@sveltejs/kit';
+  import type { ActionData } from './$types';
 
   export let form: ActionData;
   let isSubmitted = false;

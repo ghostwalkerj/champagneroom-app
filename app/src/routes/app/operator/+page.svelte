@@ -10,7 +10,6 @@
 
   import type { CreatorDocument } from '$lib/models/creator';
   import type { OperatorDocument } from '$lib/models/operator';
-  import type { ShowDocument } from '$lib/models/show';
 
   import config from '$lib/config';
   import { AuthType, DisputeDecision, currencyFormatter } from '$lib/constants';
@@ -62,7 +61,6 @@
   let creatorName = uniqueNamesGenerator({
     dictionaries: [womensNames]
   });
-  let isChangeCreatorSecret = false;
   let selectedAgentId = '0';
   let newCreator: CreatorDocument | undefined;
   let newPassword: string | undefined;
@@ -113,20 +111,20 @@
       method: 'POST',
       body: formData
     });
+
     const result: ActionResult = deserialize(await response.text());
     if (result.type === 'success' && result.data) {
       creators[index].user.secret = result.data.secret;
-      const creatorSecretModal: ModalSettings = {
+      const userSecretModal: ModalSettings = {
         type: 'component',
-        component: 'CreatorSecret',
+        component: 'UserSecret',
         meta: {
-          creator: creators[index],
+          user: creators[index].user,
           password: result.data!.password
         }
       };
-      modalStore.trigger(creatorSecretModal);
+      modalStore.trigger(userSecretModal);
     }
-    isChangeCreatorSecret = false;
   };
 
   const updateCreator = async (
@@ -320,35 +318,22 @@
   const showDecideDispute = () => {
     modalStore.trigger(decideDisputeModal);
   };
+
+  const changeSecretModal: ModalSettings = {
+    type: 'confirm',
+    // Data
+    title: 'Change Creator URL',
+    body: "Changing the Creator's Secret URL will disable the current URL and create a new one.",
+    // TRUE if confirm pressed, FALSE if cancel pressed
+    response: (r: boolean) => {
+      if (r) {
+        changeUserSecret();
+      }
+    }
+  };
 </script>
 
 {#if operator}
-  <!-- Modal for Deciding Dispute -->
-
-  {#if isChangeCreatorSecret}
-    <input
-      type="checkbox"
-      id="changeUrl-show-modal"
-      class="daisy-modal-toggle"
-    />
-    <div class="daisy-modal daisy-modal-open">
-      <div class="daisy-modal-box">
-        <h3 class="font-bold text-lg">Change Secret URL</h3>
-        <p class="py-4">
-          Changing the Creator's Secret URL will disable the current URL and
-          create a new one.
-        </p>
-        <div class="daisy-modal-action">
-          <button
-            class="daisy-btn"
-            on:click={() => (isChangeCreatorSecret = false)}>Cancel</button
-          >
-          <button class="daisy-btn" on:click={changeUserSecret}>Change</button>
-        </div>
-      </div>
-    </div>
-  {/if}
-
   <div class="min-h-screen min-w-full">
     <main class="px-10 pt-2">
       <!-- Page header -->
@@ -669,7 +654,7 @@
                                   <button
                                     class="btn variant-outline-secondary btn-sm text-secondary"
                                     on:click={() =>
-                                      (isChangeCreatorSecret = true)}
+                                      modalStore.trigger(changeSecretModal)}
                                   >
                                     Change
                                   </button>

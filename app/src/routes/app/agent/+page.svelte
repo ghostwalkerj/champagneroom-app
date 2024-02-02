@@ -77,7 +77,7 @@
     // TRUE if confirm pressed, FALSE if cancel pressed
     response: (r: boolean) => {
       if (r) {
-        changeCreatorSecret();
+        changeUserSecret();
       }
     }
   };
@@ -147,7 +147,7 @@
     updateCreator(creators[index]);
   };
 
-  const changeCreatorSecret = async () => {
+  const changeUserSecret = async () => {
     const index = activeRow;
     const userId = creators[index].user._id.toString();
     let formData = new FormData();
@@ -160,15 +160,15 @@
     const result: ActionResult = deserialize(await response.text());
     if (result.type === 'success' && result.data) {
       creators[index].user.secret = result.data.secret;
-      const creatorSecretModal: ModalSettings = {
+      const userSecretModal: ModalSettings = {
         type: 'component',
-        component: 'CreatorSecret',
+        component: 'UserSecret',
         meta: {
-          creator: creators[index],
+          user: creators[index].user,
           password: result.data!.password
         }
       };
-      modalStore.trigger(creatorSecretModal);
+      modalStore.trigger(userSecretModal);
     }
   };
 
@@ -181,15 +181,15 @@
           dictionaries: [womensNames]
         });
 
-        const creatorSecretModal: ModalSettings = {
+        const userSecretModal: ModalSettings = {
           type: 'component',
-          component: 'CreatorSecret',
+          component: 'UserSecret',
           meta: {
             creator: result.data!.creator,
             password: result.data!.password
           }
         };
-        modalStore.trigger(creatorSecretModal);
+        modalStore.trigger(userSecretModal);
       } else if (result?.type === 'failure') {
         if (result.data!.badName) {
           creatorNameElement.focus();

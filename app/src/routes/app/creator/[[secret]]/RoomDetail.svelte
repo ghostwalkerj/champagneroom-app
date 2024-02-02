@@ -2,11 +2,11 @@
   import { page } from '$app/stores';
   import CopyText from '$components/CopyText.svelte';
   import config from '$lib/config';
+  import type { roomCRUDSchema } from '$lib/models/room';
   import Icon from '@iconify/svelte';
   import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
   import type { SuperValidated } from 'sveltekit-superforms';
   import urlJoin from 'url-join';
-  import type { roomCRUDSchema } from '$lib/models/room';
 
   export let roomForm: SuperValidated<typeof roomCRUDSchema>;
 
