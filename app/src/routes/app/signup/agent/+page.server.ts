@@ -1,4 +1,4 @@
-import { error, fail } from '@sveltejs/kit';
+import { fail } from '@sveltejs/kit';
 import * as web3 from 'web3';
 
 import { AUTH_SIGNING_MESSAGE } from '$env/static/private';

@@ -6,8 +6,8 @@
   import type { CreatorDocument } from '$lib/models/creator';
 
   import { CurrencyType, currencyFormatter } from '$lib/constants';
-  import spacetime from 'spacetime';
   import Icon from '@iconify/svelte';
+  import spacetime from 'spacetime';
 
   export let creators: CreatorDocument[];
   export let showData: {

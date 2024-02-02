@@ -12,9 +12,9 @@
 
   import ConnectButton from '$components/header/ConnectButton.svelte';
 
+  import type { ActionResult } from '@sveltejs/kit';
   import type { Unsubscriber } from 'svelte/store';
   import type { ActionData, PageData } from './$types';
-  import type { ActionResult } from '@sveltejs/kit';
 
   export let data: PageData;
   export let form: ActionData;

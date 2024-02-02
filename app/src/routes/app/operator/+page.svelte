@@ -22,7 +22,13 @@
   import type { UserDocument } from '$lib/models/user';
   import { PermissionType } from '$lib/permissions';
   import Icon from '@iconify/svelte';
-  import { Ratings, Tab, TabGroup } from '@skeletonlabs/skeleton';
+  import {
+    Ratings,
+    Tab,
+    TabGroup,
+    getModalStore,
+    type ModalSettings
+  } from '@skeletonlabs/skeleton';
   import { Types } from 'mongoose';
   import type { PageData } from './$types';
 
@@ -65,6 +71,7 @@
   let newCreator: CreatorDocument | undefined;
   let newPassword: string | undefined;
   let tabSet: number = 0;
+  const modalStore = getModalStore();
 
   const canImpersonateCreator = user.permissions.includes(
     PermissionType.IMPERSONATE_CREATOR
@@ -115,11 +122,16 @@
     const result: ActionResult = deserialize(await response.text());
     if (result.type === 'success' && result.data) {
       creators[index].user.secret = result.data.secret;
-      newCreator = creators[index];
-      newPassword = result.data.password;
-      newCreatorModal.showModal();
+      const creatorSecretModal: ModalSettings = {
+        type: 'component',
+        component: 'CreatorSecret',
+        meta: {
+          creator: creators[index],
+          password: result.data!.password
+        }
+      };
+      modalStore.trigger(creatorSecretModal);
     }
-
     isChangeCreatorSecret = false;
   };
 
@@ -300,37 +312,6 @@
     };
   };
 </script>
-
-<dialog id="new_creator_modal" class="daisy-modal" bind:this={newCreatorModal}>
-  <div class="daisy-modal-box">
-    {#if newCreator}
-      <h3 class="font-bold text-lg text-center mb-6">Creator</h3>
-      <div class="text-center">
-        {newCreator.user.name} has the following password:
-        <div class="text-center font-bold text-lg">{newPassword}</div>
-      </div>
-      <div class="text-center mt-4">
-        and secret URL:
-        <div class="text-center font-bold text-sm">
-          <a
-            href={urlJoin(config.PATH.creator, newCreator.user.secret || '')}
-            target="_blank"
-            class="daisy-link daisy-link-primary"
-          >
-            {urlJoin(config.PATH.creator, newCreator.user.secret || '')}</a
-          >
-        </div>
-      </div>
-
-      <div class="daisy-modal-action">
-        <form method="dialog">
-          <!-- if there is a button in form, it will close the modal -->
-          <button class="daisy-btn">Close</button>
-        </form>
-      </div>
-    {/if}
-  </div>
-</dialog>
 
 {#if operator}
   <!-- Modal for Deciding Dispute -->
