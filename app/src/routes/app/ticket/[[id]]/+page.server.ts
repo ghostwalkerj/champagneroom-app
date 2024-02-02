@@ -3,6 +3,7 @@ import type { AxiosResponse } from 'axios';
 import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 import jwt from 'jsonwebtoken';
+import { superValidate } from 'sveltekit-superforms/server';
 
 import {
   BITCART_API_URL,
@@ -364,8 +365,15 @@ export const load: PageServerLoad = async ({ locals }) => {
     JITSI_JWT_SECRET
   );
 
+  const disputeForm = await superValidate(
+    ticket.ticketState.dispute,
+    disputeSchema,
+    { errors: false }
+  );
+
   return {
     jitsiToken,
+    disputeForm,
     ticket: ticket.toJSON({ flattenMaps: true, flattenObjectIds: true }),
     user: user?.toJSON({ flattenMaps: true, flattenObjectIds: true }),
     show: show.toJSON({ flattenMaps: true, flattenObjectIds: true }),
