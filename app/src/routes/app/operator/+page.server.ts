@@ -20,7 +20,12 @@ import type { ShowQueueType } from '$lib/workers/showWorker';
 
 import config from '$lib/config';
 import type { DisputeDecision } from '$lib/constants';
-import { AuthType, EntityType, ShowMachineEventString } from '$lib/constants';
+import {
+  AuthType,
+  EntityType,
+  ShowMachineEventString,
+  TicketStatus
+} from '$lib/constants';
 import {
   backupAuthToken,
   createAuthToken,
@@ -49,6 +54,7 @@ export const actions: Actions = {
     encAuthToken && setAuthToken(cookies, tokenName, encAuthToken);
     throw redirect(303, config.PATH.app);
   },
+
   create_agent: async ({ request }: RequestEvent) => {
     const data = await request.formData();
     let name = data.get('name') as string;
@@ -91,6 +97,7 @@ export const actions: Actions = {
       return fail(400, { address, badAgentAddress: true });
     }
   },
+
   create_creator: async ({ request }) => {
     const data = await request.formData();
     const agentId = data.get('agentId') as string;
@@ -145,6 +152,7 @@ export const actions: Actions = {
       return fail(400, { err: error });
     }
   },
+
   update_creator: async ({ request }) => {
     const data = await request.formData();
     const creatorId = data.get('creatorId') as string;
@@ -202,6 +210,7 @@ export const actions: Actions = {
       success: true
     };
   },
+
   update_agent: async ({ request }) => {
     const data = await request.formData();
     const userId = data.get('userId') as string;
@@ -240,6 +249,7 @@ export const actions: Actions = {
       success: true
     };
   },
+
   change_user_secret: async ({ request }) => {
     const data = await request.formData();
     const userId = data.get('userId') as string;
@@ -268,8 +278,8 @@ export const actions: Actions = {
   decide_dispute: async ({ request, locals }: RequestEvent) => {
     const data = await request.formData();
     const ticketId = data.get('ticketId') as string;
-    const decision = data.get('decision') as DisputeDecision;
     const showId = data.get('showId') as string;
+    const decision = data.get('decision') as DisputeDecision;
 
     if (ticketId === null) {
       return fail(400, { ticketId, badTicketId: true });
@@ -311,8 +321,12 @@ export const load: PageServerLoad = async ({ locals }) => {
   const agents = await Agent.find().sort({ 'user.name': 1 });
   const creators = await Creator.find().sort({ 'user.name': 1 });
 
+  // const disputedTickets = await Ticket.find({
+  //   'ticketState.dispute.resolved': false
+  // }).populate<{ show: ShowDocument }>('show');
+
   const disputedTickets = await Ticket.find({
-    'ticketState.dispute.resolved': false
+    'ticketState.status': TicketStatus.IN_DISPUTE
   }).populate<{ show: ShowDocument }>('show');
 
   // eslint-disable-next-line @typescript-eslint/naming-convention

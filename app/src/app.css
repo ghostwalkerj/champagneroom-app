@@ -8,7 +8,7 @@
 }
 
 .btn {
-  @apply font-CaviarDreams font-semibold text-sm p-3.5 rounded-lg
+  @apply font-CaviarDreams font-semibold text-sm rounded-lg
 }
 .input {
   @apply font-CaviarDreams  text-sm p-3.5 rounded-lg

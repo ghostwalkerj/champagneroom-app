@@ -41,13 +41,9 @@
 
   $: canAddAgent = false;
   $: canAddCreator = false;
-  const decisions = Object.values(DisputeDecision);
-  let decision = decisions[0];
-  let activeTab = 'Admin' as 'Admin' | 'Agents' | 'Creators' | 'Disputes';
   let activeAgentRow = 0;
   let activeCreatorRow = 0;
   let activeDisputeRow = 0;
-  let isDecideDispute = false;
 
   let agentNameElement: HTMLTableCellElement;
   let agentAddressElement: HTMLTableCellElement;
@@ -82,21 +78,19 @@
   );
 
   const decideDispute = async (decision: DisputeDecision) => {
+    if (!decision) return;
     const index = activeDisputeRow;
     const ticket = disputedTickets[index];
-    const show = ticket.show as unknown as ShowDocument;
-
     let formData = new FormData();
     formData.append('ticketId', ticket._id.toString());
     formData.append('decision', decision.toString());
-    formData.append('showId', show._id.toString());
+    formData.append('showId', ticket.show._id.toString());
     fetch('?/decide_dispute', {
       method: 'POST',
       body: formData
     });
 
     disputedTickets.splice(index, 1);
-    isDecideDispute = false;
   };
 
   const impersonate = async (impersonateId: string) => {
@@ -311,43 +305,25 @@
       }
     };
   };
+
+  const decideDisputeModal: ModalSettings = {
+    type: 'component',
+    component: 'DecideDispute',
+    meta: {
+      ticket: disputedTickets[activeDisputeRow]
+    },
+    response: (decision: DisputeDecision) => {
+      decideDispute(decision);
+    }
+  };
+
+  const showDecideDispute = () => {
+    modalStore.trigger(decideDisputeModal);
+  };
 </script>
 
 {#if operator}
   <!-- Modal for Deciding Dispute -->
-  {#if isDecideDispute}
-    <input
-      type="checkbox"
-      id="changeUrl-show-modal"
-      class="daisy-modal-toggle"
-    />
-    <div class="daisy-modal daisy-modal-open">
-      <div class="daisy-modal-box">
-        <h3 class="text-lg lg:text-xl font-bold">Dispute Decision</h3>
-        <div class="py-2 daisy-form-control">
-          <select
-            class="daisy-select daisy-select-primary w-full max-w-xs"
-            name="decision"
-            bind:value={decision}
-          >
-            <option disabled selected>Decision</option>
-
-            {#each decisions as decision}
-              <option>{decision}</option>
-            {/each}
-          </select>
-        </div>
-        <div class="daisy-modal-action">
-          <button class="daisy-btn" on:click={() => (isDecideDispute = false)}
-            >Cancel</button
-          >
-          <button class="daisy-btn" on:click={() => decideDispute(decision)}
-            >Finalize</button
-          >
-        </div>
-      </div>
-    </div>
-  {/if}
 
   {#if isChangeCreatorSecret}
     <input
@@ -805,12 +781,13 @@
                           <th>Run Time</th>
                           <th>Reason</th>
                           <th>Explanation</th>
+                          <th>Action</th>
                         </tr>
                       </thead>
                       <tbody>
                         {#each disputedTickets as ticket, index}
                           {@const runtime = ticket.show.showState.runtime}
-                          {#if runtime}
+                          {#if ticket.show}
                             <tr on:click={() => (activeDisputeRow = index)}>
                               <td>{index + 1}</td>
                               <td>{ticket.show.creatorInfo.name}</td>
@@ -820,26 +797,28 @@
                                 ).format(ticket.price.amount)}</td
                               >
                               <td
-                                >{spacetime(runtime.startDate || '').format(
-                                  'nice'
-                                )}</td
+                                >{runtime &&
+                                  spacetime(runtime.startDate || '').format(
+                                    'nice'
+                                  )}</td
                               >
                               <td
-                                >{spacetime(runtime.endDate).format('nice')}</td
+                                >{runtime &&
+                                  spacetime(runtime.endDate).format('nice')}</td
                               >
                               <td
-                                >{spacetime(runtime.startDate).diff(
-                                  runtime.endDate ?? spacetime.now()
-                                ).minutes}
+                                >{runtime &&
+                                  spacetime(runtime.startDate).diff(
+                                    runtime.endDate ?? spacetime.now()
+                                  ).minutes}
                                 min</td
                               >
                               <td>{ticket.ticketState.dispute?.reason}</td>
                               <td>{ticket.ticketState.dispute?.explanation}</td>
                               <td
                                 ><button
-                                  class="btn btn-sm variant-filled"
-                                  on:click={() => (isDecideDispute = true)}
-                                  >Decide</button
+                                  class="btn btn-sm variant-filled-primary m-0"
+                                  on:click={showDecideDispute}>Decide</button
                                 ></td
                               >
                             </tr>
