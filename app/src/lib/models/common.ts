@@ -14,7 +14,7 @@ import { PayoutStatus } from '$lib/payout';
 
 export type CancelType = z.infer<typeof cancelSchema>;
 
-export type DisputeType = z.infer<typeof disputeSchema>;
+export type DisputeType = z.infer<typeof ticketDisputeSchema>;
 
 export type EarningsType = z.infer<typeof earningsSchema>;
 
@@ -58,16 +58,6 @@ export const creatorSalesStatsSchema = z
   })
   .strict();
 
-export const disputeSchema = z.object({
-  startedAt: z.coerce.date().default(() => new Date()),
-  endedAt: z.coerce.date().optional(),
-  reason: z.nativeEnum(DisputeReason),
-  disputedBy: z.nativeEnum(ActorType),
-  explanation: z.string().min(10).max(500).optional(),
-  decision: z.nativeEnum(DisputeDecision).optional(),
-  resolved: z.boolean().default(false)
-});
-
 export const disputeStatsSchema = z.object({
   totalDisputes: z.number().min(0).default(0),
   totalDisputesRefunded: z.number().min(0).default(0),
@@ -91,18 +81,18 @@ export const escrowSchema = z.object({
   endedAt: z.coerce.date().optional()
 });
 
+export const feedbackStatsSchema = z.object({
+  numberOfReviews: z.number().min(0).default(0),
+  averageRating: z.number().min(0).max(5).default(0),
+  comments: z.array(z.string().trim()).default([])
+});
+
 const transactionSummarySchema = z.object({
   createdAt: z.coerce.date().default(() => new Date()),
   amount: z.number().min(0),
   currency: z.nativeEnum(CurrencyType),
   rate: z.number().min(0).default(0),
   transaction: z.any().optional()
-});
-
-export const feedbackStatsSchema = z.object({
-  numberOfReviews: z.number().min(0).default(0),
-  averageRating: z.number().min(0).max(5).default(0),
-  comments: z.array(z.string().trim()).default([])
 });
 
 export const finalizeSchema = z.object({
@@ -184,7 +174,19 @@ export const showSalesStatsSchema = z.object({
   totalRefunds: z.record(z.number().min(0)).default({})
 });
 
+export const ticketDisputeSchema = z.object({
+  startedAt: z.coerce.date().default(() => new Date()),
+  endedAt: z.coerce.date().optional(),
+  reason: z.nativeEnum(DisputeReason),
+  disputedBy: z.nativeEnum(ActorType),
+  explanation: z.string().min(10).max(500).optional(),
+  decision: z.nativeEnum(DisputeDecision).optional(),
+  resolved: z.boolean().default(false),
+  ticketId: z.string().trim().optional()
+});
+
 export const ticketFeedbackSchema = z.object({
+  ticketId: z.string().trim().optional(),
   rating: z.number().min(1).max(5),
   review: z.string().min(0).max(500).optional(),
   createdAt: z.coerce.date().default(() => new Date())

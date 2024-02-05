@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { DisputeDecision } from '$lib/constants';
   import { getModalStore } from '@skeletonlabs/skeleton';
   import type { SvelteComponent } from 'svelte';
+
+  import { DisputeDecision } from '$lib/constants';
   export let parent: SvelteComponent;
   const modalStore = getModalStore();
   const decisions = Object.values(DisputeDecision);

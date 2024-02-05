@@ -1,22 +1,14 @@
 <script lang="ts">
-  import ImageUploadForm from '$components/ImageUploadForm.svelte';
-
-  import type { CreatorDocument } from '$lib/models/creator';
   import Icon from '@iconify/svelte';
   import { Ratings } from '@skeletonlabs/skeleton';
 
+  import type { CreatorDocument } from '$lib/models/creator';
+
+  import ImageUploadForm from '$components/ImageUploadForm.svelte';
+
   export let creator: CreatorDocument;
 
-  let images: FileList;
-  let fileDrop: HTMLInputElement;
-  $: changed = false;
   $: profileImageUrl = creator.user.profileImageUrl;
-
-  const onChange = () => {
-    if (images.length === 0) return;
-    changed = true;
-    profileImageUrl = URL.createObjectURL(images[0]);
-  };
 </script>
 
 <div

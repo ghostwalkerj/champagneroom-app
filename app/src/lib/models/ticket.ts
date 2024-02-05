@@ -14,12 +14,12 @@ import { TicketStatus } from '$lib/constants';
 
 import {
   cancelSchema,
-  disputeSchema,
   escrowSchema,
   finalizeSchema,
   moneySchema,
   redemptionSchema,
   refundSchema,
+  ticketDisputeSchema,
   ticketFeedbackSchema,
   ticketSaleSchema
 } from './common';
@@ -34,7 +34,7 @@ const ticketStateSchema = z.object({
   cancel: cancelSchema.optional(),
   redemption: redemptionSchema.optional(),
   escrow: escrowSchema.optional(),
-  dispute: disputeSchema.optional(),
+  dispute: ticketDisputeSchema.optional(),
   finalize: finalizeSchema.optional(),
   feedback: ticketFeedbackSchema.optional(),
   refund: refundSchema.optional(),

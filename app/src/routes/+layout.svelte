@@ -1,16 +1,11 @@
 <script lang="ts">
-  import TransactionsActivity from '$components/TransactionsActivity.svelte';
-  import CRUDRoomForm from '$components/modals/CRUDRoomForm.svelte';
-  import DecideDispute from '$components/modals/DecideDispute.svelte';
-  import EndShowForm from '$components/modals/EndShowForm.svelte';
-  import PayoutForm from '$components/modals/PayoutForm.svelte';
-  import ReserveShowForm from '$components/modals/ReserveTicketForm.svelte';
-  import UserSecret from '$components/modals/UserSecret.svelte';
   import '@fontsource/roboto';
   import '@fontsource/roboto/300.css';
   import '@fontsource/roboto/500.css';
   import '@fontsource/roboto/700.css';
   import '@fontsource/roboto/900.css';
+  import '@fontsource/space-grotesk';
+  import '../app.css';
 
   import {
     arrow,
@@ -20,15 +15,22 @@
     offset,
     shift
   } from '@floating-ui/dom';
-  import '@fontsource/space-grotesk';
   import type { ModalComponent } from '@skeletonlabs/skeleton';
   import {
     Drawer,
-    Modal,
     initializeStores,
+    Modal,
     storePopup
   } from '@skeletonlabs/skeleton';
-  import '../app.css';
+
+  import CRUDRoomForm from '$components/modals/CRUDRoomForm.svelte';
+  import DecideDispute from '$components/modals/DecideDispute.svelte';
+  import EndShowForm from '$components/modals/EndShowForm.svelte';
+  import PayoutForm from '$components/modals/PayoutForm.svelte';
+  import ReserveShowForm from '$components/modals/ReserveTicketForm.svelte';
+  import TicketFeedback from '$components/modals/TicketFeedback.svelte';
+  import UserSecret from '$components/modals/UserSecret.svelte';
+  import TransactionsActivity from '$components/TransactionsActivity.svelte';
   initializeStores();
   storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
 
@@ -40,7 +42,8 @@
     EndShowForm: { ref: EndShowForm },
     CRUDRoomForm: { ref: CRUDRoomForm },
     UserSecret: { ref: UserSecret },
-    DecideDispute: { ref: DecideDispute }
+    DecideDispute: { ref: DecideDispute },
+    TicketFeedback: { ref: TicketFeedback }
   };
 </script>
 

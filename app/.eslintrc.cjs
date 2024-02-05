@@ -91,14 +91,6 @@ module.exports = {
     '@typescript-eslint/naming-convention': [
       'error',
       {
-        selector: 'default',
-        format: ['camelCase'],
-        filter: {
-          regex: '^(IORedis|Property-Name-Two)$',
-          match: false
-        }
-      },
-      {
         selector: 'variable',
         format: ['PascalCase', 'UPPER_CASE'],
         types: ['boolean'],
