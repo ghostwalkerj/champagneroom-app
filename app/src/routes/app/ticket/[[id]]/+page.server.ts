@@ -17,8 +17,8 @@ import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
 import {
   cancelSchema,
-  disputeSchema,
   refundSchema,
+  ticketDisputeSchema,
   ticketFeedbackSchema
 } from '$lib/models/common';
 
@@ -181,7 +181,7 @@ export const actions: Actions = {
     const ticketService = getTicketMachineService(ticket, redisConnection);
 
     const state = ticketService.getSnapshot();
-    const dispute = disputeSchema.parse({
+    const dispute = ticketDisputeSchema.parse({
       disputedBy: ActorType.CUSTOMER,
       reason: reason as DisputeReason,
       explanation
@@ -366,14 +366,21 @@ export const load: PageServerLoad = async ({ locals }) => {
   );
 
   const disputeForm = await superValidate(
-    ticket.ticketState.dispute,
-    disputeSchema,
+    { ...ticket.ticketState.dispute, ticketId: ticket.id },
+    ticketDisputeSchema,
+    { errors: false }
+  );
+
+  const feedbackForm = await superValidate(
+    { ...ticket.ticketState.feedback, ticketId: ticket.id },
+    ticketFeedbackSchema,
     { errors: false }
   );
 
   return {
     jitsiToken,
     disputeForm,
+    feedbackForm,
     ticket: ticket.toJSON({ flattenMaps: true, flattenObjectIds: true }),
     user: user?.toJSON({ flattenMaps: true, flattenObjectIds: true }),
     show: show.toJSON({ flattenMaps: true, flattenObjectIds: true }),

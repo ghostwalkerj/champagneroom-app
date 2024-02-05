@@ -9,7 +9,6 @@ import { raise } from 'xstate/lib/actions';
 import type { FeedbackType, TransactionSummaryType } from '$lib/models/common';
 import {
   type CancelType,
-  disputeSchema,
   type DisputeType,
   escrowSchema,
   finalizeSchema,
@@ -18,6 +17,7 @@ import {
   refundSchema,
   type RefundType,
   type SaleType,
+  ticketDisputeSchema,
   ticketSaleSchema,
   transactionSummarySchema
 } from '$lib/models/common';
@@ -684,7 +684,7 @@ const createTicketMachine = ({
           const refund = event.refund;
 
           if (!context.ticketState.dispute) return {};
-          const dispute = disputeSchema.parse({
+          const dispute = ticketDisputeSchema.parse({
             ...context.ticketState.dispute,
             decision: event.decision,
             endedAt: new Date(),

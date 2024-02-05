@@ -1,11 +1,13 @@
 <script lang="ts">
-  import type { WalletDocumentType } from '$lib/models/wallet';
-  import type { requestPayoutSchema } from '$lib/payout';
   import Icon from '@iconify/svelte';
   import { getModalStore } from '@skeletonlabs/skeleton';
   import type { SvelteComponent } from 'svelte';
   import type { SuperValidated } from 'sveltekit-superforms';
   import { superForm } from 'sveltekit-superforms/client';
+
+  import type { WalletDocumentType } from '$lib/models/wallet';
+
+  import type { requestPayoutSchema } from '$lib/payout';
 
   // Props
   /** Exposes parent props to this component. */
@@ -50,43 +52,39 @@
       readonly
     />
 
-    <label for="">
-      <span>Amount in {wallet.currency}</span>
-      <div class="flex gap-4">
-        <input
-          type="number"
-          step="any"
-          name="amount"
-          bind:value={$form.amount}
-          {...$constraints.amount}
-          placeholder="Enter amount..."
-          class="input variant-form-material bg-surface-800"
-        />
-        <span class="divider-vertical" />
-        <button
-          class="btn variant-soft-secondary"
-          type="button"
-          on:click={() => ($form.amount = wallet.availableBalance)}
-          >Set Current Balance</button
-        >
-      </div>
-      {#if $errors.amount}<span class="text-error">{$errors.amount}</span>{/if}
-    </label>
-
-    <label for="">
-      <span>Destination address</span>
+    <span>Amount in {wallet.currency}</span>
+    <div class="flex gap-4">
       <input
-        type="text"
-        name="destination"
-        bind:value={$form.destination}
-        {...$constraints.destination}
-        placeholder="Enter destination address..."
+        type="number"
+        step="any"
+        name="amount"
+        bind:value={$form.amount}
+        {...$constraints.amount}
+        placeholder="Enter amount..."
         class="input variant-form-material bg-surface-800"
       />
-      {#if $errors.destination}<span class="text-error"
-          >{$errors.destination}</span
-        >{/if}
-    </label>
+      <span class="divider-vertical" />
+      <button
+        class="btn variant-soft-secondary"
+        type="button"
+        on:click={() => ($form.amount = wallet.availableBalance)}
+        >Set Current Balance</button
+      >
+    </div>
+    {#if $errors.amount}<span class="text-error">{$errors.amount}</span>{/if}
+
+    <span>Destination address</span>
+    <input
+      type="text"
+      name="destination"
+      bind:value={$form.destination}
+      {...$constraints.destination}
+      placeholder="Enter destination address..."
+      class="input variant-form-material bg-surface-800"
+    />
+    {#if $errors.destination}<span class="text-error"
+        >{$errors.destination}</span
+      >{/if}
 
     <footer class="text-right font-semibold">
       <button

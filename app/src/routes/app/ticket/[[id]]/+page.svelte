@@ -1,9 +1,23 @@
 <script lang="ts">
-  import { invalidateAll, onNavigate } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
   import { onMount, tick } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
+  import type { SuperValidated } from 'sveltekit-superforms';
   import web3 from 'web3';
+
+  import { invalidateAll, onNavigate } from '$app/navigation';
+  import { page } from '$app/stores';
+
+  import type { ticketFeedbackSchema } from '$lib/models/common';
+  import { refundSchema, ticketDisputeSchema } from '$lib/models/common';
+  import type { ShowDocument } from '$lib/models/show';
+  import type { TicketDocument } from '$lib/models/ticket';
+  import type { UserDocument } from '$lib/models/user';
+
+  import {
+    createTicketMachineService,
+    type TicketMachineServiceType
+  } from '$lib/machines/ticketMachine';
 
   import {
     DisputeReason,
@@ -12,39 +26,34 @@
     TicketMachineEventString,
     TicketStatus
   } from '$lib/constants';
-  import { disputeSchema, refundSchema } from '$lib/models/common';
-  import type { ShowDocument } from '$lib/models/show';
-  import type { UserDocument } from '$lib/models/user';
-
-  import {
-    createTicketMachineService,
-    type TicketMachineServiceType
-  } from '$lib/machines/ticketMachine';
-
   import { ActorType } from '$lib/constants';
   import { InvoiceStatus, type PaymentType } from '$lib/payout';
   import { connect, defaultWallet, selectedAccount } from '$lib/web3';
 
   import { ShowStore, TicketStore } from '$stores';
 
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   import CancelTicket from './CancelTicket.svelte';
-  import DisputeTicket from './DisputeTicket.svelte';
-  import LeaveFeedback from './LeaveFeedback.svelte';
   import TicketDetail from './TicketDetail.svelte';
   import TicketInvoice from './TicketInvoice.svelte';
-
-  import type { TicketDocument } from '$lib/models/ticket';
-  import type { ActionData, PageData } from './$types';
   import VideoMeeting from './VideoMeeting.svelte';
 
+  import type { PageData } from './$types';
+
   export let data: PageData;
-  export let form: ActionData;
 
   let ticket = data.ticket as TicketDocument;
   let show = data.show as ShowDocument;
   let invoice = data.invoice;
   let user = data.user as UserDocument;
   let jitsiToken = data.jitsiToken as string;
+  let feedbackForm = data.feedbackForm as SuperValidated<
+    typeof ticketFeedbackSchema
+  >;
+
+  let disputeForm = data.disputeForm as SuperValidated<
+    typeof ticketDisputeSchema
+  >;
 
   const currentPayment = invoice?.payments?.[
     invoice?.payments?.length - 1
@@ -59,7 +68,6 @@
   $: showVideo = false;
   let canLeaveFeedback = false;
   let canDispute = false;
-  let hasMissedShow = false;
   let isWaitingForShow = false;
   let showUnSub: Unsubscriber;
   let ticketUnSub: Unsubscriber;
@@ -68,6 +76,23 @@
   $: isLoading = false;
   $: leftShow = false;
   let ticketMachineService: TicketMachineServiceType;
+  const modalStore = getModalStore();
+
+  const ticketFeedbackModal: ModalSettings = {
+    type: 'component',
+    component: 'TicketFeedback',
+    meta: {
+      feedbackForm
+    }
+  };
+
+  const ticketDisputeModal: ModalSettings = {
+    type: 'component',
+    component: 'TicketDispute',
+    meta: {
+      disputeForm
+    }
+  };
 
   const walletPay = async () => {
     isLoading = true;
@@ -151,7 +176,7 @@
 
     canDispute = state.can({
       type: 'DISPUTE INITIATED',
-      dispute: disputeSchema.parse({
+      dispute: ticketDisputeSchema.parse({
         disputedBy: ActorType.CUSTOMER,
         reason: DisputeReason.ENDED_EARLY
       }),
@@ -159,7 +184,6 @@
         reason: RefundReason.DISPUTE_DECISION
       })
     });
-    hasMissedShow = state.matches('ended.missedShow');
     isWaitingForShow =
       state.can(TicketMachineEventString.SHOW_JOINED) ||
       state.can(TicketMachineEventString.TICKET_REDEEMED);
@@ -180,6 +204,14 @@
     });
     showVideo = true;
     isLoading = false;
+  };
+
+  const leaveFeedback = async () => {
+    modalStore.trigger(ticketFeedbackModal);
+  };
+
+  const initiateDispute = async () => {
+    modalStore.trigger(ticketDisputeModal);
   };
 
   const leftShowCallback = () => {
@@ -254,6 +286,7 @@
   });
 </script>
 
+/** eslint-disable @typescript-eslint/naming-convention */
 {#if showVideo}
   <VideoMeeting bind:show {user} {jitsiToken} {leftShowCallback} />
 {:else if ticket}
@@ -332,7 +365,14 @@
           {/if}
           <div class="flex flex-col md:flex-row">
             {#if canLeaveFeedback}
-              <LeaveFeedback bind:isLoading {form} />
+              <div class="p-4 w-full flex justify-center">
+                <button
+                  class="btn variant-filled-primary"
+                  on:click={() => {
+                    leaveFeedback();
+                  }}>Leave Feedback</button
+                >
+              </div>
             {/if}
             {#if canLeaveFeedback && canDispute}
               <div class="w-full md:w-3/4 md:p-6 font-SpaceGrotesk h-1/2">
@@ -342,7 +382,14 @@
               </div>
             {/if}
             {#if canDispute}
-              <DisputeTicket bind:isLoading {form} />
+              <div class="p-4 w-full flex justify-center">
+                <button
+                  class="btn variant-filled-primary"
+                  on:click={() => {
+                    initiateDispute();
+                  }}>Initiate Dispute</button
+                >
+              </div>
             {/if}
           </div>
         </div>

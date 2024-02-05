@@ -4853,9 +4853,9 @@ builtin-status-codes@^3.0.0:
   integrity sha512-HpGFw18DgFWlncDfjTa2rcQ4W88O1mC8e8yZ2AvQY5KDaktSTwo+KRf6nHK6FRI5FyRyb/5T6+TSxfP7QyGsmQ==
 
 bullmq@^5.1.2:
-  version "5.1.6"
-  resolved "https://registry.yarnpkg.com/bullmq/-/bullmq-5.1.6.tgz#7dcbad0fa108f70818d899b51c64f5cd00d3c5d2"
-  integrity sha512-VkLfig+xm4U3hc4QChzuuAy0NGQ9dfPB8o54hmcZHCX9ofp0Zn6bEY+W3Ytkk76eYwPAgXfywDBlAb2Unjl1Rg==
+  version "5.1.8"
+  resolved "https://registry.yarnpkg.com/bullmq/-/bullmq-5.1.8.tgz#6269a03cf85ec2422aaef5004cd1f09191fc42b9"
+  integrity sha512-jZQOzjr35qGIYRjRoO56zf0Lm9aMQVlkzgBLeaoXuK86K+KvXyXoO+ErlAlaAKNQW5IGr9P1/oZzR1NvIy9tuA==
   dependencies:
     cron-parser "^4.6.0"
     glob "^8.0.3"
@@ -9355,9 +9355,9 @@ one-webcrypto@^1.0.3:
   resolved "https://registry.yarnpkg.com/one-webcrypto/-/one-webcrypto-1.0.3.tgz#f951243cde29b79b6745ad14966fc598a609997c"
   integrity sha512-fu9ywBVBPx0gS9K0etIROTiCkvI5S1TDjFsYFb3rC1ewFxeOqsbzq7aIMBHsYfrTHBcGXJaONXXjTl8B01cW1Q==
 
-"one-webcrypto@git+https://github.com/web3-storage/one-webcrypto.git":
+"one-webcrypto@https://github.com/web3-storage/one-webcrypto":
   version "1.0.3"
-  resolved "git+https://github.com/web3-storage/one-webcrypto.git#5148cd14d5489a8ac4cd38223870e02db15a2382"
+  resolved "https://github.com/web3-storage/one-webcrypto#5148cd14d5489a8ac4cd38223870e02db15a2382"
 
 onetime@^5.1.2:
   version "5.1.2"
@@ -9927,10 +9927,10 @@ prettier-plugin-svelte@^3.1.2:
   resolved "https://registry.yarnpkg.com/prettier-plugin-svelte/-/prettier-plugin-svelte-3.1.2.tgz#2e050eb56dbb467a42c45ad6ce18bb277d28ffa0"
   integrity sha512-7xfMZtwgAWHMT0iZc8jN4o65zgbAQ3+O32V6W7pXrqNvKnHnkoyQCGCbKeUyXKZLbYE0YhFRnamfxfkEGxm8qA==
 
-prettier@^3.2.4:
-  version "3.2.4"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.2.4.tgz#4723cadeac2ce7c9227de758e5ff9b14e075f283"
-  integrity sha512-FWu1oLHKCrtpO1ypU6J0SbK2d9Ckwysq6bHj/uaCP26DxrPpppCLQRGVuqAxSTvhF00AcvDRyYrLNW7ocBhFFQ==
+prettier@^3.2.5:
+  version "3.2.5"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.2.5.tgz#e52bc3090586e824964a8813b09aba6233b28368"
+  integrity sha512-3/GWa9aOC0YeD7LUfvOG2NiDyhOWRvt1k+rcKhOuYnMY24iiCphgneUfJDyFXd6rZCAnuLBv6UeAULtrhT/F4A==
 
 pretty-format@^27.0.2:
   version "27.5.1"
@@ -11342,9 +11342,9 @@ svelte-proxied-store@^2.0.4:
   integrity sha512-qNF/ck+gjmeSKEV/KRO5BuPDKKqR6ZNnbTZ1ZoPGNyv5ZRewgBgqb1baAHnb/I7LE37kDWvc69QjrVSWk/ZrHQ==
 
 svelte-table@^0.6.1:
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/svelte-table/-/svelte-table-0.6.1.tgz#0700a25eac21372b9c6d37d91e0e5b6ffe890609"
-  integrity sha512-DfSwLs19mtp9V4rFo4oYv8T0YWFOR0Yy+43qtj3fPbZhd1h3vyycJ5c6mFlxICnsNYOD7WOjmQ/EpXY85mmJMQ==
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/svelte-table/-/svelte-table-0.6.2.tgz#4f0c24e29090da509a664de670fadbb48dfaff53"
+  integrity sha512-Yiu5eSEqwExsTFHHGwvSTjY/bbD2OOtwljMiE2yM8DbQglD9RF2WHLkWNKwlD6enOiALiHeEvqub3ylGDQFqbQ==
 
 svelte2tsx@~0.7.0:
   version "0.7.0"
