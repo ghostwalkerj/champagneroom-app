@@ -10,10 +10,10 @@
 </script>
 
 <div
-  class="bg-custom rounded p-4 flex flex-col gap-4 text-center justify-center"
+  class="bg-custom flex flex-col justify-center gap-4 rounded p-4 text-center"
 >
   <h2
-    class="text-xl font-semibold text-center flex gap-2 items-center justify-center"
+    class="flex items-center justify-center gap-2 text-center text-xl font-semibold"
   >
     <Icon
       icon="fluent:shifts-activity-20-filled"
@@ -38,18 +38,18 @@
           {/if}
         </svelte:fragment>
         <svelte:fragment slot="summary">
-          <div class="text-sm text-gray-200 text-right font-semibold">
+          <div class="text-right text-sm font-semibold text-gray-200">
             {currencyFormatter(show.price.currency).format(show.price.amount)}
           </div>
         </svelte:fragment>
         <svelte:fragment slot="content">
-          <div class="text-2xl flex w-full justify-center">
+          <div class="flex w-full justify-center text-2xl">
             <Ratings
               value={show.showState.feedbackStats.averageRating ?? 0}
               max={5}
               text="text-yellow-400"
               spacing="m-0"
-              class="max-w-min m-2"
+              class="m-2 max-w-min"
             >
               <svelte:fragment slot="empty">
                 <Icon icon="fluent:star-28-regular" />
@@ -61,13 +61,13 @@
                 ><Icon icon="fluent:star-28-filled" /></svelte:fragment
               >
             </Ratings>
-            <span class="text-base mt-2">
+            <span class="mt-2 text-base">
               ({show.showState.feedbackStats.averageRating.toFixed(2) ??
                 0})</span
             >
           </div>
           {#if show.showState.feedbackStats.comments.length > 0}
-            <div class="text-sm text-left -mt-1 flex flex-col gap-1">
+            <div class="-mt-1 flex flex-col gap-1 text-left text-sm">
               <p class="font-semibold">
                 Comments ({show.showState.feedbackStats.comments.length})
               </p>

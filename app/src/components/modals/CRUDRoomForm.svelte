@@ -44,7 +44,7 @@
 </script>
 
 {#if thisModal}
-  <div class="bg-surface-900 max-w-3xl rounded">
+  <div class="max-w-3xl rounded bg-surface-900">
     <form
       class="grid sm:grid-cols-2"
       method="POST"
@@ -59,7 +59,7 @@
       <FileDropzone
         name="images"
         padding="p-0"
-        class="bg-surface-900 max-h-max overflow-hidden rounded-xl "
+        class="max-h-max overflow-hidden rounded-xl bg-surface-900 "
         bind:files={images}
         accept="image/*"
         on:change={() => {
@@ -72,11 +72,11 @@
           <div>
             <img src={$form.bannerImageUrl} alt="coverImageUrl" />
           </div>
-          <div class="label font-semibold p-4">Upload Room Cover Image</div>
+          <div class="label p-4 font-semibold">Upload Room Cover Image</div>
         </svelte:fragment>
       </FileDropzone>
 
-      <div class="p-4 flex flex-col gap-4 justify-between">
+      <div class="flex flex-col justify-between gap-4 p-4">
         <div class="flex flex-col gap-4">
           <label class="label">
             <span class="font-semibold">Room Name</span>
@@ -143,20 +143,20 @@
 
         <footer class="text-right font-semibold">
           <button
-            class="btn variant-filled-surface"
+            class="variant-filled-surface btn"
             disabled={$delayed}
             type="button"
             on:click={parent.onClose}>{parent.buttonTextCancel}</button
           >
           <button
-            class="btn variant-filled-primary gap-2"
+            class="variant-filled-primary btn gap-2"
             disabled={$delayed}
             type="submit"
             >Submit {#if $delayed}<Icon icon="eos-icons:loading" />{/if}</button
           >
           {#if $message}
             <br />
-            <p class="text-error mt-2">{$message}</p>
+            <p class="mt-2 text-error">{$message}</p>
           {/if}
         </footer>
       </div>

@@ -339,28 +339,28 @@
       <!-- Page header -->
       {#key operator}
         <div
-          class="bg-base border-2 border-secondary rounded-lg mx-auto py-4 px-4 sm:px-6 lg:px-8"
+          class="bg-base mx-auto rounded-lg border-2 border-secondary px-4 py-4 sm:px-6 lg:px-8"
         >
-          <h2 class="text-2xl font-semibold flex gap-2 items-center">
+          <h2 class="flex items-center gap-2 text-2xl font-semibold">
             Operator Dashboard
           </h2>
-          <hr class="!border-t-2 my-2" />
+          <hr class="my-2 !border-t-2" />
           <!-- Tabs -->
           <TabGroup>
             <Tab bind:group={tabSet} name="Agents" value={0}>
-              <div class="flex gap-1 items-center">
+              <div class="flex items-center gap-1">
                 <Icon icon="material-symbols-light:support-agent-rounded" />
                 Agents
               </div>
             </Tab>
             <Tab bind:group={tabSet} name="Creators" value={1}>
-              <div class="flex gap-1 items-center">
+              <div class="flex items-center gap-1">
                 <Icon icon="mdi:dance-pole" />
                 Creators
               </div></Tab
             >
             <Tab bind:group={tabSet} name="Disputes" value={2}>
-              <div class="flex gap-1 items-center">
+              <div class="flex items-center gap-1">
                 <Icon icon="healthicons:justice-outline" />
                 Disputes
               </div></Tab
@@ -375,7 +375,7 @@
                           <tr class="table-row">
                             <th
                               ><button
-                                class="btn-icon variant-filled btn-icon-sm"
+                                class="variant-filled btn-icon btn-icon-sm"
                                 on:click={() => {
                                   canAddAgent = !canAddAgent;
                                 }}
@@ -414,7 +414,7 @@
                                     name="address"
                                     value={agentAddress}
                                   /><button
-                                    class="btn btn-sm variant-filled"
+                                    class="variant-filled btn btn-sm"
                                     type="submit">Add</button
                                   >
                                 </form>
@@ -458,7 +458,7 @@
                                 <div class="flex gap-2">
                                   {#each agent.user.permissions as permission}
                                     <div
-                                      class="chip variant-filled-primary hover:variant-ringed"
+                                      class="variant-filled-primary chip hover:variant-ringed"
                                     >
                                       {permission}
                                     </div>
@@ -468,7 +468,7 @@
                               {#if canImpersonateAgent}
                                 <td>
                                   <button
-                                    class="btn variant-outline-primary btn-sm text-primary"
+                                    class="variant-outline-primary btn btn-sm text-primary"
                                     disabled={!canImpersonateAgent}
                                     on:click={() =>
                                       impersonate(agent.user._id.toString())}
@@ -506,7 +506,7 @@
                           <tr class="table-row">
                             <th
                               ><button
-                                class="btn-icon variant-filled btn-icon-sm"
+                                class="variant-filled btn-icon btn-icon-sm"
                                 on:click={() => {
                                   canAddCreator = !canAddCreator;
                                 }}
@@ -560,7 +560,7 @@
                                     value={commission}
                                   />
                                   <button
-                                    class="btn btn-sm variant-filled"
+                                    class="variant-filled btn btn-sm"
                                     type="submit">Add</button
                                   >
                                 </form>
@@ -652,7 +652,7 @@
                                     class="anchor mr-2">Secret Url</CopyText
                                   >
                                   <button
-                                    class="btn variant-outline-secondary btn-sm text-secondary"
+                                    class="variant-outline-secondary btn btn-sm text-secondary"
                                     on:click={() =>
                                       modalStore.trigger(changeSecretModal)}
                                   >
@@ -718,7 +718,7 @@
                               {#if canImpersonateCreator}
                                 <td
                                   ><button
-                                    class="btn variant-outline-primary btn-sm text-primary"
+                                    class="variant-outline-primary btn btn-sm text-primary"
                                     disabled={!canImpersonateCreator}
                                     on:click={() =>
                                       impersonate(creator.user._id.toString())}
@@ -802,7 +802,7 @@
                               <td>{ticket.ticketState.dispute?.explanation}</td>
                               <td
                                 ><button
-                                  class="btn btn-sm variant-filled-primary m-0"
+                                  class="variant-filled-primary btn btn-sm m-0"
                                   on:click={showDecideDispute}>Decide</button
                                 ></td
                               >

@@ -40,7 +40,7 @@
 {#if $modalStore[0]}
   <!-- Form -->
   <form method="post" {action} use:enhance class="space-y-4">
-    <h3 class="text-lg lg:text-xl font-bold text-center">Initiate Dispute</h3>
+    <h3 class="text-center text-lg font-bold lg:text-xl">Initiate Dispute</h3>
 
     <!-- Reason for Dispute Dropdown -->
     <div class="label">Reason</div>
@@ -66,7 +66,7 @@
     <footer class="text-right font-semibold">
       <div class="py-4 text-center">
         <button
-          class="btn variant-soft-primary neon-primary gap-2"
+          class="neon-primary variant-soft-primary btn gap-2"
           type="submit"
           disabled={$delayed}
           >{#if $delayed}Submit <Icon icon="eos-icons:loading" />{/if}</button
@@ -74,7 +74,7 @@
       </div>
       {#if $message}
         <br />
-        <p class="text-error mt-2">{$message}</p>
+        <p class="mt-2 text-error">{$message}</p>
       {/if}
     </footer>
   </form>

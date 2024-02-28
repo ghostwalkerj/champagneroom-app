@@ -40,20 +40,20 @@
 
 <Drawer>
   {#if $drawerStore.id == 'rightDrawer'}
-    <ul class="p-4 w-80 min-h-full bg-base-100 gap-4 flex flex-col">
+    <ul class="flex min-h-full w-80 flex-col gap-4 bg-base-100 p-4">
       {#each links.toReversed() as link}
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
         <li on:click={closeNav}>
           {#if link.name == 'Sign Up'}
             <a
-              class="btn bg-gradient-to-br from-primary to-pink-500 text-black rounded-lg whitespace-nowrap hover:shadow-[0px_0px_17px_6px_#e779c1] w-full py-4"
+              class="btn w-full whitespace-nowrap rounded-lg bg-gradient-to-br from-primary to-pink-500 py-4 text-black hover:shadow-[0px_0px_17px_6px_#e779c1]"
               href={link.href}
               ><span class="font-Roboto font-bold">{link.name}</span></a
             >
           {:else if link.name == 'Open App'}
             <a
-              class="btn flex flex-nowrap variant-filled-surface"
+              class="variant-filled-surface btn flex flex-nowrap"
               class:text-primary={link.href == $page.url.hash}
               href={link.href}
             >
@@ -66,7 +66,7 @@
             </a>
           {:else}
             <a
-              class="btn whitespace-nowrap hover:text-primary hover:bg-[#e779c122] w-full text-sm"
+              class="btn w-full whitespace-nowrap text-sm hover:bg-[#e779c122] hover:text-primary"
               class:text-primary={link.href == $page.url.hash}
               href={link.href}>{link.name}</a
             >
@@ -78,7 +78,7 @@
 </Drawer>
 
 <!-- Desktop Navbar -->
-<div class="flex justify-between items-center">
+<div class="flex items-center justify-between">
   <a href="/" class="w-[180px] lg:w-[280px]">
     <img
       alt="logo"
@@ -88,17 +88,17 @@
   </a>
 
   <!-- Desktop links with full items -->
-  <ul class="hidden lg:flex items-center gap-4 p-4">
+  <ul class="hidden items-center gap-4 p-4 lg:flex">
     {#each links as link}
       <li>
         {#if link.name == 'Sign Up'}
           <a
-            class="btn bg-gradient-to-br from-primary to-pink-500 text-black whitespace-nowrap hover:shadow-[0px_0px_17px_6px_#e779c1]"
+            class="btn whitespace-nowrap bg-gradient-to-br from-primary to-pink-500 text-black hover:shadow-[0px_0px_17px_6px_#e779c1]"
             href={link.href}>{link.name}</a
           >
         {:else if link.name == 'Open App'}
           <a
-            class="btn flex flex-nowrap variant-filled-surface"
+            class="variant-filled-surface btn flex flex-nowrap"
             class:text-primary={link.href == $page.url.hash}
             href={link.href}
           >
@@ -111,7 +111,7 @@
           </a>
         {:else}
           <a
-            class="btn whitespace-nowrap hover:text-primary hover:bg-[#e779c122] font-semibold"
+            class="btn whitespace-nowrap font-semibold hover:bg-[#e779c122] hover:text-primary"
             class:text-primary={link.href == $page.url.hash}
             href={link.href}>{link.name}</a
           >
@@ -121,18 +121,18 @@
   </ul>
 
   <!-- Mobile navbar -->
-  <div class="lg:hidden flex items-center">
-    <ul class="hidden sm:flex items-center gap-2 p-2">
+  <div class="flex items-center lg:hidden">
+    <ul class="hidden items-center gap-2 p-2 sm:flex">
       {#each links as link}
         <li>
           {#if link.name == 'Sign Up'}
             <a
-              class="btn bg-gradient-to-br from-primary to-pink-500 text-black rounded-lg whitespace-nowrap hover:shadow-[0px_0px_17px_6px_#e779c1] py-3.5"
+              class="btn whitespace-nowrap rounded-lg bg-gradient-to-br from-primary to-pink-500 py-3.5 text-black hover:shadow-[0px_0px_17px_6px_#e779c1]"
               href={link.href}>{link.name}</a
             >
           {:else if link.name == 'Open App'}
             <a
-              class="btn flex flex-nowrap variant-filled-surface"
+              class="variant-filled-surface btn flex flex-nowrap"
               class:text-primary={link.href == $page.url.hash}
               href={link.href}
             >

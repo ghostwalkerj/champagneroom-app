@@ -211,22 +211,22 @@
       <!-- Page header -->
       {#key agent}
         <div
-          class="bg-base border-2 border-secondary rounded-lg mx-auto py-4 px-4 sm:px-6 lg:px-8"
+          class="bg-base mx-auto rounded-lg border-2 border-secondary px-4 py-4 sm:px-6 lg:px-8"
         >
-          <h2 class="text-2xl font-semibold flex gap-2 items-center">
+          <h2 class="flex items-center gap-2 text-2xl font-semibold">
             Agent Dashboard
           </h2>
-          <hr class="!border-t-2 my-2" />
+          <hr class="my-2 !border-t-2" />
           <!-- Tabs -->
           <TabGroup>
             <Tab bind:group={tabSet} name="Dashboard" value={0}>
-              <div class="flex gap-1 items-center">
+              <div class="flex items-center gap-1">
                 <Icon icon="carbon:dashboard" />
                 Dashboard
               </div>
             </Tab>
             <Tab bind:group={tabSet} name="Creators" value={1}>
-              <div class="flex gap-1 items-center">
+              <div class="flex items-center gap-1">
                 <Icon icon="mdi:dance-pole" />
                 Creators
               </div></Tab
@@ -242,7 +242,7 @@
                           <tr class="table-row">
                             <th
                               ><button
-                                class="btn-icon variant-filled btn-icon-sm"
+                                class="variant-filled btn-icon btn-icon-sm"
                                 on:click={() => {
                                   canAddCreator = !canAddCreator;
                                 }}
@@ -294,7 +294,7 @@
                                     value={commission}
                                   />
                                   <button
-                                    class="btn btn-sm variant-filled"
+                                    class="variant-filled btn btn-sm"
                                     type="submit">Add</button
                                   >
                                 </form>
@@ -346,7 +346,7 @@
                                   >
 
                                   <button
-                                    class="btn variant-outline-secondary btn-sm text-secondary"
+                                    class="variant-outline-secondary btn btn-sm text-secondary"
                                     on:click={() =>
                                       modalStore.trigger(changeSecretModal)}
                                   >
@@ -412,7 +412,7 @@
                               {#if canImpersonate}
                                 <td>
                                   <button
-                                    class="btn variant-outline-primary btn-sm text-primary"
+                                    class="variant-outline-primary btn btn-sm text-primary"
                                     disabled={!canImpersonate}
                                     on:click={() =>
                                       impersonate(creator.user._id.toString())}
@@ -448,10 +448,10 @@
                 </div>
               {:else if tabSet === 0}
                 <div
-                  class="flex-col min-w-full lg:min-w-min lg:grid lg:grid-cols-5"
+                  class="min-w-full flex-col lg:grid lg:min-w-min lg:grid-cols-5"
                 >
                   <!-- 1st column -->
-                  <div class="flex-1 m-4 space-y-3">
+                  <div class="m-4 flex-1 space-y-3">
                     <!-- Profile -->
                     <div class="min-w-fit">
                       <AgentDetail {agent} />
@@ -463,12 +463,12 @@
                   </div>
 
                   <!--Next Column-->
-                  <div class="space-y-3 m-4 md:ml-0 md:col-span-2">
+                  <div class="m-4 space-y-3 md:col-span-2 md:ml-0">
                     <TopCreator {creators} {showData} />
                   </div>
 
                   <!--Next Column-->
-                  <div class="space-y-3 md:col-span-2 m-4 md:ml-0">
+                  <div class="m-4 space-y-3 md:col-span-2 md:ml-0">
                     <WeeklyBooking {creators} {weeklyData} />
                   </div>
                 </div>

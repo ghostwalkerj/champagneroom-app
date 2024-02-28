@@ -47,9 +47,9 @@
   });
 </script>
 
-<div class="flex flex-col min-h-screen min-w-[320px]">
+<div class="flex min-h-screen min-w-[320px] flex-col">
   <nav
-    class="flex justify-between items-center px-4 shadow-surface-900 shadow-lg"
+    class="flex items-center justify-between px-4 shadow-lg shadow-surface-900"
   >
     <a class="display-inline" href="/">
       <img
@@ -62,7 +62,7 @@
     <div class="text-xl font-semibold">
       {#if $selectedAccount}
         <div class=" flex items-center gap-2">
-          <span class="bg-primary h-3 w-3 rounded-full" />
+          <span class="h-3 w-3 rounded-full bg-primary" />
           {#if !$page.data.user?.name}
             <span>Wallet Connected</span>
           {/if}
@@ -72,10 +72,10 @@
             </div>
           {/if}
           {#if $page.data.authType === AuthType.IMPERSONATION}
-            <a class="btn variant-outline" href={config.PATH.revert}>Revert </a>
+            <a class="variant-outline btn" href={config.PATH.revert}>Revert </a>
           {:else}
             <a
-              class="btn variant-outline"
+              class="variant-outline btn"
               href={config.PATH.signout + '?returnPath=' + $page.url.pathname}
               >Signout</a
             >
@@ -87,19 +87,19 @@
     </div>
   </nav>
 
-  <div class="flex-1 flex flex-col items-center justify-center">
+  <div class="flex flex-1 flex-col items-center justify-center">
     <slot />
   </div>
 
-  <footer class="w-fit bg-surface-800 p-2 text-base-content sticky bottom-0">
+  <footer class="sticky bottom-0 w-fit bg-surface-800 p-2 text-base-content">
     <p>Build Number: {buildNumber} |</p>
     <p>Build Time: {buildTime}</p>
   </footer>
 </div>
 
 <div
-  class="fixed h-screen flex flex-col text-3xl lg:text-7xl font-semibold justify-center items-center -z-10 top-0 w-full"
+  class="fixed top-0 -z-10 flex h-screen w-full flex-col items-center justify-center text-3xl font-semibold lg:text-7xl"
 >
-  <h2 class="text-secondary neon-secondary">CHAMPAGNE</h2>
-  <h2 class="text-primary neon-primary">R O O M</h2>
+  <h2 class="neon-secondary text-secondary">CHAMPAGNE</h2>
+  <h2 class="neon-primary text-primary">R O O M</h2>
 </div>

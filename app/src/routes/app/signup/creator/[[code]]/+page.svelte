@@ -189,133 +189,133 @@
 ya<svelte:window bind:innerWidth bind:innerHeight />
 
 <div
-  class="flex place-content-center w-full flex-col text-base-100 text-center"
+  class="flex w-full flex-col place-content-center text-center text-base-100"
 >
-  <h1 class="text-3xl font-bold mt-10 text-primary">
+  <h1 class="mt-10 text-3xl font-bold text-primary">
     Join Our Creator Community and Thrive Globally
   </h1>
 
   {#if !wallet}
-    <div class="text-primary font-bold mt-2">You Need a Crypto Wallet</div>
+    <div class="mt-2 font-bold text-primary">You Need a Crypto Wallet</div>
   {/if}
   <div>
-    <div class="absolute top-auto left-auto max-w-md">
+    <div class="absolute left-auto top-auto max-w-md">
       <div
-        class="daisy-card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
+        class="daisy-card z-10 hidden transform rounded-lg border border-secondary border-opacity-50 bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl transition-transform duration-300 hover:z-50 hover:scale-125"
       >
-        <h2 class="text-xl text-secondary text-center">
+        <h2 class="text-center text-xl text-secondary">
           Get Paid Quickly in Your Local Currency
         </h2>
-        <div class="text-primary daisy-card-body">
+        <div class="daisy-card-body text-primary">
           Experience the ease of receiving payments swiftly and securely, right
           in your local currency. No more exchange rate headaches or delays.
         </div>
       </div>
     </div>
-    <div class="absolute top-auto left-auto max-w-md">
+    <div class="absolute left-auto top-auto max-w-md">
       <div
-        class="daisy-card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
+        class="daisy-card z-10 hidden transform rounded-lg border border-secondary border-opacity-50 bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl transition-transform duration-300 hover:z-50 hover:scale-125"
       >
-        <h2 class="text-xl text-secondary text-center">
+        <h2 class="text-center text-xl text-secondary">
           Hassle-Free Payment Handling
         </h2>
-        <div class="text-primary daisy-card-body">
+        <div class="daisy-card-body text-primary">
           Our streamlined payment system means you focus on creating, not on
           payment issues. We handle the complexities, you enjoy the rewards.
         </div>
       </div>
     </div>
 
-    <div class="absolute top-auto left-auto max-w-md">
+    <div class="absolute left-auto top-auto max-w-md">
       <div
-        class="daisy-card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
+        class="daisy-card z-10 hidden transform rounded-lg border border-secondary border-opacity-50 bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl transition-transform duration-300 hover:z-50 hover:scale-125"
       >
-        <h2 class="text-xl text-secondary text-center">
+        <h2 class="text-center text-xl text-secondary">
           Privacy is Our Priority
         </h2>
-        <div class="text-primary daisy-card-body">
+        <div class="daisy-card-body text-primary">
           Your safety matters. With us, your personal details stay private. No
           need to share names or phone numbers.
         </div>
       </div>
     </div>
 
-    <div class="absolute top-auto left-auto max-w-md">
+    <div class="absolute left-auto top-auto max-w-md">
       <div
-        class="daisy-card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
+        class="daisy-card z-10 hidden transform rounded-lg border border-secondary border-opacity-50 bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl transition-transform duration-300 hover:z-50 hover:scale-125"
       >
-        <h2 class="text-xl text-secondary text-center">
+        <h2 class="text-center text-xl text-secondary">
           Earn More with Fan Tips
         </h2>
-        <div class="text-primary daisy-card-body">
+        <div class="daisy-card-body text-primary">
           Connect with your audience in a meaningful way. Receive appreciation
           through tips directly from your fans.
         </div>
       </div>
     </div>
 
-    <div class="absolute top-auto left-auto max-w-md">
+    <div class="absolute left-auto top-auto max-w-md">
       <div
-        class="daisy-card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
+        class="daisy-card z-10 hidden transform rounded-lg border border-secondary border-opacity-50 bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl transition-transform duration-300 hover:z-50 hover:scale-125"
       >
-        <h2 class="text-xl text-secondary text-center">
+        <h2 class="text-center text-xl text-secondary">
           Exclusive Marketplace for Custom Content
         </h2>
-        <div class="text-primary daisy-card-body">
+        <div class="daisy-card-body text-primary">
           Unlock the potential of your creativity. Sell unique, custom content
           directly to your followers and boost your earnings.
         </div>
       </div>
     </div>
 
-    <div class="absolute top-auto left-auto max-w-md">
+    <div class="absolute left-auto top-auto max-w-md">
       <div
-        class="daisy-card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
+        class="daisy-card z-10 hidden transform rounded-lg border border-secondary border-opacity-50 bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl transition-transform duration-300 hover:z-50 hover:scale-125"
       >
-        <h2 class="text-xl text-secondary text-center">
+        <h2 class="text-center text-xl text-secondary">
           Global Reach, Local Comfort
         </h2>
-        <div class="text-primary daisy-card-body">
+        <div class="daisy-card-body text-primary">
           Wherever you are, connect with affluent customers from around the
           world. Your location is no longer a barrier to your success.
         </div>
       </div>
     </div>
 
-    <div class="absolute top-auto left-auto max-w-md">
+    <div class="absolute left-auto top-auto max-w-md">
       <div
-        class="daisy-card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
+        class="daisy-card z-10 hidden transform rounded-lg border border-secondary border-opacity-50 bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl transition-transform duration-300 hover:z-50 hover:scale-125"
       >
-        <h2 class="text-xl text-secondary text-center">
+        <h2 class="text-center text-xl text-secondary">
           Premium Prices for International Customers
         </h2>
-        <div class="text-primary daisy-card-body">
+        <div class="daisy-card-body text-primary">
           Maximize your earnings by setting competitive rates for international
           clients. Benefit from a wider, more lucrative market.
         </div>
       </div>
     </div>
 
-    <div class="absolute top-auto left-auto max-w-md">
+    <div class="absolute left-auto top-auto max-w-md">
       <div
-        class="daisy-card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
+        class="daisy-card z-10 hidden transform rounded-lg border border-secondary border-opacity-50 bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl transition-transform duration-300 hover:z-50 hover:scale-125"
       >
-        <h2 class="text-xl text-secondary text-center">
+        <h2 class="text-center text-xl text-secondary">
           Concierge Service at Your Fingertips
         </h2>
-        <div class="text-primary daisy-card-body">
+        <div class="daisy-card-body text-primary">
           Need assistance? Our concierge service is here to help you navigate
           and optimize your creator experience with ease.
         </div>
       </div>
     </div>
 
-    <div class="absolute top-auto left-auto max-w-md visible">
+    <div class="visible absolute left-auto top-auto max-w-md">
       <div
-        class="daisy-card bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl border border-opacity-50 border-secondary rounded-lg transform hover:scale-125 hover:z-50 z-10 transition-transform duration-300 hidden"
+        class="daisy-card z-10 hidden transform rounded-lg border border-secondary border-opacity-50 bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl transition-transform duration-300 hover:z-50 hover:scale-125"
       >
-        <h2 class="text-xl text-secondary text-center">Join Us Now</h2>
-        <div class="text-primary daisy-card-body">
+        <h2 class="text-center text-xl text-secondary">Join Us Now</h2>
+        <div class="daisy-card-body text-primary">
           Ready to take your creative journey to the next level? Sign up today
           and be part of a community that values and empowers creators like you.
         </div>
@@ -332,8 +332,8 @@ ya<svelte:window bind:innerWidth bind:innerHeight />
   >
     {#if wallet}
       <div>
-        <div class="w-full flex flex-col place-content-center">
-          <div class="w-full flex place-content-center">
+        <div class="flex w-full flex-col place-content-center">
+          <div class="flex w-full place-content-center">
             <img
               src="{config.PATH.staticUrl}/assets/bottlesnlegs.png"
               alt="Logo"
@@ -341,47 +341,47 @@ ya<svelte:window bind:innerWidth bind:innerHeight />
             />
           </div>
         </div>
-        <div class="font-medium text-primary text-2xl text-center">
+        <div class="text-center text-2xl font-medium text-primary">
           Sign up with this address
         </div>
-        <div class="mt-4 font-medium text-accent text-md text-center">
+        <div class="text-md mt-4 text-center font-medium text-accent">
           {walletAddress}
         </div>
-        <div class="mt-4 font-medium text-secondary text-sm text-center">
+        <div class="mt-4 text-center text-sm font-medium text-secondary">
           To use a different address, change the account connected in your
           wallet
         </div>
         <div class="daisy-modal-action place-content-center gap-10">
           <button
-            class="daisy-btn daisy-btn-primary daisy-btn-outline"
+            class="daisy-btn daisy-btn-outline daisy-btn-primary"
             on:click={() => {
               addressModel.close();
               signupModel.showModal();
             }}>Continue</button
           >
           <button
-            class="daisy-btn daisy-btn-secondary daisy-btn-outline"
+            class="daisy-btn daisy-btn-outline daisy-btn-secondary"
             on:click={() => addressModel.close()}>Cancel</button
           >
         </div>
       </div>
     {:else}
       <div>
-        <div class="w-full flex place-content-center">
+        <div class="flex w-full place-content-center">
           <img
             src="{config.PATH.staticUrl}/assets/bottlesnlegs.png"
             alt="Logo"
             class="h-16"
           />
         </div>
-        <div class="font-medium text-primary text-2xl text-center">
+        <div class="text-center text-2xl font-medium text-primary">
           Before you can sign up, connect your wallet
         </div>
 
         <div class="daisy-modal-action place-content-center gap-10">
           <ConnectButton />
           <button
-            class="daisy-btn daisy-btn-secondary daisy-btn-outline"
+            class="daisy-btn daisy-btn-outline daisy-btn-secondary"
             on:click={() => addressModel.close()}>Cancel</button
           >
         </div>
@@ -399,8 +399,8 @@ ya<svelte:window bind:innerWidth bind:innerHeight />
   >
     {#if wallet}
       <div>
-        <div class="w-full flex flex-col place-content-center">
-          <div class="w-full flex place-content-center">
+        <div class="flex w-full flex-col place-content-center">
+          <div class="flex w-full place-content-center">
             <img
               src="{config.PATH.staticUrl}/assets/bottlesnlegs.png"
               alt="Logo"
@@ -408,26 +408,26 @@ ya<svelte:window bind:innerWidth bind:innerHeight />
             />
           </div>
         </div>
-        <div class="font-medium text-primary text-2xl text-center">
+        <div class="text-center text-2xl font-medium text-primary">
           Creator already exists
         </div>
-        <div class="mt-4 font-medium text-accent text-md text-center">
+        <div class="text-md mt-4 text-center font-medium text-accent">
           {walletAddress}
         </div>
-        <div class="mt-4 font-medium text-secondary text-sm text-center">
+        <div class="mt-4 text-center text-sm font-medium text-secondary">
           To use a different address, change the account connected in your
           wallet
         </div>
         <div class="daisy-modal-action place-content-center gap-10">
           <button
-            class="daisy-btn daisy-btn-primary daisy-btn-outline"
+            class="daisy-btn daisy-btn-outline daisy-btn-primary"
             on:click={() => {
               existsModel.close();
               goto(config.PATH.creator);
             }}>Sign In</button
           >
           <button
-            class="daisy-btn daisy-btn-secondary daisy-btn-outline"
+            class="daisy-btn daisy-btn-outline daisy-btn-secondary"
             on:click={() => {
               existsModel.close();
             }}>Cancel</button
@@ -448,30 +448,30 @@ ya<svelte:window bind:innerWidth bind:innerHeight />
       method="POST"
       action="?/create_creator"
       use:enhance={({ formData }) => onSubmit({ formData })}
-      class="flex flex-col place-content-center w-full"
+      class="flex w-full flex-col place-content-center"
     >
-      <div class="w-full flex place-content-center">
+      <div class="flex w-full place-content-center">
         <img
           src="{config.PATH.staticUrl}/assets/bottlesnlegs.png"
           alt="Logo"
           class="h-16"
         />
       </div>
-      <div class="font-medium text-primary text-3xl text-center">
+      <div class="text-center text-3xl font-medium text-primary">
         Sign Up as a Creator
       </div>
-      <div class="w-full flex flex-col place-content-center mt-4">
-        <div class="font-medium text-secondary text-xl text-center">
+      <div class="mt-4 flex w-full flex-col place-content-center">
+        <div class="text-center text-xl font-medium text-secondary">
           Enter your Stage Name
         </div>
-        <div class="w-full flex place-content-center">
+        <div class="flex w-full place-content-center">
           <div class="daisy-form-control max-w-xs p-4">
             <!-- svelte-ignore a11y-label-has-associated-control -->
             <input
               type="text"
               name="name"
               placeholder={exampleName}
-              class="daisy-input daisy-input-bordered daisy-input-primary w-full max-w-xs daisy-input-sm"
+              class="daisy-input daisy-input-sm daisy-input-bordered daisy-input-primary w-full max-w-xs"
             />
 
             <!-- svelte-ignore a11y-label-has-associated-control -->
@@ -487,12 +487,12 @@ ya<svelte:window bind:innerWidth bind:innerHeight />
       </div>
       <div class="daisy-modal-action place-content-center gap-10">
         <button
-          class="daisy-btn daisy-btn-primary daisy-btn-outline"
+          class="daisy-btn daisy-btn-outline daisy-btn-primary"
           type="submit">Sign Up</button
         >
 
         <button
-          class="daisy-btn daisy-btn-secondary daisy-btn-outline"
+          class="daisy-btn daisy-btn-outline daisy-btn-secondary"
           on:click|preventDefault={() => {
             signupModel.close();
             addressModel.showModal();

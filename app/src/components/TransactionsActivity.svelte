@@ -77,9 +77,9 @@
 </script>
 
 <div
-  class="bg-surface-900 w-modal p-4 rounded flex flex-col gap-4 overflow-y-auto max-h-[90vh]"
+  class="w-modal flex max-h-[90vh] flex-col gap-4 overflow-y-auto rounded bg-surface-900 p-4"
 >
-  <h2 class="font-semibold text-xl text-center">Recent Transactions</h2>
+  <h2 class="text-center text-xl font-semibold">Recent Transactions</h2>
 
   <TabGroup justify="justify-center" active="!border-b-2 !border-primary">
     <Tab bind:group={tabSet} name="Earnings" value={0}>

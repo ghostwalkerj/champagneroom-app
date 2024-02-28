@@ -82,6 +82,6 @@
   });
 </script>
 
-<div class="fixed top-0 h-screen w-screen z-20">
+<div class="fixed top-0 z-20 h-screen w-screen">
   <div bind:this={videoCallElement} class="h-screen" />
 </div>

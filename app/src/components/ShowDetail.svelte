@@ -79,18 +79,18 @@
   });
 </script>
 
-<div class="!text-center shadow-lg rounded">
+<div class="rounded !text-center shadow-lg">
   {#if show}
-    <div class="grid !text-center md:grid-cols-2 bg-custom rounded-r">
+    <div class="bg-custom grid rounded-r !text-center md:grid-cols-2">
       <div class="relative">
         <img
           src={show.coverImageUrl}
           alt="show"
-          class="w-full max-w-xl m-auto rounded-l max-h-fit"
+          class="m-auto max-h-fit w-full max-w-xl rounded-l"
         />
         {#if options.showWaterMark && waterMarkText}
           <p
-            class="absolute p-2 font-SpaceGrotesk font-extrabold text-black text-xl bg-primary/70 w-full whitespace-nowrap top-0 rounded-tl"
+            class="absolute top-0 w-full whitespace-nowrap rounded-tl bg-primary/70 p-2 font-SpaceGrotesk text-xl font-extrabold text-black"
           >
             {waterMarkText}
           </p>
@@ -98,11 +98,11 @@
       </div>
 
       <div class="flex flex-col justify-evenly rounded-tr">
-        <div class="p-4 pb-0 flex flex-col items-center gap-2">
+        <div class="flex flex-col items-center gap-2 p-4 pb-0">
           <h1 class="text-4xl font-extrabold uppercase">{name}</h1>
 
           {#if options.showRating}
-            <div class="text-2xl mb-5 md:mb-0">
+            <div class="mb-5 text-2xl md:mb-0">
               <Ratings
                 bind:value={show.creatorInfo.averageRating}
                 max={5}
@@ -129,7 +129,7 @@
           <div>
             <CopyText
               copyValue={showPath}
-              class="btn btn-lg neon-primary font-semibold variant-soft-primary mb-1"
+              class="neon-primary variant-soft-primary btn btn-lg mb-1 font-semibold"
               >Copy Show Link</CopyText
             >
 
@@ -160,8 +160,8 @@
 
     {#if options.showSalesStats}
       <div
-        class="flex !text-center sm:flex-row rounded-b flex-col justify-between border-t border-surface-600 bg-custom font-semibold divide-x divide-surface-500
-     [&>div]:w-full [&>div]:whitespace-nowrap [&>div]:p-2 [&>div]:flex [&>div]:sm:flex-col [&>div]:gap-2"
+        class="bg-custom flex flex-col justify-between divide-x divide-surface-500 rounded-b border-t border-surface-600 !text-center font-semibold sm:flex-row
+     [&>div]:flex [&>div]:w-full [&>div]:gap-2 [&>div]:whitespace-nowrap [&>div]:p-2 [&>div]:sm:flex-col"
       >
         <div>
           <p>Reserved</p>

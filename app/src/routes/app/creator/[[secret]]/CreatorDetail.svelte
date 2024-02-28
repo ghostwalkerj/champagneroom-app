@@ -12,22 +12,22 @@
 </script>
 
 <div
-  class="bg-custom rounded pt-4 flex flex-col justify-center text-center items-center"
+  class="bg-custom flex flex-col items-center justify-center rounded pt-4 text-center"
 >
-  <h2 class="text-xl font-semibold flex gap-2 items-center">
+  <h2 class="flex items-center gap-2 text-xl font-semibold">
     <Icon class="text-secondary" icon="iconoir:profile-circle" />
     Profile
   </h2>
 
   <ImageUploadForm imageUrl={profileImageUrl} action="?/update_profile_image" />
 
-  <div class="text-2xl flex w-full justify-center m-1">
+  <div class="m-1 flex w-full justify-center text-2xl">
     <Ratings
       value={creator.feedbackStats.averageRating ?? 0}
       max={5}
       text="text-yellow-400"
       spacing="m-0"
-      class="max-w-min m-2"
+      class="m-2 max-w-min"
     >
       <svelte:fragment slot="empty">
         <Icon icon="fluent:star-28-regular" />
@@ -39,7 +39,7 @@
         ><Icon icon="fluent:star-28-filled" /></svelte:fragment
       >
     </Ratings>
-    <span class="text-base mt-2">
+    <span class="mt-2 text-base">
       ({creator.feedbackStats.averageRating.toFixed(2) ?? 0})</span
     >
   </div>

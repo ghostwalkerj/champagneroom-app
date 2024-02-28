@@ -4,23 +4,23 @@
 @import '../node_modules/npm-font-caviar-dreams/caviar-dreams';
 
 .bg-image {
-  @apply bg-cover bg-center max-w-sm w-full hover:scale-105 transition ease-in-out delay-150 shadow-sm hover:shadow-xl;
+  @apply w-full max-w-sm bg-cover bg-center shadow-sm transition delay-150 ease-in-out hover:scale-105 hover:shadow-xl;
 }
 
 .btn {
-  @apply font-CaviarDreams font-semibold text-sm rounded-lg
+  @apply rounded-lg font-CaviarDreams text-sm font-semibold;
 }
 .input {
-  @apply font-CaviarDreams  text-sm p-3.5 rounded-lg
+  @apply rounded-lg  p-3.5 font-CaviarDreams text-sm;
 }
 .select {
-  @apply font-CaviarDreams text-sm p-3.5 rounded-lg
+  @apply rounded-lg p-3.5 font-CaviarDreams text-sm;
 }
 .tab {
-  @apply !font-SpaceGrotesk
+  @apply !font-SpaceGrotesk;
 }
 .accordion-panel {
-  @apply font-light text-base font-Roboto leading-loose
+  @apply font-Roboto text-base font-light leading-loose;
 }
 html,
 body {
@@ -67,7 +67,8 @@ body {
   /*   text-shadow: 0 0 5px #f562ff, 0 0 15px #f562ff, 0 0 25px #f562ff,
     0 0 20px #f562ff, 0 0 30px #890092, 0 0 80px #890092, 0 0 80px #890092;
   color: #fccaff; */
-  text-shadow: 0 0 5px rgb(var(--color-secondary-900)),
+  text-shadow:
+    0 0 5px rgb(var(--color-secondary-900)),
     0 0 15px rgb(var(--color-secondary-800)),
     0 0 20px rgb(var(--color-secondary-600)),
     0 0 40px rgb(var(--color-secondary-700)),
@@ -84,7 +85,8 @@ body {
   /*   text-shadow: 0 0 5px #f562ff, 0 0 15px #f562ff, 0 0 25px #f562ff,
     0 0 20px #f562ff, 0 0 30px #890092, 0 0 80px #890092, 0 0 80px #890092;
   color: #fccaff; */
-  text-shadow: 0 0 5px rgb(var(--color-primary-900)),
+  text-shadow:
+    0 0 5px rgb(var(--color-primary-900)),
     0 0 15px rgb(var(--color-primary-800)),
     0 0 20px rgb(var(--color-primary-600)),
     0 0 40px rgb(var(--color-primary-700)),

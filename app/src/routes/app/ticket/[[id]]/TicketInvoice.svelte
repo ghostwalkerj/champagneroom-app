@@ -67,7 +67,7 @@
 </script>
 
 <div
-  class="relative flex flex-col w-full max-w-md md:max-w-2xl mx-auto bg-black shadow-lg rounded-xl overflow-hidden"
+  class="relative mx-auto flex w-full max-w-md flex-col overflow-hidden rounded-xl bg-black shadow-lg md:max-w-2xl"
 >
   <!-- Logo and Invoice Header -->
   <div class="flex items-center justify-between bg-black p-4">
@@ -77,7 +77,7 @@
       class="h-12"
     />
     <span
-      class="font-bold text-xl text-info absolute left-1/2 transform -translate-x-1/2"
+      class="absolute left-1/2 -translate-x-1/2 transform text-xl font-bold text-info"
       >Invoice</span
     >
     <!-- Centered Title -->
@@ -86,7 +86,7 @@
   <!-- Invoice Status Tag -->
   {#if invoice.status === InvoiceStatus.EXPIRED || invoice.status === InvoiceStatus.COMPLETE || invoice.status === InvoiceStatus.INVALID || invoice.status === InvoiceStatus.REFUNDED}
     <div
-      class="absolute top-4 right-4 text-xs lg:text-sm xl:text-base font-bold text-info p-1 lg:p-2 xl:p-3 bg-opacity-50 bg-gray-100 rounded-lg capitalize"
+      class="absolute right-4 top-4 rounded-lg bg-gray-100 bg-opacity-50 p-1 text-xs font-bold capitalize text-info lg:p-2 lg:text-sm xl:p-3 xl:text-base"
     >
       {invoiceStatus}
     </div>
@@ -94,7 +94,7 @@
 
   <!-- Invoice Content -->
   <div class="p-4 text-info">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+    <div class="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
       <div>
         <span class="text-sm font-bold">Date: </span>
         {today.format('{day-short} {date-ordinal}')}
@@ -106,7 +106,7 @@
     </div>
 
     <!-- Payment Details Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+    <div class="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
       <!-- Payment Status Section -->
       <div class="capitalize">
         <span class="font-bold">Payment Status: </span>
@@ -125,7 +125,7 @@
     </div>
 
     <!-- Rate and Time Left Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+    <div class="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
       <div>
         <span class="font-bold">Rate: </span>
         {currentPayment['rate']}
@@ -145,7 +145,7 @@
     </div>
 
     <!-- Additional Invoice Information -->
-    <div class="text-center italic mb-4">
+    <div class="mb-4 text-center italic">
       {#if invoice.status === InvoiceStatus.EXPIRED}
         <span class="font-bold">Invoice Expired</span>
       {:else if invoice.status === InvoiceStatus.REFUNDED}

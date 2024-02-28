@@ -48,11 +48,11 @@
   method="post"
   action="?/create_show"
   use:enhance
-  class="bg-custom rounded p-4 flex flex-col gap-4"
+  class="bg-custom flex flex-col gap-4 rounded p-4"
 >
   <h2 class="text-lg font-semibold">Create Show</h2>
 
-  <div class="grid lg:grid-cols-2 gap-4">
+  <div class="grid gap-4 lg:grid-cols-2">
     <label for="">
       <span>Title</span>
       <input
@@ -68,9 +68,9 @@
     <label for="">
       <span>Ticket Price (In USD)</span>
       <div
-        class="input-group input-group-divider grid-cols-[auto_1fr] variant-form-material bg-surface-700"
+        class="input-group input-group-divider variant-form-material grid-cols-[auto_1fr] bg-surface-700"
       >
-        <div class="input-group-shim text-surface-300 font-semibold">USD</div>
+        <div class="input-group-shim font-semibold text-surface-300">USD</div>
         <input
           type="number"
           name="price"
@@ -100,7 +100,7 @@
   </RangeSlider>
 
   <button
-    class="btn variant-soft-primary !font-bold btn-lg text-xl neon-primary"
+    class="neon-primary variant-soft-primary btn btn-lg text-xl !font-bold"
     disabled={$delayed}
     type="submit"
   >

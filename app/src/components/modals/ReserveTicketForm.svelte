@@ -31,7 +31,7 @@
 </script>
 
 {#if $modalStore[0]}
-  <div class="bg-surface-900 max-w-3xl rounded">
+  <div class="max-w-3xl rounded bg-surface-900">
     <form
       class="grid sm:grid-cols-2"
       method="POST"
@@ -47,10 +47,10 @@
       <img
         src={$modalStore[0].meta.profileImage}
         alt="profile"
-        class="hidden sm:block rounded-l h-auto"
+        class="hidden h-auto rounded-l sm:block"
       />
 
-      <div class="p-4 flex flex-col gap-4 justify-between">
+      <div class="flex flex-col justify-between gap-4 p-4">
         <div class="flex flex-col gap-4">
           <label class="label">
             <span class="font-semibold">Name</span>
@@ -92,13 +92,13 @@
 
         <footer class="text-right font-semibold">
           <button
-            class="btn variant-filled-surface"
+            class="variant-filled-surface btn"
             disabled={$delayed}
             type="button"
             on:click={parent.onClose}>{parent.buttonTextCancel}</button
           >
           <button
-            class="btn variant-filled-primary gap-2"
+            class="variant-filled-primary btn gap-2"
             disabled={$delayed}
             type="submit"
             >Reserve {#if $delayed}<Icon
@@ -107,7 +107,7 @@
           >
           {#if $message}
             <br />
-            <p class="text-error mt-2">{$message}</p>
+            <p class="mt-2 text-error">{$message}</p>
           {/if}
         </footer>
       </div>

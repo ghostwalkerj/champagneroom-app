@@ -25,23 +25,23 @@
 <div id="Contact" class="container mx-auto px-4 sm:px-6 md:px-10 lg:px-20">
   <div class="pt-20">
     <h2
-      class="font-bold text-primary text-2xl text-[32px] lg:text-[41px] text-center font-CaviarDreams mb-20"
+      class="mb-20 text-center font-CaviarDreams text-2xl text-[32px] font-bold text-primary lg:text-[41px]"
     >
       Contact Us
     </h2>
-    <div class="flex flex-col lg:flex-row gap-10">
-      <div class="w-full lg:w-1/2 mb-10 flex justify-center px-4">
+    <div class="flex flex-col gap-10 lg:flex-row">
+      <div class="mb-10 flex w-full justify-center px-4 lg:w-1/2">
         <Image
           src="{config.PATH.staticUrl}/assets/creator3.png"
           alt="Creator"
-          class="rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1] h-auto max-w-xs md:max-w-sm lg:max-w-md"
+          class="h-auto max-w-xs overflow-hidden rounded-xl shadow-[0px_0px_17px_6px_#e779c1] md:max-w-sm lg:max-w-md"
           height={823}
           width={658}
         />
       </div>
-      <div class="w-full lg:w-1/2 flex flex-col justify-center items-center">
+      <div class="flex w-full flex-col items-center justify-center lg:w-1/2">
         <div
-          class="text-info text-2xl md:text-3xl lg:text-4xl font-bold mb-5 lg:mb-10 tracking-wider text-center font-CaviarDreams"
+          class="mb-5 text-center font-CaviarDreams text-2xl font-bold tracking-wider text-info md:text-3xl lg:mb-10 lg:text-4xl"
         >
           Thank you for the interest in CHAMPAGNE ROOM!
         </div>
@@ -54,7 +54,7 @@
             method="post"
             action="?/show_interest"
             use:enhance={onSubmit}
-            class="flex flex-col gap-4 items-center justify-center w-full max-w-sm"
+            class="flex w-full max-w-sm flex-col items-center justify-center gap-4"
           >
             <select class="select w-[300px]" name="interest">
               <option disabled selected>I am interested in</option>
@@ -77,7 +77,7 @@
               <div class="alert variant-filled-error">Email is Required</div>
             {/if}
             <div class="w-full text-center">
-              <button class="btn variant-filled-primary w-32">Submit</button>
+              <button class="variant-filled-primary btn w-32">Submit</button>
             </div>
           </form>
         {/if}

@@ -15,13 +15,13 @@
 </script>
 
 <div
-  class="bg-surface-900/95 flex flex-col gap-8 p-6 text-center items-center rounded"
+  class="flex flex-col items-center gap-8 rounded bg-surface-900/95 p-6 text-center"
 >
-  <div class="font-semibold text-3xl w-full">You have been signed out</div>
+  <div class="w-full text-3xl font-semibold">You have been signed out</div>
 
   {#if returnPath !== undefined}
     <NeonBlur>
-      <a href={authPath} class="btn btn-lg variant-filled rounded-lg relative"
+      <a href={authPath} class="variant-filled btn btn-lg relative rounded-lg"
         >Sign in</a
       >
     </NeonBlur>

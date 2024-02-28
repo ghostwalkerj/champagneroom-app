@@ -44,21 +44,21 @@
 </script>
 
 <div
-  class="flex flex-col lg:flex-row justify-between bg-custom divide-y lg:divide-y-0 lg:divide-x divide-surface-500 rounded"
+  class="bg-custom flex flex-col justify-between divide-y divide-surface-500 rounded lg:flex-row lg:divide-x lg:divide-y-0"
 >
-  <div class="flex gap-2 p-4 flex-1">
+  <div class="flex flex-1 gap-2 p-4">
     <Icon icon="mingcute:information-line" class="text-2xl text-secondary" />
     <p class="capitalize">{statusText.toLowerCase()}</p>
   </div>
 
-  <div class="flex gap-2 p-4 flex-1">
+  <div class="flex flex-1 gap-2 p-4">
     <Icon icon="mingcute:information-line" class="text-2xl text-secondary" />
     <p class="capitalize">{eventText}</p>
   </div>
 
   {#if canStartShow}
     <button
-      class="btn flex-1 lg:rounded-l-none font-semibold variant-filled-primary text-black whitespace-nowrap hover:shadow-lg shadow-black"
+      class="variant-filled-primary btn flex-1 whitespace-nowrap font-semibold text-black shadow-black hover:shadow-lg lg:rounded-l-none"
       type="submit"
       disabled={isLoading}
       on:click={() => {

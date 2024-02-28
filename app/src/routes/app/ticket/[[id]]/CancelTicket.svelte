@@ -22,8 +22,8 @@
 </script>
 
 {#if isShowCancelLoading}
-  <div class="flex justify-center w-full px-4 lg:px-8">
-    <button class="btn variant-filled-secondary loading" disabled={true}
+  <div class="flex w-full justify-center px-4 lg:px-8">
+    <button class="loading variant-filled-secondary btn" disabled={true}
       >Cancelling</button
     >
   </div>
@@ -34,9 +34,9 @@
     name="cancelTicket"
     use:enhance={({ formElement }) => onSubmit(formElement)}
   >
-    <div class="flex justify-center w-full px-4 lg:px-8">
+    <div class="flex w-full justify-center px-4 lg:px-8">
       <button
-        class="btn variant-filled-secondary"
+        class="variant-filled-secondary btn"
         type="submit"
         disabled={isLoading}
       >

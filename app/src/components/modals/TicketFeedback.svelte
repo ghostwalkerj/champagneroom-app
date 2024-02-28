@@ -40,9 +40,9 @@
     method="post"
     {action}
     use:enhance
-    class="bg-surface-900 p-4 max-w-3xl rounded flex gap-4 flex-col"
+    class="flex max-w-3xl flex-col gap-4 rounded bg-surface-900 p-4"
   >
-    <h3 class="text-lg lg:text-xl font-bold text-center">Leave Feedback</h3>
+    <h3 class="text-center text-lg font-bold lg:text-xl">Leave Feedback</h3>
 
     <div class="py-2">
       <Ratings
@@ -51,7 +51,7 @@
         max={5}
         bind:value={$form.rating}
         spacing="m-0"
-        class="max-w-min m-2"
+        class="m-2 max-w-min"
       >
         <svelte:fragment slot="empty">
           <Icon icon="fluent:star-28-regular" />
@@ -67,7 +67,7 @@
     </div>
     <div class="w-full py-2">
       <span class="label-text">Review</span>
-      <div class="rounded-md shadow-sm mt-1 relative">
+      <div class="relative mt-1 rounded-md shadow-sm">
         <textarea
           name="review"
           class="form-input w-full"
@@ -81,7 +81,7 @@
     <footer class="text-right font-semibold">
       <div class="py-4 text-center">
         <button
-          class="btn variant-soft-primary neon-primary gap-2"
+          class="neon-primary variant-soft-primary btn gap-2"
           type="submit"
           disabled={$delayed}
           >{#if $delayed}Submit <Icon icon="eos-icons:loading" />{/if}</button
@@ -89,7 +89,7 @@
       </div>
       {#if $message}
         <br />
-        <p class="text-error mt-2">{$message}</p>
+        <p class="mt-2 text-error">{$message}</p>
       {/if}
     </footer>
   </form>

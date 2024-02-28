@@ -26,7 +26,7 @@
 
 {#if copied}
   <div
-    class="neon-primary p-4 rounded bg-custom border-2 border-primary-content"
+    class="neon-primary bg-custom rounded border-2 border-primary-content p-4"
     data-popup="popupHover"
   >
     {copyValue}

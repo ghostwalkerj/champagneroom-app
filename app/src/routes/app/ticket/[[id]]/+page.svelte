@@ -290,19 +290,19 @@
 {#if showVideo}
   <VideoMeeting bind:show {user} {jitsiToken} {leftShowCallback} />
 {:else if ticket}
-  <div class="mt-6 flex flex-col lg:flex-row items-center justify-center">
-    <div class="w-full lg:max-w-4xl mx-auto">
+  <div class="mt-6 flex flex-col items-center justify-center lg:flex-row">
+    <div class="mx-auto w-full lg:max-w-4xl">
       <!-- Page header -->
-      <div class="pb-4 text-center relative">
+      <div class="relative pb-4 text-center">
         {#key ticket.ticketState || show.showState}
           <TicketDetail {ticket} {show} {user} />
         {/key}
         {#if canWatchShow && hasShowStarted}
           <div
-            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-2xl lg:text-4xl -rotate-6 whitespace-nowrap font-extrabold text-primary ring-2 ring-primary bg-base-200/50 p-2 ring-inset rounded-xl"
+            class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-6 transform whitespace-nowrap rounded-xl bg-base-200/50 p-2 text-2xl font-extrabold text-primary ring-2 ring-inset ring-primary lg:text-4xl"
           >
             <button
-              class="btn variant-filled-secondary"
+              class="variant-filled-secondary btn"
               disabled={isLoading}
               on:click={() => {
                 joinShow();
@@ -311,7 +311,7 @@
           </div>
         {:else if isWaitingForShow}
           <div
-            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-2xl lg:text-4xl -rotate-6 whitespace-nowrap font-extrabold text-primary ring-2 ring-primary bg-base-200/50 p-2 ring-inset rounded-xl"
+            class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-6 transform whitespace-nowrap rounded-xl bg-base-200/50 p-2 text-2xl font-extrabold text-primary ring-2 ring-inset ring-primary lg:text-4xl"
           >
             Waiting for Show to Start
           </div>
@@ -326,7 +326,7 @@
           {/key}
           {#if hasPaymentSent}
             <div
-              class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-2xl lg:text-3xl -rotate-45 whitespace-nowrap font-extrabold text-primary ring-2 ring-primary bg-base-200/50 p-2 ring-inset rounded-xl"
+              class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-45 transform whitespace-nowrap rounded-xl bg-base-200/50 p-2 text-2xl font-extrabold text-primary ring-2 ring-inset ring-primary lg:text-3xl"
             >
               Waiting for Payment Confirmations
             </div>
@@ -335,24 +335,24 @@
       {/if}
 
       {#if !isTicketDone}
-        <div class="flex flex-wrap gap-6 justify-center m-3">
+        <div class="m-3 flex flex-wrap justify-center gap-6">
           {#if shouldPay && !isShowCancelLoading}
             {#if !$selectedAccount}
-              <button class="btn variant-filled-secondary" on:click={connect}
+              <button class="variant-filled-secondary btn" on:click={connect}
                 >Connect Wallet</button
               >
             {:else}
               <button
-                class="btn variant-filled-primary"
+                class="variant-filled-primary btn"
                 on:click={walletPay}
                 disabled={isLoading}>Pay with Wallet</button
               >
             {/if}
           {/if}
           {#if canWatchShow && hasShowStarted}
-            <div class="w-full flex justify-center">
+            <div class="flex w-full justify-center">
               <button
-                class="btn variant-filled-secondary"
+                class="variant-filled-secondary btn"
                 disabled={isLoading}
                 on:click={() => {
                   joinShow();
@@ -365,9 +365,9 @@
           {/if}
           <div class="flex flex-col md:flex-row">
             {#if canLeaveFeedback}
-              <div class="p-4 w-full flex justify-center">
+              <div class="flex w-full justify-center p-4">
                 <button
-                  class="btn variant-filled-primary"
+                  class="variant-filled-primary btn"
                   on:click={() => {
                     leaveFeedback();
                   }}>Leave Feedback</button
@@ -375,16 +375,16 @@
               </div>
             {/if}
             {#if canLeaveFeedback && canDispute}
-              <div class="w-full md:w-3/4 md:p-6 font-SpaceGrotesk h-1/2">
+              <div class="h-1/2 w-full font-SpaceGrotesk md:w-3/4 md:p-6">
                 <hr />
                 OR
                 <hr />
               </div>
             {/if}
             {#if canDispute}
-              <div class="p-4 w-full flex justify-center">
+              <div class="flex w-full justify-center p-4">
                 <button
-                  class="btn variant-filled-primary"
+                  class="variant-filled-primary btn"
                   on:click={() => {
                     initiateDispute();
                   }}>Initiate Dispute</button

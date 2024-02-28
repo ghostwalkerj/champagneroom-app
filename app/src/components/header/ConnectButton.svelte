@@ -7,7 +7,7 @@
 {#if !$selectedAccount}
   <NeonBlur>
     <button
-      class="btn btn-xl rounded-lg variant-filled relative"
+      class="variant-filled btn btn-xl relative rounded-lg"
       on:click={connect}
     >
       <Icon
