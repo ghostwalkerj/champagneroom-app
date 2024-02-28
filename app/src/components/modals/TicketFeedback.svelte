@@ -84,8 +84,16 @@
           class="neon-primary variant-soft-primary btn gap-2"
           type="submit"
           disabled={$delayed}
-          >{#if $delayed}Submit <Icon icon="eos-icons:loading" />{/if}</button
+          >Submit{#if $delayed}
+            <Icon icon="eos-icons:loading" />{/if}</button
         >
+        <button
+          class="btn variant-soft-surface"
+          type="button"
+          on:click={parent.onClose()}
+        >
+          Cancel
+        </button>
       </div>
       {#if $message}
         <br />
