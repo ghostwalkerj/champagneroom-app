@@ -44,15 +44,15 @@
 
 {#if wallet}
   <div
-    class="bg-custom p-4 rounded flex flex-col gap-4 justify-center items-center"
+    class="bg-custom flex flex-col items-center justify-center gap-4 rounded p-4"
   >
-    <div class="flex flex-col gap-0 items-center text-center">
-      <h2 class="text-xl font-semibold flex gap-2 items-center">
+    <div class="flex flex-col items-center gap-0 text-center">
+      <h2 class="flex items-center gap-2 text-xl font-semibold">
         <Icon class="text-secondary" icon="carbon:wallet" />
         Wallet
       </h2>
       <small class="text-base"
-        >Status: <span class="lowercase font-semibold">{wallet.status}</span
+        >Status: <span class="font-semibold lowercase">{wallet.status}</span
         ></small
       >
     </div>
@@ -75,14 +75,14 @@
 
     <div class="flex gap-2">
       <button
-        class="btn variant-soft-secondary btn-sm neon-secondary"
+        class="neon-secondary variant-soft-secondary btn btn-sm"
         disabled={!hasTransactions}
         on:click={() => modalStore.trigger(transactionsModal)}
       >
         Transactions
       </button>
       <button
-        class="btn variant-soft-secondary btn-sm neon-secondary"
+        class="neon-secondary variant-soft-secondary btn btn-sm"
         disabled={!hasAvailableBalance}
         on:click={() => modalStore.trigger(modal)}
       >

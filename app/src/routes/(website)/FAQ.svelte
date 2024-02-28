@@ -4,16 +4,16 @@
 </script>
 
 <div
-  class="container mx-auto px-4 sm:px-6 md:px-10 lg:px-20 pt-20 relative"
+  class="container relative mx-auto px-4 pt-20 sm:px-6 md:px-10 lg:px-20"
   id="FAQ"
 >
   <h2
-    class="font-bold text-primary text-[32px] lg:text-[41px] text-center font-CaviarDreams mb-10"
+    class="mb-10 text-center font-CaviarDreams text-[32px] font-bold text-primary lg:text-[41px]"
   >
     FAQ
   </h2>
 
-  <div class="flex flex-col md:flex-row gap-4 font-bold text-xl">
+  <div class="flex flex-col gap-4 text-xl font-bold md:flex-row">
     <div class="w-full md:w-1/2">
       <Accordion>
         <AccordionItem>
@@ -33,7 +33,7 @@
         <AccordionItem>
           <svelte:fragment slot="summary">How does it work?</svelte:fragment>
           <svelte:fragment slot="content">
-            <ol class="list-decimal ml-4">
+            <ol class="ml-4 list-decimal">
               <li>
                 Once you and the creator agree to a video performance, the
                 creator will generate a unique, one-time link that will be
@@ -73,7 +73,7 @@
             instead, it is held in escrow. The escrow is only released after the
             show ends and you have the chance to provide feedback.
 
-            <ul class="list-disc ml-4">
+            <ul class="ml-4 list-disc">
               <li>
                 If the creator cancels the show, you will receive a refund.
               </li>
@@ -115,7 +115,7 @@
             How is it different from other platforms like Only Fans?
           </svelte:fragment>
           <svelte:fragment slot="content">
-            <ul class="list-disc ml-4">
+            <ul class="ml-4 list-disc">
               <li>
                 Firstly, unlike OnlyFans, we do not use credit cards; we use
                 cryptocurrency for transactions. This means that credit card
@@ -138,7 +138,7 @@
             What is the road map and future of Champagne Room?
           </svelte:fragment>
           <svelte:fragment slot="content">
-            <ul class="list-disc ml-4">
+            <ul class="ml-4 list-disc">
               <li>
                 As we receive feedback from our users, we will enhance Champagne
                 Room's features.
@@ -168,23 +168,23 @@
     </div>
 
     <div
-      class="absolute top-28 left-0 right-0 mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 pointer-events-none"
+      class="pointer-events-none absolute left-0 right-0 top-28 mx-auto grid grid-cols-1 gap-4 md:grid-cols-2"
     >
       <div
-        class="image opacity-20 max-w-lg mx-auto md:flex animate-pulse transition-timing-function hidden"
+        class="image transition-timing-function mx-auto hidden max-w-lg animate-pulse opacity-20 md:flex"
       >
         <img
-          class="motion-safe:animate-fadeIn mx-auto rounded-lg opacity-45 justify-center w-full h-auto"
+          class="motion-safe:animate-fadeIn mx-auto h-auto w-full justify-center rounded-lg opacity-45"
           src="{config.PATH.staticUrl}/assets/ladyblue.png"
           alt="Lady Blue"
         />
       </div>
 
       <div
-        class="image opacity-20 max-w-lg mx-auto md:flex animate-pulse transition-timing-function hidden"
+        class="image transition-timing-function mx-auto hidden max-w-lg animate-pulse opacity-20 md:flex"
       >
         <img
-          class="motion-safe:animate-fadeIn mx-auto rounded-lg opacity-45 justify-center w-full h-auto"
+          class="motion-safe:animate-fadeIn mx-auto h-auto w-full justify-center rounded-lg opacity-45"
           src="{config.PATH.staticUrl}/assets/ladypink.png"
           alt="Lady Pink"
         />

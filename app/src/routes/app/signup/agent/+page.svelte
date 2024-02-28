@@ -109,14 +109,14 @@
 </script>
 
 <div
-  class="flex place-content-center w-full flex-col text-base-100 text-center"
+  class="flex w-full flex-col place-content-center text-center text-base-100"
 >
-  <h1 class="text-3xl font-bold mt-10 text-primary">
+  <h1 class="mt-10 text-3xl font-bold text-primary">
     Become an Agent and Earn with Your Creators
   </h1>
 
   {#if !wallet}
-    <div class="text-primary font-bold mt-2">You Need a Crypto Wallet</div>
+    <div class="mt-2 font-bold text-primary">You Need a Crypto Wallet</div>
   {/if}
   <div />
 </div>
@@ -129,8 +129,8 @@
   >
     {#if wallet}
       <div>
-        <div class="w-full flex flex-col place-content-center">
-          <div class="w-full flex place-content-center">
+        <div class="flex w-full flex-col place-content-center">
+          <div class="flex w-full place-content-center">
             <img
               src="{config.PATH.staticUrl}/assets/bottlesnlegs.png"
               alt="Logo"
@@ -138,47 +138,47 @@
             />
           </div>
         </div>
-        <div class="font-medium text-primary text-2xl text-center">
+        <div class="text-center text-2xl font-medium text-primary">
           Sign up with this address
         </div>
-        <div class="mt-4 font-medium text-accent text-md text-center">
+        <div class="text-md mt-4 text-center font-medium text-accent">
           {walletAddress}
         </div>
-        <div class="mt-4 font-medium text-secondary text-sm text-center">
+        <div class="mt-4 text-center text-sm font-medium text-secondary">
           To use a different address, change the account connected in your
           wallet
         </div>
         <div class="daisy-modal-action place-content-center gap-10">
           <button
-            class="daisy-btn daisy-btn-primary daisy-btn-outline"
+            class="daisy-btn daisy-btn-outline daisy-btn-primary"
             on:click={() => {
               addressModel.close();
               signupModel.showModal();
             }}>Continue</button
           >
           <button
-            class="daisy-btn daisy-btn-secondary daisy-btn-outline"
+            class="daisy-btn daisy-btn-outline daisy-btn-secondary"
             on:click={() => addressModel.close()}>Cancel</button
           >
         </div>
       </div>
     {:else}
       <div>
-        <div class="w-full flex place-content-center">
+        <div class="flex w-full place-content-center">
           <img
             src="{config.PATH.staticUrl}/assets/bottlesnlegs.png"
             alt="Logo"
             class="h-16"
           />
         </div>
-        <div class="font-medium text-primary text-2xl text-center">
+        <div class="text-center text-2xl font-medium text-primary">
           Before you can sign up, connect your wallet
         </div>
 
         <div class="daisy-modal-action place-content-center gap-10">
           <ConnectButton />
           <button
-            class="daisy-btn daisy-btn-secondary daisy-btn-outline"
+            class="daisy-btn daisy-btn-outline daisy-btn-secondary"
             on:click={() => addressModel.close()}>Cancel</button
           >
         </div>
@@ -196,8 +196,8 @@
   >
     {#if wallet}
       <div>
-        <div class="w-full flex flex-col place-content-center">
-          <div class="w-full flex place-content-center">
+        <div class="flex w-full flex-col place-content-center">
+          <div class="flex w-full place-content-center">
             <img
               src="{config.PATH.staticUrl}/assets/bottlesnlegs.png"
               alt="Logo"
@@ -205,26 +205,26 @@
             />
           </div>
         </div>
-        <div class="font-medium text-primary text-2xl text-center">
+        <div class="text-center text-2xl font-medium text-primary">
           Agent already exists
         </div>
-        <div class="mt-4 font-medium text-accent text-md text-center">
+        <div class="text-md mt-4 text-center font-medium text-accent">
           {walletAddress}
         </div>
-        <div class="mt-4 font-medium text-secondary text-sm text-center">
+        <div class="mt-4 text-center text-sm font-medium text-secondary">
           To use a different address, change the account connected in your
           wallet
         </div>
         <div class="daisy-modal-action place-content-center gap-10">
           <button
-            class="daisy-btn daisy-btn-primary daisy-btn-outline"
+            class="daisy-btn daisy-btn-outline daisy-btn-primary"
             on:click={() => {
               existsModel.close();
               goto(config.PATH.agent);
             }}>Sign In</button
           >
           <button
-            class="daisy-btn daisy-btn-secondary daisy-btn-outline"
+            class="daisy-btn daisy-btn-outline daisy-btn-secondary"
             on:click={() => {
               existsModel.close();
             }}>Cancel</button
@@ -245,30 +245,30 @@
       method="POST"
       action="?/create_agent"
       use:enhance={({ formData }) => onSubmit({ formData })}
-      class="flex flex-col place-content-center w-full"
+      class="flex w-full flex-col place-content-center"
     >
-      <div class="w-full flex place-content-center">
+      <div class="flex w-full place-content-center">
         <img
           src="{config.PATH.staticUrl}/assets/bottlesnlegs.png"
           alt="Logo"
           class="h-16"
         />
       </div>
-      <div class="font-medium text-primary text-3xl text-center">
+      <div class="text-center text-3xl font-medium text-primary">
         Sign Up as an Agent
       </div>
-      <div class="w-full flex flex-col place-content-center mt-4">
-        <div class="font-medium text-secondary text-xl text-center">
+      <div class="mt-4 flex w-full flex-col place-content-center">
+        <div class="text-center text-xl font-medium text-secondary">
           Agent Name
         </div>
-        <div class="w-full flex place-content-center">
+        <div class="flex w-full place-content-center">
           <div class="daisy-form-control max-w-xs p-4">
             <!-- svelte-ignore a11y-label-has-associated-control -->
             <input
               type="text"
               name="name"
               placeholder={exampleName}
-              class="daisy-input daisy-input-bordered daisy-input-primary w-full max-w-xs daisy-input-sm"
+              class="daisy-input daisy-input-sm daisy-input-bordered daisy-input-primary w-full max-w-xs"
             />
 
             <!-- svelte-ignore a11y-label-has-associated-control -->
@@ -282,16 +282,16 @@
           </div>
         </div>
       </div>
-      <div class="font-medium text-secondary text-xl text-center">
+      <div class="text-center text-xl font-medium text-secondary">
         Default Commission
       </div>
-      <div class="w-full flex place-content-center">
+      <div class="flex w-full place-content-center">
         <div class="daisy-form-control max-w-xs p-4">
           <input
             type="text"
             name="defaultCommissionRate"
             placeholder={config.UI.defaultCommissionRate.toString()}
-            class="daisy-input daisy-input-bordered daisy-input-primary w-full max-w-xs daisy-input-sm"
+            class="daisy-input daisy-input-sm daisy-input-bordered daisy-input-primary w-full max-w-xs"
           />
 
           <!-- svelte-ignore a11y-label-has-associated-control -->
@@ -307,12 +307,12 @@
 
       <div class="daisy-modal-action place-content-center gap-10">
         <button
-          class="daisy-btn daisy-btn-primary daisy-btn-outline"
+          class="daisy-btn daisy-btn-outline daisy-btn-primary"
           type="submit">Sign Up</button
         >
 
         <button
-          class="daisy-btn daisy-btn-secondary daisy-btn-outline"
+          class="daisy-btn daisy-btn-outline daisy-btn-secondary"
           on:click|preventDefault={() => {
             signupModel.close();
             addressModel.showModal();

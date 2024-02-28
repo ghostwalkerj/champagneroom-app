@@ -6,27 +6,27 @@
 <div id="Creators" class="container mx-auto px-4 sm:px-6 md:px-10">
   <div class="pt-20">
     <h2
-      class="text-primary font-bold text-[32px] lg:text-[41px] text-center font-CaviarDreams mb-10"
+      class="mb-10 text-center font-CaviarDreams text-[32px] font-bold text-primary lg:text-[41px]"
     >
       Become a Creator
     </h2>
-    <div class="flex flex-col lg:flex-row items-center justify-center">
-      <div class="w-full lg:w-1/2 my-10 flex justify-center p-4">
+    <div class="flex flex-col items-center justify-center lg:flex-row">
+      <div class="my-10 flex w-full justify-center p-4 lg:w-1/2">
         <Image
           src="{config.PATH.staticUrl}/assets/creator.png"
           alt="Creator"
-          class="rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1] max-w-xs md:max-w-sm lg:max-w-md"
+          class="max-w-xs overflow-hidden rounded-xl shadow-[0px_0px_17px_6px_#e779c1] md:max-w-sm lg:max-w-md"
           height={823}
           width={629}
         />
       </div>
-      <div class="w-full lg:w-1/2 font-medium">
+      <div class="w-full font-medium lg:w-1/2">
         <h2
-          class="text-info text-center font-bold text-3xl lg:text-[41px] mb-6 font-CaviarDreams"
+          class="mb-6 text-center font-CaviarDreams text-3xl font-bold text-info lg:text-[41px]"
         >
           Benefits
         </h2>
-        <ul class="text-lg font-medium list-disc mx-5 md:mx-10 space-y-4">
+        <ul class="mx-5 list-disc space-y-4 text-lg font-medium md:mx-10">
           <li>Get paid quickly in your local currency.</li>
           <li>
             Easily handle payments without worrying about issues and
@@ -44,12 +44,12 @@
           </li>
         </ul>
         <a
-          class="text-info text-lg md:text-xl font-bold capitalize text-center block font-CaviarDreams mt-5 mb-4"
+          class="mb-4 mt-5 block text-center font-CaviarDreams text-lg font-bold capitalize text-info md:text-xl"
           href={config.PATH.creatorSignup}
         >
           Sign Up as a Creator
         </a>
-        <ul class="text-base md:text-lg list-disc mx-5 md:mx-10">
+        <ul class="mx-5 list-disc text-base md:mx-10 md:text-lg">
           <!-- List items here -->
         </ul>
       </div>

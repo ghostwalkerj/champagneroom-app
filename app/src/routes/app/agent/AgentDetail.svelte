@@ -84,10 +84,10 @@
 </script>
 
 <div
-  class="bg-custom p-4 rounded flex flex-col gap-4 justify-center items-center min-w-60"
+  class="bg-custom flex min-w-60 flex-col items-center justify-center gap-4 rounded p-4"
 >
-  <div class="flex flex-col gap-0 items-center text-center">
-    <h2 class="text-xl font-semibold flex gap-2 items-center">
+  <div class="flex flex-col items-center gap-0 text-center">
+    <h2 class="flex items-center gap-2 text-xl font-semibold">
       <Icon class="text-secondary" icon="iconoir:profile-circle" />
       Profile
     </h2>
@@ -95,7 +95,7 @@
 
   <div class="text-center">
     <div
-      class="text-2xl font-bold w-full text-center"
+      class="w-full text-center text-2xl font-bold"
       contenteditable="true"
       on:blur={updateAgent}
       bind:this={nameDiv}
@@ -103,7 +103,7 @@
       {agent.user.name}
     </div>
     <div class="flex w-full place-content-center">
-      <div class="font-bold pr-1">Default Commission:</div>
+      <div class="pr-1 font-bold">Default Commission:</div>
       <div
         contenteditable="true"
         on:blur={updateAgent}
@@ -120,11 +120,11 @@
       />
     </div>
     <div>
-      <div class="font-bold pr-1 pt-2">Referral Url:</div>
+      <div class="pr-1 pt-2 font-bold">Referral Url:</div>
       <div>
         <CopyText
           copyValue={referralUrl}
-          class="anchor neon-primary font-semibold variant-soft-primary mb-1"
+          class="neon-primary anchor variant-soft-primary mb-1 font-semibold"
         >
           {referralCode}
         </CopyText>
@@ -132,14 +132,14 @@
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <!-- svelte-ignore a11y-no-static-element-interactions -->
       <button
-        class="btn variant-soft-secondary neon-secondary btn-sm m-2"
+        class="neon-secondary variant-soft-secondary btn btn-sm m-2"
         on:click={updateReferralCode}
       >
         Change
       </button>
     </div>
     <div class="flex w-full place-content-center">
-      <div class="font-bold pr-1">Referral Count:</div>
+      <div class="pr-1 font-bold">Referral Count:</div>
       <div>{referralCount}</div>
     </div>
   </div>

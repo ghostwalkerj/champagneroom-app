@@ -1,12 +1,23 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 module.exports = {
+  globals: {
+    process: true,
+    require: true,
+    module: true
+  },
   // ...
   extends: [
-    'plugin:svelte/recommended',
+    'plugin:@typescript-eslint/eslint-recommended',
     'plugin:@typescript-eslint/recommended',
-    'plugin:unicorn/recommended'
+    'plugin:svelte/recommended',
+    'plugin:unicorn/recommended',
+    'plugin:prettier/recommended'
   ],
-  plugins: ['simple-import-sort', 'sort-exports', 'prettier'],
+  plugins: [
+    'simple-import-sort',
+    'sort-exports',
+    '@typescript-eslint',
+    'prettier'
+  ],
 
   parser: '@typescript-eslint/parser',
   parserOptions: {

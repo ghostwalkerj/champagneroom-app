@@ -64,10 +64,10 @@
 </script>
 
 <div
-  class="bg-custom p-4 rounded flex flex-col gap-4 justify-center items-center"
+  class="bg-custom flex flex-col items-center justify-center gap-4 rounded p-4"
 >
-  <div class="flex flex-col gap-0 items-center text-center">
-    <h2 class="text-xl font-semibold flex gap-2 items-center">
+  <div class="flex flex-col items-center gap-0 text-center">
+    <h2 class="flex items-center gap-2 text-xl font-semibold">
       <Icon class="text-secondary" icon="circum:trophy" />
       Top Creators - {now.format('month')}
     </h2>

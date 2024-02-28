@@ -34,9 +34,9 @@
     method="post"
     use:enhance
     action="?/request_payout"
-    class="bg-surface-900 p-4 max-w-3xl rounded flex gap-4 flex-col"
+    class="flex max-w-3xl flex-col gap-4 rounded bg-surface-900 p-4"
   >
-    <h2 class="font-semibold text-xl">Withdraw funds into your own wallet</h2>
+    <h2 class="text-xl font-semibold">Withdraw funds into your own wallet</h2>
 
     <input type="hidden" name="walletId" bind:value={$form.walletId} readonly />
     <input
@@ -65,7 +65,7 @@
       />
       <span class="divider-vertical" />
       <button
-        class="btn variant-soft-secondary"
+        class="variant-soft-secondary btn"
         type="button"
         on:click={() => ($form.amount = wallet.availableBalance)}
         >Set Current Balance</button
@@ -88,13 +88,13 @@
 
     <footer class="text-right font-semibold">
       <button
-        class="btn variant-soft-error"
+        class="variant-soft-error btn"
         disabled={$delayed}
         type="button"
         on:click={parent.onClose}>{parent.buttonTextCancel}</button
       >
       <button
-        class="btn variant-soft-primary neon-primary gap-2"
+        class="neon-primary variant-soft-primary btn gap-2"
         disabled={$delayed}
         type="submit"
         >Request Payout {#if $delayed}<Icon
@@ -103,7 +103,7 @@
       >
       {#if $message}
         <br />
-        <p class="text-error mt-2">{$message}</p>
+        <p class="mt-2 text-error">{$message}</p>
       {/if}
     </footer>
   </form>

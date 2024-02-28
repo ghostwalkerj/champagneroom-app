@@ -41,27 +41,27 @@
 
 <div class="flex justify-center font-CaviarDreams">
   <div
-    class="flex flex-col md:w-full max-w-4xl rounded-xl bg-black overflow-hidden md:h-auto"
+    class="flex max-w-4xl flex-col overflow-hidden rounded-xl bg-black md:h-auto md:w-full"
   >
     <!-- Adjust grid layout: 2 columns on mobile, 5 on medium and larger screens -->
-    <div class="group grid grid-cols-2 md:grid-cols-5 h-full md:min-h-[200px]">
+    <div class="group grid h-full grid-cols-2 md:min-h-[200px] md:grid-cols-5">
       <!-- Image Section: Take full width on mobile, 1/5th on medium and larger screens -->
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <!-- svelte-ignore a11y-no-static-element-interactions -->
       <div
-        class="col-span-2 md:col-span-1 relative"
+        class="relative col-span-2 md:col-span-1"
         on:click={toggleFullScreen}
       >
         <!-- Add click event to open full-screen image -->
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <div
-          class="grid grid-flow-row bg-center bg-cover w-full h-48 md:h-full opacity-70 cursor-pointer"
+          class="grid h-48 w-full cursor-pointer grid-flow-row bg-cover bg-center opacity-70 md:h-full"
           style="background-image: url('{showCoverImageUrl}');"
         />
-        <div class="absolute inset-0 flex justify-center items-center">
+        <div class="absolute inset-0 flex items-center justify-center">
           <div class="w-fit animate-pulse">
             <div
-              class="-rotate-45 whitespace-nowrap font-bold text-primary ring-2 ring-primary p-2 ring-inset rounded-xl"
+              class="-rotate-45 whitespace-nowrap rounded-xl p-2 font-bold text-primary ring-2 ring-inset ring-primary"
             >
               {creatorName}
             </div>
@@ -71,12 +71,12 @@
 
       <!-- Content Section: Take full width on mobile, 3/5th on medium and larger screens -->
       <div
-        class="col-span-2 md:col-span-3 relative flex flex-col p-4 text-info font-bold text-sm h-full place-content-center"
+        class="relative col-span-2 flex h-full flex-col place-content-center p-4 text-sm font-bold text-info md:col-span-3"
       >
         <!-- Ticket Status Overlays -->
         {#if ticket.ticketState.status === TicketStatus.CANCELLED || ticket.ticketState.status === TicketStatus.FINALIZED}
           <div
-            class="absolute top-4 left-1/2 transform -translate-x-1/2 text-xl lg:text-2xl whitespace-normal font-extrabold text-primary ring-2 ring-primary bg-base-200 p-2 ring-inset rounded-xl z-20 opacity-70"
+            class="absolute left-1/2 top-4 z-20 -translate-x-1/2 transform whitespace-normal rounded-xl bg-base-200 p-2 text-xl font-extrabold text-primary opacity-70 ring-2 ring-inset ring-primary lg:text-2xl"
           >
             {ticket.ticketState.status === TicketStatus.CANCELLED
               ? 'Ticket Cancelled'
@@ -86,7 +86,7 @@
 
         <!-- Background Logo -->
         <div
-          class="bg-center bg-cover opacity-10 absolute inset-0 top-2"
+          class="absolute inset-0 top-2 bg-cover bg-center opacity-10"
           style="background-image: url('{config.PATH
             .staticUrl}/assets/logo-horizontal-tr.png'); z-index: 0;"
         />
@@ -101,11 +101,11 @@
 
       <!-- Right Side Content: Take full width on mobile, 1/5th on medium and larger screens -->
       <div
-        class="col-span-2 md:col-span-1 relative flex items-center border-t-2 md:border-l-2 md:border-t-0 border-dashed pb-4 md:pb-0"
+        class="relative col-span-2 flex items-center border-t-2 border-dashed pb-4 md:col-span-1 md:border-l-2 md:border-t-0 md:pb-0"
       >
         <!-- Added dashed border -->
         <div class="m-auto font-bold text-info">
-          <div class="text-xl p-2"><a href={showUrl}>{showName}</a></div>
+          <div class="p-2 text-xl"><a href={showUrl}>{showName}</a></div>
           <div class="text-sm">Duration: {showDuration}</div>
           <div class="text-sm">Price: {ticketPrice}{currency}</div>
         </div>
@@ -117,7 +117,7 @@
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
-      class="fixed top-0 left-0 w-screen h-screen flex justify-center items-center bg-black bg-opacity-80 z-50"
+      class="fixed left-0 top-0 z-50 flex h-screen w-screen items-center justify-center bg-black bg-opacity-80"
       on:click={toggleFullScreen}
     >
       <!-- svelte-ignore a11y-img-redundant-alt -->

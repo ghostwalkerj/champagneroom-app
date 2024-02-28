@@ -27,7 +27,7 @@
   method="post"
   action="?/cancel_show"
   use:enhance={onSubmit}
-  class="bg-custom rounded p-4 flex gap-4 justify-between"
+  class="bg-custom flex justify-between gap-4 rounded p-4"
 >
   <div>
     <h2 class="text-xl font-semibold">Cancel Your Show</h2>
@@ -36,7 +36,7 @@
     </p>
   </div>
 
-  <button class="btn variant-soft-error" type="submit" disabled={isLoading}
+  <button class="variant-soft-error btn" type="submit" disabled={isLoading}
     >Cancel Show</button
   >
 </form>

@@ -5,21 +5,21 @@
 
 <div id="Token" class="container mx-auto pt-20">
   <h2
-    class="text-primary font-bold text-[32px] lg:text-[41px] text-center font-CaviarDreams mb-10"
+    class="mb-10 text-center font-CaviarDreams text-[32px] font-bold text-primary lg:text-[41px]"
   >
     CHAMPAGNE ROOM Token
   </h2>
 </div>
 
 <div class="flex gap-4" id="page1">
-  <div class="mx-auto flex flex-col lg:flex-row items-center">
+  <div class="mx-auto flex flex-col items-center lg:flex-row">
     <div class="w-full px-4">
       <h2
-        class="text-info text-center font-bold leading-none text-3xl lg:text-[41px] lg:text-left mb-6 font-CaviarDreams"
+        class="mb-6 text-center font-CaviarDreams text-3xl font-bold leading-none text-info lg:text-left lg:text-[41px]"
       >
         CRT Tokenomics
       </h2>
-      <ul class="text-lg font-medium list-disc list-inside">
+      <ul class="list-inside list-disc text-lg font-medium">
         CRT is an ECR-20 utility token that benefits users of Champagne Room by
         offering rebates when using the token in our ecosystem.<br /><br />
         As adoption for Champagne Room increases, so does demand for CRT.<br
@@ -28,10 +28,10 @@
         tokens.
       </ul>
     </div>
-    <div class="pt-10 p-6">
+    <div class="p-6 pt-10">
       <div class="max-w-4xl">
         <Image
-          class="opacity-80 rounded-xl overflow-hidden shadow-[0px_0px_17px_6px_#e779c1]"
+          class="overflow-hidden rounded-xl opacity-80 shadow-[0px_0px_17px_6px_#e779c1]"
           src="{config.PATH.staticUrl}/assets/champagneroomtoken.gif"
           width={960}
           height={540}

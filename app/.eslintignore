@@ -3,3 +3,4 @@ build/**
 tsconfig.eslint.json
 vite.config.ts
 **.typegen.ts
+eslint.config.cjs

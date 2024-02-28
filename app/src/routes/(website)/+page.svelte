@@ -15,16 +15,16 @@
   export let form: ActionData;
 </script>
 
-<div class="flex mt-20 justify-center items-center" id="topPage">
-  <div class="flex flex-col lg:flex-row items-center space-y-4">
+<div class="mt-20 flex items-center justify-center" id="topPage">
+  <div class="flex flex-col items-center space-y-4 lg:flex-row">
     <div class="w-full pl-5">
       <h2
-        class="text-info text-center font-bold leading-none text-[41px] lg:text-left mb-6 font-CaviarDreams px-6"
+        class="mb-6 px-6 text-center font-CaviarDreams text-[41px] font-bold leading-none text-info lg:text-left"
       >
         A New Way to Discretely View NSFW Creators Live
       </h2>
       <ul
-        class="text-[25px] font-medium text-lg list-disc list-inside lg:pl-10"
+        class="list-inside list-disc text-[25px] text-lg font-medium lg:pl-10"
       >
         <li class="mt-2">Watch Completely Anonymous</li>
         <li class="mt-2">No Downloads, No Signup, No Personal Information</li>
@@ -32,12 +32,12 @@
         <li class="mt-2">Get paid instantly as a Creator</li>
       </ul>
       <div
-        class="flex flex-col 2sx:flex-row mt-10 space-x-0 2sx:space-y-0 space-y-6 2sx:space-x-6 place-content-center lg:place-content-start"
+        class="mt-10 flex flex-col place-content-center space-x-0 space-y-6 2sx:flex-row 2sx:space-x-6 2sx:space-y-0 lg:place-content-start"
       >
         <div>
           <a
             href="#FAQ"
-            class="md:w-auto btn variant-filled-primary transition-all duration-300 ease-in-out"
+            class="variant-filled-primary btn transition-all duration-300 ease-in-out md:w-auto"
           >
             Read the FAQ
           </a>
@@ -45,7 +45,7 @@
         <div>
           <a
             href="{config.PATH.staticUrl}/assets/champagne-room-white-paper.pdf"
-            class="md:w-auto btn variant-filled-secondary transition-all duration-300 ease-in-out"
+            class="variant-filled-secondary btn transition-all duration-300 ease-in-out md:w-auto"
             target="_blank"
           >
             White Paper
@@ -53,13 +53,13 @@
         </div>
       </div>
     </div>
-    <div class="w-full max-w-3xl lg:max-w-max p-10">
+    <div class="w-full max-w-3xl p-10 lg:max-w-max">
       <video
         autoplay
         loop
         controls
         muted
-        class="opacity-80 rounded-xl shadow-[0px_0px_17px_6px_#e779c1]"
+        class="rounded-xl opacity-80 shadow-[0px_0px_17px_6px_#e779c1]"
         width="800px"
         height="450px"
       >

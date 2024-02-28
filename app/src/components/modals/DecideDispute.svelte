@@ -15,11 +15,11 @@
 </script>
 
 {#if $modalStore[0]}
-  <div class="bg-surface-900 p-4 rounded">
-    <h3 class="text-lg lg:text-xl font-bold text-center">Dispute Decision</h3>
+  <div class="rounded bg-surface-900 p-4">
+    <h3 class="text-center text-lg font-bold lg:text-xl">Dispute Decision</h3>
 
-    <div class="flex gap-3 flex-col">
-      <div class="py-2 form-control">
+    <div class="flex flex-col gap-3">
+      <div class="form-control py-2">
         <select
           class="select w-full max-w-xs"
           name="decision"
@@ -35,7 +35,7 @@
 
       <div>
         <button
-          class="btn variant-filled-primary"
+          class="variant-filled-primary btn"
           type="button"
           on:click={onSubmit}
           disabled={decision === 'Decision'}
@@ -44,7 +44,7 @@
         </button>
 
         <button
-          class="btn variant-soft-surface"
+          class="variant-soft-surface btn"
           type="button"
           on:click={parent.onClose()}
         >

@@ -49,13 +49,13 @@
     use:enhance={onSubmit}
     {action}
   >
-    <div class="flex flex-col gap-3 items-center">
+    <div class="flex flex-col items-center gap-3">
       <FileDropzone
         name="images"
         bind:files={images}
         bind:fileInput={fileDrop}
         accept="image/*"
-        class="w-32 h-32 "
+        class="max-h-32 max-w-32 overflow-hidden"
         rounded="rounded-full"
         padding="p-0"
         on:change={onChange}
@@ -64,8 +64,7 @@
           <Avatar
             src={imageUrl}
             alt="profileImage"
-            rounded="rounded-full"
-            width="full"
+            class="relative max-h-32 max-w-32 rounded-full bg-cover bg-center bg-no-repeat"
           />
         </svelte:fragment>
       </FileDropzone>
@@ -81,13 +80,13 @@
       {:else}
         <div class="flex gap-2">
           <button
-            class="btn variant-soft-primary btn-sm neon-primary"
+            class="neon-primary variant-soft-primary btn btn-sm"
             type="submit"
           >
             Save
           </button>
           <button
-            class="btn variant-soft-secondary btn-sm neon-secondary"
+            class="neon-secondary variant-soft-secondary btn btn-sm"
             on:click={resetForm}
           >
             Cancel

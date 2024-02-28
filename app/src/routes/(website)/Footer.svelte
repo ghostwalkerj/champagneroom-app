@@ -4,13 +4,13 @@
   import config from '$lib/config';
 </script>
 
-<footer class="w-full flex-shrink-0 mt-20 px-4 md:px-6 lg:px-10">
-  <div class="w-full flex flex-col lg:flex-row pb-6 justify-center">
+<footer class="mt-20 w-full flex-shrink-0 px-4 md:px-6 lg:px-10">
+  <div class="flex w-full flex-col justify-center pb-6 lg:flex-row">
     <div
-      class="flex flex-col md:flex-row mx-auto md:space-x-4 whitespace-nowrap w-full text-center md:justify-evenly"
+      class="mx-auto flex w-full flex-col whitespace-nowrap text-center md:flex-row md:justify-evenly md:space-x-4"
     >
       <div class="mb-6 md:mb-0">
-        <h5 class="text-info mb-3">Social</h5>
+        <h5 class="mb-3 text-info">Social</h5>
         <ul class="list-none">
           <li class="spa">
             <a href="https://discord.gg/VgB7bWScVa" target="_blank">
@@ -27,7 +27,7 @@
         </ul>
       </div>
       <div class="mb-6 md:mb-0">
-        <h5 class="text-info mb-3">Services</h5>
+        <h5 class="mb-3 text-info">Services</h5>
         <ul class="list-none">
           <li class="spa">
             <a href={config.PATH.creator}>Creators</a>
@@ -38,7 +38,7 @@
         </ul>
       </div>
       <div class="">
-        <h5 class="text-info mb-3">Learn</h5>
+        <h5 class="mb-3 text-info">Learn</h5>
         <ul class="list-none">
           <li class="spa">
             <a

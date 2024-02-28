@@ -12,15 +12,15 @@
 <!-- Banner -->
 <div>
   <div class="relative">
-    <div class="capitalize absolute top-4 left-4 font-extrabold text-white">
+    <div class="absolute left-4 top-4 font-extrabold capitalize text-white">
       {creator.user.name}
     </div>
     <div
-      class="text-center p-4 w-[1168px] h-[204px] overflow-hidden items-center justify-center object-cover flex"
+      class="flex h-[204px] w-[1168px] items-center justify-center overflow-hidden object-cover p-4 text-center"
       style="background-image: url({room.bannerImageUrl})"
     >
       <div
-        class="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 capitalize"
+        class="bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 bg-clip-text text-5xl font-extrabold capitalize text-transparent"
       >
         {room.name}
       </div>
@@ -28,15 +28,15 @@
 
     <div class="absolute -bottom-24 left-0 text-center">
       <Avatar
-        class="ml-4 mb-4 w-32"
+        class="mb-4 ml-4 w-32"
         src={creator.user.profileImageUrl}
         border="border-4 border-surface-300-600-token hover:border-primary"
         cursor="cursor-pointer"
       />
       <span
-        class="badge-icon variant-filled-success absolute top-3 right-4 z-10"
+        class="variant-filled-success badge-icon absolute right-4 top-3 z-10"
       />
-      <div class="capitalize font-extrabold">
+      <div class="font-extrabold capitalize">
         {creator.user.name}
       </div>
       <div>Last seen recently</div>
@@ -44,15 +44,15 @@
   </div>
 
   <div
-    class="p-4 flex flex-col gap-3 min-w-full md:min-w-min max-w-7xl md:grid md:grid-cols-4"
+    class="flex min-w-full max-w-7xl flex-col gap-3 p-4 md:grid md:min-w-min md:grid-cols-4"
   >
     <!-- 1st column -->
-    <div class="flex-1 space-y-3 md:col-start-1 md:col-span-1">Col 1</div>
+    <div class="flex-1 space-y-3 md:col-span-1 md:col-start-1">Col 1</div>
 
     <!-- 2nd column -->
-    <div class="space-y-3 md:col-start-2 md:col-span-2">Col 2</div>
+    <div class="space-y-3 md:col-span-2 md:col-start-2">Col 2</div>
 
     <!--Next Column-->
-    <div class="space-y-3 md:col-start-4 md:col-span-1">Col 3</div>
+    <div class="space-y-3 md:col-span-1 md:col-start-4">Col 3</div>
   </div>
 </div>

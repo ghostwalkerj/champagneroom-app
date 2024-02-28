@@ -143,21 +143,21 @@
   });
 </script>
 
-<div class="w-screen flex flex-col text-center items-center">
+<div class="flex w-screen flex-col items-center text-center">
   {#if authType === AuthType.SIGNING}
     <div
-      class="bg-surface-800 p-6 rounded-lg font-Roboto flex flex-col items-center justify-center min-w-[320px] gap-4"
+      class="flex min-w-[320px] flex-col items-center justify-center gap-4 rounded-lg bg-surface-800 p-6 font-Roboto"
     >
-      <div class="text-4xl font-bold w-full max-w-lg mx-auto text-center">
+      <div class="mx-auto w-full max-w-lg text-center text-4xl font-bold">
         Crypto Wallet Authentication
       </div>
 
       {#if noUser}
         <div
-          class="w-full lg:w-96 border border-surface-600 p-4 lg:mt-10 rounded-lg"
+          class="w-full rounded-lg border border-surface-600 p-4 lg:mt-10 lg:w-96"
         >
           <div class="items-center text-center">
-            <h2 class="font-semibold text-xl">
+            <h2 class="text-xl font-semibold">
               Address: {walletAddress?.slice(0, 6)}...{walletAddress.slice(-4)} not
               found
             </h2>
@@ -166,13 +166,13 @@
         </div>
       {:else}
         <div
-          class="text-md text-neutral w-full max-w-md mx-auto text-center mb-4"
+          class="text-md mx-auto mb-4 w-full max-w-md text-center text-neutral"
         >
           Please sign the message in your wallet to verify your identity
         </div>
 
         {#if hasNoWallet}
-          <div class="py-6 w-full lg:w-auto">
+          <div class="w-full py-6 lg:w-auto">
             Please connect a wallet to continue
           </div>
         {/if}
@@ -180,20 +180,20 @@
           <!-- svelte-ignore a11y-no-static-element-interactions -->
           <div>
             <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <div class="btn variant-filled-primary" on:click={signMessage}>
+            <div class="variant-filled-primary btn" on:click={signMessage}>
               Sign Message
             </div>
           </div>
         {/if}
       {/if}
-      <div class="w-full max-w-md border-t border-surface-600 mt-2" />
-      <div class="text-xl font-bold w-full max-w-md mx-auto text-center mb-4">
+      <div class="mt-2 w-full max-w-md border-t border-surface-600" />
+      <div class="mx-auto mb-4 w-full max-w-md text-center text-xl font-bold">
         Not a user? Sign Up to Earn Now
       </div>
       <NeonBlur>
         <a
           href={config.PATH.signup}
-          class="relative btn btn-lg variant-filled rounded-lg"
+          class="variant-filled btn btn-lg relative rounded-lg"
         >
           Sign Up
         </a>
@@ -208,7 +208,7 @@
       method="post"
       action="?/password_secret_auth"
       use:enhance={onSubmit}
-      class="bg-surface-800 p-6 rounded-lg flex flex-col min-w-[320px] gap-4"
+      class="flex min-w-[320px] flex-col gap-4 rounded-lg bg-surface-800 p-6"
     >
       <input type="hidden" name="parseId" value={parseId} />
       <input type="hidden" name="type" value={type} />
@@ -233,11 +233,11 @@
           </div>
         {/if}
 
-        <div class="text-sm text-left">Please enter your password</div>
+        <div class="text-left text-sm">Please enter your password</div>
       </div>
 
       <div class="text-center">
-        <button class="btn variant-filled-primary" type="submit">Submit</button>
+        <button class="variant-filled-primary btn" type="submit">Submit</button>
       </div>
     </form>
   {:else if authType === AuthType.PIN}
@@ -249,7 +249,7 @@
       method="post"
       action="?/pin_auth"
       use:enhance={onSubmit}
-      class="bg-surface-800 p-6 rounded-lg flex flex-col min-w-[320px] gap-4"
+      class="flex min-w-[320px] flex-col gap-4 rounded-lg bg-surface-800 p-6"
     >
       <input type="hidden" name="parseId" value={parseId} />
       <input type="hidden" name="type" value={type} />
@@ -278,7 +278,7 @@
       <div class="text-left text-sm">You need a pin to see this ticket</div>
 
       <div class="text-center">
-        <button class="btn variant-filled-primary" type="submit">Submit</button>
+        <button class="variant-filled-primary btn" type="submit">Submit</button>
       </div>
     </form>
   {/if}

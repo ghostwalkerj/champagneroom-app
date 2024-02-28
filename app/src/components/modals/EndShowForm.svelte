@@ -21,8 +21,8 @@
 </script>
 
 {#if $modalStore[0]}
-  <div class="w-modal bg-surface-900 p-4 rounded">
-    <h3 class="font-bold text-xl">You have stopped the show</h3>
+  <div class="w-modal rounded bg-surface-900 p-4">
+    <h3 class="text-xl font-bold">You have stopped the show</h3>
 
     <p class="py-4">
       Are you sure you want to end the show? You will not be able to restart
@@ -37,7 +37,7 @@
       use:enhance={onSubmit}
     >
       <button
-        class="btn variant-soft-surface"
+        class="variant-soft-surface btn"
         type="button"
         on:click={() => {
           isLoading = true;
@@ -47,7 +47,7 @@
         }}
         disabled={!canStartShow || isLoading}>Restart Show</button
       >
-      <button class="btn variant-soft-primary" disabled={isLoading}
+      <button class="variant-soft-primary btn" disabled={isLoading}
         >End Show</button
       >
     </form>

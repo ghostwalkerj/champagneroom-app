@@ -1,7 +1,7 @@
-<div class="grid gap-8 items-start justify-center mx-auto max-w-fit">
-  <div class="relative group">
+<div class="mx-auto grid max-w-fit items-start justify-center gap-8">
+  <div class="group relative">
     <div
-      class="absolute -inset-0.5 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-tilt"
+      class="animate-tilt absolute -inset-0.5 rounded-lg bg-gradient-to-r from-pink-600 to-purple-600 opacity-75 blur transition duration-1000 group-hover:opacity-100 group-hover:duration-200"
     />
     <slot />
   </div>
