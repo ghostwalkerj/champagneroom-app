@@ -31,6 +31,8 @@
   import TicketFeedback from '$components/modals/TicketFeedback.svelte';
   import UserSecret from '$components/modals/UserSecret.svelte';
   import TransactionsActivity from '$components/TransactionsActivity.svelte';
+  import TicketDispute from '$components/modals/TicketDispute.svelte';
+
   initializeStores();
   storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
 
@@ -43,7 +45,8 @@
     CRUDRoomForm: { ref: CRUDRoomForm },
     UserSecret: { ref: UserSecret },
     DecideDispute: { ref: DecideDispute },
-    TicketFeedback: { ref: TicketFeedback }
+    TicketFeedback: { ref: TicketFeedback },
+    TicketDispute: { ref: TicketDispute }
   };
 </script>
 

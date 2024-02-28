@@ -286,7 +286,6 @@
   });
 </script>
 
-/** eslint-disable @typescript-eslint/naming-convention */
 {#if showVideo}
   <VideoMeeting bind:show {user} {jitsiToken} {leftShowCallback} />
 {:else if ticket}
