@@ -13,7 +13,6 @@ export interface Refund {
   amount: number;
   currency: string;
   wallet_id: string;
-  invoice_id: string;
   id: string;
   destination?: string;
   user_id: string;

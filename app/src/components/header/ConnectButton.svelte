@@ -1,7 +1,9 @@
 <script lang="ts">
-  import NeonBlur from '$components/NeonBlur.svelte';
-  import { connect, selectedAccount } from '$lib/web3';
   import Icon from '@iconify/svelte';
+
+  import { connect, selectedAccount } from '$lib/web3';
+
+  import NeonBlur from '$components/NeonBlur.svelte';
 </script>
 
 {#if !$selectedAccount}

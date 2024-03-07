@@ -1,14 +1,62 @@
 <script lang="ts">
   import Icon from '@iconify/svelte';
   import { Step, Stepper } from '@skeletonlabs/skeleton';
+  import { onMount } from 'svelte';
 
   import config from '$lib/config';
   import { selectedAccount } from '$lib/web3';
 
   import ConnectButton from '$components/header/ConnectButton.svelte';
+
+  let isLocked = true;
+
+  const onNextHandler = (event: CustomEvent): void => {
+    console.log('event:next', event.detail);
+  };
+
+  const onBackHandler = (event: CustomEvent): void => {
+    console.log('event:prev', event.detail);
+  };
+
+  const onStepHandler = (event: CustomEvent): void => {
+    console.log('event:step', event.detail);
+  };
+  const onCompleteHandler = (event: CustomEvent): void => {
+    console.log('event:complete', event.detail);
+    alert('Complete!');
+  };
+
+  onMount(() => {
+    console.log('selectedAccount', $selectedAccount);
+    $selectedAccount &&
+      selectedAccount.subscribe((account) => {
+        if (account) {
+          console.log('account', account);
+          isLocked = false;
+        }
+      });
+  });
 </script>
 
 <section class="flex h-[70vh] justify-center">
+  <Stepper
+    on:next={onNextHandler}
+    on:back={onBackHandler}
+    on:step={onStepHandler}
+    on:complete={onCompleteHandler}
+  >
+    {#if !$selectedAccount}
+      <Step locked={isLocked}>
+        <svelte:fragment slot="header">Connect Wallet</svelte:fragment>
+        <ConnectButton />
+      </Step>
+    {/if}
+    <Step>
+      <svelte:fragment slot="header">(header)</svelte:fragment>
+      (content)
+    </Step>
+  </Stepper>
+
   {#if $selectedAccount}
     <div class="flex h-full max-w-6xl flex-col gap-10">
       <h1 class="text-center text-3xl font-semibold uppercase">
@@ -41,7 +89,7 @@
         <a
           href={config.PATH.agentSignup}
           class="min-w-xs bg-image group h-full overflow-hidden rounded-lg"
-          style="background-image: url({config.PATH
+          style="background-image:url({config.PATH
             .staticUrl}/assets/agent2.png)"
         >
           <div

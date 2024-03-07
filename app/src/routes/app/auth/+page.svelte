@@ -2,6 +2,7 @@
   import type { ActionResult } from '@sveltejs/kit';
   import type { WalletState } from '@web3-onboard/core';
   import { onDestroy, onMount } from 'svelte';
+  import type { Unsubscriber } from 'svelte/store';
 
   import { applyAction, deserialize, enhance } from '$app/forms';
   import { goto } from '$app/navigation';
@@ -11,7 +12,7 @@
   import { defaultWallet, selectedAccount } from '$lib/web3';
 
   import NeonBlur from '$components/NeonBlur.svelte';
-  import type { Unsubscriber } from 'svelte/store';
+
   import type { ActionData, PageData } from './$types';
 
   export let data: PageData;
@@ -121,11 +122,9 @@
           }
         });
         accountUnsub = selectedAccount.subscribe((account) => {
-          if (account) {
-            if (walletAddress !== account.address) {
-              walletAddress = account.address;
-              signMessage();
-            }
+          if (account && walletAddress !== account.address) {
+            walletAddress = account.address;
+            signMessage();
           }
         });
         break;
