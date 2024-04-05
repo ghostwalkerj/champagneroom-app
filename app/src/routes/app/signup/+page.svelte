@@ -2,13 +2,17 @@
   import Icon from '@iconify/svelte';
   import { RadioGroup, RadioItem, Step, Stepper } from '@skeletonlabs/skeleton';
   import { Image } from '@unpic/svelte';
-  import { onMount } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
+  import type { Unsubscriber } from 'svelte/store';
 
   import config from '$lib/config';
   import { UserRole } from '$lib/constants';
   import { selectedAccount } from '$lib/web3';
 
   import ConnectButton from '$components/header/ConnectButton.svelte';
+
+  import AgentForm from './AgentForm.svelte';
+  import CreatorForm from './CreatorForm.svelte';
 
   const onNextHandler = (event: CustomEvent): void => {
     console.log('event:next', event.detail);
@@ -29,6 +33,7 @@
   $: isWalletConnected = true;
   $: stepStart = 1;
   let signUpRole = UserRole.CREATOR;
+  let accountUnsub: Unsubscriber;
 
   onMount(() => {
     $selectedAccount &&
@@ -36,6 +41,10 @@
         isWalletConnected = account ? true : false;
         stepStart = isWalletConnected ? 1 : 0;
       });
+  });
+
+  onDestroy(() => {
+    accountUnsub?.();
   });
 </script>
 
@@ -54,7 +63,21 @@
 
         {#if !isWalletConnected}<ConnectButton />
         {:else}
-          Wallet is connected, continue to next step{/if}
+          <div class="text-2xl font-bold text-primary">
+            Wallet is connected, continue to next step
+          </div>{/if}
+      </Step>
+      <Step>
+        <div class="text-2xl font-bold text-primary">
+          Sign up with this address
+        </div>
+        <div class="text-md text-accent">
+          {$selectedAccount?.address}
+        </div>
+        <div class=" text-secondary">
+          To use a different address, change the account connected in your
+          wallet
+        </div>
       </Step>
       <Step>
         <svelte:fragment slot="header">Choose Your Role</svelte:fragment>
@@ -143,6 +166,19 @@
             </div>
           </RadioItem>
         </RadioGroup>
+      </Step>
+      <Step>
+        <svelte:fragment slot="header"
+          >Confirm Details as an
+
+          <span class="capitalize">{signUpRole.toLowerCase()}</span>
+        </svelte:fragment>
+
+        {#if signUpRole === UserRole.CREATOR}
+          <CreatorForm />
+        {:else if signUpRole === UserRole.AGENT}
+          <AgentForm />
+        {/if}
       </Step>
     </Stepper>
   {/key}

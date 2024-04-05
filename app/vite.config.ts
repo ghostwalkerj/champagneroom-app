@@ -1,7 +1,6 @@
 import { sveltekit } from '@sveltejs/kit/vite';
-import { build, defineConfig, optimizeDeps } from 'vite';
+import { defineConfig } from 'vite';
 import EnvironmentPlugin from 'vite-plugin-environment';
-import nodePolyfills from 'vite-plugin-node-stdlib-browser';
 import mkcert from 'vite-plugin-mkcert';
 
 export default defineConfig({
@@ -12,21 +11,28 @@ export default defineConfig({
   },
 
   plugins: [
-    nodePolyfills({
-      protocolImports: true
-    }),
     sveltekit(),
     mkcert(),
     EnvironmentPlugin(['MONGO_DB_FIELD_SECRET'])
   ],
 
   resolve: {
-    alias: {}
+    alias:{
+            process: "process/browser",
+            buffer: "buffer",
+            stream: "stream-browserify",
+            assert: "assert",
+            http: "stream-http",
+            https: "https-browserify",
+            os: "os-browserify",
+            url: "url",
+            vm: 'vm-browserify'
+        },
   },
   build: {
     chunkSizeWarningLimit: 16000,
     rollupOptions: {
-      external: ['@web3-onboard/*', 'mongoose-zod']
+      external: ['@web3-onboard/*', 'mongoose-zod', 'crypto']
     },
     commonjsOptions: {
       transformMixedEsModules: true
@@ -39,7 +45,7 @@ export default defineConfig({
     }
   },
   optimizeDeps: {
-    exclude: ['@ethersproject/hash', 'wrtc', 'http'],
+    exclude: ['@ethersproject/hash', 'wrtc'],
     include: ['@web3-onboard/core', 'js-sha3', '@ethersproject/bignumber'],
     esbuildOptions: {
       // Node.js global to browser globalThis

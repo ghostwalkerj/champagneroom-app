@@ -35,7 +35,8 @@ const agentZodMongooseSchema = toZodMongooseSchema(agentSchema, {
 });
 
 const agentCRUDSchema = agentSchema.extend({
-  _id: agentSchema.shape._id.optional()
+  _id: agentSchema.shape._id.optional(),
+  user: agentSchema.shape.user.optional()
 });
 
 const agentMongooseSchema = toMongooseSchema(agentZodMongooseSchema);
