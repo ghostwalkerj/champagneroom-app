@@ -1,11 +1,11 @@
 <script lang="ts">
+  import Icon from '@iconify/svelte';
   import { Accordion, AccordionItem, Ratings } from '@skeletonlabs/skeleton';
   import spacetime from 'spacetime';
 
   import type { ShowDocument } from '$lib/models/show';
 
-  import { ShowStatus, currencyFormatter } from '$lib/constants';
-  import Icon from '@iconify/svelte';
+  import { currencyFormatter, ShowStatus } from '$lib/constants';
   export let completedShows: ShowDocument[] = [];
 </script>
 
@@ -22,12 +22,12 @@
     <span>Activity</span>
   </h2>
   <p class="">
-    {completedShows.length} Completed Show{#if completedShows.length > 1 || completedShows.length == 0}s{/if}
+    {completedShows.length} Completed Show{#if completedShows.length > 1 || completedShows.length === 0}s{/if}
   </p>
 
   <Accordion autocollapse regionPanel="bg-surface-700">
-    {#each completedShows.slice(0, 9) as show, i}
-      <AccordionItem open={i == 0}>
+    {#each completedShows.slice(0, 9) as show, index}
+      <AccordionItem open={index == 0}>
         <svelte:fragment slot="lead">
           {#if show.showState.status === ShowStatus.FINALIZED}
             {spacetime(show.showState.finalize?.finalizedAt).format(

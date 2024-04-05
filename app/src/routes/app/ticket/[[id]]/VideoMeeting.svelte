@@ -1,20 +1,19 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
 
+  import { browser } from '$app/environment';
   import { onNavigate } from '$app/navigation';
   import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
+  import type { ShowDocumentType } from '$lib/models/show';
   import type { UserDocumentType } from '$lib/models/user';
 
   import { jitsiInterfaceConfigOverwrite } from '$lib/constants';
 
-  import { browser } from '$app/environment';
-  import type { ShowDocumentType } from '$lib/models/show';
-
-  export let show: ShowDocumentType;
-  export let user: UserDocumentType;
   export let jitsiToken: string;
   export let leftShowCallback: () => void;
+  export let show: ShowDocumentType;
+  export let user: UserDocumentType;
 
   // @ts-ignore
   let videoCallElement: HTMLDivElement;
@@ -68,7 +67,7 @@
     });
 
     api.addListener('participantLeft', (event: any) => {
-      api.isP2pActive().then((isP2p: Boolean) => {
+      api.isP2pActive().then((isP2p: boolean) => {
         if (!isP2p) {
           postLeaveShow();
         }

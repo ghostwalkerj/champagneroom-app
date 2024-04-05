@@ -6,7 +6,8 @@ import type IORedis from 'ioredis';
 import { nanoid } from 'nanoid';
 import { generateSillyPassword } from 'silly-password-generator';
 import spacetime from 'spacetime';
-import { message, superValidate } from 'sveltekit-superforms/server';
+import { message, superValidate } from 'sveltekit-superforms';
+import { zod } from 'sveltekit-superforms/adapters';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 
 import {
@@ -34,9 +35,9 @@ import config from '$lib/config';
 import { AuthType, CurrencyType, EntityType } from '$lib/constants';
 import { rateCryptosRateGet } from '$lib/ext/bitcart';
 import {
+  createBitcartToken,
   PayoutJobType,
   PayoutReason,
-  createBitcartToken,
   requestPayoutSchema
 } from '$lib/payout';
 import {
@@ -51,7 +52,7 @@ import type { Actions, PageServerLoad } from './$types';
 
 export const actions: Actions = {
   request_payout: async ({ request, locals }) => {
-    const form = await superValidate(request, requestPayoutSchema);
+    const form = await superValidate(request, zod(requestPayoutSchema));
     const { walletId, amount, destination, payoutReason, jobType } = form.data;
 
     if (!form.valid) {
@@ -418,7 +419,7 @@ export const load: PageServerLoad = async ({ locals }) => {
       payoutReason: PayoutReason.AGENT_PAYOUT,
       jobType: PayoutJobType.CREATE_PAYOUT
     },
-    requestPayoutSchema,
+    zod(requestPayoutSchema),
     { errors: false }
   );
 

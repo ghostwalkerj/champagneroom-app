@@ -1,6 +1,7 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
+import { zod } from 'sveltekit-superforms/adapters';
 import { message, superValidate } from 'sveltekit-superforms/server';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 import urlJoin from 'url-join';
@@ -37,9 +38,9 @@ import { authEncrypt } from '$lib/crypt';
 import type { DisplayInvoice } from '$lib/ext/bitcart/models';
 import { mensNames } from '$lib/mensNames';
 import {
+  createBitcartToken,
   InvoiceJobType,
   InvoiceStatus,
-  createBitcartToken,
   type PaymentType
 } from '$lib/payout';
 import { createAuthToken, setAuthToken } from '$lib/server/auth';
@@ -64,7 +65,7 @@ export const actions: Actions = {
       return fail(404, { showId, missingShowId: true });
     }
 
-    const form = await superValidate(request, reserveTicketSchema);
+    const form = await superValidate(request, zod(reserveTicketSchema));
 
     // Convenient validation check:
     if (!form.valid) {
@@ -267,7 +268,7 @@ export const load: PageServerLoad = async (event) => {
       name: displayName,
       pin: Array.from({ length: 8 }, () => Math.floor(Math.random() * 10))
     },
-    reserveTicketSchema,
+    zod(reserveTicketSchema),
     {
       errors: false
     }

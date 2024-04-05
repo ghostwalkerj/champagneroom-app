@@ -1,11 +1,14 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-  import CopyText from '$components/CopyText.svelte';
-  import config from '$lib/config';
   import Icon from '@iconify/svelte';
   import { getModalStore } from '@skeletonlabs/skeleton';
   import { onMount, type SvelteComponent } from 'svelte';
   import urlJoin from 'url-join';
+
+  import { page } from '$app/stores';
+
+  import config from '$lib/config';
+
+  import CopyText from '$components/CopyText.svelte';
 
   export let parent: SvelteComponent;
 

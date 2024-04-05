@@ -28,10 +28,10 @@
   import EndShowForm from '$components/modals/EndShowForm.svelte';
   import PayoutForm from '$components/modals/PayoutForm.svelte';
   import ReserveShowForm from '$components/modals/ReserveTicketForm.svelte';
+  import TicketDispute from '$components/modals/TicketDispute.svelte';
   import TicketFeedback from '$components/modals/TicketFeedback.svelte';
   import UserSecret from '$components/modals/UserSecret.svelte';
   import TransactionsActivity from '$components/TransactionsActivity.svelte';
-  import TicketDispute from '$components/modals/TicketDispute.svelte';
 
   initializeStores();
   storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });

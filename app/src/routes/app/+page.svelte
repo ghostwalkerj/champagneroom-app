@@ -8,8 +8,8 @@
   import type { UserDocument } from '$lib/models/user';
 
   import config from '$lib/config';
-
   import { UserRole } from '$lib/constants';
+
   import type { PageData } from './$types';
   export let data: PageData;
 

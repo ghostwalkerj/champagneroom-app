@@ -822,7 +822,7 @@ export type TicketMachineType = ReturnType<typeof createTicketMachine>;
 
 export { type TicketMachineEventType };
 
-export { createTicketMachine };
+  export { createTicketMachine };
 
 export const createTicketMachineService = ({
   ticketDocument,

@@ -77,7 +77,7 @@
             <a
               class="variant-outline btn"
               href={config.PATH.signout + '?returnPath=' + $page.url.pathname}
-              >Signout</a
+              >Sign Out</a
             >
           {/if}
         </div>

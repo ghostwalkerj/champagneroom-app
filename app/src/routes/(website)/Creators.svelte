@@ -1,6 +1,7 @@
 <script lang="ts">
-  import config from '$lib/config';
   import { Image } from '@unpic/svelte';
+
+  import config from '$lib/config';
 </script>
 
 <div id="Creators" class="container mx-auto px-4 sm:px-6 md:px-10">

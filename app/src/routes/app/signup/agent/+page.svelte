@@ -1,6 +1,8 @@
 <script lang="ts">
+  import type { ActionResult } from '@sveltejs/kit';
   import type { WalletState } from '@web3-onboard/core';
   import { onDestroy, onMount } from 'svelte';
+  import type { Unsubscriber } from 'svelte/store';
   import { uniqueNamesGenerator } from 'unique-names-generator';
 
   import { applyAction, enhance } from '$app/forms';
@@ -12,8 +14,6 @@
 
   import ConnectButton from '$components/header/ConnectButton.svelte';
 
-  import type { ActionResult } from '@sveltejs/kit';
-  import type { Unsubscriber } from 'svelte/store';
   import type { ActionData, PageData } from './$types';
 
   export let data: PageData;

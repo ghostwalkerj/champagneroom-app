@@ -1,8 +1,10 @@
 <script lang="ts">
-  import NeonBlur from '$components/NeonBlur.svelte';
   import urlJoin from 'url-join';
 
   import config from '$lib/config';
+
+  import NeonBlur from '$components/NeonBlur.svelte';
+
   import type { PageData } from './$types';
 
   export let data: PageData;
@@ -22,7 +24,7 @@
   {#if returnPath !== undefined}
     <NeonBlur>
       <a href={authPath} class="variant-filled btn btn-lg relative rounded-lg"
-        >Sign in</a
+        >Sign In</a
       >
     </NeonBlur>
   {/if}

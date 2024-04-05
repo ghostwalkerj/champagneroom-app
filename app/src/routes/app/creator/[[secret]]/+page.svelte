@@ -1,11 +1,18 @@
 <script lang="ts">
-  import { invalidateAll } from '$app/navigation';
+  import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
   import { onDestroy, onMount } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
+  import type { Infer, SuperValidated } from 'sveltekit-superforms';
+  import type { Subscription } from 'xstate';
+
+  import { invalidateAll } from '$app/navigation';
+  import { page } from '$app/stores';
 
   import type { CreatorDocument } from '$lib/models/creator';
-  import type { showCRUDSchema, ShowDocument } from '$lib/models/show';
+  import type { roomCRUDSchema } from '$lib/models/room';
+  import type { ShowDocument } from '$lib/models/show';
   import type { ShowEventDocument } from '$lib/models/showEvent';
+  import type { UserDocument } from '$lib/models/user';
   import type { WalletDocument } from '$lib/models/wallet';
 
   import type { ShowMachineServiceType } from '$lib/machines/showMachine';
@@ -16,27 +23,21 @@
     CancelReason,
     ShowMachineEventString
   } from '$lib/constants';
+  import type { requestPayoutSchema } from '$lib/payout';
 
   import ShowDetail from '$components/ShowDetail.svelte';
+  import WalletDetail from '$components/WalletDetail.svelte';
   import { CreatorStore, ShowStore, WalletStore } from '$stores';
 
-  import WalletDetail from '$components/WalletDetail.svelte';
   import CancelShow from './CancelShow.svelte';
   import CreateShow from './CreateShow.svelte';
   import CreatorActivity from './CreatorActivity.svelte';
-  import ShowStatus from './ShowStatus.svelte';
-
-  import { page } from '$app/stores';
-  import type { roomCRUDSchema } from '$lib/models/room';
-  import type { UserDocument } from '$lib/models/user';
-  import type { requestPayoutSchema } from '$lib/payout';
-  import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
-  import type { SuperValidated } from 'sveltekit-superforms';
-  import type { Subscription } from 'xstate';
-  import type { PageData } from './$types';
   import CreatorDetail from './CreatorDetail.svelte';
   import RoomDetail from './RoomDetail.svelte';
+  import ShowStatus from './ShowStatus.svelte';
   import VideoMeeting from './VideoMeeting.svelte';
+
+  import type { PageData } from './$types';
 
   export let data: PageData;
 
@@ -48,11 +49,11 @@
   let exchangeRate = +data.exchangeRate || 0;
   let jitsiToken = data.jitsiToken as string;
   let user = data.user as UserDocument;
-  $: roomForm = data.roomForm as SuperValidated<typeof roomCRUDSchema>;
-  $: createShowForm = data.createShowForm as SuperValidated<
-    typeof showCRUDSchema
+  $: roomForm = data.roomForm as SuperValidated<Infer<typeof roomCRUDSchema>>;
+  $: createShowForm = data.createShowForm;
+  $: payoutForm = data.payoutForm as SuperValidated<
+    Infer<typeof requestPayoutSchema>
   >;
-  $: payoutForm = data.payoutForm as SuperValidated<typeof requestPayoutSchema>;
 
   $: showVideo = false;
 
@@ -68,7 +69,6 @@
   let walletUnSub: Unsubscriber;
   let showMachineService: ShowMachineServiceType;
   let showMachineServiceUnSub: Subscription;
-  const destination = user.payoutAddress;
   const modalStore = getModalStore();
 
   const noCurrentShow = () => {

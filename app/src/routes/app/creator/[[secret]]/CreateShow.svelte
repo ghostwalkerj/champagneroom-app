@@ -1,17 +1,16 @@
 <script lang="ts">
+  import Icon from '@iconify/svelte';
+  import { RangeSlider } from '@skeletonlabs/skeleton';
+  import type { Infer, SuperValidated } from 'sveltekit-superforms';
+  import { superForm } from 'sveltekit-superforms';
   import urlJoin from 'url-join';
 
-  import type { ShowDocument, showCRUDSchema } from '$lib/models/show';
+  import type { showCRUDSchema, ShowDocument } from '$lib/models/show';
 
   import config from '$lib/config';
   import { durationFormatter } from '$lib/constants';
 
-  import Icon from '@iconify/svelte';
-  import { RangeSlider } from '@skeletonlabs/skeleton';
-  import type { SuperValidated } from 'sveltekit-superforms';
-  import { superForm } from 'sveltekit-superforms/client';
-
-  export let createShowForm: SuperValidated<typeof showCRUDSchema>;
+  export let createShowForm: SuperValidated<Infer<typeof showCRUDSchema>>;
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   export let onShowCreated: (show: ShowDocument) => void;
 

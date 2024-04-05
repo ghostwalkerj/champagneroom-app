@@ -7,9 +7,9 @@
 
   import config from '$lib/config';
   import {
-    TicketStatus,
     currencyFormatter,
-    durationFormatter
+    durationFormatter,
+    TicketStatus
   } from '$lib/constants';
   export let show: ShowDocumentType;
   export let ticket: TicketDocumentType;

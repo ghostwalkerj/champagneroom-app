@@ -151,13 +151,6 @@
     }
   }
 
-  /* ----------------------------------------------
- * Animations below by Animista on 2020-7-11
- * Licensed under FreeBSD License.
- * See http://animista.net/license for more info.
- * w: http://animista.net, t: @cssanimista
- * ---------------------------------------------- */
-
   @keyframes -global-scale-in-center {
     0% {
       transform: scale(0);

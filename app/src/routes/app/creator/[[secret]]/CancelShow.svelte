@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { applyAction, enhance } from '$app/forms';
   import type { ActionResult } from '@sveltejs/kit';
+
+  import { applyAction, enhance } from '$app/forms';
 
   export let isLoading = false;
   // eslint-disable-next-line @typescript-eslint/no-empty-function

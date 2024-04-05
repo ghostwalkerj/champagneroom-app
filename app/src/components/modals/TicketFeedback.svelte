@@ -2,7 +2,7 @@
   import Icon from '@iconify/svelte';
   import { getModalStore, Ratings } from '@skeletonlabs/skeleton';
   import type { SvelteComponent } from 'svelte';
-  import type { SuperValidated } from 'sveltekit-superforms';
+  import type { Infer, SuperValidated } from 'sveltekit-superforms';
   import { superForm } from 'sveltekit-superforms/client';
 
   import type { ticketFeedbackSchema } from '$lib/models/common';
@@ -15,7 +15,7 @@
   let meta = $modalStore[0].meta;
   let action = meta.action;
   let ticketFeedbackForm = $modalStore[0].meta.form as SuperValidated<
-    typeof ticketFeedbackSchema
+    Infer<typeof ticketFeedbackSchema>
   >;
 
   const { form, errors, constraints, enhance, delayed, message } = superForm(
@@ -88,7 +88,7 @@
             <Icon icon="eos-icons:loading" />{/if}</button
         >
         <button
-          class="btn variant-soft-surface"
+          class="variant-soft-surface btn"
           type="button"
           on:click={parent.onClose()}
         >

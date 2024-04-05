@@ -1,7 +1,9 @@
 <script lang="ts">
+  import { Avatar } from '@skeletonlabs/skeleton';
+
   import type { CreatorDocument } from '$lib/models/creator';
   import type { RoomDocumentType } from '$lib/models/room';
-  import { Avatar } from '@skeletonlabs/skeleton';
+
   import type { PageData } from './$types';
   export let data: PageData;
 

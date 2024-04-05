@@ -1,17 +1,21 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-  import CopyText from '$components/CopyText.svelte';
-  import config from '$lib/config';
-  import {
-    ShowStatus,
-    currencyFormatter,
-    durationFormatter
-  } from '$lib/constants';
-  import type { ShowDocument } from '$lib/models/show';
   import Icon from '@iconify/svelte';
   import { Ratings } from '@skeletonlabs/skeleton';
   import { onMount } from 'svelte';
   import urlJoin from 'url-join';
+
+  import { page } from '$app/stores';
+
+  import type { ShowDocument } from '$lib/models/show';
+
+  import config from '$lib/config';
+  import {
+    currencyFormatter,
+    durationFormatter,
+    ShowStatus
+  } from '$lib/constants';
+
+  import CopyText from '$components/CopyText.svelte';
 
   type ShowDetailOptions = {
     showCopy?: boolean;

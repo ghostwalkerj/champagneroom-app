@@ -1,14 +1,18 @@
 <script lang="ts">
-  import { deserialize } from '$app/forms';
-  import { invalidateAll } from '$app/navigation';
-  import { page } from '$app/stores';
-  import CopyText from '$components/CopyText.svelte';
-  import ProfileImage from '$components/ImageUploadForm.svelte';
-  import config from '$lib/config';
-  import type { AgentDocument } from '$lib/models/agent';
   import Icon from '@iconify/svelte';
   import type { ActionResult } from '@sveltejs/kit';
   import urlJoin from 'url-join';
+
+  import { deserialize } from '$app/forms';
+  import { invalidateAll } from '$app/navigation';
+  import { page } from '$app/stores';
+
+  import type { AgentDocument } from '$lib/models/agent';
+
+  import config from '$lib/config';
+
+  import CopyText from '$components/CopyText.svelte';
+  import ProfileImage from '$components/ImageUploadForm.svelte';
 
   export let agent: AgentDocument;
 
@@ -46,9 +50,9 @@
         nameDiv.innerText = agent.user.name;
         return;
       }
-      const defaultCommissionRate = parseInt(commissionDiv.textContent);
+      const defaultCommissionRate = Number.parseInt(commissionDiv.textContent);
       if (
-        isNaN(defaultCommissionRate) ||
+        Number.isNaN(defaultCommissionRate) ||
         defaultCommissionRate < 0 ||
         defaultCommissionRate > 100
       ) {

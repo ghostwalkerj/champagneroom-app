@@ -6,15 +6,15 @@
 
   import config from '$lib/config';
   import {
-    TicketStatus,
     currencyFormatter,
-    durationFormatter
+    durationFormatter,
+    TicketStatus
   } from '$lib/constants';
   import type { PaymentType } from '$lib/payout';
   import { InvoiceStatus } from '$lib/payout';
 
-  import type { DisplayInvoice } from '$ext/bitcart/models';
   import CopyText from '$components/CopyText.svelte';
+  import type { DisplayInvoice } from '$ext/bitcart/models';
 
   export let invoice: DisplayInvoice;
   export let ticket: TicketDocumentType;

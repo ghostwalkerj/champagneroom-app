@@ -1,16 +1,17 @@
 <script lang="ts">
-  import { currencyFormatter } from '$lib/constants';
-  import type { EarningsType, PayoutType } from '$lib/models/common';
-  import { PayoutStatus } from '$lib/payout';
   import type { TableSource } from '@skeletonlabs/skeleton';
   import {
+    getModalStore,
     Tab,
     TabGroup,
     Table,
-    getModalStore,
     tableMapperValues
   } from '@skeletonlabs/skeleton';
-  import type { SvelteComponent } from 'svelte';
+
+  import type { EarningsType, PayoutType } from '$lib/models/common';
+
+  import { currencyFormatter } from '$lib/constants';
+  import { PayoutStatus } from '$lib/payout';
 
   const modalStore = getModalStore();
 
@@ -33,20 +34,27 @@
 
   function getStatusClass(status: string) {
     switch (status) {
-      case PayoutStatus.PENDING.toLowerCase():
+      case PayoutStatus.PENDING.toLowerCase(): {
         return 'variant-soft-warning';
-      case PayoutStatus.APPROVED.toLowerCase():
+      }
+      case PayoutStatus.APPROVED.toLowerCase(): {
         return 'variant-soft-success';
-      case PayoutStatus.CANCELLED.toLowerCase():
+      }
+      case PayoutStatus.CANCELLED.toLowerCase(): {
         return 'variant-soft-error';
-      case PayoutStatus.FAILED.toLowerCase():
+      }
+      case PayoutStatus.FAILED.toLowerCase(): {
         return 'variant-soft-error';
-      case PayoutStatus.SENT.toLowerCase():
+      }
+      case PayoutStatus.SENT.toLowerCase(): {
         return 'variant-soft-warning';
-      case PayoutStatus.COMPLETE.toLowerCase():
+      }
+      case PayoutStatus.COMPLETE.toLowerCase(): {
         return 'variant-soft-success';
-      default:
+      }
+      default: {
         return 'variant-soft-surface';
+      }
     }
   }
 

@@ -1,6 +1,7 @@
 <script lang="ts">
-  import config from '$lib/config';
   import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
+
+  import config from '$lib/config';
 </script>
 
 <div
