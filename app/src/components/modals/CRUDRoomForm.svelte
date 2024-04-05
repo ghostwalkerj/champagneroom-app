@@ -1,14 +1,17 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-  import config from '$lib/config';
-  import type { roomCRUDSchema } from '$lib/models/room';
   import Icon from '@iconify/svelte';
   import { FileDropzone, getModalStore } from '@skeletonlabs/skeleton';
   import { nanoid } from 'nanoid';
   import type { SvelteComponent } from 'svelte';
-  import type { SuperValidated } from 'sveltekit-superforms';
+  import type { Infer, SuperValidated } from 'sveltekit-superforms';
   import { superForm } from 'sveltekit-superforms/client';
   import urlJoin from 'url-join';
+
+  import { page } from '$app/stores';
+
+  import type { roomCRUDSchema } from '$lib/models/room';
+
+  import config from '$lib/config';
 
   const modalStore = getModalStore();
   $: thisModal = $modalStore[0];
@@ -17,7 +20,7 @@
   export let parent: SvelteComponent;
 
   let roomForm = $modalStore[0].meta.form as SuperValidated<
-    typeof roomCRUDSchema
+    Infer<typeof roomCRUDSchema>
   >;
 
   const { form, errors, constraints, enhance, delayed, message } = superForm(

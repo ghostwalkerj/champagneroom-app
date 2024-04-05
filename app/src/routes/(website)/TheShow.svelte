@@ -1,6 +1,7 @@
 <script lang="ts">
-  import config from '$lib/config';
   import { Image } from '@unpic/svelte';
+
+  import config from '$lib/config';
 </script>
 
 <div id="TheShow" class="mx-auto flex w-full flex-col pt-20">

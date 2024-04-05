@@ -3,6 +3,7 @@ import type { AxiosResponse } from 'axios';
 import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 import jwt from 'jsonwebtoken';
+import { zod } from 'sveltekit-superforms/adapters';
 import { superValidate } from 'sveltekit-superforms/server';
 
 import {
@@ -367,13 +368,13 @@ export const load: PageServerLoad = async ({ locals }) => {
 
   const disputeForm = await superValidate(
     { ...ticket.ticketState.dispute, ticketId: ticket.id },
-    ticketDisputeSchema,
+    zod(ticketDisputeSchema),
     { errors: false }
   );
 
   const feedbackForm = await superValidate(
     { ...ticket.ticketState.feedback, ticketId: ticket.id },
-    ticketFeedbackSchema,
+    zod(ticketFeedbackSchema),
     { errors: false }
   );
 

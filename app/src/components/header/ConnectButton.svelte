@@ -9,7 +9,7 @@
 {#if !$selectedAccount}
   <NeonBlur>
     <button
-      class="variant-filled btn btn-xl relative rounded-lg"
+      class="variant-glass-secondary btn btn-xl relative rounded-lg"
       on:click={connect}
     >
       <Icon

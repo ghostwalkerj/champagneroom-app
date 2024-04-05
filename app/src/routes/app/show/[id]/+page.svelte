@@ -1,13 +1,14 @@
 <script lang="ts">
-  import config from '$lib/config';
-  import getProfileImage from '$lib/profilePhoto';
-
-  import ShowDetail from '$components/ShowDetail.svelte';
-
-  import NeonBlur from '$components/NeonBlur.svelte';
-  import { ShowStatus } from '$lib/constants';
   import type { ModalSettings } from '@skeletonlabs/skeleton';
   import { getModalStore } from '@skeletonlabs/skeleton';
+
+  import config from '$lib/config';
+  import { ShowStatus } from '$lib/constants';
+  import getProfileImage from '$lib/profilePhoto';
+
+  import NeonBlur from '$components/NeonBlur.svelte';
+  import ShowDetail from '$components/ShowDetail.svelte';
+
   import type { PageData } from './$types';
 
   export let data: PageData;

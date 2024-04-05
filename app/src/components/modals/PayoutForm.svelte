@@ -2,7 +2,7 @@
   import Icon from '@iconify/svelte';
   import { getModalStore } from '@skeletonlabs/skeleton';
   import type { SvelteComponent } from 'svelte';
-  import type { SuperValidated } from 'sveltekit-superforms';
+  import type { Infer, SuperValidated } from 'sveltekit-superforms';
   import { superForm } from 'sveltekit-superforms/client';
 
   import type { WalletDocumentType } from '$lib/models/wallet';
@@ -18,7 +18,9 @@
   let wallet: WalletDocumentType = meta.wallet;
 
   const { form, errors, constraints, enhance, delayed, message } = superForm(
-    $modalStore[0].meta.form as SuperValidated<typeof requestPayoutSchema>,
+    $modalStore[0].meta.form as SuperValidated<
+      Infer<typeof requestPayoutSchema>
+    >,
     {
       validationMethod: 'auto',
       onError() {

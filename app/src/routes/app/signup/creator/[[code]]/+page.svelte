@@ -1,10 +1,15 @@
 <script lang="ts">
+  import type { ActionResult } from '@sveltejs/kit';
   import type { WalletState } from '@web3-onboard/core';
   import { onDestroy, onMount } from 'svelte';
+  import type { Unsubscriber } from 'svelte/store';
   import { uniqueNamesGenerator } from 'unique-names-generator';
 
   import { applyAction, enhance } from '$app/forms';
   import { goto } from '$app/navigation';
+
+  import type { AgentDocument } from '$lib/models/agent';
+  import type { UserDocument } from '$lib/models/user';
 
   import config from '$lib/config';
   import { defaultWallet, selectedAccount } from '$lib/web3';
@@ -12,10 +17,6 @@
 
   import ConnectButton from '$components/header/ConnectButton.svelte';
 
-  import type { AgentDocument } from '$lib/models/agent';
-  import type { UserDocument } from '$lib/models/user';
-  import type { ActionResult } from '@sveltejs/kit';
-  import type { Unsubscriber } from 'svelte/store';
   import type { ActionData, PageData } from './$types';
 
   export let data: PageData;
@@ -24,6 +25,7 @@
   const message = data.message;
   const user = data.user as UserDocument;
   const isCreator = data.isCreator;
+
   const agent = data.agent as AgentDocument | undefined;
 
   $: walletAddress = '';
@@ -106,12 +108,10 @@
     return async ({ result }: { result: ActionResult }) => {
       if (result.type === 'success') {
         goto(result.data!.returnPath);
-      } else if (result.type === 'failure') {
-        if (result.data!.alreadyCreator) {
-          existsModel.showModal();
-          addressModel?.close();
-          signupModel?.close();
-        }
+      } else if (result.type === 'failure' && result.data!.alreadyCreator) {
+        existsModel.showModal();
+        addressModel?.close();
+        signupModel?.close();
       }
       applyAction(result);
     };
@@ -124,7 +124,7 @@
     let positions: { x: number; y: number; width: number; height: number }[] =
       [];
 
-    cards.forEach((card, index) => {
+    for (const [index, card] of cards.entries()) {
       let x: number,
         y: number,
         overlap: boolean,
@@ -136,7 +136,7 @@
         y = Math.random() * (700 - card.offsetHeight);
 
         // Enhanced overlap check
-        positions.forEach((pos) => {
+        for (const pos of positions) {
           if (
             x < pos.x + pos.width &&
             x + card.offsetWidth > pos.x &&
@@ -145,7 +145,7 @@
           ) {
             overlap = true;
           }
-        });
+        }
 
         // Boundary check for viewport
         if (
@@ -182,7 +182,7 @@
         width: card.offsetWidth,
         height: card.offsetHeight
       });
-    });
+    }
   }
 </script>
 

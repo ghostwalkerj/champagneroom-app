@@ -27,6 +27,6 @@
     "./tests/**/*.svelte",
     "playwright.config.ts",
     "setupTests.js",
-    "postcss.config.cjs",
+    "postcss.config.cjs"
   ],
 }

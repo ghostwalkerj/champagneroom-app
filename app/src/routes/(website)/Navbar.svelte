@@ -1,12 +1,14 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-  import config from '$lib/config';
   import Icon from '@iconify/svelte';
   import {
     Drawer,
-    getDrawerStore,
-    type DrawerSettings
+    type DrawerSettings,
+    getDrawerStore
   } from '@skeletonlabs/skeleton';
+
+  import { page } from '$app/stores';
+
+  import config from '$lib/config';
 
   const links = [
     { name: 'About', href: '#About' },

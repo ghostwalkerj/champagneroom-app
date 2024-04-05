@@ -1,16 +1,15 @@
 <script lang="ts">
   import Icon from '@iconify/svelte';
   import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
-  import type { SuperValidated } from 'sveltekit-superforms';
+  import type { Infer, SuperValidated } from 'sveltekit-superforms';
 
   import type { WalletDocumentType } from '$lib/models/wallet';
 
-  import { CurrencyType } from '$lib/constants';
-  import { currencyFormatter } from '$lib/constants';
+  import { currencyFormatter, CurrencyType } from '$lib/constants';
   import type { requestPayoutSchema } from '$lib/payout';
 
   export let exchangeRate = 0;
-  export let payoutForm: SuperValidated<typeof requestPayoutSchema>;
+  export let payoutForm: SuperValidated<Infer<typeof requestPayoutSchema>>;
   export let wallet: WalletDocumentType;
 
   const modalStore = getModalStore();

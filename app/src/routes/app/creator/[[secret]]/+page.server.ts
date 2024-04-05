@@ -4,8 +4,9 @@ import { possessive } from 'i18n-possessive';
 import type IORedis from 'ioredis';
 import jwt from 'jsonwebtoken';
 import { ObjectId } from 'mongodb';
-import type { SuperValidated } from 'sveltekit-superforms';
-import { message, superValidate } from 'sveltekit-superforms/server';
+import type { Infer, SuperValidated } from 'sveltekit-superforms';
+import { message, superValidate } from 'sveltekit-superforms';
+import { zod } from 'sveltekit-superforms/adapters';
 
 import {
   BITCART_API_URL,
@@ -89,8 +90,8 @@ export const actions: Actions = {
   create_show: async ({ locals, request }) => {
     const form = (await superValidate(
       request,
-      showCRUDSchema
-    )) as SuperValidated<typeof showCRUDSchema>;
+      zod(showCRUDSchema)
+    )) as SuperValidated<Infer<typeof showCRUDSchema>>;
 
     if (!form.valid) {
       console.log(form.data);
@@ -197,7 +198,7 @@ export const actions: Actions = {
     };
   },
   request_payout: async ({ request, locals }) => {
-    const form = await superValidate(request, requestPayoutSchema);
+    const form = await superValidate(request, zod(requestPayoutSchema));
     const { walletId, amount, destination, payoutReason, jobType } = form.data;
 
     if (!form.valid) {
@@ -274,7 +275,7 @@ export const actions: Actions = {
     const creator = locals.creator as CreatorDocument;
     const formData = await request.formData();
 
-    const form = await superValidate(formData, roomCRUDSchema);
+    const form = await superValidate(formData, zod(roomCRUDSchema));
 
     const isUpdate = !!form.data._id;
     // Convenient validation check:
@@ -414,23 +415,25 @@ export const load: PageServerLoad = async ({ locals }) => {
           flattenMaps: true,
           flattenObjectIds: true
         }),
-        roomSchema
+        zod(roomSchema)
       )
-    : ((await superValidate(roomSchema)) as SuperValidated<typeof roomSchema>);
+    : ((await superValidate(zod(roomSchema))) as SuperValidated<
+        Infer<typeof roomSchema>
+      >);
 
   const showName = creator
     ? possessive(creator.user.name, 'en') + ' Show'
     : 'Show';
 
-  const createShowForm = (await superValidate(
+  const createShowForm = await superValidate(
     {
       name: showName
     },
-    showCRUDSchema,
+    zod(showCRUDSchema),
     {
       errors: false
     }
-  )) as SuperValidated<typeof showCRUDSchema>;
+  );
 
   const payoutForm = await superValidate(
     {
@@ -440,7 +443,7 @@ export const load: PageServerLoad = async ({ locals }) => {
       payoutReason: PayoutReason.CREATOR_PAYOUT,
       jobType: PayoutJobType.CREATE_PAYOUT
     },
-    requestPayoutSchema,
+    zod(requestPayoutSchema),
     { errors: false }
   );
 

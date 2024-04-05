@@ -1,5 +1,14 @@
 <script lang="ts">
+  import Icon from '@iconify/svelte';
+  import {
+    getModalStore,
+    type ModalSettings,
+    Ratings,
+    Tab,
+    TabGroup
+  } from '@skeletonlabs/skeleton';
   import type { ActionResult } from '@sveltejs/kit';
+  import { Types } from 'mongoose';
   import spacetime from 'spacetime';
   import { uniqueNamesGenerator } from 'unique-names-generator';
   import urlJoin from 'url-join';
@@ -8,27 +17,20 @@
   import { invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
 
+  import type { AgentDocument } from '$lib/models/agent';
   import type { CreatorDocument } from '$lib/models/creator';
   import type { OperatorDocument } from '$lib/models/operator';
+  import type { TicketDocument } from '$lib/models/ticket';
+  import type { UserDocument } from '$lib/models/user';
 
   import config from '$lib/config';
-  import { AuthType, DisputeDecision, currencyFormatter } from '$lib/constants';
+  import type { DisputeDecision } from '$lib/constants';
+  import { AuthType, currencyFormatter } from '$lib/constants';
+  import { PermissionType } from '$lib/permissions';
   import { womensNames } from '$lib/womensNames';
 
   import CopyText from '$components/CopyText.svelte';
-  import type { AgentDocument } from '$lib/models/agent';
-  import type { TicketDocument } from '$lib/models/ticket';
-  import type { UserDocument } from '$lib/models/user';
-  import { PermissionType } from '$lib/permissions';
-  import Icon from '@iconify/svelte';
-  import {
-    Ratings,
-    Tab,
-    TabGroup,
-    getModalStore,
-    type ModalSettings
-  } from '@skeletonlabs/skeleton';
-  import { Types } from 'mongoose';
+
   import type { PageData } from './$types';
 
   export let data: PageData;

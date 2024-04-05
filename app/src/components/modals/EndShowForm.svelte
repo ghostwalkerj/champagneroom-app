@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { applyAction, enhance } from '$app/forms';
   import { getModalStore } from '@skeletonlabs/skeleton';
   import type { ActionResult } from '@sveltejs/kit';
+
+  import { applyAction, enhance } from '$app/forms';
   const modalStore = getModalStore();
   let meta = $modalStore[0].meta;
 

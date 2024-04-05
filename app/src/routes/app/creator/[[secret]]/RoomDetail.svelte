@@ -1,14 +1,18 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-  import CopyText from '$components/CopyText.svelte';
-  import config from '$lib/config';
-  import type { roomCRUDSchema } from '$lib/models/room';
   import Icon from '@iconify/svelte';
   import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
-  import type { SuperValidated } from 'sveltekit-superforms';
+  import type { Infer, SuperValidated } from 'sveltekit-superforms';
   import urlJoin from 'url-join';
 
-  export let roomForm: SuperValidated<typeof roomCRUDSchema>;
+  import { page } from '$app/stores';
+
+  import type { roomCRUDSchema } from '$lib/models/room';
+
+  import config from '$lib/config';
+
+  import CopyText from '$components/CopyText.svelte';
+
+  export let roomForm: SuperValidated<Infer<typeof roomCRUDSchema>>;
 
   let room = roomForm.data;
 

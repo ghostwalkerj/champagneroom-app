@@ -6,16 +6,15 @@
 
   import type { CreatorDocument } from '$lib/models/creator';
   import type { ShowDocument } from '$lib/models/show';
+  import type { UserDocumentType } from '$lib/models/user';
 
   import { jitsiInterfaceConfigOverwrite } from '$lib/constants';
 
-  import type { UserDocumentType } from '$lib/models/user';
-
   export let creator: CreatorDocument;
   export let currentShow: ShowDocument;
-  export let user: UserDocumentType;
   export let jitsiToken: string;
   export let leftShowCallback: () => void;
+  export let user: UserDocumentType;
 
   let videoCallElement: HTMLDivElement;
   let api: any;

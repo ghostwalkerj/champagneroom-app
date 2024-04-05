@@ -2,8 +2,8 @@
   import Icon from '@iconify/svelte';
   import { getModalStore } from '@skeletonlabs/skeleton';
   import type { SvelteComponent } from 'svelte';
-  import type { SuperValidated } from 'sveltekit-superforms';
-  import { superForm } from 'sveltekit-superforms/client';
+  import type { Infer, SuperValidated } from 'sveltekit-superforms';
+  import { superForm } from 'sveltekit-superforms';
 
   import type { ticketDisputeSchema } from '$lib/models/common';
 
@@ -17,7 +17,7 @@
   let meta = $modalStore[0].meta;
   let action = meta.action;
   let ticketDisputeForm = $modalStore[0].meta.form as SuperValidated<
-    typeof ticketDisputeSchema
+    Infer<typeof ticketDisputeSchema>
   >;
 
   const { form, errors, constraints, enhance, delayed, message } = superForm(
@@ -32,20 +32,19 @@
         if (event.result.type === 'success') {
           parent.onClose();
         }
-      },
-      validators: {
-        reason: (reason) =>
-          !(reason in DisputeReason) ? 'Please select a reason' : null
       }
+      // validators: valibotClient({
+      //   reason: reason in DisputeReason ? undefined : 'Please select a reason'
+      // }) // TODO: Add other validators
     }
   );
 </script>
 
 {#if $modalStore[0]}
   <!-- Form -->
-  <div class="bg-surface-900 p-4 rounded">
+  <div class="rounded bg-surface-900 p-4">
     <form method="post" {action} use:enhance class="space-y-4">
-      <h3 class="text-lg lg:text-xl font-bold text-center">Initiate Dispute</h3>
+      <h3 class="text-center text-lg font-bold lg:text-xl">Initiate Dispute</h3>
 
       <!-- Reason for Dispute Dropdown -->
       <select
@@ -79,14 +78,14 @@
       <footer class="text-right font-semibold">
         <div class="py-4 text-center">
           <button
-            class="btn variant-soft-primary neon-primary gap-2"
+            class="neon-primary variant-soft-primary btn gap-2"
             type="submit"
             disabled={$delayed}
             >Submit{#if $delayed}
               <Icon icon="eos-icons:loading" />{/if}</button
           >
           <button
-            class="btn variant-soft-surface"
+            class="variant-soft-surface btn"
             type="button"
             on:click={parent.onClose()}
           >
@@ -95,7 +94,7 @@
         </div>
         {#if $message}
           <br />
-          <p class="text-error mt-2">{$message}</p>
+          <p class="mt-2 text-error">{$message}</p>
         {/if}
       </footer>
     </form>

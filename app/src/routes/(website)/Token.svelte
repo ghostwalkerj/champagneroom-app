@@ -1,6 +1,7 @@
 <script lang="ts">
-  import config from '$lib/config';
   import { Image } from '@unpic/svelte';
+
+  import config from '$lib/config';
 </script>
 
 <div id="Token" class="container mx-auto pt-20">

@@ -1,12 +1,11 @@
 <script lang="ts">
-  import { applyAction, deserialize } from '$app/forms';
-  import type { reserveTicketSchema } from '$lib/models/common';
   import Icon from '@iconify/svelte';
   import { getModalStore } from '@skeletonlabs/skeleton';
-  import type { ActionResult } from '@sveltejs/kit';
   import type { SvelteComponent } from 'svelte';
-  import type { SuperValidated } from 'sveltekit-superforms';
+  import type { Infer, SuperValidated } from 'sveltekit-superforms';
   import { superForm } from 'sveltekit-superforms/client';
+
+  import type { reserveTicketSchema } from '$lib/models/common';
 
   // Props
   /** Exposes parent props to this component. */
@@ -15,7 +14,9 @@
   const modalStore = getModalStore();
 
   const theForm = superForm(
-    $modalStore[0].meta.form as SuperValidated<typeof reserveTicketSchema>,
+    $modalStore[0].meta.form as SuperValidated<
+      Infer<typeof reserveTicketSchema>
+    >,
     {
       validationMethod: 'auto',
       onResult: ({ result }) => {
@@ -68,11 +69,11 @@
           <label class="label">
             <span class="font-semibold">8 digit numeric PIN</span>
             <div class="flex gap-1 text-center">
-              {#each $form.pin as _, i}
+              {#each $form.pin as index}
                 <span>
                   <input
                     name="pin"
-                    bind:value={$form.pin[i]}
+                    bind:value={$form.pin[index]}
                     class="input variant-form-material"
                     maxlength="1"
                   />
@@ -80,9 +81,9 @@
               {/each}
             </div>
 
-            {#each $form.pin as _, i}
-              {#if $errors.pin && $errors.pin[i]}
-                <div class="text-error">{$errors.pin[i]}</div>
+            {#each $form.pin as index}
+              {#if $errors.pin && $errors.pin[index]}
+                <div class="text-error">{$errors.pin[index]}</div>
               {/if}
             {/each}
 

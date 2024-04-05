@@ -1,13 +1,14 @@
 <script lang="ts">
+  import Icon from '@iconify/svelte';
   import Chart from 'chart.js/auto';
   import ChartDataLabels from 'chartjs-plugin-datalabels';
+  import spacetime from 'spacetime';
   import { Doughnut } from 'svelte-chartjs';
 
   import type { CreatorDocument } from '$lib/models/creator';
 
-  import { CurrencyType, currencyFormatter } from '$lib/constants';
-  import Icon from '@iconify/svelte';
-  import spacetime from 'spacetime';
+  import type { CurrencyType } from '$lib/constants';
+  import { currencyFormatter } from '$lib/constants';
 
   export let creators: CreatorDocument[];
   export let showData: {

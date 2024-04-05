@@ -1,10 +1,11 @@
 <script lang="ts">
-  import { applyAction, enhance } from '$app/forms';
+  import type { ActionResult } from '@sveltejs/kit';
   import { Image } from '@unpic/svelte';
+
+  import { applyAction, enhance } from '$app/forms';
 
   import config from '$lib/config';
 
-  import type { ActionResult } from '@sveltejs/kit';
   import type { ActionData } from './$types';
 
   export let form: ActionData;

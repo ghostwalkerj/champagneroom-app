@@ -2,7 +2,7 @@
   import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
   import { onMount, tick } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
-  import type { SuperValidated } from 'sveltekit-superforms';
+  import type { Infer, SuperValidated } from 'sveltekit-superforms';
   import web3 from 'web3';
 
   import { invalidateAll, onNavigate } from '$app/navigation';
@@ -20,13 +20,13 @@
   } from '$lib/machines/ticketMachine';
 
   import {
+    ActorType,
     DisputeReason,
     RefundReason,
     ShowStatus,
     TicketMachineEventString,
     TicketStatus
   } from '$lib/constants';
-  import { ActorType } from '$lib/constants';
   import { InvoiceStatus, type PaymentType } from '$lib/payout';
   import { connect, defaultWallet, selectedAccount } from '$lib/web3';
 
@@ -48,11 +48,11 @@
   let user = data.user as UserDocument;
   let jitsiToken = data.jitsiToken as string;
   let feedbackForm = data.feedbackForm as SuperValidated<
-    typeof ticketFeedbackSchema
+    Infer<typeof ticketFeedbackSchema>
   >;
 
   let disputeForm = data.disputeForm as SuperValidated<
-    typeof ticketDisputeSchema
+    Infer<typeof ticketDisputeSchema>
   >;
 
   const currentPayment = invoice?.payments?.[

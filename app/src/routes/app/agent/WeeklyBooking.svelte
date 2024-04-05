@@ -1,11 +1,11 @@
 <script lang="ts">
+  import Icon from '@iconify/svelte';
   import Chart from 'chart.js/auto';
   import autocolors from 'chartjs-plugin-autocolors';
   import ChartDataLabels from 'chartjs-plugin-datalabels';
   import { Line } from 'svelte-chartjs';
 
   import type { CreatorDocument } from '$lib/models/creator';
-  import Icon from '@iconify/svelte';
 
   export let creators: CreatorDocument[];
   export let weeklyData: {
@@ -16,7 +16,7 @@
   let datasets = [] as { label: string; data: number[] }[];
 
   if (creators) {
-    weeklyData.forEach((data) => {
+    for (const data of weeklyData) {
       const name = creators.find(
         (creator) => creator._id.toString() === data.creatorId
       )?.user.name;
@@ -31,7 +31,7 @@
         }
         datasets[dataRow - 1].data[data.dayOfWeek] = data.bookings;
       }
-    });
+    }
   }
 
   const options = {

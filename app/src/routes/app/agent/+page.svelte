@@ -1,11 +1,16 @@
 <script lang="ts">
   import Icon from '@iconify/svelte';
   import {
-    Ratings,
     getModalStore,
-    type ModalSettings
+    type ModalSettings,
+    Ratings,
+    Tab,
+    TabGroup
   } from '@skeletonlabs/skeleton';
   import type { ActionResult } from '@sveltejs/kit';
+  import { onDestroy, onMount } from 'svelte';
+  import type { Unsubscriber } from 'svelte/store';
+  import type { Infer, SuperValidated } from 'sveltekit-superforms';
   import { uniqueNamesGenerator } from 'unique-names-generator';
   import urlJoin from 'url-join';
 
@@ -13,27 +18,27 @@
   import { invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
 
-  import config from '$lib/config';
-  import { AuthType, currencyFormatter } from '$lib/constants';
-  import { womensNames } from '$lib/womensNames';
-
-  import TopCreator from './TopCreator.svelte';
-
-  import CopyText from '$components/CopyText.svelte';
-  import WalletDetail from '$components/WalletDetail.svelte';
-  import type { CurrencyType } from '$lib/constants';
   import type { AgentDocument } from '$lib/models/agent';
   import type { CreatorDocument } from '$lib/models/creator';
   import type { UserDocument } from '$lib/models/user';
   import type { WalletDocument } from '$lib/models/wallet';
+
+  import config from '$lib/config';
+  import type { CurrencyType } from '$lib/constants';
+  import { AuthType, currencyFormatter } from '$lib/constants';
+  import type { requestPayoutSchema } from '$lib/payout';
   import { PermissionType } from '$lib/permissions';
+  import { womensNames } from '$lib/womensNames';
+
+  import CopyText from '$components/CopyText.svelte';
+  import WalletDetail from '$components/WalletDetail.svelte';
   import { AgentStore } from '$stores';
-  import { Tab, TabGroup } from '@skeletonlabs/skeleton';
-  import { onDestroy, onMount } from 'svelte';
-  import type { Unsubscriber } from 'svelte/store';
-  import type { PageData } from './$types';
+
   import AgentDetail from './AgentDetail.svelte';
+  import TopCreator from './TopCreator.svelte';
   import WeeklyBooking from './WeeklyBooking.svelte';
+
+  import type { PageData } from './$types';
 
   export let data: PageData;
   $: agent = data.agent as AgentDocument;
@@ -51,7 +56,9 @@
     bookings: number;
   }[];
   $: exchangeRate = +data.exchangeRate || 0;
-  let payoutForm = data.payoutForm;
+  let payoutForm = data.payoutForm as SuperValidated<
+    Infer<typeof requestPayoutSchema>
+  >;
 
   let activeRow = 0;
   $: canAddCreator = false;
@@ -141,9 +148,9 @@
   };
 
   const updateActive = (event: Event) => {
-    const active = (event.target as HTMLInputElement).checked;
+    const isActive = (event.target as HTMLInputElement).checked;
     const index = activeRow;
-    creators[index].user.active = active;
+    creators[index].user.active = isActive;
     updateCreator(creators[index]);
   };
 

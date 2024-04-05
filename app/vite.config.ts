@@ -1,11 +1,15 @@
 import { sveltekit } from '@sveltejs/kit/vite';
-import { defineConfig } from 'vite';
+import { build, defineConfig, optimizeDeps } from 'vite';
 import EnvironmentPlugin from 'vite-plugin-environment';
 import nodePolyfills from 'vite-plugin-node-stdlib-browser';
 import mkcert from 'vite-plugin-mkcert';
 
 export default defineConfig({
   mode: 'development',
+
+  define: {
+    SUPERFORMS_LEGACY: true
+  },
 
   plugins: [
     nodePolyfills({

@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { applyAction, enhance } from '$app/forms';
-
   // TODO:Add validation
   import { FileButton, FileDropzone } from '@skeletonlabs/skeleton';
   import type { ActionResult } from '@sveltejs/kit';
   import { onMount } from 'svelte';
 
-  export let imageUrl: string;
+  import { applyAction, enhance } from '$app/forms';
+
   export let action: string;
+  export let imageUrl: string;
 
   let images: FileList;
   let fileDrop: HTMLInputElement;

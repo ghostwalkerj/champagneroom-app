@@ -176,5 +176,5 @@ const userCRUDSchema = userSchema.extend({
   _id: userSchema.shape._id.optional()
 });
 
-export type { UserDocument, UserDocumentType };
 export { User, userCRUDSchema, userSchema };
+export type { UserDocument, UserDocumentType };
