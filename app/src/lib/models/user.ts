@@ -23,6 +23,9 @@ type UserDocument = InstanceType<typeof User> & {
   isAgent: () => boolean;
   isOperator: () => boolean;
   hasPermission: (permission: PermissionType) => boolean;
+  addRole: (role: UserRole) => void;
+  removeRole: (role: UserRole) => void;
+  hasRole: (role: UserRole) => boolean;
 };
 
 type UserDocumentType = z.infer<typeof userSchema>;
@@ -160,6 +163,23 @@ userMongooseSchema.methods.hasPermission = function (
   return this.permissions.includes(permission);
 };
 
+userMongooseSchema.methods.addRole = function (role: UserRole) {
+  if (!this.roles.includes(role)) {
+    this.roles.push(role);
+  }
+};
+
+userMongooseSchema.methods.removeRole = function (role: UserRole) {
+  const index = this.roles.indexOf(role);
+  if (index > -1) {
+    this.roles.splice(index, 1);
+  }
+};
+
+userMongooseSchema.methods.hasRole = function (role: UserRole): boolean {
+  return this.roles.includes(role);
+};
+
 // userSchema.statics.encryptField = function (secret: string) {
 //   return encrypt(
 //     secret,
@@ -176,5 +196,5 @@ const userCRUDSchema = userSchema.extend({
   _id: userSchema.shape._id.optional()
 });
 
-export { User, userCRUDSchema, userSchema };
 export type { UserDocument, UserDocumentType };
+export { User, userCRUDSchema, userSchema };
