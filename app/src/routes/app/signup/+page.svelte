@@ -4,14 +4,15 @@
   import { Image } from '@unpic/svelte';
   import { onDestroy, onMount } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
+  import { uniqueNamesGenerator } from 'unique-names-generator';
 
   import config from '$lib/config';
   import { UserRole } from '$lib/constants';
   import { selectedAccount } from '$lib/web3';
+  import { womensNames } from '$lib/womensNames';
 
   import ConnectButton from '$components/header/ConnectButton.svelte';
 
-  import AgentForm from './AgentForm.svelte';
   import CreatorForm from './CreatorForm.svelte';
 
   const onNextHandler = (event: CustomEvent): void => {
@@ -31,9 +32,13 @@
   };
 
   $: isWalletConnected = true;
+  $: isSignupValid = false;
   $: stepStart = 1;
   let signUpRole = UserRole.CREATOR;
   let accountUnsub: Unsubscriber;
+  let exampleName = uniqueNamesGenerator({
+    dictionaries: [womensNames]
+  });
 
   onMount(() => {
     $selectedAccount &&
@@ -167,7 +172,7 @@
           </RadioItem>
         </RadioGroup>
       </Step>
-      <Step>
+      <Step locked={!isSignupValid}>
         <svelte:fragment slot="header"
           >Confirm Details as an
 
@@ -176,8 +181,27 @@
 
         {#if signUpRole === UserRole.CREATOR}
           <CreatorForm />
-        {:else if signUpRole === UserRole.AGENT}
-          <AgentForm />
+        {:else}
+          Form
+          <form action="?/create_agent" method="post" use:enhance>
+            {#if message}
+              <div
+                class="status"
+                class:error={$message.status >= 400}
+                class:success={$message.status || $message.status < 300}
+              >
+                {$message.text}
+              </div>
+            {/if}
+
+            <input
+              class="input"
+              title="Stage Name"
+              type="text"
+              placeholder={exampleName}
+              bind:value={$form.name}
+            />
+          </form>
         {/if}
       </Step>
     </Stepper>

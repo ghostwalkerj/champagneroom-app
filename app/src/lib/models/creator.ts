@@ -9,8 +9,12 @@ import {
   z
 } from 'mongoose-zod';
 
-import { creatorSalesStatsSchema, feedbackStatsSchema } from './common';
-import { type UserDocument } from './user';
+import {
+  creatorSalesStatsSchema,
+  feedbackStatsSchema,
+  signupSchema
+} from './common';
+import { userCRUDSchema, type UserDocument } from './user';
 
 const { models } = pkg;
 
@@ -71,3 +75,9 @@ const Creator = models?.Creator
 
 export type { CreatorDocument, CreatorDocumentType };
 export { Creator, creatorCRUDSchema, creatorSchema };
+
+const creatorSignupSchema = userCRUDSchema
+  .merge(creatorCRUDSchema)
+  .extend(signupSchema);
+
+export { creatorSignupSchema };

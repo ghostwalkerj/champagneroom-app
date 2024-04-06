@@ -9,7 +9,8 @@ import {
   z
 } from 'mongoose-zod';
 
-import type { UserDocument } from './user';
+import { signupSchema } from './common';
+import { userCRUDSchema, type UserDocument } from './user';
 
 const { models } = pkg;
 
@@ -54,4 +55,10 @@ const Agent = models?.Agent
 
 export type { AgentDocument, AgentDocumentType };
 
+const agentSignupSchema = userCRUDSchema
+  .merge(agentCRUDSchema)
+  .extend(signupSchema);
+
 export { Agent, agentCRUDSchema, agentSchema };
+
+export { agentSignupSchema };
