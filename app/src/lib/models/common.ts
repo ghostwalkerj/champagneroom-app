@@ -174,6 +174,17 @@ export const showSalesStatsSchema = z.object({
   totalRefunds: z.record(z.number().min(0)).default({})
 });
 
+export const signupSchema = {
+  message: z.string(),
+  signature: z.string(),
+  address: z
+    .string()
+    .trim()
+    .refine((value: string) => validator.isEthereumAddress(value), {
+      message: 'Invalid Ethereum address'
+    })
+};
+
 export const ticketDisputeSchema = z.object({
   startedAt: z.coerce.date().default(() => new Date()),
   endedAt: z.coerce.date().optional(),

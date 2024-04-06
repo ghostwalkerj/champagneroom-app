@@ -1,14 +1,13 @@
 import { fail } from '@sveltejs/kit';
-import { z } from 'mongoose-zod';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import validator from 'validator';
 import * as web3 from 'web3';
 
 import { AUTH_SIGNING_MESSAGE } from '$env/static/private';
 
 import { Agent, agentCRUDSchema } from '$lib/models/agent';
-import { creatorCRUDSchema } from '$lib/models/creator';
+import { signupSchema } from '$lib/models/common';
+import { creatorSignupSchema } from '$lib/models/creator';
 import { User, userCRUDSchema } from '$lib/models/user';
 import { Wallet } from '$lib/models/wallet';
 
@@ -17,26 +16,8 @@ import { AuthType, EntityType } from '$lib/constants';
 
 import type { Actions, PageServerLoad } from './$types';
 
-const signupSchema = {
-  message: z.string(),
-  signature: z.string(),
-  image: z
-    .instanceof(File, { message: 'Please upload a file.' })
-    .refine((f) => f.size < 100_000, 'Max 100 kB upload size.'),
-  address: z
-    .string()
-    .trim()
-    .refine((value: string) => validator.isEthereumAddress(value), {
-      message: 'Invalid Ethereum address'
-    })
-};
-
 const agentSignupSchema = userCRUDSchema
   .merge(agentCRUDSchema)
-  .extend(signupSchema);
-
-const creatorSignupSchema = userCRUDSchema
-  .merge(creatorCRUDSchema)
   .extend(signupSchema);
 
 const verifySignature = (
