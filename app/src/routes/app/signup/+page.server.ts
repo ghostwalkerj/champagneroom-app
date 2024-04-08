@@ -7,7 +7,6 @@ import { AUTH_SIGNING_MESSAGE } from '$env/static/private';
 
 import { Agent, agentCRUDSchema } from '$lib/models/agent';
 import { signupSchema } from '$lib/models/common';
-import { creatorSignupSchema } from '$lib/models/creator';
 import { User, userCRUDSchema } from '$lib/models/user';
 import { Wallet } from '$lib/models/wallet';
 
@@ -90,14 +89,9 @@ export const actions: Actions = {
 };
 
 export const load: PageServerLoad = async ({}) => {
-  const agentForm = await superValidate(zod(agentSignupSchema));
-  const creatorForm = await superValidate(zod(creatorSignupSchema));
-
   const nonce = Math.floor(Math.random() * 1_000_000);
   const message = AUTH_SIGNING_MESSAGE + ' ' + nonce;
   return {
-    agentForm,
-    creatorForm,
     nonce,
     message
   };

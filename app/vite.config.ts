@@ -2,6 +2,7 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 import EnvironmentPlugin from 'vite-plugin-environment';
 import mkcert from 'vite-plugin-mkcert';
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
 export default defineConfig({
   mode: 'development',
@@ -13,13 +14,25 @@ export default defineConfig({
   plugins: [
     sveltekit(),
     mkcert(),
-    EnvironmentPlugin(['MONGO_DB_FIELD_SECRET'])
+    EnvironmentPlugin(['MONGO_DB_FIELD_SECRET']),
+    nodePolyfills({
+      include: ['path', 'stream', 'util'],
+      exclude: ['http'],
+      globals: {
+        Buffer: true,
+        global: true,
+        process: true,
+      },
+      overrides: {
+        fs: 'memfs',
+      },
+      protocolImports: true,
+    }),
   ],
 
   resolve: {
     alias:{
             process: "process/browser",
-            buffer: "buffer",
             stream: "stream-browserify",
             assert: "assert",
             http: "stream-http",

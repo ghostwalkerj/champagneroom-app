@@ -46,6 +46,7 @@
   $: roomUrl = urlJoin($page.url.origin, config.PATH.room);
 </script>
 
+// eslint-disable-next-line unicorn/filename-case
 {#if thisModal}
   <div class="max-w-3xl rounded bg-surface-900">
     <form
