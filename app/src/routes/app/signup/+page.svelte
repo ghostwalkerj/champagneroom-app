@@ -13,8 +13,6 @@
 
   import ConnectButton from '$components/header/ConnectButton.svelte';
 
-  import CreatorForm from './CreatorForm.svelte';
-
   const onNextHandler = (event: CustomEvent): void => {
     console.log('event:next', event.detail);
   };
@@ -25,6 +23,11 @@
 
   const onStepHandler = (event: CustomEvent): void => {
     console.log('event:step', event.detail);
+    if (event.detail.step === 3) {
+      exampleName = uniqueNamesGenerator({
+        dictionaries: [womensNames]
+      });
+    }
   };
   const onCompleteHandler = (event: CustomEvent): void => {
     console.log('event:complete', event.detail);
@@ -32,13 +35,13 @@
   };
 
   $: isWalletConnected = true;
-  $: isSignupValid = false;
   $: stepStart = 1;
   let signUpRole = UserRole.CREATOR;
   let accountUnsub: Unsubscriber;
-  let exampleName = uniqueNamesGenerator({
+  $: exampleName = uniqueNamesGenerator({
     dictionaries: [womensNames]
   });
+  $: signupName = exampleName;
 
   onMount(() => {
     $selectedAccount &&
@@ -53,7 +56,7 @@
   });
 </script>
 
-<section class="flex min-h-screen w-full justify-center">
+<section class="flex min-h-screen max-w-xl justify-center">
   {#key stepStart}
     <Stepper
       on:next={onNextHandler}
@@ -87,7 +90,7 @@
       <Step>
         <svelte:fragment slot="header">Choose Your Role</svelte:fragment>
         <RadioGroup
-          class="flex w-full justify-evenly "
+          class="flex w-full flex-col justify-evenly"
           active="variant-filled-primary"
           hover="hover:variant-soft-primary"
         >
@@ -103,8 +106,8 @@
                 alt="Creator"
                 background="auto"
                 loading="lazy"
-                width={400}
-                height={500}
+                width={350}
+                aspectRatio={1}
               />
               <div class="absolute right-6 top-4">
                 {#if signUpRole === UserRole.CREATOR}
@@ -116,11 +119,13 @@
                 {/if}
               </div>
               <div class="absolute bottom-5 left-0 right-0 flex flex-col">
-                <h2 class="flex items-center justify-center gap-2 text-2xl">
+                <h2
+                  class="flex items-center justify-center gap-2 text-2xl font-bold"
+                >
                   Join as a Creator
                 </h2>
                 <div
-                  class="flex w-full justify-center whitespace-nowrap text-lg"
+                  class="flex w-full justify-center whitespace-nowrap text-lg font-bold"
                 >
                   <Icon
                     width="24"
@@ -139,13 +144,12 @@
           >
             <div class="btn relative">
               <Image
-                src="{config.PATH.staticUrl}/assets/agent2.png"
+                src="{config.PATH.staticUrl}/assets/agent1.png"
                 alt="Agent"
                 background="auto"
                 loading="lazy"
-                width={400}
-                height={500}
-                layout="constrained"
+                width={350}
+                aspectRatio={1}
               />
               <div class="absolute right-6 top-4">
                 {#if signUpRole === UserRole.AGENT}
@@ -157,10 +161,12 @@
                 {/if}
               </div>
               <div class="absolute bottom-5 left-0 right-0 flex flex-col">
-                <h2 class="flex items-center justify-center gap-2 text-2xl">
+                <h2
+                  class="flex items-center justify-center gap-2 text-2xl font-bold"
+                >
                   Join as an Agent
                 </h2>
-                <div class="whitespace- flex w-full justify-center text-lg">
+                <div class="text-bold flex w-full justify-center text-lg">
                   <Icon
                     class="-mb-1 text-secondary"
                     width="24"
@@ -172,37 +178,28 @@
           </RadioItem>
         </RadioGroup>
       </Step>
-      <Step locked={!isSignupValid}>
+      <Step locked={signupName.trim() === '' || signupName.trim().length < 3}>
         <svelte:fragment slot="header"
           >Confirm Details as an
 
           <span class="capitalize">{signUpRole.toLowerCase()}</span>
         </svelte:fragment>
-
-        {#if signUpRole === UserRole.CREATOR}
-          <CreatorForm />
-        {:else}
-          Form
-          <form action="?/create_agent" method="post" use:enhance>
-            {#if message}
-              <div
-                class="status"
-                class:error={$message.status >= 400}
-                class:success={$message.status || $message.status < 300}
-              >
-                {$message.text}
-              </div>
+        <div class="flex flex-row">
+          <label class="label">
+            {#if signUpRole === UserRole.CREATOR}
+              <d>Stage Name</d>
+            {:else}
+              <d>Agent Name</d>
             {/if}
-
             <input
-              class="input"
+              class="input max-w-xl"
               title="Stage Name"
               type="text"
               placeholder={exampleName}
-              bind:value={$form.name}
+              bind:value={signupName}
             />
-          </form>
-        {/if}
+          </label>
+        </div>
       </Step>
     </Stepper>
   {/key}
