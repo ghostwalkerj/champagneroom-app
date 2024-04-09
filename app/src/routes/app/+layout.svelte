@@ -1,6 +1,7 @@
 <script lang="ts">
   import { format, generate } from 'build-number-generator';
-  import { onMount } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
+  import type { Unsubscriber } from 'svelte/store';
 
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
@@ -23,9 +24,10 @@
   const buildTime = format(buildNumber);
   let lastAddress: string | undefined;
   let signOut = config.PATH.signout;
+  let accountUnsub: Unsubscriber;
 
   onMount(() => {
-    selectedAccount.subscribe((account) => {
+    accountUnsub = selectedAccount.subscribe((account) => {
       if (account && lastAddress && account.address !== lastAddress) {
         lastAddress = account.address;
         if (isAuthenticated && authType === AuthType.SIGNING) {
@@ -46,6 +48,10 @@
         }
       }
     });
+  });
+
+  onDestroy(() => {
+    accountUnsub?.();
   });
 </script>
 
@@ -75,7 +81,7 @@
           {/if}
           {#if $page.data.authType === AuthType.IMPERSONATION}
             <a class="variant-outline btn" href={config.PATH.revert}>Revert </a>
-          {:else}
+          {:else if isAuthenticated}
             <a
               class="variant-outline btn"
               href={config.PATH.signout + '?returnPath=' + $page.url.pathname}
