@@ -37,7 +37,6 @@
   storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
 
   const modalRegistry: Record<string, ModalComponent> = {
-    // Set a unique modal ID, then pass the component reference
     ReserveShowForm: { ref: ReserveShowForm },
     PayoutForm: { ref: PayoutForm },
     TransactionsActivity: { ref: TransactionsActivity },

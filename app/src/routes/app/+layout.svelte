@@ -9,6 +9,8 @@
   import { AuthType } from '$lib/constants';
   import { selectedAccount } from '$lib/web3';
 
+  import ConnectButton from '$components/header/ConnectButton.svelte';
+
   import { version } from '../../../package.json';
 
   import type { LayoutData } from './$types';
@@ -82,7 +84,9 @@
           {/if}
         </div>
       {:else}
-        <p>Connect your wallet to begin</p>
+        <div class="flow flow-col text-md">
+          <ConnectButton />
+        </div>
       {/if}
     </div>
   </nav>
