@@ -11,47 +11,48 @@
   import { selectedAccount } from '$lib/web3';
   import { womensNames } from '$lib/womensNames';
 
-  import ConnectButton from '$components/header/ConnectButton.svelte';
-
   const onNextHandler = (event: CustomEvent): void => {
-    console.log('event:next', event.detail);
+    //  console.log('event:next', event.detail);
   };
 
   const onBackHandler = (event: CustomEvent): void => {
-    console.log('event:prev', event.detail);
+    //    console.log('event:prev', event.detail);
   };
 
   const onStepHandler = (event: CustomEvent): void => {
     console.log('event:step', event.detail);
-    if (event.detail.step === 3) {
-      exampleName = uniqueNamesGenerator({
-        dictionaries: [womensNames]
-      });
+    if (event.detail.step === 2) {
+      exampleName =
+        signUpRole === UserRole.AGENT
+          ? 'Agent ' +
+            uniqueNamesGenerator({
+              dictionaries: [womensNames]
+            })
+          : uniqueNamesGenerator({
+              dictionaries: [womensNames]
+            });
     }
+    signupName = exampleName;
   };
   const onCompleteHandler = (event: CustomEvent): void => {
     console.log('event:complete', event.detail);
     alert('Complete!');
   };
 
-  $: isWalletConnected = true;
-  $: stepStart = 1;
+  $: isWalletConnected = false;
+  $: stepStart = 0;
   let signUpRole = UserRole.CREATOR;
   let accountUnsub: Unsubscriber;
-  $: exampleName = uniqueNamesGenerator({
-    dictionaries: [womensNames]
-  });
-  $: signupName = exampleName;
+  $: exampleName = '';
+  $: signupName = '';
 
   onMount(() => {
     isWalletConnected = false;
-    console.log('$selectedAccount', $selectedAccount);
-    $selectedAccount &&
-      selectedAccount.subscribe((account) => {
-        console.log('account', account);
-        isWalletConnected = account ? true : false;
-        stepStart = isWalletConnected ? 1 : 0;
-      });
+    accountUnsub = selectedAccount.subscribe((account) => {
+      console.log('account', account);
+      isWalletConnected = account ? true : false;
+      stepStart = account ? 1 : 0;
+    });
   });
 
   onDestroy(() => {
@@ -59,23 +60,43 @@
   });
 </script>
 
-<section class="flex min-h-screen max-w-xl justify-center">
+<section class="flex min-h-screen w-full justify-center">
   {#key stepStart}
     <Stepper
       on:next={onNextHandler}
       on:back={onBackHandler}
       on:step={onStepHandler}
       on:complete={onCompleteHandler}
-      class="w-full max-w-6xl"
+      class="w-full max-w-2xl"
       start={stepStart}
+      buttonCompleteLabel="Sign Up"
     >
       <Step locked={!isWalletConnected}>
-        <svelte:fragment slot="header">Connect Wallet</svelte:fragment>
+        <svelte:fragment slot="header"
+          >Connect a Wallet to Sign Up</svelte:fragment
+        >
 
-        {#if !isWalletConnected}<ConnectButton />
+        {#if !isWalletConnected}
+          If you don't have a wallet, we can help you get one. A good place to
+          start is <a
+            data-sveltekit-preload-data="tap"
+            href="https://ethereum.org/en/wallets/"
+            target="_blank"
+          >
+            Ethereum.org</a
+          >
+          or
+          <a
+            data-sveltekit-preload-data="tap"
+            href="https://metamask.io/"
+            target="_blank"
+          >
+            Metamask</a
+          >. After you create a wallet, you'll be able to sign up with it by
+          connecting it to Champagne Room.
         {:else}
           <div class="text-2xl font-bold text-primary">
-            Wallet is connected, continue to next step
+            Wallet is connected, continue to next step.
           </div>{/if}
       </Step>
       <Step>
@@ -87,7 +108,7 @@
         </div>
         <div class=" text-secondary">
           To use a different address, change the account connected in your
-          wallet
+          wallet.
         </div>
       </Step>
       <Step>
@@ -121,14 +142,17 @@
                   />
                 {/if}
               </div>
-              <div class="absolute bottom-5 left-0 right-0 flex flex-col">
+
+              <div
+                class="absolute bottom-5 left-0 right-0 flex flex-col text-white"
+              >
                 <h2
                   class="flex items-center justify-center gap-2 text-2xl font-bold"
                 >
                   Join as a Creator
                 </h2>
                 <div
-                  class="flex w-full justify-center whitespace-nowrap text-lg font-bold"
+                  class="text-md flex w-full justify-center whitespace-nowrap font-bold"
                 >
                   <Icon
                     width="24"
@@ -169,7 +193,7 @@
                 >
                   Join as an Agent
                 </h2>
-                <div class="text-bold flex w-full justify-center text-lg">
+                <div class="text-bold text-md flex w-full justify-center">
                   <Icon
                     class="-mb-1 text-secondary"
                     width="24"
