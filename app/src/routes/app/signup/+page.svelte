@@ -44,8 +44,11 @@
   $: signupName = exampleName;
 
   onMount(() => {
+    isWalletConnected = false;
+    console.log('$selectedAccount', $selectedAccount);
     $selectedAccount &&
       selectedAccount.subscribe((account) => {
+        console.log('account', account);
         isWalletConnected = account ? true : false;
         stepStart = isWalletConnected ? 1 : 0;
       });
