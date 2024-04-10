@@ -7,14 +7,14 @@ import { uniqueNamesGenerator } from 'unique-names-generator';
 import urlJoin from 'url-join';
 
 import {
-  AUTH_SALT,
-  AUTH_TOKEN_NAME,
-  BITCART_API_URL,
-  BITCART_EMAIL,
-  BITCART_INVOICE_NOTIFICATION_PATH,
-  BITCART_NOTIFICATION_URL,
-  BITCART_PASSWORD,
-  BITCART_STORE_ID
+    AUTH_SALT,
+    AUTH_TOKEN_NAME,
+    BITCART_API_URL,
+    BITCART_EMAIL,
+    BITCART_INVOICE_NOTIFICATION_PATH,
+    BITCART_NOTIFICATION_URL,
+    BITCART_PASSWORD,
+    BITCART_STORE_ID
 } from '$env/static/private';
 
 import { reserveTicketSchema } from '$lib/models/common';
@@ -27,31 +27,31 @@ import type { ShowQueueType } from '$lib/workers/showWorker';
 
 import config from '$lib/config';
 import {
-  AuthType,
-  CurrencyType,
-  EntityType,
-  ShowMachineEventString,
-  TicketMachineEventString,
-  UserRole
+    AuthType,
+    CurrencyType,
+    EntityType,
+    ShowMachineEventString,
+    TicketMachineEventString,
+    UserRole
 } from '$lib/constants';
 import { authEncrypt } from '$lib/crypt';
 import type { DisplayInvoice } from '$lib/ext/bitcart/models';
 import { mensNames } from '$lib/mensNames';
 import {
-  createBitcartToken,
-  InvoiceJobType,
-  InvoiceStatus,
-  type PaymentType
+    createBitcartToken,
+    InvoiceJobType,
+    InvoiceStatus,
+    type PaymentType
 } from '$lib/payout';
 import { createAuthToken, setAuthToken } from '$lib/server/auth';
 import {
-  getShowMachineServiceFromId,
-  getTicketMachineService
+    getShowMachineServiceFromId,
+    getTicketMachineService
 } from '$lib/server/machinesUtil';
 
 import {
-  createInvoiceInvoicesPost,
-  modifyInvoiceInvoicesModelIdPatch
+    createInvoiceInvoicesPost,
+    modifyInvoiceInvoicesModelIdPatch
 } from '$ext/bitcart';
 
 import type { Actions, PageServerLoad } from './$types';

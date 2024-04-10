@@ -2,9 +2,9 @@ import { error, fail } from '@sveltejs/kit';
 import type { ObjectId } from 'mongoose';
 
 import {
-  AUTH_SIGNING_MESSAGE,
-  AUTH_TOKEN_NAME,
-  PASSWORD_SALT
+    AUTH_SIGNING_MESSAGE,
+    AUTH_TOKEN_NAME,
+    PASSWORD_SALT
 } from '$env/static/private';
 
 import { Ticket } from '$lib/models/ticket';
@@ -13,12 +13,12 @@ import { User } from '$lib/models/user';
 
 import { AuthType } from '$lib/constants';
 import {
-  createAuthToken,
-  isPasswordMatch,
-  isPinMatch,
-  isSecretMatch,
-  setAuthToken,
-  verifySignature
+    createAuthToken,
+    isPasswordMatch,
+    isPinMatch,
+    isSecretMatch,
+    setAuthToken,
+    verifySignature
 } from '$lib/server/auth';
 
 import type { Actions, PageServerLoad } from './$types';
