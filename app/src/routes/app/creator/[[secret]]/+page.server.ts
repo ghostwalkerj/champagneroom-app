@@ -9,24 +9,24 @@ import { message, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 
 import {
-  BITCART_API_URL,
-  BITCART_EMAIL,
-  BITCART_PASSWORD,
-  JITSI_APP_ID,
-  JITSI_JWT_SECRET,
-  JWT_EXPIRY,
-  WEB3STORAGE_KEY,
-  WEB3STORAGE_PROOF
+    BITCART_API_URL,
+    BITCART_EMAIL,
+    BITCART_PASSWORD,
+    JITSI_APP_ID,
+    JITSI_JWT_SECRET,
+    JWT_EXPIRY,
+    WEB3STORAGE_KEY,
+    WEB3STORAGE_PROOF
 } from '$env/static/private';
 import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
 import type { CancelType } from '$lib/models/common';
 import { Creator, type CreatorDocument } from '$lib/models/creator';
 import {
-  Room,
-  roomCRUDSchema,
-  type RoomDocument,
-  roomSchema
+    Room,
+    roomCRUDSchema,
+    type RoomDocument,
+    roomSchema
 } from '$lib/models/room';
 import { Show, showCRUDSchema, type ShowDocument } from '$lib/models/show';
 import { ShowEvent, type ShowEventDocument } from '$lib/models/showEvent';
@@ -39,19 +39,19 @@ import type { PayoutQueueType } from '$lib/workers/payoutWorker';
 import type { ShowQueueType } from '$lib/workers/showWorker';
 
 import {
-  ActorType,
-  CancelReason,
-  CurrencyType,
-  EntityType,
-  ShowMachineEventString,
-  ShowStatus
+    ActorType,
+    CancelReason,
+    CurrencyType,
+    EntityType,
+    ShowMachineEventString,
+    ShowStatus
 } from '$lib/constants';
 import { rateCryptosRateGet } from '$lib/ext/bitcart';
 import {
-  createBitcartToken,
-  PayoutJobType,
-  PayoutReason,
-  requestPayoutSchema
+    createBitcartToken,
+    PayoutJobType,
+    PayoutReason,
+    requestPayoutSchema
 } from '$lib/payout';
 import { getShowMachineService } from '$lib/server/machinesUtil';
 import { web3Upload } from '$lib/server/upload';

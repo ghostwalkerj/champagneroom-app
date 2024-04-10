@@ -77,6 +77,8 @@ const REQUEST_AUTH_PATHS = [
   config.PATH.agent
 ];
 
+export type { isMatch };
+
 export const backupAuthToken = (cookies: Cookies, tokenName: string) => {
   const authToken = cookies.get(tokenName);
   if (authToken) {
@@ -113,6 +115,8 @@ export const deleteAuthToken = (cookies: Cookies, tokenName: string) => {
   cookies.delete(tokenName, { path: '/' });
 };
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
+type isMatch = (outmatch: string) => boolean;
 export const getAuthToken = (
   cookies: Cookies,
   tokenName: string
@@ -130,18 +134,18 @@ export const getAuthToken = (
 };
 
 //#region isMatch
-export const isAgentMatch = outmatch(AGENT_PATHS);
-export const isCreatorMatch = outmatch(CREATOR_PATHS);
-export const isNotificationMatch = outmatch(NOTIFICATION_PATHS);
-export const isOperatorMatch = outmatch(OPERATOR_PATHS);
-export const isPasswordMatch = outmatch(PASSWORD_PATHS);
-export const isPinMatch = outmatch(PIN_PATHS);
-export const isProtectedMatch = outmatch(PROTECTED_PATHS);
-export const isRequestAuthMatch = outmatch(REQUEST_AUTH_PATHS);
-export const isSecretMatch = outmatch(SECRET_PATHS);
-export const isTicketMatch = outmatch(TICKET_PATHS);
-export const isWebhookMatch = outmatch(WEBHOOK_PATHS);
-export const isWhitelistMatch = outmatch(WHITELIST_PATHS);
+export const isAgentMatch = outmatch(AGENT_PATHS) as isMatch;
+export const isCreatorMatch = outmatch(CREATOR_PATHS) as isMatch;
+export const isNotificationMatch = outmatch(NOTIFICATION_PATHS) as isMatch;
+export const isOperatorMatch = outmatch(OPERATOR_PATHS) as isMatch;
+export const isPasswordMatch = outmatch(PASSWORD_PATHS) as isMatch;
+export const isPinMatch = outmatch(PIN_PATHS) as isMatch;
+export const isProtectedMatch = outmatch(PROTECTED_PATHS) as isMatch;
+export const isRequestAuthMatch = outmatch(REQUEST_AUTH_PATHS) as isMatch;
+export const isSecretMatch = outmatch(SECRET_PATHS) as isMatch;
+export const isTicketMatch = outmatch(TICKET_PATHS) as isMatch;
+export const isWebhookMatch = outmatch(WEBHOOK_PATHS) as isMatch;
+export const isWhitelistMatch = outmatch(WHITELIST_PATHS) as isMatch;
 //#endregion
 
 export const restoreAuthToken = (cookies: Cookies, tokenName: string) => {
