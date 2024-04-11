@@ -7,20 +7,20 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { superValidate } from 'sveltekit-superforms/server';
 
 import {
-    BITCART_API_URL,
-    BITCART_EMAIL,
-    BITCART_PASSWORD,
-    JITSI_APP_ID,
-    JITSI_JWT_SECRET,
-    JWT_EXPIRY
+  BITCART_API_URL,
+  BITCART_EMAIL,
+  BITCART_PASSWORD,
+  JITSI_APP_ID,
+  JITSI_JWT_SECRET,
+  JWT_EXPIRY
 } from '$env/static/private';
 import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
 
 import {
-    cancelSchema,
-    refundSchema,
-    ticketDisputeSchema,
-    ticketFeedbackSchema
+  cancelSchema,
+  refundSchema,
+  ticketDisputeSchema,
+  ticketFeedbackSchema
 } from '$lib/models/common';
 
 import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
@@ -29,18 +29,18 @@ import type { PayoutQueueType } from '$lib/workers/payoutWorker';
 
 import type { CurrencyType, DisputeReason } from '$lib/constants';
 import {
-    ActorType,
-    CancelReason,
-    EntityType,
-    RefundReason,
-    TicketMachineEventString
+  ActorType,
+  CancelReason,
+  EntityType,
+  RefundReason,
+  TicketMachineEventString
 } from '$lib/constants';
 import { createBitcartToken, InvoiceJobType, PayoutJobType } from '$lib/payout';
 import { getTicketMachineService } from '$lib/server/machinesUtil';
 
 import {
-    getInvoiceByIdInvoicesModelIdGet,
-    updatePaymentDetailsInvoicesModelIdDetailsPatch
+  getInvoiceByIdInvoicesModelIdGet,
+  updatePaymentDetailsInvoicesModelIdDetailsPatch
 } from '$ext/bitcart';
 import type { DisplayInvoice } from '$ext/bitcart/models';
 

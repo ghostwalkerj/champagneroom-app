@@ -148,5 +148,5 @@ const SaveState = (show: ShowDocument, newState: ShowStateType) => {
   Show.updateOne({ _id: show._id }, { $set: { showState: newState } }).exec();
 };
 
-export { SaveState, Show, showCRUDSchema, showSchema };
 export type { ShowDocument, ShowDocumentType, ShowStateType };
+export { SaveState, Show, showCRUDSchema, showSchema };

@@ -51,7 +51,6 @@ module.exports = {
   plugins: [
     require('@tailwindcss/forms'),
     require('@tailwindcss/typography'),
-    require('daisyui'),
     skeleton({
       themes: {
         custom: [myCustomTheme]
@@ -70,27 +69,5 @@ module.exports = {
       );
     })
   ],
-  daisyui: {
-    styled: true,
-    base: true,
-    utils: true,
-    logs: false,
-    rtl: false,
-    prefix: 'daisy-',
-    themes: [
-      {
-        cryptoJesus: {
-          primary: '#EC31ED',
-          secondary: '#00FFFF', // Baby Blue
-          accent: '#FFFF00', // Yellow
-          neutral: '#A9CCE3', // Dark Blue (You can change this to another color if you prefer)
-          'base-100': '#1a1a1a', // Dark Base
-          info: '#00FFFF', // Baby Blue (same as secondary)
-          success: '#53c0f3', // A shade of blue
-          warning: '#F06400', // Orange
-          error: '#E24056'
-        }
-      }
-    ]
-  }
+
 };
