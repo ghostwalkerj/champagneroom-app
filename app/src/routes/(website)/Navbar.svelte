@@ -2,8 +2,8 @@
   import Icon from '@iconify/svelte';
   import {
     Drawer,
-    type DrawerSettings,
-    getDrawerStore
+    getDrawerStore,
+    type DrawerSettings
   } from '@skeletonlabs/skeleton';
 
   import { page } from '$app/stores';
@@ -68,8 +68,8 @@
             </a>
           {:else}
             <a
-              class="hover:text-primary-500-500 btn w-full whitespace-nowrap text-sm hover:bg-[#e779c122]"
-              class:text-primary-500={link.href == $page.url.hash}
+              class="btn w-full whitespace-nowrap text-sm hover:bg-[#e779c122] hover:text-primary-500"
+              class:text-primary={link.href == $page.url.hash}
               href={link.href}>{link.name}</a
             >
           {/if}
@@ -113,8 +113,8 @@
           </a>
         {:else}
           <a
-            class="hover:text-primary-500-500 btn whitespace-nowrap font-semibold hover:bg-[#e779c122]"
-            class:text-primary-500={link.href == $page.url.hash}
+            class="btn whitespace-nowrap font-semibold hover:bg-[#e779c122] hover:text-primary-500"
+            class:text-primary={link.href == $page.url.hash}
             href={link.href}>{link.name}</a
           >
         {/if}

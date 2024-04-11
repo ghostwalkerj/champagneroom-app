@@ -9,7 +9,7 @@
   id="FAQ"
 >
   <h2
-    class="text-primary-500-500 mb-10 text-center font-CaviarDreams text-[32px] font-bold lg:text-[41px]"
+    class="mb-10 text-center font-CaviarDreams text-[32px] font-bold text-primary-500 lg:text-[41px]"
   >
     FAQ
   </h2>
