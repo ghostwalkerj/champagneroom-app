@@ -61,7 +61,7 @@
         <div class="absolute inset-0 flex items-center justify-center">
           <div class="w-fit animate-pulse">
             <div
-              class="ring-primary text-primary-500-500 -rotate-45 whitespace-nowrap rounded-xl p-2 font-bold ring-2 ring-inset"
+              class="text-primary-500-500 -rotate-45 whitespace-nowrap rounded-xl p-2 font-bold ring-2 ring-inset ring-primary-500"
             >
               {creatorName}
             </div>
@@ -76,7 +76,7 @@
         <!-- Ticket Status Overlays -->
         {#if ticket.ticketState.status === TicketStatus.CANCELLED || ticket.ticketState.status === TicketStatus.FINALIZED}
           <div
-            class="bg-base-200 ring-primary text-primary-500-500 absolute left-1/2 top-4 z-20 -translate-x-1/2 transform whitespace-normal rounded-xl p-2 text-xl font-extrabold opacity-70 ring-2 ring-inset lg:text-2xl"
+            class="bg-base-200 text-primary-500-500 absolute left-1/2 top-4 z-20 -translate-x-1/2 transform whitespace-normal rounded-xl p-2 text-xl font-extrabold opacity-70 ring-2 ring-inset ring-primary-500 lg:text-2xl"
           >
             {ticket.ticketState.status === TicketStatus.CANCELLED
               ? 'Ticket Cancelled'
