@@ -61,7 +61,7 @@
         <div class="absolute inset-0 flex items-center justify-center">
           <div class="w-fit animate-pulse">
             <div
-              class="-rotate-45 whitespace-nowrap rounded-xl p-2 font-bold text-primary ring-2 ring-inset ring-primary"
+              class="ring-primary -rotate-45 whitespace-nowrap rounded-xl p-2 font-bold text-primary-500 ring-2 ring-inset"
             >
               {creatorName}
             </div>
@@ -71,12 +71,12 @@
 
       <!-- Content Section: Take full width on mobile, 3/5th on medium and larger screens -->
       <div
-        class="relative col-span-2 flex h-full flex-col place-content-center p-4 text-sm font-bold text-info md:col-span-3"
+        class="relative col-span-2 flex h-full flex-col place-content-center p-4 text-sm font-bold text-secondary-500 md:col-span-3"
       >
         <!-- Ticket Status Overlays -->
         {#if ticket.ticketState.status === TicketStatus.CANCELLED || ticket.ticketState.status === TicketStatus.FINALIZED}
           <div
-            class="absolute left-1/2 top-4 z-20 -translate-x-1/2 transform whitespace-normal rounded-xl bg-base-200 p-2 text-xl font-extrabold text-primary opacity-70 ring-2 ring-inset ring-primary lg:text-2xl"
+            class="bg-base-200 ring-primary absolute left-1/2 top-4 z-20 -translate-x-1/2 transform whitespace-normal rounded-xl p-2 text-xl font-extrabold text-primary-500 opacity-70 ring-2 ring-inset lg:text-2xl"
           >
             {ticket.ticketState.status === TicketStatus.CANCELLED
               ? 'Ticket Cancelled'
@@ -104,7 +104,7 @@
         class="relative col-span-2 flex items-center border-t-2 border-dashed pb-4 md:col-span-1 md:border-l-2 md:border-t-0 md:pb-0"
       >
         <!-- Added dashed border -->
-        <div class="m-auto font-bold text-info">
+        <div class="m-auto font-bold text-secondary-500">
           <div class="p-2 text-xl"><a href={showUrl}>{showName}</a></div>
           <div class="text-sm">Duration: {showDuration}</div>
           <div class="text-sm">Price: {ticketPrice}{currency}</div>

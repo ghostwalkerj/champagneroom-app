@@ -1,7 +1,10 @@
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable unicorn/import-style */
 /** @type {import('tailwindcss').Config} */
 // @ts-ignore
 import { skeleton } from '@skeletonlabs/tw-plugin';
-import { join } from 'path';
+import { join } from 'node:path';
 import { myCustomTheme } from './src/neonJesusTheme';
 
 const plugin = require('tailwindcss/plugin');
@@ -51,7 +54,6 @@ module.exports = {
   plugins: [
     require('@tailwindcss/forms'),
     require('@tailwindcss/typography'),
-    require('daisyui'),
     skeleton({
       themes: {
         custom: [myCustomTheme]
@@ -69,28 +71,5 @@ module.exports = {
         { values: theme('textShadow') }
       );
     })
-  ],
-  daisyui: {
-    styled: true,
-    base: true,
-    utils: true,
-    logs: false,
-    rtl: false,
-    prefix: 'daisy-',
-    themes: [
-      {
-        cryptoJesus: {
-          primary: '#EC31ED',
-          secondary: '#00FFFF', // Baby Blue
-          accent: '#FFFF00', // Yellow
-          neutral: '#A9CCE3', // Dark Blue (You can change this to another color if you prefer)
-          'base-100': '#1a1a1a', // Dark Base
-          info: '#00FFFF', // Baby Blue (same as secondary)
-          success: '#53c0f3', // A shade of blue
-          warning: '#F06400', // Orange
-          error: '#E24056'
-        }
-      }
-    ]
-  }
+  ]
 };

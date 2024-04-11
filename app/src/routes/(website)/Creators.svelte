@@ -7,7 +7,7 @@
 <div id="Creators" class="container mx-auto px-4 sm:px-6 md:px-10">
   <div class="pt-20">
     <h2
-      class="mb-10 text-center font-CaviarDreams text-[32px] font-bold text-primary lg:text-[41px]"
+      class="mb-10 text-center font-CaviarDreams text-[32px] font-bold text-primary-500 lg:text-[41px]"
     >
       Become a Creator
     </h2>
@@ -23,7 +23,7 @@
       </div>
       <div class="w-full font-medium lg:w-1/2">
         <h2
-          class="mb-6 text-center font-CaviarDreams text-3xl font-bold text-info lg:text-[41px]"
+          class="mb-6 text-center font-CaviarDreams text-3xl font-bold text-secondary-500 lg:text-[41px]"
         >
           Benefits
         </h2>
@@ -45,7 +45,7 @@
           </li>
         </ul>
         <a
-          class="mb-4 mt-5 block text-center font-CaviarDreams text-lg font-bold capitalize text-info md:text-xl"
+          class="mb-4 mt-5 block text-center font-CaviarDreams text-lg font-bold capitalize text-secondary-500 md:text-xl"
           href={config.PATH.creatorSignup}
         >
           Sign Up as a Creator

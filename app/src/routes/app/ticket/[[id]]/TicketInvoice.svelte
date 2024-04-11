@@ -77,7 +77,7 @@
       class="h-12"
     />
     <span
-      class="absolute left-1/2 -translate-x-1/2 transform text-xl font-bold text-info"
+      class="text-info absolute left-1/2 -translate-x-1/2 transform text-xl font-bold"
       >Invoice</span
     >
     <!-- Centered Title -->
@@ -86,14 +86,14 @@
   <!-- Invoice Status Tag -->
   {#if invoice.status === InvoiceStatus.EXPIRED || invoice.status === InvoiceStatus.COMPLETE || invoice.status === InvoiceStatus.INVALID || invoice.status === InvoiceStatus.REFUNDED}
     <div
-      class="absolute right-4 top-4 rounded-lg bg-gray-100 bg-opacity-50 p-1 text-xs font-bold capitalize text-info lg:p-2 lg:text-sm xl:p-3 xl:text-base"
+      class="absolute right-4 top-4 rounded-lg bg-gray-100 bg-opacity-50 p-1 text-xs font-bold capitalize text-secondary-500 lg:p-2 lg:text-sm xl:p-3 xl:text-base"
     >
       {invoiceStatus}
     </div>
   {/if}
 
   <!-- Invoice Content -->
-  <div class="p-4 text-info">
+  <div class="text-info p-4">
     <div class="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
       <div>
         <span class="text-sm font-bold">Date: </span>

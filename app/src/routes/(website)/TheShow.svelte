@@ -6,7 +6,7 @@
 
 <div id="TheShow" class="mx-auto flex w-full flex-col pt-20">
   <h2
-    class="text-center font-CaviarDreams text-[32px] font-bold text-primary lg:mb-10 lg:text-[41px]"
+    class="text-center font-CaviarDreams text-[32px] font-bold text-primary-500 lg:mb-10 lg:text-[41px]"
   >
     The CHAMPAGNE ROOM Show
   </h2>
@@ -19,7 +19,7 @@
     <div class="flex w-full flex-col lg:flex-row">
       <div class="w-full p-4 lg:p-6">
         <span
-          class="flex text-center font-CaviarDreams text-lg font-bold capitalize tracking-wider text-info"
+          class="flex text-center font-CaviarDreams text-lg font-bold capitalize tracking-wider text-secondary-500"
         >
           Easy, Safe, Private
         </span>

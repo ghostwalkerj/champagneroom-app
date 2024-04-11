@@ -74,7 +74,7 @@
       on:click={() => modalStore.trigger(roomModal)}>Edit My Room</button
     >
   {:else}
-    <div class="text-info">No room found</div>
+    <div class="text-secondary-500">No room found</div>
     <button
       type="button"
       class="neon-secondary variant-soft-secondary btn btn-sm"

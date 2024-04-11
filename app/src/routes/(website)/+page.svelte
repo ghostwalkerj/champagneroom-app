@@ -19,7 +19,7 @@
   <div class="flex flex-col items-center space-y-4 lg:flex-row">
     <div class="w-full pl-5">
       <h2
-        class="mb-6 px-6 text-center font-CaviarDreams text-[41px] font-bold leading-none text-info lg:text-left"
+        class="mb-6 px-6 text-center font-CaviarDreams text-[41px] font-bold leading-none text-secondary-500 lg:text-left"
       >
         A New Way to Discretely View NSFW Creators Live
       </h2>
