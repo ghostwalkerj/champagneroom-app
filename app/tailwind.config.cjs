@@ -2,7 +2,7 @@
 // @ts-ignore
 import { skeleton } from '@skeletonlabs/tw-plugin';
 import { join } from 'path';
-import { myCustomTheme } from './src/martinTheme';
+import { myCustomTheme } from './src/neonJesusTheme';
 
 const plugin = require('tailwindcss/plugin');
 
