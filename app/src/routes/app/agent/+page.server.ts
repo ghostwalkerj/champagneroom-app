@@ -11,13 +11,13 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 
 import {
-    AUTH_TOKEN_NAME,
-    BITCART_API_URL,
-    BITCART_EMAIL,
-    BITCART_PASSWORD,
-    PASSWORD_SALT,
-    WEB3STORAGE_KEY,
-    WEB3STORAGE_PROOF
+  AUTH_TOKEN_NAME,
+  BITCART_API_URL,
+  BITCART_EMAIL,
+  BITCART_PASSWORD,
+  PASSWORD_SALT,
+  WEB3STORAGE_KEY,
+  WEB3STORAGE_PROOF
 } from '$env/static/private';
 
 import type { AgentDocument } from '$lib/models/agent';
@@ -35,15 +35,15 @@ import config from '$lib/config';
 import { AuthType, CurrencyType, EntityType } from '$lib/constants';
 import { rateCryptosRateGet } from '$lib/ext/bitcart';
 import {
-    createBitcartToken,
-    PayoutJobType,
-    PayoutReason,
-    requestPayoutSchema
+  createBitcartToken,
+  PayoutJobType,
+  PayoutReason,
+  requestPayoutSchema
 } from '$lib/payout';
 import {
-    backupAuthToken,
-    createAuthToken,
-    setAuthToken
+  backupAuthToken,
+  createAuthToken,
+  setAuthToken
 } from '$lib/server/auth';
 import { web3Upload } from '$lib/server/upload';
 import { womensNames } from '$lib/womensNames';
