@@ -21,15 +21,15 @@ import type { ShowQueueType } from '$lib/workers/showWorker';
 import config from '$lib/config';
 import type { DisputeDecision } from '$lib/constants';
 import {
-    AuthType,
-    EntityType,
-    ShowMachineEventString,
-    TicketStatus
+  AuthType,
+  EntityType,
+  ShowMachineEventString,
+  TicketStatus
 } from '$lib/constants';
 import {
-    backupAuthToken,
-    createAuthToken,
-    setAuthToken
+  backupAuthToken,
+  createAuthToken,
+  setAuthToken
 } from '$lib/server/auth';
 
 import type { PageServerLoad } from './$types';
