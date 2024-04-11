@@ -1,4 +1,10 @@
 <script lang="ts">
+<<<<<<< 83d7156255631f73d8da0abdb2ac627e3ba4696d
+  import { applyAction, enhance } from '$app/forms';
+  import { Avatar } from '@skeletonlabs/skeleton';
+
+=======
+>>>>>>> Upgrading SuperForms
   // TODO:Add validation
   import { FileButton, FileDropzone } from '@skeletonlabs/skeleton';
   import type { ActionResult } from '@sveltejs/kit';
@@ -56,10 +62,11 @@
         accept="image/*"
         class="max-h-32 max-w-32 overflow-hidden"
         rounded="rounded-full"
+        padding="p-0"
         on:change={onChange}
       >
         <svelte:fragment slot="message">
-          <img
+          <Avatar
             src={imageUrl}
             alt="profileImage"
             class="relative max-h-32 max-w-32 rounded-full bg-cover bg-center bg-no-repeat"
