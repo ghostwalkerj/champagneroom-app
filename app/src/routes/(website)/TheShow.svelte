@@ -6,7 +6,7 @@
 
 <div id="TheShow" class="mx-auto flex w-full flex-col pt-20">
   <h2
-    class="text-center font-CaviarDreams text-[32px] font-bold text-primary-500 lg:mb-10 lg:text-[41px]"
+    class="text-primary-500-500 text-center font-CaviarDreams text-[32px] font-bold lg:mb-10 lg:text-[41px]"
   >
     The CHAMPAGNE ROOM Show
   </h2>
