@@ -2,8 +2,8 @@
   import Icon from '@iconify/svelte';
   import {
     Drawer,
-    getDrawerStore,
-    type DrawerSettings
+    type DrawerSettings,
+    getDrawerStore
   } from '@skeletonlabs/skeleton';
 
   import { page } from '$app/stores';
@@ -56,7 +56,7 @@
           {:else if link.name == 'Open App'}
             <a
               class="variant-filled-surface btn flex flex-nowrap"
-              class:text-primary={link.href == $page.url.hash}
+              class:text-primary-500={link.href == $page.url.hash}
               href={link.href}
             >
               <span class="block whitespace-nowrap">{link.name}</span>
@@ -68,8 +68,8 @@
             </a>
           {:else}
             <a
-              class="btn w-full whitespace-nowrap text-sm hover:bg-[#e779c122] hover:text-primary-500"
-              class:text-primary={link.href == $page.url.hash}
+              class="hover:text-primary-500-500 btn w-full whitespace-nowrap text-sm hover:bg-[#e779c122]"
+              class:text-primary-500={link.href == $page.url.hash}
               href={link.href}>{link.name}</a
             >
           {/if}
@@ -101,7 +101,7 @@
         {:else if link.name == 'Open App'}
           <a
             class="variant-filled-surface btn flex flex-nowrap"
-            class:text-primary={link.href == $page.url.hash}
+            class:text-primary-500={link.href == $page.url.hash}
             href={link.href}
           >
             {link.name}
@@ -113,8 +113,8 @@
           </a>
         {:else}
           <a
-            class="btn whitespace-nowrap font-semibold hover:bg-[#e779c122] hover:text-primary-500"
-            class:text-primary={link.href == $page.url.hash}
+            class="hover:text-primary-500-500 btn whitespace-nowrap font-semibold hover:bg-[#e779c122]"
+            class:text-primary-500={link.href == $page.url.hash}
             href={link.href}>{link.name}</a
           >
         {/if}
@@ -135,7 +135,7 @@
           {:else if link.name == 'Open App'}
             <a
               class="variant-filled-surface btn flex flex-nowrap"
-              class:text-primary={link.href == $page.url.hash}
+              class:text-primary-500={link.href == $page.url.hash}
               href={link.href}
             >
               {link.name}

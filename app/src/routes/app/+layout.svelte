@@ -70,7 +70,7 @@
     <div class="text-xl font-semibold">
       {#if $selectedAccount}
         <div class=" flex items-center gap-2">
-          <span class="h-3 w-3 rounded-full bg-primary" />
+          <span class="h-3 w-3 rounded-full bg-primary-500" />
           {#if !$page.data.user?.name}
             <span>Wallet Connected</span>
           {/if}
@@ -101,7 +101,7 @@
     <slot />
   </div>
 
-  <footer class="sticky bottom-0 w-fit bg-surface-800 p-2 text-base-content">
+  <footer class="text-base-content sticky bottom-0 w-fit bg-surface-800 p-2">
     <p>Build Number: {buildNumber} |</p>
     <p>Build Time: {buildTime}</p>
   </footer>
@@ -111,5 +111,5 @@
   class="fixed top-0 -z-10 flex h-screen w-full flex-col items-center justify-center text-3xl font-semibold lg:text-7xl"
 >
   <h2 class="neon-secondary text-secondary">CHAMPAGNE</h2>
-  <h2 class="neon-primary text-primary">R O O M</h2>
+  <h2 class="neon-primary text-primary-500">R O O M</h2>
 </div>

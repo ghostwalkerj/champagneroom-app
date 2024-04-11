@@ -199,7 +199,7 @@
       </NeonBlur>
     </div>
   {:else if authType === AuthType.PATH_PASSWORD}
-    <!-- <div class="font-bold text-5xl text-primary-500 w-full font-CaviarDreams">
+    <!-- <div class="font-bold text-5xl text-primary-500-500 w-full font-CaviarDreams">
       Verifying Path
     </div> -->
 
@@ -240,7 +240,7 @@
       </div>
     </form>
   {:else if authType === AuthType.PIN}
-    <!-- <div class="font-bold text-5xl text-primary-500 w-full font-CaviarDreams">
+    <!-- <div class="font-bold text-5xl text-primary-500-500 w-full font-CaviarDreams">
       Verifying PIN
     </div> -->
 

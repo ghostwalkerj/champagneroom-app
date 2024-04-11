@@ -44,17 +44,17 @@ export const myCustomTheme: CustomThemeConfig = {
     '--color-secondary-700': '0 191 191', // #00bfbf
     '--color-secondary-800': '0 153 153', // #009999
     '--color-secondary-900': '0 125 125', // #007d7d
-    // tertiary | #fdaf08
-    '--color-tertiary-50': '255 243 218', // #fff3da
-    '--color-tertiary-100': '255 239 206', // #ffefce
-    '--color-tertiary-200': '255 235 193', // #ffebc1
-    '--color-tertiary-300': '254 223 156', // #fedf9c
-    '--color-tertiary-400': '254 199 82', // #fec752
-    '--color-tertiary-500': '253 175 8', // #fdaf08
-    '--color-tertiary-600': '228 158 7', // #e49e07
-    '--color-tertiary-700': '190 131 6', // #be8306
-    '--color-tertiary-800': '152 105 5', // #986905
-    '--color-tertiary-900': '124 86 4', // #7c5604
+    // tertiary | #FFD800
+    '--color-tertiary-50': '255 239 153', // Lighter shade
+    '--color-tertiary-100': '255 236 128', // Slightly lighter
+    '--color-tertiary-200': '255 233 102', // Closer to base
+    '--color-tertiary-300': '255 230 77', // A bit darker
+    '--color-tertiary-400': '255 227 51', // Even darker
+    '--color-tertiary-500': '255 204 0', // Base Cyberpunk 2077 yellow
+    '--color-tertiary-600': '229 183 0', // Darker variant
+    '--color-tertiary-700': '204 163 0', // Even more dark
+    '--color-tertiary-800': '179 143 0', // Darker
+    '--color-tertiary-900': '154 123 0', // Darkest shade
     // success | #84cc16
     '--color-success-50': '237 247 220', // #edf7dc
     '--color-success-100': '230 245 208', // #e6f5d0

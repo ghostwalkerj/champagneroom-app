@@ -341,7 +341,7 @@
       <!-- Page header -->
       {#key operator}
         <div
-          class="bg-base mx-auto rounded-lg border-2 border-secondary px-4 py-4 sm:px-6 lg:px-8"
+          class="bg-base border-secondary mx-auto rounded-lg border-2 px-4 py-4 sm:px-6 lg:px-8"
         >
           <h2 class="flex items-center gap-2 text-2xl font-semibold">
             Operator Dashboard
@@ -470,7 +470,7 @@
                               {#if canImpersonateAgent}
                                 <td>
                                   <button
-                                    class="variant-outline-primary btn btn-sm text-primary"
+                                    class="variant-outline-primary btn btn-sm text-primary-500"
                                     disabled={!canImpersonateAgent}
                                     on:click={() =>
                                       impersonate(agent.user._id.toString())}
@@ -654,7 +654,7 @@
                                     class="anchor mr-2">Secret Url</CopyText
                                   >
                                   <button
-                                    class="variant-outline-secondary btn btn-sm text-secondary"
+                                    class="text-secondary variant-outline-secondary btn btn-sm"
                                     on:click={() =>
                                       modalStore.trigger(changeSecretModal)}
                                   >
@@ -720,7 +720,7 @@
                               {#if canImpersonateCreator}
                                 <td
                                   ><button
-                                    class="variant-outline-primary btn btn-sm text-primary"
+                                    class="variant-outline-primary btn btn-sm text-primary-500"
                                     disabled={!canImpersonateCreator}
                                     on:click={() =>
                                       impersonate(creator.user._id.toString())}

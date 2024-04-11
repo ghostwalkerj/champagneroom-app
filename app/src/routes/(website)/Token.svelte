@@ -6,7 +6,7 @@
 
 <div id="Token" class="container mx-auto pt-20">
   <h2
-    class="mb-10 text-center font-CaviarDreams text-[32px] font-bold text-primary-500 lg:text-[41px]"
+    class="text-primary-500-500 mb-10 text-center font-CaviarDreams text-[32px] font-bold lg:text-[41px]"
   >
     CHAMPAGNE ROOM Token
   </h2>
