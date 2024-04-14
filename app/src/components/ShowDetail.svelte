@@ -94,7 +94,7 @@
         />
         {#if options.showWaterMark && waterMarkText}
           <p
-            class="absolute top-0 w-full whitespace-nowrap rounded-tl bg-primary/70 p-2 font-SpaceGrotesk text-xl font-extrabold text-black"
+            class="absolute top-0 w-full whitespace-nowrap rounded-tl bg-primary-700 p-2 font-SpaceGrotesk text-xl font-extrabold text-black"
           >
             {waterMarkText}
           </p>

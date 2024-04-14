@@ -1,8 +1,11 @@
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable unicorn/import-style */
 /** @type {import('tailwindcss').Config} */
 // @ts-ignore
 import { skeleton } from '@skeletonlabs/tw-plugin';
-import { join } from 'path';
-import { myCustomTheme } from './src/martinTheme';
+import { join } from 'node:path';
+import { myCustomTheme } from './src/neonJesusTheme';
 
 const plugin = require('tailwindcss/plugin');
 
@@ -68,6 +71,5 @@ module.exports = {
         { values: theme('textShadow') }
       );
     })
-  ],
-
+  ]
 };

@@ -42,21 +42,21 @@
 
 <Drawer>
   {#if $drawerStore.id == 'rightDrawer'}
-    <ul class="flex min-h-full w-80 flex-col gap-4 bg-base-100 p-4">
+    <ul class="bg-base-100 flex min-h-full w-80 flex-col gap-4 p-4">
       {#each links.toReversed() as link}
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
         <li on:click={closeNav}>
           {#if link.name == 'Sign Up'}
             <a
-              class="btn w-full whitespace-nowrap rounded-lg bg-gradient-to-br from-primary to-pink-500 py-4 text-black hover:shadow-[0px_0px_17px_6px_#e779c1]"
+              class="from-primary btn w-full whitespace-nowrap rounded-lg bg-gradient-to-br to-pink-500 py-4 text-black hover:shadow-[0px_0px_17px_6px_#e779c1]"
               href={link.href}
               ><span class="font-Roboto font-bold">{link.name}</span></a
             >
           {:else if link.name == 'Open App'}
             <a
               class="variant-filled-surface btn flex flex-nowrap"
-              class:text-primary={link.href == $page.url.hash}
+              class:text-primary-500={link.href == $page.url.hash}
               href={link.href}
             >
               <span class="block whitespace-nowrap">{link.name}</span>
@@ -68,8 +68,8 @@
             </a>
           {:else}
             <a
-              class="btn w-full whitespace-nowrap text-sm hover:bg-[#e779c122] hover:text-primary"
-              class:text-primary={link.href == $page.url.hash}
+              class="btn w-full whitespace-nowrap text-sm hover:bg-[#e779c122] hover:text-primary-500"
+              class:text-primary-500={link.href == $page.url.hash}
               href={link.href}>{link.name}</a
             >
           {/if}
@@ -95,13 +95,13 @@
       <li>
         {#if link.name == 'Sign Up'}
           <a
-            class="btn whitespace-nowrap bg-gradient-to-br from-primary to-pink-500 text-black hover:shadow-[0px_0px_17px_6px_#e779c1]"
+            class="btn whitespace-nowrap bg-gradient-to-br from-primary-500 to-pink-500 text-black hover:shadow-[0px_0px_17px_6px_#e779c1]"
             href={link.href}>{link.name}</a
           >
         {:else if link.name == 'Open App'}
           <a
             class="variant-filled-surface btn flex flex-nowrap"
-            class:text-primary={link.href == $page.url.hash}
+            class:text-primary-500={link.href == $page.url.hash}
             href={link.href}
           >
             {link.name}
@@ -113,8 +113,8 @@
           </a>
         {:else}
           <a
-            class="btn whitespace-nowrap font-semibold hover:bg-[#e779c122] hover:text-primary"
-            class:text-primary={link.href == $page.url.hash}
+            class="btn whitespace-nowrap font-semibold hover:bg-[#e779c122] hover:text-primary-500"
+            class:text-primary-500={link.href == $page.url.hash}
             href={link.href}>{link.name}</a
           >
         {/if}
@@ -129,13 +129,13 @@
         <li>
           {#if link.name == 'Sign Up'}
             <a
-              class="btn whitespace-nowrap rounded-lg bg-gradient-to-br from-primary to-pink-500 py-3.5 text-black hover:shadow-[0px_0px_17px_6px_#e779c1]"
+              class="from-primary btn whitespace-nowrap rounded-lg bg-gradient-to-br to-pink-500 py-3.5 text-black hover:shadow-[0px_0px_17px_6px_#e779c1]"
               href={link.href}>{link.name}</a
             >
           {:else if link.name == 'Open App'}
             <a
               class="variant-filled-surface btn flex flex-nowrap"
-              class:text-primary={link.href == $page.url.hash}
+              class:text-primary-500={link.href == $page.url.hash}
               href={link.href}
             >
               {link.name}

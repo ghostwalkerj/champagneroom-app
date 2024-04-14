@@ -218,7 +218,7 @@
       <!-- Page header -->
       {#key agent}
         <div
-          class="bg-base mx-auto rounded-lg border-2 border-secondary px-4 py-4 sm:px-6 lg:px-8"
+          class="bg-base border-secondary mx-auto rounded-lg border-2 px-4 py-4 sm:px-6 lg:px-8"
         >
           <h2 class="flex items-center gap-2 text-2xl font-semibold">
             Agent Dashboard
@@ -353,7 +353,7 @@
                                   >
 
                                   <button
-                                    class="variant-outline-secondary btn btn-sm text-secondary"
+                                    class="variant-outline-secondary btn btn-sm text-secondary-500"
                                     on:click={() =>
                                       modalStore.trigger(changeSecretModal)}
                                   >
@@ -419,7 +419,7 @@
                               {#if canImpersonate}
                                 <td>
                                   <button
-                                    class="variant-outline-primary btn btn-sm text-primary"
+                                    class="variant-outline-primary btn btn-sm text-primary-500"
                                     disabled={!canImpersonate}
                                     on:click={() =>
                                       impersonate(creator.user._id.toString())}

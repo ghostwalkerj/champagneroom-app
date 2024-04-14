@@ -10,24 +10,28 @@
       class="mx-auto flex w-full flex-col whitespace-nowrap text-center md:flex-row md:justify-evenly md:space-x-4"
     >
       <div class="mb-6 md:mb-0">
-        <h5 class="mb-3 text-info">Social</h5>
+        <h5 class="mb-3 text-secondary-500">Social</h5>
         <ul class="list-none">
           <li class="spa">
             <a href="https://discord.gg/VgB7bWScVa" target="_blank">
-              <Icon icon="line-md:discord-twotone" />
-              <span class="icon-list-text">Discord</span>
+              <div class="flex gap-2">
+                <Icon icon="line-md:discord-twotone" />
+                <span class="icon-list-text">Discord</span>
+              </div>
             </a>
           </li>
           <li class="spa">
             <a href="https://twitter.com/_Champagne_Room" target="_blank">
-              <Icon icon="simple-icons:x" />
-              <span class="icon-list-text">(Twitter)</span>
+              <div class="flex gap-2">
+                <Icon icon="simple-icons:x" />
+                <span class="icon-list-text">(Twitter)</span>
+              </div>
             </a>
           </li>
         </ul>
       </div>
       <div class="mb-6 md:mb-0">
-        <h5 class="mb-3 text-info">Services</h5>
+        <h5 class="mb-3 text-secondary-500">Services</h5>
         <ul class="list-none">
           <li class="spa">
             <a href={config.PATH.creator}>Creators</a>
@@ -38,7 +42,7 @@
         </ul>
       </div>
       <div class="">
-        <h5 class="mb-3 text-info">Learn</h5>
+        <h5 class="mb-3 text-secondary-500">Learn</h5>
         <ul class="list-none">
           <li class="spa">
             <a

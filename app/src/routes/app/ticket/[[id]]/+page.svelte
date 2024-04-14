@@ -298,7 +298,7 @@
         {/key}
         {#if canWatchShow && hasShowStarted}
           <div
-            class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-6 transform whitespace-nowrap rounded-xl bg-base-200/50 p-2 text-2xl font-extrabold text-primary ring-2 ring-inset ring-primary lg:text-4xl"
+            class="bg-base-200/50 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-6 transform whitespace-nowrap rounded-xl p-2 text-2xl font-extrabold text-primary-500 ring-2 ring-inset ring-primary-500 lg:text-4xl"
           >
             <button
               class="variant-filled-secondary btn"
@@ -310,7 +310,7 @@
           </div>
         {:else if isWaitingForShow}
           <div
-            class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-6 transform whitespace-nowrap rounded-xl bg-base-200/50 p-2 text-2xl font-extrabold text-primary ring-2 ring-inset ring-primary lg:text-4xl"
+            class="bg-base-200/50 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-6 transform whitespace-nowrap rounded-xl p-2 text-2xl font-extrabold text-primary-500 ring-2 ring-inset ring-primary-500 lg:text-4xl"
           >
             Waiting for Show to Start
           </div>
@@ -325,7 +325,7 @@
           {/key}
           {#if hasPaymentSent}
             <div
-              class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-45 transform whitespace-nowrap rounded-xl bg-base-200/50 p-2 text-2xl font-extrabold text-primary ring-2 ring-inset ring-primary lg:text-3xl"
+              class="bg-base-200/50 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-45 transform whitespace-nowrap rounded-xl p-2 text-2xl font-extrabold text-primary-500 ring-2 ring-inset ring-primary-500 lg:text-3xl"
             >
               Waiting for Payment Confirmations
             </div>

@@ -40,13 +40,13 @@
 >
   <div class="flex flex-col items-center gap-0 text-center">
     <h2 class="flex items-center gap-2 text-xl font-semibold">
-      <Icon class="text-secondary" icon="icon-park-outline:door-handle" />
+      <Icon class="text-secondary-500" icon="icon-park-outline:door-handle" />
       Room
     </h2>
   </div>
 
   {#if room}
-    <div class="flex flex-col items-center text-center text-base">
+    <div class="flex flex-col items-center text-center text-surface-500">
       <div>
         Name: <span class="font-semibold">{room.name}</span>
       </div>
@@ -74,7 +74,7 @@
       on:click={() => modalStore.trigger(roomModal)}>Edit My Room</button
     >
   {:else}
-    <div class="text-info">No room found</div>
+    <div class="text-secondary-500">No room found</div>
     <button
       type="button"
       class="neon-secondary variant-soft-secondary btn btn-sm"

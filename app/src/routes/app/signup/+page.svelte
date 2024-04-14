@@ -126,18 +126,18 @@
             >. After you create a wallet, you'll be able to sign up with it by
             connecting it to Champagne Room.
           {:else}
-            <div class="text-2xl font-bold text-primary">
+            <div class="text-2xl font-bold text-primary-500">
               Wallet is connected, continue to next step.
             </div>{/if}
         </Step>
         <Step>
-          <div class="text-2xl font-bold text-primary">
+          <div class="text-2xl font-bold text-primary-500">
             Sign up with this address
           </div>
-          <div class="text-md text-accent">
+          <div class="text-md text-secondary-500">
             {$selectedAccount?.address}
           </div>
-          <div class=" text-secondary">
+          <div class="text-tertiary-500">
             To use a different address, change the account connected in your
             wallet.
           </div>
@@ -160,7 +160,7 @@
                   src="{config.PATH.staticUrl}/assets/creator2.png"
                   alt="Creator"
                   background="auto"
-                  loading="lazy"
+                  loading="eager"
                   width={350}
                   aspectRatio={1}
                 />
@@ -187,7 +187,7 @@
                   >
                     <Icon
                       width="24"
-                      class="-mb-1 text-primary"
+                      class="-mb-1 text-primary-500"
                       icon="mdi:money-100"
                     />&nbsp;Earn money by selling your content
                   </div>
@@ -205,7 +205,7 @@
                   src="{config.PATH.staticUrl}/assets/agent1.png"
                   alt="Agent"
                   background="auto"
-                  loading="lazy"
+                  loading="eager"
                   width={350}
                   aspectRatio={1}
                 />
@@ -228,7 +228,7 @@
                   </h2>
                   <div class="text-bold text-md flex w-full justify-center">
                     <Icon
-                      class="-mb-1 text-secondary"
+                      class="-mb-1 text-secondary-500"
                       width="24"
                       icon="bi:coin"
                     /> &nbsp;Earn commissions from your creators

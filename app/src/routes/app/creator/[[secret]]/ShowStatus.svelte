@@ -47,12 +47,18 @@
   class="bg-custom flex flex-col justify-between divide-y divide-surface-500 rounded lg:flex-row lg:divide-x lg:divide-y-0"
 >
   <div class="flex flex-1 gap-2 p-4">
-    <Icon icon="mingcute:information-line" class="text-2xl text-secondary" />
+    <Icon
+      icon="mingcute:information-line"
+      class="text-2xl text-secondary-500"
+    />
     <p class="capitalize">{statusText.toLowerCase()}</p>
   </div>
 
   <div class="flex flex-1 gap-2 p-4">
-    <Icon icon="mingcute:information-line" class="text-2xl text-secondary" />
+    <Icon
+      icon="mingcute:information-line"
+      class="text-2xl text-secondary-500"
+    />
     <p class="capitalize">{eventText}</p>
   </div>
 

@@ -15,7 +15,7 @@
   class="bg-custom flex flex-col items-center justify-center rounded pt-4 text-center"
 >
   <h2 class="flex items-center gap-2 text-xl font-semibold">
-    <Icon class="text-secondary" icon="iconoir:profile-circle" />
+    <Icon class="text-secondary-500" icon="iconoir:profile-circle" />
     Profile
   </h2>
 
@@ -39,7 +39,7 @@
         ><Icon icon="fluent:star-28-filled" /></svelte:fragment
       >
     </Ratings>
-    <span class="mt-2 text-base">
+    <span class="mt-2 text-surface-500">
       ({creator.feedbackStats.averageRating.toFixed(2) ?? 0})</span
     >
   </div>
