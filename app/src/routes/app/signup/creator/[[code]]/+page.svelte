@@ -90,12 +90,12 @@ ya<svelte:window bind:innerWidth bind:innerHeight />
   <div>
     <div class="absolute left-auto top-auto max-w-md">
       <div
-        class="card z-10 hidden transform rounded-lg border border-secondary border-opacity-50 bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl transition-transform duration-300 hover:z-50 hover:scale-125"
+        class="border-secondary card z-10 hidden transform rounded-lg border border-opacity-50 bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl transition-transform duration-300 hover:z-50 hover:scale-125"
       >
-        <h2 class="text-secondary text-center text-xl">
+        <h2 class="text-center text-xl text-secondary-500">
           Get Paid Quickly in Your Local Currency
         </h2>
-        <div class=" card-body text-primary">
+        <div class=" card-body text-primary-500">
           Experience the ease of receiving payments swiftly and securely, right
           in your local currency. No more exchange rate headaches or delays.
         </div>
@@ -103,12 +103,12 @@ ya<svelte:window bind:innerWidth bind:innerHeight />
     </div>
     <div class="absolute left-auto top-auto max-w-md">
       <div
-        class=" card z-10 hidden transform rounded-lg border border-secondary border-opacity-50 bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl transition-transform duration-300 hover:z-50 hover:scale-125"
+        class=" border-secondary card z-10 hidden transform rounded-lg border border-opacity-50 bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl transition-transform duration-300 hover:z-50 hover:scale-125"
       >
-        <h2 class="text-secondary text-center text-xl">
+        <h2 class="text-center text-xl text-secondary-500">
           Hassle-Free Payment Handling
         </h2>
-        <div class=" card-body text-primary">
+        <div class=" card-body text-primary-500">
           Our streamlined payment system means you focus on creating, not on
           payment issues. We handle the complexities, you enjoy the rewards.
         </div>
@@ -117,12 +117,12 @@ ya<svelte:window bind:innerWidth bind:innerHeight />
 
     <div class="absolute left-auto top-auto max-w-md">
       <div
-        class=" card z-10 hidden transform rounded-lg border border-secondary border-opacity-50 bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl transition-transform duration-300 hover:z-50 hover:scale-125"
+        class=" border-secondary card z-10 hidden transform rounded-lg border border-opacity-50 bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl transition-transform duration-300 hover:z-50 hover:scale-125"
       >
-        <h2 class="text-secondary text-center text-xl">
+        <h2 class="text-center text-xl text-secondary-500">
           Privacy is Our Priority
         </h2>
-        <div class=" card-body text-primary">
+        <div class=" card-body text-primary-500">
           Your safety matters. With us, your personal details stay private. No
           need to share names or phone numbers.
         </div>
@@ -131,12 +131,12 @@ ya<svelte:window bind:innerWidth bind:innerHeight />
 
     <div class="absolute left-auto top-auto max-w-md">
       <div
-        class=" card z-10 hidden transform rounded-lg border border-secondary border-opacity-50 bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl transition-transform duration-300 hover:z-50 hover:scale-125"
+        class=" border-secondary card z-10 hidden transform rounded-lg border border-opacity-50 bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl transition-transform duration-300 hover:z-50 hover:scale-125"
       >
-        <h2 class="text-secondary text-center text-xl">
+        <h2 class="text-center text-xl text-secondary-500">
           Earn More with Fan Tips
         </h2>
-        <div class=" card-body text-primary">
+        <div class=" card-body text-primary-500">
           Connect with your audience in a meaningful way. Receive appreciation
           through tips directly from your fans.
         </div>
@@ -145,12 +145,12 @@ ya<svelte:window bind:innerWidth bind:innerHeight />
 
     <div class="absolute left-auto top-auto max-w-md">
       <div
-        class=" card z-10 hidden transform rounded-lg border border-secondary border-opacity-50 bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl transition-transform duration-300 hover:z-50 hover:scale-125"
+        class=" border-secondary card z-10 hidden transform rounded-lg border border-opacity-50 bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl transition-transform duration-300 hover:z-50 hover:scale-125"
       >
-        <h2 class="text-secondary text-center text-xl">
+        <h2 class="text-center text-xl text-secondary-500">
           Exclusive Marketplace for Custom Content
         </h2>
-        <div class=" card-body text-primary">
+        <div class=" card-body text-primary-500">
           Unlock the potential of your creativity. Sell unique, custom content
           directly to your followers and boost your earnings.
         </div>
@@ -159,12 +159,12 @@ ya<svelte:window bind:innerWidth bind:innerHeight />
 
     <div class="absolute left-auto top-auto max-w-md">
       <div
-        class=" card z-10 hidden transform rounded-lg border border-secondary border-opacity-50 bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl transition-transform duration-300 hover:z-50 hover:scale-125"
+        class=" border-secondary card z-10 hidden transform rounded-lg border border-opacity-50 bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl transition-transform duration-300 hover:z-50 hover:scale-125"
       >
-        <h2 class="text-secondary text-center text-xl">
+        <h2 class="text-center text-xl text-secondary-500">
           Global Reach, Local Comfort
         </h2>
-        <div class=" card-body text-primary">
+        <div class=" card-body text-primary-500">
           Wherever you are, connect with affluent customers from around the
           world. Your location is no longer a barrier to your success.
         </div>
@@ -173,12 +173,12 @@ ya<svelte:window bind:innerWidth bind:innerHeight />
 
     <div class="absolute left-auto top-auto max-w-md">
       <div
-        class=" card z-10 hidden transform rounded-lg border border-secondary border-opacity-50 bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl transition-transform duration-300 hover:z-50 hover:scale-125"
+        class=" border-secondary card z-10 hidden transform rounded-lg border border-opacity-50 bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl transition-transform duration-300 hover:z-50 hover:scale-125"
       >
-        <h2 class="text-secondary text-center text-xl">
+        <h2 class="text-center text-xl text-secondary-500">
           Premium Prices for International Customers
         </h2>
-        <div class=" card-body text-primary">
+        <div class=" card-body text-primary-500">
           Maximize your earnings by setting competitive rates for international
           clients. Benefit from a wider, more lucrative market.
         </div>
@@ -187,12 +187,12 @@ ya<svelte:window bind:innerWidth bind:innerHeight />
 
     <div class="absolute left-auto top-auto max-w-md">
       <div
-        class=" card z-10 hidden transform rounded-lg border border-secondary border-opacity-50 bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl transition-transform duration-300 hover:z-50 hover:scale-125"
+        class=" border-secondary card z-10 hidden transform rounded-lg border border-opacity-50 bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl transition-transform duration-300 hover:z-50 hover:scale-125"
       >
-        <h2 class="text-secondary text-center text-xl">
+        <h2 class="text-center text-xl text-secondary-500">
           Concierge Service at Your Fingertips
         </h2>
-        <div class=" card-body text-primary">
+        <div class=" card-body text-primary-500">
           Need assistance? Our concierge service is here to help you navigate
           and optimize your creator experience with ease.
         </div>
@@ -201,10 +201,10 @@ ya<svelte:window bind:innerWidth bind:innerHeight />
 
     <div class="visible absolute left-auto top-auto max-w-md">
       <div
-        class=" card z-10 hidden transform rounded-lg border border-secondary border-opacity-50 bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl transition-transform duration-300 hover:z-50 hover:scale-125"
+        class=" border-secondary card z-10 hidden transform rounded-lg border border-opacity-50 bg-gradient-to-r from-[#0C082E] to-[#0C092E] p-5 shadow-2xl transition-transform duration-300 hover:z-50 hover:scale-125"
       >
-        <h2 class="text-center text-xl text-secondary">Join Us Now</h2>
-        <div class=" card-body text-primary">
+        <h2 class="text-center text-xl text-secondary-500">Join Us Now</h2>
+        <div class=" card-body text-primary-500">
           Ready to take your creative journey to the next level? Sign up today
           and be part of a community that values and empowers creators like you.
         </div>

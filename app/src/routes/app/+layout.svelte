@@ -110,6 +110,6 @@
 <div
   class="fixed top-0 -z-10 flex h-screen w-full flex-col items-center justify-center text-3xl font-semibold lg:text-7xl"
 >
-  <h2 class="neon-secondary text-secondary">CHAMPAGNE</h2>
+  <h2 class="neon-secondary text-secondary-500">CHAMPAGNE</h2>
   <h2 class="neon-primary text-primary-500">R O O M</h2>
 </div>

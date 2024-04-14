@@ -29,6 +29,7 @@ export const myCustomTheme: CustomThemeConfig = {
     '--color-primary-300': '247 173 248', // #f7adf8
     '--color-primary-400': '242 111 242', // #f26ff2
     '--color-primary-500': '236 49 237', // #EC31ED
+
     '--color-primary-600': '212 44 213', // #d42cd5
     '--color-primary-700': '177 37 178', // #b125b2
     '--color-primary-800': '142 29 142', // #8e1d8e

@@ -160,7 +160,7 @@
                   src="{config.PATH.staticUrl}/assets/creator2.png"
                   alt="Creator"
                   background="auto"
-                  loading="lazy"
+                  loading="eager"
                   width={350}
                   aspectRatio={1}
                 />
@@ -205,7 +205,7 @@
                   src="{config.PATH.staticUrl}/assets/agent1.png"
                   alt="Agent"
                   background="auto"
-                  loading="lazy"
+                  loading="eager"
                   width={350}
                   aspectRatio={1}
                 />
@@ -228,7 +228,7 @@
                   </h2>
                   <div class="text-bold text-md flex w-full justify-center">
                     <Icon
-                      class="text-secondary -mb-1"
+                      class="-mb-1 text-secondary-500"
                       width="24"
                       icon="bi:coin"
                     /> &nbsp;Earn commissions from your creators

@@ -92,7 +92,7 @@
 >
   <div class="flex flex-col items-center gap-0 text-center">
     <h2 class="flex items-center gap-2 text-xl font-semibold">
-      <Icon class="text-secondary" icon="iconoir:profile-circle" />
+      <Icon class="text-secondary-500" icon="iconoir:profile-circle" />
       Profile
     </h2>
   </div>

@@ -26,7 +26,7 @@
 
 {#if copied}
   <div
-    class="neon-primary bg-custom rounded border-2 border-primary-content p-4"
+    class="neon-primary bg-custom border-primary-content rounded border-2 p-4"
     data-popup="popupHover"
   >
     {copyValue}
@@ -34,7 +34,7 @@
 {/if}
 
 {#if copied}
-  <span class="text-success">Copied!</span>
+  <span class="text-success-500">Copied!</span>
 {:else}
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <!-- svelte-ignore a11y-no-static-element-interactions -->

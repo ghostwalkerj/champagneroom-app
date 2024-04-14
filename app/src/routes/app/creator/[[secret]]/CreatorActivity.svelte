@@ -61,7 +61,7 @@
                 ><Icon icon="fluent:star-28-filled" /></svelte:fragment
               >
             </Ratings>
-            <span class="mt-2 text-base">
+            <span class="mt-2 text-surface-500">
               ({show.showState.feedbackStats.averageRating.toFixed(2) ??
                 0})</span
             >

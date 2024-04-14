@@ -26,7 +26,7 @@
 <div id="Contact" class="container mx-auto px-4 sm:px-6 md:px-10 lg:px-20">
   <div class="pt-20">
     <h2
-      class="text-primary-500-500 mb-20 text-center font-CaviarDreams text-2xl text-[32px] font-bold lg:text-[41px]"
+      class="mb-20 text-center font-CaviarDreams text-2xl text-[32px] font-bold text-primary-500 lg:text-[41px]"
     >
       Contact Us
     </h2>

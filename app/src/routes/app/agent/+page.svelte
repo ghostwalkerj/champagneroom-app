@@ -353,7 +353,7 @@
                                   >
 
                                   <button
-                                    class="text-secondary variant-outline-secondary btn btn-sm"
+                                    class="variant-outline-secondary btn btn-sm text-secondary-500"
                                     on:click={() =>
                                       modalStore.trigger(changeSecretModal)}
                                   >

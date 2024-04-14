@@ -36,7 +36,7 @@
 {#if thisModal && user}
   <div class="w-modal rounded bg-surface-900 p-4">
     <div class="flex place-content-center">
-      <Icon icon="mdi:check-circle" class="text-success" />
+      <Icon icon="mdi:check-circle" class="text-success-500" />
       <span class="ml-2">Updated successfully</span>
     </div>
 

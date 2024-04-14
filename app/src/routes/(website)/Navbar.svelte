@@ -68,7 +68,7 @@
             </a>
           {:else}
             <a
-              class="hover:text-primary-500-500 btn w-full whitespace-nowrap text-sm hover:bg-[#e779c122]"
+              class="btn w-full whitespace-nowrap text-sm hover:bg-[#e779c122] hover:text-primary-500"
               class:text-primary-500={link.href == $page.url.hash}
               href={link.href}>{link.name}</a
             >
@@ -113,7 +113,7 @@
           </a>
         {:else}
           <a
-            class="hover:text-primary-500-500 btn whitespace-nowrap font-semibold hover:bg-[#e779c122]"
+            class="btn whitespace-nowrap font-semibold hover:bg-[#e779c122] hover:text-primary-500"
             class:text-primary-500={link.href == $page.url.hash}
             href={link.href}>{link.name}</a
           >

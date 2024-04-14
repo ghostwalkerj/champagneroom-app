@@ -1,6 +1,6 @@
 import { fail } from '@sveltejs/kit';
 
-import { AUTH_SIGNING_MESSAGE } from '$env/static/private';
+import { AUTH_SIGNING_MESSAGE, AUTH_TOKEN_NAME } from '$env/static/private';
 
 import { Agent } from '$lib/models/agent';
 import { Creator } from '$lib/models/creator';
@@ -9,7 +9,11 @@ import { Wallet } from '$lib/models/wallet';
 
 import config from '$lib/config';
 import { AuthType, UserRole } from '$lib/constants';
-import { verifySignature } from '$lib/server/auth';
+import {
+  createAuthToken,
+  setAuthToken,
+  verifySignature
+} from '$lib/server/auth';
 
 import type { Actions, PageServerLoad } from './$types';
 
@@ -72,14 +76,31 @@ const createUser = async ({
 };
 
 export const actions: Actions = {
-  create_agent: async ({ request }: { request: Request }) => {
+  create_agent: async ({ cookies, request }) => {
     try {
       const result = await createUser({ request, role: UserRole.AGENT });
       if ('success' in result) {
+        const tokenName = AUTH_TOKEN_NAME || 'token';
+
+        const user = result.user;
+
         Agent.create({
-          user: result.user._id,
+          user: user._id,
           defaultCommissionRate: config.UI.defaultCommissionRate
         });
+
+        // Update User Nonce
+        const nonce = Math.floor(Math.random() * 1_000_000);
+        User.updateOne({ _id: user._id }, { $set: { nonce } }).exec();
+
+        // Create Auth Token and set cookie
+        const encAuthToken = createAuthToken({
+          id: user._id.toString(),
+          selector: '_id',
+          authType: AuthType.SIGNING
+        });
+
+        encAuthToken && setAuthToken(cookies, tokenName, encAuthToken);
 
         return {
           success: true,

@@ -47,10 +47,10 @@
   >
     <div class="flex flex-col items-center gap-0 text-center">
       <h2 class="flex items-center gap-2 text-xl font-semibold">
-        <Icon class="text-secondary" icon="carbon:wallet" />
+        <Icon class="text-secondary-500" icon="carbon:wallet" />
         Wallet
       </h2>
-      <small class="text-base"
+      <small class="text-surface-500"
         >Status: <span class="font-semibold lowercase">{wallet.status}</span
         ></small
       >
