@@ -1,4 +1,5 @@
 <script lang="ts">
+  import markerSDK from '@marker.io/browser';
   import { format, generate } from 'build-number-generator';
   import { onDestroy, onMount } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
@@ -26,7 +27,13 @@
   let signOut = config.PATH.signout;
   let accountUnsub: Unsubscriber;
 
+  const loadWidget = async () =>
+    await markerSDK.loadWidget({
+      project: '661cbad15bce4e725b80f521'
+    });
+
   onMount(() => {
+    loadWidget();
     accountUnsub = selectedAccount.subscribe((account) => {
       if (account && lastAddress && account.address !== lastAddress) {
         lastAddress = account.address;
