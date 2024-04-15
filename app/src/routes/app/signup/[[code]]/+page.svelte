@@ -21,7 +21,7 @@
   export let data: PageData;
 
   const message = data.message;
-
+  const agent = data.agent;
   const onStepHandler = (event: CustomEvent): void => {
     if (event.detail.step === 2) {
       exampleName =
@@ -199,6 +199,7 @@
               name="signUpRole"
               value={UserRole.AGENT}
               padding="p-0"
+              disabled={agent}
             >
               <div class="btn relative">
                 <Image
