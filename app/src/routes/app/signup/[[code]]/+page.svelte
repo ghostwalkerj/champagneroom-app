@@ -88,8 +88,12 @@
 
     return async ({ result }: { result: ActionResult }) => {
       isSubmitting = false;
-      if (result.type === 'success') {
-        goto(result.data!.returnPath);
+      if (
+        result.type === 'failure' &&
+        result.data &&
+        (result.data.alreadyUser || result.data.alreadyAgent)
+      ) {
+        goto(config.PATH.app);
       }
       applyAction(result);
     };
