@@ -138,10 +138,11 @@ export const actions: Actions = {
   }
 };
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params, locals }) => {
   const code = params.code as string;
   const nonce = Math.floor(Math.random() * 1_000_000);
   const message = AUTH_SIGNING_MESSAGE + ' ' + nonce;
+  const user = locals.user;
   let agent: AgentDocument | undefined;
 
   if (code) {
@@ -160,6 +161,8 @@ export const load: PageServerLoad = async ({ params }) => {
   return {
     message,
     agent:
-      agent?.toJSON({ flattenMaps: true, flattenObjectIds: true }) ?? undefined
+      agent?.toJSON({ flattenMaps: true, flattenObjectIds: true }) ?? undefined,
+    user:
+      user?.toJSON({ flattenMaps: true, flattenObjectIds: true }) ?? undefined
   };
 };

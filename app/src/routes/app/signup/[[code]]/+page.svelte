@@ -22,6 +22,8 @@
 
   const message = data.message;
   const agent = data.agent;
+  const user = data.user;
+  let isSubmitting = false;
   const onStepHandler = (event: CustomEvent): void => {
     if (event.detail.step === 2) {
       exampleName =
@@ -47,6 +49,9 @@
   $: walletAddress = '';
 
   onMount(() => {
+    if (user) {
+      goto(config.PATH.app);
+    }
     accountUnsub = selectedAccount.subscribe((account) => {
       stepStart = account ? 1 : 0;
       if (account) {
@@ -66,8 +71,12 @@
   });
 
   const onSubmit = async ({ formData }: { formData: FormData }) => {
+    isSubmitting = true;
     formData.append('address', walletAddress);
     formData.append('message', message);
+    if (agent && signUpRole === UserRole.CREATOR) {
+      formData.append('agentId', agent._id.toString());
+    }
 
     if (wallet) {
       const signature = await wallet.provider.request({
@@ -78,6 +87,7 @@
     }
 
     return async ({ result }: { result: ActionResult }) => {
+      isSubmitting = false;
       if (result.type === 'success') {
         goto(result.data!.returnPath);
       }
@@ -239,7 +249,11 @@
             </RadioItem>
           </RadioGroup>
         </Step>
-        <Step locked={signupName.trim() === '' || signupName.trim().length < 3}>
+        <Step
+          locked={signupName.trim() === '' ||
+            signupName.trim().length < 3 ||
+            isSubmitting}
+        >
           <svelte:fragment slot="header"
             >Confirm Details as an
 
