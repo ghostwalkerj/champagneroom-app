@@ -55,9 +55,9 @@
         bind:files={images}
         bind:fileInput={fileDrop}
         accept="image/*"
-        class="max-h-32 max-w-32 overflow-hidden"
         rounded="rounded-full"
         padding="p-0"
+        class="w-min"
         on:change={onChange}
       >
         <svelte:fragment slot="message">

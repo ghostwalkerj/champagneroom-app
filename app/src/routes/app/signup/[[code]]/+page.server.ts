@@ -1,8 +1,8 @@
-import { fail } from '@sveltejs/kit';
+import { error, fail } from '@sveltejs/kit';
 
 import { AUTH_SIGNING_MESSAGE, AUTH_TOKEN_NAME } from '$env/static/private';
 
-import { Agent } from '$lib/models/agent';
+import { Agent, type AgentDocument } from '$lib/models/agent';
 import { Creator } from '$lib/models/creator';
 import { User, type UserDocument } from '$lib/models/user';
 import { Wallet } from '$lib/models/wallet';
@@ -138,10 +138,31 @@ export const actions: Actions = {
   }
 };
 
-export const load: PageServerLoad = async ({}) => {
+export const load: PageServerLoad = async ({ params, locals }) => {
+  const code = params.code as string;
   const nonce = Math.floor(Math.random() * 1_000_000);
   const message = AUTH_SIGNING_MESSAGE + ' ' + nonce;
+  const user = locals.user;
+  let agent: AgentDocument | undefined;
+
+  if (code) {
+    const referrer = (await User.findOne({ referralCode: code }).orFail(() => {
+      throw error(404, 'Referrer not found');
+    })) as UserDocument;
+
+    if (!referrer || !referrer.isAgent()) {
+      throw error(404, 'Referrer is not an Agent');
+    }
+
+    agent = (await Agent.findOne({ user: referrer._id }).orFail(() => {
+      throw error(404, 'Agent not found');
+    })) as AgentDocument;
+  }
   return {
-    message
+    message,
+    agent:
+      agent?.toJSON({ flattenMaps: true, flattenObjectIds: true }) ?? undefined,
+    user:
+      user?.toJSON({ flattenMaps: true, flattenObjectIds: true }) ?? undefined
   };
 };
