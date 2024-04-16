@@ -4,6 +4,7 @@
   import { onDestroy, onMount } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
 
+  import { dev } from '$app/environment';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
@@ -27,13 +28,15 @@
   let signOut = config.PATH.signout;
   let accountUnsub: Unsubscriber;
 
-  const loadWidget = async () =>
-    await markerSDK.loadWidget({
-      project: '661cbad15bce4e725b80f521'
-    });
+  if (!dev) {
+    const loadWidget = async () =>
+      await markerSDK.loadWidget({
+        project: '661cbad15bce4e725b80f521'
+      });
+    loadWidget();
+  }
 
   onMount(() => {
-    loadWidget();
     accountUnsub = selectedAccount.subscribe((account) => {
       if (account && lastAddress && account.address !== lastAddress) {
         lastAddress = account.address;
