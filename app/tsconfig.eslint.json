@@ -26,8 +26,10 @@
     "./tests/**/*.ts",
     "./tests/**/*.svelte",
     "playwright.config.ts",
-    "setupTests.js",
+    "vitest.config.ts",
     "postcss.config.cjs",
     "tailwind.config.cjs",
+    "globals.d.ts",
+    "./setup/**/*.ts",
   ],
 }

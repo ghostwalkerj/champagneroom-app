@@ -66,13 +66,5 @@ export default defineConfig({
         global: 'globalThis'
       }
     }
-  },
-  test: {
-    // Jest like globals
-    globals: true,
-    environment: 'jsdom',
-    include: ['tests/unit/*.{test,spec}.ts'],
-    // Extend jest-dom matchers
-    setupFiles: ['./setupTests.js']
   }
 });
