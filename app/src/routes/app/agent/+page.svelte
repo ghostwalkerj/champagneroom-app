@@ -1,11 +1,11 @@
 <script lang="ts">
   import Icon from '@iconify/svelte';
   import {
-    getModalStore,
-    type ModalSettings,
     Ratings,
     Tab,
-    TabGroup
+    TabGroup,
+    getModalStore,
+    type ModalSettings
   } from '@skeletonlabs/skeleton';
   import type { ActionResult } from '@sveltejs/kit';
   import { onDestroy, onMount } from 'svelte';
@@ -192,7 +192,7 @@
           type: 'component',
           component: 'UserSecret',
           meta: {
-            creator: result.data!.creator,
+            user: result.data!.user,
             password: result.data!.password
           }
         };

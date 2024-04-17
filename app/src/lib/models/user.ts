@@ -74,7 +74,7 @@ const userSchema = z
       .string()
       .max(50)
       .min(8, 'Referral code is too short')
-      .default(() => nanoid(10))
+      .default(nanoid(10))
       .mongooseTypeOptions({
         index: true,
         unique: true
