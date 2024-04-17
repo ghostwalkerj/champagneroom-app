@@ -157,6 +157,7 @@ export const actions: Actions = {
         secret,
         wallet: wallet._id,
         roles: [EntityType.CREATOR],
+        referralCode: nanoid(10),
         password: `${password}${PASSWORD_SALT}`,
         profileImageUrl: config.UI.defaultProfileImage
       });
@@ -171,6 +172,7 @@ export const actions: Actions = {
           flattenMaps: true,
           flattenObjectIds: true
         }),
+        user: user?.toJSON({ flattenMaps: true, flattenObjectIds: true }),
         password
       };
     } catch (error: unknown) {
