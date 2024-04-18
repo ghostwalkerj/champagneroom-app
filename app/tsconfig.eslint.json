@@ -13,6 +13,7 @@
     "server.ts",
     "config.ts",
     "svelte.config.js",
+    "./setup/mongoMemoryServer.ts",
     ".eslintrc.cjs",
     "ambient.d.ts",
     "orval.config.ts",
