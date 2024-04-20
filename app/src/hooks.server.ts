@@ -46,7 +46,6 @@ setup({
   defaultToMongooseSchemaOptions: { unknownKeys: 'strip' }
 });
 
-console.log(`mongodb endpoint ${env.MONGO_DB_ENDPOINT}`);
 if (mongoose.connection.readyState === 0)
   await mongoose.connect(env.MONGO_DB_ENDPOINT);
 
@@ -206,7 +205,6 @@ export const handle = (async ({ event, resolve }) => {
   const requestedPath = event.url.pathname;
   const cookies = event.cookies;
   const locals = event.locals;
-  console.log(`test ${env.MONGO_DB_ENDPOINT}`);
 
   locals.redisConnection = redisConnection;
   const tokenName = env.AUTH_TOKEN_NAME || 'token';
