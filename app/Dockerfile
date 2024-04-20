@@ -21,7 +21,7 @@ COPY . .
 RUN set -ex; \
   bun install; \
   bun pm cache rm; \
-  bun package \
+  bun run package;\
   bun run build
 
 # COPY .env.stage .env
