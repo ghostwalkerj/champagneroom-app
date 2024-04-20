@@ -9,12 +9,8 @@ import walletConnectModule from '@web3-onboard/walletconnect';
 import { lastValueFrom } from 'rxjs';
 import { derived, writable } from 'svelte/store';
 
-import {
-  PUBLIC_INFURA_API_KEY,
-  PUBLIC_WALLET_CONNECT_PROJECT_ID
-} from '$env/static/public';
-
 import config from '$lib/config';
+import { env as pubEnv } from '$env/dynamic/public';
 
 // Wallets
 const injected = injectedModule();
@@ -27,7 +23,7 @@ const trezor = trezorModule({
 
 const wcV2InitOptions = {
   version: 2 as const,
-  projectId: PUBLIC_WALLET_CONNECT_PROJECT_ID,
+  projectId: pubEnv.PUBLIC_WALLET_CONNECT_PROJECT_ID,
   requiredChains: [1],
   dappUrl: config.PATH.websiteUrl
 };
@@ -35,7 +31,7 @@ const walletConnect = walletConnectModule(wcV2InitOptions);
 
 const ledger = ledgerModule({
   walletConnectVersion: 2,
-  projectId: PUBLIC_WALLET_CONNECT_PROJECT_ID,
+  projectId: pubEnv.PUBLIC_WALLET_CONNECT_PROJECT_ID,
   requiredChains: [1]
 });
 
@@ -64,13 +60,13 @@ const chains = [
     id: 1,
     token: 'ETH',
     label: 'Ethereum Mainnet',
-    rpcUrl: `https://mainnet.infura.io/v3/${PUBLIC_INFURA_API_KEY}`
+    rpcUrl: `https://mainnet.infura.io/v3/${pubEnv.PUBLIC_INFURA_API_KEY}`
   },
   {
     id: 11_155_111,
     token: 'SepoliaETH',
     label: 'Ethereum Sepolia',
-    rpcUrl: `https://sepolia.infura.io/v3/${PUBLIC_INFURA_API_KEY}`
+    rpcUrl: `https://sepolia.infura.io/v3/${pubEnv.PUBLIC_INFURA_API_KEY}`
   }
 ];
 

@@ -1,11 +1,7 @@
 import { error, fail } from '@sveltejs/kit';
 import type { ObjectId } from 'mongoose';
 
-import {
-  AUTH_SIGNING_MESSAGE,
-  AUTH_TOKEN_NAME,
-  PASSWORD_SALT
-} from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 import { Ticket } from '$lib/models/ticket';
 import type { UserDocument } from '$lib/models/user';
@@ -23,7 +19,7 @@ import {
 
 import type { Actions, PageServerLoad } from './$types';
 
-const tokenName = AUTH_TOKEN_NAME || 'token';
+const tokenName = env.AUTH_TOKEN_NAME || 'token';
 
 export const actions: Actions = {
   get_signing_message: async ({ request }) => {
@@ -42,7 +38,7 @@ export const actions: Actions = {
         userNotFound: true
       });
     }
-    const message = AUTH_SIGNING_MESSAGE + ' ' + user.nonce;
+    const message = env.AUTH_SIGNING_MESSAGE + ' ' + user.nonce;
     return {
       success: true,
       message
@@ -144,7 +140,9 @@ export const actions: Actions = {
       return fail(400, { missingUser: true });
     }
 
-    const isGood = await user.comparePassword(`${password}${PASSWORD_SALT}`);
+    const isGood = await user.comparePassword(
+      `${password}${env.PASSWORD_SALT}`
+    );
     if (!isGood) {
       console.error('Bad Password');
       return fail(400, { badPassword: true });

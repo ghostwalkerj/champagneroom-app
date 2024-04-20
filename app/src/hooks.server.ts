@@ -7,14 +7,7 @@ import mongoose from 'mongoose';
 import { setup } from 'mongoose-zod';
 import urlJoin from 'url-join';
 
-import {
-  AUTH_TOKEN_NAME,
-  MONGO_DB_ENDPOINT,
-  REDIS_HOST,
-  REDIS_PASSWORD,
-  REDIS_PORT,
-  REDIS_USERNAME
-} from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 import type { AgentDocument } from '$lib/models/agent';
 import { Agent } from '$lib/models/agent';
@@ -53,16 +46,17 @@ setup({
   defaultToMongooseSchemaOptions: { unknownKeys: 'strip' }
 });
 
+console.log(`mongodb endpoint ${env.MONGO_DB_ENDPOINT}`);
 if (mongoose.connection.readyState === 0)
-  await mongoose.connect(MONGO_DB_ENDPOINT);
+  await mongoose.connect(env.MONGO_DB_ENDPOINT);
 
 mongoose.set('strictQuery', true);
 
 const redisConnection = new IORedis({
-  host: REDIS_HOST,
-  port: +REDIS_PORT,
-  password: REDIS_PASSWORD,
-  username: REDIS_USERNAME,
+  host: env.REDIS_HOST,
+  port: +env.REDIS_PORT,
+  password: env.REDIS_PASSWORD,
+  username: env.REDIS_USERNAME,
   enableReadyCheck: false,
   maxRetriesPerRequest: undefined
 });
@@ -212,9 +206,10 @@ export const handle = (async ({ event, resolve }) => {
   const requestedPath = event.url.pathname;
   const cookies = event.cookies;
   const locals = event.locals;
+  console.log(`test ${env.MONGO_DB_ENDPOINT}`);
 
   locals.redisConnection = redisConnection;
-  const tokenName = AUTH_TOKEN_NAME || 'token';
+  const tokenName = env.AUTH_TOKEN_NAME || 'token';
   let selector: string | undefined;
 
   const redirectPath = encodeURIComponent(requestedPath);

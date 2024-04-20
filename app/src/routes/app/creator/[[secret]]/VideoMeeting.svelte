@@ -2,7 +2,7 @@
   import { onDestroy, onMount } from 'svelte';
 
   import { browser } from '$app/environment';
-  import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
+  import { env as pubEnvironment } from '$env/dynamic/public';
 
   import type { CreatorDocument } from '$lib/models/creator';
   import type { ShowDocument } from '$lib/models/show';
@@ -77,7 +77,7 @@
     };
 
     // @ts-ignore
-    api = new JitsiMeetExternalAPI(PUBLIC_JITSI_DOMAIN, options);
+    api = new JitsiMeetExternalAPI(pubEnvironment.PUBLIC_JITSI_DOMAIN, options);
     api.executeCommand('avatarUrl', creator.user.profileImageUrl);
     api.executeCommand('subject', currentShow?.name);
     api.addListener('participantJoined', participantJoined);

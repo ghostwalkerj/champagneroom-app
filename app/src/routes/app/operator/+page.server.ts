@@ -1,11 +1,10 @@
 import type { Actions, RequestEvent } from '@sveltejs/kit';
 import { fail, redirect } from '@sveltejs/kit';
 import { Queue } from 'bullmq';
-import type IORedis from 'ioredis';
 import { nanoid } from 'nanoid';
 import { generateSillyPassword } from 'silly-password-generator';
 
-import { AUTH_TOKEN_NAME, PASSWORD_SALT } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 import { Agent } from '$lib/models/agent';
 import { Creator } from '$lib/models/creator';
@@ -39,7 +38,7 @@ export const actions: Actions = {
   impersonateUser: async ({ request, cookies }) => {
     const data = await request.formData();
     const impersonateId = data.get('impersonateId') as string;
-    const tokenName = AUTH_TOKEN_NAME || 'token';
+    const tokenName = env.AUTH_TOKEN_NAME || 'token';
     if (!impersonateId) {
       return fail(400, { impersonateId, missingId: true });
     }
@@ -99,6 +98,7 @@ export const actions: Actions = {
   },
 
   create_creator: async ({ request }) => {
+    console.log(env.MONGO_DB_ENDPOINT);
     const data = await request.formData();
     const agentId = data.get('agentId') as string;
     const name = data.get('name') as string;
@@ -122,12 +122,13 @@ export const actions: Actions = {
         wordCount: 2
       });
 
+      console.log(env.PASSWORD_SALT);
       const user = await User.create({
         name,
         authType: AuthType.PATH_PASSWORD,
         wallet: wallet._id,
         roles: [EntityType.CREATOR],
-        password: `${password}${PASSWORD_SALT}`
+        password: `${password}${env.PASSWORD_SALT}`
       });
       const creator = await Creator.create({
         user: user._id,
@@ -269,7 +270,7 @@ export const actions: Actions = {
       return fail(400, { userId, missingUserId: true });
     }
     user.secret = secret;
-    user.password = `${password}${PASSWORD_SALT}`;
+    user.password = `${password}${env.PASSWORD_SALT}`;
     user.updateOne();
 
     return { success: true, secret, password };
@@ -293,7 +294,7 @@ export const actions: Actions = {
       return fail(400, { showId, badShowId: true });
     }
 
-    const redisConnection = locals.redisConnection as IORedis;
+    const redisConnection = locals.redisConnection;
     const showQueue = new Queue(EntityType.SHOW, {
       connection: redisConnection
     }) as ShowQueueType;

@@ -7,7 +7,7 @@ import { StoreMemory } from '@web3-storage/access/stores/store-memory';
 import { create } from '@web3-storage/w3up-client';
 import type { SharedSpace } from '@web3-storage/w3up-client/space';
 
-import { WEB3STORAGE_DOMAIN } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 async function parseProof(data: string): Promise<any> {
   const reader = await CarReader.fromBytes(Buffer.from(data, 'base64'));
@@ -36,5 +36,5 @@ export const web3Upload = async (
   const space: SharedSpace = await client.addSpace(parsedProof);
   await client.setCurrentSpace(space.did());
   const cid = await client.uploadFile(image);
-  return 'https://' + cid.toString() + WEB3STORAGE_DOMAIN;
+  return 'https://' + cid.toString() + env.WEB3STORAGE_DOMAIN;
 };

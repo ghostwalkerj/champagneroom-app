@@ -6,15 +6,8 @@ import jwt from 'jsonwebtoken';
 import { zod } from 'sveltekit-superforms/adapters';
 import { superValidate } from 'sveltekit-superforms/server';
 
-import {
-  BITCART_API_URL,
-  BITCART_EMAIL,
-  BITCART_PASSWORD,
-  JITSI_APP_ID,
-  JITSI_JWT_SECRET,
-  JWT_EXPIRY
-} from '$env/static/private';
-import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
+import { env } from '$env/dynamic/private';
+import { env as pubEnvironment } from '$env/dynamic/public';
 
 import {
   cancelSchema,
@@ -239,9 +232,9 @@ export const actions: Actions = {
 
     // Tell bitcart payment is coming
     const token = await createBitcartToken(
-      BITCART_EMAIL,
-      BITCART_PASSWORD,
-      BITCART_API_URL
+      env.BITCART_EMAIL,
+      env.BITCART_PASSWORD,
+      env.BITCART_API_URL
     );
 
     try {
@@ -329,9 +322,9 @@ export const load: PageServerLoad = async ({ locals }) => {
   }
   // Get invoice associated with ticket
   const token = await createBitcartToken(
-    BITCART_EMAIL,
-    BITCART_PASSWORD,
-    BITCART_API_URL
+    env.BITCART_EMAIL,
+    env.BITCART_PASSWORD,
+    env.BITCART_API_URL
   );
 
   const invoice =
@@ -351,9 +344,9 @@ export const load: PageServerLoad = async ({ locals }) => {
   const jitsiToken = jwt.sign(
     {
       aud: 'jitsi',
-      iss: JITSI_APP_ID,
-      exp: Math.floor(Date.now() / 1000) + +JWT_EXPIRY,
-      sub: PUBLIC_JITSI_DOMAIN,
+      iss: env.JITSI_APP_ID,
+      exp: Math.floor(Date.now() / 1000) + +env.JWT_EXPIRY,
+      sub: pubEnvironment.PUBLIC_JITSI_DOMAIN,
       room: show.conferenceKey,
       context: {
         user: {
@@ -363,7 +356,7 @@ export const load: PageServerLoad = async ({ locals }) => {
         }
       }
     },
-    JITSI_JWT_SECRET
+    env.JITSI_JWT_SECRET
   );
 
   const disputeForm = await superValidate(
