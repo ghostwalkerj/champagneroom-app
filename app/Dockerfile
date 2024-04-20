@@ -1,0 +1,33 @@
+# Our Node base image
+FROM node:20.11.0
+
+# Set the Node environment to development to ensure all packages are installed
+ENV NODE_ENV development
+
+# installing with bun and running with pnpm
+RUN npm i -g bun
+RUN npm i -g pnpm
+
+# Change our current working directory
+WORKDIR /usr/src/app
+
+# Copy over `package.json` and lock files to optimize the build process
+COPY ["package.json", "bun.lockb", "./"]
+
+# Copy over rest of the project files
+COPY . .
+
+# bun build
+RUN set -ex; \
+  bun install; \
+  bun pm cache rm; \
+  bun package \
+  bun run build
+
+# COPY .env.stage .env
+
+# Expose port 3000 for the SvelteKit app and 24678 for Vite's HMR
+EXPOSE 3000
+
+# Run `yarn start`
+CMD ["pnpm", "start"]
