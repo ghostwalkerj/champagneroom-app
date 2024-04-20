@@ -4,6 +4,8 @@ FROM node:20.11.0
 # Set the Node environment to development to ensure all packages are installed
 ENV NODE_ENV development
 
+ARG MONGO_DB_FIELD_SECRET
+
 # installing with bun and running with pnpm
 RUN npm i -g bun
 RUN npm i -g pnpm
