@@ -1,7 +1,7 @@
 import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 
-import { AUTH_SALT } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 import { EntityType } from '$lib/constants';
 import { authDecrypt } from '$lib/crypt';
@@ -16,7 +16,7 @@ export const POST: RequestHandler = async ({ request, locals, params }) => {
   const redisConnection = locals.redisConnection as IORedis;
   const encryptedToken = params.token;
 
-  const token = authDecrypt(encryptedToken, AUTH_SALT);
+  const token = authDecrypt(encryptedToken, env.AUTH_SALT);
   if (!token || token !== bcPayoutId) {
     return new Response(undefined, { status: 200 });
   }

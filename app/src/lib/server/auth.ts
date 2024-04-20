@@ -4,14 +4,7 @@ import jwt from 'jsonwebtoken';
 import outmatch from 'outmatch';
 import * as web3 from 'web3';
 
-import {
-  AUTH_MAX_AGE,
-  AUTH_SALT,
-  BITCART_INVOICE_NOTIFICATION_PATH,
-  BITCART_PAYOUT_NOTIFICATION_PATH,
-  JWT_EXPIRY,
-  JWT_PRIVATE_KEY
-} from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 import config from '$lib/config';
 import type { AuthType } from '$lib/constants';
@@ -38,8 +31,8 @@ const NOTIFICATION_PATHS = [
 ];
 
 const WEBHOOK_PATHS = [
-  BITCART_INVOICE_NOTIFICATION_PATH + idString,
-  BITCART_PAYOUT_NOTIFICATION_PATH + idString
+  env.BITCART_INVOICE_NOTIFICATION_PATH + idString,
+  env.BITCART_PAYOUT_NOTIFICATION_PATH + idString
 ];
 
 const WHITELIST_PATHS = [
@@ -102,12 +95,12 @@ export const createAuthToken = ({
       selector,
       secret,
       _id: id,
-      exp: Math.floor(Date.now() / 1000) + +JWT_EXPIRY,
+      exp: Math.floor(Date.now() / 1000) + +env.JWT_EXPIRY,
       authType
     },
-    JWT_PRIVATE_KEY
+    env.JWT_PRIVATE_KEY
   );
-  const encAuthToken = authEncrypt(authToken, AUTH_SALT);
+  const encAuthToken = authEncrypt(authToken, env.AUTH_SALT);
   return encAuthToken!;
 };
 
@@ -122,11 +115,11 @@ export const getAuthToken = (
   tokenName: string
 ): JwtPayload | undefined => {
   const encryptedToken = cookies.get(tokenName);
-  const authToken = authDecrypt(encryptedToken, AUTH_SALT);
+  const authToken = authDecrypt(encryptedToken, env.AUTH_SALT);
   if (!authToken) {
     return;
   }
-  const decode = jwt.verify(authToken, JWT_PRIVATE_KEY) as JwtPayload;
+  const decode = jwt.verify(authToken, env.JWT_PRIVATE_KEY) as JwtPayload;
   if (!decode) {
     throw new Error('Invalid auth token');
   }
@@ -165,8 +158,8 @@ export const setAuthToken = (
     path: '/',
     httpOnly: true,
     sameSite: 'strict',
-    maxAge: +AUTH_MAX_AGE,
-    expires: new Date(Date.now() + +AUTH_MAX_AGE)
+    maxAge: +env.AUTH_MAX_AGE,
+    expires: new Date(Date.now() + +env.AUTH_MAX_AGE)
   });
 };
 

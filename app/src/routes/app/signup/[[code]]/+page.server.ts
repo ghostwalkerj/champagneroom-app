@@ -1,6 +1,6 @@
 import { error, fail } from '@sveltejs/kit';
 
-import { AUTH_SIGNING_MESSAGE, AUTH_TOKEN_NAME } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 import { Agent, type AgentDocument } from '$lib/models/agent';
 import { Creator } from '$lib/models/creator';
@@ -80,7 +80,7 @@ export const actions: Actions = {
     try {
       const result = await createUser({ request, role: UserRole.AGENT });
       if ('success' in result) {
-        const tokenName = AUTH_TOKEN_NAME || 'token';
+        const tokenName = env.UTH_TOKEN_NAME || 'token';
 
         const user = result.user;
 
@@ -141,7 +141,7 @@ export const actions: Actions = {
 export const load: PageServerLoad = async ({ params, locals }) => {
   const code = params.code as string;
   const nonce = Math.floor(Math.random() * 1_000_000);
-  const message = AUTH_SIGNING_MESSAGE + ' ' + nonce;
+  const message = env.AUTH_SIGNING_MESSAGE + ' ' + nonce;
   const user = locals.user;
   let agent: AgentDocument | undefined;
 

@@ -8,17 +8,8 @@ import type { Infer, SuperValidated } from 'sveltekit-superforms';
 import { message, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 
-import {
-  BITCART_API_URL,
-  BITCART_EMAIL,
-  BITCART_PASSWORD,
-  JITSI_APP_ID,
-  JITSI_JWT_SECRET,
-  JWT_EXPIRY,
-  WEB3STORAGE_KEY,
-  WEB3STORAGE_PROOF
-} from '$env/static/private';
-import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
+import { env } from '$env/dynamic/private';
+import { env as pubEnv } from '$env/dynamic/public';
 
 import type { CancelType } from '$lib/models/common';
 import { Creator, type CreatorDocument } from '$lib/models/creator';
@@ -71,7 +62,7 @@ export const actions: Actions = {
 
     if (image instanceof File && image.size > 0) {
       // upload image to web3
-      const url = await web3Upload(WEB3STORAGE_KEY, WEB3STORAGE_PROOF, image);
+      const url = await web3Upload(env.WEB3STORAGE_KEY, env.WEB3STORAGE_PROOF, image);
       User.updateOne(
         { _id: user._id },
         {
@@ -277,6 +268,8 @@ export const actions: Actions = {
 
     const form = await superValidate(formData, zod(roomCRUDSchema));
 
+    console.log(env.WEB3STORAGE_KEY):
+
     const isUpdate = !!form.data._id;
     // Convenient validation check:
     if (!form.valid) {
@@ -288,7 +281,11 @@ export const actions: Actions = {
 
     if (image instanceof File && image.size > 0) {
       // upload image to web3
-      const url = await web3Upload(WEB3STORAGE_KEY, WEB3STORAGE_PROOF, image);
+      const url = await web3Upload(
+        env.WEB3STORAGE_KEY,
+        env.WEB3STORAGE_PROOF,
+        image
+      );
       form.data.bannerImageUrl = url;
     }
 
@@ -367,9 +364,9 @@ export const load: PageServerLoad = async ({ locals }) => {
 
   // return the rate of exchange for UI from bitcart
   const token = await createBitcartToken(
-    BITCART_EMAIL,
-    BITCART_PASSWORD,
-    BITCART_API_URL
+    env.BITCART_EMAIL,
+    env.BITCART_PASSWORD,
+    env.BITCART_API_URL
   );
 
   let jitsiToken: string | undefined;
@@ -378,9 +375,9 @@ export const load: PageServerLoad = async ({ locals }) => {
     jitsiToken = jwt.sign(
       {
         aud: 'jitsi',
-        iss: JITSI_APP_ID,
-        exp: Math.floor(Date.now() / 1000) + +JWT_EXPIRY,
-        sub: PUBLIC_JITSI_DOMAIN,
+        iss: env.JITSI_APP_ID,
+        exp: Math.floor(Date.now() / 1000) + +env.JWT_EXPIRY,
+        sub: pubEnv.PUBLIC_JITSI_DOMAIN,
         room: show.conferenceKey,
         moderator: true,
         context: {
@@ -391,7 +388,7 @@ export const load: PageServerLoad = async ({ locals }) => {
           }
         }
       },
-      JITSI_JWT_SECRET
+      env.JITSI_JWT_SECRET
     );
   }
 

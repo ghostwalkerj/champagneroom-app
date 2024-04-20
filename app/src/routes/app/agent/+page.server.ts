@@ -10,15 +10,7 @@ import { message, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 
-import {
-  AUTH_TOKEN_NAME,
-  BITCART_API_URL,
-  BITCART_EMAIL,
-  BITCART_PASSWORD,
-  PASSWORD_SALT,
-  WEB3STORAGE_KEY,
-  WEB3STORAGE_PROOF
-} from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 import type { AgentDocument } from '$lib/models/agent';
 import type { CreatorDocument } from '$lib/models/creator';
@@ -82,7 +74,7 @@ export const actions: Actions = {
   impersonateUser: async ({ request, cookies }) => {
     const data = await request.formData();
     const impersonateId = data.get('impersonateId') as string;
-    const tokenName = AUTH_TOKEN_NAME || 'token';
+    const tokenName = env.AUTH_TOKEN_NAME || 'token';
     if (!impersonateId) {
       return fail(400, { impersonateId, missingId: true });
     }
@@ -110,7 +102,11 @@ export const actions: Actions = {
 
     if (image instanceof File && image.size > 0) {
       // upload image to web3
-      const url = await web3Upload(WEB3STORAGE_KEY, WEB3STORAGE_PROOF, image);
+      const url = await web3Upload(
+        env.WEB3STORAGE_KEY,
+        env.WEB3STORAGE_PROOF,
+        image
+      );
       User.updateOne(
         { _id: user._id },
         {
@@ -158,7 +154,7 @@ export const actions: Actions = {
         wallet: wallet._id,
         roles: [EntityType.CREATOR],
         referralCode: nanoid(10),
-        password: `${password}${PASSWORD_SALT}`,
+        password: `${password}${env.PASSWORD_SALT}`,
         profileImageUrl: config.UI.defaultProfileImage
       });
       const creator = (await Creator.create({
@@ -259,7 +255,7 @@ export const actions: Actions = {
       return fail(400, { userId, missingUserId: true });
     }
     user.secret = secret;
-    user.password = `${password}${PASSWORD_SALT}`;
+    user.password = `${password}${env.PASSWORD_SALT}`;
     user.updateOne();
 
     return { success: true, secret, password };
@@ -393,9 +389,9 @@ export const load: PageServerLoad = async ({ locals }) => {
 
   if (wallet) {
     const token = await createBitcartToken(
-      BITCART_EMAIL,
-      BITCART_PASSWORD,
-      BITCART_API_URL
+      env.BITCART_EMAIL,
+      env.BITCART_PASSWORD,
+      env.BITCART_API_URL
     );
 
     exchangeRate =

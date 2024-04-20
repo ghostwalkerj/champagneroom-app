@@ -6,16 +6,7 @@ import { message, superValidate } from 'sveltekit-superforms/server';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 import urlJoin from 'url-join';
 
-import {
-  AUTH_SALT,
-  AUTH_TOKEN_NAME,
-  BITCART_API_URL,
-  BITCART_EMAIL,
-  BITCART_INVOICE_NOTIFICATION_PATH,
-  BITCART_NOTIFICATION_URL,
-  BITCART_PASSWORD,
-  BITCART_STORE_ID
-} from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 import { reserveTicketSchema } from '$lib/models/common';
 import { Show } from '$lib/models/show';
@@ -56,7 +47,7 @@ import {
 
 import type { Actions, PageServerLoad } from './$types';
 
-const tokenName = AUTH_TOKEN_NAME || 'token';
+const tokenName = env.AUTH_TOKEN_NAME || 'token';
 
 export const actions: Actions = {
   reserve_ticket: async ({ params, cookies, request, locals }) => {
@@ -124,16 +115,16 @@ export const actions: Actions = {
 
     // Create invoice in Bitcart
     const token = await createBitcartToken(
-      BITCART_EMAIL,
-      BITCART_PASSWORD,
-      BITCART_API_URL
+      env.BITCART_EMAIL,
+      env.BITCART_PASSWORD,
+      env.BITCART_API_URL
     );
 
     let response = await createInvoiceInvoicesPost(
       {
         price: ticket.price.amount,
         currency: ticket.price.currency,
-        store_id: BITCART_STORE_ID,
+        store_id: env.BITCART_STORE_ID,
         expiration: config.TIMER.paymentPeriod / 60 / 1000,
         order_id: ticket._id.toString()
       },
@@ -152,11 +143,11 @@ export const actions: Actions = {
 
     // Update the notification url
     const invoice = response.data as DisplayInvoice;
-    const encryptedInvoiceId = authEncrypt(invoice.id, AUTH_SALT) ?? '';
+    const encryptedInvoiceId = authEncrypt(invoice.id, env.AUTH_SALT) ?? '';
 
     invoice.notification_url = urlJoin(
-      BITCART_NOTIFICATION_URL,
-      BITCART_INVOICE_NOTIFICATION_PATH,
+      env.BITCART_NOTIFICATION_URL,
+      env.BITCART_INVOICE_NOTIFICATION_PATH,
       encryptedInvoiceId
     );
 
@@ -196,9 +187,9 @@ export const actions: Actions = {
       ticketService?.stop();
 
       const token = await createBitcartToken(
-        BITCART_EMAIL,
-        BITCART_PASSWORD,
-        BITCART_API_URL
+        env.BITCART_EMAIL,
+        env.BITCART_PASSWORD,
+        env.BITCART_API_URL
       );
 
       // Alert the invoice is complete

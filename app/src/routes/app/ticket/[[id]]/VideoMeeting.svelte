@@ -3,7 +3,7 @@
 
   import { browser } from '$app/environment';
   import { onNavigate } from '$app/navigation';
-  import { PUBLIC_JITSI_DOMAIN } from '$env/static/public';
+  import { env } from '$env/dynamic/public';
 
   import type { ShowDocumentType } from '$lib/models/show';
   import type { UserDocumentType } from '$lib/models/user';
@@ -52,7 +52,7 @@
     };
 
     // @ts-ignore
-    api = new JitsiMeetExternalAPI(PUBLIC_JITSI_DOMAIN, options);
+    api = new JitsiMeetExternalAPI(env.PUBLIC_JITSI_DOMAIN, options);
     api.executeCommand('avatarUrl', user.profileImageUrl);
 
     api.addListener('toolbarButtonClicked', async (event: any) => {
