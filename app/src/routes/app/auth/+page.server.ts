@@ -20,7 +20,6 @@ import {
 import type { Actions, PageServerLoad } from './$types';
 
 const tokenName = env.AUTH_TOKEN_NAME || 'token';
-u;
 
 export const actions: Actions = {
   get_signing_message: async ({ request }) => {

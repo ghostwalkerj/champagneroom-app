@@ -268,8 +268,6 @@ export const actions: Actions = {
 
     const form = await superValidate(formData, zod(roomCRUDSchema));
 
-    console.log(env.WEB3STORAGE_KEY):
-
     const isUpdate = !!form.data._id;
     // Convenient validation check:
     if (!form.valid) {

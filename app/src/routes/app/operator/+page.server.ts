@@ -99,7 +99,6 @@ export const actions: Actions = {
   },
 
   create_creator: async ({ request }) => {
-    console.log(env.MONGO_DB_ENDPOINT);
     const data = await request.formData();
     const agentId = data.get('agentId') as string;
     const name = data.get('name') as string;
@@ -123,7 +122,6 @@ export const actions: Actions = {
         wordCount: 2
       });
 
-      console.log(env.PASSWORD_SALT);
       const user = await User.create({
         name,
         authType: AuthType.PATH_PASSWORD,
