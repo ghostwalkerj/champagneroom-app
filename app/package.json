@@ -59,6 +59,7 @@
     "@types/bcryptjs": "^2.4.5",
     "@types/events": "^3.0.0",
     "@types/express": "^4.17.17",
+    "@types/jest": "^29.5.12",
     "@types/jsonwebtoken": "^9.0.5",
     "@types/node": "^20.12.7",
     "@types/testing-library__dom": "^7.5.0",
