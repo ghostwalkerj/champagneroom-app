@@ -269,7 +269,7 @@ export const actions: Actions = {
       return fail(400, { userId, missingUserId: true });
     }
     user.secret = secret;
-    user.password = `${password}${PASSWORD_SALT}`;
+    user.password = `${password}${env.PASSWORD_SALT}`;
     user.updateOne();
 
     return { success: true, secret, password };
