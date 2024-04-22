@@ -42,14 +42,16 @@ import {
 
 const authUrl = config.PATH.auth;
 
-setup({
-  defaultToMongooseSchemaOptions: { unknownKeys: 'strip' }
-});
-
-if (mongoose.connection.readyState === 0)
-  await mongoose.connect(env.MONGO_DB_ENDPOINT ?? '');
-
-mongoose.set('strictQuery', true);
+if (mongoose.connection.readyState === 0) {
+  if (env.MONGO_DB_ENDPOINT === undefined) {
+    throw new Error('MONGO_DB_ENDPOINT is not defined');
+  }
+  await mongoose.connect(env.MONGO_DB_ENDPOINT);
+  setup({
+    defaultToMongooseSchemaOptions: { unknownKeys: 'strip' }
+  });
+  mongoose.set('strictQuery', true);
+}
 
 const redisConnection = new IORedis({
   host: env.REDIS_HOST,

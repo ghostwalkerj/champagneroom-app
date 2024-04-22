@@ -10,7 +10,6 @@ import basicAuth from 'express-basic-auth';
 import IORedis from 'ioredis';
 import maxListenersExceededWarning from 'max-listeners-exceeded-warning';
 import mongoose from 'mongoose';
-import { setup } from 'mongoose-zod';
 import parseArgv from 'tiny-parse-argv';
 
 import { handler } from './build/handler';
@@ -28,6 +27,11 @@ const bullMQPath = process.env.BULLMQ_ADMIN_PATH || '/admin/queues';
 const startWorker = parseArgv(process.argv).worker || false;
 const app = express();
 
+const mongoDBEndpoint = process.env.MONGO_DB_ENDPOINT;
+if (!mongoDBEndpoint) {
+  throw new Error('No MongoDB endpoint provided');
+}
+
 const redisOptions = {
   connection: {
     host: process.env.REDIS_HOST || 'localhost',
@@ -41,9 +45,6 @@ const redisOptions = {
 };
 
 const connection = new IORedis(redisOptions.connection);
-
-const mongoDBEndpoint =
-  process.env.MONGO_DB_ENDPOINT || 'mongodb://localhost:27017';
 
 const showQueue = new Queue(EntityType.SHOW, { connection });
 const invoiceQueue = new Queue(EntityType.INVOICE, {
@@ -113,29 +114,14 @@ app.get('/health', (_, res) => {
   res.send('OK');
 });
 
-// Svelte App
-app.use(handler);
 const port = process.env.PORT || 3000;
-
-if (mongoose.connection.readyState === 0) {
-  // eslint-disable-next-line unicorn/prefer-top-level-await
-  mongoose.connect(mongoDBEndpoint);
-
-  mongoose.connection.on('connected', () => {
-    console.log('Mongoose connected:', mongoose.connection.name);
-  });
-}
-
-setup({
-  defaultToMongooseSchemaOptions: { unknownKeys: 'strip' }
-});
-mongoose.set('strictQuery', true);
 
 maxListenersExceededWarning();
 
+const formatMemoryUsage = (data: number) =>
+  `${Math.round((data / 1024 / 1024) * 100) / 100} MB`;
+
 function logMemoryUsage() {
-  const formatMemoryUsage = (data: number) =>
-    `${Math.round((data / 1024 / 1024) * 100) / 100} MB`;
   const memoryData = process.memoryUsage();
   console.log(
     `Memory usage: rss: ${formatMemoryUsage(
@@ -148,11 +134,26 @@ function logMemoryUsage() {
   );
 }
 
-app.listen(port, () => {
-  console.log('Champagne Server running on:', port);
-  console.log('Workers running:', startWorker);
-  console.log('Build number:', buildNumber);
-  console.log('Build time:', buildTime);
-  logMemoryUsage();
-  setInterval(logMemoryUsage, 50_000);
+// eslint-disable-next-line unicorn/prefer-top-level-await
+mongoose.connect(mongoDBEndpoint);
+mongoose.connection.on('connected', () => {
+  console.log('Mongoose connected:', mongoose.connection.name);
+  //setup({
+  defaultToMongooseSchemaOptions: {
+    unknownKeys: 'strip';
+  }
+  //});
+  mongoose.set('strictQuery', true);
+
+  // Svelte App
+  app.use(handler);
+
+  app.listen(port, () => {
+    console.log('Champagne Server running on:', port);
+    console.log('Workers running:', startWorker);
+    console.log('Build number:', buildNumber);
+    console.log('Build time:', buildTime);
+    logMemoryUsage();
+    setInterval(logMemoryUsage, 50_000);
+  });
 });
