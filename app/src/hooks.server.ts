@@ -47,13 +47,13 @@ setup({
 });
 
 if (mongoose.connection.readyState === 0)
-  await mongoose.connect(env.MONGO_DB_ENDPOINT);
+  await mongoose.connect(env.MONGO_DB_ENDPOINT ?? '');
 
 mongoose.set('strictQuery', true);
 
 const redisConnection = new IORedis({
   host: env.REDIS_HOST,
-  port: +env.REDIS_PORT,
+  port: +(env.REDIS_PORT ?? 6379),
   password: env.REDIS_PASSWORD,
   username: env.REDIS_USERNAME,
   enableReadyCheck: false,

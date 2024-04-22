@@ -16,7 +16,11 @@ export const POST: RequestHandler = async ({ request, locals, params }) => {
   const redisConnection = locals.redisConnection as IORedis;
   const encryptedToken = params.token;
 
-  const token = authDecrypt(encryptedToken, env.AUTH_SALT);
+  if (encryptedToken === undefined) {
+    return new Response(undefined, { status: 400 });
+  }
+
+  const token = authDecrypt(encryptedToken, env.AUTH_SALT || '');
   if (!token || token !== bcPayoutId) {
     return new Response(undefined, { status: 200 });
   }

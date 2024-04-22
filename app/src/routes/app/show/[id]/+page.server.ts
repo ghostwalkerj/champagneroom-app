@@ -115,16 +115,16 @@ export const actions: Actions = {
 
     // Create invoice in Bitcart
     const token = await createBitcartToken(
-      env.BITCART_EMAIL,
-      env.BITCART_PASSWORD,
-      env.BITCART_API_URL
+      env.BITCART_EMAIL ?? '',
+      env.BITCART_PASSWORD ?? '',
+      env.BITCART_API_URL ?? '' // Add default value for env.BITCART_API_URL
     );
 
     let response = await createInvoiceInvoicesPost(
       {
         price: ticket.price.amount,
         currency: ticket.price.currency,
-        store_id: env.BITCART_STORE_ID,
+        store_id: env.BITCART_STORE_ID ?? '',
         expiration: config.TIMER.paymentPeriod / 60 / 1000,
         order_id: ticket._id.toString()
       },
@@ -143,11 +143,18 @@ export const actions: Actions = {
 
     // Update the notification url
     const invoice = response.data as DisplayInvoice;
-    const encryptedInvoiceId = authEncrypt(invoice.id, env.AUTH_SALT) ?? '';
+    const encryptedInvoiceId =
+      authEncrypt(
+        invoice.id ? (invoice.id as string) : '',
+        env.AUTH_SALT ?? ''
+      ) ?? '';
+
+    const notificationUrl = env.BITCART_NOTIFICATION_URL ?? ''; // Add default value for env.BITCART_NOTIFICATION_URL
+    const invoiceNotificationPath = env.BITCART_INVOICE_NOTIFICATION_PATH ?? ''; // Add default value for env.BITCART_INVOICE_NOTIFICATION_PATH
 
     invoice.notification_url = urlJoin(
-      env.BITCART_NOTIFICATION_URL,
-      env.BITCART_INVOICE_NOTIFICATION_PATH,
+      notificationUrl || '',
+      invoiceNotificationPath,
       encryptedInvoiceId
     );
 
@@ -187,9 +194,9 @@ export const actions: Actions = {
       ticketService?.stop();
 
       const token = await createBitcartToken(
-        env.BITCART_EMAIL,
-        env.BITCART_PASSWORD,
-        env.BITCART_API_URL
+        env.BITCART_EMAIL ?? '', // Add default value for env.BITCART_EMAIL
+        env.BITCART_PASSWORD ?? '', // Add default value for env.BITCART_PASSWORD
+        env.BITCART_API_URL ?? '' // Add default value for env.BITCART_API_URL
       );
 
       // Alert the invoice is complete

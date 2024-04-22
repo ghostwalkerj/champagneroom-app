@@ -90,17 +90,20 @@ export const createAuthToken = ({
   authType: AuthType;
   secret?: string;
 }): string => {
+  if (!env.JWT_PRIVATE_KEY) {
+    throw new Error('JWT_PRIVATE_KEY is undefined');
+  }
   const authToken = jwt.sign(
     {
       selector,
       secret,
       _id: id,
-      exp: Math.floor(Date.now() / 1000) + +env.JWT_EXPIRY,
+      exp: Math.floor(Date.now() / 1000) + +(env.JWT_EXPIRY || 3600),
       authType
     },
     env.JWT_PRIVATE_KEY
   );
-  const encAuthToken = authEncrypt(authToken, env.AUTH_SALT);
+  const encAuthToken = authEncrypt(authToken, env.AUTH_SALT ?? '');
   return encAuthToken!;
 };
 
@@ -115,11 +118,11 @@ export const getAuthToken = (
   tokenName: string
 ): JwtPayload | undefined => {
   const encryptedToken = cookies.get(tokenName);
-  const authToken = authDecrypt(encryptedToken, env.AUTH_SALT);
+  const authToken = authDecrypt(encryptedToken, env.AUTH_SALT ?? '');
   if (!authToken) {
     return;
   }
-  const decode = jwt.verify(authToken, env.JWT_PRIVATE_KEY) as JwtPayload;
+  const decode = jwt.verify(authToken, env.JWT_PRIVATE_KEY ?? '') as JwtPayload;
   if (!decode) {
     throw new Error('Invalid auth token');
   }
@@ -158,8 +161,8 @@ export const setAuthToken = (
     path: '/',
     httpOnly: true,
     sameSite: 'strict',
-    maxAge: +env.AUTH_MAX_AGE,
-    expires: new Date(Date.now() + +env.AUTH_MAX_AGE)
+    maxAge: +(env.AUTH_MAX_AGE ?? 0),
+    expires: new Date(Date.now() + +(env.AUTH_MAX_AGE ?? 0))
   });
 };
 

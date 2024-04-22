@@ -103,8 +103,8 @@ export const actions: Actions = {
     if (image instanceof File && image.size > 0) {
       // upload image to web3
       const url = await web3Upload(
-        env.WEB3STORAGE_KEY,
-        env.WEB3STORAGE_PROOF,
+        env.WEB3STORAGE_KEY ?? '',
+        env.WEB3STORAGE_PROOF ?? '', // Add default value for WEB3STORAGE_PROOF
         image
       );
       User.updateOne(
@@ -389,9 +389,9 @@ export const load: PageServerLoad = async ({ locals }) => {
 
   if (wallet) {
     const token = await createBitcartToken(
-      env.BITCART_EMAIL,
-      env.BITCART_PASSWORD,
-      env.BITCART_API_URL
+      env.BITCART_EMAIL ?? '',
+      env.BITCART_PASSWORD ?? '',
+      env.BITCART_API_URL ?? ''
     );
 
     exchangeRate =

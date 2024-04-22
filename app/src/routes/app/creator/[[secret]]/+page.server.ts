@@ -63,8 +63,8 @@ export const actions: Actions = {
     if (image instanceof File && image.size > 0) {
       // upload image to web3
       const url = await web3Upload(
-        env.WEB3STORAGE_KEY,
-        env.WEB3STORAGE_PROOF,
+        env.WEB3STORAGE_KEY ?? '',
+        env.WEB3STORAGE_PROOF ?? '',
         image
       );
       User.updateOne(
@@ -286,8 +286,8 @@ export const actions: Actions = {
     if (image instanceof File && image.size > 0) {
       // upload image to web3
       const url = await web3Upload(
-        env.WEB3STORAGE_KEY,
-        env.WEB3STORAGE_PROOF,
+        env.WEB3STORAGE_KEY ?? '', // Provide a default value for env.WEB3STORAGE_KEY
+        env.WEB3STORAGE_PROOF ?? '',
         image
       );
       form.data.bannerImageUrl = url;
@@ -368,9 +368,9 @@ export const load: PageServerLoad = async ({ locals }) => {
 
   // return the rate of exchange for UI from bitcart
   const token = await createBitcartToken(
-    env.BITCART_EMAIL,
-    env.BITCART_PASSWORD,
-    env.BITCART_API_URL
+    env.BITCART_EMAIL || '',
+    env.BITCART_PASSWORD || '',
+    env.BITCART_API_URL || ''
   );
 
   let jitsiToken: string | undefined;
@@ -380,7 +380,7 @@ export const load: PageServerLoad = async ({ locals }) => {
       {
         aud: 'jitsi',
         iss: env.JITSI_APP_ID,
-        exp: Math.floor(Date.now() / 1000) + +env.JWT_EXPIRY,
+        exp: Math.floor(Date.now() / 1000) + +(env.JWT_EXPIRY || 3600),
         sub: pubEnvironment.PUBLIC_JITSI_DOMAIN,
         room: show.conferenceKey,
         moderator: true,
@@ -392,7 +392,7 @@ export const load: PageServerLoad = async ({ locals }) => {
           }
         }
       },
-      env.JITSI_JWT_SECRET
+      env.JITSI_JWT_SECRET || '' // Ensure env.JITSI_JWT_SECRET is not undefined
     );
   }
 

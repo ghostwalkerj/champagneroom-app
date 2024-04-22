@@ -15,7 +15,9 @@ export const POST: RequestHandler = async ({ request, locals, params }) => {
   const bcInvoiceId = body['id'] as string;
   const status = body['status'] as string;
   const redisConnection = locals.redisConnection as IORedis;
-  const token = authDecrypt(encryptedToken, env.AUTH_SALT);
+  const token = encryptedToken
+    ? (authDecrypt(encryptedToken, env.AUTH_SALT ?? '') as string)
+    : undefined;
 
   if (!token || token !== bcInvoiceId) {
     console.error('Invalid token for invoice notification');

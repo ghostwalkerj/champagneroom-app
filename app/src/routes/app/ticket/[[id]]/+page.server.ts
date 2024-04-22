@@ -232,9 +232,9 @@ export const actions: Actions = {
 
     // Tell bitcart payment is coming
     const token = await createBitcartToken(
-      env.BITCART_EMAIL,
-      env.BITCART_PASSWORD,
-      env.BITCART_API_URL
+      env.BITCART_EMAIL ?? '',
+      env.BITCART_PASSWORD ?? '',
+      env.BITCART_API_URL ?? ''
     );
 
     try {
@@ -322,9 +322,9 @@ export const load: PageServerLoad = async ({ locals }) => {
   }
   // Get invoice associated with ticket
   const token = await createBitcartToken(
-    env.BITCART_EMAIL,
-    env.BITCART_PASSWORD,
-    env.BITCART_API_URL
+    env.BITCART_EMAIL ?? '',
+    env.BITCART_PASSWORD ?? '',
+    env.BITCART_API_URL ?? ''
   );
 
   const invoice =
@@ -345,7 +345,7 @@ export const load: PageServerLoad = async ({ locals }) => {
     {
       aud: 'jitsi',
       iss: env.JITSI_APP_ID,
-      exp: Math.floor(Date.now() / 1000) + +env.JWT_EXPIRY,
+      exp: Math.floor(Date.now() / 1000) + +(env.JWT_EXPIRY ?? 0),
       sub: pubEnvironment.PUBLIC_JITSI_DOMAIN,
       room: show.conferenceKey,
       context: {
@@ -356,7 +356,7 @@ export const load: PageServerLoad = async ({ locals }) => {
         }
       }
     },
-    env.JITSI_JWT_SECRET
+    env.JITSI_JWT_SECRET || '' // Ensure env.JITSI_JWT_SECRET is not undefined
   );
 
   const disputeForm = await superValidate(
