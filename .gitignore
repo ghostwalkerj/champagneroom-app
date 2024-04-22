@@ -14,7 +14,6 @@ app/.vscode/**
 **/Icon
 .vercel
 **/.yarn/**
-**.d.ts
 **.typegen.d.ts
 **/dist/**
 app/src/lib/bitcart/**
