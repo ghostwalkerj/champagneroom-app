@@ -40,17 +40,17 @@ const redisOptions = {
   }
 };
 
-const redisConnection = new IORedis(redisOptions.connection);
+const connection = new IORedis(redisOptions.connection);
 
 const mongoDBEndpoint =
   process.env.MONGO_DB_ENDPOINT || 'mongodb://localhost:27017';
 
-const showQueue = new Queue(EntityType.SHOW, { connection: redisConnection });
+const showQueue = new Queue(EntityType.SHOW, { connection });
 const invoiceQueue = new Queue(EntityType.INVOICE, {
-  connection: redisConnection
+  connection
 });
 const payoutQueue = new Queue(EntityType.PAYOUT, {
-  connection: redisConnection
+  connection
 });
 
 const paymentAuthToken = await createBitcartToken(
@@ -66,18 +66,21 @@ if (startWorker) {
     showQueue,
     // @ts-ignore
     payoutQueue,
-    redisConnection,
+    redisConnection: connection,
     paymentAuthToken
   });
   showWorker.run();
 
-  const invoiceWorker = getInvoiceWorker({ redisConnection, paymentAuthToken });
+  const invoiceWorker = getInvoiceWorker({
+    redisConnection: connection,
+    paymentAuthToken
+  });
   invoiceWorker.run();
 
   const payoutWorker = getPayoutWorker({
     // @ts-ignore
     payoutQueue,
-    redisConnection,
+    redisConnection: connection,
     paymentAuthToken
   });
   payoutWorker.run();

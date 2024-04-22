@@ -1,10 +1,18 @@
 import { sveltekit } from '@sveltejs/kit/vite';
-import { defineConfig } from 'vite';
+import { defineConfig, type UserConfig } from 'vite';
 import EnvironmentPlugin from 'vite-plugin-environment';
 import mkcert from 'vite-plugin-mkcert';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
+import type { InlineConfig } from 'vitest';
 
-export default defineConfig({
+type ViteConfig = UserConfig & { test: InlineConfig };
+const config: ViteConfig = {
+  // other config
+  test: {
+      globals: true,
+      include: ['tests/unit/*.{test,spec}.ts'],
+      setupFiles: ['./setup/setupTests.ts', './setup/mongoMemoryServer.ts']
+    },
   mode: 'development',
 
   define: {
@@ -67,12 +75,6 @@ export default defineConfig({
       }
     }
   },
-  test: {
-    // Jest like globals
-    globals: true,
-    environment: 'jsdom',
-    include: ['tests/unit/*.{test,spec}.ts'],
-    // Extend jest-dom matchers
-    setupFiles: ['./setupTests.js']
-  }
-});
+
+};
+export default defineConfig(config);

@@ -9,7 +9,8 @@ import { message, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 
 import { env } from '$env/dynamic/private';
-import { env as pubEnv } from '$env/dynamic/public';
+
+import { env as pubEnvironment } from '$env/dynamic/public';
 
 import type { CancelType } from '$lib/models/common';
 import { Creator, type CreatorDocument } from '$lib/models/creator';
@@ -197,9 +198,9 @@ export const actions: Actions = {
     }
 
     try {
-      const redisConnection = locals.redisConnection as IORedis;
+      const connection = locals.redisConnection as IORedis;
       const payoutQueue = new Queue(EntityType.PAYOUT, {
-        connection: redisConnection
+        connection
       }) as PayoutQueueType;
 
       payoutQueue.add(jobType, {
@@ -246,9 +247,9 @@ export const actions: Actions = {
     if (!show) {
       throw error(404, 'Show not found');
     }
-    const redisConnection = locals.redisConnection as IORedis;
+    const connection = locals.redisConnection;
     const showQueue = new Queue(EntityType.SHOW, {
-      connection: redisConnection
+      connection
     }) as ShowQueueType;
 
     const showService = getShowMachineService(show);
@@ -267,6 +268,8 @@ export const actions: Actions = {
     const formData = await request.formData();
 
     const form = await superValidate(formData, zod(roomCRUDSchema));
+
+    console.log(env.WEB3STORAGE_KEY);
 
     const isUpdate = !!form.data._id;
     // Convenient validation check:
@@ -375,7 +378,7 @@ export const load: PageServerLoad = async ({ locals }) => {
         aud: 'jitsi',
         iss: env.JITSI_APP_ID,
         exp: Math.floor(Date.now() / 1000) + +env.JWT_EXPIRY,
-        sub: pubEnv.PUBLIC_JITSI_DOMAIN,
+        sub: pubEnvironment.PUBLIC_JITSI_DOMAIN,
         room: show.conferenceKey,
         moderator: true,
         context: {

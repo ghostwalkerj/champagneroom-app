@@ -1,7 +1,6 @@
 import type { Actions, RequestEvent } from '@sveltejs/kit';
 import { fail, redirect } from '@sveltejs/kit';
 import { Queue } from 'bullmq';
-import type IORedis from 'ioredis';
 import { nanoid } from 'nanoid';
 import { generateSillyPassword } from 'silly-password-generator';
 
@@ -293,7 +292,7 @@ export const actions: Actions = {
       return fail(400, { showId, badShowId: true });
     }
 
-    const redisConnection = locals.redisConnection as IORedis;
+    const redisConnection = locals.redisConnection;
     const showQueue = new Queue(EntityType.SHOW, {
       connection: redisConnection
     }) as ShowQueueType;
