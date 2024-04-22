@@ -124,7 +124,7 @@ const formatMemoryUsage = (data: number) =>
 function logMemoryUsage() {
   const memoryData = process.memoryUsage();
   process.stdout.write(
-    `Memory usage: rss: ${formatMemoryUsage(
+    `\rMemory usage: rss: ${formatMemoryUsage(
       memoryData.rss
     )}, heapTotal: ${formatMemoryUsage(
       memoryData.heapTotal
