@@ -1,12 +1,15 @@
-import mongoose from 'mongoose';
 import { exit } from 'node:process';
+
+import mongoose from 'mongoose';
 import parseArgv from 'tiny-parse-argv';
+
 import Config from '../src/lib/config';
 import { AuthType, UserRole } from '../src/lib/constants';
 import { Operator } from '../src/lib/models/operator';
 import { User } from '../src/lib/models/user';
 import { Wallet } from '../src/lib/models/wallet';
-const arguments_ = parseArgv(process.argv, {string: ['address', 'mongo']});
+// eslint-disable-next-line @typescript-eslint/naming-convention
+const arguments_ = parseArgv(process.argv, { string: ['address', 'mongo'] });
 const address = arguments_.address;
 console.log(`Creating Operator for address: ${address.toLowerCase()}`);
 if (!address) throw new Error('No address provided');

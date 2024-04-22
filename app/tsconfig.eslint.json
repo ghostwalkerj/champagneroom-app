@@ -32,5 +32,6 @@
     "tailwind.config.cjs",
     "globals.d.ts",
     "./setup/**/*.ts",
+    "./scripts/**/*.ts",
   ],
 }
