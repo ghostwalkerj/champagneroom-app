@@ -57,7 +57,9 @@ const config: ViteConfig = {
     },
     commonjsOptions: {
       transformMixedEsModules: true
-    }
+    },
+    minify: true,
+    sourcemap: false,
   },
   server: {
     fs: {
