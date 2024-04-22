@@ -1,12 +1,14 @@
 import mongoose from 'mongoose';
+import { exit } from 'node:process';
 import parseArgv from 'tiny-parse-argv';
-import { User } from '../src/lib/models/user';
-import { Operator } from '../src/lib/models/operator';
-import { Wallet } from '../src/lib/models/wallet';
-import { AuthType, UserRole } from '../src/lib/constants';
 import Config from '../src/lib/config';
-const arguments_ = parseArgv(process.argv);
+import { AuthType, UserRole } from '../src/lib/constants';
+import { Operator } from '../src/lib/models/operator';
+import { User } from '../src/lib/models/user';
+import { Wallet } from '../src/lib/models/wallet';
+const arguments_ = parseArgv(process.argv, {string: ['address', 'mongo']});
 const address = arguments_.address;
+console.log(`Creating Operator for address: ${address.toLowerCase()}`);
 if (!address) throw new Error('No address provided');
 
 const mongoDBEndpoint = arguments_.mongo || 'mongodb://localhost:27017';
@@ -17,8 +19,7 @@ await wallet.save();
 
 const user = await User.create({
   wallet: wallet._id,
-  address: address,
-  payoutAddress: address,
+  address: address.toLocaleLowerCase(),
   authType: AuthType.SIGNING,
   name: 'Operator',
   roles: [UserRole.OPERATOR],
@@ -30,3 +31,5 @@ const operator = await Operator.create({
 });
 
 console.log(`Operator created: ${operator._id}`);
+
+exit(0);
