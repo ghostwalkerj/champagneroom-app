@@ -4,6 +4,8 @@ FROM node:20.11.0
 # Set the Node environment to development to ensure all packages are installed
 ENV NODE_ENV development
 
+ENV NODE_OPTIONS --max-old-space-size=4096
+
 ARG MONGO_DB_FIELD_SECRET
 
 # installing with bun and running with pnpm
