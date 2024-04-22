@@ -9,6 +9,7 @@ import { message, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 
 import { env } from '$env/dynamic/private';
+
 import { env as pubEnvironment } from '$env/dynamic/public';
 
 import type { CancelType } from '$lib/models/common';
@@ -62,11 +63,7 @@ export const actions: Actions = {
 
     if (image instanceof File && image.size > 0) {
       // upload image to web3
-      const url = await web3Upload(
-        env.WEB3STORAGE_KEY,
-        env.WEB3STORAGE_PROOF,
-        image
-      );
+      const url = await web3Upload(env.WEB3STORAGE_KEY, env.WEB3STORAGE_PROOF, image);
       User.updateOne(
         { _id: user._id },
         {
