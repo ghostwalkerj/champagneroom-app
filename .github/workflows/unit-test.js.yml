@@ -2,9 +2,9 @@ name: 'Vitest'
 
 on:
   push:
-    branches: ['105-implement-e2e-tests']
+    branches: ['bugfix/failing-vitest-gh-action']
   pull_request:
-    branches: ['105-implement-e2e-tests']
+    branches: ['main']
 
 jobs:
   test:
@@ -23,7 +23,7 @@ jobs:
     - name: 'Install Node'
       uses: actions/setup-node@v4
       with:
-        node-version: '20.11.0'
+        node-version: '20.12.2'
     - name: 'Install Deps'
       run: yarn 
     - name: 'Test'
