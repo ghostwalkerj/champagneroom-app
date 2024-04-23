@@ -24,8 +24,6 @@ const SocialMediaType = z.enum([
   'OTHER'
 ]);
 
-const tyope = SocialMediaType.enum;
-
 // Define the Mongoose model for 'Room'
 const roomSchema = z
   .object({
