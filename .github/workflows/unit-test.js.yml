@@ -25,6 +25,6 @@ jobs:
       with:
         node-version: '20.x'
     - name: 'Install Deps'
-      run: npm install
+      run: yarn 
     - name: 'Test'
-      run: npm test:unit
+      run: yarn test:unit
