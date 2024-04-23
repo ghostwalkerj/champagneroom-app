@@ -15,14 +15,16 @@ type RoomDocument = InstanceType<typeof Room>;
 
 // Define the social media type enum
 const SocialMediaType = z.enum([
-  'Facebook',
-  'Twitter',
-  'Instagram',
-  'LinkedIn',
-  'YouTube',
-  'TikTok',
-  'Other'
+  'FACEBOOK',
+  'TWITTER',
+  'INSTAGRAM',
+  'LINKEDIN',
+  'YOUTUBE',
+  'TIKTOK',
+  'OTHER'
 ]);
+
+const tyope = SocialMediaType.enum;
 
 // Define the Mongoose model for 'Room'
 const roomSchema = z
@@ -41,7 +43,9 @@ const roomSchema = z
       .toLowerCase()
       .min(5)
       .max(40)
-      .default(() => nanoid()),
+      .mongooseTypeOptions({
+        default: () => nanoid(12)
+      }),
     active: z.boolean().default(true),
     // Social media links with enum type
     socialMediaLinks: z
@@ -86,4 +90,4 @@ const Room = models?.Room
   : mongoose.model<RoomDocumentType>('Room', roomMongooseSchema);
 
 export type { RoomDocument, RoomDocumentType };
-export { Room, roomCRUDSchema, roomSchema };
+export { Room, SocialMediaType, roomCRUDSchema, roomSchema };
