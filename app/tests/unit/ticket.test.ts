@@ -5,13 +5,15 @@ import { generateSillyPassword } from 'silly-password-generator';
 
 import { Creator, type CreatorDocument } from '$lib/models/creator';
 import { Show, type ShowDocument } from '$lib/models/show';
+import { Ticket, type TicketDocument } from '$lib/models/ticket';
 import { User } from '$lib/models/user';
 import { Wallet } from '$lib/models/wallet';
 
-import { AuthType, ShowStatus, UserRole } from '$lib/constants';
+import { AuthType, CurrencyType, ShowStatus, UserRole } from '$lib/constants';
 
 let creator: CreatorDocument;
-describe('createShow', () => {
+let show: ShowDocument;
+describe('createTicket', () => {
   beforeEach(async () => {
     const wallet = new Wallet();
     await wallet.save();
@@ -31,12 +33,15 @@ describe('createShow', () => {
     }) as CreatorDocument;
 
     await creator.save();
-  });
-  it('inserts and reads a Show', async () => {
-    const show = (await Show.create({
+
+    show = (await Show.create({
       name: 'test123',
       creator: creator._id,
       agent: creator.agent,
+      price: {
+        amount: 100,
+        currency: CurrencyType.USD
+      },
       coverImageUrl: creator.user.profileImageUrl,
       showState: {
         status: ShowStatus.BOX_OFFICE_OPEN,
@@ -51,8 +56,25 @@ describe('createShow', () => {
         numberOfReviews: creator.feedbackStats.numberOfReviews
       }
     })) as ShowDocument;
+  });
+  it('inserts and reads a ticket', async () => {
+    const user = await User.create({
+      name: 'test123',
+      roles: [UserRole.TICKET_HOLDER],
+      authType: AuthType.PIN,
+      password: [1, 2, 5, 2, 3, 2, 4, 0].join('')
+    });
+
+    const ticket = (await Ticket.create({
+      user: user._id,
+      show: show._id,
+      agent: show.agent,
+      creator: show.creator,
+      price: show.price
+    })) as TicketDocument;
+
     // Check values
-    expect(show).toBeTruthy();
-    expect(show._id).toBeTruthy();
+    expect(ticket).toBeTruthy();
+    expect(ticket._id).toBeTruthy();
   });
 });

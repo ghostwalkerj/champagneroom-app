@@ -1,4 +1,4 @@
-import { env } from 'node:process';
+import 'dotenv/config';
 
 import { nanoid } from 'nanoid';
 import { generateSillyPassword } from 'silly-password-generator';
@@ -27,7 +27,7 @@ describe('createCreator', () => {
       roles: [UserRole.CREATOR],
       authType: AuthType.PATH_PASSWORD,
       secret: nanoid(),
-      password: `${password}${env.PASSWORD_SALT}`
+      password: `${password}${process.env.PASSWORD_SALT}`
     }) as UserDocument;
 
     await user.save();
@@ -73,7 +73,7 @@ describe('createCreator', () => {
         roles: [UserRole.CREATOR],
         authType: AuthType.PATH_PASSWORD,
         secret: nanoid(),
-        password: `${generateSillyPassword({ wordCount: 2 })}${env.PASSWORD_SALT}`
+        password: `${generateSillyPassword({ wordCount: 2 })}${process.env.PASSWORD_SALT}`
       }) as UserDocument;
       await creatorUser.save();
 
