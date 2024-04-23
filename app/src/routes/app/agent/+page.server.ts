@@ -153,9 +153,7 @@ export const actions: Actions = {
         secret,
         wallet: wallet._id,
         roles: [EntityType.CREATOR],
-        referralCode: nanoid(10),
-        password: `${password}${env.PASSWORD_SALT}`,
-        profileImageUrl: config.UI.defaultProfileImage
+        password: `${password}${env.PASSWORD_SALT}`
       });
       const creator = (await Creator.create({
         user: user._id,

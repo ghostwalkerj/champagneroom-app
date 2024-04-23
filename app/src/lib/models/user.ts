@@ -73,11 +73,13 @@ const userSchema = z
     referralCode: z
       .string()
       .max(50)
-      .min(8, 'Referral code is too short')
-      .default(nanoid(10))
+      .min(10, 'Referral code is too short')
       .mongooseTypeOptions({
         index: true,
         unique: true
+      })
+      .mongooseTypeOptions({
+        default: () => nanoid(12)
       }),
     referralCount: z.number().default(0),
     permissions: z.array(z.nativeEnum(PermissionType)).default([])

@@ -18,6 +18,7 @@ describe('createAgent', () => {
 
     await user.save();
 
+    // create Agent
     const agent = new Agent({
       user: user._id,
       defaultCommissionRate: 10

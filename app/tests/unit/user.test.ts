@@ -1,4 +1,4 @@
-import { env } from 'node:process';
+import 'dotenv/config';
 
 import { nanoid } from 'nanoid';
 import { generateSillyPassword } from 'silly-password-generator';
@@ -25,9 +25,7 @@ describe('createUser', () => {
       secret,
       wallet: wallet._id,
       roles: [EntityType.CREATOR],
-      referralCode: nanoid(10),
-      password: `${password}${env.PASSWORD_SALT}`,
-      profileImageUrl: config.UI.defaultProfileImage
+      password: `${password}${process.env.PASSWORD_SALT}`
     }) as UserDocument;
 
     await user.save();
@@ -41,11 +39,14 @@ describe('createUser', () => {
     expect(user.wallet).toBe(wallet._id);
     expect(user.profileImageUrl).toBe(config.UI.defaultProfileImage);
     expect(user.referralCode).toBeTruthy();
+    expect(user.referralCode?.length).toBeGreaterThanOrEqual(10);
 
     // Password should be hashed
-    expect(user.password).not.toEqual(`${password}${env.PASSWORD_SALT}`);
+    expect(user.password).not.toEqual(
+      `${password}${process.env.PASSWORD_SALT}`
+    );
     expect(
-      await user.comparePassword(`${password}${env.PASSWORD_SALT}`)
+      await user.comparePassword(`${password}${process.env.PASSWORD_SALT}`)
     ).toBeTruthy();
 
     // Check roles
