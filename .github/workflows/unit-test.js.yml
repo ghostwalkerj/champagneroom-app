@@ -2,9 +2,9 @@ name: 'Vitest'
 
 on:
   push:
-    branches: ['bugfix/failing-vitest-gh-action']
+    branches: ['105-implement-e2e-tests']
   pull_request:
-    branches: ['main']
+    branches: ['105-implement-e2e-tests']
 
 env:
   MONGO_DB_FIELD_SECRET: ${{secrets.MONGO_DB_FIELD_SECRET}}
@@ -28,6 +28,6 @@ jobs:
       with:
         node-version: '20.12.2'
     - name: 'Install Deps'
-      run: yarn 
+      run: yarn
     - name: 'Test'
       run: yarn test:unit
