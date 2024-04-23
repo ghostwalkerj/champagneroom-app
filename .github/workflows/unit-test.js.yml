@@ -8,6 +8,9 @@ on:
 
 jobs:
   test:
+    defaults:
+      run:
+        working-directory: ./app
     runs-on: ubuntu-latest
     permissions:
       # Required to checkout the code
