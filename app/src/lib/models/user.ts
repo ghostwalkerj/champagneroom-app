@@ -128,7 +128,6 @@ userMongooseSchema.pre(
     }
   }
 );
-userMongooseSchema;
 userMongooseSchema.pre('save', function (next) {
   if (this.password && this.isModified('password')) {
     bcrypt.hash(this.password, 10, (error, hash) => {
