@@ -30,6 +30,7 @@
     "vitest.config.ts",
     "postcss.config.cjs",
     "tailwind.config.cjs",
+    "vitest.workspace.ts",
     "globals.d.ts",
     "./setup/**/*.ts",
     "./scripts/**/*.ts",

@@ -3,16 +3,8 @@ import { defineConfig, type UserConfig } from 'vite';
 import EnvironmentPlugin from 'vite-plugin-environment';
 import mkcert from 'vite-plugin-mkcert';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
-import type { InlineConfig } from 'vitest';
 
-type ViteConfig = UserConfig & { test: InlineConfig };
-const config: ViteConfig = {
-  // other config
-  test: {
-      globals: true,
-      include: ['tests/unit/*.{test,spec}.ts'],
-      setupFiles: ['./setup/setupTests.ts', './setup/mongoMemoryServer.ts']
-    },
+const config: UserConfig = {
   mode: 'development',
 
   define: {
@@ -39,17 +31,18 @@ const config: ViteConfig = {
   ],
 
   resolve: {
-    alias:{
-            process: "process/browser",
-            stream: "stream-browserify",
-            assert: "assert",
-            http: "stream-http",
-            https: "https-browserify",
-            os: "os-browserify",
-            url: "url",
-            vm: 'vm-browserify'
-        },
+    alias: {
+      process: "process/browser",
+      stream: "stream-browserify",
+      assert: "assert",
+      http: "stream-http",
+      https: "https-browserify",
+      os: "os-browserify",
+      url: "url",
+      vm: 'vm-browserify'
+    },
   },
+
   build: {
     chunkSizeWarningLimit: 16000,
     rollupOptions: {
@@ -61,12 +54,14 @@ const config: ViteConfig = {
     minify: true,
     sourcemap: false,
   },
+
   server: {
     fs: {
       // Allow serving files from one level up to the project root
       allow: ['..']
     }
   },
+
   optimizeDeps: {
     exclude: ['@ethersproject/hash', 'wrtc'],
     include: ['@web3-onboard/core', 'js-sha3', '@ethersproject/bignumber'],
@@ -79,4 +74,5 @@ const config: ViteConfig = {
   },
 
 };
+
 export default defineConfig(config);

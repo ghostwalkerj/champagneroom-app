@@ -3126,7 +3126,7 @@
   dependencies:
     debug "^4.3.4"
 
-"@sveltejs/vite-plugin-svelte@^3.0.2":
+"@sveltejs/vite-plugin-svelte@^3.1.0":
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/@sveltejs/vite-plugin-svelte/-/vite-plugin-svelte-3.1.0.tgz#f9a1ff15e0206b4ed43fe06294d31b1319dcd654"
   integrity sha512-sY6ncCvg+O3njnzbZexcVtUqOBE3iYmQPJ9y+yXSkOwG576QI/xJrBnQSRXFLGwJNBa0T78JEKg5cIR0WOAuUw==
@@ -3184,7 +3184,7 @@
     lz-string "^1.5.0"
     pretty-format "^27.0.2"
 
-"@testing-library/jest-dom@*", "@testing-library/jest-dom@^6.1.6":
+"@testing-library/jest-dom@*", "@testing-library/jest-dom@^6.4.2":
   version "6.4.2"
   resolved "https://registry.yarnpkg.com/@testing-library/jest-dom/-/jest-dom-6.4.2.tgz#38949f6b63722900e2d75ba3c6d9bf8cffb3300e"
   integrity sha512-CzqH0AFymEMG48CpzXFriYYkOjk6ZGPCLMhW9e9jg3KMCn5OfJecF8GtGW7yGfR/IgCe3SX8BSwjdzI6BBbZLw==
@@ -3198,10 +3198,10 @@
     lodash "^4.17.15"
     redent "^3.0.0"
 
-"@testing-library/svelte@^4.0.5":
-  version "4.2.3"
-  resolved "https://registry.yarnpkg.com/@testing-library/svelte/-/svelte-4.2.3.tgz#bd0fd3dde5c63012da95d58ee640c0b44fd27a04"
-  integrity sha512-8vM2+JSPc6wZWkO9ICPmHvzacjy8jBw+iVjmNs+0VsPV3AO3v4P8qCLWTaQ9nYW/e+IR1BCy3MM3Uqg21dlBkw==
+"@testing-library/svelte@^5.0.1":
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@testing-library/svelte/-/svelte-5.0.1.tgz#2fd6327a14b0d72b3ddde975a20c7e725da3e30a"
+  integrity sha512-UP/n37BVDMLp9Ntlr7sYQ2jwOeFZR8bquesk9sCSjBGv/YmxuKrUuP+98KNGvEkW2uAep8rFKHgs9nRUJ40yXw==
   dependencies:
     "@testing-library/dom" "^9.3.1"
 
