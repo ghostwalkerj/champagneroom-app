@@ -6,7 +6,10 @@ export default defineWorkspace([
     test: {
       globals: true,
       include: ['tests/unit/*.{test,spec}.ts'],
-      setupFiles: ['./setup/setupTests.ts', './setup/mongoMemoryServer.ts'],
+      setupFiles: [
+        './tests/setup/setupTests.ts',
+        './tests/setup/mongoMemoryServer.ts'
+      ],
       name: 'unit',
       environment: 'node'
     }
@@ -14,9 +17,14 @@ export default defineWorkspace([
   {
     extends: './vite.config.ts',
     test: {
-      name: 'integration',
+      name: 'component',
       environment: 'node',
-      include: ['tests/integration/*.{test,spec}.ts'],
+      include: ['tests/component/*.{test,spec}.ts'],
+      setupFiles: [
+        './tests/setup/setupTests.ts',
+        './tests/setup/mongoMemoryServer.ts'
+      ],
+
       globals: true
     }
   },

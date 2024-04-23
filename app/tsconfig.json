@@ -13,7 +13,7 @@
     "ignoreDeprecations": "5.0",
     "moduleResolution": "bundler",
     "types": [
-      "vitest",
+      "vitest/globals",
       "@testing-library/jest-dom"
     ]
   }

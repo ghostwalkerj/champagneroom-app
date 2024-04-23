@@ -1,9 +1,7 @@
-import { afterEach } from 'node:test';
-
 import { MongoMemoryServer } from 'mongodb-memory-server';
 // tests/db-handler.js
 import mongoose from 'mongoose';
-import { afterAll, beforeAll } from 'vitest';
+import { afterAll, afterEach, beforeAll } from 'vitest';
 
 let mongod: MongoMemoryServer;
 
