@@ -66,8 +66,8 @@
     "@types/testing-library__jest-dom": "^6.0.0",
     "@types/ua-parser-js": "^0.7.36",
     "@types/validator": "^13.7.17",
-    "@typescript-eslint/eslint-plugin": "^7.7.0",
-    "@typescript-eslint/parser": "^7.7.0",
+    "@typescript-eslint/eslint-plugin": "^7.7.1",
+    "@typescript-eslint/parser": "^7.7.1",
     "@ucanto/core": "^10.0.0",
     "@ucanto/principal": "^9.0.1",
     "@unpic/svelte": "^0.0.51",
@@ -98,7 +98,7 @@
     "jsonwebtoken": "^9.0.2",
     "max-listeners-exceeded-warning": "^0.0.1",
     "module": "^1.2.5",
-    "mongodb-memory-server": "^9.1.8",
+    "mongodb-memory-server": "^9.2.0",
     "mongoose": "^8.3.2",
     "mongoose-autopopulate": "^1.1.0",
     "mongoose-field-encryption": "^7.0.1",
@@ -148,7 +148,7 @@
     "web3": "^4.8.0",
     "web3-validator": "^2.0.5",
     "xstate": "^4.38.3",
-    "zod": "^3.23.0"
+    "zod": "^3.23.2"
   },
   "type": "module",
   "dependencies": {
