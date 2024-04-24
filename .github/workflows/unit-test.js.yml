@@ -2,7 +2,7 @@ name: 'Vitest'
 
 on:
   push:
-    branches: ['bugfix/mongo-db-secret-github-action']
+    branches: ['main']
   pull_request:
     branches: ['main']
 
