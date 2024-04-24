@@ -28,15 +28,14 @@
   let signOut = config.PATH.signout;
   let accountUnsub: Unsubscriber;
 
-  if (!dev) {
-    const loadWidget = async () =>
-      await markerSDK.loadWidget({
-        project: '661cbad15bce4e725b80f521'
-      });
-    loadWidget();
-  }
-
   onMount(() => {
+    if (!dev) {
+      const loadWidget = async () =>
+        await markerSDK.loadWidget({
+          project: '661cbad15bce4e725b80f521'
+        });
+      loadWidget();
+    }
     accountUnsub = selectedAccount.subscribe((account) => {
       if (account && lastAddress && account.address !== lastAddress) {
         lastAddress = account.address;
