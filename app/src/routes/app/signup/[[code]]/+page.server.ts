@@ -118,15 +118,31 @@ export const actions: Actions = {
     try {
       const result = await createUser({ request, role: UserRole.CREATOR });
       if ('success' in result) {
+        const agentId = result.agentId || undefined;
+        const agent =
+          agentId &&
+          ((await Agent.findOne({ _id: agentId }).orFail(() => {
+            throw error(404, 'Agent not found');
+          })) as AgentDocument);
+        const commissionRate =
+          (agent && agent.defaultCommissionRate) ||
+          config.UI.defaultCommissionRate;
         Creator.create({
           user: result.user._id,
-          commissionRate: config.UI.defaultCommissionRate,
-          agent: result.agentId || undefined
+          commissionRate,
+          agent: agentId
         });
+
+        if (agent) {
+          User.updateOne(
+            { _id: agent.user._id },
+            { $inc: { referralCount: 1 } }
+          ).exec();
+        }
 
         return {
           success: true,
-          returnPath: config.PATH.agent
+          returnPath: config.PATH.creator
         };
       } else {
         return result;
