@@ -2675,15 +2675,15 @@
   resolved "https://registry.yarnpkg.com/@sinclair/typebox/-/typebox-0.31.28.tgz#b68831e7bc7d09daac26968ea32f42bedc968ede"
   integrity sha512-/s55Jujywdw/Jpan+vsy6JZs1z2ZTGxTmbZTPiuSL2wz9mfzA2gN1zzaqmvfi4pq+uOt7Du85fkiwv5ymW84aQ==
 
-"@sinclair/typebox@^0.32.20":
+"@sinclair/typebox@^0.32.22":
   version "0.32.22"
   resolved "https://registry.yarnpkg.com/@sinclair/typebox/-/typebox-0.32.22.tgz#209a323740911305b929d5ad960a21d19ba52cea"
   integrity sha512-4uH8BLhNbptL2UkfS/a63tQ6uZGGZ4DT6zFq7ZkE+KQi7/56ZYkkWniAqz4bUr4cZGfoR83zRvSh39ZpH8DKDw==
 
 "@skeletonlabs/skeleton@^2.9.1":
-  version "2.9.1"
-  resolved "https://registry.yarnpkg.com/@skeletonlabs/skeleton/-/skeleton-2.9.1.tgz#e97db5246d32677c078230bdec76d65320d05d03"
-  integrity sha512-cWDYfhZ8kIahPxvoT9xmwb3utIgtDpVQddNoQHnssxZZbqefl5z3cvWbuvvqEjewDxwKq4Zw4MtPcaT9nxojmQ==
+  version "2.9.2"
+  resolved "https://registry.yarnpkg.com/@skeletonlabs/skeleton/-/skeleton-2.9.2.tgz#775f5faa0c6adbf2a6709ec5ab0b3a17e7551514"
+  integrity sha512-yBRSyxx9eyLsQXqEuYb5YyqE+CY+IfyTroaqfQ4OmqDcIulMivqU7lY58bmLMGHC/g9lzliFkeY4UO4ssaWVpA==
   dependencies:
     esm-env "1.0.0"
 
@@ -3126,7 +3126,7 @@
   dependencies:
     debug "^4.3.4"
 
-"@sveltejs/vite-plugin-svelte@^3.0.2":
+"@sveltejs/vite-plugin-svelte@^3.1.0":
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/@sveltejs/vite-plugin-svelte/-/vite-plugin-svelte-3.1.0.tgz#f9a1ff15e0206b4ed43fe06294d31b1319dcd654"
   integrity sha512-sY6ncCvg+O3njnzbZexcVtUqOBE3iYmQPJ9y+yXSkOwG576QI/xJrBnQSRXFLGwJNBa0T78JEKg5cIR0WOAuUw==
@@ -3184,7 +3184,7 @@
     lz-string "^1.5.0"
     pretty-format "^27.0.2"
 
-"@testing-library/jest-dom@*", "@testing-library/jest-dom@^6.1.6":
+"@testing-library/jest-dom@*", "@testing-library/jest-dom@^6.4.2":
   version "6.4.2"
   resolved "https://registry.yarnpkg.com/@testing-library/jest-dom/-/jest-dom-6.4.2.tgz#38949f6b63722900e2d75ba3c6d9bf8cffb3300e"
   integrity sha512-CzqH0AFymEMG48CpzXFriYYkOjk6ZGPCLMhW9e9jg3KMCn5OfJecF8GtGW7yGfR/IgCe3SX8BSwjdzI6BBbZLw==
@@ -3198,10 +3198,10 @@
     lodash "^4.17.15"
     redent "^3.0.0"
 
-"@testing-library/svelte@^4.0.5":
-  version "4.2.3"
-  resolved "https://registry.yarnpkg.com/@testing-library/svelte/-/svelte-4.2.3.tgz#bd0fd3dde5c63012da95d58ee640c0b44fd27a04"
-  integrity sha512-8vM2+JSPc6wZWkO9ICPmHvzacjy8jBw+iVjmNs+0VsPV3AO3v4P8qCLWTaQ9nYW/e+IR1BCy3MM3Uqg21dlBkw==
+"@testing-library/svelte@^5.0.1":
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@testing-library/svelte/-/svelte-5.0.1.tgz#2fd6327a14b0d72b3ddde975a20c7e725da3e30a"
+  integrity sha512-UP/n37BVDMLp9Ntlr7sYQ2jwOeFZR8bquesk9sCSjBGv/YmxuKrUuP+98KNGvEkW2uAep8rFKHgs9nRUJ40yXw==
   dependencies:
     "@testing-library/dom" "^9.3.1"
 
@@ -6439,7 +6439,7 @@ detect-newline@2.X:
   resolved "https://registry.yarnpkg.com/detect-newline/-/detect-newline-2.1.0.tgz#f41f1c10be4b00e87b5f13da680759f2c5bfd3e2"
   integrity sha512-CwffZFvlJffUg9zZA0uqrjQayUTC8ob94pnr5sFwaVv3IOmkfUHcWH+jXaQK3askE51Cqe8/9Ql/0uXNwqZ8Zg==
 
-devalue@^4.3.2:
+devalue@^4.3.3:
   version "4.3.3"
   resolved "https://registry.yarnpkg.com/devalue/-/devalue-4.3.3.tgz#e35df3bdc49136837e77986f629b9fa6fef50726"
   integrity sha512-UH8EL6H2ifcY8TbD2QsxwCC/pr5xSwPvv85LrLXVihmHVC3T3YqTCIwnR5ak0yO1KYqlxrPVOA/JVZJYPy2ATg==
@@ -6979,9 +6979,9 @@ eslint-plugin-sort-exports@^0.9.1:
     minimatch "^9.0.3"
 
 eslint-plugin-svelte@^2.37.0:
-  version "2.37.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-svelte/-/eslint-plugin-svelte-2.37.0.tgz#70db1bcceab89b59dd908da5c45654a9e3c6640b"
-  integrity sha512-H/2Gz7agYHEMEEzRuLYuCmAIdjuBnbhFG9hOK0yCdSBvvJGJMkjo+lR6j67OIvLOavgp4L7zA5LnDKi8WqdPhQ==
+  version "2.38.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-svelte/-/eslint-plugin-svelte-2.38.0.tgz#4a3ae9ab9daa32da54227a9734aaf401a2175d9e"
+  integrity sha512-IwwxhHzitx3dr0/xo0z4jjDlb2AAHBPKt+juMyKKGTLlKi1rZfA4qixMwnveU20/JTHyipM6keX4Vr7LZFYc9g==
   dependencies:
     "@eslint-community/eslint-utils" "^4.4.0"
     "@jridgewell/sourcemap-codec" "^1.4.15"
@@ -6994,7 +6994,7 @@ eslint-plugin-svelte@^2.37.0:
     postcss-safe-parser "^6.0.0"
     postcss-selector-parser "^6.0.16"
     semver "^7.6.0"
-    svelte-eslint-parser ">=0.34.0 <1.0.0"
+    svelte-eslint-parser ">=0.35.0 <1.0.0"
 
 eslint-plugin-unicorn@^52.0.0:
   version "52.0.0"
@@ -8998,10 +8998,10 @@ joi@17.9.1:
     "@sideway/formula" "^3.0.1"
     "@sideway/pinpoint" "^2.0.0"
 
-joi@^17.12.3:
-  version "17.12.3"
-  resolved "https://registry.yarnpkg.com/joi/-/joi-17.12.3.tgz#944646979cd3b460178547b12ba37aca8482f63d"
-  integrity sha512-2RRziagf555owrm9IRVtdKynOBeITiDpuZqIpgwqXShPncPKNiRQoiGsl/T8SQdq+8ugRzH2LqY67irr2y/d+g==
+joi@^17.13.0:
+  version "17.13.0"
+  resolved "https://registry.yarnpkg.com/joi/-/joi-17.13.0.tgz#b6f340b8029ee7af2397f821d17a4f03bf34b043"
+  integrity sha512-9qcrTyoBmFZRNHeVP4edKqIUEgFzq7MHvTNSDuHSqkpOPtiBkgNgcmTSqmiw1kw9tdKaiddvIDv/eCJDxmqWCA==
   dependencies:
     "@hapi/hoek" "^9.3.0"
     "@hapi/topo" "^5.1.0"
@@ -12732,10 +12732,10 @@ svelte-check@^3.6.9:
     svelte-preprocess "^5.1.3"
     typescript "^5.0.3"
 
-"svelte-eslint-parser@>=0.34.0 <1.0.0":
-  version "0.34.1"
-  resolved "https://registry.yarnpkg.com/svelte-eslint-parser/-/svelte-eslint-parser-0.34.1.tgz#bc6e8772a022af99bc3135ad7d41ec90a33743d8"
-  integrity sha512-9+uLA1pqI9AZioKVGJzYYmlOZWxfoCXSbAM9iaNm7H01XlYlzRTtJfZgl9o3StQGN41PfGJIbkKkfk3e/pHFfA==
+"svelte-eslint-parser@>=0.35.0 <1.0.0":
+  version "0.35.0"
+  resolved "https://registry.yarnpkg.com/svelte-eslint-parser/-/svelte-eslint-parser-0.35.0.tgz#b4c5c0fa55b0548c4a7325dbeef04da4d2ab026c"
+  integrity sha512-CtbPseajW0gjwEvHiuzYJkPDjAcHz2FaHt540j6RVYrZgnE6xWkzUBodQ4I3nV+G5AS0Svt8K6aIA/CIU9xT2Q==
   dependencies:
     eslint-scope "^7.2.2"
     eslint-visitor-keys "^3.4.3"
@@ -12816,26 +12816,26 @@ svelte@^4.2.15:
     periscopic "^3.1.0"
 
 sveltekit-superforms@^2.12.5:
-  version "2.12.5"
-  resolved "https://registry.yarnpkg.com/sveltekit-superforms/-/sveltekit-superforms-2.12.5.tgz#b9655eca197d1ea5617261347e53d01dc5bfce1e"
-  integrity sha512-p8qHNsMcPoB1mgTU8catzID8HJmxIK9ozRbGrv50Jk/XPotOjn5zTvW/stkVDBDL/tPLz0vfw+2PNbkkHCdhlw==
+  version "2.12.6"
+  resolved "https://registry.yarnpkg.com/sveltekit-superforms/-/sveltekit-superforms-2.12.6.tgz#2bfe6ca17d2a63806bfaa7c1c08f81b154088915"
+  integrity sha512-qVA6HjD+WlPughk+YGGWXTY5lIvNP8JUoEK4TqzLhDkC8j6y0d2aB7ofgzqpkvY7nV77aNG3erP/qxr2DzBJEg==
   dependencies:
-    devalue "^4.3.2"
+    devalue "^4.3.3"
     just-clone "^6.2.0"
     memoize-weak "^1.0.2"
     ts-deepmerge "^7.0.0"
   optionalDependencies:
     "@gcornut/valibot-json-schema" "^0.0.27"
-    "@sinclair/typebox" "^0.32.20"
+    "@sinclair/typebox" "^0.32.22"
     "@sodaru/yup-to-json-schema" "^2.0.1"
     "@vinejs/vine" "^1.8.0"
     arktype "1.0.29-alpha"
-    joi "^17.12.3"
+    joi "^17.13.0"
     superstruct "^1.0.4"
     valibot "^0.30.0"
     yup "^1.4.0"
-    zod "^3.22.4"
-    zod-to-json-schema "^3.22.5"
+    zod "^3.23.4"
+    zod-to-json-schema "^3.23.0"
 
 swagger2openapi@^7.0.8:
   version "7.0.8"
@@ -14404,20 +14404,20 @@ yup@^1.4.0:
     toposort "^2.0.2"
     type-fest "^2.19.0"
 
-zod-to-json-schema@^3.22.5:
-  version "3.22.5"
-  resolved "https://registry.yarnpkg.com/zod-to-json-schema/-/zod-to-json-schema-3.22.5.tgz#3646e81cfc318dbad2a22519e5ce661615418673"
-  integrity sha512-+akaPo6a0zpVCCseDed504KBJUQpEW5QZw7RMneNmKw+fGaML1Z9tUNLnHHAC8x6dzVRO1eB2oEMyZRnuBZg7Q==
+zod-to-json-schema@^3.23.0:
+  version "3.23.0"
+  resolved "https://registry.yarnpkg.com/zod-to-json-schema/-/zod-to-json-schema-3.23.0.tgz#4fc60e88d3c709eedbfaae3f92f8a7bf786469f2"
+  integrity sha512-az0uJ243PxsRIa2x1WmNE/pnuA05gUq/JB8Lwe1EDCCL/Fz9MgjYQ0fPlyc2Tcv6aF2ZA7WM5TWaRZVEFaAIag==
 
-zod@^3.21.4, zod@^3.22.4:
+zod@^3.21.4:
   version "3.23.0"
   resolved "https://registry.yarnpkg.com/zod/-/zod-3.23.0.tgz#a25dab5052702834233e0041e9dd8b6a8480e744"
   integrity sha512-OFLT+LTocvabn6q76BTwVB0hExEBS0IduTr3cqZyMqEDbOnYmcU+y0tUAYbND4uwclpBGi4I4UUBGzylWpjLGA==
 
-zod@^3.23.2:
-  version "3.23.2"
-  resolved "https://registry.yarnpkg.com/zod/-/zod-3.23.2.tgz#d6153ce2cf5231e21e48f0d46b6079dad1313982"
-  integrity sha512-sN5ZilVfsEfag2VU6qmmgN+33nwa/nVQMztlm865jJRBJYU2yrM0L7xHIiaW+bnVqHn0V/a8MUF9FCw2H5q4tA==
+zod@^3.23.2, zod@^3.23.4:
+  version "3.23.4"
+  resolved "https://registry.yarnpkg.com/zod/-/zod-3.23.4.tgz#c63805b2f39e10d4ab3d55eb3c8cdb472c79dfb1"
+  integrity sha512-/AtWOKbBgjzEYYQRNfoGKHObgfAZag6qUJX1VbHo2PRBgS+wfWagEY2mizjfyAPcGesrJOcx/wcl0L9WnVrHFw==
 
 zxcvbn@^4.4.2:
   version "4.4.2"

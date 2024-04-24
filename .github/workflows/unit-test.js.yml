@@ -32,6 +32,6 @@ jobs:
         echo "MONGO_DB_FIELD_SECRET=$MONGO_DB_FIELD_SECRET" > .env
         cat .env
     - name: 'Install Deps'
-      run: yarn 
+      run: yarn
     - name: 'Test'
       run: yarn test:unit

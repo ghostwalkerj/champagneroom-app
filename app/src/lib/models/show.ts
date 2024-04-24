@@ -129,6 +129,7 @@ const showZodMongooseSchema = toZodMongooseSchema(showSchema, {
 });
 
 const showMongooseSchema = toMongooseSchema(showZodMongooseSchema);
+
 const Show = pkg.models.Show ?? pkg.model('Show', showMongooseSchema);
 
 type ShowDocument = InstanceType<typeof Show>;
