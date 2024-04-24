@@ -3,6 +3,7 @@
 </p>
 
 # Champagne Room
+[![Vitest](https://github.com/Champagne-Group/champagneroom-app/actions/workflows/unit-test.js.yml/badge.svg?branch=main)](https://github.com/Champagne-Group/champagneroom-app/actions/workflows/unit-test.js.yml)
 
 ## Overview
 Champagne Room is a cutting-edge web 3.0 platform revolutionizing NSFW experiences, designed to facilitate secure, one-on-one interactions using cryptocurrency for enhanced privacy and security. It redefines adult entertainment with a focus on anonymity, safety, and user privacy.
