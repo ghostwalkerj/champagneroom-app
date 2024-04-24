@@ -5,6 +5,8 @@ import parseArgv from 'tiny-parse-argv';
 
 import Config from '../src/lib/config';
 import { AuthType, UserRole } from '../src/lib/constants';
+import { Agent } from '../src/lib/models/agent';
+import { Creator } from '../src/lib/models/creator';
 import { Operator } from '../src/lib/models/operator';
 import { User } from '../src/lib/models/user';
 import { Wallet } from '../src/lib/models/wallet';
@@ -25,11 +27,19 @@ const user = await User.create({
   address: address.toLocaleLowerCase(),
   authType: AuthType.SIGNING,
   name: 'Operator',
-  roles: [UserRole.OPERATOR],
+  roles: [UserRole.OPERATOR, UserRole.AGENT, UserRole.CREATOR],
   permissions: Config.DEFAULT_PERMISSIONS[UserRole.OPERATOR]
 });
 
 const operator = await Operator.create({
+  user: user._id
+});
+
+await Agent.create({
+  user: user._id
+});
+
+await Creator.create({
   user: user._id
 });
 
