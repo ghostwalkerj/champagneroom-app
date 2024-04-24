@@ -2,9 +2,9 @@ name: 'Vitest'
 
 on:
   push:
-    branches: ['105-implement-e2e-tests']
+    branches: ['main']
   pull_request:
-    branches: ['105-implement-e2e-tests']
+    branches: ['main']
 
 env:
   MONGO_DB_FIELD_SECRET: ${{secrets.MONGO_DB_FIELD_SECRET}}
@@ -27,6 +27,10 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '20.12.2'
+    - name: "Setting environment variables"
+      run: |
+        echo "MONGO_DB_FIELD_SECRET=$MONGO_DB_FIELD_SECRET" > .env
+        cat .env
     - name: 'Install Deps'
       run: yarn
     - name: 'Test'
