@@ -1,6 +1,6 @@
 <script lang="ts">
   import { popup, type PopupSettings } from '@skeletonlabs/skeleton';
-  import { copy, type CopyDetail } from '@svelte-put/copy';
+  import { copy } from '@svelte-put/copy';
 
   export let copyValue = '';
 
@@ -11,7 +11,7 @@
   };
 
   $: copied = false;
-  async function handleCopied(e: CustomEvent<CopyDetail>) {
+  async function handleCopied() {
     copied = true;
     const clipboardItem = new ClipboardItem({
       'text/plain': new Blob([copyValue], { type: 'text/plain' }),
@@ -24,14 +24,9 @@
   }
 </script>
 
-{#if copied}
-  <div
-    class="neon-primary bg-custom border-primary-content rounded border-2 p-4"
-    data-popup="popupHover"
-  >
-    {copyValue}
-  </div>
-{/if}
+<div class="card variant-filled-secondary p-4 text-xs" data-popup="popupHover">
+  <p>Click to copy</p>
+</div>
 
 {#if copied}
   <span class="text-success-500">Copied!</span>
