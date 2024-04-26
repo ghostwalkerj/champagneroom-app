@@ -39,7 +39,7 @@ const config: UserConfig = {
       https: "https-browserify",
       os: "os-browserify",
       url: "url",
-      vm: 'vm-browserify'
+      vm: 'vm-browserify',
     },
   },
 

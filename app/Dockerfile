@@ -1,5 +1,5 @@
 # Our Node base image
-FROM node:20.11.0
+FROM node:20.12.2-bullseye-slim
 
 # Set the Node environment to development to ensure all packages are installed
 ENV NODE_ENV development
@@ -25,10 +25,8 @@ COPY . .
 RUN set -ex; \
   bun install; \
   bun pm cache rm; \
-  bun run package;\
-  bun run build
-
-# COPY .env.stage .env
+  bun run build; \
+  bun run package;
 
 # Expose port 3000 for the SvelteKit app and 24678 for Vite's HMR
 EXPOSE 3000

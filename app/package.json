@@ -12,7 +12,7 @@
     "crypto"
   ],
   "engines": {
-    "node": "20.12.2"
+    "node": "^20.12.2"
   },
   "exports": {
     ".": {
@@ -40,7 +40,6 @@
   "devDependencies": {
     "@floating-ui/dom": "^1.5.4",
     "@iconify/svelte": "^3.1.6",
-    "@ipld/car": "^5.2.6",
     "@marker.io/browser": "^0.19.0",
     "@metamask/jazzicon": "^2.0.0",
     "@playwright/test": "^1.43.1",
