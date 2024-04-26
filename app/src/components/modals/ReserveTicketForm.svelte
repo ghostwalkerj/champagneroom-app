@@ -108,7 +108,7 @@
           >
           {#if $message}
             <br />
-            <p class="mt-2 text-error">{$message}</p>
+            <p class="text-error mt-2">{$message}</p>
           {/if}
         </footer>
       </div>

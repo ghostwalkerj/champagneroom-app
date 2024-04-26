@@ -353,7 +353,11 @@
                                   >
 
                                   <button
+<<<<<<< Updated upstream
                                     class="variant-outline-secondary btn btn-sm text-secondary-500"
+=======
+                                    class="text-secondary variant-outline-secondary btn btn-sm"
+>>>>>>> Stashed changes
                                     on:click={() =>
                                       modalStore.trigger(changeSecretModal)}
                                   >
@@ -419,7 +423,11 @@
                               {#if canImpersonate}
                                 <td>
                                   <button
+<<<<<<< Updated upstream
                                     class="variant-outline-primary btn btn-sm text-primary-500"
+=======
+                                    class="text-primary variant-outline-primary btn btn-sm"
+>>>>>>> Stashed changes
                                     disabled={!canImpersonate}
                                     on:click={() =>
                                       impersonate(creator.user._id.toString())}
