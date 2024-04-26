@@ -2,5 +2,5 @@
 .vscode
 .env
 .env.dev
-buikd
+build
 .yarn
