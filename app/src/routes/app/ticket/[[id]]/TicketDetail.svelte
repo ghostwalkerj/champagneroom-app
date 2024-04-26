@@ -61,7 +61,11 @@
         <div class="absolute inset-0 flex items-center justify-center">
           <div class="w-fit animate-pulse">
             <div
+<<<<<<< Updated upstream
               class="-rotate-45 whitespace-nowrap rounded-xl p-2 font-bold text-primary-500 ring-2 ring-inset ring-primary-500"
+=======
+              class="text-primary ring-primary -rotate-45 whitespace-nowrap rounded-xl p-2 font-bold ring-2 ring-inset"
+>>>>>>> Stashed changes
             >
               {creatorName}
             </div>
@@ -71,12 +75,20 @@
 
       <!-- Content Section: Take full width on mobile, 3/5th on medium and larger screens -->
       <div
+<<<<<<< Updated upstream
         class="relative col-span-2 flex h-full flex-col place-content-center p-4 text-sm font-bold text-secondary-500 md:col-span-3"
+=======
+        class="text-info relative col-span-2 flex h-full flex-col place-content-center p-4 text-sm font-bold md:col-span-3"
+>>>>>>> Stashed changes
       >
         <!-- Ticket Status Overlays -->
         {#if ticket.ticketState.status === TicketStatus.CANCELLED || ticket.ticketState.status === TicketStatus.FINALIZED}
           <div
+<<<<<<< Updated upstream
             class="bg-base-200 absolute left-1/2 top-4 z-20 -translate-x-1/2 transform whitespace-normal rounded-xl p-2 text-xl font-extrabold text-primary-500 opacity-70 ring-2 ring-inset ring-primary-500 lg:text-2xl"
+=======
+            class="bg-base-200 text-primary ring-primary absolute left-1/2 top-4 z-20 -translate-x-1/2 transform whitespace-normal rounded-xl p-2 text-xl font-extrabold opacity-70 ring-2 ring-inset lg:text-2xl"
+>>>>>>> Stashed changes
           >
             {ticket.ticketState.status === TicketStatus.CANCELLED
               ? 'Ticket Cancelled'
@@ -104,7 +116,11 @@
         class="relative col-span-2 flex items-center border-t-2 border-dashed pb-4 md:col-span-1 md:border-l-2 md:border-t-0 md:pb-0"
       >
         <!-- Added dashed border -->
+<<<<<<< Updated upstream
         <div class="m-auto font-bold text-secondary-500">
+=======
+        <div class="text-info m-auto font-bold">
+>>>>>>> Stashed changes
           <div class="p-2 text-xl"><a href={showUrl}>{showName}</a></div>
           <div class="text-sm">Duration: {showDuration}</div>
           <div class="text-sm">Price: {ticketPrice}{currency}</div>

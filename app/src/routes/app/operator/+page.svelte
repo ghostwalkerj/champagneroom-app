@@ -470,7 +470,11 @@
                               {#if canImpersonateAgent}
                                 <td>
                                   <button
+<<<<<<< Updated upstream
                                     class="variant-outline-primary btn btn-sm text-primary-500"
+=======
+                                    class="text-primary variant-outline-primary btn btn-sm"
+>>>>>>> Stashed changes
                                     disabled={!canImpersonateAgent}
                                     on:click={() =>
                                       impersonate(agent.user._id.toString())}
@@ -654,7 +658,11 @@
                                     class="anchor mr-2">Secret Url</CopyText
                                   >
                                   <button
+<<<<<<< Updated upstream
                                     class="variant-outline-secondary btn btn-sm text-secondary-500"
+=======
+                                    class="text-secondary variant-outline-secondary btn btn-sm"
+>>>>>>> Stashed changes
                                     on:click={() =>
                                       modalStore.trigger(changeSecretModal)}
                                   >
@@ -720,7 +728,11 @@
                               {#if canImpersonateCreator}
                                 <td
                                   ><button
+<<<<<<< Updated upstream
                                     class="variant-outline-primary btn btn-sm text-primary-500"
+=======
+                                    class="text-primary variant-outline-primary btn btn-sm"
+>>>>>>> Stashed changes
                                     disabled={!canImpersonateCreator}
                                     on:click={() =>
                                       impersonate(creator.user._id.toString())}

@@ -6,7 +6,11 @@
 
 <div id="Token" class="container mx-auto pt-20">
   <h2
+<<<<<<< Updated upstream
     class="mb-10 text-center font-CaviarDreams text-[32px] font-bold text-primary-500 lg:text-[41px]"
+=======
+    class="text-primary mb-10 text-center font-CaviarDreams text-[32px] font-bold lg:text-[41px]"
+>>>>>>> Stashed changes
   >
     CHAMPAGNE ROOM Token
   </h2>
@@ -16,7 +20,11 @@
   <div class="mx-auto flex flex-col items-center lg:flex-row">
     <div class="w-full px-4">
       <h2
+<<<<<<< Updated upstream
         class="mb-6 text-center font-CaviarDreams text-3xl font-bold leading-none text-secondary-500 lg:text-left lg:text-[41px]"
+=======
+        class="text-info mb-6 text-center font-CaviarDreams text-3xl font-bold leading-none lg:text-left lg:text-[41px]"
+>>>>>>> Stashed changes
       >
         CRT Tokenomics
       </h2>

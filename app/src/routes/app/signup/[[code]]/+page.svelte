@@ -140,12 +140,20 @@
             >. After you create a wallet, you'll be able to sign up with it by
             connecting it to Champagne Room.
           {:else}
+<<<<<<< Updated upstream:app/src/routes/app/signup/[[code]]/+page.svelte
             <div class="text-2xl font-bold text-primary-500">
+=======
+            <div class="text-primary text-2xl font-bold">
+>>>>>>> Stashed changes:app/src/routes/app/signup/+page.svelte
               Wallet is connected, continue to next step.
             </div>{/if}
         </Step>
         <Step>
+<<<<<<< Updated upstream:app/src/routes/app/signup/[[code]]/+page.svelte
           <div class="text-2xl font-bold text-primary-500">
+=======
+          <div class="text-primary text-2xl font-bold">
+>>>>>>> Stashed changes:app/src/routes/app/signup/+page.svelte
             Sign up with this address
           </div>
           <div class="text-md text-secondary-500">
@@ -201,7 +209,11 @@
                   >
                     <Icon
                       width="24"
+<<<<<<< Updated upstream:app/src/routes/app/signup/[[code]]/+page.svelte
                       class="-mb-1 text-primary-500"
+=======
+                      class="text-primary -mb-1"
+>>>>>>> Stashed changes:app/src/routes/app/signup/+page.svelte
                       icon="mdi:money-100"
                     />&nbsp;Earn money by selling your content
                   </div>
@@ -243,7 +255,11 @@
                   </h2>
                   <div class="text-bold text-md flex w-full justify-center">
                     <Icon
+<<<<<<< Updated upstream:app/src/routes/app/signup/[[code]]/+page.svelte
                       class="-mb-1 text-secondary-500"
+=======
+                      class="text-secondary -mb-1"
+>>>>>>> Stashed changes:app/src/routes/app/signup/+page.svelte
                       width="24"
                       icon="bi:coin"
                     /> &nbsp;Earn commissions from your creators

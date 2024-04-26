@@ -79,7 +79,11 @@
     <div class="text-xl font-semibold">
       {#if $selectedAccount}
         <div class=" flex items-center gap-2">
+<<<<<<< Updated upstream
           <span class="h-3 w-3 rounded-full bg-primary-500" />
+=======
+          <span class="bg-primary h-3 w-3 rounded-full" />
+>>>>>>> Stashed changes
           {#if !$page.data.user?.name}
             <span>Wallet Connected</span>
           {/if}

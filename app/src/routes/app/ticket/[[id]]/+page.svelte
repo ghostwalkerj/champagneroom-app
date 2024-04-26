@@ -298,7 +298,11 @@
         {/key}
         {#if canWatchShow && hasShowStarted}
           <div
+<<<<<<< Updated upstream
             class="bg-base-200/50 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-6 transform whitespace-nowrap rounded-xl p-2 text-2xl font-extrabold text-primary-500 ring-2 ring-inset ring-primary-500 lg:text-4xl"
+=======
+            class="bg-base-200/50 text-primary ring-primary absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-6 transform whitespace-nowrap rounded-xl p-2 text-2xl font-extrabold ring-2 ring-inset lg:text-4xl"
+>>>>>>> Stashed changes
           >
             <button
               class="variant-filled-secondary btn"
@@ -310,7 +314,11 @@
           </div>
         {:else if isWaitingForShow}
           <div
+<<<<<<< Updated upstream
             class="bg-base-200/50 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-6 transform whitespace-nowrap rounded-xl p-2 text-2xl font-extrabold text-primary-500 ring-2 ring-inset ring-primary-500 lg:text-4xl"
+=======
+            class="bg-base-200/50 text-primary ring-primary absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-6 transform whitespace-nowrap rounded-xl p-2 text-2xl font-extrabold ring-2 ring-inset lg:text-4xl"
+>>>>>>> Stashed changes
           >
             Waiting for Show to Start
           </div>
@@ -325,7 +333,11 @@
           {/key}
           {#if hasPaymentSent}
             <div
+<<<<<<< Updated upstream
               class="bg-base-200/50 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-45 transform whitespace-nowrap rounded-xl p-2 text-2xl font-extrabold text-primary-500 ring-2 ring-inset ring-primary-500 lg:text-3xl"
+=======
+              class="bg-base-200/50 text-primary ring-primary absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-45 transform whitespace-nowrap rounded-xl p-2 text-2xl font-extrabold ring-2 ring-inset lg:text-3xl"
+>>>>>>> Stashed changes
             >
               Waiting for Payment Confirmations
             </div>

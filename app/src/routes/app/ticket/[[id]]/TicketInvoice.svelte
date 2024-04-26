@@ -77,7 +77,11 @@
       class="h-12"
     />
     <span
+<<<<<<< Updated upstream
       class="text-info-500 absolute left-1/2 -translate-x-1/2 transform text-xl font-bold"
+=======
+      class="text-info absolute left-1/2 -translate-x-1/2 transform text-xl font-bold"
+>>>>>>> Stashed changes
       >Invoice</span
     >
     <!-- Centered Title -->
@@ -86,14 +90,22 @@
   <!-- Invoice Status Tag -->
   {#if invoice.status === InvoiceStatus.EXPIRED || invoice.status === InvoiceStatus.COMPLETE || invoice.status === InvoiceStatus.INVALID || invoice.status === InvoiceStatus.REFUNDED}
     <div
+<<<<<<< Updated upstream
       class="absolute right-4 top-4 rounded-lg bg-gray-100 bg-opacity-50 p-1 text-xs font-bold capitalize text-secondary-500 lg:p-2 lg:text-sm xl:p-3 xl:text-surface-500"
+=======
+      class="text-info absolute right-4 top-4 rounded-lg bg-gray-100 bg-opacity-50 p-1 text-xs font-bold capitalize lg:p-2 lg:text-sm xl:p-3 xl:text-base"
+>>>>>>> Stashed changes
     >
       {invoiceStatus}
     </div>
   {/if}
 
   <!-- Invoice Content -->
+<<<<<<< Updated upstream
   <div class="text-info-500 p-4">
+=======
+  <div class="text-info p-4">
+>>>>>>> Stashed changes
     <div class="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
       <div>
         <span class="text-sm font-bold">Date: </span>
