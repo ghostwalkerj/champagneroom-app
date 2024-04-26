@@ -23,10 +23,8 @@ COPY . .
 # bun build
 RUN set -ex; \
   yarn install; \
-  yarn package;\
-  yarn build
-
-# COPY .env.stage .env
+  yarn build; \
+  yarn package;
 
 # Expose port 3000 for the SvelteKit app and 24678 for Vite's HMR
 EXPOSE 3000
