@@ -1,11 +1,11 @@
 <script lang="ts">
   import Icon from '@iconify/svelte';
   import {
+    getModalStore,
+    type ModalSettings,
     Ratings,
     Tab,
-    TabGroup,
-    getModalStore,
-    type ModalSettings
+    TabGroup
   } from '@skeletonlabs/skeleton';
   import type { ActionResult } from '@sveltejs/kit';
   import { onDestroy, onMount } from 'svelte';

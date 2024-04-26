@@ -130,6 +130,7 @@
           copyValue={referralUrl}
           class="neon-primary anchor variant-soft-primary mb-1 font-semibold"
         >
+          <div slot="hoverText">Click to copy referral url</div>
           {referralCode}
         </CopyText>
       </div>

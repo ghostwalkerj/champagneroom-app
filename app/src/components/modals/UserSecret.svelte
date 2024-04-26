@@ -43,6 +43,8 @@
     <h3 class="my-6 text-center text-lg font-bold">{user.name}</h3>
     <div class="flex w-full place-content-center">
       <CopyText copyValue={copyText}>
+        <div slot="hoverText">Click to copy and share</div>
+
         <div class="text-center">
           Password:
           <div class="text-center text-lg font-bold">{password}</div>
