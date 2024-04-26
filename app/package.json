@@ -159,7 +159,6 @@
     "@web3-onboard/ledger": "^2.6.0",
     "@web3-onboard/trezor": "^2.4.4",
     "@web3-onboard/walletconnect": "^2.5.5",
-    "aws-sdk": "^2.1608.0",
     "bullmq": "^5.7.6",
     "express": "^4.19.2",
     "express-basic-auth": "^1.2.1",
