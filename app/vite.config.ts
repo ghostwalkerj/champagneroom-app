@@ -16,7 +16,7 @@ const config: UserConfig = {
     mkcert(),
     EnvironmentPlugin(['MONGO_DB_FIELD_SECRET']),
     nodePolyfills({
-      include: ['path', 'stream', 'util'],
+      include: ['path', 'stream', 'util', 'buffer'],
       exclude: ['http'],
       globals: {
         Buffer: true,
