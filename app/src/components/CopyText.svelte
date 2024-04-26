@@ -24,17 +24,23 @@
   }
 </script>
 
-<div class="card variant-filled-secondary p-4 text-xs" data-popup="popupHover">
-  <p>Click to copy</p>
-</div>
-
 {#if copied}
-  <span class="text-success-500">Copied!</span>
+  <slot name="copiedText">
+    <span class="text-success-500">Copied!</span>
+  </slot>
 {:else}
+  <div
+    class="card variant-filled-secondary p-4 text-xs"
+    data-popup="popupHover"
+  >
+    <slot name="hoverText">
+      <span>Copy</span>
+    </slot>
+  </div>
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <!-- svelte-ignore a11y-no-static-element-interactions -->
   <span
-    class={$$props.class + ' [&>*]:pointer-events-none'}
+    class={$$props.class + ' cursor-copy [&>*]:pointer-events-none'}
     use:copy={{ text: copyValue }}
     use:popup={popupHover}
     on:copied={handleCopied}
