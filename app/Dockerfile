@@ -1,5 +1,5 @@
 # Our Node base image
-FROM node:lts
+FROM node:20.12.2-alpine
 
 # Set the Node environment to development to ensure all packages are installed
 ENV NODE_ENV development
