@@ -19,6 +19,7 @@ const config: UserConfig = {
       include: ['path', 'stream', 'util'],
       exclude: ['http'],
       globals: {
+        Buffer: true,
         global: true,
         process: true,
       },
