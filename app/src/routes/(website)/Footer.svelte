@@ -10,7 +10,11 @@
       class="mx-auto flex w-full flex-col whitespace-nowrap text-center md:flex-row md:justify-evenly md:space-x-4"
     >
       <div class="mb-6 md:mb-0">
+<<<<<<< Updated upstream
         <h5 class="mb-3 text-secondary-500">Social</h5>
+=======
+        <h5 class="text-info mb-3">Social</h5>
+>>>>>>> Stashed changes
         <ul class="list-none">
           <li class="spa">
             <a href="https://discord.gg/VgB7bWScVa" target="_blank">
@@ -31,7 +35,11 @@
         </ul>
       </div>
       <div class="mb-6 md:mb-0">
+<<<<<<< Updated upstream
         <h5 class="mb-3 text-secondary-500">Services</h5>
+=======
+        <h5 class="text-info mb-3">Services</h5>
+>>>>>>> Stashed changes
         <ul class="list-none">
           <li class="spa">
             <a href={config.PATH.creator}>Creators</a>
@@ -42,7 +50,11 @@
         </ul>
       </div>
       <div class="">
+<<<<<<< Updated upstream
         <h5 class="mb-3 text-secondary-500">Learn</h5>
+=======
+        <h5 class="text-info mb-3">Learn</h5>
+>>>>>>> Stashed changes
         <ul class="list-none">
           <li class="spa">
             <a

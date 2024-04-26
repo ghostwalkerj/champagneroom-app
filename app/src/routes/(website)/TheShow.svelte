@@ -6,7 +6,11 @@
 
 <div id="TheShow" class="mx-auto flex w-full flex-col pt-20">
   <h2
+<<<<<<< Updated upstream
     class="text-center font-CaviarDreams text-[32px] font-bold text-primary-500 lg:mb-10 lg:text-[41px]"
+=======
+    class="text-primary text-center font-CaviarDreams text-[32px] font-bold lg:mb-10 lg:text-[41px]"
+>>>>>>> Stashed changes
   >
     The CHAMPAGNE ROOM Show
   </h2>
@@ -19,7 +23,11 @@
     <div class="flex w-full flex-col lg:flex-row">
       <div class="w-full p-4 lg:p-6">
         <span
+<<<<<<< Updated upstream
           class="flex text-center font-CaviarDreams text-lg font-bold capitalize tracking-wider text-secondary-500"
+=======
+          class="text-info flex text-center font-CaviarDreams text-lg font-bold capitalize tracking-wider"
+>>>>>>> Stashed changes
         >
           Easy, Safe, Private
         </span>

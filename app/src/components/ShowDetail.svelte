@@ -94,7 +94,11 @@
         />
         {#if options.showWaterMark && waterMarkText}
           <p
+<<<<<<< Updated upstream
             class="absolute top-0 w-full whitespace-nowrap rounded-tl bg-primary-700 p-2 font-SpaceGrotesk text-xl font-extrabold text-black"
+=======
+            class="bg-primary/70 absolute top-0 w-full whitespace-nowrap rounded-tl p-2 font-SpaceGrotesk text-xl font-extrabold text-black"
+>>>>>>> Stashed changes
           >
             {waterMarkText}
           </p>

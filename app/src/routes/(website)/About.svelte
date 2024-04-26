@@ -7,7 +7,11 @@
 <div id="About">
   <div class="mx-auto pt-20">
     <h2
+<<<<<<< Updated upstream
       class="text-center font-CaviarDreams text-[32px] font-bold text-primary-500 lg:mb-10 lg:text-[41px]"
+=======
+      class="text-primary text-center font-CaviarDreams text-[32px] font-bold lg:mb-10 lg:text-[41px]"
+>>>>>>> Stashed changes
     >
       ABOUT
     </h2>
@@ -62,7 +66,11 @@
     <div class="mt-5 lg:mt-10">
       <div class="p-6">
         <div
+<<<<<<< Updated upstream
           class="text-center font-CaviarDreams text-xl font-bold text-primary-500 md:text-2xl lg:mx-10 lg:text-[32px]"
+=======
+          class="text-primary text-center font-CaviarDreams text-xl font-bold md:text-2xl lg:mx-10 lg:text-[32px]"
+>>>>>>> Stashed changes
         >
           We have specifically built CHAMPAGNE ROOM with a focus on anonymity,
           safety, and privacy for both our users and creators.

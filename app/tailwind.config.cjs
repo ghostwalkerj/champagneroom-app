@@ -4,7 +4,11 @@
 /** @type {import('tailwindcss').Config} */
 // @ts-ignore
 import { skeleton } from '@skeletonlabs/tw-plugin';
+<<<<<<< Updated upstream
 import { join } from 'node:path';
+=======
+import { join } from 'path';
+>>>>>>> Stashed changes
 import { myCustomTheme } from './src/neonJesusTheme';
 
 const plugin = require('tailwindcss/plugin');

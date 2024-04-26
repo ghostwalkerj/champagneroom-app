@@ -35,10 +35,10 @@ import {
   submitRefundInvoicesRefundsRefundIdSubmitPost
 } from '$lib/ext/bitcart';
 import type {
+  Wallet as BTWallet,
   DisplayInvoice,
   DisplayPayout,
-  Store,
-  Wallet as BTWallet
+  Store
 } from '$lib/ext/bitcart/models';
 import type { PaymentType } from '$lib/payout';
 import { PayoutJobType, PayoutReason, PayoutStatus } from '$lib/payout';

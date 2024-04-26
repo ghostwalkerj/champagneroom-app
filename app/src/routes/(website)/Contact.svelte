@@ -26,7 +26,11 @@
 <div id="Contact" class="container mx-auto px-4 sm:px-6 md:px-10 lg:px-20">
   <div class="pt-20">
     <h2
+<<<<<<< Updated upstream
       class="mb-20 text-center font-CaviarDreams text-2xl text-[32px] font-bold text-primary-500 lg:text-[41px]"
+=======
+      class="text-primary mb-20 text-center font-CaviarDreams text-2xl text-[32px] font-bold lg:text-[41px]"
+>>>>>>> Stashed changes
     >
       Contact Us
     </h2>
@@ -42,7 +46,11 @@
       </div>
       <div class="flex w-full flex-col items-center justify-center lg:w-1/2">
         <div
+<<<<<<< Updated upstream
           class="mb-5 text-center font-CaviarDreams text-2xl font-bold tracking-wider text-secondary-500 md:text-3xl lg:mb-10 lg:text-4xl"
+=======
+          class="text-info mb-5 text-center font-CaviarDreams text-2xl font-bold tracking-wider md:text-3xl lg:mb-10 lg:text-4xl"
+>>>>>>> Stashed changes
         >
           Thank you for the interest in CHAMPAGNE ROOM!
         </div>

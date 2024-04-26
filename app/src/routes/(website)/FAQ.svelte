@@ -9,7 +9,11 @@
   id="FAQ"
 >
   <h2
+<<<<<<< Updated upstream
     class="mb-10 text-center font-CaviarDreams text-[32px] font-bold text-primary-500 lg:text-[41px]"
+=======
+    class="text-primary mb-10 text-center font-CaviarDreams text-[32px] font-bold lg:text-[41px]"
+>>>>>>> Stashed changes
   >
     FAQ
   </h2>
