@@ -43,7 +43,7 @@
     <h3 class="my-6 text-center text-lg font-bold">{user.name}</h3>
     <div class="flex w-full place-content-center">
       <CopyText copyValue={copyText}>
-        <div slot="hoverText">Click to copy and share</div>
+        <div slot="hoverText">Click to copy to clipboard</div>
 
         <div class="text-center">
           Password:
@@ -76,7 +76,7 @@
         </div>
       </CopyText>
     </div>
-    <div class="flex w-full place-content-end">
+    <div class="mt-6 flex w-full place-content-center">
       <button
         class="variant-filled-secondary btn"
         on:click={() => parent.onClose()}>Close</button
