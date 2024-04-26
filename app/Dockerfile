@@ -9,7 +9,7 @@ ENV NODE_OPTIONS --max-old-space-size=4096
 ARG MONGO_DB_FIELD_SECRET
 
 # installing with yarn
-RUN npm i -g yarn
+# RUN npm i -g yarn
 
 # Change our current working directory
 WORKDIR /usr/src/app
