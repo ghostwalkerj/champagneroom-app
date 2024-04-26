@@ -25,10 +25,8 @@ COPY . .
 RUN set -ex; \
   bun install; \
   bun pm cache rm; \
-  bun run package;\
-  bun run build
-
-# COPY .env.stage .env
+  bun run build; \
+  bun run package;
 
 # Expose port 3000 for the SvelteKit app and 24678 for Vite's HMR
 EXPOSE 3000

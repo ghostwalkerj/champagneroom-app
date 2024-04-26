@@ -19,7 +19,6 @@ const config: UserConfig = {
       include: ['path', 'stream', 'util'],
       exclude: ['http'],
       globals: {
-        Buffer: true,
         global: true,
         process: true,
       },
@@ -39,7 +38,7 @@ const config: UserConfig = {
       https: "https-browserify",
       os: "os-browserify",
       url: "url",
-      vm: 'vm-browserify'
+      vm: 'vm-browserify',
     },
   },
 
