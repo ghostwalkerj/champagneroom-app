@@ -12,7 +12,7 @@
     "crypto"
   ],
   "engines": {
-    "node": "^20.12.2"
+    "node": "^20.9.0"
   },
   "exports": {
     ".": {
@@ -21,7 +21,7 @@
     }
   },
   "scripts": {
-    "dev": "vite dev  ",
+    "dev": "vite dev",
     "build": "vite build",
     "build:digitalOcean": "yarn install --production=false && rimraf dist && yarn build && yarn install --production --frozen-lockfile",
     "start": "tsx server.ts  --worker",
@@ -151,6 +151,7 @@
   "type": "module",
   "dependencies": {
     "@bull-board/express": "^5.16.0",
+    "@filebase/sdk": "^1.0.4",
     "@fontsource/roboto": "^5.0.13",
     "@fontsource/space-grotesk": "^5.0.18",
     "@web3-onboard/common": "^2.3.4",
