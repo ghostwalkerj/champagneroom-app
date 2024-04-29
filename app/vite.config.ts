@@ -23,6 +23,9 @@ const config: UserConfig = {
         global: true,
         process: true,
       },
+      overrides: {
+        fs: 'memfs',
+      },
       protocolImports: true,
     }),
   ],
@@ -45,9 +48,9 @@ const config: UserConfig = {
     rollupOptions: {
       external: ['@web3-onboard/*', 'mongoose-zod', 'crypto']
     },
-    // commonjsOptions: {
-    //   transformMixedEsModules: true
-    // },
+    commonjsOptions: {
+      transformMixedEsModules: true
+    },
     minify: true,
     sourcemap: false,
   },
@@ -61,7 +64,7 @@ const config: UserConfig = {
 
   optimizeDeps: {
     exclude: ['@ethersproject/hash', 'wrtc'],
-    include: ['@web3-onboard/core', 'js-sha3', '@ethersproject/bignumber', '@filebase/sdk'],
+    include: ['@web3-onboard/core', 'js-sha3', '@ethersproject/bignumber'],
     esbuildOptions: {
       // Node.js global to browser globalThis
       define: {
