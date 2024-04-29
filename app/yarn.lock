@@ -2528,14 +2528,14 @@
     minimatch "^6.2.0"
     validator "^13.11.0"
 
-"@iconify/svelte@^4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@iconify/svelte/-/svelte-4.0.0.tgz#4d3dffa721e34170a2ca1fb57de3c76c57e60384"
-  integrity sha512-NDgyYQQjl7ewbAPXOCvTQiDAk0x22BZfQACCZ/CRRvU19OLM0kUjJBi1jDSOdFeOEvhBItUFGE6iB70QNuBizg==
+"@iconify/svelte@^3.1.6":
+  version "3.1.6"
+  resolved "https://registry.yarnpkg.com/@iconify/svelte/-/svelte-3.1.6.tgz#060821ecae5dd92e9c1f0420a674eda5bc060086"
+  integrity sha512-yLSrlkOx5J6xXU5GDLPBV/MdVBVEZhd36onfqSbxQobp1XBoWQbMPLNZyCAmTKCPnmzXSowGy79agl8FQ3kj6A==
   dependencies:
-    "@iconify/types" "workspace:^"
+    "@iconify/types" "^2.0.0"
 
-"@iconify/types@^2.0.0", "@iconify/types@workspace:^":
+"@iconify/types@^2.0.0":
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@iconify/types/-/types-2.0.0.tgz#ab0e9ea681d6c8a1214f30cd741fe3a20cc57f57"
   integrity sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==
