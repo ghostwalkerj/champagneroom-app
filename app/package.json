@@ -12,7 +12,7 @@
     "crypto"
   ],
   "engines": {
-    "node": "^20.9.0"
+    "node": "^20.12.2"
   },
   "exports": {
     ".": {
@@ -38,8 +38,8 @@
     "format": "prettier --write  ."
   },
   "devDependencies": {
-    "@floating-ui/dom": "^1.5.4",
-    "@iconify/svelte": "^3.1.6",
+    "@floating-ui/dom": "^1.6.4",
+    "@iconify/svelte": "^4.0.0",
     "@marker.io/browser": "^0.19.0",
     "@metamask/jazzicon": "^2.0.0",
     "@playwright/test": "^1.43.1",
@@ -62,13 +62,11 @@
     "@types/jest": "^29.5.12",
     "@types/jsonwebtoken": "^9.0.5",
     "@types/node": "^20.12.7",
-    "@types/testing-library__dom": "^7.5.0",
-    "@types/testing-library__jest-dom": "^6.0.0",
     "@types/ua-parser-js": "^0.7.36",
     "@types/validator": "^13.7.17",
     "@typescript-eslint/eslint-plugin": "^7.7.1",
     "@typescript-eslint/parser": "^7.7.1",
-    "@unpic/svelte": "^0.0.51",
+    "@unpic/svelte": "^0.0.53",
     "@vitejs/plugin-basic-ssl": "^1.0.2",
     "@vitest/ui": "^1.5.2",
     "@web3-onboard/coinbase": "^2.2.7",
@@ -132,7 +130,7 @@
     "tiny-parse-argv": "^2.2.0",
     "ts-node": "^10.9.1",
     "tslib": "^2.4.1",
-    "tsx": "^4.7.3",
+    "tsx": "^3.14.0",
     "typescript": "^5.4.4",
     "ua-parser-js": "^1.0.35",
     "unique-names-generator": "^4.7.1",
@@ -161,7 +159,8 @@
     "@web3-onboard/ledger": "^2.6.0",
     "@web3-onboard/trezor": "^2.4.4",
     "@web3-onboard/walletconnect": "^2.5.5",
-    "bullmq": "^5.7.5",
+    "aws-sdk": "^2.1608.0",
+    "bullmq": "^5.7.6",
     "express": "^4.19.2",
     "express-basic-auth": "^1.2.1",
     "ioredis": "^5.3.2",
