@@ -37,7 +37,7 @@ import {
   createAuthToken,
   setAuthToken
 } from '$lib/server/auth';
-import { web3Upload } from '$lib/server/upload';
+import { ipfsUpload } from '$lib/server/upload';
 import { womensNames } from '$lib/womensNames';
 
 import type { Actions, PageServerLoad } from './$types';
@@ -102,11 +102,7 @@ export const actions: Actions = {
 
     if (image instanceof File && image.size > 0) {
       // upload image to web3
-      const url = await web3Upload(
-        env.WEB3STORAGE_KEY ?? '',
-        env.WEB3STORAGE_PROOF ?? '', // Add default value for WEB3STORAGE_PROOF
-        image
-      );
+      const url = await ipfsUpload(image);
       User.updateOne(
         { _id: user._id },
         {
@@ -438,7 +434,7 @@ export const load: PageServerLoad = async ({ locals }) => {
           creatorId: show._id[0].toString(),
           currency: show._id[1],
           amount: show.amount
-        }) as { creatorId: string; currency: CurrencyType; amount: number }
+        }) as { creatorId: string; currency: CurrencyType; amount: number; }
     ),
     weeklyData: weeklyData.map(
       (show) =>

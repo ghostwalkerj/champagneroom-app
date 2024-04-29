@@ -45,7 +45,7 @@ import {
   requestPayoutSchema
 } from '$lib/payout';
 import { getShowMachineService } from '$lib/server/machinesUtil';
-import { web3Upload } from '$lib/server/upload';
+import { ipfsUpload } from '$lib/server/upload';
 
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
 
@@ -62,11 +62,7 @@ export const actions: Actions = {
 
     if (image instanceof File && image.size > 0) {
       // upload image to web3
-      const url = await web3Upload(
-        env.WEB3STORAGE_KEY ?? '',
-        env.WEB3STORAGE_PROOF ?? '',
-        image
-      );
+      const url = await ipfsUpload(image);
       User.updateOne(
         { _id: user._id },
         {
@@ -285,11 +281,7 @@ export const actions: Actions = {
 
     if (image instanceof File && image.size > 0) {
       // upload image to web3
-      const url = await web3Upload(
-        env.WEB3STORAGE_KEY ?? '', // Provide a default value for env.WEB3STORAGE_KEY
-        env.WEB3STORAGE_PROOF ?? '',
-        image
-      );
+      const url = await ipfsUpload(image);
       form.data.bannerImageUrl = url;
     }
 
