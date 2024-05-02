@@ -20,7 +20,6 @@
 
   export let data: LayoutData;
 
-  const isAuthenticated = data.isAuthenticated;
   const authType = data.authType;
   const buildNumber = generate(version);
   const buildTime = format(buildNumber);
@@ -39,7 +38,7 @@
     accountUnsub = selectedAccount.subscribe((account) => {
       if (account && lastAddress && account.address !== lastAddress) {
         lastAddress = account.address;
-        if (isAuthenticated && authType === AuthType.SIGNING) {
+        if ($page.data.user && authType === AuthType.SIGNING) {
           goto(
             signOut + '?returnPath=' + encodeURIComponent($page.url.pathname)
           );
@@ -50,7 +49,7 @@
       }
       if (!account && lastAddress) {
         lastAddress = undefined;
-        if (isAuthenticated && authType === AuthType.SIGNING) {
+        if ($page.data.user && authType === AuthType.SIGNING) {
           goto(
             signOut + '?returnPath=' + encodeURIComponent($page.url.pathname)
           );
@@ -77,8 +76,8 @@
     </a>
 
     <div class="text-xl font-semibold">
-      {#if $selectedAccount}
-        <div class=" flex items-center gap-2">
+      <div class=" flex items-center gap-2">
+        {#if $selectedAccount}
           <span class="h-3 w-3 rounded-full bg-primary-500" />
           {#if !$page.data.user?.name}
             <span>Wallet Connected</span>
@@ -90,19 +89,20 @@
           {/if}
           {#if $page.data.authType === AuthType.IMPERSONATION}
             <a class="variant-outline btn" href={config.PATH.revert}>Revert </a>
-          {:else if isAuthenticated}
-            <a
-              class="variant-outline btn"
-              href={config.PATH.signout + '?returnPath=' + $page.url.pathname}
-              >Sign Out</a
-            >
           {/if}
-        </div>
-      {:else}
-        <div class="flow flow-col text-md">
-          <ConnectButton />
-        </div>
-      {/if}
+        {:else}
+          <div class="flow flow-col text-md">
+            <ConnectButton />
+          </div>
+        {/if}
+        {#if $page.data.user}
+          <a
+            class="variant-outline btn"
+            href={config.PATH.signout + '?returnPath=' + $page.url.pathname}
+            >Sign Out</a
+          >
+        {/if}
+      </div>
     </div>
   </nav>
 
