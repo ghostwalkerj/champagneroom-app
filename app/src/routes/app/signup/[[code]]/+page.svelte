@@ -87,15 +87,8 @@
     }
 
     return async ({ result }: { result: ActionResult }) => {
-      isSubmitting = false;
-      if (
-        result.type === 'failure' &&
-        result.data &&
-        (result.data.alreadyUser || result.data.alreadyAgent)
-      ) {
-        goto(config.PATH.app);
-      }
       applyAction(result);
+      isSubmitting = false;
     };
   };
 </script>
@@ -159,7 +152,7 @@
         <Step>
           <svelte:fragment slot="header">Choose Your Role</svelte:fragment>
           <RadioGroup
-            class="flex w-full flex-col justify-evenly"
+            class="flex w-full flex-col justify-evenly md:flex-row"
             active="variant-filled-primary"
             hover="hover:variant-soft-primary"
           >
