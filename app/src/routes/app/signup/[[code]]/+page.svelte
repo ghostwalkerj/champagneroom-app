@@ -87,8 +87,10 @@
     }
 
     return async ({ result }: { result: ActionResult }) => {
+      if (result.type !== 'redirect') {
+        isSubmitting = false;
+      }
       applyAction(result);
-      isSubmitting = false;
     };
   };
 </script>
