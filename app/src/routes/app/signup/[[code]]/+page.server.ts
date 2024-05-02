@@ -1,4 +1,4 @@
-import { error, fail } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 
 import { env } from '$env/dynamic/private';
 
@@ -16,6 +16,7 @@ import {
 } from '$lib/server/auth';
 
 import type { Actions, PageServerLoad } from './$types';
+const tokenName = env.AUTH_TOKEN_NAME || 'token';
 
 const createUser = async ({
   request,
@@ -80,8 +81,6 @@ export const actions: Actions = {
     try {
       const result = await createUser({ request, role: UserRole.AGENT });
       if ('success' in result) {
-        const tokenName = env.UTH_TOKEN_NAME || 'token';
-
         const user = result.user;
 
         Agent.create({
@@ -101,24 +100,20 @@ export const actions: Actions = {
         });
 
         encAuthToken && setAuthToken(cookies, tokenName, encAuthToken);
-
-        return {
-          success: true,
-          returnPath: config.PATH.agent
-        };
-      } else {
-        return result;
       }
     } catch (error) {
       console.error('err', error);
       return fail(400, { err: JSON.stringify(error) });
     }
+    redirect(303, config.PATH.agent);
   },
-  create_creator: async ({ request }: { request: Request }) => {
+  create_creator: async ({ cookies, request }) => {
     try {
       const result = await createUser({ request, role: UserRole.CREATOR });
       if ('success' in result) {
         const agentId = result.agentId || undefined;
+        const user = result.user;
+
         const agent =
           agentId &&
           ((await Agent.findOne({ _id: agentId }).orFail(() => {
@@ -128,29 +123,36 @@ export const actions: Actions = {
           (agent && agent.defaultCommissionRate) ||
           config.UI.defaultCommissionRate;
         Creator.create({
-          user: result.user._id,
+          user: user._id,
           commissionRate,
           agent: agentId
         });
 
         if (agent) {
           User.updateOne(
-            { _id: agent.user._id },
+            { _id: user._id },
             { $inc: { referralCount: 1 } }
           ).exec();
         }
 
-        return {
-          success: true,
-          returnPath: config.PATH.creator
-        };
-      } else {
-        return result;
+        // Update User Nonce
+        const nonce = Math.floor(Math.random() * 1_000_000);
+        User.updateOne({ _id: user._id }, { $set: { nonce } }).exec();
+
+        // Create Auth Token and set cookie
+        const encAuthToken = createAuthToken({
+          id: user._id.toString(),
+          selector: '_id',
+          authType: AuthType.SIGNING
+        });
+
+        encAuthToken && setAuthToken(cookies, tokenName, encAuthToken);
       }
     } catch (error) {
       console.error('err', error);
       return fail(400, { err: JSON.stringify(error) });
     }
+    redirect(303, config.PATH.creator);
   }
 };
 
