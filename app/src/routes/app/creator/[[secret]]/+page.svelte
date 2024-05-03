@@ -4,6 +4,7 @@
   import type { Unsubscriber } from 'svelte/store';
   import type { Infer, SuperValidated } from 'sveltekit-superforms';
   import type { Subscription } from 'xstate';
+  import type { z } from 'zod';
 
   import { invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
@@ -49,7 +50,7 @@
   let exchangeRate = +data.exchangeRate || 0;
   let jitsiToken = data.jitsiToken as string;
   let user = data.user as UserDocument;
-  $: roomForm = data.roomForm as SuperValidated<Infer<typeof roomCRUDSchema>>;
+  $: roomForm = data.roomForm as SuperValidated<z.infer<typeof roomCRUDSchema>>;
   $: createShowForm = data.createShowForm;
   $: payoutForm = data.payoutForm as SuperValidated<
     Infer<typeof requestPayoutSchema>

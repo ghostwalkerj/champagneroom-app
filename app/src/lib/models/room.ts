@@ -88,4 +88,5 @@ const Room = models?.Room
   : mongoose.model<RoomDocumentType>('Room', roomMongooseSchema);
 
 export type { RoomDocument, RoomDocumentType };
+
 export { Room, SocialMediaType, roomCRUDSchema, roomSchema };

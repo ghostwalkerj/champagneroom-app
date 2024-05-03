@@ -1,8 +1,9 @@
 <script lang="ts">
   import Icon from '@iconify/svelte';
   import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
-  import type { Infer, SuperValidated } from 'sveltekit-superforms';
+  import type { SuperValidated } from 'sveltekit-superforms';
   import urlJoin from 'url-join';
+  import type { z } from 'zod';
 
   import { page } from '$app/stores';
 
@@ -12,7 +13,7 @@
 
   import CopyText from '$components/CopyText.svelte';
 
-  export let roomForm: SuperValidated<Infer<typeof roomCRUDSchema>>;
+  export let roomForm: SuperValidated<z.infer<typeof roomCRUDSchema>>;
 
   let room = roomForm.data;
 
