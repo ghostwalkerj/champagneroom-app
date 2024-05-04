@@ -29,11 +29,7 @@
     }
   };
 
-  $: roomUrl = urlJoin(
-    $page.url.origin,
-    config.PATH.room,
-    roomForm.data.uniqueUrl
-  );
+  $: roomUrl = urlJoin($page.url.origin, config.PATH.room, room.uniqueUrl);
 </script>
 
 <div
@@ -46,7 +42,7 @@
     </h2>
   </div>
 
-  {#if room}
+  {#if room._id}
     <div class="flex flex-col items-center text-center text-surface-500">
       <div>
         Name: <span class="font-semibold">{room.name}</span>

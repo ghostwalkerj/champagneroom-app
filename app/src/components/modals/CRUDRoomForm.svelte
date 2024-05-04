@@ -2,7 +2,7 @@
   import Icon from '@iconify/svelte';
   import { FileDropzone, getModalStore } from '@skeletonlabs/skeleton';
   import { nanoid } from 'nanoid';
-  import type { SvelteComponent } from 'svelte';
+  import { onMount, type SvelteComponent } from 'svelte';
   import type { Infer, SuperValidated } from 'sveltekit-superforms';
   import { superForm } from 'sveltekit-superforms/client';
   import urlJoin from 'url-join';
@@ -26,7 +26,6 @@
   const { form, errors, constraints, enhance, delayed, message } = superForm(
     roomForm,
     {
-      validationMethod: 'submit-only',
       async onResult(event) {
         if (event.result.type === 'success') {
           modalStore.close();
@@ -35,18 +34,9 @@
     }
   );
 
-  if ($form.uniqueUrl === undefined) {
-    $form.uniqueUrl = nanoid(10).toLowerCase();
-  }
-
-  if ($form.bannerImageUrl === undefined) {
-    $form.bannerImageUrl = config.UI.defaultProfileImage;
-  }
-
   $: roomUrl = urlJoin($page.url.origin, config.PATH.room);
 </script>
 
-// eslint-disable-next-line unicorn/filename-case
 {#if thisModal}
   <div class="max-w-3xl rounded bg-surface-900">
     <form
@@ -160,7 +150,7 @@
           >
           {#if $message}
             <br />
-            <p class="mt-2 text-error">{$message}</p>
+            <p class="text-error mt-2">{$message}</p>
           {/if}
         </footer>
       </div>

@@ -4,6 +4,7 @@ import { possessive } from 'i18n-possessive';
 import type IORedis from 'ioredis';
 import jwt from 'jsonwebtoken';
 import { ObjectId } from 'mongodb';
+import { nanoid } from 'nanoid';
 import type { Infer, SuperValidated } from 'sveltekit-superforms';
 import { message, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
@@ -13,12 +14,7 @@ import { env as pubEnvironment } from '$env/dynamic/public';
 
 import type { CancelType } from '$lib/models/common';
 import { Creator, type CreatorDocument } from '$lib/models/creator';
-import {
-  Room,
-  roomCRUDSchema,
-  type RoomDocument,
-  roomSchema
-} from '$lib/models/room';
+import { Room, roomCRUDSchema, type RoomDocument } from '$lib/models/room';
 import { Show, showCRUDSchema, type ShowDocument } from '$lib/models/show';
 import { ShowEvent, type ShowEventDocument } from '$lib/models/showEvent';
 import { User, type UserDocument } from '$lib/models/user';
@@ -29,6 +25,7 @@ import type { ShowMachineEventType } from '$lib/machines/showMachine';
 import type { PayoutQueueType } from '$lib/workers/payoutWorker';
 import type { ShowQueueType } from '$lib/workers/showWorker';
 
+import config from '$lib/config';
 import {
   ActorType,
   CancelReason,
@@ -328,7 +325,7 @@ export const actions: Actions = {
     }
   }
 };
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async ({ locals, url }) => {
   const creator = locals.creator as CreatorDocument;
   const user = locals.user;
   if (!creator) {
@@ -408,11 +405,16 @@ export const load: PageServerLoad = async ({ locals }) => {
           flattenMaps: true,
           flattenObjectIds: true
         }),
-        zod(roomSchema)
+        zod(roomCRUDSchema)
       )
-    : ((await superValidate(zod(roomSchema))) as SuperValidated<
-        Infer<typeof roomSchema>
-      >);
+    : ((await superValidate(
+        {
+          uniqueUrl: nanoid(12),
+          name: possessive(creator.user.name, 'en') + ' Room',
+          bannerImageUrl: config.UI.defaultProfileImage
+        },
+        zod(roomCRUDSchema)
+      )) as SuperValidated<Infer<typeof roomCRUDSchema>>);
 
   const showName = creator
     ? possessive(creator.user.name, 'en') + ' Show'
