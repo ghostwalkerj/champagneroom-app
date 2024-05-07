@@ -1,21 +1,25 @@
 <script lang="ts">
   import Icon from '@iconify/svelte';
   import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
+  import { onDestroy, onMount } from 'svelte';
+  import type { Unsubscriber } from 'svelte/store';
   import type { SuperValidated } from 'sveltekit-superforms';
   import urlJoin from 'url-join';
   import type { z } from 'zod';
 
   import { page } from '$app/stores';
 
-  import type { roomCRUDSchema } from '$lib/models/room';
+  import type { roomCRUDSchema, RoomDocument } from '$lib/models/room';
 
   import config from '$lib/config';
 
   import CopyText from '$components/CopyText.svelte';
+  import { RoomStore } from '$stores';
 
   export let roomForm: SuperValidated<z.infer<typeof roomCRUDSchema>>;
 
   let room = roomForm.data;
+  let roomUnSub: Unsubscriber;
 
   const modalStore = getModalStore();
 
@@ -30,6 +34,22 @@
   };
 
   $: roomUrl = urlJoin($page.url.origin, config.PATH.room, room.uniqueUrl);
+
+  onMount(() => {
+    if (room._id) {
+      roomUnSub = RoomStore(room as RoomDocument).subscribe((data) => {
+        if (!data) {
+          return;
+        }
+        room = data;
+        roomModal.meta.form.data = data;
+      });
+    }
+  });
+
+  onDestroy(() => {
+    roomUnSub?.();
+  });
 </script>
 
 <div
