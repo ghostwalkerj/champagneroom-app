@@ -89,11 +89,7 @@ const roomCRUDSchema = roomSchema
       image: z
         .instanceof(File, { message: 'Please upload a file.' })
         .refine((f) => f.size < config.UI.maxImageSize, 'Max 5 MB upload size.')
-        .optional()
-    })
-  )
-  .merge(
-    z.object({
+        .optional(),
       id: z.string().optional()
     })
   );

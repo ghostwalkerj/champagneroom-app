@@ -48,10 +48,7 @@
       {#if room.tagLine}<div class="text-sm">{room.tagLine}</div>{/if}
       <div class="m-4 max-w-fit overflow-hidden">
         <!-- svelte-ignore a11y-missing-attribute -->
-        <img
-          src={room.bannerImageUrl}
-          class="max-w-full rounded-container-token"
-        />
+        <img src={room.bannerImageUrl} class="w-32 rounded-container-token" />
       </div>
       <div>
         URL:

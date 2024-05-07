@@ -47,7 +47,7 @@
       action={thisModal.meta.action}
     >
       <input type="hidden" name="active" value={true} />
-      <input type="hidden" name="_id" bind:value={roomForm.data._id} readonly />
+      <input type="hidden" name="id" bind:value={roomForm.data._id} readonly />
 
       <FileDropzone
         name="images"

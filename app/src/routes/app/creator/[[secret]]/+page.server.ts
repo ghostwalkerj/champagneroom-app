@@ -5,9 +5,10 @@ import type IORedis from 'ioredis';
 import jwt from 'jsonwebtoken';
 import { ObjectId } from 'mongodb';
 import { nanoid } from 'nanoid';
-import type { Infer, SuperValidated } from 'sveltekit-superforms';
+import type { SuperValidated } from 'sveltekit-superforms';
 import { message, setError, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
+import type { z } from 'zod';
 
 import { env } from '$env/dynamic/private';
 import { env as pubEnvironment } from '$env/dynamic/public';
@@ -78,7 +79,7 @@ export const actions: Actions = {
     const form = (await superValidate(
       request,
       zod(showCRUDSchema)
-    )) as SuperValidated<Infer<typeof showCRUDSchema>>;
+    )) as SuperValidated<z.infer<typeof showCRUDSchema>>;
 
     if (!form.valid) {
       console.log(form.data);
@@ -264,8 +265,7 @@ export const actions: Actions = {
     const form = (await superValidate(
       request,
       zod(roomCRUDSchema)
-    )) as SuperValidated<Infer<typeof roomCRUDSchema>>;
-    console.table(form);
+    )) as SuperValidated<z.infer<typeof roomCRUDSchema>>;
     const isUpdate = form.data._id ? true : false;
     const image = form.data.image;
     if (!form.valid) {
@@ -280,16 +280,19 @@ export const actions: Actions = {
 
     form.data.uniqueUrl = encodeURIComponent(form.data.uniqueUrl);
     delete form.data.image; // remove image from form
-
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    const _id = form.data._id ? new ObjectId(form.data._id) : new ObjectId();
+    delete form.data.id;
     Room.init();
 
     // check if unique url exists
     const existingRoom = await Room.findOne({ uniqueUrl: form.data.uniqueUrl });
     if (existingRoom && !isUpdate)
+      // @ts-ignore
       setError(form, 'uniqueUrl', 'Room URL already exists');
     if (!existingRoom && isUpdate) {
       const room = (await Room.findOneAndUpdate(
-        { _id: new ObjectId(form.data.id) },
+        { _id },
         {
           uniqueUrl: form.data.uniqueUrl
         },
@@ -304,7 +307,7 @@ export const actions: Actions = {
       if (isUpdate) {
         // update room
         const room = (await Room.findOneAndUpdate(
-          { _id: new ObjectId(form.data.id) },
+          { _id },
           {
             name: form.data.name,
             bannerImageUrl: form.data.bannerImageUrl,
@@ -321,7 +324,7 @@ export const actions: Actions = {
         // insert new room
         const room = (await Room.create({
           ...form.data,
-          _id: new ObjectId()
+          _id
         })) as RoomDocument;
         Creator.updateOne(
           { _id: creator._id },
@@ -427,7 +430,7 @@ export const load: PageServerLoad = async ({ locals }) => {
           name: possessive(creator.user.name, 'en') + ' Room'
         },
         zod(roomCRUDSchema)
-      )) as SuperValidated<Infer<typeof roomCRUDSchema>>);
+      )) as SuperValidated<z.infer<typeof roomCRUDSchema>>);
 
   const showName = creator
     ? possessive(creator.user.name, 'en') + ' Show'
