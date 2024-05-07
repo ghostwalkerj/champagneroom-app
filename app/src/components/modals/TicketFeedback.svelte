@@ -63,7 +63,8 @@
           ><Icon icon="fluent:star-28-filled" /></svelte:fragment
         >
       </Ratings>
-      {#if $errors.rating}<span class="text-error">{$errors.rating}</span>{/if}
+      {#if $errors.rating}<span class="text-error-500">{$errors.rating}</span
+        >{/if}
     </div>
     <div class="w-full py-2">
       <span class="label-text">Review</span>
@@ -97,7 +98,7 @@
       </div>
       {#if $message}
         <br />
-        <p class="mt-2 text-error">{$message}</p>
+        <p class="mt-2 text-error-500">{$message}</p>
       {/if}
     </footer>
   </form>

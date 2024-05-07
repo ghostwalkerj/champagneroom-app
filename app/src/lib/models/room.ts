@@ -9,6 +9,8 @@ import {
 } from 'mongoose-zod';
 import { nanoid } from 'nanoid';
 
+import config from '$lib/config';
+
 const { models } = pkg;
 
 type RoomDocument = InstanceType<typeof Room>;
@@ -32,7 +34,11 @@ const roomSchema = z
       auto: true
     }),
     name: z.string().trim().min(6).max(40),
-    bannerImageUrl: z.string().trim().optional(),
+    bannerImageUrl: z
+      .string()
+      .trim()
+      .default(config.UI.defaultRoomBanner)
+      .optional(),
     tagLine: z.string().min(6).max(40).optional(),
     announcement: z.string().min(10).max(256).optional(),
     uniqueUrl: z
@@ -74,9 +80,19 @@ const roomZodMongooseSchema = toZodMongooseSchema(roomSchema, {
   }
 });
 
-const roomCRUDSchema = roomSchema.extend({
-  _id: roomSchema.shape._id.optional()
-});
+const roomCRUDSchema = roomSchema
+  .extend({
+    _id: roomSchema.shape._id.optional()
+  })
+  .merge(
+    z.object({
+      image: z
+        .instanceof(File, { message: 'Please upload a file.' })
+        .refine((f) => f.size < config.UI.maxImageSize, 'Max 5 MB upload size.')
+        .optional(),
+      id: z.string().optional()
+    })
+  );
 
 type RoomDocumentType = z.infer<typeof roomSchema>;
 

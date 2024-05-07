@@ -62,7 +62,7 @@
         {...$constraints.name}
         class="input variant-form-material bg-surface-700"
       />
-      {#if $errors.name}<span class="text-error">{$errors.name}</span>{/if}
+      {#if $errors.name}<span class="text-error-500">{$errors.name}</span>{/if}
     </label>
 
     <label for="">
@@ -79,7 +79,7 @@
           {...$constraints.price?.amount}
         />
       </div>
-      {#if $errors.price?.amount}<span class="text-error"
+      {#if $errors.price?.amount}<span class="text-error-500"
           >{$errors.price.amount}</span
         >{/if}
     </label>

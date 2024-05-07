@@ -45,8 +45,11 @@ const config = {
   },
   UI: {
     defaultProfileImage: 'https://static.champagneroom.app/profile/default.png',
+    defaultRoomBanner: 'https://static.champagneroom.app/assets/roomBanner.png',
     profileImagePath: 'https://static.champagneroom.app/profile',
-    defaultCommissionRate: 10
+
+    defaultCommissionRate: 10,
+    maxImageSize: 5_000_000
   },
   TIMER: {
     gracePeriod: 600_000,

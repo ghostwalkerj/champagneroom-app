@@ -1,8 +1,7 @@
 <script lang="ts">
   import Icon from '@iconify/svelte';
   import { FileDropzone, getModalStore } from '@skeletonlabs/skeleton';
-  import { nanoid } from 'nanoid';
-  import { onMount, type SvelteComponent } from 'svelte';
+  import { type SvelteComponent } from 'svelte';
   import type { Infer, SuperValidated } from 'sveltekit-superforms';
   import { superForm } from 'sveltekit-superforms/client';
   import urlJoin from 'url-join';
@@ -26,9 +25,10 @@
   const { form, errors, constraints, enhance, delayed, message } = superForm(
     roomForm,
     {
-      async onResult(event) {
+      onResult(event) {
+        console.log(event);
         if (event.result.type === 'success') {
-          modalStore.close();
+          parent.onClose();
         }
       }
     }
@@ -46,9 +46,8 @@
       use:enhance
       action={thisModal.meta.action}
     >
-      <input type="hidden" name="active" value="true" />
-      <input type="hidden" name="_id" value={$form._id} />
-      <input type="hidden" name="coverImageUrl" value={$form.bannerImageUrl} />
+      <input type="hidden" name="active" value={true} />
+      <input type="hidden" name="id" bind:value={roomForm.data._id} readonly />
 
       <FileDropzone
         name="images"
@@ -58,7 +57,7 @@
         accept="image/*"
         on:change={() => {
           if (images.length > 0) {
-            $form.bannerImageUrl = URL.createObjectURL(images[0]);
+            $form.image = images[0];
           }
         }}
       >
@@ -82,7 +81,7 @@
               name="name"
               bind:value={$form.name}
             />
-            {#if $errors.name}<span class="text-error">{$errors.name}</span
+            {#if $errors.name}<span class="text-error-500">{$errors.name}</span
               >{/if}
           </label>
 
@@ -96,7 +95,7 @@
               bind:value={$form.tagLine}
               placeholder="Enter a tagline..."
             />
-            {#if $errors.tagLine}<span class="text-error"
+            {#if $errors.tagLine}<span class="text-error-500"
                 >{$errors.tagLine}</span
               >{/if}
           </label>
@@ -111,28 +110,28 @@
               bind:value={$form.uniqueUrl}
             />
             <div class="pt-1 text-sm">
-              {urlJoin(roomUrl, $form.uniqueUrl)}
+              {urlJoin(roomUrl, $form.uniqueUrl.toLocaleLowerCase())}
             </div>
 
-            {#if $errors.uniqueUrl}<span class="text-error"
+            {#if $errors.uniqueUrl}<span class="text-error-500"
                 >{$errors.uniqueUrl}</span
               >{/if}
           </label>
 
-          <!-- <label class="label">
+          <label class="label">
             <span class="font-semibold">Announcement</span>
             <input
               class="input variant-form-material"
               {...$constraints.announcement}
               type="text"
-              name="uniqueUrl"
+              name="announcement"
               bind:value={$form.announcement}
               placeholder="Enter any announcement ..."
             />
-            {#if $errors.announcement}<span class="text-error"
+            {#if $errors.announcement}<span class="text-error-500"
                 >{$errors.announcement}</span
               >{/if}
-          </label> -->
+          </label>
         </div>
 
         <footer class="text-right font-semibold">
@@ -150,7 +149,7 @@
           >
           {#if $message}
             <br />
-            <p class="text-error mt-2">{$message}</p>
+            <p class="mt-2 text-error-500">{$message}</p>
           {/if}
         </footer>
       </div>
