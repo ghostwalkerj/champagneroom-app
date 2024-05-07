@@ -43,11 +43,9 @@
   </div>
 
   {#if room._id}
-    <div class="flex flex-col items-center text-center text-surface-500">
-      <div>
-        Name: <span class="font-semibold">{room.name}</span>
-      </div>
-      <div class="text-sm">"{room.tagLine}""</div>
+    <div class="flex flex-col items-center text-center text-white">
+      <span class="font-bold text-white">{room.name}</span>
+      {#if room.tagLine}<div class="text-sm">{room.tagLine}</div>{/if}
       <div class="m-4 max-w-fit overflow-hidden">
         <!-- svelte-ignore a11y-missing-attribute -->
         <img

@@ -73,7 +73,8 @@
         >Set Current Balance</button
       >
     </div>
-    {#if $errors.amount}<span class="text-error">{$errors.amount}</span>{/if}
+    {#if $errors.amount}<span class="text-error-500">{$errors.amount}</span
+      >{/if}
 
     <span>Destination address</span>
     <input
@@ -84,7 +85,7 @@
       placeholder="Enter destination address..."
       class="input variant-form-material bg-surface-800"
     />
-    {#if $errors.destination}<span class="text-error"
+    {#if $errors.destination}<span class="text-error-500"
         >{$errors.destination}</span
       >{/if}
 
@@ -105,7 +106,7 @@
       >
       {#if $message}
         <br />
-        <p class="mt-2 text-error">{$message}</p>
+        <p class="mt-2 text-error-500">{$message}</p>
       {/if}
     </footer>
   </form>

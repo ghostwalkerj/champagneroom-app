@@ -63,7 +63,7 @@
               name="name"
               bind:value={$form.name}
             />
-            {#if $errors.name}<span class="text-error">{$errors.name}</span
+            {#if $errors.name}<span class="text-error-500">{$errors.name}</span
               >{/if}
           </label>
           <label class="label">
@@ -83,7 +83,7 @@
 
             {#each $form.pin as index}
               {#if $errors.pin && $errors.pin[index]}
-                <div class="text-error">{$errors.pin[index]}</div>
+                <div class="text-error-500">{$errors.pin[index]}</div>
               {/if}
             {/each}
 
@@ -108,7 +108,7 @@
           >
           {#if $message}
             <br />
-            <p class="mt-2 text-error">{$message}</p>
+            <p class="mt-2 text-error-500">{$message}</p>
           {/if}
         </footer>
       </div>

@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
 import { ObjectId } from 'mongodb';
 import { nanoid } from 'nanoid';
 import type { Infer, SuperValidated } from 'sveltekit-superforms';
-import { message, superValidate } from 'sveltekit-superforms';
+import { message, setError, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 
 import { env } from '$env/dynamic/private';
@@ -25,7 +25,6 @@ import type { ShowMachineEventType } from '$lib/machines/showMachine';
 import type { PayoutQueueType } from '$lib/workers/payoutWorker';
 import type { ShowQueueType } from '$lib/workers/showWorker';
 
-import config from '$lib/config';
 import {
   ActorType,
   CancelReason,
@@ -261,20 +260,17 @@ export const actions: Actions = {
   },
   upsert_room: async ({ request, locals }) => {
     const creator = locals.creator as CreatorDocument;
-    const formData = await request.formData();
 
-    const form = await superValidate(formData, zod(roomCRUDSchema));
-
-    console.log(env.WEB3STORAGE_KEY);
-
-    const isUpdate = !!form.data._id;
-    // Convenient validation check:
+    const form = (await superValidate(
+      request,
+      zod(roomCRUDSchema)
+    )) as SuperValidated<Infer<typeof roomCRUDSchema>>;
+    console.table(form);
+    const isUpdate = form.data._id ? true : false;
+    const image = form.data.image;
     if (!form.valid) {
-      // Again, return { form } and things will just work.
       return fail(400, { form });
     }
-    const image =
-      formData.get('images') && (formData.get('images') as unknown as [File]);
 
     if (image instanceof File && image.size > 0) {
       // upload image to web3
@@ -283,23 +279,44 @@ export const actions: Actions = {
     }
 
     form.data.uniqueUrl = encodeURIComponent(form.data.uniqueUrl);
+    delete form.data.image; // remove image from form
 
     Room.init();
 
+    // check if unique url exists
+    const existingRoom = await Room.findOne({ uniqueUrl: form.data.uniqueUrl });
+    if (existingRoom && !isUpdate)
+      setError(form, 'uniqueUrl', 'Room URL already exists');
+    if (!existingRoom && isUpdate) {
+      const room = (await Room.findOneAndUpdate(
+        { _id: new ObjectId(form.data.id) },
+        {
+          uniqueUrl: form.data.uniqueUrl
+        },
+        { new: true }
+      )) as RoomDocument;
+      if (!room) {
+        error(404, 'Room not found');
+      }
+    }
+
     try {
       if (isUpdate) {
+        // update room
         const room = (await Room.findOneAndUpdate(
-          { _id: form.data._id },
-          form.data,
+          { _id: new ObjectId(form.data.id) },
+          {
+            name: form.data.name,
+            bannerImageUrl: form.data.bannerImageUrl,
+            tagLine: form.data.tagLine,
+            announcement: form.data.announcement
+          },
           { new: true }
         )) as RoomDocument;
         if (!room) {
           throw error(404, 'Room not found');
         }
-        return {
-          form,
-          room: room.toJSON({ flattenMaps: true, flattenObjectIds: true })
-        };
+        return message(form, 'Room updated successfully');
       } else {
         // insert new room
         const room = (await Room.create({
@@ -314,10 +331,7 @@ export const actions: Actions = {
             }
           }
         ).exec();
-        return {
-          form,
-          room: room.toJSON({ flattenMaps: true, flattenObjectIds: true })
-        };
+        return message(form, 'Room created successfully');
       }
     } catch (error_) {
       console.error(error_);
@@ -325,7 +339,7 @@ export const actions: Actions = {
     }
   }
 };
-export const load: PageServerLoad = async ({ locals, url }) => {
+export const load: PageServerLoad = async ({ locals }) => {
   const creator = locals.creator as CreatorDocument;
   const user = locals.user;
   if (!creator) {
@@ -410,8 +424,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
     : ((await superValidate(
         {
           uniqueUrl: nanoid(12),
-          name: possessive(creator.user.name, 'en') + ' Room',
-          bannerImageUrl: config.UI.defaultProfileImage
+          name: possessive(creator.user.name, 'en') + ' Room'
         },
         zod(roomCRUDSchema)
       )) as SuperValidated<Infer<typeof roomCRUDSchema>>);

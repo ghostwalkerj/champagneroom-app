@@ -59,7 +59,8 @@
           <option>{reason}</option>
         {/each}
       </select>
-      {#if $errors.reason}<span class="text-error">{$errors.reason}</span>{/if}
+      {#if $errors.reason}<span class="text-error-500">{$errors.reason}</span
+        >{/if}
 
       <!-- Explanation Textarea -->
 
@@ -71,7 +72,7 @@
         {...$constraints.explanation}
       />
 
-      {#if $errors.explanation}<span class="text-error"
+      {#if $errors.explanation}<span class="text-error-500"
           >{$errors.explanation}</span
         >{/if}
 
@@ -94,7 +95,7 @@
         </div>
         {#if $message}
           <br />
-          <p class="mt-2 text-error">{$message}</p>
+          <p class="mt-2 text-error-500">{$message}</p>
         {/if}
       </footer>
     </form>
