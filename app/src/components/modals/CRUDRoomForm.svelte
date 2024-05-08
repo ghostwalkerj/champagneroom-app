@@ -1,7 +1,7 @@
 <script lang="ts">
   import Icon from '@iconify/svelte';
   import { FileDropzone, getModalStore } from '@skeletonlabs/skeleton';
-  import { type SvelteComponent } from 'svelte';
+  import { onMount, type SvelteComponent } from 'svelte';
   import type { Infer, SuperValidated } from 'sveltekit-superforms';
   import { superForm } from 'sveltekit-superforms/client';
   import urlJoin from 'url-join';
@@ -15,7 +15,6 @@
   const modalStore = getModalStore();
   $: thisModal = $modalStore[0];
 
-  let images: FileList;
   export let parent: SvelteComponent;
 
   let roomForm = $modalStore[0].meta.form as SuperValidated<
@@ -26,7 +25,6 @@
     roomForm,
     {
       onResult(event) {
-        console.log(event);
         if (event.result.type === 'success') {
           parent.onClose();
         }
@@ -34,7 +32,20 @@
     }
   );
 
+  let images: FileList;
+  let fileDrop: HTMLInputElement;
   $: roomUrl = urlJoin($page.url.origin, config.PATH.room);
+  let bannerImage: HTMLImageElement;
+
+  onMount(() => {
+    bannerImage.src =
+      roomForm.data.bannerImageUrl ?? config.UI.defaultRoomBanner;
+  });
+
+  const onChange = () => {
+    if (images.length === 0) return;
+    bannerImage.src = URL.createObjectURL(images[0]);
+  };
 </script>
 
 {#if thisModal}
@@ -46,24 +57,20 @@
       use:enhance
       action={thisModal.meta.action}
     >
-      <input type="hidden" name="active" value={true} />
       <input type="hidden" name="id" bind:value={roomForm.data._id} readonly />
 
       <FileDropzone
-        name="images"
+        name="image"
         padding="p-0"
         class="max-h-max overflow-hidden rounded-xl bg-surface-900 "
         bind:files={images}
+        bind:fileInput={fileDrop}
+        on:change={onChange}
         accept="image/*"
-        on:change={() => {
-          if (images.length > 0) {
-            $form.image = images[0];
-          }
-        }}
       >
         <svelte:fragment slot="message">
           <div>
-            <img src={$form.bannerImageUrl} alt="coverImageUrl" />
+            <img alt="banner URL" bind:this={bannerImage} />
           </div>
           <div class="label p-4 font-semibold">Upload Room Cover Image</div>
         </svelte:fragment>

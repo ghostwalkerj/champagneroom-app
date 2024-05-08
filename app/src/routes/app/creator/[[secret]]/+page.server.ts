@@ -261,13 +261,16 @@ export const actions: Actions = {
   },
   upsert_room: async ({ request, locals }) => {
     const creator = locals.creator as CreatorDocument;
+    const data = await request.formData();
 
     const form = (await superValidate(
-      request,
+      data,
       zod(roomCRUDSchema)
     )) as SuperValidated<z.infer<typeof roomCRUDSchema>>;
-    const isUpdate = form.data._id ? true : false;
-    const image = form.data.image;
+
+    const isUpdate = form.data.id ? true : false;
+    const image = data.get('image') && (data.get('image') as unknown as [File]);
+
     if (!form.valid) {
       return fail(400, { form });
     }
@@ -278,10 +281,9 @@ export const actions: Actions = {
       form.data.bannerImageUrl = url;
     }
 
-    form.data.uniqueUrl = encodeURIComponent(form.data.uniqueUrl);
     delete form.data.image; // remove image from form
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    const _id = form.data._id ? new ObjectId(form.data._id) : new ObjectId();
+    const _id = form.data.id ? new ObjectId(form.data.id) : new ObjectId();
     delete form.data.id;
     Room.init();
 
@@ -289,7 +291,7 @@ export const actions: Actions = {
     const existingRoom = await Room.findOne({ uniqueUrl: form.data.uniqueUrl });
     if (existingRoom && !isUpdate)
       // @ts-ignore
-      setError(form, 'uniqueUrl', 'Room URL already exists');
+      return setError(form, 'uniqueUrl', 'Room URL already exists');
     if (!existingRoom && isUpdate) {
       const room = (await Room.findOneAndUpdate(
         { _id },
@@ -299,7 +301,7 @@ export const actions: Actions = {
         { new: true }
       )) as RoomDocument;
       if (!room) {
-        error(404, 'Room not found');
+        return message(form, 'Room not found', { status: 404 });
       }
     }
 
@@ -317,9 +319,9 @@ export const actions: Actions = {
           { new: true }
         )) as RoomDocument;
         if (!room) {
-          throw error(404, 'Room not found');
+          return message(form, 'Room not found', { status: 404 });
         }
-        return message(form, 'Room updated successfully');
+        return { form };
       } else {
         // insert new room
         const room = (await Room.create({
@@ -334,7 +336,7 @@ export const actions: Actions = {
             }
           }
         ).exec();
-        return message(form, 'Room created successfully');
+        return { form };
       }
     } catch (error_) {
       console.error(error_);
