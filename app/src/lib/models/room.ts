@@ -80,6 +80,13 @@ const roomZodMongooseSchema = toZodMongooseSchema(roomSchema, {
   }
 });
 
+const ACCEPTED_IMAGE_TYPES = new Set([
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/webp'
+]);
+
 const roomCRUDSchema = roomSchema
   .extend({
     _id: roomSchema.shape._id.optional()
@@ -88,8 +95,15 @@ const roomCRUDSchema = roomSchema
     z.object({
       image: z
         .instanceof(File, { message: 'Please upload a file.' })
-        .refine((f) => f.size < config.UI.maxImageSize, 'Max 5 MB upload size.')
+        .refine(
+          (f) => f.size < config.UI.maxImageSize,
+          `Max ${config.UI.maxImageSize / 1024 / 1024} upload size.`
+        )
+        .refine((f) => ACCEPTED_IMAGE_TYPES.has(f.type), {
+          message: 'Invalid file type.'
+        })
         .optional(),
+
       id: z.string().optional()
     })
   );
