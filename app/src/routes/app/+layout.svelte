@@ -84,7 +84,7 @@
           {/if}
           {#if $page.data.user}
             <div class="text-xl">
-              {$page.data.user.name}
+              <a href={config.PATH.app}>{$page.data.user.name}</a>
             </div>
           {/if}
           {#if $page.data.authType === AuthType.IMPERSONATION}

@@ -336,7 +336,9 @@ export const actions: Actions = {
             }
           }
         ).exec();
-        return { form };
+        return {
+          form
+        };
       }
     } catch (error_) {
       console.error(error_);

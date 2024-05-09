@@ -299,16 +299,15 @@
         <CreatorDetail bind:creator />
 
         <!-- Wallet -->
-        <div>
-          {#key wallet}
-            <WalletDetail {wallet} {exchangeRate} {payoutForm} />
-          {/key}
-        </div>
+        {#key wallet}
+          <WalletDetail {wallet} {exchangeRate} {payoutForm} />
+        {/key}
 
         <!-- Room -->
-
-        <RoomDetail {roomForm} />
-
+        {#key roomForm.data._id}
+          <RoomDetail {roomForm} />
+        {/key}
+        
         <!-- Activity Feed -->
         <div>
           <div class="lg:col-span-1 lg:col-start-3">

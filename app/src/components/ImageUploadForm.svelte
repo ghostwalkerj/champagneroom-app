@@ -49,7 +49,7 @@
     use:enhance={onSubmit}
     {action}
   >
-    <div class="flex flex-col items-center gap-3">
+    <div class="flex flex-col items-center gap-2">
       <FileDropzone
         name="images"
         bind:files={images}
@@ -64,7 +64,7 @@
           <Avatar
             src={imageUrl}
             alt="profileImage"
-            class="relative max-h-32 max-w-32 rounded-full bg-cover bg-center bg-no-repeat"
+            class="relative w-28 rounded-full bg-cover bg-center bg-no-repeat"
           />
         </svelte:fragment>
       </FileDropzone>

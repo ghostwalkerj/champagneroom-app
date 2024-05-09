@@ -39,7 +39,7 @@
         ><Icon icon="fluent:star-28-filled" /></svelte:fragment
       >
     </Ratings>
-    <span class="mt-2 text-surface-500">
+    <span class="mt-2 text-sm text-surface-500">
       ({creator.feedbackStats.averageRating.toFixed(2) ?? 0})</span
     >
   </div>

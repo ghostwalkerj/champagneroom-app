@@ -33,6 +33,10 @@
     }
   };
 
+  const handleClick = () => {
+    modalStore.trigger(roomModal);
+  };
+
   $: roomUrl = urlJoin($page.url.origin, config.PATH.room, room.uniqueUrl);
 
   onMount(() => {
@@ -83,14 +87,14 @@
     <button
       type="button"
       class="neon-secondary variant-soft-secondary btn btn-sm"
-      on:click={() => modalStore.trigger(roomModal)}>Edit My Room</button
+      on:click={handleClick}>Edit My Room</button
     >
   {:else}
     <div class="text-secondary-500">No room found</div>
     <button
       type="button"
       class="neon-secondary variant-soft-secondary btn btn-sm"
-      on:click={() => modalStore.trigger(roomModal)}>Create My Room</button
+      on:click={handleClick}>Create My Room</button
     >
   {/if}
 </div>
