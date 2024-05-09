@@ -1,4 +1,4 @@
-import { error, fail, redirect } from '@sveltejs/kit';
+import { type Cookies, error, fail, redirect } from '@sveltejs/kit';
 
 import { env } from '$env/dynamic/private';
 
@@ -20,10 +20,12 @@ const tokenName = env.AUTH_TOKEN_NAME || 'token';
 
 const createUser = async ({
   request,
-  role
+  role,
+  cookies
 }: {
   request: Request;
   role: UserRole;
+  cookies: Cookies;
 }) => {
   const data = await request.formData();
   const name = data.get('name') as string;
@@ -32,24 +34,32 @@ const createUser = async ({
   const signature = data.get('signature') as string;
   const agentId = (data.get('agentId') as string) || undefined;
 
-  // Validation
-  if (!name || name.length < 3 || name.length > 50) {
-    return fail(400, { name, badName: true });
-  }
-
   // Verify Auth
   if (!verifySignature(message, address, signature)) {
     return fail(400, { invalidSignature: true });
   }
 
+  // If there is a good signature, can set auth cookie here
+
   // Check if existing user, if so, throw new Error("User already exists");
   const user = (await User.findOne({
     address
   })) as UserDocument;
+
   if (user) {
-    return user.isAgent()
-      ? fail(400, { alreadyAgent: true })
-      : fail(400, { alreadyUser: true });
+    // Update User Nonce
+    const nonce = Math.floor(Math.random() * 1_000_000);
+    User.updateOne({ _id: user._id }, { $set: { nonce } }).exec();
+
+    // Create Auth Token and set cookie
+    const encAuthToken = createAuthToken({
+      id: user._id.toString(),
+      selector: '_id',
+      authType: AuthType.SIGNING
+    });
+
+    encAuthToken && setAuthToken(cookies, tokenName, encAuthToken);
+    return fail(400, { userExists: true });
   }
 
   try {
@@ -63,8 +73,19 @@ const createUser = async ({
       address: address.toLowerCase(),
       payoutAddress: address.toLowerCase(),
       wallet: wallet._id,
-      roles: [role]
+      roles: [role],
+      nonce: Math.floor(Math.random() * 1_000_000)
     });
+
+    // Create Auth Token and set cookie
+    const encAuthToken = createAuthToken({
+      id: user._id.toString(),
+      selector: '_id',
+      authType: AuthType.SIGNING
+    });
+
+    encAuthToken && setAuthToken(cookies, tokenName, encAuthToken);
+
     return {
       success: true,
       user,
@@ -78,8 +99,8 @@ const createUser = async ({
 
 export const actions: Actions = {
   create_agent: async ({ cookies, request }) => {
+    const result = await createUser({ request, role: UserRole.AGENT, cookies });
     try {
-      const result = await createUser({ request, role: UserRole.AGENT });
       if ('success' in result) {
         const user = result.user;
 
@@ -88,28 +109,22 @@ export const actions: Actions = {
           defaultCommissionRate: config.UI.defaultCommissionRate
         });
 
-        // Update User Nonce
-        const nonce = Math.floor(Math.random() * 1_000_000);
-        User.updateOne({ _id: user._id }, { $set: { nonce } }).exec();
-
-        // Create Auth Token and set cookie
-        const encAuthToken = createAuthToken({
-          id: user._id.toString(),
-          selector: '_id',
-          authType: AuthType.SIGNING
-        });
-
-        encAuthToken && setAuthToken(cookies, tokenName, encAuthToken);
+        redirect(303, config.PATH.agent);
+      } else {
+        return fail(400, result.data);
       }
     } catch (error) {
       console.error('err', error);
       return fail(400, { err: JSON.stringify(error) });
     }
-    redirect(303, config.PATH.agent);
   },
   create_creator: async ({ cookies, request }) => {
+    const result = await createUser({
+      request,
+      role: UserRole.CREATOR,
+      cookies
+    });
     try {
-      const result = await createUser({ request, role: UserRole.CREATOR });
       if ('success' in result) {
         const agentId = result.agentId || undefined;
         const user = result.user;
@@ -134,25 +149,14 @@ export const actions: Actions = {
             { $inc: { referralCount: 1 } }
           ).exec();
         }
-
-        // Update User Nonce
-        const nonce = Math.floor(Math.random() * 1_000_000);
-        User.updateOne({ _id: user._id }, { $set: { nonce } }).exec();
-
-        // Create Auth Token and set cookie
-        const encAuthToken = createAuthToken({
-          id: user._id.toString(),
-          selector: '_id',
-          authType: AuthType.SIGNING
-        });
-
-        encAuthToken && setAuthToken(cookies, tokenName, encAuthToken);
+        redirect(303, config.PATH.creator);
+      } else {
+        return fail(400, result.data);
       }
     } catch (error) {
       console.error('err', error);
       return fail(400, { err: JSON.stringify(error) });
     }
-    redirect(303, config.PATH.creator);
   }
 };
 
@@ -162,6 +166,10 @@ export const load: PageServerLoad = async ({ params, locals }) => {
   const message = env.AUTH_SIGNING_MESSAGE + ' ' + nonce;
   const user = locals.user;
   let agent: AgentDocument | undefined;
+
+  if (user) {
+    throw redirect(303, config.PATH.app);
+  }
 
   if (code) {
     const referrer = (await User.findOne({ referralCode: code }).orFail(() => {
@@ -179,8 +187,6 @@ export const load: PageServerLoad = async ({ params, locals }) => {
   return {
     message,
     agent:
-      agent?.toJSON({ flattenMaps: true, flattenObjectIds: true }) ?? undefined,
-    user:
-      user?.toJSON({ flattenMaps: true, flattenObjectIds: true }) ?? undefined
+      agent?.toJSON({ flattenMaps: true, flattenObjectIds: true }) ?? undefined
   };
 };

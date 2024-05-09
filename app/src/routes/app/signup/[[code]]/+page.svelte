@@ -1,6 +1,13 @@
 <script lang="ts">
   import Icon from '@iconify/svelte';
-  import { RadioGroup, RadioItem, Step, Stepper } from '@skeletonlabs/skeleton';
+  import {
+    getModalStore,
+    type ModalSettings,
+    RadioGroup,
+    RadioItem,
+    Step,
+    Stepper
+  } from '@skeletonlabs/skeleton';
   import type { ActionResult } from '@sveltejs/kit';
   import { Image } from '@unpic/svelte';
   import type { WalletState } from '@web3-onboard/core';
@@ -22,8 +29,23 @@
 
   const message = data.message;
   const agent = data.agent;
-  const user = data.user;
   let isSubmitting = false;
+
+  const modalStore = getModalStore();
+
+  const userExistsModal: ModalSettings = {
+    type: 'alert',
+    // Data
+    title: 'User Exists',
+    body: 'A user already exists with this address.  You are now logged in as that user.',
+    // Action
+    response: () => {
+      goto(config.PATH.app);
+    },
+
+    buttonTextCancel: 'Close'
+  };
+
   const onStepHandler = (event: CustomEvent): void => {
     if (event.detail.step === 2) {
       exampleName =
@@ -49,9 +71,6 @@
   $: walletAddress = '';
 
   onMount(() => {
-    if (user) {
-      goto(config.PATH.app);
-    }
     accountUnsub = selectedAccount.subscribe((account) => {
       stepStart = account ? 1 : 0;
       if (account) {
@@ -89,6 +108,9 @@
     return async ({ result }: { result: ActionResult }) => {
       if (result.type !== 'redirect') {
         isSubmitting = false;
+      }
+      if (result.type === 'failure' && result.data && result.data.userExists) {
+        modalStore.trigger(userExistsModal);
       }
       applyAction(result);
     };
