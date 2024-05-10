@@ -1,6 +1,7 @@
 <script lang="ts">
   import Icon from '@iconify/svelte';
   import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
+  import { Image } from '@unpic/svelte';
   import { onDestroy, onMount } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
   import type { SuperValidated } from 'sveltekit-superforms';
@@ -71,8 +72,14 @@
       <span class="font-bold text-white">{room.name}</span>
       {#if room.tagLine}<div class="text-sm">{room.tagLine}</div>{/if}
       <div class="m-4 max-w-fit overflow-hidden">
-        <!-- svelte-ignore a11y-missing-attribute -->
-        <img src={room.bannerImageUrl} class="w-32 rounded-container-token" />
+        <Image
+          src="{room.bannerImageUrl} "
+          alt="Room Banner"
+          class="rounded-container-token"
+          height={128}
+          width={128}
+          loading="eager"
+        />
       </div>
       <div>
         URL:
