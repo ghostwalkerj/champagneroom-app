@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
+  import { Image } from '@unpic/svelte';
 
   import config from '$lib/config';
 </script>
@@ -174,20 +175,26 @@
       <div
         class="image transition-timing-function mx-auto hidden max-w-lg animate-pulse opacity-20 md:flex"
       >
-        <img
+        <Image
           class="motion-safe:animate-fadeIn mx-auto h-auto w-full justify-center rounded-lg opacity-45"
           src="{config.PATH.staticUrl}/assets/ladyblue.png"
           alt="Lady Blue"
+          height={512}
+          width={512}
+          loading="eager"
         />
       </div>
 
       <div
         class="image transition-timing-function mx-auto hidden max-w-lg animate-pulse opacity-20 md:flex"
       >
-        <img
+        <Image
           class="motion-safe:animate-fadeIn mx-auto h-auto w-full justify-center rounded-lg opacity-45"
           src="{config.PATH.staticUrl}/assets/ladypink.png"
           alt="Lady Pink"
+          height={512}
+          width={512}
+          loading="eager"
         />
       </div>
     </div>

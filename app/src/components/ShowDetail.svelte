@@ -1,6 +1,7 @@
 <script lang="ts">
   import Icon from '@iconify/svelte';
   import { Ratings } from '@skeletonlabs/skeleton';
+  import { Image } from '@unpic/svelte';
   import { onMount } from 'svelte';
   import urlJoin from 'url-join';
 
@@ -87,10 +88,13 @@
   {#if show}
     <div class="bg-custom grid rounded-r !text-center md:grid-cols-2">
       <div class="relative">
-        <img
+        <Image
           src={show.coverImageUrl}
           alt="show"
-          class="m-auto max-h-fit w-full max-w-xl rounded-l"
+          height={500}
+          width={500}
+          loading="eager"
+          class="m-auto max-h-fit w-full max-w-xl rounded-lg"
         />
         {#if options.showWaterMark && waterMarkText}
           <p

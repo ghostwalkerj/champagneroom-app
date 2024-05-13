@@ -1,6 +1,7 @@
 <script lang="ts">
   import Icon from '@iconify/svelte';
   import { getModalStore } from '@skeletonlabs/skeleton';
+  import { Image } from '@unpic/svelte';
   import type { SvelteComponent } from 'svelte';
   import type { Infer, SuperValidated } from 'sveltekit-superforms';
   import { superForm } from 'sveltekit-superforms/client';
@@ -18,10 +19,8 @@
       Infer<typeof reserveTicketSchema>
     >,
     {
-      validationMethod: 'auto',
       onResult: ({ result }) => {
         if (result.type === 'success' || result.type === 'redirect') {
-          // VERIFY THIS IS CORRECT
           modalStore.close();
         }
       }
@@ -45,9 +44,12 @@
         value={$modalStore[0].meta.profileImage}
       />
 
-      <img
+      <Image
         src={$modalStore[0].meta.profileImage}
         alt="profile"
+        height={500}
+        width={500}
+        loading="eager"
         class="hidden h-auto rounded-l sm:block"
       />
 

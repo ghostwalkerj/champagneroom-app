@@ -1,5 +1,6 @@
 <script lang="ts">
   import markerSDK from '@marker.io/browser';
+  import { Image } from '@unpic/svelte';
   import { format, generate } from 'build-number-generator';
   import { onDestroy, onMount } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
@@ -68,10 +69,12 @@
     class="flex items-center justify-between px-4 shadow-lg shadow-surface-900"
   >
     <a class="display-inline" href="/">
-      <img
+      <Image
         src="{config.PATH.staticUrl}/assets/logo-horizontal-tr.png"
         alt="Logo"
         width="300"
+        height="90"
+        loading="eager"
       />
     </a>
 

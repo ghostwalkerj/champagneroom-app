@@ -26,11 +26,11 @@
 
 {#if copied}
   <slot name="copiedText">
-    <span class="text-success-500">Copied!</span>
+    <span class="p-1 text-xs text-success-500">Copied!</span>
   </slot>
 {:else}
   <div
-    class="card variant-filled-secondary p-4 text-xs"
+    class="card variant-filled-secondary p-1 text-xs"
     data-popup="popupHover"
   >
     <slot name="hoverText">

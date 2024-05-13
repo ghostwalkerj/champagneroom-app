@@ -5,6 +5,7 @@
     type DrawerSettings,
     getDrawerStore
   } from '@skeletonlabs/skeleton';
+  import { Image } from '@unpic/svelte';
 
   import { page } from '$app/stores';
 
@@ -49,7 +50,7 @@
         <li on:click={closeNav}>
           {#if link.name == 'Sign Up'}
             <a
-              class="from-primary btn w-full whitespace-nowrap rounded-lg bg-gradient-to-br to-pink-500 py-4 text-black hover:shadow-[0px_0px_17px_6px_#e779c1]"
+              class="btn w-full whitespace-nowrap rounded-lg bg-gradient-to-br from-primary-500 to-pink-500 py-4 text-black hover:shadow-[0px_0px_17px_6px_#e779c1]"
               href={link.href}
               ><span class="font-Roboto font-bold">{link.name}</span></a
             >
@@ -60,10 +61,13 @@
               href={link.href}
             >
               <span class="block whitespace-nowrap">{link.name}</span>
-              <img
+              <Image
                 src="/icons/champagne bottles_01.png"
                 alt="champagne icon"
                 class="block h-8"
+                width={20}
+                height={20}
+                loading="eager"
               />
             </a>
           {:else}
@@ -82,10 +86,12 @@
 <!-- Desktop Navbar -->
 <div class="flex items-center justify-between">
   <a href="/" class="w-[180px] lg:w-[280px]">
-    <img
+    <Image
       alt="logo"
       src="{config.PATH.staticUrl}/assets/logo-horizontal-tr.png"
-      class=""
+      width={280}
+      loading="eager"
+      height={90}
     />
   </a>
 
@@ -105,10 +111,13 @@
             href={link.href}
           >
             {link.name}
-            <img
+            <Image
               src="/icons/champagne bottles_01.png"
               alt="champagne icon"
               class="block h-5"
+              width={20}
+              height={20}
+              loading="eager"
             />
           </a>
         {:else}
@@ -129,7 +138,7 @@
         <li>
           {#if link.name == 'Sign Up'}
             <a
-              class="from-primary btn whitespace-nowrap rounded-lg bg-gradient-to-br to-pink-500 py-3.5 text-black hover:shadow-[0px_0px_17px_6px_#e779c1]"
+              class="btn whitespace-nowrap rounded-lg bg-gradient-to-br from-primary-500 to-pink-500 text-black hover:shadow-[0px_0px_17px_6px_#e779c1]"
               href={link.href}>{link.name}</a
             >
           {:else if link.name == 'Open App'}
@@ -139,10 +148,13 @@
               href={link.href}
             >
               {link.name}
-              <img
+              <Image
                 src="/icons/champagne bottles_01.png"
                 alt="champagne icon"
                 class="block h-5"
+                width={20}
+                height={20}
+                loading="eager"
               />
             </a>
           {/if}
