@@ -49,7 +49,8 @@ const config = {
     profileImagePath: 'https://static.champagneroom.app/profile',
 
     defaultCommissionRate: 10,
-    maxImageSize: 5_000_000
+    maxImageSize: 5_000_000,
+    pinLength: 8
   },
   TIMER: {
     gracePeriod: 600_000,

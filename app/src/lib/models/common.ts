@@ -1,6 +1,7 @@
 import validator from 'validator';
 import z from 'zod';
 
+import config from '$lib/config';
 import {
   ActorType,
   CancelReason,
@@ -138,19 +139,22 @@ export const refundSchema = z.object({
 export const reserveTicketSchema = z.object({
   profileImage: z.string().optional(),
   // 3 char min, 50 char max
-  name: z.string().min(3).max(50),
+  name: z
+    .string()
+    .min(3, 'Name must be at least 3 characters long')
+    .max(50, 'Name must be at most 50 characters long')
+    .trim(),
   // 8 digit, number pin
   pin: z
-    .array(
-      z
-        .number({
-          invalid_type_error: 'PIN must be numbers'
-        })
-        .int()
-        .nonnegative()
-        .lt(10)
-    )
-    .length(8, 'PIN must be 8 digits')
+    .number({
+      coerce: true,
+      invalid_type_error: 'PIN must be numeric'
+    })
+    .int()
+    .nonnegative()
+    .lt(10)
+    .array()
+    .length(config.UI.pinLength, `PIN must be ${config.UI.pinLength} digits`)
 });
 
 export const runtimeSchema = z.object({

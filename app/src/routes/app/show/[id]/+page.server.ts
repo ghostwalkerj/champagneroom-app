@@ -57,10 +57,8 @@ export const actions: Actions = {
     }
 
     const form = await superValidate(request, zod(reserveTicketSchema));
-
-    // Convenient validation check:
+    console.table(form.data);
     if (!form.valid) {
-      // Again, return { form } and things will just work.
       return fail(400, { form });
     }
 
@@ -264,12 +262,11 @@ export const load: PageServerLoad = async (event) => {
   const form = await superValidate(
     {
       name: displayName,
-      pin: Array.from({ length: 8 }, () => Math.floor(Math.random() * 10))
+      pin: Array.from({ length: config.UI.pinLength || 8 }, () =>
+        Math.floor(Math.random() * 10)
+      )
     },
-    zod(reserveTicketSchema),
-    {
-      errors: false
-    }
+    zod(reserveTicketSchema)
   );
 
   return {

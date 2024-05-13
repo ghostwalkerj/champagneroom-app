@@ -4,7 +4,8 @@ const PROFILE_IMAGE_EXTENSION = 'jpg';
 const PROFILE_IMAGE_PREFIX = 'profile';
 
 const getProfileImage = (name: string, defaultProfileImagePath: string) => {
-  const code = [...name].reduce(
+  const cleanName = name.trim().toLowerCase();
+  const code = [...cleanName].reduce(
     (accumulator, char) => accumulator + (char.codePointAt(0) || 0),
     0
   );
