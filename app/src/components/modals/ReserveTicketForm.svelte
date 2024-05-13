@@ -8,10 +8,12 @@
 
   import type { reserveTicketSchema } from '$lib/models/common';
 
+  import config from '$lib/config';
+  import getProfileImage from '$lib/profilePhoto';
+
   // Props
   /** Exposes parent props to this component. */
   export let parent: SvelteComponent;
-
   const modalStore = getModalStore();
 
   const theForm = superForm(
@@ -28,6 +30,7 @@
   );
 
   const { form, errors, constraints, enhance, delayed, message } = theForm;
+  let profileImage = getProfileImage($form.name, config.UI.profileImagePath);
 </script>
 
 {#if $modalStore[0]}
@@ -38,19 +41,15 @@
       use:enhance
       action={$modalStore[0].meta.action}
     >
-      <input
-        type="hidden"
-        name="profileImage"
-        value={$modalStore[0].meta.profileImage}
-      />
+      <input type="hidden" name="profileImage" bind:value={profileImage} />
 
       <Image
-        src={$modalStore[0].meta.profileImage}
+        src={profileImage}
         alt="profile"
         height={500}
         width={500}
-        loading="eager"
         class="hidden h-auto rounded-l sm:block"
+        loading="eager"
       />
 
       <div class="flex flex-col justify-between gap-4 p-4">
@@ -64,6 +63,12 @@
               placeholder="Enter name..."
               name="name"
               bind:value={$form.name}
+              on:input={() => {
+                profileImage = getProfileImage(
+                  $form.name,
+                  config.UI.profileImagePath
+                );
+              }}
             />
             {#if $errors.name}<span class="text-error-500">{$errors.name}</span
               >{/if}
