@@ -109,9 +109,9 @@ const createTicketMachine = ({
   ticketDocument: TicketDocument;
   ticketMachineOptions?: TicketMachineOptions;
 }) => {
-  /** @xstate-layout N4IgpgJg5mDOIC5QBcCWBjA1mZBZAhugBaoB2YAxAMoASA8gOoAEAwgIIByLAogDK-cAIgG0ADAF1EoAA4B7WKjSzSUkAA9EAFgBMAGhABPRNoCM2zQDoAHCZObRVgOyaAnNqsuAvp-1osOAmIySlpGVk4efiFhE0kkEDkFJRV4jQQdfSMEEwBmF0cLAFYANjdtQtETYs0rYqtvXwxsPEIScgs-Zt5ZfAhICjE4mXlFVGVVNJzHQos7UWLi0ULzURcTZ0zEXNFLbRdC2tFHHM0qzRyGkE6A1uCOppxu3v6YoYSR5InEHMKZuYWlis1htDMYdjNKpoalZRDlio5HKJtJdri0gu1UU8+hABto3olRuNUogrHpQQhzG4LKZHNUctp5vkTCiHmi2mB7v5kFiXjl8R8xilQGltKZqcVfgdCvS3BVHJsEMUfhZXDlYZopSYdpoWVzAuzOV0etiBpp+UlBV8EFM-vYAct7MDNAqzAdqfs1vYEXZcrrmvq7pjjS9CubCUL1IhHGSstpSjMpnDnCVRKtkT4rqyAxjWTyccJimHPsSEMsFWq4yqrGqXOdYfNmRnUdmOUHnvnHEXLSWGSZxZKrNK9uUjgrRS4inkXE5HGtlm5in6buiOQAnOBgVcAN36oWY3A4gmiElUBOLwq2NgK6wZLhyHkKjisGXJJysFlh09K1cfn51TazW52nXWBNx3CALAAd3wUZSCgTQAAV8AMABbMBSGQCgELYABNXADwAFSYAAlbgeAASQANWPLsiQvbJYWKIpChqaZYQRGF5XJKxn1mJUjlycxim0RxG0aPUgLXDdt0gKCYLQODEOQtCMKw3D8I4IjSIo6iRFiU8BToyMEGOSw7RE4oTEfcpygVUkciKbYTGfeltkKJc2TuECwNk6DYPgpDUPQzD2C4PheDYAjyLoDgmHIjhyKiyKaIMi0jLSZyRNmaNVnvfYnxfLIqlEixZwOI48lsJwLgAiSVwsbyZIgvyFIC5TgooULIgiqKYrihKkoI6J9PiM9u3orVK1+ViKimJ9R3JMwsufOMdGqdZan-cT-UkhrpPAuT-KUoLVMGVLwytSamOmpxZo4hasmrd8qhyMxNAWWkdhq7blwNRqDpash4KoIhZEg6h6GYAApOh4pS0bDIjDKr2y288sfFa7PmUqtVTFx+Oc+YPJbPbQKaiwyFGfBkEgFh8FIdAwAAGyZ6nBUO1rNGIsAADMAFdSBxUiADEAFVDxIsjuCo+HhjSpHL3WVHcofAqY0vUVZl+WwrMfKzYWJ3b-tkym0Gp2n6cZlm2eUDmga53mBaF7gxYl7Tpd015zvPYy7DhaxCnyJw4xOUxihdON30ZUUKjOWpF1qnb6vXSAwDQnE9yYARhYIs6Eflq1ykRCw8g1VadjMeEFWcbRqVx8rVcHQ3k7AVP04hsIYbhkQT3zi6ewqGZzjYwp1hyV7nXJaoZmmOo7xOSonzEzM6r+1u+nbzODyPHvaIVxV1YpZw+0TGEpkHJ9n2bg0yG4WB0FXMGKGF7ghAAITYFgAGlJZ02X3gLiWU4DlTKImcDKQccYxxgOyg4aMJQ3AmHyNfO4t976P3BoIciVAEKiyGv1RK5Fkq729uNYywDSonDAecPYkDw7kncI+Sci94Q-Eyu5ROv1UGkDvg-J+UVv7cCIsLeKbBeDkQAFr-zGulLQuRKGaGoRA5Y9DYyWVEDjaYNlR52BKN4DMpBZB9HgPEZsklSGyIQAAWlUYgfYH57Cpicc4xwKCcxcjzBY-ehUtjlDMkcJYUJFHVAcG4qSZNwJeKtHUJi5laRWXgbZckxwmKVBrGsfI+wRJhNJj5Zq8l7aBRUsgKJJYEQQjYQcKYfspgKjcJYfGllqzOSsq9HJxt8lHRBmDUpE0fhmQ1Kcaos5KiijsucCwCxXqvWmtUdMP1PLAX2ibUgVMaYQDpgzZmrMfYyP3rkHiAcg7RiVDoKoLpCZFFKKYKEmToztOWRBU2qBzYbMttsm2pA7aKW5vzQWvTfZyhVK4Coz4mS2BdHCCcyxtB5VpAcJwDy26QABSKZyTF7xqmEh4H4cJbEIBcpMpUop3Bwq8JwxZHJ0DvJZiivuPs0UuAnDUDUr1ygShKIfUwqxZh2HODxIu30V5JwNDzMg+AmaoAAF50rlv3eidILD4wXNKFiiwzDQJ5YsesiwGT0iODktBfDIKouMHeSZlRiV2HxrUQo0CmHaoWMJcB2SKUkzIIIVAsBpB8xpqaxUSsJTwhYnixYs5yyLyrK9L6DJR6uoWSTFCXrQIQG6Sa+lZCMrTlrvSeyHhFHLFhOWao4olT5EshUI4719GeCAA */
   return createMachine(
     {
+      /** @xstate-layout N4IgpgJg5mDOIC5QBcCWBjA1mZBZAhugBaoB2YAxAMoASA8gOoAEAogHIAiLHA2gAwBdRKAAOAe1io0Y0sJAAPRABYATABoQAT0QAOAIwA6AKx9TegGw6AzFYDsV83ysBfZxrRYcBYmTAGP2MgAMmL4EJAU-EJIIOKS0rIxiggqtoYq5kbmSnx69nxKOrYa2ikquca2Oip6AJzlVVXmru4Ygd4k5P5tOCFhETx60aISUqgycskqtemZ2bn5hcVaiCr6tQZOdrbmtUZWtTa2LSABXoSdfmfBoeEQkSrDsaMJk6v6BhlZOXlWBUUlVYqJS2So6JRGWq1TIqBwna4dXzdTw3fr3HhWJ5xMYTJKIP6zb4LP5LQEpHSZTY2JRKPR8Q7QlxuU49PAXJHXPp3SJKLEvcaJUBTcyE+a-f7LUo1IxGMEykzmKpKQ7w1mIrqc24DIx8+ICt4pIyin6LIrqFYpOkbIxVKx6JR2gr1VUo9VXVlcgbmXU4wUKVa0z5zE0ks1k+21PgGRV1EFWVQE5rMhHsjUerXo2w+154lJ2oNE8VLc2le006O2FRrKzlKuVlQu9qp90oz3onTZ-W5gkFsWmyWrGaGLaWPQ6I01vhJ1qu5vIwJtyK1Tu4oWrPTG4kSkuIPRWIwqCuw23-cfTlmznxp1sZyJ0ld+qYVL590OVsmpdJfGp6A9ZNaNucV4tgut6DEMcjYjma5lJuRZhhae61DoR42Hwtj7DatSAWywHzr0YF6I8kH8qu-oIHUcH9juZSylWcxFE4FKHOeKZ4QATnAYDsQAbhEtCMEwADCACCbBCSwQRBNwUQkXqZHJOY5QGLY9hLBK+gfuhKFKUaOjVLUyrWMcyZqnOnGwNxfH3AJzCieJknSbwEExFBXYwfuOhRl8qg6IZdSOOYH5KJYBh2kYNJ-BhgU4W6BgWVZkAGAA7vgYykFASgAAr4JoAC2YCkMgFD2RJUkiQAKgAknQbBMAASiwACKACqLBUBVMmCHJvoGvukYFr5-nQlOH6QoYlZ7rYfBGEU0JEbF5lcbxSWpelmU5flhXFVlIkAJq4OwFVMFVbBVdVlVdQ+BrQuYBjVExs1TaoRhjQ4KmzcCqiGV5M2LRxy3WQYZBjPgyCQJtBVFRQu0HUdDUsBJVUAGpXT10HkXuMrRoUJgHjNkKWGNfAobUaRGjNlYzXo-2XPFgNJSDaBgxDuVQzt+2HWwx2NUjqPOdduZY7K2TjjN5QytCOgfg4d3adM5T7ioJhMjOTYA5ZK0QPT6BgKg1mQ9tMOc-DvMsCjaOuaRj67lCGyGRF1iTuY+4y1YKHTGOIVKRumRKLTSIJVrOt6wbbNG7DXM84j5v84MgswRYqkqdCUKqC7vs0VWXn3UaGeRvYkImWrQF00HQOcbr+us1t0ONQAYi1nAI617Wdbw3VW-JNsUXbBgO4UNjlC7r2IbYMwGHk5TgjKIIWEYAddOXq1pWgGVKFQRBiMlFDVUJADSLDR1wLCHR3Cfkf13l+2sw2BR+5OT6kRRzzsNI6IvfjL9ra1r5lm-bwoA3JuHAW5tQ6pbEY3cDTAgwgYGk+xxyqTUqNRChwlD3WQi7bIwJxyf3pprIGv8yD-y3jvYBzdGqtwgQLdG7lL42mvhFW+tIRpBQtLCPI-csgbiNPYaw+x8Hf3pgAMwAK6kAgPVMAABHMRcBwb3AoaA0650qqXXPnQhS+I+DTBUn5dCysZjKyUOGQ4UZHY2DHKpA8sIhEMx-qvEhShpHiMkUAlgjdKExwtporuvVuyMMGiwgKqDSx+TuvGGUql7Tu2MvYwhK91ouLAG4pRniQEIz5jJFyUCAkeSrBgvYBJoQZBJuYdh4SIRhSrPGGkuxwRVHseEMABUbL0GYNJeuFVZL+IxskHILtoxrAdJkP42cPxeVBNYe01QqzAinAvUyl4y6QDAK0-iHSmAACk6CnUgc8aB3YoQ6TSLjXyJNagPw3GFVSXkxyiw3KrC86s6aFW5HvQ+x166nREkEKqAAtA5bltEUV2BghBNZdiVkMg4MkXkMH6TWH5G0ZpoT4PeYzUgLBYDoHYoA+uLBuAACERIHyybHYF1sDREQitGYpuiSY1BemSA41oHAQh2EpO0e5WJmTwpi7WZAcV4sARwKqVAsotU6idM6F1269Lyf0xAaRDBk0yDY8eThMisr8ipDI2Rfx2mBAtZZrykSCuBti3F+Kd6KsOfk8iqr+47BtBhLVDhR6lAnJPGsSClZlJpma0uFrJFYo4KgWAIgxHgxSk49eHAwDoEjQKCg4rJXSpYEwLgQkqpcD8Uq+hyQMJRgqTkewHLjx6DJIZCxFJcgOirGTI0GKw1CtIBGqNMa-DEITUmlNMg00SqlTKnNeackX2SFaD2qg8iGRpLCG04YCiyiNDaSEIU0iNFbXcK1nbo2xt7Zlfd3bXESPSV40BZtfH2pBT3e0sIcZTnjDMKcmQvWID2IYEK6EKkinpMXF5IauiWrypGyyEAAE73TSOrNqj5VUqOTBBUKlZ2KgKGkfSNhww1BQq6kUG504FFcMyUgYhwjwBiGxS4Wie4AFpKmIAY5sUwrG2NmGmkskuuE6aajRLRg0qhJn1H0Z6ssCzwQJMShAATuYbSHlUvGRiSxNJjycEeKcqlyjIScFJ4OR7srhyKrJmCVRZT1DJp5WlqQrBjQqdGCctKTk2C40BnjgcHFWtBoow2xm+lFt3HkFCD0Mjgk8vpMaB5+5hahJCccpruNxWEZXUONd2YmcxrYQo9LDhZclknLO7tDwkkLtkHYqQ9NEPjaQ7eGWph2mmf1JYdI-IhUixsHIJMZqMr2P7YN7ml6ec4mk6RciFGQDq+8ZUKdFT1HdvYd1Zi6W6JMJGCkfxcjYX60lzzBmz2SMmwgGsexjAXNpX8CkH7e4hRUhhd+NRcj2lc9RjzLS2mHbZQpm0NZZpFBrDsD8kYNgjNMOg-YEJ8HoHwKQXWAAbWHE3-OgoOFwlzSlqiEeQjLB00Z9wykXSSBs225wiLIPgWHqAABeiPC2grHCJqo1m5sYelohHIh5FQ1EszURwxHicCrbYdiEeG0PTTnlh2zFpxmfANcCaFeNdP87eW2q1IrbWHYihghWX6Cbgh1RaA8oJDIZDUk7cZO7w2RoPWAQ700OfzArTguw1aLTjisJsccUIst+VhH5C37aT2Huq0oRNybJBkTvQaawEKEXR9mrOyXpYpyk3qLCBtbK+uJbnJasggee3B7z-tmTSP705A2MayWafmLLvHvdTn00suLOmP7gwYHYAQag4dikKE-V7npA4eLV2KkoVmiKWEtIiKKhI84IAA */
       context: {
         ticketDocument,
         ticketMachineOptions,
@@ -187,7 +187,16 @@ const createTicketMachine = ({
           ]
         },
         reserved: {
-          initial: 'waiting4Payment',
+          always: [
+            {
+              target: '#ticketMachine.reserved.waiting4Show',
+              cond: 'isFreeTicket',
+              actions: ['redeemFreeTicket']
+            },
+            {
+              target: '#ticketMachine.reserved.waiting4Payment'
+            }
+          ],
           on: {
             'SHOW CANCELLED': [
               {
@@ -798,12 +807,14 @@ const createTicketMachine = ({
                 0)
           );
         },
-
         noDisputeRefund: (context, event) => {
           const decision =
             context.ticketState.dispute?.decision || event.decision;
           if (!decision) return false;
           return decision === DisputeDecision.NO_REFUND;
+        },
+        isFreeTicket: (context) => {
+          return context.ticketDocument.price.amount === 0;
         }
       }
     }
