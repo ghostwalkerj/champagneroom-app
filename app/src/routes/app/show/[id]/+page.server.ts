@@ -19,26 +19,16 @@ import type { ShowQueueType } from '$lib/workers/showWorker';
 import config from '$lib/config';
 import {
   AuthType,
-  CurrencyType,
   EntityType,
   ShowMachineEventString,
-  TicketMachineEventString,
   UserRole
 } from '$lib/constants';
 import { authEncrypt } from '$lib/crypt';
 import type { DisplayInvoice } from '$lib/ext/bitcart/models';
 import { mensNames } from '$lib/mensNames';
-import {
-  createBitcartToken,
-  InvoiceJobType,
-  InvoiceStatus,
-  type PaymentType
-} from '$lib/payout';
+import { createBitcartToken, type PaymentType } from '$lib/payout';
 import { createAuthToken, setAuthToken } from '$lib/server/auth';
-import {
-  getShowMachineServiceFromId,
-  getTicketMachineService
-} from '$lib/server/machinesUtil';
+import { getShowMachineServiceFromId } from '$lib/server/machinesUtil';
 
 import {
   createInvoiceInvoicesPost,
@@ -57,7 +47,6 @@ export const actions: Actions = {
     }
 
     const form = await superValidate(request, zod(reserveTicketSchema));
-    console.table(form.data);
     if (!form.valid) {
       return fail(400, { form });
     }
@@ -111,120 +100,124 @@ export const actions: Actions = {
       return message(form, 'Show cannot reserve ticket', { status: 501 });
     }
 
-    // Create invoice in Bitcart
-    const token = await createBitcartToken(
-      env.BITCART_EMAIL ?? '',
-      env.BITCART_PASSWORD ?? '',
-      env.BITCART_API_URL ?? '' // Add default value for env.BITCART_API_URL
-    );
+    // Check if payments are required
+    if (ticket.price.amount > 0) {
+      // Create invoice in Bitcart
+      const token = await createBitcartToken(
+        env.BITCART_EMAIL ?? '',
+        env.BITCART_PASSWORD ?? '',
+        env.BITCART_API_URL ?? '' // Add default value for env.BITCART_API_URL
+      );
 
-    let response = await createInvoiceInvoicesPost(
-      {
-        price: ticket.price.amount,
-        currency: ticket.price.currency,
-        store_id: env.BITCART_STORE_ID ?? '',
-        expiration: config.TIMER.paymentPeriod / 60 / 1000,
-        order_id: ticket._id.toString()
-      },
-      {
+      let response = await createInvoiceInvoicesPost(
+        {
+          price: ticket.price.amount,
+          currency: ticket.price.currency,
+          store_id: env.BITCART_STORE_ID ?? '',
+          expiration: config.TIMER.paymentPeriod / 60 / 1000,
+          order_id: ticket._id.toString()
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (!response || !response.data) {
+        console.error('Invoice cannot be created');
+        return message(form, 'Invoice cannot be created', { status: 501 });
+      }
+
+      // Update the notification url
+      const invoice = response.data as DisplayInvoice;
+      const encryptedInvoiceId =
+        authEncrypt(
+          invoice.id ? (invoice.id as string) : '',
+          env.AUTH_SALT ?? ''
+        ) ?? '';
+
+      const notificationUrl = env.BITCART_NOTIFICATION_URL ?? ''; // Add default value for env.BITCART_NOTIFICATION_URL
+      const invoiceNotificationPath =
+        env.BITCART_INVOICE_NOTIFICATION_PATH ?? ''; // Add default value for env.BITCART_INVOICE_NOTIFICATION_PATH
+
+      invoice.notification_url = urlJoin(
+        notificationUrl || '',
+        invoiceNotificationPath,
+        encryptedInvoiceId
+      );
+
+      response = await modifyInvoiceInvoicesModelIdPatch(invoice.id!, invoice, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
-      }
-    );
+      });
 
-    if (!response || !response.data) {
-      console.error('Invoice cannot be created');
-      return message(form, 'Invoice cannot be created', { status: 501 });
+      // Update ticket with invoice
+      ticket.bcInvoiceId = invoice.id;
+
+      const payment = invoice.payments
+        ? (invoice.payments[0] as PaymentType) // Use the first wallet
+        : undefined;
+
+      if (payment && 'payment_address' in payment) {
+        ticket.paymentAddress = payment['payment_address'] as string;
+      }
+      await ticket.save();
     }
 
-    // Update the notification url
-    const invoice = response.data as DisplayInvoice;
-    const encryptedInvoiceId =
-      authEncrypt(
-        invoice.id ? (invoice.id as string) : '',
-        env.AUTH_SALT ?? ''
-      ) ?? '';
-
-    const notificationUrl = env.BITCART_NOTIFICATION_URL ?? ''; // Add default value for env.BITCART_NOTIFICATION_URL
-    const invoiceNotificationPath = env.BITCART_INVOICE_NOTIFICATION_PATH ?? ''; // Add default value for env.BITCART_INVOICE_NOTIFICATION_PATH
-
-    invoice.notification_url = urlJoin(
-      notificationUrl || '',
-      invoiceNotificationPath,
-      encryptedInvoiceId
-    );
-
-    response = await modifyInvoiceInvoicesModelIdPatch(invoice.id!, invoice, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
-
-    // Update ticket with invoice
-    ticket.bcInvoiceId = invoice.id;
-
-    const payment = invoice.payments
-      ? (invoice.payments[0] as PaymentType) // Use the first wallet
-      : undefined;
-
-    if (payment && 'payment_address' in payment) {
-      ticket.paymentAddress = payment['payment_address'] as string;
-    }
-    await ticket.save();
-
-    showQueue.add(ShowMachineEventString.TICKET_RESERVED, {
+    await showQueue.add(ShowMachineEventString.TICKET_RESERVED, {
       showId: show._id.toString(),
       ticketId: ticket._id.toString(),
       customerName: name
     });
 
     // If the ticket is free, skip the payment
-    if (ticket.price.amount === 0 && ticket.bcInvoiceId) {
-      const ticketService = getTicketMachineService(ticket, redisConnection);
-      ticketService.send({
-        type: TicketMachineEventString.PAYMENT_INITIATED,
-        paymentCurrency: CurrencyType.NONE
-      });
+    // if (ticket.price.amount === 0) {
+    //   const ticketService = getTicketMachineService(ticket, redisConnection);
+    //   ticketService.send({
+    //     type: TicketMachineEventString.PAYMENT_INITIATED,
+    //     paymentCurrency: CurrencyType.NONE
+    //   });
 
-      ticketService?.stop();
+    //   ticketService?.stop();
 
-      const token = await createBitcartToken(
-        env.BITCART_EMAIL ?? '', // Add default value for env.BITCART_EMAIL
-        env.BITCART_PASSWORD ?? '', // Add default value for env.BITCART_PASSWORD
-        env.BITCART_API_URL ?? '' // Add default value for env.BITCART_API_URL
-      );
+    // const token = await createBitcartToken(
+    //   env.BITCART_EMAIL ?? '', // Add default value for env.BITCART_EMAIL
+    //   env.BITCART_PASSWORD ?? '', // Add default value for env.BITCART_PASSWORD
+    //   env.BITCART_API_URL ?? '' // Add default value for env.BITCART_API_URL
+    // );
 
-      // Alert the invoice is complete
-      try {
-        await modifyInvoiceInvoicesModelIdPatch(
-          ticket.bcInvoiceId,
-          {
-            status: InvoiceStatus.COMPLETE
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            }
-          }
-        );
-      } catch (error_) {
-        console.error(error_);
-      }
+    // // Alert the invoice is complete
+    // try {
+    //   await modifyInvoiceInvoicesModelIdPatch(
+    //     ticket.bcInvoiceId,
+    //     {
+    //       status: InvoiceStatus.COMPLETE
+    //     },
+    //     {
+    //       headers: {
+    //         Authorization: `Bearer ${token}`,
+    //         'Content-Type': 'application/json'
+    //       }
+    //     }
+    //   );
+    // } catch (error_) {
+    //   console.error(error_);
+    // }
 
-      const invoiceQueue = new Queue(EntityType.INVOICE, {
-        connection: redisConnection
-      });
-      invoiceQueue.add(InvoiceJobType.UPDATE, {
-        bcInvoiceId: ticket.bcInvoiceId,
-        status: InvoiceStatus.COMPLETE
-      });
+    // const invoiceQueue = new Queue(EntityType.INVOICE, {
+    //   connection: redisConnection
+    // });
+    // invoiceQueue.add(InvoiceJobType.UPDATE, {
+    //   bcInvoiceId: ticket.bcInvoiceId,
+    //   status: InvoiceStatus.COMPLETE
+    // });
 
-      invoiceQueue.close();
-    }
+    // invoiceQueue.close();
+    //}
 
     const redirectUrl = urlJoin(config.PATH.ticket, ticket._id.toString());
 
