@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-
 import to from 'await-to-js';
+import dot from 'dot-object';
+import * as _ from 'lodash';
 import { derived, writable } from 'svelte/store';
 import urlJoin from 'url-join';
 
@@ -37,13 +38,10 @@ const abstractUpdateStore = <T extends { _id?: any }>({
     if (!doc._id) {
       throw new Error('Doc must have an _id');
     }
-    let baseDocument = doc;
-    const callback = (document: Partial<T>) => {
-      baseDocument = {
-        ...baseDocument,
-        ...document
-      };
-      set(baseDocument);
+    const callback = (updateDocument: Partial<T>) => {
+      dot.object(updateDocument);
+      const updatedDocument = _.merge(doc, updateDocument);
+      set(updatedDocument);
     };
 
     const abortDocument = getUpdateNotification({

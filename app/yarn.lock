@@ -894,29 +894,29 @@
     "@babel/helper-validator-identifier" "^7.22.20"
     to-fast-properties "^2.0.0"
 
-"@bull-board/api@5.17.1":
-  version "5.17.1"
-  resolved "https://registry.yarnpkg.com/@bull-board/api/-/api-5.17.1.tgz#99f9e5d327cb805c069b153d25086974ad3ade45"
-  integrity sha512-KQaH3z2YJxN2h+Kh4ZJ341NNEFwrsNeZAu9FtQX8h4G0nkSw3FSlgWDO6UrN0b448+co/gWTT6qZz0st2fFmPg==
+"@bull-board/api@5.18.1":
+  version "5.18.1"
+  resolved "https://registry.yarnpkg.com/@bull-board/api/-/api-5.18.1.tgz#fd906bf59d0cdc8b9d4d74146f7d9427056ad075"
+  integrity sha512-lAM8Q9dj8sGvocTnJjllps2l7x1wh+bRAWKPmYxpmQ/oQGAjTVeWmnAzn1TXcCDOQNTDi1DC26IYXeGGxA8s+w==
   dependencies:
     redis-info "^3.0.8"
 
 "@bull-board/express@^5.17.1":
-  version "5.17.1"
-  resolved "https://registry.yarnpkg.com/@bull-board/express/-/express-5.17.1.tgz#2aed5aa4d4d17e0b374cbd8fd801b08f4310fb5b"
-  integrity sha512-3aWDP7UPdnUj2SYdxKnu/Rtb/1a0KnfKu7a/iPUBVPQQJN8CQzcdcYG3BNhFnrbY8f3+efI1o0eUkgdkJYB1aA==
+  version "5.18.1"
+  resolved "https://registry.yarnpkg.com/@bull-board/express/-/express-5.18.1.tgz#8b2637a86180980f6dd0e86af0134f57f1850199"
+  integrity sha512-rCoZPaHfujyOiKoTib7q5p2NsFPpKzkACEsQx2n/n7kF2en093XnaEhUfnhEb1Tdr3vdme6YiqPEHA5SXSuGeA==
   dependencies:
-    "@bull-board/api" "5.17.1"
-    "@bull-board/ui" "5.17.1"
-    ejs "^3.1.7"
+    "@bull-board/api" "5.18.1"
+    "@bull-board/ui" "5.18.1"
+    ejs "^3.1.10"
     express "^4.17.3"
 
-"@bull-board/ui@5.17.1":
-  version "5.17.1"
-  resolved "https://registry.yarnpkg.com/@bull-board/ui/-/ui-5.17.1.tgz#a886aa503a0fb819bebf5ba8b1dd618c2c454a1b"
-  integrity sha512-/BO4C454w7ar5ZaHfcThEY2A2SYD9YkQkBizq8o9sjglVctpnnnh37YY2iOVRZCZFXMKIe7t05Kd9/9p3IPvSw==
+"@bull-board/ui@5.18.1":
+  version "5.18.1"
+  resolved "https://registry.yarnpkg.com/@bull-board/ui/-/ui-5.18.1.tgz#53202896c1aeafca7b53995eaa794ce8a3ad0610"
+  integrity sha512-e43qRxMy+PAeV1W4sudOHVJeTkprPWFsILdKi8SvYQ40vJnj0qfc/Jej4TTz09zsZ3BF4QcJI62DoUNP8+Fwlg==
   dependencies:
-    "@bull-board/api" "5.17.1"
+    "@bull-board/api" "5.18.1"
 
 "@chainsafe/is-ip@^2.0.1":
   version "2.0.2"
@@ -4915,6 +4915,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/dot-object@^2.1.6":
+  version "2.1.6"
+  resolved "https://registry.yarnpkg.com/@types/dot-object/-/dot-object-2.1.6.tgz#8820a4d36d84ead678ce2795372b963359c74114"
+  integrity sha512-G1e4SNPOuO72ZXv7wz/W2x29CzQtpxko3G9hBiHqGg/AvFIKoArCs2nbc/WPXnnUkO+1dmvX9WQCyj5gIlAzZg==
+
 "@types/es-aggregate-error@^1.0.2":
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/@types/es-aggregate-error/-/es-aggregate-error-1.0.6.tgz#1472dfb0fb1cb4c3f2bd3b2a7b7e19f60a1d66c0"
@@ -5000,6 +5005,11 @@
   version "4.17.0"
   resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.17.0.tgz#d774355e41f372d5350a4d0714abb48194a489c3"
   integrity sha512-t7dhREVv6dbNj0q17X12j7yDG4bD/DHYX7o5/DbDxobP0HnGPgpRz2Ej77aL7TZT3DSw13fqUTj8J4mMnqa7WA==
+
+"@types/lodash@^4.17.4":
+  version "4.17.4"
+  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.17.4.tgz#0303b64958ee070059e3a7184048a55159fe20b7"
+  integrity sha512-wYCP26ZLxaT3R39kiN2+HcJ4kTd3U1waI/cY7ivWYqFP6pW3ZNpvi6Wd6PHZx7T/t8z0vlkXMg3QYLa7DZ/IJQ==
 
 "@types/mime@^1":
   version "1.3.5"
@@ -7301,6 +7311,11 @@ commander@^4.0.0:
   resolved "https://registry.yarnpkg.com/commander/-/commander-4.1.1.tgz#9fd602bd936294e9e9ef46a3f4d6964044b18068"
   integrity sha512-NOKm8xhkzAjzFx8B2v5OAHT+u5pRQc2UCa2Vq9jYL/31o2wi9mxBA7LIFs3sV5VSC49z6pEhfbMULvShKj26WA==
 
+commander@^6.1.0:
+  version "6.2.1"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-6.2.1.tgz#0792eb682dfbc325999bb2b84fddddba110ac73c"
+  integrity sha512-U7VdrJFnJgo4xjrHpTzu0yrHPGImdsmD95ZlgYSEajAn2JKzDhDTPG9kBTefmObL2w/ngeZnilk+OV9CG3d7UA==
+
 common-tags@^1.4.0:
   version "1.8.2"
   resolved "https://registry.yarnpkg.com/common-tags/-/common-tags-1.8.2.tgz#94ebb3c076d26032745fd54face7f688ef5ac9c6"
@@ -7866,6 +7881,14 @@ domain-browser@^4.22.0:
   resolved "https://registry.yarnpkg.com/domain-browser/-/domain-browser-4.23.0.tgz#427ebb91efcb070f05cffdfb8a4e9a6c25f8c94b"
   integrity sha512-ArzcM/II1wCCujdCNyQjXrAFwS4mrLh4C7DZWlaI8mdh7h3BfKdNd3bKXITfl2PT9FtfQqaGvhi1vPRQPimjGA==
 
+dot-object@^2.1.5:
+  version "2.1.5"
+  resolved "https://registry.yarnpkg.com/dot-object/-/dot-object-2.1.5.tgz#0ff0f1bff42c47ff06272081b208658c0a0231c2"
+  integrity sha512-xHF8EP4XH/Ba9fvAF2LDd5O3IITVolerVV6xvkxoM8zlGEiCUrggpAnHyOoKJKCrhvPcGATFAUwIujj7bRG5UA==
+  dependencies:
+    commander "^6.1.0"
+    glob "^7.1.6"
+
 dotenv@^16.0.3:
   version "16.4.5"
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-16.4.5.tgz#cdd3b3b604cb327e286b4762e13502f717cb099f"
@@ -7929,7 +7952,7 @@ ee-first@1.1.1:
   resolved "https://registry.yarnpkg.com/ee-first/-/ee-first-1.1.1.tgz#590c61156b0ae2f4f0255732a158b266bc56b21d"
   integrity sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==
 
-ejs@^3.1.7:
+ejs@^3.1.10:
   version "3.1.10"
   resolved "https://registry.yarnpkg.com/ejs/-/ejs-3.1.10.tgz#69ab8358b14e896f80cc39e62087b88500c3ac3b"
   integrity sha512-UeJmFfOrAQS8OJWPZ4qtgHyWExa088/MtK5UEyoJGFH67cDEXkZSviOiKRCZ4Xij0zxI3JECgYs3oKx+AizQBA==
@@ -9364,7 +9387,7 @@ glob@^5.0.3:
     once "^1.3.0"
     path-is-absolute "^1.0.0"
 
-glob@^7.1.3:
+glob@^7.1.3, glob@^7.1.6:
   version "7.2.3"
   resolved "https://registry.yarnpkg.com/glob/-/glob-7.2.3.tgz#b8df0fb802bbfa8e89bd1d938b4e16578ed44f2b"
   integrity sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==
@@ -10484,9 +10507,9 @@ jackspeak@^2.3.6:
     "@pkgjs/parseargs" "^0.11.0"
 
 jake@^10.8.5:
-  version "10.8.7"
-  resolved "https://registry.yarnpkg.com/jake/-/jake-10.8.7.tgz#63a32821177940c33f356e0ba44ff9d34e1c7d8f"
-  integrity sha512-ZDi3aP+fG/LchyBzUM804VjddnwfSfsdeYkwt8NcbKRvo4rFkjhs456iLFn3k2ZUWvNe4i48WACDbza8fhq2+w==
+  version "10.9.1"
+  resolved "https://registry.yarnpkg.com/jake/-/jake-10.9.1.tgz#8dc96b7fcc41cb19aa502af506da4e1d56f5e62b"
+  integrity sha512-61btcOHNnLnsOdtLgA5efqQWjnSi/vow5HbI7HMdKKWqvrKR1bLK3BPlJn9gcSaP2ewuamUSMB5XEy76KUIS2w==
   dependencies:
     async "^3.2.3"
     chalk "^4.0.2"

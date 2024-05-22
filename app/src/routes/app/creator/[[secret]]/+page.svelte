@@ -255,7 +255,7 @@
       <!-- 1st column -->
       <div class="flex-1 space-y-3 md:col-span-3 md:col-start-1">
         <!-- Status -->
-        {#key currentShow && currentShow._id}
+        {#key currentShow}
           <ShowStatus
             {canStartShow}
             bind:isLoading

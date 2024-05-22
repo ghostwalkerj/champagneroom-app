@@ -1,4 +1,5 @@
-import { default as pkg } from 'mongoose';
+import type { Model } from 'mongoose';
+import { default as mongoose, default as pkg } from 'mongoose';
 import { fieldEncryption } from 'mongoose-field-encryption';
 import {
   genTimestampsSchema,
@@ -22,6 +23,8 @@ import {
   runtimeSchema,
   showSalesStatsSchema
 } from './common';
+
+const { models } = pkg;
 
 const showStateSchema = z.object({
   status: z.nativeEnum(ShowStatus).default(ShowStatus.CREATED),
@@ -130,7 +133,9 @@ const showZodMongooseSchema = toZodMongooseSchema(showSchema, {
 
 const showMongooseSchema = toMongooseSchema(showZodMongooseSchema);
 
-const Show = pkg.models.Show ?? pkg.model('Show', showMongooseSchema);
+const Show = models?.Show
+  ? (models.Ticket as Model<ShowDocumentType>)
+  : mongoose.model<ShowDocumentType>('Show', showMongooseSchema);
 
 type ShowDocument = InstanceType<typeof Show>;
 
