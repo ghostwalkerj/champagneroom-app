@@ -64,7 +64,7 @@
           <Avatar
             src={imageUrl}
             alt="profileImage"
-            class="relative max-h-32 max-w-32 rounded-full bg-cover bg-center bg-no-repeat"
+            class="relative w-32 rounded-full bg-cover bg-center bg-no-repeat"
           />
         </svelte:fragment>
       </FileDropzone>
