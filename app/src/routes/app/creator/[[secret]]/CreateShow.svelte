@@ -60,7 +60,7 @@
         name="name"
         bind:value={$showForm.name}
         {...$constraints.name}
-        class="input variant-form-material bg-surface-700"
+        class="input variant-form-material h-12 bg-surface-700"
       />
       {#if $errors.name}<span class="text-error-500">{$errors.name}</span>{/if}
     </label>
@@ -68,13 +68,12 @@
     <label for="">
       <span>Ticket Price (In USD)</span>
       <div
-        class="input-group input-group-divider variant-form-material grid-cols-[auto_1fr] bg-surface-700"
+        class="input-group input-group-divider variant-form-material h-12 grid-cols-[auto_1fr] bg-surface-700"
       >
         <div class="input-group-shim font-semibold text-surface-300">USD</div>
         <input
           type="number"
           name="price"
-          placeholder="10"
           bind:value={$showForm.price.amount}
           {...$constraints.price?.amount}
         />
@@ -89,10 +88,10 @@
     name="duration"
     accent={'accent-primary'}
     bind:value={$showForm.duration}
-    min={5}
+    min={10}
     max={120}
-    step={15}
-    ticked
+    step={10}
+    ticked={true}
   >
     <div class="">
       Duration: <strong>{durationFormatter($showForm.duration * 60)}</strong>
