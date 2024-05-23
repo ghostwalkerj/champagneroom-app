@@ -21,7 +21,6 @@ export const GET = (async ({ params, url }) => {
 
   const next = await changeStream.next();
   const updatedFields = next.updateDescription.updatedFields;
-  console.log(updatedFields);
   changeStream.close();
   const response = new Response(JSON.stringify(updatedFields));
   return response;

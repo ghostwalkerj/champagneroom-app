@@ -94,7 +94,7 @@
 
       showMachineService?.stop();
       showMachineService = createShowMachineService({
-        showDocument: currentShow
+        show: currentShow
       });
       useShowMachine(showMachineService);
       showUnSub?.();
@@ -103,7 +103,7 @@
           currentShow = _show;
           showMachineService?.stop();
           showMachineService = createShowMachineService({
-            showDocument: _show
+            show: _show
           });
           useShowMachine(showMachineService);
         } else {

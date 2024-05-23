@@ -110,10 +110,10 @@ export type ShowMachineType = ReturnType<typeof createShowMachine>;
 export type ShowStateType = ShowDocument['showState'];
 
 const createShowMachine = ({
-  showDocument,
+  show,
   showMachineOptions
 }: {
-  showDocument: ShowDocument;
+  show: ShowDocument;
   showMachineOptions?: ShowMachineOptions;
 }) => {
   const GRACE_PERIOD = showMachineOptions?.gracePeriod || 3_600_000;
@@ -123,14 +123,12 @@ const createShowMachine = ({
   return createMachine(
     {
       context: {
-        showDocument,
-        showState: JSON.parse(
-          JSON.stringify(showDocument.showState)
-        ) as ShowStateType,
+        show,
+        showState: JSON.parse(JSON.stringify(show.showState)) as ShowStateType,
         errorMessage: undefined as string | undefined,
         id: nanoid()
       } as {
-        showDocument: ShowDocument;
+        show: ShowDocument;
         showState: ShowStateType;
         errorMessage: string | undefined;
         id: string;
@@ -620,7 +618,7 @@ const createShowMachine = ({
 
       guards: {
         canCancel: (context) =>
-          context.showDocument.price.amount === 0 ||
+          context.show.price.amount === 0 ||
           context.showState.salesStats.ticketsSold -
             context.showState.salesStats.ticketsRefunded ===
             0,
@@ -689,22 +687,19 @@ const createShowMachine = ({
 
 export { createShowMachine };
 export const createShowMachineService = ({
-  showDocument,
+  show,
   showMachineOptions
 }: {
-  showDocument: ShowDocument;
+  show: ShowDocument;
   showMachineOptions?: ShowMachineOptions;
 }) => {
-  const showMachine = createShowMachine({ showDocument, showMachineOptions });
+  const showMachine = createShowMachine({ show, showMachineOptions });
   showMachine;
   const showService = interpret(showMachine).start();
 
-  if (showMachineOptions?.saveStateCallback) {
-    showService.onChange((context) => {
-      showMachineOptions.saveStateCallback &&
-        showMachineOptions.saveStateCallback(context.showState);
-    });
-  }
+  showService.onChange(async (context) => {
+    await context.show.save();
+  });
 
   if (showMachineOptions?.saveShowEventCallback) {
     showService.onEvent((event) => {

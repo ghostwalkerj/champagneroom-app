@@ -82,7 +82,6 @@ export const actions: Actions = {
     )) as SuperValidated<z.infer<typeof showCRUDSchema>>;
 
     if (!form.valid) {
-      console.log(form.data);
       return fail(400, { form });
     }
     const creator = locals.creator as CreatorDocument;

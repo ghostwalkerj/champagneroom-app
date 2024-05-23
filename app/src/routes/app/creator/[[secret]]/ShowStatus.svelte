@@ -16,7 +16,8 @@
   export let show: ShowDocument | undefined;
   export let showEvent: ShowEventDocument | undefined;
   let showEventUnSub: Unsubscriber | undefined;
-  $: statusText = show ? show.showState.status : 'No Current Show';
+  $: statusText =
+    show === undefined ? 'No Current Show' : show.showState.status;
   $: eventText = 'No Events';
 
   onMount(() => {

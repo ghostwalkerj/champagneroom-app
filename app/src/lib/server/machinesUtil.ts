@@ -22,7 +22,7 @@ import { EntityType } from '$lib/constants';
 
 export const getShowMachineService = (show: ShowDocument) => {
   return createShowMachineService({
-    showDocument: show,
+    show,
     showMachineOptions: {
       saveStateCallback: async (showState) => SaveState(show, showState),
       saveShowEventCallback: async ({
