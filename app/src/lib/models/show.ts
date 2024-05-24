@@ -23,6 +23,8 @@ import {
   runtimeSchema,
   showSalesStatsSchema
 } from './common';
+import { ShowEvent } from './showEvent';
+import type { TransactionDocumentType } from './transaction';
 
 const { models } = pkg;
 
@@ -133,11 +135,35 @@ const showZodMongooseSchema = toZodMongooseSchema(showSchema, {
 
 const showMongooseSchema = toMongooseSchema(showZodMongooseSchema);
 
+showMongooseSchema.methods.saveShowEvent = async function (
+  type: string,
+  ticketId?: string,
+  transaction?: TransactionDocumentType,
+  ticketInfo?: { customerName: string }
+) {
+  await ShowEvent.create({
+    show: this._id,
+    type,
+    ticket: ticketId,
+    transaction: transaction?._id,
+    agent: this.agent,
+    creator: this.creator,
+    ticketInfo
+  });
+};
+
 const Show = models?.Show
   ? (models.Ticket as Model<ShowDocumentType>)
   : mongoose.model<ShowDocumentType>('Show', showMongooseSchema);
 
-type ShowDocument = InstanceType<typeof Show>;
+type ShowDocument = InstanceType<typeof Show> & {
+  saveShowEvent: (
+    type: string,
+    ticketId?: string,
+    transaction?: TransactionDocumentType,
+    ticketInfo?: { customerName: string }
+  ) => Promise<void>;
+};
 
 type ShowStateType = z.infer<typeof showStateSchema>;
 
@@ -150,9 +176,5 @@ showMongooseSchema.plugin(fieldEncryption, {
   saltGenerator: (secret: string) => secret.slice(0, 16)
 });
 
-const SaveState = (show: ShowDocument, newState: ShowStateType) => {
-  Show.updateOne({ _id: show._id }, { $set: { showState: newState } }).exec();
-};
-
 export type { ShowDocument, ShowDocumentType, ShowStateType };
-export { SaveState, Show, showCRUDSchema, showSchema };
+export { Show, showCRUDSchema, showSchema };

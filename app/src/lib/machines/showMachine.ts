@@ -12,7 +12,6 @@ import {
   runtimeSchema
 } from '$lib/models/common';
 import type { ShowDocument } from '$lib/models/show';
-import { createShowEvent } from '$lib/models/showEvent';
 import type { TicketDocument } from '$lib/models/ticket';
 import type { TransactionDocument } from '$lib/models/transaction';
 
@@ -633,13 +632,7 @@ export const createShowMachineService = ({
         'transaction' in event ? event.transaction : undefined
       ) as TransactionDocument | undefined;
       const ticketInfo = { customerName };
-      createShowEvent({
-        show,
-        type: event.type,
-        ticketId,
-        transaction,
-        ticketInfo
-      });
+      show.saveShowEvent(event.type, ticketId, transaction, ticketInfo);
     });
   }
   return showService;
