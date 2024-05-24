@@ -17,11 +17,10 @@ import {
   refundSchema,
   type RefundType,
   type SaleType,
-  ticketDisputeSchema,
   ticketSaleSchema,
   transactionSummarySchema
 } from '$lib/models/common';
-import type { TicketDocument, TicketStateType } from '$lib/models/ticket';
+import type { TicketDocument } from '$lib/models/ticket';
 import type { TransactionDocument } from '$lib/models/transaction';
 
 import type { ShowJobDataType } from '$lib/workers/showWorker';
@@ -37,7 +36,6 @@ import {
 import { calcTotal } from '$lib/payout.js';
 
 export type TicketMachineOptions = {
-  saveStateCallback?: (state: TicketStateType) => void;
   gracePeriod?: number;
   escrowPeriod?: number;
   showQueue?: Queue<ShowJobDataType, any, string>;
@@ -103,21 +101,18 @@ type TicketMachineEventType =
     };
 
 const createTicketMachine = ({
-  ticketDocument,
+  ticket,
   ticketMachineOptions
 }: {
-  ticketDocument: TicketDocument;
+  ticket: TicketDocument;
   ticketMachineOptions?: TicketMachineOptions;
 }) => {
   /** @xstate-layout N4IgpgJg5mDOIC5QBcCWBjA1mZBZAhugBaoB2YAxAMoASA8gOoAEAwgIIByLAogDK-cAIgG0ADAF1EoAA4B7WKjSzSUkAA9EAFgBMAGhABPRNoCM2zQDoAHCZObRVgOyaAnNqsuAvp-1osOAmIySlpGVk4efiFhE0kkEDkFJRV4jQQdfSMEEwBmF0cLAFYANjdtQtETYs0rYqtvXwxsPEIScgs-Zt5ZfAhICjE4mXlFVGVVNJzHQos7UWLi0ULzURcTZ0zEXNFLbRdC2tFHHM0qzRyGkE6A1uCOppxu3v6YoYSR5InEHMKZuYWlis1htDMYdjNKpoalZRDlio5HKJtJdri0gu1UU8+hABto3olRuNUogrHpQQhzG4LKZHNUctp5vkTCiHmi2mB7v5kFiXjl8R8xilQGltKZqcVfgdCvS3BVHJsEMUfhZXDlYZopSYdpoWVzAuzOV0etiBpp+UlBV8EFM-vYAct7MDNAqzAdqfs1vYEXZcrrmvq7pjjS9CubCUL1IhHGSstpSjMpnDnCVRKtkT4rqyAxjWTyccJimHPsSEMsFWq4yqrGqXOdYfNmRnUdmOUHnvnHEXLSWGSZxZKrNK9uUjgrRS4inkXE5HGtlm5in6buiOQAnOBgVcAN36oWY3A4gmiElUBOLwq2NgK6wZLhyHkKjisGXJJysFlh09K1cfn51TazW52nXWBNx3CALAAd3wUZSCgTQAAV8AMABbMBSGQCgELYABNXADwAFSYAAlbgeAASQANWPLsiQvbJYWKIpChqaZYQRGF5XJKxn1mJUjlycxim0RxG0aPUgLXDdt0gKCYLQODEOQtCMKw3D8I4IjSIo6iRFiU8BToyMEGOSw7RE4oTEfcpygVUkciKbYTGfeltkKJc2TuECwNk6DYPgpDUPQzD2C4PheDYAjyLoDgmHIjhyKiyKaIMi0jLSZyRNmaNVnvfYnxfLIqlEixZwOI48lsJwLgAiSVwsbyZIgvyFIC5TgooULIgiqKYrihKkoI6J9PiM9u3orVK1+ViKimJ9R3JMwsufOMdGqdZan-cT-UkhrpPAuT-KUoLVMGVLwytSamOmpxZo4hasmrd8qhyMxNAWWkdhq7blwNRqDpash4KoIhZEg6h6GYAApOh4pS0bDIjDKr2y288sfFa7PmUqtVTFx+Oc+YPJbPbQKaiwyFGfBkEgFh8FIdAwAAGyZ6nBUO1rNGIsAADMAFdSBxUiADEAFVDxIsjuCo+HhjSpHL3WVHcofAqY0vUVZl+WwrMfKzYWJ3b-tkym0Gp2n6cZlm2eUDmga53mBaF7gxYl7Tpd015zvPYy7DhaxCnyJw4xOUxihdON30ZUUKjOWpF1qnb6vXSAwDQnE9yYARhYIs6Eflq1ykRCw8g1VadjMeEFWcbRqVx8rVcHQ3k7AVP04hsIYbhkQT3zi6ewqGZzjYwp1hyV7nXJaoZmmOo7xOSonzEzM6r+1u+nbzODyPHvaIVxV1YpZw+0TGEpkHJ9n2bg0yG4WB0FXMGKGF7ghAAITYFgAGlJZ02X3gLiWU4DlTKImcDKQccYxxgOyg4aMJQ3AmHyNfO4t976P3BoIciVAEKiyGv1RK5Fkq729uNYywDSonDAecPYkDw7kncI+Sci94Q-Eyu5ROv1UGkDvg-J+UVv7cCIsLeKbBeDkQAFr-zGulLQuRKGaGoRA5Y9DYyWVEDjaYNlR52BKN4DMpBZB9HgPEZsklSGyIQAAWlUYgfYH57Cpicc4xwKCcxcjzBY-ehUtjlDMkcJYUJFHVAcG4qSZNwJeKtHUJi5laRWXgbZckxwmKVBrGsfI+wRJhNJj5Zq8l7aBRUsgKJJYEQQjYQcKYfspgKjcJYfGllqzOSsq9HJxt8lHRBmDUpE0fhmQ1Kcaos5KiijsucCwCxXqvWmtUdMP1PLAX2ibUgVMaYQDpgzZmrMfYyP3rkHiAcg7RiVDoKoLpCZFFKKYKEmToztOWRBU2qBzYbMttsm2pA7aKW5vzQWvTfZyhVK4Coz4mS2BdHCCcyxtB5VpAcJwDy26QABSKZyTF7xqmEh4H4cJbEIBcpMpUop3Bwq8JwxZHJ0DvJZiivuPs0UuAnDUDUr1ygShKIfUwqxZh2HODxIu30V5JwNDzMg+AmaoAAF50rlv3eidILD4wXNKFiiwzDQJ5YsesiwGT0iODktBfDIKouMHeSZlRiV2HxrUQo0CmHaoWMJcB2SKUkzIIIVAsBpB8xpqaxUSsJTwhYnixYs5yyLyrK9L6DJR6uoWSTFCXrQIQG6Sa+lZCMrTlrvSeyHhFHLFhOWao4olT5EshUI4719GeCAA */
   return createMachine(
     {
       context: {
-        ticketDocument,
+        ticket,
         ticketMachineOptions,
-        ticketState: JSON.parse(
-          JSON.stringify(ticketDocument.ticketState)
-        ) as TicketStateType,
         errorMessage: undefined as string | undefined,
         id: nanoid()
       },
@@ -426,8 +421,8 @@ const createTicketMachine = ({
           ticketMachineOptions?.showQueue?.add(
             ShowMachineEventString.CUSTOMER_JOINED,
             {
-              showId: context.ticketDocument.show.toString(),
-              ticketId: context.ticketDocument._id.toString()
+              showId: context.ticket.show.toString(),
+              ticketId: context.ticket._id.toString()
             }
           );
         },
@@ -436,8 +431,8 @@ const createTicketMachine = ({
           ticketMachineOptions?.showQueue?.add(
             ShowMachineEventString.CUSTOMER_LEFT,
             {
-              showId: context.ticketDocument.show.toString(),
-              ticketId: context.ticketDocument._id.toString()
+              showId: context.ticket.show.toString(),
+              ticketId: context.ticket._id.toString()
             }
           );
         },
@@ -446,9 +441,9 @@ const createTicketMachine = ({
           ticketMachineOptions?.showQueue?.add(
             ShowMachineEventString.TICKET_SOLD,
             {
-              showId: context.ticketDocument.show.toString(),
-              ticketId: context.ticketDocument._id.toString(),
-              sale: context.ticketState.sale
+              showId: context.ticket.show.toString(),
+              ticketId: context.ticket._id.toString(),
+              sale: context.ticket.ticketState.sale
             }
           );
         },
@@ -457,8 +452,8 @@ const createTicketMachine = ({
           ticketMachineOptions?.showQueue?.add(
             ShowMachineEventString.TICKET_REDEEMED,
             {
-              showId: context.ticketDocument.show.toString(),
-              ticketId: context.ticketDocument._id.toString()
+              showId: context.ticket.show.toString(),
+              ticketId: context.ticket._id.toString()
             }
           );
         },
@@ -467,9 +462,9 @@ const createTicketMachine = ({
           ticketMachineOptions?.showQueue?.add(
             ShowMachineEventString.TICKET_REFUNDED,
             {
-              showId: context.ticketDocument.show.toString(),
-              ticketId: context.ticketDocument._id.toString(),
-              refund: context.ticketState.refund
+              showId: context.ticket.show.toString(),
+              ticketId: context.ticket._id.toString(),
+              refund: context.ticket.ticketState.refund
             }
           );
         },
@@ -478,9 +473,9 @@ const createTicketMachine = ({
           ticketMachineOptions?.showQueue?.add(
             ShowMachineEventString.TICKET_CANCELLED,
             {
-              showId: context.ticketDocument.show.toString(),
-              ticketId: context.ticketDocument._id.toString(),
-              customerName: context.ticketDocument.user.name,
+              showId: context.ticket.show.toString(),
+              ticketId: context.ticket._id.toString(),
+              customerName: context.ticket.user.name,
               cancel: event.cancel
             }
           );
@@ -490,8 +485,8 @@ const createTicketMachine = ({
           ticketMachineOptions?.showQueue?.add(
             ShowMachineEventString.TICKET_FINALIZED,
             {
-              showId: context.ticketDocument.show.toString(),
-              ticketId: context.ticketDocument._id.toString()
+              showId: context.ticket.show.toString(),
+              ticketId: context.ticket._id.toString()
             }
           );
         },
@@ -500,33 +495,32 @@ const createTicketMachine = ({
           ticketMachineOptions?.showQueue?.add(
             ShowMachineEventString.TICKET_DISPUTED,
             {
-              showId: context.ticketDocument.show.toString(),
-              ticketId: context.ticketDocument._id.toString(),
-              dispute: context.ticketState.dispute
+              showId: context.ticket.show.toString(),
+              ticketId: context.ticket._id.toString(),
+              dispute: context.ticket.ticketState.dispute
             }
           );
         },
 
         requestRefundCancelledShow: assign((context, event) => {
-          const state = context.ticketState;
-          const refund = refundSchema.parse({
-            requestedAmounts: state.sale?.total,
-            approvedAmounts: state.sale?.total,
+          const ticket = context.ticket;
+          ticket.ticketState.status = TicketStatus.REFUND_REQUESTED;
+          ticket.ticketState.cancel = event.cancel;
+          ticket.ticketState.refund = refundSchema.parse({
+            requestedAmounts: ticket.ticketState.sale?.total,
+            approvedAmounts: ticket.ticketState.sale?.total,
             reason: RefundReason.SHOW_CANCELLED
           });
           return {
-            ticketState: {
-              ...context.ticketState,
-              status: TicketStatus.REFUND_REQUESTED,
-              cancel: event.cancel,
-              refund
-            }
+            ticket
           };
         }),
 
         initiatePayment: assign((context, event) => {
+          const ticket = context.ticket;
           const paymentCurrency = event.paymentCurrency;
-          const sale = ticketSaleSchema.parse({
+          ticket.ticketState.status = TicketStatus.PAYMENT_INITIATED;
+          ticket.ticketState.sale = ticketSaleSchema.parse({
             totals: {
               [paymentCurrency]: 0
             },
@@ -534,85 +528,63 @@ const createTicketMachine = ({
             currency: paymentCurrency
           }) as SaleType;
           return {
-            ticketState: {
-              ...context.ticketState,
-              status: TicketStatus.PAYMENT_INITIATED,
-              sale
-            }
+            ticket
           };
         }),
 
         setFullyPaid: assign((context) => {
-          return {
-            ticketState: {
-              ...context.ticketState,
-              status: TicketStatus.FULLY_PAID
-            }
-          };
+          const ticket = context.ticket;
+          ticket.ticketState.status = TicketStatus.FULLY_PAID;
+          return { ticket };
         }),
 
         redeemTicket: assign((context) => {
-          if (context.ticketState.status === TicketStatus.REDEEMED) return {};
-          return {
-            ticketState: {
-              ...context.ticketState,
-              status: TicketStatus.REDEEMED,
-              redemption: redemptionSchema.parse({})
-            }
-          };
+          const ticket = context.ticket;
+          if (context.ticket.ticketState.status === TicketStatus.REDEEMED)
+            return { ticket };
+          ticket.ticketState.status = TicketStatus.REDEEMED;
+          ticket.ticketState.redemption = redemptionSchema.parse({});
+          return { ticket };
         }),
 
         cancelTicket: assign((context) => {
-          return {
-            ticketState: {
-              ...context.ticketState,
-              status: TicketStatus.CANCELLED
-            }
-          };
+          const ticket = context.ticket;
+          ticket.ticketState.status = TicketStatus.CANCELLED;
+          return { ticket };
         }),
 
         receivePayment: assign((context, event) => {
-          const sale = context.ticketState.sale;
-          if (!sale) return {};
+          const ticket = context.ticket;
+          if (!ticket.ticketState.sale) return { ticket };
           const payment = transactionSummarySchema.parse({
             amount: +event.transaction.amount,
             currency: event.transaction.currency.toUpperCase() as CurrencyType,
             rate: +(event.transaction.rate || 0),
             transaction: event.transaction._id
           });
-          sale.total += payment.amount;
-          sale.payments.push(payment);
-
-          return {
-            ticketState: {
-              ...context.ticketState,
-              status: TicketStatus.PAYMENT_RECEIVED
-            }
-          };
+          ticket.$inc('ticketState.sale.total', payment.amount);
+          ticket.ticketState.sale.payments.push(payment);
+          ticket.ticketState.status = TicketStatus.PAYMENT_RECEIVED;
+          return { ticket };
         }),
 
         requestRefund: assign((context, event) => {
-          return {
-            ticketState: {
-              ...context.ticketState,
-              status: TicketStatus.REFUND_REQUESTED,
-              refund: event.refund
-            }
-          };
+          const ticket = context.ticket;
+          ticket.ticketState.status = TicketStatus.REFUND_REQUESTED;
+          ticket.ticketState.refund = event.refund;
+          return { ticket };
         }),
 
         initiateRefund: assign((context, event) => {
-          return {
-            ticketState: {
-              ...context.ticketState,
-              status: TicketStatus.WAITING_FOR_REFUND,
-              refund: event.refund
-            }
-          };
+          const ticket = context.ticket;
+          ticket.ticketState.status = TicketStatus.WAITING_FOR_REFUND;
+          ticket.ticketState.refund = event.refund;
+          return { ticket };
         }),
 
         receiveRefund: assign((context, event) => {
-          const state = context.ticketState;
+          const ticket = context.ticket;
+          if (!ticket.ticketState.refund) return { ticket };
           const currency = event.transaction.currency.toUpperCase();
           const payout = transactionSummarySchema.parse({
             amount: +event.transaction.amount,
@@ -620,131 +592,94 @@ const createTicketMachine = ({
             rate: +(event.transaction.rate || 0),
             transaction: event.transaction._id
           });
-          const refund = state.refund;
-          if (!refund) return {};
-
-          refund.total += payout.amount;
-          refund.payouts.push(payout);
-
-          return {
-            ticketState: {
-              ...context.ticketState,
-              refund
-            }
-          };
+          ticket.ticketState.refund.payouts.push(payout);
+          ticket.$inc('ticketState.refund.total', payout.amount);
+          return { ticket };
         }),
 
         receiveFeedback: assign((context, event) => {
-          return {
-            ticketState: {
-              ...context.ticketState,
-              feedback: event.feedback
-            }
-          };
+          const ticket = context.ticket;
+          ticket.ticketState.feedback = event.feedback;
+          return { ticket };
         }),
 
         initiateDispute: assign((context, event) => {
-          if (!context.ticketState.sale) return {};
-
-          return {
-            ticketState: {
-              ...context.ticketState,
-              status: TicketStatus.IN_DISPUTE,
-              dispute: event.dispute,
-              refund: event.refund
-            }
-          };
+          const ticket = context.ticket;
+          if (!ticket.ticketState.sale) return { ticket };
+          ticket.ticketState.status = TicketStatus.IN_DISPUTE;
+          ticket.ticketState.dispute = event.dispute;
+          ticket.ticketState.refund = event.refund;
+          return { ticket };
         }),
 
         endShow: assign((context) => {
-          return {
-            ticketState: {
-              ...context.ticketState,
-              status: TicketStatus.IN_ESCROW,
-              escrow: escrowSchema.parse({})
-            }
-          };
+          const ticket = context.ticket;
+          ticket.ticketState.status = TicketStatus.IN_ESCROW;
+          ticket.ticketState.escrow = escrowSchema.parse({});
+          return { ticket };
         }),
 
         finalizeTicket: assign((context, event) => {
+          const ticket = context.ticket;
           const finalize = event.finalize;
-          if (context.ticketState.status !== TicketStatus.FINALIZED) {
-            return {
-              ticketState: {
-                ...context.ticketState,
-                finalize,
-                status: TicketStatus.FINALIZED
-              }
-            };
-          }
-          return {};
+          if (ticket.ticketState.status === TicketStatus.FINALIZED)
+            return { ticket };
+
+          ticket.ticketState.status = TicketStatus.FINALIZED;
+          ticket.ticketState.finalize = finalize;
+          return { ticket };
         }),
 
         decideDispute: assign((context, event) => {
-          const refund = event.refund;
-
-          if (!context.ticketState.dispute) return {};
-          const dispute = ticketDisputeSchema.parse({
-            ...context.ticketState.dispute,
-            decision: event.decision,
-            endedAt: new Date(),
-            resolved: true
-          });
-          return {
-            ticketState: {
-              ...context.ticketState,
-              dispute,
-              refund,
-              status: TicketStatus.WAITING_FOR_DISPUTE_REFUND
-            }
-          };
+          const ticket = context.ticket;
+          if (!ticket.ticketState.dispute) return { ticket };
+          ticket.ticketState.dispute.decision = event.decision;
+          ticket.ticketState.dispute.endedAt = new Date();
+          ticket.ticketState.dispute.resolved = true;
+          ticket.ticketState.refund = event.refund;
+          ticket.ticketState.status = TicketStatus.WAITING_FOR_DISPUTE_REFUND;
+          return { ticket };
         }),
 
         deactivateTicket: assign((context) => {
-          return {
-            ticketState: {
-              ...context.ticketState,
-              active: false
-            }
-          };
+          const ticket = context.ticket;
+          ticket.ticketState.active = false;
+          return { ticket };
         }),
 
         missShow: assign((context) => {
-          return {
-            ticketState: {
-              ...context.ticketState,
-              status: TicketStatus.MISSED_SHOW
-            }
-          };
+          const ticket = context.ticket;
+          ticket.ticketState.status = TicketStatus.MISSED_SHOW;
+          return { ticket };
         })
       },
       guards: {
         ticketCancelled: (context) =>
-          context.ticketState.status === TicketStatus.CANCELLED,
+          context.ticket.ticketState.status === TicketStatus.CANCELLED,
         ticketFinalized: (context) =>
-          context.ticketState.status === TicketStatus.FINALIZED,
+          context.ticket.ticketState.status === TicketStatus.FINALIZED,
         ticketInDispute: (context) =>
-          context.ticketState.status === TicketStatus.IN_DISPUTE,
+          context.ticket.ticketState.status === TicketStatus.IN_DISPUTE,
         ticketInEscrow: (context) =>
-          context.ticketState.status === TicketStatus.IN_ESCROW,
+          context.ticket.ticketState.status === TicketStatus.IN_ESCROW,
         ticketReserved: (context) =>
-          context.ticketState.status === TicketStatus.RESERVED,
+          context.ticket.ticketState.status === TicketStatus.RESERVED,
         ticketRedeemed: (context) =>
-          context.ticketState.status === TicketStatus.REDEEMED,
+          context.ticket.ticketState.status === TicketStatus.REDEEMED,
         ticketHasPaymentInitiated: (context) =>
-          context.ticketState.status === TicketStatus.PAYMENT_INITIATED,
+          context.ticket.ticketState.status === TicketStatus.PAYMENT_INITIATED,
         ticketHasPayment: (context) =>
-          context.ticketState.status === TicketStatus.PAYMENT_RECEIVED,
+          context.ticket.ticketState.status === TicketStatus.PAYMENT_RECEIVED,
         ticketFullyPaid: (context) =>
-          context.ticketState.status === TicketStatus.FULLY_PAID,
+          context.ticket.ticketState.status === TicketStatus.FULLY_PAID,
         ticketHasRefundRequested: (context) =>
-          context.ticketState.status === TicketStatus.REFUND_REQUESTED,
+          context.ticket.ticketState.status === TicketStatus.REFUND_REQUESTED,
         ticketIsWaitingForRefund: (context) =>
-          context.ticketState.status === TicketStatus.WAITING_FOR_REFUND,
+          context.ticket.ticketState.status === TicketStatus.WAITING_FOR_REFUND,
         ticketMissedShow: (context) =>
-          context.ticketState.status === TicketStatus.MISSED_SHOW,
+          context.ticket.ticketState.status === TicketStatus.MISSED_SHOW,
         ticketInDisputeRefund: (context) =>
-          context.ticketState.status ===
+          context.ticket.ticketState.status ===
           TicketStatus.WAITING_FOR_DISPUTE_REFUND,
         fullyPaid: (context, event) => {
           const amount =
@@ -752,23 +687,23 @@ const createTicketMachine = ({
           let total = +(amount * +(event.transaction?.rate || 0)).toFixed(0);
 
           // Check total payments with rates at time of transaction.
-          const payouts = (context.ticketState.sale?.payments ||
+          const payouts = (context.ticket.ticketState.sale?.payments ||
             new Map<string, TransactionSummaryType[]>()) as Map<
             string,
             TransactionSummaryType[]
           >;
           total += calcTotal(payouts);
 
-          return total >= context.ticketDocument.price.amount;
+          return total >= context.ticket.price.amount;
         },
         showMissed: (context) => {
           return (
-            context.ticketState.redemption === undefined ||
-            context.ticketState.redemption?.redeemedAt === undefined
+            context.ticket.ticketState.redemption === undefined ||
+            context.ticket.ticketState.redemption?.redeemedAt === undefined
           );
         },
         fullyRefunded: (context, event) => {
-          const refund = context.ticketState.refund;
+          const refund = context.ticket.ticketState.refund;
           if (refund === undefined) return false;
           const refundApproved = refund.approvedAmount || 0;
           if (refundApproved === 0) return false;
@@ -783,25 +718,25 @@ const createTicketMachine = ({
         },
         canWatchShow: (context) => {
           return (
-            context.ticketState.status === TicketStatus.REDEEMED ||
-            context.ticketState.status === TicketStatus.FULLY_PAID
+            context.ticket.ticketState.status === TicketStatus.REDEEMED ||
+            context.ticket.ticketState.status === TicketStatus.FULLY_PAID
           );
         },
         canBeRefunded: (context) => {
-          const currency = context.ticketDocument.price.currency;
+          const currency = context.ticket.price.currency;
 
           return (
-            context.ticketDocument.price.amount !== 0 &&
-            (!context.ticketState.sale ||
-              !context.ticketState.sale?.payments ||
-              (context.ticketState.sale?.payments as any)[currency]?.length ===
-                0)
+            context.ticket.price.amount !== 0 &&
+            (!context.ticket.ticketState.sale ||
+              !context.ticket.ticketState.sale?.payments ||
+              (context.ticket.ticketState.sale?.payments as any)[currency]
+                ?.length === 0)
           );
         },
 
         noDisputeRefund: (context, event) => {
           const decision =
-            context.ticketState.dispute?.decision || event.decision;
+            context.ticket.ticketState.dispute?.decision || event.decision;
           if (!decision) return false;
           return decision === DisputeDecision.NO_REFUND;
         }
@@ -825,24 +760,21 @@ export { type TicketMachineEventType };
 export { createTicketMachine };
 
 export const createTicketMachineService = ({
-  ticketDocument,
+  ticket,
   ticketMachineOptions
 }: {
-  ticketDocument: TicketDocument;
+  ticket: TicketDocument;
   ticketMachineOptions?: TicketMachineOptions;
 }) => {
   const ticketMachine = createTicketMachine({
-    ticketDocument,
+    ticket,
     ticketMachineOptions
   });
   const ticketService = interpret(ticketMachine).start();
 
-  if (ticketMachineOptions?.saveStateCallback) {
-    ticketService.onChange((context) => {
-      ticketMachineOptions.saveStateCallback &&
-        ticketMachineOptions.saveStateCallback(context.ticketState);
-    });
-  }
+  ticketService.onChange(async (context) => {
+    if (context.ticket.save) await context.ticket.save();
+  });
 
   return ticketService;
 };

@@ -6,12 +6,10 @@ import { raise } from 'xstate/lib/actions';
 
 import {
   type CancelType,
-  disputeStatsSchema,
   escrowSchema,
   finalizeSchema,
   type FinalizeType,
-  runtimeSchema,
-  showSalesStatsSchema
+  runtimeSchema
 } from '$lib/models/common';
 import type { ShowDocument } from '$lib/models/show';
 import type { TicketDocument } from '$lib/models/ticket';
@@ -124,12 +122,10 @@ const createShowMachine = ({
     {
       context: {
         show,
-        showState: JSON.parse(JSON.stringify(show.showState)) as ShowStateType,
         errorMessage: undefined as string | undefined,
         id: nanoid()
       } as {
         show: ShowDocument;
-        showState: ShowStateType;
         errorMessage: string | undefined;
         id: string;
       },
@@ -378,306 +374,231 @@ const createShowMachine = ({
     {
       actions: {
         closeBoxOffice: assign((context) => {
+          const show = context.show;
+          show.showState.status = ShowStatus.BOX_OFFICE_CLOSED;
           return {
-            showState: {
-              ...context.showState,
-              status: ShowStatus.BOX_OFFICE_CLOSED
-            }
+            show
           };
         }),
 
         openBoxOffice: assign((context) => {
+          const show = context.show;
+          show.showState.status = ShowStatus.BOX_OFFICE_OPEN;
           return {
-            showState: {
-              ...context.showState,
-              status: ShowStatus.BOX_OFFICE_OPEN
-            }
+            show
           };
         }),
 
         cancelShow: assign((context) => {
+          const show = context.show;
+          show.showState.status = ShowStatus.CANCELLED;
           return {
-            showState: {
-              ...context.showState,
-              status: ShowStatus.CANCELLED
-            }
+            show
           };
         }),
 
         startShow: assign((context) => {
+          const show = context.show;
+          show.showState.status = ShowStatus.LIVE;
+          show.showState.runtime = runtimeSchema.parse({
+            startDate: new Date()
+          });
           return {
-            showState: {
-              ...context.showState,
-              status: ShowStatus.LIVE,
-              runtime: runtimeSchema.parse({})
-            }
+            show
           };
         }),
 
         endShow: assign((context) => {
+          const show = context.show;
+          show.showState.status = ShowStatus.IN_ESCROW;
+          show.showState.escrow = escrowSchema.parse({});
+          show.showState.current = false;
           return {
-            showState: {
-              ...context.showState,
-              status: ShowStatus.IN_ESCROW,
-              escrow: escrowSchema.parse({}),
-              current: false
-            }
+            show
           };
         }),
 
         stopShow: assign((context) => {
-          const startDate = context.showState.runtime?.startDate;
+          const show = context.show;
+          const startDate = show.showState.runtime?.startDate;
           if (!startDate) {
             throw new Error('Show start date is not defined');
           }
-
-          return {
-            showState: {
-              ...context.showState,
-              status: ShowStatus.STOPPED,
-              runtime: runtimeSchema.parse({
-                ...context.showState.runtime,
-                endDate: new Date()
-              })
-            }
-          };
+          show.showState.status = ShowStatus.STOPPED;
+          show.showState.runtime = runtimeSchema.parse({
+            startDate,
+            endDate: new Date()
+          });
+          return { show };
         }),
 
         initiateCancellation: assign((context, event) => {
-          return {
-            showState: {
-              ...context.showState,
-              status: ShowStatus.CANCELLATION_INITIATED,
-              salesStats: showSalesStatsSchema.parse({
-                ...context.showState.salesStats,
-                ticketsAvailable: 0
-              }),
-              cancel: event.cancel
-            }
-          };
+          const show = context.show;
+          show.showState.status = ShowStatus.CANCELLATION_INITIATED;
+          show.showState.cancel = event.cancel;
+          show.showState.salesStats.ticketsAvailable = 0;
+          return { show };
         }),
 
         initiateRefund: assign((context) => {
-          return {
-            showState: {
-              ...context.showState,
-              status: ShowStatus.REFUND_INITIATED
-            }
-          };
+          const show = context.show;
+          show.showState.status = ShowStatus.REFUND_INITIATED;
+          return { show };
         }),
 
         receiveDispute: assign((context, event) => {
-          const st = context.showState;
-          return {
-            showState: {
-              ...st,
-              status: ShowStatus.IN_DISPUTE,
-              disputes: [...st.disputes, event.ticket._id],
-              disputeStats: disputeStatsSchema.parse({
-                ...st.disputeStats,
-                totalDisputes: st.disputeStats.totalDisputes + 1,
-                totalDisputesPending: st.disputeStats.totalDisputesPending + 1
-              })
-            }
-          };
+          const show = context.show;
+          show.showState.status = ShowStatus.IN_DISPUTE;
+          show.showState.disputes.push(event.ticket._id);
+          show.$inc('showState.disputeStats.totalDisputes', 1);
+          show.$inc('showState.disputeStats.totalDisputesPending', 1);
+          return { show };
         }),
 
         receiveResolution: assign((context, event) => {
-          const st = context.showState;
+          const show = context.show;
           const refunded = event.decision === DisputeDecision.NO_REFUND ? 0 : 1;
-          const showState = {
-            ...st,
-            disputeStats: disputeStatsSchema.parse({
-              ...st.disputeStats,
-              totalDisputesPending: st.disputeStats.totalDisputesPending - 1,
-              totalDisputesResolved: st.disputeStats.totalDisputesResolved + 1,
-              totalDisputesRefunded:
-                st.disputeStats.totalDisputesRefunded + refunded
-            })
-          };
-          return {
-            showState
-          };
+          show.$inc('showState.disputeStats.totalDisputesPending', -1);
+          show.$inc('showState.disputeStats.totalDisputesResolved', 1);
+          show.$inc('showState.disputeStats.totalDisputesRefunded', refunded);
+          return { show };
         }),
 
         refundTicket: assign((context, event) => {
-          const st = context.showState;
-          const salesStats = st.salesStats;
-
-          salesStats.ticketsRefunded += 1;
-          salesStats.ticketsSold -= 1;
-          salesStats.ticketsAvailable += 1;
-          st.refunds.push(event.ticket._id);
-
-          return {
-            showState: {
-              ...st,
-              salesStats: showSalesStatsSchema.parse({
-                ...salesStats
-              })
-            }
-          };
+          const show = context.show;
+          show.$inc('showState.salesStats.ticketsRefunded', 1);
+          show.$inc('showState.salesStats.ticketsSold', -1);
+          show.$inc('showState.salesStats.ticketsAvailable', 1);
+          show.showState.refunds.push(event.ticket._id);
+          return { show };
         }),
 
         deactivateShow: assign((context) => {
-          return {
-            showState: {
-              ...context.showState,
-              active: false,
-              current: false
-            }
-          };
+          const show = context.show;
+          show.showState.active = false;
+          show.showState.current = false;
+          return { show };
         }),
 
         cancelTicket: assign((context, event) => {
-          const st = context.showState;
-          st.cancellations.push(event.ticket._id);
-          return {
-            showState: {
-              ...st,
-              salesStats: showSalesStatsSchema.parse({
-                ...st.salesStats,
-                ticketsAvailable: st.salesStats.ticketsAvailable + 1,
-                ticketsReserved: st.salesStats.ticketsReserved - 1
-              })
-            }
-          };
+          const show = context.show;
+          show.showState.cancellations.push(event.ticket._id);
+          show.$inc('showState.salesStats.ticketsAvailable', 1);
+          show.$inc('showState.salesStats.ticketsReserved', -1);
+          return { show };
         }),
 
         reserveTicket: assign((context, event) => {
-          const st = context.showState;
-          st.reservations.push(event.ticket._id);
-          return {
-            showState: {
-              ...st,
-              salesStats: showSalesStatsSchema.parse({
-                ...st.salesStats,
-                ticketsAvailable: st.salesStats.ticketsAvailable - 1,
-                ticketsReserved: st.salesStats.ticketsReserved + 1
-              })
-            }
-          };
+          const show = context.show;
+          show.showState.reservations.push(event.ticket._id);
+          show.$inc('showState.salesStats.ticketsAvailable', -1);
+          show.$inc('showState.salesStats.ticketsReserved', 1);
+          return { show };
         }),
 
         redeemTicket: assign((context, event) => {
-          const st = context.showState;
-          st.redemptions.push(event.ticket._id);
-          st.salesStats.ticketsRedeemed += 1;
-          return {
-            showState: {
-              ...st,
-              salesStats: showSalesStatsSchema.parse({
-                ...st.salesStats,
-                ticketsRedeemed: st.salesStats.ticketsRedeemed + 1
-              })
-            }
-          };
+          const show = context.show;
+          show.$inc('showState.salesStats.ticketsRedeemed', 1);
+          show.showState.redemptions.push(event.ticket._id);
+          return { show };
         }),
 
         finalizeTicket: assign((context, event) => {
-          const st = context.showState;
-          st.finalizations.push(event.ticket._id);
-          st.salesStats.ticketsFinalized += 1;
-          return {
-            showState: {
-              ...st
-            }
-          };
+          const show = context.show;
+          show.$inc('showState.salesStats.ticketsFinalized', 1);
+          show.showState.finalizations.push(event.ticket._id);
+          return { show };
         }),
 
         sellTicket: assign((context, event) => {
-          const st = context.showState;
-          st.salesStats.ticketsSold += 1;
-          st.salesStats.ticketsReserved -= 1;
-
-          st.sales.push(event.ticket._id);
-          return {
-            showState: {
-              ...st
-            }
-          };
+          const show = context.show;
+          show.$inc('showState.salesStats.ticketsSold', 1);
+          show.$inc('showState.salesStats.ticketsReserved', -1);
+          show.showState.sales.push(event.ticket._id);
+          return { show };
         }),
 
         finalizeShow: assign((context, event) => {
-          const escrow = context.showState.escrow || {
-            startedAt: new Date()
-          };
-          return {
-            showState: {
-              ...context.showState,
-              escrow: escrowSchema.parse({
-                ...escrow,
-                endedAt: new Date()
-              }),
-              status: ShowStatus.FINALIZED,
-              finalize: event.finalize
-            }
-          };
+          const show = context.show;
+          show.showState.status = ShowStatus.FINALIZED;
+          show.showState.finalize = event.finalize;
+          if (!show.showState.escrow)
+            show.showState.escrow = escrowSchema.parse({
+              startedAt: new Date()
+            });
+          show.showState.escrow.endedAt = new Date();
+
+          return { show };
         })
       },
 
       guards: {
         canCancel: (context) =>
           context.show.price.amount === 0 ||
-          context.showState.salesStats.ticketsSold -
-            context.showState.salesStats.ticketsRefunded ===
+          context.show.showState.salesStats.ticketsSold -
+            context.show.showState.salesStats.ticketsRefunded ===
             0,
         showCancelled: (context) =>
-          context.showState.status === ShowStatus.CANCELLED,
+          context.show.showState.status === ShowStatus.CANCELLED,
         showFinalized: (context) =>
-          context.showState.status === ShowStatus.FINALIZED,
+          context.show.showState.status === ShowStatus.FINALIZED,
         showInitiatedCancellation: (context) =>
-          context.showState.status === ShowStatus.CANCELLATION_INITIATED,
+          context.show.showState.status === ShowStatus.CANCELLATION_INITIATED,
         showInitiatedRefund: (context) =>
-          context.showState.status === ShowStatus.REFUND_INITIATED,
+          context.show.showState.status === ShowStatus.REFUND_INITIATED,
         showBoxOfficeOpen: (context) =>
-          context.showState.status === ShowStatus.BOX_OFFICE_OPEN,
+          context.show.showState.status === ShowStatus.BOX_OFFICE_OPEN,
         showBoxOfficeClosed: (context) =>
-          context.showState.status === ShowStatus.BOX_OFFICE_CLOSED,
-        showStarted: (context) => context.showState.status === ShowStatus.LIVE,
+          context.show.showState.status === ShowStatus.BOX_OFFICE_CLOSED,
+        showStarted: (context) =>
+          context.show.showState.status === ShowStatus.LIVE,
         showStopped: (context) =>
-          context.showState.status === ShowStatus.STOPPED,
+          context.show.showState.status === ShowStatus.STOPPED,
         showInEscrow: (context) =>
-          context.showState.status === ShowStatus.IN_ESCROW,
+          context.show.showState.status === ShowStatus.IN_ESCROW,
         showInDispute: (context) =>
-          context.showState.status === ShowStatus.IN_DISPUTE,
+          context.show.showState.status === ShowStatus.IN_DISPUTE,
         soldOut: (context) =>
-          context.showState.salesStats.ticketsAvailable === 1,
+          context.show.showState.salesStats.ticketsAvailable === 1,
         canStartShow: (context) => {
-          if (context.showState.status === ShowStatus.STOPPED) {
+          if (context.show.showState.status === ShowStatus.STOPPED) {
             // Allow grace period to start show again
-            if (!context.showState.runtime!.startDate) {
+            if (!context.show.showState.runtime!.startDate) {
               return false;
             }
-            const startDate = new Date(context.showState.runtime!.startDate);
+            const startDate = new Date(
+              context.show.showState.runtime!.startDate
+            );
             return (startDate.getTime() ?? 0) + +GRACE_PERIOD > Date.now();
           }
-          return context.showState.salesStats.ticketsSold > 0;
+          return context.show.showState.salesStats.ticketsSold > 0;
         },
         fullyRefunded: (context, event) => {
           const refunded = event.type === 'TICKET REFUNDED' ? 1 : 0;
-          return context.showState.salesStats.ticketsSold - refunded === 0;
+          return context.show.showState.salesStats.ticketsSold - refunded === 0;
         },
         canFinalize: (context) => {
           let startTime = 0;
-          const startedAt = context.showState.escrow?.startedAt;
+          const startedAt = context.show.showState.escrow?.startedAt;
           if (startedAt) {
             startTime = new Date(startedAt).getTime();
           }
           const hasUnfinalizedTickets =
-            context.showState.salesStats.ticketsSold -
-              context.showState.salesStats.ticketsFinalized >
+            context.show.showState.salesStats.ticketsSold -
+              context.show.showState.salesStats.ticketsFinalized >
             0;
           const escrowTime = 0 + ESCROW_PERIOD + startTime;
           const hasDisputes =
-            context.showState.disputeStats.totalDisputesPending > 0;
+            context.show.showState.disputeStats.totalDisputesPending > 0;
           const escrowOver = escrowTime < Date.now();
           return escrowOver || (!hasDisputes && !hasUnfinalizedTickets);
         },
         disputesResolved: (context, event) => {
           const resolved = event.type === 'DISPUTE DECIDED' ? 1 : 0;
           return (
-            context.showState.disputeStats.totalDisputesPending - resolved === 0
+            context.show.showState.disputeStats.totalDisputesPending -
+              resolved ===
+            0
           );
         }
       }
@@ -698,7 +619,7 @@ export const createShowMachineService = ({
   const showService = interpret(showMachine).start();
 
   showService.onChange(async (context) => {
-    await context.show.save();
+    if (context.show.save) await context.show.save();
   });
 
   if (showMachineOptions?.saveShowEventCallback) {
@@ -728,6 +649,5 @@ export const createShowMachineService = ({
         });
     });
   }
-
   return showService;
 };
