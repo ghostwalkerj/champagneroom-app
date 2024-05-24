@@ -619,6 +619,8 @@ export const createShowMachineService = ({
   if (saveShowEvents) {
     showService.onEvent((event) => {
       if (event.type === 'xstate.stop') return;
+      178_008;
+
       let ticketId: string | undefined;
       let customerName = 'someone';
       if ('ticket' in event) {
