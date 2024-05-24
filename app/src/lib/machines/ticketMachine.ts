@@ -39,6 +39,7 @@ export type TicketMachineOptions = {
   gracePeriod?: number;
   escrowPeriod?: number;
   showQueue?: Queue<ShowJobDataType, any, string>;
+  saveState?: boolean;
 };
 type TicketMachineEventType =
   | {
@@ -771,10 +772,12 @@ export const createTicketMachineService = ({
     ticketMachineOptions
   });
   const ticketService = interpret(ticketMachine).start();
+  const saveState = ticketMachineOptions?.saveState || true;
 
-  ticketService.onChange(async (context) => {
-    if (context.ticket.save) await context.ticket.save();
-  });
+  if (saveState)
+    ticketService.onChange(async (context) => {
+      if (context.ticket.save) await context.ticket.save();
+    });
 
   return ticketService;
 };

@@ -21,7 +21,10 @@ import { ShowEvent, type ShowEventDocument } from '$lib/models/showEvent';
 import { User, type UserDocument } from '$lib/models/user';
 import type { WalletDocument } from '$lib/models/wallet';
 
-import type { ShowMachineEventType } from '$lib/machines/showMachine';
+import {
+  createShowMachineService,
+  type ShowMachineEventType
+} from '$lib/machines/showMachine';
 
 import type { PayoutQueueType } from '$lib/workers/payoutWorker';
 import type { ShowQueueType } from '$lib/workers/showWorker';
@@ -41,7 +44,6 @@ import {
   PayoutReason,
   requestPayoutSchema
 } from '$lib/payout';
-import { getShowMachineService } from '$lib/server/machinesUtil';
 import { ipfsUpload } from '$lib/server/upload';
 
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
@@ -123,7 +125,7 @@ export const actions: Actions = {
       connection: redisConnection
     }) as ShowQueueType;
 
-    const showService = getShowMachineService(show);
+    const showService = createShowMachineService({ show });
     const showMachineState = showService.getSnapshot();
 
     const cancel = {
@@ -166,7 +168,7 @@ export const actions: Actions = {
       connection: redisConnection
     }) as ShowQueueType;
 
-    const showService = getShowMachineService(show);
+    const showService = createShowMachineService({ show });
     const showState = showService.getSnapshot();
 
     if (showState.can({ type: ShowMachineEventString.SHOW_ENDED })) {
@@ -223,7 +225,7 @@ export const actions: Actions = {
       connection: redisConnection
     }) as ShowQueueType;
 
-    const showService = getShowMachineService(show);
+    const showService = createShowMachineService({ show });
 
     const showState = showService.getSnapshot();
 
@@ -247,7 +249,7 @@ export const actions: Actions = {
       connection
     }) as ShowQueueType;
 
-    const showService = getShowMachineService(show);
+    const showService = createShowMachineService({ show });
     const showState = showService.getSnapshot();
 
     if (!showState.matches('started'))

@@ -12,6 +12,7 @@ import {
   runtimeSchema
 } from '$lib/models/common';
 import type { ShowDocument } from '$lib/models/show';
+import { createShowEvent } from '$lib/models/showEvent';
 import type { TicketDocument } from '$lib/models/ticket';
 import type { TransactionDocument } from '$lib/models/transaction';
 
@@ -81,18 +82,8 @@ export type ShowMachineEventType =
     };
 
 export type ShowMachineOptions = {
-  saveStateCallback?: (state: ShowStateType) => void;
-  saveShowEventCallback?: ({
-    type,
-    ticketId,
-    transaction,
-    ticketInfo
-  }: {
-    type: string;
-    ticketId?: string;
-    transaction?: TransactionDocument;
-    ticketInfo?: { customerName: string };
-  }) => void;
+  saveState?: boolean;
+  saveShowEvents?: boolean;
   gracePeriod?: number;
   escrowPeriod?: number;
 };
@@ -617,12 +608,16 @@ export const createShowMachineService = ({
   const showMachine = createShowMachine({ show, showMachineOptions });
   showMachine;
   const showService = interpret(showMachine).start();
+  const saveState = showMachineOptions?.saveState ?? true;
+  const saveShowEvents = showMachineOptions?.saveShowEvents ?? true;
 
-  showService.onChange(async (context) => {
-    if (context.show.save) await context.show.save();
-  });
+  if (saveState) {
+    showService.onChange(async (context) => {
+      if (context.show.save) await context.show.save();
+    });
+  }
 
-  if (showMachineOptions?.saveShowEventCallback) {
+  if (saveShowEvents) {
     showService.onEvent((event) => {
       if (event.type === 'xstate.stop') return;
       let ticketId: string | undefined;
@@ -634,19 +629,17 @@ export const createShowMachineService = ({
       } else if ('customerName' in event) {
         customerName = event.customerName as string;
       }
-
       const transaction = (
         'transaction' in event ? event.transaction : undefined
       ) as TransactionDocument | undefined;
       const ticketInfo = { customerName };
-
-      showMachineOptions.saveShowEventCallback &&
-        showMachineOptions.saveShowEventCallback({
-          type: event.type,
-          ticketId,
-          transaction,
-          ticketInfo
-        });
+      createShowEvent({
+        show,
+        type: event.type,
+        ticketId,
+        transaction,
+        ticketInfo
+      });
     });
   }
   return showService;
