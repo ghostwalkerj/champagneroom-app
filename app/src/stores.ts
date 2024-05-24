@@ -137,7 +137,6 @@ const getInsertNotification = <T>({
     let shouldLoop = true;
     while (shouldLoop) {
       const signal = abortDocument.signal;
-
       const [error, response] = await to(
         fetch(path, {
           signal

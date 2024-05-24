@@ -8,8 +8,6 @@ import {
   z
 } from 'mongoose-zod';
 
-import type { ShowDocumentType } from './show';
-import type { TransactionDocumentType } from './transaction';
 const { models } = pkg;
 
 const showEventSchema = toZodMongooseSchema(
@@ -61,27 +59,3 @@ export type ShowEventDocumentType = z.infer<typeof showEventSchema>;
 export const ShowEvent = models?.ShowEvent
   ? (models.ShowEvent as Model<ShowEventDocumentType>)
   : mongoose.model<ShowEventDocumentType>('ShowEvent', showeventSchema);
-
-export const createShowEvent = ({
-  show,
-  type,
-  ticketId,
-  transaction,
-  ticketInfo
-}: {
-  show: ShowDocumentType;
-  type: string;
-  ticketId?: string;
-  transaction?: TransactionDocumentType;
-  ticketInfo?: { customerName: string };
-}) => {
-  ShowEvent.create({
-    show: show._id,
-    type,
-    ticket: ticketId,
-    transaction: transaction?._id,
-    agent: show.agent,
-    creator: show.creator,
-    ticketInfo
-  });
-};
