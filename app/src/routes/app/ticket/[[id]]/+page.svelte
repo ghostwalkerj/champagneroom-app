@@ -247,7 +247,7 @@
       isTicketDone = false;
       ticketMachineService?.stop();
       ticketMachineService = createTicketMachineService({
-        ticketDocument: ticket
+        ticket
       });
       useTicketMachine(ticketMachineService);
       ticketUnSub?.();
@@ -256,7 +256,7 @@
           ticket = _ticket;
           ticketMachineService?.stop();
           ticketMachineService = createTicketMachineService({
-            ticketDocument: ticket
+            ticket
           });
           useTicketMachine(ticketMachineService);
 
@@ -269,7 +269,7 @@
               ticket = $page.data.ticket as TicketDocument;
               ticketMachineService?.stop();
               ticketMachineService = createTicketMachineService({
-                ticketDocument: ticket
+                ticket
               });
               useTicketMachine(ticketMachineService);
             }

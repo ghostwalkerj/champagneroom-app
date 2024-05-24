@@ -61,7 +61,7 @@ export const getTicketMachineService = (
   };
 
   return createTicketMachineService({
-    ticketDocument: ticket,
+    ticket,
     ticketMachineOptions
   });
 };

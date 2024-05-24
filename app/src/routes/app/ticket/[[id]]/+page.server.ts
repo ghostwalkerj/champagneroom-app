@@ -49,7 +49,7 @@ export const actions: Actions = {
 
     const ticketService = getTicketMachineService(ticket, redisConnection);
     const state = ticketService.getSnapshot();
-    const bcInvoiceId = state.context.ticketDocument.bcInvoiceId;
+    const bcInvoiceId = state.context.ticket.bcInvoiceId;
 
     // Cancel the invoice attached to the ticket if no payment has been made
     if (state.matches('reserved.waiting4Payment')) {
