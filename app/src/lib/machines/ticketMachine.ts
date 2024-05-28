@@ -43,88 +43,65 @@ type TicketMachineContextType = {
   id: string;
 };
 
-// type TicketMachineGuardType =
-//   | { type: 'ticketCancelled' }
-//   | { type: 'ticketFinalized' }
-//   | { type: 'ticketInDispute' }
-//   | { type: 'ticketInEscrow' }
-//   | { type: 'ticketReserved' }
-//   | { type: 'ticketRedeemed' }
-//   | { type: 'ticketHasPaymentInitiated' }
-//   | { type: 'ticketHasPayment' }
-//   | { type: 'ticketFullyPaid' }
-//   | { type: 'ticketHasRefundRequested' }
-//   | { type: 'ticketIsWaitingForRefund' }
-//   | { type: 'ticketMissedShow' }
-//   | { type: 'canBeRefunded' }
-//   | { type: 'fullyPaid' }
-//   | { type: 'canWatchShow' }
-//   | { type: 'noDisputeRefund' }
-//   | { type: 'showMissed' }
-//   | { type: 'ticketHasRefundRequested' }
-//   | { type: 'ticketIsWaitingForRefund' }
-//   | { type: 'ticketInDisputeRefund' }
-//   | { type: 'fullyRefunded' };
-
 export type TicketMachineEventType =
   | {
-      type: 'CANCELLATION REQUESTED';
-      cancel: CancelType;
-    }
+    type: 'CANCELLATION REQUESTED';
+    cancel: CancelType;
+  }
   | {
-      type: 'REFUND RECEIVED';
-      transaction: TransactionDocument;
-    }
+    type: 'REFUND RECEIVED';
+    transaction: TransactionDocument;
+  }
   | {
-      type: 'REFUND REQUESTED';
-      refund: RefundType;
-    }
+    type: 'REFUND REQUESTED';
+    refund: RefundType;
+  }
   | {
-      type: 'REFUND INITIATED';
-      refund: RefundType;
-    }
+    type: 'REFUND INITIATED';
+    refund: RefundType;
+  }
   | {
-      type: 'PAYMENT RECEIVED';
-      transaction: TransactionDocument;
-    }
+    type: 'PAYMENT RECEIVED';
+    transaction: TransactionDocument;
+  }
   | {
-      type: 'FEEDBACK RECEIVED';
-      feedback: FeedbackType;
-    }
+    type: 'FEEDBACK RECEIVED';
+    feedback: FeedbackType;
+  }
   | {
-      type: 'DISPUTE INITIATED';
-      dispute: DisputeType;
-      refund: RefundType;
-    }
+    type: 'DISPUTE INITIATED';
+    dispute: DisputeType;
+    refund: RefundType;
+  }
   | {
-      type: 'TICKET REDEEMED';
-    }
+    type: 'TICKET REDEEMED';
+  }
   | {
-      type: 'SHOW JOINED';
-    }
+    type: 'SHOW JOINED';
+  }
   | {
-      type: 'SHOW LEFT';
-    }
+    type: 'SHOW LEFT';
+  }
   | {
-      type: 'SHOW ENDED';
-    }
+    type: 'SHOW ENDED';
+  }
   | {
-      type: 'SHOW CANCELLED';
-      cancel: CancelType;
-    }
+    type: 'SHOW CANCELLED';
+    cancel: CancelType;
+  }
   | {
-      type: 'TICKET FINALIZED';
-      finalize: FinalizeType;
-    }
+    type: 'TICKET FINALIZED';
+    finalize: FinalizeType;
+  }
   | {
-      type: 'DISPUTE DECIDED';
-      decision: DisputeDecision;
-      refund?: RefundType;
-    }
+    type: 'DISPUTE DECIDED';
+    decision: DisputeDecision;
+    refund?: RefundType;
+  }
   | {
-      type: 'PAYMENT INITIATED';
-      paymentCurrency: CurrencyType;
-    };
+    type: 'PAYMENT INITIATED';
+    paymentCurrency: CurrencyType;
+  };
 
 export type TicketMachineOptions = {
   gracePeriod?: number;
@@ -275,21 +252,21 @@ const createTicketMachine = ({
         });
       },
 
-      initiatePayment: (_, params: { ticket: TicketDocument; paymentCurrency: CurrencyType}) => {
+      initiatePayment: (_, params: { ticket: TicketDocument; paymentCurrency: CurrencyType; }) => {
         assign(() => {
-        const ticket = params.ticket;
-        const paymentCurrency = params.paymentCurrency;
-        ticket.ticketState.status = TicketStatus.PAYMENT_INITIATED;
-        ticket.ticketState.sale = ticketSaleSchema.parse({
-          totals: {
-            [paymentCurrency]: 0
-          },
-          payments: [],
-          currency: paymentCurrency
-        }) as SaleType;
-        return {
-          ticket
-        };
+          const ticket = params.ticket;
+          const paymentCurrency = params.paymentCurrency;
+          ticket.ticketState.status = TicketStatus.PAYMENT_INITIATED;
+          ticket.ticketState.sale = ticketSaleSchema.parse({
+            totals: {
+              [paymentCurrency]: 0
+            },
+            payments: [],
+            currency: paymentCurrency
+          }) as SaleType;
+          return {
+            ticket
+          };
         });
       },
 
@@ -369,12 +346,12 @@ const createTicketMachine = ({
         });
       },
 
-      initiateRefund:  (
+      initiateRefund: (
         _,
         params: {
           ticket: TicketDocument;
           refund: RefundType;
-         }
+        }
       ) => {
         assign(() => {
           const ticket = params.ticket;
@@ -390,7 +367,7 @@ const createTicketMachine = ({
         params: {
           ticket: TicketDocument;
           transaction: TransactionDocument;
-         }
+        }
       ) => {
         assign(() => {
           const ticket = params.ticket;
@@ -409,28 +386,28 @@ const createTicketMachine = ({
         });
       },
 
-      receiveFeedback:  (
+      receiveFeedback: (
         _,
         params: {
           ticket: TicketDocument;
           feedback: FeedbackType;
-         }
+        }
       ) => {
         assign(() => {
           const ticket = params.ticket;
           const feedback = params.feedback;
-        ticket.ticketState.feedback = feedback;
-        return { ticket };
+          ticket.ticketState.feedback = feedback;
+          return { ticket };
         });
       },
 
-      initiateDispute:  (
+      initiateDispute: (
         _,
         params: {
           ticket: TicketDocument;
           dispute: DisputeType;
           refund: RefundType;
-         }
+        }
       ) => {
         assign(() => {
           const ticket = params.ticket;
@@ -459,62 +436,62 @@ const createTicketMachine = ({
         params: {
           ticket: TicketDocument;
           finalize: FinalizeType;
-         }
+        }
       ) => {
         assign(() => {
           const ticket = params.ticket;
-        const finalize = params.finalize;
-        if (ticket.ticketState.status === TicketStatus.FINALIZED)
-          return { ticket };
+          const finalize = params.finalize;
+          if (ticket.ticketState.status === TicketStatus.FINALIZED)
+            return { ticket };
 
-        ticket.ticketState.status = TicketStatus.FINALIZED;
-        ticket.ticketState.finalize = finalize;
-        return { ticket };
+          ticket.ticketState.status = TicketStatus.FINALIZED;
+          ticket.ticketState.finalize = finalize;
+          return { ticket };
         });
       },
 
-      decideDispute:  (
+      decideDispute: (
         _,
         params: {
           ticket: TicketDocument;
           decision: DisputeDecision;
           refund: RefundType;
-         }
+        }
       ) => {
         assign(() => {
           const ticket = params.ticket;
           const decision = params.decision;
           const refund = params.refund;
 
-        if (!ticket.ticketState.dispute) return { ticket };
-        ticket.ticketState.dispute.decision = decision;
-        ticket.ticketState.dispute.endedAt = new Date();
-        ticket.ticketState.dispute.resolved = true;
-        ticket.ticketState.refund = refund;
-        ticket.ticketState.status = TicketStatus.WAITING_FOR_DISPUTE_REFUND;
-        return { ticket };
+          if (!ticket.ticketState.dispute) return { ticket };
+          ticket.ticketState.dispute.decision = decision;
+          ticket.ticketState.dispute.endedAt = new Date();
+          ticket.ticketState.dispute.resolved = true;
+          ticket.ticketState.refund = refund;
+          ticket.ticketState.status = TicketStatus.WAITING_FOR_DISPUTE_REFUND;
+          return { ticket };
         });
       },
 
-      deactivateTicket:  (
+      deactivateTicket: (
         _,
         params: { ticket: TicketDocument; }
       ) => {
         assign(() => {
           const ticket = params.ticket;
-        ticket.ticketState.active = false;
-        return { ticket };
+          ticket.ticketState.active = false;
+          return { ticket };
         });
       },
 
-      missShow:  (
+      missShow: (
         _,
         params: { ticket: TicketDocument; }
       ) => {
         assign(() => {
           const ticket = params.ticket;
-        ticket.ticketState.status = TicketStatus.MISSED_SHOW;
-        return { ticket };
+          ticket.ticketState.status = TicketStatus.MISSED_SHOW;
+          return { ticket };
         });
       }
     },
@@ -555,9 +532,9 @@ const createTicketMachine = ({
         // Check total payments with rates at time of transaction.
         const payouts = (context.ticket.ticketState.sale?.payments ||
           new Map<string, TransactionSummaryType[]>()) as Map<
-          string,
-          TransactionSummaryType[]
-        >;
+            string,
+            TransactionSummaryType[]
+          >;
         total += calcTotal(payouts);
         return total >= context.ticket.price.amount;
       },
@@ -599,7 +576,7 @@ const createTicketMachine = ({
         );
       },
 
-      noDisputeRefund: ({ context }, params : { decision: DisputeDecision; }) => {
+      noDisputeRefund: ({ context }, params: { decision: DisputeDecision; }) => {
         const decision =
           context.ticket.ticketState.dispute?.decision || params.decision;
         if (!decision) return false;
@@ -684,12 +661,24 @@ const createTicketMachine = ({
                   ticket: context.ticket,
                   cancel: event.cancel
                 })
-               }],
+              }],
               guard: 'canBeRefunded'
             },
             {
               target: '#ticketMachine.cancelled',
-              actions: ['cancelTicket', 'sendTicketCancelled']
+              actions: [
+                {
+                  type: 'cancelTicket',
+                  params: ({ context }) => ({
+                    ticket: context.ticket
+                  })
+                }, {
+                  type: 'sendTicketCancelled',
+                  params: ({ context, event }) => ({
+                    ticket: context.ticket,
+                    cancel: event.cancel
+                  })
+                }]
             }
           ]
         },
@@ -698,11 +687,30 @@ const createTicketMachine = ({
             on: {
               'CANCELLATION REQUESTED': {
                 target: '#ticketMachine.cancelled',
-                actions: ['cancelTicket', 'sendTicketCancelled']
+                actions: [{
+                  type: 'cancelTicket',
+                  params: ({ context, event }) => ({
+                    ticket: context.ticket,
+                    cancel: event.cancel
+                  })
+                }, {
+                  type: 'sendTicketCancelled',
+                  params: ({ context, event }) => ({
+                    ticket: context.ticket,
+                    cancel: event.cancel
+                  })
+                }]
               },
               'PAYMENT INITIATED': {
-                target: 'initiatedPayment',
-                actions: ['initiatePayment']
+                target: '#ticketMachine.reserved.initiatedPayment',
+                actions: [
+                  {
+                    type: 'initiatePayment',
+                    params: ({ context, event }) => ({
+                      ticket: context.ticket,
+                      paymentCurrency: event.paymentCurrency
+                    })
+                  }]
               }
             }
           },
@@ -711,12 +719,42 @@ const createTicketMachine = ({
               'PAYMENT RECEIVED': [
                 {
                   target: '#ticketMachine.reserved.waiting4Show',
-                  guard: 'fullyPaid',
-                  actions: ['receivePayment', 'setFullyPaid', 'sendTicketSold']
+                  guard: {
+                    type: 'fullyPaid',
+                    params: ({ event }) => ({
+                      transaction: event.transaction
+                    })
+                  },
+                  actions: [{
+                    type: 'receivePayment',
+                    params: ({ context, event }) => ({
+                      ticket: context.ticket,
+                      transaction: event.transaction
+                    })
+                  },
+                  {
+                    type: 'setFullyPaid',
+                    params: ({ context }) => ({
+                      ticket: context.ticket
+                    })
+                  },
+                  {
+                    type: 'sendTicketSold',
+                    params: ({ context }) => ({
+                      ticket: context.ticket
+                    })
+                  }]
                 },
                 {
                   target: '#ticketMachine.reserved.receivedPayment',
-                  actions: ['receivePayment']
+                  actions: [{
+                    type: 'receivePayment',
+                    params: ({ context, event }) => ({
+                      ticket: context.ticket,
+                      transaction: event.transaction
+                    })
+                  }]
+
                 }
               ]
             }
@@ -727,16 +765,49 @@ const createTicketMachine = ({
               'PAYMENT RECEIVED': [
                 {
                   target: '#ticketMachine.reserved.waiting4Show',
-                  guard: 'fullyPaid',
-                  actions: ['receivePayment', 'setFullyPaid', 'sendTicketSold']
+                  guard: {
+                    type: 'fullyPaid',
+                    params: ({ event }) => ({
+                      transaction: event.transaction
+                    })
+                  },
+                  actions: [{
+                    type: 'receivePayment',
+                    params: ({ context, event }) => ({
+                      ticket: context.ticket,
+                      transaction: event.transaction
+                    })
+                  },
+                  {
+                    type: 'setFullyPaid',
+                    params: ({ context }) => ({ ticket: context.ticket })
+                  },
+                  {
+                    type: 'sendTicketSold',
+                    params: ({ context }) => ({ ticket: context.ticket })
+                  }
+                  ]
                 },
                 {
-                  actions: ['receivePayment']
+                  actions: [
+                    {
+                      type: 'receivePayment',
+                      params: ({ context, event }) => ({
+                        ticket: context.ticket,
+                        transaction: event.transaction
+                      })
+                    }]
                 }
               ],
               'REFUND REQUESTED': {
                 target: 'refundRequested',
-                actions: ['requestRefund']
+                actions: [{
+                  type: 'requestRefund',
+                  params: ({ context, event }) => ({
+                    ticket: context.ticket,
+                    refund: event.refund
+                  })
+                 }]
               }
             }
           },
@@ -745,12 +816,30 @@ const createTicketMachine = ({
               'TICKET REDEEMED': {
                 target: '#ticketMachine.redeemed',
                 guard: 'canWatchShow',
-                actions: ['redeemTicket', 'sendTicketRedeemed']
+                actions: [
+                  {
+                    type: 'redeemTicket',
+                    params: ({ context }) => ({
+                      ticket: context.ticket
+                    })
+                  },
+                  {
+                    type: 'sendTicketRedeemed',
+                    params: ({ context }) => ({
+                      ticket: context.ticket
+                    })
+                  }]
               },
               'REFUND REQUESTED': [
                 {
                   target: 'refundRequested',
-                  actions: ['requestRefund'],
+                  actions: [{
+                    type: 'requestRefund',
+                    params: ({ context, event }) => ({
+                      ticket: context.ticket,
+                      refund: event.refund
+                    })
+                  }],
                   guard: 'canBeRefunded'
                 },
                 {
