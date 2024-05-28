@@ -455,7 +455,7 @@ const createTicketMachine = ({
         params: {
           ticket: TicketDocument;
           decision: DisputeDecision;
-          refund: RefundType;
+          refund?: RefundType;
         }
       ) => {
         assign(() => {
@@ -467,7 +467,7 @@ const createTicketMachine = ({
           ticket.ticketState.dispute.decision = decision;
           ticket.ticketState.dispute.endedAt = new Date();
           ticket.ticketState.dispute.resolved = true;
-          ticket.ticketState.refund = refund;
+          if (refund) ticket.ticketState.refund = refund;
           ticket.ticketState.status = TicketStatus.WAITING_FOR_DISPUTE_REFUND;
           return { ticket };
         });
@@ -807,7 +807,7 @@ const createTicketMachine = ({
                     ticket: context.ticket,
                     refund: event.refund
                   })
-                 }]
+                }]
               }
             }
           },
@@ -845,10 +845,27 @@ const createTicketMachine = ({
                 {
                   target: '#ticketMachine.cancelled',
                   actions: [
-                    'requestRefund',
-                    'cancelTicket',
-                    'sendTicketRefunded'
-                  ]
+                    {
+                      type: 'requestRefund',
+                      params: ({ context, event }) => ({
+                        ticket: context.ticket,
+                        refund: event.refund
+                      })
+                    },
+                    {
+                      type: 'cancelTicket',
+                      params: ({ context, event }) => ({
+                        ticket: context.ticket,
+                        refund: event.refund
+                      })
+                    },
+                    {
+                      type: 'sendTicketRefunded',
+                      params: ({ context, event }) => ({
+                        ticket: context.ticket,
+                        refund: event.refund
+                      })
+                    }]
                 }
               ]
             }
@@ -857,7 +874,13 @@ const createTicketMachine = ({
             on: {
               'REFUND INITIATED': {
                 target: 'waiting4Refund',
-                actions: ['initiateRefund']
+                actions: [{
+                  type: 'initiateRefund',
+                  params: ({ context, event }) => ({
+                    ticket: context.ticket,
+                    refund: event.refund
+                  })
+                }]
               }
             }
           },
@@ -868,13 +891,35 @@ const createTicketMachine = ({
                   target: '#ticketMachine.cancelled',
                   guard: 'fullyRefunded',
                   actions: [
-                    'receiveRefund',
-                    'cancelTicket',
-                    'sendTicketRefunded'
-                  ]
+                    {
+                      type: 'receiveRefund',
+                      params: ({ context, event }) => ({
+                        ticket: context.ticket,
+                        transaction: event.transaction
+                      })
+                    },
+                    {
+                      type: 'cancelTicket',
+                      params: ({ context }) => ({
+                        ticket: context.ticket
+                      })
+                    },
+                    {
+                      type: 'sendTicketRefunded',
+                      params: ({ context }) => ({
+                        ticket: context.ticket
+                      })
+                    }]
                 },
                 {
-                  actions: ['receiveRefund']
+                  actions: [
+                    {
+                      type: 'receiveRefund',
+                      params: ({ context, event }) => ({
+                        ticket: context.ticket,
+                        transaction: event.transaction
+                      })
+                    }]
                 }
               ]
             }
@@ -883,27 +928,62 @@ const createTicketMachine = ({
       },
       redeemed: {
         on: {
-          'SHOW LEFT': { actions: ['sendLeftShow'] },
+          'SHOW LEFT': {
+            actions: [{
+              type: 'sendLeftShow',
+              params: ({ context }) => ({
+                ticket: context.ticket
+              })
+            }]
+          },
           'SHOW JOINED': {
             guard: 'canWatchShow',
-            actions: ['sendJoinedShow']
+            actions: [{
+              type: 'sendJoinedShow',
+              params: ({ context }) => ({
+                ticket: context.ticket
+              })
+            }]
           }
         }
       },
       cancelled: {
         type: 'final',
-        entry: ['deactivateTicket']
+        entry: [{
+          type: 'deactivateTicket',
+          params: ({ context }) => ({
+            ticket: context.ticket
+          })
+        }]
       },
       finalized: {
         type: 'final',
-        entry: ['deactivateTicket']
+        entry: [
+          {
+            type: 'deactivateTicket',
+            params: ({ context }) => ({
+              ticket: context.ticket
+            })
+          }]
       },
       ended: {
         initial: 'inEscrow',
         on: {
           'TICKET FINALIZED': {
             target: '#ticketMachine.finalized',
-            actions: ['finalizeTicket', 'sendTicketFinalized']
+            actions: [{
+              type: 'finalizeTicket',
+              params: ({ context, event }) => ({
+                ticket: context.ticket,
+                finalize: event.finalize
+              })
+            }, {
+              type: 'sendTicketFinalized',
+              params: ({ context, event }) => ({
+                ticket: context.ticket,
+                finalize: event.finalize
+              })
+            }]
           }
         },
         states: {
@@ -912,13 +992,24 @@ const createTicketMachine = ({
               {
                 target: 'missedShow',
                 guard: 'showMissed',
-                actions: ['missShow']
+                actions: [{
+                  type: 'missShow',
+                  params: ({ context }) => ({
+                    ticket: context.ticket
+                  })
+                }]
               }
             ],
             on: {
               'FEEDBACK RECEIVED': {
                 actions: [
-                  'receiveFeedback',
+                  {
+                    type: 'receiveFeedback',
+                    params: ({ context, event }) => ({
+                      ticket: context.ticket,
+                      feedback: event.feedback
+                    })
+                  },
                   raise({
                     type: 'TICKET FINALIZED',
                     finalize: finalizeSchema.parse({
@@ -929,7 +1020,20 @@ const createTicketMachine = ({
               },
               'DISPUTE INITIATED': {
                 target: 'inDispute',
-                actions: ['initiateDispute', 'sendDisputeInitiated']
+                actions: [{
+                  type: 'initiateDispute',
+                  params: ({ context, event }) => ({
+                    ticket: context.ticket,
+                    dispute: event.dispute,
+                    refund: event.refund
+                  })
+                }, {
+                  type: 'sendDisputeInitiated',
+                  params: ({ context, event }) => ({
+                    ticket: context.ticket,
+                    dispute: event.dispute
+                  })
+                }]
               }
             }
           },
@@ -941,7 +1045,14 @@ const createTicketMachine = ({
                   'DISPUTE DECIDED': [
                     {
                       actions: [
-                        'decideDispute',
+                        {
+                          type: 'decideDispute',
+                          params: ({ context, event }) => ({
+                            ticket: context.ticket,
+                            decision: event.decision,
+                            refund: event.refund
+                          })
+                        },
                         raise({
                           type: 'TICKET FINALIZED',
                           finalize: finalizeSchema.parse({
@@ -949,10 +1060,22 @@ const createTicketMachine = ({
                           })
                         })
                       ],
-                      guard: 'noDisputeRefund'
+                      guard: {
+                        type: 'noDisputeRefund',
+                        params: ({ event }) => ({
+                          decision: event.decision
+                        })
+                      }
                     },
                     {
-                      actions: 'decideDispute',
+                      actions: [{
+                        type: 'decideDispute',
+                        params: ({ context, event }) => ({
+                          ticket: context.ticket,
+                          decision: event.decision,
+                          refund: event.refund
+                        })
+                      }],
                       target: 'waiting4DisputeRefund'
                     }
                   ]
@@ -961,14 +1084,20 @@ const createTicketMachine = ({
               waiting4DisputeRefund: {
                 on: {
                   'REFUND RECEIVED': {
-                    actions: [
-                      'receiveRefund',
-                      raise({
-                        type: 'TICKET FINALIZED',
-                        finalize: finalizeSchema.parse({
-                          finalizedBy: ActorType.ARBITRATOR
-                        })
+                    actions: [{
+                      type:
+                        'receiveRefund',
+                      params: ({ context, event }) => ({
+                        ticket: context.ticket,
+                        transaction: event.transaction
                       })
+                    },
+                    raise({
+                      type: 'TICKET FINALIZED',
+                      finalize: finalizeSchema.parse({
+                        finalizedBy: ActorType.ARBITRATOR
+                      })
+                    })
                     ]
                   }
                 }
@@ -979,7 +1108,20 @@ const createTicketMachine = ({
             on: {
               'DISPUTE INITIATED': {
                 target: 'inDispute',
-                actions: ['initiateDispute', 'sendDisputeInitiated']
+                actions: [{
+                  type: 'initiateDispute',
+                  params: ({ context, event }) => ({
+                    ticket: context.ticket,
+                    dispute: event.dispute,
+                    refund: event.refund
+                  })
+                }, {
+                  type: 'sendDisputeInitiated',
+                  params: ({ context, event }) => ({
+                    ticket: context.ticket,
+                    dispute: event.dispute
+                  }),
+                }]
               }
             }
           }
@@ -989,7 +1131,12 @@ const createTicketMachine = ({
     on: {
       'SHOW ENDED': {
         target: '#ticketMachine.ended',
-        actions: ['endShow']
+        actions: [{
+          type: 'endShow',
+          params: ({ context }) => ({
+            ticket: context.ticket
+          })
+        }]
       }
     }
   });
@@ -1005,9 +1152,7 @@ export type TicketMachineStateType = StateFrom<
 
 export type TicketMachineType = ReturnType<typeof createTicketMachine>;
 
-export { type TicketMachineEventType };
-
-  export { createTicketMachine };
+export { createTicketMachine };
 
 export const createTicketMachineService = ({
   ticket,
