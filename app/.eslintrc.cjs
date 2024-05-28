@@ -111,6 +111,10 @@ module.exports = {
         selector: 'variableLike',
         format: ['camelCase', 'UPPER_CASE', 'PascalCase']
       },
+      {
+        selector: 'params',
+        format: ['camelCase']
+      },
 
       {
         selector: 'parameter',
