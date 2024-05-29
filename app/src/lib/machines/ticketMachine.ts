@@ -45,63 +45,63 @@ type TicketMachineContextType = {
 
 export type TicketMachineEventType =
   | {
-    type: 'CANCELLATION REQUESTED';
-    cancel: CancelType;
-  }
+      type: 'CANCELLATION REQUESTED';
+      cancel: CancelType;
+    }
   | {
-    type: 'REFUND RECEIVED';
-    transaction: TransactionDocument;
-  }
+      type: 'REFUND RECEIVED';
+      transaction: TransactionDocument;
+    }
   | {
-    type: 'REFUND REQUESTED';
-    refund: RefundType;
-  }
+      type: 'REFUND REQUESTED';
+      refund: RefundType;
+    }
   | {
-    type: 'REFUND INITIATED';
-    refund: RefundType;
-  }
+      type: 'REFUND INITIATED';
+      refund: RefundType;
+    }
   | {
-    type: 'PAYMENT RECEIVED';
-    transaction: TransactionDocument;
-  }
+      type: 'PAYMENT RECEIVED';
+      transaction: TransactionDocument;
+    }
   | {
-    type: 'FEEDBACK RECEIVED';
-    feedback: FeedbackType;
-  }
+      type: 'FEEDBACK RECEIVED';
+      feedback: FeedbackType;
+    }
   | {
-    type: 'DISPUTE INITIATED';
-    dispute: DisputeType;
-    refund: RefundType;
-  }
+      type: 'DISPUTE INITIATED';
+      dispute: DisputeType;
+      refund: RefundType;
+    }
   | {
-    type: 'TICKET REDEEMED';
-  }
+      type: 'TICKET REDEEMED';
+    }
   | {
-    type: 'SHOW JOINED';
-  }
+      type: 'SHOW JOINED';
+    }
   | {
-    type: 'SHOW LEFT';
-  }
+      type: 'SHOW LEFT';
+    }
   | {
-    type: 'SHOW ENDED';
-  }
+      type: 'SHOW ENDED';
+    }
   | {
-    type: 'SHOW CANCELLED';
-    cancel: CancelType;
-  }
+      type: 'SHOW CANCELLED';
+      cancel: CancelType;
+    }
   | {
-    type: 'TICKET FINALIZED';
-    finalize: FinalizeType;
-  }
+      type: 'TICKET FINALIZED';
+      finalize: FinalizeType;
+    }
   | {
-    type: 'DISPUTE DECIDED';
-    decision: DisputeDecision;
-    refund?: RefundType;
-  }
+      type: 'DISPUTE DECIDED';
+      decision: DisputeDecision;
+      refund?: RefundType;
+    }
   | {
-    type: 'PAYMENT INITIATED';
-    paymentCurrency: CurrencyType;
-  };
+      type: 'PAYMENT INITIATED';
+      paymentCurrency: CurrencyType;
+    };
 
 export type TicketMachineOptions = {
   gracePeriod?: number;
@@ -117,17 +117,14 @@ const createTicketMachine = ({
   ticket: TicketDocument;
   ticketMachineOptions?: TicketMachineOptions;
 }) => {
-  /** @xstate-layout N4IgpgJg5mDOIC5QBcCWBjA1mZBZAhugBaoB2YAxAMoASA8gOoAEAwgIIByLAogDK-cAIgG0ADAF1EoAA4B7WKjSzSUkAA9EAFgBMAGhABPRNoCM2zQDoAHCZObRVgOyaAnNqsuAvp-1osOAmIySlpGVk4efiFhE0kkEDkFJRV4jQQdfSMEEwBmF0cLAFYANjdtQtETYs0rYqtvXwxsPEIScgs-Zt5ZfAhICjE4mXlFVGVVNJzHQos7UWLi0ULzURcTZ0zEXNFLbRdC2tFHHM0qzRyGkE6A1uCOppxu3v6YoYSR5InEHMKZuYWlis1htDMYdjNKpoalZRDlio5HKJtJdri0gu1UU8+hABto3olRuNUogrHpQQhzG4LKZHNUctp5vkTCiHmi2mB7v5kFiXjl8R8xilQGltKZqcVfgdCvS3BVHJsEMUfhZXDlYZopSYdpoWVzAuzOV0etiBpp+UlBV8EFM-vYAct7MDNAqzAdqfs1vYEXZcrrmvq7pjjS9CubCUL1IhHGSstpSjMpnDnCVRKtkT4rqyAxjWTyccJimHPsSEMsFWq4yqrGqXOdYfNmRnUdmOUHnvnHEXLSWGSZxZKrNK9uUjgrRS4inkXE5HGtlm5in6buiOQAnOBgVcAN36oWY3A4gmiElUBOLwq2NgK6wZLhyHkKjisGXJJysFlh09K1cfn51TazW52nXWBNx3CALAAd3wUZSCgTQAAV8AMABbMBSGQCgELYABNXADwAFSYAAlbgeAASQANWPLsiQvbJYWKIpChqaZYQRGF5XJKxn1mJUjlycxim0RxG0aPUgLXDdt0gKCYLQODEOQtCMKw3D8I4IjSIo6iRFiU8BToyMEGOSw7RE4oTEfcpygVUkciKbYTGfeltkKJc2TuECwNk6DYPgpDUPQzD2C4PheDYAjyLoDgmHIjhyKiyKaIMi0jLSZyRNmaNVnvfYnxfLIqlEixZwOI48lsJwLgAiSVwsbyZIgvyFIC5TgooULIgiqKYrihKkoI6J9PiM9u3orVK1+ViKimJ9R3JMwsufOMdGqdZan-cT-UkhrpPAuT-KUoLVMGVLwytSamOmpxZo4hasmrd8qhyMxNAWWkdhq7blwNRqDpash4KoIhZEg6h6GYAApOh4pS0bDIjDKr2y288sfFa7PmUqtVTFx+Oc+YPJbPbQKaiwyFGfBkEgFh8FIdAwAAGyZ6nBUO1rNGIsAADMAFdSBxUiADEAFVDxIsjuCo+HhjSpHL3WVHcofAqY0vUVZl+WwrMfKzYWJ3b-tkym0Gp2n6cZlm2eUDmga53mBaF7gxYl7Tpd015zvPYy7DhaxCnyJw4xOUxihdON30ZUUKjOWpF1qnb6vXSAwDQnE9yYARhYIs6Eflq1ykRCw8g1VadjMeEFWcbRqVx8rVcHQ3k7AVP04hsIYbhkQT3zi6ewqGZzjYwp1hyV7nXJaoZmmOo7xOSonzEzM6r+1u+nbzODyPHvaIVxV1YpZw+0TGEpkHJ9n2bg0yG4WB0FXMGKGF7ghAAITYFgAGlJZ02X3gLiWU4DlTKImcDKQccYxxgOyg4aMJQ3AmHyNfO4t976P3BoIciVAEKiyGv1RK5Fkq729uNYywDSonDAecPYkDw7kncI+Sci94Q-Eyu5ROv1UGkDvg-J+UVv7cCIsLeKbBeDkQAFr-zGulLQuRKGaGoRA5Y9DYyWVEDjaYNlR52BKN4DMpBZB9HgPEZsklSGyIQAAWlUYgfYH57Cpicc4xwKCcxcjzBY-ehUtjlDMkcJYUJFHVAcG4qSZNwJeKtHUJi5laRWXgbZckxwmKVBrGsfI+wRJhNJj5Zq8l7aBRUsgKJJYEQQjYQcKYfspgKjcJYfGllqzOSsq9HJxt8lHRBmDUpE0fhmQ1Kcaos5KiijsucCwCxXqvWmtUdMP1PLAX2ibUgVMaYQDpgzZmrMfYyP3rkHiAcg7RiVDoKoLpCZFFKKYKEmToztOWRBU2qBzYbMttsm2pA7aKW5vzQWvTfZyhVK4Coz4mS2BdHCCcyxtB5VpAcJwDy26QABSKZyTF7xqmEh4H4cJbEIBcpMpUop3Bwq8JwxZHJ0DvJZiivuPs0UuAnDUDUr1ygShKIfUwqxZh2HODxIu30V5JwNDzMg+AmaoAAF50rlv3eidILD4wXNKFiiwzDQJ5YsesiwGT0iODktBfDIKouMHeSZlRiV2HxrUQo0CmHaoWMJcB2SKUkzIIIVAsBpB8xpqaxUSsJTwhYnixYs5yyLyrK9L6DJR6uoWSTFCXrQIQG6Sa+lZCMrTlrvSeyHhFHLFhOWao4olT5EshUI4719GeCAA */
+  /** @xstate-layout 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-IygwGVPUmQgM-NlzbI28qkTIg1Lz66nr7DMGk2xqhBWDGfIEIIn0hnWN8tw9pSBiAiPAWIp4pzxO1AAWkToRvsajSNkbPTLFUqI8MZlUM+Zp909J0peogk5yCpqsJoxBM9hg5R4T8oUSwaQO5vLxo9adNglAoXvBhdV-5UGrtSgXHKXHjUVEk7YFCWYViODATjSThgHqmBQusMc0D5RyfdkY7V1NfZLRU7U7tcEqxmgQbkn4077wDWyf2H8VLNi-ks7fazbCg15zs-7VTPazC8d0ekAUVZygdJxhCcMaNIxUjyCTILIyQt+sflPLBUWlhgmPZjQEyGPxlgGpsSoZ8nrn3sIUnLHG8scIiXwwRwjIDFdSBsJRQ6QySaQofTc1gKUVjBJJgooYsxBPloprdEBet0leFLEM+wNj4uofmNSAVNjnr8tS8FbHIXvVGeM5bjnXn7i6ts3tD0thPhxlSnmPiAHaJ6nNlrnR0D4FIIrAANoDnr12EmoR5qkn4ebUL2AAcLQELjTMglqKGekP3-DsLIPgQHqAABeoOu2vPKAObuoU8LFgBGYTJewbZOqep4gWk752E8NUmhAHwbbOGyJB3UY4oHPnqLzaBGWz35pZ263VrLesGcQu0gZ9R47WorG5KMOxJMC3aRLxdlb-q9eHApGVaR9iRkzcaWBBgssOzaVA+lGODBvrIOuqt+XTF1pDURED2oNg80BK07YphCQ7c3AHt8PccgM6hNrp3S6XeKed-9JbvWQxjhyaej80CPzQjHaYSozgoJITMHkJo9u30ftgF+n9vWGMZ2G2etCHxjSgO7qGeow4dgWjtG4IAA */
   return setup({
     types: {
       events: {} as TicketMachineEventType,
       context: {} as TicketMachineContextType
     },
     actions: {
-      sendJoinedShow: (
-        _,
-        params: { ticket: TicketDocument; }
-      ) => {
+      sendJoinedShow: (_, params: { ticket: TicketDocument }) => {
         ticketMachineOptions?.showQueue?.add(
           ShowMachineEventString.CUSTOMER_JOINED,
           {
@@ -137,10 +134,7 @@ const createTicketMachine = ({
         );
       },
 
-      sendLeftShow: (
-        _,
-        params: { ticket: TicketDocument; }
-      ) => {
+      sendLeftShow: (_, params: { ticket: TicketDocument }) => {
         ticketMachineOptions?.showQueue?.add(
           ShowMachineEventString.CUSTOMER_LEFT,
           {
@@ -150,10 +144,7 @@ const createTicketMachine = ({
         );
       },
 
-      sendTicketSold: (
-        _,
-        params: { ticket: TicketDocument; }
-      ) => {
+      sendTicketSold: (_, params: { ticket: TicketDocument }) => {
         ticketMachineOptions?.showQueue?.add(
           ShowMachineEventString.TICKET_SOLD,
           {
@@ -164,10 +155,7 @@ const createTicketMachine = ({
         );
       },
 
-      sendTicketRedeemed: (
-        _,
-        params: { ticket: TicketDocument; }
-      ) => {
+      sendTicketRedeemed: (_, params: { ticket: TicketDocument }) => {
         ticketMachineOptions?.showQueue?.add(
           ShowMachineEventString.TICKET_REDEEMED,
           {
@@ -177,10 +165,7 @@ const createTicketMachine = ({
         );
       },
 
-      sendTicketRefunded: (
-        _,
-        params: { ticket: TicketDocument; }
-      ) => {
+      sendTicketRefunded: (_, params: { ticket: TicketDocument }) => {
         ticketMachineOptions?.showQueue?.add(
           ShowMachineEventString.TICKET_REFUNDED,
           {
@@ -193,7 +178,7 @@ const createTicketMachine = ({
 
       sendTicketCancelled: (
         _,
-        params: { cancel: CancelType; ticket: TicketDocument; }
+        params: { cancel: CancelType; ticket: TicketDocument }
       ) => {
         ticketMachineOptions?.showQueue?.add(
           ShowMachineEventString.TICKET_CANCELLED,
@@ -206,10 +191,7 @@ const createTicketMachine = ({
         );
       },
 
-      sendTicketFinalized: (
-        _,
-        params: { ticket: TicketDocument; }
-      ) => {
+      sendTicketFinalized: (_, params: { ticket: TicketDocument }) => {
         ticketMachineOptions?.showQueue?.add(
           ShowMachineEventString.TICKET_FINALIZED,
           {
@@ -219,10 +201,7 @@ const createTicketMachine = ({
         );
       },
 
-      sendDisputeInitiated: (
-        _,
-        params: { ticket: TicketDocument; }
-      ) => {
+      sendDisputeInitiated: (_, params: { ticket: TicketDocument }) => {
         ticketMachineOptions?.showQueue?.add(
           ShowMachineEventString.TICKET_DISPUTED,
           {
@@ -235,7 +214,7 @@ const createTicketMachine = ({
 
       requestRefundCancelledShow: (
         _,
-        params: { cancel: CancelType; ticket: TicketDocument; }
+        params: { cancel: CancelType; ticket: TicketDocument }
       ) => {
         assign(() => {
           const ticket = params.ticket;
@@ -252,7 +231,10 @@ const createTicketMachine = ({
         });
       },
 
-      initiatePayment: (_, params: { ticket: TicketDocument; paymentCurrency: CurrencyType; }) => {
+      initiatePayment: (
+        _,
+        params: { ticket: TicketDocument; paymentCurrency: CurrencyType }
+      ) => {
         assign(() => {
           const ticket = params.ticket;
           const paymentCurrency = params.paymentCurrency;
@@ -270,10 +252,7 @@ const createTicketMachine = ({
         });
       },
 
-      setFullyPaid: (
-        _,
-        params: { ticket: TicketDocument; }
-      ) => {
+      setFullyPaid: (_, params: { ticket: TicketDocument }) => {
         assign(() => {
           const ticket = params.ticket;
           ticket.ticketState.status = TicketStatus.FULLY_PAID;
@@ -281,10 +260,7 @@ const createTicketMachine = ({
         });
       },
 
-      redeemTicket: (
-        _,
-        params: { ticket: TicketDocument; }
-      ) => {
+      redeemTicket: (_, params: { ticket: TicketDocument }) => {
         assign(() => {
           const ticket = params.ticket;
           if (ticket.ticketState.status === TicketStatus.REDEEMED)
@@ -295,10 +271,7 @@ const createTicketMachine = ({
         });
       },
 
-      cancelTicket: (
-        _,
-        params: { ticket: TicketDocument; }
-      ) => {
+      cancelTicket: (_, params: { ticket: TicketDocument }) => {
         assign(() => {
           const ticket = params.ticket;
           ticket.ticketState.status = TicketStatus.CANCELLED;
@@ -419,10 +392,7 @@ const createTicketMachine = ({
         });
       },
 
-      endShow: (
-        _,
-        params: { ticket: TicketDocument; }
-      ) => {
+      endShow: (_, params: { ticket: TicketDocument }) => {
         assign(() => {
           const ticket = params.ticket;
           ticket.ticketState.status = TicketStatus.IN_ESCROW;
@@ -473,10 +443,7 @@ const createTicketMachine = ({
         });
       },
 
-      deactivateTicket: (
-        _,
-        params: { ticket: TicketDocument; }
-      ) => {
+      deactivateTicket: (_, params: { ticket: TicketDocument }) => {
         assign(() => {
           const ticket = params.ticket;
           ticket.ticketState.active = false;
@@ -484,10 +451,7 @@ const createTicketMachine = ({
         });
       },
 
-      missShow: (
-        _,
-        params: { ticket: TicketDocument; }
-      ) => {
+      missShow: (_, params: { ticket: TicketDocument }) => {
         assign(() => {
           const ticket = params.ticket;
           ticket.ticketState.status = TicketStatus.MISSED_SHOW;
@@ -523,7 +487,10 @@ const createTicketMachine = ({
       ticketInDisputeRefund: ({ context }) =>
         context.ticket.ticketState.status ===
         TicketStatus.WAITING_FOR_DISPUTE_REFUND,
-      fullyPaid: ({ context, event }, params: { transaction: TransactionDocument; }) => {
+      fullyPaid: (
+        { context, event },
+        params: { transaction: TransactionDocument }
+      ) => {
         const { transaction } = params;
         const amount =
           event.type === 'PAYMENT RECEIVED' ? +transaction.amount : 0;
@@ -532,9 +499,9 @@ const createTicketMachine = ({
         // Check total payments with rates at time of transaction.
         const payouts = (context.ticket.ticketState.sale?.payments ||
           new Map<string, TransactionSummaryType[]>()) as Map<
-            string,
-            TransactionSummaryType[]
-          >;
+          string,
+          TransactionSummaryType[]
+        >;
         total += calcTotal(payouts);
         return total >= context.ticket.price.amount;
       },
@@ -576,7 +543,7 @@ const createTicketMachine = ({
         );
       },
 
-      noDisputeRefund: ({ context }, params: { decision: DisputeDecision; }) => {
+      noDisputeRefund: ({ context }, params: { decision: DisputeDecision }) => {
         const decision =
           context.ticket.ticketState.dispute?.decision || params.decision;
         if (!decision) return false;
@@ -655,13 +622,15 @@ const createTicketMachine = ({
           'SHOW CANCELLED': [
             {
               target: '#ticketMachine.reserved.refundRequested',
-              actions: [{
-                type: 'requestRefundCancelledShow',
-                params: ({ context, event }) => ({
-                  ticket: context.ticket,
-                  cancel: event.cancel
-                })
-              }],
+              actions: [
+                {
+                  type: 'requestRefundCancelledShow',
+                  params: ({ context, event }) => ({
+                    ticket: context.ticket,
+                    cancel: event.cancel
+                  })
+                }
+              ],
               guard: 'canBeRefunded'
             },
             {
@@ -672,13 +641,15 @@ const createTicketMachine = ({
                   params: ({ context }) => ({
                     ticket: context.ticket
                   })
-                }, {
+                },
+                {
                   type: 'sendTicketCancelled',
                   params: ({ context, event }) => ({
                     ticket: context.ticket,
                     cancel: event.cancel
                   })
-                }]
+                }
+              ]
             }
           ]
         },
@@ -687,19 +658,22 @@ const createTicketMachine = ({
             on: {
               'CANCELLATION REQUESTED': {
                 target: '#ticketMachine.cancelled',
-                actions: [{
-                  type: 'cancelTicket',
-                  params: ({ context, event }) => ({
-                    ticket: context.ticket,
-                    cancel: event.cancel
-                  })
-                }, {
-                  type: 'sendTicketCancelled',
-                  params: ({ context, event }) => ({
-                    ticket: context.ticket,
-                    cancel: event.cancel
-                  })
-                }]
+                actions: [
+                  {
+                    type: 'cancelTicket',
+                    params: ({ context, event }) => ({
+                      ticket: context.ticket,
+                      cancel: event.cancel
+                    })
+                  },
+                  {
+                    type: 'sendTicketCancelled',
+                    params: ({ context, event }) => ({
+                      ticket: context.ticket,
+                      cancel: event.cancel
+                    })
+                  }
+                ]
               },
               'PAYMENT INITIATED': {
                 target: '#ticketMachine.reserved.initiatedPayment',
@@ -710,7 +684,8 @@ const createTicketMachine = ({
                       ticket: context.ticket,
                       paymentCurrency: event.paymentCurrency
                     })
-                  }]
+                  }
+                ]
               }
             }
           },
@@ -725,36 +700,39 @@ const createTicketMachine = ({
                       transaction: event.transaction
                     })
                   },
-                  actions: [{
-                    type: 'receivePayment',
-                    params: ({ context, event }) => ({
-                      ticket: context.ticket,
-                      transaction: event.transaction
-                    })
-                  },
-                  {
-                    type: 'setFullyPaid',
-                    params: ({ context }) => ({
-                      ticket: context.ticket
-                    })
-                  },
-                  {
-                    type: 'sendTicketSold',
-                    params: ({ context }) => ({
-                      ticket: context.ticket
-                    })
-                  }]
+                  actions: [
+                    {
+                      type: 'receivePayment',
+                      params: ({ context, event }) => ({
+                        ticket: context.ticket,
+                        transaction: event.transaction
+                      })
+                    },
+                    {
+                      type: 'setFullyPaid',
+                      params: ({ context }) => ({
+                        ticket: context.ticket
+                      })
+                    },
+                    {
+                      type: 'sendTicketSold',
+                      params: ({ context }) => ({
+                        ticket: context.ticket
+                      })
+                    }
+                  ]
                 },
                 {
                   target: '#ticketMachine.reserved.receivedPayment',
-                  actions: [{
-                    type: 'receivePayment',
-                    params: ({ context, event }) => ({
-                      ticket: context.ticket,
-                      transaction: event.transaction
-                    })
-                  }]
-
+                  actions: [
+                    {
+                      type: 'receivePayment',
+                      params: ({ context, event }) => ({
+                        ticket: context.ticket,
+                        transaction: event.transaction
+                      })
+                    }
+                  ]
                 }
               ]
             }
@@ -771,21 +749,22 @@ const createTicketMachine = ({
                       transaction: event.transaction
                     })
                   },
-                  actions: [{
-                    type: 'receivePayment',
-                    params: ({ context, event }) => ({
-                      ticket: context.ticket,
-                      transaction: event.transaction
-                    })
-                  },
-                  {
-                    type: 'setFullyPaid',
-                    params: ({ context }) => ({ ticket: context.ticket })
-                  },
-                  {
-                    type: 'sendTicketSold',
-                    params: ({ context }) => ({ ticket: context.ticket })
-                  }
+                  actions: [
+                    {
+                      type: 'receivePayment',
+                      params: ({ context, event }) => ({
+                        ticket: context.ticket,
+                        transaction: event.transaction
+                      })
+                    },
+                    {
+                      type: 'setFullyPaid',
+                      params: ({ context }) => ({ ticket: context.ticket })
+                    },
+                    {
+                      type: 'sendTicketSold',
+                      params: ({ context }) => ({ ticket: context.ticket })
+                    }
                   ]
                 },
                 {
@@ -796,18 +775,21 @@ const createTicketMachine = ({
                         ticket: context.ticket,
                         transaction: event.transaction
                       })
-                    }]
+                    }
+                  ]
                 }
               ],
               'REFUND REQUESTED': {
                 target: 'refundRequested',
-                actions: [{
-                  type: 'requestRefund',
-                  params: ({ context, event }) => ({
-                    ticket: context.ticket,
-                    refund: event.refund
-                  })
-                }]
+                actions: [
+                  {
+                    type: 'requestRefund',
+                    params: ({ context, event }) => ({
+                      ticket: context.ticket,
+                      refund: event.refund
+                    })
+                  }
+                ]
               }
             }
           },
@@ -828,18 +810,21 @@ const createTicketMachine = ({
                     params: ({ context }) => ({
                       ticket: context.ticket
                     })
-                  }]
+                  }
+                ]
               },
               'REFUND REQUESTED': [
                 {
                   target: 'refundRequested',
-                  actions: [{
-                    type: 'requestRefund',
-                    params: ({ context, event }) => ({
-                      ticket: context.ticket,
-                      refund: event.refund
-                    })
-                  }],
+                  actions: [
+                    {
+                      type: 'requestRefund',
+                      params: ({ context, event }) => ({
+                        ticket: context.ticket,
+                        refund: event.refund
+                      })
+                    }
+                  ],
                   guard: 'canBeRefunded'
                 },
                 {
@@ -865,7 +850,8 @@ const createTicketMachine = ({
                         ticket: context.ticket,
                         refund: event.refund
                       })
-                    }]
+                    }
+                  ]
                 }
               ]
             }
@@ -874,13 +860,15 @@ const createTicketMachine = ({
             on: {
               'REFUND INITIATED': {
                 target: 'waiting4Refund',
-                actions: [{
-                  type: 'initiateRefund',
-                  params: ({ context, event }) => ({
-                    ticket: context.ticket,
-                    refund: event.refund
-                  })
-                }]
+                actions: [
+                  {
+                    type: 'initiateRefund',
+                    params: ({ context, event }) => ({
+                      ticket: context.ticket,
+                      refund: event.refund
+                    })
+                  }
+                ]
               }
             }
           },
@@ -909,7 +897,8 @@ const createTicketMachine = ({
                       params: ({ context }) => ({
                         ticket: context.ticket
                       })
-                    }]
+                    }
+                  ]
                 },
                 {
                   actions: [
@@ -919,7 +908,8 @@ const createTicketMachine = ({
                         ticket: context.ticket,
                         transaction: event.transaction
                       })
-                    }]
+                    }
+                  ]
                 }
               ]
             }
@@ -929,32 +919,38 @@ const createTicketMachine = ({
       redeemed: {
         on: {
           'SHOW LEFT': {
-            actions: [{
-              type: 'sendLeftShow',
-              params: ({ context }) => ({
-                ticket: context.ticket
-              })
-            }]
+            actions: [
+              {
+                type: 'sendLeftShow',
+                params: ({ context }) => ({
+                  ticket: context.ticket
+                })
+              }
+            ]
           },
           'SHOW JOINED': {
             guard: 'canWatchShow',
-            actions: [{
-              type: 'sendJoinedShow',
-              params: ({ context }) => ({
-                ticket: context.ticket
-              })
-            }]
+            actions: [
+              {
+                type: 'sendJoinedShow',
+                params: ({ context }) => ({
+                  ticket: context.ticket
+                })
+              }
+            ]
           }
         }
       },
       cancelled: {
         type: 'final',
-        entry: [{
-          type: 'deactivateTicket',
-          params: ({ context }) => ({
-            ticket: context.ticket
-          })
-        }]
+        entry: [
+          {
+            type: 'deactivateTicket',
+            params: ({ context }) => ({
+              ticket: context.ticket
+            })
+          }
+        ]
       },
       finalized: {
         type: 'final',
@@ -964,26 +960,30 @@ const createTicketMachine = ({
             params: ({ context }) => ({
               ticket: context.ticket
             })
-          }]
+          }
+        ]
       },
       ended: {
         initial: 'inEscrow',
         on: {
           'TICKET FINALIZED': {
             target: '#ticketMachine.finalized',
-            actions: [{
-              type: 'finalizeTicket',
-              params: ({ context, event }) => ({
-                ticket: context.ticket,
-                finalize: event.finalize
-              })
-            }, {
-              type: 'sendTicketFinalized',
-              params: ({ context, event }) => ({
-                ticket: context.ticket,
-                finalize: event.finalize
-              })
-            }]
+            actions: [
+              {
+                type: 'finalizeTicket',
+                params: ({ context, event }) => ({
+                  ticket: context.ticket,
+                  finalize: event.finalize
+                })
+              },
+              {
+                type: 'sendTicketFinalized',
+                params: ({ context, event }) => ({
+                  ticket: context.ticket,
+                  finalize: event.finalize
+                })
+              }
+            ]
           }
         },
         states: {
@@ -992,12 +992,14 @@ const createTicketMachine = ({
               {
                 target: 'missedShow',
                 guard: 'showMissed',
-                actions: [{
-                  type: 'missShow',
-                  params: ({ context }) => ({
-                    ticket: context.ticket
-                  })
-                }]
+                actions: [
+                  {
+                    type: 'missShow',
+                    params: ({ context }) => ({
+                      ticket: context.ticket
+                    })
+                  }
+                ]
               }
             ],
             on: {
@@ -1020,20 +1022,23 @@ const createTicketMachine = ({
               },
               'DISPUTE INITIATED': {
                 target: 'inDispute',
-                actions: [{
-                  type: 'initiateDispute',
-                  params: ({ context, event }) => ({
-                    ticket: context.ticket,
-                    dispute: event.dispute,
-                    refund: event.refund
-                  })
-                }, {
-                  type: 'sendDisputeInitiated',
-                  params: ({ context, event }) => ({
-                    ticket: context.ticket,
-                    dispute: event.dispute
-                  })
-                }]
+                actions: [
+                  {
+                    type: 'initiateDispute',
+                    params: ({ context, event }) => ({
+                      ticket: context.ticket,
+                      dispute: event.dispute,
+                      refund: event.refund
+                    })
+                  },
+                  {
+                    type: 'sendDisputeInitiated',
+                    params: ({ context, event }) => ({
+                      ticket: context.ticket,
+                      dispute: event.dispute
+                    })
+                  }
+                ]
               }
             }
           },
@@ -1068,14 +1073,16 @@ const createTicketMachine = ({
                       }
                     },
                     {
-                      actions: [{
-                        type: 'decideDispute',
-                        params: ({ context, event }) => ({
-                          ticket: context.ticket,
-                          decision: event.decision,
-                          refund: event.refund
-                        })
-                      }],
+                      actions: [
+                        {
+                          type: 'decideDispute',
+                          params: ({ context, event }) => ({
+                            ticket: context.ticket,
+                            decision: event.decision,
+                            refund: event.refund
+                          })
+                        }
+                      ],
                       target: 'waiting4DisputeRefund'
                     }
                   ]
@@ -1084,20 +1091,20 @@ const createTicketMachine = ({
               waiting4DisputeRefund: {
                 on: {
                   'REFUND RECEIVED': {
-                    actions: [{
-                      type:
-                        'receiveRefund',
-                      params: ({ context, event }) => ({
-                        ticket: context.ticket,
-                        transaction: event.transaction
+                    actions: [
+                      {
+                        type: 'receiveRefund',
+                        params: ({ context, event }) => ({
+                          ticket: context.ticket,
+                          transaction: event.transaction
+                        })
+                      },
+                      raise({
+                        type: 'TICKET FINALIZED',
+                        finalize: finalizeSchema.parse({
+                          finalizedBy: ActorType.ARBITRATOR
+                        })
                       })
-                    },
-                    raise({
-                      type: 'TICKET FINALIZED',
-                      finalize: finalizeSchema.parse({
-                        finalizedBy: ActorType.ARBITRATOR
-                      })
-                    })
                     ]
                   }
                 }
@@ -1108,20 +1115,23 @@ const createTicketMachine = ({
             on: {
               'DISPUTE INITIATED': {
                 target: 'inDispute',
-                actions: [{
-                  type: 'initiateDispute',
-                  params: ({ context, event }) => ({
-                    ticket: context.ticket,
-                    dispute: event.dispute,
-                    refund: event.refund
-                  })
-                }, {
-                  type: 'sendDisputeInitiated',
-                  params: ({ context, event }) => ({
-                    ticket: context.ticket,
-                    dispute: event.dispute
-                  }),
-                }]
+                actions: [
+                  {
+                    type: 'initiateDispute',
+                    params: ({ context, event }) => ({
+                      ticket: context.ticket,
+                      dispute: event.dispute,
+                      refund: event.refund
+                    })
+                  },
+                  {
+                    type: 'sendDisputeInitiated',
+                    params: ({ context, event }) => ({
+                      ticket: context.ticket,
+                      dispute: event.dispute
+                    })
+                  }
+                ]
               }
             }
           }
@@ -1131,12 +1141,14 @@ const createTicketMachine = ({
     on: {
       'SHOW ENDED': {
         target: '#ticketMachine.ended',
-        actions: [{
-          type: 'endShow',
-          params: ({ context }) => ({
-            ticket: context.ticket
-          })
-        }]
+        actions: [
+          {
+            type: 'endShow',
+            params: ({ context }) => ({
+              ticket: context.ticket
+            })
+          }
+        ]
       }
     }
   });
