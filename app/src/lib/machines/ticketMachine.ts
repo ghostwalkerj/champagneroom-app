@@ -2,7 +2,7 @@
 
 import type { Queue } from 'bullmq';
 import { nanoid } from 'nanoid';
-import { assign, interpret, raise, setup, type StateFrom } from 'xstate';
+import { assign, createActor, raise, setup, type StateFrom } from 'xstate';
 
 import type {
   DisputeType,
@@ -1165,13 +1165,13 @@ export const createTicketMachineService = ({
     ticket,
     ticketMachineOptions
   });
-  const ticketService = interpret(ticketMachine).start();
+  const ticketService = createActor(ticketMachine).start();
   const saveState = ticketMachineOptions?.saveState || true;
 
-  // if (saveState)
-  //   ticketService.onChange(async ({ context }) => {
-  //     if (context.ticket.save) await context.ticket.save();
-  //   });
+  if (saveState)
+    ticketService.subscribe((state) => {
+      if (state.context.ticket.save) state.context.ticket.save();
+    });
 
   return ticketService;
 };
