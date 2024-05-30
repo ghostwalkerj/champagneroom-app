@@ -563,7 +563,7 @@ const createTicketMachine = ({
       ticketLoaded: {
         always: [
           {
-            target: 'reserved',
+            target: '#ticketMachine.reserved.ticketReserved',
             guard: 'ticketReserved'
           },
           {
@@ -618,41 +618,6 @@ const createTicketMachine = ({
       },
       reserved: {
         initial: 'waiting4Payment',
-        on: {
-          'SHOW CANCELLED': [
-            {
-              target: '#ticketMachine.reserved.refundRequested',
-              actions: [
-                {
-                  type: 'requestRefundCancelledShow',
-                  params: ({ context, event }) => ({
-                    ticket: context.ticket,
-                    cancel: event.cancel
-                  })
-                }
-              ],
-              guard: 'canBeRefunded'
-            },
-            {
-              target: '#ticketMachine.cancelled',
-              actions: [
-                {
-                  type: 'cancelTicket',
-                  params: ({ context }) => ({
-                    ticket: context.ticket
-                  })
-                },
-                {
-                  type: 'sendTicketCancelled',
-                  params: ({ context, event }) => ({
-                    ticket: context.ticket,
-                    cancel: event.cancel
-                  })
-                }
-              ]
-            }
-          ]
-        },
         states: {
           waiting4Payment: {
             on: {
@@ -914,6 +879,41 @@ const createTicketMachine = ({
               ]
             }
           }
+        },
+        on: {
+          'SHOW CANCELLED': [
+            {
+              target: '#ticketMachine.reserved.refundRequested',
+              actions: [
+                {
+                  type: 'requestRefundCancelledShow',
+                  params: ({ context, event }) => ({
+                    ticket: context.ticket,
+                    cancel: event.cancel
+                  })
+                }
+              ],
+              guard: 'canBeRefunded'
+            },
+            {
+              target: '#ticketMachine.cancelled',
+              actions: [
+                {
+                  type: 'cancelTicket',
+                  params: ({ context }) => ({
+                    ticket: context.ticket
+                  })
+                },
+                {
+                  type: 'sendTicketCancelled',
+                  params: ({ context, event }) => ({
+                    ticket: context.ticket,
+                    cancel: event.cancel
+                  })
+                }
+              ]
+            }
+          ]
         }
       },
       redeemed: {
