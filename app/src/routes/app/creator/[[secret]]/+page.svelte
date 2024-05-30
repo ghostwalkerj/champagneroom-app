@@ -16,7 +16,7 @@
   import type { UserDocument } from '$lib/models/user';
   import type { WalletDocument } from '$lib/models/wallet';
 
-  import type { ShowMachineServiceType } from '$lib/machines/showMachine';
+  import type { ShowMachineServiceType, ShowMachineStateType } from '$lib/machines/showMachine';
   import { createShowMachineService } from '$lib/machines/showMachine';
 
   import {
@@ -120,12 +120,8 @@
     }
   };
 
-  const useShowMachine = (showMachineService: ShowMachineServiceType) => {
-    showMachineServiceUnSub?.unsubscribe();
-    let prevState = showMachineService.getSnapshot();
-    showMachineServiceUnSub = showMachineService.subscribe((state) => {
-      if (state && state !== prevState) {
-        prevState = state;
+  const testState = (state : ShowMachineStateType) => {
+      if (state) {
         showStopped = state.matches('stopped');
         showCancelled = state.matches('cancelled');
         if (showCancelled) {
@@ -147,6 +143,14 @@
           showMachineService.stop();
         }
       }
+  }
+
+  const useShowMachine = (showMachineService: ShowMachineServiceType) => {
+    showMachineServiceUnSub?.unsubscribe();
+    const state = showMachineService.getSnapshot();
+    testState(state);
+    showMachineServiceUnSub = showMachineService.subscribe((state) => {
+      testState(state);
     });
   };
 
