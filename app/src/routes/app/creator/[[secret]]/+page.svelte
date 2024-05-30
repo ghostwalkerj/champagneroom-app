@@ -149,9 +149,7 @@
     showMachineServiceUnSub?.unsubscribe();
     const state = showMachineService.getSnapshot();
     testState(state);
-    showMachineServiceUnSub = showMachineService.subscribe((state) => {
-      testState(state);
-    });
+
   };
 
   onMount(() => {
