@@ -16,7 +16,7 @@ import { Creator } from '$lib/models/creator';
 import type { OperatorDocument } from '$lib/models/operator';
 import { Operator } from '$lib/models/operator';
 import { Room } from '$lib/models/room';
-import { Show } from '$lib/models/show';
+import { Show, type ShowDocument } from '$lib/models/show';
 import type { TicketDocument } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
 import type { UserDocument } from '$lib/models/user';
@@ -104,10 +104,10 @@ const setLocals = async (decode: JwtPayload, locals: App.Locals) => {
           locals.creator = creator;
 
           // Current Shows can be watched
-          const show = await Show.findOne({
+          const show = (await Show.findOne({
             creator: creator._id,
             'showState.current': true
-          }).exec();
+          }).exec()) as ShowDocument;
           if (show) locals.show = show;
 
           // Room can be passed
@@ -140,11 +140,11 @@ const setLocals = async (decode: JwtPayload, locals: App.Locals) => {
           }
           locals.ticket = ticket;
 
-          const show = await Show.findById(ticket.show)
+          const show = (await Show.findById(ticket.show)
             .orFail(() => {
               throw error(500, 'Show not found');
             })
-            .exec();
+            .exec()) as ShowDocument;
           locals.show = show;
           break;
         }

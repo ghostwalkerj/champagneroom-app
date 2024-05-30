@@ -95,16 +95,6 @@ export type TicketDocumentType = z.infer<typeof ticketSchema>;
 
 export type TicketStateType = z.infer<typeof ticketStateSchema>;
 
-export const SaveState = (
-  ticket: TicketDocument,
-  newState: TicketStateType
-) => {
-  Ticket.updateOne(
-    { _id: ticket._id },
-    { $set: { showState: newState } }
-  ).exec();
-};
-
 export const Ticket = models?.Ticket
   ? (models.Ticket as Model<TicketDocumentType>)
   : mongoose.model<TicketDocumentType>('Ticket', ticketMongooseSchema);

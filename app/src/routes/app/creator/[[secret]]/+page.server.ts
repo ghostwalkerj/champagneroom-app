@@ -21,7 +21,10 @@ import { ShowEvent, type ShowEventDocument } from '$lib/models/showEvent';
 import { User, type UserDocument } from '$lib/models/user';
 import type { WalletDocument } from '$lib/models/wallet';
 
-import type { ShowMachineEventType } from '$lib/machines/showMachine';
+import {
+  createShowMachineService,
+  type ShowMachineEventType
+} from '$lib/machines/showMachine';
 
 import type { PayoutQueueType } from '$lib/workers/payoutWorker';
 import type { ShowQueueType } from '$lib/workers/showWorker';
@@ -31,7 +34,6 @@ import {
   CancelReason,
   CurrencyType,
   EntityType,
-  ShowMachineEventString,
   ShowStatus
 } from '$lib/constants';
 import { rateCryptosRateGet } from '$lib/ext/bitcart';
@@ -41,7 +43,6 @@ import {
   PayoutReason,
   requestPayoutSchema
 } from '$lib/payout';
-import { getShowMachineService } from '$lib/server/machinesUtil';
 import { ipfsUpload } from '$lib/server/upload';
 
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
@@ -82,7 +83,6 @@ export const actions: Actions = {
     )) as SuperValidated<z.infer<typeof showCRUDSchema>>;
 
     if (!form.valid) {
-      console.log(form.data);
       return fail(400, { form });
     }
     const creator = locals.creator as CreatorDocument;
@@ -124,7 +124,7 @@ export const actions: Actions = {
       connection: redisConnection
     }) as ShowQueueType;
 
-    const showService = getShowMachineService(show);
+    const showService = createShowMachineService({ show });
     const showMachineState = showService.getSnapshot();
 
     const cancel = {
@@ -139,7 +139,7 @@ export const actions: Actions = {
     } as ShowMachineEventType;
 
     if (showMachineState.can(cancelEvent)) {
-      showQueue.add(ShowMachineEventString.CANCELLATION_INITIATED, {
+      showQueue.add('CANCELLATION INITIATED', {
         showId: show._id.toString(),
         cancel
       });
@@ -167,11 +167,15 @@ export const actions: Actions = {
       connection: redisConnection
     }) as ShowQueueType;
 
-    const showService = getShowMachineService(show);
+    const showService = createShowMachineService({ show });
     const showState = showService.getSnapshot();
 
-    if (showState.can({ type: ShowMachineEventString.SHOW_ENDED })) {
-      showQueue.add(ShowMachineEventString.SHOW_ENDED, {
+    if (
+      showState.can({
+        type: 'SHOW ENDED'
+      })
+    ) {
+      showQueue.add('SHOW ENDED', {
         showId: show._id.toString()
       });
       isInEscrow = true;
@@ -224,12 +228,12 @@ export const actions: Actions = {
       connection: redisConnection
     }) as ShowQueueType;
 
-    const showService = getShowMachineService(show);
+    const showService = createShowMachineService({ show });
 
     const showState = showService.getSnapshot();
 
-    if (showState.can({ type: ShowMachineEventString.SHOW_STOPPED })) {
-      showQueue.add(ShowMachineEventString.SHOW_STOPPED, {
+    if (showState.can({ type: 'SHOW STOPPED' })) {
+      showQueue.add('SHOW STOPPED', {
         showId: show._id.toString()
       });
     }
@@ -248,11 +252,11 @@ export const actions: Actions = {
       connection
     }) as ShowQueueType;
 
-    const showService = getShowMachineService(show);
+    const showService = createShowMachineService({ show });
     const showState = showService.getSnapshot();
 
     if (!showState.matches('started'))
-      showQueue.add(ShowMachineEventString.SHOW_STARTED, {
+      showQueue.add('SHOW STARTED', {
         showId: show._id.toString()
       });
 

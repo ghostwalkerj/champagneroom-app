@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-
 import to from 'await-to-js';
+import dot from 'dot-object';
+import * as _ from 'lodash';
 import { derived, writable } from 'svelte/store';
 import urlJoin from 'url-join';
 
@@ -37,13 +38,10 @@ const abstractUpdateStore = <T extends { _id?: any }>({
     if (!doc._id) {
       throw new Error('Doc must have an _id');
     }
-    let baseDocument = doc;
-    const callback = (document: Partial<T>) => {
-      baseDocument = {
-        ...baseDocument,
-        ...document
-      };
-      set(baseDocument);
+    const callback = (updateDocument: Partial<T>) => {
+      dot.object(updateDocument);
+      const updatedDocument = _.merge(doc, updateDocument);
+      set(updatedDocument);
     };
 
     const abortDocument = getUpdateNotification({
@@ -53,7 +51,13 @@ const abstractUpdateStore = <T extends { _id?: any }>({
     });
 
     return () => {
-      abortDocument?.abort();
+      try {
+        abortDocument.abort('Unsubscribe');
+      } catch (error) {
+        if (error != 'Unsubscribe') {
+          console.error(error);
+        }
+      }
     };
   });
   return {
@@ -97,7 +101,6 @@ const getUpdateNotification = <T>({
       );
       if (error) {
         shouldLoop = false;
-        console.error(error);
       } else {
         try {
           const jsonResponse = await response.json();
@@ -134,14 +137,12 @@ const getInsertNotification = <T>({
     let shouldLoop = true;
     while (shouldLoop) {
       const signal = abortDocument.signal;
-
       const [error, response] = await to(
         fetch(path, {
           signal
         })
       );
       if (error) {
-        console.error(error);
         shouldLoop = false;
       } else {
         try {
@@ -181,7 +182,13 @@ export const ShowEventStore = (show: ShowDocument) => {
       });
 
       return () => {
-        abortShowEvent.abort();
+        try {
+          abortShowEvent.abort('Unsubscribe');
+        } catch (error) {
+          if (error != 'Unsubscribe') {
+            console.error(error);
+          }
+        }
       };
     }
   );

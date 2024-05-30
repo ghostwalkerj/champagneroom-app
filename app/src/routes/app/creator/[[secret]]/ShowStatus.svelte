@@ -16,11 +16,12 @@
   export let show: ShowDocument | undefined;
   export let showEvent: ShowEventDocument | undefined;
   let showEventUnSub: Unsubscriber | undefined;
-  $: statusText = show ? show.showState.status : 'No Current Show';
+  $: statusText = 'No Current Show';
   $: eventText = 'No Events';
 
   onMount(() => {
     eventText = createEventText(showEvent);
+    statusText = show === undefined ? 'No Current Show' : show.showState.status;
 
     if (show) {
       if (showEvent && showEvent.show !== show._id) {

@@ -19,7 +19,6 @@ import config from '$lib/config';
 import {
   CurrencyType,
   EntityType,
-  TicketMachineEventString,
   WalletMachineEventString
 } from '$lib/constants';
 import { authEncrypt } from '$lib/crypt';
@@ -35,10 +34,10 @@ import {
   submitRefundInvoicesRefundsRefundIdSubmitPost
 } from '$lib/ext/bitcart';
 import type {
+  Wallet as BTWallet,
   DisplayInvoice,
   DisplayPayout,
-  Store,
-  Wallet as BTWallet
+  Store
 } from '$lib/ext/bitcart/models';
 import type { PaymentType } from '$lib/payout';
 import { PayoutJobType, PayoutReason, PayoutStatus } from '$lib/payout';
@@ -107,7 +106,7 @@ export const getPayoutWorker = ({
             const invoice = response.data as DisplayInvoice;
 
             // Possible there is unconfirmed payments.  If so, queue it up again and wait for timeout.
-            if (ticketState.matches('reserved.initiatedPayment')) {
+            if (ticketState.matches({ reserved: 'initiatedPayment' })) {
               payoutQueue.add(
                 PayoutJobType.REFUND_SHOW,
                 {
@@ -118,7 +117,7 @@ export const getPayoutWorker = ({
               return 'Unconfirmed payment';
             }
 
-            if (!ticketState.matches('reserved.refundRequested')) {
+            if (!ticketState.matches({ reserved: 'refundRequested' })) {
               return 'Not in refund requested state';
             }
 
@@ -136,7 +135,7 @@ export const getPayoutWorker = ({
               ticketRefund.approvedAmount = +invoice.sent_amount;
 
               ticketService.send({
-                type: TicketMachineEventString.REFUND_INITIATED,
+                type: 'REFUND INITIATED',
                 refund: ticketRefund
               });
 
@@ -267,7 +266,7 @@ export const getPayoutWorker = ({
               )) as AxiosResponse<DisplayInvoice>;
               const invoice = response.data as DisplayInvoice;
 
-              if (!ticketState.matches('ended.inDispute')) {
+              if (!ticketState.matches({ ended: 'inDispute' })) {
                 return 'Ticket not in Dispute state';
               }
               const payment = invoice.payments?.[0] as PaymentType;
