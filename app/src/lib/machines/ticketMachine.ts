@@ -124,21 +124,21 @@ const createTicketMachine = ({
     },
     actions: {
       sendJoinedShow: (_, params: { ticket: TicketDocument }) => {
-        ticketMachineOptions?.showQueue?.add(ShowJobDataType.CUSTOMER_JOINED, {
+        ticketMachineOptions?.showQueue?.add('CUSTOMER JOINED', {
           showId: params.ticket.show.toString(),
           ticketId: params.ticket._id.toString()
         });
       },
 
       sendLeftShow: (_, params: { ticket: TicketDocument }) => {
-        ticketMachineOptions?.showQueue?.add(ShowJobDataType.CUSTOMER_LEFT, {
+        ticketMachineOptions?.showQueue?.add('CUSTOMER LEFT', {
           showId: params.ticket.show.toString(),
           ticketId: params.ticket._id.toString()
         });
       },
 
       sendTicketSold: (_, params: { ticket: TicketDocument }) => {
-        ticketMachineOptions?.showQueue?.add(ShowJobDataType.TICKET_SOLD, {
+        ticketMachineOptions?.showQueue?.add('TICKET SOLD', {
           showId: params.ticket.show.toString(),
           ticketId: params.ticket._id.toString(),
           sale: params.ticket.ticketState.sale
@@ -146,14 +146,14 @@ const createTicketMachine = ({
       },
 
       sendTicketRedeemed: (_, params: { ticket: TicketDocument }) => {
-        ticketMachineOptions?.showQueue?.add(ShowJobDataType.TICKET_REDEEMED, {
+        ticketMachineOptions?.showQueue?.add('TICKET REDEEMED', {
           showId: params.ticket.show.toString(),
           ticketId: params.ticket._id.toString()
         });
       },
 
       sendTicketRefunded: (_, params: { ticket: TicketDocument }) => {
-        ticketMachineOptions?.showQueue?.add(ShowJobDataType.TICKET_REFUNDED, {
+        ticketMachineOptions?.showQueue?.add('TICKET REFUNDED', {
           showId: params.ticket.show.toString(),
           ticketId: params.ticket._id.toString(),
           refund: params.ticket.ticketState.refund
@@ -164,7 +164,7 @@ const createTicketMachine = ({
         _,
         params: { cancel: CancelType; ticket: TicketDocument }
       ) => {
-        ticketMachineOptions?.showQueue?.add(ShowJobDataType.TICKET_CANCELLED, {
+        ticketMachineOptions?.showQueue?.add('TICKET CANCELLED', {
           showId: ticket.show.toString(),
           ticketId: ticket._id.toString(),
           customerName: ticket.user.name,
@@ -173,14 +173,14 @@ const createTicketMachine = ({
       },
 
       sendTicketFinalized: (_, params: { ticket: TicketDocument }) => {
-        ticketMachineOptions?.showQueue?.add(ShowJobDataType.TICKET_FINALIZED, {
+        ticketMachineOptions?.showQueue?.add('TICKET FINALIZED', {
           showId: params.ticket.show.toString(),
           ticketId: params.ticket._id.toString()
         });
       },
 
       sendDisputeInitiated: (_, params: { ticket: TicketDocument }) => {
-        ticketMachineOptions?.showQueue?.add(ShowJobDataType.TICKET_DISPUTED, {
+        ticketMachineOptions?.showQueue?.add('TICKET DISPUTED', {
           showId: params.ticket.show.toString(),
           ticketId: params.ticket._id.toString(),
           dispute: params.ticket.ticketState.dispute

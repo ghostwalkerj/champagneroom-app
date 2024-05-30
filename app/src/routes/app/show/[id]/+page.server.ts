@@ -17,13 +17,7 @@ import { User } from '$lib/models/user';
 import type { ShowQueueType } from '$lib/workers/showWorker';
 
 import config from '$lib/config';
-import {
-  AuthType,
-  CurrencyType,
-  EntityType,
-  ShowJobDataType,
-  UserRole
-} from '$lib/constants';
+import { AuthType, CurrencyType, EntityType, UserRole } from '$lib/constants';
 import { authEncrypt } from '$lib/crypt';
 import type { DisplayInvoice } from '$lib/ext/bitcart/models';
 import { mensNames } from '$lib/mensNames';
@@ -175,7 +169,7 @@ export const actions: Actions = {
     }
     await ticket.save();
 
-    showQueue.add(ShowJobDataType.TICKET_RESERVED, {
+    showQueue.add('TICKET RESERVED', {
       showId: show._id.toString(),
       ticketId: ticket._id.toString(),
       customerName: name
