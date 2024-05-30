@@ -1,7 +1,6 @@
 import type { Job, Queue } from 'bullmq';
 import { Worker } from 'bullmq';
 import type IORedis from 'ioredis';
-import { waitFor } from 'xstate/lib/waitFor';
 
 import type { AgentDocument } from '$lib/models/agent';
 import { Agent } from '$lib/models/agent';
@@ -38,6 +37,7 @@ import {
   getWalletMachineServiceFromId
 } from '$lib/server/machinesUtil';
 
+import { waitFor } from 'xstate';
 import type { PayoutQueueType } from './payoutWorker';
 
 export type ShowJobDataType = {
@@ -68,54 +68,54 @@ export const getShowWorker = ({
       }
 
       switch (job.name) {
-        case ShowMachineEventString.CANCELLATION_INITIATED: {
+        case 'CANCELLATION INITIATED': {
           return cancelShow(show, job.data.cancel, showQueue);
         }
-        case ShowMachineEventString.REFUND_INITIATED: {
+        case 'REFUND INITIATED': {
           return refundShow(show, showQueue, payoutQueue);
         }
-        case ShowMachineEventString.SHOW_STARTED: {
+        case 'SHOW STARTED': {
           return startShow(show);
         }
-        case ShowMachineEventString.SHOW_ENDED: {
+        case 'SHOW ENDED': {
           return endShow(show, showQueue);
         }
-        case ShowMachineEventString.SHOW_STOPPED: {
+        case 'SHOW STOPPED': {
           return stopShow(show, showQueue);
         }
-        case ShowMachineEventString.SHOW_FINALIZED: {
+        case 'SHOW FINALIZED': {
           return finalizeShow(show, job.data.finalize, showQueue);
         }
 
         // From Ticket Machine
-        case ShowMachineEventString.CUSTOMER_JOINED: {
+        case 'CUSTOMER JOINED': {
           return customerJoined(show, job.data.ticketId);
         }
-        case ShowMachineEventString.CUSTOMER_LEFT: {
+        case 'CUSTOMER LEFT': {
           return customerLeft(show, job.data.ticketId);
         }
-        case ShowMachineEventString.TICKET_SOLD: {
+        case 'TICKET SOLD': {
           return ticketSold(show, job.data.ticketId);
         }
-        case ShowMachineEventString.TICKET_REDEEMED: {
+        case 'TICKET REDEEMED': {
           return ticketRedeemed(show, job.data.ticketId);
         }
-        case ShowMachineEventString.TICKET_RESERVED: {
+        case 'TICKET RESERVED': {
           return ticketReserved(show, job.data.ticketId);
         }
-        case ShowMachineEventString.TICKET_REFUNDED: {
+        case 'TICKET REFUNDED': {
           return ticketRefunded(show, job.data.ticketId);
         }
-        case ShowMachineEventString.TICKET_CANCELLED: {
+        case 'TICKET CANCELLED': {
           return ticketCancelled(show, job.data.ticketId);
         }
-        case ShowMachineEventString.TICKET_FINALIZED: {
+        case 'TICKET FINALIZED': {
           return ticketFinalized(show, job.data.ticketId, showQueue);
         }
-        case ShowMachineEventString.TICKET_DISPUTED: {
+        case 'TICKET DISPUTED': {
           return ticketDisputed(show, job.data.ticketId);
         }
-        case ShowMachineEventString.DISPUTE_DECIDED: {
+        case 'DISPUTE DECIDED': {
           return ticketDisputeResolved(
             show,
             job.data.ticketId,
@@ -143,7 +143,7 @@ const cancelShow = async (
     show
   });
   showService.send({
-    type: ShowMachineEventString.CANCELLATION_INITIATED,
+    type: 'CANCELLATION INITIATED',
     cancel
   });
   const tickets = (await Ticket.find({
@@ -155,16 +155,18 @@ const cancelShow = async (
     // send cancel show to all tickets
     const ticketService = getTicketMachineService(ticket, showQueue);
     const cancelEvent = {
-      type: TicketMachineEventString.SHOW_CANCELLED,
+      type: 'SHOW CANCELLED',
       cancel
     } as TicketMachineEventType;
     ticketService.send(cancelEvent);
     ticketService.stop();
   }
   const showState = showService.getSnapshot();
-  if (showState.matches('initiatedCancellation.waiting2Refund')) {
-    showService.send(ShowMachineEventString.REFUND_INITIATED);
-    showQueue.add(ShowMachineEventString.REFUND_INITIATED, {
+  if (showState.matches({ initiatedCancellation: 'waiting2Refund' })) {
+    showService.send({
+      type: 'REFUND INITIATED'
+    });
+    showQueue.add('REFUND INITIATED', {
       showId: show._id.toString()
     });
   }
@@ -182,7 +184,7 @@ const refundShow = async (
   });
   // Check if show needs to send refunds
   const showState = showService.getSnapshot();
-  if (showState.matches('initiatedCancellation.waiting2Refund')) {
+  if (showState.matches({ initiatedCancellation: 'waiting2Refund' })) {
     const tickets = (await Ticket.find({
       show: show._id,
       'ticketState.active': true
@@ -191,7 +193,7 @@ const refundShow = async (
       // send refunds
       const ticketService = getTicketMachineService(ticket, showQueue);
       const ticketState = ticketService.getSnapshot();
-      if (ticketState.matches('reserved.refundRequested')) {
+      if (ticketState.matches({ reserved: 'refundRequested' })) {
         payoutQueue.add(PayoutJobType.REFUND_SHOW, {
           bcInvoiceId: ticket.bcInvoiceId,
           ticketId: ticket._id.toString()
@@ -208,7 +210,7 @@ const startShow = async (show: ShowDocument) => {
   const showService = createShowMachineService({
     show
   });
-  showService.send(ShowMachineEventString.SHOW_STARTED);
+  showService.send({ type: 'SHOW STARTED' });
   return 'success';
 };
 
@@ -216,11 +218,13 @@ const stopShow = async (show: ShowDocument, showQueue: ShowQueueType) => {
   const showService = createShowMachineService({
     show
   });
-  showService.send(ShowMachineEventString.SHOW_STOPPED);
+  showService.send({
+    type: 'SHOW STOPPED'
+  });
 
   // once a show is stopped, end it after grace gracePeriod
   showQueue.add(
-    ShowMachineEventString.SHOW_ENDED,
+    'SHOW ENDED',
     {
       showId: show._id.toString()
     },
@@ -238,12 +242,12 @@ const endShow = async (show: ShowDocument, showQueue: ShowQueueType) => {
 
   const showState = showService.getSnapshot();
   if (showState.matches('stopped')) {
-    showService.send(ShowMachineEventString.SHOW_ENDED);
+    showService.send({ type: 'SHOW ENDED' });
     const finalize = finalizeSchema.parse({
       finalizedBy: ActorType.TIMER
     });
     showQueue.add(
-      ShowMachineEventString.SHOW_FINALIZED,
+      'SHOW FINALIZED',
       {
         showId: show._id.toString(),
         finalize
@@ -261,8 +265,8 @@ const endShow = async (show: ShowDocument, showQueue: ShowQueueType) => {
       // send show is over
       const ticketService = getTicketMachineService(ticket, showQueue);
       const ticketState = ticketService.getSnapshot();
-      if (ticketState.can(TicketMachineEventString.SHOW_ENDED)) {
-        ticketService.send(TicketMachineEventString.SHOW_ENDED);
+      if (ticketState.can({ type: 'SHOW ENDED' })) {
+        ticketService.send({ type: 'SHOW ENDED' });
       }
       ticketService.stop();
     }
@@ -287,14 +291,14 @@ const finalizeShow = async (
 
   if (
     !showState.can({
-      type: ShowMachineEventString.SHOW_FINALIZED,
+      type: 'SHOW FINALIZED',
       finalize
     })
   )
     return 'Show already finalized';
 
   showService.send({
-    type: ShowMachineEventString.SHOW_FINALIZED,
+    type: 'SHOW FINALIZED',
     finalize
   });
 
@@ -308,9 +312,9 @@ const finalizeShow = async (
     const ticketService = getTicketMachineService(ticket, showQueue);
     const ticketState = ticketService.getSnapshot();
 
-    if (ticketState.matches('ended.inEscrow')) {
+    if (ticketState.matches({ ended: 'inEscrow' })) {
       ticketService.send({
-        type: TicketMachineEventString.TICKET_FINALIZED,
+        type: 'TICKET FINALIZED',
         finalize
       });
     }
@@ -560,7 +564,7 @@ const customerJoined = async (show: ShowDocument, ticketId: string) => {
   });
   const ticket = (await Ticket.findById(ticketId).exec()) as TicketDocument;
   showService.send({
-    type: ShowMachineEventString.CUSTOMER_JOINED,
+    type: 'CUSTOMER JOINED',
     ticket
   });
   showService.stop();
@@ -573,7 +577,7 @@ const customerLeft = async (show: ShowDocument, ticketId: string) => {
   });
   const ticket = (await Ticket.findById(ticketId).exec()) as TicketDocument;
   showService.send({
-    type: ShowMachineEventString.CUSTOMER_LEFT,
+    type: 'CUSTOMER LEFT',
     ticket
   });
   showService.stop();
@@ -586,7 +590,7 @@ const ticketSold = async (show: ShowDocument, ticketId: string) => {
   });
   const ticket = (await Ticket.findById(ticketId).exec()) as TicketDocument;
   showService.send({
-    type: ShowMachineEventString.TICKET_SOLD,
+    type: 'TICKET SOLD',
     ticket
   });
   showService.stop();
@@ -599,7 +603,7 @@ const ticketRedeemed = async (show: ShowDocument, ticketId: string) => {
   });
   const ticket = (await Ticket.findById(ticketId).exec()) as TicketDocument;
   showService.send({
-    type: ShowMachineEventString.TICKET_REDEEMED,
+    type: 'TICKET REDEEMED',
     ticket
   });
   showService.stop();
@@ -612,7 +616,7 @@ const ticketReserved = async (show: ShowDocument, ticketId: string) => {
   });
   const ticket = (await Ticket.findById(ticketId).exec()) as TicketDocument;
   showService.send({
-    type: ShowMachineEventString.TICKET_RESERVED,
+    type: 'TICKET RESERVED',
     ticket
   });
   showService.stop();
@@ -625,7 +629,7 @@ const ticketRefunded = async (show: ShowDocument, ticketId: string) => {
   });
   const ticket = (await Ticket.findById(ticketId).exec()) as TicketDocument;
   showService.send({
-    type: ShowMachineEventString.TICKET_REFUNDED,
+    type: 'TICKET REFUNDED',
     ticket
   });
   return 'success';
@@ -639,13 +643,13 @@ const ticketCancelled = async (show: ShowDocument, ticketId: string) => {
   const showState = showService.getSnapshot();
   if (
     !showState.can({
-      type: ShowMachineEventString.TICKET_CANCELLED,
+      type: 'TICKET CANCELLED',
       ticket
     })
   )
     return 'Ticket already cancelled';
   showService.send({
-    type: ShowMachineEventString.TICKET_CANCELLED,
+    type: 'TICKET CANCELLED',
     ticket
   });
   showService.stop();
@@ -666,12 +670,12 @@ const ticketFinalized = async (
 
   if (
     showState.can({
-      type: ShowMachineEventString.TICKET_FINALIZED,
+      type: 'TICKET FINALIZED',
       ticket
     })
   ) {
     showService.send({
-      type: ShowMachineEventString.TICKET_FINALIZED,
+      type: 'TICKET FINALIZED',
       ticket
     });
   }
@@ -758,11 +762,11 @@ const ticketFinalized = async (
   showState = showService.getSnapshot();
   if (
     showState.can({
-      type: ShowMachineEventString.SHOW_FINALIZED,
+      type: 'SHOW FINALIZED',
       finalize
     })
   ) {
-    showQueue.add(ShowMachineEventString.SHOW_FINALIZED, {
+    showQueue.add('SHOW FINALIZED', {
       showId: show._id.toString(),
       finalize
     });
@@ -777,7 +781,7 @@ const ticketDisputed = async (show: ShowDocument, ticketId: string) => {
   });
   const ticket = (await Ticket.findById(ticketId).exec()) as TicketDocument;
   showService.send({
-    type: ShowMachineEventString.TICKET_DISPUTED,
+    type: 'TICKET DISPUTED',
     ticket
   });
   showService.stop();
@@ -796,14 +800,14 @@ const ticketDisputeResolved = async (
   });
   const ticket = (await Ticket.findById(ticketId).exec()) as TicketDocument;
   showService.send({
-    type: ShowMachineEventString.DISPUTE_DECIDED,
+    type: 'DISPUTE DECIDED',
     decision,
     ticket
   });
   const ticketService = getTicketMachineService(ticket, showQueue);
   if (decision === DisputeDecision.NO_REFUND) {
     ticketService.send({
-      type: TicketMachineEventString.DISPUTE_DECIDED,
+      type: 'DISPUTE DECIDED',
       decision
     });
   }
@@ -824,12 +828,13 @@ const ticketDisputeResolved = async (
       refund.approvedAmount = refund.requestedAmount / 2;
     }
     ticketService.send({
-      type: TicketMachineEventString.DISPUTE_DECIDED,
+      type: 'DISPUTE DECIDED',
       decision,
       refund
     });
+
     await waitFor(ticketService, (state) =>
-      state.matches('ended.inDispute.waiting4DisputeRefund')
+      state.matches({ ended: { inDispute: 'waiting4DisputeRefund' } })
     );
     payoutQueue.add(PayoutJobType.DISPUTE_PAYOUT, {
       ticketId: ticket._id.toString()
