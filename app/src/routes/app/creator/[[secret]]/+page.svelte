@@ -22,7 +22,6 @@
   import {
     ActorType,
     CancelReason,
-    ShowMachineEventString
   } from '$lib/constants';
   import type { requestPayoutSchema } from '$lib/payout';
 
@@ -123,8 +122,10 @@
 
   const useShowMachine = (showMachineService: ShowMachineServiceType) => {
     showMachineServiceUnSub?.unsubscribe();
+    let prevState = showMachineService.getSnapshot();
     showMachineServiceUnSub = showMachineService.subscribe((state) => {
-      if (state.changed) {
+      if (state && state !== prevState) {
+        prevState = state;
         showStopped = state.matches('stopped');
         showCancelled = state.matches('cancelled');
         if (showCancelled) {
@@ -138,8 +139,11 @@
             reason: CancelReason.CREATOR_CANCELLED
           }
         });
-        canStartShow = state.can(ShowMachineEventString.SHOW_STARTED);
-        if (state.done) {
+        canStartShow = state.can({
+          type: 'SHOW STARTED'
+        });
+
+        if (state.status === 'done') {
           showMachineService.stop();
         }
       }

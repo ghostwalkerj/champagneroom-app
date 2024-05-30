@@ -31,7 +31,6 @@ import {
   ActorType,
   DisputeDecision,
   RefundReason,
-  ShowMachineEventString,
   TicketStatus
 } from '$lib/constants';
 import { calcTotal } from '$lib/payout.js';
@@ -125,91 +124,67 @@ const createTicketMachine = ({
     },
     actions: {
       sendJoinedShow: (_, params: { ticket: TicketDocument }) => {
-        ticketMachineOptions?.showQueue?.add(
-          ShowMachineEventString.CUSTOMER_JOINED,
-          {
-            showId: params.ticket.show.toString(),
-            ticketId: params.ticket._id.toString()
-          }
-        );
+        ticketMachineOptions?.showQueue?.add(ShowJobDataType.CUSTOMER_JOINED, {
+          showId: params.ticket.show.toString(),
+          ticketId: params.ticket._id.toString()
+        });
       },
 
       sendLeftShow: (_, params: { ticket: TicketDocument }) => {
-        ticketMachineOptions?.showQueue?.add(
-          ShowMachineEventString.CUSTOMER_LEFT,
-          {
-            showId: params.ticket.show.toString(),
-            ticketId: params.ticket._id.toString()
-          }
-        );
+        ticketMachineOptions?.showQueue?.add(ShowJobDataType.CUSTOMER_LEFT, {
+          showId: params.ticket.show.toString(),
+          ticketId: params.ticket._id.toString()
+        });
       },
 
       sendTicketSold: (_, params: { ticket: TicketDocument }) => {
-        ticketMachineOptions?.showQueue?.add(
-          ShowMachineEventString.TICKET_SOLD,
-          {
-            showId: params.ticket.show.toString(),
-            ticketId: params.ticket._id.toString(),
-            sale: params.ticket.ticketState.sale
-          }
-        );
+        ticketMachineOptions?.showQueue?.add(ShowJobDataType.TICKET_SOLD, {
+          showId: params.ticket.show.toString(),
+          ticketId: params.ticket._id.toString(),
+          sale: params.ticket.ticketState.sale
+        });
       },
 
       sendTicketRedeemed: (_, params: { ticket: TicketDocument }) => {
-        ticketMachineOptions?.showQueue?.add(
-          ShowMachineEventString.TICKET_REDEEMED,
-          {
-            showId: params.ticket.show.toString(),
-            ticketId: params.ticket._id.toString()
-          }
-        );
+        ticketMachineOptions?.showQueue?.add(ShowJobDataType.TICKET_REDEEMED, {
+          showId: params.ticket.show.toString(),
+          ticketId: params.ticket._id.toString()
+        });
       },
 
       sendTicketRefunded: (_, params: { ticket: TicketDocument }) => {
-        ticketMachineOptions?.showQueue?.add(
-          ShowMachineEventString.TICKET_REFUNDED,
-          {
-            showId: params.ticket.show.toString(),
-            ticketId: params.ticket._id.toString(),
-            refund: params.ticket.ticketState.refund
-          }
-        );
+        ticketMachineOptions?.showQueue?.add(ShowJobDataType.TICKET_REFUNDED, {
+          showId: params.ticket.show.toString(),
+          ticketId: params.ticket._id.toString(),
+          refund: params.ticket.ticketState.refund
+        });
       },
 
       sendTicketCancelled: (
         _,
         params: { cancel: CancelType; ticket: TicketDocument }
       ) => {
-        ticketMachineOptions?.showQueue?.add(
-          ShowMachineEventString.TICKET_CANCELLED,
-          {
-            showId: ticket.show.toString(),
-            ticketId: ticket._id.toString(),
-            customerName: ticket.user.name,
-            cancel: params.cancel
-          }
-        );
+        ticketMachineOptions?.showQueue?.add(ShowJobDataType.TICKET_CANCELLED, {
+          showId: ticket.show.toString(),
+          ticketId: ticket._id.toString(),
+          customerName: ticket.user.name,
+          cancel: params.cancel
+        });
       },
 
       sendTicketFinalized: (_, params: { ticket: TicketDocument }) => {
-        ticketMachineOptions?.showQueue?.add(
-          ShowMachineEventString.TICKET_FINALIZED,
-          {
-            showId: params.ticket.show.toString(),
-            ticketId: params.ticket._id.toString()
-          }
-        );
+        ticketMachineOptions?.showQueue?.add(ShowJobDataType.TICKET_FINALIZED, {
+          showId: params.ticket.show.toString(),
+          ticketId: params.ticket._id.toString()
+        });
       },
 
       sendDisputeInitiated: (_, params: { ticket: TicketDocument }) => {
-        ticketMachineOptions?.showQueue?.add(
-          ShowMachineEventString.TICKET_DISPUTED,
-          {
-            showId: params.ticket.show.toString(),
-            ticketId: params.ticket._id.toString(),
-            dispute: params.ticket.ticketState.dispute
-          }
-        );
+        ticketMachineOptions?.showQueue?.add(ShowJobDataType.TICKET_DISPUTED, {
+          showId: params.ticket.show.toString(),
+          ticketId: params.ticket._id.toString(),
+          dispute: params.ticket.ticketState.dispute
+        });
       },
 
       requestRefundCancelledShow: (

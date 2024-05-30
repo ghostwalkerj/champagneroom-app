@@ -86,6 +86,8 @@ export type ShowMachineEventType =
       decision: DisputeDecision;
     };
 
+export type ShowMachineEventString = ShowMachineEventType['type'];
+
 export type ShowMachineOptions = {
   saveState?: boolean;
   saveShowEvents?: boolean;

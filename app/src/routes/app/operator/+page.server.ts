@@ -22,7 +22,7 @@ import type { DisputeDecision } from '$lib/constants';
 import {
   AuthType,
   EntityType,
-  ShowMachineEventString,
+  ShowJobDataType,
   TicketStatus
 } from '$lib/constants';
 import {
@@ -297,7 +297,7 @@ export const actions: Actions = {
       connection: redisConnection
     }) as ShowQueueType;
 
-    showQueue.add(ShowMachineEventString.DISPUTE_DECIDED, {
+    showQueue.add(ShowJobDataType.DISPUTE_DECIDED, {
       showId,
       ticketId,
       decision

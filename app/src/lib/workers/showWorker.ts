@@ -17,7 +17,10 @@ import { Show } from '$lib/models/show';
 import type { TicketDocument } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
 
-import { createShowMachineService } from '$lib/machines/showMachine';
+import {
+  createShowMachineService,
+  type ShowMachineEventString
+} from '$lib/machines/showMachine';
 import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
 
 import config from '$lib/config';
@@ -25,9 +28,7 @@ import {
   ActorType,
   DisputeDecision,
   EntityType,
-  ShowMachineEventString,
   ShowStatus,
-  TicketMachineEventString,
   TicketStatus,
   WalletMachineEventString
 } from '$lib/constants';

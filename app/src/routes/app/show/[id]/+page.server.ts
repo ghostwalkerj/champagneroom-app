@@ -21,8 +21,7 @@ import {
   AuthType,
   CurrencyType,
   EntityType,
-  ShowMachineEventString,
-  TicketMachineEventString,
+  ShowJobDataType,
   UserRole
 } from '$lib/constants';
 import { authEncrypt } from '$lib/crypt';
@@ -104,7 +103,7 @@ export const actions: Actions = {
 
     if (
       !showState.can({
-        type: ShowMachineEventString.TICKET_RESERVED,
+        type: 'TICKET RESERVED',
         ticket
       })
     ) {
@@ -176,7 +175,7 @@ export const actions: Actions = {
     }
     await ticket.save();
 
-    showQueue.add(ShowMachineEventString.TICKET_RESERVED, {
+    showQueue.add(ShowJobDataType.TICKET_RESERVED, {
       showId: show._id.toString(),
       ticketId: ticket._id.toString(),
       customerName: name
@@ -186,7 +185,7 @@ export const actions: Actions = {
     if (ticket.price.amount === 0 && ticket.bcInvoiceId) {
       const ticketService = getTicketMachineService(ticket, redisConnection);
       ticketService.send({
-        type: TicketMachineEventString.PAYMENT_INITIATED,
+        type: 'PAYMENT INITIATED',
         paymentCurrency: CurrencyType.NONE
       });
 

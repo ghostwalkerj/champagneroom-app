@@ -25,8 +25,7 @@ import {
   ActorType,
   CancelReason,
   EntityType,
-  RefundReason,
-  TicketMachineEventString
+  RefundReason
 } from '$lib/constants';
 import { createBitcartToken, InvoiceJobType, PayoutJobType } from '$lib/payout';
 import { getTicketMachineService } from '$lib/server/machinesUtil';
@@ -52,7 +51,7 @@ export const actions: Actions = {
     const bcInvoiceId = state.context.ticket.bcInvoiceId;
 
     // Cancel the invoice attached to the ticket if no payment has been made
-    if (state.matches('reserved.waiting4Payment')) {
+    if (state.matches({ reserved: 'waiting4Payment' })) {
       const cancel = cancelSchema.parse({
         cancelledBy: ActorType.CUSTOMER,
         cancelledInState: JSON.stringify(state.value),
@@ -76,7 +75,7 @@ export const actions: Actions = {
     }
 
     // If a payment as been made or in progress, then issue a refund
-    else if (state.matches('reserved.waiting4Show')) {
+    else if (state.matches({ reserved: 'waiting4Show' })) {
       // Check what payments were made from sales
       const sales = ticket.ticketState.sale;
       if (!sales) {
@@ -94,7 +93,7 @@ export const actions: Actions = {
       // ie, show currency is USD, but payment was made in ETH
       ticketService // Send refund event
         .send({
-          type: TicketMachineEventString.REFUND_REQUESTED,
+          type: 'REFUND REQUESTED',
           refund
         });
 
@@ -121,35 +120,26 @@ export const actions: Actions = {
     if (!ticket) {
       throw error(404, 'Ticket not found');
     }
-
     const data = await request.formData();
     const rating = data.get('rating') as string;
     const review = data.get('review') as string;
-
     if (!rating || rating === '0') {
       return fail(400, { rating, missingRating: true });
     }
-
     const redisConnection = locals.redisConnection as IORedis;
-
     const ticketService = getTicketMachineService(ticket, redisConnection);
-
     const state = ticketService.getSnapshot();
     const feedback = ticketFeedbackSchema.parse({
       rating: +rating,
       review
     });
-    if (
-      state.can({ type: TicketMachineEventString.FEEDBACK_RECEIVED, feedback })
-    ) {
+    if (state.can({ type: 'FEEDBACK RECEIVED', feedback })) {
       ticketService.send({
-        type: TicketMachineEventString.FEEDBACK_RECEIVED,
+        type: 'FEEDBACK RECEIVED',
         feedback
       });
     }
-
     ticketService?.stop();
-
     return { success: true, rating, review, feedbackReceived: true };
   },
 
@@ -188,13 +178,13 @@ export const actions: Actions = {
 
     if (
       state.can({
-        type: TicketMachineEventString.DISPUTE_INITIATED,
+        type: 'DISPUTE INITIATED',
         dispute,
         refund
       })
     ) {
       ticketService.send({
-        type: TicketMachineEventString.DISPUTE_INITIATED,
+        type: 'DISPUTE INITIATED',
         dispute,
         refund
       });
@@ -259,7 +249,7 @@ export const actions: Actions = {
     const ticketService = getTicketMachineService(ticket, redisConnection);
 
     ticketService.send({
-      type: TicketMachineEventString.PAYMENT_INITIATED,
+      type: 'PAYMENT INITIATED',
       paymentCurrency: paymentCurrency.toUpperCase() as CurrencyType
     });
 
@@ -273,24 +263,27 @@ export const actions: Actions = {
     if (!ticket) {
       throw error(404, 'Ticket not found');
     }
-
     const redisConnection = locals.redisConnection as IORedis;
-
     const ticketService = getTicketMachineService(ticket, redisConnection);
-
     const state = ticketService.getSnapshot();
-
-    if (state.can(TicketMachineEventString.TICKET_REDEEMED)) {
-      ticketService.send(TicketMachineEventString.TICKET_REDEEMED);
-      ticketService.send(TicketMachineEventString.SHOW_JOINED);
-    } else if (state.can(TicketMachineEventString.SHOW_JOINED)) {
-      ticketService.send(TicketMachineEventString.SHOW_JOINED);
+    if (state.can({ type: 'TICKET REDEEMED' })) {
+      ticketService.send({ type: 'TICKET REDEEMED' });
+      ticketService.send({
+        type: 'SHOW JOINED'
+      });
+    } else if (
+      state.can({
+        type: 'SHOW JOINED'
+      })
+    ) {
+      ticketService.send({
+        type: 'SHOW JOINED'
+      });
     }
-
     ticketService?.stop();
-
     return { success: true };
   },
+
   leave_show: async ({ locals }) => {
     const ticket = locals.ticket;
 
@@ -299,7 +292,9 @@ export const actions: Actions = {
     }
     const redisConnection = locals.redisConnection as IORedis;
     const ticketService = getTicketMachineService(ticket, redisConnection);
-    ticketService.send(TicketMachineEventString.SHOW_LEFT);
+    ticketService.send({
+      type: 'SHOW LEFT'
+    });
     ticketService?.stop();
     return { success: true };
   }

@@ -34,7 +34,7 @@ import {
   CancelReason,
   CurrencyType,
   EntityType,
-  ShowMachineEventString,
+  ShowJobDataType,
   ShowStatus
 } from '$lib/constants';
 import { rateCryptosRateGet } from '$lib/ext/bitcart';
@@ -140,7 +140,7 @@ export const actions: Actions = {
     } as ShowMachineEventType;
 
     if (showMachineState.can(cancelEvent)) {
-      showQueue.add(ShowMachineEventString.CANCELLATION_INITIATED, {
+      showQueue.add(ShowJobDataType.CANCELLATION_INITIATED, {
         showId: show._id.toString(),
         cancel
       });
@@ -171,8 +171,8 @@ export const actions: Actions = {
     const showService = createShowMachineService({ show });
     const showState = showService.getSnapshot();
 
-    if (showState.can({ type: ShowMachineEventString.SHOW_ENDED })) {
-      showQueue.add(ShowMachineEventString.SHOW_ENDED, {
+    if (showState.can({ type: ShowJobDataType.SHOW_ENDED })) {
+      showQueue.add(ShowJobDataType.SHOW_ENDED, {
         showId: show._id.toString()
       });
       isInEscrow = true;
@@ -229,8 +229,8 @@ export const actions: Actions = {
 
     const showState = showService.getSnapshot();
 
-    if (showState.can({ type: ShowMachineEventString.SHOW_STOPPED })) {
-      showQueue.add(ShowMachineEventString.SHOW_STOPPED, {
+    if (showState.can({ type: ShowJobDataType.SHOW_STOPPED })) {
+      showQueue.add(ShowJobDataType.SHOW_STOPPED, {
         showId: show._id.toString()
       });
     }
@@ -253,7 +253,7 @@ export const actions: Actions = {
     const showState = showService.getSnapshot();
 
     if (!showState.matches('started'))
-      showQueue.add(ShowMachineEventString.SHOW_STARTED, {
+      showQueue.add(ShowJobDataType.SHOW_STARTED, {
         showId: show._id.toString()
       });
 
