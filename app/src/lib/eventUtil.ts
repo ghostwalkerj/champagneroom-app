@@ -1,8 +1,7 @@
 import * as timeago from 'timeago.js';
 
 import type { ShowEventDocumentType } from '$lib/models/showEvent';
-
-import { ShowMachineEventString } from '$lib/constants';
+import type { ShowMachineEventString } from './machines/showMachine';
 
 export const createEventText = (
   showEvent: ShowEventDocumentType | undefined
@@ -13,38 +12,38 @@ export const createEventText = (
   }
   let eventText = timeago.format(showEvent.createdAt) + ' ' + name;
 
-  switch (showEvent.type) {
-    case ShowMachineEventString.TICKET_SOLD: {
+  switch (showEvent.type as ShowMachineEventString) {
+    case 'TICKET SOLD': {
       eventText += ' paid in full!';
       break;
     }
 
-    case ShowMachineEventString.TICKET_RESERVED: {
+    case 'TICKET RESERVED': {
       eventText += ' reserved a ticket!';
       break;
     }
 
-    case ShowMachineEventString.TICKET_CANCELLED: {
+    case 'TICKET CANCELLED': {
       eventText += ' cancelled the ticket';
       break;
     }
 
-    case ShowMachineEventString.TICKET_REFUNDED: {
+    case 'TICKET REFUNDED': {
       eventText += ' refunded';
       break;
     }
 
-    case ShowMachineEventString.TICKET_DISPUTED: {
+    case 'TICKET DISPUTED': {
       eventText += ' disputed the ticket';
       break;
     }
 
-    case ShowMachineEventString.CUSTOMER_JOINED: {
+    case 'CUSTOMER JOINED': {
       eventText += ' joined the show';
       break;
     }
 
-    case ShowMachineEventString.CUSTOMER_LEFT: {
+    case 'CUSTOMER LEFT': {
       eventText += ' left the show';
       break;
     }

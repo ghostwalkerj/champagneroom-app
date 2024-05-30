@@ -17,14 +17,7 @@ import { User } from '$lib/models/user';
 import type { ShowQueueType } from '$lib/workers/showWorker';
 
 import config from '$lib/config';
-import {
-  AuthType,
-  CurrencyType,
-  EntityType,
-  ShowMachineEventString,
-  TicketMachineEventString,
-  UserRole
-} from '$lib/constants';
+import { AuthType, CurrencyType, EntityType, UserRole } from '$lib/constants';
 import { authEncrypt } from '$lib/crypt';
 import type { DisplayInvoice } from '$lib/ext/bitcart/models';
 import { mensNames } from '$lib/mensNames';
@@ -60,7 +53,6 @@ export const actions: Actions = {
 
     // Convenient validation check:
     if (!form.valid) {
-      // Again, return { form } and things will just work.
       return fail(400, { form });
     }
 
@@ -105,7 +97,7 @@ export const actions: Actions = {
 
     if (
       !showState.can({
-        type: ShowMachineEventString.TICKET_RESERVED,
+        type: 'TICKET RESERVED',
         ticket
       })
     ) {
@@ -177,7 +169,7 @@ export const actions: Actions = {
     }
     await ticket.save();
 
-    showQueue.add(ShowMachineEventString.TICKET_RESERVED, {
+    showQueue.add('TICKET RESERVED', {
       showId: show._id.toString(),
       ticketId: ticket._id.toString(),
       customerName: name
@@ -187,7 +179,7 @@ export const actions: Actions = {
     if (ticket.price.amount === 0 && ticket.bcInvoiceId) {
       const ticketService = getTicketMachineService(ticket, redisConnection);
       ticketService.send({
-        type: TicketMachineEventString.PAYMENT_INITIATED,
+        type: 'PAYMENT INITIATED',
         paymentCurrency: CurrencyType.NONE
       });
 

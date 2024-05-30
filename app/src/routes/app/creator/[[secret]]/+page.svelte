@@ -16,13 +16,12 @@
   import type { UserDocument } from '$lib/models/user';
   import type { WalletDocument } from '$lib/models/wallet';
 
-  import type { ShowMachineServiceType } from '$lib/machines/showMachine';
+  import type { ShowMachineServiceType, ShowMachineStateType } from '$lib/machines/showMachine';
   import { createShowMachineService } from '$lib/machines/showMachine';
 
   import {
     ActorType,
     CancelReason,
-    ShowMachineEventString
   } from '$lib/constants';
   import type { requestPayoutSchema } from '$lib/payout';
 
@@ -94,7 +93,11 @@
 
       showMachineService?.stop();
       showMachineService = createShowMachineService({
-        showDocument: currentShow
+        show: currentShow,
+        showMachineOptions: {
+          saveShowEvents: false,
+          saveState: false
+        }
       });
       useShowMachine(showMachineService);
       showUnSub?.();
@@ -103,7 +106,11 @@
           currentShow = _show;
           showMachineService?.stop();
           showMachineService = createShowMachineService({
-            showDocument: _show
+            show: _show,
+            showMachineOptions: {
+              saveShowEvents: false,
+              saveState: false
+            }
           });
           useShowMachine(showMachineService);
         } else {
@@ -113,10 +120,8 @@
     }
   };
 
-  const useShowMachine = (showMachineService: ShowMachineServiceType) => {
-    showMachineServiceUnSub?.unsubscribe();
-    showMachineServiceUnSub = showMachineService.subscribe((state) => {
-      if (state.changed) {
+  const testState = (state : ShowMachineStateType) => {
+      if (state) {
         showStopped = state.matches('stopped');
         showCancelled = state.matches('cancelled');
         if (showCancelled) {
@@ -130,12 +135,21 @@
             reason: CancelReason.CREATOR_CANCELLED
           }
         });
-        canStartShow = state.can(ShowMachineEventString.SHOW_STARTED);
-        if (state.done) {
+        canStartShow = state.can({
+          type: 'SHOW STARTED'
+        });
+
+        if (state.status === 'done') {
           showMachineService.stop();
         }
       }
-    });
+  }
+
+  const useShowMachine = (showMachineService: ShowMachineServiceType) => {
+    showMachineServiceUnSub?.unsubscribe();
+    const state = showMachineService.getSnapshot();
+    testState(state);
+
   };
 
   onMount(() => {

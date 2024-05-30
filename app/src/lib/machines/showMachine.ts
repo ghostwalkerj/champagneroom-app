@@ -1,17 +1,21 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import { nanoid } from 'nanoid';
-import { assign, createMachine, interpret, type StateFrom } from 'xstate';
-import { raise } from 'xstate/lib/actions';
+import {
+  type AnyEventObject,
+  assign,
+  createActor,
+  raise,
+  setup,
+  type StateFrom
+} from 'xstate';
 
 import {
   type CancelType,
-  disputeStatsSchema,
   escrowSchema,
   finalizeSchema,
   type FinalizeType,
-  runtimeSchema,
-  showSalesStatsSchema
+  runtimeSchema
 } from '$lib/models/common';
 import type { ShowDocument } from '$lib/models/show';
 import type { TicketDocument } from '$lib/models/ticket';
@@ -82,19 +86,11 @@ export type ShowMachineEventType =
       decision: DisputeDecision;
     };
 
+export type ShowMachineEventString = ShowMachineEventType['type'];
+
 export type ShowMachineOptions = {
-  saveStateCallback?: (state: ShowStateType) => void;
-  saveShowEventCallback?: ({
-    type,
-    ticketId,
-    transaction,
-    ticketInfo
-  }: {
-    type: string;
-    ticketId?: string;
-    transaction?: TransactionDocument;
-    ticketInfo?: { customerName: string };
-  }) => void;
+  saveState?: boolean;
+  saveShowEvents?: boolean;
   gracePeriod?: number;
   escrowPeriod?: number;
 };
@@ -110,629 +106,1000 @@ export type ShowMachineType = ReturnType<typeof createShowMachine>;
 export type ShowStateType = ShowDocument['showState'];
 
 const createShowMachine = ({
-  showDocument,
+  show,
   showMachineOptions
 }: {
-  showDocument: ShowDocument;
+  show: ShowDocument;
   showMachineOptions?: ShowMachineOptions;
 }) => {
   const GRACE_PERIOD = showMachineOptions?.gracePeriod || 3_600_000;
   const ESCROW_PERIOD = showMachineOptions?.escrowPeriod || 3_600_000;
 
-  /** @xstate-layout N4IgpgJg5mDOIC5SwBYHsDuBZAhgYxQEsA7MAOlUwBk0cJIBiAbQAYBdRUABzVkIBdCaYpxAAPRACYWADjIBOSQEYZAdnkAWFgDZt8pfNUAaEAE9EAVhlKyF+dtXrJMjVe0yAvh5OVs+IqQU6Bg0dIxMShxIIDx8gsKiEgjKcooq6lq6+oYm5ggyirYsAMwl2hYskhpKxUpePsG4BCTkvqH0EMySUdy8AkIi0UkGqSkZOnoGxmaISpKqRSwsSu4G2nOa9SC+TQGtwe3hxT0xffGDoMMyo+maE9nTedaLJcWOcxbatVs7-i1B1FoHWYGhOsX6CSGUhUCjGdyyU1ysxUFjIkgsFlqelcki+Fh+jT+gTaQPCFjBZwGiUskiRCGK1nkZA08gsyg0GlU2mqLgJmF2-xJYU6TG0FLiVKhyRhaTU8MmORmCCUnMkZFUsi0MgsrnkLFUxT5fmaxIOpJFqnFEIu4ikslht0yCseswsMI1LmUSjZBmcRoFpsBwuYMit52pCG0tKVxXKLHVrjmqlxKNU-qJ5BIAFFYHgAE6YBgAZQAEgB5ADqAAIAGIASQAcgBBKh1gBaWYAIqww5LLogowtuToNAVKvYqnTY+jbCirNIHCzDd5toSTZniDn84Wa1muwAhJsAYQA0lWAEpZo9ZusANS7PdE4PDUtUShsbNkUc+FUk8mKU6cjYshqH+ybVDq6brmQ2a5gWGAMLuB7Hmel7XneD6RE+lKQv2CDJmqHLzAyrLKOo8hTm8GhkHiFjqEsXJssuDT8hmZAAEZoGIZYAGY8YQeBgGWXBgMQDBHk2DbXlQVBNgAKnWZYNlWjZ1gp8kPuw2ESrhtr5NGeRVJ8ZAsPo7KSFUOiSFBewcVxvH8YJwmieJknSbJClKSpDZqXWGndlh0TPn2elKJUdLKG66qyMUf4yLGKxpiuvzQZx3F8QJQkiWJCmnlmckXlmRZZue97dlpQU4TaSQOKi+olKZ6KsqoMgGYgqgaGqmJxl8MiVN8yVrrZaUOZlzk5XWeUFZexWlZhva6Uk0hviZGh6Os-UOPFdLZGi5TuCOBiaPig2sal9kZU52UMLlJ75YVs23vJinKQpWBZmWACqcmPpVOnVXaLUKHR+rlAUVgUUqrVqtY6Kfv+COeKdxrDRdjlZS5t33RJUlZjJmkLQD0rvuqBpAUufXlHSybaGQxR2BopT-t1b42f8I2XRjE1TVWRZllQ5WExG7K01GcwsDq8gFLGGh0lGTJ6vLLKGPFlRs4EHPo+NxbltWRZyU255yQT2nWhGyYReRJmGG6mQstY2jq+QmtjddWPTVmNafQ2nYm39ZtSsouI0W+9jWMm8iaHSmLFMymJKAa8WKHRJ0sSj7No5lR4ADa8IwpaVrzBtG37vT-RGtUmRqTNNXRrV0jUJTqhiuLVLFOpqE7dnpejOd5507sPSVT2ea9dbvV9P0VWXAd4e4dXV41dh121+TlAonVciROjzl3LuCX3sCMIPOPuaXpzl1K89Vw1yfNfXSpS0yxQspUKrLLImJ75nB+50fA+TTugVPmAtfozxfHhFUegaLFBfiwaoeo3hcmpvYWwysVQ1DrtUb+Pcs5-2PoA+6l4vY+3PsFRaswORMncJ1JqfU-wASVBqeMpktoYjUBHJGacAzOx-mAQ+jBT54w8i9byvl-JgIvrPPSigIqwLVDQgoqg7COEcDg0av9+6uVxjJZ6XlVLqWNgFIWV9YoKBkA4Aw9NXgyAimtEySx+pzHmBiRQXdYD8BwHmfg+ddZF0NkYyR5CiZ9TkPMEoEE7iaCUBFNQNgWTKNqFYEcndkY8IoJ47xgjPr6zLO9c8VYABSZZGxkKqubVByx0T0wSesWWSpnDSAUDbbQ+oyat3cZknxnQjw5LknkkqVYqCeyniYvCfVUQVC-G+b0nJOqWw1MyG2pRtQRK+J0rx3SdaF1yQABV2WUy+eFPhMglmtMOljjoRWarYOinVZBhQZHUNJbEPFoC4CJToBc9bF0CdPKREC9InJMjqdaFjQ6uFiesMgYVN5LH-HKTp7zPnbOrFmUhgtTaAqSBbGMGJqJ-imOUVw9M6JdxIP0HA3Sjw4GIIJbO2cqUDDIBgHA-RiBQEkOeMAPEACuxBOjEO9p2MRhjDnSJqn1dU+0ORzIlgYCKCdCIvz1G6TQ1QWrkuIJS6ltL6WMvODBbVggqWQG5XygVN1CEexIb7TF-tsWzAsvE+OjhWoJP-IqqKHp6a6HlioLVOrIA0rpWABlTLhBGqDRAc1-KAE8yFRiiIYy9JqFRIoQwGDSXvkYYZWQCxpAuFqmBF+SUVzEDQPQeA0QUp7CxSFJIABabQdJm0OMcR2jtfoXnQSFB0etFCEDzKVO+eKRQ2RvlgcdNkXc8B6rDdnSAA6ibeisOqF+jMpa1BmRFFRtgbaM2xPFDqWqtzwWXRGWKwEWo1CliUdEKopx2CZCyCoa1rGM3il3fixAcDZ0IAALyXQ6htiBrCpEUBZAoBQmounpKopZTEVTxVKPTdRnNxoXqlLC050GtBvm5BOhulR4xvmuKZAwSwlzod7vgiAWG8KjjkE4FWegJbLEVE8KWDjUNsk0L6rhq4zq2Q8Zs4D4DQNDpVHTKWa1rAqDeNcephlDBqlZDoaGmbU5CfTsSfgyLxMAskxY5jYV7DpDsH+FtMZ3yokwZLTUdFrI9tshSk1urQ3hsBcEiMa1qKlCAiRyyDCG6RyZB6RmbwrCci-S5-4bnCCmogCG-VEbiAsrZYIDlXKeVxoY0CuYdN4FviC1oP8irWQKHfGtVx74-yBvc8G+dXnmUJaS7GgV+WkiaDkPtZwFjaidSloq64NF1jrHdVGWMXgvBAA */
-  return createMachine(
-    {
-      context: {
-        showDocument,
-        showState: JSON.parse(
-          JSON.stringify(showDocument.showState)
-        ) as ShowStateType,
-        errorMessage: undefined as string | undefined,
-        id: nanoid()
-      } as {
-        showDocument: ShowDocument;
-        showState: ShowStateType;
+  /** @xstate-layout N4IgpgJg5mDOIC5SwBYHsDuBZAhgYxQEsA7MAOlUwBk0cJIBiAbQAYBdRUABzVkIBdCaYpxAAPRACYAjAA4ysgJzKAbAFZpLAMyK5AFkkAaEAE9EstYrIrFKyYr06WitZLUBfd8crZ8RUhToGDR0jEzSHEggPHyCwqISCJKS8kqqGtq6sgbGZgjS0pJaZAVqKiyuspJ6tlqe3kG4BCTkPiH0EMySkdy8AkIiUYmSLKnKthk6+kamUpIA7GQs8-Nqznoskirl87L1ID5N-q1B7WFaPdF9cYOgidKKY+maU9kzeXKSZPPSa5ojOj0Ki0Hi8B0afhagWotA6zD0lxi-XiQzmTwmLyyOVm+T0mgUo1kWiK82JZRU+0OkICbVhYTUiOuAwSiFcuUQWmkNRKzhYD3KnLUxMpEOaNNOdM6TBUjNizNRSTkCnG6kx03Z+SJ8i0RPmKj0QM52xFmCOUNpoSl81lyNu4iko2Vz0y6pxD2y1g2bmk8xY2ge0hNvjFJxhluYshtNxZCHm7ykenmeiWm2yP2cijqYKpIehwUlzEUUfld0Q7qdGJdbw1Iwsnu0id0hV+oIapup5DAxDhABUAJIAYQA0gBRHsAAgAYn2AHIAQSofYAWiOACKsYso0sIWSFJZaPQaKqrPEWGuPYpJ7RqP56zbzINmgJd3uD0cT1d9gDKAAUAKo9muG6iEi0YKloWgsEsazaACmayCsNYWIsNgNkCMjzI8eiPh2ZAvpAZAkCOsB4AATpgDBfgAEgA8gA6lOs4LsuQHsCBTJbva+RONYmaPFysgZgeSFAgoMgqNIkEGmseo4bm+EQIRxCroQsBcAArvwYAMJ+v4ASO46riOA59kZ65sVEoEllxGhWD8shVNsN66BJNYnmQDjaHqBiJq24LtvJ3YESQKlqZp2m6f+gGGcZplARE7FypxiRElBLB2MC1RCmoWpIWoKGKGhdg+lhcnHHhQWKSFqkaVpOnflFBlGSZZlMN0iW2jGrhfL6DhVECmaSfGSTbFBSjaKNKQOBS2aiuVABGaBiDRABmK2EHgYA0VwXYMAOc4zgOI5UFQc79jRM7jrOfb9mdrGbna9wLNIZCQRJrhcjeZQas2L0IRB2TpSoDkzW2wYLUtq3rZt227fth3Had52Xddt2AeuCWWRxj1lnIxQuADkkE5heganoCFkCkWgrMS3n8n5OYQ8ta0bVtO3EAw-bDmO44AEojl+I68wAavdHVgduKhxmQQpJg5rhHq5OKKCsr0rEKUv2AUZVQotzPQ2zu1c++fMC0LosYw9MYyGs3y7t1uzJFoP0CTyQLOFodg6mo2GzQFTNQ6zsMc8bPPw0dJ1i1jSU40kIwvTlQIGr6Njkj9FTJhn5R2AsuyjDrAR64HMPs5zb481+NFUOZVsKskWyvQePxbKsSjSBqthpSw7uQYNeoPn74O65DLMl7t1H0eOX49nOvPo8B0edQqhQ-K96W-DIh43ioP2VGQNR+jqGw+78vtg0+5BF6Phsh+XE785Of4zq1Fm9DH1sjCor3ZOSOh6g4GpZDqA8j7Swygcr5RkAXS+I8DYDgADa8EYBPBi09Z7z1flcd+CpNYy2puTCw3ogHtzdFLF6fIahS09ssEYZ9-JD0LrA1mCCkGdFDhOcOiMo5vyXpLKoeC5aEMViQj4zhFh4hqA5BCjxBKSGgWQK+cDEGwEYOwqeVca7i2svcMoUEcrU00MDH4+p04pG+DeEqOpdAE3kYo5hyjVF31No-Z+3CsG8K4sDL4ssCEKzkErD4GF95+M9gYfUuxbFMM2iwlRnROEnTOn2C6V0Zw3T7HdTRi8JaeOqOYvEwJljoU2BqbYX8Dx+h-rsCCyhIn63sawvaB0I5IySSjVJaN4q10llyPJ0gClJjsMUnEB5kyt28snXQepQb0IvhQfgOBSJaU6CgqeM855uKsslDkywoK6DEdkfUZRhJulJF8RwFTTxxjkAPc+uFYDzMWY47m981wjhHFgDZ2MYxvXIeTXyvoaiTJ+sCbUglljU10BIuhjNzQPKWXtP808aIfN5uOAAUjRWcnzsHbkgjlaw+ULDAkzKMNkbocpWA0KSA0OgEL8nkfchZ8KByIp7MioW44qAjknD2BePDsmJDevIT6EEFijDsGoXeGwCXk0KoNd6cjB6zMZY85ZtFUFsp-D+bFHj7jeQ8uMIkmZgSax+ruRYz1SmPEwuoBmc1YVoC4DtNVk80HrMyfy7RZZ9XjAvMaz2cYfpxmKMkH0oT1AgmyAy-gjrnWUXVeOEcriPXuIFYgOwNYjyvXUG4SZPlVjyJIP0HASyBw4GIJteB8CS0DDIBgHA-RiBQEkLzMAK11LdgYA-J+q4UlpIyXy1NXr8grHIc4OwcYM5bA1GsL+gkpF8k5AUXY0yYUBCLYIEtkAy0VrAFWmtwglLFqWa29tna1HduTYOzZsciiOiblsamqw-jDXJl-Moih7CORvM4NwhbiDHu3eWyt1abhHs3SettHa2FOMva1TGnqtn5FsMmbqRQXCWGBjqMmyQCTpTesCAFvswTEDQPQeAUQ11gC0UhgAtDvZWaglgbD9KxtjNSlV3IlJaGjsdsQfA2O+ryXIUMVAWPIvAwG93wMgLx62+p8b1yqNTZYKsfogiY75TYhUDTKEDJxwKHQ5N134RUQ+cEdSIRxG4UklNfgaaqDBdK8iFJKWImRTAxntyFDcDLBCvofYGgQulJCNgeS6B-QhY8WZbmGeCspGq4UvOeMktm-KYaKhcl+EhTCHkVggycgUPYBnyrrWIDgeBhAABesmsnDr6YJEoE7P3oUcvMDUnJ0olAcK4AwmE4y1OLjfZL9wJolCXfqYEB4yikzdNURYp8JLVFsBx2LAdr4xNq4hvjuhrAIQ0BhA8DlZsfBXgSI8bgSTjGjUyrbQ6kN9IKN19eEE3oQRO2WIkL1yZ+i5L1RzxW1sOqdXdm91t0pfFsN6dKMiXA-RVmc9QXp8s2E-f+wDEAd0gYPXaMHy8byofUJ+41PptiyA6yCEobhBmHhVhS9HEGgO7v3WB+tjbm2nugyNss5RvFE-sJ7UnwMZ32CWLUKoJIjUM8IFuzHUmWe1o3TLyDZ6IDc6SGNjYCOGt-z6SLv6awyhFeBAUGanggA */
+  return setup({
+    types: {
+      events: {} as ShowMachineEventType,
+      context: {} as {
+        show: ShowDocument;
         errorMessage: string | undefined;
         id: string;
-      },
-      tsTypes: {} as import('./showMachine.typegen.d.ts').Typegen0,
-      schema: {
-        events: {} as ShowMachineEventType
-      },
-      predictableActionArguments: true,
-      id: 'showMachine',
-      initial: 'showLoaded',
-
-      states: {
-        showLoaded: {
-          always: [
-            {
-              target: 'boxOfficeOpen',
-              cond: 'showBoxOfficeOpen'
-            },
-            {
-              target: 'boxOfficeClosed',
-              cond: 'showBoxOfficeClosed'
-            },
-            {
-              target: 'initiatedCancellation',
-              cond: 'showInitiatedCancellation'
-            },
-            {
-              target: 'initiatedCancellation.initiatedRefund',
-              cond: 'showInitiatedRefund'
-            },
-            {
-              target: 'cancelled',
-              cond: 'showCancelled'
-            },
-            {
-              target: 'finalized',
-              cond: 'showFinalized'
-            },
-            {
-              target: 'started',
-              cond: 'showStarted'
-            },
-            {
-              target: 'stopped',
-              cond: 'showStopped'
-            },
-            {
-              target: 'ended.inEscrow',
-              cond: 'showInEscrow'
-            },
-            { target: 'ended.inDispute', cond: 'showInDispute' }
-          ]
-        },
-        cancelled: {
-          type: 'final',
-          entry: ['deactivateShow']
-        },
-        ended: {
-          initial: 'inEscrow',
-          on: {
-            'TICKET FINALIZED': {
-              actions: ['finalizeTicket']
-            },
-            'TICKET DISPUTED': {
-              target: 'ended.inDispute',
-              actions: ['receiveDispute']
-            }
-          },
-          states: {
-            inEscrow: {
-              on: {
-                'SHOW FINALIZED': {
-                  target: '#showMachine.finalized',
-                  actions: ['finalizeShow'],
-                  cond: 'canFinalize'
-                }
-              }
-            },
-            inDispute: {
-              on: {
-                'DISPUTE DECIDED': [
-                  {
-                    actions: [
-                      'receiveResolution',
-                      raise({
-                        type: 'SHOW FINALIZED',
-                        finalize: finalizeSchema.parse({
-                          finalizedBy: ActorType.ARBITRATOR
-                        })
-                      })
-                    ],
-                    cond: 'canFinalize'
-                  },
-                  {
-                    actions: ['receiveResolution'],
-                    target: 'inEscrow',
-                    cond: 'disputesResolved'
-                  },
-                  {
-                    actions: ['receiveResolution']
-                  }
-                ]
-              }
-            }
-          }
-        },
-        finalized: {
-          type: 'final',
-          entry: ['deactivateShow']
-        },
-        boxOfficeOpen: {
-          on: {
-            'CANCELLATION INITIATED': [
-              {
-                target: 'cancelled',
-                cond: 'canCancel',
-                actions: ['initiateCancellation', 'cancelShow']
-              },
-              {
-                target: 'initiatedCancellation',
-                actions: ['initiateCancellation']
-              }
-            ],
-            'TICKET RESERVED': [
-              {
-                target: 'boxOfficeClosed',
-                cond: 'soldOut',
-                actions: ['reserveTicket', 'closeBoxOffice']
-              },
-              {
-                actions: ['reserveTicket']
-              }
-            ],
-
-            'TICKET CANCELLED': {
-              actions: ['cancelTicket']
-            },
-            'TICKET SOLD': {
-              actions: ['sellTicket']
-            },
-            'SHOW STARTED': {
-              target: 'started',
-              cond: 'canStartShow',
-              actions: ['startShow']
-            },
-            'TICKET REFUNDED': [
-              {
-                actions: ['refundTicket']
-              }
-            ]
-          }
-        },
-        boxOfficeClosed: {
-          on: {
-            'SHOW STARTED': {
-              cond: 'canStartShow',
-              target: 'started',
-              actions: ['startShow']
-            },
-            'TICKET CANCELLED': [
-              {
-                target: 'boxOfficeOpen',
-                actions: ['openBoxOffice', 'cancelTicket']
-              }
-            ],
-            'TICKET SOLD': {
-              actions: ['sellTicket']
-            },
-            'TICKET REFUNDED': [
-              {
-                actions: ['openBoxOffice', 'refundTicket'],
-                target: 'boxOfficeOpen'
-              }
-            ],
-            'CANCELLATION INITIATED': [
-              {
-                target: 'cancelled',
-                cond: 'canCancel',
-                actions: ['initiateCancellation', 'cancelShow']
-              },
-              {
-                target: 'initiatedCancellation',
-                actions: ['initiateCancellation']
-              }
-            ]
-          }
-        },
-        started: {
-          on: {
-            'SHOW STARTED': {
-              actions: ['startShow']
-            },
-            'TICKET REDEEMED': {
-              actions: ['redeemTicket']
-            },
-            'CUSTOMER JOINED': {},
-            'CUSTOMER LEFT': {},
-            'SHOW STOPPED': {
-              target: 'stopped',
-              actions: ['stopShow']
-            }
-          }
-        },
-        stopped: {
-          on: {
-            'SHOW STARTED': {
-              target: 'started',
-              actions: ['startShow'],
-              cond: 'canStartShow'
-            },
-            'SHOW ENDED': {
-              target: 'ended.inEscrow',
-              actions: ['endShow']
-            }
-          }
-        },
-        initiatedCancellation: {
-          initial: 'waiting2Refund',
-          states: {
-            waiting2Refund: {
-              on: {
-                'REFUND INITIATED': {
-                  target: 'initiatedRefund',
-                  actions: ['initiateRefund']
-                }
-              }
-            },
-            initiatedRefund: {
-              on: {
-                'TICKET REFUNDED': [
-                  {
-                    target: '#showMachine.cancelled',
-                    cond: 'fullyRefunded',
-                    actions: ['refundTicket', 'cancelShow']
-                  },
-                  {
-                    actions: ['refundTicket']
-                  }
-                ]
-              }
-            }
-          }
-        }
       }
     },
-    {
-      actions: {
-        closeBoxOffice: assign((context) => {
+    actions: {
+      closeBoxOffice: (_, params: { show: ShowDocument }) =>
+        assign(() => {
+          const show = params.show;
+          show.showState.status = ShowStatus.BOX_OFFICE_CLOSED;
           return {
-            showState: {
-              ...context.showState,
-              status: ShowStatus.BOX_OFFICE_CLOSED
-            }
+            show
           };
         }),
 
-        openBoxOffice: assign((context) => {
+      openBoxOffice: (_, params: { show: ShowDocument }) =>
+        assign(() => {
+          const show = params.show;
+          show.showState.status = ShowStatus.BOX_OFFICE_OPEN;
           return {
-            showState: {
-              ...context.showState,
-              status: ShowStatus.BOX_OFFICE_OPEN
-            }
+            show
           };
         }),
 
-        cancelShow: assign((context) => {
+      cancelShow: (_, params: { show: ShowDocument }) =>
+        assign(() => {
+          const show = params.show;
+          show.showState.status = ShowStatus.CANCELLED;
           return {
-            showState: {
-              ...context.showState,
-              status: ShowStatus.CANCELLED
-            }
+            show
           };
         }),
 
-        startShow: assign((context) => {
+      startShow: (_, params: { show: ShowDocument }) =>
+        assign(() => {
+          const show = params.show;
+          show.showState.status = ShowStatus.LIVE;
+          show.showState.runtime = runtimeSchema.parse({
+            startDate: new Date()
+          });
           return {
-            showState: {
-              ...context.showState,
-              status: ShowStatus.LIVE,
-              runtime: runtimeSchema.parse({})
-            }
+            show
           };
         }),
 
-        endShow: assign((context) => {
+      endShow: (_, params: { show: ShowDocument }) =>
+        assign(() => {
+          const show = params.show;
+          show.showState.status = ShowStatus.IN_ESCROW;
+          show.showState.escrow = escrowSchema.parse({});
+          show.showState.current = false;
           return {
-            showState: {
-              ...context.showState,
-              status: ShowStatus.IN_ESCROW,
-              escrow: escrowSchema.parse({}),
-              current: false
-            }
+            show
           };
         }),
 
-        stopShow: assign((context) => {
-          const startDate = context.showState.runtime?.startDate;
+      stopShow: (_, params: { show: ShowDocument }) =>
+        assign(() => {
+          const show = params.show;
+          const startDate = show.showState.runtime?.startDate;
           if (!startDate) {
             throw new Error('Show start date is not defined');
           }
-
-          return {
-            showState: {
-              ...context.showState,
-              status: ShowStatus.STOPPED,
-              runtime: runtimeSchema.parse({
-                ...context.showState.runtime,
-                endDate: new Date()
-              })
-            }
-          };
+          show.showState.status = ShowStatus.STOPPED;
+          show.showState.runtime = runtimeSchema.parse({
+            startDate,
+            endDate: new Date()
+          });
+          return { show };
         }),
 
-        initiateCancellation: assign((context, event) => {
-          return {
-            showState: {
-              ...context.showState,
-              status: ShowStatus.CANCELLATION_INITIATED,
-              salesStats: showSalesStatsSchema.parse({
-                ...context.showState.salesStats,
-                ticketsAvailable: 0
-              }),
-              cancel: event.cancel
-            }
-          };
+      initiateCancellation: (
+        _,
+        params: {
+          show: ShowDocument;
+          cancel: CancelType;
+        }
+      ) =>
+        assign(() => {
+          const show = params.show;
+          show.showState.status = ShowStatus.CANCELLATION_INITIATED;
+          show.showState.cancel = params.cancel;
+          show.showState.salesStats.ticketsAvailable = 0;
+          return { show };
         }),
 
-        initiateRefund: assign((context) => {
-          return {
-            showState: {
-              ...context.showState,
-              status: ShowStatus.REFUND_INITIATED
-            }
-          };
+      initiateRefund: (_, params: { show: ShowDocument }) =>
+        assign(() => {
+          const show = params.show;
+          show.showState.status = ShowStatus.REFUND_INITIATED;
+          return { show };
         }),
 
-        receiveDispute: assign((context, event) => {
-          const st = context.showState;
-          return {
-            showState: {
-              ...st,
-              status: ShowStatus.IN_DISPUTE,
-              disputes: [...st.disputes, event.ticket._id],
-              disputeStats: disputeStatsSchema.parse({
-                ...st.disputeStats,
-                totalDisputes: st.disputeStats.totalDisputes + 1,
-                totalDisputesPending: st.disputeStats.totalDisputesPending + 1
-              })
-            }
-          };
+      receiveDispute: (
+        _,
+        params: {
+          show: ShowDocument;
+          ticket: TicketDocument;
+        }
+      ) =>
+        assign(() => {
+          const show = params.show;
+          const ticket = params.ticket;
+          show.showState.status = ShowStatus.IN_DISPUTE;
+          show.showState.disputes.push(ticket._id);
+          show.$inc('showState.disputeStats.totalDisputes', 1);
+          show.$inc('showState.disputeStats.totalDisputesPending', 1);
+          return { show };
         }),
 
-        receiveResolution: assign((context, event) => {
-          const st = context.showState;
-          const refunded = event.decision === DisputeDecision.NO_REFUND ? 0 : 1;
-          const showState = {
-            ...st,
-            disputeStats: disputeStatsSchema.parse({
-              ...st.disputeStats,
-              totalDisputesPending: st.disputeStats.totalDisputesPending - 1,
-              totalDisputesResolved: st.disputeStats.totalDisputesResolved + 1,
-              totalDisputesRefunded:
-                st.disputeStats.totalDisputesRefunded + refunded
-            })
-          };
-          return {
-            showState
-          };
+      receiveResolution: (
+        _,
+        params: {
+          show: ShowDocument;
+          decision: DisputeDecision;
+        }
+      ) =>
+        assign(() => {
+          const show = params.show;
+          const refunded =
+            params.decision === DisputeDecision.NO_REFUND ? 0 : 1;
+          show.$inc('showState.disputeStats.totalDisputesPending', -1);
+          show.$inc('showState.disputeStats.totalDisputesResolved', 1);
+          show.$inc('showState.disputeStats.totalDisputesRefunded', refunded);
+          return { show };
         }),
 
-        refundTicket: assign((context, event) => {
-          const st = context.showState;
-          const salesStats = st.salesStats;
-
-          salesStats.ticketsRefunded += 1;
-          salesStats.ticketsSold -= 1;
-          salesStats.ticketsAvailable += 1;
-          st.refunds.push(event.ticket._id);
-
-          return {
-            showState: {
-              ...st,
-              salesStats: showSalesStatsSchema.parse({
-                ...salesStats
-              })
-            }
-          };
+      refundTicket: (
+        _,
+        params: {
+          show: ShowDocument;
+          ticket: TicketDocument;
+        }
+      ) =>
+        assign(() => {
+          show.$inc('showState.salesStats.ticketsRefunded', 1);
+          show.$inc('showState.salesStats.ticketsSold', -1);
+          show.$inc('showState.salesStats.ticketsAvailable', 1);
+          show.showState.refunds.push(params.ticket._id);
+          return { show };
         }),
 
-        deactivateShow: assign((context) => {
-          return {
-            showState: {
-              ...context.showState,
-              active: false,
-              current: false
-            }
-          };
+      deactivateShow: (_, params: { show: ShowDocument }) =>
+        assign(() => {
+          const show = params.show;
+          show.showState.active = false;
+          show.showState.current = false;
+          return { show };
         }),
 
-        cancelTicket: assign((context, event) => {
-          const st = context.showState;
-          st.cancellations.push(event.ticket._id);
-          return {
-            showState: {
-              ...st,
-              salesStats: showSalesStatsSchema.parse({
-                ...st.salesStats,
-                ticketsAvailable: st.salesStats.ticketsAvailable + 1,
-                ticketsReserved: st.salesStats.ticketsReserved - 1
-              })
-            }
-          };
+      cancelTicket: (
+        _,
+        params: {
+          show: ShowDocument;
+          ticket: TicketDocument;
+        }
+      ) =>
+        assign(() => {
+          show.showState.cancellations.push(params.ticket._id);
+          show.$inc('showState.salesStats.ticketsAvailable', 1);
+          show.$inc('showState.salesStats.ticketsReserved', -1);
+          return { show };
         }),
 
-        reserveTicket: assign((context, event) => {
-          const st = context.showState;
-          st.reservations.push(event.ticket._id);
-          return {
-            showState: {
-              ...st,
-              salesStats: showSalesStatsSchema.parse({
-                ...st.salesStats,
-                ticketsAvailable: st.salesStats.ticketsAvailable - 1,
-                ticketsReserved: st.salesStats.ticketsReserved + 1
-              })
-            }
-          };
+      reserveTicket: (
+        _,
+        params: {
+          show: ShowDocument;
+          ticket: TicketDocument;
+        }
+      ) =>
+        assign(() => {
+          const show = params.show;
+          show.showState.reservations.push(params.ticket._id);
+          show.$inc('showState.salesStats.ticketsAvailable', -1);
+          show.$inc('showState.salesStats.ticketsReserved', 1);
+          return { show };
         }),
 
-        redeemTicket: assign((context, event) => {
-          const st = context.showState;
-          st.redemptions.push(event.ticket._id);
-          st.salesStats.ticketsRedeemed += 1;
-          return {
-            showState: {
-              ...st,
-              salesStats: showSalesStatsSchema.parse({
-                ...st.salesStats,
-                ticketsRedeemed: st.salesStats.ticketsRedeemed + 1
-              })
-            }
-          };
+      redeemTicket: (
+        _,
+        params: {
+          show: ShowDocument;
+          ticket: TicketDocument;
+        }
+      ) =>
+        assign(() => {
+          const show = params.show;
+          show.$inc('showState.salesStats.ticketsRedeemed', 1);
+          show.showState.redemptions.push(params.ticket._id);
+          return { show };
         }),
 
-        finalizeTicket: assign((context, event) => {
-          const st = context.showState;
-          st.finalizations.push(event.ticket._id);
-          st.salesStats.ticketsFinalized += 1;
-          return {
-            showState: {
-              ...st
-            }
-          };
+      finalizeTicket: (
+        _,
+        params: {
+          show: ShowDocument;
+          ticket: TicketDocument;
+        }
+      ) =>
+        assign(() => {
+          const show = params.show;
+          show.$inc('showState.salesStats.ticketsFinalized', 1);
+          show.showState.finalizations.push(params.ticket._id);
+          return { show };
         }),
 
-        sellTicket: assign((context, event) => {
-          const st = context.showState;
-          st.salesStats.ticketsSold += 1;
-          st.salesStats.ticketsReserved -= 1;
-
-          st.sales.push(event.ticket._id);
-          return {
-            showState: {
-              ...st
-            }
-          };
+      sellTicket: (
+        _,
+        params: {
+          show: ShowDocument;
+          ticket: TicketDocument;
+        }
+      ) =>
+        assign(() => {
+          const show = params.show;
+          show.$inc('showState.salesStats.ticketsSold', 1);
+          show.$inc('showState.salesStats.ticketsReserved', -1);
+          show.showState.sales.push(params.ticket._id);
+          return { show };
         }),
 
-        finalizeShow: assign((context, event) => {
-          const escrow = context.showState.escrow || {
-            startedAt: new Date()
-          };
-          return {
-            showState: {
-              ...context.showState,
-              escrow: escrowSchema.parse({
-                ...escrow,
-                endedAt: new Date()
-              }),
-              status: ShowStatus.FINALIZED,
-              finalize: event.finalize
-            }
-          };
+      finalizeShow: (
+        _,
+        params: {
+          show: ShowDocument;
+          finalize: FinalizeType;
+        }
+      ) =>
+        assign(() => {
+          const show = params.show;
+          show.showState.status = ShowStatus.FINALIZED;
+          show.showState.finalize = params.finalize;
+          if (!show.showState.escrow)
+            show.showState.escrow = escrowSchema.parse({
+              startedAt: new Date()
+            });
+          show.showState.escrow.endedAt = new Date();
+
+          return { show };
         })
+    },
+    guards: {
+      canCancel: (_, params: { show: ShowDocument }) => {
+        const show = params.show;
+        return (
+          show.price.amount === 0 ||
+          show.showState.salesStats.ticketsSold -
+            show.showState.salesStats.ticketsRefunded ===
+            0
+        );
       },
-
-      guards: {
-        canCancel: (context) =>
-          context.showDocument.price.amount === 0 ||
-          context.showState.salesStats.ticketsSold -
-            context.showState.salesStats.ticketsRefunded ===
-            0,
-        showCancelled: (context) =>
-          context.showState.status === ShowStatus.CANCELLED,
-        showFinalized: (context) =>
-          context.showState.status === ShowStatus.FINALIZED,
-        showInitiatedCancellation: (context) =>
-          context.showState.status === ShowStatus.CANCELLATION_INITIATED,
-        showInitiatedRefund: (context) =>
-          context.showState.status === ShowStatus.REFUND_INITIATED,
-        showBoxOfficeOpen: (context) =>
-          context.showState.status === ShowStatus.BOX_OFFICE_OPEN,
-        showBoxOfficeClosed: (context) =>
-          context.showState.status === ShowStatus.BOX_OFFICE_CLOSED,
-        showStarted: (context) => context.showState.status === ShowStatus.LIVE,
-        showStopped: (context) =>
-          context.showState.status === ShowStatus.STOPPED,
-        showInEscrow: (context) =>
-          context.showState.status === ShowStatus.IN_ESCROW,
-        showInDispute: (context) =>
-          context.showState.status === ShowStatus.IN_DISPUTE,
-        soldOut: (context) =>
-          context.showState.salesStats.ticketsAvailable === 1,
-        canStartShow: (context) => {
-          if (context.showState.status === ShowStatus.STOPPED) {
-            // Allow grace period to start show again
-            if (!context.showState.runtime!.startDate) {
-              return false;
+      showCancelled: (_, params: { show: ShowDocument }) =>
+        params.show.showState.status === ShowStatus.CANCELLED,
+      showFinalized: (_, params: { show: ShowDocument }) =>
+        params.show.showState.status === ShowStatus.FINALIZED,
+      showInitiatedCancellation: (_, params: { show: ShowDocument }) =>
+        params.show.showState.status === ShowStatus.CANCELLATION_INITIATED,
+      showInitiatedRefund: (_, params: { show: ShowDocument }) =>
+        params.show.showState.status === ShowStatus.REFUND_INITIATED,
+      showBoxOfficeOpen: (_, params: { show: ShowDocument }) =>
+        params.show.showState.status === ShowStatus.BOX_OFFICE_OPEN,
+      showBoxOfficeClosed: (_, params: { show: ShowDocument }) =>
+        params.show.showState.status === ShowStatus.BOX_OFFICE_CLOSED,
+      showStarted: (_, params: { show: ShowDocument }) =>
+        params.show.showState.status === ShowStatus.LIVE,
+      showStopped: (_, params: { show: ShowDocument }) =>
+        params.show.showState.status === ShowStatus.STOPPED,
+      showInEscrow: (_, params: { show: ShowDocument }) =>
+        params.show.showState.status === ShowStatus.IN_ESCROW,
+      showInDispute: (_, params: { show: ShowDocument }) =>
+        params.show.showState.status === ShowStatus.IN_DISPUTE,
+      soldOut: (_, params: { show: ShowDocument }) =>
+        params.show.showState.salesStats.ticketsAvailable === 1,
+      canStartShow: (_, params: { show: ShowDocument }) => {
+        if (params.show.showState.status === ShowStatus.STOPPED) {
+          // Allow grace period to start show again
+          if (!params.show.showState.runtime!.startDate) {
+            return false;
+          }
+          const startDate = new Date(params.show.showState.runtime!.startDate);
+          return (startDate.getTime() ?? 0) + +GRACE_PERIOD > Date.now();
+        }
+        return params.show.showState.salesStats.ticketsSold > 0;
+      },
+      fullyRefunded: (
+        _,
+        params: {
+          show: ShowDocument;
+          event: ShowMachineEventType;
+        }
+      ) => {
+        const refunded = params.event.type === 'TICKET REFUNDED' ? 1 : 0;
+        return params.show.showState.salesStats.ticketsSold - refunded === 0;
+      },
+      canFinalize: (_, params: { show: ShowDocument }) => {
+        let startTime = 0;
+        const show = params.show;
+        const startedAt = show.showState.escrow?.startedAt;
+        if (startedAt) {
+          startTime = new Date(startedAt).getTime();
+        }
+        const hasUnfinalizedTickets =
+          show.showState.salesStats.ticketsSold -
+            show.showState.salesStats.ticketsFinalized >
+          0;
+        const escrowTime = 0 + ESCROW_PERIOD + startTime;
+        const hasDisputes =
+          show.showState.disputeStats.totalDisputesPending > 0;
+        const escrowOver = escrowTime < Date.now();
+        return escrowOver || (!hasDisputes && !hasUnfinalizedTickets);
+      },
+      disputesResolved: (
+        _,
+        params: {
+          show: ShowDocument;
+          event: ShowMachineEventType;
+        }
+      ) => {
+        const resolved = params.event.type === 'DISPUTE DECIDED' ? 1 : 0;
+        return (
+          params.show.showState.disputeStats.totalDisputesPending - resolved ===
+          0
+        );
+      }
+    }
+  }).createMachine({
+    context: {
+      show,
+      errorMessage: undefined as string | undefined,
+      id: nanoid()
+    } as {
+      show: ShowDocument;
+      errorMessage: string | undefined;
+      id: string;
+    },
+    id: 'showMachine',
+    initial: 'showLoaded',
+    states: {
+      showLoaded: {
+        always: [
+          {
+            target: 'boxOfficeOpen',
+            guard: {
+              type: 'showBoxOfficeOpen',
+              params: ({ context }) => ({ show: context.show })
             }
-            const startDate = new Date(context.showState.runtime!.startDate);
-            return (startDate.getTime() ?? 0) + +GRACE_PERIOD > Date.now();
+          },
+          {
+            target: 'boxOfficeClosed',
+            guard: {
+              type: 'showBoxOfficeClosed',
+              params: ({ context }) => ({
+                show: context.show
+              })
+            }
+          },
+          {
+            target: 'initiatedCancellation',
+            guard: {
+              type: 'showInitiatedCancellation',
+              params: ({ context }) => ({
+                show: context.show
+              })
+            }
+          },
+          {
+            target: 'initiatedCancellation.initiatedRefund',
+            guard: {
+              type: 'showInitiatedRefund',
+              params: ({ context }) => ({
+                show: context.show
+              })
+            }
+          },
+          {
+            target: 'cancelled',
+            guard: {
+              type: 'showCancelled',
+              params: ({ context }) => ({
+                show: context.show
+              })
+            }
+          },
+          {
+            target: 'finalized',
+            guard: {
+              type: 'showFinalized',
+              params: ({ context }) => ({
+                show: context.show
+              })
+            }
+          },
+          {
+            target: 'started',
+            guard: {
+              type: 'showStarted',
+              params: ({ context }) => ({
+                show: context.show
+              })
+            }
+          },
+          {
+            target: 'stopped',
+            guard: {
+              type: 'showStopped',
+              params: ({ context }) => ({
+                show: context.show
+              })
+            }
+          },
+          {
+            target: 'ended.inEscrow',
+            guard: {
+              type: 'showInEscrow',
+              params: ({ context }) => ({
+                show: context.show
+              })
+            }
+          },
+          {
+            target: 'ended.inDispute',
+
+            guard: {
+              type: 'showInDispute',
+              params: ({ context }) => ({
+                show: context.show
+              })
+            }
           }
-          return context.showState.salesStats.ticketsSold > 0;
-        },
-        fullyRefunded: (context, event) => {
-          const refunded = event.type === 'TICKET REFUNDED' ? 1 : 0;
-          return context.showState.salesStats.ticketsSold - refunded === 0;
-        },
-        canFinalize: (context) => {
-          let startTime = 0;
-          const startedAt = context.showState.escrow?.startedAt;
-          if (startedAt) {
-            startTime = new Date(startedAt).getTime();
+        ]
+      },
+      cancelled: {
+        type: 'final',
+        entry: [
+          {
+            type: 'deactivateShow',
+            params: ({ context }) => ({ show: context.show })
           }
-          const hasUnfinalizedTickets =
-            context.showState.salesStats.ticketsSold -
-              context.showState.salesStats.ticketsFinalized >
-            0;
-          const escrowTime = 0 + ESCROW_PERIOD + startTime;
-          const hasDisputes =
-            context.showState.disputeStats.totalDisputesPending > 0;
-          const escrowOver = escrowTime < Date.now();
-          return escrowOver || (!hasDisputes && !hasUnfinalizedTickets);
+        ]
+      },
+      ended: {
+        initial: 'inEscrow',
+        on: {
+          'TICKET FINALIZED': {
+            actions: [
+              {
+                type: 'finalizeTicket',
+                params: ({ context, event }) => ({
+                  show: context.show,
+                  ticket: event.ticket
+                })
+              }
+            ]
+          },
+          'TICKET DISPUTED': {
+            target: 'ended.inDispute',
+            actions: [
+              {
+                type: 'receiveDispute',
+                params: ({ context, event }) => ({
+                  show: context.show,
+                  ticket: event.ticket
+                })
+              }
+            ]
+          }
         },
-        disputesResolved: (context, event) => {
-          const resolved = event.type === 'DISPUTE DECIDED' ? 1 : 0;
-          return (
-            context.showState.disputeStats.totalDisputesPending - resolved === 0
-          );
+        states: {
+          inEscrow: {
+            on: {
+              'SHOW FINALIZED': {
+                target: '#showMachine.finalized',
+                actions: [
+                  {
+                    type: 'finalizeShow',
+                    params: ({ context, event }) => ({
+                      show: context.show,
+                      finalize: event.finalize
+                    })
+                  }
+                ],
+                guard: {
+                  type: 'canFinalize',
+                  params: ({ context }) => ({
+                    show: context.show
+                  })
+                }
+              }
+            }
+          },
+          inDispute: {
+            on: {
+              'DISPUTE DECIDED': [
+                {
+                  actions: [
+                    {
+                      type: 'receiveResolution',
+                      params: ({ context, event }) => ({
+                        show: context.show,
+                        decision: event.decision
+                      })
+                    },
+                    raise({
+                      type: 'SHOW FINALIZED',
+                      finalize: finalizeSchema.parse({
+                        finalizedBy: ActorType.ARBITRATOR
+                      })
+                    })
+                  ],
+                  guard: {
+                    type: 'canFinalize',
+                    params: ({ context }) => ({
+                      show: context.show
+                    })
+                  }
+                },
+                {
+                  actions: [
+                    {
+                      type: 'receiveResolution',
+                      params: ({ context, event }) => ({
+                        show: context.show,
+                        decision: event.decision
+                      })
+                    }
+                  ],
+                  target: 'inEscrow',
+                  guard: {
+                    type: 'disputesResolved',
+                    params: ({ context, event }) => ({
+                      show: context.show,
+                      event
+                    })
+                  }
+                },
+                {
+                  actions: [
+                    {
+                      type: 'receiveResolution',
+                      params: ({ context, event }) => ({
+                        show: context.show,
+                        decision: event.decision
+                      })
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      },
+      finalized: {
+        type: 'final',
+        entry: [
+          {
+            type: 'deactivateShow',
+            params: ({ context }) => ({ show: context.show })
+          }
+        ]
+      },
+      boxOfficeOpen: {
+        on: {
+          'CANCELLATION INITIATED': [
+            {
+              target: 'cancelled',
+              guard: {
+                type: 'canCancel',
+                params: ({ context }) => ({
+                  show: context.show
+                })
+              },
+              actions: [
+                {
+                  type: 'initiateCancellation',
+                  params: ({ context, event }) => ({
+                    show: context.show,
+                    cancel: event.cancel
+                  })
+                },
+                {
+                  type: 'cancelShow',
+                  params: ({ context }) => ({
+                    show: context.show
+                  })
+                }
+              ]
+            },
+            {
+              target: 'initiatedCancellation',
+              actions: [
+                {
+                  type: 'initiateCancellation',
+                  params: ({ context, event }) => ({
+                    show: context.show,
+                    cancel: event.cancel
+                  })
+                }
+              ]
+            }
+          ],
+          'TICKET RESERVED': [
+            {
+              target: 'boxOfficeClosed',
+              guard: {
+                type: 'soldOut',
+                params: ({ context }) => ({
+                  show: context.show
+                })
+              },
+              actions: [
+                {
+                  type: 'reserveTicket',
+                  params: ({ context, event }) => ({
+                    show: context.show,
+                    ticket: event.ticket
+                  })
+                },
+                {
+                  type: 'closeBoxOffice',
+                  params: ({ context }) => ({
+                    show: context.show
+                  })
+                }
+              ]
+            },
+            {
+              actions: [
+                {
+                  type: 'reserveTicket',
+                  params: ({ context, event }) => ({
+                    show: context.show,
+                    ticket: event.ticket
+                  })
+                }
+              ]
+            }
+          ],
+          'TICKET CANCELLED': {
+            actions: [
+              {
+                type: 'cancelTicket',
+                params: ({ context, event }) => ({
+                  show: context.show,
+                  ticket: event.ticket
+                })
+              }
+            ]
+          },
+          'TICKET SOLD': {
+            actions: [
+              {
+                type: 'sellTicket',
+                params: ({ context, event }) => ({
+                  show: context.show,
+                  ticket: event.ticket
+                })
+              }
+            ]
+          },
+          'SHOW STARTED': {
+            target: 'started',
+            guard: {
+              type: 'canStartShow',
+              params: ({ context }) => ({
+                show: context.show
+              })
+            },
+            actions: [
+              {
+                type: 'startShow',
+                params: ({ context }) => ({
+                  show: context.show
+                })
+              }
+            ]
+          },
+          'TICKET REFUNDED': [
+            {
+              actions: [
+                {
+                  type: 'refundTicket',
+                  params: ({ context, event }) => ({
+                    show: context.show,
+                    ticket: event.ticket
+                  })
+                }
+              ]
+            }
+          ]
+        }
+      },
+      boxOfficeClosed: {
+        on: {
+          'SHOW STARTED': {
+            guard: {
+              type: 'canStartShow',
+              params: ({ context }) => ({
+                show: context.show
+              })
+            },
+            target: 'started',
+            actions: [
+              {
+                type: 'startShow',
+                params: ({ context }) => ({
+                  show: context.show
+                })
+              }
+            ]
+          },
+          'TICKET CANCELLED': [
+            {
+              target: 'boxOfficeOpen',
+              actions: [
+                {
+                  type: 'openBoxOffice',
+                  params: ({ context }) => ({
+                    show: context.show
+                  })
+                },
+                {
+                  type: 'cancelTicket',
+                  params: ({ context, event }) => ({
+                    show: context.show,
+                    ticket: event.ticket
+                  })
+                }
+              ]
+            }
+          ],
+          'TICKET SOLD': {
+            actions: [
+              {
+                type: 'sellTicket',
+                params: ({ context, event }) => ({
+                  show: context.show,
+                  ticket: event.ticket
+                })
+              }
+            ]
+          },
+          'TICKET REFUNDED': [
+            {
+              actions: [
+                {
+                  type: 'openBoxOffice',
+                  params: ({ context }) => ({
+                    show: context.show
+                  })
+                },
+                {
+                  type: 'refundTicket',
+                  params: ({ context, event }) => ({
+                    show: context.show,
+                    ticket: event.ticket
+                  })
+                }
+              ],
+              target: 'boxOfficeOpen'
+            }
+          ],
+          'CANCELLATION INITIATED': [
+            {
+              target: 'cancelled',
+              guard: {
+                type: 'canCancel',
+                params: ({ context }) => ({ show: context.show })
+              },
+              actions: [
+                {
+                  type: 'initiateCancellation',
+                  params: ({ context, event }) => ({
+                    show: context.show,
+                    cancel: event.cancel
+                  })
+                },
+                {
+                  type: 'cancelShow',
+                  params: ({ context }) => ({
+                    show: context.show
+                  })
+                }
+              ]
+            },
+            {
+              target: 'initiatedCancellation',
+              actions: [
+                {
+                  type: 'initiateCancellation',
+                  params: ({ context, event }) => ({
+                    show: context.show,
+                    cancel: event.cancel
+                  })
+                }
+              ]
+            }
+          ]
+        }
+      },
+      started: {
+        on: {
+          'SHOW STARTED': {
+            actions: [
+              {
+                type: 'startShow',
+                params: ({ context }) => ({
+                  show: context.show
+                })
+              }
+            ]
+          },
+          'TICKET REDEEMED': {
+            actions: [
+              {
+                type: 'redeemTicket',
+                params: ({ context, event }) => ({
+                  show: context.show,
+                  ticket: event.ticket
+                })
+              }
+            ]
+          },
+          'CUSTOMER JOINED': {},
+          'CUSTOMER LEFT': {},
+          'SHOW STOPPED': {
+            target: 'stopped',
+            actions: [
+              {
+                type: 'stopShow',
+                params: ({ context }) => ({
+                  show: context.show
+                })
+              }
+            ]
+          }
+        }
+      },
+      stopped: {
+        on: {
+          'SHOW STARTED': {
+            target: 'started',
+            actions: [
+              {
+                type: 'startShow',
+                params: ({ context }) => ({
+                  show: context.show
+                })
+              }
+            ],
+            guard: {
+              type: 'canStartShow',
+              params: ({ context }) => ({
+                show: context.show
+              })
+            }
+          },
+          'SHOW ENDED': {
+            target: 'ended.inEscrow',
+            actions: [
+              {
+                type: 'endShow',
+                params: ({ context }) => ({
+                  show: context.show
+                })
+              }
+            ]
+          }
+        }
+      },
+      initiatedCancellation: {
+        initial: 'waiting2Refund',
+        states: {
+          waiting2Refund: {
+            on: {
+              'REFUND INITIATED': {
+                target: 'initiatedRefund',
+                actions: [
+                  {
+                    type: 'initiateRefund',
+                    params: ({ context }) => ({
+                      show: context.show
+                    })
+                  }
+                ]
+              }
+            }
+          },
+          initiatedRefund: {
+            on: {
+              'TICKET REFUNDED': [
+                {
+                  target: '#showMachine.cancelled',
+                  guard: {
+                    type: 'fullyRefunded',
+                    params: ({ context, event }) => ({
+                      show: context.show,
+                      event
+                    })
+                  },
+                  actions: [
+                    {
+                      type: 'refundTicket',
+                      params: ({ context, event }) => ({
+                        show: context.show,
+                        ticket: event.ticket
+                      })
+                    },
+                    {
+                      type: 'cancelShow',
+                      params: ({ context }) => ({
+                        show: context.show
+                      })
+                    }
+                  ]
+                },
+                {
+                  actions: [
+                    {
+                      type: 'refundTicket',
+                      params: ({ context, event }) => ({
+                        show: context.show,
+                        ticket: event.ticket
+                      })
+                    }
+                  ]
+                }
+              ]
+            }
+          }
         }
       }
     }
-  );
+  });
+};
+
+const createShowEvent = (show: ShowDocument, event: AnyEventObject) => {
+  if (event.type === 'xstate.stop') return;
+
+  let ticketId: string | undefined;
+  let customerName = 'someone';
+  if ('ticket' in event) {
+    const ticket = event.ticket as TicketDocument;
+    ticketId = ticket._id.toString();
+    customerName = ticket.user.name;
+  } else if ('customerName' in event) {
+    customerName = event.customerName as string;
+  }
+  const transaction = (
+    'transaction' in event ? event.transaction : undefined
+  ) as TransactionDocument | undefined;
+  const ticketInfo = { customerName };
+  show.saveShowEvent(event.type, ticketId, transaction, ticketInfo);
 };
 
 export { createShowMachine };
 export const createShowMachineService = ({
-  showDocument,
+  show,
   showMachineOptions
 }: {
-  showDocument: ShowDocument;
+  show: ShowDocument;
   showMachineOptions?: ShowMachineOptions;
 }) => {
-  const showMachine = createShowMachine({ showDocument, showMachineOptions });
-  showMachine;
-  const showService = interpret(showMachine).start();
+  const showMachine = createShowMachine({ show, showMachineOptions });
 
-  if (showMachineOptions?.saveStateCallback) {
-    showService.onChange((context) => {
-      showMachineOptions.saveStateCallback &&
-        showMachineOptions.saveStateCallback(context.showState);
-    });
-  }
-
-  if (showMachineOptions?.saveShowEventCallback) {
-    showService.onEvent((event) => {
-      if (event.type === 'xstate.stop') return;
-      let ticketId: string | undefined;
-      let customerName = 'someone';
-      if ('ticket' in event) {
-        const ticket = event.ticket as TicketDocument;
-        ticketId = ticket._id.toString();
-        customerName = ticket.user.name;
-      } else if ('customerName' in event) {
-        customerName = event.customerName as string;
+  const showService = createActor(showMachine, {
+    inspect: (inspectionEvent) => {
+      if (showMachineOptions?.saveShowEvents) {
+        if (inspectionEvent.type === '@xstate.event')
+          createShowEvent(show, inspectionEvent.event);
       }
+    }
+  }).start();
 
-      const transaction = (
-        'transaction' in event ? event.transaction : undefined
-      ) as TransactionDocument | undefined;
-      const ticketInfo = { customerName };
-
-      showMachineOptions.saveShowEventCallback &&
-        showMachineOptions.saveShowEventCallback({
-          type: event.type,
-          ticketId,
-          transaction,
-          ticketInfo
-        });
+  if (showMachineOptions?.saveState)
+    showService.subscribe((state) => {
+      if (state.context.show.save) {
+        state.context.show.save();
+      }
     });
-  }
 
   return showService;
 };

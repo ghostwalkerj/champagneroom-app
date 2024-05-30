@@ -25,7 +25,6 @@
     validationMethod: 'submit-only',
     dataType: 'json',
     onResult({ result }) {
-      console.log(result);
       if (result.type === 'success') {
         switch (true) {
           case result.data!.showCreated: {

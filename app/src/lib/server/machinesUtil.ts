@@ -2,13 +2,7 @@ import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 import mongoose, { Error } from 'mongoose';
 
-import { SaveState, type ShowDocument } from '$lib/models/show';
-import { createShowEvent } from '$lib/models/showEvent';
-import {
-  Ticket,
-  type TicketDocument,
-  type TicketStateType
-} from '$lib/models/ticket';
+import { type TicketDocument } from '$lib/models/ticket';
 import type { WalletDocument } from '$lib/models/wallet';
 import { atomicUpdateCallback } from '$lib/models/wallet';
 
@@ -20,21 +14,6 @@ import type { ShowQueueType } from '$lib/workers/showWorker';
 
 import { EntityType } from '$lib/constants';
 
-export const getShowMachineService = (show: ShowDocument) => {
-  return createShowMachineService({
-    showDocument: show,
-    showMachineOptions: {
-      saveStateCallback: async (showState) => SaveState(show, showState),
-      saveShowEventCallback: async ({
-        type,
-        ticketId,
-        transaction,
-        ticketInfo
-      }) => createShowEvent({ show, type, ticketId, transaction, ticketInfo })
-    }
-  });
-};
-
 export const getShowMachineServiceFromId = async (showId: string) => {
   const show = await mongoose
     .model('Show')
@@ -43,7 +22,7 @@ export const getShowMachineServiceFromId = async (showId: string) => {
       throw new Error('Show not found');
     })
     .exec();
-  return getShowMachineService(show);
+  return createShowMachineService(show);
 };
 
 export const getTicketMachineService = (
@@ -51,9 +30,7 @@ export const getTicketMachineService = (
   connection: ShowQueueType | IORedis
 ) => {
   const ticketMachineOptions = {
-    saveStateCallback: (ticketState: TicketStateType) => {
-      Ticket.updateOne({ _id: ticket._id }, { $set: { ticketState } }).exec();
-    },
+    saveState: true,
     showQueue:
       connection instanceof Queue
         ? connection
@@ -61,7 +38,7 @@ export const getTicketMachineService = (
   };
 
   return createTicketMachineService({
-    ticketDocument: ticket,
+    ticket,
     ticketMachineOptions
   });
 };

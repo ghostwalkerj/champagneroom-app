@@ -51,7 +51,13 @@ const abstractUpdateStore = <T extends { _id?: any }>({
     });
 
     return () => {
-      abortDocument?.abort();
+      try {
+        abortDocument.abort('Unsubscribe');
+      } catch (error) {
+        if (error != 'Unsubscribe') {
+          console.error(error);
+        }
+      }
     };
   });
   return {
@@ -95,7 +101,6 @@ const getUpdateNotification = <T>({
       );
       if (error) {
         shouldLoop = false;
-        console.error(error);
       } else {
         try {
           const jsonResponse = await response.json();
@@ -132,14 +137,12 @@ const getInsertNotification = <T>({
     let shouldLoop = true;
     while (shouldLoop) {
       const signal = abortDocument.signal;
-
       const [error, response] = await to(
         fetch(path, {
           signal
         })
       );
       if (error) {
-        console.error(error);
         shouldLoop = false;
       } else {
         try {
@@ -179,7 +182,13 @@ export const ShowEventStore = (show: ShowDocument) => {
       });
 
       return () => {
-        abortShowEvent.abort();
+        try {
+          abortShowEvent.abort('Unsubscribe');
+        } catch (error) {
+          if (error != 'Unsubscribe') {
+            console.error(error);
+          }
+        }
       };
     }
   );

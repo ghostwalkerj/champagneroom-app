@@ -24,7 +24,6 @@
     DisputeReason,
     RefundReason,
     ShowStatus,
-    TicketMachineEventString,
     TicketStatus
   } from '$lib/constants';
   import { InvoiceStatus, type PaymentType } from '$lib/payout';
@@ -156,15 +155,15 @@
     ticketMachineService: TicketMachineServiceType
   ) => {
     const state = ticketMachineService.getSnapshot();
-    shouldPay = state.matches('reserved.waiting4Payment');
+    shouldPay = state.matches({reserved: 'waiting4Payment'});
     canWatchShow =
-      state.matches('reserved.waiting4Show') || state.matches('redeemed');
+      state.matches({reserved: 'waiting4Show'}) || state.matches('redeemed');
     hasPaymentSent =
-      state.matches('reserved.initiatedPayment') &&
+      state.matches({reserved : 'initiatedPayment'}) &&
       invoice.status !== InvoiceStatus.COMPLETE;
     canCancelTicket =
-      (state.matches('reserved.waiting4Show') ||
-        state.matches('reserved.waiting4Payment')) &&
+      (state.matches({reserved : 'waiting4Show'}) ||
+        state.matches({reserved: 'waiting4Payment'})) &&
       !hasShowStarted;
     canLeaveFeedback = state.can({
       type: 'FEEDBACK RECEIVED',
@@ -185,11 +184,11 @@
       })
     });
     isWaitingForShow =
-      state.can(TicketMachineEventString.SHOW_JOINED) ||
-      state.can(TicketMachineEventString.TICKET_REDEEMED);
+      state.can({type: 'SHOW JOINED'}) ||
+      state.can({type: 'TICKET REDEEMED'})
 
-    isTicketDone = state.done ?? false;
-    if (state.done) {
+    isTicketDone = state.status === 'done' ?? false;
+    if (isTicketDone) {
       showUnSub?.();
       ticketUnSub?.();
     }
@@ -247,7 +246,7 @@
       isTicketDone = false;
       ticketMachineService?.stop();
       ticketMachineService = createTicketMachineService({
-        ticketDocument: ticket
+        ticket
       });
       useTicketMachine(ticketMachineService);
       ticketUnSub?.();
@@ -256,7 +255,7 @@
           ticket = _ticket;
           ticketMachineService?.stop();
           ticketMachineService = createTicketMachineService({
-            ticketDocument: ticket
+            ticket
           });
           useTicketMachine(ticketMachineService);
 
@@ -269,7 +268,7 @@
               ticket = $page.data.ticket as TicketDocument;
               ticketMachineService?.stop();
               ticketMachineService = createTicketMachineService({
-                ticketDocument: ticket
+                ticket
               });
               useTicketMachine(ticketMachineService);
             }

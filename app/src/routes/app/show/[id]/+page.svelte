@@ -2,6 +2,8 @@
   import type { ModalSettings } from '@skeletonlabs/skeleton';
   import { getModalStore } from '@skeletonlabs/skeleton';
 
+  import type { ShowDocument } from '$lib/models/show';
+
   import config from '$lib/config';
   import { ShowStatus } from '$lib/constants';
   import getProfileImage from '$lib/profilePhoto';
@@ -15,7 +17,7 @@
 
   const modalStore = getModalStore();
 
-  let show = data.show;
+  let show = data.show as ShowDocument;
   let displayName = data.displayName;
   let isBuyingTicket = false;
 
