@@ -96,8 +96,7 @@ const transactionSummarySchema = z.object({
 });
 
 export const finalizeSchema = z.object({
-  finalizedAt: z.coerce.date().default(() => new Date()),
-  finalizedBy: z.nativeEnum(ActorType)
+  finalizedAt: z.coerce.date().default(() => new Date())
 });
 
 export const moneySchema = z.object({
