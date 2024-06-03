@@ -24,7 +24,7 @@ import { DisputeDecision, EntityType, ShowStatus } from '$lib/constants';
 import type { ShowQueueType } from '$lib/workers/showWorker';
 import { Queue } from 'bullmq';
 
-/* #region Event Types */
+//#region Event Types
 export type ShowMachineEventType =
   | {
       type: 'CANCELLATION INITIATED';
@@ -87,7 +87,7 @@ export type ShowMachineEventType =
       ticket: TicketDocument;
       decision: DisputeDecision;
     };
-/* #endregion */
+//endregion
 
 export type ShowMachineOptions = {
   saveState: boolean;
@@ -114,7 +114,7 @@ type ShowMachineContext = {
   showQueue: ShowQueueType | undefined;
 };
 
-const showMachine = setup({
+export const showMachine = setup({
   types: {
     events: {} as ShowMachineEventType,
     context: {} as ShowMachineContext,
