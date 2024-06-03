@@ -120,11 +120,7 @@ export const actions: Actions = {
     if (!show) {
       throw error(404, 'Show not found');
     }
-    const showQueue = new Queue(EntityType.SHOW, {
-      connection: redisConnection
-    }) as ShowQueueType;
-
-    const showService = createShowMachineService({ show });
+    const showService = createShowMachineService({ show, redisConnection });
     const showMachineState = showService.getSnapshot();
 
     const cancel = {
@@ -139,13 +135,8 @@ export const actions: Actions = {
     } as ShowMachineEventType;
 
     if (showMachineState.can(cancelEvent)) {
-      showQueue.add('CANCELLATION INITIATED', {
-        showId: show._id.toString(),
-        cancel
-      });
+      showService.send(cancelEvent);
     }
-
-    showQueue.close();
     showService.stop();
 
     return {
@@ -247,20 +238,15 @@ export const actions: Actions = {
     if (!show) {
       throw error(404, 'Show not found');
     }
-    const connection = locals.redisConnection;
-    const showQueue = new Queue(EntityType.SHOW, {
-      connection
-    }) as ShowQueueType;
-
-    const showService = createShowMachineService({ show });
+    const showService = createShowMachineService({
+      show,
+      redisConnection: locals.redisConnection
+    });
     const showState = showService.getSnapshot();
-
     if (!showState.matches('started'))
-      showQueue.add('SHOW STARTED', {
-        showId: show._id.toString()
+      showService.send({
+        type: 'SHOW STARTED'
       });
-
-    showQueue.close();
     showService.stop();
   },
   upsert_room: async ({ request, locals }) => {

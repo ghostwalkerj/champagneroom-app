@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
+import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 import { nanoid } from 'nanoid';
 import {
@@ -20,9 +21,9 @@ import type { ShowDocument } from '$lib/models/show';
 import type { TicketDocument } from '$lib/models/ticket';
 import type { TransactionDocument } from '$lib/models/transaction';
 
-import { DisputeDecision, EntityType, ShowStatus } from '$lib/constants';
 import type { ShowQueueType } from '$lib/workers/showWorker';
-import { Queue } from 'bullmq';
+
+import { DisputeDecision, EntityType, ShowStatus } from '$lib/constants';
 
 //#region Event Types
 export type ShowMachineEventType =
@@ -87,8 +88,14 @@ export type ShowMachineEventType =
       ticket: TicketDocument;
       decision: DisputeDecision;
     };
-//endregion
 
+export type ShowMachineInput = {
+  show: ShowDocument;
+  redisConnection?: IORedis;
+  options?: Partial<ShowMachineOptions>;
+};
+
+//endregion
 export type ShowMachineOptions = {
   saveState: boolean;
   saveShowEvents: boolean;
@@ -100,12 +107,6 @@ export type ShowMachineServiceType = ReturnType<
   typeof createShowMachineService
 >;
 
-export type ShowMachineInput = {
-  show: ShowDocument;
-  redisConnection?: IORedis;
-  options?: ShowMachineOptions;
-};
-
 type ShowMachineContext = {
   show: ShowDocument;
   id: string;
@@ -114,6 +115,50 @@ type ShowMachineContext = {
   showQueue: ShowQueueType | undefined;
 };
 
+export type ShowMachineStateType = StateFrom<typeof showMachine>;
+
+const createShowEvent = (show: ShowDocument, event: AnyEventObject) => {
+  if (event.type === 'xstate.stop') return;
+
+  let ticketId: string | undefined;
+  let customerName = 'someone';
+  if ('ticket' in event) {
+    const ticket = event.ticket as TicketDocument;
+    ticketId = ticket._id.toString();
+    customerName = ticket.user.name;
+  } else if ('customerName' in event) {
+    customerName = event.customerName as string;
+  }
+  const transaction = (
+    'transaction' in event ? event.transaction : undefined
+  ) as TransactionDocument | undefined;
+  const ticketInfo = { customerName };
+  show.saveShowEvent(event.type, ticketId, transaction, ticketInfo);
+};
+
+export type ShowMachineType = typeof showMachine;
+
+export const createShowMachineService = (input: ShowMachineInput) => {
+  const showService = createActor(showMachine, {
+    input,
+    inspect: (inspectionEvent) => {
+      if (
+        input.options?.saveShowEvents &&
+        inspectionEvent.type === '@xstate.event'
+      )
+        createShowEvent(input.show, inspectionEvent.event);
+    }
+  }).start();
+
+  if (input.options?.saveState)
+    showService.subscribe((state) => {
+      if (state.context.show.save) {
+        state.context.show.save();
+      }
+    });
+
+  return showService;
+};
 export const showMachine = setup({
   types: {
     events: {} as ShowMachineEventType,
@@ -121,36 +166,36 @@ export const showMachine = setup({
     input: {} as ShowMachineInput
   },
   actions: {
-    closeBoxOffice: (_, params: { show: ShowDocument }) =>
+    closeBoxOffice: (_, parameters: { show: ShowDocument }) =>
       assign(() => {
-        const show = params.show;
+        const show = parameters.show;
         show.showState.status = ShowStatus.BOX_OFFICE_CLOSED;
         return {
           show
         };
       }),
 
-    openBoxOffice: (_, params: { show: ShowDocument }) =>
+    openBoxOffice: (_, parameters: { show: ShowDocument }) =>
       assign(() => {
-        const show = params.show;
+        const show = parameters.show;
         show.showState.status = ShowStatus.BOX_OFFICE_OPEN;
         return {
           show
         };
       }),
 
-    cancelShow: (_, params: { show: ShowDocument }) =>
+    cancelShow: (_, parameters: { show: ShowDocument }) =>
       assign(() => {
-        const show = params.show;
+        const show = parameters.show;
         show.showState.status = ShowStatus.CANCELLED;
         return {
           show
         };
       }),
 
-    startShow: (_, params: { show: ShowDocument }) =>
+    startShow: (_, parameters: { show: ShowDocument }) =>
       assign(() => {
-        const show = params.show;
+        const show = parameters.show;
         show.showState.status = ShowStatus.LIVE;
         show.showState.runtime = runtimeSchema.parse({
           startDate: new Date()
@@ -162,13 +207,13 @@ export const showMachine = setup({
 
     endShow: (
       _,
-      params: {
+      parameters: {
         show: ShowDocument;
         showQueue?: ShowQueueType;
       }
     ) => {
       assign(() => {
-        const show = params.show;
+        const show = parameters.show;
         show.showState.status = ShowStatus.IN_ESCROW;
         show.showState.escrow = escrowSchema.parse({});
         show.showState.current = false;
@@ -176,16 +221,16 @@ export const showMachine = setup({
           show
         };
       });
-      if (params.showQueue) {
-        params.showQueue.add('END SHOW', {
-          showId: params.show._id.toString()
+      if (parameters.showQueue) {
+        parameters.showQueue.add('END SHOW', {
+          showId: parameters.show._id.toString()
         });
       }
     },
 
-    stopShow: (_, params: { show: ShowDocument }) =>
+    stopShow: (_, parameters: { show: ShowDocument }) =>
       assign(() => {
-        const show = params.show;
+        const show = parameters.show;
         const startDate = show.showState.runtime?.startDate;
         if (!startDate) {
           throw new Error('Show start date is not defined');
@@ -200,57 +245,57 @@ export const showMachine = setup({
 
     initiateCancellation: (
       _,
-      params: {
+      parameters: {
         show: ShowDocument;
         cancel: CancelType;
         showQueue?: ShowQueueType;
       }
     ) => {
       assign(() => {
-        const show = params.show;
+        const show = parameters.show;
         show.showState.status = ShowStatus.CANCELLATION_INITIATED;
-        show.showState.cancel = params.cancel;
+        show.showState.cancel = parameters.cancel;
         show.showState.salesStats.ticketsAvailable = 0;
         return { show };
       });
-      if (params.showQueue) {
-        params.showQueue.add('CANCEL TICKETS', {
-          showId: params.show._id.toString(),
-          cancel: params.cancel
+      if (parameters.showQueue) {
+        parameters.showQueue.add('CANCEL TICKETS', {
+          showId: parameters.show._id.toString(),
+          cancel: parameters.cancel
         });
       }
     },
 
     initiateRefund: (
       _,
-      params: {
+      parameters: {
         show: ShowDocument;
         showQueue?: ShowQueueType;
       }
     ) => {
       assign(() => {
-        const show = params.show;
+        const show = parameters.show;
         show.showState.status = ShowStatus.REFUND_INITIATED;
         return { show };
       });
 
-      if (params.showQueue) {
-        params.showQueue.add('REFUND TICKETS', {
-          showId: params.show._id.toString()
+      if (parameters.showQueue) {
+        parameters.showQueue.add('REFUND TICKETS', {
+          showId: parameters.show._id.toString()
         });
       }
     },
 
     receiveDispute: (
       _,
-      params: {
+      parameters: {
         show: ShowDocument;
         ticket: TicketDocument;
       }
     ) =>
       assign(() => {
-        const show = params.show;
-        const ticket = params.ticket;
+        const show = parameters.show;
+        const ticket = parameters.ticket;
         show.showState.status = ShowStatus.IN_DISPUTE;
         show.showState.disputes.push(ticket._id);
         show.$inc('showState.disputeStats.totalDisputes', 1);
@@ -260,14 +305,15 @@ export const showMachine = setup({
 
     receiveResolution: (
       _,
-      params: {
+      parameters: {
         show: ShowDocument;
         decision: DisputeDecision;
       }
     ) =>
       assign(() => {
-        const show = params.show;
-        const refunded = params.decision === DisputeDecision.NO_REFUND ? 0 : 1;
+        const show = parameters.show;
+        const refunded =
+          parameters.decision === DisputeDecision.NO_REFUND ? 0 : 1;
         show.$inc('showState.disputeStats.totalDisputesPending', -1);
         show.$inc('showState.disputeStats.totalDisputesResolved', 1);
         show.$inc('showState.disputeStats.totalDisputesRefunded', refunded);
@@ -276,23 +322,23 @@ export const showMachine = setup({
 
     refundTicket: (
       _,
-      params: {
+      parameters: {
         show: ShowDocument;
         ticket: TicketDocument;
       }
     ) =>
       assign(() => {
-        const show = params.show;
+        const show = parameters.show;
         show.$inc('showState.salesStats.ticketsRefunded', 1);
         show.$inc('showState.salesStats.ticketsSold', -1);
         show.$inc('showState.salesStats.ticketsAvailable', 1);
-        show.showState.refunds.push(params.ticket._id);
+        show.showState.refunds.push(parameters.ticket._id);
         return { show };
       }),
 
-    deactivateShow: (_, params: { show: ShowDocument }) =>
+    deactivateShow: (_, parameters: { show: ShowDocument }) =>
       assign(() => {
-        const show = params.show;
+        const show = parameters.show;
         show.showState.active = false;
         show.showState.current = false;
         return { show };
@@ -300,14 +346,14 @@ export const showMachine = setup({
 
     cancelTicket: (
       _,
-      params: {
+      parameters: {
         show: ShowDocument;
         ticket: TicketDocument;
       }
     ) =>
       assign(() => {
-        const show = params.show;
-        show.showState.cancellations.push(params.ticket._id);
+        const show = parameters.show;
+        show.showState.cancellations.push(parameters.ticket._id);
         show.$inc('showState.salesStats.ticketsAvailable', 1);
         show.$inc('showState.salesStats.ticketsReserved', -1);
         return { show };
@@ -315,14 +361,14 @@ export const showMachine = setup({
 
     reserveTicket: (
       _,
-      params: {
+      parameters: {
         show: ShowDocument;
         ticket: TicketDocument;
       }
     ) =>
       assign(() => {
-        const show = params.show;
-        show.showState.reservations.push(params.ticket._id);
+        const show = parameters.show;
+        show.showState.reservations.push(parameters.ticket._id);
         show.$inc('showState.salesStats.ticketsAvailable', -1);
         show.$inc('showState.salesStats.ticketsReserved', 1);
         return { show };
@@ -330,50 +376,50 @@ export const showMachine = setup({
 
     redeemTicket: (
       _,
-      params: {
+      parameters: {
         show: ShowDocument;
         ticket: TicketDocument;
       }
     ) =>
       assign(() => {
-        const show = params.show;
+        const show = parameters.show;
         show.$inc('showState.salesStats.ticketsRedeemed', 1);
-        show.showState.redemptions.push(params.ticket._id);
+        show.showState.redemptions.push(parameters.ticket._id);
         return { show };
       }),
 
     finalizeTicket: (
       _,
-      params: {
+      parameters: {
         show: ShowDocument;
         ticket: TicketDocument;
       }
     ) =>
       assign(() => {
-        const show = params.show;
+        const show = parameters.show;
         show.$inc('showState.salesStats.ticketsFinalized', 1);
-        show.showState.finalizations.push(params.ticket._id);
+        show.showState.finalizations.push(parameters.ticket._id);
         return { show };
       }),
 
     sellTicket: (
       _,
-      params: {
+      parameters: {
         show: ShowDocument;
         ticket: TicketDocument;
       }
     ) =>
       assign(() => {
-        const show = params.show;
+        const show = parameters.show;
         show.$inc('showState.salesStats.ticketsSold', 1);
         show.$inc('showState.salesStats.ticketsReserved', -1);
-        show.showState.sales.push(params.ticket._id);
+        show.showState.sales.push(parameters.ticket._id);
         return { show };
       }),
 
     finalizeShow: (
       _,
-      params: {
+      parameters: {
         show: ShowDocument;
         showQueue?: ShowQueueType;
       }
@@ -382,7 +428,7 @@ export const showMachine = setup({
         finalizedAt: new Date()
       };
       assign(() => {
-        const show = params.show;
+        const show = parameters.show;
         show.showState.status = ShowStatus.FINALIZED;
         show.showState.finalize = finalize;
         if (!show.showState.escrow)
@@ -392,16 +438,16 @@ export const showMachine = setup({
         show.showState.escrow.endedAt = new Date();
         return { show };
       });
-      if (params.showQueue) {
-        params.showQueue.add('CALCULATE STATS', {
-          showId: params.show._id.toString()
+      if (parameters.showQueue) {
+        parameters.showQueue.add('CALCULATE STATS', {
+          showId: parameters.show._id.toString()
         });
       }
     }
   },
   guards: {
-    canCancel: (_, params: { show: ShowDocument }) => {
-      const show = params.show;
+    canCancel: (_, parameters: { show: ShowDocument }) => {
+      const show = parameters.show;
       return (
         show.price.amount === 0 ||
         show.showState.salesStats.ticketsSold -
@@ -409,65 +455,65 @@ export const showMachine = setup({
           0
       );
     },
-    showCancelled: (_, params: { show: ShowDocument }) =>
-      params.show.showState.status === ShowStatus.CANCELLED,
-    showFinalized: (_, params: { show: ShowDocument }) =>
-      params.show.showState.status === ShowStatus.FINALIZED,
-    showInitiatedCancellation: (_, params: { show: ShowDocument }) =>
-      params.show.showState.status === ShowStatus.CANCELLATION_INITIATED,
-    showInitiatedRefund: (_, params: { show: ShowDocument }) =>
-      params.show.showState.status === ShowStatus.REFUND_INITIATED,
-    showBoxOfficeOpen: (_, params: { show: ShowDocument }) =>
-      params.show.showState.status === ShowStatus.BOX_OFFICE_OPEN,
-    showBoxOfficeClosed: (_, params: { show: ShowDocument }) =>
-      params.show.showState.status === ShowStatus.BOX_OFFICE_CLOSED,
-    showStarted: (_, params: { show: ShowDocument }) =>
-      params.show.showState.status === ShowStatus.LIVE,
-    showStopped: (_, params: { show: ShowDocument }) =>
-      params.show.showState.status === ShowStatus.STOPPED,
-    showInEscrow: (_, params: { show: ShowDocument }) =>
-      params.show.showState.status === ShowStatus.IN_ESCROW,
-    showInDispute: (_, params: { show: ShowDocument }) =>
-      params.show.showState.status === ShowStatus.IN_DISPUTE,
-    soldOut: (_, params: { show: ShowDocument }) =>
-      params.show.showState.salesStats.ticketsAvailable === 1,
+    showCancelled: (_, parameters: { show: ShowDocument }) =>
+      parameters.show.showState.status === ShowStatus.CANCELLED,
+    showFinalized: (_, parameters: { show: ShowDocument }) =>
+      parameters.show.showState.status === ShowStatus.FINALIZED,
+    showInitiatedCancellation: (_, parameters: { show: ShowDocument }) =>
+      parameters.show.showState.status === ShowStatus.CANCELLATION_INITIATED,
+    showInitiatedRefund: (_, parameters: { show: ShowDocument }) =>
+      parameters.show.showState.status === ShowStatus.REFUND_INITIATED,
+    showBoxOfficeOpen: (_, parameters: { show: ShowDocument }) =>
+      parameters.show.showState.status === ShowStatus.BOX_OFFICE_OPEN,
+    showBoxOfficeClosed: (_, parameters: { show: ShowDocument }) =>
+      parameters.show.showState.status === ShowStatus.BOX_OFFICE_CLOSED,
+    showStarted: (_, parameters: { show: ShowDocument }) =>
+      parameters.show.showState.status === ShowStatus.LIVE,
+    showStopped: (_, parameters: { show: ShowDocument }) =>
+      parameters.show.showState.status === ShowStatus.STOPPED,
+    showInEscrow: (_, parameters: { show: ShowDocument }) =>
+      parameters.show.showState.status === ShowStatus.IN_ESCROW,
+    showInDispute: (_, parameters: { show: ShowDocument }) =>
+      parameters.show.showState.status === ShowStatus.IN_DISPUTE,
+    soldOut: (_, parameters: { show: ShowDocument }) =>
+      parameters.show.showState.salesStats.ticketsAvailable === 1,
     canStartShow: (
       _,
-      params: {
+      parameters: {
         show: ShowDocument;
         gracePeriod: number;
       }
     ) => {
-      const st = params.show.showState;
+      const st = parameters.show.showState;
       if (st.status === ShowStatus.STOPPED) {
         // Allow grace period to start show again
         if (!st.runtime!.startDate) {
           return false;
         }
         const startDate = new Date(st.runtime!.startDate);
-        return (startDate.getTime() ?? 0) + params.gracePeriod > Date.now();
+        return (startDate.getTime() ?? 0) + parameters.gracePeriod > Date.now();
       }
       return st.salesStats.ticketsSold > 0;
     },
     fullyRefunded: (
       _,
-      params: {
+      parameters: {
         show: ShowDocument;
         event: ShowMachineEventType;
       }
     ) => {
-      const refunded = params.event.type === 'TICKET REFUNDED' ? 1 : 0;
-      return params.show.showState.salesStats.ticketsSold - refunded === 0;
+      const refunded = parameters.event.type === 'TICKET REFUNDED' ? 1 : 0;
+      return parameters.show.showState.salesStats.ticketsSold - refunded === 0;
     },
     canFinalize: (
       _,
-      params: {
+      parameters: {
         show: ShowDocument;
         escrowPeriod: number;
       }
     ) => {
       let startTime = 0;
-      const show = params.show;
+      const show = parameters.show;
       const startedAt = show.showState.escrow?.startedAt;
       if (startedAt) {
         startTime = new Date(startedAt).getTime();
@@ -476,21 +522,23 @@ export const showMachine = setup({
         show.showState.salesStats.ticketsSold -
           show.showState.salesStats.ticketsFinalized >
         0;
-      const escrowTime = 0 + params.escrowPeriod + startTime;
+      const escrowTime = 0 + parameters.escrowPeriod + startTime;
       const hasDisputes = show.showState.disputeStats.totalDisputesPending > 0;
       const escrowOver = escrowTime < Date.now();
       return escrowOver || (!hasDisputes && !hasUnfinalizedTickets);
     },
     disputesResolved: (
       _,
-      params: {
+      parameters: {
         show: ShowDocument;
         event: ShowMachineEventType;
       }
     ) => {
-      const resolved = params.event.type === 'DISPUTE DECIDED' ? 1 : 0;
+      const resolved = parameters.event.type === 'DISPUTE DECIDED' ? 1 : 0;
       return (
-        params.show.showState.disputeStats.totalDisputesPending - resolved === 0
+        parameters.show.showState.disputeStats.totalDisputesPending -
+          resolved ===
+        0
       );
     }
   }
@@ -513,6 +561,11 @@ export const showMachine = setup({
   }),
   id: 'showMachine',
   initial: 'showLoaded',
+  exit: ({ context }) => {
+    if (context.showQueue) {
+      context.showQueue.close();
+    }
+  },
   states: {
     showLoaded: {
       always: [
@@ -1059,46 +1112,3 @@ export const showMachine = setup({
     }
   }
 });
-
-const createShowEvent = (show: ShowDocument, event: AnyEventObject) => {
-  if (event.type === 'xstate.stop') return;
-
-  let ticketId: string | undefined;
-  let customerName = 'someone';
-  if ('ticket' in event) {
-    const ticket = event.ticket as TicketDocument;
-    ticketId = ticket._id.toString();
-    customerName = ticket.user.name;
-  } else if ('customerName' in event) {
-    customerName = event.customerName as string;
-  }
-  const transaction = (
-    'transaction' in event ? event.transaction : undefined
-  ) as TransactionDocument | undefined;
-  const ticketInfo = { customerName };
-  show.saveShowEvent(event.type, ticketId, transaction, ticketInfo);
-};
-
-export const createShowMachineService = (input: ShowMachineInput) => {
-  const showService = createActor(showMachine, {
-    input,
-    inspect: (inspectionEvent) => {
-      if (input.options?.saveShowEvents) {
-        if (inspectionEvent.type === '@xstate.event')
-          createShowEvent(input.show, inspectionEvent.event);
-      }
-    }
-  }).start();
-
-  if (input.options?.saveState)
-    showService.subscribe((state) => {
-      if (state.context.show.save) {
-        state.context.show.save();
-      }
-    });
-
-  return showService;
-};
-
-export type ShowMachineStateType = StateFrom<typeof showMachine>;
-export type ShowMachineType = typeof showMachine;

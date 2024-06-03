@@ -111,10 +111,6 @@ module.exports = {
         selector: 'variableLike',
         format: ['camelCase', 'UPPER_CASE', 'PascalCase']
       },
-      {
-        selector: 'params',
-        format: ['camelCase']
-      },
 
       {
         selector: 'parameter',
@@ -155,6 +151,14 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'off',
     quotes: [2, 'single', { avoidEscape: true }],
     semi: [2, 'always'],
+    'unicorn/prevent-abbreviations': [
+      'error',
+      {
+        allowList: {
+          params: true
+        }
+      }
+    ],
     '@typescript-eslint/consistent-type-imports': [
       'error',
       {

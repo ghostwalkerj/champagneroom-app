@@ -94,10 +94,6 @@
       showMachineService?.stop();
       showMachineService = createShowMachineService({
         show: currentShow,
-        showMachineOptions: {
-          saveShowEvents: false,
-          saveState: false
-        }
       });
       useShowMachine(showMachineService);
       showUnSub?.();
@@ -106,11 +102,7 @@
           currentShow = _show;
           showMachineService?.stop();
           showMachineService = createShowMachineService({
-            show: _show,
-            showMachineOptions: {
-              saveShowEvents: false,
-              saveState: false
-            }
+            show: _show
           });
           useShowMachine(showMachineService);
         } else {

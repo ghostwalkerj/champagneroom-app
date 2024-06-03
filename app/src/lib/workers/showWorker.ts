@@ -1,7 +1,9 @@
 import type { Job, Queue } from 'bullmq';
 import { Worker } from 'bullmq';
 import type IORedis from 'ioredis';
+import { waitFor } from 'xstate';
 
+import { Agent, type AgentDocument } from '$lib/models/agent';
 import {
   type CancelType,
   finalizeSchema,
@@ -26,19 +28,16 @@ import {
   WalletMachineEventString
 } from '$lib/constants';
 import { PayoutJobType } from '$lib/payout';
-import {
-  getTicketMachineService,
-  getWalletMachineServiceFromId
-} from '$lib/server/machinesUtil';
+import { getWalletMachineServiceFromId } from '$lib/server/machinesUtil';
 
-import { Agent, type AgentDocument } from '$lib/models/agent';
-import { waitFor } from 'xstate';
 import type { PayoutQueueType } from './payoutWorker';
 
 export type ShowJobDataType = {
   showId: string;
   [key: string]: any;
 };
+
+export type ShowQueueType = Queue<ShowJobDataType, any, ShowWorkerJobType>;
 
 export type ShowWorkerJobType =
   | 'CANCEL TICKETS'
@@ -47,8 +46,6 @@ export type ShowWorkerJobType =
   | 'END SHOW'
   | 'CALCULATE STATS'
   | 'DISPUTE DECIDED';
-
-export type ShowQueueType = Queue<ShowJobDataType, any, ShowWorkerJobType>;
 
 export const getShowWorker = ({
   showQueue,
@@ -204,7 +201,7 @@ const endEscrow = async (
     'ticketState.active': true
   })) as TicketDocument[];
   for (const ticket of tickets) {
-    const ticketService = getTicketMachineService(ticket, showQueue);
+    const ticketService = getTicketMachineService(ticket);
     ticketService.send({
       type: 'TICKET FINALIZED',
       finalize

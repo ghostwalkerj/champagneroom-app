@@ -1,4 +1,5 @@
 import type IORedis from 'ioredis';
+import { nanoid } from 'nanoid';
 import {
   type ActorRefFrom,
   assign,
@@ -27,6 +28,7 @@ import {
   ticketSaleSchema,
   transactionSummarySchema
 } from '$lib/models/common';
+import type { ShowDocument } from '$lib/models/show';
 import type { TicketDocument } from '$lib/models/ticket';
 import type { TransactionDocument } from '$lib/models/transaction';
 
@@ -37,9 +39,8 @@ import {
   RefundReason,
   TicketStatus
 } from '$lib/constants';
-import type { ShowDocument } from '$lib/models/show';
 import { calcTotal } from '$lib/payout.js';
-import { nanoid } from 'nanoid';
+
 import {
   showMachine,
   type ShowMachineEventType,
@@ -122,19 +123,38 @@ export type TicketMachineEventType =
       type: 'SHOW UPDATED';
       show: ShowDocument;
     };
-//endregion
-
-export type TicketMachineOptions = {
-  gracePeriod?: number;
-  escrowPeriod?: number;
-  saveState?: boolean;
-};
 
 export type TicketMachineInput = {
   ticket: TicketDocument;
   show: ShowDocument;
   redisConnection?: IORedis;
-  options?: TicketMachineOptions;
+  options?: Partial<TicketMachineOptions>;
+};
+
+//endregion
+export type TicketMachineOptions = {
+  saveState?: boolean;
+};
+
+export type TicketMachineServiceType = ReturnType<
+  typeof createTicketMachineService
+>;
+
+export type TicketMachineType = typeof ticketMachine;
+
+export const createTicketMachineService = (input: TicketMachineInput) => {
+  const ticketService = createActor(ticketMachine, {
+    input
+  }).start();
+
+  if (input.options?.saveState)
+    ticketService.subscribe((state) => {
+      if (state.context.ticket.save) {
+        state.context.ticket.save();
+      }
+    });
+
+  return ticketService;
 };
 
 export const ticketMachine = setup({
@@ -214,7 +234,8 @@ export const ticketMachine = setup({
         options?: ShowMachineOptions;
       }
     ) => {
-      stopChild('showMachine'), assign({ childMachineRef: undefined });
+      stopChild('showMachine');
+      assign({ childMachineRef: undefined });
       assign({
         show: params.show,
         showMachineRef: spawnChild(showMachine, {
@@ -534,10 +555,7 @@ export const ticketMachine = setup({
         event.type === 'REFUND RECEIVED' ? +event.transaction?.amount : 0;
       const totalRefundsAmount = refund.total || 0 + amount;
 
-      const refundedInTransactionCurrency =
-        totalRefundsAmount >= refundApproved;
-
-      return refundedInTransactionCurrency;
+      return totalRefundsAmount >= refundApproved;
     },
     canWatchShow: ({ context }) => {
       return (
@@ -573,13 +591,12 @@ export const ticketMachine = setup({
     id: nanoid(),
     redisConnection: input.redisConnection,
     options: {
-      saveState: input.options?.saveState ?? false,
-      escrowPeriod: input.options?.escrowPeriod ?? 3_600_000,
-      gracePeriod: input.options?.gracePeriod ?? 3_600_000
+      saveState: input.options?.saveState ?? false
     } as TicketMachineOptions
   }),
   id: 'ticketMachine',
   initial: 'ticketLoaded',
+  exit: [stopChild('showMachine'), assign({ showMachineRef: undefined })],
   entry: [
     assign({
       showMachineRef: ({ spawn, context }) =>
@@ -589,9 +606,7 @@ export const ticketMachine = setup({
             redisConnection: context.redisConnection,
             options: {
               saveShowEvents: context.options?.saveState ?? false,
-              saveState: context.options?.saveState ?? false,
-              escrowPeriod: context.options?.escrowPeriod ?? 3_600_000,
-              gracePeriod: context.options?.gracePeriod ?? 3_600_000
+              saveState: context.options?.saveState ?? false
             }
           }
         })
@@ -1200,24 +1215,3 @@ export const ticketMachine = setup({
     }
   }
 });
-
-export type TicketMachineServiceType = ReturnType<
-  typeof createTicketMachineService
->;
-
-export type TicketMachineType = typeof ticketMachine;
-
-export const createTicketMachineService = (input: TicketMachineInput) => {
-  const ticketService = createActor(ticketMachine, {
-    input
-  }).start();
-
-  if (input.options?.saveState)
-    ticketService.subscribe((state) => {
-      if (state.context.ticket.save) {
-        state.context.ticket.save();
-      }
-    });
-
-  return ticketService;
-};
