@@ -16,7 +16,10 @@ import type { TicketDocument } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
 
 import { createShowMachineService } from '$lib/machines/showMachine';
-import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
+import {
+  createTicketMachineService,
+  type TicketMachineEventType
+} from '$lib/machines/ticketMachine';
 
 import config from '$lib/config';
 import {
@@ -69,16 +72,16 @@ export const getShowWorker = ({
 
       switch (job.name) {
         case 'CANCEL TICKETS': {
-          return cancelTickets(show, job.data.cancel, showQueue);
+          return cancelTickets(show, job.data.cancel, redisConnection);
         }
         case 'REFUND TICKETS': {
-          return refundTickets(show, showQueue, payoutQueue);
+          return refundTickets(show, redisConnection, payoutQueue);
         }
         case 'END SHOW': {
-          return endShow(show, showQueue);
+          return endShow(show, showQueue, redisConnection);
         }
         case 'END ESCROW': {
-          return endEscrow(show, job.data.finalize);
+          return endEscrow(show, redisConnection, job.data.finalize);
         }
         case 'CALCULATE STATS': {
           return calculateStats(show);
@@ -90,7 +93,7 @@ export const getShowWorker = ({
             show,
             job.data.ticketId,
             job.data.decision,
-            showQueue,
+            redisConnection,
             payoutQueue
           );
         }
@@ -106,7 +109,7 @@ export const getShowWorker = ({
 const cancelTickets = async (
   show: ShowDocument,
   cancel: CancelType,
-  showQueue: ShowQueueType
+  redisConnection: IORedis
 ) => {
   const tickets = (await Ticket.find({
     show: show._id,
@@ -115,7 +118,14 @@ const cancelTickets = async (
   })) as TicketDocument[];
   for (const ticket of tickets) {
     // send cancel show to all tickets
-    const ticketService = getTicketMachineService(ticket, showQueue);
+    const ticketService = createTicketMachineService({
+      ticket,
+      show,
+      redisConnection,
+      options: {
+        saveState: true
+      }
+    });
     const cancelEvent = {
       type: 'SHOW CANCELLED',
       cancel
@@ -127,7 +137,7 @@ const cancelTickets = async (
 
 const refundTickets = async (
   show: ShowDocument,
-  showQueue: ShowQueueType,
+  redisConnection: IORedis,
   payoutQueue: PayoutQueueType
 ) => {
   const showService = createShowMachineService({
@@ -142,7 +152,14 @@ const refundTickets = async (
     })) as TicketDocument[];
     for (const ticket of tickets) {
       // send refunds
-      const ticketService = getTicketMachineService(ticket, showQueue);
+      const ticketService = createTicketMachineService({
+        ticket,
+        show,
+        redisConnection,
+        options: {
+          saveState: true
+        }
+      });
       const ticketState = ticketService.getSnapshot();
       if (ticketState.matches({ reserved: 'refundRequested' })) {
         payoutQueue.add(PayoutJobType.REFUND_SHOW, {
@@ -158,7 +175,11 @@ const refundTickets = async (
 };
 
 // End show, alert ticket
-const endShow = async (show: ShowDocument, showQueue: ShowQueueType) => {
+const endShow = async (
+  show: ShowDocument,
+  showQueue: ShowQueueType,
+  redisConnection: IORedis
+) => {
   const finalize = finalizeSchema.parse({
     finalizedBy: ActorType.TIMER
   });
@@ -179,7 +200,14 @@ const endShow = async (show: ShowDocument, showQueue: ShowQueueType) => {
   })) as TicketDocument[];
   for (const ticket of tickets) {
     // send show is over
-    const ticketService = getTicketMachineService(ticket, showQueue);
+    const ticketService = createTicketMachineService({
+      ticket,
+      show,
+      redisConnection,
+      options: {
+        saveState: true
+      }
+    });
     const ticketState = ticketService.getSnapshot();
     if (ticketState.can({ type: 'SHOW ENDED' })) {
       ticketService.send({ type: 'SHOW ENDED' });
@@ -192,6 +220,7 @@ const endShow = async (show: ShowDocument, showQueue: ShowQueueType) => {
 // Timer to end escrow and finalize
 const endEscrow = async (
   show: ShowDocument,
+  redisConnection: IORedis,
   finalize: FinalizeType
 ): Promise<string> => {
   // Finalize all the tickets, feedback or not
@@ -201,7 +230,14 @@ const endEscrow = async (
     'ticketState.active': true
   })) as TicketDocument[];
   for (const ticket of tickets) {
-    const ticketService = getTicketMachineService(ticket);
+    const ticketService = createTicketMachineService({
+      ticket,
+      show,
+      redisConnection,
+      options: {
+        saveState: true
+      }
+    });
     ticketService.send({
       type: 'TICKET FINALIZED',
       finalize
@@ -540,7 +576,7 @@ const ticketDisputeResolved = async (
   show: ShowDocument,
   ticketId: string,
   decision: DisputeDecision,
-  showQueue: ShowQueueType,
+  redisConnection: IORedis,
   payoutQueue: PayoutQueueType
 ) => {
   const showService = createShowMachineService({
@@ -552,7 +588,14 @@ const ticketDisputeResolved = async (
     decision,
     ticket
   });
-  const ticketService = getTicketMachineService(ticket, showQueue);
+  const ticketService = createTicketMachineService({
+    ticket,
+    show,
+    redisConnection,
+    options: {
+      saveState: true
+    }
+  });
   if (decision === DisputeDecision.NO_REFUND) {
     ticketService.send({
       type: 'DISPUTE DECIDED',

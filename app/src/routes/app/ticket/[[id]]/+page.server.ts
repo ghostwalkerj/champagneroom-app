@@ -15,8 +15,13 @@ import {
   ticketDisputeSchema,
   ticketFeedbackSchema
 } from '$lib/models/common';
+import type { ShowDocument } from '$lib/models/show';
+import type { TicketDocument } from '$lib/models/ticket';
 
-import type { TicketMachineEventType } from '$lib/machines/ticketMachine';
+import {
+  createTicketMachineService,
+  type TicketMachineEventType
+} from '$lib/machines/ticketMachine';
 
 import type { PayoutQueueType } from '$lib/workers/payoutWorker';
 
@@ -28,7 +33,6 @@ import {
   RefundReason
 } from '$lib/constants';
 import { createBitcartToken, InvoiceJobType, PayoutJobType } from '$lib/payout';
-import { getTicketMachineService } from '$lib/server/machinesUtil';
 
 import {
   getInvoiceByIdInvoicesModelIdGet,
@@ -40,13 +44,19 @@ import type { Actions, PageServerLoad } from './$types';
 
 export const actions: Actions = {
   cancel_ticket: async ({ locals }) => {
-    const ticket = locals.ticket;
+    const ticket = locals.ticket as TicketDocument;
+    const show = locals.show as ShowDocument;
+    const redisConnection = locals.redisConnection as IORedis;
+
     if (!ticket) {
       throw error(404, 'Ticket not found');
     }
-    const redisConnection = locals.redisConnection as IORedis;
 
-    const ticketService = getTicketMachineService(ticket, redisConnection);
+    const ticketService = createTicketMachineService({
+      ticket,
+      show,
+      redisConnection
+    });
     const state = ticketService.getSnapshot();
     const bcInvoiceId = state.context.ticket.bcInvoiceId;
 
@@ -116,18 +126,25 @@ export const actions: Actions = {
   },
 
   leave_feedback: async ({ request, locals }) => {
-    const ticket = locals.ticket;
+    const ticket = locals.ticket as TicketDocument;
+    const show = locals.show as ShowDocument;
+    const redisConnection = locals.redisConnection as IORedis;
+
     if (!ticket) {
       throw error(404, 'Ticket not found');
     }
+
+    const ticketService = createTicketMachineService({
+      ticket,
+      show,
+      redisConnection
+    });
     const data = await request.formData();
     const rating = data.get('rating') as string;
     const review = data.get('review') as string;
     if (!rating || rating === '0') {
       return fail(400, { rating, missingRating: true });
     }
-    const redisConnection = locals.redisConnection as IORedis;
-    const ticketService = getTicketMachineService(ticket, redisConnection);
     const state = ticketService.getSnapshot();
     const feedback = ticketFeedbackSchema.parse({
       rating: +rating,
@@ -144,11 +161,19 @@ export const actions: Actions = {
   },
 
   initiate_dispute: async ({ request, locals }) => {
-    const ticket = locals.ticket;
+    const ticket = locals.ticket as TicketDocument;
+    const show = locals.show as ShowDocument;
+    const redisConnection = locals.redisConnection as IORedis;
+
     if (!ticket) {
       throw error(404, 'Ticket not found');
     }
 
+    const ticketService = createTicketMachineService({
+      ticket,
+      show,
+      redisConnection
+    });
     const data = await request.formData();
     const reason = data.get('reason') as string;
     const explanation = data.get('explanation') as string;
@@ -160,9 +185,6 @@ export const actions: Actions = {
     if (!reason) {
       return fail(400, { reason, missingReason: true });
     }
-
-    const redisConnection = locals.redisConnection as IORedis;
-    const ticketService = getTicketMachineService(ticket, redisConnection);
 
     const state = ticketService.getSnapshot();
     const dispute = ticketDisputeSchema.parse({
@@ -196,11 +218,23 @@ export const actions: Actions = {
   },
 
   initiate_payment: async ({ request, locals }) => {
+    const ticket = locals.ticket as TicketDocument;
+    const show = locals.show as ShowDocument;
+    const redisConnection = locals.redisConnection as IORedis;
+
+    if (!ticket) {
+      throw error(404, 'Ticket not found');
+    }
+
+    const ticketService = createTicketMachineService({
+      ticket,
+      show,
+      redisConnection
+    });
     const data = await request.formData();
     const address = data.get('address') as string;
     const paymentId = data.get('paymentId') as string;
     const paymentCurrency = data.get('paymentCurrency') as string;
-    const ticket = locals.ticket;
 
     if (!ticket) {
       throw error(404, 'Ticket not found');
@@ -217,8 +251,6 @@ export const actions: Actions = {
     if (!paymentId) {
       return fail(400, { paymentId, missingPaymentId: true });
     }
-
-    const redisConnection = locals.redisConnection as IORedis;
 
     // Tell bitcart payment is coming
     const token = await createBitcartToken(
@@ -246,25 +278,29 @@ export const actions: Actions = {
     }
 
     // Alert Ticket to incoming transaction
-    const ticketService = getTicketMachineService(ticket, redisConnection);
-
     ticketService.send({
       type: 'PAYMENT INITIATED',
       paymentCurrency: paymentCurrency.toUpperCase() as CurrencyType
     });
-
     ticketService?.stop();
 
     return { success: true, paymentInitiated: true };
   },
 
   join_show: async ({ locals }) => {
-    const ticket = locals.ticket;
+    const ticket = locals.ticket as TicketDocument;
+    const show = locals.show as ShowDocument;
+    const redisConnection = locals.redisConnection as IORedis;
+
     if (!ticket) {
       throw error(404, 'Ticket not found');
     }
-    const redisConnection = locals.redisConnection as IORedis;
-    const ticketService = getTicketMachineService(ticket, redisConnection);
+
+    const ticketService = createTicketMachineService({
+      ticket,
+      show,
+      redisConnection
+    });
     const state = ticketService.getSnapshot();
     if (state.can({ type: 'TICKET REDEEMED' })) {
       ticketService.send({ type: 'TICKET REDEEMED' });
@@ -285,13 +321,19 @@ export const actions: Actions = {
   },
 
   leave_show: async ({ locals }) => {
-    const ticket = locals.ticket;
+    const ticket = locals.ticket as TicketDocument;
+    const show = locals.show as ShowDocument;
+    const redisConnection = locals.redisConnection as IORedis;
 
     if (!ticket) {
       throw error(404, 'Ticket not found');
     }
-    const redisConnection = locals.redisConnection as IORedis;
-    const ticketService = getTicketMachineService(ticket, redisConnection);
+
+    const ticketService = createTicketMachineService({
+      ticket,
+      show,
+      redisConnection
+    });
     ticketService.send({
       type: 'SHOW LEFT'
     });
