@@ -1,7 +1,8 @@
 import * as timeago from 'timeago.js';
 
 import type { ShowEventDocumentType } from '$lib/models/showEvent';
-import type { ShowMachineEventString } from './machines/showMachine';
+
+import type { ShowMachineEventType } from './machines/showMachine';
 
 export const createEventText = (
   showEvent: ShowEventDocumentType | undefined
@@ -12,7 +13,7 @@ export const createEventText = (
   }
   let eventText = timeago.format(showEvent.createdAt) + ' ' + name;
 
-  switch (showEvent.type as ShowMachineEventString) {
+  switch (showEvent.type as ShowMachineEventType['type']) {
     case 'TICKET SOLD': {
       eventText += ' paid in full!';
       break;

@@ -1,3 +1,4 @@
+/* eslint-disable simple-import-sort/imports */
 import type { AxiosResponse } from 'axios';
 import type { Job, Queue } from 'bullmq';
 import { Worker } from 'bullmq';
@@ -14,6 +15,8 @@ import {
   TransactionReasonType
 } from '$lib/models/transaction';
 import { Wallet } from '$lib/models/wallet';
+
+import { createTicketMachineService } from '$lib/machines/ticketMachine';
 
 import config from '$lib/config';
 import {
@@ -41,10 +44,7 @@ import type {
 } from '$lib/ext/bitcart/models';
 import type { PaymentType } from '$lib/payout';
 import { PayoutJobType, PayoutReason, PayoutStatus } from '$lib/payout';
-import {
-  getTicketMachineService,
-  getWalletMachineService
-} from '$lib/server/machinesUtil';
+import { getWalletMachineService } from '$lib/server/machinesUtil';
 
 export type PayoutJobDataType = {
   [key: string]: any;
@@ -82,15 +82,20 @@ export const getPayoutWorker = ({
               return 'No ticket ID';
             }
 
-            const ticket = (await Ticket.findById(ticketId)) as TicketDocument;
-            if (!ticket) {
-              return 'No ticket found';
-            }
+            const ticket = (await Ticket.findById(ticketId)
+              .populate('show')
+              .orFail(() => {
+                throw new Error('Ticket not found');
+              })) as TicketDocument;
 
-            const ticketService = getTicketMachineService(
+            const ticketService = createTicketMachineService({
               ticket,
-              redisConnection
-            );
+              show: ticket.show,
+              redisConnection,
+              options: {
+                saveState: true
+              }
+            });
 
             const ticketState = ticketService.getSnapshot();
 
@@ -236,22 +241,25 @@ export const getPayoutWorker = ({
                 return 'No ticket ID';
               }
 
-              const ticket = (await Ticket.findById(
-                ticketId
-              )) as TicketDocument;
-              if (!ticket) {
-                return 'No ticket found';
-              }
+              const ticket = (await Ticket.findById(ticketId)
+                .populate('show')
+                .orFail(() => {
+                  throw new Error('Ticket not found');
+                })) as TicketDocument;
+
+              const ticketService = createTicketMachineService({
+                ticket,
+                show: ticket.show,
+                redisConnection,
+                options: {
+                  saveState: true
+                }
+              });
 
               const bcInvoiceId = ticket.bcInvoiceId;
               if (!bcInvoiceId) {
                 return 'No invoice ID';
               }
-
-              const ticketService = getTicketMachineService(
-                ticket,
-                redisConnection
-              );
 
               const ticketState = ticketService.getSnapshot();
 

@@ -14,8 +14,6 @@ import type { TicketDocument } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
 import { User } from '$lib/models/user';
 
-import type { ShowQueueType } from '$lib/workers/showWorker';
-
 import config from '$lib/config';
 import { AuthType, CurrencyType, EntityType, UserRole } from '$lib/constants';
 import { authEncrypt } from '$lib/crypt';
@@ -28,10 +26,7 @@ import {
   type PaymentType
 } from '$lib/payout';
 import { createAuthToken, setAuthToken } from '$lib/server/auth';
-import {
-  getShowMachineServiceFromId,
-  getTicketMachineService
-} from '$lib/server/machinesUtil';
+import { getShowMachineServiceFromId } from '$lib/server/machinesUtil';
 
 import {
   createInvoiceInvoicesPost,
@@ -67,9 +62,6 @@ export const actions: Actions = {
       .exec();
 
     const redisConnection = locals.redisConnection as IORedis;
-    const showQueue = new Queue(EntityType.SHOW, {
-      connection: redisConnection
-    }) as ShowQueueType;
 
     const showService = await getShowMachineServiceFromId(showId);
 

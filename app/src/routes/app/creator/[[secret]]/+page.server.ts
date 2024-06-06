@@ -27,7 +27,6 @@ import {
 } from '$lib/machines/showMachine';
 
 import type { PayoutQueueType } from '$lib/workers/payoutWorker';
-import type { ShowQueueType } from '$lib/workers/showWorker';
 
 import {
   ActorType,
@@ -120,7 +119,14 @@ export const actions: Actions = {
     if (!show) {
       throw error(404, 'Show not found');
     }
-    const showService = createShowMachineService({ show, redisConnection });
+    const showService = createShowMachineService({
+      show,
+      redisConnection,
+      options: {
+        saveState: true,
+        saveShowEvents: true
+      }
+    });
     const showMachineState = showService.getSnapshot();
 
     const cancel = {
@@ -154,11 +160,15 @@ export const actions: Actions = {
     let isInEscrow = false;
 
     const redisConnection = locals.redisConnection as IORedis;
-    const showQueue = new Queue(EntityType.SHOW, {
-      connection: redisConnection
-    }) as ShowQueueType;
 
-    const showService = createShowMachineService({ show });
+    const showService = createShowMachineService({
+      show,
+      redisConnection,
+      options: {
+        saveShowEvents: true,
+        saveState: true
+      }
+    });
     const showState = showService.getSnapshot();
 
     if (
@@ -166,13 +176,11 @@ export const actions: Actions = {
         type: 'SHOW ENDED'
       })
     ) {
-      showQueue.add('SHOW ENDED', {
-        showId: show._id.toString()
+      showService.send({
+        type: 'SHOW ENDED'
       });
       isInEscrow = true;
     }
-
-    showQueue.close();
     showService.stop();
 
     return {
@@ -215,32 +223,36 @@ export const actions: Actions = {
       throw error(404, 'Show not found');
     }
 
-    const showQueue = new Queue(EntityType.SHOW, {
-      connection: redisConnection
-    }) as ShowQueueType;
-
-    const showService = createShowMachineService({ show });
-
+    const showService = createShowMachineService({
+      show,
+      redisConnection,
+      options: {
+        saveState: true,
+        saveShowEvents: true
+      }
+    });
     const showState = showService.getSnapshot();
 
     if (showState.can({ type: 'SHOW STOPPED' })) {
-      showQueue.add('SHOW STOPPED', {
-        showId: show._id.toString()
-      });
+      showService.send({ type: 'SHOW STOPPED' });
     }
-    showQueue.close();
     showService.stop();
     console.log('Creator left show');
     return { success: true };
   },
   start_show: async ({ locals }) => {
     const show = locals.show as ShowDocument;
+    const redisConnection = locals.redisConnection as IORedis;
     if (!show) {
       throw error(404, 'Show not found');
     }
     const showService = createShowMachineService({
       show,
-      redisConnection: locals.redisConnection
+      redisConnection,
+      options: {
+        saveState: true,
+        saveShowEvents: true
+      }
     });
     const showState = showService.getSnapshot();
     if (!showState.matches('started'))

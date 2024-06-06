@@ -9,6 +9,8 @@ import { Ticket } from '$lib/models/ticket';
 import type { TransactionDocument } from '$lib/models/transaction';
 import { Transaction, TransactionReasonType } from '$lib/models/transaction';
 
+import { createTicketMachineService } from '$lib/machines/ticketMachine';
+
 import { ActorType, CancelReason, EntityType } from '$lib/constants';
 import {
   getInvoiceByIdInvoicesModelIdGet,
@@ -23,10 +25,7 @@ import {
   type PaymentType,
   PayoutReason
 } from '$lib/payout';
-import {
-  getTicketMachineService,
-  getTicketMachineServiceFromId
-} from '$lib/server/machinesUtil';
+import { getTicketMachineServiceFromId } from '$lib/server/machinesUtil';
 
 export type InvoiceJobDataType = {
   bcInvoiceId: string;
@@ -195,9 +194,11 @@ export const getInvoiceWorker = ({
                     return 'No ticket id';
                   }
 
-                  const ticket = (await Ticket.findById(
-                    ticketId
-                  )) as TicketDocument;
+                  const ticket = (await Ticket.findById(ticketId)
+                    .populate('show')
+                    .orFail(() => {
+                      throw new Error('Ticket not found');
+                    })) as TicketDocument;
 
                   let response = await getRefundInvoicesRefundsRefundIdGet(
                     refundId,
@@ -254,10 +255,14 @@ export const getInvoiceWorker = ({
                     currency: bcPayout.currency?.toUpperCase()
                   });
 
-                  const ticketService = getTicketMachineService(
+                  const ticketService = createTicketMachineService({
                     ticket,
-                    redisConnection
-                  );
+                    show: ticket.show,
+                    redisConnection,
+                    options: {
+                      saveState: true
+                    }
+                  });
 
                   ticketService.send({
                     type: 'REFUND RECEIVED',
