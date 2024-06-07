@@ -1,12 +1,30 @@
 import axios from 'axios';
+import urlJoin from 'url-join';
 import { isAddress } from 'web3-validator';
 import { z } from 'zod';
 
-import { createTokenTokenPost } from '$ext/bitcart';
+import {
+  createInvoiceInvoicesPost,
+  createTokenTokenPost,
+  modifyInvoiceInvoicesModelIdPatch
+} from '$ext/bitcart';
 
+import config from './config';
+import { authEncrypt } from './crypt';
+import type { DisplayInvoice } from './ext/bitcart/models';
 import type { TransactionSummaryType } from './models/common';
 
 const permissions = ['full_control'];
+
+// Bitcart API types
+export type BitcartConfig = {
+  storeId: string;
+  email: string;
+  password: string;
+  baseURL: string;
+  authSalt: string;
+  invoiceNotificationUrl: string;
+};
 
 export type PaymentType = {
   created: string;
@@ -26,7 +44,6 @@ export type PaymentType = {
   id: string;
 };
 
-// Bitcart API types
 export enum InvoiceJobType {
   UPDATE = 'UPDATE',
   CANCEL = 'CANCEL'
@@ -95,7 +112,71 @@ export const createBitcartToken = async (
   if (!accessToken)
     throw new Error('No access token returned from Bitcart API');
 
-  return accessToken;
+  return accessToken as string;
+};
+
+export const createTicketInvoice = async ({
+  ticket,
+  bcConfig
+}: {
+  ticket: {
+    price: { amount: number; currency: string };
+    _id: object | string;
+  };
+  bcConfig?: BitcartConfig;
+}) => {
+  if (!bcConfig) {
+    throw new Error('Bitcart config not found');
+  }
+  // Create invoice in Bitcart
+  const token = await createBitcartToken(
+    bcConfig.email,
+    bcConfig.password,
+    bcConfig.baseURL
+  );
+
+  const response = await createInvoiceInvoicesPost(
+    {
+      price: ticket.price.amount,
+      currency: ticket.price.currency,
+      store_id: bcConfig.storeId,
+      expiration: config.TIMER.paymentPeriod / 60 / 1000,
+      order_id: ticket._id.toString()
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    }
+  );
+
+  if (!response || !response.data) {
+    console.error('Invoice cannot be created');
+    throw new Error('Invoice cannot be created');
+  }
+
+  // Update the notification url
+  const invoice = response.data as DisplayInvoice;
+  const encryptedInvoiceId =
+    authEncrypt(
+      invoice.id ? (invoice.id as string) : '',
+      bcConfig.authSalt ?? ''
+    ) ?? '';
+
+  invoice.notification_url = urlJoin(
+    bcConfig.invoiceNotificationUrl,
+    encryptedInvoiceId
+  );
+
+  await modifyInvoiceInvoicesModelIdPatch(invoice.id!, invoice, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
+  });
+
+  return invoice;
 };
 
 // Schemas

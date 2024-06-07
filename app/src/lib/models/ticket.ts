@@ -29,7 +29,7 @@ import type { UserDocument } from './user';
 const { models } = pkg;
 
 const ticketStateSchema = z.object({
-  status: z.nativeEnum(TicketStatus).default(TicketStatus.RESERVED),
+  status: z.nativeEnum(TicketStatus).default(TicketStatus.CREATED),
   active: z.boolean().default(true),
   cancel: cancelSchema.optional(),
   redemption: redemptionSchema.optional(),

@@ -4,6 +4,7 @@ import {
   type ActorRefFrom,
   assign,
   createActor,
+  fromPromise,
   raise,
   sendTo,
   setup,
@@ -39,7 +40,11 @@ import {
   RefundReason,
   TicketStatus
 } from '$lib/constants';
-import { calcTotal } from '$lib/payout.js';
+import {
+  type BitcartConfig as bcConfig,
+  calcTotal,
+  createTicketInvoice
+} from '$lib/payments';
 
 import {
   showMachine,
@@ -94,6 +99,9 @@ export type TicketMachineEventType =
       type: 'TICKET REDEEMED';
     }
   | {
+      type: 'TICKET RESERVED';
+    }
+  | {
       type: 'SHOW JOINED';
     }
   | {
@@ -124,6 +132,8 @@ export type TicketMachineEventType =
       show: ShowDocument;
     };
 
+//endregion
+
 export type TicketMachineInput = {
   ticket: TicketDocument;
   show: ShowDocument;
@@ -131,9 +141,9 @@ export type TicketMachineInput = {
   options?: Partial<TicketMachineOptions>;
 };
 
-//endregion
 export type TicketMachineOptions = {
   saveState?: boolean;
+  bcConfig?: bcConfig;
 };
 
 export type TicketMachineServiceType = ReturnType<
@@ -164,7 +174,23 @@ export const ticketMachine = setup({
     input: {} as TicketMachineInput
   },
   actors: {
-    showMachine: {} as ShowMachineType
+    showMachine: {} as ShowMachineType,
+    createInvoice: fromPromise(
+      async ({
+        input
+      }: {
+        input: {
+          ticket: TicketDocument;
+          bcConfig?: bcConfig;
+        };
+      }) => {
+        const invoice = await createTicketInvoice({
+          ticket: input.ticket,
+          bcConfig: input.bcConfig
+        });
+        return invoice;
+      }
+    )
   },
   actions: {
     sendJoinedShow: (_: any, params: { ticket: TicketDocument }) => {
@@ -184,6 +210,13 @@ export const ticketMachine = setup({
     sendTicketSold: (_, params: { ticket: TicketDocument }) => {
       sendTo('showMachine', {
         type: 'TICKET SOLD',
+        ticket: params.ticket
+      } as ShowMachineEventType);
+    },
+
+    sendTicketReserved: (_, params: { ticket: TicketDocument }) => {
+      sendTo('showMachine', {
+        type: 'TICKET RESERVED',
         ticket: params.ticket
       } as ShowMachineEventType);
     },
@@ -247,6 +280,7 @@ export const ticketMachine = setup({
         })
       });
     },
+
     requestRefundCancelledShow: (
       _,
       params: { cancel: CancelType; ticket: TicketDocument }
@@ -306,10 +340,37 @@ export const ticketMachine = setup({
       });
     },
 
+    reserveTicket: (_, params: { ticket: TicketDocument }) => {
+      assign(() => {
+        const ticket = params.ticket;
+        ticket.ticketState.status = TicketStatus.RESERVED;
+        return { ticket };
+      });
+    },
+
+    reserveFreeTicket: (_, params: { ticket: TicketDocument }) => {
+      assign(() => {
+        const ticket = params.ticket;
+        ticket.ticketState.status = TicketStatus.RESERVED;
+        return { ticket };
+      });
+    },
+
     cancelTicket: (_, params: { ticket: TicketDocument }) => {
       assign(() => {
         const ticket = params.ticket;
         ticket.ticketState.status = TicketStatus.CANCELLED;
+        return { ticket };
+      });
+    },
+
+    receiveInvoice: (
+      _,
+      params: { ticket: TicketDocument; invoiceId: string | undefined }
+    ) => {
+      assign(() => {
+        const ticket = params.ticket;
+        ticket.bcInvoiceId = params.invoiceId;
         return { ticket };
       });
     },
@@ -495,6 +556,8 @@ export const ticketMachine = setup({
     }
   },
   guards: {
+    ticketCreated: ({ context }) =>
+      context.ticket.ticketState.status === TicketStatus.CREATED,
     ticketCancelled: ({ context }) =>
       context.ticket.ticketState.status === TicketStatus.CANCELLED,
     ticketFinalized: ({ context }) =>
@@ -574,13 +637,13 @@ export const ticketMachine = setup({
             ?.length === 0)
       );
     },
-
     noDisputeRefund: ({ context }, params: { decision: DisputeDecision }) => {
       const decision =
         context.ticket.ticketState.dispute?.decision || params.decision;
       if (!decision) return false;
       return decision === DisputeDecision.NO_REFUND;
-    }
+    },
+    isFreeTicket: ({ context }) => context.ticket.price.amount === 0
   }
 }).createMachine({
   context: ({ input }) => ({
@@ -616,8 +679,8 @@ export const ticketMachine = setup({
     ticketLoaded: {
       always: [
         {
-          target: '#ticketMachine.reserved',
-          guard: 'ticketReserved'
+          target: 'ticketCreated',
+          guard: 'ticketCreated'
         },
         {
           target: '#ticketMachine.reserved.initiatedPayment',
@@ -669,9 +732,83 @@ export const ticketMachine = setup({
         }
       ]
     },
+    created: {
+      on: {
+        'CANCELLATION REQUESTED': {
+          target: '#ticketMachine.cancelled',
+          actions: [
+            {
+              type: 'cancelTicket',
+              params: ({ context, event }) => ({
+                ticket: context.ticket,
+                cancel: event.cancel
+              })
+            }
+          ]
+        },
+        'TICKET RESERVED': [
+          {
+            target: '#ticketMachine.reserved.waiting4Show',
+            guard: 'isFreeTicket',
+            actions: [
+              {
+                type: 'reserveFreeTicket',
+                params: ({ context }) => ({
+                  ticket: context.ticket
+                })
+              },
+              {
+                type: 'sendTicketSold',
+                params: ({ context }) => ({
+                  ticket: context.ticket
+                })
+              }
+            ]
+          },
+          {
+            target: '#ticketMachine.reserved.waiting4Invoice',
+            actions: [
+              {
+                type: 'reserveTicket',
+                params: ({ context }) => ({
+                  ticket: context.ticket
+                })
+              },
+              {
+                type: 'sendTicketReserved',
+                params: ({ context }) => ({
+                  ticket: context.ticket
+                })
+              }
+            ]
+          }
+        ]
+      }
+    },
     reserved: {
-      initial: 'waiting4Payment',
       states: {
+        waiting4Invoice: {
+          invoke: {
+            id: 'createInvoice',
+            src: 'createInvoice',
+            input: ({ context }) => ({
+              ticket: context.ticket,
+              bcConfig: context.options?.bcConfig
+            }),
+            onDone: {
+              target: 'waiting4Payment',
+              actions: [
+                {
+                  type: 'receiveInvoice',
+                  params: ({ context, event }) => ({
+                    ticket: context.ticket,
+                    invoiceId: event.output.id
+                  })
+                }
+              ]
+            }
+          }
+        },
         waiting4Payment: {
           on: {
             'CANCELLATION REQUESTED': {

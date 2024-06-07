@@ -89,6 +89,7 @@ export enum ShowStatus {
 }
 
 export enum TicketStatus {
+  CREATED = 'CREATED',
   RESERVED = 'RESERVED',
   REFUND_REQUESTED = 'REFUND REQUESTED',
   PAYMENT_INITIATED = 'PAYMENT INITIATED',
