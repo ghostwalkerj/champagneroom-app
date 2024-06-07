@@ -40,10 +40,12 @@ import {
   RefundReason,
   TicketStatus
 } from '$lib/constants';
+import type { DisplayInvoice } from '$lib/ext/bitcart/models';
 import {
   type BitcartConfig as bcConfig,
   calcTotal,
-  createTicketInvoice
+  createTicketInvoice,
+  type PaymentType
 } from '$lib/payments';
 
 import {
@@ -366,11 +368,20 @@ export const ticketMachine = setup({
 
     receiveInvoice: (
       _,
-      params: { ticket: TicketDocument; invoiceId: string | undefined }
+      params: { ticket: TicketDocument; invoice: DisplayInvoice }
     ) => {
+      let paymentAddress = params.ticket.paymentAddress;
+      const payment = params.invoice.payments
+        ? (params.invoice.payments[0] as PaymentType) // Use the first wallet
+        : undefined;
+
+      if (payment && 'payment_address' in payment) {
+        paymentAddress = payment['payment_address'] as string;
+      }
       assign(() => {
         const ticket = params.ticket;
-        ticket.bcInvoiceId = params.invoiceId;
+        ticket.bcInvoiceId = params.invoice.id;
+        ticket.paymentAddress = paymentAddress;
         return { ticket };
       });
     },
@@ -643,7 +654,12 @@ export const ticketMachine = setup({
       if (!decision) return false;
       return decision === DisputeDecision.NO_REFUND;
     },
-    isFreeTicket: ({ context }) => context.ticket.price.amount === 0
+    canReserveFreeTicket: ({ context }) =>
+      context.show.showState.salesStats.ticketsAvailable >= 0 &&
+      context.ticket.price.amount === 0,
+    canReservePaidTicket: ({ context }) =>
+      context.show.showState.salesStats.ticketsAvailable >= 0 &&
+      context.ticket.price.amount > 0
   }
 }).createMachine({
   context: ({ input }) => ({
@@ -749,7 +765,7 @@ export const ticketMachine = setup({
         'TICKET RESERVED': [
           {
             target: '#ticketMachine.reserved.waiting4Show',
-            guard: 'isFreeTicket',
+            guard: 'canReserveFreeTicket',
             actions: [
               {
                 type: 'reserveFreeTicket',
@@ -767,6 +783,7 @@ export const ticketMachine = setup({
           },
           {
             target: '#ticketMachine.reserved.waiting4Invoice',
+            guard: 'canReservePaidTicket',
             actions: [
               {
                 type: 'reserveTicket',
@@ -802,7 +819,7 @@ export const ticketMachine = setup({
                   type: 'receiveInvoice',
                   params: ({ context, event }) => ({
                     ticket: context.ticket,
-                    invoiceId: event.output.id
+                    invoice: event.output
                   })
                 }
               ]

@@ -21,7 +21,7 @@ export type BitcartConfig = {
   storeId: string;
   email: string;
   password: string;
-  baseURL: string;
+  apiURL: string;
   authSalt: string;
   invoiceNotificationUrl: string;
 };
@@ -96,9 +96,9 @@ export const calcTotal = (payments: Map<string, TransactionSummaryType[]>) => {
 export const createBitcartToken = async (
   email: string,
   password: string,
-  baseURL: string
+  apiURL: string
 ) => {
-  axios.defaults.baseURL = baseURL;
+  axios.defaults.baseURL = apiURL;
 
   const resp = await createTokenTokenPost({
     email,
@@ -132,7 +132,7 @@ export const createTicketInvoice = async ({
   const token = await createBitcartToken(
     bcConfig.email,
     bcConfig.password,
-    bcConfig.baseURL
+    bcConfig.apiURL
   );
 
   const response = await createInvoiceInvoicesPost(

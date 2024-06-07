@@ -1,5 +1,4 @@
 import { error, fail, redirect } from '@sveltejs/kit';
-import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 import { zod } from 'sveltekit-superforms/adapters';
 import { message, superValidate } from 'sveltekit-superforms/server';
@@ -9,29 +8,20 @@ import urlJoin from 'url-join';
 import { env } from '$env/dynamic/private';
 
 import { reserveTicketSchema } from '$lib/models/common';
-import { Show } from '$lib/models/show';
+import { Show, type ShowDocument } from '$lib/models/show';
 import type { TicketDocument } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
 import { User } from '$lib/models/user';
 
-import config from '$lib/config';
-import { AuthType, CurrencyType, EntityType, UserRole } from '$lib/constants';
-import { authEncrypt } from '$lib/crypt';
-import type { DisplayInvoice } from '$lib/ext/bitcart/models';
-import { mensNames } from '$lib/mensNames';
 import {
-  createBitcartToken,
-  InvoiceJobType,
-  InvoiceStatus,
-  type PaymentType
-} from '$lib/payments';
-import { createAuthToken, setAuthToken } from '$lib/server/auth';
-import { getShowMachineServiceFromId } from '$lib/server/machinesUtil';
+  createTicketMachineService,
+  type TicketMachineOptions
+} from '$lib/machines/ticketMachine';
 
-import {
-  createInvoiceInvoicesPost,
-  modifyInvoiceInvoicesModelIdPatch
-} from '$ext/bitcart';
+import config from '$lib/config';
+import { AuthType, UserRole } from '$lib/constants';
+import { mensNames } from '$lib/mensNames';
+import { createAuthToken, setAuthToken } from '$lib/server/auth';
 
 import type { Actions, PageServerLoad } from './$types';
 
@@ -55,15 +45,13 @@ export const actions: Actions = {
     const pin = form.data.pin as number[];
     const profileImage = form.data.profileImage as string;
 
-    const show = await Show.findById(showId)
+    const show = (await Show.findById(showId)
       .orFail(() => {
         throw error(404, 'Show not found');
       })
-      .exec();
+      .exec()) as ShowDocument;
 
     const redisConnection = locals.redisConnection as IORedis;
-
-    const showService = await getShowMachineServiceFromId(showId);
 
     const user = await User.create({
       name,
@@ -85,132 +73,29 @@ export const actions: Actions = {
       return message(form, 'Show cannot reserve ticket', { status: 501 });
     }
 
-    const showState = showService.getSnapshot();
-
-    if (
-      !showState.can({
-        type: 'TICKET RESERVED',
-        ticket
-      })
-    ) {
-      console.error('Show cannot Reserve Ticket');
-      return message(form, 'Show cannot reserve ticket', { status: 501 });
-    }
-
-    // Create invoice in Bitcart
-    const token = await createBitcartToken(
-      env.BITCART_EMAIL ?? '',
-      env.BITCART_PASSWORD ?? '',
-      env.BITCART_API_URL ?? '' // Add default value for env.BITCART_API_URL
-    );
-
-    let response = await createInvoiceInvoicesPost(
-      {
-        price: ticket.price.amount,
-        currency: ticket.price.currency,
-        store_id: env.BITCART_STORE_ID ?? '',
-        expiration: config.TIMER.paymentPeriod / 60 / 1000,
-        order_id: ticket._id.toString()
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
+    const ticketService = createTicketMachineService({
+      ticket,
+      show,
+      redisConnection,
+      options: {
+        saveState: true,
+        bcConfig: {
+          storeId: env.BITCART_STORE_ID,
+          email: env.BITCART_EMAIL,
+          password: env.BITCART_PASSWORD,
+          apiURL: env.BITCART_API_URL,
+          authSalt: env.BITCART_AUTH_SALT,
+          invoiceNotificationUrl: urlJoin(
+            env.BITCART_NOTIFICATION_URL,
+            env.BITCART_INVOICE_NOTIFICATION_PATH
+          )
         }
-      }
-    );
-
-    if (!response || !response.data) {
-      console.error('Invoice cannot be created');
-      return message(form, 'Invoice cannot be created', { status: 501 });
-    }
-
-    // Update the notification url
-    const invoice = response.data as DisplayInvoice;
-    const encryptedInvoiceId =
-      authEncrypt(
-        invoice.id ? (invoice.id as string) : '',
-        env.AUTH_SALT ?? ''
-      ) ?? '';
-
-    const notificationUrl = env.BITCART_NOTIFICATION_URL ?? ''; // Add default value for env.BITCART_NOTIFICATION_URL
-    const invoiceNotificationPath = env.BITCART_INVOICE_NOTIFICATION_PATH ?? ''; // Add default value for env.BITCART_INVOICE_NOTIFICATION_PATH
-
-    invoice.notification_url = urlJoin(
-      notificationUrl || '',
-      invoiceNotificationPath,
-      encryptedInvoiceId
-    );
-
-    response = await modifyInvoiceInvoicesModelIdPatch(invoice.id!, invoice, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
+      } as TicketMachineOptions
     });
 
-    // Update ticket with invoice
-    ticket.bcInvoiceId = invoice.id;
-
-    const payment = invoice.payments
-      ? (invoice.payments[0] as PaymentType) // Use the first wallet
-      : undefined;
-
-    if (payment && 'payment_address' in payment) {
-      ticket.paymentAddress = payment['payment_address'] as string;
-    }
-    await ticket.save();
-
-    showQueue.add('TICKET RESERVED', {
-      showId: show._id.toString(),
-      ticketId: ticket._id.toString(),
-      customerName: name
+    ticketService.send({
+      type: 'TICKET RESERVED'
     });
-
-    // If the ticket is free, skip the payment
-    if (ticket.price.amount === 0 && ticket.bcInvoiceId) {
-      const ticketService = getTicketMachineService(ticket, redisConnection);
-      ticketService.send({
-        type: 'PAYMENT INITIATED',
-        paymentCurrency: CurrencyType.NONE
-      });
-
-      ticketService?.stop();
-
-      const token = await createBitcartToken(
-        env.BITCART_EMAIL ?? '', // Add default value for env.BITCART_EMAIL
-        env.BITCART_PASSWORD ?? '', // Add default value for env.BITCART_PASSWORD
-        env.BITCART_API_URL ?? '' // Add default value for env.BITCART_API_URL
-      );
-
-      // Alert the invoice is complete
-      try {
-        await modifyInvoiceInvoicesModelIdPatch(
-          ticket.bcInvoiceId,
-          {
-            status: InvoiceStatus.COMPLETE
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            }
-          }
-        );
-      } catch (error_) {
-        console.error(error_);
-      }
-
-      const invoiceQueue = new Queue(EntityType.INVOICE, {
-        connection: redisConnection
-      });
-      invoiceQueue.add(InvoiceJobType.UPDATE, {
-        bcInvoiceId: ticket.bcInvoiceId,
-        status: InvoiceStatus.COMPLETE
-      });
-
-      invoiceQueue.close();
-    }
 
     const redirectUrl = urlJoin(config.PATH.ticket, ticket._id.toString());
 
@@ -222,8 +107,7 @@ export const actions: Actions = {
 
     encAuthToken && setAuthToken(cookies, tokenName, encAuthToken);
 
-    showQueue.close();
-    showService.stop();
+    ticketService.stop();
 
     throw redirect(302, redirectUrl);
   }
