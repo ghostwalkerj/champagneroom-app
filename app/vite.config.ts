@@ -46,7 +46,7 @@ const config: UserConfig = {
   build: {
     chunkSizeWarningLimit: 16000,
     rollupOptions: {
-      external: ['@web3-onboard/*', 'mongoose-zod', 'crypto']
+      external: ['@web3-onboard/*', 'mongoose-zod', 'crypto', 'bullmq']
     },
     commonjsOptions: {
       transformMixedEsModules: true

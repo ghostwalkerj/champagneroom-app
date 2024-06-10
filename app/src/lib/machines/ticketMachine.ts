@@ -695,7 +695,7 @@ export const ticketMachine = setup({
     ticketLoaded: {
       always: [
         {
-          target: 'ticketCreated',
+          target: '#ticketMachine.created',
           guard: 'ticketCreated'
         },
         {
@@ -803,6 +803,7 @@ export const ticketMachine = setup({
       }
     },
     reserved: {
+      initial: 'waiting4Invoice',
       states: {
         waiting4Invoice: {
           invoke: {

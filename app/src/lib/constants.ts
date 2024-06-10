@@ -84,8 +84,7 @@ export enum ShowStatus {
   REFUND_INITIATED = 'REFUND INITIATED',
   LIVE = 'LIVE',
   STOPPED = 'STOPPED',
-  IN_ESCROW = 'IN ESCROW',
-  IN_DISPUTE = 'IN DISPUTE'
+  ENDED = 'ENDED'
 }
 
 export enum TicketStatus {

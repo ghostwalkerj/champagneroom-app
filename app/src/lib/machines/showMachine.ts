@@ -214,7 +214,7 @@ export const showMachine = setup({
     ) => {
       assign(() => {
         const show = parameters.show;
-        show.showState.status = ShowStatus.IN_ESCROW;
+        show.showState.status = ShowStatus.ENDED;
         show.showState.escrow = escrowSchema.parse({});
         show.showState.current = false;
         return {
@@ -296,7 +296,7 @@ export const showMachine = setup({
       assign(() => {
         const show = parameters.show;
         const ticket = parameters.ticket;
-        show.showState.status = ShowStatus.IN_DISPUTE;
+        show.showState.status = ShowStatus.ENDED;
         show.showState.disputes.push(ticket._id);
         show.$inc('showState.disputeStats.totalDisputes', 1);
         show.$inc('showState.disputeStats.totalDisputesPending', 1);
@@ -471,10 +471,8 @@ export const showMachine = setup({
       parameters.show.showState.status === ShowStatus.LIVE,
     showStopped: (_, parameters: { show: ShowDocument }) =>
       parameters.show.showState.status === ShowStatus.STOPPED,
-    showInEscrow: (_, parameters: { show: ShowDocument }) =>
-      parameters.show.showState.status === ShowStatus.IN_ESCROW,
-    showInDispute: (_, parameters: { show: ShowDocument }) =>
-      parameters.show.showState.status === ShowStatus.IN_DISPUTE,
+    showEnded: (_, parameters: { show: ShowDocument }) =>
+      parameters.show.showState.status === ShowStatus.ENDED,
     soldOut: (_, parameters: { show: ShowDocument }) =>
       parameters.show.showState.salesStats.ticketsAvailable === 1,
     canStartShow: (
@@ -640,18 +638,9 @@ export const showMachine = setup({
           }
         },
         {
-          target: 'ended.inEscrow',
+          target: 'ended',
           guard: {
-            type: 'showInEscrow',
-            params: ({ context }) => ({
-              show: context.show
-            })
-          }
-        },
-        {
-          target: 'ended.inDispute',
-          guard: {
-            type: 'showInDispute',
+            type: 'showEnded',
             params: ({ context }) => ({
               show: context.show
             })
@@ -1036,7 +1025,7 @@ export const showMachine = setup({
           }
         },
         'SHOW ENDED': {
-          target: 'ended.inEscrow',
+          target: 'ended',
           actions: [
             {
               type: 'endShow',
