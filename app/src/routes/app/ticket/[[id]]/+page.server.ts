@@ -32,7 +32,11 @@ import {
   EntityType,
   RefundReason
 } from '$lib/constants';
-import { createBitcartToken, InvoiceJobType, PayoutJobType } from '$lib/payout';
+import {
+  createBitcartToken,
+  InvoiceJobType,
+  PayoutJobType
+} from '$lib/payments';
 
 import {
   getInvoiceByIdInvoicesModelIdGet,

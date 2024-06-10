@@ -42,9 +42,13 @@ import type {
   DisplayPayout,
   Store
 } from '$lib/ext/bitcart/models';
-import type { PaymentType } from '$lib/payout';
-import { PayoutJobType, PayoutReason, PayoutStatus } from '$lib/payout';
 import { getWalletMachineService } from '$lib/server/machinesUtil';
+import {
+  PayoutJobType,
+  type PaymentType,
+  PayoutReason,
+  PayoutStatus
+} from '$lib/payments';
 
 export type PayoutJobDataType = {
   [key: string]: any;

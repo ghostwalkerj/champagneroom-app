@@ -41,7 +41,7 @@ import {
   PayoutJobType,
   PayoutReason,
   requestPayoutSchema
-} from '$lib/payout';
+} from '$lib/payments';
 import { ipfsUpload } from '$lib/server/upload';
 
 import type { Actions, PageServerLoad, RequestEvent } from './$types';

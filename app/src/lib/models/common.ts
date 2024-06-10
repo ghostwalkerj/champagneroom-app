@@ -10,7 +10,7 @@ import {
   EarningsSource,
   RefundReason
 } from '$lib/constants';
-import { PayoutStatus } from '$lib/payout';
+import { PayoutStatus } from '$lib/payments';
 
 export type CancelType = z.infer<typeof cancelSchema>;
 

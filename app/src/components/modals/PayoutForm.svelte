@@ -7,7 +7,7 @@
 
   import type { WalletDocumentType } from '$lib/models/wallet';
 
-  import type { requestPayoutSchema } from '$lib/payout';
+  import type { requestPayoutSchema } from '$lib/payments';
 
   // Props
   /** Exposes parent props to this component. */

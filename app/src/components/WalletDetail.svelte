@@ -6,7 +6,7 @@
   import type { WalletDocumentType } from '$lib/models/wallet';
 
   import { currencyFormatter, CurrencyType } from '$lib/constants';
-  import type { requestPayoutSchema } from '$lib/payout';
+  import type { requestPayoutSchema } from '$lib/payments';
 
   export let exchangeRate = 0;
   export let payoutForm: SuperValidated<Infer<typeof requestPayoutSchema>>;

@@ -16,14 +16,14 @@
   import type { UserDocument } from '$lib/models/user';
   import type { WalletDocument } from '$lib/models/wallet';
 
-  import type { ShowMachineServiceType, ShowMachineStateType } from '$lib/machines/showMachine';
+  import type {
+    ShowMachineServiceType,
+    ShowMachineStateType
+  } from '$lib/machines/showMachine';
   import { createShowMachineService } from '$lib/machines/showMachine';
 
-  import {
-    ActorType,
-    CancelReason,
-  } from '$lib/constants';
-  import type { requestPayoutSchema } from '$lib/payout';
+  import { ActorType, CancelReason } from '$lib/constants';
+  import type { requestPayoutSchema } from '$lib/payments';
 
   import ShowDetail from '$components/ShowDetail.svelte';
   import WalletDetail from '$components/WalletDetail.svelte';
@@ -93,7 +93,7 @@
 
       showMachineService?.stop();
       showMachineService = createShowMachineService({
-        show: currentShow,
+        show: currentShow
       });
       useShowMachine(showMachineService);
       showUnSub?.();
@@ -112,36 +112,35 @@
     }
   };
 
-  const testState = (state : ShowMachineStateType) => {
-      if (state) {
-        showStopped = state.matches('stopped');
-        showCancelled = state.matches('cancelled');
-        if (showCancelled) {
-          noCurrentShow();
-        }
-        canCancelShow = state.can({
-          type: 'CANCELLATION INITIATED',
-          cancel: {
-            cancelledAt: new Date(),
-            cancelledBy: ActorType.CREATOR,
-            reason: CancelReason.CREATOR_CANCELLED
-          }
-        });
-        canStartShow = state.can({
-          type: 'SHOW STARTED'
-        });
-
-        if (state.status === 'done') {
-          showMachineService.stop();
-        }
+  const testState = (state: ShowMachineStateType) => {
+    if (state) {
+      showStopped = state.matches('stopped');
+      showCancelled = state.matches('cancelled');
+      if (showCancelled) {
+        noCurrentShow();
       }
-  }
+      canCancelShow = state.can({
+        type: 'CANCELLATION INITIATED',
+        cancel: {
+          cancelledAt: new Date(),
+          cancelledBy: ActorType.CREATOR,
+          reason: CancelReason.CREATOR_CANCELLED
+        }
+      });
+      canStartShow = state.can({
+        type: 'SHOW STARTED'
+      });
+
+      if (state.status === 'done') {
+        showMachineService.stop();
+      }
+    }
+  };
 
   const useShowMachine = (showMachineService: ShowMachineServiceType) => {
     showMachineServiceUnSub?.unsubscribe();
     const state = showMachineService.getSnapshot();
     testState(state);
-
   };
 
   onMount(() => {

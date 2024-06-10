@@ -26,7 +26,7 @@
   import config from '$lib/config';
   import type { CurrencyType } from '$lib/constants';
   import { AuthType, currencyFormatter } from '$lib/constants';
-  import type { requestPayoutSchema } from '$lib/payout';
+  import type { requestPayoutSchema } from '$lib/payments';
   import { PermissionType } from '$lib/permissions';
   import { womensNames } from '$lib/womensNames';
 

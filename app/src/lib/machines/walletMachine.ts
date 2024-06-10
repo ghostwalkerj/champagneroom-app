@@ -12,7 +12,7 @@ import type { TransactionDocument } from '$lib/models/transaction';
 import { type WalletDocument, WalletStatus } from '$lib/models/wallet';
 
 import { EarningsSource } from '$lib/constants.js';
-import { PayoutStatus } from '$lib/payout.js';
+import { PayoutStatus } from '$lib/payments';
 
 export type WalletMachineEventType =
   | {
@@ -337,7 +337,6 @@ const createWalletMachine = ({
       ) =>
         assign(() => {
           const wallet = params.wallet;
-          const payout = params.payout;
           // wallet.status = WalletStatus.PAYOUT_IN_PROGRESS;
           // wallet.payouts.push(payout);
           // wallet.availableBalance -= payout.amount;
@@ -380,7 +379,6 @@ const createWalletMachine = ({
       ) =>
         assign(() => {
           const wallet = params.wallet;
-          const payout = params.payout;
           // wallet.status = WalletStatus.PAYOUT_IN_PROGRESS;
           // wallet.payouts.push(payout);
           // wallet.availableBalance -= payout.amount;

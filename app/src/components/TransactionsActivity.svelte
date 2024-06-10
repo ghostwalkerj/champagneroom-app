@@ -11,7 +11,7 @@
   import type { EarningsType, PayoutType } from '$lib/models/common';
 
   import { currencyFormatter } from '$lib/constants';
-  import { PayoutStatus } from '$lib/payout';
+  import { PayoutStatus } from '$lib/payments';
 
   const modalStore = getModalStore();
 

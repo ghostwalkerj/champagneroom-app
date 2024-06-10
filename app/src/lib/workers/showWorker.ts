@@ -30,7 +30,7 @@ import {
   TicketStatus,
   WalletMachineEventString
 } from '$lib/constants';
-import { PayoutJobType } from '$lib/payout';
+import { PayoutJobType } from '$lib/payments';
 import { getWalletMachineServiceFromId } from '$lib/server/machinesUtil';
 
 import type { PayoutQueueType } from './payoutWorker';

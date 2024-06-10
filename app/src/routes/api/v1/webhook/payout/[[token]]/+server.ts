@@ -5,7 +5,7 @@ import { env } from '$env/dynamic/private';
 
 import { EntityType } from '$lib/constants';
 import { authDecrypt } from '$lib/crypt';
-import { PayoutJobType } from '$lib/payout';
+import { PayoutJobType } from '$lib/payments';
 
 import type { RequestHandler } from './$types';
 

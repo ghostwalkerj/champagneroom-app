@@ -26,7 +26,7 @@
     ShowStatus,
     TicketStatus
   } from '$lib/constants';
-  import { InvoiceStatus, type PaymentType } from '$lib/payout';
+  import { InvoiceStatus, type PaymentType } from '$lib/payments';
   import { connect, defaultWallet, selectedAccount } from '$lib/web3';
 
   import { ShowStore, TicketStore } from '$stores';
@@ -155,15 +155,15 @@
     ticketMachineService: TicketMachineServiceType
   ) => {
     const state = ticketMachineService.getSnapshot();
-    shouldPay = state.matches({reserved: 'waiting4Payment'});
+    shouldPay = state.matches({ reserved: 'waiting4Payment' });
     canWatchShow =
-      state.matches({reserved: 'waiting4Show'}) || state.matches('redeemed');
+      state.matches({ reserved: 'waiting4Show' }) || state.matches('redeemed');
     hasPaymentSent =
-      state.matches({reserved : 'initiatedPayment'}) &&
+      state.matches({ reserved: 'initiatedPayment' }) &&
       invoice.status !== InvoiceStatus.COMPLETE;
     canCancelTicket =
-      (state.matches({reserved : 'waiting4Show'}) ||
-        state.matches({reserved: 'waiting4Payment'})) &&
+      (state.matches({ reserved: 'waiting4Show' }) ||
+        state.matches({ reserved: 'waiting4Payment' })) &&
       !hasShowStarted;
     canLeaveFeedback = state.can({
       type: 'FEEDBACK RECEIVED',
@@ -184,8 +184,8 @@
       })
     });
     isWaitingForShow =
-      state.can({type: 'SHOW JOINED'}) ||
-      state.can({type: 'TICKET REDEEMED'})
+      state.can({ type: 'SHOW JOINED' }) ||
+      state.can({ type: 'TICKET REDEEMED' });
 
     isTicketDone = state.status === 'done' ?? false;
     if (isTicketDone) {

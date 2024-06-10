@@ -10,8 +10,7 @@
     durationFormatter,
     TicketStatus
   } from '$lib/constants';
-  import type { PaymentType } from '$lib/payout';
-  import { InvoiceStatus } from '$lib/payout';
+  import { InvoiceStatus, type PaymentType } from '$lib/payments';
 
   import CopyText from '$components/CopyText.svelte';
   import type { DisplayInvoice } from '$ext/bitcart/models';

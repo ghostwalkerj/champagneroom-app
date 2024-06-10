@@ -6,9 +6,14 @@ import type IORedis from 'ioredis';
 import { nanoid } from 'nanoid';
 import { generateSillyPassword } from 'silly-password-generator';
 import spacetime from 'spacetime';
-import { message, superValidate } from 'sveltekit-superforms';
+import {
+  message,
+  superValidate,
+  type SuperValidated
+} from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { uniqueNamesGenerator } from 'unique-names-generator';
+import type { z } from 'zod';
 
 import { env } from '$env/dynamic/private';
 
@@ -31,7 +36,7 @@ import {
   PayoutJobType,
   PayoutReason,
   requestPayoutSchema
-} from '$lib/payout';
+} from '$lib/payments';
 import {
   backupAuthToken,
   createAuthToken,
@@ -44,7 +49,10 @@ import type { Actions, PageServerLoad } from './$types';
 
 export const actions: Actions = {
   request_payout: async ({ request, locals }) => {
-    const form = await superValidate(request, zod(requestPayoutSchema));
+    const form = (await superValidate(
+      request,
+      zod(requestPayoutSchema)
+    )) as SuperValidated<z.infer<typeof requestPayoutSchema>>;
     const { walletId, amount, destination, payoutReason, jobType } = form.data;
 
     if (!form.valid) {
@@ -434,7 +442,7 @@ export const load: PageServerLoad = async ({ locals }) => {
           creatorId: show._id[0].toString(),
           currency: show._id[1],
           amount: show.amount
-        }) as { creatorId: string; currency: CurrencyType; amount: number; }
+        }) as { creatorId: string; currency: CurrencyType; amount: number }
     ),
     weeklyData: weeklyData.map(
       (show) =>
