@@ -1,4 +1,4 @@
-import crypto from 'node:crypto';
+import crypto from 'crypto';
 
 export const authDecrypt = (text: string | undefined, authSalt: string) => {
   if (!text) {

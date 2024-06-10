@@ -98,10 +98,10 @@
     }
 
     if (wallet) {
-      const signature = await wallet.provider.request({
+      const signature = (await wallet.provider.request({
         method: 'personal_sign',
         params: [message, walletAddress]
-      });
+      })) as string;
       formData.append('signature', signature);
     }
 

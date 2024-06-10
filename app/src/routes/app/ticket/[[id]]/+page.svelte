@@ -62,7 +62,6 @@
   let hasPaymentSent = false;
   $: canWatchShow = false;
   $: canCancelTicket = false;
-  $: isShowInEscrow = false;
   $: isTicketDone = true;
   $: showVideo = false;
   let canLeaveFeedback = false;
@@ -229,7 +228,6 @@
     // @ts-ignore
     if (show) {
       hasShowStarted = show.showState.status === ShowStatus.LIVE;
-      isShowInEscrow = show.showState.status === ShowStatus.IN_ESCROW;
     }
 
     if (ticket.ticketState.active) {
@@ -238,7 +236,6 @@
         if (_show) {
           show = _show;
           hasShowStarted = show.showState.status === ShowStatus.LIVE;
-          isShowInEscrow = show.showState.status === ShowStatus.IN_ESCROW;
           if (canWatchShow && hasShowStarted && !leftShow) joinShow();
         }
       });
@@ -320,7 +317,7 @@
       </div>
 
       <!-- Invoice -->
-      {#if !isTicketDone && !isShowInEscrow}
+      {#if !isTicketDone}
         <div class="relative">
           {#key invoice}
             <TicketInvoice {invoice} {ticket} />

@@ -14,7 +14,7 @@ import parseArgv from 'tiny-parse-argv';
 
 import { handler } from './build/handler';
 import { EntityType } from './dist/constants';
-import { createBitcartToken } from './dist/payout';
+import { createBitcartToken } from './dist/payments';
 import { getInvoiceWorker } from './dist/workers/invoiceWorker';
 import { getPayoutWorker } from './dist/workers/payoutWorker';
 import { getShowWorker } from './dist/workers/showWorker';
