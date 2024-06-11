@@ -206,21 +206,10 @@ export const actions: Actions = {
       show,
       redisConnection
     });
-    const state = ticketService.getSnapshot();
-    if (state.can({ type: 'TICKET REDEEMED' })) {
-      ticketService.send({ type: 'TICKET REDEEMED' });
-      ticketService.send({
-        type: 'SHOW JOINED'
-      });
-    } else if (
-      state.can({
-        type: 'SHOW JOINED'
-      })
-    ) {
-      ticketService.send({
-        type: 'SHOW JOINED'
-      });
-    }
+
+    ticketService.send({
+      type: 'SHOW JOINED'
+    });
     ticketService?.stop();
     return { success: true };
   },

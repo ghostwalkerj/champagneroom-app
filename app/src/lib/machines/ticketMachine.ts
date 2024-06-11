@@ -102,9 +102,6 @@ export type TicketMachineEventType =
       invoice: DisplayInvoice;
     }
   | {
-      type: 'TICKET REDEEMED';
-    }
-  | {
       type: 'TICKET RESERVED';
     }
   | {
@@ -962,7 +959,7 @@ export const ticketMachine = setup({
         },
         waiting4Show: {
           on: {
-            'TICKET REDEEMED': {
+            'SHOW JOINED': {
               target: '#ticketMachine.redeemed',
               guard: 'canWatchShow',
               actions: [

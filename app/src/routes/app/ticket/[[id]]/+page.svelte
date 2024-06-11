@@ -184,9 +184,7 @@
         reason: RefundReason.DISPUTE_DECISION
       })
     });
-    isWaitingForShow =
-      state.can({ type: 'SHOW JOINED' }) ||
-      state.can({ type: 'TICKET REDEEMED' });
+    isWaitingForShow = state.can({ type: 'SHOW JOINED' });
 
     isTicketDone = state.status === 'done' ?? false;
     if (isTicketDone) {
