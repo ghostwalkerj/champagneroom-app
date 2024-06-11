@@ -47,7 +47,8 @@ export type PaymentType = {
 export enum InvoiceJobType {
   UPDATE = 'UPDATE',
   CANCEL = 'CANCEL',
-  CREATE = 'CREATE'
+  CREATE = 'CREATE',
+  UPDATE_ADDRESS = 'UPDATE_ADDRESS'
 }
 
 export enum InvoiceStatus {

@@ -132,6 +132,8 @@ export type TicketMachineEventType =
   | {
       type: 'PAYMENT INITIATED';
       paymentCurrency: CurrencyType;
+      paymentAddress: string;
+      paymentId: string;
     }
   | {
       type: 'SHOW UPDATED';
@@ -272,11 +274,29 @@ export const ticketMachine = setup({
 
     initiatePayment: (
       _,
-      params: { ticket: TicketDocument; paymentCurrency: CurrencyType }
+      params: {
+        ticket: TicketDocument;
+        paymentCurrency: CurrencyType;
+        connection?: IORedis;
+        paymentAddress?: string;
+        paymentId?: string;
+      }
     ) => {
+      if (params.connection === undefined) return;
+      const connection = params.connection as IORedis;
+      const ticket = params.ticket;
+      const paymentCurrency = params.paymentCurrency;
+      const invoiceQueue = new Queue(EntityType.INVOICE, {
+        connection
+      });
+      invoiceQueue.add(InvoiceJobType.UPDATE_ADDRESS, {
+        ticketId: ticket._id,
+        paymentAddress: params.paymentAddress,
+        paymentId: params.paymentId
+      });
+      invoiceQueue.close();
+
       assign(() => {
-        const ticket = params.ticket;
-        const paymentCurrency = params.paymentCurrency;
         ticket.ticketState.status = TicketStatus.PAYMENT_INITIATED;
         ticket.ticketState.sale = ticketSaleSchema.parse({
           totals: {
@@ -838,7 +858,10 @@ export const ticketMachine = setup({
                   type: 'initiatePayment',
                   params: ({ context, event }) => ({
                     ticket: context.ticket,
-                    paymentCurrency: event.paymentCurrency
+                    paymentCurrency: event.paymentCurrency,
+                    connection: context.redisConnection,
+                    paymentId: event.paymentId,
+                    paymentAddress: event.paymentAddress
                   })
                 }
               ]

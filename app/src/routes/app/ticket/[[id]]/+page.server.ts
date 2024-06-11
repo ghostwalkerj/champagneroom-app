@@ -25,10 +25,7 @@ import type { CurrencyType, DisputeReason } from '$lib/constants';
 import { ActorType, RefundReason } from '$lib/constants';
 import { createBitcartToken } from '$lib/payments';
 
-import {
-  getInvoiceByIdInvoicesModelIdGet,
-  updatePaymentDetailsInvoicesModelIdDetailsPatch
-} from '$ext/bitcart';
+import { getInvoiceByIdInvoicesModelIdGet } from '$ext/bitcart';
 import type { DisplayInvoice } from '$ext/bitcart/models';
 
 import type { Actions, PageServerLoad } from './$types';
@@ -157,10 +154,13 @@ export const actions: Actions = {
     const ticketService = createTicketMachineService({
       ticket,
       show,
-      redisConnection
+      redisConnection,
+      options: {
+        saveState: true
+      }
     });
     const data = await request.formData();
-    const address = data.get('address') as string;
+    const paymentAddress = data.get('paymentAddress') as string;
     const paymentId = data.get('paymentId') as string;
     const paymentCurrency = data.get('paymentCurrency') as string;
 
@@ -172,43 +172,20 @@ export const actions: Actions = {
       throw error(404, 'Invoice not found');
     }
 
-    if (!address) {
-      return fail(400, { address, missingAddress: true });
+    if (!paymentAddress) {
+      return fail(400, { paymentAddress, missingAddress: true });
     }
 
     if (!paymentId) {
       return fail(400, { paymentId, missingPaymentId: true });
     }
 
-    // Tell bitcart payment is coming
-    const token = await createBitcartToken(
-      env.BITCART_EMAIL ?? '',
-      env.BITCART_PASSWORD ?? '',
-      env.BITCART_API_URL ?? ''
-    );
-
-    try {
-      updatePaymentDetailsInvoicesModelIdDetailsPatch(
-        ticket.bcInvoiceId,
-        {
-          id: paymentId,
-          address
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-    } catch (error_) {
-      console.error(error_);
-    }
-
     // Alert Ticket to incoming transaction
     ticketService.send({
       type: 'PAYMENT INITIATED',
-      paymentCurrency: paymentCurrency.toUpperCase() as CurrencyType
+      paymentCurrency: paymentCurrency.toUpperCase() as CurrencyType,
+      paymentId,
+      paymentAddress
     });
     ticketService?.stop();
 
@@ -285,25 +262,32 @@ export const load: PageServerLoad = async ({ locals }) => {
   if (!show) {
     throw error(404, 'Show not found');
   }
-  // Get invoice associated with ticket
-  const token = await createBitcartToken(
-    env.BITCART_EMAIL ?? '',
-    env.BITCART_PASSWORD ?? '',
-    env.BITCART_API_URL ?? ''
-  );
 
-  const invoice =
-    (ticket.bcInvoiceId &&
-      ((await getInvoiceByIdInvoicesModelIdGet(ticket.bcInvoiceId, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      })) as AxiosResponse<DisplayInvoice>)) ||
-    undefined;
+  let invoice: DisplayInvoice | undefined;
 
-  if (!invoice) {
-    throw error(404, 'Invoice not found');
+  if (ticket.bcInvoiceId) {
+    // Get invoice associated with ticket
+    const token = await createBitcartToken(
+      env.BITCART_EMAIL ?? '',
+      env.BITCART_PASSWORD ?? '',
+      env.BITCART_API_URL ?? ''
+    );
+
+    const response =
+      (ticket.bcInvoiceId &&
+        ((await getInvoiceByIdInvoicesModelIdGet(ticket.bcInvoiceId, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        })) as AxiosResponse<DisplayInvoice>)) ||
+      undefined;
+
+    if (!response) {
+      throw error(404, 'Invoice not found');
+    }
+
+    invoice = response.data;
   }
 
   const jitsiToken = jwt.sign(
@@ -343,6 +327,6 @@ export const load: PageServerLoad = async ({ locals }) => {
     ticket: ticket.toJSON({ flattenMaps: true, flattenObjectIds: true }),
     user: user?.toJSON({ flattenMaps: true, flattenObjectIds: true }),
     show: show.toJSON({ flattenMaps: true, flattenObjectIds: true }),
-    invoice: invoice?.data
+    invoice
   };
 };

@@ -26,6 +26,7 @@
     ShowStatus,
     TicketStatus
   } from '$lib/constants';
+  import type { DisplayInvoice } from '$lib/ext/bitcart/models';
   import { InvoiceStatus, type PaymentType } from '$lib/payments';
   import { connect, defaultWallet, selectedAccount } from '$lib/web3';
 
@@ -43,7 +44,7 @@
 
   let ticket = data.ticket as TicketDocument;
   let show = data.show as ShowDocument;
-  let invoice = data.invoice;
+  let invoice = data.invoice as DisplayInvoice | undefined;
   let user = data.user as UserDocument;
   let jitsiToken = data.jitsiToken as string;
   let feedbackForm = data.feedbackForm as SuperValidated<
@@ -158,6 +159,7 @@
     canWatchShow =
       state.matches({ reserved: 'waiting4Show' }) || state.matches('redeemed');
     hasPaymentSent =
+      invoice !== undefined &&
       state.matches({ reserved: 'initiatedPayment' }) &&
       invoice.status !== InvoiceStatus.COMPLETE;
     canCancelTicket =
@@ -261,6 +263,7 @@
           invalidateAll().then(() => {
             invoice = $page.data.invoice;
             if (
+              invoice &&
               invoice.status === InvoiceStatus.COMPLETE &&
               ticket.ticketState.status === TicketStatus.PAYMENT_INITIATED
             ) {

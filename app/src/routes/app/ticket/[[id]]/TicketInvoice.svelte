@@ -15,44 +15,44 @@
   import CopyText from '$components/CopyText.svelte';
   import type { DisplayInvoice } from '$ext/bitcart/models';
 
-  export let invoice: DisplayInvoice;
+  export let invoice: DisplayInvoice | undefined;
   export let ticket: TicketDocumentType;
 
   const ticketStatus = ticket.ticketState.status;
-  let invoiceTimeLeft = invoice.time_left;
+  let invoiceTimeLeft = invoice?.time_left || 0;
 
   const currentPayment = invoice?.payments?.[
     invoice?.payments?.length - 1
   ] as PaymentType;
 
-  let invoiceStatus = '';
-
   const today = spacetime.now();
 
-  switch (invoice.status) {
+  let invoiceStatusText = 'No Invoice';
+  const invoiceStatus =
+    invoice?.status || ('No Invoice' as InvoiceStatus | 'No Invoice');
+
+  switch (invoiceStatus) {
     case InvoiceStatus.EXPIRED: {
-      invoiceStatus = 'Invoice Expired';
+      invoiceStatusText = 'Invoice Expired';
       break;
     }
     case InvoiceStatus.COMPLETE: {
-      invoiceStatus = 'Invoice Paid';
+      invoiceStatusText = 'Invoice Paid';
       break;
     }
     case InvoiceStatus.INVALID: {
-      invoiceStatus = 'Invoice Invalid';
+      invoiceStatusText = 'Invoice Invalid';
       break;
     }
     case InvoiceStatus.REFUNDED: {
-      invoiceStatus = 'Invoice Refunded';
+      invoiceStatusText = 'Invoice Refunded';
       break;
     }
     default: {
-      invoiceStatus = 'Waiting for Payment';
+      invoiceStatusText = 'No Invoice';
+      break;
     }
   }
-
-  // Invoice
-  $: invoiceTimeLeft = invoice.time_left;
 
   const timer = setInterval(() => {
     if (invoiceTimeLeft > 0) {
@@ -83,13 +83,11 @@
   </div>
 
   <!-- Invoice Status Tag -->
-  {#if invoice.status === InvoiceStatus.EXPIRED || invoice.status === InvoiceStatus.COMPLETE || invoice.status === InvoiceStatus.INVALID || invoice.status === InvoiceStatus.REFUNDED}
-    <div
-      class="absolute right-4 top-4 rounded-lg bg-gray-100 bg-opacity-50 p-1 text-xs font-bold capitalize text-secondary-500 lg:p-2 lg:text-sm xl:p-3 xl:text-surface-500"
-    >
-      {invoiceStatus}
-    </div>
-  {/if}
+  <div
+    class="absolute right-4 top-4 rounded-lg bg-gray-100 bg-opacity-50 p-1 text-xs font-bold capitalize text-secondary-500 lg:p-2 lg:text-sm xl:p-3 xl:text-surface-500"
+  >
+    {invoiceStatusText}
+  </div>
 
   <!-- Invoice Content -->
   <div class="text-info-500 p-4">
@@ -131,7 +129,7 @@
       </div>
 
       <!-- Time Left to Pay Section -->
-      {#if ticketStatus !== TicketStatus.CANCELLED && invoice.status !== InvoiceStatus.COMPLETE && invoice.status !== InvoiceStatus.INVALID && invoice.status !== InvoiceStatus.REFUNDED}
+      {#if ticketStatus !== TicketStatus.CANCELLED && invoiceStatus !== InvoiceStatus.COMPLETE && invoiceStatus !== InvoiceStatus.INVALID && invoiceStatus !== InvoiceStatus.REFUNDED && invoiceStatus !== 'No Invoice'}
         <div class="text-warning-500 lg:text-right">
           <span class="font-bold">Time Left to Pay: </span>
           {invoiceTimeLeft ? durationFormatter(invoiceTimeLeft) : 'None'}
@@ -145,11 +143,11 @@
 
     <!-- Additional Invoice Information -->
     <div class="mb-4 text-center italic">
-      {#if invoice.status === InvoiceStatus.EXPIRED}
+      {#if invoiceStatus === InvoiceStatus.EXPIRED}
         <span class="font-bold">Invoice Expired</span>
-      {:else if invoice.status === InvoiceStatus.REFUNDED}
+      {:else if invoiceStatus === InvoiceStatus.REFUNDED}
         <span class="font-bold">Invoice Refunded</span>
-      {:else if invoice.status === InvoiceStatus.COMPLETE}
+      {:else if invoiceStatus === InvoiceStatus.COMPLETE}
         Invoice Paid
       {:else}
         Please pay with your connected wallet before <span class="font-bold"

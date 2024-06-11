@@ -16,7 +16,8 @@ import {
   getInvoiceByIdInvoicesModelIdGet,
   getPayoutByIdPayoutsModelIdGet,
   getRefundInvoicesRefundsRefundIdGet,
-  modifyInvoiceInvoicesModelIdPatch
+  modifyInvoiceInvoicesModelIdPatch,
+  updatePaymentDetailsInvoicesModelIdDetailsPatch
 } from '$lib/ext/bitcart';
 import type { DisplayInvoice, DisplayPayout } from '$lib/ext/bitcart/models';
 import {
@@ -306,6 +307,47 @@ export const getInvoiceWorker = ({
           });
           ticketService.stop();
           return 'success';
+        }
+
+        case InvoiceJobType.UPDATE_ADDRESS: {
+          const ticketId = job.data.ticketId;
+          if (!ticketId) {
+            return 'No ticket ID';
+          }
+          const ticket = (await Ticket.findById(ticketId).orFail(() => {
+            throw new Error('Ticket not found');
+          })) as TicketDocument;
+          const paymentId = job.data.paymentId;
+          if (!paymentId) {
+            return 'No payment ID';
+          }
+          const paymentAddress = job.data.paymentAddress;
+          if (!paymentAddress) {
+            return 'No address';
+          }
+          if (ticket.bcInvoiceId === undefined) {
+            return 'No invoice ID';
+          }
+
+          try {
+            updatePaymentDetailsInvoicesModelIdDetailsPatch(
+              ticket.bcInvoiceId,
+              {
+                id: paymentId,
+                address: paymentAddress
+              },
+              {
+                headers: {
+                  Authorization: `Bearer ${authToken}`,
+                  'Content-Type': 'application/json'
+                }
+              }
+            );
+          } catch (error_) {
+            console.error(error_);
+          }
+
+          break;
         }
 
         default: {
