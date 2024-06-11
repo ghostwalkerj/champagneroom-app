@@ -173,7 +173,6 @@
         rating: 5
       }
     });
-
     canDispute = state.can({
       type: 'DISPUTE INITIATED',
       dispute: ticketDisputeSchema.parse({
@@ -185,7 +184,6 @@
       })
     });
     isWaitingForShow = state.can({ type: 'SHOW JOINED' });
-
     isTicketDone = state.status === 'done' ?? false;
     if (isTicketDone) {
       showUnSub?.();
