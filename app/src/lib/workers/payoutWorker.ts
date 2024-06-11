@@ -42,13 +42,13 @@ import type {
   DisplayPayout,
   Store
 } from '$lib/ext/bitcart/models';
-import { getWalletMachineService } from '$lib/server/machinesUtil';
 import {
-  PayoutJobType,
   type PaymentType,
+  PayoutJobType,
   PayoutReason,
   PayoutStatus
 } from '$lib/payments';
+import { getWalletMachineService } from '$lib/server/machinesUtil';
 
 export type PayoutJobDataType = {
   [key: string]: any;
@@ -126,7 +126,7 @@ export const getPayoutWorker = ({
               return 'Unconfirmed payment';
             }
 
-            if (!ticketState.matches({ reserved: 'refundRequested' })) {
+            if (!ticketState.matches({ reserved: 'waiting4Refund' })) {
               return 'Not in refund requested state';
             }
 

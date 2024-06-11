@@ -102,23 +102,15 @@ export const getInvoiceWorker = ({
                   redisConnection
                 );
 
-                const ticketState = ticketService.getSnapshot();
                 const cancel = cancelSchema.parse({
                   cancelledBy: ActorType.TIMER,
-                  cancelledInState: JSON.stringify(ticketState.value),
+                  cancelledInState: ticketService.getSnapshot().value,
                   reason: CancelReason.TICKET_PAYMENT_TIMEOUT
                 });
-                if (
-                  ticketState.can({
-                    type: 'CANCELLATION REQUESTED',
-                    cancel
-                  })
-                ) {
-                  ticketService.send({
-                    type: 'CANCELLATION REQUESTED',
-                    cancel
-                  });
-                }
+                ticketService.send({
+                  type: 'CANCELLATION REQUESTED',
+                  cancel
+                });
                 ticketService.stop();
                 return 'success';
               };

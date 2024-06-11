@@ -1,6 +1,5 @@
 import { error, fail } from '@sveltejs/kit';
 import type { AxiosResponse } from 'axios';
-import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 import jwt from 'jsonwebtoken';
 import { zod } from 'sveltekit-superforms/adapters';
@@ -10,7 +9,6 @@ import { env } from '$env/dynamic/private';
 import { env as pubEnvironment } from '$env/dynamic/public';
 
 import {
-  cancelSchema,
   refundSchema,
   ticketDisputeSchema,
   ticketFeedbackSchema
@@ -23,20 +21,9 @@ import {
   type TicketMachineEventType
 } from '$lib/machines/ticketMachine';
 
-import type { PayoutQueueType } from '$lib/workers/payoutWorker';
-
 import type { CurrencyType, DisputeReason } from '$lib/constants';
-import {
-  ActorType,
-  CancelReason,
-  EntityType,
-  RefundReason
-} from '$lib/constants';
-import {
-  createBitcartToken,
-  InvoiceJobType,
-  PayoutJobType
-} from '$lib/payments';
+import { ActorType, RefundReason } from '$lib/constants';
+import { createBitcartToken } from '$lib/payments';
 
 import {
   getInvoiceByIdInvoicesModelIdGet,
@@ -61,68 +48,13 @@ export const actions: Actions = {
       show,
       redisConnection
     });
-    const state = ticketService.getSnapshot();
-    const bcInvoiceId = state.context.ticket.bcInvoiceId;
 
-    // Cancel the invoice attached to the ticket if no payment has been made
-    if (state.matches({ reserved: 'waiting4Payment' })) {
-      const cancel = cancelSchema.parse({
-        cancelledBy: ActorType.CUSTOMER,
-        cancelledInState: JSON.stringify(state.value),
-        reason: CancelReason.CUSTOMER_CANCELLED
-      });
+    const cancelEvent = {
+      type: 'CANCELLATION REQUESTED'
+    } as TicketMachineEventType;
 
-      const cancelEvent = {
-        type: 'CANCELLATION REQUESTED',
-        cancel
-      } as TicketMachineEventType;
-
-      ticketService.send(cancelEvent);
-
-      const invoiceQueue = new Queue(EntityType.INVOICE, {
-        connection: redisConnection
-      });
-      invoiceQueue.add(InvoiceJobType.CANCEL, {
-        bcInvoiceId
-      });
-      invoiceQueue.close();
-    }
-
-    // If a payment as been made or in progress, then issue a refund
-    else if (state.matches({ reserved: 'waiting4Show' })) {
-      // Check what payments were made from sales
-      const sales = ticket.ticketState.sale;
-      if (!sales) {
-        throw error(404, 'No sales found');
-      }
-
-      // Create refund object
-      const refund = refundSchema.parse({
-        reason: CancelReason.CUSTOMER_CANCELLED,
-        requestedAmounts: sales.total,
-        refundCurrency: sales.paymentCurrency
-      });
-
-      // Refund the same amount as sent, not equivalent to show currency
-      // ie, show currency is USD, but payment was made in ETH
-      ticketService // Send refund event
-        .send({
-          type: 'REFUND REQUESTED',
-          refund
-        });
-
-      const payoutQueue = new Queue(EntityType.PAYOUT, {
-        connection: redisConnection
-      }) as PayoutQueueType;
-      payoutQueue.add(PayoutJobType.REFUND_SHOW, {
-        bcInvoiceId,
-        ticketId: ticket._id
-      });
-      payoutQueue.close();
-    }
-
+    ticketService.send(cancelEvent);
     ticketService?.stop();
-
     return {
       success: true,
       ticketCancelled: true

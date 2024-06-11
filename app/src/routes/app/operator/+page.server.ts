@@ -1,6 +1,5 @@
 import type { Actions, RequestEvent } from '@sveltejs/kit';
-import { fail, redirect } from '@sveltejs/kit';
-import { Queue } from 'bullmq';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { nanoid } from 'nanoid';
 import { generateSillyPassword } from 'silly-password-generator';
 
@@ -10,12 +9,12 @@ import { Agent } from '$lib/models/agent';
 import { Creator } from '$lib/models/creator';
 import type { OperatorDocument } from '$lib/models/operator';
 import type { ShowDocument } from '$lib/models/show';
-import { Ticket } from '$lib/models/ticket';
+import { Ticket, type TicketDocument } from '$lib/models/ticket';
 import type { UserDocument } from '$lib/models/user';
 import { User } from '$lib/models/user';
 import { Wallet } from '$lib/models/wallet';
 
-import type { ShowQueueType } from '$lib/workers/showWorker';
+import { createShowMachineService } from '$lib/machines/showMachine';
 
 import config from '$lib/config';
 import type { DisputeDecision } from '$lib/constants';
@@ -287,18 +286,28 @@ export const actions: Actions = {
       return fail(400, { showId, badShowId: true });
     }
 
-    const redisConnection = locals.redisConnection;
-    const showQueue = new Queue(EntityType.SHOW, {
-      connection: redisConnection
-    }) as ShowQueueType;
+    const ticket = (await Ticket.findById(ticketId)
+      .populate('show')
+      .orFail(() => {
+        throw error(404, 'Ticket not found');
+      })) as TicketDocument;
 
-    showQueue.add('DISPUTE DECIDED', {
-      showId,
-      ticketId,
-      decision
+    const redisConnection = locals.redisConnection;
+
+    const showService = createShowMachineService({
+      show: ticket.show,
+      redisConnection,
+      options: {
+        saveState: true,
+        saveShowEvents: true
+      }
     });
 
-    showQueue.close();
+    showService.send({
+      type: 'DISPUTE DECIDED',
+      decision,
+      ticket
+    });
 
     return {
       success: true

@@ -161,7 +161,7 @@ const refundTickets = async (
         }
       });
       const ticketState = ticketService.getSnapshot();
-      if (ticketState.matches({ reserved: 'refundRequested' })) {
+      if (ticketState.matches({ reserved: 'waiting4Refund' })) {
         payoutQueue.add(PayoutJobType.REFUND_SHOW, {
           bcInvoiceId: ticket.bcInvoiceId,
           ticketId: ticket._id.toString()

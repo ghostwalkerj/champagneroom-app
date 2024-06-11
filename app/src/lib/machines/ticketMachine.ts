@@ -1,3 +1,4 @@
+import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 import { nanoid } from 'nanoid';
 import {
@@ -5,6 +6,7 @@ import {
   assign,
   createActor,
   fromPromise,
+  not,
   raise,
   sendTo,
   setup,
@@ -33,11 +35,14 @@ import type { ShowDocument } from '$lib/models/show';
 import type { TicketDocument } from '$lib/models/ticket';
 import type { TransactionDocument } from '$lib/models/transaction';
 
+import type { PayoutQueueType } from '$lib/workers/payoutWorker';
+
 import type { CurrencyType } from '$lib/constants';
 import {
   ActorType,
+  CancelReason,
   DisputeDecision,
-  RefundReason,
+  EntityType,
   TicketStatus
 } from '$lib/constants';
 import type { DisplayInvoice } from '$lib/ext/bitcart/models';
@@ -45,7 +50,9 @@ import {
   type BitcartConfig as bcConfig,
   calcTotal,
   createTicketInvoice,
-  type PaymentType
+  InvoiceJobType,
+  type PaymentType,
+  PayoutJobType
 } from '$lib/payments';
 
 import {
@@ -70,15 +77,11 @@ type TicketMachineContext = {
 export type TicketMachineEventType =
   | {
       type: 'CANCELLATION REQUESTED';
-      cancel: CancelType;
+      cancel?: CancelType;
     }
   | {
       type: 'REFUND RECEIVED';
       transaction: TransactionDocument;
-    }
-  | {
-      type: 'REFUND REQUESTED';
-      refund: RefundType;
     }
   | {
       type: 'REFUND INITIATED';
@@ -283,25 +286,6 @@ export const ticketMachine = setup({
       });
     },
 
-    requestRefundCancelledShow: (
-      _,
-      params: { cancel: CancelType; ticket: TicketDocument }
-    ) => {
-      assign(() => {
-        const ticket = params.ticket;
-        ticket.ticketState.status = TicketStatus.REFUND_REQUESTED;
-        ticket.ticketState.cancel = params.cancel;
-        ticket.ticketState.refund = refundSchema.parse({
-          requestedAmounts: ticket.ticketState.sale?.total,
-          approvedAmounts: ticket.ticketState.sale?.total,
-          reason: RefundReason.SHOW_CANCELLED
-        });
-        return {
-          ticket
-        };
-      });
-    },
-
     initiatePayment: (
       _,
       params: { ticket: TicketDocument; paymentCurrency: CurrencyType }
@@ -350,20 +334,43 @@ export const ticketMachine = setup({
       });
     },
 
-    reserveFreeTicket: (_, params: { ticket: TicketDocument }) => {
-      assign(() => {
-        const ticket = params.ticket;
-        ticket.ticketState.status = TicketStatus.RESERVED;
-        return { ticket };
-      });
-    },
-
     cancelTicket: (_, params: { ticket: TicketDocument }) => {
       assign(() => {
         const ticket = params.ticket;
         ticket.ticketState.status = TicketStatus.CANCELLED;
         return { ticket };
       });
+    },
+
+    cancelInvoice: (
+      _,
+      params: { ticket: TicketDocument; connection?: IORedis }
+    ) => {
+      const ticket = params.ticket;
+      if (!ticket.bcInvoiceId || !params.connection) return;
+      const invoiceQueue = new Queue(EntityType.INVOICE, {
+        connection: params.connection
+      });
+      invoiceQueue.add(InvoiceJobType.CANCEL, {
+        bcInvoiceId: ticket.bcInvoiceId
+      });
+      invoiceQueue.close();
+    },
+
+    createRefundPayout: (
+      _,
+      params: { ticket: TicketDocument; connection?: IORedis }
+    ) => {
+      const ticket = params.ticket;
+      if (!ticket.bcInvoiceId || !params.connection) return;
+      const payoutQueue = new Queue(EntityType.PAYOUT, {
+        connection: params.connection
+      }) as PayoutQueueType;
+      payoutQueue.add(PayoutJobType.REFUND_SHOW, {
+        bcInvoiceId: ticket.bcInvoiceId,
+        ticketId: ticket._id
+      });
+      payoutQueue.close();
     },
 
     receiveInvoice: (
@@ -413,16 +420,19 @@ export const ticketMachine = setup({
     requestRefund: (
       _,
       params: {
+        cancel: CancelType;
         ticket: TicketDocument;
         refund: RefundType;
       }
     ) => {
       assign(() => {
         const ticket = params.ticket;
-        const refund = params.refund;
         ticket.ticketState.status = TicketStatus.REFUND_REQUESTED;
-        ticket.ticketState.refund = refund;
-        return { ticket };
+        ticket.ticketState.cancel = params.cancel;
+        ticket.ticketState.refund = params.refund;
+        return {
+          ticket
+        };
       });
     },
 
@@ -639,7 +649,6 @@ export const ticketMachine = setup({
     },
     canBeRefunded: ({ context }) => {
       const currency = context.ticket.price.currency;
-
       return (
         context.ticket.price.amount !== 0 &&
         (!context.ticket.ticketState.sale ||
@@ -662,6 +671,7 @@ export const ticketMachine = setup({
       context.ticket.price.amount > 0
   }
 }).createMachine({
+  /** @xstate-layout N4IgpgJg5mDOIC5QBcCWBjA1mZBZAhugBaoB2YAxAMICCAclQKIAyzNAKgJIDydABACVGARQCqjAMrtGAEQDaABgC6iUAAcA9rFRoNpVSAAeiAKwB2ADQgAnogDMAJgCcAOjsmnZ505MBGACz+AGx2AL6hVmhYOATEZJS0DCxsXLyCIuJSsnK+Kkggmtq6+vnGCOZWtgj+ZgAcLg6+TnZBQf5NCiFB4ZEY2HiEJOQUEgAS3ADqfIlMrNnKBoU6qHoGZRU2iEEKCi5BDib+Jo4HTrUtPSBR-bFDlGOT0-SzzNm5i1rLq6WmlpsIvlquxMOwUzX851qzku1xig3iI3GU1EAAUZBx5nl1J9imtEIDDi4AgpajVan4zHZKvY7L5gXZyR0gb4zCSYX04XFhg8pow6DJMR8iisSqB1n8qgd2i4vEFmiFmnZ3N0IlcOQMuWAXLDkMwNPgIJAKIosQUcSK8QgHMEGkETPszBC6Q5zkFqQDzEEGtaWi7GkE6iretENXdteq9QajTlTUtcT8rfbbfaHI7as7zlT-iy7K47IEHApDmcnP4DuyQ7d4uGQ5HDRBjQ5Y+bvmLEA4WsmHU6FC6Wu7fAcHA0TEDtvmzL57WFVTqq+Qa-069G7M3ha2jO2HF7tym0xn+9nfAGGumQv5Oi0nAoZ8GbvCFzrlw25P4119RZurceu6me323WzItXBvHNaScM5JzMCt701RccGfY0THfeM2ytTpf33XtXXdMxzDcF19hJIJalJJoYM5MMn31etjSCFCLQTQsdztbt02ww9JUCepC1pIszDlfMHAo0Nq2oqMXzMBiNzKA4WL3f9MwHWpWTcAsi38EsyxMET5y1cTaLkWppM-WTt0wxTOPbOxezcOlBwUNM5WE2d1T0+DdRo6MnBMy0O3ktiD0AyUi2HfNtNqfZnFzXSH30iMvJfOlfKYn9d0CjjgvbC9h14g4QT8G9-FiuCDOjXx3nyONGLQ60Ar-diAPdQsMPCi8zGvYIbJ01zKzilx0AAJzAfBkCNLgqAAaUYdh0gkRgBAANUFKqW1M0wGRcUkWlI8cwXzAdDn8Fx-DsDqmnTFlAxKsMhpGsaGwm6bZqEealreFK0OOeptpIyKb32-wBzLYdQMzHYIVHHq70o6thtgMBBoAN0gFwAHd8GWUgoH8ThSCRjQMEoCA9C1MgCewAbhtGsA8YJomTSFD9LV8Wl6jqOkSKLIErI9RoGknFlItaVNJxuuG4ERlGIHRzG0Gx-wUXwawAFswFIZAKBRGgAE1cD5WbODoTguAxeQFlW9d1oBOVfBlfNaVZWp5RMExDqaGVJxaTpNJvFyYdEhd4al1GyGWGmICV1X1c17W9YN9ImE4Zbzc+r9CyBFwUxUtojknBxDows4IQDOlIsdaG1T6uDg+R0PSHDh6o7VjWtd1-W6Bexgk5TmMmdQ9OSWBfYc8CcxBwHM7djw9iILzklanFoPJbrmXhvQMBUGl5uY7b+PO8Txhk5W7Erb8rxjpUkwO0nX3zCzKpWbOlwNKcOr3GCASl61WvpZcdfN7b2Vi3WO7cE5CB7h9fuNV045RlB0e0HVKSkiBtmF0JgZRnldFFMsi9eqwTDL-VGGMsY4wkEQDQaMKBPRmukAUjB9ap2gTJew1oMFnXtOSccU8soeinFtIIU5BwBmdumYq+DYbLwRqvWWpD-ACDAAAMwAK6kAbEIAAYqIfkh9j5MMtszBMjgjhuDwiRe0N4eHuggl6bYTQ2j2mCFOaCEjA4-xXn-Eh8scYKJUWoigmjtEyF0b3Sqp9DFoTpEWNwHglSNFpLmTo1iTGOHJBBdwTQ36+G-v-SAYAwBqwbDyPgrwNHsEZgYge6xATAknCpHwhwGQF2zAJMwex2hNFHJ1QRQYq4EIloaApRpikACluBGxPmaM+CY-D8MEfxEiY83bZlLnsepT9HKkhUjk9WtEaGzQ0UbGgzBOAAC1JnVRYQCSkrhgg+Cfqku0zUoYvx2MeKc+xII7LUfXRgsAhqUIoBoxgsgABCNApohIuWtFm3h4G5mPMEG8o5mmShqSdG8aSbmAlTN8+sLgyB-IBVQmQnAJAolENIPgRsTacDNhU8JVTEBmJcMXHOdIrxOF8M1FkuwUGAlzFCfalc5z9V2b8-5g1AUMqmREr8LK2UCQ5XKLlzVoojl7KyOo15WYircmKn5MsyAyFQLANQyixqyO8f4GQYB0CmpFBQUl5LKWMD4AKKgnABT6MZTAsoHUMEBgcD6MEIQyLNS8LsXiT9GQKECL00VcFxVGtICas1FqtReLIDjW19rtB6CdWSilVKPVeqgZUv1+IAh2A1YGZ0F1ajNShMdJp7gPBcsck4PF9c03mstVmhWvaM2+NUeoxgWidEQKPr3C2vqrkBBInscedRWkkldhG2kL8zDboqo4vCXbXHuWTS4FWpqEYQHIYC51xa3U0tNtIH1sqmXlD8DKEEu6uWO08M1CCbSQgdmCLbU6PVVSkA0IaeA+RE13GYdbJw7oAC0GCIIodQ6hqcOSyoQFg5aDYj9y5ElZkcUixi345LuhHHDCYywgXlIEXl5JSLLMfuYY6NRToqUdgoAIOSiHYYrVcnwbT3CKniaza8vDyRtKhOXONAZcxll4x44hcts243xoTDeVHIk7DzC6CqO6mgMndrczwpJBGHCgkp6RnjVMKx3hrbTX4hF8tOh1N+zhgioJY2WVlnhPAkTOoObJh7+p8YJQ3NAEcHPICc2UDoNbKTcQgq7a06ZDoggaGSbYTg7ROLwQHdy4WAFb0gDFuL2VKR7ClCEC6IIH74gZF6JLUEBLbA8NZkOMsB1kIoWjCrCBurDja8SQcXtHIZbCgEY4YIOrBsU6Fmuynut2Z8Uo0dA26R4VZccKcwbOiAghAOOTp5jxKiOKOEkt4+mSPcYMwpA2P7SaaE0AD76jjKUXR4EGKGyzboKzdtxA18CkA3gAGzB5AR72xhxHF9KdUN5xrHND2LSO0TR57BByYosg+AweoAAF5Q4E9bIzz3HBcuvqRCG7o2b0ihPsc7XhcWLbDMmgb9W33canJ+lk37-gZxreFfKs3NJ6urmzw1EWiVSv6yT3DzsGieABiEYiRZmo2Wk2CUseX5kum7SmodY0BuOj-czhHuWGTtGav+mURVjhjx9C4wrBr8XGtNX2zNq2bV2odRuS51t6knUZBk0cUI8JNpqHsME+27QdTaM7wHR6pfu-Tf273RuwAjrUZto4LboqlgZFCLljaBeMeD2dM4QWAwHpd0mqXp7YDnsvXLudcHWZqWCDJyEHZmPZQhA0UClntjcZZ+EIAA */
   context: ({ input }) => ({
     ticket: input.ticket,
     show: input.show,
@@ -711,10 +721,6 @@ export const ticketMachine = setup({
           guard: 'ticketFullyPaid'
         },
         {
-          target: '#ticketMachine.reserved.refundRequested',
-          guard: 'ticketHasRefundRequested'
-        },
-        {
           target: '#ticketMachine.reserved.waiting4Refund',
           guard: 'ticketIsWaitingForRefund'
         },
@@ -750,25 +756,13 @@ export const ticketMachine = setup({
     },
     created: {
       on: {
-        'CANCELLATION REQUESTED': {
-          target: '#ticketMachine.cancelled',
-          actions: [
-            {
-              type: 'cancelTicket',
-              params: ({ context, event }) => ({
-                ticket: context.ticket,
-                cancel: event.cancel
-              })
-            }
-          ]
-        },
         'TICKET RESERVED': [
           {
             target: '#ticketMachine.reserved.waiting4Show',
             guard: 'canReserveFreeTicket',
             actions: [
               {
-                type: 'reserveFreeTicket',
+                type: 'reserveTicket',
                 params: ({ context }) => ({
                   ticket: context.ticket
                 })
@@ -829,25 +823,6 @@ export const ticketMachine = setup({
         },
         waiting4Payment: {
           on: {
-            'CANCELLATION REQUESTED': {
-              target: '#ticketMachine.cancelled',
-              actions: [
-                {
-                  type: 'cancelTicket',
-                  params: ({ context, event }) => ({
-                    ticket: context.ticket,
-                    cancel: event.cancel
-                  })
-                },
-                {
-                  type: 'sendTicketCancelled',
-                  params: ({ context, event }) => ({
-                    ticket: context.ticket,
-                    cancel: event.cancel
-                  })
-                }
-              ]
-            },
             'PAYMENT INITIATED': {
               target: '#ticketMachine.reserved.initiatedPayment',
               actions: [
@@ -951,19 +926,7 @@ export const ticketMachine = setup({
                   }
                 ]
               }
-            ],
-            'REFUND REQUESTED': {
-              target: 'refundRequested',
-              actions: [
-                {
-                  type: 'requestRefund',
-                  params: ({ context, event }) => ({
-                    ticket: context.ticket,
-                    refund: event.refund
-                  })
-                }
-              ]
-            }
+            ]
           }
         },
         waiting4Show: {
@@ -982,63 +945,6 @@ export const ticketMachine = setup({
                   type: 'sendTicketRedeemed',
                   params: ({ context }) => ({
                     ticket: context.ticket
-                  })
-                }
-              ]
-            },
-            'REFUND REQUESTED': [
-              {
-                target: 'refundRequested',
-                actions: [
-                  {
-                    type: 'requestRefund',
-                    params: ({ context, event }) => ({
-                      ticket: context.ticket,
-                      refund: event.refund
-                    })
-                  }
-                ],
-                guard: 'canBeRefunded'
-              },
-              {
-                target: '#ticketMachine.cancelled',
-                actions: [
-                  {
-                    type: 'requestRefund',
-                    params: ({ context, event }) => ({
-                      ticket: context.ticket,
-                      refund: event.refund
-                    })
-                  },
-                  {
-                    type: 'cancelTicket',
-                    params: ({ context, event }) => ({
-                      ticket: context.ticket,
-                      refund: event.refund
-                    })
-                  },
-                  {
-                    type: 'sendTicketRefunded',
-                    params: ({ context, event }) => ({
-                      ticket: context.ticket,
-                      refund: event.refund
-                    })
-                  }
-                ]
-              }
-            ]
-          }
-        },
-        refundRequested: {
-          on: {
-            'REFUND INITIATED': {
-              target: 'waiting4Refund',
-              actions: [
-                {
-                  type: 'initiateRefund',
-                  params: ({ context, event }) => ({
-                    ticket: context.ticket,
-                    refund: event.refund
                   })
                 }
               ]
@@ -1087,41 +993,6 @@ export const ticketMachine = setup({
             ]
           }
         }
-      },
-      on: {
-        'SHOW CANCELLED': [
-          {
-            target: '#ticketMachine.reserved.refundRequested',
-            actions: [
-              {
-                type: 'requestRefundCancelledShow',
-                params: ({ context, event }) => ({
-                  ticket: context.ticket,
-                  cancel: event.cancel
-                })
-              }
-            ],
-            guard: 'canBeRefunded'
-          },
-          {
-            target: '#ticketMachine.cancelled',
-            actions: [
-              {
-                type: 'cancelTicket',
-                params: ({ context }) => ({
-                  ticket: context.ticket
-                })
-              },
-              {
-                type: 'sendTicketCancelled',
-                params: ({ context, event }) => ({
-                  ticket: context.ticket,
-                  cancel: event.cancel
-                })
-              }
-            ]
-          }
-        ]
       }
     },
     redeemed: {
@@ -1347,6 +1218,130 @@ export const ticketMachine = setup({
     }
   },
   on: {
+    'CANCELLATION REQUESTED': [
+      {
+        guard: not('canBeRefunded'),
+        target: '#ticketMachine.cancelled',
+        actions: [
+          {
+            type: 'cancelTicket',
+            params: ({ context, event }) => ({
+              ticket: context.ticket,
+              cancel:
+                event.cancel ??
+                ({
+                  cancelledAt: new Date(),
+                  cancelledBy: ActorType.CUSTOMER,
+                  reason: CancelReason.CUSTOMER_CANCELLED,
+                  cancelledInState: context.show.showState.status
+                } as CancelType)
+            })
+          },
+          {
+            type: 'cancelInvoice',
+            params: ({ context }) => ({
+              ticket: context.ticket,
+              connection: context.redisConnection
+            })
+          },
+          {
+            type: 'sendTicketCancelled',
+            params: ({ context }) => ({
+              ticket: context.ticket,
+              cancel: context.ticket.ticketState.cancel as CancelType
+            })
+          }
+        ]
+      },
+      {
+        target: '#ticketMachine.reserved.waiting4Refund',
+        actions: [
+          {
+            type: 'requestRefund',
+            params: ({ context, event }) => ({
+              ticket: context.ticket,
+              cancel:
+                event.cancel ??
+                ({
+                  cancelledAt: new Date(),
+                  cancelledBy: ActorType.CUSTOMER,
+                  reason: CancelReason.CUSTOMER_CANCELLED,
+                  cancelledInState: context.show.showState.status
+                } as CancelType),
+              refund: refundSchema.parse({
+                reason: CancelReason.CUSTOMER_CANCELLED,
+                requestedAmounts: context.ticket.ticketState.sale?.total || 0,
+                refundCurrency: context.ticket.ticketState.sale?.paymentCurrency
+              })
+            })
+          },
+          {
+            type: 'createRefundPayout',
+            params: ({ context }) => ({
+              ticket: context.ticket,
+              connection: context.redisConnection
+            })
+          }
+        ]
+      }
+    ],
+    'SHOW CANCELLED': [
+      {
+        target: '#ticketMachine.reserved.waiting4Refund',
+        actions: [
+          {
+            type: 'requestRefund',
+            params: ({ context }) => ({
+              ticket: context.ticket,
+              cancel: {
+                cancelledAt: new Date(),
+                cancelledBy: ActorType.AGENT,
+                reason: CancelReason.CREATOR_CANCELLED,
+                cancelledInState: context.show.showState.status
+              } as CancelType,
+              refund: refundSchema.parse({
+                reason: CancelReason.CREATOR_CANCELLED,
+                requestedAmounts: context.ticket.ticketState.sale?.total || 0,
+                refundCurrency: context.ticket.ticketState.sale?.paymentCurrency
+              })
+            })
+          },
+          {
+            type: 'createRefundPayout',
+            params: ({ context }) => ({
+              ticket: context.ticket,
+              connection: context.redisConnection
+            })
+          }
+        ],
+        guard: 'canBeRefunded'
+      },
+      {
+        target: '#ticketMachine.cancelled',
+        actions: [
+          {
+            type: 'cancelTicket',
+            params: ({ context }) => ({
+              ticket: context.ticket
+            })
+          },
+          {
+            type: 'cancelInvoice',
+            params: ({ context }) => ({
+              ticket: context.ticket,
+              connection: context.redisConnection
+            })
+          },
+          {
+            type: 'sendTicketCancelled',
+            params: ({ context, event }) => ({
+              ticket: context.ticket,
+              cancel: event.cancel
+            })
+          }
+        ]
+      }
+    ],
     'SHOW UPDATED': {
       actions: [
         {
