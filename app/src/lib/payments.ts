@@ -46,7 +46,8 @@ export type PaymentType = {
 
 export enum InvoiceJobType {
   UPDATE = 'UPDATE',
-  CANCEL = 'CANCEL'
+  CANCEL = 'CANCEL',
+  CREATE = 'CREATE'
 }
 
 export enum InvoiceStatus {
@@ -117,24 +118,16 @@ export const createBitcartToken = async (
 
 export const createTicketInvoice = async ({
   ticket,
+  token,
   bcConfig
 }: {
   ticket: {
     price: { amount: number; currency: string };
     _id: object | string;
   };
-  bcConfig?: BitcartConfig;
+  token: string;
+  bcConfig: BitcartConfig;
 }) => {
-  if (!bcConfig) {
-    throw new Error('Bitcart config not found');
-  }
-  // Create invoice in Bitcart
-  const token = await createBitcartToken(
-    bcConfig.email,
-    bcConfig.password,
-    bcConfig.apiURL
-  );
-
   const response = await createInvoiceInvoicesPost(
     {
       price: ticket.price.amount,

@@ -46,7 +46,10 @@ export const actions: Actions = {
     const ticketService = createTicketMachineService({
       ticket,
       show,
-      redisConnection
+      redisConnection,
+      options: {
+        saveState: true
+      }
     });
 
     const cancelEvent = {
@@ -73,7 +76,10 @@ export const actions: Actions = {
     const ticketService = createTicketMachineService({
       ticket,
       show,
-      redisConnection
+      redisConnection,
+      options: {
+        saveState: true
+      }
     });
     const data = await request.formData();
     const rating = data.get('rating') as string;
@@ -81,17 +87,15 @@ export const actions: Actions = {
     if (!rating || rating === '0') {
       return fail(400, { rating, missingRating: true });
     }
-    const state = ticketService.getSnapshot();
     const feedback = ticketFeedbackSchema.parse({
       rating: +rating,
       review
     });
-    if (state.can({ type: 'FEEDBACK RECEIVED', feedback })) {
-      ticketService.send({
-        type: 'FEEDBACK RECEIVED',
-        feedback
-      });
-    }
+    ticketService.send({
+      type: 'FEEDBACK RECEIVED',
+      feedback
+    });
+
     ticketService?.stop();
     return { success: true, rating, review, feedbackReceived: true };
   },
@@ -108,7 +112,10 @@ export const actions: Actions = {
     const ticketService = createTicketMachineService({
       ticket,
       show,
-      redisConnection
+      redisConnection,
+      options: {
+        saveState: true
+      }
     });
     const data = await request.formData();
     const reason = data.get('reason') as string;
@@ -117,39 +124,24 @@ export const actions: Actions = {
     if (!explanation || explanation === '') {
       return fail(400, { explanation, missingExplanation: true });
     }
-
     if (!reason) {
       return fail(400, { reason, missingReason: true });
     }
-
-    const state = ticketService.getSnapshot();
     const dispute = ticketDisputeSchema.parse({
       disputedBy: ActorType.CUSTOMER,
       reason: reason as DisputeReason,
       explanation
     });
-
     const refund = refundSchema.parse({
       requestedAmount: ticket.ticketState.sale?.total || 0,
       reason: RefundReason.DISPUTE_DECISION
     });
-
-    if (
-      state.can({
-        type: 'DISPUTE INITIATED',
-        dispute,
-        refund
-      })
-    ) {
-      ticketService.send({
-        type: 'DISPUTE INITIATED',
-        dispute,
-        refund
-      });
-    }
-
+    ticketService.send({
+      type: 'DISPUTE INITIATED',
+      dispute,
+      refund
+    });
     ticketService?.stop();
-
     return { success: true, reason, explanation, disputeInitiated: true };
   },
 

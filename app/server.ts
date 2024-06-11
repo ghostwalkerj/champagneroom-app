@@ -14,7 +14,7 @@ import parseArgv from 'tiny-parse-argv';
 
 import { handler } from './build/handler';
 import { EntityType } from './dist/constants';
-import { createBitcartToken } from './dist/payments';
+import { type BitcartConfig, createBitcartToken } from './dist/payments';
 import { getInvoiceWorker } from './dist/workers/invoiceWorker';
 import { getPayoutWorker } from './dist/workers/payoutWorker';
 import { getShowWorker } from './dist/workers/showWorker';
@@ -54,11 +54,20 @@ const payoutQueue = new Queue(EntityType.PAYOUT, {
   connection
 });
 
-const paymentAuthToken = await createBitcartToken(
+const authToken = await createBitcartToken(
   process.env.BITCART_EMAIL || '',
   process.env.BITCART_PASSWORD || '',
   process.env.BITCART_API_URL || ''
 );
+
+const bcConfig = {
+  storeId: process.env.BITCART_STORE_ID,
+  email: process.env.BITCART_EMAIL,
+  password: process.env.BITCART_PASSWORD,
+  apiURL: process.env.BITCART_API_URL,
+  authSalt: process.env.BITCART_AUTH_SALT,
+  invoiceNotificationUrl: process.env.BITCART_INVOICE_NOTIFICATION_URL
+} as BitcartConfig;
 
 // Workers
 if (startWorker) {
@@ -67,14 +76,14 @@ if (startWorker) {
     showQueue,
     // @ts-ignore
     payoutQueue,
-    redisConnection: connection,
-    paymentAuthToken
+    redisConnection: connection
   });
   showWorker.run();
 
   const invoiceWorker = getInvoiceWorker({
     redisConnection: connection,
-    paymentAuthToken
+    authToken,
+    bcConfig
   });
   invoiceWorker.run();
 
@@ -82,7 +91,7 @@ if (startWorker) {
     // @ts-ignore
     payoutQueue,
     redisConnection: connection,
-    paymentAuthToken
+    authToken
   });
   payoutWorker.run();
 }

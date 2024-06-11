@@ -63,11 +63,11 @@ export type PayoutQueueType = Queue<PayoutJobDataType, any, PayoutJobType>;
 export const getPayoutWorker = ({
   payoutQueue,
   redisConnection,
-  paymentAuthToken
+  authToken
 }: {
   payoutQueue: PayoutQueueType;
   redisConnection: IORedis;
-  paymentAuthToken: string;
+  authToken: string;
 }) => {
   return new Worker(
     EntityType.PAYOUT,
@@ -107,7 +107,7 @@ export const getPayoutWorker = ({
               bcInvoiceId,
               {
                 headers: {
-                  Authorization: `Bearer ${paymentAuthToken}`,
+                  Authorization: `Bearer ${authToken}`,
                   'Content-Type': 'application/json'
                 }
               }
@@ -158,7 +158,7 @@ export const getPayoutWorker = ({
                 },
                 {
                   headers: {
-                    Authorization: `Bearer ${paymentAuthToken}`,
+                    Authorization: `Bearer ${authToken}`,
                     'Content-Type': 'application/json'
                   }
                 }
@@ -171,7 +171,7 @@ export const getPayoutWorker = ({
                 { destination: returnAddress },
                 {
                   headers: {
-                    Authorization: `Bearer ${paymentAuthToken}`,
+                    Authorization: `Bearer ${authToken}`,
                     'Content-Type': 'application/json'
                   }
                 }
@@ -196,7 +196,7 @@ export const getPayoutWorker = ({
                 },
                 {
                   headers: {
-                    Authorization: `Bearer ${paymentAuthToken}`,
+                    Authorization: `Bearer ${authToken}`,
                     'Content-Type': 'application/json'
                   }
                 }
@@ -210,7 +210,7 @@ export const getPayoutWorker = ({
                 },
                 {
                   headers: {
-                    Authorization: `Bearer ${paymentAuthToken}`,
+                    Authorization: `Bearer ${authToken}`,
                     'Content-Type': 'application/json'
                   }
                 }
@@ -224,7 +224,7 @@ export const getPayoutWorker = ({
                 },
                 {
                   headers: {
-                    Authorization: `Bearer ${paymentAuthToken}`,
+                    Authorization: `Bearer ${authToken}`,
                     'Content-Type': 'application/json'
                   }
                 }
@@ -271,7 +271,7 @@ export const getPayoutWorker = ({
                 bcInvoiceId,
                 {
                   headers: {
-                    Authorization: `Bearer ${paymentAuthToken}`,
+                    Authorization: `Bearer ${authToken}`,
                     'Content-Type': 'application/json'
                   }
                 }
@@ -310,7 +310,7 @@ export const getPayoutWorker = ({
                 },
                 {
                   headers: {
-                    Authorization: `Bearer ${paymentAuthToken}`,
+                    Authorization: `Bearer ${authToken}`,
                     'Content-Type': 'application/json'
                   }
                 }
@@ -327,7 +327,7 @@ export const getPayoutWorker = ({
                 { destination: returnAddress },
                 {
                   headers: {
-                    Authorization: `Bearer ${paymentAuthToken}`,
+                    Authorization: `Bearer ${authToken}`,
                     'Content-Type': 'application/json'
                   }
                 }
@@ -361,7 +361,7 @@ export const getPayoutWorker = ({
                 },
                 {
                   headers: {
-                    Authorization: `Bearer ${paymentAuthToken}`,
+                    Authorization: `Bearer ${authToken}`,
                     'Content-Type': 'application/json'
                   }
                 }
@@ -375,7 +375,7 @@ export const getPayoutWorker = ({
                 },
                 {
                   headers: {
-                    Authorization: `Bearer ${paymentAuthToken}`,
+                    Authorization: `Bearer ${authToken}`,
                     'Content-Type': 'application/json'
                   }
                 }
@@ -389,7 +389,7 @@ export const getPayoutWorker = ({
                 },
                 {
                   headers: {
-                    Authorization: `Bearer ${paymentAuthToken}`,
+                    Authorization: `Bearer ${authToken}`,
                     'Content-Type': 'application/json'
                   }
                 }
@@ -419,7 +419,7 @@ export const getPayoutWorker = ({
 
           const response = await getPayoutByIdPayoutsModelIdGet(bcPayoutId, {
             headers: {
-              Authorization: `Bearer ${paymentAuthToken}`,
+              Authorization: `Bearer ${authToken}`,
               'Content-Type': 'application/json'
             }
           });
@@ -579,7 +579,7 @@ export const getPayoutWorker = ({
           try {
             const response = await getStoreByIdStoresModelIdGet(bcStoreId, {
               headers: {
-                Authorization: `Bearer ${paymentAuthToken}`,
+                Authorization: `Bearer ${authToken}`,
                 'Content-Type': 'application/json'
               }
             });
@@ -599,7 +599,7 @@ export const getPayoutWorker = ({
               bcWalletId,
               {
                 headers: {
-                  Authorization: `Bearer ${paymentAuthToken}`,
+                  Authorization: `Bearer ${authToken}`,
                   'Content-Type': 'application/json'
                 }
               }
@@ -645,7 +645,7 @@ export const getPayoutWorker = ({
               },
               {
                 headers: {
-                  Authorization: `Bearer ${paymentAuthToken}`,
+                  Authorization: `Bearer ${authToken}`,
                   'Content-Type': 'application/json'
                 }
               }

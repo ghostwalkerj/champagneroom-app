@@ -20,6 +20,8 @@ import {
 } from '$lib/ext/bitcart';
 import type { DisplayInvoice, DisplayPayout } from '$lib/ext/bitcart/models';
 import {
+  type BitcartConfig,
+  createTicketInvoice,
   InvoiceJobType,
   InvoiceStatus,
   type PaymentType,
@@ -36,35 +38,21 @@ export type InvoiceQueueType = Queue<InvoiceJobDataType, any, string>;
 
 export const getInvoiceWorker = ({
   redisConnection,
-  paymentAuthToken
+  authToken,
+  bcConfig
 }: {
   redisConnection: IORedis;
-  paymentAuthToken: string;
+  authToken: string;
+  bcConfig: BitcartConfig;
 }) => {
   return new Worker(
     EntityType.INVOICE,
     async (job: Job<InvoiceJobDataType, any, InvoiceJobType>) => {
-      const bcInvoiceId = job.data.bcInvoiceId;
       const jobType = job.name as InvoiceJobType;
-
-      const invoice =
-        (bcInvoiceId &&
-          (
-            (await getInvoiceByIdInvoicesModelIdGet(bcInvoiceId, {
-              headers: {
-                Authorization: `Bearer ${paymentAuthToken}`,
-                'Content-Type': 'application/json'
-              }
-            })) as AxiosResponse<DisplayInvoice>
-          ).data) ||
-        undefined;
-
-      if (!invoice) {
-        return 'No invoice found';
-      }
 
       switch (jobType) {
         case InvoiceJobType.CANCEL: {
+          const bcInvoiceId = job.data.bcInvoiceId;
           try {
             bcInvoiceId &&
               (await modifyInvoiceInvoicesModelIdPatch(
@@ -75,7 +63,7 @@ export const getInvoiceWorker = ({
                 },
                 {
                   headers: {
-                    Authorization: `Bearer ${paymentAuthToken}`,
+                    Authorization: `Bearer ${authToken}`,
                     'Content-Type': 'application/json'
                   }
                 }
@@ -86,8 +74,22 @@ export const getInvoiceWorker = ({
           }
           break;
         }
-
         case InvoiceJobType.UPDATE: {
+          const bcInvoiceId = job.data.bcInvoiceId;
+          const invoice =
+            (bcInvoiceId &&
+              (
+                (await getInvoiceByIdInvoicesModelIdGet(bcInvoiceId, {
+                  headers: {
+                    Authorization: `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                  }
+                })) as AxiosResponse<DisplayInvoice>
+              ).data) ||
+            undefined;
+          if (!invoice) {
+            return 'No invoice found';
+          }
           const status = invoice.status;
           switch (status) {
             case InvoiceStatus.EXPIRED: {
@@ -168,7 +170,6 @@ export const getInvoiceWorker = ({
               };
               return completedInvoice(invoice);
             }
-
             case InvoiceStatus.REFUNDED: {
               // Get the refund, payout, and ticket
               // Create a return transaction
@@ -196,7 +197,7 @@ export const getInvoiceWorker = ({
                     refundId,
                     {
                       headers: {
-                        Authorization: `Bearer ${paymentAuthToken}`,
+                        Authorization: `Bearer ${authToken}`,
                         'Content-Type': 'application/json'
                       }
                     }
@@ -211,7 +212,7 @@ export const getInvoiceWorker = ({
 
                   response = await getPayoutByIdPayoutsModelIdGet(payoutId, {
                     headers: {
-                      Authorization: `Bearer ${paymentAuthToken}`,
+                      Authorization: `Bearer ${authToken}`,
                       'Content-Type': 'application/json'
                     }
                   });
@@ -269,11 +270,46 @@ export const getInvoiceWorker = ({
               };
               return refundInvoice(invoice);
             }
-
             default: {
               return 'no op';
             }
           }
+        }
+
+        case InvoiceJobType.CREATE: {
+          const ticketId = job.data.ticketId;
+          if (!ticketId) {
+            return 'No ticket ID';
+          }
+          const ticket = (await Ticket.findById(ticketId)
+            .populate('show')
+            .orFail(() => {
+              throw new Error('Ticket not found');
+            })) as TicketDocument;
+
+          const invoice = (await createTicketInvoice({
+            ticket,
+            token: authToken,
+            bcConfig
+          })) as DisplayInvoice;
+          const ticketService = createTicketMachineService({
+            ticket,
+            show: ticket.show,
+            redisConnection,
+            options: {
+              saveState: true
+            }
+          });
+          ticketService.send({
+            type: 'INVOICE RECEIVED',
+            invoice
+          });
+          ticketService.stop();
+          return 'success';
+        }
+
+        default: {
+          return 'no op';
         }
       }
     },

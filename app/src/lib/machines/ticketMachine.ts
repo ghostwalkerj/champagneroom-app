@@ -5,7 +5,6 @@ import {
   type ActorRefFrom,
   assign,
   createActor,
-  fromPromise,
   not,
   raise,
   sendTo,
@@ -47,9 +46,7 @@ import {
 } from '$lib/constants';
 import type { DisplayInvoice } from '$lib/ext/bitcart/models';
 import {
-  type BitcartConfig as bcConfig,
   calcTotal,
-  createTicketInvoice,
   InvoiceJobType,
   type PaymentType,
   PayoutJobType
@@ -101,6 +98,10 @@ export type TicketMachineEventType =
       refund: RefundType;
     }
   | {
+      type: 'INVOICE RECEIVED';
+      invoice: DisplayInvoice;
+    }
+  | {
       type: 'TICKET REDEEMED';
     }
   | {
@@ -148,7 +149,6 @@ export type TicketMachineInput = {
 
 export type TicketMachineOptions = {
   saveState?: boolean;
-  bcConfig?: bcConfig;
 };
 
 export type TicketMachineServiceType = ReturnType<
@@ -179,23 +179,7 @@ export const ticketMachine = setup({
     input: {} as TicketMachineInput
   },
   actors: {
-    showMachine: {} as ShowMachineType,
-    createInvoice: fromPromise(
-      async ({
-        input
-      }: {
-        input: {
-          ticket: TicketDocument;
-          bcConfig?: bcConfig;
-        };
-      }) => {
-        const invoice = await createTicketInvoice({
-          ticket: input.ticket,
-          bcConfig: input.bcConfig
-        });
-        return invoice;
-      }
-    )
+    showMachine: {} as ShowMachineType
   },
   actions: {
     sendJoinedShow: (_: any, params: { ticket: TicketDocument }) => {
@@ -326,10 +310,13 @@ export const ticketMachine = setup({
       });
     },
 
-    reserveTicket: (_, params: { ticket: TicketDocument }) => {
+    reserveTicket: (
+      _,
+      params: { ticket: TicketDocument; status: TicketStatus }
+    ) => {
       assign(() => {
         const ticket = params.ticket;
-        ticket.ticketState.status = TicketStatus.RESERVED;
+        ticket.ticketState.status = params.status;
         return { ticket };
       });
     },
@@ -353,6 +340,21 @@ export const ticketMachine = setup({
       });
       invoiceQueue.add(InvoiceJobType.CANCEL, {
         bcInvoiceId: ticket.bcInvoiceId
+      });
+      invoiceQueue.close();
+    },
+
+    createInvoice: (
+      _,
+      params: { ticket: TicketDocument; connection?: IORedis }
+    ) => {
+      const ticket = params.ticket;
+      if (!params.connection) return;
+      const invoiceQueue = new Queue(EntityType.INVOICE, {
+        connection: params.connection
+      });
+      invoiceQueue.add(InvoiceJobType.CREATE, {
+        ticketId: ticket._id
       });
       invoiceQueue.close();
     },
@@ -587,8 +589,8 @@ export const ticketMachine = setup({
       context.ticket.ticketState.status === TicketStatus.IN_DISPUTE,
     ticketInEscrow: ({ context }) =>
       context.ticket.ticketState.status === TicketStatus.IN_ESCROW,
-    ticketReserved: ({ context }) =>
-      context.ticket.ticketState.status === TicketStatus.RESERVED,
+    ticketIsWaiting4Invoice: ({ context }) =>
+      context.ticket.ticketState.status === TicketStatus.WAITING_FOR_INVOICE,
     ticketRedeemed: ({ context }) =>
       context.ticket.ticketState.status === TicketStatus.REDEEMED,
     ticketHasPaymentInitiated: ({ context }) =>
@@ -709,6 +711,10 @@ export const ticketMachine = setup({
           guard: 'ticketCreated'
         },
         {
+          target: '#ticketMachine.reserved.waiting4Invoice',
+          guard: 'ticketIsWaiting4Invoice'
+        },
+        {
           target: '#ticketMachine.reserved.initiatedPayment',
           guard: 'ticketHasPaymentInitiated'
         },
@@ -764,7 +770,8 @@ export const ticketMachine = setup({
               {
                 type: 'reserveTicket',
                 params: ({ context }) => ({
-                  ticket: context.ticket
+                  ticket: context.ticket,
+                  status: TicketStatus.FULLY_PAID
                 })
               },
               {
@@ -782,11 +789,18 @@ export const ticketMachine = setup({
               {
                 type: 'reserveTicket',
                 params: ({ context }) => ({
-                  ticket: context.ticket
+                  ticket: context.ticket,
+                  status: TicketStatus.WAITING_FOR_INVOICE
                 })
               },
               {
                 type: 'sendTicketReserved',
+                params: ({ context }) => ({
+                  ticket: context.ticket
+                })
+              },
+              {
+                type: 'createInvoice',
                 params: ({ context }) => ({
                   ticket: context.ticket
                 })
@@ -800,21 +814,15 @@ export const ticketMachine = setup({
       initial: 'waiting4Invoice',
       states: {
         waiting4Invoice: {
-          invoke: {
-            id: 'createInvoice',
-            src: 'createInvoice',
-            input: ({ context }) => ({
-              ticket: context.ticket,
-              bcConfig: context.options?.bcConfig
-            }),
-            onDone: {
+          on: {
+            'INVOICE RECEIVED': {
               target: 'waiting4Payment',
               actions: [
                 {
                   type: 'receiveInvoice',
                   params: ({ context, event }) => ({
                     ticket: context.ticket,
-                    invoice: event.output
+                    invoice: event.invoice
                   })
                 }
               ]
