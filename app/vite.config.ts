@@ -46,7 +46,7 @@ const config: UserConfig = {
   build: {
     chunkSizeWarningLimit: 16000,
     rollupOptions: {
-      external: ['@web3-onboard/*', 'mongoose-zod', 'crypto', 'bullmq', 'node:crypto']
+      external: ['@web3-onboard/*', 'mongoose-zod', 'crypto', 'node:crypto']
     },
     commonjsOptions: {
       transformMixedEsModules: true
@@ -64,7 +64,7 @@ const config: UserConfig = {
 
   optimizeDeps: {
     exclude: ['@ethersproject/hash', 'wrtc', 'acorn'],
-    include: ['@web3-onboard/core', 'js-sha3', '@ethersproject/bignumber'],
+    include: ['@web3-onboard/core', 'js-sha3', '@ethersproject/bignumber' ],
     esbuildOptions: {
       // Node.js global to browser globalThis
       define: {
