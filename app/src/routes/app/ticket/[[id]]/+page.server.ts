@@ -309,6 +309,15 @@ export const load: PageServerLoad = async ({ locals }) => {
     { errors: false }
   );
 
+  const ts = createTicketMachineService({
+    ticket,
+    show,
+    redisConnection: locals.redisConnection
+  });
+
+  const ticketState = ts.getSnapshot();
+  ts.stop();
+
   return {
     jitsiToken,
     disputeForm,
@@ -316,6 +325,7 @@ export const load: PageServerLoad = async ({ locals }) => {
     ticket: ticket.toJSON({ flattenMaps: true, flattenObjectIds: true }),
     user: user?.toJSON({ flattenMaps: true, flattenObjectIds: true }),
     show: show.toJSON({ flattenMaps: true, flattenObjectIds: true }),
-    invoice
+    invoice,
+    ticketState
   };
 };

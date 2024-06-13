@@ -9,6 +9,7 @@ import {
   raise,
   sendTo,
   setup,
+  type SnapshotFrom,
   spawnChild,
   stopChild
 } from 'xstate';
@@ -153,6 +154,8 @@ export type TicketMachineOptions = {
 export type TicketMachineServiceType = ReturnType<
   typeof createTicketMachineService
 >;
+
+export type TicketMachineSnapshotType = SnapshotFrom<TicketMachineType>;
 
 export type TicketMachineType = typeof ticketMachine;
 
