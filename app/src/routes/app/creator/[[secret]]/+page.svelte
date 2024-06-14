@@ -16,11 +16,7 @@
   import type { UserDocument } from '$lib/models/user';
   import type { WalletDocument } from '$lib/models/wallet';
 
-  import type {
-    ShowMachineServiceType,
-    ShowMachineStateType
-  } from '$lib/machines/showMachine';
-  import { createShowMachineService } from '$lib/machines/showMachine';
+  import type { ShowMachineSnapshotType } from '$lib/machines/showMachine';
 
   import { ActorType, CancelReason } from '$lib/constants';
   import type { requestPayoutSchema } from '$lib/payments';
@@ -67,13 +63,11 @@
   let creatorUnSub: Unsubscriber;
   let showUnSub: Unsubscriber;
   let walletUnSub: Unsubscriber;
-  let showMachineService: ShowMachineServiceType;
   let showMachineServiceUnSub: Subscription;
   const modalStore = getModalStore();
 
   const noCurrentShow = () => {
     showUnSub?.();
-    showMachineService?.stop();
     canCreateShow = true;
     canCancelShow = false;
     canStartShow = false;
@@ -91,20 +85,14 @@
       currentShow = show;
       canCreateShow = false;
 
-      showMachineService?.stop();
-      showMachineService = createShowMachineService({
-        show: currentShow
-      });
-      useShowMachine(showMachineService);
+      useSnapShot($page.data.showMachineSnapshot);
       showUnSub?.();
       showUnSub = ShowStore(show).subscribe((_show) => {
         if (_show && _show.showState.current) {
           currentShow = _show;
-          showMachineService?.stop();
-          showMachineService = createShowMachineService({
-            show: _show
+          invalidateAll().then(() => {
+            useSnapShot($page.data.showMachineSnapshot);
           });
-          useShowMachine(showMachineService);
         } else {
           noCurrentShow();
         }
@@ -112,14 +100,14 @@
     }
   };
 
-  const testState = (state: ShowMachineStateType) => {
-    if (state) {
-      showStopped = state.matches('stopped');
-      showCancelled = state.matches('cancelled');
+  const useSnapShot = (snapShot: ShowMachineSnapshotType | undefined) => {
+    if (snapShot) {
+      showStopped = snapShot.matches('stopped');
+      showCancelled = snapShot.matches('cancelled');
       if (showCancelled) {
         noCurrentShow();
       }
-      canCancelShow = state.can({
+      canCancelShow = snapShot.can({
         type: 'CANCELLATION INITIATED',
         cancel: {
           cancelledAt: new Date(),
@@ -127,20 +115,10 @@
           reason: CancelReason.CREATOR_CANCELLED
         }
       });
-      canStartShow = state.can({
+      canStartShow = snapShot.can({
         type: 'SHOW STARTED'
       });
-
-      if (state.status === 'done') {
-        showMachineService.stop();
-      }
     }
-  };
-
-  const useShowMachine = (showMachineService: ShowMachineServiceType) => {
-    showMachineServiceUnSub?.unsubscribe();
-    const state = showMachineService.getSnapshot();
-    testState(state);
   };
 
   onMount(() => {
@@ -162,7 +140,6 @@
   onDestroy(() => {
     unSubAll();
     showMachineServiceUnSub?.unsubscribe();
-    showMachineService?.stop();
   });
 
   const onShowCreated = (show: ShowDocument | undefined) => {

@@ -23,7 +23,8 @@ import type { WalletDocument } from '$lib/models/wallet';
 
 import {
   createShowMachineService,
-  type ShowMachineEventType
+  type ShowMachineEventType,
+  type ShowMachineSnapshotType
 } from '$lib/machines/showMachine';
 
 import type { PayoutQueueType } from '$lib/workers/payoutWorker';
@@ -121,11 +122,7 @@ export const actions: Actions = {
     }
     const showService = createShowMachineService({
       show,
-      redisConnection,
-      options: {
-        saveState: true,
-        saveShowEvents: true
-      }
+      redisConnection
     });
     const showMachineState = showService.getSnapshot();
 
@@ -140,9 +137,7 @@ export const actions: Actions = {
       cancel
     } as ShowMachineEventType;
 
-    if (showMachineState.can(cancelEvent)) {
-      showService.send(cancelEvent);
-    }
+    showService.send(cancelEvent);
     showService.stop();
 
     return {
@@ -163,11 +158,7 @@ export const actions: Actions = {
 
     const showService = createShowMachineService({
       show,
-      redisConnection,
-      options: {
-        saveShowEvents: true,
-        saveState: true
-      }
+      redisConnection
     });
     const showState = showService.getSnapshot();
 
@@ -225,11 +216,7 @@ export const actions: Actions = {
 
     const showService = createShowMachineService({
       show,
-      redisConnection,
-      options: {
-        saveState: true,
-        saveShowEvents: true
-      }
+      redisConnection
     });
     const showState = showService.getSnapshot();
 
@@ -248,11 +235,7 @@ export const actions: Actions = {
     }
     const showService = createShowMachineService({
       show,
-      redisConnection,
-      options: {
-        saveState: true,
-        saveShowEvents: true
-      }
+      redisConnection
     });
     const showState = showService.getSnapshot();
     if (!showState.matches('started'))
@@ -385,6 +368,7 @@ export const load: PageServerLoad = async ({ locals }) => {
   );
 
   let jitsiToken: string | undefined;
+  let showMachineSnapshot: ShowMachineSnapshotType | undefined;
 
   if (show) {
     jitsiToken = jwt.sign(
@@ -405,6 +389,12 @@ export const load: PageServerLoad = async ({ locals }) => {
       },
       env.JITSI_JWT_SECRET || '' // Ensure env.JITSI_JWT_SECRET is not undefined
     );
+    const ss = createShowMachineService({
+      show,
+      redisConnection: locals.redisConnection as IORedis
+    });
+    showMachineSnapshot = ss.getSnapshot();
+    ss.stop();
   }
 
   const exchangeRate =
@@ -486,6 +476,7 @@ export const load: PageServerLoad = async ({ locals }) => {
     jitsiToken,
     room: room
       ? room.toJSON({ flattenMaps: true, flattenObjectIds: true })
-      : undefined
+      : undefined,
+    showMachineSnapshot
   };
 };

@@ -14,10 +14,7 @@
   import type { TicketDocument } from '$lib/models/ticket';
   import type { UserDocument } from '$lib/models/user';
 
-  import {
-    createTicketMachineService,
-    type TicketMachineServiceType
-  } from '$lib/machines/ticketMachine';
+  import type { TicketMachineSnapshotType } from '$lib/machines/ticketMachine';
 
   import {
     ActorType,
@@ -50,7 +47,6 @@
   let feedbackForm = data.feedbackForm as SuperValidated<
     Infer<typeof ticketFeedbackSchema>
   >;
-
   let disputeForm = data.disputeForm as SuperValidated<
     Infer<typeof ticketDisputeSchema>
   >;
@@ -74,7 +70,6 @@
   $: hasShowStarted = false;
   $: isLoading = false;
   $: leftShow = false;
-  let ticketMachineService: TicketMachineServiceType;
   const modalStore = getModalStore();
 
   const ticketFeedbackModal: ModalSettings = {
@@ -151,29 +146,30 @@
     isLoading = false;
   };
 
-  const useTicketMachine = async (
-    ticketMachineService: TicketMachineServiceType
-  ) => {
-    const state = ticketMachineService.getSnapshot();
-    shouldPay = state.matches({ reserved: 'waiting4Payment' });
+  const useSnapShot = (snapshot: TicketMachineSnapshotType | undefined) => {
+    if (!snapshot) {
+      return;
+    }
+    shouldPay = snapshot.matches({ reserved: 'waiting4Payment' });
     canWatchShow =
-      state.matches({ reserved: 'waiting4Show' }) || state.matches('redeemed');
+      snapshot.matches({ reserved: 'waiting4Show' }) ||
+      snapshot.matches('redeemed');
     hasPaymentSent =
       invoice !== undefined &&
-      state.matches({ reserved: 'initiatedPayment' }) &&
+      snapshot.matches({ reserved: 'initiatedPayment' }) &&
       invoice.status !== InvoiceStatus.COMPLETE;
     canCancelTicket =
-      (state.matches({ reserved: 'waiting4Show' }) ||
-        state.matches({ reserved: 'waiting4Payment' })) &&
+      (snapshot.matches({ reserved: 'waiting4Show' }) ||
+        snapshot.matches({ reserved: 'waiting4Payment' })) &&
       !hasShowStarted;
-    canLeaveFeedback = state.can({
+    canLeaveFeedback = snapshot.can({
       type: 'FEEDBACK RECEIVED',
       feedback: {
         createdAt: new Date(),
         rating: 5
       }
     });
-    canDispute = state.can({
+    canDispute = snapshot.can({
       type: 'DISPUTE INITIATED',
       dispute: ticketDisputeSchema.parse({
         disputedBy: ActorType.CUSTOMER,
@@ -183,8 +179,8 @@
         reason: RefundReason.DISPUTE_DECISION
       })
     });
-    isWaitingForShow = state.can({ type: 'SHOW JOINED' });
-    isTicketDone = state.status === 'done' ?? false;
+    isWaitingForShow = snapshot.can({ type: 'SHOW JOINED' });
+    isTicketDone = snapshot.status === 'done' ?? false;
     if (isTicketDone) {
       showUnSub?.();
       ticketUnSub?.();
@@ -222,12 +218,9 @@
   };
 
   onMount(() => {
-    // Connect to the show and redirect if it started
-    // @ts-ignore
     if (show) {
       hasShowStarted = show.showState.status === ShowStatus.LIVE;
     }
-
     if (ticket.ticketState.active) {
       showUnSub?.();
       showUnSub = ShowStore(show).subscribe((_show) => {
@@ -237,25 +230,15 @@
           if (canWatchShow && hasShowStarted && !leftShow) joinShow();
         }
       });
-
       isTicketDone = false;
-      ticketMachineService?.stop();
-      ticketMachineService = createTicketMachineService({
-        ticket,
-        show
-      });
-      useTicketMachine(ticketMachineService);
+      useSnapShot(
+        $page.data.ticketMachineSnapshot as TicketMachineSnapshotType
+      );
       ticketUnSub?.();
+
       ticketUnSub = TicketStore(ticket).subscribe((_ticket) => {
         if (_ticket) {
           ticket = _ticket;
-          ticketMachineService?.stop();
-          ticketMachineService = createTicketMachineService({
-            ticket,
-            show
-          });
-          useTicketMachine(ticketMachineService);
-
           invalidateAll().then(() => {
             invoice = $page.data.invoice;
             if (
@@ -264,13 +247,10 @@
               ticket.ticketState.status === TicketStatus.PAYMENT_INITIATED
             ) {
               ticket = $page.data.ticket as TicketDocument;
-              ticketMachineService?.stop();
-              ticketMachineService = createTicketMachineService({
-                ticket,
-                show
-              });
-              useTicketMachine(ticketMachineService);
             }
+            useSnapShot(
+              $page.data.ticketMachineSnapshot as TicketMachineSnapshotType
+            );
           });
         }
       });

@@ -13,10 +13,7 @@ import type { TicketDocument } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
 import { User } from '$lib/models/user';
 
-import {
-  createTicketMachineService,
-  type TicketMachineOptions
-} from '$lib/machines/ticketMachine';
+import { createTicketMachineService } from '$lib/machines/ticketMachine';
 
 import config from '$lib/config';
 import { AuthType, UserRole } from '$lib/constants';
@@ -76,21 +73,7 @@ export const actions: Actions = {
     const ticketService = createTicketMachineService({
       ticket,
       show,
-      redisConnection,
-      options: {
-        saveState: true,
-        bcConfig: {
-          storeId: env.BITCART_STORE_ID,
-          email: env.BITCART_EMAIL,
-          password: env.BITCART_PASSWORD,
-          apiURL: env.BITCART_API_URL,
-          authSalt: env.BITCART_AUTH_SALT,
-          invoiceNotificationUrl: urlJoin(
-            env.BITCART_NOTIFICATION_URL,
-            env.BITCART_INVOICE_NOTIFICATION_PATH
-          )
-        }
-      } as TicketMachineOptions
+      redisConnection
     });
 
     ticketService.send({

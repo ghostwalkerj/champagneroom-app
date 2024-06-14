@@ -121,10 +121,7 @@ const cancelTickets = async (
     const ticketService = createTicketMachineService({
       ticket,
       show,
-      redisConnection,
-      options: {
-        saveState: true
-      }
+      redisConnection
     });
     const cancelEvent = {
       type: 'SHOW CANCELLED',
@@ -155,10 +152,7 @@ const refundTickets = async (
       const ticketService = createTicketMachineService({
         ticket,
         show,
-        redisConnection,
-        options: {
-          saveState: true
-        }
+        redisConnection
       });
       const ticketState = ticketService.getSnapshot();
       if (ticketState.matches({ reserved: 'waiting4Refund' })) {
@@ -203,10 +197,7 @@ const endShow = async (
     const ticketService = createTicketMachineService({
       ticket,
       show,
-      redisConnection,
-      options: {
-        saveState: true
-      }
+      redisConnection
     });
     const ticketState = ticketService.getSnapshot();
     if (ticketState.can({ type: 'SHOW ENDED' })) {
@@ -233,10 +224,7 @@ const endEscrow = async (
     const ticketService = createTicketMachineService({
       ticket,
       show,
-      redisConnection,
-      options: {
-        saveState: true
-      }
+      redisConnection
     });
     ticketService.send({
       type: 'TICKET FINALIZED',
@@ -591,10 +579,7 @@ const ticketDisputeResolved = async (
   const ticketService = createTicketMachineService({
     ticket,
     show,
-    redisConnection,
-    options: {
-      saveState: true
-    }
+    redisConnection
   });
   if (decision === DisputeDecision.NO_REFUND) {
     ticketService.send({

@@ -66,7 +66,6 @@ type TicketMachineContext = {
   show: ShowDocument;
   showMachineRef: ActorRefFrom<ShowMachineType>;
   redisConnection?: IORedis;
-  options?: TicketMachineOptions;
   errorMessage: string | undefined;
   id: string;
 };
@@ -143,12 +142,7 @@ export type TicketMachineEventType =
 export type TicketMachineInput = {
   ticket: TicketDocument;
   show: ShowDocument;
-  redisConnection?: IORedis;
-  options?: Partial<TicketMachineOptions>;
-};
-
-export type TicketMachineOptions = {
-  saveState?: boolean;
+  redisConnection: IORedis;
 };
 
 export type TicketMachineServiceType = ReturnType<
@@ -164,12 +158,11 @@ export const createTicketMachineService = (input: TicketMachineInput) => {
     input
   }).start();
 
-  if (input.options?.saveState)
-    ticketService.subscribe((state) => {
-      if (state.context.ticket.save) {
-        state.context.ticket.save();
-      }
-    });
+  ticketService.subscribe((state) => {
+    if (state.context.ticket.save) {
+      state.context.ticket.save();
+    }
+  });
 
   return ticketService;
 };
@@ -700,10 +693,7 @@ export const ticketMachine = setup({
     showMachineRef: {} as ActorRefFrom<ShowMachineType>,
     errorMessage: undefined as string | undefined,
     id: nanoid(),
-    redisConnection: input.redisConnection,
-    options: {
-      saveState: input.options?.saveState ?? false
-    } as TicketMachineOptions
+    redisConnection: input.redisConnection
   }),
   id: 'ticketMachine',
   initial: 'ticketLoaded',
@@ -714,11 +704,7 @@ export const ticketMachine = setup({
         spawn(showMachine, {
           input: {
             show: context.show,
-            redisConnection: context.redisConnection,
-            options: {
-              saveShowEvents: context.options?.saveState ?? false,
-              saveState: context.options?.saveState ?? false
-            }
+            redisConnection: context.redisConnection
           }
         })
     })

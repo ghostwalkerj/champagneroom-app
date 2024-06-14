@@ -95,10 +95,7 @@ export const getPayoutWorker = ({
             const ticketService = createTicketMachineService({
               ticket,
               show: ticket.show,
-              redisConnection,
-              options: {
-                saveState: true
-              }
+              redisConnection
             });
 
             const ticketState = ticketService.getSnapshot();
@@ -254,10 +251,7 @@ export const getPayoutWorker = ({
               const ticketService = createTicketMachineService({
                 ticket,
                 show: ticket.show,
-                redisConnection,
-                options: {
-                  saveState: true
-                }
+                redisConnection
               });
 
               const bcInvoiceId = ticket.bcInvoiceId;

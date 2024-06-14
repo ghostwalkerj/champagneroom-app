@@ -252,10 +252,7 @@ export const getInvoiceWorker = ({
                   const ticketService = createTicketMachineService({
                     ticket,
                     show: ticket.show,
-                    redisConnection,
-                    options: {
-                      saveState: true
-                    }
+                    redisConnection
                   });
 
                   ticketService.send({
@@ -296,10 +293,7 @@ export const getInvoiceWorker = ({
           const ticketService = createTicketMachineService({
             ticket,
             show: ticket.show,
-            redisConnection,
-            options: {
-              saveState: true
-            }
+            redisConnection
           });
           ticketService.send({
             type: 'INVOICE RECEIVED',

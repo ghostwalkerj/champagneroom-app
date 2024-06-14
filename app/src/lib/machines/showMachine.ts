@@ -8,6 +8,7 @@ import {
   assign,
   createActor,
   setup,
+  type SnapshotFrom,
   type StateFrom
 } from 'xstate';
 
@@ -97,8 +98,6 @@ export type ShowMachineInput = {
 
 //endregion
 export type ShowMachineOptions = {
-  saveState: boolean;
-  saveShowEvents: boolean;
   gracePeriod: number;
   escrowPeriod: number;
 };
@@ -115,6 +114,7 @@ type ShowMachineContext = {
   showQueue: ShowQueueType | undefined;
 };
 
+export type ShowMachineSnapshotType = SnapshotFrom<typeof showMachine>;
 export type ShowMachineStateType = StateFrom<typeof showMachine>;
 
 const createShowEvent = (show: ShowDocument, event: AnyEventObject) => {
@@ -142,20 +142,16 @@ export const createShowMachineService = (input: ShowMachineInput) => {
   const showService = createActor(showMachine, {
     input,
     inspect: (inspectionEvent) => {
-      if (
-        input.options?.saveShowEvents &&
-        inspectionEvent.type === '@xstate.event'
-      )
+      if (inspectionEvent.type === '@xstate.event')
         createShowEvent(input.show, inspectionEvent.event);
     }
   }).start();
 
-  if (input.options?.saveState)
-    showService.subscribe((state) => {
-      if (state.context.show.save) {
-        state.context.show.save();
-      }
-    });
+  showService.subscribe((state) => {
+    if (state.context.show.save) {
+      state.context.show.save();
+    }
+  });
 
   return showService;
 };
@@ -552,8 +548,6 @@ export const showMachine = setup({
         }) as ShowQueueType)
       : undefined,
     options: {
-      saveShowEvents: input.options?.saveShowEvents ?? false,
-      saveState: input.options?.saveState ?? false,
       escrowPeriod: input.options?.escrowPeriod ?? 3_600_000,
       gracePeriod: input.options?.gracePeriod ?? 3_600_000
     } as ShowMachineOptions

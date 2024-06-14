@@ -296,11 +296,7 @@ export const actions: Actions = {
 
     const showService = createShowMachineService({
       show: ticket.show,
-      redisConnection,
-      options: {
-        saveState: true,
-        saveShowEvents: true
-      }
+      redisConnection
     });
 
     showService.send({

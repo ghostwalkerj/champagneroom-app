@@ -23,17 +23,13 @@ export const getShowMachineServiceFromId = async (
     .exec()) as ShowDocument;
   return createShowMachineService({
     show,
-    redisConnection,
-    options: {
-      saveState: true,
-      saveShowEvents: true
-    }
+    redisConnection
   });
 };
 
 export const getTicketMachineServiceFromId = async (
   ticketId: string,
-  redisConnection?: IORedis
+  redisConnection: IORedis
 ) => {
   const ticket = (await mongoose
     .model('Ticket')
@@ -47,10 +43,7 @@ export const getTicketMachineServiceFromId = async (
   return createTicketMachineService({
     ticket,
     show: ticket.show,
-    redisConnection,
-    options: {
-      saveState: true
-    }
+    redisConnection
   });
 };
 

@@ -18,7 +18,8 @@ import type { TicketDocument } from '$lib/models/ticket';
 
 import {
   createTicketMachineService,
-  type TicketMachineEventType
+  type TicketMachineEventType,
+  type TicketMachineSnapshotType
 } from '$lib/machines/ticketMachine';
 
 import type { CurrencyType, DisputeReason } from '$lib/constants';
@@ -43,10 +44,7 @@ export const actions: Actions = {
     const ticketService = createTicketMachineService({
       ticket,
       show,
-      redisConnection,
-      options: {
-        saveState: true
-      }
+      redisConnection
     });
 
     const cancelEvent = {
@@ -73,10 +71,7 @@ export const actions: Actions = {
     const ticketService = createTicketMachineService({
       ticket,
       show,
-      redisConnection,
-      options: {
-        saveState: true
-      }
+      redisConnection
     });
     const data = await request.formData();
     const rating = data.get('rating') as string;
@@ -109,10 +104,7 @@ export const actions: Actions = {
     const ticketService = createTicketMachineService({
       ticket,
       show,
-      redisConnection,
-      options: {
-        saveState: true
-      }
+      redisConnection
     });
     const data = await request.formData();
     const reason = data.get('reason') as string;
@@ -154,10 +146,7 @@ export const actions: Actions = {
     const ticketService = createTicketMachineService({
       ticket,
       show,
-      redisConnection,
-      options: {
-        saveState: true
-      }
+      redisConnection
     });
     const data = await request.formData();
     const paymentAddress = data.get('paymentAddress') as string;
@@ -315,7 +304,7 @@ export const load: PageServerLoad = async ({ locals }) => {
     redisConnection: locals.redisConnection
   });
 
-  const ticketState = ts.getSnapshot();
+  const ticketMachineSnapshot = ts.getSnapshot() as TicketMachineSnapshotType;
   ts.stop();
 
   return {
@@ -326,6 +315,6 @@ export const load: PageServerLoad = async ({ locals }) => {
     user: user?.toJSON({ flattenMaps: true, flattenObjectIds: true }),
     show: show.toJSON({ flattenMaps: true, flattenObjectIds: true }),
     invoice,
-    ticketState
+    ticketMachineSnapshot
   };
 };
