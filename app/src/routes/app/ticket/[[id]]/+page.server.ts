@@ -22,9 +22,14 @@ import {
   type TicketMachineSnapshotType
 } from '$lib/machines/ticketMachine';
 
-import type { CurrencyType, DisputeReason } from '$lib/constants';
-import { ActorType, RefundReason } from '$lib/constants';
-import { createBitcartToken } from '$lib/payments';
+import {
+  ActorType,
+  type CurrencyType,
+  DisputeReason,
+  RefundReason,
+  ShowStatus
+} from '$lib/constants';
+import { createBitcartToken, InvoiceStatus } from '$lib/payments';
 
 import { getInvoiceByIdInvoicesModelIdGet } from '$ext/bitcart';
 import type { DisplayInvoice } from '$ext/bitcart/models';
@@ -298,14 +303,47 @@ export const load: PageServerLoad = async ({ locals }) => {
     { errors: false }
   );
 
-  const ts = createTicketMachineService({
+  const tsm = createTicketMachineService({
     ticket,
     show,
     redisConnection: locals.redisConnection
   });
-
-  const ticketMachineSnapshot = ts.getSnapshot() as TicketMachineSnapshotType;
-  ts.stop();
+  const ts = tsm.getSnapshot() as TicketMachineSnapshotType;
+  const ticketPermissions = {
+    stateValue: ts.value,
+    shouldPay: ts.matches({ reserved: 'waiting4Payment' }),
+    canWatchShow:
+      ts.matches({ reserved: 'waiting4Show' }) || ts.matches('redeemed'),
+    hasPaymentSent:
+      invoice !== undefined &&
+      ts.matches({ reserved: 'initiatedPayment' }) &&
+      invoice.status !== InvoiceStatus.COMPLETE,
+    canCancelTicket:
+      (ts.matches({ reserved: 'waiting4Show' }) ||
+        ts.matches({ reserved: 'waiting4Payment' })) &&
+      show.showState.status !== ShowStatus.LIVE,
+    canLeaveFeedback: ts.can({
+      type: 'FEEDBACK RECEIVED',
+      feedback: {
+        createdAt: new Date(),
+        rating: 5
+      }
+    }),
+    canDispute: ts.can({
+      type: 'DISPUTE INITIATED',
+      dispute: ticketDisputeSchema.parse({
+        disputedBy: ActorType.CUSTOMER,
+        reason: DisputeReason.ENDED_EARLY
+      }),
+      refund: refundSchema.parse({
+        reason: RefundReason.DISPUTE_DECISION
+      })
+    }),
+    isWaitingForShow: ts.can({ type: 'SHOW JOINED' }),
+    isTicketDone: ts.status === 'done',
+    hasShowStarted: show.showState.status === ShowStatus.LIVE
+  };
+  tsm.stop();
 
   return {
     jitsiToken,
@@ -315,6 +353,6 @@ export const load: PageServerLoad = async ({ locals }) => {
     user: user?.toJSON({ flattenMaps: true, flattenObjectIds: true }),
     show: show.toJSON({ flattenMaps: true, flattenObjectIds: true }),
     invoice,
-    ticketMachineSnapshot
+    ticketPermissions
   };
 };

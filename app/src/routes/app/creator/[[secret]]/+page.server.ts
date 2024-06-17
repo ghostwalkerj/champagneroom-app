@@ -24,7 +24,7 @@ import type { WalletDocument } from '$lib/models/wallet';
 import {
   createShowMachineService,
   type ShowMachineEventType,
-  type ShowMachineSnapshotType
+  type ShowMachineStateType
 } from '$lib/machines/showMachine';
 
 import type { PayoutQueueType } from '$lib/workers/payoutWorker';
@@ -92,6 +92,7 @@ export const actions: Actions = {
       creator: creator._id,
       _id: new ObjectId(),
       agent: creator.agent,
+      conferenceKey: nanoid(12),
       coverImageUrl: creator.user.profileImageUrl,
       showState: {
         status: ShowStatus.BOX_OFFICE_OPEN,
@@ -142,7 +143,8 @@ export const actions: Actions = {
 
     return {
       success: true,
-      showCancelled: true
+      showCancelled: true,
+      show: show.toJSON({ flattenMaps: true, flattenObjectIds: true })
     };
   },
   end_show: async ({ locals }) => {
@@ -368,7 +370,24 @@ export const load: PageServerLoad = async ({ locals }) => {
   );
 
   let jitsiToken: string | undefined;
-  let showMachineSnapshot: ShowMachineSnapshotType | undefined;
+  type ShowPermissionsType = {
+    stateValue: ShowMachineStateType['value'];
+    showStopped: boolean;
+    showCancelled: boolean;
+    canCancelShow: boolean;
+    canStartShow: boolean;
+    canCreateShow: boolean;
+    isActive: boolean;
+  };
+  let showPermissions = {
+    stateValue: 'showLoaded',
+    showStopped: false,
+    showCancelled: false,
+    canCancelShow: false,
+    canStartShow: false,
+    canCreateShow: true,
+    isActive: false
+  } as ShowPermissionsType;
 
   if (show) {
     jitsiToken = jwt.sign(
@@ -389,12 +408,30 @@ export const load: PageServerLoad = async ({ locals }) => {
       },
       env.JITSI_JWT_SECRET || '' // Ensure env.JITSI_JWT_SECRET is not undefined
     );
-    const ss = createShowMachineService({
+    const sms = createShowMachineService({
       show,
       redisConnection: locals.redisConnection as IORedis
     });
-    showMachineSnapshot = ss.getSnapshot();
-    ss.stop();
+    const ss = sms.getSnapshot();
+    showPermissions = {
+      stateValue: ss.value,
+      showStopped: ss.matches('stopped'),
+      showCancelled: ss.matches('cancelled'),
+      canCancelShow: ss.can({
+        type: 'CANCELLATION INITIATED',
+        cancel: {
+          cancelledAt: new Date(),
+          cancelledBy: ActorType.CREATOR,
+          reason: CancelReason.CREATOR_CANCELLED
+        }
+      }),
+      canCreateShow: false,
+      canStartShow: ss.can({
+        type: 'SHOW STARTED'
+      }),
+      isActive: show.showState.active
+    };
+    sms.stop();
   }
 
   const exchangeRate =
@@ -471,12 +508,12 @@ export const load: PageServerLoad = async ({ locals }) => {
     completedShows: completedShows.map((show) =>
       show.toJSON({ flattenMaps: true, flattenObjectIds: true })
     ),
+    showPermissions,
     wallet: wallet.toJSON({ flattenMaps: true, flattenObjectIds: true }),
     exchangeRate: exchangeRate?.data as string,
     jitsiToken,
     room: room
       ? room.toJSON({ flattenMaps: true, flattenObjectIds: true })
-      : undefined,
-    showMachineSnapshot
+      : undefined
   };
 };

@@ -138,7 +138,8 @@ const refundTickets = async (
   payoutQueue: PayoutQueueType
 ) => {
   const showService = createShowMachineService({
-    show
+    show,
+    redisConnection
   });
   // Check if show needs to send refunds
   const showState = showService.getSnapshot();
@@ -568,7 +569,8 @@ const ticketDisputeResolved = async (
   payoutQueue: PayoutQueueType
 ) => {
   const showService = createShowMachineService({
-    show
+    show,
+    redisConnection
   });
   const ticket = (await Ticket.findById(ticketId).exec()) as TicketDocument;
   showService.send({

@@ -103,7 +103,9 @@ const showSchema = z
         ref: 'Agent'
       })
       .optional(),
-    conferenceKey: z.string().default(nanoid),
+    conferenceKey: z.string().mongooseTypeOptions({
+      default: () => nanoid(12)
+    }),
     coverImageUrl: z.string().trim().optional(),
     duration: z
       .number()
@@ -176,5 +178,6 @@ showMongooseSchema.plugin(fieldEncryption, {
   saltGenerator: (secret: string) => secret.slice(0, 16)
 });
 
-export type { ShowDocument, ShowDocumentType, ShowStateType };
 export { Show, showCRUDSchema, showSchema };
+export type { ShowDocument, ShowDocumentType, ShowStateType };
+

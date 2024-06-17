@@ -3,7 +3,6 @@
   import { onDestroy, onMount } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
   import type { Infer, SuperValidated } from 'sveltekit-superforms';
-  import type { Subscription } from 'xstate';
   import type { z } from 'zod';
 
   import { invalidateAll } from '$app/navigation';
@@ -16,9 +15,6 @@
   import type { UserDocument } from '$lib/models/user';
   import type { WalletDocument } from '$lib/models/wallet';
 
-  import type { ShowMachineSnapshotType } from '$lib/machines/showMachine';
-
-  import { ActorType, CancelReason } from '$lib/constants';
   import type { requestPayoutSchema } from '$lib/payments';
 
   import ShowDetail from '$components/ShowDetail.svelte';
@@ -37,7 +33,7 @@
 
   export let data: PageData;
 
-  $: creator = data.creator as CreatorDocument;
+  let creator = data.creator as CreatorDocument;
   let currentShow = data.show as ShowDocument | undefined;
   let currentEvent = data.showEvent as ShowEventDocument | undefined;
   let completedShows = data.completedShows as ShowDocument[];
@@ -45,90 +41,59 @@
   let exchangeRate = +data.exchangeRate || 0;
   let jitsiToken = data.jitsiToken as string;
   let user = data.user as UserDocument;
-  $: roomForm = data.roomForm as SuperValidated<z.infer<typeof roomCRUDSchema>>;
-  $: createShowForm = data.createShowForm;
-  $: payoutForm = data.payoutForm as SuperValidated<
+  let sPermissions = data.showPermissions;
+  let roomForm = data.roomForm as SuperValidated<
+    z.infer<typeof roomCRUDSchema>
+  >;
+  let createShowForm = data.createShowForm;
+  let payoutForm = data.payoutForm as SuperValidated<
     Infer<typeof requestPayoutSchema>
   >;
 
   $: showVideo = false;
-
-  $: canCreateShow = false;
-  $: canCancelShow = false;
-  $: canStartShow = false;
   $: isLoading = false;
-  $: showStopped = false;
-  $: showCancelled = false;
 
   let creatorUnSub: Unsubscriber;
   let showUnSub: Unsubscriber;
   let walletUnSub: Unsubscriber;
-  let showMachineServiceUnSub: Subscription;
+
   const modalStore = getModalStore();
 
-  const noCurrentShow = () => {
+  const useNewShow = async (show?: ShowDocument | undefined) => {
     showUnSub?.();
-    canCreateShow = true;
-    canCancelShow = false;
-    canStartShow = false;
-    currentShow = undefined;
+    currentShow = show;
     currentEvent = undefined;
-    showStopped = false;
-  };
-
-  if (!currentShow) {
-    noCurrentShow();
-  }
-
-  const useNewShow = (show: ShowDocument) => {
-    if (show && show.showState.current) {
-      currentShow = show;
-      canCreateShow = false;
-
-      useSnapShot($page.data.showMachineSnapshot);
-      showUnSub?.();
+    await invalidateAll();
+    sPermissions = $page.data.showPermissions;
+    if (show)
       showUnSub = ShowStore(show).subscribe((_show) => {
-        if (_show && _show.showState.current) {
+        if (_show) {
           currentShow = _show;
           invalidateAll().then(() => {
-            useSnapShot($page.data.showMachineSnapshot);
+            sPermissions = $page.data.showPermissions;
           });
-        } else {
-          noCurrentShow();
         }
       });
-    }
-  };
-
-  const useSnapShot = (snapShot: ShowMachineSnapshotType | undefined) => {
-    if (snapShot) {
-      showStopped = snapShot.matches('stopped');
-      showCancelled = snapShot.matches('cancelled');
-      if (showCancelled) {
-        noCurrentShow();
-      }
-      canCancelShow = snapShot.can({
-        type: 'CANCELLATION INITIATED',
-        cancel: {
-          cancelledAt: new Date(),
-          cancelledBy: ActorType.CREATOR,
-          reason: CancelReason.CREATOR_CANCELLED
-        }
-      });
-      canStartShow = snapShot.can({
-        type: 'SHOW STARTED'
-      });
-    }
   };
 
   onMount(() => {
     creatorUnSub = CreatorStore(creator).subscribe((value) => {
       creator = value;
     });
-    currentShow ? useNewShow(currentShow) : noCurrentShow();
     walletUnSub = WalletStore(wallet).subscribe((value) => {
       wallet = value;
     });
+
+    if (currentShow) {
+      showUnSub = ShowStore(currentShow).subscribe((_show) => {
+        if (_show) {
+          currentShow = _show;
+          invalidateAll().then(() => {
+            sPermissions = $page.data.showPermissions;
+          });
+        }
+      });
+    }
   });
 
   const unSubAll = () => {
@@ -139,21 +104,7 @@
 
   onDestroy(() => {
     unSubAll();
-    showMachineServiceUnSub?.unsubscribe();
   });
-
-  const onShowCreated = (show: ShowDocument | undefined) => {
-    showUnSub?.();
-    if (!show) return;
-    currentShow = show as ShowDocument;
-    invalidateAll();
-    currentEvent = $page.data.showEvent;
-    useNewShow(currentShow);
-  };
-
-  const onShowCancelled = () => {
-    noCurrentShow();
-  };
 
   const startShow = async () => {
     await invalidateAll();
@@ -170,16 +121,11 @@
 
   const leftShowCallback = () => {
     showVideo = false;
-
     let formData = new FormData();
     fetch('?/leave_show', {
       method: 'POST',
       body: formData
     });
-  };
-
-  const onShowEnded = () => {
-    noCurrentShow();
   };
 
   // --------- Modal for Restarting or Ending Show
@@ -188,19 +134,20 @@
     component: 'EndShowForm',
     meta: {
       isLoading,
-      canStartShow
+      canStartShow: sPermissions.canStartShow
     },
     response: (r: boolean | undefined) => {
       console.log('response', r);
       if (r) {
-        onShowEnded();
+        useNewShow();
       } else {
         startShow();
       }
     }
   };
+
   // Show Modal if showStopped is true
-  $: if (showStopped) {
+  $: if (sPermissions.showStopped) {
     modalStore.trigger(endShowModal);
   }
   // --------- End Modal for Restarting or Ending Show
@@ -239,7 +186,7 @@
         <!-- Status -->
         {#key currentShow}
           <ShowStatus
-            {canStartShow}
+            canStartShow={sPermissions.canStartShow}
             bind:isLoading
             show={currentShow}
             onGoToShow={startShow}
@@ -247,8 +194,8 @@
           />
         {/key}
 
-        {#if canCreateShow}
-          <CreateShow {onShowCreated} {createShowForm} />
+        {#if sPermissions.canCreateShow}
+          <CreateShow onShowCreated={useNewShow} {createShowForm} />
         {/if}
         <div>
           {#if currentShow}
@@ -268,9 +215,9 @@
           {/if}
         </div>
 
-        {#if canCancelShow}
+        {#if sPermissions.canCancelShow}
           <div class="lg:pb-4">
-            <CancelShow {onShowCancelled} bind:isLoading />
+            <CancelShow onShowCancelled={useNewShow} bind:isLoading />
           </div>
         {/if}
       </div>

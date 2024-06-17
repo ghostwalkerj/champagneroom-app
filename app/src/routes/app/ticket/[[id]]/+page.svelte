@@ -8,21 +8,15 @@
   import { invalidateAll, onNavigate } from '$app/navigation';
   import { page } from '$app/stores';
 
-  import type { ticketFeedbackSchema } from '$lib/models/common';
-  import { refundSchema, ticketDisputeSchema } from '$lib/models/common';
+  import type {
+    ticketDisputeSchema,
+    ticketFeedbackSchema
+  } from '$lib/models/common';
   import type { ShowDocument } from '$lib/models/show';
   import type { TicketDocument } from '$lib/models/ticket';
   import type { UserDocument } from '$lib/models/user';
 
-  import type { TicketMachineSnapshotType } from '$lib/machines/ticketMachine';
-
-  import {
-    ActorType,
-    DisputeReason,
-    RefundReason,
-    ShowStatus,
-    TicketStatus
-  } from '$lib/constants';
+  import { TicketStatus } from '$lib/constants';
   import type { DisplayInvoice } from '$lib/ext/bitcart/models';
   import { InvoiceStatus, type PaymentType } from '$lib/payments';
   import { connect, defaultWallet, selectedAccount } from '$lib/web3';
@@ -50,24 +44,16 @@
   let disputeForm = data.disputeForm as SuperValidated<
     Infer<typeof ticketDisputeSchema>
   >;
+  $: tPermissions = data.ticketPermissions;
 
   const currentPayment = invoice?.payments?.[
     invoice?.payments?.length - 1
   ] as PaymentType;
 
-  $: shouldPay = false;
-  let hasPaymentSent = false;
-  $: canWatchShow = false;
-  $: canCancelTicket = false;
-  $: isTicketDone = true;
   $: showVideo = false;
-  let canLeaveFeedback = false;
-  let canDispute = false;
-  let isWaitingForShow = false;
   let showUnSub: Unsubscriber;
   let ticketUnSub: Unsubscriber;
   let isShowCancelLoading = false;
-  $: hasShowStarted = false;
   $: isLoading = false;
   $: leftShow = false;
   const modalStore = getModalStore();
@@ -146,47 +132,6 @@
     isLoading = false;
   };
 
-  const useSnapShot = (snapshot: TicketMachineSnapshotType | undefined) => {
-    if (!snapshot) {
-      return;
-    }
-    shouldPay = snapshot.matches({ reserved: 'waiting4Payment' });
-    canWatchShow =
-      snapshot.matches({ reserved: 'waiting4Show' }) ||
-      snapshot.matches('redeemed');
-    hasPaymentSent =
-      invoice !== undefined &&
-      snapshot.matches({ reserved: 'initiatedPayment' }) &&
-      invoice.status !== InvoiceStatus.COMPLETE;
-    canCancelTicket =
-      (snapshot.matches({ reserved: 'waiting4Show' }) ||
-        snapshot.matches({ reserved: 'waiting4Payment' })) &&
-      !hasShowStarted;
-    canLeaveFeedback = snapshot.can({
-      type: 'FEEDBACK RECEIVED',
-      feedback: {
-        createdAt: new Date(),
-        rating: 5
-      }
-    });
-    canDispute = snapshot.can({
-      type: 'DISPUTE INITIATED',
-      dispute: ticketDisputeSchema.parse({
-        disputedBy: ActorType.CUSTOMER,
-        reason: DisputeReason.ENDED_EARLY
-      }),
-      refund: refundSchema.parse({
-        reason: RefundReason.DISPUTE_DECISION
-      })
-    });
-    isWaitingForShow = snapshot.can({ type: 'SHOW JOINED' });
-    isTicketDone = snapshot.status === 'done' ?? false;
-    if (isTicketDone) {
-      showUnSub?.();
-      ticketUnSub?.();
-    }
-  };
-
   const joinShow = async () => {
     isLoading = true;
     let formData = new FormData();
@@ -218,24 +163,24 @@
   };
 
   onMount(() => {
-    if (show) {
-      hasShowStarted = show.showState.status === ShowStatus.LIVE;
-    }
-    if (ticket.ticketState.active) {
+    if (!tPermissions.isTicketDone) {
       showUnSub?.();
       showUnSub = ShowStore(show).subscribe((_show) => {
         if (_show) {
           show = _show;
-          hasShowStarted = show.showState.status === ShowStatus.LIVE;
-          if (canWatchShow && hasShowStarted && !leftShow) joinShow();
+          if (
+            tPermissions.canWatchShow &&
+            tPermissions.hasShowStarted &&
+            !leftShow
+          )
+            joinShow();
         }
       });
-      isTicketDone = false;
-      useSnapShot(
-        $page.data.ticketMachineSnapshot as TicketMachineSnapshotType
-      );
-      ticketUnSub?.();
+      invalidateAll().then(() => {
+        tPermissions = data.ticketPermissions;
+      });
 
+      ticketUnSub?.();
       ticketUnSub = TicketStore(ticket).subscribe((_ticket) => {
         if (_ticket) {
           ticket = _ticket;
@@ -248,9 +193,7 @@
             ) {
               ticket = $page.data.ticket as TicketDocument;
             }
-            useSnapShot(
-              $page.data.ticketMachineSnapshot as TicketMachineSnapshotType
-            );
+            tPermissions = data.ticketPermissions;
           });
         }
       });
@@ -274,7 +217,7 @@
         {#key ticket.ticketState || show.showState}
           <TicketDetail {ticket} {show} {user} />
         {/key}
-        {#if canWatchShow && hasShowStarted}
+        {#if tPermissions.canWatchShow && tPermissions.hasShowStarted}
           <div
             class="bg-base-200/50 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-6 transform whitespace-nowrap rounded-xl p-2 text-2xl font-extrabold text-primary-500 ring-2 ring-inset ring-primary-500 lg:text-4xl"
           >
@@ -286,7 +229,7 @@
               }}>Go to the Show</button
             >
           </div>
-        {:else if isWaitingForShow}
+        {:else if tPermissions.isWaitingForShow}
           <div
             class="bg-base-200/50 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-6 transform whitespace-nowrap rounded-xl p-2 text-2xl font-extrabold text-primary-500 ring-2 ring-inset ring-primary-500 lg:text-4xl"
           >
@@ -296,12 +239,12 @@
       </div>
 
       <!-- Invoice -->
-      {#if !isTicketDone}
+      {#if !tPermissions.isTicketDone}
         <div class="relative">
           {#key invoice}
             <TicketInvoice {invoice} {ticket} />
           {/key}
-          {#if hasPaymentSent}
+          {#if tPermissions.hasPaymentSent}
             <div
               class="bg-base-200/50 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-45 transform whitespace-nowrap rounded-xl p-2 text-2xl font-extrabold text-primary-500 ring-2 ring-inset ring-primary-500 lg:text-3xl"
             >
@@ -311,9 +254,9 @@
         </div>
       {/if}
 
-      {#if !isTicketDone}
+      {#if !tPermissions.isTicketDone}
         <div class="m-3 flex flex-wrap justify-center gap-6">
-          {#if shouldPay && !isShowCancelLoading}
+          {#if tPermissions.shouldPay && !isShowCancelLoading}
             {#if !$selectedAccount}
               <button class="variant-filled-secondary btn" on:click={connect}
                 >Connect Wallet</button
@@ -326,7 +269,7 @@
               >
             {/if}
           {/if}
-          {#if canWatchShow && hasShowStarted}
+          {#if tPermissions.canWatchShow && tPermissions.hasShowStarted}
             <div class="flex w-full justify-center">
               <button
                 class="variant-filled-secondary btn"
@@ -337,11 +280,11 @@
               >
             </div>
           {/if}
-          {#if canCancelTicket && !hasShowStarted}
+          {#if tPermissions.canCancelTicket && !tPermissions.hasShowStarted}
             <CancelTicket bind:isLoading />
           {/if}
           <div class="flex flex-col md:flex-row">
-            {#if canLeaveFeedback}
+            {#if tPermissions.canLeaveFeedback}
               <div class="flex w-full justify-center p-4">
                 <button
                   class="variant-filled-primary btn"
@@ -351,14 +294,14 @@
                 >
               </div>
             {/if}
-            {#if canLeaveFeedback && canDispute}
+            {#if tPermissions.canLeaveFeedback && tPermissions.canDispute}
               <div class="h-1/2 w-full font-SpaceGrotesk md:w-3/4 md:p-6">
                 <hr />
                 OR
                 <hr />
               </div>
             {/if}
-            {#if canDispute}
+            {#if tPermissions.canDispute}
               <div class="flex w-full justify-center p-4">
                 <button
                   class="variant-filled-primary btn"

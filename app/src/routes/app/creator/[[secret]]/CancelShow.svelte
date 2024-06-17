@@ -3,9 +3,11 @@
 
   import { applyAction, enhance } from '$app/forms';
 
+  import type { ShowDocument } from '$lib/models/show';
+
   export let isLoading = false;
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  export let onShowCancelled: () => void;
+  export let onShowCancelled: (show: ShowDocument) => void;
 
   const onSubmit = ({}) => {
     isLoading = true;
@@ -13,7 +15,7 @@
       if (result.type === 'success') {
         switch (true) {
           case result.data!.showCancelled: {
-            onShowCancelled();
+            onShowCancelled(result.data!.show);
             break;
           }
         }

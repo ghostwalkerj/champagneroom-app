@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-
 import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 import { nanoid } from 'nanoid';
@@ -22,7 +21,7 @@ import type { ShowDocument } from '$lib/models/show';
 import type { TicketDocument } from '$lib/models/ticket';
 import type { TransactionDocument } from '$lib/models/transaction';
 
-import type { ShowQueueType } from '$lib/workers/showWorker';
+import type { ShowQueueType, ShowWorkerJobType } from '$lib/workers/showWorker';
 
 import { DisputeDecision, EntityType, ShowStatus } from '$lib/constants';
 
@@ -89,14 +88,14 @@ export type ShowMachineEventType =
       ticket: TicketDocument;
       decision: DisputeDecision;
     };
+//#endregion
 
 export type ShowMachineInput = {
   show: ShowDocument;
-  redisConnection?: IORedis;
+  redisConnection: IORedis;
   options?: Partial<ShowMachineOptions>;
 };
 
-//endregion
 export type ShowMachineOptions = {
   gracePeriod: number;
   escrowPeriod: number;
@@ -111,7 +110,7 @@ type ShowMachineContext = {
   id: string;
   errorMessage?: string;
   options: ShowMachineOptions;
-  showQueue: ShowQueueType | undefined;
+  showQueue: ShowQueueType;
 };
 
 export type ShowMachineSnapshotType = SnapshotFrom<typeof showMachine>;
@@ -162,36 +161,59 @@ export const showMachine = setup({
     input: {} as ShowMachineInput
   },
   actions: {
-    closeBoxOffice: (_, parameters: { show: ShowDocument }) =>
-      assign(() => {
-        const show = parameters.show;
+    closeBoxOffice: assign(
+      (
+        _,
+        params: {
+          show: ShowDocument;
+        }
+      ) => {
+        const show = params.show;
         show.showState.status = ShowStatus.BOX_OFFICE_CLOSED;
         return {
           show
         };
-      }),
+      }
+    ),
 
-    openBoxOffice: (_, parameters: { show: ShowDocument }) =>
-      assign(() => {
-        const show = parameters.show;
+    openBoxOffice: assign(
+      (
+        _,
+        params: {
+          show: ShowDocument;
+        }
+      ) => {
+        const show = params.show;
         show.showState.status = ShowStatus.BOX_OFFICE_OPEN;
         return {
           show
         };
-      }),
+      }
+    ),
 
-    cancelShow: (_, parameters: { show: ShowDocument }) =>
-      assign(() => {
-        const show = parameters.show;
+    cancelShow: assign(
+      (
+        _,
+        params: {
+          show: ShowDocument;
+        }
+      ) => {
+        const show = params.show;
         show.showState.status = ShowStatus.CANCELLED;
         return {
           show
         };
-      }),
+      }
+    ),
 
-    startShow: (_, parameters: { show: ShowDocument }) =>
-      assign(() => {
-        const show = parameters.show;
+    startShow: assign(
+      (
+        _,
+        params: {
+          show: ShowDocument;
+        }
+      ) => {
+        const show = params.show;
         show.showState.status = ShowStatus.LIVE;
         show.showState.runtime = runtimeSchema.parse({
           startDate: new Date()
@@ -199,34 +221,61 @@ export const showMachine = setup({
         return {
           show
         };
-      }),
-
-    endShow: (
-      _,
-      parameters: {
-        show: ShowDocument;
-        showQueue?: ShowQueueType;
       }
-    ) => {
-      assign(() => {
-        const show = parameters.show;
+    ),
+
+    endShow: assign(
+      (
+        _,
+        params: {
+          show: ShowDocument;
+        }
+      ) => {
+        const show = params.show;
         show.showState.status = ShowStatus.ENDED;
         show.showState.escrow = escrowSchema.parse({});
         show.showState.current = false;
         return {
           show
         };
-      });
-      if (parameters.showQueue) {
-        parameters.showQueue.add('END SHOW', {
-          showId: parameters.show._id.toString()
-        });
       }
+    ),
+
+    queueShowJob: (
+      _,
+      params: {
+        show: ShowDocument;
+        showQueue: ShowQueueType;
+        jobType: ShowWorkerJobType;
+      }
+    ) => {
+      params.showQueue.add(params.jobType, {
+        showId: params.show._id.toString()
+      });
     },
 
-    stopShow: (_, parameters: { show: ShowDocument }) =>
-      assign(() => {
-        const show = parameters.show;
+    queueCancelTickets: (
+      _,
+      params: {
+        show: ShowDocument;
+        cancel: CancelType;
+        showQueue: ShowQueueType;
+      }
+    ) => {
+      params.showQueue.add('CANCEL TICKETS', {
+        showId: params.show._id.toString(),
+        cancel: params.cancel
+      });
+    },
+
+    stopShow: assign(
+      (
+        _,
+        params: {
+          show: ShowDocument;
+        }
+      ) => {
+        const show = params.show;
         const startDate = show.showState.runtime?.startDate;
         if (!startDate) {
           throw new Error('Show start date is not defined');
@@ -237,194 +286,193 @@ export const showMachine = setup({
           endDate: new Date()
         });
         return { show };
-      }),
-
-    initiateCancellation: (
-      _,
-      parameters: {
-        show: ShowDocument;
-        cancel: CancelType;
-        showQueue?: ShowQueueType;
       }
-    ) => {
-      assign(() => {
-        const show = parameters.show;
+    ),
+
+    initiateCancellation: assign(
+      (
+        _,
+        params: {
+          show: ShowDocument;
+          cancel: CancelType;
+        }
+      ) => {
+        const show = params.show;
         show.showState.status = ShowStatus.CANCELLATION_INITIATED;
-        show.showState.cancel = parameters.cancel;
+        show.showState.cancel = params.cancel;
         show.showState.salesStats.ticketsAvailable = 0;
         return { show };
-      });
-      if (parameters.showQueue) {
-        parameters.showQueue.add('CANCEL TICKETS', {
-          showId: parameters.show._id.toString(),
-          cancel: parameters.cancel
-        });
       }
-    },
+    ),
 
-    initiateRefund: (
-      _,
-      parameters: {
-        show: ShowDocument;
-        showQueue?: ShowQueueType;
-      }
-    ) => {
-      assign(() => {
-        const show = parameters.show;
+    initiateRefund: assign(
+      (
+        _,
+        params: {
+          show: ShowDocument;
+        }
+      ) => {
+        const show = params.show;
         show.showState.status = ShowStatus.REFUND_INITIATED;
         return { show };
-      });
-
-      if (parameters.showQueue) {
-        parameters.showQueue.add('REFUND TICKETS', {
-          showId: parameters.show._id.toString()
-        });
       }
-    },
+    ),
 
-    receiveDispute: (
-      _,
-      parameters: {
-        show: ShowDocument;
-        ticket: TicketDocument;
-      }
-    ) =>
-      assign(() => {
-        const show = parameters.show;
-        const ticket = parameters.ticket;
+    receiveDispute: assign(
+      (
+        _,
+        params: {
+          show: ShowDocument;
+          ticket: TicketDocument;
+        }
+      ) => {
+        const show = params.show;
+        const ticket = params.ticket;
         show.showState.status = ShowStatus.ENDED;
         show.showState.disputes.push(ticket._id);
         show.$inc('showState.disputeStats.totalDisputes', 1);
         show.$inc('showState.disputeStats.totalDisputesPending', 1);
         return { show };
-      }),
-
-    receiveResolution: (
-      _,
-      parameters: {
-        show: ShowDocument;
-        decision: DisputeDecision;
       }
-    ) =>
-      assign(() => {
-        const show = parameters.show;
-        const refunded =
-          parameters.decision === DisputeDecision.NO_REFUND ? 0 : 1;
+    ),
+
+    receiveResolution: assign(
+      (
+        _,
+        params: {
+          show: ShowDocument;
+          decision: DisputeDecision;
+        }
+      ) => {
+        const show = params.show;
+        const refunded = params.decision === DisputeDecision.NO_REFUND ? 0 : 1;
         show.$inc('showState.disputeStats.totalDisputesPending', -1);
         show.$inc('showState.disputeStats.totalDisputesResolved', 1);
         show.$inc('showState.disputeStats.totalDisputesRefunded', refunded);
         return { show };
-      }),
-
-    refundTicket: (
-      _,
-      parameters: {
-        show: ShowDocument;
-        ticket: TicketDocument;
       }
-    ) =>
-      assign(() => {
-        const show = parameters.show;
+    ),
+
+    refundTicket: assign(
+      (
+        _,
+        params: {
+          show: ShowDocument;
+          ticket: TicketDocument;
+        }
+      ) => {
+        const show = params.show;
         show.$inc('showState.salesStats.ticketsRefunded', 1);
         show.$inc('showState.salesStats.ticketsSold', -1);
         show.$inc('showState.salesStats.ticketsAvailable', 1);
-        show.showState.refunds.push(parameters.ticket._id);
+        show.showState.refunds.push(params.ticket._id);
         return { show };
-      }),
+      }
+    ),
 
-    deactivateShow: (_, parameters: { show: ShowDocument }) =>
-      assign(() => {
-        const show = parameters.show;
+    deactivateShow: assign(
+      (
+        _,
+        params: {
+          show: ShowDocument;
+        }
+      ) => {
+        const show = params.show;
         show.showState.active = false;
         show.showState.current = false;
         return { show };
-      }),
-
-    cancelTicket: (
-      _,
-      parameters: {
-        show: ShowDocument;
-        ticket: TicketDocument;
       }
-    ) =>
-      assign(() => {
-        const show = parameters.show;
-        show.showState.cancellations.push(parameters.ticket._id);
+    ),
+
+    cancelTicket: assign(
+      (
+        _,
+        params: {
+          show: ShowDocument;
+          ticket: TicketDocument;
+        }
+      ) => {
+        const show = params.show;
+        show.showState.cancellations.push(params.ticket._id);
         show.$inc('showState.salesStats.ticketsAvailable', 1);
         show.$inc('showState.salesStats.ticketsReserved', -1);
         return { show };
-      }),
-
-    reserveTicket: (
-      _,
-      parameters: {
-        show: ShowDocument;
-        ticket: TicketDocument;
       }
-    ) =>
-      assign(() => {
-        const show = parameters.show;
-        show.showState.reservations.push(parameters.ticket._id);
+    ),
+
+    reserveTicket: assign(
+      (
+        _,
+        params: {
+          show: ShowDocument;
+          ticket: TicketDocument;
+        }
+      ) => {
+        const show = params.show;
+        show.showState.reservations.push(params.ticket._id);
         show.$inc('showState.salesStats.ticketsAvailable', -1);
         show.$inc('showState.salesStats.ticketsReserved', 1);
         return { show };
-      }),
-
-    redeemTicket: (
-      _,
-      parameters: {
-        show: ShowDocument;
-        ticket: TicketDocument;
       }
-    ) =>
-      assign(() => {
-        const show = parameters.show;
+    ),
+
+    redeemTicket: assign(
+      (
+        _,
+        params: {
+          show: ShowDocument;
+          ticket: TicketDocument;
+        }
+      ) => {
+        const show = params.show;
         show.$inc('showState.salesStats.ticketsRedeemed', 1);
-        show.showState.redemptions.push(parameters.ticket._id);
+        show.showState.redemptions.push(params.ticket._id);
         return { show };
-      }),
-
-    finalizeTicket: (
-      _,
-      parameters: {
-        show: ShowDocument;
-        ticket: TicketDocument;
       }
-    ) =>
-      assign(() => {
-        const show = parameters.show;
+    ),
+
+    finalizeTicket: assign(
+      (
+        _,
+        params: {
+          show: ShowDocument;
+          ticket: TicketDocument;
+        }
+      ) => {
+        const show = params.show;
         show.$inc('showState.salesStats.ticketsFinalized', 1);
-        show.showState.finalizations.push(parameters.ticket._id);
+        show.showState.finalizations.push(params.ticket._id);
         return { show };
-      }),
-
-    sellTicket: (
-      _,
-      parameters: {
-        show: ShowDocument;
-        ticket: TicketDocument;
       }
-    ) =>
-      assign(() => {
-        const show = parameters.show;
+    ),
+
+    sellTicket: assign(
+      (
+        _,
+        params: {
+          show: ShowDocument;
+          ticket: TicketDocument;
+        }
+      ) => {
+        const show = params.show;
         show.$inc('showState.salesStats.ticketsSold', 1);
         show.$inc('showState.salesStats.ticketsReserved', -1);
-        show.showState.sales.push(parameters.ticket._id);
+        show.showState.sales.push(params.ticket._id);
         return { show };
-      }),
-
-    finalizeShow: (
-      _,
-      parameters: {
-        show: ShowDocument;
-        showQueue?: ShowQueueType;
       }
-    ) => {
-      const finalize = {
-        finalizedAt: new Date()
-      };
-      assign(() => {
-        const show = parameters.show;
+    ),
+
+    finalizeShow: assign(
+      (
+        _,
+        params: {
+          show: ShowDocument;
+        }
+      ) => {
+        const finalize = {
+          finalizedAt: new Date()
+        };
+        const show = params.show;
         show.showState.status = ShowStatus.FINALIZED;
         show.showState.finalize = finalize;
         if (!show.showState.escrow)
@@ -433,17 +481,12 @@ export const showMachine = setup({
           });
         show.showState.escrow.endedAt = new Date();
         return { show };
-      });
-      if (parameters.showQueue) {
-        parameters.showQueue.add('CALCULATE STATS', {
-          showId: parameters.show._id.toString()
-        });
       }
-    }
+    )
   },
   guards: {
-    canCancel: (_, parameters: { show: ShowDocument }) => {
-      const show = parameters.show;
+    canCancel: (_, params: { show: ShowDocument }) => {
+      const show = params.show;
       return (
         show.price.amount === 0 ||
         show.showState.salesStats.ticketsSold -
@@ -451,63 +494,63 @@ export const showMachine = setup({
           0
       );
     },
-    showCancelled: (_, parameters: { show: ShowDocument }) =>
-      parameters.show.showState.status === ShowStatus.CANCELLED,
-    showFinalized: (_, parameters: { show: ShowDocument }) =>
-      parameters.show.showState.status === ShowStatus.FINALIZED,
-    showInitiatedCancellation: (_, parameters: { show: ShowDocument }) =>
-      parameters.show.showState.status === ShowStatus.CANCELLATION_INITIATED,
-    showInitiatedRefund: (_, parameters: { show: ShowDocument }) =>
-      parameters.show.showState.status === ShowStatus.REFUND_INITIATED,
-    showBoxOfficeOpen: (_, parameters: { show: ShowDocument }) =>
-      parameters.show.showState.status === ShowStatus.BOX_OFFICE_OPEN,
-    showBoxOfficeClosed: (_, parameters: { show: ShowDocument }) =>
-      parameters.show.showState.status === ShowStatus.BOX_OFFICE_CLOSED,
-    showStarted: (_, parameters: { show: ShowDocument }) =>
-      parameters.show.showState.status === ShowStatus.LIVE,
-    showStopped: (_, parameters: { show: ShowDocument }) =>
-      parameters.show.showState.status === ShowStatus.STOPPED,
-    showEnded: (_, parameters: { show: ShowDocument }) =>
-      parameters.show.showState.status === ShowStatus.ENDED,
-    soldOut: (_, parameters: { show: ShowDocument }) =>
-      parameters.show.showState.salesStats.ticketsAvailable === 1,
+    showCancelled: (_, params: { show: ShowDocument }) =>
+      params.show.showState.status === ShowStatus.CANCELLED,
+    showFinalized: (_, params: { show: ShowDocument }) =>
+      params.show.showState.status === ShowStatus.FINALIZED,
+    showInitiatedCancellation: (_, params: { show: ShowDocument }) =>
+      params.show.showState.status === ShowStatus.CANCELLATION_INITIATED,
+    showInitiatedRefund: (_, params: { show: ShowDocument }) =>
+      params.show.showState.status === ShowStatus.REFUND_INITIATED,
+    showBoxOfficeOpen: (_, params: { show: ShowDocument }) =>
+      params.show.showState.status === ShowStatus.BOX_OFFICE_OPEN,
+    showBoxOfficeClosed: (_, params: { show: ShowDocument }) =>
+      params.show.showState.status === ShowStatus.BOX_OFFICE_CLOSED,
+    showStarted: (_, params: { show: ShowDocument }) =>
+      params.show.showState.status === ShowStatus.LIVE,
+    showStopped: (_, params: { show: ShowDocument }) =>
+      params.show.showState.status === ShowStatus.STOPPED,
+    showEnded: (_, params: { show: ShowDocument }) =>
+      params.show.showState.status === ShowStatus.ENDED,
+    soldOut: (_, params: { show: ShowDocument }) =>
+      params.show.showState.salesStats.ticketsAvailable === 1,
     canStartShow: (
       _,
-      parameters: {
+      params: {
         show: ShowDocument;
         gracePeriod: number;
       }
     ) => {
-      const st = parameters.show.showState;
+      const st = params.show.showState;
       if (st.status === ShowStatus.STOPPED) {
         // Allow grace period to start show again
         if (!st.runtime!.startDate) {
           return false;
         }
         const startDate = new Date(st.runtime!.startDate);
-        return (startDate.getTime() ?? 0) + parameters.gracePeriod > Date.now();
+        return (startDate.getTime() ?? 0) + params.gracePeriod > Date.now();
       }
       return st.salesStats.ticketsSold > 0;
     },
     fullyRefunded: (
       _,
-      parameters: {
+      params: {
         show: ShowDocument;
         event: ShowMachineEventType;
       }
     ) => {
-      const refunded = parameters.event.type === 'TICKET REFUNDED' ? 1 : 0;
-      return parameters.show.showState.salesStats.ticketsSold - refunded === 0;
+      const refunded = params.event.type === 'TICKET REFUNDED' ? 1 : 0;
+      return params.show.showState.salesStats.ticketsSold - refunded === 0;
     },
     canFinalize: (
       _,
-      parameters: {
+      params: {
         show: ShowDocument;
         escrowPeriod: number;
       }
     ) => {
       let startTime = 0;
-      const show = parameters.show;
+      const show = params.show;
       const startedAt = show.showState.escrow?.startedAt;
       if (startedAt) {
         startTime = new Date(startedAt).getTime();
@@ -516,23 +559,21 @@ export const showMachine = setup({
         show.showState.salesStats.ticketsSold -
           show.showState.salesStats.ticketsFinalized >
         0;
-      const escrowTime = 0 + parameters.escrowPeriod + startTime;
+      const escrowTime = 0 + params.escrowPeriod + startTime;
       const hasDisputes = show.showState.disputeStats.totalDisputesPending > 0;
       const escrowOver = escrowTime < Date.now();
       return escrowOver || (!hasDisputes && !hasUnfinalizedTickets);
     },
     disputesResolved: (
       _,
-      parameters: {
+      params: {
         show: ShowDocument;
         event: ShowMachineEventType;
       }
     ) => {
-      const resolved = parameters.event.type === 'DISPUTE DECIDED' ? 1 : 0;
+      const resolved = params.event.type === 'DISPUTE DECIDED' ? 1 : 0;
       return (
-        parameters.show.showState.disputeStats.totalDisputesPending -
-          resolved ===
-        0
+        params.show.showState.disputeStats.totalDisputesPending - resolved === 0
       );
     }
   }
@@ -542,11 +583,9 @@ export const showMachine = setup({
     show: input.show,
     errorMessage: undefined as string | undefined,
     id: nanoid(),
-    showQueue: input.redisConnection
-      ? (new Queue(EntityType.SHOW, {
-          connection: input.redisConnection
-        }) as ShowQueueType)
-      : undefined,
+    showQueue: new Queue(EntityType.SHOW, {
+      connection: input.redisConnection
+    }) as ShowQueueType,
     options: {
       escrowPeriod: input.options?.escrowPeriod ?? 3_600_000,
       gracePeriod: input.options?.gracePeriod ?? 3_600_000
@@ -666,8 +705,15 @@ export const showMachine = setup({
           {
             type: 'finalizeShow',
             params: ({ context }) => ({
+              show: context.show
+            })
+          },
+          {
+            type: 'queueShowJob',
+            params: ({ context }) => ({
               show: context.show,
-              showQueue: context.showQueue
+              showQueue: context.showQueue,
+              jobType: 'CALCULATE STATS'
             })
           }
         ]
@@ -735,8 +781,7 @@ export const showMachine = setup({
                 type: 'initiateCancellation',
                 params: ({ context, event }) => ({
                   show: context.show,
-                  cancel: event.cancel,
-                  showQueue: context.showQueue
+                  cancel: event.cancel
                 })
               },
               {
@@ -755,6 +800,14 @@ export const showMachine = setup({
                 params: ({ context, event }) => ({
                   show: context.show,
                   cancel: event.cancel
+                })
+              },
+              {
+                type: 'queueCancelTickets',
+                params: ({ context, event }) => ({
+                  show: context.show,
+                  cancel: event.cancel,
+                  showQueue: context.showQueue
                 })
               }
             ]
@@ -1027,6 +1080,14 @@ export const showMachine = setup({
               params: ({ context }) => ({
                 show: context.show
               })
+            },
+            {
+              type: 'queueShowJob',
+              params: ({ context }) => ({
+                show: context.show,
+                showQueue: context.showQueue,
+                jobType: 'END SHOW'
+              })
             }
           ]
         }
@@ -1044,6 +1105,14 @@ export const showMachine = setup({
                   type: 'initiateRefund',
                   params: ({ context }) => ({
                     show: context.show
+                  })
+                },
+                {
+                  type: 'queueShowJob',
+                  params: ({ context }) => ({
+                    show: context.show,
+                    showQueue: context.showQueue,
+                    jobType: 'REFUND TICKETS'
                   })
                 }
               ]

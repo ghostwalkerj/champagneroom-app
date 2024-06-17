@@ -12,7 +12,7 @@ import { createWalletMachineService } from '$lib/machines/walletMachine';
 
 export const getShowMachineServiceFromId = async (
   showId: string,
-  redisConnection?: IORedis
+  redisConnection: IORedis
 ) => {
   const show = (await mongoose
     .model('Show')

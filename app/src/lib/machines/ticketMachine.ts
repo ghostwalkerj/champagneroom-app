@@ -10,7 +10,6 @@ import {
   sendTo,
   setup,
   type SnapshotFrom,
-  spawnChild,
   stopChild
 } from 'xstate';
 
@@ -53,19 +52,13 @@ import {
   PayoutJobType
 } from '$lib/payments';
 
-import {
-  showMachine,
-  type ShowMachineEventType,
-  type ShowMachineInput,
-  type ShowMachineOptions,
-  type ShowMachineType
-} from './showMachine';
+import { showMachine, type ShowMachineType } from './showMachine';
 
 type TicketMachineContext = {
   ticket: TicketDocument;
   show: ShowDocument;
   showMachineRef: ActorRefFrom<ShowMachineType>;
-  redisConnection?: IORedis;
+  redisConnection: IORedis;
   errorMessage: string | undefined;
   id: string;
 };
@@ -177,93 +170,65 @@ export const ticketMachine = setup({
     showMachine: {} as ShowMachineType
   },
   actions: {
-    sendJoinedShow: (_: any, params: { ticket: TicketDocument }) => {
-      sendTo('showMachine', {
-        type: 'CUSTOMER JOINED',
-        ticket: params.ticket
-      } as ShowMachineEventType);
-    },
-
-    sendLeftShow: (_, params: { ticket: TicketDocument }) => {
-      sendTo('showMachine', {
-        type: 'CUSTOMER LEFT',
-        ticket: params.ticket
-      } as ShowMachineEventType);
-    },
-
-    sendTicketSold: (_, params: { ticket: TicketDocument }) => {
-      sendTo('showMachine', {
-        type: 'TICKET SOLD',
-        ticket: params.ticket
-      } as ShowMachineEventType);
-    },
-
-    sendTicketReserved: (_, params: { ticket: TicketDocument }) => {
-      sendTo('showMachine', {
-        type: 'TICKET RESERVED',
-        ticket: params.ticket
-      } as ShowMachineEventType);
-    },
-
-    sendTicketRedeemed: (_, params: { ticket: TicketDocument }) => {
-      sendTo('showMachine', {
-        type: 'TICKET REDEEMED',
-        ticket: params.ticket
-      } as ShowMachineEventType);
-    },
-
-    sendTicketRefunded: (_, params: { ticket: TicketDocument }) => {
-      sendTo('showMachine', {
-        type: 'TICKET REFUNDED',
-        ticket: params.ticket
-      } as ShowMachineEventType);
-    },
-
-    sendTicketCancelled: (
-      _,
-      params: { cancel: CancelType; ticket: TicketDocument }
-    ) => {
-      sendTo('showMachine', {
-        type: 'TICKET CANCELLED',
-        ticket: params.ticket
-      } as ShowMachineEventType);
-    },
-
-    sendTicketFinalized: (_, params: { ticket: TicketDocument }) => {
-      sendTo('showMachine', {
-        type: 'TICKET FINALIZED',
-        ticket: params.ticket
-      } as ShowMachineEventType);
-    },
-
-    sendDisputeInitiated: (_, params: { ticket: TicketDocument }) => {
-      sendTo('showMachine', {
-        type: 'TICKET DISPUTED',
-        ticket: params.ticket
-      } as ShowMachineEventType);
-    },
-
-    updateShow: (
-      _,
-      params: {
-        show: ShowDocument;
-        redisConnection?: IORedis;
-        options?: ShowMachineOptions;
+    sendJoinedShow: sendTo(
+      'showMachine',
+      (_: any, params: { ticket: TicketDocument }) => {
+        return { type: 'CUSTOMER JOINED', ticket: params.ticket };
       }
-    ) => {
-      stopChild('showMachine');
-      assign({ childMachineRef: undefined });
-      assign({
-        show: params.show,
-        showMachineRef: spawnChild(showMachine, {
-          input: {
-            show: params.show,
-            redisConnection: params.redisConnection,
-            options: params.options
-          } as ShowMachineInput
-        })
-      });
-    },
+    ),
+    sendLeftShow: sendTo(
+      'showMachine',
+      (_, params: { ticket: TicketDocument }) => {
+        return { type: 'CUSTOMER LEFT', ticket: params.ticket };
+      }
+    ),
+
+    sendTicketSold: sendTo(
+      'showMachine',
+      (_, params: { ticket: TicketDocument }) => {
+        return { type: 'TICKET SOLD', ticket: params.ticket };
+      }
+    ),
+
+    sendTicketReserved: sendTo(
+      'showMachine',
+      (_, params: { ticket: TicketDocument }) => {
+        return { type: 'TICKET RESERVED', ticket: params.ticket };
+      }
+    ),
+
+    sendTicketRedeemed: sendTo(
+      'showMachine',
+      (_, params: { ticket: TicketDocument }) => {
+        return { type: 'TICKET REDEEMED', ticket: params.ticket };
+      }
+    ),
+
+    sendTicketRefunded: sendTo(
+      'showMachine',
+      (_, params: { ticket: TicketDocument }) => {
+        return { type: 'TICKET REFUNDED', ticket: params.ticket };
+      }
+    ),
+
+    sendTicketCancelled: sendTo(
+      'showMachine',
+      (_, params: { ticket: TicketDocument }) => {
+        return { type: 'TICKET CANCELLED', ticket: params.ticket };
+      }
+    ),
+    sendTicketFinalized: sendTo(
+      'showMachine',
+      (_, params: { ticket: TicketDocument }) => {
+        return { type: 'TICKET FINALIZED', ticket: params.ticket };
+      }
+    ),
+    sendDisputeInitiated: sendTo(
+      'showMachine',
+      (_, params: { ticket: TicketDocument }) => {
+        return { type: 'DISPUTE INITIATED', ticket: params.ticket };
+      }
+    ),
 
     initiatePayment: (
       _,
@@ -1361,12 +1326,17 @@ export const ticketMachine = setup({
     ],
     'SHOW UPDATED': {
       actions: [
-        {
-          type: 'updateShow',
-          params: ({ event }) => ({
-            show: event.show
-          })
-        }
+        stopChild('showMachine'),
+        assign({
+          show: ({ event }) => event.show,
+          showMachineRef: ({ spawn, context }) =>
+            spawn(showMachine, {
+              input: {
+                show: context.show,
+                redisConnection: context.redisConnection
+              }
+            })
+        })
       ]
     },
     'SHOW ENDED': {
