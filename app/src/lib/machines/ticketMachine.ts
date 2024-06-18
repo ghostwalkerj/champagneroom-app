@@ -182,35 +182,30 @@ export const ticketMachine = setup({
         return { type: 'CUSTOMER LEFT', ticket: params.ticket };
       }
     ),
-
     sendTicketSold: sendTo(
       'showMachine',
       (_, params: { ticket: TicketDocument }) => {
         return { type: 'TICKET SOLD', ticket: params.ticket };
       }
     ),
-
     sendTicketReserved: sendTo(
       'showMachine',
       (_, params: { ticket: TicketDocument }) => {
         return { type: 'TICKET RESERVED', ticket: params.ticket };
       }
     ),
-
     sendTicketRedeemed: sendTo(
       'showMachine',
       (_, params: { ticket: TicketDocument }) => {
         return { type: 'TICKET REDEEMED', ticket: params.ticket };
       }
     ),
-
     sendTicketRefunded: sendTo(
       'showMachine',
       (_, params: { ticket: TicketDocument }) => {
         return { type: 'TICKET REFUNDED', ticket: params.ticket };
       }
     ),
-
     sendTicketCancelled: sendTo(
       'showMachine',
       (_, params: { ticket: TicketDocument }) => {
@@ -230,11 +225,10 @@ export const ticketMachine = setup({
       }
     ),
 
-    initiatePayment: (
+    queueUpdateInvoiceAddress: (
       _,
       params: {
         ticket: TicketDocument;
-        paymentCurrency: CurrencyType;
         connection?: IORedis;
         paymentAddress?: string;
         paymentId?: string;
@@ -243,7 +237,6 @@ export const ticketMachine = setup({
       if (params.connection === undefined) return;
       const connection = params.connection as IORedis;
       const ticket = params.ticket;
-      const paymentCurrency = params.paymentCurrency;
       const invoiceQueue = new Queue(EntityType.INVOICE, {
         connection
       });
@@ -253,8 +246,19 @@ export const ticketMachine = setup({
         paymentId: params.paymentId
       });
       invoiceQueue.close();
+    },
 
-      assign(() => {
+    initiatePayment: assign(
+      (
+        _,
+        params: {
+          ticket: TicketDocument;
+          paymentCurrency: CurrencyType;
+        }
+      ) => {
+        const ticket = params.ticket;
+        const paymentCurrency = params.paymentCurrency;
+
         ticket.ticketState.status = TicketStatus.PAYMENT_INITIATED;
         ticket.ticketState.sale = ticketSaleSchema.parse({
           totals: {
@@ -266,48 +270,39 @@ export const ticketMachine = setup({
         return {
           ticket
         };
-      });
-    },
+      }
+    ),
 
-    setFullyPaid: (_, params: { ticket: TicketDocument }) => {
-      assign(() => {
-        const ticket = params.ticket;
-        ticket.ticketState.status = TicketStatus.FULLY_PAID;
+    setFullyPaid: assign((_, params: { ticket: TicketDocument }) => {
+      const ticket = params.ticket;
+      ticket.ticketState.status = TicketStatus.FULLY_PAID;
+      return { ticket };
+    }),
+
+    redeemTicket: assign((_, params: { ticket: TicketDocument }) => {
+      const ticket = params.ticket;
+      if (ticket.ticketState.status === TicketStatus.REDEEMED)
         return { ticket };
-      });
-    },
+      ticket.ticketState.status = TicketStatus.REDEEMED;
+      ticket.ticketState.redemption = redemptionSchema.parse({});
+      return { ticket };
+    }),
 
-    redeemTicket: (_, params: { ticket: TicketDocument }) => {
-      assign(() => {
-        const ticket = params.ticket;
-        if (ticket.ticketState.status === TicketStatus.REDEEMED)
-          return { ticket };
-        ticket.ticketState.status = TicketStatus.REDEEMED;
-        ticket.ticketState.redemption = redemptionSchema.parse({});
-        return { ticket };
-      });
-    },
-
-    reserveTicket: (
-      _,
-      params: { ticket: TicketDocument; status: TicketStatus }
-    ) => {
-      assign(() => {
+    reserveTicket: assign(
+      (_, params: { ticket: TicketDocument; status: TicketStatus }) => {
         const ticket = params.ticket;
         ticket.ticketState.status = params.status;
         return { ticket };
-      });
-    },
+      }
+    ),
 
-    cancelTicket: (_, params: { ticket: TicketDocument }) => {
-      assign(() => {
-        const ticket = params.ticket;
-        ticket.ticketState.status = TicketStatus.CANCELLED;
-        return { ticket };
-      });
-    },
+    cancelTicket: assign((_, params: { ticket: TicketDocument }) => {
+      const ticket = params.ticket;
+      ticket.ticketState.status = TicketStatus.CANCELLED;
+      return { ticket };
+    }),
 
-    cancelInvoice: (
+    queueCancelInvoice: (
       _,
       params: { ticket: TicketDocument; connection?: IORedis }
     ) => {
@@ -353,34 +348,28 @@ export const ticketMachine = setup({
       payoutQueue.close();
     },
 
-    receiveInvoice: (
-      _,
-      params: { ticket: TicketDocument; invoice: DisplayInvoice }
-    ) => {
-      let paymentAddress = params.ticket.paymentAddress;
-      const payment = params.invoice.payments
-        ? (params.invoice.payments[0] as PaymentType) // Use the first wallet
-        : undefined;
+    receiveInvoice: assign(
+      (_, params: { ticket: TicketDocument; invoice: DisplayInvoice }) => {
+        let paymentAddress = params.ticket.paymentAddress;
+        const payment = params.invoice.payments
+          ? (params.invoice.payments[0] as PaymentType) // Use the first wallet
+          : undefined;
 
-      if (payment && 'payment_address' in payment) {
-        paymentAddress = payment['payment_address'] as string;
-      }
-      assign(() => {
+        if (payment && 'payment_address' in payment) {
+          paymentAddress = payment['payment_address'] as string;
+        }
         const ticket = params.ticket;
         ticket.bcInvoiceId = params.invoice.id;
         ticket.paymentAddress = paymentAddress;
         return { ticket };
-      });
-    },
-
-    receivePayment: (
-      _,
-      params: {
-        ticket: TicketDocument;
-        transaction: TransactionDocument;
       }
-    ) => {
-      assign(() => {
+    ),
+
+    receivePayment: assign(
+      (
+        _,
+        params: { ticket: TicketDocument; transaction: TransactionDocument }
+      ) => {
         const ticket = params.ticket;
         const transaction = params.transaction;
         if (!ticket.ticketState.sale) return { ticket };
@@ -394,18 +383,18 @@ export const ticketMachine = setup({
         ticket.ticketState.sale.payments.push(payment);
         ticket.ticketState.status = TicketStatus.PAYMENT_RECEIVED;
         return { ticket };
-      });
-    },
-
-    requestRefund: (
-      _,
-      params: {
-        cancel: CancelType;
-        ticket: TicketDocument;
-        refund: RefundType;
       }
-    ) => {
-      assign(() => {
+    ),
+
+    requestRefund: assign(
+      (
+        _,
+        params: {
+          ticket: TicketDocument;
+          refund: RefundType;
+          cancel: CancelType;
+        }
+      ) => {
         const ticket = params.ticket;
         ticket.ticketState.status = TicketStatus.REFUND_REQUESTED;
         ticket.ticketState.cancel = params.cancel;
@@ -413,33 +402,24 @@ export const ticketMachine = setup({
         return {
           ticket
         };
-      });
-    },
-
-    initiateRefund: (
-      _,
-      params: {
-        ticket: TicketDocument;
-        refund: RefundType;
       }
-    ) => {
-      assign(() => {
+    ),
+
+    initiateRefund: assign(
+      (_, params: { ticket: TicketDocument; refund: RefundType }) => {
         const ticket = params.ticket;
         const refund = params.refund;
         ticket.ticketState.status = TicketStatus.WAITING_FOR_REFUND;
         ticket.ticketState.refund = refund;
         return { ticket };
-      });
-    },
-
-    receiveRefund: (
-      _,
-      params: {
-        ticket: TicketDocument;
-        transaction: TransactionDocument;
       }
-    ) => {
-      assign(() => {
+    ),
+
+    receiveRefund: assign(
+      (
+        _,
+        params: { ticket: TicketDocument; transaction: TransactionDocument }
+      ) => {
         const ticket = params.ticket;
         const transaction = params.transaction;
         if (!ticket.ticketState.refund) return { ticket };
@@ -453,59 +433,45 @@ export const ticketMachine = setup({
         ticket.ticketState.refund.payouts.push(payout);
         ticket.$inc('ticketState.refund.total', payout.amount);
         return { ticket };
-      });
-    },
-
-    receiveFeedback: (
-      _,
-      params: {
-        ticket: TicketDocument;
-        feedback: FeedbackType;
       }
-    ) => {
-      assign(() => {
+    ),
+
+    receiveFeedback: assign(
+      (_, params: { ticket: TicketDocument; feedback: FeedbackType }) => {
         const ticket = params.ticket;
         const feedback = params.feedback;
         ticket.ticketState.feedback = feedback;
         return { ticket };
-      });
-    },
-
-    initiateDispute: (
-      _,
-      params: {
-        ticket: TicketDocument;
-        dispute: DisputeType;
-        refund: RefundType;
       }
-    ) => {
-      assign(() => {
+    ),
+
+    initiateDispute: assign(
+      (
+        _,
+        params: {
+          ticket: TicketDocument;
+          dispute: DisputeType;
+          refund: RefundType;
+        }
+      ) => {
         const ticket = params.ticket;
         if (!ticket.ticketState.sale) return { ticket };
         ticket.ticketState.status = TicketStatus.IN_DISPUTE;
         ticket.ticketState.dispute = params.dispute;
         ticket.ticketState.refund = params.refund;
         return { ticket };
-      });
-    },
-
-    endShow: (_, params: { ticket: TicketDocument }) => {
-      assign(() => {
-        const ticket = params.ticket;
-        ticket.ticketState.status = TicketStatus.IN_ESCROW;
-        ticket.ticketState.escrow = escrowSchema.parse({});
-        return { ticket };
-      });
-    },
-
-    finalizeTicket: (
-      _,
-      params: {
-        ticket: TicketDocument;
-        finalize: FinalizeType;
       }
-    ) => {
-      assign(() => {
+    ),
+
+    endShow: assign((_, params: { ticket: TicketDocument }) => {
+      const ticket = params.ticket;
+      ticket.ticketState.status = TicketStatus.IN_ESCROW;
+      ticket.ticketState.escrow = escrowSchema.parse({});
+      return { ticket };
+    }),
+
+    finalizeTicket: assign(
+      (_, params: { ticket: TicketDocument; finalize: FinalizeType }) => {
         const ticket = params.ticket;
         const finalize = params.finalize;
         if (ticket.ticketState.status === TicketStatus.FINALIZED)
@@ -514,18 +480,18 @@ export const ticketMachine = setup({
         ticket.ticketState.status = TicketStatus.FINALIZED;
         ticket.ticketState.finalize = finalize;
         return { ticket };
-      });
-    },
-
-    decideDispute: (
-      _,
-      params: {
-        ticket: TicketDocument;
-        decision: DisputeDecision;
-        refund?: RefundType;
       }
-    ) => {
-      assign(() => {
+    ),
+
+    decideDispute: assign(
+      (
+        _,
+        params: {
+          ticket: TicketDocument;
+          decision: DisputeDecision;
+          refund?: RefundType;
+        }
+      ) => {
         const ticket = params.ticket;
         const decision = params.decision;
         const refund = params.refund;
@@ -537,24 +503,20 @@ export const ticketMachine = setup({
         if (refund) ticket.ticketState.refund = refund;
         ticket.ticketState.status = TicketStatus.WAITING_FOR_DISPUTE_REFUND;
         return { ticket };
-      });
-    },
+      }
+    ),
 
-    deactivateTicket: (_, params: { ticket: TicketDocument }) => {
-      assign(() => {
-        const ticket = params.ticket;
-        ticket.ticketState.active = false;
-        return { ticket };
-      });
-    },
+    deactivateTicket: assign((_, params: { ticket: TicketDocument }) => {
+      const ticket = params.ticket;
+      ticket.ticketState.active = false;
+      return { ticket };
+    }),
 
-    missShow: (_, params: { ticket: TicketDocument }) => {
-      assign(() => {
-        const ticket = params.ticket;
-        ticket.ticketState.status = TicketStatus.MISSED_SHOW;
-        return { ticket };
-      });
-    }
+    missShow: assign((_, params: { ticket: TicketDocument }) => {
+      const ticket = params.ticket;
+      ticket.ticketState.status = TicketStatus.MISSED_SHOW;
+      return { ticket };
+    })
   },
   guards: {
     ticketCreated: ({ context }) =>
@@ -809,10 +771,16 @@ export const ticketMachine = setup({
                   type: 'initiatePayment',
                   params: ({ context, event }) => ({
                     ticket: context.ticket,
-                    paymentCurrency: event.paymentCurrency,
+                    paymentCurrency: event.paymentCurrency
+                  })
+                },
+                {
+                  type: 'queueUpdateInvoiceAddress',
+                  params: ({ context, event }) => ({
+                    ticket: context.ticket,
                     connection: context.redisConnection,
-                    paymentId: event.paymentId,
-                    paymentAddress: event.paymentAddress
+                    paymentAddress: event.paymentAddress,
+                    paymentId: event.paymentId
                   })
                 }
               ]
@@ -1220,7 +1188,7 @@ export const ticketMachine = setup({
             })
           },
           {
-            type: 'cancelInvoice',
+            type: 'queueCancelInvoice',
             params: ({ context }) => ({
               ticket: context.ticket,
               connection: context.redisConnection
@@ -1308,7 +1276,7 @@ export const ticketMachine = setup({
             })
           },
           {
-            type: 'cancelInvoice',
+            type: 'queueCancelInvoice',
             params: ({ context }) => ({
               ticket: context.ticket,
               connection: context.redisConnection

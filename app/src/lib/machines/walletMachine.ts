@@ -74,15 +74,15 @@ const createWalletMachine = ({
       }
     },
     actions: {
-      showCommissionPosted: (
-        _,
-        params: {
-          show: ShowDocument;
-          creator: CreatorDocument;
-          wallet: WalletDocument;
-        }
-      ) =>
-        assign(() => {
+      showCommissionPosted: assign(
+        (
+          _,
+          params: {
+            show: ShowDocument;
+            creator: CreatorDocument;
+            wallet: WalletDocument;
+          }
+        ) => {
           const wallet = params.wallet;
           const show = params.show;
           const earnings = wallet.earnings;
@@ -127,16 +127,18 @@ const createWalletMachine = ({
           return {
             wallet
           };
-        }),
-      showEarningsPosted: (
-        _,
-        params: {
-          show: ShowDocument;
-          creator: CreatorDocument;
-          wallet: WalletDocument;
         }
-      ) =>
-        assign(() => {
+      ),
+
+      showEarningsPosted: assign(
+        (
+          _,
+          params: {
+            show: ShowDocument;
+            creator: CreatorDocument;
+            wallet: WalletDocument;
+          }
+        ) => {
           const wallet = params.wallet;
           const creator = params.creator;
           const show = params.show;
@@ -182,16 +184,17 @@ const createWalletMachine = ({
           return {
             wallet
           };
-        }),
-
-      payoutRequested: (
-        _,
-        params: {
-          wallet: WalletDocument;
-          payout: PayoutType;
         }
-      ) =>
-        assign(() => {
+      ),
+
+      payoutRequested: assign(
+        (
+          _,
+          params: {
+            wallet: WalletDocument;
+            payout: PayoutType;
+          }
+        ) => {
           const wallet = params.wallet;
           const payout = params.payout;
           wallet.status = WalletStatus.PAYOUT_IN_PROGRESS;
@@ -225,16 +228,17 @@ const createWalletMachine = ({
           return {
             wallet
           };
-        }),
-
-      payoutSent: (
-        _,
-        params: {
-          wallet: WalletDocument;
-          transaction: TransactionDocument;
         }
-      ) =>
-        assign(() => {
+      ),
+
+      payoutSent: assign(
+        (
+          _,
+          params: {
+            wallet: WalletDocument;
+            transaction: TransactionDocument;
+          }
+        ) => {
           const wallet = params.wallet;
           const transaction = params.transaction;
           const bcPayoutId = transaction.bcPayoutId;
@@ -281,16 +285,17 @@ const createWalletMachine = ({
           return {
             wallet
           };
-        }),
-
-      payoutComplete: (
-        _,
-        params: {
-          wallet: WalletDocument;
-          bcPayoutId: string;
         }
-      ) =>
-        assign(() => {
+      ),
+
+      payoutComplete: assign(
+        (
+          _,
+          params: {
+            wallet: WalletDocument;
+            bcPayoutId: string;
+          }
+        ) => {
           const wallet = params.wallet;
           const bcPayoutId = params.bcPayoutId;
           const payout = wallet.payouts.find(
@@ -326,16 +331,16 @@ const createWalletMachine = ({
           return {
             wallet
           };
-        }),
-
-      payoutCancelled: (
-        _,
-        params: {
-          wallet: WalletDocument;
-          payout: PayoutType;
         }
-      ) =>
-        assign(() => {
+      ),
+
+      payoutCancelled: assign(
+        (
+          _,
+          params: {
+            wallet: WalletDocument;
+          }
+        ) => {
           const wallet = params.wallet;
           // wallet.status = WalletStatus.PAYOUT_IN_PROGRESS;
           // wallet.payouts.push(payout);
@@ -368,16 +373,16 @@ const createWalletMachine = ({
           return {
             wallet
           };
-        }),
-
-      payoutFailed: (
-        _,
-        params: {
-          wallet: WalletDocument;
-          payout: PayoutType;
         }
-      ) =>
-        assign(() => {
+      ),
+
+      payoutFailed: assign(
+        (
+          _,
+          params: {
+            wallet: WalletDocument;
+          }
+        ) => {
           const wallet = params.wallet;
           // wallet.status = WalletStatus.PAYOUT_IN_PROGRESS;
           // wallet.payouts.push(payout);
@@ -410,7 +415,8 @@ const createWalletMachine = ({
           return {
             wallet
           };
-        })
+        }
+      )
     },
     guards: {
       walletAvailable: (_, params: { wallet: WalletDocument }) => {
