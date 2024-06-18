@@ -11,9 +11,14 @@
   import config from '$lib/config';
   import { durationFormatter } from '$lib/constants';
 
+  import type { ShowPermissionsType } from './+page.server';
+
   export let createShowForm: SuperValidated<z.infer<typeof showCRUDSchema>>;
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  export let onShowCreated: (show: ShowDocument) => void;
+  export let onShowCreated: (
+    show: ShowDocument,
+    showPermissions: ShowPermissionsType
+  ) => void;
 
   const {
     form: showForm,
@@ -34,7 +39,7 @@
               result.data!.show!._id.toString()
             );
             navigator.clipboard.writeText(showUrl);
-            onShowCreated(result.data!.show);
+            onShowCreated(result.data!.show, result.data!.showPermissions);
             break;
           }
         }

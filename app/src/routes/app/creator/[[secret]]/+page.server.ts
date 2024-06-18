@@ -47,17 +47,47 @@ import { ipfsUpload } from '$lib/server/upload';
 
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
 
+export type ShowPermissionsType = {
+  stateValue: ShowMachineStateType['value'];
+  showStopped: boolean;
+  showCancelled: boolean;
+  canCancelShow: boolean;
+  canStartShow: boolean;
+  canCreateShow: boolean;
+  isActive: boolean;
+};
+
+const getPermissions = (state: ShowMachineStateType) => {
+  const showPermissions = {
+    stateValue: state.value,
+    showStopped: state.matches('stopped'),
+    showCancelled: state.matches('cancelled'),
+    canCancelShow: state.can({
+      type: 'CANCELLATION INITIATED',
+      cancel: {
+        cancelledAt: new Date(),
+        cancelledBy: ActorType.CREATOR,
+        reason: CancelReason.CREATOR_CANCELLED
+      }
+    }),
+    canCreateShow: false,
+    canStartShow: state.can({
+      type: 'SHOW STARTED'
+    }),
+    isActive: state.context.show.showState.active
+  };
+  return showPermissions;
+};
+
 export const actions: Actions = {
   update_profile_image: async ({ locals, request }: RequestEvent) => {
     const data = await request.formData();
     const image =
       data.get('images') && (data.get('images') as unknown as [File]);
-
     const user = locals.user as UserDocument;
     if (!user) {
       throw error(404, 'User not found');
     }
-
     if (image instanceof File && image.size > 0) {
       // upload image to web3
       const url = await ipfsUpload(image);
@@ -76,6 +106,7 @@ export const actions: Actions = {
       };
     }
   },
+
   create_show: async ({ locals, request }) => {
     const form = (await superValidate(
       request,
@@ -107,14 +138,24 @@ export const actions: Actions = {
         numberOfReviews: creator.feedbackStats.numberOfReviews
       }
     })) as ShowDocument;
+    // return new permissions also
+    const showService = createShowMachineService({
+      show,
+      redisConnection: locals.redisConnection
+    });
+    const showMachineState = showService.getSnapshot();
+    showService.stop();
+    const showPermissions = getPermissions(showMachineState);
 
     return {
       success: true,
       showCreated: true,
       show: show.toJSON({ flattenMaps: true, flattenObjectIds: true }),
-      form
+      form,
+      showPermissions
     };
   },
+
   cancel_show: async ({ locals }) => {
     const redisConnection = locals.redisConnection as IORedis;
     const show = locals.show as ShowDocument;
@@ -139,48 +180,41 @@ export const actions: Actions = {
     } as ShowMachineEventType;
 
     showService.send(cancelEvent);
+    const ss = showService.getSnapshot();
     showService.stop();
+    const showPermissions = getPermissions(ss);
 
     return {
       success: true,
       showCancelled: true,
-      show: show.toJSON({ flattenMaps: true, flattenObjectIds: true })
+      show: show.toJSON({ flattenMaps: true, flattenObjectIds: true }),
+      showPermissions
     };
   },
+
   end_show: async ({ locals }) => {
     const show = locals.show as ShowDocument;
-
     if (show === null) {
       throw error(404, 'Show ID not found');
     }
-
-    let isInEscrow = false;
-
     const redisConnection = locals.redisConnection as IORedis;
-
     const showService = createShowMachineService({
       show,
       redisConnection
     });
+    showService.send({
+      type: 'SHOW ENDED'
+    });
     const showState = showService.getSnapshot();
-
-    if (
-      showState.can({
-        type: 'SHOW ENDED'
-      })
-    ) {
-      showService.send({
-        type: 'SHOW ENDED'
-      });
-      isInEscrow = true;
-    }
+    const showPermissions = getPermissions(showState);
     showService.stop();
 
     return {
       success: true,
-      inEscrow: isInEscrow
+      showPermissions
     };
   },
+
   request_payout: async ({ request, locals }) => {
     const form = await superValidate(request, zod(requestPayoutSchema));
     const { walletId, amount, destination, payoutReason, jobType } = form.data;
@@ -220,15 +254,16 @@ export const actions: Actions = {
       show,
       redisConnection
     });
-    const showState = showService.getSnapshot();
 
-    if (showState.can({ type: 'SHOW STOPPED' })) {
-      showService.send({ type: 'SHOW STOPPED' });
-    }
+    showService.send({ type: 'SHOW STOPPED' });
+    const showState = showService.getSnapshot();
+    const showPermissions = getPermissions(showState);
+
     showService.stop();
     console.log('Creator left show');
-    return { success: true };
+    return { success: true, showPermissions };
   },
+
   start_show: async ({ locals }) => {
     const show = locals.show as ShowDocument;
     const redisConnection = locals.redisConnection as IORedis;
@@ -239,12 +274,16 @@ export const actions: Actions = {
       show,
       redisConnection
     });
+    showService.send({
+      type: 'SHOW STARTED'
+    });
     const showState = showService.getSnapshot();
-    if (!showState.matches('started'))
-      showService.send({
-        type: 'SHOW STARTED'
-      });
+    const showPermissions = getPermissions(showState);
     showService.stop();
+    return {
+      success: true,
+      showPermissions
+    };
   },
   upsert_room: async ({ request, locals }) => {
     const creator = locals.creator as CreatorDocument;
@@ -370,15 +409,7 @@ export const load: PageServerLoad = async ({ locals }) => {
   );
 
   let jitsiToken: string | undefined;
-  type ShowPermissionsType = {
-    stateValue: ShowMachineStateType['value'];
-    showStopped: boolean;
-    showCancelled: boolean;
-    canCancelShow: boolean;
-    canStartShow: boolean;
-    canCreateShow: boolean;
-    isActive: boolean;
-  };
+
   let showPermissions = {
     stateValue: 'showLoaded',
     showStopped: false,
@@ -413,25 +444,8 @@ export const load: PageServerLoad = async ({ locals }) => {
       redisConnection: locals.redisConnection as IORedis
     });
     const ss = sms.getSnapshot();
-    showPermissions = {
-      stateValue: ss.value,
-      showStopped: ss.matches('stopped'),
-      showCancelled: ss.matches('cancelled'),
-      canCancelShow: ss.can({
-        type: 'CANCELLATION INITIATED',
-        cancel: {
-          cancelledAt: new Date(),
-          cancelledBy: ActorType.CREATOR,
-          reason: CancelReason.CREATOR_CANCELLED
-        }
-      }),
-      canCreateShow: false,
-      canStartShow: ss.can({
-        type: 'SHOW STARTED'
-      }),
-      isActive: show.showState.active
-    };
     sms.stop();
+    showPermissions = getPermissions(ss);
   }
 
   const exchangeRate =

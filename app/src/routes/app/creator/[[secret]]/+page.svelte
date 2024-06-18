@@ -21,6 +21,7 @@
   import WalletDetail from '$components/WalletDetail.svelte';
   import { CreatorStore, ShowStore, WalletStore } from '$stores';
 
+  import type { ShowPermissionsType } from './+page.server';
   import CancelShow from './CancelShow.svelte';
   import CreateShow from './CreateShow.svelte';
   import CreatorActivity from './CreatorActivity.svelte';
@@ -59,18 +60,21 @@
 
   const modalStore = getModalStore();
 
-  const useNewShow = async (show?: ShowDocument | undefined) => {
-    showUnSub?.();
+  const useNewShow = async (
+    show: ShowDocument | undefined,
+    showPermissions: ShowPermissionsType
+  ) => {
+    sPermissions = showPermissions;
     currentShow = show;
     currentEvent = undefined;
-    await invalidateAll();
-    sPermissions = $page.data.showPermissions;
+    showUnSub?.();
     if (show)
       showUnSub = ShowStore(show).subscribe((_show) => {
         if (_show) {
           currentShow = _show;
           invalidateAll().then(() => {
-            sPermissions = $page.data.showPermissions;
+            sPermissions = data.showPermissions;
+            console.log('sPermissions', sPermissions);
           });
         }
       });
@@ -84,12 +88,12 @@
       wallet = value;
     });
 
-    if (currentShow) {
+    if (currentShow && sPermissions.isActive) {
       showUnSub = ShowStore(currentShow).subscribe((_show) => {
         if (_show) {
           currentShow = _show;
           invalidateAll().then(() => {
-            sPermissions = $page.data.showPermissions;
+            sPermissions = data.showPermissions;
           });
         }
       });
@@ -107,9 +111,10 @@
   });
 
   const startShow = async () => {
+    isLoading = true;
+
     await invalidateAll();
     jitsiToken = $page.data.jitsiToken;
-    isLoading = true;
     let formData = new FormData();
     fetch('?/start_show', {
       method: 'POST',
@@ -138,11 +143,7 @@
     },
     response: (r: boolean | undefined) => {
       console.log('response', r);
-      if (r) {
-        useNewShow();
-      } else {
-        startShow();
-      }
+      if (!r) startShow();
     }
   };
 

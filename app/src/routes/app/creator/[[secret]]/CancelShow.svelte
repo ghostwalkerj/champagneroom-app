@@ -5,9 +5,14 @@
 
   import type { ShowDocument } from '$lib/models/show';
 
+  import type { ShowPermissionsType } from './+page.server';
+
   export let isLoading = false;
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  export let onShowCancelled: (show: ShowDocument) => void;
+  export let onShowCancelled: (
+    show: ShowDocument,
+    showPermissions: ShowPermissionsType
+  ) => void;
 
   const onSubmit = ({}) => {
     isLoading = true;
@@ -15,7 +20,7 @@
       if (result.type === 'success') {
         switch (true) {
           case result.data!.showCancelled: {
-            onShowCancelled(result.data!.show);
+            onShowCancelled(result.data!.show, result.data!.showPermissions);
             break;
           }
         }
