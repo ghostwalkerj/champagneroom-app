@@ -1,11 +1,11 @@
 import type { Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
 import {
-  genTimestampsSchema,
-  mongooseZodCustomType,
-  toMongooseSchema,
-  toZodMongooseSchema,
-  z
+    genTimestampsSchema,
+    mongooseZodCustomType,
+    toMongooseSchema,
+    toZodMongooseSchema,
+    z
 } from 'mongoose-zod';
 
 import { CurrencyType } from '$lib/constants';
@@ -50,7 +50,7 @@ const walletSchema = z
     onHoldBalance: z.number().default(0),
     earnings: z.array(earningsZodMongooseSchema).default([]),
     payouts: z.array(payoutZodMongooseSchema).default([]),
-    active: z.boolean().default(true).mongooseTypeOptions({
+    isActive: z.boolean().default(true).mongooseTypeOptions({
       index: true
     })
   })

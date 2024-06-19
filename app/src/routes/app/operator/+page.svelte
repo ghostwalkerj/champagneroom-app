@@ -1,11 +1,11 @@
 <script lang="ts">
   import Icon from '@iconify/svelte';
   import {
-    getModalStore,
-    type ModalSettings,
     Ratings,
     Tab,
-    TabGroup
+    TabGroup,
+    getModalStore,
+    type ModalSettings
   } from '@skeletonlabs/skeleton';
   import type { ActionResult } from '@sveltejs/kit';
   import { Types } from 'mongoose';
@@ -154,7 +154,7 @@
     formData.append('userId', creator.user._id.toString());
     formData.append(
       'active',
-      active ? active.toString() : creator.user.active.toString()
+      active ? active.toString() : creator.user.isActive.toString()
     );
     if (agentId) {
       formData.append('agentId', agentId.toString());
@@ -185,7 +185,7 @@
     formData.append('userId', agent.user._id.toString());
     formData.append(
       'active',
-      active ? active.toString() : agent.user.active.toString()
+      active ? active.toString() : agent.user.isActive.toString()
     );
 
     await fetch('?/update_agent', {
@@ -210,8 +210,8 @@
 
   const updateCreatorActive = (event: Event) => {
     const active = (event.target as HTMLInputElement).checked;
-    if (active === creators[activeCreatorRow].user.active) return;
-    creators[activeCreatorRow].user.active = active;
+    if (active === creators[activeCreatorRow].user.isActive) return;
+    creators[activeCreatorRow].user.isActive = active;
     updateCreator(activeCreatorRow, {
       active
     });
@@ -219,8 +219,8 @@
 
   const updateAgentActive = (event: Event) => {
     const active = (event.target as HTMLInputElement).checked;
-    if (active === agents[activeAgentRow].user.active) return;
-    agents[activeCreatorRow].user.active = active;
+    if (active === agents[activeAgentRow].user.isActive) return;
+    agents[activeCreatorRow].user.isActive = active;
     updateAgent(activeAgentRow, {
       active
     });
@@ -452,7 +452,7 @@
                                 <input
                                   class="checkbox"
                                   type="checkbox"
-                                  checked={agent.user.active}
+                                  checked={agent.user.isActive}
                                   on:change={updateAgentActive}
                                 />
                               </td>
@@ -639,7 +639,7 @@
                                 <input
                                   class="checkbox"
                                   type="checkbox"
-                                  checked={creator.user.active}
+                                  checked={creator.user.isActive}
                                   on:change={updateCreatorActive}
                                 />
                               </td>

@@ -2,11 +2,11 @@ import bcrypt from 'bcryptjs';
 import type { Model, UpdateQuery } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
 import {
-  genTimestampsSchema,
-  mongooseZodCustomType,
-  toMongooseSchema,
-  toZodMongooseSchema,
-  z
+    genTimestampsSchema,
+    mongooseZodCustomType,
+    toMongooseSchema,
+    toZodMongooseSchema,
+    z
 } from 'mongoose-zod';
 import { nanoid } from 'nanoid';
 import validator from 'validator';
@@ -68,7 +68,7 @@ const userSchema = z
       .optional(),
     name: z.string().max(50).min(3, 'Name is too short').trim(),
     authType: z.nativeEnum(AuthType).default(AuthType.SIGNING),
-    active: z.boolean().default(true),
+    isActive: z.boolean().default(true),
     profileImageUrl: z.string().default(config.UI.defaultProfileImage),
     referralCode: z
       .string()
@@ -197,5 +197,6 @@ const userCRUDSchema = userSchema.extend({
   _id: userSchema.shape._id.optional()
 });
 
-export type { UserDocument, UserDocumentType };
 export { User, userCRUDSchema, userSchema };
+export type { UserDocument, UserDocumentType };
+

@@ -23,7 +23,7 @@
     eventText = createEventText(showEvent);
     statusText = show === undefined ? 'No Current Show' : show.showState.status;
 
-    if (show) {
+    if (show && show.showState.isActive) {
       if (showEvent && showEvent.show !== show._id) {
         showEvent = undefined;
         eventText = 'No Events';
@@ -37,6 +37,7 @@
       });
     } else {
       statusText = 'No Current Show';
+      showEventUnSub?.();
     }
   });
   onDestroy(() => {

@@ -68,16 +68,14 @@
     currentShow = show;
     currentEvent = undefined;
     showUnSub?.();
-    if (show)
+    if (show && sPermissions.isActive) {
       showUnSub = ShowStore(show).subscribe((_show) => {
         if (_show) {
           currentShow = _show;
-          invalidateAll().then(() => {
-            sPermissions = data.showPermissions;
-            console.log('sPermissions', sPermissions);
-          });
+          invalidateAll();
         }
       });
+    }
   };
 
   onMount(() => {
@@ -92,9 +90,7 @@
       showUnSub = ShowStore(currentShow).subscribe((_show) => {
         if (_show) {
           currentShow = _show;
-          invalidateAll().then(() => {
-            sPermissions = data.showPermissions;
-          });
+          invalidateAll();
         }
       });
     }
@@ -199,7 +195,7 @@
           <CreateShow onShowCreated={useNewShow} {createShowForm} />
         {/if}
         <div>
-          {#if currentShow}
+          {#if sPermissions.isActive && currentShow}
             {#key currentShow.showState}
               <div class="">
                 <ShowDetail

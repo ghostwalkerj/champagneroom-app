@@ -3,19 +3,19 @@ import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 import { nanoid } from 'nanoid';
 import {
-  type AnyEventObject,
-  assign,
-  createActor,
-  setup,
-  type SnapshotFrom,
-  type StateFrom
+    type AnyEventObject,
+    assign,
+    createActor,
+    setup,
+    type SnapshotFrom,
+    type StateFrom
 } from 'xstate';
 
 import {
-  type CancelType,
-  escrowSchema,
-  type FinalizeType,
-  runtimeSchema
+    type CancelType,
+    escrowSchema,
+    type FinalizeType,
+    runtimeSchema
 } from '$lib/models/common';
 import type { ShowDocument } from '$lib/models/show';
 import type { TicketDocument } from '$lib/models/ticket';
@@ -378,7 +378,7 @@ export const showMachine = setup({
         }
       ) => {
         const show = params.show;
-        show.showState.active = false;
+        show.showState.isActive = false;
         show.showState.current = false;
         return { show };
       }

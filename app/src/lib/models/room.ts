@@ -1,11 +1,11 @@
 import type { Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
 import {
-  genTimestampsSchema,
-  mongooseZodCustomType,
-  toMongooseSchema,
-  toZodMongooseSchema,
-  z
+    genTimestampsSchema,
+    mongooseZodCustomType,
+    toMongooseSchema,
+    toZodMongooseSchema,
+    z
 } from 'mongoose-zod';
 import { nanoid } from 'nanoid';
 
@@ -50,7 +50,7 @@ const roomSchema = z
       .mongooseTypeOptions({
         default: () => nanoid(12)
       }),
-    active: z.boolean().default(true),
+    isActive: z.boolean().default(true),
     // Social media links with enum type
     socialMediaLinks: z
       .array(
@@ -74,7 +74,7 @@ const roomZodMongooseSchema = toZodMongooseSchema(roomSchema, {
       index: true,
       unique: true
     },
-    active: {
+    isActive: {
       index: true
     }
   }
@@ -119,4 +119,5 @@ const Room = models?.Room
 
 export type { RoomDocument, RoomDocumentType };
 
-export { Room, SocialMediaType, roomCRUDSchema, roomSchema };
+    export { Room, roomCRUDSchema, roomSchema, SocialMediaType };
+

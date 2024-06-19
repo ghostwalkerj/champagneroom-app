@@ -1,11 +1,11 @@
 <script lang="ts">
   import Icon from '@iconify/svelte';
   import {
-    getModalStore,
-    type ModalSettings,
     Ratings,
     Tab,
-    TabGroup
+    TabGroup,
+    getModalStore,
+    type ModalSettings
   } from '@skeletonlabs/skeleton';
   import type { ActionResult } from '@sveltejs/kit';
   import { onDestroy, onMount } from 'svelte';
@@ -110,7 +110,7 @@
     formData.append('creatorId', creator._id.toString());
     formData.append('name', creator.user.name || '');
     formData.append('commission', creator.commissionRate.toString());
-    formData.append('active', creator.user.active.toString());
+    formData.append('active', creator.user.isActive.toString());
 
     await fetch('?/update_creator', {
       method: 'POST',
@@ -150,7 +150,7 @@
   const updateActive = (event: Event) => {
     const isActive = (event.target as HTMLInputElement).checked;
     const index = activeRow;
-    creators[index].user.active = isActive;
+    creators[index].user.isActive = isActive;
     updateCreator(creators[index]);
   };
 
@@ -336,7 +336,7 @@
                                 <input
                                   class="checkbox"
                                   type="checkbox"
-                                  checked={creator.user.active}
+                                  checked={creator.user.isActive}
                                   on:change={updateActive}
                                 />
                               </td>

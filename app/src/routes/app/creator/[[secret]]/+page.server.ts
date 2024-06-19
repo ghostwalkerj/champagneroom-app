@@ -74,7 +74,7 @@ const getPermissions = (state: ShowMachineStateType) => {
     canStartShow: state.can({
       type: 'SHOW STARTED'
     }),
-    isActive: state.context.show.showState.active
+    isActive: state.context.show.showState.isActive
   };
   return showPermissions;
 };
@@ -377,9 +377,16 @@ export const load: PageServerLoad = async ({ locals }) => {
     throw error(404, 'Creator not found');
   }
 
-  const show = locals.show as ShowDocument;
+  const show =
+    locals.show ??
+    ((await Show.findOne({
+      creator: creator._id,
+      'showState.current': true
+    }).exec()) as ShowDocument);
 
-  const room = locals.room as RoomDocument;
+  const room =
+    (locals.room as RoomDocument) ??
+    ((await Room.findById(creator.room).exec()) as RoomDocument);
   let showEvent: ShowEventDocument | undefined;
 
   if (show) {

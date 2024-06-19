@@ -2,26 +2,26 @@ import type { Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
 import { fieldEncryption } from 'mongoose-field-encryption';
 import {
-  genTimestampsSchema,
-  mongooseZodCustomType,
-  toMongooseSchema,
-  toZodMongooseSchema,
-  z
+    genTimestampsSchema,
+    mongooseZodCustomType,
+    toMongooseSchema,
+    toZodMongooseSchema,
+    z
 } from 'mongoose-zod';
 import { nanoid } from 'nanoid';
 
 import { ShowStatus } from '$lib/constants';
 
 import {
-  cancelSchema,
-  creatorInfoSchema,
-  disputeStatsSchema,
-  escrowSchema,
-  feedbackStatsSchema,
-  finalizeSchema,
-  moneySchema,
-  runtimeSchema,
-  showSalesStatsSchema
+    cancelSchema,
+    creatorInfoSchema,
+    disputeStatsSchema,
+    escrowSchema,
+    feedbackStatsSchema,
+    finalizeSchema,
+    moneySchema,
+    runtimeSchema,
+    showSalesStatsSchema
 } from './common';
 import { ShowEvent } from './showEvent';
 import type { TransactionDocumentType } from './transaction';
@@ -30,7 +30,7 @@ const { models } = pkg;
 
 const showStateSchema = z.object({
   status: z.nativeEnum(ShowStatus).default(ShowStatus.CREATED),
-  active: z.boolean().default(true),
+  isActive: z.boolean().default(true),
   salesStats: showSalesStatsSchema.default({}),
   feedbackStats: feedbackStatsSchema.default({}),
   disputeStats: disputeStatsSchema.default({}),

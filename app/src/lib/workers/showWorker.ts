@@ -5,9 +5,9 @@ import { waitFor } from 'xstate';
 
 import { Agent, type AgentDocument } from '$lib/models/agent';
 import {
-  type CancelType,
-  finalizeSchema,
-  type FinalizeType
+    type CancelType,
+    finalizeSchema,
+    type FinalizeType
 } from '$lib/models/common';
 import { Creator, type CreatorDocument } from '$lib/models/creator';
 import type { ShowDocument } from '$lib/models/show';
@@ -17,18 +17,18 @@ import { Ticket } from '$lib/models/ticket';
 
 import { createShowMachineService } from '$lib/machines/showMachine';
 import {
-  createTicketMachineService,
-  type TicketMachineEventType
+    createTicketMachineService,
+    type TicketMachineEventType
 } from '$lib/machines/ticketMachine';
 
 import config from '$lib/config';
 import {
-  ActorType,
-  DisputeDecision,
-  EntityType,
-  ShowStatus,
-  TicketStatus,
-  WalletMachineEventString
+    ActorType,
+    DisputeDecision,
+    EntityType,
+    ShowStatus,
+    TicketStatus,
+    WalletMachineEventString
 } from '$lib/constants';
 import { PayoutJobType } from '$lib/payments';
 import { getWalletMachineServiceFromId } from '$lib/server/machinesUtil';
@@ -114,7 +114,7 @@ const cancelTickets = async (
   const tickets = (await Ticket.find({
     show: show._id,
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    'ticketState.active': true
+    'ticketState.isActive': true
   })) as TicketDocument[];
   for (const ticket of tickets) {
     // send cancel show to all tickets
@@ -146,7 +146,7 @@ const refundTickets = async (
   if (showState.matches({ initiatedCancellation: 'waiting2Refund' })) {
     const tickets = (await Ticket.find({
       show: show._id,
-      'ticketState.active': true
+      'ticketState.isActive': true
     })) as TicketDocument[];
     for (const ticket of tickets) {
       // send refunds
@@ -191,7 +191,7 @@ const endShow = async (
   const tickets = (await Ticket.find({
     show: show._id,
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    'ticketState.active': true
+    'ticketState.isActive': true
   })) as TicketDocument[];
   for (const ticket of tickets) {
     // send show is over
@@ -219,7 +219,7 @@ const endEscrow = async (
   const tickets = (await Ticket.find({
     show: show._id,
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    'ticketState.active': true
+    'ticketState.isActive': true
   })) as TicketDocument[];
   for (const ticket of tickets) {
     const ticketService = createTicketMachineService({

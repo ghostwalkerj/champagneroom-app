@@ -15,7 +15,7 @@ describe('createWallet', () => {
     expect(wallet.onHoldBalance).toBe(0);
     expect(wallet.payouts).toEqual([]);
     expect(wallet.earnings).toEqual([]);
-    expect(wallet.active).toBe(true);
+    expect(wallet.isActive).toBe(true);
     expect(wallet.currency).toBe(CurrencyType.ETH);
   });
 });
@@ -27,11 +27,11 @@ describe('updateWallet', () => {
 
     wallet.balance = 100;
     wallet.status = WalletStatus.PAYOUT_IN_PROGRESS;
-    wallet.active = false;
+    wallet.isActive = false;
     await wallet.save();
 
     expect(wallet.balance).toBe(100);
     expect(wallet.status).toBe(WalletStatus.PAYOUT_IN_PROGRESS);
-    expect(wallet.active).toBe(false);
+    expect(wallet.isActive).toBe(false);
   });
 });

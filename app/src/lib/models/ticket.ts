@@ -2,26 +2,26 @@ import type { Model } from 'mongoose';
 import { default as mongoose, default as pkg } from 'mongoose';
 import mongooseAutoPopulate from 'mongoose-autopopulate';
 import {
-  genTimestampsSchema,
-  mongooseZodCustomType,
-  toMongooseSchema,
-  toZodMongooseSchema,
-  z
+    genTimestampsSchema,
+    mongooseZodCustomType,
+    toMongooseSchema,
+    toZodMongooseSchema,
+    z
 } from 'mongoose-zod';
 import validator from 'validator';
 
 import { TicketStatus } from '$lib/constants';
 
 import {
-  cancelSchema,
-  escrowSchema,
-  finalizeSchema,
-  moneySchema,
-  redemptionSchema,
-  refundSchema,
-  ticketDisputeSchema,
-  ticketFeedbackSchema,
-  ticketSaleSchema
+    cancelSchema,
+    escrowSchema,
+    finalizeSchema,
+    moneySchema,
+    redemptionSchema,
+    refundSchema,
+    ticketDisputeSchema,
+    ticketFeedbackSchema,
+    ticketSaleSchema
 } from './common';
 import type { ShowDocument } from './show';
 import type { UserDocument } from './user';
@@ -30,7 +30,7 @@ const { models } = pkg;
 
 const ticketStateSchema = z.object({
   status: z.nativeEnum(TicketStatus).default(TicketStatus.CREATED),
-  active: z.boolean().default(true),
+  isActive: z.boolean().default(true),
   cancel: cancelSchema.optional(),
   redemption: redemptionSchema.optional(),
   escrow: escrowSchema.optional(),
