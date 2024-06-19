@@ -85,15 +85,7 @@
     walletUnSub = WalletStore(wallet).subscribe((value) => {
       wallet = value;
     });
-
-    if (currentShow && sPermissions.isActive) {
-      showUnSub = ShowStore(currentShow).subscribe((_show) => {
-        if (_show) {
-          currentShow = _show;
-          invalidateAll();
-        }
-      });
-    }
+    useNewShow(currentShow, sPermissions);
   });
 
   const unSubAll = () => {
@@ -160,21 +152,6 @@
   />
 {:else}
   <div class="flex place-content-center">
-    <!-- Page header -->
-
-    <!-- Modal for Restarting or Ending Show -->
-    <!-- This is no longer in use -->
-    <!-- {#if !showStopped}
-      {#key currentShow && currentShow._id && canStartShow}
-        <EndShow
-          {onShowEnded}
-          onGoToShow={startShow}
-          bind:isLoading
-          {canStartShow}
-        />
-      {/key}
-    {/if} -->
-
     <div
       class="flex min-w-full max-w-7xl flex-col gap-3 p-4 md:grid md:min-w-min md:grid-cols-4"
     >
