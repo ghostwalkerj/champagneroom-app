@@ -70,7 +70,7 @@ const getPermissions = (state: ShowMachineStateType) => {
         reason: CancelReason.CREATOR_CANCELLED
       }
     }),
-    canCreateShow: false,
+    canCreateShow: !state.context.show.showState.isActive,
     canStartShow: state.can({
       type: 'SHOW STARTED'
     }),
