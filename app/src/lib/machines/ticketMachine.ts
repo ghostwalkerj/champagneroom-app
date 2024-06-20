@@ -2,33 +2,34 @@ import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 import { nanoid } from 'nanoid';
 import {
-    type ActorRefFrom,
-    assign,
-    createActor,
-    not,
-    raise,
-    sendTo,
-    setup,
-    type SnapshotFrom,
-    stopChild
+  type ActorRefFrom,
+  assign,
+  createActor,
+  not,
+  raise,
+  sendTo,
+  setup,
+  type SnapshotFrom,
+  type StateFrom,
+  stopChild
 } from 'xstate';
 
 import type {
-    DisputeType,
-    FeedbackType,
-    FinalizeType,
-    RefundType,
-    TransactionSummaryType
+  DisputeType,
+  FeedbackType,
+  FinalizeType,
+  RefundType,
+  TransactionSummaryType
 } from '$lib/models/common';
 import {
-    type CancelType,
-    escrowSchema,
-    finalizeSchema,
-    redemptionSchema,
-    refundSchema,
-    type SaleType,
-    ticketSaleSchema,
-    transactionSummarySchema
+  type CancelType,
+  escrowSchema,
+  finalizeSchema,
+  redemptionSchema,
+  refundSchema,
+  type SaleType,
+  ticketSaleSchema,
+  transactionSummarySchema
 } from '$lib/models/common';
 import type { ShowDocument } from '$lib/models/show';
 import type { TicketDocument } from '$lib/models/ticket';
@@ -38,18 +39,18 @@ import type { PayoutQueueType } from '$lib/workers/payoutWorker';
 
 import type { CurrencyType } from '$lib/constants';
 import {
-    ActorType,
-    CancelReason,
-    DisputeDecision,
-    EntityType,
-    TicketStatus
+  ActorType,
+  CancelReason,
+  DisputeDecision,
+  EntityType,
+  TicketStatus
 } from '$lib/constants';
 import type { DisplayInvoice } from '$lib/ext/bitcart/models';
 import {
-    calcTotal,
-    InvoiceJobType,
-    type PaymentType,
-    PayoutJobType
+  calcTotal,
+  InvoiceJobType,
+  type PaymentType,
+  PayoutJobType
 } from '$lib/payments';
 
 import { showMachine, type ShowMachineType } from './showMachine';
@@ -143,6 +144,8 @@ export type TicketMachineServiceType = ReturnType<
 >;
 
 export type TicketMachineSnapshotType = SnapshotFrom<TicketMachineType>;
+
+export type TicketMachineStateType = StateFrom<TicketMachineType>;
 
 export type TicketMachineType = typeof ticketMachine;
 

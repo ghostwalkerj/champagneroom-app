@@ -3,46 +3,46 @@
 
   import { applyAction, enhance } from '$app/forms';
 
-  export let isLoading = false;
-  let isShowCancelLoading = false;
+  import type { TicketDocument } from '$lib/models/ticket';
 
-  const onSubmit = (form: HTMLFormElement) => {
-    if (form.name === 'cancelTicket') {
-      isShowCancelLoading = true;
-    }
+  import type { TicketPermissionsType } from './+page.server';
+
+  export let isLoading = false;
+  export let onTicketCancelled: (
+    ticket: TicketDocument,
+    ticketPermissions: TicketPermissionsType
+  ) => void;
+  const onSubmit = () => {
     isLoading = true;
     return async ({ result }: { result: ActionResult }) => {
-      if (result.type === 'failure') {
-        isLoading = false;
+      isLoading = false;
+      switch (result.type) {
+        case 'success': {
+          onTicketCancelled(
+            result.data!.ticket,
+            result.data!.ticketPermissions
+          );
+          break;
+        }
       }
       await applyAction(result);
-      isLoading = false;
-      isShowCancelLoading = false;
     };
   };
 </script>
 
-{#if isShowCancelLoading}
+<form
+  method="post"
+  action="?/cancel_ticket"
+  name="cancelTicket"
+  use:enhance={onSubmit}
+>
   <div class="flex w-full justify-center px-4 lg:px-8">
-    <button class="loading variant-filled-secondary btn" disabled={true}
-      >Cancelling</button
+    <button
+      class="variant-filled-secondary btn"
+      type="submit"
+      disabled={isLoading}
     >
+      Cancel Ticket
+    </button>
   </div>
-{:else}
-  <form
-    method="post"
-    action="?/cancel_ticket"
-    name="cancelTicket"
-    use:enhance={({ formElement }) => onSubmit(formElement)}
-  >
-    <div class="flex w-full justify-center px-4 lg:px-8">
-      <button
-        class="variant-filled-secondary btn"
-        type="submit"
-        disabled={isLoading}
-      >
-        Cancel Ticket
-      </button>
-    </div>
-  </form>
-{/if}
+</form>

@@ -14,9 +14,9 @@
   export let parent: SvelteComponent;
   const modalStore = getModalStore();
 
-  let meta = $modalStore[0].meta;
-  let action = meta.action;
-  let ticketDisputeForm = $modalStore[0].meta.form as SuperValidated<
+  const meta = $modalStore[0].meta;
+  const action = meta.action;
+  const ticketDisputeForm = meta.form as SuperValidated<
     Infer<typeof ticketDisputeSchema>
   >;
 

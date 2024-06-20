@@ -160,7 +160,7 @@
     "@web3-onboard/ledger": "^2.6.0",
     "@web3-onboard/trezor": "^2.4.4",
     "@web3-onboard/walletconnect": "^2.5.5",
-    "bullmq": "5.8.1",
+    "bullmq": "5.8.2",
     "dot-object": "^2.1.5",
     "express": "^4.19.2",
     "express-basic-auth": "^1.2.1",

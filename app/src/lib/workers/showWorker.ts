@@ -5,9 +5,9 @@ import { waitFor } from 'xstate';
 
 import { Agent, type AgentDocument } from '$lib/models/agent';
 import {
-    type CancelType,
-    finalizeSchema,
-    type FinalizeType
+  type CancelType,
+  finalizeSchema,
+  type FinalizeType
 } from '$lib/models/common';
 import { Creator, type CreatorDocument } from '$lib/models/creator';
 import type { ShowDocument } from '$lib/models/show';
@@ -17,18 +17,18 @@ import { Ticket } from '$lib/models/ticket';
 
 import { createShowMachineService } from '$lib/machines/showMachine';
 import {
-    createTicketMachineService,
-    type TicketMachineEventType
+  createTicketMachineService,
+  type TicketMachineEventType
 } from '$lib/machines/ticketMachine';
 
 import config from '$lib/config';
 import {
-    ActorType,
-    DisputeDecision,
-    EntityType,
-    ShowStatus,
-    TicketStatus,
-    WalletMachineEventString
+  ActorType,
+  DisputeDecision,
+  EntityType,
+  ShowStatus,
+  TicketStatus,
+  WalletMachineEventString
 } from '$lib/constants';
 import { PayoutJobType } from '$lib/payments';
 import { getWalletMachineServiceFromId } from '$lib/server/machinesUtil';

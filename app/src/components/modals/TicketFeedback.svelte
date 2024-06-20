@@ -12,11 +12,12 @@
   export let parent: SvelteComponent;
   const modalStore = getModalStore();
 
-  let meta = $modalStore[0].meta;
-  let action = meta.action;
-  let ticketFeedbackForm = $modalStore[0].meta.form as SuperValidated<
+  const meta = $modalStore[0].meta;
+  const action = meta.action;
+  const ticketFeedbackForm = meta.form as SuperValidated<
     Infer<typeof ticketFeedbackSchema>
   >;
+  const onFeedbackSubmitted = meta.onFeedbackSubmitted;
 
   const { form, errors, constraints, enhance, delayed, message } = superForm(
     ticketFeedbackForm,
@@ -28,6 +29,10 @@
       },
       onResult(event) {
         if (event.result.type === 'success') {
+          const data = event.result.data;
+          const ticket = data!.ticket;
+          const ticketPermissions = data!.ticketPermissions;
+          onFeedbackSubmitted(ticket, ticketPermissions);
           parent.onClose();
         }
       }

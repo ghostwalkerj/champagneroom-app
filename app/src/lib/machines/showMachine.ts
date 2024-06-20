@@ -3,19 +3,19 @@ import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 import { nanoid } from 'nanoid';
 import {
-    type AnyEventObject,
-    assign,
-    createActor,
-    setup,
-    type SnapshotFrom,
-    type StateFrom
+  type AnyEventObject,
+  assign,
+  createActor,
+  setup,
+  type SnapshotFrom,
+  type StateFrom
 } from 'xstate';
 
 import {
-    type CancelType,
-    escrowSchema,
-    type FinalizeType,
-    runtimeSchema
+  type CancelType,
+  escrowSchema,
+  type FinalizeType,
+  runtimeSchema
 } from '$lib/models/common';
 import type { ShowDocument } from '$lib/models/show';
 import type { TicketDocument } from '$lib/models/ticket';

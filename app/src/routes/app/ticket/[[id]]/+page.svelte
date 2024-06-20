@@ -23,6 +23,7 @@
 
   import { ShowStore, TicketStore } from '$stores';
 
+  import type { TicketPermissionsType } from './+page.server';
   // eslint-disable-next-line @typescript-eslint/naming-convention
   import CancelTicket from './CancelTicket.svelte';
   import TicketDetail from './TicketDetail.svelte';
@@ -44,16 +45,23 @@
   let disputeForm = data.disputeForm as SuperValidated<
     Infer<typeof ticketDisputeSchema>
   >;
-  $: tPermissions = data.ticketPermissions;
+  let ticketPermissions = data.ticketPermissions;
 
   const currentPayment = invoice?.payments?.[
     invoice?.payments?.length - 1
   ] as PaymentType;
 
+  const useNewTicket = async (
+    _ticket: TicketDocument,
+    _ticketPermissions: TicketPermissionsType
+  ) => {
+    ticket = _ticket;
+    ticketPermissions = _ticketPermissions;
+  };
+
   $: showVideo = false;
   let showUnSub: Unsubscriber;
   let ticketUnSub: Unsubscriber;
-  let isShowCancelLoading = false;
   $: isLoading = false;
   $: leftShow = false;
   const modalStore = getModalStore();
@@ -62,7 +70,8 @@
     type: 'component',
     component: 'TicketFeedback',
     meta: {
-      feedbackForm
+      feedbackForm,
+      onFeedbackSubmitted: useNewTicket
     }
   };
 
@@ -70,7 +79,8 @@
     type: 'component',
     component: 'TicketDispute',
     meta: {
-      disputeForm
+      disputeForm,
+      onDisputeSubmitted: useNewTicket
     }
   };
 
@@ -163,23 +173,20 @@
   };
 
   onMount(() => {
-    if (!tPermissions.isTicketDone) {
+    if (!ticketPermissions.isActive) {
       showUnSub?.();
       showUnSub = ShowStore(show).subscribe((_show) => {
         if (_show) {
           show = _show;
           if (
-            tPermissions.canWatchShow &&
-            tPermissions.hasShowStarted &&
+            ticketPermissions.canWatchShow &&
+            ticketPermissions.hasShowStarted &&
             !leftShow
           )
             joinShow();
         }
       });
-      invalidateAll().then(() => {
-        tPermissions = data.ticketPermissions;
-      });
-
+      invalidateAll();
       ticketUnSub?.();
       ticketUnSub = TicketStore(ticket).subscribe((_ticket) => {
         if (_ticket) {
@@ -191,9 +198,7 @@
               invoice.status === InvoiceStatus.COMPLETE &&
               ticket.ticketState.status === TicketStatus.PAYMENT_INITIATED
             ) {
-              ticket = $page.data.ticket as TicketDocument;
             }
-            tPermissions = data.ticketPermissions;
           });
         }
       });
@@ -217,7 +222,7 @@
         {#key ticket.ticketState || show.showState}
           <TicketDetail {ticket} {show} {user} />
         {/key}
-        {#if tPermissions.canWatchShow && tPermissions.hasShowStarted}
+        {#if ticketPermissions.canWatchShow && ticketPermissions.hasShowStarted}
           <div
             class="bg-base-200/50 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-6 transform whitespace-nowrap rounded-xl p-2 text-2xl font-extrabold text-primary-500 ring-2 ring-inset ring-primary-500 lg:text-4xl"
           >
@@ -229,7 +234,7 @@
               }}>Go to the Show</button
             >
           </div>
-        {:else if tPermissions.isWaitingForShow}
+        {:else if ticketPermissions.isWaitingForShow}
           <div
             class="bg-base-200/50 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-6 transform whitespace-nowrap rounded-xl p-2 text-2xl font-extrabold text-primary-500 ring-2 ring-inset ring-primary-500 lg:text-4xl"
           >
@@ -239,12 +244,12 @@
       </div>
 
       <!-- Invoice -->
-      {#if !tPermissions.isTicketDone}
+      {#if !ticketPermissions.isActive}
         <div class="relative">
           {#key invoice}
             <TicketInvoice {invoice} {ticket} />
           {/key}
-          {#if tPermissions.hasPaymentSent}
+          {#if ticketPermissions.hasPaymentSent}
             <div
               class="bg-base-200/50 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-45 transform whitespace-nowrap rounded-xl p-2 text-2xl font-extrabold text-primary-500 ring-2 ring-inset ring-primary-500 lg:text-3xl"
             >
@@ -254,9 +259,9 @@
         </div>
       {/if}
 
-      {#if !tPermissions.isTicketDone}
+      {#if !ticketPermissions.isActive}
         <div class="m-3 flex flex-wrap justify-center gap-6">
-          {#if tPermissions.shouldPay && !isShowCancelLoading}
+          {#if ticketPermissions.shouldPay}
             {#if !$selectedAccount}
               <button class="variant-filled-secondary btn" on:click={connect}
                 >Connect Wallet</button
@@ -269,7 +274,7 @@
               >
             {/if}
           {/if}
-          {#if tPermissions.canWatchShow && tPermissions.hasShowStarted}
+          {#if ticketPermissions.canWatchShow && ticketPermissions.hasShowStarted}
             <div class="flex w-full justify-center">
               <button
                 class="variant-filled-secondary btn"
@@ -280,11 +285,11 @@
               >
             </div>
           {/if}
-          {#if tPermissions.canCancelTicket && !tPermissions.hasShowStarted}
-            <CancelTicket bind:isLoading />
+          {#if ticketPermissions.canCancelTicket && !ticketPermissions.hasShowStarted}
+            <CancelTicket bind:isLoading onTicketCancelled={useNewTicket} />
           {/if}
           <div class="flex flex-col md:flex-row">
-            {#if tPermissions.canLeaveFeedback}
+            {#if ticketPermissions.canLeaveFeedback}
               <div class="flex w-full justify-center p-4">
                 <button
                   class="variant-filled-primary btn"
@@ -294,14 +299,14 @@
                 >
               </div>
             {/if}
-            {#if tPermissions.canLeaveFeedback && tPermissions.canDispute}
+            {#if ticketPermissions.canLeaveFeedback && ticketPermissions.canDispute}
               <div class="h-1/2 w-full font-SpaceGrotesk md:w-3/4 md:p-6">
                 <hr />
                 OR
                 <hr />
               </div>
             {/if}
-            {#if tPermissions.canDispute}
+            {#if ticketPermissions.canDispute}
               <div class="flex w-full justify-center p-4">
                 <button
                   class="variant-filled-primary btn"
