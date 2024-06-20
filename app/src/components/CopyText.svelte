@@ -30,7 +30,7 @@
   </slot>
 {:else}
   <div
-    class="card variant-filled-secondary p-4 text-xs"
+    class=" variant-filled-primary p-2 text-xs rounded-token"
     data-popup="popupHover"
   >
     <slot name="hoverText">
