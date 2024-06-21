@@ -2,7 +2,7 @@ import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 import { nanoid } from 'nanoid';
 import {
-  type ActorRefFrom,
+  type AnyActorRef,
   assign,
   createActor,
   not,
@@ -10,8 +10,7 @@ import {
   sendTo,
   setup,
   type SnapshotFrom,
-  type StateFrom,
-  stopChild
+  type StateFrom
 } from 'xstate';
 
 import type {
@@ -53,15 +52,15 @@ import {
   PayoutJobType
 } from '$lib/payments';
 
-import { showMachine, type ShowMachineType } from './showMachine';
+import { createShowActor } from './showMachine';
 
 type TicketMachineContext = {
   ticket: TicketDocument;
   show: ShowDocument;
-  showMachineRef: ActorRefFrom<ShowMachineType>;
   redisConnection: IORedis;
   errorMessage: string | undefined;
   id: string;
+  showActorRef: AnyActorRef | undefined;
 };
 
 //#region Event Types
@@ -150,17 +149,17 @@ export type TicketMachineStateType = StateFrom<TicketMachineType>;
 export type TicketMachineType = typeof ticketMachine;
 
 export const createTicketMachineService = (input: TicketMachineInput) => {
-  const ticketService = createActor(ticketMachine, {
+  const ticketActor = createActor(ticketMachine, {
     input
   }).start();
 
-  ticketService.subscribe((state) => {
+  ticketActor.subscribe((state) => {
     if (state.context.ticket.save) {
       state.context.ticket.save();
     }
   });
 
-  return ticketService;
+  return ticketActor;
 };
 
 export const ticketMachine = setup({
@@ -169,60 +168,58 @@ export const ticketMachine = setup({
     context: {} as TicketMachineContext,
     input: {} as TicketMachineInput
   },
-  actors: {
-    showMachine: {} as ShowMachineType
-  },
+
   actions: {
     sendJoinedShow: sendTo(
-      'showMachine',
+      'showActor',
       (_: any, params: { ticket: TicketDocument }) => {
         return { type: 'CUSTOMER JOINED', ticket: params.ticket };
       }
     ),
     sendLeftShow: sendTo(
-      'showMachine',
+      'showActor',
       (_, params: { ticket: TicketDocument }) => {
         return { type: 'CUSTOMER LEFT', ticket: params.ticket };
       }
     ),
     sendTicketSold: sendTo(
-      'showMachine',
+      'showActor',
       (_, params: { ticket: TicketDocument }) => {
         return { type: 'TICKET SOLD', ticket: params.ticket };
       }
     ),
     sendTicketReserved: sendTo(
-      'showMachine',
+      'showActor',
       (_, params: { ticket: TicketDocument }) => {
         return { type: 'TICKET RESERVED', ticket: params.ticket };
       }
     ),
     sendTicketRedeemed: sendTo(
-      'showMachine',
+      'showActor',
       (_, params: { ticket: TicketDocument }) => {
         return { type: 'TICKET REDEEMED', ticket: params.ticket };
       }
     ),
     sendTicketRefunded: sendTo(
-      'showMachine',
+      'showActor',
       (_, params: { ticket: TicketDocument }) => {
         return { type: 'TICKET REFUNDED', ticket: params.ticket };
       }
     ),
     sendTicketCancelled: sendTo(
-      'showMachine',
+      'showActor',
       (_, params: { ticket: TicketDocument }) => {
         return { type: 'TICKET CANCELLED', ticket: params.ticket };
       }
     ),
     sendTicketFinalized: sendTo(
-      'showMachine',
+      'showActor',
       (_, params: { ticket: TicketDocument }) => {
         return { type: 'TICKET FINALIZED', ticket: params.ticket };
       }
     ),
     sendDisputeInitiated: sendTo(
-      'showMachine',
+      'showActor',
       (_, params: { ticket: TicketDocument }) => {
         return { type: 'DISPUTE INITIATED', ticket: params.ticket };
       }
@@ -620,23 +617,31 @@ export const ticketMachine = setup({
   context: ({ input }) => ({
     ticket: input.ticket,
     show: input.show,
-    showMachineRef: {} as ActorRefFrom<ShowMachineType>,
     errorMessage: undefined as string | undefined,
     id: nanoid(),
-    redisConnection: input.redisConnection
+    redisConnection: input.redisConnection,
+    showActorRef: undefined
   }),
   id: 'ticketMachine',
   initial: 'ticketLoaded',
-  exit: [stopChild('showMachine'), assign({ showMachineRef: undefined })],
+  exit: [
+    ({ context }) => {
+      if (context.showActorRef) {
+        context.showActorRef.stop();
+      }
+    },
+    assign({
+      showActorRef: undefined
+    })
+  ],
   entry: [
     assign({
-      showMachineRef: ({ spawn, context }) =>
-        spawn(showMachine, {
-          input: {
-            show: context.show,
-            redisConnection: context.redisConnection
-          }
-        })
+      showActorRef: ({ context }) => {
+        return createShowActor({
+          redisConnection: context.redisConnection,
+          show: context.show
+        });
+      }
     })
   ],
   states: {
@@ -1297,16 +1302,18 @@ export const ticketMachine = setup({
     ],
     'SHOW UPDATED': {
       actions: [
-        stopChild('showMachine'),
+        ({ context }) => {
+          if (context.showActorRef) {
+            context.showActorRef.stop();
+          }
+        },
         assign({
-          show: ({ event }) => event.show,
-          showMachineRef: ({ spawn, context }) =>
-            spawn(showMachine, {
-              input: {
-                show: context.show,
-                redisConnection: context.redisConnection
-              }
-            })
+          showActorRef: ({ context }) => {
+            return createShowActor({
+              redisConnection: context.redisConnection,
+              show: context.show
+            });
+          }
         })
       ]
     },

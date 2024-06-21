@@ -20,6 +20,7 @@
     {
       validationMethod: 'auto',
       onResult: ({ result }) => {
+        console.log(result);
         if (result.type === 'success' || result.type === 'redirect') {
           // VERIFY THIS IS CORRECT
           modalStore.close();
@@ -69,7 +70,7 @@
           <label class="label">
             <span class="font-semibold">8 digit numeric PIN</span>
             <div class="flex gap-1 text-center">
-              {#each $form.pin as index}
+              {#each $form.pin as _, index}
                 <span>
                   <input
                     name="pin"
@@ -81,11 +82,11 @@
               {/each}
             </div>
 
-            {#each $form.pin as index}
-              {#if $errors.pin && $errors.pin[index]}
-                <div class="text-error-500">{$errors.pin[index]}</div>
-              {/if}
-            {/each}
+            {#if $errors.pin && $errors.pin._errors}
+              {#each $errors.pin._errors as error}
+                <div class="text-error-500">{error}</div>
+              {/each}
+            {/if}
 
             <span>Save the PIN to access the ticket later!</span><br />
           </label>

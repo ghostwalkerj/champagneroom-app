@@ -25,6 +25,8 @@ import type { ShowQueueType, ShowWorkerJobType } from '$lib/workers/showWorker';
 
 import { DisputeDecision, EntityType, ShowStatus } from '$lib/constants';
 
+export type ShowActorType = ReturnType<typeof createShowActor>;
+
 //#region Event Types
 export type ShowMachineEventType =
   | {
@@ -88,8 +90,8 @@ export type ShowMachineEventType =
       ticket: TicketDocument;
       decision: DisputeDecision;
     };
-//#endregion
 
+//#endregion
 export type ShowMachineInput = {
   show: ShowDocument;
   redisConnection: IORedis;
@@ -101,10 +103,6 @@ export type ShowMachineOptions = {
   escrowPeriod: number;
 };
 
-export type ShowMachineServiceType = ReturnType<
-  typeof createShowMachineService
->;
-
 type ShowMachineContext = {
   show: ShowDocument;
   id: string;
@@ -113,8 +111,10 @@ type ShowMachineContext = {
   showQueue: ShowQueueType;
 };
 
+export type ShowMachineServiceType = ReturnType<
+  typeof createShowMachineService
+>;
 export type ShowMachineSnapshotType = SnapshotFrom<typeof showMachine>;
-export type ShowMachineStateType = StateFrom<typeof showMachine>;
 
 const createShowEvent = (show: ShowDocument, event: AnyEventObject) => {
   if (event.type === 'xstate.stop') return;
@@ -135,25 +135,24 @@ const createShowEvent = (show: ShowDocument, event: AnyEventObject) => {
   show.saveShowEvent(event.type, ticketId, transaction, ticketInfo);
 };
 
+export type ShowMachineStateType = StateFrom<typeof showMachine>;
+
 export type ShowMachineType = typeof showMachine;
 
-export const createShowMachineService = (input: ShowMachineInput) => {
-  const showService = createActor(showMachine, {
+export const createShowActor = (input: ShowMachineInput) => {
+  return createActor(showMachine, {
     input,
     inspect: (inspectionEvent) => {
       if (inspectionEvent.type === '@xstate.event')
         createShowEvent(input.show, inspectionEvent.event);
     }
-  }).start();
-
-  showService.subscribe((state) => {
-    if (state.context.show.save) {
-      state.context.show.save();
-    }
   });
-
-  return showService;
 };
+
+export const createShowMachineService = (input: ShowMachineInput) => {
+  return createShowActor(input).start();
+};
+
 export const showMachine = setup({
   types: {
     events: {} as ShowMachineEventType,
