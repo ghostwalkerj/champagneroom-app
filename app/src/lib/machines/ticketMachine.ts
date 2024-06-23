@@ -2,7 +2,6 @@ import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 import { nanoid } from 'nanoid';
 import {
-  type AnyActorRef,
   assign,
   createActor,
   not,
@@ -10,7 +9,9 @@ import {
   sendTo,
   setup,
   type SnapshotFrom,
-  type StateFrom
+  spawnChild,
+  type StateFrom,
+  stopChild
 } from 'xstate';
 
 import type {
@@ -52,7 +53,7 @@ import {
   PayoutJobType
 } from '$lib/payments';
 
-import { createShowActor } from './showMachine';
+import { showMachine, type ShowMachineEventType } from './showMachine';
 
 type TicketMachineContext = {
   ticket: TicketDocument;
@@ -60,7 +61,6 @@ type TicketMachineContext = {
   redisConnection: IORedis;
   errorMessage: string | undefined;
   id: string;
-  showActorRef: AnyActorRef | undefined;
 };
 
 //#region Event Types
@@ -170,58 +170,16 @@ export const ticketMachine = setup({
   },
 
   actions: {
-    sendJoinedShow: sendTo(
+    sendToShow: sendTo(
       'showActor',
-      (_: any, params: { ticket: TicketDocument }) => {
-        return { type: 'CUSTOMER JOINED', ticket: params.ticket };
-      }
-    ),
-    sendLeftShow: sendTo(
-      'showActor',
-      (_, params: { ticket: TicketDocument }) => {
-        return { type: 'CUSTOMER LEFT', ticket: params.ticket };
-      }
-    ),
-    sendTicketSold: sendTo(
-      'showActor',
-      (_, params: { ticket: TicketDocument }) => {
-        return { type: 'TICKET SOLD', ticket: params.ticket };
-      }
-    ),
-    sendTicketReserved: sendTo(
-      'showActor',
-      (_, params: { ticket: TicketDocument }) => {
-        return { type: 'TICKET RESERVED', ticket: params.ticket };
-      }
-    ),
-    sendTicketRedeemed: sendTo(
-      'showActor',
-      (_, params: { ticket: TicketDocument }) => {
-        return { type: 'TICKET REDEEMED', ticket: params.ticket };
-      }
-    ),
-    sendTicketRefunded: sendTo(
-      'showActor',
-      (_, params: { ticket: TicketDocument }) => {
-        return { type: 'TICKET REFUNDED', ticket: params.ticket };
-      }
-    ),
-    sendTicketCancelled: sendTo(
-      'showActor',
-      (_, params: { ticket: TicketDocument }) => {
-        return { type: 'TICKET CANCELLED', ticket: params.ticket };
-      }
-    ),
-    sendTicketFinalized: sendTo(
-      'showActor',
-      (_, params: { ticket: TicketDocument }) => {
-        return { type: 'TICKET FINALIZED', ticket: params.ticket };
-      }
-    ),
-    sendDisputeInitiated: sendTo(
-      'showActor',
-      (_, params: { ticket: TicketDocument }) => {
-        return { type: 'DISPUTE INITIATED', ticket: params.ticket };
+      (
+        _,
+        params: { ticket: TicketDocument; type: ShowMachineEventType['type'] }
+      ) => {
+        return {
+          type: params.type,
+          ticket: params.ticket
+        };
       }
     ),
 
@@ -619,30 +577,21 @@ export const ticketMachine = setup({
     show: input.show,
     errorMessage: undefined as string | undefined,
     id: nanoid(),
-    redisConnection: input.redisConnection,
-    showActorRef: undefined
+    redisConnection: input.redisConnection
   }),
   id: 'ticketMachine',
   initial: 'ticketLoaded',
-  exit: [
-    ({ context }) => {
-      if (context.showActorRef) {
-        context.showActorRef.stop();
-      }
-    },
-    assign({
-      showActorRef: undefined
-    })
-  ],
+  exit: [stopChild('showActor')],
   entry: [
-    assign({
-      showActorRef: ({ context }) => {
-        return createShowActor({
-          redisConnection: context.redisConnection,
-          show: context.show
-        });
-      }
-    })
+    ({ context }) => {
+      spawnChild(showMachine, {
+        id: 'showActor',
+        input: {
+          show: context.show,
+          redisConnection: context.redisConnection
+        }
+      });
+    }
   ],
   states: {
     ticketLoaded: {
@@ -716,9 +665,10 @@ export const ticketMachine = setup({
                 })
               },
               {
-                type: 'sendTicketSold',
+                type: 'sendToShow',
                 params: ({ context }) => ({
-                  ticket: context.ticket
+                  ticket: context.ticket,
+                  type: 'TICKET SOLD'
                 })
               }
             ]
@@ -735,9 +685,10 @@ export const ticketMachine = setup({
                 })
               },
               {
-                type: 'sendTicketReserved',
+                type: 'sendToShow',
                 params: ({ context }) => ({
-                  ticket: context.ticket
+                  ticket: context.ticket,
+                  type: 'TICKET RESERVED'
                 })
               },
               {
@@ -821,9 +772,10 @@ export const ticketMachine = setup({
                     })
                   },
                   {
-                    type: 'sendTicketSold',
+                    type: 'sendToShow',
                     params: ({ context }) => ({
-                      ticket: context.ticket
+                      ticket: context.ticket,
+                      type: 'TICKET SOLD'
                     })
                   }
                 ]
@@ -868,8 +820,11 @@ export const ticketMachine = setup({
                     params: ({ context }) => ({ ticket: context.ticket })
                   },
                   {
-                    type: 'sendTicketSold',
-                    params: ({ context }) => ({ ticket: context.ticket })
+                    type: 'sendToShow',
+                    params: ({ context }) => ({
+                      ticket: context.ticket,
+                      type: 'TICKET SOLD'
+                    })
                   }
                 ]
               },
@@ -900,9 +855,10 @@ export const ticketMachine = setup({
                   })
                 },
                 {
-                  type: 'sendTicketRedeemed',
+                  type: 'sendToShow',
                   params: ({ context }) => ({
-                    ticket: context.ticket
+                    ticket: context.ticket,
+                    type: 'TICKET REDEEMED'
                   })
                 }
               ]
@@ -930,9 +886,10 @@ export const ticketMachine = setup({
                     })
                   },
                   {
-                    type: 'sendTicketRefunded',
+                    type: 'sendToShow',
                     params: ({ context }) => ({
-                      ticket: context.ticket
+                      ticket: context.ticket,
+                      type: 'TICKET REFUNDED'
                     })
                   }
                 ]
@@ -958,9 +915,10 @@ export const ticketMachine = setup({
         'SHOW LEFT': {
           actions: [
             {
-              type: 'sendLeftShow',
+              type: 'sendToShow',
               params: ({ context }) => ({
-                ticket: context.ticket
+                ticket: context.ticket,
+                type: 'CUSTOMER LEFT'
               })
             }
           ]
@@ -969,9 +927,10 @@ export const ticketMachine = setup({
           guard: 'canWatchShow',
           actions: [
             {
-              type: 'sendJoinedShow',
+              type: 'sendToShow',
               params: ({ context }) => ({
-                ticket: context.ticket
+                ticket: context.ticket,
+                type: 'CUSTOMER JOINED'
               })
             }
           ]
@@ -1014,10 +973,10 @@ export const ticketMachine = setup({
               })
             },
             {
-              type: 'sendTicketFinalized',
-              params: ({ context, event }) => ({
+              type: 'sendToShow',
+              params: ({ context }) => ({
                 ticket: context.ticket,
-                finalize: event.finalize
+                type: 'TICKET FINALIZED'
               })
             }
           ]
@@ -1069,10 +1028,10 @@ export const ticketMachine = setup({
                   })
                 },
                 {
-                  type: 'sendDisputeInitiated',
-                  params: ({ context, event }) => ({
+                  type: 'sendToShow',
+                  params: ({ context }) => ({
                     ticket: context.ticket,
-                    dispute: event.dispute
+                    type: 'TICKET DISPUTED'
                   })
                 }
               ]
@@ -1162,10 +1121,10 @@ export const ticketMachine = setup({
                   })
                 },
                 {
-                  type: 'sendDisputeInitiated',
-                  params: ({ context, event }) => ({
+                  type: 'sendToShow',
+                  params: ({ context }) => ({
                     ticket: context.ticket,
-                    dispute: event.dispute
+                    type: 'TICKET DISPUTED'
                   })
                 }
               ]
@@ -1203,10 +1162,10 @@ export const ticketMachine = setup({
             })
           },
           {
-            type: 'sendTicketCancelled',
+            type: 'sendToShow',
             params: ({ context }) => ({
               ticket: context.ticket,
-              cancel: context.ticket.ticketState.cancel as CancelType
+              type: 'TICKET CANCELLED'
             })
           }
         ]
@@ -1291,10 +1250,10 @@ export const ticketMachine = setup({
             })
           },
           {
-            type: 'sendTicketCancelled',
-            params: ({ context, event }) => ({
+            type: 'sendToShow',
+            params: ({ context }) => ({
               ticket: context.ticket,
-              cancel: event.cancel
+              type: 'TICKET CANCELLED'
             })
           }
         ]
@@ -1302,19 +1261,19 @@ export const ticketMachine = setup({
     ],
     'SHOW UPDATED': {
       actions: [
-        ({ context }) => {
-          if (context.showActorRef) {
-            context.showActorRef.stop();
-          }
-        },
         assign({
-          showActorRef: ({ context }) => {
-            return createShowActor({
-              redisConnection: context.redisConnection,
-              show: context.show
-            });
-          }
-        })
+          show: ({ event }) => event.show
+        }),
+        stopChild('showActor'),
+        ({ context }) => {
+          spawnChild(showMachine, {
+            id: 'showActor',
+            input: {
+              show: context.show,
+              redisConnection: context.redisConnection
+            }
+          });
+        }
       ]
     },
     'SHOW ENDED': {
