@@ -39,7 +39,7 @@
     animation: true,
     plugins: {
       autocolors: {
-        mode: 'label'
+        mode: 'label' as const
       },
       legend: { display: true, position: 'bottom' as const },
       datalabels: {
