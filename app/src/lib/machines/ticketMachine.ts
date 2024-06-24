@@ -2,16 +2,14 @@ import { Queue } from 'bullmq';
 import type IORedis from 'ioredis';
 import { nanoid } from 'nanoid';
 import {
+  type AnyActorRef,
   assign,
   createActor,
   not,
   raise,
-  sendTo,
   setup,
   type SnapshotFrom,
-  spawnChild,
-  type StateFrom,
-  stopChild
+  type StateFrom
 } from 'xstate';
 
 import type {
@@ -53,7 +51,7 @@ import {
   PayoutJobType
 } from '$lib/payments';
 
-import { showMachine, type ShowMachineEventType } from './showMachine';
+import { createShowActor, type ShowMachineEventType } from './showMachine';
 
 type TicketMachineContext = {
   ticket: TicketDocument;
@@ -61,6 +59,7 @@ type TicketMachineContext = {
   redisConnection: IORedis;
   errorMessage: string | undefined;
   id: string;
+  showActorRef: AnyActorRef | undefined;
 };
 
 //#region Event Types
@@ -170,18 +169,18 @@ export const ticketMachine = setup({
   },
 
   actions: {
-    sendToShow: sendTo(
-      'showActor',
-      (
-        _,
-        params: { ticket: TicketDocument; type: ShowMachineEventType['type'] }
-      ) => {
-        return {
-          type: params.type,
-          ticket: params.ticket
-        };
+    sendToShow: (
+      _,
+      params: {
+        ticket: TicketDocument;
+        showActorRef: AnyActorRef;
+        type: ShowMachineEventType['type'];
       }
-    ),
+    ) =>
+      params.showActorRef.send({
+        type: params.type,
+        ticket: params.ticket
+      }),
 
     queueUpdateInvoiceAddress: (
       _,
@@ -577,21 +576,26 @@ export const ticketMachine = setup({
     show: input.show,
     errorMessage: undefined as string | undefined,
     id: nanoid(),
-    redisConnection: input.redisConnection
+    redisConnection: input.redisConnection,
+    showActorRef: undefined
   }),
   id: 'ticketMachine',
   initial: 'ticketLoaded',
-  exit: [stopChild('showActor')],
   entry: [
+    assign({
+      showActorRef: ({ context }) => {
+        return createShowActor({
+          redisConnection: context.redisConnection,
+          show: context.show
+        });
+      }
+    })
+  ],
+  exit: [
     ({ context }) => {
-      spawnChild(showMachine, {
-        id: 'showActor',
-        input: {
-          show: context.show,
-          redisConnection: context.redisConnection
-        }
-      });
-    }
+      context.showActorRef?.stop();
+    },
+    assign({ showActorRef: undefined })
   ],
   states: {
     ticketLoaded: {
@@ -668,7 +672,8 @@ export const ticketMachine = setup({
                 type: 'sendToShow',
                 params: ({ context }) => ({
                   ticket: context.ticket,
-                  type: 'TICKET SOLD'
+                  type: 'TICKET SOLD',
+                  showActorRef: context.showActorRef!
                 })
               }
             ]
@@ -688,7 +693,8 @@ export const ticketMachine = setup({
                 type: 'sendToShow',
                 params: ({ context }) => ({
                   ticket: context.ticket,
-                  type: 'TICKET RESERVED'
+                  type: 'TICKET RESERVED',
+                  showActorRef: context.showActorRef!
                 })
               },
               {
@@ -775,7 +781,8 @@ export const ticketMachine = setup({
                     type: 'sendToShow',
                     params: ({ context }) => ({
                       ticket: context.ticket,
-                      type: 'TICKET SOLD'
+                      type: 'TICKET SOLD',
+                      showActorRef: context.showActorRef!
                     })
                   }
                 ]
@@ -823,7 +830,8 @@ export const ticketMachine = setup({
                     type: 'sendToShow',
                     params: ({ context }) => ({
                       ticket: context.ticket,
-                      type: 'TICKET SOLD'
+                      type: 'TICKET SOLD',
+                      showActorRef: context.showActorRef!
                     })
                   }
                 ]
@@ -858,7 +866,8 @@ export const ticketMachine = setup({
                   type: 'sendToShow',
                   params: ({ context }) => ({
                     ticket: context.ticket,
-                    type: 'TICKET REDEEMED'
+                    type: 'TICKET REDEEMED',
+                    showActorRef: context.showActorRef!
                   })
                 }
               ]
@@ -889,7 +898,8 @@ export const ticketMachine = setup({
                     type: 'sendToShow',
                     params: ({ context }) => ({
                       ticket: context.ticket,
-                      type: 'TICKET REFUNDED'
+                      type: 'TICKET REFUNDED',
+                      showActorRef: context.showActorRef!
                     })
                   }
                 ]
@@ -918,7 +928,8 @@ export const ticketMachine = setup({
               type: 'sendToShow',
               params: ({ context }) => ({
                 ticket: context.ticket,
-                type: 'CUSTOMER LEFT'
+                type: 'CUSTOMER LEFT',
+                showActorRef: context.showActorRef!
               })
             }
           ]
@@ -930,7 +941,8 @@ export const ticketMachine = setup({
               type: 'sendToShow',
               params: ({ context }) => ({
                 ticket: context.ticket,
-                type: 'CUSTOMER JOINED'
+                type: 'CUSTOMER JOINED',
+                showActorRef: context.showActorRef!
               })
             }
           ]
@@ -976,7 +988,8 @@ export const ticketMachine = setup({
               type: 'sendToShow',
               params: ({ context }) => ({
                 ticket: context.ticket,
-                type: 'TICKET FINALIZED'
+                type: 'TICKET FINALIZED',
+                showActorRef: context.showActorRef!
               })
             }
           ]
@@ -1031,7 +1044,8 @@ export const ticketMachine = setup({
                   type: 'sendToShow',
                   params: ({ context }) => ({
                     ticket: context.ticket,
-                    type: 'TICKET DISPUTED'
+                    type: 'TICKET DISPUTED',
+                    showActorRef: context.showActorRef!
                   })
                 }
               ]
@@ -1124,7 +1138,8 @@ export const ticketMachine = setup({
                   type: 'sendToShow',
                   params: ({ context }) => ({
                     ticket: context.ticket,
-                    type: 'TICKET DISPUTED'
+                    type: 'TICKET DISPUTED',
+                    showActorRef: context.showActorRef!
                   })
                 }
               ]
@@ -1165,7 +1180,8 @@ export const ticketMachine = setup({
             type: 'sendToShow',
             params: ({ context }) => ({
               ticket: context.ticket,
-              type: 'TICKET CANCELLED'
+              type: 'TICKET CANCELLED',
+              showActorRef: context.showActorRef!
             })
           }
         ]
@@ -1253,7 +1269,8 @@ export const ticketMachine = setup({
             type: 'sendToShow',
             params: ({ context }) => ({
               ticket: context.ticket,
-              type: 'TICKET CANCELLED'
+              type: 'TICKET CANCELLED',
+              showActorRef: context.showActorRef!
             })
           }
         ]
@@ -1264,16 +1281,17 @@ export const ticketMachine = setup({
         assign({
           show: ({ event }) => event.show
         }),
-        stopChild('showActor'),
         ({ context }) => {
-          spawnChild(showMachine, {
-            id: 'showActor',
-            input: {
-              show: context.show,
-              redisConnection: context.redisConnection
-            }
-          });
-        }
+          context.showActorRef?.stop();
+        },
+        assign({
+          showActorRef: ({ context }) => {
+            return createShowActor({
+              redisConnection: context.redisConnection,
+              show: context.show
+            });
+          }
+        })
       ]
     },
     'SHOW ENDED': {

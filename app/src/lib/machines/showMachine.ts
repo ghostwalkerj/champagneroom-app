@@ -117,10 +117,9 @@ export type ShowMachineServiceType = ReturnType<
 export type ShowMachineSnapshotType = SnapshotFrom<typeof showMachine>;
 
 const createShowEvent = (show: ShowDocument, event: AnyEventObject) => {
-  if (event.type === 'xstate.stop') return;
-
-  let ticketId: string | undefined;
   let customerName = 'someone';
+  let ticketId = '';
+  console.log('Creating show event', event);
   if ('ticket' in event) {
     const ticket = event.ticket as TicketDocument;
     ticketId = ticket._id.toString();
@@ -143,7 +142,11 @@ export const createShowActor = (input: ShowMachineInput) => {
   return createActor(showMachine, {
     input,
     inspect: (inspectionEvent) => {
-      if (inspectionEvent.type === '@xstate.event')
+      if (
+        inspectionEvent.type === '@xstate.event' &&
+        inspectionEvent.event.type !== 'xstate.init' &&
+        inspectionEvent.event.type !== 'xstate.stop'
+      )
         createShowEvent(input.show, inspectionEvent.event);
     }
   });
