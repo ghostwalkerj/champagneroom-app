@@ -4,6 +4,7 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { message, superValidate } from 'sveltekit-superforms/server';
 import { uniqueNamesGenerator } from 'unique-names-generator';
 import urlJoin from 'url-join';
+import { waitFor } from 'xstate';
 
 import { env } from '$env/dynamic/private';
 
@@ -80,6 +81,7 @@ export const actions: Actions = {
       type: 'TICKET RESERVED'
     });
 
+    await waitFor(ticketService, (state) => state.matches('reserved'));
     const redirectUrl = urlJoin(config.PATH.ticket, ticket._id.toString());
 
     const encAuthToken = createAuthToken({

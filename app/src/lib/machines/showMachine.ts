@@ -111,15 +111,12 @@ type ShowMachineContext = {
   showQueue: ShowQueueType;
 };
 
-export type ShowMachineServiceType = ReturnType<
-  typeof createShowMachineService
->;
+export type ShowMachineServiceType = ReturnType<typeof createShowActor>;
 export type ShowMachineSnapshotType = SnapshotFrom<typeof showMachine>;
 
 const createShowEvent = (show: ShowDocument, event: AnyEventObject) => {
   let customerName = 'someone';
   let ticketId = '';
-  console.log('Creating show event', event);
   if ('ticket' in event) {
     const ticket = event.ticket as TicketDocument;
     ticketId = ticket._id.toString();
@@ -139,7 +136,7 @@ export type ShowMachineStateType = StateFrom<typeof showMachine>;
 export type ShowMachineType = typeof showMachine;
 
 export const createShowActor = (input: ShowMachineInput) => {
-  return createActor(showMachine, {
+  const showActor = createActor(showMachine, {
     input,
     inspect: (inspectionEvent) => {
       if (
@@ -150,10 +147,8 @@ export const createShowActor = (input: ShowMachineInput) => {
         createShowEvent(input.show, inspectionEvent.event);
     }
   });
-};
 
-export const createShowMachineService = (input: ShowMachineInput) => {
-  return createShowActor(input).start();
+  return showActor.start();
 };
 
 export const showMachine = setup({
@@ -268,6 +263,15 @@ export const showMachine = setup({
         showId: params.show._id.toString(),
         cancel: params.cancel
       });
+    },
+
+    saveShow: (
+      _,
+      params: {
+        show: ShowDocument;
+      }
+    ) => {
+      if (params.show.save) params.show.save();
     },
 
     stopShow: assign(

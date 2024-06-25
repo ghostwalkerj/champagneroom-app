@@ -14,7 +14,7 @@ import type { UserDocument } from '$lib/models/user';
 import { User } from '$lib/models/user';
 import { Wallet } from '$lib/models/wallet';
 
-import { createShowMachineService } from '$lib/machines/showMachine';
+import { createShowActor } from '$lib/machines/showMachine';
 
 import config from '$lib/config';
 import type { DisputeDecision } from '$lib/constants';
@@ -294,7 +294,7 @@ export const actions: Actions = {
 
     const redisConnection = locals.redisConnection;
 
-    const showService = createShowMachineService({
+    const showService = createShowActor({
       show: ticket.show,
       redisConnection
     });

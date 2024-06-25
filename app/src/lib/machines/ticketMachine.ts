@@ -148,17 +148,9 @@ export type TicketMachineStateType = StateFrom<TicketMachineType>;
 export type TicketMachineType = typeof ticketMachine;
 
 export const createTicketMachineService = (input: TicketMachineInput) => {
-  const ticketActor = createActor(ticketMachine, {
+  return createActor(ticketMachine, {
     input
   }).start();
-
-  ticketActor.subscribe((state) => {
-    if (state.context.ticket.save) {
-      state.context.ticket.save();
-    }
-  });
-
-  return ticketActor;
 };
 
 export const ticketMachine = setup({
@@ -203,6 +195,15 @@ export const ticketMachine = setup({
         paymentId: params.paymentId
       });
       invoiceQueue.close();
+    },
+
+    saveTicket: (
+      _,
+      params: {
+        ticket: TicketDocument;
+      }
+    ) => {
+      if (params.ticket.save) params.ticket.save();
     },
 
     initiatePayment: assign(
@@ -669,6 +670,12 @@ export const ticketMachine = setup({
                 })
               },
               {
+                type: 'saveTicket',
+                params: ({ context }) => ({
+                  ticket: context.ticket
+                })
+              },
+              {
                 type: 'sendToShow',
                 params: ({ context }) => ({
                   ticket: context.ticket,
@@ -687,6 +694,12 @@ export const ticketMachine = setup({
                 params: ({ context }) => ({
                   ticket: context.ticket,
                   status: TicketStatus.WAITING_FOR_INVOICE
+                })
+              },
+              {
+                type: 'saveTicket',
+                params: ({ context }) => ({
+                  ticket: context.ticket
                 })
               },
               {
@@ -722,6 +735,12 @@ export const ticketMachine = setup({
                     ticket: context.ticket,
                     invoice: event.invoice
                   })
+                },
+                {
+                  type: 'saveTicket',
+                  params: ({ context }) => ({
+                    ticket: context.ticket
+                  })
                 }
               ]
             }
@@ -737,6 +756,12 @@ export const ticketMachine = setup({
                   params: ({ context, event }) => ({
                     ticket: context.ticket,
                     paymentCurrency: event.paymentCurrency
+                  })
+                },
+                {
+                  type: 'saveTicket',
+                  params: ({ context }) => ({
+                    ticket: context.ticket
                   })
                 },
                 {
@@ -778,6 +803,12 @@ export const ticketMachine = setup({
                     })
                   },
                   {
+                    type: 'saveTicket',
+                    params: ({ context }) => ({
+                      ticket: context.ticket
+                    })
+                  },
+                  {
                     type: 'sendToShow',
                     params: ({ context }) => ({
                       ticket: context.ticket,
@@ -795,6 +826,12 @@ export const ticketMachine = setup({
                     params: ({ context, event }) => ({
                       ticket: context.ticket,
                       transaction: event.transaction
+                    })
+                  },
+                  {
+                    type: 'saveTicket',
+                    params: ({ context }) => ({
+                      ticket: context.ticket
                     })
                   }
                 ]
@@ -827,6 +864,12 @@ export const ticketMachine = setup({
                     params: ({ context }) => ({ ticket: context.ticket })
                   },
                   {
+                    type: 'saveTicket',
+                    params: ({ context }) => ({
+                      ticket: context.ticket
+                    })
+                  },
+                  {
                     type: 'sendToShow',
                     params: ({ context }) => ({
                       ticket: context.ticket,
@@ -844,6 +887,12 @@ export const ticketMachine = setup({
                       ticket: context.ticket,
                       transaction: event.transaction
                     })
+                  },
+                  {
+                    type: 'saveTicket',
+                    params: ({ context }) => ({
+                      ticket: context.ticket
+                    })
                   }
                 ]
               }
@@ -858,6 +907,12 @@ export const ticketMachine = setup({
               actions: [
                 {
                   type: 'redeemTicket',
+                  params: ({ context }) => ({
+                    ticket: context.ticket
+                  })
+                },
+                {
+                  type: 'saveTicket',
                   params: ({ context }) => ({
                     ticket: context.ticket
                   })
@@ -895,6 +950,12 @@ export const ticketMachine = setup({
                     })
                   },
                   {
+                    type: 'saveTicket',
+                    params: ({ context }) => ({
+                      ticket: context.ticket
+                    })
+                  },
+                  {
                     type: 'sendToShow',
                     params: ({ context }) => ({
                       ticket: context.ticket,
@@ -911,6 +972,12 @@ export const ticketMachine = setup({
                     params: ({ context, event }) => ({
                       ticket: context.ticket,
                       transaction: event.transaction
+                    })
+                  },
+                  {
+                    type: 'saveTicket',
+                    params: ({ context }) => ({
+                      ticket: context.ticket
                     })
                   }
                 ]
@@ -957,6 +1024,12 @@ export const ticketMachine = setup({
           params: ({ context }) => ({
             ticket: context.ticket
           })
+        },
+        {
+          type: 'saveTicket',
+          params: ({ context }) => ({
+            ticket: context.ticket
+          })
         }
       ]
     },
@@ -965,6 +1038,12 @@ export const ticketMachine = setup({
       entry: [
         {
           type: 'deactivateTicket',
+          params: ({ context }) => ({
+            ticket: context.ticket
+          })
+        },
+        {
+          type: 'saveTicket',
           params: ({ context }) => ({
             ticket: context.ticket
           })
@@ -982,6 +1061,12 @@ export const ticketMachine = setup({
               params: ({ context, event }) => ({
                 ticket: context.ticket,
                 finalize: event.finalize
+              })
+            },
+            {
+              type: 'saveTicket',
+              params: ({ context }) => ({
+                ticket: context.ticket
               })
             },
             {
@@ -1007,6 +1092,12 @@ export const ticketMachine = setup({
                   params: ({ context }) => ({
                     ticket: context.ticket
                   })
+                },
+                {
+                  type: 'saveTicket',
+                  params: ({ context }) => ({
+                    ticket: context.ticket
+                  })
                 }
               ]
             }
@@ -1019,6 +1110,12 @@ export const ticketMachine = setup({
                   params: ({ context, event }) => ({
                     ticket: context.ticket,
                     feedback: event.feedback
+                  })
+                },
+                {
+                  type: 'saveTicket',
+                  params: ({ context }) => ({
+                    ticket: context.ticket
                   })
                 },
                 raise({
@@ -1038,6 +1135,12 @@ export const ticketMachine = setup({
                     ticket: context.ticket,
                     dispute: event.dispute,
                     refund: event.refund
+                  })
+                },
+                {
+                  type: 'saveTicket',
+                  params: ({ context }) => ({
+                    ticket: context.ticket
                   })
                 },
                 {
@@ -1068,6 +1171,12 @@ export const ticketMachine = setup({
                           refund: event.refund
                         })
                       },
+                      {
+                        type: 'saveTicket',
+                        params: ({ context }) => ({
+                          ticket: context.ticket
+                        })
+                      },
                       raise({
                         type: 'TICKET FINALIZED',
                         finalize: finalizeSchema.parse({
@@ -1091,6 +1200,12 @@ export const ticketMachine = setup({
                           decision: event.decision,
                           refund: event.refund
                         })
+                      },
+                      {
+                        type: 'saveTicket',
+                        params: ({ context }) => ({
+                          ticket: context.ticket
+                        })
                       }
                     ],
                     target: 'waiting4DisputeRefund'
@@ -1107,6 +1222,12 @@ export const ticketMachine = setup({
                       params: ({ context, event }) => ({
                         ticket: context.ticket,
                         transaction: event.transaction
+                      })
+                    },
+                    {
+                      type: 'saveTicket',
+                      params: ({ context }) => ({
+                        ticket: context.ticket
                       })
                     },
                     raise({
@@ -1132,6 +1253,12 @@ export const ticketMachine = setup({
                     ticket: context.ticket,
                     dispute: event.dispute,
                     refund: event.refund
+                  })
+                },
+                {
+                  type: 'saveTicket',
+                  params: ({ context }) => ({
+                    ticket: context.ticket
                   })
                 },
                 {
@@ -1167,6 +1294,12 @@ export const ticketMachine = setup({
                   reason: CancelReason.CUSTOMER_CANCELLED,
                   cancelledInState: context.show.showState.status
                 } as CancelType)
+            })
+          },
+          {
+            type: 'saveTicket',
+            params: ({ context }) => ({
+              ticket: context.ticket
             })
           },
           {
@@ -1209,6 +1342,12 @@ export const ticketMachine = setup({
             })
           },
           {
+            type: 'saveTicket',
+            params: ({ context }) => ({
+              ticket: context.ticket
+            })
+          },
+          {
             type: 'createRefundPayout',
             params: ({ context }) => ({
               ticket: context.ticket,
@@ -1240,6 +1379,12 @@ export const ticketMachine = setup({
             })
           },
           {
+            type: 'saveTicket',
+            params: ({ context }) => ({
+              ticket: context.ticket
+            })
+          },
+          {
             type: 'createRefundPayout',
             params: ({ context }) => ({
               ticket: context.ticket,
@@ -1254,6 +1399,12 @@ export const ticketMachine = setup({
         actions: [
           {
             type: 'cancelTicket',
+            params: ({ context }) => ({
+              ticket: context.ticket
+            })
+          },
+          {
+            type: 'saveTicket',
             params: ({ context }) => ({
               ticket: context.ticket
             })
@@ -1299,6 +1450,12 @@ export const ticketMachine = setup({
       actions: [
         {
           type: 'endShow',
+          params: ({ context }) => ({
+            ticket: context.ticket
+          })
+        },
+        {
+          type: 'saveTicket',
           params: ({ context }) => ({
             ticket: context.ticket
           })

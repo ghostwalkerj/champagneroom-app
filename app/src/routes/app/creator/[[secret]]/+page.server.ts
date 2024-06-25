@@ -22,7 +22,7 @@ import { User, type UserDocument } from '$lib/models/user';
 import type { WalletDocument } from '$lib/models/wallet';
 
 import {
-  createShowMachineService,
+  createShowActor,
   type ShowMachineEventType,
   type ShowMachineStateType
 } from '$lib/machines/showMachine';
@@ -139,7 +139,7 @@ export const actions: Actions = {
       }
     })) as ShowDocument;
     // return new permissions also
-    const showService = createShowMachineService({
+    const showService = createShowActor({
       show,
       redisConnection: locals.redisConnection
     });
@@ -162,7 +162,7 @@ export const actions: Actions = {
     if (!show) {
       throw error(404, 'Show not found');
     }
-    const showService = createShowMachineService({
+    const showService = createShowActor({
       show,
       redisConnection
     });
@@ -198,7 +198,7 @@ export const actions: Actions = {
       throw error(404, 'Show ID not found');
     }
     const redisConnection = locals.redisConnection as IORedis;
-    const showService = createShowMachineService({
+    const showService = createShowActor({
       show,
       redisConnection
     });
@@ -250,7 +250,7 @@ export const actions: Actions = {
       throw error(404, 'Show not found');
     }
 
-    const showService = createShowMachineService({
+    const showService = createShowActor({
       show,
       redisConnection
     });
@@ -270,7 +270,7 @@ export const actions: Actions = {
     if (!show) {
       throw error(404, 'Show not found');
     }
-    const showService = createShowMachineService({
+    const showService = createShowActor({
       show,
       redisConnection
     });
@@ -377,12 +377,10 @@ export const load: PageServerLoad = async ({ locals }) => {
     throw error(404, 'Creator not found');
   }
 
-  const show =
-    locals.show ??
-    ((await Show.findOne({
-      creator: creator._id,
-      'showState.current': true
-    }).exec()) as ShowDocument);
+  const show = (await Show.findOne({
+    creator: creator._id,
+    'showState.current': true
+  }).exec()) as ShowDocument;
 
   const room =
     (locals.room as RoomDocument) ??
@@ -446,7 +444,7 @@ export const load: PageServerLoad = async ({ locals }) => {
       },
       env.JITSI_JWT_SECRET || '' // Ensure env.JITSI_JWT_SECRET is not undefined
     );
-    const sms = createShowMachineService({
+    const sms = createShowActor({
       show,
       redisConnection: locals.redisConnection as IORedis
     });

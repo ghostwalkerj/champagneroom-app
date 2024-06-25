@@ -6,7 +6,7 @@ import type { TicketDocument } from '$lib/models/ticket';
 import type { WalletDocument } from '$lib/models/wallet';
 import { atomicUpdateCallback } from '$lib/models/wallet';
 
-import { createShowMachineService } from '$lib/machines/showMachine';
+import { createShowActor } from '$lib/machines/showMachine';
 import { createTicketMachineService } from '$lib/machines/ticketMachine';
 import { createWalletMachineService } from '$lib/machines/walletMachine';
 
@@ -21,7 +21,7 @@ export const getShowMachineServiceFromId = async (
       throw new Error('Show not found');
     })
     .exec()) as ShowDocument;
-  return createShowMachineService({
+  return createShowActor({
     show,
     redisConnection
   });

@@ -15,7 +15,7 @@ import { Show } from '$lib/models/show';
 import type { TicketDocument } from '$lib/models/ticket';
 import { Ticket } from '$lib/models/ticket';
 
-import { createShowMachineService } from '$lib/machines/showMachine';
+import { createShowActor } from '$lib/machines/showMachine';
 import {
   createTicketMachineService,
   type TicketMachineEventType
@@ -137,7 +137,7 @@ const refundTickets = async (
   redisConnection: IORedis,
   payoutQueue: PayoutQueueType
 ) => {
-  const showService = createShowMachineService({
+  const showService = createShowActor({
     show,
     redisConnection
   });
@@ -568,7 +568,7 @@ const ticketDisputeResolved = async (
   redisConnection: IORedis,
   payoutQueue: PayoutQueueType
 ) => {
-  const showService = createShowMachineService({
+  const showService = createShowActor({
     show,
     redisConnection
   });
