@@ -257,6 +257,7 @@ export const ticketMachine = setup({
     cancelTicket: assign((_, params: { ticket: TicketDocument }) => {
       const ticket = params.ticket;
       ticket.ticketState.status = TicketStatus.CANCELLED;
+      ticket.ticketState.isActive = false;
       return { ticket };
     }),
 
@@ -437,6 +438,7 @@ export const ticketMachine = setup({
 
         ticket.ticketState.status = TicketStatus.FINALIZED;
         ticket.ticketState.finalize = finalize;
+        ticket.ticketState.isActive = false;
         return { ticket };
       }
     ),
@@ -463,12 +465,6 @@ export const ticketMachine = setup({
         return { ticket };
       }
     ),
-
-    deactivateTicket: assign((_, params: { ticket: TicketDocument }) => {
-      const ticket = params.ticket;
-      ticket.ticketState.isActive = false;
-      return { ticket };
-    }),
 
     missShow: assign((_, params: { ticket: TicketDocument }) => {
       const ticket = params.ticket;
@@ -1017,38 +1013,10 @@ export const ticketMachine = setup({
       }
     },
     cancelled: {
-      type: 'final',
-      entry: [
-        {
-          type: 'deactivateTicket',
-          params: ({ context }) => ({
-            ticket: context.ticket
-          })
-        },
-        {
-          type: 'saveTicket',
-          params: ({ context }) => ({
-            ticket: context.ticket
-          })
-        }
-      ]
+      type: 'final'
     },
     finalized: {
-      type: 'final',
-      entry: [
-        {
-          type: 'deactivateTicket',
-          params: ({ context }) => ({
-            ticket: context.ticket
-          })
-        },
-        {
-          type: 'saveTicket',
-          params: ({ context }) => ({
-            ticket: context.ticket
-          })
-        }
-      ]
+      type: 'final'
     },
     ended: {
       initial: 'inEscrow',

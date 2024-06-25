@@ -197,6 +197,8 @@ export const showMachine = setup({
       ) => {
         const show = params.show;
         show.showState.status = ShowStatus.CANCELLED;
+        show.showState.isActive = false;
+        show.showState.current = false;
         return {
           show
         };
@@ -376,20 +378,6 @@ export const showMachine = setup({
       }
     ),
 
-    deactivateShow: assign(
-      (
-        _,
-        params: {
-          show: ShowDocument;
-        }
-      ) => {
-        const show = params.show;
-        show.showState.isActive = false;
-        show.showState.current = false;
-        return { show };
-      }
-    ),
-
     cancelTicket: assign(
       (
         _,
@@ -486,6 +474,8 @@ export const showMachine = setup({
             startedAt: new Date()
           });
         show.showState.escrow.endedAt = new Date();
+        show.showState.isActive = false;
+        show.showState.current = false;
         return { show };
       }
     )
@@ -689,13 +679,7 @@ export const showMachine = setup({
       ]
     },
     cancelled: {
-      type: 'final',
-      entry: [
-        {
-          type: 'deactivateShow',
-          params: ({ context }) => ({ show: context.show })
-        }
-      ]
+      type: 'final'
     },
     ended: {
       always: {
@@ -710,6 +694,12 @@ export const showMachine = setup({
         actions: [
           {
             type: 'finalizeShow',
+            params: ({ context }) => ({
+              show: context.show
+            })
+          },
+          {
+            type: 'saveShow',
             params: ({ context }) => ({
               show: context.show
             })
@@ -733,6 +723,12 @@ export const showMachine = setup({
                 show: context.show,
                 ticket: event.ticket
               })
+            },
+            {
+              type: 'saveShow',
+              params: ({ context }) => ({
+                show: context.show
+              })
             }
           ]
         },
@@ -743,6 +739,12 @@ export const showMachine = setup({
               params: ({ context, event }) => ({
                 show: context.show,
                 ticket: event.ticket
+              })
+            },
+            {
+              type: 'saveShow',
+              params: ({ context }) => ({
+                show: context.show
               })
             }
           ]
@@ -756,6 +758,12 @@ export const showMachine = setup({
                   show: context.show,
                   decision: event.decision
                 })
+              },
+              {
+                type: 'saveShow',
+                params: ({ context }) => ({
+                  show: context.show
+                })
               }
             ]
           }
@@ -763,13 +771,7 @@ export const showMachine = setup({
       }
     },
     finalized: {
-      type: 'final',
-      entry: [
-        {
-          type: 'deactivateShow',
-          params: ({ context }) => ({ show: context.show })
-        }
-      ]
+      type: 'final'
     },
     boxOfficeOpen: {
       on: {
@@ -795,6 +797,12 @@ export const showMachine = setup({
                 params: ({ context }) => ({
                   show: context.show
                 })
+              },
+              {
+                type: 'saveShow',
+                params: ({ context }) => ({
+                  show: context.show
+                })
               }
             ]
           },
@@ -806,6 +814,12 @@ export const showMachine = setup({
                 params: ({ context, event }) => ({
                   show: context.show,
                   cancel: event.cancel
+                })
+              },
+              {
+                type: 'saveShow',
+                params: ({ context }) => ({
+                  show: context.show
                 })
               },
               {
@@ -841,6 +855,12 @@ export const showMachine = setup({
                 params: ({ context }) => ({
                   show: context.show
                 })
+              },
+              {
+                type: 'saveShow',
+                params: ({ context }) => ({
+                  show: context.show
+                })
               }
             ]
           },
@@ -851,6 +871,12 @@ export const showMachine = setup({
                 params: ({ context, event }) => ({
                   show: context.show,
                   ticket: event.ticket
+                })
+              },
+              {
+                type: 'saveShow',
+                params: ({ context }) => ({
+                  show: context.show
                 })
               }
             ]
@@ -864,6 +890,12 @@ export const showMachine = setup({
                 show: context.show,
                 ticket: event.ticket
               })
+            },
+            {
+              type: 'saveShow',
+              params: ({ context }) => ({
+                show: context.show
+              })
             }
           ]
         },
@@ -874,6 +906,12 @@ export const showMachine = setup({
               params: ({ context, event }) => ({
                 show: context.show,
                 ticket: event.ticket
+              })
+            },
+            {
+              type: 'saveShow',
+              params: ({ context }) => ({
+                show: context.show
               })
             }
           ]
@@ -893,6 +931,12 @@ export const showMachine = setup({
               params: ({ context }) => ({
                 show: context.show
               })
+            },
+            {
+              type: 'saveShow',
+              params: ({ context }) => ({
+                show: context.show
+              })
             }
           ]
         },
@@ -904,6 +948,12 @@ export const showMachine = setup({
                 params: ({ context, event }) => ({
                   show: context.show,
                   ticket: event.ticket
+                })
+              },
+              {
+                type: 'saveShow',
+                params: ({ context }) => ({
+                  show: context.show
                 })
               }
             ]
@@ -928,6 +978,12 @@ export const showMachine = setup({
               params: ({ context }) => ({
                 show: context.show
               })
+            },
+            {
+              type: 'saveShow',
+              params: ({ context }) => ({
+                show: context.show
+              })
             }
           ]
         },
@@ -947,6 +1003,12 @@ export const showMachine = setup({
                   show: context.show,
                   ticket: event.ticket
                 })
+              },
+              {
+                type: 'saveShow',
+                params: ({ context }) => ({
+                  show: context.show
+                })
               }
             ]
           }
@@ -958,6 +1020,12 @@ export const showMachine = setup({
               params: ({ context, event }) => ({
                 show: context.show,
                 ticket: event.ticket
+              })
+            },
+            {
+              type: 'saveShow',
+              params: ({ context }) => ({
+                show: context.show
               })
             }
           ]
@@ -976,6 +1044,12 @@ export const showMachine = setup({
                 params: ({ context, event }) => ({
                   show: context.show,
                   ticket: event.ticket
+                })
+              },
+              {
+                type: 'saveShow',
+                params: ({ context }) => ({
+                  show: context.show
                 })
               }
             ],
@@ -1002,6 +1076,12 @@ export const showMachine = setup({
                 params: ({ context }) => ({
                   show: context.show
                 })
+              },
+              {
+                type: 'saveShow',
+                params: ({ context }) => ({
+                  show: context.show
+                })
               }
             ]
           },
@@ -1013,6 +1093,12 @@ export const showMachine = setup({
                 params: ({ context, event }) => ({
                   show: context.show,
                   cancel: event.cancel
+                })
+              },
+              {
+                type: 'saveShow',
+                params: ({ context }) => ({
+                  show: context.show
                 })
               }
             ]
@@ -1029,6 +1115,12 @@ export const showMachine = setup({
               params: ({ context }) => ({
                 show: context.show
               })
+            },
+            {
+              type: 'saveShow',
+              params: ({ context }) => ({
+                show: context.show
+              })
             }
           ]
         },
@@ -1040,6 +1132,12 @@ export const showMachine = setup({
                 show: context.show,
                 ticket: event.ticket
               })
+            },
+            {
+              type: 'saveShow',
+              params: ({ context }) => ({
+                show: context.show
+              })
             }
           ]
         },
@@ -1050,6 +1148,12 @@ export const showMachine = setup({
           actions: [
             {
               type: 'stopShow',
+              params: ({ context }) => ({
+                show: context.show
+              })
+            },
+            {
+              type: 'saveShow',
               params: ({ context }) => ({
                 show: context.show
               })
@@ -1068,6 +1172,12 @@ export const showMachine = setup({
               params: ({ context }) => ({
                 show: context.show
               })
+            },
+            {
+              type: 'saveShow',
+              params: ({ context }) => ({
+                show: context.show
+              })
             }
           ],
           guard: {
@@ -1083,6 +1193,12 @@ export const showMachine = setup({
           actions: [
             {
               type: 'endShow',
+              params: ({ context }) => ({
+                show: context.show
+              })
+            },
+            {
+              type: 'saveShow',
               params: ({ context }) => ({
                 show: context.show
               })
@@ -1109,6 +1225,12 @@ export const showMachine = setup({
               actions: [
                 {
                   type: 'initiateRefund',
+                  params: ({ context }) => ({
+                    show: context.show
+                  })
+                },
+                {
+                  type: 'saveShow',
                   params: ({ context }) => ({
                     show: context.show
                   })
@@ -1150,6 +1272,12 @@ export const showMachine = setup({
                     params: ({ context }) => ({
                       show: context.show
                     })
+                  },
+                  {
+                    type: 'saveShow',
+                    params: ({ context }) => ({
+                      show: context.show
+                    })
                   }
                 ]
               },
@@ -1160,6 +1288,12 @@ export const showMachine = setup({
                     params: ({ context, event }) => ({
                       show: context.show,
                       ticket: event.ticket
+                    })
+                  },
+                  {
+                    type: 'saveShow',
+                    params: ({ context }) => ({
+                      show: context.show
                     })
                   }
                 ]
