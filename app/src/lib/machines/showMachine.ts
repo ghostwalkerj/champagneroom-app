@@ -115,15 +115,17 @@ export type ShowMachineServiceType = ReturnType<typeof createShowActor>;
 export type ShowMachineSnapshotType = SnapshotFrom<typeof showMachine>;
 
 const createShowEvent = (show: ShowDocument, event: AnyEventObject) => {
-  let customerName = 'someone';
-  let ticketId = '';
-  if ('ticket' in event) {
-    const ticket = event.ticket as TicketDocument;
-    ticketId = ticket._id.toString();
-    customerName = ticket.user.name;
-  } else if ('customerName' in event) {
-    customerName = event.customerName as string;
-  }
+  const ticketId = (
+    'ticket' in event ? event.ticket._id.toString() : undefined
+  ) as string | undefined;
+  const customerName = (
+    'customerName' in event
+      ? event.customerName
+      : 'ticket' in event
+        ? event.ticket.user.name
+        : 'someone'
+  ) as string;
+
   const transaction = (
     'transaction' in event ? event.transaction : undefined
   ) as TransactionDocument | undefined;

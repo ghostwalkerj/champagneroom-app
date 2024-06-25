@@ -1,20 +1,16 @@
 //import adapter from '@sveltejs/adapter-auto';
 import adapter from '@sveltejs/adapter-node';
-import preprocess from 'svelte-preprocess';
+import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
-  onwarn: (
-    /** @type {{ code: string; }} */ warning,
-    /** @type {(arg0: any) => void} */ handler
-  ) => {
-    // suppress warnings on `vite dev` and `vite build`; but even without this, things still work
-    if (warning.code === 'a11y-click-events-have-key-events') return;
+  preprocess: vitePreprocess(),
+  onwarn: (warning, handler) => {
+    if (warning.code.startsWith('a11y-')) return;
+    if (warning.code === 'missing-exports-condition') return;
     if (warning.code === 'a11y-no-static-element-interactions') return;
-    if (warning.code === 'a11y-no-noninteractive-element-interactions') return;
-    // if (warning.code === 'CIRCULAR_DEPENDENCY') return;
-    // if(warning.code === 'THIS_IS_UNDEFINED') return;
-
+    if (warning.code === 'svelte-ignore a11y-autofocus') return;
+    if (warning.code.startsWith('css-unused-selector')) return;
     handler(warning);
   },
   kit: {
@@ -28,12 +24,7 @@ const config = {
       $ext: './src/lib/ext',
       $server: './src/lib/server'
     }
-  },
-  preprocess: [
-    preprocess({
-      postcss: true
-    })
-  ]
+  }
 };
 
 export default config;
