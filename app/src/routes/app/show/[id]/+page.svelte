@@ -1,6 +1,9 @@
 <script lang="ts">
   import type { ModalSettings } from '@skeletonlabs/skeleton';
   import { getModalStore } from '@skeletonlabs/skeleton';
+  import { onMount } from 'svelte';
+
+  import { invalidateAll } from '$app/navigation';
 
   import type { ShowDocument } from '$lib/models/show';
 
@@ -17,7 +20,7 @@
 
   const modalStore = getModalStore();
 
-  let show = data.show as ShowDocument;
+  $: show = data.show as ShowDocument;
   let displayName = data.displayName;
   let isBuyingTicket = false;
 
@@ -33,6 +36,12 @@
       form: data.form
     }
   };
+
+  onMount(() => {
+    setInterval(() => {
+      if (show.showState.isActive) invalidateAll();
+    }, 5000);
+  });
 </script>
 
 <!-- Page header -->
