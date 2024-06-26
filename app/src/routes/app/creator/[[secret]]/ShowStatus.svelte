@@ -56,7 +56,7 @@
     <p class="capitalize">{statusText.toLowerCase()}</p>
   </div>
 
-  <div class="flex flex-1 gap-2 p-4">
+  <div class="flex flex-1 flex-grow gap-2 p-4">
     <Icon
       icon="mingcute:information-line"
       class="text-2xl text-secondary-500"
@@ -65,14 +65,16 @@
   </div>
 
   {#if canStartShow}
-    <button
-      class="variant-filled-primary btn flex-1 whitespace-nowrap font-semibold text-black shadow-black hover:shadow-lg lg:rounded-l-none"
-      type="submit"
-      disabled={isLoading}
-      on:click={() => {
-        isLoading = true;
-        onGoToShow();
-      }}>Start Show</button
-    >
+    <div class="flex">
+      <button
+        class="variant-filled-primary btn whitespace-nowrap font-semibold text-black shadow-black hover:shadow-lg lg:rounded-l-none"
+        type="submit"
+        disabled={isLoading}
+        on:click={() => {
+          isLoading = true;
+          onGoToShow();
+        }}>Start Show</button
+      >
+    </div>
   {/if}
 </div>

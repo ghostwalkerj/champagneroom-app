@@ -62,11 +62,12 @@
 
   const useNewShow = async (
     show: ShowDocument | undefined,
-    showPermissions: ShowPermissionsType
+    showPermissions: ShowPermissionsType,
+    event?: ShowEventDocument
   ) => {
     sPermissions = showPermissions;
     currentShow = show;
-    currentEvent = undefined;
+    currentEvent = event;
     showUnSub?.();
     if (show && sPermissions.isActive) {
       showUnSub = ShowStore(show).subscribe((_show) => {
@@ -85,7 +86,7 @@
     walletUnSub = WalletStore(wallet).subscribe((value) => {
       wallet = value;
     });
-    useNewShow(currentShow, sPermissions);
+    useNewShow(currentShow, sPermissions, currentEvent);
   });
 
   const unSubAll = () => {

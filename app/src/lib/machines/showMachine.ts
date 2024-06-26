@@ -451,8 +451,11 @@ export const showMachine = setup({
         }
       ) => {
         const show = params.show;
+        // Add logic for free show that doesn't reserve a ticket
         show.$inc('showState.salesStats.ticketsSold', 1);
-        show.$inc('showState.salesStats.ticketsReserved', -1);
+        if (show.price.amount === 0)
+          show.$inc('showState.salesStats.ticketsAvailable', -1);
+        else show.$inc('showState.salesStats.ticketsReserved', -1);
         show.showState.sales.push(params.ticket._id);
         return { show };
       }
@@ -901,23 +904,55 @@ export const showMachine = setup({
             }
           ]
         },
-        'TICKET SOLD': {
-          actions: [
-            {
-              type: 'sellTicket',
-              params: ({ context, event }) => ({
-                show: context.show,
-                ticket: event.ticket
-              })
-            },
-            {
-              type: 'saveShow',
+        'TICKET SOLD': [
+          {
+            target: 'boxOfficeClosed',
+            guard: {
+              type: 'soldOut',
               params: ({ context }) => ({
                 show: context.show
               })
-            }
-          ]
-        },
+            },
+            actions: [
+              {
+                type: 'sellTicket',
+                params: ({ context, event }) => ({
+                  show: context.show,
+                  ticket: event.ticket
+                })
+              },
+              {
+                type: 'closeBoxOffice',
+                params: ({ context }) => ({
+                  show: context.show
+                })
+              },
+              {
+                type: 'saveShow',
+                params: ({ context }) => ({
+                  show: context.show
+                })
+              }
+            ]
+          },
+          {
+            actions: [
+              {
+                type: 'sellTicket',
+                params: ({ context, event }) => ({
+                  show: context.show,
+                  ticket: event.ticket
+                })
+              },
+              {
+                type: 'saveShow',
+                params: ({ context }) => ({
+                  show: context.show
+                })
+              }
+            ]
+          }
+        ],
         'SHOW STARTED': {
           target: 'started',
           guard: {
