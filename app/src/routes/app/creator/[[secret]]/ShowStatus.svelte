@@ -1,47 +1,23 @@
 <script lang="ts">
   import Icon from '@iconify/svelte';
-  import { onDestroy, onMount } from 'svelte';
-  import type { Unsubscriber } from 'svelte/store';
+  import { onMount } from 'svelte';
 
   import type { ShowDocument } from '$lib/models/show';
   import type { ShowEventDocument } from '$lib/models/showEvent';
 
   import { createEventText } from '$lib/eventUtil';
 
-  import { ShowEventStore } from '$stores';
-
   export let canStartShow: boolean;
   export let isLoading: boolean = false;
   export let onGoToShow: () => void;
   export let show: ShowDocument | undefined;
   export let showEvent: ShowEventDocument | undefined;
-  let showEventUnSub: Unsubscriber | undefined;
   $: statusText = 'No Current Show';
   $: eventText = 'No Events';
 
   onMount(() => {
     eventText = createEventText(showEvent);
     statusText = show === undefined ? 'No Current Show' : show.showState.status;
-
-    if (show && show.showState.isActive) {
-      if (showEvent && showEvent.show !== show._id) {
-        showEvent = undefined;
-        eventText = 'No Events';
-      }
-      showEventUnSub?.();
-      showEventUnSub = ShowEventStore(show).subscribe((_showEvent) => {
-        if (_showEvent) {
-          showEvent = _showEvent;
-          eventText = createEventText(_showEvent);
-        }
-      });
-    } else {
-      statusText = 'No Current Show';
-      showEventUnSub?.();
-    }
-  });
-  onDestroy(() => {
-    showEventUnSub?.();
   });
 </script>
 

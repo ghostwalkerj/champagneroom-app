@@ -387,7 +387,7 @@ export const load: PageServerLoad = async ({ locals }) => {
     ((await Room.findById(creator.room).exec()) as RoomDocument);
   let showEvent: ShowEventDocument | undefined;
 
-  if (show !== undefined) {
+  if (show !== null) {
     const se = await ShowEvent.find(
       { show: show._id },
       {},

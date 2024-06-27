@@ -73,7 +73,10 @@
       showUnSub = ShowStore(show).subscribe((_show) => {
         if (_show) {
           currentShow = _show;
-          invalidateAll();
+          invalidateAll().then(() => {
+            currentEvent = data.showEvent as ShowEventDocument | undefined;
+            sPermissions = data.showPermissions;
+          });
         }
       });
     }
@@ -159,7 +162,7 @@
       <!-- 1st column -->
       <div class="flex-1 space-y-3 md:col-span-3 md:col-start-1">
         <!-- Status -->
-        {#key currentShow}
+        {#key currentShow && currentEvent}
           <ShowStatus
             canStartShow={sPermissions.canStartShow}
             bind:isLoading
