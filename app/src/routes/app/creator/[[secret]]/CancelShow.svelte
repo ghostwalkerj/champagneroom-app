@@ -18,12 +18,7 @@
     isLoading = true;
     return async ({ result }: { result: ActionResult }) => {
       if (result.type === 'success') {
-        switch (true) {
-          case result.data!.showCancelled: {
-            onShowCancelled(result.data!.show, result.data!.showPermissions);
-            break;
-          }
-        }
+        onShowCancelled(result.data!.show, result.data!.showPermissions);
       }
       await applyAction(result);
       isLoading = false;

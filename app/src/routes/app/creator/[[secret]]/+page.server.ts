@@ -149,7 +149,6 @@ export const actions: Actions = {
 
     return {
       success: true,
-      showCreated: true,
       show: show.toJSON({ flattenMaps: true, flattenObjectIds: true }),
       form,
       showPermissions
@@ -186,7 +185,6 @@ export const actions: Actions = {
 
     return {
       success: true,
-      showCancelled: true,
       show: show.toJSON({ flattenMaps: true, flattenObjectIds: true }),
       showPermissions
     };
