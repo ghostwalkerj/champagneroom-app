@@ -31,18 +31,13 @@
     dataType: 'json',
     onResult({ result }) {
       if (result.type === 'success') {
-        switch (true) {
-          case result.data!.showCreated: {
-            const showUrl = urlJoin(
-              window.location.origin,
-              config.PATH.show,
-              result.data!.show!._id.toString()
-            );
-            navigator.clipboard.writeText(showUrl);
-            onShowCreated(result.data!.show, result.data!.showPermissions);
-            break;
-          }
-        }
+        const showUrl = urlJoin(
+          window.location.origin,
+          config.PATH.show,
+          result.data!.show!._id.toString()
+        );
+        navigator.clipboard.writeText(showUrl);
+        onShowCreated(result.data!.show, result.data!.showPermissions);
       }
     }
   });
