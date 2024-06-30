@@ -72,7 +72,6 @@
     if (show && sPermissions.isActive) {
       showUnSub = ShowStore(show).subscribe((_show) => {
         if (_show && currentShow && _show.id === currentShow.id) {
-          console.log('Show Updated', _show);
           currentShow = _show;
           invalidateAll().then(() => {
             currentEvent = data.showEvent as ShowEventDocument | undefined;
@@ -163,7 +162,7 @@
       <!-- 1st column -->
       <div class="flex-1 space-y-3 md:col-span-3 md:col-start-1">
         <!-- Status -->
-        {#key currentShow && currentEvent}
+        {#key currentShow && currentShow.showState.status}
           <ShowStatus
             canStartShow={sPermissions.canStartShow}
             bind:isLoading
