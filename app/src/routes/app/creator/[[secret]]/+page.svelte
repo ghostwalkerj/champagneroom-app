@@ -65,13 +65,14 @@
     showPermissions: ShowPermissionsType,
     event?: ShowEventDocument
   ) => {
+    showUnSub?.();
     sPermissions = showPermissions;
     currentShow = show;
     currentEvent = event;
-    showUnSub?.();
     if (show && sPermissions.isActive) {
       showUnSub = ShowStore(show).subscribe((_show) => {
-        if (_show) {
+        if (_show && currentShow && _show.id === currentShow.id) {
+          console.log('Show Updated', _show);
           currentShow = _show;
           invalidateAll().then(() => {
             currentEvent = data.showEvent as ShowEventDocument | undefined;

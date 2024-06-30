@@ -375,17 +375,14 @@ export const load: PageServerLoad = async ({ locals }) => {
     throw error(404, 'Creator not found');
   }
 
-  const show = (await Show.findOne({
-    creator: creator._id,
-    'showState.current': true
-  }).exec()) as ShowDocument;
+  const show = locals.show as ShowDocument;
 
   const room =
     (locals.room as RoomDocument) ??
     ((await Room.findById(creator.room).exec()) as RoomDocument);
   let showEvent: ShowEventDocument | undefined;
 
-  if (show !== null) {
+  if (show) {
     const se = await ShowEvent.find(
       { show: show._id },
       {},

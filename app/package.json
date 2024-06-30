@@ -105,6 +105,7 @@
     "orval": "^6.28.2",
     "outmatch": "^1.0.0",
     "postcss": "^8.4.38",
+    "postcss-import": "^16.1.0",
     "postcss-load-config": "^6.0.1",
     "postcss-nesting": "^12.1.2",
     "prettier": "^3.2.5",
