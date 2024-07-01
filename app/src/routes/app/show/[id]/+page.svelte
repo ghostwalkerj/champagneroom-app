@@ -3,7 +3,7 @@
   import { getModalStore } from '@skeletonlabs/skeleton';
   import { onMount } from 'svelte';
 
-  import { invalidateAll } from '$app/navigation';
+  import { invalidate } from '$app/navigation';
 
   import type { ShowDocument } from '$lib/models/show';
 
@@ -39,7 +39,7 @@
 
   onMount(() => {
     setInterval(() => {
-      if (show.showState.isActive) invalidateAll();
+      if (show.showState.isActive) invalidate('app:show');
     }, 5000);
   });
 </script>

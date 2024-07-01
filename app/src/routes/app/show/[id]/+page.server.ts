@@ -98,18 +98,7 @@ export const actions: Actions = {
   }
 };
 
-export const load: PageServerLoad = async (event) => {
-  const showId = event.params.id;
-  if (showId === null) {
-    throw error(404, 'Champagne Show not found');
-  }
-
-  const show = await Show.findById(showId)
-    .orFail(() => {
-      throw error(404, 'Show not found');
-    })
-    .exec();
-
+export const load: PageServerLoad = async () => {
   const displayName = uniqueNamesGenerator({
     dictionaries: [mensNames]
   });
@@ -126,7 +115,6 @@ export const load: PageServerLoad = async (event) => {
   );
 
   return {
-    show: show.toObject({ flattenObjectIds: true, flattenMaps: true }),
     displayName,
     form
   };
