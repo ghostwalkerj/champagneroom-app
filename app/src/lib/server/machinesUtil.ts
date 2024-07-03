@@ -93,8 +93,6 @@ export const getShowPermissionsFromShow = ({
     redisConnection
   });
 
-  console.log(show);
-
   const showMachineState = showService.getSnapshot();
   showService.stop();
   return getShowPermissions(showMachineState);
