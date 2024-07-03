@@ -27,6 +27,14 @@ import { DisputeDecision, EntityType, ShowStatus } from '$lib/constants';
 
 export type ShowActorType = ReturnType<typeof createShowActor>;
 
+export type ShowMachineContext = {
+  show: ShowDocument;
+  id: string;
+  errorMessage?: string;
+  options: ShowMachineOptions;
+  showQueue: ShowQueueType;
+};
+
 //#region Event Types
 export type ShowMachineEventType =
   | {
@@ -103,16 +111,11 @@ export type ShowMachineOptions = {
   escrowPeriod: number;
 };
 
-type ShowMachineContext = {
-  show: ShowDocument;
-  id: string;
-  errorMessage?: string;
-  options: ShowMachineOptions;
-  showQueue: ShowQueueType;
-};
-
 export type ShowMachineServiceType = ReturnType<typeof createShowActor>;
 export type ShowMachineSnapshotType = SnapshotFrom<typeof showMachine>;
+
+export type ShowMachineStateType = StateFrom<typeof showMachine>;
+export type ShowMachineType = typeof showMachine;
 
 const createShowEvent = (show: ShowDocument, event: AnyEventObject) => {
   const ticketId = (
@@ -132,10 +135,6 @@ const createShowEvent = (show: ShowDocument, event: AnyEventObject) => {
   const ticketInfo = { customerName };
   show.saveShowEvent(event.type, ticketId, transaction, ticketInfo);
 };
-
-export type ShowMachineStateType = StateFrom<typeof showMachine>;
-
-export type ShowMachineType = typeof showMachine;
 
 export const createShowActor = (input: ShowMachineInput) => {
   const showActor = createActor(showMachine, {

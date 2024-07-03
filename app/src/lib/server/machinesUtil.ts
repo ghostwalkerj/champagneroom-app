@@ -6,9 +6,25 @@ import type { TicketDocument } from '$lib/models/ticket';
 import type { WalletDocument } from '$lib/models/wallet';
 import { atomicUpdateCallback } from '$lib/models/wallet';
 
-import { createShowActor } from '$lib/machines/showMachine';
+import {
+  createShowActor,
+  type ShowMachineStateType
+} from '$lib/machines/showMachine';
 import { createTicketMachineService } from '$lib/machines/ticketMachine';
 import { createWalletMachineService } from '$lib/machines/walletMachine';
+
+import { ActorType, CancelReason } from '$lib/constants';
+
+export type ShowPermissionsType = {
+  showId: string;
+  stateValue: ShowMachineStateType['value'];
+  showStopped: boolean;
+  showCancelled: boolean;
+  canCancelShow: boolean;
+  canStartShow: boolean;
+  canCreateShow: boolean;
+  isActive: boolean;
+};
 
 export const getShowMachineServiceFromId = async (
   showId: string,
@@ -25,6 +41,45 @@ export const getShowMachineServiceFromId = async (
     show,
     redisConnection
   });
+};
+
+export const getShowPermissions = (state: ShowMachineStateType) => {
+  const showPermissions = {
+    showId: state.context.show._id.toString(),
+    stateValue: state.value,
+    showStopped: state.matches('stopped'),
+    showCancelled: state.matches('cancelled'),
+    canCancelShow: state.can({
+      type: 'CANCELLATION INITIATED',
+      cancel: {
+        cancelledAt: new Date(),
+        cancelledBy: ActorType.CREATOR,
+        reason: CancelReason.CREATOR_CANCELLED
+      }
+    }),
+    canCreateShow: !state.context.show.showState.isActive,
+    canStartShow: state.can({
+      type: 'SHOW STARTED'
+    }),
+    isActive: state.context.show.showState.isActive
+  };
+  return showPermissions;
+};
+
+export const getShowPermissionsFromShow = ({
+  show,
+  redisConnection
+}: {
+  show: ShowDocument;
+  redisConnection: IORedis;
+}) => {
+  const showService = createShowActor({
+    show,
+    redisConnection
+  });
+  const showMachineState = showService.getSnapshot();
+  showService.stop();
+  return getShowPermissions(showMachineState);
 };
 
 export const getTicketMachineServiceFromId = async (
