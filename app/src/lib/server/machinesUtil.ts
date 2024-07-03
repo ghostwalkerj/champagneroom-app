@@ -43,7 +43,19 @@ export const getShowMachineServiceFromId = async (
   });
 };
 
-export const getShowPermissions = (state: ShowMachineStateType) => {
+export const getShowPermissions = (state?: ShowMachineStateType) => {
+  if (state === undefined || !state.matches)
+    return {
+      showId: '',
+      stateValue: 'showLoaded',
+      showStopped: false,
+      showCancelled: false,
+      canCancelShow: false,
+      canStartShow: false,
+      canCreateShow: true,
+      isActive: false
+    } as ShowPermissionsType;
+
   const showPermissions = {
     showId: state.context.show._id.toString(),
     stateValue: state.value,
@@ -73,10 +85,16 @@ export const getShowPermissionsFromShow = ({
   show: ShowDocument;
   redisConnection: IORedis;
 }) => {
+  if (!show) {
+    return getShowPermissions();
+  }
   const showService = createShowActor({
     show,
     redisConnection
   });
+
+  console.log(show);
+
   const showMachineState = showService.getSnapshot();
   showService.stop();
   return getShowPermissions(showMachineState);

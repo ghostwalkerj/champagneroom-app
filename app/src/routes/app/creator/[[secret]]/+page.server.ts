@@ -44,8 +44,7 @@ import {
 } from '$lib/payments';
 import {
   getShowPermissions,
-  getShowPermissionsFromShow,
-  type ShowPermissionsType
+  getShowPermissionsFromShow
 } from '$lib/server/machinesUtil';
 import { ipfsUpload } from '$lib/server/upload';
 
@@ -384,17 +383,6 @@ export const load: PageServerLoad = async ({ locals }) => {
 
   let jitsiToken: string | undefined;
 
-  let showPermissions = {
-    showId: show ? show._id.toString() : '',
-    stateValue: 'showLoaded',
-    showStopped: false,
-    showCancelled: false,
-    canCancelShow: false,
-    canStartShow: false,
-    canCreateShow: true,
-    isActive: false
-  } as ShowPermissionsType;
-
   if (show) {
     jitsiToken = jwt.sign(
       {
@@ -414,14 +402,11 @@ export const load: PageServerLoad = async ({ locals }) => {
       },
       env.JITSI_JWT_SECRET || '' // Ensure env.JITSI_JWT_SECRET is not undefined
     );
-    const sms = createShowActor({
-      show,
-      redisConnection: locals.redisConnection as IORedis
-    });
-    const ss = sms.getSnapshot();
-    sms.stop();
-    showPermissions = getShowPermissions(ss);
   }
+  const showPermissions = getShowPermissionsFromShow({
+    show,
+    redisConnection: locals.redisConnection as IORedis
+  });
 
   const exchangeRate =
     (await rateCryptosRateGet(

@@ -81,7 +81,6 @@
         if (_show) {
           currentShow = _show;
           eventUnSub?.();
-
           eventUnSub = ShowEventStore(_show).subscribe((_event) => {
             if (_event) currentEvent = _event;
           });

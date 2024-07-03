@@ -37,6 +37,7 @@ const config = {
     imageUpload: '/api/v1/upload',
     notifyUpdate: '/api/v1/notify/update',
     notifyInsert: '/api/v1/notify/insert',
+    notifyState: '/api/v1/notify/state',
     staticUrl: 'https://static.champagneroom.app',
     app: '/app',
     openApp: '/app',
