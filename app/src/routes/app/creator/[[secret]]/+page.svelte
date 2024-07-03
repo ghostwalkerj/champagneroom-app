@@ -19,7 +19,12 @@
 
   import ShowDetail from '$components/ShowDetail.svelte';
   import WalletDetail from '$components/WalletDetail.svelte';
-  import { CreatorStore, ShowStore, WalletStore } from '$stores';
+  import {
+    CreatorStore,
+    ShowEventStore,
+    ShowStore,
+    WalletStore
+  } from '$stores';
 
   import type { ShowPermissionsType } from './+page.server';
   import CancelShow from './CancelShow.svelte';
@@ -56,6 +61,7 @@
 
   let creatorUnSub: Unsubscriber;
   let showUnSub: Unsubscriber;
+  let eventUnSub: Unsubscriber;
   let walletUnSub: Unsubscriber;
 
   const modalStore = getModalStore();
@@ -66,16 +72,18 @@
     event?: ShowEventDocument
   ) => {
     showUnSub?.();
+    eventUnSub?.();
     sPermissions = showPermissions;
     currentShow = show;
     currentEvent = event;
     if (show && sPermissions.isActive) {
       showUnSub = ShowStore(show).subscribe((_show) => {
-        if (_show && currentShow && _show.id === currentShow.id) {
+        if (_show) {
           currentShow = _show;
-          invalidateAll().then(() => {
-            currentEvent = data.showEvent as ShowEventDocument | undefined;
-            sPermissions = data.showPermissions;
+          eventUnSub?.();
+
+          eventUnSub = ShowEventStore(_show).subscribe((_event) => {
+            if (_event) currentEvent = _event;
           });
         }
       });
@@ -162,7 +170,7 @@
       <!-- 1st column -->
       <div class="flex-1 space-y-3 md:col-span-3 md:col-start-1">
         <!-- Status -->
-        {#key currentShow && currentShow.showState.status}
+        {#key currentShow}
           <ShowStatus
             canStartShow={sPermissions.canStartShow}
             bind:isLoading

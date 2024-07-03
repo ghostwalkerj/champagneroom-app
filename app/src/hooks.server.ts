@@ -108,6 +108,7 @@ const setLocals = async (decode: JwtPayload, locals: App.Locals) => {
             creator: creator._id,
             'showState.current': true
           }).exec()) as ShowDocument;
+
           if (show) locals.show = show;
 
           // Room can be passed

@@ -48,6 +48,7 @@ import { ipfsUpload } from '$lib/server/upload';
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
 
 export type ShowPermissionsType = {
+  showId: string;
   stateValue: ShowMachineStateType['value'];
   showStopped: boolean;
   showCancelled: boolean;
@@ -59,6 +60,7 @@ export type ShowPermissionsType = {
 
 const getPermissions = (state: ShowMachineStateType) => {
   const showPermissions = {
+    showId: state.context.show._id.toString(),
     stateValue: state.value,
     showStopped: state.matches('stopped'),
     showCancelled: state.matches('cancelled'),
@@ -375,11 +377,15 @@ export const load: PageServerLoad = async ({ locals }) => {
     throw error(404, 'Creator not found');
   }
 
-  const show = locals.show as ShowDocument;
+  const show = (await Show.findOne({
+    creator: creator._id,
+    'showState.current': true
+  }).exec()) as ShowDocument;
 
   const room =
     (locals.room as RoomDocument) ??
     ((await Room.findById(creator.room).exec()) as RoomDocument);
+
   let showEvent: ShowEventDocument | undefined;
 
   if (show) {
@@ -411,6 +417,7 @@ export const load: PageServerLoad = async ({ locals }) => {
   let jitsiToken: string | undefined;
 
   let showPermissions = {
+    showId: show?._id.toString(),
     stateValue: 'showLoaded',
     showStopped: false,
     showCancelled: false,
