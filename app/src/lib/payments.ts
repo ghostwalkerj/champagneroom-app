@@ -84,6 +84,12 @@ export enum PayoutStatus {
   COMPLETE = 'complete'
 }
 
+/**
+ * Calculates the total amount based on the payments provided.
+ *
+ * @param {Map<string, TransactionSummaryType[]>} payments - The map of payments with transaction summary types
+ * @return {number} The total calculated amount
+ */
 export const calcTotal = (payments: Map<string, TransactionSummaryType[]>) => {
   let total = 0;
 
@@ -95,6 +101,15 @@ export const calcTotal = (payments: Map<string, TransactionSummaryType[]>) => {
   return total;
 };
 
+/**
+ * Creates a Bitcart token using the provided email, password, and API URL.
+ *
+ * @param {string} email - The email associated with the Bitcart account.
+ * @param {string} password - The password associated with the Bitcart account.
+ * @param {string} apiURL - The URL of the Bitcart API.
+ * @return {Promise<string>} A promise that resolves to the access token.
+ * @throws {Error} If no data is returned from the Bitcart API or if no access token is returned.
+ */
 export const createBitcartToken = async (
   email: string,
   password: string,
@@ -117,6 +132,15 @@ export const createBitcartToken = async (
   return accessToken as string;
 };
 
+/**
+ * Creates a ticket invoice by sending a request to the Bitcart API, updating the notification URL,
+ * and modifying the invoice.
+ *
+ * @param {Object} ticket - The ticket object containing price and ID.
+ * @param {string} token - The access token for authentication.
+ * @param {BitcartConfig} bcConfig - The Bitcart configuration object.
+ * @return {Promise<DisplayInvoice>} A promise that resolves to the created invoice.
+ */
 export const createTicketInvoice = async ({
   ticket,
   token,

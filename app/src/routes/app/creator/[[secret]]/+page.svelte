@@ -16,6 +16,7 @@
   import type { WalletDocument } from '$lib/models/wallet';
 
   import type { requestPayoutSchema } from '$lib/payments';
+  import type { ShowPermissionsType } from '$lib/server/machinesUtil';
 
   import ShowDetail from '$components/ShowDetail.svelte';
   import WalletDetail from '$components/WalletDetail.svelte';
@@ -26,7 +27,6 @@
     WalletStore
   } from '$stores';
 
-  import type { ShowPermissionsType } from './+page.server';
   import CancelShow from './CancelShow.svelte';
   import CreateShow from './CreateShow.svelte';
   import CreatorActivity from './CreatorActivity.svelte';
@@ -77,15 +77,17 @@
     currentShow = show;
     currentEvent = event;
     if (show && sPermissions.isActive) {
-      showUnSub = ShowStore(show).subscribe((_show) => {
-        if (_show) {
-          currentShow = _show;
-          eventUnSub?.();
-          eventUnSub = ShowEventStore(_show).subscribe((_event) => {
-            if (_event) currentEvent = _event;
-          });
+      showUnSub = ShowStore(show).subscribe(
+        (_show: ShowDocument | undefined) => {
+          if (_show) {
+            currentShow = _show;
+            eventUnSub?.();
+            eventUnSub = ShowEventStore(_show).subscribe((_event) => {
+              if (_event) currentEvent = _event;
+            });
+          }
         }
-      });
+      );
     }
   };
 

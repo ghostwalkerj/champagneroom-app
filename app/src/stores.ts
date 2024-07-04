@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import to from 'await-to-js';
 import dot from 'dot-object';
-import * as _ from 'lodash';
-import { derived, writable } from 'svelte/store';
+import type { Types } from 'mongoose';
+import { derived, type Readable, writable } from 'svelte/store';
 import urlJoin from 'url-join';
 
 import type { AgentDocument } from '$lib/models/agent';
@@ -32,28 +32,26 @@ const enum EntityType {
  *
  * @template T - The type of document being stored.
  * @param {Object} options - The options object.
- * @param {T} options.doc - The document to store.
+ * @param {T} options.doc - The document to store. The document must have an _id property of type Types.ObjectId.
  * @param {EntityType} options.type - The type of the document.
- * @returns {Object} - An object with a `subscribe` method.
+ * @returns {Readable<T>} - An object with a `subscribe` method.
  */
-const abstractUpdateStore = <T extends { _id?: any }>({
-  doc,
-  type
-}: {
+const abstractUpdateStore = <T extends { _id: Types.ObjectId }>(options: {
   doc: T;
   type: EntityType;
-}): object => {
+}): Readable<T> => {
+  const { doc, type } = options;
   const { subscribe, set } = writable<T>(doc, () => {
-    if (!doc._id) {
-      throw new Error('Doc must have an _id');
-    }
-    const callback = (updateDocument: Partial<T>) => {
+    const callback = (updateDocument: Partial<T>): void => {
       dot.object(updateDocument);
-      const updatedDocument = _.merge(doc, updateDocument);
+      const updatedDocument: T = {
+        ...doc,
+        ...updateDocument
+      };
       set(updatedDocument);
     };
 
-    const abortDocument = getUpdateNotification({
+    const abortDocument = getUpdateNotification<T>({
       id: doc._id.toString(),
       callback,
       type
@@ -63,7 +61,7 @@ const abstractUpdateStore = <T extends { _id?: any }>({
       try {
         abortDocument.abort('Unsubscribe');
       } catch (error) {
-        if (error != 'Unsubscribe') {
+        if (error !== 'Unsubscribe') {
           console.error(error);
         }
       }
@@ -75,12 +73,12 @@ const abstractUpdateStore = <T extends { _id?: any }>({
 };
 
 /**
- * Returns a store that updates the provided agent document with incoming notifications.
+ * Returns a store that updates the provided `AgentDocument` with incoming notifications.
  *
- * @param {AgentDocument} agent - The agent document to store.
- * @return {Object} An object with a `subscribe` method.
+ * @param {AgentDocument} agent - The `AgentDocument` to store.
+ * @return {Readable<AgentDocument>} A `Readable` store with a `subscribe` method that updates the provided `AgentDocument`.
  */
-export const AgentStore = (agent: AgentDocument): object => {
+export const AgentStore = (agent: AgentDocument): Readable<AgentDocument> => {
   return abstractUpdateStore<AgentDocument>({
     doc: agent,
     type: EntityType.AGENT
@@ -88,15 +86,17 @@ export const AgentStore = (agent: AgentDocument): object => {
 };
 
 /**
- * Returns a store that updates the provided creator document with incoming notifications.
+ * Returns a store that updates the provided `CreatorDocument` with incoming notifications.
  *
- * @param {CreatorDocument} creator - The creator document to store.
- * @return {Object} An object with a `subscribe` method.
+ * @param {CreatorDocument} creator - The `CreatorDocument` to store.
+ * @return {Readable<CreatorDocument>} A `Readable` store with a `subscribe` method that updates the provided `CreatorDocument`.
  */
-export const CreatorStore = (creator: CreatorDocument): object => {
+export const CreatorStore = (
+  creator: CreatorDocument
+): Readable<CreatorDocument> => {
   return abstractUpdateStore<CreatorDocument>({
     doc: creator,
-    type: EntityType.CREATOR
+    type: EntityType.CREATOR as EntityType.CREATOR
   });
 };
 
@@ -220,9 +220,11 @@ export const RoomStore = (
  * Creates a store for managing show events.
  *
  * @param {ShowDocument} show - The initial show document.
- * @return {Object} An object containing the set function and a subscription to the show event store.
+ * @return { Readable<ShowEventDocument> & { set: (show: ShowDocument) => void } } An object containing the set function and a subscription to the show event store.
  */
-export const ShowEventStore = (show: ShowDocument): object => {
+export const ShowEventStore = (
+  show: ShowDocument
+): Readable<ShowEventDocument> & { set: (show: ShowDocument) => void } => {
   const showStore = writable<ShowDocument>(show);
   const showEventStore = derived<typeof showStore, ShowEventDocument>(
     showStore,
@@ -257,23 +259,24 @@ export const ShowEventStore = (show: ShowDocument): object => {
 /**
  * Creates a ShowStore object that encapsulates the logic for updating a ShowDocument.
  *
- * @param {ShowDocument} show - The initial ShowDocument.
- * @return {Object} An object with an update method for updating the ShowDocument.
+ * @param {ShowDocumentType} show - The initial ShowDocument.
+ * @returns {Readable<ShowDocumentType>} An object with an update method for updating the ShowDocument.
  */
-export const ShowStore = (show: ShowDocument): object => {
-  return abstractUpdateStore<ShowDocument>({
+export const ShowStore = (show: ShowDocument): Readable<ShowDocument> =>
+  abstractUpdateStore<ShowDocument>({
     doc: show,
     type: EntityType.SHOW
   });
-};
 
 /**
- * A function that creates a TicketStore object that encapsulates the logic for updating a TicketDocument.
+ * Creates a TicketStore object that encapsulates the logic for updating a TicketDocument.
  *
  * @param {TicketDocument} ticket - The initial TicketDocument.
- * @return {Object} An object with an update method for updating the TicketDocument.
+ * @returns {Readable<TicketDocument>} An object with an update method for updating the TicketDocument.
  */
-export const TicketStore = (ticket: TicketDocument): object => {
+export const TicketStore = (
+  ticket: TicketDocument
+): Readable<TicketDocument> => {
   return abstractUpdateStore<TicketDocument>({
     doc: ticket,
     type: EntityType.TICKET
@@ -284,12 +287,12 @@ export const TicketStore = (ticket: TicketDocument): object => {
  * Creates a UserStore object that encapsulates the logic for updating a UserDocument.
  *
  * @param {UserDocument} user - The initial UserDocument.
- * @return {Object} An object with an update method for updating the UserDocument.
+ * @returns {Readable<UserDocument>} An object with an update method for updating the UserDocument.
  */
-export const UserStore = (user: UserDocument): object => {
+export const UserStore = (user: UserDocument): Readable<UserDocument> => {
   return abstractUpdateStore<UserDocument>({
     doc: user,
-    type: EntityType.USER
+    type: EntityType.USER as EntityType.USER
   });
 };
 
@@ -297,11 +300,13 @@ export const UserStore = (user: UserDocument): object => {
  * Creates a WalletStore object that encapsulates the logic for updating a WalletDocument.
  *
  * @param {WalletDocument} wallet - The initial WalletDocument.
- * @return {Object} An object with an update method for updating the WalletDocument.
+ * @return {Readable<WalletDocument>} An object with an update method for updating the WalletDocument.
  */
-export const WalletStore = (wallet: WalletDocument): object => {
+export const WalletStore = (
+  wallet: WalletDocument
+): Readable<WalletDocument> => {
   return abstractUpdateStore<WalletDocument>({
     doc: wallet,
-    type: EntityType.WALLET
+    type: EntityType.WALLET as EntityType.WALLET
   });
 };

@@ -51,6 +51,15 @@ import { ipfsUpload } from '$lib/server/upload';
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
 
 export const actions: Actions = {
+  /**
+   * Updates the profile image of a user.
+   *
+   * @param {RequestEvent} requestEvent - The request event object.
+   * @param {FormData} requestEvent.request.formData - The form data containing the image.
+   * @param {UserDocument} requestEvent.locals.user - The user document.
+   * @returns {Promise<{ success: boolean, imageUrl: string } | undefined>} - A promise that resolves to an object containing the success status and the URL of the uploaded image.
+   * @throws {Error} - Throws an error if the user is not found.
+   */
   update_profile_image: async ({ locals, request }: RequestEvent) => {
     const data = await request.formData();
     const image =
@@ -78,6 +87,15 @@ export const actions: Actions = {
     }
   },
 
+  /**
+   * Creates a new show with the provided form data and returns the show, form, and show permissions.
+   *
+   * @param {Object} params - The parameters for creating the show.
+   * @param {Object} params.locals - The locals object containing the creator and redis connection.
+   * @param {Object} params.request - The request object containing the form data.
+   * @return {Promise<Object>} - A promise that resolves to an object containing the success status, show data, form data, and show permissions.
+   * @throws {Error} - Throws an error if the form data is invalid.
+   */
   create_show: async ({ locals, request }) => {
     const form = (await superValidate(
       request,
@@ -124,6 +142,12 @@ export const actions: Actions = {
     };
   },
 
+  /**
+   * Cancel a show and return success status along with show details and permissions.
+   *
+   * @param {Object} locals - The local context object containing show and redisConnection.
+   * @return {Object} An object with success status, show details, and show permissions.
+   */
   cancel_show: async ({ locals }) => {
     const redisConnection = locals.redisConnection as IORedis;
     const show = locals.show as ShowDocument;
@@ -159,6 +183,12 @@ export const actions: Actions = {
     };
   },
 
+  /**
+   * A function to end a show.
+   *
+   * @param {Object} locals - The local context object containing show and redisConnection.
+   * @return {Object} An object with success status and show permissions.
+   */
   end_show: async ({ locals }) => {
     const show = locals.show as ShowDocument;
     if (show === null) {
@@ -182,6 +212,17 @@ export const actions: Actions = {
     };
   },
 
+  /**
+   * Asynchronously handles a request to initiate a payout. Validates the request form,
+   * creates a payout job and adds it to the payout queue. If the form is invalid, returns
+   * a 400 response with the form data. If the payout job fails to be added to the queue,
+   * returns an error message. Otherwise, returns a success message.
+   *
+   * @param {Object} request - The request object containing the form data.
+   * @param {Object} locals - The local context object containing the redisConnection.
+   * @return {Promise<Object>} - A promise that resolves to a JSON object with a success
+   * message or an error message.
+   */
   request_payout: async ({ request, locals }) => {
     const form = await superValidate(request, zod(requestPayoutSchema));
     const { walletId, amount, destination, payoutReason, jobType } = form.data;
@@ -210,6 +251,13 @@ export const actions: Actions = {
     return message(form, 'Payout requested successfully');
   },
 
+  /**
+   * Leaves a show and returns the updated show permissions.
+   *
+   * @param {Object} locals - The local context object containing the redisConnection and show.
+   * @return {Promise<Object>} - A promise that resolves to an object with the success status and the updated show permissions.
+   * @throws {Error} - If the show is not found.
+   */
   leave_show: async ({ locals }) => {
     const redisConnection = locals.redisConnection as IORedis;
     const show = locals.show;
@@ -231,6 +279,12 @@ export const actions: Actions = {
     return { success: true, showPermissions };
   },
 
+  /**
+   * A function to start a show.
+   *
+   * @param {Object} locals - The local context object containing show and redisConnection.
+   * @return {Object} An object with success status and show permissions.
+   */
   start_show: async ({ locals }) => {
     const show = locals.show as ShowDocument;
     const redisConnection = locals.redisConnection as IORedis;
@@ -252,6 +306,14 @@ export const actions: Actions = {
       showPermissions
     };
   },
+
+  /**
+   * Upserts a room with the provided data.
+   *
+   * @param {Object} request - The request object.
+   * @param {Object} locals - The local context object.
+   * @return {Promise} A promise that resolves to the result of the upsert operation.
+   */
   upsert_room: async ({ request, locals }) => {
     const creator = locals.creator as CreatorDocument;
     const data = await request.formData();
@@ -337,6 +399,29 @@ export const actions: Actions = {
     }
   }
 };
+
+/**
+ * Loads the necessary data for the creator page.
+ *
+ * @param {PageServerLoadParams} params - The parameters for loading the page.
+ * @param {Locals} params.locals - The local variables.
+ * @throws {Error} Throws an error if the creator is not found.
+ * @return {Promise<{
+ *   payoutForm: SuperValidated<z.infer<typeof requestPayoutSchema>>,
+ *   createShowForm: SuperValidated<z.infer<typeof showCRUDSchema>>,
+ *   roomForm: SuperValidated<z.infer<typeof roomCRUDSchema>>,
+ *   creator: CreatorDocument,
+ *   user: UserDocument | undefined,
+ *   show: ShowDocument | undefined,
+ *   showEvent: ShowEventDocument | undefined,
+ *   completedShows: ShowDocument[],
+ *   showPermissions: ShowPermissions,
+ *   wallet: WalletDocument,
+ *   exchangeRate: string | undefined,
+ *   jitsiToken: string | undefined,
+ *   room: RoomDocument | undefined
+ * }>} Returns a promise that resolves to an object containing various data for the creator page.
+ */
 export const load: PageServerLoad = async ({ locals }) => {
   const creator = locals.creator as CreatorDocument;
   const user = locals.user;

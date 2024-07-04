@@ -5,7 +5,15 @@ import { Room } from '$lib/models/room';
 
 import type { PageServerLoad } from './$types';
 
-export const load = (async ({ params, locals }) => {
+/**
+ * Loads the data required for the room page.
+ *
+ * @param params - The parameters passed to the route.
+ * @param locals - The local variables available in the route.
+ * @returns An object containing the user, room, and creator data.
+ * @throws {Error} If the room or creator is not found.
+ */
+export const load: PageServerLoad = (async ({ params, locals }) => {
   const uniqueUrl = encodeURIComponent(params.uniqueUrl);
   const user = locals.user;
 
