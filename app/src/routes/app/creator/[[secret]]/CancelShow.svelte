@@ -5,7 +5,7 @@
 
   import type { ShowDocument } from '$lib/models/show';
 
-  import type { ShowPermissionsType } from './+page.server';
+  import type { ShowPermissionsType } from '$lib/server/machinesUtil';
 
   export let isLoading = false;
   // eslint-disable-next-line @typescript-eslint/no-empty-function

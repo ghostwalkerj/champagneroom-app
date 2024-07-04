@@ -10,8 +10,7 @@
 
   import config from '$lib/config';
   import { durationFormatter } from '$lib/constants';
-
-  import type { ShowPermissionsType } from './+page.server';
+  import type { ShowPermissionsType } from '$lib/server/machinesUtil';
 
   export let createShowForm: SuperValidated<z.infer<typeof showCRUDSchema>>;
   // eslint-disable-next-line @typescript-eslint/no-empty-function

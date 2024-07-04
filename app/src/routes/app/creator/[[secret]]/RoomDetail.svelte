@@ -41,7 +41,7 @@
         if (!data) {
           return;
         }
-        room = data;
+        room = data as RoomDocument;
         roomModal.meta.form.data = data;
       });
     }

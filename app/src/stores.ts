@@ -16,14 +16,43 @@ import type { WalletDocument } from '$lib/models/wallet';
 
 import config from '$lib/config';
 
+/**
+ * An enum representing the different types of entities that can be stored in the stores.
+ *
+ * @enum {string}
+ */
 const enum EntityType {
+  /**
+   * Represents an agent.
+   */
   AGENT = 'Agent',
+  /**
+   * Represents a creator.
+   */
   CREATOR = 'Creator',
+  /**
+   * Represents a show.
+   */
   SHOW = 'Show',
+  /**
+   * Represents a show event.
+   */
   SHOWEVENT = 'ShowEvent',
+  /**
+   * Represents a ticket.
+   */
   TICKET = 'Ticket',
+  /**
+   * Represents a wallet.
+   */
   WALLET = 'Wallet',
+  /**
+   * Represents a user.
+   */
   USER = 'User',
+  /**
+   * Represents a room.
+   */
   ROOM = 'Room'
 }
 
