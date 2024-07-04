@@ -82,7 +82,7 @@ export const getShowPermissionsFromShow = ({
   show,
   redisConnection
 }: {
-  show: ShowDocument;
+  show: ShowDocument | undefined;
   redisConnection: IORedis;
 }) => {
   if (!show) {

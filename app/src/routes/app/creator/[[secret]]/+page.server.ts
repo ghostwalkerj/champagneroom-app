@@ -44,7 +44,8 @@ import {
 } from '$lib/payments';
 import {
   getShowPermissions,
-  getShowPermissionsFromShow
+  getShowPermissionsFromShow,
+  type ShowPermissionsType
 } from '$lib/server/machinesUtil';
 import { ipfsUpload } from '$lib/server/upload';
 
@@ -52,13 +53,11 @@ import type { Actions, PageServerLoad, RequestEvent } from './$types';
 
 export const actions: Actions = {
   /**
-   * Updates the profile image of a user.
+   * Updates the profile image for the user.
    *
-   * @param {RequestEvent} requestEvent - The request event object.
-   * @param {FormData} requestEvent.request.formData - The form data containing the image.
-   * @param {UserDocument} requestEvent.locals.user - The user document.
-   * @returns {Promise<{ success: boolean, imageUrl: string } | undefined>} - A promise that resolves to an object containing the success status and the URL of the uploaded image.
-   * @throws {Error} - Throws an error if the user is not found.
+   * @param {RequestEvent} params - The request event object containing the locals and request data.
+   * @return {Promise<{ success: boolean, imageUrl: string }>} A promise that resolves to an object with the success status and the URL of the updated profile image.
+   * @throws {Error} If the user is not found.
    */
   update_profile_image: async ({ locals, request }: RequestEvent) => {
     const data = await request.formData();
@@ -88,15 +87,17 @@ export const actions: Actions = {
   },
 
   /**
-   * Creates a new show with the provided form data and returns the show, form, and show permissions.
+   * Creates a new show with the provided form data.
    *
-   * @param {Object} params - The parameters for creating the show.
-   * @param {Object} params.locals - The locals object containing the creator and redis connection.
-   * @param {Object} params.request - The request object containing the form data.
-   * @return {Promise<Object>} - A promise that resolves to an object containing the success status, show data, form data, and show permissions.
-   * @throws {Error} - Throws an error if the form data is invalid.
+   * @param {RequestEvent} event - The request event containing the locals and request data.
+   * @return {Promise<{
+   *   success: boolean,
+   *   show: ShowDocument,
+   *   form: SuperValidated<z.infer<typeof showCRUDSchema>>,
+   *   showPermissions: ShowPermissionsType
+   * }>} - A promise that resolves to an object containing the success status, the created show, the form data, and the show permissions.
    */
-  create_show: async ({ locals, request }) => {
+  create_show: async ({ locals, request }: RequestEvent) => {
     const form = (await superValidate(
       request,
       zod(showCRUDSchema)
@@ -143,12 +144,16 @@ export const actions: Actions = {
   },
 
   /**
-   * Cancel a show and return success status along with show details and permissions.
+   * Cancels a show.
    *
-   * @param {Object} locals - The local context object containing show and redisConnection.
-   * @return {Object} An object with success status, show details, and show permissions.
+   * @param {RequestEvent} locals - The request event object containing the necessary local variables.
+   * @throws {Error} Throws an error with a status code of 404 and a message of 'Show not found' if the show is not found.
+   * @return {Promise<{ success: boolean, show: object, showPermissions: object }>} Returns a promise that resolves to an object with the following properties:
+   *   - success: A boolean indicating the success of the cancellation.
+   *   - show: The cancelled show as a JSON object.
+   *   - showPermissions: The permissions for the cancelled show.
    */
-  cancel_show: async ({ locals }) => {
+  cancel_show: async ({ locals }: RequestEvent) => {
     const redisConnection = locals.redisConnection as IORedis;
     const show = locals.show as ShowDocument;
     if (!show) {
@@ -184,10 +189,15 @@ export const actions: Actions = {
   },
 
   /**
-   * A function to end a show.
+   * Ends a show.
    *
-   * @param {Object} locals - The local context object containing show and redisConnection.
-   * @return {Object} An object with success status and show permissions.
+   * @param {object} locals - The local variables object.
+   * @param {ShowDocument} locals.show - The show document.
+   * @param {IORedis} locals.redisConnection - The Redis connection.
+   * @throws {Error} Throws an error with a status code of 404 and a message of 'Show ID not found' if the show is not found.
+   * @return {Promise<{ success: boolean, showPermissions: object }>} Returns a promise that resolves to an object with the following properties:
+   *   - success: A boolean indicating the success of the operation.
+   *   - showPermissions: The permissions for the ended show.
    */
   end_show: async ({ locals }) => {
     const show = locals.show as ShowDocument;
@@ -213,17 +223,16 @@ export const actions: Actions = {
   },
 
   /**
-   * Asynchronously handles a request to initiate a payout. Validates the request form,
-   * creates a payout job and adds it to the payout queue. If the form is invalid, returns
-   * a 400 response with the form data. If the payout job fails to be added to the queue,
-   * returns an error message. Otherwise, returns a success message.
+   * Handles the request for a payout. Validates the request form data using the `requestPayoutSchema` schema.
+   * If the form is valid, creates a new payout job and adds it to the payout queue.
    *
-   * @param {Object} request - The request object containing the form data.
-   * @param {Object} locals - The local context object containing the redisConnection.
-   * @return {Promise<Object>} - A promise that resolves to a JSON object with a success
-   * message or an error message.
+   * @param {RequestEvent} locals - The request event containing the locals and request data.
+   * @return {Promise<{ success: boolean, form: object } | { success: boolean, message: string }>} - A promise that resolves to an object with the following properties:
+   *   - success: A boolean indicating the success of the operation.
+   *   - form: The form data if the operation fails.
+   *   - message: A message indicating the success or failure of the operation.
    */
-  request_payout: async ({ request, locals }) => {
+  request_payout: async ({ locals, request }: RequestEvent) => {
     const form = await superValidate(request, zod(requestPayoutSchema));
     const { walletId, amount, destination, payoutReason, jobType } = form.data;
 
@@ -252,13 +261,15 @@ export const actions: Actions = {
   },
 
   /**
-   * Leaves a show and returns the updated show permissions.
+   * Ends a show and returns the permissions for the creator.
    *
-   * @param {Object} locals - The local context object containing the redisConnection and show.
-   * @return {Promise<Object>} - A promise that resolves to an object with the success status and the updated show permissions.
-   * @throws {Error} - If the show is not found.
+   * @param {RequestEvent} locals - The locals object containing the request event.
+   * @return {Promise<{ success: boolean, showPermissions: object }>} - A promise that resolves to an object with the following properties:
+   *   - success: A boolean indicating the success of the operation.
+   *   - showPermissions: The permissions for the creator.
+   * @throws {Error} Throws an error with a status code of 404 and a message of 'Show not found' if the show is not found.
    */
-  leave_show: async ({ locals }) => {
+  leave_show: async ({ locals }: RequestEvent) => {
     const redisConnection = locals.redisConnection as IORedis;
     const show = locals.show;
     if (!show) {
@@ -280,12 +291,15 @@ export const actions: Actions = {
   },
 
   /**
-   * A function to start a show.
+   * Starts a show and returns the permissions for the creator.
    *
-   * @param {Object} locals - The local context object containing show and redisConnection.
-   * @return {Object} An object with success status and show permissions.
+   * @param {RequestEvent} locals - The locals object containing the request event.
+   * @return {Promise<{ success: boolean, showPermissions: object }>} - A promise that resolves to an object with the following properties:
+   *   - success: A boolean indicating the success of the operation.
+   *   - showPermissions: The permissions for the creator.
+   * @throws {Error} Throws an error with a status code of 404 and a message of 'Show not found' if the show is not found.
    */
-  start_show: async ({ locals }) => {
+  start_show: async ({ locals }: RequestEvent) => {
     const show = locals.show as ShowDocument;
     const redisConnection = locals.redisConnection as IORedis;
     if (!show) {
@@ -308,13 +322,14 @@ export const actions: Actions = {
   },
 
   /**
-   * Upserts a room with the provided data.
+   * Upserts a room based on the provided form data.
    *
-   * @param {Object} request - The request object.
-   * @param {Object} locals - The local context object.
-   * @return {Promise} A promise that resolves to the result of the upsert operation.
+   * @param {RequestEvent} params - The request event containing the locals and request data.
+   * @return {Promise<{ form: SuperValidated<z.infer<typeof roomCRUDSchema>> }>} - A promise that resolves to an object containing the form data.
+   * @throws {Error} Throws an error with a status code of 404 and a message of 'Room not found' if the room is not found.
+   * @throws {Error} Throws an error with a status code of 500 and a message of 'Error upserting room' if there is an error upserting the room.
    */
-  upsert_room: async ({ request, locals }) => {
+  upsert_room: async ({ locals, request }: RequestEvent) => {
     const creator = locals.creator as CreatorDocument;
     const data = await request.formData();
 
@@ -401,12 +416,9 @@ export const actions: Actions = {
 };
 
 /**
- * Loads the necessary data for the creator page.
- *
- * @param {PageServerLoadParams} params - The parameters for loading the page.
- * @param {Locals} params.locals - The local variables.
- * @throws {Error} Throws an error if the creator is not found.
- * @return {Promise<{
+ * Load function for the creator page.
+ * @param {RequestEvent} event - The request event.
+ * @returns {Promise<{
  *   payoutForm: SuperValidated<z.infer<typeof requestPayoutSchema>>,
  *   createShowForm: SuperValidated<z.infer<typeof showCRUDSchema>>,
  *   roomForm: SuperValidated<z.infer<typeof roomCRUDSchema>>,
@@ -415,59 +427,65 @@ export const actions: Actions = {
  *   show: ShowDocument | undefined,
  *   showEvent: ShowEventDocument | undefined,
  *   completedShows: ShowDocument[],
- *   showPermissions: ShowPermissions,
+ *   showPermissions: ShowPermissionsType,
  *   wallet: WalletDocument,
  *   exchangeRate: string | undefined,
  *   jitsiToken: string | undefined,
  *   room: RoomDocument | undefined
- * }>} Returns a promise that resolves to an object containing various data for the creator page.
+ * }>}
  */
-export const load: PageServerLoad = async ({ locals }) => {
-  const creator = locals.creator as CreatorDocument;
-  const user = locals.user;
+export const load: PageServerLoad = async ({
+  locals
+}: RequestEvent): Promise<{
+  payoutForm: SuperValidated<z.infer<typeof requestPayoutSchema>>;
+  createShowForm: SuperValidated<z.infer<typeof showCRUDSchema>>;
+  roomForm: SuperValidated<z.infer<typeof roomCRUDSchema>>;
+  creator: CreatorDocument;
+  user: UserDocument | undefined;
+  show: ShowDocument | undefined;
+  showEvent: ShowEventDocument | undefined;
+  completedShows: ShowDocument[];
+  showPermissions: ShowPermissionsType;
+  wallet: WalletDocument;
+  exchangeRate: string | undefined;
+  jitsiToken: string | undefined;
+  room: RoomDocument | undefined;
+}> => {
+  const creator: CreatorDocument = locals.creator!;
+  const user: UserDocument | undefined = locals.user;
   if (!creator) {
     throw error(404, 'Creator not found');
   }
 
-  const show = (await Show.findOne({
-    creator: creator._id,
-    'showState.current': true
-  }).exec()) as ShowDocument;
+  const [show, room, showEvent, completedShows, wallet] = await Promise.all([
+    Show.findOne({
+      creator: creator._id,
+      'showState.current': true
+    }).exec() as Promise<ShowDocument | undefined>,
+    Room.findById(creator.room).exec() as Promise<RoomDocument | undefined>,
+    ShowEvent.findOne({
+      show: creator._id
+    })
+      .sort({ createdAt: -1 })
+      .limit(1)
+      .exec() as Promise<ShowEventDocument | undefined>,
+    Show.find({
+      creator: creator._id,
+      'showState.status': ShowStatus.FINALIZED
+    })
+      .sort({ 'showState.finalize.finalizedAt': -1 })
+      .limit(10)
+      .exec() as Promise<ShowDocument[]>,
+    locals.wallet as WalletDocument
+  ]);
 
-  const room =
-    (locals.room as RoomDocument) ??
-    ((await Room.findById(creator.room).exec()) as RoomDocument);
-
-  let showEvent: ShowEventDocument | undefined;
-
-  if (show) {
-    const se = await ShowEvent.find(
-      { show: show._id },
-      {},
-      { sort: { createdAt: -1 } }
-    ).limit(1);
-    if (se && se[0]) showEvent = se[0];
-  }
-
-  const completedShows = (await Show.find({
-    creator: creator._id,
-    'showState.status': ShowStatus.FINALIZED
-  })
-    .sort({ 'showState.finalize.finalizedAt': -1 })
-    .limit(10)
-    .exec()) as ShowDocument[];
-
-  const wallet = locals.wallet as WalletDocument;
-
-  // return the rate of exchange for UI from bitcart
-  const token = await createBitcartToken(
+  const token: string = await createBitcartToken(
     env.BITCART_EMAIL || '',
     env.BITCART_PASSWORD || '',
     env.BITCART_API_URL || ''
   );
 
   let jitsiToken: string | undefined;
-
   if (show) {
     jitsiToken = jwt.sign(
       {
@@ -485,29 +503,29 @@ export const load: PageServerLoad = async ({ locals }) => {
           }
         }
       },
-      env.JITSI_JWT_SECRET || '' // Ensure env.JITSI_JWT_SECRET is not undefined
+      env.JITSI_JWT_SECRET || ''
     );
   }
-  const showPermissions = getShowPermissionsFromShow({
+  const showPermissions: ShowPermissionsType = getShowPermissionsFromShow({
     show,
     redisConnection: locals.redisConnection as IORedis
   });
 
-  const exchangeRate =
-    (await rateCryptosRateGet(
-      {
-        currency: wallet.currency,
-        fiat_currency: CurrencyType.USD
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+  const response = await rateCryptosRateGet(
+    {
+      currency: wallet!.currency as CurrencyType,
+      fiat_currency: CurrencyType.USD
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
       }
-    )) || undefined;
+    }
+  );
+  const exchangeRate: string | undefined = response?.data as string | undefined;
 
-  const roomForm = room
+  const roomForm: SuperValidated<z.infer<typeof roomCRUDSchema>> = room
     ? await superValidate(
         room.toJSON({
           flattenMaps: true,
@@ -523,56 +541,50 @@ export const load: PageServerLoad = async ({ locals }) => {
         zod(roomCRUDSchema)
       )) as SuperValidated<z.infer<typeof roomCRUDSchema>>);
 
-  const showName = creator
-    ? possessive(creator.user.name, 'en') + ' Show'
-    : 'Show';
+  const showName: string = creator.user.name + ' Show';
 
-  const createShowForm = await superValidate(
-    {
-      name: showName
-    },
-    zod(showCRUDSchema),
-    {
-      errors: false
-    }
-  );
+  const createShowForm: SuperValidated<z.infer<typeof showCRUDSchema>> =
+    await superValidate(
+      {
+        name: showName
+      },
+      zod(showCRUDSchema),
+      {
+        errors: false
+      }
+    );
 
-  const payoutForm = await superValidate(
-    {
-      amount: 0,
-      destination: user?.address,
-      walletId: wallet._id.toString(),
-      payoutReason: PayoutReason.CREATOR_PAYOUT,
-      jobType: PayoutJobType.CREATE_PAYOUT
-    },
-    zod(requestPayoutSchema),
-    { errors: false }
-  );
+  const payoutForm: SuperValidated<z.infer<typeof requestPayoutSchema>> =
+    await superValidate(
+      {
+        amount: 0,
+        destination: user?.address,
+        walletId: wallet!._id.toString(),
+        payoutReason: PayoutReason.CREATOR_PAYOUT,
+        jobType: PayoutJobType.CREATE_PAYOUT
+      },
+      zod(requestPayoutSchema),
+      { errors: false }
+    );
 
   return {
     payoutForm,
     createShowForm,
     roomForm,
-    creator: creator.toJSON({ flattenMaps: true, flattenObjectIds: true }),
+    creator: creator.toJSON({
+      flattenMaps: true,
+      flattenObjectIds: true
+    }),
     user: user?.toJSON({ flattenMaps: true, flattenObjectIds: true }),
-    show: show
-      ? show.toJSON({ flattenMaps: true, flattenObjectIds: true })
-      : undefined,
-    showEvent: showEvent
-      ? showEvent.toJSON({
-          flattenMaps: true,
-          flattenObjectIds: true
-        })
-      : undefined,
+    show: show?.toJSON({ flattenMaps: true, flattenObjectIds: true }),
+    showEvent: showEvent?.toJSON({ flattenMaps: true, flattenObjectIds: true }),
     completedShows: completedShows.map((show) =>
       show.toJSON({ flattenMaps: true, flattenObjectIds: true })
     ),
     showPermissions,
-    wallet: wallet.toJSON({ flattenMaps: true, flattenObjectIds: true }),
-    exchangeRate: exchangeRate?.data as string,
+    wallet: wallet?.toJSON({ flattenMaps: true, flattenObjectIds: true }),
+    exchangeRate,
     jitsiToken,
-    room: room
-      ? room.toJSON({ flattenMaps: true, flattenObjectIds: true })
-      : undefined
+    room: room?.toJSON({ flattenMaps: true, flattenObjectIds: true })
   };
 };
