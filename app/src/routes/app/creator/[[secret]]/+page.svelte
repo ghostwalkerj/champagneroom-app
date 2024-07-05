@@ -6,7 +6,6 @@
   import type { z } from 'zod';
 
   import { invalidateAll } from '$app/navigation';
-  import { page } from '$app/stores';
 
   import type { CreatorDocument } from '$lib/models/creator';
   import type { roomCRUDSchema } from '$lib/models/room';
@@ -59,6 +58,7 @@
 
   $: showVideo = false;
   $: isLoading = false;
+  $: canStartShow = false;
 
   let [
     creatorUnSub,
@@ -77,9 +77,11 @@
   ) => {
     showUnSub?.();
     eventUnSub?.();
+    permissionUnSub?.();
     sPermissions = showPermissions;
     currentShow = show;
     currentEvent = event;
+    canStartShow = sPermissions.canStartShow;
     if (show && sPermissions.isActive) {
       const showStore = ShowStore(show);
       showUnSub = showStore.subscribe((_show: ShowDocument | undefined) => {
@@ -93,6 +95,7 @@
           permissionUnSub = ShowPermissionsStore(showStore).subscribe(
             (_sPermissions) => {
               if (_sPermissions) sPermissions = _sPermissions;
+              canStartShow = sPermissions.canStartShow;
             }
           );
         }
@@ -124,7 +127,7 @@
     isLoading = true;
 
     await invalidateAll();
-    jitsiToken = $page.data.jitsiToken;
+    jitsiToken = data.jitsiToken!;
     let formData = new FormData();
     fetch('?/start_show', {
       method: 'POST',
@@ -149,7 +152,7 @@
     component: 'EndShowForm',
     meta: {
       isLoading,
-      canStartShow: sPermissions.canStartShow
+      canStartShow
     },
     response: (r: boolean | undefined) => {
       console.log('response', r);
@@ -182,7 +185,7 @@
         <!-- Status -->
         {#key currentShow}
           <ShowStatus
-            canStartShow={sPermissions.canStartShow}
+            {canStartShow}
             bind:isLoading
             show={currentShow}
             onGoToShow={startShow}

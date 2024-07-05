@@ -192,7 +192,7 @@
         if (_ticket) {
           ticket = _ticket;
           invalidateAll().then(() => {
-            invoice = $page.data.invoice;
+            invoice = data.invoice;
             if (
               invoice &&
               invoice.status === InvoiceStatus.COMPLETE &&

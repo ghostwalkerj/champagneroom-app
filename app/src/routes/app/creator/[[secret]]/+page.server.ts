@@ -457,18 +457,13 @@ export const load: PageServerLoad = async ({
     throw error(404, 'Creator not found');
   }
 
-  const [show, room, showEvent, completedShows, wallet] = await Promise.all([
+  const [show, room, completedShows, wallet] = await Promise.all([
     Show.findOne({
       creator: creator._id,
       'showState.current': true
     }).exec() as Promise<ShowDocument | undefined>,
     Room.findById(creator.room).exec() as Promise<RoomDocument | undefined>,
-    ShowEvent.findOne({
-      show: creator._id
-    })
-      .sort({ createdAt: -1 })
-      .limit(1)
-      .exec() as Promise<ShowEventDocument | undefined>,
+
     Show.find({
       creator: creator._id,
       'showState.status': ShowStatus.FINALIZED
@@ -478,6 +473,15 @@ export const load: PageServerLoad = async ({
       .exec() as Promise<ShowDocument[]>,
     locals.wallet as WalletDocument
   ]);
+
+  const showEvent = show
+    ? ((await ShowEvent.findOne({
+        show: show._id
+      })
+        .sort({ createdAt: -1 })
+        .limit(1)
+        .exec()) as ShowEventDocument)
+    : undefined;
 
   const token: string = await createBitcartToken(
     env.BITCART_EMAIL || '',

@@ -23,10 +23,6 @@ export const GET = (async ({ params, url, locals }) => {
 
   switch (type) {
     case EntityType.SHOW: {
-      // const show = (await Show.findById(objectId).orFail(
-      //   error(500, 'Show not found')
-      // )) as ShowDocument;
-
       const show = (await Show.findById(objectId)) as ShowDocument;
 
       if (show === null) {
@@ -36,6 +32,7 @@ export const GET = (async ({ params, url, locals }) => {
         show,
         redisConnection
       });
+      console.log('Show Permissions:', showPermissions);
       return new Response(JSON.stringify(showPermissions));
     }
   }
