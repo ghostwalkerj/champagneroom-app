@@ -27,7 +27,8 @@ const PROTECTED_PATHS = [
 
 const NOTIFICATION_PATHS = [
   config.PATH.notifyUpdate + idString,
-  config.PATH.notifyInsert + idString
+  config.PATH.notifyInsert + idString,
+  config.PATH.notifyState + idString
 ];
 
 const WEBHOOK_PATHS = [

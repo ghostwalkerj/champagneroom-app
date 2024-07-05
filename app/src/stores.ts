@@ -15,46 +15,9 @@ import type { UserDocument } from '$lib/models/user';
 import type { WalletDocument } from '$lib/models/wallet';
 
 import config from '$lib/config';
+import { EntityType } from '$lib/constants';
 
-/**
- * An enum representing the different types of entities that can be stored in the stores.
- *
- * @enum {string}
- */
-const enum EntityType {
-  /**
-   * Represents an agent.
-   */
-  AGENT = 'Agent',
-  /**
-   * Represents a creator.
-   */
-  CREATOR = 'Creator',
-  /**
-   * Represents a show.
-   */
-  SHOW = 'Show',
-  /**
-   * Represents a show event.
-   */
-  SHOWEVENT = 'ShowEvent',
-  /**
-   * Represents a ticket.
-   */
-  TICKET = 'Ticket',
-  /**
-   * Represents a wallet.
-   */
-  WALLET = 'Wallet',
-  /**
-   * Represents a user.
-   */
-  USER = 'User',
-  /**
-   * Represents a room.
-   */
-  ROOM = 'Room'
-}
+import type { ShowPermissionsType } from './lib/server/machinesUtil';
 
 /**
  * Returns a store that updates the provided document with incoming notifications.
@@ -125,7 +88,7 @@ export const CreatorStore = (
 ): Readable<CreatorDocument> => {
   return abstractUpdateStore<CreatorDocument>({
     doc: creator,
-    type: EntityType.CREATOR as EntityType.CREATOR
+    type: EntityType.CREATOR
   });
 };
 
@@ -285,6 +248,36 @@ export const ShowEventStore = (
   };
 };
 
+const fetchPermissions = async (id: string, type: EntityType) => {
+  const typeQuery = '?type=' + type;
+  const path = urlJoin(config.PATH.notifyState, id, typeQuery);
+  const response = await fetch(path);
+  const { permissions } = await response.json();
+  return permissions as ShowPermissionsType;
+};
+
+/**
+ * Creates a ShowPermissionsStore object that encapsulates the logic for Observing the ShowDocument permissions.
+ *
+ * @param {Readable<ShowDocument>} showStore - The Readable store for the ShowDocument.
+ * @returns {Readable<ShowPermissionsType>} An object with a readonly ShowPermissionsType.
+ */
+export const ShowPermissionsStore = (
+  showStore: Readable<ShowDocument>
+): Readable<ShowPermissionsType> => {
+  return derived<Readable<ShowDocument>, ShowPermissionsType>(
+    showStore,
+    ($show, set) => {
+      const id = $show._id.toString();
+      fetchPermissions(id, EntityType.SHOW).then(
+        (permissions: ShowPermissionsType) => {
+          if (permissions) set(permissions);
+        }
+      );
+    }
+  );
+};
+
 /**
  * Creates a ShowStore object that encapsulates the logic for updating a ShowDocument.
  *
@@ -321,7 +314,7 @@ export const TicketStore = (
 export const UserStore = (user: UserDocument): Readable<UserDocument> => {
   return abstractUpdateStore<UserDocument>({
     doc: user,
-    type: EntityType.USER as EntityType.USER
+    type: EntityType.USER
   });
 };
 
@@ -336,6 +329,6 @@ export const WalletStore = (
 ): Readable<WalletDocument> => {
   return abstractUpdateStore<WalletDocument>({
     doc: wallet,
-    type: EntityType.WALLET as EntityType.WALLET
+    type: EntityType.WALLET
   });
 };

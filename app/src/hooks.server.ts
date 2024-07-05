@@ -62,7 +62,17 @@ const redisConnection = new IORedis({
   maxRetriesPerRequest: undefined
 });
 
-const setLocals = async (decode: JwtPayload, locals: App.Locals) => {
+/**
+ * Sets the locals object based on the JWT payload.
+ *
+ * @param {JwtPayload} decode - The decoded JWT payload.
+ * @param {App.Locals} locals - The locals object to be set.
+ * @return {Promise<App.Locals>} The updated locals object.
+ */
+const setLocals = async (
+  decode: JwtPayload,
+  locals: App.Locals
+): Promise<App.Locals> => {
   const selector = decode.selector as string;
   if (selector) {
     const query: Record<string, unknown> = {};
@@ -158,52 +168,80 @@ const setLocals = async (decode: JwtPayload, locals: App.Locals) => {
   return locals;
 };
 
-const allowedPath = (path: string, locals: App.Locals, selector?: string) => {
+/**
+ * Determines if the given path is allowed for the user specified in the locals object.
+ *
+ * @param {string} path - The path to check.
+ * @param {App.Locals} locals - The locals object containing user information.
+ * @param {string | undefined} selector - The selector to use to get the user's slug. Defaults to undefined.
+ * @returns {boolean} - True if the path is allowed, false otherwise.
+ */
+const allowedPath = (
+  path: string,
+  locals: App.Locals,
+  selector?: string
+): boolean => {
   if (isWhitelistMatch(path)) return true;
 
   if (!locals.user) return false;
 
-  const slug =
-    selector === undefined
-      ? undefined
-      : locals.user[selector as keyof typeof locals.user]?.toString();
+  const slug: string | undefined = selector
+    ? locals.user[selector as keyof typeof locals.user]?.toString()
+    : undefined;
 
   // If the user is a creator, they can access their own page
-  if (isPasswordMatch(path)) {
-    const creatorUrl = `${config.PATH.creator}/${slug}`;
-    return locals.creator && path.startsWith(creatorUrl);
+  if (
+    isPasswordMatch(path) &&
+    locals.creator &&
+    path.startsWith(`${config.PATH.creator}/${slug}`)
+  ) {
+    return true;
   }
 
   // If the user is a ticket holder, they can access their own ticket
-  if (isTicketMatch(path)) {
-    return locals.ticket !== undefined;
+  if (isTicketMatch(path) && locals.ticket) {
+    return true;
   }
   // If the user is an agent, operator, creator they can access their own page
-  if (isOperatorMatch(path) && locals.operator) return true;
-  if (isAgentMatch(path) && locals.agent) return true;
-  if (isCreatorMatch(path) && locals.creator) return true;
-  if (path === config.PATH.app && locals.user) return true;
+  if (
+    (isOperatorMatch(path) && locals.operator) ||
+    (isAgentMatch(path) && locals.agent) ||
+    (isCreatorMatch(path) && locals.creator) ||
+    (path === config.PATH.app && locals.user)
+  ) {
+    return true;
+  }
 
   // Notifications can be accessed by the creator, ticket holder, agent, operator
   if (isNotificationMatch(path)) {
-    const allowedIds: string[] = [];
-    if (locals.creator) allowedIds.push(locals.creator._id.toString());
-    if (locals.ticket)
-      allowedIds.push(
-        locals.ticket._id.toString(),
-        locals.ticket.show.toString()
-      );
-    if (locals.wallet) allowedIds.push(locals.wallet._id.toString());
-    if (locals.agent) allowedIds.push(locals.agent._id.toString());
-    if (locals.operator) allowedIds.push(locals.operator._id.toString());
-    if (locals.show) allowedIds.push(locals.show._id.toString());
-    if (locals.room) allowedIds.push(locals.room._id.toString());
+    const allowedIds: (string | undefined)[] = [
+      locals.creator?._id?.toString(),
+      locals.ticket?._id?.toString(),
+      locals.ticket?.show?.toString(),
+      locals.wallet?._id?.toString(),
+      locals.agent?._id?.toString(),
+      locals.operator?._id?.toString(),
+      locals.show?._id?.toString(),
+      locals.room?._id?.toString()
+    ].filter(Boolean);
 
-    if (allowedIds.some((id) => path.includes(id))) return true;
+    return allowedIds.some((id) => path.includes(String(id)));
   }
   return false;
 };
 
+/**
+ * Handles the request and sets the locals object based on the JWT payload.
+ * If the requested path is protected and the user is not allowed to access it,
+ * it redirects to the authentication page.
+ *
+ * @param {HandleArgs} args - The arguments for the handle function.
+ * @param {Event} args.event - The request event.
+ * @param {Resolve} args.resolve - The resolve function.
+ * @returns {Promise<Response>} The response of the resolve function.
+ * @throws {Redirect} Throws a redirect to the authentication page if the token is invalid.
+ * @throws {Error} Throws an error with a status code of 403 and a message of 'Forbidden' if the user is not allowed to access the requested path.
+ */
 export const handle = (async ({ event, resolve }) => {
   const requestedPath = event.url.pathname;
   const cookies = event.cookies;

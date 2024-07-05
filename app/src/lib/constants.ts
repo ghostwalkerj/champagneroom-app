@@ -55,16 +55,19 @@ export enum EarningsSource {
 }
 
 export enum EntityType {
-  AGENT = 'AGENT',
-  CREATOR = 'CREATOR',
-  SHOW = 'SHOW',
-  TICKET = 'TICKET',
-  USER = 'USER',
-  OPERATOR = 'OPERATOR',
-  INVOICE = 'INVOICE',
-  PAYOUT = 'PAYOUT',
-  OTHER = 'OTHER',
-  NONE = 'NONE'
+  AGENT = 'Agent',
+  CREATOR = 'Creator',
+  SHOW = 'Show',
+  TICKET = 'Ticket',
+  USER = 'User',
+  OPERATOR = 'Operator',
+  INVOICE = 'Invoice',
+  PAYOUT = 'Payout',
+  OTHER = 'Other',
+  NONE = 'None',
+  ROOM = 'Room',
+  WALLET = 'Wallet',
+  SHOWEVENT = 'ShowEvent'
 }
 
 export enum RefundReason {

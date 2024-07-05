@@ -8,6 +8,7 @@ import { atomicUpdateCallback } from '$lib/models/wallet';
 
 import {
   createShowActor,
+  type ShowActorType,
   type ShowMachineStateType
 } from '$lib/machines/showMachine';
 import { createTicketMachineService } from '$lib/machines/ticketMachine';
@@ -26,10 +27,18 @@ export type ShowPermissionsType = {
   isActive: boolean;
 };
 
+/**
+ * Retrieves a ShowMachineService instance based on the provided show ID.
+ *
+ * @param {string} showId - The ID of the show.
+ * @param {IORedis} redisConnection - The Redis connection.
+ * @return {Promise<ShowActorType>} A Promise that resolves to a ShowActorType instance.
+ * @throws {Error} If the show with the provided ID is not found.
+ */
 export const getShowMachineServiceFromId = async (
   showId: string,
   redisConnection: IORedis
-) => {
+): Promise<ShowActorType> => {
   const show = (await mongoose
     .model('Show')
     .findById(showId)
@@ -40,10 +49,18 @@ export const getShowMachineServiceFromId = async (
   return createShowActor({
     show,
     redisConnection
-  });
+  }) as ShowActorType;
 };
 
-export const getShowPermissions = (state?: ShowMachineStateType) => {
+/**
+ * Retrieves the permissions for a show based on the given state.
+ *
+ * @param {ShowMachineStateType | undefined} state - The state of the show machine.
+ * @returns {ShowPermissionsType} The permissions for the show.
+ */
+export const getShowPermissions = (
+  state?: ShowMachineStateType
+): ShowPermissionsType => {
   if (state === undefined || !state.matches)
     return {
       showId: '',
@@ -78,13 +95,21 @@ export const getShowPermissions = (state?: ShowMachineStateType) => {
   return showPermissions;
 };
 
+/**
+ * Retrieves the permissions for a show based on the provided show document and Redis connection.
+ *
+ * @param {object} options - The options object.
+ * @param {ShowDocument | undefined} options.show - The show document.
+ * @param {IORedis} options.redisConnection - The Redis connection.
+ * @return {ShowPermissionsType} The permissions for the show.
+ */
 export const getShowPermissionsFromShow = ({
   show,
   redisConnection
 }: {
   show: ShowDocument | undefined;
   redisConnection: IORedis;
-}) => {
+}): ShowPermissionsType => {
   if (!show) {
     return getShowPermissions();
   }
@@ -94,8 +119,9 @@ export const getShowPermissionsFromShow = ({
   });
 
   const showMachineState = showService.getSnapshot();
+  const showPermissions = getShowPermissions(showMachineState);
   showService.stop();
-  return getShowPermissions(showMachineState);
+  return showPermissions;
 };
 
 export const getTicketMachineServiceFromId = async (

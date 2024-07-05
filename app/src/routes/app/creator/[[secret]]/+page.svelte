@@ -23,6 +23,7 @@
   import {
     CreatorStore,
     ShowEventStore,
+    ShowPermissionsStore,
     ShowStore,
     WalletStore
   } from '$stores';
@@ -44,7 +45,7 @@
   let currentEvent = data.showEvent as ShowEventDocument | undefined;
   let completedShows = data.completedShows as ShowDocument[];
   let wallet = data.wallet as WalletDocument;
-  let exchangeRate = +data.exchangeRate || 0;
+  let exchangeRate = +(data.exchangeRate || 0);
   let jitsiToken = data.jitsiToken as string;
   let user = data.user as UserDocument;
   let sPermissions = data.showPermissions;
@@ -59,10 +60,13 @@
   $: showVideo = false;
   $: isLoading = false;
 
-  let creatorUnSub: Unsubscriber;
-  let showUnSub: Unsubscriber;
-  let eventUnSub: Unsubscriber;
-  let walletUnSub: Unsubscriber;
+  let [
+    creatorUnSub,
+    showUnSub,
+    eventUnSub,
+    walletUnSub,
+    permissionUnSub
+  ]: Unsubscriber[] = [];
 
   const modalStore = getModalStore();
 
@@ -77,17 +81,22 @@
     currentShow = show;
     currentEvent = event;
     if (show && sPermissions.isActive) {
-      showUnSub = ShowStore(show).subscribe(
-        (_show: ShowDocument | undefined) => {
-          if (_show) {
-            currentShow = _show;
-            eventUnSub?.();
-            eventUnSub = ShowEventStore(_show).subscribe((_event) => {
-              if (_event) currentEvent = _event;
-            });
-          }
+      const showStore = ShowStore(show);
+      showUnSub = showStore.subscribe((_show: ShowDocument | undefined) => {
+        if (_show) {
+          currentShow = _show;
+          eventUnSub?.();
+          eventUnSub = ShowEventStore(_show).subscribe((_event) => {
+            if (_event) currentEvent = _event;
+          });
+          permissionUnSub?.();
+          permissionUnSub = ShowPermissionsStore(showStore).subscribe(
+            (_sPermissions) => {
+              if (_sPermissions) sPermissions = _sPermissions;
+            }
+          );
         }
-      );
+      });
     }
   };
 
