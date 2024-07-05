@@ -58,7 +58,6 @@
 
   $: showVideo = false;
   $: isLoading = false;
-  $: canStartShow = false;
 
   let [
     creatorUnSub,
@@ -81,7 +80,6 @@
     sPermissions = showPermissions;
     currentShow = show;
     currentEvent = event;
-    canStartShow = sPermissions.canStartShow;
     if (show && sPermissions.isActive) {
       const showStore = ShowStore(show);
       showUnSub = showStore.subscribe((_show: ShowDocument | undefined) => {
@@ -95,7 +93,6 @@
           permissionUnSub = ShowPermissionsStore(showStore).subscribe(
             (_sPermissions) => {
               if (_sPermissions) sPermissions = _sPermissions;
-              canStartShow = sPermissions.canStartShow;
             }
           );
         }
@@ -152,7 +149,7 @@
     component: 'EndShowForm',
     meta: {
       isLoading,
-      canStartShow
+      canStartShow: sPermissions.canStartShow
     },
     response: (r: boolean | undefined) => {
       console.log('response', r);
@@ -183,9 +180,9 @@
       <!-- 1st column -->
       <div class="flex-1 space-y-3 md:col-span-3 md:col-start-1">
         <!-- Status -->
-        {#key currentShow}
+        {#key currentShow?.showState.status}
           <ShowStatus
-            {canStartShow}
+            canStartShow={sPermissions.canStartShow}
             bind:isLoading
             show={currentShow}
             onGoToShow={startShow}

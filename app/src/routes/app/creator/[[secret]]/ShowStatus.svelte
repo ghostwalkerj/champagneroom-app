@@ -14,10 +14,12 @@
   export let showEvent: ShowEventDocument | undefined;
   $: statusText = 'No Current Show';
   $: eventText = 'No Events';
+  $: showStartButton = false;
 
   onMount(() => {
     eventText = createEventText(showEvent);
     statusText = show === undefined ? 'No Current Show' : show.showState.status;
+    showStartButton = canStartShow;
   });
 </script>
 
@@ -40,7 +42,7 @@
     <p class="capitalize">{eventText}</p>
   </div>
 
-  {#if canStartShow}
+  {#if showStartButton}
     <div class="flex">
       <button
         class="variant-filled-primary btn whitespace-nowrap font-semibold text-black shadow-black hover:shadow-lg lg:rounded-l-none"
