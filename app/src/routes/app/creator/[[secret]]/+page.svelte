@@ -58,6 +58,7 @@
 
   $: showVideo = false;
   $: isLoading = false;
+  $: updateCount = 0;
 
   let [
     creatorUnSub,
@@ -80,19 +81,25 @@
     sPermissions = showPermissions;
     currentShow = show;
     currentEvent = event;
+    updateCount++;
     if (show && sPermissions.isActive) {
       const showStore = ShowStore(show);
       showUnSub = showStore.subscribe((_show: ShowDocument | undefined) => {
         if (_show) {
           currentShow = _show;
+          updateCount++;
           eventUnSub?.();
           eventUnSub = ShowEventStore(_show).subscribe((_event) => {
             if (_event) currentEvent = _event;
+            updateCount++;
           });
           permissionUnSub?.();
           permissionUnSub = ShowPermissionsStore(showStore).subscribe(
             (_sPermissions) => {
-              if (_sPermissions) sPermissions = _sPermissions;
+              if (_sPermissions) {
+                sPermissions = _sPermissions;
+                updateCount++;
+              }
             }
           );
         }
@@ -180,9 +187,9 @@
       <!-- 1st column -->
       <div class="flex-1 space-y-3 md:col-span-3 md:col-start-1">
         <!-- Status -->
-        {#key currentShow?.showState.status}
+        {#key updateCount}
           <ShowStatus
-            canStartShow={sPermissions.canStartShow}
+            bind:canStartShow={sPermissions.canStartShow}
             bind:isLoading
             show={currentShow}
             onGoToShow={startShow}

@@ -49,17 +49,17 @@ const WHITELIST_PATHS = [
 ];
 
 const TICKET_PATHS = [config.PATH.ticket + '/**', config.PATH.ticket];
+
 const CREATOR_PATHS = [
   config.PATH.creator,
   config.PATH.creator + '/**',
   config.PATH.imageUpload
 ];
+
 const SECRET_PATHS = [...PASSWORD_PATHS, ...PIN_PATHS];
 const AGENT_PATHS = [config.PATH.agent];
 const OPERATOR_PATHS = [config.PATH.operator];
-
 const SIGN_PATHS = [...AGENT_PATHS, ...OPERATOR_PATHS, config.PATH.creator];
-
 const REQUEST_AUTH_PATHS = [
   ...SIGN_PATHS,
   ...PASSWORD_PATHS,

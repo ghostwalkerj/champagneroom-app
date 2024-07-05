@@ -252,6 +252,7 @@ const fetchPermissions = async (id: string, type: EntityType) => {
   const typeQuery = '?type=' + type;
   const path = urlJoin(config.PATH.notifyState, id, typeQuery);
   const response = await fetch(path);
+  console.table(response);
   const { permissions } = await response.json();
   return permissions as ShowPermissionsType;
 };
@@ -265,17 +266,16 @@ const fetchPermissions = async (id: string, type: EntityType) => {
 export const ShowPermissionsStore = (
   showStore: Readable<ShowDocument>
 ): Readable<ShowPermissionsType> => {
-  return derived<Readable<ShowDocument>, ShowPermissionsType>(
+  const ps = derived<Readable<ShowDocument>, ShowPermissionsType>(
     showStore,
-    ($show, set) => {
-      const id = $show._id.toString();
-      fetchPermissions(id, EntityType.SHOW).then(
-        (permissions: ShowPermissionsType) => {
-          if (permissions) set(permissions);
-        }
-      );
+    ($showStore, set) => async () => {
+      const id = $showStore._id.toString();
+      const permissions = await fetchPermissions(id, EntityType.SHOW);
+      set(permissions);
     }
   );
+
+  return ps;
 };
 
 /**
