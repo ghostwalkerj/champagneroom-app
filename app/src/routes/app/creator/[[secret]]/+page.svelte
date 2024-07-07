@@ -78,32 +78,30 @@
     showUnSub?.();
     eventUnSub?.();
     permissionUnSub?.();
-    sPermissions = showPermissions;
     currentShow = show;
     currentEvent = event;
+    sPermissions = showPermissions;
     updateCount++;
-    if (show && sPermissions.isActive) {
+
+    if (show && showPermissions.isActive) {
       const showStore = ShowStore(show);
-      showUnSub = showStore.subscribe((_show: ShowDocument | undefined) => {
-        if (_show) {
-          currentShow = _show;
-          updateCount++;
-          eventUnSub?.();
-          eventUnSub = ShowEventStore(_show).subscribe((_event) => {
-            if (_event) currentEvent = _event;
-            updateCount++;
-          });
-          permissionUnSub?.();
-          permissionUnSub = ShowPermissionsStore(showStore).subscribe(
-            (_sPermissions) => {
-              if (_sPermissions) {
-                sPermissions = _sPermissions;
-                updateCount++;
-              }
-            }
-          );
-        }
+      const showEventStore = ShowEventStore(show);
+      const showPermissionsStore = ShowPermissionsStore(showStore);
+
+      showUnSub = showStore.subscribe((_show: ShowDocument) => {
+        currentShow = _show;
+        updateCount++;
       });
+      eventUnSub = showEventStore.subscribe((_event: ShowEventDocument) => {
+        currentEvent = _event;
+        updateCount++;
+      });
+      permissionUnSub = showPermissionsStore.subscribe(
+        (_sPermissions: ShowPermissionsType) => {
+          sPermissions = _sPermissions;
+          updateCount++;
+        }
+      );
     }
   };
 
@@ -115,12 +113,15 @@
       wallet = value;
     });
     useNewShow(currentShow, sPermissions, currentEvent);
+
+    //TODO: And timer to invalidate the show
   });
 
   const unSubAll = () => {
     creatorUnSub?.();
     showUnSub?.();
     walletUnSub?.();
+    permissionUnSub?.();
   };
 
   onDestroy(() => {
@@ -130,24 +131,22 @@
   const startShow = async () => {
     isLoading = true;
 
-    await invalidateAll();
-    jitsiToken = data.jitsiToken!;
-    let formData = new FormData();
-    fetch('?/start_show', {
-      method: 'POST',
-      body: formData
+    Promise.all([
+      invalidateAll(),
+      fetch('?/start_show', {
+        method: 'POST',
+        body: new FormData()
+      })
+    ]).then(() => {
+      jitsiToken = data.jitsiToken!;
+      showVideo = true;
+      isLoading = false;
     });
-    showVideo = true;
-    isLoading = false;
   };
 
   const leftShowCallback = () => {
     showVideo = false;
-    let formData = new FormData();
-    fetch('?/leave_show', {
-      method: 'POST',
-      body: formData
-    });
+    fetch('?/leave_show', { method: 'POST' });
   };
 
   // --------- Modal for Restarting or Ending Show
@@ -158,16 +157,11 @@
       isLoading,
       canStartShow: sPermissions.canStartShow
     },
-    response: (r: boolean | undefined) => {
-      console.log('response', r);
-      if (!r) startShow();
-    }
+    response: (r?: boolean) => (r ? undefined : startShow)
   };
 
   // Show Modal if showStopped is true
-  $: if (sPermissions.showStopped) {
-    modalStore.trigger(endShowModal);
-  }
+  $: sPermissions.showStopped && modalStore.trigger(endShowModal);
   // --------- End Modal for Restarting or Ending Show
 </script>
 

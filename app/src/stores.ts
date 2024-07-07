@@ -248,13 +248,19 @@ export const ShowEventStore = (
   };
 };
 
+/**
+ * Fetches the ShowDocument permissions.
+ *
+ * @param {string} id - The ID of the ShowDocument.
+ * @param {EntityType} type - The type of the ShowDocument.
+ * @return {Promise<ShowPermissionsType>} The ShowPermissionsType.
+ */
 const fetchPermissions = async (id: string, type: EntityType) => {
-  const typeQuery = '?type=' + type;
-  const path = urlJoin(config.PATH.notifyState, id, typeQuery);
-  const response = await fetch(path);
-  console.table(response);
-  const { permissions } = await response.json();
-  return permissions as ShowPermissionsType;
+  const path = `${config.PATH.notifyState}/${id}?type=${type}`;
+  const response = await fetch(path); // TODO: retry on error to take care of race condition with new show creation
+  const permissions = (await response.json()) as ShowPermissionsType;
+  console.log('permissions', permissions);
+  return permissions;
 };
 
 /**
