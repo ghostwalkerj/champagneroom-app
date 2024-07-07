@@ -255,11 +255,13 @@ export const ShowEventStore = (
  * @param {EntityType} type - The type of the ShowDocument.
  * @return {Promise<ShowPermissionsType>} The ShowPermissionsType.
  */
-const fetchPermissions = async (id: string, type: EntityType) => {
+const fetchPermissions = async (
+  id: string,
+  type: EntityType
+): Promise<ShowPermissionsType> => {
   const path = `${config.PATH.notifyState}/${id}?type=${type}`;
-  const response = await fetch(path); // TODO: retry on error to take care of race condition with new show creation
+  const response = await fetch(path, { cache: 'no-store' });
   const permissions = (await response.json()) as ShowPermissionsType;
-  console.log('permissions', permissions);
   return permissions;
 };
 
@@ -276,8 +278,9 @@ export const ShowPermissionsStore = (
     showStore,
     ($showStore, set) => async () => {
       const id = $showStore._id.toString();
+      console.log('show', $showStore);
       const permissions = await fetchPermissions(id, EntityType.SHOW);
-      set(permissions);
+      if (permissions) set(permissions);
     }
   );
 

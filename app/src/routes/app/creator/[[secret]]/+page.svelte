@@ -78,30 +78,32 @@
     showUnSub?.();
     eventUnSub?.();
     permissionUnSub?.();
+    sPermissions = showPermissions;
     currentShow = show;
     currentEvent = event;
-    sPermissions = showPermissions;
     updateCount++;
-
-    if (show && showPermissions.isActive) {
-      const showStore = ShowStore(show);
-      const showEventStore = ShowEventStore(show);
-      const showPermissionsStore = ShowPermissionsStore(showStore);
-
-      showUnSub = showStore.subscribe((_show: ShowDocument) => {
-        currentShow = _show;
-        updateCount++;
-      });
-      eventUnSub = showEventStore.subscribe((_event: ShowEventDocument) => {
-        currentEvent = _event;
-        updateCount++;
-      });
-      permissionUnSub = showPermissionsStore.subscribe(
-        (_sPermissions: ShowPermissionsType) => {
-          sPermissions = _sPermissions;
-          updateCount++;
-        }
-      );
+    if (show && sPermissions.isActive) {
+      setTimeout(() => {
+        const showStore = ShowStore(show);
+        showUnSub = showStore.subscribe((_show: ShowDocument | undefined) => {
+          if (_show) {
+            currentShow = _show;
+            updateCount++;
+            eventUnSub = ShowEventStore(_show).subscribe((_event) => {
+              if (_event) currentEvent = _event;
+              updateCount++;
+            });
+            permissionUnSub = ShowPermissionsStore(showStore).subscribe(
+              (_sPermissions) => {
+                if (_sPermissions) {
+                  sPermissions = _sPermissions;
+                  updateCount++;
+                }
+              }
+            );
+          }
+        });
+      }, 1000);
     }
   };
 
@@ -113,14 +115,13 @@
       wallet = value;
     });
     useNewShow(currentShow, sPermissions, currentEvent);
-
-    //TODO: And timer to invalidate the show
   });
 
   const unSubAll = () => {
     creatorUnSub?.();
     showUnSub?.();
     walletUnSub?.();
+    eventUnSub?.();
     permissionUnSub?.();
   };
 
@@ -131,22 +132,24 @@
   const startShow = async () => {
     isLoading = true;
 
-    Promise.all([
-      invalidateAll(),
-      fetch('?/start_show', {
-        method: 'POST',
-        body: new FormData()
-      })
-    ]).then(() => {
-      jitsiToken = data.jitsiToken!;
-      showVideo = true;
-      isLoading = false;
+    await invalidateAll();
+    jitsiToken = data.jitsiToken!;
+    let formData = new FormData();
+    fetch('?/start_show', {
+      method: 'POST',
+      body: formData
     });
+    showVideo = true;
+    isLoading = false;
   };
 
   const leftShowCallback = () => {
     showVideo = false;
-    fetch('?/leave_show', { method: 'POST' });
+    let formData = new FormData();
+    fetch('?/leave_show', {
+      method: 'POST',
+      body: formData
+    });
   };
 
   // --------- Modal for Restarting or Ending Show
@@ -157,11 +160,16 @@
       isLoading,
       canStartShow: sPermissions.canStartShow
     },
-    response: (r?: boolean) => (r ? undefined : startShow)
+    response: (r: boolean | undefined) => {
+      console.log('response', r);
+      if (!r) startShow();
+    }
   };
 
   // Show Modal if showStopped is true
-  $: sPermissions.showStopped && modalStore.trigger(endShowModal);
+  $: if (sPermissions.showStopped) {
+    modalStore.trigger(endShowModal);
+  }
   // --------- End Modal for Restarting or Ending Show
 </script>
 
@@ -197,17 +205,15 @@
         <div>
           {#if sPermissions.isActive && currentShow}
             {#key currentShow.showState}
-              <div class="">
-                <ShowDetail
-                  show={currentShow}
-                  options={{
-                    showCopy: true,
-                    showSalesStats: true,
-                    showRating: true,
-                    showWaterMark: false
-                  }}
-                />
-              </div>
+              <ShowDetail
+                show={currentShow}
+                options={{
+                  showCopy: true,
+                  showSalesStats: true,
+                  showRating: true,
+                  showWaterMark: false
+                }}
+              />
             {/key}
           {/if}
         </div>
