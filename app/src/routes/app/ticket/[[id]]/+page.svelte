@@ -1,6 +1,6 @@
 <script lang="ts">
   import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
-  import { onMount, tick } from 'svelte';
+  import { onDestroy, onMount, tick } from 'svelte';
   import type { Unsubscriber } from 'svelte/store';
   import type { Infer, SuperValidated } from 'sveltekit-superforms';
   import web3 from 'web3';
@@ -16,13 +16,12 @@
   import type { TicketDocument } from '$lib/models/ticket';
   import type { UserDocument } from '$lib/models/user';
 
-  import { TicketStatus } from '$lib/constants';
   import type { DisplayInvoice } from '$lib/ext/bitcart/models';
-  import { InvoiceStatus, type PaymentType } from '$lib/payments';
+  import { type PaymentType } from '$lib/payments';
   import type { TicketPermissionsType } from '$lib/server/machinesUtil';
   import { connect, defaultWallet, selectedAccount } from '$lib/web3';
 
-  import { ShowStore, TicketStore } from '$stores';
+  import { ShowStore, TicketPermissionsStore, TicketStore } from '$stores';
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
   import CancelTicket from './CancelTicket.svelte';
@@ -59,11 +58,12 @@
     ticketPermissions = _ticketPermissions;
   };
 
-  $: showVideo = false;
   let showUnSub: Unsubscriber;
   let ticketUnSub: Unsubscriber;
+  let ticketPermissionsUnSub: Unsubscriber;
   $: isLoading = false;
-  $: leftShow = false;
+  $: showVideo = false;
+
   const modalStore = getModalStore();
 
   const ticketFeedbackModal: ModalSettings = {
@@ -163,7 +163,6 @@
 
   const leftShowCallback = () => {
     showVideo = false;
-    leftShow = true;
 
     let formData = new FormData();
     fetch('?/leave_show', {
@@ -174,38 +173,48 @@
 
   onMount(() => {
     if (ticketPermissions.isActive) {
-      showUnSub = ShowStore(show).subscribe((_show) => {
+      const showStore = ShowStore(show);
+      showUnSub = showStore.subscribe((_show) => {
         if (_show) {
           show = _show;
-          if (
-            ticketPermissions.canWatchShow &&
-            ticketPermissions.hasShowStarted &&
-            !leftShow
-          )
-            joinShow();
         }
       });
-      ticketUnSub = TicketStore(ticket).subscribe((_ticket) => {
+      const ticketStore = TicketStore(ticket);
+      ticketUnSub = ticketStore.subscribe((_ticket) => {
         if (_ticket) {
           ticket = _ticket;
           invalidateAll().then(() => {
             invoice = data.invoice;
-            if (
-              invoice &&
-              invoice.status === InvoiceStatus.COMPLETE &&
-              ticket.ticketState.status === TicketStatus.PAYMENT_INITIATED
-            ) {
-            }
           });
         }
       });
+      const ticketPermissionsStore = TicketPermissionsStore(
+        ticketStore,
+        showStore
+      );
+      ticketPermissionsUnSub = ticketPermissionsStore.subscribe(
+        (_ticketPermissions) => {
+          if (_ticketPermissions) {
+            ticketPermissions = _ticketPermissions;
+          }
+        }
+      );
     }
   });
 
-  onNavigate(async () => {
-    await tick();
+  const unSub = () => {
     showUnSub?.();
     ticketUnSub?.();
+    ticketPermissionsUnSub?.();
+  };
+
+  onNavigate(async () => {
+    await tick();
+    unSub();
+  });
+
+  onDestroy(() => {
+    unSub();
   });
 </script>
 

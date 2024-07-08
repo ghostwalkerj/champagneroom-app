@@ -304,19 +304,20 @@ export const ShowStore = (show: ShowDocument): Readable<ShowDocument> =>
   });
 
 export const TicketPermissionsStore = (
-  ticketStore: Readable<TicketDocument>
+  ticketStore: Readable<TicketDocument>,
+  showStore: Readable<ShowDocument>
 ): Readable<TicketPermissionsType> => {
-  const ps = derived<Readable<TicketDocument>, TicketPermissionsType>(
-    ticketStore,
-    ($ticketStore, set) => async () => {
-      const id = $ticketStore._id.toString();
-      const permissions = (await fetchPermissions(
-        id,
-        EntityType.TICKET
-      )) as TicketPermissionsType;
-      if (permissions) set(permissions);
-    }
-  );
+  const ps = derived<
+    [Readable<TicketDocument>, Readable<ShowDocument>],
+    TicketPermissionsType
+  >([ticketStore, showStore], ([$ticketStore], set) => async () => {
+    const id = $ticketStore._id.toString();
+    const permissions = (await fetchPermissions(
+      id,
+      EntityType.TICKET
+    )) as TicketPermissionsType;
+    if (permissions) set(permissions);
+  });
   return ps;
 };
 
