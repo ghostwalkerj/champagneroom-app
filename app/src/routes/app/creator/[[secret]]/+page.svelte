@@ -115,6 +115,10 @@
       wallet = value;
     });
     useNewShow(currentShow, sPermissions, currentEvent);
+
+    setInterval(() => {
+      invalidateAll();
+    }, 10_000);
   });
 
   const unSubAll = () => {

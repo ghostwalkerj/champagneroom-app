@@ -278,7 +278,6 @@ export const ShowPermissionsStore = (
     showStore,
     ($showStore, set) => async () => {
       const id = $showStore._id.toString();
-      console.log('show', $showStore);
       const permissions = await fetchPermissions(id, EntityType.SHOW);
       if (permissions) set(permissions);
     }
