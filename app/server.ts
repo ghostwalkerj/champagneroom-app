@@ -65,8 +65,8 @@ const bcConfig = {
   email: process.env.BITCART_EMAIL,
   password: process.env.BITCART_PASSWORD,
   apiURL: process.env.BITCART_API_URL,
-  authSalt: process.env.BITCART_AUTH_SALT,
-  invoiceNotificationUrl: process.env.BITCART_INVOICE_NOTIFICATION_URL
+  authSalt: process.env.AUTH_SALT,
+  invoiceNotificationUrl: process.env.BITCART_INVOICE_NOTIFICATION_PATH
 } as BitcartConfig;
 
 // Workers

@@ -50,7 +50,6 @@ export const getInvoiceWorker = ({
     EntityType.INVOICE,
     async (job: Job<InvoiceJobDataType, any, InvoiceJobType>) => {
       const jobType = job.name as InvoiceJobType;
-
       switch (jobType) {
         case InvoiceJobType.CANCEL: {
           const bcInvoiceId = job.data.bcInvoiceId;
@@ -273,7 +272,6 @@ export const getInvoiceWorker = ({
             }
           }
         }
-
         case InvoiceJobType.CREATE: {
           const ticketId = job.data.ticketId;
           if (!ticketId) {
@@ -282,25 +280,31 @@ export const getInvoiceWorker = ({
           const ticket = (await Ticket.findById(ticketId)
             .populate('show')
             .orFail(() => {
+              console.error('Ticket not found');
               throw new Error('Ticket not found');
             })) as TicketDocument;
 
-          const invoice = (await createTicketInvoice({
-            ticket,
-            token: authToken,
-            bcConfig
-          })) as DisplayInvoice;
-          const ticketService = createTicketMachineService({
-            ticket,
-            show: ticket.show,
-            redisConnection
-          });
-          ticketService.send({
-            type: 'INVOICE RECEIVED',
-            invoice
-          });
-          ticketService.stop();
-          return 'success';
+          try {
+            const invoice = (await createTicketInvoice({
+              ticket,
+              token: authToken,
+              bcConfig
+            })) as DisplayInvoice;
+            const ticketService = createTicketMachineService({
+              ticket,
+              show: ticket.show,
+              redisConnection
+            });
+            ticketService.send({
+              type: 'INVOICE RECEIVED',
+              invoice
+            });
+            ticketService.stop();
+            return 'success';
+          } catch (error_) {
+            console.error(error_);
+            return 'Invoice error';
+          }
         }
 
         case InvoiceJobType.UPDATE_ADDRESS: {

@@ -153,6 +153,7 @@ export const createTicketInvoice = async ({
   token: string;
   bcConfig: BitcartConfig;
 }) => {
+  console.log('Creating ticket invoice', bcConfig);
   const response = await createInvoiceInvoicesPost(
     {
       price: ticket.price.amount,
