@@ -70,41 +70,49 @@
 
   const modalStore = getModalStore();
 
-  const useNewShow = async (
+  const useNewShow = (
     show: ShowDocument | undefined,
     showPermissions: ShowPermissionsType,
     event?: ShowEventDocument
   ) => {
-    showUnSub?.();
-    eventUnSub?.();
-    permissionUnSub?.();
+    cancelShowSubscriptions();
     sPermissions = showPermissions;
     currentShow = show;
     currentEvent = event;
     updateCount++;
-    if (show && sPermissions.isActive) {
-      setTimeout(() => {
-        const showStore = ShowStore(show);
-        showUnSub = showStore.subscribe((_show: ShowDocument | undefined) => {
-          if (_show) {
-            currentShow = _show;
-            updateCount++;
-            eventUnSub = ShowEventStore(_show).subscribe((_event) => {
-              if (_event) currentEvent = _event;
-              updateCount++;
-            });
-            permissionUnSub = ShowPermissionsStore(showStore).subscribe(
-              (_sPermissions) => {
-                if (_sPermissions) {
-                  sPermissions = _sPermissions;
-                  updateCount++;
-                }
-              }
-            );
-          }
-        });
-      }, 1000);
-    }
+
+    if (!show || !sPermissions.isActive) return;
+
+    const showStore = ShowStore(show);
+    const showEventStore = ShowEventStore(show);
+    const showPermissionsStore = ShowPermissionsStore(showStore);
+
+    showUnSub = showStore.subscribe((_show) => {
+      if (_show) {
+        currentShow = _show;
+        updateCount++;
+      }
+    });
+
+    eventUnSub = showEventStore.subscribe((_event) => {
+      if (_event && _event.show === show._id) {
+        currentEvent = _event;
+        updateCount++;
+      }
+    });
+
+    permissionUnSub = showPermissionsStore.subscribe((_sPermissions) => {
+      if (_sPermissions && _sPermissions.showId === show._id.toString()) {
+        sPermissions = _sPermissions;
+        updateCount++;
+      }
+    });
+  };
+
+  const cancelShowSubscriptions = () => {
+    showUnSub?.();
+    eventUnSub?.();
+    permissionUnSub?.();
   };
 
   onMount(() => {
@@ -116,17 +124,15 @@
     });
     useNewShow(currentShow, sPermissions, currentEvent);
 
-    setInterval(() => {
-      invalidateAll();
-    }, 10_000);
+    // setInterval(() => {
+    //   invalidateAll();
+    // }, 10_000);
   });
 
   const unSubAll = () => {
     creatorUnSub?.();
-    showUnSub?.();
     walletUnSub?.();
-    eventUnSub?.();
-    permissionUnSub?.();
+    cancelShowSubscriptions();
   };
 
   onDestroy(() => {

@@ -12,7 +12,7 @@ import maxListenersExceededWarning from 'max-listeners-exceeded-warning';
 import mongoose from 'mongoose';
 import parseArgv from 'tiny-parse-argv';
 
-import { handler } from './build/handler';
+import { handler } from './build/handler.js';
 import { EntityType } from './dist/constants';
 import { type BitcartConfig, createBitcartToken } from './dist/payments';
 import { getInvoiceWorker } from './dist/workers/invoiceWorker';
