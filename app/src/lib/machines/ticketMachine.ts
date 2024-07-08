@@ -318,6 +318,7 @@ export const ticketMachine = setup({
         const ticket = params.ticket;
         ticket.bcInvoiceId = params.invoice.id;
         ticket.paymentAddress = paymentAddress;
+        ticket.ticketState.status = TicketStatus.WAITING_FOR_PAYMENT;
         return { ticket };
       }
     ),
@@ -483,6 +484,8 @@ export const ticketMachine = setup({
       context.ticket.ticketState.status === TicketStatus.IN_ESCROW,
     ticketIsWaiting4Invoice: ({ context }) =>
       context.ticket.ticketState.status === TicketStatus.WAITING_FOR_INVOICE,
+    ticketIsWaiting4Payment: ({ context }) =>
+      context.ticket.ticketState.status === TicketStatus.WAITING_FOR_PAYMENT,
     ticketRedeemed: ({ context }) =>
       context.ticket.ticketState.status === TicketStatus.REDEEMED,
     ticketHasPaymentInitiated: ({ context }) =>
@@ -602,6 +605,10 @@ export const ticketMachine = setup({
         {
           target: '#ticketMachine.reserved.waiting4Invoice',
           guard: 'ticketIsWaiting4Invoice'
+        },
+        {
+          target: '#ticketMachine.reserved.waiting4Payment',
+          guard: 'ticketIsWaiting4Payment'
         },
         {
           target: '#ticketMachine.reserved.initiatedPayment',

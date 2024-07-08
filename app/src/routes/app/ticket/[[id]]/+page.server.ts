@@ -19,69 +19,18 @@ import type { TicketDocument } from '$lib/models/ticket';
 import {
   createTicketMachineService,
   type TicketMachineEventType,
-  type TicketMachineSnapshotType,
-  type TicketMachineStateType
+  type TicketMachineSnapshotType
 } from '$lib/machines/ticketMachine';
 
-import {
-  ActorType,
-  type CurrencyType,
-  DisputeReason,
-  RefundReason,
-  ShowStatus
-} from '$lib/constants';
+import type { DisputeReason } from '$lib/constants';
+import { ActorType, type CurrencyType, RefundReason } from '$lib/constants';
 import { createBitcartToken } from '$lib/payments';
+import { getTicketPermissions } from '$lib/server/machinesUtil';
 
 import { getInvoiceByIdInvoicesModelIdGet } from '$ext/bitcart';
 import type { DisplayInvoice } from '$ext/bitcart/models';
 
 import type { Actions, PageServerLoad } from './$types';
-
-export type TicketPermissionsType = {
-  stateValue: TicketMachineStateType['value'];
-  shouldPay: boolean;
-  canWatchShow: boolean;
-  hasPaymentSent: boolean;
-  canCancelTicket: boolean;
-  canLeaveFeedback: boolean;
-  canDispute: boolean;
-  isWaitingForShow: boolean;
-  isActive: boolean;
-  hasShowStarted: boolean;
-};
-
-const getPermissions = (state: TicketMachineStateType) => {
-  return {
-    shouldPay: state.matches({ reserved: 'waiting4Payment' }),
-    canWatchShow:
-      state.matches({ reserved: 'waiting4Show' }) || state.matches('redeemed'),
-    hasPaymentSent: state.matches({ reserved: 'initiatedPayment' }),
-    canCancelTicket:
-      (state.matches({ reserved: 'waiting4Show' }) ||
-        state.matches({ reserved: 'waiting4Payment' })) &&
-      state.context.show.showState.status !== ShowStatus.LIVE,
-    canLeaveFeedback: state.can({
-      type: 'FEEDBACK RECEIVED',
-      feedback: {
-        createdAt: new Date(),
-        rating: 5
-      }
-    }),
-    canDispute: state.can({
-      type: 'DISPUTE INITIATED',
-      dispute: ticketDisputeSchema.parse({
-        disputedBy: ActorType.CUSTOMER,
-        reason: DisputeReason.ENDED_EARLY
-      }),
-      refund: refundSchema.parse({
-        reason: RefundReason.DISPUTE_DECISION
-      })
-    }),
-    isWaitingForShow: state.can({ type: 'SHOW JOINED' }),
-    isActive: state.context.ticket.ticketState.isActive,
-    hasShowStarted: state.context.show.showState.status === ShowStatus.LIVE
-  } as TicketPermissionsType;
-};
 
 export const actions: Actions = {
   cancel_ticket: async ({ locals }) => {
@@ -105,7 +54,7 @@ export const actions: Actions = {
 
     ticketService.send(cancelEvent);
     const ss = ticketService.getSnapshot();
-    const ticketPermissions = getPermissions(ss);
+    const ticketPermissions = getTicketPermissions(ss);
     ticketService.stop();
     return {
       success: true,
@@ -143,7 +92,7 @@ export const actions: Actions = {
       feedback
     });
     const ss = ticketService.getSnapshot();
-    const ticketPermissions = getPermissions(ss);
+    const ticketPermissions = getTicketPermissions(ss);
     ticketService.stop();
     return {
       success: true,
@@ -193,7 +142,7 @@ export const actions: Actions = {
       refund
     });
     const ss = ticketService.getSnapshot();
-    const ticketPermissions = getPermissions(ss);
+    const ticketPermissions = getTicketPermissions(ss);
     ticketService.stop();
     return {
       success: true,
@@ -247,7 +196,7 @@ export const actions: Actions = {
       paymentAddress
     });
     const ss = ticketService.getSnapshot();
-    const ticketPermissions = getPermissions(ss);
+    const ticketPermissions = getTicketPermissions(ss);
     ticketService.stop();
 
     return { success: true, ticketPermissions, ticket: ss.context.ticket };
@@ -272,7 +221,7 @@ export const actions: Actions = {
       type: 'SHOW JOINED'
     });
     const ss = ticketService.getSnapshot();
-    const ticketPermissions = getPermissions(ss);
+    const ticketPermissions = getTicketPermissions(ss);
     ticketService.stop();
     return { success: true, ticketPermissions, ticket: ss.context.ticket };
   },
@@ -295,7 +244,7 @@ export const actions: Actions = {
       type: 'SHOW LEFT'
     });
     const ss = ticketService.getSnapshot();
-    const ticketPermissions = getPermissions(ss);
+    const ticketPermissions = getTicketPermissions(ss);
     ticketService.stop();
     return { success: true, ticketPermissions, ticket: ss.context.ticket };
   }
@@ -380,7 +329,7 @@ export const load: PageServerLoad = async ({ locals }) => {
     redisConnection: locals.redisConnection
   });
   const ts = tsm.getSnapshot() as TicketMachineSnapshotType;
-  const ticketPermissions = getPermissions(ts);
+  const ticketPermissions = getTicketPermissions(ts);
   tsm.stop();
 
   return {

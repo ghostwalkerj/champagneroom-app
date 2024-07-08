@@ -1,7 +1,8 @@
 import type IORedis from 'ioredis';
 import mongoose, { Error } from 'mongoose';
 
-import type { ShowDocument } from '$lib/models/show';
+import { refundSchema, ticketDisputeSchema } from '$lib/models/common';
+import { Show, type ShowDocument } from '$lib/models/show';
 import type { TicketDocument } from '$lib/models/ticket';
 import type { WalletDocument } from '$lib/models/wallet';
 import { atomicUpdateCallback } from '$lib/models/wallet';
@@ -11,10 +12,19 @@ import {
   type ShowActorType,
   type ShowMachineStateType
 } from '$lib/machines/showMachine';
-import { createTicketMachineService } from '$lib/machines/ticketMachine';
+import {
+  createTicketMachineService,
+  type TicketMachineStateType
+} from '$lib/machines/ticketMachine';
 import { createWalletMachineService } from '$lib/machines/walletMachine';
 
-import { ActorType, CancelReason } from '$lib/constants';
+import {
+  ActorType,
+  CancelReason,
+  DisputeReason,
+  RefundReason,
+  ShowStatus
+} from '$lib/constants';
 
 export type ShowPermissionsType = {
   showId: string;
@@ -25,6 +35,20 @@ export type ShowPermissionsType = {
   canStartShow: boolean;
   canCreateShow: boolean;
   isActive: boolean;
+};
+
+export type TicketPermissionsType = {
+  ticketId: string;
+  stateValue: TicketMachineStateType['value'];
+  shouldPay: boolean;
+  canWatchShow: boolean;
+  hasPaymentSent: boolean;
+  canCancelTicket: boolean;
+  canLeaveFeedback: boolean;
+  canDispute: boolean;
+  isWaitingForShow: boolean;
+  isActive: boolean;
+  hasShowStarted: boolean;
 };
 
 /**
@@ -124,6 +148,29 @@ export const getShowPermissionsFromShow = ({
   return showPermissions;
 };
 
+export const getShowPermissionsFromShowId = async ({
+  showId,
+  redisConnection
+}: {
+  showId: string | undefined;
+  redisConnection: IORedis;
+}): Promise<ShowPermissionsType> => {
+  const show = (await Show.findById(showId)) as ShowDocument;
+
+  if (!show) {
+    return getShowPermissions();
+  }
+  const showService = createShowActor({
+    show,
+    redisConnection
+  });
+
+  const showMachineState = showService.getSnapshot();
+  const showPermissions = getShowPermissions(showMachineState);
+  showService.stop();
+  return showPermissions;
+};
+
 export const getTicketMachineServiceFromId = async (
   ticketId: string,
   redisConnection: IORedis
@@ -142,6 +189,66 @@ export const getTicketMachineServiceFromId = async (
     show: ticket.show,
     redisConnection
   });
+};
+
+export const getTicketPermissions = (
+  state?: TicketMachineStateType
+): TicketPermissionsType => {
+  if (state === undefined || !state.matches) return {} as TicketPermissionsType;
+
+  const ticketPermissions = {
+    shouldPay: state.matches({ reserved: 'waiting4Payment' }),
+    canWatchShow:
+      state.matches({ reserved: 'waiting4Show' }) || state.matches('redeemed'),
+    hasPaymentSent: state.matches({ reserved: 'initiatedPayment' }),
+    canCancelTicket:
+      (state.matches({ reserved: 'waiting4Show' }) ||
+        state.matches({ reserved: 'waiting4Payment' })) &&
+      state.context.show.showState.status !== ShowStatus.LIVE,
+    canLeaveFeedback: state.can({
+      type: 'FEEDBACK RECEIVED',
+      feedback: {
+        createdAt: new Date(),
+        rating: 5
+      }
+    }),
+    canDispute: state.can({
+      type: 'DISPUTE INITIATED',
+      dispute: ticketDisputeSchema.parse({
+        disputedBy: ActorType.CUSTOMER,
+        reason: DisputeReason.ENDED_EARLY
+      }),
+      refund: refundSchema.parse({
+        reason: RefundReason.DISPUTE_DECISION
+      })
+    }),
+    isWaitingForShow: state.can({ type: 'SHOW JOINED' }),
+    isActive: state.context.ticket.ticketState.isActive,
+    hasShowStarted: state.context.show.showState.status === ShowStatus.LIVE
+  } as TicketPermissionsType;
+
+  return ticketPermissions;
+};
+
+export const getTicketPermissionsFromTicketId = async ({
+  ticketId,
+  redisConnection
+}: {
+  ticketId: string | undefined;
+  redisConnection: IORedis;
+}): Promise<TicketPermissionsType> => {
+  if (!ticketId) {
+    return getTicketPermissions();
+  }
+  const ticketService = await getTicketMachineServiceFromId(
+    ticketId,
+    redisConnection
+  );
+
+  const ticketMachineState = ticketService.getSnapshot();
+  const ticketPermissions = getTicketPermissions(ticketMachineState);
+  ticketService.stop();
+  return ticketPermissions;
 };
 
 export const getWalletMachineService = (wallet: WalletDocument) => {

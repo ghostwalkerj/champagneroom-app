@@ -5,7 +5,7 @@
 
   import type { TicketDocument } from '$lib/models/ticket';
 
-  import type { TicketPermissionsType } from './+page.server';
+  import type { TicketPermissionsType } from '$lib/server/machinesUtil';
 
   export let isLoading = false;
   export let onTicketCancelled: (

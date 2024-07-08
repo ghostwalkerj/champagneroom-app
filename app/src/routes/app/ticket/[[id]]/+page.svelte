@@ -19,11 +19,11 @@
   import { TicketStatus } from '$lib/constants';
   import type { DisplayInvoice } from '$lib/ext/bitcart/models';
   import { InvoiceStatus, type PaymentType } from '$lib/payments';
+  import type { TicketPermissionsType } from '$lib/server/machinesUtil';
   import { connect, defaultWallet, selectedAccount } from '$lib/web3';
 
   import { ShowStore, TicketStore } from '$stores';
 
-  import type { TicketPermissionsType } from './+page.server';
   // eslint-disable-next-line @typescript-eslint/naming-convention
   import CancelTicket from './CancelTicket.svelte';
   import TicketDetail from './TicketDetail.svelte';
@@ -173,8 +173,7 @@
   };
 
   onMount(() => {
-    if (!ticketPermissions.isActive) {
-      showUnSub?.();
+    if (ticketPermissions.isActive) {
       showUnSub = ShowStore(show).subscribe((_show) => {
         if (_show) {
           show = _show;
@@ -186,8 +185,6 @@
             joinShow();
         }
       });
-      invalidateAll();
-      ticketUnSub?.();
       ticketUnSub = TicketStore(ticket).subscribe((_ticket) => {
         if (_ticket) {
           ticket = _ticket;

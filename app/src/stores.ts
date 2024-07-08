@@ -17,7 +17,10 @@ import type { WalletDocument } from '$lib/models/wallet';
 import config from '$lib/config';
 import { EntityType } from '$lib/constants';
 
-import type { ShowPermissionsType } from './lib/server/machinesUtil';
+import type {
+  ShowPermissionsType,
+  TicketPermissionsType
+} from './lib/server/machinesUtil';
 
 /**
  * Returns a store that updates the provided document with incoming notifications.
@@ -253,15 +256,15 @@ export const ShowEventStore = (
  *
  * @param {string} id - The ID of the ShowDocument.
  * @param {EntityType} type - The type of the ShowDocument.
- * @return {Promise<ShowPermissionsType>} The ShowPermissionsType.
+ * @return {Promise<ShowPermissionsType | TicketPermissionsType>} The ShowPermissionsType.
  */
 const fetchPermissions = async (
   id: string,
-  type: EntityType
-): Promise<ShowPermissionsType> => {
+  type: EntityType.SHOW | EntityType.TICKET
+): Promise<ShowPermissionsType | TicketPermissionsType> => {
   const path = `${config.PATH.notifyState}/${id}?type=${type}`;
   const response = await fetch(path, { cache: 'no-store' });
-  const permissions = (await response.json()) as ShowPermissionsType;
+  const permissions = await response.json();
   return permissions;
 };
 
@@ -278,11 +281,13 @@ export const ShowPermissionsStore = (
     showStore,
     ($showStore, set) => async () => {
       const id = $showStore._id.toString();
-      const permissions = await fetchPermissions(id, EntityType.SHOW);
+      const permissions = (await fetchPermissions(
+        id,
+        EntityType.SHOW
+      )) as ShowPermissionsType;
       if (permissions) set(permissions);
     }
   );
-
   return ps;
 };
 
@@ -297,6 +302,23 @@ export const ShowStore = (show: ShowDocument): Readable<ShowDocument> =>
     doc: show,
     type: EntityType.SHOW
   });
+
+export const TicketPermissionsStore = (
+  ticketStore: Readable<TicketDocument>
+): Readable<TicketPermissionsType> => {
+  const ps = derived<Readable<TicketDocument>, TicketPermissionsType>(
+    ticketStore,
+    ($ticketStore, set) => async () => {
+      const id = $ticketStore._id.toString();
+      const permissions = (await fetchPermissions(
+        id,
+        EntityType.TICKET
+      )) as TicketPermissionsType;
+      if (permissions) set(permissions);
+    }
+  );
+  return ps;
+};
 
 /**
  * Creates a TicketStore object that encapsulates the logic for updating a TicketDocument.

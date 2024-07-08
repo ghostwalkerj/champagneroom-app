@@ -1,11 +1,11 @@
 import { error, type RequestHandler } from '@sveltejs/kit';
 import type IORedis from 'ioredis';
-import mongoose from 'mongoose';
-
-import { Show, type ShowDocument } from '$lib/models/show';
 
 import { EntityType } from '$lib/constants';
-import { getShowPermissionsFromShow } from '$lib/server/machinesUtil';
+import {
+  getShowPermissionsFromShowId,
+  getTicketPermissionsFromTicketId
+} from '$lib/server/machinesUtil';
 
 export const GET = (async ({ params, url, locals }) => {
   const id = params.id;
@@ -19,21 +19,21 @@ export const GET = (async ({ params, url, locals }) => {
     console.error('Bad Request', { type });
     error(400, 'Bad Request');
   }
-  const objectId = new mongoose.Types.ObjectId(id);
 
   switch (type) {
     case EntityType.SHOW: {
-      const show = (await Show.findById(objectId)) as ShowDocument;
-
-      if (show === null) {
-        return error(500, 'Show not found');
-      }
-      const showPermissions = getShowPermissionsFromShow({
-        show,
+      const showPermissions = await getShowPermissionsFromShowId({
+        showId: id,
         redisConnection
       });
-      console.log('Show Permissions:', showPermissions);
       return new Response(JSON.stringify(showPermissions));
+    }
+    case EntityType.TICKET: {
+      const tp = await getTicketPermissionsFromTicketId({
+        ticketId: id,
+        redisConnection
+      });
+      return new Response(JSON.stringify(tp));
     }
   }
 
