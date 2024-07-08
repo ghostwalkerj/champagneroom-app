@@ -178,16 +178,15 @@ export const ticketMachine = setup({
       _,
       params: {
         ticket: TicketDocument;
-        connection?: IORedis;
+        redisConnection: IORedis;
         paymentAddress?: string;
         paymentId?: string;
       }
     ) => {
-      if (params.connection === undefined) return;
-      const connection = params.connection as IORedis;
+      const redisConnection = params.redisConnection as IORedis;
       const ticket = params.ticket;
       const invoiceQueue = new Queue(EntityType.INVOICE, {
-        connection
+        connection: redisConnection
       });
       invoiceQueue.add(InvoiceJobType.UPDATE_ADDRESS, {
         ticketId: ticket._id,
@@ -263,12 +262,12 @@ export const ticketMachine = setup({
 
     queueCancelInvoice: (
       _,
-      params: { ticket: TicketDocument; connection?: IORedis }
+      params: { ticket: TicketDocument; redisConnection: IORedis }
     ) => {
       const ticket = params.ticket;
-      if (!ticket.bcInvoiceId || !params.connection) return;
+      if (!ticket.bcInvoiceId) return;
       const invoiceQueue = new Queue(EntityType.INVOICE, {
-        connection: params.connection
+        connection: params.redisConnection
       });
       invoiceQueue.add(InvoiceJobType.CANCEL, {
         bcInvoiceId: ticket.bcInvoiceId
@@ -276,14 +275,13 @@ export const ticketMachine = setup({
       invoiceQueue.close();
     },
 
-    createInvoice: (
+    queueCreateInvoice: (
       _,
-      params: { ticket: TicketDocument; connection?: IORedis }
+      params: { ticket: TicketDocument; redisConnection: IORedis }
     ) => {
       const ticket = params.ticket;
-      if (!params.connection) return;
       const invoiceQueue = new Queue(EntityType.INVOICE, {
-        connection: params.connection
+        connection: params.redisConnection
       });
       invoiceQueue.add(InvoiceJobType.CREATE, {
         ticketId: ticket._id
@@ -291,14 +289,14 @@ export const ticketMachine = setup({
       invoiceQueue.close();
     },
 
-    createRefundPayout: (
+    queueCreateRefundPayout: (
       _,
-      params: { ticket: TicketDocument; connection?: IORedis }
+      params: { ticket: TicketDocument; redisConnection: IORedis }
     ) => {
       const ticket = params.ticket;
-      if (!ticket.bcInvoiceId || !params.connection) return;
+      if (!ticket.bcInvoiceId) return;
       const payoutQueue = new Queue(EntityType.PAYOUT, {
-        connection: params.connection
+        connection: params.redisConnection
       }) as PayoutQueueType;
       payoutQueue.add(PayoutJobType.REFUND_SHOW, {
         bcInvoiceId: ticket.bcInvoiceId,
@@ -707,9 +705,10 @@ export const ticketMachine = setup({
                 })
               },
               {
-                type: 'createInvoice',
+                type: 'queueCreateInvoice',
                 params: ({ context }) => ({
-                  ticket: context.ticket
+                  ticket: context.ticket,
+                  redisConnection: context.redisConnection
                 })
               }
             ]
@@ -764,7 +763,7 @@ export const ticketMachine = setup({
                   type: 'queueUpdateInvoiceAddress',
                   params: ({ context, event }) => ({
                     ticket: context.ticket,
-                    connection: context.redisConnection,
+                    redisConnection: context.redisConnection,
                     paymentAddress: event.paymentAddress,
                     paymentId: event.paymentId
                   })
@@ -1274,7 +1273,7 @@ export const ticketMachine = setup({
             type: 'queueCancelInvoice',
             params: ({ context }) => ({
               ticket: context.ticket,
-              connection: context.redisConnection
+              redisConnection: context.redisConnection
             })
           },
           {
@@ -1316,10 +1315,10 @@ export const ticketMachine = setup({
             })
           },
           {
-            type: 'createRefundPayout',
+            type: 'queueCreateRefundPayout',
             params: ({ context }) => ({
               ticket: context.ticket,
-              connection: context.redisConnection
+              redisConnection: context.redisConnection
             })
           }
         ]
@@ -1353,10 +1352,10 @@ export const ticketMachine = setup({
             })
           },
           {
-            type: 'createRefundPayout',
+            type: 'queueCreateRefundPayout',
             params: ({ context }) => ({
               ticket: context.ticket,
-              connection: context.redisConnection
+              redisConnection: context.redisConnection
             })
           }
         ],
@@ -1381,7 +1380,7 @@ export const ticketMachine = setup({
             type: 'queueCancelInvoice',
             params: ({ context }) => ({
               ticket: context.ticket,
-              connection: context.redisConnection
+              redisConnection: context.redisConnection
             })
           },
           {
