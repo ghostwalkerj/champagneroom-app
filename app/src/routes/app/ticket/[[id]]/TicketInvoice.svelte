@@ -5,11 +5,7 @@
   import type { TicketDocumentType } from '$lib/models/ticket';
 
   import config from '$lib/config';
-  import {
-    currencyFormatter,
-    durationFormatter,
-    TicketStatus
-  } from '$lib/constants';
+  import { currencyFormatter, durationFormatter } from '$lib/constants';
   import { InvoiceStatus, type PaymentType } from '$lib/payments';
 
   import CopyText from '$components/CopyText.svelte';
@@ -28,31 +24,8 @@
   const today = spacetime.now();
 
   let invoiceStatusText = 'No Invoice';
-  const invoiceStatus =
-    invoice?.status || ('No Invoice' as InvoiceStatus | 'No Invoice');
-
-  switch (invoiceStatus) {
-    case InvoiceStatus.EXPIRED: {
-      invoiceStatusText = 'Invoice Expired';
-      break;
-    }
-    case InvoiceStatus.COMPLETE: {
-      invoiceStatusText = 'Invoice Paid';
-      break;
-    }
-    case InvoiceStatus.INVALID: {
-      invoiceStatusText = 'Invoice Invalid';
-      break;
-    }
-    case InvoiceStatus.REFUNDED: {
-      invoiceStatusText = 'Invoice Refunded';
-      break;
-    }
-    default: {
-      invoiceStatusText = 'No Invoice';
-      break;
-    }
-  }
+  const invoiceStatus = (invoice?.status ||
+    ('No Invoice' as InvoiceStatus | 'No Invoice')) as InvoiceStatus;
 
   const timer = setInterval(() => {
     if (invoiceTimeLeft > 0) {
@@ -61,6 +34,32 @@
   }, 1000);
 
   onMount(() => {
+    switch (invoiceStatus) {
+      case InvoiceStatus.EXPIRED: {
+        invoiceStatusText = 'Invoice Expired';
+        break;
+      }
+      case InvoiceStatus.COMPLETE: {
+        invoiceStatusText = 'Invoice Paid';
+        break;
+      }
+      case InvoiceStatus.INVALID: {
+        invoiceStatusText = 'Invoice Invalid';
+        break;
+      }
+      case InvoiceStatus.REFUNDED: {
+        invoiceStatusText = 'Invoice Refunded';
+        break;
+      }
+      case InvoiceStatus.PENDING: {
+        invoiceStatusText = 'Invoice Pending';
+        break;
+      }
+      default: {
+        invoiceStatusText = 'No Invoice';
+        break;
+      }
+    }
     return () => clearInterval(timer);
   });
 </script>
@@ -129,7 +128,7 @@
       </div>
 
       <!-- Time Left to Pay Section -->
-      {#if ticketStatus !== TicketStatus.CANCELLED && invoiceStatus !== InvoiceStatus.COMPLETE && invoiceStatus !== InvoiceStatus.INVALID && invoiceStatus !== InvoiceStatus.REFUNDED && invoiceStatus !== 'No Invoice'}
+      {#if invoiceStatus === InvoiceStatus.PENDING}
         <div class="text-warning-500 lg:text-right">
           <span class="font-bold">Time Left to Pay: </span>
           {invoiceTimeLeft ? durationFormatter(invoiceTimeLeft) : 'None'}

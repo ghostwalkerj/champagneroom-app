@@ -52,12 +52,12 @@ export enum InvoiceJobType {
 }
 
 export enum InvoiceStatus {
-  PENDING = 'Pending',
+  PENDING = 'pending',
   COMPLETE = 'complete',
   INVALID = 'invalid',
   EXPIRED = 'expired',
-  IN_PROGRESS = 'In progress',
-  FAILED = 'Failed',
+  IN_PROGRESS = 'in progress',
+  FAILED = 'failed',
   REFUNDED = 'refunded'
 }
 

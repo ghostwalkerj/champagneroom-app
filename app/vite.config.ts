@@ -63,7 +63,7 @@ const config: UserConfig = {
   },
 
   optimizeDeps: {
-    exclude: ['@ethersproject/hash', 'wrtc', 'acorn'],
+    exclude: ['@ethersproject/hash', 'wrtc', 'acorn', 'xstate'],
     include: ['@web3-onboard/core', 'js-sha3', '@ethersproject/bignumber' ],
     esbuildOptions: {
       // Node.js global to browser globalThis

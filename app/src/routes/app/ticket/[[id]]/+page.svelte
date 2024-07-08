@@ -172,6 +172,7 @@
   };
 
   onMount(() => {
+    console.log('ticketPermissions', ticketPermissions);
     if (ticketPermissions.isActive) {
       const showStore = ShowStore(show);
       showUnSub = showStore.subscribe((_show) => {
@@ -196,6 +197,7 @@
         (_ticketPermissions) => {
           if (_ticketPermissions) {
             ticketPermissions = _ticketPermissions;
+            console.log('ticketPermissions', ticketPermissions);
           }
         }
       );
@@ -250,7 +252,7 @@
       </div>
 
       <!-- Invoice -->
-      {#if !ticketPermissions.isActive}
+      {#if ticketPermissions.isActive}
         <div class="relative">
           {#key invoice}
             <TicketInvoice {invoice} {ticket} />
@@ -265,7 +267,7 @@
         </div>
       {/if}
 
-      {#if !ticketPermissions.isActive}
+      {#if ticketPermissions.isActive}
         <div class="m-3 flex flex-wrap justify-center gap-6">
           {#if ticketPermissions.shouldPay}
             {#if !$selectedAccount}
