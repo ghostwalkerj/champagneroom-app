@@ -39,23 +39,18 @@
   }
 </script>
 
-<div class="flex justify-center font-CaviarDreams">
-  <div
-    class="flex max-w-4xl flex-col overflow-hidden rounded-xl bg-black md:h-auto md:w-full"
-  >
+<div class="flex h-full justify-center font-CaviarDreams">
+  <div class="flex max-w-4xl flex-col overflow-hidden rounded-xl bg-black">
     <!-- Adjust grid layout: 2 columns on mobile, 5 on medium and larger screens -->
-    <div class="group grid h-full grid-cols-2 md:min-h-[200px] md:grid-cols-5">
+    <div class="group grid h-full grid-cols-2">
       <!-- Image Section: Take full width on mobile, 1/5th on medium and larger screens -->
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <!-- svelte-ignore a11y-no-static-element-interactions -->
-      <div
-        class="relative col-span-2 md:col-span-1"
-        on:click={toggleFullScreen}
-      >
+      <div class="relative col-span-2" on:click={toggleFullScreen}>
         <!-- Add click event to open full-screen image -->
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <div
-          class="grid h-48 w-full cursor-pointer grid-flow-row bg-cover bg-center opacity-70 md:h-full"
+          class="grid h-48 w-full cursor-pointer grid-flow-row bg-cover bg-center opacity-70"
           style="background-image: url('{showCoverImageUrl}');"
         />
         <div class="absolute inset-0 flex items-center justify-center">
@@ -71,12 +66,12 @@
 
       <!-- Content Section: Take full width on mobile, 3/5th on medium and larger screens -->
       <div
-        class="relative col-span-2 flex h-full flex-col place-content-center p-4 text-sm font-bold text-secondary-500 md:col-span-3"
+        class="relative col-span-2 flex h-full flex-col place-content-center p-4 text-sm font-bold text-secondary-500"
       >
         <!-- Ticket Status Overlays -->
         {#if ticket.ticketState.status === TicketStatus.CANCELLED || ticket.ticketState.status === TicketStatus.FINALIZED}
           <div
-            class="bg-base-200 absolute left-1/2 top-4 z-20 -translate-x-1/2 transform whitespace-normal rounded-xl p-2 text-xl font-extrabold text-primary-500 opacity-70 ring-2 ring-inset ring-primary-500 lg:text-2xl"
+            class="bg-base-200 absolute left-1/2 top-4 z-20 -translate-x-1/2 transform whitespace-normal rounded-xl p-2 text-xl font-extrabold text-primary-500 opacity-70 ring-2 ring-inset ring-primary-500"
           >
             {ticket.ticketState.status === TicketStatus.CANCELLED
               ? 'Ticket Cancelled'
@@ -101,7 +96,7 @@
 
       <!-- Right Side Content: Take full width on mobile, 1/5th on medium and larger screens -->
       <div
-        class="relative col-span-2 flex items-center border-t-2 border-dashed pb-4 md:col-span-1 md:border-l-2 md:border-t-0 md:pb-0"
+        class="relative col-span-2 flex items-center border-t-2 border-dashed pb-4"
       >
         <!-- Added dashed border -->
         <div class="m-auto font-bold text-secondary-500">

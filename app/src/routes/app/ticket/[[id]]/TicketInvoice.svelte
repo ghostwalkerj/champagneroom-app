@@ -11,10 +11,9 @@
   import CopyText from '$components/CopyText.svelte';
   import type { DisplayInvoice } from '$ext/bitcart/models';
 
-  export let invoice: DisplayInvoice | undefined;
+  export let invoice: DisplayInvoice;
   export let ticket: TicketDocumentType;
 
-  const ticketStatus = ticket.ticketState.status;
   let invoiceTimeLeft = invoice?.time_left || 0;
 
   const currentPayment = invoice?.payments?.[
@@ -90,38 +89,40 @@
 
   <!-- Invoice Content -->
   <div class="text-info-500 p-4">
-    <div class="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+    <div class="mb-4 grid grid-cols-1 gap-4">
       <div>
         <span class="text-sm font-bold">Date: </span>
         {today.format('{day-short} {date-ordinal}')}
       </div>
-      <div class="text-sm lg:text-right">
-        ( {currencyFormatter(ticket.price.currency).format(ticket.price.amount)}
-        {ticket.price.currency} equivalent )
-      </div>
-    </div>
 
-    <!-- Payment Details Grid -->
-    <div class="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
-      <!-- Payment Status Section -->
-      <div class="capitalize">
-        <span class="font-bold">Payment Status: </span>
-        {invoiceStatus}
-      </div>
+      <!-- Payment Details Grid -->
+      <div class=" grid grid-cols-1 gap-4">
+        <!-- Payment Status Section -->
+        <div class="capitalize">
+          <span class="font-bold">Payment Status: </span>
+          {invoiceStatus}
+        </div>
 
-      <!-- Amount Section -->
-      <div class="text-left lg:text-right">
-        <span class="font-bold">Amount: </span>
+        <!-- Amount Section -->
+        <div class="text-left">
+          <span class="font-bold">Amount: </span>
 
-        <CopyText copyValue={currentPayment['amount']}>
-          {currentPayment['amount']}</CopyText
-        >
-        {currentPayment['currency'].toLocaleUpperCase()}
+          <CopyText copyValue={currentPayment['amount']}>
+            {currentPayment['amount']}</CopyText
+          >
+          {currentPayment['currency'].toLocaleUpperCase()}
+        </div>
+        <div class="text-sm">
+          ( {currencyFormatter(ticket.price.currency).format(
+            ticket.price.amount
+          )}
+          {ticket.price.currency} equivalent )
+        </div>
       </div>
     </div>
 
     <!-- Rate and Time Left Section -->
-    <div class="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+    <div class="mb-4 grid grid-cols-1 gap-4">
       <div>
         <span class="font-bold">Rate: </span>
         {currentPayment['rate']}
@@ -129,14 +130,12 @@
 
       <!-- Time Left to Pay Section -->
       {#if invoiceStatus === InvoiceStatus.PENDING}
-        <div class="text-warning-500 lg:text-right">
+        <div class="text-warning-500">
           <span class="font-bold">Time Left to Pay: </span>
           {invoiceTimeLeft ? durationFormatter(invoiceTimeLeft) : 'None'}
         </div>
       {:else}
-        <div class="lg:text-right">
-          <span class="font-bold">Time Left to Pay: </span>None
-        </div>
+        <span class="font-bold">Time Left to Pay: </span>None
       {/if}
     </div>
 
