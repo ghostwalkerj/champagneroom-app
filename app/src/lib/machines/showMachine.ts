@@ -487,12 +487,11 @@ export const showMachine = setup({
   guards: {
     canCancel: (_, params: { show: ShowDocument }) => {
       const show = params.show;
-      return (
-        show.price.amount === 0 ||
+      const outstandingTickets =
+        show.showState.salesStats.ticketsReserved +
         show.showState.salesStats.ticketsSold -
-          show.showState.salesStats.ticketsRefunded ===
-          0
-      );
+        show.showState.salesStats.ticketsRefunded;
+      return outstandingTickets === 0;
     },
     showCancelled: (_, params: { show: ShowDocument }) =>
       params.show.showState.status === ShowStatus.CANCELLED,

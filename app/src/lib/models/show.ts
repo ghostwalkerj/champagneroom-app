@@ -180,4 +180,3 @@ showMongooseSchema.plugin(fieldEncryption, {
 
 export { Show, showCRUDSchema, showSchema };
 export type { ShowDocument, ShowDocumentType, ShowStateType };
-
