@@ -268,7 +268,7 @@
 
     <!-- Buttons -->
     {#if ticketPermissions.isActive}
-      <div class="m-3 flex flex-wrap justify-center gap-6">
+      <div class="m-3 flex flex-wrap justify-center">
         {#if ticketPermissions.shouldPay}
           {#if !$selectedAccount}
             <button class="variant-filled-secondary btn" on:click={connect}

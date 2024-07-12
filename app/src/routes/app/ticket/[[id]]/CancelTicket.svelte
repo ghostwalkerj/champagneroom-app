@@ -36,7 +36,7 @@
   name="cancelTicket"
   use:enhance={onSubmit}
 >
-  <div class="flex w-full justify-center px-4 lg:px-8">
+  <div class="flex w-full justify-center">
     <button
       class="variant-filled-secondary btn"
       type="submit"
