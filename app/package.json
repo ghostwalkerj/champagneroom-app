@@ -96,7 +96,7 @@
     "max-listeners-exceeded-warning": "^0.0.1",
     "module": "^1.2.5",
     "mongodb-memory-server": "^9.2.0",
-    "mongoose": "^8.3.2",
+    "mongoose": "^8.8.3",
     "mongoose-autopopulate": "^1.1.0",
     "mongoose-field-encryption": "^7.0.1",
     "mongoose-zod": "^0.1.2",
